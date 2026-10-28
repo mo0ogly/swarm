@@ -78,7 +78,7 @@ impl NativeHttpService {
                         .map_err(|e| root("budget-read", e))?;
                     serde_json::to_vec(&json!({"schema_version":1,"work_id":work,
                         "revision":current.revision,"budget":budget,"state":state}))
-                        .map_err(E::Json)?
+                        .map_err(E::ResponseJson)?
                 }
                 Operation::Preview => {
                     let mut change = swarm_engine::decode_budget_change(request.body())
@@ -103,7 +103,7 @@ impl NativeHttpService {
                         "state": state,
                         "proposed": change.budget,
                     }))
-                    .map_err(E::Json)?
+                    .map_err(E::ResponseJson)?
                 }
                 Operation::Apply => {
                     let outcome = store
@@ -119,7 +119,7 @@ impl NativeHttpService {
                     swarm_engine::encode_model(&current).map_err(E::Model)?
                 }
             };
-            Ok(RouteBody { preparation_receipt:None,
+            Ok(RouteBody { auxiliary_effects:Vec::new(), provider_probe:None, preparation_receipt:None,
                 trust_publication:None,
                 observation_causes: Vec::new(),
                 bytes,

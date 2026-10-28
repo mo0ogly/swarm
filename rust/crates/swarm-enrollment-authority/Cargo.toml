@@ -5,9 +5,13 @@ edition = "2021"
 publish = false
 
 [features]
-test-fixtures = ["swarm-enrollment-proof/test-fixtures"]
+test-fixtures = ["swarm-enrollment-proof/test-fixtures", "swarm-enrollment-config/test-fixtures"]
 
 [dependencies]
+argon2 = { version = "=0.6.0", features = ["zeroize"] }
+getrandom = "=0.4.3"
+subtle = "=2.6.1"
+zeroize = "=1.9.0"
 base64 = "=0.22.1"
 sha2 = "=0.10.9"
 swarm-identity-contract = { path = "../swarm-identity-contract", features = ["serde"] }
@@ -16,19 +20,40 @@ swarm-enrollment-state = { path = "../swarm-enrollment-state" }
 swarm-wire-json = { path = "../swarm-wire-json", features = ["timestamp"] }
 serde = { version = "=1.0.228", features = ["derive"] }
 serde_json = "=1.0.150"
-ed25519-dalek = "=2.2.0"
+ed25519-dalek = { version = "=2.2.0", features = ["zeroize"] }
 time = { version = "=0.3.55", features = ["formatting", "parsing"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
+rustix = { version = "=1.1.5", features = ["fs", "process"] }
+nix = { version = "=0.30.1", default-features = false }
 swarm-enrollment-config = { path = "../swarm-enrollment-config" }
+swarm-enrollment-bootstrap = { path = "../swarm-enrollment-bootstrap" }
+swarm-linux-identity-channel = { path = "../swarm-linux-identity-channel" }
 
 [target.'cfg(target_os = "linux")'.dev-dependencies]
+nix = { version = "=0.30.1", default-features = false, features = ["socket", "signal", "fs"] }
+rusqlite = { version = "=0.40.2", features = ["bundled"] }
 swarm-enrollment-config = { path = "../swarm-enrollment-config", features = ["test-fixtures"] }
-rustix = { version = "=1.1.5", features = ["process"] }
 
 [dev-dependencies]
 tempfile = "=3.27.0"
 
 [[example]]
 name = "authority_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "service_installation_fixture"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "provisioning_request_fixture"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "operator_package_fixture"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "initial_request_fixture"
 required-features = ["test-fixtures"]

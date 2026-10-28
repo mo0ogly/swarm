@@ -36,7 +36,7 @@ fn root_overlaps(root: &str, cwd: &str) -> bool {
 
 /// Select the initial task's prospective workspace, mirroring Go profileFor.
 /// Ordinary tasks retain the selected profile; managed tasks use the stored
-/// repository/copies/<task>-1/<subdir>. The ordinal is the first attempt, not a
+/// `repository/copies/<task>-1/<subdir>`. The ordinal is the first attempt, not a
 /// retry policy: observe refuses all attempt history before calling this helper.
 /// Require canonical stored path components and a protocol task name rather than
 /// projecting an escaping/ambiguous path. UTF-8/shape failures refuse; no path is

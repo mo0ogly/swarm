@@ -58,7 +58,7 @@ impl NativeHttpService {
                 }
             }
             .map_err(HttpServiceError::Model)?;
-            Ok(RouteBody { preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(),
+            Ok(RouteBody { auxiliary_effects:Vec::new(), provider_probe:None, preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(),
                 bytes,
                 recorded_work: None,
                 configuration_recorded: known,

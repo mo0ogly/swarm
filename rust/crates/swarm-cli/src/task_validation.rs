@@ -3,6 +3,8 @@ use crate::{json_bytes, write_output, Arguments, CliError};
 use std::io::{self, Write};
 
 /// Route bounded explicit requests to Root's authoritative validation contract.
+/// baseline-preview verifies every currently accepted native publication/original
+/// and saved-policy freshness without mutation or future publication authority.
 /// publication-preview checks an original managed opinion and current candidate,
 /// and reports first-publication support plus remaining write-admission/baseline
 /// blockers; it grants no acceptance. publish performs the protected initial
@@ -31,7 +33,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     let action = a.pos[1].as_str();
     if !matches!(
         action,
-        "review-preview" | "review-inputs" | "review-check" | "publication-preview" | "publish"
+        "review-preview" | "review-inputs" | "review-check" | "baseline-preview" | "publication-preview" | "publish"
             | "validation-preview"
             | "validation-candidate"
             | "validate"
@@ -49,7 +51,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     let root_error = |error| CliError::Root(Box::new(error));
     let mut store = swarm_engine::RootStore::open(
         std::path::Path::new(&a.root),
-        !matches!(action, "validation-preview" | "review-preview" | "review-inputs" | "review-check" | "publication-preview"),
+        !matches!(action, "validation-preview" | "review-preview" | "review-inputs" | "review-check" | "baseline-preview" | "publication-preview"),
     )
     .map_err(root_error)?;
     let mut known = None;
@@ -58,6 +60,10 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
             let value = store.publish_managed_candidate(&a.pos[2], &raw).map_err(root_error)?;
             known = Some((value.work.id.clone(),value.work.revision));
             return json_bytes(&value).map_err(CliError::Output);
+        }
+        if action == "baseline-preview" {
+            return json_bytes(&store.preview_managed_baseline(&a.pos[2], &raw).map_err(root_error)?)
+                .map_err(CliError::Output);
         }
         if action == "publication-preview" {
             return json_bytes(&store.preview_managed_publication(&a.pos[2], &raw).map_err(root_error)?)

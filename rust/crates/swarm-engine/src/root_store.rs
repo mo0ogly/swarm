@@ -45,6 +45,10 @@ pub(crate) use managed_publication::PrecheckedAcceptance;
 #[cfg(target_os = "linux")]
 pub use managed_publication::{ManagedPublicationPreview, ManagedPublicationOutcome};
 #[cfg(target_os = "linux")]
+mod managed_baseline;
+#[cfg(target_os = "linux")]
+pub use managed_baseline::{ManagedBaselinePreview, ManagedBaselineTask};
+#[cfg(target_os = "linux")]
 mod native_worker_retry;
 #[cfg(target_os = "linux")]
 mod review_recovery;
@@ -66,6 +70,28 @@ mod admin_budget;
 pub use admin_budget::{AdminBudgetPolicy,AdminBudgetChange,AdminBudgetEntry,AdminBudgetView,AdminBudgetOutcome,AdminBudgetReservationRequest,AdminBudgetReservation};
 mod material_path;
 mod trust_store;
+#[cfg(target_os="linux")]
+mod trust_enrollment;
+#[cfg(target_os="linux")]
+pub use trust_enrollment::TrustEnrollmentRequest;
+#[cfg(target_os = "linux")]
+mod trust_enrollment_call;
+#[cfg(target_os = "linux")]
+pub use trust_enrollment_call::TrustEnrollmentCallError;
+#[cfg(target_os = "linux")]
+mod paea_settlement;
+#[cfg(target_os = "linux")]
+mod paea_git_intent;
+#[cfg(target_os = "linux")]
+mod managed_git_current;
+#[cfg(target_os = "linux")]
+pub use managed_git_current::CurrentManagedGitPublication;
+#[cfg(target_os = "linux")]
+pub use paea_git_intent::{PaeaGitIntent,PaeaGitIntentReservation,PaeaGitIntentObservation,PaeaGitIntentError};
+#[cfg(target_os = "linux")]
+pub use paea_settlement::{PaeaSettlementRequest,PaeaSettlementReceipt,PaeaSettlementOutcome,PaeaSettlementError,PaeaSettlementObservation,PaeaSettlementCallError};
+#[cfg(target_os="linux")]
+mod trust_evidence_runtime;
 mod quotas;
 pub use quotas::QuotaPreview;
 const SETTINGS: &str = "engine-settings.json";
@@ -113,6 +139,10 @@ pub enum RootStoreError {
     DatabaseIdentity(Box<dyn Error + Send + Sync>),
     /// Content-free Biba/codec refusal; original typed cause retained.
     Trust(Box<crate::TrustError>),
+    /// Current common identity failed before/after a Trust callback. The complete
+    /// known reply and every independent authority/action cause remain retained.
+    #[cfg(target_os = "linux")]
+    TrustEnrollment(Box<TrustEnrollmentCallError>),
     /// Recorded trust reply or visibly uncertain file publication. No rollback
     /// is inferred; consumer must expose this marker through close/output errors.
     TrustPublished { primary: Box<Self>, publication: &'static str },
@@ -121,6 +151,8 @@ pub enum RootStoreError {
     Storage(LocalStorageError),
     Providers(crate::ProviderConfigurationError),
     Sql(rusqlite::Error),
+    /// SQL phase and independent original causes; never an Agent publication.
+    SqlTransaction(Box<dyn Error + Send + Sync>),
     Settings(EngineSettingsError),
     Pricing(crate::PricingError),
     /// Preparation codec/IO boundary, including draft writes; cause retained.
@@ -146,6 +178,10 @@ pub enum RootStoreError {
     LifecycleRecorded {
         primary: Box<Self>,
     },
+    /// Known or uncertain auxiliary write observation retained through a later
+    /// error. This is not Work/config/agent publication; inspect its typed state
+    /// and read back the same operator namespace before any new action.
+    AuxiliaryRecorded { primary: Box<Self>, effect: Box<crate::AuxiliaryEffect> },
     /// WorkEngine returned known recorded state (including replay) before a late
     /// release/representation error. Preserve identity/revision and causes; no
     /// new-write, rollback, acceptance or permission inference follows.
@@ -170,6 +206,8 @@ pub enum RootStoreError {
     Context(crate::ProjectContextError),
     Workflow(crate::AgentWorkflowError),
     PlanningReport(crate::PlanningReportError),
+    #[cfg(target_os="linux")]
+    PlanningHistory(Box<planning_history::PlanningHistoryError>),
     Review(crate::ReviewEvidenceError),
     Reply(crate::ReviewReplyError),
     ControlHistory(crate::ControlHistoryError),
@@ -314,6 +352,8 @@ impl RootStoreError {
         let mut pending:Vec<&(dyn Error+'static)>=vec![self];let mut seen:Vec<*const dyn Error>=vec![];
         while let Some(error)=pending.pop(){let pointer=error as *const dyn Error;if seen.iter().any(|p|std::ptr::eq(*p,pointer)){continue}seen.push(pointer);
             if let Some(Self::TrustPublished{publication,..})=error.downcast_ref::<Self>(){return Some(publication)}
+            #[cfg(target_os = "linux")]
+            if let Some(error)=error.downcast_ref::<TrustEnrollmentCallError>() { if let Some(publication)=error.publication(){ return Some(publication); } }
             for (_,child) in crate::native_error_links(error).children.into_iter().rev(){pending.push(child);}
         }None
     }
@@ -332,6 +372,8 @@ impl RootStoreError {
     pub fn code(&self) -> &'static str {
         match self {
             Self::Trust(e)=>e.code(),
+            #[cfg(target_os = "linux")]
+            Self::TrustEnrollment(e)=>e.code(),
             Self::TrustPublished{..}=>"trust-state-preserved",
             Self::Schema(e) => e.code(),
             #[cfg(target_os = "linux")]
@@ -353,6 +395,7 @@ impl RootStoreError {
             Self::RunLimitsBody(_) => "runtime-limit-document-invalid",
             Self::LifecycleRecorded { .. } => "agent-state-preserved",
             Self::WorkRecorded { .. } => "work-state-preserved",
+            Self::AuxiliaryRecorded { .. } => "auxiliary-state-preserved",
             Self::Published { .. } => "root-state-preserved",
             Self::Runtime(e) => e.code(),
             Self::Work(e) => e.code(),
@@ -363,6 +406,8 @@ impl RootStoreError {
             Self::Context(e) => e.code(),
             Self::Workflow(e) => e.code(),
             Self::PlanningReport(e) => e.code(),
+            #[cfg(target_os="linux")]
+            Self::PlanningHistory(e)=>e.code(),
             Self::Review(e) => e.code(),
             Self::Reply(e) => e.code(),
             Self::ControlHistory(e) => e.code(),
@@ -379,6 +424,7 @@ impl RootStoreError {
             } => "root-schema-commit-refused",
             Self::SchemaCommit { .. } => "root-schema-commit-uncertain",
             Self::Sql(_) => "root-storage",
+            Self::SqlTransaction(_) => "root-sql-transaction-failed",
             Self::Refused(s) => s,
             Self::Cleanup { .. } => "root-cleanup",
             Self::Busy { .. } => "root-storage-busy",
@@ -411,6 +457,7 @@ impl fmt::Display for RootStoreError {
             }
             Self::PreparationRecorded { id, revision, .. } => write!(f,"preparation-state-preserved ({id}, revision {revision}); re-read the same event before retrying"),
             Self::WorkRecorded { work, revision, .. } => write!(f,"work state recorded ({work}, revision {revision}); operation refused or failed; re-read before retrying"),
+            Self::AuxiliaryRecorded { .. } => f.write_str("auxiliary-state-preserved; read back before retrying"),
             Self::Published { .. } => {
                 f.write_str("root-state-preserved; re-read recorded configuration before retrying")
             }
@@ -444,6 +491,8 @@ impl Error for RootStoreError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             Self::Trust(e)=>Some(e.as_ref()),
+            #[cfg(target_os = "linux")]
+            Self::TrustEnrollment(e)=>Some(e.as_ref()),
             Self::TrustPublished{primary,..}=>Some(primary.as_ref()),
             Self::Schema(e) => Some(e.as_ref()),
             #[cfg(target_os = "linux")]
@@ -453,6 +502,7 @@ impl Error for RootStoreError {
             Self::Storage(e) => Some(e),
             Self::Providers(e) => Some(e),
             Self::Sql(e) => Some(e),
+            Self::SqlTransaction(e) => Some(e.as_ref()),
             Self::Settings(e) => Some(e),
             Self::Pricing(e) => Some(e),
             Self::Preparation(e) => Some(e.as_ref()),
@@ -466,6 +516,7 @@ impl Error for RootStoreError {
             Self::RunLimitsBody(e) => Some(e),
             Self::LifecycleRecorded { primary } => Some(primary.as_ref()),
             Self::WorkRecorded { primary, .. } => Some(primary.as_ref()),
+            Self::AuxiliaryRecorded { primary, .. } => Some(primary.as_ref()),
             Self::Published { primary } => Some(primary.as_ref()),
             Self::Runtime(e) => Some(e),
             Self::Work(e) => Some(e),
@@ -476,6 +527,8 @@ impl Error for RootStoreError {
             Self::Context(e) => Some(e),
             Self::Workflow(e) => Some(e),
             Self::PlanningReport(e) => Some(e),
+            #[cfg(target_os="linux")]
+            Self::PlanningHistory(e)=>Some(e.as_ref()),
             Self::Review(e) => Some(e),
             Self::Reply(e) => Some(e),
             Self::ControlHistory(e) => Some(e),
@@ -538,6 +591,20 @@ mod provider_configuration_store;
 #[cfg(target_os = "linux")]
 #[path = "provider_policy_store.rs"]
 mod provider_policy_store;
+#[cfg(target_os = "linux")]
+#[path = "provider_model_read.rs"]
+mod provider_model_read;
+#[cfg(target_os = "linux")]
+#[path = "provider_connections_write.rs"]
+mod provider_connections_write;
+#[cfg(target_os="linux")]
+#[path = "provider_connections_read.rs"]
+mod provider_connections_read;
+#[cfg(target_os = "linux")]
+#[path = "provider_administration.rs"]
+mod provider_administration;
+#[cfg(target_os = "linux")]
+pub use provider_administration::{ProviderAdministration,ProviderAdministrationEntry,ProviderAdministrationObservation};
 
 /// Owned datastore binding retaining both .swarm and the connected SQLite file.
 /// The directory descriptor and O_PATH database witness prevent inode reuse
@@ -749,6 +816,11 @@ pub(crate) mod reported_costs;
 pub use reported_costs::{CostSummary, CostTotal};
 #[cfg(target_os = "linux")]
 mod mission_status_read;
+mod exchange_read;
+mod log_query;
+pub use log_query::{LogQueryView,LogQueryExact,LogQueryPolicyObservation};
+mod activity_read;
+pub use activity_read::{ActivityReadView,ActivityPolicyObservation};
 #[cfg(target_os = "linux")]
 mod mission_status_evidence;
 #[cfg(target_os = "linux")]
@@ -1621,7 +1693,9 @@ impl RootStore {
     pub fn list_agents(&self, work: &str) -> Result<Vec<crate::Agent>, RootStoreError> {
         crate::list_agents(&self.db, work).map_err(RootStoreError::Agent)
     }
-    /// Read one bounded page of an agent's recorded log rows after `after`.
+    /// Read recorded log rows after `after` using the current saved log policy.
+    /// Null row bound is unlimited; source errors propagate, never fallback100.
+    /// Each call observes its policy independently of other composite reads.
     /// Observation only: no lifecycle, lease or process effect. A negative
     /// cursor is refused; an unknown agent yields an empty page, so callers
     /// confirm the agent with [`Self::read_agent`] first.
@@ -1630,14 +1704,15 @@ impl RootStore {
         agent: &str,
         after: i64,
     ) -> Result<crate::CursorPage<crate::AgentLogEntry>, RootStoreError> {
-        crate::read_agent_logs_after(&self.db, agent, after).map_err(RootStoreError::Agent)
+        crate::read_agent_logs_after(&self.db, agent, after,self.log_read_policy()?.config.values.live_log_page_rows.rows()).map_err(RootStoreError::Agent)
     }
     /// Digest of all state shown by the live views; see
     /// [`crate::read_live_fingerprint`]. Observation only, no write.
     pub fn live_fingerprint(&self) -> Result<String, RootStoreError> {
         crate::read_live_fingerprint(&self.db).map_err(RootStoreError::Agent)
     }
-    /// Read one bounded page of an agent's recorded PTY chunks after `after`.
+    /// Read recorded PTY chunks using the current saved terminal row choice.
+    /// Null is unlimited; no control socket, retention or execution grant.
     /// Same contract as [`Self::agent_logs_after`]; never opens the terminal
     /// control socket, so it grants no input or lease.
     pub fn terminal_events_after(
@@ -1645,7 +1720,7 @@ impl RootStore {
         agent: &str,
         after: i64,
     ) -> Result<crate::CursorPage<crate::TerminalChunk>, RootStoreError> {
-        crate::read_terminal_events_after(&self.db, agent, after).map_err(RootStoreError::Agent)
+        crate::read_terminal_events_after(&self.db, agent, after,self.log_read_policy()?.config.values.terminal_page_rows.rows()).map_err(RootStoreError::Agent)
     }
     /// Persist a stop intention and one idempotent command event on a writable root.
     /// Timestamp comes from the engine; all SQL errors/rollback/commit uncertainty
@@ -3581,6 +3656,18 @@ mod interruption_scope_tests {
 
 pub(crate) mod preparation_read;
 #[cfg(target_os = "linux")]
+mod preparation_budget;
+#[cfg(target_os="linux")]
+mod preparation_capture;
+#[cfg(target_os="linux")]
+mod preparation_files;
+#[cfg(target_os="linux")]
+mod preparation_attachments;
+#[cfg(target_os="linux")]
+pub use preparation_files::PreparationSourceFiles;
+#[cfg(target_os = "linux")]
+pub use preparation_budget::PreparationBudgetView;
+#[cfg(target_os = "linux")]
 mod preparation_source;
 #[cfg(target_os = "linux")]
 mod preparation_methods;
@@ -3593,4 +3680,120 @@ pub use budget_history::{HistoricalBudgetView, HistoricalBudgetShow, HistoricalB
 mod preparation_write;
 #[cfg(target_os = "linux")]
 mod preparation_conversion;
+#[cfg(target_os = "linux")]
+mod preparation_release;
+#[cfg(target_os = "linux")]
+mod preparation_organization;
 mod preparation_plan;
+
+#[cfg(target_os="linux")]
+mod preparation_templates;
+#[cfg(target_os="linux")]
+mod preparation_template_check;
+#[cfg(target_os="linux")]
+pub use preparation_templates::{PreparationTemplate,Subject as PreparationTemplateSubject,Question as PreparationTemplateQuestion,Role as PreparationTemplateRole,WorkModel as PreparationTemplateWorkModel,Increment as PreparationTemplateIncrement,Intervention as PreparationTemplateIntervention};
+#[cfg(target_os="linux")]
+pub use preparation_template_check::{Answers as PreparationTemplateAnswers,Check as PreparationTemplateCheck};
+
+#[cfg(target_os="linux")]
+mod project_profile_read;
+#[cfg(target_os="linux")]
+pub use project_profile_read::ProjectProfileStatus;
+#[cfg(target_os = "linux")]
+mod project_profile_write;
+#[cfg(target_os = "linux")]
+pub use project_profile_write::{ProjectProfileDefinition, ProjectProfileInstruction, ProjectProfileChoice, ProjectProfileCatalog, ProjectProfilePreview};
+
+mod preparation_release_review;
+pub use preparation_release_review::{PreparationReleaseReview,PreparationRevisionReview};
+
+mod preparation_dialogue;
+
+#[cfg(target_os = "linux")]
+mod preparation_call_budget;
+
+#[cfg(target_os = "linux")]
+mod preparation_call;
+#[cfg(target_os = "linux")]
+pub use preparation_call::{worker_error as preparation_worker_error,PreparationSend,PreparationCallCapabilities,PreparationApiRequest,execute_preparation_cli_gate,PreparationWorkerRequest,PreparationCliRequest,decode_send as decode_preparation_send,decode_stop as decode_preparation_stop,PreparationStop};
+
+#[cfg(target_os="linux")]
+mod preparation_proposal;
+
+#[cfg(target_os="linux")]
+#[path="provider_wait_store.rs"]
+mod provider_wait_store;
+#[cfg(target_os="linux")]
+pub use provider_wait_store::{ProviderWaitView,ProviderWaitMutation};
+
+#[cfg(target_os="linux")]
+mod preparation_call_monitor;
+
+#[cfg(target_os="linux")]
+#[path="provider_connection_probe.rs"]
+mod provider_connection_probe;
+#[cfg(target_os="linux")]
+pub use provider_connection_probe::{ApiConnectionProbeRequest,API_CONNECTION_PROBE_PROMPT};
+
+#[cfg(target_os="linux")]
+mod run_limits_admin_read;
+#[cfg(target_os="linux")]
+pub use run_limits_admin_read::{RunLimitsAdminView,RunLimitsFieldBound};
+
+#[cfg(target_os="linux")]
+mod run_limits_admin_write;
+#[cfg(target_os="linux")]
+pub use run_limits_admin_write::RunLimitsMutation;
+
+#[cfg(target_os="linux")]
+#[path="log_read_policy_store.rs"]
+mod log_read_policy_store;
+#[cfg(target_os="linux")]
+pub use log_read_policy_store::{LogReadPolicyView,LogReadPolicyBounds,LogReadPolicyMutation};
+#[cfg(target_os="linux")]
+#[path="activity_read_policy_store.rs"]
+mod activity_read_policy_store;
+#[cfg(target_os="linux")]
+pub use activity_read_policy_store::{ActivityReadPolicyView,ActivityReadPolicyBounds,ActivityReadPolicyMutation};
+#[cfg(target_os="linux")]
+#[path="graph_performance_store.rs"]
+mod graph_performance_store;
+#[cfg(target_os="linux")]
+pub use graph_performance_store::{GraphPerformanceView,GraphPerformanceBounds,GraphPerformanceMutation};
+#[cfg(target_os="linux")]
+#[path="web_request_policy_store.rs"]
+mod web_request_policy_store;
+#[cfg(target_os="linux")]
+pub use web_request_policy_store::{WebRequestView,WebRequestBounds,WebRequestMutation};
+
+mod preparation_revision_contract;
+
+mod preparation_revision;
+
+#[cfg(target_os = "linux")]
+mod runtime_health_read;
+#[cfg(target_os = "linux")]
+pub use runtime_health_read::{RuntimeHealthRead, RuntimeHealthView};
+
+#[cfg(target_os="linux")]
+pub(crate) use native_transaction::{ObservedSqlFailure,SqlEffect};
+
+#[cfg(target_os="linux")]
+mod session_visit;
+#[cfg(target_os="linux")]
+pub use session_visit::{SessionVisitView,SessionVisitMutation};
+
+#[cfg(target_os="linux")]
+mod planning_history;
+#[cfg(target_os="linux")]
+pub use planning_history::{PlanningDecisionView,PlanningHistoryError};
+
+#[cfg(target_os="linux")]
+mod lifecycle_inventory;
+#[cfg(target_os="linux")]
+pub use lifecycle_inventory::LifecycleMission;
+
+#[cfg(target_os = "linux")]
+mod mission_discovery;
+#[cfg(target_os = "linux")]
+pub use mission_discovery::MissionDiscoveryObservation;

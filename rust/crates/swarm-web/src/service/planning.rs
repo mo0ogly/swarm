@@ -65,6 +65,19 @@ pub(super) fn capabilities() -> [&'static str; 10] {
 }
 
 impl NativeHttpService {
+    /// GET/HEAD retained decisions for one existing Work; strict query/body and
+    /// common admission/binding before Root's readonly snapshot. Stored operations
+    /// are never executed or rejudged as current authority. Preserve all typed
+    /// read/response-encoding/close causes, with no empty fallback or provider.
+    pub(super) fn planning_history(&self,request:&Request<Vec<u8>>)->Result<RouteBody,E>{
+        if !matches!(*request.method(),Method::GET|Method::HEAD){return Err(E::Method("GET, HEAD"))}
+        if !request.body().is_empty(){return Err(E::Refused("planning-history-body-invalid"))}
+        let q=query(request.uri().query())?;if q.action.is_some(){return Err(E::Refused("planning-history-query-invalid"))}
+        let store=RootStore::open(&self.root,false).map_err(|e|root("open",e))?;
+        let result=(||{self.check_binding(&store)?;let value=store.planning_history(&q.work).map_err(|e|root("planning-history-read",e))?;serde_json::to_vec(&value).map(RouteBody::plain).map_err(E::ResponseJson)})();
+        close(result,store.close())
+    }
+
     /// Handle the existing planning endpoint behind shared Host/session/CSRF,
     /// transport policy and Root lane. GET/HEAD return actual Work only for show;
     /// POST forwards bounded bytes to Root's strict PlanningRequest decoder and
@@ -106,7 +119,7 @@ impl NativeHttpService {
                 store.read_work(&query.work).map_err(|e| root("read", e))?
             };
             let bytes = swarm_engine::encode_model(&work).map_err(E::Model)?;
-            Ok(RouteBody { preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(),
+            Ok(RouteBody { auxiliary_effects:Vec::new(), provider_probe:None, preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(),
                 bytes,
                 recorded_work: recorded.clone(),
                 configuration_recorded: false,

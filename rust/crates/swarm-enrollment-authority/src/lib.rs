@@ -2,11 +2,50 @@
 //! never an engine capability. Callers must independently resolve expectations
 //! and serialize final use with the current protected authority source.
 #![forbid(unsafe_code)]
+/// Personal-secret derivation and exact-record knowledge checking; no sessions or grants.
+pub mod credentials;
+/// One-time personal bootstrap and held current credential use; protected startup required.
+#[cfg(target_os = "linux")]
+pub mod personal;
 /// Linux configuration-control core; transport and protected bootstrap are not
 /// supplied by this module. Current authority is retained through storage use.
 #[cfg(target_os = "linux")]
 pub mod control;
+/// Held personal account and current business authority composition; protected startup required.
+#[cfg(target_os = "linux")]
+pub mod authenticated_control;
+/// Exact Trust action bindings and borrowed current-human identity.
+#[cfg(target_os = "linux")]
+pub use control::trust_action;
+/// Exact PAEA effect permissions and held current-account capability.
+#[cfg(target_os = "linux")]
+pub use control::paea_action;
+/// Pinned v3two-source opening; no service, account initialization or human session.
+#[cfg(target_os = "linux")]
+pub mod authenticated_startup;
+/// Private pinned signing-key snapshot loader; no service or human authority.
+#[cfg(target_os = "linux")]
+pub mod protected_signer;
+/// Owned startup-bound personal enrollment/recovery; no transport or human inference.
+#[cfg(target_os = "linux")]
+pub mod personal_lifecycle;
+/// Guarded personal-service request data; no peer admission or authority.
+#[cfg(target_os = "linux")]
+pub mod service_request;
+/// Pinned personal-service core; authenticated transport and OS custody required.
+#[cfg(target_os = "linux")]
+pub mod personal_service;
+/// Service observations and output-error retention; not peer authentication.
+#[cfg(target_os = "linux")]
+pub mod service_response;
+/// Initial operator-private material only; publication/service/approval remain separate.
+#[cfg(target_os = "linux")]
+pub mod provisioning;
+
 pub mod publication;
+/// Independently pinned Linux startup declaration and current-source preflight.
+#[cfg(target_os = "linux")]
+pub mod startup;
 
 use ed25519_dalek::SigningKey;
 use serde::{Deserialize, Serialize};

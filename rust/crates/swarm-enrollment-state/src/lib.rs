@@ -5,7 +5,7 @@
 mod bound;
 mod reply;
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
-pub use bound::BoundJournal;
+pub use bound::{BatchPreview, BoundJournal};
 use ed25519_dalek::{Signature, Signer, SigningKey, Verifier as _, VerifyingKey};
 pub use reply::{decode_active_reply, ActiveReply, ACTIVE_REPLY_SCHEMA};
 use rusqlite::{params, Connection, OpenFlags};
@@ -163,7 +163,6 @@ struct Change {
 struct Loaded {
     head: Head,
     records: HashMap<String, Entry>,
-    last: Vec<u8>,
 }
 struct Entry {
     record: Record,
@@ -174,6 +173,15 @@ fn hash(raw: &[u8]) -> String {
 }
 fn hex(raw: &[u8]) -> String {
     raw.iter().map(|b| format!("{b:02x}")).collect()
+}
+/// Preserve exact SQLite TEXT/BLOB event bytes as Go Scan([]byte) does. Storage
+/// class supplies no authority: signatures/canonical history are checked by load.
+/// Numeric/null/special representations refuse instead of becoming empty events.
+fn event_bytes(value: rusqlite::types::ValueRef<'_>) -> Result<Vec<u8>, Error> {
+    match value {
+        rusqlite::types::ValueRef::Text(raw) | rusqlite::types::ValueRef::Blob(raw) => Ok(raw.to_vec()),
+        _ => Err(Error::Change),
+    }
 }
 fn valid_id(id: &str) -> bool {
     !id.trim().is_empty() && !id.chars().any(char::is_control)
@@ -369,18 +377,12 @@ impl Journal {
         let mut rows = query.query([])?;
         let mut head = Head::default();
         let mut records = HashMap::new();
-        let mut last = Vec::new();
         while let Some(row) = rows.next()? {
             ctx.check()?;
             let sequence: i64 = row.get(0)?;
             // Go Scan([]byte) accepts both SQLite TEXT and BLOB. Authenticate
             // the unchanged bytes rather than granting meaning to a storage class.
-            let raw = match row.get_ref(1)? {
-                rusqlite::types::ValueRef::Text(raw) | rusqlite::types::ValueRef::Blob(raw) => {
-                    raw.to_vec()
-                }
-                _ => return Err(Error::Change),
-            };
+            let raw = event_bytes(row.get_ref(1)?)?;
             let change = self.decode(&raw)?;
             if head.sequence == i64::MAX
                 || sequence != head.sequence + 1
@@ -394,7 +396,6 @@ impl Journal {
                 sequence,
                 digest: hash(&raw),
             };
-            last = raw;
         }
         if head != declared {
             return Err(Error::Head);
@@ -402,48 +403,65 @@ impl Journal {
         Ok(Loaded {
             head,
             records,
-            last,
         })
     }
+    /// Apply one signed event with the original exact-last-event replay contract.
+    /// Validates pins/chain before storage, then uses one SQLite transaction. An
+    /// error after SQLite publication does not prove no change; preserve/replay
+    /// the exact signed bytes. No head is learned automatically from storage.
     pub fn apply(&self, ctx: &Context, base: &Head, raw: &[u8]) -> Result<Head, Error> {
-        if !base.valid() || base.sequence == i64::MAX {
-            return Err(Error::Head);
-        }
+        // Preserve single-event refusal precedence: base, signed frame/chain,
+        // closed state, then cancellation/storage. Batch cancellation is separate.
+        if !base.valid() || base.sequence == i64::MAX { return Err(Error::Head); }
         let change = self.decode(raw)?;
-        if change.sequence != base.sequence + 1 || change.previous != base.digest {
-            return Err(Error::Head);
-        }
+        if change.sequence != base.sequence + 1 || change.previous != base.digest { return Err(Error::Head); }
         let closed = self.closed.read().map_err(|_| Error::State)?;
-        if *closed {
-            return Err(Error::Closed);
-        }
+        if *closed { return Err(Error::Closed); }
         let c = self.connect(ctx)?;
-        self.transaction(ctx, &c, |c| {
-            let Loaded {
-                head,
-                mut records,
-                last,
-            } = self.load(ctx, c)?;
-            let next = Head {
-                sequence: change.sequence,
-                digest: hash(raw),
-            };
-            if head == next && last == raw {
+        let next = Head {sequence:change.sequence,digest:hash(raw)};
+        self.apply_prepared(ctx, &c, base, &[raw], &[change], &next)
+    }
+    /// Validate every signed change and its complete chain before installing a
+    /// connection callback or touching storage. Empty batches refuse; no implicit
+    /// count/size/attempt limit is added. Cancellation is checked between changes.
+    fn prepare_batch(&self, ctx: &Context, base: &Head, raws: &[&[u8]]) -> Result<(Vec<Change>, Head), Error> {
+        ctx.check()?;
+        if !base.valid() || base.sequence == i64::MAX { return Err(Error::Head); }
+        if raws.is_empty() { return Err(Error::Change); }
+        let mut head = base.clone();
+        let mut changes = Vec::new();
+        for raw in raws {
+            ctx.check()?;
+            let change = self.decode(raw)?;
+            if head.sequence == i64::MAX || change.sequence != head.sequence + 1 || change.previous != head.digest { return Err(Error::Head); }
+            head = Head { sequence: change.sequence, digest: hash(raw) };
+            changes.push(change);
+        }
+        Ok((changes, head))
+    }
+    /// Commit a previously validated full batch on the actual owned connection.
+    /// CAS compares the independently expected base, or accepts only exact full
+    /// batch replay at its terminal head. All intermediate events and the final
+    /// metadata update share one transaction; a later refusal rolls back earlier
+    /// writes. Does not invoke external business effects or invent authority.
+    fn apply_prepared(&self, ctx: &Context, c: &Connection, base: &Head, raws: &[&[u8]], changes: &[Change], next: &Head) -> Result<Head, Error> {
+        self.transaction(ctx, c, |c| {
+            let Loaded { head, mut records, .. } = self.load(ctx, c)?;
+            if &head == next {
+                for (change, raw) in changes.iter().zip(raws) {
+                    let stored = c.query_row("SELECT body FROM enrollment_events WHERE sequence=?", [change.sequence], |r| Ok(event_bytes(r.get_ref(0)?)))??;
+                    if stored != *raw { return Err(Error::Change); }
+                }
                 return Ok(head);
             }
-            if &head != base {
-                return Err(Error::Head);
+            if &head != base { return Err(Error::Head); }
+            for (change, raw) in changes.iter().zip(raws) {
+                ctx.check()?;
+                advance(&mut records, change)?;
+                c.execute("INSERT INTO enrollment_events(sequence,body) VALUES(?,?)", params![change.sequence, *raw])?;
             }
-            advance(&mut records, &change)?;
-            c.execute(
-                "INSERT INTO enrollment_events(sequence,body) VALUES(?,?)",
-                params![change.sequence, raw],
-            )?;
-            c.execute(
-                "UPDATE enrollment_meta SET sequence=?,digest=? WHERE singleton=1",
-                params![next.sequence, next.digest],
-            )?;
-            Ok(next)
+            c.execute("UPDATE enrollment_meta SET sequence=?,digest=? WHERE singleton=1", params![next.sequence, next.digest])?;
+            Ok(next.clone())
         })
     }
     /// Keep callbacks local and reversible. No reentry, close or waiting on writers.

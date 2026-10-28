@@ -7,7 +7,10 @@ use http::{
 use rusqlite::{params, Connection};
 use serde_json::json;
 use std::{fs, net::TcpListener, os::unix::fs::PermissionsExt, path::PathBuf};
-use swarm_engine::{encode_model, Agent, RootStore, SystemEnvironment, LIVE_PAGE_ROWS};
+use swarm_engine::{encode_model, Agent, RootStore, SystemEnvironment};
+// Explicit fixture count matches the versioned live-log default, not a shared
+// production constant or proof of telemetry policy.
+const TEST_LOG_PAGE_ROWS:usize=100;
 use swarm_web::{HttpReply, LocalWebAuthority, NativeHttpService};
 
 struct Fixture {
@@ -88,7 +91,7 @@ impl Fixture {
         let result = serde_json::json!({"schema_version": 1, "capture": capture, "capture_truncated": true});
         db.execute("UPDATE agents SET body = json_set(body, '$.native_execution_result', json(?)) WHERE id = 'child'", [result.to_string()]).unwrap();
         seed("other", &works[1], "t3", "failed", "");
-        for i in 0..(LIVE_PAGE_ROWS + 3) {
+        for i in 0..(TEST_LOG_PAGE_ROWS + 3) {
             db.execute(
                 "INSERT INTO agent_logs(agent_id,at,kind,message) VALUES('lead','2026-10-21T10:00:00Z','message',?)",
                 [format!("line {i}")],
@@ -565,7 +568,7 @@ fn agent_route_pages_logs_and_terminal_by_cursor() {
     assert!(!serde_json::to_string(&first).unwrap().contains("SECRET-DIGEST"), "no memory digest or content");
     assert_eq!(first["agent"]["resources"]["supervisor"]["state"], "not-recorded");
     let logs = first["logs"]["items"].as_array().unwrap();
-    assert_eq!(logs.len(), LIVE_PAGE_ROWS);
+    assert_eq!(logs.len());
     assert_eq!(logs[0]["message"], "line 0");
     assert_eq!(first["logs"]["more"], true);
     assert!(logs.iter().all(|l| l["message"] != "not lead"));

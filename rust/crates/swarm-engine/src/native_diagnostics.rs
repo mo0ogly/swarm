@@ -2,6 +2,17 @@
 use serde::{Deserialize, Serialize};
 use std::{error::Error, io};
 
+/// Preserve one concrete boxed adapter at each visited graph node. The inner
+/// typed error is visited next instead of Box::source skipping its own fields.
+/// Every registered handler uses this lookup, so new native handlers inherit the
+/// same supported box behavior. Opaque external/nested boxes still follow their
+/// declared source; absent metadata remains unknown, never no-effect evidence.
+fn native_ref<'a,T:Error+'static>(error:&'a(dyn Error+'static),result:&mut NativeErrorLinks<'a>,explicit:&mut bool)->Option<&'a T>{
+    if let Some(value)=error.downcast_ref::<T>(){return Some(value)}
+    if let Some(value)=error.downcast_ref::<Box<T>>(){result.children.push(("source",value.as_ref()));*explicit=true;}
+    None
+}
+
 /// Safe labels/numeric observations and borrowed known error branches. These
 /// references expire with the error; no diagnostic data can authorize a retry,
 /// refund, mutation, process or business acceptance. Unknown types use source().
@@ -10,6 +21,12 @@ pub struct NativeErrorLinks<'a> {
     pub io_errno: Option<i32>,
     pub sqlite_code: Option<i32>,
     pub children: Vec<(&'static str, &'a (dyn Error + 'static))>,
+}
+/// Classify a retained PAEA observation without rendering receipt/authority data.
+/// These labels grant no retry, independent receipt or current authority.
+#[cfg(target_os="linux")]
+fn settlement_outcome_label(outcome:&crate::PaeaSettlementOutcome)->&'static str{
+    match outcome {crate::PaeaSettlementOutcome::Recorded{replayed:false,..}=>"paea-settlement-recorded",crate::PaeaSettlementOutcome::Recorded{replayed:true,..}=>"paea-settlement-replayed",crate::PaeaSettlementOutcome::ReconciledNotCommitted{..}=>"paea-settlement-reconciled-not-committed"}
 }
 /// Inspect known compound native families without rendering private messages.
 /// Root/launch/work/storage/process/mission/identity/budget cleanup branches are explicit;
@@ -36,8 +53,12 @@ pub struct NativeErrorLinks<'a> {
 /// physical revalidation can also invalidate it after successful cleanup.
 /// The public boxed failure is explicitly unwrapped before its source() can skip
 /// the per-entry branches; direct/custom-IO/boxed paths share the same projection.
+/// Boxed Root errors are unwrapped before delegated source() can skip an
+/// auxiliary/known-state receipt; metadata itself is never added to safe labels.
 /// These labels establish no availability,
 /// repaired configuration, actor identity or permission to retry/reset counters.
+/// Linux peer credential errors retain real syscall errno separately from invalid
+/// raw PID/UID/GID observations; no errno0 or credential values are manufactured.
 pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<'a> {
     let mut result = NativeErrorLinks {
         labels: vec![],
@@ -46,15 +67,66 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
         children: vec![],
     };
     let mut explicit = false;
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::GitReferenceError>(e,&mut result,&mut explicit){
+        result.labels.push(error.code().into());result.labels.push(error.observation.code().into());
+        result.children.extend(error.branches().into_iter().map(|cause|("source",cause)));explicit=true;
+    }
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::PaeaGitIntentError>(e,&mut result,&mut explicit){
+        result.labels.push(error.code.into());
+        result.labels.push(match &error.observation{
+            crate::PaeaGitIntentObservation::NotAttempted=>"paea-git-intent-not-attempted",
+            crate::PaeaGitIntentObservation::Uncertain=>"paea-git-intent-uncertain",
+            crate::PaeaGitIntentObservation::Known(crate::PaeaGitIntentReservation::New(_))=>"paea-git-intent-known-new",
+            crate::PaeaGitIntentObservation::Known(crate::PaeaGitIntentReservation::Existing(_))=>"paea-git-intent-known-existing",
+        }.into());
+        result.children.push(("primary",error.cause.as_ref()));
+        result.children.extend(error.cleanup.iter().map(|cause|("cleanup",cause as &(dyn Error+'static))));explicit=true;
+    }
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::PaeaSettlementCallError>(e,&mut result,&mut explicit){
+        result.labels.push(error.code().into());
+        if let Some(known)=error.known_outcome(){result.labels.push(settlement_outcome_label(known).into());}
+        else if error.commit_uncertain(){result.labels.push("paea-settlement-commit-uncertain".into());}
+        result.children.extend(error.branches().into_iter().map(|cause|("source",cause)));explicit=true;
+    }
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::PaeaSettlementError>(e,&mut result,&mut explicit){
+        result.labels.push(error.code.into());
+        result.labels.push(match &error.observation{
+            crate::PaeaSettlementObservation::NotAttempted=>"paea-settlement-commit-not-attempted",
+            crate::PaeaSettlementObservation::Uncertain=>"paea-settlement-commit-uncertain",
+            crate::PaeaSettlementObservation::Known(known)=>settlement_outcome_label(known),
+        }.into());
+        result.children.push(("primary",error.cause.as_ref()));
+        result.children.extend(error.cleanup.iter().map(|cause|("cleanup",cause as &(dyn Error+'static))));explicit=true;
+    }
+
     #[cfg(target_os = "linux")]
-    if let Some(e) = e.downcast_ref::<Box<crate::MissionContinuationFailure>>() {
-        // The public observation result boxes its failure. Box::source alone
-        // skips that value and would lose the retained per-entry causes.
-        result.children.push(("source", e.as_ref()));
+    if let Some(error) = native_ref::<crate::TrustEnrollmentCallError>(e, &mut result, &mut explicit) {
+        result.labels.push(error.code().into());
+        result.children.extend(error.branches().into_iter().map(|cause| ("source", cause)));
         explicit = true;
     }
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::root_store::ObservedSqlFailure>(e, &mut result, &mut explicit) {
+        result.labels.push(error.phase().into());
+        result.labels.push(match error.effect() {crate::root_store::SqlEffect::NoMutation=>"sql-no-mutation-confirmed",crate::root_store::SqlEffect::Uncertain=>"sql-effect-uncertain"}.into());
+        result.children.extend(error.children());
+        explicit=true;
+    }
     #[cfg(target_os = "linux")]
-    if let Some(e) = e.downcast_ref::<crate::MissionContinuationFailure>() {
+    if let Some(error) = native_ref::<crate::linux_peer_credentials::Error>(e, &mut result, &mut explicit) {
+        result.labels.push(error.code().into());
+        result.io_errno = error.os_errno();
+        if let Some(cause) = error.source() { result.children.push(("linux-peer-credentials", cause)); }
+        explicit = true;
+    }
+
+
+    #[cfg(target_os = "linux")]
+    if let Some(e) = native_ref::<crate::MissionContinuationFailure>(e, &mut result, &mut explicit) {
         use crate::{MissionContinuationProgress as P, MissionWorkerContinuationState as S};
         result.labels.push("mission-continuation-failed".into());
         result.labels.push(match e.phase {
@@ -85,7 +157,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
         explicit = true;
     }
     #[cfg(target_os = "linux")]
-    if let Some(e) = e.downcast_ref::<crate::MissionWorkerDispatchFailure>() {
+    if let Some(e) = native_ref::<crate::MissionWorkerDispatchFailure>(e, &mut result, &mut explicit) {
         use crate::{
             MissionDispatchPreparationEffect as P, MissionDispatchQueueEffect as Q,
             MissionDispatchResourceRefusal as R,
@@ -153,7 +225,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
         }
         explicit = true;
     }
-    if let Some(e) = e.downcast_ref::<crate::MissionOrganizationError>() {
+    if let Some(e) = native_ref::<crate::MissionOrganizationError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         result.labels.push(e.reason().into());
     }
@@ -161,20 +233,20 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
     // supplied reply or arbitrary Display; generic source traversal stays active.
     #[cfg(target_os="linux")]
     if e.is::<crate::execution_interrupt::CompletedRoleInterrupt>(){result.labels.push("execution-interrupted".into());}
-    if let Some(e) = e.downcast_ref::<crate::BuildIdentityError>() { result.labels.push(e.code().into()); }
-    if let Some(e) = e.downcast_ref::<crate::ReviewReplyError>() {
+    if let Some(e) = native_ref::<crate::BuildIdentityError>(e, &mut result, &mut explicit) { result.labels.push(e.code().into()); }
+    if let Some(e) = native_ref::<crate::ReviewReplyError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         result.labels.push(e.reason().into());
     }
-    if let Some(e) = e.downcast_ref::<crate::ReviewEvidenceError>() {
+    if let Some(e) = native_ref::<crate::ReviewEvidenceError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         result.labels.push(e.reason().into());
     }
-    if let Some(e) = e.downcast_ref::<crate::TaskLifecycleError>() {
+    if let Some(e) = native_ref::<crate::TaskLifecycleError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         result.labels.push(e.reason().into());
     }
-    if let Some(e) = e.downcast_ref::<crate::BudgetError>() {
+    if let Some(e) = native_ref::<crate::BudgetError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         result.labels.push(e.reason().into());
         if let crate::BudgetError::Cleanup { primary, cleanup } = e {
@@ -183,10 +255,10 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
             explicit = true;
         }
     }
-    if let Some(e) = e.downcast_ref::<crate::planning_boot_clock::PlanningClockFault>() {
+    if let Some(e) = native_ref::<crate::planning_boot_clock::PlanningClockFault>(e, &mut result, &mut explicit) {
         result.labels.push(e.0.into());
     }
-    if let Some(e) = e.downcast_ref::<crate::connected_database_identity::ConnectedDatabaseIdentityError>() {
+    if let Some(e) = native_ref::<crate::connected_database_identity::ConnectedDatabaseIdentityError>(e, &mut result, &mut explicit) {
         result.labels.push(format!("database-identity-operation:{:?}", e.operation));
         if let Some(primary) = e.source() {
             result.children.push(("source", primary));
@@ -196,7 +268,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
         }
         explicit = true;
     }
-    if let Some(e) = e.downcast_ref::<crate::TelemetryStoreError>() {
+    if let Some(e) = native_ref::<crate::TelemetryStoreError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         match e {
             crate::TelemetryStoreError::Cleanup { primary, cleanup } => {
@@ -221,7 +293,9 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
             _ => {},
         }
     }
-    if let Some(e) = e.downcast_ref::<crate::RootStoreError>() {
+    // Box::source may skip the Root wrapper that owns an auxiliary receipt.
+
+    if let Some(e) = native_ref::<crate::RootStoreError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         if let crate::RootStoreError::Cleanup { primary, cleanup } = e {
             if let Some(primary) = primary {
@@ -231,7 +305,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
             explicit = true;
         }
     }
-    if let Some(e) = e.downcast_ref::<crate::AgentLaunchError>() {
+    if let Some(e) = native_ref::<crate::AgentLaunchError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         match e {
             crate::AgentLaunchError::Cleanup { primary, cleanup } => {
@@ -249,7 +323,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
             _ => {}
         }
     }
-    if let Some(e) = e.downcast_ref::<crate::WorkEngineError>() {
+    if let Some(e) = native_ref::<crate::WorkEngineError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         match e {
             crate::WorkEngineError::Rollback { primary, cleanup } => {
@@ -267,7 +341,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
             _ => {}
         }
     }
-    if let Some(e) = e.downcast_ref::<crate::RecordedChangeError>() {
+    if let Some(e) = native_ref::<crate::RecordedChangeError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         match e {
             crate::RecordedChangeError::Finalize { primary, cleanup } => {
@@ -285,7 +359,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
             _ => {}
         }
     }
-    if let Some(e) = e.downcast_ref::<crate::RecordedCommandError>() {
+    if let Some(e) = native_ref::<crate::RecordedCommandError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         if let crate::RecordedCommandError::Finalize { primary, cleanup } = e {
             result.children.push(("primary", primary.as_ref()));
@@ -293,7 +367,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
             explicit = true;
         }
     }
-    if let Some(e) = e.downcast_ref::<crate::RecordedWorkError>() {
+    if let Some(e) = native_ref::<crate::RecordedWorkError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         if let crate::RecordedWorkError::Finalize { primary, cleanup } = e {
             result.children.push(("primary", primary.as_ref()));
@@ -301,7 +375,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
             explicit = true;
         }
     }
-    if let Some(e) = e.downcast_ref::<crate::RecordedEventError>() {
+    if let Some(e) = native_ref::<crate::RecordedEventError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         if let crate::RecordedEventError::Finalize { primary, cleanup } = e {
             result.children.push(("primary", primary.as_ref()));
@@ -309,10 +383,10 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
             explicit = true;
         }
     }
-    if let Some(e) = e.downcast_ref::<crate::WorkError>() {
+    if let Some(e) = native_ref::<crate::WorkError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
     }
-    if let Some(e) = e.downcast_ref::<crate::LocalStorageError>() {
+    if let Some(e) = native_ref::<crate::LocalStorageError>(e, &mut result, &mut explicit) {
         result
             .labels
             .push(format!("storage-operation:{:?}", e.operation));
@@ -324,7 +398,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
         }
         explicit = true;
     }
-    if let Some(e) = e.downcast_ref::<crate::ValidationRunError>() {
+    if let Some(e) = native_ref::<crate::ValidationRunError>(e, &mut result, &mut explicit) {
         result
             .labels
             .push(format!("process-operation:{}", e.operation()));
@@ -339,7 +413,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
         }
         explicit = true;
     }
-    if let Some(e) = e.downcast_ref::<crate::MissionSupervisionError>() {
+    if let Some(e) = native_ref::<crate::MissionSupervisionError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         if let Some(primary) = e.source() {
             result.children.push(("source", primary));
@@ -349,7 +423,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
         }
         explicit = true;
     }
-    if let Some(e) = e.downcast_ref::<crate::SupervisorIdentityError>() {
+    if let Some(e) = native_ref::<crate::SupervisorIdentityError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         result
             .labels
@@ -362,7 +436,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
         }
         explicit = true;
     }
-    if let Some(e) = e.downcast_ref::<crate::ProjectContextError>() {
+    if let Some(e) = native_ref::<crate::ProjectContextError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         result.labels.push(e.reason().into());
         if let Some(primary) = e.source() {
@@ -373,29 +447,43 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
         }
         explicit = true;
     }
-    if let Some(e) = e.downcast_ref::<crate::AgentWorkflowError>() {
+    if let Some(error)=native_ref::<crate::GateEvaluationError>(e,&mut result,&mut explicit) {
+        result.labels.push(error.code().into());
+        result.labels.push(error.reason().into());
+        if let Some(source)=error.source(){result.children.push(("source",source));}
+        if let Some(cleanup)=error.direct_cleanup_cause(){result.children.push(("cleanup",cleanup));}
+        explicit=true;
+    }
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::anchored_artifact::AnchoredArtifactError>(e,&mut result,&mut explicit) {
+        result.labels.push(error.code().into());
+        if let Some(source)=error.primary(){result.children.push(("source",source));}
+        if let Some(cleanup)=error.direct_cleanup(){result.children.push(("cleanup",cleanup));}
+        explicit=true;
+    }
+    if let Some(e) = native_ref::<crate::AgentWorkflowError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         result.labels.push(e.reason().into());
     }
-    if let Some(e) = e.downcast_ref::<crate::ValidationEvidenceError>() {
+    if let Some(e) = native_ref::<crate::ValidationEvidenceError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
         result.labels.push(e.reason().into());
     }
-    if let Some(e) = e.downcast_ref::<crate::RuntimeError>() {
+    if let Some(e) = native_ref::<crate::RuntimeError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
     }
-    if let Some(e) = e.downcast_ref::<crate::AgentGuardError>() {
+    if let Some(e) = native_ref::<crate::AgentGuardError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
     }
-    if let Some(e) = e.downcast_ref::<crate::EngineSettingsError>() {
+    if let Some(e) = native_ref::<crate::EngineSettingsError>(e, &mut result, &mut explicit) {
         result.labels.push(e.reason().into());
     }
-    if let Some(e) = e.downcast_ref::<serde_json::Error>() {
+    if let Some(e) = native_ref::<serde_json::Error>(e, &mut result, &mut explicit) {
         result
             .labels
             .push(format!("json-category:{:?}", e.classify()));
     }
-    if let Some(e) = e.downcast_ref::<rusqlite::Error>() {
+    if let Some(e) = native_ref::<rusqlite::Error>(e, &mut result, &mut explicit) {
         result.sqlite_code = match e {
             rusqlite::Error::SqlInputError { error, .. } => Some(error.extended_code),
             _ => e.sqlite_error().map(|error| error.extended_code),
@@ -404,15 +492,15 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
             result.labels.push(format!("sqlite-code:{code}"));
         }
     }
-    if let Some(e) = e.downcast_ref::<rustix::io::Errno>() {
+    if let Some(e) = native_ref::<rustix::io::Errno>(e, &mut result, &mut explicit) {
         result.io_errno = Some(e.raw_os_error());
         result.labels.push(format!("os-errno:{}", e.raw_os_error()));
     }
-    if let Some(e) = e.downcast_ref::<nix::errno::Errno>() {
+    if let Some(e) = native_ref::<nix::errno::Errno>(e, &mut result, &mut explicit) {
         result.io_errno = Some(*e as i32);
         result.labels.push(format!("os-errno:{}", *e as i32));
     }
-    if let Some(e) = e.downcast_ref::<io::Error>() {
+    if let Some(e) = native_ref::<io::Error>(e, &mut result, &mut explicit) {
         result.labels.push(format!("io-kind:{:?}", e.kind()));
         result.io_errno = e.raw_os_error();
         if let Some(code) = result.io_errno {

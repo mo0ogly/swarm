@@ -1,6 +1,9 @@
 //! Linux protected Store, below the coordinated independent witness. No default
 //! configuration or authenticated identity is inferred from filesystem data.
 mod coordinator;
+pub mod documents;
+mod file_io;
+mod guarded_read;
 use crate::{
     decode, encode, snapshot_view, Change, Entry, Error, Head, IoClass, Pins, Projection, Snapshot,
     View,
@@ -17,7 +20,6 @@ use std::{
     ffi::OsStr,
     fmt,
     fs::File,
-    io::{Read, Write},
     os::{fd::IntoRawFd, unix::ffi::OsStrExt},
     path::Path,
     sync::{
@@ -311,6 +313,10 @@ impl Store {
             None => error,
         });
     }
+    /// Acquire immediate mutex/flock exclusion only on the still-named retained
+    /// lock inode. Substitution, unsafe paths, cancellation, closed/poisoned or
+    /// busy state refuse; after-lock validation releases before returning errors.
+    /// No queue/retry or implicit authority/checkpoint adoption is introduced.
     fn reserve<'a>(&'a self, ctx: &Context) -> Result<Reservation<'a>, Error> {
         ctx.check()?;
         let guard = self.inner.handles.try_lock().map_err(|e| match e {
@@ -318,8 +324,7 @@ impl Store {
             TryLockError::Poisoned(_) => Error::State,
         })?;
         let h = guard.as_ref().ok_or(Error::Closed)?;
-        safe_directory(&h.dir, self.inner.owner)?;
-        safe_file(&h.lock, self.inner.owner)?;
+        file_io::check_handles(h, self.inner.owner, "config.lock")?;
         unix::flock(&h.lock, FlockOperation::NonBlockingLockExclusive).map_err(|e| {
             if e == Errno::WOULDBLOCK {
                 Error::Busy
@@ -327,11 +332,15 @@ impl Store {
                 Error::io(IoClass::Storage, e)
             }
         })?;
-        Ok(Reservation {
+        let r = Reservation {
             store: self,
             guard,
             locked: true,
-        })
+        };
+        if let Err(e) = file_io::check_handles(r.handles()?, self.inner.owner, "config.lock") {
+            return r.finish(Err(e));
+        }
+        Ok(r)
     }
     pub fn read(&self, ctx: &Context, expected: &Head) -> Result<View, Error> {
         if expected.revision == 0 || !expected.valid() {
@@ -494,112 +503,39 @@ impl Reservation<'_> {
         }
         Ok(snapshot)
     }
+    /// Read exact private bytes with the shared protected descriptor path. Missing
+    /// and explicit close failures remain errors; no default configuration.
     fn read_document(&self, name: &'static str) -> Result<Vec<u8>, Error> {
-        let fd = unix::openat(
+        file_io::read_document(
             &self.handles()?.dir,
+            self.store.inner.owner,
             name,
-            OFlags::RDONLY | OFlags::NOFOLLOW | OFlags::CLOEXEC | OFlags::NONBLOCK,
-            Mode::empty(),
+            &|stage, class| self.store.fault(stage, class),
         )
-        .map_err(|e| {
-            if e == Errno::NOENT {
-                Error::NotConfigured
-            } else {
-                Error::io(IoClass::Path, e)
-            }
-        })?;
-        let mut file = File::from(fd);
-        let result = (|| {
-            safe_file(&file, self.store.inner.owner)?;
-            let mut raw = vec![];
-            file.read_to_end(&mut raw)
-                .map_err(|e| Error::io(IoClass::Storage, e))?;
-            Ok(raw)
-        })();
-        let closed = combined(
-            close(file, IoClass::Storage),
-            self.store.fault(Stage::ReadClose, IoClass::Storage),
-        );
-        combined(result, closed)
     }
+    /// Flush the retained directory; failure keeps publication indeterminate.
     fn sync_directory(&self) -> Result<(), Error> {
-        self.store
-            .fault(Stage::DirectorySync, IoClass::Indeterminate)?;
-        unix::fsync(&self.handles()?.dir).map_err(|e| Error::io(IoClass::Indeterminate, e))
+        file_io::sync_directory(&self.handles()?.dir, &|stage, class| {
+            self.store.fault(stage, class)
+        })
     }
+    /// Same-directory temp/write/fsync/close/rename/fsync with original cleanup
+    /// hooks and error ordering. Store keeps its existing result/replay contract.
     fn persist_document(
         &self,
         destination: &'static str,
         raw: &[u8],
         create: bool,
     ) -> Result<(), Error> {
-        let dir = &self.handles()?.dir;
-        safe_directory(dir, self.store.inner.owner)?;
-        let mut nonce = [0; 16];
-        self.store.fault(Stage::Entropy, IoClass::Storage)?;
-        getrandom::getrandom(&mut nonce)
-            .map_err(|e| Error::io(IoClass::Storage, std::io::Error::other(e)))?;
-        let name = format!(
-            ".config-{}",
-            nonce.iter().map(|b| format!("{b:02x}")).collect::<String>()
-        );
-        let fd = unix::openat(
-            dir,
-            name.as_str(),
-            OFlags::WRONLY | OFlags::CREATE | OFlags::EXCL | OFlags::NOFOLLOW | OFlags::CLOEXEC,
-            Mode::from_raw_mode(0o600),
+        file_io::persist_document(
+            &self.handles()?.dir,
+            self.store.inner.owner,
+            destination,
+            raw,
+            create,
+            &mut file_io::Publication::NotAttempted,
+            &|stage, class| self.store.fault(stage, class),
         )
-        .map_err(|e| Error::io(IoClass::Storage, e))?;
-        let mut file = File::from(fd);
-        let result = (|| {
-            safe_file(&file, self.store.inner.owner)?;
-            self.store.fault(Stage::Write, IoClass::Storage)?;
-            if self
-                .store
-                .fault(Stage::PartialWrite, IoClass::Storage)
-                .is_err()
-            {
-                file.write_all(&raw[..raw.len() / 2])
-                    .map_err(|e| Error::io(IoClass::Storage, e))?;
-                self.store.fault(Stage::PartialWrite, IoClass::Storage)?;
-            }
-            file.write_all(raw)
-                .map_err(|e| Error::io(IoClass::Storage, e))?;
-            self.store.fault(Stage::FileSync, IoClass::Storage)?;
-            file.sync_all().map_err(|e| Error::io(IoClass::Storage, e))
-        })();
-        let written = combined(
-            result,
-            combined(
-                close(file, IoClass::Storage),
-                self.store.fault(Stage::FileClose, IoClass::Storage),
-            ),
-        );
-        let result = written.and_then(|()| {
-            let rename = if create {
-                unix::renameat_with(dir, name.as_str(), dir, destination, RenameFlags::NOREPLACE)
-            } else {
-                unix::renameat(dir, name.as_str(), dir, destination)
-            };
-            rename.map_err(|e| {
-                if e == Errno::EXIST {
-                    Error::Exists
-                } else {
-                    Error::io(IoClass::Storage, e)
-                }
-            })?;
-            self.sync_directory()
-        });
-        let cleaned = self
-            .store
-            .fault(Stage::Unlink, IoClass::Storage)
-            .and_then(
-                |()| match unix::unlinkat(dir, name.as_str(), AtFlags::empty()) {
-                    Ok(()) | Err(Errno::NOENT) => Ok(()),
-                    Err(e) => Err(Error::io(IoClass::Storage, e)),
-                },
-            );
-        combined(result, cleaned)
     }
 }
 impl Drop for Reservation<'_> {

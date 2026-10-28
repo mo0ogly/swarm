@@ -5,3 +5,9 @@
 .trust-primary{background:var(--wattson-action-fond);color:var(--wattson-action-encre);border-color:var(--wattson-action-bordure);font-weight:600}
 
 summary{color:var(--wattson-texte);cursor:pointer}
+#trust-role-settings{border:1px solid var(--wattson-ligne);min-width:0;margin-block:1rem}
+#trust-role-pairs,#trust-role-principals{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));gap:0 1rem}
+#trust-role-settings legend{color:var(--wattson-texte);font-weight:600}
+#trust-audit-summary{overflow-wrap:anywhere;white-space:pre-wrap}
+
+#trust-identity-sources { overflow-wrap: anywhere; }

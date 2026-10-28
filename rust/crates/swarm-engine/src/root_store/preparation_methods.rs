@@ -56,3 +56,18 @@ pub(super) fn catalogue(root: &Path, cap: Option<usize>) -> Result<PreparationRe
     }
     Ok(PreparationReadObservation { value: methods, causes })
 }
+
+/// Read the selected finite method's full UTF-8 sources and verify their exact
+/// aggregate against the caller's current catalogue hash. Sources are private
+/// prompt input only; no arbitrary path, silent fallback on IO, or execution
+/// permission is introduced. Concurrent byte changes refuse before admission.
+pub(super) fn prompt_sources(root:&Path,method:&PreparationMethod,cap:Option<usize>)->Result<std::collections::BTreeMap<String,String>,E>{
+    let mut sources=std::collections::BTreeMap::new();let mut joined=String::new();
+    for path in &method.paths {
+        let bytes=super::preparation_source::read_source(root,path,bundled(path)?,cap)?;
+        joined.push_str(&format!("{path}\0{:x}\n",Sha256::digest(&bytes)));
+        sources.insert(path.clone(),String::from_utf8(bytes).map_err(|e|super::preparation_read::cause("preparation-method-utf8",e))?);
+    }
+    if format!("{:x}",Sha256::digest(joined.as_bytes()))!=method.sha256{return Err(E::Refused("preparation-stale-method"));}
+    Ok(sources)
+}

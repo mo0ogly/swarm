@@ -566,3 +566,26 @@ fn external_deadline_and_cancellation_keep_the_first_reason_without_any_timer_po
     assert_eq!(s.read(&active, &first.head).unwrap(), first);
     s.close().unwrap();
 }
+
+/// Replacing a lock name must not create two independent exclusion domains for
+/// an existing source. Exact original inode restoration permits explicit reuse.
+#[test]
+fn store_replaced_lock_refuses_old_descriptor_until_exact_inode_is_restored() {
+    let (root, s) = fixture();
+    let ctx = Context::new();
+    let t = at("2026-10-17T12:00:00Z");
+    let v = s
+        .create(&ctx, &change("initial", Head::default()), t)
+        .unwrap();
+    assert_eq!(s.read(&ctx, &v.head).unwrap(), v);
+    let lock = root.path().join("config.lock");
+    let held = root.path().join("held.lock");
+    fs::rename(&lock, &held).unwrap();
+    fs::write(&lock, b"replacement").unwrap();
+    fs::set_permissions(&lock, fs::Permissions::from_mode(0o600)).unwrap();
+    code(s.read(&ctx, &v.head), "path");
+    fs::remove_file(&lock).unwrap();
+    fs::rename(&held, &lock).unwrap();
+    assert_eq!(s.read(&ctx, &v.head).unwrap(), v);
+    s.close().unwrap();
+}

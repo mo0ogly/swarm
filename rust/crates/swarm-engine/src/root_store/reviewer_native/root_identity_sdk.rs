@@ -185,6 +185,7 @@ fn database_helper(root: &Path, out: &Path, action: &str, job: &str, child: u32,
 /// Wait for either the actual child's barrier or explicit parent cancellation.
 /// A failed controller that never releases grant cannot strand a helper thread.
 /// No elapsed-time bound or repeated polling sleep is introduced.
+/// Shared raw credential validation rejects PID0/invalid UID-GID before peer fields select the child.
 fn barrier_worker(listener: UnixListener, cancel: UnixStream, root: PathBuf, out: PathBuf, job: String, attack: bool) -> Result<()> {
     let mut peer = None;
     let result = (|| -> Result<()> {
@@ -205,9 +206,9 @@ fn barrier_worker(listener: UnixListener, cancel: UnixStream, root: PathBuf, out
         let mut ready = [0_u8; 1];
         connection.read_exact(&mut ready)?;
         require(ready == *b"P", "post-grant barrier frame required")?;
-        let credentials = rustix::net::sockopt::socket_peercred(&*connection)?;
-        require(credentials.uid == rustix::process::geteuid(), "barrier peer uid mismatch")?;
-        let child = u32::try_from(credentials.pid.as_raw_pid())?;
+        let credentials = crate::linux_peer_credentials::read(&*connection)?;
+        require(credentials.uid() == rustix::process::geteuid().as_raw(), "barrier peer uid mismatch")?;
+        let child = u32::try_from(credentials.pid())?;
         database_helper(&root, &out, "prepare", &job, child, attack)?;
         connection.write_all(b"R")?;
         Ok(())

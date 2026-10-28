@@ -462,6 +462,7 @@ fn original_fresh(material: &Material, row: &Run) -> Result<(), E> {
 /// precede grant consumption; registered PID/starttime/parent/group and committed
 /// permission precede exec. Empty EOF is not execution proof. No OS confinement,
 /// cryptographic identity, descendant termination or business acceptance implied.
+/// Shared raw credential validation rejects PID0/invalid UID-GID before grant or Root use.
 pub fn execute_planning_gate(root: &Path, claim: &str) -> Result<Infallible, E> {
     if !swarm_identity_contract::name(claim.as_bytes()) {
         return Err(E::Refused("planning-gate-claim-invalid"));
@@ -478,9 +479,9 @@ pub fn execute_planning_gate(root: &Path, claim: &str) -> Result<Infallible, E> 
     let operation = (|| {
         crate::supervisor_identity::arm_parent_death_signal()
             .map_err(|e| caused("planning-gate-parent-death", e))?;
-        let peer = rustix::net::sockopt::socket_peercred(&channel)
+        let peer = crate::linux_peer_credentials::read(&channel)
             .map_err(|e| caused("planning-gate-peer-credentials", e))?;
-        if peer.uid != rustix::process::geteuid() {
+        if peer.uid() != rustix::process::geteuid().as_raw() {
             return Err(E::Refused("planning-gate-peer-user-changed"));
         }
         let mut grant = [0u8; 1];
@@ -492,7 +493,7 @@ pub fn execute_planning_gate(root: &Path, claim: &str) -> Result<Infallible, E> 
         }
         let mut store = RootStore::open(root, false)?;
         let (material, row) = finished(
-            store.prepare_planning_gate(claim, i64::from(peer.pid.as_raw_pid())),
+            store.prepare_planning_gate(claim, i64::from(peer.pid())),
             store.close(),
         )?;
         let transport = crate::native_provider_exec::PreparedExec::prepare(

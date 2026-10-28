@@ -92,7 +92,10 @@ fn fixture() -> (tempfile::TempDir, String, String) {
             },
         },
         service_uid: rustix::process::geteuid().as_raw(),
-        controller_uid: !rustix::process::geteuid().as_raw(),
+        controller_uid: match rustix::process::geteuid().as_raw() {
+            0 => 1,
+            uid => !uid,
+        },
         configuration_directory: root.path().join("configuration").to_str().unwrap().into(),
         witness_directory: root.path().join("witness").to_str().unwrap().into(),
     };

@@ -11,36 +11,280 @@
         "en": "Local delivery: an unchanged candidate also checks retained qualification; missing proof triggers rebuilding, incoherent proof refuses before stopping the server."
       },
       {
+        "fr": "Consultation CLI : mission seen raccordé au marque-page existant, JSON historique et confirmation FR/EN ; reçu conservé si la sortie échoue.",
+        "en": "CLI consultation: mission seen connects to the existing bookmark, with historical JSON and FR/EN confirmation; receipt retained if output fails."
+      },
+      {
+        "fr": "Pilotage web : la découverte des missions observe les réglages sans réserver le verrou Admin ; les contrôles de départ restent séparés.",
+        "en": "Web supervision: mission discovery observes settings without taking the Admin reservation; departure checks remain separate."
+      },
+      {
+        "fr": "Biba : identité humaine courante et intention exacte en API/CLI ; lanceur dédié avec droit signé provisionné séparément et pin indépendant, sans repli local. Admin FR/EN distingue admission et refus journalisé ; le serveur normal reste sans source enrôlée activée. Le bouton enrôlé reste inactif sans source après une action Admin et pendant une requête.",
+        "en": "Biba: current human identity and exact intent through API/CLI; dedicated launcher with separately provisioned signed permission and independent pin, without local fallback. FR/EN Admin distinguishes admission from recorded refusal; the normal server has no active enrollment source. The enrolled button stays unavailable without a source after an Admin action and during a request."
+      },
+      {
+        "fr": "Échanges historiques : consultation et arrêt explicite des tours Go actifs, renvoi exact sans nouveau départ ; aucun signal hérité, réservations et coûts engagés conservés.",
+        "en": "Historical exchanges: observe and explicitly stop active Go turns, exact replay without another launch; no inherited signals, reservations and committed costs preserved."
+      },
+      {
+        "fr": "Historique natif des décisions de planification en API/CLI et lecture explicite cockpit ; opérations historiques affichées sans exécution ni autorité actuelle.",
+        "en": "Native planning decision history in API/CLI and explicit cockpit reading; historical operations displayed without execution or current authority."
+      },
+      {
+        "fr": "Actions de confiance : séparation des rôles par principaux déclarés, audit transactionnel attribué et signatures Ed25519 avec double contrôle, checkpoint indépendant et gestion Admin FR/EN. Effets locaux simulés ; confinement général et stockage immuable non qualifiés. La réconciliation relit l’effet historique sans appliquer la matrice de rôles d’un nouvel effet.",
+        "en": "Trust Actions: role separation by declared principals, attributed transaction audit and Ed25519 signatures with dual control, independent checkpoint and FR/EN Admin management. Local simulated effects; general confinement and immutable storage remain unqualified. Reconciliation reads back the historical effect without applying the role matrix for a new effect."
+      },
+      {
+        "fr": "Audit Biba : refus attribué sur cible absente et révocation indépendante des registres de deux racines, sans retrait de la clé privée d’une autre instance.",
+        "en": "Biba audit: attributed missing-target refusal and independent revocation of two Root registries, without removing another instance’s private key."
+      },
+      {
+        "fr": "Consultation : une révision enregistrée négative est refusée par le moteur ; le marquage public peut remplacer ce repère invalide sans valider de tâche.",
+        "en": "Consultation: negative stored revisions are refused by the engine; public marking can replace the invalid bookmark without accepting a task."
+      },
+      {
+        "fr": "Erreurs API : les échecs de sérialisation des réponses sont des erreurs serveur500 avec cause conservée ; les documents reçus invalides restent400.",
+        "en": "API errors: response serialization failures are server500 errors with retained causes; invalid received documents remain400."
+      },
+      {
+        "fr": "PAEA : réponse canonique en un paquet, cause d’envoi et résultat métier conservés après erreur ; refus avant envoi et EPIPE vérifiés sans changement global SIGPIPE. Bibliothèque seulement, daemon et comptes distincts encore à qualifier.",
+        "en": "PAEA: canonical single-packet response, retained send cause and business result after error; pre-send refusals and EPIPE verified without global SIGPIPE change. Library only; daemon and distinct accounts remain unqualified."
+      },
+      {
+        "fr": "Consultation native d’une mission : repère hôte/UID séparé de la validation des tâches, lecture explicite et contrôle de révision ; résultat conservé après erreur de sortie.",
+        "en": "Native mission consultation: host/UID bookmark separate from task acceptance, explicit readback and revision fencing; outcome retained after output errors."
+      },
+      {
+        "fr": "PAEA : création atomique du processus et de son pidfd, entrées et signaux explicites, conservation du processus après erreur tardive. Bibliothèque GNU vérifiée ; daemon et séparation réelle des comptes restent à qualifier.",
+        "en": "PAEA: atomic process and pidfd creation, explicit inputs and signals, retained process after late failure. Verified GNU library; daemon and actual account separation remain unqualified."
+      },
+      {
+        "fr": "PAEA : liaison du paquet au processus contrôleur créé indépendamment, en conservant les contrôles de domaine et les effets connus après erreur. Un autre émetteur de même UID est refusé. Bibliothèque seulement ; lancement protégé et deux UID réels restent à qualifier.",
+        "en": "PAEA: packet bound to independently spawned controller process while retaining domain checks and known effects after error. A different sender with the same UID refuses. Library only; protected launch and actual distinct UIDs remain unqualified."
+      },
+      {
+        "fr": "PAEA : liaison du paquet noyau au rôle contrôleur et à un domaine de namespaces conservé indépendamment, avant décodage et dispatch. Erreurs et réponse connues conservées après fermeture ; bibliothèque seulement, daemon et deux UID réels encore à qualifier.",
+        "en": "PAEA: kernel packet bound to retained controller role and independently retained namespace domain before decoding and dispatch. Known reply/errors survive close refusal; library only, daemon and actual distinct UIDs remain unqualified."
+      },
+      {
+        "fr": "Diagnostic de stockage natif en lecture explicite : mêmes seuils Admin, liaison au projet conservée sans nouvelle lecture SQLite dans le serveur, causes indisponibles visibles.",
+        "en": "Explicit native storage diagnostic: shared Admin thresholds, retained project binding without new server SQLite reads, and visible unavailable observations."
+      },
+      {
+        "fr": "PAEA : création privée du paquet opérateur sous intention durable, ancre avant paquet et réconciliation épinglée sans nouvelle génération. Effets connus conservés après refus tardif ; aucun compte/service créé, aucune identité humaine ou autorité courante prouvée.",
+        "en": "PAEA: private operator package creation under durable intent, anchor before package and pinned reconciliation without fresh generation. Known effects survive late refusal; no account/service created or human identity/current authority proven."
+      },
+      {
+        "fr": "Biba : retours métier et replays médiatisés avec accusé borné sans contenu inférieur ; Admin HTTP soumis à une identité I3 courante après initialisation ; modification des politiques non portées refusée. Les missions ordinaires restent hors de cette qualification.",
+        "en": "Biba: business returns and replays use mediated acknowledgements without lower-level content; HTTP Admin requires a current I3 identity after setup; edits to unported policies refuse. Ordinary missions remain outside this qualification."
+      },
+      {
+        "fr": "Recherche native de journaux : filtres littéraux et pagination, réglages persistants pour recherche/CLI/live/terminal dans l’Admin, et curseurs décimaux exacts pour éviter les arrondis du navigateur.",
+        "en": "Native log search: literal filters and pagination, persisted Admin settings for search/CLI/live/terminal reads, and exact decimal cursors to avoid browser rounding."
+      },
+      {
+        "fr": "PAEA : ancre privée immuable des pins de demande et de paquet, relecture durable distincte d’une validation par pin et contrôle CLI sans création de matière. La confiance du localisateur reste à établir ; aucune identité humaine ni installation de service prouvée.",
+        "en": "PAEA: immutable private request/package pin anchor, durable reread distinct from pin validation and readonly CLI check without material generation. Locator trust remains a caller precondition; no human identity or service installation proven."
+      },
+      {
+        "fr": "Historique d’activité : les résultats de revue à critères structurés sont lus avec leur contrat d’affichage, sans être confondus avec une commande ; les champs affichés invalides restent refusés.",
+        "en": "Activity history: review results with structured criteria use the display contract instead of being mistaken for commands; invalid displayed fields still refuse."
+      },
+      {
+        "fr": "Sources projet : les guides ordinaires restent utilisables ; les leçons mémoire locales et leurs références restent refusées, même retirées, avec inventaire en lecture seule lié au Root.",
+        "en": "Project sources: ordinary guides remain usable; local memory lessons and references remain refused, including withdrawn versions, through a read-only Root-bound inventory."
+      },
+      {
+        "fr": "Fil d’activité natif : lecture paginée explicite, curseur complet et réglages persistants dans la modale Admin ; les origines enregistrées restent des indications non authentifiées.",
+        "en": "Native activity feed: explicit paginated reads, full cursor and persisted settings in the Admin modal; recorded origins remain unauthenticated observations."
+      },
+      {
+        "fr": "Préparation CLI : choix explicite du niveau de modèle autorisé, sans remplacement automatique ; niveau privé conservé jusqu’au worker et vérification d’un envoi connu après retrait des capacités.",
+        "en": "CLI preparation: explicitly choose an allowed model level without automatic substitution; retain the private level through worker execution and verify a known send after capability withdrawal."
+      },
+      {
+        "fr": "Livraison locale : sélection explicite par SHA256 du dernier candidat Rust qualifié, profil/archive/métadonnées revérifiés avant arrêt et refus des rétrogradations ; les sources plus récentes restent en attente.",
+        "en": "Local delivery: explicitly select the latest qualified Rust candidate by SHA256, recheck profile/archive/metadata before shutdown and refuse downgrades; newer sources remain pending."
+      },
+      {
+        "fr": "Échanges entre agents Rust : liste historique par mission, CLI/API compatibles et lecture explicite dans le cockpit ; ordre et pièces déclarées conservés, sans envoi ni accusé implicite.",
+        "en": "Rust agent exchanges: historical Work-scoped list, compatible CLI/API and explicit cockpit reading; ordering and declared artifacts preserved, without sending or implicit acknowledgements."
+      },
+      {
+        "fr": "Objectifs de performance des graphes Rust : profils, nombre de mesures et cibles p95 persistés, réglables dans le dialogue Admin et partagés API/CLI ; aperçu sans écriture et relecture des reçus, sans lancer de benchmark.",
+        "en": "Rust graph performance targets: saved workload profiles, sample count and p95 targets, editable in the Admin dialog and shared by API/CLI; read-only preview and receipt readback, without starting a benchmark."
+      },
+      {
+        "fr": "Préparation Rust : fournisseurs CLI Claude/Codex configurés, entrée privée, limites Admin, arrêt et réponse structurée ; aucune certification d’isolation du fournisseur externe.",
+        "en": "Rust preparation: configured Claude/Codex CLI providers, private input, Admin limits, cancellation and structured replies; external provider isolation is not certified."
+      },
+      {
+        "fr": "Confirmations Admin renforcées : reçu lié à la demande et historique effectivement relu pour les attentes navigateur/fournisseur et les limites SQL ; réponses incomplètes ou contradictoires jamais présentées comme un succès.",
+        "en": "Stronger Admin confirmation: request-bound receipts and actual history readback for browser/provider waiting and SQL limits; incomplete or contradictory replies never shown as success."
+      },
+      {
+        "fr": "Préparation Rust : comparaison et application explicite des révisions de plan, historiques conservés, mission pausée et nouvelle autorisation requise ; reçus incomplets gardés en attente de vérification.",
+        "en": "Rust preparation: compare and explicitly apply plan revisions, preserve history, pause the mission and require new start authorization; incomplete receipts stay pending for verification."
+      },
+      {
+        "fr": "Attentes navigateur Rust : politique web-requests compatible, historique et aperçu Admin/API/CLI ; délais persistés du transport commun, récupération des réglages indépendante et aucun arrêt d’agent implicite.",
+        "en": "Rust browser waiting: compatible web-requests policy, history and Admin/API/CLI preview; saved common-transport deadlines, independent settings recovery and no implicit agent stop."
+      },
+      {
+        "fr": "Préparation Rust : ajout des missions à un travail existant avec révisions contrôlées, conservation des historiques et autorisation limitée aux nouvelles tâches.",
+        "en": "Rust preparation: append missions to an existing work with revision checks, preserved history and authorization limited to the new tasks."
+      },
+      {
+        "fr": "Limites d’exécution Rust : lecture par portée, aperçu, enregistrement et retour historique via Admin, API et CLI ; révisions et tentatives déjà gelées préservées.",
+        "en": "Rust execution limits: scope reads, preview, save and historical rollback through Admin, API and CLI; revisions and already frozen attempts preserved."
+      },
+      {
+        "fr": "Profils projet Rust : catalogue, aperçu par rôle et enregistrement explicite avec contrôle d’empreinte ; refus des secrets reconnaissables dans les métadonnées et des alias de sources privées, sans lancer d’agent.",
+        "en": "Rust project profiles: catalogue, per-role preview and explicit save with digest checks; refuse recognizable secrets in metadata and private-source aliases, without starting an agent."
+      },
+      {
+        "fr": "Test de connexion API Rust : message fixe sans contexte de mission, clé facultative, réglages persistés, annulation locale et résultat conservé ; dialogue Admin FR/EN.",
+        "en": "Rust API connection test: fixed message without mission context, optional key, saved settings, local cancellation and retained result; FR/EN Admin dialog."
+      },
+      {
+        "fr": "Préparation Rust : rejouer un échange Go terminé sans relancer de fournisseur ni modifier son budget ; conserver le refus explicite des anciens tours actifs et des nouveaux niveaux non portés.",
+        "en": "Rust preparation: replay a completed Go turn without another provider call or budget change; retain explicit refusal of legacy active turns and unported new levels."
+      },
+      {
+        "fr": "Compatibilité historique d’attente : les métadonnées de changement acceptées par Go restent lisibles et conservées ; validation stricte des nouvelles demandes et premier rejeu exact, vérifiés par comparaison Go/Rust.",
+        "en": "Wait history compatibility: change metadata accepted by Go remains readable and preserved; strict new-request validation and first exact replay verified by a Go/Rust comparison."
+      },
+      {
+        "fr": "Préparation IA Rust : appels texte API explicites en JSON/SSE, budget réservé avant contact, arrêt observé et propositions enregistrées seulement après comparaison. Activation et limites dans Admin ; anciens tours actifs toujours refusés.",
+        "en": "Rust AI preparation: explicit text API calls using JSON/SSE, budget reserved before contact, observed cancellation and proposals saved only after comparison. Activation and limits in Admin; legacy active turns still refused."
+      },
+      {
+        "fr": "Attente API Rust : réglages Go compatibles et historique partagé API/CLI ; dialogue Admin avec aperçu, enregistrement et relecture explicite après incident. Test fournisseur encore à migrer.",
+        "en": "Rust API waiting: compatible Go settings and shared API/CLI history; Admin dialog with preview, saving and explicit readback after an incident. Provider testing remains to be migrated."
+      },
+      {
+        "fr": "Configuration sans changement : la confirmation du fichier synchronisé reste visible dans les erreurs CLI et observations HTTP, sans prétendre une nouvelle modification.",
+        "en": "Unchanged configuration: confirmation of synchronized state remains visible in CLI errors and HTTP observations without claiming a new mutation."
+      },
+      {
+        "fr": "Erreurs CLI : l’état de configuration conservé après publication, sortie ou fermeture est aussi exposé en JSON hors des sessions web ; relire avant de reprendre.",
+        "en": "CLI errors: configuration state preserved after publication, output or close is also exposed in JSON outside web sessions; reread before recovery."
+      },
+      {
+        "fr": "Préparation Rust : historique des échanges IA enregistré lisible en CLI/API et dans l’interface existante. Prompts privés exclus ; aucun appel ni arrêt automatique. Les tours actifs restent explicitement indisponibles.",
+        "en": "Rust preparation: recorded AI conversation history is readable in CLI/API and the existing interface. Private prompts excluded; no call or automatic stop on reads. Legacy active turns remain explicitly unavailable."
+      },
+      {
+        "fr": "Connexions API Rust : aperçu puis enregistrement lié aux sources, conservation/remplacement explicite de clé, historique privé et parcours CLI partagé ; test fournisseur encore à migrer.",
+        "en": "Rust API connections: source-bound preview then save, explicit key preservation/replacement, private history and shared CLI; provider testing remains to be migrated."
+      },
+      {
+        "fr": "Préparation Rust : revue des missions converties disponible en CLI et API avec les mêmes révisions et contrats courants, sans libérer les tâches. Les causes observées restent conservées lors des refus.",
+        "en": "Rust preparation: converted-mission review is available in CLI and API with the same current revisions and contracts, without releasing tasks. Observed causes survive refusals."
+      },
+      {
+        "fr": "Connexions API Rust : lecture des déclarations avec empreinte et clés masquées ; enregistrement et test HTTP encore à migrer.",
+        "en": "Rust API connections: read declarations with digest and masked keys; saving and HTTP testing remain to be migrated."
+      },
+      {
+        "fr": "Consignes projet Rust : statut du profil et sources observées par rôle en CLI/API et dans la préparation. Les contenus des réglages Claude restent ignorés ; les refus de consignes exposent un motif statique sûr, sans changer les droits.",
+        "en": "Rust project instructions: profile status and observed per-role sources in CLI/API and preparation. Claude settings contents remain ignored; instruction refusals expose a safe static reason without changing permissions."
+      },
+      {
+        "fr": "Formulaires historiques : valeurs hors catalogue conservées sans remplacement silencieux ; raccordement au cockpit Rust encore ouvert.",
+        "en": "Historical forms: retain out-of-catalogue values without silent replacement; Rust cockpit integration remains open."
+      },
+      {
+        "fr": "PAEA : les contrôles CLI identity refusent les options de projet même égales aux valeurs par défaut, les inconnues et les doublons, avant toute lecture de bootstrap. Les erreurs d’arguments restent en texte.",
+        "en": "PAEA: CLI identity checks reject project options even at default values, unknown options and duplicates before bootstrap IO. Argument errors remain plain text."
+      },
+      {
+        "fr": "Admin fournisseurs Rust : politiques réellement sauvegardées, catalogue déclaré local, état des exécutables et causes conservées, sans appel IA au chargement.",
+        "en": "Rust provider Admin: actually saved policies, declared local catalogue, executable state and retained causes, without model calls on load."
+      },
+      {
+        "fr": "PAEA : commandes natives d’enrôlement personnel depuis un démarrage épinglé : initialisation explicite, consommation unique et reprise, secrets hors des arguments et résultats connus conservés après échec de sortie. Service, UX d’enrôlement, UID séparé et confinement restent à établir.",
+        "en": "PAEA: native personal enrollment from pinned startup: explicit initialization, single consumption and recovery, secrets outside argv and known results retained after output failure. Personal service, enrollment UX, separate UID and confinement remain to be established."
+      },
+      {
+        "fr": "Préparation Rust : les dix modèles existants retrouvent questionnaire et graphe du portail. Le besoin peut être créé avec sa méthode ; le plan adapté reste à enregistrer explicitement. Limites de réponse et de brouillon configurables dans Admin, sans autorisation de lancement.",
+        "en": "Rust preparation: the ten existing templates regain their questionnaire and portal graph. The need can be created with its method; the adapted plan still requires explicit saving. Answer and draft limits are configurable in Admin, without launch authorization."
+      },
+      {
+        "fr": "API Rust de résolution des modèles : usages page/travail, défauts enregistrés et restrictions automatiques conservées, sans lancer de fournisseur.",
+        "en": "Rust model resolution API: page/work purposes, saved defaults and automatic restrictions preserved without starting a provider."
+      },
+      {
+        "fr": "Préparation Rust : découverte et aperçu des sources, attachement avec empreinte relue et retrait récupérable ; douze réglages documentaires Admin. Le décodage conserve les budgets finis malgré les doublons JSON et rejoue les anciens reçus équivalents.",
+        "en": "Rust preparation: discover and preview sources, attach with reread digest and recoverable removal; twelve documentary Admin settings. Decoding preserves finite budgets across duplicate JSON members and replays equivalent historical receipts."
+      },
+      {
+        "fr": "Livraison locale Rust : distinguer les tests inutilisés des vraies entrées compilées, tout en refusant les sources, outils ou métadonnées modifiés pendant le build.",
+        "en": "Local Rust delivery: distinguish unused tests from actual compiled inputs while refusing changed sources, tools or metadata during the build."
+      },
+      {
+        "fr": "API Rust des politiques fournisseurs : lecture liée au digest, aperçu et application protégés avec la validation CLI commune, sans lancer de fournisseur.",
+        "en": "Rust provider policy API: source-bound digest read, protected preview and application with shared CLI validation, without starting a provider."
+      },
+      {
+        "fr": "Préparation Rust : lire réservations, estimations engagées et couverture des coûts/jetons dans la modale, le CLI et l’API. Un coût absent reste inconnu ; l’alerte utilise les réglages Admin.",
+        "en": "Rust preparation: read reservations, committed estimates and cost/token coverage in the modal, CLI and API. Missing cost remains unknown; warnings use Admin settings."
+      },
+      {
+        "fr": "Publication native cumulative : conserver les anciens avis et tâches, relier chaque publication à la précédente et distinguer la base du worker du parent du candidat. Les contrôles et la revue de toute la cohorte restent obligatoires.",
+        "en": "Cumulative native publication: preserve earlier reviews and tasks, link each publication to its predecessor and distinguish worker base from candidate parent. Whole-cohort controls and review remain required."
+      },
+      {
+        "fr": "Préparation Rust : enregistrer une enveloppe USD explicite, avec source et date, sans modifier la consommation ni démarrer un appel. Le relevé de consommation reste à raccorder.",
+        "en": "Rust preparation: save an explicit USD envelope with source and date, without changing consumption or starting a call. The consumption statement remains to be connected."
+      },
+      {
+        "fr": "PAEA : précontrôle natif d’une déclaration de démarrage épinglée, liée au journal signé, au projet et à l’enrôlement courant. Refus de révocation ou de contexte périmé ; aucune authentification humaine, requête autorisée ou service démarré par ce contrôle.",
+        "en": "PAEA: native preflight of a pinned startup declaration, bound to the signed journal, project and current enrollment. Revoked or stale contexts are refused; this check establishes no human authentication, authorized request or started service."
+      },
+      {
+        "fr": "Préparation Rust : configurer explicitement une équipe CLI en revue humaine sur des tâches converties intactes, avec plafonds saisis, defaults de revue Admin courants, reçu atomique et rejeu. Les tâches restent verrouillées ; leur départ reste séparé.",
+        "en": "Rust preparation: explicitly configure a CLI human-review team on pristine converted tasks, with entered limits, current Admin reviewer defaults, atomic receipt and replay. Tasks remain locked; start authorization stays separate."
+      },
+      {
+        "fr": "Baseline native : vérifier les publications et originaux des tâches déjà acceptées, puis refuser le prochain candidat ou job si cette preuve est invalide. Lecture CLI explicite, sans nouvelle autorisation de publication cumulative.",
+        "en": "Native baseline: verify publications and originals of already accepted tasks, then refuse the next candidate or job if that evidence is invalid. Explicit CLI inspection, without a new cumulative-publication grant."
+      },
+      {
         "fr": "Workers après publication native : récupération explicite du candidat publié avant création de la copie dépendante, sans retour silencieux à la base initiale. Les prérequis sont contrôlés avant toute copie pour éviter un blocage après refus.",
         "en": "Workers after native publication: explicitly fetch the published candidate before preparing its dependent copy, without silently falling back to the initial base. Prerequisites are checked before any copy to prevent a refusal from blocking the next admission."
       },
       {
-        "fr": "Préparation Rust : créer explicitement un nouveau travail et ses missions verrouillées depuis un plan vérifié, avec revalidation des limites Admin et reçu atomique rejouable ; aucun démarrage ni équipe configurée implicitement.",
-        "en": "Rust preparation: explicitly create a new work and its locked tasks from a validated plan, rechecking Admin limits with an atomic replayable receipt; no implicit start or team configuration."
+        "fr": "Préparation Rust : autoriser explicitement le départ des tâches converties après revue du travail actuel, avec double contrôle de révision, verrous et reçu atomiques rejouables. Un conducteur configuré peut ensuite démarrer selon ses droits et budgets ; aucun fournisseur n’est appelé par cette commande.",
+        "en": "Rust preparation: explicitly authorize converted tasks after reviewing current work, with dual revision checks, atomic locks and replayable receipt. A configured conductor may then start under its permissions and budgets; this command calls no provider."
       },
       {
         "fr": "Première publication gérée native : publier le candidat contrôlé et accepter la tâche atomiquement, avec reçu canonique, rejeu sans nouvel appel et refus explicite des baselines cumulatives non portées. Les empreintes et le commit résultat sont rapprochés du candidat contenu dans l’original privé des contrôles.",
         "en": "First native managed publication: atomically publish the checked candidate and accept its task, with a canonical receipt, replay without another call and explicit refusal of unported cumulative baselines. Binding and result commit are matched to the candidate held in the private control original."
       },
       {
+        "fr": "Préparation Rust : créer explicitement un nouveau travail et ses missions verrouillées depuis un plan vérifié, avec revalidation des limites Admin et reçu atomique rejouable ; aucun démarrage ni équipe configurée implicitement.",
+        "en": "Rust preparation: explicitly create a new work and its locked tasks from a validated plan, rechecking Admin limits with an atomic replayable receipt; no implicit start or team configuration."
+      },
+      {
         "fr": "PAEA : menu Campagnes de laboratoire, commande explicite sur binaire figé et lecture locale du rapport des huit scénarios. Contre-exemple des aliases visible ; aucune exécution web, autorité protégée ou évaluation indépendante.",
         "en": "PAEA: Laboratory campaigns menu, explicit command with a pinned binary and local reading of the eight-scenario report. Visible alias counterexample; no web execution, protected authority or independent evaluation."
-      },
-      {
-        "fr": "PAEA : rapprocher un accord fourni avec le contenu exact de l’action et sa politique, distinguer correspondance, différence et fichier invalide ; exemples fictifs et rapport commun CLI/API, sans authentification ni accord validé. Couleurs du bouton primaire synchronisées entre thèmes pour préserver le contraste.",
-        "en": "PAEA: compare a supplied approval with exact action content and policy, distinguish match, mismatch and invalid input; fictional examples and shared CLI/API report, without authentication or validated approval. Primary-button theme colors switch together to preserve contrast."
-      },
-      {
-        "fr": "Préparation manuelle raccordée au Rust : page existante, besoin/brief/plan, méthode, décisions, historique et conflits. Limites Admin effectives, reprise des reçus incertains ; dialogue IA encore indisponible.",
-        "en": "Manual preparation connected to Rust: existing page, need/brief/plan, method, decisions, history and conflicts. Effective Admin limits and uncertain-receipt recovery; AI dialogue still unavailable."
       },
       {
         "fr": "Prépublication gérée : contrôle explicite de l’avis natif, des originaux de contrôle et du candidat courant ; blocages de publication et de baseline affichés, sans acceptation ni nouvel appel.",
         "en": "Managed prepublication: explicit native-opinion, original-control and current-candidate checks; publication and baseline blockers remain visible, without acceptance or another call."
       },
       {
+        "fr": "PAEA : rapprocher un accord fourni avec le contenu exact de l’action et sa politique, distinguer correspondance, différence et fichier invalide ; exemples fictifs et rapport commun CLI/API, sans authentification ni accord validé. Couleurs du bouton primaire synchronisées entre thèmes pour préserver le contraste.",
+        "en": "PAEA: compare a supplied approval with exact action content and policy, distinguish match, mismatch and invalid input; fictional examples and shared CLI/API report, without authentication or validated approval. Primary-button theme colors switch together to preserve contrast."
+      },
+      {
         "fr": "PAEA : examiner une action depuis le menu, lire ses termes exacts, son contexte déclaré et ses sources ordonnées ; empreintes et rapport commun CLI/API téléchargeable, sans accord ni effet.",
         "en": "PAEA: inspect an action from the menu, read exact terms, declared context and ordered sources; hashes and shared CLI/API report download, without approval or effect."
+      },
+      {
+        "fr": "Préparation manuelle raccordée au Rust : page existante, besoin/brief/plan, méthode, décisions, historique et conflits. Limites Admin effectives, reprise des reçus incertains ; dialogue IA encore indisponible.",
+        "en": "Manual preparation connected to Rust: existing page, need/brief/plan, method, decisions, history and conflicts. Effective Admin limits and uncertain-receipt recovery; AI dialogue still unavailable."
       },
       {
         "fr": "Reviewer natif géré : appel de cohorte avec candidat retenu, protocole et limites d’origine conservés, contexte adressé par contenu et reprise sans nouvel appel ; aucune acceptation de tâche.",
@@ -933,6 +1177,74 @@
       {
         "fr": "Migration Rust en qualification : lecture JSON d’un worker terminé et de son rapport réellement soumis, en attente de revue sans acceptation implicite.",
         "en": "Rust migration under qualification: JSON observation of a completed worker and its actually submitted report, pending review without implicit acceptance."
+      },
+      {
+        "fr": "Construction native : conserver le statut Git complet sans invalider des métadonnées HEAD/modifié inchangées pour un nouveau rapport ou test hors compilation ; les contrôles des entrées compilées restent actifs.",
+        "en": "Native builds: retain full Git status without invalidating unchanged HEAD/dirty metadata for a new report or test outside compilation; effective compiler-input guards remain active."
+      },
+      {
+        "fr": "PAEA : installation privée et appel opérateur natif du noyau personnel avec messages binaires sans secrets en argv ; compte et mandat courants, phases et résultats connus conservés après erreur de sortie/fermeture. Consommateur de réponse lié à la demande disponible en bibliothèque ; canal de service, UID séparées et UX d’installation encore à raccorder.",
+        "en": "PAEA: private installation and native operator calls into the personal core with binary input and no argv secrets; current account/grant, phases and known results survive output/close errors. Request-bound response consumer available as a library; service channel, separate UIDs and installer UX still to connect."
+      },
+      {
+        "fr": "Moteur Linux : les gates de planification, validation et revue lisent les credentials bruts du pair puis refusent explicitement un PID invisible/nul ; distinction conservée entre données invalides et vrai errno, sans modifier les grants ni les droits.",
+        "en": "Linux engine: planning, validation and review gates read raw peer credentials and explicitly reject invisible/zero PIDs; invalid data stays distinct from actual errno, without changing grants or rights."
+      },
+      {
+        "fr": "Préparation du canal personnel PAEA : buffers secrets exacts et refus des rôles inattendus vérifiés en fixtures. Le raccordement au service, la séparation réelle des UID et l’authentification humaine restent à terminer.",
+        "en": "PAEA personal channel preparation: exact secret buffers and unexpected-role refusals verified in fixtures. Service integration, actual UID separation and human authentication remain unfinished."
+      },
+      {
+        "fr": "PAEA : les UID réservées invalides sont refusées dans les déclarations Go/Rust et avant création des secrets ; les UID valides ne prouvent ni compte ni autorité. Installation du canal et séparation réelle restent ouvertes.",
+        "en": "PAEA: reserved invalid UIDs refuse in Go/Rust declarations and before secret generation; valid UIDs prove neither an account nor authority. Channel installation and actual separation remain open."
+      },
+      {
+        "fr": "PAEA : précontrôle natif des demandes initiales privées, épinglées et canoniques ; refus des entrées dangereuses et validation conservée après erreur de sortie. Ce contrôle ne crée aucun secret ou service.",
+        "en": "PAEA: native preflight of private pinned canonical initial requests; unsafe inputs refuse and output errors retain known validation. This check creates no material or service."
+      },
+      {
+        "fr": "PAEA : lecture du paquet opérateur sous pin indépendant et export privé déterministe du seul artefact de service, avec rapprochement de l’UID contrôleur, refus de remplacement et réconciliation explicite. Aucune identité humaine ou installation de service établie.",
+        "en": "PAEA: independently pinned operator package reading and deterministic private export of the service-only artifact, with controller UID matching, no-replace refusal and explicit reconciliation. No human identity or service installation established."
+      },
+      {
+        "fr": "PAEA : échange contrôlé unique sur canal privé, avec contrôle atomique existant, fermeture explicite et réponse canonique ; résultats connus et causes indépendantes conservés après refus. Bibliothèque qualifiée, sans daemon ni séparation réelle des comptes revendiqués.",
+        "en": "PAEA: one controlled exchange over a private channel, with existing atomic controller gate, explicit close and canonical response; known results and independent causes retained on refusal. Qualified library, without daemon or actual account-separation claims."
+      },
+      {
+        "fr": "Historique de planification : traduction anglaise des titres et exigences vérifiée dans la vue réelle.",
+        "en": "Planning history: English title and requirement labels verified in the actual view."
+      },
+      {
+        "fr": "Inventaire natif des missions actives, archivées et en corbeille : lecture explicite sans restauration ni suppression.",
+        "en": "Native inventory of active, archived and trashed missions: explicit read without restoration or deletion."
+      },
+      {
+        "fr": "PAEA : observation Linux en lecture seule par CLI, API protégée et page dédiée ; préconditions manquantes et erreurs visibles, rapport exportable. Aucune activation, séparation des comptes, exécution de helper ou qualification de confinement déduite des métadonnées.",
+        "en": "PAEA: read-only Linux observation through CLI, protected API and dedicated page; missing prerequisites and errors visible, report exportable. No activation, account separation, helper execution or confinement qualification inferred from metadata."
+      },
+      {
+        "fr": "PAEA : permission exacte distincte pour paiement fictif et promotion Git, sous compte et droit courant retenus ; noyau de bibliothèque uniquement, services protégés et séparation Linux encore requis.",
+        "en": "PAEA: separate exact permissions for fictitious payment and Git promotion under held current account and grant; library core only, protected services and Linux separation still required."
+      },
+      {
+        "fr": "PAEA : noyau de règlement fictif dans un grand livre distinct, unicité de facture et reprise d’engagement incertain ; politique relue, erreurs après effet conservées. Bibliothèque de référence : séparation activée refusée tant que l’admission attribuée manque, aucun daemon protégé activé.",
+        "en": "PAEA: fictitious settlement kernel in a separate ledger, invoice uniqueness and uncertain-commit recovery; observed current policy and retained after-effect failures. Reference library: enabled separation refuses until attributed admission is connected; no protected daemon activated."
+      },
+      {
+        "fr": "PAEA : le reçu du règlement fictif refuse les métadonnées incohérentes de projet, politique, enrôlement et date ; historique et erreurs conservés. Bibliothèque de référence, sans nouveau service protégé.",
+        "en": "PAEA: fictitious settlement receipts reject inconsistent project, policy, enrollment and time metadata; history and errors are retained. Reference library, no new protected service."
+      },
+      {
+        "fr": "PAEA : protocole Git natif sous verrou, avec annulation, échéance et résultat incertain conservés. Bibliothèque en attente du service protégé et de son intention durable ; aucun nouveau parcours de publication Git dans l’interface.",
+        "en": "PAEA: native Git protocol under a retained lock, preserving cancellation, deadlines and uncertain outcomes. Library awaiting the protected service and its durable intent; no new Git publication workflow in the interface."
+      },
+      {
+        "fr": "PAEA : journal natif d'intentions Git avec association projet explicite, unicité métier durable indépendante du transport et conservation des COMMIT SQL incertains ; six tests du journal et neuf cas Git passent. Le service protégé et la réconciliation terminale restent à raccorder.",
+        "en": "PAEA: native Git intent journal with explicit project binding, durable business uniqueness independent of transport, and retained uncertain SQL COMMITs; six journal tests and nine Git cases pass. Protected service and terminal reconciliation remain unwired."
+      },
+      {
+        "fr": "PAEA : le lecteur de publication vérifie les originaux de toutes les publications historiques, même lors du rejeu de la plus récente. Le dernier candidat cumulatif est observable sans autorisation implicite ; certificats altérés refusés et restauration vérifiée sur fixture native inerte. Service Git protégé encore à raccorder.",
+        "en": "PAEA: the publication reader verifies originals of every historical publication, including replay of the latest one. The latest cumulative candidate can be observed without implied authority; altered certificates refuse and recovery is checked on an inert native fixture. Protected Git service remains unwired."
       }
     ]
   },

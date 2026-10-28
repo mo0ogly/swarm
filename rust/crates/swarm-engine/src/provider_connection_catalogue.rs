@@ -1,5 +1,6 @@
-//! Validate the inherited API-connection namespace without executing an API.
-//! Secrets stay in read-only input bytes; only a whole-source hash is returned.
+//! Validate inherited API-connection metadata without executing an API.
+//! Namespace guard returns only a source hash; separate inventory projection
+//! discloses stored public fields and key presence, never key bytes.
 #![cfg(target_os = "linux")]
 use crate::{
     model_wire::{Fields, Kind},
@@ -8,12 +9,56 @@ use crate::{
 use serde::Deserialize;
 use std::collections::BTreeMap;
 
-/// Only the namespace discriminator is consumed. The projector validates every
-/// inherited field's type before dropping unused endpoint/model/key data.
-#[derive(Default, Deserialize)]
+/// Complete inherited connection record. Deserialize-only: no Debug/Serialize
+/// can accidentally disclose credentials. Namespace guard consumes disabled only;
+/// operator inventory deliberately projects a separate redacted public record.
+#[derive(Clone, Default, Deserialize)]
 #[serde(default)]
-struct ConnectionState {
-    disabled: bool,
+pub(crate) struct ConnectionState {
+    pub(crate) id: String,
+    pub(crate) label: String,
+    pub(crate) base_url: String,
+    pub(crate) model: String,
+    pub(crate) key: String,
+    pub(crate) disabled: bool,
+}
+
+/// Redacted Go-compatible inventory row, not availability or execution authority.
+/// Endpoint/model are stored operator declarations; only key presence is public.
+#[derive(serde::Serialize)]
+pub struct ApiConnectionPublic {
+    pub id: String,
+    pub label: String,
+    pub base_url: String,
+    pub model: String,
+    pub disabled: bool,
+    pub has_key: bool,
+    pub provider: String,
+}
+/// One actual source digest with sorted redacted records; absence hashes empty
+/// bytes while stored null hashes its actual bytes. No API call or write occurs.
+#[derive(serde::Serialize)]
+pub struct ApiConnectionCatalogue {
+    pub version: i64,
+    pub digest: String,
+    pub connections: Vec<ApiConnectionPublic>,
+}
+
+/// Project existing decoded records without exposing key bytes. Unlike the
+/// namespace-only guard, public selection metadata requires row ID to equal its
+/// authoritative map key; inconsistent stored identities refuse, never redirect
+/// selection silently. Invalid shape retains the existing typed decode cause.
+/// Endpoint contents are stored metadata, not validation or contact permission.
+pub(crate) fn public(raw: Option<&[u8]>) -> Result<ApiConnectionCatalogue, AgentLaunchError> {
+    let entries = match raw { Some(bytes) => decode(bytes)?.connections.unwrap_or_default(), None => BTreeMap::new() };
+    let mut connections = Vec::new();
+    for (id, entry) in entries {
+        if entry.id != id { return Err(AgentLaunchError::Refused("provider-connection-record-identity-invalid")); }
+        connections.push(ApiConnectionPublic { provider: format!("api-{id}"), id,
+            label: entry.label, base_url: entry.base_url, model: entry.model,
+            disabled: entry.disabled, has_key: !entry.key.is_empty() });
+    }
+    Ok(ApiConnectionCatalogue { version: 1, digest: crate::agent_launch_preflight::hash(raw.unwrap_or_default()), connections })
 }
 #[derive(Default, Deserialize)]
 #[serde(default)]
@@ -27,7 +72,7 @@ fn wrapper_shape() -> Fields {
 }
 /// Existing Go AIConnection wire fields. Endpoint/key values grant no capability
 /// and are never returned, serialized, logged or used to create a process here.
-fn connection_shape() -> Fields {
+pub(crate) fn connection_shape() -> Fields {
     &[
         ("id", Kind::String),
         ("label", Kind::String),
@@ -51,6 +96,13 @@ fn decode(raw: &[u8]) -> Result<Projection, AgentLaunchError> {
     crate::work::decode_mode(&wrapped, wrapper_shape(), true)
         .map_err(|e| AgentLaunchError::caused("agent-api-connections-catalogue-invalid", e))
 }
+/// Decode the complete private inherited map for explicit configuration writers.
+/// No serialization/logging or permission follows; callers must apply current
+/// source, identity, endpoint, policy and publication checks before persistence.
+pub(crate) fn records(raw: Option<&[u8]>) -> Result<BTreeMap<String, ConnectionState>, AgentLaunchError> {
+    match raw { Some(raw) => Ok(decode(raw)?.connections.unwrap_or_default()), None => Ok(BTreeMap::new()) }
+}
+
 /// Check namespace conflicts and selected-provider support against one complete
 /// read-only API catalogue and the decoded CLI catalogue. Absent/map-null/empty
 /// metadata permits unrelated CLI selection; active `api-<map-key>` names collide

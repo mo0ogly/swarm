@@ -6,6 +6,8 @@ use std::io::{self, Write};
 /// Configuration/snapshot metadata grants no readiness, identity or execution.
 /// Close/serialization/write/flush failures remain visible and preserve a real
 /// completed mutation. No-op/preview does not pretend a new file was written.
+/// A successful apply includes synchronized no-op state. Late errors retain
+/// that knowledge without claiming new bytes, a snapshot or a fresh mutation.
 pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
     if a.pos.len() < 3
         || a.pos[1] != "config"
@@ -71,13 +73,13 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         matches!(op, "init" | "apply"),
     )
     .map_err(root_error)?;
-    let mut changed = false;
+    let mut configuration_known = false;
     let result = (|| match op {
         "init" => {
             let view = store
                 .initialize_provider_configuration(config.as_ref().ok_or(CliError::Usage)?)
                 .map_err(root_error)?;
-            changed = true;
+            configuration_known = true;
             json_bytes(&view).map_err(CliError::Output)
         }
         "show" => json_bytes(&store.provider_configuration().map_err(root_error)?)
@@ -100,7 +102,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
             let view = store
                 .apply_provider_configuration(change.as_ref().ok_or(CliError::Usage)?)
                 .map_err(root_error)?;
-            changed = view.changed;
+            configuration_known = view.applied;
             json_bytes(&view).map_err(CliError::Output)
         }
         _ => Err(CliError::Unsupported),
@@ -115,7 +117,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         }),
     };
     result.map(|()| 0).map_err(|primary| {
-        if changed {
+        if configuration_known {
             CliError::ConfigurationStatePreserved {
                 primary: Box::new(primary),
                 english: a.language == "en",

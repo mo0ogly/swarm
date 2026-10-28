@@ -42,6 +42,30 @@ pub enum NativeServerError {
     },
 }
 impl NativeServerError {
+    /// Keep exact auxiliary observations through response/observer/stop failures.
+    /// Empty is missing retained evidence, not rollback; no retry or grant follows.
+    pub fn auxiliary_effects(&self)->Vec<swarm_engine::AuxiliaryEffect>{
+        let mut result=swarm_engine::auxiliary_effects(self);
+        match self {
+            Self::Service(error)=>swarm_engine::extend_auxiliary_effects(&mut result,error.auxiliary_effects()),
+            Self::Observation(error)=>swarm_engine::extend_auxiliary_effects(&mut result,error.auxiliary_effects()),
+            Self::StoppedOutput{report,..}=>swarm_engine::extend_auxiliary_effects(&mut result,report.last_auxiliary_effects.clone()),
+            Self::OutcomeEncoding{outcome,..}=>swarm_engine::extend_auxiliary_effects(&mut result,outcome.auxiliary_effects.clone()),
+            Self::SessionState{primary}=>swarm_engine::extend_auxiliary_effects(&mut result,primary.auxiliary_effects()),
+            Self::Cleanup{primary,cleanup}=>{swarm_engine::extend_auxiliary_effects(&mut result,primary.auxiliary_effects());swarm_engine::extend_auxiliary_effects(&mut result,cleanup.auxiliary_effects());},
+            _=>(),
+        }result
+    }
+    /// Possible manual-provider contact through pending outcomes and late output.
+    /// False is absence of a witness, never evidence of no remote effects.
+    pub fn provider_contact_may_have_occurred(&self)->bool{match self{
+        Self::Service(e)=>e.provider_probe().is_some_and(|p|p.contact_may_have_occurred),
+        Self::Observation(e)=>e.pending.iter().any(|p|p.provider_probe.as_ref().is_some_and(|p|p.contact_may_have_occurred)),
+        Self::OutcomeEncoding{outcome,..}=>outcome.provider_probe.as_ref().is_some_and(|p|p.contact_may_have_occurred),
+        Self::StoppedOutput{report,..}=>report.provider_contact_may_have_occurred,
+        Self::SessionState{primary}=>primary.provider_contact_may_have_occurred(),
+        Self::Cleanup{primary,cleanup}=>primary.provider_contact_may_have_occurred()||cleanup.provider_contact_may_have_occurred(),_=>false,
+    }}
     /// Stable diagnostic family, never a raw credential, path or permission grant.
     pub fn code(&self) -> &'static str {
         match self {
@@ -216,15 +240,33 @@ pub struct NativeHttpServer {
     pub(super) settings_revision: SettingCount,
 }
 impl NativeHttpServer {
+    /// Bind the ordinary saved loopback transport with one trusted single-intent
+    /// source prepared/provisioned outside HTTP. No request selects a source or
+    /// grants a role. On bind refusal close the supplied owner explicitly too.
+    pub fn bind_enrolled(root_path: &Path, address: Option<&str>, source: super::TrustEnrollmentSource) -> Result<Self, NativeServerError> {
+        match Self::bind_source(root_path,address,Some(&source)) {
+            Ok(mut server) => { server.service.trust_enrollment=Some(source); Ok(server) },
+            Err(primary) => match source.close() {
+                Ok(()) => Err(primary),
+                Err(cause) => Err(NativeServerError::Cleanup {primary:Box::new(primary),cleanup:Box::new(NativeServerError::Service(HttpServiceError::EnrollmentSource {primary:None,cause:Box::new(cause)}))}),
+            },
+        }
+    }
     /// Read validated settings and establish session/binding from one writable
     /// Root. Optional address is a transient override using the same canonical
     /// loopback validator; it never persists a different policy. Zero connection
     /// cap refuses before binding/session creation. Every failed step closes its
     /// owned store/socket and retains cleanup failures. Existing state is preserved.
     pub fn bind(root_path: &Path, address: Option<&str>) -> Result<Self, NativeServerError> {
+        Self::bind_source(root_path,address,None)
+    }
+    /// Retain one opened Root across source check, policy and session bootstrap;
+    /// an intervening pathname reopen cannot substitute another datastore.
+    fn bind_source(root_path:&Path,address:Option<&str>,source:Option<&super::TrustEnrollmentSource>)->Result<Self,NativeServerError>{
         let store = RootStore::open(root_path, true)
             .map_err(|e| NativeServerError::Service(root("open", e)))?;
         let configured = (|| {
+            if let Some(source)=source { source.check_root(&store).map_err(|e|NativeServerError::Service(root("trust-enrollment-root",e)))?; }
             let mut document = store
                 .settings()
                 .map_err(|e| NativeServerError::Service(root("settings", e)))?;

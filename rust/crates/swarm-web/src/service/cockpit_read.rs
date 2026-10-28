@@ -35,7 +35,7 @@ impl NativeHttpService {
                 "previous":a.previous,"started":a.started,"ended":a.ended
             })).collect();
             serde_json::to_vec(&serde_json::json!({"schema_version":1,"work_id":work,"budget":budget,"agents":agents}))
-                .map(RouteBody::plain).map_err(E::Json)
+                .map(RouteBody::plain).map_err(E::ResponseJson)
         })();
         close(result, store.close())
     }

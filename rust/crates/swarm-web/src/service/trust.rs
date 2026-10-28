@@ -39,10 +39,13 @@ impl NativeHttpService {
                 | "reconcile"
                 | "read-object"
                 | "read-original"
+                | "audit-transaction"
+                | "public-anchor" | "public-verify" | "evidence-key-prepare" | "evidence-key-activate" | "evidence-key-revoke"
         ) {
             return Err(HttpServiceError::Refused("trust-action-unknown"));
         }
         swarm_engine::check_command_input_size(r.body()).map_err(HttpServiceError::Input)?;
+        if r.headers().get_all(http::header::AUTHORIZATION).iter().count()>1 { return Err(HttpServiceError::Refused("trust-authentication-header")); }
         if matches!(*r.method(), Method::GET | Method::HEAD)
             && (r.uri().query().is_some() || !r.body().is_empty())
         {
@@ -55,8 +58,8 @@ impl NativeHttpService {
                 return Err(HttpServiceError::Refused("trust-read-body-invalid"));
             }
         }
-        if op == "verify" {
-            return swarm_engine::verify_trust(r.body())
+        if matches!(op,"verify"|"public-verify") {
+            return (if op=="verify"{swarm_engine::verify_trust(r.body())}else{swarm_engine::verify_public_trust(r.body())})
                 .map(RouteBody::plain)
                 .map_err(|e| {
                     root(
@@ -67,21 +70,35 @@ impl NativeHttpService {
         }
         let readonly = matches!(
             op,
-            "show" | "export" | "anchor" | "config-preview" | "read-object" | "read-original"
+            "show" | "export" | "anchor" | "config-preview" | "read-object" | "read-original" | "public-anchor"
         );
         let store = RootStore::open(&self.root, !readonly).map_err(|e| root("trust-open", e))?;
         let mut publication = None;
         let result = (|| {
             self.check_binding(&store)?;
-            let token = r
+            let authorization = r
                 .headers()
                 .get(http::header::AUTHORIZATION)
-                .and_then(|v| v.to_str().ok())
-                .and_then(|s| s.strip_prefix("Bearer "))
-                .unwrap_or("");
-            let reply = store
-                .trust(op, r.body(), token)
-                .map_err(|e| root("trust-command", e))?;
+                .map(|v| v.to_str().map_err(|_|HttpServiceError::Refused("trust-authentication-header")))
+                .transpose()?.unwrap_or("");
+            let mut reply = if op=="show" {
+                store.trust_as_principal(op,r.body(),"").map_err(|e|root("trust-show",e))?
+            } else if let Some(encoded)=authorization.strip_prefix("Enrollment ") {
+                use base64::{Engine,engine::general_purpose::URL_SAFE_NO_PAD};
+                let source=self.trust_enrollment.as_ref().ok_or(HttpServiceError::Refused("trust-enrollment-source-unavailable"))?;
+                let mut password=zeroize::Zeroizing::new(Vec::new());
+                URL_SAFE_NO_PAD.decode_vec(encoded, &mut password).map_err(|_|HttpServiceError::Refused("trust-enrollment-credential"))?;
+                if password.is_empty() { return Err(HttpServiceError::Refused("trust-enrollment-credential")); }
+                source.call(&store,op,r.body(),password.as_slice()).map_err(|e|root("trust-enrollment-command",e))?
+            } else if authorization.is_empty() || authorization.starts_with("Bearer ") {
+                store.trust_as_principal(op, r.body(), authorization.strip_prefix("Bearer ").unwrap_or(""))
+                    .map_err(|e| root("trust-command", e))?
+            } else { return Err(HttpServiceError::Refused("trust-authentication-scheme")); };
+            if let Some(source)=self.trust_enrollment.as_ref().filter(|_|op=="show") {
+                let mut view:serde_json::Value=serde_json::from_slice(&reply.bytes).map_err(HttpServiceError::ResponseJson)?;
+                view["identity_authentication"]["held_enrollment"]=source.capability();
+                reply.bytes=serde_json::to_vec(&view).map_err(HttpServiceError::ResponseJson)?;
+            }
             publication = reply.publication;
             let mut body = RouteBody::plain(reply.bytes);
             body.trust_publication = publication;

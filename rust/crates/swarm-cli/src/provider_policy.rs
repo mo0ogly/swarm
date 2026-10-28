@@ -5,6 +5,8 @@ use std::io::{self, Write};
 /// model policies. Responses never export commands/env/API keys. Explicit input
 /// and current token are required for writes; late output/close/flush failures
 /// preserve real applied state. No execution, defaults or identity is supplied.
+/// A successful apply includes synchronized no-op state. Late errors retain
+/// that knowledge without claiming new bytes, a snapshot or a fresh mutation.
 pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
     if a.pos.len() != 3
         || a.pos[1] != "policies"
@@ -42,7 +44,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     };
     let store = swarm_engine::RootStore::open(std::path::Path::new(&a.root), op == "apply")
         .map_err(root_error)?;
-    let mut changed = false;
+    let mut configuration_known = false;
     let result = (|| match op {
         "export" => json_bytes(&store.export_provider_policies().map_err(root_error)?)
             .map_err(CliError::Output),
@@ -56,7 +58,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
             let view = store
                 .apply_provider_policies(change.as_ref().ok_or(CliError::Usage)?)
                 .map_err(root_error)?;
-            changed = view.changed;
+            configuration_known = view.applied;
             json_bytes(&view).map_err(CliError::Output)
         }
         _ => Err(CliError::Usage),
@@ -71,7 +73,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         }),
     };
     result.map(|()| 0).map_err(|primary| {
-        if changed {
+        if configuration_known {
             CliError::ConfigurationStatePreserved {
                 primary: Box::new(primary),
                 english: a.language == "en",

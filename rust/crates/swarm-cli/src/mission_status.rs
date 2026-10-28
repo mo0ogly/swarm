@@ -262,7 +262,7 @@ fn finish(
 /// A late failure keeps each cause as a secondary branch; the existing cleanup
 /// envelope represents combined errors and does not assert that IO cleanup ran.
 /// Success returns its original exit code and never exposes raw diagnostic data.
-fn retain_observation_causes(
+pub(super) fn retain_observation_causes(
     result: Result<u8, CliError>,
     causes: Vec<RootStoreError>,
 ) -> Result<u8, CliError> {

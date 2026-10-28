@@ -39,6 +39,14 @@ fn clean(path: &str) -> String {
 fn managed(db: &Connection, project: &str) -> Result<BTreeSet<String>, E> {
     let works =
         crate::list_recorded_works(db).map_err(|e| E::caused("agent-memory-inventory", e))?;
+    Ok(managed_paths(&works, project))
+}
+
+/// Derive local legacy lesson paths from a fully decoded coherent Work inventory.
+/// Imported/foreign-project versions do not own local paths; withdrawn versions
+/// still do. Missing RETEX contributes no path. This pure projection admits no
+/// version, reads no document and creates no authority or future snapshot lease.
+pub(crate) fn managed_paths(works: &[Work], project: &str) -> BTreeSet<String> {
     let mut paths = BTreeSet::new();
     for work in works {
         for entry in work.project_memory.iter().flatten().filter(|e| !e.imported) {
@@ -61,7 +69,7 @@ fn managed(db: &Connection, project: &str) -> Result<BTreeSet<String>, E> {
             }
         }
     }
-    Ok(paths)
+    paths
 }
 
 /// Check historical Work.memory before admission and each execution permission.

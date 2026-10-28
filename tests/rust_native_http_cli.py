@@ -336,3 +336,38 @@ def main():
 
 
 if __name__=='__main__':main()
+
+
+def assert_head_wire(host, port, path, cookie, *, content_type='application/json', observe=None):
+    """Observe raw HEAD framing after a valid owned GET, without client suppression.
+
+    Connection-close EOF proves absence of body. Reject contradictory keep-alive,
+    invalid MIME/status and any body immediately; never buffer an unbounded body.
+    Header/EOF progress may be recorded safely through observe; a peer promising
+    close but never closing still requires diagnosis, not an invented watchdog.
+    TCP65536 is a buffer, not response policy. Socket/protocol/observer errors
+    propagate. Never emit request/cookie/body text or infer application acceptance.
+    """
+    import socket
+    if any(c in str(value) for value in [host,port,path,cookie] for c in ['\r','\n']):raise ValueError('head-wire-header-injection')
+    request=('HEAD '+path+' HTTP/1.1\r\nHost: '+host+':'+str(port)+'\r\nCookie: '+cookie+'\r\nConnection: close\r\n\r\n').encode('ascii')
+    with socket.create_connection((host,port),timeout=None) as connection:
+        connection.sendall(request);prefix=bytearray()
+        while b'\r\n\r\n' not in prefix:
+            chunk=connection.recv(65536)
+            if not chunk:raise AssertionError('HEAD response header incomplete')
+            prefix.extend(chunk)
+        header,separator,body=bytes(prefix).partition(b'\r\n\r\n');lines=header.split(b'\r\n');status=int(lines[0].split(b' ')[1]);headers={}
+        for line in lines[1:]:
+            name,value=line.split(b':',1);key=name.lower()
+            if key in headers and key in [b'content-type',b'connection']:raise AssertionError('HEAD ambiguous response header')
+            headers[key]=value.strip()
+        if status!=200:raise AssertionError('HEAD positive control status '+str(status))
+        mime=headers.get(b'content-type',b'').decode('ascii')
+        if mime.split(';',1)[0].strip().lower()!=content_type.split(';',1)[0].strip().lower():raise AssertionError('HEAD MIME mismatch')
+        if b'keep-alive' in [token.strip().lower() for token in headers.get(b'connection',b'').split(b',')]:raise AssertionError('HEAD server ignored Connection: close')
+        if body:raise AssertionError('HEAD unexpectedly published body ('+str(len(body))+' bytes)')
+        if observe:observe(dict(phase='headers-received-awaiting-eof',header_bytes=len(header),status=status))
+        if connection.recv(1):raise AssertionError('HEAD unexpectedly published body after header')
+    if observe:observe(dict(phase='eof-no-body',header_bytes=len(header),status=status))
+    return dict(status=status,body_bytes=0,wire_sha256=hashlib.sha256(bytes(prefix)).hexdigest(),content_type=mime,contract='actual wire EOF, no HTTP client HEAD suppression')

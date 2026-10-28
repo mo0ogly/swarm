@@ -2,6 +2,11 @@
 //! sandbox. Only independently protected startup may select the authority pins
 //! and human binding. Matching caller data, an UID or a cockpit cookie does not
 //! establish that prerequisite. No raw recover/reset operation is exposed.
+/// Exact human-authorized Trust action callback, distinct from configuration.
+pub mod trust_action;
+mod held_action;
+/// Exact PAEA effect capability; separate from Trust command permissions.
+pub mod paea_action;
 use crate::{decode, Error as DocumentError};
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 use std::{
@@ -90,9 +95,9 @@ pub enum Response {
 /// A storage error after a mutating invocation conservatively leaves its effect
 /// unknown. Authority failure after storage retains that storage result, including
 /// any cleanup cause. An Err never asserts that no configuration was published.
-#[derive(Debug)]
 pub enum Error {
     Binding,
+    PersonalBinding,
     Permission,
     Busy,
     State,
@@ -136,6 +141,7 @@ impl Error {
     pub fn code(&self) -> &'static str {
         match self {
             Self::Binding => "binding",
+            Self::PersonalBinding => "personal-binding",
             Self::Permission => "permission",
             Self::Busy => "busy",
             Self::State => "state",
@@ -160,6 +166,14 @@ impl fmt::Display for Error {
                 "not established by this diagnostic"
             }
         )
+    }
+}
+impl fmt::Debug for Error {
+    /// Same safe category/effect observation as Display. Private retained Response,
+    /// storage configuration, document inputs and nested payloads are not formatted;
+    /// all original structured variants and causes remain available to trusted code.
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(self, f)
     }
 }
 impl std::error::Error for Error {
@@ -289,6 +303,26 @@ impl Control {
             TryLockError::Poisoned(_) => Error::State,
         })
     }
+    /// Trusted crate composition only: caller must hold its configured protected
+    /// current account through this call and completion. Credential knowledge by
+    /// itself is not such authority. Bind exact principal and installation before
+    /// any business/storage operation; project/rights remain the signed grant's
+    /// responsibility. This helper is not a public proof/actor admission endpoint.
+    pub(crate) fn execute_from_current_personal(
+        &self,
+        proof: &crate::credentials::Proof<'_>,
+        authority_ctx: &state::Context,
+        storage_ctx: &store::Context,
+        expected_authority_head: &Head,
+        request: Request,
+    ) -> Result<Response, Error> {
+        if proof.principal() != &self.binding.principal
+            || proof.installation_digest() != self.installation
+        {
+            return Err(Error::PersonalBinding);
+        }
+        self.execute(authority_ctx, storage_ctx, expected_authority_head, request)
+    }
     /// Recheck actual signed current state and exact permission at service time,
     /// holding its reservation through storage return and authority COMMIT.
     /// expected_authority_head is a CAS expectation, never a grant. Cancellation
@@ -312,22 +346,9 @@ impl Control {
             &self.binding.enrollment_id,
             |record| {
                 let checked = (|| {
-                    let d = decode(&record.body).map_err(Error::Document)?;
-                    if record.id != self.binding.enrollment_id
-                        || record.enrolled_sequence != self.binding.generation
-                        || d.enrollment_id != record.id
-                        || d.generation != record.enrolled_sequence
-                        || d.project_digest != self.project
-                        || d.principal != self.binding.principal
-                        || d.scope != self.binding.scope
-                        || d.trust_revision != self.binding.trust_revision
-                    {
-                        return Err(Error::Binding);
-                    }
+                    let d = validate_record(&record, &self.binding, &self.project)?;
                     let at = OffsetDateTime::now_utc();
-                    if at < d.not_before || at >= d.expires_at {
-                        return Err(Error::Document(DocumentError::Inactive));
-                    }
+                    validate_time(&d, at)?;
                     if !d.permissions.contains(&required) {
                         return Err(Error::Permission);
                     }
@@ -394,6 +415,36 @@ impl Control {
             Ok(())
         }
     }
+}
+/// Validate canonical signed-record payload against independently selected
+/// enrollment/context. This checks data only; callers must hold current signed
+/// journal authority, then check time and the exact operation before any effect.
+pub(crate) fn validate_record(
+    record: &state::Record,
+    binding: &Binding,
+    project: &str,
+) -> Result<crate::Document, Error> {
+    let d = decode(&record.body).map_err(Error::Document)?;
+    if record.id != binding.enrollment_id
+        || record.enrolled_sequence != binding.generation
+        || d.enrollment_id != record.id
+        || d.generation != record.enrolled_sequence
+        || d.project_digest != project
+        || d.principal != binding.principal
+        || d.scope != binding.scope
+        || d.trust_revision != binding.trust_revision
+    {
+        return Err(Error::Binding);
+    }
+    Ok(d)
+}
+/// Check service-observed validity without issuing a grant or changing storage.
+/// Expiry is a pre-use check, not atomic with a later filesystem/network effect.
+pub(crate) fn validate_time(d: &crate::Document, at: OffsetDateTime) -> Result<(), Error> {
+    if swarm_wire_json::timestamp::zero(at) || at < d.not_before || at >= d.expires_at {
+        return Err(Error::Document(DocumentError::Inactive));
+    }
+    Ok(())
 }
 #[cfg(test)]
 mod tests;

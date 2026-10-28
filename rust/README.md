@@ -1,13 +1,10 @@
 # Swarm Rust workspace
 
-Native replacement under construction, with one final cutover selected by the user.
-This workspace provides identity data validation and enrollment challenge proofs,
-including a Go-compatible signed JSON envelope, plus a native transaction-owning
-Work engine, native fresh-root initialization and persisted settings CLI.
-The basic Work CLI and manual, ordinary and simple managed read views are implemented;
-extended managed protocols, hierarchical mutations, old migrations, automatic task execution,
-Admin service and server remain under construction.
-The Go engine remains the working reference.
+Current product entry points use Rust exclusively: `./swarm` delegates to installed `bin/swarm`, and `swarm.sh` owns the Rust local server. Native and Docker installers build Rust; Go is not required. See [installation](../INSTALL.md), [the current contract](../docs/en/RUST-MIGRATION.md) and [active plan](../docs/plans/migration-rust/PLAN.md) for actual capabilities and remaining refusals. Full migration acceptance remains open.
+
+## Historical component qualification notes
+
+The checkpoints below describe their original dates and do not describe today's running server. Preserve their counters and limits as historical evidence.
 
 Candidate78 connects foreground manual `agent prepare`→`agent run`, private gated
 helper, actual Linux process registration, sealed prompt stdin, explicit execve,

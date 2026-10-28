@@ -162,11 +162,24 @@ const BUDGET_FIELDS: Fields = &[
     ("actor", Kind::String),
 ];
 
-/// Known Go JSON field metadata; decoding validates types without granting authority.
-fn shape_budget() -> Fields {
+/// Exact shared Budget wire shape for persisted data and explicit envelope inputs;
+/// decoding grants no authority and business validation remains validate_budget.
+pub(crate) fn shape_budget() -> Fields {
     BUDGET_FIELDS
 }
 
+/// Supported operator source reference, excluding captured text/timestamp. These
+/// structured fields preserve Go duplicate merges, scalar-null and case folding.
+pub(crate) fn shape_preparation_reference()->Fields { &[
+    ("path",Kind::String),("start_line",Kind::Int64),("end_line",Kind::Int64),("sha256",Kind::String),
+] }
+/// Initial CLI/human organization wire shape, before business validation. The
+/// nested object must be projected while original member order is still known.
+pub(crate) fn shape_preparation_organization()->Fields { &[
+    ("worker_provider",Kind::String),("provider",Kind::String),("level",Kind::String),
+    ("model_policy_hash",Kind::String),("workspace",Kind::String),("validation",Kind::String),
+    ("max_tasks",Kind::Int64),("max_calls",Kind::Int64),
+] }
 /// Known Go JSON field metadata; decoding validates types without granting authority.
 pub(crate) fn shape_preparation_document() -> Fields {
     &[

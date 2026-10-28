@@ -1,4 +1,4 @@
-//! First managed publication: one protected SQL transition, never a new model call.
+//! Native managed publication: one protected SQL transition, never a model call.
 use super::*;
 use crate::managed_publication_record::{self as receipt, Record};
 use crate::root_store::native_transaction::{self as transaction, Change};
@@ -17,39 +17,75 @@ pub struct ManagedPublicationOutcome {
     pub provider_started: bool,
     pub work: Work,
 }
-/// Recheck a recorded publication against actual current originals and the
-/// committed report. Historical SQL settlement alone grants no acceptance.
-/// Caller owns the Root/settings snapshot; all causes propagate without writes.
+/// Verify historical task custody and the latest published whole-cohort opinion.
+/// Earlier tasks/originals remain unchanged; the latest controls and criterion
+/// verdicts, not a copied review, cover the current candidate. Caller owns actual
+/// Root/settings/SQL inputs; all original/chain/report causes refuse, no writes.
+/// Every earlier publication's own native originals are revalidated even when
+/// the caller requests the latest task; SQL chain integrity is not sufficient.
+/// Work grows with the retained chain; existing per-Git policy remains in force,
+/// with no new history cutoff, global timeout, cache lease or actor authority.
 pub(in crate::root_store) fn current(root: &RootStore, db: &rusqlite::Connection,
     work: &Work, task: &crate::Task, settings: &crate::EngineSettingsDocument) -> Result<Record,E> {
-    let review = task.independent_review.as_deref().ok_or(E::Refused("managed-publication-review-required"))?;
-    let event: String = crate::agent_launch::query(db,
-        "SELECT detail FROM main.managed_attempts WHERE agent_id=? AND work_id=? AND task_id=? AND state='integrated'",
-        params![review.producer,work.id,task.id], |rows| {
-            let row = rows.next()?.ok_or(A::Refused("managed-publication-record-required"))?;
-            let id = row.get(0)?;
-            if rows.next()?.is_some() { return Err(A::Refused("managed-publication-record-ambiguous")); }
-            Ok(id)
-        }).map_err(|e| E::Launch(Box::new(e)))?;
-    let record = receipt::read(db,&event).map_err(|e| E::Launch(Box::new(e)))?
+    let mut records=receipt::chain(db,work).map_err(|e|E::Launch(Box::new(e)))?;
+    let own=records.iter().position(|r|r.task_id==task.id)
         .ok_or(E::Refused("managed-publication-record-required"))?;
-    receipt::integrated(db,work,&review.producer,&task.id,&record.previous_candidate,&record.result_commit,&event)
-        .map_err(|e| E::Launch(Box::new(e)))?;
+    let latest=records.last().ok_or(E::Refused("managed-publication-record-required"))?;
+    let latest_task=work.tasks.iter().flatten().find(|t|t.id==latest.task_id)
+        .ok_or(E::Refused("managed-publication-task-required"))?;
+    let (context,candidate,metadata)=original(root,db,work,latest_task,settings,latest)?;
+    let limits=settings.values.mutation_limits().map_err(E::Settings)?;
+    let plan=crate::managed_repository::managed_control_plan(work,&latest.task_id,&limits.policy)
+        .map_err(|e|E::Launch(Box::new(e)))?;
+    if candidate.control_plan.as_ref()!=Some(&plan) {
+        return Err(E::Refused("managed-publication-current-controls-changed"));
+    }
+    let review=latest_task.independent_review.as_deref().ok_or(E::Refused("managed-publication-review-required"))?;
+    verify_recorded_cohort(root,db,work,review,&context,&candidate,&metadata)?;
+    // Every prior publication contributes the current cumulative baseline.
+    // Checking only the requested task could hide a damaged earlier original
+    // when the caller selected the latest task. Never infer original integrity
+    // from the canonical SQL chain or from the latest cohort's verdict alone.
+    for record in &records[..records.len()-1] {
+        let mut tasks=work.tasks.iter().flatten().filter(|t|t.id==record.task_id);
+        let earlier=tasks.next().ok_or(E::Refused("managed-publication-task-required"))?;
+        if tasks.next().is_some() { return Err(E::Refused("managed-publication-task-ambiguous")); }
+        original(root,db,work,earlier,settings,record)?;
+    }
+    Ok(records.remove(own))
+}
+/// Verify one immutable publication's native originals, worker-result base and
+/// actual Git report under current saved policy. The complete canonical chain
+/// must already be checked; historical evidence alone does not cover a newer
+/// candidate. Returns only private observation data; no mutation or fallback.
+fn original(root:&RootStore, db:&rusqlite::Connection, work:&Work, task:&crate::Task,
+    settings:&crate::EngineSettingsDocument, record:&Record)
+    ->Result<(ManagedReviewContext,crate::managed_repository::ManagedCandidate,serde_json::Value),E>{
+    let review=task.independent_review.as_deref().ok_or(E::Refused("managed-publication-review-required"))?;
     let original = root.recorded_native_review(db,&work.id,&review.id)?;
     if !original.verdict_applicable || original.review != *review || review.state != "passed"
         || original.task != task.id || original.original_receipt_sha256 != record.original_sha256
         || original.validation_receipt_sha256 != record.validation_sha256 || original.managed_context.is_none() {
         return Err(E::Refused("managed-publication-original-changed"));
     }
-    let candidate = task_validation::recorded_managed_candidate(root,work,&task.id,&record.validation_sha256)?;
+    let (candidate,metadata) = task_validation::recorded_managed_candidate(root,work,&task.id,&record.validation_sha256)?;
     if candidate.commit != record.candidate_commit || candidate.previous != record.previous_candidate
         || candidate.result != record.result_commit || candidate.agent != record.producer
         || candidate.attempt != record.attempt || candidate.contract != record.cohort_sha256
         || candidate.binding_digest().map_err(|e|E::Launch(Box::new(e)))? != record.binding_sha256 {
         return Err(E::Refused("managed-publication-original-candidate-binding"));
     }
-    report(root, work, task, settings, original.managed_context.as_ref().ok_or(E::Refused("managed-publication-context-required"))?)?;
-    Ok(record)
+    let producer=crate::task_report::completed_producer(db,&work.id,task,&record.producer)
+        .map_err(|e|E::Launch(Box::new(e)))?;
+    let result=crate::managed_repository::verify_result(&root.root,work,&producer,settings)
+        .map_err(|e|E::Launch(Box::new(e)))?;
+    if result.worker_base()!=record.worker_base().map_err(|e|E::Launch(Box::new(e)))?
+        || result.commit!=record.result_commit {
+        return Err(E::Refused("managed-publication-original-worker-base"));
+    }
+    let context=original.managed_context.ok_or(E::Refused("managed-publication-context-required"))?;
+    report(root,work,task,settings,&context)?;
+    Ok((context,candidate,metadata))
 }
 /// Read the actual immutable Git blob and Root artifacts under current saved Git
 /// policy. Paths derive from the validated managed repository and canonical task;
@@ -88,8 +124,10 @@ fn report(root: &RootStore, work: &Work, task: &crate::Task, settings: &crate::E
         .map_err(|e| caused("managed-publication-project-context",e))?;
     Ok(())
 }
-/// Return a read-only replay only for the exact strict request and still-current
-/// accepted publication. Conflicting event IDs and stale/invalid originals refuse.
+/// Replay an exact historical or latest request after verifying its preserved
+/// accepted task and the latest whole-cohort publication. Returns the original
+/// publication coordinates alongside current Work, never a new execution.
+/// Conflicting event IDs and stale/invalid originals refuse with causes.
 fn replay(root: &RootStore, db: &rusqlite::Connection, work_id: &str, request: &task_validation::Request,
     settings: &crate::EngineSettingsDocument) -> Result<Option<ManagedPublicationOutcome>,E> {
     let Some(record) = receipt::read(db,&request.event_id).map_err(|e| E::Launch(Box::new(e)))? else { return Ok(None); };
@@ -106,12 +144,13 @@ fn replay(root: &RootStore, db: &rusqlite::Connection, work_id: &str, request: &
         candidate_commit:record.candidate_commit,task_accepted:true,replayed:true,provider_started:false,work }))
 }
 impl RootStore {
-    /// Publish the first reviewed managed candidate and accept its submitted task
+    /// Publish a reviewed managed candidate and accept its submitted task
     /// atomically with the normalized worker settlement and canonical event. Uses
     /// the strict native task/revision envelope and current saved settings. Pins
     /// and refreshes candidate sources outside SQL/settings locks; verifies native
     /// originals, full cohort, report, gate, prerequisites and idle ownership inside
-    /// the writer. Existing accepted baselines explicitly remain unsupported.
+    /// the writer. Cumulative publication retains prior task/review originals,
+    /// links the previous canonical receipt and separates worker base from parent.
     /// Exact replay reads the original publication without model/control/debit;
     /// collisions, drift and missing evidence refuse without a staged mutation.
     /// Commit uncertainty and late release failures retain their causes and known
@@ -138,6 +177,13 @@ impl RootStore {
                 return Err(E::Refused("managed-publication-inputs-changed"));
             }
             candidate.refresh(self)?;
+            let producer=crate::task_report::completed_producer(&self.db,work_id,
+                checked.work.tasks.iter().flatten().find(|t|t.id==request.task_id)
+                    .ok_or(E::Refused("managed-publication-task-required"))?,&checked.review.producer)
+                .map_err(|e|E::Launch(Box::new(e)))?;
+            let result=crate::managed_repository::verify_result(&self.root,&checked.work,&producer,&self.read_settings()?)
+                .map_err(|e|E::Launch(Box::new(e)))?;
+            let worker_base=result.worker_base().to_owned();
             material_path::with_material_operation(self,|| crate::agent_storage_retry::execute_borrowed(
                 &self.db,&self.directory,false,|_,settings| {
                 let value = transaction::apply(self,|tx| {
@@ -149,11 +195,11 @@ impl RootStore {
                     }
                     let task = work.tasks.iter().flatten().find(|t|t.id == request.task_id)
                         .ok_or(E::Refused("managed-publication-task-required"))?;
-                    let repo = work.planning.as_deref().and_then(|p|p.repository.as_deref())
-                        .ok_or(E::Refused("managed-publication-repository-required"))?;
-                    if work.tasks.iter().flatten().any(|t|t.status == "accepted") || repo.candidate_commit != repo.base_commit {
-                        return Err(E::Refused("managed-publication-accepted-baseline-unported"));
-                    }
+                    super::super::managed_baseline::inspect(self,tx,&work,&task.id,settings)?;
+                    let previous=receipt::chain(tx,&work).map_err(|e|E::Launch(Box::new(e)))?.pop();
+                    let previous_publication=previous.as_ref().map(|r|Ok(receipt::PreviousPublication {
+                        event_id:r.event_id.clone(),sha256:receipt::digest(r).map_err(|e|E::Launch(Box::new(e)))?
+                    })).transpose()?;
                     if checked.review.state != "passed" || task.status != "submitted" {
                         return Err(E::Refused("managed-publication-passed-submission-required"));
                     }
@@ -188,7 +234,9 @@ impl RootStore {
                     next.planning.as_deref_mut().and_then(|p|p.repository.as_deref_mut()).ok_or(E::Refused("managed-publication-repository-required"))?.candidate_commit = held.commit.clone();
                     next.revision = work.revision.checked_add(1).ok_or(E::Refused("managed-publication-revision-overflow"))?;
                     next.updated = crate::system_timestamp().map_err(|e|caused("managed-publication-clock",e))?;
-                    let record = Record { schema_version:1,event_id:request.event_id.clone(),expected_revision:work.revision,
+                    let record = Record { schema_version:if previous_publication.is_some(){2}else{1},
+                        worker_base:previous_publication.as_ref().map(|_|worker_base.clone()),previous_publication,
+                        event_id:request.event_id.clone(),expected_revision:work.revision,
                         work_id:work.id.clone(),task_id:task.id.clone(),producer:checked.review.producer.clone(),attempt:checked.review.attempt.clone(),
                         result_commit:held.result.clone(),candidate_commit:held.commit.clone(),previous_candidate:held.previous.clone(),review_id:checked.review.id.clone(),
                         original_sha256:original.original_receipt_sha256,context_sha256:checked.review.context_sha256.clone(),validation_sha256:validation.receipt_sha256,
@@ -197,7 +245,7 @@ impl RootStore {
                     let body = crate::encode_model(&record).map_err(E::Encode)?;
                     let staged = crate::stage_recorded_change_with_hook(tx,crate::RecordedChange { work:&next,expected_revision:work.revision,event:&request.event_id,kind:"managed.publication",request:&body },|db,_| {
                         let changed = db.execute("UPDATE main.managed_attempts SET state='integrated',result_commit=?,detail=? WHERE agent_id=? AND work_id=? AND task_id=? AND base_commit=? AND state='ready' AND result_commit='' AND detail=''",
-                            params![held.result,request.event_id,checked.review.producer,work.id,task.id,held.previous])?;
+                            params![held.result,request.event_id,checked.review.producer,work.id,task.id,worker_base])?;
                         if changed != 1 { return Err(Box::new(A::Refused("managed-publication-worker-row")) as Box<dyn std::error::Error+Send+Sync>); }
                         crate::agent_launch::query(db,"SELECT state,result_commit,detail FROM managed_attempts WHERE agent_id=?",[&record.producer],|rows| {
                             let row=rows.next()?.ok_or(A::Refused("managed-publication-worker-row"))?;
@@ -207,7 +255,7 @@ impl RootStore {
                         }).map_err(|e|Box::new(e) as Box<dyn std::error::Error+Send+Sync>)
                     }).map_err(|e|caused("managed-publication-stage",e))?;
                     if !matches!(staged,crate::RecordedChangeOutcome::Staged) { return Err(E::Refused("managed-publication-unexpected-replay")); }
-                    receipt::integrated(tx,&next,&record.producer,&record.task_id,&record.previous_candidate,&record.result_commit,&record.event_id).map_err(|e|E::Launch(Box::new(e)))?;
+                    receipt::integrated(tx,&next,&record.producer,&record.task_id,&worker_base,&record.result_commit,&record.event_id).map_err(|e|E::Launch(Box::new(e)))?;
                     Ok(Change::Mutate(ManagedPublicationOutcome { schema_version:1,publication_event:request.event_id.clone(),candidate_commit:held.commit.clone(),task_accepted:true,replayed:false,provider_started:false,work:next }))
                 })?;
                 known = Some((value.work.id.clone(),value.work.revision));

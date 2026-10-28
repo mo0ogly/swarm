@@ -47,6 +47,8 @@ pub(crate) struct Evidence {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct ProofPolicyContext {
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="super::separation::present")]
+    pub role_separation:Option<super::separation::RoleSeparation>,
     pub schema_version: i64,
     pub revision: i64,
     pub policy: TrustPolicy,
@@ -120,6 +122,8 @@ pub(crate) struct IdentityContext {
     pub authenticated_at: Option<String>,
     pub expires_at: Option<String>,
     pub token_digest: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub enrollment_context: Option<EnrollmentContext>,
 }
 
 /// Assurance claims. Untrusted; not verified here.
@@ -201,4 +205,18 @@ pub(crate) struct Receipt {
     pub content_digest: String,
     pub action_id: String,
     pub state: String,
+}
+
+/// Current held enrollment observations, not a transferable authentication proof.
+/// The outer evidence hash binds these values to the actual Biba decision.
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct EnrollmentContext {
+    pub enrollment_id: String,
+    pub head_sequence: i64,
+    pub head_digest: String,
+    pub project_digest: String,
+    pub work_id: String,
+    pub plan_version: i64,
+    pub plan_digest: String,
 }

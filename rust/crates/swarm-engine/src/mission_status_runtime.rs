@@ -26,8 +26,10 @@ fn invalid(reason: &'static str) -> RootStoreError {
 /// Bavail, preserving inode-unlimited semantics and checked byte arithmetic.
 /// Requires an explicitly saved complete storage policy; historical absence
 /// refuses before probes. Probe failures yield blocked/unknown plus typed causes.
-/// Git uses saved command policy; binary identity comes only from explicit
-/// compiler metadata, otherwise stays unknown. No files or SQL are written.
+/// Git uses saved command policy; absent compiler metadata stays unknown, while
+/// malformed embedded identity refuses explicitly rather than borrowing HEAD.
+/// Valid identity comes only from compiler metadata. No application state or SQL
+/// is written by this observer; Git uses the existing command adapter contract.
 pub(crate) fn observe(
     root: &Path,
     settings: &EngineSettingsDocument,

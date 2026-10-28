@@ -10,33 +10,23 @@ use super::{
     TrustError as E,
 };
 use crate::biba::{check_biba, BibaAccess, Integrity};
-use crate::trust_types::{credential_valid, token_hash, TrustIdentity};
+use crate::trust_types::TrustIdentity;
+use super::authentication::{Actor, Source};
+pub(crate) use super::authentication::authenticated;
 use base64::{engine::general_purpose::STANDARD, Engine};
 use serde::Serialize;
 use serde_json::{json, Value};
-use subtle::ConstantTimeEq;
 use time::OffsetDateTime;
-/// Current authenticated local identity; caller-supplied claims are irrelevant.
-/// Active federated policy must already have passed State::require_supported.
-pub(crate) fn authenticated(st: &State, token: &str) -> Result<TrustIdentity, E> {
-    if !credential_valid(token) {
-        return Err(E::Authorization);
-    }
-    let digest = token_hash(token);
-    st.identities
-        .iter()
-        .find(|id| bool::from(id.token_hash.as_bytes().ct_eq(digest.as_bytes())) && !id.disabled)
-        .cloned()
-        .ok_or(E::Authorization)
-}
 /// Stable replay authority binds subject, effective level and ordered role set.
-fn authority(actor: &TrustIdentity) -> Result<String, E> {
+fn authority(actor: &Actor) -> Result<String, E> {
     #[derive(Serialize)]
     #[allow(non_snake_case)]
     struct Authority<'a> {
         Subject: &'a str,
         Integrity: i64,
         Roles: Vec<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        EnrollmentPrincipal: Option<&'a swarm_identity_contract::Principal>,
     }
     let mut roles = actor.roles.clone();
     roles.sort();
@@ -44,6 +34,7 @@ fn authority(actor: &TrustIdentity) -> Result<String, E> {
         Subject: &actor.subject,
         Integrity: actor.integrity,
         Roles: roles,
+        EnrollmentPrincipal: actor.enrollment_principal.as_ref(),
     })
 }
 /// Parse recorded timestamps with the already shared Go RFC3339 contract.
@@ -51,7 +42,7 @@ fn timestamp(raw: &str) -> Result<OffsetDateTime, E> {
     swarm_wire_json::go_rfc3339::parse(raw).map_err(|_| E::Invalid("date RFC3339 requise"))
 }
 /// Format the server-observed UTC clock; a serialization error refuses safely.
-fn stamp(now: OffsetDateTime) -> Result<String, E> {
+pub(super) fn stamp(now: OffsetDateTime) -> Result<String, E> {
     now.to_offset(time::UtcOffset::UTC)
         .format(&time::format_description::well_known::Rfc3339)
         .map_err(|_| E::Invalid("horloge non représentable"))
@@ -104,7 +95,7 @@ fn active(st: &State, id: &str, now: OffsetDateTime) -> Result<String, E> {
     Ok(String::new())
 }
 /// Match the exact explicit protected target, retaining historical resource alias.
-fn target<'a>(cmd: &'a Command) -> &'a str {
+pub(super) fn target<'a>(cmd: &'a Command) -> &'a str {
     if cmd.action_id.is_empty() {
         &cmd.resource
     } else {
@@ -238,7 +229,7 @@ fn replay(
     st: &State,
     op: &str,
     cmd: &mut Command,
-    actor: &TrustIdentity,
+    actor: &Actor,
 ) -> Result<Option<Vec<u8>>, E> {
     let Some(prior) = st.event_digests.get(&cmd.event_id) else {
         return Ok(None);
@@ -258,11 +249,11 @@ fn replay(
 }
 /// Append one official immutable audit object, linking exact original bytes,
 /// effective policy and authenticated identity. No private credential is stored.
-fn append(
+pub(crate) fn append(
     st: &mut State,
     op: &str,
     cmd: &Command,
-    actor: &TrustIdentity,
+    actor: &Actor,
     object: &str,
     content: &str,
     result: &str,
@@ -286,7 +277,7 @@ fn append(
         .get(mandate)
         .filter(|m| text(m, "subject") == actor.subject)
         .map(|_| mandate.to_string());
-    let context = IdentityContext {
+    let mut context = IdentityContext {
         schema_version: 1,
         configuration_revision: st.revision,
         principal_id: actor.subject.clone(),
@@ -307,12 +298,23 @@ fn append(
         authenticated_at: Some(at.clone()),
         expires_at: None,
         token_digest: actor.token_hash.clone(),
+        enrollment_context: actor.enrollment.clone(),
     };
+    if let Some(principal) = &actor.enrollment_principal {
+        context.principal_id=principal.id.clone();
+        context.principal_kind=principal.kind.clone();
+        context.issuer=Some(principal.issuer.clone());
+        context.subject=Some(principal.subject.clone());
+        context.assurance.method="current_personal_and_enrollment".into();
+        context.expires_at=actor.expires_at.clone();
+        context.attributes.role_mapping_digest=super::digest(&serde_json::json!({"principal":principal,"subject":actor.subject,"roles":actor.roles,"integrity":actor.integrity}))?;
+    }
     let controls = CompactJson::new(
         std::str::from_utf8(&encoded(&st.controls()?)?)
             .map_err(|_| E::Integrity("trust-controls-encoding"))?,
     )?;
     let policy = ProofPolicyContext {
+        role_separation:st.role_separation.clone(),
         schema_version: 1,
         revision: st.revision,
         policy: st.policy.clone(),
@@ -353,17 +355,21 @@ pub(crate) struct Transition {
 }
 /// Execute the historical core path under the owner's exclusive reservation.
 /// Authentication, replay, proof and current policy precede any business edit.
-pub(crate) fn execute(
+pub(crate) fn execute<'a>(
     st: &mut State,
     op: &str,
     raw: &[u8],
-    token: &str,
+    token: impl Into<Source<'a>>,
     now: OffsetDateTime,
 ) -> Result<Transition, E> {
     let mut cmd = command::decode(raw)?;
     st.require_supported()?;
     let actor = authenticated(st, token)?;
+    let role_conflict=super::separation::conflict(st,op,&cmd,&actor)?;
+    if role_conflict && st.event_replies.contains_key(&cmd.event_id){return Err(E::Authorization)}
     if let Some(bytes) = replay(st, op, &mut cmd, &actor)? {
+        let value = serde_json::from_slice(&bytes)?;
+        let bytes = encoded(&super::response::mediate(op, &actor, value)?)?;
         return Ok(Transition {
             bytes,
             publication: Some("replayed"),
@@ -386,7 +392,7 @@ pub(crate) fn execute(
     let before = st.evidence.len();
     let actions_before = st.actions.len();
     let mut effect = None;
-    let value = match op {
+    let value = if role_conflict {json!({"state":"denied","reason":"conflit de rôles sur cette transaction"})} else {match op {
         "direct-write" | "elevate" | "elevate-integrity" => {
             json!({"state":"denied","reason":"accès direct ou auto-élévation Biba refusé","next_action":"demander une admission autorisée"})
         }
@@ -593,7 +599,7 @@ pub(crate) fn execute(
             });
         }
         _ => return Err(E::Unsupported("opération Actions de confiance non portée")),
-    };
+    }};
     let denied = text(&value, "state") == "denied";
     let mut value = value;
     if denied {
@@ -656,7 +662,7 @@ pub(crate) fn execute(
             st, op, &cmd, &actor, &object, &content, result, reason, raw, now, effect,
         )?;
     }
-    let bytes = encoded(&value)?;
+    let bytes = encoded(&super::response::mediate(op, &actor, value)?)?;
     st.event_digests
         .insert(cmd.event_id.clone(), command::fingerprint(op, &mut cmd)?);
     st.event_authorities
@@ -677,7 +683,7 @@ pub(crate) fn execute(
 }
 /// Revalidate protected action content against its mandate at the effect boundary.
 /// No public command can pass an alternative action or native destination here.
-fn bound_action(st: &State, a: &Value) -> Result<(), E> {
+pub(super) fn bound_action(st: &State, a: &Value) -> Result<(), E> {
     let stored = st.actions.get(text(a, "id")).ok_or(E::Authorization)?;
     if digest(stored)? != digest(a)? {
         return Err(E::Authorization);

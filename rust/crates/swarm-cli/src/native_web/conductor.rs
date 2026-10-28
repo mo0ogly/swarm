@@ -115,7 +115,9 @@ impl Session<'_> {
 /// Discover at the current saved mission cadence. Each eligible Work owns at most
 /// one local thread, with actual lease CAS deduplicating other servers/CLI watches.
 /// Busy claims are re-observed on the next configured tick, never a spawn permission.
-/// Session failure stops admission and drains every owned session; no silent retry.
+/// Discovery reads atomic settings and one SQL observation without contending
+/// with Admin's writer reservation; it grants no future lease. Session failure
+/// stops admission and drains every owned session; no silent retry.
 /// No provider is selected here. drive keeps all current identity/budget/role gates.
 /// Session JSONL is an ephemeral observation discarded by this adapter; durable
 /// engine history and HTTP status remain authoritative, errors are retained below.
@@ -147,12 +149,8 @@ fn run(
                     (Err(error), Ok(())) | (Ok(()), Err(error)) => return Err(error),
                     (Err(error), Err(close)) => return Err(join(Some(error), close)),
                 }
-                let policy = store
-                    .settings()?
-                    .values
-                    .mission_supervision_policy()
-                    .map_err(E::Settings)?;
-                let cadence = mission_watch::cadence(&policy)?;
+                let discovery = store.mission_discovery_observation()?;
+                let cadence = mission_watch::cadence(&discovery.policy)?;
                 let finished: Vec<_> = sessions
                     .iter()
                     .filter(|(_, s)| s.handle.is_finished())
@@ -163,13 +161,10 @@ fn run(
                         session.finish()?;
                     }
                 }
-                for work in store.list_works()? {
-                    if sessions.contains_key(&work.id) {
+                for (work_id, control) in discovery.missions {
+                    if sessions.contains_key(&work_id) {
                         continue;
                     }
-                    let control = store.mission_control_view(&work.id).map_err(|e| {
-                        E::Mutation(swarm_engine::WorkEngineError::Mission(Box::new(e)))
-                    })?;
                     if !automatic(&control) {
                         continue;
                     }
@@ -177,7 +172,7 @@ fn run(
                         ExecutionInterrupt::new().map_err(|e| cause("web-conductor-source", e))?;
                     let (sender, receiver) = mpsc::channel();
                     let session_source = source.clone();
-                    let id = work.id.clone();
+                    let id = work_id.clone();
                     let handle = thread::Builder::new()
                         .name("swarm-web-mission".into())
                         .spawn_scoped(scope, move || {
@@ -207,7 +202,7 @@ fn run(
                         })
                         .map_err(|e| cause("web-conductor-thread", e))?;
                     sessions.insert(
-                        work.id,
+                        work_id,
                         Session {
                             source,
                             stop: sender,
@@ -370,7 +365,7 @@ mod tests {
     /// known Work inside its cause, and every secondary cleanup failure.
     #[test]
     fn late_conductor_failure_keeps_http_report_and_typed_effects() {
-        let report = swarm_web::NativeServerReport {
+        let report = swarm_web::NativeServerReport { last_auxiliary_effects:Vec::new(),
             completed_jobs: 3,
             ..Default::default()
         };

@@ -22,6 +22,12 @@ pub(crate) struct RetainedResult {
     pub(crate) report_path: String,
     pub(crate) report_sha256: String,
 }
+impl RetainedResult {
+    /// Borrow the worker base from this already verified immutable result.
+    /// `verify_result` binds it to the original worker proof and Git parent;
+    /// this getter adds no IO, current-source guarantee or execution authority.
+    pub(crate) fn worker_base(&self) -> &str { &self.base }
+}
 
 /// Decode exactly one regular ls-tree record. Modes and OID lengths are Git
 /// representation invariants, not operator limits. Reject malformed/multiple

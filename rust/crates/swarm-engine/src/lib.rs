@@ -1,12 +1,18 @@
 //! Native engine construction. Request data is not authority or a running engine.
 #![forbid(unsafe_code)]
+/// Raw-safe Linux connection credentials; no grant or per-message attribution.
+#[cfg(target_os = "linux")]
+mod linux_peer_credentials;
+/// Read-only Linux prerequisite observations, never launch admission.
+#[cfg(target_os = "linux")]
+pub use swarm_linux_prerequisites as linux_prerequisites;
 mod biba;
 pub use biba::{Integrity, BibaAccess, BibaDenied, check_biba};
 mod trust_types;
 #[cfg(unix)]
 mod trust;
 #[cfg(unix)]
-pub use trust::{TrustError,TrustReply,verify_trust};
+pub use trust::{TrustError,TrustReply,verify_trust,verify_public_trust};
 #[cfg(target_os = "linux")]
 mod agent_launch;
 #[cfg(target_os = "linux")]
@@ -130,7 +136,7 @@ mod provider_configuration;
 mod provider_policy_import;
 pub use provider_policy_import::{
     decode_provider_policy_change, ProviderPolicyChange, ProviderPolicyExport,
-    ProviderPolicyMutation,
+    ProviderPolicyMutation, ProviderPolicyView,
 };
 #[cfg(target_os = "linux")]
 mod provider_connection_catalogue;
@@ -142,6 +148,10 @@ pub use provider_configuration::{
 mod provider_model_arguments;
 #[cfg(target_os = "linux")]
 mod provider_model_route;
+#[cfg(target_os = "linux")]
+pub use provider_model_route::ProviderModelOption;
+#[cfg(target_os = "linux")]
+pub use root_store::{ProviderAdministration,ProviderAdministrationEntry,ProviderAdministrationObservation};
 pub use provider_model_arguments::{compile_provider_model_arguments, ProviderModelSyntax};
 mod agent_models;
 pub use agent_models::{
@@ -159,8 +169,8 @@ mod agent_resources;
 #[cfg(target_os = "linux")]
 pub use agent_resources::{observe_agent_resources, AgentResources, ProcessSlot, ProcessTable};
 pub use agent_live_read::{
-    read_agent_logs_after, read_live_fingerprint, read_terminal_events_after, AgentLogEntry, CursorPage, TerminalChunk,
-    LIVE_PAGE_ROWS,
+    read_agent_logs_after, read_live_fingerprint, read_terminal_events_after, AgentLogEntry, CursorPage, TerminalChunk, LIVE_PAGE_ROWS,
+
 };
 mod live_alerts;
 pub use live_alerts::{alert_conditions, alert_subjects, budget_conditions, usage_mismatch_conditions, AlertCondition, WorkBudgetState, ALERT_RULES};
@@ -278,6 +288,10 @@ pub use validation_run::{
     run_validation_control, ValidationRun, ValidationRunCleanup, ValidationRunError,
 };
 #[cfg(target_os = "linux")]
+mod git_reference_transaction;
+#[cfg(target_os = "linux")]
+pub use git_reference_transaction::{run_git_reference_transaction, GitReferenceDecision, GitReferenceObservation, GitReferenceRun, GitReferenceError};
+#[cfg(target_os = "linux")]
 mod git_metadata;
 #[cfg(target_os = "linux")]
 mod git_report;
@@ -308,7 +322,15 @@ pub use local_storage::{LocalStorageError, LocalStorageOperation, PublicationSta
 #[cfg(unix)]
 pub use root_schema::{RootSchemaError, RootSchemaFailure};
 #[cfg(target_os = "linux")]
-pub use root_store::RootBinding;
+pub use root_store::{RootBinding, TrustEnrollmentRequest};
+#[cfg(target_os = "linux")]
+pub use root_store::TrustEnrollmentCallError;
+#[cfg(target_os = "linux")]
+pub use root_store::CurrentManagedGitPublication;
+#[cfg(target_os = "linux")]
+pub use root_store::{PaeaGitIntent,PaeaGitIntentReservation,PaeaGitIntentObservation,PaeaGitIntentError};
+#[cfg(target_os = "linux")]
+pub use root_store::{PaeaSettlementRequest,PaeaSettlementReceipt,PaeaSettlementOutcome,PaeaSettlementError,PaeaSettlementObservation,PaeaSettlementCallError};
 #[cfg(unix)]
 pub use root_store::QuotaPreview;
 #[cfg(target_os = "linux")]
@@ -627,7 +649,7 @@ pub use root_store::{execute_planning_gate, PlanningRunOutcome, execute_review_g
 #[cfg(target_os = "linux")]
 pub use root_store::PlanningStepOutcome;
 #[cfg(target_os = "linux")]
-pub use root_store::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, TaskReviewPreview, TaskReviewInputs, TaskReviewCheck, ReviewInputSource, NativeValidationEvidence, ManagedPublicationPreview, ManagedPublicationOutcome};
+pub use root_store::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, TaskReviewPreview, TaskReviewInputs, TaskReviewCheck, ReviewInputSource, NativeValidationEvidence, ManagedPublicationPreview, ManagedPublicationOutcome, ManagedBaselinePreview, ManagedBaselineTask};
 
 #[cfg(target_os = "linux")]
 pub use root_store::{AdminBudgetPolicy,AdminBudgetChange,AdminBudgetEntry,AdminBudgetView,AdminBudgetOutcome,AdminBudgetReservationRequest,AdminBudgetReservation};
@@ -643,10 +665,12 @@ pub use root_store::MissionReportRelayOutcome;
 
 mod preparation_models;
 pub use preparation_models::{Preparation, PreparationDocument, PreparationSource, PreparationVerdict, PreparationConversion};
-pub use engine_settings::{PreparationReadPolicy, PreparationWritePolicy, PreparationPlanPolicy};
+pub use engine_settings::{PreparationReadPolicy, PreparationWritePolicy, PreparationPlanPolicy, PreparationSourcePolicy, PreparationTemplatePolicy};
 pub use root_store::{PreparationReadError, PreparationReadObservation};
 pub use preparation_models::PreparationMethod;
 pub use root_store::PreparationList;
+#[cfg(target_os="linux")]
+pub use root_store::{PreparationBudgetView,PreparationSourceFiles};
 
 pub use root_store::{HistoricalBudgetView, HistoricalBudgetShow, HistoricalBudgetPreview};
 
@@ -665,3 +689,112 @@ pub fn valid_preparation_key(value:&str)->bool{preparation_command::key(value)}
 
 #[cfg(target_os = "linux")]
 mod managed_publication_record;
+
+#[cfg(target_os="linux")]
+pub use root_store::{PreparationTemplate,PreparationTemplateSubject,PreparationTemplateQuestion,PreparationTemplateRole,PreparationTemplateWorkModel,PreparationTemplateIncrement,PreparationTemplateIntervention,PreparationTemplateAnswers,PreparationTemplateCheck};
+
+#[cfg(target_os="linux")]
+pub use root_store::ProjectProfileStatus;
+
+#[cfg(target_os = "linux")]
+pub use provider_connection_catalogue::{ApiConnectionCatalogue,ApiConnectionPublic};
+
+pub use root_store::PreparationReleaseReview;
+
+#[cfg(target_os="linux")]
+mod provider_connection_change;
+#[cfg(target_os="linux")]
+pub use provider_connection_change::{ApiConnectionChange,ApiConnectionMutation,decode_api_connection_change};
+
+mod preparation_turn;
+pub use preparation_turn::{PreparationTurn,PreparationAnswer,PreparationPlanSummary};
+
+pub use engine_settings::PreparationCallPolicy;
+
+#[cfg(target_os = "linux")]
+pub use root_store::{preparation_worker_error,decode_preparation_stop,PreparationStop,PreparationSend,PreparationCallCapabilities,PreparationApiRequest,execute_preparation_cli_gate,PreparationWorkerRequest,PreparationCliRequest,decode_preparation_send};
+
+#[cfg(target_os="linux")]
+mod provider_wait;
+#[cfg(target_os="linux")]
+pub use provider_wait::{ApiProviderWaitChange,ProviderWaitConfig,ProviderWaitChange,ProviderWaitRevision,ProviderWaitValues,decode_api_provider_wait_change,PROVIDER_WAIT_MAX_SECONDS};
+
+#[cfg(target_os="linux")]
+pub use root_store::{ProviderWaitView,ProviderWaitMutation};
+
+#[cfg(target_os="linux")]
+pub use root_store::{ApiConnectionProbeRequest,API_CONNECTION_PROBE_PROMPT};
+
+#[cfg(target_os = "linux")]
+pub use root_store::{ProjectProfileDefinition, ProjectProfileInstruction, ProjectProfileChoice, ProjectProfileCatalog, ProjectProfilePreview};
+
+mod run_limits_admin_codec;
+pub use run_limits_admin_codec::{RunLimitsConfigChange,RunLimitsHistoryEntry,ApiRunLimitsConfigChange,decode_api_run_limits_config_change,decode_run_limits_config_change,decode_run_limits_config_entry,decode_run_limits_history_entry};
+
+#[cfg(target_os="linux")]
+pub use root_store::{RunLimitsAdminView,RunLimitsFieldBound};
+
+#[cfg(target_os="linux")]
+pub use root_store::RunLimitsMutation;
+
+pub use run_limits_admin_codec::{ApiRunLimitsRollback,decode_api_run_limits_rollback};
+
+mod preparation_plan_changes;
+pub use preparation_plan_changes::PreparationPlanChange;
+
+mod activity_page;
+mod activity_entry;
+pub use activity_page::{ActivitySource,ActivityEntry,ActivityQuery,ActivityPage,ActivityPageError,activity_rank,paginate_activity};
+pub use root_store::{ActivityReadView,ActivityPolicyObservation};
+mod activity_read_policy;
+pub use activity_read_policy::{ActivityReadCap,ActivityReadValues,ActivityReadChange,ActivityReadRevision,ActivityReadConfig,ApiActivityReadChange,decode_activity_read_defaults,decode_activity_read_config,decode_api_activity_read_change,validate_activity_read_values,validate_activity_read_config,validate_activity_read_change,ACTIVITY_MAX_SAFE_ROWS};
+pub use root_store::{ActivityReadPolicyView,ActivityReadPolicyBounds,ActivityReadPolicyMutation};
+mod graph_performance;
+pub use graph_performance::{GraphPerformanceLoad,GraphPerformanceValues,GraphPerformanceChange,GraphPerformanceRevision,GraphPerformanceConfig,ApiGraphPerformanceChange,decode_graph_performance_defaults,decode_graph_performance_config,decode_api_graph_performance_change,validate_graph_performance_values,validate_graph_performance_config,validate_graph_performance_change,GRAPH_EXACT_INTEGER_MAX};
+pub use root_store::{GraphPerformanceView,GraphPerformanceBounds,GraphPerformanceMutation};
+mod web_request_policy;
+pub use web_request_policy::{WebRequestValues,WebRequestChange,WebRequestRevision,WebRequestConfig,ApiWebRequestChange,decode_web_request_defaults,decode_web_request_config,decode_api_web_request_change,validate_web_request_values,validate_web_request_config,validate_web_request_change,WEB_REQUEST_MAX_SAFE_INTEGER_MS};
+#[cfg(target_os="linux")]
+pub use root_store::{WebRequestView,WebRequestBounds,WebRequestMutation};
+
+pub use root_store::PreparationRevisionReview;
+
+mod preparation_cli_output;
+pub use preparation_cli_output::PreparationCliOutput;
+
+pub use activity_read_policy::{ActivityReadInput,decode_activity_read_input};
+
+mod log_read_policy;
+pub use log_read_policy::{LogReadCap,LogReadValues,LogReadChange,LogReadRevision,LogReadConfig,ApiLogReadChange,LogSearchInput,decode_log_read_defaults,decode_log_read_config,decode_api_log_read_change,decode_log_search_input,validate_log_read_values,validate_log_read_config,validate_log_read_change,LOG_MAX_SAFE_ROWS};
+pub use root_store::{LogReadPolicyView,LogReadPolicyBounds,LogReadPolicyMutation};
+
+pub use root_store::{LogQueryView,LogQueryExact,LogQueryPolicyObservation};
+
+#[cfg(target_os = "linux")]
+pub use root_store::{RuntimeHealthRead, RuntimeHealthView};
+
+#[cfg(unix)]
+mod auxiliary_effect;
+#[cfg(unix)]
+pub use auxiliary_effect::{auxiliary_effects,extend_auxiliary_effects,AuxiliaryEffect,AuxiliaryEffectState,SessionVisit};
+
+#[cfg(target_os="linux")]
+mod session_visit;
+#[cfg(target_os="linux")]
+pub use session_visit::{decode_visit_mark,VisitMarkInput};
+#[cfg(target_os="linux")]
+pub use root_store::{SessionVisitView,SessionVisitMutation};
+
+#[cfg(target_os="linux")]
+pub use root_store::{PlanningDecisionView,PlanningHistoryError};
+
+#[cfg(target_os="linux")]
+pub use root_store::LifecycleMission;
+
+pub use engine_settings::ReportReadPolicy;
+
+#[cfg(target_os="linux")]
+mod anchored_artifact;
+
+#[cfg(target_os = "linux")]
+pub use root_store::MissionDiscoveryObservation;

@@ -1,14 +1,21 @@
 //! Per-action Biba reference monitor. Fixed simulated effects only; no provider,
 //! Linux confinement or authority is conferred by deserializing its data.
+pub(crate) mod authentication;
 pub(crate) mod command;
+pub(crate) mod audit;
 pub(crate) mod config;
+pub(crate) mod extensions;
 pub mod error;
 pub(crate) mod json;
 pub(crate) mod operations;
 pub(crate) mod proof;
+pub(crate) mod public_evidence;
 pub(crate) mod proof_types;
+pub(crate) mod response;
+pub(crate) mod separation;
 pub(crate) mod state;
 pub use error::TrustError;
+pub use public_evidence::verify as verify_public_trust;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 /// Observable reply retained through Root close/output failures. Publication

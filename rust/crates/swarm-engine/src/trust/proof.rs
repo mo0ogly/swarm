@@ -143,6 +143,15 @@ fn verify_context(e: &Evidence, prior: &[Evidence]) -> Result<(), E> {
         return Err(E::Integrity("trust-policy-context"));
     }
     policy.policy.validate().map_err(E::Invalid)?;
+    if let Some(roles)=&policy.role_separation{roles.validate_shape()?;}
+    if let Some(roles)=policy.role_separation.as_ref().filter(|r|r.enabled){
+        if e.kind=="approve"&&e.result=="approved"{
+            let request=prior.iter().find(|p|p.kind=="request"&&p.result=="admitted"&&p.object_id==e.object_id&&p.content_digest==e.content_digest).ok_or(E::Integrity("trust-role-request-proof"))?;
+            let mandate=request.identity_context.as_ref().and_then(|i|i.delegation_id.as_deref()).ok_or(E::Integrity("trust-role-mandate-context"))?;
+            let admitted=prior.iter().find(|p|p.kind=="mandate-create"&&p.result=="admitted"&&p.object_id==mandate).ok_or(E::Integrity("trust-role-mandate-proof"))?;
+            if roles.conflicts(&[("admin",&admitted.actor),("requester",&request.actor),("approver",&e.actor)])?{return Err(E::Integrity("trust-role-approval-conflict"));}
+        }
+    }
     let controls: serde_json::Value = serde_json::from_str(policy.controls.raw())?;
     let expected: serde_json::Value =
         serde_json::from_str(include_str!("../../config/trust-controls-defaults.json"))?;
@@ -273,6 +282,16 @@ fn verify_context(e: &Evidence, prior: &[Evidence]) -> Result<(), E> {
         })
     {
         return Err(E::Integrity("trust-effect-authorizations"));
+    }
+    // Reconciliation authenticates readback of the historical effect, not a new
+    // write under today's participant grouping. Earlier commit proof remains checked.
+    if let Some(roles)=policy.role_separation.as_ref().filter(|_|e.kind=="commit"){
+        let admitted=prior.iter().find(|p|p.kind=="mandate-create"&&p.result=="admitted"&&p.content_digest==intent.mandate_digest).ok_or(E::Integrity("trust-role-mandate-proof"))?;
+        let request=prior.iter().find(|p|p.kind=="request"&&p.result=="admitted"&&p.object_id==e.object_id&&p.content_digest==e.content_digest).ok_or(E::Integrity("trust-role-request-proof"))?;
+        for hash in &intent.approval_digests{
+            let approval=prior.iter().find(|p|p.hash==*hash).ok_or(E::Integrity("trust-role-approval-proof"))?;
+            if roles.conflicts(&[("admin",&admitted.actor),("requester",&request.actor),("approver",&approval.actor),("effect",&e.actor)])?{return Err(E::Integrity("trust-role-effect-conflict"));}
+        }
     }
     Ok(())
 }

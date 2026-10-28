@@ -1,6 +1,12 @@
 //! Immutable installation declaration and read-only Linux storage observation.
 //! A human label, public key or distinct UID is never authenticated authority.
 #![forbid(unsafe_code)]
+mod authenticated;
+mod control;
+pub use authenticated::{
+    decode_authenticated, encode_authenticated, AuthenticatedDocument, PersonalDeclaration,
+};
+pub use control::{decode_control, encode_control, ControlDocument};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use swarm_enrollment_config::Pins;
@@ -8,9 +14,11 @@ use swarm_wire_json as wire;
 #[cfg(target_os = "linux")]
 mod loader;
 #[cfg(target_os = "linux")]
-pub use loader::load;
+pub use loader::{load, load_authenticated, load_control};
 #[cfg(all(target_os = "linux", feature = "test-fixtures"))]
-pub use loader::{load_with_faults, FixtureFaults};
+pub use loader::{
+    load_authenticated_with_faults, load_control_with_faults, load_with_faults, FixtureFaults,
+};
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Document {
@@ -30,6 +38,7 @@ pub enum IoOperation {
 }
 pub enum Error {
     Document,
+    Binding(swarm_enrollment_config::Error),
     Frame(serde_json::Error),
     Pin,
     Path,
@@ -44,9 +53,10 @@ pub enum Error {
     },
 }
 impl Error {
+    /// Safe validation/storage category; typed Binding preserves shared Pins refusal.
     pub fn code(&self) -> &'static str {
         match self {
-            Self::Document | Self::Frame(_) => "document",
+            Self::Document | Self::Frame(_) | Self::Binding(_) => "document",
             Self::Pin => "pin",
             Self::Path | Self::Protected(_) => "path",
             Self::Io {
@@ -60,6 +70,7 @@ impl Error {
     pub fn contains_code(&self, code: &str) -> bool {
         self.code() == code
             || match self {
+                Self::Binding(cause) => cause.contains_code(code),
                 Self::Joined { cause, cleanup } => {
                     cause.contains_code(code) || cleanup.contains_code(code)
                 }
@@ -74,8 +85,10 @@ impl Error {
     }
 }
 impl fmt::Display for Error {
+    /// Safe categories and metadata only; never echo declaration/public-key input.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::Binding(cause) => write!(f, "enrollment bootstrap: binding ({})", cause.code()),
             Self::Frame(e) => write!(
                 f,
                 "enrollment bootstrap: document ({:?}, line {}, column {})",
@@ -104,8 +117,10 @@ impl fmt::Debug for Error {
     }
 }
 impl std::error::Error for Error {
+    /// Original typed primary cause; cleanup_error is an additional Joined branch.
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
+            Self::Binding(cause) => Some(cause),
             Self::Frame(e) => Some(e),
             Self::Protected(e) => Some(e),
             Self::Io { cause, .. } => Some(cause),
@@ -127,9 +142,15 @@ fn overlaps(a: &str, b: &str) -> bool {
         || a.strip_prefix(b).is_some_and(|tail| tail.starts_with('/'))
         || b.strip_prefix(a).is_some_and(|tail| tail.starts_with('/'))
 }
+/// Encode validated canonical Linux installation data, without IO or authority.
+/// Both UID roles require assignable numeric representation and must differ;
+/// UID0 is allowed as data, never proof of an existing account or permission.
+/// Invalid schema/pins/UID/path returns a typed refusal before serialization.
 pub fn encode(d: &Document) -> Result<Vec<u8>, Error> {
     if d.schema_version != 1
         || d.pins.validate().is_err()
+        || !swarm_identity_contract::linux_uid(d.service_uid)
+        || !swarm_identity_contract::linux_uid(d.controller_uid)
         || d.service_uid == d.controller_uid
         || !clean_path(&d.configuration_directory)
         || !clean_path(&d.witness_directory)
@@ -139,6 +160,9 @@ pub fn encode(d: &Document) -> Result<Vec<u8>, Error> {
     }
     wire::encode(d).map_err(Error::Frame)
 }
+/// Decode exact canonical data and apply the same UID/pins/path validation.
+/// Reserved UID, missing/unknown/ambiguous fields and noncanonical bytes refuse;
+/// no file access, automatic migration, identity adoption or authority is issued.
 pub fn decode(raw: &[u8]) -> Result<Document, Error> {
     let d: Document = wire::decode(raw).map_err(Error::Frame)?;
     if encode(&d)? != raw {

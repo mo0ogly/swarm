@@ -409,7 +409,40 @@ impl LocalDirectory {
     pub(crate) fn reserve_provider_configuration(
         &self,
     ) -> Result<LocalReservation, LocalStorageError> {
-        let file = self.open_file("providers.lock", OFlags::RDWR | OFlags::CREATE)?;
+        self.reserve_configuration("providers.lock")
+    }
+    /// Acquire Go's provider-wait lock with checked private regular-file custody.
+    /// Nonblocking contention/errors preserve causes; no retry or policy deadline.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn reserve_provider_wait(&self) -> Result<LocalReservation, LocalStorageError> {
+        self.reserve_configuration("provider-wait.lock")
+    }
+    /// Go browser waiting policy lock, owned private nonblocking custody.
+    /// No new retry/deadline. Original open/flock/unlock/close causes remain.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn reserve_web_requests(&self) -> Result<LocalReservation, LocalStorageError> {
+        self.reserve_configuration("web-requests.lock")
+    }
+    /// Acquire the Go graph objectives lock under private checked custody.
+    /// Nonblocking errors retain causes; caller must close, no retry or deadline.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn reserve_graph_performance(&self) -> Result<LocalReservation, LocalStorageError> {
+        self.reserve_configuration("graph-performance.lock")
+    }
+    /// Reserve the native activity policy file under owned nonblocking custody.
+    /// No retry/deadline or data grant; caller explicitly checks close.
+    #[cfg(target_os="linux")]
+    pub(crate) fn reserve_activity_read_policy(&self)->Result<LocalReservation,LocalStorageError>{self.reserve_configuration("activity-policy.lock")}
+    /// Reserve the saved log/terminal read policy under owned nonblocking custody.
+    /// Caller checks close; no retry, deadline, row default or data permission.
+    #[cfg(target_os="linux")]
+    pub(crate) fn reserve_log_read_policy(&self)->Result<LocalReservation,LocalStorageError>{self.reserve_configuration("log-read-policy.lock")}
+    /// Shared checked flat-name configuration lock. Only crate-owned fixed
+    /// protocol names are passed; no external path/authority, truncation or wait.
+    /// Caller must explicitly close the returned owned reservation.
+    #[cfg(target_os = "linux")]
+    fn reserve_configuration(&self, name: &str) -> Result<LocalReservation, LocalStorageError> {
+        let file = self.open_file(name, OFlags::RDWR | OFlags::CREATE)?;
         if let Err(e) = fs::flock(&file, FlockOperation::NonBlockingLockExclusive) {
             return close_after(
                 Err(LocalStorageError::new(LocalStorageOperation::Lock, e)),

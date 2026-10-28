@@ -1,0 +1,38 @@
+{
+  "go": {
+    "work": {
+      "id": "w-9d074acd5f1dbd7ee578fcf0",
+      "revision": 1,
+      "body": "{\"schema_version\":1,\"id\":\"w-9d074acd5f1dbd7ee578fcf0\",\"revision\":1,\"title\":\"Criteria fixture\",\"objective\":\"Meaningful contract\",\"scope\":\"Private root\",\"criteria\":[\"Valid\",\" \"],\"next\":\"\",\"summary\":\"\",\"memory\":null,\"created\":\"2026-10-18T21:54:47.781922494Z\",\"updated\":\"2026-10-18T21:54:47.798806911Z\",\"git\":{\"head\":\"\",\"branch\":\"master\",\"changes\":\"\"},\"tasks\":[]}"
+    },
+    "event": {
+      "id": "go-blank-2",
+      "work_id": "w-9d074acd5f1dbd7ee578fcf0",
+      "revision": 1,
+      "kind": "work.create",
+      "at": "2026-10-18T21:54:47.798806911Z",
+      "payload": "{\"schema_version\":1,\"event_id\":\"go-blank-2\",\"expected_revision\":0,\"title\":\"Criteria fixture\",\"objective\":\"Meaningful contract\",\"scope\":\"Private root\",\"criteria\":[\"Valid\",\" \"]}",
+      "request": "{\"schema_version\":1,\"event_id\":\"go-blank-2\",\"expected_revision\":0,\"title\":\"Criteria fixture\",\"objective\":\"Meaningful contract\",\"scope\":\"Private root\",\"criteria\":[\"Valid\",\" \"]}"
+    },
+    "producer_sha256": "fe446495146feca095047385c43675a24f510d14ece66832f26a33433a75099d",
+    "source_root": "/home/fpizzi/.swarm-rust-criteria56-rkabp0le"
+  },
+  "native": {
+    "work": {
+      "id": "w-041daedb7a9e3e397b924ecb",
+      "revision": 1,
+      "body": "{\"schema_version\":1,\"id\":\"w-041daedb7a9e3e397b924ecb\",\"revision\":1,\"title\":\"Criteria fixture\",\"objective\":\"Meaningful contract\",\"scope\":\"Private root\",\"criteria\":[\"Valid\",\" \"],\"next\":\"\",\"summary\":\"\",\"memory\":null,\"created\":\"2026-10-18T21:54:48.553427325Z\",\"updated\":\"2026-10-18T21:54:48.567533497Z\",\"git\":{\"head\":\"\",\"branch\":\"master\",\"changes\":\"\"},\"tasks\":[]}"
+    },
+    "event": {
+      "id": "native-blank-2",
+      "work_id": "w-041daedb7a9e3e397b924ecb",
+      "revision": 1,
+      "kind": "work.create",
+      "at": "2026-10-18T21:54:48.567533497Z",
+      "payload": "{\"schema_version\":1,\"event_id\":\"native-blank-2\",\"expected_revision\":0,\"title\":\"Criteria fixture\",\"objective\":\"Meaningful contract\",\"scope\":\"Private root\",\"criteria\":[\"Valid\",\" \"]}",
+      "request": "{\"schema_version\":1,\"event_id\":\"native-blank-2\",\"expected_revision\":0,\"title\":\"Criteria fixture\",\"objective\":\"Meaningful contract\",\"scope\":\"Private root\",\"criteria\":[\"Valid\",\" \"]}"
+    },
+    "producer_sha256": "933aa960cfaa45a85c20eba47fb795d926ae2bef7939be343801f502d15dcdd6",
+    "source_root": "/home/fpizzi/.swarm-rust-criteria56-aja0_1sf"
+  }
+}

@@ -13,4 +13,5 @@ pub use service::{
     HttpReply, HttpServiceError, NativeHttpServer, NativeHttpService, NativeJobOutcome,
     NativeObservationCause, NativeObservationFailure, NativeOutcomeObserver, NativeOutcomeRecord,
     NativeRequestError, NativeServerError, NativeServerReport, RecordedConfiguration,
+    TrustEnrollmentSource, TrustEnrollmentSourceError,
 };

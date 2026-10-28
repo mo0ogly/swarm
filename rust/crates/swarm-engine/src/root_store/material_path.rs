@@ -16,8 +16,21 @@ pub(super) fn verify_material_path(
     root: &RootStore,
     binding: &RootBinding,
 ) -> Result<(), RootStoreError> {
+    verify_bound_path(&root.root, binding)
+}
+
+/// Check a retained Root binding against a material pathname without opening
+/// SQLite. The owned directory and database O_PATH witnesses prevent inode reuse;
+/// current path association is observed before checked close. This is neither
+/// pathname confinement nor a content-integrity/SQL-health assertion. All original
+/// observation and close errors survive; no mutation or permission is granted.
+#[cfg(target_os = "linux")]
+pub(super) fn verify_bound_path(
+    root: &std::path::Path,
+    binding: &RootBinding,
+) -> Result<(), RootStoreError> {
     let directory =
-        LocalDirectory::open(&root.root.join(".swarm")).map_err(RootStoreError::Storage)?;
+        LocalDirectory::open(&root.join(".swarm")).map_err(RootStoreError::Storage)?;
     let result = (|| {
         let expected = binding.instance()?;
         if directory.identity().map_err(RootStoreError::Storage)? != expected.directory

@@ -44,12 +44,12 @@ pub struct PreparationCommand {
 /// while text/title bounds come exclusively from the persisted editing policy.
 fn shape() -> Fields {
     &[
-        ("organization", Kind::Pointer(&Kind::Raw)),
-        ("source", Kind::Pointer(&Kind::Raw)),
-        ("budget", Kind::Pointer(&Kind::Raw)),
+        ("organization", Kind::Pointer(&Kind::Object(crate::preparation_models::shape_preparation_organization))),
+        ("source", Kind::Pointer(&Kind::Object(crate::preparation_models::shape_preparation_reference))),
+        ("budget", Kind::Pointer(&Kind::Object(crate::preparation_models::shape_budget))),
         ("adopt_brief", Kind::Bool),
         ("expected_work_revision", Kind::Pointer(&Kind::Int64)),
-        ("decisions", Kind::Array(&Kind::Raw)),
+        ("decisions", Kind::Array(&Kind::Object(crate::models::shape_plan_question))),
         ("turn_id", Kind::String),
         ("version", Kind::Int64),
         ("preparation_id", Kind::String),
@@ -65,29 +65,40 @@ fn shape() -> Fields {
     ]
 }
 /// Decode Go case-folding/null/duplicate semantics with unknown fields refused.
-/// Typed UTF8/JSON failures preserve their cause; no IO or state change occurs.
+/// Nested budget/source/organization/decisions are projected BEFORE conversion
+/// to generic JSON values, retaining original duplicate/alias/null order. Typed
+/// UTF8/JSON/shape failures preserve their cause; no IO or state change occurs.
 pub(crate) fn decode(raw: &[u8]) -> Result<PreparationCommand, crate::WorkError> {
     crate::work::decode_mode(raw, shape(), true)
 }
 /// Verify identity, revision and action-specific fields using supplied byte caps.
 /// Null caps mean unlimited; no fallback, truncation, provider call or mutation.
 /// adopt-brief/validate-plan/answer-questions/create-missions bind sha256; the
-/// writer checks freshness. create-missions requires expected_work_revision=0
-/// and supports no existing-work or organization request. No start is granted.
+/// writer checks freshness. create-missions requires a nonnegative target revision:
+/// zero for a new Work, current positive revision for an existing target. The
+/// transaction checks the association; organization remains separate. release-plan requires
+/// a positive Work revision and converted snapshot hash. Only that explicit
+/// action authorizes start; it neither launches an agent nor changes budgets.
+/// revise-missions requires a positive Work revision and changed validated draft
+/// hash; only the writer checks old custody, history, activity and pause/locks.
+/// budget requires an explicit envelope; the writer validates amounts/provenance
+/// and stamps engine metadata without changing reservations or consumption.
+/// configure-team additionally requires an explicit organization and positive
+/// Work CAS; it configures a pristine conversion without releasing any task.
 pub(crate) fn validate(
     r: &PreparationCommand,
     document_cap: Option<usize>,
     title_cap: Option<usize>,
 ) -> Result<(), crate::RootStoreError> {
     use crate::RootStoreError as E;
-    if r.organization.is_some()
-        || r.source.is_some()
-        || r.budget.is_some()
-        || r.adopt_brief
-        || (r.action!="create-missions" && r.expected_work_revision.is_some())
+    if (r.organization.is_some() && r.action!="configure-team")
+        || (r.source.is_some() && !matches!(r.action.as_str(),"source-add"|"source-remove"))
+        || (r.budget.is_some() && r.action!="budget")
+        || (r.adopt_brief && r.action!="use-proposal")
+        || (!matches!(r.action.as_str(),"create-missions"|"revise-missions"|"release-plan"|"configure-team") && r.expected_work_revision.is_some())
         || (r.action != "answer-questions" && r.decisions.is_some())
-        || !r.turn_id.is_empty()
-        || (!matches!(r.action.as_str(), "adopt-brief"|"validate-plan"|"answer-questions"|"create-missions") && !r.sha256.is_empty())
+        || (!r.turn_id.is_empty() && r.action!="use-proposal")
+        || (!matches!(r.action.as_str(), "adopt-brief"|"validate-plan"|"answer-questions"|"create-missions"|"revise-missions"|"release-plan"|"configure-team") && !r.sha256.is_empty())
         || r.version != 1
         || !key(&r.event_id)
         || r.expected_revision.is_none_or(|n| n < 0)
@@ -98,6 +109,9 @@ pub(crate) fn validate(
         return Err(E::Refused("preparation-request-invalid"));
     }
     match r.action.as_str() {
+        "use-proposal" if key(&r.preparation_id) && key(&r.turn_id) && r.work_id.is_empty() && r.title.is_empty() && r.method.is_empty() && r.document.is_empty() && r.text.is_empty()=>Ok(()),
+        "source-add"|"source-remove" if key(&r.preparation_id) && r.source.is_some() && r.work_id.is_empty() && r.title.is_empty() && r.method.is_empty() && r.document.is_empty() && r.text.is_empty() => Ok(()),
+        "budget" if key(&r.preparation_id) && r.budget.is_some() && r.work_id.is_empty() && r.title.is_empty() && r.method.is_empty() && r.document.is_empty() && r.text.is_empty() => Ok(()),
         "create"
             if r.preparation_id.is_empty()
                 && r.expected_revision == Some(0)
@@ -135,7 +149,11 @@ pub(crate) fn validate(
             Ok(())
         }
         "create-missions"
-            if key(&r.preparation_id) && r.expected_work_revision==Some(0)
+            if key(&r.preparation_id) && r.expected_work_revision.is_some_and(|n|n>=0)
+                && !r.sha256.is_empty() && r.work_id.is_empty() && r.title.is_empty()
+                && r.method.is_empty() && r.document.is_empty() && r.text.is_empty() => { Ok(()) }
+        "release-plan" | "configure-team" | "revise-missions"
+            if (r.action!="configure-team" || r.organization.is_some()) && key(&r.preparation_id) && r.expected_work_revision.is_some_and(|n|n>0)
                 && !r.sha256.is_empty() && r.work_id.is_empty() && r.title.is_empty()
                 && r.method.is_empty() && r.document.is_empty() && r.text.is_empty() => { Ok(()) }
         "adopt-brief" | "validate-plan"

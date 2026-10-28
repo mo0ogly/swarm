@@ -109,6 +109,7 @@ pub(super) fn permit_using(root:&RootStore,tx:&Transaction<'_>,settings:EngineSe
 /// are explicitly closed. Caller still owns channel closure and fresh transport
 /// checks before any exec; returned data alone is not execution or confinement.
 /// Missing/EOF/invalid grant or any uncertain identity refuses with typed causes.
+/// Shared raw credential validation rejects PID0/invalid UID-GID before grant or Root use.
 fn admit_with_job(root: &Path, id: &str, channel: &mut UnixStream) -> Result<(Material, Job), E> {
     if !swarm_identity_contract::name(id.as_bytes()) {
         return Err(E::Refused("review-gate-id-invalid"));
@@ -118,9 +119,9 @@ fn admit_with_job(root: &Path, id: &str, channel: &mut UnixStream) -> Result<(Ma
         .map_err(|error| caused("review-gate-channel-kind", error))?;
     crate::supervisor_identity::arm_parent_death_signal()
         .map_err(|error| caused("review-gate-parent-death", error))?;
-    let peer = rustix::net::sockopt::socket_peercred(&*channel)
+    let peer = crate::linux_peer_credentials::read(&*channel)
         .map_err(|error| caused("review-gate-peer-credentials", error))?;
-    if peer.uid != rustix::process::geteuid() {
+    if peer.uid() != rustix::process::geteuid().as_raw() {
         return Err(E::Refused("review-gate-peer-user-changed"));
     }
     let mut grant = [0u8; 1];
@@ -151,7 +152,7 @@ fn admit_with_job(root: &Path, id: &str, channel: &mut UnixStream) -> Result<(Ma
                     || job.child_pid != Some(actual.pid())
                     || job.child_stamp.as_deref() != Some(actual.process_stamp())
                     || job.owner_host != actual.host()
-                    || job.owner_pid != i64::from(peer.pid.as_raw_pid())
+                    || job.owner_pid != i64::from(peer.pid())
                 {
                     return Err(E::Refused("review-gate-identity-or-permission"));
                 }

@@ -6,7 +6,7 @@
 <title>Swarm — harnais d’agent</title><link rel="icon" href="/swarm-logo.png" type="image/png">
 <link rel="stylesheet" href="/live/themes.css"><link rel="stylesheet" href="/live/swarm-design.css"><link rel="stylesheet" href="/live/xterm.css"><link rel="stylesheet" href="/live/live.css">
 <script src="/live/live-common.js"></script><script src="/live/live-metrics.js"></script>
-<script src="/live/english.js" defer></script><script src="/live/i18n.js" defer></script><script src="/live/live-terminal.js" defer></script><script src="/live/live-session.js" defer></script>
+<script src="/live/english.js" defer></script><script src="/live/i18n.js" defer></script><script src="/live/live-terminal.js" defer></script><script src="/live/recorded-cursor.js" defer></script><script src="/live/log-query.js" defer></script><script src="/live/live-session.js" defer></script>
 </head>
 <body class="live-page live-harness">
 <header class="live-rail">
@@ -63,6 +63,7 @@
  <section class="live-panel" aria-labelledby="h-log-title">
   <h2 id="h-log-title">Journal</h2>
   <div class="live-logtools"><label>Filtrer <input id="h-filter" type="search" placeholder="type ou texte (/)" autocomplete="off"></label><button type="button" id="h-copy">Copier le journal</button><button type="button" id="h-last-error" disabled>Dernière erreur</button><span id="h-copy-status" role="status"></span></div>
+  <div id="h-log-query"></div>
   <ol id="h-log" class="live-log" tabindex="0" aria-live="off"></ol>
   <p id="h-log-empty" class="live-empty">Aucune entrée de journal enregistrée.</p>
  </section>

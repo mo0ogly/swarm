@@ -4,6 +4,14 @@
 //! wire codec, journal, OS boundary or public Swarm command in this crate yet.
 #![forbid(unsafe_code)]
 
+/// Whether a raw Linux UID has an assignable numeric representation. The all-ones
+/// UID (-1) is reserved by Linux; zero remains representable. This pure check does
+/// no account lookup, namespace mapping, IO, authentication or authorization and
+/// is not an operator policy ceiling. A true result is data only, never a grant.
+pub fn linux_uid(value: u32) -> bool {
+    value != u32::MAX
+}
+
 /// Existing identifier representation: 1..=100 ASCII bytes, not an execution policy.
 pub fn name(value: &[u8]) -> bool {
     !value.is_empty()
@@ -99,5 +107,18 @@ impl Permission {
                 .resource
                 .bytes()
                 .any(|byte| matches!(byte, b'*' | b'?' | b'[' | b']'))
+    }
+}
+
+#[cfg(test)]
+mod linux_uid_tests {
+    /// Representation only: root and the maximum assignable value are not grants
+    /// or existing account claims; the all-ones sentinel is the sole exclusion.
+    #[test]
+    fn linux_uid_representation_refuses_only_reserved_sentinel() {
+        for uid in [0, 1, u32::MAX - 1] {
+            assert!(super::linux_uid(uid));
+        }
+        assert!(!super::linux_uid(u32::MAX));
     }
 }

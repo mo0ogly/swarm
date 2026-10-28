@@ -167,3 +167,29 @@ fn preparation_adopt_brief_receipt_failure_rolls_back_and_same_event_recovers() 
     reopened.close().unwrap();
     std::fs::remove_dir_all(path).unwrap();
 }
+
+/// A valid explicit envelope precedes receipt-insert failure on an owned fixture.
+/// Rollback must preserve budget/revision/history; removing the injected fault
+/// permits the identical event. No provider, consumption reset or live Root.
+#[test]
+fn preparation_budget_receipt_failure_rolls_back_and_recovers() {
+    let path=std::env::temp_dir().join(format!("swarm-preparation-budget-{}-{}",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+    std::fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+    let root=RootStore::initialize(&path,&mut SystemEnvironment).unwrap();
+    let p=root.preparation_command(br#"{"version":1,"action":"create","event_id":"budget-born","expected_revision":0,"text":"retained"}"#,&mut SystemEnvironment).unwrap().value;
+    let request=|revision,event,limit|serde_json::to_vec(&serde_json::json!({"version":1,"action":"budget","preparation_id":p.id,"event_id":event,"expected_revision":revision,"budget":{"limit_usd":limit,"reserve_per_launch_usd":0.5,"estimate_source":"fixture","reference_date":"2026-10-26"}})).unwrap();
+    let current=root.preparation_command(&request(1,"budget-control",10),&mut SystemEnvironment).unwrap().value;
+    assert_eq!(current.budget.as_ref().unwrap().limit_usd.0,10.0);
+    let db=rusqlite::Connection::open(path.join(".swarm/state.db")).unwrap();
+    let raw=request(2,"budget-fault",20);
+    db.execute_batch("CREATE TRIGGER preparation_budget_fault BEFORE INSERT ON preparation_commands BEGIN SELECT RAISE(ABORT,'PRIVATE_BUDGET_FAULT'); END").unwrap();
+    let error=root.preparation_command(&raw,&mut SystemEnvironment).err().expect("receipt fault must refuse");
+    assert_eq!(error.code(),"agent-launch-storage");assert!(error.recorded_preparation().is_none());assert!(!error.to_string().contains("PRIVATE_BUDGET_FAULT"));
+    assert_eq!(root.preparation_show(&p.id).unwrap().value,current);
+    db.execute_batch("DROP TRIGGER preparation_budget_fault").unwrap();
+    let recovered=root.preparation_command(&raw,&mut SystemEnvironment).unwrap().value;
+    assert_eq!(recovered.revision,3);assert_eq!(recovered.budget.as_ref().unwrap().limit_usd.0,20.0);assert_eq!(recovered.documents,p.documents);
+    assert_eq!(root.preparation_command(&raw,&mut SystemEnvironment).unwrap().value,recovered);
+    db.close().unwrap();root.close().unwrap();
+    let reopened=RootStore::open(&path,false).unwrap();assert_eq!(reopened.preparation_show(&p.id).unwrap().value,recovered);reopened.close().unwrap();std::fs::remove_dir_all(path).unwrap();
+}

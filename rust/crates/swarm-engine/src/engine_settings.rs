@@ -4,6 +4,10 @@ use crate::{EngineMutationLimits, TaskDefinitionLimits, ValidationPolicyLimits};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeSet, error::Error, fmt};
+/// Highest supported journal/change envelope: protocol version, not an operator
+/// limit or permission to adopt missing historical settings. Group versions in
+/// `schema_version` remain fixed so old documents retain their declared shape.
+const SETTINGS_SCHEMA_MAX: i64 = 47;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SettingCount(pub i64);
 /// Providers with a supported telemetry injection (protocol capability, not an
@@ -48,6 +52,92 @@ impl<'de> Deserialize<'de> for SettingCount {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct EngineSettingsValues {
+    /// v47: bytes retained for display; null is unlimited, absence requires adoption.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_cap")]
+    pub report_preview_max_bytes:Option<SettingCap>,
+    /// v47: complete private-report verification bytes; never a truncated-proof cap.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_cap")]
+    pub report_verification_max_bytes:Option<SettingCap>,
+    /// v46: 0 désactive ; 1 autorise le parcours texte sous les contrôles de budget, de source et de fraîcheur. Le kill switch de déploiement reste prioritaire.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_count")]
+    pub preparation_call_enabled:Option<SettingCount>,
+    /// v46: Octets UTF-8 avant retrait des espaces ; null sans borne, zéro refuse tout message non vide.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_cap")]
+    pub preparation_call_message_max_bytes:Option<SettingCap>,
+    /// v46: Octets UTF-8 du prompt complet ; null sans borne, zéro refuse un contexte non vide.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_cap")]
+    pub preparation_call_context_max_bytes:Option<SettingCap>,
+    /// v46: Tours retenus par préparation ; null sans borne, zéro refuse un premier tour. Aucun historique supprimé.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_cap")]
+    pub preparation_call_turn_limit:Option<SettingCap>,
+    /// v46: JSON : octets du corps ; SSE : octets du contenu assemblé. null sans borne ; zéro refuse une réponse non vide.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_cap")]
+    pub preparation_call_response_max_bytes:Option<SettingCap>,
+    /// v46: Secondes avant annulation locale ; zéro sans délai. Une annulation ne prouve ni arrêt distant ni absence de coût.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_count")]
+    pub preparation_call_timeout_seconds:Option<SettingCount>,
+    /// v46: Secondes ; zéro sans plafond. Le délai effectif doit respecter ce maximum.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_count")]
+    pub preparation_call_timeout_maximum_seconds:Option<SettingCount>,
+    /// v46: Intervalle positif en millisecondes pour observer un arrêt demandé ; aucun retry fournisseur.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_count")]
+    pub preparation_call_observation_ms:Option<SettingCount>,
+    /// v46: Intervalle positif en millisecondes lorsque le dialogue contient un tour actif.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_count")]
+    pub preparation_call_refresh_ms:Option<SettingCount>,
+    /// v46: Borne technique positive du transport, distincte du budget et du contenu.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_count")]
+    pub preparation_call_http1_max_headers:Option<SettingCount>,
+    /// v46: Octets, entier positif représentable en u32. Borne technique du transport.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_count")]
+    pub preparation_call_http2_max_header_bytes:Option<SettingCount>,
+    /// v46: json ou sse, sans fallback automatique ni nouvelle tentative implicite.
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub preparation_call_transport:Option<String>,
+
+    /// v45: Per-answer UTF8 bytes before trimming; null unlimited, zero nonempty denied.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_cap")]
+    pub preparation_template_answer_max_bytes:Option<SettingCap>,
+    /// v45: Final questionnaire draft and projected plan bytes; null unlimited.
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_cap")]
+    pub preparation_template_draft_max_bytes:Option<SettingCap>,
+    /// v44: Complete source file bytes; null explicitly unlimited, zero permits no nonempty input.
+    #[serde(default, skip_serializing_if="Option::is_none", deserialize_with="present_cap")]
+    pub preparation_source_file_max_bytes:Option<SettingCap>,
+    /// v44: Selected source excerpt bytes; null explicitly unlimited, zero permits no nonempty input.
+    #[serde(default, skip_serializing_if="Option::is_none", deserialize_with="present_cap")]
+    pub preparation_source_max_bytes:Option<SettingCap>,
+    /// v44: All attached source excerpt bytes; null explicitly unlimited, zero permits no nonempty input.
+    #[serde(default, skip_serializing_if="Option::is_none", deserialize_with="present_cap")]
+    pub preparation_sources_max_bytes:Option<SettingCap>,
+    /// v44: Attached source count; null explicitly unlimited, zero permits no nonempty input.
+    #[serde(default, skip_serializing_if="Option::is_none", deserialize_with="present_cap")]
+    pub preparation_sources_max_count:Option<SettingCap>,
+    /// v44: Selected source line count; null explicitly unlimited, zero permits no nonempty input.
+    #[serde(default, skip_serializing_if="Option::is_none", deserialize_with="present_cap")]
+    pub preparation_source_max_lines:Option<SettingCap>,
+    /// v44: Relative source path bytes; null explicitly unlimited, zero permits no nonempty input.
+    #[serde(default, skip_serializing_if="Option::is_none", deserialize_with="present_cap")]
+    pub preparation_source_path_max_bytes:Option<SettingCap>,
+    /// v44: Source search query bytes; null explicitly unlimited, zero permits no nonempty input.
+    #[serde(default, skip_serializing_if="Option::is_none", deserialize_with="present_cap")]
+    pub preparation_source_query_max_bytes:Option<SettingCap>,
+    /// v44: Listed child directories; null explicitly unlimited, zero permits no nonempty input.
+    #[serde(default, skip_serializing_if="Option::is_none", deserialize_with="present_cap")]
+    pub preparation_source_directory_limit:Option<SettingCap>,
+    /// v44: Listed source files; null explicitly unlimited, zero permits no nonempty input.
+    #[serde(default, skip_serializing_if="Option::is_none", deserialize_with="present_cap")]
+    pub preparation_source_file_limit:Option<SettingCap>,
+    /// v44: Visited source entries; null explicitly unlimited, zero permits no nonempty input.
+    #[serde(default, skip_serializing_if="Option::is_none", deserialize_with="present_cap")]
+    pub preparation_source_scan_limit:Option<SettingCap>,
+    /// v44: Allowed source file extensions, each a dot plus ASCII alphanumerics; empty denies all. Absence remains unconfigured.
+    #[serde(default, skip_serializing_if="Option::is_none", deserialize_with="present_string_array")]
+    pub preparation_source_allowed_extensions:Option<Vec<String>>,
+    /// v44: Excluded generated directory/file basenames; private path classes remain forbidden. Absence remains unconfigured.
+    #[serde(default, skip_serializing_if="Option::is_none", deserialize_with="present_string_array")]
+    pub preparation_source_excluded_components:Option<Vec<String>>,
+
     /// Report mtime tolerance in seconds (v40). Absence stays unconfigured on
     /// historical installations; zero requires mtime >= the attempt start.
     /// This affects relay selection, never author authentication or acceptance.
@@ -399,7 +489,9 @@ pub struct EngineSettingsValues {
         deserialize_with = "present_cap"
     )]
     pub agent_launch_instruction_max_bytes: Option<SettingCap>,
-    /// v16: explicit saved launch preparation policy; absence requires adoption.
+    /// v16: saved shared provider/model-catalogue and migrated local-policy
+    /// source/serialized-history byte cap; None requires adoption, inner null
+    /// explicitly removes it. No existing source/attempt is rewritten.
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
@@ -1025,11 +1117,16 @@ impl EngineSettingsValues {
     /// missing groups. Returns a safe typed format/policy error; no IO or state
     /// changes occur, and legacy absence never becomes implicit current defaults.
     /// Validate supplied values, technical representation and complete versioned
-    /// policy groups through v43. Historical absence remains absent; network20
+    /// policy groups through v47. The independent report-read group does not
+    /// adopt unrelated earlier groups. Historical absence remains absent; network20
     /// requires prior groups and never adopts defaults, opens sockets, changes
     /// Work/history or establishes active-server state. Typed validation causes
     /// survive rejection; caller still owes authority and publication freshness.
     pub fn validate(&self) -> Result<(), EngineSettingsError> {
+        if self.report_preview_max_bytes.is_some() || self.report_verification_max_bytes.is_some() { self.report_read_policy()?; }
+        if self.has_preparation_call_policy() { self.preparation_call_policy()?; self.preparation_template_policy()?; self.preparation_source_policy()?; self.preparation_plan_policy()?; self.preparation_write_policy()?; self.preparation_read_policy()?; }
+        if self.has_preparation_source_policy() { self.preparation_source_policy()?; self.preparation_plan_policy()?; self.preparation_write_policy()?; self.preparation_read_policy()?; }
+        if self.has_preparation_template_policy() { self.preparation_template_policy()?; self.preparation_source_policy()?; self.preparation_plan_policy()?; self.preparation_write_policy()?; self.preparation_read_policy()?; }
         if self.has_preparation_plan_policy() { self.preparation_plan_policy()?; self.preparation_write_policy()?; self.preparation_read_policy()?; }
         if self.has_preparation_write_policy() { self.preparation_write_policy()?; self.preparation_read_policy()?; }
         if self.preparation_list_limit.is_some() || self.preparation_history_limit.is_some() || self.preparation_method_max_bytes.is_some() {
@@ -1345,6 +1442,56 @@ impl EngineSettingsValues {
             history_limit: read(self.preparation_history_limit)?,
             method_max_bytes: read(self.preparation_method_max_bytes)? })
     }
+    /// Preserve historical absence of the template-check policy group.
+    fn has_preparation_template_policy(&self)->bool {
+        self.preparation_template_answer_max_bytes.is_some() || self.preparation_template_draft_max_bytes.is_some()
+    }
+    /// Read explicit v45 answer/draft caps, never silently adopt initial values.
+    /// Null is unlimited; zero blocks nonempty bytes. Missing/partial groups or
+    /// representation overflow refuse. Pure: no template, draft or authority changes.
+    pub fn preparation_template_policy(&self)->Result<PreparationTemplatePolicy,EngineSettingsError>{
+        let cap=|v:Option<SettingCap>|v.ok_or_else(||refuse("settings-preparation-templates-not-configured"))?.0.map(|n|size(Some(n))).transpose();
+        Ok(PreparationTemplatePolicy{answer_max_bytes:cap(self.preparation_template_answer_max_bytes)?,draft_max_bytes:cap(self.preparation_template_draft_max_bytes)?})
+    }
+    /// Whether any v44 source policy was declared, preserving historic absence.
+    fn has_preparation_source_policy(&self)->bool {
+        self.preparation_source_file_max_bytes.is_some() || self.preparation_source_max_bytes.is_some() || self.preparation_sources_max_bytes.is_some() || self.preparation_sources_max_count.is_some() || self.preparation_source_max_lines.is_some() || self.preparation_source_path_max_bytes.is_some() || self.preparation_source_query_max_bytes.is_some() || self.preparation_source_directory_limit.is_some() || self.preparation_source_file_limit.is_some() || self.preparation_source_scan_limit.is_some() || self.preparation_source_allowed_extensions.is_some() || self.preparation_source_excluded_components.is_some()
+    }
+    /// Validate the complete persisted source policy without adopting defaults.
+    /// Null caps are unlimited, zero blocks nonempty data/listing. Extension and
+    /// basename lists are case-insensitive and must survive the Admin line editor
+    /// without trimming changes. Empty extension list denies all. Private path
+    /// classes and known secret detection remain protocol guards, not overrides.
+    /// Missing/partial groups, unsafe list entries, duplicates and representation
+    /// overflow refuse; no IO, capture, history mutation or launch occurs.
+    pub fn preparation_source_policy(&self)->Result<PreparationSourcePolicy,EngineSettingsError>{
+        let missing=||refuse("settings-preparation-sources-not-configured");
+        let cap=|v:Option<SettingCap>|v.ok_or_else(missing)?.0.map(|n|size(Some(n))).transpose();
+        let extensions=self.preparation_source_allowed_extensions.as_ref().ok_or_else(missing)?;
+        let excluded=self.preparation_source_excluded_components.as_ref().ok_or_else(missing)?;
+        let mut seen=BTreeSet::new();
+        for value in extensions {
+            if !value.starts_with('.') || value.len()<2 || !value[1..].bytes().all(|b|b.is_ascii_alphanumeric()) || !seen.insert(value.to_ascii_lowercase()){return Err(refuse("settings-preparation-source-extensions-invalid"));}
+        }
+        seen.clear();
+        for value in excluded {
+            if value.is_empty() || matches!(value.as_str(),"."|"..") || value.contains(['/', '\\', '\0', '\n', '\r']) || crate::text::trim_space(value)!=value || !seen.insert(crate::text::scalar_lower(value)){return Err(refuse("settings-preparation-source-components-invalid"));}
+        }
+        Ok(PreparationSourcePolicy {
+            file_max_bytes:cap(self.preparation_source_file_max_bytes)?,
+            excerpt_max_bytes:cap(self.preparation_source_max_bytes)?,
+            total_max_bytes:cap(self.preparation_sources_max_bytes)?,
+            max_count:cap(self.preparation_sources_max_count)?,
+            max_lines:cap(self.preparation_source_max_lines)?,
+            path_max_bytes:cap(self.preparation_source_path_max_bytes)?,
+            query_max_bytes:cap(self.preparation_source_query_max_bytes)?,
+            directory_limit:cap(self.preparation_source_directory_limit)?,
+            file_limit:cap(self.preparation_source_file_limit)?,
+            scan_limit:cap(self.preparation_source_scan_limit)?,
+            allowed_extensions:extensions.iter().map(|v|v.to_ascii_lowercase()).collect(),
+            excluded_components:excluded.iter().map(|v|crate::text::scalar_lower(v)).collect(),
+        })
+    }
     /// Whether any plan-validation cap was declared, preserving legacy absence.
     fn has_preparation_plan_policy(&self) -> bool {
         self.preparation_plan_max_bytes.is_some() || self.preparation_plan_max_tasks.is_some()
@@ -1375,6 +1522,10 @@ impl EngineSettingsValues {
     /// Return the complete declared settings version, preserving historical
     /// absence. This does not adopt defaults, mutate history or grant authority.
     pub fn schema_version(&self) -> i64 {
+        if self.report_preview_max_bytes.is_some() || self.report_verification_max_bytes.is_some() { return 47; }
+        if self.has_preparation_call_policy() { return 46; }
+        if self.has_preparation_template_policy() { return 45; }
+        if self.has_preparation_source_policy() { return 44; }
         if self.has_preparation_plan_policy() { return 43; }
         if self.has_preparation_write_policy() { return 42; }
         if self.preparation_list_limit.is_some() || self.preparation_history_limit.is_some() || self.preparation_method_max_bytes.is_some() {
@@ -2231,7 +2382,7 @@ fn entry_digest(entry: &EngineSettingsEntry) -> Result<String, EngineSettingsErr
 /// typed validation causes. This reads supplied values only; publication,
 /// preview freshness and actor authority remain caller responsibilities.
 fn validate_change(r: &EngineSettingsChange) -> Result<(), EngineSettingsError> {
-    if !matches!(r.schema_version, 1..=43)
+    if !matches!(r.schema_version, 1..=SETTINGS_SCHEMA_MAX)
         || r.schema_version != r.values.schema_version()
         || !swarm_identity_contract::name(r.event_id.as_bytes())
         || r.expected_revision.0 < 0
@@ -2278,12 +2429,12 @@ impl EngineSettingsDocument {
         doc.validate()?;
         Ok(doc)
     }
-    /// Verify schema1–29 values, complete history, immutable digest chain and
+    /// Verify schema1–47 values, complete history, immutable digest chain and
     /// agreement between the head and last entry, preserving historical absence.
     /// Return typed format/policy errors without adoption, publication or IO.
     /// Logical integrity does not establish authentication or rollback protection.
     pub fn validate(&self) -> Result<(), EngineSettingsError> {
-        if !matches!(self.schema_version, 1..=43) || self.revision.0 < 1 || self.history.is_empty()
+        if !matches!(self.schema_version, 1..=SETTINGS_SCHEMA_MAX) || self.revision.0 < 1 || self.history.is_empty()
         {
             return Err(refuse("settings-document-envelope"));
         }
@@ -2417,3 +2568,27 @@ pub struct PreparationPlanPolicy {
     pub max_assumptions: Option<usize>,
     pub max_questions: Option<usize>,
 }
+
+/// Explicit v44 source acquisition/discovery policy. Every cap comes from the
+/// persisted Admin/API/CLI document; None is deliberately unlimited. This is not
+/// filesystem confinement, permission to transmit to an agent, or a source lease.
+#[derive(Clone,Debug,PartialEq,Eq)]
+pub struct PreparationSourcePolicy {
+    pub file_max_bytes:Option<usize>,pub excerpt_max_bytes:Option<usize>,
+    pub total_max_bytes:Option<usize>,pub max_count:Option<usize>,pub max_lines:Option<usize>,
+    pub path_max_bytes:Option<usize>,pub query_max_bytes:Option<usize>,
+    pub directory_limit:Option<usize>,pub file_limit:Option<usize>,pub scan_limit:Option<usize>,
+    pub allowed_extensions:Vec<String>,pub excluded_components:Vec<String>,
+}
+
+/// Explicit saved v45 questionnaire caps, not completeness or launch permission.
+#[derive(Clone,Debug,PartialEq,Eq)]
+pub struct PreparationTemplatePolicy {
+    pub answer_max_bytes:Option<usize>,pub draft_max_bytes:Option<usize>,
+}
+
+mod preparation_calls;
+pub use preparation_calls::PreparationCallPolicy;
+
+mod report_read;
+pub use report_read::ReportReadPolicy;

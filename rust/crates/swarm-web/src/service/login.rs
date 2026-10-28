@@ -242,7 +242,7 @@ impl NativeHttpService {
                 };
                 let body = if json {
                     serde_json::to_vec(&serde_json::json!({"error":message}))
-                        .map_err(HttpServiceError::Json)?
+                        .map_err(HttpServiceError::ResponseJson)?
                 } else {
                     page(english, light, message)?
                 };
@@ -262,7 +262,7 @@ impl NativeHttpService {
         let next = redirect(&next);
         let body = if json {
             serde_json::to_vec(&serde_json::json!({"redirect":next}))
-                .map_err(HttpServiceError::Json)?
+                .map_err(HttpServiceError::ResponseJson)?
         } else {
             vec![]
         };

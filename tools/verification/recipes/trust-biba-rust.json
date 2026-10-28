@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "trust-biba-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/biba.rs",
+    "rust/crates/swarm-engine/src/trust_types.rs",
+    "rust/crates/swarm-engine/src/trust/*.rs",
+    "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/local_storage.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-engine/config/trust-controls-defaults.json",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/src/trust.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/*.rs",
+    "rust/crates/swarm-engine/tests/trust_biba.rs",
+    "web/trust-native.*",
+    "web/i18n*.js",
+    "locales/en.json",
+    "tests/rust_trust_biba*",
+    "docs/actions-confiance-rust.md",
+    "docs/architecture/BIBA-RUST.md",
+    "docs/en/BIBA-RUST.md",
+    "docs/en/actions-confiance-rust.md",
+    "version_history.json",
+    "tests/rust_trust_biba_unit.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_agent_model_route.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "native-invariants",
+      "command": [
+        "python3",
+        "tests/rust_trust_biba_unit.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "BIBA_UNIT_PASS 30 named tests",
+        "PASS BIBA_UNIT_proof",
+        "PASS BIBA_UNIT_root"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-biba",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile; from pathlib import Path; p=Path(tempfile.mkdtemp(prefix='trust-biba-replay-',dir='.cache')).resolve()/'journey'; subprocess.run(['python3','tests/rust_trust_biba.py','--binary',os.environ['SWARM_BIBA_BINARY'],'--go-reference','bin/swarm-actions-confiance-proof-exact','--browser','--output',str(p)],check=True); print('BIBA_REPLAY_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS Go-verifies-Rust-exact-proof",
+        "PASS Rust-verifies-Go-exact-proof",
+        "PASS browser-public-journey",
+        "PASS late-output-failure-retains-publication",
+        "BIBA_PUBLIC_PASS",
+        "BIBA_REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

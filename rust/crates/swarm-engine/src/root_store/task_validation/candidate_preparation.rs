@@ -35,7 +35,8 @@ struct Snapshot {
 /// Observe an unclaimed actual submission under a short read transaction and
 /// saved-settings reservation; close both before returning plain data. Existing
 /// validation events/active jobs refuse before any Git or stage creation. The
-/// actual cumulative plan is validated with saved limits before filesystem writes.
+/// actual cumulative plan and accepted-baseline originals/freshness are verified
+/// with saved policy before filesystem writes; final snapshot repeats the checks.
 /// Errors and explicit rollback/release failures retain their typed causes. No
 /// busy retry, mutation, process, permission or lease is added by this observer.
 fn snapshot(store: &RootStore, work: &str, request: &Request) -> Result<Snapshot, E> {
@@ -69,6 +70,7 @@ fn snapshot(store: &RootStore, work: &str, request: &Request) -> Result<Snapshot
                 &limits.policy,
             )
             .map_err(launch)?;
+            super::super::managed_baseline::inspect(store,&tx,&observation.work,&request.task_id,&settings)?;
             let identity = crate::root_store::observe_instance(&tx, &store.directory)?;
             let digest = super::digest(&(
                 "native-managed-candidate-preparation/1",
@@ -90,7 +92,8 @@ fn snapshot(store: &RootStore, work: &str, request: &Request) -> Result<Snapshot
 impl RootStore {
     /// Prepare and retain one managed single-parent candidate from the current
     /// canonical submission and actual completed native producer. Uses saved
-    /// per-task cumulative policies, no aggregate limit. Root observations and
+    /// per-task cumulative policies and verified accepted-baseline originals, no
+    /// aggregate limit. Missing/stale historical authority refuses before Git. Root observations and
     /// checked releases surround Git preparation/pinning outside Root locks.
     /// Repeating an unchanged request reuses the immutable checkpoint; no job,
     /// event, command, permission, review, candidate-pointer or Work mutation is

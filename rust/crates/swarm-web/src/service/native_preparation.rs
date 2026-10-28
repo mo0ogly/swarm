@@ -29,7 +29,8 @@ pub(super) fn page(request: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceErr
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="/swarm-logo.png" type="image/png"><title>Préparer — Swarm</title>
 <link rel="stylesheet" href="/wattson_themes.css"><link rel="stylesheet" href="/prephase.css">
-<link rel="stylesheet" href="/swarm-design.css"><script src="/i18n-en.js" defer></script>
+<link rel="stylesheet" href="/swarm-design.css"><link rel="stylesheet" href="/preparation-work-model.css">
+<script src="/lib/dagre.min.js" defer></script><script src="/i18n-en.js" defer></script>
 <script src="/i18n.js" defer></script><script src="/swarm-shell.js" defer></script>
 <script type="module" src="/preparation-native.js"></script></head><body {body}"#).into_bytes())
 }

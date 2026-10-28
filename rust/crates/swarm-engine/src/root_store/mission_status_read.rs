@@ -23,14 +23,14 @@ pub struct MissionStatusPlanningCall {
     pub usage: Option<Usage>,
 }
 /// Stored exchange artifact declaration; no filesystem/hash verification occurs.
-#[derive(Clone, PartialEq, Eq, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Deserialize, serde::Serialize)]
 pub struct MissionStatusExchangeArtifact {
     pub path: String,
     pub sha256: String,
 }
-/// Persisted exchange observation, never recipient permission or acknowledgement
+/// Go-compatible public exchange observation, never recipient permission or acknowledgement
 /// authentication. Optional artifact-array null is preserved, not invented [].
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq, serde::Serialize)]
 pub struct MissionStatusExchange {
     pub id: String,
     pub work_id: String,
@@ -40,16 +40,24 @@ pub struct MissionStatusExchange {
     pub source_attempt_id: String,
     pub recipient_task_id: String,
     pub recipient_role: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
     pub recipient_attempt_id: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
     pub reply_to: String,
     pub state: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
     pub result_state: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
     pub need: String,
     pub artifacts: Option<Vec<MissionStatusExchangeArtifact>>,
     pub created_at: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
     pub deadline_at: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
     pub acknowledged_at: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
     pub acknowledged_by: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
     pub acknowledgement: String,
 }
 /// One SQL snapshot of complete retained data needed by the legacy aggregate.
@@ -142,6 +150,7 @@ fn spending_usage(raw: &[u8]) -> Result<Option<Usage>, E> {
 }
 
 /// Decode the historical artifact array with Go struct-zero/null semantics.
+/// BLOB/TEXT bytes share Go replacement of invalid UTF-8/UTF-16 strings.
 /// Unknown object fields remain compatible; malformed scalar/array/member types
 /// retain codec causes. No file access, artifact validation or hash grant occurs.
 fn exchange_artifacts(raw: &[u8]) -> Result<Option<Vec<MissionStatusExchangeArtifact>>, E> {
@@ -153,15 +162,17 @@ fn exchange_artifacts(raw: &[u8]) -> Result<Option<Vec<MissionStatusExchangeArti
     struct Envelope {
         artifacts: Option<Vec<MissionStatusExchangeArtifact>>,
     }
-    let raw: &serde_json::value::RawValue =
-        serde_json::from_slice(raw).map_err(|e| E::Encode(crate::WorkError::Json(e)))?;
+    // Normalize Go string spelling before RawValue validates UTF-8. Keep the
+    // original ordered object members; a Value intermediary would erase them.
+    let raw: Box<serde_json::value::RawValue> =
+        swarm_wire_json::decode(raw).map_err(|e| E::Encode(crate::WorkError::Json(e)))?;
     #[derive(serde::Serialize)]
     struct RetainedEnvelope<'a> {
         artifacts: &'a serde_json::value::RawValue,
     }
     // Serialize RawValue directly: a Value intermediary would collapse duplicate
     // keys before Go's ordered merge/type checks and could hide a bad value.
-    let wrapped = serde_json::to_vec(&RetainedEnvelope { artifacts: raw })
+    let wrapped = serde_json::to_vec(&RetainedEnvelope { artifacts: &raw })
         .map_err(|e| E::Encode(crate::WorkError::Json(e)))?;
     let envelope: Envelope = crate::work::decode(
         &wrapped,
@@ -169,6 +180,37 @@ fn exchange_artifacts(raw: &[u8]) -> Result<Option<Vec<MissionStatusExchangeArti
     )
     .map_err(E::Encode)?;
     Ok(envelope.artifacts)
+}
+
+/// Read exact ordered exchange rows in the caller's existing SQL snapshot.
+/// No Work existence check, IO artifacts, state transition, cutoff or permission
+/// is inferred here: the caller validates Work in that same transaction. Invalid
+/// stored JSON/types and SQL/finalization causes propagate, never empty success.
+pub(super) fn exchanges(db: &Connection, work: &str) -> Result<Vec<MissionStatusExchange>, E> {
+    collect(db,
+        "SELECT id,work_id,kind,source_agent_id,source_task_id,source_attempt_id,recipient_task_id,recipient_role,recipient_attempt_id,reply_to,state,result_state,need,artifacts,created_at,deadline_at,acknowledged_at,acknowledged_by,acknowledgement FROM agent_exchanges WHERE work_id=?1 ORDER BY created_at,id", [work], |row| {
+        // Go database/sql scans both SQLite BLOB and TEXT into []byte.
+        // SQL NULL becomes nil bytes, whose JSON decoding must still refuse;
+        // it is never silently converted to the valid JSON array/null values.
+        let stored = row.get_ref(13).map_err(E::Sql)?;
+        let artifacts = match stored {
+            rusqlite::types::ValueRef::Blob(raw) | rusqlite::types::ValueRef::Text(raw) => exchange_artifacts(raw)?,
+            rusqlite::types::ValueRef::Null => exchange_artifacts(&[])?,
+            other => return Err(E::Sql(rusqlite::Error::InvalidColumnType(13, "artifacts".into(), other.data_type()))),
+        };
+        Ok(MissionStatusExchange {
+            id: row.get(0).map_err(E::Sql)?, work_id: row.get(1).map_err(E::Sql)?,
+            kind: row.get(2).map_err(E::Sql)?, source_agent_id: row.get(3).map_err(E::Sql)?,
+            source_task_id: row.get(4).map_err(E::Sql)?, source_attempt_id: row.get(5).map_err(E::Sql)?,
+            recipient_task_id: row.get(6).map_err(E::Sql)?, recipient_role: row.get(7).map_err(E::Sql)?,
+            recipient_attempt_id: row.get(8).map_err(E::Sql)?, reply_to: row.get(9).map_err(E::Sql)?,
+            state: row.get(10).map_err(E::Sql)?, result_state: row.get(11).map_err(E::Sql)?,
+            need: row.get(12).map_err(E::Sql)?, artifacts,
+            created_at: row.get(14).map_err(E::Sql)?, deadline_at: row.get(15).map_err(E::Sql)?,
+            acknowledged_at: row.get(16).map_err(E::Sql)?, acknowledged_by: row.get(17).map_err(E::Sql)?,
+            acknowledgement: row.get(18).map_err(E::Sql)?,
+        })
+    })
 }
 
 /// Read exact retained visit/history/call/exchange rows in the caller snapshot.
@@ -204,23 +246,7 @@ fn read(db: &Connection, work: &str, operator: &str) -> Result<MissionStatusInpu
             usage: spending_usage(raw.as_deref().unwrap_or_default())?,
         })
     })?;
-    let exchanges = collect(db,
-        "SELECT id,work_id,kind,source_agent_id,source_task_id,source_attempt_id,recipient_task_id,recipient_role,recipient_attempt_id,reply_to,state,result_state,need,artifacts,created_at,deadline_at,acknowledged_at,acknowledged_by,acknowledgement FROM agent_exchanges WHERE work_id=?1 ORDER BY created_at,id", [work], |row| {
-        let artifacts: Vec<u8> = row.get(13).map_err(E::Sql)?;
-        let artifacts = exchange_artifacts(&artifacts)?;
-        Ok(MissionStatusExchange {
-            id: row.get(0).map_err(E::Sql)?, work_id: row.get(1).map_err(E::Sql)?,
-            kind: row.get(2).map_err(E::Sql)?, source_agent_id: row.get(3).map_err(E::Sql)?,
-            source_task_id: row.get(4).map_err(E::Sql)?, source_attempt_id: row.get(5).map_err(E::Sql)?,
-            recipient_task_id: row.get(6).map_err(E::Sql)?, recipient_role: row.get(7).map_err(E::Sql)?,
-            recipient_attempt_id: row.get(8).map_err(E::Sql)?, reply_to: row.get(9).map_err(E::Sql)?,
-            state: row.get(10).map_err(E::Sql)?, result_state: row.get(11).map_err(E::Sql)?,
-            need: row.get(12).map_err(E::Sql)?, artifacts,
-            created_at: row.get(14).map_err(E::Sql)?, deadline_at: row.get(15).map_err(E::Sql)?,
-            acknowledged_at: row.get(16).map_err(E::Sql)?, acknowledged_by: row.get(17).map_err(E::Sql)?,
-            acknowledgement: row.get(18).map_err(E::Sql)?,
-        })
-    })?;
+    let exchanges = exchanges(db, work)?;
     Ok(MissionStatusInputs {
         work: document,
         agents,

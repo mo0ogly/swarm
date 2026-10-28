@@ -184,7 +184,7 @@ pub(crate) fn read_budget(tx: &rusqlite::Connection, work: &str) -> Result<Optio
 /// Reject corrupt active row values before summing the same ledger using SQLite.
 /// Queries are static module-owned statements; only work ID is parameterized.
 /// No inactive history is changed; missing schema/query/NULL/type/overflow fail.
-fn ledger_sum(tx: &rusqlite::Connection, work: &str, rows: &str, sum: &str) -> Result<f64> {
+pub(crate) fn ledger_sum(tx: &rusqlite::Connection, work: &str, rows: &str, sum: &str) -> Result<f64> {
     let mut statement = tx.prepare(rows).map_err(BudgetError::Sql)?;
     let scanned = (|| {
         let mut values = statement.query([work]).map_err(BudgetError::Sql)?;

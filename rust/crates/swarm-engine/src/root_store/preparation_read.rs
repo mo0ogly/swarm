@@ -44,7 +44,7 @@ pub struct PreparationList {
 }
 /// Read a retained SQLite text/blob body without coercing another SQL type.
 /// Finalization belongs to the caller; allocation/SQL causes propagate safely.
-fn body(row: &rusqlite::Row<'_>, index: usize) -> Result<Vec<u8>, E> {
+pub(super) fn body(row: &rusqlite::Row<'_>, index: usize) -> Result<Vec<u8>, E> {
     match row.get_ref(index).map_err(E::Sql)? {
         rusqlite::types::ValueRef::Blob(raw) | rusqlite::types::ValueRef::Text(raw) => Ok(raw.to_vec()),
         other => Err(E::Sql(rusqlite::Error::InvalidColumnType(index, "preparation body".into(), other.data_type()))),
@@ -88,6 +88,38 @@ fn needs_method(p: &Preparation) -> bool {
 }
 #[cfg(target_os = "linux")]
 impl RootStore {
+    /// Observe embedded framing/work models under current saved caps and role
+    /// body policy, with the shared Root/material/transaction guard. No draft,
+    /// provider, authority, visit or execution mutation; catalogue/schema errors
+    /// refuse instead of returning partial or empty success.
+    pub fn preparation_templates(&self)->Result<PreparationReadObservation<Vec<super::preparation_templates::PreparationTemplate>>,E>{
+        self.preparation_observed(|_,_,_|super::preparation_templates::catalogue(&self.read_settings()?.values))
+    }
+    /// Resolve a current or historical template ID without adopting its data.
+    /// Unknown IDs refuse, retaining the same role/graph validation and Root
+    /// cleanup semantics as catalogue reads. No user text enters diagnostics.
+    pub fn preparation_template(&self,id:&str)->Result<PreparationReadObservation<super::preparation_templates::PreparationTemplate>,E>{
+        self.preparation_observed(|_,_,_|{
+            let templates=super::preparation_templates::catalogue(&self.read_settings()?.values)?;
+            super::preparation_templates::select(&templates,id)
+        })
+    }
+    /// Validate questionnaire JSON and project a fresh draft under saved answer,
+    /// document/plan/task policies. The read-only snapshot owns no receipt or
+    /// adoption: completeness never authorizes launch. Unknown/malformed data,
+    /// policy, catalogue, encoding and cleanup causes propagate unchanged.
+    pub fn preparation_template_check(&self,raw:&[u8])->Result<PreparationReadObservation<super::preparation_template_check::Check>,E>{
+        self.preparation_observed(|_,_,_|{
+            let r=super::preparation_template_check::decode(raw)?;
+            let settings=self.read_settings()?.values;
+            let limits=settings.preparation_template_policy().map_err(E::Settings)?;
+            let plan=settings.preparation_plan_policy().map_err(E::Settings)?;
+            let task=settings.mutation_limits().map_err(E::Settings)?.task;
+            let templates=super::preparation_templates::catalogue(&settings)?;
+            let template=super::preparation_templates::select(&templates,&r.template_id)?;
+            super::preparation_template_check::check(&template,&r,&limits,&plan,&task)
+        })
+    }
     /// Guard read-only SQL/material association, saved policy and explicit rollback.
     /// Retain unavailable-method causes even if an outer path/close check fails;
     /// no snapshot atomicity, policy adoption or execution authority is inferred.
@@ -156,6 +188,60 @@ impl RootStore {
         if !crate::valid_preparation_key(id) { return Err(E::Refused("preparation-id-invalid")); }
         self.preparation_observed(|db, policy, causes| {
             let mut p = stored(db, id)?; self.preparation_project(&mut p, policy, causes)?; Ok(p)
+        })
+    }
+    /// Observe retained dialogue under one readonly SQL/material/settings guard.
+    /// Current method hashes and document source-turn references determine stale/
+    /// used flags. Method failures remain sidecars even on later SQL/refusal/close
+    /// errors. All turns are read without a second history cap. Legacy active turns
+    /// refuse; native active records must bind this physical Root. No stop, timeout heuristic,
+    /// budget/reservation/history mutation or provider call. File observations
+    /// are not an atomic filesystem snapshot or future execution authority.
+    pub fn preparation_dialogue(&self,id:&str)->Result<PreparationReadObservation<Vec<crate::PreparationTurn>>,E>{
+        if !crate::valid_preparation_key(id){return Err(E::Refused("preparation-id-invalid"));}
+        self.preparation_observed(|db,policy,causes|{
+            let p=stored(db,id)?;
+            let mut methods=super::preparation_methods::catalogue(&self.root,policy.method_max_bytes)?;
+            causes.append(&mut methods.causes);
+            let id=if p.method=="audit_pdca"{"audit-pdca"}else{p.method.as_str()};
+            let hash=methods.value.iter().find(|m|m.id==id && m.available).map(|m|m.sha256.as_str());
+            super::preparation_dialogue::read(db,&p,hash,&self.instance()?)
+        })
+    }
+    /// Observe preparation estimates/cost coverage in one read-only SQL snapshot.
+    /// Saved warning policy is read before SQL; this is not a policy lease. All
+    /// stored monetary/identity/codec/SQL and enclosing material/close failures
+    /// propagate. No provider, visit, reservation, document or budget mutation.
+    pub fn preparation_budget(&self,id:&str)->Result<PreparationReadObservation<super::PreparationBudgetView>,E>{
+        if !crate::valid_preparation_key(id){return Err(E::Refused("preparation-id-invalid"));}
+        let settings=self.read_settings()?;
+        if settings.values.work_budget_warning_percent.is_none(){return Err(E::Refused("budget-warning-policy-missing"));}
+        self.preparation_observed(|db,_,_|super::preparation_budget::read(db,&stored(db,id)?,settings.values.budget_warning_percent()))
+    }
+    /// Observe one project source with a full-file digest under actual connected
+    /// Root association. Range/content caps come from saved source policy; the
+    /// supplied environment contributes capture time only. No snapshot lease,
+    /// source authentication, transmission, adoption or mutation is established.
+    pub fn preparation_source<W:crate::WorkEnvironment>(&self,id:&str,path:&str,start:i64,end:i64,environment:&mut W)->Result<PreparationReadObservation<crate::PreparationSource>,E>{
+        if !crate::valid_preparation_key(id){return Err(E::Refused("preparation-id-invalid"));}
+        let at=environment.timestamp().map_err(E::Runtime)?;
+        self.preparation_observed(|db,_,_|{
+            stored(db,id)?;let policy=self.read_settings()?.values.preparation_source_policy().map_err(E::Settings)?;
+            let project=super::preparation_capture::project(&self.root,&self.instance()?)?;
+            let reference=super::preparation_capture::SourceRef{path:path.into(),start_line:start,end_line:end,sha256:String::new()};
+            super::finished(super::preparation_capture::excerpt(&project,&reference,&policy,&at),super::preparation_capture::close(project))
+        })
+    }
+    /// Discover allowed paths under a descriptor-bound project and a SQL-read
+    /// preparation identity. Settings are read under the material reservation;
+    /// filesystem contents are a non-atomic observation, not future permission.
+    /// Policy truncation is explicit; IO/codec/identity/close failures propagate.
+    pub fn preparation_files(&self,id:&str,scope:&str,query:&str)->Result<PreparationReadObservation<super::PreparationSourceFiles>,E>{
+        if !crate::valid_preparation_key(id){return Err(E::Refused("preparation-id-invalid"));}
+        self.preparation_observed(|db,_,_|{
+            stored(db,id)?;let policy=self.read_settings()?.values.preparation_source_policy().map_err(E::Settings)?;
+            let project=super::preparation_capture::project(&self.root,&self.instance()?)?;
+            super::finished(super::preparation_files::list(&project,scope,query,&policy),super::preparation_capture::close(project))
         })
     }
     /// Read earlier document snapshots newest revision first. Positive before

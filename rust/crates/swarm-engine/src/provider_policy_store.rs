@@ -1,6 +1,6 @@
 //! Policy-only adaptation of the existing checked provider-file publisher.
 use super::{finished, RootStore, RootStoreError as E};
-use crate::{ProviderPolicyChange, ProviderPolicyExport, ProviderPolicyMutation};
+use crate::{ProviderPolicyChange, ProviderPolicyExport, ProviderPolicyMutation, ProviderPolicyView};
 impl RootStore {
     /// Export only explicitly saved model policies in the portable version1
     /// shape. Read-only, bounded by current file policy; no API secret read or
@@ -9,6 +9,15 @@ impl RootStore {
     /// Structural/metadata/read/close failures retain safe causes. This proves
     /// neither catalogue availability nor operator/model identity or admission.
     pub fn export_provider_policies(&self) -> Result<ProviderPolicyExport, E> {
+        let view = self.provider_policies()?;
+        Ok(ProviderPolicyExport { version: view.version, policies: view.policies })
+    }
+    /// Read saved policies and their exact provider-file digest under the shared
+    /// directory reservation. Both derive from one validated source observation;
+    /// no secret-bearing configuration is serialized. Missing/invalid sources,
+    /// implicit known-provider defaults, empty policies and close failures refuse.
+    /// This performs no write, catalogue lookup, provider launch or authentication.
+    pub fn provider_policies(&self) -> Result<ProviderPolicyView, E> {
         let reservation = self.directory.reserve(false, false).map_err(E::Storage)?;
         let result = (|| {
             let source = self.provider_configuration()?;
@@ -28,8 +37,9 @@ impl RootStore {
             if policies.is_empty() {
                 return Err(E::Refused("provider-policy-export-empty"));
             }
-            Ok(ProviderPolicyExport {
+            Ok(ProviderPolicyView {
                 version: 1,
+                digest: source.digest,
                 policies,
             })
         })();

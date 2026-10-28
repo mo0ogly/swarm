@@ -1,0 +1,6 @@
+{
+  "search_page_rows": 100,
+  "history_page_rows": 200,
+  "live_log_page_rows": 100,
+  "terminal_page_rows": 100
+}

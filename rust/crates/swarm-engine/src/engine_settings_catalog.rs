@@ -160,6 +160,8 @@ impl EngineSettingsCatalog {
         let mut fields = descriptor.fields;
         for field in &mut fields {
             field.technical_maximum = network_transport.maximum_for(&field.name);
+            // HTTP/2 client header API uses u32, a technical representation bound.
+            if field.name=="preparation_call_http2_max_header_bytes"{field.technical_maximum=Some(crate::SettingCount(i64::from(u32::MAX)));}
             if crate::WEB_POLICY_FIELDS.contains(&field.name.as_str()) {
                 field.application = Some(EngineSettingApplication::ServerRestart);
             }

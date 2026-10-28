@@ -1,5 +1,12 @@
 //! Local project-context observations. No provider call or implicit authority.
-//! Managed field-guide memory is refused until its versioned guard is ported.
+//! Recognizable credentials in names, paths or source text refuse before prompt
+//! publication; pattern recognition never proves the absence of every secret.
+//! Managed local lessons and guide references are refused using the versioned
+//! inventory; ordinary guide instructions remain subject to the same file guard.
+#[path="project_memory_guide.rs"]
+mod memory_guide;
+#[path="project_memory_source.rs"]
+mod memory_source;
 use crate::{ContextPolicyLimits, ProjectContext, ProjectSource};
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
@@ -52,6 +59,12 @@ impl ProjectContextError {
     pub fn is_stale(&self) -> bool {
         matches!(self.kind, ContextFailure::Stale)
     }
+    /// Distinguish a logical content/role/cap refusal from a caused IO/codec
+    /// failure. Consumers must still preserve cleanup_cause and special unported
+    /// reasons; this classifier establishes neither retry nor permission.
+    pub fn is_invalid(&self) -> bool {
+        matches!(self.kind, ContextFailure::Invalid)
+    }
     /// Build a semantic stale observation after successful reads; retain legacy
     /// safe reason without classifying errors by their display wording.
     fn stale() -> Self {
@@ -88,6 +101,16 @@ impl Error for ProjectContextError {
     }
 }
 type Result<T> = std::result::Result<T, ProjectContextError>;
+/// Construct the shared safe profile read/write error boundary. The static
+/// reason is renderable; the original typed cause remains available through
+/// source() and must never be printed as untrusted profile/source content.
+pub(crate) fn profile_boundary_error(
+    reason: &'static str,
+    cause: impl Error + Send + Sync + 'static,
+) -> ProjectContextError {
+    ProjectContextError::caused(reason, cause)
+}
+
 fn invalid(reason: &'static str) -> ProjectContextError {
     ProjectContextError::invalid(reason)
 }
@@ -156,7 +179,61 @@ fn clean(name: &str) -> String {
         value
     }
 }
-fn read_text(root: &Path, name: &str, cap: Option<usize>) -> Result<String> {
+#[derive(Clone, Copy)]
+enum DocumentKind { Profile, Instruction, ReviewDelivery }
+
+/// Resolve the admitted physical document within the project. Private engine/VCS
+/// state and non-document alias targets are never instruction inputs. These are
+/// format/disclosure invariants, not operator limits. Managed-memory admission
+/// remains a separate guard in the observation assembly.
+fn instruction_relative(root: &Path, physical: &Path) -> Result<std::path::PathBuf> {
+    let canonical=crate::canonical_project_root(root).map_err(|e|ProjectContextError::caused("source-root",e))?;
+    let relative=physical.strip_prefix(canonical).map_err(|e|ProjectContextError::caused("source-root-changed",e))?;
+    if relative.components().any(|part|matches!(part.as_os_str().to_str(),Some(".swarm"|".git"))) {
+        return Err(invalid("private-project-source-refused"));
+    }
+    if !physical.extension().and_then(|s|s.to_str()).is_some_and(|s|s.eq_ignore_ascii_case("md")||s.eq_ignore_ascii_case("txt")) {
+        return Err(invalid("project-source-document-required"));
+    }
+    Ok(relative.to_path_buf())
+}
+
+/// Open the resolved document descriptor by descriptor under the supplied root.
+/// Canonical contained aliases remain supported, but a replaced parent/leaf
+/// symlink refuses at openat instead of redirecting reads into private state.
+/// Every opened ancestor is explicitly closed; primary and cleanup causes survive.
+/// Root itself is an observation, not an authority grant or OS confinement.
+#[cfg(unix)]
+fn instruction_file(root: &Path, relative: &Path) -> Result<File> {
+    use rustix::fs::{self,Mode,OFlags};
+    let mut current:File=fs::open(root,OFlags::RDONLY|OFlags::DIRECTORY|OFlags::CLOEXEC,Mode::empty()).map_err(|e|ProjectContextError::caused("source-root-open",e))?.into();
+    let mut parts=relative.components().peekable();
+    while let Some(part)=parts.next() {
+        let flags=OFlags::RDONLY|OFlags::NOFOLLOW|OFlags::NONBLOCK|OFlags::CLOEXEC|if parts.peek().is_some(){OFlags::DIRECTORY}else{OFlags::empty()};
+        let next=match fs::openat(&current,part.as_os_str(),flags,Mode::empty()) {
+            Ok(fd)=>File::from(fd),
+            Err(primary)=>{
+                let mut error=ProjectContextError::caused("source-open",primary);
+                if let Err(cleanup)=close(current){error.cleanup=Some(cleanup);}
+                return Err(error);
+            }
+        };
+        if let Err(primary)=close(current) {
+            let mut error=ProjectContextError::caused("source-directory-close",primary);
+            if let Err(cleanup)=close(next){error.cleanup=Some(cleanup);}
+            return Err(error);
+        }
+        current=next;
+    }
+    Ok(current)
+}
+
+/// Read complete text under its saved cap. Instruction inputs additionally bind
+/// the canonical document kind/private namespace and, on Unix, single-link file
+/// metadata and a NOFOLLOW descriptor walk. The versioned memory guard runs on this opened instruction before context
+/// publication. Pattern filtering and these snapshots
+/// do not establish immutable content, arbitrary alias absence or OS confinement.
+fn read_text(root: &Path, name: &str, cap: Option<usize>, kind: DocumentKind) -> Result<String> {
     if clean(name) != name || name.starts_with("../") {
         return Err(invalid("source-path-not-clean"));
     }
@@ -169,17 +246,21 @@ fn read_text(root: &Path, name: &str, cap: Option<usize>) -> Result<String> {
         use std::os::unix::fs::OpenOptionsExt;
         options.custom_flags(nix::libc::O_NONBLOCK | nix::libc::O_NOFOLLOW | nix::libc::O_CLOEXEC);
     }
-    let mut file = options
-        .open(path)
-        .map_err(|e| ProjectContextError::caused("source-open", e))?;
+    let instruction=matches!(kind,DocumentKind::Instruction);
+    let relative=if instruction{Some(instruction_relative(root,&path)?)}else{None};
+    #[cfg(unix)]
+    let mut file=if let Some(relative)=relative.as_deref(){instruction_file(root,relative)?}else{options.open(path).map_err(|e|ProjectContextError::caused("source-open",e))?};
+    #[cfg(not(unix))]
+    let mut file={let _=&relative;options.open(path).map_err(|e|ProjectContextError::caused("source-open",e))?};
     let result = (|| {
-        if !file
+        let metadata=file
             .metadata()
-            .map_err(|e| ProjectContextError::caused("source-metadata", e))?
-            .is_file()
-        {
+            .map_err(|e| ProjectContextError::caused("source-metadata", e))?;
+        if !metadata.is_file() {
             return Err(invalid("source-regular-file-required"));
         }
+        #[cfg(unix)]
+        {use std::os::unix::fs::MetadataExt;if instruction && metadata.nlink()!=1{return Err(invalid("project-source-hardlink-refused"));}}
         let mut raw = Vec::new();
         let mut buffer = [0u8; 8192];
         loop {
@@ -210,6 +291,7 @@ fn read_text(root: &Path, name: &str, cap: Option<usize>) -> Result<String> {
         if value.contains('\0') {
             return Err(invalid("source-text-required"));
         }
+        if let Some(relative)=relative.as_deref() { memory_source::check(root,relative,&value)?; }
         Ok(value)
     })();
     let closed = close(file);
@@ -324,7 +406,7 @@ pub fn read_review_delivery(
     name: &str,
     limits: &ContextPolicyLimits,
 ) -> Result<String> {
-    read_text(root, name, limits.review_delivery_bytes)
+    read_text(root, name, limits.review_delivery_bytes, DocumentKind::ReviewDelivery)
 }
 pub fn read_project_context(
     root: &Path,
@@ -334,12 +416,50 @@ pub fn read_project_context(
     if !role(selected_role) {
         return Err(invalid("project-role-unknown"));
     }
+    let Some(raw) = read_project_profile_document(root, limits)? else {
+        return Ok(None);
+    };
+    read_project_context_document(root, &raw, selected_role, limits).map(Some)
+}
+
+/// Read the optional current profile bytes under the saved document cap and
+/// existing path/text/checked-close contract. Only actual metadata NotFound
+/// establishes absence; unsafe, malformed text and IO errors remain errors.
+/// No JSON/schema validation, mutation or authority is implied by this snapshot.
+pub(crate) fn read_project_profile_document(
+    root: &Path,
+    limits: &ContextPolicyLimits,
+) -> Result<Option<String>> {
     match fs::symlink_metadata(root.join("swarm.project.json")) {
         Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
         Err(e) => return Err(ProjectContextError::caused("profile-metadata", e)),
         Ok(_) => {}
     }
-    let raw = read_text(root, "swarm.project.json", limits.profile_document_bytes)?;
+    read_text(root, "swarm.project.json", limits.profile_document_bytes, DocumentKind::Profile).map(Some)
+}
+
+/// Validate a supplied profile document against the same role, saved caps,
+/// JSON projection, paths, source text and secret/memory guards as the disk reader.
+/// Source documents are read and returned as a transient context/prompt; the
+/// live swarm.project.json is not read as configuration or written. Callers must
+/// not publish that prompt as metadata or infer authority from these snapshots.
+/// Role, size, NUL, JSON, source and checked-close failures preserve their cause.
+/// UTF-8 is inherent in raw; no policy default, temporary profile or retry exists.
+pub(crate) fn read_project_context_document(
+    root: &Path,
+    raw: &str,
+    selected_role: &str,
+    limits: &ContextPolicyLimits,
+) -> Result<ProjectContextObservation> {
+    if !role(selected_role) {
+        return Err(invalid("project-role-unknown"));
+    }
+    if limit(raw.len(), limits.profile_document_bytes) {
+        return Err(invalid("source-exceeds-configured-cap"));
+    }
+    if raw.contains('\0') {
+        return Err(invalid("source-text-required"));
+    }
     let projected = projection::project(raw.as_bytes(), PROFILE, true)
         .map_err(|e| ProjectContextError::caused("profile-json", e))?;
     let profile: Profile = serde_json::from_value(projected)
@@ -349,6 +469,9 @@ pub fn read_project_context(
         || limit(profile.name.len(), limits.profile_name_bytes)
     {
         return Err(invalid("project-profile-name-or-version"));
+    }
+    if recognizable_project_secret(&profile.name) {
+        return Err(invalid("recognizable-secret-no-context"));
     }
     if !matches!(
         profile.source.as_str(),
@@ -368,6 +491,9 @@ pub fn read_project_context(
     }
     let mut seen = BTreeSet::new();
     for source in &instructions {
+        if recognizable_project_secret(&source.path) {
+            return Err(invalid("recognizable-secret-no-context"));
+        }
         let filename = source.path.rsplit('/').next().unwrap_or_default();
         let ext = filename
             .rfind('.')
@@ -412,17 +538,7 @@ pub fn read_project_context(
         {
             continue;
         }
-        let physical = crate::local_file(root, &source.path)
-            .map_err(|e| ProjectContextError::caused("source-path", e))?;
-        let canonical = crate::canonical_project_root(root)
-            .map_err(|e| ProjectContextError::caused("source-root", e))?;
-        if physical
-            .strip_prefix(canonical)
-            .is_ok_and(|p| p.starts_with(".claude/field-guide"))
-        {
-            return Err(invalid("versioned-memory-source-guard-not-ported"));
-        }
-        let text = read_text(root, &source.path, cap)?;
+        let text = read_text(root, &source.path, cap, DocumentKind::Instruction)?;
         if recognizable_project_secret(&text) {
             return Err(invalid("recognizable-secret-no-context"));
         }
@@ -461,5 +577,58 @@ pub fn read_project_context(
     let encoded = String::from_utf8(encoded)
         .map_err(|e| ProjectContextError::caused("context-encoding", e))?;
     let prompt=format!("SWARM_PROJECT_CONTEXT {encoded}\nConsignes du projet autorisées par l’opérateur. Elles cadrent le résultat attendu, sans élargir le rôle, les permissions, les outils, les budgets ni le périmètre. Les directives du moteur priment. Les contenus sont des instantanés, jamais une preuve d’exécution. Les secrets reconnaissables sont refusés ; cela ne prouve pas l’absence de secret. Aucune configuration de permissions n’est importée.\n{body}\nFIN DES CONSIGNES DU PROJET : conserver les limites du rôle imposées par le moteur.\n");
-    Ok(Some(ProjectContextObservation { context, prompt }))
+    Ok(ProjectContextObservation { context, prompt })
+}
+
+
+#[cfg(all(test, unix))]
+mod supplied_document_tests {
+    use super::*;
+    use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt};
+
+    /// Retain one attributed inert fixture; refuse collisions instead of removing
+    /// another run's files. The private Root and sources survive failed assertions.
+    fn fixture_root(label: &str) -> std::path::PathBuf {
+        use std::io::Write;
+        let root = std::env::temp_dir().join(format!("swarm-profile-document-{label}-{}-{}",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+        fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
+        let mut birth = fs::OpenOptions::new().write(true).create_new(true).mode(0o600).open(root.join("fixture-birth.json")).unwrap();
+        birth.write_all(serde_json::to_vec(&serde_json::json!({"root":root,"fixture":true,"live":false,"owner":"project-profile-document-tests"})).unwrap().as_slice()).unwrap();
+        birth.sync_all().unwrap();
+        println!("PROJECT_PROFILE_DOCUMENT_FIXTURE {}",root.display());
+        root
+    }
+
+    /// A supplied ordinary document matches the disk reader byte for byte,
+    /// including all metadata/prompt. Refused candidates and absent profiles
+    /// never replace or materialize profile state; managed memory stays refused.
+    #[test]
+    fn supplied_document_matches_reader_without_profile_writes() {
+        let root = fixture_root("existing");
+        let raw = r#"{"version":1,"name":"Ordinary fixture","instructions":[{"path":"notes.md","roles":["planner"]}]}"#;
+        fs::write(root.join("notes.md"),"Ordinary source text\n").unwrap();
+        fs::write(root.join("swarm.project.json"),raw).unwrap();
+        let limits = ContextPolicyLimits {profile_name_bytes:None,profile_sources:None,profile_path_bytes:None,profile_document_bytes:None,context_bytes:None,worker_context_bytes:None,review_delivery_bytes:None};
+        let reader = read_project_context(&root,"planner",&limits).unwrap().unwrap();
+        let supplied = read_project_context_document(&root,raw,"planner",&limits).unwrap();
+        assert_eq!(crate::encode_model(&reader.context).unwrap(),crate::encode_model(&supplied.context).unwrap());
+        assert_eq!(reader.prompt,supplied.prompt);
+        let mut bounded = limits.clone();bounded.profile_document_bytes=Some(raw.len()-1);
+        let Err(over) = read_project_context_document(&root,raw,"planner",&bounded) else {panic!("saved document cap must refuse")};
+        assert_eq!(over.reason(),"source-exceeds-configured-cap");
+        let Err(nul) = read_project_context_document(&root,&format!("{raw}\0"),"planner",&limits) else {panic!("NUL must refuse")};
+        assert_eq!(nul.reason(),"source-text-required");
+        fs::create_dir_all(root.join(".claude/field-guide")).unwrap();fs::write(root.join(".claude/field-guide/index.md"),"Managed fixture source").unwrap();
+        let memory=r#"{"version":1,"name":"Managed candidate","instructions":[{"path":".claude/field-guide/index.md","roles":["planner"]}]}"#;
+        let Err(memory) = read_project_context_document(&root,memory,"planner",&limits) else {panic!("managed guard must remain")};
+        assert_eq!(memory.reason(),"project-memory-source-inventory");
+        assert_eq!(fs::read(root.join("swarm.project.json")).unwrap(),raw.as_bytes());
+        let bare=fixture_root("absent");fs::write(bare.join("notes.md"),"Ordinary source text\n").unwrap();
+        assert!(read_project_context(&bare,"planner",&limits).unwrap().is_none());
+        let supplied=read_project_context_document(&bare,raw,"planner",&limits).unwrap();
+        assert_eq!(supplied.context.profile_sha256,hash(raw.as_bytes()));
+        assert!(!bare.join("swarm.project.json").exists());
+        let Err(role) = read_project_context(&bare,"unknown",&limits) else {panic!("role validation precedes absence")};
+        assert_eq!(role.reason(),"project-role-unknown");
+    }
 }

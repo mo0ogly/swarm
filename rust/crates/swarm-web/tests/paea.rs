@@ -997,3 +997,26 @@ fn paea_approval_http_refusals_keep_causes_and_recover_without_partial_report() 
         let recovered=fixture.call(fixture.request("POST",path,raw.clone()));assert_eq!(recovered.response.status(),StatusCode::OK);assert_eq!(recovered.response.body(),control.response.body());
     }
 }
+
+/// Current server-process metadata only, under the existing protected GET gate.
+/// Invalid transport never mutates the opened Root or leaks rejected input text.
+#[test]
+fn paea_native_linux_prerequisites_get_observation_refusals_and_recovery(){
+ let f=Fixture::new();let before=snapshot(&f.root);let path="/api/v1/protection/linux-prerequisites";
+ let control=f.call(f.request("GET",path,vec![]));assert_eq!(control.response.status(),StatusCode::OK);assert!(control.failure.is_none());
+ let v:Value=serde_json::from_slice(control.response.body()).unwrap();assert_eq!(v["schema_version"],2);assert_eq!(v["read_only"],true);
+ for key in ["launch_verified","separate_host_uid_verified","confinement_verified","human_verified"] {assert_eq!(v[key],false)}
+ assert_eq!(snapshot(&f.root),before);
+ for fault in ["cookie","host","method","query","body"] {
+  let witness=f.call(f.request("GET",path,vec![]));assert_eq!(witness.response.status(),StatusCode::OK);
+  let mut r=f.request("GET",path,vec![]);let expected=match fault {
+   "cookie"=>{r.headers_mut().remove(COOKIE);StatusCode::FORBIDDEN},
+   "host"=>{r.headers_mut().insert(HOST,"invalid.test".parse().unwrap());StatusCode::FORBIDDEN},
+   "method"=>{*r.method_mut()=http::Method::POST;let authority=LocalWebAuthority::from_listener(&f.listener,KEY).unwrap();r.headers_mut().insert(ORIGIN,format!("http://{}",authority.host()).parse().unwrap());r.headers_mut().insert("x-swarm-csrf",KEY.parse().unwrap());StatusCode::METHOD_NOT_ALLOWED},
+   "query"=>{*r.uri_mut()=format!("{path}?root=PRIVATE_PREREQ_CANARY").parse().unwrap();StatusCode::BAD_REQUEST},
+   "body"=>{*r.body_mut()=b"PRIVATE_PREREQ_CANARY".to_vec();StatusCode::BAD_REQUEST},_=>unreachable!(),
+  };
+  let denied=f.call(r);assert_eq!(denied.response.status(),expected,"{fault}");assert!(denied.failure.is_some());assert!(!String::from_utf8_lossy(denied.response.body()).contains("PRIVATE_PREREQ_CANARY"));assert_eq!(snapshot(&f.root),before);
+  let recovered=f.call(f.request("GET",path,vec![]));assert_eq!(recovered.response.status(),StatusCode::OK);assert_eq!(snapshot(&f.root),before);
+ }
+}

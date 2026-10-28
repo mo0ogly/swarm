@@ -27,7 +27,10 @@ fn fixture() -> (tempfile::TempDir, Document, std::path::PathBuf) {
             },
         },
         service_uid: rustix::process::geteuid().as_raw(),
-        controller_uid: !rustix::process::geteuid().as_raw(),
+        controller_uid: match rustix::process::geteuid().as_raw() {
+            0 => 1,
+            uid => !uid,
+        },
         configuration_directory: root.path().join("configuration").to_str().unwrap().into(),
         witness_directory: root.path().join("witness").to_str().unwrap().into(),
     };
@@ -298,4 +301,39 @@ fn bootstrap_read_postcheck_and_all_close_failures_preserve_causes_and_refuse_da
     assert_eq!(e.code(), "pin");
     assert!(e.contains_code("storage"));
     assert!(e.cleanup_error().is_some());
+}
+
+/// Pure canonical UID data, not actual accounts or protected-root ownership.
+fn numeric_uid_witness() -> (tempfile::TempDir, Document) {
+    let (root, mut d, _) = fixture();
+    for (service, controller) in [(0, 1), (u32::MAX - 1, 0)] {
+        d.service_uid = service;
+        d.controller_uid = controller;
+        let raw = encode(&d).unwrap();
+        assert_eq!(decode(&raw).unwrap(), d);
+    }
+    d.service_uid = 0;
+    d.controller_uid = 1;
+    (root, d)
+}
+/// A reserved service UID must refuse in both encoder and decoder; restore valid
+/// data afterwards without any filesystem/identity adoption or authority claim.
+#[test]
+fn bootstrap_reserved_service_uid_refuses_after_valid_numeric_witness() {
+    let (_root, mut d) = numeric_uid_witness();
+    d.service_uid = u32::MAX;
+    assert!(encode(&d).is_err(), "reserved service UID was accepted");
+    assert!(decode(&serde_json::to_vec(&d).unwrap()).is_err());
+    d.service_uid = 0;
+    assert!(encode(&d).is_ok());
+}
+/// Same invariant for controller role; UID0 remains valid representation only.
+#[test]
+fn bootstrap_reserved_controller_uid_refuses_after_valid_numeric_witness() {
+    let (_root, mut d) = numeric_uid_witness();
+    d.controller_uid = u32::MAX;
+    assert!(encode(&d).is_err(), "reserved controller UID was accepted");
+    assert!(decode(&serde_json::to_vec(&d).unwrap()).is_err());
+    d.controller_uid = 1;
+    assert!(encode(&d).is_ok());
 }

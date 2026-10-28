@@ -61,7 +61,7 @@ fn mission_error(cause: swarm_engine::MissionSupervisionError) -> E {
 /// Attach every ancillary read cause to a later actual encode/close failure.
 /// Successful degraded observations are valid DTOs, as in historical CLI; this
 /// helper runs only after a real failure and retains all original typed causes.
-fn retain_observation_error(mut primary: E, causes: Vec<RootStoreError>) -> E {
+pub(super) fn retain_observation_error(mut primary: E, causes: Vec<RootStoreError>) -> E {
     for cause in causes { primary = E::Close { primary: Some(Box::new(primary)), cleanup: Box::new(cause) }; }
     primary
 }
@@ -103,7 +103,7 @@ impl NativeHttpService {
                     .map_err(|c| root("mutate", c))?.result.work;
                 recorded = Some((work.id.clone(), work.revision));
                 let bytes = swarm_engine::encode_model(&work).map_err(E::Model)?;
-                return Ok(RouteBody { preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(), bytes, recorded_work: recorded.clone(), configuration_recorded: false, recorded_configuration: None });
+                return Ok(RouteBody { auxiliary_effects:Vec::new(), provider_probe:None, preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(), bytes, recorded_work: recorded.clone(), configuration_recorded: false, recorded_configuration: None });
             }
             let bytes = match action {
                 "show" => serde_json::to_vec(&store.mission_control_view(&query.work).map_err(mission_error)?),
@@ -116,8 +116,8 @@ impl NativeHttpService {
                     serde_json::to_vec(&observation.status)
                 }
                 _ => return Err(E::Refused("web-operation-unported")),
-            }.map_err(E::Json)?;
-            Ok(RouteBody { preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(), bytes, recorded_work: None, configuration_recorded: false, recorded_configuration: None })
+            }.map_err(E::ResponseJson)?;
+            Ok(RouteBody { auxiliary_effects:Vec::new(), provider_probe:None, preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(), bytes, recorded_work: None, configuration_recorded: false, recorded_configuration: None })
         })();
         match close(result, store.close()) {
             Ok(mut body) => { body.observation_causes = observation_causes; Ok(body) }

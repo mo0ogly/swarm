@@ -163,6 +163,13 @@ pub(crate) fn validate(
     validate_inner(raw, method, policy, task, true)
 }
 
+/// Validate a projected draft with the shared plan/task rules and saved caps.
+/// Missing answers are permitted; no adoption, final verdict, tasks or authority
+/// follows. Returns the decoded plan or preserves the existing typed cause.
+pub(super) fn validate_draft(raw:&[u8],method:&str,policy:&PreparationPlanPolicy,task:&TaskDefinitionLimits)->Result<ActionPlan,E>{
+    validate_inner(raw,method,policy,task,false)
+}
+
 /// Shared structural check. `require_answers=false` permits partial decisions,
 /// but never creates a verdict; task/product rules and saved caps still apply.
 /// Only final validation requires the method-specific complete product contract.

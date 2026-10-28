@@ -9,6 +9,7 @@ use std::io::{self, Write};
 /// requires existing consent. Watch delegates to the incremental native conductor;
 /// status is a facts-only text view, status-native a distinct versioned JSON DTO.
 /// Historical JSON reads supported ordinary/hierarchical facts; missing producers refuse.
+/// Seen marks only the current operator bookmark through the visit writer.
 /// Changes/spending expose their historical subdocuments under the same guards;
 /// they never mark a visit or replace an unsupported status with native facts.
 /// Control documents are bounded and validated before Root open; common Root
@@ -27,6 +28,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         return Err(CliError::Usage);
     }
     let op = a.pos[1].as_str();
+    if op == "seen" { return super::session_visit::execute(a, out); }
     if op == "watch" { return super::mission_watch::execute(a, out); }
     if matches!(op, "status" | "status-native" | "changes" | "spending") {
         return super::mission_status::execute(a, out);

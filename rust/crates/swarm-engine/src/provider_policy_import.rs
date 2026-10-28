@@ -53,8 +53,10 @@ pub fn decode_provider_policy_change(raw: &[u8]) -> Result<ProviderPolicyChange,
     Ok(r)
 }
 /// Exactly the portable Go export format: saved policies only, no secrets,
-/// commands, fallback model names or assertion of availability. Export refuses
-/// unresolved known-provider defaults instead of silently exporting no policy.
+/// commands, fallback model names or assertion of availability. The strict Root
+/// exporter refuses unresolved known-provider defaults. An Admin inventory can
+/// carry this portable shape with only actually saved policies, including an
+/// explicitly empty snapshot; that never approves an empty import.
 #[derive(Serialize)]
 pub struct ProviderPolicyExport {
     pub version: i64,
@@ -77,7 +79,24 @@ pub struct ProviderPolicyMutation {
     pub provider_execution_started: bool,
     pub scope: &'static str,
 }
+/// Source-bound saved policies for an authenticated read surface. The digest
+/// and policies come from one checked provider-file read; no command, environment,
+/// key, availability or execution authority is exposed. CLI portable export keeps
+/// its original version/policies-only format.
+#[derive(Serialize)]
+pub struct ProviderPolicyView {
+    pub version: i64,
+    pub digest: String,
+    pub policies: BTreeMap<String, ModelPolicy>,
+}
 impl ProviderPolicyChange {
+    /// Return the flag after strict inherited null/case/duplicate decoding.
+    /// This chooses preview versus apply, not authentication or write authority;
+    /// the Root publisher still requires current digest/token and writable access.
+    pub fn preview_requested(&self) -> bool {
+        self.preview
+    }
+
     /// Clone only validated nonnull policies. This never supplies defaults or
     /// treats a missing value as a cleared/approved provider declaration.
     pub(crate) fn entries(&self) -> Result<BTreeMap<String, ModelPolicy>, E> {

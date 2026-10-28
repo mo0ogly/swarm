@@ -3,6 +3,7 @@
 (function () {
  let sequence=0;
  const errorLabels={
+  'settings-preparation-templates-not-configured':'Adoptez les deux limites de réponses et de brouillons des modèles dans Admin.',
   'admin-budget-policy-invalid':'Indiquez une estimation positive par conseil et sa source. Le plafond doit être positif, nul ou explicitement sans plafond.',
   'admin-budget-input-invalid':'Format du budget incompatible : utilisez des montants exacts et tous les champs requis.',
   'admin-budget-intent-invalid':'Indiquez un motif non vide pour le changement de budget.',
@@ -11,6 +12,9 @@
   'admin-budget-preview-stale':'Le budget ou sa consommation a changé. Prévisualisez à nouveau avant d’enregistrer.',
   'admin-budget-exhausted':'Le budget Admin ne permet pas de réserver un autre conseil.',
   'admin-budget-not-configured':'Configurez le budget Admin avant de demander un conseil direct.',
+  'settings-preparation-sources-not-configured':'Adoptez tous les réglages de sources documentaires dans Admin.',
+  'settings-preparation-source-extensions-invalid':'Indiquez des extensions distinctes, point suivi de lettres ou chiffres.',
+  'settings-preparation-source-components-invalid':'Indiquez des noms simples distincts, sans séparateur ni espaces de bord.',
   'settings-preparation-read-not-configured':'Adoptez les trois réglages de lecture des préparations.',
   'settings-preparation-requires-report-clock-policy':'Adoptez les politiques précédentes avant les limites de lecture des préparations.',
   'admin-budget-money-invalid':'Saisissez un montant USD positif ou nul avec au plus six décimales, sans exposant.',

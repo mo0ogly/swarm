@@ -3,6 +3,17 @@
 use super::*;
 use std::sync::{Mutex, MutexGuard, TryLockError};
 
+/// Cryptographic chain prediction only, not an observed database head, active
+/// account, checkpoint adoption or action permit. Created only by preview_batch.
+#[derive(Debug)]
+pub struct BatchPreview(Head);
+impl BatchPreview {
+    /// Predicted terminal head; no current state/SQLite observation was performed.
+    pub fn predicted_head(&self) -> &Head {
+        &self.0
+    }
+}
+
 /// A retained connection to an already initialized, signed WAL journal. It never
 /// creates a database or follows its pathname again after opening. Operations
 /// and close refuse contention immediately; there is no queue or retry policy.
@@ -97,6 +108,38 @@ impl BoundJournal {
         let c = state.connection.as_ref().ok_or(Error::Closed)?;
         Journal::configure(ctx, c)?;
         self.journal.active_on(ctx, c, expected, id, f)
+    }
+    /// Validate signatures/context/canonical chain without opening, locking or
+    /// observing SQLite. This data-only preview also works after close; it proves
+    /// neither current state nor that the expected base exists. Cancellation
+    /// still refuses. Only apply_batch can attempt the current-state transaction.
+    pub fn preview_batch(
+        &self,
+        ctx: &Context,
+        base: &Head,
+        raws: &[&[u8]],
+    ) -> Result<BatchPreview, Error> {
+        self.journal
+            .prepare_batch(ctx, base, raws)
+            .map(|(_, next)| BatchPreview(next))
+    }
+    /// Apply a nonempty complete chain of signed events atomically on this
+    /// retained existing database. Validates every signature/context before
+    /// storage and holds one write reservation through all events and COMMIT.
+    /// Only exact full-batch replay at its terminal head is idempotent; another
+    /// current head refuses. No implicit retry, queue or batch-count policy.
+    /// An error is not proof of no publication: retain exact bytes/checkpoints
+    /// for authorized readback/replay. This grants no signing or business rights.
+    pub fn apply_batch(&self, ctx: &Context, base: &Head, raws: &[&[u8]]) -> Result<Head, Error> {
+        let (changes, next) = self.journal.prepare_batch(ctx, base, raws)?;
+        let state = self.lock()?;
+        if state.closed {
+            return Err(Error::Closed);
+        }
+        let c = state.connection.as_ref().ok_or(Error::Closed)?;
+        Journal::configure(ctx, c)?;
+        self.journal
+            .apply_prepared(ctx, c, base, raws, &changes, &next)
     }
     /// Reject future operations and explicitly close SQLite. Contention returns
     /// Busy without closing; a failed close retains the connection for a later

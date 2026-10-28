@@ -39,7 +39,7 @@ fn close(file: File) -> Result<(), AgentLaunchError> {
 /// Read the executable fully and bind the observation to one unchanged inode.
 /// Buffered transfer size is an allocation detail, not an executable-size policy.
 /// Read/metadata/close failures refuse; no executable is launched or trusted.
-fn executable(path: &Path) -> Result<String, AgentLaunchError> {
+pub(crate) fn executable(path: &Path) -> Result<String, AgentLaunchError> {
     if !path.is_absolute() {
         return Err(AgentLaunchError::Refused(
             "agent-provider-absolute-command-required",

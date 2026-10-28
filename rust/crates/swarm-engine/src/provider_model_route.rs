@@ -251,9 +251,10 @@ fn cache_path(
     Ok(None)
 }
 /// Recognize configured model spelling using the same dialect helper as the
-/// compiler, preserving generic single-dash flags. Dangling,
-/// ambiguous or control-bearing values are refused by the shared compiler before
-/// catalogue use; this observation itself establishes no model availability.
+/// compiler, preserving generic single-dash flags. Execution/resolution callers
+/// separately compile argv and refuse unsafe forms. Inventory also displays this
+/// raw declaration without compiling it; no argument validity, effective model
+/// identity or availability is established.
 fn configured_model(args: &[String], syntax: ProviderModelSyntax) -> Option<&str> {
     for (index, arg) in args.iter().enumerate() {
         if matches!(arg.as_str(), "--model" | "-m") {
@@ -365,6 +366,79 @@ pub(crate) fn resolve_configuration_metadata(
     settings: &EngineSettingsValues,
     policy: &AgentLaunchPolicy,
 ) -> Result<ModelRoutePreparation, AgentLaunchError> {
+    resolve_configuration_metadata_for_purpose(provider, launch, settings, policy, "work")
+}
+
+/// One locally declared model option for operator inventory. This data proves
+/// neither account access nor effective effort/identity; selection still uses
+/// the common resolver and current saved restrictions before admission.
+#[derive(Serialize)]
+pub struct ProviderModelOption {
+    pub id: String,
+    pub efforts: Vec<String>,
+    pub source: &'static str,
+}
+
+/// Read actual compatible visible Codex cache entries and the configured argv
+/// model, with no built-in vendor model list or inferred default. Cache reads
+/// share the runtime's effective environment, saved per-file cap and close checks.
+/// Equal IDs merge declared efforts as runtime selection uses any matching row;
+/// output is sorted. Missing cache may expose an already configured model, but
+/// malformed/type/IO/close failures never become a successful empty catalogue.
+/// No provider call, write, availability probe or execution grant occurs.
+pub(crate) fn model_options(
+    provider: &Provider,
+    policy: &AgentLaunchPolicy,
+) -> Result<Vec<ProviderModelOption>, AgentLaunchError> {
+    let adapter = adapter(provider);
+    let mut options = std::collections::BTreeMap::<String, ProviderModelOption>::new();
+    if adapter == "codex" {
+        if let Some(path) = cache_path(provider, policy)? {
+            if let Some(raw) = read_cache(&path, policy.provider_bytes)? {
+                let cache: ModelCache = crate::work::decode_mode(&raw, cache_shape(), false)
+                    .map_err(|e| AgentLaunchError::caused("agent-model-catalogue-invalid", e))?;
+                for model in cache.models.unwrap_or_default() {
+                    if model.visibility != "list" || !crate::model_routing_policy::model_policy_v1_name(&model.slug) { continue; }
+                    let entry = options.entry(model.slug.clone()).or_insert_with(|| ProviderModelOption {
+                        id: model.slug, efforts: Vec::new(), source: "local_cache_unverified",
+                    });
+                    entry.efforts.extend(model.supported_reasoning_levels.unwrap_or_default().into_iter().map(|effort| effort.effort));
+                    entry.efforts.sort(); entry.efforts.dedup();
+                }
+            }
+        }
+    }
+    let syntax = if adapter == "codex" { ProviderModelSyntax::Codex } else { ProviderModelSyntax::ModelAndEffort };
+    if let Some(model) = configured_model(provider.args.as_deref().unwrap_or_default(), syntax).filter(|v| !v.is_empty()) {
+        options.entry(model.into()).or_insert_with(|| ProviderModelOption {
+            id: model.into(), efforts: Vec::new(), source: "configured_argv_unverified",
+        });
+    }
+    Ok(options.into_values().collect())
+}
+
+/// Inherited provider-resolution purpose vocabulary, never a permission or a
+/// model/policy default. This pure check is shared by public reads and resolver.
+pub(crate) fn valid_purpose(purpose: &str) -> bool {
+    matches!(purpose, "work" | "page" | "brainstorm" | "preparation" | "planning")
+}
+
+/// Resolve read-only local metadata for an explicit inherited purpose. Automatic
+/// page selection uses saved page_level; other purposes use work_level. Retain
+/// automatic=true for saved restriction checks, rather than converting a default
+/// into an explicit request. All existing catalogue/argv/source guards remain;
+/// neither this candidate nor a successful read grants execution or availability.
+/// Invalid purpose/policy/selection, corrupt sources and IO/close errors refuse.
+pub(crate) fn resolve_configuration_metadata_for_purpose(
+    provider: &Provider,
+    launch: &Launch,
+    settings: &EngineSettingsValues,
+    policy: &AgentLaunchPolicy,
+    purpose: &str,
+) -> Result<ModelRoutePreparation, AgentLaunchError> {
+    if !valid_purpose(purpose) {
+        return Err(AgentLaunchError::Refused("provider-model-purpose-invalid"));
+    }
     if !provider.api_connection_id.is_empty() {
         return Err(AgentLaunchError::Refused("provider-policy-api-unported"));
     }
@@ -390,7 +464,8 @@ pub(crate) fn resolve_configuration_metadata(
     let levels = policy_levels(model_policy)?;
     let automatic = matches!(launch.level.as_str(), "" | "auto");
     let level = if automatic {
-        model_policy.work_level.as_str()
+        if purpose == "page" { model_policy.page_level.as_str() }
+        else { model_policy.work_level.as_str() }
     } else {
         launch.level.as_str()
     };
@@ -479,7 +554,7 @@ pub(crate) fn resolve_configuration_metadata(
         })
         .map_err(|e| AgentLaunchError::caused("agent-model-scope-encoding", e))?,
     );
-    let route=ModelRoute{level:level.into(),model:choice.model.clone(),effort:choice.effort.clone(),billing:model_policy.billing.clone(),policy_hash,reason:"Politique fournisseur enregistrée · work · sans montée en gamme automatique ; annonce non authentifiée".into()};
+    let route=ModelRoute{level:level.into(),model:choice.model.clone(),effort:choice.effort.clone(),billing:model_policy.billing.clone(),policy_hash,reason:format!("Politique fournisseur enregistrée · {purpose} · sans montée en gamme automatique ; annonce non authentifiée")};
     let mut effective = provider.clone();
     effective.args = Some(effective_args);
     Ok(ModelRoutePreparation {

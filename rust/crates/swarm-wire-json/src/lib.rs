@@ -34,8 +34,9 @@ fn unicode_unit(raw: &[u8], position: usize) -> Option<u16> {
 }
 
 // Go substitutes U+FFFD for each invalid UTF-8 byte and each unpaired UTF-16
-// escape inside strings. No schema/type/syntax checks are removed: Serde still
-// rejects unknown, duplicate, missing, non-string and trailing envelope fields.
+// escape inside strings. The target Deserialize/schema pass owns field/type
+// policy. This normalization alone does not reject unknown, duplicate or missing
+// members; opaque RawValue callers must retain their authoritative typed pass.
 fn go_string_bytes(raw: &[u8]) -> Vec<u8> {
     let mut output = Vec::with_capacity(raw.len());
     let mut inside = false;
@@ -129,6 +130,10 @@ fn go_depth_valid(raw: &[u8]) -> bool {
     }
     true
 }
+/// Decode supplied JSON with Go string replacement and Go nesting representation.
+/// The target's Deserialize/schema contract determines field and type checks;
+/// RawValue can preserve ordered members and requires a later typed producer.
+/// Syntax/depth/target errors propagate. No IO, mutation, fallback or authority.
 pub fn decode<T: DeserializeOwned>(raw: &[u8]) -> Result<T, serde_json::Error> {
     if !go_depth_valid(raw) {
         return Err(serde::de::Error::custom(

@@ -23,7 +23,8 @@ fn no(v: &bool) -> bool {
     !*v
 }
 /// Business input, including ignored historical claims. Order/omitempty matches
-/// the Go event-digest producer; secrets/configuration are refused for business.
+/// the Go event-digest producer. Only the historical all-zero policy placeholder
+/// is accepted; it grants no configuration authority. Other configuration refuses.
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct Command {
@@ -88,6 +89,8 @@ pub(crate) struct Command {
 /// unported policies must refuse; an unknown key never becomes configuration.
 #[derive(Deserialize)]
 pub(crate) struct ConfigChange {
+    #[serde(default,deserialize_with="super::separation::present")]
+    pub role_separation:Option<super::separation::RoleSeparation>,
     pub schema_version: i64,
     pub event_id: String,
     pub expected_revision: i64,
@@ -105,6 +108,10 @@ pub(crate) fn decode(raw: &[u8]) -> Result<Command, E> {
         return Err(E::Invalid("schema_version=1 et event_id requis"));
     }
     if !cmd.identities.is_empty()
+        || cmd.policy.mandate_ttl_seconds != 0
+        || cmd.policy.unknown_reconcile_seconds != 0
+        || cmd.policy.evidence_retention_days != 0
+        || cmd.policy.require_separation
         || cmd.export.is_some()
         || cmd.anchor.is_some()
         || !cmd.verification_key.is_empty()
@@ -156,6 +163,7 @@ impl ConfigChange {
                 "policy",
                 "identities",
                 "reason",
+                "role_separation",
             ],
         )?;
         Ok(c)

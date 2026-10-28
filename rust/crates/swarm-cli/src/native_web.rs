@@ -167,9 +167,12 @@ struct StopRecord<'a> {
     observed_outcomes: u64,
     configuration_outcomes: u64,
     work_outcomes: u64,
+    provider_contact_may_have_occurred:bool,
     first_request_failure: Option<String>,
     first_service_failure: Option<&'static str>,
     first_connection_failure: Option<ConnectionFailure>,
+    #[serde(skip_serializing_if="Vec::is_empty")]
+    last_auxiliary_effects:&'a Vec<swarm_engine::AuxiliaryEffect>,
     last_recorded_work: Option<&'a (String, i64)>,
     last_recorded_configuration: Option<&'a swarm_web::RecordedConfiguration>,
 }
@@ -196,6 +199,7 @@ fn stop_record(report: &swarm_web::NativeServerReport) -> StopRecord<'_> {
         observed_outcomes: report.observed_outcomes,
         configuration_outcomes: report.configuration_outcomes,
         work_outcomes: report.work_outcomes,
+        provider_contact_may_have_occurred:report.provider_contact_may_have_occurred,
         first_request_failure: report
             .first_request_failure
             .as_ref()
@@ -211,6 +215,7 @@ fn stop_record(report: &swarm_web::NativeServerReport) -> StopRecord<'_> {
                 causes: super::safe_causes(error),
             }
         }),
+        last_auxiliary_effects:&report.last_auxiliary_effects,
         last_recorded_work: report.last_recorded_work.as_ref(),
         last_recorded_configuration: report.last_recorded_configuration.as_ref(),
     }
@@ -265,10 +270,17 @@ fn failed_bound(server: NativeHttpServer, primary: NativeServerError, english: b
 /// No IO, formatting of arbitrary data, authority or retry follows this traversal.
 pub(super) fn branches<'a>(error: &'a (dyn Error + 'static)) -> Vec<&'a (dyn Error + 'static)> {
     let mut out: Vec<&'a (dyn Error + 'static)> = Vec::new();
+    if let Some(value)=error.downcast_ref::<Box<swarm_web::TrustEnrollmentSourceError>>(){out.push(value.as_ref());}
+    if let Some(value)=error.downcast_ref::<swarm_web::TrustEnrollmentSourceError>(){out.extend(value.branches());}
+    if let Some(value)=error.downcast_ref::<Box<NativeServerError>>(){out.push(value.as_ref());}
+    if let Some(value)=error.downcast_ref::<Box<swarm_web::HttpServiceError>>(){out.push(value.as_ref());}
+    if let Some(value)=error.downcast_ref::<Box<swarm_web::NativeObservationFailure>>(){out.push(value.as_ref());}
+
     if let Some(error) = error.downcast_ref::<NativeServerError>() {
         match error {
             NativeServerError::Cleanup { cleanup, .. } => out.push(cleanup.as_ref()),
             NativeServerError::StoppedOutput { report, .. } => {
+                if let Some(cause)=report.first_provider_probe.as_ref().and_then(|p|p.cause()){out.push(cause);}
                 if let Some(error) = report.first_request_failure.as_ref() {
                     out.push(error);
                 }
@@ -280,6 +292,7 @@ pub(super) fn branches<'a>(error: &'a (dyn Error + 'static)) -> Vec<&'a (dyn Err
                 }
             }
             NativeServerError::OutcomeEncoding { outcome, .. } => {
+                if let Some(cause)=outcome.provider_probe.as_ref().and_then(|p|p.cause()){out.push(cause);}
                 if let Some(error) = outcome.failure.as_ref() {
                     out.push(error);
                 }
@@ -290,6 +303,7 @@ pub(super) fn branches<'a>(error: &'a (dyn Error + 'static)) -> Vec<&'a (dyn Err
     }
     if let Some(error) = error.downcast_ref::<swarm_web::NativeObservationFailure>() {
         for outcome in &error.pending {
+            if let Some(cause)=outcome.provider_probe.as_ref().and_then(|p|p.cause()){out.push(cause);}
             if let Some(error) = outcome.failure.as_ref() {
                 out.push(error);
             }
@@ -298,6 +312,8 @@ pub(super) fn branches<'a>(error: &'a (dyn Error + 'static)) -> Vec<&'a (dyn Err
     }
     if let Some(error) = error.downcast_ref::<swarm_web::HttpServiceError>() {
         match error {
+            swarm_web::HttpServiceError::EnrollmentSource{cause,..}=>out.push(cause.as_ref()),
+            swarm_web::HttpServiceError::ProviderProbe{receipt,..}=>{if let Some(cause)=receipt.cause(){out.push(cause);}},
             swarm_web::HttpServiceError::Close { cleanup, .. } => out.push(cleanup.as_ref()),
             swarm_web::HttpServiceError::ResponseEncoding { cause, .. } => out.push(cause),
             _ => (),
@@ -308,7 +324,8 @@ pub(super) fn branches<'a>(error: &'a (dyn Error + 'static)) -> Vec<&'a (dyn Err
 /// Add only classified native families to safe CLI diagnostics. Metadata values,
 /// panic payloads, raw request/headers, paths and arbitrary cause messages stay out.
 pub(super) fn family(error: &(dyn Error + 'static)) -> Option<&'static str> {
-    if let Some(error) = error.downcast_ref::<NativeServerError>() {
+    if let Some(error)=error.downcast_ref::<swarm_api_client::Error>() {Some(error.code())}
+    else if let Some(error) = error.downcast_ref::<NativeServerError>() {
         Some(error.code())
     } else if let Some(error) = error.downcast_ref::<swarm_web::HttpServiceError>() {
         Some(error.code())
@@ -332,6 +349,9 @@ pub(super) fn details(error: &CliError, document: &mut serde_json::Value) {
         .into_iter()
         .find_map(|error| error.downcast_ref::<NativeServerError>())
     {
+        let auxiliary=native.auxiliary_effects();
+        if !auxiliary.is_empty(){document["auxiliary_effects"]=serde_json::json!(auxiliary);}
+        document["provider_contact_may_have_occurred"]=native.provider_contact_may_have_occurred().into();
         document["web_session_may_be_recorded"] = native.session_state_may_be_recorded().into();
         document["configuration_may_be_recorded"] = native.configuration_may_be_recorded().into();
         if let Some((id, revision)) = native.recorded_work() {
@@ -360,7 +380,8 @@ mod tests {
     /// original cause/report/known effects survive CLI normalization and JSON output.
     #[test]
     fn late_web_summary_failure_retains_report_effects_and_safe_causes() {
-        let report = swarm_web::NativeServerReport {
+        let report = swarm_web::NativeServerReport { last_auxiliary_effects:Vec::new(),
+            provider_contact_may_have_occurred:true,
             configuration_outcomes: 1,
             work_outcomes: 1,
             last_recorded_work: Some(("owned-late-work".into(), 3)),
@@ -398,6 +419,8 @@ mod tests {
         let json: serde_json::Value = serde_json::from_slice(&diagnostic).unwrap();
         assert_eq!(json["failure"]["code"], "web-summary-output");
         assert_eq!(json["configuration_may_be_recorded"], true);
+        assert_eq!(json["provider_contact_may_have_occurred"],true);
+        assert_eq!(json["stopped_report"]["provider_contact_may_have_occurred"],true);
         assert_eq!(json["recorded_work"]["id"], "owned-late-work");
         assert_eq!(
             json["stopped_report"]["first_request_failure"],

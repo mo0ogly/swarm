@@ -465,10 +465,10 @@
     },
     {
       "name": "agent_provider_config_max_bytes",
-      "label": "Configuration fournisseur — taille maximale",
+      "label": "Configurations fournisseurs et politiques locales — taille maximale",
       "unit": "bytes",
       "nullable": true,
-      "help": "Taille maximale par fichier de configuration fournisseur ou de catalogue local de modèles. La même valeur encadre providers.json et models_cache.json ; aucune seconde borne cachée. Sans plafond retire cette limite ; zéro refuse tout contenu non vide. Les valeurs installées et les tentatives existantes sont conservées.",
+      "help": "Taille maximale par fichier de configuration fournisseur, catalogue local de modèles ou politique locale migrée : providers.json, models_cache.json, provider-wait.json, web-requests.json, graph-performance.json, activity-policy.json et log-read-policy.json. La même valeur encadre lecture et historique sérialisé des politiques ; aucune seconde borne cachée. Sans plafond retire cette limite ; zéro refuse tout contenu non vide. Changer la borne ne réécrit aucun fichier ni aucune tentative déjà lancée.",
       "introduced_schema_version": 16
     },
     {
@@ -1019,7 +1019,7 @@
       "unit": "percent",
       "nullable": true,
       "null_label": "Avertissement désactivé",
-      "help": "Part du plafond de budget d’une mission (plafond positif seulement) à partir de laquelle l’alerte « seuil de budget » s’ouvre : montants engagés (estimations réservées des agents, assistances, préparations et appels de planification) ou coût déclaré par les fournisseurs, le plus élevé des deux. De 1 à 100. Null désactive l’avertissement ; l’alerte « budget dépassé » (coût déclaré supérieur au plafond) reste active. 80 est un choix d’installation, modifiable.",
+      "help": "Part du plafond de budget d’une mission (plafond positif seulement) à partir de laquelle l’alerte « seuil de budget » s’ouvre : montants engagés (estimations réservées des agents, assistances, préparations et appels de planification) ou coût déclaré par les fournisseurs, le plus élevé des deux. De 1 à 100. Null désactive l’avertissement ; l’alerte « budget dépassé » (coût déclaré supérieur au plafond) reste active. 80 est un choix d’installation, modifiable. Dans les relevés financiers du travail et de préparation, ce même pourcentage signale le seuil sur réservé + estimation engagée ; le coût rapporté et sa couverture restent affichés séparément. Ce relevé ne déclenche pas lui-même une alerte serveur.",
       "introduced_schema_version": 35
     },
     {
@@ -1175,6 +1175,240 @@
       "nullable": true,
       "help": "Nombre maximal de questions, toutes avec réponse avant verdict. Null sans plafond ; zéro exige une liste vide. Initial : 16.",
       "introduced_schema_version": 43
+    },
+    {
+      "name": "preparation_source_file_max_bytes",
+      "label": "Sources — taille d’un fichier",
+      "unit": "bytes",
+      "nullable": true,
+      "null_label": "Sans plafond",
+      "help": "Octets du fichier complet consulté, avant découpage et hachage. Null : sans plafond ; zéro : fichier vide seulement. Valeur initiale explicite d’installation : 262144. Aucun plafond interne supplémentaire.",
+      "introduced_schema_version": 44
+    },
+    {
+      "name": "preparation_source_max_bytes",
+      "label": "Sources — taille d’un extrait",
+      "unit": "bytes",
+      "nullable": true,
+      "null_label": "Sans plafond",
+      "help": "Octets de l’extrait sélectionné. Null : sans plafond ; zéro : extrait vide seulement. Valeur initiale explicite d’installation : 12000. Aucun plafond interne supplémentaire.",
+      "introduced_schema_version": 44
+    },
+    {
+      "name": "preparation_sources_max_bytes",
+      "label": "Sources — taille totale des extraits joints",
+      "unit": "bytes",
+      "nullable": true,
+      "null_label": "Sans plafond",
+      "help": "Somme des octets des extraits joints après ajout/remplacement. Null : sans plafond ; zéro : aucun texte joint. Un retrait reste possible. Valeur initiale explicite d’installation : 24000. Aucun plafond interne supplémentaire.",
+      "introduced_schema_version": 44
+    },
+    {
+      "name": "preparation_sources_max_count",
+      "label": "Sources — nombre d’extraits joints",
+      "unit": "count",
+      "nullable": true,
+      "null_label": "Sans plafond",
+      "help": "Nombre d’extraits joints après ajout/remplacement. Null : sans plafond ; zéro : aucun ajout ni remplacement. Les données existantes restent conservées et retirables. Valeur initiale explicite d’installation : 8. Aucun plafond interne supplémentaire.",
+      "introduced_schema_version": 44
+    },
+    {
+      "name": "preparation_source_max_lines",
+      "label": "Sources — lignes demandées par extrait",
+      "unit": "count",
+      "nullable": true,
+      "null_label": "Sans plafond",
+      "help": "Nombre de lignes demandées, avant troncature à la fin du fichier. Null : sans plafond ; zéro : consultation désactivée. Les indices commencent à1. Valeur initiale explicite d’installation : 200. Aucun plafond interne supplémentaire.",
+      "introduced_schema_version": 44
+    },
+    {
+      "name": "preparation_source_path_max_bytes",
+      "label": "Sources — longueur du chemin relatif",
+      "unit": "bytes",
+      "nullable": true,
+      "null_label": "Sans plafond",
+      "help": "Octets du chemin documentaire relatif. Null : sans plafond ; zéro : aucun chemin non vide admis. Les chemins privés et liens symboliques restent refusés. Valeur initiale explicite d’installation : 1024. Aucun plafond interne supplémentaire.",
+      "introduced_schema_version": 44
+    },
+    {
+      "name": "preparation_source_query_max_bytes",
+      "label": "Sources — taille de la recherche",
+      "unit": "bytes",
+      "nullable": true,
+      "null_label": "Sans plafond",
+      "help": "Octets de la recherche dans les chemins. Null : sans plafond ; zéro : recherche vide seulement. Valeur initiale explicite d’installation : 120. Aucun plafond interne supplémentaire.",
+      "introduced_schema_version": 44
+    },
+    {
+      "name": "preparation_source_directory_limit",
+      "label": "Sources — dossiers proposés",
+      "unit": "count",
+      "nullable": true,
+      "null_label": "Sans plafond",
+      "help": "Nombre de sous-dossiers proposés. Null : sans plafond ; zéro : aucune proposition de dossier. Ne limite pas l’énumération nécessaire au tri lexical. Valeur initiale explicite d’installation : 100. Aucun plafond interne supplémentaire.",
+      "introduced_schema_version": 44
+    },
+    {
+      "name": "preparation_source_file_limit",
+      "label": "Sources — fichiers proposés",
+      "unit": "count",
+      "nullable": true,
+      "null_label": "Sans plafond",
+      "help": "Nombre de fichiers proposés par recherche. Null : sans plafond ; zéro : aucun fichier proposé. Les résultats indiquent une limite atteinte. Valeur initiale explicite d’installation : 100. Aucun plafond interne supplémentaire.",
+      "introduced_schema_version": 44
+    },
+    {
+      "name": "preparation_source_scan_limit",
+      "label": "Sources — entrées visitées par recherche",
+      "unit": "count",
+      "nullable": true,
+      "null_label": "Sans plafond",
+      "help": "Entrées visitées pendant la marche récursive triée, racine comprise. Null : sans plafond ; zéro : aucune visite. Ne constitue pas une échéance temporelle ni un plafond de mémoire. Valeur initiale explicite d’installation : 20000. Aucun plafond interne supplémentaire.",
+      "introduced_schema_version": 44
+    },
+    {
+      "name": "preparation_source_allowed_extensions",
+      "label": "Sources — extensions autorisées",
+      "unit": "strings",
+      "nullable": false,
+      "help": "Une extension par ligne, point suivi de lettres/chiffres ASCII ; comparaison sans distinction de casse. Liste vide : aucun format admis. Les règles de confidentialité restent obligatoires.",
+      "introduced_schema_version": 44
+    },
+    {
+      "name": "preparation_source_excluded_components",
+      "label": "Sources — noms de dossiers/fichiers exclus",
+      "unit": "strings",
+      "nullable": false,
+      "help": "Un nom simple par ligne, sans séparateur de chemin ni espaces de bord. Comparaison sans distinction de casse. Liste vide : aucune exclusion opérateur ; chemins privés et secrets restent refusés.",
+      "introduced_schema_version": 44
+    },
+    {
+      "name": "preparation_template_answer_max_bytes",
+      "label": "Taille d’une réponse de modèle",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Octets UTF-8 par réponse avant retrait des espaces. Valeur initiale : 1 000 ; zéro refuse toute réponse non vide, null enlève la borne. Ne valide ni le brief ni le plan.",
+      "introduced_schema_version": 45
+    },
+    {
+      "name": "preparation_template_draft_max_bytes",
+      "label": "Taille du brouillon issu d’un modèle",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Octets du besoin avant et après ajout du graphe et du plan projeté. Valeur initiale : 16 000 ; zéro refuse un brouillon non vide, null enlève cette borne. Les limites de structure et de document restent applicables aux étapes suivantes.",
+      "introduced_schema_version": 45
+    },
+    {
+      "name": "preparation_call_enabled",
+      "label": "Activation des appels IA",
+      "unit": "count",
+      "nullable": false,
+      "help": "0 désactive ; 1 autorise le parcours texte sous les contrôles de budget, de source et de fraîcheur. Le kill switch de déploiement reste prioritaire.",
+      "introduced_schema_version": 46
+    },
+    {
+      "name": "preparation_call_message_max_bytes",
+      "label": "Taille du message utilisateur",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Octets UTF-8 avant retrait des espaces ; null sans borne, zéro refuse tout message non vide.",
+      "introduced_schema_version": 46
+    },
+    {
+      "name": "preparation_call_context_max_bytes",
+      "label": "Taille du contexte IA",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Octets UTF-8 du prompt complet ; null sans borne, zéro refuse un contexte non vide.",
+      "introduced_schema_version": 46
+    },
+    {
+      "name": "preparation_call_turn_limit",
+      "label": "Nombre de tours IA",
+      "unit": "count",
+      "nullable": true,
+      "help": "Tours retenus par préparation ; null sans borne, zéro refuse un premier tour. Aucun historique supprimé.",
+      "introduced_schema_version": 46
+    },
+    {
+      "name": "preparation_call_response_max_bytes",
+      "label": "Taille de réponse IA",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "JSON : octets du corps ; SSE : octets du contenu assemblé. null sans borne ; zéro refuse une réponse non vide. Partagé par les appels de préparation et le test manuel de connexion API ; pas de délai total implicite.",
+      "introduced_schema_version": 46
+    },
+    {
+      "name": "preparation_call_timeout_seconds",
+      "label": "Délai d’appel IA",
+      "unit": "seconds",
+      "nullable": false,
+      "help": "Secondes avant annulation locale ; zéro sans délai. Une annulation ne prouve ni arrêt distant ni absence de coût.",
+      "introduced_schema_version": 46
+    },
+    {
+      "name": "preparation_call_timeout_maximum_seconds",
+      "label": "Délai maximal d’appel IA",
+      "unit": "seconds",
+      "nullable": false,
+      "help": "Secondes ; zéro sans plafond. Le délai effectif doit respecter ce maximum.",
+      "introduced_schema_version": 46
+    },
+    {
+      "name": "preparation_call_observation_ms",
+      "label": "Observation du worker IA",
+      "unit": "milliseconds",
+      "nullable": false,
+      "help": "Intervalle positif en millisecondes pour observer un arrêt demandé ; aucun retry fournisseur. Partagé par les appels de préparation et le test manuel de connexion API ; pas de délai total implicite.",
+      "introduced_schema_version": 46
+    },
+    {
+      "name": "preparation_call_refresh_ms",
+      "label": "Rafraîchissement du dialogue",
+      "unit": "milliseconds",
+      "nullable": false,
+      "help": "Intervalle positif en millisecondes lorsque le dialogue contient un tour actif.",
+      "introduced_schema_version": 46
+    },
+    {
+      "name": "preparation_call_http1_max_headers",
+      "label": "Transport IA — nombre de headers HTTP/1",
+      "unit": "count",
+      "nullable": false,
+      "help": "Borne technique positive du transport, distincte du budget et du contenu. Partagé par les appels de préparation et le test manuel de connexion API ; pas de délai total implicite.",
+      "introduced_schema_version": 46
+    },
+    {
+      "name": "preparation_call_http2_max_header_bytes",
+      "label": "Transport IA — headers HTTP/2",
+      "unit": "bytes",
+      "nullable": false,
+      "help": "Octets, entier positif représentable en u32. Borne technique du transport. Partagé par les appels de préparation et le test manuel de connexion API ; pas de délai total implicite.",
+      "introduced_schema_version": 46
+    },
+    {
+      "name": "preparation_call_transport",
+      "label": "Transport des appels IA",
+      "unit": "text",
+      "nullable": false,
+      "help": "json ou sse, sans fallback automatique ni nouvelle tentative implicite.",
+      "introduced_schema_version": 46
+    },
+    {
+      "name": "report_preview_max_bytes",
+      "label": "Taille maximale de l’extrait de rapport affiché",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Octets du fichier retenus pour affichage, avant remplacement UTF-8 et marqueur de troncature. Zéro ne montre aucun octet du fichier ; sans plafond lit tout le texte en mémoire. Ne transforme jamais un extrait en preuve complète. Les limites de vérification complète et du contexte de planification restent distinctes.",
+      "introduced_schema_version": 47
+    },
+    {
+      "name": "report_verification_max_bytes",
+      "label": "Taille maximale du rapport privé à vérifier entièrement",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Octets lus pour vérifier complètement le SHA d’un rapport privé attribué. Zéro refuse tout rapport non vide ; sans plafond permet le parcours complet en flux. Un dépassement refuse toute lecture, sans succès sur une preuve tronquée. Le plafond d’extrait affiché reste indépendant.",
+      "introduced_schema_version": 47
     }
   ]
 }

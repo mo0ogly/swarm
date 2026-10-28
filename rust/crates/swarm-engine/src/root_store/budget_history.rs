@@ -125,7 +125,7 @@ fn estimates(db: &Connection, work: &str) -> Result<(f64, f64), E> {
 /// historical unlimited wire representation; malformed policy still refuses.
 /// Sum grouping matches Go. Provider declarations remain unauthenticated, partial
 /// and separate from atomic launch admission. No state or reservations change.
-fn view(db: &Connection, work: &str, warning_percent: Option<i64>) -> Result<HistoricalBudgetView, E> {
+pub(super) fn view(db: &Connection, work: &str, warning_percent: Option<i64>) -> Result<HistoricalBudgetView, E> {
     let budget = crate::financial_budget::read_budget(db, work).map_err(budget_error)?.unwrap_or_default();
     let (reserved, estimated) = estimates(db, work)?;
     let committed = amount(reserved + estimated)?;

@@ -36,15 +36,20 @@ fn current_method_hash(root: &RootStore, method: &str, policy: &crate::Preparati
     let hash=selected.sha256.clone();causes.extend(observed.causes);Ok(hash)
 }
 /// Execute one intent inside the caller's immediate transaction. Receipt replay
-/// compares canonical intent, returns its historical snapshot and never rewrites
+/// compares schema-projected canonical intent (including retained Go/old Rust
+/// representations without rewriting their bytes), returns its historical snapshot and never rewrites
 /// a document. Every staged row is read back before commit; triggers/corruption,
 /// stale CAS and conflicting events refuse the entire transaction. Current
 /// receipts must equal stored content before projection; historical receipts
 /// have no corresponding current-content witness. Brief adoption copies only
 /// the current nonblank document matching the requested hash and need hash. It
 /// appends no history. Answers append one plan revision while retaining provenance
-/// and invalidating verdicts. create-missions delegates new-work materialization
-/// to the same transaction; no start, organization or OS confinement is granted.
+/// and invalidating verdicts. create-missions delegates new or bound-work materialization
+/// to the same transaction; release-plan explicitly releases the snapshot at a
+/// Work CAS, preserving draft verdicts. Neither operation calls a provider or
+/// grants organization configuration or OS confinement. budget validates the shared
+/// finite USD envelope, stamps current local actor/time and preserves documents,
+/// verdicts, reservations and consumption; it never sets a Work envelope.
 fn apply<W:WorkEnvironment>(
     context: &WriteContext<'_>,
     db: &Connection,
@@ -66,7 +71,12 @@ fn apply<W:WorkEnvironment>(
     let old:Option<(Vec<u8>,Vec<u8>)>=crate::agent_launch::query(db,"SELECT CAST(request AS BLOB),CAST(response AS BLOB) FROM preparation_commands WHERE preparation_id=?1 AND event_id=?2",params![id,r.event_id],|rows|Ok(rows.next()?.map(|row|Ok::<_,rusqlite::Error>((row.get(0)?,row.get(1)?))).transpose()?)).map_err(|e|E::Launch(Box::new(e)))?;
     if let Some((request, response)) = old {
         if request != raw {
-            return Err(E::Refused("preparation-event-conflict"));
+            // Original Go and earlier Rust receipts have different object order
+            // and omitted zero members. Project both through the actual wire
+            // schema before comparison, without rewriting their original bytes.
+            let recorded=crate::preparation_command::decode(&request)
+                .map_err(|e|cause("preparation-receipt-invalid",e))?;
+            if encode(&recorded)?!=raw {return Err(E::Refused("preparation-event-conflict"));}
         }
         let mut p: Preparation =
             crate::work::decode(&response, crate::preparation_models::shape_preparation())
@@ -120,7 +130,25 @@ fn apply<W:WorkEnvironment>(
     if r.expected_revision != Some(p.revision) {
         return Err(E::Refused("preparation-revision-conflict"));
     }
+    let original_request=r;
+    let proposal=if r.action=="use-proposal"{
+        let method=current_method_hash(root,&p.method,policy,causes)?;
+        Some(super::preparation_proposal::edit(db,&p,r,&method,context.settings)?)
+    }else{None};
+    let r=proposal.as_ref().unwrap_or(r);
     let previous = p.revision;
+    if r.action == "budget" {
+        let raw=serde_json::to_vec(r.budget.as_ref().ok_or(E::Refused("preparation-request-invalid"))?)
+            .map_err(|e|cause("preparation-budget-invalid",e))?;
+        let mut budget:crate::Budget=crate::work::decode_mode(&raw,crate::preparation_models::shape_budget(),true)
+            .map_err(|e|cause("preparation-budget-invalid",e))?;
+        crate::validate_budget(&budget).map_err(|e|cause("preparation-budget-invalid",e))?;
+        budget.actor=environment.operator().map_err(E::Runtime)?;
+        budget.updated=at.into();p.budget=Some(Box::new(budget));
+    }
+    if matches!(r.action.as_str(),"source-add"|"source-remove") {
+        super::preparation_attachments::edit(root,&mut p,r,context.settings,at)?;
+    }
     if r.action == "method" {
         p.method_hash=current_method_hash(root,method,policy,causes)?;
         p.method=method.into();
@@ -161,7 +189,13 @@ fn apply<W:WorkEnvironment>(
         }
         p.adopted_brief = Some(Box::new(brief.clone()));
     }
-    let materialization=if r.action=="create-missions" {Some(super::preparation_conversion::materialize(root,db,&mut p,r,context.document,at,environment,causes)?)}else{None};
+    let materialization=match r.action.as_str(){
+        "revise-missions"=>Some(super::preparation_revision::revise(root,db,&mut p,r,context.document,at,environment,causes)?),
+        "create-missions"=>Some(super::preparation_conversion::materialize(root,db,&mut p,r,context.document,at,environment,causes)?),
+        "release-plan"=>Some(super::preparation_release::release(db,&mut p,r,at)?),
+        "configure-team"=>Some(super::preparation_organization::configure(root,db,&mut p,r,context.document,at,environment,causes)?),
+        _=>None,
+    };
     let mut document = None;
     if r.action == "answer-questions" {
         let original=p.documents.as_ref().and_then(|docs|docs.get("plan"))
@@ -242,14 +276,20 @@ fn apply<W:WorkEnvironment>(
         documents.insert(kind.into(), doc.clone());
         document = Some(doc);
     }
+    if original_request.action=="use-proposal"{
+        let doc=document.as_mut().ok_or(E::Refused("preparation-proposal-document-missing"))?;
+        doc.source_turn=original_request.turn_id.clone();
+        p.documents.as_mut().ok_or(E::Refused("preparation-proposal-document-missing"))?.insert(doc.kind.clone(),doc.clone());
+        if original_request.adopt_brief{p.adopted_brief=Some(Box::new(doc.clone()));}
+    }
     p.revision = p
         .revision
         .checked_add(1)
         .ok_or(E::Refused("preparation-revision-overflow"))?;
     p.updated_at = at.into();
-    if !matches!(r.action.as_str(),"validate-plan"|"create-missions") { p.verdict = None; }
+    if !matches!(r.action.as_str(),"validate-plan"|"create-missions"|"revise-missions"|"release-plan"|"configure-team"|"budget") { p.verdict = None; }
     p.plan_ready = false;
-    if matches!(r.action.as_str(),"validate-plan"|"create-missions") { root.preparation_project(&mut p,policy,causes)?; }
+    if matches!(r.action.as_str(),"validate-plan"|"create-missions"|"revise-missions"|"release-plan"|"configure-team"|"budget") { root.preparation_project(&mut p,policy,causes)?; }
     p.receipt_historical = false;
     let body = encode(&p)?;
     let changed = if r.action == "create" {
@@ -295,7 +335,7 @@ fn apply<W:WorkEnvironment>(
 }
 
 impl RootStore {
-    /// Create/edit/adopt/answer a draft, materialize a standalone plan or replay
+    /// Create/edit/adopt/answer a draft, materialize a new or bound-work plan or replay
     /// its immutable event receipt on this opened
     /// Root. Requires writable Root, complete enabled saved v42 policy, bounded
     /// valid request and exact revision. Stable settings and retained physical
@@ -318,10 +358,23 @@ impl RootStore {
     /// Consumed document hashes must match stored text. Mismatches refuse with
     /// preparation-document-digest-mismatch; public save/adopt operations may
     /// replace damaged targets, without implicit repair or datastore authenticity.
-    /// create-missions requires expected_work_revision=0, a fresh exact plan and
-    /// no existing work/conversion; materializes tasks under unreleased SQL locks
-    /// in this same transaction. Existing work, organization/revision/release and
-    /// provider/mission start remain unavailable. All failures roll back jointly
+    /// create-missions requires a fresh exact plan and no existing conversion.
+    /// Zero target revision creates a Work; a positive revision binds an existing
+    /// target by CAS, preserving old tasks, plans, settings and history while
+    /// appending new tasks under unreleased locks in the same transaction. release-plan explicitly clears those locks for
+    /// exactly the conversion task subset at the current Work revision, preserving edited task
+    /// contracts, draft documents and the verdict. The conversion snapshot hash
+    /// selects the task IDs, never a newer draft. It can unblock an authorized
+    /// conductor but performs no synchronous dispatch or budget/autonomy change.
+    /// configure-team requires the original locked task contracts and a current
+    /// verdict. Its explicit CLI/human configuration preserves locks/budgets and
+    /// snapshots reviewer defaults; existing history, teams and release refuse.
+    /// revise-missions revalidates the changed draft at both revisions, preserves
+    /// histories and consumption, invalidates impacted results, relocks only the
+    /// new conversion and pauses cockpit/planning in this transaction. Active
+    /// agents/reviews/decisions or incompatible controls/dependencies refuse.
+    /// It grants no start; another release is explicit. Automatic initial team
+    /// modes remain unavailable. All failures roll back jointly
     /// or retain explicit unknown/known publication semantics as described above.
     pub fn preparation_command<W: WorkEnvironment>(
         &self,

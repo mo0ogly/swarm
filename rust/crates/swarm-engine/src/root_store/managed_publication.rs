@@ -1,4 +1,4 @@
-//! Current native cohort observation and explicit protected first publication.
+//! Current native cohort observation and explicit protected publication.
 use super::{finished, material_path, task_validation, RootStore, RootStoreError as E};
 use crate::{AgentLaunchError as A, IndependentReview, ManagedReviewContext, Work};
 use serde::Serialize;
@@ -22,8 +22,8 @@ impl PrecheckedAcceptance<'_> {
 
 /// Exact current candidate and original-opinion coordinates. Verification means
 /// the named observations passed during this read, not criterion truth, identity,
-/// a future lease or permission to accept. Writer admission and unsupported
-/// cumulative-baseline consumers stay explicit even with a passed opinion.
+/// a future lease or permission to accept. Writer admission stays explicit even
+/// with a passed opinion and a verified cumulative baseline.
 #[derive(Serialize)]
 pub struct ManagedPublicationPreview {
     pub schema_version: u32,
@@ -116,14 +116,23 @@ fn verify_cohort(root: &RootStore, db: &rusqlite::Connection, work: &Work,
     review: &IndependentReview, context: &ManagedReviewContext,
     candidate: &task_validation::ReviewCandidate) -> Result<(), E> {
     let held = candidate.candidate();
+    verify_recorded_cohort(root,db,work,review,context,held,candidate.metadata())
+}
+/// Bind a whole-cohort opinion to exact original control metadata and every
+/// current task/report/producer. Works with a held candidate or verified stored
+/// originals, never an invented review projection. Missing/changed data refuses
+/// with causes. This read grants no current source lease or publication right.
+fn verify_recorded_cohort(root: &RootStore, db: &rusqlite::Connection, work: &Work,
+    review: &IndependentReview, context: &ManagedReviewContext,
+    held: &crate::managed_repository::ManagedCandidate, metadata: &serde_json::Value) -> Result<(), E> {
     if review.candidate_commit != held.commit || context.candidate_commit != held.commit
         || review.previous_candidate != held.previous || context.previous_candidate != held.previous {
         return Err(E::Refused("publication-preview-candidate-changed"));
     }
-    let metadata: serde_json::Value = serde_json::from_str(context.receipt.0.get())
+    let original_metadata: serde_json::Value = serde_json::from_str(context.receipt.0.get())
         .map_err(|e| caused("publication-preview-control-context", e))?;
-    if crate::encode_model(&metadata).map_err(E::Encode)?
-        != crate::encode_model(candidate.metadata()).map_err(E::Encode)? {
+    if crate::encode_model(&original_metadata).map_err(E::Encode)?
+        != crate::encode_model(metadata).map_err(E::Encode)? {
         return Err(E::Refused("publication-preview-control-context-changed"));
     }
     let plan = held.control_plan.as_ref().ok_or(E::Refused("publication-preview-plan-required"))?;
@@ -182,11 +191,7 @@ impl RootStore {
             if after.work != checked.work || after.settings_sha256 != checked.settings_sha256 {
                 return Err(E::Refused("publication-preview-inputs-changed"));
             }
-            let initial = !checked.work.tasks.iter().flatten().any(|t|t.status == "accepted")
-                && checked.work.planning.as_deref().and_then(|p|p.repository.as_deref())
-                    .is_some_and(|r|r.candidate_commit == r.base_commit);
-            let mut blockers = if initial { vec!["managed-publication-write-admission-required"] }
-                else { vec!["managed-accepted-baseline-authority-unported"] };
+            let mut blockers = vec!["managed-publication-write-admission-required"];
             if checked.review.state != "passed" { blockers.push("managed-passed-opinion-required"); }
             Ok(ManagedPublicationPreview { schema_version: 1, work_id: work.into(),
                 work_revision: checked.work.revision, settings_revision: checked.settings_revision,
@@ -197,7 +202,7 @@ impl RootStore {
                 context_sha256: checked.review.context_sha256,
                 cohort_tasks: checked.context.tasks.unwrap_or_default().into_iter().map(|t| t.task).collect(),
                 validation: checked.validation, native_original_verified: true, current_candidate_verified: true,
-                publication_supported: initial, publication_ready: false, blockers,
+                publication_supported: true, publication_ready: false, blockers,
                 provider_started: false, task_accepted: false })
         })();
         finished(result, candidate.close())

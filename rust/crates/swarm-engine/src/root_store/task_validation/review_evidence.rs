@@ -181,18 +181,20 @@ fn recorded(
 /// Recover the actual managed checkpoint from the verified original controls for
 /// current publication attribution. Revalidates scalar/public/original evidence,
 /// then requires the same framed body on reread and the full checkpoint preimage.
-/// Returns private data only to Root consumers; no source lease, provider call,
+/// Returns checkpoint and rebuilt original control metadata to Root consumers;
+/// no source lease, provider call,
 /// accepted baseline or new execution right follows. Missing/changed originals,
 /// ordinary controls and decode/IO failures refuse with their typed causes.
 pub(in crate::root_store) fn recorded_managed_candidate(
     root: &RootStore, work: &crate::Work, task: &str, sha256: &str,
-) -> Result<crate::managed_repository::ManagedCandidate,E> {
+) -> Result<(crate::managed_repository::ManagedCandidate,serde_json::Value),E> {
     let evidence=recorded_evidence_for_review_result(root,work,task,sha256)?;
     let (receipt,hash):(Receipt,String)=journal::read(root,&journal::name("job",&evidence.job_id))?;
     if hash != evidence.receipt_sha256 { return Err(E::Refused("publication-control-original-changed")); }
-    publication::recorded_original(root,&receipt,&hash)?;
+    let job=publication::recorded_original(root,&receipt,&hash)?;
+    let metadata=super::review_candidate::recorded_metadata(&receipt,&job,&hash)?;
     let candidate=receipt.managed_candidate.ok_or(E::Refused("publication-managed-original-required"))?;
     candidate.verify_binding().map_err(|e|E::Launch(Box::new(e)))?;
     if candidate.work != work.id || candidate.task != task { return Err(E::Refused("publication-managed-original-binding")); }
-    Ok(candidate)
+    Ok((candidate,metadata))
 }

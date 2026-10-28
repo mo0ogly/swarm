@@ -5,6 +5,7 @@
 (function(){
  const L=globalThis.SwarmLive,M=globalThis.SwarmLiveMetrics,{tr,el}=L,$=id=>document.getElementById(id);
  const q=new URLSearchParams(location.search),agentId=q.get('agent')||'',workId=q.get('work')||'',runId=q.get('run')||'';
+ if(!runId&&agentId&&workId)SwarmNativeLogQuery.mount($('h-log-query'),{read:params=>{const u=new URL('/api/v1/logs',location.href);u.search=new URLSearchParams({work:workId,agent:agentId,...params});return L.getJSON(u.href)}},{translate:tr,agent:agentId});
  // Polling cadence when push is unavailable: 500 ms while active (Go terminal
  // page polls at 350 ms). A full page is re-read immediately in both modes.
  const ACTIVE_MS=500;
@@ -206,16 +207,16 @@
  function scroll(box){if(follow.checked)box.scrollTop=box.scrollHeight}
 
  let loaded=false,lastCallAt=-Infinity;
- function apply(data){const a=data.agent;facts(a);
+ function apply(data){const nextLog=SwarmRecordedCursor.next(data.logs),nextTerminal=SwarmRecordedCursor.next(data.terminal);const a=data.agent;facts(a);
   for(const e of data.logs.items)events.push(e);
   for(const e of data.logs.items)log.append(el('li',{class:'kind-'+e.kind+(loaded?' is-new':'')},el('time',{datetime:e.at,text:new Date(e.at).toLocaleTimeString(globalThis.SwarmI18n?.locale||'fr-FR')}),el('span',{class:'live-log-kind',text:e.kind}),el('span',{class:'live-log-msg',text:e.message})));
-  logsAfter=data.logs.next;$('h-log-empty').hidden=log.childElementCount>0;
+  logsAfter=nextLog;$('h-log-empty').hidden=log.childElementCount>0;
   if(data.terminal.items.length){$('h-term-panel').hidden=false;if(xterm)xterm.fit();let text=term.textContent;
    for(const c of data.terminal.items){if(xterm){xterm.resize(c.cols,c.rows);xterm.write(c.text)}
     text+=L.stripAnsi(c.text).replace(/\r\n/g,'\n').replace(/[^\n]*\r(?!\n)/g,'');
     if(c.invalid_utf8){const note='\n['+tr('octets non UTF-8 remplacés')+']\n';text+=note;xterm?.write(note.replace(/\n/g,'\r\n'))}}
    term.textContent=text}
-  termAfter=data.terminal.next;
+  termAfter=nextTerminal;
   if(a.reply){$('h-reply-panel').hidden=false;$('h-reply').textContent=a.reply}
   const live=resources(a);tools(a);tokensPanel(a);planned(a);transcript(a);telemetry(a);annotation(a);evaluations(a);
   scnTask=a.task_id;scnWork=a.work_id;if(scnWasActive!==a.active){const ended=scnWasActive===true;scnWasActive=a.active;scenario(ended)}frise();applyFilter();lastError();

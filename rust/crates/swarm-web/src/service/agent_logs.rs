@@ -96,7 +96,7 @@ impl NativeHttpService {
                 rows,
             })
             .map(RouteBody::plain)
-            .map_err(E::Json)
+            .map_err(E::ResponseJson)
         })();
         close(result, store.close())
     }

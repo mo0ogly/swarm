@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "installation_digest": "abababababababababababababababababababababababababababababababab",
+  "root_directory": "/synthetic-initial-service",
+  "service_uid": 1001,
+  "controller_uid": 1002,
+  "grant": {
+    "schema_version": 1,
+    "enrollment_id": "synthetic-initial-grant",
+    "generation": 1,
+    "project_context_digest": "1212121212121212121212121212121212121212121212121212121212121212",
+    "principal": {
+      "issuer": "urn:swarm:initial:fixture",
+      "subject": "synthetic-subject",
+      "principal_id": "synthetic-human",
+      "principal_kind": "human"
+    },
+    "scope": {
+      "work_id": "synthetic-work",
+      "plan_version": 3,
+      "plan_digest": "3434343434343434343434343434343434343434343434343434343434343434"
+    },
+    "trust_configuration_revision": 2,
+    "permissions": [
+      {
+        "operation": "effect.execute",
+        "resource": "enrollment-config/abababababababababababababababababababababababababababababababab/read"
+      }
+    ],
+    "delegable": [],
+    "not_before": "2026-01-01T00:00:00Z",
+    "expires_at": "2099-01-01T00:00:00Z"
+  },
+  "personal_project_context_digest": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+  "personal_generation": 7,
+  "parameters": {
+    "memory_kib": 32,
+    "passes": 1,
+    "parallelism": 1
+  }
+}

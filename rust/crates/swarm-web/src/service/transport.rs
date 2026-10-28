@@ -32,6 +32,9 @@ pub type NativeOutcomeObserver<'a> = dyn FnMut(&NativeJobOutcome) -> io::Result<
 #[must_use = "Inspect failures and retain observed/pending effects; shutdown is not acceptance"]
 #[derive(Default)]
 pub struct NativeServerReport {
+    /// Last acknowledged nonempty auxiliary observation set; not full history,
+    /// current state, peer delivery or business acceptance.
+    pub last_auxiliary_effects: Vec<swarm_engine::AuxiliaryEffect>,
     pub accepted_connections: u64,
     pub completed_jobs: u64,
     pub rejected_connections: u64,
@@ -44,6 +47,10 @@ pub struct NativeServerReport {
     pub observed_outcomes: u64,
     pub configuration_outcomes: u64,
     pub work_outcomes: u64,
+    /// Any observed contact remains possible even after later summary IO fails.
+    pub provider_contact_may_have_occurred: bool,
+    /// First probe, retaining its sanitized typed diagnostic after observation.
+    pub first_provider_probe:Option<Arc<super::ProviderProbeReceipt>>,
     pub rejected_queued_jobs: u64,
     /// Last acknowledged known values, for late stop/output failures only. They
     /// do not replace the full observer stream or prove current active state.
@@ -462,7 +469,7 @@ fn spawn_job(
 ) {
     jobs.spawn_blocking(move || {
         let head = message.request.method() == Method::HEAD;
-        let result = service.handle_observed_transport(message.request);
+        let result = service.handle_observed_transport(message.request, &||message.reply.is_closed());
         JobCompletion {
             result,
             reply: message.reply,
@@ -526,6 +533,7 @@ async fn run<'a, F: Future<Output = ()>>(
             break;
         }
     }
+    service.probe_shutdown.store(true,std::sync::atomic::Ordering::Release);
     receiver.close();
     drop(sender);
     sockets.abort_all();
@@ -572,10 +580,12 @@ fn wire_failure(
     head: bool,
 ) -> Result<Response<Body>, serde_json::Error> {
     let mut value = serde_json::json!({"schema_version":1,"error":code,"failure":{"code":code}});
+    if !outcome.auxiliary_effects.is_empty(){value["auxiliary_effects"]=serde_json::to_value(&outcome.auxiliary_effects)?;}
     if let Some((work, revision)) = &outcome.recorded_work {
         value["recorded_work"] = serde_json::json!({"id":work,"revision":revision});
     }
     if let Some(publication)=outcome.trust_publication{value["trust_publication"]=publication.into();value["trust_state_may_be_recorded"]=true.into();}
+    if let Some(probe)=&outcome.provider_probe {value["provider_contact_may_have_occurred"]=probe.contact_may_have_occurred.into();}
     if outcome.configuration_may_be_recorded {
         value["configuration_may_be_recorded"] = true.into();
     }
@@ -667,6 +677,7 @@ fn complete_job(
             if let Err(error) = count(&mut report.observed_outcomes) {
                 owner.fail(error);
             }
+            if let Some(probe)=&outcome.provider_probe {report.provider_contact_may_have_occurred |= probe.contact_may_have_occurred;if report.first_provider_probe.as_ref().is_none_or(|old|old.error.is_none() && probe.error.is_some()){report.first_provider_probe=Some(Arc::clone(probe));}}
             if outcome.configuration_may_be_recorded {
                 if let Err(error) = count(&mut report.configuration_outcomes) {
                     owner.fail(error);
@@ -677,6 +688,7 @@ fn complete_job(
                     owner.fail(error);
                 }
             }
+            if !outcome.auxiliary_effects.is_empty(){report.last_auxiliary_effects=outcome.auxiliary_effects.clone();}
             if let Some(work) = &outcome.recorded_work {
                 report.last_recorded_work = Some(work.clone());
             }
@@ -711,7 +723,8 @@ fn reject_queued(
         owner.fail(error);
     }
     let head = message.request.method() == Method::HEAD;
-    let outcome = NativeJobOutcome {
+    let outcome = NativeJobOutcome { auxiliary_effects:Vec::new(),
+        provider_probe:None,
         recorded_preparation:None,
         trust_publication:None,
         status: StatusCode::SERVICE_UNAVAILABLE,

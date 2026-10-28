@@ -1,14 +1,37 @@
 //! Development entry point. Only migrated commands are executable; never calls Go.
 #![forbid(unsafe_code)]
+#[cfg(target_os = "linux")]
+mod identity_control;
+#[cfg(target_os = "linux")]
+mod personal_secret_frame;
+#[cfg(target_os = "linux")]
+mod identity_personal;
+#[cfg(target_os = "linux")]
+mod identity_service;
+#[cfg(target_os = "linux")]
+mod identity_service_call;
+#[cfg(target_os = "linux")]
+mod trust_enrollment;
+#[cfg(target_os = "linux")]
+mod identity_linux_prerequisites;
+#[cfg(target_os = "linux")]
+mod identity_provisioning;
+#[cfg(target_os = "linux")]
+mod identity_operator;
+#[cfg(target_os = "linux")]
+mod identity_checkpoint;
+#[cfg(target_os = "linux")]
+mod identity_initial;
+
 use serde::Serialize;
 use std::{
     fmt,
     io::{self, Write},
 };
 use swarm_enrollment_bootstrap as bootstrap;
-const USAGE:&str="swarm-rust init --root ROOT | work list --json --root ROOT | work show ID | resume ID | planning show|enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions ID | mission show|order|queue|priority|start|resume|pause|unpause|stop ID --input FILE | mission watch|status|changes|spending ID | mission status-native ID --json | costs show ID | budget show|preview|apply ID [--input FILE] | task add|update|submit|validation-preview|validation-candidate ID --input FILE | task-model show|preview|apply ID | providers config show|init|inspect|backups|preview|apply --root ROOT [--input FILE] | providers policies export|preview|apply --root ROOT [--input FILE] | pricing list|save|estimate --input FILE | engine-settings show|preview|apply|model-check --root ROOT [--input FILE] | admin-budget show|preview|apply --root ROOT [--input FILE] | identity bootstrap-check SHA256 --input FILE";
-const HELP_FR:&str="swarm-rust — développement : migration partielle\nCommandes disponibles :\n  swarm-rust trust show|config-preview|config-apply|mandate-create|request|approve|commit|reconcile|export|anchor|verify --root RACINE [--input FICHIER|-]\n  swarm-rust version [--json] [--root ROOT]\n  swarm-rust --version [--json]\n  swarm-rust init --root ROOT [--json]\n  swarm-rust web [ADDRESS] --root ROOT [--json]\n  swarm-rust prepare create|save|method|adopt-brief|validate-plan|answer-questions|create-missions [ID] --root ROOT --input FILE [--json]\n  swarm-rust prepare list|methods --root ROOT [--json]\n  swarm-rust prepare show ID --root ROOT [--json]\n  swarm-rust prepare history ID besoin|brief|plan [BEFORE] --root ROOT [--json]\n  swarm-rust work list --root ROOT [--json]\n  swarm-rust work show ID --root ROOT [--json]\n  swarm-rust resume ID --root ROOT [--json]\n  swarm-rust planning show ID --root ROOT\n  swarm-rust costs show ID --root ROOT [--json]\n  swarm-rust budget show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust pricing list|save|estimate --root ROOT [--input FILE] [--json]\n  swarm-rust providers config show --root ROOT [--json]\n  swarm-rust providers config init --root ROOT --input FILE [--json]\n  swarm-rust providers config inspect [SNAPSHOT] --root ROOT [--json]\n  swarm-rust providers policies export|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers config backups --root ROOT [--json]\n  swarm-rust providers config preview|apply --root ROOT --input FILE [--json]\n  swarm-rust task review-reconcile|review-retire-stale REVIEW_ID --root ROOT [--json]\n  swarm-rust task review|review-preview|review-inputs|review-check|publication-preview|publish|validation-preview|validation-candidate|validate|validation-reconcile|validation-retire ID --root ROOT --input FILE [--json]\n  swarm-rust agent run ID --root ROOT [--json]\n  swarm-rust agent show|stop|reconcile ID --root ROOT [--json]\n  swarm-rust agent logs ID [AFTER] --root ROOT [--json] [--output FILE]\n  swarm-rust agent preview|prepare WORK --root ROOT --input FILE [--json]\n  swarm-rust agent guard ID --root ROOT --input FILE [--json]\n  swarm-rust agent limits WORK ROLE TASK --root ROOT --input FILE [--json]\n  swarm-rust planning enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions|call-preview|run ID --root ROOT --input FILE\n  swarm-rust planning step WORK --root ROOT [--json]\n  swarm-rust planning reconcile CLAIM --root ROOT [--json]\n  swarm-rust work create|update [ID] --root ROOT --input FILE [--json]\n  swarm-rust task add|update|submit ID --root ROOT --input FILE [--json]\n  swarm-rust quotas show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission show|order|queue|priority|start|resume|pause|unpause|stop ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission watch ID --root ROOT [--json]\n  swarm-rust mission changes|spending ID --root ROOT [--json]\n  swarm-rust mission status ID --root ROOT [--json]\n  swarm-rust mission status-native ID --root ROOT --json\n  swarm-rust task-model show|preview|apply ID --root ROOT [--input FILE] --json\n  swarm-rust ooda|checkpoint ID --root ROOT --input FILE [--json]\n  swarm-rust gate ID --root ROOT --input FILE [--task TASK] [--json]\n  swarm-rust project-context ROLE --root ROOT [--json]\n  swarm-rust agent-workflow ROLE --root ROOT [--json]\n  swarm-rust planning-output check --root ROOT --input FILE [--json]\n  swarm-rust planning-report --root ROOT --input FILE [--json]\n  swarm-rust evaluate --root ROOT --input FILE [--phase entry|validation|delivery|audit] [--json]\n  swarm-rust admin-budget show|preview|apply --root ROOT [--input FILE] [--json]\n  swarm-rust engine-settings show|describe|quality-profile --root ROOT [--json]\n  swarm-rust engine-settings preview|apply|model-check --root ROOT --input FILE [--json]\n  swarm-rust identity bootstrap-check EMPREINTE_SHA256 --input FILE [--json]\nLangue : --lang fr|en. init initialise sans service ; web lance l’API native de développement.\nMigration partielle : seules les commandes Rust listées sont actuellement disponibles.\n";
-const HELP_EN:&str="swarm-rust — development: partial migration\nAvailable commands:\n  swarm-rust trust show|config-preview|config-apply|mandate-create|request|approve|commit|reconcile|export|anchor|verify --root ROOT [--input FILE|-]\n  swarm-rust version [--json] [--root ROOT]\n  swarm-rust --version [--json]\n  swarm-rust init --root ROOT [--json]\n  swarm-rust web [ADDRESS] --root ROOT [--json]\n  swarm-rust prepare create|save|method|adopt-brief|validate-plan|answer-questions|create-missions [ID] --root ROOT --input FILE [--json]\n  swarm-rust prepare list|methods --root ROOT [--json]\n  swarm-rust prepare show ID --root ROOT [--json]\n  swarm-rust prepare history ID besoin|brief|plan [BEFORE] --root ROOT [--json]\n  swarm-rust work list --root ROOT [--json]\n  swarm-rust work show ID --root ROOT [--json]\n  swarm-rust resume ID --root ROOT [--json]\n  swarm-rust planning show ID --root ROOT\n  swarm-rust costs show ID --root ROOT [--json]\n  swarm-rust budget show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust pricing list|save|estimate --root ROOT [--input FILE] [--json]\n  swarm-rust providers config show --root ROOT [--json]\n  swarm-rust providers config init --root ROOT --input FILE [--json]\n  swarm-rust providers config inspect [SNAPSHOT] --root ROOT [--json]\n  swarm-rust providers policies export|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers config backups --root ROOT [--json]\n  swarm-rust providers config preview|apply --root ROOT --input FILE [--json]\n  swarm-rust task review-reconcile|review-retire-stale REVIEW_ID --root ROOT [--json]\n  swarm-rust task review|review-preview|review-inputs|review-check|publication-preview|publish|validation-preview|validation-candidate|validate|validation-reconcile|validation-retire ID --root ROOT --input FILE [--json]\n  swarm-rust agent run ID --root ROOT [--json]\n  swarm-rust agent show|stop|reconcile ID --root ROOT [--json]\n  swarm-rust agent logs ID [AFTER] --root ROOT [--json] [--output FILE]\n  swarm-rust agent preview|prepare WORK --root ROOT --input FILE [--json]\n  swarm-rust agent guard ID --root ROOT --input FILE [--json]\n  swarm-rust agent limits WORK ROLE TASK --root ROOT --input FILE [--json]\n  swarm-rust planning enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions|call-preview|run ID --root ROOT --input FILE\n  swarm-rust planning step WORK --root ROOT [--json]\n  swarm-rust planning reconcile CLAIM --root ROOT [--json]\n  swarm-rust work create|update [ID] --root ROOT --input FILE [--json]\n  swarm-rust task add|update|submit ID --root ROOT --input FILE [--json]\n  swarm-rust quotas show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission show|order|queue|priority|start|resume|pause|unpause|stop ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission watch ID --root ROOT [--json]\n  swarm-rust mission changes|spending ID --root ROOT [--json]\n  swarm-rust mission status ID --root ROOT [--json]\n  swarm-rust mission status-native ID --root ROOT --json\n  swarm-rust task-model show|preview|apply ID --root ROOT [--input FILE] --json\n  swarm-rust ooda|checkpoint ID --root ROOT --input FILE [--json]\n  swarm-rust gate ID --root ROOT --input FILE [--task TASK] [--json]\n  swarm-rust project-context ROLE --root ROOT [--json]\n  swarm-rust agent-workflow ROLE --root ROOT [--json]\n  swarm-rust planning-output check --root ROOT --input FILE [--json]\n  swarm-rust planning-report --root ROOT --input FILE [--json]\n  swarm-rust evaluate --root ROOT --input FILE [--phase entry|validation|delivery|audit] [--json]\n  swarm-rust admin-budget show|preview|apply --root ROOT [--input FILE] [--json]\n  swarm-rust engine-settings show|describe|quality-profile --root ROOT [--json]\n  swarm-rust engine-settings preview|apply|model-check --root ROOT --input FILE [--json]\n  swarm-rust identity bootstrap-check SHA256_DIGEST --input FILE [--json]\nLanguage: --lang fr|en. init starts no service; web starts the native development API.\nPartial migration: only the listed Rust commands are currently available.\n";
+const USAGE:&str="swarm-rust init --root ROOT | work list --json --root ROOT | work show ID | resume ID | planning show|enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions ID | mission show|order|queue|priority|start|resume|pause|unpause|stop ID --input FILE | mission watch|status|changes|spending ID | mission status-native ID --json | costs show ID | budget show|preview|apply ID [--input FILE] | task add|update|submit|validation-preview|validation-candidate ID --input FILE | task-model show|preview|apply ID | providers config show|init|inspect|backups|preview|apply --root ROOT [--input FILE] | providers policies export|preview|apply --root ROOT [--input FILE] | pricing list|save|estimate --input FILE | engine-settings show|preview|apply|model-check --root ROOT [--input FILE] | admin-budget show|preview|apply --root ROOT [--input FILE] | identity initial-create|initial-reconcile REQUEST_SHA256 OPERATOR_DIRECTORY PRIVATE_ANCHOR --input PRIVATE_REQUEST | identity checkpoint-check REQUEST_SHA256 --input PRIVATE_ANCHOR | identity operator-check SHA256 --input PRIVATE_OPERATOR_DIRECTORY | identity service-export|service-export-reconcile SHA256 PRIVATE_OUTPUT --input PRIVATE_OPERATOR_DIRECTORY | identity provisioning-check SHA256 --input PRIVATE_REQUEST | identity bootstrap-check|control-check SHA256 --input FILE | identity personal-init|personal-enroll|personal-recover SHA256 SEED_PATH --input BOOTSTRAP | identity service-install|service-resume|service-reconcile SHA256 --input PRIVATE_ARTIFACT | identity service-call SHA256 SEED_PATH --input BOOTSTRAP | trust enrollment-call OPERATION ABSOLUTE_DECLARATION --input REQUESTFILE | trust enrollment-serve OPERATION ABSOLUTE_DECLARATION [LOOPBACK_ADDRESS] --input REQUESTFILE";
+const HELP_FR:&str="swarm-rust — développement : migration partielle\nCommandes disponibles :\n  swarm-rust lifecycle list --root ROOT --json\n  swarm-rust planning history WORK --root ROOT --json\n  swarm-rust visit show|mark WORK --root ROOT [--input INTENT.json] --json\n  swarm-rust runtime-health --root ROOT --json\n  swarm-rust logs query WORK AGENT --root ROOT [--input QUERY.json] --json\n  swarm-rust run-limits logs show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust activity show WORK --root ROOT [--input QUERY.json] --json\n  swarm-rust run-limits activity show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust exchange list WORK --root ROOT --json\n  swarm-rust run-limits performance show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust run-limits web-requests show|history|preview|apply [--input FICHIER] [--json]\n  swarm-rust run-limits show|history|preview|apply SCOPE MISSION KEY --root ROOT [--input FILE] --json\n  swarm-rust run-limits effective MISSION ROLE TASK --root ROOT --json\n  swarm-rust run-limits rollback-preview|rollback SCOPE MISSION KEY REV --root ROOT --input FILE --json\n  swarm-rust trust show|config-preview|config-apply|mandate-create|request|approve|commit|reconcile|export|anchor|verify --root RACINE [--input FICHIER|-]\n  swarm-rust version [--json] [--root ROOT]\n  swarm-rust --version [--json]\n  swarm-rust init --root ROOT [--json]\n  swarm-rust web [ADDRESS] --root ROOT [--json]\n  swarm-rust prepare send|stop|use-proposal|create|save|method|adopt-brief|validate-plan|answer-questions|create-missions|revise-missions|configure-team|release-plan|budget|source-add|source-remove [ID] --root ROOT --input FILE [--json]\n  swarm-rust prepare list|methods|capabilities --root ROOT [--json]\n  swarm-rust prepare show|budget|release-review|dialogue ID --root ROOT [--json]\n  swarm-rust prepare files ID [SCOPE [QUERY]] --root ROOT [--json]\n  swarm-rust prepare templates | template ID | template-check --input JSON\n  swarm-rust project-profile show|check|list --root ROOT [--json]\n  swarm-rust project-profile preview|apply|select [PROFILE] --root ROOT --input JSON [--json]\n  swarm-rust prepare source ID PATH START END --root ROOT [--json]\n  swarm-rust prepare history ID besoin|brief|plan [BEFORE] --root ROOT [--json]\n  swarm-rust work list --root ROOT [--json]\n  swarm-rust work show ID --root ROOT [--json]\n  swarm-rust resume ID --root ROOT [--json]\n  swarm-rust planning show ID --root ROOT\n  swarm-rust costs show ID --root ROOT [--json]\n  swarm-rust budget show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust pricing list|save|estimate --root ROOT [--input FILE] [--json]\n  swarm-rust providers config show --root ROOT [--json]\n  swarm-rust providers config init --root ROOT --input FILE [--json]\n  swarm-rust providers config inspect [SNAPSHOT] --root ROOT [--json]\n  swarm-rust run-limits provider-wait show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers connections show|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers policies export|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers config backups --root ROOT [--json]\n  swarm-rust providers config preview|apply --root ROOT --input FILE [--json]\n  swarm-rust task review-reconcile|review-retire-stale REVIEW_ID --root ROOT [--json]\n  swarm-rust task review|review-preview|review-inputs|review-check|baseline-preview|publication-preview|publish|validation-preview|validation-candidate|validate|validation-reconcile|validation-retire ID --root ROOT --input FILE [--json]\n  swarm-rust agent run ID --root ROOT [--json]\n  swarm-rust agent show|stop|reconcile ID --root ROOT [--json]\n  swarm-rust agent logs ID [AFTER] --root ROOT [--json] [--output FILE]\n  swarm-rust agent preview|prepare WORK --root ROOT --input FILE [--json]\n  swarm-rust agent guard ID --root ROOT --input FILE [--json]\n  swarm-rust agent limits WORK ROLE TASK --root ROOT --input FILE [--json]\n  swarm-rust planning enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions|call-preview|run ID --root ROOT --input FILE\n  swarm-rust planning step WORK --root ROOT [--json]\n  swarm-rust planning reconcile CLAIM --root ROOT [--json]\n  swarm-rust work create|update [ID] --root ROOT --input FILE [--json]\n  swarm-rust task add|update|submit ID --root ROOT --input FILE [--json]\n  swarm-rust quotas show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission show|order|queue|priority|start|resume|pause|unpause|stop ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission watch ID --root ROOT [--json]\n  swarm-rust mission changes|spending|seen ID --root ROOT [--json]\n  swarm-rust mission status ID --root ROOT [--json]\n  swarm-rust mission status-native ID --root ROOT --json\n  swarm-rust task-model show|preview|apply ID --root ROOT [--input FILE] --json\n  swarm-rust ooda|checkpoint ID --root ROOT --input FILE [--json]\n  swarm-rust gate ID --root ROOT --input FILE [--task TASK] [--json]\n  swarm-rust project-profile show|check --root ROOT [--json]\n  swarm-rust project-context ROLE --root ROOT [--json]\n  swarm-rust agent-workflow ROLE --root ROOT [--json]\n  swarm-rust planning-output check --root ROOT --input FILE [--json]\n  swarm-rust planning-report --root ROOT --input FILE [--json]\n  swarm-rust evaluate --root ROOT --input FILE [--phase entry|validation|delivery|audit] [--json]\n  swarm-rust admin-budget show|preview|apply --root ROOT [--input FILE] [--json]\n  swarm-rust engine-settings show|describe|quality-profile --root ROOT [--json]\n  swarm-rust engine-settings preview|apply|model-check --root ROOT --input FILE [--json]\n  swarm-rust identity linux-prerequisites --json [--lang fr|en]\n    Read-only current CLI namespace metadata; no launch or protection verified.\n  swarm-rust identity service-call SHA256 PRIVATE_SEED --input BOOTSTRAP [--json]\n    Appel opérateur local : paquet binaire sur stdin, aucun listener ou session.\n  swarm-rust identity service-install|service-resume|service-reconcile SHA256 --input ARTEFACT_PRIVE_ABSOLU [--json]\n    Installation initiale, sans compte humain ni démarrage de service.\n  swarm-rust identity personal-init|personal-enroll|personal-recover EMPREINTE_SHA256 CLE_PRIVEE --input BOOTSTRAP [--json]\n    personal-enroll : frame binaire sur stdin ; aucun secret dans argv.\n  swarm-rust identity initial-create|initial-reconcile PIN_DEMANDE DOSSIER_OPERATEUR ANCRE_PRIVEE --input DEMANDE_PRIVEE [--json]\n    Matière dormante uniquement ; intention avant génération, aucun compte/Root/service/humain admis.\n  swarm-rust identity checkpoint-check PIN_DEMANDE --input ANCRE_PRIVEE_ABSOLUE [--json]\n    Lecture uniquement ; confiance du localisateur à établir par l’appelant, aucun paquet lu/créé.\n  swarm-rust identity operator-check PIN --input DOSSIER_OPERATEUR_PRIVE [--json]\n  swarm-rust identity service-export|service-export-reconcile PIN SORTIE_PRIVEE --input DOSSIER_OPERATEUR_PRIVE [--json]\n    Artefact de service uniquement ; aucune installation, nouvelle clé/preuve ou identité humaine vérifiée.\n  swarm-rust identity provisioning-check EMPREINTE_SHA256 --input DEMANDE_PRIVEE_ABSOLUE [--json]\n    Précontrôle uniquement ; aucun secret créé, compte vérifié ou service démarré.\n  swarm-rust identity bootstrap-check EMPREINTE_SHA256 --input FILE [--json]\n  swarm-rust identity control-check EMPREINTE_SHA256 --input FILE [--json] (précontrôle, sans démarrage)\nLangue : --lang fr|en. init initialise sans service ; web lance l’API native de développement.\nMigration partielle : seules les commandes Rust listées sont actuellement disponibles.\n";
+const HELP_EN:&str="swarm-rust — development: partial migration\nAvailable commands:\n  swarm-rust lifecycle list --root ROOT --json\n  swarm-rust planning history WORK --root ROOT --json\n  swarm-rust visit show|mark WORK --root ROOT [--input INTENT.json] --json\n  swarm-rust runtime-health --root ROOT --json\n  swarm-rust logs query WORK AGENT --root ROOT [--input QUERY.json] --json\n  swarm-rust run-limits logs show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust activity show WORK --root ROOT [--input QUERY.json] --json\n  swarm-rust run-limits activity show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust exchange list WORK --root ROOT --json\n  swarm-rust run-limits performance show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust run-limits web-requests show|history|preview|apply [--input FILE] [--json]\n  swarm-rust run-limits show|history|preview|apply SCOPE MISSION KEY --root ROOT [--input FILE] --json\n  swarm-rust run-limits effective MISSION ROLE TASK --root ROOT --json\n  swarm-rust run-limits rollback-preview|rollback SCOPE MISSION KEY REV --root ROOT --input FILE --json\n  swarm-rust run-limits provider-wait show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust trust show|config-preview|config-apply|mandate-create|request|approve|commit|reconcile|export|anchor|verify --root ROOT [--input FILE|-]\n  swarm-rust version [--json] [--root ROOT]\n  swarm-rust --version [--json]\n  swarm-rust init --root ROOT [--json]\n  swarm-rust web [ADDRESS] --root ROOT [--json]\n  swarm-rust prepare send|stop|use-proposal|create|save|method|adopt-brief|validate-plan|answer-questions|create-missions|revise-missions|configure-team|release-plan|budget|source-add|source-remove [ID] --root ROOT --input FILE [--json]\n  swarm-rust prepare list|methods|capabilities --root ROOT [--json]\n  swarm-rust prepare show|budget|release-review|dialogue ID --root ROOT [--json]\n  swarm-rust prepare files ID [SCOPE [QUERY]] --root ROOT [--json]\n  swarm-rust prepare templates | template ID | template-check --input JSON\n  swarm-rust project-profile show|check|list --root ROOT [--json]\n  swarm-rust project-profile preview|apply|select [PROFILE] --root ROOT --input JSON [--json]\n  swarm-rust prepare source ID PATH START END --root ROOT [--json]\n  swarm-rust prepare history ID besoin|brief|plan [BEFORE] --root ROOT [--json]\n  swarm-rust work list --root ROOT [--json]\n  swarm-rust work show ID --root ROOT [--json]\n  swarm-rust resume ID --root ROOT [--json]\n  swarm-rust planning show ID --root ROOT\n  swarm-rust costs show ID --root ROOT [--json]\n  swarm-rust budget show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust pricing list|save|estimate --root ROOT [--input FILE] [--json]\n  swarm-rust providers config show --root ROOT [--json]\n  swarm-rust providers config init --root ROOT --input FILE [--json]\n  swarm-rust providers config inspect [SNAPSHOT] --root ROOT [--json]\n  swarm-rust providers policies export|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers config backups --root ROOT [--json]\n  swarm-rust providers config preview|apply --root ROOT --input FILE [--json]\n  swarm-rust task review-reconcile|review-retire-stale REVIEW_ID --root ROOT [--json]\n  swarm-rust task review|review-preview|review-inputs|review-check|baseline-preview|publication-preview|publish|validation-preview|validation-candidate|validate|validation-reconcile|validation-retire ID --root ROOT --input FILE [--json]\n  swarm-rust agent run ID --root ROOT [--json]\n  swarm-rust agent show|stop|reconcile ID --root ROOT [--json]\n  swarm-rust agent logs ID [AFTER] --root ROOT [--json] [--output FILE]\n  swarm-rust agent preview|prepare WORK --root ROOT --input FILE [--json]\n  swarm-rust agent guard ID --root ROOT --input FILE [--json]\n  swarm-rust agent limits WORK ROLE TASK --root ROOT --input FILE [--json]\n  swarm-rust planning enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions|call-preview|run ID --root ROOT --input FILE\n  swarm-rust planning step WORK --root ROOT [--json]\n  swarm-rust planning reconcile CLAIM --root ROOT [--json]\n  swarm-rust work create|update [ID] --root ROOT --input FILE [--json]\n  swarm-rust task add|update|submit ID --root ROOT --input FILE [--json]\n  swarm-rust quotas show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission show|order|queue|priority|start|resume|pause|unpause|stop ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission watch ID --root ROOT [--json]\n  swarm-rust mission changes|spending|seen ID --root ROOT [--json]\n  swarm-rust mission status ID --root ROOT [--json]\n  swarm-rust mission status-native ID --root ROOT --json\n  swarm-rust task-model show|preview|apply ID --root ROOT [--input FILE] --json\n  swarm-rust ooda|checkpoint ID --root ROOT --input FILE [--json]\n  swarm-rust gate ID --root ROOT --input FILE [--task TASK] [--json]\n  swarm-rust project-profile show|check --root ROOT [--json]\n  swarm-rust project-context ROLE --root ROOT [--json]\n  swarm-rust agent-workflow ROLE --root ROOT [--json]\n  swarm-rust planning-output check --root ROOT --input FILE [--json]\n  swarm-rust planning-report --root ROOT --input FILE [--json]\n  swarm-rust evaluate --root ROOT --input FILE [--phase entry|validation|delivery|audit] [--json]\n  swarm-rust admin-budget show|preview|apply --root ROOT [--input FILE] [--json]\n  swarm-rust engine-settings show|describe|quality-profile --root ROOT [--json]\n  swarm-rust engine-settings preview|apply|model-check --root ROOT --input FILE [--json]\n  swarm-rust identity service-call SHA256 PRIVATE_SEED --input BOOTSTRAP [--json]\n    Local operator call: binary stdin packet, no listener or session.\n  swarm-rust identity service-install|service-resume|service-reconcile SHA256 --input ABSOLUTE_PRIVATE_ARTIFACT [--json]\n    Initial installation only; no human account or service started.\n  swarm-rust identity personal-init|personal-enroll|personal-recover SHA256_DIGEST PRIVATE_KEY --input BOOTSTRAP [--json]\n    personal-enroll: binary frame on stdin; no secrets in argv.\n  swarm-rust identity initial-create|initial-reconcile REQUEST_PIN OPERATOR_DIRECTORY PRIVATE_ANCHOR --input PRIVATE_REQUEST [--json]\n    Dormant material only; intent before generation, no account/Root/service/human admitted.\n  swarm-rust identity checkpoint-check REQUEST_PIN --input ABSOLUTE_PRIVATE_ANCHOR [--json]\n    Read only; caller must establish locator trust, no package read/creation.\n  swarm-rust identity operator-check PIN --input PRIVATE_OPERATOR_DIRECTORY [--json]\n  swarm-rust identity service-export|service-export-reconcile PIN PRIVATE_OUTPUT --input PRIVATE_OPERATOR_DIRECTORY [--json]\n    Service artifact only; no installation, new keys/proof or verified human identity.\n  swarm-rust identity provisioning-check SHA256_DIGEST --input ABSOLUTE_PRIVATE_REQUEST [--json]\n    Preflight only; no material generated, account verified or service started.\n  swarm-rust identity bootstrap-check SHA256_DIGEST --input FILE [--json]\n  swarm-rust identity control-check SHA256_DIGEST --input FILE [--json] (preflight, no service start)\nLanguage: --lang fr|en. init starts no service; web starts the native development API.\nPartial migration: only the listed Rust commands are currently available.\n";
 pub enum CliError {
     Trust(Box<swarm_engine::TrustError>),
     TrustPublication { primary:Box<Self>, publication: &'static str },
@@ -69,6 +92,30 @@ pub enum CliError {
     },
     ArgumentEncoding,
     Bootstrap(bootstrap::Error),
+    /// Pinned current-source preflight failure; no project/grant/config mutation.
+    #[cfg(target_os = "linux")]
+    ControlCheck { cause: Box<swarm_enrollment_authority::startup::Error>, english: bool },
+    /// Personal lifecycle failure retains known publication and independent close/output causes.
+    #[cfg(target_os = "linux")]
+    PersonalLifecycle { cause: Box<identity_personal::Error>, english: bool },
+    /// Installer failures retain input validation, root publication and output causes.
+    #[cfg(target_os = "linux")]
+    ServiceInstallation { cause: Box<identity_service::Error>, english: bool },
+    /// Operator call retains operation, independent close and output causes.
+    #[cfg(target_os = "linux")]
+    ServiceCall { cause: Box<identity_service_call::Error>, english: bool },
+    /// Pinned request preflight retains observed read/validation and cleanup/output causes.
+    #[cfg(target_os = "linux")]
+    ProvisioningCheck { cause: Box<identity_provisioning::Error>, english: bool },
+    /// Private operator package/handoff errors retain source and target/output phases.
+    #[cfg(target_os = "linux")]
+    OperatorPackage { cause: Box<identity_operator::Error>, english: bool },
+    /// Protected-locator anchor reading retains actual FS/decode/close/output facts.
+    #[cfg(target_os = "linux")]
+    CheckpointCheck { cause: Box<identity_checkpoint::Error>, english: bool },
+    /// Dormant initial material retains durable intent/anchor/package and output facts.
+    #[cfg(target_os = "linux")]
+    InitialCreation { cause: Box<identity_initial::Error>, english: bool },
     Root(Box<swarm_engine::RootStoreError>),
     Evaluation(Box<swarm_engine::GateEvaluationError>),
     SettingsInput(serde_json::Error),
@@ -76,6 +123,9 @@ pub enum CliError {
     Protection(swarm_protection_contract::Error),
     Input(io::Error),
     CommandInput(swarm_engine::CommandInputError),
+    /// Typed auxiliary receipt kept beside an actual later close/output error.
+    /// No new write, business acceptance, peer receipt or retry grant follows.
+    AuxiliaryState { primary:Box<CliError>, effects:Vec<swarm_engine::AuxiliaryEffect>, english:bool },
     RootCleanup {
         primary: Box<CliError>,
         cleanup: Box<swarm_engine::RootStoreError>,
@@ -119,6 +169,7 @@ impl CliError {
             }
             seen.push(pointer);
             causes.push(error);
+            if let Some(error)=error.downcast_ref::<Box<Self>>(){pending.push(error.as_ref());}
             #[cfg(target_os = "linux")]
             pending.extend(native_web::branches(error));
             // source() alone loses secondary Root cleanup causes. Reuse the
@@ -133,6 +184,22 @@ impl CliError {
                 if let Some(cause) = primary { pending.push(cause.as_ref()); }
                 if let Some(cause) = close { pending.push(cause.as_ref()); }
             }
+            #[cfg(target_os = "linux")]
+            pending.extend(identity_control::error_links(error).1);
+            #[cfg(target_os = "linux")]
+            pending.extend(identity_personal::error_links(error).1);
+            #[cfg(target_os = "linux")]
+            pending.extend(identity_service::error_links(error).1);
+            #[cfg(target_os = "linux")]
+            pending.extend(identity_service_call::error_links(error).1);
+            #[cfg(target_os = "linux")]
+            pending.extend(identity_provisioning::error_links(error).1);
+            #[cfg(target_os = "linux")]
+            pending.extend(identity_operator::error_links(error).1);
+            #[cfg(target_os = "linux")]
+            pending.extend(identity_checkpoint::error_links(error).1);
+            #[cfg(target_os = "linux")]
+            pending.extend(identity_initial::error_links(error).1);
             // IO source() skips its custom error itself. Retain that typed node,
             // as the established safe diagnostic traversal already does.
             if let Some(io) = error.downcast_ref::<io::Error>() {
@@ -157,6 +224,22 @@ impl CliError {
             #[cfg(target_os="linux")]
             if let Some(web)=error.downcast_ref::<swarm_web::HttpServiceError>(){if let Some(receipt)=web.recorded_preparation(){return Some(receipt);}}
         }None
+    }
+    /// Collect actual auxiliary witnesses across CLI/Root/IO and pending Web
+    /// outcomes. Exact duplicates only; an absent witness never proves rollback.
+    /// These data do not grant acceptance, execution or unchanged retries.
+    fn auxiliary_effects(&self)->Vec<swarm_engine::AuxiliaryEffect>{
+        let mut result=Vec::new();
+        for error in self.typed_causes(){
+            if let Some(Self::AuxiliaryState{effects,..})=error.downcast_ref::<Self>(){swarm_engine::extend_auxiliary_effects(&mut result,effects.clone());}
+            swarm_engine::extend_auxiliary_effects(&mut result,swarm_engine::auxiliary_effects(error));
+            #[cfg(target_os="linux")]
+            if let Some(error)=error.downcast_ref::<swarm_web::NativeServerError>(){swarm_engine::extend_auxiliary_effects(&mut result,error.auxiliary_effects());}
+            #[cfg(target_os="linux")]
+            if let Some(error)=error.downcast_ref::<swarm_web::HttpServiceError>(){swarm_engine::extend_auxiliary_effects(&mut result,error.auxiliary_effects());}
+            #[cfg(target_os="linux")]
+            if let Some(error)=error.downcast_ref::<swarm_web::NativeObservationFailure>(){swarm_engine::extend_auxiliary_effects(&mut result,error.auxiliary_effects());}
+        }result
     }
     /// Recover known Work metadata from explicit CLI state-preservation wrappers
     /// and typed Root/native outcomes, including nested cleanup failures. Never
@@ -226,8 +309,24 @@ impl CliError {
             Self::View(e) => e.code(),
             Self::GateInput(e) => e.code(),
             Self::GateTaskMismatch { .. } => "gate-task-mismatch",
-            Self::StatePreserved { primary, .. } => primary.code(),
+            Self::StatePreserved { primary, .. } | Self::AuxiliaryState {primary,..} => primary.code(),
             Self::Evaluation(e) => e.code(),
+            #[cfg(target_os = "linux")]
+            Self::ControlCheck { cause, .. } => cause.code(),
+            #[cfg(target_os = "linux")]
+            Self::PersonalLifecycle { cause, .. } => cause.code(),
+            #[cfg(target_os = "linux")]
+            Self::ServiceInstallation { cause, .. } => cause.code(),
+            #[cfg(target_os = "linux")]
+            Self::ServiceCall { cause, .. } => cause.code(),
+            #[cfg(target_os = "linux")]
+            Self::ProvisioningCheck { cause, .. } => cause.code(),
+            #[cfg(target_os = "linux")]
+            Self::OperatorPackage { cause, .. } => cause.code(),
+            #[cfg(target_os = "linux")]
+            Self::CheckpointCheck { cause, .. } => cause.code(),
+            #[cfg(target_os = "linux")]
+            Self::InitialCreation { cause, .. } => cause.code(),
             Self::SettingsInput(_) => "settings-request-invalid",
             Self::Protection(e) => e.code(),
             Self::Input(_) => "input-unavailable",
@@ -269,6 +368,34 @@ impl CliError {
             Self::PlanningStatePreserved { primary, work, revision, english } => if *english {
                 format!("Work {work} revision {revision} is recorded; output/close failed: {primary}. Inspect stored state before retrying the control.")
             } else { format!("Travail {work} révision {revision} enregistré ; échec de sortie/fermeture : {primary}. Vérifier l’état enregistré avant de relancer le contrôle.") },
+            #[cfg(target_os = "linux")]
+            Self::InitialCreation { cause, english } => if *english {format!("Initial material command failed ({}); {}. Preserve intent/anchor/package and use initial-reconcile; never regenerate implicitly.",cause.code(),cause.observation())}else{format!("Échec de commande de matière initiale ({}) ; {}. Conserver intention/ancre/paquet et utiliser initial-reconcile ; jamais de régénération implicite.",cause.code(),cause.observation())},
+            #[cfg(target_os = "linux")]
+            Self::CheckpointCheck { cause, english } => if *english {format!("Private anchor check failed ({}); {}. Inspect protected locator and retained read phases.",cause.code(),cause.observation())}else{format!("Échec du contrôle d’ancre privée ({}) ; {}. Vérifier le localisateur protégé et les phases de lecture conservées.",cause.code(),cause.observation())},
+            #[cfg(target_os = "linux")]
+            Self::OperatorPackage { cause, english } => if *english {
+                format!("Operator package command failed ({}); {}. Inspect retained phases and reconcile from the independent package pin.",cause.code(),cause.observation())
+            } else {format!("Échec de commande du paquet opérateur ({}) ; {}. Consulter les phases conservées et réconcilier depuis le pin indépendant du paquet.",cause.code(),cause.observation())},
+            #[cfg(target_os = "linux")]
+            Self::ProvisioningCheck { cause, english } => if *english {
+                format!("Provisioning request check failed ({}); {}. No material generated or service started.",cause.code(),cause.observation())
+            } else {format!("Échec du précontrôle de préparation ({}); {}. Aucun secret créé ni service démarré.",cause.code(),cause.observation())},
+            #[cfg(target_os = "linux")]
+            Self::ServiceCall { cause, english } => if *english {
+                format!("Personal service operation/output/close failed ({}); {}. Inspect known state before any retry.",cause.code(),cause.observation())
+            } else {format!("Échec d’opération/sortie/fermeture du noyau personnel ({}) ; {}. Consulter l’état connu avant toute reprise.",cause.code(),cause.observation())},
+            #[cfg(target_os = "linux")]
+            Self::ServiceInstallation { cause, english } => if *english {
+                format!("Service installation command failed ({}); {}. Inspect retained phases before explicit recovery.",cause.code(),cause.observation())
+            } else {format!("Échec de commande d’installation du service ({}) ; {}. Consulter les phases conservées avant reprise explicite.",cause.code(),cause.observation())},
+            #[cfg(target_os = "linux")]
+            Self::PersonalLifecycle { cause, english } => if *english {
+                format!("Personal lifecycle command failed ({}); {}. Inspect the retained checkpoint before recovery.",cause.code(),cause.observation())
+            } else {format!("Échec de commande du lifecycle personnel ({}) ; {}. Relire le checkpoint conservé avant reprise.",cause.code(),cause.observation())},
+            #[cfg(target_os = "linux")]
+            Self::ControlCheck { cause, english } => if *english {
+                format!("Authority startup check refused ({}); no request authorized or service started.", cause.code())
+            } else { format!("Contrôle de démarrage de l’autorité refusé ({}) ; aucune requête autorisée ni service démarré.", cause.code()) },
             Self::Bootstrap(e) => match e.code() {
                 "document" => "enrollment bootstrap: invalid canonical declaration".into(),
                 "pin" => "enrollment bootstrap: independently approved digest required".into(),
@@ -291,6 +418,10 @@ impl CliError {
             Self::Protection(e) => e.to_string(),
             Self::Input(e) => format!("input failed ({:?}, errno {:?})",e.kind(),e.raw_os_error()),
             Self::CommandInput(e)=>e.to_string(),
+            Self::AuxiliaryState{primary,effects,english}=>{
+                let uncertain=effects.iter().any(|effect|match effect {swarm_engine::AuxiliaryEffect::SessionVisit{state,..}=>*state==swarm_engine::AuxiliaryEffectState::Uncertain});
+                let notice=match (*english,uncertain){(true,true)=>"A consultation may already be recorded. Read its state before retrying.",(true,false)=>"Consultation recorded. Read its state before retrying.",(false,true)=>"Une consultation peut déjà être enregistrée. Relisez son état avant de reprendre.",(false,false)=>"Consultation enregistrée. Relisez son état avant de reprendre."};format!("{notice} {}",primary.message())
+            },
             Self::RootCleanup{..}=>"root cleanup failed; inspect the current state before recovery".into(),
             Self::Output(e) if e.raw_os_error() == Some(28) => "Écriture impossible : stockage plein. Libérez de l’espace puis vérifiez l’état de la mission avant de reprendre ; aucun résultat n’est validé par cette erreur.".into(),
             Self::Output(e) => format!("output failed ({:?}, errno {:?})", e.kind(), e.raw_os_error()),
@@ -314,6 +445,22 @@ impl std::error::Error for CliError {
             Self::AgentExecutionPreserved { primary, .. } => Some(primary.as_ref()),
             Self::AgentLaunchPreserved { primary, .. } => Some(primary.as_ref()),
             Self::Bootstrap(e) => Some(e),
+            #[cfg(target_os = "linux")]
+            Self::ControlCheck { cause, .. } => Some(cause.as_ref()),
+            #[cfg(target_os = "linux")]
+            Self::PersonalLifecycle { cause, .. } => Some(cause.as_ref()),
+            #[cfg(target_os = "linux")]
+            Self::ServiceInstallation { cause, .. } => Some(cause.as_ref()),
+            #[cfg(target_os = "linux")]
+            Self::ServiceCall { cause, .. } => Some(cause.as_ref()),
+            #[cfg(target_os = "linux")]
+            Self::ProvisioningCheck { cause, .. } => Some(cause.as_ref()),
+            #[cfg(target_os = "linux")]
+            Self::OperatorPackage { cause, .. } => Some(cause.as_ref()),
+            #[cfg(target_os = "linux")]
+            Self::CheckpointCheck { cause, .. } => Some(cause.as_ref()),
+            #[cfg(target_os = "linux")]
+            Self::InitialCreation { cause, .. } => Some(cause.as_ref()),
             Self::Trust(e)=>Some(e.as_ref()),
             Self::TrustPublication{primary,..}=>Some(primary.as_ref()),
             Self::Root(e) => Some(e.as_ref()),
@@ -323,7 +470,7 @@ impl std::error::Error for CliError {
             Self::MissionWorkerEntry { primary, .. } => Some(primary.as_ref()),
             Self::View(e) => Some(e),
             Self::GateInput(e) => Some(e),
-            Self::StatePreserved { primary, .. } => Some(primary.as_ref()),
+            Self::StatePreserved { primary, .. } | Self::AuxiliaryState {primary,..} => Some(primary.as_ref()),
             Self::PlanningStatePreserved { primary, .. } => Some(primary.as_ref()),
             Self::TaskValidationStatePreserved { primary, .. } => Some(primary.as_ref()),
             Self::Evaluation(e) => Some(e.as_ref()),
@@ -386,6 +533,10 @@ struct Arguments {
     help: bool,
     language: String,
 }
+/// Parse language and command arguments without IO. Executable identity routes
+/// accept each input/json/lang option at most once and reject project/unknown
+/// flags even when their values equal defaults. Other command grammars retain
+/// their existing consumers; public help remains a non-executing observation.
 fn parse(args: &[String], environment_language: &str) -> Result<Arguments, CliError> {
     let mut language = if environment_language.is_empty() {
         "fr".into()
@@ -393,14 +544,17 @@ fn parse(args: &[String], environment_language: &str) -> Result<Arguments, CliEr
         environment_language.to_owned()
     };
     let mut filtered = Vec::new();
+    let mut identity_flags = Vec::new();
     let mut iter = args.iter();
     while let Some(a) = iter.next() {
         if a == "--lang" {
+            identity_flags.push("--lang".to_owned());
             language = iter
                 .next()
                 .ok_or_else(|| CliError::Language("--lang requires fr or en".into()))?
                 .clone();
         } else if let Some(v) = a.strip_prefix("--lang=") {
+            identity_flags.push("--lang".to_owned());
             language = v.into();
         } else {
             filtered.push(a.clone());
@@ -425,6 +579,8 @@ fn parse(args: &[String], environment_language: &str) -> Result<Arguments, CliEr
     };
     let mut iter = filtered.into_iter();
     while let Some(a) = iter.next() {
+        // Record option names at their producer, never values or secret input.
+        if a.starts_with('-') { identity_flags.push(a.clone()); }
         match a.as_str() {
             "--json" => result.json = true,
             "--version" => result.pos.push("version".into()),
@@ -450,7 +606,20 @@ fn parse(args: &[String], environment_language: &str) -> Result<Arguments, CliEr
             _ => result.pos.push(a),
         }
     }
+    if result.pos.first().is_some_and(|p|p=="identity") && result.pos.get(1).is_some_and(|p|p=="linux-prerequisites") && identity_flags.iter().any(|f|f=="--input") {
+        return Err(CliError::Usage);
+    }
+    if result.pos.first().is_some_and(|p|p=="identity") && !closed_identity_options(&identity_flags) {
+        return Err(CliError::Usage);
+    }
     Ok(result)
+}
+/// Canonical identity option names, not execution policy. Preserve explicit
+/// presence so default-valued forbidden flags cannot be silently ignored; reject
+/// ambiguous duplicates. No value, path, datastore or identity is inspected.
+fn closed_identity_options(flags:&[String])->bool {
+    let mut seen=std::collections::HashSet::new();
+    flags.iter().all(|f| matches!(f.as_str(),"--input"|"--json"|"--lang") && seen.insert(f.as_str()))
 }
 mod version;
 mod trust;
@@ -463,6 +632,26 @@ mod native_web;
 mod provider_configuration;
 #[cfg(target_os = "linux")]
 mod provider_policy;
+#[cfg(target_os="linux")]
+mod provider_connections;
+#[cfg(target_os="linux")]
+mod provider_wait;
+mod log_query;
+#[cfg(target_os = "linux")]
+mod runtime_health;
+#[cfg(target_os="linux")]
+mod session_visit;
+#[cfg(target_os="linux")]
+mod planning_history;
+#[cfg(target_os="linux")]
+mod lifecycle_inventory;
+mod log_read_policy;
+mod activity;
+mod activity_policy;
+mod exchange;
+mod graph_performance;
+mod web_request_policy;
+mod run_limits_admin;
 #[cfg(target_os = "linux")]
 mod admin_budget;
 #[cfg(target_os = "linux")]
@@ -519,6 +708,11 @@ fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
     if a.pos[0] == "version" { return version::execute(a,out); }
     #[cfg(target_os = "linux")]
     if a.pos[0] == "prepare" { return preparation::execute(a,out); }
+    #[cfg(target_os="linux")]
+    if a.pos[0] == "_prepare_turn" {return preparation_worker::execute(a);}
+    #[cfg(target_os="linux")]
+    if a.pos[0] == "_prepare_cli_exec" {return preparation_worker::execute_cli_gate(a);}
+    if a.pos[0]=="project-profile"{return project_profile::execute(a,out);}
     #[cfg(target_os = "linux")]
     if a.pos[0] == "web" {
         return native_web::execute(a, out);
@@ -567,9 +761,23 @@ fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
         return task_model::execute(a, out);
     }
     #[cfg(target_os = "linux")]
+    if a.pos[0]=="visit" {return session_visit::execute(a,out);}
+    #[cfg(target_os="linux")]
+    if a.pos[0]=="runtime-health" {return runtime_health::execute(a,out);}
+    #[cfg(target_os = "linux")]
+    if a.pos[0] == "logs" {return log_query::execute(a,out);}
+    #[cfg(target_os="linux")]
+    if a.pos[0] == "activity" {return activity::execute(a,out);}
+    #[cfg(target_os="linux")]
+    if a.pos[0] == "exchange" {return exchange::execute(a,out);}
+    #[cfg(target_os = "linux")]
+    if a.pos[0] == "run-limits" {return if a.pos.get(1).is_some_and(|p|p=="provider-wait"){provider_wait::execute(a,out)}else if a.pos.get(1).is_some_and(|p|p=="web-requests"){web_request_policy::execute(a,out)}else if a.pos.get(1).is_some_and(|p|p=="performance"){graph_performance::execute(a,out)}else if a.pos.get(1).is_some_and(|p|p=="activity"){activity_policy::execute(a,out)}else if a.pos.get(1).is_some_and(|p|p=="logs"){log_read_policy::execute(a,out)}else{run_limits_admin::execute(a,out)};}
+    #[cfg(target_os="linux")]
     if a.pos[0] == "providers" {
         return if a.pos.get(1).is_some_and(|s| s == "policies") {
             provider_policy::execute(a, out)
+        } else if a.pos.get(1).is_some_and(|s|s=="connections") {
+            provider_connections::execute(a,out)
         } else {
             provider_configuration::execute(a, out)
         };
@@ -584,12 +792,16 @@ fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
         return execute_planning_output(a, out);
     }
     if a.pos[0] == "budget" && a.pos.get(1).is_some_and(|v| matches!(v.as_str(), "show" | "preview")) { return budget_history::execute(a,out); }
+    #[cfg(target_os="linux")]
+    if a.pos[0]=="planning" && a.pos.get(1).is_some_and(|v|v=="history"){return planning_history::execute(a,out);}
+    #[cfg(target_os="linux")]
+    if a.pos[0]=="lifecycle" && a.pos.get(1).is_some_and(|v|v=="list"){return lifecycle_inventory::execute(a,out);}
     if matches!(a.pos[0].as_str(), "planning" | "budget") {
         return execute_control(a, out);
     }
     #[cfg(target_os = "linux")]
     if a.pos[0]=="task" && a.pos.get(1).is_some_and(|v|matches!(v.as_str(),"review"|"review-reconcile"|"review-retire-stale")) {return task_review::execute(a,out);}
-    if a.pos[0] == "task" && a.pos.get(1).is_some_and(|v| matches!(v.as_str(), "review-preview" | "review-inputs" | "review-check" | "publication-preview" | "publish" | "validation-preview" | "validation-candidate" | "validate" | "validation-reconcile" | "validation-retire")) {
+    if a.pos[0] == "task" && a.pos.get(1).is_some_and(|v| matches!(v.as_str(), "review-preview" | "review-inputs" | "review-check" | "baseline-preview" | "publication-preview" | "publish" | "validation-preview" | "validation-candidate" | "validate" | "validation-reconcile" | "validation-retire")) {
         return task_validation::execute(a, out);
     }
     if matches!(
@@ -664,6 +876,8 @@ fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
         write_output(out, &observed)?;
         return Ok(0);
     }
+    #[cfg(target_os = "linux")]
+    if a.pos[0] == "trust" && a.pos.get(1).is_some_and(|s| matches!(s.as_str(),"enrollment-call"|"enrollment-serve")) { return trust_enrollment::execute(a,out); }
     if a.pos[0] == "trust" { return trust::execute(a,out); }
     if a.pos[0] == "protection" { return protection::execute(a,out); }
     if a.pos[0] == "evaluate" {
@@ -671,6 +885,38 @@ fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
     }
     if a.pos[0] != "identity" {
         return Err(CliError::Unsupported);
+    }
+    #[cfg(target_os = "linux")]
+    if matches!(a.pos.get(1).map(String::as_str),Some("initial-create"|"initial-reconcile")){return identity_initial::execute(a,out);}
+    #[cfg(target_os = "linux")]
+    if a.pos.get(1).map(String::as_str)==Some("checkpoint-check"){return identity_checkpoint::execute(a,out);}
+    #[cfg(target_os = "linux")]
+    if matches!(a.pos.get(1).map(String::as_str),Some("operator-check"|"service-export"|"service-export-reconcile")) {
+        return identity_operator::execute(a,out);
+    }
+    #[cfg(target_os = "linux")]
+    if a.pos.get(1).map(String::as_str)==Some("provisioning-check") {
+        return identity_provisioning::execute(a,out);
+    }
+    #[cfg(target_os = "linux")]
+    if a.pos.get(1).map(String::as_str)==Some("linux-prerequisites") {
+        return identity_linux_prerequisites::execute(a,out);
+    }
+    #[cfg(target_os = "linux")]
+    if a.pos.get(1).map(String::as_str)==Some("service-call") {
+        return identity_service_call::execute(a,out);
+    }
+    #[cfg(target_os = "linux")]
+    if matches!(a.pos.get(1).map(String::as_str),Some("service-install"|"service-resume"|"service-reconcile")) {
+        return identity_service::execute(a,out);
+    }
+    #[cfg(target_os = "linux")]
+    if matches!(a.pos.get(1).map(String::as_str),Some("personal-init"|"personal-enroll"|"personal-recover")) {
+        return identity_personal::execute(a,out);
+    }
+    #[cfg(target_os = "linux")]
+    if a.pos.get(1).map(String::as_str) == Some("control-check") {
+        return identity_control::execute(a, out);
     }
     if a.pos.len() != 3
         || a.pos[1] != "bootstrap-check"
@@ -1449,6 +1695,8 @@ fn safe_causes(error: &(dyn std::error::Error + 'static)) -> Vec<String> {
             continue;
         }
         seen.push(pointer);
+        #[cfg(target_os="linux")]
+        if let Some(api)=e.downcast_ref::<swarm_api_client::Error>(){out.push(api.code().into());}
         #[cfg(target_os = "linux")]
         {
             pending.extend(native_web::branches(e));
@@ -1473,6 +1721,30 @@ fn safe_causes(error: &(dyn std::error::Error + 'static)) -> Vec<String> {
         }
         #[cfg(target_os = "linux")]
         {
+            let (labels, children) = identity_control::error_links(e);
+            out.extend(labels);
+            pending.extend(children);
+            let (labels, children) = identity_personal::error_links(e);
+            out.extend(labels);
+            pending.extend(children);
+            let (labels, children) = identity_service::error_links(e);
+            out.extend(labels);
+            pending.extend(children);
+            let (labels, children) = identity_service_call::error_links(e);
+            out.extend(labels);
+            pending.extend(children);
+            let (labels, children) = identity_provisioning::error_links(e);
+            out.extend(labels);
+            pending.extend(children);
+            let (labels, children) = identity_initial::error_links(e);
+            out.extend(labels);
+            pending.extend(children);
+            let (labels, children) = identity_checkpoint::error_links(e);
+            out.extend(labels);
+            pending.extend(children);
+            let (labels, children) = identity_operator::error_links(e);
+            out.extend(labels);
+            pending.extend(children);
             let links = swarm_engine::native_error_links(e);
             out.extend(links.labels);
             pending.extend(links.children.into_iter().rev().map(|(_, error)| error));
@@ -1531,8 +1803,10 @@ fn safe_causes(error: &(dyn std::error::Error + 'static)) -> Vec<String> {
 /// Returns the protocol failure exit (preparation conflicts3, disabled4, unknown
 /// method5; other ordinary failures2), with the original and any encode/write/flush
 /// error, so a failed diagnostic cannot hide a recorded state or authorize retry.
-/// Render a nonzero CLI failure with safe typed causes and known Work metadata
-/// on every platform, independently of web-specific fields. Unknown effects are
+/// Render a nonzero CLI failure with safe typed causes, known Work and typed
+/// configuration/auxiliary-preservation metadata on every platform, independently of web
+/// sessions. A true configuration_may_be_recorded requires reread before recovery;
+/// its absence never proves rollback. Unknown effects are
 /// omitted rather than asserted rolled back; output failures retain the original
 /// diagnostic and secondary writer error in RunOutcome. This writes/flushes only
 /// the supplied error sink, performs no Root IO/retry and grants no acceptance.
@@ -1549,6 +1823,10 @@ fn report(error: CliError, json_mode: bool, english: bool, err: &mut dyn Write) 
     } else {
         error
     };
+    // Retain an actual Root/transport receipt in both JSON and human diagnostics.
+    // This adds no effect based on an error string or a missing witness.
+    let effects=error.auxiliary_effects();
+    let error=if !effects.is_empty()&&!matches!(&error,CliError::AuxiliaryState{..}) {CliError::AuxiliaryState{primary:Box::new(error),effects,english}}else{error};
     // Language parsing errors precede the command parser, matching Go Main. Missing
     // option values are also plain diagnostics, even when --json appeared earlier.
     let plain = matches!(
@@ -1562,12 +1840,19 @@ fn report(error: CliError, json_mode: bool, english: bool, err: &mut dyn Write) 
     let bytes = if as_json {
         let mut document = serde_json::json!({"schema_version":1,"error":message,"failure":Failure{code:error.code(),message:&message,retryable:false,causes:safe_causes(&error)}});
         if let Some(publication)=error.trust_publication(){document["trust_publication"]=serde_json::json!(publication);document["trust_state_may_be_recorded"]=serde_json::json!(true);}
+        let auxiliary=error.auxiliary_effects();
+        if !auxiliary.is_empty(){document["auxiliary_effects"]=serde_json::json!(auxiliary);}
         if let Some((id, revision)) = error.recorded_work() {
             document["recorded_work"] = serde_json::json!({"id":id,"revision":revision});
         }
         if let Some((id,revision))=error.recorded_preparation(){document["recorded_preparation"]=serde_json::json!({"id":id,"revision":revision});}
         #[cfg(target_os = "linux")]
         native_web::details(&error, &mut document);
+        // Typed configuration state applies to ordinary CLI commands as well as
+        // web sessions. Missing metadata is unknown, never evidence of rollback.
+        if error.configuration_may_be_recorded() {
+            document["configuration_may_be_recorded"] = serde_json::json!(true);
+        }
         json_bytes(&document)
     } else {
         Ok(if plain {
@@ -1584,7 +1869,7 @@ fn report(error: CliError, json_mode: bool, english: bool, err: &mut dyn Write) 
         Ok(bytes) => err.write_all(&bytes).and_then(|()| err.flush()).err(),
         Err(e) => Some(e),
     };
-    let code=if error.typed_causes().iter().any(|e|e.is::<swarm_engine::TrustError>()){match error.code(){"authorization_required"=>4,"revision_conflict"|"event_conflict"|"idempotency_conflict"=>3,_=>2}}else{match error.code(){"preparation-event-conflict"|"preparation-revision-conflict"=>3,"preparation-write-disabled"=>4,"preparation-method-unavailable"=>5,_=>2}};
+    let code=if error.typed_causes().iter().any(|e|e.is::<swarm_engine::TrustError>()){match error.code(){"authorization_required"=>4,"revision_conflict"|"event_conflict"|"idempotency_conflict"=>3,_=>2}}else{match error.code(){"preparation-event-conflict"|"preparation-revision-conflict"|"preparation-work-revision-conflict"=>3,"preparation-write-disabled"=>4,"preparation-method-unavailable"=>5,_=>2}};
     RunOutcome {
         code,
         error: Some(error),
@@ -1956,3 +2241,34 @@ mod recorded_work_tests {
 mod preparation;
 
 mod budget_history;
+
+#[cfg(target_os="linux")]
+mod project_profile;
+
+#[cfg(test)]
+mod configuration_report_metadata_tests {
+    use super::*;
+    /// Machine-readable preservation follows typed configuration wrappers even
+    /// outside native-web errors; unrelated refusal is never reported as rollback.
+    #[test]
+    fn recorded_configuration_json_survives_non_web_output_and_cleanup_errors() {
+        let published=||swarm_engine::RootStoreError::Published { primary:Box::new(swarm_engine::RootStoreError::Refused("fixture-late-configuration-error")) };
+        let cases=vec![
+            CliError::ConfigurationStatePreserved { primary:Box::new(CliError::Output(io::Error::new(io::ErrorKind::BrokenPipe,"owned fixture sink"))),english:true },
+            CliError::Root(Box::new(published())),
+            CliError::RootCleanup { primary:Box::new(CliError::Root(Box::new(published()))),cleanup:Box::new(swarm_engine::RootStoreError::Refused("fixture-close-error")) },
+        ];
+        for error in cases {
+            let mut bytes=Vec::new();let outcome=report(error,true,true,&mut bytes);
+            assert_eq!(outcome.code,2);assert!(outcome.diagnostic_error.is_none());
+            let wire:serde_json::Value=serde_json::from_slice(&bytes).unwrap();
+            assert_eq!(wire["configuration_may_be_recorded"],true);
+        }
+        let mut bytes=Vec::new();report(CliError::Usage,true,true,&mut bytes);
+        let wire:serde_json::Value=serde_json::from_slice(&bytes).unwrap();
+        assert!(wire.get("configuration_may_be_recorded").is_none());
+    }
+}
+
+#[cfg(target_os="linux")]
+mod preparation_worker;

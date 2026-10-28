@@ -8,6 +8,9 @@ pub struct AgentLaunchPolicy {
     pub(crate) ttl: i64,
     pub(crate) ttl_cap: Option<i64>,
     pub(crate) instruction_bytes: Option<usize>,
+    /// Saved source/serialized-history cap shared by provider/model catalogues
+    /// and migrated local policies. Inner None explicitly means no cap. This
+    /// carries a resource choice, never runtime authority or a fallback.
     pub(crate) provider_bytes: Option<usize>,
     pub(crate) context_bytes: Option<usize>,
     pub(crate) minimum_free_bytes: u64,

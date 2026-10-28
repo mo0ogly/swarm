@@ -39,7 +39,21 @@ impl GateEvaluationError {
     pub fn reason(&self) -> &'static str {
         self.reason
     }
+    /// Earliest close failure, including the Linux anchored reader. Full native
+    /// diagnostics traverse all primary and independent cleanup branches.
     pub fn cleanup_cause(&self) -> Option<&io::Error> {
+        #[cfg(target_os = "linux")]
+        if let Some(error) = self
+            .cause
+            .as_ref()
+            .and_then(|e| e.downcast_ref::<crate::anchored_artifact::AnchoredArtifactError>())
+        {
+            return self.cleanup.as_ref().or_else(|| error.first_cleanup());
+        }
+        self.cleanup.as_ref()
+    }
+    /// Direct legacy cleanup only; anchored cleanup is traversed through source.
+    pub(crate) fn direct_cleanup_cause(&self) -> Option<&io::Error> {
         self.cleanup.as_ref()
     }
 }
@@ -135,40 +149,23 @@ pub(crate) fn artifact_metadata(
     root: &Path,
     name: &str,
 ) -> Result<(std::path::PathBuf, std::fs::Metadata)> {
-    let path =
-        local_file(root, name).map_err(|e| GateEvaluationError::caused("artifact-path", e))?;
     #[cfg(target_os = "linux")]
     {
-        let file = File::from(
-            rustix::fs::open(
-                &path,
-                rustix::fs::OFlags::PATH
-                    | rustix::fs::OFlags::CLOEXEC
-                    | rustix::fs::OFlags::NOFOLLOW,
-                rustix::fs::Mode::empty(),
-            )
-            .map_err(|e| GateEvaluationError::caused("artifact-open", io::Error::from(e)))?,
-        );
-        let result = (|| {
-            let metadata = file
-                .metadata()
-                .map_err(|e| GateEvaluationError::caused("artifact-metadata", e))?;
-            if !metadata.is_file() {
-                return Err(invalid("artifact-regular-file-required"));
-            }
-            Ok(metadata)
-        })();
-        let closed = nix::unistd::close(file).map_err(io::Error::from);
-        match (result, closed) {
-            (Ok(metadata), Ok(())) => Ok((path, metadata)),
-            (Err(error), Ok(())) => Err(error),
-            (Ok(_), Err(e)) => Err(GateEvaluationError::caused("artifact-close", e)),
-            (Err(mut error), Err(e)) => {
-                error.cleanup = Some(e);
-                Err(error)
-            }
-        }
+        return crate::anchored_artifact::with(
+            root,
+            name,
+            crate::anchored_artifact::Access::Metadata,
+            |_| {},
+            |file| {
+                file.metadata()
+                    .map_err(|e| GateEvaluationError::caused("artifact-metadata", e))
+            },
+        )
+        .map_err(anchored_error);
     }
+    #[cfg(not(target_os = "linux"))]
+    let path =
+        local_file(root, name).map_err(|e| GateEvaluationError::caused("artifact-path", e))?;
     #[cfg(not(target_os = "linux"))]
     {
         let metadata = std::fs::metadata(&path)
@@ -229,50 +226,95 @@ fn artifact_access<T>(
     name: &str,
     read: impl FnOnce(&mut File) -> Result<T>,
 ) -> Result<(std::path::PathBuf, T)> {
-    let path =
-        local_file(root, name).map_err(|e| GateEvaluationError::caused("artifact-path", e))?;
-    #[cfg(unix)]
-    let mut file = File::from(
-        rustix::fs::open(
-            &path,
-            rustix::fs::OFlags::RDONLY
-                | rustix::fs::OFlags::NONBLOCK
-                | rustix::fs::OFlags::CLOEXEC
-                | rustix::fs::OFlags::NOFOLLOW,
-            rustix::fs::Mode::empty(),
+    artifact_access_before_open(root, name, |_| {}, read)
+}
+/// Apply the same production artifact path with an explicit pre-open observer.
+/// Production supplies a no-op; component regression controls ancestor changes
+/// after resolution. No path/IO authority, cap, retry or fixture feature follows.
+pub(crate) fn artifact_access_before_open<T>(
+    root: &Path,
+    name: &str,
+    before_open: impl FnOnce(&Path),
+    read: impl FnOnce(&mut File) -> Result<T>,
+) -> Result<(std::path::PathBuf, T)> {
+    #[cfg(target_os = "linux")]
+    {
+        return crate::anchored_artifact::with(
+            root,
+            name,
+            crate::anchored_artifact::Access::Contents,
+            before_open,
+            read,
         )
-        .map_err(|e| GateEvaluationError::caused("artifact-open", io::Error::from(e)))?,
-    );
-    #[cfg(not(unix))]
-    let mut file =
-        File::open(&path).map_err(|e| GateEvaluationError::caused("artifact-open", e))?;
-    let result = (|| {
-        if !file
-            .metadata()
-            .map_err(|e| GateEvaluationError::caused("artifact-metadata", e))?
-            .is_file()
-        {
-            return Err(invalid("artifact-regular-file-required"));
-        }
-        read(&mut file)
-    })();
-    #[cfg(unix)]
-    let closed = nix::unistd::close(file).map_err(io::Error::from);
-    #[cfg(not(unix))]
-    let closed = {
-        drop(file);
-        Ok::<_, io::Error>(())
-    };
-    match (result, closed) {
-        (Ok(hash), Ok(())) => Ok((path, hash)),
-        (Err(error), Ok(())) => Err(error),
-        (Ok(_), Err(e)) => Err(GateEvaluationError::caused("artifact-close", e)),
-        (Err(mut error), Err(e)) => {
-            error.cleanup = Some(e);
-            Err(error)
+        .map_err(anchored_error);
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let path =
+            local_file(root, name).map_err(|e| GateEvaluationError::caused("artifact-path", e))?;
+        before_open(&path);
+        #[cfg(unix)]
+        let mut file = File::from(
+            rustix::fs::open(
+                &path,
+                rustix::fs::OFlags::RDONLY
+                    | rustix::fs::OFlags::NONBLOCK
+                    | rustix::fs::OFlags::CLOEXEC
+                    | rustix::fs::OFlags::NOFOLLOW,
+                rustix::fs::Mode::empty(),
+            )
+            .map_err(|e| GateEvaluationError::caused("artifact-open", io::Error::from(e)))?,
+        );
+        #[cfg(not(unix))]
+        let mut file =
+            File::open(&path).map_err(|e| GateEvaluationError::caused("artifact-open", e))?;
+        let result = (|| {
+            if !file
+                .metadata()
+                .map_err(|e| GateEvaluationError::caused("artifact-metadata", e))?
+                .is_file()
+            {
+                return Err(invalid("artifact-regular-file-required"));
+            }
+            read(&mut file)
+        })();
+        #[cfg(unix)]
+        let closed = nix::unistd::close(file).map_err(io::Error::from);
+        #[cfg(not(unix))]
+        let closed = {
+            drop(file);
+            Ok::<_, io::Error>(())
+        };
+        match (result, closed) {
+            (Ok(hash), Ok(())) => Ok((path, hash)),
+            (Err(error), Ok(())) => Err(error),
+            (Ok(_), Err(e)) => Err(GateEvaluationError::caused("artifact-close", e)),
+            (Err(mut error), Err(e)) => {
+                error.cleanup = Some(e);
+                Err(error)
+            }
         }
     }
 }
+/// Preserve legacy callback/path/type reasons while keeping the complete Linux
+/// primary and close graph, including unsupported-kernel/permission failures.
+#[cfg(target_os = "linux")]
+fn anchored_error(error: crate::anchored_artifact::AnchoredArtifactError) -> GateEvaluationError {
+    let reason = error
+        .reader_cause()
+        .and_then(|e| e.downcast_ref::<GateEvaluationError>())
+        .map(|e| e.reason())
+        .unwrap_or(match error.code() {
+            "anchored-artifact-path" => "artifact-path",
+            "anchored-artifact-open" => "artifact-open",
+            "anchored-artifact-metadata" => "artifact-metadata",
+            "anchored-artifact-regular-file-required" => "artifact-regular-file-required",
+            "anchored-artifact-file-close" => "artifact-close",
+            _ => "artifact-root-access",
+        });
+    GateEvaluationError::caused(reason, error)
+}
+
 fn rank(phase: &str) -> Option<i64> {
     match phase {
         "entry" => Some(0),

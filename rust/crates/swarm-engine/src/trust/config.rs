@@ -15,6 +15,8 @@ struct Material<'a> {
     roles: &'a Vec<String>,
     #[serde(skip_serializing_if = "is_false")]
     disabled: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    enrollment_principal: Option<&'a swarm_identity_contract::Principal>,
 }
 fn is_false(v: &bool) -> bool {
     !*v
@@ -25,6 +27,7 @@ impl Serialize for ConfigDigest<'_> {
     fn serialize<S: Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
         let c = self.0;
         let mut map = s.serialize_map(None)?;
+        if let Some(policy)=&c.role_separation{map.serialize_entry("role_separation",policy)?;}
         for key in [
             "kernel_observation",
             "kernel_check",
@@ -61,6 +64,7 @@ impl Serialize for ConfigDigest<'_> {
                 integrity: i.integrity,
                 roles: &i.roles,
                 disabled: i.disabled,
+                enrollment_principal: i.enrollment_principal.as_ref(),
             })
             .collect();
         map.serialize_entry("identities", &identities)?;
@@ -88,6 +92,26 @@ pub(crate) fn change(
         return Err(E::Invalid("configuration Actions de confiance invalide"));
     }
     c.policy.validate().map_err(E::Invalid)?;
+    if let Some(policy)=&c.role_separation{policy.validate_shape()?;}
+    // Unported policy configuration cannot silently become effective. Validate
+    // supplied structure even for a replay, and permit only byte-identical
+    // inactive retained blocks (or null/omission preserving an existing block).
+    let controls = st.controls()?;
+    for (name, value) in &c.extensions {
+        if !controls.contains_key(name) && !matches!(name.as_str(), "oidc" | "workloads") {
+            return Err(E::Invalid("champ de configuration inconnu"));
+        }
+        if value.raw() == "null" { continue; }
+        if name=="evidence_signing"{
+            let policy:super::public_evidence::SigningPolicy=swarm_wire_json::decode(value.raw().as_bytes())?;
+            policy.validate()?;continue;
+        }
+        super::extensions::validate(name, value)?;
+        let prior = st.extensions.get(name).or_else(|| controls.get(name));
+        if prior.is_none_or(|v|v.raw()!=value.raw()) {
+            return Err(E::Unsupported("trust-extension-edit-not-ported"));
+        }
+    }
     let fingerprint = super::digest(&ConfigDigest(&c))?;
     if let Some(prior) = st.event_digests.get(&c.event_id) {
         if prior != &fingerprint {
@@ -107,6 +131,8 @@ pub(crate) fn change(
     let mut proposed = st.clone();
     proposed.policy = c.policy;
     proposed.identities = identities;
+    if let Some(policy)=c.role_separation{proposed.role_separation=Some(policy);}
+    if let Some(policy)=&proposed.role_separation{policy.validate(&proposed.identities)?;}
     let controls = proposed.controls()?;
     for (name, value) in c.extensions {
         if !controls.contains_key(&name) && !matches!(name.as_str(), "oidc" | "workloads") {
@@ -123,9 +149,9 @@ pub(crate) fn change(
         .ok_or(E::Integrity("trust-revision-representation"))?;
     if preview {
         let public = proposed.public()?;
-        return encoded(
-            &json!({"schema_version":1,"current_revision":st.revision,"proposed_revision":next,"policy":proposed.policy,"identities":public["identities"],"identity_count":proposed.identities.len(),"applied":false}),
-        );
+        let mut value=json!({"schema_version":1,"current_revision":st.revision,"proposed_revision":next,"policy":proposed.policy,"identities":public["identities"],"identity_count":proposed.identities.len(),"applied":false});
+        if let Some(policy)=public.get("role_separation"){value["role_separation"]=policy.clone();}
+        return encoded(&value);
     }
     proposed.revision = next;
     let at = now
@@ -133,6 +159,7 @@ pub(crate) fn change(
         .format(&time::format_description::well_known::Rfc3339)
         .map_err(|_| E::Invalid("horloge non représentable"))?;
     proposed.history.push(json!({"revision":next,"policy":proposed.policy,"actor":operator,"reason":c.reason,"event_id":c.event_id,"at":at}));
+    if let Some(policy)=&proposed.role_separation{proposed.history.last_mut().ok_or(E::Integrity("trust-history-missing"))?["role_separation"]=serde_json::to_value(policy)?;}
     for field in ["oidc_pending", "oidc_sessions", "workload_sessions"] {
         proposed.extensions.remove(field);
     }

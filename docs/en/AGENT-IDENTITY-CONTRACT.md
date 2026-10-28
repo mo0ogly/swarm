@@ -1492,3 +1492,1518 @@ Real isolated storage tests use explicit test-only hooks, separately from the
 normal build without `test-fixtures`. Authenticated transport, actual human
 identity, service account, confinement, service installation, PA-03 and E2/E3
 acceptance remain open. No additional global invariant is claimed.
+
+
+## Control declaration v2 and native PAEA27 startup preflight
+
+Bootstrap v1 and the reply from `identity bootstrap-check` remain unchanged;
+options follow shared37a validation. The closed
+`swarm_enrollment_bootstrap::ControlDocument` v2 contains `schema_version:2`,
+`installation` (complete v1), `journal_path`, `project_context_digest`,
+`authority_head` (sequence/digest), `enrollment_id`, `generation`, `scope` and
+`trust_configuration_revision`. Its expected principal comes from installation
+pins, never an operation's actor field.
+
+Generation is positive and no greater than the checkpoint sequence. Bootstrap,
+configuration, witness and journal roots are distinct: clean absolute paths,
+no linked/writable ancestors (except root-owned sticky ancestors), service-owned
+0700directories and 0600regular single-link files. The loader rejects ambiguous
+or noncanonical JSON, missing/unsafe paths and special files; it explicitly closes
+all handles and retains secondary failures. It creates no data.
+
+The declaration digest and checkpoint must come from independent approved control
+outside the agent channel. Hashing the same untrusted file or declaring human
+labels establishes no trust. `authority_head` is an independent expectation,
+never automatically learned from that journal. Changed history makes it stale;
+recovery requires an authorized current checkpoint, preserving history.
+
+```sh
+swarm-rust identity control-check SHA256_DIGEST --input /protected/directory/control.json --json --lang en
+```
+
+The command loads pinned v2 data, opens the existing signed journal with the
+retained26connection and verifies exact head, current non-revocation, canonical
+record, generation/principal/project/scope/trust binding and service-clock dates
+under its reservation. It shares the actual core's validators. Every refusal is
+nonzero; none becomes an empty success or a freshly adopted checkpoint. Authority
+COMMIT/close precede serialization. Output/write/flush errors retain their cause.
+No hidden grant, deadline/retry or execution policy is added.
+
+The v1report includes `bootstrap_digest`, the v2`declaration`, `checked_at`,
+`current_enrollment_verified:true`, and false values for human authentication,
+confinement, request authorization and service start. This dated observation is
+not a transferable permit. No project or Coordinator/configuration/witness is
+opened or created by the CLI check; SQLite may manage WAL/SHM sidecars. Non-default runtime
+options, stdin, output files and extra commands are refused before this flow.
+
+`swarm_enrollment_authority::startup::open` also provides the real Control plus
+declared checkpoint for future service integration after the same protected load.
+It may create Coordinator lockfiles but creates no configuration, grant, human
+session or listener. Subsequent execute still checks current authority and exact
+permission. The CLI check never calls this factory. Path checks and retained
+connections do not defend against root or agents sharing the service UID/access;
+actual confinement and independent pin provenance remain prerequisites.
+
+```mermaid
+flowchart LR
+  P["Independently approved digest and checkpoint"] --> L["load_control: v2 and private storage"]
+  L --> C["control-check: signed journal, reservation, context and dates"]
+  C --> O["Dated observation, close then output"]
+  L -. "future service integration" .-> F["startup::open: core + checkpoint"]
+  F -. "authentication/transport/confinement still required" .-> S["Protected service"]
+```
+
+Personal local enrollment with one-time independent bootstrap, authenticated
+transport, actual service account, confinement and PA-03 remain open. No HTTP/Admin
+endpoint or screen is added. The binary's FR/EN evolution notes describe only this
+preflight. Recipe: `tools/verification/recipes/paea-control-startup.json`;
+[increment27evidence and RETEX](plans/actions-confiance/paea/INCREMENT-27.md).
+
+
+Verify local delivery from the actual running process and served binary identity
+(version, commit, SHA), then select its matching effective profile and archived
+sources. Latest prepared build state may belong to a parallel delivery not yet
+activated; that file alone never establishes the running binary. Replay the
+affected flow using the actual normal binary without fixture features.
+
+
+## Personal verifier and secret-knowledge proof PAEA28
+
+`swarm_enrollment_authority::credentials` supplies the future local account's
+cryptographic contract, without creating an account/listener. `create` takes an
+installation, stable human principal, positive generation, explicit parameters
+and borrowed secret bytes. OS entropy supplies a32byte salt; RustCrypto Argon2id
+v19 derives32bytes. A closed canonical v1Record persists context, algorithm,
+memoryKiB/passes/parallelism, canonical base64url salt and verifier. Debug redacts
+this sensitive material; encode/decode refuse ambiguity/substitutions.
+
+No implicit KDF costs: consumers persist their choice and use the same
+`Parameters::validate` algorithm/representation check. It is not a security
+recommendation; algorithm-valid low costs do not establish secure policy. Future
+installation/Admin/API/CLI must manage identical values before exposing a
+service.28 opens no password endpoint and introduces no lifetime/retry/attempt
+policy. `fingerprint` hashes `swarm-personal-credential-v1` NUL canonical JSON.
+Its expected value must be independently approved, never learned from the record.
+
+`verify` checks exact pin/installation/principal/generation before Argon2 work,
+then compares derived bytes in constant time. Password mismatch refuses;
+entropy/algorithm/allocation/framing failures retain typed causes with redacted
+public categories. Its opaque borrowed, non-cloneable/non-serializable Proof
+establishes knowledge of that exact record's secret only, not current/revoked
+account status, actual human presence, a session or business authority.
+
+Temporary output and the owned working allocation use Zeroizing guards on
+success/error. Resolved Argon2 source shows its zeroize feature alone does not
+wipe its internal allocated workspace, so28 supplies its own guarded allocation
+to `hash_password_into_with_memory`. This does not establish erasure of every
+compiler/OS/stack/dump copy. Borrowed password memory remains its owner's duty;
+there is no normalization/truncation. One-time independent bootstrap, protected
+current/revocable storage, authenticated transport, separate service account and
+pre-effect authority remain required. [Evidence28](plans/actions-confiance/paea/INCREMENT-28.md),
+recipe `tools/verification/recipes/paea-personal-credentials.json`.
+
+
+## Transactional personal bootstrap PAEA29
+
+`personal::Source` composes28credential checking with an existing signed journal
+on a retained connection. Protected startup selects public pins, journal context,
+installation/stable human/generation (`Expected`) and independent checkpoints,
+never a request actor or first caller. It creates no journal or paths. Future
+deployment must protect storage/private keys and bootstrap delivery.
+
+Closed canonical v1Bootstrap stores context, explicit KDF costs and SHA256 of
+`swarm-personal-bootstrap-v1` NUL installationhex64 secret32. The fresh random32byte
+installation secret must be independently delivered outside the agent channel;
+this API proves neither generation nor delivery. Fixed protocol IDs
+`personal-bootstrap-v1`/`personal-account-v1` live in a personal journal distinct
+from business grants. `prepare` checks active bootstrap/checkpoint/secret/context/
+signing key, derives verifier data and signs revoke-bootstrap+enroll-account;
+it mutates nothing. Opaque private Prepared holds exact signed bytes for protected
+durable recovery; its next head is only a prediction.
+
+`enroll` uses `BoundJournal::apply_batch` to validate the complete signed chain,
+CAS and atomically commit both events. A refused second write rolls back the first;
+exact terminal replay does not duplicate history. Conflicting proposals/stale
+heads/consumed bootstrap refuse. Account revocation never reopens bootstrap.
+Apply failure means UNKNOWN until authorized exact replay/readback, never reset.
+`with_authenticated` checks the active signed account and independent credential
+pin/password, retaining its reservation through callback and COMMIT. No actor field
+or implicit grant. Refusal never calls back; business Err remains distinct, and
+authority failure afterward retains the entire success/error in UseError::AfterUse
+with effect uncertainty. Consumers must traverse outcome and Error::Joined's
+secondary authority branch, not only source(). SQL rollback undoes no external effect.
+
+Mandatory reservation order: **personal account → business grants → configuration**.
+No source reentry/writer wait in callbacks. Concurrent revocation is Busy during
+use, succeeds after release, then prevents authentication. No hidden retry/queue/
+lifetime/batch policy; i64sequence bounds are technical. Existing single-event
+base/frame/closed/cancellation error precedence is preserved and tested.
+
+No session, socket/HTTP, OS account, enrollment screen or business right is created.
+Protected roots/ancestors, independently retained pins/checkpoints/proposals/key,
+KDF installation/Admin/API/CLI settings, authenticated transport and confinement
+remain prerequisites. Secret knowledge does not prove human consent/presence.
+[Evidence29](plans/actions-confiance/paea/INCREMENT-29.md),
+recipe `tools/verification/recipes/paea-personal-bootstrap.json`.
+
+
+## Restorable personal proposal PAEA30
+
+`Source::encode_prepared` produces sensitive canonical v1bytes with exactly
+schema_version, independent base head and changes (two base64url original signed
+events). No password or installation secret is included. Base64 is not encryption;
+keep verifier data in PAEA32protected durable intent/checkpoint storage, never
+logs/public exports. Codec performs no file IO. `restore_prepared` rejects
+ambiguous/noncanonical JSON, versions, wrong key/project/chain/signature, event
+order/operation/IDs and noncanonical or differently bound credentials. It uses
+Source's existing independent pins, never roots/principals learned from the file.
+A signature represents protected signing-authority approval of exact bytes, not
+a fresh installation-secret check or human decision. No salt/secret/signature is
+regenerated. Exact shape is revoke bootstrap then enroll account.
+
+`BoundJournal::preview_batch` validates cryptographic data without SQLite/lock or
+current-state observation, even after connection close. BatchPreview exposes only
+a predicted_head, not an applied result. Positive witness under a held writer
+precedes fault cases. enroll still performs actual CAS/irreversible-state checks;
+restored replay never reopens bootstrap or duplicates the account. Credential/
+proposal base64 failures retain concrete DecodeError with safe public categories,
+without secrets in Debug/Display.
+
+```mermaid
+flowchart LR
+  P["Exact proposal after initial proof"] --> E["encode_prepared: private bytes"]
+  E -. "PAEA32library" .-> W["Protected durable intent/checkpoint"]
+  W -. "PAEA32library" .-> R["restore_prepared: independent root/exact shape"]
+  E --> R
+  R --> V["BatchPreview: prediction, no current state observed"]
+  V --> A["enroll: CAS and atomic real journal batch"]
+  A -. "PAEA32library" .-> W
+```
+
+The codec supplies recovery representation only and performs no IO. PAEA32adds
+atomic storage/fsync/checkpoint recovery above it; startup34/36 is connected,
+transport/Admin/UX and actual service activation remain required. Local proof is not activation.
+KDF parameters remain explicit/shared; no lifetime/retry/volume policy added.
+Two events are a bootstrap operation invariant, not a generic batch ceiling.
+[Evidence30](plans/actions-confiance/paea/INCREMENT-30.md),
+recipe `tools/verification/recipes/paea-personal-proposal.json`.
+
+
+## Atomic private documents PAEA31 — qualified library included locally
+
+`swarm_enrollment_config::store::documents::Documents` opens an existing0700
+actual-effective-UID directory, retains directory/lock descriptors and creates
+only private-documents.lock (0600,regular,single-link,NOFOLLOW). Use a dedicated
+directory. Immediate mutex/flock, no queue/retry/deadline. No identity/root/schema
+or human authority inferred. Internal ASCII names start alphanumeric, followed by
+alphanumeric/dot/underscore/hyphen; never paths, lock/hidden temp names reserved.
+Filesystem representation limits remain typed IO errors, not an operator cap.
+Reservation read preserves missing/error; create uses NOREPLACE; replace requires
+exact expected bytes under cooperative exclusion. Renaming the directory path
+never redirects its retained descriptor. Lock dev/inode must match its current
+name; substitution refuses instead of splitting exclusion. This also protects the
+configuration Store/Coordinator after a distinct reproducer. Cancellation, modes,
+links/hardlinks/types and explicit close errors are checked. This does not defend
+against root/noncooperating same-UID writers; separate service UID/confinement remain.
+Shared IO writes a private same-directory temp, fsync/close, rename then directory
+fsync, never truncating originals. WriteError retains primary/cleanup cause and
+Publication: NotAttempted (rename not called), Unknown (attempt without success
+ack), Visible (rename ack only), Durable (directory fsync ack). Cleanup may fail
+after Durable. Err alone never proves absence of effects. Retain exact proposal
+bytes for authorized recovery; sync follows authorized readback, never root adoption.
+Acknowledgements describe local filesystem responses, not universal hardware durability.
+Explicit finish returns release errors separately from already known outcomes.
+Drop retains release failures for close and forbids reuse; poison refuses. close
+is immediate/Busy-aware and never grants renewed data authority. Release file
+reservation before personal SQLite authority and external business effects.
+No OS confinement or defense against restoring all witnesses is established.
+Permanent paea-private-documents recipe checks private IO, actual NOREPLACE and
+Store/Coordinator/Control regressions; current named assertions/counts are maintained
+in its manifest. ENOSPC/partial/sync/close/unlock hooks only
+in disposable fixtures, absent from the normal profile. [State31](plans/actions-confiance/paea/INCREMENT-31.md).
+Personal coordinator32uses this primitive; startup34/36 is connected, transport remains required;
+internal-library inclusion alone is not an active protected service.
+
+
+## Durable personal coordinator PAEA32 — locally verified library
+
+personal::coordinator::Coordinator owns Source and dedicated Documents; new has no
+IO/adoption. Paired explicit cancellation has no timer/preemptive rollback.
+initialize requires an independent positive bootstrap head, real signed active
+context check and absent-only checkpoint creation. No first-caller/shared password
+or DB-learned root. Internal API does not provision OS protection/deliver human
+secret/start a service. Closed canonical v1checkpoint binds independent install,
+principal,generation,key,project,head and optional credential pin/exact pending
+signed intent, with explicit nulls. enroll validates/proves/prepares, fsyncs intent
+BEFORE atomic journal apply, then fsyncs confirmed account checkpoint. No business
+callback under FS reservation. recover only restores protected exact signed intent,
+fsyncs/replays CAS and confirms, without new password/salt/signature. Confirmed
+account recovery reads real current signed state at protected head/pin. Missing,
+corrupt,bad-pending,divergence refuse; no DB head adoption/reset/automatic retry.
+CommitError.progress retains independent intent/checkpoint publication phases and
+journal NotAttempted/Unknown/Acknowledged/Observed. Observed is successful current
+read, not new apply. Acknowledgement survives later confirmation/unlock failure.
+Safe diagnostics redact heads,verifiers,paths,business outcomes; typed primary and
+secondary cleanup branches remain. with_authenticated validates committed witness,
+fsyncs the validated checkpoint and releases/checks file cleanup BEFORE fresh held journal/password authority and
+business use. AfterUse retains success/failure outcome after authority failure.
+close attempts both owners, retains both errors; one may close while another Busy,
+never resetting authority. Dedicated files/journal still require protected startup;
+no same-UID/root rollback defense or OS confinement is claimed.
+
+```mermaid
+flowchart LR
+  B["Independent bootstrap head"] --> I["Exact signed intent + private fsync"]
+  I --> J["Atomic bootstrap revocation / account creation"]
+  J --> C["Account checkpoint + private fsync"]
+  I --> R["Exact recovery under independent pins"]
+  R --> J
+  C --> F["Read checkpoint / fsync / release FS and check cleanup"]
+  F --> A["Current journal + password held through use"]
+```
+
+Permanent paea-personal-coordinator recipe expects32tests/5steps:9new scenarios
+(including3actual subprocess exits, valid control before each),6credentials,3codec,
+5Source,9control. Exit73is a fixture abrupt-exit protocol, not product policy or
+power-loss simulation. Phase hooks absent normal profile. Of31's43tests,34cover unchanged config code;
+9control tests run again in32. New personal composition is qualified separately.
+[State32](plans/actions-confiance/paea/INCREMENT-32.md). Transport/Admin/UX, protected
+provisioning/service UID/confinement and actual human enrollment/E2/E3 remain.
+Internal library does not establish active endpoint or human journey.
+
+
+## Held personal account / business grant composition PAEA33 — locally verified library
+
+authenticated_control::AuthenticatedControl owns both preopened kernels. execute
+accepts context,expected business CAS head,borrowed password and existing Request,
+never caller actor/proof. Its context cancels personal/business/config consumers,
+starts no timer/deadline/retry and never rolls back an external effect. Personal
+checkpoint fsync/release precedes actual password/current-account verification;
+account remains held through current business grant, configuration effect and
+both authority completions. Crate-private execute_from_current_personal requires
+the trusted composition to hold its configured protected account already.
+Credential Proof is exact-record knowledge only; public create/verify never become
+an authority admission endpoint. installation_digest getter is data, not a grant.
+Principal OR installation mismatch refuses before business IO. Actual signed grant
+still owns project/scope/rights. Account and business generations are distinct,
+validated with7/1fixture. Outcome retains complete inner business Result and outer
+personal UseError: AfterUse may retain AfterStorage and its own storage result/cause.
+Inspect all layers; never empty success or no-effect inference. Control Debug now
+redacts private retained responses like Display while preserving structured data.
+CloseError keeps both independent/possibly partial close branches safely.
+
+```mermaid
+flowchart LR
+  F["Validate private checkpoint + fsync / release"] --> P["Current account + password, held"]
+  P --> B["Exact principal and installation"]
+  B --> G["Current business grant, held"]
+  G --> C["Configuration / witness / result"]
+  C --> GB["Business authority completion + retained result"]
+  GB --> PB["Personal authority completion + retained result"]
+```
+
+Personal/business journals must differ and come from protected startup; new does
+not validate OS custody/physical roots. Startup34/36 validates these roots and keys;
+transport/protected-profile routing remains required, with keys outside agents. Raw Control stays a low-level library, never an
+exposed profile bypass. No listener/session/confinement/actual human or protected
+existing public route is established by compiling this wrapper. [State33](plans/actions-confiance/paea/INCREMENT-33.md),
+permanent paea-authenticated-control recipe expects39tests/5steps.
+
+
+## Composite v3 declaration PAEA34 — canonical codec
+
+AuthenticatedDocument has schema_version3, unchanged v2control and explicit personal
+authority_public_key,project_context_digest,journal_path,checkpoint_directory,
+generation,bootstrap_head. Personal install/principal derives protected installation.
+Bootstrap head is initial independent provisioning input, never adopted current head.
+Positive account/grant generations differ; personal signing context differs from
+business project, protected-key reuse allowed. Five declared storage roots cannot
+overlap. Closed canonical codec refuses other versions, ambiguity/null/unknowns,
+never v1/v2fallback. Binding retains shared typed Pins refusal as document category.
+No secret/privatekey/KDFdefault or IO. Physical loader and source opening are implemented below; personal service
+remains required. [State34](plans/actions-confiance/paea/INCREMENT-34.md).
+
+
+## Two-source opening PAEA34 — internal API
+
+load_authenticated reuses v1/v2shared IO: independent exact SHA256pin, closed codec,
+actual-service-euid private ancestors/roots,0700dirs/0600regular single-link files,
+NOFOLLOW and dev/inode comparisons on all retained directories. Five storage roots
+and bootstrap parent differ. Trusted Rust accessors select layout, never JSON code.
+Both journal metadata files are inspected without SQLite/lock creation/history
+validation. Every acquired FD explicitly closes, preserving read/stat/close causes
+and secondary errors. Actual FD alias guard is not hostile-mount/OS confinement proof.
+authenticated_startup::open(ctx,path,pin) loads that declaration, resolves independent
+inputs, opens personal Source+Documents/Coordinator then business Control.33wrapper
+owns successful objects with expected business head from document. Actual retained
+SQLite connections/directories serve later operations, no per-request actor/root.
+Opens may create private lockfiles/SQLiteWAL/SHM; readonly metadata loader does not.
+No checkpoint/account initialization, database-head adoption, private key, listener
+or human session. Documents failure explicitly closes Source; Control failure closes
+personal Coordinator. Error retains primary and source_cleanup/coordinator_cleanup
+branches; safe Display/Debug redact private data. No reset. Disposable post-close EIO
+hook only in test-fixtures feature, explicitly forwarding config's same fixture flag;
+normal profile must remain fixture-free. Lifecycle/provisioning/transport/confinement
+and legacy route closure still required before protected activation.
+
+```mermaid
+flowchart LR
+  D["Pinned v3declaration"] --> L["Shared loader: 6dirs / 2files"]
+  L --> P["Retained personal Source + witness"]
+  P --> B["Retained business Control"]
+  B --> A["Authenticated wrapper33"]
+  P -. "later failure: close and retain causes" .-> E["Structured error / explicit recovery"]
+  B -. "later failure" .-> E
+```
+
+[State/evidence34](plans/actions-confiance/paea/INCREMENT-34.md), permanent
+paea-authenticated-bootstrap and paea-authenticated-startup recipes.
+
+
+## Personal signing key — PAEA35 internal loader
+
+`protected_signer::load(path, expected_public_key)` reads exactly32 raw Ed25519
+seed bytes from independently protected startup input. No create/write or
+request-selected path/pin. Shared loader walks every existing ancestor without
+symlinks, requires root/service ownership and no group/other writes except
+root-sticky ancestors; final parent actualeuid0700. File must be regular0600,
+single-link, NOFOLLOW/NONBLOCK; retained FD/current name checked again after
+read, and derived public key must match the independent pin.
+
+Owned seed and extra-byte buffer use Zeroizing; dalek zeroize feature explicitly
+required. Wrapper has no Clone/Serialize/seed export/public arbitrary-signing API.
+It remains a snapshot despite later file changes; consumers still require current
+account, rights and journal. Compiler/OS copies, swap/cache and OS confinement
+are not proven. All acquired descriptors close before success; failed close
+refuses/discards key while retaining independent Error::Joined cleanup causes.
+Safe Display/Debug; source() is primary only, inspect cleanup branches too.
+No empty fallback, retry, deadline or volume policy;32bytes is seed format.
+Unit-only faults always perform real closes. Permanent paea-protected-signer
+recipe: file/key and two-source startup tests (current counts in maintained manifests). Service, actual human enrollment
+and password rotation/recovery remain separate work.
+[State/evidence35](plans/actions-confiance/paea/INCREMENT-35.md).
+
+
+## Owned personal lifecycle — PAEA36
+
+`authenticated_startup::open_lifecycle(ctx,path,pin,signer_path)` loads pinnedv3
+once. Seed path is independent protected startup input, never a request field.
+Expected public key comes from validated document; private loader runs before
+source opens can create lockfiles/WAL/SHM. Shared open_document retains all partial
+cleanup causes. Later failure drops owned signer. No implicit account/checkpoint,
+secret or listener. PersonalLifecycle owns control,signer,initial personal/business
+heads with crate-private constructor. initialize(ctx) takes no client head;
+enroll(ctx,secret,password) uses actual installation proof and owned key, durable
+signed intent before consumption and confirmation. recover(ctx) takes no newsecret,
+password,seed/head and replays exact protected signed bytes only. execute keeps
+current account/grant through effect with pinned business CAS. Authority changes
+require refreshed protected input/reopen, never database-head adoption.
+
+CommitError/Progress/Outcome retain publication,journal and known/uncertain effects.
+Consuming close(self) attempts both closes and drops key even on error; every close
+cause remains structured. Diagnose then explicitly reopen protected state, no reset
+or implicit compensation. Borrowed secret erasure remains caller responsibility.
+Injected close test performs real close and retains prior effect after reopen;
+compiler/OS copies are not proven erased.
+
+```mermaid
+flowchart TD
+  D["Pinned v3 declaration"] --> K["Load private key bound to expected public key"]
+  K --> O["Open personal and business sources"]
+  O --> L["Owning PersonalLifecycle"]
+  L --> I["initialize: independent initial head"]
+  L --> E["enroll: borrowed proof and password"]
+  E --> J["Durable intent → journal → checkpoint"]
+  L --> R["recover: exact signed intent"]
+  L --> X["execute: held account and grant"]
+  L --> C["Consuming close: both closes then key drop"]
+```
+
+Permanent paea-personal-lifecycle recipe covers cold startup,authority/key checks,
+three durable phases and actual process-exit recovery, isolated fixtures only.
+Older manifests keep current counts without rewriting historical proofs. Transport,
+enrollment UX,actual human,separate OS UID/confinement and password rotation/recovery
+remain necessary. No new operator policy.
+[State36](plans/actions-confiance/paea/INCREMENT-36.md).
+
+
+## CLI identity options — correction37a
+
+Executable identity checks accept --input,--json,--lang once each. Project/service
+and unknown options refuse in parse before bootstrap IO, including --root .,default
+phase and empty task/output. Duplicates refuse even with equal values; --lang=fr
+and --lang fr are one option. Public help stays nonexecuting. No RootStore/service.
+Parser retains option names only, never values, instead of merely comparing final
+values to defaults. No operator policy/limit; other command consumers unchanged.
+Parser failures remain plain even with --json, runtime refusals retain existing
+JSONdiagnostics. Actual142reproducer followed by corrected integration guard.
+Permanent paea-identity-options recipe covers bootstrap and pure private-worker
+helper without actual setsid/Agent. Personal enrollment CLI37b is locally qualified below.
+[State37](plans/actions-confiance/paea/INCREMENT-37.md).
+
+
+## Personal enrollment CLI — 37b, local qualification
+
+Native identity personal-init|personal-enroll|personal-recover PIN_SHA256
+PRIVATE_SEED_PATH --input PINNED_V3_BOOTSTRAP [--json] [--lang en] uses owned
+PersonalLifecycle. Operator prerequisites: independently pinned declaration,
+signed journals, private key/offline installation proof and private service-UID
+roots. Initial installer,separate UID,service/enrollment UX remain distinct work;
+no actual human enrolled here. No RootStore/project/business request authorized.
+Business generation equals its next enrollment sequence; personal generation is
+an independent expected-record label, exercised as personal7/business1.
+
+Init creates only absent checkpoint at pinnedinitialhead; enroll consumes actual
+proof once using startup-owned key; recover replays exact protected intent or
+confirms current account without new password/salt/signature. Init/recover never
+read/lock stdin. Enrollment requires nonterminal binary stdin, no interactiveprompt:
+exact ASCII swarm-personal-enrollment-v1 followed by LF,32raw proof bytes,exact
+nonempty password throughEOF. No hex/JSON/trim/normalization. Existing16MiBnative
+transport bound includes header/proof, one extra sentinel, no new operator policy.
+Single pre-reserved Zeroizing allocation, no secret-bearing reallocations; EINTR
+continues bytes only. Caller owns borrowed FD/stream and any stdio/OS/compiler
+copies; abrupt process termination not covered by owned-buffer erasure.
+
+JSONreport v1 follows schemas/paea/personal-lifecycle-cli-v1.schema.json: operation,
+result,intent/journal/checkpoint,sequence without private digest,close state; human/
+service/confinement assertions false. Operation errors emit phase report then
+nonzero diagnostic; parse/input/startup failures have no phase stdout. Runtime
+--json diagnostics, parser errorsplain; FR/ENmessages/common machine vocabulary.
+All operation outcomes close both sources/dropkey; secretbuffer dropped before
+close/output. Encode/write/flush failures retain knownreport and earlierfailure/
+close tree. Safe diagnostics traverse secondary/customIO without private text.
+Failed never implies no effect; successful recover says current_verified without
+inferring replay versus existing-account observation. Actualnative fixtures cover
+singleaccount/recovery,badproof/key/frame,EISDIRinput,transportbound andENOSPCstdout
+after real fixtureaccountcreation. [State37](plans/actions-confiance/paea/INCREMENT-37.md).
+
+
+```mermaid
+flowchart TD
+  A["Closed identity arguments"] --> B["Enrollment: nonterminal binary stdin"]
+  A --> P["Init or recover: no stdin"]
+  B --> F["Bounded frame: borrowed proof and password"]
+  F --> S["Pinned startup and owned private key"]
+  P --> S
+  S --> L["PersonalLifecycle"]
+  L --> O["Initialize / single enrollment / exact recovery"]
+  O --> R["Known phase report, including errors"]
+  R --> C["Wipe buffer, close both sources, drop key"]
+  C --> W["Encode then write and flush"]
+  W --> J["Phase JSON and safe diagnostics"]
+  W -. "output failure: result retained" .-> E["Structured error with report and secondary causes"]
+```
+
+
+## Initial provisioning material — PAEA38
+
+provisioning::prepare accepts an explicit closed canonical Request: installation,
+clean absolute root, distinct service/controller UIDs, complete business grant,
+distinct personal context, positive personal generation and KDF parameters.
+Human grant generation1 is the actual initial business sequence; no default right,
+KDF cost, duration or UID. Operator approval/authority remains a prerequisite.
+This library slice adds no CLI command, route, service or settings screen.
+
+Validation precedes one kernel96byte entropy draw: two distinct Ed25519seeds and
+one raw32proof, no retry/deterministic fallback. Equal keys refuse. Two exact signed
+initial proposals start at Head::default: business grant and personal bootstrap
+with proof commitment/explicit KDF. No account/password created. declaration derives
+expected sequence1/SHA256(signed event bytes) heads per Journal::apply, never reads
+or adopts database heads. Real isolated journal tests compare both applied heads.
+Logical layout: configuration,configuration-witness,business/journal.sqlite,
+personal/journal.sqlite,personal-witness; future publisher adds bootstrap/startup.json
+and bootstrap/personal.seed. Names establish no physical protection or OS boundary.
+
+encode_private returns guarded private operator bytes, never for agent or personal
+service storage: exact ASCII swarm-initial-provisioning-v1 plus LF, business seed32,
+personal seed32,proof32,then exact canonical Request JSON through EOF. No MAC,
+encryption/authentication; independent protected pin/delivery still required.
+decode_private restores exact proposals/declaration without entropy or IO; does
+not reset any journal/file. Unknown/null/ambiguous/noncanonical/truncated frames
+refuse without fallback. Prepared has no Clone/Serialize, redactedDebug. Dalekkeys,
+proof,temporaryseed copies and privateoutput buffers zeroize; one reservation before
+secret copies, no secret-bearing growth. Borrowedcaller/compiler/OS/runtime copies
+and abrupt exit are outside this claim.
+
+write_personal_seed delivers only the personal key to a private installer sink,
+never the business key. write_installation_proof delivers proof to an independent
+operator sink, not actual human-receipt evidence. Borrowed sinks may retain partial
+or complete bytes after write/flush error; typed causes retained, redacted ordinary
+diagnostics. Caller owns close/fsync/publication. Core material functions open/create no FD,file,journal or permission. Protected publication/recovery, installer CLI, Admin KDF
+settings, transport/UX,separateUID/confinement remain required.
+[Plan/evidence38](plans/actions-confiance/paea/INCREMENT-38.md).
+
+
+```mermaid
+flowchart TD
+ R["Explicit operator decisions"] --> V["Validate before entropy"]
+ V --> K["One draw: two distinct keys + proof"]
+ K --> E["Two signed base0 proposals"]
+ K --> P["Private operator package: both keys"]
+ P --> D["Exact decode without fresh entropy"]
+ D --> E
+ E --> B["Expected declaration: exact event-byte heads"]
+ P -. "next39, unimplemented" .-> I["Protected publication and recovery"]
+ E -.-> I
+ B -.-> I
+ I -.-> S["Service: personal key only"]
+ K --> H["Proof to independent sink: human receipt unverified"]
+```
+
+Sink errors retain OutputPhase: WriteUnknown keeps delivered quantity unknown;
+WrittenFlushFailed confirms all32bytes acknowledged before failedflush. Neither
+close/fsync/durability nor actual human receipt is established.
+
+
+## Guarded private read and write precheck — PAEA39
+
+Documents::Reservation::read_private is separate from historical Vec read. It
+returns PrivateBytes without Clone/Serialize, with redactedDebug and explicit
+as_bytes borrow; no schema/pin/authentication/authority/freshness inferred. Missing
+remains NotConfigured, never empty fallback; an actual zero-length file is valid
+empty data. Validate name/retainedreservation before NOFOLLOW/CLOEXEC/NONBLOCK
+regular0600singlelink owner-file open. Current name must match retaineddev/inode.
+Actualstat-size plus one sentinel, checked usizeconversion/allocation, one guarded
+reservation before any secret read; no operator cutoff or secret-bearing growth.
+Growth/truncation Conflict, EINTR byte continuation only, cancellation between reads
+and at completion, no timeout/syscallpreemption. Recheck name/inode,size,mtime/ctime,
+reservation afterEOF. Actualexplicitclose and independent cleanupcauses retained;
+close/latecheck failure drops bytes rather than returning them. Atime can change;
+Err does not imply no filesystem observation sideeffect. HostilesameUID/root,
+rollback/snapshots,borrowed/compiler/OS/runtime copies are outside this protection.
+
+create/replace also use this path to inspect old content before Exists/exactCAS,
+so an existing key package is not read into a growing unguarded Vec on refusal.
+Existing31atomicpublication/phases/cleanup remain. Historical nonsecret read keeps
+its original interface without an erasure promise. This does not authenticate38's
+private package or create human authority.Protected service-file publication/recovery and
+interfaces remain required. [Plan/evidence39](plans/actions-confiance/paea/INCREMENT-39.md).
+
+
+```mermaid
+flowchart TD
+ R["Reservation: retained directory and lock"] --> N["Open private name without links"]
+ N --> S["Stat and name: same inode, actual size"]
+ S --> B["Reserve guarded buffer: size + sentinel"]
+ B --> L["Read without growth, check cancellation"]
+ L --> V["Exact EOF, unchanged name/inode and metadata"]
+ V --> C["Close file, retain every cause"]
+ C --> P["PrivateBytes: explicit borrow, redacted Debug"]
+ P --> W["Caller read or Exists / exactCAS write precheck"]
+ L -. "refusal" .-> E["Refuse bytes: buffer wiped, one close handled, causes retained"]
+ V -. "refusal" .-> E
+ C -. "failure" .-> E
+```
+
+
+## Immutable operator package — PAEA40
+
+provisioning::repository::seal consumes Prepared into guarded private Seal bytes,
+noClone/Serialize, redactedDebug. Pin is exactSHA256 data known before IO; caller
+must independently protect/persist it BEFOREeffects. Canonical lowercasehex only,
+never learned from file, no rights/human inference. PackageStore::new owns already
+opened descriptor-bound Documents, no IO or physicalservice-separation proof.
+Use dedicated private0700operator storage, never hand clones to agents. Package
+contains businesskey: never personalservice storage. No service layout/journal/
+OSaccount/endpoint created; actual separation remains41prerequisite.
+
+create only absent singleton initial-provisioning-v1.bin via NOREPLACE, using held
+Seal bytes. Safe existing files evenidentical refuseExists; unsafe objects retain their refusal; noadoption/reset/rotation/newentropy.
+CommitError retains actual NotAttempted/Unknown/Visible/Durable plus typedcause.
+Always finish reservation; unlockfailure cannot erase knownpublication. Primary/
+secondarycauses retained separately, ordinaryDebug/Display redacted. load takes
+externalPin, guardedread39, constanttime digestcomparison then exact38decode.
+ReadObservation NotAttempted(package read, not absenceofearlierIO),ReadUnknown
+(possiblypartialattempt),BytesRead,PinMatched,Decoded survives error. Late release
+failure drops/withholds decoded material. Matchingpin on invalidframe refuses
+afterPinMatched, nofallback. Successfulload implies no fsync/durability/freshness/
+humanreceipt;41must explicitly establish verifiedmaterialdurability after uncertain
+publication before installation effects. close consumesowner and keeps actual
+Documentserrors, never deletes/resets package. No sameUID/root confinement or
+borrowed/compiler/OScopywipe claim. [Plan/evidence40](plans/actions-confiance/paea/INCREMENT-40.md).
+
+
+```mermaid
+flowchart TD
+ M["Prepared"] --> S["Seal: guarded private bytes"]
+ S --> P["Pin known before IO"]
+ P -. "caller prerequisite" .-> I["Independently protect and retain pin"]
+ S --> C["create: singleton NOREPLACE"]
+ C --> F["Private file or refusal retaining actual phase"]
+ I --> L["load: reserved read_private"]
+ F --> L
+ L --> V["Compare pin then exact decode"]
+ V --> R["Finish reservation once"]
+ R --> A["Material returned: observation, no implicit durability"]
+ R -. "failure" .-> E["Drop material, retain observation and causes"]
+```
+
+
+## Explicit pinned durable reread — PAEA41
+
+Documents::Reservation::read_private_durable(name,expectedSHA256) is separate from
+observational read_private. Canonical name/pin before IO, same guarded nongrowing
+read39, exactEOF/stablemetadata and constanttimeSHA256 before fsync. Wrongpin never
+syncs. Then heldfileFDfsync and retaineddirectoryfsync with file still open, final
+name/inode/metadata/cancellation checks, oneclose. Borrowed/compiler/OScopies and
+universal hardware durability remain outside this claim. DurableReadError separates
+ReadValidation NotAttempted/ReadUnknown/BytesRead/PinMatched from ReadDurability
+NotAcknowledged/FileAcknowledged/DirectoryAcknowledged. Lateclose/cancel/decode
+cannot erase acknowledged FS effects; private data still dropped on anyerror.
+Primary/independentclose causes remain structured includingJoined. Technical
+observations, no new operatorpolicy/default/KDF/timeouts/retry/rights.
+
+PackageStore::load_durable explicitly chooses this path; externalpin, exact38decode,
+explicitrelease then keys onlyon completesuccess. ReadError also retains durability
+afterdecode/release refusal: pinnedbutmalformed bytes may be DirectoryAcknowledged
+yet refused without material. Primarypinrefusal throughclosewrappers retains
+operator-package-pin; no pin/bytes in diagnostics. Historical load stays plain,
+noimplicitfsync/ack. Success acknowledges localFS, nothumanconsent/freshness/OS
+confinement/powerloss survival. Sharedstorage change requalifies oldreader/writes/
+Control/coordinator/operator package with targetedchecks.39manifestnowexpects8unit
+cases, original7/51proofs preserved.42actualservicefile/journalpublication/physical
+vaultseparation remains; no installer/endpoint/OSaccount here.
+[Plan/evidence41](plans/actions-confiance/paea/INCREMENT-41.md).
+
+
+```mermaid
+flowchart TD
+ P["Canonical external pin"] --> R["Exact guarded read, EOF and metadata"]
+ R --> V["Expected digest verified before sync"]
+ V --> F["Held-file fsync: FileAcknowledged"]
+ F --> D["Directory fsync, file FD still open: DirectoryAcknowledged"]
+ D --> C["Recheck, close once"]
+ C --> K["Exact material decode, finish reservation"]
+ K --> O["Return material only after complete success"]
+ F -. "later error" .-> E["Refuse keys, retain validation and known acknowledgement"]
+ D -.-> E
+ C -.-> E
+ K -.-> E
+```
+
+
+## Personal-service-only handoff — PAEA42
+
+`provisioning::service_artifact::from_prepared` extracts the personal seed, v3
+declaration and two already signed initial events. The business seed and initial
+proof stay in the operator package. `ServiceArtifact` has no Clone or Serialize,
+redacts diagnostics and zeroizes its seed/private encoding on drop. Borrowed,
+compiler and OS copies remain outside that erasure guarantee.
+
+Exact format: `swarm-service-installation-v1\n`, 32 personal-seed bytes, then
+three u64 big endian length/content frames: declaration, business event, personal
+event. Exact EOF and checked lengths/additions; no new operator volume policy.
+Encoding reserves memory before copying the seed. Retain the expected SHA256
+independently before handoff; `decode` checks that canonical pin before parsing.
+The bytes are private but unencrypted.
+
+The closed v3 validator checks the declaration. The personal public key must
+match the seed; business generation and initial head sequences equal 1; event
+digests match exact bytes. All five storage paths follow the fixed initial layout
+under one root other than `/`. These are initial protocol constraints, not proof
+of actual ownership, freshness or human decisions.
+
+Events remain opaque to the codec. An altered signature can decode as data under
+a new consistent pin, but the real journal refuses it. The test then applies the
+valid event at base zero to that same journal, proving recovery after refusal.
+Publisher43 applies events through the real journals and check their
+authority contracts before publishing the final name. Seed sink errors preserve
+the original cause and write/flush phase; an error does not imply no bytes written.
+This codec creates no file, service, account or grant.
+[Plan and evidence42](plans/actions-confiance/paea/INCREMENT-42.md).
+
+```mermaid
+flowchart TD
+ O["Protected operator package"] --> E["Extract service material only"]
+ E --> A["Personal seed + declaration + signed events"]
+ A --> P["Retain pin independently before handoff"]
+ A --> D["Pinned decode: framing and bindings verified"]
+ P --> D
+ D --> J["Next: real journals and authority checks"]
+ J --> F["Protected final-name publication: still pending"]
+ O -. "stay outside service" .-> S["Business seed and initial proof"]
+```
+
+
+## Initial private-root publication — PAEA43 (local dev168 delivery)
+
+`provisioning::service_installation::install(ctx, artifact, pin, mode)` accepts42
+service-only material and an independently retained expected pin. Declared service
+UID must equal actual euid. An existing0700owned parent passes shared nofollow
+ancestor validation. No OS account or separation from the agent domain is created.
+
+`Create` refuses any existing final or staging root. The sibling stage is
+`<final-name>.paea-stage-v1`, with six0700children: identity, business, personal,
+configuration, configuration-witness, personal-witness. Held descriptors and
+name/inode rechecks bind the tree; immediate flock excludes cooperating installers.
+The declaration's identity directory stays separate from all five storage roots,
+preserving the existing protected loader's overlap refusal.
+
+A canonical intent at the stage root binds42pin and destination before creating
+or repairing any of the six children or journal files. Opening may create only
+its technical lock before that verification. Documents
+publishes0600intent, personal seed and final/staging declarations. Exact expected
+pins are checked before fsync. Metadata reservations finish and close before
+personal authority acquisition. Stage-name durability is acknowledged only after
+intent verification, never merely from opening an existing directory.
+
+`ResumeStage` keeps material and pin unchanged, requires exact existing bytes and
+may create missing files after intent verification. Without intent, only an empty
+stage (apart from the installer's own lock) may resume. Unexplained DB/data refuses.
+No automatic deletion/reset of partial roots or unknown files. A closed inventory
+allows only initial protocol files, known locks and SQLite sidecars. Existing DB,
+WAL and SHM must be owned0600regular single-link files before SQLite opens them.
+
+Real journals apply signed events from base zero; only exact last-event sequence1
+replay is accepted. No DB head is adopted. Existing `startup::check` verifies the
+current business grant; new `PersonalLifecycle::check_bootstrap` uses the existing
+personal semantic/context check at the startup-pinned initial head. No checkpoint,
+account or password is initialized. This point-in-time check transfers no business
+permit. Staging declarations change only protected paths, never keys, contexts,
+generations, rights or signed events.
+
+After kernel close and file/directory fsync, Linux NOREPLACE publishes the whole
+root. Parent fsync acknowledges the final name. `Failure.progress` separates stage,
+intent, journal attempts/acks and final NotAttempted/Unknown/Visible/Durable state.
+Errors after rename retain Visible; errors after acknowledgement retain Durable.
+All independent close/release causes survive. Safe diagnostics omit seed, pin,
+paths and nested private IO text.
+
+`RecoverPublished` creates no missing file and replays no journal. It checks exact
+immutable material and current initial sources, then explicitly reacknowledges
+existing files/directories. Journal `Observed` differs from a new `Acknowledged`.
+Advanced, enrolled or revoked state refuses this initial-only recovery; never reset
+to sequence1. The running service owns its normal recovery. Returned private paths
+and expected declaration pin are startup data; retain the pin before service start.
+No listener, human authentication, OS privilege/confinement or public installer
+CLI/API/UX is supplied by this library. Borrowed/compiler/OS copies and privileged
+same-UID actors remain outside its custody/erasure guarantee.
+[Plan and evidence43](plans/actions-confiance/paea/INCREMENT-43.md).
+
+```mermaid
+flowchart TD
+ A["Artifact42 + independent pin + actual euid"] --> S["Exclusive private staging root"]
+ S --> I["Exact durable intent before journals"]
+ I --> X["Create or complete the six held children"]
+ X --> F["Personal seed and exact declarations"]
+ F --> J["Real journals: signature, base zero, exact replay"]
+ J --> V["Current grant and personal bootstrap checked"]
+ V --> C["Close kernels; fsync files and directories"]
+ C --> R["Root NOREPLACE rename: Visible"]
+ R --> D["Parent fsync: Durable"]
+ R -. "error" .-> E["Retain visible effect; explicit published recovery"]
+ I -. "interruption" .-> P["Stage resume under same material and pin"]
+ P --> F
+```
+
+
+## Initial installation CLI — PAEA44 (local dev168 delivery)
+
+`identity service-install SHA256 --input /private/path/service-v1.bin --json`
+selects43Create. `service-resume` selects ResumeStage and `service-reconcile`
+RecoverPublished; no automatic fallback after refusal. Only unique input/json/lang
+options are accepted; forbidden project flags refuse before input IO even with
+default values. Input must be absolute; stdin/`-` refuse. Documents basename grammar
+is ASCII alphanumeric first, followed by alphanumeric/dot/hyphen/underscore. Folder
+paths use existing protected checks, without symlink-following canonicalization.
+
+An independent canonical expected pin is checked before parent IO. Existing0700
+parent and0600single-link file owned by actualeuid, nofollow/heldname identity;
+private exact read checks pin before fsync, then42codec decoding. Keys/buffers stay
+withheld until reservation finish and store close both succeed. Late failures drop
+decoded material while retaining causes and validation/durability/decoded phases.
+Opening may create an input technical lock; input bytes/target are not overwritten.
+
+Closed `swarm-service-installation-cli-v1` reports result/stage/intent/journals/final
+publication. Successful startup contains private bootstrap/seed paths and expected
+bootstrap pin derived from independently pinned input, never learned from installed
+storage. This is protected operator output to retain before service start; never
+seed/password/installationproof. Failed operations have null startup. Later encode/
+write/flush errors retain the known report and previous failure tree, including
+already Durable effects. stderr projects only safe categories/phases; Debug/message
+omit paths/pins. `human_presence_verified`/`service_started`/`confinement_verified` stay
+false. No account/listener/RootStore/provider is created or used. Startup data feeds
+existing37personal-init/enroll/recover.43initial-only reconciliation refuses advanced
+accounts without reset. Physical acknowledgement is not human/OS/business authority.
+[Plan44](plans/actions-confiance/paea/INCREMENT-44.md) and
+[report schema](../../schemas/paea/service-installation-cli-v1.schema.json).
+
+
+```mermaid
+flowchart TD
+ O["Operator: independent pin and private42artifact"] --> L["Private read: pin before fsync; exact decode"]
+ L --> C["Finish and close input before returning material"]
+ C --> A["Explicit install, stage resume or initial reconciliation"]
+ A --> P["43publisher: retained phases and explicit owner closes"]
+ P --> Z["Drop private material before output"]
+ Z --> R["Observed report; private startup on success"]
+ R -. "write/flush refuses" .-> E["Keep known report and earlier failures"]
+ R --> S["Operator retains expected pin before personal-init/enroll"]
+```
+
+
+## Observed Linux prerequisites —45
+
+The [read-only Linux observer](PAEA-LINUX-PREREQUISITES.md) distinguishes file
+availability from verified launch. Self-mapped unshare/bwrap retain same-host-UID
+private-file access, so they do not establish required separation. Uidmap is missing
+and sudo needs local authentication. No UID allocation, hostpolicy change or weaker
+protection; protected launch/service/human verification remain open.
+
+## Private requests and personal service core — PAEA46
+
+`service_request` is data framing for the future service, in a distinct binary
+domain; it never reinterprets Go `installation-control-v2`. Decoding neither
+admits a peer nor grants permission. The transport must receive a complete
+`Zeroizing<Vec<u8>>`, protect its copies and admit the actual controller before
+any dispatch.
+
+| Part, in order | Exact contract |
+| --- | --- |
+| Header | ASCII `swarm-personal-service-request-v1` followed by LF |
+| Target | 64ASCII canonical SHA256 bytes of the expected bootstrap declaration |
+| Correlation | 32client-supplied bytes, no freshness implied |
+| Operation | 1init,2enroll,3recover,4read,5preview,6create,7apply |
+| Change length | u64 big-endian length of the following public bytes only |
+| Change | empty for1…4; existing canonical codec for5…7, no actor/time/grant |
+| Secrets | none for1/3; raw32 proof then nonempty password for2; nonempty password for4…7 through exact packet end |
+
+Password NUL/LF bytes remain exact. Decoded secrets borrow the guarded buffer,
+with no secret allocation or normalization. Encoding reserves the complete
+capacity with checked arithmetic before the first secret copy, then never grows
+that storage. The transport must specify its actual technical packet bound;
+this codec adds no operator ceiling, deadline or retry. Debug/ordinary errors
+omit contents/target/challenge/sizes; allocation/configuration causes remain
+typed. Prior copies, kernel buffers and abrupt termination are outside erasure
+claims.
+
+The challenge is correlation, not uniqueness or a session. No public hash of a
+password-bearing packet is produced: that would provide a fast password oracle
+bypassing derivation cost. The future transport must bind its result to public
+request data and an authenticated channel without exposing a secret hash.
+
+`personal_service::Service::open` owns the actual lifecycle from independent
+startup paths/pin and protected signing snapshot. It initializes no account or
+listener and establishes no publication durability: retain the installer's
+acknowledgement before first use. `dispatch(&mut self,…)` compares the target to
+that startup pin before any operation and calls only explicit existing methods.
+Read/preview/create/apply recheck current personal account and business authority
+through commitment. Init/enroll/recover are explicit operator operations requiring
+actual controller admission by the future channel. No actor, personal/business
+head, path, clock or key is request-selectable; configuration CAS remains in the
+existing Change.
+
+Reply preserves complete typed outcomes: CommitError phases or nested control
+Result/AfterUse branches. Successful routing is not business success. Consuming
+close attempts both sources and drops/zeroizes the signer even on refusal, with
+all causes inspectable. Mutable serialization covers this owner only; existing
+transactions/reservations remain necessary. No automatic replay/fallback/reset,
+granted right or human acceptance.
+
+This internal Rust core does not prove a public service path. Attributed channel,
+distinct UIDs, confinement, physical recovery after account advancement, Admin
+and UX remain to connect and verify. [Plan46](plans/actions-confiance/paea/INCREMENT-46.md).
+
+## Service responses and send errors — PAEA47
+
+Reply now retains the validated opcode and request_digest: SHA256 over domain
+`swarm-personal-service-public-request-v1` followed by NUL, then the exact public
+prefix (header/target/challenge/opcode/length/Change). Proof/password are excluded;
+changing only secrets therefore leaves this binding unchanged. It proves no
+knowledge. The client must generate fresh correlation, authenticate the actual
+sender and compare the independently expected request before interpreting data.
+No fast password hash or authority token is exported.
+
+`service_response::Observation` is closed canonical JSON schema1/domain
+`swarm-personal-service-response-v1`. The [frame schema](../../schemas/paea/personal-service-response-v1.schema.json)
+covers framing only; existing validate_view/validate_projection must still verify
+configuration semantics/history, followed by expected-request binding. The48consumer below adds data validation; no public channel is activated.
+
+Fields are opcode, public digest, base64url challenge, completed, failure_layers,
+intent/journal/checkpoint phases, sequence without private digest,
+configuration_effect_unknown and optional known View/Projection. Init success
+acknowledges only checkpoint; enroll acknowledges intent/journal/checkpoint;
+recover success says current_verified without claiming new apply or known intent.
+CommitError retains exact phases. personal/business/personal_after_use/
+business_after_storage preserve failure layers. Known View may coexist with
+completed=false and conservative uncertainty; it is not overall acceptance.
+
+Consuming send retains complete Reply and Observation in Sent or SendError. A
+successful write/flush never discards original operation errors or implies business
+success. Encode refusal precedes IO; WriteUnknown may include partial/full write;
+WrittenFlushFailed retains write_all success, not peer receipt. No effect retry or
+rollback. source() describes output cause only: consumers must also traverse
+Reply.outcome and every independent branch. Debug/Display omit payload, identity,
+binding and raw IO text.
+
+```mermaid
+flowchart LR
+  P["Guarded packet; admitted peer required"] --> R["Closed request, public digest excluding secrets"]
+  R --> S["Service: pinned target then current lifecycle"]
+  S --> T["Reply: outcome and every typed cause"]
+  T --> O["Observation: phases, known result, failure layers"]
+  O --> W["Encode then write and flush"]
+  T --> K["Reply retained in Sent or SendError"]
+  W --> K
+  K -. "Attributed channel, UID and client still to verify" .-> C["Future protected client"]
+```
+
+Nested/invalid-encode tests attach explicitly synthetic faults to a real fixture
+mutation response; they do not prove an actual distributed transaction fault.
+Channel authentication, OS separation, public delivery and global acceptance
+remain open. [Plan47](plans/actions-confiance/paea/INCREMENT-47.md).
+
+## Request-bound response consumer — PAEA48
+
+`service_response::consumer::decode` completes data validation. Its caller must
+already authenticate the actual peer and supply the expected Request plus
+configuration pins from the same independent protected installation. None are
+learned from the response.
+
+Reject unknown/duplicate/noncanonical frames; compare version, opcode, exact
+challenge and public-prefix digest. Then validate verdict/failure layers/personal
+phases and exclusive result kind. Successful control requires its expected result;
+a sole personal AfterUse necessarily retains a successful inner business result,
+so dropping it refuses even with completed=false. Other errors may retain durable
+phases or known results without becoming successful. Sequence positivity matches
+the actual journal observation.
+
+Reuse existing validate_view/validate_projection for complete history, actor,
+recomputed head, values and base/replay. Compare independent pins and exact final
+Change for preview/create/apply; a different valid configuration is insufficient.
+Read validates history/pins without claiming mutation; projection is not saved
+state.
+
+Private-constructor BoundResponse has no Deserialize and establishes these data
+checks only. Raw Observation can deserialize as untrusted data, never implying
+those checks. The wrapper proves neither sender, freshness, password knowledge,
+current grant, independent effect observation nor confinement. Service-side
+revocation/current-authority checks still govern commitment. No IO, mutation,
+retry or volume policy added.
+
+```mermaid
+flowchart LR
+  A["Peer admission: external prerequisite"] --> B["Closed canonical response"]
+  B --> C["Expected Request: opcode, challenge, public digest"]
+  C --> D["Coherent verdict, phases and result"]
+  D --> E["Existing configuration validators"]
+  E --> F["Independent pins, exact Change and base/replay"]
+  F --> G["BoundResponse: point-in-time checked data"]
+```
+
+Semantic rejection fixtures reencode the typed observation in canonical field
+order before the targeted change. Generic JSON reordering would otherwise reject
+too early and mask the intended contract. The dropped AfterUse known-View case
+actually failed before correction after a valid witness; originals retained. This
+was a defect in the new unreleased consumer, not historical47producer behavior
+(which already retained the View). [Plan48](plans/actions-confiance/paea/INCREMENT-48.md).
+
+## Native operator call — PAEA49
+
+```sh
+swarm-rust identity service-call BOOTSTRAP_SHA256 ABSOLUTE_PERSONAL_SEED --input ABSOLUTE_BOOTSTRAP --json --lang en
+```
+
+This is a local operator command, not a listener or authenticated human/peer.
+Startup paths/pin are independent protected operator inputs. No RootStore or
+request-learned actor/grant/head/clock/key/business path. Retain actual installer
+durability acknowledgement before first use.
+
+Stdin receives the complete46binary packet toEOF; no proof/password in argv/env.
+Terminal stdin refuses before reading to avoid echo. Do not type secrets into a
+terminal or construct shell argv containing them. No safe interactive input form
+yet: the future controller/UX must own its secret channel. Shared personal-enroll
+reader keeps the same16MiB+sentinel technical command bound, not a KDF/operator/
+time policy; full guarded allocation precedes reads, no secret reallocation.
+The existing37Frame storage contract stays unchanged.
+
+Only unique input/json/lang options, including rejecting forbidden default-valued
+flags. Pure shape/pin/absolute paths before IO, decode/compare target before
+bootstrap/signer/journal opening. Dispatch once, drop/erase packet, consume close,
+then output. No reset/adoption/implicit recovery/retry.
+
+Stdout is canonical47Observation. completed describes the operation only: later
+close/write/flush refusal yields nonzero and retains the known result even with
+completed=true. Safe diagnostics expose phases/close only, no payload/pin/challenge/
+paths/raw IO text. Exit failure proves no absence of effects; inspect known state
+before explicit resumption.
+
+Cause traversal follows Reply.outcome, CommitError, AfterUse.outcome and
+AfterStorage.storage plus both independent closes, even through customIO wrappers.
+Send errors retain the original operation; source() alone is insufficient.48bound
+consumer is a library for the future actually admitted client; this local producer
+route is not an authenticated transport client.
+
+Tests use real isolated installation/journals, with separately frozen synthetic
+material helper. Its explicit prepare-control mode grants4configuration permissions,
+without changing other modes or actual rights. Adapter close errors are synthetic,
+distinct from existing actual lifecycle-close tests. PTY/devfull are real child
+processes; no OSaccount/human/daemon/live mission created. Default production and
+fixture profiles remain separate.
+
+```mermaid
+flowchart LR
+ A["Shape and flags, then TTY refusal"] --> B["Guarded stdin, complete packet"]
+ B --> C["Compare target before protected startup"]
+ C --> D["Service: one explicit dispatch"]
+ D --> E["Drop secret packet"]
+ E --> F["Close both sources and signer"]
+ F --> G["Observation then write and flush"]
+ G --> H["Reply and closes retained on failure"]
+```
+
+[Plan49](plans/actions-confiance/paea/INCREMENT-49.md).
+
+## Linux credentials: raw representation before validation — PAEA50
+
+Common linux_peer_credentials::read uses Nix0.30.1 SO_PEERCRED with raw integer
+libc::ucred fields. Reject PID<=0 and invalid UID/GID sentinels before using the
+PID or reading a grant. Actual syscall failure preserves its Errno; invalid data
+returns linux-peer-credentials-invalid without manufacturing errno0. Safe
+projection keeps this distinction through custom IO wrappers without exposing
+private credential values.
+
+An [upstream Rustix report](https://github.com/bytecodealliance/rustix/issues/1698)
+and installed1.1.5source show UCred.pid is a nonzero Pid despite valid kernelPID0.
+A connected witness then isolated user/PID/mount namespace confirmed invisible
+connection creatorPID0 with visible immediate parent. Old175refused all3gates
+before grant but reported bogus errno0; no Root/effect or successful exploit
+observed. Nix raw fields let this boundary reject without constructing an invalid
+strong PID.
+
+Planning/task-validation/review gates use the common getter; existing UID/PDEATH,
+grant/source/owner/freshness/current-right checks remain required. The cfgtest
+review SDK helper also uses it, distinct from complete functional SDK acceptance.
+Socket feature adds memoffset/autocfg without changing existing lockfile versions.
+No authority/deadline/retry/operator policy/account/host namespace/configuration
+default changes, and no unsafe added to the repository.
+
+SO_PEERCRED describes the connection creator/establishment, not each actual
+message sender, executed image, grant or human. This correction does not replace
+SCM_CREDENTIALS/SCM_PIDFD, held pidfds, admission or confinement for the personal
+channel. Installed wrapper limitations remain to solve without declared-PID or
+connection-identity fallback. [Plan50](plans/actions-confiance/paea/INCREMENT-50.md).
+
+## Personal channel boundary — PAEA51, library without a listener
+
+`swarm-linux-identity-channel` receives an AF_UNIX/SOCK_SEQPACKET packet with Linux
+SCM_CREDENTIALS and SCM_PIDFD. It uniquely owns the kernel-returned pidfd and opens
+PID/mount namespace objects through its ioctls, never by reopening `/proc/<pid>`.
+Wrong socket type, absent options, empty/truncated payload or controls, nonpositive
+PID, unknown controls and unexpected SCM_RIGHTS refuse. Known received FDs are
+owned before refusal, including MSG_CTRUNC; explicit close causes stay separately
+available. Drop is emergency cleanup, not a successful-close receipt.
+
+The caller supplies an initialized Zeroizing buffer; its length is transport
+capacity, not a hidden execution policy. Ancillary capacity is the exact expected
+two-control Linux envelope. Unexpected rights may truncate it; delivered FDs are
+closed and Linux closes undelivered excess descriptors. No automatic deadline or
+retry. Pre-receive refusal does not dequeue; post-receive failure may consume a
+packet. Effect requests still require the existing recovery contract.
+
+FFI is an **explicit isolated exception** in this new crate's `src/kernel.rs`:
+getsockopt/setsockopt/recvmsg, initialized buffer views, ownership transfer of
+kernel-returned FDs and namespace ioctls. Types/constants use locked libc 0.2.186;
+missing SCM_PIDFD=0x04 is checked against retained Linux 6.17 headers. Other Swarm
+crates keep forbid(unsafe_code). This does not automatically establish memory
+safety; bounds, ownership and cleanup contracts receive a byte-bound review.
+
+Credentials describe the kernel-checked subject under Linux privilege rules. An
+unprivileged forged PID is refused in the test, not a proof for every privileged
+sender. A child using a parent-created connection is observed as its own message
+subject; held-pidfd namespace operations refuse after exit. Independent admission
+must still verify expected UID/domain, image, mandate and current rights. Transport,
+namespace equality and pidfd alone grant none of them.
+
+Nine Rust cases and two native fixture journeys are verified with witnesses, FD
+counts and recovery. Strict Rustdoc passes separately after a comment repair;
+the original aggregate failure remains. The test-fixtures example is distinct
+from the normal server. No public consumer exists yet: no daemon, distinct UID,
+human session or global conformance is activated. [Plan51](plans/actions-confiance/paea/INCREMENT-51.md).
+
+```mermaid
+flowchart LR
+ A["Borrowed socket, verified options"] --> B["recvmsg, initialized guarded buffers"]
+ B --> C["Own kernel-received descriptors"]
+ C --> D{"Complete packet, expected controls?"}
+ D -->|Refuse| E["Explicit closes, retain all causes"]
+ D -->|Valid| F["Packet owns subject pidfd"]
+ F --> G["Namespaces via pidfd, data only"]
+ G --> H["Namespaces: explicit close"]
+ F --> I["Packet: explicit close"]
+ F -. "Future integration" .-> J["Independent admission then service"]
+```
+
+## Retained controller role and exact packet borrow — PAEA52
+
+Pinned v3startup now carries its controller_uid into the lifecycle and service
+from the same bootstrap read. Service::controller_uid observes immutable declared
+role data, not packet input/current journal/OS-account discovery. Installation
+changes still require a new protected declaration/reopen. This role is not current
+business authority or human evidence.
+
+Service::controller_namespaces compares the kernel packet subject UID to that role
+without decoding payload or executing a business operation. Mismatch refuses before
+namespace lookup. Matching subjects yield namespaces through the held pidfd; caller
+owns packet/namespace custody through independent admission and explicit closes.
+Equality, a namespace handle or this method alone is not a permit. Concrete
+admission and dispatch integration remain open.
+
+Packet::guarded_data lends the exact Zeroizing allocation to the existing decoder.
+After a valid receive, unused initialized reserve is wiped and length trimmed,
+without copying/reallocating secrets; pidfd remains owned during the borrow.
+Refusals retain the full buffer through erasure. Tests assert allocation address,
+capacity, exact null/newline bytes and an empty-secret-tail operation; reserve bytes
+cannot become part of a password.
+
+Service fixtures use a different synthetic controller UID. The actual wrong-role
+kernel-subject refusal and unchanged checkpoint are proved, not a successful
+controller under a real second UID. Operator-core positives, valid library namespace
+observations and this refusal remain distinct. No listener/session/frontend or
+confinement is activated. [Plan52](plans/actions-confiance/paea/INCREMENT-52.md).
+
+```mermaid
+flowchart LR
+ B["Protected bootstrap, same pinned read"] --> L["Lifecycle then Service: retained UID role"]
+ L --> P["controller_namespaces: UID precondition"]
+ K["Kernel Packet, held pidfd"] --> P
+ P -->|Mismatch| E["Refuse, no business use"]
+ P -->|Match| N["Held namespaces, data only"]
+ K --> G["Exact Zeroizing borrow, no copy"]
+ G --> R["Existing request decoder"]
+ N -. "Future integration" .-> A["Independent admission then dispatch"]
+ R -. "Future integration" .-> A
+```
+
+### UID representation — increment 53
+
+Go/Rust bootstrap codecs and initial provisioning reject `4294967295` for
+either role before generating material. This is Linux’s invalid UID marker,
+not an operator ceiling. Roles remain distinct; `0` and `4294967294` are valid
+representations without proving an account, authority or actual separation.
+Fixture data select a valid partner even under UID0; no account is created.
+
+Older declarations containing the invalid marker now refuse. Existing private
+files and identities are never rewritten or reset. Recovery requires explicitly
+authorized valid configuration; migration of advanced physical state and channel
+integration remain open. Increment 53 records evidence and limitations.
+
+### Public initial request preflight — increment 54
+
+`swarm-rust identity provisioning-check SHA256_DIGEST --input
+/private-path/request.json --json` validates explicitly pinned canonical initial
+request data. Parent0700/current effective UID, regular0600 file with no symlink
+or extra hardlink; shared Documents checks retained descriptors. The request’s
+service/controller UID never selects the reader’s storage owner.
+
+Verify the independent pin before file/directory fsync, apply the shared request
+codec, then finish reservation and close input handles before returning a report.
+Any late refusal withholds the Request while retaining validation/local durability
+and independent cleanup causes. Reading can create its private lock and update
+atime; no package, target, journal or mandate is published. A hash learned from
+received bytes is not made independent by this command.
+
+```mermaid
+flowchart LR
+  P["Private path and independent pin"] --> R["Protected read ; pin then fsync"]
+  R --> V["Canonical request codec ; no entropy"]
+  V --> C["Finish reservation and close owners"]
+  C --> O["Data validation report"]
+  R --> E["Refusal ; retain observations and causes"]
+  V --> E
+  C --> E
+  O --> S["Write and flush ; validation retained on error"]
+```
+
+Closed `swarm-provisioning-request-cli-v1` reports the supplied pin, declared
+UIDs, request_validated=true and local input_durability=directory_acknowledged.
+provisioning_started, human_authentication_verified, current_authority_verified,
+service_started and confinement_verified stay false. No actual account, current
+mandate/expiry, human approval or durability beyond this read is verified; no
+secrets, service preparation or installation.
+
+Bad pin/canonical request/UID/file/extra flag refuses without target effects.
+Only unique input/json/lang flags are admitted. Partial output or flush refusal
+is failure; safe diagnostics retain known validation, while received bytes and
+their persistence remain the caller’s responsibility. Restore valid data and an
+independent pin before explicit retry. Operator package generation/publication/
+recovery still needs integration; protected reading/export is described below.
+Preflight grants nothing.
+
+Input basenames also follow the technical Documents grammar: first character
+ASCII alphanumeric, then ASCII alphanumeric, dot, hyphen or underscore.
+`private-documents.lock` is reserved for the lock and cannot be an input document.
+This naming contract is not operator policy; `request.json` is an example.
+
+### Operator package and private service export — increment55
+
+`identity operator-check PIN --input PRIVATE_OPERATOR_DIRECTORY --json` reads
+immutable initial-provisioning-v1.bin under an independent expected pin, fsyncs
+file/directory and closes the store. Declared controller UID must match actual
+effective reader UID in its kernel view, not account/human/namespace/current
+authority authentication. Late cleanup refusal withholds usable keys.
+
+`identity service-export PIN PRIVATE_OUTPUT --input PRIVATE_OPERATOR_DIRECTORY
+--json` derives only the service artifact. Its expected pin is computed from the
+protected package before target writes and also returned by operator-check,
+never learned from output. Business seed/proof are absent from the service
+artifact; package keys drop before target opening. NOREPLACE creates one private
+file in an existing controller-owned0700 directory; no mkdir/chmod/chown or
+directory copy. Other same-directory private files are neither copied nor replaced.
+
+`identity service-export-reconcile PIN PRIVATE_OUTPUT --input
+PRIVATE_OPERATOR_DIRECTORY --json` derives the same expected bytes/pin again,
+reads/verifies/fsyncs matching output without new entropy. Repeat create refuses
+even equal files; explicit reconcile only observes. Different/unsafe output
+remains untouched and refused. Output/close errors retain actual NotAttempted/
+Unknown/Visible/Durable publication and independent read/ack causes.
+
+Closed swarm-operator-package-cli-v1 separates semantic result, this operation’s
+publication and output read/ack. NotAttempted does not mean no prior file.
+Transport failure remains overall failure even after complete JSON then failed
+flush. Pins are explicit private caller output; no seed/proof/path/grant in
+reports or ordinary diagnostics. Human/current authority/service installation/
+startup/actual UID separation/confinement remain unverified by these operations.
+
+Output remains controller-owned. Protected transfer of only artifact bytes to
+a service-owned input then service-install is separate. Never hand the operator
+package or copy its directory to service. Initial package generation with an
+independently retained pin, human enrollment and channel still need integration.
+
+Precision: export never regenerates keys or proof. Shared atomic publication
+still draws entropy for a private temporary filename. Refusal precedes output
+publication; explicit retry keeps identical package-derived artifact bytes and
+does not regenerate private key/proof material.
+
+The public `provisioning::operator_handoff::run` kernel owns private reads,
+actual euid matching and deterministic handoff. CLI owns grammar/output and
+preserves kernel causes after transport failure. Callers cannot select the UID.
+
+```mermaid
+flowchart LR
+ P["Private package + independent pin"] --> K["Kernel: durable read + actual euid"]
+ K --> C["Verified source close"]
+ C --> D["Deterministic artifact; drop business key and proof"]
+ D --> Q{"Explicit operation"}
+ Q -->|operator-check| R["Secret-free report; no authority granted"]
+ Q -->|service-export| W["Private NOREPLACE create"]
+ Q -->|service-export-reconcile| V["Read under derived pin; acknowledge"]
+ W --> E["Known result/publication; original causes retained"]
+ V --> E
+ E --> R
+ R --> O["CLI: serialize, write, flush; retain every failure"]
+```
+
+### Durable private-anchor reading — increment56 in progress
+
+`Reservation::read_trusted_private_durable` requires an already protected LOCATOR
+from the caller. It acknowledges file/directory and closes the file through the
+same private guards, without inventing an independent digest. Errors retain
+BytesRead, never PinMatched, and known acknowledgements. Caller must still validate
+the anchor record, finish reservation and close Documents before using it. This
+never replaces a pinned read of received package data; locator trust, current
+authority and rollback are not established. Canonical immutable anchor persistence
+and public initial creation remain to be integrated.
+
+`provisioning::checkpoint` defines closed canonical `swarm-operator-anchor-v1`
+(schema_version,protocol,request_pin,package_pin). No seed/proof; both pins are
+private metadata, never authority. Operator protects the locator separately from
+received package bytes. `create` uses NOREPLACE, preserves publication/all causes
+and finishes/closes before returning. Future initial creation must await Durable
+without error before package publication. `load` reads/acknowledges this already
+protected locator, checks canonical bytes and expected request pin, finishes/closes
+before usable return. Late close refuses with decoded/ack facts retained. An
+orphan anchor permits no implicit regeneration. JSON schema covers shape; Rust
+codec additionally enforces exact member order/bytes. Hex64 is representation size.
+
+`identity checkpoint-check REQUEST_PIN --input ABSOLUTE_PRIVATE_ANCHOR --json`
+checks/reacknowledges an already protected anchor. Expected request pin is given
+independently; package pin comes from the record, never package bytes read here.
+Actual euid/private modes/links/name are checked and owners close before report.
+This command does not verify trust provenance of caller-selected locator;
+`locator_trust_verified:false` says so explicitly. Closed report
+`swarm-operator-anchor-cli-v1` separates bytes_read/ack/decode from always false
+current-authority/human/distinctUID/package-read/material/install claims. Pins
+are explicit private output. Write/flush refusal retains completed read facts
+and remains failure without reread/regeneration. Only unique input/json/lang
+flags; no Root or package opened/created.
+
+```mermaid
+flowchart TB
+ A["Caller-protected locator: precondition"] --> R["Private read + file/directory fsync; BytesRead"]
+ R --> C["Canonical record + expected request pin"]
+ C --> X["Finish/close; late failure withholds record"]
+ X --> O["CLI report; locator trust/human/authority unproved"]
+ P["Already known Seal pin + request pin"] --> W["Immutable NOREPLACE anchor; publication retained"]
+ W --> D["Successful finish/close; Durable"]
+ D -. "next-stage precondition" .-> F["Initial package creation: unimplemented"]
+```
+
+Preparation57:repository/checkpoint share real reads/publication via private borrowed-reservation helpers. Helpers do not reserve/release/close; callers own complete cleanup and must withhold usable data after refused closure. Existing interfaces retain validation-before-reservation and refusal/publication/read/ack/cause behavior. No trust or policy is introduced by this extraction.
+
+### Initial creation under durable intent — increment57 qualifying
+
+initial_creation accepts strict canonical Request bytes and independent digest,
+checking digest/decode/actual controller euid before target IO. Existing private
+operator/anchor directories have immediate nonblocking reservations. Any existing
+package/anchor/intent refuses before generation. `ANCHOR.intent` is immutable
+canonical `swarm-initial-provisioning-intent-v1` (schema_version,protocol,request_pin),
+no key/approval. Durable before generation; after preparation, anchor pin must be
+Durable BEFORE private package bytes. Persist package under both reservations,
+then finish/close all owners. Late cleanup remains failure while retaining pinned
+material/effects for reconciliation. A local known-record writer need not follow
+the same close-before-use order as an untrusted decoded anchor reader.
+
+Reconciliation closes anchor reader before independently pinned package read,
+checks exact canonical Request and closes/drops every key before metadata return.
+No fresh generation/publication. Orphan intent refuses implicit regeneration;
+history-preserving operator remediation remains undefined. Temp-name randomness
+is distinct from key/proof generation. No human/current authority/account/service/
+installation Root created or proven.
+
+`identity initial-create REQUEST_PIN OPERATOR_DIRECTORY PRIVATE_ANCHOR --input
+PRIVATE_REQUEST --json`, then initial-reconcile with same arguments, shares the
+existing canonical private reader closed before core. Both target directories
+are already private/existing; no mkdir/chmod/chown. Closed
+`swarm-initial-creation-cli-v1` reports completed CORE result, explicit private
+pins and separate publication/read/ack/generation facts. CLI write/flush can still
+fail after core completion. Read fields denote explicit validation/decode phases,
+not absence-only probes, which may observe/reject existing bytes and change atime.
+NotAttempted never asserts zero filesystem observation.
+
+After effect/error preserve files and use initial-reconcile; no implicit new
+create. Orphan intent remains refused without regeneration/reset/destructive
+abandonment. No seed/proof/path/grant in reports/ordinary diagnostics; no service
+account/Root/startup/human/real UID separation/confinement/current authority proven.
+Digest matching does not establish trust provenance of the chosen anchor locator.
+
+```mermaid
+flowchart TB
+ A["Private canonical Request + independent pin; source closed"] --> B["Check pin/euid; two immediate private reservations"]
+ B --> C{"Explicit operation"}
+ C -->|initial-create| D["Refuse every existing slot"]
+ D --> I["Immutable Durable intent before generation"]
+ I --> G["Prepare once; private Seal"]
+ G --> P["Durable pin anchor"]
+ P --> W["NOREPLACE package under both reservations"]
+ W --> F["Drop Seal; finish/close all custodians"]
+ C -->|initial-reconcile| R["Read intent/anchor; close anchor reader"]
+ R --> K["Pinned package; exact Request match"]
+ K --> E["Drop keys; finish/close"]
+ F --> O["Metadata or failure with known effects/causes"]
+ E --> O
+ R -. "orphan intent" .-> X["Retain refusal; no regeneration or deletion"]
+```
+
+
+### Actual packet bound to a retained domain — increment58
+
+`Namespaces::same_domain` compares BOTH mount and PID kernel objects using
+fstat(dev,ino) on retained owned descriptors. Nix fs is explicitly declared in
+the normal dependency, without relying on test feature unification. Request
+bytes cannot supply an independent expected PID/path/inode/UID. The caller must
+approve the expected domain independently of the first untrusted caller and
+retain its handles; this API does not prove that approval.
+
+`Service::dispatch_controller_packet` borrows Packet and expected domain; checks
+retained bootstrap UID, kernel-subject pidfd namespaces, both object identities,
+then decodes the guarded buffer and calls existing dispatch. Observed handles
+remain open during use and explicitly close afterwards. Late close refusal
+retains the ENTIRE Reply and cause. Caller still closes Packet and expected
+anchor after return. No listener, first-caller adoption, image/confinement/human
+approval, mandate or retry policy; current rights remain in existing control.
+
+`controller_packet::Error` exposes cause, cleanup and reply; `error_branches`
+retains nested business errors and AfterUse.outcome beyond source() alone.
+Pre-dispatch refusal invents no Reply; absent Reply never proves rollback.
+This library does not validate anchor approval, install a daemon or prove actual
+business success under two separate UIDs.
+
+Handles retain the observed objects without freezing the peer: namespace changes or exit remain possible afterwards. This point-in-time comparison establishes no freshness lease or prevention of setns/unshare.
+
+
+```mermaid
+flowchart TD
+ P["Guarded kernel Packet + domain approved elsewhere"] --> U["Subject UID = retained bootstrap role"]
+ U --> N["Subject namespaces through retained pidfd"]
+ N --> D["Compare BOTH mount and PID objects"]
+ D --> R["Decode guarded buffer without copying"]
+ R --> B["Existing dispatch: target and current authority"]
+ B --> C["Close observed namespaces after use"]
+ C --> O["Complete Reply OR error retaining Reply and cleanup"]
+ U -->|refusal| E["No business use, no invented reply"]
+ D -->|refusal| E
+ R -->|refusal| E
+ N -->|ioctl refusal| E
+ B -->|target refusal| E
+ E --> F["Close acquired handles"]
+ O --> A["Caller closes Packet and expected anchor"]
+ F --> A
+```
+
+Library flow only; domain approval, daemon and actual distinct-UID business
+success remain unproven. Point-in-time comparison without freezing the peer.
+
+
+### Spawned retained controller process — increment59
+
+`ProcessAnchor::capture_child` accepts the launcher's existing Child, never a
+request-selected PID. try_wait refuses observed/reaped termination, then pidfd_open
+captures the kernel object. Caller must prevent external reaping/SIGCHLD auto-reap
+during this window: not atomic CLONE_PIDFD creation, and std Child alone proves
+no such custody. No first-packet adoption. Capture never creates, signals, kills
+or restarts the child.
+
+Identity requires pidfs and a full64bit inode representation on held descriptors;
+old anon_inode/incomplete32bit identity refuses without PID fallback. Poll ZERO
+observes exit without waiting/retrying: technical nonblocking query, not execution
+policy/watchdog. Peer may still exit/exec/change namespaces afterwards; no freeze,
+lease, image/human approval or current rights inferred. Closing anchor closes
+only its pidfd. Post-open refusal attempts close and preserves cleanup cause.
+
+`Service::dispatch_spawned_controller_packet` adds an explicit requirement:
+bootstrap UID before observing even the expected process; exact process object
+versus kernel packet subject; then ALL namespace58/decode/target/current authority
+and close checks. Matching process in wrong domain still refuses. Same UID,
+namespace or connection creator never replaces expected process. Anchor/domain
+must come from independently approved protected launch, not untrusted caller.
+Privileged SCM_CREDENTIALS kernel semantics remain; no defense against a compromised
+trusted OS is claimed.
+
+Existing JSON/transport contract unchanged: anchors are not serializable, no new
+schema or Admin policy. Daemon consumer, launcher custody, inter-UID inspection58
+and independent approval remain open.
+
+
+```mermaid
+flowchart TD
+ L["Existing Child: approval and reaper custody established elsewhere"] --> C["Nonatomic capture: try_wait then pidfd_open"]
+ C --> T["pidfs + inode64 + immediate exit observation"]
+ T --> A["Owned ProcessAnchor: no mandate"]
+ P["Guarded kernel packet"] --> U["Retained bootstrap UID"]
+ A --> M["Compare subject to expected process not observed exited"]
+ U --> M
+ M --> N["ALL58 checks: namespaces, decode, target, operation"]
+ N --> R["Known Reply/effects retained with close errors"]
+ M -->|refusal| E["Error, no business call, no invented Reply"]
+ U -->|refusal| E
+ R --> F["Caller closes packet and both anchors"]
+ E --> F
+ F --> O["Closing anchor only closes FD; no child kill/reap"]
+```
+
+Library flow without active daemon consumer. Launcher custody, cross-UID
+permissions and actual business success under two accounts remain open.
+
+## Exact human Biba bridge — G05.1 candidate
+
+`AuthenticatedControl::with_trust_action` reuses its two retained current sources
+for a Biba callback distinct from enrollment administration. Signed permission
+binds a closed operation, root digest and request digest under `trust-action/...`;
+`enrollment-config/...` never implies this permission. Borrowed identity cannot
+be deserialized or cloned as authority. Business outcomes and after-use authority
+errors remain separate. See the [consumer contract](BIBA-GOVERNANCE-RUST.md).
+The RootStore consumer and single-prepared-intent transport are described below; this is neither a public identity
+service nor qualified service-principal authentication.
+
+Biba G05.2 now has a native RootStore consumer with current retained authority, exact permission/plan/revision and attributed evidence. The explicit G05.3 launcher can bind one prepared intent to the common human source; the normal server retains an absent source; see [the current Biba contract](BIBA-GOVERNANCE-RUST.md). No service authentication or global acceptance follows.

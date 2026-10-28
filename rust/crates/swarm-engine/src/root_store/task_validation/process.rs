@@ -146,6 +146,7 @@ fn gate_command(store: &RootStore, id: &str, peer: i64, managed: &mut Option<sup
 /// Failure returns typed causes and a private safe frame, never a zero success.
 /// Same-UID mutation, executable/PATH attestation and escaped descendants remain
 /// outside this trust boundary; no task or independent review is accepted here.
+/// Shared raw credential validation rejects PID0/invalid UID-GID before grant or Root use.
 pub(super) fn execute_gate(root: &Path, id: &str) -> Result<Infallible, E> {
     if !swarm_identity_contract::name(id.as_bytes()) {
         return Err(E::Refused("task-validation-step-id-invalid"));
@@ -160,9 +161,9 @@ pub(super) fn execute_gate(root: &Path, id: &str) -> Result<Infallible, E> {
             .map_err(|e| caused("task-validation-channel-kind", e))?;
         crate::supervisor_identity::arm_parent_death_signal()
             .map_err(|e| caused("task-validation-parent-death", e))?;
-        let peer = rustix::net::sockopt::socket_peercred(&channel)
+        let peer = crate::linux_peer_credentials::read(&channel)
             .map_err(|e| caused("task-validation-peer-credentials", e))?;
-        if peer.uid != rustix::process::geteuid() {
+        if peer.uid() != rustix::process::geteuid().as_raw() {
             return Err(E::Refused("task-validation-peer-user-changed"));
         }
         let mut grant = [0u8; 1];
@@ -174,7 +175,7 @@ pub(super) fn execute_gate(root: &Path, id: &str) -> Result<Infallible, E> {
         }
         let store = RootStore::open(root, false)?;
         let mut command = finished(
-            gate_command(&store, id, i64::from(peer.pid.as_raw_pid()), &mut managed),
+            gate_command(&store, id, i64::from(peer.pid()), &mut managed),
             store.close(),
         )?;
         Err(caused("task-validation-command-exec", command.exec()))

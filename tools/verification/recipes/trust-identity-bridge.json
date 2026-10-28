@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "trust-identity-bridge",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-enrollment-*/Cargo.toml",
+    "rust/crates/swarm-enrollment-*/src/**/*",
+    "rust/crates/swarm-enrollment-authority/tests/authenticated_startup.rs",
+    "rust/crates/swarm-linux-identity-channel/Cargo.toml",
+    "rust/crates/swarm-linux-identity-channel/src/**/*",
+    "rust/crates/swarm-identity-contract/Cargo.toml",
+    "rust/crates/swarm-identity-contract/src/**/*",
+    "rust/crates/swarm-wire-json/Cargo.toml",
+    "rust/crates/swarm-wire-json/src/**/*",
+    "docs/architecture/BIBA-GOUVERNANCE-RUST.md",
+    "docs/en/BIBA-GOVERNANCE-RUST.md",
+    "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": ".cache/biba-identity-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0"
+  },
+  "steps": [
+    {
+      "id": "current-sources",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "authenticated_startup",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "authenticated_trust_action_uses_current_principal_and_exact_grant ... ok",
+        "authenticated_trust_action_holds_and_rechecks_revocation ... ok",
+        "authenticated_trust_action_retains_outcome_after_cancellation ... ok",
+        "10 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "nonforgeable-capability",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--doc",
+        "trust_action"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "compile fail",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

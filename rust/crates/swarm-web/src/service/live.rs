@@ -77,6 +77,8 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
             include_bytes!("../../../../../web/live.css"),
         )),
         "/live/live.js" => Some((JS, include_bytes!("../../../../../web/live.js"))),
+        "/live/recorded-cursor.js"=>Some((JS,include_bytes!("../../../../../web/recorded-cursor.js"))),
+        "/live/log-query.js"=>Some((JS,include_bytes!("../../../../../web/native-log-query.js"))),
         "/live/live-session.js" => {
             Some((JS, include_bytes!("../../../../../web/live-session.js")))
         }
@@ -157,7 +159,7 @@ fn harness_page(template: &[u8]) -> Result<(Vec<u8>, Option<String>), HttpServic
 /// Keep only [`AGENT_FIELDS`] plus the diagnostic summary of one agent.
 /// Encoding failure is returned, never replaced by a partial object.
 fn agent_view(agent: &Agent) -> Result<Value, HttpServiceError> {
-    let full = serde_json::to_value(agent).map_err(HttpServiceError::Json)?;
+    let full = serde_json::to_value(agent).map_err(HttpServiceError::ResponseJson)?;
     let mut view = Map::new();
     for key in AGENT_FIELDS {
         if let Some(value) = full.get(key) {
@@ -488,7 +490,7 @@ fn attach_resources(
 ) -> Result<(), HttpServiceError> {
     view["resources"] = match probe {
         Ok((host, table)) => serde_json::to_value(swarm_engine::observe_agent_resources(agent, host, table))
-            .map_err(HttpServiceError::Json)?,
+            .map_err(HttpServiceError::ResponseJson)?,
         Err(code) => json!({"observation": "unavailable", "error": code}),
     };
     Ok(())
@@ -634,7 +636,7 @@ impl NativeHttpService {
                 // Console-store read failure for verdicts: shown, not hidden as "none".
                 "annotations_state": annotated.as_ref().err().map_or(Value::Null, |code| json!({"state": "unavailable", "code": code})),
             }))
-            .map_err(HttpServiceError::Json)
+            .map_err(HttpServiceError::ResponseJson)
         })();
         close(result, store.close()).map(RouteBody::plain)
     }
@@ -672,7 +674,7 @@ impl NativeHttpService {
                 fingerprint = digest.iter().map(|b| format!("{b:02x}")).collect();
             }
             serde_json::to_vec(&json!({"schema_version": 1, "fingerprint": fingerprint}))
-                .map_err(HttpServiceError::Json)
+                .map_err(HttpServiceError::ResponseJson)
         });
         close(result, store.close()).map(RouteBody::plain)
     }
@@ -770,7 +772,7 @@ impl NativeHttpService {
                 "logs": logs,
                 "terminal": terminal,
             }))
-            .map_err(HttpServiceError::Json)
+            .map_err(HttpServiceError::ResponseJson)
         })();
         close(result, store.close()).map(RouteBody::plain)
     }
@@ -829,7 +831,7 @@ impl NativeHttpService {
                 "telemetry": telemetry_view(&self.root, &run),
                 "cache_policy": cache_policy,
             }))
-            .map_err(HttpServiceError::Json)
+            .map_err(HttpServiceError::ResponseJson)
         })();
         close(result, store.close()).map(RouteBody::plain)
     }
@@ -899,7 +901,7 @@ impl NativeHttpService {
         let queue: Vec<&str> = finished.iter().filter(|a| !annotations.contains_key(&a.id)).map(|a| a.id.as_str()).collect();
         serde_json::to_vec(&json!({"schema_version": 1, "work": work, "policy": limit.is_some(), "note_max_chars": limit.flatten(), "attempts": items, "queue": queue}))
             .map(RouteBody::plain)
-            .map_err(HttpServiceError::Json)
+            .map_err(HttpServiceError::ResponseJson)
     }
 
     fn write_annotation(&self, request: &Request<Vec<u8>>) -> Result<RouteBody, HttpServiceError> {
@@ -957,7 +959,7 @@ impl NativeHttpService {
         };
         serde_json::to_vec(&json!({"schema_version": 1, "annotation": annotation}))
             .map(RouteBody::plain)
-            .map_err(HttpServiceError::Json)
+            .map_err(HttpServiceError::ResponseJson)
     }
 
     /// `GET /api/v1/live/dataset?work=&select=failed|bad|all` (LangWatch
@@ -1049,7 +1051,7 @@ impl NativeHttpService {
         };
         serde_json::to_vec(&json!({"schema_version": 1, "work": work, "select": select, "provenance": "recorded-facts-no-content", "entries": entries}))
             .map(RouteBody::plain)
-            .map_err(HttpServiceError::Json)
+            .map_err(HttpServiceError::ResponseJson)
     }
 
     /// `/api/v1/live/scenario` (LangWatch L6). `GET ?work=&task=`: the
@@ -1113,7 +1115,7 @@ impl NativeHttpService {
         body["schema_version"] = json!(1);
         body["task"] = json!({"id": task, "title": title});
         body["attempt"] = latest.map_or(Value::Null, |a| json!({"agent_id": a.id, "status": a.status, "started": a.started}));
-        serde_json::to_vec(&body).map(RouteBody::plain).map_err(HttpServiceError::Json)
+        serde_json::to_vec(&body).map(RouteBody::plain).map_err(HttpServiceError::ResponseJson)
     }
 
     fn write_scenario(&self, request: &Request<Vec<u8>>) -> Result<RouteBody, HttpServiceError> {
@@ -1154,7 +1156,7 @@ impl NativeHttpService {
             (Ok(r), Ok(())) => r,
             (Err(e), _) | (Ok(_), Err(e)) => return Err(HttpServiceError::Telemetry(Box::new(e))),
         };
-        serde_json::to_vec(&json!({"schema_version": 1, "revision": revision})).map(RouteBody::plain).map_err(HttpServiceError::Json)
+        serde_json::to_vec(&json!({"schema_version": 1, "revision": revision})).map(RouteBody::plain).map_err(HttpServiceError::ResponseJson)
     }
 
     /// Saved v33 retention applied once at server start, before the telemetry
@@ -1353,7 +1355,7 @@ impl NativeHttpService {
         let server = SERVER_EVALUATIONS.lock().unwrap_or_else(std::sync::PoisonError::into_inner).get(&self.root).cloned().unwrap_or(Value::Null);
         serde_json::to_vec(&json!({"schema_version": 1, "rules": swarm_engine::ALERT_RULES.iter().map(|(r, l)| json!({"rule": r, "level": l})).collect::<Vec<_>>(), "alerts": view, "retention": {"policy": policy, "last_purge": last_purge}, "server_evaluation": server}))
             .map(RouteBody::plain)
-            .map_err(HttpServiceError::Json)
+            .map_err(HttpServiceError::ResponseJson)
     }
 
     /// `POST /api/v1/live/alerts/evaluate` (session + CSRF): compute the
@@ -1382,7 +1384,7 @@ impl NativeHttpService {
             return Err(HttpServiceError::Refused("live-query-invalid"));
         }
         let view = self.evaluate_alerts()?;
-        serde_json::to_vec(&view).map(RouteBody::plain).map_err(HttpServiceError::Json)
+        serde_json::to_vec(&view).map(RouteBody::plain).map_err(HttpServiceError::ResponseJson)
     }
 
     /// One alert evaluation, shared by the console POST and the server loop

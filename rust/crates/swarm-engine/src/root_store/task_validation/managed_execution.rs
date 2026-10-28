@@ -116,7 +116,9 @@ fn review_source(review:Option<&crate::IndependentReview>)->ReviewSource<'_>{
 /// Read actual managed submission and owner/phase under a short reservation and
 /// SQL snapshot. None means genuinely ordinary Work only, never a failed read.
 /// Fresh requires idle task; existing jobs require exact current scalar equality.
-/// No Git, candidate creation or execution occurs while these locks are held.
+/// Accepted-baseline verification reads immutable Git reports under saved policy;
+/// no candidate creation or control/provider execution occurs while locks are held.
+/// Missing/stale original authority refuses before preparing/claiming a new job.
 fn inputs(
     store: &RootStore,
     work: &str,
@@ -153,6 +155,7 @@ fn inputs_using(store:&RootStore,work:&str,request:&Request,job:Option<&store::J
             {
                 return Ok(None);
             }
+            super::super::managed_baseline::inspect(store,&tx,&current,&request.task_id,&settings)?;
             if job.is_none() {
                 super::require_validation_idle(&tx, work, &request.task_id).map_err(launch)?;
             }

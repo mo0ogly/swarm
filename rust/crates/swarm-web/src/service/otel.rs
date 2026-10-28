@@ -195,7 +195,7 @@ impl NativeHttpService {
                     "errorMessage": message,
                 }})
             };
-            serde_json::to_vec(&document).map_err(HttpServiceError::Json)
+            serde_json::to_vec(&document).map_err(HttpServiceError::ResponseJson)
         })();
         let closed = telemetry.close().map_err(store_error);
         match (result, closed) {

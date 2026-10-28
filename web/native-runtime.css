@@ -54,3 +54,14 @@
 @media(max-width:48rem){.native-workspace-layout,.native-mission-layout{grid-template-columns:minmax(0,1fr)}.native-navigation{border-inline-end:0;border-block-end:1px solid var(--wattson-ligne);padding:.75rem 1rem}.native-navigation nav{display:flex;flex-wrap:wrap;gap:.75rem 1.5rem}.native-navigation details{flex:1 1 10rem;margin:0}.native-navigation-note{margin-block:.25rem}.native-workspace .native-runtime-header{padding:1rem}.native-mission-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:.5rem}.native-mission-list li+li{margin:0}.native-mission-detail{padding:1rem}.native-facts{grid-template-columns:minmax(0,1fr)}}
 
 @media(max-width:48rem){.native-mission-detail h3{flex:none}}
+
+/* Same fixed-footer dialog structure; policy values never drive CSS bounds. */
+dialog[data-web-requests] .modal-body{overflow:auto;min-height:0}
+dialog[data-web-requests] .modal-footer{flex-shrink:0}
+
+/* Graph objectives use the shared scroll-body/fixed-footer contract. */
+dialog[data-graph-performance] .modal-body{overflow:auto;min-height:0}
+dialog[data-graph-performance] .modal-footer{flex-shrink:0}
+
+/* Retained exchange text may contain unbroken IDs/paths; never force page overflow. */
+[data-exchanges] :is(p,dd,h4){overflow-wrap:anywhere}

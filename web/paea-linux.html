@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr" data-theme="etat"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Swarm — PAEA Linux</title><link rel="icon" href="/swarm-logo.png">
+<link rel="stylesheet" href="/wattson_themes.css"><link rel="stylesheet" href="/swarm-design.css"><link rel="stylesheet" href="/paea.css">
+<script src="/i18n-en.js" defer></script><script src="/i18n.js" defer></script><script src="/paea-linux.js" defer></script>
+</head><body>
+<a class="paea-skip" href="#paea-main" data-i18n>Aller aux vérifications</a>
+<header><a href="/">Swarm</a><h1 data-i18n>Prérequis Linux de PAEA</h1><nav aria-label="Navigation PAEA"><a href="/paea.html" data-paea-link data-i18n>Vérifications PAEA</a><button id="paea-theme" type="button" data-i18n>Changer de thème</button></nav></header>
+<main id="paea-main" tabindex="-1">
+<p id="linux-limits" class="paea-notice" data-i18n>Lecture du processus serveur dans son namespace courant. Aucun lancement, séparation des comptes, confinement ou accord humain n’est vérifié.</p>
+<p data-i18n>Observer les préconditions disponibles sur le serveur. Cette action ne lance aucun helper, ne modifie aucun compte et n’active aucune protection.</p>
+<button id="linux-observe" class="paea-primary" type="button" data-i18n>Observer le serveur Linux</button>
+<p id="linux-status" role="status" aria-live="polite" data-state="empty" data-i18n>Aucune observation demandée.</p>
+<section id="linux-result" aria-labelledby="linux-result-title" hidden>
+<h2 id="linux-result-title" data-i18n>Observations du serveur</h2>
+<p id="linux-summary"></p><dl id="linux-observations"></dl>
+<h3 data-i18n>Préconditions à traiter avant qualification</h3><ul id="linux-missing"></ul>
+<p data-i18n>Faire vérifier les helpers et les plages par l’administrateur de l’hôte, puis observer à nouveau. Leur présence ne suffit pas : le lancement avec comptes séparés reste à qualifier.</p>
+<details><summary data-i18n>Rapport technique en lecture seule</summary><pre id="linux-json" tabindex="0"></pre></details>
+</section>
+<button id="linux-download" type="button" disabled data-i18n>Télécharger le rapport</button>
+<details><summary data-i18n>Portée de cette observation</summary><p data-i18n>Les UID et mappings sont locaux au namespace du serveur. Les métadonnées sont relues sans descripteurs détenus, attribution exclusive ni preuve d’exécution. Les erreurs de lecture restent visibles ; un rapport complet ne constitue pas une admission protégée.</p><p data-i18n>La commande identity linux-prerequisites --json observe le processus CLI, qui peut avoir un environnement différent du serveur.</p></details>
+</main></body></html>

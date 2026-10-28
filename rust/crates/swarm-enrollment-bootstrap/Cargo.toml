@@ -12,7 +12,8 @@ serde = { version = "=1.0.228", features = ["derive"] }
 serde_json = "=1.0.150"
 sha2 = "=0.10.9"
 swarm-enrollment-config = { path = "../swarm-enrollment-config" }
-swarm-identity-contract = { path = "../swarm-identity-contract" }
+swarm-identity-contract = { path = "../swarm-identity-contract", features = ["serde"] }
+swarm-enrollment-state = { path = "../swarm-enrollment-state" }
 swarm-wire-json = { path = "../swarm-wire-json" }
 
 [target.'cfg(target_os = "linux")'.dependencies]

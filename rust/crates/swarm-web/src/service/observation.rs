@@ -13,6 +13,10 @@ use std::{
 /// Internal response extension, shared only to retain non-cloneable typed causes.
 /// Arc copies preserve ownership; neither its presence nor a diagnostic grants
 /// authority. Successful DTOs already expose their unavailable observations.
+/// Trusted auxiliary Root metadata, separate from business/config publication.
+#[derive(Clone)]
+pub(super) struct AuxiliaryEffects(pub Vec<swarm_engine::AuxiliaryEffect>);
+
 #[derive(Clone)]
 pub(super) struct ObservationCauses(pub Vec<Arc<swarm_engine::RootStoreError>>);
 
@@ -29,6 +33,10 @@ pub(super) struct PreparationReceipt(pub (String,i64));
 /// authenticates a supplied in-process claim nor proves receipt/acceptance.
 #[must_use = "Observe the outcome and preserve known effects before delivering its response"]
 pub struct NativeJobOutcome {
+    /// Auxiliary SQL observations, not business completion or peer receipt.
+    pub auxiliary_effects: Vec<swarm_engine::AuxiliaryEffect>,
+    /// Owned manual probe result, independent of local state or peer receipt.
+    pub provider_probe:Option<Arc<super::ProviderProbeReceipt>>,
     /// Recorded/replayed/uncertain trust state; never client receipt or retry permission.
     pub trust_publication:Option<&'static str>,
     pub status: StatusCode,
@@ -46,6 +54,9 @@ impl NativeJobOutcome {
     /// cause and known/replayed state. Error metadata is retained even if an
     /// adapter omitted redundant reply metadata. None/false never proves rollback.
     pub fn from_reply(mut reply: HttpReply) -> (Self, Response<Vec<u8>>) {
+        let mut auxiliary_effects=reply.response.extensions_mut().remove::<AuxiliaryEffects>().map_or_else(Vec::new,|value|value.0);
+        if let Some(error)=&reply.failure{swarm_engine::extend_auxiliary_effects(&mut auxiliary_effects,error.auxiliary_effects());}
+        let provider_probe=reply.response.extensions_mut().remove::<Arc<super::ProviderProbeReceipt>>().or_else(||reply.failure.as_ref().and_then(HttpServiceError::provider_probe).cloned());
         let trust_publication=reply.response.extensions_mut().remove::<TrustPublication>().map(|p|p.0).or_else(||reply.failure.as_ref().and_then(HttpServiceError::trust_publication));
         let observation_causes = reply.response.extensions_mut().remove::<ObservationCauses>()
             .map_or_else(Vec::new, |causes| causes.0);
@@ -69,6 +80,8 @@ impl NativeJobOutcome {
                 .is_some_and(HttpServiceError::configuration_may_be_recorded);
         (
             Self {
+                auxiliary_effects,
+                provider_probe,
                 trust_publication,
                 status: reply.response.status(),
                 observation_causes,
@@ -86,6 +99,8 @@ impl NativeJobOutcome {
     /// or automatic retry is performed; transport still owes explicit delivery.
     pub fn from_error(error: HttpServiceError) -> Self {
         Self {
+            auxiliary_effects:error.auxiliary_effects(),
+            provider_probe:error.provider_probe().cloned(),
             trust_publication:error.trust_publication(),
             recorded_preparation:error.recorded_preparation().map(|(id,r)|(id.to_owned(),r)),
             status: error.status(),
@@ -104,6 +119,8 @@ impl NativeJobOutcome {
     /// persistence nor HTTP peer receipt. It is not a signed audit attestation.
     pub fn record(&self) -> NativeOutcomeRecord<'_> {
         NativeOutcomeRecord {
+            auxiliary_effects:&self.auxiliary_effects,
+            provider_probe:self.provider_probe.as_ref().map(|p|ProviderProbeRecord{provider_contact_may_have_occurred:p.contact_may_have_occurred,error:p.error,latency_ms:p.latency_ms}),
             trust_publication:self.trust_publication,
             recorded_preparation:self.recorded_preparation.as_ref().map(|(id,r)|RecordedPreparation{id,revision:*r}),
             schema_version: 1,
@@ -146,6 +163,7 @@ impl fmt::Debug for NativeJobOutcome {
     /// Safe summary; no raw cause, response, credential or Work identifier.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("NativeJobOutcome")
+            .field("auxiliary_observations", &self.auxiliary_effects.len())
             .field("status", &self.status)
             .field("error", &self.failure.as_ref().map(HttpServiceError::code))
             .field("work_known", &self.recorded_work.is_some())
@@ -161,6 +179,10 @@ impl fmt::Debug for NativeJobOutcome {
 /// The underlying in-process outcome still requires trusted service provenance.
 #[derive(serde::Serialize)]
 pub struct NativeOutcomeRecord<'a> {
+    #[serde(skip_serializing_if="Vec::is_empty")]
+    auxiliary_effects:&'a Vec<swarm_engine::AuxiliaryEffect>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    provider_probe:Option<ProviderProbeRecord>,
     #[serde(skip_serializing_if="Option::is_none")]
     trust_publication:Option<&'static str>,
     schema_version: u8,
@@ -175,6 +197,14 @@ pub struct NativeOutcomeRecord<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     recorded_configuration: Option<&'a RecordedConfiguration>,
 }
+impl NativeOutcomeRecord<'_> {
+    /// Borrow Root-derived auxiliary observations for the owner. This is neither
+    /// a grant, new-write assertion nor a claim of durable/client receipt.
+    pub fn auxiliary_effects(&self)->&[swarm_engine::AuxiliaryEffect]{self.auxiliary_effects.as_slice()}
+}
+/// Safe manual-probe projection. No provider/body/key or remote billing claim.
+#[derive(serde::Serialize)]
+struct ProviderProbeRecord{provider_contact_may_have_occurred:bool,error:Option<&'static str>,latency_ms:u128}
 /// Named Work metadata avoids an ambiguous positional tuple on the wire. It is
 /// known/replayed state from the service, never a new execution authorization.
 #[derive(serde::Serialize)]
@@ -222,6 +252,12 @@ pub struct NativeObservationFailure {
     pub pending: Vec<NativeJobOutcome>,
 }
 impl NativeObservationFailure {
+    /// Preserve all pending auxiliary observations plus typed observer causes.
+    /// No current mutable state is reread, no uncertainty is upgraded or retried.
+    pub fn auxiliary_effects(&self)->Vec<swarm_engine::AuxiliaryEffect>{
+        let mut result=swarm_engine::auxiliary_effects(self);
+        for outcome in &self.pending {swarm_engine::extend_auxiliary_effects(&mut result,outcome.auxiliary_effects.clone());if let Some(error)=&outcome.failure{swarm_engine::extend_auxiliary_effects(&mut result,error.auxiliary_effects());}}result
+    }
     /// Stable family; retry remains a supervisor/operator decision after readback.
     pub fn code(&self) -> &'static str {
         "web-outcome-observation-failed"
@@ -329,7 +365,8 @@ mod tests {
         assert!(
             matches!(&failed.cause,NativeObservationCause::Panic(p) if p.lock().unwrap().downcast_ref::<&str>()==Some(&"owned observer panic"))
         );
-        failed.defer(NativeJobOutcome {
+        failed.defer(NativeJobOutcome { auxiliary_effects:Vec::new(),
+            provider_probe:None,
             trust_publication:None,
             status: StatusCode::OK,
             failure: None,

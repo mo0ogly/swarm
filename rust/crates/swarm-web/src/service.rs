@@ -13,8 +13,11 @@ pub use transport::{NativeOutcomeObserver, NativeRequestError, NativeServerRepor
 mod observation;
 mod settings;
 mod trust;
+mod trust_enrollment;
+pub use trust_enrollment::{TrustEnrollmentSource, TrustEnrollmentSourceError};
 mod paea;
 mod planning;
+mod lifecycle_inventory;
 mod mission;
 mod cockpit_read;
 mod work_budget;
@@ -22,6 +25,23 @@ mod work_resume;
 mod agent_logs;
 mod agent_transcript;
 mod pricing;
+mod provider_policies;
+mod provider_models;
+mod provider_admin;
+mod api_connections;
+mod provider_wait;
+mod log_query;
+mod runtime_health;
+mod session_visit;
+mod log_read_policy;
+mod activity;
+mod activity_policy;
+mod exchanges;
+mod graph_performance;
+mod web_request_policy;
+mod run_limits_admin;
+mod api_connection_probe;
+pub use api_connection_probe::ProviderProbeReceipt;
 #[cfg(target_os = "linux")]
 mod admin_budget;
 #[cfg(target_os = "linux")]
@@ -57,6 +77,10 @@ pub struct RecordedConfiguration {
 /// Safe typed service failures; no raw body/header/credential appears in diagnostics.
 /// Original causes and known recorded Work survive response/close aggregation.
 pub enum HttpServiceError {
+    /// Independent trusted-source startup/close causes beside any earlier error.
+    EnrollmentSource { primary: Option<Box<Self>>, cause: Box<TrustEnrollmentSourceError> },
+    /// Local output failure after a manual probe; possible contact survives.
+    ProviderProbe { primary: Box<Self>, receipt: std::sync::Arc<ProviderProbeReceipt> },
     /// A known preparation receipt preceded a later response/close failure.
     PreparationRecorded { primary: Box<Self>, id: String, revision: i64 },
     ConfigurationRecorded {
@@ -76,6 +100,10 @@ pub enum HttpServiceError {
     Protection(swarm_protection_contract::Error),
     Projection(projection::Error),
     Json(serde_json::Error),
+    /// Server response serialization failed. Retains the original cause and
+    /// reports500; unlike request JSON this never attributes failure to input.
+    /// Any separate recorded-state wrapper remains authoritative.
+    ResponseJson(serde_json::Error),
     LoginEncoding(std::str::Utf8Error),
     HeaderEncoding(http::header::InvalidHeaderValue),
     Model(swarm_engine::WorkError),
@@ -97,6 +125,9 @@ pub enum HttpServiceError {
         primary: Box<Self>,
         cause: serde_json::Error,
     },
+    /// A trusted auxiliary receipt survived a later response/close error.
+    /// Not a failed cleanup action, business approval or retry permission.
+    AuxiliaryState { primary:Box<Self>, effect:swarm_engine::AuxiliaryEffect },
     Method(&'static str),
     Refused(&'static str),
     /// Provider-telemetry store failure (OTLP ingest), cause retained.
@@ -105,17 +136,39 @@ pub enum HttpServiceError {
     TelemetryInput(swarm_engine::TelemetryInputError),
 }
 impl HttpServiceError {
+    /// Collect typed auxiliary effects through all primary and cleanup branches.
+    /// No message parsing, mutation or inferred rollback; pending transport
+    /// outcomes have their own accessor and must also be retained by their owner.
+    pub fn auxiliary_effects(&self)->Vec<swarm_engine::AuxiliaryEffect> {
+        let mut result=swarm_engine::auxiliary_effects(self);
+        if let Self::AuxiliaryState{effect,..}=self{swarm_engine::extend_auxiliary_effects(&mut result,[effect.clone()]);}
+        match self {
+            Self::Close{primary,cleanup}=>{if let Some(primary)=primary {swarm_engine::extend_auxiliary_effects(&mut result,primary.auxiliary_effects())}swarm_engine::extend_auxiliary_effects(&mut result,swarm_engine::auxiliary_effects(cleanup.as_ref()));},
+            Self::ProviderProbe{primary,..}|Self::PreparationRecorded{primary,..}|Self::Recorded{primary,..}|Self::ResponseEncoding{primary,..}|Self::AuxiliaryState{primary,..}|Self::SessionState{primary}|Self::ConfigurationState{primary}|Self::ConfigurationRecorded{primary,..}=>swarm_engine::extend_auxiliary_effects(&mut result,primary.auxiliary_effects()),
+            _=>(),
+        }result
+    }
+    /// Possible provider contact retained through primary/cleanup wrappers.
+    /// False means no retained witness, never proof of remote rollback.
+    pub fn provider_probe(&self)->Option<&std::sync::Arc<ProviderProbeReceipt>> {match self {
+        Self::ProviderProbe{receipt,..}=>Some(receipt),
+        Self::Close{primary,..}=>primary.as_deref().and_then(Self::provider_probe),
+        Self::ResponseEncoding{primary,..}|Self::AuxiliaryState{primary,..}|Self::Recorded{primary,..}|Self::ConfigurationState{primary}|Self::ConfigurationRecorded{primary,..}|Self::SessionState{primary}|Self::PreparationRecorded{primary,..}=>primary.provider_probe(),_=>None,
+    }}
     /// Retain trust outcomes through primary/secondary Root close and response
     /// encoding errors. None is unknown, never proof of rollback or retry safety.
     pub fn trust_publication(&self)->Option<&'static str>{match self{
+      Self::EnrollmentSource{primary,..}=>primary.as_deref().and_then(Self::trust_publication),
       Self::Root{cause,..}=>cause.trust_publication(),
       Self::Close{primary,cleanup}=>primary.as_deref().and_then(Self::trust_publication).or_else(||cleanup.trust_publication()),
-      Self::ResponseEncoding{primary,..}|Self::Recorded{primary,..}|Self::ConfigurationState{primary}|Self::ConfigurationRecorded{primary,..}|Self::SessionState{primary}=>primary.trust_publication(),_=>None,
+      Self::ResponseEncoding{primary,..}|Self::AuxiliaryState{primary,..}|Self::Recorded{primary,..}|Self::ConfigurationState{primary}|Self::ConfigurationRecorded{primary,..}|Self::SessionState{primary}=>primary.trust_publication(),_=>None,
     }}
 
     /// Stable family only; it grants neither retry nor any business authority.
     pub fn code(&self) -> &'static str {
         match self {
+            Self::EnrollmentSource { .. } => "web-trust-enrollment-source",
+            Self::ProviderProbe { primary, .. } => primary.code(),
             Self::ConfigurationState { .. } | Self::ConfigurationRecorded { .. } => {
                 "web-configuration-state-preserved"
             }
@@ -127,12 +180,14 @@ impl HttpServiceError {
             Self::Input(e) => e.code(),
             Self::Protection(e) => e.code(),
             Self::Projection(_) | Self::Json(_) => "web-document-invalid",
+            Self::ResponseJson(_) => "web-response-encoding",
             Self::Model(_) => "web-model-encoding",
             Self::Request(_) => "web-request-encoding",
             Self::Root { cause, .. } => cause.code(),
             Self::Close { .. } => "web-root-close",
             Self::Recorded { .. } => "work-state-preserved",
             Self::PreparationRecorded { .. } => "preparation-state-preserved",
+            Self::AuxiliaryState {primary,..} => primary.code(),
             Self::ResponseEncoding { .. } => "web-response-encoding",
             Self::Method(_) => "web-method-refused",
             Self::Refused(code) => code,
@@ -151,7 +206,7 @@ impl HttpServiceError {
                 .as_deref()
                 .is_some_and(Self::session_state_may_be_recorded),
             Self::Recorded { primary, .. }
-            | Self::ResponseEncoding { primary, .. }
+            | Self::ResponseEncoding { primary, .. } | Self::AuxiliaryState { primary, .. }
             | Self::ConfigurationState { primary }
             | Self::ConfigurationRecorded { primary, .. } => {
                 primary.session_state_may_be_recorded()
@@ -173,7 +228,7 @@ impl HttpServiceError {
                     || cleanup.configuration_may_be_recorded()
             }
             Self::Recorded { primary, .. }
-            | Self::ResponseEncoding { primary, .. }
+            | Self::ResponseEncoding { primary, .. } | Self::AuxiliaryState { primary, .. }
             | Self::SessionState { primary } => primary.configuration_may_be_recorded(),
             _ => false,
         }
@@ -188,7 +243,7 @@ impl HttpServiceError {
                 primary.as_deref().and_then(Self::recorded_configuration)
             }
             Self::Recorded { primary, .. }
-            | Self::ResponseEncoding { primary, .. }
+            | Self::ResponseEncoding { primary, .. } | Self::AuxiliaryState { primary, .. }
             | Self::SessionState { primary }
             | Self::ConfigurationState { primary } => primary.recorded_configuration(),
             _ => None,
@@ -204,7 +259,7 @@ impl HttpServiceError {
                 .as_deref()
                 .and_then(Self::recorded_preparation)
                 .or_else(|| cleanup.recorded_preparation()),
-            Self::Recorded { primary, .. } | Self::ResponseEncoding { primary, .. }
+            Self::Recorded { primary, .. } | Self::ResponseEncoding { primary, .. } | Self::AuxiliaryState { primary, .. }
             | Self::SessionState { primary }
             | Self::ConfigurationState { primary }
             | Self::ConfigurationRecorded { primary, .. } => primary.recorded_preparation(),
@@ -221,7 +276,7 @@ impl HttpServiceError {
                 .as_deref()
                 .and_then(Self::recorded_work)
                 .or_else(|| cleanup.recorded_work()),
-            Self::ResponseEncoding { primary, .. }
+            Self::ResponseEncoding { primary, .. } | Self::AuxiliaryState { primary, .. }
             | Self::SessionState { primary }
             | Self::ConfigurationState { primary }
             | Self::ConfigurationRecorded { primary, .. } => primary.recorded_work(),
@@ -243,6 +298,8 @@ impl HttpServiceError {
             return StatusCode::INTERNAL_SERVER_ERROR;
         }
         match self {
+            Self::EnrollmentSource { .. } => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::ProviderProbe {..}=>StatusCode::INTERNAL_SERVER_ERROR,
             Self::ConfigurationState { .. }
             | Self::ConfigurationRecorded { .. }
             | Self::Session(_)
@@ -268,16 +325,21 @@ impl HttpServiceError {
             ) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
-            Self::Refused("web-root-binding-changed" | "budget-revision-conflict") => StatusCode::CONFLICT,
+            Self::Refused("web-root-binding-changed" | "budget-revision-conflict" | "preparation-stale-plan" | "preparation-already-released") => StatusCode::CONFLICT,
             Self::Refused("web-route-unported" | "live-agent-unknown" | "live-run-unknown" | "live-task-unknown") => StatusCode::NOT_FOUND,
             Self::Refused(
-                "web-operation-unported"
+                "web-operation-unported" | "preparation-release-scope-unported"
                 | "web-mutation-transport-pending"
                 | "live-events-transport-required",
             ) => {
                 StatusCode::NOT_IMPLEMENTED
             }
             Self::Root { operation, cause } => match cause.code() {
+                "project-profile-conflict" if matches!(*operation,"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+                "project-profile-choice-unknown" if *operation=="project-profile-write" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
+                _ if project_profile::caller_invalid(operation,cause.as_ref()) && !matches!(cause.as_ref(),RootStoreError::Context(e) if e.reason()=="versioned-memory-source-guard-not-ported")=>StatusCode::BAD_REQUEST,
+                "project-context-invalid" if matches!(*operation,"project-profile-read"|"preparation-call"|"project-profile-catalog"|"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Context(error) if error.reason()=="versioned-memory-source-guard-not-ported" && error.cleanup_cause().is_none())=>StatusCode::NOT_IMPLEMENTED,
+                "settings-context-policy-not-configured" if matches!(*operation,"project-profile-read"|"preparation-call"|"project-profile-catalog"|"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Settings(_))=>StatusCode::NOT_IMPLEMENTED,
                 "settings-revision-conflict"
                 | "settings-event-conflict"
                 | "settings-preview-stale-or-missing"
@@ -316,13 +378,68 @@ impl HttpServiceError {
                 "budget-invalid" if matches!(*operation,"budget-input"|"budget-apply")
                     && matches!(cause.as_ref(),RootStoreError::Mutation(swarm_engine::WorkEngineError::Budget(
                         swarm_engine::BudgetError::Decode(_) | swarm_engine::BudgetError::Date(_) | swarm_engine::BudgetError::Refused(_)))) => StatusCode::BAD_REQUEST,
+                "settings-preparation-calls-not-configured" if *operation=="preparation-call" && matches!(cause.as_ref(),RootStoreError::Settings(_))=>StatusCode::NOT_IMPLEMENTED,
+                "preparation-provider-adapter-unported" if *operation=="preparation-call"=>StatusCode::NOT_IMPLEMENTED,
+                "preparation-call-disabled" if *operation=="preparation-call"=>StatusCode::FORBIDDEN,
+                "preparation-turn-not-found" if *operation=="preparation-call"=>StatusCode::NOT_FOUND,
+                "preparation-send-invalid"|"preparation-stop-invalid"|"preparation-message-over-limit"|"preparation-context-over-limit" if *operation=="preparation-call"=>StatusCode::BAD_REQUEST,
+                "preparation-event-conflict"|"preparation-revision-conflict"|"preparation-capability-stale"|"preparation-turn-active"|"preparation-turn-limit"|"preparation-budget-exhausted"|"work-budget-exhausted" if *operation=="preparation-call"=>StatusCode::CONFLICT,
+                "settings-preparation-plan-not-configured" if *operation=="preparation-read" && matches!(cause.as_ref(),RootStoreError::Settings(_))=>StatusCode::NOT_IMPLEMENTED,
+                "settings-preparation-templates-not-configured" if *operation=="preparation-read" && matches!(cause.as_ref(),RootStoreError::Settings(_))=>StatusCode::NOT_IMPLEMENTED,
+                "preparation-template-not-found" if *operation=="preparation-read" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
+                "settings-preparation-sources-not-configured" if matches!(*operation,"preparation-read"|"preparation-command") && matches!(cause.as_ref(),RootStoreError::Settings(_))=>StatusCode::NOT_IMPLEMENTED,
+                "preparation-stale-source"|"preparation-source-duplicate-path" if *operation=="preparation-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+                "preparation-source-range"|"preparation-source-start-beyond-file"|"preparation-source-path-refused"|"preparation-source-type-refused"|"preparation-source-scope-refused"|"preparation-source-not-regular"|"preparation-source-file-over-limit"|"preparation-source-excerpt-over-limit"|"preparation-source-binary"|"preparation-source-utf8"|"preparation-source-secret"|"preparation-source-count-over-limit"|"preparation-source-total-over-limit"|"preparation-source-query-over-limit"|"preparation-source-absent"
+                    if matches!(*operation,"preparation-read"|"preparation-command") && matches!(cause.as_ref(),RootStoreError::Refused(_)|RootStoreError::Preparation(_))=>StatusCode::BAD_REQUEST,
+                "preparation-dialogue-active-unported" if matches!(*operation,"preparation-read"|"preparation-call") && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_IMPLEMENTED,
+                "preparation-organization-mode-unported" | "preparation-organization-worker-role-required" | "preparation-release-scope-unported" => StatusCode::NOT_IMPLEMENTED,
                 "command_not_ported" if *operation == "resume-read" && matches!(cause.as_ref(), RootStoreError::Projection(_)) => StatusCode::NOT_IMPLEMENTED,
+                "provider-configuration-preview-required" if *operation == "provider-policy-apply"
+                    && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::CONFLICT,
+                "provider-policy-provider-missing" | "provider-policy-default-invalid"
+                    if matches!(*operation, "provider-policy-preview" | "provider-policy-apply")
+                    && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::BAD_REQUEST,
+                _ if *operation == "provider-policy-input"
+                    && matches!(cause.as_ref(), RootStoreError::Providers(_)) => StatusCode::BAD_REQUEST,
+                _ if provider_policies::caller_policy_refusal(operation, cause.as_ref()) => StatusCode::BAD_REQUEST,
+                "provider-wait-event-conflict" if *operation=="provider-wait-change" && matches!(cause.as_ref(),RootStoreError::Refused(_)) => StatusCode::CONFLICT,
+                "run-limits-preview-required"|"run-limits-event-conflict" if operation.starts_with("run-limits-")=>StatusCode::CONFLICT,
+                "log-read-policy-preview-stale"|"log-read-policy-event-conflict" if operation.starts_with("log-read-policy-")=>StatusCode::CONFLICT,
+                "visit-revision-conflict" if *operation=="visit-mark"&&matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+                "visit-input-invalid"|"visit-revision-invalid" if *operation=="visit-input"&&matches!(cause.as_ref(),RootStoreError::Launch(_))=>StatusCode::BAD_REQUEST,
+                "log-query-work-mismatch" if *operation=="log-query-read"=>StatusCode::FORBIDDEN,
+                "agent-missing" if *operation=="log-query-read"=>StatusCode::NOT_FOUND,
+                "activity-read-policy-preview-stale"|"activity-read-policy-event-conflict" if operation.starts_with("activity-policy-")=>StatusCode::CONFLICT,
+                "graph-performance-policy-preview-stale"|"graph-performance-policy-event-conflict" if operation.starts_with("graph-performance-")=>StatusCode::CONFLICT,
+                "web-request-policy-preview-stale"|"web-request-policy-event-conflict" if operation.starts_with("web-requests-")=>StatusCode::CONFLICT,
+                "run-limits-history-revision-not-found" if operation.starts_with("run-limits-")=>StatusCode::NOT_FOUND,
+                "settings-runtime-policy-not-configured" if operation.starts_with("run-limits-")=>StatusCode::NOT_IMPLEMENTED,
+                _ if run_limits_admin::caller_refusal(operation,cause.as_ref())=>StatusCode::BAD_REQUEST,
+                _ if provider_wait::caller_refusal(operation,cause.as_ref()) || web_request_policy::caller_refusal(operation,cause.as_ref()) || graph_performance::caller_refusal(operation,cause.as_ref()) || activity_policy::caller_refusal(operation,cause.as_ref()) || log_read_policy::caller_refusal(operation,cause.as_ref()) => StatusCode::BAD_REQUEST,
+                "api-connection-disabled"|"api-connection-probe-preview-refused" if *operation=="api-connection-probe"=>StatusCode::BAD_REQUEST,
+                "settings-preparation-calls-not-configured" if *operation=="api-connection-probe"=>StatusCode::NOT_IMPLEMENTED,
+                _ if api_connections::caller_refusal(operation,cause.as_ref()) => StatusCode::BAD_REQUEST,
+                _ if *operation == "provider-model-read" && provider_models::selection_refusal(cause.as_ref()) => StatusCode::BAD_REQUEST,
+                "provider-policy-api-unported" | "agent-api-provider-execution-unported" if *operation == "provider-model-read"
+                    && matches!(cause.as_ref(), RootStoreError::Launch(e) if matches!(e.as_ref(),swarm_engine::AgentLaunchError::Refused(_))) => StatusCode::NOT_IMPLEMENTED,
                 "pricing-version-unknown" if *operation == "pricing-quote" => StatusCode::NOT_FOUND,
                 _ if matches!(*operation,"pricing-input" | "pricing-quote-input" | "pricing-quote")
                     && matches!(cause.as_ref(), RootStoreError::Pricing(swarm_engine::PricingError::Decode(_) | swarm_engine::PricingError::Date(_) | swarm_engine::PricingError::Refused(_))) => StatusCode::BAD_REQUEST,
-                "preparation-request-invalid" | "preparation-method-unavailable" | "preparation-invalid-plan" => StatusCode::BAD_REQUEST,
-                "preparation-event-conflict" | "preparation-revision-conflict"
-                | "preparation-stale-document" | "preparation-stale-brief" | "preparation-stale-method" | "preparation-stale-plan" => StatusCode::CONFLICT,
+                // Only explicit caller-selection refusals become 4xx here;
+                // corrupt sources, IO, close and rollback failures stay server errors.
+                "agent-provider-not-configured" | "agent-workspace-outside-project-or-not-directory"
+                    if *operation=="preparation-command" && matches!(cause.as_ref(), RootStoreError::Launch(error) if matches!(error.as_ref(),swarm_engine::AgentLaunchError::Refused(_))) => StatusCode::BAD_REQUEST,
+                "agent-model-policy-hash-changed"
+                    if *operation=="preparation-command" && matches!(cause.as_ref(), RootStoreError::Launch(error) if matches!(error.as_ref(),swarm_engine::AgentLaunchError::Refused(_))) => StatusCode::CONFLICT,
+                "preparation-budget-invalid" | "preparation-organization-task-budget" | "preparation-request-invalid" | "preparation-method-unavailable" | "preparation-invalid-plan" => StatusCode::BAD_REQUEST,
+                "preparation-event-conflict" | "preparation-revision-conflict" | "preparation-work-revision-conflict" | "preparation-revision-agent-active" | "planning-closure-review-active"
+                | "preparation-revision-scope-held" | "preparation-revision-scope-branching"
+                | "preparation-revision-task-running" | "preparation-revision-retires-requirement"
+                | "preparation-revision-controls-sense" | "preparation-revision-controls-criteria"
+                | "preparation-revision-criteria-shrink" | "preparation-revision-task-id-collide"
+                | "preparation-revision-new-task-unauthorized" | "preparation-revision-retired-dependency"
+                | "preparation-revision-requirement-limit"
+                | "preparation-organization-already-configured" | "preparation-organization-contract-changed" | "preparation-organization-history-present" | "preparation-organization-target-invalid" | "preparation-already-released" | "preparation-stale-document" | "preparation-stale-brief" | "preparation-stale-method" | "preparation-stale-plan" => StatusCode::CONFLICT,
                 "preparation-write-disabled" => StatusCode::FORBIDDEN,
                 "preparation-not-found" | "work-missing" | "unknown_work" | "unknown_task" => StatusCode::NOT_FOUND,
                 "authorization_required" => StatusCode::FORBIDDEN,
@@ -340,12 +457,12 @@ impl HttpServiceError {
                 }
                 _ => StatusCode::INTERNAL_SERVER_ERROR,
             },
-            Self::HeaderEncoding(_)
+            Self::ResponseJson(_) | Self::HeaderEncoding(_)
             | Self::Model(_)
             | Self::Request(_)
             | Self::Close { .. }
             | Self::Recorded { .. }
-            | Self::ResponseEncoding { .. } => StatusCode::INTERNAL_SERVER_ERROR,
+            | Self::ResponseEncoding { .. } | Self::AuxiliaryState { .. } => StatusCode::INTERNAL_SERVER_ERROR,
             _ => StatusCode::BAD_REQUEST,
         }
     }
@@ -367,6 +484,8 @@ impl Error for HttpServiceError {
     /// encoding causes in their fields for the owning transport's diagnostics.
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
+            Self::ProviderProbe { primary, .. } => Some(primary.as_ref()),
+            Self::EnrollmentSource { primary, cause } => primary.as_deref().map(|e|e as &(dyn Error+'static)).or(Some(cause.as_ref())),
             Self::ConfigurationState { primary } | Self::ConfigurationRecorded { primary, .. } => {
                 Some(primary.as_ref())
             }
@@ -377,7 +496,7 @@ impl Error for HttpServiceError {
             Self::Input(e) => Some(e),
             Self::Protection(e) => Some(e),
             Self::Projection(e) => Some(e),
-            Self::Json(e) => Some(e),
+            Self::Json(e) | Self::ResponseJson(e) => Some(e),
             Self::LoginEncoding(e) => Some(e),
             Self::HeaderEncoding(e) => Some(e),
             Self::Model(e) => Some(e),
@@ -390,7 +509,7 @@ impl Error for HttpServiceError {
                 ..
             } => Some(primary.as_ref()),
             Self::Close { cleanup, .. } => Some(cleanup.as_ref()),
-            Self::Recorded { primary, .. } | Self::ResponseEncoding { primary, .. } => {
+            Self::Recorded { primary, .. } | Self::ResponseEncoding { primary, .. } | Self::AuxiliaryState { primary, .. } => {
                 Some(primary.as_ref())
             }
             _ => None,
@@ -416,6 +535,12 @@ pub struct HttpReply {
     pub recorded_configuration: Option<RecordedConfiguration>,
 }
 impl HttpReply {
+    /// Retained auxiliary observations from trusted response/typed failure,
+    /// never reconstructed from JSON or evidence of client receipt/permission.
+    pub fn auxiliary_effects(&self)->Vec<swarm_engine::AuxiliaryEffect>{
+        let mut result=self.response.extensions().get::<observation::AuxiliaryEffects>().map_or_else(Vec::new,|v|v.0.clone());
+        if let Some(error)=&self.failure{swarm_engine::extend_auxiliary_effects(&mut result,error.auxiliary_effects())}result
+    }
     /// Borrow ancillary read diagnostics already represented in a successful DTO.
     /// No HTTP failure/commit/permission is inferred. The actual owner must retain
     /// these typed causes if later response/observer output fails; raw messages
@@ -428,6 +553,8 @@ impl HttpReply {
 /// Internal encoded route result and known effects. Plain data has no claimed
 /// operation effect; it never establishes rollback after an unknown failure.
 struct RouteBody {
+    auxiliary_effects: Vec<swarm_engine::AuxiliaryEffect>,
+    provider_probe: Option<std::sync::Arc<ProviderProbeReceipt>>,
     trust_publication:Option<&'static str>,
     preparation_receipt: Option<(String,i64)>,
     observation_causes: Vec<RootStoreError>,
@@ -440,7 +567,9 @@ impl RouteBody {
     /// Wrap successful observational bytes without inventing a recorded mutation.
     fn plain(bytes: Vec<u8>) -> Self {
         Self {
+            auxiliary_effects:Vec::new(),
             bytes,
+            provider_probe:None,
             trust_publication:None,
             preparation_receipt:None,
             observation_causes: Vec::new(),
@@ -463,10 +592,10 @@ impl DispatchProfile {
     fn capabilities(self) -> serde_json::Value {
         match self {
             Self::Typed => {
-                serde_json::json!({"schema_version":1,"profile":"rust-native-in-construction","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
+                serde_json::json!({"schema_version":1,"profile":"rust-native-in-construction","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
             }
             Self::ObservedHttp1 => {
-                serde_json::json!({"schema_version":1,"profile":"rust-native-http1-observed","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
+                serde_json::json!({"schema_version":1,"profile":"rust-native-http1-observed","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
             }
         }
     }
@@ -479,12 +608,26 @@ impl DispatchProfile {
 /// adapter owns its listener loop; bearer expiry/rotation, worker launch and full
 /// cockpit are not supplied by this dispatcher.
 pub struct NativeHttpService {
+    trust_enrollment: Option<TrustEnrollmentSource>,
     root: PathBuf,
     authority: LocalWebAuthority,
     binding: RootBinding,
     cookie_max_age_seconds: Option<i64>,
+    probe_shutdown: std::sync::atomic::AtomicBool,
 }
 impl NativeHttpService {
+    /// Trusted typed bootstrap of one exact prepared/provisioned intent. No
+    /// request selects its declaration or pin. Failed setup also closes source;
+    /// ordinary session/CSRF and current account/Biba guards remain independent.
+    pub fn open_enrolled(root_path: &Path, authority: LocalWebAuthority, source: TrustEnrollmentSource) -> Result<Self, HttpServiceError> {
+        match Self::open_source(root_path,authority,Some(&source)) {
+            Ok(mut service)=> {service.trust_enrollment=Some(source);Ok(service)},
+            Err(primary)=>match source.close() {
+                Ok(())=>Err(primary),
+                Err(cause)=>Err(HttpServiceError::EnrollmentSource{primary:Some(Box::new(primary)),cause:Box::new(cause)}),
+            },
+        }
+    }
     /// Bootstrap the native service and persisted private session from one trusted
     /// writable Root and the real bound loopback listener. NOREPLACE publication
     /// reuses Go-compatible complete bytes; invalid state refuses without repair.
@@ -531,10 +674,12 @@ impl NativeHttpService {
         };
         match (prepared, store.close()) {
             (Ok((authority, binding)), Ok(())) => Ok(Self {
+                trust_enrollment: None,
                 root: root_path.to_path_buf(),
                 authority,
                 binding,
                 cookie_max_age_seconds,
+                probe_shutdown:std::sync::atomic::AtomicBool::new(false),
             }),
             (Err(primary), cleanup) => close(Err(primary), cleanup),
             (Ok((_, binding)), Err(cause)) => {
@@ -555,7 +700,13 @@ impl NativeHttpService {
     /// Caller owes persisted credential/session policy, actual bounded transport
     /// and explicit service close; this is not OS/project-file confinement.
     pub fn open(root_path: &Path, authority: LocalWebAuthority) -> Result<Self, HttpServiceError> {
+        Self::open_source(root_path,authority,None)
+    }
+    /// Bind the same opened descriptor checked against the prepared owner;
+    /// source selection never comes from HTTP or an inferred principal.
+    fn open_source(root_path:&Path,authority:LocalWebAuthority,source:Option<&TrustEnrollmentSource>)->Result<Self,HttpServiceError>{
         let store = RootStore::open(root_path, false).map_err(|cause| root("open", cause))?;
+        if let Some(source)=source { if let Err(error)=source.check_root(&store) { return close(Err(root("trust-enrollment-root",error)),store.close()); } }
         let cookie_max_age_seconds = match Self::cookie_age(&store) {
             Ok(age) => age,
             Err(error) => return close(Err(error), store.close()),
@@ -564,10 +715,12 @@ impl NativeHttpService {
             Err(cause) => close(Err(root("bind", cause)), store.close()),
             Ok(binding) => match store.close() {
                 Ok(()) => Ok(Self {
+                    trust_enrollment: None,
                     root: root_path.to_path_buf(),
                     authority,
                     binding,
                     cookie_max_age_seconds,
+                    probe_shutdown:std::sync::atomic::AtomicBool::new(false),
                 }),
                 Err(cause) => close(Err(root("bootstrap-close", cause)), binding.close()),
             },
@@ -620,9 +773,14 @@ impl NativeHttpService {
     /// requests. Errors remain typed; Drop alone does not prove checked release.
     /// No project data, credential or agent is removed/stopped.
     pub fn close(self) -> Result<(), HttpServiceError> {
-        self.binding
+        let source = self.trust_enrollment.map(TrustEnrollmentSource::close).transpose();
+        let binding = self.binding
             .close()
-            .map_err(|cause| root("binding-close", cause))
+            .map_err(|cause| root("binding-close", cause));
+        match source {
+            Ok(_) => binding,
+            Err(cause) => Err(HttpServiceError::EnrollmentSource { primary:binding.err().map(Box::new), cause:Box::new(cause) }),
+        }
     }
     /// Gate every protected route before body decode/per-request Root open, then dispatch the
     /// supported Go /works list and /action kind=task subset. Unsupported routes/
@@ -635,7 +793,7 @@ impl NativeHttpService {
     /// HEAD keeps status/headers but omits body. This handles typed requests only,
     /// not TCP parsing/draining, credential creation, expiry or output flushing.
     pub fn handle(&self, request: Request<Vec<u8>>) -> Result<HttpReply, HttpServiceError> {
-        self.handle_profile(request, DispatchProfile::Typed)
+        self.handle_profile(request, DispatchProfile::Typed, &||false)
     }
     /// Dispatch the observed HTTP1 profile. The owning transport must retain every
     /// Root job/result and observe its effects before handing off response bytes.
@@ -643,8 +801,9 @@ impl NativeHttpService {
     fn handle_observed_transport(
         &self,
         request: Request<Vec<u8>>,
+        peer_closed: &(dyn Fn()->bool+Sync),
     ) -> Result<HttpReply, HttpServiceError> {
-        self.handle_profile(request, DispatchProfile::ObservedHttp1)
+        self.handle_profile(request, DispatchProfile::ObservedHttp1, peer_closed)
     }
     /// Shared public-bootstrap/protected authorization and response/error/state encoding.
     /// The finite public allowlist grants no API access. Profile changes capability
@@ -653,6 +812,7 @@ impl NativeHttpService {
         &self,
         request: Request<Vec<u8>>,
         profile: DispatchProfile,
+        peer_closed: &(dyn Fn()->bool+Sync),
     ) -> Result<HttpReply, HttpServiceError> {
         let head = request.method() == Method::HEAD;
         if login::public(&request) || self.root_login(&request) {
@@ -698,10 +858,14 @@ impl NativeHttpService {
             .authority
             .authorize(&request)
             .map_err(HttpServiceError::Access)
-            .and_then(|()| self.route(&request, profile));
+            .and_then(|()| self.route(&request, profile, peer_closed));
         match result {
             Ok(body) => {
                 let mut response = response(StatusCode::OK, body.bytes, head, None);
+                // Fixed protocol route only, after protected Root success. Errors remain JSON.
+                if request.uri().path()=="/api/v1/web-requests/script.js"{response.headers_mut().insert(CONTENT_TYPE,HeaderValue::from_static("application/javascript; charset=utf-8"));}
+                if !body.auxiliary_effects.is_empty(){response.extensions_mut().insert(observation::AuxiliaryEffects(body.auxiliary_effects));}
+                if let Some(receipt)=body.provider_probe {response.extensions_mut().insert(receipt);}
                 if let Some(publication)=body.trust_publication{response.extensions_mut().insert(observation::TrustPublication(publication));}
                 if !body.observation_causes.is_empty() {
                     response.extensions_mut().insert(observation::ObservationCauses(
@@ -725,8 +889,10 @@ impl NativeHttpService {
         &self,
         request: &Request<Vec<u8>>,
         profile: DispatchProfile,
+        peer_closed: &(dyn Fn()->bool+Sync),
     ) -> Result<RouteBody, HttpServiceError> {
         match request.uri().path() {
+            "/api/v1/providers/connections/test"=>self.api_connection_probe(request,peer_closed),
             "/api/v1/native-version" => {
                 if request.method() != Method::GET && request.method() != Method::HEAD {
                     return Err(HttpServiceError::Method("GET, HEAD"));
@@ -738,13 +904,13 @@ impl NativeHttpService {
                 let history: serde_json::Value = serde_json::from_slice(include_bytes!("../../../../version_history.json"))
                     .map_err(HttpServiceError::Json)?;
                 serde_json::to_vec(&serde_json::json!({"schema_version":1,"binary":binary,"history":history}))
-                    .map(RouteBody::plain).map_err(HttpServiceError::Json)
+                    .map(RouteBody::plain).map_err(HttpServiceError::ResponseJson)
             }
             "/api/v1/native-session" => {
                 if request.method() != Method::GET && request.method() != Method::HEAD {
                     return Err(HttpServiceError::Method("GET, HEAD"));
                 }
-                serde_json::to_vec(&serde_json::json!({"schema_version":1,"csrf_token":self.authority.csrf_token(),"csrf_format":"hmac-sha256-v1","legacy_csrf_header":true,"host":self.authority.host()})).map(RouteBody::plain).map_err(HttpServiceError::Json)
+                serde_json::to_vec(&serde_json::json!({"schema_version":1,"csrf_token":self.authority.csrf_token(),"csrf_format":"hmac-sha256-v1","legacy_csrf_header":true,"host":self.authority.host()})).map(RouteBody::plain).map_err(HttpServiceError::ResponseJson)
             }
             "/api/v1/native-capabilities" => {
                 if request.method() != Method::GET && request.method() != Method::HEAD {
@@ -752,10 +918,15 @@ impl NativeHttpService {
                 }
                 serde_json::to_vec(&profile.capabilities())
                     .map(RouteBody::plain)
-                    .map_err(HttpServiceError::Json)
+                    .map_err(HttpServiceError::ResponseJson)
             }
+            "/api/v1/run-limits"|"/api/v1/run-limits/effective"|"/api/v1/run-limits/preview"|"/api/v1/run-limits/apply"|"/api/v1/run-limits/rollback"|"/api/v1/run-limits/rollback/preview"=>self.run_limits_admin(request),
+            "/api/v1/project-profile"=>self.project_profile_status(request),
+            "/api/v1/project-profile/catalog"|"/api/v1/project-profile/preview"|"/api/v1/project-profile/apply"|"/api/v1/project-profile/select"=>self.project_profile_configuration(request),
             "/api/v1/preparations/command" => self.preparation_command(request),
-            "/api/v1/preparations" | "/api/v1/preparations/methods" | "/api/v1/preparations/show" | "/api/v1/preparations/history" => self.preparations(request),
+            "/api/v1/preparations/send"|"/api/v1/preparations/stop"|"/api/v1/preparations/capabilities"=>self.preparation_calls(request),
+            "/api/v1/preparations/template-check"=>self.preparation_template_check(request),
+            "/api/v1/preparations" | "/api/v1/preparations/methods" | "/api/v1/preparations/show" | "/api/v1/preparations/history" | "/api/v1/preparations/release-review" | "/api/v1/preparations/budget" | "/api/v1/preparations/files" | "/api/v1/preparations/source" | "/api/v1/preparations/templates" | "/api/v1/preparations/dialogue" => self.preparations(request),
             "/api/v1/works" => {
                 if request.method() != Method::GET && request.method() != Method::HEAD {
                     return Err(HttpServiceError::Method("GET, HEAD"));
@@ -782,10 +953,27 @@ impl NativeHttpService {
                 }
                 Err(HttpServiceError::Refused("live-events-transport-required"))
             }
+            "/api/v1/planning-history"=>self.planning_history(request),
+            "/api/v1/lifecycle/missions"=>self.lifecycle_inventory(request),
             "/api/v1/planning" => self.planning(request),
             "/api/v1/mission" => self.mission(request),
             "/api/v1/pricing" => self.pricing_route(if request.method() == Method::POST { pricing::PricingOperation::Save } else { pricing::PricingOperation::Show }, request),
             "/api/v1/pricing/estimate" => self.pricing_route(pricing::PricingOperation::Estimate, request),
+            "/api/v1/providers/policies" => self.provider_policies(request),
+            "/api/v1/providers/resolve" => self.provider_model(request),
+            "/api/v1/providers/admin" => self.provider_admin(request),
+            "/api/v1/visit"=>self.session_visit(request,true),
+            "/api/v1/visit-state"=>self.session_visit(request,false),
+            "/api/v1/runtime-health"=>self.runtime_health(request),
+            "/api/v1/logs"=>self.log_query(request),
+            "/api/v1/log-read-policy"|"/api/v1/log-read-policy/preview"|"/api/v1/log-read-policy/apply"=>self.log_read_policy(request),
+            "/api/v1/activity"=>self.activity(request),
+            "/api/v1/activity-policy"|"/api/v1/activity-policy/preview"|"/api/v1/activity-policy/apply"=>self.activity_read_policy(request),
+            "/api/v1/exchanges"=>self.exchanges(request),
+            "/api/v1/graph-performance"|"/api/v1/graph-performance/preview"|"/api/v1/graph-performance/apply"=>self.graph_performance_policy(request),
+            "/api/v1/web-requests"|"/api/v1/web-requests/preview"|"/api/v1/web-requests/apply"|"/api/v1/web-requests/script.js"=>self.web_request_policy(request),
+            "/api/v1/provider-wait" | "/api/v1/provider-wait/preview" | "/api/v1/provider-wait/apply" => self.provider_wait(request),
+            "/api/v1/providers/connections" => self.api_connections(request),
             "/api/v1/work-resume" => self.work_resume(work_resume::Operation::Calculated, request),
             "/api/v1/work-recorded-resume" => self.work_resume(work_resume::Operation::Recorded, request),
             "/api/v1/agent-transcript" => self.agent_transcript(request),
@@ -814,6 +1002,8 @@ impl NativeHttpService {
             #[cfg(target_os = "linux")]
             "/api/v1/quotas/apply" => self.quotas(quotas::Operation::Apply,request),
             "/api/v1/trust-actions" => self.trust_actions(request),
+            #[cfg(target_os = "linux")]
+            "/api/v1/protection/linux-prerequisites" => paea::linux_prerequisites(request),
             "/api/v1/protection/receipt-report" => paea::receipt_report(request),
             "/api/v1/protection/resolve-payment" => paea::resolve_payment(request),
             "/api/v1/protection/compare" => paea::compare(request),
@@ -876,7 +1066,7 @@ impl NativeHttpService {
             let work = outcome.result.work;
             recorded = Some((work.id.clone(), work.revision));
             swarm_engine::encode_model(&work)
-                .map(|bytes| RouteBody { trust_publication:None, preparation_receipt:None, observation_causes: Vec::new(),
+                .map(|bytes| RouteBody { auxiliary_effects:Vec::new(), provider_probe:None, trust_publication:None, preparation_receipt:None, observation_causes: Vec::new(),
                     bytes,
                     recorded_work: recorded.clone(),
                     configuration_recorded: false,
@@ -900,6 +1090,9 @@ impl NativeHttpService {
 /// Err; it never manufactures empty success or rolls back a known transaction.
 fn error_reply(error: HttpServiceError, head: bool) -> Result<HttpReply, HttpServiceError> {
     let mut document = serde_json::json!({"schema_version":1,"error":error.code(),"failure":{"code":error.code()}});
+    if let Some(probe)=error.provider_probe(){document["provider_contact_may_have_occurred"]=probe.contact_may_have_occurred.into();}
+    #[cfg(target_os="linux")]
+    if let Some(reason)=project_profile::public_reason(&error){document["failure"]["reason"]=reason.into();}
     if let Some((work, revision)) = error.recorded_work() {
         document["recorded_work"] = serde_json::json!({"id":work,"revision":revision});
     }
@@ -925,6 +1118,8 @@ fn error_reply(error: HttpServiceError, head: bool) -> Result<HttpReply, HttpSer
             }
         }
     }
+    let auxiliary=error.auxiliary_effects();
+    if !auxiliary.is_empty(){document["auxiliary_effects"]=match serde_json::to_value(auxiliary){Ok(value)=>value,Err(cause)=>return Err(HttpServiceError::ResponseEncoding {primary:Box::new(error),cause})};}
     let body = match serde_json::to_vec(&document) {
         Ok(body) => body,
         Err(cause) => {
@@ -1274,3 +1469,6 @@ mod tests {
 }
 
 mod preparations;
+
+#[cfg(target_os="linux")]
+mod project_profile;

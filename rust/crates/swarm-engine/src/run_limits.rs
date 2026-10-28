@@ -14,6 +14,9 @@ impl RuntimeLimitPolicy {
     pub(crate) fn new(defaults: [i64; 5], ceilings: [Option<i64>; 5]) -> Self {
         Self { defaults, ceilings }
     }
+    /// Return saved nullable definition ceilings in canonical five-field order.
+    /// Observational only: no default adoption, mutation or execution authority.
+    pub(crate) fn definition_ceilings(&self)->[Option<i64>;5]{self.ceilings}
     /// Validate an override without substituting defaults. Zero inherits; positive
     /// values obey the saved nullable ceilings. Observation is a protocol enum,
     /// not permission: only an authoritative administrative consumer may supply it.

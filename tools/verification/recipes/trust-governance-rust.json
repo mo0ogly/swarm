@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "id": "trust-governance-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/biba.rs",
+    "rust/crates/swarm-engine/src/trust_types.rs",
+    "rust/crates/swarm-engine/src/trust/*.rs",
+    "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/local_storage.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-engine/config/trust-controls-defaults.json",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/src/trust.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/*.rs",
+    "rust/crates/swarm-engine/tests/trust_biba.rs",
+    "web/trust-native.*",
+    "web/i18n*.js",
+    "locales/en.json",
+    "tests/rust_trust_biba*",
+    "docs/actions-confiance-rust.md",
+    "docs/architecture/BIBA-RUST.md",
+    "docs/en/BIBA-RUST.md",
+    "docs/en/actions-confiance-rust.md",
+    "version_history.json",
+    "tests/rust_trust_biba_unit.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-engine/src/root_store/trust_evidence_runtime.rs",
+    "rust/crates/swarm-engine/tests/trust_governance.rs",
+    "tests/rust_trust_governance*",
+    "docs/architecture/BIBA-GOUVERNANCE-RUST.md",
+    "docs/en/BIBA-GOVERNANCE-RUST.md",
+    "rust/crates/swarm-engine/src/root_store/trust_enrollment.rs",
+    "rust/crates/swarm-engine/tests/trust_enrollment.rs",
+    "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "native-governance",
+      "command": [
+        "python3",
+        "tests/rust_trust_governance_unit.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "GOVERNANCE_UNIT_PASS 11 named tests",
+        "test governance_reconcile_survives_later_group_conflict ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-governance",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile; from pathlib import Path; p=Path(tempfile.mkdtemp(prefix='trust-governance-replay-',dir='.cache')).resolve()/'journey'; subprocess.run(['python3','tests/rust_trust_governance.py','--binary',os.environ['SWARM_BIBA_BINARY'],'--browser','--output',str(p)],check=True); print('GOVERNANCE_REPLAY_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS same-principal-effect-denied",
+        "PASS audit-complete-links",
+        "PASS business-replay-after-server-restart",
+        "PASS extension-across-rotation",
+        "PASS governance-browser-public-flow",
+        "GOVERNANCE_PUBLIC_PASS",
+        "GOVERNANCE_REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "invalid-governance",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile; from pathlib import Path; p=Path(tempfile.mkdtemp(prefix='trust-governance-invalid-',dir='.cache')).resolve()/'journey'; subprocess.run(['python3','tests/rust_trust_governance_invalid.py','--binary',os.environ['SWARM_BIBA_BINARY'],'--output',str(p)],check=True); print('GOVERNANCE_INVALID_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS duplicate-principal-refused-without-mutation",
+        "GOVERNANCE_INVALID_PASS 8"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

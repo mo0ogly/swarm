@@ -70,15 +70,7 @@ pub(in crate::root_store) fn acquire_using(root:&RootStore,work:&str,request:&Re
             if job.work_id!=work || job.task_id!=request.task_id || candidate.work!=work || candidate.task!=request.task_id {
                 return Err(E::Refused("review-managed-candidate-mismatch"));
             }
-            let plan=candidate.control_plan.as_ref().ok_or(E::Refused("review-managed-plan-required"))?;
-            let observations:Vec<_>=plan.slots.iter().zip(&receipt.steps).map(|(slot,(original,_))|serde_json::json!({
-                "task_id":slot.task_id,"ordinal":slot.ordinal,"transport_id":slot.transport_id,
-                "control":slot.control,"result":original.result})).collect();
-            let metadata=serde_json::json!({"schema_version":1,"inspection_only":true,
-                "candidate_commit":candidate.commit,"previous_candidate":candidate.previous,
-                "candidate_binding_sha256":candidate.binding_digest().map_err(launch)?,
-                "cohort_contract_sha256":candidate.contract,"control_job_id":job.id,
-                "control_receipt_sha256":hash,"policies":plan.policies,"control_observations":observations});
+            let metadata=recorded_metadata(&receipt,&job,&hash)?;
             Ok(Some((job,candidate.clone(),metadata)))
         })();
         finished(result,tx.rollback().map_err(E::Sql))
@@ -88,6 +80,23 @@ pub(in crate::root_store) fn acquire_using(root:&RootStore,work:&str,request:&Re
         let session=managed_execution::acquire_for_review(root,&job,&candidate,review)?;
         Ok(ReviewCandidate{session,job,metadata,review:review.cloned()})
     }).transpose()
+}
+/// Rebuild the exact public-shaped current review metadata from verified native
+/// control originals. Caller must establish job/step custody and complete success
+/// first. No caller-supplied hashes or observations are promoted into authority;
+/// missing managed plans/preimages and codec failures refuse without mutation.
+pub(super) fn recorded_metadata(receipt:&Receipt, job:&store::Job, hash:&str)->Result<serde_json::Value,E>{
+    let candidate=receipt.managed_candidate.as_ref().ok_or(E::Refused("review-managed-candidate-required"))?;
+    candidate.verify_binding().map_err(launch)?;
+    let plan=candidate.control_plan.as_ref().ok_or(E::Refused("review-managed-plan-required"))?;
+    let observations:Vec<_>=plan.slots.iter().zip(&receipt.steps).map(|(slot,(original,_))|serde_json::json!({
+        "task_id":slot.task_id,"ordinal":slot.ordinal,"transport_id":slot.transport_id,
+        "control":slot.control,"result":original.result})).collect();
+    Ok(serde_json::json!({"schema_version":1,"inspection_only":true,
+        "candidate_commit":candidate.commit,"previous_candidate":candidate.previous,
+        "candidate_binding_sha256":candidate.binding_digest().map_err(launch)?,
+        "cohort_contract_sha256":candidate.contract,"control_job_id":job.id,
+        "control_receipt_sha256":hash,"policies":plan.policies,"control_observations":observations}))
 }
 /// Retain a typed launch cause behind the actual Root error family.
 fn launch(error:A)->E{E::Launch(Box::new(error))}

@@ -70,7 +70,11 @@ impl TrustPolicy {
 #[serde(deny_unknown_fields)]
 pub(crate) struct TrustIdentityInput {
     pub subject: String,
+    #[serde(default)]
     pub token: String,
+    /// Role mapping data only; an active held enrollment must authenticate it.
+    #[serde(default)]
+    pub enrollment_principal: Option<swarm_identity_contract::Principal>,
     pub integrity: i64,
     pub roles: Vec<String>,
     #[serde(default)]
@@ -82,6 +86,9 @@ pub(crate) struct TrustIdentityInput {
 pub(crate) struct TrustIdentity {
     pub subject: String,
     pub token_hash: String,
+    /// Exact canonical identity mapping, never a stored authentication proof.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub enrollment_principal: Option<swarm_identity_contract::Principal>,
     pub integrity: i64,
     pub roles: Vec<String>,
     #[serde(default, skip_serializing_if = "is_false")]
@@ -103,7 +110,7 @@ pub(crate) fn token_hash(token: &str) -> String {
 }
 
 /// Credential representation check: minimum length, forbidden whitespace
-/// (space, tab, CR, LF), and forbidden lowercase `remplacer-`/`replace-`
+/// (space, tab, CR, LF), and forbidden `remplacer-`/`replace-` (ASCII case-insensitive)
 /// prefixes. Not an authentication: it only filters well-formed tokens.
 pub(crate) fn credential_valid(token: &str) -> bool {
     if token.len() < 16 {
@@ -132,7 +139,9 @@ pub(crate) fn credential_valid(token: &str) -> bool {
 /// - subjects unique and token digests unique;
 /// - subject must satisfy `swarm_identity_contract::name`;
 /// - integrity in 1..=3;
-/// - token passes [`credential_valid`];
+/// - local token passes [`credential_valid`]; an enrollment mapping instead
+///   requires an exact valid human Principal and an empty/omitted local token;
+/// - enrollment IDs and issuer/subject pairs are unique, rejecting aliases;
 /// - roles restricted to `requester|approver|admin|effect`, then sorted
 ///   lexicographically; duplicates are kept, not deduplicated and not
 ///   rejected (Go allows them);
@@ -149,6 +158,7 @@ pub(crate) fn prepare_identities(
     let mut out = Vec::with_capacity(inputs.len());
     let mut seen_subject: Vec<String> = Vec::new();
     let mut seen_hash: Vec<String> = Vec::new();
+    let mut seen_principals: Vec<swarm_identity_contract::Principal> = Vec::new();
     for i in inputs {
         if !swarm_identity_contract::name(i.subject.as_bytes()) {
             return Err("subject does not match identity contract");
@@ -159,13 +169,22 @@ pub(crate) fn prepare_identities(
         if !(1..=3).contains(&i.integrity) {
             return Err("integrity out of range");
         }
-        if !credential_valid(&i.token) {
-            return Err("token fails credential format checks");
-        }
-        let hash = token_hash(&i.token);
-        if seen_hash.contains(&hash) {
-            return Err("duplicate token digest");
-        }
+        let hash = if let Some(p) = &i.enrollment_principal {
+            if !p.valid() || p.kind != "human" || !i.token.is_empty() {
+                return Err("enrollment mapping requires human principal and no local token");
+            }
+            if seen_principals.iter().any(|q| q.id == p.id || q.issuer == p.issuer && q.subject == p.subject) {
+                return Err("duplicate enrollment principal or issuer subject");
+            }
+            seen_principals.push(p.clone());
+            String::new()
+        } else {
+            if !credential_valid(&i.token) { return Err("token fails credential format checks"); }
+            let hash = token_hash(&i.token);
+            if seen_hash.contains(&hash) { return Err("duplicate token digest"); }
+            seen_hash.push(hash.clone());
+            hash
+        };
         let mut roles = Vec::with_capacity(i.roles.len());
         for r in &i.roles {
             match r.as_str() {
@@ -175,10 +194,10 @@ pub(crate) fn prepare_identities(
         }
         roles.sort();
         seen_subject.push(i.subject.clone());
-        seen_hash.push(hash.clone());
         out.push(TrustIdentity {
             subject: i.subject,
             token_hash: hash,
+            enrollment_principal: i.enrollment_principal,
             integrity: i.integrity,
             roles,
             disabled: i.disabled,
@@ -201,6 +220,7 @@ mod tests {
         TrustIdentityInput {
             subject: subject.to_string(),
             token: token.to_string(),
+            enrollment_principal: None,
             integrity,
             roles: roles.iter().map(|s| s.to_string()).collect(),
             disabled,
@@ -294,7 +314,7 @@ mod tests {
         assert!(!credential_valid("has space in it yes"));
         assert!(!credential_valid("replace-this-is-long"));
         assert!(!credential_valid("remplacer-long-token"));
-        assert!(credential_valid("Remplace-long-token")); // case-sensitive prefix check
+        assert!(credential_valid("Remplace-long-token")); // different spelling, not a case variant
         assert!(token_hash("x") != token_hash("y"));
         // disabled input is honored (omitted => false is exercised by serde default)
         let out = prepare_identities(vec![

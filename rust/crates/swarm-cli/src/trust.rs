@@ -36,6 +36,8 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
             | "reconcile"
             | "read-object"
             | "read-original"
+            | "audit-transaction"
+            | "public-anchor" | "public-verify" | "evidence-key-prepare" | "evidence-key-activate" | "evidence-key-revoke"
     ) {
         return Err(CliError::Usage);
     }
@@ -56,12 +58,12 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         })
         .map_err(CliError::CommandInput)?
     };
-    if op == "verify" {
-        let bytes = swarm_engine::verify_trust(&raw).map_err(|e| CliError::Trust(Box::new(e)))?;
+    if matches!(op,"verify"|"public-verify") {
+        let bytes = (if op=="verify"{swarm_engine::verify_trust(&raw)}else{swarm_engine::verify_public_trust(&raw)}).map_err(|e| CliError::Trust(Box::new(e)))?;
         write_output(out, &bytes)?;
         return Ok(0);
     }
-    let readonly = read || matches!(op, "config-preview" | "read-object" | "read-original");
+    let readonly = read || matches!(op, "config-preview" | "read-object" | "read-original" | "public-anchor");
     let store = swarm_engine::RootStore::open(Path::new(&a.root), !readonly)
         .map_err(|e| CliError::Root(Box::new(e)))?;
     let token = std::env::var("SWARM_TRUST_TOKEN").unwrap_or_default();
