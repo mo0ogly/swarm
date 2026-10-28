@@ -3,7 +3,7 @@
 
 No Compose configuration, real mission, provider or global watchdog. BuildKit
 caches are derivatives; image identity, original channels and data remain in fresh
-private evidence. Cleanup can remove only this test's uniquely named container.
+private evidence. Missing output parents are created; existing output is refused. Cleanup can remove only this test's uniquely named container.
 """
 import argparse,hashlib,json,os,socket,subprocess,urllib.request,uuid
 from pathlib import Path
@@ -11,7 +11,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def main():
     """Check image build, singular JSON output, persistence, API and no Go tool."""
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',required=True,type=Path);a=p.parse_args();out=a.output.resolve();out.mkdir(mode=0o700,exist_ok=False);project=out/'project';project.mkdir();calls=[];checks=[];name='swarm-rust-install-'+uuid.uuid4().hex;image=name+':test';started=False;primary=None
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',required=True,type=Path);a=p.parse_args();out=a.output.resolve();out.mkdir(mode=0o700,parents=True,exist_ok=False);project=out/'project';project.mkdir();calls=[];checks=[];name='swarm-rust-install-'+uuid.uuid4().hex;image=name+':test';started=False;primary=None
     def call(args,value=None):
         """Record exact subprocess channels, propagating every failure without retry."""
         index=len(calls)+1

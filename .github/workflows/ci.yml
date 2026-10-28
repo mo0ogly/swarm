@@ -46,4 +46,6 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - run: rustup toolchain install 1.96.0 --profile minimal && rustup default 1.96.0
       - run: cargo fetch --locked --manifest-path rust/Cargo.toml
-      - run: make test-install
+      - run: |
+          python3 tests/test_rust_install_outputs.py
+          make test-install

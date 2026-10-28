@@ -3,6 +3,7 @@
 
 No Go, Docker daemon, real mission or provider. Preserve exact subprocess channels,
 installed version/hash, public init/work persistence and bundled method reads.
+Missing output parents are created; an existing output is refused without overwrite.
 A failed prerequisite stops the recipe; no watchdog or implicit retry.
 """
 import argparse,hashlib,json,os,subprocess
@@ -11,7 +12,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def main():
     """Install through the public shell into a fresh output and verify actual CLI."""
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',type=Path,required=True);a=parser.parse_args();out=a.output.resolve();out.mkdir(mode=0o700,exist_ok=False)
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',type=Path,required=True);a=parser.parse_args();out=a.output.resolve();out.mkdir(mode=0o700,parents=True,exist_ok=False)
     project=out/'project with spaces';project.mkdir();(project/'keep.txt').write_text('preserved');bin_dir=out/'native bin';calls=[];checks=[]
     def call(args,value=None):
         """Retain original argv/channels, stop on failure, never print private data."""
