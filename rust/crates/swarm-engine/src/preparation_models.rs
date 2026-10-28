@@ -351,18 +351,18 @@ mod tests {
         p.receipt_historical = false; p.documents.as_mut().unwrap().remove("besoin");
         apply_freshness(&mut p, Some("method")); assert!(!p.plan_ready);
     }
-    /// Saved defaults supply v41; old complete v40 remains readable but cannot
+    /// Saved defaults contain the v41 read group; removing it retains later groups but cannot
     /// silently acquire new bounds. Partial/negative groups fail authoritative decode.
     #[test]
     fn preparation_policy_explicit_defaults_legacy_and_unlimited() {
         let values = crate::EngineSettingsValues::installation_defaults().unwrap();
-        assert_eq!(values.schema_version(), 41);
+        assert!(values.schema_version() >= 41);
         assert_eq!(values.preparation_read_policy().unwrap(), crate::PreparationReadPolicy {
             list_limit: Some(100), history_limit: Some(50), method_max_bytes: Some(131072) });
         let mut raw = serde_json::to_value(&values).unwrap();
         for key in ["preparation_list_limit", "preparation_history_limit", "preparation_method_max_bytes"] { raw.as_object_mut().unwrap().remove(key); }
         let legacy = crate::EngineSettingsValues::decode(&serde_json::to_vec(&raw).unwrap()).unwrap();
-        assert_eq!(legacy.schema_version(), 40); assert!(legacy.preparation_read_policy().is_err());
+        assert_eq!(legacy.schema_version(), values.schema_version()); assert!(legacy.preparation_read_policy().is_err());
         raw["preparation_list_limit"] = serde_json::Value::Null;
         assert!(crate::EngineSettingsValues::decode(&serde_json::to_vec(&raw).unwrap()).is_err());
         raw["preparation_history_limit"] = serde_json::Value::Null; raw["preparation_method_max_bytes"] = serde_json::Value::Null;

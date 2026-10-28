@@ -1118,14 +1118,10 @@ mod tests {
             panic!("outside path must preserve Gate cause")
         };
         assert_eq!(error.reason(), "artifact-path");
-        assert!(matches!(
-            error
-                .source()
-                .and_then(|cause| cause.downcast_ref::<crate::LocalPathError>()),
-            Some(crate::LocalPathError::Refused(
-                crate::PathRefusal::OutsideProject
-            ))
-        ));
+        assert!(super::mission_status_evidence::artifact_cause_matches(&error, |cause| matches!(
+            cause.downcast_ref::<crate::LocalPathError>(),
+            Some(crate::LocalPathError::Refused(crate::PathRefusal::OutsideProject))
+        )));
         disk::remove_file(fixture.0.join("docs/task-handoff-link.md")).unwrap();
         symlink("../inside.md", fixture.0.join("docs/task-handoff-link.md")).unwrap();
         assert_eq!(task_reports(&fixture.0, "task").unwrap(), linked);

@@ -17,7 +17,16 @@ def main():
         index=len(calls)+1
         with (out/(str(index)+'.stdout')).open('xb') as stdout,(out/(str(index)+'.stderr')).open('xb') as stderr:
             r=subprocess.run(args,cwd=ROOT,input=None if value is None else json.dumps(value).encode(),stdout=stdout,stderr=stderr)
-        calls.append(dict(argv=args,exit=r.returncode));(out/'commands.json').write_text(json.dumps(calls,indent=2));assert r.returncode==0,(index,r.returncode);return (out/(str(index)+'.stdout')).read_bytes()
+        calls.append(dict(argv=args,exit=r.returncode));(out/'commands.json').write_text(json.dumps(calls,indent=2))
+        if r.returncode != 0:
+            # This fixture runs no provider or secret transfer. Preserve full original
+            # channels and expose the failed build/runtime diagnostic to CI.
+            import sys
+            for suffix in ('stdout','stderr'):
+                sys.stderr.buffer.write((out/(str(index)+'.'+suffix)).read_bytes())
+            sys.stderr.flush()
+            raise AssertionError((index,r.returncode))
+        return (out/(str(index)+'.stdout')).read_bytes()
     def check(label,value):
         """Retain distinct observable assertions, never count zero-test success."""
         assert value,label;assert label not in checks;checks.append(label);print('PASS docker-install-'+label,flush=True)

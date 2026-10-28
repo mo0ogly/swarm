@@ -70,6 +70,26 @@ fn missing(error: &(dyn Error + 'static)) -> bool {
     }
     false
 }
+/// Inspect typed primary/IO/anchored causes without parsing messages or dropping
+/// wrappers. Cycles are deduplicated; this projection grants no file access and
+/// does not classify cleanup as semantic (the caller rejects cleanup first).
+pub(super) fn artifact_cause_matches(error: &(dyn Error + 'static), predicate: impl Fn(&(dyn Error + 'static)) -> bool) -> bool {
+    let mut pending = vec![error];
+    let mut seen: Vec<*const dyn Error> = vec![];
+    while let Some(error) = pending.pop() {
+        let pointer = error as *const dyn Error;
+        if seen.iter().any(|old| std::ptr::eq(*old, pointer)) { continue; }
+        seen.push(pointer);
+        if predicate(error) { return true; }
+        #[cfg(target_os = "linux")]
+        for (_, cause) in crate::native_error_links(error).children { pending.push(cause); }
+        #[cfg(not(target_os = "linux"))]
+        if let Some(io) = error.downcast_ref::<io::Error>() {
+            if let Some(cause) = io.get_ref() { pending.push(cause); }
+        } else if let Some(cause) = error.source() { pending.push(cause); }
+    }
+    false
+}
 /// Classify the existing artifact parser's typed/closed reason vocabulary,
 /// never Display text. A secondary close error always invalidates the read.
 /// Unknown caused errors are conservatively returned, not called stale.
@@ -78,14 +98,14 @@ pub(super) fn semantic_artifact(error: &GateEvaluationError) -> bool {
         return false;
     }
     match error.reason() {
-        "artifact-path" => error.source().is_some_and(|e| {
+        "artifact-path" => artifact_cause_matches(error, |e| {
             missing(e)
                 || matches!(
                     e.downcast_ref::<crate::LocalPathError>(),
                     Some(crate::LocalPathError::Refused(_))
                 )
         }),
-        "artifact-open" => error.source().is_some_and(missing),
+        "artifact-open" => artifact_cause_matches(error, missing),
         "artifact-read"
         | "artifact-metadata"
         | "artifact-close"
@@ -93,9 +113,7 @@ pub(super) fn semantic_artifact(error: &GateEvaluationError) -> bool {
         | "artifact-byte-limit-exceeded" => false,
         _ => {
             error.source().is_none()
-                || error
-                    .source()
-                    .is_some_and(|e| e.is::<crate::gate_json::JsonError>())
+                || artifact_cause_matches(error, |e| e.is::<crate::gate_json::JsonError>())
         }
     }
 }
@@ -391,6 +409,19 @@ impl RootStore {
 #[cfg(test)]
 mod tests {
     use super::*;
+    /// Typed nested path/missing errors survive wrappers; permissions and text
+    /// resembling ENOENT remain infrastructure errors, never stale evidence.
+    #[test]
+    fn status_artifact_cause_wrappers_preserve_refusal_and_missing_only() {
+        let path = io::Error::other(crate::LocalPathError::Refused(crate::PathRefusal::OutsideProject));
+        assert!(artifact_cause_matches(&path, |e| matches!(e.downcast_ref::<crate::LocalPathError>(), Some(crate::LocalPathError::Refused(crate::PathRefusal::OutsideProject)))));
+        let absent = io::Error::other(io::Error::from(io::ErrorKind::NotFound));
+        assert!(artifact_cause_matches(&absent, missing));
+        let denied = io::Error::other(io::Error::from(io::ErrorKind::PermissionDenied));
+        assert!(!artifact_cause_matches(&denied, missing));
+        assert!(!artifact_cause_matches(&io::Error::other("No such file or directory"), missing));
+    }
+
     /// Pure graph fixture: eligibility is deliberately supplied, not a real proof.
     fn task(id: &str, deps: &[&str]) -> Task {
         Task {

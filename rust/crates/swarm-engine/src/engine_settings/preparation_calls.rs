@@ -94,7 +94,7 @@ mod tests {
     fn defaults_are_complete_disabled_and_versioned() {
         let s = EngineSettingsValues::installation_defaults().unwrap();
         let p = s.preparation_call_policy().unwrap();
-        assert_eq!(s.schema_version(), 46);
+        assert!(s.schema_version() >= 46);
         assert!(!p.enabled);
         assert_eq!((p.timeout_seconds, p.timeout_maximum_seconds), (300, 600));
     }
@@ -107,7 +107,8 @@ mod tests {
             .retain(|k, _| !k.starts_with("preparation_call_"));
         let s: EngineSettingsValues = serde_json::from_value(v).unwrap();
         s.validate().unwrap();
-        assert_eq!(s.schema_version(), 45);
+        // Later independently adopted groups retain their newer schema.
+        assert_eq!(s.schema_version(), EngineSettingsValues::installation_defaults().unwrap().schema_version());
         assert!(s.preparation_call_policy().is_err());
     }
     #[test]

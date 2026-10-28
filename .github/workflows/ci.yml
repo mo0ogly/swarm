@@ -49,3 +49,20 @@ jobs:
       - run: |
           python3 tests/test_rust_install_outputs.py
           make test-install
+
+      - name: Retain installation diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: installation-diagnostics
+          path: |
+            .cache/install-native-*/commands.json
+            .cache/install-native-*/*.stdout
+            .cache/install-native-*/*.stderr
+            .cache/install-native-*/result.json
+            .cache/install-docker-*/commands.json
+            .cache/install-docker-*/*.stdout
+            .cache/install-docker-*/*.stderr
+            .cache/install-docker-*/result.json
+          if-no-files-found: warn
+          include-hidden-files: true
