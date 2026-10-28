@@ -1,0 +1,17 @@
+from pathlib import Path
+import json,hashlib,subprocess,datetime,sys,tempfile
+b=Path('docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017');inputs=json.loads((b/'inputs-final.json').read_text())
+def changed():return [p for p,h in inputs.items() if hashlib.sha256(Path(p).read_bytes()).hexdigest()!=h]
+def run(cmd):
+ before=changed();assert not before,before
+ start=datetime.datetime.now(datetime.timezone.utc).isoformat();r=subprocess.run(cmd,capture_output=True,text=True)
+ return r,dict(command=cmd,start=start,end=datetime.datetime.now(datetime.timezone.utc).isoformat(),exit_code=r.returncode,input_files=len(inputs),changed_inputs=changed())
+if sys.argv[1]=='race':
+ r,meta=run(['go','test','-race','-json','./internal/engine','-run','^TestAgentIdentity(Plan|Registry|Channel|Runtime)','-count=1','-timeout','120s']);(b/'race-final-run.json').write_text(json.dumps(meta,indent=2)+'\n');(b/'race-final.jsonl').write_text(r.stdout);(b/'race-final.stderr').write_text(r.stderr);ev=[json.loads(x) for x in r.stdout.splitlines()];s=dict(exit_code=r.returncode,runs=len([x for x in ev if x.get('Test') and x['Action']=='run']),passes=len([x for x in ev if x.get('Test') and x['Action']=='pass']),fails=[x.get('Test') for x in ev if x['Action']=='fail'],skips=[x.get('Test') for x in ev if x['Action']=='skip'],changed_inputs=meta['changed_inputs'],stderr=r.stderr[-1000:]);(b/'race-final-summary.json').write_text(json.dumps(s,indent=2)+'\n');print(json.dumps(s,indent=2))
+else:
+ records=[];binary=Path(tempfile.mkdtemp(prefix='swarm-identity-plan-build-'))/'swarm'
+ for cmd in [['go','vet','./internal/engine'],['go','build','-o',str(binary),'./cmd/swarm']]:
+  r,meta=run(cmd);meta.update(stdout=r.stdout,stderr=r.stderr);records.append(meta)
+ (b/'static-build-final.json').write_text(json.dumps(records,indent=2)+'\n')
+ if binary.exists():(b/'binary-final.json').write_text(json.dumps(dict(path=str(binary),sha256=hashlib.sha256(binary.read_bytes()).hexdigest(),deployed=False),indent=2)+'\n')
+ print(json.dumps([dict(command=x['command'],exit_code=x['exit_code'],changed_inputs=x['changed_inputs'],stderr=x['stderr'][-1500:]) for x in records],indent=2))

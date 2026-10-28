@@ -1,0 +1,8 @@
+{"Time":"2026-10-17T09:05:42.585996954+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-17T09:05:42.632768435+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityRegistryAtomicWriteRequiresSyncableDirectory"}
+{"Time":"2026-10-17T09:05:42.633223562+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityRegistryAtomicWriteRequiresSyncableDirectory","Output":"=== RUN   TestAgentIdentityRegistryAtomicWriteRequiresSyncableDirectory\n"}
+{"Time":"2026-10-17T09:05:42.634117965+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityRegistryAtomicWriteRequiresSyncableDirectory","Output":"--- PASS: TestAgentIdentityRegistryAtomicWriteRequiresSyncableDirectory (0.00s)\n"}
+{"Time":"2026-10-17T09:05:42.634160375+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityRegistryAtomicWriteRequiresSyncableDirectory","Elapsed":0}
+{"Time":"2026-10-17T09:05:42.638542345+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"PASS\n"}
+{"Time":"2026-10-17T09:05:42.642923983+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"ok  \tswarm.local/companion/internal/engine\t0.056s\n"}
+{"Time":"2026-10-17T09:05:42.643018992+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Elapsed":0.057}

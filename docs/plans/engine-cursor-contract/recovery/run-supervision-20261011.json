@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-11T09:14:22.356520+00:00",
+  "patch": "docs/plans/engine-cursor-contract/recovery/run-supervision-20261011.patch",
+  "sha256": "576d9fd0d3826415ec2698bb6a124e2fc40ac3179649a45385094574311a63b2",
+  "bytes": 88245,
+  "parent_patches": [
+    {
+      "path": "agent-engine-protocol-20261011.patch",
+      "sha256": "a9eb1ca8961e446e4d777c3202759c51e02c1c555e8929303853bb1f51f4cb84"
+    },
+    {
+      "path": "agent-engine-protocol-resumption-20261011-git.patch",
+      "sha256": "39d1d7b8c926282f206b0b5b69188cb38505caf6634ecdbfbe42879044e1e945"
+    },
+    {
+      "path": "agent-continuity-20261011.patch",
+      "sha256": "c644c794682b6878b278c7b3d9f4604051e350f3a7320cf930c3047c91738755"
+    }
+  ],
+  "normalized_parent": {
+    "original": "agent-engine-protocol-resumption-20261011.patch",
+    "replacement": "agent-engine-protocol-resumption-20261011-git.patch",
+    "reason": "Original preserved; three new-file mode headers missing in the original prevented application inside a Git repository. Separate packaging copy restores only new file mode 100644; all source hunks unchanged."
+  },
+  "files": [
+    "internal/engine/agents_process.go",
+    "internal/engine/agent_terminal_process.go",
+    "internal/engine/agents_store.go",
+    "internal/engine/loop_guard.go",
+    "internal/engine/planning.go",
+    "internal/engine/planning_runner.go",
+    "internal/engine/planning_schema.go",
+    "internal/engine/managed_integration.go",
+    "internal/engine/run_limits.go",
+    "internal/engine/supervision_r3_test.go",
+    "internal/engine/agent_terminal_test.go",
+    "internal/engine/loop_guard_test.go",
+    "internal/engine/worker_recovery_context_test.go",
+    "internal/engine/managed_git_test.go",
+    "internal/engine/agents_test.go",
+    "internal/engine/stream_regression_test.go",
+    "internal/engine/run_supervision.go",
+    "internal/engine/run_supervision_test.go",
+    "internal/engine/recovered_result.go",
+    "internal/engine/recovered_result_new_attempt_test.go",
+    "web/admin.js",
+    "web/pilot-actions.js",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "tests/run_limits_admin_ui.cjs",
+    "docs/architecture/RUN-SUPERVISION.md",
+    "docs/en/RUN-SUPERVISION.md",
+    "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
+    "docs/en/AGENT-ENGINE-PROTOCOL.md",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "docs/ATTEMPT-RECOVERY.md",
+    "docs/en/ATTEMPT-RECOVERY.md"
+  ],
+  "checks": {
+    "full_parent_reconstruction": "PASS with the normalized packaging copy",
+    "patch_application_and_reverse_check": "PASS",
+    "resulting_files_match_local": "PASS",
+    "race": "PASS 78.101s",
+    "admin": "PASS FR/EN and both themes, isolated root",
+    "full_go_suite": "PASS 1118 discovered targets, all 19 disjoint processes exit 0; optional skips explicit"
+  },
+  "limits": "No source-snapshot regeneration included: regenerate after native T1..T4 integration. No native acceptance or real AI time decision claimed."
+}

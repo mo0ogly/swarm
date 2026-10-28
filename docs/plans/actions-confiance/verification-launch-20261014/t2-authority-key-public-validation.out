@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-2/tests/actions_confiance_t2.py", line 83, in <module>
+    if a.criterion in (0,n):all_cases.extend(fn())
+                                             ~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-2/tests/actions_confiance_t2.py", line 45, in c1
+    first=call(root,'request',replay_input,TOKENS['alice']);state_path=root/'.swarm/trust-actions.json';retained=state_path.read_bytes();foreign=call(root,'request',replay_input,TOKENS['bob'],False);assert foreign.returncode==4 and retained==state_path.read_bytes();same=call(root,'request',replay_input,TOKENS['alice']);assert same==first
+                                                                                                                                                                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

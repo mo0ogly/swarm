@@ -1,0 +1,18 @@
+{
+  "go.mod": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+  "go.sum": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+  "internal/enrollmentauthority/authority.go": "6d051fc5ad657f22097e99b198f59b2bbee39a6b630ddb1c576b3178325ca555",
+  "internal/enrollmentauthority/authority_test.go": "e0bee7e39fe590dbccd8c3e2b46c9080d647ac913cc9554a39dfcc1346803f4c",
+  "internal/enrollmentauthority/reply_version_test.go": "a386a59411eddfb15a34963ab9ff6e1e0096201f84764f580cfad69d58fffb0d",
+  "internal/enrollmentproof/proof.go": "0b7b1976be1f34f64e9233e769acb084988fbf5df593442e9b69fcfb8217440f",
+  "internal/enrollmentproof/proof_test.go": "15898ca8835dc11be94a4f747045e2bdd5c4373ed9c104b861e64f2d64243530",
+  "internal/enrollmentrequest/request.go": "9af7c03c69997239ac246fa4f620893c57d3d58bec339f75eeecb16f50ca4f31",
+  "internal/enrollmentrequest/request_test.go": "bd925ac64ae511230a1fcc9132e932935ce741bb16d7a2ed70a60a81a262ba64",
+  "internal/enrollmentstate/journal.go": "b2587484295d0bc54fd4233e7e3a3f25d3912d7c2738c9c913e38ff737ff859a",
+  "internal/enrollmentstate/journal_test.go": "6794264e8eae25b8cb05dcf4c59f3a698395a073079a55f1e0ab4142a497c32a",
+  "internal/enrollmentstate/recovery_test.go": "648eaa86435154bd94b04740dad651433f5c84970417d1386a2850c12e88a51d",
+  "internal/enrollmentstate/reply.go": "2989216e0b098ce99d81ae43c97ed3e47e75918d468efe4647d74d63eccd3a68",
+  "internal/enrollmentstate/reply_test.go": "822b2ded07b5eaf1c6c470d0f9627509c811a682e56b5e9f3d33d31e8ac34069",
+  "internal/identitycontract/contract.go": "5eb8c945536080d376285ac547aea421bc196f7fc446375cbe2d9327721b1dd8",
+  "internal/identitycontract/contract_test.go": "3ca9b1020401471a5a3a887d063def73019eb32485f6b023277de776ae859ea7"
+}

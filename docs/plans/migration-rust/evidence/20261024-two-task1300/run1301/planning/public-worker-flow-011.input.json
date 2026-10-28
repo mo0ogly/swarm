@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "two-task-planning-pause",
+  "expected_revision": 7,
+  "reason": "Isolate public worker cycles from planner roles"
+}

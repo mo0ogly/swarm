@@ -1,0 +1,13 @@
+{
+  "error": "planning-call-binding-required",
+  "failure": {
+    "causes": [
+      "planning-call-binding-required",
+      "planning-call-binding-required"
+    ],
+    "code": "planning-call-binding-required",
+    "message": "planning-call-binding-required",
+    "retryable": false
+  },
+  "schema_version": 1
+}

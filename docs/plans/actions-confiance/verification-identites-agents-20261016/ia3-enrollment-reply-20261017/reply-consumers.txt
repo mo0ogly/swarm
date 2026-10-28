@@ -1,0 +1,16 @@
+internal/enrollmentstate/reply_test.go:35:	r, err := DecodeActiveReply(statement.Payload())
+internal/enrollmentstate/reply_test.go:43:	good := ActiveReply{Schema: ActiveReplySchema, Head: Head{Sequence: 2, Digest: strings.Repeat("a", 64)}, Record: Record{ID: "alice", Body: []byte("owned"), EnrolledSequence: 1}}
+internal/enrollmentstate/reply_test.go:74:			got, err := DecodeActiveReply(raw)
+internal/enrollmentstate/reply_test.go:75:			if err == nil || !reflect.DeepEqual(got, ActiveReply{}) {
+internal/enrollmentstate/reply_test.go:89:			if got, err := DecodeActiveReply(bad); err == nil || !reflect.DeepEqual(got, ActiveReply{}) {
+internal/enrollmentstate/reply_test.go:94:	decoded, err := DecodeActiveReply(raw)
+internal/enrollmentstate/reply_test.go:99:	again, err := DecodeActiveReply(raw)
+internal/enrollmentauthority/authority.go:142:	active, err := enrollmentstate.DecodeActiveReply(statement.Payload())
+internal/enrollmentrequest/request_test.go:239:	payload, _ := json.Marshal(enrollmentstate.ActiveReply{Schema: enrollmentstate.ActiveReplySchema, Head: p.Enrollment.Head, Record: enrollmentstate.Record{ID: doc.EnrollmentID, Body: newBody, EnrolledSequence: 1}})
+internal/enrollmentstate/journal.go:390:		payload, err := json.Marshal(ActiveReply{Schema: ActiveReplySchema, Head: expected, Record: record})
+internal/enrollmentauthority/authority_test.go:233:			r := enrollmentstate.ActiveReply{Schema: enrollmentstate.ActiveReplySchema, Head: f.head, Record: enrollmentstate.Record{ID: f.doc.EnrollmentID, Body: body, EnrolledSequence: 1}}
+internal/enrollmentstate/reply.go:35:// DecodeActiveReply validates format only, not signature, authority or freshness.
+internal/enrollmentstate/reply.go:38:func DecodeActiveReply(raw []byte) (ActiveReply, error) {
+internal/enrollmentstate/reply.go:41:		return ActiveReply{}, ErrReply
+internal/enrollmentstate/reply.go:44:		return ActiveReply{}, ErrReplyVersion
+internal/enrollmentstate/reply.go:49:		return ActiveReply{}, ErrReply

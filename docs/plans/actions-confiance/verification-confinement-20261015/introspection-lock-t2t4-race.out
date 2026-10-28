@@ -1,0 +1,506 @@
+=== RUN   TestActionsConfianceT2EmptyLedgerIsAnArrayWithoutMutation
+--- PASS: TestActionsConfianceT2EmptyLedgerIsAnArrayWithoutMutation (1.17s)
+=== RUN   TestActionsConfianceT2PolicyHasNoArbitraryBusinessCeilings
+--- PASS: TestActionsConfianceT2PolicyHasNoArbitraryBusinessCeilings (0.00s)
+=== RUN   TestActionsConfianceT2ReconcileHonorsDelayWithoutAnotherEffect
+--- PASS: TestActionsConfianceT2ReconcileHonorsDelayWithoutAnotherEffect (1.33s)
+=== RUN   TestActionsConfianceT2HTTPVerifyAndStrictInput
+--- PASS: TestActionsConfianceT2HTTPVerifyAndStrictInput (1.18s)
+=== RUN   TestActionsConfianceT2HTTPRejectsTrailingJSONWithoutMutation
+--- PASS: TestActionsConfianceT2HTTPRejectsTrailingJSONWithoutMutation (0.96s)
+=== RUN   TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource
+--- PASS: TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource (9.65s)
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState/committed
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState/unknown
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState/reconciled
+--- PASS: TestActionsConfianceT2ApprovalCannotRegressEffectState (3.12s)
+    --- PASS: TestActionsConfianceT2ApprovalCannotRegressEffectState/committed (1.05s)
+    --- PASS: TestActionsConfianceT2ApprovalCannotRegressEffectState/unknown (0.90s)
+    --- PASS: TestActionsConfianceT2ApprovalCannotRegressEffectState/reconciled (1.17s)
+=== RUN   TestActionsConfianceT2ConfigReplayRetainsOriginalAcrossLaterChanges
+--- PASS: TestActionsConfianceT2ConfigReplayRetainsOriginalAcrossLaterChanges (1.43s)
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/requester-token-012345
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Basic_requester-token-012345
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer__requester-token-012345
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer_
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/#00
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer_requester-token-012345
+--- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays (6.58s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/requester-token-012345 (1.22s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Basic_requester-token-012345 (1.16s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer__requester-token-012345 (1.05s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer_ (1.03s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/#00 (0.85s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer_requester-token-012345 (1.27s)
+=== RUN   TestActionsConfianceT2OriginalBytesPersistAndVerify
+=== RUN   TestActionsConfianceT2OriginalBytesPersistAndVerify/altered
+=== RUN   TestActionsConfianceT2OriginalBytesPersistAndVerify/missing
+=== RUN   TestActionsConfianceT2OriginalBytesPersistAndVerify/extra
+--- PASS: TestActionsConfianceT2OriginalBytesPersistAndVerify (6.00s)
+    --- PASS: TestActionsConfianceT2OriginalBytesPersistAndVerify/altered (0.00s)
+    --- PASS: TestActionsConfianceT2OriginalBytesPersistAndVerify/missing (0.00s)
+    --- PASS: TestActionsConfianceT2OriginalBytesPersistAndVerify/extra (0.00s)
+=== RUN   TestActionsConfianceT2OriginalsCoverDecisionsAndRejectCredentialFields
+--- PASS: TestActionsConfianceT2OriginalsCoverDecisionsAndRejectCredentialFields (2.57s)
+=== RUN   TestActionsConfianceT2BusinessReplayPreservesIntegerPrecision
+--- PASS: TestActionsConfianceT2BusinessReplayPreservesIntegerPrecision (1.15s)
+=== RUN   TestActionsConfianceT2RevocationBindsUpdatedMandate
+--- PASS: TestActionsConfianceT2RevocationBindsUpdatedMandate (1.11s)
+=== RUN   TestActionsConfianceT2StateBoundIncludesFinalNewline
+=== RUN   TestActionsConfianceT2StateBoundIncludesFinalNewline/last-readable-byte
+=== RUN   TestActionsConfianceT2StateBoundIncludesFinalNewline/newline-overflow
+=== RUN   TestActionsConfianceT2StateBoundIncludesFinalNewline/body-overflow
+--- PASS: TestActionsConfianceT2StateBoundIncludesFinalNewline (34.25s)
+    --- PASS: TestActionsConfianceT2StateBoundIncludesFinalNewline/last-readable-byte (11.71s)
+    --- PASS: TestActionsConfianceT2StateBoundIncludesFinalNewline/newline-overflow (8.23s)
+    --- PASS: TestActionsConfianceT2StateBoundIncludesFinalNewline/body-overflow (8.29s)
+=== RUN   TestActionsConfianceT2ExampleCredentialsAreRejectedWithoutMutation
+=== RUN   TestActionsConfianceT2ExampleCredentialsAreRejectedWithoutMutation/remplacer-par-un-secret-admin
+=== RUN   TestActionsConfianceT2ExampleCredentialsAreRejectedWithoutMutation/replace-with-a-secret-admin
+--- PASS: TestActionsConfianceT2ExampleCredentialsAreRejectedWithoutMutation (1.81s)
+    --- PASS: TestActionsConfianceT2ExampleCredentialsAreRejectedWithoutMutation/remplacer-par-un-secret-admin (0.91s)
+    --- PASS: TestActionsConfianceT2ExampleCredentialsAreRejectedWithoutMutation/replace-with-a-secret-admin (0.90s)
+=== RUN   TestActionsConfianceT2ReplayBindsAuthenticatedAuthority
+--- PASS: TestActionsConfianceT2ReplayBindsAuthenticatedAuthority (2.02s)
+=== RUN   TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation
+=== RUN   TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation/anchor
+=== RUN   TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation/config
+--- PASS: TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation (1.71s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation/anchor (0.91s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation/config (0.80s)
+=== RUN   TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap
+=== RUN   TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/changed-role
+=== RUN   TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/changed-integrity
+=== RUN   TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/legacy-missing-binding
+=== RUN   TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/credential-rotation
+--- PASS: TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap (3.89s)
+    --- PASS: TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/changed-role (0.89s)
+    --- PASS: TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/changed-integrity (0.90s)
+    --- PASS: TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/legacy-missing-binding (1.01s)
+    --- PASS: TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/credential-rotation (1.09s)
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/short
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/invalid-hex
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/public-permissions
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/directory
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/fifo
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/missing
+--- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey (5.72s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/short (1.08s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/invalid-hex (0.90s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/public-permissions (1.01s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/directory (0.93s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/fifo (0.89s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/missing (0.91s)
+=== RUN   TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey
+=== RUN   TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/regular
+=== RUN   TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/hardlink
+--- PASS: TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey (1.84s)
+    --- PASS: TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/regular (0.95s)
+    --- PASS: TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/hardlink (0.90s)
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/revoked
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/expired
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/missing
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/not_started
+--- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate (4.02s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/revoked (0.95s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/expired (0.97s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/missing (1.04s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/not_started (1.07s)
+=== RUN   TestActionsConfianceT2InitialKeyPublicationFailure
+--- PASS: TestActionsConfianceT2InitialKeyPublicationFailure (2.39s)
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-create/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-create/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-revoke/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-revoke/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/request/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/request/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/approve/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/approve/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/commit/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/commit/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/reconcile/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/reconcile/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/different_operator_request
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-create/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-create/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-revoke/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-revoke/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/request/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/request/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/approve/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/approve/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/commit/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/commit/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/reconcile/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/reconcile/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/different_operator_request
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-create/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-create/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-revoke/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-revoke/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/request/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/request/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/approve/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/approve/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/commit/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/commit/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/reconcile/invalid-token
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/reconcile/requester-token-012345
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/different_operator_request
+--- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery (3.92s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key (0.99s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-create/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-create/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-revoke/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-revoke/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/request/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/request/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/approve/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/approve/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/commit/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/commit/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/reconcile/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/reconcile/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/different_operator_request (0.02s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key (0.99s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-create/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-create/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-revoke/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-revoke/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/request/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/request/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/approve/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/approve/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/commit/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/commit/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/reconcile/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/reconcile/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/different_operator_request (0.02s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state (0.89s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-create/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-create/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-revoke/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-revoke/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/request/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/request/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/approve/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/approve/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/commit/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/commit/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/reconcile/invalid-token (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/reconcile/requester-token-012345 (0.00s)
+        --- PASS: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/different_operator_request (0.01s)
+=== RUN   TestActionsConfianceT2InitialPublicationRecovery
+=== RUN   TestActionsConfianceT2InitialPublicationRecovery/before_key
+=== RUN   TestActionsConfianceT2InitialPublicationRecovery/after_key
+=== RUN   TestActionsConfianceT2InitialPublicationRecovery/after_state
+--- PASS: TestActionsConfianceT2InitialPublicationRecovery (4.17s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRecovery/before_key (1.15s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRecovery/after_key (1.15s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRecovery/after_state (0.93s)
+=== RUN   TestActionsConfianceT2InitialPublicationRejectsReplacement
+=== RUN   TestActionsConfianceT2InitialPublicationRejectsReplacement/state
+=== RUN   TestActionsConfianceT2InitialPublicationRejectsReplacement/key
+=== RUN   TestActionsConfianceT2InitialPublicationRejectsReplacement/digest
+=== RUN   TestActionsConfianceT2InitialPublicationRejectsReplacement/public
+=== RUN   TestActionsConfianceT2InitialPublicationRejectsReplacement/symlink
+--- PASS: TestActionsConfianceT2InitialPublicationRejectsReplacement (5.20s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRejectsReplacement/state (0.81s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRejectsReplacement/key (0.84s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRejectsReplacement/digest (0.88s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRejectsReplacement/public (0.84s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRejectsReplacement/symlink (0.86s)
+=== RUN   TestActionsConfianceT2InitialPublicationConcurrent
+--- PASS: TestActionsConfianceT2InitialPublicationConcurrent (2.15s)
+=== RUN   TestActionsConfianceT2RemovedRequesterInvalidatesMandate
+=== RUN   TestActionsConfianceT2RemovedRequesterInvalidatesMandate/approve
+=== RUN   TestActionsConfianceT2RemovedRequesterInvalidatesMandate/commit
+--- PASS: TestActionsConfianceT2RemovedRequesterInvalidatesMandate (2.79s)
+    --- PASS: TestActionsConfianceT2RemovedRequesterInvalidatesMandate/approve (1.53s)
+    --- PASS: TestActionsConfianceT2RemovedRequesterInvalidatesMandate/commit (1.25s)
+=== RUN   TestActionsConfianceT2ConfigurationEpochControlsUnspentOperations
+=== RUN   TestActionsConfianceT2ConfigurationEpochControlsUnspentOperations/request
+=== RUN   TestActionsConfianceT2ConfigurationEpochControlsUnspentOperations/approve
+=== RUN   TestActionsConfianceT2ConfigurationEpochControlsUnspentOperations/commit
+--- PASS: TestActionsConfianceT2ConfigurationEpochControlsUnspentOperations (4.03s)
+    --- PASS: TestActionsConfianceT2ConfigurationEpochControlsUnspentOperations/request (1.38s)
+    --- PASS: TestActionsConfianceT2ConfigurationEpochControlsUnspentOperations/approve (1.30s)
+    --- PASS: TestActionsConfianceT2ConfigurationEpochControlsUnspentOperations/commit (1.34s)
+=== RUN   TestActionsConfianceT2ConfigurationEpochPreservesCommittedRecovery
+--- PASS: TestActionsConfianceT2ConfigurationEpochPreservesCommittedRecovery (1.19s)
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/absent
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/expired
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/revoked
+--- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba (1.75s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/absent (0.07s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/expired (0.13s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/revoked (0.19s)
+=== RUN   TestActionsConfianceT2IdempotencyRestartAndReconciliation
+--- PASS: TestActionsConfianceT2IdempotencyRestartAndReconciliation (5.08s)
+=== RUN   TestActionsConfianceT2ConfigProofAndInvalidInputs
+--- PASS: TestActionsConfianceT2ConfigProofAndInvalidInputs (2.03s)
+=== RUN   TestActionsConfianceT2HTTPAuthenticationAndPersistence
+--- PASS: TestActionsConfianceT2HTTPAuthenticationAndPersistence (1.11s)
+=== RUN   TestActionsConfianceT4DataPolicyPublicContract
+--- PASS: TestActionsConfianceT4DataPolicyPublicContract (0.83s)
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/confidential
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/restricted
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/absent
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/url
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/path
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/symlink
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/binary
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/provider
+--- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture (7.91s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/confidential (0.93s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/restricted (0.89s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/absent (1.05s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/url (1.03s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/path (1.05s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/symlink (0.96s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/binary (1.07s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/provider (0.93s)
+=== RUN   TestActionsConfianceT4DataPolicyExactActionAndRecovery
+--- PASS: TestActionsConfianceT4DataPolicyExactActionAndRecovery (1.27s)
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/enabled-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/enabled-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/classifications-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/classifications-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/destinations-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/destinations-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/providers-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/providers-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/tools-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/tools-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/resources-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/resources-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/context-classification
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/context-destination
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/context-provider
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/context-tool
+--- PASS: TestActionsConfianceT4DataPolicyStrictValidation (4.80s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/enabled-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/enabled-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/classifications-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/classifications-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/destinations-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/destinations-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/providers-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/providers-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/tools-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/tools-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/resources-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/resources-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/context-classification (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/context-destination (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/context-provider (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/context-tool (0.00s)
+=== RUN   TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect
+=== RUN   TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect/approve
+=== RUN   TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect/commit
+--- PASS: TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect (1.85s)
+    --- PASS: TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect/approve (1.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect/commit (0.86s)
+=== RUN   TestActionsConfianceT4DataPolicyPersistenceAndDisabled
+--- PASS: TestActionsConfianceT4DataPolicyPersistenceAndDisabled (1.05s)
+=== RUN   TestActionsConfianceT4DataPolicyResourceClassification
+=== RUN   TestActionsConfianceT4DataPolicyResourceClassification/uncatalogued
+=== RUN   TestActionsConfianceT4DataPolicyResourceClassification/downgraded
+=== RUN   TestActionsConfianceT4DataPolicyResourceClassification/empty-rules
+--- PASS: TestActionsConfianceT4DataPolicyResourceClassification (7.44s)
+    --- PASS: TestActionsConfianceT4DataPolicyResourceClassification/uncatalogued (0.91s)
+    --- PASS: TestActionsConfianceT4DataPolicyResourceClassification/downgraded (1.01s)
+    --- PASS: TestActionsConfianceT4DataPolicyResourceClassification/empty-rules (0.90s)
+=== RUN   TestActionsConfianceT4RemoteDestination
+--- PASS: TestActionsConfianceT4RemoteDestination (0.92s)
+=== RUN   TestActionsConfianceT4RemoteAuthenticatedPost
+--- PASS: TestActionsConfianceT4RemoteAuthenticatedPost (1.01s)
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/https://127.0.0.1:1234
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://localhost:1234
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://192.0.2.1:1234
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:0
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:65536
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://user:password@127.0.0.1:1234
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/session/private
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/?token=private
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/#private
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/%2f
+--- PASS: TestActionsConfianceT4RemoteInvalidOrigins (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/https://127.0.0.1:1234 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://localhost:1234 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://192.0.2.1:1234 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:0 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:65536 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://user:password@127.0.0.1:1234 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/session/private (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/?token=private (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/#private (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/%2f (0.00s)
+=== RUN   TestActionsConfianceT4RemoteRefusals
+=== RUN   TestActionsConfianceT4RemoteRefusals/missing-session
+=== RUN   TestActionsConfianceT4RemoteRefusals/wrong-session
+=== RUN   TestActionsConfianceT4RemoteRefusals/missing-bearer
+=== RUN   TestActionsConfianceT4RemoteRefusals/wrong-bearer
+=== RUN   TestActionsConfianceT4RemoteRefusals/header-injection
+--- PASS: TestActionsConfianceT4RemoteRefusals (1.08s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/missing-session (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/wrong-session (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/missing-bearer (0.01s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/wrong-bearer (0.02s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/header-injection (0.00s)
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/html
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/empty
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/null
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/empty-object
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/array
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/trailing
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/unstructured-error
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/structured-error
+--- PASS: TestActionsConfianceT4RemoteResponseBoundaries (0.03s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/html (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/empty (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/null (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/empty-object (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/array (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/trailing (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/unstructured-error (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/structured-error (0.00s)
+=== RUN   TestActionsConfianceT4RemoteNoRedirect
+--- PASS: TestActionsConfianceT4RemoteNoRedirect (0.00s)
+=== RUN   TestActionsConfianceT4RemoteCancellation
+--- PASS: TestActionsConfianceT4RemoteCancellation (0.00s)
+=== RUN   TestActionsConfianceT4RemoteUnavailableAndLocal
+--- PASS: TestActionsConfianceT4RemoteUnavailableAndLocal (1.07s)
+=== RUN   TestActionsConfianceT4SealedPublicPolicy
+--- PASS: TestActionsConfianceT4SealedPublicPolicy (0.90s)
+=== RUN   TestActionsConfianceT4SealedHelper
+--- PASS: TestActionsConfianceT4SealedHelper (0.00s)
+=== RUN   TestActionsConfianceT4SealedBoundary
+--- PASS: TestActionsConfianceT4SealedBoundary (1.40s)
+=== RUN   TestActionsConfianceT4SealedValidationAndPersistence
+--- PASS: TestActionsConfianceT4SealedValidationAndPersistence (0.89s)
+=== RUN   TestActionsConfianceT4SealedDisabledAndInvalidRequest
+--- PASS: TestActionsConfianceT4SealedDisabledAndInvalidRequest (0.87s)
+=== RUN   TestActionsConfianceT4SealedCancellation
+--- PASS: TestActionsConfianceT4SealedCancellation (0.00s)
+=== RUN   TestActionsConfianceT4SealedTimeoutClosesDescendants
+--- PASS: TestActionsConfianceT4SealedTimeoutClosesDescendants (2.02s)
+=== RUN   TestActionsConfianceT4SealedStaleConfiguration
+--- PASS: TestActionsConfianceT4SealedStaleConfiguration (0.89s)
+=== RUN   TestActionsConfianceT4SealedBusyStateRefusesPromptly
+--- PASS: TestActionsConfianceT4SealedBusyStateRefusesPromptly (0.76s)
+=== RUN   TestActionsConfianceT4SecretBrokerPolicy
+--- PASS: TestActionsConfianceT4SecretBrokerPolicy (0.81s)
+=== RUN   TestActionsConfianceT4SecretBrokerScope
+--- PASS: TestActionsConfianceT4SecretBrokerScope (1.00s)
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-1.5
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-1.5
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-1.5
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-1.5
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-1.5
+--- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy (0.02s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-1.5 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-1.5 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-1.5 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-1.5 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-1.5 (0.00s)
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/restart
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/revoke
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/expired
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/failed-consumer
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/configuration
+--- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery (5.30s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/restart (1.05s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/revoke (0.98s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/expired (1.08s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/failed-consumer (1.03s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/configuration (1.16s)
+=== RUN   TestActionsConfianceT4SecretBrokerConcurrency
+--- PASS: TestActionsConfianceT4SecretBrokerConcurrency (0.95s)
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries/not-ready
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries/wrong-role
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries/oversized
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries/cancelled
+--- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries (1.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries/not-ready (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries/wrong-role (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries/oversized (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries/cancelled (0.01s)
+=== RUN   TestActionsConfianceT4SecretBrokerStatusAfterRestart
+--- PASS: TestActionsConfianceT4SecretBrokerStatusAfterRestart (0.96s)
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/digest
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/destination
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/connector
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/action
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/ref
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/role
+--- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries (1.02s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/digest (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/destination (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/connector (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/action (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/ref (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/role (0.01s)
+=== RUN   TestActionsConfianceT4SecretBrokerPreparation
+--- PASS: TestActionsConfianceT4SecretBrokerPreparation (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	177.118s

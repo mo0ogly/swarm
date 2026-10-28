@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "node",
+    "tests/actions_confiance_delegation_ui.cjs",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+    "docs/plans/actions-confiance/verification-globale-20261016/candidate-current/identity-delegation"
+  ],
+  "pid": 4091134,
+  "start_ticks": "6294046",
+  "started_unix": 1792128516.3209684,
+  "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+  "status": "passed",
+  "exit_code": 0,
+  "ended_unix": 1792128529.3099005,
+  "checks": 10,
+  "report_sha256": "a6a7ad2a3218e69ddbe3b04ddfba3afa423962b52bde02af5a52815ebb1b2fa9"
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-11T08:04:50.438737+00:00",
+  "patch": "docs/plans/engine-cursor-contract/recovery/agent-engine-protocol-resumption-20261011.patch",
+  "sha256": "a2c6d3dff49ce66001db40acd2e80c15309cbba46a53e4e5ec9e98b49bf3a3ef",
+  "bytes": 28431,
+  "parent_patch": "agent-engine-protocol-20261011.patch",
+  "parent_sha256": "a9eb1ca8961e446e4d777c3202759c51e02c1c555e8929303853bb1f51f4cb84",
+  "includes_local_untransmitted_patch": "recovery-repaired-handoff-20261011.patch",
+  "scope": "Repair-ref handoff, externally attributed repair provenance, explicit prepared skill refresh preserving original manifest and frozen launch settings; CLI route and strict refusal tests.",
+  "candidate_integration": "Preserve native T1..T4 and regenerate source snapshot in integrated candidate. Merge provider-wait-20261010.patch separately.",
+  "checks": {
+    "targeted_skill_refresh": "13 PASS events, exit 0",
+    "repaired_handoff": "66 PASS events, exit 0",
+    "repaired_handoff_race": "23 PASS events, exit 0",
+    "expanded_recovery_skill_race": "51 PASS events, exit 0; includes concurrent prepared launch resumption",
+    "go_vet": "exit 0",
+    "final_full_default_suite": "1114 discovered tests/examples/fuzz targets; four disjoint groups all exit 0",
+    "patch_reverse_check": "git apply --reverse --check, exit 0"
+  },
+  "runtime": "Installed server build 2026-10-11T08:04:05Z verified via runtime-health; T2 resumed with explicit current APEX selection, second allowed production attempt, original preparation unchanged."
+}

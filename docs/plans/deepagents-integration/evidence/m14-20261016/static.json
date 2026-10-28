@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "go",
+    "vet",
+    "./internal/engine"
+  ],
+  "started_at_utc": "2026-10-16T17:58:11.096309+00:00",
+  "duration_seconds": 22.455,
+  "exit_code": 0,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "real_model_calls": 0
+}

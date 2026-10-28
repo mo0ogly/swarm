@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "id": "paea-glm-regressions",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-protection-contract/Cargo.toml",
+    "rust/crates/swarm-protection-contract/src/*.rs",
+    "rust/crates/swarm-protection-contract/tests/*.rs",
+    "rust/crates/swarm-identity-contract/Cargo.toml",
+    "rust/crates/swarm-identity-contract/src/*.rs",
+    "rust/crates/swarm-cli/Cargo.toml",
+    "rust/crates/swarm-cli/src/*.rs",
+    "rust/crates/swarm-cli/src/*/*.rs",
+    "rust/crates/swarm-cli/tests/protection.rs",
+    "rust/crates/swarm-cli/tests/protection_receipt.rs",
+    "tests/fixtures/paea/*.json",
+    "schemas/paea/*.json",
+    "tests/paea_contract_schema_test.py",
+    "tools/paea/*.py",
+    "tools/verification/recipe.py",
+    "docs/architecture/PAEA-CONTRACT.md",
+    "docs/en/PAEA-CONTRACT.md",
+    "rust/crates/swarm-cli/tests/protection_receipt_report.rs",
+    "rust/crates/swarm-web/Cargo.toml",
+    "rust/crates/swarm-web/src/*.rs",
+    "rust/crates/swarm-web/src/service/*.rs",
+    "rust/crates/swarm-web/tests/paea.rs",
+    "web/paea.*",
+    "web/trust-native.html",
+    "locales/en.json",
+    "web/i18n*.js",
+    "rust/crates/**/*",
+    "web/*",
+    "frontend/engine-settings/*",
+    "tools/agent-workflows/**/*",
+    ".claude/skills/**/*",
+    "version_history.json",
+    "tests/paea_payment_schema_test.py",
+    "web/paea-payment.html",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "web/lib/**/*"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "json-envelope-redaction-and-duplicates",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea",
+        "paea_envelope_type_and_conflicting_duplicates_are_redacted_and_recover",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "paea_envelope_type_and_conflicting_duplicates_are_redacted_and_recover"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "registry-i64-and-bom",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-protection-contract",
+        "--test",
+        "payment_registry",
+        "strict_i64_overflow_and_bom_refuse_with_causes_then_recover",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "strict_i64_overflow_and_bom_refuse_with_causes_then_recover"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

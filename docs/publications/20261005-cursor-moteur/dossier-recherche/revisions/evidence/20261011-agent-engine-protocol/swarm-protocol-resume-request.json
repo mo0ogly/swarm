@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "event_id": "review-protocol-repair-20261011",
+  "task_id": "plan-ca937edf4e-T2",
+  "reason": "Correction vérifiée du moteur : citation exacte autorisée à un caractère de la ligne annoncée, identité du retour de revue reliée explicitement, erreur de protocole routée au vérificateur. Binaire installé du 11 octobre 2026. Les méthodes embarquées ont changé : nouvelle revue complète du même candidat 56ca8cab5bfde7dc9ddf7a7a5d2169231d87c9a9, sans réutilisation d’avis, tentative et 10 appels consommés conservés. Aperçu : 5 appels requis sur 20 disponibles.",
+  "confirm_review_error_repair": true,
+  "expected_revision": 90
+}

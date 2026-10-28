@@ -1,0 +1,15 @@
+{
+  "result": "PASS render and visual inspection FR/EN",
+  "diagrams": [
+    {
+      "lang": "fr",
+      "exit": 0,
+      "image": "/home/fpizzi/.cache/swarm-operator-replan-20261011/log-console-diagrams/fr.png"
+    },
+    {
+      "lang": "en",
+      "exit": 0,
+      "image": "/home/fpizzi/.cache/swarm-operator-replan-20261011/log-console-diagrams/en.png"
+    }
+  ]
+}

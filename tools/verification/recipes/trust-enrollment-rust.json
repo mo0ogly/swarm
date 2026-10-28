@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "id": "trust-enrollment-rust",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-engine/src/**/*",
+    "rust/crates/swarm-engine/config/**/*",
+    "rust/crates/swarm-engine/tests/trust_governance.rs",
+    "rust/crates/swarm-engine/tests/trust_enrollment.rs",
+    "rust/crates/swarm-enrollment-*/src/**/*",
+    "rust/crates/swarm-enrollment-authority/tests/authenticated_startup.rs",
+    "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+    "rust/crates/swarm-identity-contract/src/**/*",
+    "rust/crates/swarm-wire-json/src/**/*",
+    "rust/crates/swarm-linux-identity-channel/src/**/*",
+    "rust/crates/swarm-linux-prerequisites/src/**/*",
+    "docs/architecture/BIBA-GOUVERNANCE-RUST.md",
+    "docs/en/BIBA-GOVERNANCE-RUST.md",
+    "tests/rust_trust_enrollment_sdk.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": ".cache/rust-native-version846-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0"
+  },
+  "steps": [
+    {
+      "id": "held-root-and-governance",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "trust_governance",
+        "--test",
+        "trust_enrollment",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "enrolled_biba_action_current_source_exact_root_bytes_plan_and_replay ... ok",
+        "enrolled_biba_rechecks_revision_and_disabled_mapping ... ok",
+        "governance_enrollment_mapping_has_no_local_token_fallback ... ok",
+        "3 passed; 0 failed",
+        "11 passed; 0 failed",
+        "enrolled_approver_cannot_bypass_exact_financial_validation ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "current-account-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "authenticated_startup",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "authenticated_trust_action_holds_and_rechecks_revocation ... ok",
+        "authenticated_trust_action_retains_outcome_after_cancellation ... ok",
+        "10 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "anti-json-capability",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--doc",
+        "trust_action"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "compile fail",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

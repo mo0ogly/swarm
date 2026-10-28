@@ -1,0 +1,20 @@
+=== RUN   TestFragmentRetryFeedbackIsDiagnosticOnly
+--- PASS: TestFragmentRetryFeedbackIsDiagnosticOnly (0.31s)
+=== RUN   TestFragmentRetryFeedbackRejectsInventedOperatorInCompactReply
+--- PASS: TestFragmentRetryFeedbackRejectsInventedOperatorInCompactReply (0.27s)
+=== RUN   TestFragmentRetryFeedbackKeepsValidMidlineAndDiagnosesEscapedTab
+--- PASS: TestFragmentRetryFeedbackKeepsValidMidlineAndDiagnosesEscapedTab (0.25s)
+=== RUN   TestFragmentRetryAssociationFeedbackMatchesCitationContract
+=== RUN   TestFragmentRetryAssociationFeedbackMatchesCitationContract/0
+=== RUN   TestFragmentRetryAssociationFeedbackMatchesCitationContract/1
+--- PASS: TestFragmentRetryAssociationFeedbackMatchesCitationContract (0.46s)
+    --- PASS: TestFragmentRetryAssociationFeedbackMatchesCitationContract/0 (0.23s)
+    --- PASS: TestFragmentRetryAssociationFeedbackMatchesCitationContract/1 (0.22s)
+=== RUN   TestFragmentRetryFeedbackDiagnosesRejectedQuoteOnlyCitation
+--- PASS: TestFragmentRetryFeedbackDiagnosesRejectedQuoteOnlyCitation (0.20s)
+=== RUN   TestFragmentRetryFeedbackSeparatesNeedsMismatchFromWrongQuote
+--- PASS: TestFragmentRetryFeedbackSeparatesNeedsMismatchFromWrongQuote (0.23s)
+=== RUN   TestFragmentRetryFeedbackDiagnosesDuplicateDefects
+--- PASS: TestFragmentRetryFeedbackDiagnosesDuplicateDefects (0.22s)
+PASS
+ok  	swarm.local/companion/internal/engine	3.102s

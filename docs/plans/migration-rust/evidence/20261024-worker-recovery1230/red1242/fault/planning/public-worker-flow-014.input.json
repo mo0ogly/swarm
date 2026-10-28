@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "recovery-isolate-planning",
+  "expected_revision": 9,
+  "reason": "Isolate completion recovery from later roles"
+}

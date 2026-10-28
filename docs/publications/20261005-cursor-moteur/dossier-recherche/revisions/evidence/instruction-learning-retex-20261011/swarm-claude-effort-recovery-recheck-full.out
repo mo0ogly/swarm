@@ -1,0 +1,119 @@
+?   	swarm.local/companion	[no test files]
+?   	swarm.local/companion/cmd/swarm	[no test files]
+--- FAIL: TestTerminalPTYLeaseResizeReplayAndFinish (0.51s)
+    agent_terminal_test.go:98: false Chemin du terminal trop long ; utiliser une racine de projet plus courte.
+--- FAIL: TestTerminalControlHTTPBoundary (0.47s)
+    agent_terminal_test.go:220: Chemin du terminal trop long ; utiliser une racine de projet plus courte.
+--- FAIL: TestTerminalTimeThresholdAndExplicitStop (0.45s)
+    agent_terminal_test.go:261: Chemin du terminal trop long ; utiliser une racine de projet plus courte.
+--- FAIL: TestTerminalOutputBound (0.47s)
+    agent_terminal_test.go:289: Chemin du terminal trop long ; utiliser une racine de projet plus courte.
+2026/10/11 18:10:27 http: TLS handshake error from 127.0.0.1:54580: remote error: tls: bad certificate
+panic: test timed out after 12m0s
+	running tests:
+		TestManagedFragmentHistoricalPublicRecovery (8s)
+		TestManagedFragmentHistoricalPublicRecovery/pass (8s)
+
+goroutine 71730 [running]:
+testing.(*M).startAlarm.func1()
+	/usr/local/go/src/testing/testing.go:2484 +0x394
+created by time.goFunc
+	/usr/local/go/src/time/sleep.go:215 +0x2d
+
+goroutine 1 [chan receive]:
+testing.(*T).Run(0xc000502a80, {0x13bd29a?, 0x24?}, 0x3ff5ed8)
+	/usr/local/go/src/testing/testing.go:1859 +0x431
+testing.runTests.func1(0xc000502a80)
+	/usr/local/go/src/testing/testing.go:2279 +0x37
+testing.tRunner(0xc000502a80, 0xc00053fc70)
+	/usr/local/go/src/testing/testing.go:1792 +0xf4
+testing.runTests(0xc000010138, {0x4dcb9a0, 0x482, 0x482}, {0x4dd67e0?, 0x7?, 0x4dd4b20?})
+	/usr/local/go/src/testing/testing.go:2277 +0x4b4
+testing.(*M).Run(0xc0000da140)
+	/usr/local/go/src/testing/testing.go:2142 +0x64a
+main.main()
+	_testmain.go:2355 +0x9b
+
+goroutine 71070 [select]:
+database/sql.(*DB).connectionOpener(0xc0007968f0, {0x4220758, 0xc0000d8000})
+	/usr/local/go/src/database/sql/sql.go:1261 +0x87
+created by database/sql.OpenDB in goroutine 71079
+	/usr/local/go/src/database/sql/sql.go:841 +0x130
+
+goroutine 1303 [syscall, 11 minutes]:
+os/signal.signal_recv()
+	/usr/local/go/src/runtime/sigqueue.go:152 +0x29
+os/signal.loop()
+	/usr/local/go/src/os/signal/signal_unix.go:23 +0x13
+created by os/signal.Notify.func1.1 in goroutine 1264
+	/usr/local/go/src/os/signal/signal.go:152 +0x1f
+
+goroutine 71078 [chan receive]:
+testing.(*T).Run(0xc000aec000, {0x12271a0?, 0x66b?}, 0xc000832150)
+	/usr/local/go/src/testing/testing.go:1859 +0x431
+swarm.local/companion/internal/engine.TestManagedFragmentHistoricalPublicRecovery(0xc000aec000)
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review_fragment_reuse_test.go:209 +0x8b
+testing.tRunner(0xc000aec000, 0x3ff5ed8)
+	/usr/local/go/src/testing/testing.go:1792 +0xf4
+created by testing.(*T).Run in goroutine 1
+	/usr/local/go/src/testing/testing.go:1851 +0x413
+
+goroutine 71079 [runnable]:
+encoding/json.appendString[...]({0xc001eda63d?, 0x16?, 0x460fab?}, {0xc001650000?, 0xfa06}, 0x1)
+	/usr/local/go/src/encoding/json/encode.go:984 +0xc6
+encoding/json.stringEncoder(0xc0006b8840, {0x11180a0?, 0xc0006cc2b0?, 0x11?}, {0xe0?, 0x70?})
+	/usr/local/go/src/encoding/json/encode.go:601 +0x3c5
+encoding/json.structEncoder.encode({{{0xc0000fb408, 0x4, 0x4}, 0xc0009ac390, 0xc0009ac3c0}}, 0xc0006b8840, {0x11b4520?, 0xc0006cc280?, 0x47269c?}, {0x0, ...})
+	/usr/local/go/src/encoding/json/encode.go:727 +0x30a
+encoding/json.arrayEncoder.encode({0xc00014ea20?}, 0xc0006b8840, {0x1109f80?, 0xc00044e678?, 0x1?}, {0x0?, 0x0?})
+	/usr/local/go/src/encoding/json/encode.go:870 +0xcf
+encoding/json.sliceEncoder.encode({0xc00044e640?}, 0xc0006b8840, {0x1109f80?, 0xc00044e678?, 0x2?}, {0xc?, 0x0?})
+	/usr/local/go/src/encoding/json/encode.go:843 +0x335
+encoding/json.structEncoder.encode({{{0xc00047e008, 0x9, 0x11}, 0xc0009ac4e0, 0xc0009ac510}}, 0xc0006b8840, {0x11e4780?, 0xc00044e620?, 0x323a22736c6c6163?}, {0x0, ...})
+	/usr/local/go/src/encoding/json/encode.go:727 +0x30a
+encoding/json.(*encodeState).reflectValue(0xc0006b8840, {0x11e4780?, 0xc00044e620?, 0x41a8bb?}, {0xe0?, 0xff?})
+	/usr/local/go/src/encoding/json/encode.go:333 +0x73
+encoding/json.(*encodeState).marshal(0x40d465?, {0x11e4780?, 0xc00044e620?}, {0x30?, 0x0?})
+	/usr/local/go/src/encoding/json/encode.go:309 +0xb2
+encoding/json.Marshal({0x11e4780, 0xc00044e620})
+	/usr/local/go/src/encoding/json/encode.go:175 +0xbe
+swarm.local/companion/internal/engine.validateManagedFragmentJournal({0x1, {0xc0000cec80, 0x40}, {0xc000238340, 0x1a}, {0xc0000cecc0, 0x40}, {0xc001230420, 0x4, 0x4}}, ...)
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review_fragment_journal.go:54 +0x597
+swarm.local/companion/internal/engine.readManagedFragmentJournal({_, _}, {_, _}, {0x0, {0x0, 0x0, 0x0}, 0x0, 0x2, ...}, ...)
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review_fragment_journal.go:102 +0x258
+swarm.local/companion/internal/engine.(*Store).readFragmentJournalAnchorVersion(_, {{0xc000762a40, 0x37}, {0x0, 0x0}, 0x0, 0xc0008f0a90, 0xc000d81860, {0x0, 0x0}, ...}, ...)
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review_fragment_store.go:148 +0x1a85
+swarm.local/companion/internal/engine.(*Store).readFragmentJournalAnchor(...)
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review_fragment_store.go:32
+swarm.local/companion/internal/engine.(*Store).validateFragmentReuseSources(_, {{0x0, 0x0}, {0x0, 0x0}, 0x0, 0xc00056dad0, 0xc000d81620, {0x0, 0x0}, ...}, ...)
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review_fragment_reuse.go:307 +0x8ae
+swarm.local/companion/internal/engine.(*Store).readFragmentJournalAnchorVersion(_, {{0x0, 0x0}, {0x0, 0x0}, 0x0, 0xc00056dad0, 0xc000d81620, {0x0, 0x0}, ...}, ...)
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review_fragment_store.go:125 +0x1385
+swarm.local/companion/internal/engine.(*Store).readFragmentJournalAnchor(...)
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review_fragment_store.go:32
+swarm.local/companion/internal/engine.(*Store).managedReviewFilesIntactSeen(_, {{0x0, 0x0}, {0x0, 0x0}, 0x0, 0xc00056dad0, 0xc000d81620, {0x0, 0x0}, ...}, ...)
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review.go:675 +0x17a
+swarm.local/companion/internal/engine.(*Store).managedReviewFilesIntact(...)
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review.go:664
+swarm.local/companion/internal/engine.(*Store).runManagedFragmentReview.func1()
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review_fragment_runtime.go:51 +0x5ea
+swarm.local/companion/internal/engine.(*Store).runManagedFragmentReview(_, {0x0, 0xc001392000, 0xc0004afd60, {0x0, 0x0, 0x0}, {0x0, 0x0, 0x0}, ...}, ...)
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review_fragment_runtime.go:153 +0x10e2
+swarm.local/companion/internal/engine.(*Store).reviewManagedCandidate(_, {0x0, 0xc0008601c0, 0xc000591e00, {0x0, 0x0, 0x0}, {0x0, 0x0, 0x0}, ...}, ...)
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review.go:358 +0x15a5
+swarm.local/companion/internal/engine.(*Store).integrateManagedAttempt(_, {0x1, 0xc0000b0840, 0x0, 0xc000b06780, {0x0, 0x0}, {0x0, 0x0}, 0x0, ...})
+	/home/fpizzi/workspace/swarm/internal/engine/managed_integration.go:168 +0x2527
+swarm.local/companion/internal/engine.(*Store).recoverResult(_, {_, _}, {{0x0, 0x0}, 0x0, 0x0, 0x0, 0x0, {0x0, ...}, ...}, ...)
+	/home/fpizzi/workspace/swarm/internal/engine/recovered_result.go:260 +0x2645
+swarm.local/companion/internal/engine.(*Store).planningChange(_, {_, _}, {_, _}, {{0x0, 0x0}, 0x0, 0x0, 0x0, ...})
+	/home/fpizzi/workspace/swarm/internal/engine/planning.go:224 +0x1635
+swarm.local/companion/internal/engine.fragmentHistoricalPublicRecovery(0xc000aec380, {0x12271a0, 0x4})
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review_fragment_reuse_test.go:255 +0xf8c
+swarm.local/companion/internal/engine.TestManagedFragmentHistoricalPublicRecovery.func1(0xc000aec380?)
+	/home/fpizzi/workspace/swarm/internal/engine/managed_review_fragment_reuse_test.go:209 +0x1b
+testing.tRunner(0xc000aec380, 0xc000832150)
+	/usr/local/go/src/testing/testing.go:1792 +0xf4
+created by testing.(*T).Run in goroutine 71078
+	/usr/local/go/src/testing/testing.go:1851 +0x413
+FAIL	swarm.local/companion/internal/engine	720.056s
+FAIL

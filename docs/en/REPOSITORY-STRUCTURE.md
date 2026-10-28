@@ -1,87 +1,24 @@
 # Swarm repository map
 
-Swarm is a Go application with a CLI and a local web interface for preparing,
-organizing and tracking missions assigned to AI agents. This map describes
-where sources, documentation and development tools belong.
-
-## Where to work
+Swarm uses a Rust engine, CLI and HTTP server with a local HTML/CSS/JavaScript interface. The functional migration remains in progress; see [the active plan](../plans/migration-rust/PLAN.md).
 
 | Path | Purpose |
 | --- | --- |
-| `cmd/swarm/main.go` | Executable entry point calling the engine |
-| `internal/engine/` | Go CLI, server, storage, orchestration and Go unit tests |
-| `resources.go` | Embeds canonical assets in the binary with `go:embed` |
-| `web/` | HTML/CSS/JavaScript served by the engine |
-| `frontend/` | Existing frontend sources and rebuild toolchain |
-| `locales/` | Translation catalogue |
-| `config/` | Public defaults; secrets belong outside Git |
-| `contracts/` | Data contracts and schemas |
-| `tests/` | CLI, HTTP, browser and acceptance harnesses |
-| `testdata/` | Data fixtures for Go tests |
-| `tools/` | Verification, agent workflows and development utilities |
-| `scripts/` | Auxiliary scripts, including translation and screenshots |
-| `deploy/` | Container entry point and deployment files |
-| `docs/` | Documentation, screenshots, plans and reports |
-| `docs/training/casa-pizza/` | French/English training guides, screenshots and reference application |
-| `docs/en/` | English documentation |
-| `benchmarks/` | Benchmark scenarios and tools |
-| `bin/` | Locally built binaries, ignored by Git |
-| `test-results/` | Generated verification artifacts, ignored by Git |
-| `.claude/skills/` | Canonical methods; `.agents/skills` references them |
-| `.github/` | CI workflows and GitHub templates |
+| `rust/crates/swarm-cli/` | `swarm-rust` command entry and CLI adapters |
+| `rust/crates/swarm-engine/` | RootStore, WorkEngine, persisted state and policies |
+| `rust/crates/swarm-web/` | Protected HTTP routes and embedded resource inventory |
+| `rust/crates/swarm-*/` | Identity, enrollment and JSON contracts |
+| `rust/Cargo.toml`, `rust/Cargo.lock`, `.cargo/config.toml` | Workspace, locked dependencies, required SQLite capability |
+| `web/`, `frontend/`, `locales/` | Canonical interface sources and translations |
+| `contracts/`, `tests/` | Schemas, fixtures, CLI/API/browser verification |
+| `tools/verification/`, `tools/rust-migration/` | Permanent recipes and qualified native builds |
+| `docs/`, `docs/en/` | FR/EN docs; dated plans/evidence retain history |
+| `.claude/skills/` | Canonical agent methods; `.agents/skills/` references them |
+| `deploy/`, `Dockerfile`, `compose.yaml` | Local container delivery |
+| `swarm`, `swarm.sh`, `build.sh`, `install.sh` | Installed CLI wrapper, lifecycle, Rust build, installer |
 
-The root retains normal entry documents: French/English READMEs, license,
-security, contributing and agent instructions, installation documentation,
-Go/npm manifests, Dockerfile, Makefile and the `swarm`/`swarm.sh` launchers.
+Rust `include_bytes!`/`include_str!` embed only declared resources. JavaScript is reused across the migration; its presence does not prove a Rust route is implemented. Go sources are no longer tracked; ignored local copies and dated proofs are references, never a runtime fallback.
 
-## Finding engine code
+Use `./swarm.sh build` for an identified local candidate, then the supported restart path. A plain development build is `cargo build --manifest-path rust/Cargo.toml --locked -p swarm-cli`. Neither automatically migrates old missions or validates every feature.
 
-The engine remains one Go package. Existing filename prefixes identify topics
-without introducing packages with circular dependencies.
-
-| Prefix under `internal/engine` | Topic |
-| --- | --- |
-| `main`, `console`, `*_cli` | CLI commands and rendering |
-| `web`, `prephase`, `preparation` | Web server and preparation |
-| `agent`, `agents`, `provider`, `role_model` | Execution, providers and models |
-| `planning`, `conductor`, `supervision`, `pilotage` | Planning and supervision |
-| `managed`, `workspace`, `recovery` | Integration, workspaces and recovery |
-| `validation`, `evidence`, `review`, `independent` | Checks, evidence and review |
-| `graph`, `automation` | Graphs and automation |
-| `storage`, `model`, `migration` | Storage and data models |
-| `*_test.go` | Go tests alongside the engine code they verify |
-
-This path migration does not split the engine into domain packages. Dated
-reports may cite former root Go paths; current sources with the same filename
-are under `internal/engine`. Historical manifests remain evidence of their
-own candidates.
-
-## Build and check
-
-Run from the repository root:
-
-```sh
-make build
-go test -timeout 25m ./...
-go vet ./...
-npm test
-make smoke
-python3 tools/check_distribution.py
-python3 tools/agent-workflows/check.py
-```
-
-For focused cases: `go test ./internal/engine -run '^TestVersion'`.
-For a development binary without injected release identity:
-`go build -o bin/swarm ./cmd/swarm`. Identified builds use `build.sh`.
-The root package now contains assets: `go build .` no longer builds the executable.
-Moving a Go file across packages requires checking dependencies and test coverage.
-
-## Assets and private data
-
-`go:embed` cannot read parent directories. One root Go file therefore embeds
-assets at their canonical paths, without generated copies to synchronize.
-
-Mission databases and secrets under `.swarm`, API keys, certificates, private
-Compose overrides and Skynet installation documents are excluded from publication.
-A live mission database is never a test fixture. Building a candidate does not
-replace the binary of an already running server.
+`.swarm`, credentials, databases, local deployment configuration and build caches are private. Preserve real mission data; use isolated fixture Roots for tests. Rebuilding does not replace a running process. See [installation](INSTALL.md) and [contribution](../../CONTRIBUTING.md).

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T11:16:49.950583+00:00",
+  "parent": "reviewer-method-source-snapshot-20261011.patch",
+  "parent_sha256": "9c2d11dcf761088bcd9eb45f0cab17c17ffb4e4228a9cbb9da705ce36fe7e4af",
+  "preimage_tree": "b090d80bf35858a31d0768a5dfee95336417f8ec",
+  "patch": "docs/plans/engine-cursor-contract/recovery/planning-exact-envelope-20261011.patch",
+  "sha256": "f719102703429f3a31c4e391e2d7b8b76b65ea7504abaf5be177fad75923fd29",
+  "bytes": 18321,
+  "paths": [
+    "internal/engine/planning.go",
+    "internal/engine/planning_runner.go",
+    "internal/engine/planning_prompt.go",
+    "internal/engine/planning_prompt_envelope_test.go",
+    "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
+    "docs/en/AGENT-ENGINE-PROTOCOL.md"
+  ],
+  "purpose": "Use exact shared instruction byte size in claim and runner context allowance, removing guessed 3000-byte overhead while retaining the existing complete-message bound. Whole-event reduction before claim, exact received receipt, latest resume first and no auto-ack.",
+  "tests": "Old behavior reproduced with Go overlay and corrected provider double; current actual complete request62138bytes, methods31688, context25850,7/8whole events, explicit1decision/pending7. Full/race/vet verification in progress.",
+  "limits": "Native root activation12 correctly received latest resume/retry restriction but stopped unpaid on old complete-envelope calculation; original activation and refusals retained, no autonomous RETEX yet."
+}

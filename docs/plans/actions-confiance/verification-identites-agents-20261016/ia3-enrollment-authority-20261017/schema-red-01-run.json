@@ -1,0 +1,25 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/enrollmentauthority",
+    "-count=1",
+    "-timeout=0"
+  ],
+  "exit": 1,
+  "start": "2026-10-17T11:29:39.752009+00:00",
+  "end": "2026-10-17T11:29:39.904173+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 10
+}

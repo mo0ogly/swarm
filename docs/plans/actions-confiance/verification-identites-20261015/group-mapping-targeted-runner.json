@@ -1,0 +1,10 @@
+{
+  "pid": 1163450,
+  "proc_start_ticks": "2739720",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-group-mapping-targeted-check.py",
+    "run"
+  ],
+  "at": "2026-10-15T19:36:13.058904+00:00"
+}

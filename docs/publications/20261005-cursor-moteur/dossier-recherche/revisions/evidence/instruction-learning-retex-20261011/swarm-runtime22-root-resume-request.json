@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "root-qualified22-capacity-replan-bbb248e9eb55441ab9523c243aada41c",
+  "expected_revision": 487,
+  "scope": "root",
+  "reason": "REPLAN : cumul21+22 qualifié et réellement installé, sans changement du candidat T2, de sa méthode de revue ou de ses critères. L'inventaire original759750octets retrouve11sources avec empreinte exacte ; aucun manque ne doit être déduit de l'ancien lecteur512Kio. Le journal final historique1 SHA763721e130d1c97eb3756d02c770edaab4c4659b45baa633f0b3353622858f46 s'arrête à sélection unknown, sans appel final de tâche. Le calcul sur ses inspections immuables corrige la capacité14618→79564octets ; les deux pièces Judge complètes23334octets tiennent. selection_capacity_recovery et sa réception persistée attestent cette précondition générale corrigée, sans autorité tirée d'un texte d'erreur. Examiner les originaux, puis décider review-retry avec une consigne nouvelle si la correction est pertinente ; garder les constats locaux défavorables et une décision finale indépendante. Le moteur ne rembourse rien et n'engage aucune production ;54appels restent disponibles,2 requis. Un refus métier réel reste refusé. Ne pas remettre l'ancien avis acquitté dans input_events. Vérifier réception, décision, application et effet, puis reprendre T3..T8 jusqu'au RETEX selon les preuves et droits, sans clôturer sur une nouvelle consigne seule."
+}

@@ -1,0 +1,7 @@
+{"ImportPath":"swarm.local/companion/internal/identitycontract","Action":"build-output","Output":"# swarm.local/companion/internal/enrollmentauthority\n"}
+{"ImportPath":"swarm.local/companion/internal/identitycontract","Action":"build-output","Output":"internal/enrollmentauthority/authority_test.go:20:2: no required module provides package swarm.local/companion/internal/identitycontract; to add it:\n"}
+{"ImportPath":"swarm.local/companion/internal/identitycontract","Action":"build-output","Output":"\tgo get swarm.local/companion/internal/identitycontract\n"}
+{"ImportPath":"swarm.local/companion/internal/identitycontract","Action":"build-fail"}
+{"Time":"2026-10-17T13:29:39.896813055+02:00","Action":"start","Package":"swarm.local/companion/internal/enrollmentauthority"}
+{"Time":"2026-10-17T13:29:39.896860364+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentauthority","Output":"FAIL\tswarm.local/companion/internal/enrollmentauthority [setup failed]\n"}
+{"Time":"2026-10-17T13:29:39.896883057+02:00","Action":"fail","Package":"swarm.local/companion/internal/enrollmentauthority","Elapsed":0,"FailedBuild":"swarm.local/companion/internal/identitycontract"}

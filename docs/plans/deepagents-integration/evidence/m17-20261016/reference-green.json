@@ -1,0 +1,38 @@
+{
+  "argv": [
+    "python3",
+    "tests/test_memory_summarization.py"
+  ],
+  "started_at_utc": "2026-10-16T19:30:52.380825+00:00",
+  "duration_seconds": 0.947,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "test_changed_old_source_refuses_progression_even_with_new_candidate_hash",
+    "test_changed_or_invented_quote_is_refused",
+    "test_cli_existing_output_and_invalid_history_are_explicit_errors",
+    "test_cli_invalid_json_duplicate_fields_and_nonfinite_values_fall_back",
+    "test_contradictory_intention_evidence_and_incident_states_are_refused",
+    "test_duplicate_or_added_claim_is_refused",
+    "test_empty_candidate_cannot_erase_history",
+    "test_empty_tool_messages_are_valid_source_records",
+    "test_invalid_boundaries_never_drop_recent_messages",
+    "test_invalid_candidate_schema_is_not_empty_success",
+    "test_invalid_source_schema_or_tool_sequence_is_an_error",
+    "test_missing_open_incident_cannot_be_accepted",
+    "test_model_failure_preserves_all_original_messages",
+    "test_non_progressive_boundary_is_refused",
+    "test_parallel_tool_results_remain_one_complete_group",
+    "test_progressive_summary_preserves_old_and_new_protections",
+    "test_real_cli_progression_and_contradiction_preserve_source_files",
+    "test_reference_preserves_types_quotes_recent_messages_and_sources",
+    "test_returned_projection_does_not_alias_originals",
+    "test_scope_change_refuses_parent_reuse",
+    "test_stale_source_hash_is_refused",
+    "test_tampered_parent_and_fallback_parent_are_refused",
+    "test_tool_call_and_result_cannot_be_split",
+    "test_wrong_parent_is_refused"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "e0165ed7e8441073d3b8b5b2b61f7e321228396ba783d94bed467a57fb886b98",
+  "model_calls": 0
+}

@@ -1,0 +1,8 @@
+flowchart TD
+  P["Empreinte approuvée indépendante"] --> C["Précontrôle avant ouverture projet"]
+  F["Manifeste privé V1 et répertoires existants"] --> C
+  C --> V["Format exact, empreinte, UID et chemins protégés"]
+  V --> O["Observation du stockage à cet instant"]
+  V --> R["Refus explicite sans résultat ni mutation"]
+  O --> N["Humain, confinement et service actif restent non vérifiés"]
+  N -. "raccord futur après preuves" .-> S["Service séparé et contrôle métier indépendant"]

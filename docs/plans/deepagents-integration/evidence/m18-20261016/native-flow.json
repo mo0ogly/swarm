@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "python3",
+    "tests/memory_summary_source.py",
+    "/tmp/swarm-m18-bin-y9nj4k1n/swarm-final",
+    "docs/plans/deepagents-integration/evidence/m18-20261016/native-flow"
+  ],
+  "started_at_utc": "2026-10-16T19:58:33.439247+00:00",
+  "duration_seconds": 2.585,
+  "exit_code": 0,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "890f27d7ea65ea2680bf3f003772e16a29422c43e43e5c79edeb5a00735025e3",
+  "real_model_calls": 0
+}

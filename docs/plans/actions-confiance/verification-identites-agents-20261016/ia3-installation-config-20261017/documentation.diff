@@ -1,0 +1,447 @@
+--- before/docs/plans/actions-confiance/identites-agents-replan.md
++++ after/docs/plans/actions-confiance/identites-agents-replan.md
+@@ -1363,3 +1363,134 @@
+ modification documentaire. Les contrôles de configuration, UI et moteur seront
+ requis dans les tranches qui les modifient. Preuves dans
+ [le rapport de décision](verification-identites-agents-20261016/ia3-deployment-choice-20261017/RAPPORT-IA3c2f.md).
++
++
++## IA3c.2f-02a — noyau de configuration d’installation, reprise du 17 octobre
++
++Besoin : rendre le choix local du pilote persistant hors d’un projet importable,
++sans transformer le réglage en preuve d’isolation ou autorisation. Checkout et
++preuves antérieures conservés ; Codex seul, replan/APEX. Les réglages de projet
++existants ne forment pas la frontière requise. Deux voies : réutiliser un fichier
++sous .swarm du projet, ou fournir un stockage dédié ouvert par l’installation
++protégée. Retenir le second ; ne pas assimiler le client Trust loopback existant
++à une autorité distante. Aucun endpoint public ni activation par défaut ajouté.
++
++Périmètre annoncé avant édition : nouveau paquet internal/enrollmentconfig
++(format, stockage Linux et tests), contrat cible/plan, contrats opérationnels
++FR/EN, notes d’installation FR/EN et preuves sous ia3-installation-config-20261017.
++Aucun source moteur, frontend, service réel ou mission modifié. Pas de politique
++de délai, retry, budget, rétention ou plafond d’historique nouvelle.
++
++Contrat retenu : pins d’installation fournis indépendamment (digest d’installation,
++clé publique et principal humain exact), valeurs locales explicites ; distant
++connu mais refusé. Snapshot canonique version 1, historique chaîné et checkpoint
++indépendant requis. Révisions en chaînes décimales uint64 pour éviter une perte
++de précision JavaScript ; overflow est un refus de représentation. Le chemin
++socket utilise la limite technique Linux exposée, pas un plafond opérateur.
++
++Le répertoire doit préexister, appartenir au compte attendu et être privé ;
++parcours sans symlink et contrôle des ancêtres, ouvert via descripteurs. Le
++verrou privé peut être initialisé à l’ouverture du handle ; Preview ne crée ni
++fichier de configuration ni événement. Écritures atomiques, fsync fichier puis
++répertoire, CAS, retry exact du seul événement courant. Erreur après rename :
++résultat durable incertain, sans faux succès ; reprise explicite et observation.
++
++L’authorizer est une dépendance de contrôle obligatoire, appelée sous réservation ;
++le principal retourné doit égaler le bootstrap épinglé. Un principal déclaré dans
++la demande ne suffit pas ; fixtures d’authorizer ne prouvent pas une session OIDC
++réelle. Les données et projections retournées ne sont pas des capacités moteur.
++L’ouverture du répertoire sous l’UID du test ne prouve pas un fournisseur confiné.
++
++Critères : codec/types/versions/refus sans résultat partiel ; create/read/reopen ;
++preview sans mutation ; CAS et événements exacts/conflits ; authentification refusée
++sans mutation ; mauvais pins/checkpoint, rollback cohérent, symlinks/permissions/
++propriétaire/type de fichier ; annulation, concurrence et erreur de persistance
++avec reprise. Tests écrits avant sources ; nouvelle capacité absente auparavant,
++aucun échec de compilation ne sera présenté comme contre-exemple comportemental.
++Go normal/race ciblés avec -timeout=0, vet/build du paquet, diff et docs FR/EN.
++
++IA3c.2f-02 reste partiel tant que témoin indépendant durable, opérations publiques,
++service et UX ne sont pas raccordés. Ce noyau ne rend aucun réglage actif ; il
++ne crée pas une configuration cachée modifiable sans Admin. IA3c.2f-03 à -06,
++F01–F07, source courante et admission restent ouverts. Bootstrap réel attend le
++principal exact et les preuves d’isolation ; leur absence ne bloque pas les fixtures.
++
++
++### Replan IA3c.2f-02a — permissions des fixtures
++
++Le lot normal-01 collecte 49 noms : 38 PASS, 11 FAIL, zéro SKIP ; dix ouvertures
++de fixture sont refusées, plus le parent du lot de fichiers dangereux. Les
++entrées sont stables. Première frontière : répertoire final non privé, avant
++la lecture/écriture de configuration. go doc -src testing.T.TempDir montre un
++enfant créé avec 0777 sous son parent privé ; une sonde Go isolée mesure 0775
++avec l’umask courant. Ce n’est pas une preuve de défaut du contrôle produit.
++
++Correction de précondition : préparer explicitement les répertoires de fixture
++en 0700, comme l’installation devra le faire ; conserver les cas négatifs 0755
++et parent ouvert. Pas de relâchement des contrôles, pas de retry inchangé ni
++hausse de timeout. Original normal-01, source du test et sonde conservés.
++Propriétaire Codex ; reprise : nouveaux inputs de fixture puis lot normal/race.
++
++
++### Replan IA3c.2f-02a — trois contre-exemples du candidat
++
++Après normal/race-02 (52 noms PASS), la relecture ajoute trois tests ciblés.
++regressions-red-01 collecte et échoue réellement les trois, entrées stables :
++(1) modifier le répertoire de 0700 vers 0770 après Open permet encore Apply ;
++(2) Preview accepte une date année 10000 que JSON ne peut sérialiser, alors que
++Apply refuse ensuite ; (3) passer l’umask à 0700 après Open permet de remplacer
++la configuration par un fichier 0000, déclaré comme succès puis illisible.
++Sources antérieures archivées et sorties originales conservées.
++
++Causes : métadonnées du répertoire contrôlées seulement à l’ouverture ; erreur
++de sérialisation ignorée dans le calcul de tête et preview moins strict que
++l’écriture ; permissions effectives du fichier temporaire non revérifiées.
++Corrections générales décidées : recontrôle du répertoire sous réservation et
++avant persistance, calcul de tête fallible propagé, validation du candidat complet
++pour preview/Apply, contrôle du fichier réellement créé avant toute écriture.
++Pas d’adaptation à un ID ou mission, pas de changement de timeout ni contournement
++de l’umask. Propriétaire Codex ; reprise : mêmes trois tests puis lot normal/race.
++
++Ces découvertes I2f02a-01 à -03 sont de nouveaux défauts du candidat, pas des
++failles publiques démontrées. Leur valeur est de préserver le contrat sous
++changement d’environnement et d’empêcher un aperçu ou succès trompeur. État :
++reproduits, corrections en cours ; effet à vérifier avec leurs cas conservés.
++
++
++### Résultat IA3c.2f-02a — configuration souhaitée, raccord encore partiel
++
++70 noms PASS normal/race-05, zéro FAIL/SKIP ; vet et compilation ciblés PASS,
++8 entrées stables. Contrôle des workflows : PASS (12 skills et contextes moteur),
++sans modifier ses sources. 19 entrées antérieures préservées ; quatre nouveaux
++fichiers du paquet. Trois contre-exemples locaux du candidat sont conservés en
++rouge puis verts après correction. La preuve de filesystem utilise le même UID
++de fixture et une faute fsync injectée, pas un service isolé ni une panne matérielle.
++
++Le [rapport](verification-identites-agents-20261016/ia3-installation-config-20261017/RAPPORT-IA3c2f02a.md)
++lie sources, échecs originaux, régressions, améliorations I2f02a-01 à -07 et
++limites. FR/EN opérationnels, guides d’installation et schéma de reprise sont
++actualisés dans le même incrément. Une reprise exacte ne refait pas le rename :
++elle revalide l’autorisation puis synchronise le répertoire. Annulation observée
++avant persistance refuse ; annulation concurrente pendant persistance ne prouve
++pas une absence de mutation. Le consommateur futur doit observer le résultat.
++
++Le décodeur commun est disponible mais aucun endpoint/CLI/UX ne le consomme.
++Le prochain contrat indépendant est le maintien durable du checkpoint hors
++configuration, avec reprise après écriture de config visible mais témoin non
++confirmé ; aucun max/retry/TTL ne doit remplacer ce diagnostic. Service, opérations
++publiques et Admin restent ouverts. Le principal humain initial reste à désigner
++pour l’activation, pas pour poursuivre les fixtures. F01–F07 et RETEX global ouverts.
++
++
++### Replan IA3c.2f-02a — périmètre de correction des schémas
++
++Le diff final révèle qu’un remplacement textuel générique de flèche, destiné
++au nouveau schéma, a modifié trois graphes antérieurs dans chaque langue.
++Cause : correction appliquée au document entier au lieu du nouveau bloc.
++Original conservé dans documentation-before-graph-recovery.diff. Restaurer le
++préfixe FR/EN exact depuis l’archive avant modification, conserver uniquement
++le nouveau chapitre ; égalité des anciens chapitres vérifiée. Les nouveaux
++rendus sont inchangés et restent conformes au bloc actuel. Aucun code touché,
++aucun résultat Go élargi ou relancé sans raison. Amélioration I2f02a-08 :
++périmètre des transformations documentaires vérifié par le diff et les sections
++originales ; propriétaire Codex, correction vérifiée, apprentissage dans le rapport.
+--- before/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
++++ after/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
+@@ -1,8 +1,9 @@
+ # IA3c.2 — source d’enrôlement et frontière de contrôle
+ 
+ 17 octobre 2026 — protocole d’authenticité IA3c.2a, journal IA3c.2b, schéma
+-d’autorité IA3c.2c, demande complète IA3c.2d et lecture versionnée IA3c.2e
+-vérifiés en fixtures ; service protégé, bootstrap et consommateur moteur
++d’autorité IA3c.2c, demande complète IA3c.2d, lecture versionnée IA3c.2e
++et noyau de configuration IA3c.2f-02a vérifiés en fixtures ; service protégé,
++bootstrap et consommateur moteur
+ **non réalisés**. Frontière adoptée le 17 octobre : service local isolé pour
+ développement/pilote ; autorité distante prévue pour une évolution. Principal
+ humain initial et activation encore ouverts.
+@@ -116,7 +117,8 @@
+ 
+ ## Installation initiale et UX Admin — contrat cible IA3c.2f
+ 
+-**Cible adoptée, non implémentée.** install.sh propose actuellement Docker ou
++**Service, installation et UX encore cibles ; noyau de configuration vérifié
++en fixtures (IA3c.2f-02a ci-dessous).** install.sh propose actuellement Docker ou
+ natif ; compose.yaml contient un seul service sous l’UID/GID opérateur. Aucun
+ de ces choix n’installe l’autorité d’enrôlement séparée. Le client Trust dit
+ « remote » exige aujourd’hui une origine HTTP de boucle locale ; il ne constitue
+@@ -176,9 +178,9 @@
+ 
+ Les critères EP-01 à EP-10 restent inchangés. IA3c.2f-01 formalise la décision ;
+ -02 à -06 dans le plan canonique couvrent configuration, service, UX, admission
+-et migration. Leur documentation ne vaut pas livraison. Le prochain travail
+-technique est le contrat de configuration protégée et de ses opérations publiques,
+-puis le service local et ses contre-exemples OS ; l’activation attend encore
++et migration. Leur documentation ne vaut pas livraison. Le noyau de configuration est désormais réalisé et vérifié en fixtures ;
++les opérations publiques et le témoin protégé, puis le service local et ses
++contre-exemples OS, restent à réaliser. L’activation attend encore
+ le principal humain exact et les preuves de ces frontières.
+ 
+ ## Vérification et portée scientifique
+@@ -278,3 +280,28 @@
+ I2c-06 est réalisé pour le format et le refus locaux ; sélection et interopérabilité
+ entre vrais pairs restent à vérifier avant client externe. Aucun service activé,
+ aucune preuve d’actualité ou d’autorité ne découle du numéro de version.
++
++
++## IA3c.2f-02a — stockage de configuration souhaitée vérifié en fixtures
++
++Le paquet internal/enrollmentconfig fournit le codec commun, pins indépendants,
++historique lié au contexte d’installation, checkpoint attendu, Open/Preview/
++Create/Apply/Read, persistance atomique Linux et erreurs explicites. Il reste
++interne : aucun réglage dans l’installateur ou l’Admin, aucun endpoint ou service
++activé. La validation commune est disponible pour les futurs adaptateurs, pas
++encore utilisée par eux. Le [contrat FR](../../architecture/AGENT-IDENTITY-CONTRACT.md)
++et son équivalent EN décrivent champs, limites, erreurs et reprise.
++
++70 noms PASS normal/race ; vet/build ciblés PASS, 8 entrées stables. Trois
++contre-exemples du candidat sont reproduits puis corrigés ; la faute fsync après
++rename rend le résultat durable incertain et se reprend sans second événement.
++[Rapport et preuves](verification-identites-agents-20261016/ia3-installation-config-20261017/RAPPORT-IA3c2f02a.md).
++La sonde de fixture mesure 0775, corrigé explicitement en 0700 sans relâcher le
++produit. Les tests de callback ne prouvent pas l’identité d’un humain réel.
++
++Le Head fourni reste à conserver dans un témoin durable indépendant ; restauration
++des deux retire la détection. Un répertoire privé sous l’UID du test ne prouve
++pas l’isolement d’un fournisseur. Le bootstrap réel, les opérations publiques,
++la configuration UX et le raccord d’usage restent ouverts. Le proposed Head de
++Preview n’est jamais un checkpoint sauvegardé. Le futur mode distant est refusé
++par le codec courant ; son évolution devra préserver les versions historiques.
+--- before/docs/architecture/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/architecture/AGENT-IDENTITY-CONTRACT.md
+@@ -910,3 +910,108 @@
+ Les modules IA3c.2a à .2e restent vérifiés en fixtures ; F01–F07 et EP-01 à EP-10
+ ne sont pas clos par la décision d’hébergement. Le [rapport IA3c.2f](../plans/actions-confiance/verification-identites-agents-20261016/ia3-deployment-choice-20261017/RAPPORT-IA3c2f.md)
+ lie la décision, les sources observées, les rendus et les contrôles documentaires.
++
++## Noyau de configuration d’installation — IA3c.2f-02a
++
++`internal/enrollmentconfig` fournit désormais un format strict et un stockage
++Linux pour la **configuration souhaitée** de l’autorité locale. Ce paquet n’est
++importé par aucun adaptateur moteur, CLI, HTTP, installateur ou écran Admin ;
++aucun réglage n’est actif dans l’application. Il prépare IA3c.2f-02, encore partiel.
++Le mode `remote` est connu mais refusé par ErrMode, sans repli local.
++
++Le bootstrap fournit indépendamment `Pins` : `installation_digest` (SHA-256 hex
++minuscule), `authority_public_key` (32 octets Ed25519 en base64url sans padding)
++et `bootstrap_principal` humain complet selon identitycontract. Le fichier ouvert
++ne fournit pas sa propre racine. Le principal et la racine sont immuables dans
++les changements ordinaires ; aucune clé privée n’est un champ du format.
++Une valeur bien formée ne prouve pas sa provenance ni une authentification OIDC.
++
++Le cadre `Change` comporte exactement `schema_version:1`, `event_id`,
++`expected_head`, `values` et `reason`. `values` contient `mode:"local"` et
++`local_socket_path`, absolu et canonique. La limite Linux de 107 octets est dérivée
++de sockaddr_un et exposée par `LocalSocketPathMaxBytes` : limite technique du
++transport, sans rapport avec un délai ou un budget. Head contient `revision`
++comme **chaîne décimale uint64** et `digest` hex ; le checkpoint de genèse seul
++est `{"revision":"0","digest":""}`. Zéro n’est pas une révision courante.
++Les clients doivent conserver ces révisions comme chaînes, sans Number JavaScript.
++
++EncodeChange/DecodeChange valident la demande commune des futurs adaptateurs.
++Encode/Decode valident le snapshot complet (`schema_version`, `pins`, `history`).
++Chaque entrée porte `change`, `actor`, `at` ; son hash SHA-256, séparé par domaine
++et lié aux pins, dépend aussi de la tête précédente dans change. Dates UTC,
++identifiants/raisons textuels non vides, absence de doublons d’événements et chaîne
++exacte sont vérifiés. Les décodeurs exigent les octets canoniques ; champs inconnus,
++doublons, casse, nulls, omissions, types erronés et trailing sont refusés, sans
++résultat partiel. Le hash de chaîne n’est pas une signature numérique.
++
++| Opération Go | Entrée attendue / résultat | Limite |
++| --- | --- | --- |
++| Open | Répertoire existant, UID réel attendu, pins indépendants, Authorizer non nil ; handle de stockage | Peut initialiser config.lock ; aucun fichier config.json ni valeur par défaut créé |
++| Preview | Change et instant explicite ; Projection avec base, proposed et current_event_replay | Réservation, validation complète et autorisation ; aucune écriture de configuration ni événement |
++| Create | Bootstrap explicite à tête zéro ; View sauvegardée | Ne remplace pas une configuration existante ; seul retry exact du premier événement encore courant reconnu |
++| Apply | Change avec tête attendue ; View sauvegardée | Configuration absente refusée, CAS, événement unique et retry exact du seul événement courant |
++| Read | Head courant fourni indépendamment ; View avec snapshot possédé | Refus des pins/tête divergents ; ne découvre pas son témoin dans le fichier |
++
++Le répertoire final doit appartenir à l’UID du processus et être exactement 0700.
++Les composants sont ouverts par descripteurs sans suivre les symlinks ; les
++ancêtres appartiennent à root ou au service et ne sont pas modifiables par
++groupe/autres, sauf un répertoire sticky appartenant à root tel /tmp. Verrou et
++configuration doivent être des fichiers réguliers 0600, même propriétaire et un
++seul lien. FIFO, symlink, lien physique supplémentaire et métadonnées trop ouvertes
++sont refusés. Répertoire revérifié à la réservation et avant persistance ; le
++fichier temporaire réel est vérifié, sans contourner un umask restrictif.
++Ces contrôles ne confinent pas un agent partageant l’UID du service.
++
++La réservation non bloquante retourne ErrBusy sans timer ou retry interne.
++Authorizer reçoit des copies et s’exécute sous cette réservation : son résultat
++humain doit égaler le principal épinglé ; il doit résoudre l’autorité authentifiée,
++pas recopier un champ de demande, et ne doit pas réentrer dans le Store. Les
++fixtures de callback ne prouvent pas cette authentification réelle. Read reste
++une API interne de données ; le futur transport devra en autoriser l’accès aussi.
++
++L’application écrit un temporaire privé, synchronise le fichier, effectue un
++rename atomique (sans remplacement lors du bootstrap), puis synchronise le
++répertoire. Une erreur après rename retourne ErrIndeterminate et aucun View :
++une mutation peut déjà être visible. Observer avec le checkpoint indépendant,
++puis reprendre l’événement courant exact, de nouveau autorisé, sans ajouter
++l’historique et avec une nouvelle barrière de synchronisation. Une révision
++périmée retourne ErrConflict ; un événement différent/réutilisé/historique ErrEvent.
++ErrPath/ErrFormat/ErrVersion/ErrPins/ErrHead distinguent les autres refus.
++Une erreur d’autorisation conserve sa cause via errors.Is ; annulation observée avant
++l’entrée en persistance refuse l’écriture. Après cette entrée, une annulation
++concurrente ne prouve pas l’absence de mutation : observer le résultat courant. L’absence de progression ne donne aucun droit de retry.
++
++Preview valide la même représentation que l’écriture pour les mêmes entrées,
++instant compris. L’instant d’application réel peut produire une autre empreinte :
++le proposed Head d’un aperçu n’est jamais le témoin d’une écriture effectuée.
++Révisions ordonnent les événements ; les horodatages ne constituent pas une
++politique d’expiration. Aucun plafond de volume/historique, timeout ou budget ajouté.
++
++```mermaid
++flowchart TD
++  B["Bootstrap fourni indépendamment<br/>pins et Authorizer ; fixtures seulement"] --> O["Open : UID, ancêtres, répertoire 0700<br/>verrou privé ; aucune valeur par défaut"]
++  O --> P["Preview : lecture et autorisation<br/>Projection distincte ; aucune sauvegarde"]
++  O --> A["Create explicite ou Apply<br/>codec strict, autorisation et CAS"]
++  H["Head indépendant fourni<br/>témoin durable protégé non réalisé"] --> A
++  A --> W["Fichier temporaire 0600 vérifié<br/>écriture et fsync fichier"]
++  W --> R["Rename atomique"]
++  R --> D["fsync répertoire"]
++  D --> V["View : configuration sauvegardée<br/>aucune preuve de service effectif"]
++  D -. "erreur après rename" .-> E["ErrIndeterminate<br/>résultat durable incertain"]
++  E --> C["Observer sous checkpoint<br/>retry courant exact et réautorisé"]
++  C --> D
++  A --> F["Distant non implémenté, conflit ou refus<br/>aucun succès vide ni secours permissif"]
++  V -. "raccord encore absent" .-> U["Service isolé, installation et Admin<br/>autorité actuelle et usage final à vérifier"]
++```
++
++70 noms de tests/sous-tests passent en normal/race, vet et build ciblés passent.
++Trois contre-exemples du candidat ont échoué avant correction : permissions
++modifiées après Open, date non sérialisable acceptée par Preview et umask rendant
++le nouveau fichier illisible. Ils sont conservés dans le [rapport IA3c.2f-02a](../plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/RAPPORT-IA3c2f02a.md).
++La panne de fsync est injectée localement ; aucune coupure matérielle n’est testée.
++Restaurer le fichier ET le Head fourni retire la détection de rollback : le témoin
++durable indépendant, les frontières OS réelles, le service, les opérations
++publiques et l’UX restent ouverts. Le service doit aussi distinguer bootstrap
++neuf et restauration ; Create n’est pas un endpoint de remise à zéro.
++L’évolution vers le distant devra conserver les octets et règles des versions
++historiques, pas recalculer discrètement leur chaîne avec un nouveau codec.
+--- before/docs/en/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/en/AGENT-IDENTITY-CONTRACT.md
+@@ -865,3 +865,102 @@
+ IA3c.2a through .2e modules retain their fixture evidence; F01–F07 and EP-01 through
+ EP-10 are not closed by this hosting decision. The [IA3c.2f report](../plans/actions-confiance/verification-identites-agents-20261016/ia3-deployment-choice-20261017/RAPPORT-IA3c2f.md)
+ links the decision, observed sources, rendered diagrams and documentation checks.
++
++## Installation configuration kernel — IA3c.2f-02a
++
++`internal/enrollmentconfig` now provides a strict format and Linux storage for
++**desired configuration** of the local authority. No engine, CLI, HTTP, installer
++or Admin adapter imports this package; no application setting is active. It
++prepares IA3c.2f-02, which remains partial. Known mode `remote` returns ErrMode
++without local fallback.
++
++Bootstrap independently supplies `Pins`: `installation_digest` (lowercase SHA-256
++hex), `authority_public_key` (32 Ed25519 bytes in unpadded base64url), and the exact
++human `bootstrap_principal` from identitycontract. The opened file cannot supply
++its own root. Ordinary changes cannot alter the principal or root; no private
++key is a format field. Valid data establishes neither provenance nor OIDC login.
++
++`Change` has exactly `schema_version:1`, `event_id`, `expected_head`, `values` and
++`reason`. Values contain `mode:"local"` and an absolute canonical
++`local_socket_path`. The 107-byte Linux bound is derived from sockaddr_un and
++exposed as `LocalSocketPathMaxBytes`: a transport representation bound, unrelated
++to time or budgets. Head has a **decimal uint64 string** `revision` and hex
++`digest`; only genesis is `{"revision":"0","digest":""}`. Zero is not a current
++revision. Clients must retain revision strings without JavaScript Number conversion.
++
++EncodeChange/DecodeChange are the shared request boundary for future adapters.
++Encode/Decode validate complete snapshots (`schema_version`, `pins`, `history`).
++Each entry contains `change`, `actor`, `at`; its domain-separated SHA-256 hash is
++bound to pins and the previous head in change. UTC timestamps, nonempty text IDs
++and reasons, unique events and exact chaining are checked. Decoders require exact
++canonical bytes: unknown/duplicate/folded/null/missing/wrong-type fields and
++trailing input are rejected without partial results. This hash chain is not a
++digital signature.
++
++| Go operation | Expected input / result | Limit |
++| --- | --- | --- |
++| Open | Existing directory, actual expected UID, independent pins, non-nil Authorizer; storage handle | May initialize config.lock; creates neither config.json nor default values |
++| Preview | Change and explicit observation time; Projection with base, proposed, current_event_replay | Reservation, complete validation and authorization; no configuration write or event |
++| Create | Explicit genesis bootstrap; saved View | Never replaces existing configuration; recognizes only exact retry of an initial event still current |
++| Apply | Change with expected head; saved View | Missing configuration denied; CAS, unique event and exact retry of current event only |
++| Read | Independently supplied current Head; owned snapshot View | Rejects mismatching pins/head; never learns its witness from the opened file |
++
++The final directory must belong to the process UID with exactly 0700 permissions.
++Components are opened by descriptor without following symlinks. Ancestors belong
++to root or the service and are not group/other writable, except root-owned sticky
++directories such as /tmp. Lock and configuration must be regular 0600 files with
++the same owner and one link. FIFOs, symlinks, extra hard links and open permissions
++are rejected. Directory checks repeat at reservation and before persistence;
++actual temporary-file permissions are checked without bypassing restrictive umask.
++These checks do not confine agents sharing the service UID.
++
++Nonblocking reservation returns ErrBusy without internal timer or retry.
++Authorizer runs under reservation on owned copies; its human result must equal
++the pinned principal. It must resolve authenticated authority rather than echo
++a request field, and must not reenter the Store. Fixture callbacks establish no
++real authentication. Read is an internal data API; its future transport must
++authorize access as well.
++
++Application writes a private temporary file, syncs it, atomically renames it
++(without replacement during bootstrap), then syncs the directory. Failure after
++rename returns ErrIndeterminate and no View: a mutation may already be visible.
++Observe against an independent checkpoint, then retry the exact current event
++with fresh authorization and another durability barrier, without adding history.
++Stale revision gives ErrConflict; changed/reused/historical events give ErrEvent.
++ErrPath/ErrFormat/ErrVersion/ErrPins/ErrHead distinguish other rejections.
++Authorization errors preserve their cause via errors.Is; cancellation observed before
++entering persistence rejects writes. After that point, concurrent cancellation
++does not prove absence of mutation: observe the current result. Lack of progress grants no retry authority.
++
++Preview validates the same representation as application for the same inputs,
++including time. Actual application time may change the digest: proposed preview
++Head is never evidence of a completed write. Revisions order events; timestamps
++are not an expiration policy. No history/volume cap, timeout or budget is added.
++
++```mermaid
++flowchart TD
++  B["Independently supplied bootstrap<br/>pins and Authorizer ; fixtures only"] --> O["Open : UID, ancestors, directory 0700<br/>private lock ; no configuration defaults"]
++  O --> P["Preview : read and authorize<br/>distinct Projection ; no save"]
++  O --> A["Explicit Create or Apply<br/>strict codec, authorization and CAS"]
++  H["Independent supplied Head<br/>protected durable witness not implemented"] --> A
++  A --> W["Verified 0600 temporary file<br/>write and file fsync"]
++  W --> R["Atomic rename"]
++  R --> D["Directory fsync"]
++  D --> V["View : saved configuration<br/>no effective-service evidence"]
++  D -. "failure after rename" .-> E["ErrIndeterminate<br/>uncertain durable outcome"]
++  E --> C["Observe against checkpoint<br/>exact current retry with reauthorization"]
++  C --> D
++  A --> F["Remote unimplemented, conflict or denial<br/>no empty success or permissive fallback"]
++  V -. "integration still absent" .-> U["Isolated service, setup and Admin<br/>current authority and final use to verify"]
++```
++
++70 named tests/subtests pass in normal and race modes; targeted vet/build pass.
++Three candidate counterexamples failed before correction: changed directory
++permissions after Open, an unserializable date accepted by Preview, and umask
++making a saved file unreadable. They remain in the [IA3c.2f-02a report](../plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/RAPPORT-IA3c2f02a.md).
++The fsync failure is locally injected; no hardware power loss is tested. Restoring
++both file AND supplied Head removes rollback detection. The protected durable
++witness, real OS boundaries, service, public adapters and UX remain open. The
++service must distinguish new bootstrap from restoration; Create is not a reset
++endpoint. Future remote support must preserve historical bytes and version rules,
++not silently recompute the chain using a new codec.
+--- before/INSTALL.md
++++ after/INSTALL.md
+@@ -27,6 +27,11 @@
+ Aucun échec de connexion ne devra déclencher une bascule permissive vers le local.
+ Voir le [contrat et les limites](docs/architecture/AGENT-IDENTITY-CONTRACT.md) et
+ le [plan de configuration et de migration](docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md).
++
++
++Le noyau de persistance de cette configuration est vérifié en fixtures locales ;
++il n’est pas encore raccordé à l’installateur ni au modal Admin. Ces vérifications
++ne constituent pas une installation de l’autorité ou une preuve de confinement.
+ 
+ ## Formation embarquée et identité visuelle
+ 
+--- before/docs/en/INSTALL.md
++++ after/docs/en/INSTALL.md
+@@ -28,6 +28,11 @@
+ [contract and limits](AGENT-IDENTITY-CONTRACT.md) and the
+ [configuration and migration plan](../plans/actions-confiance/identites-agents-enrolement-IA3c2.md).
+ 
++
++The persistence kernel for this configuration is verified in local fixtures;
++it is not connected to the installer or Admin modal yet. These checks establish
++neither an authority deployment nor agent confinement.
++
+ ## Included training resources and branding
+ 
+ After opening the cockpit, choose **Cockpit help → Casa Pizza training**. The reader provides videos, GIF previews, transcripts, a 38-page PDF and a downloadable offline kit. The selected cockpit language chooses French or English resources; the reader language control updates every resource link. Word files remain editable sources.

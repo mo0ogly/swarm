@@ -1,0 +1,90 @@
+{
+  "source-final": {
+    "status": "PASS",
+    "manifest_inputs": 1029,
+    "later_changed_nonconsumed_inputs": {
+      "tests/memory_summary_source.py": {
+        "executed_sha256": "7a9f756927973e46931a451a9f3aef8f9fa35f13987123aeeefced90d7a5f25f",
+        "current_sha256": "68b8de79ee70adda022edcb9d81a19b356a4159a27817c64f12e6febf44175d1"
+      }
+    },
+    "assessment": "Changed native recipe was not consumed by this check; Python-only checks also did not load the changed Go inspection classifier/test. All actual program, test and embedded/build sources remain identical."
+  },
+  "bridge-final": {
+    "status": "PASS",
+    "manifest_inputs": 1029,
+    "later_changed_nonconsumed_inputs": {
+      "internal/engine/memory_summary_source_test.go": {
+        "executed_sha256": "7d06840559be965c6f3cd704fbd412a2b407e8e808702410ab5373f8a07f4d37",
+        "current_sha256": "75cd9da2655931ac592620ece5a8beccdb7fa2d22c19fe2fb15ef1965d4b7c68"
+      },
+      "internal/engine/storage_inspection.go": {
+        "executed_sha256": "c7c7f96a1d901c1ec1f2f6f5cc8c908b46e6fe6eb44db26d83e509ed92cdb345",
+        "current_sha256": "2e384ffb72104ed32ab0bb1afbbde92fbe3162eebfe137cd3696a8332d0a6ff1"
+      },
+      "tests/memory_summary_source.py": {
+        "executed_sha256": "2005472a889d3cfa4ecff650c02ab1fea4e58a81dc8bfe62d878a10bb2f32863",
+        "current_sha256": "68b8de79ee70adda022edcb9d81a19b356a4159a27817c64f12e6febf44175d1"
+      }
+    },
+    "assessment": "Changed native recipe was not consumed by this check; Python-only checks also did not load the changed Go inspection classifier/test. All actual program, test and embedded/build sources remain identical."
+  },
+  "reference-regression": {
+    "status": "PASS",
+    "manifest_inputs": 1029,
+    "later_changed_nonconsumed_inputs": {
+      "internal/engine/memory_summary_source_test.go": {
+        "executed_sha256": "7d06840559be965c6f3cd704fbd412a2b407e8e808702410ab5373f8a07f4d37",
+        "current_sha256": "75cd9da2655931ac592620ece5a8beccdb7fa2d22c19fe2fb15ef1965d4b7c68"
+      },
+      "internal/engine/storage_inspection.go": {
+        "executed_sha256": "c7c7f96a1d901c1ec1f2f6f5cc8c908b46e6fe6eb44db26d83e509ed92cdb345",
+        "current_sha256": "2e384ffb72104ed32ab0bb1afbbde92fbe3162eebfe137cd3696a8332d0a6ff1"
+      },
+      "tests/memory_summary_source.py": {
+        "executed_sha256": "2005472a889d3cfa4ecff650c02ab1fea4e58a81dc8bfe62d878a10bb2f32863",
+        "current_sha256": "68b8de79ee70adda022edcb9d81a19b356a4159a27817c64f12e6febf44175d1"
+      }
+    },
+    "assessment": "Changed native recipe was not consumed by this check; Python-only checks also did not load the changed Go inspection classifier/test. All actual program, test and embedded/build sources remain identical."
+  },
+  "build-final": {
+    "status": "PASS",
+    "manifest_inputs": 1029,
+    "later_changed_nonconsumed_inputs": {
+      "tests/memory_summary_source.py": {
+        "executed_sha256": "7a9f756927973e46931a451a9f3aef8f9fa35f13987123aeeefced90d7a5f25f",
+        "current_sha256": "68b8de79ee70adda022edcb9d81a19b356a4159a27817c64f12e6febf44175d1"
+      }
+    },
+    "assessment": "Changed native recipe was not consumed by this check; Python-only checks also did not load the changed Go inspection classifier/test. All actual program, test and embedded/build sources remain identical."
+  },
+  "static-final": {
+    "status": "PASS",
+    "manifest_inputs": 1029,
+    "later_changed_nonconsumed_inputs": {
+      "tests/memory_summary_source.py": {
+        "executed_sha256": "7a9f756927973e46931a451a9f3aef8f9fa35f13987123aeeefced90d7a5f25f",
+        "current_sha256": "68b8de79ee70adda022edcb9d81a19b356a4159a27817c64f12e6febf44175d1"
+      }
+    },
+    "assessment": "Changed native recipe was not consumed by this check; Python-only checks also did not load the changed Go inspection classifier/test. All actual program, test and embedded/build sources remain identical."
+  },
+  "config-final": {
+    "status": "PASS",
+    "manifest_inputs": 1029,
+    "later_changed_nonconsumed_inputs": {
+      "tests/memory_summary_source.py": {
+        "executed_sha256": "7a9f756927973e46931a451a9f3aef8f9fa35f13987123aeeefced90d7a5f25f",
+        "current_sha256": "68b8de79ee70adda022edcb9d81a19b356a4159a27817c64f12e6febf44175d1"
+      }
+    },
+    "assessment": "Changed native recipe was not consumed by this check; Python-only checks also did not load the changed Go inspection classifier/test. All actual program, test and embedded/build sources remain identical."
+  },
+  "native-flow": {
+    "status": "PASS",
+    "manifest_inputs": 1029,
+    "later_changed_nonconsumed_inputs": {},
+    "assessment": "No source drift."
+  }
+}

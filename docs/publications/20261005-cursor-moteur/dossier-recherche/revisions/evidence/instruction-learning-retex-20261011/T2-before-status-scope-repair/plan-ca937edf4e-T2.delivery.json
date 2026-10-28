@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "task": "plan-ca937edf4e-T2",
+  "attempt": "a-a349f9134d355713576b7166",
+  "contract": "42322681531fbc222f795d153904f9b002b1f11c597af097c3c7660509100044",
+  "outcome": "complete",
+  "criteria": [
+    {
+      "index": 1,
+      "status": "pass",
+      "reason": "Verdict durable distinct des avis de candidats ; source complète et test de verdict. Réparation externe attribuée, nouvelle revue requise.",
+      "controls": [
+        "plan-entry",
+        "plan-validation",
+        "plan-delivery",
+        "plan-criterion-1"
+      ],
+      "evidence": [
+        "internal/engine/planning_judge.go",
+        "internal/engine/planning_judge_test.go",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-targeted.out",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-race.out"
+      ]
+    },
+    {
+      "index": 2,
+      "status": "pass",
+      "reason": "Renouvellement conserve objectif, exigences, compteurs et historique ; contexte global_cycle reconstruit après réouverture et CLI géré rejouable.",
+      "controls": [
+        "plan-entry",
+        "plan-validation",
+        "plan-delivery",
+        "plan-criterion-2"
+      ],
+      "evidence": [
+        "internal/engine/planning_judge.go",
+        "internal/engine/planning_judge_test.go",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-targeted.out",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-race.out",
+        "internal/engine/planning_context.go"
+      ]
+    },
+    {
+      "index": 3,
+      "status": "pass",
+      "reason": "Tests de rejeu, cycle/révisions périmés, pause/échec, quotas et refus atomiques ; aucune nouvelle production ni hausse de plafond.",
+      "controls": [
+        "plan-entry",
+        "plan-validation",
+        "plan-delivery",
+        "plan-criterion-3"
+      ],
+      "evidence": [
+        "internal/engine/planning_judge.go",
+        "internal/engine/planning_judge_test.go",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-targeted.out",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-race.out"
+      ]
+    },
+    {
+      "index": 4,
+      "status": "pass",
+      "reason": "Reproduction rouge du candidat seul puis garde commune à close : preuves des exigences, acceptedFresh, enfants/retours, reçus et processus actif. Cas accepté avec contrôles et reviewer double ; architecture FR/EN et Mermaid dans ce candidat.",
+      "controls": [
+        "plan-entry",
+        "plan-validation",
+        "plan-delivery",
+        "plan-criterion-4"
+      ],
+      "evidence": [
+        "internal/engine/planning_judge.go",
+        "internal/engine/planning_judge_test.go",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-targeted.out",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-race.out",
+        "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+        "docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md"
+      ]
+    }
+  ]
+}

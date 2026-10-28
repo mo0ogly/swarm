@@ -1,0 +1,12 @@
+{
+  "path": "/tmp/swarm-memory-m9-build-ry_lbhep/swarm",
+  "sha256": "6184f0ad2c7863d2cdb4208d9bedc7edc87a277e5b280b44afcfd372027c1cc6",
+  "version_argv": [
+    "/tmp/swarm-memory-m9-build-ry_lbhep/swarm",
+    "--json",
+    "version"
+  ],
+  "exit_code": 0,
+  "stderr": "",
+  "deployed": false
+}

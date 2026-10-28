@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-12T11:02:54.658943+00:00",
+  "candidate_digest": "1dba385b5ee3b3b8d29e2588f3d35d9ce624f4659a8dbf179147141d335e85fe",
+  "paths_transferred": [
+    "docs/T3-operator-development.md",
+    "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+    "docs/en/CURSOR-ENGINE-CONTRACT.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/cursor_engine_t3_effective_provider_test.go",
+    "internal/engine/planning.go"
+  ],
+  "source_inputs_verified": 1221,
+  "preimages_verified": true,
+  "backup": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-effective-provider-primary-preimages",
+  "operator_patch": "T3-effective-provider-recovery-20261012.patch",
+  "patch_sha256": "024e34c987a21b2e7dd3cfda721060b07fa17916cd10a5734a37bca19efe4046",
+  "runtime": "original T3 unchanged; qualification of runtime-T3 does not install it"
+}

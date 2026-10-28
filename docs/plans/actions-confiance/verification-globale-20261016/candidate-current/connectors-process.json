@@ -1,0 +1,25 @@
+{
+  "stage": "connectors",
+  "argv": [
+    "python3",
+    "tests/actions_confiance_connectors.py",
+    "--binary",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+    "--timeout-seconds",
+    "180",
+    "--evidence-dir",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/candidate-current/connectors"
+  ],
+  "pid": 4053022,
+  "start_ticks": "6256643",
+  "started_unix": 1792128142.2813938,
+  "status": "passed",
+  "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+  "exit_code": 0,
+  "ended_unix": 1792128145.5787733,
+  "stdout_sha256": "21ea92d1362ab9dd2183ff967944f87aeb0db8efa54414531a606eb033da063d",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "observed_results": 11,
+  "result_path": "docs/plans/actions-confiance/verification-globale-20261016/candidate-current/connectors/connector-public.json",
+  "result_sha256": "48b618282a1976d14182984f861abb5b27357cc3e1157c36a5dd7a6d89871eb2"
+}

@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-17T09:01:19.019057+00:00",
+  "phase": "before command build; targeted tests still running",
+  "path": "cmd/swarm/main.go",
+  "sha256": "98a5c8cc6a0413228d0155d37f1841aab653aef70ac219ed20436c1e90447f69",
+  "source": "// Command swarm starts the local Swarm CLI and web server.\npackage main\n\nimport \"swarm.local/companion/internal/engine\"\n\nfunc main() {\n\tengine.Main()\n}\n",
+  "toolchain": "go version go1.24.3 linux/amd64"
+}

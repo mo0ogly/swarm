@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "python3",
+    "tests/actions_confiance_t2.py",
+    "--criterion",
+    "0",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm",
+    "--timeout-seconds",
+    "25"
+  ],
+  "started_at": "2026-10-15T20:07:34.202845+00:00",
+  "ended_at": "2026-10-15T20:08:15.898351+00:00",
+  "exit_code": 1,
+  "sources_unchanged": true,
+  "output_sha256": "e49a4e0d600b7c1acc694438ce1ba7e2ac5e84399da80063c899fa2148e2434c",
+  "input_sha256": {
+    "bin/swarm-actions-confiance-data-policy": "c3cabbc584913c54542c9564f65c1013b43d1f9b69e309691db82533d80058b8",
+    "web/trust-actions.js": "64e6c861d256aeddc4596b2fa3a5bd23ed2febe5a5757382bfc8710915f8cefb",
+    "web/trust-actions.html": "bfc75a17a39a2b43088dfbdfa6314efd3d513b8cd6cf59c52719483ac1973574",
+    "web/trust-actions-en.js": "440ab435d58d390ab08226eb51ae671849b23ffe3cd81979669939a19c7781d6"
+  }
+}

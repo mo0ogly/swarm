@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "provider-model-http-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/provider_model_route.rs",
+    "rust/crates/swarm-engine/src/provider_model_read.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/model_routing_policy.rs",
+    "rust/crates/swarm-engine/src/provider_configuration_store.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/provider_models.rs",
+    "tests/rust_provider_model_http.py",
+    "tests/rust_provider_policy_http.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "docs/architecture/NATIVE-PROVIDER-RESOLUTION.md",
+    "docs/en/NATIVE-PROVIDER-RESOLUTION.md",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/provider_connection_catalogue.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "protected-model-resolution-with-saved-automatic-restrictions",
+      "expected_exit": 0,
+      "required_stdout": [
+        "PROVIDER_MODEL_HTTP_VERIFIED"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\nout=Path(tempfile.mkdtemp(prefix='provider-model-http-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_provider_model_http.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(out)],check=True)\nr=json.loads((out/'result.json').read_bytes());assert r['status']=='PASS' and len(r['checks'])==6 and not r['provider_started'] and not r['mission_accepted']\nprint('PROVIDER_MODEL_HTTP_VERIFIED '+str(out))"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+function trustProofJSON(raw){return JSON.parse(raw,(key,value,context)=>{if(typeof value==="number"&&Number.isInteger(value)&&!Number.isSafeInteger(value)){if(typeof JSON.rawJSON!=="function"||!context?.source)throw Error(peText("Ce navigateur ne conserve pas ces grands entiers. Utilisez le CLI pour cette preuve."));return JSON.rawJSON(context.source)}return value})}

@@ -1,0 +1,272 @@
+# Contrat interne d'identité et d'autorité des agents
+
+17 octobre 2026 — [English](../en/AGENT-IDENTITY-CONTRACT.md).
+Périmètre : noyau IA2.2, canal IA2.3a et source durable IA2.3b, internes et non raccordés aux lanceurs.
+Les défauts de l'[audit IA1](../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md)
+restent ouverts. Il n'existe aucun nouvel endpoint, commande, paramètre Admin,
+bootstrap ou confinement fournisseur livré par ce contrat.
+
+## Responsabilités et parcours actuel
+
+Le [contrat sémantique IA2](../plans/actions-confiance/identites-agents-contrat-IA2.md)
+définit la cible complète. Le noyau concret vérifie des données et construit un
+reçu de décision. Une décision positive n'est ni une réservation, ni une
+approbation humaine, ni un processus attesté, ni un effet métier observé.
+
+```mermaid
+flowchart TD
+  R["Demande interne JSON"] --> P["Schéma strict : aucune autorité déclarée"]
+  P --> L["Verrou partagé Trust"]
+  L --> I["Résoudre le jeton dans l'état courant"]
+  A["Cadre fourni par le contrôle<br/>source durable IA2.3b ci-dessous"] --> V
+  I --> V["Vérifier plan, instance, octrois et délégation"]
+  V --> D["Décision liée à la demande exacte ou refus"]
+  D -. "IA2.3 / IA3 : non raccordé" .-> E["Engagement atomique, lancement et effets"]
+```
+
+Le producteur Trust fournit l'émetteur et le sujet, la catégorie `local`, `human`
+ou `service`, la révision et l'expiration. Le noyau ne promeut pas un accès local
+en personne ni les rôles métier `requester`, `approver`, `admin` ou `effect` en
+droit de création. Il ne déduit aucune instance du seul jeton.
+
+## Données et sources d'autorité
+
+Types privés dans `internal/engine/agent_identity_contract.go` :
+
+| Objet | Contenu / sens |
+| --- | --- |
+| `agentIdentityPrincipal` | Identifiant local, catégorie, émetteur et sujet externe distincts. Aucun jeton brut ni condensat de jeton dans l'attribution. |
+| `agentIdentityActor` | Principal et éventuelle instance. Ce rattachement doit être établi par le contrôle. |
+| `agentIdentityScope` | Mission, version et empreinte du plan. La source du plan adopté demeure à raccorder. |
+| `agentIdentityGrant` | Émetteur, détenteur, parent, portée, révision Trust, permissions exactes, permissions déléguables, dates et révocation. |
+| `agentIdentityInstance` | Instance, agent logique, principal, portée, octroi et référence de liaison d'exécution. Comparer cette référence n'atteste pas le processus. |
+| `agentIdentitySnapshot` | Schéma 1, révision, octrois et instances sérialisables. Une sauvegarde ou un import reste une donnée. |
+| `agentIdentityRequest` | Schéma 1, événement, portée, octroi, opération, ressource et empreinte de contenu. Aucun champ auteur/approbateur/autorité autorisant. |
+| `agentIdentityDecision` | Contexte de projet, événement, acteur, empreintes de demande et d'instantané, révisions et expiration maximale. Aucun effet ni consommation implicites. |
+
+`agentIdentityAuthority` est un cadre privé, non sérialisable depuis JSON :
+racine canonique du projet, empreinte et révision courantes de l'instantané, révision Trust, plan courant et
+octrois racine explicitement reconnus. Le producteur durable interne est décrit
+en IA2.3b ; les émetteurs protégés de permis/checkpoint restent à raccorder.
+Recalculer ce cadre depuis l'instantané à vérifier créerait une autorité circulaire.
+Les tests historiques IA2.2 construisent une fixture ; IA2.3b lit les données
+persistées sous un checkpoint de contrôle, sans déployer d'ancre externe.
+
+Les empreintes sont des SHA-256 en hexadécimal minuscule. Les identifiants
+réutilisent la syntaxe commune `safeName`. Les ressources sont comparées
+exactement, sans jokers ni règle implicite de préfixe de chemin. Les opérations
+reconnues sont `agent.create`, `memory.read`, `memory.summarize`,
+`memory.transmit`, `tool.invoke`, `effect.execute` ; leurs consommateurs ne sont
+pas raccordés par cette livraison. Il n'existe ni délai ni plafond opérateur
+nouveau caché dans ce noyau.
+
+Émetteur et sujet sont des chaînes opaques : les crochets d'un émetteur IPv6
+ou d'un sujet ne sont pas traités comme des jokers. La validation du texte
+refuse vide, UTF-8 invalide, contrôles et espaces périphériques ; l'interdiction
+`*?[]` concerne seulement les ressources de permission.
+
+Le digest du contenu doit venir de la proposition réelle, de ses paramètres et
+de son contexte résolu. Le noyau lie la décision au digest reçu ; il ne prouve
+pas la bonne production de ce digest ni sa correspondance avec un futur effet.
+Le producteur et la frontière d'engagement appartiennent à IA2.3/IA3.
+
+## Vérifications et reprise
+
+`decodeAgentIdentityRequest` refuse champs inconnus, variantes de casse des
+champs, doublons de clés y compris imbriqués/échappés, document multiple,
+entrée vide/null/invalide, autorité déclarée et octrois à joker. Le décodeur
+d'instantané refuse aussi les champs inconnus, les doublons et les objets absents.
+
+`evaluateAgentIdentity` exige un appelant vérifié au même instant d'évaluation,
+un cadre courant, un instantané correspondant et la même portée. Il vérifie
+détenteur, référence d'instance, permission, dates, révocations et chaîne jusqu'à
+une racine reconnue. Chaque lien conserve la portée ; ses droits sont inclus
+dans les droits déléguables du parent et sa validité temporelle y est incluse.
+La chaîne est parcourue avec détection des cycles, sans récursion par octroi.
+
+Le consommateur lie l'appelant à `Store.root`, déjà canonisé à l'ouverture.
+Le cadre privé doit désigner cette même racine ; le reçu porte l'empreinte de
+ce contexte. Deux projets aux mêmes noms et jetons de fixture ne peuvent ainsi
+échanger cadre et reçu. Ce contrôle local n'est ni un identifiant de projet
+durable entre hôtes, ni une preuve de propriété du compte système. Une migration
+de racine ou une fédération devra établir explicitement son nouveau contexte
+et son ancre protégée dans IA2.3.
+
+Une modification de la configuration Trust invalide les anciens octrois dans
+ce contrat conservateur : renouvellement explicite requis. La réauthentification
+ne remet pas ces octrois à jour. L'expiration d'une décision ne dépasse ni celle
+du demandeur ni celle des octrois utilisés.
+
+`Store.evaluateAgentIdentityRequest` résout l'identité et évalue sous le même
+verrou Trust. Un rejeu repasse par cette résolution, puis par les mêmes contrôles
+et la comparaison complète du reçu. Il ne retourne pas un ancien résultat avant
+authentification. Le temps réel est échantillonné après acquisition du verrou ;
+une horloge de fixture peut être injectée par les tests internes. Aucune horloge
+JSON n'est acceptée. Ce consommateur interne ne fournit pas encore de voie
+pour un appelant agent : celle-ci attend le courtier protégé.
+
+`validateAgentIdentityTransition` exige la révision suivante et la conservation
+des anciens enregistrements. Une révocation ne peut être effacée ou déplacée ;
+les autres champs d'un ancien octroi ou d'une instance ne sont pas réécrits.
+Un remplacement utilise un nouvel identifiant et ne supprime pas l'histoire.
+Le contrôle de transition n'autorise ni ne publie la modification : le futur
+écrivain devra vérifier l'état courant et publier son ancre sous le protocole
+atomique approprié. Aucun stockage de production n'utilise encore ce validateur.
+
+## Limites et suite obligatoire
+
+La vérification des tests est conservée dans le
+[rapport IA2.2](../plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md).
+Les essais emploient des racines isolées, des acteurs d'instance simulés et des
+émetteurs OIDC/service locaux. Ils ne prouvent ni fournisseur réel ni revue
+indépendante. Les régressions du contexte d'appelant réutilisé et du cadre échangé
+entre projets sont conservées avant et après leurs corrections.
+
+Restent à réaliser : bootstrap et émetteurs protégés du cadre/checkpoint,
+engagement de l'admission dans les verrous, intégration du canal d'instance, liaison au vrai plan et au
+contenu préparé, approbation humaine exacte, consommation unique, course
+départ/révocation, réconciliation après panne et raccord de **tous** les
+consommateurs CLI/API/fournisseur/mémoire. Les deux fichiers de stockage actuels
+ne deviennent pas atomiques par l'ajout d'un évaluateur. La matrice IDA-01–18 et
+le RETEX restent la condition de qualification globale.
+
+## Expérience de canal IA2.3, distincte du noyau
+
+Le [prototype du 17 octobre](../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md)
+vérifie 13 contrôles locaux sur deux cages Linux. PID/montage sont épinglés avant
+exécution ; l'émetteur est attribué par les credentials de chaque message. Une
+connexion B copiée à A conserve le pair B, mais le message est attribué à A et
+refusé sous l'identité B déclarée. Trois joins vers B avec des descripteurs de
+namespace copiés sont refusés. Le namespace utilisateur change au bootstrap et
+n'est pas supposé stable. Ce prototype Python n'est ni un courtier Go intégré ni
+une source d'autorité ; registre et révocation sont en mémoire. Les lanceurs
+ne sont pas qualifiés par cette expérience.
+
+## Canal Go d'instance — IA2.3a
+
+Le récepteur et le registre de liaisons sont maintenant implémentés dans
+`agent_identity_channel_linux.go` et `agent_identity_runtime_linux.go`.
+`Store.evaluateAgentIdentityMessage` les relie au noyau IA2.2 en interne.
+Ils ne sont enregistrés dans aucun serveur ni lanceur. Le [rapport IA2.3a](../plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md)
+porte les contrôles et limites de cette tranche.
+
+```mermaid
+flowchart TD
+  C["Contrôle avant ouverture de la porte<br/>tests Bubblewrap ; lanceurs non raccordés"] --> N["Épingler les namespaces PID/montage attendus"]
+  N --> T["Table privée de liaisons en mémoire"]
+  M["Paquet Unix avec credentials et pidfd du message"] --> J["Décoder la demande stricte"]
+  J --> L["Verrou Trust partagé : état courant"]
+  L --> R["Verrou du registre de liaisons"]
+  T --> R
+  R --> P["Namespaces du processus par ioctl sur le pidfd"]
+  P --> B["Comparer UID et objets épinglés ; refuser révocation"]
+  B --> H["Lire l'horloge après les attentes"]
+  H --> V["Vérifier IA2.2 ; décision ou refus"]
+  A["Cadre privé d'autorité<br/>source durable IA2.3b ci-dessous"] -.-> V
+```
+
+Le contrôle appelle `pin` à partir d'un bootstrap de lanceur tenu par une porte,
+puis conserve les descripteurs PID/montage. Le namespace PID de l'hôte, les
+références incompatibles et la réutilisation d'une instance, liaison ou namespace
+PID déjà réservé sont refusés. Le premier message ne peut pas remplir cette table.
+Son caractère privé au processus ne protège pas le compte contrôleur hôte non
+confiné ; le lanceur et le bootstrap protégés restent des obligations d'intégration.
+
+`configureAgentIdentityChannel` exige un socket Unix `SOCK_SEQPACKET` et active
+`SO_PASSCRED` et `SO_PASSPIDFD`. La réception exige credentials et un unique
+`SCM_PIDFD`. Les namespaces sont obtenus depuis ce descripteur, sans rouvrir le
+numéro de PID du message. Un émetteur disparu n'est pas réidentifié par son numéro.
+Le pair de connexion n'est pas utilisé pour attribuer le message. Il s'agit du
+processus/groupe de threads indiqué par ce mécanisme, pas d'une attestation de
+chaque thread ou du binaire exécuté. Les primitives manquantes entraînent un refus,
+sans repli numérique ; seule la plateforme du rapport a été exécutée.
+
+Le consommateur fournit son tampon et sa deadline de transport. Aucun plafond ni
+délai opérateur nouveau n'est introduit. Un paquet tronqué, des credentials
+manquants ou des droits de fichier injectés sont refusés ; les descripteurs reçus
+sont fermés en cas de rejet. Le consommateur ferme le message accepté. Les
+namespaces restent épinglés jusqu'à fermeture du registre, même après révocation,
+pour conserver l'exclusion des anciennes références. Une table vide après reprise
+n'adopte pas l'autorité du premier émetteur.
+
+La réception a lieu hors du verrou Trust. L'évaluation prend Trust partagé puis
+le registre, vérifie révision/liaison/UID/namespaces, échantillonne le temps réel
+après ces attentes et appelle le noyau sous les deux verrous. La révocation de
+liaison et la fermeture sont sérialisées avec cette évaluation. Cela ne constitue
+aucun engagement Trust/SQLite, aucune consommation unique ni aucun arrêt observé.
+Les instantanés et cadres d'autorité employés par les essais restent des fixtures.
+
+Le verrou runtime protège les liaisons, pas les maps d'un instantané fourni par
+un autre composant. IA2.3b fournit sa propre copie courante. Les consommateurs
+primitifs IA2.2/IA2.3a recevant encore un cadre et un instantané supposent que leur
+appelant respecte cette propriété et leur fraîcheur ; ils ne consultent pas le
+registre durable. Une opération publique devra utiliser le parcours durable.
+
+## Source durable et publication récupérable — IA2.3b
+
+Le registre privé est maintenant produit depuis SQLite et une tête Trust
+indépendante. La version de stockage est **36** :
+`agent_identity_snapshots` conserve les versions, `agent_identity_publications`
+les reçus chaînés. La migration sauvegarde le stockage et ne crée aucun droit
+pour les anciens travaux. La consultation refuse une migration implicite.
+Le [rapport IA2.3b](../plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md)
+lie les sources, commandes et résultats ; les sections précédentes restent les
+étapes IA2.2/IA2.3a, avec leurs fixtures d'origine.
+
+```mermaid
+sequenceDiagram
+  participant C as Contrôle autorisé
+  participant T as Trust / fichier durable
+  participant S as SQLite
+  C->>T: Prendre Trust exclusif sans attente cachée
+  C->>S: Réserver transaction et vérifier version / travail
+  C->>C: Vérifier permission exacte, appelant frais et ancienne tête
+  C->>T: Persister intention et instantané cible
+  Note over T,S: Toute lecture identité refuse<br/>une intention en attente
+  C->>S: Insérer instantané et reçu, puis COMMIT
+  C->>T: Finaliser la tête et retirer le marqueur en attente
+  T-->>C: Checkpoint cible après publication réussie
+  Note over C,S: Après interruption, reprise exacte du permis initial, sans lancer de processus
+```
+
+La tête stocke contexte du projet, portée, révision et digest de l'instantané,
+révision Trust, racines reconnues, principal publiant, événement et lien vers la
+tête précédente. Elle provient d'un `agentIdentityRegistryPermit` privé liant
+le contenu exact, la portée et les racines autorisées. La voie normale résout
+le jeton courant sous Trust, après attente de SQLite et de nouveau avant
+l'intention. Un rôle métier ou un corps JSON ne construit pas ce permis.
+L'émetteur humain de ce permis reste à raccorder dans IA3.
+
+La publication prend Trust exclusif en mode non bloquant, puis réserve SQLite
+avant lecture. Elle vérifie le travail, la version et le checkpoint précédent,
+les liens, l'histoire non réécrite et le contenu approuvé. Elle persiste une
+intention dans `agent_identity_authorities` de Trust avant COMMIT, puis publie
+la nouvelle tête. Une panne après intention ou après COMMIT laisse une reprise
+exacte à effectuer. `recoverAgentIdentityRegistry` exige le permis et l'instantané
+initiaux ; il ne prépare pas une nouvelle opération. Une révision Trust changée
+est conservée : finaliser un historique ancien ne réactive pas ses droits.
+
+`atomicWrite` ouvre désormais le répertoire avant mutation, synchronise le
+fichier, renomme, puis synchronise le répertoire. Une erreur après renommage
+signifie un résultat incertain à réconcilier. Les tests ne simulent pas une
+coupure électrique ou un stockage qui ment sur `fsync`.
+
+La lecture exige un `agentIdentityRegistryCheckpoint` privé et courant, fourni
+par le contrôle, puis vérifie la tête Trust et la chaîne de reçus. Elle charge
+l'instantané exact dans une transaction de lecture avec garde de version,
+vérifie son contenu canonique et le copie. La connexion SQLite est libérée
+avant le verrou runtime. `evaluateAgentIdentityRegistryMessage` prend ainsi
+ses données dans le registre, sans recevoir de snapshot/cadre dans le message.
+Le temps réel est lu au moment de l'évaluation du rattachement d'instance.
+Aucun de ces chemins ne consomme un droit ni ne lance un effet métier.
+
+Le checkpoint n'est pas recalculé depuis une base importée ou le même ensemble
+de fichiers restaurés. Les tests le conservent hors de l'état restauré ; ils
+ne déploient aucun témoin externe. Si tous les fichiers et un ancien témoin sont
+restaurés ensemble, la fraîcheur n'est pas prouvée. L'émission et la conservation
+indépendantes du témoin restent une condition d'intégration ouverte. La portée
+est liée au permis du contrôle ; le producteur du vrai plan adopté reste à
+raccorder. La confidentialité du paquet Go ne protège pas à elle seule le compte
+hôte, les fichiers du contrôle ou une image SQLite hostile arbitraire. F01–F07
+restent ouverts, de même que l'admission publique, le confinement fournisseur,
+l'accord humain exact, la réservation/départ et les droits mémoire.

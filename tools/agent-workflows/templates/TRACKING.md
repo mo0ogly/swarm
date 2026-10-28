@@ -1,11 +1,8 @@
 # Local action checkpoint — <task / attempt>
 
-Use this compact section in your assigned working report when useful. It is
-private working memory for the owning task, not a cross-agent notification channel.
-Rewrite the current-state section as evidence changes; preserve significant
-decisions and their evidence in the final handoff. Do not accumulate raw transcripts.
-Tool-free planners/reviewers report these facts in their required JSON response
-instead of attempting to write a file.
+Use in the owning task's report, never for cross-agent notifications. Update current
+state; retain significant decisions/evidence in the handoff, without raw transcripts.
+Tool-free roles return their required JSON instead of writing files.
 
 ## Current state
 
@@ -14,6 +11,9 @@ instead of attempting to write a file.
 - Current action / next action: <one bounded action each>
 - Blocker and changed precondition needed: <cause, owner, evidence>
 - Remaining limits: <observed attempts/budget or unknown>
+- Linked problem / parent: <original requirement or failing diagnostic/control>
+- Iteration progress: <new discriminating fact or changed precondition; no unchanged retry>
+- Reassessment: <original requirement now proved, still blocked or requiring another bounded check>
 
 ## Significant actions and decisions
 
@@ -27,7 +27,5 @@ instead of attempting to write a file.
 | --- | --- | --- | --- | --- |
 | <identity> | <public reference> | <owning scope> | <pending/delivered/decision recorded/unknown> | <action> |
 
-Writing a report, emitting an event, supplying context and recording a decision
-are different observations. Never label a file "read" merely because it exists.
-An engine acknowledgement proves the recorded operation, not human-like understanding.
-Use public Swarm state for authoritative statuses; never copy this table into its database.
+Saving, event emission, receipt and decision are separate observations. ACK proves
+the recorded operation, not understanding. Use public statuses; never edit the database.

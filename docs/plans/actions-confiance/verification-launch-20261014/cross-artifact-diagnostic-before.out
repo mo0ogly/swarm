@@ -1,0 +1,11 @@
+=== RUN   TestDefectCitationCrossArtifactDiagnosticPreservesOpinion
+=== RUN   TestDefectCitationCrossArtifactDiagnosticPreservesOpinion/1
+    managed_review_fragment_defect_citation_test.go:247: missing attribution diagnostic "texte cité": inspection de fragment : citation de la pièce 0 : quote absent
+=== RUN   TestDefectCitationCrossArtifactDiagnosticPreservesOpinion/2
+    managed_review_fragment_defect_citation_test.go:247: missing attribution diagnostic "texte cité": inspection de fragment : citation de la pièce 0 : quote absent
+--- FAIL: TestDefectCitationCrossArtifactDiagnosticPreservesOpinion (0.00s)
+    --- FAIL: TestDefectCitationCrossArtifactDiagnosticPreservesOpinion/1 (0.00s)
+    --- FAIL: TestDefectCitationCrossArtifactDiagnosticPreservesOpinion/2 (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.018s
+FAIL

@@ -1,0 +1,10 @@
+{
+  "root": "/tmp/swarm-summary-source-2ane842u",
+  "checks": [
+    "M18 actual persisted source flow passes; verified M17 reference prepares a declarative choice without source text",
+    "CLI preview is read-only, reports one omitted original and never injects the operator task snapshot",
+    "Authenticated API preview equals CLI; missing confirmation and changed selection reason refuse without launch or mutation",
+    "Public criteria update makes prior confirmation stale; no worker invocation occurs and current sources are prepared again"
+  ],
+  "error": "Traceback (most recent call last):\n  File \"/home/fpizzi/Documents/ChatGPT/swarm/tests/memory_summary_admission.py\", line 131, in main\n    target=next(t for t in current['tasks'] if t['id']=='t1');assert target['status']!='accepted' and 'summary_selection' not in target['profile']\n                                                                                                                                 ~~~~~~^^^^^^^^^^^\nKeyError: 'profile'\n"
+}

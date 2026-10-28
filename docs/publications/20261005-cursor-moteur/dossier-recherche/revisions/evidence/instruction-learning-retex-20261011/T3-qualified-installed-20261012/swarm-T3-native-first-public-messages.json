@@ -1,0 +1,15 @@
+{
+  "entries": [
+    {
+      "seq": 154259,
+      "agent_id": "auto-b39bb80661d6d56b9df2",
+      "at": "2026-10-12T10:26:18.823667328Z",
+      "kind": "message",
+      "message": "Checked workspace, isolated copy clean, HEAD at e32388f. Looked at real engine code before trusting embedded claims.  **Falsified one embedded \"verified\" claim**: task text claims claim-loop never increments scope's own `Activations` (only ancestors), citing `internal/engine/planning.go` line ~484-487. Read code directly — `planningAncestors(p, scope.ID)` (planning_budget.go:50) includes scope itself as first element before walking to `.Parent`. So `owner.Activations++` loop DOES increment self too. `checkScopeActivation` (planning_budget.go:74) also iterates `planningAncestors` which includes self. Claim doesn't hold against current revision. No code change made for it — false positive, not a prereq blocker for req-11.  **Real state of T3 scope**: grepped for \"explor\" across `internal/engine/*.go` — zero existing read-only exploration primitive tied to scope/revision. No discovery→task-adaptation persistence path either. Concurrent sub-planning partially exists already (per-scope `Holder`/`Until`/`Generation` lease + optimistic revision check in `planning.go` claim/decide already allows two distinct scope IDs to be claimed independently — that's your req-11 \"atomic decisions, distinct scopes\" baseline), but nothing implements req-9/10/12 yet. This is greenfield, not a patch.  Scope here (new read-model op + discovery/adaptation persistence + dedup-safe stop/resume + bilingual Mermaid architecture docs + `TestCursorEngineT3*` suite + passing `go test ./internal/engine`) is a multi-file Go feature, not a turn-sized fix. Before I sink budget into a half build I can't finish cleanly:  Want me to (a) continue and implement req-9 (read-only explore op) first as the smallest shippable slice, reporting req-10/11/12 honestly as not_tested/partial, or (b) do the precontrôle/split request to the planner the contract's \"next action\" field actually asks for (task#N inventory before a big submit)? I won't fabricate PASS on untested criteria either way."
+    }
+  ],
+  "next_cursor": 154259,
+  "retained_from": 154236,
+  "retention_gap": false,
+  "more": false
+}

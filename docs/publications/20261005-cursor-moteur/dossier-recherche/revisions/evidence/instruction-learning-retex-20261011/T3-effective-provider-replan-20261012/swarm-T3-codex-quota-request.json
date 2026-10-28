@@ -1,0 +1,14 @@
+{
+  "kind": "quotas",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "expected_revision": 730,
+  "quotas": {
+    "limits": {
+      "planning_activations": 84,
+      "planning_decisions": 67,
+      "review_calls": 100
+    },
+    "reason": "Autorisation utilisateur existante. Réserve restante de deux activations/décisions par tâche non acceptée plus clôture, recalculée après replans ; consommation intégralement conservée."
+  },
+  "event_id": "T3-codex-supervision-reserve-bdcbb493d24a4537956c0e0f0577ea8a"
+}

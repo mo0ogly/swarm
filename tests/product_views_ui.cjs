@@ -21,7 +21,7 @@ const app=spawn(binary,['--root',root,'web','127.0.0.1:0']);let browser;const er
  for(const lang of ['fr','en'])for(const theme of ['etat','sombre']){
   await page.goto(new URL('/?lang='+lang,session).href);
   await page.waitForSelector('#product-heading');
-  if(await page.$eval('html',e=>e.dataset.theme)!==theme)await page.click('#theme');
+  if(await page.$eval('html',e=>e.dataset.theme)!==theme){await page.$eval('#theme',e=>e.closest('details').open=true);await page.click('#theme');}
   await button('Application');
   assert.match(await page.$eval('.product-count',e=>e.textContent),/1–20\/25/);
   assert.equal(await page.$$('.product-map-node').then(es=>es.length),20);

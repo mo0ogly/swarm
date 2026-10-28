@@ -1,0 +1,29 @@
+{
+  "reason": "Known failing new guard; stop a broader verification before correcting that guard. No native mission or other process is targeted. Partial output is retained, not PASS.",
+  "owner": {
+    "pid": 313800,
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./internal/engine",
+      "-count=1",
+      "-v",
+      "-run",
+      "^Test(CorrectiveCandidateRetainsClosedFragmentMethodEvidence|RecoveredResult|ReferencedCitationInstructionsAloneCannotRestart)"
+    ],
+    "start_ticks": "5938479"
+  },
+  "test_child": {
+    "pid": 316416,
+    "argv": [
+      "/tmp/go-build1886616939/b001/engine.test",
+      "-test.paniconexit0",
+      "-test.timeout=10m0s",
+      "-test.count=1",
+      "-test.v=true",
+      "-test.run=^Test(CorrectiveCandidateRetainsClosedFragmentMethodEvidence|RecoveredResult|ReferencedCitationInstructionsAloneCannotRestart)"
+    ],
+    "start_ticks": "5941265"
+  }
+}

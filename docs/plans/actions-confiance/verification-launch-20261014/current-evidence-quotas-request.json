@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "current-originals-quota-1792035513778289101",
+  "expected_revision": 271,
+  "limits": {
+    "review_context_files": 31,
+    "review_source_bytes": 98304,
+    "review_context_bytes": 360448,
+    "review_delivery_files": 100,
+    "planning_scopes": 0,
+    "delegation_depth": 0,
+    "planning_tasks": 20,
+    "planning_activations": 40,
+    "planning_decisions": 40,
+    "review_calls": 64
+  },
+  "reason": "Original brut courant des tests ajouté comme preuve sélectionnable ; 31 fichiers complets, 346648 octets, sous le plafond inchangé de 360448 octets. Autorisation utilisateur existante. Conserver les 50 appels, tentatives et toutes les autres limites."
+}

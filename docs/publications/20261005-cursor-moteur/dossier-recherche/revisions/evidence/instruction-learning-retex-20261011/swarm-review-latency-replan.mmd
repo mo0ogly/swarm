@@ -1,0 +1,13 @@
+flowchart TD
+    Mesure[Appel actif : durée, volume, tokens et verdict] --> Diagnostic[Replan : fait, hypothèse, preuve manquante]
+    Diagnostic --> Code[Défaut confirmé : effort absent du catalogue Admin]
+    Diagnostic --> Avis[Refus indépendant : handoff T1 périmé]
+    Code --> Regle[Politique Admin explicite, versionnée et prévisualisée]
+    Avis --> Correction[Correction attribuée, anciens constats conservés]
+    Regle --> Reprise[Routes fraîches : aucun mélange des avis]
+    Correction --> Reprise
+    Reprise --> Controles[Contrôles et revue du même nouveau candidat]
+    Controles --> Mesure
+    Controles --> Proprio[Superviseur : poursuivre T3 à T8 ou corriger]
+    Diagnostic --> T4[T4 : concurrence et métriques publiques sous contraintes]
+    Diagnostic --> T5[T5 : Admin, héritage et effort observé ou inconnu]

@@ -1,0 +1,19 @@
+{
+  "candidate": "60c3dc65edf0f1f3915414e284f58543c6814924",
+  "binary_sha256": "2c48fe08c2a5d8cc585e29f573c2c5065f32446a0018cff41426b881b3af0768",
+  "root": "/tmp/swarm-t7-codex-2pbm7fl4",
+  "work": "w-6a2c13c498cba8780192b44d",
+  "base": "12237f3054868454d7c1ed415f49a84217245b9b",
+  "provider": "codex-standard",
+  "requested_model": "gpt-5.6-sol",
+  "requested_effort": "medium",
+  "provider_config_sha256": "67f6422e1ec975a9a9ce133025881197cbc19aac5ef0865cf08397e0318f2382",
+  "profile": {
+    "provider": "codex-standard",
+    "role": "worker",
+    "workspace": "/tmp/swarm-t7-codex-2pbm7fl4/project",
+    "capture_output": true,
+    "timeout_seconds": 0
+  },
+  "instrumentation_observation_seconds": 1200
+}

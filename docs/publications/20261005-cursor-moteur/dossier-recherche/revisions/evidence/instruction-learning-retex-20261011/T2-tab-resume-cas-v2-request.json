@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-T2-installed-original-tab-feedback-resume-20261011",
+  "expected_revision": 225,
+  "task_id": "plan-ca937edf4e-T2",
+  "reason": "Nouvelle précondition vérifiée : runtime installé SHA2565e8b55d8416632fca9ba6501cfcd9ab78a37d1a56a48fb4067dc4c2996460a79, suite complète PASS441.491s. Le diagnostic fragmentRetryFeedback fournit maintenant la quote rejetée et les lignes physiques originales exactes ; il distingue une tabulation JSON échappée une seule fois des caractères littéraux backslash+t. La revue actuelle review-f5cb258178e80a4bdc4778d3 a échoué sur artifact17/line7, sans verdict sémantique valable. Reprendre son journal immuable sur candidat1ce2af045bef41baf4af808c610a921c7fe71224, sans réparer sa réponse brute ni relancer le producteur. Aperçu public224 :4inspections restantes,1réutilisable,6appels requis,52disponibles ; méthode inchangée. Décision superviseur15 a créé T8 mais omis son opération review-retry pourtant mentionnée ; intervention opérateur attribuée pour débloquer le protocole. Toutes les allégations restent à examiner librement sur les pièces originales ; ancien FAILED et nouvelles suites corrigées PASS sont une chronologie, pas un remplacement des reçus."
+}

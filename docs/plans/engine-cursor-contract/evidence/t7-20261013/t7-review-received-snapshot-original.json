@@ -1,0 +1,240 @@
+{
+  "planning": {
+    "reviewer_required": true,
+    "reviewer": {
+      "model_selection": {
+        "provider": "codex-standard",
+        "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+        "route": {
+          "level": "standard",
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "billing": "external",
+          "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+          "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+        },
+        "actor": "fpizzi/uid:1001",
+        "at": "2026-10-13T07:10:10.824804436Z"
+      },
+      "provider": "codex-standard",
+      "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+      "model_route": {
+        "level": "standard",
+        "model": "gpt-5.6-sol",
+        "effort": "medium",
+        "billing": "external",
+        "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+        "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+      },
+      "max_calls": 30,
+      "calls": 0,
+      "authorized": "2026-10-13T07:04:25.476133754Z"
+    },
+    "model_route": {
+      "level": "standard",
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh",
+      "billing": "external",
+      "policy_hash": "01b042984f3d780344988275a292380e1eed1904e36b8a7c9f72140a13acaa51",
+      "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+    },
+    "checks": {
+      "req-1": [
+        {
+          "id": "alpha",
+          "command": [
+            "python3",
+            "-B",
+            "-c",
+            "import alpha; assert alpha.answer()==42"
+          ],
+          "criteria": [
+            1
+          ],
+          "justification": "Actual return value of alpha equals 42.",
+          "timeout_seconds": 15
+        }
+      ],
+      "req-2": [
+        {
+          "id": "beta",
+          "command": [
+            "python3",
+            "-B",
+            "-c",
+            "import beta; assert beta.answer()==7"
+          ],
+          "criteria": [
+            1
+          ],
+          "justification": "Actual return value of beta equals 7.",
+          "timeout_seconds": 15
+        }
+      ]
+    },
+    "repository": {
+      "source": "/tmp/swarm-t7-codex-2pbm7fl4/project",
+      "storage": "/tmp/swarm-t7-codex-2pbm7fl4/.swarm/managed/w-6a2c13c498cba8780192b44d",
+      "base_commit": "12237f3054868454d7c1ed415f49a84217245b9b",
+      "candidate_commit": "12237f3054868454d7c1ed415f49a84217245b9b",
+      "snapshot_digest": "5b340907792f26ade3effd170473debe0a10fa2ceb72bb7d180f9cf0d23cb4db",
+      "request_digest": "6f3ae99290ea8c9ca8460bca64f8b284f92c0760871f92ae2c36ad7f93cccfbc"
+    },
+    "provider": "codex",
+    "provider_digest": "cb924ae9fb7559c8774643a4056f9f45e15813012a1f64734aacc8acbc931290",
+    "activations": 3,
+    "max_activations": 40,
+    "version": 1,
+    "paused": false,
+    "max_tasks": 6,
+    "max_decisions": 40,
+    "decisions": 2,
+    "scopes": [
+      {
+        "model_selection": {
+          "provider": "codex-standard",
+          "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+          "route": {
+            "level": "standard",
+            "model": "gpt-5.6-sol",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "fpizzi/uid:1001",
+          "at": "2026-10-13T07:10:10.725482186Z"
+        },
+        "last_model": {
+          "provider": "codex-standard",
+          "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+          "route": {
+            "level": "standard",
+            "model": "gpt-5.6-sol",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "",
+          "at": "2026-10-13T07:10:51.660205325Z"
+        },
+        "delivery": {
+          "judge_cycle": 1,
+          "renew_available": true,
+          "task_budget": 6,
+          "activation_budget": 40,
+          "closure_unavailable": true,
+          "exploration_available": true,
+          "review_retry_unavailable": true,
+          "production_retry_unavailable": true,
+          "context_sha256": "a0401a02ce02f21e95698cc76a82f758eff651ea39ded2557766557bd7dbeac7",
+          "events": [
+            "plan-01e159df9d0a419b97779bd6fb53c039358eb4993df096253feee639de3b61b2"
+          ],
+          "decision": "planning-claim-da16497de6b453aecc349251-decision"
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "e537da8f3a71fb180c5eb65db1ef8ade5b4354414aa555c7f6dd95f4e498360b"
+        },
+        "activations": 3,
+        "id": "root",
+        "objective": "Isolated engine acceptance recipe. Root supervisor must FIRST emit judge with continue for cycle 1 (expected_candidate from received context), then renew cycle 1 in its next activation, receiving cycle 2. BEFORE delegating, use explore read for SPEC.md from the current candidate and await the attributed exploration result. Discover alpha=42 and beta=7 from SPEC.md. Delegate req-1 to alpha-owner and req-2 to beta-owner in the SAME decision, no dependencies across branches. Each child subplanner must create exactly one worker task for its own module plus docs/<task-id>.md, with the exact expected return value and a meaningful result report covering the criterion and checks. No edits by planners. Workers only edit the assigned module and their report, run python3 -B checks, and finish; do not wait for review. The reviewer and deterministic controls are required. Each child closes its scope only after its task is accepted. Root waits for accepted tasks and closed children, then emits judge end for the current cycle and candidate, rather than a legacy close. Preserve all requirements and failures. If any worker or review fails, diagnose and revise its instructions then retry only when the reason is corrected. If waiting for worker/reviewer, acknowledge input with zero operations; never close prematurely.",
+        "requirements": [
+          "req-1",
+          "req-2"
+        ],
+        "revision": 4,
+        "generation": 9,
+        "state": "ready"
+      }
+    ],
+    "inbox": [
+      {
+        "id": "2492564a984c460188bc1f4a46ed0e9f",
+        "scope": "root",
+        "kind": "brief",
+        "message": "Isolated engine acceptance recipe. Root supervisor must FIRST emit judge with continue for cycle 1 (expected_candidate from received context), then renew cycle 1 in its next activation, receiving cycle 2. BEFORE delegating, use explore read for SPEC.md from the current candidate and await the attributed exploration result. Discover alpha=42 and beta=7 from SPEC.md. Delegate req-1 to alpha-owner and req-2 to beta-owner in the SAME decision, no dependencies across branches. Each child subplanner must create exactly one worker task for its own module plus docs/<task-id>.md, with the exact expected return value and a meaningful result report covering the criterion and checks. No edits by planners. Workers only edit the assigned module and their report, run python3 -B checks, and finish; do not wait for review. The reviewer and deterministic controls are required. Each child closes its scope only after its task is accepted. Root waits for accepted tasks and closed children, then emits judge end for the current cycle and candidate, rather than a legacy close. Preserve all requirements and failures. If any worker or review fails, diagnose and revise its instructions then retry only when the reason is corrected. If waiting for worker/reviewer, acknowledge input with zero operations; never close prematurely.",
+        "decision": "planning-claim-6356cfaad1a6cd68e2237f8a-decision",
+        "at": "2026-10-13T07:04:25.461305756Z"
+      },
+      {
+        "id": "bcd3f2add2a045c9bee7189bfb953992",
+        "scope": "root",
+        "kind": "operator_resume",
+        "message": "Observed gpt-6.1-sol capacity refusal. Explicit configured standard gpt-5.6-sol/medium route selected and frozen for root, reviewer and workers; preserve failed reservation and history.",
+        "decision": "planning-claim-6356cfaad1a6cd68e2237f8a-decision",
+        "at": "2026-10-13T07:10:11.156732848Z"
+      },
+      {
+        "id": "plan-01e159df9d0a419b97779bd6fb53c039358eb4993df096253feee639de3b61b2",
+        "scope": "root",
+        "kind": "cycle_judged",
+        "message": "Décision du superviseur appliquée ; cycle 1. Reconstruire le contexte depuis les exigences, résultats et incidents courants ; historique et consommation conservés.",
+        "decision": "planning-claim-da16497de6b453aecc349251-decision",
+        "at": "2026-10-13T07:10:51.096215195Z"
+      },
+      {
+        "id": "plan-510a2f97b2a490118d0b9ccf89dc26722c8b786d63eb87af33cf2fd3ddfbe641",
+        "scope": "root",
+        "kind": "cycle_renewed",
+        "message": "Décision du superviseur appliquée ; cycle 2. Reconstruire le contexte depuis les exigences, résultats et incidents courants ; historique et consommation conservés.",
+        "at": "2026-10-13T07:11:01.73725722Z"
+      }
+    ],
+    "judge": {
+      "cycle": 2,
+      "max_cycles": 0,
+      "closed": false,
+      "history": [
+        {
+          "verdict": "continue",
+          "reason": "Le refus de capacité gpt-6.1-sol est conservé dans l’historique et sa précondition a changé grâce à la route standard gpt-5.6-sol/medium désormais sélectionnée et figée. Conformément à la recette reçue et à l’état du cycle 1, la seule décision admissible ici est le jugement global « continue ». Aucun renouvellement, aucune exploration ni délégation ne doit être anticipé dans cette même décision.",
+          "at": "2026-10-13T07:10:51.096215195Z",
+          "renewed_at": "2026-10-13T07:11:01.73725722Z",
+          "cycle": 1
+        }
+      ]
+    }
+  },
+  "launch_profile": {
+    "provider": "codex-standard",
+    "role": "worker",
+    "workspace": "/tmp/swarm-t7-codex-2pbm7fl4/project",
+    "capture_output": true,
+    "updated": "2026-10-13T07:10:10.9418219Z",
+    "actor": "operateur"
+  },
+  "schema_version": 1,
+  "id": "w-6a2c13c498cba8780192b44d",
+  "revision": 15,
+  "title": "T7 Codex cumulative isolated recipe",
+  "objective": "Isolated engine acceptance recipe. Root supervisor must FIRST emit judge with continue for cycle 1 (expected_candidate from received context), then renew cycle 1 in its next activation, receiving cycle 2. BEFORE delegating, use explore read for SPEC.md from the current candidate and await the attributed exploration result. Discover alpha=42 and beta=7 from SPEC.md. Delegate req-1 to alpha-owner and req-2 to beta-owner in the SAME decision, no dependencies across branches. Each child subplanner must create exactly one worker task for its own module plus docs/<task-id>.md, with the exact expected return value and a meaningful result report covering the criterion and checks. No edits by planners. Workers only edit the assigned module and their report, run python3 -B checks, and finish; do not wait for review. The reviewer and deterministic controls are required. Each child closes its scope only after its task is accepted. Root waits for accepted tasks and closed children, then emits judge end for the current cycle and candidate, rather than a legacy close. Preserve all requirements and failures. If any worker or review fails, diagnose and revise its instructions then retry only when the reason is corrected. If waiting for worker/reviewer, acknowledge input with zero operations; never close prematurely.",
+  "scope": "Two isolated modules; actual Codex; no historical mission",
+  "criteria": [
+    "alpha.answer() returns 42",
+    "beta.answer() returns 7"
+  ],
+  "next": "Root reads SPEC and delegates two independent branches",
+  "summary": "",
+  "memory": null,
+  "created": "2026-10-13T07:04:25.319765878Z",
+  "updated": "2026-10-13T07:11:01.737297256Z",
+  "git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "tasks": []
+}

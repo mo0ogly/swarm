@@ -1,0 +1,30 @@
+{
+  "checks": [
+    "fr: provider logout policy previews without network or mutation and persists exact values",
+    "fr: saved freshness and unlimited retention reopen with callback address, focus and no mobile overflow",
+    "fr: signed logout also fences a matching connection already in progress",
+    "fr: malformed signed callback is rejected without changing state",
+    "fr: issuer callback without operator cookie revokes only matching ordinary and strong sessions",
+    "fr: revoked Bearer and step-up proof are refused before business mutation",
+    "fr: duplicate signed delivery is refused without touching a newly valid session",
+    "fr: UI refresh removes the inactive identity and preserves the committed effect in both themes",
+    "fr: CLI subject logout preserves another person and business history, with no raw credentials in storage",
+    "en: provider logout policy previews without network or mutation and persists exact values",
+    "en: saved freshness and unlimited retention reopen with callback address, focus and no mobile overflow",
+    "en: signed logout also fences a matching connection already in progress",
+    "en: malformed signed callback is rejected without changing state",
+    "en: issuer callback without operator cookie revokes only matching ordinary and strong sessions",
+    "en: revoked Bearer and step-up proof are refused before business mutation",
+    "en: duplicate signed delivery is refused without touching a newly valid session",
+    "en: UI refresh removes the inactive identity and preserves the committed effect in both themes",
+    "en: CLI subject logout preserves another person and business history, with no raw credentials in storage"
+  ],
+  "errors": [],
+  "expectedDiagnostics": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+  ],
+  "discovery": 30,
+  "root": "/tmp/swarm-oidc-logout-ui-PaIY0x",
+  "at": "2026-10-16T05:29:21.890Z"
+}

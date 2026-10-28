@@ -1,0 +1,16 @@
+{
+  "pid": 2200544,
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-nested",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm",
+    "mission",
+    "watch",
+    "w-68b50cc82ec3fe55624f9549"
+  ],
+  "proc_start_ticks": "2951906",
+  "started_at_utc": "2026-10-15T01:51:31.303026+00:00",
+  "executable": "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-nested",
+  "binary_sha256": "304f72d41dbe1cd785b7920ad19b34503595578da6e9c884d67faffb1e2e1508",
+  "source_proof": "nested-qualified-source-proof.json"
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "provider-policy-http-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/provider_policy_import.rs",
+    "rust/crates/swarm-engine/src/provider_policy_store.rs",
+    "rust/crates/swarm-engine/src/provider_configuration.rs",
+    "rust/crates/swarm-engine/src/provider_configuration_store.rs",
+    "rust/crates/swarm-engine/src/provider_model_route.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-cli/src/provider_policy.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/provider_policies.rs",
+    "tests/rust_provider_policy_http.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "docs/architecture/NATIVE-PROVIDER-POLICIES.md",
+    "docs/en/NATIVE-PROVIDER-POLICIES.md"
+  ],
+  "steps": [
+    {
+      "id": "protected-policy-journey",
+      "expected_exit": 0,
+      "required_stdout": [
+        "PROVIDER_POLICY_HTTP_VERIFIED"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\nout=Path(tempfile.mkdtemp(prefix='provider-policy-http-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_provider_policy_http.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(out)],check=True)\nr=json.loads((out/'result.json').read_bytes());assert r['status']=='PASS' and len(r['checks'])==8 and not r['provider_started'] and not r['mission_accepted']\nprint('PROVIDER_POLICY_HTTP_VERIFIED '+str(out))"
+      ]
+    }
+  ],
+  "environment": {}
+}

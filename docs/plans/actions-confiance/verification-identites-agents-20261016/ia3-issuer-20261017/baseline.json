@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-17T08:04:25.411919+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "sha256": {
+    "/home/fpizzi/.codex/AGENTS.md": "ba7084f1a404dd82cd6719e44c5a5d2627094875948480a37abc841ba0f97e31",
+    "AGENTS.md": "8423908d7dbf58d0357d57bc82e920a7cf468428e661b314d1c5930365368727",
+    "tools/agent-workflows/CONTRACT.md": "864062887b694e005c15ce12c68f4c8fd8a3be05f1a912b1f2c2c0ddb37b6827",
+    "docs/AGENT-METHODS.md": "58a82902c00a0220c67c3cd1b076deb1e58eea220dca9547582efcb5185be327",
+    "docs/en/AGENT-METHODS.md": "7f8c7e3f22aecd50aa7c73a9c39e4a6b8263fdec1239a1b7f47f09b4bddf37f2",
+    "docs/plans/actions-confiance/identites-agents-replan.md": "52305baa10783d74eed1784a57a179a475e34c2e1d6252440c0dafa95a7468d2",
+    "docs/plans/actions-confiance/identites-agents-contrat-IA2.md": "daab8368ebfea40804021635999b3af0eb43405a728fe655b5c872fa6dda3170",
+    "docs/architecture/AGENT-IDENTITY-CONTRACT.md": "7136d0a2cfd24f777aaacb67415b7c9db9a5393993f40da8e529c748281680e7",
+    "docs/en/AGENT-IDENTITY-CONTRACT.md": "8afda8b9317fe17174fd09486ff328cb92dba8a3c0c56045792b2ab2542cfbbb",
+    "internal/engine/agent_identity_registry_publish.go": "7fe0ccf79a7f47f0fab28a896069980990af1c7ea13d6c5d222dc927253419c1",
+    "internal/engine/agent_identity_registry_types.go": "31e18f0fe132fd499e08dcb61914135a6f396da26675301b2209accd1d540391",
+    "internal/engine/trust_actions.go": "0c7df052d315a49fc6785787d41b3954a7b13da82afb7b6346e4177e80c10744"
+  }
+}

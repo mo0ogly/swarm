@@ -1,0 +1,10 @@
+{
+  "review": "review-a533e395b07d47d75811ebad",
+  "candidate": "671336f40f5e33279a61898131abab2809990c77",
+  "plan": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-581cec8704c8ecf3/review-a533e395b07d47d75811ebad-plan.json",
+  "plan_sha256": "f1d3ef2b91d5deba2fd194d725429805cba6d4ffc2ba5dc3b64bb0802aaa602c",
+  "raw_path": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-581cec8704c8ecf3/fragment-call-5654991cad9504770e18e790-raw-94f030b60da4b5936d1085cd47e0c84f838457e2bf1b3a16b817688a81f4cb76.json",
+  "raw_sha256": "94f030b60da4b5936d1085cd47e0c84f838457e2bf1b3a16b817688a81f4cb76",
+  "failure": "inspection de fragment : defect without unique failed artifact",
+  "consumed_review_calls": 36
+}

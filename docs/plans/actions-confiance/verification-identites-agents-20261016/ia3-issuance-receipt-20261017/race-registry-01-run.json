@@ -1,0 +1,59 @@
+{
+  "command": [
+    "go",
+    "tool",
+    "test2json",
+    "-p",
+    "swarm.local/companion/internal/engine",
+    "-t",
+    "/tmp/swarm-identity-receipt-race-orjibt_m/engine.test",
+    "-test.v",
+    "-test.run=^TestAgentIdentityRegistry",
+    "-test.count=1",
+    "-test.timeout=90s"
+  ],
+  "overlay": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/overlay.json",
+  "start": "2026-10-17T09:10:49.146950+00:00",
+  "end": "2026-10-17T09:12:23.216822+00:00",
+  "elapsed_seconds": 94.069865130994,
+  "exit": 1,
+  "input_count": 1064,
+  "changed_inputs": [],
+  "counts": {
+    "pass": 22,
+    "fail": 1,
+    "skip": 0
+  },
+  "names": {
+    "pass": [
+      "TestAgentIdentityRegistryAtomicWritePreservesReplacementContract",
+      "TestAgentIdentityRegistryAtomicWriteRequiresSyncableDirectory",
+      "TestAgentIdentityRegistryPublicationPersistenceAndOwnedSource",
+      "TestAgentIdentityRegistryRecoveryAtBothCommitBoundaries",
+      "TestAgentIdentityRegistryRecoveryAtBothCommitBoundaries/intent_persisted-bootstrap",
+      "TestAgentIdentityRegistryRecoveryAtBothCommitBoundaries/intent_persisted-update",
+      "TestAgentIdentityRegistryRecoveryAtBothCommitBoundaries/sqlite_committed-bootstrap",
+      "TestAgentIdentityRegistryRecoveryAtBothCommitBoundaries/sqlite_committed-update",
+      "TestAgentIdentityRegistryRecoveryPreservesChangedTrust",
+      "TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite",
+      "TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite/cancelled-context",
+      "TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite/changed-content",
+      "TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite/cycle",
+      "TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite/event-reuse",
+      "TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite/foreign-project",
+      "TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite/missing-permit",
+      "TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite/missing-work",
+      "TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite/nil-context",
+      "TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite/unrevoke",
+      "TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite/untrusted-root",
+      "TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite/wrong-publisher",
+      "TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite/wrong-token"
+    ],
+    "fail": [
+      "TestAgentIdentityRegistryRollbackAndTamperRequireCurrentWitness/sqlite-rollback"
+    ],
+    "skip": []
+  },
+  "binary_sha256": "ab5b441e0096b97361e8389b16edd6b781caf5f4c1fa5e276b035d7831b142b9",
+  "binary_unchanged": true
+}

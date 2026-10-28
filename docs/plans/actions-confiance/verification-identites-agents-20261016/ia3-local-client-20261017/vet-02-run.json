@@ -1,0 +1,32 @@
+{
+  "packages": {},
+  "command": [
+    "go",
+    "vet",
+    "-overlay",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/overlay.json",
+    "./internal/engine",
+    "./internal/enrollmentconfig"
+  ],
+  "exit": 0,
+  "start": "2026-10-17T13:57:00.211931+00:00",
+  "end": "2026-10-17T13:57:08.593434+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 832,
+  "overlay": {
+    "Replace": {
+      "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/work_row.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/work_row.go.overlay.txt",
+      "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/work_row_test.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/work_row_test.go.overlay.txt"
+    }
+  }
+}

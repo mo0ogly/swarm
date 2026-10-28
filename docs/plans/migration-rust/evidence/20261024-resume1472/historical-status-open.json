@@ -1,0 +1,36 @@
+{
+  "state": "OPEN_EXISTING_CONTRACT",
+  "origin": "HTTP failures retained by installed resume read check; readonly CLI discrimination",
+  "observations": [
+    {
+      "work_id": "w-a77d9f4799712a6c6d96c662",
+      "exit": 2,
+      "code": "mission-root-unavailable",
+      "cause_codes": [
+        "mission-root-unavailable",
+        "mission-root-unavailable",
+        "mission-root-unavailable",
+        "agent-mission-provenance",
+        "agent-mission-provenance",
+        "mission-agent-binding-required"
+      ]
+    },
+    {
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "exit": 2,
+      "code": "mission-root-unavailable",
+      "cause_codes": [
+        "mission-root-unavailable",
+        "mission-root-unavailable",
+        "mission-root-unavailable",
+        "agent-mission-provenance",
+        "agent-mission-provenance",
+        "mission-agent-binding-required"
+      ]
+    }
+  ],
+  "owner": "Codex",
+  "scope": "Historical agent provenance versus native mission status, not resume rendering",
+  "action": "Keep missions paused and execution identity checks intact; no fabricated binding or live data rewrite. Existing cockpit reports partial read; new resume remains independently readable.",
+  "resume_condition": "Audit provenance producer/adoption and status consumer; valid native binding plus legacy/manual missing-binding fixtures; preserve execution refusal while providing honest read observation or supported explicit migration, then verify both historical status reads."
+}

@@ -1,0 +1,40 @@
+{
+  "revision": 302,
+  "task": "plan-ca937edf4e-T2",
+  "attempt": {
+    "id": "a-2f9e1debb1548be96273f0d3",
+    "status": "recorded",
+    "started": "2026-10-11T14:12:02.469298849Z"
+  },
+  "copy": "/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3",
+  "recovery": {
+    "version": 1,
+    "work": "w-ca937edf4e0abd85f8d3d67b",
+    "task": "plan-ca937edf4e-T2",
+    "previous_agent": "auto-f2abbcfe6bed66fd1a5e",
+    "previous_attempt": "a-a349f9134d355713576b7166",
+    "previous_status": "interrupted",
+    "previous_activity": "Budget de temps atteint ; fin du processus confirmée",
+    "failure": "revue de fragments non favorable : Correction demandée : contracts-reports-controls-baseline, ligne de la pièce 1 : delivery.json cite 'plan-validation' comme preuve des 4 criteres de plan-ca937edf4e-T2 (verdict distinct, renouvellement, rejeu/quota, cloture sans preuve). Mais cette commande receipt filtre 5 noms de test, aucun ne correspondant aux 7 fonctions TestPlanningJudge* ajoutees dans planning_judge_test.go. Seul TestManagedCheckpointRecovery est couvert ; end-verdict, rejets stale/quota/actif et cloture-sans-preuve, coeur des criteres 1/3/4, ne sont jamais executes par ce controle moteur malgre la citation. Reproduction : Executer go test ./internal/engine -run 'TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff' -v et comparer aux 7 noms TestPlanningJudge* de planning_judge_test.go : aucun ne correspond. Attendu : Le motif -run de plan-validation devrait couvrir TestPlanningJudge* (ex: TestPlanningJudge.*) avant d'etre cite comme preuve des criteres qu'il est censu verifier.",
+    "correction": "Troisième tentative autorisée (attempts_max=3, 2 consommées conservées) ; précondition changée vérifiable : le contrôle moteur plan-validation sélectionne désormais aussi TestPlanningJudge* en plus des cinq familles historiques, autres contrôles inchangés. Ne pas réimplémenter le juge : réutiliser dans VOTRE copie le résultat réparé attribué via .git/swarm-recovery.json / refs/swarm/recovery/previous (commit 736460f60459595c61df1d953dec77ac132db9e5, arbre b5b49c7b16ef7409257302cc92d39a8aa22a0024), après comparaison avec HEAD. Refaire exactement la vérification demandée par le refus payé f613 : confirmer que la commande -run citée comme preuve couvre nommément les fonctions TestPlanningJudge* de planning_judge_test.go, puis redémontrer les 4 critères (verdict global distinct de la revue de candidat, renouvellement de cycle, rejeu/verdict périmé/panne/quota, clôture sans preuve fraîche requise) avec des tests exécutés qui exercent réellement ces comportements, pas seulement cités dans un rapport. Ne pas tenter de contourner le refus revise-instructions déjà émis pour le défaut global de composition opérateur/IA : rester strictement dans la correction locale de T2, sans nouvelle demande d'apprentissage sur ce point. Conserver les deux tentatives historiques et le budget existant ; ne rien avancer sur T3..T8 avant acceptation effective de T2 avec preuve fraîche liée au commit candidat testé.",
+    "base_commit": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+    "result_commit": "736460f60459595c61df1d953dec77ac132db9e5",
+    "report_in_result": "docs/plan-ca937edf4e-T2.md",
+    "external_repair": {
+      "proof_key": "auto-f2abbcfe6bed66fd1a5e-repair-93d91c4070c4e039",
+      "replaces_result": "92271ad707fb3902a0680798c771233354c1853a",
+      "prior_review_id": "review-f5cb258178e80a4bdc4778d3",
+      "event_id": "T2-local-status-and-test-scope-repair-20261011",
+      "request_sha256": "93d91c4070c4e039226810653b4bc1026577b0d6b90e5006fae9f34c8586e488",
+      "agent_id": "auto-f2abbcfe6bed66fd1a5e",
+      "attempt_id": "a-a349f9134d355713576b7166",
+      "result_commit": "736460f60459595c61df1d953dec77ac132db9e5",
+      "tree": "b5b49c7b16ef7409257302cc92d39a8aa22a0024",
+      "actor": "fpizzi/uid:1001",
+      "at": "2026-10-11T13:34:14.788410243Z",
+      "reason": "Refus sémantique f5 valide conservé avec19appels. Correction de portée:pass/complete sont bilans locaux, pas acceptation; fournir argv exact du contrôle filtré plan-validation rejouéexit0 à13:12:05, commande et original de suite canonique1096/19 distincts des FAIL historiques conservés. Cinq sourcesGo identiques au candidat1ce2; docs/source-integrité ciblés PASS,18sources130304octets sous131072 sans troncature. Réparation opérateur attribuée en copie indépendante, patch de six fichiers docs appliqué seulement à copie native inactive, HEADaccepted e323 conservé; treeb5b49c7. Moteur qualifié60441875 installé et protocole partagé de revue vérifié; nouvelle recette/revue indépendante exigées, aucune acceptation, tentative ou coût remboursé.",
+      "original_process_status": "interrupted"
+    }
+  },
+  "recovery_sha256": "eaaba395ac745d551ed206cb3a94280f6a689336fcfa87c345cb9a567da3bda8"
+}

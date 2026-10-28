@@ -1,0 +1,76 @@
+.engine-settings-table{overflow-x:auto;max-width:100%}
+.engine-settings-table :is(th,td){overflow-wrap:anywhere;white-space:pre-wrap;vertical-align:top}
+.engine-settings-dialog{width:min(64rem,calc(100vw - 2rem));max-height:calc(100dvh - 2rem)}
+.engine-settings-dialog[open]{display:flex;flex-direction:column;overflow:hidden}
+.engine-settings-dialog form{display:flex;flex:1;min-height:0;flex-direction:column;max-height:none;overflow:hidden}
+.engine-settings-dialog .modal-body{flex:1;min-height:0;overflow:auto;max-height:none}
+.engine-settings-dialog :is(.modal-header,.modal-footer){flex-shrink:0}
+.engine-settings-dialog .modal-header h2{margin:0;min-width:0;overflow-wrap:anywhere}
+.engine-settings-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));gap:1rem}
+.engine-settings-field{min-width:0}
+.engine-settings-field :is(input,textarea){max-width:100%;width:100%}
+.engine-settings-unlimited{display:flex;align-items:center;gap:.5rem}
+.engine-settings-unlimited input{width:auto}
+.engine-settings-dialog .modal-footer{flex-wrap:wrap}
+.engine-settings-dialog .modal-footer button{min-width:0;white-space:normal;flex:1}
+
+.engine-settings-phase-list{min-width:0;margin:0;border-color:var(--wattson-ligne)}
+.engine-settings-phase-list legend{font-weight:700}
+
+/* Accordion sections own field grids; their inputs remain mounted when closed. */
+.engine-settings-dialog .modal-body > .engine-settings-fields{display:block}
+.engine-settings-group{margin-block:1rem;border:1px solid var(--wattson-ligne);padding:.75rem;border-radius:5px}
+.engine-settings-group > summary{cursor:pointer;font-weight:700;min-height:44px;overflow-wrap:anywhere}
+.engine-settings-group > .toolbar{margin-block:.5rem 1rem;flex-wrap:wrap}
+.engine-settings-help .modal-body{display:grid;gap:1rem}
+.engine-settings-help label{display:grid;gap:.5rem;min-width:0}
+.engine-settings-help textarea{width:100%;min-height:8rem;resize:vertical;box-sizing:border-box;font:inherit}
+.engine-settings-help [data-advice-prompt]{min-height:14rem}
+.engine-settings-help .engine-settings-unlimited{display:flex}
+.engine-settings-group button,.engine-settings-help button{min-height:44px;white-space:normal}
+
+.engine-settings-budget{margin-block:1.5rem;padding-block:1rem;border-top:1px solid var(--wattson-ligne)}
+.engine-settings-budget > button{margin:.25rem}
+.engine-settings-dialog[data-admin-budget] .modal-body > label{display:grid;gap:.5rem;margin-block:1rem}
+.engine-settings-dialog[data-admin-budget] .modal-body > .engine-settings-unlimited{display:flex}
+.engine-settings-dialog[data-admin-budget] :is(input:not([type=checkbox]),textarea){width:100%;min-width:0;box-sizing:border-box;font:inherit}
+.engine-settings-dialog[data-admin-budget] textarea{min-height:5rem}
+
+/* Provider wait shares dialog tokens and semantics; no operator input ceiling. */
+.engine-settings-dialog[data-provider-wait] label{display:grid;gap:.5rem;min-width:0;margin-block:.75rem}
+.engine-settings-dialog[data-provider-wait] :is(input,textarea){width:100%;min-width:0;box-sizing:border-box;font:inherit}
+.engine-settings-dialog[data-provider-wait] table{width:100%;table-layout:fixed;overflow-wrap:anywhere}
+#native-provider-wait dd{overflow-wrap:anywhere;margin-inline-start:0}
+
+/* Manual probe uses shared modal scrolling; actions remain keyboard visible. */
+.engine-settings-dialog[data-connection-probe] label{display:grid;gap:.5rem;min-width:0;margin-block:.75rem}
+.engine-settings-dialog[data-connection-probe] :is(input:not([type=checkbox]),select){width:100%;min-width:0;box-sizing:border-box;font:inherit}
+.engine-settings-dialog[data-connection-probe] [role=status]{overflow-wrap:anywhere}
+
+.engine-settings-dialog[data-connection-probe] .modal-footer button{flex:1 1 12rem;word-break:normal;overflow-wrap:normal}
+
+/* Scope limits share modal tokens; fixed action footer and scrollable data. */
+.engine-settings-dialog[data-run-limits] label{display:grid;gap:.5rem;min-width:0;margin-block:.75rem}
+.engine-settings-dialog[data-run-limits] :is(input:not([type=checkbox]),select,textarea){width:100%;min-width:0;box-sizing:border-box;font:inherit}
+.engine-settings-dialog[data-run-limits] pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.engine-settings-dialog[data-run-limits] [role=status]{overflow-wrap:anywhere}
+.engine-settings-dialog[data-run-limits] .modal-footer button{flex:1 1 12rem;word-break:normal;overflow-wrap:normal}
+
+.engine-settings-dialog[data-run-limits] .run-limits-status{flex-basis:100%;margin:0}
+
+/* Shared semantic layout for browser policy; sizes are presentation only. */
+.engine-settings-dialog[data-web-requests] label{display:grid;gap:.5rem;min-width:0;margin-block:.75rem}
+.engine-settings-dialog[data-web-requests] :is(input,textarea){width:100%;min-width:0;box-sizing:border-box;font:inherit}
+.engine-settings-dialog[data-web-requests] pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.engine-settings-dialog[data-web-requests] [role=status]{overflow-wrap:anywhere}
+.engine-settings-dialog[data-web-requests] .modal-footer button{flex:1 1 12rem;word-break:normal;overflow-wrap:normal}
+.engine-settings-dialog[data-web-requests] .run-limits-status{flex-basis:100%;margin:0}
+
+/* Graph objectives share semantic modal layout; no CSS execution policy. */
+.engine-settings-dialog[data-graph-performance] label{display:grid;gap:.5rem;min-width:0;margin-block:.75rem}
+.engine-settings-dialog[data-graph-performance] :is(input,textarea){width:100%;min-width:0;box-sizing:border-box;font:inherit}
+.engine-settings-dialog[data-graph-performance] fieldset{min-width:0;border:1px solid var(--wattson-ligne);border-radius:.5rem;margin-block:1rem;padding:1rem}
+.engine-settings-dialog[data-graph-performance] pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.engine-settings-dialog[data-graph-performance] [role=status]{overflow-wrap:anywhere}
+.engine-settings-dialog[data-graph-performance] .modal-footer button{flex:1 1 12rem;word-break:normal;overflow-wrap:normal}
+.engine-settings-dialog[data-graph-performance] .run-limits-status{flex-basis:100%;margin:0}

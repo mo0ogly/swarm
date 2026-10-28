@@ -1,0 +1,9 @@
+{"Time":"2026-10-17T11:27:35.235239642+02:00","Action":"start","Package":"swarm.local/companion/internal/enrollmentproof"}
+{"Time":"2026-10-17T11:27:35.238883371+02:00","Action":"run","Package":"swarm.local/companion/internal/enrollmentproof","Test":"TestResponseNullIsNotAString"}
+{"Time":"2026-10-17T11:27:35.23904767+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentproof","Test":"TestResponseNullIsNotAString","Output":"=== RUN   TestResponseNullIsNotAString\n"}
+{"Time":"2026-10-17T11:27:35.242086119+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentproof","Test":"TestResponseNullIsNotAString","Output":"    proof_test.go:84: null became a successful empty signed payload:  \u003cnil\u003e\n"}
+{"Time":"2026-10-17T11:27:35.242210804+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentproof","Test":"TestResponseNullIsNotAString","Output":"--- FAIL: TestResponseNullIsNotAString (0.00s)\n"}
+{"Time":"2026-10-17T11:27:35.242226073+02:00","Action":"fail","Package":"swarm.local/companion/internal/enrollmentproof","Test":"TestResponseNullIsNotAString","Elapsed":0}
+{"Time":"2026-10-17T11:27:35.242236432+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentproof","Output":"FAIL\n"}
+{"Time":"2026-10-17T11:27:35.24282508+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentproof","Output":"FAIL\tswarm.local/companion/internal/enrollmentproof\t0.007s\n"}
+{"Time":"2026-10-17T11:27:35.24289388+02:00","Action":"fail","Package":"swarm.local/companion/internal/enrollmentproof","Elapsed":0.008}

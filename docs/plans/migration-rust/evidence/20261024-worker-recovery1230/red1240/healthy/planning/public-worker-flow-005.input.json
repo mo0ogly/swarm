@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "public-flow-create",
+  "expected_revision": 0,
+  "title": "ROOT-PRIVATE-TITLE",
+  "objective": "ROOT-PRIVATE-OBJECTIVE",
+  "scope": "ROOT-PRIVATE-BRIEF",
+  "criteria": [
+    "OWN-REQUIREMENT"
+  ]
+}

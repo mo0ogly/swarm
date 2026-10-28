@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "checks": [
+    "/: assistant",
+    "/: pilotage",
+    "/: autonomie",
+    "/: decisions",
+    "/: activity",
+    "/: tasks",
+    "/: agents",
+    "/: logs",
+    "/: resume",
+    "/: budget",
+    "/prepare.html: method",
+    "/prepare.html: chat",
+    "/prepare.html: need",
+    "/prepare.html: documents",
+    "/terminal.html: session"
+  ],
+  "themes": [
+    "etat",
+    "sombre"
+  ],
+  "keyboard": true,
+  "focusRestored": true,
+  "mobile": true,
+  "errors": []
+}

@@ -1,0 +1,59 @@
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/reason
+    trust_effect_proof_test.go:60: effect or replay accepted an already corrupt chain
+    trust_effect_proof_test.go:65: rejected operation changed persisted state
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/sequence
+    trust_effect_proof_test.go:60: effect or replay accepted an already corrupt chain
+    trust_effect_proof_test.go:65: rejected operation changed persisted state
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/previous
+    trust_effect_proof_test.go:60: effect or replay accepted an already corrupt chain
+    trust_effect_proof_test.go:65: rejected operation changed persisted state
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/approval
+    trust_effect_proof_test.go:60: effect or replay accepted an already corrupt chain
+    trust_effect_proof_test.go:65: rejected operation changed persisted state
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/direct
+    trust_effect_proof_test.go:53: direct SPI accepted corrupt chain or mutated native state
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/replay
+    trust_effect_proof_test.go:60: effect or replay accepted an already corrupt chain
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/reason
+    trust_effect_proof_test.go:60: effect or replay accepted an already corrupt chain
+    trust_effect_proof_test.go:65: rejected operation changed persisted state
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/sequence
+    trust_effect_proof_test.go:60: effect or replay accepted an already corrupt chain
+    trust_effect_proof_test.go:65: rejected operation changed persisted state
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/previous
+    trust_effect_proof_test.go:60: effect or replay accepted an already corrupt chain
+    trust_effect_proof_test.go:65: rejected operation changed persisted state
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/approval
+    trust_effect_proof_test.go:60: effect or replay accepted an already corrupt chain
+    trust_effect_proof_test.go:65: rejected operation changed persisted state
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/direct
+    trust_effect_proof_test.go:53: direct SPI accepted corrupt chain or mutated native state
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/replay
+    trust_effect_proof_test.go:60: effect or replay accepted an already corrupt chain
+--- FAIL: TestActionsConfianceT6CorruptChainStopsEffects (12.06s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/false/reason (1.26s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/false/sequence (1.10s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/false/previous (1.28s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/false/approval (1.15s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/false/direct (0.93s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/false/replay (0.99s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/true/reason (0.97s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/true/sequence (0.96s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/true/previous (0.94s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/true/approval (0.83s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/true/direct (0.79s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/true/replay (0.84s)
+=== RUN   TestActionsConfianceT6ExportBindsEffectAndPolicy
+=== RUN   TestActionsConfianceT6ExportBindsEffectAndPolicy/false
+    trust_effect_proof_test.go:102: export omits the effective versioned policy
+    trust_effect_proof_test.go:111: export omits the exact connector intent/result/native observation
+=== RUN   TestActionsConfianceT6ExportBindsEffectAndPolicy/true
+    trust_effect_proof_test.go:102: export omits the effective versioned policy
+    trust_effect_proof_test.go:111: export omits the exact connector intent/result/native observation
+--- FAIL: TestActionsConfianceT6ExportBindsEffectAndPolicy (1.81s)
+    --- FAIL: TestActionsConfianceT6ExportBindsEffectAndPolicy/false (0.99s)
+    --- FAIL: TestActionsConfianceT6ExportBindsEffectAndPolicy/true (0.82s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	14.479s
+FAIL

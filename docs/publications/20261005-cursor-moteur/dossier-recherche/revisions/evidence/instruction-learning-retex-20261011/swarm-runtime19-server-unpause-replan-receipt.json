@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-11T18:26:36.528640+00:00",
+  "operation": "POST /api/v1/action kind unpause through authenticated native server; no separate writable Store",
+  "paused_before": true,
+  "paused_after": false,
+  "before_revision": 454,
+  "after_revision": 454,
+  "precondition": "Fresh operator event confirmed in existing inbox, holder idle, original mission authorization retained; previous CLI SQLITE_BUSY preserved.",
+  "no_event_replay": true,
+  "limits": "Native supervisor receipt and decision pending."
+}

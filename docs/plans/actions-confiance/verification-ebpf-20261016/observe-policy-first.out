@@ -1,0 +1,6 @@
+=== RUN   TestKernelObservePolicyDefault
+--- PASS: TestKernelObservePolicyDefault (0.00s)
+=== RUN   TestKernelObservePolicyInvalid
+--- PASS: TestKernelObservePolicyInvalid (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	0.085s

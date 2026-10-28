@@ -27,3 +27,22 @@ console.log('PASS i18n locale, fallback, interpolation, engine formats and catal
 const graphContext={SwarmI18n:api,module:{exports:{}}};
 vm.runInNewContext(fs.readFileSync('web/pilot-graph.js','utf8'),graphContext);
 assert.equal(graphContext.module.exports.guidance({}), 'Complete: deliverable, success criterion, instructions');
+{
+ const cp=require('node:child_process'),os=require('node:os'),path=require('node:path');
+ const fixture=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-i18n-build-'));
+ try{
+  fs.mkdirSync(path.join(fixture,'locales'));fs.mkdirSync(path.join(fixture,'web'));
+  fs.writeFileSync(path.join(fixture,'locales/en.json'),JSON.stringify({Langue:'Language'}));
+  fs.writeFileSync(path.join(fixture,'locales/trust-actions-en.json'),JSON.stringify({Pilote:'Pilot'}));
+  const script=path.resolve('scripts/i18n/build.cjs');
+  cp.execFileSync(process.execPath,[script],{cwd:fixture,stdio:'pipe'});
+  cp.execFileSync(process.execPath,[script,'--check'],{cwd:fixture,stdio:'pipe'});
+  const target=path.join(fixture,'web/trust-actions-en.js'),other=path.join(fixture,'web/i18n-en.js');
+  const retained=fs.readFileSync(other);fs.writeFileSync(target,'stale original output\n');
+  const check=cp.spawnSync(process.execPath,[script,'--check'],{cwd:fixture,encoding:'utf8'});
+  assert.notEqual(check.status,0,'check must reject a stale generated artifact');
+  assert.equal(fs.readFileSync(target,'utf8'),'stale original output\n','check must not repair tested sources');
+  assert.deepEqual(fs.readFileSync(other),retained,'check changed another generated artifact');
+  console.log('PASS i18n build check accepts current output and refuses stale output without mutation');
+ }finally{fs.rmSync(fixture,{recursive:true,force:true})}
+}

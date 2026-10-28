@@ -1,0 +1,6 @@
+{"ImportPath":"swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]","Action":"build-output","Output":"# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]\n"}
+{"ImportPath":"swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]","Action":"build-output","Output":"internal/engine/agents_store.go:1317:9: no new variables on left side of :=\n"}
+{"ImportPath":"swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]","Action":"build-fail"}
+{"Time":"2026-10-12T22:47:44.907106172+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-12T22:47:44.907374596+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine [build failed]\n"}
+{"Time":"2026-10-12T22:47:44.907432145+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0,"FailedBuild":"swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]"}

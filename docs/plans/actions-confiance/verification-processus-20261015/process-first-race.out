@@ -1,0 +1,4 @@
+# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]
+internal/engine/trust_process_service.go:156:9: invalid operation: id.Subject == subject && !id.Disabled && id.Integrity >= 2 && (trustHasRole(id, "approver") || trustHasRole(id, "effect")) (mismatched types trustIdentityDisabled and bool)
+FAIL	swarm.local/companion/internal/engine [build failed]
+FAIL

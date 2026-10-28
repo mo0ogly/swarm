@@ -1,0 +1,19 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^(TestAgentIdentity.*|TestLaunchAtomicIdempotentAndWorkspaceExclusive|TestLaunchRejectsEscapeAndUnsatisfiedDependencies|TestActionsConfianceT3IdentityContextPublicReadOnly|TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation|TestActionsConfianceT3OIDCLogoutSessionAndSubject)$",
+    "-count=1",
+    "-timeout",
+    "60s"
+  ],
+  "start": "2026-10-17T06:33:09.144973+00:00",
+  "end": "2026-10-17T06:33:50.379291+00:00",
+  "exit_code": 0,
+  "input_files": 1046,
+  "changed_inputs": [],
+  "reason": "Final assertions reject unavailable FD inventories rather than treating empty results as no leak"
+}

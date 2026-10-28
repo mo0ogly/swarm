@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "version": "v0.1.1-dev.3",
+  "binary_sha256": "7b72f4ab3ae44bef730098aa9a99a00d50f84dbaada05164bf610d7d784a1455",
+  "notes": 4,
+  "live_log_events": 100,
+  "source_fidelity": true,
+  "errors": [],
+  "failed": [],
+  "mutations": [],
+  "outside": [],
+  "limits": "Read-only acceptance on actual managed server. No mission content or session credential retained."
+}

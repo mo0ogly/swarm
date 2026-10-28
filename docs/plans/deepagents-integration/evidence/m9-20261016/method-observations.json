@@ -1,0 +1,26 @@
+{
+  "at_utc": "2026-10-16T09:26:15.398068+00:00",
+  "owner": "Codex",
+  "items": [
+    {
+      "kind": "lookup_error",
+      "cause": "Assumed context.go, agents_prepare.go, agents_terminal.go and CLI.md paths absent from the actual repository",
+      "correction": "Used rg --files and symbol search; inspected actual producer and console_cli.go/web_server.go consumers",
+      "effect": "Scope and JSON keys derived from actual code; no configuration or engine exception added"
+    },
+    {
+      "kind": "fixture_compilation_error",
+      "original": "context-receipt-red.json",
+      "cause": "Passed Usage pointer to finishAgent whose fourth argument is exit code *int",
+      "correction": "Read signature, stored Usage on Agent and passed nil exit code",
+      "verification": "Two named failures then executed before engine correction in context-receipt-red-executed.log",
+      "counted_as_test_pass": false
+    },
+    {
+      "kind": "documentation_patch_refusal",
+      "cause": "Patch expected a paragraph starting on a different physical line",
+      "correction": "Used the exact existing final paragraph as insertion anchor",
+      "effect": "Bilingual sections inserted without overwriting prior text"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "at": "2026-10-11T17:15:05.751622+00:00",
+  "isolated_root": "/tmp/swarm-storage28-public-0uk761nu",
+  "steps": [
+    {
+      "label": "old_init",
+      "command": [
+        "/home/fpizzi/workspace/swarm/bin/swarm",
+        "--root",
+        "/tmp/swarm-storage28-public-0uk761nu",
+        "init",
+        "--json"
+      ],
+      "exit": 0,
+      "output": "/tmp/swarm-storage28-public-old_init.json",
+      "output_sha256": "c52e88dfbb2d4b0e00d12e52ae7071a3b0d7b2192623aa18523c28765bb94e2f",
+      "binary_sha256": "1250e99e8f4c3f65a25a26186f46bc688dfab5e9c3b8bf48c1543ca3f33576cd",
+      "error": null,
+      "receipt_reconstruction": "Existing original output files after summary helper failed on expected list response; no commands repeated."
+    },
+    {
+      "label": "new_init",
+      "command": [
+        "/tmp/swarm-review-retry-storage-candidate",
+        "--root",
+        "/tmp/swarm-storage28-public-0uk761nu",
+        "init",
+        "--json"
+      ],
+      "exit": 0,
+      "output": "/tmp/swarm-storage28-public-new_init.json",
+      "output_sha256": "c52e88dfbb2d4b0e00d12e52ae7071a3b0d7b2192623aa18523c28765bb94e2f",
+      "binary_sha256": "df593d310c85b8a1ace46082ef977524d717eea27147167d767460c25b677ba4",
+      "error": null,
+      "receipt_reconstruction": "Existing original output files after summary helper failed on expected list response; no commands repeated."
+    },
+    {
+      "label": "old_read",
+      "command": [
+        "/home/fpizzi/workspace/swarm/bin/swarm",
+        "--root",
+        "/tmp/swarm-storage28-public-0uk761nu",
+        "work",
+        "list",
+        "--json"
+      ],
+      "exit": 2,
+      "output": "/tmp/swarm-storage28-public-old_read.json",
+      "output_sha256": "f33f73864aa39237d9cdfff01c1760d95a317bf0337a2efa4766392df5b2b336",
+      "binary_sha256": "1250e99e8f4c3f65a25a26186f46bc688dfab5e9c3b8bf48c1543ca3f33576cd",
+      "error": "version de stockage non supportée : 28",
+      "receipt_reconstruction": "Existing original output files after summary helper failed on expected list response; no commands repeated."
+    },
+    {
+      "label": "new_read",
+      "command": [
+        "/tmp/swarm-review-retry-storage-candidate",
+        "--root",
+        "/tmp/swarm-storage28-public-0uk761nu",
+        "work",
+        "list",
+        "--json"
+      ],
+      "exit": 0,
+      "output": "/tmp/swarm-storage28-public-new_read.json",
+      "output_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "binary_sha256": "df593d310c85b8a1ace46082ef977524d717eea27147167d767460c25b677ba4",
+      "error": null,
+      "receipt_reconstruction": "Existing original output files after summary helper failed on expected list response; no commands repeated."
+    }
+  ],
+  "private_v28_backup": {
+    "path": "/tmp/swarm-storage28-public-0uk761nu/.swarm/state-pre-v28-cf36dc0ecc9ba6522d396f05.db",
+    "mode": "0600"
+  },
+  "check": "PASS public27init→28init→old reader refuses→new reader succeeds",
+  "limits": "Empty isolated public root; populated directive/revision/consumption preservation proved separately in Go tests. Summary helper initial list parsing error preserved; exit codes inferred from command error/success shape, not an original complete subprocess receipt."
+}

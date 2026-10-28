@@ -1,0 +1,20 @@
+{
+  "rust/crates/swarm-engine/src/preparation_command.rs": "03946d8d5165a34398ca7e0b7c5e117b17c06b0cfb44b60471584d07b35eb5cd",
+  "rust/crates/swarm-engine/src/root_store/preparation_write.rs": "daeb6dfe0ffc55cf692c60309ae2db9befb85b9e285faf3c54b66b8f2b479d90",
+  "rust/crates/swarm-cli/src/preparation.rs": "06c848ea5c60920b0bfe42912ff99c0ff47b5a2321d6fc88440a0622495bedb6",
+  "rust/crates/swarm-cli/src/lib.rs": "c0c7f506861705a9adde550fadf2116a3ac710b99a7c820bd85724a5aa01a42d",
+  "rust/crates/swarm-web/src/service/preparations.rs": "f0524caeb5437bae5e05fe4ae0f216e378b63be447cfc2bedbbad168f8ecec3d",
+  "rust/crates/swarm-web/src/service.rs": "f8c6b8053458dcda00be5afc6f1af4e00e525bbda86c17edb12c99862c7dcbd1",
+  "tests/rust_preparation_adoption.py": "557e1645f13ea6c37ea6e0d9d5160d0a361cf128fa3a089b507824343e57c643",
+  "tools/verification/recipes/preparation-writes-rust.json": "ed84d32b8e21febc33f97ceb63254dbf2fb5f6950358565e3707f741c8995d87",
+  "version_history.json": "c7b0644aa3008144500dd193f83add34076935f2f5474b631451ea1f29b203fe",
+  "docs/architecture/RUST-MIGRATION.md": "576234cbfc4536d49c1729f54cbbf759b6820a87fbb74985259736e3e7642103",
+  "docs/en/RUST-MIGRATION.md": "b6d9d5ae4d3ae88c2305a8dab265ef47f108c79ca1aac50c0d34c0051ce7de25",
+  "docs/RUNTIME-RECOVERY.md": "b2f64333646d9253148eae0778db12238a0a9addcdbc9194e559d93faa649489",
+  "docs/en/RUNTIME-RECOVERY.md": "3452d7e3e0f4dd1751413b142c5d69145b4d2f719aed0d8f442afa68eab2ce57",
+  "docs/plans/migration-rust/REPLAYS.md": "eed5fa211f4692617715da9306d909b03f29cc3875c7739f37c035e737f063fb",
+  "docs/en/RUST-MIGRATION-REPLAYS.md": "268cebd55653e8f491bea7ae33508ce5c2719a557f28099ec3c8a4ec386112d4",
+  "rust/crates/swarm-engine/tests/preparation_writes.rs": "ee8def0d18aa804235b450e908db827cefd88ce7b6a01fbfcbff7f20c36dd5e4",
+  "docs/plans/migration-rust/PLAN.md": "dcb1240236fdf1f50d0f96ce52a5a6365b8978a85e5c902c2ae5fdf38cdcf648",
+  "docs/plans/migration-rust/PREPARATION-ADOPTION-20261026.md": "758d647e53802777244a6afcccffd190bffe94dbbf9f91e80e0f0bcbf98b12f0"
+}

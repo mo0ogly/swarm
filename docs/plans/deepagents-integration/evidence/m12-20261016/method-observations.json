@@ -1,0 +1,39 @@
+{
+  "method": "replan",
+  "owner": "Codex",
+  "incidents": [
+    {
+      "observed": "Public API authentication test expected 401 but observed 403",
+      "original": "recovery-green.json/.log",
+      "cause": "Test assumption differed from existing web_server.go session middleware",
+      "changed_precondition": "Assertion fixed to the single authoritative 403 response without changing authentication",
+      "verified_effect": "recovery-final-ui CLI/API read-only and scope test passes"
+    },
+    {
+      "observed": "First browser recipe compared focus with an old DOM node",
+      "original": "browser.json and browser/failure.json",
+      "cause": "Assertion used element-instance identity despite semantic focus restoration contract",
+      "changed_precondition": "Use the real diagnostic action and assert its missionAction identity",
+      "verified_effect": "browser-flow verifies action focus after Escape in all four language/theme pairs"
+    },
+    {
+      "observed": "Second browser recipe waited for a lazily created action before expanding results",
+      "original": "browser-final.json and browser-final/failure.json",
+      "cause": "Missing public UI precondition, confirmed in Mission.renderResults",
+      "changed_precondition": "Expand mission-results before clicking the actual action",
+      "verified_effect": "browser-flow passes through real button and API"
+    },
+    {
+      "observed": "Documentation patch anchor absent from PLAN.md",
+      "cause": "Anchor copied from another document",
+      "changed_precondition": "Read actual resumption paragraph and reapply an atomic patch",
+      "verified_effect": "Report, plan and Markdown targets present; failed patch applied no mutation"
+    }
+  ],
+  "limitations": [
+    "No provider restart or decision grant",
+    "No model calls",
+    "No deployment or live migration",
+    "Same-context local review, not independent acceptance"
+  ]
+}

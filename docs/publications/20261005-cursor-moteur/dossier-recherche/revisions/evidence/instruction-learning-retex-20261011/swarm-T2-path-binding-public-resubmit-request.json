@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-path-binding-originals-and-semantic-scope-replan-20261011",
+  "expected_revision": 407,
+  "task_id": "plan-ca937edf4e-T2",
+  "agent_id": "auto-a23c60f03a732c02841f",
+  "attempt_id": "a-2f9e1debb1548be96273f0d3",
+  "review_id": "review-d77d76cb2428baa608cc5d3b",
+  "confirm_recovery": true,
+  "result_tree": "9b03d914eadbc6711dd3804b5178e78e7c30f063",
+  "reason": "Replan du refus d77 : inspection Git exacte du candidat6c2da25/tree201b3a8 démontre que stdout racine et copie imbriquée existent, mêmeSHA fbaa92ea. Original racine fourni fragment0, imbriqué fragment1 ; absence du seul paquet ne démontre aucune absence du candidat. Reçu courant référence désormais copie imbriquée ; metadata.native-original inchangé SHA69e7ad88, chemin racine vérifié. Reçu path-binding-replan.json attribué et rapport/index conservent originaux et refus, aucune opinion annulée. Critère4 distingue contrôle structurel de conformité sémantique soumise revue indépendante. Cinq chemins de documentation seulement ; sourceunion17fichiers130889octets sans troncature. Préimages/empreintes et arbre9b03d914 vérifiés sur copie terminée, aucune nouvelle tentative/Go/consommation modifiée. Nouveaux contrôles et revue indépendante du même candidat requis. Correctif opérateur de transmission review-retry en cours de qualification séparée, pas annoncé installé ni comportement global achevé."
+}

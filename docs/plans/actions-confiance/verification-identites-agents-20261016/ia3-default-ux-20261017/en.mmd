@@ -1,0 +1,14 @@
+flowchart TD
+  I["Initial setup<br/>target, not delivered"] --> C["Hosting: local by default"]
+  I --> H["Local human account by default<br/>optional enterprise provider"]
+  H --> V
+  A["Admin modal<br/>target, not delivered"] --> V["Rights, shared validation<br/>expected revision and preview"]
+  C --> V
+  V --> S["Persistent protected configuration<br/>outside agent/import sources"]
+  S --> L["Adopted local adapter<br/>separate service account and confinement"]
+  S -. "planned evolution" .-> R["Remote adapter not implemented<br/>separate machine and administration"]
+  L --> K["Same business contract<br/>identity, delegation, current state and revocation"]
+  R -.-> K
+  K --> E["Effective state and usage evidence<br/>distinct from saved choice"]
+  L --> F["Unavailable or forbidden request<br/>deny, no permissive fallback"]
+  R -.-> F

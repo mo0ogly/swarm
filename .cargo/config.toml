@@ -1,0 +1,5 @@
+# Required technical capability: observe the file descriptor of the actual
+# bundled SQLite main connection without unsafe FFI or pathname inference.
+# This is not an operator execution policy. Unsupported builds refuse Root opens.
+[env]
+LIBSQLITE3_FLAGS = { value = "-DSQLITE_ENABLE_FILESTAT", force = true }

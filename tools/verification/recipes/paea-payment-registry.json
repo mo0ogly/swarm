@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "id": "paea-payment-registry",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-protection-contract/Cargo.toml",
+    "rust/crates/swarm-protection-contract/src/*.rs",
+    "rust/crates/swarm-protection-contract/tests/*.rs",
+    "rust/crates/swarm-identity-contract/Cargo.toml",
+    "rust/crates/swarm-identity-contract/src/*.rs",
+    "rust/crates/swarm-cli/Cargo.toml",
+    "rust/crates/swarm-cli/src/*.rs",
+    "rust/crates/swarm-cli/src/*/*.rs",
+    "rust/crates/swarm-cli/tests/protection.rs",
+    "rust/crates/swarm-cli/tests/protection_receipt.rs",
+    "tests/fixtures/paea/*.json",
+    "schemas/paea/*.json",
+    "tests/paea_contract_schema_test.py",
+    "tools/paea/*.py",
+    "tools/verification/recipe.py",
+    "docs/architecture/PAEA-CONTRACT.md",
+    "docs/en/PAEA-CONTRACT.md",
+    "rust/crates/swarm-cli/tests/protection_receipt_report.rs",
+    "rust/crates/swarm-web/Cargo.toml",
+    "rust/crates/swarm-web/src/*.rs",
+    "rust/crates/swarm-web/src/service/*.rs",
+    "rust/crates/swarm-web/tests/paea.rs",
+    "web/paea.*",
+    "web/trust-native.html",
+    "locales/en.json",
+    "web/i18n*.js",
+    "rust/crates/**/*",
+    "web/*",
+    "frontend/engine-settings/*",
+    "tools/agent-workflows/**/*",
+    ".claude/skills/**/*",
+    "version_history.json",
+    "rust/crates/swarm-cli/tests/protection_payment.rs",
+    "tests/paea_payment_schema_test.py",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "web/lib/**/*"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "payment-schema",
+      "command": [
+        "python3",
+        "tests/paea_payment_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "Ran 4 tests",
+        "OK"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "payment_registry",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-protection-contract",
+        "--test",
+        "payment_registry",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "7 passed; 0 failed",
+        "aliases_converge_and_supplier_references_remain_distinct",
+        "corrected_terms_preserve_intent_and_change_content",
+        "ambiguous_ids_and_supplier_aliases_refuse_then_recover",
+        "project_staleness_unknown_and_empty_registry_refuse",
+        "invalid_registry_and_request_values_never_produce_a_proposal",
+        "strict_raw_bytes_and_non_authority_markers_are_preserved",
+        "strict_i64_overflow_and_bom_refuse_with_causes_then_recover"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "protection_payment",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "protection_payment",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "3 passed; 0 failed",
+        "payment_resolution_public_aliases_and_both_languages",
+        "payment_resolution_public_refusal_and_recovery",
+        "payment_resolution_write_and_flush_causes_and_recovery"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "rust-contract",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-protection-contract",
+        "--test",
+        "contract",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "17 passed; 0 failed",
+        "both_domains_match_precomputed_python_bytes_and_digests",
+        "unknown_never_becomes_denial_retry_or_unobserved_success"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-cli",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "protection",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "8 passed; 0 failed",
+        "protection_output_failure_is_nonzero_without_project_side_effects",
+        "protection_live_operations_are_not_advertised_as_implemented",
+        "protection_comparison_both_domains_preserves_values_and_authority_boundary",
+        "protection_comparison_fault_on_either_side_refuses_then_recovers",
+        "protection_comparison_rejects_runtime_options_without_project_effects",
+        "protection_comparison_output_failure_then_recovery"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

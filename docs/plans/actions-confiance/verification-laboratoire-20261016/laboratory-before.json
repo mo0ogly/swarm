@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-archive-confirmed",
+    "--root",
+    "isolated-fixture",
+    "--json",
+    "laboratory",
+    "show"
+  ],
+  "at": 1792110803.940538,
+  "expected_exit": 0,
+  "exit": 2,
+  "stdout": "",
+  "stderr": "{\n  \"error\": \"commande inconnue : laboratory\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"commande inconnue : laboratory\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n"
+}

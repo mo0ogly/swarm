@@ -1,0 +1,216 @@
+#!/usr/bin/env python3
+"""Compiled CLI/supervisor/API recipe, isolated root and scripted provider only."""
+
+import argparse
+import hashlib
+import http.cookiejar
+import json
+import os
+from pathlib import Path
+import re
+import select
+import subprocess
+import sys
+import tempfile
+import time
+import traceback
+import urllib.error
+import urllib.parse
+import urllib.request
+import uuid
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("binary", type=Path)
+    parser.add_argument("output", type=Path)
+    args = parser.parse_args()
+    binary = args.binary.resolve()
+    out = args.output.resolve()
+    out.mkdir(mode=0o700, parents=True, exist_ok=False)
+    root = Path(tempfile.mkdtemp(prefix="swarm-recovery-projection-"))
+    checks, commands = [], []
+    server, active = None, None
+
+    def save(name, value):
+        data = value if isinstance(value, bytes) else (json.dumps(value, ensure_ascii=False, indent=2) + "\n").encode()
+        with (out / name).open("xb") as file:
+            os.chmod(file.name, 0o600)
+            file.write(data)
+
+    def cli(*argv, payload=None):
+        command = [str(binary), "--root", str(root), "--json", *argv]
+        raw = json.dumps(payload) if payload is not None else None
+        if raw is not None:
+            command += ["--input", "-"]
+        result = subprocess.run(command, input=raw, text=True, capture_output=True, timeout=20)
+        commands.append({"argv": argv, "exit_code": result.returncode, "stderr": result.stderr,
+                         "input_sha256": hashlib.sha256(raw.encode()).hexdigest() if raw else None})
+        assert result.returncode == 0 and not result.stderr, f"CLI failed: {argv}: {result.returncode}: {result.stderr}"
+        return json.loads(result.stdout)
+
+    def request(revision, **fields):
+        return dict(schema_version=1, event_id=str(uuid.uuid4()), expected_revision=revision, **fields)
+
+    def wait_for(check, description, timeout=20):
+        until = time.monotonic() + timeout
+        while time.monotonic() < until:
+            value = check()
+            if value:
+                return value
+            time.sleep(.1)
+        raise AssertionError(description)
+
+    def stopped(agent_id):
+        value = cli("agent", "show", agent_id)["agent"]
+        return value if value["status"] not in {"queued", "starting", "running", "stopping"} else None
+
+    def digest(data):
+        return hashlib.sha256(data).hexdigest()
+
+    try:
+        assert binary.is_file() and os.access(binary, os.X_OK), "Build the executable ./cmd/swarm before running this recipe"
+        save("built-version.json", cli("version"))
+        cli("init")
+        provider = root / "claude"
+        provider.write_text("#!" + sys.executable + "\n" + '''import json, pathlib, sys
+p = pathlib.Path(__file__)
+if "--swarm-preflight" in sys.argv:
+    print(json.dumps({"schema_version":1,"capabilities":{"process":"verified","workspace_read":"verified","workspace_write":"verified"}}))
+    sys.exit(0)
+calls = p.with_suffix(".calls")
+number = len(calls.read_text().splitlines()) + 1 if calls.exists() else 1
+p.with_suffix(".input-"+str(number)).write_text(sys.stdin.read())
+with calls.open("a") as file: file.write("call\\n")
+if number == 1:
+    for i, suffix in enumerate(["first.go", "second.go", "masked"]):
+        tool = "Read" if i < 2 else "Bash"
+        data = {"file_path":"common/"*40+suffix} if i < 2 else {"command":"token=private-fixture-value"}
+        print(json.dumps({"type":"assistant","message":{"content":[{"type":"tool_use","id":str(i),"name":tool,"input":data}]}}))
+        print(json.dumps({"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":str(i),"content":"raw-fixture-result-must-not-be-projected"}]}}))
+print(json.dumps({"type":"result","result":"controlled fixture outcome","usage":{"input_tokens":17,"output_tokens":3}}))
+sys.exit(1 if number == 1 else 0)
+''')
+        provider.chmod(0o700)
+        (root / ".swarm/providers.json").write_text(json.dumps({"schema_version": 1, "providers": {"fixture": {
+            "command": str(provider), "preflight_args": ["--swarm-preflight"], "preflight_kind": "provider-context",
+            "preflight_capabilities": ["process", "workspace_read", "workspace_write"]}}}))
+        work = cli("work", "create", payload=request(0, title="Recovery projection fixture", objective="Inspect bounded historical context",
+                   scope="Owned local fixture", criteria=["Attributed projection"], next="Inspect"))["work"]
+        criterion = "Check the retained evidence before deciding. " * 10
+        work = cli("task", "add", work["id"], payload=request(work["revision"], id="t1", title="Inspect recovery projection",
+                   deliverable="fixture.txt", criteria=[criterion], next="Inspect the current task and retained operations"))["work"]
+
+        def launch(w):
+            return cli("agent", "start", w["id"], payload=request(w["revision"], task_id="t1", provider="fixture", role="worker",
+                       workspace=".", instruction="Inspect this local scripted fixture", capture_output=True, timeout_seconds=30))["agent"]
+
+        active = launch(work)
+        source = wait_for(lambda: stopped(active["id"]), "Source execution did not stop")
+        assert source["status"] == "failed", "Controlled source failure was not retained"
+        work = wait_for(lambda: (lambda w: w if w["tasks"][0]["status"] == "blocked" else None)(cli("work", "show", work["id"])["work"]), "Source task did not settle")
+        assert source["progress"]["tool_calls"] == source["progress"]["tool_results"] == 3
+        logs_before = cli("agent", "logs", source["id"], "-1")
+        save("source-before.json", source)
+        save("source-logs-before.json", logs_before)
+        checks.append("Public launch retains a failed source with three completed scripted operations")
+
+        active = launch(work)
+        current = wait_for(lambda: stopped(active["id"]), "Recovery execution did not stop")
+        assert current["status"] == "completed", "Scripted recovery did not complete"
+        received = provider.with_suffix(".input-2").read_bytes()
+        assert received == current["prompt"].encode()
+        assert current["context"]["sha256"] == digest(received) and current["context"]["bytes"] == len(received)
+        prepared = current["prepared_context"]
+        assert prepared["sha256"] == digest(received[:prepared["bytes"]]) and prepared["bytes"] < len(received)
+        save("provider-input.txt", received)
+        save("cli-agent.json", current)
+        checks.append("Actual provider input equals the persisted final prompt and both context receipts match their bytes")
+
+        marker = "MÉMOIRE DE REPRISE FOURNIE PAR LE MOTEUR :\n"
+        projection = json.loads(current["prompt"].split(marker, 1)[1].split("\n", 1)[0])
+        assert projection["work"] == work["id"] and projection["task"] == "t1"
+        assert projection["agent"] == source["id"] and projection["attempt"] == source["attempt_id"]
+        p, operations = projection["activity_projection"], projection["observed_operations"]
+        assert p["retained_activity_rows"] == len([r for r in logs_before if r["kind"] == "activity"])
+        assert p["retained_activity_rows"] == p["scanned_activity_rows"] + p["unscanned_activity_rows"]
+        assert p["scanned_activity_rows"] == len(operations) + p["excluded_tool_result_rows"] + p["duplicate_rows"] + p["omitted_budget_rows"]
+        assert len(p["sources"]) == len(operations)
+        indexed = {row["seq"]: row for row in logs_before}
+        assert [r["seq"] for r in p["sources"]] == sorted(r["seq"] for r in p["sources"])
+        long_sources = [indexed[row["seq"]]["message"] for row in p["sources"] if row["truncated"]]
+        assert len(long_sources) == 2 and long_sources[0] != long_sources[1]
+        for row in p["sources"]:
+            assert indexed[row["seq"]]["agent_id"] == source["id"] and indexed[row["seq"]]["kind"] == "activity"
+        assert projection["bounded_excerpt"] is True
+        assert "private-fixture-value" not in json.dumps(projection) and "raw-fixture-result-must-not-be-projected" not in json.dumps(projection)
+        save("projection.json", projection)
+        checks.append("Source log sequences preserve distinct shortened operations; counters explain all retained rows without raw results or secrets")
+
+        focus = projection["task_focus"]
+        assert focus["bounded_excerpt"] and "criteria.1.expected" in focus["truncated_fields"]
+        assert all(row["verification_required"] for row in focus["criteria"])
+        checks.append("Shortened current criterion is explicitly attributed and still requires verification")
+
+        source_after = cli("agent", "show", source["id"])["agent"]
+        logs_after = cli("agent", "logs", source["id"], "-1")
+        assert source_after == source and logs_after == logs_before
+        save("source-after.json", source_after)
+        save("source-logs-after.json", logs_after)
+        checks.append("Original source record, observed consumption and retained logs remain identical after recovery")
+
+        server = subprocess.Popen([str(binary), "--root", str(root), "web", "127.0.0.1:0"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        announced, match = b"", None
+        deadline = time.monotonic() + 15
+        while time.monotonic() < deadline and match is None:
+            assert server.poll() is None, "Owned API server exited before readiness"
+            ready, _, _ = select.select([server.stdout], [], [], .1)
+            if ready:
+                announced += os.read(server.stdout.fileno(), 4096)
+                match = re.search(r"http://\S+/session/\S+", announced.decode())
+        assert match, "Owned API server did not provide a session address"
+        address = match.group()
+        base = address.split("/session/", 1)[0]
+        opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+        with opener.open(address, timeout=10) as response:
+            response.read()
+        query = urllib.parse.urlencode({"work": work["id"], "agent": current["id"]})
+        with opener.open(base + "/api/v1/agent-detail?" + query, timeout=10) as response:
+            api = json.load(response)["agent"]
+        assert api == current, "CLI and authenticated API disagree after reopening"
+        save("api-agent.json", api)
+        foreign = urllib.parse.urlencode({"work": "foreign-work", "agent": current["id"]})
+        try:
+            opener.open(base + "/api/v1/agent-detail?" + foreign, timeout=10)
+            raise AssertionError("Foreign work read succeeded")
+        except urllib.error.HTTPError as error:
+            assert error.code == 403 and current["prompt"].encode() not in error.read()
+        checks.append("Reopened compiled API returns the same receipt and rejects another work with HTTP 403")
+
+        work = cli("work", "show", work["id"])["work"]
+        assert work["tasks"][0]["status"] != "accepted" and len(work["tasks"][0]["attempts"]) == 2
+        assert provider.with_suffix(".calls").read_text() == "call\ncall\n"
+        checks.append("Two attempts and two local script invocations; no implicit task acceptance or model call")
+        result = {"status": "PASS", "root": str(root), "checks": checks, "local_scripted_invocations": 2,
+                  "model_calls": 0, "binary_sha256": digest(binary.read_bytes()), "script_sha256": digest(Path(__file__).read_bytes())}
+        save("result.json", result)
+        print(json.dumps({"status": "PASS", "checks": len(checks), "local_scripted_invocations": 2, "model_calls": 0}))
+    except Exception:
+        save("failure.json", {"status": "FAIL", "error": re.sub(r"/session/[^\s/]+", "/session/[private]", traceback.format_exc()), "root": str(root), "checks": checks})
+        raise
+    finally:
+        save("commands.json", commands)
+        if server is not None:
+            server.terminate()
+            try:
+                server.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                server.kill()
+                server.wait(timeout=5)
+        if active is not None and not stopped(active["id"]):
+            cli("agent", "stop", active["id"])
+            wait_for(lambda: stopped(active["id"]), "Owned fixture execution did not stop during cleanup")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-11T18:16:53.504208+00:00",
+  "command": [
+    "sh",
+    "./build.sh",
+    "/tmp/swarm-local-negative-recovery19-qualified-candidate"
+  ],
+  "sha256": "e23d4ff43d8cb6f64b00bee8b4e531dcb3da2a71f390d8be5c130f3f79445ece",
+  "source_digest": "afc079ad08db70a1c0f18a0e53e6a3081054ecd55e432d0dab965c6099d85690",
+  "root": "/tmp/swarm-local-negative-recovery-preview-7y29w_sm",
+  "status": "Built19 cumulative sources; fullv2 after temporary-volume correction running, not installed."
+}

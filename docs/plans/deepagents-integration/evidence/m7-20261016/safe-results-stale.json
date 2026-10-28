@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "protocol": "storage-knowledge-v2",
+  "source": {
+    "kind": "fixture"
+  },
+  "results": [
+    {
+      "case_id": "contract-current-without",
+      "scenario": "contract-current",
+      "treatment": "without",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "awaits_current_source",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "contract-current-with",
+      "scenario": "contract-current",
+      "treatment": "with",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "concrete_migration_plan",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "contract-changed-without",
+      "scenario": "contract-changed",
+      "treatment": "without",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "awaits_current_source",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "contract-changed-with",
+      "scenario": "contract-changed",
+      "treatment": "with",
+      "result": "FAIL",
+      "violations": [
+        "unsupported_knowledge",
+        "missing_current_source",
+        "future_condition"
+      ],
+      "resolution": "not_established",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "scenario": "contract-changed",
+      "without": {
+        "result": "PASS",
+        "resolution": "awaits_current_source"
+      },
+      "with": {
+        "result": "FAIL",
+        "resolution": "not_established"
+      }
+    },
+    {
+      "scenario": "contract-current",
+      "without": {
+        "result": "PASS",
+        "resolution": "awaits_current_source"
+      },
+      "with": {
+        "result": "PASS",
+        "resolution": "concrete_migration_plan"
+      }
+    }
+  ],
+  "result": "FAIL",
+  "model_effectiveness": "NOT TESTED",
+  "scope": "Current evidence and proposed actions only; safe abstention is valid; no migration or acceptance performed",
+  "pack_sha256": "f5fa8d5ad55fddd25116ffe634733c685a4ffcf94e52c7c3d60e38a5c48441b6",
+  "answers_sha256": "1c893ac70d305a3073891679a2b30118a7aed05b37f7fe2464b16e521daa6633"
+}

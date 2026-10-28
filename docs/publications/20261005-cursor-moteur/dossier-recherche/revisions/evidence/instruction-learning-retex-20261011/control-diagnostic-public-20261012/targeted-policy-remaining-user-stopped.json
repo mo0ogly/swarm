@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-12T13:55:31.524805+00:00",
+  "result": "STOPPED BY USER INSTRUCTION",
+  "reason": "Only necessary targeted tests; no full-suite repetition. Original full FAIL preserved.",
+  "output": "/tmp/swarm-control-diagnostic-public-remaining.out",
+  "output_sha256": "bd654e5b4e509af958c672cef605ce40ab7606e455cbe5e4c02f651849202afc",
+  "finished_cases": 118,
+  "case_failures": [],
+  "limits": "Stopped aggregate coverage is not PASS. Inputs were frozen until process stop; AGENTS and derived manifest changed afterwards."
+}

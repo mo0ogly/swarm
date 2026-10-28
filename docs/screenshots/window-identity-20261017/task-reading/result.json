@@ -1,0 +1,46 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "lang": "fr",
+      "theme": "etat",
+      "widths": 5,
+      "labels": "bold",
+      "original": "exact",
+      "navigation": "task title",
+      "mutation": false
+    },
+    {
+      "lang": "fr",
+      "theme": "sombre",
+      "widths": 5,
+      "labels": "bold",
+      "original": "exact",
+      "navigation": "task title",
+      "mutation": false
+    },
+    {
+      "lang": "en",
+      "theme": "etat",
+      "widths": 5,
+      "labels": "bold",
+      "original": "exact",
+      "navigation": "task title",
+      "mutation": false
+    },
+    {
+      "lang": "en",
+      "theme": "sombre",
+      "widths": 5,
+      "labels": "bold",
+      "original": "exact",
+      "navigation": "task title",
+      "mutation": false
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "mutations": [],
+  "navigation_receipts": 3,
+  "scope": "isolated fixture; no provider or Git repair"
+}

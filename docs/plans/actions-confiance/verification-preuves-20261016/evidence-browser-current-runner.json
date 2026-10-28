@@ -1,0 +1,10 @@
+{
+  "pid": 2360858,
+  "proc_start_ticks": "4185156",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-evidence-browser-current.py",
+    "run"
+  ],
+  "at": "2026-10-15T23:37:07.417200+00:00"
+}

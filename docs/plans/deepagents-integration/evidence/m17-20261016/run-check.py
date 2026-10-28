@@ -1,0 +1,29 @@
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+
+root = Path(__file__).resolve().parents[5]
+out = Path(__file__).resolve().parent
+name, argv = sys.argv[1], sys.argv[2:]
+paths = ["tools/memory-evaluation/summarization.py", "tests/test_memory_summarization.py", "tools/memory-evaluation/compare.py", "tools/memory-evaluation/README.md", "docs/PROJECT-MEMORY.md", "docs/en/PROJECT-MEMORY.md", "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-13.md", str(Path(__file__).resolve().relative_to(root))]
+def inputs():
+    return {path: hashlib.sha256((root / path).read_bytes()).hexdigest() for path in paths}
+before = inputs()
+(out / (name + "-inputs.json")).write_text(json.dumps(before, indent=2) + "\n")
+start = datetime.datetime.now(datetime.timezone.utc).isoformat()
+at = time.monotonic()
+with (out / (name + ".log")).open("w") as log:
+    result = subprocess.run(argv, cwd=root, stdout=log, stderr=subprocess.STDOUT)
+after = inputs()
+raw = (out / (name + ".log")).read_text()
+tests = re.findall(r"^(test_\w+) \([^\n]+?\) \.\.\.", raw, re.M)
+receipt = {"argv": argv, "started_at_utc": start, "duration_seconds": round(time.monotonic() - at, 3), "exit_code": result.returncode, "named_tests_ran": tests, "changed_inputs": [path for path in before if before[path] != after[path]], "log_sha256": hashlib.sha256(raw.encode()).hexdigest(), "model_calls": 0}
+(out / (name + ".json")).write_text(json.dumps(receipt, indent=2) + "\n")
+print(json.dumps(receipt))
+print(raw[-1300:])
+raise SystemExit(result.returncode)

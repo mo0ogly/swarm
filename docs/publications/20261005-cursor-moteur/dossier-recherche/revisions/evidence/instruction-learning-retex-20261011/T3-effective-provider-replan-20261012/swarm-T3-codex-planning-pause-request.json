@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "T3-codex-owned-planning-pause-214b7c0f23094b17b4b778391c53a7fa",
+  "expected_revision": 725,
+  "scope": "root",
+  "reason": "Replan au repos après quota Claude429 et deux productions sans résultat. Configurer une autre route existante et une correction d’usage des sources ; conserver dépenses et attente Claude."
+}

@@ -1,0 +1,99 @@
+{
+  "status": "DIRECT_TARGETED_VERIFICATION_NOT_NATIVE_ACCEPTANCE",
+  "at": "2026-10-12T20:33:39.534971+00:00",
+  "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "base_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+  "source_candidate_digest": "7f45c28f73fdc6f923c5e7819a7db8ea933b7c5c1df8ccc95622fa4acc4212ce",
+  "binary": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-direct-development",
+  "binary_sha256": "6e97d5ff75eb52f98f81dcdab608325e64acc785874c6c30754278e05cac858d",
+  "checks": {
+    "direct-publication-staging-race.jsonl": {
+      "status": "PASS",
+      "executed": 20,
+      "passed": 20,
+      "elapsed_seconds": 13.161,
+      "sha256": "a62040a68c61b7a0e442a3217c92d5001947d4493b3ed86129d2111c96bf72af"
+    },
+    "direct-judge-operation-received-context.jsonl": {
+      "status": "PASS",
+      "executed": 19,
+      "passed": 19,
+      "elapsed_seconds": 3.062,
+      "sha256": "47749381391a210bdbc86eea5ee2ea67454572f0f5625559b475a758dec6441f"
+    },
+    "direct-judge-shared-decision-contracts.jsonl": {
+      "status": "PASS",
+      "executed": 7,
+      "passed": 7,
+      "elapsed_seconds": 0.551,
+      "sha256": "ad86d9e6bde996cf2f88478ea71b192576ee3061e72d50063a0ef5ae784efe2f"
+    },
+    "direct-publication-measured-recipe-repaired.jsonl": {
+      "status": "PASS",
+      "executed": 1,
+      "passed": 1,
+      "elapsed_seconds": 7.292,
+      "sha256": "ca67d95c08bd29c556acd14f1c48f0386794db801ec7507697c52cc5315c2ccc"
+    },
+    "direct-final-role-cycle.jsonl": {
+      "status": "PASS",
+      "executed": 6,
+      "passed": 6,
+      "elapsed_seconds": 0.306,
+      "sha256": "aba5cfe03ea6590246d2e386a4fb969c3c70db28fb7dcaf71c588ec860bb4b97"
+    },
+    "direct-compact-quotas-ui": {
+      "status": "PASS",
+      "checks": [
+        "quota preview read-only",
+        "judge cycles persisted and audited",
+        "no fixed policy ceilings in inputs",
+        "web CLI parity",
+        "counts preserved",
+        "missing reviewer not invented",
+        "stale form refused",
+        "keyboard focus",
+        "FR EN both themes",
+        "Admin mobile entry"
+      ],
+      "sha256": "18b3a6f07bff69d3e88fcac94aba473496584203e07ec45ddb18f41675204b20"
+    },
+    "direct-terminal-feedback-ui": {
+      "status": "PASS",
+      "checks": [
+        "fr/etat: frame, keyboard rejection, persistence, mobile, fresh recipe, optional RETEX, sourced preparation with no launch",
+        "fr/sombre: frame, keyboard rejection, persistence, mobile, fresh recipe, optional RETEX, sourced preparation with no launch",
+        "en/etat: frame, keyboard rejection, persistence, mobile, fresh recipe, optional RETEX, sourced preparation with no launch",
+        "en/sombre: frame, keyboard rejection, persistence, mobile, fresh recipe, optional RETEX, sourced preparation with no launch"
+      ],
+      "sha256": "3989a43bce90f8b469aea15e1790af4e31bcfe5fc1eaf02a10582c7bd3cffb05"
+    },
+    "direct-completion-scope-audit.jsonl": {
+      "status": "PASS",
+      "executed": 46,
+      "passed": 46,
+      "elapsed_seconds": 11.153,
+      "sha256": "f0e98e038bc09e5bc70cb6ea524d1e44086cb662cc932727c0a46c4b9a7137ba"
+    }
+  },
+  "native_state": {
+    "work_id": "w-ca937edf4e0abd85f8d3d67b",
+    "revision": 839,
+    "paused": true,
+    "accepted": 1,
+    "tasks": 8,
+    "review_calls": 82,
+    "active_agents": 0
+  },
+  "toolchain": {
+    "go": "go version go1.24.3 linux/amd64",
+    "node": "v22.23.2"
+  },
+  "limits": [
+    "Exact final source integrity; earlier receipts reused only for unchanged relevant contracts.",
+    "Source hashes for every historical red run were not captured separately.",
+    "Local deterministic providers only; real model autonomy and independent assessment NOT TESTED.",
+    "Native installed server unchanged; historical mission remains paused.",
+    "Full Go suite not repeated; prior full-suite failures remain historical."
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "executor": "operator external isolated verification after independent refusal; not native autonomous worker",
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestGraphDeliverySourcePartsPreserveIntegrity$",
+    "-count=1",
+    "-v",
+    "-timeout=60s"
+  ],
+  "cwd": "/tmp/swarm-T2-historical-handoff-repair-20261011-n5zjdmir",
+  "start": "2026-10-11T16:31:59.672853+00:00",
+  "end": "2026-10-11T16:32:10.983796+00:00",
+  "seconds": 11.310935427994991,
+  "exit": 0,
+  "public_base_candidate": "6089c4fb54e72b344e2950628ca8662da38c1b07",
+  "verified_local_tree": "e1491d4539518ab4bd0955a41b8aee6d0d85e87f",
+  "local_head": "39e89b169fc55255e828e66e765a0fee4ef91530",
+  "basis": "Existing isolated clone indexed tree exactly equals public candidate tree; no unstaged change. Public candidate commit lives in integration repository, not producer copy; attempted producer fetch failed before any reset. No requirement for same local commit identity claimed.",
+  "tracked_files": 2009,
+  "source_drift": [],
+  "new_code_changes": false,
+  "expected_subtests": [
+    "tampered",
+    "escape",
+    "duplicate",
+    "alias-dot",
+    "alias-parent",
+    "ambiguous",
+    "missing"
+  ],
+  "passed_subtests": [
+    "tampered",
+    "escape",
+    "duplicate",
+    "alias-dot",
+    "alias-parent",
+    "ambiguous",
+    "missing"
+  ],
+  "original_output": "/tmp/swarm-T2-final-source-alias-targeted.out",
+  "output_sha256": "20a5231bb6e125999159510686de3096a238d4a1a6dd734b44debebf350937fa",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  },
+  "supersedes_as_final_test_proof": "Historical source-parts-targeted.out retained intact; it predates alias-dot/alias-parent and alone does not prove final source-parts implementation."
+}

@@ -1,0 +1,10 @@
+=== RUN   TestGraphDeliveryD04InstallVersion
+--- PASS: TestGraphDeliveryD04InstallVersion (6.94s)
+=== RUN   TestGraphDeliveryD04RollbackSafety
+--- PASS: TestGraphDeliveryD04RollbackSafety (3.30s)
+=== RUN   TestReviewInputTokensMatchIndependentPythonVectors
+--- PASS: TestReviewInputTokensMatchIndependentPythonVectors (0.08s)
+=== RUN   TestReplayGLMRetryEventShapes
+--- PASS: TestReplayGLMRetryEventShapes (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	10.403s

@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "control-infrastructure-recovery-owned-resume-525279af11f3461d82bfba4767c43947",
+  "expected_revision": 766,
+  "scope": "root",
+  "reason": "Reprendre le plan Cursor jusqu’au RETEX. Nouvelle précondition opérateur vérifiée : moteur qualifié et installé, contrat30, budget Admin du rôle validation révision1/180s. La reprise publique retry-integration est réservée au même résultat T3 récupéré61693d4413607770cfff22508236f3986c20bd33 et à la même tentative4, sans nouveau worker ; attendre contrôles cumulés puis organiser la revue complète via scope-preview si précontrôle de volume, identités task#N/evidence/candidat effectivement retournées. Ne pas inventer de PASS ni confondre budget externe avec options des commandes. T2 reste bloquée et27 différé jusqu’à T3. Après T3, reprendre la correction de T2 puis T4–T8. Les incidents d’infrastructure reconnus sont désormais remis au propriétaire pendant l’exécution ; la décision de conduite lui appartient, droits et appels restent contrôlés. Cette correction du mécanisme ne prouve pas une réparation du sandbox du poste par une IA. Conserver interventions opérateur, incidents, preuves et consommations."
+}

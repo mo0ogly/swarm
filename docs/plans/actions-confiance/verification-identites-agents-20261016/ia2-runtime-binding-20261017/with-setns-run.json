@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python3",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2_runtime_binding.py",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/with-setns"
+  ],
+  "start": "2026-10-17T06:06:04.468588+00:00",
+  "end": "2026-10-17T06:06:04.855407+00:00",
+  "exit_code": 0,
+  "stdout": "{\"result\": \"PASS_ISOLATED_CHANNEL_EXPERIMENT\", \"checks\": 13, \"failure\": null, \"cleanup\": [{\"id\": \"A\", \"exit_code\": 0, \"stdout\": \"\", \"stderr\": \"\"}, {\"id\": \"B\", \"exit_code\": 0, \"stdout\": \"\", \"stderr\": \"\"}]}\n",
+  "stderr": "",
+  "script_sha256": "9253af47218b7fe8edddd4ca954b49f4856904c7a054a222e6193efc16c1f065"
+}

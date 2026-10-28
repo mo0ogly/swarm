@@ -1,0 +1,7 @@
+{
+  "original": "quality1274/clippy.stderr",
+  "cause": "nonminimal_bool: completed guard combines three negated alternatives",
+  "decision": "Name the disjunction completed_supported, reject completed only when false; same conditions, no allow/suppression",
+  "verified_before": "105 status +44CLI tests PASS; both public recipes1276 PASS and integrity checked",
+  "next": "Fresh Clippy/default profile/public recipe; retain original quality failure"
+}

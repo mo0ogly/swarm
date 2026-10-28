@@ -1,0 +1,106 @@
+{
+  "at": "2026-10-11T16:34:27.149226+00:00",
+  "installed_binary_sha256": "1250e99e8f4c3f65a25a26186f46bc688dfab5e9c3b8bf48c1543ca3f33576cd",
+  "current_server_pid": 1229997,
+  "source_digest": "cb3f555834076c1fda77d6adb3d00158cf55b18a052c934c0401d96fb4cee26a",
+  "paths": 1172,
+  "full": {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "start": "2026-10-11T16:23:28.374701+00:00",
+    "end": "2026-10-11T16:31:41.488772+00:00",
+    "seconds": 493.11408601799485,
+    "exit": 0,
+    "output": "/tmp/swarm-claude-effort-recovery-temp-separation-full.out",
+    "output_sha256": "06f8e6b038424e446d2a2b11a12c2e998c2b02386cb8ab5cef66ae41fb8a3d28",
+    "qualification_environment": {
+      "TMPDIR": "/tmp",
+      "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+    },
+    "source_manifest_sha256": "e25a625d327c7b228a86047b2952aef095b5d78d6d4d83bc14957001c8035e78",
+    "candidate_digest": "cb3f555834076c1fda77d6adb3d00158cf55b18a052c934c0401d96fb4cee26a",
+    "paths": 1172,
+    "source_drift": [],
+    "manifest_changed": false
+  },
+  "reused_same_frozen_source_checks": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "./internal/engine",
+        "-run",
+        "TestClaudeConfiguredEffort|TestPolicyPreviewAtomic|TestModelDefaults|TestLaunchBindsPolicy|TestProviderCooldown|TestManagedReviewFragmentResume",
+        "-count=1",
+        "-timeout=120s"
+      ],
+      "start": "2026-10-11T15:59:55.277310+00:00",
+      "end": "2026-10-11T16:00:39.773964+00:00",
+      "seconds": 44.49665842499962,
+      "exit": 0,
+      "output": "/tmp/swarm-claude-effort-recovery-race.out",
+      "output_sha256": "72f19d6f96eba4d8ee9ba73a7326d1b0d5f57c4c0a2c51c826727b9afe650f30"
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "start": "2026-10-11T15:59:55.278145+00:00",
+      "end": "2026-10-11T16:00:08.702477+00:00",
+      "seconds": 13.426251501998195,
+      "exit": 0,
+      "output": "/tmp/swarm-claude-effort-recovery-vet.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "python3",
+        "tools/agent-workflows/check.py"
+      ],
+      "start": "2026-10-11T15:59:55.278787+00:00",
+      "end": "2026-10-11T15:59:59.203844+00:00",
+      "seconds": 3.9250545030008652,
+      "exit": 0,
+      "output": "/tmp/swarm-claude-effort-recovery-workflows.out",
+      "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start": "2026-10-11T15:59:59.204265+00:00",
+      "end": "2026-10-11T15:59:59.411678+00:00",
+      "seconds": 0.2074398699987796,
+      "exit": 0,
+      "output": "/tmp/swarm-claude-effort-recovery-diff.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "sh",
+        "./build.sh",
+        "/tmp/swarm-claude-effort-recovery-candidate"
+      ],
+      "start": "2026-10-11T15:59:59.412164+00:00",
+      "end": "2026-10-11T16:00:11.501349+00:00",
+      "seconds": 12.089200201000494,
+      "exit": 0,
+      "output": "/tmp/swarm-claude-effort-recovery-build.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "ui_receipt": "/tmp/swarm-claude-effort-admin-ui-bilingual/ui.json",
+  "basis": "Later full qualification of already-scoped installed14, not a rewrite of the original install receipt. First tmpfs failure and second long TMPDIR failure retained. Same source frozen, no new Go/catalog changes.",
+  "scope": "Runtime14 effort Admin/public configuration and recoveries qualified; global T3..T8 engine evolution still pending."
+}

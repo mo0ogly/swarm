@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "id": "preparation-legacy-active-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_legacy.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_budget.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_dialogue.rs",
+    "rust/crates/swarm-engine/src/preparation_turn.rs",
+    "rust/crates/swarm-engine/src/supervisor_identity.rs",
+    "web/preparation-native-dialogue.js",
+    "web/prephase-dialogue.js",
+    "web/i18n-en.js",
+    "locales/en.json",
+    "tests/rust_preparation_legacy_active.py",
+    "tests/rust_preparation_legacy_active_ui.cjs",
+    "tests/rust_preparation_legacy_replay.py",
+    "tests/rust_preparation_calls.py",
+    "tests/rust_preparation_calls_ui.cjs",
+    "tests/rust_project_memory_source.py",
+    "rust/crates/swarm-engine/examples/memory_source_fixture.rs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "rust/crates/swarm-cli/src/preparation.rs",
+    "rust/crates/swarm-web/src/service/preparations.rs",
+    "rust/crates/swarm-engine/src/engine_settings.rs",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "tests/rust_settings_schema_boundary.py",
+    "rust/crates/swarm-engine/src/root_store.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "settings-bootstrap",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='legacy-active-schema',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_settings_schema_boundary.py','--binary',os.environ['SWARM_LEGACY_ACTIVE_BINARY'],'--legacy-binary',os.environ['SWARM_SCHEMA_LEGACY_BINARY'],'--broken-binary',os.environ['SWARM_SCHEMA_BROKEN_BINARY'],'--output',str(p)],check=True)\nprint('LEGACY_ACTIVE_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "SETTINGS_SCHEMA_BOUNDARY_PASS 11",
+        "PASS settings-partial-init-public-recovery",
+        "PASS settings-legacy-read-no-adoption",
+        "PASS settings-unknown-future-schema-refuses"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "active",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='legacy-active-'+'active',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_legacy_active.py','--binary',os.environ['SWARM_LEGACY_ACTIVE_BINARY'],'--output',str(p)]+['--browser'],check=True)\nprint('LEGACY_ACTIVE_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "LEGACY_ACTIVE_PASS ",
+        "LEGACY_ACTIVE_BROWSER_PASS ",
+        "PASS legacy-trigger-tamper-rolls-back",
+        "PASS legacy-unknown-foreign-host-refuses-no-write"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "terminal-replay",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='legacy-active-'+'terminal-replay',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_legacy_replay.py','--binary',os.environ['SWARM_LEGACY_ACTIVE_BINARY'],'--output',str(p)]+[],check=True)\nprint('LEGACY_ACTIVE_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_LEGACY_REPLAY_PASS "
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-api",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='legacy-active-'+'native-api',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_calls.py','--binary',os.environ['SWARM_LEGACY_ACTIVE_BINARY'],'--output',str(p)]+['--browser'],check=True)\nprint('LEGACY_ACTIVE_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_CALLS_PASS 35",
+        "PREPARATION_CALLS_BROWSER_PASS 48"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

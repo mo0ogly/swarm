@@ -1,0 +1,9 @@
+{
+  "error": "révision périmée : attendue 440, courante 441 ; relire le travail",
+  "failure": {
+    "code": "revision_conflict",
+    "message": "révision périmée : attendue 440, courante 441 ; relire le travail",
+    "retryable": true
+  },
+  "schema_version": 1
+}

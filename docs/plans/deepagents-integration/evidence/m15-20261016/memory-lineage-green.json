@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestDialogueRestoreMemory.*|TestProjectMemoryDialogue.*)$",
+    "-count=1",
+    "-v",
+    "-timeout=120s"
+  ],
+  "started_at_utc": "2026-10-16T18:20:12.645872+00:00",
+  "duration_seconds": 134.234,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestDialogueRestoreMemoryDeselectionCannotForgetHistory",
+    "TestProjectMemoryDialogueInheritedUseAndWithdrawal",
+    "TestProjectMemoryDialogueValidChainAndStartupWithdrawal",
+    "TestProjectMemoryDialogueRejectsBrokenLineage",
+    "TestDialogueRestoreMemoryRechecksAncestorAfterPreflight"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "148b5ed5a8cef4fe05d788c0462f917aa19b27c4564635faf449de31e9386ccb",
+  "real_model_calls": 0
+}

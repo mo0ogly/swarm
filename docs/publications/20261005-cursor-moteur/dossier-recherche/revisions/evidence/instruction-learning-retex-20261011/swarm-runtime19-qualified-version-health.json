@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "binary": {
+    "version": "devel",
+    "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+    "modified": true,
+    "build_date": "2026-10-11T18:07:25Z",
+    "provenance": "injected"
+  },
+  "diagnostic": {
+    "installed_cli": {
+      "available": true,
+      "version": "devel",
+      "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+      "modified": true,
+      "provenance": "injected"
+    },
+    "active_server": {
+      "available": true,
+      "version": "devel",
+      "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+      "modified": true,
+      "provenance": "injected"
+    },
+    "candidate": {
+      "available": true,
+      "version": null,
+      "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+      "modified": true,
+      "provenance": "git"
+    },
+    "state": "identical",
+    "differences": []
+  }
+}

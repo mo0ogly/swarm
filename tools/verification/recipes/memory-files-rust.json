@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "memory-files-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/memory_files.rs",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/agent_execution_preflight.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/recorded_work.rs",
+    "rust/crates/swarm-engine/src/local_path.rs",
+    "rust/crates/swarm-engine/src/models.rs",
+    "tests/rust_memory_files.py",
+    "tests/memory_files_oracle.py",
+    "tests/instruction_oracle.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "rust/crates/swarm-engine/examples/identity_plan_probe.rs",
+    "rust/crates/swarm-engine/src/identity_plan.rs",
+    "rust/crates/swarm-engine/src/identity_plan_rules.rs",
+    "tools/rust-migration/memory-files-reference/main.go",
+    "tools/rust-migration/memory-files-reference/origin.json",
+    "docs/PROJECT-MEMORY.md",
+    "docs/en/PROJECT-MEMORY.md",
+    "version_history.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "cold-sqlite-policy",
+      "command": ["cargo", "test", "--manifest-path", "rust/Cargo.toml", "-p", "swarm-engine", "--lib", "bootstrap_busy_tests", "--", "--nocapture"],
+      "expected_exit": 0,
+      "required_stdout": ["running 3 tests", "test result: ok. 3 passed"],
+      "required_stderr": []
+    },
+    {
+      "id": "memory-file-guards",
+      "command": ["cargo", "test", "--manifest-path", "rust/Cargo.toml", "-p", "swarm-engine", "--lib", "memory_files", "--", "--nocapture"],
+      "expected_exit": 0,
+      "required_stdout": ["running 4 tests", "test result: ok. 4 passed"],
+      "required_stderr": []
+    },
+    {
+      "id": "historical-memory-public-journey",
+      "command": ["python3", "-c", "import os,sys,subprocess,tempfile\nfrom pathlib import Path\nsys.path.insert(0,str(Path('tests').resolve()))\nimport memory_files_oracle\np=Path(tempfile.mkdtemp(prefix='memory-files-',dir='.cache')).resolve()\nreference=memory_files_oracle.build(p/'go-reference')\nprobe=memory_files_oracle.build_projection(p/'projection-fixture')\nsubprocess.run(['python3','tests/rust_memory_files.py','--binary',os.environ['SWARM_MEMORY_FILES_BINARY'],'--output',str(p/'journey'),'--go-reference',str(reference),'--projection-probe',str(probe)],check=True)\nmemory_files_oracle.verify(p/'go-reference')\nprint('MEMORY_FILES_EVIDENCE '+str(p))"],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS memory-preview-readonly",
+        "PASS memory-manifest-exact-paths",
+        "PASS memory-API-retained-paths",
+        "PASS memory-exact-replay-no-double-reservation",
+        "PASS memory-actual-native-worker-received-prompt",
+        "PASS memory-missing-before-execution-no-provider",
+        "PASS memory-same-intention-recovery",
+        "PASS memory-withdrawn-source-before-execution-no-provider",
+        "PASS memory-inventory-recovery",
+        "PASS memory-unmanaged-Go-Rust-source-predicate",
+        "PASS memory-withdrawn-Go-Rust-source-predicate",
+        "PASS memory-Go-reference-input-stability",
+        "MEMORY_FILES_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "added": [
+    "/home/fpizzi/.cache/go-build/bd/bd14607af8519e0f507cb74f798daa9b000b497bafab84f69ba7dca5661d8217-d",
+    "internal/engine/memory_usage_decision.go"
+  ],
+  "removed": [
+    "/home/fpizzi/.cache/go-build/5e/5e4e3453a642170e069f3b20f053d16c576f553b508c3e5843882d3354cce432-d"
+  ],
+  "changed": [
+    "internal/engine/memory_usage_binding.go",
+    "internal/engine/memory_usage_binding_test.go",
+    "internal/engine/memory_usage_decision_test.go"
+  ]
+}

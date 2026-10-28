@@ -1,0 +1,18 @@
+=== RUN   TestAgentWorkflowRolesAreBounded
+=== RUN   TestAgentWorkflowRolesAreBounded/planner
+    agent_workflow_test.go:44: planner workflow: 32038 bytes
+=== RUN   TestAgentWorkflowRolesAreBounded/subplanner
+    agent_workflow_test.go:44: subplanner workflow: 32044 bytes
+=== RUN   TestAgentWorkflowRolesAreBounded/worker
+    agent_workflow_test.go:44: worker workflow: 31823 bytes
+=== RUN   TestAgentWorkflowRolesAreBounded/reviewer
+    agent_workflow_test.go:44: reviewer workflow: 17717 bytes
+--- PASS: TestAgentWorkflowRolesAreBounded (0.00s)
+    --- PASS: TestAgentWorkflowRolesAreBounded/planner (0.00s)
+    --- PASS: TestAgentWorkflowRolesAreBounded/subplanner (0.00s)
+    --- PASS: TestAgentWorkflowRolesAreBounded/worker (0.00s)
+    --- PASS: TestAgentWorkflowRolesAreBounded/reviewer (0.00s)
+=== RUN   TestAgentWorkflowReachesWorkerAndSurvivesReopen
+--- PASS: TestAgentWorkflowReachesWorkerAndSurvivesReopen (0.07s)
+PASS
+ok  	swarm.local/companion/internal/engine	0.096s

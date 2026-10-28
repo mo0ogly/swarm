@@ -1,0 +1,84 @@
+{
+  "at": "2026-10-11T18:59:24.228920+00:00",
+  "review": "review-14a105dc677c088e4121afb7",
+  "candidate": "b3cdfcf607d0466cace8cc27de4325ee5a1d75e8",
+  "context": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-f61e23cf5a02b03f/review-14a105dc677c088e4121afb7-context.json",
+  "bytes": 759750,
+  "sha256": "d1682458e31ca9cd0e3e3edb4f62e3320c965409298a8519c0987425c9b80a8b",
+  "expected_sha256": "d1682458e31ca9cd0e3e3edb4f62e3320c965409298a8519c0987425c9b80a8b",
+  "candidate_matches": true,
+  "sources": [
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/fiches-lecture.md",
+      "git_blob": "fe87c05dbbd02b528b30412bb6277468b0fcfe44",
+      "sha256": "1c7e84b87fc2e7baa53383be0c494658f6d0c1615962daf40511d99c7301934a",
+      "bytes": 23612
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T1-handoff.md",
+      "git_blob": "b8ed64a9103c2a93eae96e0ed1cd8e2dd1afb8da",
+      "sha256": "08bab9381ee79fb529b912e942e3151943d5a7d1e503cfdcb34f5b1c628be779",
+      "bytes": 35462
+    },
+    {
+      "path": "docs/plan-ca937edf4e-T1.review-context.json",
+      "git_blob": "54fe72b9b907d2942d49bb2947a7c563f8047703",
+      "sha256": "98360181ba01570539798849b7c1e1caaaff5926679834b91cba42bf521e2afc",
+      "bytes": 123
+    },
+    {
+      "path": "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+      "git_blob": "01813e6d05dc74c8e82eca42c75db3c19704c018",
+      "sha256": "afe4e55b44f552537ca01aff13ac9e4bcdd1fc8ce559745825142f866fe781a6",
+      "bytes": 10096
+    },
+    {
+      "path": "docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md",
+      "git_blob": "82ae608f5b2ff09d03a1110b8260cb56dda654b2",
+      "sha256": "10ac147726e3a88b776d392c9a9c4d12302f72efbbc56d64b74a168b853d86ec",
+      "bytes": 9282
+    },
+    {
+      "path": "internal/engine/planning.go",
+      "git_blob": "99ff11bcd84a468b8a29f57728cb83e0025e588d",
+      "sha256": "c3d8ac967e7b800ca5c8124da586f33afee83d967d4370e608a8b27ffab97fa6",
+      "bytes": 39763
+    },
+    {
+      "path": "internal/engine/planning_api.go",
+      "git_blob": "cede08156420367ca58d8413922060c56f8d409b",
+      "sha256": "9004ed00bfb31b5209972516dddf53c85cea6ebcfcb9385a45c0cd49e29b9d94",
+      "bytes": 6018
+    },
+    {
+      "path": "internal/engine/score.go",
+      "git_blob": "b2292c7c5befac3a7a1f2c94c73f257d39d3d830",
+      "sha256": "449fd157d53cc656f103984a997ec8d11297c660df5aaf6f32f1a3e94f1df62d",
+      "bytes": 11988
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-vet.out",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "internal/engine/planning_context.go",
+      "git_blob": "942d142bc889b229be3a6077dac9d7bf53c779bd",
+      "sha256": "66176ec869f60bded108597cd81b18549a370b7c4dd11cc9903881ac8c605cc9",
+      "bytes": 4376
+    },
+    {
+      "path": "docs/architecture/CURSOR-ENGINE-CONTRACT.md",
+      "git_blob": "49295a1c2e13e9c2cb711a8ecf80794401110fe7",
+      "sha256": "c124f521d7938dd5933ffccbd38774ec23fc4bdb6a66ada652a29177645a4988",
+      "bytes": 13405
+    }
+  ],
+  "first_failed_boundary": "reviewEvidenceInventory incorrectly invokes recovery handoff reader capped at512KiB on already admitted759750byte review context; file exists, whole hash and candidate match. No native mutation.",
+  "options": {
+    "raise_global_handoff_limit": "Rejected: changes unrelated handoff admission and merely shifts threshold.",
+    "truncate_context": "Rejected: hash/originals invalidated.",
+    "dedicated_authenticated_stream_reader": "Selected: verify full original digest before decoding; verify decoded read again including EOF, regular file; inventory only metadata."
+  }
+}

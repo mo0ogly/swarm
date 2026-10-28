@@ -1,0 +1,9 @@
+{
+  "internal/engine/main.go": "6b4a4f19081725a6210c7830898b7818351e8559ad8a1c1b436c9d88e45433c9",
+  "internal/enrollmentconfig/store_linux.go": "6aad12e3c40a78332cbc1f5d3d0a396079c3f81e9b1097ab741782f8d02ef79f",
+  "internal/enrollmentconfig/path_linux.go": "0ac9d824bcb5121c1ca60b58764777f47f614f6e6a77354626f3eabdb851aff8",
+  "internal/enrollmentbootstrap/bootstrap_linux.go": "696994fc66279d3ea9a4656b9c6cd00f367b50160a55a555653a7ac047fcaeb0",
+  "internal/enrollmentbootstrap/bootstrap_linux_test.go": "336bcddbab715ee7eee95638f0fc2247ab126fd9287f236a177d8bd0aacf21b7",
+  "internal/engine/agent_identity_bootstrap_linux.go": "a5ff02b2adddbd7ef57e4d8257e182ef56f78e1402d9d15539ea2c0ab6c5ba5d",
+  "internal/engine/agent_identity_bootstrap_linux_test.go": "ecc8751605910a7bf3ad7db74f0386ed5ff07956bba48ccfcbefda92494b2872"
+}

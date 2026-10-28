@@ -1,0 +1,19 @@
+AssertionError [ERR_ASSERTION]: {
+  expires_at: '2026-10-15T18:13:49.630709148Z',
+  integrity: 2,
+  revision: 2,
+  roles: [
+    'approver'
+  ],
+  session_token: 'yaj0m0zDCzncTr8n4YwRnobrZl0CLovq3JmPlebgS1s',
+  step_up_action_id: 'act-ed71aa3e72f55bb3d300',
+  subject: 'bob'
+} == null
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_step_up_ui.cjs:36:843 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Object],
+  expected: null,
+  operator: '==',
+  diff: 'simple'
+}

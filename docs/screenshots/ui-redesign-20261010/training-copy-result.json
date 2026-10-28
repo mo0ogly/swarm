@@ -1,0 +1,280 @@
+{
+  "status": "PASS",
+  "binary": "/tmp/swarm-ui-20261010/swarm-training-copy-final",
+  "checks": [
+    {
+      "offline": false,
+      "lang": "fr",
+      "module": 1,
+      "duration": 24,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": false,
+      "lang": "fr",
+      "module": 2,
+      "duration": 24,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": false,
+      "lang": "fr",
+      "module": 3,
+      "duration": 30,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": false,
+      "lang": "fr",
+      "module": 4,
+      "duration": 42,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": false,
+      "lang": "fr",
+      "module": "graph-intro",
+      "duration": 63,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": false,
+      "lang": "en",
+      "module": 1,
+      "duration": 24,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": false,
+      "lang": "en",
+      "module": 2,
+      "duration": 24,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": false,
+      "lang": "en",
+      "module": 3,
+      "duration": 30,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": false,
+      "lang": "en",
+      "module": 4,
+      "duration": 42,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "fr",
+      "module": 1,
+      "duration": 24,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "fr",
+      "module": 2,
+      "duration": 24,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "fr",
+      "module": 3,
+      "duration": 30,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "fr",
+      "module": 4,
+      "duration": 42,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "fr",
+      "module": "graph-intro",
+      "duration": 63,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "en",
+      "module": 1,
+      "duration": 24,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "en",
+      "module": 2,
+      "duration": 24,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "en",
+      "module": 3,
+      "duration": 30,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "en",
+      "module": 4,
+      "duration": 42,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "fr",
+      "module": 1,
+      "duration": 24,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "fr",
+      "module": 2,
+      "duration": 24,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "fr",
+      "module": 3,
+      "duration": 30,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "fr",
+      "module": 4,
+      "duration": 42,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "fr",
+      "module": "graph-intro",
+      "duration": 63,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "en",
+      "module": 1,
+      "duration": 24,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "en",
+      "module": 2,
+      "duration": 24,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "en",
+      "module": 3,
+      "duration": 30,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    },
+    {
+      "offline": true,
+      "lang": "en",
+      "module": 4,
+      "duration": 42,
+      "width": 1280,
+      "height": 900,
+      "paused": true,
+      "autoplay": false
+    }
+  ],
+  "errors": [],
+  "failures": [],
+  "binary_sha256": "30763335512de76808611fb3647d9f719b7e44f43ad285b868fba940e47383a7",
+  "media_manifest_sha256": "07aec1197f332748a77b04af4766e322903db106f55739daae8a52d763b9624e"
+}

@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestDialogueRecoveryPreviewKeepsBoundaryAndUnknownAuthority|TestDialogueRecoveryCLIAPIReadOnlyAndScoped|TestDialogueRecoveryQualifiesIncompleteAndChangedContracts|TestDialogueRecoverySelectionIgnoresRecentHistoryWindow|TestRecoveryPreviewScopesAttemptAndPreservesState|TestRecoveryEvidenceChangedUnknownAndUnchanged|TestRecoveryPreviewRefusalDoesNotUseVisitOrOtherTasks|TestRecoveryEvidenceBoundedAndInvalidInputUnknown|TestDialogueCheckpointRejectsInvalidOrForeignState|TestDialogueCheckpointAPIReadAndForeignWorkRefusal|TestDialogueCheckpointProgressUsesStoredBoundaryTime)$",
+    "-count=1",
+    "-v",
+    "-timeout=120s"
+  ],
+  "started_at_utc": "2026-10-16T14:18:53.830789+00:00",
+  "elapsed_seconds": 31.30078082399268,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestDialogueCheckpointAPIReadAndForeignWorkRefusal",
+    "TestDialogueCheckpointRejectsInvalidOrForeignState",
+    "TestDialogueCheckpointProgressUsesStoredBoundaryTime",
+    "TestDialogueRecoveryPreviewKeepsBoundaryAndUnknownAuthority",
+    "TestDialogueRecoveryCLIAPIReadOnlyAndScoped",
+    "TestDialogueRecoveryQualifiesIncompleteAndChangedContracts",
+    "TestDialogueRecoverySelectionIgnoresRecentHistoryWindow",
+    "TestRecoveryPreviewScopesAttemptAndPreservesState",
+    "TestRecoveryEvidenceChangedUnknownAndUnchanged",
+    "TestRecoveryPreviewRefusalDoesNotUseVisitOrOtherTasks",
+    "TestRecoveryEvidenceBoundedAndInvalidInputUnknown"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "5b12cd9d4507d2f1b8252b2624ff03a6e3dee2a6a4ccfa2a4ca6b3d595c3a3ba",
+  "real_model_calls": 0
+}

@@ -1,0 +1,9 @@
+flowchart TD
+  A[Completed production and delivery] --> C[Controls on immutable candidate]
+  C --> B[Source capacity exceeded, no review call]
+  B --> V{Matching checkpoint, receipt and typed refusal}
+  V -->|No| R[Refuse without effects or calls]
+  V -->|Yes| O[Attributed operator repair]
+  O --> N[New result with original evidence retained]
+  N --> F[Fresh controls and independent review]
+  F --> P[Accept only valid fresh evidence]

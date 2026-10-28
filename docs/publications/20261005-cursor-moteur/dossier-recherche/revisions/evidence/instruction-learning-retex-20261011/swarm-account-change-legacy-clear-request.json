@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "claude-account-changed-user-confirmed-20261011",
+  "expected_digest": "27e49ba2218b37bf2e9033e121957aac75575907884ea8888d0d45e4074ccb71",
+  "reason": "Utilisateur : « j’ai changer de compte cest reset donc reprends ». Connexion Claude active observée ; autorise une nouvelle vérification réelle, conserve quota précédent, appels et tentatives."
+}

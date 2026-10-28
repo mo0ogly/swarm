@@ -1,0 +1,10 @@
+[
+  "setup",
+  "provider",
+  "http-driver",
+  "resources",
+  "cleanup",
+  "admission",
+  "recipe",
+  "review"
+]

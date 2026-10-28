@@ -1,0 +1,3 @@
+Vérification isolée du numéro et des évolutions…
+Livraison locale préparée : v0.1.1-dev.2
+Candidat prêt ; restart l’installera après arrêt du seul serveur géré.

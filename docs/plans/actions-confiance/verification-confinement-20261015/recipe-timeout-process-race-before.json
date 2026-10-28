@@ -1,0 +1,6 @@
+{
+  "observed": "ProcessLookupError [Errno 3] while reading /proc child stat after cleanup",
+  "source_sha256": "6af1c3a47de04564bb6f335479cb1db78139f7ec5027c6ecf1f4f42dd6856fdc",
+  "classification": "verification witness race; not proof that child remained alive",
+  "at": "2026-10-15T20:55:48.376004+00:00"
+}

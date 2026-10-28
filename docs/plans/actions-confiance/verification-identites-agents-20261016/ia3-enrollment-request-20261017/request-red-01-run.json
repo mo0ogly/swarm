@@ -1,0 +1,28 @@
+{
+  "packages": {
+    "swarm.local/companion/internal/enrollmentrequest": 0
+  },
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/enrollmentrequest",
+    "-count=1",
+    "-timeout=0"
+  ],
+  "exit": 1,
+  "start": "2026-10-17T11:42:46.217887+00:00",
+  "end": "2026-10-17T11:42:46.412480+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 12
+}

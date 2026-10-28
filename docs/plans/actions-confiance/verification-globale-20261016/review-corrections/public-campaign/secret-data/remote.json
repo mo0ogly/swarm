@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "binary_sha256": "c0030271a0c2108a6d872b954b0be7556f69642463e28e3070f6bde1edfd8ec8",
+  "checks": [
+    "server view without local root",
+    "authenticated identity context",
+    "real sealed helper through remote API: 14 assertions",
+    "same-UID parent cannot open protected server memory",
+    "raw material through authenticated dedicated channel",
+    "exact content-bound native HMAC attestation",
+    "wrong role denied without mutation",
+    "single consumption and replay refusal",
+    "raw marker absent from state and proof export",
+    "memory consumption separate from persistent policy",
+    "server restart loses material and old grant refuses without mutation",
+    "fresh material works after restart and revoked grant stays closed",
+    "request exact approval effect and reconciliation: one effect",
+    "withdrawn secret destination refuses preparation before raw transfer without mutation",
+    "wrong operator session refused without mutation",
+    "client root never created",
+    "stopped server refused without local fallback"
+  ],
+  "server_stopped": true,
+  "provider_account_used": false,
+  "real_payment": false
+}

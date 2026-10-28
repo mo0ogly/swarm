@@ -1,0 +1,285 @@
+diff --git a/docs/plan-ca937edf4e-T2.delivery.json b/docs/plan-ca937edf4e-T2.delivery.json
+index 06b37c0..872b733 100644
+--- a/docs/plan-ca937edf4e-T2.delivery.json
++++ b/docs/plan-ca937edf4e-T2.delivery.json
+@@ -76,7 +76,6 @@
+         "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+         "docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md",
+         "docs/architecture/CURSOR-ENGINE-CONTRACT.md",
+-        "docs/en/CURSOR-ENGINE-CONTRACT.md",
+         "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/check-evolution-docs.out"
+       ]
+     }
+diff --git a/docs/plan-ca937edf4e-T2.md b/docs/plan-ca937edf4e-T2.md
+index beb9e34..053e35b 100644
+--- a/docs/plan-ca937edf4e-T2.md
++++ b/docs/plan-ca937edf4e-T2.md
+@@ -1,3 +1,21 @@
++## Reprise opérateur : dossier borné et preuve courante
++
++Cette réparation après la production native3 est documentaire et attribuée à
++l’opérateur. Le contrôle producteur courant inclut `|TestPlanningJudge` et `-v`,
++16tests nommés PASS, exit0. Le journal public annonce l’outil à14:13:29 et reçoit
++son résultat à14:14:21UTC ; ces bornes ne remplacent pas un horodatage de commande
++qui n’a pas été capturé. La date13:40 du metadata natif était incohérente avec
++le début14:12 de la tentative ; l’original est conservé sous
++`judge-coverage-fix-20261011/metadata.native-original.json`. Le metadata corrigé
++reste complet en JSON compact et cite la suite canonique1096/19groupes.
++
++La sélection jointe conserve les cinq Go du juge, `score.go`, le contrat FR et
++les architectures FR/EN complètes, le reçu ciblé et le reçu complet canonique.
++La version EN du contrat normatif et les anciens reçus f5/filtré sont conservés
++sur le candidat mais exclus de cette sélection redondante. Aucun fichier ni
++contrôle n’est supprimé. Les sections anciennes ci-dessous restent historiques.
++Le bilan est local : aucune acceptation ni verdict indépendant n’est déclaré.
++
+ # T2 — juge global, renouvellement et reprise opérateur
+ 
+ Mission `w-ca937edf4e0abd85f8d3d67b`, tâche `plan-ca937edf4e-T2`, agent
+@@ -17,7 +35,7 @@ commit directement enfant de la base ci-dessus, donc sans nouveau conflit ni
+ arbre réécrit) puis a refait exactement le contrôle demandé par le refus payé
+ f613. Voir « Correction f613 » plus bas pour le reçu daté de cette tentative.
+ 
+-## Portée du bilan et reçu exact — correction du refus du 11 octobre
++## Historique : portée du bilan et reçu filtré avant correction f613
+ 
+ `pass` et `complete` sont les résultats locaux de cette remise ; ils ne déclarent
+ aucune acceptation indépendante. Le refus valide `review-f5cb258178e80a4bdc4778d3`
+@@ -224,17 +242,11 @@ plein-suite antérieur hérité (`T2-execution/go-test-full-engine.out`, lignée
+ repasse PASS seul (`judge-coverage-fix-20261011/go-test-graph-qual.out`) car le
+ manifeste `docs/engine-cursor-source-manifest.json` déjà fusionné est à jour.
+ 
+-Le même reçu plein-suite hérité montre aussi un panic par timeout global (4m30s)
+-pendant `TestManagedFragmentHistoricalPublicRecovery` lorsque le paquet tourne en
+-un seul processus série. La suite shardée de l'opérateur
+-(`operator-recovery-20261011/full-suite-final.out`, 1095 cibles, 19 shards, tous
+-exit 0) exécute ce même test (shard 3) avec succès : c'est un artefact de timeout
+-du binaire de test complet en série, pas une régression du code juge de ce lot, et
+-hors périmètre JAN-4/JAN-5/FEB-3 (le test relève de
+-`internal/engine/managed_review_fragment_reuse_test.go`). Cette tentative n'a pas
+-rejoué l'intégralité de la suite shardée (plusieurs minutes, budget d'exploration
+-limité) ; elle s'appuie sur ce reçu antérieur déjà présent dans le candidat fusionné,
+-et le signale comme limite explicite plutôt que comme nouvelle preuve.
++Le reçu complet actuel est `operator-recovery-20261011/source-alias-full-suite.out`,
++commande `python3 tests/supervision_go_suite.py`, 1096 cibles et19groupes exit0.
++Le précédent `full-suite-final.out` de1095cibles et le panic du vieux contrôle
++série restent historiques. Le code Go des cinq fichiers est inchangé ; cette
++réparation documentaire ne prétend aucune nouvelle exécution de suite complète.
+ 
+ Aucun fichier Go n'a été modifié par cette tentative : les cinq fichiers du juge
+ (`planning.go`, `planning_api.go`, `planning_context.go`, `planning_judge.go`,
+diff --git a/docs/plan-ca937edf4e-T2.review-context.json b/docs/plan-ca937edf4e-T2.review-context.json
+index 8328cc8..ba8588f 100644
+--- a/docs/plan-ca937edf4e-T2.review-context.json
++++ b/docs/plan-ca937edf4e-T2.review-context.json
+@@ -4,11 +4,9 @@
+     "internal/engine/planning.go",
+     "internal/engine/planning_api.go",
+     "internal/engine/score.go",
+-    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/status-scope-validation.out",
+     "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-targeted.out",
+     "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-race.out",
+     "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-vet.out",
+-    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-full-suite.out",
+-    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-semantic-refusal.json"
++    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-full-suite.out"
+   ]
+ }
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json b/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json
+index 0baf1cf..3d8bb53 100644
+--- a/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json
++++ b/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json
+@@ -1,93 +1 @@
+-{
+-  "schema_version": 1,
+-  "purpose": "Reproduce exactly the moteur-updated 'plan-validation' control and demonstrate by name that it now exercises TestPlanningJudge*, closing the gap named by the paid refusal f613.",
+-  "work": "w-ca937edf4e0abd85f8d3d67b",
+-  "task": "plan-ca937edf4e-T2",
+-  "agent": "auto-a23c60f03a732c02841f",
+-  "attempt": "a-2f9e1debb1548be96273f0d3",
+-  "base_commit_before_attempt": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+-  "merged_repaired_commit": "736460f60459595c61df1d953dec77ac132db9e5",
+-  "merge_method": "git merge --ff-only 736460f60459595c61df1d953dec77ac132db9e5 (direct child of HEAD; no new tree created by the merge itself)",
+-  "executed_at_utc": "2026-10-11T13:40:00Z",
+-  "environment": {
+-    "GOCACHE": "/tmp/gocache-T2-3",
+-    "GOTMPDIR": "/tmp",
+-    "TMPDIR": "/tmp"
+-  },
+-  "receipts": [
+-    {
+-      "id": "plan-validation",
+-      "argv": ["go", "test", "./internal/engine", "-run", "TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestPlanningJudge", "-count=1", "-timeout", "25s", "-v"],
+-      "note": "Exact control command from the current task contract, run with -v so every matched test name is visible in the raw output.",
+-      "exit_code": 0,
+-      "stdout_path": "docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.out",
+-      "stdout_sha256": "fbaa92ea28409f7d476cdf46ba7046372f7d868a050833c5c7c2d31872115199",
+-      "names_covered": [
+-        "TestManagedRecoveryHandoffSuppliesRejectedWorkWithoutPublishingIt",
+-        "TestManagedRecoveryHandoffCorrectedResultNeedsNewChecksAndReview",
+-        "TestManagedRecoveryHandoffResumeAndTampering",
+-        "TestManagedRecoveryHandoffMissingResultIsExplicit",
+-        "TestManagedCheckpointRecovery",
+-        "TestPlanningJudgeEndRejectsMatchingCandidateWithoutProofs",
+-        "TestPlanningJudgeVerdictDistinctFromCandidateReview",
+-        "TestPlanningJudgeEndRequiresFreshMatchingCandidate",
+-        "TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess",
+-        "TestPlanningJudgeRenewalPreservesContextAndHistory",
+-        "TestPlanningJudgeReplayStaleAndDoubleVerdictRefused",
+-        "TestPlanningJudgePausedAndQuotaRefuseEffects",
+-        "TestPlanningParentSeesDelegationAndUnverifiedDescendant",
+-        "TestPlanningParentValidationFollowsProofFreshness",
+-        "TestPlanningReportRelayIsAtomicScopedAndIdempotent",
+-        "TestPreparedOrganizationManagedRepository"
+-      ],
+-      "result": "PASS 16 top-level tests, 0 FAIL, exit 0, 8.302s"
+-    },
+-    {
+-      "id": "plan-validation-PREVIOUS-STALE-comparison",
+-      "argv": ["go", "test", "./internal/engine", "-run", "TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff", "-count=1", "-timeout", "25s"],
+-      "note": "Retained for comparison only: this is the pre-correction -run pattern the paid reviewer rejected as evidence for criteria 1/3/4 because it never names a single TestPlanningJudge* function. Not used as current evidence.",
+-      "exit_code": 0,
+-      "stdout_path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/go-test-plan-validation.PREVIOUS-STALE.out",
+-      "stdout_sha256": "0dc8abdf04bc4da57f0f0c9f266a0ac558d23318c5ab2a37a28a6bf670930d0e"
+-    },
+-    {
+-      "id": "plan-entry / plan-delivery / plan-criterion-1..4",
+-      "argv": ["python3", "docs/plans/engine-cursor-contract/check-evolution-docs.py", "T2"],
+-      "exit_code": 0,
+-      "stdout_path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/check-evolution-docs.out",
+-      "stdout_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee",
+-      "result": "T2: architecture/evidence structure verified; semantic review still required"
+-    },
+-    {
+-      "id": "go-build",
+-      "argv": ["go", "build", "./..."],
+-      "exit_code": 0,
+-      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+-    },
+-    {
+-      "id": "go-vet",
+-      "argv": ["go", "vet", "./..."],
+-      "exit_code": 0,
+-      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+-    },
+-    {
+-      "id": "graph-qualification-regression-check",
+-      "argv": ["go", "test", "./internal/engine", "-run", "TestGraphDeliveryD03QualificationManifest", "-count=1", "-timeout", "20s", "-v"],
+-      "note": "Re-checks the test added by the external repair that an earlier full-suite capture (go-test-full-engine.out, T2-2 lineage) showed failing with 'stale input: AGENTS.md'. Passes now because the merged commit already includes the refreshed docs/engine-cursor-source-manifest.json.",
+-      "exit_code": 0,
+-      "stdout_sha256": "9f34cab232180035ef4bb9b8875e80f1316db0af3cfa62274bafe14919d59e15"
+-    }
+-  ],
+-  "prior_evidence_examined_not_rerun": {
+-    "full_sharded_suite": {
+-      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-final.out",
+-      "observed": "PASS full discovered Go suite: 1095 tests; all 19 shards exited 0, including TestManagedFragmentHistoricalPublicRecovery/exit (shard 3).",
+-      "why_not_rerun": "Reruns the whole ~1096-target suite (sharded, several minutes). The single-process go-test-full-engine.out capture from the prior lineage shows the same test panicking only via a 4m30s *global* test binary timeout when run serially in one process, not a per-test failure; the sharded runner isolates it and passes. Treated as a pre-existing serial-timeout artifact of the full-package run, not a regression introduced by this task's judge code, and out of this task's JAN-4/JAN-5/FEB-3 scope (internal/engine/managed_review_fragment_reuse_test.go)."
+-    }
+-  },
+-  "limits": [
+-    "Judge/renew tests use provider doubles; no autonomous real-model judge/renewal observed in this receipt.",
+-    "This is a producer-local verification, not engine acceptance or independent review.",
+-    "No new attempt or budget created; this is the 3rd of 3 authorized attempts on plan-ca937edf4e-T2."
+-  ]
+-}
++{"schema_version":1,"purpose":"Reproduce exactly the moteur-updated 'plan-validation' control and demonstrate by name that it now exercises TestPlanningJudge*, closing the gap named by the paid refusal f613.","work":"w-ca937edf4e0abd85f8d3d67b","task":"plan-ca937edf4e-T2","agent":"auto-a23c60f03a732c02841f","attempt":"a-2f9e1debb1548be96273f0d3","base_commit_before_attempt":"e32388fda21e7c225c3b2416d230d6f5450230cd","merged_repaired_commit":"736460f60459595c61df1d953dec77ac132db9e5","merge_method":"git merge --ff-only 736460f60459595c61df1d953dec77ac132db9e5 (direct child of HEAD; no new tree created by the merge itself)","environment":{"GOCACHE":"/tmp/gocache-T2-3","GOTMPDIR":"/tmp","TMPDIR":"/tmp"},"receipts":[{"id":"plan-validation","argv":["go","test","./internal/engine","-run","TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestPlanningJudge","-count=1","-timeout","25s","-v"],"note":"Exact control command from the current task contract, run with -v so every matched test name is visible in the raw output.","exit_code":0,"stdout_path":"docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.out","stdout_sha256":"fbaa92ea28409f7d476cdf46ba7046372f7d868a050833c5c7c2d31872115199","result":"PASS 16 top-level tests, 0 FAIL, exit 0, 8.302s","names_location":"All16 top-level names retained in the joined raw stdout, not duplicated here."},{"id":"plan-entry / plan-delivery / plan-criterion-1..4","argv":["python3","docs/plans/engine-cursor-contract/check-evolution-docs.py","T2"],"exit_code":0,"stdout_path":"docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/check-evolution-docs.out","stdout_sha256":"b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee","result":"T2: architecture/evidence structure verified; semantic review still required"},{"id":"go-build","argv":["go","build","./..."],"exit_code":0,"stdout_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},{"id":"go-vet","argv":["go","vet","./..."],"exit_code":0,"stdout_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},{"id":"graph-qualification-regression-check","argv":["go","test","./internal/engine","-run","TestGraphDeliveryD03QualificationManifest","-count=1","-timeout","20s","-v"],"note":"Re-checks the test added by the external repair that an earlier full-suite capture (go-test-full-engine.out, T2-2 lineage) showed failing with 'stale input: AGENTS.md'. Passes now because the merged commit already includes the refreshed docs/engine-cursor-source-manifest.json.","exit_code":0,"stdout_sha256":"9f34cab232180035ef4bb9b8875e80f1316db0af3cfa62274bafe14919d59e15"}],"prior_evidence_examined_not_rerun":{"full_sharded_suite":{"path":"docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-full-suite.out","sha256":"14ac1d7a7423f8ca394e653013cc60ba07bae85bedf3ff8d443b3ca336308675","command":["python3","tests/supervision_go_suite.py"],"observed":"Canonical later receipt1096 targets,19 groups exit0; optional skips explicit. Earlier1095 receipt and serial timeout retained as historical originals.","limit":"No new full run claimed: five Go files verified byte-identical to native previous repaired result and current native result; docs only repair. Does not prove independent acceptance."}},"limits":["Judge/renew tests use provider doubles; no autonomous real-model judge/renewal observed in this receipt.","This is a producer-local verification, not engine acceptance or independent review.","No new attempt or budget created; this is the 3rd of 3 authorized attempts on plan-ca937edf4e-T2."],"operator_correction":{"actor":"Codex operator","at":"2026-10-11T14:26:20.226188+00:00","native_original":"docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.native-original.json","native_original_sha256":"69e7ad880d6551d4f08e77c1981896b148951c279855cb9c19445b5f2c114113","date_limit":"Native13:40 timestamp precedes attempt14:12; exact command clock was not captured. Public activity seq122010 announced at14:13:29.583410262Z; result seq122037 received14:14:21.068541688Z. These are observation boundaries, not fabricated command start/end.","scope":"Producer-local receipt and operator correction only; native validation and independent acceptance still required."}}
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.native-original.json b/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.native-original.json
+new file mode 100644
+index 0000000..0baf1cf
+--- /dev/null
++++ b/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.native-original.json
+@@ -0,0 +1,93 @@
++{
++  "schema_version": 1,
++  "purpose": "Reproduce exactly the moteur-updated 'plan-validation' control and demonstrate by name that it now exercises TestPlanningJudge*, closing the gap named by the paid refusal f613.",
++  "work": "w-ca937edf4e0abd85f8d3d67b",
++  "task": "plan-ca937edf4e-T2",
++  "agent": "auto-a23c60f03a732c02841f",
++  "attempt": "a-2f9e1debb1548be96273f0d3",
++  "base_commit_before_attempt": "e32388fda21e7c225c3b2416d230d6f5450230cd",
++  "merged_repaired_commit": "736460f60459595c61df1d953dec77ac132db9e5",
++  "merge_method": "git merge --ff-only 736460f60459595c61df1d953dec77ac132db9e5 (direct child of HEAD; no new tree created by the merge itself)",
++  "executed_at_utc": "2026-10-11T13:40:00Z",
++  "environment": {
++    "GOCACHE": "/tmp/gocache-T2-3",
++    "GOTMPDIR": "/tmp",
++    "TMPDIR": "/tmp"
++  },
++  "receipts": [
++    {
++      "id": "plan-validation",
++      "argv": ["go", "test", "./internal/engine", "-run", "TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestPlanningJudge", "-count=1", "-timeout", "25s", "-v"],
++      "note": "Exact control command from the current task contract, run with -v so every matched test name is visible in the raw output.",
++      "exit_code": 0,
++      "stdout_path": "docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.out",
++      "stdout_sha256": "fbaa92ea28409f7d476cdf46ba7046372f7d868a050833c5c7c2d31872115199",
++      "names_covered": [
++        "TestManagedRecoveryHandoffSuppliesRejectedWorkWithoutPublishingIt",
++        "TestManagedRecoveryHandoffCorrectedResultNeedsNewChecksAndReview",
++        "TestManagedRecoveryHandoffResumeAndTampering",
++        "TestManagedRecoveryHandoffMissingResultIsExplicit",
++        "TestManagedCheckpointRecovery",
++        "TestPlanningJudgeEndRejectsMatchingCandidateWithoutProofs",
++        "TestPlanningJudgeVerdictDistinctFromCandidateReview",
++        "TestPlanningJudgeEndRequiresFreshMatchingCandidate",
++        "TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess",
++        "TestPlanningJudgeRenewalPreservesContextAndHistory",
++        "TestPlanningJudgeReplayStaleAndDoubleVerdictRefused",
++        "TestPlanningJudgePausedAndQuotaRefuseEffects",
++        "TestPlanningParentSeesDelegationAndUnverifiedDescendant",
++        "TestPlanningParentValidationFollowsProofFreshness",
++        "TestPlanningReportRelayIsAtomicScopedAndIdempotent",
++        "TestPreparedOrganizationManagedRepository"
++      ],
++      "result": "PASS 16 top-level tests, 0 FAIL, exit 0, 8.302s"
++    },
++    {
++      "id": "plan-validation-PREVIOUS-STALE-comparison",
++      "argv": ["go", "test", "./internal/engine", "-run", "TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff", "-count=1", "-timeout", "25s"],
++      "note": "Retained for comparison only: this is the pre-correction -run pattern the paid reviewer rejected as evidence for criteria 1/3/4 because it never names a single TestPlanningJudge* function. Not used as current evidence.",
++      "exit_code": 0,
++      "stdout_path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/go-test-plan-validation.PREVIOUS-STALE.out",
++      "stdout_sha256": "0dc8abdf04bc4da57f0f0c9f266a0ac558d23318c5ab2a37a28a6bf670930d0e"
++    },
++    {
++      "id": "plan-entry / plan-delivery / plan-criterion-1..4",
++      "argv": ["python3", "docs/plans/engine-cursor-contract/check-evolution-docs.py", "T2"],
++      "exit_code": 0,
++      "stdout_path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/check-evolution-docs.out",
++      "stdout_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee",
++      "result": "T2: architecture/evidence structure verified; semantic review still required"
++    },
++    {
++      "id": "go-build",
++      "argv": ["go", "build", "./..."],
++      "exit_code": 0,
++      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
++    },
++    {
++      "id": "go-vet",
++      "argv": ["go", "vet", "./..."],
++      "exit_code": 0,
++      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
++    },
++    {
++      "id": "graph-qualification-regression-check",
++      "argv": ["go", "test", "./internal/engine", "-run", "TestGraphDeliveryD03QualificationManifest", "-count=1", "-timeout", "20s", "-v"],
++      "note": "Re-checks the test added by the external repair that an earlier full-suite capture (go-test-full-engine.out, T2-2 lineage) showed failing with 'stale input: AGENTS.md'. Passes now because the merged commit already includes the refreshed docs/engine-cursor-source-manifest.json.",
++      "exit_code": 0,
++      "stdout_sha256": "9f34cab232180035ef4bb9b8875e80f1316db0af3cfa62274bafe14919d59e15"
++    }
++  ],
++  "prior_evidence_examined_not_rerun": {
++    "full_sharded_suite": {
++      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-final.out",
++      "observed": "PASS full discovered Go suite: 1095 tests; all 19 shards exited 0, including TestManagedFragmentHistoricalPublicRecovery/exit (shard 3).",
++      "why_not_rerun": "Reruns the whole ~1096-target suite (sharded, several minutes). The single-process go-test-full-engine.out capture from the prior lineage shows the same test panicking only via a 4m30s *global* test binary timeout when run serially in one process, not a per-test failure; the sharded runner isolates it and passes. Treated as a pre-existing serial-timeout artifact of the full-package run, not a regression introduced by this task's judge code, and out of this task's JAN-4/JAN-5/FEB-3 scope (internal/engine/managed_review_fragment_reuse_test.go)."
++    }
++  },
++  "limits": [
++    "Judge/renew tests use provider doubles; no autonomous real-model judge/renewal observed in this receipt.",
++    "This is a producer-local verification, not engine acceptance or independent review.",
++    "No new attempt or budget created; this is the 3rd of 3 authorized attempts on plan-ca937edf4e-T2."
++  ]
++}

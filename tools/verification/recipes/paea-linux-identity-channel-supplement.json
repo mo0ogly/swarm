@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "paea-linux-identity-channel-supplement",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-linux-identity-channel/**/*",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-linux-identity-channel.json",
+    "tests/paea_identity_channel_native_test.py",
+    "tools/verification/recipes/paea-linux-identity-channel-supplement.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "linux-ffi-private-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-identity-channel",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "declared-only-channel-example-build",
+      "command": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-identity-channel",
+        "--features",
+        "test-fixtures",
+        "--example",
+        "channel_probe",
+        "--message-format=json"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"reason\":\"build-finished\",\"success\":true"
+      ],
+      "required_stderr": [
+        "Finished"
+      ]
+    }
+  ]
+}

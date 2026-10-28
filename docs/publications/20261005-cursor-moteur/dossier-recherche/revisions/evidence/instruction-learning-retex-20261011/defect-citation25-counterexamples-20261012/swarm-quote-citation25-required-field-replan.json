@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-12T06:33:54.623141+00:00",
+  "owned_qualifier_pid": 3252862,
+  "owned_go_pid": 3252983,
+  "result": "Qualification deliberately interrupted before completion",
+  "cause": "Self-review identified missing artifact field interpreted as zero in new quote-only decoding; require explicit presence before final qualification",
+  "native_runtime_affected": false,
+  "old_output_preserved": true
+}

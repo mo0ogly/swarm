@@ -1,0 +1,44 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T17:56:04.924826+00:00",
+  "end": "2026-10-11T18:03:04.436637+00:00",
+  "seconds": 419.51376334200177,
+  "exit": 1,
+  "output": "/tmp/swarm-unresolved-review-resume-qualified-v1-full.out",
+  "output_sha256": "565b877ea27aa4d8ccb0b7b8e221f5d96a5c3586dc32d4644e442c392bb84cc6",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  },
+  "source_manifest_sha256": "19f27cb49823b249189eddcf13298cdb9010c906c89759c1374932cf7c2ab262",
+  "candidate_digest": "0154d77abe6f80699910e4e3e41b2dce29ea85f5e211eb95286e989fc18f4a31",
+  "paths": 1177,
+  "source_drift": [],
+  "manifest_changed": false,
+  "driver": {
+    "start": "2026-10-11T17:56:04.924826+00:00",
+    "driver_pid": 2340665,
+    "pgid": 2340665,
+    "sid": 2340665,
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "manifest_sha256": "19f27cb49823b249189eddcf13298cdb9010c906c89759c1374932cf7c2ab262",
+    "source_digest": "0154d77abe6f80699910e4e3e41b2dce29ea85f5e211eb95286e989fc18f4a31",
+    "paths": 1177,
+    "precondition": "Replan18: acknowledged current protocol incident was incorrectly hidden on fresh activation. Preserve original decision and deliver current incident separately with persisted exact identity receipt, new correction and existing budget guards. Storage29 blocks lossy v28 writers. RED retained; public chain and negative identities/storage targeted PASS. Immutable isolated1177 snapshot includes17; no native mission DB.",
+    "go_pid": 2340670
+  }
+}

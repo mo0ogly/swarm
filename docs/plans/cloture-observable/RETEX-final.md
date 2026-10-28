@@ -1,5 +1,13 @@
 # RETEX — clôture observable et reprise fiable
 
+## Repère APEX — 24 octobre 2026
+
+La [file APEX FR](../FILE-APEX.md#vague-3--autres-suivis-historiques-24-octobre-2026) et [EN](../../en/APEX-QUEUE.md#wave-3--other-historical-tracking-october-24-2026) conserve le résultat historique 5/5 et
+la responsabilité racine clôturée. Les propositions sur la fraîcheur pertinente
+des preuves et la publication restent des enseignements à comparer au Rust
+actuel, pas un défaut actuel démontré. Codex racine possède ce rapprochement ;
+aucune mission ni recette n’est relancée et les rapports acceptés restent intacts.
+
 ## Résultat vérifié — 4 octobre 2026
 
 Mission `w-58060a818f1fad5e9a3286b7` : cinq tâches acceptées avec gates et revues indépendantes, responsabilité racine `closed` à la révision 96. Le reçu final r89 `a-a7289c486eacd9880ed58709-receipt-65a590f2ae74522196d29687.json` atteste le contrôle réel `python3 tests/supervision_final_acceptance.py`, code 0, du 20:18:46.826751905Z au 20:22:06.507759619Z : environ 199,7 secondes murales. Il comprend suite Go répartie sans omission, vet, configuration, diff, build et navigateur isolé, puis les contrôles ciblés d'observabilité et recontrôle FR/EN clair/sombre. Le contrôle local n'est pas une preuve d'autonomie d'un fournisseur dans tous les environnements.

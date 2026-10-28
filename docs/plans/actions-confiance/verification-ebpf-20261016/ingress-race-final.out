@@ -1,0 +1,80 @@
+=== RUN   TestKernelObservationStrictFrame
+=== RUN   TestKernelObservationStrictFrame/unknown
+=== RUN   TestKernelObservationStrictFrame/null
+=== RUN   TestKernelObservationStrictFrame/oversize
+=== RUN   TestKernelObservationStrictFrame/invalid_utf8
+=== RUN   TestKernelObservationStrictFrame/boolean
+=== RUN   TestKernelObservationStrictFrame/noncanonical
+=== RUN   TestKernelObservationStrictFrame/duplicate
+=== RUN   TestKernelObservationStrictFrame/missing
+=== RUN   TestKernelObservationStrictFrame/trailing
+--- PASS: TestKernelObservationStrictFrame (0.01s)
+    --- PASS: TestKernelObservationStrictFrame/unknown (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/null (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/oversize (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/invalid_utf8 (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/boolean (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/noncanonical (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/duplicate (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/missing (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/trailing (0.00s)
+=== RUN   TestKernelObservationAttributionAndLoss
+--- PASS: TestKernelObservationAttributionAndLoss (0.00s)
+=== RUN   TestKernelObservationPeerHelper
+    kernel_observation_linux_test.go:95: owned subprocess fixture only
+--- SKIP: TestKernelObservationPeerHelper (0.00s)
+=== RUN   TestKernelObservationUnixPeer
+=== RUN   TestKernelObservationUnixPeer/same_uid_other_pid
+=== RUN   TestKernelObservationUnixPeer/wrong_uid
+=== RUN   TestKernelObservationUnixPeer/reused_pid
+--- PASS: TestKernelObservationUnixPeer (1.62s)
+    --- PASS: TestKernelObservationUnixPeer/same_uid_other_pid (0.00s)
+    --- PASS: TestKernelObservationUnixPeer/wrong_uid (0.00s)
+    --- PASS: TestKernelObservationUnixPeer/reused_pid (0.00s)
+=== RUN   TestKernelObservationRefusesStaleSource
+=== RUN   TestKernelObservationRefusesStaleSource/mission
+=== RUN   TestKernelObservationRefusesStaleSource/task
+=== RUN   TestKernelObservationRefusesStaleSource/attempt
+=== RUN   TestKernelObservationRefusesStaleSource/digest
+=== RUN   TestKernelObservationRefusesStaleSource/pid
+=== RUN   TestKernelObservationRefusesStaleSource/start
+=== RUN   TestKernelObservationRefusesStaleSource/boot
+=== RUN   TestKernelObservationRefusesStaleSource/probe
+=== RUN   TestKernelObservationRefusesStaleSource/clock
+=== RUN   TestKernelObservationRefusesStaleSource/gap
+=== RUN   TestKernelObservationRefusesStaleSource/overflow
+=== RUN   TestKernelObservationRefusesStaleSource/changed
+=== RUN   TestKernelObservationRefusesStaleSource/read_error
+--- PASS: TestKernelObservationRefusesStaleSource (3.36s)
+    --- PASS: TestKernelObservationRefusesStaleSource/mission (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/task (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/attempt (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/digest (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/pid (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/start (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/boot (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/probe (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/clock (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/gap (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/overflow (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/changed (1.76s)
+    --- PASS: TestKernelObservationRefusesStaleSource/read_error (1.58s)
+=== RUN   TestKernelObservationConcurrentReplay
+--- PASS: TestKernelObservationConcurrentReplay (0.01s)
+=== RUN   TestKernelObservationProcessIdentity
+    kernel_observation_linux_test.go:276: owned PID identity checked; no kernel collection
+--- PASS: TestKernelObservationProcessIdentity (0.00s)
+=== RUN   TestKernelObservationAgentLifecycle
+=== RUN   TestKernelObservationAgentLifecycle/stop
+=== RUN   TestKernelObservationAgentLifecycle/invalid
+=== RUN   TestKernelObservationAgentLifecycle/running
+--- PASS: TestKernelObservationAgentLifecycle (1.28s)
+    --- PASS: TestKernelObservationAgentLifecycle/stop (0.00s)
+    --- PASS: TestKernelObservationAgentLifecycle/invalid (0.00s)
+    --- PASS: TestKernelObservationAgentLifecycle/running (0.00s)
+=== RUN   TestKernelObservationUnixLossAndCancellation
+--- PASS: TestKernelObservationUnixLossAndCancellation (1.55s)
+=== RUN   TestKernelObservationUnixMalformedFrame
+--- PASS: TestKernelObservationUnixMalformedFrame (3.14s)
+PASS
+ok  	swarm.local/companion/internal/engine	12.554s

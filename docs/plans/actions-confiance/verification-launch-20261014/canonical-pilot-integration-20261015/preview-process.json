@@ -1,0 +1,19 @@
+{
+  "pid": 141273,
+  "proc_start_ticks": "157303",
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-pilot",
+    "--root",
+    "/tmp/swarm-actions-preview-g81kfiuh",
+    "web",
+    "127.0.0.1:0"
+  ],
+  "binary_sha256": "99243cbb491bda4828f73fc9f24a75182bccec4b8e291b4554bacc3260aae0b7",
+  "origin": "http://127.0.0.1:36525",
+  "fixture_root": "/tmp/swarm-actions-preview-g81kfiuh",
+  "created_at_utc": "2026-10-15T12:25:49.163373+00:00",
+  "actions": 2,
+  "ledger_entries": 1,
+  "simulation": true,
+  "html_title_present": true
+}

@@ -1,0 +1,8 @@
+{
+  "case_id": "contract-current-with",
+  "model": "gpt-5.6-sol",
+  "effort": "medium",
+  "pack_sha256": "f5fa8d5ad55fddd25116ffe634733c685a4ffcf94e52c7c3d60e38a5c48441b6",
+  "at": "2026-10-16T07:59:45.316003+00:00",
+  "automatic_retries": 0
+}

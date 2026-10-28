@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "tests/actions_confiance_t2.py",
+    "--criterion",
+    "0",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm",
+    "--timeout-seconds",
+    "120",
+    "--evidence-dir",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-donnees-20261015/data-policy-final-public-evidence"
+  ],
+  "started_at": "2026-10-15T20:18:05.515036+00:00",
+  "ended_at": "2026-10-15T20:18:47.368015+00:00",
+  "exit_code": 0,
+  "sources_unchanged": true,
+  "output_sha256": "70a37e81afbb5a082cbf547eeda27e92d5d0e02ea66a802d65439c7c9c50bf38",
+  "input_sha256": {
+    "bin/swarm-actions-confiance-data-policy-resources": "1a7a69aed6f2aa153413b628c525895a77b8e2fe0aea0a84cf621aabad110d31",
+    "web/trust-actions.js": "fd9122502f4412ff25532e9048d3fbb281c24a97270d779a9be434e2640f46b7",
+    "web/trust-actions.html": "b43635cbe17e2775b4fcae223b4857c7c77ad72e517032456ed330d6828d570e",
+    "web/trust-actions-en.js": "5f101a2f5cfb5a11a93f02b50169d6456dcdd24c1a98f314997186645b5e1361"
+  }
+}

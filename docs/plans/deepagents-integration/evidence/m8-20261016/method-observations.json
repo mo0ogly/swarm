@@ -1,0 +1,37 @@
+{
+  "at_utc": "2026-10-16T08:15:26.175594+00:00",
+  "observations": [
+    {
+      "kind": "source_lookup",
+      "cause": "Initially assumed project_memory_cli_test.go, cli_test.go and command*.go paths that do not exist",
+      "original_observation": "rg reported No such file or directory",
+      "correction": "Enumerated actual paths with rg --files and traced main.go run, CLI inspection selection and emit JSON work producer",
+      "effect": "Go test consumes JSON key work from actual producer; no application changes",
+      "owner": "Codex"
+    },
+    {
+      "kind": "expected_preimplementation_counterexample",
+      "original": "v3-dispatch-red.json",
+      "cause": "The client rejected the not-yet-implemented storage-plan-v3 protocol",
+      "correction": "Added explicit protocol/schema dispatch; no existing protocol changed",
+      "verification": "collector-final, actual pack reader and local preflight",
+      "model_calls": 0
+    },
+    {
+      "kind": "test_fixture_failure",
+      "original": "collector-tests.receipt.json",
+      "cause": "Dispatch test mocked the lower-level knowledge reader with an incomplete pack; V3 matrix validation correctly required knowledge",
+      "correction": "Mock the V3 pack reader at the dispatch boundary; test the real V3 pack separately",
+      "verification": "collector-tests-fixed and collector-final, engine-produced pack read and graded successfully",
+      "owner": "Codex",
+      "model_calls": 0
+    },
+    {
+      "kind": "compile_latency",
+      "observed": "No test log during compilation; compiler observed at 203% CPU after about 44 seconds",
+      "action": "Preserved the active compilation, communicated status, did not retry or edit Go sources",
+      "verification": "engine-contexts receipt: 80.516 seconds total, 2.469 seconds reported package execution, PASS",
+      "owner": "Codex"
+    }
+  ]
+}

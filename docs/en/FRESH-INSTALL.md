@@ -8,7 +8,7 @@ an empty project rather than copying a demonstration `.swarm` database.
 
 ## Native installation
 
-Requirements: Git, Bash, Python 3 and Go 1.24 or newer. From a directory with no
+Requirements: Git, Bash, Python 3, Rust/Cargo (validated: 1.96.0) and a C compiler. From a directory with no
 existing `swarm` checkout:
 
 ```sh
@@ -122,3 +122,5 @@ restart. Pulling Git changes alone does not replace an installed native binary
 or a running container.
 
 [Application creation workflow and graph views](PRODUCT-WORKFLOW.md).
+
+Rust has no Go fallback. Legacy provider/preparation writing workflows remain subject to the active migration plan; a successful installation does not prove full parity.

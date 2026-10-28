@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "id": "instruction-learning-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/instruction_learning.rs",
+    "rust/crates/swarm-engine/src/instruction.rs",
+    "rust/crates/swarm-engine/src/planning_control.rs",
+    "rust/crates/swarm-engine/src/planning_decision.rs",
+    "rust/crates/swarm-engine/src/work_engine.rs",
+    "rust/crates/swarm-engine/src/models.rs",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-web/src/service/planning.rs",
+    "rust/crates/swarm-web/src/service/native_admin.rs",
+    "web/cockpit-native.js",
+    "web/cockpit-native-instructions.js",
+    "web/i18n-en.js",
+    "locales/en.json",
+    "tests/rust_instruction_learning.py",
+    "tests/rust_instruction_learning_ui.cjs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_native_http_cli.py",
+    "tools/rust-migration/instruction-learning-reference/main.go",
+    "internal/engine/instruction_revision.go",
+    "internal/engine/model.go",
+    "internal/engine/planning.go",
+    "internal/engine/score.go",
+    "docs/architecture/RUST-MIGRATION.md",
+    "docs/en/RUST-MIGRATION.md",
+    "version_history.json",
+    "rust/crates/swarm-engine/src/planning_run_material.rs",
+    "rust/crates/swarm-engine/src/planning_scope_context.rs",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_budget.py",
+    "tests/instruction_oracle.py",
+    "tests/helpers/instruction_recovery_race.cjs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "pure-learning-guards",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "instruction_learning",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 4 tests",
+        "test result: ok. 4 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "managed-context-capability",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "managed_candidate_changes_the_scoped_contract_without_private_paths",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 1 test",
+        "test result: ok. 1 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-cli-api-ui-go-parity",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='instruction-learning-',dir='.cache')).resolve()\nimport sys\nsys.path.insert(0,str(Path('tests').resolve()))\nimport instruction_oracle\nreference=instruction_oracle.build(p/'go-proof')\ndef run(args):subprocess.run(args,check=True)\nrun(['python3','tests/rust_instruction_learning.py','--binary',os.environ['SWARM_INSTRUCTION_BINARY'],'--output',str(p/'journey'),'--go-reference',str(reference),'--browser'])\ninstruction_oracle.verify(p/'go-proof')\nprint('INSTRUCTION_LEARNING_EVIDENCE '+str(p/'journey'))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS rejection-valid-before-faults",
+        "PASS Go-Rust-revise-task-equality",
+        "PASS Go-Rust-reject-planning-equality",
+        "PASS rejection-delivered-to-supervisor",
+        "PASS reserved-learning-refuses-rejection",
+        "PASS browser-journey",
+        "INSTRUCTION_LEARNING_EVIDENCE",
+        "PASS native-learning-contract-actually-received",
+        "PASS native-rejection-actually-received",
+        "PASS native-rejection-acknowledged-preserves-base",
+        "PASS saved-instruction-policy-zero-refuses",
+        "PASS saved-instruction-policy-restored-recovery",
+        "PASS Go-oracle-actual-source-and-embed-stability",
+        "PASS web-event-capture-valid",
+        "PASS web-event-capture-exceeds-original-pipe"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

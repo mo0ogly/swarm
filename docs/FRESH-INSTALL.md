@@ -8,7 +8,7 @@ installation neuve ne doit pas réutiliser une base `.swarm` de démonstration.
 
 ## Installation native
 
-Prérequis : Git, Bash, Python 3 et Go 1.24 ou supérieur. Depuis un dossier où
+Prérequis : Git, Bash, Python 3, Rust/Cargo (toolchain validée : 1.96.0) et un compilateur C. Depuis un dossier où
 `swarm` n’existe pas encore :
 
 ```sh
@@ -129,3 +129,5 @@ conservez les modifications locales et examinez la divergence. Reconstruisez ave
 pas un binaire natif déjà installé ou un conteneur existant.
 
 [Parcours de création d’application et vues des graphes](PRODUCT-WORKFLOW.md).
+
+Rust n’a aucun repli Go. Les parcours historiques de configuration fournisseur et d’écriture des préparations restent soumis au plan de migration actif ; une installation réussie ne prouve pas la parité complète.

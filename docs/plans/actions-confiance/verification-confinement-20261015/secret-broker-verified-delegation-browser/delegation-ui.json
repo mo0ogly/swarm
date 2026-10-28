@@ -1,0 +1,17 @@
+{
+  "checks": [
+    "fr: Admin depth preview is read-only, saves and reopens with keyboard focus on mobile",
+    "fr: two parent links, contained default expiry and exact approved effect are visible through CLI/API/UI",
+    "fr: mandate amount beyond JavaScript integer precision renders exactly",
+    "fr: amplified child is refused without creating a mandate",
+    "fr: ancestor revocation blocks descendants, preserves the effect and displays a translated reason without overflow",
+    "en: Admin depth preview is read-only, saves and reopens with keyboard focus on mobile",
+    "en: two parent links, contained default expiry and exact approved effect are visible through CLI/API/UI",
+    "en: mandate amount beyond JavaScript integer precision renders exactly",
+    "en: amplified child is refused without creating a mandate",
+    "en: ancestor revocation blocks descendants, preserves the effect and displays a translated reason without overflow"
+  ],
+  "errors": [],
+  "root": "/tmp/swarm-delegation-ui-WtBijs",
+  "at": "2026-10-15T21:46:38.652Z"
+}

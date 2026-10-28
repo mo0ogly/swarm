@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "reviewer": "Root exact-source self review; no independent acceptance",
+  "baseline_sha256": "a212a507359e80527b684806cb088a17b172ffa637cc1ce7fba6e05d11d1edb2",
+  "current_sha256": "b5d5f576ce6f68fbfc5e4658e4749187e9318ac85d3a46e12e9acefb483aed6e",
+  "files": {
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs": {
+      "sha256": "a544025a8f90cdd578588dce063cdbf83996ec8143eb2797585f542414110405",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Reviewed exact changed bytes and consumers; file-specific analysis and limitations retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-status1370/review-notes.md",
+              "sha256": "4b3d369c6f17c98effb8674e4c9abba6549849b81460fe964485ae8f76d4324a"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Reviewed exact changed bytes and consumers; file-specific analysis and limitations retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-status1370/review-notes.md",
+              "sha256": "4b3d369c6f17c98effb8674e4c9abba6549849b81460fe964485ae8f76d4324a"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Reviewed exact changed bytes and consumers; file-specific analysis and limitations retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-status1370/review-notes.md",
+              "sha256": "4b3d369c6f17c98effb8674e4c9abba6549849b81460fe964485ae8f76d4324a"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Reviewed exact changed bytes and consumers; file-specific analysis and limitations retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-status1370/review-notes.md",
+              "sha256": "4b3d369c6f17c98effb8674e4c9abba6549849b81460fe964485ae8f76d4324a"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/root_store/mission_status_readiness.rs": {
+      "sha256": "08e65a1c62e4ffefc30f02dcba0495c963515642209f5b0542adef7dfc191e75",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Reviewed exact changed bytes and consumers; file-specific analysis and limitations retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-status1370/review-notes.md",
+              "sha256": "4b3d369c6f17c98effb8674e4c9abba6549849b81460fe964485ae8f76d4324a"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Reviewed exact changed bytes and consumers; file-specific analysis and limitations retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-status1370/review-notes.md",
+              "sha256": "4b3d369c6f17c98effb8674e4c9abba6549849b81460fe964485ae8f76d4324a"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Reviewed exact changed bytes and consumers; file-specific analysis and limitations retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-status1370/review-notes.md",
+              "sha256": "4b3d369c6f17c98effb8674e4c9abba6549849b81460fe964485ae8f76d4324a"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Reviewed exact changed bytes and consumers; file-specific analysis and limitations retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-status1370/review-notes.md",
+              "sha256": "4b3d369c6f17c98effb8674e4c9abba6549849b81460fe964485ae8f76d4324a"
+            }
+          ]
+        }
+      }
+    },
+    "version_history.json": {
+      "sha256": "2f18c5cdedcfa281c5b0be3a90c11df4df3af05856eb0a3613c558f083eaf55c",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Reviewed exact changed bytes and consumers; file-specific analysis and limitations retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-status1370/review-notes.md",
+              "sha256": "4b3d369c6f17c98effb8674e4c9abba6549849b81460fe964485ae8f76d4324a"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Reviewed exact changed bytes and consumers; file-specific analysis and limitations retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-status1370/review-notes.md",
+              "sha256": "4b3d369c6f17c98effb8674e4c9abba6549849b81460fe964485ae8f76d4324a"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Reviewed exact changed bytes and consumers; file-specific analysis and limitations retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-status1370/review-notes.md",
+              "sha256": "4b3d369c6f17c98effb8674e4c9abba6549849b81460fe964485ae8f76d4324a"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Reviewed exact changed bytes and consumers; file-specific analysis and limitations retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-status1370/review-notes.md",
+              "sha256": "4b3d369c6f17c98effb8674e4c9abba6549849b81460fe964485ae8f76d4324a"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "tool_activity_count": 0,
+  "diagnostics": [
+    {
+      "id": "item_0",
+      "type": "error",
+      "message": "Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."
+    }
+  ],
+  "completed_turns": 1,
+  "failed_turns": 0,
+  "usage": {
+    "input_tokens": 16551,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 176,
+    "reasoning_output_tokens": 66
+  },
+  "thread_ids": [
+    "01a14378-1608-76b1-a5dd-d985d8882e50"
+  ],
+  "result": "COMPLETE",
+  "reason": "Startup diagnostic misclassified by initial collector; original receipt retained; no repeated provider call",
+  "original_receipt_sha256": "0159da64de6801221de38931e63320a564eec61589ed3d0b0053f3ac89eb48cc",
+  "events_sha256": "8f7f95435911558dbe8bf50347754bd2824ff32765213d1f81e51de92b480d06",
+  "assessment_source_sha256": "1be2e3cc0086e7612c75580867d402a7f9775592de72a6888278ef46a647bc38"
+}

@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "id": "paea-initial-creation-core",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-authority/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "tests/fixtures/paea_provisioning_request.json",
+    "schemas/paea/operator-package-cli-v1.schema.json",
+    "tests/paea_operator_package_schema_test.py",
+    "tools/verification/recipes/paea-operator-package-core.json",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "rust/crates/swarm-linux-identity-channel/**/*",
+    "rust/crates/swarm-enrollment-authority/tests/operator_checkpoint.rs",
+    "schemas/paea/operator-anchor-v1.schema.json",
+    "tests/paea_operator_anchor_schema_test.py",
+    "tools/verification/recipes/paea-operator-anchor-core.json",
+    "rust/crates/swarm-enrollment-authority/tests/initial_creation.rs",
+    "tools/verification/recipes/paea-initial-creation-core.json",
+    "schemas/paea/initial-provisioning-intent-v1.schema.json",
+    "tests/paea_initial_intent_schema_test.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "public-initial-creation-intent-pins-refusal-and-reconciliation",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "initial_creation",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "8 passed; 0 failed",
+        "initial_create_then_reconcile_exact_private_material",
+        "initial_existing_slot_refuses_before_generation",
+        "initial_wrong_request_pin_and_controller_refuse_before_files",
+        "initial_noncanonical_request_refuses_before_generation",
+        "initial_same_directory_alias_refuses_without_material",
+        "initial_reconcile_missing_or_changed_files_refuses_then_recovers",
+        "initial_orphan_intent_never_regenerates_or_disappears",
+        "initial_reconcile_different_request_refuses_current_bytes"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "material-counters-fs-custody-and-error-matrix",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--features",
+        "test-fixtures",
+        "--lib",
+        "provisioning::initial_creation::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "7 passed; 0 failed",
+        "initial_intent_fs_failures_precede_material_and_preserve_slot",
+        "initial_material_failure_retains_intent_and_refuses_regeneration",
+        "initial_anchor_cleanup_keeps_pinned_material_for_explicit_recovery",
+        "initial_package_visible_failure_reconciles_same_material",
+        "initial_operator_cleanup_keeps_durable_package_and_all_causes",
+        "initial_cancelled_context_refuses_before_material_and_recovers",
+        "initial_custom_io_cleanup_and_unknown_metadata_keep_every_branch"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "immutable-intent-closed-schema",
+      "command": [
+        "python3",
+        "tests/paea_initial_intent_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "private-initial-creation-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished",
+        "Generated"
+      ]
+    }
+  ]
+}

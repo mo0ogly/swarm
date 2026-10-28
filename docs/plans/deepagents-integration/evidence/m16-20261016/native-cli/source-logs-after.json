@@ -1,0 +1,128 @@
+[
+  {
+    "seq": 1,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:49.923620531Z",
+    "kind": "command",
+    "message": "Lancement demandé par opérateur local"
+  },
+  {
+    "seq": 2,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:49.977005862Z",
+    "kind": "environment",
+    "message": "Cache de compilation Go prêt : /tmp/swarm-recovery-projection-p8x2af6l/.swarm/cache/go-build ; cache global conservé."
+  },
+  {
+    "seq": 3,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:49.979643577Z",
+    "kind": "lifecycle",
+    "message": "Processus fournisseur démarré"
+  },
+  {
+    "seq": 4,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:49.980195321Z",
+    "kind": "limits",
+    "message": "Limites : durée 30s ; silence 180s ; outil observable 300s ; appels 100 ; répétitions 4 ; erreurs consécutives 3"
+  },
+  {
+    "seq": 5,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.012672865Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/first.go"
+  },
+  {
+    "seq": 6,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.012682804Z",
+    "kind": "output",
+    "message": "{\"type\": \"assistant\", \"message\": {\"content\": [{\"type\": \"tool_use\", \"id\": \"0\", \"name\": \"Read\", \"input\": {\"file_path\": \"common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/first.go\"}}]}}"
+  },
+  {
+    "seq": 7,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.012756092Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 1 reçus · 0 en attente"
+  },
+  {
+    "seq": 8,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.012759649Z",
+    "kind": "output",
+    "message": "{\"type\": \"user\", \"message\": {\"content\": [{\"type\": \"tool_result\", \"tool_use_id\": \"0\", \"content\": \"raw-fixture-result-must-not-be-projected\"}]}}"
+  },
+  {
+    "seq": 9,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.012822458Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/second.go"
+  },
+  {
+    "seq": 10,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.012825965Z",
+    "kind": "output",
+    "message": "{\"type\": \"assistant\", \"message\": {\"content\": [{\"type\": \"tool_use\", \"id\": \"1\", \"name\": \"Read\", \"input\": {\"file_path\": \"common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/second.go\"}}]}}"
+  },
+  {
+    "seq": 11,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.012875378Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 2 reçus · 0 en attente"
+  },
+  {
+    "seq": 12,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.012877282Z",
+    "kind": "output",
+    "message": "{\"type\": \"user\", \"message\": {\"content\": [{\"type\": \"tool_result\", \"tool_use_id\": \"1\", \"content\": \"raw-fixture-result-must-not-be-projected\"}]}}"
+  },
+  {
+    "seq": 13,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.012901377Z",
+    "kind": "activity",
+    "message": "Bash · Exécution d’une commande · [détail masqué : donnée potentiellement sensible]"
+  },
+  {
+    "seq": 14,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.012904794Z",
+    "kind": "output",
+    "message": "{\"type\": \"assistant\", \"message\": {\"content\": [{\"type\": \"tool_use\", \"id\": \"2\", \"name\": \"Bash\", \"input\": {\"command\": \"token=private-fixture-value\"}}]}}"
+  },
+  {
+    "seq": 15,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.012943397Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 3 reçus · 0 en attente"
+  },
+  {
+    "seq": 16,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.01294488Z",
+    "kind": "output",
+    "message": "{\"type\": \"user\", \"message\": {\"content\": [{\"type\": \"tool_result\", \"tool_use_id\": \"2\", \"content\": \"raw-fixture-result-must-not-be-projected\"}]}}"
+  },
+  {
+    "seq": 17,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.012965449Z",
+    "kind": "output",
+    "message": "{\"type\": \"result\", \"result\": \"controlled fixture outcome\", \"usage\": {\"input_tokens\": 17, \"output_tokens\": 3}}"
+  },
+  {
+    "seq": 18,
+    "agent_id": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+    "at": "2026-10-16T19:21:50.024153502Z",
+    "kind": "lifecycle",
+    "message": "Processus en échec (code 1) ; consulter les journaux"
+  }
+]

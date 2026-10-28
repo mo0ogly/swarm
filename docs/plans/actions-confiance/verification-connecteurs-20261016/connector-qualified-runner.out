@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/tmp/swarm-connector-qualified.py", line 12, in <module>
+    files=sorted((repo/'internal/engine').glob('*.go'))+sorted(repo.glob('*.go'))+sorted((repo/'web').glob('*'))+[repo/'go.mod',repo/'go.sum'];inputs={str(f.relative_to(repo)):sha(f) for f in files}
+                                                                                                                                                                                ~~~^^^
+  File "/tmp/swarm-connector-qualified.py", line 5, in sha
+    def sha(f):return hashlib.sha256(f.read_bytes()).hexdigest()
+                                     ~~~~~~~~~~~~^^
+  File "/usr/lib/python3.13/pathlib/_abc.py", line 625, in read_bytes
+    with self.open(mode='rb') as f:
+         ~~~~~~~~~^^^^^^^^^^^
+  File "/usr/lib/python3.13/pathlib/_local.py", line 539, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+IsADirectoryError: [Errno 21] Is a directory: '/home/fpizzi/Documents/ChatGPT/swarm/web/lib'

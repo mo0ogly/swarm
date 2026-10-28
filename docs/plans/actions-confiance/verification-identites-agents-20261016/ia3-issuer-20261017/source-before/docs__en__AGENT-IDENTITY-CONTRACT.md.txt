@@ -1,0 +1,326 @@
+# Internal agent identity and authority contract
+
+17 October 2026 — [Français](../architecture/AGENT-IDENTITY-CONTRACT.md).
+Scope: IA2.2 kernel, IA2.3a channel, IA2.3b durable source and IA3a plan binding, **not connected to launchers**.
+The [IA1 findings](../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md)
+remain open. This contract adds no public endpoint, CLI command, Admin setting,
+bootstrap mechanism or provider confinement.
+
+## Responsibilities and current flow
+
+The [IA2 semantic contract](../plans/actions-confiance/identites-agents-contrat-IA2.md)
+defines the full target. The kernel evaluates data and returns a decision
+receipt. A positive decision is not a reservation, human approval, attested
+process or observed business effect.
+
+```mermaid
+flowchart TD
+  R["Internal JSON request"] --> P["Strict schema: no asserted authority"]
+  P --> L["Shared Trust lock"]
+  L --> I["Resolve token against current state"]
+  A["Controller-supplied frame<br/>IA2.3b durable source below"] --> V
+  I --> V["Check plan, instance, grants and delegation"]
+  V --> D["Decision bound to exact request or refusal"]
+  D -. "IA2.3 / IA3: not connected" .-> E["Atomic commitment, launch and effects"]
+```
+
+Trust supplies the issuer, external subject, `local`/`human`/`service` kind,
+configuration revision and expiry. Local access is never promoted to a human,
+and business roles (`requester`, `approver`, `admin`, `effect`) never implicitly
+grant agent creation. A token alone does not establish an instance.
+
+## Data and authority sources
+
+Private types in `internal/engine/agent_identity_contract.go`:
+
+| Type | Meaning |
+| --- | --- |
+| `agentIdentityPrincipal` | Separate local ID, kind, issuer and external subject; no credential or credential digest in attribution. |
+| `agentIdentityActor` | Principal and optional controller-established instance. |
+| `agentIdentityScope` | Work, persisted generation and recorded-contract digest. IA3a reads it from SQLite; this does not attest human adoption. |
+| `agentIdentityGrant` | Issuer, holder, parent, scope, Trust revision, exact and delegable permissions, validity and revocation. |
+| `agentIdentityInstance` | Instance, logical agent, principal, scope, grant and execution binding reference. Matching this reference is not process attestation. |
+| `agentIdentitySnapshot` | Serializable schema 1, revision, grants and instances. Imports and backups remain data. |
+| `agentIdentityRequest` | Schema 1, event, scope, grant, operation, resource and content digest. No author/approver/authority claim grants rights. |
+| `agentIdentityDecision` | Project context, event, actor, request/snapshot digests, revisions and upper expiry bound. No implicit consumption or effect. |
+
+`agentIdentityAuthority` is a private frame with no JSON-populatable fields:
+canonical project root, current snapshot digest/revision, Trust revision, current plan and explicitly
+recognized root grants. Its internal durable producer is described in IA2.3b;
+protected permit/checkpoint issuers remain unconnected. Computing this frame from
+the snapshot being checked would create circular authority. Historical IA2.2
+tests use fixtures; IA2.3b reads persisted data under a controller checkpoint,
+without deploying an external anchor.
+
+Digests use lowercase hexadecimal SHA-256. IDs reuse `safeName`. Resources match
+exactly, without wildcards or implicit path-prefix rules. Recognized operations
+are `agent.create`, `memory.read`, `memory.summarize`, `memory.transmit`,
+`tool.invoke`, `effect.execute`; their consumers are not connected by this change.
+The kernel introduces no hidden operator timeout or execution ceiling.
+
+Issuer and subject are opaque strings: brackets in an IPv6 issuer or a subject
+are not treated as wildcards. Text validation rejects empty or invalid UTF-8
+strings, control characters and surrounding whitespace; the `*?[]` restriction
+applies only to permission resources.
+
+The content digest must come from the actual proposal, parameters and resolved
+context. Binding a receipt to the supplied digest does not prove that producer
+or its correspondence with a later effect. These remain IA2.3/IA3 obligations.
+
+## Checks and recovery
+
+`decodeAgentIdentityRequest` rejects unknown/case-variant fields, duplicate keys
+including nested and escaped duplicates, multiple documents, empty/null/invalid
+input, asserted authority and wildcard permissions. The snapshot decoder also
+rejects unknown fields, duplicate keys and absent objects.
+
+`evaluateAgentIdentity` requires a caller verified at the evaluation instant, a
+current private frame, a matching snapshot and the same scope. It checks holder,
+instance binding, permission, dates, revocations and each delegation hop up to a
+recognized root. Each child preserves scope, attenuates the parent's delegable
+permissions and stays within its validity interval. An iterative traversal
+detects cycles.
+
+The consumer binds the caller to `Store.root`, canonicalized on opening. The
+private frame must name that same root and the receipt includes a project-context
+digest. Projects with identical fixture names and tokens cannot exchange frames
+or receipts. This local check is not a durable cross-host project ID or proof of
+OS account ownership. Root relocation or federation requires an explicit new
+context and protected anchor in IA2.3.
+
+A Trust configuration change invalidates old grants under this conservative
+contract; renewal must be explicit. Reauthentication does not renew grants.
+Decision expiry cannot exceed the caller's or any contributing grant's expiry.
+
+`Store.evaluateAgentIdentityRequest` resolves and evaluates under the same Trust
+lock. Reuse reauthenticates first, reevaluates, then compares the full receipt.
+It never returns a cached result before authentication. The real clock is
+sampled after lock acquisition; internal tests can inject a fixture clock, but
+JSON cannot. This internal consumer has no runtime-agent caller path yet:
+that requires the protected broker.
+
+`validateAgentIdentityTransition` requires the next revision and retains all
+historical records. Revocation cannot be cleared or moved; other fields of a
+published grant/instance cannot be rewritten. A replacement needs a new ID.
+This check neither authorizes nor publishes an update. The future writer must
+validate against protected current state and atomically publish its new anchor.
+No production storage writer uses this validator yet.
+
+## Limits and required follow-up
+
+Evidence is retained in the
+[IA2.2 report](../plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md).
+Tests use isolated roots, simulated runtime bindings and local OIDC/service
+issuers. They prove neither a real provider boundary nor independent review.
+The cached-caller and cross-project frame regressions retain before/after evidence.
+
+Remaining: protected bootstrap/frame/checkpoint issuers, admission commitment
+lock order, runtime channel integration, prepared-content binding, exact
+human approval, single consumption, start/revocation races, crash reconciliation
+and **all** CLI/API/provider/memory consumers. Adding this evaluator does not make
+Trust JSON and mission SQLite atomic. IDA-01–18 and the retrospective remain
+required for overall qualification.
+
+## IA2.3 channel experiment, separate from the kernel
+
+The [17 October prototype](../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md)
+passes 13 local checks with two Linux sandboxes. The controller pins PID/mount
+namespaces before execution and attributes each message using kernel credentials.
+A connection copied from B to A retains peer B, but the message sender is A and
+the claimed B identity is denied. Joining B with three copied namespace
+descriptors is also denied. The user namespace changes during bootstrap and is
+not assumed stable. This Python prototype is neither an integrated Go broker
+nor an authority source; its registry and revocation are in memory. It does not
+qualify the launchers.
+
+## Go instance channel — IA2.3a
+
+The receiver and binding registry are now implemented in
+`agent_identity_channel_linux.go` and `agent_identity_runtime_linux.go`.
+`Store.evaluateAgentIdentityMessage` connects them internally to IA2.2.
+No server or launcher registers this path. The [IA2.3a report](../plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md)
+records this slice's checks and limits.
+
+```mermaid
+flowchart TD
+  C["Controller before releasing execution gate<br/>Bubblewrap tests ; launchers not connected"] --> N["Pin expected PID/mount namespace objects"]
+  N --> T["Private in-memory binding registry"]
+  M["Unix packet with per-message credentials and pidfd"] --> J["Decode strict request"]
+  J --> L["Shared Trust lock : current state"]
+  L --> R["Binding registry lock"]
+  T --> R
+  R --> P["Process namespaces through pidfd ioctl"]
+  P --> B["Match UID and pinned objects ; reject revocation"]
+  B --> H["Sample clock after coordination waits"]
+  H --> V["Evaluate IA2.2 ; decision or rejection"]
+  A["Private authority frame<br/>IA2.3b durable source below"] -.-> V
+```
+
+The controller calls `pin` using a gated launcher bootstrap and holds the resulting
+PID/mount namespace descriptors. It rejects the host PID namespace, mismatching
+references and reuse of an already reserved instance, binding or PID namespace.
+A first worker message cannot populate this table. Process-private state does not
+protect an unconfined controller account; a protected launcher/bootstrap remains
+an integration obligation.
+
+`configureAgentIdentityChannel` requires a Unix `SOCK_SEQPACKET` socket and enables
+`SO_PASSCRED` and `SO_PASSPIDFD`. Reception requires credentials and exactly one
+`SCM_PIDFD`. Namespaces are obtained from that descriptor, without reopening the
+message's PID number. An exited sender is not reidentified by its number. The
+connection peer does not determine message attribution. This identifies the
+process/thread group represented by the mechanism, not each thread or executable
+image. Missing kernel primitives fail closed, without a numeric fallback; only
+the report's platform was executed.
+
+The consumer supplies its transport buffer and deadline. No new operator ceiling
+or timeout is introduced. Truncated packets, missing credentials and injected
+file rights are rejected; received descriptors are closed on rejection. The
+consumer closes an accepted message. Namespace pins remain held until registry
+closure, including after revocation, to exclude reuse of historical references.
+An empty registry after restart cannot adopt the first sender's authority.
+
+Reception happens outside Trust. Evaluation takes the shared Trust lock, then
+the registry lock, checks current revision/binding/UID/namespaces, samples real
+time after those waits, and evaluates under both locks. Binding revocation and
+registry closure are serialized with evaluation. This is not Trust/SQLite
+commitment, single consumption or observed process termination. Authority frames
+and snapshots used by the tests remain fixtures.
+
+The runtime lock protects bindings, not maps in a snapshot supplied by another
+component. IA2.3b provides its own current copy. Low-level IA2.2/IA2.3a consumers
+still accepting caller-supplied snapshots/frames require their caller to preserve
+ownership and freshness; they do not consult the durable registry. Public
+operations must use the durable path.
+
+## Durable source and recoverable publication — IA2.3b
+
+The private registry is now produced from SQLite and an independent Trust head.
+Version **36** added `agent_identity_snapshots` for versions and
+`agent_identity_publications` for chained receipts. Migration backs up storage
+and grants no authority to historical work. Inspection refuses implicit upgrades.
+The [IA2.3b report](../plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md)
+binds sources, commands and results. Earlier sections describe the original
+IA2.2/IA2.3a slices and their fixtures.
+
+```mermaid
+sequenceDiagram
+  participant C as Authorized controller
+  participant T as Trust / durable file
+  participant S as SQLite
+  C->>T: Acquire exclusive Trust without a hidden wait policy
+  C->>S: Reserve transaction and check version / work
+  C->>C: Verify exact permit, fresh caller and prior head
+  C->>T: Persist intent and target snapshot
+  Note over T,S: Identity readers reject<br/>a pending intent
+  C->>S: Insert snapshot and receipt, then COMMIT
+  C->>T: Finalize head and remove pending marker
+  T-->>C: Target checkpoint after successful publication
+  Note over C,S: Interrupted publication requires the exact original permit, with no process start
+```
+
+The head records project context, scope, snapshot revision/digest, Trust revision,
+recognized roots, publishing principal, event and previous-head link. A private
+`agentIdentityRegistryPermit` independently binds the exact content, scope and
+approved roots. Normal publication resolves the current token under Trust after
+waiting for SQLite and again before preparing the intent. Business roles or JSON
+bodies do not mint this permit. Its human issuer remains an IA3 integration task.
+
+Publication takes a nonblocking exclusive Trust lock and reserves SQLite before
+reading. It checks work existence, version, prior checkpoint, links, preserved
+history and approved content. It persists an intent in Trust's
+`agent_identity_authorities` before COMMIT, then publishes the new head. Failure
+after intent or after COMMIT leaves an exact recovery to perform.
+`recoverAgentIdentityRegistry` requires the original permit and snapshot; it
+cannot prepare a new operation. Changed Trust configuration is preserved:
+finalizing old history does not reactivate its rights.
+
+`atomicWrite` now opens the parent before mutation, syncs the file, renames it,
+then syncs the directory. Failure after rename means an uncertain result to
+reconcile. Tests simulate neither power loss nor storage that lies about `fsync`.
+
+Inspection requires a private current `agentIdentityRegistryCheckpoint` from
+the controller, then checks the Trust head, receipt chain, snapshot and plan
+in a read transaction before releasing its owned copy. Message consumer
+`evaluateAgentIdentityRegistryMessage` likewise obtains source data from the
+registry, not the message; since IA3a it reserves SQLite's writer through the
+runtime decision, as described below. Real time is sampled after waits. These
+paths neither consume a right nor start a business effect.
+
+A checkpoint is never recomputed from an imported database or the same restored
+files. Tests retain it outside the restored state and deploy no external witness.
+If all files and an old witness are restored together, freshness is unproven.
+Independent witness issuance/retention remains an open integration condition.
+Scope is bound to the controller's permit and the IA3a recorded contract. Human
+adoption attestation and exact creation membership still require integration. Go package privacy alone does not protect the host account,
+control files or an arbitrary hostile SQLite image. F01–F07 remain open, together
+with public admission, provider confinement, exact human approval,
+reservation/start and memory rights.
+
+
+## Binding to the current recorded plan contract — IA3a
+
+`agent_identity_plan_linux.go` reads the work body/revision and
+`agent_identity_plan_heads` in the same SQLite transaction as authority. It
+requires a recorded `Work.Plans` plan or valid hierarchical planning. Classical
+plan adoption, preparation conversion and hierarchical decisions feed this
+common source. Recording data does not attest human approval or grant creation.
+
+Projection **v1** retains definitions, instructions, owners, roles, dependencies,
+hierarchy, budgets, profiles and unrecognized fields. It removes identified
+result, status, attempt, review, lease, counter and integrated-candidate fields.
+Memory selections remain inputs; their presence grants no usage right. Results,
+framing and transmission still require separate permissions. Lists retain their
+order; object keys are canonicalized recursively without rounding integers
+through `float64`. Changing a retained field requires a new exact permit.
+
+```mermaid
+flowchart TD
+  W["Insert or update Work"] --> T["SQLite transaction<br/>v1 projection and contract generation"]
+  T --> S["Work and plan stamp<br/>committed together"]
+  S --> R["Identity reader<br/>SQLite writer reserved"]
+  H["Trust head and current checkpoint<br/>issuer still a fixture"] --> R
+  R --> C{"Same generation<br/>and digest?"}
+  C -->|Yes| V["Runtime binding and rights evaluation"]
+  C -->|No| N["Reject: return no authority"]
+  V --> F["COMMIT without a business effect"]
+```
+
+Current storage version **37** backs up storage, creates generation-1 initial
+stamps and installs insert/update triggers on `works`. Contract changes advance
+the generation in that transaction; identified runtime results preserve it.
+Changing then reverting contents does not reactivate the previous scope,
+including after reopening. Transaction rollback also rolls back its stamp. The
+counter must remain a positive SQLite integer; technical overflow rejects the
+entire update. It is not an operator resource limit.
+
+Triggers call `swarm_identity_plan_digest_v1`, a pure function registered once
+in the driver before connections open, and verify the prior stamp before
+rewriting. Readers recompute the body digest and compare the stamp, projection
+version and Trust-head scope. Missing plans return
+`agent_identity_plan_unavailable`, different scopes `agent_identity_plan_mismatch`,
+and missing/inconsistent stamps `agent_identity_plan_stamp_changed`. Normal
+refusals prepare no intent, publish no rights and create no agent. A trigger
+error rolls back the work write rather than yielding an empty success.
+
+`readAgentIdentityNextPlanScope` is a read-only proposal of the observed scope
+for a future permit. It requires an existing head's checkpoint, rejects pending
+publication and never infers authority from imports. Normal publication compares
+the permit against this same source after reserving SQLite, before preparing
+an intent. Exact recovery may finish history prepared before a plan change;
+normal reading still rejects that history. Instance decisions take shared Trust
+→ SQLite writer reservation → current read → runtime lock → fresh time and pure
+evaluation → COMMIT. The reservation prevents Work changes during the runtime
+wait. This closed callback never reenters Store and the runtime methods called
+do not access SQLite; future consumers must preserve that precondition. Any
+error, including COMMIT failure, returns no positive decision. This serialization
+has an unmeasured concurrency cost and implements neither consumption nor start.
+The private component does not activate launcher admission.
+
+Stamps/triggers enforce application integrity, not a boundary against a host
+administrator or unconfined provider. Physically restoring all SQLite may
+restore the old stamp as well. A checkpoint covering only an unchanged identity
+head cannot attest freshness of a plan change not published in that head: the
+future independent witness must also cover the plan watermark. Its issuer and
+protection remain open, owned by Codex/operator. Creation membership, resolved
+content, human approval, consumption and all public launchers still require
+integration. F01–F07 and IDA classifications remain unchanged.

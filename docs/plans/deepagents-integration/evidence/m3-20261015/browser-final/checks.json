@@ -1,0 +1,52 @@
+{
+  "checks": [
+    "Imported history does not certify current files; fixture evidence restored and checked through the public CLI evaluator",
+    "Empty catalogue and authenticated loading",
+    "Admission preview, Escape/focus, application and text-only rendering",
+    "Selected source, exact content and conditions received by a real local provider process",
+    "Replacement retains the first version",
+    "Withdrawal prevents new selection while retaining the original received context",
+    "FR/EN, both themes and 1440/1024/760/390/320 widths; user text unchanged",
+    "Stale preview rejected visibly without losing input or adding a lesson"
+  ],
+  "errors": [],
+  "failed": [],
+  "responses": [
+    {
+      "url": "http://127.0.0.1:32861/api/v1/project-memory?action=admit",
+      "status": 409
+    }
+  ],
+  "navigationCancelled": [
+    {
+      "url": "http://127.0.0.1:32861/log-console.html?lang=fr",
+      "error": "net::ERR_ABORTED",
+      "origin": "http://127.0.0.1:32861/"
+    },
+    {
+      "url": "http://127.0.0.1:32861/api/v1/runtime-health",
+      "error": "net::ERR_ABORTED",
+      "origin": "http://127.0.0.1:32861/"
+    },
+    {
+      "url": "http://127.0.0.1:32861/api/v1/preparation-timeout",
+      "error": "net::ERR_ABORTED",
+      "origin": "http://127.0.0.1:32861/"
+    },
+    {
+      "url": "http://127.0.0.1:32861/api/v1/assist/turns?work=w-a3ddd90f6c345cde380f4b45",
+      "error": "net::ERR_ABORTED",
+      "origin": "http://127.0.0.1:32861/"
+    },
+    {
+      "url": "http://127.0.0.1:32861/api/v1/snapshot?work=w-a3ddd90f6c345cde380f4b45",
+      "error": "net::ERR_ABORTED",
+      "origin": "http://127.0.0.1:32861/"
+    },
+    {
+      "url": "http://127.0.0.1:32861/api/v1/provider-wait",
+      "error": "net::ERR_ABORTED",
+      "origin": "http://127.0.0.1:32861/"
+    }
+  ]
+}

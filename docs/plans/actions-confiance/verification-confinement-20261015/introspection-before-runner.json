@@ -1,0 +1,10 @@
+{
+  "pid": 1888240,
+  "proc_start_ticks": "3615479",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-introspection-before.py",
+    "run"
+  ],
+  "at": "2026-10-15T22:02:10.646133+00:00"
+}

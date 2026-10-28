@@ -1,0 +1,1292 @@
+[
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-en-etat.png",
+    "kind": "capture",
+    "sha256": "dece9f329db8a0c3b6cc0e00d1bab85b4c0cbc42c300d038c8993d0dea265880"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "925a34f46411f78e847f03a2977e4c44d45162a4de2821adc355fa081808b6b6"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre.png",
+    "kind": "capture",
+    "sha256": "d29bf44ff459b59d66e5eaa9d7a341a86256593e7674e23def4b5f37748a1c1e"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "e8de3cf6a5514112acb33898a7a3d24882806fa636f7b6fd82c4cf1438a9236c"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat.png",
+    "kind": "capture",
+    "sha256": "761807ac16eeba60c01ae9bcd3997e7fd29ba49c47a1c294e8f5f157641c8856"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "afaf6fa6c55c1308241660e3e0222098e7a53df9f0264ea33fc84d3cb82183db"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "4c2df9433e549879b59199f3f41a52b624493d722ac4ae4af08f68e81115aefe"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/en-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "4e5f3deaf5e80592d40137d763d2d0b6e6bc840c2fa4874b9aa17e867e397853"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/en-etat.png",
+    "kind": "capture",
+    "sha256": "179fe14ce98157407f4668e013a6e5ca317813a92316b2b9fdea8e8114376665"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/en-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "c38fa3d745ab2171af2c25abeb0fb76b1ccb7fd72a3df04ffd7dbfc2dc78feb5"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/en-sombre.png",
+    "kind": "capture",
+    "sha256": "362a9d7ac5860c0e053cc5c0ef98aa63c26d414360838e3fe1e7f659c38603cf"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/fr-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "ad3dda130c1053782ca27de5177f9128225959fee4e24cd86e3eff9a54175260"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/fr-etat.png",
+    "kind": "capture",
+    "sha256": "63c8a1cd8400232f8f4ec2f97026e7f26ac8062244c35c74af9872f802e5b47f"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/fr-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "b932ce091fbe5ffae966c3e3614a3193b0e4454446d8a07bba4f01beff787225"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/fr-sombre.png",
+    "kind": "capture",
+    "sha256": "574216c70777d524e6ccc981995160f972ec659d6ba069c8a23f62cf2b441343"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/result.json",
+    "kind": "doc",
+    "sha256": "dfc203fe428d2d01c4756e2a8370453c030c3ceb6e7dc7dc2cabfb638c9237e3"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-etat-deliver.png",
+    "kind": "capture",
+    "sha256": "840c965748f6cf9bf2530adb6266cc5733c53dfa2a1e0be54abc21862fcc0bb1"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-etat-mobile-foundation.png",
+    "kind": "capture",
+    "sha256": "00ce6a6875a472c3b744d51af6f5929e88df4101daaa3ba07371912b8a3ea607"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "39a95ab1ce7db37111a2e7baee259eadf57bd81e7ed253f1b607463848b516e3"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-etat-plan.png",
+    "kind": "capture",
+    "sha256": "047ebfbdd1a3f794a4a8a04f548007bffd8584ac2b4b480f8db9ded585a48f3b"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-sombre-deliver.png",
+    "kind": "capture",
+    "sha256": "9d4021def5970f8c39f27561a7c56c7a891167a8f81efb32849d18bb78f6929a"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile-foundation.png",
+    "kind": "capture",
+    "sha256": "c9f03bc3b92b3ba26d32c7c5365ee166cd386810cad358c72229a3c5f1a30b13"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "edd5e7d687d8153315682e4f526b7b051b5913e3a17d142a9b997be102c67647"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-sombre-plan.png",
+    "kind": "capture",
+    "sha256": "5e32034594e55f3c477a2d6f5659838c246c0690f9288c5b2d6780f10ac4ca9e"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-etat-deliver.png",
+    "kind": "capture",
+    "sha256": "5548beeafe3644bfe934c0d767de9d49264cf43c340d1ed098f3db2f606f0e46"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile-foundation.png",
+    "kind": "capture",
+    "sha256": "cd6125bf24de7fba786cf8ca028b6902a75dac31b069800e512197c027d0e184"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "6a5a76d8238ee337e153dd18ea2f4e5199e27f5dc4d6c914eadf4101347e3691"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-etat-plan.png",
+    "kind": "capture",
+    "sha256": "91cf8cd8e18df6f1c43909833e55e7660083df8b063199ca90df4a4f08f49df5"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-sombre-deliver.png",
+    "kind": "capture",
+    "sha256": "4fbda8e7ea68f6ac2f2bbdaa23a8ac2a7db4b401bcaf5127c3eb940e3b729c61"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile-foundation.png",
+    "kind": "capture",
+    "sha256": "6b8f952f08831fdc6431d438fb4c6ae5024b0dba3a9c09b246abb753f7a257d3"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "0775f1656fe2098f97c67ef34e9fa9710049a61e5cfd670217fb8eaa590191b3"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-sombre-plan.png",
+    "kind": "capture",
+    "sha256": "2415abc2ecccdb4a9a99f0797a453041755ccf782e6462ea73225347e7dc52f5"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/qualification.json",
+    "kind": "doc",
+    "sha256": "14bf2365b9ed9759155d9069502ff4d9a2d0b3a8e9da11aa813e111c49142f5e"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/result.json",
+    "kind": "doc",
+    "sha256": "41d27d83107db17355397fc4fdf5371148831574610a2a3bba07df906ee4364d"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/README.md",
+    "kind": "doc",
+    "sha256": "b608b5975621c44793911af1de0e9573e62ddb53593733158e67b51418d63f59"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/candidate-graph-cache.json",
+    "kind": "doc",
+    "sha256": "8bc34f373bf01e5c1b2d6c0ffb0a3c20596d6c191f3d964dc9c614eef0351371"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/candidate-menu.json",
+    "kind": "doc",
+    "sha256": "b199dc606539e9cc251a6c7a0ad35fb6c86bb6c0972b7a6fd899f92e2b8deb2d"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/candidate-next.json",
+    "kind": "doc",
+    "sha256": "e83c59dd6979d0448be50b533950a398c5d37074233a5f80388080dfaef1520a"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/candidate.json",
+    "kind": "doc",
+    "sha256": "563f951d5141e4f6bda3d7e85c455d003bcdff5f259cabd7a1dbe96cbf3abcd7"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/cockpit-collapsed-final-fr-etat.png",
+    "kind": "capture",
+    "sha256": "46aa856832f49acb52438e3ba2cdacdf30ffb219e54f7d551aaad54005122258"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/cockpit-collapsed-final-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "60c533c49aa6fb1c4c6f61fcf74eb57585cb2f383b624010b8988ef3e1bd362f"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/cockpit-collapsed-fr-etat.png",
+    "kind": "capture",
+    "sha256": "46aa856832f49acb52438e3ba2cdacdf30ffb219e54f7d551aaad54005122258"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/cockpit-collapsed-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "45cdc94318599dde59d2098437ec90d65fa044b7554894b5ac5ea018331c3e02"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/cockpit-fr-etat.png",
+    "kind": "capture",
+    "sha256": "0117e823d62dab277b7d036a3265f4383a146219ab5bea694565f31aa625a07b"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/cockpit-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "2e7522c3f9f9d6f274f7a1a7b7d0d4628f9ab9cd6fcc7515ce9326eb6baf7689"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/connection-en-sombre.png",
+    "kind": "capture",
+    "sha256": "7832674b997a5755789859fe11c40242a027652e4f78668e55753fa41cb34098"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/design-result.json",
+    "kind": "doc",
+    "sha256": "a89c50ea61330d0139f2b7068faacba5076226a9114ea4d36380c21ec214aa2c"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/final-checks.json",
+    "kind": "doc",
+    "sha256": "7f7858491a914e19b1892c3edfd6846d20f72d851b2e6f910a0e39cdca3a1b47"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/final-source-check-before-capture-failure.json",
+    "kind": "doc",
+    "sha256": "89a6a3ca5372490c58399f9d8d7fd8e13412d0e8d2b3edef79642d6c26799c50"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/graph-result.json",
+    "kind": "doc",
+    "sha256": "3eed3c39f1ffdf44bceaecbdba404ee31bb49140e0ad6b7538064dbbb5f1e8d8"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/graph-task-inspector.png",
+    "kind": "capture",
+    "sha256": "34d9b5acbc62df550d75449d70ad4ebb23c375bdb78c070769af1fa2b9037768"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/load-profile-after.json",
+    "kind": "doc",
+    "sha256": "1d9f2c1da9bcc81206f8c28fa1426692526361bed9b6b0e2e99eb84ba04449a7"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/load-profile-before.json",
+    "kind": "doc",
+    "sha256": "6a9f785a1a704c0150864829676b0071cd75f967e6151c77bf53348067d65f01"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/login-fr-etat.png",
+    "kind": "capture",
+    "sha256": "411a75e43dbc89554bbd81c01963ed26eabdd65c1250f0a932019e05396c691b"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/login-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "d8df38bbfe07ec5e7628196e8b8c02883a1df98b5fc3d719615b1da1199dee1c"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/next-design-final-result.json",
+    "kind": "doc",
+    "sha256": "a79de8196687d42510ebdea21344dfed185b644914f7d38288adffbfb0e7b62b"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/next-design-result.json",
+    "kind": "doc",
+    "sha256": "60fbb5b8c1f2759382a74540c631c323bfd82ae6279d673cf6521c8e193e8e04"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/next-graph-before-cache.json",
+    "kind": "doc",
+    "sha256": "a3edfb0238841524678ecc7969a132059eed26c97ab4d11a0758d813364aaca9"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/next-graph-result.json",
+    "kind": "doc",
+    "sha256": "20761fc779fcc4476f975752469cdeb23767170a5db3e85f691ed2e060efc5ed"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/next-guidance-result.json",
+    "kind": "doc",
+    "sha256": "ff02ce87a3813f8517f477fbe1fb0878fc06f5df3b3215f5ebb91eb4bc8dad73"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/preparation-dialogue-fr.png",
+    "kind": "capture",
+    "sha256": "404f7c243f31073d0e26041c47a985137c19e77420b7440c685b6830cdd642f8"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/prepare-fr-etat.png",
+    "kind": "capture",
+    "sha256": "be9a8fd63f67c05cb1e8d55dfbc41c1428caa11128db3316a90e27ef828ad08d"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/prepare-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "3c00f3eac6bcdd5fb978a9dfa7f0a96e8a9771ee35294371c299c02190fb6d96"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/preview-final-collapsed.png",
+    "kind": "capture",
+    "sha256": "56a2e476e507c2ad58c623bb4b33689630c66d648d84aa13023d2fa2ad895041"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/preview-final-training.png",
+    "kind": "capture",
+    "sha256": "3931e64947f7de6386377a39247dc5390f63e06fed10593b52a8f07e963fb273"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/terminal-mobile.png",
+    "kind": "capture",
+    "sha256": "c2b6bb85879bbfb8bc73699a2d1445e5b341200024e039483f87e19106471ae2"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/terminal-result.json",
+    "kind": "doc",
+    "sha256": "7e68fb3ab4330a43e80e67b390ba43e52d46db248ac7904737e80886e5da7d7b"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/training-capture-result.json",
+    "kind": "doc",
+    "sha256": "a4eeef21d272349aa4b523c835de0776d842a7226074db17960d7b7698b4a8a1"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/training-capture-v2-failure.json",
+    "kind": "doc",
+    "sha256": "b69a6683da67eaf9aedbe79244d7d7e880297210d9a1897ca4ceb47e7cd05a71"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/training-capture-v3-failure.json",
+    "kind": "doc",
+    "sha256": "b896473bedc1b10b328387f78bc11026b09f57375b079542248ba62d22dbeeeb"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/training-copy-candidate.json",
+    "kind": "doc",
+    "sha256": "f6da6a458d3ed84064b095558e6cdc0af9f46c177af5a31be252102e6f9b09c4"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/training-copy-fr.png",
+    "kind": "capture",
+    "sha256": "d5f188c5f69dbd7ffc3b0a8338a83b88aa7e0c7aba78ffe0fecf51ef6f8d4055"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/training-copy-result.json",
+    "kind": "doc",
+    "sha256": "47547a561b69f420f7c9e8f5ccd4837918017e2b01f1ba734f9355f1db8a455e"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/training-media-result.json",
+    "kind": "doc",
+    "sha256": "d0c0b6bb0e47ecb4db4d4652208133a65969fc1ffde066b338c8a46ea2bce797"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/training-reader-result.json",
+    "kind": "doc",
+    "sha256": "2c3390df95a63853fef4df0106f47ce450dd49320a88729cf92c39eb4e815bb1"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/training-refreshed-fr.png",
+    "kind": "capture",
+    "sha256": "6965ec6bcc09fadfc3f539883fb68f43ac12a78c6f7ef83e6f29accb67654e23"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/baseline-design-console.json",
+    "kind": "doc",
+    "sha256": "77859b7d58a701b3737bf8ca2f2f7bee96b8f001d31482c74babccf2e01a0c2a"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/before-design-console.json",
+    "kind": "doc",
+    "sha256": "26d6053cb45ec9420fe8d1db1427ace83a7a2c22c6ef74f5ff56161b6aedd2be"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/before-favicon.txt",
+    "kind": "doc",
+    "sha256": "2aad1ec4b4bdfa698f4de5f321450377bc5bd977a2767d4a3682bb148d5a8fe3"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/before-help-mobile-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "e70adc6053fa2598d4865a61668c67b8594820c7d679241986f5ea1440dc136a"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/before-help.txt",
+    "kind": "doc",
+    "sha256": "3ebe745b53d1e902e2a3e68aa0ad3d24ffff1340f22294e27b4a7b357dbac043"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/before-log-visibility.json",
+    "kind": "doc",
+    "sha256": "5ec7fab41e639c9b93ec417e1b746da5e6801a9eb3dbf44de5d63da80bb0446e"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/before-logo.txt",
+    "kind": "doc",
+    "sha256": "620ada6009175a3f67dd113a2370c8c85c9e9c081a637765fbcf6206c71019df"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/cockpit-collapsed-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "a382c216db8315c61bc46659668fb4f98030bd037696c0ab350a8cb6afcbbc9e"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/connection-fr-etat.png",
+    "kind": "capture",
+    "sha256": "32864077b9d356678ddbba1c953158fa975be6226e22c0142b5379884d3e38db"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/connection-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "e0d1de3cc5859a0f1ada56b60c1901cc7d5160bd558877bc45b292fd96ed967e"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/context-help-result.json",
+    "kind": "doc",
+    "sha256": "c4972f1ddc00faacff5c983d2b421f590a61111d8124242d0069f8e60988277d"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/before-failure.json",
+    "kind": "doc",
+    "sha256": "a93bf58dd7f00004bfea180b734d9088c5f8924a8d6159da884f0ff096ab6c54"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/dense-result.json",
+    "kind": "doc",
+    "sha256": "72446ca1edbf49267a3fb87a5115af00bb51e78b41f17c9a04517ec12e598bdf"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/design-result.json",
+    "kind": "doc",
+    "sha256": "181cebd45376057eb2bca3f39a621a416a941a26e16324eea4673999808f0227"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/frame-navigation-original-failure.json",
+    "kind": "doc",
+    "sha256": "ce5c1f64131284e268d0d5e25b4c6d6395885723012859268ce525dcf36ab5ce"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/instructions-fr-etat.png",
+    "kind": "capture",
+    "sha256": "c05d78dca944467758ccc929c70785fcaf4e6071d68004cd9c09bf78e5379f55"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/instructions-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "5e173ec0fa95640ae2eaa985cedfff445ce359d01543739d3e9bad9ad843137d"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/instructions-mobile-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "ff602c1745dbe20f14fb5041778caaf71711679061525d276908dbb6cdde3b80"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/instructions-result.json",
+    "kind": "doc",
+    "sha256": "9116eefcd9fcc54878de41b357a99f3d7b3fff977c1bce1d5232b25d68fcf06a"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/logs-en-etat.png",
+    "kind": "capture",
+    "sha256": "d3e0c887ea01fb82124302521b3b830b9b221375c1728df107b7805c6bc86875"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/logs-en-sombre.png",
+    "kind": "capture",
+    "sha256": "2e54e435a2df48ad35dc80cc80f1f9f1dc0ae295d065a5e7273ffbebd3bad4fa"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/logs-mobile-en-sombre.png",
+    "kind": "capture",
+    "sha256": "9448504784180adceb09b1825f1fa8a928180bb09d467ccc03775441ce36ae14"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/logs-result.json",
+    "kind": "doc",
+    "sha256": "8152335310784df59115af12956fec83a45253ebabcea694412ca4541559f023"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/manifest-verification.txt",
+    "kind": "doc",
+    "sha256": "c7cd64afb03a000ede1f82b5c5475cdae0591d23fdb63baf8a3ead4bc4e89246"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/navigation-diagnostics-original-failure.json",
+    "kind": "doc",
+    "sha256": "4d8d9e22d7ba3ed480501a4ac8d54749c94049e75dc40e68ecf8975daf8c1059"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/projection-original-interruption.json",
+    "kind": "doc",
+    "sha256": "52f4781194f3dc727c5115159131c591828cebd228eff4237a89909956174b01"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/source-focus-before-failure.json",
+    "kind": "doc",
+    "sha256": "d967c1223f0aa28e73c6688521a0405736622848c15bb73f3f95e2d74d3fa9d0"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/source-integrity.json",
+    "kind": "doc",
+    "sha256": "fd7c64c93201df2c1ce4930a1f98670d894ace66b26897741f006194e0f68bd4"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/syntax-result.json",
+    "kind": "doc",
+    "sha256": "8ba92b7505ba9be9f08b2a62ca2b25fa06b4057c9cd013745947fa4110f32625"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/verification.json",
+    "kind": "doc",
+    "sha256": "2bce8186b5e402082e5bc82bc11d19b78399576497336414dd7b98707eefa690"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/verify_embedded_sources.py",
+    "kind": "doc",
+    "sha256": "565e622c9757189e2921131b38a1ce867779ac8e3621d7448bf7ab158f9a272e"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/dense-reading/visibility-result.json",
+    "kind": "doc",
+    "sha256": "a587a95de002631f8408f690d9c06a9637afc450ee2928c70a37b7e9898bb5c1"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/design-result.json",
+    "kind": "doc",
+    "sha256": "1615c08fb5a3943a4457da0b4d08858299cac70a9258a5a26a38d885a78f04e0"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/diagnostic-preparation-interrupted-long.json",
+    "kind": "doc",
+    "sha256": "d4a3332e21da9ac7f5f76581ba138bd784182c7fd8ba4e4799a31037ffd04873"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/diagnostic-preparation-interrupted-short.json",
+    "kind": "doc",
+    "sha256": "9f829c07fbf4454a1b32e9a403738ee9e46c7b44afa7a70a94507a527a35ffbe"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/help-mobile-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "a06abde220c21398fbd2be748d75bb2f0b3669bd877623813d3c3a3edd5546d0"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/build-receipt.json",
+    "kind": "doc",
+    "sha256": "1b6d1ee02bebbac14ec4b984a6f195410cbee5672af9a76d83e581060794bd0f"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/changed-inputs.txt",
+    "kind": "doc",
+    "sha256": "c36b019b87b87ad968bc136f210e7a662b5813aec87ad7b13819f2ed06058ffc"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/contrast-fr-etat.json",
+    "kind": "doc",
+    "sha256": "e2cb5dc93c86868c03fa55c9e8280ee405c5129563cd359025366198566ede58"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/contrast-original-failure.txt",
+    "kind": "doc",
+    "sha256": "e0ab817b887bcc20dc4b5094567beff6c4da938bc8a5d375bd372b025b2eec1a"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/dense-ui-result.json",
+    "kind": "doc",
+    "sha256": "85d919e76baa9ef42e1b9e6b8d11a57935495cf92cb0d4a413ec91cc2cbc4559"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/final-build.txt",
+    "kind": "doc",
+    "sha256": "535288ae42c352d07b994e0dfc6748a3d2f0c7ab964857d0468c3741556e1f83"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/installation-result.json",
+    "kind": "doc",
+    "sha256": "20580107c5d6537bb7ebd365b25073dbdc3cbebe570f1fd67ca406bfe4335357"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/launcher-tests.txt",
+    "kind": "doc",
+    "sha256": "988aa08e97c2f7c3989b016ed43513172f54b767b4b22f61962d5975232a0922"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/live-result.json",
+    "kind": "doc",
+    "sha256": "bc668e508b9dd894fe1d3b372f8e5ef28f030028970cda7176851c88958d3b09"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/numbering-tests.txt",
+    "kind": "doc",
+    "sha256": "d9e08586bf0054430b7c2aeaac5ab6320790f59d21ed80c2a5743137924a0081"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/post-cli-original-failure.json",
+    "kind": "doc",
+    "sha256": "4bc3824d16de896ff5dd235e5fffe275ea41bc9aa036722dd398f713aad99cc3"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/restart.txt",
+    "kind": "doc",
+    "sha256": "b691829c92801db3947f2b8cfa99919d1396f523e7b22d2cd84b7da15425fdc8"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/staged-version-checks.txt",
+    "kind": "doc",
+    "sha256": "e2b0abbbc4e5f1aef75b5bf5e0d73dbac3edf769d02fcd93134c6f284a981f47"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/unchanged-inputs.txt",
+    "kind": "doc",
+    "sha256": "a7e3de00052da7826b4f3adf43631693a8bf688042507b64431790df9a62fdeb"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/verify-live.cjs",
+    "kind": "doc",
+    "sha256": "27bd1a080788b6f9d904cd3b2dbdcdafd29366f871dbb71bc28e9b230a8967e0"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/version-en-sombre.png",
+    "kind": "capture",
+    "sha256": "72409556d253601bc9a26c5b6efdb21de5a7c7a9b76ef80757dd9961f54fdb57"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/version-go.txt",
+    "kind": "doc",
+    "sha256": "d056b75133e72bcfa95bb4f48394c9b13c6eeb9ef06e292ab769b6c7d8285d0f"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/version-live.png",
+    "kind": "capture",
+    "sha256": "56aa4ecbace976c101a0ac7e410d74ec2c36162f213e965c8bec888adf8a81b1"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/version-ui-result.json",
+    "kind": "doc",
+    "sha256": "75933db9395b7cca3730de7b831193c5fd404354604e1aeacce624f7a2bd0f24"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/workflow-final.txt",
+    "kind": "doc",
+    "sha256": "3093e83007021db28cf55d5f0b6a3e6b161477bea52f4ec8e18a001e1e8975ef"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/workflow-intermediate-failure.txt",
+    "kind": "doc",
+    "sha256": "819a0aceb35e4818c8ffedf2ee04e295d203b3a6efa905d5fd5ea551bacf6d7f"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/local-delivery/workflow-original-failure.txt",
+    "kind": "doc",
+    "sha256": "6f1238916ce3430928574ce0d6e7003d71bba4003f5af7906d2f238125272b40"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/log-visibility-result.json",
+    "kind": "doc",
+    "sha256": "bcf1f7e56e63e7a9db8272cc285003adc4ccef908b14eb368f242e3ca1fd41ef"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/logs-result.json",
+    "kind": "doc",
+    "sha256": "a3194fc6d4c808df09d985871061846d220ced343f3268abe885aab902039518"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/method-result.json",
+    "kind": "doc",
+    "sha256": "61966fe334f2b9182b1684ded5db193c3cf584acd779a42794be407743558bc1"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/before-failure.png",
+    "kind": "capture",
+    "sha256": "001a886b6fc1f1ad92add503d7193837d0d9f425a012d95f72b4c0ff1bee8511"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/before-failure.txt",
+    "kind": "doc",
+    "sha256": "ab03868eea9a5131b2a625dedcf0977828d242e20deda17e7413fecebcf90d19"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/build-4.txt",
+    "kind": "doc",
+    "sha256": "bc16b3db5c94f774bbfe608a8e7e91239329658737e22995a8ef9456867751ad"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/build-5.txt",
+    "kind": "doc",
+    "sha256": "73898560238192805d523bf42b8245603b10a5e53a2139b101d8519a48dfa2bf"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/build-receipt.json",
+    "kind": "doc",
+    "sha256": "a67fecf92ae5fe5bfa37faa0845172800bb42c9acd5b67651df91cc9cabd3934"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/fixture-failure-excerpt.txt",
+    "kind": "doc",
+    "sha256": "3a46098722861baf058103c6d299a14903f5943804d619dee6fa84bf11cf0a8d"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/focus-failure.png",
+    "kind": "capture",
+    "sha256": "13ed707682a1723670609957847dcb0a2d3ef1e0c62c2c93f4065e2bfe521acd"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/focus-failure.txt",
+    "kind": "doc",
+    "sha256": "2b3219e5c64e5dee6bc9a507090072782145532dcea6160bf351e559778ae638"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/installation-result.json",
+    "kind": "doc",
+    "sha256": "9806db258ed9746e8c977f746d30283165bb1e809607808eab0440021debd55f"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/live-ui-result.json",
+    "kind": "doc",
+    "sha256": "6e14686f1eef58903302babb8007545ae8f38570fbd9f7fe13fe613e4f288547"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/receipt-failure.png",
+    "kind": "capture",
+    "sha256": "69ed4df3338ada34541b069bc2b45d0627fb384ab5268cc0607d329e8b05012e"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/receipt-failure.txt",
+    "kind": "doc",
+    "sha256": "a3f7d107ef17ba931341702d953779d9989861797eadf9839542c6569acefd64"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/restart.txt",
+    "kind": "doc",
+    "sha256": "2f61d77756026169e3cdc7a034e18bcfd329084f8269181f29c2e0f0df3f8551"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/result.json",
+    "kind": "doc",
+    "sha256": "6b6f8db33fb488d1a7882ab8df5e952eea97d592e57bab4aefc01c2aa6c794cf"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-en-etat-1440.png",
+    "kind": "capture",
+    "sha256": "4aa64c09ab2a6fa981f19fb34f5af33f4a9374d2c78d2d72a89c5e590da93981"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-en-etat-390.png",
+    "kind": "capture",
+    "sha256": "ae837f5cfc49790ea94028c081935f4160b93e8d8c99d6a187cd2ad9f06081de"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-en-sombre-1440.png",
+    "kind": "capture",
+    "sha256": "dfc078cd5d4dbb8e9eb6cf898eddf05d9022d76aa958c8eb0073ba1760fd32ad"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-en-sombre-390.png",
+    "kind": "capture",
+    "sha256": "ab3734d7eed17eb85afe9911e747373c4717fd7b14fb2cad0561e97651e831ed"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-fr-etat-1440.png",
+    "kind": "capture",
+    "sha256": "1fba56b91fb7704045afc9a0dbaa2e0228b805070f6efd21e7a103c3f2a9ff9b"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-fr-etat-390.png",
+    "kind": "capture",
+    "sha256": "92f83654bfc1b30eeebc14b9662b91aecb4d35e71998c6d50303ce11c6497f60"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-fr-sombre-1440.png",
+    "kind": "capture",
+    "sha256": "ac6d634d0ad101384a3f9e0d180ea282d81d52ab653b21e79d909d84d7822177"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-fr-sombre-390.png",
+    "kind": "capture",
+    "sha256": "ec83a180643ee665baf46a3c491671fe312e546681a8d9a14950633e6e465695"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/verification.json",
+    "kind": "doc",
+    "sha256": "cd3914f6dd17782d3c8dd6bd8a01953444a4cb49d0d435a3bc44b9333bbdb3f5"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/terminal-result.json",
+    "kind": "doc",
+    "sha256": "907ec359a22408f2725552fdaedf41c1cb357d3e43b11abe79230542713c6832"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/verification.json",
+    "kind": "doc",
+    "sha256": "4f45ae356bac4527cca68c00e07764adbb920992660e9340cfc120d63d3d3dc6"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/windows-result.json",
+    "kind": "doc",
+    "sha256": "43e9ce56ac585943aa5852ba86e24fca87c0543af6f78da7a6d77ad05260645e"
+  },
+  {
+    "path": "docs/training/casa-pizza/COMMENCER_ICI.txt",
+    "kind": "doc",
+    "sha256": "6ae76cad42ae0e4d4dbb8715aa70bc91a0952a3862c63bb9025c87f7a4230088"
+  },
+  {
+    "path": "docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.docx",
+    "kind": "doc",
+    "sha256": "71d679ec094eacb434f2b9ed4168ea58e6607bf02aa6fa98485e9c4dc7428dae"
+  },
+  {
+    "path": "docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.pdf",
+    "kind": "doc",
+    "sha256": "46215d85e09ca0e5815ccc254ead66ba76325248581d5843020a99262334b8ea"
+  },
+  {
+    "path": "docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip",
+    "kind": "doc",
+    "sha256": "b29008bf3b6c810ab5067b4877386cb1d33ef6949a6eb3360e78cb023fabcd67"
+  },
+  {
+    "path": "docs/training/casa-pizza/README.md",
+    "kind": "doc",
+    "sha256": "7591af28667fbd7309d5af31d690393b7114cc1852f33311847358fa85575009"
+  },
+  {
+    "path": "docs/training/casa-pizza/START_HERE_EN.txt",
+    "kind": "doc",
+    "sha256": "cffbaf6627b9937c244bbce837bf37ede55006fcb8ffaf3396b714812601cfc3"
+  },
+  {
+    "path": "docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.docx",
+    "kind": "doc",
+    "sha256": "cad02591de8525754842f9ad4fc24ca2a9da399800842eee700da7ed26a2c600"
+  },
+  {
+    "path": "docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.pdf",
+    "kind": "doc",
+    "sha256": "4b99de4d97eaa4a023d7237a74610d469fc2760b335c6d941c852806e79ff39a"
+  },
+  {
+    "path": "docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip",
+    "kind": "doc",
+    "sha256": "cd8f95bb91584d154e0b82d209a130f3a552bd6aeb476957e4c3bde39984497f"
+  },
+  {
+    "path": "docs/training/casa-pizza/VERIFICATION.md",
+    "kind": "doc",
+    "sha256": "fd663a68a5d55161448c518f6ce183989097fdd034a005ff6df725119f344af9"
+  },
+  {
+    "path": "docs/training/casa-pizza/atelier_swarm.py",
+    "kind": "doc",
+    "sha256": "a4cc0a614370a18f2289bd23546ac2345231ef1768883da33cec00308fd2ccd5"
+  },
+  {
+    "path": "docs/training/casa-pizza/build_kits.py",
+    "kind": "doc",
+    "sha256": "70491349c83bc86f963e96ec98c062af8044ec5d6e038aa24fa43dff8668221a"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/00-swarm-besoin.png",
+    "kind": "doc",
+    "sha256": "70b61980da6d1fbfe34a767224636f6afd6a6dd59209c5f19e7f296bf4e4cdfc"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/01-swarm-mission.png",
+    "kind": "doc",
+    "sha256": "0fa4986ded7d1e2b27ed8115be580348702cbe6d1cd155288a73aeb9e51ec5ec"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/02-swarm-lancement.png",
+    "kind": "doc",
+    "sha256": "497b2b753a05429029c2279f6a3cb36af5c4c78ab9f9413d3c98313537dae687"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/04-swarm-activite.png",
+    "kind": "doc",
+    "sha256": "c4aa2a4c76a9b079f6dc70da9bada91260dfe5e9b764881d599d538f4ffea5ca"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/05-casa-catalogue.png",
+    "kind": "doc",
+    "sha256": "eb0c4aaa1575d381b55a1ded71d201ce6d614e5b0b91aa45439fe9c38b0989cd"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/07-casa-erreur-minimum.png",
+    "kind": "doc",
+    "sha256": "7417e1a356ae12ed3038d45c6f9c3520a5afce771d106e9dc43cc8b1b667a325"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/08-casa-panier.png",
+    "kind": "doc",
+    "sha256": "4f9b43b0c71b217ec6031f5d43804a5442b3e05455ec29afe972063b6abcf750"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/09-casa-confirmation.png",
+    "kind": "doc",
+    "sha256": "c14b277cc5b15f1083c2e1584706b47fe86cd88233195ae8548fd7ae4f1c2955"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/11-casa-restaurant.png",
+    "kind": "doc",
+    "sha256": "dd7fb99d47a60658408917f62004436188284f4bb8de93bd912e2a89022fa6c1"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/13-casa-livree.png",
+    "kind": "doc",
+    "sha256": "1cf3e2c285d168b01ba3d0b05bac7506bc97bdcba1729fa0bdc58cbb748bd317"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/16-casa-mobile-confirmation.png",
+    "kind": "doc",
+    "sha256": "57e5cc7de61f57a8565b3193626c6851714ad69f32b621a8d903c54605053e09"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/17-swarm-validation.png",
+    "kind": "doc",
+    "sha256": "767a7b85b11c1547dacfdefffe7dc2711c3fe16b63df90c72c14ff7763088c9f"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/18-graph-en.jpg",
+    "kind": "doc",
+    "sha256": "21145415fe53f7fd66d45fe0d37868c7382083dd3e0651fbf92f2378e4eafcb6"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/18-graph-fr.jpg",
+    "kind": "doc",
+    "sha256": "d1db8b6e406cc11de0035de02056c279499078335fafbdef8cff3f67f7283031"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/19-task-en.jpg",
+    "kind": "doc",
+    "sha256": "4cfb35abfcb8de534a081334a5ea59f113fd8e3079d565fda8f6ce589d99be9a"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/19-task-fr.jpg",
+    "kind": "doc",
+    "sha256": "b833df91af423b345ad6ff9dcf5fc3a2d248cbaf35d5031000d4f27cdd7fa233"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/20-validation-human-en.jpg",
+    "kind": "doc",
+    "sha256": "9933b0232772dbd95f4bb6ac7b207164126e007dfbfee6a26f6dd50f973e12a4"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/20-validation-human-fr.jpg",
+    "kind": "doc",
+    "sha256": "747a40ca4e635d2b2e91432ae31e2c814aae98f66daaefa6c6484e4b4fcbd16c"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/21-validation-command-en.jpg",
+    "kind": "doc",
+    "sha256": "7b92b68f28f1b2e13b64c259f5b1538f83dc30cb990170c7a8d2ea21053f69ac"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/21-validation-command-fr.jpg",
+    "kind": "doc",
+    "sha256": "a2718e81a260a2b04949dfe4029c3b4e7835532944db2a6220ee12850856e4d9"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/23-validation-effect-en.jpg",
+    "kind": "doc",
+    "sha256": "ee802f4ac75f06b8d68a3de87ecbc172ea42967c726ff568a8a7faa02f430e81"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/23-validation-effect-fr.jpg",
+    "kind": "doc",
+    "sha256": "0ac0eba350fe32599d23029597f5617423ecf8ac45abaee82b86a98a8141a0da"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/24-validation-auto-en.jpg",
+    "kind": "doc",
+    "sha256": "a7f7cd08a3338fad3fa597f00d582eab3bf722fa69f3e9b550a8ff42a2588c4d"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/24-validation-auto-fr.jpg",
+    "kind": "doc",
+    "sha256": "c50509e05fe36598116e43fdb63b823080c37f84f9b4b5d345e87dbf4cc8343a"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/25-graph-edit-en.jpg",
+    "kind": "doc",
+    "sha256": "74c2c520056782433aa11a73c7d650ab16c2d3347f663cc4d8f719d6a1155b88"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/25-graph-edit-fr.jpg",
+    "kind": "doc",
+    "sha256": "9b29c4531efe409856b8498f74be25831c08cde4b3a903db2f431ae475347636"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/26-casa-accueil.png",
+    "kind": "doc",
+    "sha256": "4bc6e6f837db9b71ba4f48c51f0c7dd3d31cb997c35a3d7a154094c61f87e9f2"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/guide-graph-en.png",
+    "kind": "doc",
+    "sha256": "8b5a3f4e6b77fe8266ea7ed4009078d9f428d75799aefea987fc8e69669d3590"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/guide-graph-fr.png",
+    "kind": "doc",
+    "sha256": "569aca7ebcc579bde3c6a9a2ef24b3220cec0e472faa6cab9f540a2757a4ac59"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/guide-validation-en.png",
+    "kind": "doc",
+    "sha256": "8cee691cc13bb794ee94ab975bdf29637b0ae3353a7188bbcfa49e6418e6dc8d"
+  },
+  {
+    "path": "docs/training/casa-pizza/captures/guide-validation-fr.png",
+    "kind": "doc",
+    "sha256": "7a194b11a33a90a7054a07f7a8b292cf6f4fadeb43afc6aef98420e6dbd31e14"
+  },
+  {
+    "path": "docs/training/casa-pizza/creer_plan_pedagogique.py",
+    "kind": "doc",
+    "sha256": "c5d015ba6e8f2ada86ea596d077282bfb58eae2376af429735ed0df71afe4810"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/.gitignore",
+    "kind": "doc",
+    "sha256": "b62556573fc1009d580d10e75b33a3f382632e9f1b2f9155870d95f261c82b4b"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/AGENTS.md",
+    "kind": "doc",
+    "sha256": "7976e979353c24aeba246114519361c9bae102fa45ae488f4872456bd4bbd10f"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/README.md",
+    "kind": "doc",
+    "sha256": "673eb514d0f2eb44dc146702f7a1900aa0d152ae0abe155f5505222d59893415"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/app.py",
+    "kind": "doc",
+    "sha256": "2cc00278fa3729a388c295faa90c59e246dac189a36d6afc58dddf9b7d843de7"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/docs/BESOIN.md",
+    "kind": "doc",
+    "sha256": "1ae7486bd60d57db16a6b7f33b40d4833604a791ef3e330a4afde1e154c1b5d7"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/docs/FORMATEUR.md",
+    "kind": "doc",
+    "sha256": "b76c23c0cbc3e46e8a902b20692ef54d8400ac61e936744126bafb637a8bc553"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/docs/HANDOFF.md",
+    "kind": "doc",
+    "sha256": "c625cee313db04dc3df9f6c204fa17c0114f65d604c95309a4957354b554a2a2"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/docs/REFONTE.md",
+    "kind": "doc",
+    "sha256": "424a20ea9533f97262c507135b5468445bab0e32c66c2c34d9e2e60b566fd90c"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/docs/pizza-app.md",
+    "kind": "doc",
+    "sha256": "7fa1fa4a07492ab8f89a2a0dd9695d58c1543944612031a04698d01de8de624a"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/static/app.js",
+    "kind": "doc",
+    "sha256": "67f1d5d868198b5918a639b54d8b74c130d44de8025a9c48339c667aa5269e6b"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/static/images/calzone.svg",
+    "kind": "doc",
+    "sha256": "3c84f4c4d96446ac695818c12d16a5395c8eed8bf88eb20be6045dfca1dcc33c"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/static/images/diavola.svg",
+    "kind": "doc",
+    "sha256": "6dd9b3fb872fb8bfd7fb2665a81c7749a076aee73f26d6b1bf47cf79a0fff2ca"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/static/images/fromages.svg",
+    "kind": "doc",
+    "sha256": "586fc74b0ec8d7acc103787c73f75a7a8911bf2421194a08f9d3021f3c6c3da2"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/static/images/margherita.svg",
+    "kind": "doc",
+    "sha256": "ce57c6d476901925ceb855d798264760d780313143dae70c33049cdba428d814"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/static/images/reine.svg",
+    "kind": "doc",
+    "sha256": "c6de8a3ad63851140555186a717ba4c6db309c41c2d37730345e02c28c78fbb1"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/static/images/vegetarienne.svg",
+    "kind": "doc",
+    "sha256": "5deb1d9384d7a5099094ed185efe313da4e34a48896ab9dc764517b0c2cf81e4"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/static/index.html",
+    "kind": "doc",
+    "sha256": "1fab86c44c18bb3007ef92e40c11dc5b8b6ce754a15a58a501be158b8f57c56b"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/static/restaurant.html",
+    "kind": "doc",
+    "sha256": "3e8113aa153d0c70df8d664d0be9ab37eb4292bc5e4f27b51bc87d07929d7a53"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/static/restaurant.js",
+    "kind": "doc",
+    "sha256": "c66d6958ddf782351e56104079a027a753ec2ef43efbfa683406cb13016ac519"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/static/style.css",
+    "kind": "doc",
+    "sha256": "f3c7575fbc3ac6d152796431306f838f9c8a34f37da34375ae73f2a254ea70c4"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/tests/__init__.py",
+    "kind": "doc",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/tests/test_app.py",
+    "kind": "doc",
+    "sha256": "380034c9b5f199529dc32790ae4ca9447d5084e7fc5daf982eff0239768523f7"
+  },
+  {
+    "path": "docs/training/casa-pizza/projet-pizza/tests/test_http.py",
+    "kind": "doc",
+    "sha256": "7cc1d01fb813c0ab3229b6f788c39b592faa8ac0ba0fdbfd8328eb2d36d98510"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/README.md",
+    "kind": "doc",
+    "sha256": "6f5af8b1e5e6927e97e85f21c3c3607dd42f932fc9950de934465ce9969c9f99"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/build_graph_overview.py",
+    "kind": "harness",
+    "sha256": "ff48f42ed96b83df0ef56773957eac931e44c765220bff4b0f22c35fab45b077"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/build_media.py",
+    "kind": "doc",
+    "sha256": "6f6dbafaf1096a3944e63e8312373066f99c31db2dfb9778db1912a738e35cf5"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/build_player.py",
+    "kind": "doc",
+    "sha256": "b393de4be73385a8415c4e12acc8f5b79362f58cc59ac34e0382f08bb657b0f5"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/extend_guides.py",
+    "kind": "doc",
+    "sha256": "7b500fab060baa7274a185bf786a6e7cf84c387cb2789ae2c5d1e4d152cafce2"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/00-besoin-en.png",
+    "kind": "doc",
+    "sha256": "c6617a6424e7c7dd86f16acf6c88413382a44a3ef15058fd4b2e94859a3a1ce2"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/00-besoin-fr.png",
+    "kind": "doc",
+    "sha256": "a03f9f2756f1ea23e7743672cde511f47ec9115a0f35a3dd72dc9c4453a04af9"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/01-catalogue.png",
+    "kind": "doc",
+    "sha256": "9f12bd3a64aeff93f60b6fd89fbbd8c3ddebf708f8c68e15c5b5035457950b50"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/02-filtre.png",
+    "kind": "doc",
+    "sha256": "65e56a16efb0aada7485a259b69b040fde0bff322ea53538c5209afbd6a3fb6c"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/03-minimum.png",
+    "kind": "doc",
+    "sha256": "aa086130ca188f664cf2c17ab0aa882f90966bf60db73b3dc6eeb9f46ab7aa05"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/04-quantite.png",
+    "kind": "doc",
+    "sha256": "01c3748913d85c7ba911f7447c02d0420f2cf3a38b7df72818b1b3a0880862c5"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/05-confirmee.png",
+    "kind": "doc",
+    "sha256": "a1ca68e98009cecac1b0e9bac119cdafed108be20069935c01f0689b170bf567"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/06-connexion.png",
+    "kind": "doc",
+    "sha256": "a15ace60eaba995d6ef78c4acec3ec3cb8c1c8eb780196ead6a474a90992f90a"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/07-refus-acces.png",
+    "kind": "doc",
+    "sha256": "a807b062779b379c44eecd78667866127e15c1ee41ba8d6e2b6e60578c947eea"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/08-commande-recue.png",
+    "kind": "doc",
+    "sha256": "0234fc577cf135fd32cdcc9dc8dd466efd11d327513983b7e007d76738418826"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/09-preparation.png",
+    "kind": "doc",
+    "sha256": "ad76f2691660e7215b9ef69f304de40bd318fcb2b20ba6bcf5d0df8a4dc7c3c7"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/10-suivi-preparation.png",
+    "kind": "doc",
+    "sha256": "c3160bd85262ab6475cc89549e0ee8321e16a9ca4ed2bea49a7c46c8a731278d"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/11-livraison.png",
+    "kind": "doc",
+    "sha256": "1f8bb1c5d5122a5a3ea43507ccafb7d5c051087ba2b5018fa57d2dfeb52f65e5"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/12-livree.png",
+    "kind": "doc",
+    "sha256": "212aa35392d72cf5a947dc2c5d09d62d5739eb6abd3e565de1b6b4864aaa473e"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/13-graphe-en.png",
+    "kind": "doc",
+    "sha256": "94db04df5378bee8db76e31ca5464594e72146abc5a45de6d72fc528f018589a"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/13-graphe-fr.png",
+    "kind": "doc",
+    "sha256": "3a25f9bc07d41a81265f89165963bc010c79eabb405b89d0360402a6763b8e2e"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/14-tache-en.png",
+    "kind": "doc",
+    "sha256": "414e318af79bf4ffcc1b62adb93d3c16c1a08c3b0827a2bc3394bb98d4f9e062"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/14-tache-fr.png",
+    "kind": "doc",
+    "sha256": "7d11a3a38186e05ded297df771094d75376260ed2b632a113784cf5a2ae0a230"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/15-humaine-en.png",
+    "kind": "doc",
+    "sha256": "6aa24e542d5bde90a4c400f791c763f4efa6c9c66a87945efbc11bcfa135519c"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/15-humaine-fr.png",
+    "kind": "doc",
+    "sha256": "848ce4da4ec12755243413486c8e8f823e6842c3ce4409314bda820f7694fec1"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/16-controle-en.png",
+    "kind": "doc",
+    "sha256": "fb7453abd9882aae2574278303a485e01a43940586c4715d8871a9cd34fe56ee"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/16-controle-fr.png",
+    "kind": "doc",
+    "sha256": "6b24d96efda31fcca3f394715a17c1854aea0ad164ccf1381502dc3b2d42d846"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/17-apercu-en.png",
+    "kind": "doc",
+    "sha256": "5c330e33c46de5636fa63f10183a6ef4d7ca5a5d9d53b1058d87a97164bc1ccd"
+  }
+]

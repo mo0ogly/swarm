@@ -1,5 +1,13 @@
 # Méthodes produit KS et navigation des graphes
 
+## Repère APEX — 24 octobre 2026
+
+La [file APEX FR](FILE-APEX.md#vague-3--autres-suivis-historiques-24-octobre-2026) et [EN](../en/APEX-QUEUE.md#wave-3--other-historical-tracking-october-24-2026) relie ces exigences produit aux parcours
+Rust et au plan d’accueil, sans créer un projet concurrent. Codex racine conserve
+la distinction application/parcours/story/tâches et doit qualifier les capacités
+courantes avant une nouvelle tranche. Les validations historiques ne valent pas
+preuve de l’interface Rust actuellement servie ; aucun modèle n’est modifié ici.
+
 Autorisation : l’utilisateur a accepté le 9 octobre 2026 la migration des méthodes
 KS et les trois niveaux application → parcours → story → tâches.
 

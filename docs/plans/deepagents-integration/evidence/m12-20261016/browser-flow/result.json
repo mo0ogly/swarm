@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "root": "/tmp/swarm-dr-ui-SmBes4",
+  "checks": [
+    "Actual provider boundary and stopped process inspected through recovery-preview; no provider restart",
+    "FR/EN, both themes, 1440/760/390/320 widths, Escape and semantic action focus restoration",
+    "Two unknown checks remain visible, verified checks expand on demand and confirmation is hidden",
+    "Rendered diagnostic text contrast is at least 4.5:1",
+    "Untrusted diagnostic text is rendered as text without executable nodes"
+  ],
+  "errors": [],
+  "failures": [],
+  "provider_invocations": 1,
+  "model_calls": 0
+}

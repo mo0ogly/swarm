@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "python3",
+    "tools/agent-workflows/check.py"
+  ],
+  "started_at_utc": "2026-10-16T17:22:20.874295+00:00",
+  "duration_seconds": 6.573,
+  "exit_code": 0,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+  "real_model_calls": 0
+}

@@ -1,5 +1,14 @@
 # V4 — Recette et documentation de la livraison
 
+## Repère de lecture APEX — 24 octobre 2026
+
+La [file APEX FR](../FILE-APEX.md#vague-3--autres-suivis-historiques-24-octobre-2026) et [EN](../../en/APEX-QUEUE.md#wave-3--other-historical-tracking-october-24-2026) distingue le rapport worker initial
+PARTIAL de la qualification technique ajoutée en fin de document, dont R5 garde
+la décision indépendante attendue dans ce suivi. Cela ne prouve ni acceptation
+ultérieure ni version actuellement servie. Codex racine doit rattacher les
+contrats version/CLI/web/installation au candidat Rust et à sa recette actuelle,
+sans recopier un ancien numéro, hash, build ou lancement comme preuve neuve.
+
 ## Résultat
 
 La documentation française et anglaise décrit désormais la version du binaire,

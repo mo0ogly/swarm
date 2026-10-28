@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-11T16:53:18.028439+00:00",
+  "agent": "auto-a23c60f03a732c02841f",
+  "status": "completed",
+  "ended": "2026-10-11T14:21:56.918328529Z",
+  "base_tree": "201b3a8e2e0f724a7cc88fef7107bf2d41569316",
+  "result_tree": "9b03d914eadbc6711dd3804b5178e78e7c30f063",
+  "paths": [
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json",
+    "docs/plan-ca937edf4e-T2.md",
+    "docs/plan-ca937edf4e-T2.delivery.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/path-binding-replan.json"
+  ],
+  "preimages_exact": true,
+  "postimages_exact": true,
+  "native_original_retained": "69e7ad880d6551d4f08e77c1981896b148951c279855cb9c19445b5f2c114113",
+  "effect": "Attributed documentation/context correction in inactive owned copy only; no Go/DB/usage/attempt/acceptance change."
+}

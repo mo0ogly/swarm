@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "claude-account-restored-ecda23edbc3d4b39a7000556c161ebde",
+  "expected_digest": "e48048ff49c414b7f98b8d71135e00a2970d729e0f3310c3664e1d7799d95f8a",
+  "reason": "Utilisateur : « cest ok j'ai arrangé claude tu peux repartie ». Précondition de compte déclarée rétablie ; reprise explicite autorisée. Conserver le refus original, son délai et toutes les dépenses. Cette confirmation autorise un nouvel essai et ne prouve pas encore la disponibilité réelle du fournisseur.",
+  "confirm_account_change": true
+}

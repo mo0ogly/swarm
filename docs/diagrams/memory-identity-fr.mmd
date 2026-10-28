@@ -1,0 +1,40 @@
+flowchart TB
+    accTitle: Swarm : moteur déterministe Rust, mémoire et identité
+    accDescr: Le moteur déterministe Rust swarm-engine est le cœur de Swarm. Un parcours worker natif ciblé relie proposition, départ et observations. La mémoire versionnée est un socle historique Go ; ses raccords Rust et l’autorité publique sont encore en pointillés.
+    subgraph NATIVE["CŒUR NATIF RUST"]
+        PLAN["Humain et superviseur<br/>Objectif · proposition · critères"]
+        ENGINE["MOTEUR DÉTERMINISTE RUST<br/>swarm-engine · RootStore<br/>État · transitions · droits · preuves"]
+        AGENT["Tentative worker<br/>Parcours natif ciblé"]
+        FACTS["Activité · rapport · incident<br/>Faits et incertitudes conservés"]
+        PLAN -->|Proposition à vérifier| ENGINE
+        ENGINE -->|Départ autorisé| AGENT
+        AGENT --> FACTS
+        FACTS -->|Observation et reprise| ENGINE
+    end
+    subgraph MEMORY["MÉMOIRE GO"]
+        RETEX["RETEX vérifié<br/>Sources et conditions"]
+        LESSON[("Expériences et procédures<br/>Versions et sélection explicite")]
+        HISTORY["Historique conservé<br/>Retrait et contextes déjà reçus"]
+        RETEX -->|Admission explicite Go| LESSON
+        LESSON --> HISTORY
+    end
+    subgraph IDENTITY["IDENTITÉ À INTÉGRER"]
+        KERNEL["Noyau interne vérifié localement<br/>Acteur · instance · plan · délégation"]
+        TARGET["Raccord protégé restant<br/>Propriétaire · auteur · droits d’usage"]
+        KERNEL -.-> TARGET
+    end
+    ENGINE -.->|Admission et sélection Rust à raccorder| LESSON
+    LESSON -.->|Contexte mémoire Rust à raccorder| AGENT
+    KERNEL -.->|Autorité publique à raccorder| ENGINE
+    TARGET -.->|Droits mémoire à raccorder| LESSON
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+    classDef engine fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+    classDef memory fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef target fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:1.6px,stroke-dasharray:6 4;
+    class PLAN,AGENT,FACTS,RETEX,HISTORY,KERNEL ordinary;
+    class ENGINE engine;
+    class LESSON memory;
+    class TARGET target;
+    style NATIVE fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style MEMORY fill:#f5f3ec,stroke:#926300,color:#062b49
+    style IDENTITY fill:#f5f3ec,stroke:#926300,color:#062b49,stroke-dasharray:6 4

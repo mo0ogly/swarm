@@ -1,0 +1,9 @@
+flowchart TD
+  E["Enrôlement protégé courant<br/>prérequis : encore une fixture"] --> A["Autorité privée explicite<br/>principal, portée, droits et dates"]
+  H["Session OIDC résolue par Trust"] --> V["Trust partagé puis écrivain SQLite<br/>plan courant et temps frais"]
+  A --> V
+  S["Candidat complet et checkpoint précédent"] --> V
+  V --> P["Permis privé exact<br/>empreinte, racines, session et échéance"]
+  P --> C["Publiant : revalider session et autorité<br/>après attente et avant intention"]
+  C --> D["Intention Trust puis COMMIT SQLite<br/>puis tête Trust"]
+  D -.-> X["Lanceurs publics et accord de création exact<br/>raccord restant à réaliser"]

@@ -1,0 +1,17 @@
+{
+  "checks": [
+    {
+      "configured_ms": 250,
+      "delayed_module_ms": 900,
+      "result": "fallback editable and saved through CLI",
+      "errors": []
+    },
+    {
+      "configured_ms": 0,
+      "delayed_module_ms": 900,
+      "result": "Monaco loaded without an asset deadline",
+      "errors": []
+    }
+  ],
+  "real_models": 0
+}

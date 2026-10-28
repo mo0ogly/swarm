@@ -1,0 +1,14 @@
+--- FAIL: TestCursorEngineT3ClaimUsesEffectiveScopeProviderCooldown (0.34s)
+    --- FAIL: TestCursorEngineT3ClaimUsesEffectiveScopeProviderCooldown/root_override_ignores_base_wait (0.06s)
+        cursor_engine_t3_effective_provider_test.go:80: unrelated base provider blocks selected scope: Fournisseur base : quota refusé (429). Nouveaux appels suspendus jusqu’au 2026-10-12 11:43:33 UTC. Les tentatives et budgets déjà consommés restent conservés.
+    --- FAIL: TestCursorEngineT3ClaimUsesEffectiveScopeProviderCooldown/root_override_respects_own_wait (0.07s)
+        cursor_engine_t3_effective_provider_test.go:72: effective provider wait ignored: <nil>
+    --- FAIL: TestCursorEngineT3ClaimUsesEffectiveScopeProviderCooldown/child_override_ignores_base_wait (0.05s)
+        cursor_engine_t3_effective_provider_test.go:41: exigence possédée plusieurs fois
+    --- FAIL: TestCursorEngineT3ClaimUsesEffectiveScopeProviderCooldown/child_override_respects_own_wait (0.06s)
+        cursor_engine_t3_effective_provider_test.go:41: exigence possédée plusieurs fois
+    --- FAIL: TestCursorEngineT3ClaimUsesEffectiveScopeProviderCooldown/child_without_override_inherits_base (0.05s)
+        cursor_engine_t3_effective_provider_test.go:41: exigence possédée plusieurs fois
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.375s
+FAIL

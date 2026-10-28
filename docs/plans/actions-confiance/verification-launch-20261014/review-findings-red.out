@@ -1,0 +1,49 @@
+=== RUN   TestPreparedOrganizationAttachAfterMaterialization
+=== RUN   TestPreparedOrganizationAttachAfterMaterialization/create-missions
+    prephase_organization_test.go:75: new event silently reapplied an existing organization
+=== RUN   TestPreparedOrganizationAttachAfterMaterialization/authorize-plan
+    prephase_organization_test.go:75: new event silently reapplied an existing organization
+--- FAIL: TestPreparedOrganizationAttachAfterMaterialization (0.09s)
+    --- FAIL: TestPreparedOrganizationAttachAfterMaterialization/create-missions (0.05s)
+    --- FAIL: TestPreparedOrganizationAttachAfterMaterialization/authorize-plan (0.04s)
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/stale-work
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/stale-plan
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/released
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/task-edited
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/attempted
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/invalid-provider
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/foreign-task
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/missing-lock
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/work-reframed
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/prior-review
+    prephase_organization_test.go:162: unsafe organization accepted
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/recovery
+    prephase_organization_test.go:162: unsafe organization accepted
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/prior-policy
+    prephase_organization_test.go:162: unsafe organization accepted
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/scope
+    prephase_organization_test.go:162: unsafe organization accepted
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/blocker
+    prephase_organization_test.go:162: unsafe organization accepted
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/stale-evidence
+    prephase_organization_test.go:162: unsafe organization accepted
+--- FAIL: TestPreparedOrganizationAttachRejectsUnsafeState (0.58s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/stale-work (0.03s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/stale-plan (0.04s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/released (0.04s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/task-edited (0.05s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/attempted (0.03s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/invalid-provider (0.04s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/foreign-task (0.04s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/missing-lock (0.04s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/work-reframed (0.04s)
+    --- FAIL: TestPreparedOrganizationAttachRejectsUnsafeState/prior-review (0.03s)
+    --- FAIL: TestPreparedOrganizationAttachRejectsUnsafeState/recovery (0.04s)
+    --- FAIL: TestPreparedOrganizationAttachRejectsUnsafeState/prior-policy (0.06s)
+    --- FAIL: TestPreparedOrganizationAttachRejectsUnsafeState/scope (0.04s)
+    --- FAIL: TestPreparedOrganizationAttachRejectsUnsafeState/blocker (0.03s)
+    --- FAIL: TestPreparedOrganizationAttachRejectsUnsafeState/stale-evidence (0.03s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.696s
+FAIL

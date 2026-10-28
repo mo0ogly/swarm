@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "id": "paea56-checkpoint-cli",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/**/*",
+    "web/*",
+    "web/lib/**/*",
+    "web/paea-examples/v1/*.json",
+    "frontend/engine-settings/*",
+    "tools/agent-workflows/**/*",
+    ".claude/skills/**/*",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "version_history.json",
+    "tools/verification/recipe.py",
+    "rust/crates/swarm-cli/tests/identity_control.rs",
+    "tools/verification/recipes/paea-identity-options.json",
+    "tests/fixtures/paea_personal_tty.py",
+    "tests/fixtures/paea_personal_report_schema.py",
+    "schemas/paea/personal-lifecycle-cli-v1.schema.json",
+    "tools/verification/recipes/paea-personal-cli.json",
+    "tests/paea_personal_native_driver.py",
+    "tools/verification/recipes/paea-personal-cli-native.json",
+    "rust/crates/swarm-cli/tests/identity_provisioning.rs",
+    "schemas/paea/operator-package-cli-v1.schema.json",
+    "tests/paea_operator_package_schema_test.py",
+    "tools/verification/recipes/paea-operator-package-cli-library.json",
+    "rust/crates/swarm-cli/tests/identity_checkpoint.rs",
+    "schemas/paea/operator-anchor-cli-v1.schema.json",
+    "tests/paea_operator_anchor_cli_schema_test.py",
+    "tools/verification/recipes/paea-checkpoint-cli.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "public-checkpoint-read-and-refusal",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "identity_checkpoint",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "6 passed; 0 failed",
+        "checkpoint_read_exact_report_fr_en_without_package",
+        "checkpoint_output_failure_keeps_known_read_and_recovers"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "closed-read-report-schema",
+      "command": [
+        "python3",
+        "tests/paea_operator_anchor_cli_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "private-checkpoint-cli-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Documenting swarm-cli",
+        "Finished"
+      ]
+    }
+  ]
+}

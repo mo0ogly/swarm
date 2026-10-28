@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "local-build-cache-proof",
+  "inputs": [
+    "tools/swarm_version.py",
+    "tools/swarm_local.py",
+    "tools/rust-migration/build_native.py",
+    "tools/verification/verify_native_profile.py",
+    "tests/test_swarm_cache_proof.py",
+    "tests/test_swarm_prepared_build.py",
+    "tests/test_swarm_version_candidate_race.py"
+  ],
+  "environment": {
+    "SWARM_TEST_BUILD_STATE": "deploy/local-build.json"
+  },
+  "steps": [
+    {
+      "id": "test_swarm_cache_proof",
+      "command": [
+        "python3",
+        "tests/test_swarm_cache_proof.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "test_swarm_version_candidate_race",
+      "command": [
+        "python3",
+        "tests/test_swarm_version_candidate_race.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 7 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "test_swarm_prepared_build",
+      "command": [
+        "python3",
+        "tests/test_swarm_prepared_build.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 5 tests",
+        "OK"
+      ]
+    }
+  ]
+}

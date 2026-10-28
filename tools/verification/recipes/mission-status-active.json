@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "mission-status-active",
+  "inputs": [
+    "tests/rust_status_active.py",
+    "tests/rust_mission_status_contract.py",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs",
+    "rust/crates/swarm-engine/src/mission_status_tasks.rs",
+    "rust/crates/swarm-engine/src/task_lifecycle.rs",
+    "version_history.json",
+    "tools/verification/recipes/mission-status-active.json",
+    "rust/crates/swarm-engine/src/root_store/mission_status_activity.rs",
+    "rust/crates/swarm-engine/src/agent_heartbeat.rs",
+    "rust/crates/swarm-engine/src/supervisor_identity.rs",
+    "tests/rust_status_submitted_window.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-active-observation",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='status-active-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_status_active.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS public queued and running observation, early report, cancellation and submission recovery",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

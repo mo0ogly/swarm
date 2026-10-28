@@ -1,0 +1,16 @@
+[
+  {
+    "source": "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "at": "2026-10-11T22:20:11.224821+00:00",
+    "exit": 0,
+    "render": "/tmp/swarm-inspection-state24-fr.png",
+    "sha256": "8a03bc3ee1c15c3caa17fdf6c9594cd191b45fc3010be08adaea7e034bcd3587"
+  },
+  {
+    "source": "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "at": "2026-10-11T22:20:13.997575+00:00",
+    "exit": 0,
+    "render": "/tmp/swarm-inspection-state24-en.png",
+    "sha256": "3e0dce8a81044b6014cc64f9f4c74320c8d27227aa94e504c14ee3f24f996694"
+  }
+]

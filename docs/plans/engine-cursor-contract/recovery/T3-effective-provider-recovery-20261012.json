@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-12T10:48:30.091080+00:00",
+  "parent": "T3-exploration-concurrent-recovery-20261012.patch",
+  "parent_tree": "8bcca8a7a2a7470a16ad84461ffdaaa10e637442",
+  "preimage_tree": "8bcca8a7a2a7470a16ad84461ffdaaa10e637442",
+  "preimage_extensions": [],
+  "preimages": {
+    "docs/T3-operator-development.md": "3b2b969e305043eb665e41987d285f1862e287b8ec34dec7ac62294f4ee58cae",
+    "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md": "9e8047c720e11d416f667c9c689f2a9c5bbb91c295d09a1b732537f6e889e921",
+    "docs/en/CURSOR-ENGINE-CONTRACT.md": "fe0550346912d02940acac5624660c5e8d53f1f805d4337988d873720973228f",
+    "docs/engine-cursor-source-inputs-001.json": "04d99fc9eddadd79edf24c98f4bdffd8e060e662f0a54aa7e732d70dbf907ae4",
+    "docs/engine-cursor-source-inputs-003.json": "3116b138cf89e91da5a9b0c65604e6f2fe5a3bf531e88287f23690fe67a7b67b",
+    "docs/engine-cursor-source-inputs-004.json": "b0572ae418f181cd4c64e69317f2bd4f5acf992cea01672b1d0e3aa3a76c7db7",
+    "docs/engine-cursor-source-inputs-005.json": "401704856fd84daf1c9f255480aa911c677102825980ca22dccb874a4a9a9d66",
+    "docs/engine-cursor-source-manifest.json": "c630ce9aba752f859e78afbb783d39ecb29188fc8049fa448e782715b1ef542b",
+    "internal/engine/cursor_engine_t3_effective_provider_test.go": null,
+    "internal/engine/planning.go": "05d9e8de7d64057177e35ee8c8805731558c21fecdc65c433ff5963c3aa99e78"
+  },
+  "postimages": {
+    "docs/T3-operator-development.md": "c0f24ddfc961abe260073beadec9169b49d1803f09c34ff981ee83121a553a49",
+    "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md": "518d2a597f76b631e59aad94eb8c374604c001f0663e898d289ce809d48b3328",
+    "docs/en/CURSOR-ENGINE-CONTRACT.md": "de1472ee6a7b02dfaa8e75d620ed0190f1610584116e591614765fc6128dff22",
+    "docs/engine-cursor-source-inputs-001.json": "c7f5914db0f2530e14436352c9c48ad16fcdba5c354cf8dcea4dbe8959860319",
+    "docs/engine-cursor-source-inputs-003.json": "2c93ea3f133e0cd4c050957dfcb671f989399fc3a74132d0c6eda4ff0a4a78b8",
+    "docs/engine-cursor-source-inputs-004.json": "7e11c938f5b3cdc23be3c485f0619227bd3be34e7b054dcfbed207c8c4318292",
+    "docs/engine-cursor-source-inputs-005.json": "e984617a264f366ba9a42d38f4b934538327ca6f129a00f90198bb7c9b3614aa",
+    "docs/engine-cursor-source-manifest.json": "5c19a0eb9e709d2e591bdc78f5953d68244e1c3cb1e56b53f3ff24cfda93fc6b",
+    "internal/engine/cursor_engine_t3_effective_provider_test.go": "f00eaf69d8e846f420c0d189c29047371f0f7666848d0fa386bd8c0c849997c4",
+    "internal/engine/planning.go": "d7602d31402f89ad687710efe8ea2266866b99d787bd1b6b650253a754ef596d"
+  },
+  "result_tree": "a24e707d8a34e17ce0feb891df6501d3bc6a73e4",
+  "patch": "T3-effective-provider-recovery-20261012.patch",
+  "patch_sha256": "024e34c987a21b2e7dd3cfda721060b07fa17916cd10a5734a37bca19efe4046",
+  "paths": [
+    "docs/T3-operator-development.md",
+    "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+    "docs/en/CURSOR-ENGINE-CONTRACT.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/cursor_engine_t3_effective_provider_test.go",
+    "internal/engine/planning.go"
+  ],
+  "candidate_digest": "1dba385b5ee3b3b8d29e2588f3d35d9ce624f4659a8dbf179147141d335e85fe",
+  "check": "PASS exact path diff, isolated refreshed-index apply, result tree and all postimages",
+  "qualification": {
+    "at": "2026-10-12T11:02:45.499697+00:00",
+    "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-effective-provider-3el54ztk",
+    "candidate_digest": "1dba385b5ee3b3b8d29e2588f3d35d9ce624f4659a8dbf179147141d335e85fe",
+    "checks": [
+      {
+        "state": "finished",
+        "started": "2026-10-12T10:51:16.367263+00:00",
+        "finished": "2026-10-12T11:02:34.539266+00:00",
+        "argv": [
+          "go",
+          "test",
+          "-json",
+          "./...",
+          "-count=1",
+          "-timeout=12m"
+        ],
+        "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-effective-provider-3el54ztk",
+        "candidate_digest": "1dba385b5ee3b3b8d29e2588f3d35d9ce624f4659a8dbf179147141d335e85fe",
+        "manifest_sha256": "5c19a0eb9e709d2e591bdc78f5953d68244e1c3cb1e56b53f3ff24cfda93fc6b",
+        "frozen_paths": 2127,
+        "wall_seconds": 678.1743992630072,
+        "exit": 0,
+        "output": "/tmp/swarm-T3-effective-provider-linked-full.out",
+        "output_sha256": "f725a1117665408cbcd90f190a27325f083bcc647d30b185c2b5a5e0485539fe",
+        "drift": [],
+        "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+      },
+      {
+        "state": "finished",
+        "started": "2026-10-12T11:02:36.059443+00:00",
+        "finished": "2026-10-12T11:02:39.258294+00:00",
+        "argv": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-effective-provider-3el54ztk",
+        "candidate_digest": "1dba385b5ee3b3b8d29e2588f3d35d9ce624f4659a8dbf179147141d335e85fe",
+        "manifest_sha256": "5c19a0eb9e709d2e591bdc78f5953d68244e1c3cb1e56b53f3ff24cfda93fc6b",
+        "frozen_paths": 2127,
+        "wall_seconds": 3.198880641008145,
+        "exit": 0,
+        "output": "/tmp/swarm-T3-effective-provider-linked-vet.out",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "drift": [],
+        "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+      },
+      {
+        "state": "finished",
+        "started": "2026-10-12T11:02:39.846635+00:00",
+        "finished": "2026-10-12T11:02:42.629016+00:00",
+        "argv": [
+          "python3",
+          "tools/agent-workflows/check.py"
+        ],
+        "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-effective-provider-3el54ztk",
+        "candidate_digest": "1dba385b5ee3b3b8d29e2588f3d35d9ce624f4659a8dbf179147141d335e85fe",
+        "manifest_sha256": "5c19a0eb9e709d2e591bdc78f5953d68244e1c3cb1e56b53f3ff24cfda93fc6b",
+        "frozen_paths": 2127,
+        "wall_seconds": 2.782388029998401,
+        "exit": 0,
+        "output": "/tmp/swarm-T3-effective-provider-linked-methods.out",
+        "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+        "drift": [],
+        "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+      },
+      {
+        "state": "finished",
+        "started": "2026-10-12T11:02:43.110740+00:00",
+        "finished": "2026-10-12T11:02:45.083281+00:00",
+        "argv": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/swarm-qualified-T3-effective-provider-linked-build",
+          "./cmd/swarm"
+        ],
+        "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-effective-provider-3el54ztk",
+        "candidate_digest": "1dba385b5ee3b3b8d29e2588f3d35d9ce624f4659a8dbf179147141d335e85fe",
+        "manifest_sha256": "5c19a0eb9e709d2e591bdc78f5953d68244e1c3cb1e56b53f3ff24cfda93fc6b",
+        "frozen_paths": 2127,
+        "wall_seconds": 1.9725473430007696,
+        "exit": 0,
+        "output": "/tmp/swarm-T3-effective-provider-linked-build.out",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "drift": [],
+        "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance.",
+        "binary_sha256": "d76af56bffc1b7864c5455e109f054716c4a4b218b58c23521e10747880faf74"
+      }
+    ],
+    "result": "PASS local qualification",
+    "limits": "Primary/runtime unchanged; public installation, reception, decision and effect remain required."
+  },
+  "purpose": "Effective-scope provider cooldown admission: guard the same selected provider as the runner, preserve unrelated provider waits, budgets and replay. Extends qualified T3, does not include deferred27 and grants no acceptance.",
+  "preimage_scope": "Exact current primary preimages checked; any divergence from historical24 external packaging tree explicitly extended without rewriting its old objects."
+}

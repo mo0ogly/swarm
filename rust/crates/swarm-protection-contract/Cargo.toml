@@ -1,0 +1,11 @@
+[package]
+name = "swarm-protection-contract"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+serde = { version = "=1.0.228", features = ["derive"] }
+serde_json = { version = "=1.0.150", features = ["raw_value"] }
+sha2 = "=0.10.9"
+swarm-identity-contract = { path = "../swarm-identity-contract" }

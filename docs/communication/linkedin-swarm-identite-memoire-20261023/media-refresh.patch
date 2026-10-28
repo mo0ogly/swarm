@@ -1,0 +1,301 @@
+--- README.en.md before
++++ README.en.md updated
+@@ -29,23 +29,22 @@
+ 
+ ## Videos
+ 
+-### Supervision, identity and memory — 2 minutes
+-
+-[![Swarm overview: supervision, identity and memory, French captions](docs/communication/linkedin-swarm-identite-memoire-20261023/video/apercu.png)](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.mp4)
+-
+-An animated architecture overview: root supervisor, scope owners, deterministic
+-engine, identity, memory and future security. **French captions, 1080p, no audio.**
+-This explainer distinguishes scoped Rust evidence from the planned AC-02 work;
+-it does not record the application. An English version of this overview is not
+-available yet.
+-
+-[Watch the MP4](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.mp4) · [French SRT captions](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.srt) · [Chapters and sources, FR](docs/communication/linkedin-swarm-identite-memoire-20261023/video/README.md)
+-
+-[Updated Word article, in French](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v4.docx): persistent memory,
+-identity, the Rust engine and human control, with five detailed views and dated
+-public sources on context poisoning.
+-The earlier video is a shorter overview; the human-validation contract is explained
+-[below](#human-control-and-validation).
++### Identity memory and human control — 1 min 40
++
++[![Swarm film: Rust engine, memory, identity and human validation](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/apercu.png)](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Architecture_Film_v2.mp4)
++
++A motion-design film follows a bad instruction retained and transmitted, then
++explains the deterministic Rust engine, permissions, human validation and
++supervision. **French on-screen text, 1080p, original instrumental music, no voice.**
++French and English subtitle tracks and SRT files are included. Pending integrations
++and the unstarted AC02 plan stay explicit. This is an architecture explainer,
++not an application screen recording.
++
++[Watch MP4](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Architecture_Film_v2.mp4) · [French SRT](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/Swarm_Architecture_Film_v2.fr.srt) · [English SRT](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/Swarm_Architecture_Film_v2.en.srt) · [Chapters and sources](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/README.md) · [Previous video](docs/communication/linkedin-swarm-identite-memoire-20261023/video/README.md)
++
++[Word article v5, in French](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v5.docx): context-poisoning introduction,
++18 references, five complete technical views and film access. The Rust engine
++and human validation remain central to the architecture.
+ 
+ ### Explore the graph — about 1 minute
+ 
+@@ -144,6 +143,8 @@
+ The view also retains configuration/witness, checked local transport, expiry,
+ revocation and preparation authority before a plan. Pending integrations remain
+ identified; a signature or cookie does not become business authority.
++A signature establishes origin under its trust assumptions; it does not prove
++content truth or safety.
+ [Identity contract](docs/en/AGENT-IDENTITY-CONTRACT.md).
+ 
+ ## Memory and context
+@@ -156,7 +157,8 @@
+ lessons, prepared and finally composed context, task history, extractive selections,
+ instruction revisions and dialogue boundaries. Versions, conditions, sources,
+ digests, reception and recovery remain attributable. Withdrawal never rewrites
+-context already delivered.
++context already delivered. A memory grants no authority: memory informs reasoning,
++while contracts establish permissions.
+ 
+ A mistaken instruction stored in memory can return in another instance.
+ Provenance, admission and reuse conditions must remain examinable; memory creates
+--- README.md before
++++ README.md updated
+@@ -30,22 +30,22 @@
+ 
+ ## Vidéos
+ 
+-### Supervision, identité et mémoire — 2 minutes
+-
+-[![Présentation Swarm : supervision, identité et mémoire](docs/communication/linkedin-swarm-identite-memoire-20261023/video/apercu.png)](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.mp4)
+-
+-Une présentation animée de l’architecture : superviseur racine, responsables de
+-périmètre, moteur déterministe, identité, mémoire et sécurité future.
+-**Français, 1080p, légendes intégrées, sans audio.** Ce support explicatif distingue
+-les preuves Rust ciblées et le chantier AC-02 prévu ; il ne filme pas l’application.
+-
+-[Lire le MP4](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.mp4) · [Sous-titres SRT](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.srt) · [Chapitres et sources](docs/communication/linkedin-swarm-identite-memoire-20261023/video/README.md)
+-
+-[Article Word actualisé](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v4.docx) : mémoire persistante,
+-identité, moteur Rust et contrôle humain, avec cinq vues détaillées et références
+-publiques datées sur la contamination du contexte.
+-Le support vidéo antérieur est plus synthétique ; le contrat de validation humaine
+-est précisé [ci-dessous](#contrôle-humain-et-validation).
++### Identité mémoire et contrôle humain — 1 min 40
++
++[![Film Swarm : moteur Rust, mémoire, identité et validation humaine](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/apercu.png)](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Architecture_Film_v2.mp4)
++
++Un film en motion design : une mauvaise consigne conservée puis transmise, le
++moteur déterministe Rust, les droits, la validation humaine et la supervision.
++**Français, 1080p, musique instrumentale originale, sans voix.** Les textes sont
++intégrés ; des sous-titres FR et EN sont également fournis. Les raccords encore
++ouverts et le plan AC02 non démarré restent explicites. Ce film illustre
++l’architecture ; il ne constitue pas une capture de l’application.
++
++[Lire le MP4](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Architecture_Film_v2.mp4) · [SRT français](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/Swarm_Architecture_Film_v2.fr.srt) · [English SRT](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/Swarm_Architecture_Film_v2.en.srt) · [Chapitres et sources](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/README.md) · [Ancienne vidéo](docs/communication/linkedin-swarm-identite-memoire-20261023/video/README.md)
++
++[Article Word v5](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v5.docx) : introduction sur la contamination du contexte,
++18 références, cinq vues techniques complètes et accès au film. Le moteur Rust
++et la validation humaine restent au centre de l’architecture.
+ 
+ ### Explorer le graphe — environ 1 minute
+ 
+@@ -146,6 +146,8 @@
+ La vue conserve aussi configuration/témoin, canal local contrôlé, expiration,
+ révocation et autorité de préparation avant plan. Les raccords encore ouverts
+ sont identifiés ; une signature ou un cookie ne devient pas un droit métier.
++Une signature établit une origine sous ses hypothèses de confiance ; elle ne
++prouve ni la vérité ni l’innocuité du contenu.
+ [Contrat d’identité](docs/architecture/AGENT-IDENTITY-CONTRACT.md).
+ 
+ ## Mémoire et contexte
+@@ -158,7 +160,8 @@
+ versionnées issues de RETEX, contexte préparé puis réellement composé, historique
+ de la tâche, sélections extractives, révisions de consigne et frontières de dialogue.
+ Les versions, conditions, sources, empreintes, réceptions et reprises restent
+-attribuées. Le retrait ne réécrit pas les contextes déjà transmis.
++attribuées. Le retrait ne réécrit pas les contextes déjà transmis. Un souvenir ne crée aucun droit :
++la mémoire informe le raisonnement, les contrats établissent l’autorité.
+ 
+ Une mauvaise instruction conservée en mémoire peut revenir dans une autre
+ instance. La provenance, l’admission et les conditions de réutilisation doivent
+--- docs/diagrams/memory-context-fr.mmd before
++++ docs/diagrams/memory-context-fr.mmd updated
+@@ -4,7 +4,7 @@
+     subgraph G0["CONNAISSANCES"]
+         M_RETEX["RETEX vérifié et tâche acceptée<br/>Sources et preuves fraîches"]
+         M_ADMIT["Admission · preview puis apply<br/>Révision · événement · token"]
+-        M_VERSION["Mémoire de projet versionnée<br/>Expérience / procédure · provenance"]
++        M_VERSION["Mémoire de projet versionnée<br/>Expérience / procédure · provenance<br/>Un souvenir ne crée aucun droit"]
+         M_SELECT["Sélection explicite pour une tâche<br/>Version · empreinte · conditions"]
+         M_REPLACE["Remplacement · retrait · import<br/>Histoire et contextes reçus conservés"]
+     end
+--- docs/diagrams/memory-context-en.mmd before
++++ docs/diagrams/memory-context-en.mmd updated
+@@ -4,7 +4,7 @@
+     subgraph G0["KNOWLEDGE"]
+         M_RETEX["Verified lessons and accepted task<br/>Fresh sources and evidence"]
+         M_ADMIT["Admission · preview then apply<br/>Revision · event · token"]
+-        M_VERSION["Versioned project memory<br/>Experience / procedure · provenance"]
++        M_VERSION["Versioned project memory<br/>Experience / procedure · provenance<br/>A memory grants no authority"]
+         M_SELECT["Explicit task selection<br/>Version · digest · conditions"]
+         M_REPLACE["Replacement · withdrawal · import<br/>History and received contexts retained"]
+     end
+--- docs/diagrams/CONTRACT-MAP.md before
++++ docs/diagrams/CONTRACT-MAP.md updated
+@@ -113,3 +113,17 @@
+ - Candidat, originaux, contrôles, revue, jugement global et acceptation conservent leurs frontières ; AC-02 reste futur et non démarré. / Candidate, originals, checks, review, global judgment and acceptance retain their boundaries; AC-02 remains future and not started.
+ 
+ Cette relecture est celle de Codex dans la même session. Elle ne constitue pas une revue indépendante ni une qualification du moteur. / This is same-session Codex review, not independent review or engine qualification.
++
++## Précisions éditoriales du film / Film editorial limits
++
++`I_JOURNAL` rappelle que l’authenticité des octets ne certifie pas la vérité de leur
++contenu ; `M_VERSION` rappelle qu’une mémoire ne crée pas de droit. Ces limites
++n’ajoutent ni nœud ni capacité. Le raisonnement et les sources sont conservés dans
++le [chapitre d’introduction](../communication/linkedin-swarm-identite-memoire-20261023/article-v4-fr.md)
++et son [contrôle des sources](../communication/linkedin-swarm-identite-memoire-20261023/sources-v4-review.json).
++Les empreintes historiques du catalogue restent attribuées à leurs observations ;
++cette correction de libellés ne requalifie pas tous les fichiers Rust en évolution.
++
++`I_JOURNAL` separates authenticated bytes from truthful content; `M_VERSION`
++separates memory from authority. These editorial clarifications add no nodes or
++capability and do not renew historical runtime qualification claims.
+--- docs/diagrams/architecture-contracts.json before
++++ docs/diagrams/architecture-contracts.json updated
+@@ -788,13 +788,14 @@
+         {
+           "id": "I_JOURNAL",
+           "labels": {
+-            "fr": "Journal d’enrôlement signé\nHead · pins indépendants · révocation",
+-            "en": "Signed enrollment journal\nHead · independent pins · revocation"
++            "fr": "Journal d’enrôlement signé\nHead · pins indépendants · révocation\nSignature ≠ vérité du contenu",
++            "en": "Signed enrollment journal\nHead · independent pins · revocation\nSignature ≠ truth of content"
+           },
+           "source": "journal",
+           "group": "ENRÔLEMENT / ENROLLMENT",
+           "kind": "data",
+-          "shape": "rect"
++          "shape": "rect",
++          "editorial_limit": "Content origin/integrity does not establish semantic truth or grant authority. No graph relationship or runtime maturity changed."
+         },
+         {
+           "id": "I_AUTH",
+@@ -1201,13 +1202,14 @@
+         {
+           "id": "M_VERSION",
+           "labels": {
+-            "fr": "Mémoire de projet versionnée\nExpérience / procédure · provenance",
+-            "en": "Versioned project memory\nExperience / procedure · provenance"
++            "fr": "Mémoire de projet versionnée\nExpérience / procédure · provenance\nUn souvenir ne crée aucun droit",
++            "en": "Versioned project memory\nExperience / procedure · provenance\nA memory grants no authority"
+           },
+           "source": "mem",
+           "group": "CONNAISSANCES / KNOWLEDGE",
+           "kind": "data",
+-          "shape": "rect"
++          "shape": "rect",
++          "editorial_limit": "Content origin/integrity does not establish semantic truth or grant authority. No graph relationship or runtime maturity changed."
+         },
+         {
+           "id": "M_SELECT",
+--- docs/diagrams/README.md before
++++ docs/diagrams/README.md updated
+@@ -34,6 +34,19 @@
+ separate path, active by default and rejectable before reservation.
+ 
+ [Contrat FR](../ENGINE-ACCEPTANCE.md#contrôles-comme-preuves-dune-revue-humaine) · [EN contract](../en/ENGINE-ACCEPTANCE.md#checks-as-evidence-for-human-review).
++
++## Limites de confiance / Trust limits
++
++Les libellés du journal signé et de la mémoire versionnée explicitent deux limites :
++une signature ne prouve pas la vérité du contenu ; un souvenir ne crée aucun droit.
++Les cinq familles, tous leurs nœuds et toutes leurs relations sont conservés dans
++les deux langues. Les animations du [nouveau film](../communication/linkedin-swarm-identite-memoire-20261023/video-v2/README.md)
++sont des extraits explicatifs ; elles ne remplacent pas ces schémas complets.
++
++Signed-journal and versioned-memory labels retain two boundaries: signatures do
++not prove content truth, and memories grant no authority. All five bilingual
++families, nodes and relationships are preserved. The film explains selected flows;
++it does not replace these complete views or qualify the runtime.
+ 
+ ## Provenance et lecture / Provenance and interpretation
+ 
+--- docs/diagrams/identity-authority-en.mmd before
++++ docs/diagrams/identity-authority-en.mmd updated
+@@ -8,7 +8,7 @@
+     end
+     subgraph G1["ENROLLMENT"]
+         I_ENROLL["Request challenge · nonce<br/>Ed25519 signed response"]
+-        I_JOURNAL["Signed enrollment journal<br/>Head · independent pins · revocation"]
++        I_JOURNAL["Signed enrollment journal<br/>Head · independent pins · revocation<br/>Signature ≠ truth of content"]
+         I_AUTH["Current human authority<br/>Issuer · subject · scope · rights · dates"]
+     end
+     subgraph G2["CONFIGURATION"]
+--- docs/diagrams/identity-authority-fr.mmd before
++++ docs/diagrams/identity-authority-fr.mmd updated
+@@ -8,7 +8,7 @@
+     end
+     subgraph G1["ENRÔLEMENT"]
+         I_ENROLL["Challenge de demande · nonce<br/>Réponse signée Ed25519"]
+-        I_JOURNAL["Journal d’enrôlement signé<br/>Head · pins indépendants · révocation"]
++        I_JOURNAL["Journal d’enrôlement signé<br/>Head · pins indépendants · révocation<br/>Signature ≠ vérité du contenu"]
+         I_AUTH["Autorité humaine courante<br/>Issuer · sujet · portée · droits · dates"]
+     end
+     subgraph G2["CONFIGURATION"]
+--- docs/architecture/OVERVIEW.md before
++++ docs/architecture/OVERVIEW.md updated
+@@ -1,6 +1,9 @@
+ # Architecture interne de Swarm
+ 
+ [English](../en/ARCHITECTURE.md) · [README](../../README.md) · [Sources des schémas](../diagrams/CONTRACT-MAP.md)
++
++
++La mémoire informe le raisonnement sans créer de droits. Une signature peut établir une origine et une intégrité sous ses hypothèses de confiance ; elle ne prouve ni vérité ni innocuité du contenu. Les vues complètes gardent leurs objets, échanges et raccords ouverts.
+ 
+ Le **moteur déterministe Rust** est le cœur de Swarm. Les vues ci-dessous sont
+ reconstruites à partir des contrats internes, avec leurs objets, propriétaires,
+--- docs/en/ARCHITECTURE.md before
++++ docs/en/ARCHITECTURE.md updated
+@@ -1,6 +1,9 @@
+ # Swarm internal architecture
+ 
+ [Français](../architecture/OVERVIEW.md) · [README](../../README.en.md) · [Diagram sources](../diagrams/CONTRACT-MAP.md)
++
++
++Memory informs reasoning without granting authority. A signature can establish origin and integrity under its trust assumptions; it proves neither content truth nor safety. Complete views retain their objects, relationships and open integrations.
+ 
+ The **deterministic Rust engine** is Swarm’s core. These views are reconstructed
+ from internal contracts, retaining objects, owners, durable state and control
+--- docs/communication/linkedin-swarm-identite-memoire-20261023/README.md before
++++ docs/communication/linkedin-swarm-identite-memoire-20261023/README.md updated
+@@ -4,16 +4,20 @@
+ editorial draft, not published. No software behavior or shared contract changed;
+ an English article is not part of this French editorial request.
+ 
+-- **Version Word courante** : [article v4](Swarm_Article2_Identite_Memoire_v4.docx),
+-  révisé depuis la v3 avec le chapitre demandé sur la mémoire comme composante de
+-  l’identité fonctionnelle. Treize pages vérifiées visuellement : texte A4, cinq
+-  planches complètes en grand format et 18 références. [Texte v4](article-v4-fr.md),
+-  [contrôle des sources](sources-v4-review.json) et [revue liée aux octets](word-v4-review.json).
+-  La v2 utilisateur et la [v3 figée](Swarm_Article2_Identite_Memoire_v3.docx) sont
+-  conservées. / **Current Word**: French v4, thirteen visually checked pages,
+-  five complete views and dated public research, with the original files preserved.
++- **Version Word courante** : [article v5](Swarm_Article2_Identite_Memoire_v5.docx),
++  avec le texte et les 18 références conservés, cinq schémas complets actualisés,
++  puis une page d’accès au film. [Texte v5](article-v5-fr.md) et
++  [revue des médias et documents](media-refresh-review.json).
++  Les versions [v4](Swarm_Article2_Identite_Memoire_v4.docx) et
++  [v3](Swarm_Article2_Identite_Memoire_v3.docx) restent figées avec leurs preuves.
++  / **Current French Word**: v5, preserving the article, its 18 sources and five
++  complete technical views, with a film presentation page.
++- **Nouveau film** : [MP4 1 min 40](Swarm_Architecture_Film_v2.mp4), motion design
++  français, musique originale, sans voix ; [sous-titres FR](video-v2/Swarm_Architecture_Film_v2.fr.srt)
++  et [EN](video-v2/Swarm_Architecture_Film_v2.en.srt), [chapitres et sources](video-v2/README.md).
++  / French motion-design film with original instrumental audio and FR/EN subtitles.
+ - [Article](article-fr.md), avec références publiques.
+-- [Vidéo MP4](Swarm_Supervision_Identite_Memoire.mp4) : présentation animée de
++- [Vidéo MP4 précédente](Swarm_Supervision_Identite_Memoire.mp4) : présentation animée de
+   deux minutes, 1080p, sous-titres français intégrés, sans voix ni capture du
+   logiciel. [Sous-titres SRT](Swarm_Supervision_Identite_Memoire.srt) et
+   [chapitres et sources de la vidéo](video/README.md).

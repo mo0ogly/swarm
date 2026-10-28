@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "id": "native-reviewer-claim-candidate",
+  "inputs": [
+    ".claude/skills/*/SKILL.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "contracts/agent-wire-layout.v1.json",
+    "contracts/work-request-fields.v1.json",
+    "frontend/engine-settings/admin.js",
+    "internal/engine/testdata/*.json",
+    "locales/en.json",
+    "rust/Cargo.lock",
+    "rust/Cargo.toml",
+    "rust/crates/**/*",
+    "rust/crates/swarm-engine/config/*.json",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_native_review_inputs.py",
+    "tests/rust_native_review_preview.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_reviewer_claim_candidate.py",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/agent-workflows/check.py",
+    "tools/agent-workflows/templates/*.md",
+    "tools/agent-workflows/test_check.py",
+    "web/i18n-en.js",
+    "web/native-quotas.js",
+    "tools/verification/verify_native_profile.py",
+    "tools/verification/test_native_profile.py",
+    "tools/verification/native_no_go.py",
+    "tests/rust_native_reviewer.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r97",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "native-profile-collector-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/verification",
+        "-p",
+        "test_native_profile.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 5 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "shared-storage-borrow-modes",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "agent_storage_retry::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "3 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "candidate-ledger-current",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "reviewer_ledger_",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "original-expiry-current",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "reviewer_guard_requires_original_fresh_timestamp",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "original-context-coherence",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "review_inputs_reject_document_changed_since_control_observation",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "shared-planner-material",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "planning_run_material::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "2 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "new-versus-reserved-availability",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "reviewer_runtime_catalogue_digest_cooldown_and_executable_refuse_then_recover",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "owned-claim-and-child-gate",
+      "command": [
+        "python3",
+        "-c",
+        "import json,tempfile,subprocess,sys; from pathlib import Path; base=Path(tempfile.mkdtemp(prefix='native-review-claim-',dir='.cache')).resolve(); subprocess.run([sys.executable,'tools/verification/verify_native_profile.py','--output',str(base/'profile')],check=True); profile=json.loads((base/'profile/result.json').read_bytes()); subprocess.run([sys.executable,'tests/rust_reviewer_claim_candidate.py','--binary',profile['binary'],'--output',str(base/'sdk')],check=True); print('REPLAY_EVIDENCE '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS candidate reviewer atomic SDK claim without execution",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "sealed-exec-final-reserved-call",
+      "command": [
+        "python3",
+        "-c",
+        "import json,tempfile,subprocess,sys; from pathlib import Path; base=Path(tempfile.mkdtemp(prefix='native-review-claim-',dir='.cache')).resolve(); subprocess.run([sys.executable,'tools/verification/verify_native_profile.py','--output',str(base/'profile')],check=True); profile=json.loads((base/'profile/result.json').read_bytes()); subprocess.run([sys.executable,'tests/rust_reviewer_claim_candidate.py','--binary',profile['binary'],'--output',str(base/'sdk'),'--execute-reviewer','--final-reserved-call'],check=True); print('REPLAY_EVIDENCE '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS candidate reviewer sealed exec without result publication",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

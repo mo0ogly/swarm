@@ -1,0 +1,96 @@
+//go:build linux
+
+package engine
+
+import (
+	"bytes"
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+func summarySourceFixture(t *testing.T) (*Store, Work, map[string]any) {
+	t.Helper()
+	s := storeTest(t)
+	w := memorySeed(t, s, taskTest(t, s, createTest(t, s)))
+	q := map[string]any{"schema_version": 1, "work": w.ID, "task": "t1", "expected_revision": w.Revision, "dialogues": []DialogueRef{dialogueHits(w)[0].Ref}}
+	return s, w, q
+}
+
+func summarySourceCLI(t *testing.T, s *Store, q map[string]any) (int, []byte, string) {
+	t.Helper()
+	raw, err := json.Marshal(q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(t.TempDir(), "request.json")
+	if err := os.WriteFile(path, raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	var out, stderr bytes.Buffer
+	code := run([]string{"--root", s.root, "--json", "memory", "summary-source", "--input", path}, &out, &stderr)
+	return code, out.Bytes(), stderr.String()
+}
+
+func TestMemorySummarySourceCLIExportsExactSelectedSourcesWithoutMutation(t *testing.T) {
+	s, w, q := summarySourceFixture(t)
+	before := recoverySnapshotTest(t, s)
+	code, raw, stderr := summarySourceCLI(t, s, q)
+	if code != 0 {
+		t.Fatalf("source export unavailable: code=%d stderr=%s body=%s", code, stderr, raw)
+	}
+	var packet struct {
+		Schema  int    `json:"schema_version"`
+		Kind    string `json:"kind"`
+		Payload string `json:"payload"`
+		SHA256  string `json:"sha256"`
+	}
+	if err := json.Unmarshal(raw, &packet); err != nil {
+		t.Fatal(err)
+	}
+	if packet.Schema != 1 || packet.Kind != "swarm_summary_source_v1" || packet.SHA256 != hash([]byte(packet.Payload)) {
+		t.Fatal("source packet lacks exact-byte binding")
+	}
+	var value struct {
+		Scope struct {
+			Work string `json:"work"`
+			Task string `json:"task"`
+		} `json:"scope"`
+		Revision int    `json:"work_revision"`
+		Project  string `json:"project_sha256"`
+		Complete bool   `json:"provider_history_complete"`
+		Audience string `json:"audience"`
+		Sources  []struct {
+			ID     string `json:"id"`
+			Role   string `json:"role"`
+			Kind   string `json:"kind"`
+			Text   string `json:"text"`
+			SHA256 string `json:"sha256"`
+		} `json:"sources"`
+	}
+	if err := json.Unmarshal([]byte(packet.Payload), &value); err != nil {
+		t.Fatal(err)
+	}
+	if value.Scope.Work != w.ID || value.Scope.Task != "t1" || value.Revision != w.Revision || value.Project != hash([]byte(s.root)) || value.Complete || value.Audience != "local_operator" || len(value.Sources) != 3 {
+		t.Fatalf("wrong scope or completeness: %+v", value)
+	}
+	for _, source := range value.Sources {
+		if source.SHA256 != hash([]byte(source.Text)) {
+			t.Fatal("source text hash mismatch")
+		}
+	}
+	if value.Sources[0].ID != "current-task-snapshot" || value.Sources[0].Kind != "task_snapshot" || !strings.Contains(value.Sources[0].Text, "tests PASS") {
+		t.Fatal("current task snapshot missing")
+	}
+	if value.Sources[1].Text != dialogueHits(w)[0].Question || value.Sources[2].Text != dialogueHits(w)[0].Text || value.Sources[2].Role != "assistant" {
+		t.Fatal("selected question/answer not copied exactly")
+	}
+	if strings.Contains(packet.Payload, "Réponse 5") || strings.Contains(packet.Payload, "old-5") {
+		t.Fatal("unselected sibling exchange leaked")
+	}
+	if recoverySnapshotTest(t, s) != before {
+		t.Fatal("read-only source export mutated state")
+	}
+}

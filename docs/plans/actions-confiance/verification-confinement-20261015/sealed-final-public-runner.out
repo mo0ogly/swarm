@@ -1,0 +1,7 @@
+{"stage": "data", "exit_code": 0}
+{"stage": "public", "exit_code": 0}
+{"stage": "human", "exit_code": 0}
+{"stage": "services", "exit_code": 0}
+{"stage": "delegation", "exit_code": 0}
+{"stage": "step-up", "exit_code": 0}
+{"stage": "logout", "exit_code": 0}

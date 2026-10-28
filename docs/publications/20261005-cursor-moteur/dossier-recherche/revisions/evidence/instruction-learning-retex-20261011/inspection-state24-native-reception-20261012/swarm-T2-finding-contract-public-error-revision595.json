@@ -1,0 +1,6 @@
+{
+  "at": "2026-10-11T22:30:09.514472+00:00",
+  "error": "{'http': 409, 'public_error': {'error': 'révision périmée : attendue 595, courante 596 ; relire le travail', 'failure': {'code': 'revision_conflict', 'message': 'révision périmée : attendue 595, courante 596 ; relire le travail', 'retryable': True}}}",
+  "event_id": "T2-finding-contract-proof-repair-4780936607d7473e8aa4333ab26a989f",
+  "condition": "Inspect public state before any further operation; do not replay an unknown outcome"
+}

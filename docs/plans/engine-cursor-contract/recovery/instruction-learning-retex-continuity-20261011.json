@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T10:37:03.756228+00:00",
+  "parent": "instruction-learning-retex-20261011.patch",
+  "parent_sha256": "6c202d64b1261082d78842c3ccc5d554437135c862197f0b4edaa30929aae13b",
+  "preimage_tree": "4462fa8a446afa53cb0125ba5524b8a37ceaf2e4",
+  "patch": "docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-continuity-20261011.patch",
+  "sha256": "459949e903fdc72b155cdca2bdd06a0a4a6b2cd7eeaeae4f87b67527eabe373c",
+  "bytes": 10408,
+  "purpose": "After the final historical-only acknowledgement, emit a current receipt so the IA owner can reassess; no engine completion decision. Tests consume actual admitted IDs and retain retry-budget guards.",
+  "limits": "Full suite initially exposed the obsolete mixed-input fixture, retained as FAIL; corrected protocol/race/full suite must pass before install."
+}

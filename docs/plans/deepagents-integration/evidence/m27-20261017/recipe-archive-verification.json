@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "at": "2026-10-17T12:59:30.696959+00:00",
+  "artifact": "recipe-bundle.zip",
+  "sha256": "dae5be2c59b5c484407f602ea9a166f5a7915dbc0bbefb076ff76bff0905a738",
+  "schema_version": 1,
+  "work_schema": 1,
+  "event_count": 6,
+  "work_revision": 6,
+  "files": {
+    "proof.txt": "c1cda26362828b69266512052b97cb3729e3b052e4ade47c0a1e3383defe73c7"
+  },
+  "missing": [],
+  "scope": "Synthetic test fixture archive only, not user acceptance or identity authority"
+}

@@ -114,3 +114,51 @@ aucun document et ne déclenche aucune relance automatique. Corriger la cause
 avant un nouvel envoi ; l'échange et sa consommation restent dans l'historique.
 Les anciens rejets génériques ne peuvent pas être diagnostiqués rétroactivement
 si la réponse originale n'a pas été conservée.
+
+## Délai du dialogue de préparation
+
+Administration → Dialogue de préparation expose le délai par défaut et le plafond,
+en secondes. Les deux valeurs sont modifiables, prévisualisées avant sauvegarde,
+persistées avec révision, auteur et motif, puis consultables dans l’historique.
+Un retour à un ancien réglage applique ses valeurs dans une nouvelle révision.
+CLI : `swarm run-limits preparation show|history|preview|apply` ; CLI et API
+authentifiée utilisent la même validation.
+
+Les valeurs initiales sont dans `config/preparation-timeout.json` ; aucun plafond
+de politique de 120, 300 ou 600 secondes ne reste dans le runtime Go. Les valeurs
+positives doivent respecter délai ≤ plafond et être représentables par une durée
+Go. La politique s’applique aux nouveaux échanges de préparation ; chacun fige
+ses deux valeurs. Les appels existants conservent leur délai d’origine. Arrêt
+manuel et absence de relance automatique sont conservés. Les délais des workers
+et des revues restent des réglages distincts. Le binaire corrigé doit être actif
+pour utiliser ces contrôles.
+
+### Sources dans la préparation manuelle Rust
+
+Le bouton Sources ouvre la recherche de fichiers et l’aperçu d’un extrait.
+Saisir explicitement la première et la dernière ligne, lire puis joindre : le
+serveur relit le fichier et compare l’empreinte complète avant enregistrement.
+L’extrait reste consultable même si le fichier change/disparaît. Le retrait est
+possible sous une politique devenue restrictive. Joindre ou retirer invalide
+l’adoption du brief et le verdict ; les documents restent conservés et doivent
+être réexaminés. Aucun appel IA ne démarre par ces opérations.
+
+Le lien Admin mène aux réglages documentaires du groupe Préparations et documents,
+avec aides et contexte IA des douze paramètres. Les résultats limités sont signalés ;
+un refus de lecture n’est jamais affiché comme une liste vide réussie. Les limites
+numériques peuvent être null (sans plafond) ou zéro selon le contrat décrit.
+Une ancienne installation doit adopter explicitement les nouveaux réglages.
+
+### Historique IA dans la préparation Rust
+
+La vue de conversation existante affiche les échanges conservés, leur provenance
+et leur fraîcheur. Elle permet de lire les propositions, sans envoi, arrêt ou
+adoption implicite ; les prompts privés restent exclus. Un échange actif garde
+un refus explicite tant que son superviseur n’est pas porté. Cette lecture ne
+termine aucun appel et ne libère aucune réservation. Voir [référence](REFERENCE.md#historique-des-échanges-de-préparation--rust).
+
+Pilote local : dialogue API texte avec arrêt et proposition explicitement
+comparée, installé et vérifié ; voir `docs/plans/migration-rust/PREPARATION-AI-CALLS-20261026.md`.
+Le lecteur historique reste disponible lorsque la politique d'appel n'est pas
+configurée. Le formulaire ne doit pas interpréter cette absence comme une valeur
+par défaut ni une autorisation de transmettre les documents.

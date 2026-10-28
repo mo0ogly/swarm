@@ -1,0 +1,55 @@
+{
+  "at": "2026-10-12T15:22:02.114271+00:00",
+  "bundle": {
+    "at": "2026-10-12T15:07:42.834285+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-inputs-binary-preflight-inspection-20261012.bundle",
+    "sha256": "cab3149e01c275813198878dcb6c616f3bc35670a3434c02ca1805016542128a",
+    "commit": "9985c3d40d810d4caf5c918ed93b81f9b3d54ce1",
+    "ref": "refs/heads/operator-inputs",
+    "input_files": 142,
+    "manifest_sha256": "2b88ddd4c3fc0f340646df67b8e4bbbddcf269d00ed48a3431893902003cb974",
+    "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/binary-preflight-inspection-inputs-xomcl_3j",
+    "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/binary-preflight-inspection-import-xspy41uu",
+    "old139_originals_preserved": true,
+    "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+    "limits": "Qualified read-only binary recovery inventory extends all 139 originals unchanged. Passed attributed control receipts and exact candidate retained; ordinary binary text review remains refused. Schema31 unchanged, no mutation or paid call from inspection. No visual review or acceptance. Preserve every prior input and history; deferred27 excluded. Native future tasks must verify matching preimages, preserve their own manifest and qualify the cumulative candidate; operator deployment is not native acceptance or autonomous recovery."
+  },
+  "updates": [
+    {
+      "task": "plan-ca937edf4e-T4",
+      "revision": 807,
+      "operator_base_sha256": "c7164b6c16a7335e1379241de214bbecd208c9bf82268f94787afd888db1125a",
+      "instruction_bytes": 25195,
+      "criteria_dependencies_attempts_models_budget_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "revision": 808,
+      "operator_base_sha256": "4cd9497f1e586eff60380c95495ef70083fc7c6eafac92fee9fe346ee3e95151",
+      "instruction_bytes": 30452,
+      "criteria_dependencies_attempts_models_budget_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "revision": 809,
+      "operator_base_sha256": "f40c683a05673f7804227b9b41d5c3495d6e70f39f53fbdb5c41d7f9fa9da4ef",
+      "instruction_bytes": 25443,
+      "criteria_dependencies_attempts_models_budget_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "revision": 810,
+      "operator_base_sha256": "a88f34e0272c65798fa06a1c064fcc170954ea28e9d205a8fdc7be0f2876053a",
+      "instruction_bytes": 24088,
+      "criteria_dependencies_attempts_models_budget_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T8",
+      "revision": 811,
+      "operator_base_sha256": "b322d5aead0171dce1aa2e94fe9e3049b6f996d38605055dbee66dd97d4704b8",
+      "instruction_bytes": 18574,
+      "criteria_dependencies_attempts_models_budget_learning_preserved": true
+    }
+  ],
+  "limit": "Future task inputs publicly saved, not yet received or executed by a worker; T3 retained result, policies and active control contract unchanged."
+}

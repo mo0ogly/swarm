@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-11T20:10:04.729100+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-feedback-docs-20261011.bundle",
+  "sha256": "bf0f7da73ff6bf08cec49d87e4e07203ba30fede0c3773a080d7efe4ad311548",
+  "commit": "04823fb8f3c4e6f151b85d3dc500826267f5fb77",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 101,
+  "manifest_sha256": "0b2ef7fb75408465732b34c345acbecc93bf69cb4a21d46252612e5bd74945d0",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/feedback-docs-inputs-5bx4qh76",
+  "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/feedback-docs-inputs-import-b1m5nvg3",
+  "old98_originals_preserved": true,
+  "added_documentation": [
+    "docs/architecture/CONTROLS-AND-FEEDBACK.md",
+    "docs/en/CONTROLS-AND-FEEDBACK.md",
+    "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261011-controls-feedback-agent-quality.md"
+  ],
+  "verification": "PASS isolated import and every original byte/hash, new3 whole document bytes verified",
+  "limits": "Documentation-only extension. No new engine code/qualification/acceptance or receipt by future native agents inferred."
+}

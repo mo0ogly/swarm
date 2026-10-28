@@ -1,0 +1,24 @@
+
+> test
+> node tests/pilot_graph_test.cjs && node tests/graph_layout_cache_test.cjs && node tests/product_graph_test.cjs && node tests/mission_overview_test.cjs && node tests/cockpit_refresh_test.cjs && node tests/audit_acceptance_runner_test.cjs && node tests/review_recovery_test.cjs && node tests/reported_model_test.cjs && node tests/ai_connections_response_test.cjs && node tests/attempt_ledger_test.cjs && node tests/recovery_evidence_test.cjs && npm run test:i18n
+
+PASS: shared branches, nested folds, reveal, identity-safe preferences
+PASS: multiple roots, topology growth and removed node identity
+PASS: deterministic reveal, shorter path and removed target
+PASS: orchestrator, delegated responsibility, independent reviewer and honest missing-role state
+PASS graph geometry cache: exact dagre nodes/routes; topology/orientation/dimension invalidation; corrupt/unavailable storage fallback
+PASS product hierarchy: canonical mappings, shared tasks, external links, evidence freshness, plan revisions, legacy and 300 stories
+PASS: décisions de pilotage, coordination A8, triplet factuel, diagnostic Q3 et supervision Q5
+PASS: visible refresh, hidden-tab suspension, immediate return, timer and listener cleanup
+PASS: audit acceptance runner fails closed for DOM, Go, zero tests and unknown cases
+PASS review recovery action follows engine freshness and task state
+PASS requested and reported models remain separate in FR/EN; missing observation remains unknown
+PASS JSON connection replies use real newlines; plain text and literal backslashes are preserved
+PASS attempt histories, missing metrics/costs and partial measurements in FR/EN
+PASS spending modal returns focus to the refreshed trigger
+PASS FR/EN recovery delta, changed/unknown inputs and remaining criteria without approval
+
+> test:i18n
+> node tests/i18n_test.cjs
+
+PASS i18n locale, fallback, interpolation, engine formats and catalogue parity

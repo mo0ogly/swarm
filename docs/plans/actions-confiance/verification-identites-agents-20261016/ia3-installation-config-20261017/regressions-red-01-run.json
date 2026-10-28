@@ -1,0 +1,34 @@
+{
+  "packages": {
+    "swarm.local/companion/internal/enrollmentconfig": 0
+  },
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/enrollmentconfig",
+    "-run",
+    "TestConfigStore(RejectsPermissionsChangedAfterOpen|PreviewRejectsUnrepresentableClock|RejectsRestrictiveUmaskWithoutReplacingConfig)$",
+    "-count=1",
+    "-timeout=0"
+  ],
+  "exit": 1,
+  "start": "2026-10-17T12:42:44.447804+00:00",
+  "end": "2026-10-17T12:42:45.205958+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 3,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [
+      "TestConfigStorePreviewRejectsUnrepresentableClock",
+      "TestConfigStoreRejectsPermissionsChangedAfterOpen",
+      "TestConfigStoreRejectsRestrictiveUmaskWithoutReplacingConfig"
+    ],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 8
+}

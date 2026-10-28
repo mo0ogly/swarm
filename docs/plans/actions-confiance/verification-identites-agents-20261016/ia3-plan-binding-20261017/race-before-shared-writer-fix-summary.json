@@ -1,0 +1,12 @@
+{
+  "exit_code": 1,
+  "runs": 83,
+  "passes": 82,
+  "fails": [
+    "TestAgentIdentityPlanWaitReadsCommittedContract",
+    null
+  ],
+  "skips": [],
+  "changed_inputs": [],
+  "stderr": ""
+}

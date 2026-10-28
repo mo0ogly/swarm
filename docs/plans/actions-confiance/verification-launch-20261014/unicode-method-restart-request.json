@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "event_id": "unicode-inspection-restart-1edabb81d92e",
+  "expected_revision": 333,
+  "task_id": "plan-68b50cc82e-T2",
+  "confirm_review_error_repair": true,
+  "reason": "Corrected engine schema/parser mismatch: inspection contract1 counts 3-240 Unicode characters and diagnoses UTF-8 bytes separately; historical contract0 and original R17 remain immutable. New partial instructions explain omitted metadata diff. Full new review, no reused opinions, no refund, same candidate and controls."
+}

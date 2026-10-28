@@ -1,0 +1,16 @@
+=== RUN   TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts
+=== RUN   TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/1
+=== RUN   TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/2
+=== RUN   TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/3
+=== RUN   TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/4
+=== RUN   TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/5
+--- PASS: TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts (18.87s)
+    --- PASS: TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/1 (3.90s)
+    --- PASS: TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/2 (3.78s)
+    --- PASS: TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/3 (3.51s)
+    --- PASS: TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/4 (3.67s)
+    --- PASS: TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/5 (3.99s)
+=== RUN   TestManagedFragmentSelectionSchemaBindsOriginalReference
+--- PASS: TestManagedFragmentSelectionSchemaBindsOriginalReference (1.22s)
+PASS
+ok  	swarm.local/companion/internal/engine	21.229s

@@ -1,0 +1,159 @@
+{
+  "status": "PASS",
+  "root": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw1-preflight/store",
+  "work": "w-630ae432039dbb236949d842",
+  "checks": [
+    {
+      "language": "fr",
+      "theme": "etat",
+      "calls": 7,
+      "keyboard": true,
+      "escape": true,
+      "focus_restored": true,
+      "mobile_no_overflow": true
+    },
+    {
+      "language": "fr",
+      "theme": "sombre",
+      "calls": 7,
+      "keyboard": true,
+      "escape": true,
+      "focus_restored": true,
+      "mobile_no_overflow": true
+    },
+    {
+      "language": "en",
+      "theme": "etat",
+      "calls": 7,
+      "keyboard": true,
+      "escape": true,
+      "focus_restored": true,
+      "mobile_no_overflow": true
+    },
+    {
+      "language": "en",
+      "theme": "sombre",
+      "calls": 7,
+      "keyboard": true,
+      "escape": true,
+      "focus_restored": true,
+      "mobile_no_overflow": true
+    }
+  ],
+  "failures": [],
+  "calls": [
+    {
+      "id": "planning/1bc83f0772b4497f8ea3bda09c8627e9",
+      "record_type": "planning_reservation",
+      "kind": "planner",
+      "role": "planner",
+      "scope": "root",
+      "state": "estimated",
+      "registered_at": "2026-10-13T19:22:00.422573315Z",
+      "usage": null
+    },
+    {
+      "id": "agent/63f69a2552004043a6b682ef4c2f8a4d",
+      "record_type": "producer_attempt",
+      "kind": "worker",
+      "role": "worker",
+      "scope": "root",
+      "task": "recover-number",
+      "attempt": "a-95de4baab71f0d8f98a41f03",
+      "provider": "fault-fixture",
+      "state": "completed",
+      "registered_at": "2026-10-13T19:22:57.753224483Z",
+      "usage": null
+    },
+    {
+      "id": "planning/review-04d276b724b90b6334467e39",
+      "record_type": "planning_reservation",
+      "kind": "reviewer",
+      "role": "reviewer",
+      "scope": "reviewer",
+      "state": "finished",
+      "registered_at": "2026-10-13T19:24:33.974808017Z",
+      "usage": {
+        "cached_input_tokens": 0,
+        "input_tokens": 16292,
+        "output_tokens": 272,
+        "source": "événement fournisseur turn.completed",
+        "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+        "at": "2026-10-13T19:24:44.445599872Z"
+      }
+    },
+    {
+      "id": "planning/planning-claim-2d7c4ad7abf03e4d291d009e",
+      "record_type": "planning_reservation",
+      "kind": "planner",
+      "role": "planner",
+      "scope": "root",
+      "state": "finished",
+      "registered_at": "2026-10-13T19:24:45.82239301Z",
+      "usage": {
+        "cached_input_tokens": 0,
+        "input_tokens": 21531,
+        "output_tokens": 537,
+        "source": "événement fournisseur turn.completed",
+        "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+        "at": "2026-10-13T19:24:59.757744536Z"
+      }
+    },
+    {
+      "id": "agent/auto-b283e98ca4f93a1a4c2b",
+      "record_type": "producer_attempt",
+      "kind": "worker",
+      "role": "worker",
+      "scope": "root",
+      "task": "recover-number",
+      "attempt": "a-6b4e1cdcc6259e87118114e7",
+      "provider": "codex",
+      "requested_model": "gpt-5.6-sol",
+      "state": "completed",
+      "registered_at": "2026-10-13T19:25:01.785391403Z",
+      "usage": {
+        "cached_input_tokens": 521088,
+        "input_tokens": 559548,
+        "output_tokens": 11695,
+        "source": "événement fournisseur turn.completed",
+        "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+        "at": "2026-10-13T19:27:48.163746869Z"
+      }
+    },
+    {
+      "id": "planning/review-42de5ab5e3e936f7eb9140b7",
+      "record_type": "planning_reservation",
+      "kind": "reviewer",
+      "role": "reviewer",
+      "scope": "reviewer",
+      "state": "finished",
+      "registered_at": "2026-10-13T19:27:49.836530442Z",
+      "usage": {
+        "cached_input_tokens": 0,
+        "input_tokens": 20061,
+        "output_tokens": 265,
+        "source": "événement fournisseur turn.completed",
+        "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+        "at": "2026-10-13T19:27:58.610979872Z"
+      }
+    },
+    {
+      "id": "planning/planning-claim-621abea550179a234aa8691a",
+      "record_type": "planning_reservation",
+      "kind": "planner",
+      "role": "planner",
+      "scope": "root",
+      "state": "finished",
+      "registered_at": "2026-10-13T19:27:59.779964019Z",
+      "usage": {
+        "cached_input_tokens": 0,
+        "input_tokens": 23429,
+        "output_tokens": 365,
+        "source": "événement fournisseur turn.completed",
+        "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+        "at": "2026-10-13T19:28:15.615606082Z"
+      }
+    }
+  ],
+  "binary": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-retex-final-candidate"
+}

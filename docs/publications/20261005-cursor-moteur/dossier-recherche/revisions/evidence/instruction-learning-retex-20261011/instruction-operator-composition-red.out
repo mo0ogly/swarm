@@ -1,0 +1,7 @@
+# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]
+internal/engine/instruction_revision_operator_test.go:16:15: assignment mismatch: 2 variables but s.apply returns 1 value
+internal/engine/instruction_revision_operator_test.go:16:23: cannot use w.ID (variable of type string) as *Work value in argument to s.apply
+internal/engine/instruction_revision_operator_test.go:27:15: assignment mismatch: 2 variables but s.apply returns 1 value
+internal/engine/instruction_revision_operator_test.go:27:23: cannot use w.ID (variable of type string) as *Work value in argument to s.apply
+FAIL	swarm.local/companion/internal/engine [build failed]
+FAIL

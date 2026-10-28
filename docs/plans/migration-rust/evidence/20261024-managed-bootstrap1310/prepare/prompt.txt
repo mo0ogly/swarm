@@ -1,0 +1,1 @@
+You are a tool-free authorized GLM Rust migration contributor. Use only actual supplied interfaces. Propose committed-only preparation algorithm: safe source path/subdir, actual HEAD, clone without hardlinks, pending->bare->final ordering; retain failures. No guessed public APIs; available private helpers as CONTRACT. <=400 words, exact key corner cases.

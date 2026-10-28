@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-12T07:40:53.962555+00:00",
+  "revision": 641,
+  "global_paused": false,
+  "planning_paused": false,
+  "task_status": "blocked",
+  "blocker": "contexte de revue supérieur à 192 Kio ; aucun contenu tronqué, découper le livrable : tâche plan-ca937edf4e-T1 ; fragments : préparation des fragments périmée",
+  "current_review": null,
+  "calls": 73,
+  "activations": 58,
+  "root": [
+    {
+      "id": "root",
+      "state": "ready",
+      "holder": null,
+      "failure": null
+    }
+  ],
+  "cause": "operator resumed global pause only, leaving planning pause true",
+  "effect": "planning resume applied638; root activation58 observed; native review pending",
+  "limit": "No acceptance and no fresh independent review observed yet; counters and all original reviews preserved."
+}

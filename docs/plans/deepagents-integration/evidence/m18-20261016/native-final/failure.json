@@ -1,0 +1,7 @@
+{
+  "error": "Traceback (most recent call last):\n  File \"/home/fpizzi/Documents/ChatGPT/swarm/tests/memory_summary_source.py\", line 94, in main\n    opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))\n                                                                          ^^^^\nUnboundLocalError: cannot access local variable 'http' where it is not associated with a value\n",
+  "root": "/tmp/swarm-summary-source-khd7sxgj",
+  "checks": [
+    "Two actual brainstorm launches persist selected question/answer references; CLI exports exact scoped sources"
+  ]
+}

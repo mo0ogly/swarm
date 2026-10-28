@@ -1,18 +1,17 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.26-bookworm AS build
-ARG SWARM_VERSION=devel
-ARG SWARM_COMMIT=
-ARG SWARM_MODIFIED=unknown
-ARG SWARM_BUILD_DATE=
+FROM rust:1.96-bookworm AS build
 WORKDIR /src
-COPY go.mod go.sum ./
-RUN go mod download
 COPY . .
-RUN SWARM_VERSION="$SWARM_VERSION" \
-    SWARM_COMMIT="$SWARM_COMMIT" \
-    SWARM_MODIFIED="$SWARM_MODIFIED" \
-    SWARM_BUILD_DATE="$SWARM_BUILD_DATE" \
-    sh ./build.sh /out/swarm
+# Default product features only; no fixtures or Go fallback. SQLite uses the
+# checked-in .cargo/config.toml FILESTAT capability. Cargo.lock pins dependencies.
+# A source archive has no Git attestation: absent metadata stays devel/unknown.
+ARG SWARM_NATIVE_BUILD_METADATA
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/src/rust/target \
+    if [ -n "$SWARM_NATIVE_BUILD_METADATA" ]; then export SWARM_NATIVE_BUILD_METADATA; else unset SWARM_NATIVE_BUILD_METADATA; fi; \
+    cargo build --locked --manifest-path rust/Cargo.toml --release -p swarm-cli --bin swarm-rust \
+    && install -D -m 755 rust/target/release/swarm-rust /out/swarm \
+    && /out/swarm version --json
 
 FROM node:22-bookworm-slim AS runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \

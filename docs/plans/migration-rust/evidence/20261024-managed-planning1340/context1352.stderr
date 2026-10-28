@@ -1,0 +1,8 @@
+   Compiling swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+    Finished `test` profile [unoptimized] target(s) in 31.08s
+     Running unittests src/lib.rs (.cache/rust-native-version846-target/debug/deps/swarm_engine-b6aa09cf62374457)
+
+thread 'planning_scope_context::tests::managed_candidate_changes_the_scoped_contract_without_private_paths' (3672052) panicked at crates/swarm-engine/src/planning_scope_context.rs:160:53:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p swarm-engine --lib`

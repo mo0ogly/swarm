@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-11T21:49:26.875157+00:00",
+  "cause": "The operator HTTP client had a fixed40s mutation timeout while native recovery synchronously waits for controls and independent review",
+  "preimage_sha256": "57ee19257f237c329e412033fd009a4864ae53089ed984c481c371d4eb0cf754",
+  "postimage_sha256": "3f12380591b9f8d9b4d6b5e0ca1dd715cc8af8bd5c17f18066a0de9368d9828b",
+  "contract": "post timeout is an explicit optional caller parameter; absent value waits for server operation. Public snapshot and event establish applied effect after any transport failure. Provider/motor limits unchanged. No original call replayed.",
+  "verification": "PASS AST optional None default, fixed40s removed from mutation; no mutation sent for this verification",
+  "limits": "Operator client correction, not asynchronous server implementation; current native review remains unchanged."
+}

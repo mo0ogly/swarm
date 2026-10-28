@@ -1,0 +1,22 @@
+{
+  "before": "6ee1ccf5d75428e02a8d95b47e0b92c5cbda61ed",
+  "after": "48a3f72d50580207a7227eed0e2ffa68636d9191",
+  "applied_tree": "48a3f72d50580207a7227eed0e2ffa68636d9191",
+  "sha256": "1d9552c7fd4571c7d9e47170cfa27918f333e8cd163a7f1ae7420cb30d039b84",
+  "extensions": [
+    {
+      "path": "internal/engine/managed_review_preflight_retry.go",
+      "blob": "3016ce3b9d28cfc97fc157f40a1b090e299aebc0",
+      "sha256": "06daa8d5cfd3f5f48b48d1ce19fbb3109813fc585187249a5e541fbae20776b1",
+      "origin": "HEAD and qualified11 byte-identical"
+    }
+  ],
+  "paths": [
+    "internal/engine/managed_review_sources.go",
+    "internal/engine/managed_review_preflight_retry.go",
+    "internal/engine/recovered_result.go",
+    "internal/engine/recovered_result_source_capacity_test.go",
+    "docs/ATTEMPT-RECOVERY.md",
+    "docs/en/ATTEMPT-RECOVERY.md"
+  ]
+}

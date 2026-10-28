@@ -1,0 +1,17 @@
+{
+  "revision": 194,
+  "task_id": "plan-68b50cc82e-T2",
+  "review_id": "review-a533e395b07d47d75811ebad",
+  "candidate_commit": "671336f40f5e33279a61898131abab2809990c77",
+  "state": "method_restart_ready",
+  "cause": "inspection de fragment : defect without unique failed artifact",
+  "next_step": "Méthode ou contrat de citation modifié : nouvelle revue complète du même candidat ; anciens avis et appels conservés, aucune observation réutilisée.",
+  "actor": "operator",
+  "inspections_remaining": 3,
+  "inspections_reusable": 0,
+  "calls_required": 5,
+  "calls_available": 28,
+  "calls_missing": 0,
+  "minimum_review_limit": 41,
+  "timeout_seconds": 0
+}

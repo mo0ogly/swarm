@@ -1,0 +1,19 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-race",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentity(Plan|Registry|Channel|Runtime)",
+    "-count=1",
+    "-timeout",
+    "120s"
+  ],
+  "start": "2026-10-17T07:45:44.506107+00:00",
+  "end": "2026-10-17T07:47:58.666035+00:00",
+  "exit_code": 1,
+  "input_files": 1055,
+  "changed_inputs": []
+}

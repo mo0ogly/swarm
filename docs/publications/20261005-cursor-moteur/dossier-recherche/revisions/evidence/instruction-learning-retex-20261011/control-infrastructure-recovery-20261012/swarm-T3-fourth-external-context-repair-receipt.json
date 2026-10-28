@@ -1,0 +1,31 @@
+{
+  "at": "2026-10-12T11:49:04.442542+00:00",
+  "actor": "operator external repair after confirmed process end",
+  "attempt": "a-cd4afa7836a7687fe0e466c5",
+  "before": {
+    "docs/plan-ca937edf4e-T3.delivery.json": "361f63a030b489789ad004c0e38f6e98ecc8632c4bd41c40eccea8737130aee9",
+    "docs/plan-ca937edf4e-T3.review-context.json": "abdd7af0c592992a5b0c14a252bcbefca5e6deff760fac64e94cb51a6394a475"
+  },
+  "after": {
+    "docs/plan-ca937edf4e-T3.delivery.json": "5809f15b0263efff344804cb32b512aeb89a32e8e31bf0d8245139631b49fe18",
+    "docs/plan-ca937edf4e-T3.review-context.json": "4362efe685ddcd06df761d3368c1bc08ea5d359bbdb59f4faac7b99a721af898"
+  },
+  "originals_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-fourth-original-context-declarations",
+  "source_files": 9,
+  "source_bytes": 121127,
+  "omitted_redundant_additional_paths": [
+    "docs/architecture/CURSOR-ENGINE-CONTRACT.md",
+    "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+    "docs/en/CURSOR-ENGINE-CONTRACT.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-002.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/planning_runner.go"
+  ],
+  "all_omitted_originals_still_unchanged_in_complete_candidate_diff": true,
+  "code_or_original_evidence_content_changed": false,
+  "claims_or_criteria_changed": false,
+  "limits": "Additional source declaration curated; every omitted original remains in the full candidate diff, including complete new JSON parts. Coordinated review must cover the whole candidate; no truncation or acceptance fabricated."
+}

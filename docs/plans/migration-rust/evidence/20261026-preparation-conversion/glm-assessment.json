@@ -1,0 +1,17 @@
+{
+  "transport": "SSE",
+  "completed_responses": 2,
+  "reported_requested_model": "glm-5.2",
+  "backend_version_established": false,
+  "declared_total_tokens": 93104,
+  "analysis_seconds": 328.023,
+  "review_seconds": 1002.72,
+  "automatic_retries": 0,
+  "D1": "Static prewrite families missing from UI unlock: reproduced111 and fixed112. Cycle inference disproved by provided-later validator.",
+  "D2": "Append producer inspected: append-only assumption valid; no unproven fix.",
+  "D3": "Projection actually rereads source catalogue; real changed method fixture refusal added.",
+  "D4": "Existing-work draft editing intentionally retained; conversion explicitly unported.",
+  "D5_D6": "No reachable user defect established under hidden sections/modal navigation guards.",
+  "D7_D8": "Repeated optional warning / malformed response diagnostics retained for a later bounded UX increment, preserving conservative replay.",
+  "limits": "Static supplied-context review; later Witness/DFS/docs changes reviewed by principal with source-bound tests, not independent final acceptance."
+}

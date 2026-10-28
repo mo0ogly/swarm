@@ -1,0 +1,11 @@
+{"state": "RUN", "case": "turn-0", "phase": "waiting-bound"}
+STAGE awaiting-two-task-provider-0
+PASS two-task-cycle-1-settles-once-with-durable-original
+{"state": "RUN", "case": "turn-1", "phase": "waiting-bound"}
+PASS two-task-paused-reopen-retains-first-completion
+STAGE awaiting-two-task-provider-1
+PASS two-task-cycle-2-settles-once-with-durable-original
+{"state": "RUN", "case": "final-paused", "phase": "waiting-bound"}
+PASS two-task-final-reopen-has-no-third-agent-or-fake-acceptance
+NATIVE_TWO_TASK_PASS
+REPLAY_EVIDENCE /home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm

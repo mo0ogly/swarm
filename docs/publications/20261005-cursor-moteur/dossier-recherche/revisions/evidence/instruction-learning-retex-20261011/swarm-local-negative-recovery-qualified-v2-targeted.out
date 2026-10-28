@@ -1,0 +1,101 @@
+=== RUN   TestFragmentRetryFeedbackIsDiagnosticOnly
+--- PASS: TestFragmentRetryFeedbackIsDiagnosticOnly (0.05s)
+=== RUN   TestFragmentRetryFeedbackRejectsInventedOperatorInCompactReply
+--- PASS: TestFragmentRetryFeedbackRejectsInventedOperatorInCompactReply (0.03s)
+=== RUN   TestFragmentRetryFeedbackKeepsValidMidlineAndDiagnosesEscapedTab
+--- PASS: TestFragmentRetryFeedbackKeepsValidMidlineAndDiagnosesEscapedTab (0.03s)
+=== RUN   TestManagedFragmentResumePreservesUnknownQuestions
+    managed_review_fragment_questions_test.go:99: sizes 164551 168169 21899 parts 1
+--- PASS: TestManagedFragmentResumePreservesUnknownQuestions (0.73s)
+=== RUN   TestManagedFragmentInspectionNeverAcceptsTask
+--- PASS: TestManagedFragmentInspectionNeverAcceptsTask (0.00s)
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/candidate
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/context
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/packet
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/missing
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/duplicate
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/digest
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/invented
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/needs
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/accepted
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/oversized
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/unknown-field
+--- PASS: TestManagedFragmentInspectionRejectsFalseProof (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/candidate (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/context (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/packet (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/missing (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/duplicate (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/digest (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/invented (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/needs (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/accepted (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/oversized (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/unknown-field (0.00s)
+=== RUN   TestManagedFragmentFinalOrphanReservationResume
+=== RUN   TestManagedFragmentFinalOrphanReservationResume/available
+    managed_review_fragment_resume_test.go:19: sizes 164551 168163 21899 parts 1
+=== RUN   TestManagedFragmentFinalOrphanReservationResume/exhausted
+    managed_review_fragment_resume_test.go:19: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentFinalOrphanReservationResume (2.02s)
+    --- PASS: TestManagedFragmentFinalOrphanReservationResume/available (1.10s)
+    --- PASS: TestManagedFragmentFinalOrphanReservationResume/exhausted (0.92s)
+=== RUN   TestManagedFragmentDurableVerdictResumesWithoutBudget
+    managed_review_fragment_resume_test.go:67: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentDurableVerdictResumesWithoutBudget (4.02s)
+=== RUN   TestManagedFragmentInspectionOrphanResume
+    managed_review_fragment_resume_test.go:108: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentInspectionOrphanResume (0.61s)
+=== RUN   TestManagedFragmentResumeRejectsInvalidDeadline
+    managed_review_fragment_resume_test.go:141: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentResumeRejectsInvalidDeadline (0.57s)
+=== RUN   TestManagedLocalNegativeTransportRecoveryRetainsOpinionAndConsumption
+    managed_review_local_negative_resume_test.go:14: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedLocalNegativeTransportRecoveryRetainsOpinionAndConsumption (2.67s)
+=== RUN   TestFragmentRetryFeedbackSeparatesNeedsMismatchFromWrongQuote
+--- PASS: TestFragmentRetryFeedbackSeparatesNeedsMismatchFromWrongQuote (0.02s)
+=== RUN   TestReviewRecoveryPreviewBudgetAndNoMutation
+    managed_review_recovery_test.go:15: sizes 164551 168167 21899 parts 1
+--- PASS: TestReviewRecoveryPreviewBudgetAndNoMutation (0.67s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.45s)
+=== RUN   TestFragmentRetryFeedbackDiagnosesDuplicateDefects
+--- PASS: TestFragmentRetryFeedbackDiagnosesDuplicateDefects (0.02s)
+=== RUN   TestPlanningAcknowledgedProtocolIncidentRemainsRecoverableWithFreshInputAfterReopen
+    planning_unresolved_review_recovery_test.go:15: sizes 164551 168163 21899 parts 1
+--- PASS: TestPlanningAcknowledgedProtocolIncidentRemainsRecoverableWithFreshInputAfterReopen (2.66s)
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/current
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/old-review
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168165 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/other-attempt
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/foreign-scope
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/semantic-refusal
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/held
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/missing-origin
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/no-fresh-input
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly (6.13s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/current (0.89s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/old-review (0.81s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/other-attempt (0.70s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/foreign-scope (0.75s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/semantic-refusal (0.69s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/held (0.80s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/missing-origin (0.75s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/no-fresh-input (0.74s)
+=== RUN   TestPlanningAcknowledgedIncidentDifferentReceivedCandidateCannotQueueOrSpend
+    planning_unresolved_review_recovery_test.go:209: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningAcknowledgedIncidentDifferentReceivedCandidateCannotQueueOrSpend (0.79s)
+=== RUN   TestUnresolvedReviewStorageUpgradePreservesReceivedIncidentWithoutRewriting
+    planning_unresolved_review_recovery_test.go:245: sizes 164551 168167 21899 parts 1
+--- PASS: TestUnresolvedReviewStorageUpgradePreservesReceivedIncidentWithoutRewriting (0.78s)
+PASS
+ok  	swarm.local/companion/internal/engine	22.349s

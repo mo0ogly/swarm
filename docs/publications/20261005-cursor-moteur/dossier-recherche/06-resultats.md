@@ -8,8 +8,9 @@ ceux des modules d'analyse figés avant les données.
 ## 6.1 Campagne scriptée
 
 **Validité.** B0 et B1 : 3 000 exécutions valides sur 3 000 chacune. S : 2 968 sur 3 000 ;
-les 32 exclues (27 ERREUR, 5 DÉLAI) viennent toutes d'un verrou SQLite transitoire non
-réessayé par le moteur (défaut D5, chapitre 7) : 31 sous F4e, 1 sous F7. Une case dépasse le seuil de 10 %
+les 32 exclues comprennent 27 ERREUR SQLite explicites et cinq DÉLAI dont la cause initiale
+n’est pas établie : 31 sous F4e, une sous F7. Les 27 erreurs relèvent du défaut D5 ; les cinq
+délais doivent être analysés séparément (section 6.4). Une case dépasse le seuil de 10 %
 (S, clé métier, F4e : 13 exclues sur 100) ; elle est signalée, non retirée (section 5.6). Tous les
 contrôles positifs de B0 ont produit le défaut attendu, et le contrôle négatif aucun défaut,
 dans les trois conditions.
@@ -35,7 +36,8 @@ condition.
 inexact ni de faux succès (intervalle de Wilson à 95 % : [0 ; 0,13 %]). B0 et B1 déclarent un
 succès démenti par le grand livre dans 1 900 exécutions sur 3 000 chacune. Les campagnes étant
 déterministes, chaque case vaut 0 ou 100 sur 100 ; l'intervalle d'une case à 0 sur 100 est
-[0 ; 3,7 %].
+[0 ; 3,7 %]. Ces intervalles ne permettent pas d’extrapoler un taux de défaillance
+en exploitation réelle ; zéro événement observé ne signifie pas risque nul.
 
 **Hypothèses** (section 5.9, verdicts calculés par des règles fixées avant la fin de la campagne) :
 
@@ -49,7 +51,10 @@ déterministes, chaque case vaut 0 ou 100 sur 100 ; l'intervalle d'une case à 0
   dans le règlement, hors du moteur. S ne déclare pourtant jamais ce règlement réussi.
 - **H5 confirmée.** Sans faute, la durée médiane de S est de 18,6 à 18,7 s selon la clé, contre
   0,6 à 2,4 s pour B0, soit un facteur 8 à 30. Les durées de B, mesurées sur quatre exécutants
-  parallèles, dérivent avec la charge de l’hôte (section 8.6) ; le facteur n'en dépend pas.
+  parallèles, dérivent avec la charge de l’hôte (section 8.6) ; le facteur dépend donc de cette
+  charge et du protocole de parallélisme. Il caractérise ce banc et cette implémentation, pas
+  le coût intrinsèque d’un contrôle déterministe. Une comparaison équitable doit égaliser
+  le parallélisme et décomposer attente, persistance, contrôles, revue et exécution.
 - **H6** relève de l'étiquetage des blocages (chapitre 9) ; non établie à ce jour.
 
 **Qui arrête quoi.** Sous F4 (lot modifié après le départ du règlement), l'arrêt revient au
@@ -135,3 +140,70 @@ l'architecture où l'agent propose et des composants déterministes contrôlent 
 produit aucun effet faux, mais ce lot ne distingue pas le moteur d'un workflow fixe qui reprend ses
 règles : l'apport propre de Swarm reste démontré par les fautes de concurrence et de bail de la
 campagne scriptée.
+
+
+## 6.4 Les 32 exclusions : sûreté, progression et diagnostic
+
+L’analyse du 8 octobre 2026 consulte les 32 historiques conservés via `work show` et
+`planning show`, avec le binaire dont l’empreinte concorde exactement avec la campagne.
+Les consultations portent sur des copies isolées sans migration, pas sur une mission active.
+Le rapport complet et l’inventaire sont dans
+`docs/benchmarks/billing/analyse-32-exclusions-20261008.md` et le JSON adjacent.
+Cette analyse ne relance aucune campagne et ne change aucun critère enregistré.
+
+| Frontière | Nombre | Preuve établie |
+|---|---:|---|
+| Application d’une décision | 14 | SQLITE_BUSY dans le résultat et un événement public |
+| Revue indépendante | 13 | SQLITE_BUSY dans le résultat et un événement public |
+| Planification sans décision suivante | 5 | Claim conservé, aucun règlement lancé, DÉLAI vers 120 s |
+
+Les 32 exclusions représentent 1,07 % des 3 000 essais S ; 31/300, soit 10,33 %, se
+concentrent sous F4e. Ces proportions décrivent la grille testée, pas un risque en production.
+Les 27 lignes ERREUR n’enregistrent pas de mesures finales de paiement : l’absence de
+champs ne prouve donc pas l’absence de paiement pour ces cas.
+
+Les cinq délais concernent aucune/1087, tentative/1029 et 1037, métier/1056 et 1087.
+L’ordre acceptation puis modification du lot est prouvé. Dans chaque cas, prepare et verrou
+sont acceptées, settle reste todo, la validation de prepare est périmée, deux exécutants
+sont terminés et le relevé final contient zéro paiement, 12 impayés et aucun faux succès.
+Le moteur retient donc l’effet dangereux, mais le processus n’aboutit pas à une issue
+exploitable avant le délai.
+
+Les événements publics montrent un claim automatique avec un bail de 120 secondes, sans
+décision suivante ; le holder reste présent. Aucun événement SQLITE_BUSY, planning.failure,
+reviewer.failure ou dependency_stale n’apparaît dans ces cinq historiques. Le journal
+conducteur ne contient pas de diagnostic exploitable. La cause initiale de la décision
+manquante reste inconnue ; elle ne doit être attribuée ni à SQLite ni à D2 sans preuve.
+
+Le banc amplifie l’attente : planning_busy considère un holder présent comme une activité,
+sans vérifier l’expiration du bail. Le délai global et le bail valent tous deux 120 secondes,
+ce qui laisse peu de place à une reprise après expiration. Ce chemin de classement en
+DÉLAI est expliqué par le code et les états conservés, sans reproduction dynamique.
+
+Après corrections, les 300 cas F4e de vérification sont valides, sans délai ni exclusion
+SQLite, et D2 journalise la dépendance périmée dans 300 cas. Plusieurs corrections ont
+changé ensemble : cela ne démontre pas que D5 seul supprime les cinq délais. La suite à
+mener doit isoler perte de décision après claim, diagnostic de bail et reprise, avec des
+ablations D2/D5 et des mesures séparées de sûreté, disponibilité et progression.
+
+
+## 6.5 Rejeu ciblé des exclusions F4e — 10 octobre 2026
+
+Sur main 3faa8a9, les 31 combinaisons F4e historiquement exclues ont été rejouées une fois : 26 anciennes erreurs SQLite et cinq anciens délais sans décision. Les 31 nouvelles exécutions sont mesurables ; chacune observe une mutation après acceptation, une preuve devenue périmée, un événement dependency_stale et aucun départ du règlement. Aucun paiement, doublon, paiement inexact ni faux succès n'est observé ; les 372 factures restent impayées, comme attendu dans ce scénario de candidat périmé.
+
+La médiane observée est de 20,906 secondes par exécution. Ce temps inclut la recette et ses attentes ; il n'est pas une latence interne du moteur. Le journal possède une empreinte SHA256 2c9cdb90b7b51beed1070ee89c77410ec3417a984b65a9970f05734822f51e5c. Les identifiants de mission et les audits CLI privés sont conservés dans le bilan de reprise.
+
+## 6.6 Observation distincte : reprise d'une supervision réelle
+
+Le 10 octobre 2026, dans la mission d'évolution Cursor, une revue réelle a terminé
+en 166,40 secondes après suppression de son plafond implicite de 90 secondes.
+Elle a demandé une preuve complémentaire ; le responsable racine a enregistré
+une correction ciblée et le moteur a lancé la tentative suivante. Les
+[traces et limites](revisions/20261010-vivacite-supervision.md) sont conservées
+séparément. Ce cas unique hors banc de facturation n'entre dans aucun effectif
+ni taux des sections précédentes. Il ne détermine pas la cause initiale des cinq
+délais historiques de la section 6.4.
+
+Ces résultats ciblés ne réestiment pas un taux de panne en production. Ils n'injectent pas un verrou SQLite connu ; plusieurs correctifs séparent les versions. Les cinq anciens délais restent de cause initiale non démontrée et ne deviennent pas rétroactivement des erreurs SQLite. F7/tentative/1010 est exclu de ce lot ciblé ; une recette séparée ultérieure, sur candidat instrumenté, observe la prise de main d'un second conducteur et douze paiements exacts avec preuve publique d'ordre. Elle ne doit pas être mélangée aux 31 observations du candidat main.
+
+La nouvelle campagne complète est préparée ; ses résultats définitifs restent à acquérir.

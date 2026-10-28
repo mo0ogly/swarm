@@ -1,0 +1,91 @@
+[
+  {
+    "command": [
+      "go",
+      "test",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "start": "2026-10-11T14:53:00.851068+00:00",
+    "end": "2026-10-11T15:01:05.817877+00:00",
+    "seconds": 484.9667909439995,
+    "exit": 0,
+    "output": "/tmp/swarm-T2-primary12-preview-full.out",
+    "output_sha256": "1a2dc770b7c4c39515237df57196ccc7969931249767d9cf02b0790bfb5c989a",
+    "source_manifest_sha256": "a1a1b90cff1a37e8626b6183b99048a34c7b3d4e9599841ba3c22f60e0db5b53",
+    "candidate_digest": "c01c2cbf41a0d8b19a6f2c8d0fe40712bed7f784ed1fafbf736d73adca534cb3",
+    "paths": 1174,
+    "source_drift": [],
+    "manifest_changed": false
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "./internal/engine",
+      "-run",
+      "TestPlanningJudge|TestRecoveredResultCompletedSourceCapacity|TestInstructionRevisionOperator|TestAdminDurationThreshold",
+      "-count=1",
+      "-timeout=120s"
+    ],
+    "start": "2026-10-11T14:53:00.851579+00:00",
+    "end": "2026-10-11T14:53:52.660970+00:00",
+    "seconds": 51.80940362099864,
+    "exit": 0,
+    "output": "/tmp/swarm-T2-primary12-preview-race.out",
+    "output_sha256": "24f2900a7b0e981825b9c56266881cb3ec37a0d974ce66c61b19518e50183a24"
+  },
+  {
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "start": "2026-10-11T14:53:00.852695+00:00",
+    "end": "2026-10-11T14:53:13.119662+00:00",
+    "seconds": 12.26698688399847,
+    "exit": 0,
+    "output": "/tmp/swarm-T2-primary12-preview-vet.out",
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "python3",
+      "tools/agent-workflows/check.py"
+    ],
+    "start": "2026-10-11T14:53:00.852992+00:00",
+    "end": "2026-10-11T14:53:23.159648+00:00",
+    "seconds": 22.306677256998228,
+    "exit": 0,
+    "output": "/tmp/swarm-T2-primary12-preview-workflows.out",
+    "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "start": "2026-10-11T14:53:13.120890+00:00",
+    "end": "2026-10-11T14:53:13.274912+00:00",
+    "seconds": 0.15402023700153222,
+    "exit": 0,
+    "output": "/tmp/swarm-T2-primary12-preview-diff.out",
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "sh",
+      "./build.sh",
+      "/tmp/swarm-T2-primary12-preview-candidate"
+    ],
+    "start": "2026-10-11T14:53:13.275360+00:00",
+    "end": "2026-10-11T14:53:25.057693+00:00",
+    "seconds": 11.782352483998693,
+    "exit": 0,
+    "output": "/tmp/swarm-T2-primary12-preview-build.out",
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

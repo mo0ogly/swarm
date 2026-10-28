@@ -1,0 +1,25 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/enrollmentproof",
+    "-run",
+    "^TestResponseNullIsNotAString$",
+    "-count=1",
+    "-timeout=0"
+  ],
+  "exit": 1,
+  "counts": {
+    "pass": 0,
+    "fail": 1,
+    "skip": 0
+  },
+  "source_captured_after_run_before_fix": {
+    "internal/enrollmentproof/proof.go": "68da8c0e18245f2134c90d29c3f42fd5920aade630cca6e8356a39ce41edec79",
+    "internal/enrollmentproof/proof_test.go": "4307e6fccdfa6153d3d519f1c6b81ecd0e5363bc1efd657ea0d3be6e885f7f86"
+  },
+  "first_event": "2026-10-17T11:27:35.235239642+02:00",
+  "last_event": "2026-10-17T11:27:35.24289388+02:00",
+  "no_pre_run_hash_manifest": true
+}

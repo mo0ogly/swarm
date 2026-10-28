@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-11T18:02:13.687861+00:00",
+  "operator_patch": "review-fragment-global-decision-20261011.patch",
+  "full_source_digest": "6e5d70a75c09b33779958665c2efe1177551cee6369cc0fde0e247292e3bd655",
+  "paths_verified": 1176,
+  "changed_paths": [
+    "docs/REVIEW-FRAGMENTS.md",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/REVIEW-FRAGMENTS.md",
+    "internal/engine/managed_review_diagnostic_test.go",
+    "internal/engine/managed_review_fragment_capacity.go",
+    "internal/engine/managed_review_fragment_capacity_test.go",
+    "internal/engine/managed_review_fragment_decision.go",
+    "internal/engine/managed_review_fragment_final.go",
+    "internal/engine/managed_review_fragment_final_test.go",
+    "internal/engine/managed_review_fragment_finish.go",
+    "internal/engine/managed_review_fragment_finish_test.go",
+    "internal/engine/managed_review_fragment_journal.go",
+    "internal/engine/managed_review_fragment_partial_scope_test.go",
+    "internal/engine/managed_review_fragment_questions.go",
+    "internal/engine/managed_review_fragment_reuse_test.go",
+    "internal/engine/managed_review_fragment_runtime.go",
+    "internal/engine/managed_review_fragment_runtime_test.go",
+    "internal/engine/managed_review_fragment_store.go",
+    "internal/engine/managed_review_fragment_tokens_store_test.go",
+    "internal/engine/managed_review_fragment_transport.go"
+  ],
+  "checked_preimages": true,
+  "exact_preview_full_qualification_source": true,
+  "extra_french_doc_sha256": "6195eef0456f1c022020878ad345d4793b0d18f58f76d62055b82b91c57b970c",
+  "status": "Qualified slice17 transferred to primary; installed runtime still16; negative/transport resumption follow-up19 remains open; native T2 not accepted."
+}

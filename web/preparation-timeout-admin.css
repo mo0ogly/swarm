@@ -1,0 +1,20 @@
+:is(#preparation-timeout-admin,#provider-wait-admin) { margin-block: 1rem; }
+.preparation-policy-scope, .preparation-policy-note, .preparation-policy-state { color: var(--wattson-texte-discret); }
+.preparation-policy-scope { font-size: .875rem; margin-block-end: .4rem; }
+.preparation-policy-values { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; margin-block: 1rem; }
+.preparation-policy-values > div { padding: 1rem; background: var(--wattson-carte-appuyee); border: 1px solid var(--wattson-ligne); border-radius: 8px; }
+.preparation-policy-values dt { color: var(--wattson-texte-discret); font-size: .9rem; }
+.preparation-policy-values dd { margin: .4rem 0 0; font-size: 1.75rem; font-weight: 600; color: var(--wattson-texte); font-variant-numeric: tabular-nums; }
+:is(#preparation-timeout-modal,#provider-wait-modal) { width: min(38rem,calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); overflow-y: auto; }
+:is(#preparation-timeout-modal,#provider-wait-modal) .dialog-body { display: grid; gap: 1rem; }
+:is(#preparation-timeout-modal,#provider-wait-modal) label { display: grid; gap: .4rem; }
+:is(#preparation-timeout-modal,#provider-wait-modal) input, :is(#preparation-timeout-modal,#provider-wait-modal) textarea { width: 100%; box-sizing: border-box; font-size: 1rem; min-height: 44px; }
+:is(#preparation-timeout-modal,#provider-wait-modal) footer { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: .75rem; }
+:is(#preparation-timeout-admin,#provider-wait-admin) button, :is(#preparation-timeout-modal,#provider-wait-modal) button, :is(#preparation-timeout-admin,#provider-wait-admin) summary, :is(#preparation-timeout-modal,#provider-wait-modal) summary { min-height: 44px; }
+:is(#preparation-timeout-admin,#provider-wait-admin) summary, :is(#preparation-timeout-modal,#provider-wait-modal) summary { display: list-item; padding-block: .75rem; cursor: pointer; }
+@media(max-width: 600px) { .preparation-policy-values { grid-template-columns: 1fr; } :is(#preparation-timeout-modal,#provider-wait-modal) footer button { flex: 1; } }
+:is(#preparation-timeout-modal,#provider-wait-modal) > header { padding: 1.25rem 1.5rem .25rem; }
+:is(#preparation-timeout-modal,#provider-wait-modal) .dialog-body { padding: 1rem 1.5rem; }
+:is(#preparation-timeout-modal,#provider-wait-modal) footer { padding: 1rem 1.5rem; border-top: 1px solid var(--wattson-ligne); }
+:is(#preparation-timeout-modal,#provider-wait-modal) h3 { margin-block: .25rem .5rem; }
+@media(max-width: 600px) { :is(#preparation-timeout-modal,#provider-wait-modal) > header, :is(#preparation-timeout-modal,#provider-wait-modal) .dialog-body, :is(#preparation-timeout-modal,#provider-wait-modal) footer { padding-inline: 1rem; } }

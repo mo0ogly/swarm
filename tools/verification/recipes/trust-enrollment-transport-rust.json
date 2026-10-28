@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "trust-enrollment-transport-rust",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-engine/src/**/*",
+    "rust/crates/swarm-engine/config/**/*",
+    "rust/crates/swarm-engine/tests/trust_governance.rs",
+    "rust/crates/swarm-engine/tests/trust_enrollment.rs",
+    "rust/crates/swarm-enrollment-*/src/**/*",
+    "rust/crates/swarm-enrollment-authority/tests/authenticated_startup.rs",
+    "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+    "rust/crates/swarm-identity-contract/src/**/*",
+    "rust/crates/swarm-wire-json/src/**/*",
+    "rust/crates/swarm-linux-identity-channel/src/**/*",
+    "rust/crates/swarm-linux-prerequisites/src/**/*",
+    "docs/architecture/BIBA-GOUVERNANCE-RUST.md",
+    "docs/en/BIBA-GOVERNANCE-RUST.md",
+    "tests/rust_trust_enrollment_sdk.py",
+    "rust/crates/swarm-web/src/**/*",
+    "rust/crates/swarm-web/tests/trust_enrollment.rs",
+    "rust/crates/swarm-cli/src/**/*",
+    "rust/crates/swarm-cli/tests/trust_enrollment.rs",
+    "web/trust-native.*",
+    "web/i18n-en.js",
+    "locales/en.json",
+    "tests/rust_trust_enrollment_transport.py",
+    "tests/rust_trust_enrolled_ui.cjs",
+    "tests/trust_enrolled_outcome_test.cjs"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": ".cache/rust-native-version846-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0"
+  },
+  "steps": [
+    {
+      "id": "decision-presentation",
+      "command": [
+        "node",
+        "tests/trust_enrolled_outcome_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS unknown-visible; concurrent-gesture-once; denied200-visible; admitted-labelled; readback-failure-preserves-decision; password-cleared-all-cases"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "exact-enrollment-transport",
+      "command": [
+        "python3",
+        "tests/rust_trust_enrollment_transport.py",
+        "--output-parent",
+        "test-results"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "TRANSPORT_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

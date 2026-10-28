@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python3",
+    "tools/agent-workflows/check.py"
+  ],
+  "effective_goflags": "-overlay=/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/overlay.json",
+  "start": "2026-10-17T13:55:50.039756+00:00",
+  "end": "2026-10-17T13:56:02.991415+00:00",
+  "exit": 0,
+  "changed_inputs": [],
+  "input_count": 832,
+  "checker_sha256": "9a13a15d160107a269d74b1fa8fb0f620a4ab52ef6eec09c27cc9716fb1de61c"
+}

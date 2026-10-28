@@ -1,0 +1,38 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentityIssuer(AuthenticatesBeforeWorkLookup|MintReadsAfterSQLiteWait)$",
+    "-count=1",
+    "-timeout",
+    "30s",
+    "-json"
+  ],
+  "executor": "Codex alone; isolated fixture stores; local OIDC signed-token fixture, no real provider",
+  "start": "2026-10-17T08:20:04.005167+00:00",
+  "end": "2026-10-17T08:21:51.181604+00:00",
+  "elapsed_seconds": 107.17915160601842,
+  "exit": 0,
+  "input_count": 1058,
+  "changed_inputs": [],
+  "counts": {
+    "pass": 7,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [
+      "TestAgentIdentityIssuerAuthenticatesBeforeWorkLookup",
+      "TestAgentIdentityIssuerAuthenticatesBeforeWorkLookup/local-admin",
+      "TestAgentIdentityIssuerAuthenticatesBeforeWorkLookup/missing-token",
+      "TestAgentIdentityIssuerAuthenticatesBeforeWorkLookup/unenrolled-human",
+      "TestAgentIdentityIssuerMintReadsAfterSQLiteWait",
+      "TestAgentIdentityIssuerMintReadsAfterSQLiteWait/amended-plan",
+      "TestAgentIdentityIssuerMintReadsAfterSQLiteWait/expiry"
+    ],
+    "fail": [],
+    "skip": []
+  }
+}

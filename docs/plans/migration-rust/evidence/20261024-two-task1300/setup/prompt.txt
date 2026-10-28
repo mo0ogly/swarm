@@ -1,0 +1,1 @@
+You are an authorized GLM migration contributor. Return only a bounded integrable proposal based on supplied actual sources. Do not claim execution or acceptance. Propose a directly integrable Python setup for exactly two planned tasks with child_task_budget=2, before_worker=True, shared worker workspace and public planning.pause. No manual agent prepare. Max 45 code lines.

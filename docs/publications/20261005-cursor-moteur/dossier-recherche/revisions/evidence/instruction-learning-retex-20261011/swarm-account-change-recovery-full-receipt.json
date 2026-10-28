@@ -1,0 +1,20 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T15:31:45.414535+00:00",
+  "end": "2026-10-11T15:39:37.986846+00:00",
+  "seconds": 472.572304841,
+  "exit": 0,
+  "output": "/tmp/swarm-account-change-recovery-full.out",
+  "output_sha256": "9f94e3b63f3ca865dd64874afb1b8f542fcc94bb726632f47e855785f1997334",
+  "source_manifest_sha256": "9f2b0f58e235f592ed0c3fac2ed5246e9d8ed601614c4f49455290491e4e4d80",
+  "candidate_digest": "0311c86726f5e09c46bb29061efdc3f894fcef658d57602fc4cde877c2c8f28c",
+  "paths": 1172,
+  "source_drift": [],
+  "manifest_changed": false
+}

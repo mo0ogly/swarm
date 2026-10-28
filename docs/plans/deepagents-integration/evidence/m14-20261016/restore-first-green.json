@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestDialogue(Restore|UsageSnapshot)",
+    "-count=1",
+    "-v",
+    "-timeout=120s"
+  ],
+  "started_at_utc": "2026-10-16T17:35:44.537885+00:00",
+  "duration_seconds": 137.765,
+  "exit_code": 1,
+  "named_tests_ran": [
+    "TestDialogueUsageSnapshotDoesNotMutate",
+    "TestDialogueRestorePublicOperationExists",
+    "TestDialogueRestoreKeepsSessionGuardsAndSeparatesExecutionUsage",
+    "TestDialogueRestoreRejectsStaleUnconfirmedAndUnverifiedWithoutMutation",
+    "TestDialogueRestoreRechecksSourceAfterPreflight",
+    "TestDialogueRestoreConcurrentRequestsCreateOneExecution"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "94dc7ba074e95db8c7794ca816f3338af883f2e5caae50f993af1cd5c9eb80bc",
+  "real_model_calls": 0
+}

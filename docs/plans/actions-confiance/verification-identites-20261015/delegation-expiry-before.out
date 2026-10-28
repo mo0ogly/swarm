@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT3DelegationDefaultExpiryBoundedByParent
+    trust_delegation_test.go:318: default child lifetime is not capped by parent map[business_mutated:false next_action:corriger le mandat, l’identité ou l’accord reason:délégation plus large que le mandat parent state:denied]
+--- FAIL: TestActionsConfianceT3DelegationDefaultExpiryBoundedByParent (0.08s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.162s
+FAIL

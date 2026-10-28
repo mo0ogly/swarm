@@ -39,7 +39,7 @@ const GraphDraft = {
   if(this.workID!==work){this.workID=work;this.draft=null;this.history=[[]];this.cursor=0}
   $('graph-draft-panel').hidden=false;this.render();$('graph-draft-kind').focus();
  },
- close(){this.editing=false;$('graph-draft-panel').hidden=true;this.render();this.returnFocus?.focus()},
+ close(){globalThis.GraphStudio?.help();this.editing=false;$('graph-draft-panel').hidden=true;this.render();this.returnFocus?.focus()},
  choose(id){
   if(!this.source||this.source===id&&this.target){this.source=id;this.target=''}else if(id!==this.source)this.target=id;
   this.preview=null;this.render();
@@ -60,11 +60,11 @@ const GraphDraft = {
  },
  async commit(operations){this.history=this.history.slice(0,this.cursor+1);this.history.push(this.clone(operations));this.cursor++;await this.persist(operations)},
  async persist(operations){
-  this.busy(true);try{this.draft=await api('/api/v1/graph-drafts',{schema_version:1,work_id:work,draft_id:this.draft?.draft_id||undefined,expected_revision:snapshot.work.revision,expected_draft_revision:this.draft?.revision||undefined,operations});this.preview=null;this.conflict=false;this.clearError()}
-  catch(error){this.handle(error);throw error}finally{this.busy(false);this.render()}
+  this.busy(true);try{this.draft=await api('/api/v1/graph-drafts',{schema_version:1,work_id:work,draft_id:this.draft?.draft_id||undefined,expected_revision:snapshot.work.revision,expected_draft_revision:this.draft?.revision||undefined,operations});this.preview=null;this.unsaved=false;this.conflict=false;this.clearError()}
+  catch(error){this.preview=null;this.unsaved=true;this.handle(error);throw error}finally{this.busy(false);this.render()}
  },
  async doPreview(){
-  if(!this.draft||!this.current().length)return this.fail(tr_web_graph_draft_js('Ajoutez au moins une modification au brouillon.'));
+  if(this.unsaved||!this.draft||!this.current().length)return this.fail(tr_web_graph_draft_js('Ajoutez au moins une modification au brouillon.'));
   this.busy(true);try{this.preview=await api('/api/v1/graph-drafts/preview',{schema_version:1,work_id:work,draft_id:this.draft.draft_id,expected_revision:snapshot.work.revision});this.conflict=false;this.clearError();this.render();$('graph-draft-apply').focus()}
   catch(error){this.handle(error)}finally{this.busy(false);this.render()}
  },
@@ -77,7 +77,7 @@ const GraphDraft = {
   const operations=this.current();this.busy(true);try{await refresh(true);this.draft=null;this.preview=null;this.conflict=false;await this.persist(operations);this.clearError();$('graph-draft-status').textContent=tr_web_graph_draft_js('Brouillon recréé sur la révision courante. Prévisualisez-le à nouveau.')}
   catch(error){this.handle(error)}finally{this.busy(false);this.render()}
  },
- handle(error){this.conflict=['revision_conflict','draft_conflict','preview_stale','active_scope_conflict'].includes(error.code);this.fail((error.message||tr_web_graph_draft_js('Modification refusée.'))+(this.conflict?tr_web_graph_draft_js(' Vos modifications sont conservées ; rechargez avant de réessayer.') : ''))},
+ handle(error){this.preview=null;this.conflict=['revision_conflict','draft_conflict','preview_stale','active_scope_conflict'].includes(error.code);this.fail((error.message||tr_web_graph_draft_js('Modification refusée.'))+(this.conflict?tr_web_graph_draft_js(' Vos modifications sont conservées ; rechargez avant de réessayer.') : ''))},
  fail(message){const box=$('graph-draft-error');box.hidden=false;box.firstChild.textContent=message;$('graph-draft-recover').hidden=!this.conflict;box.focus()},
  clearError(){const box=$('graph-draft-error');box.hidden=true;box.firstChild.textContent=''},
  busy(value){this.pending=value;for(const element of $('graph-draft-panel')?.querySelectorAll('button,select')||[])element.disabled=value},
@@ -92,7 +92,7 @@ const GraphDraft = {
   if(this.operationsKey!==operationsKey){this.operationsKey=operationsKey;list.replaceChildren(...operations.map(item=>node('li',(item.kind==='add_dependency'?tr_web_graph_draft_js('Ajouter'):tr_web_graph_draft_js('Retirer'))+' '+item.prerequisite+' → '+item.dependent)));
   if(!operations.length)list.append(node('li',tr_web_graph_draft_js('Aucune modification préparée.')));}
   $('graph-draft-undo').disabled=this.pending||this.cursor===0;$('graph-draft-redo').disabled=this.pending||this.cursor===this.history.length-1;
-  $('graph-draft-stage').disabled=this.pending||!this.source||!this.target;$('graph-draft-preview').disabled=this.pending||!this.draft||!operations.length;$('graph-draft-apply').disabled=this.pending||!this.preview;
+  $('graph-draft-stage').disabled=this.pending||!this.source||!this.target;$('graph-draft-preview').disabled=this.pending||this.unsaved||!this.draft||!operations.length;$('graph-draft-apply').disabled=this.pending||!this.preview;
   let status;
   if(this.pending)status=tr_web_graph_draft_js('Enregistrement en cours…');
   else if(this.preview)status=tr_web_graph_draft_js('Aperçu moteur : ') + this.preview.affected_tasks.length+tr_web_graph_draft_js(' tâche(s) affectée(s). Aucun départ implicite. Confirmez pour appliquer.');
@@ -104,8 +104,8 @@ const GraphDraft = {
  minimap(svg){
   const old=$('graph-minimap');if(svg&&svg===this.minimapSource&&old?.isConnected)return;old?.remove();if(!svg||!$('pilot-canvas'))return;this.minimapSource=svg;
   const map=svgNode('svg',{id:'graph-minimap',class:'graph-minimap',viewBox:svg.getAttribute('viewBox'),role:'img','aria-label':tr_web_graph_draft_js('Mini-carte du graphe')});
-  for(const edge of svg.querySelectorAll('.graph-arete,.graph-organisation-link'))map.append(svgNode('polyline',{points:edge.getAttribute('points'),class:'graph-minimap-edge'}));
-  for(const item of svg.querySelectorAll('.graph-noeud .graph-cadre,.graph-responsibility rect'))map.append(svgNode('rect',{x:item.getAttribute('x'),y:item.getAttribute('y'),width:item.getAttribute('width'),height:item.getAttribute('height'),rx:8,class:'graph-minimap-node'}));
+  for(const edge of svg.querySelectorAll('.graph-arete,.graph-organisation-link'))map.append(svgNode('path',{d:edge.getAttribute('d'),class:'graph-minimap-edge'}));
+  for(const item of svg.querySelectorAll('.graph-noeud .graph-cadre,.graph-responsibility rect')){const box=svgNode('rect',{x:item.getAttribute('x'),y:item.getAttribute('y'),width:item.getAttribute('width'),height:item.getAttribute('height'),rx:8,class:'graph-minimap-node'});const transform=item.closest('.graph-unit')?.getAttribute('transform');if(transform)box.setAttribute('transform',transform);map.append(box)};
   $('pilot-canvas').append(map);
  }
 };

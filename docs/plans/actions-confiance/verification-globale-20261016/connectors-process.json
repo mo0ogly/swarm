@@ -1,0 +1,20 @@
+{
+  "stage": "connectors",
+  "argv": [
+    "python3",
+    "tests/actions_confiance_connectors.py",
+    "--binary",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-attempt-source",
+    "--timeout-seconds",
+    "120",
+    "--evidence-dir",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/connectors"
+  ],
+  "pid": 3616652,
+  "start_ticks": "5735282",
+  "started_unix": 1792122928.674357,
+  "status": "watchdog_failed",
+  "binary_sha256": "4b60f2637fd526b7a9aefe990507404d46cf7fb953989c3849c368ea3a690f24",
+  "exit_code": 0,
+  "ended_unix": 1792122932.1530712
+}

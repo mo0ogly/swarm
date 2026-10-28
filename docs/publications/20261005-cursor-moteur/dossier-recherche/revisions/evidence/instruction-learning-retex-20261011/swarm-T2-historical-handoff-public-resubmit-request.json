@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-historical-handoff-corrected-after-review-20261011",
+  "expected_revision": 373,
+  "task_id": "plan-ca937edf4e-T2",
+  "agent_id": "auto-a23c60f03a732c02841f",
+  "attempt_id": "a-2f9e1debb1548be96273f0d3",
+  "review_id": "review-dd11fa7937a5314dd9b58538",
+  "confirm_recovery": true,
+  "result_tree": "e1491d4539518ab4bd0955a41b8aee6d0d85e87f",
+  "reason": "Replan du refus indépendant : correction documentaire opérateur explicitement attribuée dans T1-handoff et rapport T2. JAN-4/JAN-5 restent historiques T1, le Judge Go T2 et ses limites sont distingués ; aucun changement Go ni acceptation fabriquée. Producteur terminé, mêmes agent/tentative, originaux et consommation conservés. Patch/transfert vérifiés, contrôles documentaires PASS. Réglage public Claude standard et rôles root/reviewer medium enregistré ; nouvelle revue du candidat exact requise, anciens avis non réutilisables après changement de configuration. Correctif14 installé après qualification ciblée/race/vet/UI ; suite Go complète réexécutée après correction du stockage temporaire, résultat encore attendu. Incidents globaux replan transmis aux lots T3..T8 par opérations publiques."
+}

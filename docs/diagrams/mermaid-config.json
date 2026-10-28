@@ -1,0 +1,29 @@
+{
+  "theme": "base",
+  "securityLevel": "strict",
+  "deterministicIds": true,
+  "deterministicIDSeed": "swarm-memory-identity",
+  "flowchart": {
+    "htmlLabels": false,
+    "curve": "basis",
+    "nodeSpacing": 32,
+    "rankSpacing": 44,
+    "padding": 18,
+    "wrappingWidth": 320,
+    "subGraphTitleMargin": {
+      "top": 10,
+      "bottom": 20
+    }
+  },
+  "themeVariables": {
+    "fontFamily": "Arial, sans-serif",
+    "fontSize": "18px",
+    "textColor": "#243d4a",
+    "lineColor": "#205e70",
+    "edgeLabelBackground": "#fffefa",
+    "clusterBkg": "#f5f3ec",
+    "clusterBorder": "#205e70"
+  },
+  "themeCSS": ".edgeLabel rect { opacity: 1 !important; }",
+  "htmlLabels": false
+}

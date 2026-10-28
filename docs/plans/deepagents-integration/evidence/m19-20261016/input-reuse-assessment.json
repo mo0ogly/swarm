@@ -1,0 +1,78 @@
+{
+  "contract-final": {
+    "result": "PASS",
+    "manifest_inputs": 1034,
+    "later_changed_nonconsumed_inputs": {
+      "tests/memory_summary_admission.py": {
+        "executed_sha256": "95754c8716f2d47f989a3a7c5de135c14af760d602fa78f9eb40331cd304cb4a",
+        "current_sha256": "a6793da414fd8a499316f13a51591f67d6d161a5704f0315c1c28dd6944d1d15"
+      }
+    },
+    "assessment": "Native recipe is not consumed by Go/Python unit checks, configuration or build. Python discovery does not load Go tests. Actual consumed sources are unchanged; final native recipe has no drift."
+  },
+  "selection-race": {
+    "result": "PASS",
+    "manifest_inputs": 1034,
+    "later_changed_nonconsumed_inputs": {
+      "tests/memory_summary_admission.py": {
+        "executed_sha256": "95754c8716f2d47f989a3a7c5de135c14af760d602fa78f9eb40331cd304cb4a",
+        "current_sha256": "a6793da414fd8a499316f13a51591f67d6d161a5704f0315c1c28dd6944d1d15"
+      }
+    },
+    "assessment": "Native recipe is not consumed by Go/Python unit checks, configuration or build. Python discovery does not load Go tests. Actual consumed sources are unchanged; final native recipe has no drift."
+  },
+  "source-reference-regression": {
+    "result": "PASS",
+    "manifest_inputs": 1034,
+    "later_changed_nonconsumed_inputs": {
+      "internal/engine/memory_summary_selection_test.go": {
+        "executed_sha256": "3bfc2462f6f0cba17102501184692dcd0be2a663404b79424083948a91dffd6f",
+        "current_sha256": "3a674a68f3a5b737f2aba163674a698b73f7e4cbbc0d83062d85f336b510aea3"
+      },
+      "tests/memory_summary_admission.py": {
+        "executed_sha256": "95754c8716f2d47f989a3a7c5de135c14af760d602fa78f9eb40331cd304cb4a",
+        "current_sha256": "a6793da414fd8a499316f13a51591f67d6d161a5704f0315c1c28dd6944d1d15"
+      }
+    },
+    "assessment": "Native recipe is not consumed by Go/Python unit checks, configuration or build. Python discovery does not load Go tests. Actual consumed sources are unchanged; final native recipe has no drift."
+  },
+  "build": {
+    "result": "PASS",
+    "manifest_inputs": 1034,
+    "later_changed_nonconsumed_inputs": {
+      "tests/memory_summary_admission.py": {
+        "executed_sha256": "95754c8716f2d47f989a3a7c5de135c14af760d602fa78f9eb40331cd304cb4a",
+        "current_sha256": "a6793da414fd8a499316f13a51591f67d6d161a5704f0315c1c28dd6944d1d15"
+      }
+    },
+    "assessment": "Native recipe is not consumed by Go/Python unit checks, configuration or build. Python discovery does not load Go tests. Actual consumed sources are unchanged; final native recipe has no drift."
+  },
+  "static": {
+    "result": "PASS",
+    "manifest_inputs": 1034,
+    "later_changed_nonconsumed_inputs": {
+      "tests/memory_summary_admission.py": {
+        "executed_sha256": "95754c8716f2d47f989a3a7c5de135c14af760d602fa78f9eb40331cd304cb4a",
+        "current_sha256": "a6793da414fd8a499316f13a51591f67d6d161a5704f0315c1c28dd6944d1d15"
+      }
+    },
+    "assessment": "Native recipe is not consumed by Go/Python unit checks, configuration or build. Python discovery does not load Go tests. Actual consumed sources are unchanged; final native recipe has no drift."
+  },
+  "configuration": {
+    "result": "PASS",
+    "manifest_inputs": 1034,
+    "later_changed_nonconsumed_inputs": {
+      "tests/memory_summary_admission.py": {
+        "executed_sha256": "95754c8716f2d47f989a3a7c5de135c14af760d602fa78f9eb40331cd304cb4a",
+        "current_sha256": "a6793da414fd8a499316f13a51591f67d6d161a5704f0315c1c28dd6944d1d15"
+      }
+    },
+    "assessment": "Native recipe is not consumed by Go/Python unit checks, configuration or build. Python discovery does not load Go tests. Actual consumed sources are unchanged; final native recipe has no drift."
+  },
+  "native-final": {
+    "result": "PASS",
+    "manifest_inputs": 1034,
+    "later_changed_nonconsumed_inputs": {},
+    "assessment": "Native recipe is not consumed by Go/Python unit checks, configuration or build. Python discovery does not load Go tests. Actual consumed sources are unchanged; final native recipe has no drift."
+  }
+}

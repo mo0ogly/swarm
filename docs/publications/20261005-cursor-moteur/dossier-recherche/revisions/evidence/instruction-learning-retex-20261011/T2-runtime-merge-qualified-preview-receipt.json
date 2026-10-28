@@ -1,0 +1,50 @@
+{
+  "at": "2026-10-11T12:53:49.755862+00:00",
+  "preview_only": true,
+  "T2_accepted": false,
+  "installed": false,
+  "current_root_go_preimages_unchanged": true,
+  "full": {
+    "command": "go test ./... -count=1 -timeout=12m",
+    "exit": 0,
+    "stdout": "?   \tswarm.local/companion\t[no test files]\n?   \tswarm.local/companion/cmd/swarm\t[no test files]\nok  \tswarm.local/companion/internal/engine\t453.096s\n"
+  },
+  "race": {
+    "command": "go test -race ./internal/engine -run 'TestPlanningJudge|TestPlanningRejected|TestInstructionRevision' -count=1 -timeout=90s",
+    "exit": 0,
+    "stdout": "ok  \tswarm.local/companion/internal/engine\t12.285s\n"
+  },
+  "vet": {
+    "command": "go vet ./...",
+    "exit": 0
+  },
+  "targeted": {
+    "exit": 0,
+    "seconds": 3.539
+  },
+  "source_T2_tree": "1ded4021e9c822ccb8b2ce3e427f075bfdc9d7ff",
+  "source_manifest_paths": 1169,
+  "source_parts": 5,
+  "binary": {
+    "preview_only": true,
+    "installed": false,
+    "candidate_accepted": false,
+    "source_tree_T2": "1ded4021e9c822ccb8b2ce3e427f075bfdc9d7ff",
+    "command": [
+      "go",
+      "build",
+      "-ldflags",
+      "-X swarm.local/companion/internal/engine.buildVersion=devel -X swarm.local/companion/internal/engine.buildCommit=1169df70bec73d50fd23f640245b8ffd1317b9de -X swarm.local/companion/internal/engine.buildModified=true -X swarm.local/companion/internal/engine.buildDate=2026-10-11T12:49:19Z -X swarm.local/companion/internal/engine.buildProvenance=injected",
+      "-o",
+      "/tmp/swarm-T2-runtime-integration-preview-candidate",
+      "./cmd/swarm"
+    ],
+    "cwd": "/tmp/swarm-T2-runtime-integration-check-20261011-vmgw26pa",
+    "start": "2026-10-11T12:49:19.133533+00:00",
+    "end": "2026-10-11T12:49:20.590710+00:00",
+    "exit": 0,
+    "binary": "/tmp/swarm-T2-runtime-integration-preview-candidate",
+    "build_date": "2026-10-11T12:49:19Z",
+    "sha256": "9e645131ba24597be9c78af4c0968e3097df6b8831a7357eb6cba2cdf4edd5e9"
+  }
+}

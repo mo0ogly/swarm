@@ -1,0 +1,68 @@
+{
+  "at": "2026-10-11T20:13:34.621300+00:00",
+  "bundle": {
+    "at": "2026-10-11T20:10:04.729100+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-feedback-docs-20261011.bundle",
+    "sha256": "bf0f7da73ff6bf08cec49d87e4e07203ba30fede0c3773a080d7efe4ad311548",
+    "commit": "04823fb8f3c4e6f151b85d3dc500826267f5fb77",
+    "ref": "refs/heads/operator-inputs",
+    "input_files": 101,
+    "manifest_sha256": "0b2ef7fb75408465732b34c345acbecc93bf69cb4a21d46252612e5bd74945d0",
+    "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/feedback-docs-inputs-5bx4qh76",
+    "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/feedback-docs-inputs-import-b1m5nvg3",
+    "old98_originals_preserved": true,
+    "added_documentation": [
+      "docs/architecture/CONTROLS-AND-FEEDBACK.md",
+      "docs/en/CONTROLS-AND-FEEDBACK.md",
+      "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261011-controls-feedback-agent-quality.md"
+    ],
+    "verification": "PASS isolated import and every original byte/hash, new3 whole document bytes verified",
+    "limits": "Documentation-only extension. No new engine code/qualification/acceptance or receipt by future native agents inferred."
+  },
+  "updates": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "revision": 508,
+      "operator_base_sha256": "cecc7d2108516634a2a3fb1f6e78954d890fce0438cd1cda2db5988226e908b7",
+      "criteria_dependencies_attempts_learning_preserved": true,
+      "active_review_candidate_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "revision": 509,
+      "operator_base_sha256": "bdbda926b19160286db489bafd8cf58e62ad4b171bd9894239f6b7d2e727fbb0",
+      "criteria_dependencies_attempts_learning_preserved": true,
+      "active_review_candidate_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "revision": 510,
+      "operator_base_sha256": "84298a40e0c2c009b1ab6c7ec1e5d6ce16bfa643503ea3469f3a79f9a1fcd3cb",
+      "criteria_dependencies_attempts_learning_preserved": true,
+      "active_review_candidate_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "revision": 511,
+      "operator_base_sha256": "457f44c1799b383cff3b488144929d2d70b757fc2880eddd97592ca12b950ffd",
+      "criteria_dependencies_attempts_learning_preserved": true,
+      "active_review_candidate_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "revision": 512,
+      "operator_base_sha256": "bcab3e39a488d28da6ea0f596fdf0e395202bf8948fa77eaa5417b807c446d4e",
+      "criteria_dependencies_attempts_learning_preserved": true,
+      "active_review_candidate_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T8",
+      "revision": 513,
+      "operator_base_sha256": "908f42cf80ddac662ad09a10542f7ba853b247c7cdf3012f0eda3db2d535fea3",
+      "criteria_dependencies_attempts_learning_preserved": true,
+      "active_review_candidate_preserved": true
+    }
+  ],
+  "native_review_id": "review-a11876529ad90296f47d5dd1",
+  "limits": "Future documents and operator inputs saved through public operations; no actual worker receipt, extra rights or native completion inferred. Existing review candidate/contract unaffected."
+}

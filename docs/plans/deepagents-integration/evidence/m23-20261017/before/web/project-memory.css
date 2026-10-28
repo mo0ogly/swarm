@@ -1,0 +1,15 @@
+.memory-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 2rem;border-bottom:1px solid var(--wattson-ligne)}
+.memory-header nav{display:flex;align-items:center;gap:1rem;margin:0;flex-wrap:wrap}
+.memory-header .brand{display:flex;align-items:center;gap:.5rem;color:var(--wattson-titre)}
+.memory-page a{color:var(--wattson-lien);overflow-wrap:anywhere}
+.memory-page main{margin:0 auto;max-width:1100px;padding:1.5rem}
+.memory-page .surface{margin:1rem 0}
+.memory-page form{display:grid;gap:1rem}
+.memory-page #memory-content-fields{display:grid;gap:1rem}
+.memory-page .toolbar{display:flex}
+.memory-page .memory-choice{display:flex;align-items:start;gap:.75rem}
+.memory-page .memory-choice input{width:1.25rem;min-width:1.25rem;height:1.25rem}
+.memory-page .memory-receipt{overflow-wrap:anywhere;color:var(--wattson-texte-discret)}
+.memory-page .memory-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.memory-page .language-picker{min-width:8rem}
+@media(max-width:760px){.memory-header{padding:1rem;align-items:start;flex-wrap:wrap}.memory-page main{padding:.75rem}.memory-page .surface{padding:1rem}.memory-page input,.memory-page select,.memory-page textarea{font-size:16px}.memory-header nav{gap:.5rem}}

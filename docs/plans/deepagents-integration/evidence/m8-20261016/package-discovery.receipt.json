@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "go",
+    "list",
+    "./..."
+  ],
+  "started_at_utc": "2026-10-16T08:13:01.159104+00:00",
+  "ended_at_utc": "2026-10-16T08:13:03.277061+00:00",
+  "exit_code": 0,
+  "expected_exit_code": 0,
+  "log_sha256": "6b69b1f63a565630a206b1fecb8aed544f70bfed32e32b922f4a6af49b145ec6"
+}

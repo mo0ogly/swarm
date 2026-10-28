@@ -1,0 +1,10 @@
+{
+  "original_failure": "Verifier assertion previous literal test-name set is a subset of final names failed",
+  "cause": "Nine parameterized memory test names embed schemaVersion-1/current/+1; source is unchanged, but actual schema advances 36 to 37.",
+  "old_storage_version": 36,
+  "new_storage_version": 37,
+  "correction": "Correlate the parameterized names by their version offset, retain all original JSONL names and assert the unchanged producer test source hash.",
+  "effect_on_tests": "None; all 232 final tests and 84 race tests already passed. No Go source/test or result modified.",
+  "owner": "Codex",
+  "status": "pending final index verification"
+}

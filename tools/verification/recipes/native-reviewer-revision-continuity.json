@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "native-reviewer-revision-continuity",
+  "inputs": [
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_native_review_inputs.py",
+    "tests/rust_native_review_preview.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_reviewer_claim_candidate.py",
+    "tools/agent-workflows/check.py",
+    "tools/agent-workflows/test_check.py",
+    "tests/rust_native_reviewer.py",
+    "tools/verification/verify_native_profile.py",
+    "tools/verification/recipe.py",
+    "tools/verification/native_no_go.py",
+    "tests/rust_review_streaming_capture.py",
+    "tests/rust_review_raw_capture.py",
+    "tests/rust_review_required_receipt_guard.py",
+    "tests/rust_review_retained_evidence_test.py",
+    "tests/rust_review_publication.py",
+    "tests/rust_review_public_context.py",
+    "tests/rust_review_context_units.py",
+    "tests/normal_profile_archive_test.py",
+    "tests/rust_review_revision_continuity.py",
+    "tests/rust_review_revision_retention_test.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r97",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "qualified-oracle-review-revision-and-publication-regressions",
+      "command": [
+        "python3",
+        "-c",
+        "import json,tempfile,subprocess,sys; from pathlib import Path; base=Path(tempfile.mkdtemp(prefix='native-review-revision-',dir='.cache')).resolve(); subprocess.run([sys.executable,'tools/verification/verify_native_profile.py','--output',str(base/'profile')],check=True); profile=json.loads((base/'profile/result.json').read_bytes()); binary=str(Path(profile['binary']).resolve()); subprocess.run([sys.executable,'tests/rust_review_revision_continuity.py','--binary',binary,'--output',str(base/'revision')],check=True); subprocess.run([sys.executable,'tests/rust_review_publication.py','--binary',binary,'--output',str(base/'cases')],check=True); print('REPLAY_EVIDENCE '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS reviewer unrelated revision continuity",
+        "PASS reviewer publication 8 cases",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "synthetic-revision-retention-guards",
+      "command": [
+        "python3",
+        "tests/rust_review_revision_retention_test.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 4 tests",
+        "OK"
+      ]
+    }
+  ]
+}

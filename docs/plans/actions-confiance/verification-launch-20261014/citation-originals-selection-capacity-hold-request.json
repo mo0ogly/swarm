@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "hold-native-reference-selection-capacity",
+  "expected_revision": 426,
+  "reason": "La sélection native dépasse la capacité de décision avant le cinquième appel. Suspendre les nouveaux départs, conserver les 84 appels et les constats partiels, diagnostiquer le contrat de sélection sans relance identique ni hausse de budget."
+}

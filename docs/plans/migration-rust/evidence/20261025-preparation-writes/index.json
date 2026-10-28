@@ -1,0 +1,32 @@
+{
+  "scope": "Isolated verification, not global migration acceptance",
+  "final_binary_sha256": "bde7da26821e20958766a9aeba122350757e1cba68c9668f66ebe31d14166072",
+  "profile": "private/frozen-profile8",
+  "effective_inputs": 432,
+  "final_inputs_stable": true,
+  "default_native_profile": true,
+  "fixture_features": false,
+  "recipes": {
+    "writes-recipe8": {
+      "status": "PASS",
+      "public_assertions": 47,
+      "historical_keys": 8,
+      "sdk_named_tests": 2,
+      "sdk_transaction_fault_variants": 2,
+      "browser_assertions": 45
+    },
+    "upgrade-recipe8": {
+      "status": "PASS",
+      "assertions": 6,
+      "browser_assertions": 45
+    }
+  },
+  "independent_static_review": "independent-review-assessment.json",
+  "runtime77": "Real running binary hash matched, public/upgrade fixture journeys PASS before later D1 fix; live Root not tested or mutated",
+  "installation": "Verified local78; see delivery-result.json, previous isolated profile8 retained separately",
+  "global_qualification": "OPEN; mixed other-owner changes, final delivery and native/global acceptance not established",
+  "known_successful_glm_tokens": 206415,
+  "failed_glm_usage": "unknown",
+  "installed_version": "v0.1.1-dev.78",
+  "installed_binary_sha256": "bef3310cab879016fdc84973d0a11aa47ab27a9bd0a2d34b0948ec9473c43f1c"
+}

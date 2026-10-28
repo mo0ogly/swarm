@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "review_type": "final_independent_candidate_review",
+  "reviewer_context": "/root/review_actions_candidate",
+  "reviewed_at_utc": "2026-10-16T07:27:54.629834+00:00",
+  "candidate": {
+    "packet": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/review-corrections/review-packet.json",
+    "packet_sha256": "2855f3bde6af869d97ca8293d15659e01fb47cdf71f7ed347e3b4e6c17aa97b3",
+    "base_commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+    "branch": "codex/clear-product-method-names",
+    "dirty_diff_sha256": "f751c243ad1ab97125a2e8d4ebe67407c8124698960cf02e9b1447a3c5457ef1",
+    "binary": "bin/swarm-actions-confiance-proof-exact",
+    "binary_sha256": "5b9ce6f43d0498624d120c70ab72b8c6b3a66785f0d856df8a357115fedfd2c6"
+  },
+  "scope": "Final corrected simulated Actions de confiance candidate, including F1/F2/F3. R20 positive native qualification explicitly deferred by user.",
+  "findings": [],
+  "resolved_findings": [
+    {
+      "id": "F1",
+      "status": "verified",
+      "evidence": "Both public connector flows deny fresh commit on corrupt chain without persisted mutation; authenticated exact historical reply remains read-only; wrong authority and new event denied. Shared writer and SPI source guards inspected."
+    },
+    {
+      "id": "F2",
+      "status": "verified",
+      "evidence": "Versioned policy/intent/result/native context exported and linked for both connectors; earlier unknown snapshot unchanged after reconciliation; altered result rejected; current and historical HMAC verification pass. Ed25519/context/checkpoint linkage inspected against supplied completed tests and browser receipt."
+    },
+    {
+      "id": "F3",
+      "status": "verified",
+      "evidence": "Invalid fractional sequence is preserved by exact decoder and refused by final Go verifier; unsafe large integer preserved. Parser/API VM checks executed; final supplied browser receipt covers FR/EN real rejection, signing, archive and large integer verification."
+    }
+  ],
+  "checks_performed": {
+    "integrity": {
+      "verified_at_utc": "2026-10-16T07:27:54.629107+00:00",
+      "packet_sha256": "2855f3bde6af869d97ca8293d15659e01fb47cdf71f7ed347e3b4e6c17aa97b3",
+      "binary_sha256": "5b9ce6f43d0498624d120c70ab72b8c6b3a66785f0d856df8a357115fedfd2c6",
+      "dirty_diff_sha256": "f751c243ad1ab97125a2e8d4ebe67407c8124698960cf02e9b1447a3c5457ef1",
+      "source_entries": 1073,
+      "proof_entries": 204,
+      "mismatches": [],
+      "native_go_input_entries": 747,
+      "native_go_input_changes": []
+    },
+    "independent_fixture_checks": 14,
+    "independent_fixture_receipt": "/tmp/swarm-actions-final-review-20261016-FpcUxBui/checks-receipt.json",
+    "independent_fixture_receipt_sha256": "33557030623fb11fd22954fbdef35afb5c760b430b8fcd2f28ab185214881242",
+    "producer_receipts_reviewed": {
+      "public_stages": 9,
+      "public_stage_exit_codes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "proof_cli_legacy_checks": 15,
+      "browser_checks": 46,
+      "browser_expected_denials": 10,
+      "browser_unexpected_diagnostics": 0,
+      "native_meaningful_cases": 722,
+      "native_principal": 189,
+      "native_subcases": 533,
+      "native_packages_structured_pass": 2,
+      "native_second_go_exit_code": null,
+      "native_second_wrapper_exit_code": 143
+    }
+  },
+  "evidence_gaps": [
+    {
+      "id": "R20",
+      "status": "deferred_by_user",
+      "condition": "Separate authorization/environment and positive kernel attribution, foreign exclusion, loss/restart/cleanup and paired overhead remain required to qualify R20."
+    },
+    {
+      "id": "native_process_exit",
+      "status": "observability_limit",
+      "detail": "Second package emitted terminal structured PASS with named cases; Go command exit was not observed after conductor SIGTERM143. No exit0 is claimed."
+    },
+    {
+      "id": "R12_final_retex",
+      "status": "outside_this_review",
+      "detail": "Final retrospective/closure remains with objective owner; this review does not fabricate its completion."
+    }
+  ],
+  "verdict": "approve",
+  "verdict_scope": "Approval of this exact corrected candidate for the authorized simulated functional scope with R20 deferred; not global business acceptance or native eBPF qualification.",
+  "limits": [
+    "No candidate files changed. Isolated reviewer fixture state only; no live state, kernel/BPF, third-party accounts, providers, payments or mission resumption.",
+    "Native and browser producer campaigns were inspected rather than rerun wholesale; independent targeted CLI/decoder checks are separately retained.",
+    "No findings does not prove excluded or untested behavior; a code/binary/relevant-input change requires renewed review."
+  ],
+  "evidence": {
+    "integrity_receipt": "/tmp/swarm-actions-final-review-20261016-FpcUxBui/integrity-receipt.json",
+    "integrity_receipt_sha256": "d65071e2b7ee29b6857caec8e5703e6604aa7e627279a5e5d0aa7ac4dfcb405d",
+    "reviewer_script": "/tmp/swarm-actions-final-review-20261016-FpcUxBui/check_final.py",
+    "reviewer_script_sha256": "468bf3b0a78a32199dc22c88d95806cb50cfbfbeaa44d5ad102790d8252b8034"
+  }
+}

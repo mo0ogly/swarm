@@ -1,0 +1,342 @@
+{
+  "current": {
+    "review_manifest_transport_bytes": 8192,
+    "bounds": {
+      "planning_activations": 0,
+      "planning_decisions": 0,
+      "review_calls": null
+    },
+    "revision": 402,
+    "limits": {
+      "review_context_files": 31,
+      "review_source_bytes": 98304,
+      "review_context_bytes": 368640,
+      "review_delivery_files": 100,
+      "planning_scopes": 0,
+      "delegation_depth": 0,
+      "planning_tasks": 20,
+      "planning_activations": 40,
+      "planning_decisions": 40,
+      "review_calls": 80
+    },
+    "consumed": {
+      "planning_scopes": 1,
+      "delegation_depth": 1,
+      "planning_tasks": 8,
+      "planning_activations": 35,
+      "planning_decisions": 26,
+      "review_calls": 80
+    },
+    "remaining": {
+      "planning_tasks": 12,
+      "planning_activations": 5,
+      "planning_decisions": 14,
+      "review_calls": 0
+    },
+    "last_authorization": {
+      "before": {
+        "review_context_files": 31,
+        "review_source_bytes": 98304,
+        "review_context_bytes": 360448,
+        "review_delivery_files": 100,
+        "planning_scopes": 0,
+        "delegation_depth": 0,
+        "planning_tasks": 20,
+        "planning_activations": 40,
+        "planning_decisions": 40,
+        "review_calls": 64
+      },
+      "after": {
+        "review_context_files": 31,
+        "review_source_bytes": 98304,
+        "review_context_bytes": 368640,
+        "review_delivery_files": 100,
+        "planning_scopes": 0,
+        "delegation_depth": 0,
+        "planning_tasks": 20,
+        "planning_activations": 40,
+        "planning_decisions": 40,
+        "review_calls": 80
+      },
+      "actor": "fpizzi/uid:1001",
+      "at": "2026-10-15T04:22:12.13334592Z",
+      "reason": "Insuffisance mesurée après correction de la lecture structurée et des deux défauts R14 : 60 appels conservés, 4 restants contre au moins trois inspections et deux étapes finales pour la nouvelle revue ; 31 sources complètes font 364903 octets, au-dessus des 360448 autorisés. Selon autorisation utilisateur existante, porter les appels à 80 et le contexte à 360 Kio, sans toucher tentatives, consommations, modèle, transport, autres limites ou critères. Cela ne corrige ni ne valide à lui seul la réponse coupée historique."
+    },
+    "scopes": [
+      {
+        "last_model": {
+          "provider": "codex",
+          "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+          "route": {
+            "level": "standard",
+            "model": "gpt-5.6-sol",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "",
+          "at": "2026-10-15T07:40:42.984682735Z"
+        },
+        "delivery": {
+          "task_budget": 20,
+          "activation_budget": 40,
+          "closure_unavailable": true,
+          "exploration_available": true,
+          "unresolved_review_sources": {
+            "plan-68b50cc82e-T2": {
+              "result_event": "review-d9ea32fa4816bae18021ddaa-result-dfebb5630dcc3281",
+              "review_id": "review-d9ea32fa4816bae18021ddaa",
+              "attempt": "a-b4669e24bbfb91f7a9686499",
+              "candidate_commit": "3d66a1fdd7d6a16f848f1f3f79890c6fcb0fcd43",
+              "failure_code": "review_fragment_protocol",
+              "owner": "reviewer_protocol",
+              "operation": "review-retry",
+              "producer_correction_required": false
+            }
+          },
+          "production_retry_unavailable": true,
+          "context_sha256": "e3d35be8798d3b9cbcd00bb0e0e7993dcd704a88ad482b8a833247b5b6dac8d5",
+          "events": [
+            "planning-rejected-1fc8dd7b77fbc449f76860868d7e51a838dffb59e0500ff1bb50511ff38e5ef7",
+            "plan-49e552252d71d0b85829ec3609531e6223b09b7ecea511577f725140fe593b8a",
+            "review-d9ea32fa4816bae18021ddaa-result-632993a2cc0150c1",
+            "plan-47f77c0437f6797b90e6ee51a89831c66152e16409acfcae4ecdb560aec8dedb",
+            "plan-074631257dd0f2c8dd3c7a1f1b786632dcc39f7e027b650dac6257ce4f300f5e",
+            "plan-3ab532bd42b58ae05f96376007fa39969adea594ff72204c1c989f8b789f9835"
+          ],
+          "reports": [
+            {
+              "path": ".swarm/planning/w-68b50cc82ec3fe55624f9549/diagnostic-b55e652be3cd4f16ae75c32f004e09d6aebe07ed885d5ff98ac102858b0ac874.json",
+              "sha256": "b55e652be3cd4f16ae75c32f004e09d6aebe07ed885d5ff98ac102858b0ac874"
+            }
+          ]
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "e537da8f3a71fb180c5eb65db1ef8ade5b4354414aa555c7f6dd95f4e498360b"
+        },
+        "activations": 35,
+        "id": "root",
+        "objective": "Livrer Actions de confiance dans Swarm : pilote Biba, identités d’entreprise, politiques de données, processus métier, preuves durables, simulations adversariales, connecteurs, référentiels et observation eBPF ; recette complète puis RETEX.",
+        "requirements": [
+          "req-1",
+          "req-2",
+          "req-3",
+          "req-4",
+          "req-5",
+          "req-6",
+          "req-7",
+          "req-8",
+          "req-9",
+          "req-10",
+          "req-11",
+          "req-12",
+          "req-13",
+          "req-14",
+          "req-15",
+          "req-16",
+          "req-17",
+          "req-18",
+          "req-19",
+          "req-20",
+          "req-21",
+          "req-22",
+          "req-23",
+          "req-24",
+          "req-25",
+          "req-26",
+          "req-27",
+          "req-28",
+          "req-29",
+          "req-30",
+          "req-31",
+          "req-32"
+        ],
+        "revision": 32,
+        "generation": 104,
+        "state": "ready"
+      }
+    ]
+  },
+  "proposed": {
+    "review_manifest_transport_bytes": 8192,
+    "bounds": {
+      "planning_activations": 0,
+      "planning_decisions": 0,
+      "review_calls": null
+    },
+    "revision": 402,
+    "limits": {
+      "review_context_files": 31,
+      "review_source_bytes": 98304,
+      "review_context_bytes": 368640,
+      "review_delivery_files": 100,
+      "planning_scopes": 0,
+      "delegation_depth": 0,
+      "planning_tasks": 20,
+      "planning_activations": 40,
+      "planning_decisions": 40,
+      "review_calls": 85
+    },
+    "consumed": {
+      "planning_scopes": 1,
+      "delegation_depth": 1,
+      "planning_tasks": 8,
+      "planning_activations": 35,
+      "planning_decisions": 26,
+      "review_calls": 80
+    },
+    "remaining": {
+      "planning_tasks": 12,
+      "planning_activations": 5,
+      "planning_decisions": 14,
+      "review_calls": 5
+    },
+    "last_authorization": {
+      "before": {
+        "review_context_files": 31,
+        "review_source_bytes": 98304,
+        "review_context_bytes": 368640,
+        "review_delivery_files": 100,
+        "planning_scopes": 0,
+        "delegation_depth": 0,
+        "planning_tasks": 20,
+        "planning_activations": 40,
+        "planning_decisions": 40,
+        "review_calls": 80
+      },
+      "after": {
+        "review_context_files": 31,
+        "review_source_bytes": 98304,
+        "review_context_bytes": 368640,
+        "review_delivery_files": 100,
+        "planning_scopes": 0,
+        "delegation_depth": 0,
+        "planning_tasks": 20,
+        "planning_activations": 40,
+        "planning_decisions": 40,
+        "review_calls": 85
+      },
+      "actor": "fpizzi/uid:1001",
+      "at": "2026-10-15T09:13:07.211672852Z",
+      "reason": "Reprise du même candidat sous le contrat de références version 2 et lecture Git exacte, qualifiée par les contre-exemples, contrôles race et parcours publics isolés. Aperçu public : trois inspections et deux appels finaux requis, zéro avis réutilisé. Autorisation utilisateur existante de relever les budgets nécessaires au projet ; 80 appels consommés et toutes les tentatives conservés. Cette hausse ne qualifie ni le pilote ni sa diffusion."
+    },
+    "scopes": [
+      {
+        "last_model": {
+          "provider": "codex",
+          "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+          "route": {
+            "level": "standard",
+            "model": "gpt-5.6-sol",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "",
+          "at": "2026-10-15T07:40:42.984682735Z"
+        },
+        "delivery": {
+          "task_budget": 20,
+          "activation_budget": 40,
+          "closure_unavailable": true,
+          "exploration_available": true,
+          "unresolved_review_sources": {
+            "plan-68b50cc82e-T2": {
+              "result_event": "review-d9ea32fa4816bae18021ddaa-result-dfebb5630dcc3281",
+              "review_id": "review-d9ea32fa4816bae18021ddaa",
+              "attempt": "a-b4669e24bbfb91f7a9686499",
+              "candidate_commit": "3d66a1fdd7d6a16f848f1f3f79890c6fcb0fcd43",
+              "failure_code": "review_fragment_protocol",
+              "owner": "reviewer_protocol",
+              "operation": "review-retry",
+              "producer_correction_required": false
+            }
+          },
+          "production_retry_unavailable": true,
+          "context_sha256": "e3d35be8798d3b9cbcd00bb0e0e7993dcd704a88ad482b8a833247b5b6dac8d5",
+          "events": [
+            "planning-rejected-1fc8dd7b77fbc449f76860868d7e51a838dffb59e0500ff1bb50511ff38e5ef7",
+            "plan-49e552252d71d0b85829ec3609531e6223b09b7ecea511577f725140fe593b8a",
+            "review-d9ea32fa4816bae18021ddaa-result-632993a2cc0150c1",
+            "plan-47f77c0437f6797b90e6ee51a89831c66152e16409acfcae4ecdb560aec8dedb",
+            "plan-074631257dd0f2c8dd3c7a1f1b786632dcc39f7e027b650dac6257ce4f300f5e",
+            "plan-3ab532bd42b58ae05f96376007fa39969adea594ff72204c1c989f8b789f9835"
+          ],
+          "reports": [
+            {
+              "path": ".swarm/planning/w-68b50cc82ec3fe55624f9549/diagnostic-b55e652be3cd4f16ae75c32f004e09d6aebe07ed885d5ff98ac102858b0ac874.json",
+              "sha256": "b55e652be3cd4f16ae75c32f004e09d6aebe07ed885d5ff98ac102858b0ac874"
+            }
+          ]
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "e537da8f3a71fb180c5eb65db1ef8ade5b4354414aa555c7f6dd95f4e498360b"
+        },
+        "activations": 35,
+        "id": "root",
+        "objective": "Livrer Actions de confiance dans Swarm : pilote Biba, identités d’entreprise, politiques de données, processus métier, preuves durables, simulations adversariales, connecteurs, référentiels et observation eBPF ; recette complète puis RETEX.",
+        "requirements": [
+          "req-1",
+          "req-2",
+          "req-3",
+          "req-4",
+          "req-5",
+          "req-6",
+          "req-7",
+          "req-8",
+          "req-9",
+          "req-10",
+          "req-11",
+          "req-12",
+          "req-13",
+          "req-14",
+          "req-15",
+          "req-16",
+          "req-17",
+          "req-18",
+          "req-19",
+          "req-20",
+          "req-21",
+          "req-22",
+          "req-23",
+          "req-24",
+          "req-25",
+          "req-26",
+          "req-27",
+          "req-28",
+          "req-29",
+          "req-30",
+          "req-31",
+          "req-32"
+        ],
+        "revision": 32,
+        "generation": 104,
+        "state": "ready"
+      }
+    ]
+  }
+}

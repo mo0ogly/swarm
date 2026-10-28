@@ -1,0 +1,11 @@
+{
+  "http": 400,
+  "error": {
+    "error": "précontrôle complet (281 pièces, 7 paquets): aucune capacité restante pour les preuves finales (socle=50713 tokens, marge=109383 tokens/879480 octets, variables=111296 octets)",
+    "failure": {
+      "code": "command_failed",
+      "message": "précontrôle complet (281 pièces, 7 paquets): aucune capacité restante pour les preuves finales (socle=50713 tokens, marge=109383 tokens/879480 octets, variables=111296 octets)",
+      "retryable": false
+    }
+  }
+}

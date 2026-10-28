@@ -1,0 +1,49 @@
+{
+  "at_utc": "2026-10-14T23:43:01.074660+00:00",
+  "work": "w-68b50cc82ec3fe55624f9549",
+  "revision": 113,
+  "review": "review-fdadd3c686a8d0d0f77c40fa",
+  "state": "changes_requested",
+  "review_calls": 19,
+  "criteria": [
+    {
+      "index": 1,
+      "verdict": "pass",
+      "evidence": "\"wrong_approval\": \"denied\", \"direct_denials\": [\"denied\", \"denied\"], \"ledger_before\": 0"
+    },
+    {
+      "index": 2,
+      "verdict": "pass",
+      "evidence": "\"unknown\": \"unknown\", \"reconciled\": \"reconciled\", \"ledger_entries\": 1"
+    },
+    {
+      "index": 3,
+      "verdict": "fail",
+      "evidence": "Le modèle persistant TrustMandate/TrustAction/TrustEvidence ne conserve que OriginalHash/original_digest. Aucun champ ni magasin ne retient les octets originaux, et les tests ne vérifient que chaîne, ancre, altération et absence de secrets. Un digest ne satisfait pas « originaux conservés »."
+    },
+    {
+      "index": 4,
+      "verdict": "fail",
+      "evidence": "web/trust-actions.html rend « Retour au cockpit » comme un lien classé `.button`. La règle tactile partagée à 44 px cible `button`, `summary` et les liens du rail, mais pas `.button`; la règle locale ne fournit que le padding `.55rem .8rem`. La recette mobile vérifie débordement et contraste, jamais la dimension de cette cible."
+    }
+  ],
+  "attempts": [
+    {
+      "id": "a-769ed89815896246f9ba4af5",
+      "status": "interrupted",
+      "started": "2026-10-14T20:13:19.079638262Z",
+      "ended": "2026-10-14T20:36:16.279269672Z"
+    },
+    {
+      "id": "a-b4669e24bbfb91f7a9686499",
+      "status": "completed",
+      "started": "2026-10-14T20:36:34.956689338Z",
+      "ended": "2026-10-14T21:05:55.9317104Z"
+    }
+  ],
+  "candidate": "84c13f5954ebfcc95b5757c2fb545ddaab91dd45",
+  "context_sha256": "cbd862afbd0bb48222d8866a04f77207534b9960b52944662a84736c5c4c57eb",
+  "receipt_sha256": "e1b6f68e50bb09d82858e430977819c8a92cc57e0c0a3549a82f8459a5574dd9",
+  "original_failure": "Literal control quotation rejected against its JSON envelope; false refusal reproduced and corrected",
+  "observed_effect": "Fresh final decision accepts identity and idempotent recovery, and independently rejects two actual pilot omissions. It is not global acceptance."
+}

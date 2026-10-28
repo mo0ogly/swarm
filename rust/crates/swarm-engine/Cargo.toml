@@ -1,0 +1,204 @@
+[package]
+name = "swarm-engine"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+test-fixtures = []
+
+[dependencies]
+c_http = { package = "http", version = "=1.5.0" }
+base64 = "=0.22.1"
+hmac = "=0.13.0"
+ed25519-dalek = { version = "=2.2.0", default-features = false, features = ["std", "zeroize"] }
+zeroize = "=1.9.0"
+subtle = "=2.6.1"
+sha2_csrf = { package = "sha2", version = "=0.11.1" }
+serde = { version = "=1.0.228", features = ["derive"] }
+serde_json = { version = "=1.0.150", features = ["raw_value", "float_roundtrip", "unbounded_depth"] }
+serde_stacker = "=0.1.14"
+rusqlite = { version = "=0.40.2", features = ["bundled", "functions"] }
+sha2 = "=0.10.9"
+time = { version = "=0.3.55", features = ["large-dates", "formatting"] }
+getrandom = { version = "=0.2.17", features = ["std"] }
+swarm-identity-contract = { path = "../swarm-identity-contract", features = ["serde"] }
+swarm-wire-json = { path = "../swarm-wire-json", features = ["timestamp"] }
+regex = { version = "=1.13.1", default-features = false, features = ["std", "unicode"] }
+
+[target.'cfg(unix)'.dependencies]
+nix = { version = "=0.30.1", default-features = false, features = ["hostname", "user", "process", "socket"] }
+rustix = { version = "=1.1.5", features = ["fs", "process", "event", "stdio", "time", "net"] }
+
+[dev-dependencies]
+tempfile = "=3.27.0"
+swarm-enrollment-bootstrap = { path = "../swarm-enrollment-bootstrap" }
+swarm-enrollment-config = { path = "../swarm-enrollment-config" }
+swarm-enrollment-state = { path = "../swarm-enrollment-state" }
+
+[[example]]
+name = "request_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "work_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "identity_plan_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "identity_plan_upgrade_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "recorded_work_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "recorded_event_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "recorded_command_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "recorded_change_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "mutation_guard_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "planning_state_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "work_definition_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "local_path_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "task_definition_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "environment_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "work_engine_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "root_store_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "validation_run_probe"
+required-features = ["test-fixtures"]
+
+[target.'cfg(target_os = "linux")'.dependencies]
+swarm-enrollment-authority = { path = "../swarm-enrollment-authority" }
+swarm-enrollment-state = { path = "../swarm-enrollment-state" }
+swarm-protection-contract = { path = "../swarm-protection-contract" }
+swarm-linux-prerequisites = { path = "../swarm-linux-prerequisites" }
+wait4 = "=0.2.0"
+
+[[example]]
+name = "gate_store_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "project_context_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "review_contract_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "review_evidence_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "managed_review_anchor_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "managed_review_contract_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "git_report_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "review_context_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "baseline_files_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "review_quote_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "review_reply_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "control_history_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "validation_evidence_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "work_projection_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "git_metadata_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "managed_receipt_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "planning_control_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "planning_budget_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "planning_rejection_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "financial_budget_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "pricing_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "agent_runtime_probe"
+required-features = ["test-fixtures"]
+
+[[example]]
+name = "telemetry_token_fixture"
+required-features = ["test-fixtures"]

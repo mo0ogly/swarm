@@ -1,0 +1,6 @@
+=== RUN   TestKernelCheckPolicy
+--- PASS: TestKernelCheckPolicy (0.07s)
+=== RUN   TestKernelCheckInactiveRefusesBeforeRunner
+--- PASS: TestKernelCheckInactiveRefusesBeforeRunner (0.06s)
+PASS
+ok  	swarm.local/companion/internal/engine	0.190s

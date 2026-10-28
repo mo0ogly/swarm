@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "latency-replan-explicit-medium-root-20261011",
+  "expected_revision": 365,
+  "reviewer": false,
+  "provider": "claude",
+  "level": "standard",
+  "model_policy_hash": "1bf3b70b3c0dc5153cf4fab9db87ff0e23668d2744a9cf3f7483e6cd2fa506f9",
+  "inherit": false,
+  "scope": "root"
+}

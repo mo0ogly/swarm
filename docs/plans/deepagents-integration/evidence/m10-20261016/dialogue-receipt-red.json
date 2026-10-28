@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestDialogueIncompleteTurnCannotBeAnswered$",
+    "-count=1",
+    "-v",
+    "-timeout=60s"
+  ],
+  "started_at_utc": "2026-10-16T10:19:44.749264+00:00",
+  "ended_at_utc": "2026-10-16T10:20:05.182450+00:00",
+  "elapsed_seconds": 20.433881514996756,
+  "exit_code": 1,
+  "log_sha256": "6aec5b0a6c7c5803f2aaf5ab842ac107dd75cb4353b4e2a3b5d89a6961f373bc",
+  "test_source_sha256": "5b88c0eb35be7f9c7f2ef847c30c0bb11135e2e2a6689f46aec3f78004a93297",
+  "real_model_calls": 0
+}

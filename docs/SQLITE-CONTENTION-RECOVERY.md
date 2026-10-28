@@ -1,3 +1,5 @@
+> Historique du moteur Go : ce guide ne décrit pas les commandes Rust. Utiliser les réglages moteur natifs `storage_busy_timeout_ms`, `storage_busy_retries`, `storage_busy_retry_delay_ms` et `swarm engine-settings show|preview|apply`. Les preuves Go restent historiques.
+
 # Reprise après contention SQLite
 
 ## Ce qui change

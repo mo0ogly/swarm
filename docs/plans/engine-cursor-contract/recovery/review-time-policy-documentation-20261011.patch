@@ -1,0 +1,28 @@
+diff --git a/docs/ATTEMPT-RECOVERY.md b/docs/ATTEMPT-RECOVERY.md
+index 4605e34..80bf98d 100644
+--- a/docs/ATTEMPT-RECOVERY.md
++++ b/docs/ATTEMPT-RECOVERY.md
+@@ -260,7 +260,8 @@ fourni ne suffit jamais à établir l’absence de rapport.
+ ### Revue interrompue par son délai
+ 
+ Dans le cockpit, **Délai de vérification** sous le vérificateur permet de régler
+-la durée des prochaines revues entre 1 et 900 secondes, avec un motif enregistré.
++une durée positive pour les prochaines revues, ou `0` pour hériter de la
++politique du projet configurée dans Admin, avec un motif enregistré.
+ La sauvegarde conserve les appels consommés et leur plafond ; elle ne relance rien.
+ Après correction de la cause, **Reprendre la vérification** reprend l’examen du
+ résultat existant dans le budget restant, sans lancer un nouvel exécutant.
+diff --git a/docs/en/ATTEMPT-RECOVERY.md b/docs/en/ATTEMPT-RECOVERY.md
+index 571e225..e657ab1 100644
+--- a/docs/en/ATTEMPT-RECOVERY.md
++++ b/docs/en/ATTEMPT-RECOVERY.md
+@@ -241,7 +241,8 @@ report is absent.
+ ### Review stopped by its time limit
+ 
+ In the cockpit, **Review time limit** below the reviewer sets the duration of
+-future reviews between 1 and 900 seconds, with a recorded reason. Saving preserves
++future reviews to a positive duration, or `0` to inherit the project policy
++configured in Admin, with a recorded reason. Saving preserves
+ used calls and their limit; it does not restart anything. After fixing the cause,
+ **Resume review** examines the existing result within the remaining budget, without
+ starting another worker.

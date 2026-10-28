@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "work_id": "w-ca937edf4e0abd85f8d3d67b",
+  "task_id": "plan-ca937edf4e-T2",
+  "task_title": "Implémenter le juge global et le renouvellement des cycles",
+  "revision": 295,
+  "intent": "replace",
+  "mode": "automatic",
+  "scope": "Cette autorisation concerne uniquement la tâche plan-ca937edf4e-T2 et reste applicable à ses tentatives jusqu’à modification ou retrait explicite.",
+  "criteria": [
+    {
+      "index": 1,
+      "text": "Verdict global de poursuivre ou finir distinct de la revue indépendante de candidat.",
+      "control_ids": [
+        "plan-entry",
+        "plan-validation",
+        "plan-delivery",
+        "plan-criterion-1"
+      ],
+      "review": "contrôle structuré préautorisé"
+    },
+    {
+      "index": 2,
+      "text": "Transition durable entre cycles, contexte reconstruit, objectif, preuves, tentatives et limites conservés.",
+      "control_ids": [
+        "plan-entry",
+        "plan-validation",
+        "plan-delivery",
+        "plan-criterion-2"
+      ],
+      "review": "contrôle structuré préautorisé"
+    },
+    {
+      "index": 3,
+      "text": "Rejeu, verdict périmé, panne, quota et limite refusent les effets ou appels doubles.",
+      "control_ids": [
+        "plan-entry",
+        "plan-validation",
+        "plan-delivery",
+        "plan-criterion-3"
+      ],
+      "review": "contrôle structuré préautorisé"
+    },
+    {
+      "index": 4,
+      "text": "Aucune clôture globale sans les preuves fraîches requises. Architecture documentée dans le même candidat, avec schémas et limites à jour.",
+      "control_ids": [
+        "plan-entry",
+        "plan-validation",
+        "plan-delivery",
+        "plan-criterion-4"
+      ],
+      "review": "contrôle structuré préautorisé"
+    }
+  ],
+  "controls": [
+    {
+      "review_output": true,
+      "id": "plan-entry",
+      "command": [
+        "python3",
+        "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+        "T2"
+      ],
+      "criteria": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "justification": "Contrôle mécanique de traçabilité et documentation, ou régression du lancement/reprise ; la couverture comportementale et sémantique du critère exige les preuves du lot et la revue indépendante du même candidat.",
+      "timeout_seconds": 30
+    },
+    {
+      "review_output": true,
+      "id": "plan-validation",
+      "command": [
+        "go",
+        "test",
+        "./internal/engine",
+        "-run",
+        "TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestPlanningJudge",
+        "-count=1",
+        "-timeout",
+        "25s"
+      ],
+      "criteria": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "justification": "Exécute les régressions de plan/reprise historiques et les tests comportementaux TestPlanningJudge du même candidat ; les contrôles locaux et ce reçu moteur ne remplacent pas la revue indépendante.",
+      "timeout_seconds": 30
+    },
+    {
+      "review_output": true,
+      "id": "plan-delivery",
+      "command": [
+        "python3",
+        "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+        "T2"
+      ],
+      "criteria": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "justification": "Contrôle mécanique de traçabilité et documentation, ou régression du lancement/reprise ; la couverture comportementale et sémantique du critère exige les preuves du lot et la revue indépendante du même candidat.",
+      "timeout_seconds": 30
+    },
+    {
+      "review_output": true,
+      "id": "plan-criterion-1",
+      "command": [
+        "python3",
+        "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+        "T2"
+      ],
+      "criteria": [
+        1
+      ],
+      "justification": "Contrôle mécanique de traçabilité et documentation, ou régression du lancement/reprise ; la couverture comportementale et sémantique du critère exige les preuves du lot et la revue indépendante du même candidat.",
+      "timeout_seconds": 30
+    },
+    {
+      "review_output": true,
+      "id": "plan-criterion-2",
+      "command": [
+        "python3",
+        "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+        "T2"
+      ],
+      "criteria": [
+        2
+      ],
+      "justification": "Contrôle mécanique de traçabilité et documentation, ou régression du lancement/reprise ; la couverture comportementale et sémantique du critère exige les preuves du lot et la revue indépendante du même candidat.",
+      "timeout_seconds": 30
+    },
+    {
+      "review_output": true,
+      "id": "plan-criterion-3",
+      "command": [
+        "python3",
+        "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+        "T2"
+      ],
+      "criteria": [
+        3
+      ],
+      "justification": "Contrôle mécanique de traçabilité et documentation, ou régression du lancement/reprise ; la couverture comportementale et sémantique du critère exige les preuves du lot et la revue indépendante du même candidat.",
+      "timeout_seconds": 30
+    },
+    {
+      "review_output": true,
+      "id": "plan-criterion-4",
+      "command": [
+        "python3",
+        "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+        "T2"
+      ],
+      "criteria": [
+        4
+      ],
+      "justification": "Contrôle mécanique de traçabilité et documentation, ou régression du lancement/reprise ; la couverture comportementale et sémantique du critère exige les preuves du lot et la revue indépendante du même candidat.",
+      "timeout_seconds": 30
+    }
+  ],
+  "limits": [
+    "1 à 8 contrôles ; 32 arguments maximum par commande",
+    "300 secondes cumulées ; 64 Kio de sortie retenue par contrôle",
+    "Programmes autorisés : go, git, node, npm, python, python3, pytest",
+    "Exécution sans shell implicite, dans le projet uniquement"
+  ],
+  "effects": [
+    "Toute gate, tout reçu automatique et toute preuve de validation antérieurs seront invalidés.",
+    "La configuration n’exécute aucun contrôle et ne lance aucun agent."
+  ],
+  "warnings": [
+    "Une suggestion ou un texte produit par une IA n’est jamais une autorisation.",
+    "Un critère qualitatif doit conserver la revue humaine : choisir le mode humain pour toute la tâche."
+  ],
+  "confirmation": "Préautoriser exactement les contrôles affichés ; ils ne pourront valider que cette tâche, sous autorisation de mission active.",
+  "preview_token": "33ed4f52c0e6b2b4d658ffa2636fc550e8de18ee4392b0cd00387db9510f0e5f"
+}

@@ -1,0 +1,21 @@
+=== RUN   TestFragmentUnicodeNeedsMatchesPublishedSchema
+=== RUN   TestFragmentUnicodeNeedsMatchesPublishedSchema/accent_boundary
+    managed_review_fragment_unicode_test.go:46: schema-valid Unicode need rejected  inspection de fragment : demande de preuve invalide
+=== RUN   TestFragmentUnicodeNeedsMatchesPublishedSchema/astral_boundary
+    managed_review_fragment_unicode_test.go:46: schema-valid Unicode need rejected  inspection de fragment : demande de preuve invalide
+=== RUN   TestFragmentUnicodeNeedsMatchesPublishedSchema/minimum
+=== RUN   TestFragmentUnicodeNeedsMatchesPublishedSchema/overlong
+=== RUN   TestFragmentUnicodeNeedsMatchesPublishedSchema/underlength
+    managed_review_fragment_unicode_test.go:49: need outside schema admitted
+--- FAIL: TestFragmentUnicodeNeedsMatchesPublishedSchema (0.00s)
+    --- FAIL: TestFragmentUnicodeNeedsMatchesPublishedSchema/accent_boundary (0.00s)
+    --- FAIL: TestFragmentUnicodeNeedsMatchesPublishedSchema/astral_boundary (0.00s)
+    --- PASS: TestFragmentUnicodeNeedsMatchesPublishedSchema/minimum (0.00s)
+    --- PASS: TestFragmentUnicodeNeedsMatchesPublishedSchema/overlong (0.00s)
+    --- FAIL: TestFragmentUnicodeNeedsMatchesPublishedSchema/underlength (0.00s)
+=== RUN   TestFragmentUnicodeNeedsPreservesHistoricalWire
+    managed_review_fragment_unicode_test.go:70: unknown inspection contract admitted
+--- FAIL: TestFragmentUnicodeNeedsPreservesHistoricalWire (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.035s
+FAIL

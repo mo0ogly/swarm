@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-12T21:08:36.056412+00:00",
+  "status": "DIRECT_WEB_REQUEST_POLICY_VERIFIED_NOT_NATIVE_INSTALL_OR_INDEPENDENT_ACCEPTANCE",
+  "base_head": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+  "sources_sha256": {
+    "resources.go": "b5c75f94ab0176cb200e4717e9a818178b72111a48c7dadb7602ceb18416af13",
+    "config/web-requests.json": "e93688764193124252a11ff96f51e66fbdc4fbe98faa8eca2e0abe76df58754c",
+    "internal/engine/web_requests_config.go": "b7d03079a6fe6b5ac239256223479d352daedf32d94caf05d2dfd1a611dd130c",
+    "internal/engine/web_requests_config_test.go": "ad40d0273db9ca9f27ef1f36ebe0932d40d108b99b8606c50e3e0e5a380e37e9",
+    "internal/engine/run_limits_cli.go": "bec24adc87e250e7de544983d5878a8aa09c95d2d0ef1adc9264ee85f72b6b4c",
+    "internal/engine/run_limits_web.go": "80601b9ef1760c8d4f09285e18948ccb5d4ca445ecd5c95fa253afe46e8bbe32",
+    "web/web-requests.js": "d3cf45e07b7336f0267af1bbb914d1f3d4d9eaafce24d574ed7cde90822cd3ea",
+    "web/web-requests-admin.js": "fba07b14e52e21cb5b011bc80708310571aaec257a527a422a13f023e37459e1",
+    "web/cockpit.js": "f9b0d4d22ac70a24a62b9af99e20c2017d0b999a10d3292a4c063b2e51ad4ae4",
+    "web/prephase.js": "73c973a45226dfab8cd93f8e238939db0068d9f832b5d070ee5dcea0f0c905a9",
+    "web/projects.js": "187a33e827e7ad929038a31ca0d0af6200154b91ba99afb66a876bf86c57a944",
+    "web/runtime-health.js": "8b356f3bc111c5a1be99a420e1e770fdebc5acb56012783194718f4960c212fc",
+    "web/index.html": "7fe5f0a5638ef4ad37f760d411177616c4f057d773bc45e2d02c52d8070888d8",
+    "web/prepare.html": "7e3d0603a3600de6252a289af41bc69131c13151888aedfbda756bdfea0cb6f2",
+    "web/projects.html": "2ca1e58a4e14ddda65fa101c8c289bb71444f8a5a64889b7863c46e74b5ff1c2",
+    "web/terminal.html": "2b82c603ea5342c55693e8189c969e85f87f1dd8975d6714fd79df7305a72748",
+    "web/log-console.html": "10e2739932667b79c361c91392888f7b22edd91567b78d5bd9d73cb576fd3685",
+    "web/swarm-design.css": "8e74c42d43349d3ab29f3a2991f348d98292800a26998f1331782815980391eb",
+    "locales/en.json": "a405b452dd635ddbbba42bb3e450996b4d4152b7892b538cd05813551e685e9d",
+    "web/i18n-en.js": "4ed08a05b95a2d5d65938e11224e449b73baf19016ed7a50388a2a380fe06342",
+    "tests/web_requests_test.cjs": "c177f0d8e003c28c4b0a2fef5a8decc26b4275af15648dd3166617ce5404ccd2",
+    "tests/web_requests_admin_ui.cjs": "354d19e2b66a8f7875eb2eb4ddd7e16909d62d232029826fa8159388f55c3b3a",
+    "package.json": "5c8d28e51dde8bada6d858049652ec522df12ee512d90cbdf19cdc562e0f3621",
+    "docs/engine-cursor-source-manifest.json": "a1ab363be083fc1c4195c6b5441baf9e8e3bd1ef4cbef49ad701e08a64d871fe"
+  },
+  "fixture_binary": {
+    "path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-direct-web-requests",
+    "sha256": "f5dff0f18701ede605c23283b41265a04038935ee3c3b08549fd68f730299dfb"
+  },
+  "native_binary": {
+    "path": "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm",
+    "sha256": "ae2e5f9d63c421859a57a2d3f7e4de3ff9cb098f5a25dbe1cd6e90640a611d37",
+    "replaced": false
+  },
+  "checks": {
+    "go_race_command": "go test -race ./internal/engine -run '^(TestWebRequests.*|TestWebAuthenticationOriginAndSharedGuard|TestPreparationWebCLIParityAndSecurity|TestWebSessionStablePrivateAndScoped|TestWebLoginDesignAssetsRemainPublicAndAPIPrivate)$' -count=1 -timeout=90s -json",
+    "passed_cases": [
+      "TestWebLoginDesignAssetsRemainPublicAndAPIPrivate",
+      "TestPreparationWebCLIParityAndSecurity",
+      "TestWebRequestsPublicPersistencePreviewReplayAndConflict",
+      "TestWebRequestsInvalidAuthenticationAndConcurrentRevision",
+      "TestWebRequestsConfigRefusesSymlinkAndAllPagesLoadPolicy",
+      "TestWebAuthenticationOriginAndSharedGuard",
+      "TestWebSessionStablePrivateAndScoped"
+    ],
+    "client_and_refresh_tests": "PASS",
+    "browser_cases": [
+      "fr/etat: persisted/CLI parity, read-only preview, current/reloaded/other-page settings, observed timeout, zero duration, no replay, stale refusal, Escape/focus, mobile, delayed readback focus",
+      "fr/sombre: persisted/CLI parity, read-only preview, current/reloaded/other-page settings, observed timeout, zero duration, no replay, stale refusal, Escape/focus, mobile, delayed readback focus",
+      "en/etat: persisted/CLI parity, read-only preview, current/reloaded/other-page settings, observed timeout, zero duration, no replay, stale refusal, Escape/focus, mobile, delayed readback focus",
+      "en/sombre: persisted/CLI parity, read-only preview, current/reloaded/other-page settings, observed timeout, zero duration, no replay, stale refusal, Escape/focus, mobile, delayed readback focus"
+    ],
+    "i18n": "PASS",
+    "go_vet": "PASS",
+    "diff_check": "PASS"
+  },
+  "proofs_sha256": {
+    "direct-web-requests-red.jsonl": "497b3208e4d7a7a2283ab8a1e03e1f9af53f45156074eb22adc612bbcc9b8546",
+    "direct-web-requests-contracts.jsonl": "04b6f0e0973e81febf0e3a2510e104e08b4d02c72a2020b58dac3c25450c00cb",
+    "direct-web-requests-shared-race.jsonl": "9fa3820e192dc0669d27afabca03a15fbd3c23c3d932a9350069294d7877c1be",
+    "direct-web-requests-client-final.out": "2e053676aeb9e98f2252c042cc07b8b36ac8f49925d85478e8f9f75aa0496a20",
+    "direct-web-requests-refresh.out": "81cede803ecb6ad9d81a85c37de3ed7ffa48abb743e8fb8b17f7b1dea1632321",
+    "direct-web-requests-vet.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "direct-web-requests-source-manifest.out": "4f025f8c50c93c6f2457bab38326d9d61463bc9c23c89e18e9248f5d6134742c",
+    "web-requests-ui-result.json": "a3300ee72de1de4e782fe9f783b538be2fb4b6d156cab65028717fb2a01a92e7",
+    "web-requests-en-mobile.png": "3edef8c7e47a121829c375f573cc6e9eb9f8d2db46ebc578fd3cb8edc63bf925",
+    "web-requests-fr-preview.png": "997e94bba0a0acbff3bf2ee2d028c6aef874eacf96074bc29337fff8b9d0ed42",
+    "web-requests-focus-original-failure.json": "7f399d26088c70528263c3312e829332c8b1206b219fde3b69bdb9f3e01af774",
+    "web-requests-focus-original.png": "d8f5b6bb6da404b869be25b2a388ba38a4bf35983a658ad5038519ee70e4b65d"
+  },
+  "limits": [
+    "Original red source was not separately hashed; red output is retained",
+    "Race results cover the backend source contract before the final CSS-only refinement; browser recipe and final executable cover the final assets",
+    "HTTP waiting probes were intercepted and did not call a provider",
+    "Other browser pages receive configuration on reload; no immediate cross-tab propagation",
+    "Server AI connection 60-second waits and editor loading wait remain separate fixed policies",
+    "T7 real model/independent review and native root migration/access remain unproven"
+  ]
+}

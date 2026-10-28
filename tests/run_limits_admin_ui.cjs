@@ -12,14 +12,21 @@ async function fillEffective(page,values){for(const [k,v] of Object.entries(valu
  await cli(['init']);
  const w=(await cli(['work','create'],{schema_version:1,event_id:'create',expected_revision:0,title:'Admin run-limits test',objective:'Verify run-limits admin screen',scope:'isolated',criteria:['No secret shown'],next:'Configure'})).work;
  app=spawn(binary,['--root',root,'web','127.0.0.1:0']);const url=await new Promise((resolve,reject)=>{let text='';app.stdout.on('data',x=>{text+=x;const m=text.match(/http:\/\/[^\s]+/);if(m)resolve(m[0])});app.on('exit',c=>reject(Error('server '+c)))});
- browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});const checks=[],errors=[];
+ browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});const checks=[],errors=[],diagnostics=[];
  try{
  for(const lang of ['fr','en']){
   const key='qa-'+lang;
   const show=()=>cli(['run-limits','show','role',w.id,key]);
-  const p=await browser.newPage();p.setDefaultTimeout(30000);p.on('pageerror',e=>errors.push(lang+': '+e.message));await p.setViewport({width:1400,height:1000});
+  const p=await browser.newPage();p.setDefaultTimeout(30000);let testingStaleRevision=false;
+  p.on('pageerror',e=>errors.push(lang+': '+e.message));
+  p.on('requestfailed',r=>errors.push(lang+': '+new URL(r.url()).pathname+': '+r.failure()?.errorText));
+  p.on('response',r=>{if(r.status()<400)return;const pathname=new URL(r.url()).pathname;const expected=testingStaleRevision&&pathname==='/api/v1/run-limits/preview'&&[400,409].includes(r.status());diagnostics.push({lang,kind:'http',pathname,status:r.status(),expected});if(!expected)errors.push(lang+': unexpected HTTP '+r.status()+' '+pathname)});
+  p.on('console',m=>{if(m.type()!=='error')return;const expected=testingStaleRevision&&/^Failed to load resource: the server responded with a status of (400|409)\b/.test(m.text());diagnostics.push({lang,kind:'console',text:m.text(),expected});if(!expected)errors.push(lang+': '+m.text())});
+  await p.setViewport({width:1400,height:1000});
   const u=new URL(url);u.searchParams.set('work',w.id);u.searchParams.set('lang',lang);await p.goto(u.href);await p.waitForFunction(()=>typeof snapshot!=='undefined' && snapshot?.work);
   if(await p.$eval('[data-view="admin"]',e=>e.getClientRects().length===0))await p.click('#mode');
+  const adminGroup = '#tabs details:has([data-view="admin"])';
+  if(!await p.$eval(adminGroup,e=>e.open)) await p.click(adminGroup+' > summary');
   await p.click('[data-view="admin"]');
   await p.waitForFunction(()=>document.querySelector('#admin-current').textContent.length>0);
 
@@ -45,6 +52,7 @@ async function fillEffective(page,values){for(const [k,v] of Object.entries(valu
   let openBtn=await p.$('#admin-current button');
   await openBtn.click();
   await p.waitForSelector('#field-silence_seconds');
+  assert(await p.$eval('#modal',e=>/Seuil d’observation d’un outil|Tool observation threshold/.test(e.textContent)), 'duration described as an automatic cutoff');
   await fill({silence_seconds:'30',tool_seconds:'120',max_tool_calls:'50',max_repeated_calls:'3',max_consecutive_errors:'2',reason:'ui recette'});
   const before=await show();
   await p.click('#confirm');
@@ -78,10 +86,12 @@ async function fillEffective(page,values){for(const [k,v] of Object.entries(valu
   await openBtn.click();
   await p.waitForSelector('#field-silence_seconds');
   const outside=await cli(['run-limits','apply','role',w.id,key],{schema_version:1,event_id:'outside-'+lang,scope:'role',mission_id:w.id,scope_key:key,expected_revision:afterApply.revision,values:{silence_seconds:99,tool_seconds:99,max_tool_calls:99,max_repeated_calls:9,max_consecutive_errors:9},reason:'external concurrent change'});
+  testingStaleRevision=true;
   await p.click('#confirm');
   await p.waitForFunction(()=>!document.querySelector('#modal-error').hidden);
   const errText=await p.$eval('#modal-error',e=>e.textContent);
   assert(/a changé depuis le chargement|changed since it was loaded/.test(errText),errText);
+  testingStaleRevision=false;
   checks.push(lang+': révision périmée détectée et refusée (aucune écriture silencieuse)');
   await p.click('#cancel');
   await p.waitForFunction(()=>!document.querySelector('#modal').open);
@@ -106,8 +116,12 @@ async function fillEffective(page,values){for(const [k,v] of Object.entries(valu
   assert.equal(afterRollback.revision,outside.revision+1);
   checks.push(lang+': retour à la révision 1 confirmé, historique conservé (révision '+afterRollback.revision+')');
 
-  await p.click('#admin summary');
-  await fillEffective(p,{mission:w.id,role:key,task:'plan-demo-'+lang});
+  const effectivePanel='#admin details:has(#admin-effective-form)';
+  if(!await p.$eval(effectivePanel,e=>e.open))await p.click(effectivePanel+' > summary');
+  const taskID='plan-demo-'+lang;
+  const currentWork=(await cli(['work','show',w.id])).work;
+  await cli(['task','add',w.id],{schema_version:1,event_id:'effective-task-'+lang,expected_revision:currentWork.revision,id:taskID,title:'Effective limit fixture',owner:'qa',deliverable:'proof.txt',criteria:['Observed effect'],depends:[],next:'Read effective limits'});
+  await fillEffective(p,{mission:w.id,role:key,task:taskID});
   await p.click('#admin-effective-form button');
   await p.waitForFunction(()=>!document.querySelector('#admin-effective-output').hidden);
   const effText=await p.$eval('#admin-effective-output',e=>e.textContent);
@@ -140,7 +154,7 @@ async function fillEffective(page,values){for(const [k,v] of Object.entries(valu
 
  }
  assert.deepEqual(errors,[]);
- fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({status:'PASS',checks,errors,at:new Date().toISOString(),root},null,2));
+ fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({status:'PASS',checks,errors,diagnostics,at:new Date().toISOString(),root},null,2));
  console.log(checks.join('\n'));
  }finally{await browser.close();app.kill()}
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>{try{app&&app.kill()}catch{}});

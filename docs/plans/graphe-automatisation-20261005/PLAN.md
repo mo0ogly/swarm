@@ -1,5 +1,18 @@
 # Plan détaillé pour l’édition graphique et l’automatisation de Swarm
 
+## Repère de reprise — 24 octobre 2026
+
+Cette proposition historique rejoint la
+[file APEX FR](../FILE-APEX.md#vague-2--rapprochement-des-suivis-antérieurs-24-octobre-2026)
+et [EN](../../en/APEX-QUEUE.md#wave-2--reconciling-earlier-tracking-october-24-2026).
+La [migration Rust](../migration-rust/PLAN.md) reste le socle prioritaire ; les
+références Go ci-dessous décrivent l’état du 5 octobre, pas un choix de conserver
+un second moteur. Codex racine possède la cartographie A01 à reprendre sur le
+candidat Rust concerné : exigence, capacité disponible, preuve, écart et raccord
+G4/G5 ou autre parcours affecté. Cette relecture ne prouve ni adoption ni livraison
+de l’ensemble A01–D04. A02/A03 doivent partir de cet inventaire avant toute
+nouvelle réalisation ; les seize lots ne sont pas relancés par leur inscription.
+
 Date : 5 octobre 2026. Statut : proposition documentée, sans modification du moteur, sans création ni lancement de mission. Destinataire : Fabrice Pizzi et les personnes qui réaliseront et examineront les lots.
 
 ## Résultat recherché

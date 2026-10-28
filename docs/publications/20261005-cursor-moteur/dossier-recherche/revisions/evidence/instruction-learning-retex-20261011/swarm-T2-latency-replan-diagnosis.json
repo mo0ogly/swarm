@@ -1,0 +1,40 @@
+{
+  "at": "2026-10-11T16:06:00.857720+00:00",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "review": "review-dd11fa7937a5314dd9b58538",
+  "candidate": "39e89b169fc55255e828e66e765a0fee4ef91530",
+  "final_state": "changes_requested",
+  "current_call": "fragment-call-d1f35ef1e1c52a353ba30a8a",
+  "provider_process_start_approx": "2026-10-11T15:35:18.614166+00:00",
+  "provider_finished": "2026-10-11T15:53:18.198498073Z",
+  "duration_seconds_approx": 1079.584332,
+  "duration_limit": "Start reconstructed from observed /proc elapsed age, not a persisted call receipt. Full review wall includes quota pause.",
+  "whole_review_wall_seconds": 3999.863029,
+  "reply_json_bytes": 1653,
+  "reported_output_tokens_delta": 99121,
+  "reported_cost_usd_delta": 1.7616821999999992,
+  "usage_limit": "Public aggregate delta across one newly completed call, no other new reviewer reservation. Provider-reported usage/cost, not invoiced subscription charges; no private reasoning inspected.",
+  "packet_count": 6,
+  "packet_execution": "Sequential loop in runManagedFragmentReview; no parallel inspections in current engine.",
+  "artifact_content_bytes_by_kind": {
+    "diff": 497038,
+    "context": 62494,
+    "source": 164432
+  },
+  "source_manifest_diff_bytes": 189927,
+  "effort": {
+    "requested": "",
+    "cli_flag_present": false,
+    "user_setting": "xhigh",
+    "effective": "unknown",
+    "hypothesis": "Client settings may provide xhigh; safe-mode disables customizations but does not document ignoring model settings. Actual reviewer model/effort not surfaced."
+  },
+  "replan_decision": "Expose explicit effort via existing Admin CAS, then operator select medium for next roles, preserve consumption/history and perform fresh candidate controls/review. New route prevents mixing old Claude opinions; request high explicitly on actual insufficient verification. T4 owns concurrent fragment protocol/public latency, T5 complete Admin telemetry/policies.",
+  "source": "https://code.claude.com/docs/en/model-config#adjust-effort-level",
+  "limitations": [
+    "No controlled speedup measured yet",
+    "Reported output tokens do not identify the reasoning/content split",
+    "Current T2 independent verdict requests historical handoff correction, not Go defect",
+    "Never increase silence/disable verification to manufacture performance"
+  ]
+}

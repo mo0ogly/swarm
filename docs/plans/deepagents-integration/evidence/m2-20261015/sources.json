@@ -1,0 +1,185 @@
+{
+  "captured_at_utc": "2026-10-15T19:25:02.791485+00:00",
+  "repositories": {
+    "memory-agent": {
+      "repository": "https://github.com/langchain-ai/memory-agent",
+      "path": "/tmp/swarm-memory-agent-AFnHs8",
+      "commit": "05ed21ef365fc2c24ca5a735f6e65b0e2296c967",
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "ca6e58e59e1afc06b9bbb0e013a2b8d0f52b75e6eb9cec2d85666de05b8e34aa"
+        },
+        {
+          "path": "pyproject.toml",
+          "sha256": "e225a30b1813559aaae8dbf60036cb74df291ce2476ec89f968913cbfe2abd68"
+        },
+        {
+          "path": "src/memory_agent/__init__.py",
+          "sha256": "1527b3674b6244ef78a288c94c0d9d044a1e4f79c5a3f0b52261a19bdaaa8074"
+        },
+        {
+          "path": "src/memory_agent/context.py",
+          "sha256": "7a67fe56f49908edee83cc865fe513567ddfc9b139fc5e4442746bc95b56d333"
+        },
+        {
+          "path": "src/memory_agent/graph.py",
+          "sha256": "844de38aa1295f6b3dcd5883cff426951f85d6c150163bdd22b3c1ec45f61e9f"
+        },
+        {
+          "path": "src/memory_agent/prompts.py",
+          "sha256": "b1556177b06bb56ed5687516e15608c4a87fe9ece8ec23e8afaf5b35d4900216"
+        },
+        {
+          "path": "src/memory_agent/state.py",
+          "sha256": "1a2f07b4e0b2c386a9dd2ba486025c2694b4c6e4bccf6022f8658065f95394bb"
+        },
+        {
+          "path": "src/memory_agent/tools.py",
+          "sha256": "9aa2757f3c11387ae69d50e9e3dcba4a26cfaab9566760a995483ea663378d8d"
+        },
+        {
+          "path": "src/memory_agent/utils.py",
+          "sha256": "acdc4ed3df541e3df1e5926f0cc41cc9a9235e6e4cfacf9949cd44a02ae637f2"
+        },
+        {
+          "path": "tests/conftest.py",
+          "sha256": "54d89dd0dc68d0cef1a5fb8fda715b78c3bdb287d424d9d2108769a9d7c57749"
+        },
+        {
+          "path": "tests/integration_tests/__init__.py",
+          "sha256": "8a7f7e2ef440f249bf8386d5f34a7bca4356f5df49c870b2627ba6205e79cea0"
+        },
+        {
+          "path": "tests/integration_tests/test_graph.py",
+          "sha256": "d9ee663d66f499bdfe79337490a491705f34a088dbdf1e3dcedf3e2f045db0e9"
+        },
+        {
+          "path": "tests/unit_tests/__init__.py",
+          "sha256": "b1a2d1776f2b31d77dfa055e7271d0daeb5a01b1cc5768bb58de10df63b6535c"
+        },
+        {
+          "path": "tests/unit_tests/test_context.py",
+          "sha256": "aa017ed112ffcd808a56b5c13ec270500ca60a030d4d81aeb36e628dca2f84ec"
+        }
+      ]
+    },
+    "memory-template": {
+      "repository": "https://github.com/langchain-ai/memory-template",
+      "path": "/tmp/swarm-memory-template-wsrdkl",
+      "commit": "c4e05d4c5c519256eb70ab1be763c81df03040ed",
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "19ee8ef9161e6d177ce4d073e210766d578f0f130492545d307dc8a5de3c14d3"
+        },
+        {
+          "path": "pyproject.toml",
+          "sha256": "fe62eabd5aec1fe880c9f468bd0904be9a467999af28464170540864561a2680"
+        },
+        {
+          "path": "src/chatbot/__init__.py",
+          "sha256": "ddeb5b458a637ccbec4311a0b3e81adaac7b10479c30d845401a99fe3f67784e"
+        },
+        {
+          "path": "src/chatbot/configuration.py",
+          "sha256": "6ed56cfab3e6b3d96e82d30c37b5f66c90fb2fab1e9a85d320d90c879f398efd"
+        },
+        {
+          "path": "src/chatbot/graph.py",
+          "sha256": "b62e7481835d34b10d547730287d427733cba3bfb9cafca4b6f90fed27d86d99"
+        },
+        {
+          "path": "src/chatbot/prompts.py",
+          "sha256": "a764695e92d388b722cb3b6ee0d293f488ec50b92a5f20bf6b15c820aee80d84"
+        },
+        {
+          "path": "src/chatbot/utils.py",
+          "sha256": "db3412c7dba28f69136564d4e5495ac612e5905048caa9ae27bde7dd717128c6"
+        },
+        {
+          "path": "src/memory_graph/__init__.py",
+          "sha256": "fcc1e9bb09420d7420f32f8e1a3cbc9d4486f52b6771c19faba7415b97509059"
+        },
+        {
+          "path": "src/memory_graph/configuration.py",
+          "sha256": "66adedce0c869a6d85067a036d714b8d1a19d1d864ce0e7ff2dfbb8e6c33a3ed"
+        },
+        {
+          "path": "src/memory_graph/graph.py",
+          "sha256": "fd3209fc815732187a63d0f0c2dfc6a9e6fcee8319769debd7706757ceb811b3"
+        },
+        {
+          "path": "src/memory_graph/utils.py",
+          "sha256": "d51e139bd23b565a0bfcce96c51a54380abd0bb556b341e242281412e2de6dee"
+        },
+        {
+          "path": "tests/integration_tests/__init__.py",
+          "sha256": "8a7f7e2ef440f249bf8386d5f34a7bca4356f5df49c870b2627ba6205e79cea0"
+        },
+        {
+          "path": "tests/integration_tests/test_graph.py",
+          "sha256": "8bb97fdc09d436d2695f3c4655e2f4fbb070db08501304529742a488ab77c041"
+        },
+        {
+          "path": "tests/unit_tests/__init__.py",
+          "sha256": "b1a2d1776f2b31d77dfa055e7271d0daeb5a01b1cc5768bb58de10df63b6535c"
+        },
+        {
+          "path": "tests/unit_tests/test_configuration.py",
+          "sha256": "6aa9f881a830c5b34ccd55858c484d79836cb099245f8094228a4c9197c72e7a"
+        }
+      ]
+    },
+    "swarm": {
+      "commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm",
+      "files": [
+        {
+          "path": "internal/engine/agent_dialogue.go",
+          "sha256": "9560564e0c409e446e33f4f14055251e42d6beac1b804fb859b631f1b600b25c"
+        },
+        {
+          "path": "internal/engine/agent_dialogue_test.go",
+          "sha256": "199b3d13ec7107e14b1986d222405ab33a73760e8ab50d87bdb1d38d82328869"
+        },
+        {
+          "path": "internal/engine/worker_recovery_context.go",
+          "sha256": "b9993b698462b8138c7b5349ea809cf2fdead033341c0e5c53b4e33200e15459"
+        },
+        {
+          "path": "internal/engine/worker_recovery_context_test.go",
+          "sha256": "058aaf6a42352d18a098a9c00aa7ebf6957d8759402a81a075a55ad1858a5c94"
+        },
+        {
+          "path": "internal/engine/instruction_revision.go",
+          "sha256": "8fb06af1125ed0785f282e77be4607e81e4a76e32f1a1ee36a4863cb6efc8615"
+        },
+        {
+          "path": "internal/engine/instruction_revision_operator_test.go",
+          "sha256": "595d052c1e8a425463220e98af2674f4e213eb2db6c9c2a72d9f0560c6d6c747"
+        },
+        {
+          "path": "internal/engine/dialogue_context.go",
+          "sha256": "b8885e9d6e6f7681307cf42b10dc76cca7774df43319974a8fbb521a2970e2ab"
+        },
+        {
+          "path": "internal/engine/planning_context.go",
+          "sha256": "81e66799412c188e71a46a6a180d4101a946351a0d5d4d9421393fc0c68a1eb9"
+        },
+        {
+          "path": "internal/engine/retex.go",
+          "sha256": "0112c6e2b1d31de4f7d8c829f046cbe86c4cb2588123b8bfa13b6ff9f2b3f0ec"
+        },
+        {
+          "path": "internal/engine/retex_model.go",
+          "sha256": "ff4f37000ad5f3da5c29511a96378095ee3cc98c45c4699c0a45936d25600456"
+        },
+        {
+          "path": "internal/engine/tracking_views.go",
+          "sha256": "9ebb087691bcb243bae586cd7c142fcaa599180806e1cea2794e4fcaea25e86f"
+        }
+      ]
+    }
+  }
+}

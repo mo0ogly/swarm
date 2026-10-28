@@ -1,0 +1,24 @@
+{
+  "calls": 1,
+  "result": {
+    "usable_response": true,
+    "requested_model": "glm-5.2",
+    "started_at_unix": 1792863017.2791467,
+    "automatic_retries": 0,
+    "reported_model": "glm-5.2",
+    "usage": {
+      "completion_tokens": 1512,
+      "prompt_tokens": 1459,
+      "total_tokens": 2971,
+      "completion_tokens_details": {
+        "reasoning_tokens": 41,
+        "text_tokens": 1471
+      }
+    },
+    "finish_reason": "stop",
+    "elapsed_seconds": 7.84
+  },
+  "integrated": "Protected work_budget HTTP adapter, corrected principal DTO/null/JSON error conversion and preview metadata handling; principal owns UI and qualification.",
+  "model": "GLM5.3 according user; API requested/reported glm-5.2, actual backend unverified.",
+  "automatic_retries": 0
+}

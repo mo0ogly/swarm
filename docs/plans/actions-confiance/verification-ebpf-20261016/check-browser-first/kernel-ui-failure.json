@@ -1,0 +1,13 @@
+{
+  "message": "Waiting for selector `#trust-kernel-result:not([hidden])` failed",
+  "stack": "TimeoutError: Waiting for selector `#trust-kernel-result:not([hidden])` failed\n    at CSSQueryHandler.waitFor (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/common/QueryHandler.js:214:46)\n    at async CdpFrame.waitForSelector (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Frame.js:544:21)\n    at async CdpPage.waitForSelector (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Page.js:1385:20)\n    at async /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_kernel_ui.cjs:22:141",
+  "checks": [
+    "inactive diagnostic is explained and cannot launch",
+    "fr: preview read-only and Admin persists non-default policy",
+    "fr: saved values reopen and keyboard focus restores"
+  ],
+  "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+  ],
+  "root": "/tmp/swarm-kernel-ui-Bt3Jg9"
+}

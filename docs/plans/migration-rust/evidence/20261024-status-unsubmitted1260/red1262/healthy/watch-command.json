@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-7292e53a8fc2c24a7c9b343bad79f7bfe0cd6ef6989bef6340e5c70baec0ca6b",
+    "mission",
+    "watch",
+    "w-fb9104b0010fb99e75753229",
+    "--root",
+    "/tmp/swarm-model83-_ddjlp3y",
+    "--json"
+  ],
+  "mode": "sigint",
+  "global_watchdog": null
+}

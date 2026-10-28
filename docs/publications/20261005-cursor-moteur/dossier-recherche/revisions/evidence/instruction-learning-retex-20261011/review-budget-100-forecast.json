@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-11T15:04:13.128053+00:00",
+  "prior_calls": 23,
+  "current_review_planned_calls": 8,
+  "future_tasks": 6,
+  "forecast_per_task": 8,
+  "estimate_total": 79,
+  "current_limit": 70,
+  "proposed_limit": 100,
+  "current_consumed": 27,
+  "guard": "applyQuotaChange refuses active review/holder; wait for completion without cancelling",
+  "limits": "Forecast hypothesis from observed packet format, not guarantee; provider account limits and financial policy unchanged"
+}

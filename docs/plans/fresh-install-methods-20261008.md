@@ -1,5 +1,13 @@
 # Installation neuve et méthodes de préparation
 
+## Repère APEX — 24 octobre 2026
+
+La [file APEX FR](FILE-APEX.md#vague-3--autres-suivis-historiques-24-octobre-2026) et [EN](../en/APEX-QUEUE.md#wave-3--other-historical-tracking-october-24-2026) conserve la chronologie des méthodes et
+de leur contexte transmis, y compris le suivi du 16 octobre. Codex racine doit
+contrôler le chargement effectif des méthodes dans le candidat concerné avant
+réutilisation d’une preuve ; la présence des fichiers ne suffit pas. Aucun
+contexte embarqué, agent déjà démarré, installation ou méthode n’est modifié ici.
+
 Le clone GitHub `main` à `7cbec49` a été installé en mode natif dans un second
 dossier, avec un projet vide séparé. `prepare methods` retourne quatre méthodes
 indisponibles ; APEX annonce « Méthode hors périmètre ». Le chargement dans
@@ -24,3 +32,43 @@ La recette complète utilise des projets jetables. Aucun fournisseur IA réel ni
 donnée de mission existante n'est nécessaire. La suite Go est rééquilibrée autour
 des trois tests longs qui ont dépassé les groupes de 240 s ; aucun cas ne doit
 disparaître de l'inventaire. Aucun plafond d'exécution du moteur n'est modifié.
+
+## Suivi du 16 octobre — amélioration autorécursive et capacité des méthodes
+
+L'utilisateur demande de conserver toute amélioration découverte comme un
+élément de grande valeur, pour cette session et les suivantes. La règle complète
+est enregistrée dans les consignes générales Codex et la skill personnelle
+`replan` ; le dépôt, le contrat commun et les méthodes FR/EN la relaient.
+Sa réception dans les consignes de la session courante est observée. Cette
+persistance ne prouve pas une amélioration autonome du moteur installé.
+
+Le premier ajout au contrat et à la skill embarqués a révélé un dépassement du
+cadrage : planner 33 173 octets, subplanner 33 176, pour une borne existante de
+32 000. Le contrôle refuse sans tronquer. La reprise conserve cet échec, factorise
+le nouvel ajout dans la boucle existante et raccourcit la description de la skill,
+sans relever la borne ni retirer les consignes antérieures. Les quatre rôles
+passent ensuite `TestAgentWorkflowRolesAreBounded` ; le worker scripté reçoit le
+contexte complet figé et sa réouverture le conserve dans
+`TestAgentWorkflowReachesWorkerAndSurvivesReopen`. Six noms RUN/PASS, dont les
+quatre sous-cas de rôle, sont effectivement appariés. Aucun modèle réel appelé.
+
+Les longueurs affichées par le test de rôle incluent l'enveloppe JSON et ne sont
+pas la mesure du corps à laquelle s'applique la borne dans `agent_workflow.go`.
+Ne pas comparer ces deux représentations comme si elles étaient identiques.
+
+Amélioration à conserver ouverte : le cadrage reste proche de sa borne.
+Propriétaire Codex ; bénéfice attendu : éviter que les prochains apprentissages
+empêchent l'admission des rôles. Avant un nouvel enrichissement, inventorier les
+répétitions par responsabilité et comparer leur factorisation à un chargement
+plus ciblé, sans perdre limites de rôle, originaux requis ou preuves. Vérifier
+les quatre assemblages et le contenu reçu par un fournisseur scripté avant
+toute annonce. Ce suivi n'autorise ni nouvelle politique de limite ni exécution
+native. La compression structurelle reste à instruire ; seule la réduction
+ciblée de cet ajout est vérifiée.
+
+Originaux et reçus de cette reprise :
+`/tmp/swarm-recursive-improvement-xnzq6g5a/` contient
+`shared-contexts-validation.json` (échec initial), les deux préimages surdimensionnées,
+`replan-context-size.json` (diagnostic) et `compact-validation.json` (contrôle final).
+Ce répertoire local temporaire est conservé ; aucun déploiement ni qualification
+des identités des agents ne découle de ces contrôles de méthode.

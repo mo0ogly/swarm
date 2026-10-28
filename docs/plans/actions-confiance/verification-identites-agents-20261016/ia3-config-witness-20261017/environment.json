@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-17T13:04:50.985621+00:00",
+  "cwd": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "branch": "codex/clear-product-method-names",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "go": "go version go1.24.3 linux/amd64",
+  "platform": "Linux-6.17.0-41-generic-x86_64-with-glibc2.43",
+  "execution": "Codex alone, isolated fixtures; no provider, real service or deployment",
+  "test_watchdog": "parent and child disabled explicitly"
+}

@@ -1,0 +1,13 @@
+=== RUN   TestManagedLocalNegativeTransportRecoveryRetainsOpinionAndConsumption
+    managed_review_local_negative_resume_test.go:14: sizes 164551 168167 21899 parts 1
+    managed_review_local_negative_resume_test.go:53: local opinion wrongly prevents actual transport recovery preview: inspection non récupérable : changes_requested
+    managed_review_local_negative_resume_test.go:60: local opinion wrongly prevents public transport recovery avis de fragment défavorable ou inconnu : correction des preuves requise
+--- FAIL: TestManagedLocalNegativeTransportRecoveryRetainsOpinionAndConsumption (1.19s)
+=== RUN   TestFragmentRetryFeedbackSeparatesNeedsMismatchFromWrongQuote
+    managed_review_local_negative_resume_test.go:122: observed needs mismatch misdiagnosed as a quote error 
+        REPRISE APRÈS REFUS DE CITATION : la réponse précédente citait des extraits absents ou trop courts pour les pièces [0]. Réexaminer TOUTES les pièces. Copier evidence uniquement depuis le champ content de LA MÊME pièce, 8 à 16 caractères, sans espace aux extrémités. Un diff peut omettre l’en-tête du fichier : ne jamais supposer que package main, version ou un autre texte habituel y figure. Vérifier littéralement chaque citation avant réponse. Ceci décrit un défaut de format précédent, pas un avis sur la qualité du code.
+        
+--- FAIL: TestFragmentRetryFeedbackSeparatesNeedsMismatchFromWrongQuote (0.02s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.257s
+FAIL

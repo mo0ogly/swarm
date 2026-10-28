@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-11T17:58:05.382327+00:00",
+  "initial_failure": "/tmp/swarm-fragment-partial-scope17-apply-initial-failure.out",
+  "cause": "Own packaging helper invoked indexed apply from object-repository cwd after read-tree/checkout-index without refresh. The actual163 checkout originals match every indexed blob; index stat boundary must be refreshed in the application checkout.",
+  "changed_precondition": "Explicit git-dir/work-tree with cwd of application copy; update-index --refresh; no production preimage changed.",
+  "copies": 163,
+  "original_bytes_all_match": true,
+  "fresh_apply_check": 0,
+  "fresh_apply": 0,
+  "result_tree": "1bc775235322df196225b3f4a73f83c06f086d2e",
+  "index": "/tmp/swarm-partial-scope17-index-ri1urxvi",
+  "copy": "/tmp/swarm-partial-scope17-apply-a1y_s2wp"
+}

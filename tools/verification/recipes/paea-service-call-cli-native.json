@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "paea-service-call-cli-native",
+  "inputs": [
+    "tests/paea_service_call_cli_test.py",
+    "tests/paea_service_installation_cli_test.py",
+    "tests/fixtures/paea_personal_tty.py",
+    "schemas/paea/personal-service-response-v1.schema.json",
+    "schemas/paea/service-installation-cli-v1.schema.json",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-service-call-cli-native.json",
+    "tests/paea_fixture_binding_check.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "verify-frozen-fixture-role-source-and-bytes",
+      "command": [
+        "python3",
+        "tests/paea_fixture_binding_check.py",
+        "service"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "FIXTURE_BINDING_PASS role=service"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "actual-default-service-call-all-operations-and-refusals",
+      "command": [
+        "python3",
+        "tests/paea_service_call_cli_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS all-seven-operations-and-exact-replay",
+        "PASS target-frame-options-pty-before-startup",
+        "PASS password-private-key-refusal-and-recovery",
+        "PASS stdout-enospc-known-mutation",
+        "PASS fr-en-service-call-help",
+        "SERVICE_CALL_NATIVE_PASS cases=5"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

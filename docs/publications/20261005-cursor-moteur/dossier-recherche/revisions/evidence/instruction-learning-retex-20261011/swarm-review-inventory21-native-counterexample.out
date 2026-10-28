@@ -1,0 +1,5 @@
+=== RUN   TestOperatorInventory21OriginalCounterexample
+OPERATOR_DIAGNOSTIC {"current_capacity_bytes":79564,"inventory_sources":11,"legacy_capacity_bytes":14618,"legacy_prompt_reverified":true,"native_mutations":0,"original_final_state":"unknown","provider_calls":0,"whole_final_message_fits":true,"whole_required_artifacts_bytes":23334}
+--- PASS: TestOperatorInventory21OriginalCounterexample (0.34s)
+PASS
+ok  	swarm.local/companion/internal/engine	0.365s

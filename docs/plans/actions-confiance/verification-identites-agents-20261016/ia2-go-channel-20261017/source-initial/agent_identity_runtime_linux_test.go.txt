@@ -1,0 +1,441 @@
+//go:build linux
+
+package engine
+
+import (
+	"bufio"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"sync"
+	"testing"
+	"time"
+
+	"golang.org/x/sys/unix"
+)
+
+// Scripted providers only. The extra control socket transfers real connection
+// descriptors for the adversarial fixture; it is not an identity source.
+const agentIdentityChannelWorker = `
+import array,json,os,socket,sys
+s=socket.socket(socket.AF_UNIX,socket.SOCK_SEQPACKET);s.connect('/broker.sock')
+c=socket.socket(socket.AF_UNIX,socket.SOCK_SEQPACKET);c.connect('/control.sock')
+def send(sock,body):
+    sock.send(json.dumps(body).encode());sock.recv(1)
+for line in sys.stdin:
+    command=json.loads(line);op=command['op'];body=command.get('body')
+    if op=='quit':break
+    if op=='send':send(s,body)
+    elif op=='child':
+        pid=os.fork()
+        if pid==0:
+            send(s,body);os._exit(0)
+        _,status=os.waitpid(pid,0)
+        if status!=0:raise RuntimeError('tool child failed')
+    elif op=='dead-child':
+        pid=os.fork()
+        if pid==0:
+            s.send(json.dumps(body).encode());os._exit(0)
+        _,status=os.waitpid(pid,0)
+        if status!=0:raise RuntimeError('dead tool failed')
+    elif op=='export':
+        c.sendmsg([b'endpoint'],[(socket.SOL_SOCKET,socket.SCM_RIGHTS,array.array('i',[s.fileno()]))])
+    elif op=='borrow':
+        raw,anc,flags,_=c.recvmsg(32,socket.CMSG_SPACE(4))
+        descriptors=array.array('i')
+        for level,kind,data in anc:
+            if level==socket.SOL_SOCKET and kind==socket.SCM_RIGHTS:descriptors.frombytes(data)
+        if len(descriptors)!=1:raise RuntimeError('one copied connection required')
+        borrowed=socket.socket(fileno=descriptors[0]);send(borrowed,body);borrowed.close()
+    else:raise RuntimeError('unknown fixture command')
+    print('done',flush=True)
+s.close();c.close()
+`
+
+type agentIdentityTestCage struct {
+	cmd           *exec.Cmd
+	input         io.WriteCloser
+	output        *os.File
+	reader        *bufio.Reader
+	connection    *net.UnixConn
+	control       *net.UnixConn
+	stderr        bytes.Buffer
+	bootstrapPID  int
+	expected      [2]uint64
+	actor         agentIdentityActor
+	bindingID     string
+	configuration int
+}
+
+func agentIdentityTestListener(t *testing.T, path string) *net.UnixListener {
+	t.Helper()
+	listener, err := net.ListenUnix("unixpacket", &net.UnixAddr{Name: path, Net: "unixpacket"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { listener.Close() })
+	return listener
+}
+
+func startAgentIdentityTestCage(t *testing.T, runtime *agentIdentityRuntime, actor agentIdentityActor, binding string, revision int, directory string, listener, control *net.UnixListener) *agentIdentityTestCage {
+	t.Helper()
+	bwrap, err := exec.LookPath("bwrap")
+	if err != nil {
+		t.Fatal("required isolated-channel capability missing: ", err)
+	}
+	infoRead, infoWrite, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer infoRead.Close()
+	defer infoWrite.Close()
+	gateRead, gateWrite, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer gateRead.Close()
+	defer gateWrite.Close()
+	args := []string{"--unshare-user", "--unshare-pid", "--unshare-net", "--unshare-ipc", "--unshare-uts", "--die-with-parent", "--new-session", "--cap-drop", "ALL", "--ro-bind", "/usr", "/usr"}
+	for _, name := range []string{"bin", "sbin", "lib", "lib64"} {
+		if target, e := os.Readlink("/" + name); e == nil {
+			args = append(args, "--symlink", target, "/"+name)
+		}
+	}
+	args = append(args, "--proc", "/proc", "--dev", "/dev", "--tmpfs", "/tmp", "--clearenv", "--ro-bind", filepath.Join(directory, "worker.py"), "/worker.py", "--ro-bind", filepath.Join(directory, "broker.sock"), "/broker.sock", "--ro-bind", filepath.Join(directory, "control.sock"), "/control.sock", "--info-fd", "3", "--block-fd", "4", "--", "/usr/bin/python3", "/worker.py")
+	cage := &agentIdentityTestCage{cmd: exec.Command(bwrap, args...), actor: actor, bindingID: binding, configuration: revision}
+	cage.cmd.Env = []string{"LANG=C"}
+	cage.cmd.ExtraFiles = []*os.File{infoWrite, gateRead}
+	cage.cmd.Stderr = &cage.stderr
+	cage.input, err = cage.cmd.StdinPipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	output, err := cage.cmd.StdoutPipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	cage.output = output.(*os.File)
+	cage.reader = bufio.NewReader(cage.output)
+	if err = cage.cmd.Start(); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		// Only this fixture's processes may be interrupted on test failure.
+		cage.command(t, "quit", nil)
+		cage.input.Close()
+		done := make(chan error, 1)
+		go func() { done <- cage.cmd.Wait() }()
+		select {
+		case e := <-done:
+			if e != nil {
+				t.Errorf("scripted provider termination: %v (%s)", e, cage.stderr.String())
+			}
+		case <-time.After(3 * time.Second):
+			cage.cmd.Process.Kill()
+			<-done
+			t.Error("scripted provider required forced cleanup")
+		}
+		if cage.connection != nil {
+			cage.connection.Close()
+		}
+		if cage.control != nil {
+			cage.control.Close()
+		}
+	})
+	infoWrite.Close()
+	gateRead.Close()
+	infoRead.SetReadDeadline(time.Now().Add(5 * time.Second))
+	var bootstrap struct {
+		PID   int    `json:"child-pid"`
+		PIDNS uint64 `json:"pid-namespace"`
+		Mount uint64 `json:"mnt-namespace"`
+	}
+	if err = json.NewDecoder(infoRead).Decode(&bootstrap); err != nil {
+		t.Fatal("bootstrap unavailable before gate: ", err)
+	}
+	cage.bootstrapPID, cage.expected = bootstrap.PID, [2]uint64{bootstrap.PIDNS, bootstrap.Mount}
+	if err = runtime.pin(actor, binding, revision, uint32(os.Getuid()), bootstrap.PID, cage.expected); err != nil {
+		t.Fatal("controlled binding registration: ", err)
+	}
+	if _, err = gateWrite.Write([]byte{1}); err != nil {
+		t.Fatal(err)
+	}
+	listener.SetDeadline(time.Now().Add(5 * time.Second))
+	cage.connection, err = listener.AcceptUnix()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = configureAgentIdentityChannel(cage.connection); err != nil {
+		t.Fatal(err)
+	}
+	cage.connection.SetDeadline(time.Now().Add(10 * time.Second))
+	control.SetDeadline(time.Now().Add(5 * time.Second))
+	cage.control, err = control.AcceptUnix()
+	if err != nil {
+		t.Fatal(err)
+	}
+	cage.control.SetDeadline(time.Now().Add(10 * time.Second))
+	t.Logf("instance=%s bootstrap_pid=%d pinned_pid=%d pinned_mnt=%d", actor.InstanceID, bootstrap.PID, bootstrap.PIDNS, bootstrap.Mount)
+	return cage
+}
+
+func (c *agentIdentityTestCage) command(t *testing.T, op string, body any) {
+	t.Helper()
+	if err := json.NewEncoder(c.input).Encode(map[string]any{"op": op, "body": body}); err != nil {
+		t.Error(err)
+	}
+}
+
+func (c *agentIdentityTestCage) completed(t *testing.T) {
+	t.Helper()
+	c.output.SetReadDeadline(time.Now().Add(5 * time.Second))
+	line, err := c.reader.ReadString('\n')
+	if err != nil || line != "done\n" {
+		t.Fatalf("scripted provider did not finish operation: %q %v", line, err)
+	}
+}
+
+func TestAgentIdentityRuntimeRealCagesAndDelegation(t *testing.T) {
+	s, _ := trustFixture(t)
+	f := agentIdentityAuthorityFixture(t)
+	// The authority and grants are explicitly fixture inputs, not read from a
+	// production authority store. Only runtime attribution is real here.
+	f.authority.projectRoot = s.root
+	instanceA := f.caller.actor
+	instanceB := instanceA
+	instanceB.InstanceID = "instance-sibling"
+	grantB := f.snapshot.Grants["grant-child"]
+	grantB.ID, grantB.Holder = "grant-sibling", instanceB
+	f.snapshot.Grants[grantB.ID] = grantB
+	bindingB := f.snapshot.Instances[instanceA.InstanceID]
+	bindingB.ID, bindingB.GrantID, bindingB.BindingID = instanceB.InstanceID, grantB.ID, "verified-channel-2"
+	f.snapshot.Instances[instanceB.InstanceID] = bindingB
+	f.refreshTestAuthority(t)
+	requestB := f.request
+	requestB.GrantID = grantB.ID
+	runtime, err := newAgentIdentityRuntime(s.root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { runtime.Close() })
+	directory, err := os.MkdirTemp("", "swarm-identity-go-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { os.RemoveAll(directory) })
+	if err = os.WriteFile(filepath.Join(directory, "worker.py"), []byte(agentIdentityChannelWorker), 0600); err != nil {
+		t.Fatal(err)
+	}
+	listener := agentIdentityTestListener(t, filepath.Join(directory, "broker.sock"))
+	control := agentIdentityTestListener(t, filepath.Join(directory, "control.sock"))
+	a := startAgentIdentityTestCage(t, runtime, instanceA, f.caller.bindingID, f.caller.trustRevision, directory, listener, control)
+	b := startAgentIdentityTestCage(t, runtime, instanceB, bindingB.BindingID, f.caller.trustRevision, directory, listener, control)
+	if a.expected[0] == b.expected[0] || a.expected[1] == b.expected[1] {
+		t.Fatal("fixture did not isolate the two instances")
+	}
+	evaluate := func(t *testing.T, conn *net.UnixConn, want agentIdentityActor, allowed bool, reply bool) *agentIdentityMessage {
+		t.Helper()
+		message, e := receiveAgentIdentityMessage(conn, make([]byte, 65536))
+		if e != nil {
+			t.Fatal(e)
+		}
+		decision, e := s.evaluateAgentIdentityMessage(message, runtime, f.snapshot, f.authority, nil, f.at)
+		if reply {
+			if _, writeErr := conn.Write([]byte{1}); writeErr != nil {
+				t.Fatal(writeErr)
+			}
+		}
+		if (e == nil) != allowed || (allowed && decision.Actor != want) {
+			message.Close()
+			t.Fatalf("decision actor=%+v permitted=%v want_actor=%+v want_permitted=%v err=%v", decision.Actor, e == nil, want, allowed, e)
+		}
+		t.Logf("message_pid=%d permission=%v actor=%s error=%v", message.pid, e == nil, decision.Actor.InstanceID, e)
+		return message
+	}
+
+	t.Run("legitimate-A-and-B", func(t *testing.T) {
+		for _, c := range []*agentIdentityTestCage{a, b} {
+			request := f.request
+			if c == b {
+				request = requestB
+			}
+			c.command(t, "send", request)
+			evaluate(t, c.connection, c.actor, true, true).Close()
+			c.completed(t)
+		}
+	})
+	t.Run("tool-child-inherits-instance-not-agent-creation", func(t *testing.T) {
+		a.command(t, "child", f.request)
+		message := evaluate(t, a.connection, a.actor, true, true)
+		if message.pid == int32(a.bootstrapPID) {
+			t.Fatal("tool fixture did not create a separate process")
+		}
+		message.Close()
+		a.completed(t)
+	})
+	t.Run("exited-tool-is-not-reidentified-by-pid-number", func(t *testing.T) {
+		a.command(t, "dead-child", f.request)
+		a.completed(t) // waitpid completed before receiving the queued packet
+		message := evaluate(t, a.connection, agentIdentityActor{}, false, false)
+		message.Close()
+	})
+	t.Run("bootstrap-and-binding-reuse-rejected", func(t *testing.T) {
+		if e := runtime.pin(a.actor, a.bindingID, a.configuration, uint32(os.Getuid()), a.bootstrapPID, a.expected); e == nil {
+			t.Fatal("live binding silently replaced")
+		}
+		wrong := a.expected
+		wrong[1]++
+		if e := runtime.pin(b.actor, "other-binding", b.configuration, uint32(os.Getuid()), a.bootstrapPID, wrong); e == nil {
+			t.Fatal("wrong bootstrap namespace accepted")
+		}
+	})
+	t.Run("real-B-endpoint-used-by-host-and-A", func(t *testing.T) {
+		b.command(t, "export", nil)
+		buffer, oob := make([]byte, 32), make([]byte, unix.CmsgSpace(4))
+		_, n, flags, _, e := b.control.ReadMsgUnix(buffer, oob)
+		if e != nil || flags&unix.MSG_CTRUNC != 0 {
+			t.Fatalf("endpoint export: %v flags=%d", e, flags)
+		}
+		controls, e := unix.ParseSocketControlMessage(oob[:n])
+		if e != nil || len(controls) != 1 {
+			t.Fatal("one descriptor transfer required: ", e)
+		}
+		fds, e := unix.ParseUnixRights(&controls[0])
+		if e != nil || len(fds) != 1 {
+			t.Fatal("real endpoint descriptor missing: ", e)
+		}
+		file := os.NewFile(uintptr(fds[0]), "copied-B-endpoint")
+		copied, e := net.FileConn(file)
+		file.Close()
+		if e != nil {
+			t.Fatal(e)
+		}
+		defer copied.Close()
+		endpoint := copied.(*net.UnixConn)
+		endpoint.SetDeadline(time.Now().Add(5 * time.Second))
+		b.completed(t)
+		body, _ := json.Marshal(requestB)
+		if _, e = endpoint.Write(body); e != nil {
+			t.Fatal(e)
+		}
+		evaluate(t, b.connection, agentIdentityActor{}, false, true).Close()
+		if _, e = endpoint.Read(buffer[:1]); e != nil {
+			t.Fatal(e)
+		}
+		for _, permitA := range []bool{false, true} {
+			request := requestB
+			if permitA {
+				request = f.request
+			}
+			a.command(t, "borrow", request)
+			raw, e := endpoint.SyscallConn()
+			if e != nil {
+				t.Fatal(e)
+			}
+			var transferErr error
+			if e = raw.Control(func(fd uintptr) {
+				_, _, transferErr = a.control.WriteMsgUnix([]byte("copy"), unix.UnixRights(int(fd)), nil)
+			}); e != nil || transferErr != nil {
+				t.Fatalf("copy to sibling: %v %v", e, transferErr)
+			}
+			evaluate(t, b.connection, a.actor, permitA, true).Close()
+			a.completed(t)
+		}
+	})
+	t.Run("no-first-message-bootstrap-and-foreign-project", func(t *testing.T) {
+		a.command(t, "send", f.request)
+		message := evaluate(t, a.connection, a.actor, true, true)
+		defer message.Close()
+		a.completed(t)
+		empty, _ := newAgentIdentityRuntime(s.root)
+		defer empty.Close()
+		if _, e := s.evaluateAgentIdentityMessage(message, empty, f.snapshot, f.authority, nil, f.at); e == nil {
+			t.Fatal("message bootstrapped its own authority in empty runtime")
+		}
+		other, _ := trustFixture(t)
+		if _, e := other.evaluateAgentIdentityMessage(message, runtime, f.snapshot, f.authority, nil, f.at); e == nil {
+			t.Fatal("runtime binding transferred to another project")
+		}
+	})
+	t.Run("concurrent-revocation-removes-subsequent-decisions", func(t *testing.T) {
+		a.command(t, "send", f.request)
+		message := evaluate(t, a.connection, a.actor, true, true)
+		defer message.Close()
+		a.completed(t)
+		var group sync.WaitGroup
+		for i := 0; i < 12; i++ {
+			group.Add(1)
+			go func() {
+				defer group.Done()
+				_, _ = s.evaluateAgentIdentityMessage(message, runtime, f.snapshot, f.authority, nil, f.at)
+			}()
+		}
+		if e := runtime.revoke(a.bindingID); e != nil {
+			t.Fatal(e)
+		}
+		group.Wait()
+		if _, e := s.evaluateAgentIdentityMessage(message, runtime, f.snapshot, f.authority, nil, f.at); e == nil {
+			t.Fatal("revocation returned but a later decision was accepted")
+		}
+		a.command(t, "send", f.request)
+		evaluate(t, a.connection, agentIdentityActor{}, false, true).Close()
+		a.completed(t)
+		if e := runtime.pin(a.actor, a.bindingID, a.configuration, uint32(os.Getuid()), a.bootstrapPID, a.expected); e == nil {
+			t.Fatal("revoked binding resurrected")
+		}
+	})
+	t.Run("fresh-Trust-revision-and-closed-runtime", func(t *testing.T) {
+		if _, e := s.trustConfig(lifecycleChange(t, "alice", true, 1), false); e != nil {
+			t.Fatal(e)
+		}
+		b.command(t, "send", requestB)
+		evaluate(t, b.connection, agentIdentityActor{}, false, true).Close()
+		b.completed(t)
+		if e := runtime.Close(); e != nil {
+			t.Fatal(e)
+		}
+		if e := runtime.Close(); e != nil {
+			t.Fatal("close was not idempotent: ", e)
+		}
+		b.command(t, "send", requestB)
+		evaluate(t, b.connection, agentIdentityActor{}, false, true).Close()
+		b.completed(t)
+	})
+}
+
+func TestAgentIdentityRuntimeRejectsHostNamespace(t *testing.T) {
+	f := agentIdentityAuthorityFixture(t)
+	runtime, err := newAgentIdentityRuntime(f.authority.projectRoot)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer runtime.Close()
+	var expected [2]uint64
+	for i, name := range []string{"pid", "mnt"} {
+		file, e := os.Open("/proc/self/ns/" + name)
+		if e != nil {
+			t.Fatal(e)
+		}
+		ns, e := agentIdentityNamespaceOf(file)
+		file.Close()
+		if e != nil {
+			t.Fatal(e)
+		}
+		expected[i] = ns.inode
+	}
+	if err = runtime.pin(f.caller.actor, "host-binding", f.caller.trustRevision, uint32(os.Getuid()), os.Getpid(), expected); err == nil {
+		t.Fatal("unisolated host process registered as confined instance")
+	}
+	if _, err = newAgentIdentityRuntime("relative/project"); err == nil {
+		t.Fatal("relative project accepted")
+	}
+	if err = (*agentIdentityRuntime)(nil).revoke("unknown"); err == nil {
+		t.Fatal("nil runtime revocation succeeded")
+	}
+	_ = fmt.Sprint(expected) // keep diagnostics printable without exposing credentials
+}

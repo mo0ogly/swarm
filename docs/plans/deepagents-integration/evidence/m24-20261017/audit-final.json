@@ -1,0 +1,163 @@
+{
+  "status": "PASS",
+  "at": "2026-10-17T09:08:56.078710+00:00",
+  "scope": "M24 private memory binding against frozen identity view, not public memory enforcement",
+  "owned_files": {
+    "docs/PROJECT-MEMORY.md": "2e717ee0df5e2443b3da120705e40ca84b5d328863ce9b0fab646a9c4e6fcdf4",
+    "docs/en/PROJECT-MEMORY.md": "1e4c4e7f9027318bdbdb2ba5da16f4e964431a0445ef5423c79adc9fe89a631d",
+    "docs/plans/deepagents-integration/PLAN.md": "02c7d17b156b4cfd5c32a9bc0c7ec041440eaf2f88bb6cc35534dafc32191be0",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-16.md": "027b3693c686ef6caba42c37478148a6168c20c1abc0de033add14fea2caf437",
+    "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md": "a91468eb8100363594c53a5ea2adafd540db1b9d064fad2b8353d3991f01f687",
+    "internal/engine/memory_usage_binding.go": "dbfbd664bcdf3c7df39bec54fe7ccb98233205db126fcf89e48ebd1443d75501",
+    "internal/engine/memory_usage_binding_test.go": "3c844ea4e2a199ae38a34998e21e02e1606aa78661488065cf85af435be2a0b8",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-20.md": "9a3c9a95b980e716b5df080ac0635b7db0e16b42d8bba55863058526469918e7",
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-20.md": "4603fda9514fe85a0949daa77d2b6a4b8902043914beca4090396326bab166dd"
+  },
+  "tests": {
+    "parent_names": [
+      "TestMemorySummarySelectionPublicLaunchContract",
+      "TestMemorySummarySourceCLIAPIParityAndSessionProtection",
+      "TestMemoryUsageBindingExactSourcesAndNoOperatorTransmission",
+      "TestMemoryUsageBindingChangesWhenPlanProjectionDoesNot",
+      "TestMemoryUsageBindingTracksDestinationAndSelection",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult",
+      "TestMemoryUsageRequestsUseIndependentKernelRightsAndFreshness"
+    ],
+    "subcase_count": 27,
+    "pass_names": [
+      "TestMemorySummarySelectionPublicLaunchContract",
+      "TestMemorySummarySourceCLIAPIParityAndSessionProtection",
+      "TestMemoryUsageBindingExactSourcesAndNoOperatorTransmission",
+      "TestMemoryUsageBindingChangesWhenPlanProjectionDoesNot",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/recipient-instance",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/plan-version",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/target-task",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/task-definition",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/revision",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/plan-digest",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/project-root",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/annotation",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/recipient-principal",
+      "TestMemoryUsageBindingTracksDestinationAndSelection",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/invalid-work",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/zero-revision",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/no-summary",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/invalid-utf8",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/stale-packet",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/duplicate-source",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/missing-anchor",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/no-recipient",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/no-instance",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/no-scope",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/foreign-work",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/wrong-task",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/relative-root",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult",
+      "TestMemoryUsageRequestsUseIndependentKernelRightsAndFreshness/memory.read",
+      "TestMemoryUsageRequestsUseIndependentKernelRightsAndFreshness/memory.summarize",
+      "TestMemoryUsageRequestsUseIndependentKernelRightsAndFreshness/memory.transmit",
+      "TestMemoryUsageRequestsUseIndependentKernelRightsAndFreshness/expired",
+      "TestMemoryUsageRequestsUseIndependentKernelRightsAndFreshness/revoked",
+      "TestMemoryUsageRequestsUseIndependentKernelRightsAndFreshness"
+    ],
+    "failed": [],
+    "skipped": []
+  },
+  "effective_compilation_inputs": 1070,
+  "effective_inputs_unchanged": true,
+  "identity_files_frozen": 22,
+  "identity_snapshot_archive_verified": true,
+  "read_only_unowned_observation": {
+    "internal/engine/agent_identity_contract.go": {
+      "baseline": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+      "current": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+      "frozen": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+      "unchanged_since_baseline": true
+    },
+    "internal/engine/agent_identity_authority.go": {
+      "baseline": "464b7b450c6f9eea4917eaf27c6e3949a53d2bc7c3944ef05a4bb92e3324ab53",
+      "current": "464b7b450c6f9eea4917eaf27c6e3949a53d2bc7c3944ef05a4bb92e3324ab53",
+      "frozen": "464b7b450c6f9eea4917eaf27c6e3949a53d2bc7c3944ef05a4bb92e3324ab53",
+      "unchanged_since_baseline": true
+    },
+    "internal/engine/agent_identity_registry_types.go": {
+      "baseline": "20f04785449e42af3e1715c955cb9d7fd1de782c372c669b93030c694d2a153e",
+      "current": "1f3a02411c92b57a1cce4b2f6c2a72e85a2e89e7ab4f2a7567844a102848ccd7",
+      "frozen": "1f3a02411c92b57a1cce4b2f6c2a72e85a2e89e7ab4f2a7567844a102848ccd7",
+      "unchanged_since_baseline": false
+    },
+    "internal/engine/agent_identity_issuer_linux.go": {
+      "baseline": "7761ac4fe4323a9b32bde176d4b1d6e02ce2a58294a8ea8697d2ed0ae85253d3",
+      "current": "7ee38e272c7ca66fae7d9962d159acac314ba1c868cea3e603973081e21a5a1d",
+      "frozen": "7ee38e272c7ca66fae7d9962d159acac314ba1c868cea3e603973081e21a5a1d",
+      "unchanged_since_baseline": false
+    },
+    "internal/engine/agent_identity_plan_linux.go": {
+      "baseline": "d4c19975145926a24b7e60df731034f92d52474fd7a8aac7baaba8730b916381",
+      "current": "d4c19975145926a24b7e60df731034f92d52474fd7a8aac7baaba8730b916381",
+      "frozen": "d4c19975145926a24b7e60df731034f92d52474fd7a8aac7baaba8730b916381",
+      "unchanged_since_baseline": true
+    },
+    "internal/engine/memory_summary_source.go": {
+      "baseline": "d0a5552fe9a5a93d68e9f4e8eb62d096ac7e1503d842e93bb77744aff8cdadfa",
+      "current": "d0a5552fe9a5a93d68e9f4e8eb62d096ac7e1503d842e93bb77744aff8cdadfa",
+      "frozen": "d0a5552fe9a5a93d68e9f4e8eb62d096ac7e1503d842e93bb77744aff8cdadfa",
+      "unchanged_since_baseline": true
+    },
+    "internal/engine/memory_summary_selection.go": {
+      "baseline": "97a7c589e1196ad5335778bb6e438e1e58571bdde0b0c69bb56369595970fe38",
+      "current": "97a7c589e1196ad5335778bb6e438e1e58571bdde0b0c69bb56369595970fe38",
+      "frozen": "97a7c589e1196ad5335778bb6e438e1e58571bdde0b0c69bb56369595970fe38",
+      "unchanged_since_baseline": true
+    },
+    "internal/engine/dialogue_context.go": {
+      "baseline": "510d596e9f20ee3e27c3791b3ebf1ef2c96cf2d3eb348907b5e76725f99bf079",
+      "current": "510d596e9f20ee3e27c3791b3ebf1ef2c96cf2d3eb348907b5e76725f99bf079",
+      "frozen": "510d596e9f20ee3e27c3791b3ebf1ef2c96cf2d3eb348907b5e76725f99bf079",
+      "unchanged_since_baseline": true
+    },
+    "internal/engine/agents_store.go": {
+      "baseline": "6d0a96e05f6e155377ed8d9287c40f0b475c7a62b13542f81655888cb7204f21",
+      "current": "6d0a96e05f6e155377ed8d9287c40f0b475c7a62b13542f81655888cb7204f21",
+      "frozen": "6d0a96e05f6e155377ed8d9287c40f0b475c7a62b13542f81655888cb7204f21",
+      "unchanged_since_baseline": true
+    }
+  },
+  "relative_links_checked": 23,
+  "checks": [
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "gofmt",
+        "-l",
+        "internal/engine/memory_usage_binding.go",
+        "internal/engine/memory_usage_binding_test.go"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "go_vet_exit_code": 0,
+  "command_build_exit_code": 0,
+  "binary": "/tmp/swarm-m24-frozen-bin-q746qzv8/swarm",
+  "binary_sha256": "079ceec695f907b2180c829c90746508749c54433a019e81eb5979deb86bab33",
+  "current_full_identity_tree_verified": false,
+  "user_server_restarted": false,
+  "real_model_calls": 0,
+  "native_swarm_runs": 0,
+  "delegated_agents": 0,
+  "interchat_messages_sent": 0,
+  "public_enforcement_enabled": false,
+  "M20_public_acceptance": "OPEN",
+  "independent_review": false
+}

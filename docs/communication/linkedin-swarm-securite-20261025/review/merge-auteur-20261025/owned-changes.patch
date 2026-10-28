@@ -1,0 +1,976 @@
+--- before/article-fr.md
++++ docs/communication/linkedin-swarm-securite-20261025/article-fr.md
+@@ -1,374 +1,415 @@
+-# IA agentique : qui garde les règles, les clés et les conséquences ?
+-
+-### Nous construisons des systèmes autonomes plus vite que nous ne construisons les garanties nécessaires pour leur confier nos processus critiques.
+-
+-L'intelligence artificielle agentique progresse à une vitesse impressionnante.
+-
+-Les modèles gagnent en capacité, les frameworks se succèdent, les outils deviennent plus accessibles et les architectures multi-agents permettent désormais d'envisager des niveaux d'automatisation difficiles à imaginer il y a seulement quelques années.
+-
+-Une personne seule peut aujourd'hui concevoir, développer et déployer des systèmes dont la complexité aurait auparavant nécessité plusieurs mois de travail et des compétences réparties entre différentes équipes.
+-
+-C'est une formidable évolution.
+-
+-Mais elle soulève une question que je trouve encore insuffisamment traitée : **sommes-nous réellement capables de contrôler les systèmes autonomes que nous devenons capables de construire ?**
+-
+-Je repense souvent à *L'Apprenti sorcier*, dans Fantasia, lorsque Mickey donne vie aux balais pour accomplir son travail.
+-
+-Tout fonctionne merveilleusement, jusqu'au moment où il perd le contrôle de ce qu'il a déclenché.
+-
+-La difficulté n'est plus de faire travailler les balais. Elle est de les arrêter.
+-
+-Nous n'en sommes évidemment pas là avec l'IA agentique. Mais la métaphore mérite réflexion : développer la capacité d'agir est une chose ; conserver la maîtrise de cette action en est une autre.
+-
+-## Quand la vitesse de développement dépasse notre capacité de contrôle
+-
+-Nous savons déjà qu'un LLM peut produire une réponse erronée, interpréter incorrectement une consigne ou se laisser influencer par une injection de prompt.
+-
+-L'agentique ajoute une dimension supplémentaire : le modèle ne se contente plus de répondre. Il peut planifier, appeler des outils, exécuter des commandes, consulter des services, créer d'autres agents, mémoriser des expériences et poursuivre un objectif pendant une période prolongée.
+-
+-Les erreurs changent alors de nature.
+-
+-Une instruction mal interprétée peut devenir une commande. Une commande peut modifier un système. Son résultat peut être enregistré comme une expérience réussie, puis réintroduit dans le contexte d'un autre agent.
+-
+-Une donnée externe devient progressivement une consigne, une consigne devient une connaissance persistante, et cette connaissance finit parfois par influencer une décision future.
+-
+-Le plus préoccupant est que cette dérive ne nécessite pas toujours un attaquant.
+-
+-Elle peut naître d'une erreur du modèle, d'une mauvaise interprétation, d'une synthèse incomplète ou d'un contexte devenu obsolète.
+-
+-Les attaques intentionnelles exploitent ces mêmes mécanismes : confusion entre instructions et données, détournement d'objectif, abus d'outils, usurpation de privilèges ou empoisonnement de la mémoire.
+-
+-L'OWASP les décrit notamment dans son Top 10 des risques agentiques 2026, avec ASI01 (détournement d'objectif), ASI03 (abus d'identité et de privilèges), ASI06 (empoisonnement de la mémoire et du contexte) et ASI08 (défaillances en cascade).
+-
+-Dans un système multi-agents, le problème est encore plus délicat.
+-
+-Plusieurs agents peuvent échanger des résultats, modifier des plans, reprendre des travaux interrompus et réutiliser les connaissances accumulées.
+-
+-**Qui garantit alors qu'une instruction reçue possède réellement l'autorité qui lui est attribuée ?**
+-
+-Qui garantit qu'une mémoire n'a pas été altérée, qu'une autorisation est toujours valable, qu'une action correspond bien à celle qui a été approuvée ?
+-
+-Et surtout, qui empêche effectivement l'exécution lorsque ces garanties manquent ?
+-
+-## Deux mondes qu'il faut apprendre à faire cohabiter
+-
+-C'est une question centrale dans mon travail sur Swarm.
+-
+-Les agents reposent sur des modèles probabilistes. Leur intérêt vient précisément de leur capacité à interpréter des situations, à explorer des solutions et à proposer des décisions sans que chaque chemin ait été programmé à l'avance.
+-
+-Mais nous leur confions progressivement des interactions avec des systèmes dont les exigences sont d'une autre nature.
+-
+-Une banque doit garantir l'intégrité d'une transaction.
+-
+-Un système industriel doit respecter ses conditions de sûreté.
+-
+-Un processus médical doit préserver les validations nécessaires à la sécurité des personnes.
+-
+-Une infrastructure critique doit pouvoir empêcher une opération non autorisée, indépendamment de la qualité du raisonnement qui l'a proposée.
+-
+-Ces garanties ne peuvent pas simplement reposer sur la probabilité que le modèle prenne la bonne décision.
+-
+-Même un modèle excellent n'est pas un mécanisme d'autorisation.
+-
+-C'est pourquoi j'ai choisi de placer un **moteur déterministe, développé en Rust, au cœur de Swarm**.
+-
+-Son rôle n'est pas de remplacer le raisonnement des agents.
+-
+-Il consiste à contrôler les opérations qu'ils proposent, à partir de règles explicites, d'identités, d'autorisations, d'états persistés et de preuves vérifiables.
+-
+-L'agent raisonne et propose.
+-
+-Le moteur vérifie les conditions et applique uniquement les transitions autorisées.
+-
+-Mais une précision est fondamentale : déterministe ne signifie pas infaillible.
+-
+-Une mauvaise règle peut être appliquée parfaitement. Un moteur peut comporter un défaut de concurrence, une mauvaise gestion des reprises ou un chemin de contournement.
+-
+-Le moteur lui-même doit donc être testé, audité et soumis à des exigences de sécurité.
+-
+-**Le déterminisme ne garantit pas la justesse des règles. Il rend leur application explicite, reproductible dans un contexte maîtrisé et vérifiable.**
+-
+-## Les standards existent. Pourquoi restent-ils insuffisants ?
+-
+-Il serait inexact d'affirmer que personne ne travaille sur ces questions.
+-
+-Nous disposons déjà de référentiels et de mécanismes solides.
+-
+-Le modèle de Biba, publié en 1977, propose une approche formelle de la protection de l'intégrité des informations. Dans sa version stricte, ses principes *no read down* et *no write up* empêchent les flux ordinaires qui permettraient à des informations de moindre intégrité de contaminer des objets de plus forte intégrité.
+-
+-Appliqué à l'agentique, ce modèle apporte une idée essentielle : une information issue d'une source externe ne doit pas acquérir automatiquement le statut d'instruction fiable.
+-
+-Mais Biba ne détermine pas si une information est vraie. Il protège des flux d'intégrité selon une politique et suppose des procédures de promotion de confiance elles-mêmes contrôlées.
+-
+-SPIFFE, avec son implémentation SPIRE, propose une autre brique fondamentale : attribuer aux services et processus des identités vérifiables, notamment au moyen de certificats X.509 ou de jetons JWT.
+-
+-On peut ainsi authentifier un processus sans dépendre uniquement d'un nom d'agent ou d'un identifiant déclaré dans un message.
+-
+-Mais **une identité authentifiée n'est pas une autorisation**. Savoir qui exécute une opération ne suffit pas à déterminer ce qu'il a le droit de faire.
+-
+-OAuth, ses extensions et les mécanismes ABAC permettent de préciser les droits, les ressources, les contraintes et les délégations.
+-
+-Le Zero Trust du NIST apporte la séparation entre les décisions de politique et leur application effective, au moyen de points de décision et de points d'application des règles.
+-
+-Les normes ISO/IEC 42001 et 23894 structurent respectivement le management des systèmes d'IA et celui des risques associés. ISO/IEC 27001 apporte les exigences générales de management de la sécurité de l'information.
+-
+-Plus récemment, NVIDIA OpenShell propose des politiques déclaratives pour encadrer les accès aux fichiers, aux processus et au réseau.
+-
+-Agent Baseline décrit une architecture où les décisions de l'agent restent séparées des autorisations et de leur application par l'infrastructure.
+-
+-Ces approches sont complémentaires et apportent des réponses techniques concrètes.
+-
+-Et la normalisation agentique commence réellement à se structurer.
+-
+-Le NIST a lancé son *AI Agent Standards Initiative* en février 2026. Ses travaux sur l'identité et l'autorisation des agents se poursuivent.
+-
+-L'OWASP a publié en septembre 2026 son **Agent Control Standard (ACS)**. Sa version 0.1 définit déjà des mécanismes d'interception, de dialogue avec un Guardian, de traçabilité, de provenance et de contrôle à l'exécution.
+-
+-C'est une évolution importante, qu'il faut reconnaître.
+-
+-Pourtant, la présence d'un mécanisme dans un standard ne signifie pas automatiquement que chaque système qui l'utilise possède toutes les garanties attendues.
+-
+-Une plateforme peut disposer de hooks de contrôle sans démontrer que tous les chemins vers un effet métier sont interceptés.
+-
+-Elle peut posséder des identités vérifiables sans contrôler suffisamment la délégation de droits.
+-
+-Elle peut tracer les actions sans garantir l'intégrité de l'historique.
+-
+-Elle peut protéger la mémoire au repos sans empêcher sa contamination sémantique.
+-
+-Elle peut exiger une validation humaine tout en permettant à un agent d'utiliser directement des identifiants techniques pour contourner cette validation.
+-
+-**Le problème n'est donc plus seulement de définir des contrôles. Il est de garantir leur continuité et leur efficacité sur l'ensemble du cycle de vie agentique.**
+-
+-## Le gardien des règles ne suffit pas : il faut aussi un gardien des clés et des garde-barrières
+-
+-Je distingue trois responsabilités qui devraient, selon moi, être explicitement séparées dans toute architecture agentique sensible.
+-
+-**Le gardien des règles** décide si une opération est admissible.
+-
+-Il vérifie l'identité, le mandat, la politique applicable, les dépendances, les versions, les budgets et les validations requises.
+-
+-Son fonctionnement doit reposer sur des règles exécutables et des états vérifiables, et non sur l'appréciation probabiliste d'un second modèle.
+-
+-Une IA peut apporter une analyse ou une recommandation de sécurité. Elle ne doit pas pouvoir transformer seule cette recommandation en autorisation.
+-
+-**Le gardien des clés** protège les moyens techniques permettant réellement d'agir.
+-
+-Un agent qui prépare un paiement n'a pas besoin de posséder les identifiants permettant d'exécuter ce paiement.
+-
+-De même, un agent chargé de préparer un déploiement n'a pas nécessairement besoin des secrets qui permettent de modifier directement l'environnement de production.
+-
+-Ces capacités doivent rester détenues par des services protégés, capables de délivrer des autorisations limitées à une action, un destinataire, un périmètre et une durée.
+-
+-Les secrets ne doivent pas être simplement dissimulés dans le prompt ou dans un fichier auquel l'agent pourrait accéder.
+-
+-**Les garde-barrières** constituent les points de passage obligatoires vers les ressources et les effets réels.
+-
+-Ce sont eux qui doivent rendre techniquement impossible le contournement du gardien des règles.
+-
+-Une approbation refusée n'a aucune valeur protectrice si l'agent peut appeler directement une autre API, ouvrir un socket, exécuter un programme ou utiliser un autre connecteur disposant des mêmes privilèges.
+-
+-Les barrières doivent être indépendantes du comportement volontaire du modèle : contrôle des appels d'outils, confinement des processus, restrictions réseau, permissions sur les fichiers et médiation des services métier.
+-
+-Dans mes propres essais sur un scénario financier simulé, un agent supposé restreint conservait une possibilité de lecture hors de son dossier par un outil utilisant `curl file://`. Il fallait supprimer cette possibilité d'accès plutôt que compter sur la consigne donnée au modèle.
+-
+-C'est une illustration très concrète de la différence entre une restriction déclarée et une restriction réellement appliquée.
+-
+-La sécurité ne consiste pas à demander à l'agent de respecter une frontière.
+-
+-**Elle consiste à construire une frontière qu'il ne peut pas franchir par les moyens qui lui sont accessibles.**
+-
+-## Le véritable danger apparaît au moment de l'effet métier
+-
+-Prenons un exemple simple.
+-
+-Un agent analyse une facture et prépare un virement.
+-
+-Il consulte plusieurs documents, identifie un bénéficiaire et propose un montant.
+-
+-Un second agent vérifie le dossier. Son avis est favorable.
+-
+-Puis une nouvelle information apparaît : un courriel annonce un changement de coordonnées bancaires.
+-
+-L'agent met à jour sa proposition.
+-
+-Que se passe-t-il si la validation précédente est réutilisée ?
+-
+-Que se passe-t-il si la source de cette modification était malveillante ?
+-
+-Et que se passe-t-il si, après avoir envoyé le paiement, l'agent perd la réponse du service bancaire et décide de recommencer ?
+-
+-Ces questions ne relèvent plus uniquement de la qualité du modèle.
+-
+-Elles concernent la séparation des pouvoirs, l'intégrité des données, l'autorité de la source, la validité de l'approbation et la cohérence de l'exécution.
+-
+-La validation doit porter sur l'action exacte : montant, devise, bénéficiaire, version de la demande et identité de la personne qui approuve.
+-
+-Une modification de ces éléments doit invalider l'autorisation correspondante.
+-
+-L'exécution doit être confiée à un composant distinct, capable de vérifier une dernière fois les conditions de l'opération.
+-
+-Et lorsqu'une réponse se perd, la reprise doit s'appuyer sur une intention métier durable et un mécanisme d'idempotence ou de réconciliation, pas simplement sur une nouvelle requête produite par le modèle.
+-
+-C'est précisément ce que j'ai étudié dans mon premier article sur Swarm, consacré aux processus financiers.
+-
+-Les résultats obtenus sur des scénarios simulés montrent l'intérêt des contrôles déterministes, mais aussi leurs limites, leur coût et la nécessité de tester le moteur lui-même.
+-
+-Il serait incorrect d'en déduire une garantie générale sur des systèmes bancaires réels.
+-
+-## Vers un référentiel d'assurance de l'exécution agentique
+-
+-Je pense qu'il devient nécessaire de formaliser un **socle minimal d'exigences d'implémentation pour les systèmes agentiques**, avec des niveaux d'assurance proportionnés à leurs capacités d'action.
+-
+-L'idée n'est pas de remplacer ISO, le NIST, l'OWASP, SPIFFE ou les standards existants.
+-
+-Au contraire, il faudrait construire un profil commun, réutilisant leurs mécanismes, puis définir les propriétés qu'un système complet doit obligatoirement démontrer.
+-
+-Je proposerais les exigences suivantes.
+-
+-### 1. Une identité vérifiable et une chaîne d'autorité explicite
+-
+-Chaque agent et chaque instance d'exécution doivent pouvoir être rattachés à un principal authentifié, à un mandat, à un périmètre et à une chaîne de délégation.
+-
+-Aucun agent ne doit pouvoir s'attribuer lui-même de nouveaux privilèges par une instruction, une mémoire ou un échange avec un autre agent.
+-
+-La création d'agents secondaires doit conserver les limites d'autorité du délégant.
+-
+-### 2. Une séparation obligatoire entre données et instructions
+-
+-Les documents, résultats d'outils, messages et mémoires constituent des informations dont la provenance et le niveau de confiance doivent être connus.
+-
+-L'admission d'une information à un niveau d'intégrité supérieur doit faire l'objet d'une procédure explicite.
+-
+-La signature d'un document prouve éventuellement son origine et son intégrité, jamais sa vérité.
+-
+-Une information ne doit pas acquérir un droit de commande du seul fait de sa présence dans le contexte.
+-
+-### 3. Une mémoire persistante gouvernée
+-
+-Toute mémoire réutilisable doit porter une provenance, une version, une portée et des conditions d'usage.
+-
+-Lire, résumer, modifier et transmettre une mémoire doivent être des opérations autorisées distinctes.
+-
+-Une mémoire suspecte doit pouvoir être isolée. Sa révocation doit empêcher les nouveaux usages concernés, sans prétendre effacer rétroactivement les contextes déjà transmis.
+-
+-Les résumés et les échanges entre agents doivent conserver les informations nécessaires pour retrouver leur origine.
+-
+-### 4. Un moteur de contrôle indépendant des modèles
+-
+-Les opérations sensibles doivent être proposées sous une forme structurée, puis évaluées par un moteur de politique externe au raisonnement du LLM.
+-
+-Le moteur doit vérifier les conditions au moment pertinent, y compris juste avant l'engagement d'un effet irréversible.
+-
+-Un accord obtenu au lancement d'une mission ne suffit pas à autoriser indistinctement toutes ses actions futures.
+-
+-Toute règle modifiée doit être versionnée, justifiée et testée. Une erreur du moteur doit conduire à un refus sûr, et non à un contournement silencieux.
+-
+-### 5. Des capacités d'exécution isolées et non contournables
+-
+-Les agents ne doivent pas disposer directement des secrets permettant les opérations critiques.
+-
+-L'accès aux services sensibles doit passer par des connecteurs contrôlés qui appliquent les autorisations effectives.
+-
+-Le confinement des processus, des fichiers, des outils et du réseau doit être démontré.
+-
+-Un mécanisme de surveillance qui observe une opération après son exécution ne remplace pas une barrière capable de l'empêcher.
+-
+-### 6. Une maîtrise des effets irréversibles et des reprises
+-
+-Toute opération sensible doit posséder une identité métier durable, une autorisation liée à son contenu exact et un état d'exécution vérifiable.
+-
+-Les reprises doivent distinguer une opération non exécutée, exécutée, refusée ou d'issue inconnue.
+-
+-Une issue inconnue impose une réconciliation avant toute répétition susceptible de provoquer un second effet.
+-
+-L'idempotence doit être assurée au niveau où l'effet peut réellement être engagé. Lorsque le système externe ne permet pas cette garantie, le risque doit rester explicite et bloquer l'automatisation correspondante.
+-
+-### 7. Une validation humaine réellement opposable
+-
+-Pour les actions de forte criticité, l'approbation humaine doit être authentifiée et liée à l'opération exacte.
+-
+-Le demandeur et l'approbateur doivent être distincts lorsque la politique l'exige.
+-
+-Une revue IA favorable ne doit jamais remplacer une validation humaine obligatoire.
+-
+-L'humain ne peut pas examiner chaque microdécision d'une architecture multi-agents. Son intervention doit donc se concentrer sur les véritables points d'engagement, avec des informations suffisantes pour prendre une décision éclairée.
+-
+-### 8. Des preuves opposables et une qualification de bout en bout
+-
+-Chaque action doit pouvoir être reliée à son objectif, son identité, son mandat, la politique appliquée, la version de ses données, sa décision d'autorisation et son résultat réellement observé.
+-
+-Les preuves doivent être protégées contre les modifications et les omissions selon un modèle de menace déclaré.
+-
+-La qualification doit intégrer des tests adversariaux reproductibles : injection de prompt, empoisonnement de mémoire, élévation de privilèges, contournement de connecteur, révocation concurrente, modification après approbation, reprise après incident et effets dupliqués.
+-
+-Le système doit également démontrer qu'un arrêt ou une révocation empêche les nouvelles opérations concernées, sans effacer les preuves de celles déjà engagées.
++# IA agentique : jusqu’où peut-on déléguer sans perdre le contrôle ?
++
++### Pour un cadre d'assurance de l'exécution des processus critiques
++
++*Fabrice Pizzi — Swarm | Octobre 2026*
++
++## L'autonomie progresse. Mais qu'en est-il de notre capacité à la maîtriser ?
++
++Les progrès de l'intelligence artificielle agentique changent profondément notre manière de concevoir les systèmes informatiques.
++
++Les modèles gagnent en capacité, les outils évoluent rapidement et les architectures multi-agents permettent d'automatiser des processus toujours plus complexes.
++
++Une personne seule peut désormais développer des systèmes dont la réalisation aurait auparavant mobilisé plusieurs spécialistes pendant plusieurs mois.
++
++Cette démocratisation est extraordinaire. Mais elle crée un déséquilibre.
++
++**Notre capacité à construire des systèmes autonomes progresse plus vite que notre capacité à démontrer que nous en maîtrisons l'exécution.**
++
++Un agent ne se contente plus de fournir une réponse.
++
++Il peut décomposer un objectif, créer des sous-agents, appeler des outils, modifier des données, accéder à des services externes, conserver des expériences et poursuivre une mission pendant une période prolongée.
++
++Cette autonomie introduit une nouvelle difficulté : nous ne pouvons plus supposer que chaque décision intermédiaire sera examinée par un humain.
++
++La question n'est donc plus seulement de savoir si le modèle produit de bonnes réponses.
++
++Elle devient : **dans quelles conditions peut-on lui permettre de produire des conséquences réelles ?**
++
++## Le problème n'est pas simplement la fiabilité du modèle
++
++Les systèmes agentiques associent des mécanismes de raisonnement probabilistes à des environnements informatiques dont les règles de fonctionnement sont souvent déterministes.
++
++Cette association est précisément ce qui les rend puissants.
++
++Le modèle interprète, explore et propose. Les systèmes qu'il utilise exécutent des opérations concrètes.
++
++Mais cette architecture crée une asymétrie fondamentale.
++
++Une erreur de raisonnement peut rester bénigne tant qu'elle demeure une proposition. Elle change de nature lorsqu'elle devient un virement, une modification de droits, une suppression de données ou une commande adressée à une infrastructure.
++
++Les mécanismes traditionnels de sécurité ne disparaissent pas. Ils deviennent au contraire indispensables.
++
++Authentification, autorisation, séparation des privilèges, isolation des processus, vérification des transactions et journalisation doivent être appliquées à une nouvelle catégorie d'acteurs : des programmes capables de déterminer dynamiquement leurs prochaines actions.
++
++À cela s'ajoute une difficulté particulière.
++
++Dans un système agentique, les informations qui influencent une décision peuvent évoluer pendant l'exécution.
++
++Un document externe peut contenir une injection de prompt. Un résultat d'outil peut être trompeur. Un résumé transmis entre agents peut perdre sa provenance. Une mémoire persistante peut conserver une procédure erronée ou malveillante et la réintroduire plusieurs sessions plus tard.
++
++L'OWASP décrit ces risques dans son Top 10 pour les applications agentiques, notamment à travers le détournement d'objectif, les abus de privilèges, l'empoisonnement de mémoire et les défaillances en cascade.
++
++Ces catégories mettent en évidence une propriété essentielle : **une information n'acquiert pas une autorité du seul fait qu'un agent l'a mémorisée, répétée ou transmise.**
++
++## De la sécurité des agents à l'assurance de leurs effets
++
++La recherche et les initiatives de standardisation commencent à apporter des réponses importantes.
++
++Le projet CaMeL, de Debenedetti et ses coauteurs, montre l'intérêt d'une séparation explicite entre flux de contrôle et flux de données, associée à des capacités restreignant les appels d'outils.
++
++AgentSpec explore l'application de contraintes déclaratives pendant l'exécution.
++
++L'OWASP Agent Control Standard, publié en septembre 2026, définit un protocole d'interception et de décision permettant à un Guardian de contrôler les opérations d'un agent.
++
++SPIFFE apporte des identités vérifiables pour les workloads. Les standards OAuth permettent d'exprimer des autorisations structurées et des délégations.
++
++NVIDIA OpenShell propose des politiques de confinement des fichiers, processus et accès réseau.
++
++Enfin, un Internet-Draft individuel déposé par Sangam Das en septembre 2026 propose une architecture d'autorisation graduée et de contrôle de l'engagement final des actions critiques.
++
++Ces travaux montrent que le problème est identifié et que les réponses techniques progressent.
++
++Ces références n'ont toutefois pas toutes le même statut. ISO/IEC 27001 et 42001 définissent des exigences de systèmes de management ; ISO/IEC 23894 fournit des recommandations de gestion des risques. Le Top 10 agentique classe des risques, tandis qu'ACS spécifie des mécanismes de contrôle à l'exécution. SPIFFE traite de l'identité des workloads, et OWASP ASVS fournit des exigences de vérification pour les applications et services web. Ces apports sont complémentaires. [1–3, 9, 12–13]
++
++ACS décrit déjà une couche déterministe, avec un recours optionnel à un LLM. La séparation entre raisonnement et contrôle est donc un principe partagé. L'apport recherché avec Swarm porte sur sa continuité dans les parcours effectivement réalisés : autorité, contenu approuvé, engagement, preuve et reprise après incident. [2]
++
++Une correspondance documentaire avec un référentiel, une compatibilité testée avec une version précise et une certification sont trois affirmations différentes. Une organisation peut structurer son management de l'IA sans que cela démontre la sécurité de chaque action produite par son système.
++
++Le NIST a lancé son AI Agent Standards Initiative le 17 février 2026. Ses travaux sur l'identité et l'autorisation alimentent cette construction collective ; ils ne constituent pas à eux seuls une certification de sécurité agentique. De même, l'Internet-Draft individuel de Sangam Das reste une proposition de recherche sans approbation normative de l'IETF. [3, 6, 14]
++
++Il serait donc inexact d'affirmer que les standards sont inexistants.
++
++En revanche, **l'existence de mécanismes de contrôle ne démontre pas encore leur continuité sur l'ensemble du cycle de vie d'un processus agentique**.
++
++Une identité peut être authentifiée sans que l'action soit autorisée.
++
++Une action peut avoir été approuvée puis modifiée avant son exécution.
++
++Une mémoire peut conserver des données intègres mais mensongères.
++
++Une décision de refus peut être contournée par un autre connecteur.
++
++Une transaction peut avoir été exécutée alors que l'agent, après une panne, croit devoir la recommencer.
++
++C'est cette continuité qu'il faut désormais considérer comme une propriété de sécurité à part entière.
++
++## Qu'est-ce qu'un processus critique dans un système agentique ?
++
++Je propose de ne pas limiter cette notion aux seules infrastructures officiellement classées critiques.
++
++Un processus métier peut présenter une criticité élevée sans appartenir à un secteur réglementé particulier.
++
++Je retiendrais la définition suivante :
++
++**Un processus agentique critique est un ensemble d'activités dans lequel une action incorrecte, non autorisée, répétée ou insuffisamment contrôlée peut provoquer une conséquence grave pour les personnes, les droits, les finances, la confidentialité, la sûreté ou la continuité d'un service essentiel.**
++
++Cette définition repose sur la conséquence possible, et non sur la technologie employée.
++
++Elle concerne notamment :
++
++- Les transferts financiers, règlements et modifications de bénéficiaires.
++- Les décisions ou opérations affectant directement la santé et la sécurité des personnes.
++- Les commandes industrielles et les modifications de systèmes assurant des fonctions de sûreté.
++- Les changements de privilèges dans des infrastructures sensibles.
++- La divulgation ou la destruction de données dont la compromission aurait des conséquences graves.
++- Les décisions administratives ou contractuelles affectant significativement les droits d'une personne.
++- Les modifications de services essentiels, de leurs contrôles de sécurité ou de leurs mécanismes de restauration.
++
++La criticité ne dépend pas uniquement du montant d'une transaction ou de la sensibilité d'un outil.
++
++Un ensemble d'opérations apparemment limitées peut produire un effet critique par accumulation.
++
++Dix opérations individuellement admissibles ne constituent pas nécessairement une opération globale autorisée.
++
++Le contrôle doit donc porter sur la trajectoire complète du processus, ses dépendances, ses délégations et ses effets cumulés.
++
++Autre point essentiel : **l'assistance agentique et l'engagement autonome doivent être distingués**.
++
++Un agent peut analyser une situation critique sans avoir le droit de modifier le système concerné.
++
++Il peut préparer une proposition d'action sans disposer des moyens techniques nécessaires pour l'exécuter.
++
++Cette séparation permet de bénéficier des capacités de l'IA sans lui transférer automatiquement l'autorité associée aux systèmes métier.
++
++## Trois responsabilités : les règles, les clés et les barrières
++
++Dans les deux précédents articles consacrés à Swarm, j'ai présenté le rôle de son moteur déterministe Rust, puis les questions d'identité et de mémoire persistante.
++
++Je voudrais maintenant élargir cette réflexion.
++
++Une architecture de contrôle agentique devrait distinguer trois responsabilités fondamentales.
++
++### Le gardien des règles
++
++Il vérifie les conditions dans lesquelles une action peut être autorisée.
++
++Il applique des politiques explicites, versionnées et indépendantes du raisonnement du modèle.
++
++Il contrôle l'identité de l'acteur, sa délégation, les ressources concernées, les dépendances, les restrictions métier et les validations exigées.
++
++Son fonctionnement déterministe ne garantit pas que ses règles sont correctes. Il permet en revanche de vérifier que la même règle est appliquée selon les mêmes conditions.
++
++### Le gardien des clés
++
++Il conserve les capacités techniques permettant de produire des effets sensibles.
++
++Un agent chargé de préparer un paiement n'a aucune raison de posséder directement les identifiants permettant de déclencher ce paiement.
++
++Un agent de développement n'a pas nécessairement besoin de disposer des secrets de production.
++
++Ces capacités doivent être protégées et délivrées uniquement pour des opérations précises, sous des conditions définies.
++
++Le contrôle des secrets n'est donc pas une simple mesure de confidentialité.
++
++Il constitue une séparation des pouvoirs entre l'agent qui propose et le composant qui peut agir.
++
++### Les garde-barrières
++
++Ils appliquent effectivement les décisions à la frontière des ressources protégées.
++
++Une politique de refus n'offre aucune garantie si l'agent peut emprunter un autre chemin d'exécution.
++
++Les accès aux fichiers, au réseau, aux outils, aux services métier et aux opérations privilégiées doivent être médiatisés par des mécanismes que l'agent ne peut pas modifier ou désactiver avec ses propres permissions.
++
++Ce principe rejoint celui du moniteur de référence et des points d'application des politiques du Zero Trust.
++
++La distinction entre les trois fonctions est logique : elles peuvent partager des composants physiques si leur architecture préserve réellement leurs propriétés de sécurité.
++
++**L'important n'est pas le nombre de services. C'est l'impossibilité de contourner les fonctions de contrôle.**
++
++### Une approbation doit suivre l'action exacte
++
++Prenons une facture pour laquelle un agent prépare un règlement. Le montant, la devise et le bénéficiaire sont approuvés. Un courriel annonce ensuite de nouvelles coordonnées bancaires et l'agent modifie sa proposition.
++
++L'autorisation initiale doit rester liée au contenu qui a été examiné. Changer le bénéficiaire, le montant ou un autre paramètre protégé doit invalider l'accord correspondant et déclencher les contrôles requis sur la nouvelle demande.
++
++Le service qui engage l'effet doit vérifier une dernière fois le mandat courant, la politique applicable et les approbations exactes au dernier point où il peut encore empêcher l'opération. Une révocation prise en compte avant ce point doit empêcher un nouvel engagement ; elle ne permet pas d'effacer un effet déjà engagé.
++
++Si le paiement a été exécuté mais que la réponse est perdue, une nouvelle requête ne constitue pas une reprise sûre. Il faut conserver une intention métier durable, un identifiant d'opération et une issue connue ou inconnue, puis réconcilier l'état avant toute répétition susceptible de produire un second effet.
++
++L'idempotence doit être vérifiée là où l'effet est réellement engagé. Une clé locale ne suffit pas si le service externe peut encore exécuter deux opérations distinctes. ACRFence étudie justement les risques de rejeu et de réutilisation d'autorité lorsque des agents restaurés reconstruisent des appels différents. Ses résultats restent liés au périmètre étudié. [7]
++
++## La mémoire doit entrer dans le périmètre de sécurité
++
++C'est probablement l'un des aspects que les architectures agentiques devront approfondir.
++
++Une mémoire persistante n'est pas seulement un mécanisme d'optimisation du contexte.
++
++Elle participe au comportement futur de l'agent.
++
++Elle peut conserver des préférences, des décisions, des procédures, des résultats antérieurs ou des expériences présentées comme réussies.
++
++Dès qu'une mémoire influence une action future, son intégrité, sa provenance et ses droits d'usage deviennent des propriétés du processus.
++
++Dans Swarm, je cherche notamment à distinguer :
++
++- L'identité de l'agent et les droits qui lui sont accordés.
++- L'origine et la version d'une information mémorisée.
++- Les conditions de lecture, de résumé et de transmission.
++- Le contexte effectivement préparé pour une tentative.
++- Les règles qui gouvernent l'action résultante.
++
++Le modèle de Biba fournit ici une référence historique utile pour raisonner sur les niveaux d'intégrité.
++
++Mais Biba, une signature cryptographique ou un contrôle de provenance ne prouvent pas qu'un souvenir est sémantiquement correct.
++
++L'architecture doit donc préserver une frontière : une information, même authentifiée, ne peut pas créer d'autorisation par elle-même.
++
++Le contenu peut contribuer au raisonnement.
++
++**Il ne doit pas modifier seul les règles qui gouvernent les conséquences de ce raisonnement.**
++
++La révocation d'une mémoire doit également être décrite avec précision. Elle peut empêcher de nouveaux usages contrôlés ; elle ne supprime pas rétroactivement ce qui a déjà été transmis à une conversation ou à un fournisseur. Une reprise doit donc tenir compte des versions et du contexte effectivement reçus.
++
++Biba fournit un modèle de contrôle des flux d'intégrité. Il ne garantit ni la confidentialité, ni la vérité d'un contenu, ni une séparation sémantique générale entre données et instructions. Ces propriétés demandent des mécanismes et des preuves complémentaires.
++
++## Proposition : PAEA, un profil d'assurance de l'exécution agentique
++
++À partir de ces constats, je propose un premier cadre de travail :
++
++**PAEA — Profil d'Assurance de l'Exécution Agentique.**
++
++Son objectif n'est pas de remplacer les standards existants.
++
++Il consiste à les articuler autour d'une propriété centrale :
++
++**Toute action critique produite par un système agentique doit rester sans effet tant que son identité, son autorité, son contenu exact et ses conditions d'engagement n'ont pas été vérifiés par une chaîne de contrôle non contournable.**
++
++Le framework couvre également ce qui précède l'action et ce qui lui succède.
++
++Avant l'action : classification de criticité, identité, mandat, provenance et contexte.
++
++Pendant l'action : contrôles d'autorisation, approbations, capacité d'exécution limitée et vérification au dernier point permettant d'empêcher l'effet.
++
++Après l'action : résultat observé, preuve, réconciliation, supervision et reprise.
++
++La proposition s'appuie sur des invariants vérifiables plutôt que sur une confiance déclarée envers les modèles.
++
++Elle distingue plusieurs niveaux d'assurance proportionnés aux conséquences possibles.
++
++Ces niveaux restent à spécifier et à éprouver. À ce stade, PAEA constitue une proposition de profil d'assurance ; aucun barème, label de conformité ou niveau de certification n'est acquis par son seul énoncé.
++
++Elle impose enfin une qualification fondée sur des scénarios adversariaux, des tests reproductibles et l'identification exacte de la version évaluée.
++
++Le modèle lui-même peut changer. Ses performances peuvent progresser.
++
++Les garanties d'autorité et d'exécution doivent rester indépendantes de ces évolutions.
++
++### Huit exigences à rendre vérifiables
++
++Pour transformer PAEA en un cadre testable, je propose de conserver huit exigences complémentaires.
++
++**1. Une identité vérifiable et une chaîne d'autorité explicite.** Chaque instance doit être rattachée à un principal authentifié, un mandat et une portée. La création d'un sous-agent doit respecter les droits délégables du parent. Une consigne ou un message ne peut pas augmenter ces droits.
++
++**2. Une intégrité des données et une admission contrôlée.** La provenance et le niveau de confiance des documents, messages et résultats d'outils doivent être connus. Leur admission à un niveau d'intégrité supérieur exige une procédure explicite, attribuée et liée à l'original. Un champ déclaré par l'agent ne constitue pas une autorité.
++
++**3. Une mémoire persistante gouvernée.** Chaque mémoire réutilisable doit conserver sa provenance, sa version, sa portée et ses conditions d'usage. Lire, résumer et transmettre sont des opérations dont les droits doivent être vérifiés. Le retrait bloque les nouveaux usages concernés sans réécrire les contextes déjà transmis.
++
++**4. Un contrôle indépendant au point d'engagement.** Les opérations sensibles doivent être proposées sous une forme structurée. Le contrôle doit vérifier la politique courante et les conditions exactes jusqu'au moment où l'effet peut encore être empêché. Une panne de ce contrôle ne doit pas libérer l'action sensible.
++
++**5. Des capacités limitées et des voies d'accès maîtrisées.** Les secrets critiques restent détenus par des composants protégés. Les accès directs et alternatifs par outil, processus, fichier, réseau ou connecteur doivent être inventoriés et éprouvés. Une télémétrie qui observe l'effet après coup ne démontre pas qu'elle pouvait l'empêcher.
++
++**6. Une maîtrise des effets et des reprises.** Chaque intention sensible doit posséder une identité durable, une autorisation liée à son contenu et un état vérifiable. Une issue inconnue exige une réconciliation avant toute répétition susceptible de produire un doublon. Les garanties du connecteur réel font partie du périmètre évalué.
++
++**7. Une validation humaine effective lorsqu'elle est requise.** L'approbation doit être authentifiée et liée à l'opération exacte. La séparation demandeur et approbateur doit être vérifiée lorsque la politique l'exige. Une revue IA favorable ne remplace pas cette décision humaine.
++
++**8. Des preuves protégées et une qualification reproductible.** Chaque effet observé doit pouvoir être relié à son objectif, son acteur, son mandat, la politique, la décision et les versions de données concernées. L'altération et l'omission de preuves doivent être traitées selon un modèle de menace déclaré.
++
++Ces exigences doivent être évaluées sur le système complet concerné. Une frontière entre modules ne suffit pas si les permissions de l'agent lui permettent de modifier les politiques, de récupérer les clés ou d'altérer les preuves. Les hypothèses sur le même utilisateur système, l'administrateur de l'hôte et les services externes doivent rester explicites.
++
++## Pourquoi Swarm ?
++
++Je positionne Swarm autour d'une idée :
++
++**Organiser le travail des agents et rendre vérifiables les conditions dans lesquelles ils peuvent agir.**
++
++Swarm est un moteur d'orchestration multi-agents à contrôle déterministe.
++
++Il vise à relier chaque action à une identité, une autorité, un contenu approuvé et un résultat vérifiable, avec des mécanismes de supervision et de reprise.
++
++Son moteur Rust porte des contrôles et des transitions qui restent distincts des propositions des modèles.
++
++Les travaux sur la mémoire, les contrats d'identité et les actions de confiance cherchent à étendre cette séparation à des processus complets.
++
++Swarm est toutefois un projet en évolution.
++
++Au 25 octobre 2026, le plan BIBA-RUST consigne la livraison locale du noyau des actions de confiance : moniteur I0–I3, identités locales, mandats, accords exacts, deux connecteurs à effets simulés, idempotence et réconciliation, avec des parcours CLI, API et web. Ces preuves portent sur le périmètre évalué ; elles ne démontrent ni paiement réel, ni attribution de droits externes, ni confinement général des agents. [11]
++
++Le plan AC-02 de confinement et de médiation réseau et secrets est enregistré, sans démarrage. La référence à OpenShell ou à une politique YAML ne suffit pas à établir une protection active dans Swarm. Les parcours complets d'identité et d'usage de la mémoire restent à qualifier. [11]
++
++Une matrice relie déjà douze contrôles NIST sélectionnés à des preuves locales contextualisées. Elle conserve ses écarts et ne sélectionne aucune baseline de conformité. PAEA peut prolonger cette matrice en reliant chaque exigence à un mécanisme, un propriétaire et une preuve, sans transformer les résultats partiels en certification. [11]
++
++Les garanties actuellement disponibles sont établies sur des parcours précis et des versions identifiées. Les mécanismes d'identité, de mémoire et de confinement ne sont pas encore tous qualifiés de bout en bout.
++
++Il serait prématuré de présenter Swarm comme un système certifié pour des processus critiques.
++
++Son intérêt, dans le cadre de cette recherche, est de constituer un terrain d'expérimentation sur lequel les propriétés proposées pourront être implémentées, attaquées, mesurées et comparées à d'autres approches.
++
++## Faut-il suspendre l'exécution autonome des processus critiques ?
++
++Ma position est la suivante.
++
++**Nous ne devrions pas autoriser un système agentique à engager directement des actions critiques lorsque les garanties nécessaires à leur contrôle n'ont pas été démontrées.**
++
++Cela ne signifie pas interdire l'usage de l'IA dans les domaines sensibles.
++
++Cela signifie distinguer ce que le système peut analyser, ce qu'il peut préparer, ce qu'il peut recommander et ce qu'il peut effectivement exécuter.
++
++L'autonomie d'engagement devrait dépendre d'un niveau d'assurance explicite.
++
++Pour certaines opérations, une autorisation préalable limitée et un contrôle déterministe suffiront peut-être.
++
++Pour d'autres, il faudra une validation humaine indépendante.
++
++Pour les fonctions de sûreté les plus sensibles, le framework ne pourra pas remplacer les exigences de certification et les dispositifs de protection propres au domaine.
++
++Cette approche suppose d'accepter un coût supplémentaire de contrôle.
++
++Mais l'optimisation de la vitesse d'exécution n'est pas le seul objectif d'un processus critique.
++
++L'enjeu est de rendre l'autonomie compatible avec la responsabilité.
++
++## De l'expérimentation à une proposition vérifiable
++
++Le prochain travail consiste à transformer PAEA en spécification technique.
++
++Il faudra définir les invariants, les frontières de confiance, les conditions de déploiement et les scénarios de qualification.
++
++Puis comparer plusieurs architectures : agents disposant directement des outils, contrôle des appels d'outils, workflow déterministe et contrôle complet du cycle de vie.
++
++Les mesures devront porter sur les effets indésirables réellement observés, les blocages injustifiés, les coûts, la latence et la capacité à reprendre correctement après incident.
++
++Chaque fiche d'évaluation devra identifier la version et l'empreinte du binaire, sa configuration, les références retenues, le modèle de menace, les exigences applicables et les preuves. Les tests devront conserver un témoin valide, les refus attendus et les conditions de reprise.
++
++Les scénarios doivent notamment couvrir une modification après approbation, une révocation concurrente, une injection de prompt, une mémoire contaminée, un accès direct contournant le connecteur, une panne du contrôle et une réponse perdue après engagement. Ils doivent mesurer l'effet réellement observé, au-delà du seul code de retour.
++
++Une unité réussie, une simulation locale, une intégration avec un service réel et une évaluation indépendante doivent conserver des statuts distincts. L'absence de preuve laisse le critère ouvert ; un pourcentage moyen ne compense pas l'échec d'un invariant nécessaire.
++
++Une série de tests réussis ne constituera pas une preuve universelle de sécurité.
++
++Elle permettra néanmoins de formuler des garanties bornées, reproductibles et réfutables.
++
++C'est ce type de démonstration qui doit accompagner le développement de l'autonomie agentique.
++
++Nous avons consacré beaucoup d'efforts à apprendre aux agents à raisonner et à agir.
++
++Il devient nécessaire de consacrer autant d'efforts à **définir les conditions vérifiables dans lesquelles nous acceptons de leur laisser produire des conséquences**.
++
++La vraie question n'est pas de savoir si l'IA agentique deviendra suffisamment capable pour piloter nos processus critiques.
++
++Elle est de savoir si nous construirons, avant de lui en confier les clés, les mécanismes qui garantissent que ces clés ne pourront pas être utilisées hors de l'autorité accordée.
++
++*Swarm — orchestrer les agents, contrôler leur autorité, vérifier leurs effets.*
+ 
+ ---
+ 
+-Ce socle devrait s'accompagner d'une suite de tests de conformité ouverte.
+-
+-Un fournisseur ou un intégrateur ne devrait pas pouvoir déclarer son système sécurisé parce qu'il possède un garde-fou, un journal, un sandbox ou un moteur de politique.
+-
+-Il devrait démontrer, sur une configuration et une version identifiées, que chaque invariant applicable est effectivement respecté.
+-
+-L'absence de preuve resterait une absence de garantie, et non une conformité présumée.
+-
+-## Faut-il autoriser des agents autonomes sur nos processus critiques ?
+-
+-C'est ici que je prends une position plus exigeante.
+-
+-Je pense qu'il faut distinguer clairement les systèmes d'aide à la décision et les systèmes capables de produire directement des effets critiques.
+-
+-Permettre à une IA d'analyser un dossier médical n'est pas lui confier l'autorité d'exécuter une décision thérapeutique.
+-
+-Préparer un lot de paiements n'est pas autoriser son règlement.
+-
+-Analyser l'état d'une infrastructure industrielle n'est pas disposer du droit de modifier ses paramètres de fonctionnement.
+-
+-**Tant que les garanties d'exécution nécessaires ne sont pas démontrées, je suis favorable à l'interdiction de l'exécution autonome directe d'actions critiques, et non à l'interdiction de l'IA dans ces environnements.**
+-
+-Pour les processus touchant à la vie humaine, à la sûreté des installations, aux infrastructures essentielles ou à des opérations financières dont les conséquences peuvent être graves, le principe devrait être simple : autonomie d'analyse possible, autonomie d'engagement conditionnée à des garanties vérifiables.
+-
+-Cela suppose une classification des actions selon leur criticité, des exigences de validation adaptées et, pour les niveaux les plus sensibles, une qualification indépendante intégrant les contraintes réglementaires et sectorielles.
+-
+-Il s'agit ici d'une proposition de politique d'ingénierie et de déploiement, pas de l'affirmation qu'une interdiction générale serait déjà imposée par la réglementation.
+-
+-## Ce que j'essaie de construire avec Swarm
+-
+-Swarm est mon terrain d'expérimentation pour ces principes.
+-
+-Le moteur Rust, les contrats d'identité, la mémoire versionnée, les contrôles de validation, les mécanismes de supervision et la chaîne de preuves constituent les éléments de cette architecture.
+-
+-Les travaux sur les actions de confiance introduisent également une réflexion sur Biba, les mandats, les approbations exactes, l'isolation des secrets et les connecteurs métier.
+-
+-Mais je tiens à conserver une distinction essentielle entre ce qui est conçu, ce qui est implémenté localement, ce qui a été testé et ce qui est réellement qualifié.
+-
+-Swarm n'est pas aujourd'hui une certification de sécurité agentique, et les parcours de contrôle sensibles ne sont pas tous qualifiés de bout en bout.
+-
+-C'est précisément l'objet du travail à poursuivre.
+-
+-Mon ambition n'est pas de produire un agent supplémentaire qui surveillerait les autres en espérant qu'il soit plus fiable.
+-
+-Elle est de construire un environnement où la liberté de raisonnement des agents cohabite avec des limites d'exécution techniquement opposables.
+-
+-Un environnement dans lequel les modèles peuvent évoluer sans que chaque évolution redistribue implicitement les droits, modifie les règles ou compromette les processus métier.
+-
+-## Une dernière question
+-
+-Nous cherchons tous à rendre les agents plus autonomes.
+-
+-Nous cherchons à leur donner davantage de mémoire, davantage d'outils et davantage de capacités.
+-
+-Mais avons-nous consacré autant d'efforts à déterminer ce qu'ils ne doivent jamais pouvoir faire seuls ?
+-
+-Le véritable enjeu n'est peut-être plus de savoir jusqu'où nous pouvons pousser l'autonomie.
+-
+-Il est de savoir **quelles garanties nous devons exiger avant de lui confier les clés.**
+-
+-Et surtout : **qui garde ces clés lorsque les agents commencent à agir sans nous ?**
+-
+-*Fabrice Pizzi — Swarm*
+-
+-#AgenticAI #AISecurity #Cybersecurity #AIEngineering #MultiAgentSystems #Rust
+-
++**Références principales**
++
++[1] OWASP GenAI Security Project, *Top 10 for Agentic Applications*, 2026.
++
++[Source 1](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)
++
++[2] OWASP, *Agent Control Standard*, spécification v0.1.0, 2026.
++
++[Source 2](https://github.com/GenAI-Security-Project/agent-control-standard)
++
++[3] NIST, *AI Risk Management Framework*, 2023, et travaux sur l'identité agentique et les infrastructures critiques, 2026.
++
++[Source 3](https://www.nist.gov/itl/ai-risk-management-framework)
++
++[4] Debenedetti et al., *Defeating Prompt Injections by Design*, CaMeL, arXiv:2503.18813.
++
++[Source 4](https://arxiv.org/abs/2503.18813)
++
++[5] Wang et al., *AgentSpec: Customizable Runtime Enforcement for Safe and Reliable LLM Agents*, arXiv:2503.18666.
++
++[Source 5](https://arxiv.org/abs/2503.18666)
++
++[6] Das, *Adaptive Authorization for Agentic AI: Graduated and Escalated Execution Control for Critical Infrastructure*, Internet-Draft individuel, septembre 2026.
++
++[Source 6](https://datatracker.ietf.org/doc/draft-das-agentic-adaptive-authorization/00/)
++
++[7] Zheng et al., *ACRFence: Preventing Semantic Rollback Attacks in Agent Checkpoint-Restore*, arXiv:2603.20625.
++
++[Source 7](https://arxiv.org/abs/2603.20625)
++
++[8] Agent Baseline, *The Secure Software Factory: A Reference Architecture*, version 1, octobre 2026.
++
++[Source 8](https://github.com/agentbaseline/agentbaseline/blob/d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283/software-factory/software-factory.md)
++
++[9] ISO/IEC 42001:2023, ISO/IEC 23894:2023 ; NIST SP 800-207 ; SPIFFE ; RFC 8693 et RFC 9396.
++
++[Source 9](https://www.iso.org/standard/42001)
++
++[10] ANSSI, *Recommandations de sécurité pour un système d'IA générative*, avril 2024.
++
++[Source 10](https://messervices.cyber.gouv.fr/guides/recommandations-de-securite-pour-un-systeme-dia-generative)
++
++[11] Documentation d'architecture et contrats de Swarm, état d'octobre 2026.
++
++[12] ISO/IEC 27001:2022, systèmes de management de la sécurité de l'information. [Source](https://www.iso.org/standard/27001).
++
++[13] OWASP, Application Security Verification Standard, version 5.0.0. [Source](https://asvs.owasp.org/).
++
++[14] NIST, AI Agent Standards Initiative, annonce du 17 février 2026 ; point sur l'identité et l'autorisation du 29 septembre 2026. [Initiative](https://www.nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative-interoperable-and-secure) ; [identité et autorisation](https://www.nist.gov/news-events/news/2026/09/comments-software-and-agentic-ai-identity-concept-paper).
+--- before/build_word.py
++++ docs/communication/linkedin-swarm-securite-20261025/build_word.py
+@@ -1,8 +1,9 @@
+-"""Build the French LinkedIn DOCX from the unabridged supplied article.
++"""Build the French LinkedIn DOCX from the authorized merged article.
+ 
+ Run with the bundled document Python runtime and python-docx. The builder reads
+-article-fr.md and accompagnement-original-fr.md, preserves their prose and
+-headings, performs no network access and atomically replaces its sole DOCX output.
++article-fr.md, preserves all of its prose and headings, performs no network
++access and atomically replaces its sole DOCX output. Author-source retention
++must additionally be verified against source-auteur-fr.md and additions.json.
+ Rendering and visual approval are separate steps; this program proves neither.
+ """
+ 
+@@ -87,6 +88,10 @@
+             continue
+         if block.startswith(("```", "<")):
+             raise ValueError("Unsupported article structure")
++        if block == "**Références principales**":
++            paragraph = document.add_paragraph("Références principales", "Heading 1")
++            paragraph.paragraph_format.page_break_before = True
++            continue
+         heading = re.match(r"^(#{1,6}) (.+)$", block)
+         if heading:
+             level, title = len(heading[1]), heading[2]
+@@ -165,15 +170,17 @@
+ 
+ 
+ def build(source_dir: Path, output: Path) -> None:
+-    """Create the original article followed by its supplied accompanying notes.
++    """Create the merged article as one editable French Word document.
+ 
+ Sources must exist as UTF-8. Uses A4 pages, black native Word headings and
+-    editable paragraphs and the original notes table; no images, active content
+-    or credentials are added. The original text, including punctuation, is retained.
++    editable prose and any supported source tables; no images, active content
++    or credentials are added. The Markdown content and punctuation are retained.
+ Reading, parsing and atomic save errors propagate. No render approval is implied.
+ """
+     article = (source_dir / "article-fr.md").read_text(encoding="utf-8")
+-    accompaniment = (source_dir / "accompagnement-original-fr.md").read_text(encoding="utf-8")
++    first_line = article.splitlines()[0]
++    if not first_line.startswith("# "):
++        raise ValueError("The article must start with its author title")
+     document = Document()
+     # The bundled default template carries a blue Title paragraph border.
+     # Remove paragraph borders at their source so inherited formatting cannot
+@@ -215,16 +222,13 @@
+     language = OxmlElement("w:lang")
+     language.set(qn("w:val"), "fr-FR")
+     normal.element.get_or_add_rPr().append(language)
+-    document.core_properties.title = "IA agentique : qui garde les règles, les clés et les conséquences ?"
++    document.core_properties.title = first_line[2:]
+     document.core_properties.subject = "Positionnement et références de sécurité"
+     document.core_properties.author = "Fabrice Pizzi"
+     document.core_properties.keywords = "Swarm, sécurité agentique, LinkedIn"
+     add_article(document, article)
+-    document.add_page_break()
+-    document.add_paragraph("Annexe — Éléments d’accompagnement du texte fourni", "Title")
+-    add_article(document, accompaniment)
+     save_atomically(document, output)
+-    print(f"Created {output.name}; original article: {len(article.split())} words; accompanying notes: {len(accompaniment.split())} words")
++    print(f"Created {output.name}; merged article: {len(article.split())} words")
+ 
+ 
+ def main() -> None:
+--- before/README.md
++++ docs/communication/linkedin-swarm-securite-20261025/README.md
+@@ -3,6 +3,31 @@
+ 25 octobre 2026. Demande utilisateur : intégrer le positionnement dans la
+ documentation de Swarm et préparer un Word français à copier dans LinkedIn.
+ Livraison éditoriale locale, sans publication.
++
++## Fusion courante avec la dernière source auteur
++
++L’utilisateur a fourni son article « IA agentique : jusqu’où peut-on déléguer
++sans perdre le contrôle ? » et demandé explicitement une fusion avec les
++compléments de positionnement. Cette source remplace la précédente comme base
++auteur de la livraison courante ; les deux originaux restent conservés.
++
++- [Dernière source auteur](source-auteur-fr.md), copie exacte de la nouvelle pièce jointe, 2 493 mots.
++- [Article fusionné](article-fr.md), 3 859 mots, conservant les 160 blocs de la source dans l’ordre, sans suppression ni reformulation de ces blocs.
++- [Word courant](Swarm_Securite_LinkedIn.docx), uniquement l’article fusionné avec son titre original et PAEA ; aucune ancienne annexe ni aucun post abrégé n’est inséré.
++- Ajouts et points d’insertion : `review/merge-auteur-20261025/additions.json`. Source d’autorité et critères : `plan.json` dans le même dossier. La preuve de livraison courante est `verification.json` après contrôle.
++
++Sept ajouts apportent la distinction entre référentiels, le cas de l’approbation
++et de la réponse perdue, les limites du retrait mémoire, le statut des niveaux
++d’assurance, les huit exigences testables, les acquis Biba et limites AC-02,
++puis les conditions de qualification. Les onze références de l’auteur sont
++conservées ; les liens publics et trois références complémentaires sont ajoutés.
++
++PAEA est aussi nommé dans la documentation de positionnement FR/EN, sans nouvelle
++politique active. Les détails de compatibilité, de certification et de déploiement
++restent non établis. Le générateur conserve le contenu de la fusion ; une
++vérification distincte compare tous les blocs de l’auteur à la pièce jointe,
++puis tous les blocs du Word à la fusion. Les historiques ci-dessous restent
++attribués à leurs propres livraisons.
+ 
+ ## Correction de la fidélité au texte fourni
+ 
+@@ -12,15 +37,15 @@
+ a signalé la troncature ; le critère initial reste en échec dans la preuve
+ historique `review/review.json`, qui porte uniquement sur cette ancienne livraison.
+ 
+-**Livraison courante : article original intégral de 3 278 mots**, suivi en annexe
++**Livraison restaurée précédente : article original intégral de 3 278 mots**, suivi en annexe
+ des 803 mots d’accompagnement également fournis. Le titre, la ponctuation, les
+ sections, les huit exigences détaillées, exemples et prises de position sont
+ conservés. Aucun post abrégé n’est placé avant l’article dans le Word corrigé.
+ 
+ - [Source fournie intégrale](source-integrale-fr.md), copie octet pour octet de la pièce jointe.
+-- [Article original](article-fr.md), tranche exacte de cette source du titre aux hashtags.
++- L’article original de cette reprise est conservé sous `review/merge-auteur-20261025/article-fr.md` ; `article-fr.md` désigne désormais la fusion courante.
+ - [Accompagnement original](accompagnement-original-fr.md), préambule et recommandations conservés en annexe.
+-- [Word corrigé](Swarm_Securite_LinkedIn.docx), article en premier, accompagnement en annexe.
++- Le Word de cette reprise est conservé sous `review/merge-auteur-20261025/Swarm_Securite_LinkedIn.docx` ; le lien principal désigne désormais la fusion courante.
+ - Reprise, première livraison et contrôles de correction : `review/truncation-incident/` ; la preuve courante est `review/truncation-incident/verification.json` après contrôle.
+ 
+ Le positionnement FR/EN constitue une analyse distincte ; il n’est pas substitué
+--- before/docs/SECURITY-POSITIONING.md
++++ docs/SECURITY-POSITIONING.md
+@@ -83,6 +83,19 @@
+ 
+ ## Proposition de profil d’assurance de l’exécution agentique
+ 
++**PAEA — Profil d’Assurance de l’Exécution Agentique** est le nom proposé par
++l’auteur dans son [article](communication/linkedin-swarm-securite-20261025/article-fr.md).
++Il désigne ce cadre de travail documentaire. Les identifiants de suivi PA-01–08
++ci-dessous sont conservés ; ce nom ne crée ni nouveau mécanisme du moteur, ni
++label ou niveau de certification.
++
++Le périmètre proposé couvre les actions dont une erreur, un défaut d’autorité,
++une répétition ou un contrôle insuffisant pourrait avoir des conséquences graves
++pour les personnes, les droits, les finances, la confidentialité, la sûreté ou la
++continuité d’un service essentiel. La criticité se juge aussi sur la trajectoire
++et les effets cumulés, pas seulement sur une opération isolée. Les niveaux
++d’assurance et leur protocole de qualification restent à spécifier.
++
+ Ce profil est une **proposition documentaire**, pas un nouveau standard adopté,
+ une politique active, une qualification réalisée ou une autorisation de démarrer
+ AC-02. Il prolonge la matrice existante au lieu de la remplacer. Les identifiants
+@@ -135,7 +148,8 @@
+ sectorielle du déploiement appartient à son responsable mandaté.
+ 
+ Le [dossier LinkedIn et le Word](communication/linkedin-swarm-securite-20261025/README.md)
+-conservent l’article original fourni intégralement et ses éléments d’accompagnement.
+-Cette analyse de positionnement reste distincte du texte de l’auteur, sans le
+-remplacer par un résumé. Cette documentation ne lance aucun
++conservent la dernière source auteur et une fusion explicitement demandée avec
++les compléments de positionnement. Chaque paragraphe de cette source est conservé
++dans l’ordre ; les ajouts sont tracés séparément. Les anciennes versions restent
++historiques. Cette documentation ne lance aucun
+ chantier, ne modifie aucune politique d’exécution et ne requalifie aucun runtime.
+--- before/docs/en/SECURITY-POSITIONING.md
++++ docs/en/SECURITY-POSITIONING.md
+@@ -79,6 +79,18 @@
+ 
+ ## Proposed agentic execution assurance profile
+ 
++**PAEA — Profil d’Assurance de l’Exécution Agentique** is the name proposed by
++the author in the [French article](../communication/linkedin-swarm-securite-20261025/article-fr.md).
++It names this documentary framework. Existing PA-01–08 tracking identifiers
++remain unchanged; the name creates no engine mechanism, certification label
++or assurance level.
++
++The proposed scope covers actions where error, missing authority, repetition or
++insufficient controls could seriously affect people, rights, finances,
++confidentiality, safety or continuity of an essential service. Criticality also
++depends on the complete trajectory and cumulative effects, not only individual
++operations. Assurance levels and their qualification protocol remain to be specified.
++
+ This profile is a **documentary proposal**, not an adopted new standard, active
+ policy, completed qualification or authorization to start AC-02. It extends the
+ existing matrix rather than replacing it. PA identifiers support tracking;
+@@ -129,7 +141,8 @@
+ mandated responsible party.
+ 
+ The [French LinkedIn dossier and Word](../communication/linkedin-swarm-securite-20261025/README.md)
+-preserve the complete supplied original article and its accompanying material.
+-This positioning analysis remains separate from the author's text and does not
+-replace it with a summary. This documentation starts no implementation, changes no
++retain the latest author source and an explicitly requested merge with the
++positioning contributions. Each source paragraph remains in order; additions
++are tracked separately. Earlier versions remain historical. This documentation
++starts no implementation, changes no
+ execution policy and requalifies no runtime.

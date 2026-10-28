@@ -1,0 +1,11 @@
+{
+  "status": "RED_VALID_EMPTY_LIST_RECOVERY",
+  "exit": 2,
+  "actual": "managed-manifest-binding-mismatch",
+  "include_dirty": [],
+  "original_pending_sha256": "e8d9126ec90869fe6d9126a74fcd3fa88c430508f7631ae0bbd2fba454068e4c",
+  "bare_restored": true,
+  "final_absent": true,
+  "root": "/tmp/swarm-model83-ve37jk33",
+  "expected": "Successful recovery of identical valid request"
+}

@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "id": "preparation-sources-regressions-rust",
+  "inputs": [
+    "tests/rust_preparation_sources.py",
+    "tests/rust_preparation_sources_browser.py",
+    "tests/rust_preparation_sources_ui.cjs",
+    "tests/rust_preparation_sources_upgrade.py",
+    "tests/rust_preparation_sources_admin_ui.cjs",
+    "tests/rust_preparation_wire.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "tests/helpers/engine_settings_admin_state.cjs",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-engine/Cargo.toml",
+    "rust/crates/swarm-engine/src/engine_settings.rs",
+    "rust/crates/swarm-engine/src/preparation_command.rs",
+    "rust/crates/swarm-engine/src/preparation_models.rs",
+    "rust/crates/swarm-engine/src/text.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_capture.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_files.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_attachments.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_write.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_read.rs",
+    "rust/crates/swarm-cli/src/preparation.rs",
+    "rust/crates/swarm-web/src/service/preparations.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/native_admin.rs",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+    "frontend/engine-settings/admin.js",
+    "web/preparation-native-sources.js",
+    "web/preparation-native.js",
+    "web/prepare.html",
+    "web/prephase.css",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "tests/rust_preparation_plan.py",
+    "tests/rust_preparation_reads.py",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/models.rs",
+    "tests/rust_preparation_budget.py",
+    "tests/rust_preparation_budget_ui.cjs",
+    "tests/rust_preparation_team.py",
+    "tests/rust_preparation_team_ui.cjs",
+    "tests/rust_preparation_plan_integrity.py",
+    "tests/rust_preparation_source_policy.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "policy",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-regression-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_source_policy.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_REGRESSION_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_SOURCE_POLICY_PASS 8"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "budget",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-regression-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_budget.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_REGRESSION_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_BUDGET_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "team",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-regression-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_team.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_REGRESSION_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_TEAM_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "questions",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-regression-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_plan_integrity.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_REGRESSION_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_PLAN_INTEGRITY_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

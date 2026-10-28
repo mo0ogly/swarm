@@ -1,0 +1,9 @@
+test_observation_and_cleanup_causes_both_survive (test_rust_report_relay_guards.RunningBarrier.test_observation_and_cleanup_causes_both_survive)
+Failure never becomes an empty successful Agent even if close also fails. ... ok
+test_starting_is_not_success_and_actual_running_is_required (test_rust_report_relay_guards.RunningBarrier.test_starting_is_not_success_and_actual_running_is_required)
+A valid running control precedes the delayed parent-record variant. ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.007s
+
+OK

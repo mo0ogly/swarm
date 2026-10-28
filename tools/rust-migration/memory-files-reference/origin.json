@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "commit": "d566ed35c42a362f59e48a025d58b2b68a25b179",
+  "original_files_sha256": {
+    "internal/engine/project_memory.go": "16aa64873f1a26f102a9c1e26d4021425bf063ea7ff1b58c7634a423ec77070d",
+    "internal/engine/retex.go": "0112c6e2b1d31de4f7d8c829f046cbe86c4cb2588123b8bfa13b6ff9f2b3f0ec",
+    "internal/identitycontract/contract.go": "5eb8c945536080d376285ac547aea421bc196f7fc446375cbe2d9327721b1dd8",
+    "internal/engine/agents_store.go": "6d0a96e05f6e155377ed8d9287c40f0b475c7a62b13542f81655888cb7204f21"
+  },
+  "verbatim_function_sha256": {
+    "memoryLegacyPaths": "38ebc4d92025bd5854bc556df488fc8227436739b4efedc8424eeafa2ae1c682",
+    "findRetex": "d22eb0b5fb7dea491d613add8128f64e19ef2cca7aabaae0d77af62a56d1678f"
+  },
+  "scope": "unchanged historical Go source-selection predicate with data-only reader; no SQL/source admission/identity/actual process parity"
+}

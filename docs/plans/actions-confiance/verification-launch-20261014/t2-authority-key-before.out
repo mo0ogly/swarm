@@ -1,0 +1,14 @@
+=== RUN   TestActionsConfianceT2ReplayBindsAuthenticatedAuthority
+    trust_actions_operator_regression_test.go:653: another authenticated principal replayed the original authority
+--- FAIL: TestActionsConfianceT2ReplayBindsAuthenticatedAuthority (0.03s)
+=== RUN   TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation
+=== RUN   TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation/anchor
+    trust_actions_operator_regression_test.go:691: preexisting proof-key symlink accepted
+=== RUN   TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation/config
+    trust_actions_operator_regression_test.go:691: preexisting proof-key symlink accepted
+--- FAIL: TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation (0.05s)
+    --- FAIL: TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation/anchor (0.02s)
+    --- FAIL: TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation/config (0.02s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.096s
+FAIL

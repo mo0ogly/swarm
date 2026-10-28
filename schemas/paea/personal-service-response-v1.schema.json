@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:paea:personal-service-response:v1",
+  "title": "Personal service response observation v1",
+  "description": "Top-level frame shape only, not authority, sender/freshness or full configuration semantics. Consumers must run the existing configuration validate_view/validate_projection and match the independently expected request before use. A failed response may retain a known view/projection and uncertainty. Original typed causes remain in the local Reply.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "protocol",
+    "operation",
+    "request_digest",
+    "challenge",
+    "completed",
+    "failure_layers",
+    "intent",
+    "journal",
+    "checkpoint",
+    "sequence",
+    "configuration_effect_unknown",
+    "view",
+    "projection"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "protocol": {
+      "const": "swarm-personal-service-response-v1"
+    },
+    "operation": {
+      "enum": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    "request_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "challenge": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{43}$"
+    },
+    "completed": {
+      "type": "boolean"
+    },
+    "failure_layers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "personal",
+          "business",
+          "personal_after_use",
+          "business_after_storage"
+        ]
+      }
+    },
+    "intent": {
+      "enum": [
+        null,
+        "not_attempted",
+        "unknown",
+        "visible",
+        "durable"
+      ]
+    },
+    "journal": {
+      "enum": [
+        null,
+        "not_attempted",
+        "unknown",
+        "acknowledged",
+        "observed",
+        "current_verified"
+      ]
+    },
+    "checkpoint": {
+      "enum": [
+        null,
+        "not_attempted",
+        "unknown",
+        "visible",
+        "durable"
+      ]
+    },
+    "sequence": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "integer",
+          "minimum": 1
+        }
+      ]
+    },
+    "configuration_effect_unknown": {
+      "type": "boolean"
+    },
+    "view": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/view"
+        }
+      ]
+    },
+    "projection": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/projection"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "view": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "snapshot",
+        "head"
+      ],
+      "properties": {
+        "snapshot": {
+          "type": "object"
+        },
+        "head": {
+          "type": "object"
+        }
+      }
+    },
+    "projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "base",
+        "proposed",
+        "current_event_replay"
+      ],
+      "properties": {
+        "base": {
+          "type": "object"
+        },
+        "proposed": {
+          "$ref": "#/$defs/view"
+        },
+        "current_event_replay": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "completed": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "failure_layers": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "failure_layers": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "not": {
+        "properties": {
+          "view": {
+            "type": "object"
+          },
+          "projection": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "view",
+          "projection"
+        ]
+      }
+    }
+  ]
+}

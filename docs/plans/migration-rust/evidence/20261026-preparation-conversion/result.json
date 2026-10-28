@@ -1,0 +1,44 @@
+{
+  "status": "PASS within new-work conversion scope",
+  "version": "v0.1.1-dev.115",
+  "binary_sha256": "3635bd296a419b7d7c8f5c845a5caa87efea689b028358ec228c43c36d9fae62",
+  "effective_inputs": 477,
+  "previous_commit_created": "50a972330831a8644a322343c6c5807eb0a2ec25",
+  "unrelated_staged_entries_preserved_at_commit": 108,
+  "functional_proof": {
+    "version": "v0.1.1-dev.113",
+    "CLI_API_assertions": 50,
+    "browser_assertions": 51,
+    "recipe": "private/campaign/recipe113",
+    "integrity": "VERIFIED"
+  },
+  "regression_proof": {
+    "version": "v0.1.1-dev.112",
+    "browser_assertions": 105,
+    "recipe": "private/campaign/ui-reviewed112-frozen",
+    "integrity": "VERIFIED"
+  },
+  "reuse": "113→114 only three Rustdoc deltas,114→115 identical477 inputs; exact comparison retained",
+  "unit_test_count": 1,
+  "installed_HTTP_checks": 16,
+  "installed_Version_checks": 14,
+  "installed_page_checks": 6,
+  "live_settings_schema_preserved": 41,
+  "paused_mission_revisions_preserved": [
+    50,
+    469
+  ],
+  "provider_calls": 0,
+  "native_missions_started": 0,
+  "glm_completed_responses": 2,
+  "glm_declared_total_tokens": 93104,
+  "global_acceptance": false,
+  "independent_final_acceptance": false,
+  "unported": [
+    "existing-work conversion",
+    "organization configuration",
+    "release/revision",
+    "AI dialogue"
+  ],
+  "push_performed": false
+}

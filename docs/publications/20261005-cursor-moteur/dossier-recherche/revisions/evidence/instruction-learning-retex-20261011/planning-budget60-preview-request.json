@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-planning-budget-through-retex-60-20261011",
+  "expected_revision": 254,
+  "limits": {
+    "planning_activations": 60,
+    "planning_decisions": 60,
+    "review_calls": 70
+  },
+  "reason": "Autorisation explicite utilisateur pour augmenter les droits/budgets nécessaires au projet jusqu’au RETEX. Observation:22 activations/30 et14 décisions/30, T2 non acceptée,6 tâches T3..T8 futures plus retours de revue et conduite hiérarchique. Les8 activations restantes offrent une marge insuffisante au format observé, estimation de conduite et corrections, pas minimum garanti. Allocation planification30→60 et décisions30→60; revue70 conservée avec19 appels utilisés. Conserver toutes consommations, tentatives, preuves et refus; aucune acceptation, réinitialisation ou limite de compte fournisseur contournée. Les décisions restent au propriétaire IA; plafond administrable, pas critère de fin."
+}

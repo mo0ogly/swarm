@@ -1,0 +1,38 @@
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_worker_recovery.py", line 216, in <module>
+  |     if __name__=='__main__':main()
+  |                             ~~~~^^
+  |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_worker_recovery.py", line 213, in main
+  |     worker.subreaper_scope(cases,lambda e:fixture.publish(out/'failure.json',dict(status='FAIL',cause=''.join(traceback.format_exception(e)))),parent_death.subreaper)
+  |     ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_watch_worker.py", line 90, in subreaper_scope
+  |     raise BaseExceptionGroup('watch observation/publication/subreaper restoration', errors)
+  | ExceptionGroup: watch observation/publication/subreaper restoration (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Exception Group Traceback (most recent call last):
+    |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_watch_worker.py", line 80, in subreaper_scope
+    |     result = operation()
+    |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_worker_recovery.py", line 210, in cases
+    |     fault(binary,out/'fault',args.baseline_probe)
+    |     ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_worker_recovery.py", line 196, in fault
+    |     if primary is not None or errors:raise BaseExceptionGroup('worker recovery and cleanup',([primary] if primary else [])+errors)
+    |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | ExceptionGroup: worker recovery and cleanup (1 sub-exception)
+    +-+---------------- 1 ----------------
+      | Traceback (most recent call last):
+      |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_worker_recovery.py", line 175, in fault
+      |     view=request(server,'GET','/api/v1/mission?'+urlencode(dict(work=f.work,action='status')))
+      |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_native_http_mission.py", line 45, in request
+      |     assert status==expected, (method,path,status,data[:300])
+      |            ^^^^^^^^^^^^^^^^
+      | AssertionError: ('GET', '/api/v1/mission?work=w-217b58dc8b5674b262746459&action=status', 500, b'{"error":"mission-status-planning-unported","failure":{"code":"mission-status-planning-unported"},"schema_version":1}')
+      +------------------------------------
+Traceback (most recent call last):
+  File "<string>", line 4, in <module>
+    subprocess.run(['python3','tests/rust_mission_worker_recovery.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/'run')],check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python3', 'tests/rust_mission_worker_recovery.py', '--binary', '/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-f95d19030b34b9178c9cb02950a800680458cf0c3c15df87079feadb8f14e017', '--profile', '/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-worker-recovery1230/normal1239/result.json', '--output', '/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-hprotzij/run']' returned non-zero exit status 1.

@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "node",
+    "tests/recovery_evidence_test.cjs"
+  ],
+  "started_at_utc": "2026-10-16T18:21:23.983506+00:00",
+  "duration_seconds": 1.239,
+  "exit_code": 0,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "14c09f4b7fe1f40d52d235789d9487e62fe11d29655e6bb39e4f9e486f07109f",
+  "real_model_calls": 0
+}

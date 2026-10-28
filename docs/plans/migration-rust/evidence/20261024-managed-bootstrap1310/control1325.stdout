@@ -1,0 +1,11 @@
+
+running 6 tests
+test planning_wire_preserves_complete_fields_and_custom_dependency_intent ... ok
+test planning_wire_rejects_invalid_types_unknown_fields_and_recovers ... ok
+test planning_controls_revoke_every_lease_and_preserve_budget_and_input ... ok
+test planning_resume_policy_requires_explicit_adoption_only_when_consumed ... ok
+test planning_controls_reject_scope_size_envelope_clock_and_generation_faults ... ok
+test root_planning_controls_commit_replay_and_refuse_atomically ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+

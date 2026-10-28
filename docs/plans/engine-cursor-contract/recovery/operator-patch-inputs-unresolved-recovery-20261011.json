@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-11T18:23:05.629325+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-unresolved-recovery-20261011.bundle",
+  "sha256": "5959b4fb67e99ca6ca2bd3fdfc50e3d5c55ee2382cdc90ed120bbb1c271468a6",
+  "commit": "c326710df6a5777d1337d5c9a9308a09b5928904",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 84,
+  "manifest_sha256": "0014e80ebbe5fcc4202ebdaf46e0e633630a92cc387b100bb6a8bae7b7db1b4b",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/review-recovery19-inputs-iodjje2b",
+  "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/review-recovery19-import-37xl1fsk",
+  "verification": "PASS fetch and all84 original full bytes/hash; old62 preserved",
+  "limits": "Immutable cumulative62 originals plus qualified17+18+18b+19 and14 exact historical preimage extensions. Full cumulative1179 PASS495.576s, targeted/race PASS; initial18nil-review and19storage failures preserved. Native T3 must merge Judge and all patches, verify its combined candidate; native supervisor review directive reception/effect and T4 global recovery, T7 real hierarchical parallel flow and T8 RETEX remain required. No task acceptance or extra rights inferred."
+}

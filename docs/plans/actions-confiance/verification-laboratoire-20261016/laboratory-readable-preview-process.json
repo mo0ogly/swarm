@@ -1,0 +1,39 @@
+{
+  "pid": 2801993,
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-laboratory-readable",
+    "--root",
+    "/tmp/swarm-actions-preview-g81kfiuh",
+    "web",
+    "127.0.0.1:36525"
+  ],
+  "proc_start_ticks": "4718634",
+  "binary_sha256": "9d0d47d3b1faa70e86565c67596fd4323547f487de806acdabe5118b9d815b36",
+  "fixture_root": "/tmp/swarm-actions-preview-g81kfiuh",
+  "origin": "http://127.0.0.1:36525",
+  "state_sha256_unchanged": "d3b01d34c5c750ca91cbe1591ccd1c978ecb3a52a6416ffbbb0d610cfddd48c1",
+  "old_process": {
+    "pid": 2776550,
+    "identity_verified_before_stop": true,
+    "stopped": true
+  },
+  "verification_status": "verified",
+  "private_startup_log": "/tmp/swarm-laboratory-preview-47hbwqf4.log",
+  "browser_reload_observed": false,
+  "actions": 2,
+  "ledger_entries": 1,
+  "laboratory": {
+    "enabled": false,
+    "timeout_seconds": 30,
+    "max_concurrent_runs": 1
+  },
+  "evidence_signing": {
+    "enabled": false,
+    "key_ttl_seconds": 86400
+  },
+  "process_policy": {
+    "enabled": false
+  },
+  "public_api_html_js_verified": true,
+  "at": "2026-10-16T01:06:02.615829+00:00"
+}

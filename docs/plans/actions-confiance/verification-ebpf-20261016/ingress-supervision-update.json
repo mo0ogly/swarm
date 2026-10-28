@@ -1,0 +1,12 @@
+{
+  "automation_id": "superviser-swarm-actions-de-confiance",
+  "status": "ACTIVE",
+  "at": "2026-10-16T02:33:05.676871+00:00",
+  "result": "Internal observation receiver verified; R20 remains partial",
+  "next": "Fixed owned collector/launcher and kernel filter; native unavailable handling; qualification and RETEX",
+  "linux_privilege_authorized": false,
+  "prompt_previous_characters": 13367,
+  "prompt_current_characters": 7482,
+  "notification_policy": "meaningful changes only; quiet while unchanged/non-actionable",
+  "prompt_reduction_proves_latency_cause": false
+}

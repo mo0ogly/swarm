@@ -1,0 +1,20 @@
+{
+  "error": "Error: Node is detached from document\n    at CdpElementHandle.assertConnectedElement (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:1304:23)\n    at async CdpElementHandle.isIntersectingViewport (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:1329:17)\n    at async CdpElementHandle.<anonymous> (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:122:20)\n    at async CdpElementHandle.scrollIntoViewIfNeeded (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:1311:17)\n    at async CdpElementHandle.click (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:725:13)\n    at async CdpElementHandle.<anonymous> (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:133:24)\n    at async CdpFrame.click (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Frame.js:752:17)\n    at async open (/home/fpizzi/Documents/ChatGPT/swarm/tests/dialogue_recovery_ui.cjs:92:288)\n    at async /home/fpizzi/Documents/ChatGPT/swarm/tests/dialogue_recovery_ui.cjs:94:4",
+  "errors": [],
+  "failures": [
+    {
+      "url": "http://127.0.0.1:44031/api/v1/assist/turns?work=w-0f4adb15e013436341880a04",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:44031/api/v1/activity?work=w-0f4adb15e013436341880a04&limit=50",
+      "error": "net::ERR_ABORTED"
+    }
+  ],
+  "focus": {
+    "active": {
+      "id": ""
+    },
+    "returnTarget": {}
+  }
+}

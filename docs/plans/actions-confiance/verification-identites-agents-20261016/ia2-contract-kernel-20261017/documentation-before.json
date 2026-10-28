@@ -1,0 +1,12 @@
+[
+  {
+    "path": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "sha256": "5a4eeb867b511a0438194c16cf9c22981a6d25b7bbe545d2a4e375e827570334",
+    "preimage": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/preimages/docs/plans/actions-confiance/identites-agents-replan.md"
+  },
+  {
+    "path": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+    "sha256": "4cb8c0b4b5aee9b96099ce43702ae0e70fc28f0c74ad7fb5e7e85c4ee626861b",
+    "preimage": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/preimages/docs/plans/actions-confiance/identites-agents-contrat-IA2.md"
+  }
+]

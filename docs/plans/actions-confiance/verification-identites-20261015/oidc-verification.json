@@ -1,0 +1,95 @@
+{
+  "verified_at_utc": "2026-10-15T17:07:52.333415+00:00",
+  "scope": "R13 human OIDC sign-in with isolated issuer; enterprise services/delegation/global acceptance remain open",
+  "go_race": {
+    "oidc_named": 37,
+    "main": 8,
+    "sub": 29,
+    "original": "oidc-race-verified.out",
+    "pilot_reused_named": 139,
+    "pilot_original": "oidc-race-first.out",
+    "reuse_reason": "Final changes affect strict OIDC enabled decoding and CSS/localized errors; historical pilot identities omit OIDC. Final targeted OIDC and browser checks cover changed inputs."
+  },
+  "public_recipe": {
+    "cases": 7,
+    "original": "oidc-public-delivery-final.out",
+    "status": "pass"
+  },
+  "browser": {
+    "checks": 14,
+    "unexpected_diagnostics": [],
+    "expected_rejected_mapping_responses": [
+      "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    ],
+    "exchanges": 2,
+    "languages": [
+      "fr",
+      "en"
+    ],
+    "themes": [
+      "etat",
+      "sombre"
+    ],
+    "widths": [
+      390,
+      320
+    ],
+    "original": "oidc-browser-public-result/oidc-ui.json",
+    "visual_inspection": "OIDC FR/EN mobile surfaces and English Admin inspected; previous captures retained"
+  },
+  "i18n": "pass",
+  "vet": "pass",
+  "build": "pass",
+  "workflow_contexts": 12,
+  "source_sha256": {
+    "go.mod": "cfe933eb08fd50f5fcadc26ad849594b0bfa9de4cdb1879c28142a0e65ff8eb2",
+    "go.sum": "7fb5a679d594c0cbc5f93dff2253bfb5e55a63e8759c15624e804f3817ab3f5f",
+    "internal/engine/trust_oidc.go": "1905714f4386e2081d1ba76bfd3638e4c3176f3b872516e9b081d7959f640a79",
+    "internal/engine/trust_oidc_test.go": "a61f3f7c99d11bc128ccca21347eae56c67fa225ffb446ac4a30887404c6ae44",
+    "internal/engine/trust_actions.go": "51d0c96f1cf38af3ecfdcc6a4c0366a85a8f77a311a747340f162f40fdb70d56",
+    "internal/engine/trust_actions_http.go": "05af91784f32667d57ce8905b6d9d26bc1a23f9f6be8f937ff50aa5fb606c91b",
+    "internal/engine/trust_actions_cli.go": "b3469ad1a8b1c1dd109b3caefb72d37af6ba88dfd8df5460f161f0fce83f5169",
+    "internal/engine/main.go": "3298422e3f1a38b074a1467a8d8d9f1c979c6c0729389c2d42c4cf48ad90e7b6",
+    "internal/engine/web_server.go": "e1687a1870c4af8996e88819db5797cf3faf0757bc5c870b652b093994385671",
+    "web/trust-actions.html": "4b502eb86cf3008b662032b815d8bb1dae3fee79d6440c327756798f193271b7",
+    "web/trust-actions.js": "f1bb8777c6835e016fe2d01a0a206a8a5c85cb108122be571f12367035a86caa",
+    "web/trust-actions.css": "1098d3791da648690d98040fbddf9141ee3a3e9c31a03124e1f4fc715bcb128c",
+    "web/trust-actions-en.js": "c1ae0bd5990e4ba73e813d0783a4fb391f5d7ff424fced9c41d59b644b29582c",
+    "web/trust-oidc-callback.html": "5100eaf4951d02f6b97f4dc8a3f7bd479a505020947799c4ff126bc5c770921c",
+    "web/trust-oidc-callback.js": "e06812a409b04c8853339221ab959c06facd086ad0eb39f2208fd65bf0ce18c8",
+    "locales/trust-actions-en.json": "360c9d709395924aa1e2d7c6c1e36f00025634ad12aaad4683099a1ebbe8e450",
+    "tests/actions_confiance_oidc_ui.cjs": "7f4b3c6adda689d1835994f1fea28c4e6f39f4c09cdd5e8548e14c824eddd548",
+    "tests/actions_confiance_t2_ui.cjs": "adb38ef648422ff9fa7c0bfe2b3e646f544ef5c2bfab5abbbeae96cc454c8c7c"
+  },
+  "binary_sha256": "4e1888d24220777fcae11bd98df224f15bfcea5368cd29514fcfea1b9f206050",
+  "limits": [
+    "isolated local issuer only",
+    "operator cockpit authorization remains required",
+    "no enterprise account activation",
+    "no service private_key_jwt, delegation or step-up yet",
+    "no provider-initiated logout integration",
+    "not independent review or global acceptance"
+  ],
+  "original_failures": [
+    "oidc-before.out",
+    "oidc-public-delivery.out",
+    "oidc-browser-final.out",
+    "oidc-enabled-before.out",
+    "oidc-build-final.out",
+    "oidc-race-final.out",
+    "oidc-browser-verified.out"
+  ],
+  "preview_receipt": "oidc-preview-process.json",
+  "qualification_manifest": {
+    "status": "pass",
+    "named_checks": 1,
+    "original": "oidc-manifest-test.out"
+  },
+  "diff_check": "pass",
+  "supervision": {
+    "automation_id": "superviser-swarm-actions-de-confiance",
+    "updated": "ACTIVE",
+    "next": "service identities private_key_jwt, delegation and step-up"
+  }
+}

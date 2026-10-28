@@ -1,0 +1,1 @@
+{"stage":"first public recipe","operation":"show","expected_exit":0,"observed_exit":2,"result":"failed; stderr was not retained by recipe; no passing result claimed"}

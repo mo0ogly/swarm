@@ -1,0 +1,11 @@
+{
+  "M26-I02": {
+    "cause": "The before-start checker formerly mutated the caller receipt before failed persistence; finishAgent retried that stamped body and the injected trigger failed again. The new caller-preserving behavior lets the supervisor persist a failed status, so nil from supervise no longer means provider success.",
+    "action": "Assert failed status, original cause, absent check stamp and no provider input; keep the trigger until those assertions pass."
+  },
+  "M26-I03": {
+    "cause": "Existing invalid-UTF8 source fixture cannot write malformed Work because the identity plan projection trigger rejects it before the source CLI runs.",
+    "producer": "internal/engine/agent_identity_plan_schema_linux.go",
+    "action": "Assert rejection without mutation at the actual storage boundary; separately exercise the original source reader UTF8 guard on a minimal isolated SQL read fixture, without deleting/disabling any production trigger."
+  }
+}

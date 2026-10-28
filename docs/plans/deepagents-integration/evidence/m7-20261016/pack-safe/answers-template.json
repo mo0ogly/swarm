@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "source": {
+    "kind": "supplied_outputs",
+    "provider": "TO_CHOOSE",
+    "model": "TO_CHOOSE"
+  },
+  "answers": [
+    {
+      "case_id": "contract-current-without",
+      "prompt_sha256": "34993bb6123e4fd3577669a16b59a9f444d9b15ff5e0e4f6c75da82732873877",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "contract-current-with",
+      "prompt_sha256": "89b0049fc015056d9224adacaf552a56216d3b546ce3fee5e19530a1aaf81caa",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "contract-changed-without",
+      "prompt_sha256": "82ec910152f0fe6dbdeba17d7458373fdf997974fcf6b53ede27ffbbd24a9abc",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "contract-changed-with",
+      "prompt_sha256": "0177b4e4869643bc94912479f233cfef4a7b9a325014863af26bb8f4f5319ced",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-10-15T21:20:58.238819+00:00",
+  "scope": "authenticated loopback CLI to existing trust API; no local fallback",
+  "binary": "bin/swarm-actions-confiance-remote",
+  "binary_sha256": "8aa54660104bf3eeee22157262c9a3b57e0668db98f46ee7806de488e645674d",
+  "go_race": {
+    "receipt": "trust-remote-final3-race.json",
+    "principal_cases": 8,
+    "subcases": 24,
+    "total": 32
+  },
+  "public_recipe": {
+    "receipt": "trust-remote-public-final/remote.json",
+    "controls": 7
+  },
+  "preview_read": {
+    "at": "2026-10-15T21:19:31.259337+00:00",
+    "server_pid": 1587745,
+    "server_identity_verified": true,
+    "server_binary_sha256": "77e92112aca0dec7e031388ad804d21bdfdaeb5ae5a5c9b323f507c609e403c8",
+    "client_binary_sha256": "8aa54660104bf3eeee22157262c9a3b57e0668db98f46ee7806de488e645674d",
+    "client_exit": 0,
+    "actions": 2,
+    "ledger_entries": 1,
+    "state_sha256_unchanged": "d3b01d34c5c750ca91cbe1591ccd1c978ecb3a52a6416ffbbb0d610cfddd48c1",
+    "server_restarted": false,
+    "browser_reloaded": false
+  },
+  "static_checks": {
+    "build": {
+      "receipt": "trust-remote-final3-build.json",
+      "exit_code": 0
+    },
+    "vet": {
+      "receipt": "trust-remote-final3-vet.json",
+      "exit_code": 0
+    },
+    "i18n": {
+      "receipt": "trust-remote-final3-i18n.json",
+      "exit_code": 0
+    },
+    "contexts": {
+      "receipt": "trust-remote-final3-contexts.json",
+      "exit_code": 0
+    },
+    "diff": {
+      "receipt": "trust-remote-final3-diff.json",
+      "exit_code": 0
+    }
+  },
+  "manifest": {
+    "paths": 1398,
+    "named_test_passed": true
+  },
+  "input_sha256": {
+    "internal/engine/main.go": "79ed18b6555f5e23438a921e369f13e98ccbaf21804d0935ab3afcf9d7b2f4a9",
+    "internal/engine/trust_remote.go": "b6790be9b3793a66854c2d76e5a60c71d31fd59505cdd57372adb886f501982a",
+    "internal/engine/trust_remote_test.go": "31bb4d15b1ee7047f98bd0c4da1e9b0a2e1082650ec376da85bc5edb6a99c7fb",
+    "tests/actions_confiance_remote.py": "c63b2ee1c460dff25d96fb35684ad57b861af25e03008227eeab0866c640222a",
+    "docs/actions-confiance-T2.md": "231ae7dd3ea0d8590ab446b5f7e9102f866436e3c3c22cc0353260c1c253333c",
+    "docs/en/actions-confiance-T2.md": "e34403d6429822184be1963a834ddb47e1290551bb328dab3ad6fb22ea3cc027",
+    "docs/actions-confiance-T4.md": "949b32852220c2b021ee6fb4a16359097e04125f20f0eab50df319d7349043fa",
+    "docs/en/actions-confiance-T4.md": "b3a824c190b8f8beccc2737328ea47bffd7144d2d6bf01a3cd8ca92b601a08e9",
+    "tools/verification/refresh_engine_source_manifest.py": "0c2a572e6173e6cd3087b359a3abe7c75adc315a95f3b78ff20616930e037ca3",
+    "go.mod": "cfe933eb08fd50f5fcadc26ad849594b0bfa9de4cdb1879c28142a0e65ff8eb2",
+    "go.sum": "7fb5a679d594c0cbc5f93dff2253bfb5e55a63e8759c15624e804f3817ab3f5f"
+  },
+  "evidence_sha256": {
+    "trust-remote-before-race.json": "b66c8098f16d18d32d554bba60efa34d02b4a0a88cb19351a6be2e7464b0e7c4",
+    "trust-remote-before-race.out": "0be008be1e28db220ab504d39509455d40f77bf00952c6aa9a1d82475f8ef749",
+    "trust-remote-before-runner.json": "e0d27e7891d1007a066af20470c64ddc1968c4f2ad8ec5852fada9f687e2588c",
+    "trust-remote-before-runner.out": "10d5666f28d5f09a164524513b5e37a9d66f49bd677951dd8883b48f9d51f91d",
+    "trust-remote-before.json": "a163d2042ab9f5aa9ce68aac929efa117d6acd8fe9ee3f79c2c195ebc4dfd879",
+    "trust-remote-cancellation-first-stop.json": "19cf091404434d5477cb6547e663e9008cdb543ef7e58884f2e0bdeb50f69314",
+    "trust-remote-destination-before-race.json": "76535423483158ac76ecaeb2bd55e2bb0eab458a0760c3de9d02534513547e66",
+    "trust-remote-destination-before-race.out": "eeb7f0e35d92a9143263d64096f22808bd1f3166737abeabcc17f0339ac37554",
+    "trust-remote-destination-before-runner.json": "8dfd957af16cb291c9db6cd1f5a4b00e788c7d4f5ff80b064a8749548f79a1b2",
+    "trust-remote-destination-before-runner.out": "4e697aef416029585c42edfc016e785bf9737c5eb67599625e945581a0f1605e",
+    "trust-remote-final-build-runner.out": "4fb74988ba5fa265c30e4a19528c03ab01ed667dd8935668db41eb7bcf7551db",
+    "trust-remote-final-build.json": "4e8f121ac99aa6cdc4f73715eaa59fce28f6a398bfed2806b1cfed29b5741a60",
+    "trust-remote-final-build.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "trust-remote-final-contexts.json": "1d21b290d593e6ae8e51b659205c2a4c745fc92423ee2931a0a5826c24ab8503",
+    "trust-remote-final-contexts.out": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+    "trust-remote-final-diff.json": "ee882968253feaa10648db7b10c168048798ecffa7580a71a7f73affc43c7901",
+    "trust-remote-final-diff.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "trust-remote-final-i18n.json": "91bd8988b10458331f92062cb2cea841817a3e9081a32512d73d89302155a2e0",
+    "trust-remote-final-i18n.out": "23d0852b273fc311a94c30acddc4f7e897ac4e8f2782cabdb417754737419987",
+    "trust-remote-final-race.out": "24ed7e04e3d3d8d9c1b6f98ecc0a2d6d431ebe9e72fff8f4fd909ec661cb1a25",
+    "trust-remote-final-runner.json": "c2f20335c10459f91c0ef468918799f331ffb47a087229bc947c649e22b31390",
+    "trust-remote-final-runner.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "trust-remote-final-vet.json": "0e066abf4bbe700f9ffc46842be948622f7a52bedab5e6d1a2bf403f7ef93d7d",
+    "trust-remote-final-vet.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "trust-remote-final2-race.json": "e29ff13c92cf564270ff1f081c5665a943a4f26c09a13b2f05041683cd43f762",
+    "trust-remote-final2-race.out": "e2c9f04895b39efee3aa6466b4840394b935634dd56a67460af4b4f37d0b85a2",
+    "trust-remote-final2-runner.json": "f3e7ea07f01eb8ff21750ad677df3cb715afd63c1bdae62e4d3ac03e21db4a23",
+    "trust-remote-final2-runner.out": "091dfb1f122052c9201d47bc485b982dcc2c3083726055c8268261216be7a353",
+    "trust-remote-final3-build-runner.out": "4fb74988ba5fa265c30e4a19528c03ab01ed667dd8935668db41eb7bcf7551db",
+    "trust-remote-final3-build.json": "6802db6a6720652463d3e78f756495c903d8af38dae6db7a9a2340574d77c89e",
+    "trust-remote-final3-build.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "trust-remote-final3-contexts.json": "336c1d15b1bff76e2336cde130ad406356d446d7cf1c2d3c10a7c30ac779aa2f",
+    "trust-remote-final3-contexts.out": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+    "trust-remote-final3-diff.json": "1ba548a72c43f80ee2e36aad1185d5d437a4b4b966abbff7068cf60356a61253",
+    "trust-remote-final3-diff.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "trust-remote-final3-i18n.json": "71899c7a0359e731b53ef46540a172b984bae1490bfd3061507f961e7934cbf2",
+    "trust-remote-final3-i18n.out": "23d0852b273fc311a94c30acddc4f7e897ac4e8f2782cabdb417754737419987",
+    "trust-remote-final3-race.json": "efa1682851a8228aca72abd43841749bb6ca70c17e07be89a0d30d6135225b1a",
+    "trust-remote-final3-race.out": "529f340c82ac372b76c76be534d500e63fc6a36eac730509230df4d3222f399b",
+    "trust-remote-final3-runner.json": "37741b06f273f10f1489eb0397d2b752485464920ba6f682488ac85166644802",
+    "trust-remote-final3-runner.out": "c22a39b75c1951bc71bab649f641154c3b4b123c5ba9b3e0d0bbd2a62501bbfa",
+    "trust-remote-final3-vet.json": "50a85237ea0ce2c44fb212f277521237b34c6fa3c86556703ba5844be9de8afa",
+    "trust-remote-final3-vet.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "trust-remote-manifest-final-race.json": "bb6e40cb6738a4b08cc8a8fc32d0b3c7e64ce5db06730f0d674871ba31437089",
+    "trust-remote-manifest-final-race.out": "68c95e228cc4cff2f8a924cabc6866f81c7f5cfaed32dcfe62c2ebe65173628f",
+    "trust-remote-manifest-final-runner.json": "a5970bb97aa539b05f8444ec01ee39ec4d665ea04bc7c4482701ce2a349b1f6e",
+    "trust-remote-manifest-final-runner.out": "911adea18aed4c24879be0d13f062979f2b4e2d2c7d20c16da368f52df95ae2e",
+    "trust-remote-preview-read.json": "94c47e7358d08485dfee42e844d79ef29f8e516b09f853d4d387aeb09f865496",
+    "trust-remote-public-first.json": "32506bfaf339fab4b3b84616e327c939576fdacd28030f4974dc6747616f052e",
+    "trust-remote-public-final/remote.json": "68d43256f91dd6fcbea92a01b384ee7b7cd8f718eb8488c55d80781c26ae6c79"
+  },
+  "limits": [
+    "no broker or secret grant implemented",
+    "same-session self-review, no independent acceptance",
+    "existing preview server retained; browser not reloaded",
+    "no new client deadline or automatic replay; cancellation does not undo an effect",
+    "historical browser evidence retained at its original inputs, not rerun or relabelled"
+  ]
+}

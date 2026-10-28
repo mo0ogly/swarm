@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "binary_sha256": "8aa54660104bf3eeee22157262c9a3b57e0668db98f46ee7806de488e645674d",
+  "checks": [
+    "server view without local root",
+    "authenticated identity context",
+    "real sealed helper through remote API: 14 assertions",
+    "request exact approval effect and reconciliation: one effect",
+    "wrong operator session refused without mutation",
+    "client root never created",
+    "stopped server refused without local fallback"
+  ],
+  "server_stopped": true,
+  "provider_account_used": false,
+  "real_payment": false
+}

@@ -1,0 +1,84 @@
+{
+  "result": "PASS_LOCAL_KERNEL_NOT_LAUNCHER_INTEGRATION",
+  "at": "2026-10-17T05:59:59.715860+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "tests": {
+    "top_level": 21,
+    "named_runs": 114,
+    "named_pass": 114,
+    "new_kernel_top_level": 16,
+    "new_kernel_named_pass": 100,
+    "existing_named_pass": 14
+  },
+  "inputs": {
+    "files": 1042,
+    "changed_since_tests": [],
+    "manifest": "inputs-final.json"
+  },
+  "gofmt": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "git_diff_check": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "links_missing": [],
+  "whitespace_findings": [],
+  "diagrams": {
+    "rendered": 2,
+    "visually_inspected": 2
+  },
+  "source_reconstruction": "Exact matches against both recorded before-fix source hashes; derived source archives, not new executions",
+  "self_review": "Two introduced defects reproduced and corrected; local reinspection, not independent approval",
+  "model_calls": 0,
+  "deployed": false,
+  "runtime_identity_guarantees": false,
+  "still_open": [
+    "F01-F07",
+    "Protected authority/bootstrap and runtime channel",
+    "Trust JSON/SQLite commitment and actual launch/revocation",
+    "Human approval and all consumer integration",
+    "Memory rights, global qualification and RETEX"
+  ],
+  "files": [
+    {
+      "path": "internal/engine/agent_identity_authority.go",
+      "sha256": "cd335869ae1b6a80959e64432f0759fde44d94bc5846c48417d1ce8dcc32a150"
+    },
+    {
+      "path": "internal/engine/agent_identity_authority_test.go",
+      "sha256": "cddd3ac48c73a36c70f2b82fffaed7a293c6438356e2957e3b89ccb8edc30808"
+    },
+    {
+      "path": "internal/engine/agent_identity_contract.go",
+      "sha256": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55"
+    },
+    {
+      "path": "internal/engine/agent_identity_contract_test.go",
+      "sha256": "942cb255b11065db4b47b5cd1a50820d663566256cf68baff9d292a1b1c2e4e9"
+    },
+    {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "sha256": "d55ccd3e4f249f2fbf60dad3ab022d898722de8f58019b6f274ad0f7f93244de"
+    },
+    {
+      "path": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "sha256": "5cc4572de9ab14f5732d8a69af946609cf44c1814e4a4cbd0e5ea768e93dd8ce"
+    },
+    {
+      "path": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "sha256": "643bda38329ba957f4bd35d7061976a432afb857b13fdeb71f3524fc128eeac6"
+    },
+    {
+      "path": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "sha256": "46becbe0b3790bbd641e38da2d028e233b0d6618809f47c3a55e8b5b528a8690"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md",
+      "sha256": "ba8a59982c72e1ff752c5a0f9b45348521b71601e03c5c0b1b94fde89238fe72"
+    }
+  ]
+}

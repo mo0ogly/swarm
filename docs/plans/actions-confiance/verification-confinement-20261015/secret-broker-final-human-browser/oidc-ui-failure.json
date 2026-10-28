@@ -1,0 +1,7 @@
+{
+  "name": "AssertionError",
+  "message": "'mandate_ttl_seconds' == 'oidc_issuer'",
+  "stack": "AssertionError [ERR_ASSERTION]: 'mandate_ttl_seconds' == 'oidc_issuer'\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_oidc_ui.cjs:26:243",
+  "checks": [],
+  "errors": []
+}

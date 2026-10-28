@@ -1,0 +1,21 @@
+{
+  "usable_response": false,
+  "requested_model": "glm-5.2",
+  "started_at_unix": 1792840332.7564356,
+  "automatic_retries": 0,
+  "reported_model": "glm-5.2",
+  "usage": {
+    "completion_tokens": 2000,
+    "prompt_tokens": 8457,
+    "total_tokens": 10457,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1404,
+      "text_tokens": 596
+    }
+  },
+  "finish_reason": "length",
+  "error_type": "ValueError",
+  "error": "no complete tool-free final text; inspect response and usage before retry",
+  "outcome_note": "No complete answer established; do not assume zero consumption",
+  "elapsed_seconds": 13.401
+}

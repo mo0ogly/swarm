@@ -1,0 +1,869 @@
+{
+  "binary": "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+  "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+  "packet_sha256": "ba442a030208b5b69ed2329339493d60c2a22d6d31f2dd2631d68cd9bbfed3d1",
+  "source_hashes": {
+    "internal/engine/trust_actions.go": "5e8f2e99cb7d2d0dedea7696ce287b5901ba199a09cb68a63edd43f8d9feb9f4",
+    "internal/engine/trust_actions_originals.go": "dd207a2582467e2b3b83a5fe189e7ed594be2421bf91379066eead8d838cbf1f",
+    "internal/engine/trust_connector.go": "61ad5f667968cbada2a924614eb9cbd417a8a4754cbe4931c0723ede6b9d2751",
+    "internal/engine/trust_evidence_service.go": "9c701743a050897a7f0f3f5554fefbf000b187b1f9fabf5be6aed753dc76e57c",
+    "internal/engine/trust_evidence_validation.go": "9f011cbba602a317edd2b23f0cd88a46a3df179928333fa0b1ce62ef8d108a1f"
+  },
+  "export_case": {
+    "verify": {
+      "sequence": 4,
+      "simulation": true,
+      "verified": true
+    },
+    "export_fields": [
+      "originals",
+      "schema_version",
+      "simulation",
+      "evidence"
+    ],
+    "event_kinds": [
+      "mandate-create",
+      "request",
+      "approve",
+      "commit"
+    ],
+    "commit_evidence": [
+      {
+        "identity_context": {
+          "schema_version": 1,
+          "configuration_revision": 1,
+          "principal_id": "effect",
+          "principal_kind": "local",
+          "issuer": "urn:swarm:local",
+          "subject": "effect",
+          "assurance": {
+            "method": "local_bearer",
+            "provider_authenticated_at": null
+          },
+          "attributes": {
+            "roles": [
+              "effect"
+            ],
+            "integrity": 2
+          },
+          "delegation_id": null,
+          "authenticated_at": "2026-10-16T06:30:26.860267002Z",
+          "expires_at": null,
+          "token_digest": "4cd6b7a4e7d13856ae787b4e4cada66fcd874752a979cf3c009773b5b420a63e"
+        },
+        "sequence": 4,
+        "previous_hash": "6414b12cd43cb26a9ea622dae6b3efbbf1868eb089fe662693b0461035eb272a",
+        "hash": "e691460690b0dcae03677b180d873bf19066ab9a9b46d8daf645356f04e48d97",
+        "kind": "commit",
+        "actor": "effect",
+        "integrity": 2,
+        "object_id": "act-5e234313e317c41d3575",
+        "content_digest": "5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3",
+        "original_digest": "0acdcb2704d3b4c5deb7a5aee69c0608c8376fe0894d85801c9254809fe12856",
+        "result": "committed",
+        "at": "2026-10-16T06:30:26.860267002Z"
+      }
+    ],
+    "effect_result_digest": "dece4a78c61dd9251869182b46edf07fd77d201496ab8c7527535dcbb451623c",
+    "result_digest_in_export": false,
+    "result_digest_in_originals": false,
+    "intent_in_export": false,
+    "policy_in_export": false
+  },
+  "corrupt_chain_case": {
+    "fixture_only_tamper": "evidence[0].reason changed; ev.hash and originals unchanged",
+    "state_before_sha256": "6e0d5767b22c6cdb1f93541629a24323ccfaca0212d2d22ca506391965384380",
+    "verification_before_commit": {
+      "exit_code": 2,
+      "stderr": "{\n  \"error\": \"altération détectée à la séquence 1\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"altération détectée à la séquence 1\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n"
+    },
+    "commit_result_state": "committed",
+    "ledger_before": 0,
+    "ledger_after": 1,
+    "effect_digest": "8b691fc8731a4a169921fcd1a2d0fa9e5393dff90baac0d27521fcfac770fefe"
+  },
+  "runs": [
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/export-fixture-db33cf23",
+        "--json",
+        "trust",
+        "config-apply",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "9a1f7e377ba046f5a591a6725aa6fd56",
+        "expected_revision": 0,
+        "reason": "independent proof content check",
+        "identities": [
+          {
+            "subject": "admin",
+            "token": "admin-independent-fixture-token",
+            "integrity": 3,
+            "roles": [
+              "admin"
+            ]
+          },
+          {
+            "subject": "requester",
+            "token": "requester-independent-fixture-token",
+            "integrity": 1,
+            "roles": [
+              "requester"
+            ]
+          },
+          {
+            "subject": "approver",
+            "token": "approver-independent-fixture-token",
+            "integrity": 2,
+            "roles": [
+              "approver"
+            ]
+          },
+          {
+            "subject": "effect",
+            "token": "effect-independent-fixture-token",
+            "integrity": 2,
+            "roles": [
+              "effect"
+            ]
+          }
+        ],
+        "policy": {
+          "mandate_ttl_seconds": 3600,
+          "unknown_reconcile_seconds": 0,
+          "evidence_retention_days": 365,
+          "require_separation": true
+        }
+      },
+      "actor": null,
+      "started_unix": 1792132226.480366,
+      "ended_unix": 1792132226.5823946,
+      "exit_code": 0,
+      "stdout": "{\n  \"access_ledger\": [],\n  \"actions\": {},\n  \"amount_minor_text\": {},\n  \"connector_catalog\": {\n    \"arbitrary_plugins\": false,\n    \"connectors\": [\n      {\n        \"external_effects\": false,\n        \"id\": \"local-ledger-simulation\",\n        \"idempotency\": true,\n        \"provider_containment\": false,\n        \"readback\": true,\n        \"secret_grants\": false,\n        \"simulation\": true,\n        \"version\": 1\n      },\n      {\n        \"external_effects\": false,\n        \"id\": \"local-access-simulation\",\n        \"idempotency\": true,\n        \"provider_containment\": false,\n        \"readback\": true,\n        \"secret_grants\": false,\n        \"simulation\": true,\n        \"version\": 1\n      }\n    ],\n    \"schema_version\": 1\n  },\n  \"data_capabilities\": {\n    \"classifications\": [\n      \"public\",\n      \"internal\"\n    ],\n    \"destination\": \"local-ledger\",\n    \"external_containment_verified\": false,\n    \"local_paths\": [\n      {\n        \"destination\": \"local-access-state\",\n        \"provider\": \"swarm\",\n        \"tool\": \"simulated-access-grant\"\n      },\n      {\n        \"destination\": \"local-ledger\",\n        \"provider\": \"swarm\",\n        \"tool\": \"simulated-settlement\"\n      },\n      {\n        \"destination\": \"local-process-state\",\n        \"provider\": \"swarm\",\n        \"tool\": \"process-workflow\"\n      }\n    ],\n    \"provider\": \"swarm\",\n    \"secret_delivery\": {\n      \"classification\": \"restricted\",\n      \"destination\": \"local-attestation\",\n      \"provider\": \"swarm\",\n      \"scope\": \"fixed_helper_only\",\n      \"tool\": \"sealed-attestation\"\n    },\n    \"secret_grants_supported\": false,\n    \"tool\": \"simulated-settlement\"\n  },\n  \"data_policy\": {\n    \"resources\": [],\n    \"enabled\": false,\n    \"classifications\": [],\n    \"destinations\": [],\n    \"providers\": [],\n    \"tools\": []\n  },\n  \"delegation\": {\n    \"max_depth\": 0\n  },\n  \"effect_receipts\": {},\n  \"evidence_count\": 0,\n  \"evidence_signing\": {\n    \"enabled\": false,\n    \"key_ttl_seconds\": 86400\n  },\n  \"group_mapping\": {\n    \"enabled\": false,\n    \"claim\": \"groups\",\n    \"rules\": []\n  },\n  \"identities\": [\n    {\n      \"disabled\": false,\n      \"integrity\": 3,\n      \"roles\": [\n        \"admin\"\n      ],\n      \"subject\": \"admin\"\n    },\n    {\n      \"disabled\": false,\n      \"integrity\": 2,\n      \"roles\": [\n        \"approver\"\n      ],\n      \"subject\": \"approver\"\n    },\n    {\n      \"disabled\": false,\n      \"integrity\": 2,\n      \"roles\": [\n        \"effect\"\n      ],\n      \"subject\": \"effect\"\n    },\n    {\n      \"disabled\": false,\n      \"integrity\": 1,\n      \"roles\": [\n        \"requester\"\n      ],\n      \"subject\": \"requester\"\n    }\n  ],\n  \"kernel_check\": {\n    \"enabled\": false,\n    \"timeout_seconds\": 15,\n    \"ring_bytes\": 65536\n  },\n  \"kernel_observation\": {\n    \"enabled\": false,\n    \"window_seconds\": 5,\n    \"timeout_seconds\": 15,\n    \"ring_bytes\": 65536,\n    \"max_events\": 128\n  },\n  \"laboratory\": {\n    \"enabled\": false,\n    \"timeout_seconds\": 30,\n    \"max_concurrent_runs\": 1\n  },\n  \"ledger\": [],\n  \"limits\": [\n    \"aucun paiement réel\",\n    \"jetons du pilote local\",\n    \"preuve locale non ancrée par un tiers\"\n  ],\n  \"mandate_amount_minor_text\": {},\n  \"mandate_status\": {},\n  \"mandates\": {},\n  \"oidc\": null,\n  \"oidc_defaults\": {\n    \"enabled\": false,\n    \"issuer\": \"\",\n    \"client_id\": \"\",\n    \"redirect_uri\": \"\",\n    \"request_timeout_seconds\": 15,\n    \"login_ttl_seconds\": 300,\n    \"session_ttl_seconds\": 900,\n    \"mappings\": []\n  },\n  \"oidc_logout\": {\n    \"enabled\": false,\n    \"max_age_seconds\": 300,\n    \"replay_retention_seconds\": 600\n  },\n  \"oidc_logout_replay_records\": 0,\n  \"originals_missing\": 0,\n  \"policy\": {\n    \"mandate_ttl_seconds\": 3600,\n    \"unknown_reconcile_seconds\": 0,\n    \"evidence_retention_days\": 365,\n    \"require_separation\": true\n  },\n  \"policy_bounds\": {\n    \"evidence_key_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"evidence_registry_revision\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"evidence_retention_days\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"evidence_verify_bytes\": {\n      \"max\": 16777216,\n      \"min\": 1\n    },\n    \"introspection_max_sessions\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"introspection_max_token_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"introspection_response_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"introspection_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"introspection_validation_window_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"kernel_check_ring_bytes\": {\n      \"max\": 2147483648,\n      \"min\": 4096\n    },\n    \"kernel_check_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"kernel_observation_max_events\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"kernel_observation_ring_bytes\": {\n      \"max\": 2147483648,\n      \"min\": 4096\n    },\n    \"kernel_observation_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"kernel_observation_window_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"laboratory_max_concurrent_runs\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"laboratory_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"mandate_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"max_delegation_depth\": {\n      \"max\": 9007199254740991,\n      \"min\": 0\n    },\n    \"oidc_logout_max_age_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"oidc_logout_replay_retention_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"process_command_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"process_state_bytes\": {\n      \"max\": 8388608,\n      \"min\": 1\n    },\n    \"process_version\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"sealed_execution_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"secret_broker_grant_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"secret_broker_material_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"secret_broker_max_entries\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"secret_broker_max_material_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"step_up_max_age_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"step_up_proof_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"unknown_reconcile_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    }\n  },\n  \"process_policy\": {\n    \"enabled\": false\n  },\n  \"revision\": 1,\n  \"schema_version\": 1,\n  \"sealed_execution\": {\n    \"enabled\": false,\n    \"timeout_seconds\": 15\n  },\n  \"secret_broker\": {\n    \"enabled\": false,\n    \"material_ttl_seconds\": 300,\n    \"grant_ttl_seconds\": 60,\n    \"max_material_bytes\": 4096,\n    \"max_entries\": 16\n  },\n  \"secret_grants\": null,\n  \"simulation\": true,\n  \"step_up\": {\n    \"enabled\": false,\n    \"operations\": [\n      \"approve\"\n    ],\n    \"acr_values\": [],\n    \"max_age_seconds\": 0,\n    \"proof_ttl_seconds\": 300\n  },\n  \"workload_defaults\": {\n    \"enabled\": false,\n    \"issuer\": \"\",\n    \"audience\": \"\",\n    \"request_timeout_seconds\": 15,\n    \"assertion_ttl_seconds\": 300,\n    \"session_ttl_seconds\": 900,\n    \"clients\": []\n  },\n  \"workload_introspection\": {\n    \"enabled\": false,\n    \"endpoint\": \"\",\n    \"client_id\": \"\",\n    \"timeout_seconds\": 15,\n    \"validation_window_seconds\": 5,\n    \"max_sessions\": 64,\n    \"max_token_bytes\": 16384\n  },\n  \"workloads\": null\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/export-fixture-db33cf23",
+        "--json",
+        "trust",
+        "mandate-create",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "3acc03fb6d43479baf5dbcf512f59cc9",
+        "mandate_id": "review-mandate",
+        "subject": "requester",
+        "actions": [
+          "settle"
+        ],
+        "resource": "invoice/review",
+        "max_amount_minor": 1000,
+        "currency": "EUR",
+        "beneficiary": "ACME"
+      },
+      "actor": "admin",
+      "started_unix": 1792132226.5828493,
+      "ended_unix": 1792132226.6581194,
+      "exit_code": 0,
+      "stdout": "{\n  \"id\": \"review-mandate\",\n  \"subject\": \"requester\",\n  \"delegator\": \"admin\",\n  \"actions\": [\n    \"settle\"\n  ],\n  \"resource\": \"invoice/review\",\n  \"max_amount_minor\": 1000,\n  \"currency\": \"EUR\",\n  \"beneficiary\": \"ACME\",\n  \"version\": 1,\n  \"policy_revision\": 1,\n  \"integrity\": 2,\n  \"starts_at\": \"2026-10-16T06:30:26Z\",\n  \"expires_at\": \"2026-10-16T07:30:26Z\",\n  \"content_digest\": \"4e5b69b3d57f9c33766576b032a90c32c9f2d87ce25a24b554a64667de416501\",\n  \"original_digest\": \"22734541239eebf13ed52be7b93b7d49cb797a9fae15fc8767aa201c37966a35\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/export-fixture-db33cf23",
+        "--json",
+        "trust",
+        "request",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "0b3fcb7b7fbd4d359c93330cb9a73fe4",
+        "mandate_id": "review-mandate",
+        "resource": "invoice/review",
+        "amount_minor": 100,
+        "currency": "EUR",
+        "beneficiary": "ACME",
+        "idempotency_key": "review-effect"
+      },
+      "actor": "requester",
+      "started_unix": 1792132226.658244,
+      "ended_unix": 1792132226.7347944,
+      "exit_code": 0,
+      "stdout": "{\n  \"id\": \"act-5e234313e317c41d3575\",\n  \"mandate_id\": \"review-mandate\",\n  \"requester\": \"requester\",\n  \"resource\": \"invoice/review\",\n  \"amount_minor\": 100,\n  \"currency\": \"EUR\",\n  \"beneficiary\": \"ACME\",\n  \"idempotency_key\": \"review-effect\",\n  \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n  \"original_digest\": \"5caf96281bd56d9be94425f8521170123f17e42e498e9ee99efbc578f0052357\",\n  \"state\": \"pending_approval\",\n  \"next_action\": \"approbation séparée requise\",\n  \"created_at\": \"2026-10-16T06:30:26.727109297Z\",\n  \"updated_at\": \"2026-10-16T06:30:26.727109297Z\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/export-fixture-db33cf23",
+        "--json",
+        "trust",
+        "approve",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "50801f7c24c849b189a5f0efd9377af5",
+        "action_id": "act-5e234313e317c41d3575",
+        "mandate_id": "review-mandate",
+        "amount_minor": 100,
+        "currency": "EUR",
+        "beneficiary": "ACME",
+        "content_digest": "5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3"
+      },
+      "actor": "approver",
+      "started_unix": 1792132226.7349539,
+      "ended_unix": 1792132226.8003893,
+      "exit_code": 0,
+      "stdout": "{\n  \"id\": \"act-5e234313e317c41d3575\",\n  \"mandate_id\": \"review-mandate\",\n  \"requester\": \"requester\",\n  \"approver\": \"approver\",\n  \"resource\": \"invoice/review\",\n  \"amount_minor\": 100,\n  \"currency\": \"EUR\",\n  \"beneficiary\": \"ACME\",\n  \"idempotency_key\": \"review-effect\",\n  \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n  \"original_digest\": \"5caf96281bd56d9be94425f8521170123f17e42e498e9ee99efbc578f0052357\",\n  \"state\": \"approved\",\n  \"next_action\": \"engager le connecteur simulé\",\n  \"created_at\": \"2026-10-16T06:30:26.727109297Z\",\n  \"updated_at\": \"2026-10-16T06:30:26.794477484Z\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/export-fixture-db33cf23",
+        "--json",
+        "trust",
+        "commit",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "187b782305b04fa395100997e8cc4f20",
+        "action_id": "act-5e234313e317c41d3575"
+      },
+      "actor": "effect",
+      "started_unix": 1792132226.8005335,
+      "ended_unix": 1792132226.866646,
+      "exit_code": 0,
+      "stdout": "{\n  \"id\": \"act-5e234313e317c41d3575\",\n  \"mandate_id\": \"review-mandate\",\n  \"requester\": \"requester\",\n  \"approver\": \"approver\",\n  \"resource\": \"invoice/review\",\n  \"amount_minor\": 100,\n  \"currency\": \"EUR\",\n  \"beneficiary\": \"ACME\",\n  \"idempotency_key\": \"review-effect\",\n  \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n  \"original_digest\": \"5caf96281bd56d9be94425f8521170123f17e42e498e9ee99efbc578f0052357\",\n  \"state\": \"committed\",\n  \"next_action\": \"consulter ou exporter les preuves\",\n  \"created_at\": \"2026-10-16T06:30:26.727109297Z\",\n  \"updated_at\": \"2026-10-16T06:30:26.860267002Z\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/export-fixture-db33cf23",
+        "--json",
+        "trust",
+        "show"
+      ],
+      "input": null,
+      "actor": null,
+      "started_unix": 1792132226.8667006,
+      "ended_unix": 1792132226.9308708,
+      "exit_code": 0,
+      "stdout": "{\n  \"access_ledger\": [],\n  \"actions\": {\n    \"act-5e234313e317c41d3575\": {\n      \"id\": \"act-5e234313e317c41d3575\",\n      \"mandate_id\": \"review-mandate\",\n      \"requester\": \"requester\",\n      \"approver\": \"approver\",\n      \"resource\": \"invoice/review\",\n      \"amount_minor\": 100,\n      \"currency\": \"EUR\",\n      \"beneficiary\": \"ACME\",\n      \"idempotency_key\": \"review-effect\",\n      \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n      \"original_digest\": \"5caf96281bd56d9be94425f8521170123f17e42e498e9ee99efbc578f0052357\",\n      \"state\": \"committed\",\n      \"next_action\": \"consulter ou exporter les preuves\",\n      \"created_at\": \"2026-10-16T06:30:26.727109297Z\",\n      \"updated_at\": \"2026-10-16T06:30:26.860267002Z\"\n    }\n  },\n  \"amount_minor_text\": {\n    \"act-5e234313e317c41d3575\": \"100\"\n  },\n  \"connector_catalog\": {\n    \"arbitrary_plugins\": false,\n    \"connectors\": [\n      {\n        \"external_effects\": false,\n        \"id\": \"local-ledger-simulation\",\n        \"idempotency\": true,\n        \"provider_containment\": false,\n        \"readback\": true,\n        \"secret_grants\": false,\n        \"simulation\": true,\n        \"version\": 1\n      },\n      {\n        \"external_effects\": false,\n        \"id\": \"local-access-simulation\",\n        \"idempotency\": true,\n        \"provider_containment\": false,\n        \"readback\": true,\n        \"secret_grants\": false,\n        \"simulation\": true,\n        \"version\": 1\n      }\n    ],\n    \"schema_version\": 1\n  },\n  \"data_capabilities\": {\n    \"classifications\": [\n      \"public\",\n      \"internal\"\n    ],\n    \"destination\": \"local-ledger\",\n    \"external_containment_verified\": false,\n    \"local_paths\": [\n      {\n        \"destination\": \"local-access-state\",\n        \"provider\": \"swarm\",\n        \"tool\": \"simulated-access-grant\"\n      },\n      {\n        \"destination\": \"local-ledger\",\n        \"provider\": \"swarm\",\n        \"tool\": \"simulated-settlement\"\n      },\n      {\n        \"destination\": \"local-process-state\",\n        \"provider\": \"swarm\",\n        \"tool\": \"process-workflow\"\n      }\n    ],\n    \"provider\": \"swarm\",\n    \"secret_delivery\": {\n      \"classification\": \"restricted\",\n      \"destination\": \"local-attestation\",\n      \"provider\": \"swarm\",\n      \"scope\": \"fixed_helper_only\",\n      \"tool\": \"sealed-attestation\"\n    },\n    \"secret_grants_supported\": false,\n    \"tool\": \"simulated-settlement\"\n  },\n  \"data_policy\": {\n    \"resources\": [],\n    \"enabled\": false,\n    \"classifications\": [],\n    \"destinations\": [],\n    \"providers\": [],\n    \"tools\": []\n  },\n  \"delegation\": {\n    \"max_depth\": 0\n  },\n  \"effect_receipts\": {\n    \"review-effect\": {\n      \"intent\": {\n        \"schema_version\": 1,\n        \"intent_id\": \"intent-5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n        \"action_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n        \"mandate_digest\": \"4e5b69b3d57f9c33766576b032a90c32c9f2d87ce25a24b554a64667de416501\",\n        \"approval_digests\": [\n          \"6414b12cd43cb26a9ea622dae6b3efbbf1868eb089fe662693b0461035eb272a\"\n        ],\n        \"connector_id\": \"local-ledger-simulation\",\n        \"connector_version\": 1,\n        \"resource\": \"invoice/review\",\n        \"canonical_parameters\": {\n          \"amount_minor\": 100,\n          \"currency\": \"EUR\",\n          \"beneficiary\": \"ACME\"\n        },\n        \"idempotency_key\": \"review-effect\",\n        \"deadline\": \"2026-10-16T07:30:26Z\"\n      },\n      \"result\": {\n        \"schema_version\": 1,\n        \"intent_id\": \"intent-5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n        \"connector_receipt\": \"receipt-7b70c38fbd72330bdb95d6e0a699f90b8405bd627a69a8d5a0e35fda860ac972\",\n        \"state\": \"committed\",\n        \"committed_at\": \"2026-10-16T06:30:26.860267002Z\",\n        \"observed_at\": \"2026-10-16T06:30:26.860267002Z\",\n        \"result_digest\": \"dece4a78c61dd9251869182b46edf07fd77d201496ab8c7527535dcbb451623c\",\n        \"reconciliation_required\": false,\n        \"diagnostic_code\": \"\"\n      },\n      \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n      \"action_id\": \"act-5e234313e317c41d3575\",\n      \"state\": \"committed\"\n    }\n  },\n  \"evidence_count\": 4,\n  \"evidence_signing\": {\n    \"enabled\": false,\n    \"key_ttl_seconds\": 86400\n  },\n  \"group_mapping\": {\n    \"enabled\": false,\n    \"claim\": \"groups\",\n    \"rules\": []\n  },\n  \"identities\": [\n    {\n      \"disabled\": false,\n      \"integrity\": 3,\n      \"roles\": [\n        \"admin\"\n      ],\n      \"subject\": \"admin\"\n    },\n    {\n      \"disabled\": false,\n      \"integrity\": 2,\n      \"roles\": [\n        \"approver\"\n      ],\n      \"subject\": \"approver\"\n    },\n    {\n      \"disabled\": false,\n      \"integrity\": 2,\n      \"roles\": [\n        \"effect\"\n      ],\n      \"subject\": \"effect\"\n    },\n    {\n      \"disabled\": false,\n      \"integrity\": 1,\n      \"roles\": [\n        \"requester\"\n      ],\n      \"subject\": \"requester\"\n    }\n  ],\n  \"kernel_check\": {\n    \"enabled\": false,\n    \"timeout_seconds\": 15,\n    \"ring_bytes\": 65536\n  },\n  \"kernel_observation\": {\n    \"enabled\": false,\n    \"window_seconds\": 5,\n    \"timeout_seconds\": 15,\n    \"ring_bytes\": 65536,\n    \"max_events\": 128\n  },\n  \"laboratory\": {\n    \"enabled\": false,\n    \"timeout_seconds\": 30,\n    \"max_concurrent_runs\": 1\n  },\n  \"ledger\": [\n    {\n      \"sequence\": 1,\n      \"action_id\": \"act-5e234313e317c41d3575\",\n      \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n      \"idempotency_key\": \"review-effect\",\n      \"amount_minor\": 100,\n      \"currency\": \"EUR\",\n      \"beneficiary\": \"ACME\",\n      \"resource\": \"invoice/review\",\n      \"committed_at\": \"2026-10-16T06:30:26.860267002Z\",\n      \"simulation\": true\n    }\n  ],\n  \"limits\": [\n    \"aucun paiement réel\",\n    \"jetons du pilote local\",\n    \"preuve locale non ancrée par un tiers\"\n  ],\n  \"mandate_amount_minor_text\": {\n    \"review-mandate\": \"1000\"\n  },\n  \"mandate_status\": {\n    \"review-mandate\": \"\"\n  },\n  \"mandates\": {\n    \"review-mandate\": {\n      \"id\": \"review-mandate\",\n      \"subject\": \"requester\",\n      \"delegator\": \"admin\",\n      \"actions\": [\n        \"settle\"\n      ],\n      \"resource\": \"invoice/review\",\n      \"max_amount_minor\": 1000,\n      \"currency\": \"EUR\",\n      \"beneficiary\": \"ACME\",\n      \"version\": 1,\n      \"policy_revision\": 1,\n      \"integrity\": 2,\n      \"starts_at\": \"2026-10-16T06:30:26Z\",\n      \"expires_at\": \"2026-10-16T07:30:26Z\",\n      \"content_digest\": \"4e5b69b3d57f9c33766576b032a90c32c9f2d87ce25a24b554a64667de416501\",\n      \"original_digest\": \"22734541239eebf13ed52be7b93b7d49cb797a9fae15fc8767aa201c37966a35\"\n    }\n  },\n  \"oidc\": null,\n  \"oidc_defaults\": {\n    \"enabled\": false,\n    \"issuer\": \"\",\n    \"client_id\": \"\",\n    \"redirect_uri\": \"\",\n    \"request_timeout_seconds\": 15,\n    \"login_ttl_seconds\": 300,\n    \"session_ttl_seconds\": 900,\n    \"mappings\": []\n  },\n  \"oidc_logout\": {\n    \"enabled\": false,\n    \"max_age_seconds\": 300,\n    \"replay_retention_seconds\": 600\n  },\n  \"oidc_logout_replay_records\": 0,\n  \"originals_missing\": 0,\n  \"policy\": {\n    \"mandate_ttl_seconds\": 3600,\n    \"unknown_reconcile_seconds\": 0,\n    \"evidence_retention_days\": 365,\n    \"require_separation\": true\n  },\n  \"policy_bounds\": {\n    \"evidence_key_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"evidence_registry_revision\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"evidence_retention_days\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"evidence_verify_bytes\": {\n      \"max\": 16777216,\n      \"min\": 1\n    },\n    \"introspection_max_sessions\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"introspection_max_token_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"introspection_response_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"introspection_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"introspection_validation_window_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"kernel_check_ring_bytes\": {\n      \"max\": 2147483648,\n      \"min\": 4096\n    },\n    \"kernel_check_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"kernel_observation_max_events\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"kernel_observation_ring_bytes\": {\n      \"max\": 2147483648,\n      \"min\": 4096\n    },\n    \"kernel_observation_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"kernel_observation_window_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"laboratory_max_concurrent_runs\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"laboratory_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"mandate_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"max_delegation_depth\": {\n      \"max\": 9007199254740991,\n      \"min\": 0\n    },\n    \"oidc_logout_max_age_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"oidc_logout_replay_retention_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"process_command_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"process_state_bytes\": {\n      \"max\": 8388608,\n      \"min\": 1\n    },\n    \"process_version\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"sealed_execution_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"secret_broker_grant_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"secret_broker_material_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"secret_broker_max_entries\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"secret_broker_max_material_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"step_up_max_age_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"step_up_proof_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"unknown_reconcile_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    }\n  },\n  \"process_policy\": {\n    \"enabled\": false\n  },\n  \"revision\": 1,\n  \"schema_version\": 1,\n  \"sealed_execution\": {\n    \"enabled\": false,\n    \"timeout_seconds\": 15\n  },\n  \"secret_broker\": {\n    \"enabled\": false,\n    \"material_ttl_seconds\": 300,\n    \"grant_ttl_seconds\": 60,\n    \"max_material_bytes\": 4096,\n    \"max_entries\": 16\n  },\n  \"secret_grants\": null,\n  \"simulation\": true,\n  \"step_up\": {\n    \"enabled\": false,\n    \"operations\": [\n      \"approve\"\n    ],\n    \"acr_values\": [],\n    \"max_age_seconds\": 0,\n    \"proof_ttl_seconds\": 300\n  },\n  \"workload_defaults\": {\n    \"enabled\": false,\n    \"issuer\": \"\",\n    \"audience\": \"\",\n    \"request_timeout_seconds\": 15,\n    \"assertion_ttl_seconds\": 300,\n    \"session_ttl_seconds\": 900,\n    \"clients\": []\n  },\n  \"workload_introspection\": {\n    \"enabled\": false,\n    \"endpoint\": \"\",\n    \"client_id\": \"\",\n    \"timeout_seconds\": 15,\n    \"validation_window_seconds\": 5,\n    \"max_sessions\": 64,\n    \"max_token_bytes\": 16384\n  },\n  \"workload_introspection_status\": {\n    \"persistent_tokens\": false,\n    \"prepared\": false,\n    \"retained_sessions\": 0,\n    \"retained_token_bytes\": 0\n  },\n  \"workloads\": null\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/export-fixture-db33cf23",
+        "--json",
+        "trust",
+        "export"
+      ],
+      "input": null,
+      "actor": null,
+      "started_unix": 1792132226.9312365,
+      "ended_unix": 1792132226.9839716,
+      "exit_code": 0,
+      "stdout": "{\n  \"originals\": {\n    \"0acdcb2704d3b4c5deb7a5aee69c0608c8376fe0894d85801c9254809fe12856\": \"eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICIxODdiNzgyMzA1YjA0ZmEzOTUxMDA5OTdlOGNjNGYyMCIsICJhY3Rpb25faWQiOiAiYWN0LTVlMjM0MzEzZTMxN2M0MWQzNTc1In0=\",\n    \"22734541239eebf13ed52be7b93b7d49cb797a9fae15fc8767aa201c37966a35\": \"eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICIzYWNjMDNmYjZkNDM0NzliYWY1ZGJjZjUxMmY1OWNjOSIsICJtYW5kYXRlX2lkIjogInJldmlldy1tYW5kYXRlIiwgInN1YmplY3QiOiAicmVxdWVzdGVyIiwgImFjdGlvbnMiOiBbInNldHRsZSJdLCAicmVzb3VyY2UiOiAiaW52b2ljZS9yZXZpZXciLCAibWF4X2Ftb3VudF9taW5vciI6IDEwMDAsICJjdXJyZW5jeSI6ICJFVVIiLCAiYmVuZWZpY2lhcnkiOiAiQUNNRSJ9\",\n    \"40cb63293276083ae0ceb59f6e97c1fd1a58d47399f47b1fec06150039fd83c8\": \"eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICI1MDgwMWY3YzI0Yzg0OWIxODlhNWYwZWZkOTM3N2FmNSIsICJhY3Rpb25faWQiOiAiYWN0LTVlMjM0MzEzZTMxN2M0MWQzNTc1IiwgIm1hbmRhdGVfaWQiOiAicmV2aWV3LW1hbmRhdGUiLCAiYW1vdW50X21pbm9yIjogMTAwLCAiY3VycmVuY3kiOiAiRVVSIiwgImJlbmVmaWNpYXJ5IjogIkFDTUUiLCAiY29udGVudF9kaWdlc3QiOiAiNWUyMzQzMTNlMzE3YzQxZDM1NzVlZmE1Y2ExNzA1YmJlYTQ3MTdkN2UyZmIxNGQ5NTc0ZTA0ODc5YTA0YzhiMyJ9\",\n    \"5caf96281bd56d9be94425f8521170123f17e42e498e9ee99efbc578f0052357\": \"eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICIwYjNmY2I3YjdmYmQ0ZDM1OWM5MzMzMGNiOWE3M2ZlNCIsICJtYW5kYXRlX2lkIjogInJldmlldy1tYW5kYXRlIiwgInJlc291cmNlIjogImludm9pY2UvcmV2aWV3IiwgImFtb3VudF9taW5vciI6IDEwMCwgImN1cnJlbmN5IjogIkVVUiIsICJiZW5lZmljaWFyeSI6ICJBQ01FIiwgImlkZW1wb3RlbmN5X2tleSI6ICJyZXZpZXctZWZmZWN0In0=\"\n  },\n  \"schema_version\": 2,\n  \"simulation\": true,\n  \"evidence\": [\n    {\n      \"identity_context\": {\n        \"schema_version\": 1,\n        \"configuration_revision\": 1,\n        \"principal_id\": \"admin\",\n        \"principal_kind\": \"local\",\n        \"issuer\": \"urn:swarm:local\",\n        \"subject\": \"admin\",\n        \"assurance\": {\n          \"method\": \"local_bearer\",\n          \"provider_authenticated_at\": null\n        },\n        \"attributes\": {\n          \"roles\": [\n            \"admin\"\n          ],\n          \"integrity\": 3\n        },\n        \"delegation_id\": null,\n        \"authenticated_at\": \"2026-10-16T06:30:26.650086588Z\",\n        \"expires_at\": null,\n        \"token_digest\": \"55b2aec689d04bc3e73990fa98790d26d601adb6aec19e9f41bc766455182713\"\n      },\n      \"sequence\": 1,\n      \"previous_hash\": \"\",\n      \"hash\": \"5289025f978fa916165e3a735cffee11fd76944ca7fd77468534b53139e180a8\",\n      \"kind\": \"mandate-create\",\n      \"actor\": \"admin\",\n      \"integrity\": 3,\n      \"object_id\": \"review-mandate\",\n      \"content_digest\": \"4e5b69b3d57f9c33766576b032a90c32c9f2d87ce25a24b554a64667de416501\",\n      \"original_digest\": \"22734541239eebf13ed52be7b93b7d49cb797a9fae15fc8767aa201c37966a35\",\n      \"result\": \"admitted\",\n      \"reason\": \"endorsement Biba I3 vers nouvel objet I2\",\n      \"at\": \"2026-10-16T06:30:26.650086588Z\"\n    },\n    {\n      \"identity_context\": {\n        \"schema_version\": 1,\n        \"configuration_revision\": 1,\n        \"principal_id\": \"requester\",\n        \"principal_kind\": \"local\",\n        \"issuer\": \"urn:swarm:local\",\n        \"subject\": \"requester\",\n        \"assurance\": {\n          \"method\": \"local_bearer\",\n          \"provider_authenticated_at\": null\n        },\n        \"attributes\": {\n          \"roles\": [\n            \"requester\"\n          ],\n          \"integrity\": 1\n        },\n        \"delegation_id\": \"review-mandate\",\n        \"authenticated_at\": \"2026-10-16T06:30:26.727109297Z\",\n        \"expires_at\": null,\n        \"token_digest\": \"98ced5e93b061b6ce7d63931345a4558777f543390e6e032c0cb957600c6d085\"\n      },\n      \"sequence\": 2,\n      \"previous_hash\": \"5289025f978fa916165e3a735cffee11fd76944ca7fd77468534b53139e180a8\",\n      \"hash\": \"1c657880302dadf2050fa6cbe64a41ab25ba20d881588570513fe642187ea067\",\n      \"kind\": \"request\",\n      \"actor\": \"requester\",\n      \"integrity\": 1,\n      \"object_id\": \"act-5e234313e317c41d3575\",\n      \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n      \"original_digest\": \"5caf96281bd56d9be94425f8521170123f17e42e498e9ee99efbc578f0052357\",\n      \"result\": \"admitted\",\n      \"reason\": \"nouvel objet I2; original I1 conservé avec ses octets et son digest\",\n      \"at\": \"2026-10-16T06:30:26.727109297Z\"\n    },\n    {\n      \"identity_context\": {\n        \"schema_version\": 1,\n        \"configuration_revision\": 1,\n        \"principal_id\": \"approver\",\n        \"principal_kind\": \"local\",\n        \"issuer\": \"urn:swarm:local\",\n        \"subject\": \"approver\",\n        \"assurance\": {\n          \"method\": \"local_bearer\",\n          \"provider_authenticated_at\": null\n        },\n        \"attributes\": {\n          \"roles\": [\n            \"approver\"\n          ],\n          \"integrity\": 2\n        },\n        \"delegation_id\": null,\n        \"authenticated_at\": \"2026-10-16T06:30:26.794477484Z\",\n        \"expires_at\": null,\n        \"token_digest\": \"1d7df7f122ddb1791331bf1450e69b54e2bd9c004318cb182a367e2c27f106a7\"\n      },\n      \"sequence\": 3,\n      \"previous_hash\": \"1c657880302dadf2050fa6cbe64a41ab25ba20d881588570513fe642187ea067\",\n      \"hash\": \"6414b12cd43cb26a9ea622dae6b3efbbf1868eb089fe662693b0461035eb272a\",\n      \"kind\": \"approve\",\n      \"actor\": \"approver\",\n      \"integrity\": 2,\n      \"object_id\": \"act-5e234313e317c41d3575\",\n      \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n      \"original_digest\": \"40cb63293276083ae0ceb59f6e97c1fd1a58d47399f47b1fec06150039fd83c8\",\n      \"result\": \"approved\",\n      \"reason\": \"accord exact\",\n      \"at\": \"2026-10-16T06:30:26.794477484Z\"\n    },\n    {\n      \"identity_context\": {\n        \"schema_version\": 1,\n        \"configuration_revision\": 1,\n        \"principal_id\": \"effect\",\n        \"principal_kind\": \"local\",\n        \"issuer\": \"urn:swarm:local\",\n        \"subject\": \"effect\",\n        \"assurance\": {\n          \"method\": \"local_bearer\",\n          \"provider_authenticated_at\": null\n        },\n        \"attributes\": {\n          \"roles\": [\n            \"effect\"\n          ],\n          \"integrity\": 2\n        },\n        \"delegation_id\": null,\n        \"authenticated_at\": \"2026-10-16T06:30:26.860267002Z\",\n        \"expires_at\": null,\n        \"token_digest\": \"4cd6b7a4e7d13856ae787b4e4cada66fcd874752a979cf3c009773b5b420a63e\"\n      },\n      \"sequence\": 4,\n      \"previous_hash\": \"6414b12cd43cb26a9ea622dae6b3efbbf1868eb089fe662693b0461035eb272a\",\n      \"hash\": \"e691460690b0dcae03677b180d873bf19066ab9a9b46d8daf645356f04e48d97\",\n      \"kind\": \"commit\",\n      \"actor\": \"effect\",\n      \"integrity\": 2,\n      \"object_id\": \"act-5e234313e317c41d3575\",\n      \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n      \"original_digest\": \"0acdcb2704d3b4c5deb7a5aee69c0608c8376fe0894d85801c9254809fe12856\",\n      \"result\": \"committed\",\n      \"at\": \"2026-10-16T06:30:26.860267002Z\"\n    }\n  ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/export-fixture-db33cf23",
+        "--json",
+        "trust",
+        "anchor"
+      ],
+      "input": null,
+      "actor": null,
+      "started_unix": 1792132226.984146,
+      "ended_unix": 1792132227.0344024,
+      "exit_code": 0,
+      "stdout": "{\n  \"schema_version\": 1,\n  \"sequence\": 4,\n  \"hash\": \"e691460690b0dcae03677b180d873bf19066ab9a9b46d8daf645356f04e48d97\",\n  \"signature\": \"593697675a49c032c7b12953709a52bddf40b79fcf3da23732979891778e03fc\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/export-fixture-db33cf23",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "8c0bbf44a024440793ef83e988f0b8e2",
+        "export": {
+          "originals": {
+            "0acdcb2704d3b4c5deb7a5aee69c0608c8376fe0894d85801c9254809fe12856": "eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICIxODdiNzgyMzA1YjA0ZmEzOTUxMDA5OTdlOGNjNGYyMCIsICJhY3Rpb25faWQiOiAiYWN0LTVlMjM0MzEzZTMxN2M0MWQzNTc1In0=",
+            "22734541239eebf13ed52be7b93b7d49cb797a9fae15fc8767aa201c37966a35": "eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICIzYWNjMDNmYjZkNDM0NzliYWY1ZGJjZjUxMmY1OWNjOSIsICJtYW5kYXRlX2lkIjogInJldmlldy1tYW5kYXRlIiwgInN1YmplY3QiOiAicmVxdWVzdGVyIiwgImFjdGlvbnMiOiBbInNldHRsZSJdLCAicmVzb3VyY2UiOiAiaW52b2ljZS9yZXZpZXciLCAibWF4X2Ftb3VudF9taW5vciI6IDEwMDAsICJjdXJyZW5jeSI6ICJFVVIiLCAiYmVuZWZpY2lhcnkiOiAiQUNNRSJ9",
+            "40cb63293276083ae0ceb59f6e97c1fd1a58d47399f47b1fec06150039fd83c8": "eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICI1MDgwMWY3YzI0Yzg0OWIxODlhNWYwZWZkOTM3N2FmNSIsICJhY3Rpb25faWQiOiAiYWN0LTVlMjM0MzEzZTMxN2M0MWQzNTc1IiwgIm1hbmRhdGVfaWQiOiAicmV2aWV3LW1hbmRhdGUiLCAiYW1vdW50X21pbm9yIjogMTAwLCAiY3VycmVuY3kiOiAiRVVSIiwgImJlbmVmaWNpYXJ5IjogIkFDTUUiLCAiY29udGVudF9kaWdlc3QiOiAiNWUyMzQzMTNlMzE3YzQxZDM1NzVlZmE1Y2ExNzA1YmJlYTQ3MTdkN2UyZmIxNGQ5NTc0ZTA0ODc5YTA0YzhiMyJ9",
+            "5caf96281bd56d9be94425f8521170123f17e42e498e9ee99efbc578f0052357": "eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICIwYjNmY2I3YjdmYmQ0ZDM1OWM5MzMzMGNiOWE3M2ZlNCIsICJtYW5kYXRlX2lkIjogInJldmlldy1tYW5kYXRlIiwgInJlc291cmNlIjogImludm9pY2UvcmV2aWV3IiwgImFtb3VudF9taW5vciI6IDEwMCwgImN1cnJlbmN5IjogIkVVUiIsICJiZW5lZmljaWFyeSI6ICJBQ01FIiwgImlkZW1wb3RlbmN5X2tleSI6ICJyZXZpZXctZWZmZWN0In0="
+          },
+          "schema_version": 2,
+          "simulation": true,
+          "evidence": [
+            {
+              "identity_context": {
+                "schema_version": 1,
+                "configuration_revision": 1,
+                "principal_id": "admin",
+                "principal_kind": "local",
+                "issuer": "urn:swarm:local",
+                "subject": "admin",
+                "assurance": {
+                  "method": "local_bearer",
+                  "provider_authenticated_at": null
+                },
+                "attributes": {
+                  "roles": [
+                    "admin"
+                  ],
+                  "integrity": 3
+                },
+                "delegation_id": null,
+                "authenticated_at": "2026-10-16T06:30:26.650086588Z",
+                "expires_at": null,
+                "token_digest": "55b2aec689d04bc3e73990fa98790d26d601adb6aec19e9f41bc766455182713"
+              },
+              "sequence": 1,
+              "previous_hash": "",
+              "hash": "5289025f978fa916165e3a735cffee11fd76944ca7fd77468534b53139e180a8",
+              "kind": "mandate-create",
+              "actor": "admin",
+              "integrity": 3,
+              "object_id": "review-mandate",
+              "content_digest": "4e5b69b3d57f9c33766576b032a90c32c9f2d87ce25a24b554a64667de416501",
+              "original_digest": "22734541239eebf13ed52be7b93b7d49cb797a9fae15fc8767aa201c37966a35",
+              "result": "admitted",
+              "reason": "endorsement Biba I3 vers nouvel objet I2",
+              "at": "2026-10-16T06:30:26.650086588Z"
+            },
+            {
+              "identity_context": {
+                "schema_version": 1,
+                "configuration_revision": 1,
+                "principal_id": "requester",
+                "principal_kind": "local",
+                "issuer": "urn:swarm:local",
+                "subject": "requester",
+                "assurance": {
+                  "method": "local_bearer",
+                  "provider_authenticated_at": null
+                },
+                "attributes": {
+                  "roles": [
+                    "requester"
+                  ],
+                  "integrity": 1
+                },
+                "delegation_id": "review-mandate",
+                "authenticated_at": "2026-10-16T06:30:26.727109297Z",
+                "expires_at": null,
+                "token_digest": "98ced5e93b061b6ce7d63931345a4558777f543390e6e032c0cb957600c6d085"
+              },
+              "sequence": 2,
+              "previous_hash": "5289025f978fa916165e3a735cffee11fd76944ca7fd77468534b53139e180a8",
+              "hash": "1c657880302dadf2050fa6cbe64a41ab25ba20d881588570513fe642187ea067",
+              "kind": "request",
+              "actor": "requester",
+              "integrity": 1,
+              "object_id": "act-5e234313e317c41d3575",
+              "content_digest": "5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3",
+              "original_digest": "5caf96281bd56d9be94425f8521170123f17e42e498e9ee99efbc578f0052357",
+              "result": "admitted",
+              "reason": "nouvel objet I2; original I1 conservé avec ses octets et son digest",
+              "at": "2026-10-16T06:30:26.727109297Z"
+            },
+            {
+              "identity_context": {
+                "schema_version": 1,
+                "configuration_revision": 1,
+                "principal_id": "approver",
+                "principal_kind": "local",
+                "issuer": "urn:swarm:local",
+                "subject": "approver",
+                "assurance": {
+                  "method": "local_bearer",
+                  "provider_authenticated_at": null
+                },
+                "attributes": {
+                  "roles": [
+                    "approver"
+                  ],
+                  "integrity": 2
+                },
+                "delegation_id": null,
+                "authenticated_at": "2026-10-16T06:30:26.794477484Z",
+                "expires_at": null,
+                "token_digest": "1d7df7f122ddb1791331bf1450e69b54e2bd9c004318cb182a367e2c27f106a7"
+              },
+              "sequence": 3,
+              "previous_hash": "1c657880302dadf2050fa6cbe64a41ab25ba20d881588570513fe642187ea067",
+              "hash": "6414b12cd43cb26a9ea622dae6b3efbbf1868eb089fe662693b0461035eb272a",
+              "kind": "approve",
+              "actor": "approver",
+              "integrity": 2,
+              "object_id": "act-5e234313e317c41d3575",
+              "content_digest": "5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3",
+              "original_digest": "40cb63293276083ae0ceb59f6e97c1fd1a58d47399f47b1fec06150039fd83c8",
+              "result": "approved",
+              "reason": "accord exact",
+              "at": "2026-10-16T06:30:26.794477484Z"
+            },
+            {
+              "identity_context": {
+                "schema_version": 1,
+                "configuration_revision": 1,
+                "principal_id": "effect",
+                "principal_kind": "local",
+                "issuer": "urn:swarm:local",
+                "subject": "effect",
+                "assurance": {
+                  "method": "local_bearer",
+                  "provider_authenticated_at": null
+                },
+                "attributes": {
+                  "roles": [
+                    "effect"
+                  ],
+                  "integrity": 2
+                },
+                "delegation_id": null,
+                "authenticated_at": "2026-10-16T06:30:26.860267002Z",
+                "expires_at": null,
+                "token_digest": "4cd6b7a4e7d13856ae787b4e4cada66fcd874752a979cf3c009773b5b420a63e"
+              },
+              "sequence": 4,
+              "previous_hash": "6414b12cd43cb26a9ea622dae6b3efbbf1868eb089fe662693b0461035eb272a",
+              "hash": "e691460690b0dcae03677b180d873bf19066ab9a9b46d8daf645356f04e48d97",
+              "kind": "commit",
+              "actor": "effect",
+              "integrity": 2,
+              "object_id": "act-5e234313e317c41d3575",
+              "content_digest": "5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3",
+              "original_digest": "0acdcb2704d3b4c5deb7a5aee69c0608c8376fe0894d85801c9254809fe12856",
+              "result": "committed",
+              "at": "2026-10-16T06:30:26.860267002Z"
+            }
+          ]
+        },
+        "anchor": {
+          "schema_version": 1,
+          "sequence": 4,
+          "hash": "e691460690b0dcae03677b180d873bf19066ab9a9b46d8daf645356f04e48d97",
+          "signature": "593697675a49c032c7b12953709a52bddf40b79fcf3da23732979891778e03fc"
+        },
+        "verification_key": "d6fc50e0a6084d1364c0741f1e89e6a16d73758b1bda5f050c8d0dcac86f5b5b"
+      },
+      "actor": null,
+      "started_unix": 1792132227.0347767,
+      "ended_unix": 1792132227.0876927,
+      "exit_code": 0,
+      "stdout": "{\n  \"sequence\": 4,\n  \"simulation\": true,\n  \"verified\": true\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/corrupt-chain-fixture-7b882f61",
+        "--json",
+        "trust",
+        "config-apply",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "b349852f2a8944b9b65e5faee54b7215",
+        "expected_revision": 0,
+        "reason": "independent proof content check",
+        "identities": [
+          {
+            "subject": "admin",
+            "token": "admin-independent-fixture-token",
+            "integrity": 3,
+            "roles": [
+              "admin"
+            ]
+          },
+          {
+            "subject": "requester",
+            "token": "requester-independent-fixture-token",
+            "integrity": 1,
+            "roles": [
+              "requester"
+            ]
+          },
+          {
+            "subject": "approver",
+            "token": "approver-independent-fixture-token",
+            "integrity": 2,
+            "roles": [
+              "approver"
+            ]
+          },
+          {
+            "subject": "effect",
+            "token": "effect-independent-fixture-token",
+            "integrity": 2,
+            "roles": [
+              "effect"
+            ]
+          }
+        ],
+        "policy": {
+          "mandate_ttl_seconds": 3600,
+          "unknown_reconcile_seconds": 0,
+          "evidence_retention_days": 365,
+          "require_separation": true
+        }
+      },
+      "actor": null,
+      "started_unix": 1792132227.186526,
+      "ended_unix": 1792132227.2469974,
+      "exit_code": 0,
+      "stdout": "{\n  \"access_ledger\": [],\n  \"actions\": {},\n  \"amount_minor_text\": {},\n  \"connector_catalog\": {\n    \"arbitrary_plugins\": false,\n    \"connectors\": [\n      {\n        \"external_effects\": false,\n        \"id\": \"local-ledger-simulation\",\n        \"idempotency\": true,\n        \"provider_containment\": false,\n        \"readback\": true,\n        \"secret_grants\": false,\n        \"simulation\": true,\n        \"version\": 1\n      },\n      {\n        \"external_effects\": false,\n        \"id\": \"local-access-simulation\",\n        \"idempotency\": true,\n        \"provider_containment\": false,\n        \"readback\": true,\n        \"secret_grants\": false,\n        \"simulation\": true,\n        \"version\": 1\n      }\n    ],\n    \"schema_version\": 1\n  },\n  \"data_capabilities\": {\n    \"classifications\": [\n      \"public\",\n      \"internal\"\n    ],\n    \"destination\": \"local-ledger\",\n    \"external_containment_verified\": false,\n    \"local_paths\": [\n      {\n        \"destination\": \"local-access-state\",\n        \"provider\": \"swarm\",\n        \"tool\": \"simulated-access-grant\"\n      },\n      {\n        \"destination\": \"local-ledger\",\n        \"provider\": \"swarm\",\n        \"tool\": \"simulated-settlement\"\n      },\n      {\n        \"destination\": \"local-process-state\",\n        \"provider\": \"swarm\",\n        \"tool\": \"process-workflow\"\n      }\n    ],\n    \"provider\": \"swarm\",\n    \"secret_delivery\": {\n      \"classification\": \"restricted\",\n      \"destination\": \"local-attestation\",\n      \"provider\": \"swarm\",\n      \"scope\": \"fixed_helper_only\",\n      \"tool\": \"sealed-attestation\"\n    },\n    \"secret_grants_supported\": false,\n    \"tool\": \"simulated-settlement\"\n  },\n  \"data_policy\": {\n    \"resources\": [],\n    \"enabled\": false,\n    \"classifications\": [],\n    \"destinations\": [],\n    \"providers\": [],\n    \"tools\": []\n  },\n  \"delegation\": {\n    \"max_depth\": 0\n  },\n  \"effect_receipts\": {},\n  \"evidence_count\": 0,\n  \"evidence_signing\": {\n    \"enabled\": false,\n    \"key_ttl_seconds\": 86400\n  },\n  \"group_mapping\": {\n    \"enabled\": false,\n    \"claim\": \"groups\",\n    \"rules\": []\n  },\n  \"identities\": [\n    {\n      \"disabled\": false,\n      \"integrity\": 3,\n      \"roles\": [\n        \"admin\"\n      ],\n      \"subject\": \"admin\"\n    },\n    {\n      \"disabled\": false,\n      \"integrity\": 2,\n      \"roles\": [\n        \"approver\"\n      ],\n      \"subject\": \"approver\"\n    },\n    {\n      \"disabled\": false,\n      \"integrity\": 2,\n      \"roles\": [\n        \"effect\"\n      ],\n      \"subject\": \"effect\"\n    },\n    {\n      \"disabled\": false,\n      \"integrity\": 1,\n      \"roles\": [\n        \"requester\"\n      ],\n      \"subject\": \"requester\"\n    }\n  ],\n  \"kernel_check\": {\n    \"enabled\": false,\n    \"timeout_seconds\": 15,\n    \"ring_bytes\": 65536\n  },\n  \"kernel_observation\": {\n    \"enabled\": false,\n    \"window_seconds\": 5,\n    \"timeout_seconds\": 15,\n    \"ring_bytes\": 65536,\n    \"max_events\": 128\n  },\n  \"laboratory\": {\n    \"enabled\": false,\n    \"timeout_seconds\": 30,\n    \"max_concurrent_runs\": 1\n  },\n  \"ledger\": [],\n  \"limits\": [\n    \"aucun paiement réel\",\n    \"jetons du pilote local\",\n    \"preuve locale non ancrée par un tiers\"\n  ],\n  \"mandate_amount_minor_text\": {},\n  \"mandate_status\": {},\n  \"mandates\": {},\n  \"oidc\": null,\n  \"oidc_defaults\": {\n    \"enabled\": false,\n    \"issuer\": \"\",\n    \"client_id\": \"\",\n    \"redirect_uri\": \"\",\n    \"request_timeout_seconds\": 15,\n    \"login_ttl_seconds\": 300,\n    \"session_ttl_seconds\": 900,\n    \"mappings\": []\n  },\n  \"oidc_logout\": {\n    \"enabled\": false,\n    \"max_age_seconds\": 300,\n    \"replay_retention_seconds\": 600\n  },\n  \"oidc_logout_replay_records\": 0,\n  \"originals_missing\": 0,\n  \"policy\": {\n    \"mandate_ttl_seconds\": 3600,\n    \"unknown_reconcile_seconds\": 0,\n    \"evidence_retention_days\": 365,\n    \"require_separation\": true\n  },\n  \"policy_bounds\": {\n    \"evidence_key_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"evidence_registry_revision\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"evidence_retention_days\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"evidence_verify_bytes\": {\n      \"max\": 16777216,\n      \"min\": 1\n    },\n    \"introspection_max_sessions\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"introspection_max_token_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"introspection_response_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"introspection_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"introspection_validation_window_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"kernel_check_ring_bytes\": {\n      \"max\": 2147483648,\n      \"min\": 4096\n    },\n    \"kernel_check_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"kernel_observation_max_events\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"kernel_observation_ring_bytes\": {\n      \"max\": 2147483648,\n      \"min\": 4096\n    },\n    \"kernel_observation_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"kernel_observation_window_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"laboratory_max_concurrent_runs\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"laboratory_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"mandate_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"max_delegation_depth\": {\n      \"max\": 9007199254740991,\n      \"min\": 0\n    },\n    \"oidc_logout_max_age_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"oidc_logout_replay_retention_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"process_command_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"process_state_bytes\": {\n      \"max\": 8388608,\n      \"min\": 1\n    },\n    \"process_version\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"sealed_execution_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"secret_broker_grant_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"secret_broker_material_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"secret_broker_max_entries\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"secret_broker_max_material_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"step_up_max_age_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"step_up_proof_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"unknown_reconcile_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    }\n  },\n  \"process_policy\": {\n    \"enabled\": false\n  },\n  \"revision\": 1,\n  \"schema_version\": 1,\n  \"sealed_execution\": {\n    \"enabled\": false,\n    \"timeout_seconds\": 15\n  },\n  \"secret_broker\": {\n    \"enabled\": false,\n    \"material_ttl_seconds\": 300,\n    \"grant_ttl_seconds\": 60,\n    \"max_material_bytes\": 4096,\n    \"max_entries\": 16\n  },\n  \"secret_grants\": null,\n  \"simulation\": true,\n  \"step_up\": {\n    \"enabled\": false,\n    \"operations\": [\n      \"approve\"\n    ],\n    \"acr_values\": [],\n    \"max_age_seconds\": 0,\n    \"proof_ttl_seconds\": 300\n  },\n  \"workload_defaults\": {\n    \"enabled\": false,\n    \"issuer\": \"\",\n    \"audience\": \"\",\n    \"request_timeout_seconds\": 15,\n    \"assertion_ttl_seconds\": 300,\n    \"session_ttl_seconds\": 900,\n    \"clients\": []\n  },\n  \"workload_introspection\": {\n    \"enabled\": false,\n    \"endpoint\": \"\",\n    \"client_id\": \"\",\n    \"timeout_seconds\": 15,\n    \"validation_window_seconds\": 5,\n    \"max_sessions\": 64,\n    \"max_token_bytes\": 16384\n  },\n  \"workloads\": null\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/corrupt-chain-fixture-7b882f61",
+        "--json",
+        "trust",
+        "mandate-create",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "e41303822435421e8c7fe1770525c381",
+        "mandate_id": "review-mandate",
+        "subject": "requester",
+        "actions": [
+          "settle"
+        ],
+        "resource": "invoice/review",
+        "max_amount_minor": 1000,
+        "currency": "EUR",
+        "beneficiary": "ACME"
+      },
+      "actor": "admin",
+      "started_unix": 1792132227.2473056,
+      "ended_unix": 1792132227.307058,
+      "exit_code": 0,
+      "stdout": "{\n  \"id\": \"review-mandate\",\n  \"subject\": \"requester\",\n  \"delegator\": \"admin\",\n  \"actions\": [\n    \"settle\"\n  ],\n  \"resource\": \"invoice/review\",\n  \"max_amount_minor\": 1000,\n  \"currency\": \"EUR\",\n  \"beneficiary\": \"ACME\",\n  \"version\": 1,\n  \"policy_revision\": 1,\n  \"integrity\": 2,\n  \"starts_at\": \"2026-10-16T06:30:27Z\",\n  \"expires_at\": \"2026-10-16T07:30:27Z\",\n  \"content_digest\": \"64345d2aff3127c307388441ece691cea271e22faf971eace13a71bedaf35859\",\n  \"original_digest\": \"3c47b75eb8e2151ed4f3946b95bd2b2946057a4ae6dc6b2bcf75c49f3e07d12c\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/corrupt-chain-fixture-7b882f61",
+        "--json",
+        "trust",
+        "request",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "2bbfaed942a142faaf6da330b1b4be6f",
+        "mandate_id": "review-mandate",
+        "resource": "invoice/review",
+        "amount_minor": 100,
+        "currency": "EUR",
+        "beneficiary": "ACME",
+        "idempotency_key": "review-effect"
+      },
+      "actor": "requester",
+      "started_unix": 1792132227.3071742,
+      "ended_unix": 1792132227.3713493,
+      "exit_code": 0,
+      "stdout": "{\n  \"id\": \"act-5e234313e317c41d3575\",\n  \"mandate_id\": \"review-mandate\",\n  \"requester\": \"requester\",\n  \"resource\": \"invoice/review\",\n  \"amount_minor\": 100,\n  \"currency\": \"EUR\",\n  \"beneficiary\": \"ACME\",\n  \"idempotency_key\": \"review-effect\",\n  \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n  \"original_digest\": \"0cfbf022e8ecb0b78c2e2de759e4008bf386159fcc4b7ad0ec41f758ee99e86b\",\n  \"state\": \"pending_approval\",\n  \"next_action\": \"approbation séparée requise\",\n  \"created_at\": \"2026-10-16T06:30:27.364573727Z\",\n  \"updated_at\": \"2026-10-16T06:30:27.364573727Z\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/corrupt-chain-fixture-7b882f61",
+        "--json",
+        "trust",
+        "approve",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "65ce9471253a4c3a993f237bd2ff36c9",
+        "action_id": "act-5e234313e317c41d3575",
+        "mandate_id": "review-mandate",
+        "amount_minor": 100,
+        "currency": "EUR",
+        "beneficiary": "ACME",
+        "content_digest": "5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3"
+      },
+      "actor": "approver",
+      "started_unix": 1792132227.3714457,
+      "ended_unix": 1792132227.4331434,
+      "exit_code": 0,
+      "stdout": "{\n  \"id\": \"act-5e234313e317c41d3575\",\n  \"mandate_id\": \"review-mandate\",\n  \"requester\": \"requester\",\n  \"approver\": \"approver\",\n  \"resource\": \"invoice/review\",\n  \"amount_minor\": 100,\n  \"currency\": \"EUR\",\n  \"beneficiary\": \"ACME\",\n  \"idempotency_key\": \"review-effect\",\n  \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n  \"original_digest\": \"0cfbf022e8ecb0b78c2e2de759e4008bf386159fcc4b7ad0ec41f758ee99e86b\",\n  \"state\": \"approved\",\n  \"next_action\": \"engager le connecteur simulé\",\n  \"created_at\": \"2026-10-16T06:30:27.364573727Z\",\n  \"updated_at\": \"2026-10-16T06:30:27.427263176Z\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/corrupt-chain-fixture-7b882f61",
+        "--json",
+        "trust",
+        "export"
+      ],
+      "input": null,
+      "actor": null,
+      "started_unix": 1792132227.4348698,
+      "ended_unix": 1792132227.4928808,
+      "exit_code": 0,
+      "stdout": "{\n  \"originals\": {\n    \"0cfbf022e8ecb0b78c2e2de759e4008bf386159fcc4b7ad0ec41f758ee99e86b\": \"eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICIyYmJmYWVkOTQyYTE0MmZhYWY2ZGEzMzBiMWI0YmU2ZiIsICJtYW5kYXRlX2lkIjogInJldmlldy1tYW5kYXRlIiwgInJlc291cmNlIjogImludm9pY2UvcmV2aWV3IiwgImFtb3VudF9taW5vciI6IDEwMCwgImN1cnJlbmN5IjogIkVVUiIsICJiZW5lZmljaWFyeSI6ICJBQ01FIiwgImlkZW1wb3RlbmN5X2tleSI6ICJyZXZpZXctZWZmZWN0In0=\",\n    \"3c47b75eb8e2151ed4f3946b95bd2b2946057a4ae6dc6b2bcf75c49f3e07d12c\": \"eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICJlNDEzMDM4MjI0MzU0MjFlOGM3ZmUxNzcwNTI1YzM4MSIsICJtYW5kYXRlX2lkIjogInJldmlldy1tYW5kYXRlIiwgInN1YmplY3QiOiAicmVxdWVzdGVyIiwgImFjdGlvbnMiOiBbInNldHRsZSJdLCAicmVzb3VyY2UiOiAiaW52b2ljZS9yZXZpZXciLCAibWF4X2Ftb3VudF9taW5vciI6IDEwMDAsICJjdXJyZW5jeSI6ICJFVVIiLCAiYmVuZWZpY2lhcnkiOiAiQUNNRSJ9\",\n    \"ea8086ec0a7cb78d490fb43ab36568d638cd03ec9fa9954d9b174658c77d319d\": \"eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICI2NWNlOTQ3MTI1M2E0YzNhOTkzZjIzN2JkMmZmMzZjOSIsICJhY3Rpb25faWQiOiAiYWN0LTVlMjM0MzEzZTMxN2M0MWQzNTc1IiwgIm1hbmRhdGVfaWQiOiAicmV2aWV3LW1hbmRhdGUiLCAiYW1vdW50X21pbm9yIjogMTAwLCAiY3VycmVuY3kiOiAiRVVSIiwgImJlbmVmaWNpYXJ5IjogIkFDTUUiLCAiY29udGVudF9kaWdlc3QiOiAiNWUyMzQzMTNlMzE3YzQxZDM1NzVlZmE1Y2ExNzA1YmJlYTQ3MTdkN2UyZmIxNGQ5NTc0ZTA0ODc5YTA0YzhiMyJ9\"\n  },\n  \"schema_version\": 2,\n  \"simulation\": true,\n  \"evidence\": [\n    {\n      \"identity_context\": {\n        \"schema_version\": 1,\n        \"configuration_revision\": 1,\n        \"principal_id\": \"admin\",\n        \"principal_kind\": \"local\",\n        \"issuer\": \"urn:swarm:local\",\n        \"subject\": \"admin\",\n        \"assurance\": {\n          \"method\": \"local_bearer\",\n          \"provider_authenticated_at\": null\n        },\n        \"attributes\": {\n          \"roles\": [\n            \"admin\"\n          ],\n          \"integrity\": 3\n        },\n        \"delegation_id\": null,\n        \"authenticated_at\": \"2026-10-16T06:30:27.304202576Z\",\n        \"expires_at\": null,\n        \"token_digest\": \"55b2aec689d04bc3e73990fa98790d26d601adb6aec19e9f41bc766455182713\"\n      },\n      \"sequence\": 1,\n      \"previous_hash\": \"\",\n      \"hash\": \"266bdd8a0f1133b849cd17749dfbe3ec6fd7ff41a2de80aa9a61e503aa8d3617\",\n      \"kind\": \"mandate-create\",\n      \"actor\": \"admin\",\n      \"integrity\": 3,\n      \"object_id\": \"review-mandate\",\n      \"content_digest\": \"64345d2aff3127c307388441ece691cea271e22faf971eace13a71bedaf35859\",\n      \"original_digest\": \"3c47b75eb8e2151ed4f3946b95bd2b2946057a4ae6dc6b2bcf75c49f3e07d12c\",\n      \"result\": \"admitted\",\n      \"reason\": \"independent fixture corruption - original hash deliberately unchanged\",\n      \"at\": \"2026-10-16T06:30:27.304202576Z\"\n    },\n    {\n      \"identity_context\": {\n        \"schema_version\": 1,\n        \"configuration_revision\": 1,\n        \"principal_id\": \"requester\",\n        \"principal_kind\": \"local\",\n        \"issuer\": \"urn:swarm:local\",\n        \"subject\": \"requester\",\n        \"assurance\": {\n          \"method\": \"local_bearer\",\n          \"provider_authenticated_at\": null\n        },\n        \"attributes\": {\n          \"roles\": [\n            \"requester\"\n          ],\n          \"integrity\": 1\n        },\n        \"delegation_id\": \"review-mandate\",\n        \"authenticated_at\": \"2026-10-16T06:30:27.364573727Z\",\n        \"expires_at\": null,\n        \"token_digest\": \"98ced5e93b061b6ce7d63931345a4558777f543390e6e032c0cb957600c6d085\"\n      },\n      \"sequence\": 2,\n      \"previous_hash\": \"266bdd8a0f1133b849cd17749dfbe3ec6fd7ff41a2de80aa9a61e503aa8d3617\",\n      \"hash\": \"5d60644f475021f2e8d34c7bd84b133ca9877d36ef95adcbbc4ecb26c9fb16ac\",\n      \"kind\": \"request\",\n      \"actor\": \"requester\",\n      \"integrity\": 1,\n      \"object_id\": \"act-5e234313e317c41d3575\",\n      \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n      \"original_digest\": \"0cfbf022e8ecb0b78c2e2de759e4008bf386159fcc4b7ad0ec41f758ee99e86b\",\n      \"result\": \"admitted\",\n      \"reason\": \"nouvel objet I2; original I1 conservé avec ses octets et son digest\",\n      \"at\": \"2026-10-16T06:30:27.364573727Z\"\n    },\n    {\n      \"identity_context\": {\n        \"schema_version\": 1,\n        \"configuration_revision\": 1,\n        \"principal_id\": \"approver\",\n        \"principal_kind\": \"local\",\n        \"issuer\": \"urn:swarm:local\",\n        \"subject\": \"approver\",\n        \"assurance\": {\n          \"method\": \"local_bearer\",\n          \"provider_authenticated_at\": null\n        },\n        \"attributes\": {\n          \"roles\": [\n            \"approver\"\n          ],\n          \"integrity\": 2\n        },\n        \"delegation_id\": null,\n        \"authenticated_at\": \"2026-10-16T06:30:27.427263176Z\",\n        \"expires_at\": null,\n        \"token_digest\": \"1d7df7f122ddb1791331bf1450e69b54e2bd9c004318cb182a367e2c27f106a7\"\n      },\n      \"sequence\": 3,\n      \"previous_hash\": \"5d60644f475021f2e8d34c7bd84b133ca9877d36ef95adcbbc4ecb26c9fb16ac\",\n      \"hash\": \"f919c48e4581e8fa95eae50f27560ef529032337536a6311ced788a5a0a169d8\",\n      \"kind\": \"approve\",\n      \"actor\": \"approver\",\n      \"integrity\": 2,\n      \"object_id\": \"act-5e234313e317c41d3575\",\n      \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n      \"original_digest\": \"ea8086ec0a7cb78d490fb43ab36568d638cd03ec9fa9954d9b174658c77d319d\",\n      \"result\": \"approved\",\n      \"reason\": \"accord exact\",\n      \"at\": \"2026-10-16T06:30:27.427263176Z\"\n    }\n  ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/corrupt-chain-fixture-7b882f61",
+        "--json",
+        "trust",
+        "anchor"
+      ],
+      "input": null,
+      "actor": null,
+      "started_unix": 1792132227.493026,
+      "ended_unix": 1792132227.5552526,
+      "exit_code": 0,
+      "stdout": "{\n  \"schema_version\": 1,\n  \"sequence\": 3,\n  \"hash\": \"f919c48e4581e8fa95eae50f27560ef529032337536a6311ced788a5a0a169d8\",\n  \"signature\": \"60b0a74a6caea0978672c344e91cc4c8954ff56e169ccf69dac9d608e4f766e5\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/corrupt-chain-fixture-7b882f61",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "75a01271c84247dcb9b606af460e7255",
+        "export": {
+          "originals": {
+            "0cfbf022e8ecb0b78c2e2de759e4008bf386159fcc4b7ad0ec41f758ee99e86b": "eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICIyYmJmYWVkOTQyYTE0MmZhYWY2ZGEzMzBiMWI0YmU2ZiIsICJtYW5kYXRlX2lkIjogInJldmlldy1tYW5kYXRlIiwgInJlc291cmNlIjogImludm9pY2UvcmV2aWV3IiwgImFtb3VudF9taW5vciI6IDEwMCwgImN1cnJlbmN5IjogIkVVUiIsICJiZW5lZmljaWFyeSI6ICJBQ01FIiwgImlkZW1wb3RlbmN5X2tleSI6ICJyZXZpZXctZWZmZWN0In0=",
+            "3c47b75eb8e2151ed4f3946b95bd2b2946057a4ae6dc6b2bcf75c49f3e07d12c": "eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICJlNDEzMDM4MjI0MzU0MjFlOGM3ZmUxNzcwNTI1YzM4MSIsICJtYW5kYXRlX2lkIjogInJldmlldy1tYW5kYXRlIiwgInN1YmplY3QiOiAicmVxdWVzdGVyIiwgImFjdGlvbnMiOiBbInNldHRsZSJdLCAicmVzb3VyY2UiOiAiaW52b2ljZS9yZXZpZXciLCAibWF4X2Ftb3VudF9taW5vciI6IDEwMDAsICJjdXJyZW5jeSI6ICJFVVIiLCAiYmVuZWZpY2lhcnkiOiAiQUNNRSJ9",
+            "ea8086ec0a7cb78d490fb43ab36568d638cd03ec9fa9954d9b174658c77d319d": "eyJzY2hlbWFfdmVyc2lvbiI6IDEsICJldmVudF9pZCI6ICI2NWNlOTQ3MTI1M2E0YzNhOTkzZjIzN2JkMmZmMzZjOSIsICJhY3Rpb25faWQiOiAiYWN0LTVlMjM0MzEzZTMxN2M0MWQzNTc1IiwgIm1hbmRhdGVfaWQiOiAicmV2aWV3LW1hbmRhdGUiLCAiYW1vdW50X21pbm9yIjogMTAwLCAiY3VycmVuY3kiOiAiRVVSIiwgImJlbmVmaWNpYXJ5IjogIkFDTUUiLCAiY29udGVudF9kaWdlc3QiOiAiNWUyMzQzMTNlMzE3YzQxZDM1NzVlZmE1Y2ExNzA1YmJlYTQ3MTdkN2UyZmIxNGQ5NTc0ZTA0ODc5YTA0YzhiMyJ9"
+          },
+          "schema_version": 2,
+          "simulation": true,
+          "evidence": [
+            {
+              "identity_context": {
+                "schema_version": 1,
+                "configuration_revision": 1,
+                "principal_id": "admin",
+                "principal_kind": "local",
+                "issuer": "urn:swarm:local",
+                "subject": "admin",
+                "assurance": {
+                  "method": "local_bearer",
+                  "provider_authenticated_at": null
+                },
+                "attributes": {
+                  "roles": [
+                    "admin"
+                  ],
+                  "integrity": 3
+                },
+                "delegation_id": null,
+                "authenticated_at": "2026-10-16T06:30:27.304202576Z",
+                "expires_at": null,
+                "token_digest": "55b2aec689d04bc3e73990fa98790d26d601adb6aec19e9f41bc766455182713"
+              },
+              "sequence": 1,
+              "previous_hash": "",
+              "hash": "266bdd8a0f1133b849cd17749dfbe3ec6fd7ff41a2de80aa9a61e503aa8d3617",
+              "kind": "mandate-create",
+              "actor": "admin",
+              "integrity": 3,
+              "object_id": "review-mandate",
+              "content_digest": "64345d2aff3127c307388441ece691cea271e22faf971eace13a71bedaf35859",
+              "original_digest": "3c47b75eb8e2151ed4f3946b95bd2b2946057a4ae6dc6b2bcf75c49f3e07d12c",
+              "result": "admitted",
+              "reason": "independent fixture corruption - original hash deliberately unchanged",
+              "at": "2026-10-16T06:30:27.304202576Z"
+            },
+            {
+              "identity_context": {
+                "schema_version": 1,
+                "configuration_revision": 1,
+                "principal_id": "requester",
+                "principal_kind": "local",
+                "issuer": "urn:swarm:local",
+                "subject": "requester",
+                "assurance": {
+                  "method": "local_bearer",
+                  "provider_authenticated_at": null
+                },
+                "attributes": {
+                  "roles": [
+                    "requester"
+                  ],
+                  "integrity": 1
+                },
+                "delegation_id": "review-mandate",
+                "authenticated_at": "2026-10-16T06:30:27.364573727Z",
+                "expires_at": null,
+                "token_digest": "98ced5e93b061b6ce7d63931345a4558777f543390e6e032c0cb957600c6d085"
+              },
+              "sequence": 2,
+              "previous_hash": "266bdd8a0f1133b849cd17749dfbe3ec6fd7ff41a2de80aa9a61e503aa8d3617",
+              "hash": "5d60644f475021f2e8d34c7bd84b133ca9877d36ef95adcbbc4ecb26c9fb16ac",
+              "kind": "request",
+              "actor": "requester",
+              "integrity": 1,
+              "object_id": "act-5e234313e317c41d3575",
+              "content_digest": "5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3",
+              "original_digest": "0cfbf022e8ecb0b78c2e2de759e4008bf386159fcc4b7ad0ec41f758ee99e86b",
+              "result": "admitted",
+              "reason": "nouvel objet I2; original I1 conservé avec ses octets et son digest",
+              "at": "2026-10-16T06:30:27.364573727Z"
+            },
+            {
+              "identity_context": {
+                "schema_version": 1,
+                "configuration_revision": 1,
+                "principal_id": "approver",
+                "principal_kind": "local",
+                "issuer": "urn:swarm:local",
+                "subject": "approver",
+                "assurance": {
+                  "method": "local_bearer",
+                  "provider_authenticated_at": null
+                },
+                "attributes": {
+                  "roles": [
+                    "approver"
+                  ],
+                  "integrity": 2
+                },
+                "delegation_id": null,
+                "authenticated_at": "2026-10-16T06:30:27.427263176Z",
+                "expires_at": null,
+                "token_digest": "1d7df7f122ddb1791331bf1450e69b54e2bd9c004318cb182a367e2c27f106a7"
+              },
+              "sequence": 3,
+              "previous_hash": "5d60644f475021f2e8d34c7bd84b133ca9877d36ef95adcbbc4ecb26c9fb16ac",
+              "hash": "f919c48e4581e8fa95eae50f27560ef529032337536a6311ced788a5a0a169d8",
+              "kind": "approve",
+              "actor": "approver",
+              "integrity": 2,
+              "object_id": "act-5e234313e317c41d3575",
+              "content_digest": "5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3",
+              "original_digest": "ea8086ec0a7cb78d490fb43ab36568d638cd03ec9fa9954d9b174658c77d319d",
+              "result": "approved",
+              "reason": "accord exact",
+              "at": "2026-10-16T06:30:27.427263176Z"
+            }
+          ]
+        },
+        "anchor": {
+          "schema_version": 1,
+          "sequence": 3,
+          "hash": "f919c48e4581e8fa95eae50f27560ef529032337536a6311ced788a5a0a169d8",
+          "signature": "60b0a74a6caea0978672c344e91cc4c8954ff56e169ccf69dac9d608e4f766e5"
+        },
+        "verification_key": "53f7b028fc860eb009cfea6113bf59351452ddebfbca9e28d41c35bc04c81849"
+      },
+      "actor": null,
+      "started_unix": 1792132227.5556834,
+      "ended_unix": 1792132227.6129792,
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "{\n  \"error\": \"altération détectée à la séquence 1\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"altération détectée à la séquence 1\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n"
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/corrupt-chain-fixture-7b882f61",
+        "--json",
+        "trust",
+        "commit",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "c8bda7e2923046d0bb86939faaed798d",
+        "action_id": "act-5e234313e317c41d3575"
+      },
+      "actor": "effect",
+      "started_unix": 1792132227.6130621,
+      "ended_unix": 1792132227.672567,
+      "exit_code": 0,
+      "stdout": "{\n  \"id\": \"act-5e234313e317c41d3575\",\n  \"mandate_id\": \"review-mandate\",\n  \"requester\": \"requester\",\n  \"approver\": \"approver\",\n  \"resource\": \"invoice/review\",\n  \"amount_minor\": 100,\n  \"currency\": \"EUR\",\n  \"beneficiary\": \"ACME\",\n  \"idempotency_key\": \"review-effect\",\n  \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n  \"original_digest\": \"0cfbf022e8ecb0b78c2e2de759e4008bf386159fcc4b7ad0ec41f758ee99e86b\",\n  \"state\": \"committed\",\n  \"next_action\": \"consulter ou exporter les preuves\",\n  \"created_at\": \"2026-10-16T06:30:27.364573727Z\",\n  \"updated_at\": \"2026-10-16T06:30:27.665762777Z\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--root",
+        "/tmp/swarm-actions-independent-review-20261016-L50TtVBt/corrupt-chain-fixture-7b882f61",
+        "--json",
+        "trust",
+        "show"
+      ],
+      "input": null,
+      "actor": null,
+      "started_unix": 1792132227.672651,
+      "ended_unix": 1792132227.7331114,
+      "exit_code": 0,
+      "stdout": "{\n  \"access_ledger\": [],\n  \"actions\": {\n    \"act-5e234313e317c41d3575\": {\n      \"id\": \"act-5e234313e317c41d3575\",\n      \"mandate_id\": \"review-mandate\",\n      \"requester\": \"requester\",\n      \"approver\": \"approver\",\n      \"resource\": \"invoice/review\",\n      \"amount_minor\": 100,\n      \"currency\": \"EUR\",\n      \"beneficiary\": \"ACME\",\n      \"idempotency_key\": \"review-effect\",\n      \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n      \"original_digest\": \"0cfbf022e8ecb0b78c2e2de759e4008bf386159fcc4b7ad0ec41f758ee99e86b\",\n      \"state\": \"committed\",\n      \"next_action\": \"consulter ou exporter les preuves\",\n      \"created_at\": \"2026-10-16T06:30:27.364573727Z\",\n      \"updated_at\": \"2026-10-16T06:30:27.665762777Z\"\n    }\n  },\n  \"amount_minor_text\": {\n    \"act-5e234313e317c41d3575\": \"100\"\n  },\n  \"connector_catalog\": {\n    \"arbitrary_plugins\": false,\n    \"connectors\": [\n      {\n        \"external_effects\": false,\n        \"id\": \"local-ledger-simulation\",\n        \"idempotency\": true,\n        \"provider_containment\": false,\n        \"readback\": true,\n        \"secret_grants\": false,\n        \"simulation\": true,\n        \"version\": 1\n      },\n      {\n        \"external_effects\": false,\n        \"id\": \"local-access-simulation\",\n        \"idempotency\": true,\n        \"provider_containment\": false,\n        \"readback\": true,\n        \"secret_grants\": false,\n        \"simulation\": true,\n        \"version\": 1\n      }\n    ],\n    \"schema_version\": 1\n  },\n  \"data_capabilities\": {\n    \"classifications\": [\n      \"public\",\n      \"internal\"\n    ],\n    \"destination\": \"local-ledger\",\n    \"external_containment_verified\": false,\n    \"local_paths\": [\n      {\n        \"destination\": \"local-access-state\",\n        \"provider\": \"swarm\",\n        \"tool\": \"simulated-access-grant\"\n      },\n      {\n        \"destination\": \"local-ledger\",\n        \"provider\": \"swarm\",\n        \"tool\": \"simulated-settlement\"\n      },\n      {\n        \"destination\": \"local-process-state\",\n        \"provider\": \"swarm\",\n        \"tool\": \"process-workflow\"\n      }\n    ],\n    \"provider\": \"swarm\",\n    \"secret_delivery\": {\n      \"classification\": \"restricted\",\n      \"destination\": \"local-attestation\",\n      \"provider\": \"swarm\",\n      \"scope\": \"fixed_helper_only\",\n      \"tool\": \"sealed-attestation\"\n    },\n    \"secret_grants_supported\": false,\n    \"tool\": \"simulated-settlement\"\n  },\n  \"data_policy\": {\n    \"resources\": [],\n    \"enabled\": false,\n    \"classifications\": [],\n    \"destinations\": [],\n    \"providers\": [],\n    \"tools\": []\n  },\n  \"delegation\": {\n    \"max_depth\": 0\n  },\n  \"effect_receipts\": {\n    \"review-effect\": {\n      \"intent\": {\n        \"schema_version\": 1,\n        \"intent_id\": \"intent-5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n        \"action_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n        \"mandate_digest\": \"64345d2aff3127c307388441ece691cea271e22faf971eace13a71bedaf35859\",\n        \"approval_digests\": [\n          \"f919c48e4581e8fa95eae50f27560ef529032337536a6311ced788a5a0a169d8\"\n        ],\n        \"connector_id\": \"local-ledger-simulation\",\n        \"connector_version\": 1,\n        \"resource\": \"invoice/review\",\n        \"canonical_parameters\": {\n          \"amount_minor\": 100,\n          \"currency\": \"EUR\",\n          \"beneficiary\": \"ACME\"\n        },\n        \"idempotency_key\": \"review-effect\",\n        \"deadline\": \"2026-10-16T07:30:27Z\"\n      },\n      \"result\": {\n        \"schema_version\": 1,\n        \"intent_id\": \"intent-5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n        \"connector_receipt\": \"receipt-29a950938c0d9ef1a6a37398f94e53ce9acaecf86b06cc3b84f98a5aa9cec0d6\",\n        \"state\": \"committed\",\n        \"committed_at\": \"2026-10-16T06:30:27.665762777Z\",\n        \"observed_at\": \"2026-10-16T06:30:27.665762777Z\",\n        \"result_digest\": \"8b691fc8731a4a169921fcd1a2d0fa9e5393dff90baac0d27521fcfac770fefe\",\n        \"reconciliation_required\": false,\n        \"diagnostic_code\": \"\"\n      },\n      \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n      \"action_id\": \"act-5e234313e317c41d3575\",\n      \"state\": \"committed\"\n    }\n  },\n  \"evidence_count\": 4,\n  \"evidence_signing\": {\n    \"enabled\": false,\n    \"key_ttl_seconds\": 86400\n  },\n  \"group_mapping\": {\n    \"enabled\": false,\n    \"claim\": \"groups\",\n    \"rules\": []\n  },\n  \"identities\": [\n    {\n      \"disabled\": false,\n      \"integrity\": 3,\n      \"roles\": [\n        \"admin\"\n      ],\n      \"subject\": \"admin\"\n    },\n    {\n      \"disabled\": false,\n      \"integrity\": 2,\n      \"roles\": [\n        \"approver\"\n      ],\n      \"subject\": \"approver\"\n    },\n    {\n      \"disabled\": false,\n      \"integrity\": 2,\n      \"roles\": [\n        \"effect\"\n      ],\n      \"subject\": \"effect\"\n    },\n    {\n      \"disabled\": false,\n      \"integrity\": 1,\n      \"roles\": [\n        \"requester\"\n      ],\n      \"subject\": \"requester\"\n    }\n  ],\n  \"kernel_check\": {\n    \"enabled\": false,\n    \"timeout_seconds\": 15,\n    \"ring_bytes\": 65536\n  },\n  \"kernel_observation\": {\n    \"enabled\": false,\n    \"window_seconds\": 5,\n    \"timeout_seconds\": 15,\n    \"ring_bytes\": 65536,\n    \"max_events\": 128\n  },\n  \"laboratory\": {\n    \"enabled\": false,\n    \"timeout_seconds\": 30,\n    \"max_concurrent_runs\": 1\n  },\n  \"ledger\": [\n    {\n      \"sequence\": 1,\n      \"action_id\": \"act-5e234313e317c41d3575\",\n      \"content_digest\": \"5e234313e317c41d3575efa5ca1705bbea4717d7e2fb14d9574e04879a04c8b3\",\n      \"idempotency_key\": \"review-effect\",\n      \"amount_minor\": 100,\n      \"currency\": \"EUR\",\n      \"beneficiary\": \"ACME\",\n      \"resource\": \"invoice/review\",\n      \"committed_at\": \"2026-10-16T06:30:27.665762777Z\",\n      \"simulation\": true\n    }\n  ],\n  \"limits\": [\n    \"aucun paiement réel\",\n    \"jetons du pilote local\",\n    \"preuve locale non ancrée par un tiers\"\n  ],\n  \"mandate_amount_minor_text\": {\n    \"review-mandate\": \"1000\"\n  },\n  \"mandate_status\": {\n    \"review-mandate\": \"\"\n  },\n  \"mandates\": {\n    \"review-mandate\": {\n      \"id\": \"review-mandate\",\n      \"subject\": \"requester\",\n      \"delegator\": \"admin\",\n      \"actions\": [\n        \"settle\"\n      ],\n      \"resource\": \"invoice/review\",\n      \"max_amount_minor\": 1000,\n      \"currency\": \"EUR\",\n      \"beneficiary\": \"ACME\",\n      \"version\": 1,\n      \"policy_revision\": 1,\n      \"integrity\": 2,\n      \"starts_at\": \"2026-10-16T06:30:27Z\",\n      \"expires_at\": \"2026-10-16T07:30:27Z\",\n      \"content_digest\": \"64345d2aff3127c307388441ece691cea271e22faf971eace13a71bedaf35859\",\n      \"original_digest\": \"3c47b75eb8e2151ed4f3946b95bd2b2946057a4ae6dc6b2bcf75c49f3e07d12c\"\n    }\n  },\n  \"oidc\": null,\n  \"oidc_defaults\": {\n    \"enabled\": false,\n    \"issuer\": \"\",\n    \"client_id\": \"\",\n    \"redirect_uri\": \"\",\n    \"request_timeout_seconds\": 15,\n    \"login_ttl_seconds\": 300,\n    \"session_ttl_seconds\": 900,\n    \"mappings\": []\n  },\n  \"oidc_logout\": {\n    \"enabled\": false,\n    \"max_age_seconds\": 300,\n    \"replay_retention_seconds\": 600\n  },\n  \"oidc_logout_replay_records\": 0,\n  \"originals_missing\": 0,\n  \"policy\": {\n    \"mandate_ttl_seconds\": 3600,\n    \"unknown_reconcile_seconds\": 0,\n    \"evidence_retention_days\": 365,\n    \"require_separation\": true\n  },\n  \"policy_bounds\": {\n    \"evidence_key_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"evidence_registry_revision\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"evidence_retention_days\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"evidence_verify_bytes\": {\n      \"max\": 16777216,\n      \"min\": 1\n    },\n    \"introspection_max_sessions\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"introspection_max_token_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"introspection_response_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"introspection_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"introspection_validation_window_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"kernel_check_ring_bytes\": {\n      \"max\": 2147483648,\n      \"min\": 4096\n    },\n    \"kernel_check_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"kernel_observation_max_events\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"kernel_observation_ring_bytes\": {\n      \"max\": 2147483648,\n      \"min\": 4096\n    },\n    \"kernel_observation_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"kernel_observation_window_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"laboratory_max_concurrent_runs\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"laboratory_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"mandate_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"max_delegation_depth\": {\n      \"max\": 9007199254740991,\n      \"min\": 0\n    },\n    \"oidc_logout_max_age_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"oidc_logout_replay_retention_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"process_command_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"process_state_bytes\": {\n      \"max\": 8388608,\n      \"min\": 1\n    },\n    \"process_version\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"sealed_execution_timeout_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"secret_broker_grant_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"secret_broker_material_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"secret_broker_max_entries\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"secret_broker_max_material_bytes\": {\n      \"max\": 1048576,\n      \"min\": 1\n    },\n    \"step_up_max_age_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"step_up_proof_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 1\n    },\n    \"unknown_reconcile_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    }\n  },\n  \"process_policy\": {\n    \"enabled\": false\n  },\n  \"revision\": 1,\n  \"schema_version\": 1,\n  \"sealed_execution\": {\n    \"enabled\": false,\n    \"timeout_seconds\": 15\n  },\n  \"secret_broker\": {\n    \"enabled\": false,\n    \"material_ttl_seconds\": 300,\n    \"grant_ttl_seconds\": 60,\n    \"max_material_bytes\": 4096,\n    \"max_entries\": 16\n  },\n  \"secret_grants\": null,\n  \"simulation\": true,\n  \"step_up\": {\n    \"enabled\": false,\n    \"operations\": [\n      \"approve\"\n    ],\n    \"acr_values\": [],\n    \"max_age_seconds\": 0,\n    \"proof_ttl_seconds\": 300\n  },\n  \"workload_defaults\": {\n    \"enabled\": false,\n    \"issuer\": \"\",\n    \"audience\": \"\",\n    \"request_timeout_seconds\": 15,\n    \"assertion_ttl_seconds\": 300,\n    \"session_ttl_seconds\": 900,\n    \"clients\": []\n  },\n  \"workload_introspection\": {\n    \"enabled\": false,\n    \"endpoint\": \"\",\n    \"client_id\": \"\",\n    \"timeout_seconds\": 15,\n    \"validation_window_seconds\": 5,\n    \"max_sessions\": 64,\n    \"max_token_bytes\": 16384\n  },\n  \"workload_introspection_status\": {\n    \"persistent_tokens\": false,\n    \"prepared\": false,\n    \"retained_sessions\": 0,\n    \"retained_token_bytes\": 0\n  },\n  \"workloads\": null\n}\n",
+      "stderr": ""
+    }
+  ]
+}

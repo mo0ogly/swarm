@@ -1,0 +1,13 @@
+{
+  "error": "command_not_ported: planning-enable-repository-unported",
+  "failure": {
+    "causes": [
+      "command_not_ported",
+      "command_not_ported"
+    ],
+    "code": "command_not_ported",
+    "message": "command_not_ported: planning-enable-repository-unported",
+    "retryable": false
+  },
+  "schema_version": 1
+}

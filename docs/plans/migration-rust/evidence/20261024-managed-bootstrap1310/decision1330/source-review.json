@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "reviewer": "Root exact-source self review, not independent acceptance",
+  "baseline_sha256": "aaea1341339a1cf3671a6fefc5494592953bc34c770547f5536c1821f711f5ba",
+  "current_sha256": "2b7023a1a93399c4e31bdf2d58b67f2416a0912e1ef8c11f82a550d625bb2ede",
+  "files": {
+    "rust/crates/swarm-engine/src/lib.rs": {
+      "sha256": "367ed61d19dae19e2432203200b24233e1993b0eba1ba84b27643934dd420974",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/local_storage.rs": {
+      "sha256": "feab7caffa6dafc520061b2086c211dbaf747919437b0832fff191127c7d9400",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/managed_repository.rs": {
+      "sha256": "e9b49435c247d2ff66a2d53a8ca3b6ebd853d907f24a08768acb54d9dc399b55",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/work_engine.rs": {
+      "sha256": "6509c42c447935e5eb58615a6935b7dbb0d871277ccc6af53efe20214ce35068",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        }
+      }
+    },
+    "version_history.json": {
+      "sha256": "de1c165d8b8e2d5edb7329a010fd8d7dc2cb3526b79dd453481fb39602db5fa1",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and consumers reviewed; scope/retained failures/tested limits in file-specific notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/decision1330/review-notes.md",
+              "sha256": "ba283c68772c9a92fa82d667f684c4aeef0f5df37b8981c046bc9e00a3a3deab"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

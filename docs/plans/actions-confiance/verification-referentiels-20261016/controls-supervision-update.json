@@ -1,0 +1,9 @@
+{
+  "automation_id": "superviser-swarm-actions-de-confiance",
+  "status": "ACTIVE",
+  "at": "2026-10-16T02:06:29.491170+00:00",
+  "result": "R19 locally verified",
+  "next": "R20 collector preparation; BPF_MAP_CREATE EPERM remains explicit; then global qualification and RETEX",
+  "privilege_escalation_authorized": false,
+  "notification_policy": "meaningful changes only; quiet while unchanged/non-actionable"
+}

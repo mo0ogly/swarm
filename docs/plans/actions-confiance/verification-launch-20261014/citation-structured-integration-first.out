@@ -1,0 +1,16 @@
+=== RUN   TestStructuredCitationContractRequiresOriginalReferences
+--- PASS: TestStructuredCitationContractRequiresOriginalReferences (0.57s)
+=== RUN   TestReferencedCitationFinalContractMaterializesNativeFailureForms
+=== RUN   TestReferencedCitationFinalContractMaterializesNativeFailureForms/715b8e9984fe
+=== RUN   TestReferencedCitationFinalContractMaterializesNativeFailureForms/8a87bd5e73d5
+=== RUN   TestReferencedCitationFinalContractMaterializesNativeFailureForms/a95c0e9944d0
+--- PASS: TestReferencedCitationFinalContractMaterializesNativeFailureForms (1.18s)
+    --- PASS: TestReferencedCitationFinalContractMaterializesNativeFailureForms/715b8e9984fe (0.43s)
+    --- PASS: TestReferencedCitationFinalContractMaterializesNativeFailureForms/8a87bd5e73d5 (0.35s)
+    --- PASS: TestReferencedCitationFinalContractMaterializesNativeFailureForms/a95c0e9944d0 (0.40s)
+=== RUN   TestReferencedCitationSingleAndBatchContracts
+--- PASS: TestReferencedCitationSingleAndBatchContracts (0.06s)
+=== RUN   TestReferencedCitationWireBoundPrecedesMaterialization
+--- PASS: TestReferencedCitationWireBoundPrecedesMaterialization (0.06s)
+PASS
+ok  	swarm.local/companion/internal/engine	1.893s

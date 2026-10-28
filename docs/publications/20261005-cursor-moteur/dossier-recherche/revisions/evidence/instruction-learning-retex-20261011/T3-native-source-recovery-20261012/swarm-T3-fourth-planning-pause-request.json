@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "T3-fourth-owned-planning-pause-eb2e72e37aac4a3b94b33776fa7488d8",
+  "expected_revision": 748,
+  "scope": "root",
+  "reason": "Replan sur arrêt de trois erreurs consécutives : import129 et patch cumulatif vérifiés contre baseT1 ; prévoir dépôt temporaire propre, commande Python et mesure du contrôle attendue. Préserver les trois tentatives et le rapport produit."
+}

@@ -1,0 +1,25 @@
+{
+  "command": [
+    "go",
+    "build",
+    "-o",
+    "/tmp/swarm-identity-bootstrap-03d-fixture-04",
+    "./cmd/swarm"
+  ],
+  "exit": 0,
+  "start": "2026-10-17T16:31:08.080915+00:00",
+  "end": "2026-10-17T16:31:20.225428+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 848,
+  "overlay": null
+}

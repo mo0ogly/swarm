@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "npm",
+    "run",
+    "test:i18n"
+  ],
+  "started_at_utc": "2026-10-16T18:21:24.270446+00:00",
+  "duration_seconds": 5.606,
+  "exit_code": 0,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "23d0852b273fc311a94c30acddc4f7e897ac4e8f2782cabdb417754737419987",
+  "real_model_calls": 0
+}

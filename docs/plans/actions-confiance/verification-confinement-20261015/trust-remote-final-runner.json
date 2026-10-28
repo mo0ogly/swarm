@@ -1,0 +1,10 @@
+{
+  "pid": 1636937,
+  "proc_start_ticks": "3312308",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-trust-remote-final-check.py",
+    "run"
+  ],
+  "at": "2026-10-15T21:11:38.934028+00:00"
+}

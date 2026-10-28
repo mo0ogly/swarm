@@ -1,0 +1,7 @@
+   Compiling swarm-cli v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-cli)
+    Finished `test` profile [unoptimized] target(s) in 4.90s
+     Running unittests src/lib.rs (.cache/rust-native-version846-target/debug/deps/swarm_cli-60701b2d7ea7bfad)
+
+thread 'mission_watch::tests::watch_listener_panic_must_wake_owned_role' (3330550) panicked at crates/swarm-cli/src/mission_watch.rs:1493:52:
+Box<dyn Any>
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

@@ -1,0 +1,954 @@
+{
+  "serial": {
+    "work": "w-6ec6f9ecb0fb24c96fd9924b",
+    "slots": 1,
+    "tasks": 4,
+    "baseline_tree": "6fba7fca3663d5ca76cbc4ccda1a92e2ceb90254",
+    "binary_sha256": "eeead1e1624ee11b6667a17fa03455c260fd99df907d7be0c0f16cc07625bfa5",
+    "provider_config_sha256": "c1ece2c9adfc37424dcf26a5d73cd476fcb8110e28510cd052c5ba8551cc698c",
+    "model_policy": {
+      "version": 1,
+      "billing": "external",
+      "work_level": "standard",
+      "page_level": "simple",
+      "levels": {
+        "exigeant": {
+          "model": "gpt-6-astra",
+          "effort": "high"
+        },
+        "simple": {
+          "model": "gpt-5.6-luna",
+          "effort": "low"
+        },
+        "standard": {
+          "model": "gpt-5.6-sol",
+          "effort": "medium"
+        }
+      }
+    },
+    "mission_start_to_judge_seconds": 352.43423,
+    "recipe_elapsed_seconds": 356.61139211400223,
+    "observed_peak_workers": 1,
+    "stages": [
+      {
+        "task": "module_4",
+        "agent": "auto-394bcbcbcc8d96396b88",
+        "attempt": "a-72dacb4691e2ac84ba0dc275",
+        "process_seconds": 67.152262,
+        "post_process_before_control_seconds": 0.517759,
+        "review_seconds": 10.629602,
+        "post_review_to_publication_seconds": 0.39065,
+        "tools": 12,
+        "review_id": "review-4d561700dfeded278754f0f2"
+      },
+      {
+        "task": "module_3",
+        "agent": "auto-0d8c83b755f28822a429",
+        "attempt": "a-8918419ac896c1d5ec66fcda",
+        "process_seconds": 59.906976,
+        "post_process_before_control_seconds": 0.388004,
+        "review_seconds": 12.884543,
+        "post_review_to_publication_seconds": 0.292399,
+        "tools": 13,
+        "review_id": "review-a3f0d811102314fe76e96391"
+      },
+      {
+        "task": "module_2",
+        "agent": "auto-58145296598a3c7ad406",
+        "attempt": "a-e43f10ac7f479f041664ceff",
+        "process_seconds": 93.002026,
+        "post_process_before_control_seconds": 0.44904,
+        "review_seconds": 12.480922,
+        "post_review_to_publication_seconds": 0.228255,
+        "tools": 10,
+        "review_id": "review-e6bbb49f93e3b255e6675a82"
+      },
+      {
+        "task": "module_1",
+        "agent": "auto-da1ca5acd19268ba7184",
+        "attempt": "a-cd3bf1fd960a80ed48339e34",
+        "process_seconds": 101.264986,
+        "post_process_before_control_seconds": 0.314662,
+        "review_seconds": 10.711286,
+        "post_review_to_publication_seconds": 0.095686,
+        "tools": 15,
+        "review_id": "review-fb52060e8b535979d4583d82"
+      }
+    ],
+    "control_executions": 10,
+    "control_seconds": 0.508903,
+    "review_executions": 4,
+    "review_seconds": 46.706353,
+    "multi_worker_tool_progress_windows": [],
+    "window_poll_seconds": 2.0,
+    "rows": [
+      {
+        "kind": "planner",
+        "id": "root",
+        "label": "Responsable : root",
+        "recorded_calls": 5,
+        "observed_tool_calls": 0,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 93954,
+        "output_tokens": 1861,
+        "calls_without_usage": 1,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 5
+        },
+        "reviews_recorded": 0,
+        "task_retries": 0,
+        "recorded_process_ms": null,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "reviewer",
+        "id": "reviewer",
+        "label": "V\u00e9rificateur ind\u00e9pendant",
+        "recorded_calls": 4,
+        "observed_tool_calls": 0,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 97299,
+        "output_tokens": 1495,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 4
+        },
+        "reviews_recorded": 0,
+        "task_retries": 0,
+        "recorded_process_ms": null,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "worker",
+        "id": "module_1",
+        "label": "Implement module_1.py",
+        "recorded_calls": 1,
+        "observed_tool_calls": 15,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 331520,
+        "output_tokens": 6448,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "reviews_recorded": 1,
+        "task_retries": 0,
+        "recorded_process_ms": 101264,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "worker",
+        "id": "module_2",
+        "label": "Implement module_2.py",
+        "recorded_calls": 1,
+        "observed_tool_calls": 10,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 322532,
+        "output_tokens": 6047,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "reviews_recorded": 1,
+        "task_retries": 0,
+        "recorded_process_ms": 93002,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "worker",
+        "id": "module_3",
+        "label": "Implement module_3.py",
+        "recorded_calls": 1,
+        "observed_tool_calls": 13,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 346963,
+        "output_tokens": 7400,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "reviews_recorded": 1,
+        "task_retries": 0,
+        "recorded_process_ms": 59906,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "worker",
+        "id": "module_4",
+        "label": "Implement module_4.py",
+        "recorded_calls": 1,
+        "observed_tool_calls": 12,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 382191,
+        "output_tokens": 6717,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "reviews_recorded": 1,
+        "task_retries": 0,
+        "recorded_process_ms": 67152,
+        "attempts_without_duration": 0
+      }
+    ],
+    "calls": [
+      {
+        "id": "planning/08c97c83f1a04fb3b4669b723d6c0fc7",
+        "record_type": "planning_reservation",
+        "kind": "planner",
+        "role": "planner",
+        "scope": "root",
+        "state": "estimated",
+        "registered_at": "2026-10-13T20:00:40.815064526Z",
+        "usage": null
+      },
+      {
+        "id": "agent/auto-da1ca5acd19268ba7184",
+        "record_type": "producer_attempt",
+        "kind": "worker",
+        "role": "worker",
+        "scope": "root",
+        "task": "module_1",
+        "attempt": "a-cd3bf1fd960a80ed48339e34",
+        "provider": "codex",
+        "requested_model": "gpt-5.6-sol",
+        "state": "completed",
+        "registered_at": "2026-10-13T20:01:46.963052475Z",
+        "usage": {
+          "cached_input_tokens": 302848,
+          "input_tokens": 331520,
+          "output_tokens": 6448,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:03:26.900620523Z"
+        }
+      },
+      {
+        "id": "planning/review-fb52060e8b535979d4583d82",
+        "record_type": "planning_reservation",
+        "kind": "reviewer",
+        "role": "reviewer",
+        "scope": "reviewer",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:03:28.789726451Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 19114,
+          "output_tokens": 222,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:03:38.849765469Z"
+        }
+      },
+      {
+        "id": "agent/auto-58145296598a3c7ad406",
+        "record_type": "producer_attempt",
+        "kind": "worker",
+        "role": "worker",
+        "scope": "root",
+        "task": "module_2",
+        "attempt": "a-e43f10ac7f479f041664ceff",
+        "provider": "codex",
+        "requested_model": "gpt-5.6-sol",
+        "state": "completed",
+        "registered_at": "2026-10-13T20:03:30.897554067Z",
+        "usage": {
+          "cached_input_tokens": 299520,
+          "input_tokens": 322532,
+          "output_tokens": 6047,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:05:02.47136478Z"
+        }
+      },
+      {
+        "id": "planning/planning-claim-6c9ad5c7d608fe9ded56fa0d",
+        "record_type": "planning_reservation",
+        "kind": "planner",
+        "role": "planner",
+        "scope": "root",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:03:41.005253317Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 23274,
+          "output_tokens": 427,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:03:51.552037148Z"
+        }
+      },
+      {
+        "id": "planning/review-e6bbb49f93e3b255e6675a82",
+        "record_type": "planning_reservation",
+        "kind": "reviewer",
+        "role": "reviewer",
+        "scope": "reviewer",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:05:04.798543032Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 22652,
+          "output_tokens": 372,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:05:16.670001576Z"
+        }
+      },
+      {
+        "id": "agent/auto-0d8c83b755f28822a429",
+        "record_type": "producer_attempt",
+        "kind": "worker",
+        "role": "worker",
+        "scope": "root",
+        "task": "module_3",
+        "attempt": "a-8918419ac896c1d5ec66fcda",
+        "provider": "codex",
+        "requested_model": "gpt-5.6-sol",
+        "state": "completed",
+        "registered_at": "2026-10-13T20:05:06.898517015Z",
+        "usage": {
+          "cached_input_tokens": 323328,
+          "input_tokens": 346963,
+          "output_tokens": 7400,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:06:05.062684245Z"
+        }
+      },
+      {
+        "id": "planning/planning-claim-778d39da93eb108b268f6c3e",
+        "record_type": "planning_reservation",
+        "kind": "planner",
+        "role": "planner",
+        "scope": "root",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:05:19.008460791Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 23342,
+          "output_tokens": 555,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:05:31.789356569Z"
+        }
+      },
+      {
+        "id": "planning/review-a3f0d811102314fe76e96391",
+        "record_type": "planning_reservation",
+        "kind": "reviewer",
+        "role": "reviewer",
+        "scope": "reviewer",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:06:07.670085779Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 25382,
+          "output_tokens": 477,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:06:19.972221995Z"
+        }
+      },
+      {
+        "id": "agent/auto-394bcbcbcc8d96396b88",
+        "record_type": "producer_attempt",
+        "kind": "worker",
+        "role": "worker",
+        "scope": "root",
+        "task": "module_4",
+        "attempt": "a-72dacb4691e2ac84ba0dc275",
+        "provider": "codex",
+        "requested_model": "gpt-5.6-sol",
+        "state": "completed",
+        "registered_at": "2026-10-13T20:06:08.90246746Z",
+        "usage": {
+          "cached_input_tokens": 358528,
+          "input_tokens": 382191,
+          "output_tokens": 6717,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:07:14.574135203Z"
+        }
+      },
+      {
+        "id": "planning/planning-claim-fbe3f94a165c3e3a4d1de367",
+        "record_type": "planning_reservation",
+        "kind": "planner",
+        "role": "planner",
+        "scope": "root",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:06:21.261903245Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 23494,
+          "output_tokens": 517,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:06:33.57132924Z"
+        }
+      },
+      {
+        "id": "planning/review-4d561700dfeded278754f0f2",
+        "record_type": "planning_reservation",
+        "kind": "reviewer",
+        "role": "reviewer",
+        "scope": "reviewer",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:07:17.241665907Z",
+        "usage": {
+          "cached_input_tokens": 8960,
+          "input_tokens": 30151,
+          "output_tokens": 424,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:07:27.246093134Z"
+        }
+      },
+      {
+        "id": "planning/planning-claim-e87f8ae1a2dec6d4f7cc6f87",
+        "record_type": "planning_reservation",
+        "kind": "planner",
+        "role": "planner",
+        "scope": "root",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:07:29.078205219Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 23844,
+          "output_tokens": 362,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:07:38.382328058Z"
+        }
+      }
+    ],
+    "operator_interventions_after_start": 0,
+    "limits": "Process intervals are not model inference time. Pre-control interval includes queue/preparation; publication tail includes validation. Reservation count includes manual setup claim. Missing billed cost remains unknown. Polling pause is nominal; intervals include CLI duration and common progress windows do not prove simultaneous inference. One observation per level, not p95 or endurance."
+  },
+  "parallel": {
+    "work": "w-4cac57c1bf86383814aa3c50",
+    "slots": 4,
+    "tasks": 4,
+    "baseline_tree": "6fba7fca3663d5ca76cbc4ccda1a92e2ceb90254",
+    "binary_sha256": "eeead1e1624ee11b6667a17fa03455c260fd99df907d7be0c0f16cc07625bfa5",
+    "provider_config_sha256": "c1ece2c9adfc37424dcf26a5d73cd476fcb8110e28510cd052c5ba8551cc698c",
+    "model_policy": {
+      "version": 1,
+      "billing": "external",
+      "work_level": "standard",
+      "page_level": "simple",
+      "levels": {
+        "exigeant": {
+          "model": "gpt-6-astra",
+          "effort": "high"
+        },
+        "simple": {
+          "model": "gpt-5.6-luna",
+          "effort": "low"
+        },
+        "standard": {
+          "model": "gpt-5.6-sol",
+          "effort": "medium"
+        }
+      }
+    },
+    "mission_start_to_judge_seconds": 131.814878,
+    "recipe_elapsed_seconds": 134.76036120299977,
+    "observed_peak_workers": 4,
+    "stages": [
+      {
+        "task": "module_4",
+        "agent": "auto-e17a664d777afe04ecc6",
+        "attempt": "a-bcded1cb6d6ac4075533c7e4",
+        "process_seconds": 60.209169,
+        "post_process_before_control_seconds": 0.384565,
+        "review_seconds": 10.452211,
+        "post_review_to_publication_seconds": 0.17964,
+        "tools": 11,
+        "review_id": "review-6fb0af73d45190fa98cc0960"
+      },
+      {
+        "task": "module_3",
+        "agent": "auto-0e88fcc9295f3c527613",
+        "attempt": "a-3c8e32e04a633e8527b266cc",
+        "process_seconds": 62.7521,
+        "post_process_before_control_seconds": 24.410011,
+        "review_seconds": 10.031994,
+        "post_review_to_publication_seconds": 0.466105,
+        "tools": 12,
+        "review_id": "review-68f064ea8f6fd5ab02a79d0c"
+      },
+      {
+        "task": "module_2",
+        "agent": "auto-247db341da1df1d0cb98",
+        "attempt": "a-225b08e8d7e700b106f83b33",
+        "process_seconds": 61.567066,
+        "post_process_before_control_seconds": 12.063365,
+        "review_seconds": 12.184015,
+        "post_review_to_publication_seconds": 0.275413,
+        "tools": 12,
+        "review_id": "review-9549d5c830361e136462405f"
+      },
+      {
+        "task": "module_1",
+        "agent": "auto-c16517a3450449075b70",
+        "attempt": "a-392902a0641faf239ebc152e",
+        "process_seconds": 51.715666,
+        "post_process_before_control_seconds": 0.581581,
+        "review_seconds": 7.324992,
+        "post_review_to_publication_seconds": 0.195231,
+        "tools": 10,
+        "review_id": "review-17ab6c4e52b51f8273b7d426"
+      }
+    ],
+    "control_executions": 10,
+    "control_seconds": 0.385062,
+    "review_executions": 4,
+    "review_seconds": 39.993212,
+    "multi_worker_tool_progress_windows": [
+      {
+        "at": "2026-10-13T20:08:02.445360+00:00",
+        "agents": [
+          "auto-e17a664d777afe04ecc6",
+          "auto-0e88fcc9295f3c527613",
+          "auto-c16517a3450449075b70"
+        ]
+      },
+      {
+        "at": "2026-10-13T20:08:04.621089+00:00",
+        "agents": [
+          "auto-0e88fcc9295f3c527613",
+          "auto-247db341da1df1d0cb98",
+          "auto-c16517a3450449075b70"
+        ]
+      },
+      {
+        "at": "2026-10-13T20:08:09.025229+00:00",
+        "agents": [
+          "auto-0e88fcc9295f3c527613",
+          "auto-c16517a3450449075b70"
+        ]
+      },
+      {
+        "at": "2026-10-13T20:08:13.408488+00:00",
+        "agents": [
+          "auto-e17a664d777afe04ecc6",
+          "auto-0e88fcc9295f3c527613",
+          "auto-247db341da1df1d0cb98",
+          "auto-c16517a3450449075b70"
+        ]
+      },
+      {
+        "at": "2026-10-13T20:08:17.751513+00:00",
+        "agents": [
+          "auto-0e88fcc9295f3c527613",
+          "auto-c16517a3450449075b70"
+        ]
+      },
+      {
+        "at": "2026-10-13T20:08:19.887442+00:00",
+        "agents": [
+          "auto-e17a664d777afe04ecc6",
+          "auto-0e88fcc9295f3c527613",
+          "auto-c16517a3450449075b70"
+        ]
+      },
+      {
+        "at": "2026-10-13T20:08:22.049536+00:00",
+        "agents": [
+          "auto-0e88fcc9295f3c527613",
+          "auto-247db341da1df1d0cb98"
+        ]
+      },
+      {
+        "at": "2026-10-13T20:08:24.262549+00:00",
+        "agents": [
+          "auto-e17a664d777afe04ecc6",
+          "auto-c16517a3450449075b70"
+        ]
+      },
+      {
+        "at": "2026-10-13T20:08:29.096457+00:00",
+        "agents": [
+          "auto-e17a664d777afe04ecc6",
+          "auto-247db341da1df1d0cb98",
+          "auto-c16517a3450449075b70"
+        ]
+      },
+      {
+        "at": "2026-10-13T20:08:37.895328+00:00",
+        "agents": [
+          "auto-e17a664d777afe04ecc6",
+          "auto-c16517a3450449075b70"
+        ]
+      },
+      {
+        "at": "2026-10-13T20:08:42.499580+00:00",
+        "agents": [
+          "auto-e17a664d777afe04ecc6",
+          "auto-247db341da1df1d0cb98",
+          "auto-c16517a3450449075b70"
+        ]
+      },
+      {
+        "at": "2026-10-13T20:08:44.802341+00:00",
+        "agents": [
+          "auto-0e88fcc9295f3c527613",
+          "auto-247db341da1df1d0cb98"
+        ]
+      },
+      {
+        "at": "2026-10-13T20:08:49.323780+00:00",
+        "agents": [
+          "auto-e17a664d777afe04ecc6",
+          "auto-0e88fcc9295f3c527613",
+          "auto-247db341da1df1d0cb98"
+        ]
+      },
+      {
+        "at": "2026-10-13T20:08:51.520183+00:00",
+        "agents": [
+          "auto-e17a664d777afe04ecc6",
+          "auto-247db341da1df1d0cb98"
+        ]
+      }
+    ],
+    "window_poll_seconds": 2.0,
+    "rows": [
+      {
+        "kind": "planner",
+        "id": "root",
+        "label": "Responsable : root",
+        "recorded_calls": 3,
+        "observed_tool_calls": 0,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 51494,
+        "output_tokens": 1280,
+        "calls_without_usage": 1,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 3
+        },
+        "reviews_recorded": 0,
+        "task_retries": 0,
+        "recorded_process_ms": null,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "reviewer",
+        "id": "reviewer",
+        "label": "V\u00e9rificateur ind\u00e9pendant",
+        "recorded_calls": 4,
+        "observed_tool_calls": 0,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 93904,
+        "output_tokens": 1422,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 4
+        },
+        "reviews_recorded": 0,
+        "task_retries": 0,
+        "recorded_process_ms": null,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "worker",
+        "id": "module_1",
+        "label": "Implement module_1.py",
+        "recorded_calls": 1,
+        "observed_tool_calls": 10,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 316580,
+        "output_tokens": 5637,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "reviews_recorded": 1,
+        "task_retries": 0,
+        "recorded_process_ms": 51715,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "worker",
+        "id": "module_2",
+        "label": "Implement module_2.py",
+        "recorded_calls": 1,
+        "observed_tool_calls": 12,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 357929,
+        "output_tokens": 7033,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "reviews_recorded": 1,
+        "task_retries": 0,
+        "recorded_process_ms": 61567,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "worker",
+        "id": "module_3",
+        "label": "Implement module_3.py",
+        "recorded_calls": 1,
+        "observed_tool_calls": 12,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 384117,
+        "output_tokens": 6734,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "reviews_recorded": 1,
+        "task_retries": 0,
+        "recorded_process_ms": 62752,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "worker",
+        "id": "module_4",
+        "label": "Implement module_4.py",
+        "recorded_calls": 1,
+        "observed_tool_calls": 11,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 358146,
+        "output_tokens": 6754,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "reviews_recorded": 1,
+        "task_retries": 0,
+        "recorded_process_ms": 60209,
+        "attempts_without_duration": 0
+      }
+    ],
+    "calls": [
+      {
+        "id": "planning/4cba16ad21e7499aaa86f250f54910c0",
+        "record_type": "planning_reservation",
+        "kind": "planner",
+        "role": "planner",
+        "scope": "root",
+        "state": "estimated",
+        "registered_at": "2026-10-13T20:01:01.812806413Z",
+        "usage": null
+      },
+      {
+        "id": "agent/auto-c16517a3450449075b70",
+        "record_type": "producer_attempt",
+        "kind": "worker",
+        "role": "worker",
+        "scope": "root",
+        "task": "module_1",
+        "attempt": "a-392902a0641faf239ebc152e",
+        "provider": "codex",
+        "requested_model": "gpt-5.6-sol",
+        "state": "completed",
+        "registered_at": "2026-10-13T20:07:53.650720541Z",
+        "usage": {
+          "cached_input_tokens": 294272,
+          "input_tokens": 316580,
+          "output_tokens": 5637,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:08:43.645511523Z"
+        }
+      },
+      {
+        "id": "agent/auto-247db341da1df1d0cb98",
+        "record_type": "producer_attempt",
+        "kind": "worker",
+        "role": "worker",
+        "scope": "root",
+        "task": "module_2",
+        "attempt": "a-225b08e8d7e700b106f83b33",
+        "provider": "codex",
+        "requested_model": "gpt-5.6-sol",
+        "state": "completed",
+        "registered_at": "2026-10-13T20:07:53.938563611Z",
+        "usage": {
+          "cached_input_tokens": 334080,
+          "input_tokens": 357929,
+          "output_tokens": 7033,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:08:54.04075619Z"
+        }
+      },
+      {
+        "id": "agent/auto-0e88fcc9295f3c527613",
+        "record_type": "producer_attempt",
+        "kind": "worker",
+        "role": "worker",
+        "scope": "root",
+        "task": "module_3",
+        "attempt": "a-3c8e32e04a633e8527b266cc",
+        "provider": "codex",
+        "requested_model": "gpt-5.6-sol",
+        "state": "completed",
+        "registered_at": "2026-10-13T20:07:54.419515111Z",
+        "usage": {
+          "cached_input_tokens": 360320,
+          "input_tokens": 384117,
+          "output_tokens": 6734,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:08:55.857205959Z"
+        }
+      },
+      {
+        "id": "agent/auto-e17a664d777afe04ecc6",
+        "record_type": "producer_attempt",
+        "kind": "worker",
+        "role": "worker",
+        "scope": "root",
+        "task": "module_4",
+        "attempt": "a-bcded1cb6d6ac4075533c7e4",
+        "provider": "codex",
+        "requested_model": "gpt-5.6-sol",
+        "state": "completed",
+        "registered_at": "2026-10-13T20:07:54.797347207Z",
+        "usage": {
+          "cached_input_tokens": 333696,
+          "input_tokens": 358146,
+          "output_tokens": 6754,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:08:53.538449882Z"
+        }
+      },
+      {
+        "id": "planning/review-17ab6c4e52b51f8273b7d426",
+        "record_type": "planning_reservation",
+        "kind": "reviewer",
+        "role": "reviewer",
+        "scope": "reviewer",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:08:46.220270303Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 17777,
+          "output_tokens": 224,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:08:53.007239855Z"
+        }
+      },
+      {
+        "id": "planning/review-6fb0af73d45190fa98cc0960",
+        "record_type": "planning_reservation",
+        "kind": "reviewer",
+        "role": "reviewer",
+        "scope": "reviewer",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:08:55.812003367Z",
+        "usage": {
+          "cached_input_tokens": 6656,
+          "input_tokens": 21392,
+          "output_tokens": 313,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:09:05.698461934Z"
+        }
+      },
+      {
+        "id": "planning/review-9549d5c830361e136462405f",
+        "record_type": "planning_reservation",
+        "kind": "reviewer",
+        "role": "reviewer",
+        "scope": "reviewer",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:09:08.029582297Z",
+        "usage": {
+          "cached_input_tokens": 6656,
+          "input_tokens": 25392,
+          "output_tokens": 414,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:09:19.60453194Z"
+        }
+      },
+      {
+        "id": "planning/review-68f064ea8f6fd5ab02a79d0c",
+        "record_type": "planning_reservation",
+        "kind": "reviewer",
+        "role": "reviewer",
+        "scope": "reviewer",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:09:22.167834787Z",
+        "usage": {
+          "cached_input_tokens": 6656,
+          "input_tokens": 29343,
+          "output_tokens": 471,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:09:31.596713072Z"
+        }
+      },
+      {
+        "id": "planning/planning-claim-420559a4da2db750da3e421f",
+        "record_type": "planning_reservation",
+        "kind": "planner",
+        "role": "planner",
+        "scope": "root",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:09:33.752633937Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 23618,
+          "output_tokens": 700,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:09:49.023374Z"
+        }
+      },
+      {
+        "id": "planning/planning-claim-df0b509ee79a01519d8f287d",
+        "record_type": "planning_reservation",
+        "kind": "planner",
+        "role": "planner",
+        "scope": "root",
+        "state": "finished",
+        "registered_at": "2026-10-13T20:09:51.816773781Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 27876,
+          "output_tokens": 580,
+          "source": "\u00e9v\u00e9nement fournisseur turn.completed",
+          "scope": "champs bruts du dernier \u00e9v\u00e9nement ; caches s\u00e9par\u00e9s, sans somme ni cumul de session",
+          "at": "2026-10-13T20:10:04.266468302Z"
+        }
+      }
+    ],
+    "operator_interventions_after_start": 0,
+    "limits": "Process intervals are not model inference time. Pre-control interval includes queue/preparation; publication tail includes validation. Reservation count includes manual setup claim. Missing billed cost remains unknown. Polling pause is nominal; intervals include CLI duration and common progress windows do not prove simultaneous inference. One observation per level, not p95 or endurance."
+  },
+  "wall_ratio_serial_over_parallel": 2.673705998498895
+}

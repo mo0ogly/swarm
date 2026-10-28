@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "node",
+    "tests/dialogue_recovery_ui.cjs",
+    "/tmp/swarm-m12-bin-ot5ubx_d/swarm",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m12-20261016/browser-flow"
+  ],
+  "started_at_utc": "2026-10-16T14:23:57.771978+00:00",
+  "elapsed_seconds": 12.63467957598914,
+  "exit_code": 0,
+  "script_sha256": "8fc94bd7f86e478eea30e411e820f0c8b512cced7f07d68de553014dc7ae162a",
+  "binary_sha256": "99f7fb054a60099842fedcd51b58213335629693371cc67d97422c96cbf44d06",
+  "log_sha256": "b8df55086912d07b407e778a31b9c0621fa9e51f37824a245bf19f839f42e029",
+  "real_model_calls": 0
+}

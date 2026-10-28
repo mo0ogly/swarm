@@ -1,0 +1,185 @@
+{
+  "status": "VERIFIED_LOCAL_COMMITTED_ONLY_MANAGED_BOOTSTRAP",
+  "binary_sha256": "886352366369f187ea3128509845943d01019cdc49e115adece4e654c8168320",
+  "calls": [
+    {
+      "role": "git-runner",
+      "usable": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 1438,
+        "prompt_tokens": 6043,
+        "total_tokens": 7481,
+        "completion_tokens_details": {
+          "reasoning_tokens": 74,
+          "text_tokens": 1364
+        }
+      },
+      "context_sha256": "adffb3a0ab76856766bcac12525f054bb2664d0afeded074ef42a517e2d25e93",
+      "source_snapshot": {
+        "rust/crates/swarm-engine/src/git_metadata.rs": "5ae5f6e625af9715a9e65e425f02084a01733f592238aea4833afc34be0d578f",
+        "rust/crates/swarm-engine/src/agent_launch_error.rs": "67d8d32f62289989378e4a894e6f1a515ac085d5958ed8226c2dfe95d721a73d"
+      },
+      "answer_sha256": "bcd0038ff7131fa9ab5169b0637ab9107b50227dd45c2afd0de2568d55b65115"
+    },
+    {
+      "role": "manifest",
+      "usable": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 730,
+        "prompt_tokens": 2969,
+        "total_tokens": 3699,
+        "completion_tokens_details": {
+          "reasoning_tokens": 70,
+          "text_tokens": 660
+        }
+      },
+      "context_sha256": "8c7f7a6483a71aede5253a4b8600af9887711dc5e7939909e96d4e8e0e49ab31",
+      "source_snapshot": {
+        "rust/crates/swarm-engine/src/models.rs": "e8e1f61cb35d49bd34f3e5822d393c27302f7a732e3848ce88efaf035c4e9a1d",
+        "rust/crates/swarm-engine/src/work.rs": "5ce14f08318b6c3ca6bd67bed06d7987444bfda21fdbe135019607d32000c6c7"
+      },
+      "answer_sha256": "cc54dfcd97ee60b42e6c2b01788b7f52840e9d53068696e314b5e36dd5f51deb"
+    },
+    {
+      "role": "directory",
+      "usable": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 1288,
+        "prompt_tokens": 10081,
+        "total_tokens": 11369,
+        "completion_tokens_details": {
+          "reasoning_tokens": 60,
+          "text_tokens": 1228
+        }
+      },
+      "context_sha256": "94a7315030c2107ad6ec0daea0042c30c538f393a82976bc084b755091b211e7",
+      "source_snapshot": {
+        "rust/crates/swarm-engine/src/local_storage.rs": "0955a30632775b1db8b2bb8a45d7d17238028002e28577cec5a8a75acdf132f3"
+      },
+      "answer_sha256": "8e28f3786b87620f9f4efc16d9e0b4a970c10d26367f63179f47e6394e9f020e"
+    },
+    {
+      "role": "prepare",
+      "usable": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 696,
+        "prompt_tokens": 7940,
+        "total_tokens": 8636,
+        "completion_tokens_details": {
+          "reasoning_tokens": 20,
+          "text_tokens": 676
+        }
+      },
+      "context_sha256": "8bdc9eade73f151b6ea4e5986b6f6619eb2c87bda0f9c54da5813d9c08e1d5d0",
+      "source_snapshot": {
+        "rust/crates/swarm-engine/src/planning_request.rs": "427a366bcb71d4c7c9fec040d7a9108e81d98c55265abf205af3f435657a628c",
+        "rust/crates/swarm-engine/src/local_path.rs": "bf8fab7323dba6a0c02ed431985010fd062a41461dc8cdc2e138d99eb15629b0"
+      },
+      "answer_sha256": "fa895f0083f7e526737737289f96a49b7e13bd8169cd9e590ae0af891a6f1d0b"
+    },
+    {
+      "role": "root-hook",
+      "usable": false,
+      "finish_reason": "length",
+      "usage": {
+        "completion_tokens": 2000,
+        "prompt_tokens": 8457,
+        "total_tokens": 10457,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1404,
+          "text_tokens": 596
+        }
+      },
+      "context_sha256": "3ceb1c2ab31bb8decadc4fc53abecda36769ddb53fcc685e4a46a0010efbfe7f",
+      "source_snapshot": {
+        "rust/crates/swarm-engine/src/work_engine.rs": "e9190ac30bfa591a984adcf0cc22429d4daf5e03ec3fd83043ebd30e85034555",
+        "rust/crates/swarm-engine/src/planning_control.rs": "674d4fbe9583cd5387a57ba0d328b3a215ad54f405d4e7a1bec7b5eb2dc4ba77"
+      },
+      "answer_sha256": "626ecf24d6c7e0b9d6d99734bfa1e510ff59f29bf126f7e92ed58d0b03c8941b"
+    },
+    {
+      "role": "public-test",
+      "usable": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 1539,
+        "prompt_tokens": 15298,
+        "total_tokens": 16837,
+        "completion_tokens_details": {
+          "reasoning_tokens": 322,
+          "text_tokens": 1217
+        }
+      },
+      "context_sha256": "ff8ac522306e15556b517d719ba016852c4a03e3c14e60c717c12e1b39b66d1f",
+      "source_snapshot": {
+        "tests/rust_planning_bootstrap.py": "616030118522e7ecc039eecb38d93f86a964256bb6c5a72e13ceae550741f555",
+        "tests/rust_agent_model_route.py": "fa2bad462b761024c15d3705ac26996385cb53e7b41bf4ae409a11570bf18145"
+      },
+      "answer_sha256": "26be6fd2cc4dc32ede8874abc4ee30005191424799fc31d37a48fc235f6bebf0"
+    },
+    {
+      "role": "negative-test",
+      "usable": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 767,
+        "prompt_tokens": 7799,
+        "total_tokens": 8566,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1,
+          "text_tokens": 766
+        }
+      },
+      "context_sha256": "1c3e83fac26123ebd30d3d251eebfbc22e8ec5737e381a182786094d1877084b",
+      "source_snapshot": {
+        "tests/rust_planning_bootstrap.py": "616030118522e7ecc039eecb38d93f86a964256bb6c5a72e13ceae550741f555",
+        "rust/crates/swarm-engine/src/planning_request.rs": "427a366bcb71d4c7c9fec040d7a9108e81d98c55265abf205af3f435657a628c"
+      },
+      "answer_sha256": "d9ad842938a092bccda40964502259cb107cf377bb5f2530d0cba2545b3c4dc0"
+    },
+    {
+      "role": "review",
+      "usable": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 1131,
+        "prompt_tokens": 15970,
+        "total_tokens": 17101,
+        "completion_tokens_details": {
+          "reasoning_tokens": 460,
+          "text_tokens": 671
+        }
+      },
+      "context_sha256": "1f2cea6dffa1fd547a3d6bd316ad849b2e835661549d8f7d6a794680a475e344",
+      "source_snapshot": {
+        "rust/crates/swarm-engine/src/work_engine.rs": "e9190ac30bfa591a984adcf0cc22429d4daf5e03ec3fd83043ebd30e85034555",
+        "rust/crates/swarm-engine/src/planning_control.rs": "674d4fbe9583cd5387a57ba0d328b3a215ad54f405d4e7a1bec7b5eb2dc4ba77",
+        "rust/crates/swarm-engine/src/planning_activation.rs": "d5aa7961402fa4b589da599490e8122f93bf3ce6912aa4a8f8b48b731cbd448e"
+      },
+      "answer_sha256": "c350032bae4713342b36310bcbdd04664354c518c106f04d61cfca3945994299"
+    }
+  ],
+  "glm_calls": 8,
+  "complete_responses": 7,
+  "declared_tokens": 84146,
+  "automatic_retries": 0,
+  "recipe": "recipe1327",
+  "assertions": 7,
+  "rust_tests": 8,
+  "clippy": "PASS",
+  "rustdoc": "PASS",
+  "nonmanaged_provider_bootstrap": "PASS",
+  "installed": false,
+  "independent_acceptance": false,
+  "open": [
+    "dirty snapshots",
+    "managed claims/decisions",
+    "worker copies/settlement",
+    "managed controls/review/acceptance",
+    "R6/R7/RETEX"
+  ]
+}

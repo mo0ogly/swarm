@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-finding-contract-proof-repair-d01bfde6ef8c4f2ab844453832c4c20b",
+  "expected_revision": 596,
+  "task_id": "plan-ca937edf4e-T2",
+  "agent_id": "auto-a23c60f03a732c02841f",
+  "attempt_id": "a-2f9e1debb1548be96273f0d3",
+  "confirm_recovery": true,
+  "confirm_review_error_repair": true,
+  "review_id": "review-aac9c2070e72abe2a655eb12",
+  "result_tree": "52b15c9e3c3bd900fae81ef0b5716e592cd03ab4",
+  "reason": "Replan : la revue6 reçoit les originaux mais sa sixième inspection déclare inspected avec besoins de preuve ; aucun verdict final. Le défaut général du schéma est corrigé dans runtime24 qualifié : nouveaux paquets finding_contract_version=1 avec formes distinctes, ancienne revue et tous appels conservés. Rapport corrigé pour attribuer cette cause et séparer effet local de verdict natif. Le code Go519fichiers, helper original et preuves entières demeurent inchangés ; aucun pass réutilisé ni avis favorable déduit de métadonnées. Nouvelle remise explicite du candidat documentaire corrigé sous contrôles frais et nouveau contrat, puis véritable décision indépendante. Cette réparation externe ne constitue pas une production autonome ni une fin du besoin."
+}

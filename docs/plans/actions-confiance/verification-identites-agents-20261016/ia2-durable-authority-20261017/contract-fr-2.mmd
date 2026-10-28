@@ -1,0 +1,12 @@
+flowchart TD
+  C["Contrôle avant ouverture de la porte<br/>tests Bubblewrap ; lanceurs non raccordés"] --> N["Épingler les namespaces PID/montage attendus"]
+  N --> T["Table privée de liaisons en mémoire"]
+  M["Paquet Unix avec credentials et pidfd du message"] --> J["Décoder la demande stricte"]
+  J --> L["Verrou Trust partagé : état courant"]
+  L --> R["Verrou du registre de liaisons"]
+  T --> R
+  R --> P["Namespaces du processus par ioctl sur le pidfd"]
+  P --> B["Comparer UID et objets épinglés ; refuser révocation"]
+  B --> H["Lire l'horloge après les attentes"]
+  H --> V["Vérifier IA2.2 ; décision ou refus"]
+  A["Cadre privé d'autorité<br/>source durable IA2.3b ci-dessous"] -.-> V

@@ -1,6 +1,8 @@
 {
   "title": "Swarm moteur — contrat Cursor et vérification obligatoire",
   "source": "https://cursor.com/blog/self-driving-codebases#the-final-system-design",
+  "requested_reference": "https://cursor.com/blog/scaling-agents",
+  "reference_correction": "2026-10-10 : clarification utilisateur, janvier et février sont retenus. source conserve la provenance historique ; requested_reference conserve la référence initiale. requested_references indique le cadrage courant. Les tâches historiques ne prouvent pas la couverture de JAN-1..JAN-7 et FEB-1..FEB-4.",
   "base_commit": "6eb65b9aef3375cac7615e4ce3ade1e8033e1970",
   "prior_work": "w-fff7368010d114f6e2578985",
   "status": "prepared_not_started",
@@ -109,5 +111,9 @@
     "deploy": false
   },
   "bootstrap": "Correctifs préalables supervisés et revue séparée. Ce travail externe est compté, ne démontre pas autonomie Swarm.",
-  "coordination": "Dépendances internes à chaque périmètre, conformément au moteur. Trois branches indépendantes; le responsable racine reçoit leurs retours et ne clôt qu après fermeture de tous les enfants. Chaque intégration rejoue les contrôles cumulatifs et renouvelle leur revue sur le candidat. Toute adaptation des branches est décidée par leur propriétaire."
+  "coordination": "Dépendances internes à chaque périmètre, conformément au moteur. Trois branches indépendantes; le responsable racine reçoit leurs retours et ne clôt qu après fermeture de tous les enfants. Chaque intégration rejoue les contrôles cumulatifs et renouvelle leur revue sur le candidat. Toute adaptation des branches est décidée par leur propriétaire.",
+  "requested_references": [
+    "https://cursor.com/blog/scaling-agents",
+    "https://cursor.com/blog/self-driving-codebases"
+  ]
 }

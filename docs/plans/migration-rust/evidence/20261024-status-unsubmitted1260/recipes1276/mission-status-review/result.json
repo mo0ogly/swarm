@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "recipe": "mission-status-review",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "review-acceptance-status",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='status-review-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_status_review.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 21.125842729001306,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "574f1e3a44a0a2c00dd7fa3899327855dd3e3f6529122df58ca9aec5bd911d30",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "6f1b43adbed3060f65b3aca6ce246000db7e5f2b49cacbdea2efe6e194e27595",
+    "declared-inputs.tar.gz": "deb75230cdd7bf96b542f4b8ab4261da4680259adf245f2207a1624aa170f791",
+    "environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "step-0001.stdout": "3bb6fd4a7e0b59e7221b11da43c1046e79c4b652e53f15dfc11a9c7ae8916e10",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "07f83d86a278dd191da5a1e657e27ebe1dc952acc2f43b5a13db1bcde3652f1f",
+    "inputs.after.json": "6f1b43adbed3060f65b3aca6ce246000db7e5f2b49cacbdea2efe6e194e27595"
+  }
+}

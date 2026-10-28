@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "paea-git-reference-transaction-primitives",
+  "inputs": [
+    "tests/paea_git_ref_transaction.py",
+    "tools/verification/recipes/paea-git-reference-transaction.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "real-git-prepared-locks-ref-type-cas-abort-recovery",
+      "command": [
+        "python3",
+        "tests/paea_git_ref_transaction.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PAEA_GIT_REF_TRANSACTION_VERIFIED 6",
+        "git_executable",
+        "sha256"
+      ],
+      "required_stderr": [
+        "Ran 6 tests",
+        "test_direct_prepared_publication_and_explicit_abort",
+        "test_prepared_lock_prevents_competing_symbolic_and_direct_updates",
+        "test_symbolic_ref_refused_under_prepared_lock_then_recovers",
+        "test_wrong_old_oid_refuses_then_recovers",
+        "test_decision_failure_closes_transaction_without_publication",
+        "test_unsafe_no_deref_alone_overwrites_symbolic_ref",
+        "OK"
+      ]
+    }
+  ]
+}

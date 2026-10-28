@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "run-limits-admin-browser-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/run_limits_admin_codec.rs",
+    "rust/crates/swarm-engine/src/root_store/run_limits_admin_read.rs",
+    "rust/crates/swarm-engine/src/root_store/run_limits_admin_write.rs",
+    "rust/crates/swarm-engine/src/run_limits.rs",
+    "rust/crates/swarm-cli/src/run_limits_admin.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-web/src/service/run_limits_admin.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/native_admin.rs",
+    "web/native-run-limits.js",
+    "web/native-runtime.js",
+    "web/native-runtime.html",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "docs/architecture/NATIVE-RUN-LIMITS-ADMIN.md",
+    "docs/en/NATIVE-RUN-LIMITS-ADMIN.md",
+    "tests/rust_run_limits_admin.py",
+    "tests/rust_run_limits_admin_go_parity.py",
+    "tests/rust_run_limits_admin_browser.py",
+    "tests/rust_run_limits_admin_ui.cjs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "tests/helpers/browser_verification_runtime.cjs",
+    "tests/helpers/verification_cleanup.cjs",
+    "rust/crates/swarm-engine/src/agent_storage_retry.rs",
+    "rust/crates/swarm-engine/src/agent_execution_store.rs",
+    "rust/crates/swarm-engine/src/models.rs",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+    "web/processes.css",
+    "web/native-runtime.css",
+    "frontend/engine-settings/admin.css",
+    "web/wattson_themes.css"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "admin-browser",
+      "expected_exit": 0,
+      "required_stdout": [
+        "RUN_LIMITS_BROWSER_VERIFIED 4"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='run-limits-final-',dir='.cache')).resolve()/'admin-browser'\nargs=['python3','tests/rust_run_limits_admin_browser.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\nprint('RETAINED_FLOW',p,flush=True)\nsubprocess.run(args,check=True)"
+      ]
+    }
+  ]
+}

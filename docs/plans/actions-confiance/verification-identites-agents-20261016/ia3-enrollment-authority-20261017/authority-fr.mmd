@@ -1,0 +1,12 @@
+flowchart TD
+  C["Contrôle autorisé<br/>principal et droits explicites : prérequis"] -.-> D["Document version 1<br/>humain, projet, plan, droits et dates"]
+  P["identitycontract partagé<br/>principal, portée, permission, nom"] --> D
+  D --> S["SignEnrollment<br/>schéma valide et génération = prochain événement"]
+  S --> J["Journal signé : Apply<br/>CAS, création unique, révocation"]
+  J --> R["SignActive : tête courante<br/>séquence de création dérivée de la chaîne"]
+  R --> V["enrollmentproof.Verify<br/>challenge et signature"]
+  E["Expected indépendant<br/>tête, identité, génération, demande, portée"] --> A["DecodeActive<br/>cadre et document stricts, dates à l’observation"]
+  V --> A
+  P --> A
+  A --> O["Document validé<br/>aucune capacité moteur créée"]
+  O -.-> M["Raccord moteur et fraîcheur à l’usage<br/>cible : non réalisés"]

@@ -1,0 +1,10 @@
+flowchart TD
+  B["Independent bootstrap<br/>target: operator choice pending"] -.-> K["Pinned public key<br/>NewVerifier"]
+  K --> Q["New local challenge<br/>key, project, full request, nonce"]
+  S["Current protected service<br/>target: not connected"] -.-> R["SignResponse<br/>format tested with fixture key"]
+  Q --> R
+  R --> V["Verify<br/>signature, context and strict envelope"]
+  K --> V
+  V --> P["Statement: authenticated bytes<br/>one local consumption"]
+  P -.-> C["Business schema, freshness, revocation<br/>consumer checks still required"]
+  C -.-> E["Engine admission and publication<br/>integration absent"]

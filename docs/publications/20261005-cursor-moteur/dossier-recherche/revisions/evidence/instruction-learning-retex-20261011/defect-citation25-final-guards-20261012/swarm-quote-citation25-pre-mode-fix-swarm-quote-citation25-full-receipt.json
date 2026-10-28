@@ -1,0 +1,22 @@
+{
+  "state": "finished",
+  "started": "2026-10-12T06:35:22.648412+00:00",
+  "finished": "2026-10-12T06:44:11.661957+00:00",
+  "argv": [
+    "go",
+    "test",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/quote-citation25-preview-6ff2n61k",
+  "candidate_digest": "3441e47c7333bdb9bb515b2645e5341af01918d198be4b2d8f3db48db468418c",
+  "manifest_sha256": "cb97af4acd761730be5c30ca31f707dac062263c501c04e9488c38b8064040da",
+  "frozen_paths": 2118,
+  "wall_seconds": 529.0144338529935,
+  "exit": 1,
+  "output": "/tmp/swarm-quote-citation25-full.out",
+  "output_sha256": "a8d7c13ae7ab176128a72cd5e06e5364989f0420a6798becb5f7191848767492",
+  "drift": [],
+  "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+}

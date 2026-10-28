@@ -1,0 +1,6 @@
+{
+  "matrix_present": false,
+  "validator_present": false,
+  "expected": "versioned contextual matrix and rejection of unsupported claims",
+  "observation": "existing verify.py validates lots and receipt shape, not applicability mappings"
+}

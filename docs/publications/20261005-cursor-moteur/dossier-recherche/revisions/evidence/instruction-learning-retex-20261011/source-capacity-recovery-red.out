@@ -1,0 +1,5 @@
+--- FAIL: TestRecoveredResultCompletedSourceCapacityRefusalCanBeCorrected (0.43s)
+    recovered_result_source_capacity_test.go:86: completed source-capacity result cannot be repaired la livraison initiale est complète et bornée ; utiliser la reprise de contrôle ou de revue
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.447s
+FAIL

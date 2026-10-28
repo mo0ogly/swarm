@@ -1,0 +1,7 @@
+{
+  "cause": "Paragraph displacement cut dependence/supervisor words in French examples documentation",
+  "preimage_sha256": "c5e2e597975bb0b847ec68a5c647388549751dbe737e0f55f58692747bb3dd98",
+  "corrected_sha256": "e0670a2fede5c5f8b7a8423c939e71aa655f5323f0f0da83beb52666ce78858d",
+  "scope": "Exact malformed span only; all other bytes unchanged; complete document now identical to qualified version",
+  "qualification_reuse": "Exact byte restoration, no changed qualified candidate or code"
+}

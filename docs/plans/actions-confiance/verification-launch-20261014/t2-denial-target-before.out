@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT2OriginalsCoverDecisionsAndRejectCredentialFields
+    trust_actions_operator_regression_test.go:467: missing target lost from attributed refusal: engine.TrustEvidence{Sequence:1, PreviousHash:"", Hash:"d23834b7b60abcac0d8f600f8f1bc74d9eac5461a985bdebf039afd81035dd71", Kind:"approve", Actor:"bob", Integrity:2, ObjectID:"", ContentHash:"", OriginalHash:"fae8ce5ff2cc4bc36caee98a40af6e8a4fc8a0adae271656f65e01359dbd62d8", Result:"denied", Reason:"action absente", At:"2026-10-14T12:00:00Z"}
+--- FAIL: TestActionsConfianceT2OriginalsCoverDecisionsAndRejectCredentialFields (0.02s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.042s
+FAIL

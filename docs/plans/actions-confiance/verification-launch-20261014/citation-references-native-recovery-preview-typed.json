@@ -1,0 +1,17 @@
+{
+  "revision": 402,
+  "task_id": "plan-68b50cc82e-T2",
+  "review_id": "review-d9ea32fa4816bae18021ddaa",
+  "candidate_commit": "3d66a1fdd7d6a16f848f1f3f79890c6fcb0fcd43",
+  "state": "budget_authorization_required",
+  "cause": "résolution sans preuve originale visible : packet=1 artifact=13 need_index=0 ; citation_sha256=f5461fc81e5fdb8dcec42de22b43ce2a32fb4218bd832d0acae89d07444f8b47 citation_rejetée=\"+v, err := s.trustOperate(action, cmd, os.Getenv(\\\"SWARM_TRUST_TOKEN\\\"), time.Now().UTC())\" ; le texte cité est absent, cela ne démontre pas l’absence du fichier",
+  "next_step": "Revue complète sous le nouveau contrat : 5 appels nécessaires, 0 disponibles ; plafond minimal 85, sans remboursement ni appel lors de cet aperçu.",
+  "actor": "operator",
+  "inspections_remaining": 3,
+  "inspections_reusable": 0,
+  "calls_required": 5,
+  "calls_available": 0,
+  "calls_missing": 5,
+  "minimum_review_limit": 85,
+  "timeout_seconds": 0
+}

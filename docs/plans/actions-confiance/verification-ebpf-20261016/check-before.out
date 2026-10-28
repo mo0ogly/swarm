@@ -1,0 +1,7 @@
+# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]
+internal/engine/trust_kernel_check_test.go:28:41: undefined: TrustKernelCheckPolicy
+internal/engine/trust_kernel_check_test.go:33:11: s.trustKernelCheckUsing undefined (type *Store has no field or method trustKernelCheckUsing)
+internal/engine/trust_kernel_check_test.go:33:104: undefined: TrustKernelCheckPolicy
+internal/engine/trust_kernel_check_test.go:33:128: undefined: TrustKernelCheckResult
+FAIL	swarm.local/companion/internal/engine [build failed]
+FAIL

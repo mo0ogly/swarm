@@ -1,0 +1,70 @@
+=== RUN   TestManagedPreflightRetryUsesRetainedCandidateWithoutProducer
+    managed_review_preflight_retry_test.go:85: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedPreflightRetryUsesRetainedCandidateWithoutProducer (1.06s)
+=== RUN   TestManagedPreflightRetryRejectsMissingOrStaleProofs
+=== RUN   TestManagedPreflightRetryRejectsMissingOrStaleProofs/other-failure
+    managed_review_preflight_retry_test.go:130: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedPreflightRetryRejectsMissingOrStaleProofs/missing-candidate
+    managed_review_preflight_retry_test.go:130: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedPreflightRetryRejectsMissingOrStaleProofs/changed-contract
+    managed_review_preflight_retry_test.go:130: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedPreflightRetryRejectsMissingOrStaleProofs/changed-receipt
+    managed_review_preflight_retry_test.go:130: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedPreflightRetryRejectsMissingOrStaleProofs/exhausted-budget
+    managed_review_preflight_retry_test.go:130: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedPreflightRetryRejectsMissingOrStaleProofs/unconfirmed-end
+    managed_review_preflight_retry_test.go:130: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedPreflightRetryRejectsMissingOrStaleProofs/existing-review
+    managed_review_preflight_retry_test.go:130: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedPreflightRetryRejectsMissingOrStaleProofs/oversize-still
+    managed_review_preflight_retry_test.go:130: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedPreflightRetryRejectsMissingOrStaleProofs (3.74s)
+    --- PASS: TestManagedPreflightRetryRejectsMissingOrStaleProofs/other-failure (0.49s)
+    --- PASS: TestManagedPreflightRetryRejectsMissingOrStaleProofs/missing-candidate (0.55s)
+    --- PASS: TestManagedPreflightRetryRejectsMissingOrStaleProofs/changed-contract (0.38s)
+    --- PASS: TestManagedPreflightRetryRejectsMissingOrStaleProofs/changed-receipt (0.39s)
+    --- PASS: TestManagedPreflightRetryRejectsMissingOrStaleProofs/exhausted-budget (0.52s)
+    --- PASS: TestManagedPreflightRetryRejectsMissingOrStaleProofs/unconfirmed-end (0.42s)
+    --- PASS: TestManagedPreflightRetryRejectsMissingOrStaleProofs/existing-review (0.40s)
+    --- PASS: TestManagedPreflightRetryRejectsMissingOrStaleProofs/oversize-still (0.58s)
+=== RUN   TestManagedPreflightRetryRecoveredFalseBinary
+    managed_review_preflight_retry_test.go:179: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedPreflightRetryRecoveredFalseBinary (0.59s)
+=== RUN   TestManagedPreflightRetryRecoversHistoricalSourceCountRefusal
+    managed_review_preflight_retry_test.go:204: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedPreflightRetryRecoversHistoricalSourceCountRefusal (1.01s)
+=== RUN   TestManagedPreflightRetryRecoversHistoricalProtocolRefusal
+    managed_review_preflight_retry_test.go:228: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedPreflightRetryRecoversHistoricalProtocolRefusal (1.00s)
+=== RUN   TestFragmentReviewerReplacementPublicRecovery
+=== RUN   TestFragmentReviewerReplacementPublicRecovery/ready
+    managed_review_provider_recovery_test.go:15: sizes 164551 168167 21899 parts 1
+=== RUN   TestFragmentReviewerReplacementPublicRecovery/budget
+    managed_review_provider_recovery_test.go:15: sizes 164551 168167 21899 parts 1
+=== RUN   TestFragmentReviewerReplacementPublicRecovery/tampered
+    managed_review_provider_recovery_test.go:15: sizes 164551 168167 21899 parts 1
+=== RUN   TestFragmentReviewerReplacementPublicRecovery/not-selected
+    managed_review_provider_recovery_test.go:15: sizes 164551 168167 21899 parts 1
+=== RUN   TestFragmentReviewerReplacementPublicRecovery/active
+    managed_review_provider_recovery_test.go:15: sizes 164551 168167 21899 parts 1
+=== RUN   TestFragmentReviewerReplacementPublicRecovery/negative
+    managed_review_provider_recovery_test.go:15: sizes 164551 168167 21899 parts 1
+--- PASS: TestFragmentReviewerReplacementPublicRecovery (3.47s)
+    --- PASS: TestFragmentReviewerReplacementPublicRecovery/ready (0.69s)
+    --- PASS: TestFragmentReviewerReplacementPublicRecovery/budget (0.67s)
+    --- PASS: TestFragmentReviewerReplacementPublicRecovery/tampered (0.59s)
+    --- PASS: TestFragmentReviewerReplacementPublicRecovery/not-selected (0.49s)
+    --- PASS: TestFragmentReviewerReplacementPublicRecovery/active (0.54s)
+    --- PASS: TestFragmentReviewerReplacementPublicRecovery/negative (0.48s)
+=== RUN   TestRoleModelRejectsQueuedFragmentReview
+    managed_review_provider_recovery_test.go:102: sizes 164551 168167 21899 parts 1
+--- PASS: TestRoleModelRejectsQueuedFragmentReview (0.49s)
+=== RUN   TestReviewerReplacementHistoricalBaselineIsNotFreshAcceptance
+--- PASS: TestReviewerReplacementHistoricalBaselineIsNotFreshAcceptance (1.77s)
+=== RUN   TestReviewRecoveryPreviewBudgetAndNoMutation
+    managed_review_recovery_test.go:15: sizes 164551 168165 21899 parts 1
+--- PASS: TestReviewRecoveryPreviewBudgetAndNoMutation (0.51s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.30s)
+PASS
+ok  	swarm.local/companion/internal/engine	14.019s

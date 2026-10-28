@@ -1,0 +1,58 @@
+[
+  {
+    "label": "race",
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "./internal/engine",
+      "-run",
+      "TestAdminDurationThreshold|TestRunLimits|TestObservation|TestInstructionRevision",
+      "-count=1",
+      "-timeout=120s"
+    ],
+    "start": "2026-10-11T14:19:40.629903+00:00",
+    "seconds": 44.63229731600222,
+    "exit": 0,
+    "output": "/tmp/swarm-admin-duration-launch-race.out",
+    "sha256": "cdf44a83af74aac51d9871bf66fb1495c300ab37ec388a4d8bca78becf1e7ddf"
+  },
+  {
+    "label": "vet",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "start": "2026-10-11T14:20:25.262659+00:00",
+    "seconds": 2.3088951389981958,
+    "exit": 0,
+    "output": "/tmp/swarm-admin-duration-launch-vet.out",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "workflows",
+    "command": [
+      "python3",
+      "tools/agent-workflows/check.py"
+    ],
+    "start": "2026-10-11T14:20:27.571894+00:00",
+    "seconds": 12.485926834000566,
+    "exit": 0,
+    "output": "/tmp/swarm-admin-duration-launch-workflows.out",
+    "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+  },
+  {
+    "label": "diff",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "start": "2026-10-11T14:20:40.058151+00:00",
+    "seconds": 0.051596572000562446,
+    "exit": 0,
+    "output": "/tmp/swarm-admin-duration-launch-diff.out",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

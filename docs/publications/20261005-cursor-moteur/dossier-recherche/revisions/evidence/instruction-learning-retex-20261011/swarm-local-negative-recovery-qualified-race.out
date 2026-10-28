@@ -1,0 +1,6 @@
+--- FAIL: TestManagedFragmentDurableVerdictResumesWithoutBudget (18.35s)
+    managed_review_fragment_resume_test.go:67: sizes 164551 168167 21899 parts 1
+    managed_review_fragment_resume_test.go:103: durable verdict lost or charged contexte de revue supérieur à 192 Kio ; aucun contenu tronqué, découper le livrable : tâche first
+FAIL
+FAIL	swarm.local/companion/internal/engine	96.530s
+FAIL

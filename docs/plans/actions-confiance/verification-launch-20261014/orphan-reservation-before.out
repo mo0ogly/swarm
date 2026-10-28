@@ -1,0 +1,13 @@
+=== RUN   TestManagedReviewOrphanReservationSettlesWithoutAnotherCall
+=== RUN   TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/inspection
+    managed_review_orphan_reservation_test.go:21: sizes 164551 168167 21899 parts 1
+    managed_review_orphan_reservation_test.go:79: orphan inspection reservation remains active
+=== RUN   TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/final
+    managed_review_orphan_reservation_test.go:31: sizes 164551 168167 21899 parts 1
+    managed_review_orphan_reservation_test.go:87: orphan final reservation remains active
+--- FAIL: TestManagedReviewOrphanReservationSettlesWithoutAnotherCall (1.55s)
+    --- FAIL: TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/inspection (0.56s)
+    --- FAIL: TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/final (0.99s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.575s
+FAIL

@@ -1,0 +1,44 @@
+{
+  "task_id": "plan-68b50cc82e-T2",
+  "agent_id": "auto-e2979000265b0af18da6",
+  "incidents": 4,
+  "compilation_collision": "containsString redeclared; corrected before named tests",
+  "command_start_failures": 2,
+  "command_start_cause": "Two incorrect workdir values, diagnosed by worker; next run used confirmed default CWD",
+  "other_incident": "File/source lookup failure",
+  "checks": [
+    {
+      "seq": 199803,
+      "at": "2026-10-14T20:25:20.944209582Z",
+      "command": "/bin/bash -lc \"gofmt -w internal/engine/trust_actions.go internal/engine/trust_actions_test.go internal/engine/main.go internal/engine/web_server.go && go test ./internal/engine -run '\"'^TestActionsConfianceT2(IdentityMandateApprovalAndBiba|ConcurrencyRecoveryAndConflict|EvidenceConfigAPIAndCLIPersist)$'\"' -count=1 -v\"",
+      "exit_code": -1,
+      "output": "Failed to create unified exec process: No such file or directory (os error 2)",
+      "output_sha256": "fdbad5ea73e6aea9bb40573ae3923d834eb8d9d29e51d39ba3c890cf7141055b"
+    },
+    {
+      "seq": 199811,
+      "at": "2026-10-14T20:25:23.30537975Z",
+      "command": "/bin/bash -lc \"gofmt -w internal/engine/trust_actions.go internal/engine/trust_actions_test.go internal/engine/main.go internal/engine/web_server.go && go test ./internal/engine -run '\"'^TestActionsConfianceT2(IdentityMandateApprovalAndBiba|ConcurrencyRecoveryAndConflict|EvidenceConfigAPIAndCLIPersist)$'\"' -count=1 -v\"",
+      "exit_code": -1,
+      "output": "Failed to create unified exec process: No such file or directory (os error 2)",
+      "output_sha256": "fdbad5ea73e6aea9bb40573ae3923d834eb8d9d29e51d39ba3c890cf7141055b"
+    },
+    {
+      "seq": 199817,
+      "at": "2026-10-14T20:25:42.176874669Z",
+      "command": "/bin/bash -lc \"gofmt -w internal/engine/trust_actions.go internal/engine/trust_actions_test.go internal/engine/main.go internal/engine/web_server.go && go test ./internal/engine -run '\"'^TestActionsConfianceT2(IdentityMandateApprovalAndBiba|ConcurrencyRecoveryAndConflict|EvidenceConfigAPIAndCLIPersist)$'\"' -count=1 -v\"",
+      "exit_code": 0,
+      "output": "=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba\n--- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba (0.03s)\n=== RUN   TestActionsConfianceT2ConcurrencyRecoveryAndConflict\n--- PASS: TestActionsConfianceT2ConcurrencyRecoveryAndConflict (0.04s)\n=== RUN   TestActionsConfianceT2EvidenceConfigAPIAndCLIPersist\n--- PASS: TestActionsConfianceT2EvidenceConfigAPIAndCLIPersist (0.02s)\nPASS\nok  \tswarm.local/companion/internal/engine\t0.119s\n",
+      "output_sha256": "d39e51756e7985baa87fbbc911106584c91a7f68577f9a66ebcd93a3c9fbf992"
+    },
+    {
+      "seq": 199883,
+      "at": "2026-10-14T20:27:07.810316378Z",
+      "command": "/bin/bash -lc \"npm run i18n:build && gofmt -w internal/engine/trust_actions.go internal/engine/trust_actions_test.go && go test ./internal/engine -run '\"'^TestActionsConfianceT2'\"' -count=1 -v\"",
+      "exit_code": 0,
+      "output": "\n> i18n:build\n> node scripts/i18n/build.cjs\n\n=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba\n--- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba (0.03s)\n=== RUN   TestActionsConfianceT2ConcurrencyRecoveryAndConflict\n--- PASS: TestActionsConfianceT2ConcurrencyRecoveryAndConflict (0.03s)\n=== RUN   TestActionsConfianceT2EvidenceConfigAPIAndCLIPersist\n--- PASS: TestActionsConfianceT2EvidenceConfigAPIAndCLIPersist (0.02s)\n=== RUN   TestActionsConfianceT2UIContractSources\n--- PASS: TestActionsConfianceT2UIContractSources (0.01s)\nPASS\nok  \tswarm.local/companion/internal/engine\t0.105s\n",
+      "output_sha256": "c1746ce0afeb2b990d14f7720b3d3312ecb299811f19fcd8f16baeae50e33f43"
+    }
+  ],
+  "scope": "Passing Go checks are local evidence; pilot acceptance and complete UI/public recipe remain pending"
+}

@@ -1,0 +1,11 @@
+{
+  "revision": 330,
+  "review": "review-b03fcdf22b23d6817513711b",
+  "candidate": "3d66a1fdd7d6a16f848f1f3f79890c6fcb0fcd43",
+  "packet": 0,
+  "packet_sha256": "f2a283acbf59ad89f838187cf14bce0213fb748979d4a316e6c33cae2fdb46c5",
+  "reply_sha256": "c792b5b1a8d9b2730771578b7a84069d0cf6894b579d4b118f79af16f361cbf0",
+  "scope_version": 1,
+  "state": "unknown",
+  "limits": "Valid partial inspection received; unknown is not an acceptance or complete verdict."
+}

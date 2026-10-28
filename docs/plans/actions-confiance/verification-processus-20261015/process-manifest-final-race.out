@@ -1,0 +1,6 @@
+=== RUN   TestGraphDeliveryD03QualificationManifest
+    graph_delivery_qualification_test.go:307: stale input: tests/actions_confiance_process_ui.cjs
+--- FAIL: TestGraphDeliveryD03QualificationManifest (3.44s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	4.061s
+FAIL

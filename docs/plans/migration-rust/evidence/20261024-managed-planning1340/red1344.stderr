@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_managed_planning.py", line 102, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_managed_planning.py", line 96, in main
+    try:run(args.binary.resolve(),args.profile.resolve(),args.output.resolve())
+        ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_managed_planning.py", line 48, in run
+    first=f.ok(['planning','step',f.work]);assert first['run']['decision_applied']
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_agent_model_route.py", line 143, in ok
+    assert code == 0, (self.label,args,code,value)
+           ^^^^^^^^^
+AssertionError: ('managed-planning', ['planning', 'step', 'w-33d1ecf3e674b5f9e91cea83'], 2, {'error': 'planning-claim-repository-unported', 'failure': {'causes': ['planning-claim-repository-unported', 'planning-claim-repository-unported'], 'code': 'planning-claim-repository-unported', 'message': 'planning-claim-repository-unported', 'retryable': False}, 'schema_version': 1})

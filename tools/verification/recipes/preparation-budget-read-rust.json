@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "id": "preparation-budget-read-rust",
+  "inputs": [
+    "tests/rust_preparation_conversion.py",
+    "tests/rust_preparation_conversion_ui.cjs",
+    "tests/rust_preparation_reads.py",
+    "tests/rust_preparation_plan.py",
+    "tests/rust_native_http_cli.py",
+    "web/preparation-native.js",
+    "web/prepare.html",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "rust/crates/swarm-engine/src/root_store/preparation_conversion.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_write.rs",
+    "rust/crates/swarm-engine/src/preparation_command.rs",
+    "rust/crates/swarm-engine/src/mutation_guard.rs",
+    "rust/crates/swarm-cli/src/preparation.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "tests/rust_preparation_release.py",
+    "tests/rust_preparation_release_ui.cjs",
+    "rust/crates/swarm-engine/src/root_store/preparation_release.rs",
+    "rust/crates/swarm-web/src/service/preparations.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_organization.rs",
+    "rust/crates/swarm-engine/src/reviewer_bootstrap.rs",
+    "tests/rust_preparation_team.py",
+    "tests/rust_preparation_team_ui.cjs",
+    "tests/rust_preparation_budget.py",
+    "tests/rust_preparation_budget_ui.cjs",
+    "rust/crates/swarm-engine/src/financial_budget.rs",
+    "rust/crates/swarm-engine/src/preparation_models.rs",
+    "tests/rust_preparation_budget_read.py",
+    "rust/crates/swarm-engine/src/root_store/preparation_budget.rs",
+    "rust/crates/swarm-engine/src/root_store/budget_history.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_read.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/models.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "historical-preparation-budget",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-budget-read-replay-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_budget_read.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_BUDGET_READ_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_BUDGET_READ_PASS",
+        "PASS reader-reported-zero",
+        "PASS reader-warning-disabled",
+        "PASS reader-negative-commitment-recovery",
+        "PASS reader-shared-work-view"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "explicit-usd-envelope",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-budget-replay-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_budget.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_BUDGET_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_BUDGET_PASS",
+        "PASS budget-exact-replay",
+        "PASS budget-stale-cas",
+        "PASS budget-unlimited-explicit",
+        "PASS budget-never-executed-provider",
+        "PASS en-sombre-no-overflow-390"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

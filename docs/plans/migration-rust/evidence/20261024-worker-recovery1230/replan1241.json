@@ -1,0 +1,8 @@
+{
+  "cause": "red1240 fixture snapshot retained SQLite BLOB as Python bytes, publication JSON failed",
+  "status": "recipe-prerequisite-failed-not-product-RED",
+  "changed_precondition": "read CAST(body AS TEXT) for JSON snapshot; underlying values unchanged",
+  "owner": "Codex",
+  "original": "red1240/fault/failure.json",
+  "next": "fresh baseline restored-original probe and current public recipe"
+}

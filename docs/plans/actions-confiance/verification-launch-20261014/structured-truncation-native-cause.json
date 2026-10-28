@@ -1,0 +1,57 @@
+{
+  "review_id": "review-ccf9e3a44811222ac65d2748",
+  "state": "error",
+  "failure_code": "review_fragment_protocol",
+  "captured_bytes": 16037,
+  "captured_sha256": "f9f06d02e1dc52d453aa5fe8c11411a1721433bbf4f226a4bdda68e5f0870412",
+  "observed_suffix": "moteur GOARCH=386 manquant.\"},{\"pack\n[Réponse tronquée à 16000 octets]",
+  "cause": "providerReply applies human display truncation at 16000 bytes before structured consumer 65536-byte validation. The suffix creates invalid JSON.",
+  "limits": [
+    "Captured file is the exact engine-received, already-truncated text, not an intact provider original.",
+    "No tail recovery or accepted verdict is possible from this capture."
+  ],
+  "diagnostic_only_review_prefix": [
+    {
+      "task": "plan-68b50cc82e-T1",
+      "criteria": [
+        [
+          1,
+          "pass"
+        ],
+        [
+          2,
+          "pass"
+        ],
+        [
+          3,
+          "pass"
+        ],
+        [
+          4,
+          "pass"
+        ]
+      ]
+    },
+    {
+      "task": "plan-68b50cc82e-T2",
+      "criteria": [
+        [
+          1,
+          "pass"
+        ],
+        [
+          2,
+          "pass"
+        ],
+        [
+          3,
+          "fail"
+        ],
+        [
+          4,
+          "pass"
+        ]
+      ]
+    }
+  ]
+}

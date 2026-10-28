@@ -1,0 +1,165 @@
+{
+  "review_id": "review-481aead2af7d5e3314889c6e",
+  "candidate": "c6c13be3f3eb51065d6783a1b66675c2ca1d4738",
+  "state": "running",
+  "root_activations": 10,
+  "root_decisions": 10,
+  "directive": {
+    "decision": "planning-claim-92726aace3ac6d4e73d710ee-decision",
+    "scope": "root",
+    "result_event": "review-481aead2af7d5e3314889c6e-result-309cda782f3191c1",
+    "review": "review-481aead2af7d5e3314889c6e",
+    "candidate_commit": "c6c13be3f3eb51065d6783a1b66675c2ca1d4738",
+    "attempt": "a-b4669e24bbfb91f7a9686499",
+    "failure_code": "review_fragment_protocol",
+    "cause": "inspection de fragment : defect without unique failed artifact",
+    "instruction": "Reprendre la revue indépendante du candidat exact c6c13be3f3eb51065d6783a1b66675c2ca1d4738 après correction du protocole de fragments : rattacher chaque défaut examiné à un artefact source unique parmi les originaux intégralement fournis, puis rendre une décision distincte et traçable pour chaque constat. Préserver le refus historique, les quatre défauts métier antérieurs, la tentative et toutes les dépenses ; vérifier sur les originaux et reçus réels si leurs corrections sont présentes et suffisantes, sans déduire un succès du rapport opérateur. Contrôler notamment l’empreinte après révocation, la borne finale de 8 Mio incluant le saut de ligne, la cible tactile de la séparation et le refus des secrets d’exemple, ainsi que leurs gardes de régression. Distinguer toute pièce réellement absente d’un défaut du candidat et ne produire un verdict final qu’après examen indépendant du même candidat."
+  },
+  "applied_resume_calls": [
+    "fragment-call-2a761fa4434f94f902a7d783"
+  ],
+  "events": [
+    {
+      "id": "fragment-call-16d087f96e9a358f27ed96e3-reserve",
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "revision": 140,
+      "kind": "review.fragment.journal",
+      "at": "2026-10-15T00:25:14.306836316Z",
+      "payload": {
+        "version": 1,
+        "plan_sha256": "1549cadb3ef1c3a25223dcbaa1f11e87913ce24c640e4046f7ee87da3a3e3901",
+        "attempt": "a-b4669e24bbfb91f7a9686499",
+        "provider_sha256": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+        "entries": [
+          {
+            "prompt_sha256": "1fe4887edd0b2fc159a04311dafdf15114e0d28518c84f125ca0ba0bbe8b0696",
+            "packet": 0,
+            "packet_sha256": "2260d567566539de638368eb7dedd0d964a3ae9156dbacbdd3ac586989b81dbe",
+            "call_id": "fragment-call-2a761fa4434f94f902a7d783",
+            "state": "interrupted"
+          },
+          {
+            "retry_directive": {
+              "decision": "planning-claim-92726aace3ac6d4e73d710ee-decision",
+              "scope": "root",
+              "result_event": "review-481aead2af7d5e3314889c6e-result-309cda782f3191c1",
+              "review": "review-481aead2af7d5e3314889c6e",
+              "candidate_commit": "c6c13be3f3eb51065d6783a1b66675c2ca1d4738",
+              "attempt": "a-b4669e24bbfb91f7a9686499",
+              "failure_code": "review_fragment_protocol",
+              "cause": "inspection de fragment : defect without unique failed artifact",
+              "instruction": "Reprendre la revue indépendante du candidat exact c6c13be3f3eb51065d6783a1b66675c2ca1d4738 après correction du protocole de fragments : rattacher chaque défaut examiné à un artefact source unique parmi les originaux intégralement fournis, puis rendre une décision distincte et traçable pour chaque constat. Préserver le refus historique, les quatre défauts métier antérieurs, la tentative et toutes les dépenses ; vérifier sur les originaux et reçus réels si leurs corrections sont présentes et suffisantes, sans déduire un succès du rapport opérateur. Contrôler notamment l’empreinte après révocation, la borne finale de 8 Mio incluant le saut de ligne, la cible tactile de la séparation et le refus des secrets d’exemple, ainsi que leurs gardes de régression. Distinguer toute pièce réellement absente d’un défaut du candidat et ne produire un verdict final qu’après examen indépendant du même candidat."
+            },
+            "prompt_sha256": "79226cb81646ab53cc0acd57ade9a4567507e53c64214e9cbec58593289a0715",
+            "packet": 0,
+            "packet_sha256": "2260d567566539de638368eb7dedd0d964a3ae9156dbacbdd3ac586989b81dbe",
+            "call_id": "fragment-call-16d087f96e9a358f27ed96e3",
+            "state": "reserved"
+          }
+        ]
+      }
+    },
+    {
+      "id": "fragment-call-16d087f96e9a358f27ed96e3-result",
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "revision": 141,
+      "kind": "review.fragment.journal",
+      "at": "2026-10-15T00:25:48.256156941Z",
+      "payload": {
+        "version": 1,
+        "plan_sha256": "1549cadb3ef1c3a25223dcbaa1f11e87913ce24c640e4046f7ee87da3a3e3901",
+        "attempt": "a-b4669e24bbfb91f7a9686499",
+        "provider_sha256": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+        "entries": [
+          {
+            "prompt_sha256": "1fe4887edd0b2fc159a04311dafdf15114e0d28518c84f125ca0ba0bbe8b0696",
+            "packet": 0,
+            "packet_sha256": "2260d567566539de638368eb7dedd0d964a3ae9156dbacbdd3ac586989b81dbe",
+            "call_id": "fragment-call-2a761fa4434f94f902a7d783",
+            "state": "interrupted"
+          },
+          {
+            "retry_directive": {
+              "decision": "planning-claim-92726aace3ac6d4e73d710ee-decision",
+              "scope": "root",
+              "result_event": "review-481aead2af7d5e3314889c6e-result-309cda782f3191c1",
+              "review": "review-481aead2af7d5e3314889c6e",
+              "candidate_commit": "c6c13be3f3eb51065d6783a1b66675c2ca1d4738",
+              "attempt": "a-b4669e24bbfb91f7a9686499",
+              "failure_code": "review_fragment_protocol",
+              "cause": "inspection de fragment : defect without unique failed artifact",
+              "instruction": "Reprendre la revue indépendante du candidat exact c6c13be3f3eb51065d6783a1b66675c2ca1d4738 après correction du protocole de fragments : rattacher chaque défaut examiné à un artefact source unique parmi les originaux intégralement fournis, puis rendre une décision distincte et traçable pour chaque constat. Préserver le refus historique, les quatre défauts métier antérieurs, la tentative et toutes les dépenses ; vérifier sur les originaux et reçus réels si leurs corrections sont présentes et suffisantes, sans déduire un succès du rapport opérateur. Contrôler notamment l’empreinte après révocation, la borne finale de 8 Mio incluant le saut de ligne, la cible tactile de la séparation et le refus des secrets d’exemple, ainsi que leurs gardes de régression. Distinguer toute pièce réellement absente d’un défaut du candidat et ne produire un verdict final qu’après examen indépendant du même candidat."
+            },
+            "prompt_sha256": "79226cb81646ab53cc0acd57ade9a4567507e53c64214e9cbec58593289a0715",
+            "packet": 0,
+            "packet_sha256": "2260d567566539de638368eb7dedd0d964a3ae9156dbacbdd3ac586989b81dbe",
+            "call_id": "fragment-call-16d087f96e9a358f27ed96e3",
+            "state": "inspected",
+            "reply": "{\"candidate_commit\":\"c6c13be3f3eb51065d6783a1b66675c2ca1d4738\",\"context_sha256\":\"2f24553c908d9389fa9057ff5a2c3aec2a605b44d500a4834b5d002619d63276\",\"defects\":[],\"findings\":{\"0\":{\"e\":0,\"r\":\"contrat examiné\",\"v\":\"inspected\"},\"1\":{\"e\":0,\"r\":\"parité examinée\",\"v\":\"inspected\"},\"10\":{\"e\":0,\"r\":\"tests examinés\",\"v\":\"inspected\"},\"11\":{\"e\":0,\"r\":\"source examinée\",\"v\":\"inspected\"},\"12\":{\"e\":0,\"r\":\"routage examiné\",\"v\":\"inspected\"},\"13\":{\"e\":0,\"r\":\"catalogue exam.\",\"v\":\"inspected\"},\"14\":{\"e\":0,\"r\":\"garde examinée\",\"v\":\"inspected\"},\"15\":{\"e\":0,\"r\":\"recette examinée\",\"v\":\"inspected\"},\"16\":{\"e\":0,\"r\":\"parcours examiné\",\"v\":\"inspected\"},\"17\":{\"e\":0,\"r\":\"test i18n exam.\",\"v\":\"inspected\"},\"18\":{\"e\":0,\"r\":\"sortie examinée\",\"v\":\"inspected\"},\"19\":{\"e\":0,\"r\":\"styles examinés\",\"v\":\"inspected\"},\"2\":{\"e\":0,\"r\":\"bilan examiné\",\"v\":\"inspected\"},\"20\":{\"e\":0,\"r\":\"cible examinée\",\"v\":\"inspected\"},\"21\":{\"e\":0,\"r\":\"client examiné\",\"v\":\"inspected\"},\"22\":{\"e\":0,\"r\":\"preuves revues\",\"v\":\"inspected\"},\"23\":{\"e\":0,\"r\":\"reçus examinés\",\"v\":\"inspected\"},\"3\":{\"e\":0,\"r\":\"rapport examiné\",\"v\":\"inspected\"},\"4\":{\"e\":0,\"r\":\"reçus examinés\",\"v\":\"inspected\"},\"5\":{\"e\":0,\"r\":\"liste examinée\",\"v\":\"inspected\"},\"6\":{\"e\":0,\"r\":\"entrée examinée\",\"v\":\"inspected\"},\"7\":{\"e\":0,\"r\":\"source examinée\",\"v\":\"inspected\"},\"8\":{\"e\":0,\"r\":\"source examinée\",\"v\":\"inspected\"},\"9\":{\"e\":0,\"r\":\"source examinée\",\"v\":\"inspected\"}},\"packet_sha256\":\"2260d567566539de638368eb7dedd0d964a3ae9156dbacbdd3ac586989b81dbe\"}",
+            "reply_sha256": "348e5aecff279c9900f855c2dbe65027adbbaf60707eb33d80dcf26e22305ae9"
+          }
+        ]
+      }
+    },
+    {
+      "id": "fragment-call-2ce4efbf2241c20d42e629e6-reserve",
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "revision": 142,
+      "kind": "review.fragment.journal",
+      "at": "2026-10-15T00:25:48.609124631Z",
+      "payload": {
+        "version": 1,
+        "plan_sha256": "1549cadb3ef1c3a25223dcbaa1f11e87913ce24c640e4046f7ee87da3a3e3901",
+        "attempt": "a-b4669e24bbfb91f7a9686499",
+        "provider_sha256": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+        "entries": [
+          {
+            "prompt_sha256": "1fe4887edd0b2fc159a04311dafdf15114e0d28518c84f125ca0ba0bbe8b0696",
+            "packet": 0,
+            "packet_sha256": "2260d567566539de638368eb7dedd0d964a3ae9156dbacbdd3ac586989b81dbe",
+            "call_id": "fragment-call-2a761fa4434f94f902a7d783",
+            "state": "interrupted"
+          },
+          {
+            "retry_directive": {
+              "decision": "planning-claim-92726aace3ac6d4e73d710ee-decision",
+              "scope": "root",
+              "result_event": "review-481aead2af7d5e3314889c6e-result-309cda782f3191c1",
+              "review": "review-481aead2af7d5e3314889c6e",
+              "candidate_commit": "c6c13be3f3eb51065d6783a1b66675c2ca1d4738",
+              "attempt": "a-b4669e24bbfb91f7a9686499",
+              "failure_code": "review_fragment_protocol",
+              "cause": "inspection de fragment : defect without unique failed artifact",
+              "instruction": "Reprendre la revue indépendante du candidat exact c6c13be3f3eb51065d6783a1b66675c2ca1d4738 après correction du protocole de fragments : rattacher chaque défaut examiné à un artefact source unique parmi les originaux intégralement fournis, puis rendre une décision distincte et traçable pour chaque constat. Préserver le refus historique, les quatre défauts métier antérieurs, la tentative et toutes les dépenses ; vérifier sur les originaux et reçus réels si leurs corrections sont présentes et suffisantes, sans déduire un succès du rapport opérateur. Contrôler notamment l’empreinte après révocation, la borne finale de 8 Mio incluant le saut de ligne, la cible tactile de la séparation et le refus des secrets d’exemple, ainsi que leurs gardes de régression. Distinguer toute pièce réellement absente d’un défaut du candidat et ne produire un verdict final qu’après examen indépendant du même candidat."
+            },
+            "prompt_sha256": "79226cb81646ab53cc0acd57ade9a4567507e53c64214e9cbec58593289a0715",
+            "packet": 0,
+            "packet_sha256": "2260d567566539de638368eb7dedd0d964a3ae9156dbacbdd3ac586989b81dbe",
+            "call_id": "fragment-call-16d087f96e9a358f27ed96e3",
+            "state": "inspected",
+            "reply": "{\"candidate_commit\":\"c6c13be3f3eb51065d6783a1b66675c2ca1d4738\",\"context_sha256\":\"2f24553c908d9389fa9057ff5a2c3aec2a605b44d500a4834b5d002619d63276\",\"defects\":[],\"findings\":{\"0\":{\"e\":0,\"r\":\"contrat examiné\",\"v\":\"inspected\"},\"1\":{\"e\":0,\"r\":\"parité examinée\",\"v\":\"inspected\"},\"10\":{\"e\":0,\"r\":\"tests examinés\",\"v\":\"inspected\"},\"11\":{\"e\":0,\"r\":\"source examinée\",\"v\":\"inspected\"},\"12\":{\"e\":0,\"r\":\"routage examiné\",\"v\":\"inspected\"},\"13\":{\"e\":0,\"r\":\"catalogue exam.\",\"v\":\"inspected\"},\"14\":{\"e\":0,\"r\":\"garde examinée\",\"v\":\"inspected\"},\"15\":{\"e\":0,\"r\":\"recette examinée\",\"v\":\"inspected\"},\"16\":{\"e\":0,\"r\":\"parcours examiné\",\"v\":\"inspected\"},\"17\":{\"e\":0,\"r\":\"test i18n exam.\",\"v\":\"inspected\"},\"18\":{\"e\":0,\"r\":\"sortie examinée\",\"v\":\"inspected\"},\"19\":{\"e\":0,\"r\":\"styles examinés\",\"v\":\"inspected\"},\"2\":{\"e\":0,\"r\":\"bilan examiné\",\"v\":\"inspected\"},\"20\":{\"e\":0,\"r\":\"cible examinée\",\"v\":\"inspected\"},\"21\":{\"e\":0,\"r\":\"client examiné\",\"v\":\"inspected\"},\"22\":{\"e\":0,\"r\":\"preuves revues\",\"v\":\"inspected\"},\"23\":{\"e\":0,\"r\":\"reçus examinés\",\"v\":\"inspected\"},\"3\":{\"e\":0,\"r\":\"rapport examiné\",\"v\":\"inspected\"},\"4\":{\"e\":0,\"r\":\"reçus examinés\",\"v\":\"inspected\"},\"5\":{\"e\":0,\"r\":\"liste examinée\",\"v\":\"inspected\"},\"6\":{\"e\":0,\"r\":\"entrée examinée\",\"v\":\"inspected\"},\"7\":{\"e\":0,\"r\":\"source examinée\",\"v\":\"inspected\"},\"8\":{\"e\":0,\"r\":\"source examinée\",\"v\":\"inspected\"},\"9\":{\"e\":0,\"r\":\"source examinée\",\"v\":\"inspected\"}},\"packet_sha256\":\"2260d567566539de638368eb7dedd0d964a3ae9156dbacbdd3ac586989b81dbe\"}",
+            "reply_sha256": "348e5aecff279c9900f855c2dbe65027adbbaf60707eb33d80dcf26e22305ae9"
+          },
+          {
+            "retry_directive": {
+              "decision": "planning-claim-92726aace3ac6d4e73d710ee-decision",
+              "scope": "root",
+              "result_event": "review-481aead2af7d5e3314889c6e-result-309cda782f3191c1",
+              "review": "review-481aead2af7d5e3314889c6e",
+              "candidate_commit": "c6c13be3f3eb51065d6783a1b66675c2ca1d4738",
+              "attempt": "a-b4669e24bbfb91f7a9686499",
+              "failure_code": "review_fragment_protocol",
+              "cause": "inspection de fragment : defect without unique failed artifact",
+              "instruction": "Reprendre la revue indépendante du candidat exact c6c13be3f3eb51065d6783a1b66675c2ca1d4738 après correction du protocole de fragments : rattacher chaque défaut examiné à un artefact source unique parmi les originaux intégralement fournis, puis rendre une décision distincte et traçable pour chaque constat. Préserver le refus historique, les quatre défauts métier antérieurs, la tentative et toutes les dépenses ; vérifier sur les originaux et reçus réels si leurs corrections sont présentes et suffisantes, sans déduire un succès du rapport opérateur. Contrôler notamment l’empreinte après révocation, la borne finale de 8 Mio incluant le saut de ligne, la cible tactile de la séparation et le refus des secrets d’exemple, ainsi que leurs gardes de régression. Distinguer toute pièce réellement absente d’un défaut du candidat et ne produire un verdict final qu’après examen indépendant du même candidat."
+            },
+            "prompt_sha256": "56a5a1eb8bac89f2b225620b9bbdee76ebdf9438d5cf2a6f49fb8758ac73e7a2",
+            "packet": 1,
+            "packet_sha256": "e8cd17a1adfd7ca17981716a4ce28553094e447f29fd127cad42413a6e9a209e",
+            "call_id": "fragment-call-2ce4efbf2241c20d42e629e6",
+            "state": "reserved"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+   Compiling swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+    Finished `test` profile [unoptimized] target(s) in 52.90s
+     Running unittests src/lib.rs (.cache/rust-native-version846-target/debug/deps/swarm_engine-b6aa09cf62374457)
+owned prestart metadata fixture: /tmp/facts79-813a46023ba7be5f3872aa0a
+OWNED_REVIEW_FIXTURE /tmp/swarm-status-review-3342912-1792835655260583898

@@ -1,0 +1,792 @@
+--- docs/UI-DESIGN.md before
++++ docs/UI-DESIGN.md after
+@@ -201,3 +201,18 @@
+ recherche, le suivi débrayable, les pages et l'export original. Le cadre authentifié
+ isole les styles de l'éditeur ; un repli texte conserve la lecture en cas d'échec.
+ Voir [LOG-CONSOLE.md](architecture/LOG-CONSOLE.md) pour les frontières et preuves.
++
++## Cachets de contexte partagés
++
++Le [vocabulaire de cachets](SEMANTIC-SIGNALS.md) fournit des empreintes SVG
++inspirées d'un cachet de cire au bas d'une fiche : type de mémoire au centre,
++identité et protection de l'usage dans des libellés distincts. Les 29 repères
++et leurs descriptions existent en FR/EN ; [English](en/SEMANTIC-SIGNALS.md).
++Ils utilisent les jetons communs, avec formes et mots en plus des couleurs.
++
++Le composant canonique est `frontend/signals/signals.js` et sa feuille
++`signals.css`. Un catalogue interactif isolé démontre thèmes, états et variantes.
++Les écrans actuels ne le chargent pas encore : intégrer les assets par le
++chemin de livraison convenu et vérifier chaque vue, sans dupliquer les icônes.
++Sans données attestées, montrer identité/droits inconnus. Ni cachet, ni nom,
++ni version active ne constitue une signature ou une autorisation.
+--- docs/PROJECT-MEMORY.md before
++++ docs/PROJECT-MEMORY.md after
+@@ -311,6 +311,11 @@
+ exclut les réponses/historiques, et la préparation initiale précède l'adoption
+ du plan. Une autorité explicite avant plan reste à fournir ; aucune permission
+ n'est déduite du rôle, du cookie, d'un texte ou de l'absence de plan.
++
++Une [bibliothèque de cachets et de repères](SEMANTIC-SIGNALS.md) est disponible
++pour les futures vues mémoire et identité, avec descriptions FR/EN et inconnus
++par défaut. Son catalogue interactif est isolé ; la page mémoire actuelle ne
++charge pas encore ces assets. Ce composant de présentation ne délivre aucun droit.
+ 
+ ```mermaid
+ flowchart LR
+--- docs/en/PROJECT-MEMORY.md before
++++ docs/en/PROJECT-MEMORY.md after
+@@ -281,6 +281,11 @@
+ answers/history, and initial framing precedes plan adoption. An explicit
+ pre-plan authority remains required; no permission follows from a role, cookie,
+ text or the absence of a plan.
++
++A [shared seal and signal library](SEMANTIC-SIGNALS.md) is available for future
++memory and identity views, with FR/EN descriptions and unknown defaults. Its
++interactive catalogue is isolated; the current memory page does not load these
++assets yet. This presentation component issues no permission.
+ 
+ ```mermaid
+ flowchart LR
+--- docs/plans/deepagents-integration/PLAN.md before
++++ docs/plans/deepagents-integration/PLAN.md after
+@@ -53,6 +53,7 @@
+ | M19 Sélection extractive pour un lancement explicite | Réalisé et vérifié localement | Aperçu et confirmation CLI/API, citations reconstruites dans le moteur et sources revérifiées avant départ ; 21 tests Go dont deux avec `-race`, 49 tests Python, cinq contrôles applicatifs M19 et cinq M18. Docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-15.md`. Qualité LLM, hiérarchie et progression générale restent ouvertes. |
+ | M20 Propriété et droits du cadrage | Replan : identité et autorité préalables à l’extension hiérarchique | Attribution technique distinguée de la responsabilité et des droits ; ordre révisé dans `INCREMENT-MEMOIRE-16.md`, lié à R01/R13 et aux 18 scénarios IDA de `../actions-confiance/identites-agents-replan.md`. Création hors plan bloquée avec explication et décision humaine : exigence à réaliser, aucun code M20 ni partage activé. |
+ | M21 Liaison des citations et références | Correction vérifiée dans la préparation mémoire | Alias et doublons reproduits puis refusés par le validateur partagé, y compris le choix extractif ; 57 tests Python et parcours source → référence → worker scripté sur binaire M19 conservé. Voir `INCREMENT-MEMOIRE-17.md` et `RESULTATS-MEMOIRE-17.md`. M20/IA2–IA3 restent ouverts ; aucune identité ou autorisation déduite des empreintes. |
++| M22 Cachets de contexte et repères | Composant et démonstration isolée vérifiés | Direction « cachet de cire au bas d'un parchemin », 29 repères FR/EN et descriptions, états inconnus par défaut. API réutilisable pour la session identité ; deux thèmes, cinq largeurs et contrastes vérifiés. Voir `RESULTATS-MEMOIRE-18.md` ; intégration aux écrans réels et droits moteur encore distincts. |
+ 
+ **Point de reprise au 16 octobre :** les quatre appels M6 et leurs résultats
+ mixtes sont conservés, sans renotation. M7 prépare puis, après accord « oui »,
+@@ -223,6 +224,15 @@
+ pas de modification des sources communes ni d'activation mémoire implicite.
+ Le statut des opérations publiques reste inchangé ; M21 conserve ses résultats
+ à entrées Python identiques.
++
++Demande suivante : ajouter des icônes démonstratives réutilisables par le chantier
++identité, puis préciser leur forme comme un cachet de cire au bas d'un parchemin.
++M22 livre le composant dans `frontend/signals/`, un catalogue interactif isolé,
++29 repères et descriptions FR/EN. Le build reste hors checkout pour préserver
++les ressources embarquées pendant IA3b. La recette navigateur vérifie états,
++inconnus, texte non fiable, deux thèmes et cinq largeurs ; aucune activation de
++droit ou intégration aux écrans existants n'en est déduite. Documentation partagée
++et RETEX : `RESULTATS-MEMOIRE-18.md`.
+ 
+ À chaque reprise, lire ce point, l’audit et le manifeste ; contrôler les empreintes
+ concernées, conserver les acquis et poursuivre le prochain travail autorisé.
+--- frontend/signals/signals.js before
++++ frontend/signals/signals.js after
+@@ -0,0 +1,137 @@
++/* Local presentation vocabulary. No identity, permission or signature is issued here. */
++(function (root, factory) {
++ 'use strict';
++ const api = factory();
++ if (typeof module === 'object' && module.exports) module.exports = api;
++ else root.SwarmSignals = api;
++})(globalThis, function () {
++ 'use strict';
++ const paths = Object.freeze({
++  book: ['M4 4h6l2 2 2-2h6v15h-6l-2 2-2-2H4z', 'M12 6v15M7 8h2M7 11h2M15 8h2M15 11h2'],
++  flow: ['M9 3h6v5H9zM3 16h6v5H3zM15 16h6v5h-6z', 'M12 8v4H6v4M12 12h6v4'],
++  dialogue: ['M3 4h15v11H9l-5 4v-4H3z', 'M18 8h3v12h-3l-4 2v-4M6 8h9M6 11h6'],
++  summary: ['M6 3h12v18H6zM9 7h6M9 11h6M9 15h3', 'M2 9l3 3-3 3M22 9l-3 3 3 3'],
++  bulb: ['M8 16c0-3-3-4-3-8a7 7 0 0 1 14 0c0 4-3 5-3 8zM9 19h6M10 22h4', 'M12 5v7M9 8l3 4 3-4'],
++  layers: ['M12 3 2 8l10 5 10-5zM3 13l9 5 9-5M3 18l9 5 9-5'],
++  clock: ['M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9z', 'M12 7v6l4 2'],
++  question: ['M4 4h16v16H4z', 'M9 8a3 3 0 1 1 5 2c-2 1-2 2-2 3M12 17h.01'],
++  check: ['M4 12l5 5L20 6'],
++  cross: ['M6 6l12 12M18 6 6 18'],
++  minus: ['M4 12h16'],
++  shield: ['M12 2 3 6v6c0 5 9 10 9 10s9-5 9-10V6z'],
++  person: ['M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM4 22v-3a8 8 0 0 1 16 0v3'],
++  agent: ['M5 6h14v13H5zM9 10h.01M15 10h.01M9 15h6M12 3v3M2 10h3M19 10h3M2 15h3M19 15h3'],
++  service: ['M3 3h18v7H3zM3 14h18v7H3zM6 6h.01M6 17h.01M10 6h7M10 17h7M12 10v4'],
++  pen: ['m4 16 12-12 4 4L8 20l-5 1zM13 7l4 4'],
++  key: ['M11 8a5 5 0 1 1-10 0 5 5 0 0 1 10 0zM10 11l10 10M15 16l3-3M18 19l3-3'],
++  eye: ['M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z', 'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z'],
++  send: ['m3 3 19 9-19 9 4-9zM7 12h15'],
++  pause: ['M8 4v16M16 4v16']
++ });
++ const definitions = Object.create(null);
++ function add(id, family, glyph, tone, fr, en, detailFr, detailEn) {
++  definitions[id] = Object.freeze({id, family, glyph, tone,
++   label: Object.freeze({fr, en}), description: Object.freeze({fr: detailFr, en: detailEn})});
++ }
++ add('memory-unknown','memory','question','neutral','Type inconnu','Unknown type','La catégorie de mémoire n’est pas renseignée.','The memory category has not been supplied.');
++ add('memory-experience','memory','book','info','Expérience','Experience','Une expérience passée, à revalider avant réemploi.','A past experience to recheck before reuse.');
++ add('memory-procedure','memory','flow','info','Procédure','Procedure','Une méthode réutilisable avec ses conditions et limites.','A reusable method with conditions and limits.');
++ add('memory-dialogue','memory','dialogue','info','Cadrage','Framing','Une question et une réponse conservées dans leur contexte.','A question and answer retained in context.');
++ add('memory-summary','memory','summary','info','Résumé extractif','Extractive summary','Des extraits attribués ; les sources restent distinctes du résumé.','Attributed excerpts; sources remain distinct from the summary.');
++ add('memory-knowledge','concept','bulb','neutral','Faits · repère conceptuel','Facts · conceptual marker','Repère de mémoire sémantique ; ce n’est pas un nouveau type persistant disponible.','A semantic-memory marker, not a newly available persisted type.');
++ add('version-active','version','layers','info','Version active','Active version','Version courante du catalogue ; ce statut ne donne pas de droit d’usage.','Current catalogue version; this status grants no usage right.');
++ add('version-historical','version','clock','neutral','Historique','Historical','Version conservée pour comprendre le passé, sans actualité présumée.','Retained to explain the past, with no presumed current validity.');
++ add('version-withdrawn','version','minus','warning','Retirée','Withdrawn','Retirée du réemploi ; les textes et réceptions historiques sont conservés.','Withdrawn from reuse; historical text and receipts remain retained.');
++ add('version-unavailable','version','cross','danger','Indisponible','Unavailable','La source ne peut pas être utilisée dans ce contexte.','The source cannot be used in this context.');
++ add('version-unknown','version','question','neutral','État inconnu','Unknown state','Aucun état de version exploitable n’a été fourni.','No usable version state has been supplied.');
++ add('protection-unknown','protection','shield-question','neutral','Droits non établis','Rights not established','Aucun contrôle courant fourni ; aucune autorisation ne peut être déduite.','No current check supplied; no permission can be inferred.');
++ add('protection-pending','protection','shield-clock','warning','Décision attendue','Decision pending','L’usage attend une décision ; l’attente n’autorise pas l’action.','Use awaits a decision; waiting does not authorize the action.');
++ add('protection-allowed','protection','shield-check','success','Usage autorisé','Use authorized','Autorisation pour le contenu, le destinataire et la durée contrôlés, à vérifier dans la preuve.','Permission for the checked content, recipient and duration; consult its evidence.');
++ add('protection-denied','protection','shield-cross','danger','Usage refusé','Use denied','Le contrôle refuse cet usage ; le motif doit rester visible.','The check denies this use; its reason must remain visible.');
++ add('protection-revoked','protection','shield-minus','danger','Autorisation révoquée','Permission revoked','Un ancien accord ne permet plus un nouvel usage.','An earlier permission no longer permits new use.');
++ add('identity-unknown','identity','question','neutral','Identité non attestée','Identity not attested','Un nom ou un fournisseur ne prouve pas l’identité de l’intervenant.','A name or provider does not prove the actor’s identity.');
++ add('identity-pending','identity','clock','warning','Identité à vérifier','Identity check pending','La vérification est attendue ; ne pas afficher une identité attestée.','Verification is pending; do not show an attested identity.');
++ add('identity-verified','identity','person-check','success','Identité attestée','Attested identity','Identité attestée par le contrôle concerné ; aucun droit implicite.','Attested by the relevant check; no implicit rights follow.');
++ add('identity-suspended','identity','person-pause','danger','Identité suspendue','Identity suspended','Les droits courants sont suspendus ; l’auteur historique reste conservé.','Current rights are suspended; historical authorship is preserved.');
++ add('identity-revoked','identity','person-minus','danger','Identité révoquée','Identity revoked','La liaison ne peut plus autoriser de nouveaux usages.','The binding can no longer authorize new uses.');
++ add('actor-human','actor','person','info','Personne','Person','Catégorie d’acteur ; ce pictogramme ne prouve pas l’authentification.','Actor category; this icon does not prove authentication.');
++ add('actor-agent','actor','agent','info','Agent','Agent','Instance d’agent, à distinguer du fournisseur et de ses droits.','An agent instance, distinct from its provider and rights.');
++ add('actor-service','actor','service','info','Service','Service','Identité de service ; elle ne remplace pas un accord humain.','A service identity cannot substitute for human approval.');
++ add('usage-read','usage','eye','info','Consulter','Read','Droit de lecture ; il ne permet pas de rediffuser.','Read permission does not permit redistribution.');
++ add('usage-summarize','usage','summary','info','Résumer','Summarize','Droit de synthèse distinct de la consultation et de la transmission.','Summarization is distinct from reading and transmission.');
++ add('usage-transmit','usage','send','info','Transmettre','Transmit','Droit de transmettre au destinataire précisément autorisé.','Permission to transmit to the specifically authorized recipient.');
++ add('attribution-owner','attribution','key','info','Propriétaire','Owner','Responsabilité et autorité de gestion, distinctes de l’auteur.','Responsibility and management authority, distinct from authorship.');
++ add('attribution-author','attribution','pen','info','Auteur','Author','Origine de l’intervention ; elle ne donne pas tous les droits d’usage.','Origin of the contribution; it does not grant all usage rights.');
++ Object.freeze(definitions);
++ const words = Object.freeze({
++  fr: Object.freeze({seal:'Cachet de contexte',owner:'Propriétaire',author:'Auteur',unknown:'Non renseigné',reference:'Référence'}),
++  en: Object.freeze({seal:'Context seal',owner:'Owner',author:'Author',unknown:'Not supplied',reference:'Reference'})
++ });
++ function options(value = {}) {
++  const lang = value.lang || 'fr';
++  if (!Object.hasOwn(words,lang)) throw new RangeError('Unsupported signal language');
++  const doc = value.document || globalThis.document;
++  if (!doc?.createElementNS) throw new TypeError('A DOM document is required');
++  return {...value, lang, document: doc};
++ }
++ function element(doc, tag, className, text) {
++  const node = doc.createElement(tag); node.className = className;
++  if (text !== undefined) node.textContent = String(text);
++  return node;
++ }
++ function svgNode(doc, tag, attributes) {
++  const node = doc.createElementNS('http://www.w3.org/2000/svg', tag);
++  for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
++  return node;
++ }
++ function glyph(doc, name) {
++  const group = svgNode(doc,'g',{}), [base, mark] = name.split('-');
++  for (const d of paths[base]) group.append(svgNode(doc,'path',{d}));
++  if (mark) {
++   const overlay = svgNode(doc,'g',{transform:'translate(10 11) scale(.58)'});
++   for (const d of paths[mark]) overlay.append(svgNode(doc,'path',{d}));
++   group.append(overlay);
++  }
++  return group;
++ }
++ function icon(doc, name) {
++  const svg = svgNode(doc,'svg',{viewBox:'0 0 24 24',fill:'none',stroke:'currentColor','stroke-width':'1.7','stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true',focusable:'false',class:'swarm-signal__icon'});
++  svg.append(glyph(doc,name));return svg;
++ }
++ function badge(id, config) {
++  const o = options(config), item = definitions[id];
++  if (!item) throw new RangeError('Unknown semantic signal');
++  const span = element(o.document,'span','swarm-signal swarm-signal--'+item.tone);
++  span.dataset.signal = id;span.title = item.description[o.lang];span.append(icon(o.document,item.glyph));
++  if (o.iconOnly) {span.setAttribute('role','img');span.setAttribute('aria-label',item.label[o.lang]);}
++  else span.append(element(o.document,'span','swarm-signal__label',item.label[o.lang]));
++  return span;
++ }
++ function state(family, value, config) {
++  if (!['identity','protection','version'].includes(family)) throw new RangeError('Unknown state family');
++  return badge(family+'-'+(value == null || value === '' ? 'unknown' : value),config);
++ }
++ function memory(kind, config) {
++  const id = 'memory-'+kind;
++  return badge(definitions[id]?.family === 'memory' || definitions[id]?.family === 'concept' ? id : 'memory-unknown',config);
++ }
++ function seal(config = {}) {
++  const o = options(config), doc = o.document, w = words[o.lang];
++  const memoryBadge = memory(o.memory,o), protection = state('protection',o.protection,o), identity = state('identity',o.identity,o);
++  const footer = element(doc,'footer','swarm-context-seal');
++  const mark = svgNode(doc,'svg',{viewBox:'0 0 80 80',fill:'none',stroke:'currentColor','stroke-width':'1.15','stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true',focusable:'false',class:'swarm-context-seal__wax'});
++  const points = Array.from({length:72},(_,i)=>{const a=i*Math.PI/36,r=34+1.6*Math.sin(i*2.4)+.7*Math.cos(i*1.2);return (40+Math.cos(a)*r).toFixed(2)+','+(40+Math.sin(a)*r).toFixed(2)}).join(' ');
++  mark.append(svgNode(doc,'polygon',{points,fill:'currentColor','fill-opacity':'.12'}));
++  mark.append(svgNode(doc,'circle',{cx:'40',cy:'40',r:'28'}));
++  mark.append(svgNode(doc,'circle',{cx:'40',cy:'40',r:'24','stroke-dasharray':'1 3'}));
++  const imprint = svgNode(doc,'g',{transform:'translate(25 25) scale(1.25)'});
++  imprint.append(glyph(doc,definitions[memoryBadge.dataset.signal].glyph));mark.append(imprint);
++  const content = element(doc,'div','swarm-context-seal__content');
++  content.append(element(doc,'p','swarm-context-seal__title',w.seal));
++  const signals = element(doc,'div','swarm-context-seal__signals');signals.append(memoryBadge,protection,identity);content.append(signals);
++  content.append(element(doc,'p','swarm-context-seal__attribution',w.owner+' : '+(o.owner || w.unknown)+' · '+w.author+' : '+(o.author || w.unknown)));
++  if (o.reference) content.append(element(doc,'p','swarm-context-seal__reference',w.reference+' : '+o.reference));
++  footer.append(mark,content);return footer;
++ }
++ return Object.freeze({definitions,badge,state,memory,seal});
++});
+--- frontend/signals/signals.css before
++++ frontend/signals/signals.css after
+@@ -0,0 +1,15 @@
++/* Semantic pairs come from Swarm's shared theme tokens. */
++.swarm-signal{display:inline-flex;align-items:center;gap:.45rem;max-width:100%;padding:.3rem .55rem;border:1px solid currentColor;border-radius:.35rem;vertical-align:middle;line-height:1.35;font-size:.875rem;overflow-wrap:anywhere}
++.swarm-signal__icon{flex:none;width:1.2rem;height:1.2rem}
++.swarm-signal--neutral{color:var(--wattson-texte-discret);background:var(--wattson-carte)}
++.swarm-signal--info{color:var(--wattson-info-encre);background:var(--wattson-info-fond)}
++.swarm-signal--success{color:var(--wattson-succes-encre);background:var(--wattson-succes-fond)}
++.swarm-signal--warning{color:var(--wattson-attention-encre);background:var(--wattson-attention-fond)}
++.swarm-signal--danger{color:var(--wattson-alerte-encre);background:var(--wattson-alerte-fond)}
++.swarm-context-seal{display:flex;align-items:center;gap:1.2rem;border-top:1px dashed var(--wattson-ligne);padding:1.25rem 0 .3rem;margin-top:1.5rem;color:var(--wattson-texte)}
++.swarm-context-seal__wax{flex:none;width:6.5rem;height:6.5rem;color:var(--wattson-accent-encre);filter:drop-shadow(0 2px 1px var(--wattson-carte-creuse))}
++.swarm-context-seal__content{min-width:0}
++.swarm-context-seal__title{font-family:Georgia,serif;font-size:1.25rem;color:var(--wattson-titre);margin:0 0 .6rem}
++.swarm-context-seal__signals{display:flex;flex-wrap:wrap;gap:.45rem}
++.swarm-context-seal__attribution,.swarm-context-seal__reference{font-size:.85rem;line-height:1.5;overflow-wrap:anywhere;margin:.65rem 0 0;color:var(--wattson-texte-discret)}
++@media(max-width:480px){.swarm-context-seal{align-items:flex-start;gap:.5rem}.swarm-context-seal__wax{width:4.1rem;height:4.1rem}.swarm-context-seal__signals{gap:.4rem}.swarm-signal{padding:.25rem .4rem}}
+--- frontend/signals/catalogue.html before
++++ frontend/signals/catalogue.html after
+@@ -0,0 +1,12 @@
++<!doctype html>
++<html lang="fr" data-theme="etat">
++<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'"><title>Cachets de contexte — Swarm</title><link rel="icon" href="swarm-logo.png"><link rel="stylesheet" href="wattson_themes.css"><link rel="stylesheet" href="swarm-design.css"><link rel="stylesheet" href="signals.css"><link rel="stylesheet" href="catalogue.css"><script src="signals.js" defer></script><script src="catalogue.js" defer></script></head>
++<body class="signal-catalogue"><a href="#catalogue-main" class="catalogue-skip">Aller au contenu</a>
++<header class="catalogue-header"><a class="catalogue-brand" href="catalogue.html"><img src="swarm-logo.png" alt="" width="38" height="38"> SWARM <span id="edition">ATELIER VISUEL</span></a><div class="catalogue-tools"><label id="language-label" for="language">Langue</label><select id="language"><option value="fr">Français</option><option value="en">English</option></select><button id="theme" type="button">Changer le thème</button></div></header>
++<main id="catalogue-main" tabindex="-1"><p class="catalogue-kicker" id="kicker">MÉMOIRE · IDENTITÉ · USAGE</p><h1 id="title">Le cachet au bas du parchemin.</h1><p id="intro" class="catalogue-intro">Reconnaître ce qui est conservé, qui intervient et ce qui est permis.</p>
++<p id="demonstration" class="catalogue-demo" role="note">Démonstration visuelle : aucun cachet ne constitue une signature ou une autorisation réelle.</p>
++<div class="catalogue-workbench"><article class="catalogue-parchment" aria-labelledby="paper-title"><p class="catalogue-paper-number" id="paper-number">FRAGMENT 01 · EXEMPLE</p><h2 id="paper-title">Vérifier avant de réutiliser.</h2><p id="paper-body">Une expérience éclaire la prochaine décision. Elle conserve sa source, ses conditions et ses limites ; elle ne valide pas le résultat présent.</p><blockquote id="paper-quote">« Conserver la provenance, puis vérifier le droit d’usage. »</blockquote><div id="seal-preview" aria-live="polite"></div></article>
++<aside class="catalogue-controls" aria-labelledby="controls-title"><h2 id="controls-title">Composer un cachet</h2><label id="memory-label" for="memory">Type de mémoire</label><select id="memory"><option value="experience">Expérience</option><option value="procedure">Procédure</option><option value="dialogue">Cadrage</option><option value="summary">Résumé extractif</option><option value="knowledge">Faits · repère conceptuel</option></select><label id="protection-label" for="protection">Protection de l’usage</label><select id="protection"><option value="unknown">Droits non établis</option><option value="pending">Décision attendue</option><option value="allowed">Usage autorisé</option><option value="denied">Usage refusé</option><option value="revoked">Autorisation révoquée</option></select><label id="identity-label" for="identity">Identité de l’intervenant</label><select id="identity"><option value="unknown">Identité non attestée</option><option value="pending">Identité à vérifier</option><option value="verified">Identité attestée</option><option value="suspended">Identité suspendue</option><option value="revoked">Identité révoquée</option></select><p id="current-meaning" class="catalogue-meaning"></p><button id="reset" type="button">Revenir à l’état inconnu</button></aside></div>
++<section aria-labelledby="legend-title"><p class="catalogue-kicker" id="legend-kicker">UNE FORME, UN SENS</p><h2 id="legend-title">La légende des empreintes</h2><p id="legend-intro">Le type, l’état de version, l’identité et les droits sont des dimensions distinctes.</p><div id="legend"></div></section>
++<details class="catalogue-guide"><summary id="guide-title">Comment réutiliser ces cachets ?</summary><p id="guide-body">Associer les états à des données attestées du moteur. Une identité attestée ne donne pas de droits ; une version active n’est pas une preuve actuelle. Sans donnée, afficher l’état inconnu.</p><p id="concept-note">« Faits » est un repère conceptuel ; les types persistants actuels restent expérience et procédure.</p></details>
++</main></body></html>
+--- frontend/signals/catalogue.js before
++++ frontend/signals/catalogue.js after
+@@ -0,0 +1,36 @@
++/* Isolated examples only: this catalogue calls no application API. */
++(function () {
++ 'use strict';
++ const $ = id => document.getElementById(id), S = globalThis.SwarmSignals;
++ const copy = {
++  fr:{edition:'ATELIER VISUEL',kicker:'MÉMOIRE · IDENTITÉ · USAGE',title:'Le cachet au bas du parchemin.',intro:'Reconnaître ce qui est conservé, qui intervient et ce qui est permis.',demonstration:'Démonstration visuelle : aucun cachet ne constitue une signature ou une autorisation réelle.','paper-number':'FRAGMENT 01 · EXEMPLE','paper-title':'Vérifier avant de réutiliser.','paper-body':'Une expérience éclaire la prochaine décision. Elle conserve sa source, ses conditions et ses limites ; elle ne valide pas le résultat présent.','paper-quote':'« Conserver la provenance, puis vérifier le droit d’usage. »','controls-title':'Composer un cachet','memory-label':'Type de mémoire','protection-label':'Protection de l’usage','identity-label':'Identité de l’intervenant',reset:'Revenir à l’état inconnu','legend-kicker':'UNE FORME, UN SENS','legend-title':'La légende des empreintes','legend-intro':'Le type, l’état de version, l’identité et les droits sont des dimensions distinctes.','guide-title':'Comment réutiliser ces cachets ?','guide-body':'Associer les états à des données attestées du moteur. Une identité attestée ne donne pas de droits ; une version active n’est pas une preuve actuelle. Sans donnée, afficher l’état inconnu.','concept-note':'« Faits » est un repère conceptuel ; les types persistants actuels restent expérience et procédure.','language-label':'Langue',theme:'Changer le thème',skip:'Aller au contenu',families:{memory:'01 · Ce que la mémoire conserve',concept:'Repère conceptuel',version:'02 · La vie d’une version',protection:'03 · La protection de l’usage',identity:'04 · L’état de l’identité',actor:'05 · Qui intervient',usage:'06 · Des droits distincts',attribution:'07 · Propriétaire et auteur'}},
++  en:{edition:'VISUAL WORKSHOP',kicker:'MEMORY · IDENTITY · USE',title:'The seal at the foot of the parchment.',intro:'Recognize what is retained, who contributes and what is permitted.',demonstration:'Visual demonstration: no seal constitutes a signature or an actual permission.','paper-number':'FRAGMENT 01 · EXAMPLE','paper-title':'Verify before reusing.','paper-body':'An experience informs the next decision. Its source, conditions and limits remain attached; it does not validate the present outcome.','paper-quote':'“Preserve provenance, then verify usage permission.”','controls-title':'Compose a seal','memory-label':'Memory type','protection-label':'Usage protection','identity-label':'Actor identity',reset:'Return to unknown state','legend-kicker':'A SHAPE, A MEANING','legend-title':'A legend of impressions','legend-intro':'Type, version state, identity and permissions are distinct dimensions.','guide-title':'How can these seals be reused?','guide-body':'Bind states to attested engine data. An attested identity grants no rights; an active version is not current evidence. Without data, show the unknown state.','concept-note':'“Facts” is a conceptual marker; current persisted types remain experience and procedure.','language-label':'Language',theme:'Change theme',skip:'Skip to content',families:{memory:'01 · What memory retains',concept:'Conceptual marker',version:'02 · The life of a version',protection:'03 · Usage protection',identity:'04 · Identity state',actor:'05 · Who contributes',usage:'06 · Distinct rights',attribution:'07 · Owner and author'}}
++ };
++ function preview() {
++  const lang = $('language').value, protection = $('protection').value, identity = $('identity').value;
++  $('seal-preview').replaceChildren(S.seal({lang,memory:$('memory').value,protection,identity}));
++  $('current-meaning').textContent = S.definitions['protection-'+protection].description[lang]+' '+S.definitions['identity-'+identity].description[lang];
++ }
++ function render() {
++  const lang = $('language').value, text = copy[lang];document.documentElement.lang = lang;
++  for (const [id,value] of Object.entries(text)) if (typeof value === 'string' && $(id)) $(id).textContent = value;
++  document.querySelector('.catalogue-skip').textContent = text.skip;document.title = lang === 'fr' ? 'Cachets de contexte — Swarm' : 'Context seals — Swarm';
++  for (const [id,prefix] of [['memory','memory'],['protection','protection'],['identity','identity']]) for (const option of $(id).options) option.textContent = S.definitions[prefix+'-'+option.value].label[lang];
++  const legend = $('legend');legend.replaceChildren();
++  for (const [family,title] of Object.entries(text.families)) {
++   const section = document.createElement('div');section.className = 'catalogue-family';section.dataset.family = family;const heading = document.createElement('h3');heading.textContent = title;
++   const list = document.createElement('div');list.className = 'catalogue-family-list';
++   for (const item of Object.values(S.definitions).filter(d=>d.family===family)) {
++    const entry = document.createElement('div');entry.className = 'catalogue-entry';entry.append(S.badge(item.id,{lang}));
++    const detail = document.createElement('p');detail.textContent = item.description[lang];entry.append(detail);list.append(entry);
++   }
++   section.append(heading,list);legend.append(section);
++  }
++  preview();
++ }
++ for (const id of ['memory','protection','identity']) $(id).addEventListener('change',preview);
++ $('language').addEventListener('change',render);
++ $('theme').addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='etat'?'sombre':'etat'});
++ $('reset').addEventListener('click',()=>{$('protection').value='unknown';$('identity').value='unknown';preview()});
++ render();
++})();
+--- frontend/signals/catalogue.css before
++++ frontend/signals/catalogue.css after
+@@ -0,0 +1,25 @@
++.signal-catalogue{margin:0;color:var(--wattson-texte);font:16px/1.65 system-ui,sans-serif;background:var(--wattson-fond)}
++.signal-catalogue *{box-sizing:border-box}.signal-catalogue a{color:var(--wattson-lien)}
++.catalogue-skip{position:absolute;left:1rem;top:-10rem;padding:.6rem;background:var(--wattson-carte);z-index:2}.catalogue-skip:focus{top:.5rem}
++.catalogue-header{display:flex;justify-content:space-between;gap:1rem;align-items:center;border-bottom:1px solid var(--wattson-ligne);padding:1rem 4vw}
++.catalogue-brand{display:flex;align-items:center;gap:.7rem;font-weight:750;text-decoration:none}.catalogue-brand span{font-size:.65rem;letter-spacing:.13em;color:var(--wattson-texte-discret)}
++.catalogue-tools{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
++.signal-catalogue button,.signal-catalogue select{font:inherit;min-height:44px;border:1px solid var(--wattson-ligne);border-radius:.3rem;background:var(--wattson-champ);color:var(--wattson-libelle);padding:.45rem .65rem;max-width:100%}
++.signal-catalogue button{cursor:pointer}.signal-catalogue :focus-visible{outline:3px solid var(--wattson-lien);outline-offset:3px}
++.signal-catalogue main{max-width:1200px;padding:2.8rem 1.5rem 4rem;margin:auto}
++.catalogue-kicker{font-size:.7rem;font-weight:750;letter-spacing:.19em;color:var(--wattson-texte-discret);margin:0 0 .8rem}
++.signal-catalogue h1,.signal-catalogue h2,.signal-catalogue h3{font-family:Georgia,serif;color:var(--wattson-titre);font-weight:normal;line-height:1.2}
++.signal-catalogue h1{font-size:clamp(2rem,4.2vw,3.6rem);max-width:850px;margin:0 0 .8rem}.signal-catalogue h2{font-size:1.65rem;margin:0 0 1rem}
++.catalogue-intro{max-width:800px;color:var(--wattson-texte-discret);margin:0 0 1.4rem}
++.catalogue-demo{border-left:3px solid var(--wattson-ligne);padding:.2rem 0 .2rem 1rem;font-size:.85rem;color:var(--wattson-texte-discret)}
++.catalogue-workbench{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(240px,1fr);gap:2rem;margin:2rem 0 4rem;align-items:start}
++.catalogue-parchment{padding:2rem;border:1px solid var(--wattson-ligne);background:var(--wattson-carte);box-shadow:4px 5px 0 var(--wattson-carte-creuse);border-radius:2px 2px 20px 2px;min-width:0}
++.catalogue-paper-number{font-size:.65rem;letter-spacing:.17em;color:var(--wattson-texte-discret);margin:0 0 1.8rem}
++.catalogue-parchment h2{font-size:2rem}.catalogue-parchment blockquote{font-family:Georgia,serif;font-size:1.25rem;padding-left:1rem;margin:1.5rem 0;border-left:2px solid var(--wattson-ligne);color:var(--wattson-titre)}
++.catalogue-controls{display:grid;gap:.55rem;padding:.5rem 0}.catalogue-controls label{font-size:.8rem;color:var(--wattson-libelle);margin-top:.3rem}.catalogue-controls h2{margin-bottom:.25rem}
++.catalogue-meaning{font-size:.85rem;color:var(--wattson-texte-discret);margin:.7rem 0}
++.catalogue-family{border-top:1px solid var(--wattson-ligne);padding:1.5rem 0}.catalogue-family h3{font-size:1.2rem;margin:0 0 1rem}.catalogue-family-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.3rem}
++.catalogue-entry{min-width:0}.catalogue-entry p{font-size:.85rem;color:var(--wattson-texte-discret);margin:.55rem 0 0}
++.catalogue-guide{padding:1rem;border:1px solid var(--wattson-ligne);background:var(--wattson-carte);margin-top:1.5rem}.catalogue-guide summary{cursor:pointer;min-height:32px;color:var(--wattson-titre)}
++@media(max-width:760px){.catalogue-workbench{grid-template-columns:1fr;gap:1.5rem;margin-bottom:2rem}.catalogue-family-list{grid-template-columns:repeat(2,minmax(0,1fr))}.catalogue-header{align-items:flex-start;flex-wrap:wrap}.catalogue-brand span{display:none}}
++@media(max-width:480px){.signal-catalogue main{padding:2rem 1rem}.catalogue-parchment{padding:1.1rem}.catalogue-parchment h2{font-size:1.7rem}.catalogue-family-list{grid-template-columns:1fr}.catalogue-tools{gap:.4rem}.catalogue-tools label{font-size:.8rem}.signal-catalogue select{font-size:16px}}
+--- frontend/build-signals.mjs before
++++ frontend/build-signals.mjs after
+@@ -0,0 +1,18 @@
++// Explicit, fresh output only. Does not replace embedded web assets.
++import {readFile,writeFile,mkdir,copyFile,realpath} from 'node:fs/promises';
++import {fileURLToPath} from 'node:url';
++import path from 'node:path';
++import {createHash} from 'node:crypto';
++const source = path.dirname(fileURLToPath(import.meta.url)), root = path.dirname(source);
++if (process.argv.length !== 3) throw Error('Usage: node frontend/build-signals.mjs NEW_OUTPUT_DIRECTORY');
++const requested = path.resolve(process.argv[2]);
++const out = path.join(await realpath(path.dirname(requested)),path.basename(requested));
++const checkout = await realpath(root);
++if (out===checkout || out.startsWith(checkout+path.sep) || checkout.startsWith(out+path.sep)) throw Error('Preview output must be outside the checkout');
++await mkdir(out,{recursive:false});
++const files = ['signals.js','signals.css','catalogue.html','catalogue.js','catalogue.css'];
++const manifest = {schema_version:1,kind:'swarm-signals-presentation',entry:'catalogue.html',demonstration:true,authority:false,assets:{}};
++for (const name of files) {const from=path.join(source,'signals',name);await copyFile(from,path.join(out,name));manifest.assets[name]=createHash('sha256').update(await readFile(from)).digest('hex');}
++for (const name of ['wattson_themes.css','swarm-design.css','swarm-logo.png']) {const from=path.join(root,'web',name);await copyFile(from,path.join(out,name));manifest.assets[name]=createHash('sha256').update(await readFile(from)).digest('hex');}
++await writeFile(path.join(out,'build-manifest.json'),JSON.stringify(manifest,null,2)+'\n');
++console.log(JSON.stringify({output:out,assets:Object.keys(manifest.assets).length,entry:manifest.entry,authority:false}));
+--- tests/semantic_signals_ui.cjs before
++++ tests/semantic_signals_ui.cjs after
+@@ -0,0 +1,89 @@
++'use strict';
++// Browser verification of the isolated, generated component: no Swarm server/provider.
++const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),http=require('node:http');
++const assert=require('node:assert/strict'),crypto=require('node:crypto');
++const {execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
++const repo=path.resolve(__dirname,'..');let S;
++const out=path.resolve(process.argv[2]||fs.mkdtempSync(path.join(os.tmpdir(),'swarm-signals-evidence-')));
++if(process.argv[2])fs.mkdirSync(out,{recursive:false});
++const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-signals-build-')),build=path.join(temporary,'catalogue');
++const checks=[],errors=[],failed=[],requests=[];let server,browser;
++const hash=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
++const inputPaths=['frontend/build-signals.mjs','frontend/signals/signals.js','frontend/signals/signals.css','frontend/signals/catalogue.html','frontend/signals/catalogue.js','frontend/signals/catalogue.css','web/wattson_themes.css','web/swarm-design.css','web/swarm-logo.png','tests/semantic_signals_ui.cjs'];
++const inputs=Object.fromEntries(inputPaths.map(p=>[p,hash(path.join(repo,p))]));
++const save=(name,value)=>fs.writeFileSync(path.join(out,name),JSON.stringify(value,null,2)+'\n');
++(async()=>{
++ try{
++  const result=execFileSync(process.execPath,['frontend/build-signals.mjs',build],{cwd:repo,encoding:'utf8'});save('build.json',JSON.parse(result));
++  S=require(path.join(build,'signals.js'));
++  assert.equal(Object.keys(S.definitions).length,29);
++  for(const item of Object.values(S.definitions)){assert(item.label.fr&&item.label.en&&item.description.fr&&item.description.en);assert(Object.isFrozen(item));}
++  assert.equal(JSON.parse(result).authority,false);
++  const manifest=JSON.parse(fs.readFileSync(path.join(build,'build-manifest.json'),'utf8'));
++  for(const [name,digest]of Object.entries(manifest.assets))assert.equal(hash(path.join(build,name)),digest);
++  assert.throws(()=>execFileSync(process.execPath,['frontend/build-signals.mjs',build],{cwd:repo,stdio:'pipe'}));
++  assert.throws(()=>execFileSync(process.execPath,['frontend/build-signals.mjs',path.join(repo,'web','signals-proof')],{cwd:repo,stdio:'pipe'}));
++  fs.symlinkSync(path.join(repo,'web'),path.join(temporary,'web-alias'),'dir');
++  assert.throws(()=>execFileSync(process.execPath,['frontend/build-signals.mjs',path.join(temporary,'web-alias','signals-proof')],{cwd:repo,stdio:'pipe'}));
++  assert(!fs.existsSync(path.join(repo,'web','signals-proof')));checks.push('Explicit fresh build preserves inputs and refuses replacement or embedded-web output');
++  const allowed=new Set(Object.keys(manifest.assets));allowed.add('build-manifest.json');
++  server=http.createServer((req,res)=>{const name=new URL(req.url,'http://localhost').pathname.slice(1)||'catalogue.html';if(!allowed.has(name)){res.writeHead(404);res.end();return;}const ext=path.extname(name);res.setHeader('Content-Type',({'.html':'text/html','.css':'text/css','.js':'application/javascript','.png':'image/png','.json':'application/json'})[ext]);res.end(fs.readFileSync(path.join(build,name)));});
++  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin='http://127.0.0.1:'+server.address().port;
++  browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});const page=await browser.newPage();
++  page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('requestfailed',r=>failed.push(r.url()));page.on('request',r=>requests.push(r.url()));
++  await page.setViewport({width:1440,height:1050});await page.goto(origin+'/catalogue.html',{waitUntil:'networkidle0'});
++  assert.equal(await page.$$eval('#legend [data-signal]',nodes=>nodes.length),29);
++  assert.equal(await page.$eval('#seal-preview [data-signal^="protection-"]',n=>n.dataset.signal),'protection-unknown');
++  assert.equal(await page.$eval('#seal-preview [data-signal^="identity-"]',n=>n.dataset.signal),'identity-unknown');
++  assert.equal(await page.$$eval('#seal-preview .swarm-signal--success',nodes=>nodes.length),0);
++  assert.equal(await page.$eval('.swarm-context-seal__wax',n=>n.getAttribute('aria-hidden')),'true');
++  checks.push('All bilingual examples render; the default wax seal shows unknown identity/rights and no positive status');
++  const safety=await page.evaluate(()=>{
++   const host=document.createElement('div');document.body.append(host);const malicious='<img src=x onerror=alert(1)>';
++   host.append(SwarmSignals.seal({owner:malicious,author:malicious,reference:malicious}));
++   const result={images:host.querySelectorAll('img').length,text:host.textContent.includes(malicious),positive:host.querySelectorAll('.swarm-signal--success').length};
++   const only=SwarmSignals.badge('actor-agent',{iconOnly:true});result.aria=only.getAttribute('aria-label');result.role=only.getAttribute('role');
++   result.unknown=SwarmSignals.memory('future-type').dataset.signal;
++   result.refused=0;for(const fn of [()=>SwarmSignals.badge('invented'),()=>SwarmSignals.state('protection',true),()=>SwarmSignals.state('identity','admin'),()=>SwarmSignals.badge('actor-agent',{lang:'xx'}),...['constructor','__proto__','toString'].map(id=>()=>SwarmSignals.badge(id)),...['constructor','__proto__','toString'].map(lang=>()=>SwarmSignals.badge('actor-agent',{lang}))])try{fn()}catch(e){if(e instanceof RangeError)result.refused++;}
++   host.remove();return result;
++  });assert.deepEqual(safety,{images:0,text:true,positive:0,aria:'Agent',role:'img',unknown:'memory-unknown',refused:10});
++  checks.push('Names and references remain text; IDs/roles/booleans cannot imply verification; icon-only output is named');
++  await page.select('#memory','procedure');await page.select('#protection','denied');await page.select('#identity','suspended');
++  assert.equal(await page.$eval('#seal-preview [data-signal^="memory-"]',n=>n.dataset.signal),'memory-procedure');
++  assert.equal(await page.$eval('#seal-preview [data-signal^="protection-"]',n=>n.dataset.signal),'protection-denied');
++  assert.equal(await page.$eval('#seal-preview [data-signal^="identity-"]',n=>n.dataset.signal),'identity-suspended');
++  for(const lang of ['fr','en']){
++   await page.select('#language',lang);assert.equal(await page.$eval('html',n=>n.lang),lang);
++   assert.equal(await page.$eval('#protection',n=>n.value),'denied');assert.equal(await page.$eval('#identity',n=>n.value),'suspended');
++   for(const theme of ['etat','sombre']){
++    if(await page.$eval('html',n=>n.dataset.theme)!==theme)await page.click('#theme');
++    for(const width of [1440,1024,760,390,320]){await page.setViewport({width,height:1050});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${lang}/${theme}/${width}: overflow`);}
++    const contrast=await page.evaluate(()=>{
++     const rgb=x=>x.match(/[\d.]+/g).slice(0,3).map(Number),lum=x=>x.map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4}).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0);
++     return Array.from(document.querySelectorAll('.swarm-signal')).map(n=>{const s=getComputedStyle(n),a=lum(rgb(s.color)),b=lum(rgb(s.backgroundColor));return{id:n.dataset.signal,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05)}});
++    });assert(contrast.every(c=>c.ratio>=4.5),JSON.stringify({lang,theme,contrast}));save(`contrast-${lang}-${theme}.json`,contrast);
++    await page.screenshot({path:path.join(out,`${lang}-${theme}-mobile.png`)});
++    await page.setViewport({width:1440,height:1050});await page.screenshot({path:path.join(out,`${lang}-${theme}-desktop.png`)});
++   }
++  }
++  checks.push('FR/EN selections persist; both themes render at 1440/1024/760/390/320px without overflow; every badge reaches 4.5:1');
++  await page.select('#language','fr');if(await page.$eval('html',n=>n.dataset.theme)!=='etat')await page.click('#theme');
++  await page.select('#memory','experience');await page.click('#reset');assert.equal(await page.$eval('#reset',n=>document.activeElement===n),true);
++  assert.equal(await page.$$eval('#seal-preview .swarm-signal--success',n=>n.length),0);
++  await page.keyboard.press('Tab');await page.focus('#theme');await page.keyboard.press('Tab');
++  assert(await page.evaluate(()=>{const el=document.activeElement,s=getComputedStyle(el);return el.matches(':focus-visible')&&s.outlineStyle!=='none'}));
++  await page.focus('summary');await page.keyboard.press('Enter');assert(await page.$eval('details',n=>n.open));await page.keyboard.press('Enter');assert.equal(await page.$eval('details',n=>n.open),false);
++  const geometry=await page.$$eval('button,select',nodes=>nodes.map(n=>({id:n.id,width:n.getBoundingClientRect().width,height:n.getBoundingClientRect().height})));assert(geometry.every(n=>n.height>=44));save('controls.json',geometry);
++  for(const state of ['unknown','pending','allowed','denied','revoked']){await page.select('#protection',state);assert.equal(await page.$eval('#seal-preview [data-signal^="protection-"]',n=>n.dataset.signal),'protection-'+state);}
++  for(const state of ['unknown','pending','verified','suspended','revoked']){await page.select('#identity',state);assert.equal(await page.$eval('#seal-preview [data-signal^="identity-"]',n=>n.dataset.signal),'identity-'+state);}
++  await page.click('#reset');await page.screenshot({path:path.join(out,'seal-default.png')});
++  await(await page.$('.catalogue-parchment')).screenshot({path:path.join(out,'seal-paper.png')});
++  for(const family of ['protection','identity','version'])await(await page.$(`[data-family="${family}"]`)).screenshot({path:path.join(out,`legend-${family}.png`)});
++  checks.push('Every protection/identity state updates the seal; reset preserves focus and restores unknown; keyboard disclosure and visible focus work');
++  assert.equal(errors.length,0,errors.join('\n'));assert.equal(failed.length,0,failed.join('\n'));assert(requests.every(url=>url.startsWith(origin+'/')));
++  assert(inputPaths.every(p=>hash(path.join(repo,p))===inputs[p]));
++  save('result.json',{status:'PASS',checks,definitions:29,viewports:20,inputs,input_unchanged:true,requests:requests.map(u=>new URL(u).pathname),console_errors:errors,failed_requests:failed,application_api_calls:0,model_calls:0,build_directory:build});
++  console.log(JSON.stringify({status:'PASS',checks:checks.length,definitions:29,viewports:20,output:out}));
++ }catch(error){save('failure.json',{error:String(error.stack),checks,errors,failed,inputs});throw error;}
++ finally{if(browser)await browser.close();if(server)await new Promise(resolve=>server.close(resolve));}
++})().catch(error=>{console.error(error.message);process.exitCode=1});
+--- docs/SEMANTIC-SIGNALS.md before
++++ docs/SEMANTIC-SIGNALS.md after
+@@ -0,0 +1,118 @@
++# Cachets de contexte et repères partagés
++
++Composant de présentation réutilisable, inspiré d'un cachet de cire au bas d'un
++parchemin. **Le composant et le catalogue isolé sont livrés ; les écrans métier
++existants ne les chargent pas encore.** Aucun cachet n'émet de droit, ne signe un
++document et ne certifie une identité. [English](en/SEMANTIC-SIGNALS.md).
++
++## Forme et vocabulaire
++
++Une empreinte centrale indique le type de mémoire ; un bord irrégulier, un
++double cerclage et une ombre discrète évoquent la cire. À côté, trois libellés
++séparent le type, la protection de l'usage et l'état de l'identité. Propriétaire,
++auteur et référence sont affichés en texte lorsqu'ils sont fournis. Sans données,
++le cachet montre **Droits non établis** et **Identité non attestée**.
++
++Les couleurs viennent uniquement des jetons partagés Swarm. L'or du cachet est
++un repère de présentation ; les états ont leurs formes et leurs mots, sans
++autorité déduite de la couleur ou de l'ornement.
++
++| Famille | Repères et sens |
++| --- | --- |
++| Mémoire, 5 | Type inconnu ; expérience passée ; procédure ; cadrage question/réponse ; résumé extractif. |
++| Concept, 1 | Faits : repère de mémoire sémantique, **pas un nouveau type persistant**. Les types du catalogue mémoire actuel restent `experience` et `procedure`. |
++| Version, 5 | Inconnue ; active dans le catalogue ; historique ; retirée du réemploi ; indisponible dans le contexte. Active ne signifie pas autorisée. |
++| Protection, 5 | Droits non établis ; décision attendue ; usage autorisé pour son contenu/destinataire/durée ; usage refusé ; autorisation révoquée. |
++| Identité, 5 | Non attestée ; à vérifier ; attestée ; suspendue ; révoquée. Une identité attestée n'octroie aucun droit implicite. |
++| Intervenant, 3 | Personne, agent, service : catégories, sans preuve d'authentification automatique. Un service n'est pas une approbation humaine. |
++| Usage, 3 | Consulter, résumer, transmettre : droits indépendants. |
++| Attribution, 2 | Propriétaire : responsabilité/gestion ; auteur : origine de l'intervention. |
++
++Les 29 repères ont un libellé et une description FR/EN dans le catalogue.
++Retrait et révocation conservent les auteurs, textes et réceptions historiques.
++Le refus doit conserver un motif visible dans le parcours qui utilise le cachet.
++
++## Sources et construction
++
++Sources canoniques :
++
++- [signals.js](../frontend/signals/signals.js) : API sans dépendance, SVG locaux
++  construits par le DOM, dictionnaire bilingue et états explicites.
++- [signals.css](../frontend/signals/signals.css) : badges et cachet, uniquement
++  avec les paires sémantiques du thème.
++- [catalogue.html](../frontend/signals/catalogue.html), `catalogue.js` et
++  `catalogue.css` : démonstration interactive, légende et descriptions.
++
++Créer une sortie **neuve hors du checkout**, dont le parent existe :
++
++```sh
++node frontend/build-signals.mjs /tmp/mon-catalogue-cachets
++```
++
++Le build copie les cinq fichiers, les deux feuilles de jetons Swarm et le logo
++local ; `build-manifest.json` contient leurs empreintes. Il refuse une sortie
++existante ou résolue dans le checkout, y compris via un lien symbolique. Cela
++évite de modifier les sources ou ressources embarquées pendant le chantier
++identité actif. Il ne reconstruit pas le binaire et ne déploie pas de page.
++Le catalogue est `catalogue.html` dans cette sortie ; il fonctionne sans API.
++
++## Réutilisation par la session identité et les autres vues
++
++Charger `signals.css` après les jetons et `signals.js` comme script local avant
++le consommateur. Pour intégrer aux vues embarquées, ajouter ces deux fichiers
++par le chemin de livraison frontend convenu, puis reconstruire et vérifier les
++écrans concernés. Ne pas recopier les pictogrammes dans chaque vue, ni modifier
++un fichier généré à la main. La démo n'a pas besoin d'être livrée avec l'application.
++
++```js
++// Dans un fichier JS local de la vue, après chargement du composant.
++const cachet = SwarmSignals.seal({
++  memory: 'procedure',
++  lang: 'fr'
++}); // Identité et droits restent inconnus tant que non fournis.
++container.append(cachet);
++
++const lecture = SwarmSignals.badge('usage-read', {lang: 'fr'});
++const inconnu = SwarmSignals.state('identity', undefined, {lang: 'fr'});
++```
++
++`seal` accepte aussi `protection`, `identity`, `owner`, `author`, `reference`.
++Les trois dernières valeurs sont du texte affiché, **jamais une source d'autorité**.
++`memory` accepte les suffixes `experience`, `procedure`, `dialogue`, `summary`,
++`knowledge` ; un type non reconnu devient inconnu. Les états de protection sont
++`unknown`, `pending`, `allowed`, `denied`, `revoked` ; ceux d'identité sont
++`unknown`, `pending`, `verified`, `suspended`, `revoked`.
++
++`badge(id, {lang, iconOnly})` et `state(family, value, options)` rendent un DOM neuf.
++`family` vaut `identity`, `protection` ou `version`. Une valeur absente reste
++inconnue ; un état/identifiant ou une langue non pris en charge produit un
++`RangeError`, sans remplacer l'erreur par un succès visuel. `lang` vaut `fr`
++(défaut) ou `en` ; un document DOM peut être passé explicitement via `document`.
++
++Le consommateur doit relier les états aux données vérifiées du moteur. Ne pas
++déduire `verified` d'un nom, d'un fournisseur, d'un ID ou du rôle Admin ; ne pas
++déduire `allowed` de l'authentification, d'un hash, de l'existence d'une version
++active ou d'un accord historique. Le
++[contrat mémoire cible](plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md)
++reste distinct : son autorisation réelle n'est pas fournie par ce composant.
++
++## Accessibilité et vérification
++
++Les badges ont un texte visible ; leur SVG est décoratif, hors du focus clavier.
++`iconOnly` donne au conteneur `role="img"` et un nom accessible localisé. Le
++cachet conserve ses libellés ; ses champs utilisent `textContent`, sans HTML
++de provenance. Les descriptions sont visibles dans la légende et disponibles
++en titre sur le badge. Aucun CDN, police distante, image générée, script inline,
++écouteur HTML ou accès réseau applicatif.
++
++```sh
++node tests/semantic_signals_ui.cjs /tmp/ma-verification-cachets
++```
++
++La recette utilise Chrome local (`CHROME_BIN`, sinon `/usr/bin/google-chrome`),
++un build temporaire et un serveur statique de test, tous les processus de test
++étant fermés en fin de recette. Elle vérifie les états, le retour à inconnu,
++les textes malveillants, FR/EN, les deux thèmes, 1440/1024/760/390/320 px, le
++contraste des badges, le clavier, le focus et les erreurs/réseau. Les résultats
++et captures sont conservés. Il reste à vérifier chaque écran réel lors de son
++intégration ; ce test isolé ne prouve pas l'application des droits du moteur.
+--- docs/en/SEMANTIC-SIGNALS.md before
++++ docs/en/SEMANTIC-SIGNALS.md after
+@@ -0,0 +1,103 @@
++# Shared context seals and semantic signals
++
++A reusable presentation component inspired by a wax seal at the foot of a
++parchment. **The component and isolated catalogue are delivered; existing
++application screens do not load them yet.** A seal grants no rights, signs no
++document and certifies no identity. [Français](../SEMANTIC-SIGNALS.md).
++
++## Shape and meaning
++
++The central imprint represents the memory type. An irregular rim, double ring
++and subtle shadow suggest wax. Adjacent text separates memory type, usage
++protection and identity state. Owner, author and reference remain text when
++supplied. Missing data produces **Rights not established** and **Identity not
++attested**. Gold is a presentation accent; it carries no authority.
++
++All colours use existing Swarm semantic tokens. Shapes and labels accompany
++colour, with 29 bilingual signals and descriptions:
++
++| Family | Signals and meaning |
++| --- | --- |
++| Memory, 5 | Unknown type; experience; procedure; framing; extractive summary. |
++| Concept, 1 | Facts, a semantic-memory marker, **not a new persisted type**. Current catalogue types remain `experience` and `procedure`. |
++| Version, 5 | Unknown; active in the catalogue; historical; withdrawn; unavailable. Active does not mean authorized. |
++| Protection, 5 | Not established; pending; authorized for the checked content/recipient/duration; denied; revoked. |
++| Identity, 5 | Not attested; pending; attested; suspended; revoked. Attestation grants no implicit rights. |
++| Actor, 3 | Person; agent; service. Categories do not prove authentication. A service is not human approval. |
++| Usage, 3 | Read; summarize; transmit, as distinct permissions. |
++| Attribution, 2 | Owner: responsibility/management; author: origin of the contribution. |
++
++Withdrawal and revocation preserve historical authorship, text and receipt.
++A refusal reason must remain visible in the screen using the seal.
++
++## Sources and build
++
++Canonical sources are [signals.js](../../frontend/signals/signals.js),
++[signals.css](../../frontend/signals/signals.css) and
++[catalogue.html](../../frontend/signals/catalogue.html), with its local JS/CSS.
++The library has no dependency; SVG geometry is built through DOM APIs. Labels,
++descriptions and presentation states are local and bilingual.
++
++```sh
++node frontend/build-signals.mjs /tmp/my-context-seals
++```
++
++The parent must exist and the output must be new and outside the checkout.
++The build copies five component/demo files, two existing theme sheets and the
++local logo, then records hashes in `build-manifest.json`. Existing outputs and
++paths resolving into the checkout, including symlinks, are refused. This avoids
++changing embedded resources while the identity workstream is active. It neither
++rebuilds Go nor deploys a page. The standalone entry is `catalogue.html`; it uses
++no application API.
++
++## Reuse by the identity workstream and other views
++
++Load `signals.css` after theme tokens and `signals.js` as a local script before
++the consumer. For embedded views, deliver these two assets through the agreed
++frontend path, rebuild, then verify the affected screen. Reuse the component;
++do not duplicate icons or edit generated copies. Shipping the demo is optional.
++
++```js
++// In the view's local JS after loading the shared component.
++const seal = SwarmSignals.seal({memory: 'procedure', lang: 'en'});
++container.append(seal); // Identity and permission remain unknown by default.
++const read = SwarmSignals.badge('usage-read', {lang: 'en'});
++const unknown = SwarmSignals.state('identity', undefined, {lang: 'en'});
++```
++
++`seal` also accepts `protection`, `identity`, `owner`, `author`, `reference`.
++The last three are text, never authority. Memory values are `experience`,
++`procedure`, `dialogue`, `summary`, `knowledge`; an unrecognized type is unknown.
++Protection states are `unknown`, `pending`, `allowed`, `denied`, `revoked`.
++Identity states are `unknown`, `pending`, `verified`, `suspended`, `revoked`.
++
++`badge(id, {lang, iconOnly})` and `state(family, value, options)` create fresh DOM.
++Families are `identity`, `protection`, `version`. Missing state means unknown;
++unsupported IDs/states/languages throw `RangeError`, never a successful-looking
++replacement. Languages are `fr` (default), `en`; `document` may supply a DOM.
++
++Consumers must map states to verified engine data. Never derive `verified` from
++a name, provider, ID or Admin role, or `allowed` from authentication, a hash,
++an active version or historical approval. The
++[target memory contract](../plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md)
++(French) remains separate; this component does not implement its authorization.
++
++## Accessibility and verification
++
++Badges have visible text; decorative SVGs are hidden from assistive technology
++and keyboard focus. `iconOnly` supplies `role="img"` and a localized accessible
++name. The seal retains visible labels. Fields use `textContent`; provenance
++cannot insert HTML. Descriptions are visible in the legend and available as
++badge titles. No CDN, remote font, generated bitmap, inline script/handler or
++application network access is used.
++
++```sh
++node tests/semantic_signals_ui.cjs /tmp/my-context-seal-check
++```
++
++The recipe uses local Chrome (`CHROME_BIN`, else `/usr/bin/google-chrome`), a
++temporary build and a test static server; browser/server are closed afterwards.
++It checks states, reset, hostile text, FR/EN, both themes, widths
++1440/1024/760/390/320, badge contrast, keyboard/focus and console/network errors.
++Receipts and screenshots are retained. Each real screen still needs integration
++testing; this isolated check does not establish engine permission enforcement.
+--- docs/plans/deepagents-integration/INCREMENT-MEMOIRE-18.md before
++++ docs/plans/deepagents-integration/INCREMENT-MEMOIRE-18.md after
+@@ -0,0 +1,30 @@
++# M22 — cachets de contexte et repères réutilisables
++
++17 octobre 2026. Demande : icônes démonstratives pour mémoire/protection/identité,
++descriptions des états, réemploi possible par la session identité ; direction
++visuelle précisée comme un cachet de cire au bas d'un parchemin. Codex seul,
++APEX borné et `replan` sur prérequis manquant.
++
++Choix : modifier tout de suite les écrans et ressources Go embarquées pendant
++IA3b, ou livrer d'abord le composant partagé et son catalogue isolé. La seconde
++voie est retenue pour préserver les compilations et fichiers actifs de la session
++identité. Les sources sont sous `frontend/signals/` ; le build explicite produit
++un répertoire neuf hors checkout. Aucun asset `web/` n'est modifié.
++
++| Lot | Propriétaire | Critère |
++| --- | --- | --- |
++| M22.1 | Codex mémoire | Vocabulaire de formes et de sens : 29 repères, FR/EN, type/version/identité/protection distincts ; fait conceptuel marqué non persistant. |
++| M22.2 | Codex mémoire | API locale `SwarmSignals`, badges accessibles et cachet irrégulier ; inconnus par défaut, aucun octroi ou signature par affichage. |
++| M22.3 | Codex mémoire | Catalogue interactif, changement d'états, FR/EN/thèmes, cinq largeurs, contraste, texte non fiable, clavier/focus et diagnostics. |
++| M22.4 | Codex mémoire | Documentation partagée FR/EN, exemple pour la session identité, captures inspectées et RETEX. Intégration aux écrans réels explicitement restante. |
++
++Périmètre : composants, build/recette isolés et documentation. Exclut identité
++réelle, autorisation moteur, migration, activation Admin, appels modèles,
++lancement Swarm natif, déploiement et changement de serveur. L'ajout visuel ne
++ferme pas M20. Les preuves et incidents sont dans `evidence/m22-20261017/`.
++
++M22.1–M22.4 sont réalisés et vérifiés dans ce périmètre isolé : cinq groupes de
++contrôle passent sur les 29 repères et vingt configurations de rendu. Les
++contrastes minimaux sont 5,75:1 et 8,02:1. La régression des clés JavaScript
++héritées est reproduite puis corrigée ; le résultat courant et les captures
++sont dans `browser-verified/`. [Rapport et RETEX](RESULTATS-MEMOIRE-18.md).
+--- docs/plans/deepagents-integration/RESULTATS-MEMOIRE-18.md before
++++ docs/plans/deepagents-integration/RESULTATS-MEMOIRE-18.md after
+@@ -0,0 +1,101 @@
++# M22 — cachets de contexte, bibliothèque et démonstration
++
++17 octobre 2026. Codex seul, APEX borné ; `replan` sur prérequis et module de test.
++**Composant et démonstration vérifiés localement ; intégration applicative restante.**
++
++## Résultat
++
++La demande de repères pour mémoire, protection et identité est réalisée sous la
++forme d'un cachet en bas de fiche : bord irrégulier, relief discret et empreinte
++centrale du type de mémoire. Les libellés adjacents séparent les dimensions.
++Les états inconnus restent inconnus ; noms, références et rôles ne sont jamais
++interprétés comme preuve ou autorisation par le rendu.
++
++Le composant comprend 29 repères FR/EN : cinq types mémoire, un concept factuel
++explicitement non persistant, cinq états de version, cinq protections, cinq états
++d'identité, trois intervenants, trois usages et deux attributions. Chaque repère
++a sa description, visible dans la légende. Les formes, mots et paires sémantiques
++du thème se complètent ; aucun CDN, police distante, nouveau nuancier ou image
++bitmap n'a été ajouté.
++
++Sources : `frontend/signals/` et `frontend/build-signals.mjs`. Les deux assets
++réutilisables sont `signals.js` / `signals.css`, via `SwarmSignals`. Le catalogue
++permet de composer un cachet, changer langue/thème/états et revenir aux inconnus.
++Documentation et exemple destinés au chantier identité :
++[FR](../../SEMANTIC-SIGNALS.md), [EN](../../en/SEMANTIC-SIGNALS.md).
++
++## Vérifications et preuves
++
++Paquet : [`evidence/m22-20261017/`](evidence/m22-20261017/).
++Préimages et périmètre dans `baseline.json`. La construction produit un
++répertoire neuf hors checkout ; aucun fichier `web/`, source Go, configuration,
++mission ou serveur existant n'est modifié par ce lot.
++
++| Critère | Effet observé | Preuve |
++| --- | --- | --- |
++| M22.1 vocabulaire | 29 libellés/descriptions FR/EN et catégories distinctes ; données absentes affichées inconnues. | `browser-verified/result.json`, source liée par empreinte. |
++| M22.2 composant sûr | Rendu DOM neuf, textes non fiables non interprétés en HTML ; ID/état/langue invalides refusés ; pas de vert par présence d'un nom ou ID ; SVG décoratifs et noms accessibles en mode icône seule. | Cinq groupes de contrôle de la recette, dont sécurité du rendu ; aucun appel API. |
++| M22.3 fonctionnement | Tous les états identité/protection sont sélectionnés et répercutés ; reset garde le focus, retour aux inconnus ; accordéon clavier et focus visibles. | Recette et captures `browser-verified/`. |
++| M22.3 lisibilité | FR/EN × État/sombre × 1440/1024/760/390/320 px : 20 configurations sans débordement horizontal ; tous les badges ont un contraste au moins 4,5:1. | Quatre reçus `contrast-*.json`, huit captures desktop/mobile. |
++| M22.4 partage | API/conditions d'intégration, sources canoniques, règles sémantiques, limites et recette documentées FR/EN. | Documentation, liens, diff et bilan final. |
++
++Commande : `node tests/semantic_signals_ui.cjs SORTIE_NOUVELLE`.
++La recette finale est liée à dix entrées inchangées, dont le test lui-même,
++les composants, les feuilles de thème et le logo. Les cinq groupes passent ;
++console et requêtes échouées sont vides, aucun accès API, fournisseur ou modèle.
++Les contrastes minimaux observés sont 5,75:1 en clair et 8,02:1 en sombre.
++Elle ferme son navigateur et son serveur statique. Le dossier généré est conservé
++avec son manifeste. Le refus d'écraser un reçu précédent est aussi vérifié.
++
++Les captures du cachet, de la légende protection et du mobile sombre sont
++inspectées visuellement. L'aperçu centré pour l'utilisateur est
++[`seal-paper.png`](evidence/m22-20261017/browser-verified/seal-paper.png).
++Le catalogue constitue une démonstration graphique ; sélectionner « autorisé »
++ne crée pas un véritable accord.
++
++## Incidents et RETEX
++
++- Le chargement Node initial supposait CommonJS alors que `frontend/package.json`
++  déclare ESM. Diagnostic conservé dans `module-preflight-incident.json` ; le
++  navigateur charge le script classique généré et les assertions Node utilisent
++  ce même fichier généré, sans changer le contrat global du frontend.
++- Le premier navigateur attendu par le cache Puppeteer était absent
++  (`browser-first/failure.json`). Lecture des recettes existantes et inventaire
++  des exécutables : Chrome local est disponible. La recette utilise leur même
++  convention `CHROME_BIN` / `/usr/bin/google-chrome`, sans téléchargement.
++- Une recherche initiale trop large a inclus un bundle tiers minifié. Les
++  recherches suivantes excluent les répertoires `lib/` et bornent les colonnes ;
++  cette sortie tronquée ne constitue pas une preuve d'inventaire.
++- La revue a reproduit six refus incorrects pour des noms hérités de JavaScript
++  (`constructor`, `__proto__`, `toString`) utilisés comme identifiant/langue.
++  Le dictionnaire est désormais sans prototype et la langue est contrôlée par
++  propriété propre. `browser-key-regression/failure.json` garde l'échec ;
++  `source-before-key-fix.js.txt` est repris octet pour octet du build fautif et
++  vérifié contre son empreinte d'entrée. La recette finale vérifie dix entrées
++  invalides, dont ces six variantes, et les refuse explicitement. Ce défaut de
++  composant n'est pas présenté comme un contournement de l'identité du moteur.
++- La recette finale ajoute la conservation des preuves (sortie neuve exigée)
++  et une capture centrée du cachet. Le premier résultat navigateur PASS est
++  conservé ; la relance finale vérifie cette modification de recette et lie
++  les captures aux entrées exactes. Après correction des clés héritées,
++  `browser-verified/` est le résultat courant. Les exécutions ne sont pas additionnées
++  comme des scénarios différents.
++
++Apprentissage réutilisable : une grammaire visuelle d'identité doit représenter
++l'inconnu et le refus aussi clairement que le succès. Ne pas confondre catégorie,
++état d'une version, authenticité et permission. Cette règle est dans le composant,
++le guide et sa recette, pas seulement dans ce rapport.
++
++## Reste à raccorder
++
++La session identité peut réutiliser les deux assets et l'API depuis les sources
++partagées ; aucun message inter-chat ni accusé de réception n'est revendiqué.
++Les assets ne sont pas encore livrés dans les pages Go embarquées : ce choix
++préserve les sources et compilations de la session IA3b active. Leur adoption
++exige le chemin frontend convenu, la reconstruction concernée et une vérification
++du parcours réel. Le catalogue isolé n'est pas une qualification de ces pages.
++
++M20 reste ouvert : propriétaire, auteur attesté et droits effectifs dépendent
++du contrat d'identité/autorité et du consommateur mémoire décrits dans
++`CONTRAT-USAGES-MEMOIRE.md`. Aucun cachet ne répare ce contrat à lui seul ; aucune
++signature, permission, preuve d'authenticité, acceptation ou diffusion n'est créée.

@@ -1,0 +1,86 @@
+{
+  "recorded_at_utc": "2026-10-15T19:15:57.001895+00:00",
+  "scope": "Targeted memory audit M1; deterministic probes and source analysis",
+  "upstream_commit": "29d646fd2d832a44c476964333eddecb0ec1c0cd",
+  "upstream_original_memory_tests": 55,
+  "additional_upstream_audit_scenarios": 8,
+  "swarm_final_top_level_tests": 12,
+  "swarm_source_baseline_stable": true,
+  "runtime_models": "GenericFakeChatModel or local stdin-capture process; no paid model",
+  "application_sources_modified_by_audit": false,
+  "real_llm_learning_quality": "NOT TESTED",
+  "browser_ui": "NOT TESTED",
+  "deepagents_code_runtime": "NOT TESTED; inspected statically",
+  "runs": {
+    "upstream-memory": {
+      "exit_code": 1,
+      "metadata": "upstream-memory.json",
+      "output": "upstream-memory.log"
+    },
+    "upstream-memory-ready": {
+      "exit_code": 0,
+      "metadata": "upstream-memory-ready.json",
+      "output": "upstream-memory-ready.log"
+    },
+    "upstream-paths": {
+      "exit_code": 0,
+      "metadata": "upstream-paths.json",
+      "output": "upstream-paths.log"
+    },
+    "upstream-boundaries": {
+      "exit_code": 0,
+      "metadata": "upstream-boundaries.json",
+      "output": "upstream-boundaries.log"
+    },
+    "swarm-existing": {
+      "exit_code": 0,
+      "metadata": "swarm-existing.json",
+      "output": "swarm-existing.log"
+    },
+    "swarm-prompt-path": {
+      "exit_code": 1,
+      "metadata": "swarm-prompt-path.json",
+      "output": "swarm-prompt-path.log"
+    },
+    "swarm-prompt-ready": {
+      "exit_code": 0,
+      "metadata": "swarm-prompt-ready.json",
+      "output": "swarm-prompt-ready.log"
+    },
+    "swarm-delivery": {
+      "exit_code": 0,
+      "metadata": "swarm-delivery.json",
+      "output": "swarm-delivery.log"
+    },
+    "swarm-final": {
+      "exit_code": 0,
+      "metadata": "swarm-final.json",
+      "output": "swarm-final.log"
+    },
+    "doc-constructors": {
+      "exit_code": 0,
+      "metadata": "doc-constructors.json",
+      "output": "doc-constructors.log"
+    }
+  },
+  "recoveries": [
+    {
+      "initial": "upstream-memory",
+      "cause": "Missing pytest_cov module referenced by upstream warning filters before collection",
+      "changed_precondition": "Installed pytest-cov and pytest-benchmark in isolated audit environment",
+      "verification": "upstream-memory-ready: 55 tests passed"
+    },
+    {
+      "initial": "swarm-prompt-path",
+      "cause": "Audit fixture omitted verified RETEX status before promotion",
+      "changed_precondition": "Retained initial fixture; ready fixture calls retex-status before retex-guide-preview",
+      "verification": "swarm-prompt-ready and swarm-final passed"
+    },
+    {
+      "initial": "source-drift.json",
+      "cause": "Unrelated Go test changed during the audit",
+      "changed_precondition": "New complete Go-source baseline and final selected test run",
+      "verification": "swarm-final-source-check.json: no changed or new Go files"
+    }
+  ]
+}

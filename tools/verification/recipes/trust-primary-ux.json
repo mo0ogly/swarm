@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "id": "trust-primary-ux-component",
+  "inputs": [
+    "tests/trust_primary_ui_test.cjs", "web/trust-native.*", "web/paea.*", "web/i18n*.js",
+    "web/wattson_themes.css", "web/swarm-design.css", "web/swarm-logo.png", "locales/en.json",
+    "package.json", "package-lock.json", "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "actual-page-contrast-and-preview",
+      "command": ["python3", "-c", "import os,subprocess; subprocess.run(['node','tests/trust_primary_ui_test.cjs',os.environ['SWARM_TRUST_UI_EVIDENCE']],check=True)"],
+      "expected_exit": 0,
+      "required_stdout": ["PASS fr-etat-1440-valid-control-loaded", "PASS fr-etat-1440-execute-normal-contrast-AA", "PASS en-sombre-320-save-keyboard-contrast-AA", "PASS en-sombre-320-escape-restores-focus", "PASS en-sombre-320-paea-navigation-language", "PASS en-sombre-320-paea-keyboard-contrast-AA", "PASS only-read-and-preview-operations", "PASS no-browser-errors", "TRUST_PRIMARY_UI_PASS"],
+      "required_stderr": []
+    }
+  ]
+}

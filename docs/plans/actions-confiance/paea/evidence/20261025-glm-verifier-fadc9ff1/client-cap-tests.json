@@ -1,0 +1,11 @@
+{
+  "exit": 0,
+  "scope": "local HTTP fixture, no SKYNET call",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "-v",
+    "test_call"
+  ]
+}

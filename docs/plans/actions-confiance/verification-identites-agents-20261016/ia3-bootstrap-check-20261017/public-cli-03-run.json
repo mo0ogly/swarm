@@ -1,0 +1,24 @@
+{
+  "command": [
+    "python3",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/verify_cli.py",
+    "03",
+    "07"
+  ],
+  "exit": 0,
+  "start": "2026-10-17T16:57:24.461409+00:00",
+  "end": "2026-10-17T16:57:25.404764+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 1123,
+  "overlay": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/overlay.json"
+}

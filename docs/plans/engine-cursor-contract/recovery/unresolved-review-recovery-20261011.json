@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T17:58:54.152728+00:00",
+  "parent": "review-fragment-global-decision-20261011.patch",
+  "parent_tree": "1bc775235322df196225b3f4a73f83c06f086d2e",
+  "preimage_tree": "1bc775235322df196225b3f4a73f83c06f086d2e",
+  "preimage_extensions": [],
+  "preimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "837dfbb62ec246782b2978948238da41997c9bdd37796469254897ea76026541",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "c81821cccd9ff4bcd6de5b716e36454a7f944fd15d1640dfcfdbe75ca225b053",
+    "internal/engine/model.go": "fadce2e824c4f3ba07f11978d0b0ef557bf31e200e7c15ab3746ed1a24325a5b",
+    "internal/engine/planning_context.go": "99a6589a309d7fb7eb5670ca2f112f9e85ef9d3bbba3ca9b2d10239c36c9c411",
+    "internal/engine/planning_delivery.go": "80c8cc40d50636c6ce2f199217f20892cb46f7d63dd6994e521aca03e8a7c406",
+    "internal/engine/planning_prompt.go": "d7497457d2813b95ec6291e5318f79f1cf387bf4407ec3896c806dd9e6beaacc",
+    "internal/engine/planning_review_retry.go": "54d3acc6b0cf214647a28cada56e2e241ce3eb103c1684d65c5b4baf53d77dca",
+    "internal/engine/planning_unresolved_review_recovery_test.go": null,
+    "internal/engine/review_failure_routing.go": "b58e6de24225ab08790cbee6204eb9bae07b8bfa09da763806d7829ad4f39c2c",
+    "internal/engine/store.go": "475c87496faab62e314a6e20ba749ea22ed4f26e15268e5731615f8e8b2741b4"
+  },
+  "postimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "a897360d9086b60e6ecd03128fd13c4a4d7657ac9690e2d6ad372bc154830797",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "5c25bf18ee4481330cfe678fb08dd85b7bde186a109cd48cb1dabbc7c490c44c",
+    "internal/engine/model.go": "981b1e093c087ada3b4f1525e805d0a001abdecc4d95f88222ff159735130149",
+    "internal/engine/planning_context.go": "88734350869d023d39bdac4ab9f600ccdd2bbc2b2e0b6bb9f1473c4f1920684e",
+    "internal/engine/planning_delivery.go": "886ba17aef455a021cc2fbcd81efbe511cef756972be67b8ba94541b171bea62",
+    "internal/engine/planning_prompt.go": "9e98a65b3848b1cff8b7da4738ad6aea2f0b11e76bb95242b4b0f05535d83da6",
+    "internal/engine/planning_review_retry.go": "fdcb3e25ed60f1cf49b8568025253440e53257512f2030ae06850584bbc330c9",
+    "internal/engine/planning_unresolved_review_recovery_test.go": "4085acc26687522b78465a3f52662ac454cd68bb87b7e6eaab8c93118908a471",
+    "internal/engine/review_failure_routing.go": "6d9b0ceb95d788cfbed502856bca4bcda3c6e95d1f0ea519060ae620dae67842",
+    "internal/engine/store.go": "32630cd50979c16189c85ff5824c7c437159eb2a1de22e91151ef6e008133bed"
+  },
+  "result_tree": "0415ac3a23ed9fe1a48ddd14fc60119bbded0859",
+  "patch": "unresolved-review-recovery-20261011.patch",
+  "patch_sha256": "285615b4fbe7a1fcaa7649608519ae91ceeb5d586f7fd3abddcab49b626f9161",
+  "paths": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "internal/engine/model.go",
+    "internal/engine/planning_context.go",
+    "internal/engine/planning_delivery.go",
+    "internal/engine/planning_prompt.go",
+    "internal/engine/planning_review_retry.go",
+    "internal/engine/planning_unresolved_review_recovery_test.go",
+    "internal/engine/review_failure_routing.go",
+    "internal/engine/store.go"
+  ],
+  "check": "PASS exact original preimages, refreshed isolated index, apply--check/apply and exact result tree",
+  "qualification": {
+    "cumulative_source_digest": "afc079ad08db70a1c0f18a0e53e6a3081054ecd55e432d0dab965c6099d85690",
+    "full_receipt": "/tmp/swarm-local-negative-recovery-qualified-v2-full-receipt.json",
+    "full_exit": 0,
+    "full_seconds": 495.57582037799875,
+    "source_drift": [],
+    "targeted": "/tmp/swarm-local-negative-recovery-qualified-v2-targeted.out",
+    "race": "/tmp/swarm-local-negative-recovery-qualified-v2-race.out",
+    "limits": "Cumulative17+18+18b+19 qualified.18 initial nil-review panic and19 initial temporary-storage guard failures remain original evidence; native supervisor delivery/effect and T3..RETEX still pending. No independent native acceptance inferred."
+  }
+}

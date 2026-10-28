@@ -1,0 +1,7 @@
+{
+  "at": "2026-10-11T18:32:42.090508+00:00",
+  "observed": "UI recipe clicked log destination while its Suivi details group was closed; page remained in Conduite while programmatic select loaded console behind hidden Logs section.",
+  "proof": "v2 diagnostic reports Monaco ready, frame hidden=false, no CSP or JS errors; failure screenshot shows Conduite active and Suivi closed.",
+  "correction": "Open navigation group, wait visible destination and actual Logs section before console assertions. No editor or visibility guard weakened.",
+  "original": "log-console-ui-v1/v2 failed recipe and v2 diagnostic/screenshot retained"
+}

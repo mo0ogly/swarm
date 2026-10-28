@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "python3",
+    "docs/plans/deepagents-integration/evidence/m14-20261016/storage-preview-probe.py",
+    "/tmp/swarm-m14-release-bin-uqzy339n/swarm",
+    "docs/plans/deepagents-integration/evidence/m14-20261016/preview-storage-green-results.json"
+  ],
+  "started_at_utc": "2026-10-16T18:01:30.176323+00:00",
+  "duration_seconds": 5.703,
+  "exit_code": 0,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "40c7ef67f87cdc88a8fed4e6113b20a102a87f6c5e1b8131ca20e33ef539d0ad",
+  "real_model_calls": 0
+}

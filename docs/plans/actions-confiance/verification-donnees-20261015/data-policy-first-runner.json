@@ -1,0 +1,10 @@
+{
+  "pid": 1294732,
+  "proc_start_ticks": "2898640",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-data-policy-first-check.py",
+    "run"
+  ],
+  "at": "2026-10-15T20:02:42.260504+00:00"
+}

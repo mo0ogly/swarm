@@ -1,0 +1,62 @@
+{
+  "status": "LOCAL_SEMANTIC_REVIEW_RECORDED",
+  "reviewer": "Codex principal; no independent acceptance",
+  "source_sha256": {
+    "rust/crates/swarm-web/src/service.rs": "6836e296c6606dd9d42f146f00fb92802dc2ce4b1dbdc4ddedaffb046ac2a48e",
+    "rust/crates/swarm-web/src/service/cockpit_read.rs": "a5cf7c79eb17bc1e9e750d96148f4efedbe8f10816dc60084ec365e840c562d2",
+    "rust/crates/swarm-web/src/service/native_admin.rs": "bf78580219f5c705d75911dd510083665edaaabb8fca265b6ac6fc7deb973093",
+    "web/graph.js": "d525dcd7e5360758bee1e8f1a4621e26cf4841cbef07d16d875fe424579bef9f",
+    "web/graph.css": "335eeb7b609e2e00a1faf3fbd550ef45dde2551df3fdd25e391f9a8b2c8d8ed8",
+    "web/cockpit-native.js": "4e58d5a91fbd90e080fd78c5a8cf0777c0cb4c8396adbd317949b2fec099506e",
+    "web/cockpit-native-read.js": "5f0e1c8feaaacea204596771fdf396d7c92b57c4e4f17e15db1537bf52a9a63f",
+    "web/cockpit-native-panels.js": "aec6b037572b3b9aee6204e479b5ccb46efeb3c2fb5f878b126e9599fae07e45",
+    "web/cockpit-native-graph.js": "e9c9f0cd30f634738b8f12471ad61d05deee5d958488044f8b2e316fd45eae04",
+    "web/lib/dagre.min.js": "62eb9787ccfdbdf4148d4d99d31dbf9ee4770eafee81e637d759b52aac22cd51",
+    "tests/rust_native_cockpit_browser.py": "fc5a7111a2726883d3597d3d81b84f761c173694e9fa4431b5a391c123877459",
+    "tests/rust_existing_cockpit_ui.cjs": "18694fcf997e1e2bd02dad211ec6cf4c7aa61a6532c1950050451343b78fceb3",
+    "tests/graph_identifiers_test.cjs": "c36ec17808163a3560cacceec5737f5c3129961f660f030429f3daa5173e8ddf",
+    "tests/graph_layout_cache_test.cjs": "1dc5a1e7f1c6ef4a92e451cdff44c1cc1941dbd4ae29c6766344b51ca7004c22",
+    "tools/verification/recipes/existing-cockpit-rust.json": "b10583e8d8a77064e87bbb883f4ceeb82353e4bfe7350aa8ddeb3f95fa803cdd",
+    "tools/verification/recipes/native-cockpit-ux.json": "dbf59702c6117501992e7bc75b7dccaed9b1dd90ed0fc642e0784bcbdc345f48",
+    "locales/en.json": "9a2be6fec9bcc0c9236cfdaa486144848f38a531c8d991bf6709fff60ff326cd",
+    "web/i18n-en.js": "31a15b7059c378af196e2ba189ea054664b46635c53623f79a940fd558c0d8fd",
+    "version_history.json": "4018981748caf3edd464438b322faa47e2462c76d8d5aeb31ddb571dbdd08173",
+    "docs/architecture/RUST-MIGRATION.md": "a9b9960af9a0a1e0b6f04b07f47697fb289fff267e479e955d7270cf2de15dc5",
+    "docs/en/RUST-MIGRATION.md": "acf475f01fb947239d35c49b128e1b1c08598f2c424a2d3a222a417b1308ef2e",
+    "docs/plans/migration-rust/PLAN.md": "b145662ee133e6b949a56856326c0f0a005873d9744dd95ecf136a0ae5e82c99",
+    "docs/plans/migration-rust/REPLAYS.md": "250d2a7b39859ce656fe54981e750180851b172f558d699405036308124d8a2d"
+  },
+  "policies": "No new execution/operator policy, provider, polling, retry, timeout or concurrency cap. Graph ranker/orientation/dimensions/margins and40-character captions are presentation choices, full titles remain accessible. Work/schema and USD/null semantics are existing protocol/producer contracts. graphNodeKey is injective internal representation, never authority/identifier mutation. Prototype-free agent index avoids inherited properties without excluding names. Existing Root/session/Host/lanes and server transport settings unchanged. All absence stays explicit. Test names/amounts/widths are fixtures.",
+  "functions": {
+    "graph_common": "Reviewed graphAgentsParTache, graphNodeKey and every changed drawPilotGraph dagre boundary. Canonical node/edge identifiers are namespaced for both task and responsibility paths; DOM, commands and shape keep literal IDs. Cache signature includes internal graph nodes and invalidates prior geometry naturally. Rust native profile loads pure definitions only, never calls interactive drawPilotGraph/Pilot. Public/nontrivial changed functions carry current JSDoc including legacy dependencies/effects/limits.",
+    "native_graph": "Reviewed container/validateWork/detectCycles/showEmpty/render/appendTruncated/svgNodeTitle/clear. All user text inserted literally. Complete type/duplicate checks, iterative cycle test, explicit unknown links, null depends permitted as actual Work encoding. Real local dagre/svgNode/graphEdgePath/graphTonalites and graphNodeKey are required without silent helper fallback. Marker direction prerequisite->task, including warning text. Native projection no buttons or validated/live/satisfied-edge inference. Captions full in title/ARIA.",
+    "other_views": "Budget/agent bootstrap/renderer remains exactly reviewed1466 except common read renderer now draws graph and catches its visible failure. API narrow projection retains same source hash. Old panels are cleared on selection/error; stale request generation checks retained.",
+    "tests": "Final permanent recipe executes13 named actual-vendor identifier/index checks, canonical cache regression and185 named browser assertions. CLI creates2actual tasks and dependency/budget. Graph invalid/cycle/prototype fixtures marked client-only, no actual invalid stored Work or real agents invented. HTTP9 checks remain actual protected route/refusal/recovery. FR/EN2themes5widths with local keyboard scroll. Native Admin recipe input inventory updated; not rerun or relabelled as new Admin acceptance."
+  },
+  "errors": "Kahn cycle detection refuses before layout; remaining IDs can include downstream nodes. Duplicate names refuse; unknown dependency warned, never synthesized. Graph failures clear and show original pure-render error as literal text, manual refresh permits recovery. Underlying graph helpers contain no credential data. API/budget failures unchanged from1466. Original prototype-loss witness retained before shared boundary correction. No retries or empty-success fallbacks added. No claim that unrelated historical graph/business contracts were reaccepted.",
+  "documentation": "FR/EN Rust architecture, PLAN/REPLAYS and compiled local notes updated; generated i18n current, test:i18n PASS. No new documentation examples/Rustdoc compilation promised. Canonical index unmodified from1462 hash. Graph helper/renderer documentation reviewed semantically.",
+  "limits": [
+    "Read-only native projection, advanced filters/inspector/editing/responsibilities/launch still unconnected.",
+    "Other legacy screens and write journeys remain open; full migration/independent acceptance not claimed.",
+    "Original Version dialog remains disconnected; compiled identity/notes checked at protected endpoint.",
+    "New source-review is local exact-byte semantic record, not global compiler collector acceptance."
+  ],
+  "follow_up": [
+    {
+      "origin": "1465",
+      "item": "Overlapping load/select aria-busy duration",
+      "state": "hypothesis retained, not data corruption",
+      "owner": "Codex",
+      "criterion": "Rapid refresh/selection test reproduces before correction"
+    },
+    {
+      "origin": "1467 semantic review",
+      "item": "Fixed character captions may visually exceed node width for very wide glyphs",
+      "state": "hypothesis, not reproduced; full accessible titles already present",
+      "owner": "Codex",
+      "value": "Readable captions across variable glyph widths",
+      "scope": "Existing and native SVG caption contract",
+      "resume": "Add wide-glyph visual witness then measure-fit captions at actual visibility; avoid arbitrary semantic title limit"
+    }
+  ]
+}

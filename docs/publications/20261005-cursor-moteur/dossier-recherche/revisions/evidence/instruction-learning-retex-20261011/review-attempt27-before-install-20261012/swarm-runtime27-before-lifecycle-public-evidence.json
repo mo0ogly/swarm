@@ -1,0 +1,58 @@
+{
+  "at": "2026-10-12T08:55:00.730897+00:00",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "revision": 701,
+  "task": "plan-ca937edf4e-T2",
+  "task_status": "blocked",
+  "blocker": "remise trop large : 112 fichiers modifiés depuis la base acceptée, limite 100 ; utiliser planning scope-preview pour organiser des revues coordonnées avec le sous-planificateur. Aucun appel de revue dépensé ; le candidat complet est conservé",
+  "attempts": [
+    {
+      "id": "a-5fff6319655d0b5b9b34413a",
+      "status": "completed",
+      "started": "2026-10-10T18:40:16.176230641Z",
+      "ended": "2026-10-10T19:07:59.148427197Z"
+    },
+    {
+      "id": "a-a349f9134d355713576b7166",
+      "status": "interrupted",
+      "started": "2026-10-11T08:06:25.430669861Z",
+      "ended": "2026-10-11T08:36:27.528395766Z"
+    },
+    {
+      "id": "a-2f9e1debb1548be96273f0d3",
+      "status": "completed",
+      "started": "2026-10-11T14:12:02.469298849Z",
+      "ended": "2026-10-11T14:21:56.981332827Z"
+    },
+    {
+      "id": "a-67814a677979c23767c4e6c5",
+      "status": "completed",
+      "started": "2026-10-12T08:20:17.019949352Z",
+      "ended": "2026-10-12T08:39:57.878223595Z"
+    }
+  ],
+  "current_review": {
+    "id": "review-8e5cc55c66eca0c86032c505",
+    "attempt": "a-2f9e1debb1548be96273f0d3",
+    "producer": "auto-a23c60f03a732c02841f",
+    "state": "changes_requested",
+    "finished": "2026-10-12T08:03:41.660369768Z",
+    "candidate_commit": "4af006a35e56d799a26eae29dd197326bf6288f5"
+  },
+  "previous_review_ids": [
+    "review-d69462672b530e6dad368bce",
+    "review-6eadd171c67897f10f4ec754",
+    "review-f61323bfa5817ab0f9bb4433",
+    "review-14a105dc677c088e4121afb7",
+    "review-44f2da6a502adf1b1853484b"
+  ],
+  "calls": 82,
+  "pause": false,
+  "planning_pause": false,
+  "scope_preview": null,
+  "scope_preview_error": {
+    "http_status": 400,
+    "body": "{\"error\":\"aucun précontrôle de revue impayé à reprendre\",\"failure\":{\"code\":\"command_failed\",\"message\":\"aucun précontrôle de revue impayé à reprendre\",\"retryable\":false}}\n"
+  },
+  "limits": "Public before-state only; historical opinion is neither current-attempt acceptance nor a newly executed review."
+}

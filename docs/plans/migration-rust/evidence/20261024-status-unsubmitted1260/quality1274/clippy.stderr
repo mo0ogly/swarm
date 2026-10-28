@@ -1,0 +1,15 @@
+    Checking swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+error: this boolean expression can be simplified
+   --> crates/swarm-engine/src/root_store/mission_status_reports.rs:741:12
+    |
+741 |           if agent.status == "completed" && !matches!(task.status.as_str(), "submitted" | "accepted")
+    |  ____________^
+742 | |             && !(task.status=="blocked" && matches!(&observed_review,Some(ReviewObservation::Presented(_))))
+743 | |             && !(unsubmitted_pair(task, agent) && attribution.is_some()) {
+    | |________________________________________________________________________^ help: try: `!(agent.status != "completed" || matches!(task.status.as_str(), "submitted" | "accepted") || task.status=="blocked" && matches!(&observed_review,Some(ReviewObservation::Presented(_))) || unsubmitted_pair(task, agent) && attribution.is_some())`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#nonminimal_bool
+    = note: `-D clippy::nonminimal-bool` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::nonminimal_bool)]`
+
+error: could not compile `swarm-engine` (lib) due to 1 previous error

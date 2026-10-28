@@ -1,0 +1,15 @@
+flowchart TD
+    W[Active worker and observable evidence] --> O[Engine measures time, tools and counters]
+    O --> E[Attempt-bound run_observation event]
+    E --> S[Owning supervisor diagnoses]
+    S --> C[Propose continue-run]
+    S --> A[Propose stop-run with reason]
+    C --> G{Valid rights, lease, input and attempt?}
+    A --> G
+    G -->|no| R[Record rejection without attributed stop]
+    G -->|continue| W
+    G -->|stop| P[Request owned process stop]
+    P --> F[Confirm actual exit and retain counters]
+    F --> D[Existing correction or delivery path]
+    D --> V[Controls and review of the same candidate]
+    V --> K[Accept only fresh evidence and satisfied criteria]

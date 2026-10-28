@@ -1,0 +1,9 @@
+{
+  "error": "enrollment bootstrap: independently approved digest required",
+  "failure": {
+    "code": "command_failed",
+    "message": "enrollment bootstrap: independently approved digest required",
+    "retryable": false
+  },
+  "schema_version": 1
+}

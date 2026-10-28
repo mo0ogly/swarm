@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia1_audit.py", line 364, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia1_audit.py", line 213, in main
+    identity_failure = cli(["trust", "identity-context"], {}, token=invalid_token, want=3)
+  File "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia1_audit.py", line 134, in cli
+    assert result.returncode == want, (argv, result.returncode, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['trust', 'identity-context'], 4, '{\n  "error": "identité non reconnue ou suspendue",\n  "failure": {\n    "code": "authorization_required",\n    "message": "identité non reconnue ou suspendue",\n    "retryable": false\n  },\n  "schema_version": 1\n}\n')

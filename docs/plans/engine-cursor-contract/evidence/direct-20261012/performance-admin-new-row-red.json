@@ -1,0 +1,209 @@
+{
+  "error": "AssertionError [ERR_ASSERTION]: preview did not accept operator values\n\ntrue !== false\n\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/graph_performance_admin_ui.cjs:18:998",
+  "diagnostic": {
+    "error": "",
+    "modalOpen": true,
+    "fields": [
+      {
+        "id": "performance-keyboard",
+        "value": "60001",
+        "min": "1",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-samples",
+        "value": "101",
+        "min": "1",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-cards-0",
+        "value": "10001",
+        "min": "2",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-render-0",
+        "value": "60001",
+        "min": "1",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-cards-1",
+        "value": "200",
+        "min": "2",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-render-1",
+        "value": "1000",
+        "min": "1",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-cards-2",
+        "value": "500",
+        "min": "2",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-render-2",
+        "value": "2000",
+        "min": "1",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-cards-3",
+        "value": "501",
+        "min": "2",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-render-3",
+        "value": "",
+        "min": "1",
+        "max": "9007199254740991",
+        "valid": false,
+        "validation": "Please fill out this field."
+      },
+      {
+        "id": "performance-cards-4",
+        "value": "502",
+        "min": "2",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-render-4",
+        "value": "",
+        "min": "1",
+        "max": "9007199254740991",
+        "valid": false,
+        "validation": "Please fill out this field."
+      },
+      {
+        "id": "performance-cards-5",
+        "value": "503",
+        "min": "2",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-render-5",
+        "value": "",
+        "min": "1",
+        "max": "9007199254740991",
+        "valid": false,
+        "validation": "Please fill out this field."
+      },
+      {
+        "id": "performance-cards-6",
+        "value": "504",
+        "min": "2",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-render-6",
+        "value": "",
+        "min": "1",
+        "max": "9007199254740991",
+        "valid": false,
+        "validation": "Please fill out this field."
+      },
+      {
+        "id": "performance-cards-7",
+        "value": "505",
+        "min": "2",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-render-7",
+        "value": "",
+        "min": "1",
+        "max": "9007199254740991",
+        "valid": false,
+        "validation": "Please fill out this field."
+      },
+      {
+        "id": "performance-cards-8",
+        "value": "506",
+        "min": "2",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-render-8",
+        "value": "",
+        "min": "1",
+        "max": "9007199254740991",
+        "valid": false,
+        "validation": "Please fill out this field."
+      },
+      {
+        "id": "performance-cards-9",
+        "value": "507",
+        "min": "2",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-render-9",
+        "value": "",
+        "min": "1",
+        "max": "9007199254740991",
+        "valid": false,
+        "validation": "Please fill out this field."
+      },
+      {
+        "id": "performance-cards-10",
+        "value": "508",
+        "min": "2",
+        "max": "9007199254740991",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "performance-render-10",
+        "value": "",
+        "min": "1",
+        "max": "9007199254740991",
+        "valid": false,
+        "validation": "Please fill out this field."
+      },
+      {
+        "id": "performance-reason",
+        "value": "New responsiveness targets for isolated test",
+        "valid": true,
+        "validation": ""
+      }
+    ],
+    "previewHidden": true
+  },
+  "responses": []
+}

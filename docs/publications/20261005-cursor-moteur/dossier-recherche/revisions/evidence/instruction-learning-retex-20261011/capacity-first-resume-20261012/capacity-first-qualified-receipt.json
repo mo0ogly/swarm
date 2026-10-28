@@ -1,0 +1,80 @@
+{
+  "checks": [
+    {
+      "name": "selector",
+      "argv": [
+        "go",
+        "test",
+        "./internal/engine",
+        "-run",
+        "^TestManagedFragment(AllCallsPreflight|SelectionCostsCoverActualEncoding|SelectionUsesReceivedEvidenceCapacity)$",
+        "-count=1",
+        "-timeout=90s"
+      ],
+      "started": "2026-10-12T18:50:01.141909+00:00",
+      "exit": 0,
+      "seconds": 6.171622306000245,
+      "output_sha256": "ce54f3355823230c1b36c3cac594127de701c605a05479c99f0c97f38fac74c8",
+      "drift": []
+    },
+    {
+      "name": "vet",
+      "argv": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "started": "2026-10-12T18:50:07.314176+00:00",
+      "exit": 0,
+      "seconds": 16.346965074999844,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "drift": []
+    },
+    {
+      "name": "methods",
+      "argv": [
+        "python3",
+        "tools/agent-workflows/check.py"
+      ],
+      "started": "2026-10-12T18:50:48.938701+00:00",
+      "exit": 0,
+      "seconds": 3.905917860000045,
+      "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+      "drift": []
+    },
+    {
+      "name": "build",
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-qualified-capacity-first",
+        "./cmd/swarm"
+      ],
+      "started": "2026-10-12T18:50:52.845355+00:00",
+      "exit": 0,
+      "seconds": 3.8523701779995463,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "drift": []
+    }
+  ],
+  "owned_source_hashes": {
+    "internal/engine/managed_review_capacity_first.go": "d094003bdaf2a845542a4d7c27be905c964ec54d339ce24c936703e592d8c275",
+    "internal/engine/managed_review_capacity_first_test.go": "459343a04dd5d6864836e3d28c3262ae14b6740b2f287442a906c9138deab841",
+    "internal/engine/managed_review_capacity_reserve_test.go": "7a34a35d44de1a5c2f3fe494c7bbb91f5835adc2eff070c1a69c664d113859a7",
+    "internal/engine/managed_review_input_budget.go": "cf735165be79cff8a5f6ac1cf40da2a416a6970c0b9a71801e02c5245d64255f",
+    "internal/engine/managed_review_input_provider.go": "e56486f586476ade5a3af30f0be0a8f8901b4818deed83f36d68c5b380ae19a4",
+    "internal/engine/managed_review_fragment_capacity.go": "1329d09e3bbceb2072b244c1a347b7c23f0014313c123f92793bc0179496cd6d",
+    "internal/engine/managed_review_fragment_plan.go": "66a87a389ad8e0ca5a6d1b7eea0f8cc962c12143459b38e573f814f26837855a",
+    "internal/engine/managed_review_fragment_tokens_store_test.go": "b9a90f605cc98f6b1e40f50b49c48012b541d31716ab0efdb0460b7fff28b649",
+    "docs/REVIEW-FRAGMENTS.md": "bdb9760546b564036cadca7047ff2c4137850c714f59ce3c3868e1501b536fc9",
+    "docs/en/REVIEW-FRAGMENTS.md": "61757fb0fbb8447536fb9ec6a5cb4a91c8a3917ddaac93fed3e75832cefe1009",
+    "docs/engine-cursor-source-inputs-001.json": "84d468ea1dc9a739dfaff10610d25311cd0fbdb33c3bf150f5a6ca00c5fba391",
+    "docs/engine-cursor-source-inputs-003.json": "d39efad81d09183cb64f5bc2941eda85df4d83db1c64fd74c6a11590e9c3ab36",
+    "docs/engine-cursor-source-inputs-004.json": "ae51111b1ce1155cf6089e7076eaad18024ab68e6f4ba8d8367bac9fe2300f60",
+    "docs/engine-cursor-source-inputs-005.json": "966ad43b74fb9a7cf904fbc06367e287d62fa82a96765217ade88a2c9c2c95c4",
+    "docs/engine-cursor-source-manifest.json": "66672689030f5f2495caafbc18d7ff02e597fa02ee6fce9cca0fbf12136212ab"
+  },
+  "binary_sha256": "ae2634674b99a06d0252928a4793b75bbbf393441163502a85f2aaef86f4f76d",
+  "limitations": "No full suite; no new shared-state algorithm or schema. Native installation/review/acceptance not inferred."
+}

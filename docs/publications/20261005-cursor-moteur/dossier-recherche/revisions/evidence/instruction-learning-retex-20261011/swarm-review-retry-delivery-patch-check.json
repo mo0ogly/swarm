@@ -1,0 +1,78 @@
+{
+  "at": "2026-10-11T16:57:38.529869+00:00",
+  "parent": "claude-effort-recovery-20261011.patch",
+  "parent_sha256": "c11969ded95b4268fe875f6d35a34a8ce00f181f868b0f99cdc9a98851f62ab9",
+  "parent_tree": "65a37782ee5aa1de81802ba274b361303e4202f2",
+  "preimage_tree": "a60ceb6c6c743f9deab6242fe58e6c137c8cfd2e",
+  "preimage_extensions": [
+    {
+      "path": "internal/engine/managed_review_fragment_journal.go",
+      "blob": "f5f179505a2ead69a33595e49370042c47b63918",
+      "sha256": "025f819c3e4fa8e574fd3c6ef563419a1aebcda5fe0edf649ca398b054dde4cb",
+      "origin": "Primary HEAD; this file was unchanged before scoped15 (runtime14 qualified source). Explicit sparse patch preimage extension."
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_runtime.go",
+      "blob": "bfa118551ba06b8730d29e2aed5d8a44619313de",
+      "sha256": "b8706fbb4ce3ead0fa55f1607bfbc558c4ca6966d7947e8e4c62be1afd109368",
+      "origin": "Primary HEAD; this file was unchanged before scoped15 (runtime14 qualified source). Explicit sparse patch preimage extension."
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_final_journal.go",
+      "blob": "5a8a224bce4dace5071e1109626a38b43db61095",
+      "sha256": "7b1fdf4d94feb16cc04395e17d68afa02e5679ec5fda629cf25d8a9a3ee9579d",
+      "origin": "Primary HEAD; this file was unchanged before scoped15 (runtime14 qualified source). Explicit sparse patch preimage extension."
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_final_store.go",
+      "blob": "63fe8a889167006ca23ec6b3a3f63de427daa26c",
+      "sha256": "9ced0dbacf2a1e2bcad29accb5e5eb19c0f09a3c9418c792568baa1c51952d6b",
+      "origin": "Primary HEAD; this file was unchanged before scoped15 (runtime14 qualified source). Explicit sparse patch preimage extension."
+    }
+  ],
+  "preimages": {
+    "internal/engine/managed_review_retry_delivery.go": null,
+    "internal/engine/managed_review_retry_delivery_test.go": null,
+    "internal/engine/managed_review_fragment_store.go": "f55d6813fd16d46927240d690ab6c3f830197d0697d1ba1a7872940695d0c8df",
+    "internal/engine/managed_review_fragment_journal.go": "025f819c3e4fa8e574fd3c6ef563419a1aebcda5fe0edf649ca398b054dde4cb",
+    "internal/engine/managed_review_fragment_runtime.go": "b8706fbb4ce3ead0fa55f1607bfbc558c4ca6966d7947e8e4c62be1afd109368",
+    "internal/engine/managed_review_fragment_feedback.go": "deecde16aedc306f5c48dff50f7792548853e105c1a585f4fe88c9e9e8c5fe94",
+    "internal/engine/managed_review_fragment_final_journal.go": "7b1fdf4d94feb16cc04395e17d68afa02e5679ec5fda629cf25d8a9a3ee9579d",
+    "internal/engine/managed_review_fragment_final_store.go": "9ced0dbacf2a1e2bcad29accb5e5eb19c0f09a3c9418c792568baa1c51952d6b",
+    "internal/engine/planning_review_retry.go": "819dccbe8c41130ceb1e2dad0ee11756af953cf6feb961f09bcb0bd392989ae1",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "61c303a29308a82725d8b0ec9d3fba40a0e90ee8dfd0efeb02601b939b7b3fb3",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "d68a4cb0b88303f246aa51610d2e1d652009a911d60b1a55c4b79b0c6032cf4e"
+  },
+  "result_tree": "4df897e2d154d23085af28a7dd15ec96c51b70ca",
+  "patch": "docs/plans/engine-cursor-contract/recovery/review-retry-delivery-20261011.patch",
+  "patch_sha256": "ddb7d6ebfdfc9eca7f2aa43e4c5da537a1e20939dfa386379c695dba72e24dba",
+  "bytes": 29840,
+  "paths": [
+    "internal/engine/managed_review_retry_delivery.go",
+    "internal/engine/managed_review_retry_delivery_test.go",
+    "internal/engine/managed_review_fragment_store.go",
+    "internal/engine/managed_review_fragment_journal.go",
+    "internal/engine/managed_review_fragment_runtime.go",
+    "internal/engine/managed_review_fragment_feedback.go",
+    "internal/engine/managed_review_fragment_final_journal.go",
+    "internal/engine/managed_review_fragment_final_store.go",
+    "internal/engine/planning_review_retry.go",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md"
+  ],
+  "postimages": {
+    "internal/engine/managed_review_retry_delivery.go": "3244a2deaaeb3781b6f1c82030cac885ea51a8a7103b7e8309449bb5ff2f2914",
+    "internal/engine/managed_review_retry_delivery_test.go": "0df3cddfaf15c149a056723dc8602d992698bfec69d858549fc6ccb5cb3a217d",
+    "internal/engine/managed_review_fragment_store.go": "cfbde1c04257f2907a7218b6ed2efb8180e8bf927941b50b7bc8c6acb0518a56",
+    "internal/engine/managed_review_fragment_journal.go": "42f91903c8ebf7c1c24ef4a380a08d6e18fb26ffb306cb77833691e10c89d43a",
+    "internal/engine/managed_review_fragment_runtime.go": "de3e14dbdee13e795e4ca262b1abec59ffba931646bd2a11bb41540de46d26ac",
+    "internal/engine/managed_review_fragment_feedback.go": "336c258ee22ebfa16d3252b82cf073e3e77df12398ad3daf9d76ed4bda9129e6",
+    "internal/engine/managed_review_fragment_final_journal.go": "4249b2b37e6f54d0a8602d5300adc930da2ae33dfab86bdbaaef2379cff8777d",
+    "internal/engine/managed_review_fragment_final_store.go": "05c6f0c665f9a6a3d2f33d39d537ec92960f358bd20ddba2a0709fedde48db6a",
+    "internal/engine/planning_review_retry.go": "54d3acc6b0cf214647a28cada56e2e241ce3eb103c1684d65c5b4baf53d77dca",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "377c6852872a034edb7d66e8535840fb21483dd2da2fe9ee583e248b5ac6d824",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "6902e399226b0dec67d43df097131cec9e3206cdd02356c1608c841244984ec3"
+  },
+  "check": "PASS isolated index exact preimages, git apply --check, apply and exact result tree",
+  "limits": "Scoped15 operator patch only; qualification currently running separately; no native acceptance or installation claimed. Native candidate must refresh its own manifest including Judge/other new code."
+}

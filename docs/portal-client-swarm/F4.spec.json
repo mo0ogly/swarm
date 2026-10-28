@@ -1,0 +1,237 @@
+{
+  "version": 1,
+  "foundation": "F4",
+  "title": "Definir l'architecture backend",
+  "depends_on": "F3",
+  "options": [
+    {
+      "id": "O-D1",
+      "question": "D1 heritee F1 : authentification compte client.",
+      "approaches": [
+        {
+          "id": "A1",
+          "label": "Mot de passe local avec reinitialisation",
+          "pros": "Aucune dependance a un fournisseur distant ; coherent avec le perimetre 'aucune connexion reelle a un service externe' ; controle total du hachage, de la politique de verrouillage et des sessions server-side.",
+          "cons": "Portail doit gerer hachage (bcrypt/argon2), reinitialisation par email (necessite un service d'envoi, hors perimetre agents actuel), politique de mot de passe."
+        },
+        {
+          "id": "A2",
+          "label": "Delegation OAuth a un fournisseur externe",
+          "pros": "Pas de gestion de mot de passe ni de reinitialisation côté portail ; reduction du risque de fuite de mot de passe.",
+          "cons": "Introduit une connexion reelle a un service distant, explicitement exclue du perimetre agents actuel ; necessite enregistrement d'une application OAuth, secrets, callback public, hors de ce qui peut etre decide sans autorisation utilisateur explicite sur un fournisseur nomme."
+        }
+      ],
+      "chosen": "A1",
+      "rationale": "Le perimetre adopte interdit toute connexion reelle a un fournisseur distant sans autorisation explicite ; A1 est la seule option executable dans ce perimetre et couvre les criteres F2/F3 (session creee, anti enumeration E8). Email de reinitialisation differe hors engine ; implementation initiale peut se limiter a creation de compte + mot de passe, reinitialisation declaree limite ouverte."
+    },
+    {
+      "id": "O-D2",
+      "question": "D2 heritee F1 : granularite des droits administrateur.",
+      "approaches": [
+        {
+          "id": "A1",
+          "label": "Role binaire actif/revoque (admin ou non, compte actif ou revoque)",
+          "pros": "Suffit aux sept stories actuelles (aucun partage selectif de ressource entre comptes n'est demande) ; schema de donnees et contrats API simples (booleens) ; plus rapide a verifier (moins de cas de test d'autorisation).",
+          "cons": "Ne couvre pas un futur partage fin de ressources entre comptes ou modeles premium par abonnement differencie."
+        },
+        {
+          "id": "A2",
+          "label": "Droits fins par ressource/modele (liste de scopes)",
+          "pros": "Extensible a des offres differenciees (ex. ressources premium par modele).",
+          "cons": "Complexifie la matrice d'autorisation et les tests anti-enumeration (E1-E3) sans besoin actuel ; risque de defauts d'autorisation plus eleve pour un gain non demande par les sept stories."
+        }
+      ],
+      "chosen": "A1",
+      "rationale": "Aucune story des sept ne demande de partage selectif entre comptes ; A1 couvre role (client/administrateur) + etat de compte (actif/revoque) + propriete de ressource (compte proprietaire uniquement, pas de partage). Schema conçu pour permettre une migration vers A2 (table rights isolee plutot que champ sur compte) sans decision supplementaire immediate."
+    },
+    {
+      "id": "O-local-boundary",
+      "question": "D3 heritee F1 : frontiere portail commercial / moteur Swarm local.",
+      "approaches": [
+        {
+          "id": "A1",
+          "label": "Portail vitrine + comptes, aucun etat moteur reflete",
+          "pros": "Isolation maximale : le portail ne stocke que compte/session/ressources-autorisees/progression-guide ; aucune donnee moteur (missions, taches, preuves reelles) ne transite ni n'est dupliquee cote portail. Simplifie la securite (surface d'attaque reduite, pas de synchronisation a invalider).",
+          "cons": "Le portail ne peut pas afficher un etat moteur en temps reel (ex. avancement d'une mission Swarm locale) ; limite a 'declencher une preparation' sans suivi distant."
+        },
+        {
+          "id": "A2",
+          "label": "Portail miroir d'etat moteur distant (synchronisation bidirectionnelle)",
+          "pros": "Permettrait un tableau de bord temps reel de l'etat moteur local depuis le portail.",
+          "cons": "Exige un canal reseau portail <-> installation locale de l'utilisateur (reverse connexion ou agent distant), hors perimetre 'aucun effet externe / aucune connexion distante reelle' ; duplique l'etat moteur (source de verite ambigue) ; risque de desynchronisation preuve/affichage contraire a la methode moteur deterministe."
+        }
+      ],
+      "chosen": "A1",
+      "rationale": "Le perimetre agents exclut explicitement toute connexion reelle a un service distant et toute modification du moteur existant. A1 est seule compatible : le portail s'arrete a 'guide + declenchement local', l'etat moteur reste local et verifie par le moteur lui-meme, jamais reflete a distance. Le story demarrage se termine par confirmation d'une action Swarm local (ex. fichier/preparation ecrite localement par l'utilisateur suivant le guide), pas par un flux reseau portail->poste utilisateur."
+    },
+    {
+      "id": "O-D4",
+      "question": "D4 heritee F1/F3 : politique d'expiration et renouvellement de session.",
+      "approaches": [
+        {
+          "id": "A1",
+          "label": "Session server-side, duree fixe courte (24h), pas de renouvellement glissant automatique",
+          "pros": "Preuve de revocation simple (une ligne supprimee/invalidee = refus immediat, E5) ; duree courte limite l'exposition d'un jeton vole.",
+          "cons": "Utilisateur actif peut etre deconnecte en cours de session longue (ex. guide de demarrage > 24h, juge improbable pour ce parcours)."
+        },
+        {
+          "id": "A2",
+          "label": "Session glissante (renouvellement a chaque activite) avec plafond absolu",
+          "pros": "Meilleure experience pour une session active longue.",
+          "cons": "Complexifie la preuve d'expiration (deux horloges a verifier) sans necessite demontree par les sept stories ; le guide de demarrage peut etre repris plus tard via reprise d'etape (story demarrage) sans necessiter une session ininterrompue."
+        }
+      ],
+      "chosen": "A1",
+      "rationale": "Confirme la decision d'echafaudage D-F3-1 : session server-side avec duree fixe (24h), revocation manuelle immediate independante de l'expiration programmee. Repond directement a E5 et aux criteres de la story sessions/revocation sans mecanisme de renouvellement supplementaire non demande."
+    },
+    {
+      "id": "O-D5",
+      "question": "D5 heritee F1/F2 : visibilite du journal d'audit pour le client concerne.",
+      "approaches": [
+        {
+          "id": "A1",
+          "label": "Journal reserve a l'administrateur uniquement",
+          "pros": "Perimetre minimal, coherent avec F2 (position par defaut) ; aucun endpoint supplementaire.",
+          "cons": "Le client ne voit pas l'historique des droits qui le concernent (ex. pourquoi une ressource a disparu)."
+        },
+        {
+          "id": "A2",
+          "label": "Journal partiel visible au client pour les evenements qui le concernent (ex. revocation, changement de droit sur son compte)",
+          "pros": "Transparence, utile pour expliquer un refus d'acces au client sans contacter l'administrateur.",
+          "cons": "Necessite un filtrage supplementaire (le client ne doit voir que les entrees relatives a son propre compte) et un endpoint additionnel (GET /api/me/audit-log) hors matrice F3 actuelle."
+        }
+      ],
+      "chosen": "A1",
+      "rationale": "F2 fixe la position par defaut (journal reserve a l'administrateur) et F3 n'a pas inclus d'endpoint client ; conserver A1 pour ce premier increment limite le perimetre API aux sept stories deja couvertes. A2 reste une extension explicitement ouverte (voir recovery/limits), a decider par l'utilisateur avant toute implementation de la story ressources etendue."
+    }
+  ],
+  "decision": [
+    {"id": "D1", "resolution": "Mot de passe local (hachage argon2id), creation de compte incluse ; reinitialisation par email hors perimetre agents actuel, declaree limite."},
+    {"id": "D2", "resolution": "Role binaire client/administrateur + etat compte actif/revoque ; propriete de ressource = association compte<->ressource sans partage, schema migrable vers scopes fins si demande plus tard."},
+    {"id": "D3", "resolution": "Portail vitrine + comptes uniquement (option A1 O-local-boundary) ; aucune synchronisation d'etat moteur distant, aucune connexion reseau portail->poste utilisateur."},
+    {"id": "D4", "resolution": "Session server-side, duree fixe 24h, revocation manuelle immediate et independante ; confirme D-F3-1."},
+    {"id": "D5", "resolution": "Journal d'audit reserve a l'administrateur pour ce premier increment ; extension client (A2) ouverte, non implementee sans nouvelle decision utilisateur."}
+  ],
+  "data_model": {
+    "entities": [
+      {
+        "name": "Account",
+        "fields": ["id (uuid v4, opaque)", "email (unique, index)", "password_hash (argon2id)", "display_name", "role (enum: client|administrateur)", "status (enum: actif|revoque)", "created_at", "updated_at"],
+        "notes": "Identifiant expose jamais sequentiel (D-F3-3). Aucun champ ne distingue 'email inexistant' de 'mot de passe faux' dans les reponses (D-F3-2)."
+      },
+      {
+        "name": "Session",
+        "fields": ["id (uuid v4, valeur opaque du cookie/jeton)", "account_id (FK Account)", "created_at", "expires_at (created_at + 24h)", "revoked_at (nullable)", "last_seen_at"],
+        "notes": "Server-side, pas de JWT auto-suffisant (decision D4). revoked_at non nul ou expires_at depasse => session invalide a toute verification."
+      },
+      {
+        "name": "ModelCatalogEntry",
+        "fields": ["id (uuid)", "slug (public, lisible)", "title", "summary_foundations (5 champs texte courts)", "summary_steps (6 champs texte courts)", "published (bool)"],
+        "notes": "Public en lecture (story catalogue), aucune authentification requise."
+      },
+      {
+        "name": "ResourceGrant",
+        "fields": ["id (uuid, identifiant de ressource expose)", "account_id (FK Account, proprietaire unique)", "resource_type (enum: doc|config|credential_template)", "resource_ref (chemin ou cle interne, jamais expose brut si sensible)", "created_at"],
+        "notes": "Story ressources : liste filtree strictement par account_id=session.account_id. Aucun champ 'partage' dans ce premier increment (D2=A1)."
+      },
+      {
+        "name": "OnboardingState",
+        "fields": ["account_id (FK Account, cle primaire)", "current_step (enum: installation|fournisseur|configuration|complete)", "step_data (JSON par etape)", "updated_at"],
+        "notes": "Story demarrage : un seul etat par compte, reprise exacte a current_step au retour (critere F2)."
+      },
+      {
+        "name": "RightChangeAuditEntry",
+        "fields": ["id (uuid)", "actor_account_id (FK Account administrateur)", "target_account_id (FK Account)", "action (enum: grant_admin|revoke_admin|activate|deactivate|revoke_session|revoke_resource)", "created_at (horodatage exact, source de verite pour E5)"],
+        "notes": "Ecrite dans la meme transaction que l'effet applique (jamais apres coup, cf. story revocation : 'jamais afficher revoque sans confirmation serveur')."
+      }
+    ],
+    "relationships": [
+      "Account 1..N Session",
+      "Account 1..N ResourceGrant (proprietaire unique, pas de partage)",
+      "Account 0..1 OnboardingState",
+      "Account 1..N RightChangeAuditEntry (comme target), Account(role=administrateur) 1..N RightChangeAuditEntry (comme actor)"
+    ]
+  },
+  "api_contracts": {
+    "base_note": "Reprend et precise les endpoints de la matrice F3 (coverage[].api) avec schemas concrets ; aucun endpoint ajoute hors perimetre sept stories sauf mention explicite.",
+    "public": [
+      {"method": "GET", "path": "/api/public/landing-content", "auth": "aucune", "response_200": {"headline": "string", "engine_vs_agents": "string", "foundations_link": "string", "steps_link": "string"}},
+      {"method": "GET", "path": "/api/public/example-graph", "auth": "aucune", "response_200": {"nodes": "array", "edges": "array", "proofs": "array"}, "response_empty": {"status": 200, "body": {"nodes": [], "message": "aucun graphe exemple disponible"}}},
+      {"method": "GET", "path": "/api/public/models", "auth": "aucune", "response_200": {"items": [{"id": "uuid", "slug": "string", "title": "string", "summary_foundations": "array[5]", "summary_steps": "array[6]"}]}},
+      {"method": "GET", "path": "/api/public/models/{modelId}", "auth": "aucune", "response_404": "identifiant inexistant -> 404 generique", "response_200": "fiche detaillee complete"}
+    ],
+    "auth": [
+      {"method": "POST", "path": "/api/auth/register", "auth": "aucune", "request": {"email": "string", "password": "string (min 12, politique cote serveur)"}, "response_201": {"account_id": "uuid"}, "response_409": "email deja utilise -> message generique identique a un succes partiel impossible (pas de fuite sur l'existence, mais creation de compte necessite confirmation d'unicite ; limite documentee en recovery)."},
+      {"method": "POST", "path": "/api/auth/login", "auth": "aucune (etablit la session)", "request": {"email": "string", "password": "string"}, "response_200": {"session_cookie": "Set-Cookie httpOnly secure sameSite=strict, valeur=session.id opaque"}, "response_401": {"message": "identifiants invalides", "note": "identique que email inexistant ou mot de passe faux, cf D-F3-2"}},
+      {"method": "POST", "path": "/api/auth/logout", "auth": "session requise", "response_204": "session.revoked_at=now, cookie invalide immediatement cote serveur"},
+      {"method": "GET", "path": "/api/auth/session", "auth": "session requise", "response_200": {"account_id": "uuid", "role": "enum", "expires_at": "iso8601"}, "response_401": "session absente/expiree/revoquee"}
+    ],
+    "client": [
+      {"method": "GET", "path": "/api/me/resources", "auth": "session requise", "response_200": {"items": "ResourceGrant filtres par account_id=session.account_id uniquement"}},
+      {"method": "GET", "path": "/api/me/resources/{resourceId}", "auth": "session requise", "response_200": "contenu ressource si resourceId appartient a session.account_id", "response_403_or_404": "sinon, meme reponse pour ressource existante-interdite et inexistante (E1/E2/E3)"},
+      {"method": "GET", "path": "/api/me/onboarding/state", "auth": "session requise", "response_200": {"current_step": "enum", "step_data": "object"}},
+      {"method": "POST", "path": "/api/me/onboarding/steps/{stepId}/validate", "auth": "session requise", "request": "donnees de l'etape", "response_200": "etape suivante debloquee", "response_409": "etape non atteignable dans l'ordre"},
+      {"method": "POST", "path": "/api/me/onboarding/complete", "auth": "session requise", "response_200": {"local_action_confirmed": "bool"}, "note": "Declenche une action locale documentee par le guide (ex. ecriture d'un fichier de preparation sur le poste de l'utilisateur) ; aucun appel reseau portail->poste, cf local_swarm_boundary."}
+    ],
+    "admin": [
+      {"method": "GET", "path": "/api/admin/accounts?q={query}", "auth": "session + role administrateur", "response_200": {"items": "Account sans password_hash"}},
+      {"method": "GET", "path": "/api/admin/accounts/{accountId}", "auth": "session + role administrateur", "response_200": "Account + droits + dernieres entrees audit"},
+      {"method": "PATCH", "path": "/api/admin/accounts/{accountId}/rights", "auth": "session + role administrateur", "request": {"role": "enum optionnel", "status": "enum optionnel"}, "response_200": "etat applique + RightChangeAuditEntry cree dans la meme transaction"},
+      {"method": "POST", "path": "/api/admin/accounts/{accountId}/sessions/revoke", "auth": "session + role administrateur", "response_200": "toutes Session.revoked_at=now pour ce compte, verification immediate possible"},
+      {"method": "POST", "path": "/api/admin/accounts/{accountId}/rights/revoke", "auth": "session + role administrateur", "response_200": "ResourceGrant cible supprime/revoque + audit"},
+      {"method": "GET", "path": "/api/admin/audit-log", "auth": "session + role administrateur", "response_200": {"items": "RightChangeAuditEntry tri decroissant created_at"}}
+    ]
+  },
+  "authorization": {
+    "model": "RBAC simple (role: client|administrateur) + controle de propriete par ligne (account_id sur ResourceGrant/OnboardingState).",
+    "middleware_order": ["1. Resolution session (cookie opaque -> Session valide non expiree non revoquee) sinon 401.", "2. Verification role si endpoint /api/admin/* sinon 403 (E6).", "3. Verification propriete (account_id de la ressource cible == session.account_id) pour /api/me/* sinon reponse generique identique existe/inexiste (E1/E2/E3)."],
+    "anti_enumeration": "Reponses 401/403/404 pour ressource/compte formulees identiquement quelle que soit la cause reelle (D-F3-2) ; identifiants opaques uuid v4 (D-F3-3) ; register et login ne distinguent jamais email inexistant de mot de passe/email deja pris dans le message utilisateur (voir limite sur /auth/register ci-dessous).",
+    "revocation_propagation": "Toute verification de session relit l'etat Session en base a chaque appel (pas de cache long ni de jeton auto-suffisant) ; une revocation est donc visible au prochain appel sans delai de propagation (E5)."
+  },
+  "sessions": {
+    "mechanism": "Session server-side opaque (uuid v4), cookie httpOnly + secure + sameSite=strict, jamais accessible en JavaScript cote client.",
+    "duration": "Fixe 24h a la creation (expires_at = created_at + 24h), pas de renouvellement glissant automatique (decision D4/A1).",
+    "revocation": "logout explicite ou action administrateur -> revoked_at=now immediat ; toute verification ulterieure constate revoked_at non nul avant expires_at et refuse (401/403).",
+    "storage": "Table Session dediee (voir data_model), pas de JWT stateless, pour satisfaire la preuve de revocation immediate exigee par E5."
+  },
+  "storage": {
+    "options_considered": [
+      {"id": "A1", "label": "Base relationnelle unique (ex. Postgres/SQLite selon environnement final) pour Account/Session/ResourceGrant/OnboardingState/Audit", "pros": "Transactions ACID necessaires pour ecrire effet+audit atomiquement (story revocation/administration) ; relations simples, requetes de filtrage par account_id triviales.", "cons": "Necessite un service de base de donnees, hors perimetre d'implementation de cette fondation."},
+      {"id": "A2", "label": "Stockage cle-valeur distribue (ex. document store) sans transactions multi-entites", "pros": "Scalabilite horizontale simple pour sessions.", "cons": "Ecriture atomique effet+audit (critere story administration/revocation) plus difficile a garantir sans transaction native ; risque d'audit ecrit apres coup, explicitement exclu par F2."}
+    ],
+    "chosen": "A1",
+    "rationale": "Les criteres F2/F3 exigent qu'une entree d'audit soit creee au meme moment que l'effet applique, jamais apres coup ; une base relationnelle avec transaction couvre nativement cette exigence. Choix de moteur SQL precis (Postgres vs SQLite) reste une decision d'implementation hors perimetre de cette fondation, a trancher en phase realisation."
+  },
+  "local_swarm_boundary": {
+    "see_options": "O-local-boundary",
+    "chosen_boundary": "Le portail stocke et sert uniquement : comptes, sessions, ressources autorisees (metadonnees + contenu statique documentaire), progression du guide de demarrage. Le portail ne stocke, ne lit et ne reflete aucun etat moteur Swarm reel (missions, taches, preuves d'execution) : ces objets existent uniquement dans l'installation locale de l'utilisateur et sont geres par le moteur lui-meme, hors de toute API portail.",
+    "onboarding_completion_contract": "POST /api/me/onboarding/complete ne declenche aucun appel reseau vers le poste de l'utilisateur ; il marque l'etat local du guide comme termine et fournit a l'utilisateur les instructions/materiel (deja couverts par la story ressources) necessaires pour executer l'etape de preparation directement dans son installation Swarm locale. La preuve de preparation reelle appartient au moteur local, jamais au portail."
+  },
+  "recovery": {
+    "network_or_provider_failure": "Toute ecriture effet+audit (administration/revocation) utilise une transaction ; en cas d'echec partiel, rollback complet et reponse d'erreur explicite (aucune modification partielle silencieuse, critere F2 story administration).",
+    "idempotency": "POST /api/admin/accounts/{id}/sessions/revoke et /rights/revoke sont idempotents : rejouer l'appel sur une cible deja revoquee renvoie un succes sans nouvelle entree audit dupliquee inutilement, mais ne cree jamais un etat 'succes degrade'.",
+    "guide_abandonment": "OnboardingState persistant par compte (pas en memoire de session) : fermeture/retour reprend exactement a current_step, meme sur une nouvelle session (critere F2).",
+    "provider_unreachable_during_onboarding": "Etape de validation (POST .../validate) renvoie une erreur specifique a l'etape en echec sans modifier current_step ; l'utilisateur reste a l'etape precedente reussie (E7).",
+    "open_limits": [
+      "Reinitialisation de mot de passe (D1) necessite un canal d'envoi (email) non couvert par cette fondation ; declare comme limite ouverte, pas implemente ici.",
+      "Extension D5/A2 (journal visible au client) non implementee ; nouvel endpoint GET /api/me/audit-log a concevoir si l'utilisateur confirme ce choix.",
+      "Choix du moteur SQL precis (Postgres/SQLite/autre) renvoye a la phase de realisation, hors perimetre architecture de cette fondation.",
+      "POST /api/auth/register : eviter la fuite d'enumeration d'email tout en garantissant l'unicite reste un compromis a verifier en realisation (reponse generique recommandee, verification differee par email si besoin)."
+    ]
+  },
+  "stories_traceability": {
+    "decouverte": ["api_contracts.public landing-content/example-graph"],
+    "catalogue": ["api_contracts.public models"],
+    "sessions": ["data_model.Session", "api_contracts.auth", "sessions.*", "authorization.anti_enumeration"],
+    "ressources": ["data_model.ResourceGrant", "api_contracts.client resources", "authorization.*"],
+    "demarrage": ["data_model.OnboardingState", "api_contracts.client onboarding", "local_swarm_boundary.*", "recovery.guide_abandonment", "recovery.provider_unreachable_during_onboarding"],
+    "administration": ["data_model.Account", "data_model.RightChangeAuditEntry", "api_contracts.admin", "storage.chosen"],
+    "revocation": ["data_model.Session", "data_model.RightChangeAuditEntry", "api_contracts.admin sessions/rights revoke", "authorization.revocation_propagation", "recovery.idempotency"]
+  },
+  "limits": [
+    "Cette fondation fixe une architecture candidate (schemas, contrats, frontiere) ; aucun code moteur ni service reel n'est implemente dans ce perimetre agents.",
+    "D1/D2/D3/D4/D5 sont tranchees ici pour permettre F5 (design) mais restent des decisions d'architecture proposees, soumises a confirmation explicite de l'utilisateur avant realisation (cf. contrat de tache : aucune acceptation implicite par ce rapport).",
+    "Choix de moteur de base de donnees precis et canal d'envoi email (reinitialisation) renvoyes a la phase de realisation.",
+    "Pertinence semantique de l'architecture (coherence avec les sept stories et les huit cas d'erreur E1-E8) verifiee par revue independante ; les controles locaux ne verifient que presence/longueur structurelle."
+  ]
+}

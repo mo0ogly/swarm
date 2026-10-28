@@ -1,0 +1,15 @@
+{
+  "error": "budget-existing-planning-estimate-changed",
+  "failure": {
+    "causes": [
+      "budget-existing-planning-estimate-changed",
+      "budget-existing-planning-estimate-changed",
+      "budget-invalid",
+      "budget-existing-planning-estimate-changed"
+    ],
+    "code": "budget-existing-planning-estimate-changed",
+    "message": "budget-existing-planning-estimate-changed",
+    "retryable": false
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "resume-current-originals-1792035531052294110",
+  "expected_revision": 272,
+  "reason": "Replan après unknown : les appels commit/reconcile refusaient trop tard une ressource explicite contradictoire. Garde commune avant tout état terminal, contre-exemple avant FAIL puis 24 tests principaux et 34 sous-cas race PASS, parcours publics renforcés. La remise fournit les originaux courants complets, 31 sources sous 352 Kio ; rapports historiques et avis conservés séparément. Conducteur identifié arrêté après pause et absence de descendants ; reprise uniquement pour importer le nouvel arbre, sans relancer l’ancien candidat ni les tentatives. Contrôles et revue indépendante neufs requis, aucune acceptation présumée."
+}

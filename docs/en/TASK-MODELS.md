@@ -39,6 +39,18 @@ are not included.
 Exact model and effort are configured under **AI and connections → Configure levels**;
 the task selects a level from that policy.
 
+For Sonnet and Opus, Admin offers explicit Claude effort choices: `low`, `medium`,
+`high`, `xhigh` and `max`. This is a saved, previewed and versioned policy;
+the engine does not automatically replace a blank choice.
+**Inherited Claude Code setting** means the client resolves its own setting,
+possibly a personal one, rather than a verified effort level. An explicit choice
+is passed as `--effort` on subsequent calls. Claude may lower it for the resolved
+model or a managed cap; the saved route records requested effort, not evidence
+of applied effort. See [Claude documentation](https://code.claude.com/docs/en/model-config#adjust-effort-level).
+The legacy Haiku alias and custom models without verified capabilities retain
+a blank effort. Changing effort refunds no calls and prevents reusing opinions
+produced under another configuration.
+
 
 ## Planner, subplanners and reviewer
 
@@ -68,3 +80,23 @@ set its `scope`, `reviewer:false`, `inherit:true`. Use the revision observed aft
 pausing. Stale forms are rejected. Active planner sessions, running reviews and
 unfinished batch reviews prevent editing. No missing role is created; usage,
 quotas, failures and previous verdicts remain unchanged.
+
+## Reusable profiles in the Rust candidate — lot188
+
+Admission retains the requested level in the task profile and, for a manual
+launch, the reusable mission profile. An explicit task-model choice is bound to
+the launch request first, then its level is retained. An absent level stays
+absent: it means inheriting provider policy on a future launch, not freezing its
+current default. Preview writes nothing; identical replay rewrites neither profile
+nor reservation. Saved levels do not authenticate the model actually executed.
+Older profiles that already lost this level are not reconstructed by guessing;
+explicitly choose and save the desired level for future launches.
+
+Lot188 is locally verified on a frozen candidate, not installed. Permanent launch-profile-level covers inheritance,
+explicit levels and task-specific model choice through CLI without a provider
+process. It does not yet port full dispatch or task.launch_profile precedence in
+the automatic factory; the latter needs a versioned provenance contract.
+
+Embedded resource check: embedded-settings-locale consumes SWARM_EMBEDDED_LOCALE_BINARY and SWARM_EMBEDDED_LOCALE_PROFILE (qualified profile result.json). After a valid protected API witness it reads the actual served English script, compares its hash with after.json and requires cost-setting label/help translations. Current workspace files alone are insufficient. The earlier188/normal03 candidate fails this check, with original evidence retained; no installation is claimed.
+
+Current native limit: swarm-rust task-model show returns the Work alone; the available_models field described above is not yet ported there. Native recipes obtain a policy hash from an actual valid agent preview. Full CLI option discovery remains open in the migration plan.

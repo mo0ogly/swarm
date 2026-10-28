@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "id": "paea-control-core",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-enrollment-authority/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "bound",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-state",
+        "--test",
+        "bound",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "3 passed; 0 failed",
+        "existing_only_no_follow_foreign_pins_and_explicit_close",
+        "retained_connection_never_reopens_replaced_path",
+        "current_revocation_contention_cancellation_and_recovery"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "journal-regressions",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-state",
+        "--test",
+        "journal",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "9 passed; 0 failed",
+        "callback_failure_cancellation_and_sql_rollback_recover",
+        "corrupt_history_keeps_the_original_rejection_cause"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "journal-settings",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-state",
+        "--lib",
+        "tests::every_connection_",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "every_connection_has_full_sync_no_busy_timeout_and_sql_cancellation_recovers"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "control",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--lib",
+        "control::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "16 passed; 0 failed",
+        "revocation_and_close_contend_during_real_storage_then_explicit_revoke_wins",
+        "authority_failure_after_publication_is_unknown_preserves_result_and_exact_replay",
+        "every_operation_requires_its_exact_signed_permission_including_replay_and_read"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "authority-regressions",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "authority",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "10 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "publication-regressions",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "publication",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "8 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "coordinator-preview",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-config",
+        "--test",
+        "coordinator",
+        "coordinator_preview_commit_replay_and_reopen",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "coordinator_preview_commit_replay_and_reopen"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

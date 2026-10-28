@@ -1,0 +1,25 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T16:23:28.374701+00:00",
+  "end": "2026-10-11T16:31:41.488772+00:00",
+  "seconds": 493.11408601799485,
+  "exit": 0,
+  "output": "/tmp/swarm-claude-effort-recovery-temp-separation-full.out",
+  "output_sha256": "06f8e6b038424e446d2a2b11a12c2e998c2b02386cb8ab5cef66ae41fb8a3d28",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  },
+  "source_manifest_sha256": "e25a625d327c7b228a86047b2952aef095b5d78d6d4d83bc14957001c8035e78",
+  "candidate_digest": "cb3f555834076c1fda77d6adb3d00158cf55b18a052c934c0401d96fb4cee26a",
+  "paths": 1172,
+  "source_drift": [],
+  "manifest_changed": false
+}

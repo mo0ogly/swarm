@@ -1,0 +1,6 @@
+=== RUN   TestRecoveredResultCorrectionAfterPublicPolicyChange
+    recovered_result_policy_test.go:56: a corrected policy must not strand a refused result révision corrective liée au dernier refus indépendant requise
+--- FAIL: TestRecoveredResultCorrectionAfterPublicPolicyChange (0.55s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.570s
+FAIL

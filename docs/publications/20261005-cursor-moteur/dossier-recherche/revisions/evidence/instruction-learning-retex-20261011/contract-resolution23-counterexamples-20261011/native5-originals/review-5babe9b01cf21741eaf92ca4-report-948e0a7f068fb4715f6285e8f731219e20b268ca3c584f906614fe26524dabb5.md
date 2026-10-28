@@ -1,0 +1,113 @@
+# T2 — juge global et renouvellement : remise courante
+
+Mission w-ca937edf4e0abd85f8d3d67b ; tâche plan-ca937edf4e-T2 ; producteur
+native auto-a23c60f03a732c02841f, tentative a-2f9e1debb1548be96273f0d3 (3/3),
+terminée. Base acceptée e32388fda21e7c225c3b2416d230d6f5450230cd.
+Bilan local vérifié ; contrôles et revue indépendante de ce candidat requis avant
+acceptation. Aucune autonomie réelle ou intégration native globale annoncée.
+
+## Comportement livré et preuves
+
+| Critère | Résultat local et preuve déclarée dans delivery.json |
+| --- | --- |
+| 1. Verdict global distinct de la revue | planning judge enregistre continue/end ; planning_judge.go et TestPlanningJudgeVerdictDistinctFromCandidateReview. |
+| 2. Transition durable et contexte | planning renew après continue conserve objectif, exigences, tentatives, consommations et historique ; TestPlanningJudgeRenewalPreservesContextAndHistory et TestManagedCheckpointRecovery. |
+| 3. Rejeu, fraîcheur, panne et quota | Tests TestPlanningJudgeReplayStaleAndDoubleVerdictRefused, TestPlanningJudgePausedAndQuotaRefuseEffects et TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess. Nouvelle suite Go entière brute exit0. |
+| 4. Fin sous preuves et architecture | end appelle validatePlanningClosure ; TestPlanningJudgeEndRejectsMatchingCandidateWithoutProofs et TestPlanningJudgeEndRequiresFreshMatchingCandidate. Architectures FR/EN et contrat FR complets joints. Script documentaire structurel PASS ; conformité sémantique à revoir indépendamment. |
+
+Les cinq fichiers Go concernés et score.go, les architectures complètes, le contrat,
+les originaux ciblés et les reçus courants sont fournis sans troncature. Le contrôle
+producteur renforcé inclut TestPlanningJudge et -v : 16 tests nommés PASS, exit0.
+Les annonces d'outil publiques 14:13:29→14:14:21UTC sont des bornes observées,
+sans prétendre reconstruire l'horodatage de commande non capturé. Le metadata
+natif portant13:40 est conservé sous metadata.native-original.json ; le reçu
+courant distingue cette incohérence historique et les preuves observées.
+
+Nouvelle suite canonique non divisée : go test ./... -count=1 -timeout=12m,
+11 octobre17:11:59→17:20:11UTC, exit0 en492,395s, paquet moteur470,557s.
+Code Go identique à la copie native arrêtée ; manifeste1049sources vérifié
+avant/après sans écart. Originaux exacts :
+- docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-canonical-20261011.out
+- docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-canonical-20261011-receipt.json
+
+Tests locaux avec doubles et skips optionnels : ils ne prouvent ni les recettes
+navigateur non exécutées ni l'autonomie d'un modèle réel. Les politiques Admin,
+l'orchestration native complète et les sous-superviseurs restent T3–T7.
+
+## Historique conservé et corrections attribuées
+
+Interventions opérateur après la production : source alias/citations et portée
+des tests corrigées, preuve brute canonique ajoutée ; aucun code Go, compteur,
+ancien original ou avis indépendant modifié. Les résumés shardés anciens sont
+historiques. Deux cardinalités égales ne prouvent ni authenticité ni fabrication ;
+la nouvelle sortie brute constitue la preuve complète courante. Le refus1b5f est
+conservé, aucun verdict annulé.
+
+Le refus d77 signalait un chemin stdout absent. La vérification Git exacte du
+candidat6c2da25/arbre201b3a8 démontre les deux originaux racine/imbriqué de même
+SHA fbaa92ea28409f7d476cdf46ba7046372f7d868a050833c5c7c2d31872115199.
+Le metadata courant nomme la copie imbriquée ; l'original natif reste inchangé.
+Preuve : operator-recovery-20261011/path-binding-replan.json. Une absence du
+seul fragment ne prouve aucune absence du candidat.
+
+Le rapport précédent,22489octets, est conservé intégralement dans le commit
+96c0ea89013b71656b4259ee9ee5a6a880f4de57 : docs/plan-ca937edf4e-T2.md,
+SHA256 51e846248353e79e49f719e431b7d2df87965ae9228452fd4a80d586c5ee8aa7. Cette remise concise remplace l'accumulation
+historique dans le contexte actif ; elle ne supprime aucun original du dépôt
+Git. Précontrôle final trop grand observé sans nouvel appel à425 : cette
+réduction volontaire est une nouvelle précondition, pas une troncature moteur.
+Le détail historique demeure aussi dans l'index operator-recovery-20261011,
+les metadata, anciens candidats et rapports. Les anciens contrôles filtrés ne
+sont jamais déclarés comme la suite entière. Nouveaux contrôles/revue frais requis.
+
+## Réparation de traçabilité — 11 octobre 2026, 20 h UTC
+
+Le constat indépendant partiel est conservé. Le paquet local historique rapporte
+8.302s. Le contrôle natif `plan-validation`, exécuté sans `-v`, possède un reçu
+propre à chaque candidat ; sa durée est générée lors du contrôle après la remise.
+Aucune durée native du futur candidat n'est prédite ici. La durée du paquet
+ne constitue pas le temps mur de la commande. La nouvelle exécution
+opérateur locale est datée, avec sortie originale et SHA-256 :
+
+- Commande : `go test ./internal/engine -run 'TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestPlanningJudge' -count=1 -timeout 25s -v`.
+- Début/fin : 19:56:45.391400–19:57:02.882998 UTC ; exit 0.
+- Durée du paquet : 7.274s ; temps mur : 17.491583s.
+- Sortie : `docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/producer-targeted-v2.out`.
+- Reçu : `docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/producer-targeted-v2-receipt.json`.
+
+Les cellules date/source de toutes les citations du tableau T1 sont comparées
+aux cellules originales, puis reproduites intégralement avec URL et référence
+bibliographique. L'original complet de `fiches-lecture.md` est déclaré dans le
+contexte de revue. Les préimages et le manifeste Go du début de commande sont
+conservés séparément dans l'archive opérateur ; aucun original de preuve natif
+n'est modifié. Le code Go est inchangé. Ces preuves locales ne remplacent ni
+les contrôles frais du nouveau candidat ni son verdict indépendant. Le refus
+Claude 429 reste une dépendance de compte jusqu'à 20:20 UTC ; sa levée ne
+constitue pas une acceptation.
+
+Précontrôle de remise : les deux originaux T1 (tableau et fiches de lecture)
+restent déclarés intégralement par la livraison T1 dans le contexte cumulatif ;
+ils ne sont pas dupliqués dans le paquet T2. Les critères T2 déclarent la nouvelle
+sortie locale complète et son reçu ; les anciennes sorties et métadonnées restent
+historiques, conservées au dépôt et dans les préimages. Les limites de contexte
+restent inchangées, aucune pièce requise n'est tronquée.
+
+## Replan : attribution des contrôles à chaque candidat
+
+La revue du candidat151cb5906d1cb3b80633bb9c5c8dac9a60b1568c a détecté
+une durée native historique reprise à tort comme mesure du candidat courant.
+La correction générale sépare les reçus locaux déjà exécutés et les contrôles
+natifs générés ensuite. Changer un candidat impose un nouveau reçu natif ;
+une mesure précédente n'est jamais recopiée comme prédiction de ce reçu.
+Les préimages et les refus restent conservés, aucune mesure passée n'est effacée.
+
+Le timeout historique du paquet entier est aussi explicitement réconcilié :
+la suite canonique ultérieure complète passe en492,395530s (paquet470,557s),
+sur les mêmes sources attestées, sous son délai12m. Le cas nommé
+TestManagedFragmentHistoricalPublicRecovery, isolé sous le délai4m30s,
+passe ses variantes pass/fail/exit en46,640s ; paquet46,671s, mur48,587606s.
+Sortie et reçu entiers : traceability-repair-20261011/historical-case.out et
+historical-case-receipt.json. L'ancien timeout de suite demeure historique ;
+il n'est pas un verdict sur l'état courant. Le code Go reste inchangé.
+Ces nouveaux originaux sont déclarés ; le contrôle et le verdict indépendants
+du nouveau candidat demeurent requis.

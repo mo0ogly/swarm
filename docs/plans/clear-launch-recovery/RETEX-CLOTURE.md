@@ -1,5 +1,13 @@
 # Clôture — lancement clair et reprise fiable
 
+## Repère APEX — 24 octobre 2026
+
+La [file APEX FR](../FILE-APEX.md#vague-3--autres-suivis-historiques-24-octobre-2026) et [EN](../../en/APEX-QUEUE.md#wave-3--other-historical-tracking-october-24-2026) conserve la clôture historique T0–T5, 6/6,
+et distingue les propositions QW5–QW8 encore cochées comme non faites dans ce
+suivi. Codex racine doit comparer chacune aux acquis et preuves actuels avant
+de décider le travail restant ; ces cases ne prouvent pas un défaut du Rust
+actuel. Aucun nouvel essai ni reprise de la mission clôturée par cette inscription.
+
 Le 3 octobre 2026, à la révision 332, les six tâches T0–T5 sont acceptées. Le moteur confirme 6/6 résultats validés, six gates courantes valides, aucun agent actif et aucun agent incertain. La revue indépendante 45 a rendu PASS sur les trois critères de T5. L’acceptation a été confirmée dans l’interface normale, sans dérogation ni modification directe de SQLite.
 
 Le candidat de 48 fichiers reste a0b89b5c7f8ba687ddb729ed6fff82b051456004f202b59b9891cbceddbc7e77, basé sur 1d9570bd4ef617130c6be96b7ec88844fdbcd00e avec modifications locales. Suite Go complète PASS (473,034 secondes), vet, race ciblée et frontend PASS. Les cinq contrôles finaux T5 ont un code de sortie 0 ; les captures et séquences clavier ont été examinées par la revue indépendante. Preuve de clôture : CLOTURE-r332.json.

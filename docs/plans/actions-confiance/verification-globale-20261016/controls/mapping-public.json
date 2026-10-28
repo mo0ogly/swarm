@@ -1,0 +1,20 @@
+{
+  "checks": [
+    "actual repository matrix verifies pinned primary catalog, historical receipts and relevant current source bindings without qualification claim",
+    "certification rejected",
+    "global_compliance rejected",
+    "independent_assessment rejected",
+    "unknown-control rejected",
+    "unknown-status rejected",
+    "missing-evidence rejected",
+    "altered-receipt rejected",
+    "stale-source rejected",
+    "escaped-proof rejected",
+    "no-gap rejected",
+    "false-runtime-context rejected",
+    "unknown-field rejected"
+  ],
+  "matrix_sha256": "788e7a736798acddeb2773f5d73ac42f400966969eec83ced631818c74cfab38",
+  "source_mutation": false,
+  "qualification": false
+}

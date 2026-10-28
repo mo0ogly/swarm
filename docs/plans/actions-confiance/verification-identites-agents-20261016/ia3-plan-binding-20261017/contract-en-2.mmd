@@ -1,0 +1,12 @@
+flowchart TD
+  C["Controller before releasing execution gate<br/>Bubblewrap tests ; launchers not connected"] --> N["Pin expected PID/mount namespace objects"]
+  N --> T["Private in-memory binding registry"]
+  M["Unix packet with per-message credentials and pidfd"] --> J["Decode strict request"]
+  J --> L["Shared Trust lock : current state"]
+  L --> R["Binding registry lock"]
+  T --> R
+  R --> P["Process namespaces through pidfd ioctl"]
+  P --> B["Match UID and pinned objects ; reject revocation"]
+  B --> H["Sample clock after coordination waits"]
+  H --> V["Evaluate IA2.2 ; decision or rejection"]
+  A["Private authority frame<br/>IA2.3b durable source below"] -.-> V

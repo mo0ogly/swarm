@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_memory_summary_admission.py",
+    "-v"
+  ],
+  "started_at": "2026-10-16T21:01:48.725462+00:00",
+  "finished_at": "2026-10-16T21:01:49.409598+00:00",
+  "exit_code": 1,
+  "expected": "new source identity rejection cases fail before correction"
+}

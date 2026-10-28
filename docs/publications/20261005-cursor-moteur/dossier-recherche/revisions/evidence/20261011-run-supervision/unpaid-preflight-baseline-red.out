@@ -1,0 +1,5 @@
+--- FAIL: TestRecoveredResultInterruptedUnpaidPreflightCanBeCorrected (0.64s)
+    recovered_result_unpaid_test.go:38: confirmed stopped interrupted result must support correction of its retained unpaid preflight livraison partielle terminée et attribuable requise
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.667s
+FAIL

@@ -1,0 +1,132 @@
+=== RUN   TestPreparationConversionRollbackStaleAndConcurrency
+--- PASS: TestPreparationConversionRollbackStaleAndConcurrency (0.45s)
+=== RUN   TestPreparedOrganizationAttachAfterMaterialization
+=== RUN   TestPreparedOrganizationAttachAfterMaterialization/create-missions
+=== RUN   TestPreparedOrganizationAttachAfterMaterialization/authorize-plan
+--- PASS: TestPreparedOrganizationAttachAfterMaterialization (0.71s)
+    --- PASS: TestPreparedOrganizationAttachAfterMaterialization/create-missions (0.37s)
+    --- PASS: TestPreparedOrganizationAttachAfterMaterialization/authorize-plan (0.34s)
+=== RUN   TestPreparedOrganizationAttachExistingStateRefused
+=== RUN   TestPreparedOrganizationAttachExistingStateRefused/stale-work
+=== RUN   TestPreparedOrganizationAttachExistingStateRefused/planning-removed
+=== RUN   TestPreparedOrganizationAttachExistingStateRefused/profile-altered
+=== RUN   TestPreparedOrganizationAttachExistingStateRefused/missing-lock
+--- PASS: TestPreparedOrganizationAttachExistingStateRefused (1.24s)
+    --- PASS: TestPreparedOrganizationAttachExistingStateRefused/stale-work (0.35s)
+    --- PASS: TestPreparedOrganizationAttachExistingStateRefused/planning-removed (0.32s)
+    --- PASS: TestPreparedOrganizationAttachExistingStateRefused/profile-altered (0.27s)
+    --- PASS: TestPreparedOrganizationAttachExistingStateRefused/missing-lock (0.30s)
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/stale-work
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/stale-plan
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/released
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/task-edited
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/attempted
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/invalid-provider
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/foreign-task
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/missing-lock
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/work-reframed
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/prior-review
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/recovery
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/prior-policy
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/scope
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/blocker
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/stale-evidence
+=== RUN   TestPreparedOrganizationAttachRejectsUnsafeState/work-profile
+--- PASS: TestPreparedOrganizationAttachRejectsUnsafeState (4.55s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/stale-work (0.27s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/stale-plan (0.26s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/released (0.31s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/task-edited (0.28s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/attempted (0.32s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/invalid-provider (0.28s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/foreign-task (0.30s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/missing-lock (0.31s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/work-reframed (0.28s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/prior-review (0.28s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/recovery (0.32s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/prior-policy (0.25s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/scope (0.27s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/blocker (0.29s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/stale-evidence (0.26s)
+    --- PASS: TestPreparedOrganizationAttachRejectsUnsafeState/work-profile (0.29s)
+=== RUN   TestPreparedOrganizationRepositoryRollback
+=== RUN   TestPreparedOrganizationRepositoryRollback/initial
+=== RUN   TestPreparedOrganizationRepositoryRollback/late
+--- PASS: TestPreparedOrganizationRepositoryRollback (0.88s)
+    --- PASS: TestPreparedOrganizationRepositoryRollback/initial (0.44s)
+    --- PASS: TestPreparedOrganizationRepositoryRollback/late (0.45s)
+=== RUN   TestPreparedRepositoryRetainsIncompletePendingEvidence
+=== RUN   TestPreparedRepositoryRetainsIncompletePendingEvidence/pending-only
+=== RUN   TestPreparedRepositoryRetainsIncompletePendingEvidence/different-request
+=== RUN   TestPreparedRepositoryRetainsIncompletePendingEvidence/malformed
+--- PASS: TestPreparedRepositoryRetainsIncompletePendingEvidence (0.98s)
+    --- PASS: TestPreparedRepositoryRetainsIncompletePendingEvidence/pending-only (0.32s)
+    --- PASS: TestPreparedRepositoryRetainsIncompletePendingEvidence/different-request (0.32s)
+    --- PASS: TestPreparedRepositoryRetainsIncompletePendingEvidence/malformed (0.33s)
+=== RUN   TestPreparedConversionFreshEventsRefusedWithoutMutation
+=== RUN   TestPreparedConversionFreshEventsRefusedWithoutMutation/create-missions/pristine
+=== RUN   TestPreparedConversionFreshEventsRefusedWithoutMutation/create-missions/task-edited
+=== RUN   TestPreparedConversionFreshEventsRefusedWithoutMutation/create-missions/missing-lock
+=== RUN   TestPreparedConversionFreshEventsRefusedWithoutMutation/create-missions/stale-work
+=== RUN   TestPreparedConversionFreshEventsRefusedWithoutMutation/authorize-plan/pristine
+=== RUN   TestPreparedConversionFreshEventsRefusedWithoutMutation/authorize-plan/task-edited
+=== RUN   TestPreparedConversionFreshEventsRefusedWithoutMutation/authorize-plan/missing-lock
+=== RUN   TestPreparedConversionFreshEventsRefusedWithoutMutation/authorize-plan/stale-work
+--- PASS: TestPreparedConversionFreshEventsRefusedWithoutMutation (2.20s)
+    --- PASS: TestPreparedConversionFreshEventsRefusedWithoutMutation/create-missions/pristine (0.28s)
+    --- PASS: TestPreparedConversionFreshEventsRefusedWithoutMutation/create-missions/task-edited (0.26s)
+    --- PASS: TestPreparedConversionFreshEventsRefusedWithoutMutation/create-missions/missing-lock (0.26s)
+    --- PASS: TestPreparedConversionFreshEventsRefusedWithoutMutation/create-missions/stale-work (0.24s)
+    --- PASS: TestPreparedConversionFreshEventsRefusedWithoutMutation/authorize-plan/pristine (0.33s)
+    --- PASS: TestPreparedConversionFreshEventsRefusedWithoutMutation/authorize-plan/task-edited (0.27s)
+    --- PASS: TestPreparedConversionFreshEventsRefusedWithoutMutation/authorize-plan/missing-lock (0.28s)
+    --- PASS: TestPreparedConversionFreshEventsRefusedWithoutMutation/authorize-plan/stale-work (0.28s)
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/storage
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/source
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/project_subdir
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/candidate_commit
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/base_commit
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/snapshot_digest
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/included
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/storage
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/source
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/project_subdir
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/candidate_commit
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/base_commit
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/snapshot_digest
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/included
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/storage
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/source
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/project_subdir
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/candidate_commit
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/base_commit
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/snapshot_digest
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/included
+--- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest (6.89s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/storage (0.31s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/source (0.35s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/project_subdir (0.33s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/candidate_commit (0.32s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/base_commit (0.35s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/snapshot_digest (0.32s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/included (0.32s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/storage (0.33s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/source (0.33s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/project_subdir (0.32s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/candidate_commit (0.32s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/base_commit (0.33s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/snapshot_digest (0.31s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/included (0.31s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/both/storage (0.34s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/both/source (0.36s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/both/project_subdir (0.35s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/both/candidate_commit (0.32s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/both/base_commit (0.34s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/both/snapshot_digest (0.33s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/both/included (0.32s)
+=== RUN   TestPreparedRepositoryRejectsDivergentManifests
+--- PASS: TestPreparedRepositoryRejectsDivergentManifests (0.38s)
+PASS
+ok  	swarm.local/companion/internal/engine	19.479s

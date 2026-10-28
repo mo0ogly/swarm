@@ -1,0 +1,5 @@
+--- FAIL: TestPlanningRejectedProposalReturnsToOwnerWithIntactEvidence (0.15s)
+    planning_rejection_test.go:138: both diagnostic and response must be declared {104d8f3631100ec3d0ff683cdc8d0d1073980abc91d9bdc7f3adf2eeb59f6a55 <nil>   0xc00007ae80 planning-rejected-998ce70b531c9c93d7d5f3e86cd7c1fe4cb8d248bffdeed17e23d60b9b2748c8 root planning_rejected   Proposition refusée : opération 1 task[existing] : tâche déjà présente. Diagnostic attribué fourni ; aucune opération ni acceptation appliquée. []  2026-10-11T12:25:18.53935569Z}
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.181s
+FAIL

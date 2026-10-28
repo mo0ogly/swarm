@@ -1,0 +1,25 @@
+=== RUN   TestFreshCapacityCurrentPublicDossier
+    managed_review_capacity_first_test.go:153: complete public candidate=48db9ca5550eab184f01843877e2e3b3f657dd4b pieces=281 packets=7 calls=9
+--- PASS: TestFreshCapacityCurrentPublicDossier (9.44s)
+=== RUN   TestManagedFragmentBeginNoSpendAndReopen
+    managed_review_fragment_begin_test.go:31: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentBeginNoSpendAndReopen (1.04s)
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/pass
+    managed_review_fragment_tokens_store_test.go:23: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/fail
+    managed_review_fragment_tokens_store_test.go:23: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/capacity-drift
+    managed_review_fragment_tokens_store_test.go:23: sizes 164551 168161 21899 parts 1
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/coordinated
+    managed_review_fragment_tokens_store_test.go:23: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/fresh-capacity
+    managed_review_fragment_tokens_store_test.go:23: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift (16.08s)
+    --- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/pass (4.06s)
+    --- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/fail (3.87s)
+    --- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/capacity-drift (2.10s)
+    --- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/coordinated (4.63s)
+    --- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/fresh-capacity (1.42s)
+PASS
+ok  	swarm.local/companion/internal/engine	26.610s

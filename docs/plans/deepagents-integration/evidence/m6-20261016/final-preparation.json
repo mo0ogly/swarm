@@ -1,0 +1,21 @@
+{
+  "checked_engine_inputs": 995,
+  "changed_engine_inputs": [],
+  "diff_or_link_issues": [],
+  "prepared_contexts": 4,
+  "python_tests_ran_13": true,
+  "positive_control": "PASS",
+  "negative_control": "FAIL",
+  "model_effectiveness": "NOT TESTED",
+  "real_model_calls": 0,
+  "owned_files_sha256": {
+    "internal/engine/project_memory_comparison_test.go": "c1a4cf4c353d84c6004dff80d698615001facaf52f9909e6a6ea87d8160bdb6c",
+    "tools/memory-evaluation/compare.py": "2d0277366d5f6772aecdf6a344d769a0c21131c65d8eb5ac0b0261dd50e9f041",
+    "tools/memory-evaluation/README.md": "9f2c3b86490038d3c2af530b0c5341e01f7185fe7346ea6dca5f9010e958ec19",
+    "tests/test_memory_comparison.py": "b5805aeb7784e21764ead0983532653c0b02174cbe5d31698a6355f6a660fb7c",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-02.md": "d75bbb6a605d7961c05274faea3456800968a34e47e75692af0f7a860b91141e",
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-02.md": "83c0b760ae8aa1b7d8906da800ea8dd1703db526bdf6dde98c6ca905831565a9",
+    "docs/plans/deepagents-integration/PLAN.md": "b67fd3e08842601d9c76207d2c40fccc345bf26e481d3929726333637514aedd",
+    "docs/plans/deepagents-integration/cas-evaluation.json": "ba9254d24c248896533c23ba143e523b53f2a370295c9c0b2efb1f5652dbf589"
+  }
+}

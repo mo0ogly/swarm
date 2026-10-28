@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "id": "paea-inspection",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-protection-contract/Cargo.toml",
+    "rust/crates/swarm-protection-contract/src/*.rs",
+    "rust/crates/swarm-protection-contract/tests/*.rs",
+    "rust/crates/swarm-identity-contract/Cargo.toml",
+    "rust/crates/swarm-identity-contract/src/*.rs",
+    "rust/crates/swarm-cli/Cargo.toml",
+    "rust/crates/swarm-cli/src/*.rs",
+    "rust/crates/swarm-cli/src/*/*.rs",
+    "rust/crates/swarm-cli/tests/protection.rs",
+    "rust/crates/swarm-cli/tests/protection_receipt.rs",
+    "tests/fixtures/paea/*.json",
+    "schemas/paea/*.json",
+    "tests/paea_contract_schema_test.py",
+    "tools/paea/*.py",
+    "tools/verification/recipe.py",
+    "docs/architecture/PAEA-CONTRACT.md",
+    "docs/en/PAEA-CONTRACT.md",
+    "rust/crates/swarm-cli/tests/protection_receipt_report.rs",
+    "rust/crates/swarm-web/Cargo.toml",
+    "rust/crates/swarm-web/src/*.rs",
+    "rust/crates/swarm-web/src/service/*.rs",
+    "rust/crates/swarm-web/tests/paea.rs",
+    "web/paea.*",
+    "web/trust-native.html",
+    "locales/en.json",
+    "web/i18n*.js",
+    "rust/crates/**/*",
+    "web/*",
+    "frontend/engine-settings/*",
+    "tools/agent-workflows/**/*",
+    ".claude/skills/**/*",
+    "version_history.json",
+    "tests/paea_payment_schema_test.py",
+    "web/paea-payment.html",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "web/lib/**/*",
+    "tests/paea_comparison_http_schema_test.py",
+    "web/paea-compare.html",
+    "web/paea-examples/v1/*.json",
+    "tests/paea_examples_test.py",
+    "tools/paea/make_examples.py",
+    "web/paea-inspect.html",
+    "rust/crates/swarm-cli/tests/protection_inspection.rs",
+    "tests/paea_inspection_schema_test.py",
+    "rust/crates/swarm-protection-contract/tests/inspection.rs",
+    "web/paea-approval.html",
+    "schemas/paea/approval-report-v1.schema.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "inspection-shapes",
+      "command": [
+        "python3",
+        "tests/paea_inspection_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "Ran 2 tests",
+        "OK"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "inspection-core",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-protection-contract",
+        "--test",
+        "inspection",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "3 passed; 0 failed",
+        "inspection_preserves_all_vectors_and_exact_i64_content",
+        "inspection_distinguishes_original_bytes_canonical_terms_and_sources",
+        "inspection_invalid_inputs_refuse_then_recover_without_partial_report"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "inspection-cli",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "protection_inspection",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "2 passed; 0 failed",
+        "inspection_cli_matches_pure_report_and_existing_canonicalize",
+        "inspection_cli_refusal_and_recovery_keep_output_and_root_safe"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "inspection-http",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea",
+        "paea_inspection_http_",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "2 passed; 0 failed",
+        "paea_inspection_http_matches_shared_exact_content_without_root_mutation",
+        "paea_inspection_http_refusals_recover_and_preserve_private_assets"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

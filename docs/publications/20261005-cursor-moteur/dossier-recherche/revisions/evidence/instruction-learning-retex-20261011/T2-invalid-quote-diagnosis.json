@@ -1,0 +1,13 @@
+{
+  "review": "review-6eadd171c67897f10f4ec754",
+  "candidate": "d405c0ee9479fb26521fc6041cc6932f9929a3a1",
+  "state": "error",
+  "reason": "inspection de fragment : defect quote absent at original line (artifact 1, line 42)",
+  "source_reply": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-f2abbcfe6bed66fd1a5e-repair-946f3b7e9306564c/fragment-call-e4c226aae08ba6805d7a15c8-raw-5a7ecca94beccdfeccdd318665573887690a14f70339e1294748556e7248d5b4.json",
+  "source_reply_sha256": "5a7ecca94beccdfeccdd318665573887690a14f70339e1294748556e7248d5b4",
+  "raw_retained": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/T2-invalid-quote-original-reply.json",
+  "diagnosis": "Quote drops the French space before semicolon; exact line guard correctly rejects malformed attribution. Raw response also suggests a FR/EN max_judge_cycles documentation contradiction, locally confirmed in original candidate but not an accepted independent verdict.",
+  "changed_precondition": "Existing fragmentRetryFeedback supplies rejected quote and exact physical neighboring lines from the same immutable packet on the authorized retry; no altered verdict, no new production.",
+  "public_recovery": "7 calls required,15 available; no budget increase needed for this retry",
+  "limit": "Must observe new received feedback and independently validated response; no fake acceptance."
+}

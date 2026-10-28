@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^TestActionsConfiance(T3|T5|T6(Evidence|Archive|Laboratory))",
+    "-count=1"
+  ],
+  "pid": 4063157,
+  "start_ticks": "6264258",
+  "started_unix": 1792128218.4404664,
+  "reason": "Shared validation/routes and fixed helper changed since historical T3/T5/R16/R17 receipts; rerun these affected contracts, excluding already current T2/T4 and native BPF.",
+  "status": "passed",
+  "exit_code": 0,
+  "ended_unix": 1792128482.3543925,
+  "inputs_unchanged": true
+}

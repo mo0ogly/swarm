@@ -1,0 +1,40 @@
+=== RUN   TestIncrementalFinalTransportDistinguishesOmittedAndEmptyDiff
+--- PASS: TestIncrementalFinalTransportDistinguishesOmittedAndEmptyDiff (1.24s)
+=== RUN   TestIncrementalHistoricalPrefixRemainsStable
+--- PASS: TestIncrementalHistoricalPrefixRemainsStable (0.00s)
+=== RUN   TestIncrementalReviewNewVerdictAndHistoricalEvidence
+    managed_review_incremental_test.go:46: old verdict reused vérificateur indépendant : activation révoquée avant appel
+--- FAIL: TestIncrementalReviewNewVerdictAndHistoricalEvidence (1.38s)
+=== RUN   TestIncrementalReviewRejectsUnverifiedBaseline
+=== RUN   TestIncrementalReviewRejectsUnverifiedBaseline/missing-proof
+=== RUN   TestIncrementalReviewRejectsUnverifiedBaseline/policy
+=== RUN   TestIncrementalReviewRejectsUnverifiedBaseline/verdict
+--- PASS: TestIncrementalReviewRejectsUnverifiedBaseline (5.06s)
+    --- PASS: TestIncrementalReviewRejectsUnverifiedBaseline/missing-proof (1.49s)
+    --- PASS: TestIncrementalReviewRejectsUnverifiedBaseline/policy (1.73s)
+    --- PASS: TestIncrementalReviewRejectsUnverifiedBaseline/verdict (1.85s)
+=== RUN   TestIncrementalReviewStillRequiresFreshPass
+    managed_review_incremental_test.go:122: new refusal ignored
+--- FAIL: TestIncrementalReviewStillRequiresFreshPass (1.53s)
+=== RUN   TestIncrementalReviewUsesVerifiedBaselineWhenContextFits
+    managed_review_incremental_test.go:156: fixture candidate not independently accepted vérificateur indépendant : activation révoquée avant appel
+--- FAIL: TestIncrementalReviewUsesVerifiedBaselineWhenContextFits (1.27s)
+=== RUN   TestIncrementalBaselineScopeReachesFragmentInspection
+=== RUN   TestIncrementalBaselineScopeReachesFragmentInspection/0
+=== RUN   TestIncrementalBaselineScopeReachesFragmentInspection/1
+=== RUN   TestIncrementalBaselineScopeReachesFragmentInspection/2
+=== RUN   TestIncrementalBaselineScopeReachesFragmentInspection/3
+--- PASS: TestIncrementalBaselineScopeReachesFragmentInspection (0.00s)
+    --- PASS: TestIncrementalBaselineScopeReachesFragmentInspection/0 (0.00s)
+    --- PASS: TestIncrementalBaselineScopeReachesFragmentInspection/1 (0.00s)
+    --- PASS: TestIncrementalBaselineScopeReachesFragmentInspection/2 (0.00s)
+    --- PASS: TestIncrementalBaselineScopeReachesFragmentInspection/3 (0.00s)
+=== RUN   TestIncrementalFittingContextRefusesCorruptedAcceptedBaseline
+--- PASS: TestIncrementalFittingContextRefusesCorruptedAcceptedBaseline (1.21s)
+=== RUN   TestManagedFragmentSelectorIdentifiesCompleteOriginalAlreadySupplied
+--- PASS: TestManagedFragmentSelectorIdentifiesCompleteOriginalAlreadySupplied (1.15s)
+=== RUN   TestManagedFragmentSelectorRejectsChangedOriginalMetadata
+--- PASS: TestManagedFragmentSelectorRejectsChangedOriginalMetadata (0.96s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	13.965s
+FAIL

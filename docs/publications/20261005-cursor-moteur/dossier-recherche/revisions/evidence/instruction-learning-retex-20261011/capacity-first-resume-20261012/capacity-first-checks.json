@@ -1,0 +1,59 @@
+[
+  {
+    "name": "selector",
+    "argv": [
+      "go",
+      "test",
+      "./internal/engine",
+      "-run",
+      "^TestManagedFragment(AllCallsPreflight|SelectionCostsCoverActualEncoding|SelectionUsesReceivedEvidenceCapacity)$",
+      "-count=1",
+      "-timeout=90s"
+    ],
+    "started": "2026-10-12T18:50:01.141909+00:00",
+    "exit": 0,
+    "seconds": 6.171622306000245,
+    "output_sha256": "ce54f3355823230c1b36c3cac594127de701c605a05479c99f0c97f38fac74c8",
+    "drift": []
+  },
+  {
+    "name": "vet",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "started": "2026-10-12T18:50:07.314176+00:00",
+    "exit": 0,
+    "seconds": 16.346965074999844,
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "drift": []
+  },
+  {
+    "name": "methods",
+    "argv": [
+      "python3",
+      "tools/agent-workflows/check.py"
+    ],
+    "started": "2026-10-12T18:50:48.938701+00:00",
+    "exit": 0,
+    "seconds": 3.905917860000045,
+    "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+    "drift": []
+  },
+  {
+    "name": "build",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-qualified-capacity-first",
+      "./cmd/swarm"
+    ],
+    "started": "2026-10-12T18:50:52.845355+00:00",
+    "exit": 0,
+    "seconds": 3.8523701779995463,
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "drift": []
+  }
+]

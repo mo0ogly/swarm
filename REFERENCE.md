@@ -1,5 +1,8 @@
 # Swarm — référence technique
 
+> Référence historique du contrat Go. La CLI active est Rust, sans repli Go. Les commandes et exemples de compilation Go ci-dessous sont conservés comme historique, pas comme procédure actuelle d’installation. Consulter [INSTALL](INSTALL.md), l’aide native et le plan de migration pour les commandes disponibles.
+
+
 [English](docs/en/REFERENCE.md) · Français
 
 Pour la présentation du produit et le démarrage rapide, voir [le README](README.md) et le [guide utilisateur](GUIDE-UTILISATEUR.md).
@@ -73,6 +76,13 @@ Les champs communs aux mutations métier sont `schema_version: 1`, un `event_id`
 unique et `expected_revision` (0 à la création, révision courante ensuite).
 La sortie contient le travail, l’historique, les gates recalculées et la fiche.
 Les dates sont UTC. Les identifiants utilisent lettres ASCII, chiffres, `_`, `-`.
+
+Les lecteurs communs de travaux persistés vérifient ensemble clé SQL, révision
+positive et corps UTF-8/JSON de schéma 1. `work show`, `work list` et la liste
+HTTP refusent une incohérence avec erreur, sans publier de résultat partiel.
+Mutation et rejeu communs appliquent aussi cette garde avant leurs callbacks.
+Cette concordance ne prouve aucun auteur ou droit et ne couvre pas tous les
+lecteurs SQL explicites : voir le [contrat des lignes Work](docs/architecture/WORK-ROW-CONTRACT.md).
 
 Création (`work.json`) :
 
@@ -363,6 +373,14 @@ un double envoi idempotent ; une collision pendant restauration laisse toute la
 mission en corbeille. Le web utilise exactement le même moteur via les actions
 `lifecycle-preview` et `lifecycle-apply`.
 
+Pour la corbeille, aperçu et reçu exposent `snapshot_sha256` ; le jeton lie les
+octets exacts de la capture, revérifiés avant écriture. Une capture incohérente,
+une ligne liée étrangère ou un contenu remplacé est refusé sans restauration
+partielle ni perte de corbeille. Il faut obtenir un nouvel aperçu après tout
+changement. Le Work restauré conserve son identité/révision concordante ; cette
+cohérence n'atteste ni auteur ni droit d'usage. Voir le
+[contrat des captures](docs/architecture/WORK-ROW-CONTRACT.md#captures-dynamiques-et-restauration).
+
 Dans le cockpit, **Gérer les missions** regroupe recherche, filtres Active,
 Archivée et Corbeille récupérable, puis les actions **Archiver**, **Restaurer**,
 **Purger l’historique** et **Supprimer**. Chaque action ouvre d’abord l’aperçu du
@@ -466,3 +484,338 @@ fonctions au CLI. Voir les [contrats de préparation](PREPARATION-UX.md).
 ## Préparation, révision et modèles IA
 
 Voir [le parcours web et les contrats CLI](PREPARATION-UX.md) : formulaire de missions, responsable durable, validation explicite, révision avec historique et menu **IA et connexions**.
+
+### Statuts des résultats d’évaluation
+
+L’évaluateur accepte exactement un des cinq statuts : `PASS`, `FAIL`, `PARTIEL`,
+`NON TESTÉ`, `NON APPLICABLE`. Une composition (`FAIL|PARTIEL`), une valeur
+inconnue ou entourée d’espaces est refusée avant décision. Un échec critique ne
+peut pas être déguisé en composition pour éviter son blocage. Les règles de
+compteur, preuve et justification restent applicables à chaque statut admis.
+La correction est à livrer par le parcours habituel ; elle ne remplace pas
+automatiquement un binaire déjà lancé.
+
+Les poids d’évaluation doivent permettre un agrégat fini dans la représentation
+numérique utilisée. Un débordement produit un refus explicite ; il ne crée
+aucun plafond métier sur les poids. Si nécessaire, réduire leur échelle en
+conservant leurs proportions et préparer à nouveau les preuves du barème.
+Un échec d’écriture du résultat JSON renvoie aussi une erreur, même lorsque
+l’évaluation calculée était favorable.
+
+Les contrôles obligatoires d’un plan sont lus avec les mêmes clés JSON exactes
+que le calcul de score : `checks`, `id`, `gate`, `mandatory`. Des variantes de
+casse ne peuvent pas satisfaire des contrôles différents de ceux évalués.
+La présence des contrôles ne prouve pas leurs résultats, la fraîcheur des
+artefacts ou l’autorité d’accepter la tâche.
+
+La correction est vérifiée par la commande publique gate sur fixtures isolées ;
+la livraison du service actif reste une opération distincte.
+
+Une tâche en cours ne peut pas être terminée sans tentative courante conservée.
+Un état incohérent est refusé avec `attempt_state_invalid`, sans créer de
+tentative ni effacer l’historique. Une réparation doit établir les preuves
+manquantes ; un nouveau retry ne les remplace pas.
+
+### Sources documentaires — moteur Rust
+
+`prepare files ID [DOSSIER [RECHERCHE]]` observe les noms autorisés ;
+`prepare source ID CHEMIN DÉBUT FIN` capture un extrait UTF-8, lignes inclusives
+à partir de1, avec empreinte SHA-256 du fichier complet. Les GET protégés
+`/api/v1/preparations/files` (`id,scope,q`) et `/source` (`id,path,start,end`)
+partagent ce lecteur ; les clés inconnues/répétées sont refusées.
+`prepare source-add ID --input REQUÊTE` et `source-remove` utilisent le writer
+version1, event_id, expected_revision et `source:{path,start_line,end_line,sha256}`
+(retrait : path seul). Le serveur relit et compare l’empreinte avant ajout,
+conserve l’extrait horodaté puis invalide adoption du brief/verdict/plan prêt.
+Les documents, Work et engagements existants restent conservés. Un reçu exact
+se rejoue sans relire le fichier ; un retrait n’exige ni fichier ni politique
+source disponible. Le dialogue Sources utilise ces mêmes opérations sans IA.
+
+Admin expose douze réglages `preparation_source_*`/`preparation_sources_*` :
+taille fichier/extrait/total/chemin/recherche, lignes, nombre de sources,
+limites dossiers/fichiers/visites, extensions et composants exclus. Le groupe
+settings44 est complet ou absent ; une ancienne installation n’adopte pas ces
+valeurs silencieusement. `null` enlève une borne numérique ; zéro interdit le
+volume correspondant. Les listes vides autorisent zéro extension / n’excluent
+aucun composant supplémentaire. Le défaut `private` protège les répertoires de
+preuves privés connus, sans constituer un détecteur universel de données privées.
+Les limites de visite/résultats ne bornent pas la durée ou la mémoire : un dossier
+est énuméré et trié avant leur application.
+
+Les chemins privés connus, traversées, liens, fichiers spéciaux, NUL, UTF-8
+invalide et formes de secrets dans le fichier entier sont refusés. Les
+identités .swarm/base sont vérifiées par descripteurs ; ceci n’est ni un
+confinement OS ni un instantané atomique de fichiers modifiés simultanément.
+Un aperçu n’accorde aucun droit d’exécution. Un objet JSON imbriqué de forme
+invalide retourne `preparation-request-invalid` ; un budget décodé mais
+monétairement invalide retourne `preparation-budget-invalid`. Doublons/alias/null
+suivent la projection Go dès le premier décodage, sans perdre une limite finie.
+
+### Statut des consignes projet — Rust
+
+`project-profile show` et `project-profile check` observent les métadonnées des
+consignes courantes pour préparation, planificateur, sous-planificateur, exécutant
+et vérificateur. GET/HEAD protégé `/api/v1/project-profile` renvoie le même statut,
+sans paramètres ni corps. Le lecteur partagé applique les politiques de contexte,
+les refus de secrets reconnaissables et le garde mémoire existant. Les rôles sont
+observés successivement : aucune cohérence atomique du système de fichiers,
+réception par un agent, authentification ou autorisation future n’est prouvée.
+
+La détection des trois chemins Claude connus vérifie uniquement présence régulière
+et confinement du chemin ; aucun contenu de réglage natif n’est ouvert/importé.
+Absence, type non régulier ou chemin externe sont exclus ; les autres erreurs
+restent des erreurs, pas une liste vide réussie. La préparation réutilise le
+dialogue de métadonnées. Sélection/catalogue/application de profil restent à porter.
+Pour cette lecture, les refus exposent un motif statique sûr dans failure.reason ;
+les causes internes restent masquées. L’interface l’affiche comme texte sans
+modifier les décisions de contrôle fondées sur les codes.
+
+La source canonique sous `.claude/field-guide` reste refusée avec HTTP501 et
+`versioned-memory-source-guard-not-ported` tant que son garde versionné n’est pas
+porté. Le statut ne contourne pas cette limite.
+
+`prepare release-review ID` lit le même objet `{preparation, work}` que GET
+`/api/v1/preparations/release-review?id=ID`. Les deux observations successives
+ne constituent pas un instantané atomique : une libération ultérieure doit lier
+les deux révisions. Le Work contient les contrats courants, même modifiés depuis
+la conversion. Aucun verrou de départ ni budget n’est modifié par la lecture.
+
+### Historique des échanges de préparation — Rust
+
+`prepare dialogue ID` et GET/HEAD `/api/v1/preparations/dialogue?id=ID` lisent
+tous les tours conservés dans leur ordre SQL. Le statut de ligne fait autorité ;
+identités/type/cause invalides refusent. Les marqueurs used_in_brief/used_in_plan
+et stale sont recalculés depuis les documents et octets de méthode observés.
+Le prompt privé ne peut pas être sérialisé par ce DTO de lecture.
+
+Cette lecture ne tue/termine aucun processus et ne touche aucune réservation.
+Un tour pending/running/stopping refuse explicitement501 tant que le superviseur
+correspondant reste à porter. L’historique fini est consultable dans la vue de
+conversation existante, en texte ; envoyer/arrêter/utiliser une proposition reste
+indisponible. Aucun polling, plafond de20 ou délai15s hérité du Go n’est ajouté.
+Les politiques et appels futurs doivent avoir leur propre contrat persisté.
+
+### Appels IA de préparation Rust — pilote local
+
+Le raccord API texte, ses politiques Admin v46 et le worker Rust sont installés
+dans le pilote local ; preuves et limites dans [le suivi dédié](docs/plans/migration-rust/PREPARATION-AI-CALLS-20261026.md).
+Aucun appel n'est activé implicitement sur une installation historique. Les
+adaptateurs CLI et les agents Work API restent explicitement non portés.
+
+Le parcours texte natif expose `prepare capabilities`, `prepare send ID --input
+JSON`, `prepare stop ID --input JSON`, `prepare dialogue ID` et
+`prepare use-proposal ID --input JSON`, avec `--root ROOT --json`. Les routes
+protégées correspondantes sont GET/HEAD `preparations/capabilities`, GET/HEAD
+`preparations/dialogue?id=ID`, POST `preparations/send`, POST `preparations/stop`
+et POST `preparations/command` pour `use-proposal`, sous `/api/v1/`.
+
+Le groupe Admin v46 est complet ou absent ; les installations historiques ne
+l'adoptent pas automatiquement. Valeurs initiales : activation0, message8000
+et contexte96000 octets,20 tours, réponse1048576 octets, délai300s et maximum600s,
+observation200ms, rafraîchissement2000ms, transport `json`,100 headers HTTP/1 et
+16384 octets de headers HTTP/2 (représentation `u32`). Toutes sont persistées,
+validées et éditables dans Admin. Les quatre caps acceptent `null` sans borne et
+0 pour refuser du contenu/un tour non vide. Un délai0 exige un maximum0 pour
+retirer le délai ; les intervalles restent positifs. Les durées non représentables
+par l'horloge locale sont refusées sans fallback. SSE borne chaque événement
+avec `agent_provider_event_max_bytes` ; la borne de réponse porte alors sur le
+contenu assemblé, contre le corps entier en JSON.
+
+Seules les connexions API texte actives déjà configurées sont proposées. Le
+modèle configuré est envoyé exactement ; son affichage ne prouve ni le backend,
+ni le compte fournisseur. Pas de redirection, retry, changement de modèle ou
+outil. Le texte reçu doit être un JSON complet ; raisonnement SSE et prompts
+privés ne sont pas publiés. Les tours, réservations et données restent conservés.
+La réservation devient `estimated` avant tout contact possible ; erreur, arrêt,
+absence d'usage ou mort du worker ne la remboursent pas automatiquement. Les
+jetons sont déclarés par le fournisseur ; aucun tarif ou coût nul n'est inventé.
+
+Toute modification du journal des réglages, des catalogues fournisseurs, de la
+méthode ou des consignes du projet invalide l'appel en cours, sans relance ; un
+appel distant peut déjà être facturé. Les extraits joints restent des instantanés.
+Le switch de déploiement `SWARM_PREPARATION_DISABLED=1` reste prioritaire. Le
+serveur vivant réconcilie la mort de son propre worker. Après sortie du CLI, un
+worker orphelin demande une reprise explicite par `stop`, sans signal sur un PID
+seul. Un autre host/boot/namespace est refusé. Ces observations ne constituent
+ni authentification d'agent, ni confinement du système.
+
+Les propositions se comparent avant `use-proposal`, avec événement et CAS ; le
+brouillon, son historique et `source_turn` sont conservés. L'adoption du brief
+reste explicite ; le plan reste à vérifier. Aucune mission n'est démarrée par ce
+parcours. Adaptateurs CLI, anciens tours actifs et agents Work API restent hors
+de ce premier raccord. La garde des sources mémoire versionnées reste en501,
+avec une raison statique ; la supprimer n'est pas un mode de reprise.
+
+Compatibilité historique livrée : un événement exact d'un tour Go
+terminé peut être relu sans métadonnées de worker natif, sans appel ni mutation.
+Le parent et l'empreinte restent obligatoires ; un autre message est un conflit.
+Un ancien tour actif reste explicitement non porté (CLI et HTTP501). Les nouveaux
+appels n'acceptent toujours que les niveaux vide/auto. Voir le suivi du rejeu historique.
+
+### Sélection des profils projet Rust — pilote local
+
+`project-profile show|check|list` lit les observations et les suggestions ;
+`preview|apply --input JSON` consomme `{profile, expected_sha256}` et
+`select ID --input JSON` consomme `{expected_sha256}`. Les opérations acceptent
+`--root ROOT --json` ; sans JSON, un titre FR/EN précède le document complet.
+Le catalogue protégé est GET/HEAD `/api/v1/project-profile/catalog` ; les POST
+`project-profile/preview|apply|select` utilisent session/CSRF et limites de transport
+communes. Le POST select reçoit `{id, expected_sha256}`.
+
+Le profil référence des fichiers et des rôles, jamais des permissions natives.
+L'aperçu ne crée ni fichier temporaire de profil vivant, ni appel ni agent. Il
+valide les cinq rôles avec les limites `project_profile_max_*`,
+`project_context_max_bytes` et `project_worker_context_max_bytes` persistées/Admin.
+`null` garde le sens illimité et0 le refus de contenu non vide ; aucune seconde
+borne n'est ajoutée au formulaire. Les empreintes sont des observations, pas
+une approbation des futurs contenus : appliquer relit les sources.
+
+L'application compare le SHA actuel puis publie `swarm.project.json` atomiquement,
+en JSON compatible Go avec nouvelle ligne. Une configuration absente utilise
+NOREPLACE. Les écrivains Root coopérants partagent une réservation exclusive ;
+les éditeurs externes ne sont pas confinés. Un échec tardif conserve le marqueur
+`configuration_may_be_recorded` : relire et comparer, jamais supposer un rollback.
+Le catalogue peut signaler `active_error` avec le SHA du profil JSON invalide
+pour permettre une réparation explicite ; il n'en affirme pas la validité.
+
+Les secrets reconnaissables sont contrôlés dans le nom, les chemins et le texte.
+Les cibles réelles privées `.swarm`/`.git` et les alias vers des fichiers autres
+que Markdown/texte sont refusés ; sur Unix, les sources à liens physiques
+multiples et les redirections de composants lors de l'ouverture sont refusées.
+Cette preuve concerne Linux : ni absence de tout secret, ni confinement OS, ni
+attestation d'agent. Les mémoires versionnées restent sous leur garde501.
+Le formulaire conserve le brouillon et son ancien SHA après échec ; actualiser
+ne le rebase pas silencieusement. Aucune configuration vivante n'est sélectionnée
+par l'installation. Voir [le suivi](docs/plans/migration-rust/PROJECT-PROFILE-SELECT-20261027.md).
+
+### Préparation Rust vers un travail existant — pilote local
+
+Une préparation créée avec un `work_id` explicite peut matérialiser son plan
+validé dans ce travail. La revue readonly `prepare release-review ID` et
+GET `/api/v1/preparations/release-review?id=ID` retournent préparation et travail
+courants ; leurs deux révisions doivent être relues après un conflit. Le nom
+historique de la route ne vaut pas autorisation de départ.
+
+`prepare create-missions ID --input JSON` et le POST partagé exigent le SHA du
+plan, `expected_revision` et `expected_work_revision` :0 pour créer un travail,
+révision positive courante pour ajouter à la cible associée. Le formulaire
+affiche le titre et la révision de cette cible avant confirmation. Les anciennes
+tâches, plans, budgets, configuration et tentatives restent conservés ; seuls
+les nouveaux identifiants déterministes sont ajoutés, verrouillés, avec gates et
+provenance. Toute collision refuse ; aucune tâche existante n'est remplacée.
+
+Tâches, verrous, événement et reçu sont écrits dans la même transaction avec
+relecture finale, y compris des verrous des autres préparations. Un refus CAS
+n'écrit rien. Un échec de commit ou une sortie tardive conserve les diagnostics
+incertain/enregistré existants : relire ou rejouer exactement le même événement.
+`release-plan` exige une autre confirmation et la révision courante ; il libère
+uniquement les tâches de cette conversion, conservant les autres tâches/verrous.
+Il peut dépauser un conducteur déjà configuré, sans changer autonomie ni budget
+et sans lancer synchroniquement un fournisseur. L'équipe initiale garde son
+contrat pristine ; un travail déjà configuré se pilote par les opérations
+publiques existantes, pas par adoption automatique d'une organisation du plan.
+Aucun nouveau délai, plafond ou permission n'est introduit. Parcours livré localement en179 ; preuves et limites dans le [suivi](docs/plans/migration-rust/PREPARATION-EXISTING-WORK-20261027.md).
+
+### Révision d’un plan matérialisé Rust — pilote local184
+
+Après avoir enregistré puis vérifié un nouveau plan, `prepare release-review ID`
+et GET `/api/v1/preparations/release-review?id=ID` ajoutent un champ `revision`
+uniquement si son hash diffère de la conversion. Il contient `plan_hash`, `spec`
+et les `changes` ordonnés : ajoutée, modifiée, conservée, retirée avec historique
+ou dépendante à revérifier. La vue compare le plan d’origine, le contrat actuel
+du travail et le nouveau contrat ; elle ne masque pas les modifications manuelles.
+Ce sont des observations successives de préparation, travail et réglages, pas
+un instantané atomique ou une approbation des futurs contenus.
+
+`prepare revise-missions ID --root ROOT --input JSON --json` ou le POST commun
+`/api/v1/preparations/command` exige `version:1`, `action:revise-missions`,
+`preparation_id`, `event_id`, `expected_revision`, `expected_work_revision` positif
+et `sha256` du nouveau document. Le moteur revalide le plan sous les politiques
+Admin actuelles et contrôle les deux révisions. Les agents, revues natives
+actives/incertaines et décisions détenues bloquent ; réconcilier par les
+opérations publiques correspondantes, jamais par effacement des journaux.
+
+La révision conserve tentatives, versions, anciennes revues, plans et consommation.
+Elle archive la revue courante des tâches impactées et invalide leurs résultats,
+y compris les dépendants externes. Les retraits restent `abandoned` ; une
+dépendance vivante vers un retrait refuse. Contrôles dont le sens change, branches
+déléguées ou perte d’exigences demandent une réautorisation/reconfiguration
+explicite. La limite stockée d’une récupération reste conservée si le plafond
+auteur ne change pas ; une réduction explicite du plan s’applique. Cela ne crée
+ni droit, ni réservation, ni appel supplémentaire.
+
+Corps du travail, verrous, pause, événement et reçu partagent la transaction et
+sa relecture finale, avec les verrous conservés des tâches retirées/étrangères.
+Les tâches du nouveau plan sont verrouillées et le cockpit/planning pausé.
+`release-plan` reste explicite ; il ne retire pas la pause cockpit d’une révision.
+La reprise de mission utilise son contrôle public distinct. Aucune exécution
+ni acceptation n’est attestée par la création ou la libération du plan.
+
+Un conflit Work invalide la revue : la fermer puis la rouvrir pour obtenir une
+nouvelle intention. Un reçu200 incohérent garde au contraire l’événement original
+en attente pour vérification/rejeu ; ne pas fabriquer un autre événement après
+une issue inconnue. Les erreurs tardives gardent leurs marqueurs connu/incertain.
+Voir le [suivi et ses limites](docs/plans/migration-rust/PREPARATION-REVISION-20261027.md).
+
+### Préparation : adaptateurs CLI Rust (pilote192)
+
+Le dialogue de préparation peut proposer les exécutables absolus Claude/Codex configurés avec une route de modèle enregistrée et le droit Admin de contexte fournisseur non vérifié. Les adaptateurs personnalisés/harness et les probes obligatoires restent refusés. Une indisponibilité individuelle de route est exposée dans `unavailable_providers` sans masquer les fournisseurs API disponibles ; une erreur de lecture/décodage reste un échec.
+
+Le worker possède son enfant derrière un canal privé. Le prompt passe sur stdin scellé, dans un répertoire temporaire privé, avec l’environnement autorisé. Délais, cadence d’observation et limites de sortie viennent des paramètres Admin existants ; zéro délai conserve l’absence de limite enregistrée. Une réponse exige un événement terminal, une sortie de processus réussie et le contrat JSON du dialogue. Les restrictions d’outils sont demandées au fournisseur : leur efficacité externe n’est pas certifiée.
+
+Arrêter n’annule pas un coût distant. Une réservation tentée reste estimée après erreur ou annulation ; consommation absente/invalide reste inconnue. Aucun document n’est adopté automatiquement. Changer paramètres, configuration, exécutable, environnement autorisé ou route invalide la confirmation précédente. Les tours Go actifs ne sont pas adoptés.
+
+Les déclarations structurées connues d’appels/résultats d’outils Claude/Codex interrompent aussi le flux CLI : une réponse finale ultérieure ne les efface pas. Cela ne certifie ni les événements non observés, ni l’absence ou l’annulation d’effets externes.
+
+### Niveaux CLI explicites — pilote195
+
+Les niveaux `simple`, `standard`, `exigeant` sont observés dans les capacités de préparation CLI, avec leur modèle, leur politique et leur empreinte. Ils restent soumis aux annonces et restrictions enregistrées. Le choix automatique conserve sa route configurée ; s’il est interdit, une sélection humaine est requise. Aucun modèle voisin n’est substitué. Les API conservent leur modèle fixe et refusent un niveau explicite. La réservation manuelle n’est pas une tarification ni une facture.
+
+Un envoi explicite conserve son niveau dans les métadonnées privées v2 ; les tours API/automatiques gardent v1. Un ancien worker refuse v2 avant contact. Les reçus terminés et budgets restent conservés ; terminer/interrompre les tours avec une version compatible avant de revenir à un exécutable ancien. Un même événement garde son payload initial même après retrait des capacités, afin de vérifier son état connu sans nouveau départ implicite.
+
+### Sources de profil et mémoire versionnée — pilote201
+
+Le lecteur de contexte vérifie le chemin physique du document ouvert. Dans `.claude/field-guide`, les leçons locales liées aux versions mémoire et les références à ces leçons dans `index.md` sont refusées, y compris après retrait. Un guide ordinaire sans référence gérée reste disponible. Imports et versions d’un autre projet ne déclarent pas de chemin local ; cette règle n’admet ni ne sélectionne une version mémoire.
+
+L’inventaire provient d’une connexion Root en lecture seule distincte du writer appelant, avec association répertoire/base conservée et revérifiée. Les erreurs d’inventaire ou de fermeture empêchent la publication du contexte ; elles ne deviennent pas une liste vide. Les fichiers liés plusieurs fois, les alias privés et les chemins hors projet gardent les refus du lecteur existant. Ces observations ne figent pas le système de fichiers et n’établissent aucune autorisation d’agent.
+
+```mermaid
+flowchart LR
+ A[Document instruction ouvert] --> B[Chemin physique et texte borné]
+ B --> C{Guide local ?}
+ C -- non --> G[Autres contrôles du contexte]
+ C -- oui --> D[Root lecture seule et inventaire Work cohérent]
+ D --> E[Versions locales et références héritées]
+ E --> F{Source gérée ?}
+ F -- oui --> R[Refus sans publication]
+ F -- non --> G
+ D -- erreur --> R
+```
+
+### Récupération explicite d’un échange historique Go actif (pilote216)
+
+L’historique affiche aussi les échanges `pending`, `running` et `stopping`, sans
+adopter leurs processus ni appliquer l’ancien arrêt automatique après15s.
+`prepare stop ID --input FICHIER --json` et `POST /api/v1/preparations/stop`
+acceptent une intention `{ "preparation_id": "ID", "turn_id": "TOUR" }`.
+L’interface expose « Demander ou vérifier l’arrêt » même sans activer les appels IA.
+Un échange en attente est interrompu par CAS avant claim. Pour un superviseur d’origine
+observé vivant, seul le statut `stopping` est enregistré ; sa réception n’est pas
+attestée. Actualiser ou redemander l’arrêt après sa fin permet le règlement. Identité absente/étrangère ou observation
+incertaine : refus sans règlement terminal. Aucun signal hérité ni relance.
+Seule une réservation restée `reserved` est libérée ; `estimated` reste engagé.
+Un ledger absent/corrompu refuse et annule la transaction. Un descendant fournisseur
+peut survivre : aucune garantie d’arrêt distant ou d’absence de coût.
+Le renvoi exact d’un événement historique encore actif retourne son état enregistré sans dispatch, réservation supplémentaire ou adoption du worker.
+Preuves et état de livraison : [plan](docs/plans/migration-rust/PREPARATION-LEGACY-ACTIVE-20261027.md).
+
+Le format de journal47 est accepté à l’initialisation et dans les changements,
+avec les mêmes contrôles de chaîne d’historique. Lire un journal46 n’ajoute aucune
+valeur ; son évolution vers47 exige toujours preview/apply explicite. Une version
+future inconnue est refusée. La borne de format est un invariant de protocole,
+aucune augmentation de budget ou adoption automatique des paramètres.
+
+La commande Rust `mission seen WORK --root ROOT [--json]` raccorde le marque-page
+de consultation historique au writer `visit mark`. JSON historique Visit, texte
+FR/EN ; aucun document `--input`. Une erreur de sortie peut suivre une écriture
+enregistrée : relire `visit show WORK`. Voir docs/architecture/NATIVE-SESSION-VISIT.md.

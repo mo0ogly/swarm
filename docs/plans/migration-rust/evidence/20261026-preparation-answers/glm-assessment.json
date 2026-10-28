@@ -1,0 +1,41 @@
+{
+  "calls": [
+    {
+      "role": "glm-implementation",
+      "requested_model": "glm-5.2",
+      "reported_model": null,
+      "usable_response": false,
+      "http_status": 504,
+      "elapsed_seconds": 600.09,
+      "usage": "unknown",
+      "automatic_retries": 0
+    },
+    {
+      "role": "glm-review",
+      "requested_model": "glm-5.2",
+      "reported_model": null,
+      "usable_response": false,
+      "http_status": 504,
+      "elapsed_seconds": 600.097,
+      "usage": "unknown",
+      "automatic_retries": 0
+    },
+    {
+      "role": "glm-focused-review",
+      "requested_model": "glm-5.2",
+      "reported_model": null,
+      "usable_response": false,
+      "http_status": 504,
+      "elapsed_seconds": 600.094,
+      "usage": "unknown",
+      "automatic_retries": 0
+    }
+  ],
+  "code_contributions_integrated": 0,
+  "code_owner": "Codex principal",
+  "external_review": "NOT_OBTAINED",
+  "diagnosis": "Three generation requests gateway504 at600s, including3286byte focused context; metadata responds0.111s. Smaller context did not repair generation. No fourth attempt.",
+  "owner": "SKYNET service / delegation tooling",
+  "resumption": "A complete generation response on the intended route, then review the exact candidate; no client cap was imposed",
+  "backend_version": "Not established; API request identifier glm-5.2"
+}

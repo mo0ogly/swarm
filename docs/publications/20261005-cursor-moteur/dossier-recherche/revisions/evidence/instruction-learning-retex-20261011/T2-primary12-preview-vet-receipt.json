@@ -1,0 +1,13 @@
+{
+  "command": [
+    "go",
+    "vet",
+    "./..."
+  ],
+  "start": "2026-10-11T14:53:00.852695+00:00",
+  "end": "2026-10-11T14:53:13.119662+00:00",
+  "seconds": 12.26698688399847,
+  "exit": 0,
+  "output": "/tmp/swarm-T2-primary12-preview-vet.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

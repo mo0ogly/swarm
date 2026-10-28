@@ -1,0 +1,84 @@
+{
+  "at": "2026-10-12T13:55:57.222135+00:00",
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-diagnostic-public-bk85g3ke",
+  "candidate_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+  "checks": [
+    {
+      "started": "2026-10-12T13:54:50.810003+00:00",
+      "finished": "2026-10-12T13:55:19.050158+00:00",
+      "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-diagnostic-public-bk85g3ke",
+      "candidate_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+      "manifest_sha256": "185f805ec66a630f4456ec9bc465d9f8bff8bd068e9904466685b1a46d617959",
+      "argv": [
+        "go",
+        "test",
+        "./internal/engine",
+        "-run",
+        "^TestControlDiagnosticPublicHTTP",
+        "-count=1",
+        "-timeout=90s"
+      ],
+      "exit": 0,
+      "wall_seconds": 28.241430827998556,
+      "output": "/tmp/swarm-control-diagnostic-public-targeted-targeted-policy.out",
+      "output_sha256": "ac304bf7525f59f49aadd732c75590d42143f8805ac67f7a11e067ea0882fc86",
+      "drift": []
+    },
+    {
+      "started": "2026-10-12T13:55:20.341113+00:00",
+      "finished": "2026-10-12T13:55:31.216490+00:00",
+      "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-diagnostic-public-bk85g3ke",
+      "candidate_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+      "manifest_sha256": "185f805ec66a630f4456ec9bc465d9f8bff8bd068e9904466685b1a46d617959",
+      "argv": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit": 0,
+      "wall_seconds": 10.875382191996323,
+      "output": "/tmp/swarm-control-diagnostic-public-vet-targeted-policy.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "drift": []
+    },
+    {
+      "started": "2026-10-12T13:55:33.325218+00:00",
+      "finished": "2026-10-12T13:55:46.492570+00:00",
+      "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-diagnostic-public-bk85g3ke",
+      "candidate_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+      "manifest_sha256": "185f805ec66a630f4456ec9bc465d9f8bff8bd068e9904466685b1a46d617959",
+      "argv": [
+        "python3",
+        "tools/agent-workflows/check.py"
+      ],
+      "exit": 0,
+      "wall_seconds": 13.167391948009026,
+      "output": "/tmp/swarm-control-diagnostic-public-methods-targeted-policy.out",
+      "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+      "drift": []
+    },
+    {
+      "started": "2026-10-12T13:55:48.353335+00:00",
+      "finished": "2026-10-12T13:55:55.470829+00:00",
+      "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-diagnostic-public-bk85g3ke",
+      "candidate_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+      "manifest_sha256": "185f805ec66a630f4456ec9bc465d9f8bff8bd068e9904466685b1a46d617959",
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/tmp/swarm-qualified-control-diagnostic-public-build",
+        "./cmd/swarm"
+      ],
+      "exit": 0,
+      "wall_seconds": 7.117518993007252,
+      "output": "/tmp/swarm-control-diagnostic-public-build-targeted-policy.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "drift": [],
+      "binary_sha256": "cc4dc7ad7d72e38cc546125efac07176170142691e02c0954cda408bd2db0ae8"
+    }
+  ],
+  "result": "PASS targeted qualification",
+  "selection": "User explicitly requires proportionate tests. Authenticated diagnostic transport, unchanged state/calls, original output/provenance, wrong session/task, replaced blocker/attempt and corrupt output. No synchronization change. Prior full attempt FAIL18m and stopped disjoint remainder preserved; neither relabelled PASS.",
+  "limits": "No native acceptance, real-model autonomous correction or browser proof."
+}

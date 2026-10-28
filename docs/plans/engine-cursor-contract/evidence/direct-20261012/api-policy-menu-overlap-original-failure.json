@@ -1,0 +1,5 @@
+{
+  "error": "Error: Error: failed to find element matching selector \"#provider-wait-maximum\"\n    at CdpElementHandle.$eval (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:499:27)\n    at async CdpFrame.$eval (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Frame.js:467:20)\n    at async CdpPage.$eval (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Page.js:460:20)\n    at async configure (/home/fpizzi/Documents/ChatGPT/swarm/tests/api_wait_admin_ui.cjs:17:131)\n    at async /home/fpizzi/Documents/ChatGPT/swarm/tests/api_wait_admin_ui.cjs:20:47",
+  "calls": 5,
+  "cancelled": 3
+}

@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-12T14:10:17.391955+00:00",
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-command-deadline-v6lw54rd",
+  "selected_contract_source_hashes": {
+    "internal/engine/control_runtime_limits.go": "2243fdc6c84e0a779a1f022e4ed7e6827258da12f65256ec367bba36353bc593",
+    "internal/engine/control_command_deadline_test.go": "120b1e9686c9f6a6876e4d81f4729c0e41098d1aea3858b71118ca74927b12c5",
+    "internal/engine/model.go": "a9640177d552e947efe4aa8b70eaed70032b833147f9e91dcb47720b68edcec3",
+    "internal/engine/store.go": "87b25dd7b309eb2825c81e16dc3346083b2e3de7b4bec458e3bc2325f1eef32c"
+  },
+  "new_contract_test": {
+    "argv": [
+      "go",
+      "test",
+      "./internal/engine",
+      "-run",
+      "^(TestControlRuntimeBudgetAppliesToGoCommandDeadlineAndKeepsApprovedPolicy|TestConfiguredGoTestDeadline|TestControlGoBudget)",
+      "-count=1",
+      "-timeout=90s"
+    ],
+    "exit": 0,
+    "output": "/tmp/swarm-control-command-deadline-green-repaired.out",
+    "output_sha256": "60ccf18a6673c5d1889fcc640470ee49a88170e5d62f4cb1bb01ba46fb422b64",
+    "engine_package_seconds": 21.091
+  },
+  "original_red": "Observed first new test FAIL: configured budget left inner deadline unchanged; real Go test panic after1ms. Tool transcript preserved. Earlier interrupted invocation143 had empty output and is not a red proof.",
+  "compile_repair": "Initial green build failed because test used Mission/Key instead of verified RunLimitsConfigEntry MissionID/ScopeKey; original output preserved in green.out; test corrected before rerun."
+}

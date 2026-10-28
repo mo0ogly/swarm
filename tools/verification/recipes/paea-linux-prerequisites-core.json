@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "id": "paea-linux-prerequisites-core",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-linux-prerequisites/**/*",
+    "tests/paea_linux_prerequisites_rustdoc_test.py",
+    "tests/paea_packet_response_rustdoc_test.py",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-linux-prerequisites-core.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-linux-prerequisites-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "parsers-original-io-refusals-and-fresh-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-prerequisites",
+        "--lib",
+        "tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "6 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "actual-current-process-report-no-protection-claims",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-prerequisites",
+        "--test",
+        "current_process",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "native_linux_prerequisites_observe_current_process_without_claiming_protection ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "strict-read-only-observer-docs",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-prerequisites",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "exact-read-only-observer-source-and-prose",
+      "command": [
+        "python3",
+        "tests/paea_linux_prerequisites_rustdoc_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "SOURCE_BOUND_RUSTDOC_PASS sources=1 pages=4"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

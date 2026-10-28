@@ -1,0 +1,9 @@
+AssertionError [ERR_ASSERTION]: 'denied' == 'committed'
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_workload_ui.cjs:19:705 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 'denied',
+  expected: 'committed',
+  operator: '==',
+  diff: 'simple'
+}

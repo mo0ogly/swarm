@@ -1,0 +1,50 @@
+{
+  "pid": 1391647,
+  "proc_start_ticks": "3007788",
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-data-policy-resources",
+    "--root",
+    "/tmp/swarm-actions-preview-g81kfiuh",
+    "web",
+    "127.0.0.1:36525"
+  ],
+  "binary_sha256": "1a7a69aed6f2aa153413b628c525895a77b8e2fe0aea0a84cf621aabad110d31",
+  "origin": "http://127.0.0.1:36525",
+  "fixture_root": "/tmp/swarm-actions-preview-g81kfiuh",
+  "old_process": {
+    "pid": 1230788,
+    "identity_verified": true,
+    "stopped": true
+  },
+  "actions": 2,
+  "ledger_entries": 1,
+  "state_sha256_unchanged": "d3b01d34c5c750ca91cbe1591ccd1c978ecb3a52a6416ffbbb0d610cfddd48c1",
+  "delegation_admin_present": true,
+  "delegation_max_depth": 0,
+  "step_up_admin_present": true,
+  "step_up_enabled": false,
+  "oidc_logout_enabled": false,
+  "oidc_logout_admin_present": true,
+  "oidc_enabled": false,
+  "workloads_enabled": false,
+  "group_mapping_enabled": false,
+  "group_mapping_admin_present": true,
+  "data_policy_admin_present": true,
+  "data_policy_enabled": false,
+  "data_capabilities": {
+    "classifications": [
+      "public",
+      "internal"
+    ],
+    "destination": "local-ledger",
+    "external_containment_verified": false,
+    "provider": "swarm",
+    "secret_grants_supported": false,
+    "tool": "simulated-settlement"
+  },
+  "identity_context_ui_present": true,
+  "public_api_and_html_verified": true,
+  "browser_reload_observed": false,
+  "private_startup_log": "/tmp/swarm-data-policy-preview-xkvi59r5.log",
+  "created_at_utc": "2026-10-15T20:20:54.560392+00:00"
+}

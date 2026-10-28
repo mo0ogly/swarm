@@ -1,0 +1,25 @@
+{
+  "pid": 268160,
+  "proc_start_ticks": "1671906",
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-lifecycle",
+    "--root",
+    "/tmp/swarm-actions-preview-g81kfiuh",
+    "web",
+    "127.0.0.1:36525"
+  ],
+  "binary_sha256": "a75225af0e00ef3dfedd4b647985e5add725790a35e49c31bbf3dbdf64dd88cd",
+  "origin": "http://127.0.0.1:36525",
+  "fixture_root": "/tmp/swarm-actions-preview-g81kfiuh",
+  "old_process": {
+    "pid": 141273,
+    "identity_verified": true,
+    "stopped": true
+  },
+  "actions": 2,
+  "ledger_entries": 1,
+  "identity_access_present": true,
+  "local_identities_active": true,
+  "simulation": true,
+  "created_at_utc": "2026-10-15T16:38:15.185942+00:00"
+}

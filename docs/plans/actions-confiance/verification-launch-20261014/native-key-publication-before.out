@@ -1,0 +1,12 @@
+=== RUN   TestActionsConfianceT2InitialKeyPublicationFailure
+    native_key_publication_regression_test.go:4: isolated process: exit status 1
+        === RUN   TestActionsConfianceT2InitialKeyPublicationFailure
+            native_key_publication_regression_test.go:7: injected local file-size failure: write /tmp/TestActionsConfianceT2InitialKeyPublicationFailure742745281/001/.swarm/.swarm-write-3098513434: file too large
+            native_key_publication_regression_test.go:7: failed publication left a key without configuration: <nil>
+            native_key_publication_regression_test.go:8: retry after repaired storage remains blocked: clé préexistante sans configuration attribuée ; diagnostiquer son origine avant reprise
+        --- FAIL: TestActionsConfianceT2InitialKeyPublicationFailure (0.03s)
+        FAIL
+--- FAIL: TestActionsConfianceT2InitialKeyPublicationFailure (0.06s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.084s
+FAIL

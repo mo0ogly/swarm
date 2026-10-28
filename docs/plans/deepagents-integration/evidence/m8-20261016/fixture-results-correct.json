@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "protocol": "storage-plan-v3",
+  "source": {
+    "kind": "fixture"
+  },
+  "results": [
+    {
+      "case_id": "storage-32-current-without",
+      "scenario": "storage-32-current",
+      "treatment": "without",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "awaits_current_source",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "storage-32-current-with",
+      "scenario": "storage-32-current",
+      "treatment": "with",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "concrete_upgrade_proposal",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "storage-32-changed-without",
+      "scenario": "storage-32-changed",
+      "treatment": "without",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "awaits_current_source",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "storage-32-changed-with",
+      "scenario": "storage-32-changed",
+      "treatment": "with",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "awaits_current_source",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "storage-33-current-without",
+      "scenario": "storage-33-current",
+      "treatment": "without",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "awaits_current_source",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "storage-33-current-with",
+      "scenario": "storage-33-current",
+      "treatment": "with",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "readonly_inspection_possible",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "storage-33-changed-without",
+      "scenario": "storage-33-changed",
+      "treatment": "without",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "awaits_current_source",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "storage-33-changed-with",
+      "scenario": "storage-33-changed",
+      "treatment": "with",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "awaits_current_source",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "storage-34-current-without",
+      "scenario": "storage-34-current",
+      "treatment": "without",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "awaits_current_source",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "storage-34-current-with",
+      "scenario": "storage-34-current",
+      "treatment": "with",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "compatible_cli_required",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "storage-34-changed-without",
+      "scenario": "storage-34-changed",
+      "treatment": "without",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "awaits_current_source",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "storage-34-changed-with",
+      "scenario": "storage-34-changed",
+      "treatment": "with",
+      "result": "PASS",
+      "violations": [],
+      "resolution": "awaits_current_source",
+      "available_knowledge_unused": false,
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "scenario": "storage-32-changed",
+      "without": {
+        "result": "PASS",
+        "resolution": "awaits_current_source"
+      },
+      "with": {
+        "result": "PASS",
+        "resolution": "awaits_current_source"
+      }
+    },
+    {
+      "scenario": "storage-32-current",
+      "without": {
+        "result": "PASS",
+        "resolution": "awaits_current_source"
+      },
+      "with": {
+        "result": "PASS",
+        "resolution": "concrete_upgrade_proposal"
+      }
+    },
+    {
+      "scenario": "storage-33-changed",
+      "without": {
+        "result": "PASS",
+        "resolution": "awaits_current_source"
+      },
+      "with": {
+        "result": "PASS",
+        "resolution": "awaits_current_source"
+      }
+    },
+    {
+      "scenario": "storage-33-current",
+      "without": {
+        "result": "PASS",
+        "resolution": "awaits_current_source"
+      },
+      "with": {
+        "result": "PASS",
+        "resolution": "readonly_inspection_possible"
+      }
+    },
+    {
+      "scenario": "storage-34-changed",
+      "without": {
+        "result": "PASS",
+        "resolution": "awaits_current_source"
+      },
+      "with": {
+        "result": "PASS",
+        "resolution": "awaits_current_source"
+      }
+    },
+    {
+      "scenario": "storage-34-current",
+      "without": {
+        "result": "PASS",
+        "resolution": "awaits_current_source"
+      },
+      "with": {
+        "result": "PASS",
+        "resolution": "compatible_cli_required"
+      }
+    }
+  ],
+  "result": "PASS",
+  "model_effectiveness": "NOT TESTED",
+  "scope": "Proposals and guarded paths only; no migration, downgrade, launch or acceptance performed",
+  "pack_sha256": "fd11f19d85c83f6d0f91e6c1a991fa3cb6042f799195b1339c6d5b86831a6d43",
+  "answers_sha256": "0991a465dc515c0b726f98c5a85532028ce02a1bc102fb967164cd646201b9a5"
+}

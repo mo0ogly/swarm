@@ -1,0 +1,38 @@
+{
+  "legacy_binary_sha256": "8cd3ae2b2a996315375f04834d8db7ab463f39ec68fe985272b36514f96ba157",
+  "fixture_root": "/tmp/swarm-legacy-root-digest-q2jf4oix",
+  "input": {
+    "schema_version": 1,
+    "event_id": "legacy-root-create",
+    "mandate_id": "legacy-root",
+    "subject": "alice",
+    "actions": [
+      "settle"
+    ],
+    "resource": "invoice/acme",
+    "max_amount_minor": 1000,
+    "currency": "EUR",
+    "beneficiary": "ACME",
+    "starts_at": "2026-10-14T12:00:00Z",
+    "expires_at": "2026-10-14T13:00:00Z"
+  },
+  "observed": {
+    "id": "legacy-root",
+    "subject": "alice",
+    "delegator": "admin",
+    "actions": [
+      "settle"
+    ],
+    "resource": "invoice/acme",
+    "max_amount_minor": 1000,
+    "currency": "EUR",
+    "beneficiary": "ACME",
+    "version": 1,
+    "policy_revision": 1,
+    "integrity": 2,
+    "starts_at": "2026-10-14T12:00:00Z",
+    "expires_at": "2026-10-14T13:00:00Z",
+    "content_digest": "17749c31acf37938ebabe43b794adf5726fbc565905e6c0eb059afdae9ab5ad3",
+    "original_digest": "8bb32fd5721806452cbfc9059a2ef919defb663ebc74b857be2e5b5e57276da0"
+  }
+}

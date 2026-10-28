@@ -1,0 +1,38 @@
+[
+  {
+    "path": "docs/plans/deepagents-integration/PLAN.md",
+    "sha256": "4da14cf852079eb5694d99fcbe1c97072759422d67c6c31c3d84cd1df328592d",
+    "added": 9,
+    "removed": 0
+  },
+  {
+    "path": "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-16.md",
+    "sha256": "594f8a39bc62c7a7652bc6b4325da45f7206822e7d85be563a8459f9115894b9",
+    "added": 21,
+    "removed": 1
+  },
+  {
+    "path": "docs/plans/deepagents-integration/AUDIT-PROVENANCE-M20.md",
+    "sha256": "a9a1540fdc4831d2ca3700bd132f3dd8a48a9eb28701954d97ec13c40eaac1eb",
+    "added": 25,
+    "removed": 0
+  },
+  {
+    "path": "docs/PROJECT-MEMORY.md",
+    "sha256": "cff1d0aeaa15159ff9b8e906786a63e5e0c9b2ae9a99e28485753d1b7f010e87",
+    "added": 8,
+    "removed": 0
+  },
+  {
+    "path": "docs/en/PROJECT-MEMORY.md",
+    "sha256": "94092512ad081e6a1f74702aa1d0e3b3471ad68491d5042502d6a44788fab221",
+    "added": 8,
+    "removed": 0
+  },
+  {
+    "path": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+    "sha256": "267ee0e7f6adeedb4361389bacdb151ccaa1b7e4fe5334dda988a4bb2505df2b",
+    "added": 121,
+    "removed": 0
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-preauth-publication-quota-20261015-1059",
+  "expected_revision": 459,
+  "limits": {
+    "review_context_tokens": 400000,
+    "review_context_files": 32,
+    "review_source_bytes": 98304,
+    "review_context_bytes": 409600,
+    "review_delivery_files": 100,
+    "planning_scopes": 0,
+    "delegation_depth": 0,
+    "planning_tasks": 20,
+    "planning_activations": 60,
+    "planning_decisions": 40,
+    "review_calls": 94
+  },
+  "reason": "Replan R21 : publication préauthentification reproduite, correction générale et 126 tests race puis sept recettes publiques passent. Nouvelle remise de 32 originaux et rapport : 398126 octets mesurés au-delà de 393216 ; autoriser 409600 sans retirer de preuve. Quatre appels frais, plafond 94 et 90 consommés conservés ; autres politiques inchangées."
+}

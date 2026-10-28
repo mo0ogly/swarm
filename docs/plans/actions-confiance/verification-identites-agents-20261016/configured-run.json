@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "python3",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia1_audit.py",
+    "/tmp/swarm-ia1-build-_bj_x21c/swarm",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/configured",
+    "--require-protection"
+  ],
+  "started_unix": 1792183509.3761137,
+  "ended_unix": 1792183511.5290213,
+  "exit_code": 1,
+  "changed_precondition": "Four separated fixture identities; application binary unchanged",
+  "parent_failure": "initial/failure.json"
+}

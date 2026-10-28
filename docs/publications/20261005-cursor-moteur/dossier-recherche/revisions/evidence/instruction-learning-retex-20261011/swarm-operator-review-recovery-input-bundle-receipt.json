@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-11T17:34:07.109695+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-review-recovery-20261011.bundle",
+  "sha256": "68de5690442e1b72fea6266ec951a15e408d22a6ba6b15c0e6043045f111d0b6",
+  "bytes": 356557,
+  "ref": "refs/heads/operator-inputs",
+  "commit": "52a4d220c8de6ca50accd198b898b0fab4d8e70c",
+  "manifest_sha256": "6a35ea6f6e89deebc54ca3e76a6fc8ef6ea0759fad92c126761a733d94cdb0f0",
+  "input_files": 62,
+  "source": "/tmp/swarm-operator-review-recovery-inputs-20261011-smytbbqw",
+  "isolated_import_check": "/tmp/swarm-review-recovery-input-check-g5vvl5gb",
+  "verification": "PASS independent fetch, commit, manifest and all62 hashes; old55 originals preserved",
+  "limits": "Cumulative unchanged55 operator inputs plus qualified15/16 and future-version fixture patch. Explicit historical fixture preimage supplied for native code snapshots missing this file. Native T3 must merge Judge without losing original fields, refresh its own full manifest and qualify actual combined candidate.17partial/global decision fix still separate work, not in this bundle."
+}

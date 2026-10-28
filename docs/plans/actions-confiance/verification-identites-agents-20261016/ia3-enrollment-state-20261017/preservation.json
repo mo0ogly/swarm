@@ -1,0 +1,52 @@
+{
+  "internal/enrollmentproof/proof.go": {
+    "expected": "0b7b1976be1f34f64e9233e769acb084988fbf5df593442e9b69fcfb8217440f",
+    "current": "0b7b1976be1f34f64e9233e769acb084988fbf5df593442e9b69fcfb8217440f",
+    "unchanged": true
+  },
+  "internal/enrollmentproof/proof_test.go": {
+    "expected": "15898ca8835dc11be94a4f747045e2bdd5c4373ed9c104b861e64f2d64243530",
+    "current": "15898ca8835dc11be94a4f747045e2bdd5c4373ed9c104b861e64f2d64243530",
+    "unchanged": true
+  },
+  "go.mod": {
+    "expected": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+    "current": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+    "unchanged": true
+  },
+  "go.sum": {
+    "expected": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+    "current": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+    "unchanged": true
+  },
+  "internal/engine/agent_identity_issuer_linux.go": {
+    "expected": "7ee38e272c7ca66fae7d9962d159acac314ba1c868cea3e603973081e21a5a1d",
+    "current": "7ee38e272c7ca66fae7d9962d159acac314ba1c868cea3e603973081e21a5a1d",
+    "unchanged": true
+  },
+  "internal/engine/agent_identity_registry_types.go": {
+    "expected": "1f3a02411c92b57a1cce4b2f6c2a72e85a2e89e7ab4f2a7567844a102848ccd7",
+    "current": "1f3a02411c92b57a1cce4b2f6c2a72e85a2e89e7ab4f2a7567844a102848ccd7",
+    "unchanged": true
+  },
+  "internal/engine/agent_identity_registry_publish.go": {
+    "expected": "12cd527e6de9638d44ea761151d8571ed49e9ecaa2fbab17e51bc3dcc3c353bd",
+    "current": "12cd527e6de9638d44ea761151d8571ed49e9ecaa2fbab17e51bc3dcc3c353bd",
+    "unchanged": true
+  },
+  "internal/engine/agent_identity_registry_store.go": {
+    "expected": "5caa3e567df9646ade66026bd1c3a0e46e85bb3b022e3f0dbff8490789d04609",
+    "current": "5caa3e567df9646ade66026bd1c3a0e46e85bb3b022e3f0dbff8490789d04609",
+    "unchanged": true
+  },
+  "internal/engine/agent_identity_receipt_linux.go": {
+    "expected": "c1d1f50fcb1da0f987e77e8a583ce286762e09d10ebb35ec91c246ee789ee2e8",
+    "current": "c1d1f50fcb1da0f987e77e8a583ce286762e09d10ebb35ec91c246ee789ee2e8",
+    "unchanged": true
+  },
+  "internal/engine/agent_identity_receipt_linux_test.go": {
+    "expected": "4b739068d8dec888ce0134ac5aacc523db23029a7302e9c2998bfc90804cc041",
+    "current": "4b739068d8dec888ce0134ac5aacc523db23029a7302e9c2998bfc90804cc041",
+    "unchanged": true
+  }
+}

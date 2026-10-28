@@ -1,0 +1,58 @@
+{
+  "at": "2026-10-11T18:58:55.527671+00:00",
+  "bundle": {
+    "at": "2026-10-11T18:47:56.469638+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-log-console-20261011.bundle",
+    "sha256": "e83b8428fc3391947c34a834157a9458c7bd3167dfb2f15da0422d487eddcecc",
+    "commit": "b03e53ca531953b4240ee0a727276836ed176091",
+    "ref": "refs/heads/operator-inputs",
+    "input_files": 89,
+    "manifest_sha256": "2c602607b5639cbf2b6bbcb6170de25683eebbc23f43203e28ff104247247de8",
+    "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/log-console20-inputs-renr51r2",
+    "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/log-console20-import-ewwh255_",
+    "verification": "PASS fetch and all89 original full bytes/hash; old84 preserved",
+    "limits": "Cumulative84 unchanged qualified recovery inputs plus console20 patch/metadata and3exact preimages,89files. Full1187 PASS497.550s without drift; browserFR-EN/themes/mobile/search/filter/export/stale/fallback PASS, actual Ctrl-F PASS, compatible19-to20 detached agent restart PASS. No global native acceptance: T2 current unknown after selection needs remains unresolved, producer attempt history preserved; T3 must merge all corrections plus Judge and qualify own combined candidate, T4..T8 still required."
+  },
+  "updates": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "revision": 475,
+      "operator_base_sha256": "5baf51dc68abd0a1ad255e6cbb7e76e4fb4ea0507e21b60eccf8e71e2ee1c644",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "revision": 476,
+      "operator_base_sha256": "a6759d56b658e700c62c31a0d28807b5818448279e2c7a0156a6521b3c77b298",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "revision": 477,
+      "operator_base_sha256": "cd7a267a556fca024a91bac61c4a5af7f9a6fc67c21c1f081c58d2bb647b18dd",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "revision": 478,
+      "operator_base_sha256": "2893449cf651050ff124eb3a035ffe00c9d915aaad47080c9cbbdcd42e03b0b5",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "revision": 479,
+      "operator_base_sha256": "0a393727c6c3a416a69d5558653c4e2df47c360713507eb3b41ddf3e647571c4",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T8",
+      "revision": 480,
+      "operator_base_sha256": "224983a601f1a8f1155ec7baf0f354043c08c4922be9fe50def78faa7d6bf2e6",
+      "criteria_dependencies_attempts_learning_preserved": true
+    }
+  ],
+  "public_revision": 480,
+  "paused": false,
+  "t2_original_preserved": true,
+  "scope": "Future instructions saved publicly, not yet received by workers. Console installed and mission unpaused; T2 current unknown still needs genuine evidence repair. No fresh supervisor activation from UI-only deployment."
+}

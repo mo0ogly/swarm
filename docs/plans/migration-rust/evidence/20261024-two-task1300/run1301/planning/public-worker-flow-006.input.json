@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "event_id": "public-flow-enable",
+  "expected_revision": 1,
+  "provider": "fixture",
+  "level": "standard",
+  "max_activations": 6,
+  "max_tasks": 10,
+  "max_decisions": 10,
+  "max_review_calls": 2,
+  "checks": {
+    "req-1": [
+      {
+        "id": "actual-handoff",
+        "command": [
+          "python3",
+          "-c",
+          "from pathlib import Path; import re; text=Path('handoff.md').read_text(); assert re.search(r'Input SHA256: [0-9a-f]{64}',text)"
+        ],
+        "criteria": [
+          1
+        ],
+        "inputs": [
+          "handoff.md"
+        ],
+        "review_output": false,
+        "justification": "Check actual owned fixture handoff input digest"
+      }
+    ]
+  }
+}

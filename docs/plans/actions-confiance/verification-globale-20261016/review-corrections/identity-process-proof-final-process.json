@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^TestActionsConfiance(T3|T5|T6)",
+    "-count=1"
+  ],
+  "pid": 361560,
+  "start_ticks": "6836753",
+  "started_unix": 1792133943.389121,
+  "status": "running"
+}

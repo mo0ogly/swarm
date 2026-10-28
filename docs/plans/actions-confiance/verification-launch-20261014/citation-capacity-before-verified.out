@@ -1,0 +1,7 @@
+=== RUN   TestFinalCitationRetryMeasuresRemainingMessage
+    managed_review_citation_feedback_test.go:315: sizes 164551 168226 21899 parts 1
+    managed_review_citation_feedback_test.go:381: completed inspections blocked a fitting final retry consignes et paquet d’inspection dépassent la limite ; aucun envoi tronqué
+--- FAIL: TestFinalCitationRetryMeasuresRemainingMessage (1.05s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.082s
+FAIL

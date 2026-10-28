@@ -1,10 +1,90 @@
 # Install Swarm
 
+**Rust installation — October 24, 2026.** Native CLI, source-managed server and Docker image use Rust exclusively. No Go compiler or fallback is required. Validated toolchain: Rust/Cargo 1.96.0, with a C compiler for bundled SQLite; native installation explicitly fetches Cargo.lock dependencies before the offline qualified build. Docker builds its own toolchain environment. Direct Docker source builds without supplied build metadata truthfully report `devel` and unknown commit; they do not fabricate a release. The active migration plan defines available commands; legacy capabilities described below are not proof of Rust availability.
+
+
 [Français](../../INSTALL.md) · [User guide](USER-GUIDE.md)
 
 The supported installation path is Linux. Choose Docker for a dedicated runtime,
 or a native binary to use tools already installed on your machine. The installer
 does not request sudo, modify shell profiles or install Docker for you.
+
+## Identity authority — development and pilot
+
+The selected development and pilot target is a **local authority under a separate
+system account, with verified agent confinement**. An authority on a separate
+machine with separate administration is planned for future installations.
+Local/remote describes the authority; it is distinct from Swarm's Docker/native
+installation choice below.
+
+**Selected authentication flow, not implemented yet:** no external identity
+provider is required. First run will default to creating a personal local human
+account, followed by workflow startup once the account and protection prerequisites
+are verified. No shared account or password will be preinstalled. Bootstrap must
+verify independent installation proof; the first visitor does not become an
+administrator. The wizard and Admin will expose “Human authentication”, with an
+optional enterprise provider. This differs from “Authority hosting” and the AI
+model provider. Unreadable configuration must never reactivate initial enrollment.
+This describes the target; the current installer does not provide it yet.
+
+**This separation and its configuration flow are not delivered yet.** The current
+installer creates neither a dedicated authority account nor its service; the
+current container uses your UID/GID. Successful installation does not establish
+identity isolation or control of agent creation.
+
+The planned flow selects the mode at initial setup, then manages it in an Admin
+modal: persistent configuration, an explicitly approved trust root, a designated
+initial human principal, and effective status separate from the saved choice.
+The remote option will remain labelled as planned until implemented; it cannot
+be obtained by entering a cockpit URL or reusing the existing Trust client.
+Connection failure must never trigger permissive local fallback. See the
+[contract and limits](AGENT-IDENTITY-CONTRACT.md) and the
+[configuration and migration plan](../plans/actions-confiance/identites-agents-enrolement-IA3c2.md).
+
+
+The persistence kernel for this configuration is verified in local fixtures;
+it is not connected to the installer or Admin modal yet. These checks establish
+neither an authority deployment nor agent confinement.
+
+The local coordinator now retains a witness in a separate directory and verifies
+interruption recovery in fixtures. This script does not install it. Restoring
+configuration and witness together can hide rollback: their protection and backup
+strategy remain to be qualified before deployment. See the identity contract above.
+
+A private control adapter now reuses the per-message attributed Linux channel
+and the coordinator; its exchanges and refusals can be tested in fixtures. It
+still provides neither an installation command nor a running service. Paths,
+pins and rights must come from protected bootstrap; no account, cockpit cookie
+or first caller automatically becomes the authority.
+
+The private client now verifies the service process from an independently
+supplied launcher pidfd and binds replies to a challenge and the exact request
+(transport version 2). This neither designates the initial human nor creates a
+system service or Admin setting. On-disk configuration retains schema 1; no
+history reset is required. See the identity contract for Linux prerequisites and
+transport limits.
+
+Private channel handoff can now be tested with two local processes: the launcher
+pins the image, verifies attributed startup before the business request and
+reaps its child. This internal helper starts no service through the installer;
+its fixtures share one account. The initial human, dedicated account, confinement
+and Admin flow remain to be supplied. No secret or session cookie is transmitted
+by this startup protocol.
+
+Source now provides a bootstrap precheck without opening a project:
+
+```sh
+swarm identity bootstrap-check APPROVED_DIGEST --input /absolute/path/bootstrap.json --json
+```
+
+Run under the intended service UID, against objects already provisioned through
+an authorized flow. The expected digest must come from independent approval;
+computing it from the file to accept is not that approval. The identity contract
+describes the V1 manifest and private directories. This command creates no
+account/service/lock and does not authenticate the declared human: storage_verified
+is separate from human_authentication_verified, confinement_verified and
+service_started, all false. Actual human bootstrap and account provisioning
+remain to be connected.
 
 ## Included training resources and branding
 
@@ -28,7 +108,7 @@ mkdir -p "$HOME/projects/my-project"
 ./install.sh --project "$HOME/projects/my-project"
 ```
 
-Open the session URL printed after startup. Retrieve it again with:
+Open the printed loopback address and its `/login` page. Rust no longer prints a credential-bearing session URL. The private key is in the project’s `.swarm/web-session-<address-hash>` file (first16 hexadecimal SHA-256 characters of the exact `host:port`). Read it locally and enter it in the login form; never publish it. Logs are for startup diagnostics:
 
 ```sh
 docker compose --env-file deploy/install.env logs --tail 20 swarm
@@ -56,11 +136,11 @@ reinstallation.
 
 For native Linux development, use `./swarm.sh start --root /path/to/project`. The launcher builds the canonical binary, initializes the project and opens the authenticated browser automatically. `start` reuses its existing server; `restart` replaces only its recorded process after checking PID, start time, executable and command. Missions, project data and agents are retained. An unrelated listener is never killed. Stop a legacy server explicitly before the first managed start.
 
-Commands: `start`, `restart`, `stop`, `status`, `logs`, `open`, `build`. Use the same root with every command. The stable default URL is `http://127.0.0.1:18792/`. Options: `--root`, `--address`, `--binary`, `--startup-timeout`, `--stop-timeout`, `--no-open`, `--mask-cifs`. Environment: `SWARM_PROJECT_ROOT`, `SWARM_WEB_ADDRESS`, `SWARM_BINARY`, `SWARM_BROWSER`. Requires Python 3, Go for building, and `xdg-open` for browser launch. `--mask-cifs` needs `bwrap` and only masks the host share inside the server's mount namespace.
+Commands: `start`, `restart`, `stop`, `status`, `logs`, `open`, `build`. Use the same root with every command. The stable default URL is `http://127.0.0.1:18792/`. Options: `--root`, `--address`, `--binary`, `--startup-timeout`, `--stop-timeout`, `--no-open`, `--mask-cifs`. Environment: `SWARM_PROJECT_ROOT`, `SWARM_WEB_ADDRESS`, `SWARM_BINARY`, `SWARM_BROWSER`. Requires Python 3, Rust/Cargo and a C compiler for building, and `xdg-open` for browser launch. `--mask-cifs` needs `bwrap` and only masks the host share inside the server's mount namespace.
 
 `configure --root PROJECT --address ADDRESS` persists the project, address and mount-mask choice in Git-ignored `deploy/local-web.json`; subsequent commands reuse them. `adopt --pid PID --root PROJECT --binary BINARY --address ADDRESS` can take ownership of a known legacy server only when its full process command matches exactly. No name-based process killing or project data deletion occurs.
 
-Authentication remains enabled. `open` supplies the private session to the local browser without printing its credential. The persistent HttpOnly, SameSite strict cookie survives server restarts. A browser without a cookie sees a real FR/EN, dark/light sign-in page. Configure cookie lifetime in `.swarm/web-session.json`: `{"schema_version":1,"cookie_max_age_seconds":2592000}` (default 30 days; range one second to 365 days). Restart and sign in again to renew the cookie after changing the policy. Removing the private session key while stopped revokes sessions; ordinary restarts preserve it. Origin and CSRF checks remain enforced. Logs and identity records stay under `.swarm/local-web/` outside Git; `logs` redacts session links. The launcher stops the web server, not agents. Docker remains a separate installation.
+Authentication remains enabled. `open` opens the native login page; it does not transmit the private key automatically. Cookie lifetime is the persisted Admin setting `web_cookie_max_age_seconds` in `.swarm/engine-settings.json` (initial30days), not the historical `.swarm/web-session.json`. Restart and sign in again after changing the server policy. The key is selected by exact listener address from the private `.swarm` directory. Removing it while stopped revokes that credential; normal restarts preserve it. Origin and CSRF checks remain enforced. Local lifecycle files stay under `.swarm/local-web/`; the launcher stops its server, not agents. Docker remains a separate lifecycle.
 
 ### Network access
 
@@ -75,7 +155,7 @@ For a remote Linux server, run this from your workstation:
 ssh -L 18787:127.0.0.1:18787 user@server
 ```
 
-Then open the session link at `127.0.0.1:18787` locally. Keep session links private.
+Then open `http://127.0.0.1:18787/login` locally and use the corresponding private local key. Keep the key private.
 
 ## Configure AI providers
 
@@ -101,26 +181,25 @@ its `bin` directory is on PATH. Additional system dependencies belong in a deriv
 image; installation only in a container's writable layer does not survive recreation.
 
 Host-installed commands are not automatically available in the container.
-`providers init` discovers known commands only when it creates the configuration;
+`providers config init` discovers known commands only when it creates the configuration;
 it does not overwrite an existing file. After adding a provider, review and update
 `/workspace/.swarm/providers.json`. The `skynet_harness` model adapter recognizes
 that executable when installed and configured; recognition is not installation
 or a full qualification test.
 
 ```sh
-docker compose --env-file deploy/install.env exec swarm swarm --root /workspace providers show
+docker compose --env-file deploy/install.env exec swarm swarm --root /workspace providers config show
 docker compose --env-file deploy/install.env exec swarm swarm --lang en --root /workspace work list
 ```
 
 ## Native installation
 
-Requirements: Linux and a suitable Go toolchain; see `go.mod` for the declared
-version. From the checkout:
+Requirements: Linux, Git, Bash, Python 3, Rust/Cargo (validated: 1.96.0), a C compiler and network access to fetch locked Cargo dependencies. From the checkout:
 
 ```sh
 ./install.sh --mode native --bin-dir "$HOME/.local/bin"
 "$HOME/.local/bin/swarm" --root /path/to/project init
-"$HOME/.local/bin/swarm" --root /path/to/project providers init
+"$HOME/.local/bin/swarm" --root /path/to/project providers config init
 "$HOME/.local/bin/swarm" --root /path/to/project web 127.0.0.1:18787
 ```
 
@@ -155,7 +234,7 @@ opening upgraded state; restore a matching backup rather than forcing a downgrad
 
 - Docker unavailable: check `docker version` and access to the local engine.
 - Port occupied: use another `--port`; do not stop an unrelated service.
-- Session refused: reopen the link from this server's logs.
+- Session refused: open `/login` and use the private key for the exact listener address; no secret URL is printed in logs.
 - Agent unavailable: check inside the runtime, not only on the host.
 - Permission failure: check actual project ownership and the agent's permissions.
 - Empty connection list: add your API or install/configure your agent.
@@ -166,17 +245,15 @@ make test-install
 make test-process
 ```
 
-The installer recipe requires Docker and a checkout without an existing
-`deploy/install.env`. It uses isolated test projects. Process recipes use
-simulated deterministic agents without paid model calls. They do not validate
-your real provider or your project.
+`make test-install` runs real native installation and a separate Docker build/runtime recipe on isolated projects. They verify compiled identity, bundled methods, persistence across processes/containers, permissions, protected API reads and absence of Go in the runtime image. Fresh evidence/data stays in `.cache`; no shared `deploy/install.env` is modified. A local Docker Engine, Rust/Cargo, a C compiler and Python 3 are required. Temporary containers are removed; images and isolated evidence/data are retained.
+
+Shell/Compose argument handling uses regression doubles, distinct from the actual image recipe. These checks do not qualify the complete Compose lifecycle, Docker login form, provider authentication or sandboxes. No arbitrary global build/recipe watchdog is added; `compose up --wait` keeps the service health checks. Process fixtures do not invoke paid models.
 
 ### SQLite initialization and migrations
 
-No database is shipped in Git or the Docker image. `swarm init` creates
-`PROJECT/.swarm/state.db` with permissions `0600`. The server applies supported
-migrations at startup; inspection commands refuse to silently migrate an older
-database. For CLI-only use, after stopping old processes and taking a backup:
+No database is shipped in Git or the Docker image. `swarm init` creates a fresh Root and private `PROJECT/.swarm/state.db` with mode0600. Rust currently verifies schema37; old or incompatible schemas refuse without invoking Go or silently replaying its former migrations. `init` is not a general Go mission converter. Keep a complete backup and use a migration procedure explicitly qualified for that schema.
+
+To initialize a new Root only:
 
 ```sh
 docker compose --env-file deploy/install.env run --rm --no-deps swarm init
@@ -343,6 +420,32 @@ make build
 docker compose --env-file deploy/install.env run --rm --no-deps swarm --json version
 ```
 
+For a source-managed server (`bin/swarm` or `bin/swarm-local`), `swarm.sh`
+prepares the binary before stopping the instance and assigns a local prerelease
+`vMAJOR.MINOR.PATCH-dev.N`. Its base is the next patch after the latest release
+declared in `version_history.json`. Changed effective build inputs increment `N`;
+identical inputs retain their number and verified binary. Local tracking persists
+in `deploy/local-build.json` (Git-ignored), covering actual Rust compiler inputs, effective Cargo features/dependencies, embedded resources and build settings. A failed build or sources
+changing during compilation leaves the previous server running.
+
+Update French/English `local_changes` in `version_history.json`, then use:
+
+```sh
+./swarm.sh build
+./swarm.sh restart --root /path/to/project
+```
+
+Configuration retains the address and binary selection; check agents before
+restart. `build` can prepare a candidate while the server remains active;
+`restart` installs it after stopping only the managed process. An external
+prebuilt `--binary` is reused without rebuilding. `SWARM_VERSION` remains an
+explicit override; calling `build.sh` directly still uses the exact tag or
+`devel` without that variable. After restart, check **Version and what's new**:
+actual number, localized changes, binary commit and uncommitted-change disclosure.
+A local prerelease creates no Git tag or GitHub release. Local changes remain
+separate from published releases; their Git base is not presented as containing
+the uncommitted edits.
+
 An explicit release requires a SemVer version, a 40-character SHA, a known
 modified state and a UTC date; `SOURCE_DATE_EPOCH` supports reproducible builds.
 The Docker build accepts `SWARM_VERSION`, `SWARM_COMMIT`, `SWARM_MODIFIED` and
@@ -353,8 +456,9 @@ metadata have been checked.
 dialog keeps the **running binary** separate from **local sources**: `*` in the
 summary describes the binary at build time, while local checkout dirtiness is a
 separate source fact. Comparison makes no network request. The embedded release
-list is currently empty because no release is declared; the UI says so and links
-to the complete GitHub commit history. Escape closes the dialog and restores
+list comes from `version_history.json` and contains explicitly declared releases;
+the UI says when it is empty and links to the complete GitHub commit history.
+Escape closes the dialog and restores
 focus to its trigger.
 
 ![English cockpit, State theme](../screenshots/version-history/cockpit-en-etat.png)
@@ -477,7 +581,7 @@ For recovery or revision conflicts, see the [engine recovery conditions](ENGINE-
 
 After installation, configure instructions from the target project root: [role-specific project profile](PROJECT-PROFILE.md). Configuration does not start a mission.
 
-## Agent Go cache — fix being delivered
+## Historical Go agent cache — not used by the Rust engine
 
 An agent may be able to read the global Go cache but not write to it inside its
 sandbox. A `read-only file system` error targeting that cache does not prove a
@@ -511,7 +615,7 @@ The fresh October 6 recipe binds the product candidate to [light graph](../scree
 ## Native Linux launcher and on-premise APIs
 
 The repository ships `swarm.sh` and `tools/swarm_local.py`. Requires Python 3,
-Go for building and `xdg-open` to open the browser. Run from the repository:
+Rust/Cargo and a C compiler for building, plus `xdg-open` to open the browser. Run from the repository:
 
 ```sh
 ./swarm.sh configure --root /path/to/project
@@ -533,7 +637,6 @@ Authentication stays enabled and private browser URLs are not printed.
 Docker uses Compose instead. The [on-premise override guide](../ON-PREMISE-AI.md)
 (French) covers internal CAs, DNS, proxies, mounts and saved connections.
 
+Native SQLite settings are available in **Configure the engine** through `storage_busy_timeout_ms`, `storage_busy_retries` and `storage_busy_retry_delay_ms`. They are persisted and shared by Admin/API/CLI (`swarm engine-settings show|preview|apply`). The [historical SQLite guide](SQLITE-CONTENTION-RECOVERY.md) describes the former Go engine; its `storage-retry` command is not a Rust command.
 
-### Configurable SQLite wait
-
-Open **Administration → SQLite storage wait** to inspect or change retries, retry delay and SQLite wait per attempt. The CLI exposes the same persisted settings through `swarm storage-retry show` and `swarm storage-retry apply --input configuration.json`. These settings do not restart a provider or agent. See the [SQLite recovery guide](SQLITE-CONTENTION-RECOVERY.md).
+A project without Git can read compiled version identity: the optional source candidate is explicitly unavailable. Existing/broken repository markers still use the checked Git observer; its errors are not reclassified as absence.

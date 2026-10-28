@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "reviewer": "Root exact-source self review, not independent acceptance",
+  "baseline_sha256": "2b7023a1a93399c4e31bdf2d58b67f2416a0912e1ef8c11f82a550d625bb2ede",
+  "current_sha256": "a212a507359e80527b684806cb088a17b172ffa637cc1ce7fba6e05d11d1edb2",
+  "files": {
+    "rust/crates/swarm-engine/src/managed_repository.rs": {
+      "sha256": "95ee3c71b2a77d50f25040fbe33157c1474a8b311a1f48bd305cedfacd6f2bcf",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/planning_activation.rs": {
+      "sha256": "4d1ed48ce50e15b5ead827ed1b0ccfcbc6b6c40fc684373525efb79b892d504a",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/planning_call_preview.rs": {
+      "sha256": "dac727d3c96e991c732dbb777dfdd9ccb32b3366ad0727611894933d0fc6c545",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/planning_decision.rs": {
+      "sha256": "5289b1b8622f41a1ca6f2cc09c4a5b9f59a9f4e002a22867ef054ed6d9f4ba86",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/planning_scope_context.rs": {
+      "sha256": "c9d54af7b7f2fb598e8baac63ecfea5ef6a736e17b211042897c9a668812fb29",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/root_store/planning_step.rs": {
+      "sha256": "bdd66cf1b1a02b1b371dcc41f15a549f3d904204a7e67f5f94d6647466baa4d6",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/work_engine.rs": {
+      "sha256": "da5afa476f8ac78e48c22d21dd9c0ef7ed3b0cabdfceec7db9a61e5f6cf13a66",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        }
+      }
+    },
+    "version_history.json": {
+      "sha256": "ac9ab1aa65ce2261f518f14d03d80033647db18b9cb2bcf71c0eb1a0febbdea5",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed bytes and producer/consumer examined; file-specific proof and bounded limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-managed-planning1340/decision1365/review-notes.md",
+              "sha256": "548a59119bfa5f300a5b770a99147e025e0d450927a46a6ca185709b003ecd24"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

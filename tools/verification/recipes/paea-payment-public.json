@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "paea-payment-public",
+  "inputs": [
+    "tests/paea_payment_public_test.py",
+    "tests/fixtures/paea/payment-*.json",
+    "schemas/paea/payment-resolution-v1.schema.json",
+    "rust/crates/swarm-protection-contract/src/*.rs",
+    "rust/crates/swarm-cli/src/protection.rs"
+  ],
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "steps": [
+    {
+      "id": "normal-profile-public-resolution",
+      "command": [
+        "python3",
+        "tests/paea_payment_public_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "Ran 2 tests",
+        "OK",
+        "test_normal_profile_resolves_aliases_in_both_languages",
+        "test_normal_profile_safe_semantic_refusals_then_recovery",
+        "PAEA_PAYMENT_PUBLIC_CALLS 33",
+        "PAEA_PAYMENT_PUBLIC_BINARY_STABLE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

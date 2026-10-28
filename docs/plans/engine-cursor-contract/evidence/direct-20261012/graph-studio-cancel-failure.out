@@ -1,0 +1,15 @@
+AssertionError [ERR_ASSERTION]: cancel changed presentation
++ actual - expected
+
++ 'translate(65 46)'
+- 'translate(0 16)'
+             ^
+
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/graph_studio_ui.cjs:20:313 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'translate(65 46)',
+  expected: 'translate(0 16)',
+  operator: 'strictEqual',
+  diff: 'simple'
+}

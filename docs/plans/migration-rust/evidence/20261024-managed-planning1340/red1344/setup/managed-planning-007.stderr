@@ -1,0 +1,13 @@
+{
+  "error": "planning-claim-repository-unported",
+  "failure": {
+    "causes": [
+      "planning-claim-repository-unported",
+      "planning-claim-repository-unported"
+    ],
+    "code": "planning-claim-repository-unported",
+    "message": "planning-claim-repository-unported",
+    "retryable": false
+  },
+  "schema_version": 1
+}

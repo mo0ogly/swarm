@@ -1,3 +1,4 @@
+// Historical Go-only recipe; not Rust qualification.
 'use strict';
 // Real browser recipe for REQ-4: FR/EN x etat/sombre, validation errors,
 // keyboard submission/focus, persisted readback and secret-shaped marker scan.

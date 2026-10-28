@@ -1,0 +1,9 @@
+{"Time":"2026-10-17T14:41:35.550800755+02:00","Action":"start","Package":"command-line-arguments"}
+{"Time":"2026-10-17T14:41:35.55384907+02:00","Action":"run","Package":"command-line-arguments","Test":"TestActualTempDirMode"}
+{"Time":"2026-10-17T14:41:35.553905586+02:00","Action":"output","Package":"command-line-arguments","Test":"TestActualTempDirMode","Output":"=== RUN   TestActualTempDirMode\n"}
+{"Time":"2026-10-17T14:41:35.553975728+02:00","Action":"output","Package":"command-line-arguments","Test":"TestActualTempDirMode","Output":"    probe_test.go:3: TempDir final mode=0775; store requires 0700\n"}
+{"Time":"2026-10-17T14:41:35.554153032+02:00","Action":"output","Package":"command-line-arguments","Test":"TestActualTempDirMode","Output":"--- PASS: TestActualTempDirMode (0.00s)\n"}
+{"Time":"2026-10-17T14:41:35.554184832+02:00","Action":"pass","Package":"command-line-arguments","Test":"TestActualTempDirMode","Elapsed":0}
+{"Time":"2026-10-17T14:41:35.554196714+02:00","Action":"output","Package":"command-line-arguments","Output":"PASS\n"}
+{"Time":"2026-10-17T14:41:35.555311962+02:00","Action":"output","Package":"command-line-arguments","Output":"ok  \tcommand-line-arguments\t0.004s\n"}
+{"Time":"2026-10-17T14:41:35.555368108+02:00","Action":"pass","Package":"command-line-arguments","Elapsed":0.005}

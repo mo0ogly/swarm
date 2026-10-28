@@ -1,0 +1,10 @@
+{
+  "pid": 2721024,
+  "proc_start_ticks": "4624194",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-laboratory-verified.py",
+    "run"
+  ],
+  "at": "2026-10-16T00:50:17.794437+00:00"
+}

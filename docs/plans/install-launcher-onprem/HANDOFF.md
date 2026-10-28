@@ -1,5 +1,14 @@
 # Delivery recovery: native launcher and on-premise setup
 
+## APEX tracking note — October 24, 2026
+
+The [French queue](../FILE-APEX.md#vague-3--autres-suivis-historiques-24-octobre-2026)
+and [English queue](../../en/APEX-QUEUE.md#wave-3--other-historical-tracking-october-24-2026)
+retain this delivery’s historical scope and checks. Root Codex owns reconciling
+launcher/install contracts with current Rust delivery; these results prove no
+current CI, publication or installed version. No commit, push, deployment,
+certificate operation or new lifecycle run is authorized or performed here.
+
 Base: main be8e05c. Scope authorized: publish the missing native launcher and
 its dependencies, audit local delivery gaps, document generic on-premise Docker
 overrides, and keep organization-specific installation documents private.

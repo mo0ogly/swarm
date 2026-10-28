@@ -1,0 +1,16 @@
+{
+  "exit": 2,
+  "response": {
+    "error": "agent-launch-work-branch-unported",
+    "failure": {
+      "causes": [
+        "agent-launch-work-branch-unported",
+        "agent-launch-work-branch-unported"
+      ],
+      "code": "agent-launch-work-branch-unported",
+      "message": "agent-launch-work-branch-unported",
+      "retryable": false
+    },
+    "schema_version": 1
+  }
+}

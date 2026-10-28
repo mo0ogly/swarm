@@ -1,0 +1,33 @@
+{
+  "pid": 2009363,
+  "direct_key": {
+    "accessible": true
+  },
+  "write_open_key": {
+    "accessible": true
+  },
+  "direct_registry": {
+    "accessible": true
+  },
+  "symlink_key": {
+    "accessible": true
+  },
+  "workspace_control": {
+    "accessible": true
+  },
+  "ancestor_root": {
+    "accessible": true
+  },
+  "ancestor_visible": true,
+  "inherited_private_env": true,
+  "child_key": {
+    "accessible": true
+  },
+  "workspace_write": true,
+  "control_cli": {
+    "exit_code": 0,
+    "stdout": "[]\n",
+    "stderr": ""
+  },
+  "host_loopback": true
+}

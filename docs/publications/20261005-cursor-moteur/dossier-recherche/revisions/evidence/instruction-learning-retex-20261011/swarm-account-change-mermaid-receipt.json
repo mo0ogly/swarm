@@ -1,0 +1,21 @@
+{
+  "command": [
+    "/home/fpizzi/.npm-global/bin/mmdc",
+    "-i",
+    "/tmp/swarm-account-change-recovery.mmd",
+    "-o",
+    "/tmp/swarm-account-change-recovery.png",
+    "-p",
+    "/tmp/swarm-mermaid-puppeteer.json",
+    "-w",
+    "1250",
+    "-b",
+    "white"
+  ],
+  "start": "2026-10-11T15:39:45.456195+00:00",
+  "end": "2026-10-11T15:39:48.963962+00:00",
+  "exit": 0,
+  "source": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261011-instruction-learning-retex.md",
+  "render": "/tmp/swarm-account-change-recovery.png",
+  "sha256": "84a0222b6aaa0e456d536a869851bb5a16adc44568ebfe85842ac2dc50cfd151"
+}

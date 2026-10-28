@@ -1,0 +1,66 @@
+flowchart TB
+    accTitle: Swarm memory: knowledge, context and conversation recovery
+    accDescr: Project memory, instruction revisions, extractive references, prepared/final context and dialogue boundaries are distinct objects. Usage rights bind exact sources and recipients.
+    subgraph G0["KNOWLEDGE"]
+        M_RETEX["Verified lessons and accepted task<br/>Fresh sources and evidence"]
+        M_ADMIT["Admission · preview then apply<br/>Revision · event · token"]
+        M_VERSION["Versioned project memory<br/>Experience / procedure · provenance<br/>A memory grants no authority"]
+        M_SELECT["Explicit task selection<br/>Version · digest · conditions"]
+        M_REPLACE["Replacement · withdrawal · import<br/>History and received contexts retained"]
+    end
+    subgraph G1["AUTHORITY"]
+        M_RIGHTS["Identity usage contract · integration open<br/>read ≠ summarize ≠ transmit<br/>Exact source and recipient"]
+        M_ATTRIB["Owner · author · recipient<br/>Three distinct facts to attest"]
+    end
+    subgraph G2["CONTEXT"]
+        M_EXTRACT["Confirmed extractive selection<br/>Rebuilt quotations · context_hash"]
+        M_HISTORY["Same-task history<br/>Attributed activity · excerpts and omissions"]
+        M_INSTRUCT["Attributed instruction revisions<br/>revise-instructions · retained base<br/>Additions active by default<br/>Reject before reservation"]
+        M_METHODS["Instructions and task contract<br/>Selected methods · references"]
+        M_ENGINE["DETERMINISTIC RUST ENGINE<br/>Resolve sources and usage<br/>Compose and check the prompt"]
+        M_MANIFEST["prepared_context and final context<br/>Text · bytes · SHA · received sources"]
+        M_CHECK["Read again before launch<br/>Freshness · capacity · recorded receipt"]
+    end
+    subgraph G3["DIALOGUE"]
+        M_PROVIDER["Context sent to the attempt<br/>Reception distinct from AI compliance"]
+        M_BOUNDARY["Durable dialogue boundary<br/>Turn · session · usage · confirmation"]
+        M_RECOVERY["Read-only recovery diagnosis<br/>checkpoint_sha256 · facts_sha256"]
+        M_RECONCILE["Reconcile uncertain effects<br/>No implicit replay"]
+        M_RESUME["Explicitly authorized resume<br/>New attempt · same conversation"]
+    end
+    M_RETEX --> M_ADMIT
+    M_ADMIT --> M_VERSION
+    M_VERSION --> M_SELECT
+    M_VERSION --> M_REPLACE
+    M_REPLACE -->|Revalidate future selections| M_SELECT
+    M_ATTRIB --> M_RIGHTS
+    M_RIGHTS -.->|Global integration pending| M_ENGINE
+    M_SELECT --> M_ENGINE
+    M_EXTRACT --> M_ENGINE
+    M_HISTORY --> M_ENGINE
+    M_INSTRUCT --> M_ENGINE
+    M_METHODS --> M_ENGINE
+    M_ENGINE --> M_MANIFEST
+    M_MANIFEST --> M_CHECK
+    M_CHECK --> M_PROVIDER
+    M_PROVIDER --> M_BOUNDARY
+    M_BOUNDARY -->|Confirmed boundary| M_RECOVERY
+    M_BOUNDARY -->|Unconfirmed end| M_RECONCILE
+    M_RECONCILE --> M_RECOVERY
+    M_RECOVERY -->|Separate decision and preflight| M_RESUME
+    M_RESUME --> M_CHECK
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+    classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+    classDef control fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:2px;
+    classDef supervisor fill:#205e70,stroke:#205e70,color:#fffefa,stroke-width:2px;
+    classDef data fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef pending fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+    class M_RETEX,M_SELECT,M_EXTRACT,M_HISTORY,M_INSTRUCT,M_METHODS,M_PROVIDER,M_RECOVERY ordinary;
+    class M_ENGINE core;
+    class M_ADMIT,M_ATTRIB,M_CHECK,M_RECONCILE,M_RESUME control;
+    class M_VERSION,M_REPLACE,M_MANIFEST,M_BOUNDARY data;
+    class M_RIGHTS pending;
+    style G0 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G1 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G2 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G3 fill:#f5f3ec,stroke:#205e70,color:#062b49

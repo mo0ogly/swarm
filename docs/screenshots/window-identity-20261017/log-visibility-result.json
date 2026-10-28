@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "errors": [],
+  "root": "/tmp/swarm-log-visibility-xA7mnj",
+  "checks": [
+    "real engine logs",
+    "hide via navigation",
+    "mobile/desktop resize while hidden",
+    "return and repaint",
+    "original content retained",
+    "no console errors"
+  ]
+}

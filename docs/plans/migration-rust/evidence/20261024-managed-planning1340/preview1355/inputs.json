@@ -1,0 +1,13 @@
+{
+  "binary": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-71a5150d60be6b4139884e7e0cdab0ee146e858072f92bd563ad085b6a048917",
+  "binary_sha256": "71a5150d60be6b4139884e7e0cdab0ee146e858072f92bd563ad085b6a048917",
+  "sources": {
+    "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_planning_call_preview.py": "cb65c0d541df16fac46565d32f831eb3fee11ed5a75d1af22720c3bca0df8fdc",
+    "tests/rust_planning_activation.py": "d7ae2b8ae2d92837cc7340acf484276fe3145e4ed919c833d2c289d55b4c347b",
+    "tests/rust_planning_call_inputs.py": "5342bb6899eb10108f93a084e2b39b8f3674cf2b3a75206839bd8818f8053afc",
+    "tests/rust_planning_budget.py": "3951a579c3901454841dfe3619f0bf7211215d752ca5d78c06b93e48b61ec7ff",
+    "tests/rust_planning_decision.py": "a4bed781ad3ee99800f4c9f173546c23c786e437baa05e5bf2815c7dfd8db5e1",
+    "tests/rust_planning_bootstrap.py": "616030118522e7ecc039eecb38d93f86a964256bb6c5a72e13ceae550741f555",
+    "tests/rust_agent_model_route.py": "fa2bad462b761024c15d3705ac26996385cb53e7b41bf4ae409a11570bf18145"
+  }
+}

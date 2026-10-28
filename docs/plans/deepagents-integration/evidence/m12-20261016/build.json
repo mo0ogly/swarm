@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "go",
+    "build",
+    "-o",
+    "/tmp/swarm-m12-bin-ot5ubx_d/swarm",
+    "./cmd/swarm"
+  ],
+  "started_at_utc": "2026-10-16T14:18:53.831951+00:00",
+  "elapsed_seconds": 13.46578519200557,
+  "exit_code": 0,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "real_model_calls": 0
+}

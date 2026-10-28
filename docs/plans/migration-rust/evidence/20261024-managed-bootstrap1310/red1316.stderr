@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_managed_repository_bootstrap.py", line 143, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_managed_repository_bootstrap.py", line 137, in main
+    try:run(args.binary.resolve(),args.profile.resolve(),args.output.resolve())
+        ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_managed_repository_bootstrap.py", line 82, in run
+    configured=f.ok(['planning','enable',f.work],value)
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_agent_model_route.py", line 143, in ok
+    assert code == 0, (self.label,args,code,value)
+           ^^^^^^^^^
+AssertionError: ('managed-bootstrap', ['planning', 'enable', 'w-abdf811a95f645f3130420cc'], 2, {'error': 'command_not_ported: planning-enable-repository-unported', 'failure': {'causes': ['command_not_ported', 'command_not_ported'], 'code': 'command_not_ported', 'message': 'command_not_ported: planning-enable-repository-unported', 'retryable': False}, 'schema_version': 1})

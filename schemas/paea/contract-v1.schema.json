@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:paea:contract:v1",
+  "title": "PAEA offline data contract v1",
+  "description": "Data shape only. Strict raw decoding and documented semantic validation also apply. No identity, policy, approval, effect or assurance is established by schema validation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["proposal", "context"],
+  "properties": {
+    "proposal": {"$ref": "#/$defs/proposal"},
+    "context": {"$ref": "#/$defs/context"}
+  },
+  "$defs": {
+    "name": {"type": "string", "minLength": 1, "maxLength": 100, "not": {"pattern": "[^A-Za-z0-9_-]"}},
+    "digest": {"type": "string", "minLength": 64, "maxLength": 64, "not": {"pattern": "[^a-f0-9]"}},
+    "oid": {"type": "string", "oneOf": [{"minLength": 40, "maxLength": 40}, {"minLength": 64, "maxLength": 64}], "not": {"anyOf": [{"pattern": "[^a-f0-9]"}, {"pattern": "^0+$"}]}},
+    "proposal": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "request_id", "action"],
+      "properties": {
+        "schema_version": {"const": 1, "type": "integer"},
+        "request_id": {"$ref": "#/$defs/name"},
+        "action": {"oneOf": [{"$ref": "#/$defs/payment"}, {"$ref": "#/$defs/git"}]}
+      }
+    },
+    "payment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "invoice_id", "invoice_version", "amount_minor", "currency", "beneficiary_account_id"],
+      "properties": {
+        "kind": {"const": "payment.settle"},
+        "invoice_id": {"$ref": "#/$defs/name"},
+        "invoice_version": {"$ref": "#/$defs/name"},
+        "amount_minor": {"type": "string", "minLength": 1, "maxLength": 19, "pattern": "^[1-9]", "not": {"pattern": "[^0-9]"}, "description": "Canonical positive decimal string; semantic admission additionally requires <= 9223372036854775807, the existing i64 representation, not an operator monetary limit."},
+        "currency": {"type": "string", "minLength": 3, "maxLength": 3, "not": {"pattern": "[^A-Z]"}, "description": "Representation only: actual supported currency must be resolved by the service."},
+        "beneficiary_account_id": {"$ref": "#/$defs/name"}
+      }
+    },
+    "git": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "repository_id", "target_ref", "expected_old_oid", "candidate_oid"],
+      "properties": {
+        "kind": {"const": "repository.promote"},
+        "repository_id": {"$ref": "#/$defs/name"},
+        "target_ref": {"type": "string", "pattern": "^refs/heads/", "description": "Full direct-branch grammar, same-algorithm distinct OIDs, physical repository binding and symbolic-ref refusal require the semantic/domain checks."},
+        "expected_old_oid": {"$ref": "#/$defs/oid"},
+        "candidate_oid": {"$ref": "#/$defs/oid"}
+      }
+    },
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_id", "version", "digest", "integrity", "confidentiality_labels"],
+      "properties": {
+        "source_id": {"$ref": "#/$defs/name"}, "version": {"$ref": "#/$defs/name"},
+        "digest": {"$ref": "#/$defs/digest"},
+        "integrity": {"type": "integer", "minimum": 0, "maximum": 3},
+        "confidentiality_labels": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/name"}}
+      }
+    },
+    "context": {
+      "type": "object", "additionalProperties": false,
+      "required": ["project_id", "principal_id", "instance_id", "mandate_id", "mandate_revision", "policy_revision", "policy_digest", "tool_manifest_digest", "sources"],
+      "properties": {
+        "project_id": {"$ref": "#/$defs/name"}, "principal_id": {"$ref": "#/$defs/name"},
+        "instance_id": {"$ref": "#/$defs/name"}, "mandate_id": {"$ref": "#/$defs/name"},
+        "mandate_revision": {"type": "integer", "minimum": 1, "maximum": 9223372036854775807},
+        "policy_revision": {"type": "integer", "minimum": 1, "maximum": 9223372036854775807},
+        "policy_digest": {"$ref": "#/$defs/digest"}, "tool_manifest_digest": {"$ref": "#/$defs/digest"},
+        "sources": {"type": "array", "items": {"$ref": "#/$defs/source"}, "description": "Order is significant; duplicate source_id/version pairs require semantic refusal even if other source fields differ."}
+      }
+    },
+    "approval": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "action_digest", "policy_digest", "approver_id"],
+      "properties": {"schema_version": {"type": "integer", "const": 1}, "action_digest": {"$ref": "#/$defs/digest"}, "policy_digest": {"$ref": "#/$defs/digest"}, "approver_id": {"$ref": "#/$defs/name"}}
+    },
+    "receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "action_digest", "intent_id", "sink_id", "outcome", "observation_digest"],
+      "properties": {"schema_version": {"type": "integer", "const": 1}, "action_digest": {"$ref": "#/$defs/digest"}, "intent_id": {"$ref": "#/$defs/digest"}, "sink_id": {"$ref": "#/$defs/name"}, "outcome": {"enum": ["COMMITTED", "DENIED", "UNKNOWN", "RECONCILED_COMMITTED", "RECONCILED_NOT_COMMITTED"]}, "observation_digest": {"$ref": "#/$defs/digest"}}
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "observed": "Outer exec session reported143 after full child stdout PASS; separately recorded Go child exited0 with immutable full output hash and end timestamp.",
+  "outer_exec_exit": 143,
+  "actual_child_exit": 0,
+  "actual_child_output_sha256": "c05dc00fa426d05b4c333e37706424a0daf8a63dfb7819fdc58bf65a50b947fc",
+  "cause": "Outer launcher lifecycle not observed; do not attribute to Go regression or manufacture cause.",
+  "correction": "Retain both boundaries; use detached receipt driver for next long qualification to preserve child result independently.",
+  "native_state": "Public runtime health ready, no active actors, revision480, mission unpaused."
+}

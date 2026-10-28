@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-12T11:03:12.907702+00:00",
+  "argv": [
+    "/home/fpizzi/workspace/swarm/bin/swarm",
+    "--root",
+    "/home/fpizzi/workspace/swarm",
+    "--json",
+    "profile",
+    "w-ca937edf4e0abd85f8d3d67b",
+    "plan-ca937edf4e-T3",
+    "--input",
+    "/tmp/swarm-T3-effective-provider-worker-profile-request.json"
+  ],
+  "exit": 0,
+  "revision": 735,
+  "instruction_bytes": 6375,
+  "instruction_sha256": "7eb6c59307a2a0e6b73881a99c060add6753bb08ee798c36d38a585ec03816ce",
+  "bundle": {
+    "at": "2026-10-12T11:02:57.389534+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-inputs-T3-effective-provider-20261012.bundle",
+    "sha256": "d38499599712befac5965ae75a14cad5823c1c8951586b148e243f82e0938b85",
+    "commit": "9dd3d59f348396af02c664c5e2e1484688273256",
+    "ref": "refs/heads/operator-inputs",
+    "input_files": 127,
+    "manifest_sha256": "50a34ab7b08dd9fe3260d3167245104c6ce243b05e3e04699fd0d99882664593",
+    "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-effective-provider-inputs-i7o3nizk",
+    "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-effective-provider-import-o7ek2z0w",
+    "old125_originals_preserved": true,
+    "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+    "limits": "Qualified effective-scope provider cooldown correction extends all125 original T3 and priority inputs preserved byte-for-byte. Guard the same provider as the selected role and preserve unrelated waits, counters and replay. Deferred27 remains excluded. Native worker must import original inputs, qualify its own cumulative candidate, deliver architecture and receipts, and obtain independent review. No local test or deployment implies native acceptance."
+  },
+  "timeout_limits_skills_capture_preserved": true,
+  "criteria_dependencies_attempts_learning_preserved": true,
+  "limits": "Full profile saved publicly before the next reservation; worker receipt/import and acceptance remain required."
+}

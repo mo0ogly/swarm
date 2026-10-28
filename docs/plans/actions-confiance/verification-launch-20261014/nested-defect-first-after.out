@@ -1,0 +1,101 @@
+=== RUN   TestDefectCitationProtocolRestartKeepsMethodAndOldEvidence
+    managed_review_fragment_defect_citation_test.go:214: sizes 164551 168167 21899 parts 1
+--- PASS: TestDefectCitationProtocolRestartKeepsMethodAndOldEvidence (1.03s)
+=== RUN   TestFragmentFindingContractNativeInspectedNeeds
+--- PASS: TestFragmentFindingContractNativeInspectedNeeds (0.00s)
+=== RUN   TestFragmentFindingContractSchemaOracle
+--- PASS: TestFragmentFindingContractSchemaOracle (0.01s)
+=== RUN   TestFragmentNestedDefectBinding
+--- PASS: TestFragmentNestedDefectBinding (0.00s)
+=== RUN   TestFragmentNestedDefectInvalidBoundaries
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/inspected_defect
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/unknown_defect
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/fail_without_defect
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/fail_with_needs
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/inspected_with_empty_needs
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/unknown_without_needs
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/global_defects
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/global_null
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/foreign_artifact
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/line_supplied
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/string_anchor
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/missing_anchor
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/altered_quote
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/duplicate_claim
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/too_many_claims
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/array_findings
+--- PASS: TestFragmentNestedDefectInvalidBoundaries (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/inspected_defect (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/unknown_defect (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/fail_without_defect (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/fail_with_needs (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/inspected_with_empty_needs (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/unknown_without_needs (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/global_defects (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/global_null (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/foreign_artifact (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/line_supplied (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/string_anchor (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/missing_anchor (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/altered_quote (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/duplicate_claim (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/too_many_claims (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/array_findings (0.00s)
+=== RUN   TestFragmentNestedDefectSchemaOracle
+--- PASS: TestFragmentNestedDefectSchemaOracle (0.00s)
+=== RUN   TestManagedFragmentRuntimeProviderProtocol
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/pass
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/fail
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/unknown
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168167 21899 parts 1
+    managed_review_fragment_runtime_test.go:133: wrong call count 4 2
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/exit
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/selection-unknown
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168159 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/decision-fail
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/questions-resolved
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/questions-open
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/questions-omitted
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168167 21899 parts 1
+--- FAIL: TestManagedFragmentRuntimeProviderProtocol (22.41s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/pass (3.33s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/fail (2.91s)
+    --- FAIL: TestManagedFragmentRuntimeProviderProtocol/unknown (2.13s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/exit (0.99s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/selection-unknown (1.91s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/decision-fail (2.77s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/questions-resolved (3.07s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/questions-open (2.75s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/questions-omitted (2.54s)
+=== RUN   TestReviewMethodRestartRequiresExplicitCorrectionAndKeepsHistory
+    managed_review_method_restart_test.go:28: sizes 164551 168167 21899 parts 1
+--- PASS: TestReviewMethodRestartRequiresExplicitCorrectionAndKeepsHistory (1.30s)
+=== RUN   TestPlanningReviewRetryCanRestartChangedMethod
+    managed_review_method_restart_test.go:66: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryCanRestartChangedMethod (0.69s)
+=== RUN   TestChangedReviewMethodCannotReuseRecoveredPriorOpinion
+    managed_review_method_restart_test.go:81: sizes 164551 168167 21899 parts 1
+--- PASS: TestChangedReviewMethodCannotReuseRecoveredPriorOpinion (0.61s)
+=== RUN   TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal
+=== RUN   TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/journal
+    managed_review_method_restart_test.go:112: sizes 164551 168167 21899 parts 1
+=== RUN   TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/receipt
+    managed_review_method_restart_test.go:112: sizes 164551 168167 21899 parts 1
+=== RUN   TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/semantic_refusal
+    managed_review_method_restart_test.go:112: sizes 164551 168167 21899 parts 1
+=== RUN   TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/budget
+    managed_review_method_restart_test.go:112: sizes 164551 168167 21899 parts 1
+--- PASS: TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal (2.73s)
+    --- PASS: TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/journal (0.63s)
+    --- PASS: TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/receipt (0.60s)
+    --- PASS: TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/semantic_refusal (0.59s)
+    --- PASS: TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/budget (0.91s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	28.804s
+FAIL

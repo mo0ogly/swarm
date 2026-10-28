@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python3",
+    "tools/agent-workflows/check.py"
+  ],
+  "start": "2026-10-11T14:37:17.822983+00:00",
+  "end": "2026-10-11T14:37:21.677606+00:00",
+  "seconds": 3.854638478002016,
+  "exit": 0,
+  "output": "/tmp/swarm-source-capacity-recovery-workflows.out",
+  "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+}

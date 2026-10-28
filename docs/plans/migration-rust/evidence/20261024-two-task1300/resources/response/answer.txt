@@ -1,0 +1,21 @@
+# Proposal: two completed Agents, one attempt each, estimated amount1, FIFO release once each
+
+**Basis:** supplied actual sources only (`rust_planning_worker_public_flow.py` before_worker fixture, `rust_workspace_fifo_completion.py` read-only `reservation()`/`one_turn()`, `rust_mission_report_relay.rows()`, `agent reconcile` replay equality). No writes, no execution, no acceptance claimed. Missing evidence: actual `reservations` / `workspace_turn_events` schema beyond columns observed in context; second-Agent creation path is proposed via `extra_worker=True` (context: "proposes a second independent task under the explicit supplied child task budget") but not yet witnessed end-to-end for a *second completed Agent* — flagged below.
+
+## Exact assertions (proposed, not run)
+
+1. Setup: `ready, owned = planning.flow(binary, out, before_worker=True, return_fixture=True, extra_worker=True)`; assert `ready['status']=='READY_FOR_NATIVE_WORKER'` and `not ready['worker_started']`.
+2. For each distinct `agent_id` in `{agent_a, agent_b}` (actual ids from each launch, per SDK result contract — ids are never invented):
+   - `agent = owned.ok(['agent','show',agent_id])['agent']`; assert `agent['status'] == 'completed'`.
+   - `assert agent['native_mission']['schema_version'] == 3`.
+   - Attempts: `work = owned.ok(['work','show',owned.work])['work']`; for its task `t`, `assert len(t['attempts']) == 1` and that attempt's id equals the Agent's own; assert the *other* Agent's attempt id differs (`agent_a_attempt != agent_b_attempt`).
+   - Reservation (read-only, `reservation()` pattern): `assert reservation(owned, agent_id) == ['estimated', 1.0]` — exactly one row, `amount==1.0`, state `estimated` (post-release, per context line `assert after_reservation == ['estimated', before_reservation[1]]` with `before==['reserved',1.0]`).
+   - FIFO turn: `queue = owned.ok(['mission','queue',owned.work])`; `turn = one_turn(queue, owned.work, agent_id)`; assert `turn['state']=='released'`, `turn['seq']` matches that Agent's `native_mission['workspace_turn_seq']`, and `turn['released_at']` is non-empty while `turn['acquired_at']` equals the SDK-recorded acquired stamp.
+   - Release-once: `rows(owned, 'SELECT COUNT(*) FROM workspace_turn_events WHERE work_id=? AND agent_id=? AND state=?', (owned.work, agent_id, 'released'))[0][0] == 1` — exactly one terminal release event per Agent; and `len({seq_a, seq_b}) == 2` — distinct turn sequences.
+3. Cross-Agent isolation: `one_turn(queue, ...)` per Agent returns exactly one turn each; no turn is shared (`turn_a['seq'] != turn_b['seq']`); neither task accepted: `task['status'] == 'blocked'` for both scoped tasks.
+4. Idempotence: `replay = owned.ok(['agent','reconcile',agent_id])` per Agent; assert `replay == recovered` shape and queue/reservation unchanged after replay (per context replay-equality pattern) — second `reconcile` adds no release row (COUNT still 1).
+
+## Reservations of evidence
+- Second-Agent actual id, attempt id, and per-Agent turn DTO fields (`seq`, `state`, `released_at`) require live observation; only field *names* are attested by supplied sources.
+- `reservations` column order `(state, amount)` is attested only via `reservation()` in context; `event_seq`/`turn_seq` columns via `missing_terminal_release`.
+- No assertion here may be recorded as PASS without a real run; this document proposes assertions only and grants no write, launch, or acceptance authority.

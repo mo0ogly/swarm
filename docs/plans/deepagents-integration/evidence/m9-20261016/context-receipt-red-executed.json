@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestMemory(PreparedContextIncludesManagedDelivery|RuntimeRecoveryContextMatchesProviderAndPersists)$",
+    "-count=1",
+    "-v",
+    "-timeout=60s"
+  ],
+  "started_at_utc": "2026-10-16T09:16:11.195114+00:00",
+  "ended_at_utc": "2026-10-16T09:16:29.333005+00:00",
+  "elapsed_seconds": 18.13787897900329,
+  "exit_code": 1,
+  "log_sha256": "c604b5b72ee69cea2ab2cc10dd7ee98d3807912a05d0218edcc6bba386c838c0",
+  "test_source_sha256": "21d8c58a7f90faf4abf4d17211f586ef5bf15d2221292806674c05887235d07b",
+  "real_model_calls": 0
+}

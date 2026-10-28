@@ -2,11 +2,29 @@
 
 [English](en/AGENT-METHODS.md) · [Guide utilisateur](../GUIDE-UTILISATEUR.md)
 
-Ce dépôt fournit **douze méthodes** pour cadrer, réaliser, vérifier et améliorer
+Ce dépôt fournit **treize méthodes** pour cadrer, réaliser, vérifier et améliorer
 Swarm : parcours guidé, examen et amélioration, construction et examen de
 spécification, revue du code, diagnostic, vérification, replanification et retour
 d’expérience. Elles partagent des critères explicites, des décisions tracées et
 des preuves observables, sans dépendance à une autre installation.
+
+La préférence permanente de l’utilisateur est une amélioration autorécursive :
+toute amélioration découverte a de la valeur et reste tracée, même sans panne.
+Qualifier son origine et son bénéfice attendu, décider dans les droits du rôle,
+réaliser ou transmettre, vérifier l’effet puis réexaminer le besoin et capitaliser
+les leçons vérifiées. Une anomalie déclenche `replan`. Un report conserve son
+propriétaire et sa condition de reprise. Ce contrat de méthode ne prouve pas une
+amélioration autonome du moteur installé et n’accorde aucun droit supplémentaire.
+
+Les preuves de compilation Go couvrent le code des paquets, y compris à la racine,
+les ressources go:embed et les octets effectivement substitués par un overlay.
+Une liste de dossiers supposée ne suffit pas. Avant chaque injection de défaut,
+établir un témoin valide avec les mêmes préconditions : un refus commun ne prouve
+pas la couverture de tous les défauts. Ces règles sont aussi dans le contrat
+embarqué ; reconstruire le binaire pour les futures tentatives, sans changer les
+preuves historiques ou les processus déjà démarrés.
+
+Pour la migration Rust, [APEX](../.claude/skills/apex/SKILL.md) intègre la méthode adoptée le 22 octobre 2026 : contrats stricts et banc différentiel, réécriture par parcours, lots verticaux, preuves selon le risque, durcissement différé, plan court, fichiers propriétaires et préparation R6/R7. La bascule des écritures reste unique ; le service anticipé en lecture seule attend une confirmation explicite. Cette consigne persistante ne met pas à jour les contextes déjà démarrés. Les huit points sont conservés dans la référence conditionnelle APEX `references/rust-migration.md` : ils sont chargés pour la migration, sans gonfler toutes les instructions natives. Une préparation sans outils doit recevoir cette référence explicitement.
 
 ## Catalogue lisible
 
@@ -27,6 +45,7 @@ Ouvrez Codex ou Claude **dans ce dépôt**, puis utilisez la commande adaptée :
 | Analyser, planifier et réaliser un changement | `$apex` | `/apex` |
 | Auditer avec des preuves reproductibles | `$audit-pdca` | `/audit-pdca` |
 | Rédiger un besoin et ses critères vérifiables | `$spec-builder` | `/spec-builder` |
+| Découvrir des tarifs officiels avec leurs conditions | `$pricing-discovery` | `/pricing-discovery` |
 | Trouver les trous d'un plan | `$spec-audit` | `/spec-audit` |
 | Examiner le code et ses risques | `$code-reviewer` | `/code-reviewer` |
 | Diagnostiquer un défaut avant une correction ciblée | `$debug` | `/debug` |
@@ -89,6 +108,35 @@ La préparation reste limitée à l’analyse et à la planification.
 
 ## Cadrage automatique des agents par le moteur
 
+Chaque modification inclut la documentation concernée dans le même incrément,
+y compris pour les méthodes et la configuration. Si aucune mise à jour ne
+s'applique, la raison figure dans le suivi existant. Versions FR/EN et schémas
+restent cohérents ; leur présence ne prouve pas l'effet ni l'acceptation.
+
+Les règles personnelles communes, importées par `~/.claude/CLAUDE.md`, et les
+règles du dépôt imposent aussi les docstrings/Rustdoc/commentaires Go des fonctions
+publiques ou non triviales créées ou modifiées : but, entrées/préconditions,
+sorties, erreurs, effets et limites. Vérifier les liens et exemples exécutables.
+Ces fichiers persistants cadrent les prochains contextes qui les lisent ; cette
+mise à jour ne modifie pas le contexte d’un processus Claude déjà lancé ni les
+instructions embarquées du moteur. Le contrat embarqué n’est pas changé ici.
+
+Pendant toute la migration, chaque incrément conserve en plus une revue des
+politiques codées en dur, des contrats documentaires et des chemins d’erreur,
+liée aux empreintes des fichiers examinés. Les recherches automatiques fournissent
+des candidats ; la revue distingue données de test, invariants, limites techniques
+et politiques opérateur. Une politique doit être suivie de sa configuration
+persistée à son consommateur réel et à son réglage Admin. Vérifier aussi les
+pages FR/EN, schémas, notes d’évolution et exemples concernés, ou justifier
+explicitement l’absence de changement. Tout point non vérifié reste ouvert ;
+aucun scanner ni commentaire ne garantit à lui seul la conformité. Une découverte
+impose de réexaminer les lots antérieurs concernés, sans altérer leurs preuves.
+
+Le collecteur des qualifications de migration impose aussi une référence précédente
+explicite et une revue fraîche sur les quatre axes ; une couverture absente ou
+un constat ouvert refuse la qualification de cet incrément. Les constats antérieurs
+restent à traiter dans le plan avant toute acceptation globale.
+
 Pour les nouvelles tentatives, le moteur inclut les méthodes adaptées au rôle dans
 le contexte envoyé au fournisseur. Il ne dépend pas de la découverte des commandes
 par Codex ou Claude pour fournir ce cadrage.
@@ -132,9 +180,19 @@ Modifiez la source canonique, puis lancez :
 
 ```sh
 python3 tools/agent-workflows/check.py
-go test ./... -run 'TestRepositoryPreparation|TestPreparationMethodCatalogue|TestPreparationDialogueLateProposalAndMethodDrift' -count=1
 git diff --check
 ```
+
+Le contrôleur vérifie les liens et les sources puis exécute les intégrations
+Rust `agent_workflow`. Neuf tests nommés sont requis, dont un pour chaque rôle
+planner/subplanner/worker/reviewer ; chacun vérifie le contexte réellement
+construit, pas un rôle simplement déclaré. Une collecte vide, un rôle manquant,
+un test ignoré/échoué ou des compteurs incohérents refusent. Les codes d’échec
+d’origine et les deux canaux sont conservés ; aucun watchdog global n’est ajouté.
+Cargo utilise le cache/environnement du lanceur, avec dépendances offline/locked.
+Les gardes Python se rejouent par `python3 -m unittest discover -s
+tools/agent-workflows -p test_check.py -v` (doubles de sortie Rust, sans modèle).
+Ces doubles ne prouvent pas l’exécution native ni une acceptation indépendante.
 
 Une modification des méthodes ou du contrat change leur empreinte. Une préparation
 ancienne doit appliquer la nouvelle version et refaire sa validation ; les preuves
@@ -251,3 +309,105 @@ respect effectif de la méthode ni la réussite d’un diagnostic.
 
 La version portable adapte la skill Debug installée localement, sans connecteurs
 obligatoires, chemins machine ou dépendance à une autre installation.
+
+### Vérification d'un moteur pendant un changement web parallèle
+
+Les ressources web et les méthodes embarquées partagent actuellement le paquet
+racine `resources.go` : une modification web peut invalider des entrées de
+compilation des tests moteur. Pour figer une preuve, un overlay de compilation
+peut conserver les ressources observées et leur liste explicite, sans modifier
+le checkout partagé. Déclarer cette vue et ses empreintes ; elle ne vérifie pas
+l'interface web en cours d'édition. Conserver un binaire de test compilé permet
+de répéter les contrôles ciblés sans relier le paquet à chaque commande.
+Distinguer compilation, tests collectés, résultats partiels et résultat final.
+Voir le [diagnostic IA3b](plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md).
+
+
+### Justifier un délai de vérification
+
+Tant que les limites du code ne sont pas comprises, être prudent avec les
+timeouts temporels et les autres blocages ajoutés aux tests : tentatives,
+itérations, volume, concurrence ou conditions d’arrêt. Identifier origine,
+portée et risque protégé ; observer la progression et mesurer avant d’ajouter
+ou de durcir une borne. Distinguer lenteur, blocage réel, limite fonctionnelle
+et limite de la méthode. Un seuil arbitraire ne remplace pas un diagnostic ;
+aucune protection existante de sécurité, de droits ou de budget n’est contournée.
+
+Un watchdog de test doit être lié à une exigence observable et à un coût
+justifié ; ne pas reprendre un nombre par commodité d’une recette précédente.
+Le distinguer d’une politique du moteur et d’un objectif de performance. Sans
+borne justifiée, utiliser explicitement `-test.timeout=0` pour désactiver le
+délai global Go, suivre les événements nommés et diagnostiquer une absence de
+progression ; cela ne supprime pas les contrats des opérations individuelles.
+Un timeout est une exécution incomplète, pas la preuve d’une assertion métier
+fausse. Découper le lot peut aider le diagnostic mais ne justifie pas la borne.
+Conserver les échecs originaux et le lien aux mêmes sources/binaire. Le
+[replan IA3c.1](plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md)
+conserve l’objection utilisateur, le délai choisi sans preuve et sa suppression.
+
+### Preuves des contextes natifs
+
+`python3 tools/agent-workflows/check.py --evidence DOSSIER_NEUF` utilise la recette
+permanente `tools/verification/recipes/agent-workflows-native.json`. Elle conserve
+les sources déclarées Rust et textes embarqués, les commandes, canaux originaux
+et leurs empreintes, sans écraser une preuve. Le profil Cargo et les dépendances
+externes ne sont pas un graphe hermétique ou un profil production prouvé par
+cette archive seule. Les sources sont comparées avant/après ; aucune identité,
+conformité d’un modèle, livraison installée ou acceptation n’en découle.
+
+Les anciennes preuves Go/delta restent historiques. `--evidence-baseline` refuse
+explicitement : une baseline Go ne peut pas qualifier Rust. Omettre ce paramètre
+produit une archive native complète. Les outils Go de conservation historiques
+ne sont plus exécutés par ce vérificateur. Un contrôle sans --evidence affiche
+les tests réels mais ne conserve pas leur archive.
+
+### Historique des preuves Go107
+
+107 qualifié localement :4tests Python de conservation/rejeu et29consommateurs
+Rust (24admissions+5workflows) passent. Après une vraie régression de taille,
+les corps mesurés sont31970/31973/31970/18605octets ; cap sauvegardé32000 inchangé.
+Les5tests/sous-tests Go réels passent sur1163sources projet+1testmain généré,
+archives et JSON originaux conservés, entrées stables avant/après. Une seconde
+exécution passe en réutilisant la base avec0fichier nouveau ; les274entrées
+manquantes à l’ancien inventaire sont désormais couvertes, sans réécrire celui-ci.
+Binaire normal-dev isolé sans fixture/test-util,2HTTP réels PASS ; aucune installation.
+Les overlays/GOFLAGS non pris en charge refusent ce profil ; compilation externe
+C/système hermétique et revue indépendante non établies. Le défaut du vérificateur
+parent-seul et les échecs originaux restent conservés. Preuves107/result.json.
+Cette correction de preuve ne termine pas la migration. Suite : garde-fou de
+l’organisation hiérarchique et de la revue, puis configuration/créneaux/consentement,
+branches gérées et origine/gate avant conduite automatique. R6/R7 et RETEX ouverts.
+
+Vérification native138 : le profil d’intégration Root courant requiert Linux et
+la chaîne Rust du projet. Le mode --evidence rejoue aussi huit gardes Python depuis141,
+dont un enfant Python possédé qui fournit un vrai statut SIGTERM ; ce dernier
+ne prouve pas un arrêt Cargo. Le statut signé original est conservé dans le
+diagnostic, et le code CLI suit la convention POSIX128+signal. Les erreurs de
+compilation conservent leur code d’origine. Aucun plafond temporel n’est ajouté.
+
+141 : la recette native globale ne dépend plus du minuscule module Go utilisé
+pour tester l’ancien archiveur. Trois tests de cet outil restent accessibles
+uniquement par legacy-go-source-archive.json (Go requis, non exécutés par la cible
+native). Le contrôle de routage des rôles a migré vers un shim Cargo/piège Go
+possédé, distinct des neuf vrais tests Rust. Le contrat incorporé référence
+désormais la preuve native ; il faut reconstruire pour les futurs contextes.
+Les processus et prompts déjà émis ne sont pas réécrits. Cette modification
+ajoute8octets au corps worker31970, sous le cap sauvegardé32000 inchangé ;
+la mesure runtime après reconstruction reste requise.
+
+## Installation locale par défaut — décision utilisateur du 24 octobre 2026
+
+Pour un développement autorisé, toute avancée vérifiée doit être construite,
+installée et activée dans l’instance locale concernée par défaut, sans nouvelle
+demande d’accord. Cette autorisation couvre le démarrage ou redémarrage du seul
+service local identifié comme appartenant au projet. Utiliser le chemin de
+livraison pris en charge ; préserver données, missions, travaux et processus
+d’autrui. Vérifier l’identité du binaire réellement exécuté, la version, les
+évolutions FR/EN et le parcours affecté avant d’annoncer « installé ».
+Un test réussi ou un candidat compilé ne constitue pas une installation.
+Si le raccordement de livraison manque ou refuse, appliquer replan et le traiter
+dans le périmètre autorisé ; conserver le défaut, sa preuve et sa condition de
+reprise sans prétendre que le produit est installé. Cette préférence ne vaut pas
+autorisation de commit, push, publication ou déploiement externe/production.
+
+Avant de modifier des consignes embarquées, mesurer leurs corps par rôle avec `python3 tools/agent-workflows/check_workflow_size.py` avant compilation, puis vérifier les véritables contextes Rust avec `python3 tools/agent-workflows/check.py`. Une taille admissible ne prouve ni réception ni respect des consignes. Conserver la politique opérateur : réduire les répétitions sans perdre les obligations ; une capacité insuffisante exige un diagnostic. Le lot1438 a montré qu’un ajout de règle peut casser les rôles alors que le serveur web répond encore.

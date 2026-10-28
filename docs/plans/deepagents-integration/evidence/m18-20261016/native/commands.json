@@ -1,0 +1,1615 @@
+[
+  {
+    "argv": [
+      "init"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "create"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "task",
+      "add",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "start",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "dcc9caee-4bdd-4ae8-858b-03059ab32fc7"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-a2ed86a5915a223f894310dd"
+    ],
+    "exit_code": 0
+  }
+]

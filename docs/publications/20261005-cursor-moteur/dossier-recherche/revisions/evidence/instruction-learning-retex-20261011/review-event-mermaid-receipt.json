@@ -1,0 +1,16 @@
+{
+  "source": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261011-instruction-learning-retex.md",
+  "input": "/tmp/swarm-review-event-routing.mmd",
+  "output": "/tmp/swarm-review-event-routing.png",
+  "command": [
+    "/home/fpizzi/.npm-global/bin/mmdc",
+    "-i",
+    "/tmp/swarm-review-event-routing.mmd",
+    "-o",
+    "/tmp/swarm-review-event-routing.png",
+    "-p",
+    "/tmp/swarm-mermaid-puppeteer.json"
+  ],
+  "exit_code": 0,
+  "sha256": "febf03577b93a3e43d4a23f8b829a7b53115cc2d89f89378b1d1d68ac3fddaf3"
+}

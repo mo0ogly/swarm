@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-17T11:35:57.644032+00:00",
+  "executor": "Codex",
+  "renders": 4,
+  "inspected": [
+    "authority-fr.png",
+    "authority-en.png"
+  ],
+  "result": "Readable complete graphs, prerequisite and missing engine adapter labeled."
+}

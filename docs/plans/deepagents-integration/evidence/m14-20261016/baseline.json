@@ -1,0 +1,38 @@
+{
+  "at": "2026-10-16T17:30:31.678550+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "runtime": {
+    "running": true,
+    "pid": 2186583,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "ready": true
+  },
+  "files": {
+    "internal/engine/agents_store.go": "c8ad50030dd6641af0210c7f0a0eccdbfa31ec222f1f354d30a40d18d2745886",
+    "internal/engine/agent_dialogue.go": "2ca82544a688b8f5ccee919dd0ed49d4c45051e730d30b08df7adf12918e122a",
+    "internal/engine/dialogue_checkpoint.go": "eac699d5356b39ee9c160824fbbae4300023de0601e19a06707771761c62b0c8",
+    "internal/engine/dialogue_checkpoint_store.go": "50370855602cc7e255646a8d249796754d65cc577ae675e252bdbaeef6cff418",
+    "internal/engine/dialogue_recovery.go": "0557c1135c8dfc2fd41e4163eb36fff106d0fca2ed95c44c34f1daa3449d1652",
+    "internal/engine/agent_terminal_process.go": "3521a9313a5ef4df6ef7fec296d13d72e58627c0c9f625efdf4759635060dee9",
+    "internal/engine/console_cli.go": "bb73c277877bc3f62720b140586b890a6e4b091e0bf20c9be97196f37e04397c",
+    "internal/engine/web_server.go": "58bc3deb09379b3cf13ef05c7412579af405f8753ad08cd18871eecaa9247b81",
+    "internal/engine/mission_insights.go": "31a24ad2b66ea09163f1bcb69a962922ce6997bb773ed04bf2e63804ac086efe",
+    "internal/engine/dialogue_recovery_test.go": "8b0f881f28f88782bf3463ae2e1f09c707c60809cb0f7ec263b919dc0139b2f7",
+    "web/mission-insights.js": "c4d1953651d756c2570cae1834cc21a16385e76ce65a00a9e1507f115159c130",
+    "locales/en.json": "9335afc1be52b603efa892845857df517fa87a3fdfb8d0472605e40f1dc17628",
+    "web/i18n-en.js": "ece35efe7e14e14f1ce98258e8e9d2936f41f24bf42aabd45a27ed6f4d74f252",
+    "docs/PROJECT-MEMORY.md": "0cf0875a3479a6d2af4cc0564a3731cfb828f49a919e2ffe37420d38c4454219",
+    "docs/en/PROJECT-MEMORY.md": "c82155d283bdc67e78ace65c5a16ccaa29b7cefc05fef97a77e2318e81008663",
+    "docs/plans/deepagents-integration/PLAN.md": "639f6cb6894eed532c4e079d98dca8b71ceab71d07fe67d59ea086d163d9d827",
+    "docs/plans/deepagents-integration/cas-evaluation.json": "855da8c0273fb7bf0e9e96741b40340ad61687373e99a6e0cbad50589bf627e7",
+    "tests/dialogue_recovery_ui.cjs": "3aec181727212c136a7d5ff2a33e84ab542f73fedbdd92750715edf55d080ff3",
+    "internal/engine/store.go": "900dc14657b98175f4b10228bcd220289b6a13f3acc00e017bba751de57de09f",
+    "internal/engine/model.go": "48f4d847be25de24ea8e6b0f9f99b753cc209c87789a9cec78f322b40d818eb1",
+    "internal/engine/dialogue_receipt_test.go": "d8bdc6d008099aa7ee41527c726538eb2262b754152515e0cd501797f46889b3",
+    "internal/engine/dialogue_checkpoint_test.go": "91697807b2291afdf5e08eea75136d08eb3169dde1d81a4ea502ff16fa5dc542",
+    "internal/engine/storage_inspection.go": "e44facdf98a162ddbe5c95aa344f1fa19648ebf0193ff61e72d74de3aa81accb",
+    "internal/engine/storage_inspection_test.go": "99e246b8fc04babbc72f90b4a104b2f3361e13cd65eebccd8a8309f2565d8805"
+  }
+}

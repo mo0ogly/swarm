@@ -1,0 +1,49 @@
+
+running 44 tests
+test diagnostic_tests::cli_compound_cleanup_retains_primary_and_secondary_causes ... ok
+test diagnostic_tests::nested_guard_causes_are_classified_without_private_text ... ok
+test mission_status::tests::native_status_supervision_vocabulary_and_text_limits_are_explicit ... ok
+test mission_status::tests::status_read_close_and_flush_failures_do_not_become_empty_success ... ok
+test diagnostic_tests::unsupported_commands_keep_typed_code_and_both_languages ... ok
+test agent_logs::tests::agent_logs_export_and_cause_matrix ... ok
+test diagnostic_tests::typed_same_address_source_is_not_mistaken_for_a_cycle ... ok
+test diagnostic_tests::recorded_cli_control_metadata_reaches_json_without_a_web_error ... ok
+test agent_logs::tests::agent_logs_public_secondary_close_cause ... ok
+test mission_status::tests::historical_observation_causes_survive_output_failure ... ok
+test mission_status::tests::status_historical_uses_root_and_rejects_invalid_native_transport ... ok
+test mission_watch::role_job::tests::ordered_role_phases_do_not_promote_empty_results_or_skip_receipts ... ok
+test mission_watch::role_job::tests::planner_report_keeps_original_and_latest_work_on_output_failure ... ok
+test mission_watch::tests::local_session_stop_and_owner_loss_are_distinct ... ok
+test mission_watch::tests::stale_dispatch_reobservation_requires_exact_no_effect_proof ... ok
+test mission_watch::tests::watch_admission_preservation_keeps_primary_and_cleanup_causes ... ok
+test mission_watch::tests::watch_adoption_candidates_are_only_unknown_old_nonstopped_queued ... ok
+test mission_status::tests::native_status_keeps_absence_and_excludes_private_agent_fields ... ok
+test mission_watch::tests::watch_cadence_uses_validated_saved_milliseconds ... ok
+test mission_watch::tests::watch_blocked_dispatch_preserves_permission_cause_without_fake_completion ... ok
+test mission_watch::tests::watch_cycle_after_action_keeps_supervision_and_journal_errors ... ok
+test mission_watch::tests::watch_retained_intentions_distinguish_owned_pending_children ... ok
+test mission_watch::tests::watch_listener_panic_must_wake_owned_role ... ok
+test mission_watch::tests::watch_planning_entry_requires_explicit_controls_and_defers_active_context ... ok
+test mission_watch::tests::watch_worker_argv_uses_existing_private_bootstrap ... ok
+test mission_worker_entry::tests::bootstrap_dispatch_rejects_help_before_public_help ... ok
+test mission_worker_entry::tests::bootstrap_after_session_error_keeps_state_cleanup_and_diagnostics ... ok
+test mission_watch::tests::watch_planning_projection_keeps_idle_distinct_and_excludes_private_work ... ok
+test mission_worker_entry::tests::bootstrap_refuses_invalid_transport_before_session_or_root ... ok
+test mission_worker_entry::tests::bootstrap_session_refusal_preserves_errno_without_runtime ... ok
+test mission_worker_entry::tests::bootstrap_normalizes_without_inventing_identity_or_authority ... ok
+test native_web::conductor::tests::conductor_wrapped_known_work_and_cleanup_reach_cli ... ok
+test native_web::conductor::tests::late_conductor_failure_keeps_http_report_and_typed_effects ... ok
+test mission_watch::tests::watch_interruption_keeps_newer_session_work ... ok
+test mission_watch::tests::watch_signal_listener_startup_wait_and_checked_shutdown ... ok
+test native_web::ancillary_tests::ancillary_native_causes_reach_cli_after_observation_and_encoding_failure ... ok
+test recorded_work_tests::cli_retains_root_recorded_work_through_compound_cleanup ... ok
+test recorded_work_tests::cli_preserved_state_wrapped_in_io_keeps_work_and_config_markers ... ok
+test recorded_work_tests::cli_configuration_marker_survives_own_io_and_cleanup_wrappers ... ok
+test recorded_work_tests::cli_native_commit_projection_retains_both_causes_without_private_text ... ok
+test recorded_work_tests::cli_settings_publication_survives_late_close_in_json_and_text ... ok
+test native_web::tests::late_web_summary_failure_retains_report_effects_and_safe_causes ... ok
+test mission_watch::tests::watch_interrupted_output_keeps_original_and_known_work ... ok
+test mission_watch::role_job::tests::planner_finish_distinguishes_main_shutdown_and_actual_stop_metadata ... ok
+
+test result: ok. 44 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

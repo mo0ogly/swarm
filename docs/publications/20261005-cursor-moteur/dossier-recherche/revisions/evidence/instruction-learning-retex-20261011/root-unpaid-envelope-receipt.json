@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-11T11:18:29.481611+00:00",
+  "revision": 165,
+  "activation": 12,
+  "decision_count": 7,
+  "failure": "Contexte supérieur à 64 Kio ; aucune troncature ni nouvel appel.",
+  "received": {
+    "production_retry_unavailable": true,
+    "context_sha256": "0ab4e319aadd39628164996827addb6407405e48a835b22d72420fe365cd380a",
+    "events": [
+      "operator-strict-current-protocol-through-retex-20261011",
+      "operator-historical-context-corrected-through-retex-20261011",
+      "operator-project-through-retex-20261011",
+      "plan-9922c4588b251328fbc8aaac59da2b4b375db64adb24b42c054574e69a85d3d2",
+      "plan-f8cb4e759c322f85985c5f1d1229cc3ee0dcc9e5c5588f15005298a5ac338653"
+    ]
+  },
+  "latest_operator_resume_delivered": true,
+  "provider_call_launched": false,
+  "T8_exists": false,
+  "limits": "Exact wire-envelope issue stopped before provider, after claim; original consumed activation retained."
+}

@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "id": "paea-personal-cli",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/**/*",
+    "web/*",
+    "web/lib/**/*",
+    "web/paea-examples/v1/*.json",
+    "frontend/engine-settings/*",
+    "tools/agent-workflows/**/*",
+    ".claude/skills/**/*",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "version_history.json",
+    "tools/verification/recipe.py",
+    "rust/crates/swarm-cli/tests/identity_control.rs",
+    "tools/verification/recipes/paea-identity-options.json",
+    "tests/fixtures/paea_personal_tty.py",
+    "tests/fixtures/paea_personal_report_schema.py",
+    "schemas/paea/personal-lifecycle-cli-v1.schema.json",
+    "tools/verification/recipes/paea-personal-cli.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0"
+  },
+  "steps": [
+    {
+      "id": "personal-native-lifecycle",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "identity_personal",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "7 passed; 0 failed",
+        "personal_native_cold_enrollment_exact_once_and_recovery_fr_en",
+        "personal_native_stdout_loss_keeps_actual_enrollment_and_safe_diagnostic",
+        "personal_native_terminal_refuses_without_echo_or_bootstrap_use",
+        "personal_native_observation_reports_match_closed_schema"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "personal-unit-error-observations",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--lib",
+        "identity_personal::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "3 passed; 0 failed",
+        "personal_cli_error_links_keep_primary_secondary_and_custom_io_redacted"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "secret-owned-frame",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--lib",
+        "personal_secret_frame::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 passed; 0 failed",
+        "personal_frame_existing_transport_bound_stops_after_sentinel"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "identity-control-public-options-and-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "identity_control",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "7 passed; 0 failed",
+        "identity_cli_closed_options_refuse_default_value_aliases_before_io",
+        "current_control_cli_observes_real_signed_enrollment_fr_en_without_authorizing_or_creating_project"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "private-worker-parser-nonregression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--lib",
+        "mission_worker_entry::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "bootstrap_normalizes_without_inventing_identity_or_authority"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "bootstrap-rejects-incomplete-identity",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "cli",
+        "native_bootstrap_cli_rejects_incomplete_identity_without_creating_a_project",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "shared-personal-fixture-original-consumer",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "personal",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "personal_bootstrap_secret_is_consumed_atomically_exact_retry_and_password_use_after_reopen"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

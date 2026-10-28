@@ -1,0 +1,14 @@
+{
+  "accepted_base": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+  "native_T2_head": "7d48c5e28514828a3fc979fb7d514e4713ddf23d",
+  "paths": [
+    "internal/engine/graph_delivery_qualification_test.go",
+    "internal/engine/planning.go",
+    "internal/engine/planning_api.go",
+    "internal/engine/planning_context.go",
+    "internal/engine/planning_judge.go",
+    "internal/engine/planning_judge_test.go"
+  ],
+  "patch_sha256": "decf2de0daf66075c1f9e7236c6063ba648bb7c4b8c2052b9ba2d4303f6fa608",
+  "limits": "Read-only original native candidate capture; not acceptance. Native workspace untouched."
+}

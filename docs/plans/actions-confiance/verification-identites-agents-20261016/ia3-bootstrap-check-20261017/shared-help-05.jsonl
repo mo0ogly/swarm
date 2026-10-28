@@ -1,0 +1,12 @@
+{"Time":"2026-10-17T18:42:38.496548771+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-17T18:42:38.57544088+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestHelpTopicsReadOnlyAndContextReturn"}
+{"Time":"2026-10-17T18:42:38.576049086+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestHelpTopicsReadOnlyAndContextReturn","Output":"=== RUN   TestHelpTopicsReadOnlyAndContextReturn\n"}
+{"Time":"2026-10-17T18:42:38.656745907+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestHelpTopicsReadOnlyAndContextReturn","Output":"--- PASS: TestHelpTopicsReadOnlyAndContextReturn (0.08s)\n"}
+{"Time":"2026-10-17T18:42:38.656937512+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestHelpTopicsReadOnlyAndContextReturn","Elapsed":0.08}
+{"Time":"2026-10-17T18:42:38.656963901+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestHelpWithoutProject"}
+{"Time":"2026-10-17T18:42:38.656979159+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestHelpWithoutProject","Output":"=== RUN   TestHelpWithoutProject\n"}
+{"Time":"2026-10-17T18:42:38.656997753+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestHelpWithoutProject","Output":"--- PASS: TestHelpWithoutProject (0.00s)\n"}
+{"Time":"2026-10-17T18:42:38.657012401+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestHelpWithoutProject","Elapsed":0}
+{"Time":"2026-10-17T18:42:38.657024273+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"PASS\n"}
+{"Time":"2026-10-17T18:42:38.665986044+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"ok  \tswarm.local/companion/internal/engine\t0.168s\n"}
+{"Time":"2026-10-17T18:42:38.66622137+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Elapsed":0.17}

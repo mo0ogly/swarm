@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-17T09:08:24.171840+00:00",
+  "process_sample": [
+    " 225209  224611       04:24  1.9 24824 go",
+    " 225681  225209       04:20 76.9 1358608 compile"
+  ],
+  "memory": "               total        used        free      shared  buff/cache   available\nMem:           14694       11886         906         100        2227        2807\nSwap:          15538       14083        1455\n",
+  "observation": "race compilation exceeds prior 206s reference while another compilation overlapped; compiler still active; no test result yet",
+  "cause": "large shared Go package and shared host resource pressure are hypotheses, not an isolated benchmark",
+  "decision": "continue the active owned compiler; no timeout increase, parallel owned build or interruption of other work",
+  "owner": "Codex/method; structural package isolation IA3b-I07 remains open"
+}

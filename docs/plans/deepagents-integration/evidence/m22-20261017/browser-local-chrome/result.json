@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Explicit fresh build preserves inputs and refuses replacement or embedded-web output",
+    "All bilingual examples render; the default wax seal shows unknown identity/rights and no positive status",
+    "Names and references remain text; IDs/roles/booleans cannot imply verification; icon-only output is named",
+    "FR/EN selections persist; both themes render at 1440/1024/760/390/320px without overflow; every badge reaches 4.5:1",
+    "Every protection/identity state updates the seal; reset preserves focus and restores unknown; keyboard disclosure and visible focus work"
+  ],
+  "definitions": 29,
+  "viewports": 20,
+  "inputs": {
+    "frontend/build-signals.mjs": "0393639c712bf77a9e17de1baa596481ec23987d0c69fe57d7d3eda48092322f",
+    "frontend/signals/signals.js": "b9b415be0802514b9942a627c8f09bfe74a21d5c01a940e2365f100af375372a",
+    "frontend/signals/signals.css": "69136aecc40063438ace306231d1e1b5aa18a059be8b79503828e1ae58f51c8a",
+    "frontend/signals/catalogue.html": "e692c760466e829757a4554d07feaa6d7f2bef0bb0c0a717689325ced4428465",
+    "frontend/signals/catalogue.js": "640faa8df6fba5f3c0b8c33c20c6334849c79909b5b91c91039816a5431f8c51",
+    "frontend/signals/catalogue.css": "559ae399676e51cc46933b8341fc4ae1d3b67f6699bd0cf54844fbeb2e97bdc0",
+    "web/wattson_themes.css": "0055edad2bcfa30d65b63eee8c522cd53d6953353f0a98f34024c364a08f0a59",
+    "web/swarm-design.css": "9a15b7bfa9163f32c8542d50e0ad62c8acb346a4e2e61a7a8f110c831c9740d3",
+    "web/swarm-logo.png": "d8ad9094dd879b42f213cea10c471696af378679c0634a044b7fe312de7ae9bb",
+    "tests/semantic_signals_ui.cjs": "1a8544e42e6b2f1e830a1cf772fe917d17c2d5390f7ccdabb99e2c7eb309f110"
+  },
+  "input_unchanged": true,
+  "requests": [
+    "/catalogue.html",
+    "/wattson_themes.css",
+    "/swarm-design.css",
+    "/signals.css",
+    "/catalogue.css",
+    "/signals.js",
+    "/catalogue.js",
+    "/swarm-logo.png",
+    "/swarm-logo.png"
+  ],
+  "console_errors": [],
+  "failed_requests": [],
+  "application_api_calls": 0,
+  "model_calls": 0,
+  "build_directory": "/tmp/swarm-signals-build-FHK2Ws/catalogue"
+}

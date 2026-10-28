@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "at": "2026-10-11T18:42:59.710890+00:00",
+  "fixture_root": "/home/fpizzi/.cache/swarm-operator-replan-20261011/console20-restart-fixture-qwiz95g_",
+  "old_binary_sha256": "e23d4ff43d8cb6f64b00bee8b4e531dcb3da2a71f390d8be5c130f3f79445ece",
+  "new_binary_sha256": "371239add2a2ba968c3b1807d5bfd896eb6662c31d59d0644792753321f471ff",
+  "same_agent": "9d5c34e7097e44b5b8872dbe5584a641",
+  "same_attempt": "a-0fd8f2ee9b7b59cb2cc61004",
+  "same_detached_supervisor_pid": 2839430,
+  "same_child_pid": 2839452,
+  "public_work_preserved": true,
+  "original_process_completed_after_replacement": true,
+  "both_original_messages_observed": true,
+  "new_runtime_executed_sha_verified": true,
+  "limits": "Isolated actual detached provider process, no model or native mission DB. Proves active detached agents survive compatible19\u219220 web replacement; does not authorize interrupting in-server reviews or held planning provider calls."
+}

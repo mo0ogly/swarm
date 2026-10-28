@@ -1,0 +1,5 @@
+--- FAIL: TestPlanningRejectedProposalReturnsToOwnerWithIntactEvidence (0.12s)
+    planning_rejection_test.go:134: diagnostic lost in export/import retour planning-rejected-c2887577449a707143afdab9a1cc3d9d943417bb37b95e4a20867d538c2e7948 : rapport indisponible ou hors projet : lstat /tmp/TestPlanningRejectedProposalReturnsToOwnerWithIntactEvidence1283497723/004/.swarm/planning: no such file or directory
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.308s
+FAIL

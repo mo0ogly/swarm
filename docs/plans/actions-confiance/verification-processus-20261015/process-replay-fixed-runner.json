@@ -1,0 +1,10 @@
+{
+  "pid": 2145380,
+  "proc_start_ticks": "3920131",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-process-replay-fixed.py",
+    "run"
+  ],
+  "at": "2026-10-15T22:52:57.173395+00:00"
+}

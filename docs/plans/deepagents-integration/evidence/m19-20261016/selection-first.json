@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestMemorySummarySelectionPublicLaunchContract$",
+    "-count=1",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T20:08:37.820183+00:00",
+  "duration_seconds": 16.493,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestMemorySummarySelectionPublicLaunchContract"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "26031e6c942d341600cca1c6e343c5ce0558d18383ed8983c66adfccb9df0298",
+  "real_model_calls": 0
+}

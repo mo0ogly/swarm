@@ -1,0 +1,12 @@
+{
+  "revision": 338,
+  "review": "review-d9ea32fa4816bae18021ddaa",
+  "candidate": "3d66a1fdd7d6a16f848f1f3f79890c6fcb0fcd43",
+  "packet": 0,
+  "inspection_contract_version": 1,
+  "scope_version": 1,
+  "packet_sha256": "679cbd591c6108ab304d12343b1149aa62b85a67735be42325e31e74fd2919bd",
+  "reply_sha256": "3cb61622110b742e6aa4fbeac9c8cf5ce7322d2bb5c7f8da92286ac5fd438a54",
+  "state": "unknown",
+  "limits": "Partial valid receipt only, not a business acceptance."
+}

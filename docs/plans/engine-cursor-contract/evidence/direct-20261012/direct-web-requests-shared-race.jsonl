@@ -1,0 +1,32 @@
+{"Time":"2026-10-12T23:05:44.225122766+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-12T23:05:44.523032807+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestWebLoginDesignAssetsRemainPublicAndAPIPrivate"}
+{"Time":"2026-10-12T23:05:44.523088483+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestWebLoginDesignAssetsRemainPublicAndAPIPrivate","Output":"=== RUN   TestWebLoginDesignAssetsRemainPublicAndAPIPrivate\n"}
+{"Time":"2026-10-12T23:05:44.908061239+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestWebLoginDesignAssetsRemainPublicAndAPIPrivate","Output":"--- PASS: TestWebLoginDesignAssetsRemainPublicAndAPIPrivate (0.38s)\n"}
+{"Time":"2026-10-12T23:05:44.90815126+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestWebLoginDesignAssetsRemainPublicAndAPIPrivate","Elapsed":0.38}
+{"Time":"2026-10-12T23:05:44.9084889+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestPreparationWebCLIParityAndSecurity"}
+{"Time":"2026-10-12T23:05:44.908501805+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPreparationWebCLIParityAndSecurity","Output":"=== RUN   TestPreparationWebCLIParityAndSecurity\n"}
+{"Time":"2026-10-12T23:05:45.427866644+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPreparationWebCLIParityAndSecurity","Output":"--- PASS: TestPreparationWebCLIParityAndSecurity (0.52s)\n"}
+{"Time":"2026-10-12T23:05:45.42930348+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestPreparationWebCLIParityAndSecurity","Elapsed":0.52}
+{"Time":"2026-10-12T23:05:45.429364796+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestWebRequestsPublicPersistencePreviewReplayAndConflict"}
+{"Time":"2026-10-12T23:05:45.429371809+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestWebRequestsPublicPersistencePreviewReplayAndConflict","Output":"=== RUN   TestWebRequestsPublicPersistencePreviewReplayAndConflict\n"}
+{"Time":"2026-10-12T23:05:45.946047275+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestWebRequestsPublicPersistencePreviewReplayAndConflict","Output":"--- PASS: TestWebRequestsPublicPersistencePreviewReplayAndConflict (0.52s)\n"}
+{"Time":"2026-10-12T23:05:45.946126335+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestWebRequestsPublicPersistencePreviewReplayAndConflict","Elapsed":0.52}
+{"Time":"2026-10-12T23:05:45.946140983+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestWebRequestsInvalidAuthenticationAndConcurrentRevision"}
+{"Time":"2026-10-12T23:05:45.946147966+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestWebRequestsInvalidAuthenticationAndConcurrentRevision","Output":"=== RUN   TestWebRequestsInvalidAuthenticationAndConcurrentRevision\n"}
+{"Time":"2026-10-12T23:05:46.411107914+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestWebRequestsInvalidAuthenticationAndConcurrentRevision","Output":"--- PASS: TestWebRequestsInvalidAuthenticationAndConcurrentRevision (0.46s)\n"}
+{"Time":"2026-10-12T23:05:46.411204057+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestWebRequestsInvalidAuthenticationAndConcurrentRevision","Elapsed":0.46}
+{"Time":"2026-10-12T23:05:46.411220117+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestWebRequestsConfigRefusesSymlinkAndAllPagesLoadPolicy"}
+{"Time":"2026-10-12T23:05:46.411227912+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestWebRequestsConfigRefusesSymlinkAndAllPagesLoadPolicy","Output":"=== RUN   TestWebRequestsConfigRefusesSymlinkAndAllPagesLoadPolicy\n"}
+{"Time":"2026-10-12T23:05:46.894642989+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestWebRequestsConfigRefusesSymlinkAndAllPagesLoadPolicy","Output":"--- PASS: TestWebRequestsConfigRefusesSymlinkAndAllPagesLoadPolicy (0.49s)\n"}
+{"Time":"2026-10-12T23:05:46.894737859+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestWebRequestsConfigRefusesSymlinkAndAllPagesLoadPolicy","Elapsed":0.49}
+{"Time":"2026-10-12T23:05:46.894894166+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestWebAuthenticationOriginAndSharedGuard"}
+{"Time":"2026-10-12T23:05:46.894903844+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestWebAuthenticationOriginAndSharedGuard","Output":"=== RUN   TestWebAuthenticationOriginAndSharedGuard\n"}
+{"Time":"2026-10-12T23:05:47.494829665+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestWebAuthenticationOriginAndSharedGuard","Output":"--- PASS: TestWebAuthenticationOriginAndSharedGuard (0.60s)\n"}
+{"Time":"2026-10-12T23:05:47.494907833+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestWebAuthenticationOriginAndSharedGuard","Elapsed":0.6}
+{"Time":"2026-10-12T23:05:47.495184488+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestWebSessionStablePrivateAndScoped"}
+{"Time":"2026-10-12T23:05:47.495202673+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestWebSessionStablePrivateAndScoped","Output":"=== RUN   TestWebSessionStablePrivateAndScoped\n"}
+{"Time":"2026-10-12T23:05:47.994503905+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestWebSessionStablePrivateAndScoped","Output":"--- PASS: TestWebSessionStablePrivateAndScoped (0.50s)\n"}
+{"Time":"2026-10-12T23:05:47.994585249+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestWebSessionStablePrivateAndScoped","Elapsed":0.5}
+{"Time":"2026-10-12T23:05:47.995230463+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"PASS\n"}
+{"Time":"2026-10-12T23:05:49.012392161+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"ok  \tswarm.local/companion/internal/engine\t4.783s\n"}
+{"Time":"2026-10-12T23:05:49.012461352+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Elapsed":4.788}

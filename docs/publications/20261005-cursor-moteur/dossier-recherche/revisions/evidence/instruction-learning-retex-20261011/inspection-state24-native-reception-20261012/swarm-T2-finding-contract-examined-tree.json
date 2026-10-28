@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-11T22:29:57.061325+00:00",
+  "examined_tree": "52b15c9e3c3bd900fae81ef0b5716e592cd03ab4",
+  "preimage_tree": "b64901e7c9f3b75d81420a80f0103a3911c4fe82",
+  "changed_paths": [
+    "docs/plan-ca937edf4e-T2.md"
+  ],
+  "preimage_sha256": "41f55e355efbedf12f433f94e7bb0a5c5788da050315b93c32af034e044b1791",
+  "report_sha256": "afbbd79a82fe82bb59d2a1c336211f86eba731210e188e51231b089156e4126d",
+  "source_helper_sha256": "4e190bce0ee367c5b490b495b0c1f1c6c4a821df11ab8a33f7568289fb6c586d",
+  "original_go_drift": [],
+  "sources": 23,
+  "source_bytes": 130989,
+  "remaining_bytes": 83,
+  "runtime_sha256": "79134e6216eac9d315d3824a5cedb49112bd4ec86289c894e35626d6507284ea",
+  "limits": "Inactive owned copy only; existing staged work preserved. Report attributes native contradiction, no favorable verdict prescribed, fresh controls/review still required."
+}

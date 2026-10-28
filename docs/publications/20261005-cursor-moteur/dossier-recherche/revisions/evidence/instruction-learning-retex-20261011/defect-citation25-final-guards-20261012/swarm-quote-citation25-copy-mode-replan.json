@@ -1,0 +1,14 @@
+{
+  "cause": "write_bytes copy preserved hashes but dropped executable mode on install.sh",
+  "affected": "isolated qualification only, native runtime24 unchanged",
+  "corrected_modes": [
+    "swarm.sh",
+    "deploy/entrypoint.sh",
+    "install.sh",
+    "swarm",
+    "tests/assist_provider.py"
+  ],
+  "original_parent_modes_restored": true,
+  "qualification_failed_exit": 1,
+  "limits": "Failed full run preserved; final full/vet/methods/build still required"
+}

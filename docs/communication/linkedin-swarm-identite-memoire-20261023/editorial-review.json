@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "editorial_date": "2026-10-23 Europe/Paris",
+  "purpose": "Word article and explanatory architecture assets, no Swarm implementation",
+  "checks": {
+    "docx_zip": "PASS",
+    "embedded_images": 2,
+    "image_alternative_texts": 2,
+    "public_reference_targets": 5,
+    "local_markdown_links": 18,
+    "rendered_pages": 5,
+    "visually_inspected_pages": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "title_and_headings": "black, no title rule",
+    "layout": "no clipping, overlaps or split figures observed",
+    "qualification_scope": "historical Go, partial Rust, future AC-02 kept distinct"
+  },
+  "review": {
+    "policies": "No runtime policy/default/rights/budget changed. Video duration is editorial only.",
+    "functions": "No Swarm function created or modified. Temporary asset and DOCX builders are outside product sources.",
+    "errors": "No product error path changed; missing evidence is not a delivered capability. Browser default executable absent: supplied Playwright used an isolated installed Chrome. No browser install.",
+    "documentation": "French editorial request; no shared product contract changed. Relevant source languages not modified. README and storyboard retain limits and resumption conditions.",
+    "build_and_delivery": "No Swarm build, application tests, provider call, server restart, commit, push or publication.",
+    "independence": "Same-session editorial and visual QA; no independent system qualification."
+  },
+  "renderer": {
+    "node_and_python": "Codex bundled runtime 26.1020.11127",
+    "libreoffice": "/home/fpizzi/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override/soffice",
+    "mermaid": {
+      "version": "11.12.0",
+      "registry_integrity": "sha512-ZudVx73BwrMJfCFmSSJT84y6u5brEoV8DOItdHomNLz32uBjNrelm7mg95X7g+C6UoQH/W6mBLGDEDv73JdxBg==",
+      "tarball_sha256": "93492e4d609be83653a41c435f4cbd7e74419f7fa6b4fc90a8c983195f64af82",
+      "min_js": true
+    },
+    "word_render_directory": ".cache/editorial-swarm-20261023/word-render-02"
+  },
+  "retained_recovery": {
+    "original_render": ".cache/editorial-swarm-20261023/word-render-01",
+    "observation": "Default Word Title style retained a blue paragraph border; first diagram layout was too narrow.",
+    "correction": "Removed paragraph borders from styles/document, widened Mermaid wrapping and set Arial, clarified future subset qualification and non-expanding delegation.",
+    "verified_effect": "Second render inspected on all five pages; black title without border, readable complete figures, explicit future wording.",
+    "owner": "Root Codex / editorial author",
+    "resumption": "Before any publication, reread maturity sources and validate final publication layout."
+  },
+  "artifacts": [
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md",
+      "sha256": "3d23fca21e7b7d5503c635801e512262ce512aeca6bb527ca5758089ce72e8f8",
+      "bytes": 3984
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Identite_Memoire_LinkedIn.docx",
+      "sha256": "599fef2b5c0644784fc311cdc6b76fa08e89e31f80557de421d53422b9aa1e3f",
+      "bytes": 448833
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/architecture.mmd",
+      "sha256": "58f3904d17db121f2ae28d0253bcf08f7985657400e3937912da2b7c93e6eab3",
+      "bytes": 1876
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/architecture.png",
+      "sha256": "29cf75f339dbbf9b79b3126da49cd11c8b94c881adb4158f5c9290e253e3a5a1",
+      "bytes": 221294
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/architecture.svg",
+      "sha256": "18b2ec955080792689162a72a0f96ba432d23b56ed0ff4c970e0e509476037cd",
+      "bytes": 20693
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/article-fr.md",
+      "sha256": "6e93b18ba0e0907714a28045f0da9ab411b60b80c301cb0303ad88fea04964bc",
+      "bytes": 5725
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/memoire.mmd",
+      "sha256": "443623c737708f8d29c31bb8dc8fce4b05cf339a346c0521ba93d309a8d3cd0d",
+      "bytes": 1672
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/memoire.png",
+      "sha256": "8dbf5397d7de86d7eed0eaae880a09538a8e5396d0bb0686a67f3d3f9a229245",
+      "bytes": 206931
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/memoire.svg",
+      "sha256": "260d5ddf264378e496109251cac21a9ba4270b74f00ccaeaf19cea423c598683",
+      "bytes": 21129
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/storyboard-video-fr.md",
+      "sha256": "e92d8637e8d47260f3bea9ee509da6d239acc637fc7a9b8b3ebde1426075b0ff",
+      "bytes": 3837
+    }
+  ],
+  "source_inventory": [
+    {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "sha256_at_review": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59",
+      "scope": "inspected source/contract; not proof of unchanged global checkout"
+    },
+    {
+      "path": "docs/PROJECT-MEMORY.md",
+      "sha256_at_review": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13",
+      "scope": "inspected source/contract; not proof of unchanged global checkout"
+    },
+    {
+      "path": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+      "sha256_at_review": "5103687bb52f19ab08eaabde219965651ca65fc88dc0c23961648a5be324cda2",
+      "scope": "inspected source/contract; not proof of unchanged global checkout"
+    },
+    {
+      "path": "docs/plans/migration-rust/PLAN.md",
+      "sha256_at_review": "f2e9804f858f317c4a1efc0818bb1e125897667871d6624299e426bd78eb3442",
+      "scope": "inspected source/contract; not proof of unchanged global checkout"
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-apex.md",
+      "sha256_at_review": "07a3b77b0fb8b72a0e51e0074fdb82121491707fc0b4efd5dcd7d7041e6bfafb",
+      "scope": "inspected source/contract; not proof of unchanged global checkout"
+    },
+    {
+      "path": "internal/engine/project_memory.go",
+      "sha256_at_review": "16aa64873f1a26f102a9c1e26d4021425bf063ea7ff1b58c7634a423ec77070d",
+      "scope": "inspected source/contract; not proof of unchanged global checkout"
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/identity_plan.rs",
+      "sha256_at_review": "f0c58cc317d01810f33b635a59a9863cd18bfe44bc78e14723c12d9f426879c0",
+      "scope": "inspected source/contract; not proof of unchanged global checkout"
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/supervisor_identity.rs",
+      "sha256_at_review": "92fe4da43547cee94da9427d8deeecd89a77ee330018a879a8af947c21e70b4d",
+      "scope": "inspected source/contract; not proof of unchanged global checkout"
+    }
+  ]
+}

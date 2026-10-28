@@ -1,0 +1,52 @@
+{
+  "task_focus": {
+    "work_revision": 5,
+    "next_action": "Examiner le handoff et les preuves après exécution",
+    "criteria": [
+      {
+        "index": 1,
+        "expected": "Check the retained evidence before deciding. Check the retained evidence before deciding. Check the retained evidence before deciding. Check the retained evidence before deciding. Check the retained evidence before deciding. Check the retained evidence before deciding. Check the retained evidence b…",
+        "verification_required": true
+      }
+    ],
+    "bounded_excerpt": true,
+    "truncated_fields": [
+      "criteria.1.expected"
+    ]
+  },
+  "work": "w-2a47c70cd5443fbc13326cdf",
+  "task": "t1",
+  "agent": "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+  "attempt": "a-f660f9982684e0ff2cb45b24",
+  "status": "failed",
+  "tool_calls": 3,
+  "tool_results": 3,
+  "observed_operations": [
+    "Read · Lecture d’un fichier · common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common…",
+    "Read · Lecture d’un fichier · common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common/common…",
+    "Bash · Exécution d’une commande · [détail masqué : donnée potentiellement sensible]"
+  ],
+  "activity_projection": {
+    "retained_activity_rows": 6,
+    "scanned_activity_rows": 6,
+    "unscanned_activity_rows": 0,
+    "excluded_tool_result_rows": 3,
+    "duplicate_rows": 0,
+    "omitted_budget_rows": 0,
+    "sources": [
+      {
+        "seq": 5,
+        "truncated": true
+      },
+      {
+        "seq": 9,
+        "truncated": true
+      },
+      {
+        "seq": 13,
+        "truncated": false
+      }
+    ]
+  },
+  "bounded_excerpt": true
+}

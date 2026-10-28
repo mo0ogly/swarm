@@ -1,0 +1,64 @@
+--- a/README.md
++++ b/README.md
+@@ -43,8 +43,9 @@
+ 
+ [Lire le MP4](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Architecture_Film_v2.mp4) · [SRT français](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/Swarm_Architecture_Film_v2.fr.srt) · [English SRT](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/Swarm_Architecture_Film_v2.en.srt) · [Chapitres et sources](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/README.md) · [Ancienne vidéo](docs/communication/linkedin-swarm-identite-memoire-20261023/video/README.md)
+ 
+-[Article Word v5](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v5.docx) : introduction sur la contamination du contexte,
+-18 références, cinq vues techniques complètes et accès au film. Le moteur Rust
++[Article Word v6](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v6.docx) : introduction sur la contamination du contexte,
++18 références, cinq vues techniques complètes intégrées aux sections de l’article
++et accès au film. Le moteur Rust
+ et la validation humaine restent au centre de l’architecture.
+ 
+ ### Explorer le graphe — environ 1 minute
+--- a/README.en.md
++++ b/README.en.md
+@@ -42,8 +42,9 @@
+ 
+ [Watch MP4](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Architecture_Film_v2.mp4) · [French SRT](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/Swarm_Architecture_Film_v2.fr.srt) · [English SRT](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/Swarm_Architecture_Film_v2.en.srt) · [Chapters and sources](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/README.md) · [Previous video](docs/communication/linkedin-swarm-identite-memoire-20261023/video/README.md)
+ 
+-[Word article v5, in French](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v5.docx): context-poisoning introduction,
+-18 references, five complete technical views and film access. The Rust engine
++[Word article v6, in French](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v6.docx): context-poisoning introduction,
++18 references, five complete technical views embedded in the corresponding article
++sections and film access. The Rust engine
+ and human validation remain central to the architecture.
+ 
+ ### Explore the graph — about 1 minute
+--- a/docs/communication/linkedin-swarm-identite-memoire-20261023/README.md
++++ b/docs/communication/linkedin-swarm-identite-memoire-20261023/README.md
+@@ -4,14 +4,16 @@
+ editorial draft, not published. No software behavior or shared contract changed;
+ an English article is not part of this French editorial request.
+ 
+-- **Version Word courante** : [article v5](Swarm_Article2_Identite_Memoire_v5.docx),
+-  avec le texte et les 18 références conservés, cinq schémas complets actualisés,
+-  puis une page d’accès au film. [Texte v5](article-v5-fr.md) et
+-  [revue des médias et documents](media-refresh-review.json).
+-  Les versions [v4](Swarm_Article2_Identite_Memoire_v4.docx) et
++- **Version Word courante** : [article v6](Swarm_Article2_Identite_Memoire_v6.docx),
++  avec les cinq schémas complets intégrés aux sections Rust, identité, mémoire,
++  supervision et logs, au fil de l’article. Le texte, les 18 références et la
++  page d’accès au film sont conservés. [Texte illustré v6](article-v6-fr.md) et
++  [vérification du placement](word-v6-review.json).
++  Les versions [v5](Swarm_Article2_Identite_Memoire_v5.docx),
++  [v4](Swarm_Article2_Identite_Memoire_v4.docx) et
+   [v3](Swarm_Article2_Identite_Memoire_v3.docx) restent figées avec leurs preuves.
+-  / **Current French Word**: v5, preserving the article, its 18 sources and five
+-  complete technical views, with a film presentation page.
++  / **Current French Word**: v6, with all five complete views embedded alongside
++  their corresponding article sections. Prose, 18 sources and film access retained.
+ - **Nouveau film** : [MP4 1 min 40](Swarm_Architecture_Film_v2.mp4), motion design
+   français, musique originale, sans voix ; [sous-titres FR](video-v2/Swarm_Architecture_Film_v2.fr.srt)
+   et [EN](video-v2/Swarm_Architecture_Film_v2.en.srt), [chapitres et sources](video-v2/README.md).
+--- a/docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/README.md
++++ b/docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/README.md
+@@ -1,6 +1,6 @@
+ # Film Swarm identité mémoire et contrôle humain
+ 
+-[Lire le MP4](../Swarm_Architecture_Film_v2.mp4) · [Word v5](../Swarm_Article2_Identite_Memoire_v5.docx) · [SRT FR](Swarm_Architecture_Film_v2.fr.srt) · [English SRT](Swarm_Architecture_Film_v2.en.srt).
++[Lire le MP4](../Swarm_Architecture_Film_v2.mp4) · [Word v6](../Swarm_Article2_Identite_Memoire_v6.docx) · [SRT FR](Swarm_Architecture_Film_v2.fr.srt) · [English SRT](Swarm_Architecture_Film_v2.en.srt).
+ 
+ Film local de 100 secondes, 1920 × 1080, 30 images/s, H.264/yuv420p, AAC stéréo.
+ Français à l’écran, musique électronique instrumentale originale, sans voix.

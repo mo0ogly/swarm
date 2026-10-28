@@ -1,0 +1,516 @@
+{
+  "date": "2026-10-23",
+  "objective": "Refresh French and English README content, videos and architecture; do not start AC-02 or change implementation.",
+  "method": "replan: recover existing dirty README bytes; inspect sources; revise both languages; render, inspect, check links/media and retain limitations.",
+  "checkout": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "head_at_review": "553593a2ffa3823d16784a6fedc291eebf390837",
+  "scope": "Documentation and derived illustration/poster assets only. No product behavior, policy, API or embedded resources changed.",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "bdffd08875568a92b158f2e0abe17c588ac22626ad073b992566a280e75fdf0d",
+      "bytes": 17813
+    },
+    {
+      "path": "README.en.md",
+      "sha256": "48237bc9d0e898468e73c28b916a5a8abb7556a2fbc3b7ef2ba8349013f05389",
+      "bytes": 16503
+    },
+    {
+      "path": "docs/diagrams/README.md",
+      "sha256": "dfe129fba789d7e7489b858ada899b8f76115678bf2ddcb6533cef8994fa873d",
+      "bytes": 5143
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-fr.mmd",
+      "sha256": "fbe260490924e495478bfedff2dd4be28efb2b10dd1062c531a2430ff7752461",
+      "bytes": 1809
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-fr.svg",
+      "sha256": "8680e403e7fe4df314a1c269aba3cf632ffa7d1f68cfeba096fdd8ba963e6500",
+      "bytes": 37632
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-fr.png",
+      "sha256": "6a5d2a8f43140614041ea4a7c8a1da2eeb42ef1ee5f4036e59b761a2c64b5043",
+      "bytes": 97110
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-en.mmd",
+      "sha256": "eb414c51096307751e24cf9f63ca707e851a6a7b07c5f26c2001fc448dc6bc0d",
+      "bytes": 1733
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-en.svg",
+      "sha256": "3ed77a29b4327907316354b42431b97a4955a113d8149017c833c99347c1d5ea",
+      "bytes": 37569
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-en.png",
+      "sha256": "9ad7c0e0ed4ac12c86c7504e6c7cfc42820b212255ea64e90cb3c9b0f7733ba4",
+      "bytes": 99968
+    },
+    {
+      "path": "docs/diagrams/memory-identity-fr.mmd",
+      "sha256": "270e8521ba035709e8564e16bb13c53c790df5e41c992586213c2464eff5d8df",
+      "bytes": 2307
+    },
+    {
+      "path": "docs/diagrams/memory-identity-fr.svg",
+      "sha256": "99bf7002bfbc7e8d2f7b87c6c9620c1163d23b4b065b838edaa8e219151b4ef6",
+      "bytes": 36941
+    },
+    {
+      "path": "docs/diagrams/memory-identity-fr.png",
+      "sha256": "f27d42ba19a3815281e5c0fec9ddfd5a028ede961b081b4a83054ce2f4dc8fc2",
+      "bytes": 113282
+    },
+    {
+      "path": "docs/diagrams/memory-identity-en.mmd",
+      "sha256": "f069334ab9ad969e00d4d0ed6005b390b5e5cff82af7314aece9345f2bf3e810",
+      "bytes": 2262
+    },
+    {
+      "path": "docs/diagrams/memory-identity-en.svg",
+      "sha256": "a2ab98d11e4f33b0dc6067f36eb0f9bc7b19154d3fa86fe4f7fe368f82876b17",
+      "bytes": 37213
+    },
+    {
+      "path": "docs/diagrams/memory-identity-en.png",
+      "sha256": "6aae9a04c418f157cba54dc429d847f630a16708669884176898e75e4dc0669f",
+      "bytes": 117470
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/video/apercu.png",
+      "sha256": "606f8188c0337777bb0641510ce6b5936b27a5381e235d66a0eeb269b1c35f78",
+      "bytes": 431256
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md",
+      "sha256": "d9019379b4d1a8e43bfa490164f3688008e025e71a0d25f2f1b48144e0692924",
+      "bytes": 5625
+    }
+  ],
+  "before_snapshots": {
+    "README.md": {
+      "sha256": "337558e4c89a2e6747aed990253a8f7b1d89893e96e93ac158868da9d9fb67d7",
+      "bytes": 28801
+    },
+    "README.en.md": {
+      "sha256": "17bfe1f19d769d0d66033f0eb75cda6324f9f100e3b3d9c65c01650b7d6fd3a8",
+      "bytes": 18252
+    },
+    "docs/diagrams/README.md": {
+      "sha256": "e724c63f3665e79d7d6405ad42b3f1622d156eba62e46431657c940e85f3e5af",
+      "bytes": 3887
+    },
+    "docs/diagrams/mermaid-config.json": {
+      "sha256": "c0c2f4004458e3537547181e466bb145f354c7ad60f14eb44d5a7c7a45312549",
+      "bytes": 687
+    },
+    "docs/diagrams/memory-identity-fr.mmd": {
+      "sha256": "135c67765c4e984be7f1c0b2adedeb899a8b4b47ee5171cb29972ee7cf3adc04",
+      "bytes": 2247
+    },
+    "docs/diagrams/memory-identity-fr.svg": {
+      "sha256": "b5d9b58d1bcbe6397187f5e5959670380c08fa534611e944ca286f44f52ba21f",
+      "bytes": 34958
+    },
+    "docs/diagrams/memory-identity-fr.png": {
+      "sha256": "49aa423151260fa533191358a902a1526831d8ac9d2474e9fcde36ec5fce5039",
+      "bytes": 136422
+    },
+    "docs/diagrams/memory-identity-en.mmd": {
+      "sha256": "a6b4a97bb0b7eb9a922ae82d9d3031d34924f9290476c1b6228078267c6a2d26",
+      "bytes": 2185
+    },
+    "docs/diagrams/memory-identity-en.svg": {
+      "sha256": "706ab360f0365f4765be01514ae9ed6ea917950704654fc7d16b15079f513404",
+      "bytes": 35215
+    },
+    "docs/diagrams/memory-identity-en.png": {
+      "sha256": "0a2f1e32ffacb811582f9c136a0a08b98c7acd51eb68b2c8a7e487ae455e18ba",
+      "bytes": 139680
+    }
+  },
+  "baseline_location": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/readme-before",
+  "owned_text_diff": {
+    "path": "readme-refresh.patch",
+    "sha256": "b44db2c15e429be79c9d3883e7318395cd8bf98b0c032b4ac14c9f69307e82ea",
+    "scope": "Exact pre-edit snapshots for root README files, diagram documentation and memory sources; new architecture sources. Editorial index link addition is recorded separately by final hash."
+  },
+  "sources_observed_at_review": [
+    {
+      "path": "docs/PRODUCT-ARCHITECTURE.md",
+      "sha256": "e3d946e78513bfd500d6dcf6e1fb153369efd1e0ecf7bb62e45408c5548bfe5d",
+      "bytes": 7930
+    },
+    {
+      "path": "docs/architecture/RUST-MIGRATION.md",
+      "sha256": "61946176c05856b2488a8a2d998bbb39f0c7d7a8e0c0e242a3419091233c0db5",
+      "bytes": 561018
+    },
+    {
+      "path": "docs/plans/migration-rust/PLAN.md",
+      "sha256": "fd65dcd2cb2afcbb59dac935fa232e57a3c84f033fb85181a82bede6740e94ae",
+      "bytes": 53028
+    },
+    {
+      "path": "docs/architecture/RUN-SUPERVISION.md",
+      "sha256": "7e683f910245320bd7c21061a69e0b45421ba8222ae3cbf94c7ad9b2f99f5a1e",
+      "bytes": 19670
+    },
+    {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59",
+      "bytes": 99353
+    },
+    {
+      "path": "docs/PROJECT-MEMORY.md",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13",
+      "bytes": 45994
+    },
+    {
+      "path": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+      "sha256": "5103687bb52f19ab08eaabde219965651ca65fc88dc0c23961648a5be324cda2",
+      "bytes": 17449
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-apex.md",
+      "sha256": "07a3b77b0fb8b72a0e51e0074fdb82121491707fc0b4efd5dcd7d7041e6bfafb",
+      "bytes": 34663
+    },
+    {
+      "path": "docs/publications/20261022-console-live/README.md",
+      "sha256": "f3d01e1f8974340896e7c3ae7d3873d1ec17b1817cfe2ebd3211f2abfeb810c1",
+      "bytes": 1667
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/README.md",
+      "sha256": "6f5af8b1e5e6927e97e85f21c3c3607dd42f932fc9950de934465ce9969c9f99",
+      "bytes": 5248
+    },
+    {
+      "path": "build.sh",
+      "sha256": "05811cd8695a75abe03eaa0def11b6e1c2a91414345bf1cd53428f909d39806c",
+      "bytes": 3437
+    },
+    {
+      "path": "tools/swarm_local.py",
+      "sha256": "15c9fd46ac83fdc2b9a03d5541616c34a46fb9c0624478081eb5c4f6259e02f3",
+      "bytes": 12104
+    },
+    {
+      "path": "tools/swarm_version.py",
+      "sha256": "712140f641da0ef06d4cd20e1e71596dcd84071e5c9ef8b5838a6eb6175568a1",
+      "bytes": 8700
+    },
+    {
+      "path": "rust/crates/swarm-cli/Cargo.toml",
+      "sha256": "f71c724ee8ec9a4286c34634d387238674cc1c83c618fb5861fe35691be88558",
+      "bytes": 911
+    }
+  ],
+  "checks": {
+    "FR_EN_structure": "Same main sections, seven maturity rows, architecture responsibilities, memory/identity limits, four AC-02 visual references, source links and installation scope reviewed semantically in both languages.",
+    "markdown_preview": {
+      "scope": "Local Markdown preview, not GitHub remote rendering or application runtime",
+      "reports": [
+        {
+          "lang": "fr",
+          "theme": "light",
+          "layout": "desktop",
+          "links": 101,
+          "localLinks": 97,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "fr",
+          "theme": "light",
+          "layout": "mobile",
+          "links": 101,
+          "localLinks": 97,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "desktop",
+          "links": 101,
+          "localLinks": 97,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "mobile",
+          "links": 101,
+          "localLinks": 97,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "en",
+          "theme": "light",
+          "layout": "desktop",
+          "links": 101,
+          "localLinks": 97,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "en",
+          "theme": "light",
+          "layout": "mobile",
+          "links": 101,
+          "localLinks": 97,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "en",
+          "theme": "dark",
+          "layout": "desktop",
+          "links": 101,
+          "localLinks": 97,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "en",
+          "theme": "dark",
+          "layout": "mobile",
+          "links": 101,
+          "localLinks": 97,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        }
+      ]
+    },
+    "diagrams": {
+      "mermaid": "11.12.0",
+      "results": [
+        {
+          "name": "architecture-overview-fr",
+          "title": "Swarm : architecture logique et intégrations restantes",
+          "description": "Le cockpit et la CLI utilisent les opérations publiques. Le superviseur décide, le moteur vérifie et applique, les agents produisent, la revue examine. Le moteur persiste l’état. Le portage Rust est partiel ; identité publique et confinement AC-02 restent à raccorder.",
+          "viewBox": "0 15 1293.953125 691.7535400390625",
+          "nodes": 9,
+          "edges": 12
+        },
+        {
+          "name": "architecture-overview-en",
+          "title": "Swarm: logical architecture and pending integrations",
+          "description": "The cockpit and CLI use public operations. The supervisor decides, the engine checks and applies, agents produce, and review examines. The engine persists state. Rust porting is partial; public identity integration and AC-02 confinement remain pending.",
+          "viewBox": "0 15 1287.09375 709.9205932617188",
+          "nodes": 9,
+          "edges": 12
+        },
+        {
+          "name": "memory-identity-fr",
+          "title": "Swarm : fondations Go, mémoire et identité",
+          "description": "Le workflow et la mémoire versionnée décrivent le socle historique Go. Le portage Rust est en cours. Les liaisons en pointillés représentent le raccord identité restant : lanceurs, propriété, auteur, droits mémoire et approbation humaine.",
+          "viewBox": "0 -15 1197.78515625 1058.6463623046875",
+          "nodes": 8,
+          "edges": 9
+        },
+        {
+          "name": "memory-identity-en",
+          "title": "Swarm: Go foundations, memory and identity",
+          "description": "Workflow and versioned memory describe the historical Go foundation. Rust porting is in progress. Dashed links represent pending identity integration: launchers, ownership, authorship, memory rights and human approval.",
+          "viewBox": "0 -15 1181.1171875 1078.4464111328125",
+          "nodes": 8,
+          "edges": 9
+        }
+      ]
+    },
+    "svg_integrity": "4/4: accessible title/description, explicit background, no foreignObject. All four rendered diagrams visually inspected.",
+    "preview_visual_inspection": [
+      "fr-light-desktop-top",
+      "en-dark-desktop-architecture",
+      "fr-dark-mobile-top",
+      "en-light-mobile-architecture"
+    ],
+    "mobile_diagram_access": "Clickable SVG images plus explicit full-size links; paragraph text explains responsibilities independently of scaled diagrams.",
+    "media_probes": [
+      {
+        "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.mp4",
+        "duration": 120.0,
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1920,
+            "height": 1080
+          }
+        ]
+      },
+      {
+        "path": "docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR_V2.mp4",
+        "duration": 63.0,
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1080,
+            "height": 1350
+          }
+        ]
+      },
+      {
+        "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.mp4",
+        "duration": 24.0,
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 900
+          }
+        ]
+      },
+      {
+        "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.mp4",
+        "duration": 24.0,
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 900
+          }
+        ]
+      },
+      {
+        "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.mp4",
+        "duration": 24.0,
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 900
+          }
+        ]
+      },
+      {
+        "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.mp4",
+        "duration": 24.0,
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 900
+          }
+        ]
+      },
+      {
+        "path": "docs/training/casa-pizza/tutoriels/media/03-client-en.mp4",
+        "duration": 30.0,
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 900
+          }
+        ]
+      },
+      {
+        "path": "docs/training/casa-pizza/tutoriels/media/03-client-fr.mp4",
+        "duration": 30.0,
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 900
+          }
+        ]
+      },
+      {
+        "path": "docs/training/casa-pizza/tutoriels/media/04-restaurant-en.mp4",
+        "duration": 42.0,
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 900
+          }
+        ]
+      },
+      {
+        "path": "docs/training/casa-pizza/tutoriels/media/04-restaurant-fr.mp4",
+        "duration": 42.0,
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 900
+          }
+        ]
+      }
+    ],
+    "video_unchanged": "Original 120-second MP4 hash unchanged. Prior full decode evidence remains in video-review.json; unchanged media were probed, not re-encoded.",
+    "poster": "Exact decoded frame at 00:10 from the existing MP4; no generated application screen.",
+    "git_diff_check": {
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "scope": "Tracked diff plus explicit whitespace check on every final Markdown/Mermaid file in the 17-file inventory."
+    },
+    "mermaid_config_unchanged": true,
+    "final_inventory": "All 17 final file hashes match; 4 Mermaid sources render; 10 MP4 paths probe successfully; 8 local Markdown previews pass."
+  },
+  "recovery": [
+    {
+      "observed": "Preview architecture anchor check failed.",
+      "cause": "The local renderer used about:blank and a base URL; #architecture navigated away from the document.",
+      "action": "Serve rendered Markdown at its synthetic README URL without a base element.",
+      "verification": "Architecture anchor click passes in all 8 final previews.",
+      "proof": "Original attempt preserved in .cache/editorial-swarm-20261023/readme-preview/attempt-01.txt."
+    },
+    {
+      "observed": "English README linked to nonexistent docs/en/WORKFLOWS.md.",
+      "cause": "Assumed an English sibling path rather than checking the file inventory.",
+      "action": "Use the existing root WORKFLOWS.md and label the link French.",
+      "verification": "All local README links resolve in final check.",
+      "lesson": "Check actual localized paths; explicitly identify a French-only destination."
+    },
+    {
+      "observed": "Existing overview/memory labels said current without a Go/Rust distinction; installation text mixed historical scripts and native development; no-release wording contradicted v0.1.0.",
+      "action": "Separate historical Go, scoped native Rust and saved future AC-02, including diagram text and historical installation section.",
+      "verification": "Manual comparison with migration plan, launcher producer/build script, identity and memory contracts."
+    }
+  ],
+  "review_axes": {
+    "hardcoded_policies": "Not applicable to product execution: no executable policy changed. Video durations, diagram render dimensions and preview widths are media/presentation inputs, not operator limits.",
+    "public_or_nontrivial_functions": "No maintained function changed. Temporary rendering/check scripts are not product sources. Diagram regeneration and scope are documented in docs/diagrams/README.md.",
+    "errors": "No product error branch changed. Review preserves preview harness failure and missing-link correction; historical/refusal/unknown-state limits remain visible in README text.",
+    "effective_build_inputs": "No build executed, no fixture/production profile qualification claimed. Cargo package/binary names and historical Go build path inspected in their producers."
+  },
+  "documentation_and_transmission": "Both root README languages, localized Mermaid/exports and diagram documentation updated together; editorial index links this receipt. Existing dirty work was snapshotted. No embedded agent context or running process refreshed.",
+  "version_history": "Unchanged: README/diagram documentation is not an installed runtime delivery; no new running version or application evolution note is claimed.",
+  "limits": [
+    "Local Markdown preview uses a GitHub-like layout, not GitHub hosted rendering.",
+    "Public reference URLs are retained from previously read/pinned sources; no fresh web-availability audit in this increment.",
+    "No application tests, production build, server start/restart, live mission mutation, provider invocation, publication, commit or push.",
+    "No independent reviewer or user editorial acceptance claimed.",
+    "AC-02 A0-A7 remain saved and not started; English explainer video remains a future option, while Casa Pizza has both languages."
+  ]
+}

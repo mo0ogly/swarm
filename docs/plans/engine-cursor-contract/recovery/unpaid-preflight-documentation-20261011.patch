@@ -1,0 +1,110 @@
+diff --git a/docs/ATTEMPT-RECOVERY.md b/docs/ATTEMPT-RECOVERY.md
+index 1ebe741..4605e34 100644
+--- a/docs/ATTEMPT-RECOVERY.md
++++ b/docs/ATTEMPT-RECOVERY.md
+@@ -174,7 +174,8 @@ la tentative courante arrêtée. La nouvelle remise conserve l’ancienne répar
+ son avis et sa coordination dans l’événement durable ; leurs références Git et
+ reçus restent intacts. Elle exige ses propres contrôles et un nouvel avis. Une
+ deuxième soumission implicite de la même tentative reste refusée ; une correction
+-de ce résultat passe par `revise-recovered-result` et son refus indépendant attribué.
++de ce résultat passe par `revise-recovered-result` et son refus indépendant attribué, ou le précontrôle
++sans appel vérifié décrit plus bas.
+ 
+ Après examen du diff et des preuves, indexer la copie avec `git add -A`, relever
+ `git write-tree`, puis fournir à la commande un JSON contenant `schema_version: 1`,
+@@ -324,3 +325,29 @@ Une décision opérateur distincte, `swarm planning restart-task`, peut autorise
+ une seule nouvelle production après examen du résultat courant. Ce n’est ni une
+ cinquième tentative automatique ni une remise à zéro. Voir les
+ [conditions et empreintes du redémarrage](ENGINE-RECOVERY.md#repartir-sur-une-tâche-bloquée).
++
++### Corriger un précontrôle sans appel après interruption
++
++Une réparation externe peut avoir une déclaration complète et passer les
++contrôles, puis échouer avant toute revue parce qu’une pièce de contexte est
++trop grande. La même tentative arrêtée peut être corrigée explicitement par
++`planning revise-recovered-result`, sans `review_id` puisqu’aucun avis n’existe.
++Fournir les identités, la révision courante, `confirm_recovery`, un motif concret
++et le nouvel `result_tree` examiné ; l’arbre doit différer du résultat conservé.
++
++Le moteur relit le précontrôle conservé : cause connue sans appel, tâche bloquée,
++agent/tentative courants, processus effectivement terminé, résultat attribuable,
++checkpoint candidat et reçu concordants avec base/contrat/contrôles. Leur
++altération refuse la reprise avant mutation. Une erreur arbitraire n’autorise
++pas cette correction. Le résultat, l’avis éventuel, les références et reçus
++antérieurs restent conservés ; des contrôles et une revue frais couvrent le
++nouveau candidat. Le rejeu n’ajoute aucun appel, essai ou remboursement.
++
++Un grand manifeste d’intégrité peut être réparti en plusieurs fichiers complets,
++chacun lié par SHA-256 à son manifeste parent. Le harness reconstruit toutes
++les entrées avant d’en vérifier le digest cumulé. Ce découpage ne retire aucune
++preuve, ne relève aucun plafond et ne renouvelle aucune acceptation historique.
++
++Les seuils de durée et de silence restent des observations aussi en mode
++plafonds actifs. Le changement de mode concerne les plafonds d’exécution et
++les tentatives ; la décision IA de conduite conserve son attribution.
+diff --git a/docs/en/ATTEMPT-RECOVERY.md b/docs/en/ATTEMPT-RECOVERY.md
+index acb0bb7..571e225 100644
+--- a/docs/en/ATTEMPT-RECOVERY.md
++++ b/docs/en/ATTEMPT-RECOVERY.md
+@@ -161,7 +161,8 @@ current stopped attempt. The durable event preserves the old repair, review and
+ coordination; their Git references and receipts remain intact. The new submission
+ requires its own checks and a fresh review. Another implicit submission of the
+ same attempt remains rejected; correcting that result uses
+-`revise-recovered-result` and its attributed independent rejection.
++`revise-recovered-result` and its attributed independent rejection, or the
++verified no-call preflight described below.
+ 
+ After reviewing the diff and evidence, run `git add -A` and `git write-tree` in the
+ copy. Supply JSON with `schema_version: 1`, `event_id`, `expected_revision`,
+@@ -172,8 +173,8 @@ mandatory even for legacy attempts.
+ 
+ Normal checks and independent review still cover the same candidate. A rejection
+ stays blocked; no fifth attempt is created. Replaying the same event uses the
+-recorded revision and does not repeat a rejected review. A second repair submission
+-for the task is refused. Review incidents use the existing explicit retry path.
++recorded revision and does not repeat a rejected review. Another implicit submission
++of the same attempt is refused. Review incidents use the existing explicit retry path.
+ 
+ Oversized review context can come from unchanged diff lines. Above 160 KiB of
+ serialized context, the engine uses three Git context lines instead of forty.
+@@ -260,8 +261,8 @@ Tasks using human review retain their existing workflow.
+ 
+ ## Recovery and tool budgets
+ 
+-The last authorized tool may finish and its result is retained within the
+-existing deadlines. Additional calls remain prohibited; repetition and error
++The last authorized tool may finish and its result is retained. Duration
++thresholds send observations to the owner; they do not stop production. Additional calls remain prohibited; repetition and error
+ guards stay active. An interruption does not validate the work.
+ 
+ A new attempt receives a bounded summary of operations observed in the previous
+@@ -300,3 +301,29 @@ operator decision, `swarm planning restart-task`, can authorize exactly one new
+ production after examining the current result. This is neither an automatic fifth
+ attempt nor a counter reset. See the
+ [restart conditions and evidence bindings](ENGINE-RECOVERY.md#restarting-a-blocked-task).
++
++### Correct a no-call preflight after interruption
++
++An external repair may have complete delivery and pass controls, then fail
++before any review because one context artifact is too large. Explicit
++`planning revise-recovered-result` can correct that same stopped attempt
++without `review_id`, since no opinion exists. Supply the current identities
++and revision, `confirm_recovery`, a concrete reason and the examined new
++`result_tree`; its tree must differ from the retained result.
++
++The engine rereads the retained preflight: a known no-call cause, blocked task,
++current agent/attempt, confirmed process exit, attributed result, and candidate
++checkpoint/receipt matching the base, contract and controls. Tampering refuses
++the correction before mutation. An arbitrary controller error grants no such
++permission. Previous results, opinions where present, references and receipts
++remain retained. Fresh controls and review cover the new candidate. Replay
++grants no additional call, attempt or refund.
++
++A large integrity manifest may use several complete files, each linked by
++SHA-256 to its parent manifest. The harness reconstructs every input before
++checking the aggregate digest. Packaging removes no evidence, raises no
++limit and renews no historical acceptance.
++
++Duration and silence thresholds remain observations with caps enabled as well.
++Changing the mode affects execution caps and attempts; AI conduct decisions
++retain their attribution.

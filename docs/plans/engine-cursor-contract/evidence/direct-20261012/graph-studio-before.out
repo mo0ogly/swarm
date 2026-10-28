@@ -1,0 +1,9 @@
+AssertionError [ERR_ASSERTION]: fullscreen control missing
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/graph_studio_ui.cjs:13:8 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: null,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

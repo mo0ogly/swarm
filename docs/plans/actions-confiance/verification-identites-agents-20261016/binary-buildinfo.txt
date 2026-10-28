@@ -1,0 +1,33 @@
+/tmp/swarm-ia1-build-_bj_x21c/swarm: go1.24.3
+	path	swarm.local/companion/cmd/swarm
+	mod	swarm.local/companion	v0.1.1-0.20261014170123-4e58f7cbf820+dirty	
+	dep	github.com/cilium/ebpf	v0.19.0	h1:Ro/rE64RmFBeA9FGjcTc+KmCeY6jXmryu6FfnzPRIao=
+	dep	github.com/coreos/go-oidc/v3	v3.17.0	h1:hWBGaQfbi0iVviX4ibC7bk8OKT5qNr4klBaCHVNvehc=
+	dep	github.com/dlclark/regexp2	v1.11.5	h1:Q/sSnsKerHeCkc/jSTNq1oCm7KiVgUMZRDUoRu0JQZQ=
+	dep	github.com/dustin/go-humanize	v1.0.1	h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
+	dep	github.com/go-jose/go-jose/v4	v4.1.4	h1:moDMcTHmvE6Groj34emNPLs/qtYXRVcd6S7NHbHz3kA=
+	dep	github.com/google/uuid	v1.6.0	h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+	dep	github.com/remyoudompheng/bigfft	v0.0.0-20230129092748-24d4a6f8daec	h1:W09IVJc94icq4NjY3clb7Lk8O1qJ8BdBEF8z0ibU0rE=
+	dep	github.com/rivo/uniseg	v0.4.7	h1:WUdvkW8uEhrYfLC4ZzdpI2ztxP1I582+49Oc5Mq64VQ=
+	dep	github.com/tiktoken-go/tokenizer	v0.6.2	h1:t0GN2DvcUZSFWT/62YOgoqb10y7gSXBGs0A+4VCQK+g=
+	dep	golang.org/x/exp	v0.0.0-20230315142452-642cacee5cc0	h1:pVgRXcIictcr+lBQIFeiwuwtDIs4eL21OuM9nyAADmo=
+	dep	golang.org/x/oauth2	v0.28.0	h1:CrgCKl8PPAVtLnU3c+EDw6x11699EWlsDeWNWKdIOkc=
+	dep	golang.org/x/sys	v0.31.0	h1:ioabZlmFYtWhL+TRYpcnNlLwhyxaM9kWTDEmfnprqik=
+	dep	modernc.org/libc	v1.61.13	h1:3LRd6ZO1ezsFiX1y+bHd1ipyEHIJKvuprv0sLTBwLW8=
+	dep	modernc.org/mathutil	v1.7.1	h1:GCZVGXdaN8gTqB1Mf/usp1Y/hSqgI2vAGGP4jZMCxOU=
+	dep	modernc.org/memory	v1.8.2	h1:cL9L4bcoAObu4NkxOlKWBWtNHIsnnACGF/TbqQ6sbcI=
+	dep	modernc.org/sqlite	v1.36.3	h1:qYMYlFR+rtLDUzuXoST1SDIdEPbX8xzuhdF90WsX1ss=
+	build	-buildmode=exe
+	build	-compiler=gc
+	build	CGO_ENABLED=1
+	build	CGO_CFLAGS=
+	build	CGO_CPPFLAGS=
+	build	CGO_CXXFLAGS=
+	build	CGO_LDFLAGS=
+	build	GOARCH=amd64
+	build	GOOS=linux
+	build	GOAMD64=v1
+	build	vcs=git
+	build	vcs.revision=4e58f7cbf8200a58f69f1f4d03d657c3313fb642
+	build	vcs.time=2026-10-14T17:01:23Z
+	build	vcs.modified=true

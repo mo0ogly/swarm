@@ -1,0 +1,6 @@
+{"ImportPath":"swarm.local/companion/internal/enrollmentauthority [swarm.local/companion/internal/enrollmentauthority.test]","Action":"build-output","Output":"# swarm.local/companion/internal/enrollmentauthority [swarm.local/companion/internal/enrollmentauthority.test]\n"}
+{"ImportPath":"swarm.local/companion/internal/enrollmentauthority [swarm.local/companion/internal/enrollmentauthority.test]","Action":"build-output","Output":"internal/enrollmentauthority/reply_version_test.go:39:90: undefined: enrollmentstate.ErrReplyVersion\n"}
+{"ImportPath":"swarm.local/companion/internal/enrollmentauthority [swarm.local/companion/internal/enrollmentauthority.test]","Action":"build-fail"}
+{"Time":"2026-10-17T13:56:08.318800941+02:00","Action":"start","Package":"swarm.local/companion/internal/enrollmentauthority"}
+{"Time":"2026-10-17T13:56:08.318879198+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentauthority","Output":"FAIL\tswarm.local/companion/internal/enrollmentauthority [build failed]\n"}
+{"Time":"2026-10-17T13:56:08.31889613+02:00","Action":"fail","Package":"swarm.local/companion/internal/enrollmentauthority","Elapsed":0,"FailedBuild":"swarm.local/companion/internal/enrollmentauthority [swarm.local/companion/internal/enrollmentauthority.test]"}

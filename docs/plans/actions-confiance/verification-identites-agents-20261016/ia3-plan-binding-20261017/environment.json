@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-17T07:45:27.339181+00:00",
+  "provenance": "Captured during final tests, before separate race/static/build checks",
+  "commands": [
+    {
+      "command": [
+        "go",
+        "version"
+      ],
+      "exit_code": 0,
+      "stdout": "go version go1.24.3 linux/amd64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "uname",
+        "-srmo"
+      ],
+      "exit_code": 0,
+      "stdout": "Linux 6.17.0-41-generic x86_64 GNU/Linux\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "bwrap",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "bubblewrap 0.11.0\n",
+      "stderr": ""
+    }
+  ]
+}

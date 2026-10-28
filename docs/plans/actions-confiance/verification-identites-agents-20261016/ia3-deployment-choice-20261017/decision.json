@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-17",
+  "timezone": "Europe/Paris",
+  "user_instruction": "on fait 1 mais on prevois 2 possible pour l’avenir la configuration de l’installation initiale et la partie ux gerera ca et la documentation sera claire dessus : ici on est en dev et pilote mais a l’avenir les clients voudront 2 je pense",
+  "adopted": "local service under separate system account with verified confinement for development/pilot",
+  "future_target": "remote authority on separate machine and administration, selected by initial setup and managed in Admin UX",
+  "not_established": [
+    "real service deployment",
+    "confinement of all agents",
+    "current authority at final execution",
+    "remote adapter",
+    "customer demand evidence"
+  ],
+  "principal_initial": "not yet designated",
+  "scope": "Architecture decision, initial setup/Admin requirements and documentation; no host provisioning"
+}

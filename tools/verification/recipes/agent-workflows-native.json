@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "agent-workflows-native",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/**/*",
+    ".claude/skills/*/SKILL.md",
+    "tools/agent-workflows/check.py",
+    "tools/agent-workflows/test_check.py",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/verification/recipes/agent-workflows-native.json"
+  ],
+  "environment": {
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0"
+  },
+  "steps": [
+    {
+      "id": "checker-guards",
+      "command": [
+        "python3",
+        "tools/agent-workflows/test_check.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 8 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "actual-native-contexts",
+      "command": [
+        "python3",
+        "tools/agent-workflows/check.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 native roles, 9 named native tests"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

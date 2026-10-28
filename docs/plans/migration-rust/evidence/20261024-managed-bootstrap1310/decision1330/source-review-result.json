@@ -1,0 +1,3122 @@
+{
+  "coverage_status": "PASS",
+  "contract_status": "DECLARED_REVIEW_COMPLETE",
+  "files": 5,
+  "open_findings": [],
+  "lexical_candidates": {
+    "rust/crates/swarm-engine/src/lib.rs": {
+      "policies": [
+        {
+          "line": 457,
+          "text": "            Self::Version => write!(f, \"engine request: schema_version must equal 1\"),"
+        },
+        {
+          "line": 486,
+          "text": "    let value = projection::project(raw, request::FIELDS_REQUEST, true).map_err(|e| match e {"
+        },
+        {
+          "line": 499,
+          "text": "    if value.schema_version != 1 {"
+        }
+      ],
+      "functions": [
+        {
+          "line": 439,
+          "text": "    pub fn code(&self) -> &'static str {"
+        },
+        {
+          "line": 447,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 462,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 470,
+          "text": "    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {"
+        },
+        {
+          "line": 485,
+          "text": "pub fn decode_request(raw: &[u8]) -> Result<Request, Error> {"
+        },
+        {
+          "line": 492,
+          "text": "pub fn encode_request(value: &Request) -> Result<Vec<u8>, Error> {"
+        },
+        {
+          "line": 497,
+          "text": "pub fn decode_external_request(raw: &[u8]) -> Result<Request, Error> {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 442,
+          "text": "            _ => \"format\","
+        },
+        {
+          "line": 451,
+          "text": "                \"engine request: format ({:?}, line {}, column {})\","
+        },
+        {
+          "line": 469,
+          "text": "impl std::error::Error for Error {"
+        },
+        {
+          "line": 470,
+          "text": "    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {"
+        },
+        {
+          "line": 474,
+          "text": "            _ => None,"
+        },
+        {
+          "line": 489,
+          "text": "    })?;"
+        },
+        {
+          "line": 498,
+          "text": "    let mut value = decode_request(raw)?;"
+        },
+        {
+          "line": 500,
+          "text": "        return Err(Error::Version);"
+        }
+      ]
+    },
+    "rust/crates/swarm-engine/src/local_storage.rs": {
+      "policies": [
+        {
+          "line": 21,
+          "text": "/// not a persisted execution policy, retry or permission."
+        },
+        {
+          "line": 129,
+          "text": "    owned_mode(file, directory, true)"
+        },
+        {
+          "line": 140,
+          "text": "        || (private && metadata.mode() & 0o077 != 0)"
+        },
+        {
+          "line": 141,
+          "text": "        || (!directory && metadata.nlink() != 1)"
+        },
+        {
+          "line": 165,
+          "text": "    owned_mode(file, false, false)?;"
+        },
+        {
+          "line": 172,
+          "text": "    owned(file, false)"
+        },
+        {
+          "line": 191,
+          "text": "        if let Err(e)=owned(&file,true) { return close_after(Err(e),file); }"
+        },
+        {
+          "line": 249,
+          "text": "            owned(&file, true)"
+        },
+        {
+          "line": 264,
+          "text": "        if let Err(error) = owned(&file, true) {"
+        },
+        {
+          "line": 270,
+          "text": "    /// private directory permissions. Reserved for telemetry's existing 0755"
+        },
+        {
+          "line": 277,
+          "text": "        if let Err(error) = owned_mode(&file, true, false) {"
+        },
+        {
+          "line": 287,
+          "text": "        owned_mode(&self.file,true,false)?;"
+        },
+        {
+          "line": 296,
+          "text": "            || name.contains('\\0')"
+        },
+        {
+          "line": 316,
+          "text": "        if let Err(error) = owned(&file, false) {"
+        },
+        {
+          "line": 334,
+          "text": "                .and_then(|n| n.checked_add(1))"
+        },
+        {
+          "line": 379,
+          "text": "    /// No timeout, retries or alternative lock name is invented. Open/flock/close"
+        },
+        {
+          "line": 393,
+          "text": "    /// caller can retry only after a changed precondition. No retry/deadline policy"
+        },
+        {
+          "line": 414,
+          "text": "        let fd = rustix::io::fcntl_dupfd_cloexec(&self.file, 0)"
+        },
+        {
+          "line": 423,
+          "text": "        owned(&self.file, true)?;"
+        },
+        {
+          "line": 464,
+          "text": "    /// usual ownership/regular/private/single-link checks remain mandatory."
+        },
+        {
+          "line": 486,
+          "text": "    /// no bytes are rewritten. Open/sync/close causes remain joined, no retry or"
+        },
+        {
+          "line": 516,
+          "text": "            owned(&file, true)?;"
+        },
+        {
+          "line": 519,
+          "text": "                usize::from(u16::MAX) + 1 + std::mem::align_of::<u64>()"
+        },
+        {
+          "line": 561,
+          "text": "    /// Only the inherited Go retry file permits public read bits and 4096 bytes."
+        },
+        {
+          "line": 566,
+          "text": "            \"storage-retry.json\","
+        },
+        {
+          "line": 573,
+          "text": "            owned_mode(&file, false, false)?;"
+        },
+        {
+          "line": 576,
+          "text": "                .take(4097)"
+        },
+        {
+          "line": 579,
+          "text": "            if data.len() > 4096 {"
+        },
+        {
+          "line": 584,
+          "text": "                        \"legacy retry file exceeds Go format bound\","
+        },
+        {
+          "line": 612,
+          "text": "        close_after(owned(&views, true), views)?;"
+        },
+        {
+          "line": 642,
+          "text": "                    close_after(owned(&file, true), file)?;"
+        },
+        {
+          "line": 701,
+          "text": "    /// Fault variants are absent in normal builds; no process or retry is created."
+        },
+        {
+          "line": 730,
+          "text": "                file.write_all(data.get(..1).unwrap_or_default())"
+        },
+        {
+          "line": 859,
+          "text": "    /// Real directory/descriptor witness in the default image's unit suite."
+        },
+        {
+          "line": 897,
+          "text": "                disk::remove_dir_all(&self.0).unwrap();"
+        },
+        {
+          "line": 912,
+          "text": "            let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 940,
+          "text": "            let temporary: Vec<_> = disk::read_dir(&f.0)"
+        },
+        {
+          "line": 954,
+          "text": "                assert_eq!(temporary.len(), 1);"
+        },
+        {
+          "line": 970,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 971,
+          "text": "        let writer = dir.reserve(true, true).unwrap();"
+        },
+        {
+          "line": 973,
+          "text": "            dir.reserve(false, false).err().unwrap().operation,"
+        },
+        {
+          "line": 977,
+          "text": "            dir.reserve(true, false).err().unwrap().operation,"
+        },
+        {
+          "line": 981,
+          "text": "        let a = dir.reserve(false, false).unwrap();"
+        },
+        {
+          "line": 982,
+          "text": "        let b = dir.reserve(false, false).unwrap();"
+        },
+        {
+          "line": 983,
+          "text": "        assert!(dir.reserve(true, false).is_err());"
+        },
+        {
+          "line": 986,
+          "text": "        dir.reserve(true, false).unwrap().close().unwrap();"
+        },
+        {
+          "line": 996,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 1003,
+          "text": "        assert_eq!(disk::read(f.0.join(\"target\")).unwrap(), b\"original\");"
+        },
+        {
+          "line": 1004,
+          "text": "        symlink(\"target\", f.0.join(\"link\")).unwrap();"
+        },
+        {
+          "line": 1009,
+          "text": "        assert!(f.0.join(\"link\").is_symlink());"
+        },
+        {
+          "line": 1010,
+          "text": "        assert_eq!(disk::read(f.0.join(\"target\")).unwrap(), b\"original\");"
+        },
+        {
+          "line": 1011,
+          "text": "        let names: Vec<_> = disk::read_dir(&f.0)"
+        },
+        {
+          "line": 1015,
+          "text": "        assert_eq!(names.len(), 2);"
+        },
+        {
+          "line": 1026,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 1029,
+          "text": "        assert_eq!(disk::read(f.0.join(\"control\")).unwrap(), b\"control\");"
+        },
+        {
+          "line": 1030,
+          "text": "        disk::remove_file(f.0.join(\"control\")).unwrap();"
+        },
+        {
+          "line": 1032,
+          "text": "        let gate = Arc::new(Barrier::new(3));"
+        },
+        {
+          "line": 1035,
+          "text": "            let path = f.0.clone();"
+        },
+        {
+          "line": 1052,
+          "text": "        assert_eq!(outcomes.iter().filter(|(won, _)| *won).count(), 1);"
+        },
+        {
+          "line": 1054,
+          "text": "            disk::read(f.0.join(\"target\")).unwrap(),"
+        },
+        {
+          "line": 1055,
+          "text": "            outcomes.iter().find(|(won, _)| *won).unwrap().1"
+        },
+        {
+          "line": 1057,
+          "text": "        assert_eq!(disk::read_dir(&f.0).unwrap().count(), 1);"
+        },
+        {
+          "line": 1066,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 1068,
+          "text": "        symlink(\"missing\", f.0.join(\"link\")).unwrap();"
+        },
+        {
+          "line": 1070,
+          "text": "            f.0.join(std::ffi::OsStr::from_bytes(b\"nonutf8\\xff\")),"
+        },
+        {
+          "line": 1074,
+          "text": "        for _ in 0..2 {"
+        },
+        {
+          "line": 1090,
+          "text": "    /// wait/deadline/retry or alternate lock defeats another writer's reservation."
+        },
+        {
+          "line": 1095,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 1097,
+          "text": "        assert!(f.0.join(\"providers.lock\").is_file());"
+        },
+        {
+          "line": 1132,
+          "text": "            if !std::thread::panicking() { disk::remove_dir_all(&self.0).unwrap(); }"
+        },
+        {
+          "line": 1143,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 1145,
+          "text": "        let path = f.0.join(\"state.db\");"
+        },
+        {
+          "line": 1155,
+          "text": "        disk::hard_link(&path, f.0.join(\"hardlink\")).unwrap();"
+        },
+        {
+          "line": 1157,
+          "text": "        disk::remove_file(f.0.join(\"hardlink\")).unwrap();"
+        },
+        {
+          "line": 1158,
+          "text": "        disk::rename(&path, f.0.join(\"original.db\")).unwrap();"
+        },
+        {
+          "line": 1162,
+          "text": "        assert_eq!(disk::read(f.0.join(\"original.db\")).unwrap(), b\"retained original database bytes\");"
+        },
+        {
+          "line": 1172,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 1174,
+          "text": "        let path = f.0.join(\"state.db\");"
+        },
+        {
+          "line": 1177,
+          "text": "        disk::rename(&path, f.0.join(\"original.db\")).unwrap();"
+        },
+        {
+          "line": 1181,
+          "text": "        assert_eq!(disk::metadata(f.0.join(\"original.db\")).unwrap().mode() & 0o777, 0o600);"
+        },
+        {
+          "line": 1190,
+          "text": "    /// no elapsed timeout or parent-only SQLite query substitutes for this check."
+        },
+        {
+          "line": 1195,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 1197,
+          "text": "        let path = f.0.join(\"state.db\");"
+        },
+        {
+          "line": 1202,
+          "text": "                .args([\"--ignored\", \"--exact\", \"connected_database_identity::tests::connected_database_lock_child_process\", \"--nocapture\", \"--test-threads=1\"])"
+        }
+      ],
+      "functions": [
+        {
+          "line": 73,
+          "text": "    fn append_cleanup(&mut self, error: Self) {"
+        },
+        {
+          "line": 80,
+          "text": "    fn new(operation: LocalStorageOperation, cause: impl Error + Send + Sync + 'static) -> Self {"
+        },
+        {
+          "line": 88,
+          "text": "    pub fn code(&self) -> &'static str {"
+        },
+        {
+          "line": 97,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 102,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 107,
+          "text": "    fn source(&self) -> Option<&(dyn Error + 'static)> {"
+        },
+        {
+          "line": 111,
+          "text": "fn close(file: File, operation: LocalStorageOperation) -> Result<(), LocalStorageError> {"
+        },
+        {
+          "line": 114,
+          "text": "fn close_after<T>("
+        },
+        {
+          "line": 128,
+          "text": "fn owned(file: &File, directory: bool) -> Result<(), LocalStorageError> {"
+        },
+        {
+          "line": 131,
+          "text": "fn owned_mode(file: &File, directory: bool, private: bool) -> Result<(), LocalStorageError> {"
+        },
+        {
+          "line": 163,
+          "text": "fn privatize_database(file: &File) -> Result<(), LocalStorageError> {"
+        },
+        {
+          "line": 180,
+          "text": "    pub(crate) fn child(&self, name: &str, create: bool) -> Result<Self, LocalStorageError> {"
+        },
+        {
+          "line": 198,
+          "text": "    pub(crate) fn process_path(&self) -> std::path::PathBuf {"
+        },
+        {
+          "line": 206,
+          "text": "    pub(crate) fn rename_from(&self, source:&Self, from:&str, to:&str)->Result<(),LocalStorageError>{"
+        },
+        {
+          "line": 224,
+          "text": "    pub(crate) fn gate_descriptor(&self) -> std::os::fd::BorrowedFd<'_> {"
+        },
+        {
+          "line": 235,
+          "text": "    pub(crate) fn adopt_gate_descriptor(fd: std::os::fd::OwnedFd) -> Result<Self, LocalStorageError> {"
+        },
+        {
+          "line": 256,
+          "text": "    pub(crate) fn open(path: &Path) -> Result<Self, LocalStorageError> {"
+        },
+        {
+          "line": 273,
+          "text": "    pub(crate) fn open_owned(path: &Path) -> Result<Self, LocalStorageError> {"
+        },
+        {
+          "line": 286,
+          "text": "    pub(crate) fn owned_identity(&self) -> Result<(u64,u64),LocalStorageError> {"
+        },
+        {
+          "line": 291,
+          "text": "    fn name(name: &str) -> Result<(), LocalStorageError> {"
+        },
+        {
+          "line": 306,
+          "text": "    fn open_file(&self, name: &str, flags: OFlags) -> Result<File, LocalStorageError> {"
+        },
+        {
+          "line": 325,
+          "text": "    pub(crate) fn read_bounded("
+        },
+        {
+          "line": 362,
+          "text": "    pub(crate) fn read_capped("
+        },
+        {
+          "line": 381,
+          "text": "    pub(crate) fn reserve_pricing(&self) -> Result<LocalReservation, LocalStorageError> {"
+        },
+        {
+          "line": 396,
+          "text": "    pub(crate) fn reserve_provider_configuration("
+        },
+        {
+          "line": 413,
+          "text": "    pub(crate) fn duplicate(&self) -> Result<Self, LocalStorageError> {"
+        },
+        {
+          "line": 422,
+          "text": "    pub(crate) fn identity(&self) -> Result<(u64, u64), LocalStorageError> {"
+        },
+        {
+          "line": 438,
+          "text": "    pub(crate) fn prepare_database_for_initialization(&self) -> Result<(), LocalStorageError> {"
+        },
+        {
+          "line": 468,
+          "text": "    pub(crate) fn database_identity(&self) -> Result<(u64, u64), LocalStorageError> {"
+        },
+        {
+          "line": 477,
+          "text": "    pub(crate) fn regular_identity(&self, name: &str) -> Result<(u64, u64), LocalStorageError> {"
+        },
+        {
+          "line": 489,
+          "text": "    pub(crate) fn synchronize_existing(&self, name: &str) -> Result<(), LocalStorageError> {"
+        },
+        {
+          "line": 506,
+          "text": "    pub(crate) fn names(&self) -> Result<Vec<Vec<u8>>, LocalStorageError> {"
+        },
+        {
+          "line": 538,
+          "text": "    pub(crate) fn read_native_receipt(&self, name: &str) -> Result<Vec<u8>, LocalStorageError> {"
+        },
+        {
+          "line": 544,
+          "text": "    pub(crate) fn read(&self, name: &str) -> Result<Vec<u8>, LocalStorageError> {"
+        },
+        {
+          "line": 563,
+          "text": "    pub(crate) fn read_legacy_retry(&self) -> Result<Vec<u8>, LocalStorageError> {"
+        },
+        {
+          "line": 592,
+          "text": "    pub(crate) fn initialize_layout(&self) -> Result<(), LocalStorageError> {"
+        },
+        {
+          "line": 632,
+          "text": "    pub(crate) fn validate_layout(&self) -> Result<(), LocalStorageError> {"
+        },
+        {
+          "line": 655,
+          "text": "    pub(crate) fn reserve("
+        },
+        {
+          "line": 684,
+          "text": "    pub(crate) fn publish(&self, name: &str, data: &[u8]) -> Result<(), LocalStorageError> {"
+        },
+        {
+          "line": 689,
+          "text": "    pub(crate) fn publish_with_fault("
+        },
+        {
+          "line": 703,
+          "text": "    pub(crate) fn publish_new_with_fault("
+        },
+        {
+          "line": 714,
+          "text": "    fn publish_mode("
+        },
+        {
+          "line": 833,
+          "text": "    pub(crate) fn close(self) -> Result<(), LocalStorageError> {"
+        },
+        {
+          "line": 841,
+          "text": "    pub(crate) fn close(self) -> Result<(), LocalStorageError> {"
+        },
+        {
+          "line": 863,
+          "text": "    fn directory_binding_duplicate_preserves_identity_and_cloexec() {"
+        },
+        {
+          "line": 887,
+          "text": "        fn new() -> Self {"
+        },
+        {
+          "line": 895,
+          "text": "        fn drop(&mut self) {"
+        },
+        {
+          "line": 902,
+          "text": "    fn publication_faults_preserve_original_or_report_visible_uncertain_write_and_recover() {"
+        },
+        {
+          "line": 968,
+          "text": "    fn write_reservation_excludes_readers_and_writers_and_release_restores_access() {"
+        },
+        {
+          "line": 993,
+          "text": "    fn create_only_publication_preserves_existing_regular_and_symlink_targets() {"
+        },
+        {
+          "line": 1023,
+          "text": "    fn create_only_racing_publishers_never_overwrite_the_winning_bytes() {"
+        },
+        {
+          "line": 1063,
+          "text": "    fn provider_configuration_directory_names_preserve_bytes_and_fresh_cursor() {"
+        },
+        {
+          "line": 1093,
+          "text": "    fn provider_configuration_lock_refuses_contention_then_recovers() {"
+        },
+        {
+          "line": 1122,
+          "text": "        fn new() -> Self {"
+        },
+        {
+          "line": 1131,
+          "text": "        fn drop(&mut self) {"
+        },
+        {
+          "line": 1140,
+          "text": "    fn database_initialization_prepares_private_file_and_refuses_unsafe_targets() {"
+        },
+        {
+          "line": 1170,
+          "text": "    fn database_initialization_permission_repair_follows_owned_inode_after_rename() {"
+        },
+        {
+          "line": 1193,
+          "text": "    fn database_initialization_opath_chmod_preserves_cross_process_sqlite_lock() {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 8,
+          "text": "    error::Error,"
+        },
+        {
+          "line": 73,
+          "text": "    fn append_cleanup(&mut self, error: Self) {"
+        },
+        {
+          "line": 78,
+          "text": "        *slot = Some(Box::new(error));"
+        },
+        {
+          "line": 98,
+          "text": "        write!(f, \"{}: {:?}\", self.code(), self.operation)"
+        },
+        {
+          "line": 120,
+          "text": "        (Err(e), Ok(())) => Err(e),"
+        },
+        {
+          "line": 121,
+          "text": "        (Ok(_), Err(e)) => Err(e),"
+        },
+        {
+          "line": 122,
+          "text": "        (Err(mut e), Err(cleanup)) => {"
+        },
+        {
+          "line": 124,
+          "text": "            Err(e)"
+        },
+        {
+          "line": 134,
+          "text": "        .map_err(|e| LocalStorageError::new(LocalStorageOperation::Metadata, e))?;"
+        },
+        {
+          "line": 143,
+          "text": "        return Err(LocalStorageError::new("
+        },
+        {
+          "line": 161,
+          "text": "/// fallback to state.db or unsupported fchmodat2/AT_EMPTY_PATH emulation."
+        },
+        {
+          "line": 165,
+          "text": "    owned_mode(file, false, false)?;"
+        },
+        {
+          "line": 171,
+          "text": "    ).map_err(|error| LocalStorageError::new(LocalStorageOperation::Permissions, error))?;"
+        },
+        {
+          "line": 181,
+          "text": "        Self::name(name)?;"
+        },
+        {
+          "line": 184,
+          "text": "                Ok(()) => self.file.sync_all().map_err(|e|LocalStorageError::new(LocalStorageOperation::SyncDirectory,e))?,"
+        },
+        {
+          "line": 185,
+          "text": "                Err(e) if e==rustix::io::Errno::EXIST => {},"
+        },
+        {
+          "line": 186,
+          "text": "                Err(e) => return Err(LocalStorageError::new(LocalStorageOperation::CreateDirectory,e)),"
+        },
+        {
+          "line": 190,
+          "text": "            .map_err(|e|LocalStorageError::new(LocalStorageOperation::OpenDirectory,e))?.into();"
+        },
+        {
+          "line": 191,
+          "text": "        if let Err(e)=owned(&file,true) { return close_after(Err(e),file); }"
+        },
+        {
+          "line": 207,
+          "text": "        Self::name(from)?;Self::name(to)?;"
+        },
+        {
+          "line": 209,
+          "text": "            .map_err(|e|LocalStorageError::new(LocalStorageOperation::Rename,e))?;"
+        },
+        {
+          "line": 211,
+          "text": "        let mut error=None;"
+        },
+        {
+          "line": 213,
+          "text": "            if let Err(cause)=result {"
+        },
+        {
+          "line": 216,
+          "text": "                if let Some(primary)=error.as_mut(){LocalStorageError::append_cleanup(primary,e);}else{error=Some(e);}"
+        },
+        {
+          "line": 219,
+          "text": "        if let Some(error)=error {Err(error)}else{Ok(())}"
+        },
+        {
+          "line": 239,
+          "text": "                .map_err(|e| LocalStorageError::new(LocalStorageOperation::Metadata, e))?;"
+        },
+        {
+          "line": 241,
+          "text": "                .map_err(|e| LocalStorageError::new(LocalStorageOperation::Metadata, e))?;"
+        },
+        {
+          "line": 246,
+          "text": "                return Err(LocalStorageError::new(LocalStorageOperation::Metadata,"
+        },
+        {
+          "line": 253,
+          "text": "            Err(error) => close_after(Err(error), file),"
+        },
+        {
+          "line": 262,
+          "text": "        .map_err(|e| LocalStorageError::new(LocalStorageOperation::OpenDirectory, e))?"
+        },
+        {
+          "line": 264,
+          "text": "        if let Err(error) = owned(&file, true) {"
+        },
+        {
+          "line": 265,
+          "text": "            return close_after(Err(error), file);"
+        },
+        {
+          "line": 276,
+          "text": "            Mode::empty()).map_err(|error| LocalStorageError::new(LocalStorageOperation::OpenDirectory,error))?.into();"
+        },
+        {
+          "line": 277,
+          "text": "        if let Err(error) = owned_mode(&file, true, false) {"
+        },
+        {
+          "line": 278,
+          "text": "            return close_after(Err(error), file);"
+        },
+        {
+          "line": 287,
+          "text": "        owned_mode(&self.file,true,false)?;"
+        },
+        {
+          "line": 289,
+          "text": "            .map_err(|error| LocalStorageError::new(LocalStorageOperation::Metadata,error))"
+        },
+        {
+          "line": 298,
+          "text": "            Err(LocalStorageError::new("
+        },
+        {
+          "line": 307,
+          "text": "        Self::name(name)?;"
+        },
+        {
+          "line": 314,
+          "text": "        .map_err(|e| LocalStorageError::new(LocalStorageOperation::OpenFile, e))?"
+        },
+        {
+          "line": 316,
+          "text": "        if let Err(error) = owned(&file, false) {"
+        },
+        {
+          "line": 317,
+          "text": "            return close_after(Err(error), file);"
+        },
+        {
+          "line": 330,
+          "text": "        let mut file = self.open_file(name, OFlags::RDONLY)?;"
+        },
+        {
+          "line": 343,
+          "text": "                })?;"
+        },
+        {
+          "line": 348,
+          "text": "                .map_err(|e| LocalStorageError::new(LocalStorageOperation::Read, e))?;"
+        },
+        {
+          "line": 350,
+          "text": "                return Err(LocalStorageError::new("
+        },
+        {
+          "line": 360,
+          "text": "    /// None means the saved policy permits complete reading, not a hidden fallback."
+        },
+        {
+          "line": 370,
+          "text": "        let mut file = self.open_file(name, OFlags::RDONLY)?;"
+        },
+        {
+          "line": 382,
+          "text": "        let file = self.open_file(\"model-rates.lock\", OFlags::RDWR | OFlags::CREATE)?;"
+        },
+        {
+          "line": 383,
+          "text": "        if let Err(error) = fs::flock(&file, FlockOperation::LockExclusive) {"
+        },
+        {
+          "line": 385,
+          "text": "                Err(LocalStorageError::new(LocalStorageOperation::Lock, error)),"
+        },
+        {
+          "line": 392,
+          "text": "    /// like other Root try-lock guards. A busy/error result preserves its cause;"
+        },
+        {
+          "line": 399,
+          "text": "        let file = self.open_file(\"providers.lock\", OFlags::RDWR | OFlags::CREATE)?;"
+        },
+        {
+          "line": 400,
+          "text": "        if let Err(e) = fs::flock(&file, FlockOperation::NonBlockingLockExclusive) {"
+        },
+        {
+          "line": 402,
+          "text": "                Err(LocalStorageError::new(LocalStorageOperation::Lock, e)),"
+        },
+        {
+          "line": 415,
+          "text": "            .map_err(|e| LocalStorageError::new(LocalStorageOperation::DuplicateDirectory, e))?;"
+        },
+        {
+          "line": 423,
+          "text": "        owned(&self.file, true)?;"
+        },
+        {
+          "line": 427,
+          "text": "            .map_err(|e| LocalStorageError::new(LocalStorageOperation::Metadata, e))?;"
+        },
+        {
+          "line": 449,
+          "text": "            Err(error) if error == rustix::io::Errno::NOENT => {"
+        },
+        {
+          "line": 450,
+          "text": "                self.publish_new_with_fault(\"state.db\", b\"\", AtomicStorageFault::None)?;"
+        },
+        {
+          "line": 455,
+          "text": "                    .map_err(|error| LocalStorageError::new(LocalStorageOperation::OpenFile, error))?.into();"
+        },
+        {
+          "line": 458,
+          "text": "            Err(error) => Err(LocalStorageError::new(LocalStorageOperation::OpenFile, error)),"
+        },
+        {
+          "line": 478,
+          "text": "        let file = self.open_file(name, OFlags::PATH)?;"
+        },
+        {
+          "line": 481,
+          "text": "            .map_err(|error| LocalStorageError::new(LocalStorageOperation::Metadata, error));"
+        },
+        {
+          "line": 490,
+          "text": "        let file = self.open_file(name, OFlags::RDONLY)?;"
+        },
+        {
+          "line": 494,
+          "text": "        close_after(synced, file)?;"
+        },
+        {
+          "line": 513,
+          "text": "        .map_err(|e| LocalStorageError::new(LocalStorageOperation::OpenDirectory, e))?;"
+        },
+        {
+          "line": 516,
+          "text": "            owned(&file, true)?;"
+        },
+        {
+          "line": 525,
+          "text": "                    entry.map_err(|e| LocalStorageError::new(LocalStorageOperation::Read, e))?;"
+        },
+        {
+          "line": 539,
+          "text": "        let mut file = self.open_file(name, OFlags::RDONLY)?;"
+        },
+        {
+          "line": 545,
+          "text": "        let mut file = self.open_file(name, OFlags::RDONLY)?;"
+        },
+        {
+          "line": 553,
+          "text": "            (Err(e), Ok(())) => Err(e),"
+        },
+        {
+          "line": 554,
+          "text": "            (Ok(_), Err(e)) => Err(e),"
+        },
+        {
+          "line": 555,
+          "text": "            (Err(mut e), Err(cleanup)) => {"
+        },
+        {
+          "line": 557,
+          "text": "                Err(e)"
+        },
+        {
+          "line": 570,
+          "text": "        .map_err(|e| LocalStorageError::new(LocalStorageOperation::OpenFile, e))?"
+        },
+        {
+          "line": 573,
+          "text": "            owned_mode(&file, false, false)?;"
+        },
+        {
+          "line": 578,
+          "text": "                .map_err(|e| LocalStorageError::new(LocalStorageOperation::Read, e))?;"
+        },
+        {
+          "line": 580,
+          "text": "                return Err(LocalStorageError::new("
+        },
+        {
+          "line": 593,
+          "text": "        self.validate_layout()?;"
+        },
+        {
+          "line": 596,
+          "text": "            Err(e) if e == rustix::io::Errno::EXIST => {}"
+        },
+        {
+          "line": 597,
+          "text": "            Err(e) => {"
+        },
+        {
+          "line": 598,
+          "text": "                return Err(LocalStorageError::new("
+        },
+        {
+          "line": 610,
+          "text": "        .map_err(|e| LocalStorageError::new(LocalStorageOperation::OpenDirectory, e))?"
+        },
+        {
+          "line": 612,
+          "text": "        close_after(owned(&views, true), views)?;"
+        },
+        {
+          "line": 613,
+          "text": "        // Existing user-owned ignore content is preserved, never overwritten."
+        },
+        {
+          "line": 620,
+          "text": "                close_after(result, file)?;"
+        },
+        {
+          "line": 622,
+          "text": "            Err(e)"
+        },
+        {
+          "line": 626,
+          "text": "            Err(e) => return Err(e),"
+        },
+        {
+          "line": 642,
+          "text": "                    close_after(owned(&file, true), file)?;"
+        },
+        {
+          "line": 644,
+          "text": "                Err(e) if e == rustix::io::Errno::NOENT => {}"
+        },
+        {
+          "line": 645,
+          "text": "                Err(e) => {"
+        },
+        {
+          "line": 646,
+          "text": "                    return Err(LocalStorageError::new("
+        },
+        {
+          "line": 668,
+          "text": "        )?;"
+        },
+        {
+          "line": 669,
+          "text": "        if let Err(error) = fs::flock("
+        },
+        {
+          "line": 678,
+          "text": "                Err(LocalStorageError::new(LocalStorageOperation::Lock, error)),"
+        },
+        {
+          "line": 699,
+          "text": "    /// kernels/filesystems refuse; no fallback replaces a target. Same private"
+        },
+        {
+          "line": 722,
+          "text": "        let _ = fault;"
+        },
+        {
+          "line": 723,
+          "text": "        Self::name(name)?;"
+        },
+        {
+          "line": 725,
+          "text": "            .map_err(|e: RuntimeError| LocalStorageError::new(LocalStorageOperation::Entropy, e))?;"
+        },
+        {
+          "line": 726,
+          "text": "        let mut file = self.open_file(&temp, OFlags::WRONLY | OFlags::CREATE | OFlags::EXCL)?;"
+        },
+        {
+          "line": 731,
+          "text": "                    .map_err(|e| LocalStorageError::new(LocalStorageOperation::Write, e))?;"
+        },
+        {
+          "line": 732,
+          "text": "                return Err(LocalStorageError::new("
+        },
+        {
+          "line": 738,
+          "text": "                .map_err(|e| LocalStorageError::new(LocalStorageOperation::Write, e))?;"
+        },
+        {
+          "line": 744,
+          "text": "                return Err(LocalStorageError::new("
+        },
+        {
+          "line": 756,
+          "text": "                Err(LocalStorageError::new("
+        },
+        {
+          "line": 766,
+          "text": "            (Err(e), Ok(())) | (Ok(()), Err(e)) => Err(e),"
+        },
+        {
+          "line": 767,
+          "text": "            (Err(mut e), Err(cleanup)) => {"
+        },
+        {
+          "line": 769,
+          "text": "                Err(e)"
+        },
+        {
+          "line": 776,
+          "text": "                    return Err(LocalStorageError::new("
+        },
+        {
+          "line": 797,
+          "text": "                    let mut error = LocalStorageError::new("
+        },
+        {
+          "line": 801,
+          "text": "                    error.publication = PublicationState::RenamedDurabilityUnknown;"
+        },
+        {
+          "line": 802,
+          "text": "                    return Err(error);"
+        },
+        {
+          "line": 805,
+          "text": "                    let mut error = LocalStorageError::new(LocalStorageOperation::SyncDirectory, e);"
+        },
+        {
+          "line": 806,
+          "text": "                    error.publication = PublicationState::RenamedDurabilityUnknown;"
+        },
+        {
+          "line": 807,
+          "text": "                    error"
+        },
+        {
+          "line": 810,
+          "text": "        if let Err(mut error) = result {"
+        },
+        {
+          "line": 811,
+          "text": "            if error.publication == PublicationState::NotPublished {"
+        },
+        {
+          "line": 814,
+          "text": "                    error.append_cleanup(LocalStorageError::new("
+        },
+        {
+          "line": 818,
+          "text": "                    return Err(error);"
+        },
+        {
+          "line": 820,
+          "text": "                if let Err(e) = fs::unlinkat(&self.file, &temp, AtFlags::empty()) {"
+        },
+        {
+          "line": 822,
+          "text": "                        error.append_cleanup(LocalStorageError::new("
+        },
+        {
+          "line": 829,
+          "text": "            return Err(error);"
+        },
+        {
+          "line": 847,
+          "text": "            (Err(e), Ok(())) | (Ok(()), Err(e)) => Err(e),"
+        },
+        {
+          "line": 848,
+          "text": "            (Err(mut e), Err(cleanup)) => {"
+        },
+        {
+          "line": 850,
+          "text": "                Err(e)"
+        },
+        {
+          "line": 865,
+          "text": "        let path = std::env::temp_dir().join(generate_identifier(\"binding-storage-\").unwrap());"
+        },
+        {
+          "line": 869,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 870,
+          "text": "        let original = LocalDirectory::open(&path).unwrap();"
+        },
+        {
+          "line": 871,
+          "text": "        let duplicate = original.duplicate().unwrap();"
+        },
+        {
+          "line": 872,
+          "text": "        assert_eq!(original.identity().unwrap(), duplicate.identity().unwrap());"
+        },
+        {
+          "line": 874,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 876,
+          "text": "        duplicate.close().unwrap();"
+        },
+        {
+          "line": 877,
+          "text": "        original.close().unwrap();"
+        },
+        {
+          "line": 878,
+          "text": "        std::fs::remove_dir(&path).unwrap();"
+        },
+        {
+          "line": 888,
+          "text": "            let p = std::env::temp_dir().join(generate_identifier(\"atomic-storage-\").unwrap());"
+        },
+        {
+          "line": 889,
+          "text": "            disk::create_dir(&p).unwrap();"
+        },
+        {
+          "line": 890,
+          "text": "            disk::set_permissions(&p, disk::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 897,
+          "text": "                disk::remove_dir_all(&self.0).unwrap();"
+        },
+        {
+          "line": 912,
+          "text": "            let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 914,
+          "text": "                .unwrap();"
+        },
+        {
+          "line": 915,
+          "text": "            assert_eq!(dir.read(\"settings\").unwrap(), b\"original complete settings\");"
+        },
+        {
+          "line": 916,
+          "text": "            let error = dir"
+        },
+        {
+          "line": 921,
+          "text": "                    error.publication,"
+        },
+        {
+          "line": 924,
+          "text": "                assert_eq!(dir.read(\"settings\").unwrap(), b\"next complete settings\");"
+        },
+        {
+          "line": 926,
+          "text": "                assert_eq!(error.publication, PublicationState::NotPublished);"
+        },
+        {
+          "line": 927,
+          "text": "                assert_eq!(dir.read(\"settings\").unwrap(), b\"original complete settings\");"
+        },
+        {
+          "line": 931,
+          "text": "                    error"
+        },
+        {
+          "line": 933,
+          "text": "                        .unwrap()"
+        },
+        {
+          "line": 935,
+          "text": "                        .unwrap()"
+        },
+        {
+          "line": 941,
+          "text": "                .unwrap()"
+        },
+        {
+          "line": 942,
+          "text": "                .map(|v| v.unwrap())"
+        },
+        {
+          "line": 951,
+          "text": "                    error.cleanup.unwrap().operation,"
+        },
+        {
+          "line": 959,
+          "text": "                .unwrap();"
+        },
+        {
+          "line": 961,
+          "text": "                dir.read(\"settings\").unwrap(),"
+        },
+        {
+          "line": 964,
+          "text": "            dir.close().unwrap();"
+        },
+        {
+          "line": 970,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 971,
+          "text": "        let writer = dir.reserve(true, true).unwrap();"
+        },
+        {
+          "line": 973,
+          "text": "            dir.reserve(false, false).err().unwrap().operation,"
+        },
+        {
+          "line": 977,
+          "text": "            dir.reserve(true, false).err().unwrap().operation,"
+        },
+        {
+          "line": 980,
+          "text": "        writer.close().unwrap();"
+        },
+        {
+          "line": 981,
+          "text": "        let a = dir.reserve(false, false).unwrap();"
+        },
+        {
+          "line": 982,
+          "text": "        let b = dir.reserve(false, false).unwrap();"
+        },
+        {
+          "line": 984,
+          "text": "        a.close().unwrap();"
+        },
+        {
+          "line": 985,
+          "text": "        b.close().unwrap();"
+        },
+        {
+          "line": 986,
+          "text": "        dir.reserve(true, false).unwrap().close().unwrap();"
+        },
+        {
+          "line": 987,
+          "text": "        dir.close().unwrap();"
+        },
+        {
+          "line": 996,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 998,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 1003,
+          "text": "        assert_eq!(disk::read(f.0.join(\"target\")).unwrap(), b\"original\");"
+        },
+        {
+          "line": 1004,
+          "text": "        symlink(\"target\", f.0.join(\"link\")).unwrap();"
+        },
+        {
+          "line": 1010,
+          "text": "        assert_eq!(disk::read(f.0.join(\"target\")).unwrap(), b\"original\");"
+        },
+        {
+          "line": 1012,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 1013,
+          "text": "            .map(|e| e.unwrap().file_name())"
+        },
+        {
+          "line": 1016,
+          "text": "        dir.close().unwrap();"
+        },
+        {
+          "line": 1026,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 1028,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 1029,
+          "text": "        assert_eq!(disk::read(f.0.join(\"control\")).unwrap(), b\"control\");"
+        },
+        {
+          "line": 1030,
+          "text": "        disk::remove_file(f.0.join(\"control\")).unwrap();"
+        },
+        {
+          "line": 1031,
+          "text": "        dir.close().unwrap();"
+        },
+        {
+          "line": 1039,
+          "text": "                let dir = LocalDirectory::open(&path).unwrap();"
+        },
+        {
+          "line": 1042,
+          "text": "                if let Err(e) = result {"
+        },
+        {
+          "line": 1046,
+          "text": "                dir.close().unwrap();"
+        },
+        {
+          "line": 1051,
+          "text": "        let outcomes: Vec<_> = workers.into_iter().map(|w| w.join().unwrap()).collect();"
+        },
+        {
+          "line": 1054,
+          "text": "            disk::read(f.0.join(\"target\")).unwrap(),"
+        },
+        {
+          "line": 1055,
+          "text": "            outcomes.iter().find(|(won, _)| *won).unwrap().1"
+        },
+        {
+          "line": 1057,
+          "text": "        assert_eq!(disk::read_dir(&f.0).unwrap().count(), 1);"
+        },
+        {
+          "line": 1066,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 1067,
+          "text": "        dir.publish(\"source\", b\"data\").unwrap();"
+        },
+        {
+          "line": 1068,
+          "text": "        symlink(\"missing\", f.0.join(\"link\")).unwrap();"
+        },
+        {
+          "line": 1073,
+          "text": "        .unwrap();"
+        },
+        {
+          "line": 1075,
+          "text": "            let mut names = dir.names().unwrap();"
+        },
+        {
+          "line": 1087,
+          "text": "        dir.close().unwrap();"
+        },
+        {
+          "line": 1095,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 1096,
+          "text": "        let first = dir.reserve_provider_configuration().unwrap();"
+        },
+        {
+          "line": 1098,
+          "text": "        let error = dir.reserve_provider_configuration().err().unwrap();"
+        },
+        {
+          "line": 1099,
+          "text": "        assert_eq!(error.operation, LocalStorageOperation::Lock);"
+        },
+        {
+          "line": 1100,
+          "text": "        first.close().unwrap();"
+        },
+        {
+          "line": 1102,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 1104,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 1105,
+          "text": "        dir.close().unwrap();"
+        },
+        {
+          "line": 1123,
+          "text": "            let path = std::env::temp_dir().join(generate_identifier(\"database-init-\").unwrap());"
+        },
+        {
+          "line": 1124,
+          "text": "            disk::create_dir(&path).unwrap();"
+        },
+        {
+          "line": 1125,
+          "text": "            disk::set_permissions(&path, disk::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 1130,
+          "text": "        /// Remove only this owned fixture after success; preserve it on panic."
+        },
+        {
+          "line": 1132,
+          "text": "            if !std::thread::panicking() { disk::remove_dir_all(&self.0).unwrap(); }"
+        },
+        {
+          "line": 1143,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 1144,
+          "text": "        dir.prepare_database_for_initialization().unwrap();"
+        },
+        {
+          "line": 1146,
+          "text": "        assert_eq!(disk::metadata(&path).unwrap().mode() & 0o777, 0o600);"
+        },
+        {
+          "line": 1147,
+          "text": "        assert_eq!(disk::read(&path).unwrap(), b\"\");"
+        },
+        {
+          "line": 1148,
+          "text": "        disk::write(&path, b\"retained original database bytes\").unwrap();"
+        },
+        {
+          "line": 1149,
+          "text": "        disk::set_permissions(&path, disk::Permissions::from_mode(0o644)).unwrap();"
+        },
+        {
+          "line": 1150,
+          "text": "        let inode = disk::metadata(&path).unwrap().ino();"
+        },
+        {
+          "line": 1151,
+          "text": "        dir.prepare_database_for_initialization().unwrap();"
+        },
+        {
+          "line": 1152,
+          "text": "        assert_eq!(disk::metadata(&path).unwrap().ino(), inode);"
+        },
+        {
+          "line": 1153,
+          "text": "        assert_eq!(disk::metadata(&path).unwrap().mode() & 0o777, 0o600);"
+        },
+        {
+          "line": 1154,
+          "text": "        assert_eq!(disk::read(&path).unwrap(), b\"retained original database bytes\");"
+        },
+        {
+          "line": 1155,
+          "text": "        disk::hard_link(&path, f.0.join(\"hardlink\")).unwrap();"
+        },
+        {
+          "line": 1157,
+          "text": "        disk::remove_file(f.0.join(\"hardlink\")).unwrap();"
+        },
+        {
+          "line": 1158,
+          "text": "        disk::rename(&path, f.0.join(\"original.db\")).unwrap();"
+        },
+        {
+          "line": 1159,
+          "text": "        symlink(\"original.db\", &path).unwrap();"
+        },
+        {
+          "line": 1162,
+          "text": "        assert_eq!(disk::read(f.0.join(\"original.db\")).unwrap(), b\"retained original database bytes\");"
+        },
+        {
+          "line": 1163,
+          "text": "        dir.close().unwrap();"
+        },
+        {
+          "line": 1167,
+          "text": "    /// magic link remains attached to the owned original inode; no path fallback."
+        },
+        {
+          "line": 1172,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 1173,
+          "text": "        dir.prepare_database_for_initialization().unwrap();"
+        },
+        {
+          "line": 1175,
+          "text": "        let held: File = fs::openat(&dir.file, \"state.db\", OFlags::PATH | OFlags::NOFOLLOW | OFlags::CLOEXEC, Mode::empty()).unwrap().into();"
+        },
+        {
+          "line": 1176,
+          "text": "        disk::set_permissions(&path, disk::Permissions::from_mode(0o644)).unwrap();"
+        },
+        {
+          "line": 1177,
+          "text": "        disk::rename(&path, f.0.join(\"original.db\")).unwrap();"
+        },
+        {
+          "line": 1178,
+          "text": "        disk::write(&path, b\"replacement\").unwrap();"
+        },
+        {
+          "line": 1179,
+          "text": "        disk::set_permissions(&path, disk::Permissions::from_mode(0o644)).unwrap();"
+        },
+        {
+          "line": 1180,
+          "text": "        privatize_database(&held).unwrap();"
+        },
+        {
+          "line": 1181,
+          "text": "        assert_eq!(disk::metadata(f.0.join(\"original.db\")).unwrap().mode() & 0o777, 0o600);"
+        },
+        {
+          "line": 1182,
+          "text": "        assert_eq!(disk::metadata(&path).unwrap().mode() & 0o777, 0o644);"
+        },
+        {
+          "line": 1183,
+          "text": "        assert_ne!(held.metadata().unwrap().ino(), disk::metadata(&path).unwrap().ino());"
+        },
+        {
+          "line": 1184,
+          "text": "        close(held, LocalStorageOperation::CloseFile).unwrap();"
+        },
+        {
+          "line": 1185,
+          "text": "        dir.close().unwrap();"
+        },
+        {
+          "line": 1195,
+          "text": "        let dir = LocalDirectory::open(&f.0).unwrap();"
+        },
+        {
+          "line": 1196,
+          "text": "        dir.prepare_database_for_initialization().unwrap();"
+        },
+        {
+          "line": 1198,
+          "text": "        let db = rusqlite::Connection::open(&path).unwrap();"
+        },
+        {
+          "line": 1199,
+          "text": "        db.execute_batch(\"CREATE TABLE witness(value INTEGER); BEGIN IMMEDIATE\").unwrap();"
+        },
+        {
+          "line": 1201,
+          "text": "            let output = std::process::Command::new(std::env::current_exe().unwrap())"
+        },
+        {
+          "line": 1205,
+          "text": "                .output().unwrap();"
+        },
+        {
+          "line": 1209,
+          "text": "            assert!(String::from_utf8(output.stdout).unwrap().contains(&format!(\"OBSERVED independent SQLite lock {expected}\")));"
+        },
+        {
+          "line": 1212,
+          "text": "        disk::set_permissions(&path, disk::Permissions::from_mode(0o644)).unwrap();"
+        },
+        {
+          "line": 1213,
+          "text": "        dir.prepare_database_for_initialization().unwrap();"
+        },
+        {
+          "line": 1215,
+          "text": "        db.execute_batch(\"ROLLBACK\").unwrap();"
+        },
+        {
+          "line": 1217,
+          "text": "        db.close().unwrap();"
+        },
+        {
+          "line": 1218,
+          "text": "        dir.close().unwrap();"
+        }
+      ]
+    },
+    "rust/crates/swarm-engine/src/managed_repository.rs": {
+      "policies": [
+        {
+          "line": 20,
+          "text": "    let timeout = settings"
+        },
+        {
+          "line": 24,
+          "text": "    let deadline = timeout"
+        },
+        {
+          "line": 38,
+          "text": "        \"core.fsmonitor=false\","
+        },
+        {
+          "line": 40,
+          "text": "        \"commit.gpgsign=false\","
+        },
+        {
+          "line": 61,
+          "text": "        .env(\"GIT_CONFIG_NOSYSTEM\", \"1\")"
+        },
+        {
+          "line": 63,
+          "text": "        .env(\"GIT_TERMINAL_PROMPT\", \"0\")"
+        },
+        {
+          "line": 64,
+          "text": "        .env(\"GIT_OPTIONAL_LOCKS\", \"0\");"
+        },
+        {
+          "line": 121,
+          "text": "    crate::work::decode_mode(&bytes, crate::models::shape_managed_repository(), true)"
+        },
+        {
+          "line": 127,
+          "text": "    if !matches!(oid.len(), 40 | 64)"
+        },
+        {
+          "line": 156,
+          "text": "    if repo.snapshot_digest.len() != 64"
+        },
+        {
+          "line": 165,
+          "text": "        dir.child(\"repository.git\", false)"
+        },
+        {
+          "line": 228,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 236,
+          "text": "                            .child(\"managed\", true)"
+        },
+        {
+          "line": 241,
+          "text": "                                    .child(work, true)"
+        },
+        {
+          "line": 245,
+          "text": "                                        .reserve(true, true)"
+        },
+        {
+          "line": 316,
+          "text": "                dir.child(&staging_name, true)"
+        },
+        {
+          "line": 342,
+          "text": "                            .child(\"repository.git\", false)"
+        },
+        {
+          "line": 411,
+          "text": "        let child = dir.child(\"owned\", true).unwrap();"
+        },
+        {
+          "line": 414,
+          "text": "        assert!(dir.child(\"owned\", true).is_err());"
+        },
+        {
+          "line": 420,
+          "text": "        assert!(dir.child(\"../outside\", true).is_err());"
+        },
+        {
+          "line": 434,
+          "text": "        let staging = dir.child(\"staging\", true).unwrap();"
+        },
+        {
+          "line": 435,
+          "text": "        let source = staging.child(\"repository.git\", true).unwrap();"
+        },
+        {
+          "line": 437,
+          "text": "        let prior = dir.child(\"repository.git\", true).unwrap();"
+        },
+        {
+          "line": 452,
+          "text": "        dir.child(\"repository.git\", false).unwrap().close().unwrap();"
+        }
+      ],
+      "functions": [
+        {
+          "line": 19,
+          "text": "fn git(root: &Path, args: &[&str], settings: &EngineSettingsDocument) -> Result<Vec<u8>, E> {"
+        },
+        {
+          "line": 90,
+          "text": "fn hash(bytes: &[u8]) -> String {"
+        },
+        {
+          "line": 94,
+          "text": "fn text(bytes: Vec<u8>) -> Result<String, E> {"
+        },
+        {
+          "line": 98,
+          "text": "fn inside<T>("
+        },
+        {
+          "line": 111,
+          "text": "fn read_manifest(dir: &LocalDirectory, name: &str) -> Result<Option<ManagedRepository>, E> {"
+        },
+        {
+          "line": 126,
+          "text": "fn commit(dir: &Path, oid: &str, settings: &EngineSettingsDocument) -> Result<(), E> {"
+        },
+        {
+          "line": 142,
+          "text": "fn validate("
+        },
+        {
+          "line": 179,
+          "text": "pub(crate) fn prepare("
+        },
+        {
+          "line": 266,
+          "text": "fn locked("
+        },
+        {
+          "line": 406,
+          "text": "    fn directories_pin_inodes_and_refuse_symlink_children() {"
+        },
+        {
+          "line": 429,
+          "text": "    fn repository_rename_never_replaces_a_prior_target() {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 23,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 30,
+          "text": "        .transpose()?;"
+        },
+        {
+          "line": 69,
+          "text": "        Err(cause) => Err(E::caused("
+        },
+        {
+          "line": 76,
+          "text": "        Ok(run) if run.timed_out || !run.usage.status.success() => Err(E::caused("
+        },
+        {
+          "line": 114,
+          "text": "        .map_err(|e| E::caused(\"managed-manifest-list\", e))?;"
+        },
+        {
+          "line": 120,
+          "text": "        .map_err(|e| E::caused(\"managed-manifest-read\", e))?;"
+        },
+        {
+          "line": 132,
+          "text": "        return Err(E::Refused(\"managed-commit-invalid\"));"
+        },
+        {
+          "line": 135,
+          "text": "    if text(git(dir, &[\"rev-parse\", \"--verify\", &expression], settings)?)? != oid {"
+        },
+        {
+          "line": 136,
+          "text": "        return Err(E::Refused(\"managed-commit-not-canonical\"));"
+        },
+        {
+          "line": 154,
+          "text": "        return Err(E::Refused(\"managed-manifest-binding-mismatch\"));"
+        },
+        {
+          "line": 162,
+          "text": "        return Err(E::Refused(\"managed-snapshot-invalid\"));"
+        },
+        {
+          "line": 166,
+          "text": "            .map_err(|e| E::caused(\"managed-repository-open\", e))?,"
+        },
+        {
+          "line": 168,
+          "text": "            commit(&bare.process_path(), &repo.base_commit, settings)?;"
+        },
+        {
+          "line": 186,
+          "text": "        return Err(E::Refused(\"managed-work-id-invalid\"));"
+        },
+        {
+          "line": 194,
+          "text": "        return Err(E::Refused(\"managed-dirty-snapshot-unported\"));"
+        },
+        {
+          "line": 197,
+          "text": "        crate::canonical_project_root(root).map_err(|e| E::caused(\"managed-project-path\", e))?;"
+        },
+        {
+          "line": 199,
+          "text": "        .map_err(|e| E::caused(\"managed-source-path\", e))?;"
+        },
+        {
+          "line": 201,
+          "text": "        LocalDirectory::open_owned(&source).map_err(|e| E::caused(\"managed-source-open\", e))?,"
+        },
+        {
+          "line": 207,
+          "text": "            )?)?);"
+        },
+        {
+          "line": 210,
+          "text": "                .map_err(|e| E::caused(\"managed-project-outside-repository\", e))?;"
+        },
+        {
+          "line": 213,
+          "text": "                    .map_err(|e| E::caused(\"managed-request-encode\", e))?,"
+        },
+        {
+          "line": 224,
+          "text": "                    .ok_or(E::Refused(\"managed-project-encoding\"))?"
+        },
+        {
+          "line": 232,
+          "text": "                    .map_err(|e| E::caused(\"managed-state-directory\", e))?,"
+        },
+        {
+          "line": 237,
+          "text": "                            .map_err(|e| E::caused(\"managed-parent-directory\", e))?,"
+        },
+        {
+          "line": 242,
+          "text": "                                    .map_err(|e| E::caused(\"managed-work-directory\", e))?,"
+        },
+        {
+          "line": 246,
+          "text": "                                        .map_err(|e| E::caused(\"managed-operation-busy\", e))?;"
+        },
+        {
+          "line": 265,
+          "text": "/// original and present canonical commit objects. No source fallback is permitted."
+        },
+        {
+          "line": 272,
+          "text": "    let final_manifest = read_manifest(dir, \"repository.json\")?;"
+        },
+        {
+          "line": 273,
+          "text": "    let pending = read_manifest(dir, \"repository.json.pending\")?;"
+        },
+        {
+          "line": 280,
+          "text": "            return Err(E::Refused(\"managed-manifest-divergence\"));"
+        },
+        {
+          "line": 282,
+          "text": "        validate(retained, expected, dir, settings)?;"
+        },
+        {
+          "line": 286,
+          "text": "                .map_err(|e| E::caused(\"managed-pending-read\", e))?;"
+        },
+        {
+          "line": 292,
+          "text": "            .map_err(|e| E::caused(\"managed-manifest-publish\", e))?;"
+        },
+        {
+          "line": 298,
+          "text": "        .map_err(|e| E::caused(\"managed-storage-list\", e))?"
+        },
+        {
+          "line": 302,
+          "text": "        return Err(E::Refused(\"managed-orphan-repository\"));"
+        },
+        {
+          "line": 305,
+          "text": "        LocalDirectory::open_owned(top).map_err(|e| E::caused(\"managed-source-top\", e))?,"
+        },
+        {
+          "line": 311,
+          "text": "            )?)?;"
+        },
+        {
+          "line": 312,
+          "text": "            commit(&source.process_path(), &base, settings)?;"
+        },
+        {
+          "line": 314,
+          "text": "                .map_err(|e| E::caused(\"managed-staging-id\", e))?;"
+        },
+        {
+          "line": 317,
+          "text": "                    .map_err(|e| E::caused(\"managed-staging-directory\", e))?,"
+        },
+        {
+          "line": 331,
+          "text": "                                .ok_or(E::Refused(\"managed-source-encoding\"))?,"
+        },
+        {
+          "line": 334,
+          "text": "                                .ok_or(E::Refused(\"managed-storage-encoding\"))?,"
+        },
+        {
+          "line": 337,
+          "text": "                    )?;"
+        },
+        {
+          "line": 339,
+          "text": "                        .map_err(|e| E::caused(\"managed-copy-permissions\", e))?;"
+        },
+        {
+          "line": 343,
+          "text": "                            .map_err(|e| E::caused(\"managed-copy-open\", e))?,"
+        },
+        {
+          "line": 345,
+          "text": "                            commit(&bare.process_path(), &base, settings)?;"
+        },
+        {
+          "line": 351,
+          "text": "                                    top.to_str().ok_or(E::Refused(\"managed-source-encoding\"))?,"
+        },
+        {
+          "line": 354,
+          "text": "                            )?;"
+        },
+        {
+          "line": 359,
+          "text": "                            )?;"
+        },
+        {
+          "line": 364,
+          "text": "                            )?;"
+        },
+        {
+          "line": 367,
+          "text": "                    )?;"
+        },
+        {
+          "line": 373,
+          "text": "                            .map_err(|e| E::caused(\"managed-snapshot-encode\", e))?,"
+        },
+        {
+          "line": 376,
+          "text": "                        .map_err(|e| E::caused(\"managed-manifest-encode\", e))?;"
+        },
+        {
+          "line": 382,
+          "text": "                    .map_err(|e| E::caused(\"managed-pending-publish\", e))?;"
+        },
+        {
+          "line": 384,
+          "text": "                        .map_err(|e| E::caused(\"managed-copy-publish\", e))?;"
+        },
+        {
+          "line": 390,
+          "text": "                    .map_err(|e| E::caused(\"managed-manifest-publish\", e))?;"
+        },
+        {
+          "line": 407,
+          "text": "        let root = std::env::temp_dir().join(crate::generate_identifier(\"managed-dir-\").unwrap());"
+        },
+        {
+          "line": 408,
+          "text": "        std::fs::create_dir(&root).unwrap();"
+        },
+        {
+          "line": 409,
+          "text": "        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 410,
+          "text": "        let dir = LocalDirectory::open(&root).unwrap();"
+        },
+        {
+          "line": 411,
+          "text": "        let child = dir.child(\"owned\", true).unwrap();"
+        },
+        {
+          "line": 412,
+          "text": "        std::fs::rename(root.join(\"owned\"), root.join(\"moved\")).unwrap();"
+        },
+        {
+          "line": 413,
+          "text": "        symlink(root.join(\"moved\"), root.join(\"owned\")).unwrap();"
+        },
+        {
+          "line": 415,
+          "text": "        std::fs::write(child.process_path().join(\"pinned\"), b\"actual inode\").unwrap();"
+        },
+        {
+          "line": 417,
+          "text": "            std::fs::read(root.join(\"moved/pinned\")).unwrap(),"
+        },
+        {
+          "line": 421,
+          "text": "        child.close().unwrap();"
+        },
+        {
+          "line": 422,
+          "text": "        dir.close().unwrap();"
+        },
+        {
+          "line": 423,
+          "text": "        std::fs::remove_dir_all(root).unwrap();"
+        },
+        {
+          "line": 430,
+          "text": "        let root = std::env::temp_dir().join(crate::generate_identifier(\"managed-move-\").unwrap());"
+        },
+        {
+          "line": 431,
+          "text": "        std::fs::create_dir(&root).unwrap();"
+        },
+        {
+          "line": 432,
+          "text": "        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 433,
+          "text": "        let dir = LocalDirectory::open(&root).unwrap();"
+        },
+        {
+          "line": 434,
+          "text": "        let staging = dir.child(\"staging\", true).unwrap();"
+        },
+        {
+          "line": 435,
+          "text": "        let source = staging.child(\"repository.git\", true).unwrap();"
+        },
+        {
+          "line": 436,
+          "text": "        source.close().unwrap();"
+        },
+        {
+          "line": 437,
+          "text": "        let prior = dir.child(\"repository.git\", true).unwrap();"
+        },
+        {
+          "line": 438,
+          "text": "        prior.close().unwrap();"
+        },
+        {
+          "line": 439,
+          "text": "        std::fs::write(root.join(\"repository.git/original\"), b\"preserve\").unwrap();"
+        },
+        {
+          "line": 444,
+          "text": "            std::fs::read(root.join(\"repository.git/original\")).unwrap(),"
+        },
+        {
+          "line": 448,
+          "text": "        std::fs::remove_dir_all(root.join(\"repository.git\")).unwrap();"
+        },
+        {
+          "line": 450,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 452,
+          "text": "        dir.child(\"repository.git\", false).unwrap().close().unwrap();"
+        },
+        {
+          "line": 453,
+          "text": "        staging.close().unwrap();"
+        },
+        {
+          "line": 454,
+          "text": "        dir.close().unwrap();"
+        },
+        {
+          "line": 455,
+          "text": "        std::fs::remove_dir_all(root).unwrap();"
+        }
+      ]
+    },
+    "rust/crates/swarm-engine/src/work_engine.rs": {
+      "policies": [
+        {
+          "line": 108,
+          "text": "    /// classification performs no IO, retry, state change or authority decision."
+        },
+        {
+          "line": 137,
+          "text": "                rolled_back: true, .."
+        },
+        {
+          "line": 144,
+          "text": "    /// storage retry. No retry, event renaming or consumption reset occurs."
+        },
+        {
+          "line": 150,
+          "text": "                    rolled_back: false,"
+        },
+        {
+          "line": 261,
+          "text": "    /// no IO, default adoption or operation occurs in this builder."
+        },
+        {
+          "line": 284,
+          "text": "    /// v25 decisions apply task/delegation, same-task native production retry"
+        },
+        {
+          "line": 293,
+          "text": "    /// supports ordinary actions; changes_requested supports only same-task retry."
+        },
+        {
+          "line": 319,
+          "text": "    /// records consent=false. Unpause preserves mode/consent, never dispatches or"
+        },
+        {
+          "line": 323,
+          "text": "    /// explicit local consent; resume requires a current true record and preserves"
+        },
+        {
+          "line": 375,
+          "text": "            (Request{schema_version:change.schema_version,event_id:change.event_id.clone(),expected_revision:change.expected_revision,id:change.task_id.clone(),..Default::default()},"
+        },
+        {
+          "line": 385,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 399,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 409,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 424,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 435,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 447,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 560,
+          "text": "/// transaction as closure or retry. Runtime statuses are protocol, not a policy"
+        },
+        {
+          "line": 569,
+          "text": "            \"SELECT id FROM main.agents WHERE work_id=? AND task_id=? AND status IN ('queued','starting','running','stopping') LIMIT 1\","
+        },
+        {
+          "line": 637,
+          "text": "        let empty = Work::default();"
+        },
+        {
+          "line": 652,
+          "text": "                replayed: true,"
+        },
+        {
+          "line": 658,
+          "text": "            schema_version: 1,"
+        },
+        {
+          "line": 664,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 830,
+          "text": "                for op in request.operations.iter().flatten().filter(|op| matches!(op.kind.as_str(), \"retry\" | \"review-retry\")) {"
+        },
+        {
+          "line": 831,
+          "text": "                    require_native_task_idle(tx, &candidate.id, &op.id, \"planning-retry-worker-active\")?;"
+        },
+        {
+          "line": 884,
+          "text": "                apply_work_creation(&mut candidate, r, crate::GitState::default())"
+        },
+        {
+          "line": 887,
+          "text": "                apply_checkpoint(&mut candidate, r, root, crate::GitState::default())"
+        },
+        {
+          "line": 938,
+          "text": "                gate.document.0.get().as_bytes(),"
+        },
+        {
+          "line": 1021,
+          "text": "        .checked_add(1)"
+        },
+        {
+          "line": 1062,
+          "text": "                replayed: false,"
+        },
+        {
+          "line": 1068,
+          "text": "            replayed: true,"
+        }
+      ],
+      "functions": [
+        {
+          "line": 21,
+          "text": "    fn check(&self, db: &Connection, work: &str, now: &str) -> Result<(), WorkEngineError>;"
+        },
+        {
+          "line": 24,
+          "text": "    fn check_agent(&self, db:&Connection,work:&str,now:&str,_settings:&crate::EngineSettingsDocument)->Result<(),WorkEngineError>{self.check(db,work,now)}"
+        },
+        {
+          "line": 27,
+          "text": "    fn mission_conductor(&self)->Option<&str>{None}"
+        },
+        {
+          "line": 29,
+          "text": "    fn mission_profile(&self)->Option<&crate::LaunchProfile>{None}"
+        },
+        {
+          "line": 34,
+          "text": "    fn mission_binding(&self,_db:&Connection,_agent:&crate::Agent,_receipt:MutationFenceReceipt<'_>)->Result<Option<crate::GoRaw>,WorkEngineError>{Ok(None)}"
+        },
+        {
+          "line": 39,
+          "text": "    fn finishing_planner(&self, _db: &Connection, _run: &crate::planning_run_store::Run, _event: &str, _now: &str) -> Result<(), WorkEngineError> {"
+        },
+        {
+          "line": 44,
+          "text": "    fn stage_receipt("
+        },
+        {
+          "line": 109,
+          "text": "    pub fn code(&self) -> &'static str {"
+        },
+        {
+          "line": 145,
+          "text": "    pub fn requires_reconciliation(&self) -> bool {"
+        },
+        {
+          "line": 161,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 178,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 183,
+          "text": "    fn source(&self) -> Option<&(dyn Error + 'static)> {"
+        },
+        {
+          "line": 218,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 237,
+          "text": "    pub fn new("
+        },
+        {
+          "line": 255,
+          "text": "    pub fn with_quality_policy(mut self, policy: Option<&'a crate::QualityPolicySnapshot>) -> Self {"
+        },
+        {
+          "line": 262,
+          "text": "    pub fn with_planning_settings(mut self, settings: &'a crate::EngineSettingsDocument) -> Self {"
+        },
+        {
+          "line": 269,
+          "text": "    pub(crate) fn with_mutation_fence(mut self, fence: Option<&'a dyn MutationFence>) -> Self {"
+        },
+        {
+          "line": 329,
+          "text": "    pub fn execute_external("
+        },
+        {
+          "line": 564,
+          "text": "fn require_native_task_idle(db: &Connection, work: &str, task: &str, worker_refusal: &'static str) -> Result<(), WorkEngineError> {"
+        },
+        {
+          "line": 603,
+          "text": "fn apply<E: WorkEnvironment>("
+        }
+      ],
+      "errors": [
+        {
+          "line": 14,
+          "text": "use std::{collections::BTreeMap, error::Error, fmt, path::Path};"
+        },
+        {
+          "line": 40,
+          "text": "        Err(WorkEngineError::PlanningActivation(Box::new(crate::AgentLaunchError::Refused(\"planning-closure-native-run-active\"))))"
+        },
+        {
+          "line": 142,
+          "text": "    /// A commit error or transaction loss requires observing actual state before"
+        },
+        {
+          "line": 173,
+          "text": "            _ => f.write_str(self.code()),"
+        },
+        {
+          "line": 208,
+          "text": "            _ => None,"
+        },
+        {
+          "line": 336,
+          "text": "            Some(((if action==crate::MissionControlAction::Start {crate::decode_mission_start_request(raw)} else if action==crate::MissionControlAction::Priority {crate::decode_mission_priority_request(raw)} else {crate::decode_mission_control_request(raw)}).map_err(|e| WorkEngineError::Mission(Box::new(e)))?, action))"
+        },
+        {
+          "line": 339,
+          "text": "            Some(crate::decode_quota_change(raw).map_err(WorkEngineError::Quota)?)"
+        },
+        {
+          "line": 342,
+          "text": "            Some(crate::decode_task_report_request(raw).map_err(WorkEngineError::TaskReport)?)"
+        },
+        {
+          "line": 347,
+          "text": "            Some(crate::decode_task_model_request(raw).map_err(WorkEngineError::TaskModel)?)"
+        },
+        {
+          "line": 353,
+          "text": "                crate::decode_planning_request(raw).map_err(WorkEngineError::PlanningRequest)?;"
+        },
+        {
+          "line": 355,
+          "text": "                .map_err(WorkEngineError::PlanningControl)?;"
+        },
+        {
+          "line": 361,
+          "text": "            let mut change = crate::decode_budget_change(raw).map_err(WorkEngineError::Budget)?;"
+        },
+        {
+          "line": 362,
+          "text": "            crate::validate_budget_change(&change).map_err(WorkEngineError::Budget)?;"
+        },
+        {
+          "line": 370,
+          "text": "            Some(crate::decode_gate_request(raw).map_err(WorkEngineError::GateRequest)?)"
+        },
+        {
+          "line": 376,
+          "text": "             crate::encode_model(change).map_err(|e|WorkEngineError::Mission(Box::new(crate::mission_control_request::cause(\"mission-control-request-encoding\",e))))?)"
+        },
+        {
+          "line": 392,
+          "text": "                })?,"
+        },
+        {
+          "line": 401,
+          "text": "                crate::AgentLaunchError::caused(\"quota-request-encoding\", e)))?)"
+        },
+        {
+          "line": 416,
+          "text": "                })?,"
+        },
+        {
+          "line": 427,
+          "text": "                    .map_err(WorkEngineError::PlanningEncoding)?,"
+        },
+        {
+          "line": 438,
+          "text": "                    .map_err(|error| WorkEngineError::Budget(crate::BudgetError::Decode(error)))?,"
+        },
+        {
+          "line": 449,
+          "text": "                crate::encode_gate_request_intent(gate).map_err(WorkEngineError::GateRequest)?,"
+        },
+        {
+          "line": 452,
+          "text": "            let request = decode_external_request(raw).map_err(WorkEngineError::Request)?;"
+        },
+        {
+          "line": 453,
+          "text": "            validate_work_request(kind, &request).map_err(WorkEngineError::Definition)?;"
+        },
+        {
+          "line": 454,
+          "text": "            let intent = encode_work_mutation_intent(&request).map_err(WorkEngineError::Request)?;"
+        },
+        {
+          "line": 457,
+          "text": "        let mut tx = self.db.transaction().map_err(WorkEngineError::Sql)?;"
+        },
+        {
+          "line": 463,
+          "text": "                    .map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 464,
+          "text": "                fence.check(&tx, work, &at)?;"
+        },
+        {
+          "line": 489,
+          "text": "            )?;"
+        },
+        {
+          "line": 496,
+          "text": "                    })?;"
+        },
+        {
+          "line": 506,
+          "text": "                    )?;"
+        },
+        {
+          "line": 511,
+          "text": "                    .map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 512,
+          "text": "                fence.check(&tx, work, &at)?;"
+        },
+        {
+          "line": 519,
+          "text": "                tx.rollback().map_err(WorkEngineError::ReplayRollback)?;"
+        },
+        {
+          "line": 524,
+          "text": "                Err(cause) => {"
+        },
+        {
+          "line": 531,
+          "text": "                    Err(WorkEngineError::Commit {"
+        },
+        {
+          "line": 541,
+          "text": "            Err(primary) => {"
+        },
+        {
+          "line": 544,
+          "text": "                    return Err(WorkEngineError::TransactionLost {"
+        },
+        {
+          "line": 549,
+          "text": "                    Ok(()) => Err(primary),"
+        },
+        {
+          "line": 550,
+          "text": "                    Err(cleanup) => Err(WorkEngineError::Rollback {"
+        },
+        {
+          "line": 566,
+          "text": "        crate::root_store::require_validation_idle(db, work, task)?;"
+        },
+        {
+          "line": 567,
+          "text": "        crate::RootStore::require_idle_task_review(db, work, task)?;"
+        },
+        {
+          "line": 569,
+          "text": "            \"SELECT id FROM main.agents WHERE work_id=? AND task_id=? AND status IN ('queued','starting','running','stopping') LIMIT 1\","
+        },
+        {
+          "line": 570,
+          "text": "            rusqlite::params![work, task], |rows| Ok(rows.next()?.is_some()))?;"
+        },
+        {
+          "line": 571,
+          "text": "        if active { return Err(crate::AgentLaunchError::Refused(worker_refusal)); }"
+        },
+        {
+          "line": 595,
+          "text": "/// a typed guard, validation, observation, overflow or storage error. Git reads"
+        },
+        {
+          "line": 597,
+          "text": "/// must roll back/discard on error and separately reconcile a failed commit."
+        },
+        {
+          "line": 628,
+          "text": "            .map_err(WorkEngineError::Guard)?;"
+        },
+        {
+          "line": 645,
+          "text": "                .map_err(|e| WorkEngineError::Definition(WorkDefinitionError::RequestFields(e)))?;"
+        },
+        {
+          "line": 661,
+          "text": "                .map_err(WorkEngineError::Runtime)?,"
+        },
+        {
+          "line": 662,
+          "text": "            created: environment.timestamp().map_err(WorkEngineError::Runtime)?,"
+        },
+        {
+          "line": 670,
+          "text": "        ))?;"
+        },
+        {
+          "line": 672,
+          "text": "            .map_err(WorkEngineError::PlanningControl)?;"
+        },
+        {
+          "line": 676,
+          "text": "        let task = if kind == \"gate\" {gate.ok_or(WorkEngineError::UnportedStatus)?.task_id.as_str()} else {r.id.as_str()};"
+        },
+        {
+          "line": 677,
+          "text": "        crate::root_store::require_validation_idle(tx,&candidate.id,task).map_err(|e|WorkEngineError::ValidationController(Box::new(e)))?;"
+        },
+        {
+          "line": 696,
+          "text": "            let (request, action)=mission.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 697,
+          "text": "            let settings=planning_settings.ok_or_else(||WorkEngineError::Mission(Box::new(crate::MissionSupervisionError::Refused(\"mission-control-settings-required\"))))?;"
+        },
+        {
+          "line": 698,
+          "text": "            let at=environment.timestamp().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 699,
+          "text": "            let actor=environment.operator().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 701,
+          "text": "            crate::root_store::stage_mission_control(tx,root,&mut candidate,action,request,settings,(&at,&actor)).map_err(|e|WorkEngineError::Mission(Box::new(e)))?;"
+        },
+        {
+          "line": 703,
+          "text": "            {let _=(request,action,settings,at,actor);return Err(WorkEngineError::UnportedStatus);}"
+        },
+        {
+          "line": 706,
+          "text": "            let change = quota.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 708,
+          "text": "                crate::AgentLaunchError::Refused(\"quota-settings-required\")))?;"
+        },
+        {
+          "line": 710,
+          "text": "                WorkEngineError::Quota(crate::AgentLaunchError::caused(e.reason(), e)))?;"
+        },
+        {
+          "line": 711,
+          "text": "            let at = environment.timestamp().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 712,
+          "text": "            let actor = environment.operator().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 714,
+          "text": "                .map_err(WorkEngineError::Quota)?;"
+        },
+        {
+          "line": 717,
+          "text": "            let request = task_report.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 720,
+          "text": "            ))?;"
+        },
+        {
+          "line": 722,
+          "text": "                .map_err(WorkEngineError::TaskReport)?;"
+        },
+        {
+          "line": 725,
+          "text": "            let request = task_model.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 728,
+          "text": "            ))?;"
+        },
+        {
+          "line": 730,
+          "text": "                .map_err(WorkEngineError::TaskModel)?;"
+        },
+        {
+          "line": 733,
+          "text": "            let change = budget.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 734,
+          "text": "            let at = environment.timestamp().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 735,
+          "text": "            let actor = environment.operator().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 737,
+          "text": "                .map_err(WorkEngineError::Budget)?;"
+        },
+        {
+          "line": 747,
+          "text": "            let (request, action) = planning.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 750,
+          "text": "            ))?;"
+        },
+        {
+          "line": 751,
+          "text": "            let at = environment.timestamp().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 760,
+          "text": "                )?;"
+        },
+        {
+          "line": 762,
+          "text": "                return Err(WorkEngineError::UnportedStatus);"
+        },
+        {
+          "line": 774,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 778,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 788,
+          "text": "                    .map_err(WorkEngineError::Budget)?;"
+        },
+        {
+          "line": 792,
+          "text": "                    return Err(WorkEngineError::UnportedStatus);"
+        },
+        {
+          "line": 796,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 800,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(crate::AgentLaunchError::caused(\"planning-judge-native-owner-active\",e))))?;"
+        },
+        {
+          "line": 802,
+          "text": "                return Err(WorkEngineError::UnportedStatus);"
+        },
+        {
+          "line": 805,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 808,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 815,
+          "text": "                        let ancestors = crate::planning_scope_ancestors(&candidate, &scope.id).map_err(|e| WorkEngineError::PlanningActivation(Box::new(crate::AgentLaunchError::caused(\"planning-closure-tree-invalid\", e))))?;"
+        },
+        {
+          "line": 818,
+          "text": "                            require_native_task_idle(tx, &candidate.id, &task.id, \"planning-closure-worker-active\")?;"
+        },
+        {
+          "line": 821,
+          "text": "                            .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))? {"
+        },
+        {
+          "line": 823,
+          "text": "                                fence.ok_or_else(|| WorkEngineError::PlanningActivation(Box::new(crate::AgentLaunchError::Refused(\"planning-closure-native-run-active\"))))?"
+        },
+        {
+          "line": 824,
+          "text": "                                    .finishing_planner(tx, &run, &request.event_id, &at)?;"
+        },
+        {
+          "line": 831,
+          "text": "                    require_native_task_idle(tx, &candidate.id, &op.id, \"planning-retry-worker-active\")?;"
+        },
+        {
+          "line": 843,
+          "text": "                        .map_err(WorkEngineError::PlanningControl)?;"
+        },
+        {
+          "line": 848,
+          "text": "                                .map_err(|e| WorkEngineError::PlanningBootstrap(Box::new(e)))?,"
+        },
+        {
+          "line": 853,
+          "text": "                        return Err(WorkEngineError::UnportedStatus);"
+        },
+        {
+          "line": 866,
+          "text": "                .map_err(WorkEngineError::PlanningControl)?;"
+        },
+        {
+          "line": 872,
+          "text": "                                .map_err(|e|WorkEngineError::PlanningBootstrap(Box::new(e)))?;"
+        },
+        {
+          "line": 873,
+          "text": "                            candidate.planning.as_mut().ok_or(WorkEngineError::UnportedStatus)?.repository=Some(Box::new(prepared));"
+        },
+        {
+          "line": 874,
+          "text": "                            crate::validate_planning_state(&candidate).map_err(|e|WorkEngineError::PlanningControl(crate::PlanningControlError::State(e)))?;"
+        },
+        {
+          "line": 877,
+          "text": "                        return Err(WorkEngineError::UnportedStatus);"
+        },
+        {
+          "line": 885,
+          "text": "                    .map_err(WorkEngineError::Definition)?;"
+        },
+        {
+          "line": 888,
+          "text": "                    .map_err(WorkEngineError::Checkpoint)?;"
+        },
+        {
+          "line": 890,
+          "text": "            let observed = environment.git(root).map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 895,
+          "text": "            apply_work_definition(&mut candidate, r).map_err(WorkEngineError::Definition)?"
+        },
+        {
+          "line": 899,
+          "text": "            // have no authority to invent a runtime fallback or hidden ceiling."
+        },
+        {
+          "line": 904,
+          "text": "                return Err(WorkEngineError::Task(crate::TaskDefinitionError::Refused("
+        },
+        {
+          "line": 914,
+          "text": "                )))?;"
+        },
+        {
+          "line": 916,
+          "text": "                .map_err(WorkEngineError::Definition)?"
+        },
+        {
+          "line": 918,
+          "text": "        \"ooda\" => apply_ooda(&mut candidate, r).map_err(WorkEngineError::Definition)?,"
+        },
+        {
+          "line": 921,
+          "text": "            let gate = gate.ok_or_else(|| refused(\"gate-request-not-prepared\"))?;"
+        },
+        {
+          "line": 923,
+          "text": "                quality_policy.ok_or_else(|| refused(\"gate-policy-observation-required\"))?;"
+        },
+        {
+          "line": 930,
+          "text": "                .ok_or_else(|| refused(\"gate-task-not-found\"))?;"
+        },
+        {
+          "line": 935,
+          "text": "                    .ok_or_else(|| refused(\"gate-task-not-found\"))?[index],"
+        },
+        {
+          "line": 942,
+          "text": "            .map_err(WorkEngineError::Gate)?;"
+        },
+        {
+          "line": 943,
+          "text": "            let at = environment.timestamp().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 945,
+          "text": "                return Err(WorkEngineError::Gate(crate::GateContractError::Refused("
+        },
+        {
+          "line": 952,
+          "text": "                .ok_or_else(|| refused(\"gate-preparation-incomplete\"))?"
+        },
+        {
+          "line": 957,
+          "text": "                .ok_or_else(|| refused(\"gate-task-not-found\"))?[index] = prepared;"
+        },
+        {
+          "line": 970,
+          "text": "                    ))?;"
+        },
+        {
+          "line": 977,
+          "text": "                        require_native_task_idle(tx, &candidate.id, &r.id, \"scoped-initial-decision-worker-active\")?;"
+        },
+        {
+          "line": 979,
+          "text": "                        return Err(WorkEngineError::Lifecycle(crate::TaskLifecycleError::HierarchyNotPorted));"
+        },
+        {
+          "line": 986,
+          "text": "                }.map_err(WorkEngineError::Lifecycle)?;"
+        },
+        {
+          "line": 991,
+          "text": "                    .ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 995,
+          "text": "                    environment.timestamp().map_err(WorkEngineError::Runtime)?"
+        },
+        {
+          "line": 1000,
+          "text": "                    environment.operator().map_err(WorkEngineError::Runtime)?"
+        },
+        {
+          "line": 1010,
+          "text": "                apply_task_metadata(&mut candidate, r, &context).map_err(WorkEngineError::Task)?;"
+        },
+        {
+          "line": 1013,
+          "text": "        _ => return Err(WorkEngineError::UnportedStatus),"
+        },
+        {
+          "line": 1018,
+          "text": "        .map_err(WorkEngineError::Planning)?;"
+        },
+        {
+          "line": 1022,
+          "text": "        .ok_or(WorkEngineError::Overflow)?;"
+        },
+        {
+          "line": 1023,
+          "text": "    candidate.updated = environment.timestamp().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 1025,
+          "text": "        let (request, _) = planning.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 1031,
+          "text": "        .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 1034,
+          "text": "        let (request, _) = planning.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 1036,
+          "text": "            .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 1048,
+          "text": "    .map_err(WorkEngineError::Change)?;"
+        },
+        {
+          "line": 1053,
+          "text": "                let (request, action) = planning.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 1055,
+          "text": "                    return Err(WorkEngineError::UnportedStatus);"
+        },
+        {
+          "line": 1058,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        }
+      ]
+    },
+    "version_history.json": {
+      "policies": [
+        {
+          "line": 2,
+          "text": "  \"schema_version\": 1,"
+        },
+        {
+          "line": 107,
+          "text": "        \"en\": \"Rust candidate: initial hierarchical missions show provider waits with UTC expiry or explicit intervention, without clearing quotas or implicit retries.\""
+        },
+        {
+          "line": 179,
+          "text": "        \"en\": \"Memory and mission state: an unreadable pause refuses affected launches and operations, retains a safe diagnostic and no longer becomes a false “launches allowed” state.\""
+        },
+        {
+          "line": 186,
+          "text": "        \"fr\": \"Migration Rust en qualification : lecture structurée des avis et trois limites UTF-8 persistantes réglables dans Admin, sans acceptation implicite ni remplacement du serveur.\","
+        },
+        {
+          "line": 187,
+          "text": "        \"en\": \"Rust migration under qualification: structured review reply parsing and three persisted UTF-8 limits editable in Admin, without implicit acceptance or server replacement.\""
+        },
+        {
+          "line": 223,
+          "text": "        \"en\": \"Go/Rust sources under qualification: required criterion bindings from task.add, blank criteria refused and Admin limit consumed by Rust creation; historical task adoption remains open.\""
+        },
+        {
+          "line": 231,
+          "text": "        \"en\": \"Rust migration: persisted configurable default check phases with FR/EN Admin choices; existing task requirements and criteria remain protected. Explicit legacy-setting adoption, safe errors and recovery verified by scope; verification evidence is scoped, while installation and cutover remain separate.\""
+        },
+        {
+          "line": 322,
+          "text": "        \"fr\": \"Recettes Admin : les états de refus visibles remontent hors du polling, avec régressions conservées et sans timeout global arbitraire ; les essais restent distincts du service installé.\","
+        },
+        {
+          "line": 323,
+          "text": "        \"en\": \"Admin recipes: visible refusal states propagate outside polling, with retained regression checks and no arbitrary global timeout; verification remains distinct from the installed service.\""
+        },
+        {
+          "line": 331,
+          "text": "        \"en\": \"Rust migration, verified component: per-attempt frozen Admin failure-window policy, diagnostic CLI replay and shared SQLite retries verified; actual supervision and cutover remain open, no process enabled.\""
+        },
+        {
+          "line": 362,
+          "text": "        \"fr\": \"Candidat Rust non installé : routage natif explicite vérifié sur huit parcours locaux, avec sources relues avant exécution, format modèle v1, limites Admin et reprises ; 566 tests workspace et quatre parcours Admin passent. Migration globale encore partielle.\","
+        },
+        {
+          "line": 363,
+          "text": "        \"en\": \"Uninstalled Rust candidate: explicit native routing verified in eight local journeys, with sources reread before execution, v1 model format, Admin limits and recovery; 566 workspace tests and four Admin journeys pass. Overall migration remains partial.\""
+        },
+        {
+          "line": 370,
+          "text": "        \"fr\": \"Candidat Rust non installé : création et lecture fournisseur par CLI vérifiées sans écrasement ; courses, erreurs de stockage/durabilité/sortie et reprises couvertes. 140 tests de recette, 593 tests workspace tous features et dix parcours natifs passent. Migration globale partielle.\","
+        },
+        {
+          "line": 371,
+          "text": "        \"en\": \"Uninstalled Rust candidate: provider-file CLI create/readback verified without overwrite; creation races, storage/durability/output errors and recovery covered. 140 recipe tests, 593 all-features workspace tests and ten native journeys pass. Overall migration stays partial.\""
+        },
+        {
+          "line": 374,
+          "text": "        \"fr\": \"Candidat Rust86 non installé : édition et restauration fournisseur vérifiées avec aperçu lié au Root, CAS, sauvegardes exactes et reprise. 151 tests Rust, 13 parcours natifs, Clippy et Rustdoc passent ; migration globale partielle.\","
+        },
+        {
+          "line": 375,
+          "text": "        \"en\": \"Uninstalled Rust86 candidate: provider update/restore verified with Root-bound preview, CAS, exact snapshots and recovery. 151 Rust tests, 13 native journeys, Clippy and Rustdoc pass; overall migration partial.\""
+        },
+        {
+          "line": 378,
+          "text": "        \"fr\": \"Candidat Rust87 non installé : choix de modèle par tâche conservé/rejoué et réellement appliqué au processus, avec refus des divergences et reprise. Compatibilité JSON Go et erreurs de transaction/sortie vérifiées. 155 tests de recette, 10 transactionnels et 14 parcours natifs passent ; migration partielle.\","
+        },
+        {
+          "line": 379,
+          "text": "        \"en\": \"Uninstalled Rust87 candidate: task model choice persists/replays and reaches actual process argv, with conflict refusals and recovery. Go JSON compatibility and transaction/output failures verified. 155 recipe tests, 10 transaction tests and 14 native journeys pass; overall migration partial.\""
+        },
+        {
+          "line": 382,
+          "text": "        \"fr\": \"Candidat Rust88 non installé : import/export de politiques explicites avec sauvegarde et refus/reprise ; confirmation UI liée au Root, choix par défaut conservé et règles Admin appliquées. 161 tests Rust et 15 parcours natifs, 4 parcours navigateur passent. Aucun modèle implicite ajouté ; migration globale partielle.\","
+        },
+        {
+          "line": 383,
+          "text": "        \"en\": \"Uninstalled Rust88 candidate: explicit policy import/export with snapshots/refusal/recovery; Root-bound UI confirmation, preserved default choice and saved Admin rules. 161 Rust tests, 15 native and 4 browser journeys pass. No implicit named model added; overall migration partial.\""
+        },
+        {
+          "line": 386,
+          "text": "        \"fr\": \"Candidat Rust89 non installé : mission manuelle worker/rapport/soumission/gate/validation opérateur vérifiée ; identités SQL/corps incohérentes refusées par les lecteurs. 169 tests Rust de recette, 15 parcours de routage et 4 missions passent. Migration globale partielle.\","
+        },
+        {
+          "line": 387,
+          "text": "        \"en\": \"Uninstalled Rust89 candidate: verified manual worker/report/submission/gate/operator acceptance; readers refuse inconsistent SQL/body identities. 169 Rust recipe tests, 15 routing and 4 mission journeys pass. Overall migration partial.\""
+        },
+        {
+          "line": 390,
+          "text": "        \"fr\": \"Candidat Rust90–91 non installé : garde HTTP local et routage typé partiel vers le vrai Root ; datastore lié par descripteur, refus des chemins remplacés, état conservé après échecs tardifs. Session locale persistante qualifiée :202tests Rust, Clippy/Rustdoc et parcours CLI vérifiés ; transport réseau et serveur Go inchangés.\","
+        },
+        {
+          "line": 391,
+          "text": "        \"en\": \"Uninstalled Rust90–91 candidate: local HTTP gate and limited typed routing into actual Root; descriptor-bound datastore, replacement-path refusal, retained state after late failures. Persistent local session qualified:202Rust tests, Clippy/Rustdoc and CLI journeys verified; network transport and Go server unchanged.\""
+        },
+        {
+          "line": 395,
+          "text": "        \"en\": \"Uninstalled Rust92 candidate: retained configuration after init/settings apply/replay output or close failure; refusals without false publication markers. Local qualification206Rust tests, Clippy/Rustdoc and CLI journeys verified.\""
+        },
+        {
+          "line": 434,
+          "text": "        \"fr\": \"Migration Rust102 : commandes Work sous bail vérifiées dans la transaction et avant commit, rollback budgétaire sur expiration et reprise de tests sans timeout arbitraire. Journal, conduite complète et bascule globale restent ouverts ; serveur Go conservé.\","
+        },
+        {
+          "line": 435,
+          "text": "        \"en\": \"Rust migration102: Work commands lease-checked inside the transaction and before commit, budget rollback on expiry and recovered verification without arbitrary timeout. Journal, complete conductor and global cutover remain open; serving Go preserved.\""
+        },
+        {
+          "line": 478,
+          "text": "        \"fr\": \"Candidat Rust113/114 vérifié localement : réservation et décisions task/delegate, refus atomiques et adoption explicite v24→v25 ; réglages Admin FR/EN réellement consommés. Conduite complète et bascule restent ouvertes ; application en service inchangée.\","
+        },
+        {
+          "line": 479,
+          "text": "        \"en\": \"Rust113/114 locally verified candidate: scope claims and task/delegate decisions, atomic refusal and explicit v24→v25 adoption; FR/EN Admin settings consumed by actual operations. Complete orchestration and cutover remain open; the running application is unchanged.\""
+        },
+        {
+          "line": 531,
+          "text": "        \"en\": \"Rust migration: structured-provider waiting and ownership renewal declared as persisted Admin settings; the lease does not become a model-duration limit, runner still in progress.\""
+        },
+        {
+          "line": 535,
+          "text": "        \"en\": \"Rust CLOCK_BOOTTIME clock and absolute timerfd wake primitive, without fallback or new product timeout; planner integration remains in progress.\""
+        },
+        {
+          "line": 538,
+          "text": "        \"fr\": \"Le contrôleur Rust peut réveiller le poll du processus possédé via un descripteur noyau ; vérification locale en cours, sans nouveau timeout global ni raccord planner implicite.\","
+        },
+        {
+          "line": 539,
+          "text": "        \"en\": \"The Rust controller can wake the owned-process poll via a kernel descriptor; local verification in progress, with no new global timeout or implicit planner integration.\""
+        },
+        {
+          "line": 654,
+          "text": "        \"fr\": \"Rust : raccord JSON historique de mission status pour les missions ordinaires sans profil, Agent ni planification ; santé stockage réelle et seuils persistés dans Admin (schéma réglages 38). Qualification du parcours en cours, aucune installation revendiquée.\","
+        },
+        {
+          "line": 655,
+          "text": "        \"en\": \"Rust: historical mission status JSON wired for ordinary missions without profiles, Agents or planning; actual storage health and persisted Admin thresholds (settings schema 38). Journey qualification in progress; no installation claimed.\""
+        },
+        {
+          "line": 669,
+          "text": "      \"version\": \"v0.1.0\","
+        },
+        {
+          "line": 670,
+          "text": "      \"date\": \"2026-10-06\","
+        },
+        {
+          "line": 685,
+          "text": "      \"release_url\": \"https://github.com/mo0ogly/swarm/releases/tag/v0.1.0\""
+        }
+      ],
+      "functions": [],
+      "errors": [
+        {
+          "line": 227,
+          "text": "        \"en\": \"Rust migration: continuous policy, function, error and documentation review, with hash/evidence checks in qualification. This method does not establish exhaustive semantic correctness or deployment.\""
+        },
+        {
+          "line": 247,
+          "text": "        \"en\": \"Rust candidate: ordinary hierarchical projection combines review, gate and dependencies; typed staleness and retained error causes, under verification without cutover.\""
+        },
+        {
+          "line": 271,
+          "text": "        \"en\": \"Worker framing: policy, function documentation and error-handling rules are delivered as a canonical embedded source. No extra rights or raised limits; verification in progress.\""
+        },
+        {
+          "line": 339,
+          "text": "        \"en\": \"Rust migration: manual agent run with private helper, execve without shell fallback, sealed prompt, stream guards and settlement without acceptance. Elapsed duration is observation only; native verification and replay recipe in progress. No service restarted.\""
+        },
+        {
+          "line": 443,
+          "text": "        \"en\": \"Rust migration104: cycle error/recovery journal, shared owner checks and rollback on journal failure.48targeted tests and2HTTP flows pass. Complete conductor and cutover remain open.\""
+        },
+        {
+          "line": 450,
+          "text": "        \"fr\": \"Migration Rust106 : consentement, révocation, pause et autonomie lus sans fallback ; corruption refusée sans mutation, reprise SQL vérifiée.33tests ciblés et2parcours HTTP passent. Configuration et départ automatique restent ouverts.\","
+        },
+        {
+          "line": 451,
+          "text": "        \"en\": \"Rust migration106:consent, revocation, pause and autonomy read without fallback; corruption refused without mutation and SQL recovery verified.33targeted tests and2HTTP flows pass. Configuration and automatic launch remain open.\""
+        },
+        {
+          "line": 535,
+          "text": "        \"en\": \"Rust CLOCK_BOOTTIME clock and absolute timerfd wake primitive, without fallback or new product timeout; planner integration remains in progress.\""
+        },
+        {
+          "line": 615,
+          "text": "        \"en\": \"Rust: read-only reviewer original inputs, saved limits and precise context error reasons; reviewer invocation remains unported.\""
+        }
+      ]
+    }
+  },
+  "independent_review": false,
+  "semantic_guarantee": false,
+  "runtime_acceptance": false
+}

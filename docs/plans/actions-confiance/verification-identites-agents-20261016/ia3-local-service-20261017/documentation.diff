@@ -1,0 +1,490 @@
+--- before/INSTALL.md
++++ after/INSTALL.md
+@@ -38,6 +38,12 @@
+ ce script. Restaurer configuration et témoin ensemble peut masquer un retour
+ arrière : leur protection et leur stratégie de sauvegarde restent à qualifier
+ avant déploiement. Voir le contrat d’identité lié ci-dessus.
++
++Un adaptateur interne de contrôle réutilise maintenant le canal Linux attribué
++par message et le coordinateur ; ses échanges et refus sont testables en fixtures.
++Il ne fournit encore ni commande d’installation ni service lancé. Les chemins,
++pins et droits doivent venir du bootstrap protégé ; aucun compte, cookie cockpit
++ou premier appelant ne devient automatiquement l’autorité.
+ 
+ ## Formation embarquée et identité visuelle
+ 
+--- before/docs/architecture/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/architecture/AGENT-IDENTITY-CONTRACT.md
+@@ -1104,3 +1104,98 @@
+ pas une édition d’état privé. Propriétaire : opérateur pour protection/identité,
+ Codex pour service et parcours publics. Distant toujours refusé par le codec
+ courant ; aucun secours permissif ou nouveau timeout/budget ajouté.
++
++
++## Adaptateur local de contrôle IA3c.2f-03a — interne et non activé
++
++Le moteur possède maintenant un adaptateur privé qui reçoit un paquet Linux
++SOCK_SEQPACKET, attribue chaque message via SCM_CREDENTIALS et SCM_PIDFD, puis
++consomme exclusivement le coordinateur configuration/témoin. Il réutilise le
++canal IA2 ; un PID déclaré dans le JSON ou l’identité du créateur de la connexion
++ne remplace pas l’émetteur fourni par le noyau. Le canal doit être configuré avant
++libération de l’émetteur. Aucun listener, commande CLI, route HTTP, compte ou
++service système n’est créé ; le binaire du serveur en cours n’est pas remplacé.
++
++La requête canonique version 1 comporte exactement schema_version, operation et
++change. read exige change:null ; preview, create et apply exigent le Change strict
++existant. Acteur, date, extensions, clés dupliquées ou de casse différente, version
++inconnue et octets non canoniques sont refusés. Exemple de lecture :
++`{"schema_version":1,"operation":"read","change":null}`.
++
++Le bootstrap de confiance fournit chemins, propriétaire, pins et contrôleur
++d’autorité indépendamment du projet. Ce contrôleur reçoit le message attribué et
++une copie de la demande exacte ; il authentifie, autorise l’opération et maintient
++sa sérialisation avec la révocation pendant toute l’exécution. Même read exige ce
++contrôle. Le principal retourné doit être l’humain épinglé. La demande de mutation
++est de nouveau comparée sous les réservations du coordinateur ; le client ne
++choisit pas l’heure. Les callbacks de test ne réalisent pas une connexion OIDC,
++une délégation courante ou un confinement de fournisseur réel.
++
++| Opération | Effet de l’adaptateur |
++| --- | --- |
++| read | Lire uniquement une View confirmée après autorisation |
++| preview | Projeter sans écrire config.json ou witness.json ; ce n’est pas un état sauvegardé |
++| create | Bootstrap explicite selon les deux états, sans choisir l’autorité depuis la demande |
++| apply | CAS courant et reprise de la demande pendante exacte, réautorisée ; aucun second événement pour le retry courant |
++
++Il n’expose pas Recover sans demande : l’opérateur peut reprendre le Change exact
++par apply. Un pending, un conflit ou une histoire manquante ne déclenche aucune
++réinitialisation ni reconstruction automatique. Une implémentation du contrôleur
++qui n’exécute pas son callback, en absorbe l’erreur, l’appelle deux fois ou le
++retient après son retour ne peut produire un succès sans contrôle : absence et
++retard sont refusés, erreur conservée, second effet empêché. Une erreur après un
++effet réussi conserve une issue incertaine ; elle n’annule pas une écriture.
++Le contrôleur doit exécuter synchroniquement et maintenir ses protections ; ces
++gardes ne remplacent pas son implémentation et sa vérification indépendante.
++
++La réponse comporte schema_version, operation, view, projection et error, avec
++null pour les résultats absents. Une erreur n’expose aucun résultat ; seuls des
++codes limités traversent le canal : invalid_request, denied, conflict, busy,
++pending, not_configured, indeterminate ou unavailable. Les causes Go originales
++restent du côté service, sans envoi de chemins privés. Un paquet tronqué ou ses
++métadonnées invalides sont refusés avant accès au stockage, sans réponse métier.
++
++Après une écriture réussie, perdre l’acquittement retourne une erreur incertaine
++côté service et ne provoque aucun rollback. Reprendre la même demande avec son
++EventID et sa base permet la relecture/réautorisation sans événement supplémentaire.
++Le propriétaire fournit le buffer de transport et gère la connexion ; une réponse
++qui dépasse les possibilités du socket échoue, sans découpage implicite. Aucun
++timeout, retry, volume ou concurrence de politique supplémentaire. Un contexte
++annulé seul n’interrompt pas une réception bloquée ; le propriétaire doit fermer
++sa connexion. Le futur service devra rendre cette gestion observable.
++
++```mermaid
++sequenceDiagram
++  participant C as Contrôleur appelant
++  participant K as Canal Linux configuré
++  participant S as Adaptateur privé
++  participant A as Autorité indépendante (raccord restant)
++  participant W as Coordinateur et témoin
++  C->>K: Paquet canonique et demande exacte
++  K->>S: Émetteur noyau et pidfd du message
++  S->>A: Authentifier et autoriser cette opération
++  Note over A,W: Protection de l’autorité maintenue pendant l’opération
++  A->>W: Exécuter une seule fois sous le principal épinglé
++  W-->>S: View confirmée ou Projection, sinon erreur
++  S-->>C: Résultat explicite ou code limité
++  Note over C,W: Réponse perdue après effet : retry exact réautorisé, sans doublon
++```
++
++Le [rapport de raccord](../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-service-20261017/RAPPORT-IA3c2f03a.md)
++lie les tests aux sources et conserve leurs limites. L’échange enfant attribue le
++processus émetteur réel, sous le même compte en fixture. Il ne prouve pas une
++séparation de comptes, un service protégé actif ou l’authentification du service
++par un client public. EP-01/04/05/07, F01–F07 et l’admission publique restent ouverts.
++Avant activation : désigner l’humain initial, fournir le contrôle d’autorité réel,
++protéger les fichiers/clefs/compte, établir le pair service côté client et vérifier
++le confinement, puis raccorder commandes, installation et Admin FR/EN. Le mode
++distant reste prévu ; aucune bascule permissive.
++
++Le contrôleur des workflows utilise aussi -timeout 0 pour son test de contexte :
++l’ancien watchdog global hérité de 30 secondes a été retiré faute de contrat
++temporel justifié. Ce contrôle de méthode ne mesure pas une performance produit.
++
++Le même contrôleur exige maintenant les événements JSON run/pass du test nommé
++et la fin du paquet ; un sélecteur vide, un skip ou une preuve incomplète ne peut
++plus produire OK. Les doubles de sortie Go et le contrôle réel sont deux preuves
++distinctes, conservées dans le rapport de raccord.
+--- before/docs/en/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/en/AGENT-IDENTITY-CONTRACT.md
+@@ -1049,3 +1049,97 @@
+ designed, not private-state edits. Owners: operator for protection/identity,
+ Codex for the service and public flows. Remote mode remains rejected by the
+ current codec; no permissive fallback or new timeout/budget is added.
++
++
++## Local control adapter IA3c.2f-03a — private and inactive
++
++The engine now has a private adapter that receives a Linux SOCK_SEQPACKET packet,
++attributes each message using SCM_CREDENTIALS and SCM_PIDFD, and exclusively uses
++the configuration/witness coordinator. It reuses the IA2 channel; a PID in JSON
++or the identity of the connection creator does not replace the kernel-attributed
++sender. Configure the channel before releasing the sender. No listener, CLI
++command, HTTP route, account or system service is created; the running server's
++binary is not replaced.
++
++The canonical version 1 request contains exactly schema_version, operation and
++change. read requires change:null; preview, create and apply require the existing
++strict Change. Client actors, dates, extensions, duplicate or case-folded keys,
++unknown versions and noncanonical bytes are rejected. Example read:
++`{"schema_version":1,"operation":"read","change":null}`.
++
++Trusted bootstrap supplies paths, owner, pins and the authority controller
++independently of project data. This controller receives the attributed message
++and an owned copy of the exact request; it authenticates, authorizes the operation
++and holds its revocation serialization throughout execution. Even read requires
++this control. The returned principal must equal the pinned human. The mutation
++request is checked again under the coordinator's reservations; the client cannot
++choose the time. Test callbacks implement neither OIDC authentication, current
++delegation nor real provider confinement.
++
++| Operation | Adapter effect |
++| --- | --- |
++| read | Read a confirmed View only after authorization |
++| preview | Project without writing config.json or witness.json; this is not saved state |
++| create | Explicit bootstrap according to both stores, without choosing authority from the request |
++| apply | Current CAS and reauthorized exact pending request recovery; current-event retry creates no extra event |
++
++It does not expose request-free Recover: the operator can resume the exact Change
++through apply. Pending state, conflict or missing history triggers no automatic
++reset or reconstruction. An authority controller that omits execution, swallows
++its error, executes twice or retains execution after returning cannot manufacture
++unchecked success: omitted/late execution is denied, errors preserved and a second
++effect prevented. Failure after successful effect retains an uncertain outcome;
++it does not undo a write. The controller must execute synchronously and maintain
++its protections; these guards do not replace its implementation or independent
++verification.
++
++Replies contain schema_version, operation, view, projection and error, with null
++for absent results. Errors expose no result; only limited codes cross the channel:
++invalid_request, denied, conflict, busy, pending, not_configured, indeterminate or
++unavailable. Original Go causes remain service-side, without sending private
++paths. Truncated packets or invalid ancillary metadata are rejected before storage
++access, without a business reply.
++
++Losing acknowledgement after a successful write returns an uncertain service-side
++error without rollback. Retry the same request, EventID and base for reauthorized
++observation without an extra event. The owner supplies the transport buffer and
++manages the connection; replies beyond socket capabilities fail without implicit
++chunking. No extra timeout, retry, volume or concurrency policy is introduced.
++Cancellation alone does not interrupt a blocked receive; the owner must close its
++connection. The eventual service must make that management observable.
++
++```mermaid
++sequenceDiagram
++  participant C as Calling controller
++  participant K as Configured Linux channel
++  participant S as Private adapter
++  participant A as Independent authority (unwired)
++  participant W as Coordinator and witness
++  C->>K: Canonical packet and exact request
++  K->>S: Kernel sender and per-message pidfd
++  S->>A: Authenticate and authorize this operation
++  Note over A,W: Authority protection held throughout the operation
++  A->>W: Execute once under the pinned principal
++  W-->>S: Confirmed View or Projection, otherwise error
++  S-->>C: Explicit result or limited code
++  Note over C,W: Reply lost after effect: reauthorized exact retry, no duplicate
++```
++
++The [adapter report](../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-service-20261017/RAPPORT-IA3c2f03a.md)
++binds checks to source and retains their limits. The child exchange attributes the
++actual sending process under the same fixture account. It proves neither account
++separation, an active protected service nor service authentication by a public
++client. EP-01/04/05/07, F01–F07 and public admission remain open. Before activation:
++designate the initial human, provide real authority control, protect files, keys
++and account, establish the service peer client-side and verify confinement, then
++wire commands, installation and FR/EN Admin. Remote mode remains planned; no
++permissive fallback.
++
++The workflow checker also uses -timeout 0 for its context test: the inherited
++30-second global watchdog was removed because no timing contract justified it.
++This method check does not measure product performance.
++
++The same checker now requires JSON run/pass events for the named test and package
++completion; an empty selector, skip or incomplete evidence can no longer produce
++OK. Controlled Go-output doubles and the actual check are distinct proofs, both
++retained in the adapter report.
+--- before/docs/en/INSTALL.md
++++ after/docs/en/INSTALL.md
+@@ -38,6 +38,12 @@
+ configuration and witness together can hide rollback: their protection and backup
+ strategy remain to be qualified before deployment. See the identity contract above.
+ 
++A private control adapter now reuses the per-message attributed Linux channel
++and the coordinator; its exchanges and refusals can be tested in fixtures. It
++still provides neither an installation command nor a running service. Paths,
++pins and rights must come from protected bootstrap; no account, cockpit cookie
++or first caller automatically becomes the authority.
++
+ ## Included training resources and branding
+ 
+ After opening the cockpit, choose **Cockpit help → Casa Pizza training**. The reader provides videos, GIF previews, transcripts, a 38-page PDF and a downloadable offline kit. The selected cockpit language chooses French or English resources; the reader language control updates every resource link. Word files remain editable sources.
+--- before/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
++++ after/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
+@@ -2,7 +2,8 @@
+ 
+ 17 octobre 2026 — protocole d’authenticité IA3c.2a, journal IA3c.2b, schéma
+ d’autorité IA3c.2c, demande complète IA3c.2d, lecture versionnée IA3c.2e
+-et noyau de configuration IA3c.2f-02a vérifiés en fixtures ; service protégé,
++et noyau de configuration IA3c.2f-02a/02b vérifiés en fixtures ; adaptateur
++interne IA3c.2f-03a vérifié en fixtures ; service protégé,
+ bootstrap et consommateur moteur
+ **non réalisés**. Frontière adoptée le 17 octobre : service local isolé pour
+ développement/pilote ; autorité distante prévue pour une évolution. Principal
+@@ -325,3 +326,22 @@
+ stockages retire encore la détection : EP-06/F07 restent partiels/ouverts.
+ Pas de reset ni abandon automatique d’intention. Le principal humain initial
+ reste à désigner avant activation ; callbacks de test ne prouvent aucun humain.
++
++
++## IA3c.2f-03a — raccord de contrôle local
++
++Adaptateur interne du moteur : canal Linux IA2 par message/pidfd réutilisé,
++requêtes canoniques read/preview/create/apply, contrôle d’autorité indépendant
++maintenu pendant l’opération et consommation exclusive de Coordinator. Apply
++reprend la demande pendante exacte ; pas de réparation libre ou de témoin appris.
++La lecture est elle aussi autorisée ; aucune identité déclarée ou UID de connexion
++ne confère un droit. Une réponse perdue ne remet pas à zéro l’état : retry exact
++et réautorisation, sans événement supplémentaire. Les causes détaillées restent
++au service, codes limités sur le canal.
++
++Voir le contrat FR/EN pour les données et la gestion des connexions. Le
++[rapport](verification-identites-agents-20261016/ia3-local-service-20261017/RAPPORT-IA3c2f03a.md)
++conserve résultats, sources et limites ; ce raccord n’installe aucun listener,
++compte, principal humain ou contrôle réel de fournisseur. Le client public doit
++encore authentifier le service. EP-01/04/05/07 et F01–F07 restent ouverts ; le
++service système, ses commandes et Admin ne sont pas livrés par cet adaptateur.
+--- before/docs/plans/actions-confiance/identites-agents-replan.md
++++ after/docs/plans/actions-confiance/identites-agents-replan.md
+@@ -1600,3 +1600,144 @@
+ Le prochain raccord est le service local protégé, puis ses opérations publiques
+ et la configuration installation/Admin ; aucun raccourci depuis un projet ou
+ le cookie cockpit ne doit fournir l’autorité. F01–F07, IDA, IA3–IA5 et RETEX ouverts.
++
++## IA3c.2f-03a — adaptateur local de contrôle, reprise du 17 octobre
++
++Reprise avec `replan` et APEX : le coordinateur est vérifié, aucun service protégé
++n’est actif. Comparer un nouveau transport par UID de connexion et la réutilisation
++du canal Linux IA2 par message/pidfd : retenir ce dernier, sans copier son code ni
++prendre un UID pour une autorité. Codex seul possède deux nouveaux fichiers
++agent_identity_config_service_linux.go et son test dans internal/engine ; aucun
++fichier mémoire ou lanceur public modifié. Mettre à jour cible, contrats FR/EN,
++installation et note scientifique dans le même incrément. Originaux archivés dans
++verification-identites-agents-20261016/ia3-local-service-20261017.
++
++Livrer un adaptateur interne pour quatre opérations explicites : read, preview,
++create et apply. Apply reprend aussi une intention pendante exacte ; pas de commande
++de réparation libre. Requête canonique schéma 1, sans acteur ou date fournis par
++le client. Le canal est configuré avant libération de l’émetteur. Le contrôleur
++d’autorité de confiance doit maintenir son contrôle pendant toute l’opération,
++sur le message attribué et la demande exacte ; pas d’inférence cockpit/Admin/UID.
++Le principal doit correspondre aux pins indépendants. Lire exige aussi ce contrôle.
++Le coordinateur revalide la demande exacte sous ses réservations. Cette interface
++ne constitue pas une implémentation OIDC ou une preuve du confinement réel.
++
++Critères avant code : format strict et refus sans mutation, quatre parcours utiles
++avec résultat inspecté, preview sans écriture, CAS et retry, refus de principal,
++autorisation absente/non exécutée/erreur aval/second appel, métadonnées tronquées
++ou injectées, réponse perdue après mutation et reprise sans doublon, échange entre
++processus attribué à l’émetteur réel. Erreurs réseau publiques sans chemins privés,
++causes originales côté service. Buffer transport explicitement fourni, aucun
++plafond métier, délai ou retry ajouté. Watchdogs Go/enfant désactivés.
++
++Le raccord autonome commande/service, compte système, principal humain initial,
++configuration Admin, authentification du service par un client public et contrôle
++du fournisseur restent des dépendances ouvertes. Ne pas activer l’adaptateur dans
++les opérations publiques avant ces preuves ; EP-01/04/05/07 et F01–F07 non clos.
++
++
++### Ajustement de preuve IA3c.2f-03a
++
++Le premier candidat passe 40 noms moteur et 101 du coordinateur en normal/race,
++vet/build. Ajouter la variante enfant même UID refusé, la fenêtre pending exacte
++par apply et annulation/absence de config ; seul le test moteur change. Rejouer
++ce sélecteur, conserver les 101 noms config tant que ses entrées restent identiques.
++Étendre le manifeste à tous les Go internes/CLI pour couvrir les imports transitifs.
++L’archivage du binaire de fixture par rename vers /tmp échoue EXDEV (volumes
++distincts), sans toucher le source ou un service. Correction de méthode : move
++avec copie inter-volumes puis vérification de hash et d’absence dans le dépôt.
++Aucun résultat de test perdu, aucun relancement du même déplacement inchangé.
++
++
++### Replan lié I2f03a-04 — watchdog hérité du contrôleur de méthode
++
++Le contrôle des workflows passe, mais l’inspection de son lanceur constate un
++-timeout 30s global sans contrat temporel justifié. Cause : recette héritée, pas
++lenteur ou blocage du code mesuré. Comparer laisser la borne, ajouter une valeur
++configurable et la désactiver : choisir -timeout 0, conforme à la consigne déjà
++adoptée, sans créer une nouvelle politique produit. L’original check.py est
++archivé avant correction ; il s’agit d’un changement de méthode, pas d’une panne
++reproduite après 30 secondes. Codex prend aussi ce fichier ; aucun autre fichier
++de méthode ou mémoire modifié. Relancer le contrôleur et conserver l’exécution
++JSON nommée du test de contextes. Les 44 noms moteur et 101 config ont leurs
++preuves distinctes ; ils ne dépendent pas de ce délai Python. Propriétaire Codex,
++critère : commande sans watchdog global et test non vide effectivement PASS.
++
++
++### Replan I2f03a-05 — compilation dans le dépôt partagé
++
++normal-engine-02 exécute 44 noms PASS ; race-engine-02 aussi mais le manifeste
++rejette la preuve : work_row.go et work_row_test.go ont changé entre entrée et
++sortie. Aucun de nos deux nouveaux fichiers ne change ; conserver stdout et
++AssertionError, ne pas annoncer cette course comme preuve liée au candidat final.
++Cause établie : mutation de deux sources mémoire du même paquet pendant la
++compilation ; pas une course Go observée ni un échec des assertions identité.
++
++Comparer attendre puis relancer en espérant la stabilité et fixer explicitement
++ces deux entrées via Go overlay. Retenir un overlay de deux fichiers dans le
++même dossier de preuve, sans copie du dépôt ni modification du chantier mémoire.
++Conserver les deux textes, leurs hashes et la table d’overlay ; le manifeste
++porte les sources effectivement compilées et refuse toute autre mutation.
++Rejouer normal/race moteur, vet/build avec ce même overlay. Les 101 gardes config
++et leurs entrées propres inchangées restent réutilisables. Cette preuve décrit
++le candidat avec cet instantané mémoire ; vérifier l’écart au dépôt lors du rapport
++final et ne pas déclarer un serveur courant reconstruit/déployé. Propriétaire
++Codex pour stabilité de la vérification, chantier mémoire pour ses deux sources.
++
++
++### Replan lié I2f03a-06 — faux succès d’un sélecteur vide
++
++L’inspection du même contrôleur montre qu’il n’exige que le code 0 de Go.
++Reproducer indépendant du contenu des rôles : exécuter son vrai main avec une
++sortie externe contrôlée « no tests to run » et exit 0. collection-red-01 échoue
++sur un test : le main imprimait OK. Cause au contrat de preuve, pas au moteur
++ni au test de contexte effectivement exécuté dans les lots précédents.
++
++Corriger check.py au même endroit : demander JSON, exiger run et pass du test
++nommé ainsi que la fin du paquet, refuser skip/fail et format invalide. Afficher
++le compte observé ; préserver le code et le texte d’un échec Go. Nouveau fichier
++possédé tools/agent-workflows/test_check.py : quatre tests dont variantes vide,
++mauvais nom, skip, incomplet, sous-test échoué, JSON mal formé et mauvais type.
++Vérifier mocks puis le vrai contrôleur et ses cinq noms. Les mocks ne prouvent
++pas l’assemblage des contextes, le contrôle réel le vérifie séparément. Garder
++le FAIL original, puis revenir au raccord identité. Le même propriétaire reste
++Codex ; aucun besoin de fournisseur ou nouvelle politique d’exécution.
++
++
++### Capitalisation méthode et lecture des preuves
++
++Actualiser aussi docs/AGENT-METHODS.md et sa version EN : contrôle nommé, refus
++sans test et recette Go ciblée avec watchdog désactivé. Les trois sélecteurs de
++la recette sont vérifiés dans internal/engine ; cette édition documentaire ne
++modifie pas leurs sources et n’en invente pas une nouvelle exécution. Conserver
++les versions de ces deux pages juste avant édition, sans toucher leurs autres
++travaux. Un lecteur auxiliaire de manifestes a rencontré KeyError counts en
++mélangeant résultats Go et résultat Python hétérogènes ; lecture corrigée par
++sélection explicite des quatre manifestes Go et schéma Python séparé. Aucun
++résultat manquant transformé en zéro ou PASS ; quatre résultats Go relus avec
++succès et comparaison explicite des deux sources d’overlay au dépôt courant.
++
++
++### Résultat IA3c.2f-03a — raccord privé vérifié, activation ouverte
++
++44 noms moteur PASS normal/race-03, zéro FAIL/SKIP, vet/build PASS avec 830 entrées
++effectives stables et l’overlay borné à deux fichiers mémoire. Leur version
++courante correspond à l’overlay au contrôle de fin ; conserver cette comparaison,
++qui ne prédit pas une modification ultérieure. Les 101 gardes config normal/race-01
++sont réutilisées sur douze entrées propres identiques. La course du lot 02 reste
++une preuve rejetée, pas rebaptisée verte. Aucun autre fichier moteur modifié.
++
++Contrôleur de méthode : quatre tests Python PASS (variantes incluses) et contrôle
++réel à cinq noms Go PASS, avec watchdog désactivé ; FAIL original de sélecteur vide
++conservé avant correction. Les versions FR/EN des contrats, installation et
++méthodes, schémas et note scientifique sont actualisées. Les rendus sont inspectés,
++pas un parcours UX. Prochain contexte : lire le [rapport de raccord](verification-identites-agents-20261016/ia3-local-service-20261017/RAPPORT-IA3c2f03a.md),
++ses diffs et checks-final avant intégration ; les processus déjà lancés n’ont
++pas reçu ces sources et ne sont pas annoncés corrigés.
++
++Le contrôleur réel, l’établissement du pair service côté client, le point d’entrée
++système et la protection compte/confinement restent des préconditions d’activation,
++avec le principal humain initial explicitement désigné. Les callbacks ici ne les
++remplacent pas. I2f03a-01 à -06 conservent valeur, origine, propriétaire et reprise
++dans le rapport ; la taille effective d’une réponse EMSGSIZE reste à mesurer lors
++du client public. F01–F07, EP-01/04/05/07, IDA, IA3–IA5 et RETEX restent ouverts.
+--- before/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
++++ after/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
+@@ -605,3 +605,28 @@
+ authentification, délégation, décision courante, application et effet, en comparant
+ local/distant selon une menace et des métriques explicites, sans réécrire les
+ preuves historiques ni assimiler la configuration souhaitée au service effectif.
++
++
++### IA3c.2f-03a — attribution du message et décision dans le processus
++
++Le [raccord privé de contrôle de configuration](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-service-20261017/RAPPORT-IA3c2f03a.md)
++réutilise le canal Linux IA2 : émetteur par message et pidfd fourni par le noyau,
++puis contrôle d’autorité sur la demande exacte pendant l’opération. Le créateur
++de la connexion, le compte Unix et le principal humain autorisé restent trois
++faits distincts. Les requêtes sont canoniques et limitées à read/preview/create/apply ;
++la réponse perdue après écriture ne provoque ni remise à zéro ni événement dupliqué
++au retry exact réautorisé. Les sources et critères sont dans le contrat FR/EN.
++
++Le témoin et le contrôle externe servent ici la configuration de l’installation ;
++ce raccord ne prouve pas encore un suivi d’identité sur tous les nœuds d’un
++workflow, une révocation finale linéarisée ou le confinement des fournisseurs.
++Le contrôleur réel, le client authentifiant le service, le compte séparé et les
++parcours publics restent à fournir. Les callbacks sont des doubles locaux.
++
++Apport expérimental à tester : distinguer attribution par connexion et par message
++quand un descripteur passe à un autre processus ; vérifier ensuite le refus d’un
++émetteur sans droit, même sous le même compte. Un échange entre processus et une
++fixture d’intention pendante sont des expériences différentes ; cette dernière
++ne constitue pas une panne réelle. Ces techniques et cette séparation de preuves
++ne démontrent aucune priorité scientifique ni supériorité sur un produit tiers.
++La comparaison d’état de l’art doit conserver ses sources et protocoles propres.
+--- before/docs/AGENT-METHODS.md
++++ after/docs/AGENT-METHODS.md
+@@ -145,9 +145,19 @@
+ 
+ ```sh
+ python3 tools/agent-workflows/check.py
+-go test ./... -run 'TestRepositoryPreparation|TestPreparationMethodCatalogue|TestPreparationDialogueLateProposalAndMethodDrift' -count=1
++go test ./internal/engine -run 'TestRepositoryPreparation|TestPreparationMethodCatalogue|TestPreparationDialogueLateProposalAndMethodDrift' -count=1 -timeout=0
+ git diff --check
+ ```
++
++Le contrôleur vérifie les liens et les sources puis exécute le test réel
++TestAgentWorkflowRolesAreBounded. Il exige ses événements JSON run/pass et la fin
++du paquet, refuse les sélecteurs vides, skip, fail et formats invalides, et affiche
++le nombre observé de tests/sous-tests. Son watchdog global est explicitement
++désactivé (-timeout 0) : suivre la progression et diagnostiquer une absence
++anormale de progression ; aucun objectif temporel produit n’en découle.
++Ses gardes propres se vérifient avec `python3 -m unittest discover -s
++tools/agent-workflows -p test_check.py -v` (doubles de sorties Go, sans modèle).
++Un contrôleur réussi ne prouve ni déploiement ni acceptation des missions.
+ 
+ Une modification des méthodes ou du contrat change leur empreinte. Une préparation
+ ancienne doit appliquer la nouvelle version et refaire sa validation ; les preuves
+--- before/docs/en/AGENT-METHODS.md
++++ after/docs/en/AGENT-METHODS.md
+@@ -138,9 +138,19 @@
+ 
+ ```sh
+ python3 tools/agent-workflows/check.py
+-go test ./... -run 'TestRepositoryPreparation|TestPreparationMethodCatalogue|TestPreparationDialogueLateProposalAndMethodDrift' -count=1
++go test ./internal/engine -run 'TestRepositoryPreparation|TestPreparationMethodCatalogue|TestPreparationDialogueLateProposalAndMethodDrift' -count=1 -timeout=0
+ git diff --check
+ ```
++
++The checker validates links and sources, then runs the actual
++TestAgentWorkflowRolesAreBounded test. It requires JSON run/pass events and
++package completion, rejects empty selectors, skip, fail and invalid formats, and
++prints the observed test/subtest count. Its global watchdog is explicitly
++disabled (-timeout 0): observe progress and diagnose abnormal lack of progress;
++this does not establish a product timing target. Its own guards can be checked
++with `python3 -m unittest discover -s tools/agent-workflows -p test_check.py -v`
++(controlled Go-output doubles, no model). A successful checker proves neither
++deployment nor mission acceptance.
+ 
+ Changing a method or the shared contract changes its fingerprint. Existing
+ preparations must apply the new version and repeat validation; earlier evidence

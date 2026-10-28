@@ -1,0 +1,13 @@
+{
+  "scope": "task",
+  "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+  "scope_key": "plan-ca937edf4e-T3",
+  "expected_revision": 1,
+  "values": {
+    "silence_seconds": 0,
+    "tool_seconds": 900,
+    "max_tool_calls": 0,
+    "max_repeated_calls": 0,
+    "max_consecutive_errors": 6
+  }
+}

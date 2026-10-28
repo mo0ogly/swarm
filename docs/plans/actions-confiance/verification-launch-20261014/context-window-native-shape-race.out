@@ -1,0 +1,5 @@
+=== RUN   TestReviewContextWindowFragmentRuntimeAndReopen
+    managed_review_context_policy_test.go:194: sizes 164551 168220 22003 parts 1
+--- PASS: TestReviewContextWindowFragmentRuntimeAndReopen (21.78s)
+PASS
+ok  	swarm.local/companion/internal/engine	22.949s

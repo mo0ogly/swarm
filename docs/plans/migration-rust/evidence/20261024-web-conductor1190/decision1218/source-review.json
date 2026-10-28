@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "reviewer": "Root semantic self-review; not independent acceptance",
+  "baseline_sha256": "59908f671a8dc67758324d0ae3b8114aedb21b787b169220d7faf6f06d389fe6",
+  "current_sha256": "c51d6dd34e4bac95fad556d399e582bbd3a8c3d330958c9d80faf94df4690ce5",
+  "files": {
+    "rust/crates/swarm-cli/src/lib.rs": {
+      "sha256": "94cbab29dc19b7a3621ab4ef42660c10c08676aaf42b44806297dac16c3f5a8d",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Existing identity/cycle bounds unchanged; native wrapper traversal is not a policy.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Only typed_causes changed: documented shared matrix; all44CLI tests cover affected consumers.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Secondary Root cleanup loss RED1203 now preserved by native_error_links, including known Work.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Rustdoc and FR/EN correction notes match observed behavior.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-cli/src/mission_watch.rs": {
+      "sha256": "80e1ad7ab87d862ed524fb1243a698e2236cdd11abfc33a7e15e755eddb81666",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Saved cadence only; exact typed no-effect revision refusal and same event_id.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Shared session/local stop adapter and classifier contracts documented; CLI OS input preserved.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Claim/busy/stop/lease/root cleanup preserve original causes; stale effects remain fatal.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "CLI3cases and local/web receipts; default profile and Rustdoc bound.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-cli/src/mission_watch/role_job.rs": {
+      "sha256": "2d9cd50eb1ffe745951aff5fd8ba87fcb20f0a12f0487ec758f09dea160a013b",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "ControllerShutdown is closed local protocol, not new signal permission.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "finish contract already describes local shutdown and owned scope; enum match exhaustive.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Role drain/publication order unchanged; 6real signal cases and held web planner pass.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Existing Rustdoc remains true for added branch; tests explicit.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-cli/src/native_web.rs": {
+      "sha256": "ff4b7e34f91113e17d7913fb559411058c9de0aa53e58e45fa882bef7eea26e8",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "No new operator default; uses saved coordinator policy; HTTP lanes untouched.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "execute and failed_conductor_start describe new owner and checked cleanup.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Pre-start server close plus independent conductor/root failures retained through native wrappers.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Version notes and FR/EN distinguish server invocation from request mutation.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-cli/src/native_web/conductor.rs": {
+      "sha256": "dabcc948ea1a0a71d406fdb7034a667d004b80c7864ffc4404459afa0cc07300",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Saved policy discovery; lease per Work is exclusion invariant; typed vocabulary not human matching.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "All nontrivial helpers/run/serve/merge have current purpose, inputs, errors, effects and limitations.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Notify before drain, local stop despite wake error, checked close/join, panic retention, late HTTP report and causes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Actual13web assertions and named error regression guards; internal JSONL discard documented.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-web/src/service/listener.rs": {
+      "sha256": "e113afd4953d979b1168b206220bc2f666c6269053764feeee0996060d73bcf3",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Trusted in-process bound peer only, no HTTP grant or execution policy.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "bound_mission_root states exact identity, caller close/lease obligation and failure behavior.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Open/check failure closes peer and preserves both errors without closing owner implicitly.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "FR/EN server flow and actual foreignDB/reopen guard support contract.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        }
+      }
+    },
+    "version_history.json": {
+      "sha256": "4368f7cbbd3e96ebb8c0fe24a46a9426f6359cb1c4f91261369c6691cfad117e",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Prose release notes only, no configuration changes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "No function changes in JSON notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "No error handling code changed in this input.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "FR/EN notes say candidate/local evidence/no installation or global acceptance.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/review-notes.md",
+              "sha256": "5e0c1c4ad5fda5df3513ba1e1e3c1ed6b96082b19337ccab5340a49f5e29280c"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

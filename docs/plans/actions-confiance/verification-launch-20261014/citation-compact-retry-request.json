@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "event_id": "citation-compact-retry-8ab08b7be637",
+  "expected_revision": 375,
+  "task_id": "plan-68b50cc82e-T2",
+  "confirm_review_error_repair": true,
+  "reason": "Corriger la citation selon le diagnostic exact attribué ; conserver toute réserve et la décision indépendante."
+}

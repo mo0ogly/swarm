@@ -1,0 +1,85 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "path": "web/cockpit.js",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "web/pilot-inspector.js",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "web/instruction-revisions.js",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "web/mission.js",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "web/pilot-actions.js",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "web/journal-console.js",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "web/text-reader.js",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "web/i18n-en.js",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "web/swarm-shell.js",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "tests/dense_text_ui.cjs",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "tests/instruction_retex_ui.cjs",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "tests/log_console_ui.cjs",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "tests/design_system_ui.cjs",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "tests/log_console_visibility_ui.cjs",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "tests/text_reader_test.cjs",
+      "exit": 0,
+      "diagnostic": ""
+    },
+    {
+      "path": "web/log-console.js",
+      "exit": 0,
+      "diagnostic": ""
+    }
+  ]
+}

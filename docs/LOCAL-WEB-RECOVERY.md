@@ -1,5 +1,7 @@
 # Cockpit local stable — 8 octobre 2026
 
+Historique du cockpit Go. Le chemin actuel est le [lanceur Rust](architecture/NATIVE-LOCAL-LAUNCHER.md) ; les preuves ci-dessous restent historiques.
+
 ## Résultat
 
 `./swarm.sh start`, `restart`, `status`, `open`, `stop` et `logs` gèrent une instance Linux identifiée. Le redémarrage remplace le serveur et conserve les missions. La configuration locale non versionnée mémorise le projet et l’adresse. Les délais sont des options explicites. Le masquage de `/cifs` reste optionnel et conserve les permissions antérieures.
@@ -23,3 +25,27 @@ Une suite complète a également signalé le manifeste historique périmé par l
 ## Limites
 
 Ce lanceur local Linux n’est pas un gestionnaire de service système ou un déploiement distant. Il ne tue pas des agents ou des processus étrangers et ne supprime pas les données. Le partage CIFS de l’hôte n’est pas réparé. Une clé supprimée ou explicitement renouvelée nécessite une reconnexion. Aucun commit ni push effectué.
+
+## Version et nouveautés dans le cockpit Rust
+Le bouton existant affiche l’identité compilée du serveur actif et les notes
+FR/EN embarquées via GET protégé `/api/v1/native-version`. La vue est relue à
+chaque ouverture explicite ; aucun polling de stockage n’est ajouté. Le lien Git
+pointe sur la base compilée du binaire et la présence de changements non commités
+est signalée. Ces notes locales ne constituent pas une release publiée.
+Les sources du checkout et le CLI ne sont pas examinés par cette vue : aucune
+identité, comparaison ou santé du stockage n’est déduite. Une réponse invalide
+ou inaccessible remplace les données précédentes par une erreur visible ; fermer
+puis rouvrir déclenche une nouvelle lecture, sans retry automatique.
+
+```mermaid
+sequenceDiagram
+    actor U as Utilisateur
+    participant D as Dialogue Version existant
+    participant A as API Rust protégée
+    participant B as Métadonnées du binaire
+    U->>D: Ouvrir Version et nouveautés
+    D->>A: GET native-version
+    A->>B: Identité compilée et notes embarquées
+    A-->>D: Version, commit, modified, notes FR/EN
+    Note over D: Sources/CLI non examinés, aucune comparaison implicite
+```

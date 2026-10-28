@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-12T13:54:28.157328+00:00",
+  "parent": "control-infrastructure-recovery-20261012.patch",
+  "parent_tree": "9058acc6fd169349e2c50fa3b0b0b9f596017bb6",
+  "preimage_tree": "9058acc6fd169349e2c50fa3b0b0b9f596017bb6",
+  "preimage_extensions": [],
+  "preimages": {
+    "internal/engine/managed_control_diagnostic_api.go": null,
+    "internal/engine/managed_control_diagnostic_api_test.go": null,
+    "internal/engine/planning_api.go": "6680491c81a1b0d6b73f84d33128281a1352217ddf687fc49e435c80846e1027",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "c24cecdee8744eebd5950f03f3763e6231f037af7be5b7cea6840fc3e00e5a95",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "301a64e736d2aee57adf9c24a603a39cb25278d8d37b6b0c65257d233caf9c76",
+    "docs/engine-cursor-source-manifest.json": "954b910b0c986f07f1c8da7359258bc305a78f5f94ea1398b5835284c15d0d57",
+    "docs/engine-cursor-source-inputs-001.json": "c8716802cf49dce1a6641f7530521512baaa2e63e9f9c0ce037536f24f93f199",
+    "docs/engine-cursor-source-inputs-005.json": "bc73c465dd57e3bcaad19b34aee7ca498b10cb9e1997b1eac0bc8e4f175f16e2",
+    "docs/engine-cursor-source-inputs-004.json": "17b415e2d0e4979e6381f5953ee3b0ee519c554c54937b2b234d8e0c67e60f6e",
+    "docs/engine-cursor-source-inputs-003.json": "f301d1de39f70f61b5fc4f0ead4230aa763dfbf8ce0bcef70456a5828c06c76c"
+  },
+  "postimages": {
+    "internal/engine/managed_control_diagnostic_api.go": "adee0d146b55c7abcd803bc709c6da1ad35aa400ac31061ec5b4b903ae1caa73",
+    "internal/engine/managed_control_diagnostic_api_test.go": "7790dab1b8c48a32dff8b1dd0f1e43e3350a374048da7ec1625592d7ccbbf051",
+    "internal/engine/planning_api.go": "22e7ab79259945688fa7703feb487fa643b4e3589cab7b15b670021abd3f6d10",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "44370936dcfc675075fcc8896748e2014aa3e71875a0472ba03547a340555c4a",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "618c29654358ae50ee952d62fee686f20e98a0705935882599c6afe8c1ccd567",
+    "docs/engine-cursor-source-manifest.json": "185f805ec66a630f4456ec9bc465d9f8bff8bd068e9904466685b1a46d617959",
+    "docs/engine-cursor-source-inputs-001.json": "e28740023688ff8e55f96786f09374a0e63868c6acbea1e8e0aa2ab24c16eaa1",
+    "docs/engine-cursor-source-inputs-005.json": "eff907c870585defeda4be4f6e7796fb63e0865f10640e5fc3d0d50a8055ca47",
+    "docs/engine-cursor-source-inputs-004.json": "c5f0afa7a2721ffb5f1be825b708cd0b1dadf276b99e70c01979478996486ae8",
+    "docs/engine-cursor-source-inputs-003.json": "afeb2611617ba7fbbca7d4462f5625db68dd7b26e5f446cfb7079f84b1b9047d"
+  },
+  "result_tree": "194c18b8838a4ca94ef4d716efea50cf745ede52",
+  "patch": "control-diagnostic-public-20261012.patch",
+  "patch_sha256": "143ed70048ac430e98e8b7d7d6522bf9fd097c217925635321e548205ba7d2fe",
+  "paths": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/managed_control_diagnostic_api.go",
+    "internal/engine/managed_control_diagnostic_api_test.go",
+    "internal/engine/planning_api.go"
+  ],
+  "candidate_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+  "check": "PASS exact path diff, isolated refreshed-index apply, result tree and all postimages",
+  "qualification": {
+    "at": "2026-10-12T13:55:57.222135+00:00",
+    "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-diagnostic-public-bk85g3ke",
+    "candidate_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+    "checks": [
+      {
+        "started": "2026-10-12T13:54:50.810003+00:00",
+        "finished": "2026-10-12T13:55:19.050158+00:00",
+        "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-diagnostic-public-bk85g3ke",
+        "candidate_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+        "manifest_sha256": "185f805ec66a630f4456ec9bc465d9f8bff8bd068e9904466685b1a46d617959",
+        "argv": [
+          "go",
+          "test",
+          "./internal/engine",
+          "-run",
+          "^TestControlDiagnosticPublicHTTP",
+          "-count=1",
+          "-timeout=90s"
+        ],
+        "exit": 0,
+        "wall_seconds": 28.241430827998556,
+        "output": "/tmp/swarm-control-diagnostic-public-targeted-targeted-policy.out",
+        "output_sha256": "ac304bf7525f59f49aadd732c75590d42143f8805ac67f7a11e067ea0882fc86",
+        "drift": []
+      },
+      {
+        "started": "2026-10-12T13:55:20.341113+00:00",
+        "finished": "2026-10-12T13:55:31.216490+00:00",
+        "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-diagnostic-public-bk85g3ke",
+        "candidate_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+        "manifest_sha256": "185f805ec66a630f4456ec9bc465d9f8bff8bd068e9904466685b1a46d617959",
+        "argv": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "exit": 0,
+        "wall_seconds": 10.875382191996323,
+        "output": "/tmp/swarm-control-diagnostic-public-vet-targeted-policy.out",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "drift": []
+      },
+      {
+        "started": "2026-10-12T13:55:33.325218+00:00",
+        "finished": "2026-10-12T13:55:46.492570+00:00",
+        "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-diagnostic-public-bk85g3ke",
+        "candidate_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+        "manifest_sha256": "185f805ec66a630f4456ec9bc465d9f8bff8bd068e9904466685b1a46d617959",
+        "argv": [
+          "python3",
+          "tools/agent-workflows/check.py"
+        ],
+        "exit": 0,
+        "wall_seconds": 13.167391948009026,
+        "output": "/tmp/swarm-control-diagnostic-public-methods-targeted-policy.out",
+        "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+        "drift": []
+      },
+      {
+        "started": "2026-10-12T13:55:48.353335+00:00",
+        "finished": "2026-10-12T13:55:55.470829+00:00",
+        "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-diagnostic-public-bk85g3ke",
+        "candidate_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+        "manifest_sha256": "185f805ec66a630f4456ec9bc465d9f8bff8bd068e9904466685b1a46d617959",
+        "argv": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/swarm-qualified-control-diagnostic-public-build",
+          "./cmd/swarm"
+        ],
+        "exit": 0,
+        "wall_seconds": 7.117518993007252,
+        "output": "/tmp/swarm-control-diagnostic-public-build-targeted-policy.out",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "drift": [],
+        "binary_sha256": "cc4dc7ad7d72e38cc546125efac07176170142691e02c0954cda408bd2db0ae8"
+      }
+    ],
+    "result": "PASS targeted qualification",
+    "selection": "User explicitly requires proportionate tests. Authenticated diagnostic transport, unchanged state/calls, original output/provenance, wrong session/task, replaced blocker/attempt and corrupt output. No synchronization change. Prior full attempt FAIL18m and stopped disjoint remainder preserved; neither relabelled PASS.",
+    "limits": "No native acceptance, real-model autonomous correction or browser proof."
+  },
+  "purpose": "Authenticated read-only diagnostic of the current refused control: engine-owned provenance, output hash, unchanged state and stale/corrupt/foreign-task rejection. Extends qualified contract30 without deferred27 or acceptance.",
+  "preimage_scope": "Exact current primary preimages checked; any divergence from historical24 external packaging tree explicitly extended without rewriting its old objects."
+}

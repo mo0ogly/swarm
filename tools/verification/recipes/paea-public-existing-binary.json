@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "paea-public-existing-binary",
+  "inputs": [
+    "tests/paea_public_contract_test.py",
+    "tests/fixtures/paea/contract-v1.json",
+    "tools/verification/recipe.py",
+    "docs/architecture/PAEA-CONTRACT.md",
+    "docs/en/PAEA-CONTRACT.md",
+    "rust/crates/swarm-cli/src/protection.rs",
+    "rust/crates/swarm-protection-contract/src/*.rs",
+    "schemas/paea/*.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "offline-public-corpus",
+      "command": [
+        "python3",
+        "tests/paea_public_contract_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "Ran 18 tests",
+        "OK",
+        "test_all_frozen_vectors_match_public_bytes_in_both_languages",
+        "test_raw_ambiguities_refuse_between_valid_control_and_recovery",
+        "test_equivalent_input_encodings_preserve_exact_content",
+        "test_active_operations_and_runtime_options_refuse_then_recover",
+        "test_input_failures_refuse_without_mutation_then_recover",
+        "test_output_failure_is_nonzero_after_valid_control_then_recovers",
+        "test_comparison_exact_reports_both_domains_and_transport_equivalence",
+        "test_comparison_invalid_either_file_refuses_then_recovers",
+        "test_comparison_runtime_options_and_stdin_refuse_then_recovers",
+        "test_comparison_public_writer_failure_recovers",
+        "test_receipt_exact_correspondence_both_domains_and_languages",
+        "test_receipt_malformed_and_mismatched_data_refuse_then_recovers",
+        "test_receipt_state_sink_and_runtime_refusals_then_recovery",
+        "test_receipt_public_writer_failure_recovers",
+        "test_receipt_report_exact_both_domains_languages_and_legacy_shape",
+        "test_receipt_report_distinguishes_raw_receipt_and_document_bytes",
+        "test_receipt_report_refusal_binding_lifecycle_and_framing_then_recovery",
+        "test_receipt_report_public_output_failure_then_recovery",
+        "PAEA_PUBLIC_BINARY_STABLE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+sequenceDiagram
+  participant B as Trusted bootstrap (unwired)
+  participant C as Private client
+  participant S as Private service
+  participant W as Coordinator and witness
+  B->>C: Independent server pidfd, UID and pins
+  C->>S: V2, fresh challenge, pins, operation and Change
+  S->>S: Compare pins and authorize the request sender
+  S->>W: Execute under maintained authority control
+  W-->>S: Confirmed state or refusal
+  S-->>C: V2 and request digest, result or error code
+  S->>S: Close the channel on every terminal outcome
+  C->>C: Compare kernel process, UID and exact request
+  C->>C: Validate head, projection, pins and Change then close
+  Note over C,W: Reply lost after mutation: no result, uncertain outcome
+  Note over C,W: Exact business retry on a new channel, fresh challenge and renewed authorization

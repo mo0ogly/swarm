@@ -1,0 +1,22 @@
+{
+  "command": [
+    "go",
+    "vet",
+    "./internal/enrollmentstate"
+  ],
+  "exit": 0,
+  "start": "2026-10-17T11:12:26.536857+00:00",
+  "end": "2026-10-17T11:12:27.022541+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 7
+}

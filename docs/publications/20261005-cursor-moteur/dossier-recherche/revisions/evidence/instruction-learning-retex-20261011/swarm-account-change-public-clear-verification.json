@@ -1,0 +1,17 @@
+{
+  "active": false,
+  "cooldown": {
+    "provider": "claude",
+    "observed_at": "2026-10-11T15:18:42.477218207Z",
+    "resets_at": 1791739800,
+    "source": "fragment-call-b4041f7801a466b589f6f114",
+    "signal": "result.api_error_status.429",
+    "cleared_at": "2026-10-11T15:34:42.859676102Z",
+    "clear_event": "claude-account-changed-explicit-recovery-20261011",
+    "clear_reason": "Utilisateur : \u00ab j\u2019ai changer de compte cest reset donc reprends \u00bb. Connexion Claude active observ\u00e9e ; autorise une nouvelle v\u00e9rification r\u00e9elle, conserve quota pr\u00e9c\u00e9dent, appels et tentatives.",
+    "clear_actor": "local-uid-1001",
+    "clear_account_change": true
+  },
+  "digest": "dfed1cd359f6b6caff70195d1f6b21b4e73fad277b4d0a254e86d00dfe577ec8",
+  "provider": "claude"
+}

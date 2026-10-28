@@ -1,0 +1,94 @@
+{
+  "at": "2026-10-11T14:41:47.443257+00:00",
+  "source_count": 17,
+  "source_bytes": 130040,
+  "limit": 131072,
+  "paths": [
+    {
+      "path": "docs/architecture/CURSOR-ENGINE-CONTRACT.md",
+      "bytes": 13405,
+      "sha256": "c124f521d7938dd5933ffccbd38774ec23fc4bdb6a66ada652a29177645a4988"
+    },
+    {
+      "path": "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+      "bytes": 10096,
+      "sha256": "afe4e55b44f552537ca01aff13ac9e4bcdd1fc8ce559745825142f866fe781a6"
+    },
+    {
+      "path": "docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md",
+      "bytes": 9282,
+      "sha256": "10ac147726e3a88b776d392c9a9c4d12302f72efbbc56d64b74a168b853d86ec"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.exit",
+      "bytes": 7,
+      "sha256": "194ff5bca66278888f0f00be5c7ca523d15098ece958b14952533811089f6106"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.out",
+      "bytes": 3713,
+      "sha256": "fbaa92ea28409f7d476cdf46ba7046372f7d868a050833c5c7c2d31872115199"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/check-evolution-docs.out",
+      "bytes": 77,
+      "sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json",
+      "bytes": 4451,
+      "sha256": "4f355ad577ad2148cc9816d31585a62c67ba1f958306a75ccc4ac30799f57bfe"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-full-suite.out",
+      "bytes": 6785,
+      "sha256": "14ac1d7a7423f8ca394e653013cc60ba07bae85bedf3ff8d443b3ca336308675"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-race.out",
+      "bytes": 50,
+      "sha256": "b7f0a8a51fc1706f41dc399bb8dc0e53d38dbdbdcfaef9ff97504effccaa0618"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-targeted.out",
+      "bytes": 50,
+      "sha256": "1c47ae5625372b5aac5b782483ddf944e6db53e980839dc2e81d6889068e9dfd"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-vet.out",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "internal/engine/planning.go",
+      "bytes": 39763,
+      "sha256": "c3d8ac967e7b800ca5c8124da586f33afee83d967d4370e608a8b27ffab97fa6"
+    },
+    {
+      "path": "internal/engine/planning_api.go",
+      "bytes": 6018,
+      "sha256": "9004ed00bfb31b5209972516dddf53c85cea6ebcfcb9385a45c0cd49e29b9d94"
+    },
+    {
+      "path": "internal/engine/planning_context.go",
+      "bytes": 4376,
+      "sha256": "66176ec869f60bded108597cd81b18549a370b7c4dd11cc9903881ac8c605cc9"
+    },
+    {
+      "path": "internal/engine/planning_judge.go",
+      "bytes": 6462,
+      "sha256": "63de41bafd8f876fb90a667d9a3005233daf7fb274bbbce082ab448f8211986b"
+    },
+    {
+      "path": "internal/engine/planning_judge_test.go",
+      "bytes": 13517,
+      "sha256": "2be9973bad1ba5dbf0a625cbb5984f30f1da80b0bf48965a78fd7b491e65c9dd"
+    },
+    {
+      "path": "internal/engine/score.go",
+      "bytes": 11988,
+      "sha256": "449fd157d53cc656f103984a997ec8d11297c660df5aaf6f32f1a3e94f1df62d"
+    }
+  ],
+  "status": "Final exact transport prepared treead247d51; original preliminary source-union130779 receipt retained historical"
+}

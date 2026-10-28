@@ -1,0 +1,9 @@
+{"Time":"2026-10-13T00:18:35.349563364+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-13T00:18:35.374776827+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphPerformanceOversizePreviewAndApplyAgree"}
+{"Time":"2026-10-13T00:18:35.374897143+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphPerformanceOversizePreviewAndApplyAgree","Output":"=== RUN   TestGraphPerformanceOversizePreviewAndApplyAgree\n"}
+{"Time":"2026-10-13T00:18:35.415473124+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphPerformanceOversizePreviewAndApplyAgree","Output":"    graph_performance_config_test.go:279: oversized configuration approved; preview=true\n"}
+{"Time":"2026-10-13T00:18:35.417287574+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphPerformanceOversizePreviewAndApplyAgree","Output":"--- FAIL: TestGraphPerformanceOversizePreviewAndApplyAgree (0.04s)\n"}
+{"Time":"2026-10-13T00:18:35.418043024+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestGraphPerformanceOversizePreviewAndApplyAgree","Elapsed":0.04}
+{"Time":"2026-10-13T00:18:35.41807808+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-13T00:18:35.427183436+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.077s\n"}
+{"Time":"2026-10-13T00:18:35.427264508+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.078}

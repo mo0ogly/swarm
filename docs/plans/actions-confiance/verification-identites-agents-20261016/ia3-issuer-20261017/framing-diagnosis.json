@@ -1,0 +1,17 @@
+{
+  "observed": "planner=32185, subplanner=32188 > 32000 bytes",
+  "cause": "documentation requirement exceeded combined embedded context capacity",
+  "action": "consolidate shared wording, retain rule and role boundaries, no increased limit/truncation",
+  "before_bytes": 8019,
+  "after_bytes": 7890,
+  "verified": true,
+  "final_method_pack_exit": 0,
+  "subsequent_findings": [
+    "two further condensations insufficient (max 32059 and 32019 bytes)",
+    "an editing assertion failed before writing and a dependent check was incorrectly relaunched unchanged; original outputs retained"
+  ],
+  "correction": "dependent check now inside successful mutation process; final written contract assembled for all four roles",
+  "persistent_personal_rule": "/home/fpizzi/.codex/AGENTS.md",
+  "claude_reference_verified": "/home/fpizzi/.claude/CLAUDE.md includes personal AGENTS.md",
+  "deployment": "no deployed binary rebuilt or restarted"
+}

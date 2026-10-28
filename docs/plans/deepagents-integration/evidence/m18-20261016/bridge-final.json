@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "tests/test_memory_swarm_source.py"
+  ],
+  "started_at_utc": "2026-10-16T19:51:37.275895+00:00",
+  "duration_seconds": 0.255,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "test_cli_writes_new_private_bundle_and_preserves_sources",
+    "test_does_not_mutate_inputs",
+    "test_new_current_task_snapshot_invalidates_previous_reference",
+    "test_preserves_exact_quotes_scope_and_provenance_for_reference",
+    "test_refuses_wrong_scope_roles_duplicates_and_completeness",
+    "test_rejects_changed_dialogue_pair_even_after_text_rehash",
+    "test_rejects_payload_and_text_tampering",
+    "test_requires_annotations_bound_to_packet_and_current_task"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "97a1b2639cf719d2da39ae36e1a3cde454255ebbe47b8cd8d294223606fef93b",
+  "real_model_calls": 0
+}

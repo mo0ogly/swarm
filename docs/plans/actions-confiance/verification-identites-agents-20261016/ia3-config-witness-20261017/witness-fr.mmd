@@ -1,0 +1,18 @@
+flowchart TD
+  O["OpenCoordinated<br/>deux répertoires privés distincts"] --> A["Réservations et autorisation<br/>base attendue, demande exacte"]
+  A --> I["Intention dans witness.json<br/>entrée et cible, fichier et répertoire synchronisés"]
+  I --> C["Configuration atomique<br/>écriture, rename et synchronisation"]
+  C --> W["Confirmer le témoin<br/>committed = cible, pending = null"]
+  W --> V["View sauvegardée<br/>pas une preuve de service actif"]
+  I -. "erreur" .-> E["Aucun View<br/>cause et étape conservées"]
+  C -. "erreur" .-> E
+  W -. "erreur ou acquittement incertain" .-> E
+  E --> S["Relire les deux états<br/>ne jamais apprendre le témoin de la configuration"]
+  S --> P["Intention ouverte<br/>Read et Preview ordinaires refusés"]
+  P --> R["Recover ou demande pendante exacte<br/>comparer base ou cible, réautoriser, sync intention"]
+  R -- "base exacte" --> C
+  R -- "cible déjà visible" --> D["Sync configuration<br/>sans second événement ni réécriture"]
+  D --> W
+  S -- "déjà confirmé et cohérent" --> B["Barrières des deux répertoires"]
+  B --> V
+  O -. "raccord restant" .-> F["Protection OS et sauvegardes, service, API et Admin<br/>pas réalisés par ces fixtures"]

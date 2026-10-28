@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "tools/memory-evaluation/compare.py",
+    "--pack",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m6-20261016/pack",
+    "--answers",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m6-20261016/real-codex-02/answers.json",
+    "--output",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m8-20261016/v1-replay-result.json"
+  ],
+  "started_at_utc": "2026-10-16T08:13:00.512621+00:00",
+  "ended_at_utc": "2026-10-16T08:13:00.848969+00:00",
+  "exit_code": 1,
+  "expected_exit_code": 1,
+  "log_sha256": "0ed14c945a06416ce5db1695eea311b3b9c09e52de76d664407562882d6f43aa"
+}
