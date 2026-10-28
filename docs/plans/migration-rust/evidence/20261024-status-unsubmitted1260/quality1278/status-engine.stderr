@@ -1,0 +1,5 @@
+    Blocking waiting for file lock on build directory
+   Compiling swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+    Finished `test` profile [unoptimized] target(s) in 54.47s
+     Running unittests src/lib.rs (.cache/rust-native-version846-target/debug/deps/swarm_engine-b6aa09cf62374457)
+OWNED_REVIEW_FIXTURE /tmp/swarm-status-review-3419590-1792836945405567251

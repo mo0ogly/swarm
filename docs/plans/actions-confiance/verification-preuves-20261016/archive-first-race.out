@@ -1,0 +1,20 @@
+=== RUN   TestActionsConfianceT6ArchiveLifecycle
+--- PASS: TestActionsConfianceT6ArchiveLifecycle (1.35s)
+=== RUN   TestActionsConfianceT6ArchiveRejectsDamagedFiles
+=== RUN   TestActionsConfianceT6ArchiveRejectsDamagedFiles/missing
+=== RUN   TestActionsConfianceT6ArchiveRejectsDamagedFiles/corrupt
+=== RUN   TestActionsConfianceT6ArchiveRejectsDamagedFiles/link
+=== RUN   TestActionsConfianceT6ArchiveRejectsDamagedFiles/directory-link
+--- PASS: TestActionsConfianceT6ArchiveRejectsDamagedFiles (4.58s)
+    --- PASS: TestActionsConfianceT6ArchiveRejectsDamagedFiles/missing (1.24s)
+    --- PASS: TestActionsConfianceT6ArchiveRejectsDamagedFiles/corrupt (1.14s)
+    --- PASS: TestActionsConfianceT6ArchiveRejectsDamagedFiles/link (1.16s)
+    --- PASS: TestActionsConfianceT6ArchiveRejectsDamagedFiles/directory-link (1.04s)
+=== RUN   TestActionsConfianceT6ArchiveOrphanAndPolicy
+--- PASS: TestActionsConfianceT6ArchiveOrphanAndPolicy (1.38s)
+=== RUN   TestActionsConfianceT6ArchiveConcurrentReplay
+--- PASS: TestActionsConfianceT6ArchiveConcurrentReplay (1.23s)
+=== RUN   TestActionsConfianceT6ArchiveLargeRetention
+--- PASS: TestActionsConfianceT6ArchiveLargeRetention (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	10.008s

@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-17T12:54:21.485252+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "inputs": {
+    "go.mod": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+    "go.sum": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+    "internal/enrollmentconfig/config.go": "32302422388538e4432afff63ef540e3a6225b5b2cf1a55d5330baeb39a531d1",
+    "internal/enrollmentconfig/config_test.go": "d6d6e1d0f8a600b7e6b97bfe2c785129c0c0c5b8b75114317f491c89f0ef4977",
+    "internal/enrollmentconfig/store_linux.go": "233c55b20b2b0835833d933d436efd76b707f52dfbfad6b8299c68f67a193e81",
+    "internal/enrollmentconfig/store_linux_test.go": "975833b2ba07e1a54bf432867025e7a5db0e9f56c7860d3b720f25f056db6706",
+    "internal/identitycontract/contract.go": "5eb8c945536080d376285ac547aea421bc196f7fc446375cbe2d9327721b1dd8",
+    "internal/identitycontract/contract_test.go": "3ca9b1020401471a5a3a887d063def73019eb32485f6b023277de776ae859ea7"
+  }
+}

@@ -1,0 +1,1394 @@
+//go:build linux
+
+package engine
+
+import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+	"syscall"
+	"time"
+)
+
+const trustStateMaxBytes = 8 << 20
+const trustProofKeyBytes = 32
+
+type TrustPolicy struct {
+	MandateTTLSeconds       int  `json:"mandate_ttl_seconds"`
+	UnknownReconcileSeconds int  `json:"unknown_reconcile_seconds"`
+	EvidenceRetentionDays   int  `json:"evidence_retention_days"`
+	RequireSeparation       bool `json:"require_separation"`
+}
+
+type TrustIdentityInput struct {
+	Subject   string                `json:"subject"`
+	Token     string                `json:"token"`
+	Integrity int                   `json:"integrity"`
+	Roles     []string              `json:"roles"`
+	Disabled  trustIdentityDisabled `json:"disabled,omitempty"`
+}
+
+type trustIdentity struct {
+	Context   *TrustIdentityContext `json:"-"`
+	Subject   string                `json:"subject"`
+	TokenHash string                `json:"token_hash"`
+	Integrity int                   `json:"integrity"`
+	Roles     []string              `json:"roles"`
+	Disabled  trustIdentityDisabled `json:"disabled,omitempty"`
+}
+
+type TrustConfigChange struct {
+	KernelObservation     *TrustKernelObservePolicy   `json:"kernel_observation,omitempty"`
+	KernelCheck           *TrustKernelCheckPolicy     `json:"kernel_check,omitempty"`
+	Laboratory            *TrustLaboratoryPolicy      `json:"laboratory,omitempty"`
+	EvidenceSigning       *TrustEvidenceSigningPolicy `json:"evidence_signing,omitempty"`
+	ProcessPolicy         *TrustProcessPolicy         `json:"process_policy,omitempty"`
+	WorkloadIntrospection *TrustIntrospectionPolicy   `json:"workload_introspection,omitempty"`
+	SecretBroker          *TrustSecretPolicy          `json:"secret_broker,omitempty"`
+	SealedExecution       *TrustSealedPolicy          `json:"sealed_execution,omitempty"`
+	DataPolicy            *TrustDataPolicy            `json:"data_policy,omitempty"`
+	GroupMapping          *TrustGroupMapping          `json:"group_mapping,omitempty"`
+	OIDCLogout            *TrustOIDCLogoutPolicy      `json:"oidc_logout,omitempty"`
+	StepUp                *TrustStepUpPolicy          `json:"step_up,omitempty"`
+	Delegation            *TrustDelegationPolicy      `json:"delegation,omitempty"`
+	Workloads             *TrustWorkloadConfig        `json:"workloads,omitempty"`
+	OIDC                  *TrustOIDCConfig            `json:"oidc,omitempty"`
+	Schema                int                         `json:"schema_version"`
+	EventID               string                      `json:"event_id"`
+	ExpectedRevision      int                         `json:"expected_revision"`
+	Policy                TrustPolicy                 `json:"policy"`
+	Identities            []TrustIdentityInput        `json:"identities"`
+	Reason                string                      `json:"reason"`
+}
+
+type trustConfigRevision struct {
+	Revision int         `json:"revision"`
+	Policy   TrustPolicy `json:"policy"`
+	Actor    string      `json:"actor"`
+	Reason   string      `json:"reason"`
+	EventID  string      `json:"event_id"`
+	At       string      `json:"at"`
+}
+
+type TrustMandate struct {
+	Connector    *TrustConnectorSelection `json:"connector,omitempty"`
+	ParentID     string                   `json:"parent_mandate_id,omitempty"`
+	ParentHash   string                   `json:"parent_content_digest,omitempty"`
+	ID           string                   `json:"id"`
+	Subject      string                   `json:"subject"`
+	Delegator    string                   `json:"delegator"`
+	Actions      []string                 `json:"actions"`
+	Resource     string                   `json:"resource"`
+	MaxAmount    int64                    `json:"max_amount_minor"`
+	Currency     string                   `json:"currency"`
+	Beneficiary  string                   `json:"beneficiary"`
+	Version      int                      `json:"version"`
+	PolicyRev    int                      `json:"policy_revision"`
+	Integrity    int                      `json:"integrity"`
+	StartsAt     string                   `json:"starts_at"`
+	ExpiresAt    string                   `json:"expires_at"`
+	RevokedAt    string                   `json:"revoked_at,omitempty"`
+	ContentHash  string                   `json:"content_digest"`
+	OriginalHash string                   `json:"original_digest"`
+}
+
+type TrustAction struct {
+	Connector      *TrustConnectorSelection `json:"connector,omitempty"`
+	DataContext    *TrustDataContext        `json:"data_context,omitempty"`
+	ID             string                   `json:"id"`
+	MandateID      string                   `json:"mandate_id"`
+	Requester      string                   `json:"requester"`
+	Approver       string                   `json:"approver,omitempty"`
+	Resource       string                   `json:"resource"`
+	Amount         int64                    `json:"amount_minor"`
+	Currency       string                   `json:"currency"`
+	Beneficiary    string                   `json:"beneficiary"`
+	IdempotencyKey string                   `json:"idempotency_key"`
+	ContentHash    string                   `json:"content_digest"`
+	OriginalHash   string                   `json:"original_digest"`
+	State          string                   `json:"state"`
+	Reason         string                   `json:"reason,omitempty"`
+	NextAction     string                   `json:"next_action,omitempty"`
+	CreatedAt      string                   `json:"created_at"`
+	UpdatedAt      string                   `json:"updated_at"`
+}
+
+type TrustLedgerEntry struct {
+	Sequence       int    `json:"sequence"`
+	ActionID       string `json:"action_id"`
+	ContentHash    string `json:"content_digest"`
+	IdempotencyKey string `json:"idempotency_key"`
+	Amount         int64  `json:"amount_minor"`
+	Currency       string `json:"currency"`
+	Beneficiary    string `json:"beneficiary"`
+	Resource       string `json:"resource"`
+	CommittedAt    string `json:"committed_at"`
+	Simulation     bool   `json:"simulation"`
+}
+
+type TrustEvidence struct {
+	PolicyContext   *TrustProofPolicyContext `json:"policy_context,omitempty"`
+	EffectReceipt   *TrustEffectProof        `json:"effect_receipt,omitempty"`
+	IdentityContext *TrustIdentityContext    `json:"identity_context,omitempty"`
+	Sequence        int                      `json:"sequence"`
+	PreviousHash    string                   `json:"previous_hash"`
+	Hash            string                   `json:"hash"`
+	Kind            string                   `json:"kind"`
+	Actor           string                   `json:"actor"`
+	Integrity       int                      `json:"integrity"`
+	ObjectID        string                   `json:"object_id"`
+	ContentHash     string                   `json:"content_digest"`
+	OriginalHash    string                   `json:"original_digest,omitempty"`
+	Result          string                   `json:"result"`
+	Reason          string                   `json:"reason,omitempty"`
+	At              string                   `json:"at"`
+}
+
+type trustReceipt struct {
+	Intent      *TrustEffectIntent `json:"intent,omitempty"`
+	Result      *TrustEffectResult `json:"result,omitempty"`
+	ContentHash string             `json:"content_digest"`
+	ActionID    string             `json:"action_id"`
+	State       string             `json:"state"`
+}
+
+type trustState struct {
+	AgentIdentities       map[string]agentIdentityPublicationState `json:"agent_identity_authorities,omitempty"`
+	KernelObservation     *TrustKernelObservePolicy                `json:"kernel_observation,omitempty"`
+	KernelCheck           *TrustKernelCheckPolicy                  `json:"kernel_check,omitempty"`
+	AccessLedger          []TrustAccessEntry                       `json:"access_ledger,omitempty"`
+	Laboratory            *TrustLaboratoryPolicy                   `json:"laboratory,omitempty"`
+	LaboratoryRuns        *trustLaboratoryState                    `json:"laboratory_runs,omitempty"`
+	EvidenceSigning       *TrustEvidenceSigningPolicy              `json:"evidence_signing,omitempty"`
+	PublicEvidence        *trustEvidenceRegistry                   `json:"public_evidence,omitempty"`
+	ProcessPolicy         *TrustProcessPolicy                      `json:"process_policy,omitempty"`
+	Processes             *trustProcessState                       `json:"processes,omitempty"`
+	serviceProof          *trustServiceProof                       `json:"-"`
+	WorkloadIntrospection *TrustIntrospectionPolicy                `json:"workload_introspection,omitempty"`
+	SecretBroker          *TrustSecretPolicy                       `json:"secret_broker,omitempty"`
+	SecretGrants          map[string]TrustSecretGrant              `json:"secret_grants,omitempty"`
+	SealedExecution       *TrustSealedPolicy                       `json:"sealed_execution,omitempty"`
+	DataPolicy            *TrustDataPolicy                         `json:"data_policy,omitempty"`
+	GroupMapping          *TrustGroupMapping                       `json:"group_mapping,omitempty"`
+	OIDCLogoutFences      map[string]trustOIDCLogoutFence          `json:"oidc_logout_fences,omitempty"`
+	OIDCLogout            *TrustOIDCLogoutPolicy                   `json:"oidc_logout,omitempty"`
+	OIDCLogoutUsed        map[string]time.Time                     `json:"oidc_logout_used,omitempty"`
+	StepUp                *TrustStepUpPolicy                       `json:"step_up,omitempty"`
+	Delegation            *TrustDelegationPolicy                   `json:"delegation,omitempty"`
+	Workloads             *TrustWorkloadConfig                     `json:"workloads,omitempty"`
+	WorkloadUsed          map[string]time.Time                     `json:"workload_used,omitempty"`
+	WorkloadSessions      map[string]trustOIDCSession              `json:"workload_sessions,omitempty"`
+	OIDC                  *TrustOIDCConfig                         `json:"oidc,omitempty"`
+	OIDCPending           map[string]trustOIDCPending              `json:"oidc_pending,omitempty"`
+	OIDCSessions          map[string]trustOIDCSession              `json:"oidc_sessions,omitempty"`
+	Originals             map[string][]byte                        `json:"originals,omitempty"`
+	Schema                int                                      `json:"schema_version"`
+	Revision              int                                      `json:"revision"`
+	Policy                TrustPolicy                              `json:"policy"`
+	Identities            []trustIdentity                          `json:"identities"`
+	History               []trustConfigRevision                    `json:"history"`
+	Mandates              map[string]TrustMandate                  `json:"mandates"`
+	Actions               map[string]TrustAction                   `json:"actions"`
+	Receipts              map[string]trustReceipt                  `json:"connector_receipts"`
+	Ledger                []TrustLedgerEntry                       `json:"ledger"`
+	Evidence              []TrustEvidence                          `json:"evidence"`
+	EventAuthorities      map[string]string                        `json:"event_authorities,omitempty"`
+	EventReplies          map[string]json.RawMessage               `json:"event_replies"`
+	EventDigests          map[string]string                        `json:"event_digests"`
+}
+
+type TrustCommand struct {
+	Connector        *TrustConnectorSelection `json:"connector,omitempty"`
+	DataContext      *TrustDataContext        `json:"data_context,omitempty"`
+	ParentMandateID  string                   `json:"parent_mandate_id,omitempty"`
+	original         []byte
+	Schema           int                  `json:"schema_version"`
+	EventID          string               `json:"event_id"`
+	ExpectedRevision int                  `json:"expected_revision,omitempty"`
+	Actor            string               `json:"actor,omitempty"`     // untrusted and deliberately ignored
+	Integrity        int                  `json:"integrity,omitempty"` // untrusted and deliberately ignored
+	Policy           TrustPolicy          `json:"policy,omitempty"`
+	Identities       []TrustIdentityInput `json:"identities,omitempty"`
+	Reason           string               `json:"reason,omitempty"`
+	MandateID        string               `json:"mandate_id,omitempty"`
+	ActionID         string               `json:"action_id,omitempty"`
+	ContentHash      string               `json:"content_digest,omitempty"`
+	Subject          string               `json:"subject,omitempty"`
+	Actions          []string             `json:"actions,omitempty"`
+	Resource         string               `json:"resource,omitempty"`
+	MaxAmount        int64                `json:"max_amount_minor,omitempty"`
+	Amount           int64                `json:"amount_minor,omitempty"`
+	Currency         string               `json:"currency,omitempty"`
+	Beneficiary      string               `json:"beneficiary,omitempty"`
+	StartsAt         string               `json:"starts_at,omitempty"`
+	ExpiresAt        string               `json:"expires_at,omitempty"`
+	IdempotencyKey   string               `json:"idempotency_key,omitempty"`
+	LoseResponse     bool                 `json:"lose_response,omitempty"`
+	Export           *TrustProofExport    `json:"export,omitempty"`
+	Anchor           *TrustProofAnchor    `json:"anchor,omitempty"`
+	VerificationKey  string               `json:"verification_key,omitempty"`
+}
+
+type TrustProofExport struct {
+	Originals  map[string][]byte `json:"originals"`
+	Schema     int               `json:"schema_version"`
+	Simulation bool              `json:"simulation"`
+	Evidence   []TrustEvidence   `json:"evidence"`
+}
+
+type TrustProofAnchor struct {
+	Schema    int    `json:"schema_version"`
+	Sequence  int    `json:"sequence"`
+	Hash      string `json:"hash"`
+	Signature string `json:"signature"`
+}
+
+func defaultTrustPolicy() TrustPolicy {
+	return TrustPolicy{MandateTTLSeconds: 3600, UnknownReconcileSeconds: 0, EvidenceRetentionDays: 365, RequireSeparation: true}
+}
+
+func newTrustState() trustState {
+	return trustState{Originals: map[string][]byte{}, Schema: 1, Policy: defaultTrustPolicy(), Mandates: map[string]TrustMandate{}, Actions: map[string]TrustAction{}, Receipts: map[string]trustReceipt{}, EventReplies: map[string]json.RawMessage{}, EventDigests: map[string]string{}}
+}
+
+func validateTrustPolicy(p TrustPolicy) error {
+	bounds := trustPolicyBounds()
+	for key, value := range map[string]int{"mandate_ttl_seconds": p.MandateTTLSeconds, "unknown_reconcile_seconds": p.UnknownReconcileSeconds, "evidence_retention_days": p.EvidenceRetentionDays} {
+		if int64(value) < bounds[key]["min"] || int64(value) > bounds[key]["max"] {
+			return fmt.Errorf("%s : entier entre %d et %d (limite technique de représentation)", key, bounds[key]["min"], bounds[key]["max"])
+		}
+	}
+	return nil
+}
+
+func trustPolicyBounds() map[string]map[string]int64 {
+	integerMax := int64(^uint(0) >> 1)
+	if integerMax > 1<<53-1 {
+		integerMax = 1<<53 - 1
+	}
+	durationMax := int64(^uint64(0)>>1) / int64(time.Second)
+	if durationMax > integerMax {
+		durationMax = integerMax
+	}
+	return map[string]map[string]int64{
+		"kernel_observation_window_seconds":       {"min": 1, "max": durationMax},
+		"kernel_observation_timeout_seconds":      {"min": 1, "max": durationMax},
+		"kernel_observation_ring_bytes":           {"min": int64(os.Getpagesize()), "max": 1 << 31},
+		"kernel_observation_max_events":           {"min": 1, "max": integerMax},
+		"kernel_check_timeout_seconds":            {"min": 1, "max": durationMax},
+		"kernel_check_ring_bytes":                 {"min": int64(os.Getpagesize()), "max": 1 << 31},
+		"laboratory_timeout_seconds":              {"min": 1, "max": durationMax},
+		"laboratory_max_concurrent_runs":          {"min": 1, "max": integerMax},
+		"evidence_key_ttl_seconds":                {"min": 1, "max": durationMax},
+		"evidence_registry_revision":              {"min": 1, "max": integerMax},
+		"evidence_verify_bytes":                   {"min": 1, "max": 2 * trustStateMaxBytes},
+		"process_command_bytes":                   {"min": 1, "max": 1 << 20},
+		"process_state_bytes":                     {"min": 1, "max": trustStateMaxBytes},
+		"process_version":                         {"min": 1, "max": integerMax},
+		"introspection_timeout_seconds":           {"min": 1, "max": durationMax},
+		"introspection_validation_window_seconds": {"min": 1, "max": durationMax},
+		"introspection_max_sessions":              {"min": 1, "max": integerMax},
+		"introspection_max_token_bytes":           {"min": 1, "max": 1 << 20},
+		"introspection_response_bytes":            {"min": 1, "max": 1 << 20},
+		"secret_broker_material_ttl_seconds":      {"min": 1, "max": durationMax},
+		"secret_broker_grant_ttl_seconds":         {"min": 1, "max": durationMax},
+		"secret_broker_max_material_bytes":        {"min": 1, "max": 1 << 20},
+		"secret_broker_max_entries":               {"min": 1, "max": integerMax},
+		"sealed_execution_timeout_seconds":        {"min": 1, "max": durationMax},
+		"mandate_ttl_seconds":                     {"min": 0, "max": durationMax},
+		"unknown_reconcile_seconds":               {"min": 0, "max": durationMax},
+		"evidence_retention_days":                 {"min": 1, "max": integerMax},
+		"max_delegation_depth":                    {"min": 0, "max": integerMax},
+		"step_up_max_age_seconds":                 {"min": 0, "max": durationMax},
+		"step_up_proof_ttl_seconds":               {"min": 1, "max": durationMax},
+		"oidc_logout_max_age_seconds":             {"min": 1, "max": durationMax},
+		"oidc_logout_replay_retention_seconds":    {"min": 0, "max": durationMax},
+	}
+}
+
+func trustTokenHash(token string) string { return hash([]byte("trust-token-v1\x00" + token)) }
+
+func (s *Store) trustPaths() (string, string, string) {
+	dir := filepath.Join(s.root, ".swarm")
+	return filepath.Join(dir, "trust-actions.json"), filepath.Join(dir, "trust-actions.lock"), filepath.Join(dir, "trust-actions-proof.key")
+}
+
+func (s *Store) loadTrustState() (trustState, error) {
+	return s.loadTrustStateWithOpen(os.OpenFile)
+}
+
+func (s *Store) loadTrustStateWithOpen(open func(string, int, os.FileMode) (*os.File, error)) (trustState, error) {
+	path, _, _ := s.trustPaths()
+	state := newTrustState()
+	f, err := open(path, os.O_RDONLY|syscall.O_NOFOLLOW|syscall.O_NONBLOCK, 0)
+	if os.IsNotExist(err) {
+		return state, nil
+	}
+	if err != nil {
+		return state, err
+	}
+	defer f.Close()
+	st, err := f.Stat()
+	if err != nil {
+		return state, err
+	}
+	if !st.Mode().IsRegular() || st.Size() > trustStateMaxBytes {
+		return state, fmt.Errorf("état Actions de confiance invalide")
+	}
+	raw, err := io.ReadAll(io.LimitReader(f, int64(trustStateMaxBytes)+1))
+	if err != nil {
+		return state, err
+	}
+	if len(raw) > trustStateMaxBytes {
+		return state, fmt.Errorf("état Actions de confiance supérieur à 8 Mio")
+	}
+	if err = strict(raw, &state); err != nil {
+		return state, err
+	}
+	if state.Schema != 1 || state.Revision != len(state.History) || state.Mandates == nil || state.Actions == nil || state.Receipts == nil || state.EventReplies == nil || state.EventDigests == nil {
+		return state, fmt.Errorf("état Actions de confiance incohérent")
+	}
+	if err = validateAgentIdentityPublicationStates(state.AgentIdentities); err != nil {
+		return state, err
+	}
+	if state.Originals == nil {
+		state.Originals = map[string][]byte{}
+	}
+	for digest, source := range state.Originals {
+		if len(source) == 0 || hash(source) != digest || !json.Valid(source) {
+			return state, fmt.Errorf("original conservé altéré")
+		}
+	}
+	if err = validateTrustProcesses(state.Processes); err != nil {
+		return state, err
+	}
+	if err = validateTrustSecretPolicy(state.SecretBroker); err != nil {
+		return state, err
+	}
+	if err = validateTrustSealedPolicy(state.SealedExecution); err != nil {
+		return state, err
+	}
+	if err = validateKernelObservePolicy(state.KernelObservation); err != nil {
+		return state, err
+	}
+	if err = validateTrustKernelPolicy(state.KernelCheck); err != nil {
+		return state, err
+	}
+	if err = validateTrustDataPolicy(state.DataPolicy); err != nil {
+		return state, err
+	}
+	if err = validateTrustDelegation(state.Delegation); err != nil {
+		return state, err
+	}
+	if err = validateTrustIntrospection(state.WorkloadIntrospection, state.Workloads); err != nil {
+		return state, err
+	}
+	if err = validateTrustWorkloads(state.Workloads, state.Identities); err != nil {
+		return state, err
+	}
+	if err = validateTrustOIDC(state.OIDC, state.Identities); err != nil {
+		return state, err
+	}
+	if err = validateTrustGroupMapping(state.GroupMapping, state.OIDC, state.Workloads); err != nil {
+		return state, err
+	}
+	if err = validateTrustOIDCLogout(state.OIDCLogout, state.OIDC); err != nil {
+		return state, err
+	}
+	if err = validateTrustStepUp(state.StepUp, state.OIDC); err != nil {
+		return state, err
+	}
+	if err = validateTrustLaboratoryState(&state); err != nil {
+		return state, err
+	}
+	if err = validateTrustEvidencePolicy(state.EvidenceSigning); err != nil {
+		return state, err
+	}
+	if err = validateTrustEvidenceRegistry(state.PublicEvidence); err != nil {
+		return state, err
+	}
+	if err = validateTrustPolicy(state.Policy); err != nil {
+		return state, err
+	}
+	return state, nil
+}
+
+func (s *Store) withTrustLock(write bool, fn func(*trustState) (any, error)) (any, error) {
+	return s.withTrustPublicationLock(write, nil, fn)
+}
+
+func (s *Store) withTrustPublicationLock(write bool, recovery *TrustConfigChange, fn func(*trustState) (any, error)) (any, error) {
+	return s.withTrustPublicationLockUsing(write, recovery, false, fn)
+}
+func (s *Store) withTrustReadAvailable(fn func(*trustState) (any, error)) (any, error) {
+	return s.withTrustPublicationLockUsing(false, nil, true, fn)
+}
+func (s *Store) withTrustPublicationLockUsing(write bool, recovery *TrustConfigChange, nonblocking bool, fn func(*trustState) (any, error)) (any, error) {
+	path, lockPath, _ := s.trustPaths()
+	lock, err := os.OpenFile(lockPath, os.O_CREATE|os.O_RDWR|syscall.O_NOFOLLOW, 0600)
+	if err != nil {
+		return nil, err
+	}
+	defer lock.Close()
+	mode := syscall.LOCK_SH
+	if write {
+		mode = syscall.LOCK_EX
+	}
+	if nonblocking {
+		mode |= syscall.LOCK_NB
+	}
+	if err = syscall.Flock(int(lock.Fd()), mode); err != nil {
+		if nonblocking && err == syscall.EWOULDBLOCK {
+			return nil, &CommandError{Code: "workspace_wait", Message: "état Actions de confiance occupé ; réessayez après la fin de l’opération en cours"}
+		}
+		return nil, err
+	}
+	defer syscall.Flock(int(lock.Fd()), syscall.LOCK_UN)
+	if write && recovery != nil {
+		if err = s.resumeTrustInitialPublication(recovery); err != nil {
+			return nil, err
+		}
+	} else if _, pendingErr := os.Lstat(s.trustInitialPath()); pendingErr == nil {
+		return nil, &CommandError{Code: "initial_configuration_pending", Message: "publication initiale incomplète ; réappliquer la configuration initiale exacte après diagnostic du stockage"}
+	} else if !os.IsNotExist(pendingErr) {
+		return nil, pendingErr
+	}
+	state, err := s.loadTrustState()
+	initial := state.Revision == 0
+	if err != nil {
+		return nil, err
+	}
+	previousRevision := state.Revision
+	state.serviceProof = s.serviceProof
+	if write {
+		if err := verifyTrustEvidenceChain(TrustProofExport{Evidence: state.Evidence, Originals: state.Originals}); err != nil {
+			return nil, &trustProofIntegrityError{err}
+		}
+	}
+	result, err := fn(&state)
+	if err != nil {
+		return nil, err
+	}
+	if write {
+		raw, marshalErr := encodeTrustState(state)
+		if marshalErr != nil {
+			return nil, marshalErr
+		}
+		if initial && state.Revision == 1 {
+			err = s.publishTrustInitialState(raw)
+		} else {
+			err = atomicWrite(path, raw)
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	if write && state.Revision != previousRevision && s.serviceRuntime != nil {
+		b := s.serviceRuntime
+		b.mu.Lock()
+		b.purge(state.Revision, time.Now().UTC())
+		b.mu.Unlock()
+	}
+	if write && state.Revision != previousRevision && s.evidenceRuntime != nil {
+		b := s.evidenceRuntime
+		b.mu.Lock()
+		b.purge(state.Revision)
+		b.mu.Unlock()
+	}
+	return result, nil
+}
+
+func encodeTrustState(state trustState) ([]byte, error) {
+	raw, err := json.MarshalIndent(state, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+	raw = append(raw, '\n')
+	if len(raw) > trustStateMaxBytes {
+		return nil, fmt.Errorf("état Actions de confiance supérieur à 8 Mio")
+	}
+	return raw, nil
+}
+
+func trustPublicState(st *trustState) map[string]any {
+	mandateAmounts, mandateReasons := trustDelegationPublicState(st)
+	identities := trustPublicIdentities(st.Identities)
+	missing := 0
+	for _, ev := range st.Evidence {
+		if len(st.Originals[ev.OriginalHash]) == 0 {
+			missing++
+		}
+	}
+	limits := []string{"aucun paiement réel", "jetons du pilote local", "preuve locale non ancrée par un tiers"}
+	if missing > 0 {
+		limits = append(limits, "Originaux historiques absents : vérification incomplète ; données conservées.")
+	}
+	amounts := map[string]string{}
+	for id, action := range st.Actions {
+		amounts[id] = fmt.Sprint(action.Amount)
+	}
+	return map[string]any{"connector_catalog": trustConnectorCatalog(), "access_ledger": append([]TrustAccessEntry{}, st.AccessLedger...), "effect_receipts": st.Receipts, "amount_minor_text": amounts, "mandate_amount_minor_text": mandateAmounts, "mandate_status": mandateReasons, "originals_missing": missing, "schema_version": 1, "revision": st.Revision, "policy": st.Policy, "policy_bounds": trustPolicyBounds(), "identities": identities, "oidc": st.OIDC, "oidc_defaults": defaultTrustOIDCConfig(), "workloads": st.Workloads, "workload_defaults": defaultTrustWorkloadConfig(), "workload_introspection": trustIntrospectionPolicyValue(st.WorkloadIntrospection), "evidence_signing": trustEvidencePolicy(st.EvidenceSigning), "laboratory": laboratoryPolicy(st.Laboratory), "process_policy": trustProcessPolicyValue(st.ProcessPolicy), "delegation": effectiveTrustDelegation(st), "step_up": effectiveTrustStepUp(st), "oidc_logout": effectiveTrustOIDCLogout(st), "group_mapping": effectiveTrustGroupMapping(st), "secret_broker": trustSecretPolicyValue(st.SecretBroker), "secret_grants": st.SecretGrants, "kernel_observation": kernelObservePolicy(st.KernelObservation), "kernel_check": trustKernelPolicy(st.KernelCheck), "sealed_execution": trustSealedPolicyValue(st.SealedExecution), "data_policy": effectiveTrustDataPolicy(st), "data_capabilities": trustDataCapabilities(), "oidc_logout_replay_records": len(st.OIDCLogoutUsed), "mandates": st.Mandates, "actions": st.Actions, "ledger": append([]TrustLedgerEntry{}, st.Ledger...), "evidence_count": len(st.Evidence), "simulation": true, "limits": limits}
+}
+
+func validateTrustIdentities(inputs []TrustIdentityInput) ([]trustIdentity, error) {
+	if len(inputs) < 3 {
+		return nil, fmt.Errorf("au moins trois identités séparées sont requises")
+	}
+	seenSubject, seenToken := map[string]bool{}, map[string]bool{}
+	result := make([]trustIdentity, 0, len(inputs))
+	for _, in := range inputs {
+		if !safeName(in.Subject) || !trustCredentialValid(in.Token) || in.Integrity < 1 || in.Integrity > 3 || seenSubject[in.Subject] {
+			return nil, fmt.Errorf("identité invalide, dupliquée ou jeton privé incomplet/d’exemple")
+		}
+
+		h := trustTokenHash(in.Token)
+		if seenToken[h] {
+			return nil, fmt.Errorf("jeton partagé entre identités refusé")
+		}
+		roles := append([]string(nil), in.Roles...)
+		sort.Strings(roles)
+		for _, role := range roles {
+			if role != "requester" && role != "approver" && role != "admin" && role != "effect" {
+				return nil, fmt.Errorf("rôle inconnu : %s", role)
+			}
+		}
+		seenSubject[in.Subject], seenToken[h] = true, true
+		result = append(result, trustIdentity{Subject: in.Subject, TokenHash: h, Integrity: in.Integrity, Roles: roles, Disabled: in.Disabled})
+	}
+	return result, nil
+}
+
+func findTrustIdentity(st *trustState, token string) (trustIdentity, error) {
+	return findTrustIdentityAt(st, token, time.Now().UTC())
+}
+
+func findTrustIdentityAt(st *trustState, token string, now time.Time) (trustIdentity, error) {
+	return resolveTrustIdentityAt(st, token, now)
+}
+
+func trustHasRole(id trustIdentity, role string) bool {
+	for _, r := range id.Roles {
+		if r == role {
+			return true
+		}
+	}
+	return false
+}
+
+func validTrustResource(resource string) bool {
+	if resource == "" || len(resource) > 512 || strings.HasPrefix(resource, "/") || strings.HasSuffix(resource, "/") {
+		return false
+	}
+	for _, part := range strings.Split(resource, "/") {
+		if !safeName(part) || part == "." || part == ".." {
+			return false
+		}
+	}
+	return true
+}
+
+func trustCanonical(v any) ([]byte, string) { raw, _ := json.Marshal(v); return raw, hash(raw) }
+
+func appendTrustEvidence(st *trustState, kind string, actor trustIdentity, objectID, contentHash, originalHash, result, reason string, now time.Time) {
+	prev := ""
+	if len(st.Evidence) > 0 {
+		prev = st.Evidence[len(st.Evidence)-1].Hash
+	}
+	ev := TrustEvidence{IdentityContext: actor.Context, Sequence: len(st.Evidence) + 1, PreviousHash: prev, Kind: kind, Actor: actor.Subject, Integrity: actor.Integrity, ObjectID: objectID, ContentHash: contentHash, OriginalHash: originalHash, Result: result, Reason: reason, At: now.UTC().Format(time.RFC3339Nano)}
+	ev.PolicyContext = trustProofPolicyContext(st)
+	if (kind == "commit" || kind == "reconcile") && (result == "committed" || result == "unknown" || result == "reconciled") {
+		ev.EffectReceipt = trustEffectProofSnapshot(st, objectID)
+	}
+	ev.Hash = trustEvidenceHash(ev)
+	st.Evidence = append(st.Evidence, ev)
+}
+
+func trustCommandDigest(operation string, cmd TrustCommand) string {
+	cmd.Actor, cmd.Integrity = "", 0
+	return trustLegacyCommandDigest(operation, cmd)
+}
+
+func trustLegacyCommandDigest(operation string, cmd TrustCommand) string {
+	_, d := trustCanonical(struct {
+		Operation string       `json:"operation"`
+		Command   TrustCommand `json:"command"`
+	}{operation, cmd})
+	return d
+}
+
+func trustEventDigestMatches(st *trustState, operation string, cmd TrustCommand, prior string) bool {
+	digest := trustCommandDigest(operation, cmd)
+	if prior == digest || prior == trustLegacyCommandDigest(operation, cmd) {
+		return true
+	}
+	for originalHash, raw := range st.Originals {
+		if hash(raw) != originalHash {
+			continue
+		}
+		var original TrustCommand
+		if strict(raw, &original) != nil || original.EventID != cmd.EventID || original.Schema != 1 {
+			continue
+		}
+		if trustLegacyCommandDigest(operation, original) == prior && trustCommandDigest(operation, original) == digest {
+			return true
+		}
+	}
+	return false
+}
+
+func eventReplay(st *trustState, operation string, cmd TrustCommand, actor trustIdentity) (any, bool, error) {
+	if cmd.EventID == "" {
+		return nil, false, nil
+	}
+	if prior, ok := st.EventDigests[cmd.EventID]; ok {
+		if !trustEventDigestMatches(st, operation, cmd, prior) {
+			return nil, true, &CommandError{Code: "event_conflict", Message: "event_id réutilisé avec un contenu différent"}
+		}
+		if st.EventAuthorities[cmd.EventID] != trustAuthorityDigest(actor) {
+			return nil, true, &CommandError{Code: "authorization_required", Message: "autorisation du rejeu absente ou différente ; événement historique conservé"}
+		}
+		result, err := trustStoredReply(st, cmd.EventID)
+		if err != nil {
+			return nil, true, err
+		}
+		var fields map[string]json.RawMessage
+		if err := json.Unmarshal(st.EventReplies[cmd.EventID], &fields); err != nil {
+			return nil, true, err
+		}
+		if rawFailure, rejected := fields["failure"]; rejected {
+			var failure CommandError
+			if err := strict(rawFailure, &failure); err != nil {
+				return nil, true, err
+			}
+			if failure.Code == "" || failure.Message == "" {
+				return nil, true, fmt.Errorf("refus historique illisible")
+			}
+			return nil, true, &failure
+		}
+		return result, true, nil
+	}
+	return nil, false, nil
+}
+
+func saveEventReply(st *trustState, operation string, cmd TrustCommand, actor trustIdentity, result any) {
+	if cmd.EventID == "" {
+		return
+	}
+	raw, _ := json.Marshal(result)
+	st.EventDigests[cmd.EventID], st.EventReplies[cmd.EventID] = trustCommandDigest(operation, cmd), raw
+	if st.EventAuthorities == nil {
+		st.EventAuthorities = map[string]string{}
+	}
+	st.EventAuthorities[cmd.EventID] = trustAuthorityDigest(actor)
+}
+
+func trustDenied(st *trustState, actor trustIdentity, operation, objectID, contentHash, originalHash, reason string, now time.Time) map[string]any {
+	appendTrustEvidence(st, operation, actor, objectID, contentHash, originalHash, "denied", reason, now)
+	return map[string]any{"state": "denied", "reason": reason, "next_action": "corriger le mandat, l’identité ou l’accord", "business_mutated": false}
+}
+
+func parseTrustTime(raw string, fallback time.Time) (time.Time, error) {
+	if raw == "" {
+		return fallback, nil
+	}
+	t, err := time.Parse(time.RFC3339, raw)
+	return t.UTC(), err
+}
+
+func (s *Store) trustConfig(change TrustConfigChange, preview bool) (any, error) {
+	if change.Schema != 1 || !safeName(change.EventID) || change.ExpectedRevision < 0 || len(strings.TrimSpace(change.Reason)) < 8 || len(change.Reason) > 2000 {
+		return nil, fmt.Errorf("schema_version=1, event_id, expected_revision et reason (8..2000) requis")
+	}
+	if err := validateTrustPolicy(change.Policy); err != nil {
+		return nil, err
+	}
+	identities, err := validateTrustIdentities(change.Identities)
+	if err != nil {
+		return nil, err
+	}
+	return s.withTrustPublicationLock(!preview, &change, func(st *trustState) (any, error) {
+		if prior, ok := st.EventDigests[change.EventID]; ok {
+			d := hashMust(change)
+			if prior != d {
+				return nil, &CommandError{Code: "event_conflict", Message: "event_id de configuration conflictuel"}
+			}
+			original, err := trustStoredReply(st, change.EventID)
+			if err != nil {
+				return nil, err
+			}
+			var view struct {
+				Revision *int `json:"revision"`
+			}
+			if err := json.Unmarshal(original, &view); err != nil || view.Revision == nil {
+				return nil, fmt.Errorf("réponse originale de configuration invalide")
+			}
+			return original, nil
+		}
+		if st.Revision != change.ExpectedRevision {
+			return nil, &CommandError{Code: "revision_conflict", Message: "configuration modifiée ; rechargez avant de confirmer"}
+		}
+		effectiveDelegation := change.Delegation
+		if effectiveDelegation == nil {
+			effectiveDelegation = st.Delegation
+		}
+		if err := validateTrustDelegation(effectiveDelegation); err != nil {
+			return nil, err
+		}
+		effectiveWorkloads := change.Workloads
+		if effectiveWorkloads == nil {
+			effectiveWorkloads = st.Workloads
+		}
+		if err := validateTrustWorkloads(effectiveWorkloads, identities); err != nil {
+			return nil, err
+		}
+		effectiveEvidence := change.EvidenceSigning
+		if effectiveEvidence == nil {
+			effectiveEvidence = st.EvidenceSigning
+		}
+		if err := validateTrustEvidencePolicy(effectiveEvidence); err != nil {
+			return nil, err
+		}
+		effectiveLab := change.Laboratory
+		if effectiveLab == nil {
+			effectiveLab = st.Laboratory
+		}
+		if err := validateTrustLaboratoryPolicy(effectiveLab); err != nil {
+			return nil, err
+		}
+		effectiveProcess := change.ProcessPolicy
+		if effectiveProcess == nil {
+			effectiveProcess = st.ProcessPolicy
+		}
+		effectiveIntrospection := change.WorkloadIntrospection
+		if effectiveIntrospection == nil {
+			effectiveIntrospection = st.WorkloadIntrospection
+		}
+		if err := validateTrustIntrospection(effectiveIntrospection, effectiveWorkloads); err != nil {
+			return nil, err
+		}
+		effectiveOIDC := change.OIDC
+		if effectiveOIDC == nil {
+			effectiveOIDC = st.OIDC
+		}
+		if err := validateTrustOIDC(effectiveOIDC, identities); err != nil {
+			return nil, err
+		}
+		effectiveSecret := change.SecretBroker
+		if effectiveSecret == nil {
+			effectiveSecret = st.SecretBroker
+		}
+		if err := validateTrustSecretPolicy(effectiveSecret); err != nil {
+			return nil, err
+		}
+		effectiveSealed := change.SealedExecution
+		if effectiveSealed == nil {
+			effectiveSealed = st.SealedExecution
+		}
+		if err := validateTrustSealedPolicy(effectiveSealed); err != nil {
+			return nil, err
+		}
+		effectiveObservation := change.KernelObservation
+		if effectiveObservation == nil {
+			effectiveObservation = st.KernelObservation
+		}
+		if err := validateKernelObservePolicy(effectiveObservation); err != nil {
+			return nil, err
+		}
+		effectiveKernel := change.KernelCheck
+		if effectiveKernel == nil {
+			effectiveKernel = st.KernelCheck
+		}
+		if err := validateTrustKernelPolicy(effectiveKernel); err != nil {
+			return nil, err
+		}
+		effectiveData := change.DataPolicy
+		if effectiveData == nil {
+			effectiveData = st.DataPolicy
+		}
+		if err := validateTrustDataPolicy(effectiveData); err != nil {
+			return nil, err
+		}
+		effectiveGroups := change.GroupMapping
+		if effectiveGroups == nil {
+			effectiveGroups = st.GroupMapping
+		}
+		if err := validateTrustGroupMapping(effectiveGroups, effectiveOIDC, effectiveWorkloads); err != nil {
+			return nil, err
+		}
+		effectiveLogout := change.OIDCLogout
+		if effectiveLogout == nil {
+			effectiveLogout = st.OIDCLogout
+		}
+		if err := validateTrustOIDCLogout(effectiveLogout, effectiveOIDC); err != nil {
+			return nil, err
+		}
+		effectiveStepUp := change.StepUp
+		if effectiveStepUp == nil {
+			effectiveStepUp = st.StepUp
+		}
+		if err := validateTrustStepUp(effectiveStepUp, effectiveOIDC); err != nil {
+			return nil, err
+		}
+		view := map[string]any{"schema_version": 1, "current_revision": st.Revision, "proposed_revision": st.Revision + 1, "policy": change.Policy, "oidc": effectiveOIDC, "workloads": effectiveWorkloads, "workload_introspection": trustIntrospectionPolicyValue(effectiveIntrospection), "evidence_signing": trustEvidencePolicy(effectiveEvidence), "laboratory": laboratoryPolicy(effectiveLab), "process_policy": trustProcessPolicyValue(effectiveProcess), "delegation": effectiveDelegation, "step_up": effectiveStepUp, "oidc_logout": effectiveLogout, "group_mapping": trustGroupMappingValue(effectiveGroups), "secret_broker": trustSecretPolicyValue(effectiveSecret), "kernel_observation": kernelObservePolicy(effectiveObservation), "kernel_check": trustKernelPolicy(effectiveKernel), "sealed_execution": trustSealedPolicyValue(effectiveSealed), "data_policy": trustDataPolicyValue(effectiveData), "identity_count": len(identities), "identities": trustPublicIdentities(identities), "applied": !preview}
+		if preview {
+			return view, nil
+		}
+		if st.Revision > 0 {
+			if _, err := s.trustProofKey(); err != nil {
+				return nil, err
+			}
+		}
+		st.Revision++
+		st.Policy = change.Policy
+		st.Identities = identities
+		st.Delegation = effectiveDelegation
+		st.EvidenceSigning = effectiveEvidence
+		st.Laboratory = effectiveLab
+		st.ProcessPolicy = effectiveProcess
+		st.WorkloadIntrospection = effectiveIntrospection
+		st.Workloads = effectiveWorkloads
+		st.WorkloadSessions = nil
+		st.OIDC = effectiveOIDC
+		st.StepUp = effectiveStepUp
+		st.OIDCLogout = effectiveLogout
+		st.GroupMapping = effectiveGroups
+		st.DataPolicy = effectiveData
+		st.SealedExecution = effectiveSealed
+		st.KernelObservation = effectiveObservation
+		st.KernelCheck = effectiveKernel
+		st.SecretBroker = effectiveSecret
+		st.OIDCPending = nil
+		st.OIDCSessions = nil
+		st.History = append(st.History, trustConfigRevision{Revision: st.Revision, Policy: change.Policy, Actor: operatorIdentity(), Reason: change.Reason, EventID: change.EventID, At: time.Now().UTC().Format(time.RFC3339Nano)})
+		st.EventDigests[change.EventID] = hashMust(change)
+		result := trustPublicState(st)
+		raw, err := json.Marshal(result)
+		if err != nil {
+			return nil, err
+		}
+		st.EventReplies[change.EventID] = raw
+		return result, nil
+	})
+}
+
+func hashMust(v any) string { raw, _ := json.Marshal(v); return hash(raw) }
+
+func trustActionTarget(cmd TrustCommand) string {
+	if cmd.ActionID != "" {
+		return cmd.ActionID
+	}
+	return cmd.Resource
+}
+
+func trustResourceMatches(cmd TrustCommand, action TrustAction) bool {
+	return cmd.ActionID == "" || cmd.Resource == "" || cmd.Resource == action.Resource
+}
+
+func (s *Store) trustOperate(operation string, cmd TrustCommand, token string, now time.Time) (any, error) {
+	if cmd.Schema != 1 || !safeName(cmd.EventID) {
+		return nil, fmt.Errorf("schema_version=1 et event_id requis")
+	}
+	var rejected error
+	value, err := s.withTrustLock(true, func(st *trustState) (any, error) {
+		if now.IsZero() {
+			now = time.Now().UTC()
+		}
+		actor, err := findTrustIdentityAt(st, token, now)
+		if err != nil {
+			return nil, err
+		}
+		mandateID := cmd.MandateID
+		if action, ok := st.Actions[cmd.ActionID]; ok {
+			mandateID = action.MandateID
+		}
+		if m, ok := st.Mandates[mandateID]; ok && m.Subject == actor.Subject {
+			actor.Context.DelegationID = trustContextString(m.ID)
+		}
+		if replay, ok, err := eventReplay(st, operation, cmd, actor); ok || err != nil {
+			return replay, err
+		}
+		if err := verifyTrustEvidenceChain(TrustProofExport{Evidence: st.Evidence, Originals: st.Originals}); err != nil {
+			return nil, err
+		}
+		if err := trustDataAdmission(st, operation, cmd); err != nil {
+			return nil, err
+		}
+		if err := trustDataActionAdmission(st, operation, cmd); err != nil {
+			return nil, err
+		}
+		if err := trustConnectorCommandValid(operation, cmd); err != nil {
+			return nil, err
+		}
+		original, err := trustCommandOriginal(cmd)
+		if err != nil {
+			return nil, err
+		}
+		originalHash := hash(original)
+		auditRejection := func(cause error, objectID, contentHash string) (any, error) {
+			failure := commandFailure(cause)
+			result := trustDenied(st, actor, operation, objectID, contentHash, originalHash, failure.Message, now)
+			result["failure"] = failure
+			st.Originals[originalHash] = append([]byte{}, original...)
+			saveEventReply(st, operation, cmd, actor, result)
+			rejected = cause
+			return result, nil
+		}
+		beforeEvidence := len(st.Evidence)
+		var result any
+		switch operation {
+		case "mandate-create":
+			if !trustHasRole(actor, "admin") || actor.Integrity != 3 {
+				result = trustDenied(st, actor, operation, cmd.MandateID, "", originalHash, "administrateur I3 requis", now)
+				break
+			}
+			if !safeName(cmd.MandateID) || !safeName(cmd.Subject) || !validTrustResource(cmd.Resource) || (trustConnectorID(cmd.Connector) != "local-access-simulation" && cmd.MaxAmount <= 0) || len(cmd.Actions) == 0 || (trustConnectorID(cmd.Connector) != "local-access-simulation" && (strings.ToUpper(cmd.Currency) != cmd.Currency || len(cmd.Currency) != 3 || cmd.Beneficiary == "")) {
+				return auditRejection(fmt.Errorf("mandat invalide"), cmd.MandateID, "")
+			}
+			if _, exists := st.Mandates[cmd.MandateID]; exists {
+				return auditRejection(&CommandError{Code: "conflict", Message: "mandat déjà présent"}, cmd.MandateID, "")
+			}
+			start, err := parseTrustTime(cmd.StartsAt, now.UTC())
+			if err != nil {
+				return auditRejection(err, cmd.MandateID, "")
+			}
+			expFallback := start.Add(time.Duration(st.Policy.MandateTTLSeconds) * time.Second)
+			if st.Policy.MandateTTLSeconds == 0 {
+				expFallback = time.Date(9999, 1, 1, 0, 0, 0, 0, time.UTC)
+			}
+			expires, err := parseTrustTime(cmd.ExpiresAt, expFallback)
+			if err != nil || !expires.After(start) {
+				return auditRejection(fmt.Errorf("expiration de mandat invalide"), cmd.MandateID, "")
+			}
+			m := TrustMandate{Connector: cmd.Connector, ID: cmd.MandateID, Subject: cmd.Subject, Delegator: actor.Subject, Actions: append([]string(nil), cmd.Actions...), Resource: cmd.Resource, MaxAmount: cmd.MaxAmount, Currency: cmd.Currency, Beneficiary: cmd.Beneficiary, Version: 1, PolicyRev: st.Revision, Integrity: 2, StartsAt: start.Format(time.RFC3339), ExpiresAt: expires.Format(time.RFC3339), OriginalHash: originalHash}
+			if cmd.ParentMandateID != "" {
+				parent, ok := st.Mandates[cmd.ParentMandateID]
+				if !ok {
+					result = trustDenied(st, actor, operation, m.ID, "", originalHash, "mandat parent absent", now)
+					break
+				}
+				m.ParentID = parent.ID
+				m.ParentHash = parent.ContentHash
+				if cmd.ExpiresAt == "" && expires.After(mustTrustTime(parent.ExpiresAt)) {
+					m.ExpiresAt = parent.ExpiresAt
+				}
+			}
+			m.ContentHash = trustMandateContentHash(m)
+			if reason := trustDelegatedMandateReason(st, m, now); reason != "" {
+				result = trustDenied(st, actor, operation, m.ID, m.ContentHash, originalHash, reason, now)
+				break
+			}
+			st.Mandates[m.ID] = m
+			appendTrustEvidence(st, operation, actor, m.ID, m.ContentHash, originalHash, "admitted", "endorsement Biba I3 vers nouvel objet I2", now)
+			result = m
+		case "mandate-revoke":
+			if !trustHasRole(actor, "admin") || actor.Integrity != 3 {
+				result = trustDenied(st, actor, operation, cmd.MandateID, "", originalHash, "administrateur I3 requis", now)
+				break
+			}
+			m, ok := st.Mandates[cmd.MandateID]
+			if !ok {
+				result = trustDenied(st, actor, operation, cmd.MandateID, "", originalHash, "mandat absent", now)
+				break
+			}
+			if m.RevokedAt == "" {
+				m.RevokedAt = now.UTC().Format(time.RFC3339Nano)
+				m.Version++
+			}
+			m.ContentHash = trustMandateContentHash(m)
+			st.Mandates[m.ID] = m
+			appendTrustEvidence(st, operation, actor, m.ID, m.ContentHash, originalHash, "revoked", cmd.Reason, now)
+			result = m
+		case "request":
+			if !trustHasRole(actor, "requester") || actor.Integrity < 1 {
+				result = trustDenied(st, actor, operation, cmd.EventID, "", originalHash, "demandeur authentifié requis", now)
+				break
+			}
+			m, ok := st.Mandates[cmd.MandateID]
+			digest := trustActionContentHash(cmd, actor.Subject)
+			reason := ""
+			if !ok {
+				reason = "mandat absent"
+			} else if m.Subject != actor.Subject {
+				reason = "mauvais sujet"
+			} else if m.RevokedAt != "" {
+				reason = "mandat révoqué"
+			} else if now.Before(mustTrustTime(m.StartsAt)) || !now.Before(mustTrustTime(m.ExpiresAt)) {
+				reason = "mandat inactif ou expiré"
+			} else if m.PolicyRev != st.Revision {
+				reason = "révision de configuration du mandat périmée"
+			} else if chainReason := trustDelegatedMandateReason(st, m, now); chainReason != "" {
+				reason = chainReason
+			} else if m.Resource != cmd.Resource || m.Currency != cmd.Currency || m.Beneficiary != cmd.Beneficiary || !trustConnectorRequestWithin(m, cmd) {
+				reason = "paramètres hors mandat"
+			} else if !safeName(cmd.IdempotencyKey) {
+				reason = "clé d’idempotence invalide"
+			}
+			if reason != "" {
+				result = trustDenied(st, actor, operation, cmd.EventID, digest, originalHash, reason, now)
+				break
+			}
+			id := "act-" + digest[:20]
+			for _, existing := range st.Actions {
+				if existing.IdempotencyKey == cmd.IdempotencyKey && existing.ContentHash != digest {
+					return auditRejection(&CommandError{Code: "idempotency_conflict", Message: "même clé avec contenu différent"}, existing.ID, digest)
+				}
+			}
+			if existing, exists := st.Actions[id]; exists {
+				if existing.ContentHash != digest {
+					return auditRejection(&CommandError{Code: "idempotency_conflict", Message: "identifiant d’action avec contenu différent"}, existing.ID, digest)
+				}
+				result = existing
+				break
+			}
+			a := TrustAction{Connector: cmd.Connector, DataContext: cmd.DataContext, ID: id, MandateID: m.ID, Requester: actor.Subject, Resource: cmd.Resource, Amount: cmd.Amount, Currency: cmd.Currency, Beneficiary: cmd.Beneficiary, IdempotencyKey: cmd.IdempotencyKey, ContentHash: digest, OriginalHash: originalHash, State: "pending_approval", NextAction: "approbation séparée requise", CreatedAt: now.UTC().Format(time.RFC3339Nano), UpdatedAt: now.UTC().Format(time.RFC3339Nano)}
+			st.Actions[id] = a
+			appendTrustEvidence(st, operation, actor, id, digest, originalHash, "admitted", "nouvel objet I2; original I1 conservé avec ses octets et son digest", now)
+			result = a
+		case "approve":
+			target := trustActionTarget(cmd)
+			a, ok := st.Actions[target]
+			if !ok {
+				result = trustDenied(st, actor, operation, target, "", originalHash, "action absente", now)
+				break
+			}
+			if !trustHasRole(actor, "approver") || actor.Integrity < 2 || (st.Policy.RequireSeparation && actor.Subject == a.Requester) {
+				result = trustDenied(st, actor, operation, a.ID, a.ContentHash, originalHash, "séparation demandeur/approbateur ou intégrité insuffisante", now)
+				break
+			}
+			if !trustResourceMatches(cmd, a) {
+				result = trustDenied(st, actor, operation, a.ID, a.ContentHash, originalHash, "ressource explicite contradictoire", now)
+				break
+			}
+			if a.State != "pending_approval" {
+				result = trustDenied(st, actor, operation, a.ID, a.ContentHash, originalHash, "action n’attend plus d’approbation", now)
+				break
+			}
+			if !trustConnectorEqual(cmd.Connector, a.Connector) || cmd.ContentHash != a.ContentHash || cmd.Beneficiary != a.Beneficiary || cmd.Currency != a.Currency || cmd.Amount != a.Amount || cmd.MandateID != a.MandateID {
+				result = trustDenied(st, actor, operation, a.ID, a.ContentHash, originalHash, "accord non exact", now)
+				break
+			}
+			if reason := trustActiveMandateReason(st, a.MandateID, now); reason != "" {
+				result = trustDenied(st, actor, operation, a.ID, a.ContentHash, originalHash, reason, now)
+				break
+			}
+			a.Approver = actor.Subject
+			if reason := trustStepUpApprovalReason(st, token, actor, a, now); reason != "" {
+				result = trustDenied(st, actor, operation, a.ID, a.ContentHash, originalHash, reason, now)
+				break
+			}
+			if session, ok := st.OIDCSessions[trustTokenHash(token)]; ok && session.StepUp != nil {
+				session.StepUp.Used = true
+				st.OIDCSessions[trustTokenHash(token)] = session
+			}
+			a.State = "approved"
+			a.Reason = ""
+			a.NextAction = "engager le connecteur simulé"
+			a.UpdatedAt = now.UTC().Format(time.RFC3339Nano)
+			st.Actions[a.ID] = a
+			appendTrustEvidence(st, operation, actor, a.ID, a.ContentHash, originalHash, "approved", "accord exact", now)
+			result = a
+		case "commit":
+			target := trustActionTarget(cmd)
+			if !trustHasRole(actor, "effect") || actor.Integrity < 2 {
+				result = trustDenied(st, actor, operation, target, "", originalHash, "service d’effet I2 authentifié requis", now)
+				break
+			}
+			a, ok := st.Actions[target]
+			if !ok {
+				result = trustDenied(st, actor, operation, target, "", originalHash, "action absente", now)
+				break
+			}
+			if !trustResourceMatches(cmd, a) {
+				result = trustDenied(st, actor, operation, a.ID, a.ContentHash, originalHash, "ressource explicite contradictoire", now)
+				break
+			}
+			if a.State == "committed" || a.State == "reconciled" || a.State == "unknown" {
+				result = a
+				break
+			}
+			reason := trustActiveMandateReason(st, a.MandateID, now)
+			if reason == "" && a.State != "approved" {
+				reason = "accord absent"
+			}
+			if reason != "" {
+				result = trustDenied(st, actor, operation, a.ID, a.ContentHash, originalHash, reason, now)
+				break
+			}
+			if receipt, exists := st.Receipts[a.IdempotencyKey]; exists {
+				if receipt.ContentHash != a.ContentHash {
+					return auditRejection(&CommandError{Code: "idempotency_conflict", Message: "même clé avec contenu différent"}, a.ID, a.ContentHash)
+				}
+				result = st.Actions[receipt.ActionID]
+				break
+			}
+			if err := trustConnectorCommit(st, a, actor, now, cmd.LoseResponse); err != nil {
+				return nil, err
+			}
+			if cmd.LoseResponse {
+				a.State = "unknown"
+				a.Reason = "réponse du connecteur perdue après engagement"
+				a.NextAction = "réconcilier avant toute nouvelle tentative"
+			} else {
+				a.State = "committed"
+				a.Reason = ""
+				a.NextAction = "consulter ou exporter les preuves"
+			}
+			a.UpdatedAt = now.UTC().Format(time.RFC3339Nano)
+			st.Actions[a.ID] = a
+			appendTrustEvidence(st, operation, actor, a.ID, a.ContentHash, originalHash, a.State, a.Reason, now)
+			result = a
+		case "reconcile":
+			target := trustActionTarget(cmd)
+			if !trustHasRole(actor, "effect") || actor.Integrity < 2 {
+				result = trustDenied(st, actor, operation, target, "", originalHash, "service d’effet I2 authentifié requis", now)
+				break
+			}
+			a, ok := st.Actions[target]
+			if !ok {
+				result = trustDenied(st, actor, operation, target, "", originalHash, "action absente", now)
+				break
+			}
+			if !trustResourceMatches(cmd, a) {
+				result = trustDenied(st, actor, operation, a.ID, a.ContentHash, originalHash, "ressource explicite contradictoire", now)
+				break
+			}
+			receipt, found := st.Receipts[a.IdempotencyKey]
+			if !found || receipt.ContentHash != a.ContentHash || !trustConnectorReadback(st, a, receipt) {
+				result = trustDenied(st, actor, operation, a.ID, a.ContentHash, originalHash, "reçu connecteur absent ou incompatible", now)
+				break
+			}
+			if a.State == "unknown" {
+				if now.Before(mustTrustTime(a.UpdatedAt).Add(time.Duration(st.Policy.UnknownReconcileSeconds) * time.Second)) {
+					result = trustDenied(st, actor, operation, a.ID, a.ContentHash, originalHash, "délai de réconciliation non écoulé", now)
+					break
+				}
+				a.State = "reconciled"
+				if receipt.Result != nil {
+					receipt.Result.State = "reconciled"
+					receipt.Result.ReconciliationRequired = false
+					receipt.Result.Diagnostic = ""
+					receipt.Result.ObservedAt = now.UTC().Format(time.RFC3339Nano)
+					st.Receipts[a.IdempotencyKey] = receipt
+				}
+				a.Reason = ""
+				a.NextAction = "consulter ou exporter les preuves"
+				a.UpdatedAt = now.UTC().Format(time.RFC3339Nano)
+				st.Actions[a.ID] = a
+				appendTrustEvidence(st, operation, actor, a.ID, a.ContentHash, originalHash, "reconciled", "effet unique confirmé par reçu stable", now)
+			}
+			result = a
+		case "direct-write", "elevate-integrity":
+			result = trustDenied(st, actor, operation, cmd.Resource, hashMust(cmd), originalHash, "accès direct ou auto-élévation Biba refusé", now)
+		default:
+			return nil, fmt.Errorf("opération Actions de confiance inconnue : %s", operation)
+		}
+		if len(st.Evidence) > beforeEvidence {
+			st.Originals[originalHash] = append([]byte{}, original...)
+		}
+		saveEventReply(st, operation, cmd, actor, result)
+		return result, nil
+	})
+	if err != nil {
+		var integrity *trustProofIntegrityError
+		if errors.As(err, &integrity) {
+			return s.trustHistoricalReplay(operation, cmd, token, now, integrity)
+		}
+		return nil, err
+	}
+	if rejected != nil {
+		return nil, rejected
+	}
+	return value, nil
+}
+
+func mustTrustTime(raw string) time.Time { t, _ := time.Parse(time.RFC3339, raw); return t }
+func containsTrust(values []string, want string) bool {
+	for _, v := range values {
+		if v == want {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Store) trustView() (any, error) {
+	return s.withTrustLock(false, func(st *trustState) (any, error) {
+		view := trustPublicState(st)
+		view["workload_introspection_status"] = s.trustServiceConsumption(st.Revision)
+		return view, nil
+	})
+}
+
+func (s *Store) trustExport() (TrustProofExport, error) {
+	result, err := s.withTrustLock(false, func(st *trustState) (any, error) {
+		originals := map[string][]byte{}
+		for _, ev := range st.Evidence {
+			if raw, ok := st.Originals[ev.OriginalHash]; ok {
+				originals[ev.OriginalHash] = append([]byte{}, raw...)
+			}
+		}
+		return TrustProofExport{Originals: originals, Schema: 2, Simulation: true, Evidence: append([]TrustEvidence(nil), st.Evidence...)}, nil
+	})
+	if err != nil {
+		return TrustProofExport{}, err
+	}
+	return result.(TrustProofExport), nil
+}
+
+func (s *Store) trustAnchor() (TrustProofAnchor, error) {
+	result, err := s.withTrustLock(false, func(st *trustState) (any, error) {
+		if err := verifyTrustEvidenceChain(TrustProofExport{Evidence: st.Evidence, Originals: st.Originals}); err != nil {
+			return nil, err
+		}
+		if len(st.Evidence) == 0 {
+			return nil, fmt.Errorf("aucune preuve à ancrer")
+		}
+		key, err := s.trustProofKey()
+		if err != nil {
+			return nil, err
+		}
+		last := st.Evidence[len(st.Evidence)-1]
+		mac := hmac.New(sha256.New, key)
+		fmt.Fprintf(mac, "%d:%s", last.Sequence, last.Hash)
+		return TrustProofAnchor{Schema: 1, Sequence: last.Sequence, Hash: last.Hash, Signature: hex.EncodeToString(mac.Sum(nil))}, nil
+	})
+	if err != nil {
+		return TrustProofAnchor{}, err
+	}
+	return result.(TrustProofAnchor), nil
+}
+
+func verifyTrustProof(export TrustProofExport, anchor TrustProofAnchor, keyHex string) error {
+	if export.Schema != 2 || !export.Simulation || anchor.Schema != 1 || len(export.Evidence) == 0 || anchor.Sequence <= 0 || len(anchor.Hash) != sha256.Size*2 || len(anchor.Signature) != sha256.Size*2 {
+		return fmt.Errorf("export ou ancre invalide")
+	}
+	key, err := hex.DecodeString(strings.TrimSpace(keyHex))
+	if err != nil || len(key) != trustProofKeyBytes {
+		return fmt.Errorf("clé de vérification de 32 octets requise")
+	}
+	if err := verifyTrustEvidenceChain(export); err != nil {
+		return err
+	}
+	prev := ""
+	for i, ev := range export.Evidence {
+		if ev.Sequence != i+1 || ev.PreviousHash != prev {
+			return fmt.Errorf("omission ou réordonnancement détecté à la séquence %d", i+1)
+		}
+		computed := trustEvidenceHash(ev)
+		if computed != ev.Hash {
+			return fmt.Errorf("altération détectée à la séquence %d", ev.Sequence)
+		}
+		prev = ev.Hash
+	}
+	if len(export.Evidence) != anchor.Sequence || prev != anchor.Hash {
+		return fmt.Errorf("export incomplet par rapport à l’ancre")
+	}
+	mac := hmac.New(sha256.New, key)
+	fmt.Fprintf(mac, "%d:%s", anchor.Sequence, anchor.Hash)
+	expected := hex.EncodeToString(mac.Sum(nil))
+	if !hmac.Equal([]byte(expected), []byte(anchor.Signature)) {
+		return fmt.Errorf("signature d’ancre invalide")
+	}
+	return nil
+}
+
+func verifyTrustCommand(cmd TrustCommand) (map[string]any, error) {
+	if cmd.Export == nil || cmd.Anchor == nil || cmd.VerificationKey == "" {
+		return nil, fmt.Errorf("export, anchor et verification_key requis")
+	}
+	if err := verifyTrustProof(*cmd.Export, *cmd.Anchor, cmd.VerificationKey); err != nil {
+		return nil, err
+	}
+	return map[string]any{"verified": true, "sequence": cmd.Anchor.Sequence, "simulation": true}, nil
+}
+
+func trustActiveMandateBaseReason(st *trustState, id string, now time.Time) string {
+	m, ok := st.Mandates[id]
+	if !ok {
+		return "mandat absent"
+	}
+	if m.RevokedAt != "" {
+		return "mandat révoqué"
+	}
+	if now.Before(mustTrustTime(m.StartsAt)) {
+		return "mandat inactif"
+	}
+	if !now.Before(mustTrustTime(m.ExpiresAt)) {
+		return "mandat expiré"
+	}
+	if m.PolicyRev != st.Revision {
+		return "révision de configuration du mandat périmée"
+	}
+	return ""
+}
+
+func trustMandateContentHash(m TrustMandate) string {
+	_, digest := trustCanonical(struct {
+		ID, Subject, Delegator         string
+		Actions                        []string
+		Resource                       string
+		MaxAmount                      int64
+		Currency, Beneficiary          string
+		Version, PolicyRev, Integrity  int
+		StartsAt, ExpiresAt, RevokedAt string
+	}{m.ID, m.Subject, m.Delegator, m.Actions, m.Resource, m.MaxAmount, m.Currency, m.Beneficiary, m.Version, m.PolicyRev, m.Integrity, m.StartsAt, m.ExpiresAt, m.RevokedAt})
+	if m.Connector != nil {
+		digest = hashMust(struct {
+			Base      string
+			Connector *TrustConnectorSelection
+		}{digest, m.Connector})
+	}
+	if m.ParentID != "" || m.ParentHash != "" {
+		return hashMust(struct{ Base, ParentID, ParentHash string }{digest, m.ParentID, m.ParentHash})
+	}
+	return digest
+}
+
+func trustCredentialValid(token string) bool {
+	marker := strings.ToLower(token)
+	return len(token) >= 16 && !strings.ContainsAny(token, " \t\r\n") && !strings.HasPrefix(marker, "remplacer-") && !strings.HasPrefix(marker, "replace-")
+}
+
+func trustAuthorityDigest(actor trustIdentity) string {
+	roles := append([]string{}, actor.Roles...)
+	sort.Strings(roles)
+	return hashMust(struct {
+		Subject   string
+		Integrity int
+		Roles     []string
+	}{actor.Subject, actor.Integrity, roles})
+}
+
+func (s *Store) trustProofKey() ([]byte, error) {
+	_, _, path := s.trustPaths()
+
+	f, err := os.OpenFile(path, os.O_RDONLY|syscall.O_NOFOLLOW|syscall.O_NONBLOCK, 0)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	info, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	if !info.Mode().IsRegular() || info.Mode().Perm()&0077 != 0 || info.Size() < int64(trustProofKeyBytes*2) || info.Size() > int64(trustProofKeyBytes*2+1) {
+		return nil, fmt.Errorf("clé de preuve privée régulière de 32 octets requise")
+	}
+	raw, err := io.ReadAll(io.LimitReader(f, trustProofKeyBytes*2+2))
+	if err != nil {
+		return nil, err
+	}
+	key, err := hex.DecodeString(strings.TrimSuffix(string(raw), "\n"))
+	if err != nil || len(key) != trustProofKeyBytes {
+		return nil, fmt.Errorf("clé de preuve invalide")
+	}
+	return key, nil
+}

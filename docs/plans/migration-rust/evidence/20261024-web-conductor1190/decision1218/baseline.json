@@ -1,0 +1,15 @@
+{
+  "SWARM_MIGRATION_REVIEW_BASELINE": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-eight-waves-1080/normal1156/after.json",
+  "sha256": "59908f671a8dc67758324d0ae3b8114aedb21b787b169220d7faf6f06d389fe6",
+  "current": "docs/plans/migration-rust/evidence/20261024-web-conductor1190/normal1211/after.json",
+  "current_sha256": "c51d6dd34e4bac95fad556d399e582bbd3a8c3d330958c9d80faf94df4690ce5",
+  "changed": [
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/src/mission_watch.rs",
+    "rust/crates/swarm-cli/src/mission_watch/role_job.rs",
+    "rust/crates/swarm-cli/src/native_web.rs",
+    "rust/crates/swarm-cli/src/native_web/conductor.rs",
+    "rust/crates/swarm-web/src/service/listener.rs",
+    "version_history.json"
+  ]
+}

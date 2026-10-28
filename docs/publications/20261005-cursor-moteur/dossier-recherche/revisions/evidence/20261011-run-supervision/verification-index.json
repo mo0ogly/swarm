@@ -1,0 +1,667 @@
+{
+  "schema_version": 1,
+  "base_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+  "dirty": true,
+  "observed_at_utc": "2026-10-11T09:17:57.142567+00:00",
+  "checks": {
+    "baseline_overlay": {
+      "status": "EXPECTED_FAIL",
+      "exit_code": 1,
+      "command": "go test -overlay /tmp/swarm-time-supervision-baseline/overlay.json ./internal/engine -run '^(TestSupervisionR3TimeThresholdDoesNotStopSilence|TestTerminalTimeThresholdAndExplicitStop|TestLoopGuardEvents)$' -count=1 -timeout 60s"
+    },
+    "targeted": {
+      "status": "PASS",
+      "exit_code": 0,
+      "command": "go test ./internal/engine -run '^(TestRunSupervision|TestSupervisionR3|TestTerminal|TestLoopGuard|TestLastAuthorizedTool|TestManagedPlannerWaits|TestAgentWorkflowRolesAreBounded)' -count=1 -timeout 140s"
+    },
+    "race": {
+      "status": "PASS",
+      "exit_code": 0,
+      "command": "go test -race ./internal/engine -run '^(TestRunSupervision|TestSupervisionR3|TestTerminalTime|TestLoopGuard|TestLastAuthorizedTool|TestManagedPlannerWaits)' -count=1 -timeout 120s"
+    },
+    "workflow_context": {
+      "status": "PASS",
+      "exit_code": 0,
+      "command": "python3 tools/agent-workflows/check.py"
+    },
+    "canonical_full_suite": {
+      "status": "PASS",
+      "exit_code": 0,
+      "command": "python3 tests/supervision_go_suite.py",
+      "coverage": "1118 discovered targets, 19 disjoint processes, all exit 0; optional skips listed, not counted as passed"
+    },
+    "verified_race": {
+      "status": "PASS",
+      "exit_code": 0,
+      "command": "go test -race ./internal/engine -run '^(TestRunSupervision|TestStopAfterTimeObservation|TestReplayGLMRetryEventShapes|TestRecoveredResult|TestManagedRecoveryHandoffAfterExternalRepair)' -count=1 -timeout 120s",
+      "package_elapsed_seconds": 78.101
+    },
+    "vet": {
+      "status": "PASS",
+      "exit_code": 0,
+      "command": "go vet ./..."
+    },
+    "admin": {
+      "status": "PASS",
+      "exit_code": 0,
+      "command": "node tests/run_limits_admin_ui.cjs /tmp/swarm-time-supervision-candidate /tmp/swarm-time-supervision-admin-verified",
+      "scope": "FR/EN, both themes; actual temporary-root CLI/API/browser, no real mission writes"
+    },
+    "new_attempt_recovery": {
+      "status": "PASS",
+      "exit_code": 0,
+      "command": "go test ./internal/engine -run '^(TestRecoveredResult|TestManagedRecoveryHandoffAfterExternalRepair)' -count=1 -timeout 85s"
+    },
+    "go_test_all": {
+      "status": "PASS",
+      "exit_code": 0,
+      "command": "go test ./...",
+      "engine_package_elapsed_seconds": 504.591
+    },
+    "frontend": {
+      "status": "PASS",
+      "exit_code": 0,
+      "command": "npm test"
+    },
+    "unpaid_preflight_revision": {
+      "targeted": "PASS 36.669s",
+      "race": "PASS 93.513s",
+      "baseline": "FAIL expected: stopped interrupted result formerly rejected",
+      "negative": "Modified retained candidate checkpoint or receipt rejects correction without state/call change",
+      "source_parts": "PASS complete rows/digest reconstructed; altered, unsafe, duplicate, ambiguous and missing parts rejected",
+      "vet": "PASS exit 0"
+    },
+    "workflow_context_after_unpaid_preflight": "PASS exit 0; actual planner/subplanner/worker/reviewer contexts; 12 skills"
+  },
+  "artifacts": [
+    {
+      "path": "admin-en-etat.png",
+      "sha256": "a58da37a063097ce2d0931d1d163c5d74e8e0119fb50c7f607cd539050f321c9"
+    },
+    {
+      "path": "admin-en-sombre.png",
+      "sha256": "35535def80a4b200bc93054fc2b11d7daf2c4ad0f4e5d88f54e2a5daac5ab495"
+    },
+    {
+      "path": "admin-fr-etat.png",
+      "sha256": "8b8e721750338836f3ee43d06a9d5085c91de00f5bd0f7e3c33c8ae2ccd54693"
+    },
+    {
+      "path": "admin-fr-sombre.png",
+      "sha256": "4f3016323b36108832aa0ef5d22efd67d5615f36314f15bf066fabde4a42e069"
+    },
+    {
+      "path": "admin-original-failure.txt",
+      "sha256": "9e6ab230f6c143cdd92db70c0c6deb6d98f3b7ec8784513a4af90f5c11cb9e88"
+    },
+    {
+      "path": "admin-receipt.json",
+      "sha256": "299ee36fede2c527e83bf75b83190048f87284befb84f840ec77cc269a923950"
+    },
+    {
+      "path": "admin-verified.txt",
+      "sha256": "7ed52a25e4ae5b8d2973fef7ef37ca5bd48d6a1842ad17604f5a2d65da011de9"
+    },
+    {
+      "path": "baseline-red.txt",
+      "sha256": "cff5c00dce48fd19e9049b8fa5a6ad4c89ed99ea96e7bb3d9156d697f65fabf6"
+    },
+    {
+      "path": "canonical-before-correction.txt",
+      "sha256": "937cacabe59dad031781e6befcb58747eafca6253eccf8ff25ed1c5d3ccbaae2"
+    },
+    {
+      "path": "canonical-verified.txt",
+      "sha256": "7afadac21999a683b96fa7f1fcc751241a988e2044551c00a782694291a7dce8"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/T2-source-parts-revise-request.json",
+      "sha256": "8bd7a5580743c0bd32e1ec49c0620de8a9eaa86f997bbf9ff7c95901eca5badd",
+      "bytes": 1191
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/T2-source-parts-revision-applied.json",
+      "sha256": "295a6b12ecba4c335b216a9b3e91e227dc23360918516f21dda9ee974ee0e8d6",
+      "bytes": 722
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/admin-en-etat.png",
+      "sha256": "a58da37a063097ce2d0931d1d163c5d74e8e0119fb50c7f607cd539050f321c9",
+      "bytes": 127851
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/admin-en-sombre.png",
+      "sha256": "35535def80a4b200bc93054fc2b11d7daf2c4ad0f4e5d88f54e2a5daac5ab495",
+      "bytes": 126269
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/admin-fr-etat.png",
+      "sha256": "8b8e721750338836f3ee43d06a9d5085c91de00f5bd0f7e3c33c8ae2ccd54693",
+      "bytes": 137704
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/admin-fr-sombre.png",
+      "sha256": "4f3016323b36108832aa0ef5d22efd67d5615f36314f15bf066fabde4a42e069",
+      "bytes": 136444
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/admin-original-failure.txt",
+      "sha256": "9e6ab230f6c143cdd92db70c0c6deb6d98f3b7ec8784513a4af90f5c11cb9e88",
+      "bytes": 763
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/admin-receipt.json",
+      "sha256": "299ee36fede2c527e83bf75b83190048f87284befb84f840ec77cc269a923950",
+      "bytes": 1780
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/admin-verified.txt",
+      "sha256": "7ed52a25e4ae5b8d2973fef7ef37ca5bd48d6a1842ad17604f5a2d65da011de9",
+      "bytes": 1478
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/baseline-red.txt",
+      "sha256": "cff5c00dce48fd19e9049b8fa5a6ad4c89ed99ea96e7bb3d9156d697f65fabf6",
+      "bytes": 122785
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/canonical-before-correction.txt",
+      "sha256": "937cacabe59dad031781e6befcb58747eafca6253eccf8ff25ed1c5d3ccbaae2",
+      "bytes": 15813
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/canonical-verified.txt",
+      "sha256": "7afadac21999a683b96fa7f1fcc751241a988e2044551c00a782694291a7dce8",
+      "bytes": 6744
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/en-1.mmd",
+      "sha256": "572a1d39cb0b1c3bc5c69a0845bfcf42850cd3e257f95e5cf90076e8987f51a1",
+      "bytes": 684
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/en-1.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/en-1.stdout.txt",
+      "sha256": "561a11b7a6c00acc18c8f2f729f2f7d45d0db369c0d66c9cc61a6a8bfcc0ac6d",
+      "bytes": 32
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/en-1.svg",
+      "sha256": "d47a7272e2ecfb9f8c2499f1ae2b47b7ee194f65d3967aaf0887faca28ea5c35",
+      "bytes": 25544
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/en-2.mmd",
+      "sha256": "e505966df8e2ddc5141200cdc552bbbd0a5ad340ed8bd1fd3cbdcb9eb4730799",
+      "bytes": 682
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/en-2.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/en-2.stdout.txt",
+      "sha256": "561a11b7a6c00acc18c8f2f729f2f7d45d0db369c0d66c9cc61a6a8bfcc0ac6d",
+      "bytes": 32
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/en-2.svg",
+      "sha256": "fc5becdf959928662858911af2fb0f7e6e498bf0021fe37ce31365306d33a539",
+      "bytes": 26378
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-1.mmd",
+      "sha256": "41e24c28d2e12b2ab123d63f04ef8f07d123270addfb8dd0157bf807df1a7a18",
+      "bytes": 765
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-1.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-1.stdout.txt",
+      "sha256": "561a11b7a6c00acc18c8f2f729f2f7d45d0db369c0d66c9cc61a6a8bfcc0ac6d",
+      "bytes": 32
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-1.svg",
+      "sha256": "6b03d730ed45d78bec1c44736d014b8610548691c40e0f6194ef32558210be6e",
+      "bytes": 25481
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-2-failed-original.stderr.txt",
+      "sha256": "80285b86b17407ec75c3a327a6c9a4aa2eb1ed4d1be0bc5c80c4a787ed9b46e1",
+      "bytes": 2138
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-2.mmd",
+      "sha256": "6aaf3a8cd850b8eb55b391157c15d9068d55a69d3ea7ba801e7ad45f1decd895",
+      "bytes": 784
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-2.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-2.stdout.txt",
+      "sha256": "561a11b7a6c00acc18c8f2f729f2f7d45d0db369c0d66c9cc61a6a8bfcc0ac6d",
+      "bytes": 32
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-2.svg",
+      "sha256": "83a4ddb15c4bbd027eeeadda1f8bff3c081f16049b7b06a8f448995d2adbe9cc",
+      "bytes": 26560
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/go-test-all.txt",
+      "sha256": "d49fea5e7c6aabd3cfe06c191d0bf5760515b77dc64108fcbb21d891233fdb07",
+      "bytes": 148
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/install-preflight.json",
+      "sha256": "94ba8139c7fc4f27dc485096912b86dc437c2edffd9fb52259ca849a7043315a",
+      "bytes": 363
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/install-receipt.json",
+      "sha256": "80787db4ea5f080880b3509aea4079797ece01faa2ddb5ff0d6b2faec5d15d63",
+      "bytes": 437
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/interrupted-source-observation.json",
+      "sha256": "96003738de35f2ca367b6f976437b4861c101d37b9b5d66ff2c6a76aa86f066f",
+      "bytes": 672
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/mermaid-receipts.json",
+      "sha256": "d3ee001b5ed2fa8f042b1242122e5e58fec5021228dbad5b661eda4004642cfb",
+      "bytes": 2242
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/npm-tests.txt",
+      "sha256": "ff9363f46ba114994134d3bd55432ee23281e655ded9176bf4257cc7113358bb",
+      "bytes": 1915
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/observation-en-etat.png",
+      "sha256": "19ab2f384391926f50d7f981f27d34030f15876d52dcacd627e761f42b7df0c0",
+      "bytes": 153876
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/observation-en-sombre.png",
+      "sha256": "91790a167e6ca9bf407a815189efeb88cf48708504e7260e1da48fa1e0b5dbbd",
+      "bytes": 150871
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/observation-fr-etat.png",
+      "sha256": "b0c58194b68e604c49a655f6203bdfdf67cdfba6e073bde79850f8493c56cb8c",
+      "bytes": 155196
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/observation-fr-sombre.png",
+      "sha256": "1f684a1eac466158d51f92a382c25733a8302d6d85eb821b7d223dbe60092873",
+      "bytes": 155185
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/race.txt",
+      "sha256": "717159a39eae5ac954756778df2099d392110c4500368ffac4ec14a698ec4687",
+      "bytes": 51
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/recovery-new-attempt-red.txt",
+      "sha256": "0464ebeec6ab06e30de082e03e2c21b4103ef88f47d5489a3e2651875d3a82f3",
+      "bytes": 343
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/recovery-new-attempt-verified.txt",
+      "sha256": "9b3fcbfcd84f7e8d5d3fc1558590f5b8b8a399db94adccbdae4597d2ef4ad905",
+      "bytes": 51
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/stream-regression.txt",
+      "sha256": "6cadbe345b88231ca6202df4ba0edfeb7f6f7d637fe0363ecc1192cd97aa620a",
+      "bytes": 50
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/targeted.txt",
+      "sha256": "9d770bbd76df46a7c43d61db9d75186a2f6b6470b93a71b8208f975fe2e2b876",
+      "bytes": 51
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-baseline-red.out",
+      "sha256": "2a6c728c9387bfe6add5c1a9966363c3e0281d6905558bdeb18a1ec097586bed",
+      "bytes": 325
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-full-suite.out",
+      "sha256": "47b5427caaf02f1a7879101e0573774abbfde30e4a6eea8da3a2170ef717213c",
+      "bytes": 7397
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-install-preflight.json",
+      "sha256": "afdfb0fd1ad222d7e0b32f2717c18a340546c931fc887e632b34f1464deaab88",
+      "bytes": 2119
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-install.json",
+      "sha256": "f8049cec9566343085b2fb4d96625e76b2c0a726f7febb702f8c0825d585b935",
+      "bytes": 592
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-race.out",
+      "sha256": "677ff916b7278dc3a988bc2229b9a7655dad17b5452943ba0ebd189494ba4778",
+      "bytes": 51
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-targeted.out",
+      "sha256": "47202aea233118a557e95715c137139cf1cf4b6b1e44c3d003e7bb858b24c7ab",
+      "bytes": 51
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-vet-exit.json",
+      "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+      "bytes": 16
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-vet.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/verified-race.txt",
+      "sha256": "5ec44a26e0836152f283de1cc60429a0ea5c8c2ff6245770f5fcf60024704d10",
+      "bytes": 51
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/verified-vet.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/verified-workflows.txt",
+      "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+      "bytes": 97
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/workflows.txt",
+      "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+      "bytes": 97
+    },
+    {
+      "path": "en-1.mmd",
+      "sha256": "572a1d39cb0b1c3bc5c69a0845bfcf42850cd3e257f95e5cf90076e8987f51a1"
+    },
+    {
+      "path": "en-1.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "en-1.stdout.txt",
+      "sha256": "561a11b7a6c00acc18c8f2f729f2f7d45d0db369c0d66c9cc61a6a8bfcc0ac6d"
+    },
+    {
+      "path": "en-1.svg",
+      "sha256": "d47a7272e2ecfb9f8c2499f1ae2b47b7ee194f65d3967aaf0887faca28ea5c35"
+    },
+    {
+      "path": "en-2.mmd",
+      "sha256": "e505966df8e2ddc5141200cdc552bbbd0a5ad340ed8bd1fd3cbdcb9eb4730799"
+    },
+    {
+      "path": "en-2.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "en-2.stdout.txt",
+      "sha256": "561a11b7a6c00acc18c8f2f729f2f7d45d0db369c0d66c9cc61a6a8bfcc0ac6d"
+    },
+    {
+      "path": "en-2.svg",
+      "sha256": "fc5becdf959928662858911af2fb0f7e6e498bf0021fe37ce31365306d33a539"
+    },
+    {
+      "path": "fr-1.mmd",
+      "sha256": "41e24c28d2e12b2ab123d63f04ef8f07d123270addfb8dd0157bf807df1a7a18"
+    },
+    {
+      "path": "fr-1.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "fr-1.stdout.txt",
+      "sha256": "561a11b7a6c00acc18c8f2f729f2f7d45d0db369c0d66c9cc61a6a8bfcc0ac6d"
+    },
+    {
+      "path": "fr-1.svg",
+      "sha256": "6b03d730ed45d78bec1c44736d014b8610548691c40e0f6194ef32558210be6e"
+    },
+    {
+      "path": "fr-2-failed-original.stderr.txt",
+      "sha256": "80285b86b17407ec75c3a327a6c9a4aa2eb1ed4d1be0bc5c80c4a787ed9b46e1"
+    },
+    {
+      "path": "fr-2.mmd",
+      "sha256": "6aaf3a8cd850b8eb55b391157c15d9068d55a69d3ea7ba801e7ad45f1decd895"
+    },
+    {
+      "path": "fr-2.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "fr-2.stdout.txt",
+      "sha256": "561a11b7a6c00acc18c8f2f729f2f7d45d0db369c0d66c9cc61a6a8bfcc0ac6d"
+    },
+    {
+      "path": "fr-2.svg",
+      "sha256": "83a4ddb15c4bbd027eeeadda1f8bff3c081f16049b7b06a8f448995d2adbe9cc"
+    },
+    {
+      "path": "go-test-all.txt",
+      "sha256": "d49fea5e7c6aabd3cfe06c191d0bf5760515b77dc64108fcbb21d891233fdb07"
+    },
+    {
+      "path": "install-preflight.json",
+      "sha256": "94ba8139c7fc4f27dc485096912b86dc437c2edffd9fb52259ca849a7043315a"
+    },
+    {
+      "path": "install-receipt.json",
+      "sha256": "80787db4ea5f080880b3509aea4079797ece01faa2ddb5ff0d6b2faec5d15d63"
+    },
+    {
+      "path": "interrupted-source-observation.json",
+      "sha256": "96003738de35f2ca367b6f976437b4861c101d37b9b5d66ff2c6a76aa86f066f"
+    },
+    {
+      "path": "mermaid-receipts.json",
+      "sha256": "d3ee001b5ed2fa8f042b1242122e5e58fec5021228dbad5b661eda4004642cfb"
+    },
+    {
+      "path": "npm-tests.txt",
+      "sha256": "ff9363f46ba114994134d3bd55432ee23281e655ded9176bf4257cc7113358bb"
+    },
+    {
+      "path": "observation-en-etat.png",
+      "sha256": "19ab2f384391926f50d7f981f27d34030f15876d52dcacd627e761f42b7df0c0"
+    },
+    {
+      "path": "observation-en-sombre.png",
+      "sha256": "91790a167e6ca9bf407a815189efeb88cf48708504e7260e1da48fa1e0b5dbbd"
+    },
+    {
+      "path": "observation-fr-etat.png",
+      "sha256": "b0c58194b68e604c49a655f6203bdfdf67cdfba6e073bde79850f8493c56cb8c"
+    },
+    {
+      "path": "observation-fr-sombre.png",
+      "sha256": "1f684a1eac466158d51f92a382c25733a8302d6d85eb821b7d223dbe60092873"
+    },
+    {
+      "path": "race.txt",
+      "sha256": "717159a39eae5ac954756778df2099d392110c4500368ffac4ec14a698ec4687"
+    },
+    {
+      "path": "recovery-new-attempt-red.txt",
+      "sha256": "0464ebeec6ab06e30de082e03e2c21b4103ef88f47d5489a3e2651875d3a82f3"
+    },
+    {
+      "path": "recovery-new-attempt-verified.txt",
+      "sha256": "9b3fcbfcd84f7e8d5d3fc1558590f5b8b8a399db94adccbdae4597d2ef4ad905"
+    },
+    {
+      "path": "stream-regression.txt",
+      "sha256": "6cadbe345b88231ca6202df4ba0edfeb7f6f7d637fe0363ecc1192cd97aa620a"
+    },
+    {
+      "path": "targeted.txt",
+      "sha256": "9d770bbd76df46a7c43d61db9d75186a2f6b6470b93a71b8208f975fe2e2b876"
+    },
+    {
+      "path": "verified-race.txt",
+      "sha256": "5ec44a26e0836152f283de1cc60429a0ea5c8c2ff6245770f5fcf60024704d10"
+    },
+    {
+      "path": "verified-vet.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "verified-workflows.txt",
+      "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+    },
+    {
+      "path": "workflows.txt",
+      "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-go-test-all.out",
+      "sha256": "a009d312e7c094d7a471e3a7101c05388449f9096247a32e9a2059ec9d4cccc5",
+      "bytes": 148
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-go-test-all-exit.json",
+      "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+      "bytes": 16
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-workflows.out",
+      "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+      "bytes": 97
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-workflows-exit.json",
+      "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+      "bytes": 16
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-final-doc-integrity.out",
+      "sha256": "9d89e67bd5d11fa5cfb876936afda600ac9e6b6357ca14effec061a14326348a",
+      "bytes": 50
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-final-doc-integrity-exit.json",
+      "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+      "bytes": 16
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-public-transmission.json",
+      "sha256": "8dc66a00b05ab6f406da0eab9ede762c7200cc3a7965b057356e36d9366cb578",
+      "bytes": 4102
+    }
+  ],
+  "full_suite": "PASS canonical 1118 discovered targets and plain go test ./...",
+  "installed_runtime": {
+    "status": "VERIFIED",
+    "pid": 1413919,
+    "build_date": "2026-10-11T09:14:45Z",
+    "sha256": "4512a96c184cfa894272c3e02d67bd2916a06dd84c62a6da4fa7eb930a09f278",
+    "limits": "Three public work inventories had no active producer/review/holder before restart; installed and running executable bytes match verified build. Real provider duration decision remains untested."
+  },
+  "native_independent_acceptance": false,
+  "real_provider_run_decision": "NOT_TESTED",
+  "budgets_changed": false,
+  "recovery_history": [
+    {
+      "failure": "Canonical original full suite: obsolete GLM stall assertion required automatic tool kill",
+      "correction": "Stall remains pending and duration visible; call/result accounting asserted; original failure retained"
+    },
+    {
+      "failure": "Admin recipe opened an unrelated history accordion",
+      "correction": "Target actual effective-settings panel; public preview/apply/stale-revision/rollback passes FR/EN"
+    },
+    {
+      "failure": "Previous-attempt repair prevented current stopped-attempt submission",
+      "correction": "Current agent/attempt fence, original repair/review/coordination retained in durable event; fresh checks/review required"
+    },
+    {
+      "failure": "Parent patch missing new-file modes inside a Git repository",
+      "correction": "Original preserved; separate git packaging copy restores only three new-file modes; whole chain apply/reverse verified"
+    }
+  ],
+  "public_transmission": [
+    {
+      "task": "plan-ca937edf4e-T4",
+      "revision_before": 110,
+      "revision_after": 111,
+      "event": "run-supervision-T4-20261011"
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "revision_before": 111,
+      "revision_after": 112,
+      "event": "run-supervision-T5-20261011"
+    }
+  ],
+  "full_suite_after_unpaid_preflight": {
+    "targets": 1120,
+    "shards": 19,
+    "result": "PASS all processes exit 0, optional skips explicit",
+    "plain_go_test_all": "PASS exit 0; engine 476.732s"
+  },
+  "installed_runtime_after_unpaid_preflight": {
+    "installed_at": "2026-10-11T09:38:38.361564+00:00",
+    "pid": 1839433,
+    "sha256": "3b523e12b9d71b59f8fb424ea13f50b4c6611fc27eedad6c9dd21960736de2d3",
+    "preflight": "/tmp/swarm-unpaid-source-parts-install-preflight.json",
+    "runtime_health": "/tmp/swarm-unpaid-source-parts-runtime-health.json",
+    "version": {
+      "version": "devel",
+      "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+      "modified": true,
+      "build_date": "2026-10-11T09:35:34Z",
+      "provenance": "injected"
+    },
+    "tests": "1120-target full suite, targeted/race/vet PASS; plain go test ./... still running"
+  },
+  "native_T2_source_parts": {
+    "local_targets": 1096,
+    "shards": 19,
+    "status": "PASS local; ordinary native controls passed; review running, no independent acceptance yet",
+    "revision_after_start": 117,
+    "review": "review-4b2233e89effd7e81afc1b5e",
+    "calls_after_first_inspection_reservation": 12,
+    "max_calls": 30
+  },
+  "preserved_prior_private_proofs": "PASS original protocol refusal proofs and prepared skill refresh manifest hashes unchanged",
+  "public_transmission_after_unpaid_preflight": {
+    "record": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/unpaid-preflight-public-transmission.json",
+    "revisions": [
+      120,
+      121,
+      122,
+      123
+    ],
+    "tasks": [
+      "T3",
+      "T4",
+      "T5",
+      "T7"
+    ],
+    "meaning": "Public task next fields and prior instructions verified after storage; workers not yet started, no claim that an AI acted on them. Current T2 candidate/review contract unchanged."
+  }
+}

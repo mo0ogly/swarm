@@ -1,0 +1,8 @@
+{
+  "cause": "browser producer stores relative argv output directory; consolidator applied relative_to against an absolute root without resolving it",
+  "observed": "ValueError before packet publication",
+  "product_failure": false,
+  "owner": "Codex",
+  "resumption": "resolve argv output path against canonical root then verify all evidence hashes",
+  "original_source": "build-review-packet-before.py"
+}

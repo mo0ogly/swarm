@@ -1,0 +1,8 @@
+{"Time":"2026-10-13T22:01:26.562064577+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-13T22:01:26.779216087+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingPreservesCompleteWorkerHistoryAndRetries"}
+{"Time":"2026-10-13T22:01:26.779290827+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingPreservesCompleteWorkerHistoryAndRetries","Output":"=== RUN   TestMissionSpendingPreservesCompleteWorkerHistoryAndRetries\n"}
+{"Time":"2026-10-13T22:01:28.86996448+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingPreservesCompleteWorkerHistoryAndRetries","Output":"--- PASS: TestMissionSpendingPreservesCompleteWorkerHistoryAndRetries (2.09s)\n"}
+{"Time":"2026-10-13T22:01:28.870038128+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingPreservesCompleteWorkerHistoryAndRetries","Elapsed":2.09}
+{"Time":"2026-10-13T22:01:28.870581787+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"PASS\n"}
+{"Time":"2026-10-13T22:01:29.883318253+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"ok  \tswarm.local/companion/internal/engine\t3.321s\n"}
+{"Time":"2026-10-13T22:01:29.883445772+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Elapsed":3.321}

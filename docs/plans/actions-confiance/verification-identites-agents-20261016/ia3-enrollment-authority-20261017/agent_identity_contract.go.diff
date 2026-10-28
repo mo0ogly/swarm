@@ -1,0 +1,104 @@
+--- before/internal/engine/agent_identity_contract.go
++++ internal/engine/agent_identity_contract.go
+@@ -4,43 +4,30 @@
+ 
+ import (
+ 	"bytes"
+-	"encoding/hex"
+ 	"encoding/json"
+ 	"fmt"
+ 	"io"
+ 	"path/filepath"
+-	"strings"
+ 	"time"
+-	"unicode"
+ 	"unicode/utf8"
++
++	"swarm.local/companion/internal/identitycontract"
+ )
+ 
+ // These private types describe the admission contract. They are not Launch
+ // fields and are not accepted as authority by any CLI or HTTP handler. IA3 must
+ // connect the verifier to protected storage, runtime attestation and launchers.
+-type agentIdentityPrincipal struct {
+-	ID      string `json:"principal_id"`
+-	Kind    string `json:"principal_kind"`
+-	Issuer  string `json:"issuer"`
+-	Subject string `json:"subject"`
+-}
++type agentIdentityPrincipal identitycontract.Principal
+ 
+ type agentIdentityActor struct {
+ 	Principal  agentIdentityPrincipal `json:"principal"`
+ 	InstanceID string                 `json:"instance_id,omitempty"`
+ }
+ 
+-type agentIdentityScope struct {
+-	WorkID      string `json:"work_id"`
+-	PlanVersion int    `json:"plan_version"`
+-	PlanDigest  string `json:"plan_digest"`
+-}
++type agentIdentityScope identitycontract.Scope
+ 
+ // Resources are exact identifiers, never globs or a path-prefix policy.
+-type agentIdentityPermission struct {
+-	Operation string `json:"operation"`
+-	Resource  string `json:"resource"`
+-}
++type agentIdentityPermission identitycontract.Permission
+ 
+ type agentIdentityGrant struct {
+ 	ID            string                    `json:"id"`
+@@ -135,44 +122,19 @@
+ 	return hash(b), nil
+ }
+ 
+-func agentIdentityHashValid(v string) bool {
+-	b, err := hex.DecodeString(v)
+-	return err == nil && len(b) == 32 && strings.ToLower(v) == v
+-}
+-
+-func agentIdentityText(v string) bool {
+-	return v != "" && utf8.ValidString(v) && strings.TrimSpace(v) == v &&
+-		strings.IndexFunc(v, unicode.IsControl) < 0
+-}
+-
+-func (p agentIdentityPrincipal) valid() bool {
+-	if !safeName(p.ID) || !agentIdentityText(p.Issuer) || !agentIdentityText(p.Subject) {
+-		return false
+-	}
+-	switch p.Kind {
+-	case "local":
+-		return p.Issuer == "urn:swarm:local" && p.Subject == p.ID
+-	case "human", "service":
+-		return p.Issuer != "urn:swarm:local"
+-	}
+-	return false
+-}
++func agentIdentityHashValid(v string) bool { return identitycontract.Digest(v) }
++
++func agentIdentityText(v string) bool { return identitycontract.Text(v) }
++
++func (p agentIdentityPrincipal) valid() bool { return identitycontract.Principal(p).Valid() }
+ 
+ func (a agentIdentityActor) valid() bool {
+ 	return a.Principal.valid() && (a.InstanceID == "" || safeName(a.InstanceID))
+ }
+ 
+-func (s agentIdentityScope) valid() bool {
+-	return safeName(s.WorkID) && s.PlanVersion > 0 && agentIdentityHashValid(s.PlanDigest)
+-}
+-
+-func (p agentIdentityPermission) valid() bool {
+-	switch p.Operation {
+-	case "agent.create", "memory.read", "memory.summarize", "memory.transmit", "tool.invoke", "effect.execute":
+-		return agentIdentityText(p.Resource) && !strings.ContainsAny(p.Resource, "*?[]")
+-	}
+-	return false
+-}
++func (s agentIdentityScope) valid() bool { return identitycontract.Scope(s).Valid() }
++
++func (p agentIdentityPermission) valid() bool { return identitycontract.Permission(p).Valid() }
+ 
+ func (r agentIdentityRequest) valid() bool {
+ 	return r.Schema == 1 && safeName(r.EventID) && r.Scope.valid() && safeName(r.GrantID) &&

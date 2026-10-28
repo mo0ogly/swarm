@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "base_commit": "6e8fcc7b69c4b5e4638cb36ec680be0f45ce5dc1",
+  "prerequisite_patch": "provider-wait-20261010.patch",
+  "prerequisite_sha256": "f83ca08f01a3e32665a9222a7826190ed7d41e1c7d80632f2dc4ac731c3ee340",
+  "patch": "review-evidence-20261010.patch",
+  "patch_sha256": "491ff5bfd43043e3d54a91b2b39414d6633af3d0c1b5c2b476dd18ad6e8c3fd1",
+  "files": [
+    ".claude/skills/replan/SKILL.md",
+    "docs/ATTEMPT-RECOVERY.md",
+    "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+    "docs/architecture/REVIEW-EVIDENCE.md",
+    "docs/en/ATTEMPT-RECOVERY.md",
+    "docs/en/REVIEW-EVIDENCE.md",
+    "docs/publications/20261005-cursor-moteur/dossier-recherche/07-moniteur.md",
+    "docs/publications/20261005-cursor-moteur/dossier-recherche/09-programme.md",
+    "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-correction-globale-preuves.md",
+    "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-refus-contexte-observation.json",
+    "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-refus-contexte-revue.md",
+    "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+    "internal/engine/managed_delivery_contract.go",
+    "internal/engine/managed_recovery_handoff.go",
+    "internal/engine/managed_review_delivery_sources_test.go",
+    "internal/engine/managed_review_evidence_inventory.go",
+    "internal/engine/managed_review_evidence_inventory_test.go",
+    "internal/engine/managed_review_sources.go",
+    "internal/engine/planning_context.go",
+    "internal/engine/planning_delivery.go",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/agent-workflows/templates/HANDOFF.md"
+  ],
+  "verification": "git apply --check after provider-wait patch on a fresh isolated checkout: PASS",
+  "source_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+  "source_modified": true,
+  "runtime_binary_sha256": "0be752032093ce5da2c017cb4a6bb4bf07e4f42d6f366f22156945f33c03fe83",
+  "limits": "No attempt/tool/review budget changes; intermediate T1..T4 changes must be preserved when merging.",
+  "public_handoff": {
+    "work_id": "w-ca937edf4e0abd85f8d3d67b",
+    "task_id": "plan-ca937edf4e-T5",
+    "event_id": "global-evidence-patch-handoff-20d7f817b0684353b4469c60bedcd488",
+    "work_revision": 39
+  }
+}

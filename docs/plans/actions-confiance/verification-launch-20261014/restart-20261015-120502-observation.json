@@ -1,0 +1,27 @@
+{
+  "observed_at_utc": "2026-10-15T12:05:02Z",
+  "work_revision": 464,
+  "old_pid_absent": 423881,
+  "new_process_receipt": "restart-20261015-120502-process.json",
+  "system_uptime_seconds_at_observation": 282.86,
+  "old_temporary_proof_dir_absent": true,
+  "binary_sha256": "560a19612a0ff22346f000cf3860682f7fc76afa4f789aa93cc7a267ff5d7adf",
+  "result_commit": "bdb4d220a97220fd47f51787d9bb0a5e5b856706",
+  "candidate_commit": "a6486106403b64c2c344568576479dc605742ac1",
+  "receipt_path": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-c547732b2266247c/receipt.json",
+  "receipt_sha256": "720e9a23fb1bb5a5360e6033cccd55ca8a802ef54430d4d5721d146a3a1c7279",
+  "controls": {
+    "plan-68b50cc82e-T1": {
+      "count": 7,
+      "passed": 7
+    },
+    "plan-68b50cc82e-T2": {
+      "count": 8,
+      "passed": 8
+    }
+  },
+  "review_calls_consumed": 90,
+  "review_calls_limit": 94,
+  "acceptance": "T1 only; T2 not accepted",
+  "limit": "uptime and absence establish restart context; cause of process interruption is not established"
+}

@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-11T20:02:47.900349+00:00",
+  "old_pid": 3416256,
+  "new_pid": 3497645,
+  "executed_binary_sha256": "8b2bcc55dc94734ce3e0b4ad55db9a21d7475fd0e8d53842f1c40f6c60b01246",
+  "public_operation": "providers cooldown clear claude; explicit user-confirmed restored account precondition",
+  "original_cooldown_sha256": "e48048ff49c414b7f98b8d71135e00a2970d729e0f3310c3664e1d7799d95f8a",
+  "original_cooldown_fields_preserved": true,
+  "native_work_post_pause_bodies_identical": true,
+  "source_or_db_copy_edit": false,
+  "reviewer_calls_before": 47,
+  "reviewer_calls_after": 47,
+  "paused": false,
+  "revision": 496,
+  "method_incident": "Restart driver assumed reset_at instead of observed wire name; stopped after successful public clear. No repeated clear; originals verified and same qualified binary restarted.",
+  "provider_actual_availability": "Pending real managed review call"
+}

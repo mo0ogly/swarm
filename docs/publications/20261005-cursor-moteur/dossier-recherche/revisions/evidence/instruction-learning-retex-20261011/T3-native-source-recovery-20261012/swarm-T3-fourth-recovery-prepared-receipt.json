@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-12T11:20:37.177251+00:00",
+  "revision": 752,
+  "three_attempts_preserved": true,
+  "max_attempts": 4,
+  "task_same_id": "plan-ca937edf4e-T3",
+  "bundle_inputs": 129,
+  "patch_paths": 331,
+  "source_inputs_checked": 1221,
+  "max_consecutive_errors": 6,
+  "limits": {
+    "planning_activations": 88,
+    "planning_decisions": 70,
+    "review_calls": 100
+  },
+  "Claude_cooldown_unchanged": true,
+  "acceptance_fabricated": false,
+  "limit": "Operator-authorized scoped continuation with changed transport/preimages and persisted Admin setting; root owns subsequent review decisions. Classification of expected negative checks is still a general incident, not closed by increasing the policy."
+}

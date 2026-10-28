@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-v",
+    "-count=1",
+    "-run",
+    "^(TestLaunchAtomicIdempotentAndWorkspaceExclusive|TestLaunchRejectsEscapeAndUnsatisfiedDependencies|TestActionsConfianceT3IdentityContextPublicReadOnly|TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation)$",
+    "-timeout",
+    "60s"
+  ],
+  "started_unix": 1792183521.3177266,
+  "ended_unix": 1792183526.6330824,
+  "exit_code": 0,
+  "named_tests": [
+    "TestLaunchAtomicIdempotentAndWorkspaceExclusive",
+    "TestLaunchRejectsEscapeAndUnsatisfiedDependencies",
+    "TestActionsConfianceT3IdentityContextPublicReadOnly",
+    "TestActionsConfianceT3IdentityContextPublicReadOnly/missing",
+    "TestActionsConfianceT3IdentityContextPublicReadOnly/unknown",
+    "TestActionsConfianceT3IdentityContextPublicReadOnly/forged",
+    "TestActionsConfianceT3IdentityContextPublicReadOnly/null",
+    "TestActionsConfianceT3IdentityContextPublicReadOnly/foreign",
+    "TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation",
+    "TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/alice",
+    "TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/bob",
+    "TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/effect-service",
+    "TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/admin"
+  ],
+  "pass_lines": 13,
+  "python_ast": "PASS"
+}

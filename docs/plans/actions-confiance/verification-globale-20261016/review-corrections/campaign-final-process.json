@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "tests/actions_confiance_campaign.py",
+    "--binary",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+    "--candidate-receipt",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/review-corrections/build-final-process.json",
+    "--build-inputs",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/review-corrections/build-final-inputs.json",
+    "--evidence-dir",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/review-corrections/public-campaign",
+    "--timeout-seconds",
+    "180"
+  ],
+  "pid": 439005,
+  "start_ticks": "6935779",
+  "started_unix": 1792134933.6485736,
+  "status": "passed",
+  "binary_sha256": "c0030271a0c2108a6d872b954b0be7556f69642463e28e3070f6bde1edfd8ec8",
+  "exit_code": 0,
+  "ended_unix": 1792135053.6693113,
+  "inputs_unchanged": true,
+  "changed_inputs": []
+}

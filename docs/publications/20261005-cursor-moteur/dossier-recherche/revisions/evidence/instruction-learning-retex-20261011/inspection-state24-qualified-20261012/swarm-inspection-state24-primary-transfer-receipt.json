@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-11T22:29:35.619443+00:00",
+  "candidate_digest": "780e0c1d47c2dd6fbeb77c39ac9f393400204cda11fb87abcf0c0c1ec2936aac",
+  "paths_transferred": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/managed_review_fragment_finding_contract.go",
+    "internal/engine/managed_review_fragment_finding_contract_test.go",
+    "internal/engine/managed_review_fragment_plan.go",
+    "internal/engine/managed_review_fragment_prompt.go",
+    "internal/engine/managed_review_fragment_reply.go",
+    "internal/engine/managed_review_fragment_reuse.go",
+    "internal/engine/managed_review_fragment_tokens.go",
+    "internal/engine/planning_historical_delivery_test.go",
+    "internal/engine/planning_operation_schema_contract_test.go",
+    "internal/engine/planning_runner.go",
+    "internal/engine/planning_schema.go",
+    "internal/engine/testdata/fragment-inspected-needs-native-packet.json",
+    "internal/engine/testdata/fragment-inspected-needs-native-reply.json"
+  ],
+  "source_inputs_verified": 1211,
+  "preimages_verified": true,
+  "backup": "/home/fpizzi/.cache/swarm-operator-replan-20261011/inspection-state24-primary-preimages",
+  "operator_patch": "inspection-state-contract-recovery-20261012.patch",
+  "patch_sha256": "57e10fc091bfd4b3983d7325bf9b4a5917256d11b55aebadb4e629f40decb849",
+  "runtime": "23 unchanged; installation pending"
+}

@@ -1,0 +1,6 @@
+=== RUN   TestReferencedCitationOrdinaryRetryRequiresChangedPrecondition
+    managed_review_citation_runtime_test.go:147: ordinary path bypassed protocol recovery <nil>
+--- FAIL: TestReferencedCitationOrdinaryRetryRequiresChangedPrecondition (0.42s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.453s
+FAIL

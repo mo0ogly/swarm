@@ -1,0 +1,35 @@
+{
+  "validator": "python jsonschema Draft202012Validator",
+  "cases": [
+    {
+      "case": "legacy freely accepts corrupt digest",
+      "valid": true,
+      "expected": true,
+      "status": "pass"
+    },
+    {
+      "case": "current admits exact reference",
+      "valid": true,
+      "expected": true,
+      "status": "pass"
+    },
+    {
+      "case": "current rejects corrupt digest",
+      "valid": false,
+      "expected": false,
+      "status": "pass"
+    },
+    {
+      "case": "current rejects wrong artifact",
+      "valid": false,
+      "expected": false,
+      "status": "pass"
+    },
+    {
+      "case": "current rejects stale context",
+      "valid": false,
+      "expected": false,
+      "status": "pass"
+    }
+  ]
+}

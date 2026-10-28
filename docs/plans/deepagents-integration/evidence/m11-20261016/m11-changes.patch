@@ -1,0 +1,1409 @@
+--- before/internal/engine/model.go
++++ after/internal/engine/model.go
+@@ -11,7 +11,7 @@
+ 	"time"
+ )
+ 
+-const schemaVersion = 33
++const schemaVersion = 34
+ 
+ type ManualOverride struct {
+ 	Reason         string `json:"reason"`
+--- before/internal/engine/store.go
++++ after/internal/engine/store.go
+@@ -412,6 +412,18 @@
+ 			return fail(e)
+ 		}
+ 	}
++	// v34 retains complete dialogue guard state at turn boundaries. Old
++	// processes must not confirm turns without this durable state.
++	if version < 34 {
++		if version != 0 {
++			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v34-")+".db")); e != nil {
++				return fail(e)
++			}
++		}
++		if e = migrateDialogueCheckpoints(db); e != nil {
++			return fail(e)
++		}
++	}
+ 	if e = os.Chmod(path, 0600); e != nil {
+ 		return fail(e)
+ 	}
+--- before/internal/engine/agent_dialogue.go
++++ after/internal/engine/agent_dialogue.go
+@@ -218,6 +218,7 @@
+ // One sink and one guard for the entire attempt. Namespace tool ids per turn:
+ // Codex can reuse item_0 on each exec resume.
+ type dialogueMonitor struct {
++	agent     Agent
+ 	authorize io.Writer
+ 	mu        sync.Mutex
+ 	sink      *outputSink
+@@ -232,7 +233,7 @@
+ }
+ 
+ func newDialogueMonitor(s *Store, a Agent) *dialogueMonitor {
+-	return &dialogueMonitor{provider: filepath.Base(a.Command), seenTurns: map[string]bool{}, sink: &outputSink{s: s, id: a.ID, provider: a.Provider, guard: newLoopGuard(a.Limits), capture: a.Capture}}
++	return &dialogueMonitor{agent: a, provider: filepath.Base(a.Command), seenTurns: map[string]bool{}, sink: &outputSink{s: s, id: a.ID, provider: a.Provider, guard: newLoopGuard(a.Limits), capture: a.Capture}}
+ }
+ func namespaceDialogueTools(d map[string]any, prefix string) {
+ 	if item, ok := d["item"].(map[string]any); ok {
+@@ -266,7 +267,7 @@
+ 			m.mu.Unlock()
+ 			return
+ 		}
+-		acknowledge, allowed := false, false
++		acknowledge, allowed, checkpoint := false, false, false
+ 		switch event.Kind {
+ 		case "start":
+ 			acknowledge = true
+@@ -277,6 +278,7 @@
+ 					m.failure = "Nouvel échange refusé : arrêt demandé ou limite atteinte"
+ 				}
+ 			} else {
++				checkpoint = true
+ 				m.active = true
+ 				m.turn = event.Turn
+ 				m.seenTurns[event.Turn] = true
+@@ -318,6 +320,7 @@
+ 			if !m.active || m.turn != event.Turn {
+ 				m.failure = "Fin d’échange incohérente"
+ 			} else {
++				checkpoint = true
+ 				m.active = false
+ 				m.addUsage()
+ 				if m.failure == "" && len(m.sink.guard.pending) > 0 {
+@@ -340,6 +343,11 @@
+ 		}
+ 		if err := m.sink.persist(); err != nil {
+ 			m.failure = "Persistance du dialogue indisponible"
++		}
++		if checkpoint {
++			if err := m.persistCheckpoint(); err != nil {
++				m.failure = "Persistance de l’état du dialogue indisponible"
++			}
+ 		}
+ 		if acknowledge && m.authorize != nil {
+ 			ack := byte(0)
+@@ -358,6 +366,9 @@
+ 		m.active = false
+ 		if m.failure == "" {
+ 			m.failure = "Canal fermé avant confirmation de fin ; tour interrompu"
++		}
++		if err := m.persistCheckpoint(); err != nil {
++			m.failure = "Persistance de l’état du dialogue indisponible"
+ 		}
+ 	}
+ 	m.mu.Unlock()
+--- before/internal/engine/agent_dialogue_test.go
++++ after/internal/engine/agent_dialogue_test.go
+@@ -3,33 +3,21 @@
+ package engine
+ 
+ import (
+-	"encoding/json"
+ 	"strings"
+ 	"testing"
+ 	"time"
+ )
+ 
+ func TestDialogueCumulativeToolsAndIdle(t *testing.T) {
+-	s := storeTest(t)
+-	w, r := setupAgent(t, s)
+-	a, _, e := s.prepare(w.ID, r)
+-	if e != nil {
+-		t.Fatal(e)
++	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"fixture-session"}`, `{"type":"item.started","item":{"id":"item_0","type":"command_execution","command":"pwd"}}`, `{"type":"item.completed","item":{"id":"item_0","type":"command_execution","status":"completed"}}`, `{"type":"turn.completed"}`})
++	a.Limits, _ = (RunLimits{MaxToolCalls: 2}).normalized()
++	if err := s.saveAgent(a); err != nil {
++		t.Fatal(err)
+ 	}
+-	a.Limits, _ = (RunLimits{MaxToolCalls: 2}).normalized()
+-	a.Command = "/fixture/codex"
+-	m := newDialogueMonitor(s, a)
+-	var stream strings.Builder
+-	enc := json.NewEncoder(&stream)
+-	for _, turn := range []string{"turn-one", "turn-two"} {
+-		enc.Encode(dialogueEvent{Kind: "start", Turn: turn})
+-		enc.Encode(dialogueEvent{Kind: "event", Turn: turn, Data: map[string]any{"type": "thread.started", "thread_id": "fixture-session"}})
+-		enc.Encode(dialogueEvent{Kind: "event", Turn: turn, Data: map[string]any{"type": "item.started", "item": map[string]any{"id": "item_0", "type": "command_execution", "command": "pwd"}}})
+-		enc.Encode(dialogueEvent{Kind: "event", Turn: turn, Data: map[string]any{"type": "item.completed", "item": map[string]any{"id": "item_0", "type": "command_execution", "status": "completed"}}})
+-		enc.Encode(dialogueEvent{Kind: "event", Turn: turn, Data: map[string]any{"type": "turn.completed"}})
+-		enc.Encode(dialogueEvent{Kind: "end", Turn: turn, Data: map[string]any{"session_id": "fixture-session"}})
++	m, err := runDialogueReceiptWrapper(t, s, a, "second question\n/fin\n")
++	if err == nil {
++		t.Fatal("cumulative tool limit did not refuse continuation")
+ 	}
+-	m.consume(strings.NewReader(stream.String()))
+ 	p, _, reason, _ := m.snapshot()
+ 	if p.ToolCalls != 2 || reason == "" {
+ 		t.Fatal(p, reason)
+--- before/internal/engine/console_cli.go
++++ after/internal/engine/console_cli.go
+@@ -369,7 +369,15 @@
+ 				return e
+ 			}
+ 			d, _ := s.desired(a.ID)
+-			return printJSON(out, map[string]any{"agent": a, "observed_status": observedAgent(a), "desired": d})
++			boundary, e := s.dialogueBoundary(a)
++			if e != nil {
++				return e
++			}
++			result := map[string]any{"agent": a, "observed_status": observedAgent(a), "desired": d}
++			if boundary != nil {
++				result["dialogue"] = boundary
++			}
++			return printJSON(out, result)
+ 		case "start":
+ 			b, e := readInput(input)
+ 			if e != nil {
+--- before/internal/engine/web_server.go
++++ after/internal/engine/web_server.go
+@@ -507,7 +507,16 @@
+ 			return
+ 		}
+ 		desired, _ := s.desired(a.ID)
+-		send(w, map[string]any{"agent": a, "health": pilotAgentHealth(a, desired, now())})
++		boundary, e := s.dialogueBoundary(a)
++		if e != nil {
++			fail(w, e)
++			return
++		}
++		result := map[string]any{"agent": a, "health": pilotAgentHealth(a, desired, now())}
++		if boundary != nil {
++			result["dialogue"] = boundary
++		}
++		send(w, result)
+ 	})
+ 	mux.HandleFunc("/api/v1/recovery-preview", func(w http.ResponseWriter, r *http.Request) {
+ 		if r.Method != "GET" {
+--- before/internal/engine/loop_guard.go
++++ after/internal/engine/loop_guard.go
+@@ -270,7 +270,11 @@
+ 	g.contexts = map[string]toolFailure{}
+ }
+ func (g *loopGuard) summary() AgentProgress {
+-	output, tool, vitality := g.monitoring(time.Now())
++	return g.summaryAt(time.Now())
++}
++
++func (g *loopGuard) summaryAt(at time.Time) AgentProgress {
++	output, tool, vitality := g.monitoring(at)
+ 	lastOutput := ""
+ 	if g.outputSeen {
+ 		lastOutput = g.lastOutput.UTC().Format(time.RFC3339Nano)
+@@ -278,7 +282,7 @@
+ 	waitSeconds := 0
+ 	if g.degraded == "" {
+ 		for _, started := range g.pending {
+-			if seconds := int(time.Since(started).Seconds()); seconds > waitSeconds {
++			if seconds := int(at.Sub(started).Seconds()); seconds > waitSeconds {
+ 				waitSeconds = seconds
+ 			}
+ 		}
+--- before/internal/engine/dialogue_supervisor_receipt_test.go
++++ after/internal/engine/dialogue_supervisor_receipt_test.go
+@@ -14,13 +14,29 @@
+ 	"time"
+ )
+ 
++type dialogueAuthorizationFunc func([]byte) (int, error)
++
++func (f dialogueAuthorizationFunc) Write(p []byte) (int, error) { return f(p) }
++
+ func TestDialogueProtocolRejectsReplayAndUnconfirmedEOF(t *testing.T) {
+ 	for _, scenario := range []string{"replayed_start", "unconfirmed_eof", "session_changed"} {
+ 		t.Run(scenario, func(t *testing.T) {
+ 			s, a, _ := dialogueReceiptFixture(t, "codex", nil)
+ 			monitor := newDialogueMonitor(s, a)
+ 			var acks, stream bytes.Buffer
+-			monitor.authorize = &acks
++			if _, err := s.db.Exec("INSERT INTO agent_dialogue_turns(id,agent_id,question,status,session_id) VALUES(?,?,'fixture','running','')", "first-turn", a.ID); err != nil {
++				t.Fatal(err)
++			}
++			monitor.authorize = dialogueAuthorizationFunc(func(p []byte) (int, error) {
++				n, err := acks.Write(p)
++				if err == nil && acks.Len() == 2 && p[0] == 1 && scenario == "session_changed" {
++					if _, err = s.db.Exec("UPDATE agent_dialogue_turns SET status='answered' WHERE id='first-turn'"); err != nil {
++						return n, err
++					}
++					_, err = s.db.Exec("INSERT INTO agent_dialogue_turns(id,agent_id,question,status,session_id) VALUES(?,?,'fixture','running','')", "second-turn", a.ID)
++				}
++				return n, err
++			})
+ 			enc := json.NewEncoder(&stream)
+ 			enc.Encode(dialogueEvent{Kind: "start", Turn: "first-turn"})
+ 			enc.Encode(dialogueEvent{Kind: "event", Turn: "first-turn", Data: map[string]any{"type": "thread.started", "thread_id": "fixture-session"}})
+--- /dev/null
++++ after/internal/engine/dialogue_checkpoint.go
+@@ -0,0 +1,182 @@
++//go:build linux
++
++package engine
++
++import (
++	"bytes"
++	"encoding/json"
++	"fmt"
++	"maps"
++	"sort"
++	"time"
++)
++
++// This is a boundary snapshot, not permission to restart a provider. An active
++// turn may have effects after its start snapshot that the engine has not seen.
++type dialogueCheckpoint struct {
++	Schema   int                `json:"schema_version"`
++	Agent    string             `json:"agent"`
++	Turn     string             `json:"turn"`
++	Project  string             `json:"project_sha256"`
++	Launch   string             `json:"launch_sha256"`
++	Session  string             `json:"session_id"`
++	Phase    string             `json:"phase"`
++	Failure  string             `json:"failure,omitempty"`
++	At       string             `json:"at"`
++	Guard    dialogueGuardState `json:"guard"`
++	Usage    *Usage             `json:"usage,omitempty"`
++	Model    *ReportedModel     `json:"reported_model,omitempty"`
++	Cooldown *ProviderCooldown  `json:"provider_cooldown,omitempty"`
++	SHA256   string             `json:"sha256"`
++}
++
++type dialogueFailureState struct {
++	Name, Action, Detail, Technical, Category string
++}
++
++type dialogueFailedCall struct {
++	Signature [32]byte
++	Completed int
++}
++
++type dialogueSignatureCount struct {
++	Signature [32]byte
++	Count     int
++}
++
++// Keep all decision state, not only the AgentProgress projection. Fixed-size
++// signatures are values; encoding map[[32]byte]int directly is unsupported.
++type dialogueGuardState struct {
++	Limits                      RunLimits
++	Signatures                  map[string][32]byte
++	Failures                    []dialogueFailedCall
++	LastOutput                  time.Time
++	OutputSeen                  bool
++	Calls, Repeated, Errors     int
++	LastSignature               [32]byte
++	Seen                        map[string]bool
++	Pending                     map[string]time.Time
++	Contexts                    map[string]dialogueFailureState
++	ToolFailures                []dialogueFailureState
++	EnvironmentBlocked          bool
++	Reason, Degraded            string
++	Completed                   int
++	LastTool, LastAction        string
++	ActionDetail, LastResult    string
++	Reads, Writes, Unclassified int
++	TotalErrors, TotalRepeats   int
++	SignatureCounts             []dialogueSignatureCount
++}
++
++func checkpointFailure(f toolFailure) dialogueFailureState {
++	return dialogueFailureState{f.name, f.action, f.detail, f.technical, f.category}
++}
++
++func (f dialogueFailureState) restore() toolFailure {
++	return toolFailure{f.Name, f.Action, f.Detail, f.Technical, f.Category}
++}
++
++func checkpointGuard(g *loopGuard) dialogueGuardState {
++	v := dialogueGuardState{Limits: g.limits, Signatures: g.signatures, LastOutput: g.lastOutput, OutputSeen: g.outputSeen,
++		Calls: g.calls, Repeated: g.repeated, Errors: g.errors, LastSignature: g.lastSignature, Seen: g.seen, Pending: g.pending,
++		Contexts: map[string]dialogueFailureState{}, EnvironmentBlocked: g.environmentBlocked, Reason: g.reason, Degraded: g.degraded,
++		Completed: g.completed, LastTool: g.lastTool, LastAction: g.lastAction, ActionDetail: g.actionDetail, LastResult: g.lastResult,
++		Reads: g.reads, Writes: g.writes, Unclassified: g.unclassified, TotalErrors: g.totalErrors, TotalRepeats: g.totalRepeats}
++	for _, f := range g.failures {
++		v.Failures = append(v.Failures, dialogueFailedCall{f.signature, f.completed})
++	}
++	for id, f := range g.contexts {
++		v.Contexts[id] = checkpointFailure(f)
++	}
++	for _, f := range g.toolFailures {
++		v.ToolFailures = append(v.ToolFailures, checkpointFailure(f))
++	}
++	for signature, count := range g.sigSeen {
++		v.SignatureCounts = append(v.SignatureCounts, dialogueSignatureCount{signature, count})
++	}
++	sort.Slice(v.SignatureCounts, func(i, j int) bool {
++		return bytes.Compare(v.SignatureCounts[i].Signature[:], v.SignatureCounts[j].Signature[:]) < 0
++	})
++	return v
++}
++
++func (v dialogueGuardState) restore() (*loopGuard, error) {
++	for _, n := range []int{v.Calls, v.Repeated, v.Errors, v.Completed, v.Reads, v.Writes, v.Unclassified, v.TotalErrors, v.TotalRepeats} {
++		if n < 0 {
++			return nil, fmt.Errorf("Compteur de dialogue invalide")
++		}
++	}
++	if v.Completed > v.Calls || v.Reads+v.Writes+v.Unclassified != v.Calls || len(v.Pending) > v.Calls-v.Completed || v.Signatures == nil || v.Seen == nil || v.Pending == nil || v.Contexts == nil {
++		return nil, fmt.Errorf("Gardes de dialogue incohérentes")
++	}
++	g := newLoopGuard(v.Limits)
++	g.signatures, g.lastOutput, g.outputSeen = maps.Clone(v.Signatures), v.LastOutput, v.OutputSeen
++	g.calls, g.repeated, g.errors, g.lastSignature = v.Calls, v.Repeated, v.Errors, v.LastSignature
++	g.seen, g.pending = maps.Clone(v.Seen), maps.Clone(v.Pending)
++	g.environmentBlocked, g.reason, g.degraded = v.EnvironmentBlocked, v.Reason, v.Degraded
++	g.completed, g.lastTool, g.lastAction = v.Completed, v.LastTool, v.LastAction
++	g.actionDetail, g.lastResult = v.ActionDetail, v.LastResult
++	g.reads, g.writes, g.unclassified = v.Reads, v.Writes, v.Unclassified
++	g.totalErrors, g.totalRepeats = v.TotalErrors, v.TotalRepeats
++	for _, f := range v.Failures {
++		if f.Completed < 0 || f.Completed > v.Completed {
++			return nil, fmt.Errorf("Historique d’échecs de dialogue invalide")
++		}
++		g.failures = append(g.failures, failedCall{f.Signature, f.Completed})
++	}
++	for id, started := range v.Pending {
++		if !v.Seen[id] || started.IsZero() {
++			return nil, fmt.Errorf("Outil de dialogue en attente invalide")
++		}
++	}
++	for id, f := range v.Contexts {
++		g.contexts[id] = f.restore()
++	}
++	for _, f := range v.ToolFailures {
++		g.toolFailures = append(g.toolFailures, f.restore())
++	}
++	totalSignatures := 0
++	for _, item := range v.SignatureCounts {
++		if item.Count < 1 || g.sigSeen[item.Signature] != 0 {
++			return nil, fmt.Errorf("Historique de répétition de dialogue invalide")
++		}
++		g.sigSeen[item.Signature] = item.Count
++		totalSignatures += item.Count
++	}
++	if totalSignatures != v.Calls || v.Repeated > v.Calls || v.Errors > v.TotalErrors {
++		return nil, fmt.Errorf("Historique cumulé de dialogue incomplet")
++	}
++	return g, nil
++}
++
++func dialogueLaunchSHA(a Agent) string {
++	b, _ := json.Marshal(struct {
++		ID, Work, Task, Attempt, Provider, Role, Mode, Workspace, Command, Prompt string
++		Args, Env                                                                 []string
++		Limits                                                                    RunLimits
++		Timeout                                                                   int
++	}{a.ID, a.WorkID, a.TaskID, a.Attempt, a.Provider, a.Role, a.Mode, a.CWD, a.Command, hash([]byte(a.Prompt)), a.Args, a.Env, a.Limits, a.Timeout})
++	return hash(b)
++}
++
++func (v dialogueCheckpoint) digest() string {
++	v.SHA256 = ""
++	b, _ := json.Marshal(v)
++	return hash(b)
++}
++
++func (v dialogueCheckpoint) restoreGuard(a Agent, root string) (*loopGuard, error) {
++	if v.Schema != 1 || v.Agent != a.ID || v.Project != hash([]byte(root)) || v.Launch != dialogueLaunchSHA(a) || v.SHA256 == "" || v.SHA256 != v.digest() || !preparationKey(v.Turn) || v.Guard.Limits != a.Limits {
++		return nil, fmt.Errorf("État de dialogue incompatible ou altéré ; aucune reprise autorisée")
++	}
++	if _, err := time.Parse(time.RFC3339Nano, v.At); err != nil || v.Phase != "running" && v.Phase != "confirmed" && v.Phase != "interrupted" {
++		return nil, fmt.Errorf("Frontière de dialogue invalide")
++	}
++	if v.Usage != nil && (v.Usage.Input < 0 || v.Usage.Output < 0) {
++		return nil, fmt.Errorf("Usage de dialogue invalide")
++	}
++	if v.Phase == "confirmed" && (v.Session == "" || v.Failure != "" || v.Guard.Reason != "" || v.Guard.Degraded != "" || len(v.Guard.Pending) != 0) {
++		return nil, fmt.Errorf("Fin de dialogue sans confirmation cohérente")
++	}
++	return v.Guard.restore()
++}
+--- /dev/null
++++ after/internal/engine/dialogue_checkpoint_store.go
+@@ -0,0 +1,130 @@
++//go:build linux
++
++package engine
++
++import (
++	"database/sql"
++	"encoding/json"
++	"fmt"
++	"time"
++)
++
++func migrateDialogueCheckpoints(db *sql.DB) error {
++	tx, err := db.Begin()
++	if err != nil {
++		return err
++	}
++	defer tx.Rollback()
++	var exists int
++	if err = tx.QueryRow("SELECT count(*) FROM pragma_table_info('agent_dialogue_turns') WHERE name='checkpoint'").Scan(&exists); err != nil {
++		return err
++	}
++	if exists == 0 {
++		if _, err = tx.Exec("ALTER TABLE agent_dialogue_turns ADD COLUMN checkpoint BLOB NOT NULL DEFAULT ''"); err != nil {
++			return err
++		}
++	}
++	if _, err = tx.Exec("PRAGMA user_version=34"); err != nil {
++		return err
++	}
++	return tx.Commit()
++}
++
++func (m *dialogueMonitor) persistCheckpoint() error {
++	phase := "running"
++	if !m.active {
++		phase = "confirmed"
++		if m.failure != "" {
++			phase = "interrupted"
++		}
++	}
++	session := m.session
++	if m.outcome.session != "" {
++		session = m.outcome.session
++	}
++	v := dialogueCheckpoint{Schema: 1, Agent: m.agent.ID, Turn: m.turn, Project: hash([]byte(m.sink.s.root)), Launch: dialogueLaunchSHA(m.agent),
++		Session: session, Phase: phase, Failure: m.failure, At: now(), Guard: checkpointGuard(m.sink.guard), Usage: m.usage,
++		Model: m.sink.reportedModelSnapshot(), Cooldown: m.sink.cooldown}
++	v.SHA256 = v.digest()
++	if _, err := v.restoreGuard(m.agent, m.sink.s.root); err != nil {
++		return err
++	}
++	raw, err := json.Marshal(v)
++	if err != nil {
++		return err
++	}
++	result, err := m.sink.s.db.Exec("UPDATE agent_dialogue_turns SET checkpoint=? WHERE id=? AND agent_id=? AND status='running'", raw, m.turn, m.agent.ID)
++	if err != nil {
++		return err
++	}
++	n, err := result.RowsAffected()
++	if err != nil {
++		return err
++	}
++	if n != 1 {
++		return fmt.Errorf("Tour de dialogue modifié ; état non enregistré")
++	}
++	return nil
++}
++
++// DialogueBoundaryView deliberately excludes private guard details and provider
++// tool arguments. It describes stored evidence, never authority to execute.
++type DialogueBoundaryView struct {
++	Available        bool           `json:"available"`
++	Turn             string         `json:"turn,omitempty"`
++	Status           string         `json:"status,omitempty"`
++	Phase            string         `json:"phase,omitempty"`
++	Confirmed        bool           `json:"boundary_confirmed"`
++	RestartSupported bool           `json:"restart_supported"`
++	Session          string         `json:"session_id,omitempty"`
++	At               string         `json:"at,omitempty"`
++	SHA256           string         `json:"sha256,omitempty"`
++	Scope            string         `json:"scope"`
++	Progress         *AgentProgress `json:"progress,omitempty"`
++	Usage            *Usage         `json:"usage,omitempty"`
++}
++
++func (s *Store) dialogueBoundary(a Agent) (*DialogueBoundaryView, error) {
++	if a.Mode != "dialogue" {
++		return nil, nil
++	}
++	v := &DialogueBoundaryView{Scope: "Aucun état de frontière conservé ; gardes et usages historiques inconnus"}
++	var raw []byte
++	err := s.db.QueryRow("SELECT id,status,checkpoint FROM agent_dialogue_turns WHERE agent_id=? ORDER BY rowid DESC LIMIT 1", a.ID).Scan(&v.Turn, &v.Status, &raw)
++	if err == sql.ErrNoRows {
++		return v, nil
++	}
++	if err != nil {
++		return nil, err
++	}
++	if len(raw) == 0 {
++		return v, nil
++	}
++	var c dialogueCheckpoint
++	if err = strict(raw, &c); err != nil {
++		return nil, fmt.Errorf("État de dialogue illisible ; aucune reprise autorisée")
++	}
++	if c.Turn != v.Turn {
++		return nil, fmt.Errorf("État de dialogue hors tour")
++	}
++	g, err := c.restoreGuard(a, s.root)
++	if err != nil {
++		return nil, err
++	}
++	if v.Status == "answered" && c.Phase != "confirmed" {
++		return nil, fmt.Errorf("Tour répondu sans état de fin confirmé")
++	}
++	v.Available, v.Phase, v.Session, v.At, v.SHA256 = true, c.Phase, c.Session, c.At, c.SHA256
++	v.Confirmed = v.Status == "answered" && c.Phase == "confirmed"
++	at, err := time.Parse(time.RFC3339Nano, c.At)
++	if err != nil {
++		return nil, fmt.Errorf("Date de frontière invalide")
++	}
++	progress := g.summaryAt(at)
++	v.Progress, v.Usage = &progress, c.Usage
++	v.Scope = "État observé à cette frontière ; aucune autorisation de redémarrage"
++	if c.Phase == "running" {
++		v.Scope = "État au début du tour ; effets et usages ultérieurs inconnus"
++	}
++	return v, nil
++}
+--- /dev/null
++++ after/internal/engine/dialogue_checkpoint_test.go
+@@ -0,0 +1,395 @@
++//go:build linux
++
++package engine
++
++import (
++	"bytes"
++	"database/sql"
++	"encoding/json"
++	"fmt"
++	"io"
++	"net/http"
++	"net/http/httptest"
++	"os"
++	"path/filepath"
++	"strings"
++	"testing"
++	"time"
++)
++
++func TestDialogueBoundaryHasDurableStateBeforeHeartbeat(t *testing.T) {
++	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"checkpoint-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
++	if _, err := runDialogueReceiptWrapper(t, s, a, "second question\n/fin\n"); err != nil {
++		t.Fatal(err)
++	}
++	assertDialoguePublicCheckpoint(t, s, a, true, 20)
++}
++
++func loadDialogueCheckpointTest(t *testing.T, s *Store, a Agent) dialogueCheckpoint {
++	t.Helper()
++	var raw []byte
++	if err := s.db.QueryRow("SELECT checkpoint FROM agent_dialogue_turns WHERE agent_id=? ORDER BY rowid DESC LIMIT 1", a.ID).Scan(&raw); err != nil {
++		t.Fatal(err)
++	}
++	var c dialogueCheckpoint
++	if err := json.Unmarshal(raw, &c); err != nil {
++		t.Fatal(err)
++	}
++	return c
++}
++
++func TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing(t *testing.T) {
++	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"guard-session"}`, `{"type":"item.started","item":{"id":"tool_0","type":"command_execution","command":"fixture-command"}}`, `{"type":"item.completed","item":{"id":"tool_0","type":"command_execution","status":"failed","exit_code":1,"aggregated_output":"fixture failure"}}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
++	a.Limits, _ = (RunLimits{MaxToolCalls: 5, MaxRepeatedCalls: 3, MaxConsecutiveErrors: 3}).normalized()
++	if err := s.saveAgent(a); err != nil {
++		t.Fatal(err)
++	}
++	monitor, err := runDialogueReceiptWrapper(t, s, a, "follow-up\n/fin\n")
++	if err != nil {
++		t.Fatal(err)
++	}
++	c := loadDialogueCheckpointTest(t, s, a)
++	g, err := c.restoreGuard(a, s.root)
++	if err != nil {
++		t.Fatal(err)
++	}
++	got, _ := json.Marshal(checkpointGuard(g))
++	want, _ := json.Marshal(checkpointGuard(monitor.sink.guard))
++	if !bytes.Equal(got, want) || g.calls != 2 || g.errors != 2 || g.repeated != 2 || len(g.failures) != 2 || g.totalRepeats != 1 {
++		t.Fatal("guard state reset", string(got), string(want))
++	}
++	before, _ := json.Marshal(c)
++	g.call("third-turn:tool_0", "command_execution", "fixture-command", time.Now())
++	if g.reason == "" || g.calls != 3 || g.totalRepeats != 2 {
++		t.Fatal("restored repetition guard lost its decision", g.reason)
++	}
++	after, _ := json.Marshal(c)
++	if !bytes.Equal(before, after) || monitor.sink.guard.calls != 2 {
++		t.Fatal("restored guard mutated retained snapshot or original monitor")
++	}
++}
++
++func TestDialogueCheckpointWriteFailureStopsBeforeNextProvider(t *testing.T) {
++	for _, phase := range []string{"running", "confirmed"} {
++		t.Run(phase, func(t *testing.T) {
++			s, a, script := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"checkpoint-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
++			trigger := fmt.Sprintf(`CREATE TRIGGER reject_checkpoint BEFORE UPDATE OF checkpoint ON agent_dialogue_turns WHEN json_extract(NEW.checkpoint,'$.phase')='%s' BEGIN SELECT RAISE(ABORT,'fixture checkpoint failure'); END`, phase)
++			if _, err := s.db.Exec(trigger); err != nil {
++				t.Fatal(err)
++			}
++			if _, err := runDialogueReceiptWrapper(t, s, a, "must-not-start\n/fin\n"); err == nil {
++				t.Fatal("checkpoint write failure allowed continuation")
++			}
++			calls, err := os.ReadFile(script + ".calls")
++			if phase == "running" && (!os.IsNotExist(err) || len(calls) != 0) || phase == "confirmed" && (err != nil || string(calls) != "call\n") {
++				t.Fatal("provider ran beyond durable boundary", phase, string(calls), err)
++			}
++			var answered int
++			if err := s.db.QueryRow("SELECT count(*) FROM agent_dialogue_turns WHERE agent_id=? AND status='answered'", a.ID).Scan(&answered); err != nil || answered != 0 {
++				t.Fatal("failed checkpoint became answered", err)
++			}
++		})
++	}
++}
++
++func TestDialogueCheckpointAPIReadAndForeignWorkRefusal(t *testing.T) {
++	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"public-checkpoint-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
++	if _, err := runDialogueReceiptWrapper(t, s, a, "/fin\n"); err != nil {
++		t.Fatal(err)
++	}
++	before := loadDialogueCheckpointTest(t, s, a).SHA256
++	handler := newWebHandler(s, "localhost:18787", "checkpoint-fixture-token")
++	for _, work := range []string{a.WorkID, "foreign-work"} {
++		req := httptest.NewRequest(http.MethodGet, "http://localhost:18787/api/v1/agent-detail?work="+work+"&agent="+a.ID, nil)
++		req.AddCookie(&http.Cookie{Name: "swarm_session", Value: "checkpoint-fixture-token"})
++		response := httptest.NewRecorder()
++		handler.ServeHTTP(response, req)
++		if work != a.WorkID {
++			if response.Code != http.StatusForbidden || strings.Contains(response.Body.String(), "public-checkpoint-session") {
++				t.Fatal("checkpoint crossed work ownership")
++			}
++			continue
++		}
++		var result struct {
++			State DialogueBoundaryView `json:"dialogue"`
++		}
++		if response.Code != http.StatusOK || json.Unmarshal(response.Body.Bytes(), &result) != nil || !result.State.Available || !result.State.Confirmed || result.State.RestartSupported || result.State.SHA256 != before || result.State.Usage == nil || result.State.Usage.Input != 10 {
++			t.Fatal("API lost stored boundary", response.Code, response.Body.String())
++		}
++		if strings.Contains(response.Body.String(), "SignatureCounts") {
++			t.Fatal("private guard details exposed")
++		}
++	}
++	if loadDialogueCheckpointTest(t, s, a).SHA256 != before {
++		t.Fatal("inspection mutated checkpoint")
++	}
++}
++
++func TestDialogueCheckpointRejectsInvalidOrForeignState(t *testing.T) {
++	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"checkpoint-session"}`, `{"type":"turn.completed"}`})
++	if _, err := runDialogueReceiptWrapper(t, s, a, "/fin\n"); err != nil {
++		t.Fatal(err)
++	}
++	original := loadDialogueCheckpointTest(t, s, a)
++	for _, kind := range []string{"digest", "version", "agent", "project", "launch", "turn", "negative", "repetition_history", "phase"} {
++		t.Run(kind, func(t *testing.T) {
++			raw, _ := json.Marshal(original)
++			var c dialogueCheckpoint
++			if err := json.Unmarshal(raw, &c); err != nil {
++				t.Fatal(err)
++			}
++			switch kind {
++			case "digest":
++				c.Session = "altered"
++			case "version":
++				c.Schema++
++			case "agent":
++				c.Agent = "foreign-agent"
++			case "project":
++				c.Project = "foreign-project"
++			case "launch":
++				c.Launch = "foreign-launch"
++			case "turn":
++				c.Turn = "foreign-turn"
++			case "negative":
++				c.Guard.Calls = -1
++			case "repetition_history":
++				c.Guard.Calls = 1
++				c.Guard.Unclassified = 1
++			case "phase":
++				c.Phase = "running"
++			}
++			if kind != "digest" {
++				c.SHA256 = c.digest()
++			}
++			raw, _ = json.Marshal(c)
++			if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET checkpoint=? WHERE agent_id=?", raw, a.ID); err != nil {
++				t.Fatal(err)
++			}
++			if _, err := s.dialogueBoundary(a); err == nil {
++				t.Fatal("invalid state became available", kind)
++			}
++		})
++	}
++	if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET checkpoint='' WHERE agent_id=?", a.ID); err != nil {
++		t.Fatal(err)
++	}
++	legacy, err := s.dialogueBoundary(a)
++	if err != nil || legacy.Available || legacy.Confirmed || legacy.Usage != nil || legacy.Scope == "" {
++		t.Fatal("missing legacy checkpoint invented known state", legacy, err)
++	}
++}
++
++func TestDialogueCheckpointMigrationPreservesLegacyAndBackup(t *testing.T) {
++	s, a, _ := dialogueReceiptFixture(t, "codex", nil)
++	if _, err := s.db.Exec("INSERT INTO agent_dialogue_turns(id,agent_id,question,status,session_id) VALUES('legacy-turn',?,'legacy question','answered','legacy-session')", a.ID); err != nil {
++		t.Fatal(err)
++	}
++	var before []byte
++	if err := s.db.QueryRow("SELECT body FROM agents WHERE id=?", a.ID).Scan(&before); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := s.db.Exec("ALTER TABLE agent_dialogue_turns DROP COLUMN checkpoint"); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := s.db.Exec("PRAGMA user_version=33"); err != nil {
++		t.Fatal(err)
++	}
++	if err := s.db.Close(); err != nil {
++		t.Fatal(err)
++	}
++	if old, err := openStoreWithMigration(s.root, false, false); err == nil {
++		old.db.Close()
++		t.Fatal("inspection migrated legacy store")
++	}
++	migrated, err := openStore(s.root, false)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer migrated.db.Close()
++	var after []byte
++	var version int
++	var question, status, session string
++	if err := migrated.db.QueryRow("SELECT body FROM agents WHERE id=?", a.ID).Scan(&after); err != nil || !bytes.Equal(before, after) {
++		t.Fatal("migration changed agent", err)
++	}
++	if err := migrated.db.QueryRow("PRAGMA user_version").Scan(&version); err != nil || version != 34 {
++		t.Fatal("migration version", version, err)
++	}
++	if err := migrated.db.QueryRow("SELECT question,status,session_id FROM agent_dialogue_turns WHERE id='legacy-turn'").Scan(&question, &status, &session); err != nil || question != "legacy question" || status != "answered" || session != "legacy-session" {
++		t.Fatal("migration changed legacy turn", err)
++	}
++	v, err := migrated.dialogueBoundary(a)
++	if err != nil || v.Available || v.Usage != nil {
++		t.Fatal("migration fabricated checkpoint", err)
++	}
++	backups, err := filepath.Glob(filepath.Join(s.root, ".swarm/state-pre-v34-*.db"))
++	if err != nil || len(backups) != 1 {
++		t.Fatal("migration backup missing", backups, err)
++	}
++	info, err := os.Stat(backups[0])
++	if err != nil || info.Mode().Perm() != 0600 {
++		t.Fatal("backup is not private", err)
++	}
++	backup, err := sql.Open("sqlite", backups[0])
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer backup.Close()
++	if err := backup.QueryRow("PRAGMA user_version").Scan(&version); err != nil || version != 33 {
++		t.Fatal("backup is not pre-migration", version, err)
++	}
++	var fields int
++	if err := backup.QueryRow("SELECT count(*) FROM pragma_table_info('agent_dialogue_turns') WHERE name='checkpoint'").Scan(&fields); err != nil || fields != 0 {
++		t.Fatal("backup contains migrated column", err)
++	}
++}
++
++func TestDialogueCheckpointSurvivesLifecycleDeleteRestore(t *testing.T) {
++	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"retained-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
++	m, err := runDialogueReceiptWrapper(t, s, a, "/fin\n")
++	if err != nil {
++		t.Fatal(err)
++	}
++	a.Progress, a.Usage, _, _ = m.snapshot()
++	if err := s.finishAgent(a, "completed", "fixture ended without acceptance", nil); err != nil {
++		t.Fatal(err)
++	}
++	before := loadDialogueCheckpointTest(t, s, a).SHA256
++	w, err := s.get(a.WorkID)
++	if err != nil {
++		t.Fatal(err)
++	}
++	p, err := s.lifecyclePreview(w.ID, LifecycleRequest{Schema: 1, Revision: w.Revision, Action: "delete"})
++	if err != nil {
++		t.Fatal(err)
++	}
++	if _, err := s.lifecycleApply(w.ID, lifecycleRequest(p, "delete-checkpoint-fixture")); err != nil {
++		t.Fatal(err)
++	}
++	p, err = s.lifecyclePreview(w.ID, LifecycleRequest{Schema: 1, Revision: w.Revision, Action: "restore"})
++	if err != nil {
++		t.Fatal(err)
++	}
++	if _, err := s.lifecycleApply(w.ID, lifecycleRequest(p, "restore-checkpoint-fixture")); err != nil {
++		t.Fatal(err)
++	}
++	if loadDialogueCheckpointTest(t, s, a).SHA256 != before {
++		t.Fatal("lifecycle changed checkpoint")
++	}
++	v, err := s.dialogueBoundary(a)
++	if err != nil || !v.Confirmed || v.Usage == nil || v.Usage.Input != 10 {
++		t.Fatal("restored checkpoint unavailable", err)
++	}
++}
++
++func TestDialoguePendingBoundaryHasDurableUsage(t *testing.T) {
++	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"checkpoint-session"}`, `{"type":"item.started","item":{"id":"item_0","type":"command_execution","command":"fixture effect"}}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
++	if _, err := runDialogueReceiptWrapper(t, s, a, "/fin\n"); err == nil {
++		t.Fatal("pending result was confirmed")
++	}
++	assertDialoguePublicCheckpoint(t, s, a, false, 10)
++}
++
++func assertDialoguePublicCheckpoint(t *testing.T, s *Store, a Agent, confirmed bool, input int64) {
++	t.Helper()
++	var out, stderr bytes.Buffer
++	if code := run([]string{"--root", s.root, "--json", "agent", "show", a.ID}, &out, &stderr); code != 0 {
++		t.Fatal("public inspection failed", code, stderr.String())
++	}
++	var result struct {
++		Agent Agent `json:"agent"`
++		State *struct {
++			Available bool   `json:"available"`
++			Confirmed bool   `json:"boundary_confirmed"`
++			Usage     *Usage `json:"usage"`
++		} `json:"dialogue"`
++	}
++	if err := json.Unmarshal(out.Bytes(), &result); err != nil {
++		t.Fatal(err)
++	}
++	if result.State == nil || !result.State.Available || result.State.Confirmed != confirmed || result.State.Usage == nil || result.State.Usage.Input != input {
++		t.Fatalf("dialogue boundary lost before supervisor heartbeat: checkpoint=%+v agent_usage=%+v", result.State, result.Agent.Usage)
++	}
++}
++
++func TestDialogueCheckpointWithoutAnsweredStatusIsUnconfirmed(t *testing.T) {
++	s, a, script := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"unconfirmed-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
++	if _, err := s.db.Exec(`CREATE TRIGGER reject_answered BEFORE UPDATE ON agent_dialogue_turns WHEN NEW.status='answered' BEGIN SELECT RAISE(ABORT,'fixture status failure'); END`); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := runDialogueReceiptWrapper(t, s, a, "must-not-start\n/fin\n"); err == nil {
++		t.Fatal("status write failure allowed continuation")
++	}
++	v, err := s.dialogueBoundary(a)
++	if err != nil || !v.Available || v.Phase != "confirmed" || v.Status != "running" || v.Confirmed || v.RestartSupported || v.Usage == nil || v.Usage.Input != 10 {
++		t.Fatal("end snapshot advertised uncommitted answer", v, err)
++	}
++	calls, err := os.ReadFile(script + ".calls")
++	if err != nil || string(calls) != "call\n" {
++		t.Fatal("provider repeated after status failure", err)
++	}
++}
++
++func TestDialogueStartCheckpointDoesNotDescribeLaterEffects(t *testing.T) {
++	s, a, _ := dialogueReceiptFixture(t, "codex", nil)
++	if _, err := s.db.Exec("INSERT INTO agent_dialogue_turns(id,agent_id,question,status,session_id) VALUES('active-turn',?,'fixture','running','')", a.ID); err != nil {
++		t.Fatal(err)
++	}
++	reader, writer := io.Pipe()
++	authRead, authWrite := io.Pipe()
++	m := newDialogueMonitor(s, a)
++	m.authorize = authWrite
++	done := make(chan struct{})
++	go func() { m.consume(reader); close(done) }()
++	defer func() {
++		writer.Close()
++		authRead.Close()
++		authWrite.Close()
++		reader.Close()
++		select {
++		case <-done:
++		case <-time.After(3 * time.Second):
++			t.Error("monitor failed to stop")
++		}
++	}()
++	if err := json.NewEncoder(writer).Encode(dialogueEvent{Kind: "start", Turn: "active-turn"}); err != nil {
++		t.Fatal(err)
++	}
++	var ack [1]byte
++	if _, err := io.ReadFull(authRead, ack[:]); err != nil || ack[0] != 1 {
++		t.Fatal("start not authorized", err)
++	}
++	v, err := s.dialogueBoundary(a)
++	if err != nil || !v.Available || v.Phase != "running" || v.Confirmed || v.RestartSupported || v.Usage != nil || !strings.Contains(v.Scope, "inconnus") {
++		t.Fatal("start snapshot invented later effects", v, err)
++	}
++}
++
++func TestDialogueCheckpointProgressUsesStoredBoundaryTime(t *testing.T) {
++	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"frozen-session"}`, `{"type":"item.started","item":{"id":"tool_0","type":"command_execution","command":"fixture effect"}}`, `{"type":"turn.completed"}`})
++	if _, err := runDialogueReceiptWrapper(t, s, a, "/fin\n"); err == nil {
++		t.Fatal("pending turn confirmed")
++	}
++	c := loadDialogueCheckpointTest(t, s, a)
++	started := time.Now().UTC().Add(-48 * time.Hour)
++	for id := range c.Guard.Pending {
++		c.Guard.Pending[id] = started
++	}
++	c.At = started.Add(2 * time.Second).Format(time.RFC3339Nano)
++	c.SHA256 = c.digest()
++	raw, err := json.Marshal(c)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET checkpoint=? WHERE agent_id=?", raw, a.ID); err != nil {
++		t.Fatal(err)
++	}
++	v, err := s.dialogueBoundary(a)
++	if err != nil || v.Progress == nil {
++		t.Fatal("historical progress unavailable", v, err)
++	}
++	if v.Progress.ToolWaitSeconds != 2 {
++		t.Fatalf("historical wait grew after interruption: got %d seconds, want 2", v.Progress.ToolWaitSeconds)
++	}
++}
+--- before/docs/PROJECT-MEMORY.md
++++ after/docs/PROJECT-MEMORY.md
+@@ -106,8 +106,9 @@
+ ## Stockage, reprise et limites
+ 
+ Les versions sont ajoutées au travail source dans SQLite et conservées avec ses
+-événements. Le stockage passe à la version 33, avec sauvegarde avant migration
+-d’un espace existant. Arrêter les anciens programmes avant cette mise à niveau ;
++événements. La mémoire versionnée a introduit le stockage 33 ; les états de
++frontière du dialogue portent désormais le stockage courant à 34, avec sauvegarde
++avant migration d’un espace existant. Arrêter les anciens programmes avant cette mise à niveau ;
+ les commandes de consultation ne migrent pas silencieusement un ancien espace.
+ Une compilation seule ne met pas à jour un serveur déjà en cours.
+ 
+@@ -199,12 +200,13 @@
+   participant F as Fournisseur
+   participant S as Stockage
+   W->>M: Début du tour
++  M->>S: État de début enregistré
+   M-->>W: Autorisation de commencer
+   W->>F: Question et session courante
+   F-->>W: Événements puis sortie du processus
+   W->>M: Événements et demande de confirmation de fin
+   M->>M: Fin positive, session, gardes et résultats d’outils
+-  M->>S: Enregistrement des journaux
++  M->>S: Journaux et état de fin enregistrés
+   M-->>W: Confirmation ou refus
+   W->>S: answered seulement après confirmation
+ ```
+@@ -233,3 +235,58 @@
+ Elle contrôle les statuts des tours, le nombre d’invocations et les compteurs,
+ puis relit l’agent par la CLI construite. Les preuves, variantes de panne et
+ limites sont dans `docs/plans/deepagents-integration/RESULTATS-MEMOIRE-06.md`.
++
++## État durable aux frontières du dialogue
++
++Le moniteur enregistre un état de version 1 dans la colonne `checkpoint` du tour,
++avant l’autorisation de commencer et avant la confirmation de fin. L’état conserve
++les gardes cumulées : limites, signatures et répétitions, erreurs, appels/résultats,
++outils en attente et observations connues, avec l’usage rapporté. Son empreinte
++lie les valeurs au projet, à la tentative, au tour et au lancement enregistré.
++Elle détecte une incohérence ; elle n’est ni une signature d’autorité ni une preuve
++de l’état actuel des permissions ou de la conversation chez le fournisseur.
++
++La CLI `swarm --json agent show IDENTIFIANT` et l’API authentifiée
++`GET /api/v1/agent-detail?work=TRAVAIL&agent=IDENTIFIANT` ajoutent un objet
++`dialogue` pour ce mode. Il contient `available`, `phase`, `status`,
++`boundary_confirmed`, `restart_supported`, l’identité de session, l’empreinte,
++la date, `progress`, `usage` et la portée de ces observations. Les signatures et
++détails internes des gardes restent dans le stockage privé. L’API contrôle le
++travail propriétaire avant de lire cet état.
++
++| État conservé | Interprétation |
++| --- | --- |
++| `running` | État au début du tour ; effets et usages ultérieurs inconnus. |
++| `confirmed` et statut `answered` | Frontière de fin confirmée, avec usage cumulé connu à cette frontière. |
++| `confirmed` sans statut `answered` | Confirmation du statut non établie, par exemple après interruption du wrapper. |
++| `interrupted` | Dernière frontière d’interruption observée ; effets à examiner avant toute reprise. |
++| `available: false` | Aucun état ou ancien tour sans checkpoint ; aucun zéro ni succès de restauration inventé. |
++
++Une écriture d’état refusée au début empêche l’appel fournisseur ; en fin, elle
++empêche `answered` et l’échange suivant. Une fermeture observée du canal conserve
++l’état interrompu si le stockage est disponible. Un arrêt brutal des deux
++processus peut laisser seulement l’état de début : ses effets ultérieurs restent
++inconnus. L’état de fin et le statut du tour sont deux écritures successives ;
++`boundary_confirmed` exige les deux. L’objet `agent` garde ses compteurs de
++supervision périodiques ; `dialogue.usage` donne l’usage durable de cette frontière
++sans attendre le battement. Un usage non rapporté reste absent.
++Les durées et états d’attente de cette projection sont calculés à la date `at`
++de la frontière ; consulter un état interrompu plus tard ne les fait pas croître.
++
++Les tours restent conservés lors de la purge des journaux. Leur état est inclus
++dans la suppression récupérable et sa restauration locale ; un export historique
++standard ne devient pas pour autant un checkpoint exécutable. Un ancien tour
++n’est pas reconstruit à partir des journaux tronqués. Un état non vide altéré,
++incompatible ou visant un autre lancement est refusé explicitement.
++
++`restart_supported` reste `false` : ni l’inspection ni la reconstitution technique
++des gardes n’autorise de redémarrage fournisseur. La prochaine étape doit définir
++la décision de reprise et le traitement des effets incertains. Avant toute mise
++à niveau réelle vers le stockage 34, arrêter les anciens processus selon le
++parcours d’installation ; une commande de consultation ne migre pas la base.
++
++Recette locale sans modèle :
++
++```sh
++go test ./internal/engine -run '^(TestDialogueBoundaryHasDurableStateBeforeHeartbeat|TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing|TestDialogueCheckpointWriteFailureStopsBeforeNextProvider)$' -count=1 -v
++```
+--- before/docs/en/PROJECT-MEMORY.md
++++ after/docs/en/PROJECT-MEMORY.md
+@@ -91,8 +91,9 @@
+ ## Persistence, recovery and limits
+ 
+ Versions are appended to the source work in SQLite alongside its event history.
+-Storage version 33 backs up existing storage before migration. Stop older
+-programs before upgrading; observation commands do not silently migrate an old
++Versioned memory introduced storage 33; dialogue boundary snapshots now raise
++the current storage version to 34, backing up existing storage before migration.
++Stop older programs before upgrading; observation commands do not silently migrate an old
+ workspace. Building a binary does not update a running server.
+ 
+ Archives retain versions and received contexts. Import marks lessons as imported
+@@ -177,12 +178,13 @@
+   participant F as Provider
+   participant S as Storage
+   W->>M: Turn start
++  M->>S: Persist start state
+   M-->>W: Permission to start
+   W->>F: Question and current session
+   F-->>W: Events followed by process exit
+   W->>M: Events and completion confirmation request
+   M->>M: Positive ending, session, guards and tool results
+-  M->>S: Persist logs
++  M->>S: Persist logs and end state
+   M-->>W: Confirm or refuse
+   W->>S: answered only after confirmation
+ ```
+@@ -211,3 +213,57 @@
+ It checks turn statuses, invocation counts and cumulative counters, then reads
+ the agent through the built CLI. Evidence, failure variants and limitations are
+ in `docs/plans/deepagents-integration/RESULTATS-MEMOIRE-06.md`.
++
++## Durable dialogue boundary state
++
++The monitor saves a version 1 state in the turn's `checkpoint` column before
++authorizing its start and before confirming its completion. It retains cumulative
++guards: limits, signatures and repetition, errors, calls/results, pending tools
++and known observations, together with reported usage. Its digest binds these
++values to the project, attempt, turn and recorded launch. It detects inconsistent
++data; it is neither an authority signature nor proof of current provider-side
++permissions or conversation state.
++
++`swarm --json agent show ID` and the authenticated API
++`GET /api/v1/agent-detail?work=WORK&agent=ID` add a `dialogue` object for this mode.
++It contains `available`, `phase`, `status`, `boundary_confirmed`,
++`restart_supported`, session identity, digest, date, `progress`, `usage` and the
++scope of these observations. Internal guard signatures and details remain in
++private storage. The API checks work ownership before reading this state.
++
++| Stored state | Meaning |
++| --- | --- |
++| `running` | State at turn start; later effects and usage are unknown. |
++| `confirmed` with status `answered` | Confirmed end boundary, including cumulative usage known at that boundary. |
++| `confirmed` without status `answered` | Status confirmation is unproven, for example after wrapper interruption. |
++| `interrupted` | Last observed interruption boundary; effects require review before recovery. |
++| `available: false` | No state or a legacy turn without a checkpoint; no invented zero or restoration success. |
++
++A failed state write at the start prevents the provider call; at completion it
++prevents `answered` and the next exchange. An observed channel closure retains
++interrupted state if storage is available. Abrupt loss of both processes can
++leave only the start snapshot: later effects remain unknown. The end snapshot
++and turn status are successive writes; `boundary_confirmed` requires both.
++The `agent` object retains periodically saved supervision counters, while
++`dialogue.usage` provides durable usage at this boundary without waiting for the
++heartbeat. Unreported usage remains absent.
++Waiting durations and states in this projection are computed at the boundary's
++`at` timestamp; inspecting interrupted state later does not make them grow.
++
++Turns remain retained when logs are purged. Their state is included in local
++recoverable deletion and restoration; a standard historical export does not
++thereby become an executable checkpoint. Legacy state is not reconstructed from
++truncated logs. Nonempty corrupted state, incompatible state or a snapshot bound
++to another launch is explicitly refused.
++
++`restart_supported` remains `false`: neither inspection nor technical guard
++reconstruction authorizes a provider restart. The next step must define recovery
++decisions and uncertain-effect handling. Before a real upgrade to storage 34,
++stop older processes through the installation procedure; inspection commands do
++not migrate storage.
++
++Local recipe without a model:
++
++```sh
++go test ./internal/engine -run '^(TestDialogueBoundaryHasDurableStateBeforeHeartbeat|TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing|TestDialogueCheckpointWriteFailureStopsBeforeNextProvider)$' -count=1 -v
++```
+--- /dev/null
++++ after/docs/plans/deepagents-integration/INCREMENT-MEMOIRE-07.md
+@@ -0,0 +1,52 @@
++# État durable aux frontières des tours de dialogue
++
++16 octobre 2026, reprise « suite ». Codex seul applique APEX et `replan`.
++Exigences : MEM-U08, MEM-U12, MEM-U13 ; cas MEM-C15 et MEM-C16.
++
++## Observation et choix
++
++M10 qualifie la fin, mais le tour peut être répondu avant le prochain battement
++du superviseur. Les usages cumulés, signatures de répétition, erreurs et outils
++en attente vivent dans `dialogueMonitor` et `loopGuard`. `agent_logs` ne peut pas
++servir de journal de restauration : il est limité à 2 000 entrées et sa capture
++de sortie est facultative et tronquée. Réutiliser les seuls compteurs visibles
++remettrait à zéro les gardes internes.
++
++Options : reconstruire depuis les journaux incomplets, ajouter un nouveau magasin,
++ou conserver un état versionné sur le tour existant. Choix : une colonne
++`checkpoint` de `agent_dialogue_turns`, sous clôture de compatibilité du stockage.
++La sauvegarde de migration précède le changement. Les copies de cycle de vie
++capturent déjà toutes les colonnes de cette table. Aucun autre service ni
++politique de rétention ou de seuil n’est ajouté.
++
++L’état est enregistré avant l’autorisation de début et avant la confirmation
++de fin. Il lie projet, agent, tentative, tour, session, configuration de lancement,
++limites et gardes cumulées, avec usage observé et empreinte. Une interruption au
++milieu d’un tour reste incertaine : un état de début ne décrit pas les effets
++survenus ensuite. Le statut `answered` et un état confirmé sont tous deux requis
++pour qualifier une frontière complète. Aucun rejeu ni nouveau droit de reprise.
++
++## Séquence et preuves attendues
++
++| Lot | Propriétaire et périmètre | Critère |
++| --- | --- | --- |
++| M11.1 | Codex, reproduction et producteurs réels | Montrer qu’un tour répondu n’a pas encore son usage durable avant le battement ; préserver cette preuve. |
++| M11.2 | Codex, état sérialisé et persistance | Sauvegarde avant départ/fin ; restauration technique identique des gardes dans une fixture ; panne d’écriture bloque le fournisseur ou la continuation. |
++| M11.3 | Codex, lectures CLI/API et compatibilité | Exposer la frontière et ses limites sans état interne privé ; ancienne absence explicite, corruption refusée ; migration isolée préservant histoire et sauvegarde ; cycle de vie conservé. |
++| M11.4 | Codex, vérification et RETEX | Parcours binaire local, tests ciblés/race, analyse statique, docs FR/EN, preuves liées aux sources. |
++
++Les sous-processus fournisseurs sont des scripts locaux. Le serveur déjà lancé
++et sa base restent intacts. Les huit évaluations réelles précédentes ne sont ni
++relancées ni renotées. La restauration technique de la garde dans un test ne
++constitue pas la reprise autorisée d’une conversation : le refus de redémarrage
++implicite reste en place.
++
++## Résultat
++
++M11.1 à M11.4 sont réalisés et vérifiés localement. Deux critères échouent avant
++réalisation ; un défaut de temps dans la nouvelle projection est ensuite reproduit
++et corrigé. Le candidat final passe 32 tests nommés, dont 16 avec `-race`, ainsi
++que l’analyse statique et le parcours du binaire construit. Migration et cycle de
++vie sont testés dans des racines isolées ; documentation FR/EN et RETEX sont dans
++[RESULTATS-MEMOIRE-07.md](RESULTATS-MEMOIRE-07.md). Aucun stockage utilisateur n’a
++été migré et aucun redémarrage fournisseur n’est autorisé.
+--- /dev/null
++++ after/docs/plans/deepagents-integration/RESULTATS-MEMOIRE-07.md
+@@ -0,0 +1,159 @@
++# Dialogue : état durable avant les autorisations de tour
++
++16 octobre 2026, après « suite ». Codex seul, APEX et `replan`, dans le checkout
++existant. L’[incrément 7](INCREMENT-MEMOIRE-07.md) conserve l’état nécessaire aux
++gardes entre les frontières des tours ; il n’autorise pas de redémarrage du
++fournisseur. Aucun modèle réel, délégation ou mission utilisateur n’est lancé.
++Le serveur ouvert précédemment et sa base restent inchangés.
++Les quatre tâches M11 sont réalisées et vérifiées dans ce périmètre local.
++
++## Écart observé et réalisation
++
++Les deux cas exécutés avant modification du moteur montrent l’écart : après
++deux tours répondus, ou après un tour interrompu avec outil en attente, la CLI
++ne dispose d’aucun état durable de frontière. L’usage connu du moniteur n’est
++pas encore dans `agent.usage` avant son prochain battement. Les deux FAIL sont
++dans `evidence/m11-20261016/checkpoint-red.json/.log`, avec la source originale.
++Ils établissent ce manque de conservation ; ils ne remettent pas en cause la
++qualification technique de fin apportée par M10.
++
++Les gardes complètes ne pouvaient pas être reconstruites à partir de
++`AgentProgress`, qui est une projection. Les journaux ne sont pas un remplacement :
++`logBatch` ne conserve que 2 000 entrées ; la capture fournisseur est optionnelle
++et tronquée. Le nouveau champ `agent_dialogue_turns.checkpoint` contient un état
++versionné distinct de ces journaux. Il conserve les limites, signatures, séries
++et totaux de répétition/erreur, déduplication, résultats, outils en attente,
++diagnostics connus, usage et déclaration du modèle lorsqu’ils ont été reçus.
++
++Le moniteur l’écrit avant d’autoriser le début, puis avant de confirmer la fin,
++après la persistance des journaux. Une fermeture observée du canal conserve une
++frontière interrompue si le stockage fonctionne. Une écriture refusée au début
++empêche le fournisseur de partir ; en fin, elle empêche `answered` et le tour
++suivant. Les erreurs ne sont pas converties en état vide réussi.
++
++L’état est lié au projet canonique, à l’agent et à son lancement enregistré :
++travail, tâche, tentative, rôle, espace, commande/arguments, noms d’environnement
++autorisés, prompt, limites et durée. L’empreinte est un contrôle de cohérence,
++pas une signature d’autorité ni une preuve de l’environnement actuel. Les
++valeurs secrètes d’environnement ne sont pas enregistrées.
++
++## Lecture et qualification de la frontière
++
++La CLI `agent show` et l’API authentifiée `agent-detail` ajoutent `dialogue` pour
++les agents de ce mode. Cette projection donne l’état, sa date/empreinte, sa
++portée, les compteurs et l’usage de la frontière ; les structures internes des
++gardes ne sont pas exposées. L’API refuse un autre travail avant de lire l’état.
++Un ancien tour sans checkpoint est explicitement inconnu. Un état non vide
++altéré, hors tour/projet/lancement, de version inconnue ou incohérent est refusé.
++
++Une fin enregistrée et son statut sont deux écritures successives. La vue exige
++**phase `confirmed` et statut `answered`** pour `boundary_confirmed: true`.
++Le test de panne du statut conserve bien l’état de fin et l’usage reçu, mais
++refuse cette qualification et ne lance pas le fournisseur suivant. L’état de
++début reste explicitement incomplet quant aux effets ultérieurs. Dans tous les
++cas, `restart_supported` reste `false`.
++
++La garde reconstituée depuis le JSON réellement conservé est identique à celle
++du moniteur : deux appels en échec, deux séries d’erreur/répétition et l’historique
++des signatures restent présents. Un troisième appel identique déclenche la même
++garde de répétition. Cette vérification technique n’exécute aucun outil réel ni
++conversation restaurée. Les collections sont copiées : modifier la garde
++reconstituée ne modifie ni l’état conservé ni le moniteur initial.
++
++## Migration, histoire et parcours public
++
++Le stockage passe de **33 à 34** ; le format de checkpoint commence à **1**.
++La migration sauvegarde l’original en mode `0600`, puis ajoute la colonne sans
++réécrire les agents, questions, statuts ou sessions. Le test ouvre la sauvegarde
++et vérifie sa version 33 et l’absence de la nouvelle colonne. La consultation
++d’un ancien stockage refuse toujours la migration implicite. Aucun checkpoint
++historique n’est inventé.
++
++La suppression récupérable et la restauration locale conservent l’empreinte et
++l’usage du checkpoint, via le mécanisme qui capture toutes les colonnes des
++tables. La purge des journaux ne supprime pas les tours. L’export historique
++standard conserve son périmètre partiel : il ne devient pas un état exécutable
++de conversation. Les sources et réponses des évaluations antérieures en version
++33 restent historiques et inchangées. Les tests de connaissance et de grille V3
++lisent désormais la source courante 34 et vérifient les branches 33/34/35 ; aucun
++nouvel essai LLM ne leur est attribué.
++
++Le vrai binaire est construit et exécuté par
++`TestDialogueActualSupervisorConfirmsTurnReceipts`, avec superviseur, bail de
++terminal, deux saisies et relecture par sa CLI. Les fournisseurs restent des
++scripts locaux. Les originaux du candidat final sont dans
++`evidence/m11-20261016/actual-supervisor-final/` :
++
++| Parcours | Tours répondu/interrompu | État durable reçu par la CLI |
++| --- | --- | --- |
++| Deux tours puis `/fin` | 2 / 0 | Frontière confirmée, deux appels et résultats, usage 20/4. |
++| Refus fournisseur avec sortie nulle | 0 / 1 | Frontière interrompue, usage non rapporté absent. |
++| Outil sans résultat | 0 / 1 | Frontière interrompue, un appel, zéro résultat reçu, un outil en attente, usage 10/2. |
++
++Les nombres de tokens sont des valeurs de fixture. Aucun coût réel n’est déduit
++de ces nombres. Aucune tâche n’est acceptée par ces parcours.
++
++## Vérification et replan du candidat
++
++Le premier candidat passe 25 tests nommés et 44 sous-tests, puis 15 tests nommés
++avec `-race`. La relecture trouve ensuite un défaut de la nouvelle vue :
++`loopGuard.summary()` utilise l’heure actuelle, ce qui fait croître après arrêt
++la durée d’un outil conservé comme en attente. Un cas daté de deux jours avec
++une frontière située deux secondes après son début échoue avant correction :
++`boundary-time-red.json/.log` et sources liées dans `boundary-time-source.json`.
++Ces premiers lots verts ne sont pas présentés comme la preuve du candidat final.
++
++Le calcul commun `summaryAt(at)` permet maintenant une projection à la date
++enregistrée. La supervision courante garde `summary()` à l’heure actuelle ; la
++lecture historique utilise la date du checkpoint. Cette correction a justifié
++de vérifier aussi les événements, défauts de capture et arrêts du superviseur
++qui utilisent les mêmes gardes. Les originaux des lots précédents sont conservés.
++
++| Contrôle final | Résultat | Preuve sous `evidence/m11-20261016/` |
++| --- | --- | --- |
++| Tours, état durable, refus, CLI/API, migration, connaissance actuelle, cycle de vie et garde commune | PASS, 32 tests nommés et 47 sous-tests | `checkpoint-final.json/.log` |
++| Concurrence, état incomplet, panne du statut et heure de projection | PASS, 16 tests nommés avec `-race` | `checkpoint-final-race.json/.log` |
++| Analyse statique | PASS | `engine-final-vet.json/.log` |
++| Compilation et parcours du vrai binaire | PASS dans le test du superviseur | Même lot final, `actual-supervisor-final/` |
++| Reprise d’une conversation réelle et arrêt brutal simultané des deux processus | NOT TESTED | Aucun droit de restauration n’est activé. |
++
++Les préimages conservent les modifications antérieures, et les empreintes des
++entrées Go/ressources embarquées lient chaque contrôle à son candidat. La revue
++est locale, dans le contexte d’implémentation ; elle ne vaut pas approbation
++indépendante. Aucun écran n’a changé, aucune recette navigateur n’est revendiquée.
++Les contrats sont décrits en [FR](../../PROJECT-MEMORY.md) et
++[EN](../../en/PROJECT-MEMORY.md).
++
++Les 16 tests `-race` sont compris dans les **32 noms distincts**, sans addition
++artificielle. Les 1 007 entrées du manifeste du candidat final restent identiques
++pendant et après ses contrôles. Les premières sources vertes, puis celles du cas
++rouge de temps, sont conservées par empreinte ; les résultats antérieurs ne sont
++pas attribués à la correction suivante. `final-audit.json` lie les sources,
++journaux, reçus publics et contrôles documentaires finaux.
++
++## RETEX et suite
++
++La perte de l’usage entre deux battements se traite au contrat de la frontière,
++pas en accélérant le battement ni en reconstruisant depuis un journal tronqué.
++Les gardes métier et leur projection d’affichage sont distinctes. Une vue d’un
++état historique doit utiliser sa propre date ; cette règle est appliquée dans
++le calcul commun et protégée par le cas de régression. Le lecteur vérifie les
++liaisons et distingue absence historique, corruption et fin non confirmée.
++
++Incidents d’exploration : deux lectures ont encore visé des fichiers supposés
++absents (`recovery_evidence.go`, `agents.go`). Les producteurs réels ont ensuite
++été localisés dans `agents_store.go` et par recherche des symboles. Un patch
++contenant deux opérations sur le même fichier a été refusé avant mutation ; il
++a été regroupé avant application. Une erreur de ponctuation dans un premier
++texte documentaire a été corrigée après relecture. Ces incidents ne constituent
++ni échecs de produit ni tests exécutés ; la règle existante de découverte des
++chemins reste suffisante, sans nouvelle consigne doublon.
++
++L’incrément conserve un état de frontière ; il ne constitue pas un checkpointer
++complet de conversation. Une mort brutale peut laisser l’état de début, sans les
++effets suivants. La disponibilité de la session chez le fournisseur et les
++permissions actuelles ne sont pas établies par l’empreinte. La restauration
++autorisée doit encore définir sa décision, sa fraîcheur, les consommations et la
++vérification des effets incertains. Le refus de redémarrage reste nécessaire.
++Les critères MEM-C15 et MEM-C16 restent PARTIAL ; résumé progressif, suppression
++et qualité LLM gardent leurs critères ouverts.
+--- before/docs/plans/deepagents-integration/PLAN.md
++++ after/docs/plans/deepagents-integration/PLAN.md
+@@ -42,6 +42,7 @@
+ | M8 Branches conditionnelles et trois versions | Recette locale et RETEX vérifiés | Vrai CLI isolé pour versions ancienne/égale/supérieure, douze contextes moteur, grille V3 ; 44 tests Python, 2 tests Go et 11 sous-tests. Réponses V1/V2 et leurs échecs inchangés ; aucun nouvel appel de modèle. Voir `RESULTATS-MEMOIRE-04.md`. |
+ | M9 Traçabilité du contexte de reprise | Défaut moteur corrigé et vérifié localement | Deux défauts d’empreinte reproduits avant correction ; manifeste préparé conservé, contexte final lié au texte et enregistré avant départ, refus de capacité et d’écriture. 20 tests ciblés puis 6 avec `-race`, soit 21 noms distincts, CLI/API, analyse statique et compilation. Voir `RESULTATS-MEMOIRE-05.md`. |
+ | M10 Confirmation de fin des tours | Défaut moteur corrigé et vérifié localement | Trois faux `answered` reproduits, puis confirmation par le moniteur avant écriture. 10 tests distincts, dont 6 avec `-race` ; vrai superviseur, terminal et CLI avec fournisseurs locaux. Docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-06.md`. Restauration après arrêt toujours non réalisée. |
++| M11 État durable aux frontières | Réalisé et vérifié localement | Gardes et usages conservés avant autorisations, vue CLI/API qualifiée, migration isolée 33 → 34 et restauration locale de corbeille ; 32 tests distincts, dont 16 avec `-race`, vrai binaire et RETEX dans `RESULTATS-MEMOIRE-07.md`. Aucun redémarrage fournisseur activé. |
+ 
+ **Point de reprise au 16 octobre :** les quatre appels M6 et leurs résultats
+ mixtes sont conservés, sans renotation. M7 prépare puis, après accord « oui »,
+@@ -80,6 +81,17 @@
+ restauration des gardes et la vérification des effets incertains. Ni restauration
+ complète ni nouveau droit de reprise ne sont déclarés acquis.
+ 
++Après « suite » et après démarrage de l’interface, M11 conserve l’état de garde
++et l’usage aux frontières des tours, avant les accords de début/fin. Le candidat
++utilise le stockage 34 et expose cette preuve dans `dialogue` via `agent show`
++et `agent-detail`. Un état de début ne décrit pas les effets ultérieurs, et une
++fin sans statut `answered` reste non confirmée. La lecture historique est figée
++à la date conservée après reproduction et correction de son défaut de temps.
++Lire `RESULTATS-MEMOIRE-07.md` et `evidence/m11-20261016/`. Le serveur déjà ouvert
++reste inchangé et non migré. Prochaine frontière : décision explicite de reprise,
++fraîcheur et qualification des effets incertains, avant toute opération publique
++de restauration. Aucun appel de modèle supplémentaire n’a été effectué.
++
+ À chaque reprise, lire ce point, l’audit et le manifeste ; contrôler les empreintes
+ concernées, conserver les acquis et poursuivre le prochain travail autorisé.
+ Actualiser le référentiel en cas de dérive, sans écraser les observations initiales.
+@@ -208,6 +220,7 @@
+ | 2026-10-15 | Question sur la couverture du guide et la mémoire procédurale. | Replan du cadrage trop centré sur RETEX : guide relu, liens techniques inventoriés, code d’optimisation LangMem et notebook procédural inspectés à SHA fixe. Deux exigences et quatre cas proposés ajoutés ; choix avant M3 rouvert, sans changement applicatif ni appel LLM. |
+ | 2026-10-15 | L’utilisateur fournit le texte du guide pratique `langgraph/add-memory`, distinct de la page conceptuelle ouverte précédemment. | Erreur de méthode sur l’identité du document diagnostiquée ; contenu joint conservé. Sections fonctionnelles analysées, sources discriminantes inspectées, 2 sondes LangGraph passent. Reprise, projection/résumé et effets distincts de suppression ajoutés au cadrage ; aucun backend externe ni donnée réelle modifiée. |
+ | 2026-10-16 | M10, reprise après « next » : trois tours incomplets marqués répondus sont reproduits avant correction. | Confirmation de fin et de persistance par le moniteur ; dix tests distincts et vrai parcours superviseur/terminal/CLI avec fournisseurs locaux. Restauration après arrêt encore ouverte ; aucun nouvel appel de modèle. |
++| 2026-10-16 | M11, reprise « suite » après lancement de l’interface. | État durable sur le tour, usage avant battement, gardes complètes et lecture datée ; stockage 34 testé isolément, 32 tests distincts dont 16 avec `-race`. Serveur réel conservé, restauration fournisseur encore ouverte. |
+ 
+ ## Réalisation M3 — décision technique et critères
+ 
+--- before/docs/plans/deepagents-integration/cas-evaluation.json
++++ after/docs/plans/deepagents-integration/cas-evaluation.json
+@@ -670,6 +670,25 @@
+           "scope": "Missing tool results prevent technical turn confirmation, and pending effect counters remain visible through the actual supervisor and CLI. No structured conversation projection, summary or restoration of tool-message sequences is implemented by this increment."
+         }
+       ]
++    },
++    {
++      "id": "memory-07-dialogue-boundary-state",
++      "date": "2026-10-16",
++      "report": "RESULTATS-MEMOIRE-07.md",
++      "environment": "Actual wrapper and built supervisor/terminal/CLI with local provider scripts; authenticated API inspection, isolated v33 to v34 migration, local trash restoration and targeted race tests; running user server preserved",
++      "model_calls": 0,
++      "cases": [
++        {
++          "id": "MEM-C15",
++          "result": "PARTIAL",
++          "scope": "Versioned complete loop-guard and reported-usage state is saved before start/end acknowledgments and validated against project and recorded launch. Stored guards retain repetition/error decisions in a technical fixture. Missing/foreign/corrupt states are distinct; provider restart remains unsupported, current provider session availability and uncertain effects remain unverified."
++        },
++        {
++          "id": "MEM-C16",
++          "result": "PARTIAL",
++          "scope": "Pending tools and cumulative usage are durable at observed boundaries; a start boundary does not assert later effects, and confirmed phase without answered status remains unconfirmed. Historical progress uses stored boundary time. No provider conversation projection, summarization or structured tool-message restoration is implemented."
++        }
++      ]
+     }
+   ]
+ }

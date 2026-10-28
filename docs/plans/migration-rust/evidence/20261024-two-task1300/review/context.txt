@@ -1,0 +1,1040 @@
+DELIVERY: implement a maintained public two-task sequential journey; not managed Git settlement or parallel execution. Root integrates and executes. No tools available to model. Shared source default production binary already qualified, empty features.
+
+FILE tests/rust_native_web_conductor.py
+#!/usr/bin/env python3
+"""Exercise server-only mission dispatch on a qualified normal Rust binary.
+
+Owned public planning setup runs two inert local processes. HTTP start then admits
+one independently granted worker without a separate mission watch. Kernel sockets,
+pidfds, parentage and real CLI/HTTP state prove dispatch, nonblocking controls,
+lease contention, server shutdown/reopen and surviving worker completion. No paid
+provider, private SQL write, Go, installation, retry or global watchdog is used.
+"""
+import argparse
+import json
+import os
+from pathlib import Path
+import select
+import selectors
+import socket
+import traceback
+from urllib.parse import urlencode
+import rust_agent_model_route as fixture
+import rust_planning_worker_public_flow as planning
+import rust_mission_watch_planning as planner
+from rust_mission_report_relay import rows
+import rust_mission_watch_worker as worker
+import rust_mission_watch_public as public
+import rust_native_parent_death as parent_death
+import rust_native_http_cli as native
+from rust_native_http_mission import request, foreign_inode
+
+
+def run(binary, profile, out):
+    """Run one fresh server-owned journey, preserving every original and cleanup error.
+
+    The inert worker waits for an authenticated nonce release, never a timeout.
+    A positive live worker precedes pause/stop/contention checks. Server stop must
+    leave that worker alive; only this owned fixture's cleanup may release/signal it.
+    Reopen tests revoked consent, not an unsupported managed-process recovery claim.
+    """
+    out.mkdir(parents=True, mode=0o700, exist_ok=False)
+    qualified=json.loads(profile.read_bytes())
+    assert qualified['no_fixture_feature'] and fixture.digest(binary.read_bytes())==qualified['sha256']
+    ready,f=planning.flow(binary,out/'planning',before_worker=True,return_fixture=True)
+    nonce=fixture.digest(str(f.root).encode());root=f.root
+    fixture.publish(root/'codex',worker.provider_program(nonce).encode());(root/'codex').chmod(0o700)
+    (root/'watch-worker').mkdir(mode=0o700)
+    fixture.publish(out/'fixture.json',dict(root=str(root),work=f.work,setup_inert_planning=True,paid_provider=False))
+    listener=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+    server=connection=supervisor=provider=None
+    server_fd=supervisor_fd=provider_fd=None
+    reaped=False;checks=[];errors=[];primary=None
+    path=lambda action:'/api/v1/mission?'+urlencode(dict(work=f.work,action=action))
+    def passed(name):
+        """Retain named successful assertions, never infer PASS from process exit."""
+        checks.append(name);print('PASS '+name,flush=True)
+    try:
+        listener.bind(str(root/'watch-provider.sock'));os.chmod(root/'watch-provider.sock',0o600);listener.listen(1)
+        server=native.Server(binary,root,out,'web',environment=f.environment)
+        server_identity=worker.observation(server.process.pid);server_fd=worker.attach(server_identity)
+        csrf=server.request('/api/v1/native-session')['csrf_token']
+        before=f.ok(['mission','status-native',f.work]);assert before['agents']==[] and before['supervision'] is None
+        for action in ['show','order','queue','status']:
+            assert request(server,'GET',path(action)) is not None
+        passed('protected-mission-reads-before-start')
+        current=f.ok(['work','show',f.work])['work']
+        start=dict(schema_version=1,event_id='http-conductor-start',expected_revision=current['revision'],reason='Owned inert server conductor',slots=1,
+            profile=dict(provider='fixture',role='worker',workspace='watch-worker',level='standard',capture_output=True))
+        request(server,'POST',path('start'),start,csrf)
+        print('STAGE awaiting-server-owned-provider',flush=True)
+        with selectors.DefaultSelector() as selector:
+            selector.register(listener,selectors.EVENT_READ,'provider');selector.register(server_fd,selectors.EVENT_READ,'server')
+            while connection is None:
+                for key,_ in selector.select():
+                    assert key.data=='provider','server exited before worker entry'
+                    connection,_=listener.accept()
+        supervisor,supervisor_fd,provider,provider_fd,agent_id=public.attach_provider(connection,server_identity,binary,root)
+        entry=worker.frame(connection);assert entry['nonce']==nonce and entry['pid']==provider['pid']
+        agent=worker.wait_running(f,agent_id,server_fd,supervisor_fd)
+        assert agent['status']=='running' and agent['supervisor_pid']==supervisor['pid']
+        worker.verify_current_root_binding(agent['native_mission'],root)
+        lease=worker.supervision(f);assert lease['stopped_at']==''
+        fixture.publish(out/'running.json',dict(agent=agent_id,provider=entry,supervisor=supervisor,lease=lease))
+        passed('http-start-alone-launches-real-inert-worker')
+        observed=request(server,'GET',path('status'));assert agent_id in json.dumps(observed)
+        assert len(f.ok(['mission','status-native',f.work])['agents'])==1
+        passed('http-status-responds-during-active-session')
+        code,denied=f.call(['mission','watch',f.work]);assert code!=0 and 'mission-lease-already-held' in json.dumps(denied)
+        assert worker.supervision(f)==lease and len(f.ok(['mission','status-native',f.work])['agents'])==1
+        fixture.publish(out/'competing-watch-refusal.json',denied)
+        passed('competing-cli-watch-refused-without-duplicate-agent')
+        other=None;other_error=None
+        try:
+            other=native.Server(binary,root,out,'contending-web',environment=f.environment)
+            assert request(other,'GET',path('show'))['consent_enabled'] is True
+            other.stop()
+        except BaseException as error:
+            other_error=error;raise
+        finally:
+            if other is not None:native.finish(other,other_error)
+        assert worker.supervision(f)==lease and server.process.poll() is None
+        assert len(f.ok(['mission','status-native',f.work])['agents'])==1
+        passed('second-web-server-remains-usable-without-owning-or-releasing-first-lease')
+        stable_work=f.ok(['work','show',f.work])['work']
+        invalid=dict(start,event_id='invalid-server-start',expected_revision=stable_work['revision'],unexpected=True)
+        request(server,'POST',path('start'),invalid,csrf,expected=400)
+        request(server,'POST',path('stop'),dict(schema_version=1,event_id='csrf-refusal',expected_revision=stable_work['revision'],reason='Owned refusal'),csrf='invalid',expected=403)
+        assert f.ok(['work','show',f.work])['work']==stable_work
+        assert request(server,'GET',path('show'))['consent_enabled'] is True
+        passed('invalid-and-unauthorized-controls-refuse-without-work-mutation-and-read-recovers')
+        def control(action,event,**extra):
+            """Use each fresh Work revision through the authenticated HTTP writer."""
+            value=f.ok(['work','show',f.work])['work']
+            return request(server,'POST',path(action),dict(schema_version=1,event_id=event,expected_revision=value['revision'],reason='Owned server control',**extra),csrf)
+        control('pause','server-pause');assert request(server,'GET',path('show'))['paused'] is True
+        control('priority','server-priority',task_id='task',priority='7')
+        control('resume','server-resume');assert request(server,'GET',path('show'))['paused'] is False
+        control('stop','server-stop');assert request(server,'GET',path('show'))['consent_enabled'] is False
+        control('unpause','server-unpause');view=request(server,'GET',path('show'));assert view['paused'] is False and view['consent_enabled'] is False
+        assert len(f.ok(['mission','status-native',f.work])['agents'])==1
+        passed('all-six-http-writers-remain-responsive-and-stop-revokes-consent')
+        connection.sendall(b'Q');assert worker.frame(connection)['nonce']==nonce
+        server.stop();native.finish(server,None);server=None
+        assert worker.supervision(f)['stopped_at']!=''
+        assert worker.observation(supervisor['pid'])['ppid']==os.getpid()
+        connection.sendall(b'Q');assert worker.frame(connection)['pid']==provider['pid']
+        passed('server-shutdown-releases-lease-and-granted-worker-survives')
+        server=native.Server(binary,root,out,'reopened',environment=f.environment)
+        view=request(server,'GET',path('show'));assert view['consent_enabled'] is False
+        assert len(f.ok(['mission','status-native',f.work])['agents'])==1
+        server.stop();native.finish(server,None);server=None
+        passed('reopen-preserves-revocation-and-no-duplicate-agent')
+        fixture.publish(root/'watch-worker/release-worker.json',dict(nonce=nonce,release=True))
+        select.select([supervisor_fd],[],[])
+        waited,status=os.waitpid(supervisor['pid'],0);reaped=True
+        assert waited==supervisor['pid'] and os.WIFEXITED(status) and os.WEXITSTATUS(status)==0
+        final=f.ok(['agent','show',agent_id])['agent'];assert final['status']=='completed'
+        task=next(t for t in f.ok(['work','show',f.work])['work']['tasks'] if t['id']=='task');assert task['status']=='blocked'
+        passed('independent-worker-completes-after-server-without-fake-acceptance')
+        server=native.Server(binary,root,out,'identity-witness',environment=f.environment)
+        assert request(server,'GET',path('show'))['consent_enabled'] is False
+        with foreign_inode(root/'.swarm/state.db'):
+            assert server.process.wait()!=0,'foreign datastore replacement did not stop coordinator'
+        native.finish(server,None)
+        assert 'web-root-binding-changed' in server.stderr.decode()
+        server=None
+        passed('foreign-datastore-stops-coordinator-and-preserves-original')
+        server=native.Server(binary,root,out,'identity-recovered',environment=f.environment)
+        assert request(server,'GET',path('show'))['consent_enabled'] is False
+        assert f.ok(['agent','show',agent_id])['agent']['status']=='completed'
+        server.stop();native.finish(server,None);server=None
+        passed('restored-original-reopens-with-retained-completion-and-revocation')
+        assert fixture.digest(binary.read_bytes())==qualified['sha256']
+    except BaseException as error:
+        primary=error
+        worker.retain_failure(errors,lambda:fixture.publish(out/'failure.json',dict(status='FAIL',cause=''.join(traceback.format_exception(error)))))
+    finally:
+        if server is not None:
+            worker.retain_failure(errors,lambda:native.finish(server,primary))
+        if primary is not None:
+            release=root/'watch-worker/release-worker.json'
+            if not release.exists():worker.retain_failure(errors,lambda:fixture.publish(release,dict(nonce=nonce,release=True)))
+            if supervisor is not None and not reaped:
+                worker.retain_failure(errors,lambda:public.reap_cleanup_helper(supervisor))
+            worker.retain_failure(errors,lambda:public.cleanup_owned_children(binary,root,out))
+        for item in [connection,listener]:
+            if item is not None:worker.retain_failure(errors,item.close)
+        for fd in [server_fd,supervisor_fd,provider_fd]:
+            if fd is not None:worker.retain_failure(errors,lambda fd=fd:os.close(fd))
+    if primary is not None or errors:raise BaseExceptionGroup('Public web conductor and cleanup',([primary] if primary else [])+errors)
+    result=dict(status='PASS',assertions=checks,server_only=True,paid_provider=False,setup_inert_planning=True,installed=False,global_watchdog=None,binary_sha256=qualified['sha256'])
+    fixture.publish(out/'worker-result.json',result)
+    print('WEB_WORKER_JOURNEY_PASS',flush=True)
+    return result
+
+
+def held_planner(binary,out):
+    """Observe a real permitted planner before stopping its owning HTTP server.
+
+    No proposal is released. HTTP remains responsive while the foreground child
+    is held; local ControllerShutdown must TERM/wait and publish the actual failed
+    receipt before lease close. This tests server cancellation, separately from OS
+    signal CLI recipes; it grants no model, task acceptance or managed recovery.
+    """
+    out.mkdir(parents=True,mode=0o700,exist_ok=False)
+    f,nonce,_=planner.setup(binary,out/'setup')
+    fixture.publish(out/'fixture.json',dict(root=str(f.root),work=f.work))
+    listener=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+    server=peer=None;child_fd=server_fd=None;primary=None;errors=[]
+    try:
+        listener.bind(str(f.root/'watch-planner.sock'));os.chmod(f.root/'watch-planner.sock',0o600);listener.listen(1)
+        server=native.Server(binary,f.root,out,'held-planner',environment=f.environment)
+        identity=worker.observation(server.process.pid);server_fd=worker.attach(identity)
+        ready,_,_=select.select([listener,server_fd],[],[]);assert listener in ready and server_fd not in ready
+        peer,_=listener.accept();child,child_fd=planner.planner_peer(peer,identity)
+        assert worker.frame(peer)['nonce']==nonce
+        job=rows(f,'SELECT claim_id,permission,phase,child_pid,owner_pid FROM native_planning_runs WHERE work_id=? AND child_pid=?',(f.work,child['pid']))
+        assert len(job)==1 and job[0][1:]==(1,'permitted',child['pid'],identity['pid'])
+        path='/api/v1/mission?'+urlencode(dict(work=f.work,action='show'))
+        assert request(server,'GET',path)['consent_enabled'] is True
+        assert not select.select([child_fd],[],[],0)[0]
+        server.stop();native.finish(server,None);server=None
+        assert select.select([child_fd],[],[],0)[0] and worker.supervision(f)['stopped_at']!=''
+        receipts=list((f.root/'.swarm').glob('native-planning-*.receipt'));assert len(receipts)==1
+        magic,extent,digest,body=receipts[0].read_bytes().split(b'\n',3)
+        assert magic==b'SR1' and int(extent)==len(body) and fixture.digest(body)==digest.decode()
+        receipt=json.loads(body)
+        assert receipt['signal']==15 and receipt['grant_attempted'] is True
+        assert receipt['output_complete'] is False and receipt['failure']=='planning-execution-interrupted'
+        work=f.ok(['work','show',f.work])['work'];assert not work.get('tasks')
+        assert f.ok(['mission','show',f.work])['consent_enabled'] is True
+        fixture.publish(out/'result.json',dict(status='PASS',http_responsive_while_role_held=True,actual_TERM_failed_receipt=True,no_decision_applied=True,local_controller_shutdown=True,installed=False,global_watchdog=None))
+        print('PASS web-owned-held-planner-shutdown-retains-actual-TERM-failed-receipt',flush=True)
+    except BaseException as error:
+        primary=error
+        worker.retain_failure(errors,lambda:fixture.publish(out/'failure.json',dict(status='FAIL',cause=''.join(traceback.format_exception(error)))))
+    finally:
+        if server is not None:worker.retain_failure(errors,lambda:native.finish(server,None))
+        for item in [peer,listener]:
+            if item is not None:worker.retain_failure(errors,item.close)
+        for fd in [child_fd,server_fd]:
+            if fd is not None:worker.retain_failure(errors,lambda fd=fd:os.close(fd))
+    if primary is not None or errors:raise BaseExceptionGroup('Held web planner and cleanup',([primary] if primary else [])+errors)
+
+
+def main():
+    """Require qualified inputs and scope Linux subreaper only to this owned recipe."""
+    parser=argparse.ArgumentParser(description=__doc__)
+    for name in ['binary','profile','output']:parser.add_argument('--'+name,type=Path,required=True)
+    args=parser.parse_args()
+    def cases():
+        """Keep ordinary worker journey and held-role shutdown in independent Roots."""
+        result=run(args.binary.resolve(),args.profile.resolve(),args.output.resolve())
+        held_planner(args.binary.resolve(),args.output.resolve()/'held-planner')
+        result['held_planner_local_shutdown_verified']=True
+        fixture.publish(args.output.resolve()/'result.json',result)
+        print('NATIVE_WEB_CONDUCTOR_PASS',flush=True)
+    worker.subreaper_scope(cases,lambda error:None,parent_death.subreaper)
+
+
+if __name__=='__main__':main()
+
+FILE tests/rust_planning_worker_public_flow.py
+#!/usr/bin/env python3
+"""Public Rust planner delegation -> worker -> handoff -> planner observation.
+
+No Go-shaped seed, private SQL writes, paid provider, automatic conductor or
+acceptance is used. Actual inert processes produce proposals and a report;
+source/binary inputs and original failures are retained without global timeout.
+"""
+import argparse,json,os,sys,traceback
+from pathlib import Path
+import rust_agent_model_route as fixture
+import rust_planning_rejection_recovery as feedback
+import rust_manual_mission as mission
+from rust_planning_bootstrap import request
+
+def pending(work,scope):
+    """Select real pending events for the intended scope, not fabricated IDs."""
+    return [e['id'] for e in work['planning']['inbox'] if e['scope']==scope and not e.get('decision')]
+
+def proposal(owned,work,scope,operations):
+    """Supply owned inert model output; the engine still validates delivery/fences."""
+    fixture.publish(owned.root/'planning-proposal.json',dict(input_events=pending(work,scope),reason='Explicit public integration fixture',operations=operations))
+
+def flow(binary,out,authorized=True,control_script=None,control_inputs=None,extra_controls=(),deliverable="handoff.md",share_control_output=None,fixture_files=(),child_task_budget=1,child_activation_budget=3,before_worker=False,extra_worker=False,return_fixture=False):
+    """Require public provenance, child isolation, real submission and next prompt.
+
+    Explicit fixture budgets are persisted public inputs, not product policy or
+    measured prices. The authorized case supplies an explicit handoff control;
+    its timeout comes from saved policy and the command is not executed by this
+    recipe. Afterwards the missing-control variant must refuse without mutation.
+    Optional control_inputs declares fixture input paths; control_script replaces
+    only the explicitly authorized fixture command before enable. deliverable and
+    share_control_output override explicit fixture declarations, not product defaults.
+    fixture_files creates explicit owned input bytes before authorization. extra_controls
+    appends explicit fixture definitions in operator order; none execute here.
+    child_task_budget is the explicit delegate-proposal fixture value, not a product
+    default; the normal one-worker witness uses1. child_activation_budget is
+    likewise an explicit saved delegation fixture input (legacy witness3), not
+    a retry cap imposed by the recipe. Manual worker invocation
+    and inert proposals prove no autonomous orchestration, model authenticity,
+    completed controls or independent review. before_worker retains a genuine
+    ready task setup without admitting a worker; its result is READY, not PASS.
+    return_fixture requires before_worker and returns (ready, actual Fixture),
+    preserving its private environment/command history without reconstructing it.
+    This test context is not an identity, capability or launch grant.
+    extra_worker proposes a second independent task under the explicit supplied
+    child task budget; it never silently raises that budget.
+    """
+    if return_fixture and not before_worker:raise ValueError('return_fixture requires before_worker')
+    owned=fixture.Fixture(binary,out,'public-worker-flow' if authorized else 'missing-controls')
+    for name,raw in fixture_files:
+        target=owned.root/name;assert target.resolve().is_relative_to(owned.root.resolve())
+        target.parent.mkdir(parents=True,exist_ok=True);fixture.publish(target,raw)
+    fixture.publish(owned.root/'codex',feedback.PROGRAM.encode());os.chmod(owned.root/'codex',0o700)
+    work=owned.ok(['work','create'],dict(schema_version=1,event_id='public-flow-create',expected_revision=0,title='ROOT-PRIVATE-TITLE',objective='ROOT-PRIVATE-OBJECTIVE',scope='ROOT-PRIVATE-BRIEF',criteria=['OWN-REQUIREMENT']))['work'];owned.work=work['id']
+    control_code=control_script if control_script is not None else "from pathlib import Path; import re; text=Path('handoff.md').read_text(); assert re.search(r'Input SHA256: [0-9a-f]{64}',text)"
+    controls={'req-1':[dict(id='actual-handoff',command=['python3','-c',control_code],criteria=[1],inputs=['handoff.md'] if control_inputs is None else control_inputs,review_output=(control_script is not None) if share_control_output is None else share_control_output,justification='Check actual owned fixture handoff input digest')]}
+    controls['req-1'].extend(dict(c) for c in extra_controls)
+    work=owned.ok(['planning','enable',owned.work],request(event='public-flow-enable',max_activations=6,checks=controls if authorized else None))
+    proposal(owned,work,'root',[dict(kind='delegate',id='child',title='OWN-SCOPE',next='Produce only the owned requirement',requirements=['req-1'],max_tasks=child_task_budget,max_activations=child_activation_budget)])
+    first=owned.ok(['planning','step',owned.work]);assert first['run']['decision_applied'];work=first['run']['work'];assert not work.get('tasks')
+    child=next(s for s in work['planning']['scopes'] if s['id']=='child');assert child['parent']=='root' and child['requirements']==['req-1']
+    before=set(owned.root.glob('fixture-prompt-*.bin'))
+    operations=[dict(kind='task',id='task',title='OWN-TASK',next='Produce the actual local handoff',requirements=['req-1'],deliverable=deliverable,criteria=['OWN-CRITERION'])]
+    if extra_worker:operations.append(dict(kind='task',id='task-2',title='SECOND-OWN-TASK',next='Produce the second owned handoff',requirements=['req-1'],deliverable='second/handoff.md',criteria=['OWN-CRITERION']))
+    proposal(owned,work,'child',operations)
+    second=owned.ok(['planning','step',owned.work]);assert second['run']['decision_applied'];work=second['run']['work'];task=work['tasks'][0];assert task['scope_id']=='child' and task['plan_role']=='worker'
+    prompts=set(owned.root.glob('fixture-prompt-*.bin'))-before;assert len(prompts)==1;child_prompt=next(iter(prompts)).read_bytes();assert b'OWN-SCOPE' in child_prompt and b'ROOT-PRIVATE-TITLE' not in child_prompt and b'ROOT-PRIVATE-OBJECTIVE' not in child_prompt
+    work=owned.ok(['budget','apply',owned.work],dict(schema_version=1,event_id='public-worker-budget',expected_revision=work['revision'],budget=dict(limit_usd=10,reserve_per_launch_usd=1,estimate_source='Owned inert integration fixture, not measured pricing',reference_date='2026-10-21')))
+    fixture.publish(owned.root/'codex',mission.PROGRAM.encode());os.chmod(owned.root/'codex',0o700)
+    owned.request=dict(schema_version=1,event_id='session',expected_revision=work['revision'],task_id='task',provider='fixture',capture_output=True)
+    if before_worker:
+        assert authorized and not (owned.root/'model-received.json').exists()
+        ready=dict(status='READY_FOR_NATIVE_WORKER',root=str(owned.root),work_id=owned.work,revision=work['revision'],worker_started=False,accepted=False)
+        return (ready,owned) if return_fixture else ready
+    if not authorized:
+        before=owned.snapshot();code,wire=owned.call(['agent','preview',owned.work],owned.request)
+        assert code!=0 and wire['failure']['code']=='organization_incomplete',wire
+        assert 'organization-requirement-controls-missing' in wire['failure']['causes'],wire
+        assert owned.snapshot()==before and owned.reservation() is None and not (owned.root/'model-received.json').exists()
+        return dict(status='PASS',root=str(owned.root),missing_controls_refused=True,no_worker_start=True,no_mutation=True)
+    preview=owned.prepare(preview=True);assert preview['preview_only'] and not preview['process_started'] and owned.reservation() is None
+    owned.request['model_policy_hash']=preview['agent']['model_route']['policy_hash'];prepared=owned.prepare();prompt=prepared['agent']['prompt']
+    assert all(marker in prompt for marker in ['OWN-SCOPE','OWN-TASK','OWN-CRITERION','OWN-REQUIREMENT'])
+    assert all(marker not in prompt for marker in ['ROOT-PRIVATE-TITLE','ROOT-PRIVATE-OBJECTIVE','ROOT-PRIVATE-BRIEF'])
+    actual=owned.run_and_assert(prepared);report=(owned.root/'handoff.md').read_bytes();assert actual['stdin_sha256'].encode() in report
+    mission.submit(owned);work=owned.ok(['work','show',owned.work])['work'];assert work['tasks'][0]['status']=='submitted' and len(work['tasks'][0]['attempts'])==1
+    events=[e for e in work['planning']['inbox'] if e['kind'] in ['attempt_ended','handoff']];assert len(events)==2 and all(e['scope']=='child' and e['task']=='task' and e['attempt']==prepared['agent']['attempt_id'] for e in events)
+    handoff=next(e for e in events if e['kind']=='handoff');assert handoff['handoff']==dict(path='handoff.md',sha256=fixture.digest(report))
+    fixture.publish(owned.root/'codex',feedback.PROGRAM.encode());os.chmod(owned.root/'codex',0o700);before=set(owned.root.glob('fixture-prompt-*.bin'));proposal(owned,work,'child',[])
+    third=owned.ok(['planning','step',owned.work]);assert third['run']['decision_applied'];current=third['run']['work'];assert current['tasks'][0]['status']=='submitted' and current['planning']['reviewer'].get('calls',0)==0
+    fresh=set(owned.root.glob('fixture-prompt-*.bin'))-before;assert len(fresh)==1;received=next(iter(fresh)).read_bytes()
+    with feedback.native.database(owned) as db:
+        row=db.execute('SELECT context_json FROM native_planning_claims WHERE claim_id=?',[third['run']['claim_id']]).fetchone();assert row
+    assert received.endswith(row[0].encode());context=json.loads(row[0]);assert context['scope']['id']=='child'
+    actual_reports=[r for r in context['reports'] if r['event_id']==handoff['id']];assert len(actual_reports)==1 and actual_reports[0]['text']==report.decode() and actual_reports[0]['sha256']==fixture.digest(report)
+    assert all(e['decision'] for e in current['planning']['inbox'] if e['id'] in {event['id'] for event in events})
+    return dict(status='PASS',root=str(owned.root),work_id=owned.work,revision=current['revision'],agent_id='session',attempt_id=prepared['agent']['attempt_id'],public_delegation=True,child_prompt_isolated=True,real_worker_and_report=True,handoff_received_by_planner=True,private_sql_writes=False,go_seed=False,autonomous_conductor=False,independent_review=False,accepted=False)
+
+def main():
+    """Retain exact helpers/default binary and fresh fixture; never delete failures."""
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--binary',required=True,type=Path);p.add_argument('--output',required=True,type=Path);a=p.parse_args();out=a.output.resolve();out.mkdir(exist_ok=False);binary=a.binary.resolve()
+    modules=[sys.modules[f.__module__] for f in [feedback.fresh_work,feedback.request,feedback.ledger,feedback.apply_policy]];sources=list(dict.fromkeys([Path(__file__),Path(fixture.__file__),Path(feedback.__file__),Path(feedback.native.__file__),Path(mission.__file__)]+[Path(m.__file__) for m in modules]));inputs=dict(binary=str(binary),binary_sha256=fixture.digest(binary.read_bytes()),sources={str(p):fixture.digest(p.read_bytes()) for p in sources});fixture.publish(out/'inputs.json',inputs)
+    try:
+        checks=[flow(binary,out),flow(binary,out,False)];assert fixture.digest(binary.read_bytes())==inputs['binary_sha256'] and all(fixture.digest(Path(n).read_bytes())==h for n,h in inputs['sources'].items());result=dict(status='PASS',checks=checks,paid_provider=False,global_watchdog=None);fixture.publish(out/'result.json',result);print(json.dumps(result))
+    except BaseException:fixture.publish(out/'failure.json',dict(status='FAIL',cause=traceback.format_exc()));raise
+
+if __name__=='__main__':main()
+
+FILE tests/rust_workspace_fifo_completion.py
+#!/usr/bin/env python3
+"""Verify public FIFO completion recovery after the real SDK owner has exited.
+
+Public planning supplies one genuine scoped worker. A separately qualified SDK
+runs an owned inert provider, injects a negative journal fault during settlement,
+restores its cause and exits with the turn still held. This harness reads that
+state, reconciles through the normal CLI and verifies durable release/replay.
+No positive SQL seed, real model, acceptance, installation or global watchdog.
+All channels, original receipts, fixture paths and failures remain retained.
+"""
+import argparse
+import json
+from pathlib import Path
+import sqlite3
+import subprocess
+import sys
+import time
+import traceback
+
+import rust_agent_model_route as fixture
+import rust_mission_task_order as diagnostic
+import rust_planning_worker_public_flow as planning
+
+
+def reservation(owned, agent):
+    """Read the exact owned Agent reservation without writing or resetting it.
+
+    Missing rows refuse; statement/connection errors propagate with their cause.
+    Amount/state are existing product observations, not fixture permission or a
+    measured invoice. The immutable result can be compared across reconciliation.
+    """
+    db = sqlite3.connect('file:' + str(owned.root / '.swarm/state.db') + '?mode=ro', uri=True)
+    try:
+        row = db.execute('SELECT state,amount FROM reservations WHERE agent_id=?', (agent,)).fetchone()
+        assert row is not None, 'real admission reservation missing'
+        return list(row)
+    finally:
+        db.close()
+
+
+def provider_files(root):
+    """Observe all actual inert-provider markers and reports under this Root.
+
+    Include planner markers, counts, exact bytes, inode/size/mtime; no invented
+    process count is inferred. Unchanged files plus public state/replay assertions
+    witness this fixture's no-second-provider result, not model authenticity or
+    general OS confinement. Files remain owned originals; IO errors refuse.
+    """
+    paths = set(root.rglob('model-received*.json')) | set(root.rglob('handoff.md'))
+    result = {}
+    for path in sorted(paths):
+        stat = path.stat()
+        result[str(path.relative_to(root))] = dict(sha256=fixture.digest(path.read_bytes()),
+                inode=stat.st_ino, device=stat.st_dev, size=stat.st_size, mtime_ns=stat.st_mtime_ns)
+    return dict(count=len(result), files=result)
+
+
+def one_turn(queue, work, agent):
+    """Require exactly the actual owned task/Agent turn; duplicates never vanish.
+
+    This reads the public strict queue DTO, not a forged claim or a launch grant.
+    Other retained Works may exist in the fixture and are not silently rewritten.
+    """
+    turns = [turn for turn in queue['turns']
+             if turn['work'] == work and turn['task'] == 'task' and turn['agent'] == agent]
+    assert len(turns) == 1, 'expected exactly one actual worker turn'
+    return turns[0]
+
+
+def missing_terminal_release(owned, out, agent, seq, valid_replay, providers):
+    """Remove only genuine release proof after healthy reconciliation/replay.
+
+    This negative corruption never fabricates permission: exact original rows
+    and complete SQL snapshots are retained before deletion. Restore those same
+    rows in finally, compare the original database, then require public recovery
+    success even when the negative unexpectedly succeeded. Independent refusal,
+    restore and post-restore failures are all retained before raising. No original
+    failed observation is overwritten by the restored successful witness.
+    """
+    before = diagnostic.snapshot(owned)
+    rows = None
+    failures = []
+    try:
+        db = sqlite3.connect(owned.root / '.swarm/state.db')
+        try:
+            rows = db.execute('SELECT * FROM workspace_turn_events WHERE turn_seq=? AND work_id=? AND agent_id=? AND state=? ORDER BY event_seq',
+                              (int(seq), owned.work, agent, 'released')).fetchall()
+            assert len(rows) == 1, 'expected genuine single terminal release proof'
+            fixture.publish(out / 'terminal-release-original.json', dict(rows=rows, snapshot=before))
+            deleted = db.execute('DELETE FROM workspace_turn_events WHERE turn_seq=? AND work_id=? AND agent_id=? AND state=?',
+                                 (int(seq), owned.work, agent, 'released')).rowcount
+            assert deleted == len(rows)
+            db.commit()
+        finally:
+            db.close()
+        fault = diagnostic.snapshot(owned)
+        fixture.publish(out / 'terminal-release-fault.json', dict(snapshot=fault))
+        code, response = owned.call(['agent', 'reconcile', agent])
+        fixture.publish(out / 'terminal-release-refusal.json', dict(exit=code, response=response))
+        assert diagnostic.snapshot(owned) == fault, 'terminal refusal mutated the damaged fixture'
+        assert provider_files(owned.root) == providers
+        assert code != 0, 'terminal reconciliation accepted missing FIFO release proof'
+        assert response['failure']['code'], 'missing explicit typed refusal'
+        assert 'mission-agent-turn-release-missing' in response['failure']['causes'], 'wrong terminal FIFO refusal boundary'
+    except BaseException:
+        failures.append(dict(phase='missing-terminal-proof', cause=traceback.format_exc()))
+    finally:
+        try:
+            if rows:
+                db = sqlite3.connect(owned.root / '.swarm/state.db')
+                try:
+                    for row in rows:
+                        current = db.execute('SELECT * FROM workspace_turn_events WHERE event_seq=?', (row[0],)).fetchone()
+                        if current is None:
+                            placeholders = ','.join('?' for _ in row)
+                            db.execute('INSERT INTO workspace_turn_events VALUES(' + placeholders + ')', row)
+                        else:
+                            assert current == row, 'original event identity was unexpectedly replaced'
+                    db.commit()
+                finally:
+                    db.close()
+            assert diagnostic.snapshot(owned) == before, 'exact terminal-proof restoration failed'
+        except BaseException:
+            failures.append(dict(phase='restore-terminal-proof', cause=traceback.format_exc()))
+    try:
+        restored = owned.ok(['agent', 'reconcile', agent])
+        assert restored == valid_replay
+        assert diagnostic.snapshot(owned) == before
+        assert provider_files(owned.root) == providers
+        fixture.publish(out / 'terminal-release-restored.json', dict(response=restored, original_sql_restored=True))
+    except BaseException:
+        failures.append(dict(phase='public-replay-after-restoration', cause=traceback.format_exc()))
+    fixture.publish(out / 'terminal-release-proof-check.json', dict(status='FAIL' if failures else 'PASS', failures=failures))
+    if failures:
+        raise RuntimeError('terminal FIFO proof check failed; original phases and restoration retained')
+
+
+def main():
+    """Bind real build profiles and exercise post-exit reconcile plus strict replay.
+
+    Fresh output is mandatory. Actual SDK process exit precedes any normal CLI
+    recovery; the live-owner refusal belongs to the SDK's named assertion. SDK
+    receipt/hash and held turn/reservation must agree with actual retained files,
+    normal public Agent/queue and read-only reservation SQL. Reconciliation must
+    recover the completion, release the same turn, keep task unaccepted and retain
+    the original estimate. Replay compares every SQL table and provider files.
+    No missing/unknown outcome is converted to PASS or to absence of side effects.
+    """
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ('binary', 'profile', 'sdk-binary', 'sdk-profile', 'output'):
+        parser.add_argument('--' + key, required=True, type=Path)
+    args = parser.parse_args()
+    out = args.output.resolve()
+    out.mkdir(parents=True, exist_ok=False)
+    root = None
+    fixture.publish(out / 'method.py', Path(__file__).read_bytes())
+    try:
+        binary, sdk = args.binary.resolve(), args.sdk_binary.resolve()
+        normal = json.loads(args.profile.read_bytes())
+        profile = json.loads(args.sdk_profile.read_bytes())
+        assert normal['no_fixture_feature'] is True
+        assert normal['sha256'] == fixture.digest(binary.read_bytes())
+        assert profile['engine_features_empty'] is True
+        assert profile['shared_workspace_features_match_normal'] is True
+        assert profile['test_profile'] is False
+        assert profile['binary_sha256'] == fixture.digest(sdk.read_bytes())
+        assert profile['normal_profile_sha256'] == normal['sha256']
+        fixture.publish(out / 'profiles.json', dict(normal=normal, sdk=profile))
+        sources = {str(Path(module.__file__).resolve()): fixture.digest(Path(module.__file__).read_bytes())
+                   for name, module in tuple(sys.modules.items())
+                   if name.startswith('rust_') and getattr(module, '__file__', None)}
+        sources[str(Path(__file__).resolve())] = fixture.digest(Path(__file__).read_bytes())
+        fixture.publish(out / 'inputs.json', dict(sources=sources,
+                        normal_sha256=normal['sha256'], sdk_sha256=profile['binary_sha256']))
+        ready, owned = planning.flow(binary, out / 'planning', before_worker=True, return_fixture=True)
+        assert ready['status'] == 'READY_FOR_NATIVE_WORKER' and not ready['worker_started']
+        root = Path(ready['root']).resolve()
+        fixture.publish(out / 'ready.json', ready)
+        request = dict(kind='owned-inert-fifo-completion-fixture', root=str(root),
+                       work=ready['work_id'], result=str(out / 'sdk-result.json'))
+        fixture.publish(root / '.swarm/verification-fifo-completion.json', request)
+        fixture.publish(out / 'request.json', request)
+        command = [str(sdk), str(out / 'request.json')]
+        fixture.publish(out / 'command.json', dict(argv=command, global_watchdog=None,
+                        fixture_cache=str(owned.cache_root)))
+        started = time.time()
+        run = subprocess.run(command, env=owned.environment, stdin=subprocess.DEVNULL, capture_output=True)
+        fixture.publish(out / 'stdout', run.stdout)
+        fixture.publish(out / 'stderr', run.stderr)
+        fixture.publish(out / 'exit.json', dict(returncode=run.returncode,
+                        started=started, finished=time.time()))
+        assert run.returncode == 0, 'completion SDK failed; original channels retained'
+        lines = run.stdout.decode('utf-8').splitlines()
+        for name in (
+            'PASS provider completed but FIFO settlement journal failure retains ownership',
+            'PASS live owner reconcile refuses and preserves held FIFO state',
+        ):
+            assert lines.count(name) == 1, 'missing/duplicate named SDK assertion'
+        result = json.loads((out / 'sdk-result.json').read_bytes())
+        assert result['status'] == 'READY_FOR_POST_EXIT_RECONCILE'
+        assert result['work'] == owned.work and result['agent_id'] == 'fifo-completion-agent'
+        for name in ('completion_sqlite_full', 'held_on_failure', 'live_owner_reconcile_refused', 'known_receipt'):
+            assert result[name] is True, name
+        assert result['paid_provider'] is False and result['task_accepted'] is False
+        agent_id = result['agent_id']
+        marker = (root / result['provider_marker']).resolve()
+        assert marker.is_relative_to(root) and marker == root / 'fifo-completion/model-received.json'
+        assert marker.is_file()
+        receipt_name = result['receipt_file']
+        assert isinstance(receipt_name, str) and Path(receipt_name).name == receipt_name
+        receipt = (root / '.swarm' / receipt_name).resolve()
+        assert receipt.parent == root / '.swarm' and receipt.is_file()
+        receipt_bytes = receipt.read_bytes()
+        assert fixture.digest(receipt_bytes) == result['receipt_sha256']
+        fixture.publish(out / 'original-native-completion.json', receipt_bytes)
+        agent = owned.ok(['agent', 'show', agent_id])['agent']
+        assert agent['status'] == result['pre_reconcile_status']
+        assert agent['status'] in ('starting', 'running')
+        assert agent['native_mission']['schema_version'] == 3
+        assert agent['native_mission']['workspace_turn_seq'] == result['turn_seq']
+        queue = owned.ok(['mission', 'queue', owned.work])
+        held = one_turn(queue, owned.work, agent_id)
+        assert held == result['held_turn'] and held['state'] == 'acquired'
+        assert held['seq'] == result['turn_seq']
+        before_reservation = reservation(owned, agent_id)
+        # SDK uses the real producer tuple (work, amount, state); this read-only
+        # observation requests (state, amount). Compare explicit fields instead
+        # of inheriting an imagined reservation serialization.
+        assert result['reservation_before'] == result['reservation_after']
+        assert result['reservation_after'] == [owned.work, before_reservation[1], before_reservation[0]]
+        assert before_reservation == ['reserved', 1.0]
+        before_provider = provider_files(root)
+        fixture.publish(out / 'post-owner-exit-held.json', dict(agent=agent, queue=queue,
+                        reservation=before_reservation, provider_files=before_provider))
+        recovered = owned.ok(['agent', 'reconcile', agent_id])
+        assert recovered['completion_recovered'] is True
+        assert recovered['cancelled_before_start'] is False
+        assert recovered['accepted_by_cancellation'] is False
+        assert recovered['agent']['status'] == 'completed'
+        assert recovered['agent']['native_mission'] == agent['native_mission']
+        after_queue = owned.ok(['mission', 'queue', owned.work])
+        released = one_turn(after_queue, owned.work, agent_id)
+        assert released['state'] == 'released' and released['seq'] == held['seq']
+        assert released['released_at'] and released['acquired_at'] == held['acquired_at']
+        after_reservation = reservation(owned, agent_id)
+        assert after_reservation == ['estimated', before_reservation[1]]
+        work = owned.ok(['work', 'show', owned.work])['work']
+        task = next(task for task in work['tasks'] if task['id'] == 'task')
+        assert task['status'] == 'blocked'
+        assert provider_files(root) == before_provider
+        snapshot = diagnostic.snapshot(owned)
+        replay = owned.ok(['agent', 'reconcile', agent_id])
+        assert replay == recovered and diagnostic.snapshot(owned) == snapshot
+        assert owned.ok(['mission', 'queue', owned.work]) == after_queue
+        assert reservation(owned, agent_id) == after_reservation
+        assert provider_files(root) == before_provider
+        missing_terminal_release(owned, out, agent_id, held['seq'], replay, before_provider)
+        assert fixture.digest(binary.read_bytes()) == normal['sha256']
+        assert fixture.digest(sdk.read_bytes()) == profile['binary_sha256']
+        assert all(fixture.digest(Path(path).read_bytes()) == sha for path, sha in sources.items())
+        fixture.publish(out / 'result.json', dict(status='PASS', root=str(root), agent_id=agent_id,
+                        turn_seq=held['seq'], original_owner_exited=True, held_after_failure=True,
+                        public_completion_recovered=True, released=released, reservation=after_reservation,
+                        replay_all_sql_unchanged=True, provider_files_unchanged=True,
+                        terminal_release_proof_required=True,
+                        actual_provider_files=before_provider, task_accepted=False, installed=False,
+                        paid_provider=False, global_watchdog=None, source_stable=True))
+        print('PASS FIFO completion refusal retains acquired turn and reservation after owner exit', flush=True)
+        print('PASS public reconciliation releases exact FIFO turn without accepting task', flush=True)
+        print('PASS completion replay preserves all SQL and actual provider files', flush=True)
+        print('PASS terminal replay refuses missing FIFO release proof and recovers', flush=True)
+        print('REPLAY_EVIDENCE=' + str(out), flush=True)
+    except BaseException:
+        fixture.publish(out / 'failure.json', dict(status='FAIL', root=str(root) if root else None,
+                        cause=traceback.format_exc()))
+        raise
+
+
+if __name__ == '__main__':
+    main()
+
+FILE tests/rust_mission_watch_public.py (exact selected functions)
+
+def attach_provider(connection, conductor, binary, root):
+    """Bind kernel peer to this owned conductor's actual normal helper child.
+
+    Exact argv/executable, UID, start stamps, parentage and public Agent identity
+    are all checked; peer-supplied JSON cannot authorize an arbitrary PID signal.
+    Return supervisor/provider identities, pidfds and real helper Agent id.
+    """
+    peer, uid, _ = struct.unpack('3i', connection.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
+    check(uid == os.getuid(), 'owned public provider UID mismatch')
+    provider = worker.observation(peer)
+    supervisor = worker.observation(provider['ppid'])
+    check(supervisor['ppid'] == conductor['pid'], 'public supervisor not owned conductor child')
+    args = Path('/proc', str(supervisor['pid']), 'cmdline').read_bytes().split(b'\0')[:-1]
+    check(len(args) == 6 and args[:2] == [os.fsencode(binary), b'_mission_worker_entry']
+          and args[3:] == [b'--root', os.fsencode(root), b'--json'],
+          'public supervisor argv differs from helper/Root')
+    agent_id = os.fsdecode(args[2])
+    check(fixture.digest(Path('/proc', str(supervisor['pid']), 'exe').read_bytes())
+          == fixture.digest(binary.read_bytes()), 'public supervisor binary mismatch')
+    supervisor_fd = worker.attach(supervisor)
+    try:
+        actual_provider, provider_fd = worker.owned_provider_peer(connection, supervisor)
+    except BaseException as primary:
+        worker.close_descriptor(supervisor_fd, primary)
+        raise
+    return supervisor, supervisor_fd, actual_provider, provider_fd, agent_id
+
+def reap_cleanup_helper(identity):
+    """Reap a verified adopted helper, tolerating its live→zombie exit race.
+
+    Caller must first verify actual parentage, exact CLI/Root argv and executable.
+    A pidfd plus repeated stamp/parent checks binds a possible signal; terminal
+    state is reaped without signalling. Only ESRCH with readable held pidfd may
+    become an observed exit. Other errors and descriptor-close causes propagate.
+    No retry, timeout, unknown-PID signalling or provider permission follows.
+    """
+    pid = identity['pid']
+    waited, status = os.waitpid(pid, os.WNOHANG)
+    if waited == pid:
+        return dict(pid=waited,status=status,role='owned-helper-already-terminal')
+    check(waited == 0, 'unexpected cleanup helper wait identity')
+    before = worker.observation(pid, allow_terminal=True)
+    check(before['stamp'] == identity['stamp'] and before['ppid'] == os.getpid(),
+          'cleanup helper ownership changed before pidfd')
+    descriptor = os.pidfd_open(pid)
+    try:
+        after = worker.observation(pid, allow_terminal=True)
+        check(after['stamp'] == identity['stamp'] and after['ppid'] == os.getpid(),
+              'cleanup helper ownership changed after pidfd')
+        sent = False
+        if after['state'] not in ('Z','X') and not select.select([descriptor],[],[],0)[0]:
+            try:
+                signal.pidfd_send_signal(descriptor, signal.SIGTERM)
+                sent = True
+            except ProcessLookupError:
+                check(bool(select.select([descriptor],[],[],0)[0]), 'cleanup helper ESRCH without observed exit')
+        waited, status = os.waitpid(pid, 0)
+        check(waited == pid, 'cleanup helper reap identity mismatch')
+        return dict(pid=waited,status=status,role='owned-helper-cleanup-only',signal_sent=sent)
+    finally:
+        worker.close_descriptor(descriptor, sys.exception())
+
+def cleanup_owned_children(binary, root, out):
+    """Reap only adopted exact helper children from this owned Root on failure.
+
+    A child must be an actual kernel child, match exact binary and Root argv and
+    retain its stamp around pidfd attachment. Unknown children are never signalled.
+    This is failure cleanup, not evidence of successful product recovery.
+    """
+    children = Path('/proc', str(os.getpid()), 'task', str(os.getpid()), 'children').read_text().split()
+    records = []
+    for raw_pid in children:
+        pid = int(raw_pid)
+        current = worker.observation(pid, allow_terminal=True)
+        if current['state'] == 'Z':
+            waited, status = os.waitpid(pid, 0)
+            records.append(dict(pid=waited, status=status, role='unknown-owned-zombie'))
+            continue
+        argv = Path('/proc', str(pid), 'cmdline').read_bytes().split(b'\0')[:-1]
+        expected = (len(argv) == 6 and argv[:2] == [os.fsencode(binary), b'_mission_worker_entry']
+                    and argv[3:] == [b'--root', os.fsencode(root), b'--json'])
+        if not expected:
+            records.append(dict(pid=pid, role='unknown-live-not-signalled'))
+            continue
+        check(current['ppid'] == os.getpid() and fixture.digest(Path('/proc', str(pid), 'exe').read_bytes())
+              == fixture.digest(binary.read_bytes()), 'adopted helper ownership mismatch')
+        records.append(reap_cleanup_helper(current))
+    fixture.publish(out / 'cleanup-children.json', records)
+    check(not any(item['role'] == 'unknown-live-not-signalled' for item in records),
+          'unknown adopted live child remains; not signalled')
+
+FILE tests/rust_mission_watch_worker.py (exact selected functions)
+
+def provider_program(nonce):
+    """Build an inert provider with actual stdin/marker and kernel release gate.
+
+    Socket Q only probes liveness. The physical nonce release file wakes inotify
+    and is required before any normal result/report/exit. No model account, sleep,
+    arbitrary timeout, retry ceiling or positive runtime-state seed is used.
+    """
+    return r'''#!/usr/bin/python3
+import ctypes, hashlib, json, os, selectors, socket, sys
+from pathlib import Path
+nonce = ''' + repr(nonce) + r'''
+args=sys.argv[1:];model=args[args.index('--model')+1];raw=sys.stdin.buffer.read()
+observed=dict(pid=os.getpid(),ppid=os.getppid(),stdin_sha256=hashlib.sha256(raw).hexdigest(),stdin_bytes=len(raw),argv=args)
+with open('model-received.json','x',encoding='utf-8') as stream:
+    json.dump(observed,stream);stream.flush();os.fsync(stream.fileno())
+libc=ctypes.CDLL(None,use_errno=True)
+libc.inotify_init1.argtypes=[ctypes.c_int];libc.inotify_init1.restype=ctypes.c_int
+libc.inotify_add_watch.argtypes=[ctypes.c_int,ctypes.c_char_p,ctypes.c_uint32];libc.inotify_add_watch.restype=ctypes.c_int
+fd=libc.inotify_init1(os.O_CLOEXEC|os.O_NONBLOCK)
+if fd<0:raise OSError(ctypes.get_errno(),'provider inotify')
+try:
+    if libc.inotify_add_watch(fd,b'.',8|128|256)<0:raise OSError(ctypes.get_errno(),'provider release watch')
+    with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as control,selectors.DefaultSelector() as selector:
+        control.connect('../watch-provider.sock')
+        def reply():
+            value=dict(pid=os.getpid(),ppid=os.getppid(),sid=os.getsid(0),pgid=os.getpgrp(),nonce=nonce)
+            control.sendall((json.dumps(value)+'\n').encode())
+        selector.register(control,selectors.EVENT_READ,'probe');selector.register(fd,selectors.EVENT_READ,'release')
+        reply()
+        while not Path('release-worker.json').exists():
+            for key,_ in selector.select():
+                if key.data=='probe':
+                    if control.recv(1)!=b'Q':raise RuntimeError('provider control closed or invalid')
+                    reply()
+                else:
+                    try:os.read(fd,65536)
+                    except BlockingIOError:pass
+        if json.loads(Path('release-worker.json').read_bytes())!={'nonce':nonce,'release':True}:raise RuntimeError('provider release mismatch')
+finally:os.close(fd)
+with open('handoff.md','x',encoding='utf-8') as report:
+    report.write('Owned inert worker\nInput SHA256: '+observed['stdin_sha256']+'\n');report.flush();os.fsync(report.fileno())
+print(json.dumps({'type':'system','subtype':'init','model':model}),flush=True)
+print(json.dumps({'type':'assistant','message':{'model':model,'content':[{'type':'text','text':'owned independent worker'}]}}),flush=True)
+print(json.dumps({'type':'result','usage':{'input_tokens':7,'output_tokens':8},'total_cost_usd':1}),flush=True)
+'''
+
+def frame(connection):
+    """Read the finite owned provider JSON frame; EOF/partial output refuses.
+
+    No global watchdog or hidden frame-size policy; peer/kernel ownership is
+    checked before consuming the fixture frame. Text is never execution authority.
+    """
+    data = bytearray()
+    while True:
+        byte = connection.recv(1)
+        if not byte:
+            raise RuntimeError('provider control EOF before complete frame')
+        if byte == b'\n':
+            return json.loads(data)
+        data.extend(byte)
+
+def wait_running(owned, agent_id, conductor_fd, supervisor_fd):
+    """Wait for the parent-recorded running state after actual provider entry.
+
+    The socket can arrive while the canonical Agent is still starting; requiring
+    one immediate read races that parent write. Subscribe before the first read,
+    then require actual running/permission state; child death or an unexpected
+    state refuses. Inotify observes DB modifications, not a temporal watchdog.
+    A structured SQLite BUSY during the Root identity Prepare remains refusal;
+    actual DB activity is required before a fresh read, never an execution retry.
+    No deadline/cap is invented and other identity refusals still fail immediately.
+    Finally close our descriptor and preserve primary/cleanup causes together.
+    """
+    fd = watch_directory(owned.root / '.swarm', modifications=True)
+    errors = []
+    result = None
+    pending = None
+    try:
+        while result is None:
+            code,value=owned.call(['agent','show',agent_id])
+            if code:
+                failure=value.get('failure',{})
+                labels=set(failure.get('causes',[]))
+                pending=RuntimeError('public running-state read refused: '+json.dumps(failure,sort_keys=True))
+                transient=(failure.get('code')=='root-database-identity' and labels=={'root-database-identity','database-identity-operation:Prepare','sqlite-code:5'})
+                if not transient:raise pending
+                # No success, no execution retry: observe actual DB activity or
+                # owned child/conductor exit before another read-only probe.
+                ready,_,_=select.select([fd,conductor_fd,supervisor_fd],[],[])
+                check(conductor_fd not in ready and supervisor_fd not in ready,'worker or conductor exited after refused observation')
+                if fd in ready:os.read(fd,65536)
+                continue
+            agent=value['agent']
+            if agent['status'] == 'running':
+                result = agent
+                break
+            check(agent['status'] == 'starting', 'worker departed before recorded running')
+            ready, _, _ = select.select([fd, conductor_fd, supervisor_fd], [], [])
+            check(conductor_fd not in ready and supervisor_fd not in ready,
+                  'worker or conductor exited before recorded running')
+            if fd in ready:
+                os.read(fd, 65536)
+    except BaseException as error:
+        if pending is not None and pending is not error:errors.append(pending)
+        errors.append(error)
+    finally:
+        try: os.close(fd)
+        except BaseException as error: errors.append(error)
+    if errors:
+        raise BaseExceptionGroup('recorded running observation/close', errors)
+    return result
+
+def verify_current_root_binding(binding, root, *, expected_version=4):
+    """Check the explicitly declared fixture binding, defaulting to current v4.
+
+    Version3 is a deliberate historical proof input: require its canonical parent
+    hash/positive turn sequence and ABSENT root_instance, never infer identity.
+    Version4 compares strict JSON integer pairs with physical directory/main DB
+    metadata. No version is inferred from payload; declaration mismatch refuses.
+    These observations validate DTOs, not engine FD authority, grant or same-UID
+    authentication. Only isolated historical root probes override default4.
+    """
+    check(type(expected_version) is int and expected_version in (3, 4),
+          'unsupported explicitly expected binding version')
+    check(type(binding.get('schema_version')) is int and binding['schema_version'] == expected_version,
+          'automatic intent differs from explicitly expected binding version')
+    if expected_version == 3:
+        parent, sequence = binding.get('parent_profile_sha256'), binding.get('workspace_turn_seq')
+        check('root_instance' not in binding, 'historical Binding3 must omit Root instance')
+        check(isinstance(parent, str) and len(parent) == 64
+              and all(byte in '0123456789abcdef' for byte in parent), 'historical Binding3 parent hash invalid')
+        check(isinstance(sequence, str) and sequence.isascii() and sequence.isdigit()
+              and int(sequence) > 0 and str(int(sequence)) == sequence,
+              'historical Binding3 turn sequence invalid')
+        return
+    identity = binding.get('root_instance')
+    check(isinstance(identity, dict) and set(identity) == {'directory', 'database'},
+          'Binding4 Root instance shape missing or unknown')
+    for value in identity.values():
+        check(isinstance(value, list) and len(value) == 2 and all(type(item) is int for item in value),
+              'Binding4 Root instance pair type invalid')
+    local, database = (root / '.swarm').stat(), (root / '.swarm/state.db').stat()
+    check(identity == dict(directory=[local.st_dev, local.st_ino], database=[database.st_dev, database.st_ino]),
+          'Binding4 Root instance differs from fixture observation')
+
+def subreaper_scope(operation, report, control):
+    """Run owned work and always attempt restoration of the original flag.
+
+    control reads with no argument and sets with a boolean. After its initial
+    read succeeds, restoration runs even if enable, work or reporting fails.
+    Preserve primary, report and restoration failures independently; return the
+    work result only when all required operations succeeded. No child is owned
+    or signalled by this flag-management helper.
+    """
+    old = control()
+    errors = []
+    result = None
+    try:
+        control(True)
+        result = operation()
+    except BaseException as error:
+        errors.append(error)
+        retain_failure(errors, lambda: report(error))
+    finally:
+        try:
+            control(old)
+        except BaseException as error:
+            errors.append(error)
+    if errors:
+        raise BaseExceptionGroup('watch observation/publication/subreaper restoration', errors)
+    return result
+
+def retain_failure(errors, publish):
+    """Attempt diagnostic publication without bypassing subsequent cleanup.
+
+    The caller retains its primary exception separately. Append any publication
+    failure (including interruption) to its error list, then return to cleanup;
+    no logging failure establishes publication or successful recovery.
+    """
+    try:
+        publish()
+    except BaseException as error:
+        errors.append(error)
+
+FILE tests/rust_mission_report_relay.py (exact selected functions)
+
+def rows(owned,sql,parameters):
+    """Read isolated fixture metadata through a read-only, nonblocking probe.
+
+    Zero SQLite wait requests immediate observation, not a global verification
+    watchdog or product policy. SQL/read and independent close failures both
+    survive; no live mission or SQL authority mutation is admitted here.
+    """
+    db=sqlite3.connect((owned.root/'.swarm/state.db').as_uri()+'?mode=ro',uri=True,timeout=0)
+    primary=None;value=None
+    try:value=db.execute(sql,parameters).fetchall()
+    except BaseException as error:primary=error
+    try:db.close()
+    except BaseException as error:
+        if primary is not None:raise BaseExceptionGroup('fixture metadata read/close',[primary,error])
+        raise
+    if primary is not None:raise primary
+    return value
+
+RECIPE
+{
+  "schema_version": 1,
+  "id": "mission-worker-completion-recovery",
+  "inputs": [
+    "rust/crates/swarm-cli/src/mission_watch.rs",
+    "rust/crates/swarm-cli/src/native_web/conductor.rs",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "rust/crates/swarm-engine/src/agent_completion_journal.rs",
+    "rust/crates/swarm-engine/src/agent_execution_preflight.rs",
+    "rust/crates/swarm-engine/src/agent_execution_store.rs",
+    "rust/crates/swarm-engine/src/engine_settings.rs",
+    "rust/crates/swarm-engine/src/execution_interrupt.rs",
+    "rust/crates/swarm-engine/src/financial_budget.rs",
+    "rust/crates/swarm-engine/src/gate_evaluation.rs",
+    "rust/crates/swarm-engine/src/mission_agent.rs",
+    "rust/crates/swarm-engine/src/mission_status_tasks.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_receipts.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_store.rs",
+    "rust/crates/swarm-engine/src/mission_worker_adoption.rs",
+    "rust/crates/swarm-engine/src/mission_worker_continuation.rs",
+    "rust/crates/swarm-engine/src/mission_worker_recovery.rs",
+    "rust/crates/swarm-engine/src/native_diagnostics.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/agent_execution_origin.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_producer.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_report_relay.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_review.rs",
+    "rust/crates/swarm-engine/src/root_store/planning_native.rs",
+    "rust/crates/swarm-engine/src/root_store/review_preview.rs",
+    "rust/crates/swarm-engine/src/root_store/review_preview/*.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/*.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/gate.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/journal.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/mission_authority.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/process.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/publication.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/retirement.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/review_evidence.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/runtime.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/source_authority.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/source_policy.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/store.rs",
+    "rust/crates/swarm-engine/src/task_report.rs",
+    "rust/crates/swarm-engine/src/validation_run.rs",
+    "rust/crates/swarm-engine/src/work_engine.rs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_mission_controls.py",
+    "tests/rust_mission_foreground_signals.py",
+    "tests/rust_mission_report_relay.py",
+    "tests/rust_mission_review_refusal.py",
+    "tests/rust_mission_task_order.py",
+    "tests/rust_mission_watch_planning.py",
+    "tests/rust_mission_watch_public.py",
+    "tests/rust_mission_watch_registered.py",
+    "tests/rust_mission_watch_signal_probe.py",
+    "tests/rust_mission_watch_worker.py",
+    "tests/rust_mission_worker_recovery.py",
+    "tests/rust_native_completion_recovery.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_native_http_mission.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_failure_recovery.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_workspace_fifo_completion.py",
+    "tests/test_rust_mission_control_helpers.py",
+    "tests/test_rust_registered_observer_resources.py",
+    "tests/test_rust_report_relay_guards.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "real-native-worker-completion-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nb=Path(tempfile.mkdtemp(prefix='worker-recovery-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_worker_recovery.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(b))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS recovery-healthy-worker-control",
+        "PASS recovery-missing-original-waits-without-settlement",
+        "PASS recovery-rejects-kernel-not-reaped",
+        "PASS recovery-rejects-incomplete-output",
+        "PASS recovery-rejects-wrong-agent",
+        "PASS recovery-rejects-unknown-version",
+        "PASS recovery-restored-original-settles-under-new-lease-without-rerun",
+        "MISSION_WORKER_RECOVERY_PASS",
+        "REPLAY_EVIDENCE",
+        "PASS recovery-historical-cli-http-report-attribution-and-saved-policy"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "cards": 200,
+  "samples": 5,
+  "first_open_ms": 1057,
+  "first_open_method": "one cold geometry observation including session-link redirect; excluded from the historical five reload p95 samples",
+  "initial_method": "five page reloads in the same tab; optional geometry cache can be warm",
+  "initial_p95_ms": 919,
+  "keyboard_p95_ms": 32.600000001490116,
+  "initial_samples_ms": [
+    877,
+    759,
+    919,
+    717,
+    828
+  ],
+  "keyboard_samples_ms": [
+    31.699999999254942,
+    29.300000000745058,
+    25.59999999962747,
+    30.90000000037253,
+    32.600000001490116
+  ],
+  "keyboard_method": "trusted keydown timestamp to second animation frame",
+  "expected_reload_aborts": [],
+  "arrows": true,
+  "focus_recovered": true
+}

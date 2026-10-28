@@ -1,0 +1,19 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^(TestAgentIdentity.*|TestLaunchAtomicIdempotentAndWorkspaceExclusive|TestLaunchRejectsEscapeAndUnsatisfiedDependencies|TestActionsConfianceT3IdentityContextPublicReadOnly|TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation|TestActionsConfianceT3OIDCLogoutSessionAndSubject|TestInspection.*|TestGraphDeliveryD02Migration|TestDialogueCheckpointMigrationPreservesLegacyAndBackup|TestProjectMemoryStoragePlanContexts|TestResumeDurableAndNoAutostart)$",
+    "-count=1",
+    "-timeout",
+    "90s"
+  ],
+  "start": "2026-10-17T07:17:31.739251+00:00",
+  "end": "2026-10-17T07:18:09.656083+00:00",
+  "exit_code": 0,
+  "changed_inputs": [],
+  "input_files": 1052,
+  "coverage_reason": "Shared atomicWrite and schema 36; final reader adds in-transaction storage-version fence after actual failing counterexample"
+}

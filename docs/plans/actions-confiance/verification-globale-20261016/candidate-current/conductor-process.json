@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "tests/actions_confiance_campaign.py",
+    "--binary",
+    "bin/swarm-actions-confiance-secret-data-qualified",
+    "--evidence-dir",
+    "docs/plans/actions-confiance/verification-globale-20261016/candidate-current",
+    "--timeout-seconds",
+    "180"
+  ],
+  "pid": 4052918,
+  "start_ticks": "6256538",
+  "started_unix": 1792128141.2364655,
+  "status": "passed",
+  "exit_code": 0,
+  "ended_unix": 1792128240.5357573
+}

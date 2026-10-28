@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "complete-originals-capacity-68ceafbfcd3f416e",
+  "expected_revision": 129,
+  "limits": {
+    "review_context_files": 24,
+    "review_source_bytes": 98304,
+    "review_context_bytes": 262144,
+    "review_delivery_files": 100,
+    "planning_scopes": 0,
+    "delegation_depth": 0,
+    "planning_tasks": 20,
+    "planning_activations": 40,
+    "planning_decisions": 40,
+    "review_calls": 40
+  },
+  "reason": "Les 24 originaux complets mesurés représentent 252255 octets, au-delà de 245760. Porter uniquement la capacité totale à 256 Kio pour conserver sources et régressions i18n complètes ; conserver tentatives, 23 appels de revue consommés et tous les autres plafonds. Autorisation utilisateur existante pour les budgets nécessaires à ce projet."
+}

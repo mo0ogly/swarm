@@ -1,0 +1,9 @@
+=== RUN   TestIncrementalFinalTransportDistinguishesOmittedAndEmptyDiff
+    managed_review_baseline_transport_test.go:16: missing transport distinction "DIFF CANONIQUE ET TRANSPORT"
+--- FAIL: TestIncrementalFinalTransportDistinguishesOmittedAndEmptyDiff (0.01s)
+=== RUN   TestIncrementalHistoricalPrefixRemainsStable
+    managed_review_baseline_transport_test.go:58: historical prefix sha256 ab9be60c2918941a66c63c6da79c7198d1e8266228c03298881d6943519ad261
+--- PASS: TestIncrementalHistoricalPrefixRemainsStable (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.031s
+FAIL

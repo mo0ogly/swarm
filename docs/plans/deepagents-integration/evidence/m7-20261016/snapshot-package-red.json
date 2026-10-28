@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "go",
+    "list",
+    "-f",
+    "{{.ImportPath}} {{join .GoFiles \",\"}}",
+    "./docs/plans/deepagents-integration/evidence/m7-20261016/pack"
+  ],
+  "at_utc": "2026-10-16T07:47:27.223607+00:00",
+  "exit_code": 0,
+  "stdout": "swarm.local/companion/docs/plans/deepagents-integration/evidence/m7-20261016/pack contract-model.go,contract-store.go\n",
+  "stderr": "",
+  "snapshot_creates_application_package": true,
+  "criterion": "Source snapshots must not introduce buildable Go packages in the application module"
+}

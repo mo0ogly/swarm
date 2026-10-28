@@ -1,0 +1,4 @@
+# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]
+internal/engine/trust_process_service.go:153:13: cannot use effectiveTrustDataPolicy(st) (value of struct type TrustDataPolicy) as *TrustDataPolicy value in return statement
+FAIL	swarm.local/companion/internal/engine [build failed]
+FAIL

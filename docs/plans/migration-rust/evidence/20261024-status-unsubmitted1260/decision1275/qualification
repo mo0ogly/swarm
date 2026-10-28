@@ -1,0 +1,4442 @@
+{
+  "coverage_status": "PASS",
+  "contract_status": "DECLARED_REVIEW_COMPLETE",
+  "files": 3,
+  "open_findings": [],
+  "lexical_candidates": {
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs": {
+      "policies": [
+        {
+          "line": 47,
+          "text": "/// Runtime blockers must be applied by the caller afterwards. Task attempt-limit"
+        },
+        {
+          "line": 48,
+          "text": "/// explanations use saved positive limits, never a new retry policy."
+        },
+        {
+          "line": 57,
+          "text": "    let mut unknown = false;"
+        },
+        {
+          "line": 60,
+          "text": "        let prefix = format!(\"Fournisseur {provider} : quota refusé (429). \");"
+        },
+        {
+          "line": 61,
+          "text": "        let message = if cooldown.resets_at > 0 {"
+        },
+        {
+          "line": 66,
+          "text": "            format!(\"{prefix}Nouveaux appels suspendus jusqu’au {:04}-{:02}-{:02} {:02}:{:02}:{:02} UTC. Les tentatives et budgets déjà consommés restent conservés.\", at.year(), u8::from(at.month()), at.day(), at.hour(), at.minute(), at.second())"
+        },
+        {
+          "line": 68,
+          "text": "            unknown = true;"
+        },
+        {
+          "line": 82,
+          "text": "        .filter(|task| task.status == \"blocked\" && task.plan_max_attempts > 0"
+        },
+        {
+          "line": 101,
+          "text": "        return Ok(Organization {ready:false,label:\"Organisation autonome non configurée\".into(),issues:Some(vec![\"Responsable de mission absent : planification hiérarchique non configurée.\".into()]),next:\"Préparer une mission hiérarchique avec un responsable et des contrôles explicites. Les tâches existantes restent consultables et exécutables manuellement.\".into(),verification:\"Politique incomplète ; aucune vérification de mission démontrée.\".into()});"
+        },
+        {
+          "line": 111,
+          "text": "        ready: true,"
+        },
+        {
+          "line": 156,
+          "text": "        occupied:rows(&store.db,\"SELECT cwd FROM agents WHERE status IN ('queued','starting','running','stopping') ORDER BY rowid\",None,|r|r.get::<_,String>(0))?,"
+        },
+        {
+          "line": 157,
+          "text": "        priorities:rows(&store.db,\"SELECT task_id,priority FROM cockpit_tasks WHERE work_id=?1 ORDER BY task_id\",Some(work),|r|Ok((r.get::<_,String>(0)?,r.get::<_,i64>(1)?)))?,"
+        },
+        {
+          "line": 166,
+          "text": "/// lexical workspace overlap and budget/brief assistance. Managed copies/history refuse. No probe, SQL write, default, reservation or grant."
+        },
+        {
+          "line": 205,
+          "text": "            .slots(controls.controls.as_ref().map(|c| c.slots)).map_err(E::Settings)?.0;"
+        },
+        {
+          "line": 222,
+          "text": "    let hour = 60 * minute;"
+        },
+        {
+          "line": 228,
+          "text": "        format!(\"il y a environ {} min\", (age + minute / 2) / minute)"
+        },
+        {
+          "line": 230,
+          "text": "        format!(\"il y a environ {} h\", (age + hour / 2) / hour)"
+        },
+        {
+          "line": 234,
+          "text": "/// Milliseconds convert to nanoseconds exactly; no timing policy or default is"
+        },
+        {
+          "line": 238,
+          "text": "    if poll_ms < 1 {"
+        },
+        {
+          "line": 244,
+          "text": "    if wait > 0 {"
+        },
+        {
+          "line": 246,
+          "text": "            return Ok(if poll_ms % 1000 == 0 {"
+        },
+        {
+          "line": 247,
+          "text": "                format!(\"dans moins de {} s\", poll_ms / 1000)"
+        },
+        {
+          "line": 252,
+          "text": "        return Ok(format!(\"dans environ {} s\", (wait + second / 2) / second));"
+        },
+        {
+          "line": 258,
+          "text": "        format!(\"en retard d’environ {} s\", (late + second / 2) / second)"
+        },
+        {
+          "line": 289,
+          "text": "        late: false,"
+        },
+        {
+          "line": 314,
+          "text": "                    out.next_check_relative = next_relative(at, &next, policy.poll_interval_ms.0)?;"
+        },
+        {
+          "line": 325,
+          "text": "    let actions=rows(&store.db,\"SELECT at,kind,message FROM cockpit_events WHERE work_id=?1 AND (kind='conductor' OR kind IN ('validation-accepted','validation-retained') OR (kind='dispatch' AND message LIKE '% : départ automatique · %')) ORDER BY seq DESC LIMIT 1\",Some(work),|r|Ok((r.get::<_,String>(0)?,r.get::<_,String>(1)?,r.get::<_,String>(2)?)))?;"
+        },
+        {
+          "line": 340,
+          "text": "fn recent_agents(agents: &[crate::Agent], limit: Option<usize>) -> &[crate::Agent] {"
+        },
+        {
+          "line": 341,
+          "text": "    &agents[..limit.unwrap_or(agents.len()).min(agents.len())]"
+        },
+        {
+          "line": 345,
+          "text": "/// page with more=true when events exist. Inputs/visit/ledger are never mutated."
+        },
+        {
+          "line": 348,
+          "text": "fn changes(input: &super::MissionStatusInputs, limit: Option<usize>) -> Result<MissionChanges, E> {"
+        },
+        {
+          "line": 349,
+          "text": "    let from = input.visit.as_ref().map_or(0, |v| v.revision);"
+        },
+        {
+          "line": 355,
+          "text": "        more: false,"
+        },
+        {
+          "line": 367,
+          "text": "    if let Some(limit) = limit {"
+        },
+        {
+          "line": 368,
+          "text": "        out.more = events.len() > limit;"
+        },
+        {
+          "line": 369,
+          "text": "        events.truncate(limit);"
+        },
+        {
+          "line": 373,
+          "text": "        #[serde(default)]"
+        },
+        {
+          "line": 375,
+          "text": "        #[serde(default)]"
+        },
+        {
+          "line": 377,
+          "text": "        #[serde(default)]"
+        },
+        {
+          "line": 379,
+          "text": "        #[serde(default)]"
+        },
+        {
+          "line": 381,
+          "text": "        #[serde(default)]"
+        },
+        {
+          "line": 383,
+          "text": "        #[serde(default)]"
+        },
+        {
+          "line": 392,
+          "text": "            None => Payload::default(),"
+        },
+        {
+          "line": 454,
+          "text": "    /// Read the Go 21-key historical aggregate for supported ordinary Work and"
+        },
+        {
+          "line": 467,
+          "text": "    /// Previous review/retry/recovery, managed copies and closed scopes remain"
+        },
+        {
+          "line": 514,
+          "text": "                let tolerance = policy.future_tolerance_ms.0;"
+        },
+        {
+          "line": 546,
+          "text": "                    let dependencies:Vec<_>=t.depends.as_deref().unwrap_or(&[]).iter().map(|id|DependencyObservation {task_id:id.clone(),freshness:if dependency_current.get(id)==Some(&true) {DependencyFreshness::Current} else {DependencyFreshness::NotCurrent}}).collect();"
+        },
+        {
+          "line": 549,
+          "text": "                    let execution=if t.status==\"blocked\" && t.plan_max_attempts>0 && t.attempts.as_ref().map_or(0,Vec::len) as u128>=t.plan_max_attempts as u128 {"
+        },
+        {
+          "line": 551,
+          "text": "                        if admin.observation_mode==1 {ExecutionObservation::Observed} else {ExecutionObservation::NotPresent}"
+        },
+        {
+          "line": 556,
+          "text": "                let mut status=MissionStatus {changes:changes(&input,event_limit)?,spending:crate::mission_status_spending::mission_spending(&input,&now)?,guidance:MissionGuidance {what:String::new(),next:String::new(),actor:String::new(),primary:MissionPrimaryAction {kind:String::new(),label:String::new(),effect:String::new(),task:String::new(),tone:String::new()}},runtime:observed.runtime,provider_cooldowns:(!cooldowns.is_empty()).then(|| cooldowns.clone()),evidence_stage:insight::mission_evidence_stage(&input.work,0,0),organization:organization(&input.work)?,authorized,enabled:false,paused,summary:String::new(),next:String::new(),validated:0,review:0,running:0,active_agents:0,uncertain_agents:0,total:i64::try_from(tasks.len()).map_err(|_|E::Refused(\"mission-status-count-representation\"))?,supervision,understanding:understanding(),coordination:None,tasks:Some(Vec::new())};"
+        },
+        {
+          "line": 561,
+          "text": "                    *count = count.checked_add(1).ok_or(E::Refused(\"mission-status-count-representation\"))?;"
+        },
+        {
+          "line": 578,
+          "text": "                    status.enabled = false;"
+        },
+        {
+          "line": 707,
+          "text": "                eprintln!(\"historical status fixture retained: {}\", self.0.display());"
+        },
+        {
+          "line": 709,
+          "text": "                fs::remove_dir_all(&self.0).unwrap();"
+        },
+        {
+          "line": 715,
+          "text": "        body[\"schema_version\"] = 1.into();"
+        },
+        {
+          "line": 726,
+          "text": "        work.id=\"owned-work\".into();work.revision=10;"
+        },
+        {
+          "line": 729,
+          "text": "        let mut input=super::super::MissionStatusInputs{work,agents:vec![],events:vec![event(1,\"decision\",serde_json::json!({\"id\":\"actual-task\"}))],visit:Some(super::super::MissionStatusVisit{revision:0,at:\"recorded-visit\".into()}),planning_calls:vec![],exchanges:vec![]};"
+        },
+        {
+          "line": 730,
+          "text": "        let control=changes(&input,None).unwrap();assert_eq!(control.items.unwrap()[0].task,\"actual-task\");"
+        },
+        {
+          "line": 731,
+          "text": "        input.events=vec![event(2,\"review.result\",serde_json::json!({\"id\":\"review-id\",\"state\":\"passed\"})),event(3,\"review.result\",serde_json::json!({\"id\":\"prior-review\",\"state\":\"passed\"})),event(4,\"task.auto-validation\",serde_json::json!({\"attempt_id\":\"attempt-id\"})),event(5,\"review.result\",serde_json::json!({\"id\":\"missing\",\"state\":\"passed\"})),event(6,\"task.auto-validation\",serde_json::json!({\"attempt_id\":\"review-id\"}))];"
+        },
+        {
+          "line": 732,
+          "text": "        let observed=changes(&input,None).unwrap();let rows=observed.items.unwrap();assert_eq!(rows.len(),5);"
+        },
+        {
+          "line": 734,
+          "text": "            if (2..=4).contains(&row.revision) {assert_eq!(row.task,\"actual-task\",\"revision {}\",row.revision);assert_eq!(row.title,\"Actual owner\");}"
+        },
+        {
+          "line": 738,
+          "text": "    /// Valid small page followed by 201 retained raw events; reads never mark a"
+        },
+        {
+          "line": 743,
+          "text": "        let mut store = RootStore::initialize(&fixture.0, &mut SystemEnvironment).unwrap();"
+        },
+        {
+          "line": 744,
+          "text": "        let work = store.execute_external(\"\", \"work.create\", &request(\"create-window\", 0,"
+        },
+        {
+          "line": 748,
+          "text": "        input.visit = Some(super::super::mission_status_read::MissionStatusVisit {revision:0, at:\"recorded-visit\".into()});"
+        },
+        {
+          "line": 749,
+          "text": "        input.work.revision = 201;"
+        },
+        {
+          "line": 750,
+          "text": "        input.events = (1..=2).map(|revision| crate::RecordedEvent {"
+        },
+        {
+          "line": 754,
+          "text": "        let control = changes(&input, Some(200)).unwrap();"
+        },
+        {
+          "line": 755,
+          "text": "        assert_eq!(control.items.as_ref().unwrap().len(), 2);"
+        },
+        {
+          "line": 757,
+          "text": "        let template = input.events[0].clone();"
+        },
+        {
+          "line": 758,
+          "text": "        input.events = (1..=201).map(|revision| {let mut row=template.clone(); row.revision=revision; row.id=format!(\"event-{revision}\").into_bytes();row}).collect();"
+        },
+        {
+          "line": 759,
+          "text": "        let page = changes(&input, Some(200)).unwrap();"
+        },
+        {
+          "line": 762,
+          "text": "        assert_eq!(items.len(), 200);"
+        },
+        {
+          "line": 763,
+          "text": "        assert_eq!(items[0].revision, 201);"
+        },
+        {
+          "line": 764,
+          "text": "        assert_eq!(items[199].revision, 2);"
+        },
+        {
+          "line": 765,
+          "text": "        assert_eq!(input.events.len(), 201);"
+        },
+        {
+          "line": 768,
+          "text": "        assert_eq!(unlimited.items.as_ref().unwrap().len(), 201);"
+        },
+        {
+          "line": 769,
+          "text": "        let empty = changes(&input, Some(0)).unwrap();"
+        },
+        {
+          "line": 771,
+          "text": "        // The raw page limit is consumed before visibility/category filtering."
+        },
+        {
+          "line": 772,
+          "text": "        input.events[200].kind=b\"not-visible\".to_vec();"
+        },
+        {
+          "line": 773,
+          "text": "        let filtered=changes(&input, Some(200)).unwrap();"
+        },
+        {
+          "line": 775,
+          "text": "        assert_eq!(filtered.items.as_ref().unwrap().len(), 199);"
+        },
+        {
+          "line": 776,
+          "text": "        input.events[200].kind=b\"decision\".to_vec();"
+        },
+        {
+          "line": 777,
+          "text": "        input.events[200].payload=Some(b\"invalid-json\".to_vec());"
+        },
+        {
+          "line": 778,
+          "text": "        assert!(changes(&input, Some(200)).is_err());"
+        },
+        {
+          "line": 779,
+          "text": "        input.events[200].payload=Some(b\"{}\".to_vec());"
+        },
+        {
+          "line": 780,
+          "text": "        assert_eq!(changes(&input, Some(200)).unwrap().items.as_ref().unwrap().len(), 200);"
+        },
+        {
+          "line": 782,
+          "text": "        input.agents=(0..201).map(|index| {"
+        },
+        {
+          "line": 783,
+          "text": "            crate::Agent { id: format!(\"agent-{index}\"), work_id: input.work.id.clone(), task_id:\"task\".into(), attempt_id:format!(\"attempt-{index}\"), role:\"worker\".into(), mode:\"pipe\".into(), status:\"completed\".into(), ..crate::Agent::default() }"
+        },
+        {
+          "line": 785,
+          "text": "        let agents=recent_agents(&input.agents, Some(200));"
+        },
+        {
+          "line": 786,
+          "text": "        assert_eq!(agents.len(),200);"
+        },
+        {
+          "line": 787,
+          "text": "        assert_eq!(agents[0].id,\"agent-0\");"
+        },
+        {
+          "line": 788,
+          "text": "        assert_eq!(agents[199].id,\"agent-199\");"
+        },
+        {
+          "line": 789,
+          "text": "        assert_eq!(recent_agents(&input.agents,None).len(),201);"
+        },
+        {
+          "line": 790,
+          "text": "        assert!(recent_agents(&input.agents,Some(0)).is_empty());"
+        },
+        {
+          "line": 791,
+          "text": "        input.agents[200].usage=Some(Box::new(serde_json::from_value(serde_json::json!({\"input_tokens\":7,\"output_tokens\":9,\"provider_reported_cost_usd\":0.25,\"source\":\"fixture\",\"scope\":\"attempt\",\"at\":\"recorded\"})).unwrap()));"
+        },
+        {
+          "line": 793,
+          "text": "        assert_eq!(spending.calls.as_ref().unwrap().len(),201);"
+        },
+        {
+          "line": 794,
+          "text": "        assert_eq!(spending.attempts.as_ref().unwrap().len(),201);"
+        },
+        {
+          "line": 795,
+          "text": "        assert_eq!(spending.rows.as_ref().unwrap()[0].calls,201);"
+        },
+        {
+          "line": 796,
+          "text": "        assert_eq!(spending.rows.as_ref().unwrap()[0].input,7);"
+        },
+        {
+          "line": 797,
+          "text": "        assert_eq!(spending.rows.as_ref().unwrap()[0].output,9);"
+        },
+        {
+          "line": 798,
+          "text": "        assert_eq!(spending.rows.as_ref().unwrap()[0].cost.reported_usd.0,0.25);"
+        },
+        {
+          "line": 799,
+          "text": "        assert_eq!(input.agents.len(),201);"
+        },
+        {
+          "line": 801,
+          "text": "        assert!(!changes(&input, Some(0)).unwrap().more);"
+        },
+        {
+          "line": 802,
+          "text": "        assert_eq!(input.events.len(), 201);"
+        },
+        {
+          "line": 808,
+          "text": "        let at = crate::mission_supervision::parse(\"2026-10-23T00:00:00Z\").unwrap();"
+        },
+        {
+          "line": 809,
+          "text": "        assert_eq!(next_relative(at, \"2026-10-23T00:00:01.5Z\", 1500).unwrap(), \"dans moins de 1500 ms\");"
+        },
+        {
+          "line": 810,
+          "text": "        assert_eq!(next_relative(at, \"2026-10-23T00:00:02Z\", 2000).unwrap(), \"dans moins de 2 s\");"
+        },
+        {
+          "line": 811,
+          "text": "        assert_eq!(next_relative(at, \"2026-10-23T00:00:03.5Z\", 2000).unwrap(), \"dans environ 4 s\");"
+        },
+        {
+          "line": 812,
+          "text": "        assert_eq!(next_relative(at, \"2026-10-22T23:59:59.999999999Z\", 2000).unwrap(), \"attendue maintenant\");"
+        },
+        {
+          "line": 813,
+          "text": "        assert_eq!(next_relative(at, \"2026-10-22T23:59:58.5Z\", 2000).unwrap(), \"en retard d’environ 2 s\");"
+        },
+        {
+          "line": 814,
+          "text": "        assert!(next_relative(at, \"2026-10-23T00:00:01Z\", 0).is_err());"
+        },
+        {
+          "line": 815,
+          "text": "        assert!(next_relative(at, \"PRIVATE-MALFORMED-TIME\", 2000).is_err());"
+        },
+        {
+          "line": 816,
+          "text": "        assert_eq!(next_relative(at, \"2026-10-23T00:00:02Z\", 2000).unwrap(), \"dans moins de 2 s\");"
+        },
+        {
+          "line": 823,
+          "text": "        let mut store = RootStore::initialize(&fixture.0, &mut SystemEnvironment).unwrap();"
+        },
+        {
+          "line": 824,
+          "text": "        let work = store.execute_external(\"\", \"work.create\", &request(\"lease-status-create\", 0,"
+        },
+        {
+          "line": 829,
+          "text": "        let tolerance = store.settings().unwrap().values.mission_supervision_policy().unwrap().future_tolerance_ms.0;"
+        },
+        {
+          "line": 840,
+          "text": "            &stamp(i128::from(policy.stale_after_ms.0) * 1_000_000), tolerance).unwrap().state, \"active\");"
+        },
+        {
+          "line": 842,
+          "text": "            &stamp(i128::from(policy.stale_after_ms.0) * 1_000_000 + 1), tolerance).unwrap();"
+        },
+        {
+          "line": 846,
+          "text": "            &stamp(-i128::from(policy.future_tolerance_ms.0) * 1_000_000), tolerance).unwrap().state, \"active\");"
+        },
+        {
+          "line": 848,
+          "text": "            &stamp(-i128::from(policy.future_tolerance_ms.0) * 1_000_000 - 1), tolerance).unwrap();"
+        },
+        {
+          "line": 858,
+          "text": "        assert_eq!(public.status.active_agents, 0);"
+        },
+        {
+          "line": 859,
+          "text": "        store.update_mission_supervision(&lease, &now, true).unwrap();"
+        },
+        {
+          "line": 872,
+          "text": "            \"planning\": {\"version\":1,\"provider\":\"fixture\",\"max_tasks\":10,"
+        },
+        {
+          "line": 873,
+          "text": "                \"max_activations\":3,\"max_decisions\":10,"
+        },
+        {
+          "line": 874,
+          "text": "                \"reviewer\":{\"provider\":\"fixture\",\"authorized\":\"fixture\",\"max_calls\":2},"
+        },
+        {
+          "line": 875,
+          "text": "                \"scopes\":[{\"id\":\"root\",\"revision\":1,\"state\":\"ready\"}]}"
+        },
+        {
+          "line": 882,
+          "text": "        assert!(observation.verification.contains(\"0/2 appels\"));"
+        },
+        {
+          "line": 884,
+          "text": "        for variant in 0..7 {"
+        },
+        {
+          "line": 889,
+          "text": "                0 => p.activations = -1,"
+        },
+        {
+          "line": 890,
+          "text": "                1 => p.decisions = -1,"
+        },
+        {
+          "line": 891,
+          "text": "                2 => p.scopes.as_mut().unwrap()[0].holder = \"fixture-holder\".into(),"
+        },
+        {
+          "line": 892,
+          "text": "                3 => p.scopes.as_mut().unwrap()[0].lease_until = \"future\".into(),"
+        },
+        {
+          "line": 893,
+          "text": "                4 => p.scopes.as_mut().unwrap()[0].state = \"closed\".into(),"
+        },
+        {
+          "line": 894,
+          "text": "                5 => p.scopes.as_mut().unwrap()[0].activations = -1,"
+        },
+        {
+          "line": 895,
+          "text": "                _ => invalid.tasks = Some(vec![crate::Task::default()]),"
+        },
+        {
+          "line": 902,
+          "text": "        planning.decisions = 1;"
+        },
+        {
+          "line": 903,
+          "text": "        let scope = &mut planning.scopes.as_mut().unwrap()[0];"
+        },
+        {
+          "line": 904,
+          "text": "        scope.activations = 1;"
+        },
+        {
+          "line": 906,
+          "text": "        scope.lease_until = \"2026-10-23T12:00:00Z\".into();"
+        },
+        {
+          "line": 908,
+          "text": "        claimed.planning.as_deref_mut().unwrap().scopes.as_mut().unwrap()[0].lease_until = \"invalid\".into();"
+        },
+        {
+          "line": 912,
+          "text": "        assert!(supported(&work, &[crate::Agent::default()]).is_err());"
+        },
+        {
+          "line": 928,
+          "text": "            \"planning\":{\"version\":1,\"provider\":\"fixture\",\"max_tasks\":10,"
+        },
+        {
+          "line": 929,
+          "text": "                \"max_activations\":3,\"max_decisions\":10,\"human_review_authorized\":\"fixture\","
+        },
+        {
+          "line": 930,
+          "text": "                \"reviewer\":{\"provider\":\"fixture\",\"authorized\":\"fixture\",\"max_calls\":2},"
+        },
+        {
+          "line": 931,
+          "text": "                \"scopes\":[{\"id\":\"root\",\"revision\":1,\"state\":\"ready\",\"requirements\":[\"req-1\"]}]},"
+        },
+        {
+          "line": 932,
+          "text": "            \"tasks\":[{\"id\":\"t\",\"status\":\"submitted\",\"scope_id\":\"root\",\"plan_role\":\"worker\",\"requirements\":[\"req-1\"],"
+        },
+        {
+          "line": 935,
+          "text": "        (work,crate::Agent {id:\"a\".into(),task_id:\"t\".into(),status:\"completed\".into(),..Default::default()})"
+        },
+        {
+          "line": 949,
+          "text": "            let mut invalid=work.clone();invalid.tasks.as_mut().unwrap()[0].status=state.into();"
+        },
+        {
+          "line": 952,
+          "text": "        let mut blocked=work.clone();blocked.tasks.as_mut().unwrap()[0].status=\"blocked\".into();"
+        },
+        {
+          "line": 954,
+          "text": "        blocked.tasks.as_mut().unwrap()[0].blocker=\"Livraison incomplète : evidence missing\".into();"
+        },
+        {
+          "line": 966,
+          "text": "        for kind in 0..7 {"
+        },
+        {
+          "line": 967,
+          "text": "            let mut invalid=work.clone();let t=&mut invalid.tasks.as_mut().unwrap()[0];"
+        },
+        {
+          "line": 969,
+          "text": "                0=>t.independent_review=Some(Default::default()),"
+        },
+        {
+          "line": 970,
+          "text": "                1=>t.previous_reviews=Some(vec![Default::default()]),"
+        },
+        {
+          "line": 971,
+          "text": "                2=>t.corrective_recovery=Some(Default::default()),"
+        },
+        {
+          "line": 972,
+          "text": "                3=>t.planning_retry=true,"
+        },
+        {
+          "line": 973,
+          "text": "                4=>t.review_coordination=Some(Default::default()),"
+        },
+        {
+          "line": 974,
+          "text": "                5=>t.batch_review_resume=Some(Default::default()),"
+        },
+        {
+          "line": 975,
+          "text": "                _=>t.recovered_result=Some(Default::default()),"
+        },
+        {
+          "line": 979,
+          "text": "        let mut invalid=work.clone();invalid.planning.as_mut().unwrap().repository=Some(Default::default());"
+        },
+        {
+          "line": 981,
+          "text": "        let mut invalid=work.clone();invalid.planning.as_mut().unwrap().scopes.as_mut().unwrap()[0].state=\"closed\".into();"
+        },
+        {
+          "line": 983,
+          "text": "        let mut invalid=work.clone();invalid.tasks.as_mut().unwrap()[0].validation_policy=None;"
+        },
+        {
+          "line": 996,
+          "text": "        let task=&mut work.tasks.as_mut().unwrap()[0];"
+        },
+        {
+          "line": 997,
+          "text": "        task.independent_review=Some(Box::new(crate::IndependentReview{state:\"passed\".into(),..Default::default()}));"
+        },
+        {
+          "line": 999,
+          "text": "        work.tasks.as_mut().unwrap()[0].status=\"accepted\".into();"
+        },
+        {
+          "line": 1002,
+          "text": "            work.tasks.as_mut().unwrap()[0].independent_review.as_mut().unwrap().state=state.into();"
+        },
+        {
+          "line": 1012,
+          "text": "        work.tasks.as_mut().unwrap()[0].status=\"todo\".into();"
+        },
+        {
+          "line": 1014,
+          "text": "        work.planning.as_mut().unwrap().repository=Some(Default::default());"
+        },
+        {
+          "line": 1016,
+          "text": "        work.tasks.as_mut().unwrap()[0].status=\"submitted\".into();"
+        },
+        {
+          "line": 1026,
+          "text": "        work.tasks.as_mut().unwrap()[0].status=\"running\".into();"
+        },
+        {
+          "line": 1027,
+          "text": "        work.tasks.as_mut().unwrap()[0].attempts=Some(vec![crate::Attempt {id:\"x\".into(),status:\"queued\".into(),..Default::default()}]);"
+        },
+        {
+          "line": 1043,
+          "text": "            let mut other=work.clone();other.tasks.as_mut().unwrap()[0].status=state.into();"
+        },
+        {
+          "line": 1046,
+          "text": "        let mut invalid=work.clone();invalid.planning.as_mut().unwrap().repository=Some(Default::default());"
+        },
+        {
+          "line": 1058,
+          "text": "        work.tasks.as_mut().unwrap()[0].status=\"blocked\".into();"
+        },
+        {
+          "line": 1064,
+          "text": "            let mut invalid=work.clone();invalid.tasks.as_mut().unwrap()[0].planning_retry=true;"
+        },
+        {
+          "line": 1066,
+          "text": "            let mut invalid=work.clone();invalid.tasks.as_mut().unwrap()[0].independent_review=Some(Default::default());"
+        },
+        {
+          "line": 1082,
+          "text": "            work.tasks.as_mut().unwrap()[0].status=task_state.into();agent.status=agent_state.into();"
+        },
+        {
+          "line": 1088,
+          "text": "            work.tasks.as_mut().unwrap()[0].status=state.into();view(&work,&[]).unwrap();"
+        },
+        {
+          "line": 1097,
+          "text": "            \"planning\":{\"version\":1,\"provider\":\"fixture\",\"max_tasks\":10,"
+        },
+        {
+          "line": 1098,
+          "text": "                \"max_activations\":3,\"max_decisions\":10,"
+        },
+        {
+          "line": 1099,
+          "text": "                \"reviewer\":{\"provider\":\"fixture\",\"authorized\":\"fixture\",\"max_calls\":2},"
+        },
+        {
+          "line": 1100,
+          "text": "                \"scopes\":[{\"id\":\"root\",\"revision\":1,\"state\":\"waiting\"},"
+        },
+        {
+          "line": 1101,
+          "text": "                    {\"id\":\"child\",\"parent\":\"root\",\"revision\":1,\"state\":\"ready\"}]}"
+        },
+        {
+          "line": 1105,
+          "text": "        for index in 0..2 {"
+        },
+        {
+          "line": 1106,
+          "text": "            for variant in 0..4 {"
+        },
+        {
+          "line": 1110,
+          "text": "                scope.lease_until = \"2026-10-23T12:00:00Z\".into();"
+        },
+        {
+          "line": 1114,
+          "text": "                    0 => scope.lease_until.clear(),"
+        },
+        {
+          "line": 1115,
+          "text": "                    1 => scope.holder.clear(),"
+        },
+        {
+          "line": 1116,
+          "text": "                    2 => scope.holder = \"../outside\".into(),"
+        },
+        {
+          "line": 1120,
+          "text": "                assert_eq!(error.code(), if variant == 3 {\"mission-status-planning-lease-invalid\"}"
+        },
+        {
+          "line": 1122,
+          "text": "                if variant == 3 { assert!(std::error::Error::source(&error).is_some()); }"
+        },
+        {
+          "line": 1125,
+          "text": "        for variant in 0..4 {"
+        },
+        {
+          "line": 1130,
+          "text": "                0 => scopes[1].parent = \"missing\".into(),"
+        },
+        {
+          "line": 1131,
+          "text": "                1 => scopes[0].id = \"other\".into(),"
+        },
+        {
+          "line": 1132,
+          "text": "                2 => scopes[1].state = \"closed\".into(),"
+        },
+        {
+          "line": 1133,
+          "text": "                _ => scopes[0].state = \"unknown\".into(),"
+        },
+        {
+          "line": 1136,
+          "text": "            assert_eq!(error.code(), if variant < 2 {\"mission-status-organization-invalid\"}"
+        },
+        {
+          "line": 1138,
+          "text": "            if variant < 2 { assert!(std::error::Error::source(&error).is_some()); }"
+        },
+        {
+          "line": 1145,
+          "text": "        let mut store = RootStore::initialize(&fixture.0, &mut SystemEnvironment).unwrap();"
+        },
+        {
+          "line": 1146,
+          "text": "        let work=store.execute_external(\"\",\"work.create\",&request(\"create\",0,serde_json::json!({\"title\":\"Historical status\",\"objective\":\"Read observations\",\"scope\":\"Owned fixture\",\"criteria\":[\"No mutation\"]})),&mut SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 1153,
+          "text": "        assert_eq!(json.as_object().unwrap().len(), 21);"
+        },
+        {
+          "line": 1154,
+          "text": "        assert_eq!(json[\"total\"], 0);"
+        },
+        {
+          "line": 1156,
+          "text": "        assert_eq!(json[\"changes_since_visit\"][\"first_visit\"], true);"
+        },
+        {
+          "line": 1157,
+          "text": "        assert_eq!(json[\"organization\"][\"ready\"], false);"
+        },
+        {
+          "line": 1171,
+          "text": "            0"
+        },
+        {
+          "line": 1181,
+          "text": "        assert_eq!(observation.status.total, 1);"
+        },
+        {
+          "line": 1182,
+          "text": "        let task = &observation.status.tasks.as_ref().unwrap()[0];"
+        },
+        {
+          "line": 1188,
+          "text": "        assert_eq!(observation.status.validated, 0);"
+        },
+        {
+          "line": 1189,
+          "text": "        assert_eq!(observation.status.active_agents, 0);"
+        },
+        {
+          "line": 1204,
+          "text": "        let mut store = RootStore::initialize(&fixture.0,&mut SystemEnvironment).unwrap();"
+        },
+        {
+          "line": 1205,
+          "text": "        let mut work=store.execute_external(\"\",\"work.create\",&request(\"create-profile\",0,serde_json::json!({\"title\":\"Profile observation\",\"objective\":\"Read saved data\",\"scope\":\"Owned fixture\",\"criteria\":[\"No grant\"]})),&mut SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 1210,
+          "text": "        let read=|work:&crate::Work,controls:&super::super::MissionControlsObservation,settings:&crate::EngineSettingsDocument,dependencies:&[DependencyObservation],causes:&mut Vec<E>|readiness(&store,work,&work.tasks.as_ref().unwrap()[0],controls,settings,dependencies,causes);"
+        },
+        {
+          "line": 1212,
+          "text": "        work.launch_profile=Some(Box::default()); // Stored-presence probe, not validated provider health."
+        },
+        {
+          "line": 1215,
+          "text": "        controls.controls=Some(super::super::MissionControlSettings {autonomy:super::super::MissionAutonomy::Automatic,paused:true,slots:1});"
+        },
+        {
+          "line": 1217,
+          "text": "        controls.controls.as_mut().unwrap().paused=false;"
+        },
+        {
+          "line": 1225,
+          "text": "        work.tasks.as_mut().unwrap()[0].planning_retry=true;"
+        },
+        {
+          "line": 1237,
+          "text": "        let mut store = RootStore::initialize(&fixture.0, &mut SystemEnvironment).unwrap();"
+        },
+        {
+          "line": 1238,
+          "text": "        let work = store.execute_external(\"\", \"work.create\", &request(\"create\", 0,"
+        },
+        {
+          "line": 1243,
+          "text": "        assert_eq!(control.status.tasks.as_ref().unwrap()[0].state, \"configure\");"
+        },
+        {
+          "line": 1249,
+          "text": "        let task = &observed.status.tasks.as_ref().unwrap()[0];"
+        },
+        {
+          "line": 1255,
+          "text": "        assert_eq!(observed.status.validated, 0);"
+        },
+        {
+          "line": 1256,
+          "text": "        assert_eq!(observed.status.review, 0);"
+        },
+        {
+          "line": 1257,
+          "text": "        assert_eq!(observed.status.running, 0);"
+        },
+        {
+          "line": 1258,
+          "text": "        assert_eq!(observed.status.active_agents, 0);"
+        },
+        {
+          "line": 1267,
+          "text": "            candidate.tasks.as_mut().unwrap()[0].status = unsupported.into();"
+        },
+        {
+          "line": 1271,
+          "text": "            let agent = crate::Agent { task_id: \"task\".into(), status: state.into(), ..Default::default() };"
+        },
+        {
+          "line": 1275,
+          "text": "        candidate.tasks.as_mut().unwrap()[0].planning_retry = true;"
+        },
+        {
+          "line": 1282,
+          "text": "        let task = &recovered.status.tasks.as_ref().unwrap()[0];"
+        },
+        {
+          "line": 1285,
+          "text": "        assert_eq!(recovered.status.validated, 0);"
+        }
+      ],
+      "functions": [
+        {
+          "line": 20,
+          "text": "fn mission(cause: crate::MissionSupervisionError) -> E {"
+        },
+        {
+          "line": 24,
+          "text": "fn retain(mut error: E, causes: Vec<E>) -> E {"
+        },
+        {
+          "line": 34,
+          "text": "fn understanding() -> MissionUnderstanding {"
+        },
+        {
+          "line": 49,
+          "text": "fn apply_provider_waits(work: &crate::Work, status: &mut MissionStatus) -> Result<(), E> {"
+        },
+        {
+          "line": 99,
+          "text": "fn organization(work: &crate::Work) -> Result<Organization, E> {"
+        },
+        {
+          "line": 121,
+          "text": "fn rows<T>("
+        },
+        {
+          "line": 153,
+          "text": "fn dispatch_context(store: &RootStore, work: &str) -> Result<DispatchContext, E> {"
+        },
+        {
+          "line": 169,
+          "text": "fn readiness("
+        },
+        {
+          "line": 215,
+          "text": "fn relative(at: time::OffsetDateTime, raw: &str, tolerance: i64) -> String {"
+        },
+        {
+          "line": 237,
+          "text": "fn next_relative(at: time::OffsetDateTime, next: &str, poll_ms: i64) -> Result<String, E> {"
+        },
+        {
+          "line": 267,
+          "text": "fn supervision("
+        },
+        {
+          "line": 340,
+          "text": "fn recent_agents(agents: &[crate::Agent], limit: Option<usize>) -> &[crate::Agent] {"
+        },
+        {
+          "line": 348,
+          "text": "fn changes(input: &super::MissionStatusInputs, limit: Option<usize>) -> Result<MissionChanges, E> {"
+        },
+        {
+          "line": 474,
+          "text": "    pub fn mission_status_historical("
+        },
+        {
+          "line": 695,
+          "text": "        fn new() -> Self {"
+        },
+        {
+          "line": 705,
+          "text": "        fn drop(&mut self) {"
+        },
+        {
+          "line": 714,
+          "text": "    fn request(event: &str, revision: i64, mut body: serde_json::Value) -> Vec<u8> {"
+        },
+        {
+          "line": 724,
+          "text": "    fn mission_status_changes_resolves_review_and_attempt_owners() {"
+        },
+        {
+          "line": 741,
+          "text": "    fn mission_status_changes_recent_window_preserves_complete_inputs() {"
+        },
+        {
+          "line": 807,
+          "text": "    fn mission_status_deadline_units_rounding_and_invalid_recovery() {"
+        },
+        {
+          "line": 821,
+          "text": "    fn mission_status_native_lease_active_stale_future_and_recovery() {"
+        },
+        {
+          "line": 870,
+          "text": "    fn mission_status_initial_planning_boundaries_and_organization() {"
+        },
+        {
+          "line": 925,
+          "text": "    fn submitted_planning_fixture() -> (crate::Work, crate::Agent) {"
+        },
+        {
+          "line": 939,
+          "text": "    fn mission_status_planned_submitted_requires_full_completed_history() {"
+        },
+        {
+          "line": 962,
+          "text": "    fn mission_status_planned_submitted_keeps_review_recovery_and_tree_refusals() {"
+        },
+        {
+          "line": 993,
+          "text": "    fn mission_status_planned_passed_opinion_and_accepted_shape() {"
+        },
+        {
+          "line": 1009,
+          "text": "    fn mission_status_planned_initial_managed_metadata_keeps_prior_read_boundary() {"
+        },
+        {
+          "line": 1022,
+          "text": "    fn mission_status_planned_queued_pairing_and_original_boundaries() {"
+        },
+        {
+          "line": 1054,
+          "text": "    fn mission_status_planned_terminal_pairs_preserve_view_and_review_refusals() {"
+        },
+        {
+          "line": 1077,
+          "text": "    fn mission_status_view_requires_active_or_blocked_agent_without_rejecting_terminal_metadata() {"
+        },
+        {
+          "line": 1095,
+          "text": "    fn mission_status_initial_planning_tree_boundaries() {"
+        },
+        {
+          "line": 1143,
+          "text": "    fn mission_status_historical_empty_todo_unknown_recovery_no_write() {"
+        },
+        {
+          "line": 1202,
+          "text": "    fn mission_status_profile_manual_pause_automatic_and_policy_refusals() {"
+        },
+        {
+          "line": 1235,
+          "text": "    fn mission_status_historical_abandoned_no_agent_and_reopen() {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 24,
+          "text": "fn retain(mut error: E, causes: Vec<E>) -> E {"
+        },
+        {
+          "line": 26,
+          "text": "        error = E::Cleanup {"
+        },
+        {
+          "line": 27,
+          "text": "            primary: Some(Box::new(error)),"
+        },
+        {
+          "line": 31,
+          "text": "    error"
+        },
+        {
+          "line": 65,
+          "text": "                }))?;"
+        },
+        {
+          "line": 104,
+          "text": "        .ok_or(E::Refused(\"mission-status-reviewer-missing\"))?;"
+        },
+        {
+          "line": 127,
+          "text": "    let mut statement = db.prepare(sql).map_err(E::Sql)?;"
+        },
+        {
+          "line": 134,
+          "text": "        .map_err(E::Sql)?;"
+        },
+        {
+          "line": 136,
+          "text": "        while let Some(row) = query.next().map_err(E::Sql)? {"
+        },
+        {
+          "line": 137,
+          "text": "            out.push(decode(row).map_err(E::Sql)?);"
+        },
+        {
+          "line": 155,
+          "text": "        cost:store.reported_costs(work)?,budget:store.work_budget_state(work)?,"
+        },
+        {
+          "line": 156,
+          "text": "        occupied:rows(&store.db,\"SELECT cwd FROM agents WHERE status IN ('queued','starting','running','stopping') ORDER BY rowid\",None,|r|r.get::<_,String>(0))?,"
+        },
+        {
+          "line": 157,
+          "text": "        priorities:rows(&store.db,\"SELECT task_id,priority FROM cockpit_tasks WHERE work_id=?1 ORDER BY task_id\",Some(work),|r|Ok((r.get::<_,String>(0)?,r.get::<_,i64>(1)?)))?,"
+        },
+        {
+          "line": 189,
+          "text": "        Err(error @ crate::MissionSupervisionError::Refused(\"mission-task-reported-cost-threshold\")) => {"
+        },
+        {
+          "line": 190,
+          "text": "            causes.push(mission(error));"
+        },
+        {
+          "line": 193,
+          "text": "        Err(error) => return Err(mission(error)),"
+        },
+        {
+          "line": 202,
+          "text": "        let context = dispatch_context(store, &work.id)?;"
+        },
+        {
+          "line": 203,
+          "text": "        let agents = store.list_agents(&work.id)?;"
+        },
+        {
+          "line": 204,
+          "text": "        let slots = settings.values.mission_dispatch_policy().map_err(E::Settings)?"
+        },
+        {
+          "line": 205,
+          "text": "            .slots(controls.controls.as_ref().map(|c| c.slots)).map_err(E::Settings)?.0;"
+        },
+        {
+          "line": 239,
+          "text": "        return Err(E::Refused(\"mission-status-supervision-cadence-invalid\"));"
+        },
+        {
+          "line": 241,
+          "text": "    let next = crate::mission_supervision::parse(next).map_err(mission)?;"
+        },
+        {
+          "line": 262,
+          "text": "/// Present/error retain effective deadlines; stale/future/stopped show absent,"
+        },
+        {
+          "line": 273,
+          "text": "    let lease = store.read_mission_supervision(work, now).map_err(mission)?;"
+        },
+        {
+          "line": 276,
+          "text": "        return Err(E::Refused(\"mission-status-live-supervision-unported\"));"
+        },
+        {
+          "line": 278,
+          "text": "    let at = crate::mission_supervision::parse(now).map_err(mission)?;"
+        },
+        {
+          "line": 305,
+          "text": "                    \"error\""
+        },
+        {
+          "line": 311,
+          "text": "                        .ok_or(E::Refused(\"mission-status-supervision-policy-missing\"))?;"
+        },
+        {
+          "line": 313,
+          "text": "                        .ok_or(E::Refused(\"mission-status-supervision-deadline-unobserved\"))?;"
+        },
+        {
+          "line": 314,
+          "text": "                    out.next_check_relative = next_relative(at, &next, policy.poll_interval_ms.0)?;"
+        },
+        {
+          "line": 325,
+          "text": "    let actions=rows(&store.db,\"SELECT at,kind,message FROM cockpit_events WHERE work_id=?1 AND (kind='conductor' OR kind IN ('validation-accepted','validation-retained') OR (kind='dispatch' AND message LIKE '% : départ automatique · %')) ORDER BY seq DESC LIMIT 1\",Some(work),|r|Ok((r.get::<_,String>(0)?,r.get::<_,String>(1)?,r.get::<_,String>(2)?)))?;"
+        },
+        {
+          "line": 390,
+          "text": "                serde_json::from_slice(raw).map_err(|e| E::Encode(crate::WorkError::Json(e)))?"
+        },
+        {
+          "line": 400,
+          "text": "                _ => None,"
+        },
+        {
+          "line": 421,
+          "text": "            _ => None,"
+        },
+        {
+          "line": 438,
+          "text": "            _ => &payload.task_id,"
+        },
+        {
+          "line": 441,
+          "text": "        out.items.as_mut().unwrap().push(MissionChange {"
+        },
+        {
+          "line": 482,
+          "text": "            let input = self.mission_status_inputs(work, operator)?;"
+        },
+        {
+          "line": 483,
+          "text": "            let settings = self.read_settings()?;"
+        },
+        {
+          "line": 484,
+          "text": "            let controls = self.read_mission_controls(work).map_err(mission)?;"
+        },
+        {
+          "line": 485,
+          "text": "            let now = crate::system_timestamp().map_err(E::Runtime)?;"
+        },
+        {
+          "line": 487,
+          "text": "                super::mission_status_reports::supported(&input.work, &input.agents)?;"
+        },
+        {
+          "line": 488,
+          "text": "                let (agent_limit, event_limit) = settings.values.mission_status_view_limits().map_err(E::Settings)?;"
+        },
+        {
+          "line": 490,
+          "text": "                super::mission_status_reports::supported_view(&input.work, agents)?;"
+        },
+        {
+          "line": 499,
+          "text": "                let cooldown_at = crate::mission_supervision::parse(&now).map_err(mission)?.unix_timestamp();"
+        },
+        {
+          "line": 500,
+          "text": "                let cooldowns = super::mission_status_reports::active_cooldowns(&self.root, &input.work, cooldown_at)?;"
+        },
+        {
+          "line": 502,
+          "text": "                    super::mission_status_reports::diagnostics(agents)?;"
+        },
+        {
+          "line": 503,
+          "text": "                let states = super::mission_status_activity::observe(agents, &now, &mut causes)?;"
+        },
+        {
+          "line": 505,
+          "text": "                    super::mission_status_reports::agent_observations(agents, &diagnostics)?;"
+        },
+        {
+          "line": 513,
+          "text": "                    .map_err(E::Settings)?;"
+        },
+        {
+          "line": 515,
+          "text": "                let observed = crate::mission_status_runtime::observe(&self.root, &settings, &now)?;"
+        },
+        {
+          "line": 519,
+          "text": "                let context = dispatch_context(self, work)?;"
+        },
+        {
+          "line": 526,
+          "text": "                let supervision = supervision(self, work, &now, tolerance)?;"
+        },
+        {
+          "line": 529,
+          "text": "                    super::mission_status_evidence::read_freshness(self, &input.work, &settings)?;"
+        },
+        {
+          "line": 542,
+          "text": "                    .map_err(E::Settings)?;"
+        },
+        {
+          "line": 544,
+          "text": "                    let fact=evidence.remove(&t.id).ok_or(E::Refused(\"mission-status-freshness-missing\"))?;"
+        },
+        {
+          "line": 547,
+          "text": "                    let result=super::mission_status_reports::observed_result_inputs(&self.root,&input.work,t,agent,&settings,&mut causes,fact)?;"
+        },
+        {
+          "line": 550,
+          "text": "                        let admin=crate::run_limits::read_configured_runtime_limits(&self.db,&runtime_policy,work,\"worker\",&t.id)?;"
+        },
+        {
+          "line": 553,
+          "text": "                    let readiness=if agent.is_some() || matches!(t.status.as_str(),\"submitted\"|\"abandoned\"|\"accepted\") {ReadinessObservation::NotObserved} else {readiness(self,&input.work,t,&controls,&settings,&dependencies,&mut causes)?};"
+        },
+        {
+          "line": 555,
+          "text": "                }).collect::<Result<_,E>>()?;"
+        },
+        {
+          "line": 556,
+          "text": "                let mut status=MissionStatus {changes:changes(&input,event_limit)?,spending:crate::mission_status_spending::mission_spending(&input,&now)?,guidance:MissionGuidance {what:String::new(),next:String::new(),actor:String::new(),primary:MissionPrimaryAction {kind:String::new(),label:String::new(),effect:String::new(),task:String::new(),tone:String::new()}},runtime:observed.runtime,provider_cooldowns:(!cooldowns.is_empty()).then(|| cooldowns.clone()),evidence_stage:insight::mission_evidence_stage(&input.work,0,0),organization:organization(&input.work)?,authorized,enabled:false,paused,summary:String::new(),next:String::new(),validated:0,review:0,running:0,active_agents:0,uncertain_agents:0,total:i64::try_from(tasks.len()).map_err(|_|E::Refused(\"mission-status-count-representation\"))?,supervision,understanding:understanding(),coordination:None,tasks:Some(Vec::new())};"
+        },
+        {
+          "line": 561,
+          "text": "                    *count = count.checked_add(1).ok_or(E::Refused(\"mission-status-count-representation\"))?;"
+        },
+        {
+          "line": 569,
+          "text": "                    project_tasks(&input.work, &status, &observations, &agent_observations)?;"
+        },
+        {
+          "line": 588,
+          "text": "                apply_provider_waits(&input.work, &mut status)?;"
+        },
+        {
+          "line": 593,
+          "text": "                let at = crate::mission_supervision::parse(&now).map_err(mission)?;"
+        },
+        {
+          "line": 601,
+          "text": "                            .map_err(|_| E::Refused(\"mission-status-tolerance-representation\"))?,"
+        },
+        {
+          "line": 606,
+          "text": "                    if super::mission_status_reports::task_reports(&self.root, &task)? != paths {"
+        },
+        {
+          "line": 607,
+          "text": "                        return Err(E::Refused(\"mission-status-reports-changed\"));"
+        },
+        {
+          "line": 610,
+          "text": "                if super::mission_status_reports::active_cooldowns(&self.root, &input.work, cooldown_at)? != cooldowns {"
+        },
+        {
+          "line": 611,
+          "text": "                    return Err(E::Refused(\"mission-status-provider-cooldowns-changed\"));"
+        },
+        {
+          "line": 619,
+          "text": "                    Err(E::Refused(\"mission-status-work-changed\"))"
+        },
+        {
+          "line": 626,
+          "text": "                    Err(E::Refused(\"mission-status-settings-changed\"))"
+        },
+        {
+          "line": 639,
+          "text": "                    Err(E::Refused(\"mission-status-inputs-changed\"))"
+        },
+        {
+          "line": 649,
+          "text": "                        Err(E::Refused(\"mission-status-controls-changed\"))"
+        },
+        {
+          "line": 657,
+          "text": "                        Err(E::Refused(\"mission-status-dispatch-context-changed\"))"
+        },
+        {
+          "line": 664,
+          "text": "                        Err(E::Refused(\"mission-status-supervision-changed\"))"
+        },
+        {
+          "line": 681,
+          "text": "            Err(error) => Err(retain(error, causes)),"
+        },
+        {
+          "line": 697,
+          "text": "                .join(crate::generate_identifier(\"status-historical-\").unwrap());"
+        },
+        {
+          "line": 698,
+          "text": "            fs::create_dir(&path).unwrap();"
+        },
+        {
+          "line": 699,
+          "text": "            fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 709,
+          "text": "                fs::remove_dir_all(&self.0).unwrap();"
+        },
+        {
+          "line": 718,
+          "text": "        serde_json::to_vec(&body).unwrap()"
+        },
+        {
+          "line": 727,
+          "text": "        work.tasks=Some(vec![serde_json::from_value(serde_json::json!({\"id\":\"review-id\",\"title\":\"Wrong collision\"})).unwrap(),serde_json::from_value(serde_json::json!({\"id\":\"actual-task\",\"title\":\"Actual owner\",\"attempts\":[{\"id\":\"attempt-id\"}],\"independent_review\":{\"id\":\"review-id\"},\"previous_reviews\":[{\"id\":\"prior-review\"}]})).unwrap()]);"
+        },
+        {
+          "line": 728,
+          "text": "        let event=|revision,kind:&str,payload:serde_json::Value| crate::RecordedEvent{id:format!(\"event-{revision}\").into_bytes(),work_id:b\"owned-work\".to_vec(),revision,kind:kind.as_bytes().to_vec(),at:b\"recorded-event\".to_vec(),payload:Some(serde_json::to_vec(&payload).unwrap())};"
+        },
+        {
+          "line": 730,
+          "text": "        let control=changes(&input,None).unwrap();assert_eq!(control.items.unwrap()[0].task,\"actual-task\");"
+        },
+        {
+          "line": 732,
+          "text": "        let observed=changes(&input,None).unwrap();let rows=observed.items.unwrap();assert_eq!(rows.len(),5);"
+        },
+        {
+          "line": 743,
+          "text": "        let mut store = RootStore::initialize(&fixture.0, &mut SystemEnvironment).unwrap();"
+        },
+        {
+          "line": 746,
+          "text": "            &mut SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 747,
+          "text": "        let mut input = store.mission_status_inputs(&work.id, \"window-operator\").unwrap();"
+        },
+        {
+          "line": 754,
+          "text": "        let control = changes(&input, Some(200)).unwrap();"
+        },
+        {
+          "line": 755,
+          "text": "        assert_eq!(control.items.as_ref().unwrap().len(), 2);"
+        },
+        {
+          "line": 759,
+          "text": "        let page = changes(&input, Some(200)).unwrap();"
+        },
+        {
+          "line": 761,
+          "text": "        let items = page.items.as_ref().unwrap();"
+        },
+        {
+          "line": 766,
+          "text": "        let unlimited = changes(&input, None).unwrap();"
+        },
+        {
+          "line": 768,
+          "text": "        assert_eq!(unlimited.items.as_ref().unwrap().len(), 201);"
+        },
+        {
+          "line": 769,
+          "text": "        let empty = changes(&input, Some(0)).unwrap();"
+        },
+        {
+          "line": 770,
+          "text": "        assert!(empty.more && empty.items.as_ref().unwrap().is_empty());"
+        },
+        {
+          "line": 773,
+          "text": "        let filtered=changes(&input, Some(200)).unwrap();"
+        },
+        {
+          "line": 775,
+          "text": "        assert_eq!(filtered.items.as_ref().unwrap().len(), 199);"
+        },
+        {
+          "line": 780,
+          "text": "        assert_eq!(changes(&input, Some(200)).unwrap().items.as_ref().unwrap().len(), 200);"
+        },
+        {
+          "line": 791,
+          "text": "        input.agents[200].usage=Some(Box::new(serde_json::from_value(serde_json::json!({\"input_tokens\":7,\"output_tokens\":9,\"provider_reported_cost_usd\":0.25,\"source\":\"fixture\",\"scope\":\"attempt\",\"at\":\"recorded\"})).unwrap()));"
+        },
+        {
+          "line": 792,
+          "text": "        let spending=crate::mission_status_spending::mission_spending(&input,\"observation\").unwrap();"
+        },
+        {
+          "line": 793,
+          "text": "        assert_eq!(spending.calls.as_ref().unwrap().len(),201);"
+        },
+        {
+          "line": 794,
+          "text": "        assert_eq!(spending.attempts.as_ref().unwrap().len(),201);"
+        },
+        {
+          "line": 795,
+          "text": "        assert_eq!(spending.rows.as_ref().unwrap()[0].calls,201);"
+        },
+        {
+          "line": 796,
+          "text": "        assert_eq!(spending.rows.as_ref().unwrap()[0].input,7);"
+        },
+        {
+          "line": 797,
+          "text": "        assert_eq!(spending.rows.as_ref().unwrap()[0].output,9);"
+        },
+        {
+          "line": 798,
+          "text": "        assert_eq!(spending.rows.as_ref().unwrap()[0].cost.reported_usd.0,0.25);"
+        },
+        {
+          "line": 801,
+          "text": "        assert!(!changes(&input, Some(0)).unwrap().more);"
+        },
+        {
+          "line": 803,
+          "text": "        store.close().unwrap();"
+        },
+        {
+          "line": 808,
+          "text": "        let at = crate::mission_supervision::parse(\"2026-10-23T00:00:00Z\").unwrap();"
+        },
+        {
+          "line": 809,
+          "text": "        assert_eq!(next_relative(at, \"2026-10-23T00:00:01.5Z\", 1500).unwrap(), \"dans moins de 1500 ms\");"
+        },
+        {
+          "line": 810,
+          "text": "        assert_eq!(next_relative(at, \"2026-10-23T00:00:02Z\", 2000).unwrap(), \"dans moins de 2 s\");"
+        },
+        {
+          "line": 811,
+          "text": "        assert_eq!(next_relative(at, \"2026-10-23T00:00:03.5Z\", 2000).unwrap(), \"dans environ 4 s\");"
+        },
+        {
+          "line": 812,
+          "text": "        assert_eq!(next_relative(at, \"2026-10-22T23:59:59.999999999Z\", 2000).unwrap(), \"attendue maintenant\");"
+        },
+        {
+          "line": 813,
+          "text": "        assert_eq!(next_relative(at, \"2026-10-22T23:59:58.5Z\", 2000).unwrap(), \"en retard d’environ 2 s\");"
+        },
+        {
+          "line": 816,
+          "text": "        assert_eq!(next_relative(at, \"2026-10-23T00:00:02Z\", 2000).unwrap(), \"dans moins de 2 s\");"
+        },
+        {
+          "line": 823,
+          "text": "        let mut store = RootStore::initialize(&fixture.0, &mut SystemEnvironment).unwrap();"
+        },
+        {
+          "line": 826,
+          "text": "            &mut SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 827,
+          "text": "        let now = crate::system_timestamp().unwrap();"
+        },
+        {
+          "line": 828,
+          "text": "        let at = crate::mission_supervision::parse(&now).unwrap();"
+        },
+        {
+          "line": 829,
+          "text": "        let tolerance = store.settings().unwrap().values.mission_supervision_policy().unwrap().future_tolerance_ms.0;"
+        },
+        {
+          "line": 830,
+          "text": "        assert_eq!(supervision(&store, &work.id, &now, tolerance).unwrap().state, \"absent\");"
+        },
+        {
+          "line": 831,
+          "text": "        let lease = store.claim_mission_supervision(&work.id, \"owned-status-fixture\", &now).unwrap();"
+        },
+        {
+          "line": 834,
+          "text": "            .format(&time::format_description::well_known::Rfc3339).unwrap();"
+        },
+        {
+          "line": 835,
+          "text": "        let active = supervision(&store, &work.id, &now, tolerance).unwrap();"
+        },
+        {
+          "line": 840,
+          "text": "            &stamp(i128::from(policy.stale_after_ms.0) * 1_000_000), tolerance).unwrap().state, \"active\");"
+        },
+        {
+          "line": 842,
+          "text": "            &stamp(i128::from(policy.stale_after_ms.0) * 1_000_000 + 1), tolerance).unwrap();"
+        },
+        {
+          "line": 846,
+          "text": "            &stamp(-i128::from(policy.future_tolerance_ms.0) * 1_000_000), tolerance).unwrap().state, \"active\");"
+        },
+        {
+          "line": 848,
+          "text": "            &stamp(-i128::from(policy.future_tolerance_ms.0) * 1_000_000 - 1), tolerance).unwrap();"
+        },
+        {
+          "line": 852,
+          "text": "        store.record_mission_cycle(&lease, &now, Some(\"owned fixture cycle failure\")).unwrap();"
+        },
+        {
+          "line": 853,
+          "text": "        assert_eq!(supervision(&store, &work.id, &now, tolerance).unwrap().state, \"error\");"
+        },
+        {
+          "line": 854,
+          "text": "        store.record_mission_cycle(&lease, &now, None).unwrap();"
+        },
+        {
+          "line": 855,
+          "text": "        assert_eq!(supervision(&store, &work.id, &now, tolerance).unwrap().state, \"active\");"
+        },
+        {
+          "line": 856,
+          "text": "        let public = store.mission_status_historical(&work.id, \"operator-a\").unwrap();"
+        },
+        {
+          "line": 859,
+          "text": "        store.update_mission_supervision(&lease, &now, true).unwrap();"
+        },
+        {
+          "line": 860,
+          "text": "        let stopped = supervision(&store, &work.id, &now, tolerance).unwrap();"
+        },
+        {
+          "line": 863,
+          "text": "        lease.close().unwrap();"
+        },
+        {
+          "line": 864,
+          "text": "        store.close().unwrap();"
+        },
+        {
+          "line": 868,
+          "text": "    /// Missing structural data retains the organization error in its source chain."
+        },
+        {
+          "line": 876,
+          "text": "        })).unwrap();"
+        },
+        {
+          "line": 878,
+          "text": "        supported(&work, &[]).unwrap();"
+        },
+        {
+          "line": 879,
+          "text": "        let observation = organization(&work).unwrap();"
+        },
+        {
+          "line": 881,
+          "text": "        assert!(observation.issues.unwrap().is_empty());"
+        },
+        {
+          "line": 885,
+          "text": "            supported(&work, &[]).unwrap();"
+        },
+        {
+          "line": 887,
+          "text": "            let p = invalid.planning.as_deref_mut().unwrap();"
+        },
+        {
+          "line": 891,
+          "text": "                2 => p.scopes.as_mut().unwrap()[0].holder = \"fixture-holder\".into(),"
+        },
+        {
+          "line": 892,
+          "text": "                3 => p.scopes.as_mut().unwrap()[0].lease_until = \"future\".into(),"
+        },
+        {
+          "line": 893,
+          "text": "                4 => p.scopes.as_mut().unwrap()[0].state = \"closed\".into(),"
+        },
+        {
+          "line": 894,
+          "text": "                5 => p.scopes.as_mut().unwrap()[0].activations = -1,"
+        },
+        {
+          "line": 895,
+          "text": "                _ => invalid.tasks = Some(vec![crate::Task::default()]),"
+        },
+        {
+          "line": 900,
+          "text": "        let planning = claimed.planning.as_deref_mut().unwrap();"
+        },
+        {
+          "line": 903,
+          "text": "        let scope = &mut planning.scopes.as_mut().unwrap()[0];"
+        },
+        {
+          "line": 907,
+          "text": "        supported(&claimed, &[]).unwrap(); // A consumed cap stays observable."
+        },
+        {
+          "line": 908,
+          "text": "        claimed.planning.as_deref_mut().unwrap().scopes.as_mut().unwrap()[0].lease_until = \"invalid\".into();"
+        },
+        {
+          "line": 909,
+          "text": "        let error = supported(&claimed, &[]).unwrap_err();"
+        },
+        {
+          "line": 910,
+          "text": "        assert_eq!(error.code(), \"mission-status-planning-lease-invalid\");"
+        },
+        {
+          "line": 911,
+          "text": "        assert!(std::error::Error::source(&error).is_some());"
+        },
+        {
+          "line": 914,
+          "text": "        invalid.planning.as_deref_mut().unwrap().reviewer = None;"
+        },
+        {
+          "line": 915,
+          "text": "        let error = supported(&invalid, &[]).unwrap_err();"
+        },
+        {
+          "line": 916,
+          "text": "        assert_eq!(error.code(), \"mission-status-organization-invalid\");"
+        },
+        {
+          "line": 917,
+          "text": "        assert!(std::error::Error::source(&error).is_some());"
+        },
+        {
+          "line": 920,
+          "text": "        human.planning.as_deref_mut().unwrap().human_review_authorized = \"fixture\".into();"
+        },
+        {
+          "line": 921,
+          "text": "        assert!(organization(&human).unwrap().verification.contains(\"Revue humaine explicitement autorisée\"));"
+        },
+        {
+          "line": 934,
+          "text": "        })).unwrap();"
+        },
+        {
+          "line": 942,
+          "text": "        supported(&work,std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 949,
+          "text": "            let mut invalid=work.clone();invalid.tasks.as_mut().unwrap()[0].status=state.into();"
+        },
+        {
+          "line": 952,
+          "text": "        let mut blocked=work.clone();blocked.tasks.as_mut().unwrap()[0].status=\"blocked\".into();"
+        },
+        {
+          "line": 953,
+          "text": "        supported(&blocked,std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 954,
+          "text": "        blocked.tasks.as_mut().unwrap()[0].blocker=\"Livraison incomplète : evidence missing\".into();"
+        },
+        {
+          "line": 958,
+          "text": "        supported(&work,&[agent]).unwrap();"
+        },
+        {
+          "line": 965,
+          "text": "        supported(&work,std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 967,
+          "text": "            let mut invalid=work.clone();let t=&mut invalid.tasks.as_mut().unwrap()[0];"
+        },
+        {
+          "line": 975,
+          "text": "                _=>t.recovered_result=Some(Default::default()),"
+        },
+        {
+          "line": 979,
+          "text": "        let mut invalid=work.clone();invalid.planning.as_mut().unwrap().repository=Some(Default::default());"
+        },
+        {
+          "line": 981,
+          "text": "        let mut invalid=work.clone();invalid.planning.as_mut().unwrap().scopes.as_mut().unwrap()[0].state=\"closed\".into();"
+        },
+        {
+          "line": 983,
+          "text": "        let mut invalid=work.clone();invalid.tasks.as_mut().unwrap()[0].validation_policy=None;"
+        },
+        {
+          "line": 984,
+          "text": "        let error=supported(&invalid,std::slice::from_ref(&agent)).unwrap_err();"
+        },
+        {
+          "line": 985,
+          "text": "        assert_eq!(error.code(),\"mission-status-organization-invalid\");"
+        },
+        {
+          "line": 986,
+          "text": "        assert!(std::error::Error::source(&error).is_some());"
+        },
+        {
+          "line": 987,
+          "text": "        supported(&work,&[agent]).unwrap();"
+        },
+        {
+          "line": 996,
+          "text": "        let task=&mut work.tasks.as_mut().unwrap()[0];"
+        },
+        {
+          "line": 998,
+          "text": "        supported(&work,std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 999,
+          "text": "        work.tasks.as_mut().unwrap()[0].status=\"accepted\".into();"
+        },
+        {
+          "line": 1000,
+          "text": "        supported(&work,std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 1001,
+          "text": "        for state in [\"running\",\"error\",\"stale\",\"changes_requested\",\"\"] {"
+        },
+        {
+          "line": 1002,
+          "text": "            work.tasks.as_mut().unwrap()[0].independent_review.as_mut().unwrap().state=state.into();"
+        },
+        {
+          "line": 1012,
+          "text": "        work.tasks.as_mut().unwrap()[0].status=\"todo\".into();"
+        },
+        {
+          "line": 1013,
+          "text": "        supported(&work,&[]).unwrap();"
+        },
+        {
+          "line": 1014,
+          "text": "        work.planning.as_mut().unwrap().repository=Some(Default::default());"
+        },
+        {
+          "line": 1015,
+          "text": "        supported(&work,&[]).unwrap();"
+        },
+        {
+          "line": 1016,
+          "text": "        work.tasks.as_mut().unwrap()[0].status=\"submitted\".into();"
+        },
+        {
+          "line": 1026,
+          "text": "        work.tasks.as_mut().unwrap()[0].status=\"running\".into();"
+        },
+        {
+          "line": 1027,
+          "text": "        work.tasks.as_mut().unwrap()[0].attempts=Some(vec![crate::Attempt {id:\"x\".into(),status:\"queued\".into(),..Default::default()}]);"
+        },
+        {
+          "line": 1029,
+          "text": "        supported(&work,std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 1030,
+          "text": "        view(&work,std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 1035,
+          "text": "            supported(&work,std::slice::from_ref(&observed)).unwrap();"
+        },
+        {
+          "line": 1036,
+          "text": "            view(&work,std::slice::from_ref(&observed)).unwrap();"
+        },
+        {
+          "line": 1043,
+          "text": "            let mut other=work.clone();other.tasks.as_mut().unwrap()[0].status=state.into();"
+        },
+        {
+          "line": 1046,
+          "text": "        let mut invalid=work.clone();invalid.planning.as_mut().unwrap().repository=Some(Default::default());"
+        },
+        {
+          "line": 1048,
+          "text": "        supported(&work,&[agent]).unwrap();"
+        },
+        {
+          "line": 1058,
+          "text": "        work.tasks.as_mut().unwrap()[0].status=\"blocked\".into();"
+        },
+        {
+          "line": 1061,
+          "text": "            supported(&work,std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 1062,
+          "text": "            view(&work,std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 1064,
+          "text": "            let mut invalid=work.clone();invalid.tasks.as_mut().unwrap()[0].planning_retry=true;"
+        },
+        {
+          "line": 1066,
+          "text": "            let mut invalid=work.clone();invalid.tasks.as_mut().unwrap()[0].independent_review=Some(Default::default());"
+        },
+        {
+          "line": 1082,
+          "text": "            work.tasks.as_mut().unwrap()[0].status=task_state.into();agent.status=agent_state.into();"
+        },
+        {
+          "line": 1083,
+          "text": "            supported(&work,std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 1084,
+          "text": "            view(&work,std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 1088,
+          "text": "            work.tasks.as_mut().unwrap()[0].status=state.into();view(&work,&[]).unwrap();"
+        },
+        {
+          "line": 1102,
+          "text": "        })).unwrap();"
+        },
+        {
+          "line": 1104,
+          "text": "        supported(&work, &[]).unwrap();"
+        },
+        {
+          "line": 1108,
+          "text": "                let scope = &mut valid.planning.as_deref_mut().unwrap().scopes.as_mut().unwrap()[index];"
+        },
+        {
+          "line": 1111,
+          "text": "                supported(&valid, &[]).unwrap();"
+        },
+        {
+          "line": 1112,
+          "text": "                let scope = &mut valid.planning.as_deref_mut().unwrap().scopes.as_mut().unwrap()[index];"
+        },
+        {
+          "line": 1117,
+          "text": "                    _ => scope.lease_until = \"invalid\".into(),"
+        },
+        {
+          "line": 1119,
+          "text": "                let error = supported(&valid, &[]).unwrap_err();"
+        },
+        {
+          "line": 1120,
+          "text": "                assert_eq!(error.code(), if variant == 3 {\"mission-status-planning-lease-invalid\"}"
+        },
+        {
+          "line": 1122,
+          "text": "                if variant == 3 { assert!(std::error::Error::source(&error).is_some()); }"
+        },
+        {
+          "line": 1126,
+          "text": "            supported(&work, &[]).unwrap();"
+        },
+        {
+          "line": 1128,
+          "text": "            let scopes = invalid.planning.as_deref_mut().unwrap().scopes.as_mut().unwrap();"
+        },
+        {
+          "line": 1133,
+          "text": "                _ => scopes[0].state = \"unknown\".into(),"
+        },
+        {
+          "line": 1135,
+          "text": "            let error = supported(&invalid, &[]).unwrap_err();"
+        },
+        {
+          "line": 1136,
+          "text": "            assert_eq!(error.code(), if variant < 2 {\"mission-status-organization-invalid\"}"
+        },
+        {
+          "line": 1138,
+          "text": "            if variant < 2 { assert!(std::error::Error::source(&error).is_some()); }"
+        },
+        {
+          "line": 1145,
+          "text": "        let mut store = RootStore::initialize(&fixture.0, &mut SystemEnvironment).unwrap();"
+        },
+        {
+          "line": 1146,
+          "text": "        let work=store.execute_external(\"\",\"work.create\",&request(\"create\",0,serde_json::json!({\"title\":\"Historical status\",\"objective\":\"Read observations\",\"scope\":\"Owned fixture\",\"criteria\":[\"No mutation\"]})),&mut SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 1147,
+          "text": "        let settings = store.settings().unwrap();"
+        },
+        {
+          "line": 1148,
+          "text": "        let events = store.events(&work.id).unwrap();"
+        },
+        {
+          "line": 1151,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 1152,
+          "text": "        let json = serde_json::to_value(&empty.status).unwrap();"
+        },
+        {
+          "line": 1153,
+          "text": "        assert_eq!(json.as_object().unwrap().len(), 21);"
+        },
+        {
+          "line": 1168,
+          "text": "                .unwrap()"
+        },
+        {
+          "line": 1173,
+          "text": "        assert!(store.read_work(&work.id).unwrap() == work);"
+        },
+        {
+          "line": 1174,
+          "text": "        assert!(store.settings().unwrap() == settings);"
+        },
+        {
+          "line": 1175,
+          "text": "        assert!(store.events(&work.id).unwrap() == events);"
+        },
+        {
+          "line": 1176,
+          "text": "        let work=store.execute_external(&work.id,\"task.add\",&request(\"task\",work.revision,serde_json::json!({\"id\":\"task\",\"title\":\"Observe todo\",\"deliverable\":\"Report\",\"criteria\":[\"No acceptance\"]})),&mut SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 1177,
+          "text": "        let events = store.events(&work.id).unwrap();"
+        },
+        {
+          "line": 1180,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 1182,
+          "text": "        let task = &observation.status.tasks.as_ref().unwrap()[0];"
+        },
+        {
+          "line": 1187,
+          "text": "        assert!(task.waits.as_ref().unwrap().is_empty());"
+        },
+        {
+          "line": 1190,
+          "text": "        assert!(store.read_work(&work.id).unwrap() == work);"
+        },
+        {
+          "line": 1191,
+          "text": "        assert!(store.events(&work.id).unwrap() == events);"
+        },
+        {
+          "line": 1192,
+          "text": "        assert!(store.settings().unwrap() == settings);"
+        },
+        {
+          "line": 1193,
+          "text": "        assert!(store.list_agents(&work.id).unwrap().is_empty());"
+        },
+        {
+          "line": 1194,
+          "text": "        store.close().unwrap();"
+        },
+        {
+          "line": 1204,
+          "text": "        let mut store = RootStore::initialize(&fixture.0,&mut SystemEnvironment).unwrap();"
+        },
+        {
+          "line": 1205,
+          "text": "        let mut work=store.execute_external(\"\",\"work.create\",&request(\"create-profile\",0,serde_json::json!({\"title\":\"Profile observation\",\"objective\":\"Read saved data\",\"scope\":\"Owned fixture\",\"criteria\":[\"No grant\"]})),&mut SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 1206,
+          "text": "        work=store.execute_external(&work.id,\"task.add\",&request(\"add-profile\",work.revision,serde_json::json!({\"id\":\"task\",\"title\":\"Observe profile\",\"deliverable\":\"Report\",\"criteria\":[\"No mutation\"]})),&mut SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 1207,
+          "text": "        let mut settings=store.settings().unwrap();"
+        },
+        {
+          "line": 1208,
+          "text": "        let mut controls=store.read_mission_controls(&work.id).unwrap();"
+        },
+        {
+          "line": 1210,
+          "text": "        let read=|work:&crate::Work,controls:&super::super::MissionControlsObservation,settings:&crate::EngineSettingsDocument,dependencies:&[DependencyObservation],causes:&mut Vec<E>|readiness(&store,work,&work.tasks.as_ref().unwrap()[0],controls,settings,dependencies,causes);"
+        },
+        {
+          "line": 1211,
+          "text": "        assert!(matches!(read(&work,&controls,&settings,&[],&mut causes).unwrap(),ReadinessObservation::Observed {profile:ProfileObservation::Missing,..}));"
+        },
+        {
+          "line": 1213,
+          "text": "        super::super::mission_status_reports::supported(&work,&[]).unwrap();"
+        },
+        {
+          "line": 1214,
+          "text": "        assert!(matches!(read(&work,&controls,&settings,&[],&mut causes).unwrap(),ReadinessObservation::Observed {disposition:DispatchDisposition::Manual,profile:ProfileObservation::Configured,..}));"
+        },
+        {
+          "line": 1216,
+          "text": "        assert!(matches!(read(&work,&controls,&settings,&[],&mut causes).unwrap(),ReadinessObservation::Observed {disposition:DispatchDisposition::Waiting,..}));"
+        },
+        {
+          "line": 1217,
+          "text": "        controls.controls.as_mut().unwrap().paused=false;"
+        },
+        {
+          "line": 1218,
+          "text": "        assert!(matches!(read(&work,&controls,&settings,&[],&mut causes).unwrap(),ReadinessObservation::Observed {disposition:DispatchDisposition::Ready,assistance:AssistObservation::Allowed,..}));"
+        },
+        {
+          "line": 1219,
+          "text": "        controls.controls.as_mut().unwrap().autonomy=super::super::MissionAutonomy::Assisted;"
+        },
+        {
+          "line": 1220,
+          "text": "        assert!(matches!(read(&work,&controls,&settings,&[],&mut causes).unwrap(),ReadinessObservation::Observed {disposition:DispatchDisposition::Manual,..}));"
+        },
+        {
+          "line": 1224,
+          "text": "        assert!(matches!(read(&work,&controls,&settings,&dependencies,&mut causes).unwrap(),ReadinessObservation::NotObserved));"
+        },
+        {
+          "line": 1225,
+          "text": "        work.tasks.as_mut().unwrap()[0].planning_retry=true;"
+        },
+        {
+          "line": 1228,
+          "text": "        store.close().unwrap();"
+        },
+        {
+          "line": 1237,
+          "text": "        let mut store = RootStore::initialize(&fixture.0, &mut SystemEnvironment).unwrap();"
+        },
+        {
+          "line": 1239,
+          "text": "            serde_json::json!({\"title\":\"Decision history\", \"objective\":\"Observe decisions\", \"scope\":\"Owned fixture\", \"criteria\":[\"No inferred acceptance\"]})), &mut SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 1241,
+          "text": "            serde_json::json!({\"id\":\"task\", \"title\":\"Explicit decision\", \"deliverable\":\"Report\", \"criteria\":[\"No mutation\"]})), &mut SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 1242,
+          "text": "        let control = store.mission_status_historical(&work.id, \"operator-a\").unwrap();"
+        },
+        {
+          "line": 1243,
+          "text": "        assert_eq!(control.status.tasks.as_ref().unwrap()[0].state, \"configure\");"
+        },
+        {
+          "line": 1244,
+          "text": "        let settings = store.settings().unwrap();"
+        },
+        {
+          "line": 1246,
+          "text": "            serde_json::json!({\"id\":\"task\", \"status\":\"abandoned\", \"next\":\"Explicitly retained decision\"})), &mut SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 1247,
+          "text": "        let events = store.events(&work.id).unwrap();"
+        },
+        {
+          "line": 1248,
+          "text": "        let observed = store.mission_status_historical(&work.id, \"operator-a\").unwrap();"
+        },
+        {
+          "line": 1249,
+          "text": "        let task = &observed.status.tasks.as_ref().unwrap()[0];"
+        },
+        {
+          "line": 1259,
+          "text": "        assert!(store.read_work(&work.id).unwrap() == abandoned);"
+        },
+        {
+          "line": 1260,
+          "text": "        assert!(store.settings().unwrap() == settings);"
+        },
+        {
+          "line": 1261,
+          "text": "        assert!(store.events(&work.id).unwrap() == events);"
+        },
+        {
+          "line": 1262,
+          "text": "        assert!(store.list_agents(&work.id).unwrap().is_empty());"
+        },
+        {
+          "line": 1267,
+          "text": "            candidate.tasks.as_mut().unwrap()[0].status = unsupported.into();"
+        },
+        {
+          "line": 1275,
+          "text": "        candidate.tasks.as_mut().unwrap()[0].planning_retry = true;"
+        },
+        {
+          "line": 1279,
+          "text": "            serde_json::json!({\"id\":\"task\", \"status\":\"todo\"})), &mut SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 1280,
+          "text": "        let events = store.events(&work.id).unwrap();"
+        },
+        {
+          "line": 1281,
+          "text": "        let recovered = store.mission_status_historical(&work.id, \"operator-a\").unwrap();"
+        },
+        {
+          "line": 1282,
+          "text": "        let task = &recovered.status.tasks.as_ref().unwrap()[0];"
+        },
+        {
+          "line": 1286,
+          "text": "        assert!(store.read_work(&work.id).unwrap() == reopened);"
+        },
+        {
+          "line": 1287,
+          "text": "        assert!(store.settings().unwrap() == settings);"
+        },
+        {
+          "line": 1288,
+          "text": "        assert!(store.events(&work.id).unwrap() == events);"
+        },
+        {
+          "line": 1289,
+          "text": "        assert!(store.list_agents(&work.id).unwrap().is_empty());"
+        },
+        {
+          "line": 1290,
+          "text": "        store.close().unwrap();"
+        }
+      ]
+    },
+    "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs": {
+      "policies": [
+        {
+          "line": 60,
+          "text": "        usize::from(u16::MAX) + 1 + std::mem::align_of::<u64>()"
+        },
+        {
+          "line": 183,
+          "text": "        found.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));"
+        },
+        {
+          "line": 199,
+          "text": "    if skew < 0 { return Err(E::Refused(\"mission-status-report-clock-skew-invalid\")); }"
+        },
+        {
+          "line": 215,
+          "text": "        if metadata.len() == 0 { continue; }"
+        },
+        {
+          "line": 217,
+          "text": "        if modified < since { stale += 1; } else { fresh.push(name); }"
+        },
+        {
+          "line": 221,
+          "text": "        [] => Ok(Unavailable { reason: if stale > 0 {"
+        },
+        {
+          "line": 235,
+          "text": "/// Sanitization and sensitivity masking precede the Go-compatible 600-cell"
+        },
+        {
+          "line": 256,
+          "text": "    crate::terminal_clip::clip(&text, 600)"
+        },
+        {
+          "line": 320,
+          "text": "        \"limit\"=>(\"Limite atteinte\",reason,\"Le superviseur a interrompu la tentative ; cette interruption ne valide ni le livrable ni la tâche.\",\"Examiner les erreurs précédentes et les préconditions ; reprendre explicitement sans relever arbitrairement les protections.\",\"review_limit\"),"
+        },
+        {
+          "line": 326,
+          "text": "        count: 1,"
+        },
+        {
+          "line": 356,
+          "text": "                || agent.diagnostic.observed_errors > 0"
+        },
+        {
+          "line": 363,
+          "text": "                return Ok(AttemptDiagnostic::default());"
+        },
+        {
+          "line": 374,
+          "text": "            let category = if limited { \"limit\" } else { category(reason) };"
+        },
+        {
+          "line": 378,
+          "text": "            if cap > 0 {"
+        },
+        {
+          "line": 396,
+          "text": "                observed_errors: 0,"
+        },
+        {
+          "line": 411,
+          "text": "/// Go recoveryCategoryFor environment branch and its terminal-limit precedence."
+        },
+        {
+          "line": 438,
+          "text": "                        || agent.diagnostic.observed_errors > 0"
+        },
+        {
+          "line": 442,
+          "text": "                        AttemptDiagnostic::default()"
+        },
+        {
+          "line": 446,
+          "text": "                terminal_diagnostics(std::slice::from_ref(agent)).map(|mut values| values.remove(0))"
+        },
+        {
+          "line": 460,
+          "text": "        _ => false,"
+        },
+        {
+          "line": 476,
+          "text": "    task.independent_review.as_deref().is_some_and(|review| super::mission_status_review::applies(true,task.attempts.as_ref().and_then(|v|v.last()).map(|a|a.id.as_str()),&agent.id,&agent.attempt_id,review))"
+        },
+        {
+          "line": 515,
+          "text": "/// mandatory before a live classification, never inferred from these rows."
+        },
+        {
+          "line": 598,
+          "text": "                _ => false,"
+        },
+        {
+          "line": 635,
+          "text": "/// No IO, mutation, policy/default or process/launch authority is established."
+        },
+        {
+          "line": 650,
+          "text": "/// Terminal-limit/provider cooldown precedence follows recoveryCategoryFor."
+        },
+        {
+          "line": 807,
+          "text": "            if value.cleared_at.is_empty() && (value.resets_at == 0 || at < value.resets_at) {"
+        },
+        {
+          "line": 821,
+          "text": "        let mut work = crate::Work { tasks: Some(vec![crate::Task { id:\"task\".into(),status:\"submitted\".into(),..Default::default() }]),..Default::default() };"
+        },
+        {
+          "line": 822,
+          "text": "        let agent = Agent { task_id:\"task\".into(),status:\"completed\".into(),..Default::default() };"
+        },
+        {
+          "line": 824,
+          "text": "        work.tasks.as_mut().unwrap()[0].status = \"accepted\".into();"
+        },
+        {
+          "line": 829,
+          "text": "        let task = &work.tasks.as_ref().unwrap()[0];"
+        },
+        {
+          "line": 835,
+          "text": "        work.tasks.as_mut().unwrap()[0].planning_retry = true;"
+        },
+        {
+          "line": 837,
+          "text": "        work.tasks.as_mut().unwrap()[0].planning_retry = false;"
+        },
+        {
+          "line": 838,
+          "text": "        work.tasks.as_mut().unwrap()[0].independent_review = Some(Box::default());"
+        },
+        {
+          "line": 850,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 852,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 858,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 861,
+          "text": "        work.tasks.as_mut().unwrap()[0].planning_retry = true;"
+        },
+        {
+          "line": 863,
+          "text": "        work.tasks.as_mut().unwrap()[0].planning_retry = false;"
+        },
+        {
+          "line": 864,
+          "text": "        work.tasks.as_mut().unwrap()[0].status = \"submitted\".into();"
+        },
+        {
+          "line": 881,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 883,
+          "text": "            ..crate::Work::default()"
+        },
+        {
+          "line": 885,
+          "text": "        assert!(active_cooldowns(&fixture.0, &work, 0).unwrap().is_empty());"
+        },
+        {
+          "line": 886,
+          "text": "        let dir = fixture.0.join(\".swarm/provider-cooldowns\");"
+        },
+        {
+          "line": 892,
+          "text": "            observed_at: \"2026-10-23T00:00:00Z\".into(),"
+        },
+        {
+          "line": 895,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 901,
+          "text": "            active_cooldowns(&fixture.0, &work, 0).unwrap(),"
+        },
+        {
+          "line": 905,
+          "text": "            crate::agent_launch::cooldown(&fixture.0, \"fixture\")"
+        },
+        {
+          "line": 912,
+          "text": "        expired.resets_at = 10;"
+        },
+        {
+          "line": 915,
+          "text": "            active_cooldowns(&fixture.0, &work, 9).unwrap(),"
+        },
+        {
+          "line": 918,
+          "text": "        assert!(active_cooldowns(&fixture.0, &work, 10).unwrap().is_empty());"
+        },
+        {
+          "line": 920,
+          "text": "        cleared.cleared_at = \"2026-10-23T00:01:00Z\".into();"
+        },
+        {
+          "line": 922,
+          "text": "        assert!(active_cooldowns(&fixture.0, &work, 0).unwrap().is_empty());"
+        },
+        {
+          "line": 923,
+          "text": "        crate::agent_launch::cooldown(&fixture.0, \"fixture\").unwrap();"
+        },
+        {
+          "line": 926,
+          "text": "        let error = active_cooldowns(&fixture.0, &work, 0).unwrap_err();"
+        },
+        {
+          "line": 930,
+          "text": "        assert_eq!(active_cooldowns(&fixture.0, &work, 0).unwrap().len(), 1);"
+        },
+        {
+          "line": 936,
+          "text": "        assert_eq!(trace(&\"x\".repeat(600)).unwrap(), \"x\".repeat(600));"
+        },
+        {
+          "line": 938,
+          "text": "            trace(&\"\\u{2e3b}\".repeat(200)).unwrap(),"
+        },
+        {
+          "line": 939,
+          "text": "            format!(\"{}…\", \"\\u{2e3b}\".repeat(149))"
+        },
+        {
+          "line": 941,
+          "text": "        assert_eq!(trace(&\"é\".repeat(600)).unwrap(), \"é\".repeat(600));"
+        },
+        {
+          "line": 959,
+          "text": "                eprintln!(\"reports fixture retained: {}\", self.0.display());"
+        },
+        {
+          "line": 961,
+          "text": "                disk::remove_dir_all(&self.0).unwrap();"
+        },
+        {
+          "line": 966,
+          "text": "    /// witness before true outside-Root symlink refusal and restored recovery."
+        },
+        {
+          "line": 970,
+          "text": "        assert!(task_reports(&fixture.0, \"task\").unwrap().is_empty());"
+        },
+        {
+          "line": 971,
+          "text": "        disk::create_dir(fixture.0.join(\"docs\")).unwrap();"
+        },
+        {
+          "line": 972,
+          "text": "        disk::create_dir(fixture.0.join(\"docs/nested\")).unwrap();"
+        },
+        {
+          "line": 973,
+          "text": "        disk::write(fixture.0.join(\"docs/task.md\"), \"A real partial report\").unwrap();"
+        },
+        {
+          "line": 975,
+          "text": "            fixture.0.join(\"docs/nested/task-handoff.md\"),"
+        },
+        {
+          "line": 979,
+          "text": "        disk::write(fixture.0.join(\"docs/other.md\"), \"Unrelated\").unwrap();"
+        },
+        {
+          "line": 980,
+          "text": "        let oldest = std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1);"
+        },
+        {
+          "line": 981,
+          "text": "        let newest = std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(2);"
+        },
+        {
+          "line": 982,
+          "text": "        File::open(fixture.0.join(\"docs/task.md\"))"
+        },
+        {
+          "line": 986,
+          "text": "        File::open(fixture.0.join(\"docs/nested/task-handoff.md\"))"
+        },
+        {
+          "line": 994,
+          "text": "        assert_eq!(task_reports(&fixture.0, \"task\").unwrap(), expected);"
+        },
+        {
+          "line": 998,
+          "text": "            fixture.0.join(\"docs/task.md\"),"
+        },
+        {
+          "line": 1004,
+          "text": "                File::open(fixture.0.join(\"docs/task.md\"))"
+        },
+        {
+          "line": 1010,
+          "text": "        assert_eq!(task_reports(&fixture.0, \"task\").unwrap(), expected);"
+        },
+        {
+          "line": 1012,
+          "text": "            fixture.0.join(\"docs/task.md\"),"
+        },
+        {
+          "line": 1016,
+          "text": "        disk::write(fixture.0.join(\"inside.md\"), \"Contained target is a report\").unwrap();"
+        },
+        {
+          "line": 1017,
+          "text": "        File::open(fixture.0.join(\"inside.md\"))"
+        },
+        {
+          "line": 1022,
+          "text": "            fixture.0.join(\"inside.md\"),"
+        },
+        {
+          "line": 1026,
+          "text": "        symlink(\"../inside.md\", fixture.0.join(\"docs/task-handoff-link.md\")).unwrap();"
+        },
+        {
+          "line": 1027,
+          "text": "        // The newly created link sorts ahead of 1970-dated regular entries,"
+        },
+        {
+          "line": 1034,
+          "text": "        assert_eq!(task_reports(&fixture.0, \"task\").unwrap(), linked);"
+        },
+        {
+          "line": 1036,
+          "text": "        symlink(\"nested\", fixture.0.join(\"docs/linked-dir\")).unwrap();"
+        },
+        {
+          "line": 1037,
+          "text": "        assert_eq!(task_reports(&fixture.0, \"task\").unwrap(), linked);"
+        },
+        {
+          "line": 1039,
+          "text": "        disk::write(outside.0.join(\"report.md\"), \"Outside project\").unwrap();"
+        },
+        {
+          "line": 1040,
+          "text": "        disk::remove_file(fixture.0.join(\"docs/task-handoff-link.md\")).unwrap();"
+        },
+        {
+          "line": 1042,
+          "text": "            outside.0.join(\"report.md\"),"
+        },
+        {
+          "line": 1043,
+          "text": "            fixture.0.join(\"docs/task-handoff-link.md\"),"
+        },
+        {
+          "line": 1046,
+          "text": "        let error = task_reports(&fixture.0, \"task\")"
+        },
+        {
+          "line": 1060,
+          "text": "        disk::remove_file(fixture.0.join(\"docs/task-handoff-link.md\")).unwrap();"
+        },
+        {
+          "line": 1061,
+          "text": "        symlink(\"../inside.md\", fixture.0.join(\"docs/task-handoff-link.md\")).unwrap();"
+        },
+        {
+          "line": 1062,
+          "text": "        assert_eq!(task_reports(&fixture.0, \"task\").unwrap(), linked);"
+        },
+        {
+          "line": 1063,
+          "text": "        disk::remove_file(fixture.0.join(\"docs/task-handoff-link.md\")).unwrap();"
+        },
+        {
+          "line": 1064,
+          "text": "        assert_eq!(task_reports(&fixture.0, \"task\").unwrap(), expected);"
+        },
+        {
+          "line": 1065,
+          "text": "        disk::remove_file(fixture.0.join(\"docs/task.md\")).unwrap();"
+        },
+        {
+          "line": 1066,
+          "text": "        disk::create_dir(fixture.0.join(\"docs/task.md\")).unwrap();"
+        },
+        {
+          "line": 1069,
+          "text": "            task_reports(&fixture.0, \"task\").unwrap(),"
+        },
+        {
+          "line": 1073,
+          "text": "            task_reports(&fixture.0, \"../task\"),"
+        },
+        {
+          "line": 1085,
+          "text": "        disk::create_dir(fixture.0.join(\"docs\")).unwrap();"
+        },
+        {
+          "line": 1086,
+          "text": "        disk::write(fixture.0.join(\"docs/task.md\"), \"partial\").unwrap();"
+        },
+        {
+          "line": 1088,
+          "text": "            task_reports(&fixture.0, \"task\").unwrap(),"
+        },
+        {
+          "line": 1091,
+          "text": "        disk::set_permissions(fixture.0.join(\"docs\"), disk::Permissions::from_mode(0o000)).unwrap();"
+        },
+        {
+          "line": 1092,
+          "text": "        let failed = task_reports(&fixture.0, \"task\");"
+        },
+        {
+          "line": 1093,
+          "text": "        disk::set_permissions(fixture.0.join(\"docs\"), disk::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 1098,
+          "text": "            task_reports(&fixture.0, \"task\").unwrap(),"
+        },
+        {
+          "line": 1103,
+          "text": "    /// interruption emptiness, environment/check/limit categories and redaction."
+        },
+        {
+          "line": 1112,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 1115,
+          "text": "            terminal_diagnostics(&[agent.clone()]).unwrap()[0],"
+        },
+        {
+          "line": 1116,
+          "text": "            AttemptDiagnostic::default()"
+        },
+        {
+          "line": 1121,
+          "text": "        let diagnostic = terminal_diagnostics(&[agent.clone()]).unwrap().remove(0);"
+        },
+        {
+          "line": 1123,
+          "text": "            diagnostic.items.as_ref().unwrap()[0].category,"
+        },
+        {
+          "line": 1127,
+          "text": "        assert_eq!(diagnostic.observed_errors, 0);"
+        },
+        {
+          "line": 1130,
+          "text": "            terminal_diagnostics(&[agent.clone()]).unwrap()[0]"
+        },
+        {
+          "line": 1133,
+          "text": "                .unwrap()[0]"
+        },
+        {
+          "line": 1138,
+          "text": "        agent.limits.max_consecutive_errors = 4;"
+        },
+        {
+          "line": 1139,
+          "text": "        let diagnostic = terminal_diagnostics(&[agent.clone()]).unwrap().remove(0);"
+        },
+        {
+          "line": 1141,
+          "text": "        assert_eq!(diagnostic.consecutive_error_limit, 4);"
+        },
+        {
+          "line": 1144,
+          "text": "            terminal_diagnostics(&[agent.clone()]).unwrap()[0]"
+        },
+        {
+          "line": 1147,
+          "text": "                .unwrap()[0]"
+        },
+        {
+          "line": 1150,
+          "text": "                .unwrap()[0],"
+        },
+        {
+          "line": 1155,
+          "text": "            terminal_diagnostics(&[agent.clone()]).unwrap()[0],"
+        },
+        {
+          "line": 1158,
+          "text": "        agent.diagnostic = AttemptDiagnostic::default();"
+        },
+        {
+          "line": 1159,
+          "text": "        agent.activity = \"x\".repeat(601);"
+        },
+        {
+          "line": 1162,
+          "text": "            clipped[0].items.as_ref().unwrap()[0]"
+        },
+        {
+          "line": 1165,
+          "text": "                .unwrap()[0],"
+        },
+        {
+          "line": 1166,
+          "text": "            format!(\"{}…\", \"x\".repeat(599))"
+        },
+        {
+          "line": 1182,
+          "text": "        disk::create_dir(fixture.0.join(\"docs\")).unwrap();"
+        },
+        {
+          "line": 1183,
+          "text": "        disk::write(fixture.0.join(\"docs/task.md\"), \"actual scanner control\").unwrap();"
+        },
+        {
+          "line": 1185,
+          "text": "            task_reports(&fixture.0, \"task\").unwrap(),"
+        },
+        {
+          "line": 1193,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 1198,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 1207,
+          "text": "                activity: \"x\".repeat(601),"
+        },
+        {
+          "line": 1208,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 1217,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 1223,
+          "text": "        assert_eq!(diagnostics[0], AttemptDiagnostic::default());"
+        },
+        {
+          "line": 1224,
+          "text": "        assert!(!diagnostics[1].items.as_ref().unwrap().is_empty());"
+        },
+        {
+          "line": 1226,
+          "text": "        disk::set_permissions(fixture.0.join(\"docs\"), disk::Permissions::from_mode(0o000)).unwrap();"
+        },
+        {
+          "line": 1228,
+          "text": "            assert!(task_reports(&fixture.0, \"task\").is_err());"
+        },
+        {
+          "line": 1231,
+          "text": "            &fixture.0,"
+        },
+        {
+          "line": 1232,
+          "text": "            &work.tasks.as_ref().unwrap()[0],"
+        },
+        {
+          "line": 1233,
+          "text": "            Some(&agents[0]),"
+        },
+        {
+          "line": 1240,
+          "text": "        disk::set_permissions(fixture.0.join(\"docs\"), disk::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 1262,
+          "text": "        assert_eq!(projected.review, 1);"
+        },
+        {
+          "line": 1263,
+          "text": "        assert_eq!(projected.validated, 0);"
+        },
+        {
+          "line": 1264,
+          "text": "        assert_eq!(projected.running, 0);"
+        },
+        {
+          "line": 1265,
+          "text": "        let task = &projected.tasks[0];"
+        },
+        {
+          "line": 1276,
+          "text": "        agents[0].diagnostic = diagnostics[1].clone();"
+        },
+        {
+          "line": 1277,
+          "text": "        assert_eq!(terminal_diagnostics(&agents).unwrap()[0], diagnostics[1]);"
+        },
+        {
+          "line": 1278,
+          "text": "        agents[0].status = \"running\".into();"
+        },
+        {
+          "line": 1280,
+          "text": "        agents[0].status = \"completed\".into();"
+        },
+        {
+          "line": 1282,
+          "text": "        work.tasks.as_mut().unwrap()[0].status = \"blocked\".into();"
+        },
+        {
+          "line": 1284,
+          "text": "        work.tasks.as_mut().unwrap()[0].status = \"submitted\".into();"
+        },
+        {
+          "line": 1286,
+          "text": "        work.tasks.as_mut().unwrap()[0].independent_review = Some(Box::default());"
+        },
+        {
+          "line": 1289,
+          "text": "            &fixture.0,"
+        },
+        {
+          "line": 1290,
+          "text": "            &work.tasks.as_ref().unwrap()[0],"
+        },
+        {
+          "line": 1291,
+          "text": "            Some(&agents[0]),"
+        },
+        {
+          "line": 1296,
+          "text": "        work.tasks.as_mut().unwrap()[0].independent_review = None;"
+        },
+        {
+          "line": 1298,
+          "text": "        work.tasks.as_mut().unwrap()[0].previous_reviews = Some(vec![Default::default()]);"
+        },
+        {
+          "line": 1300,
+          "text": "        work.tasks.as_mut().unwrap()[0].previous_reviews = None;"
+        },
+        {
+          "line": 1302,
+          "text": "        agents[1].status = \"completed\".into();"
+        },
+        {
+          "line": 1310,
+          "text": "                &fixture.0,"
+        },
+        {
+          "line": 1311,
+          "text": "                &work.tasks.as_ref().unwrap()[0],"
+        },
+        {
+          "line": 1337,
+          "text": "        let mut recent_task = window_work.tasks.as_ref().unwrap()[0].clone();"
+        },
+        {
+          "line": 1340,
+          "text": "        let mut window_agents: Vec<_> = (0..200)"
+        },
+        {
+          "line": 1342,
+          "text": "                let mut agent = agents[0].clone();"
+        },
+        {
+          "line": 1349,
+          "text": "        window_agents.push(agents[0].clone());"
+        },
+        {
+          "line": 1351,
+          "text": "        supported(&window_work, &window_agents[..200]).unwrap();"
+        },
+        {
+          "line": 1352,
+          "text": "        supported(&window_work, &window_agents[..0]).unwrap();"
+        },
+        {
+          "line": 1356,
+          "text": "        assert_eq!(hidden.tasks[0].state, \"review\");"
+        },
+        {
+          "line": 1357,
+          "text": "        assert_eq!(hidden.tasks[0].result.state, \"result_to_review\");"
+        },
+        {
+          "line": 1358,
+          "text": "        assert_eq!(hidden.tasks[0].result.process_state, \"unknown\");"
+        },
+        {
+          "line": 1359,
+          "text": "        assert!(hidden.tasks[0].attempt.agent_id.is_empty());"
+        },
+        {
+          "line": 1360,
+          "text": "        assert!(hidden.tasks[0].attempt.attempt_id.is_empty());"
+        },
+        {
+          "line": 1361,
+          "text": "        assert_eq!(hidden.validated, 0);"
+        },
+        {
+          "line": 1363,
+          "text": "        refused.tasks.as_mut().unwrap()[0].planning_retry = true;"
+        },
+        {
+          "line": 1365,
+          "text": "        refused.tasks.as_mut().unwrap()[0].planning_retry = false;"
+        },
+        {
+          "line": 1366,
+          "text": "        refused.tasks.as_mut().unwrap()[0].independent_review = Some(Box::default());"
+        },
+        {
+          "line": 1368,
+          "text": "        refused.tasks.as_mut().unwrap()[0].independent_review = None;"
+        },
+        {
+          "line": 1369,
+          "text": "        refused.tasks.as_mut().unwrap()[0].status = \"blocked\".into();"
+        },
+        {
+          "line": 1371,
+          "text": "        refused.tasks.as_mut().unwrap()[0].status = \"submitted\".into();"
+        },
+        {
+          "line": 1374,
+          "text": "        assert_eq!(completed.tasks[0].attempt.agent_id, \"current\");"
+        },
+        {
+          "line": 1375,
+          "text": "        assert_eq!(completed.tasks[0].attempt.attempt_id, \"current-attempt\");"
+        },
+        {
+          "line": 1376,
+          "text": "        assert_eq!(completed.tasks[0].result.state, \"result_to_review\");"
+        },
+        {
+          "line": 1377,
+          "text": "        assert_eq!(completed.tasks[0].result.process_state, \"completed\");"
+        },
+        {
+          "line": 1378,
+          "text": "        assert_eq!(completed.validated, 0);"
+        },
+        {
+          "line": 1379,
+          "text": "        assert_eq!(agents[1].id, \"previous\");"
+        },
+        {
+          "line": 1380,
+          "text": "        assert_eq!(agents[1].status, \"completed\");"
+        },
+        {
+          "line": 1381,
+          "text": "        work.tasks.as_mut().unwrap()[0].status = \"blocked\".into();"
+        },
+        {
+          "line": 1382,
+          "text": "        agents[0].status = \"failed\".into();"
+        },
+        {
+          "line": 1385,
+          "text": "        assert_eq!(failed.tasks[0].attempt.agent_id, \"current\");"
+        },
+        {
+          "line": 1386,
+          "text": "        assert_eq!(failed.tasks[0].result.process_state, \"failed\");"
+        },
+        {
+          "line": 1387,
+          "text": "        assert_ne!(failed.tasks[0].result.state, \"result_to_review\");"
+        },
+        {
+          "line": 1388,
+          "text": "        assert_eq!(failed.validated, 0);"
+        },
+        {
+          "line": 1389,
+          "text": "        agents[1].status = \"running\".into();"
+        },
+        {
+          "line": 1391,
+          "text": "        agents[1].status = \"completed\".into();"
+        },
+        {
+          "line": 1393,
+          "text": "        agents[0].status = \"completed\".into();"
+        },
+        {
+          "line": 1395,
+          "text": "        work.tasks.as_mut().unwrap()[0].status = \"submitted\".into();"
+        },
+        {
+          "line": 1397,
+          "text": "        agents[1].status = \"failed\".into();"
+        },
+        {
+          "line": 1401,
+          "text": "    /// Boundary equality uses an explicit test margin, never a product default."
+        },
+        {
+          "line": 1406,
+          "text": "        let mut agent = Agent { task_id: \"task\".into(), started: \"1970-01-01T00:01:40Z\".into(), ..Default::default() };"
+        },
+        {
+          "line": 1408,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,2,&mut causes).unwrap(),Unavailable { .. }));"
+        },
+        {
+          "line": 1409,
+          "text": "        disk::create_dir(fixture.0.join(\"docs\")).unwrap();"
+        },
+        {
+          "line": 1410,
+          "text": "        let path=fixture.0.join(\"docs/task.md\");disk::write(&path,\"actual report\").unwrap();"
+        },
+        {
+          "line": 1411,
+          "text": "        let set_time=|seconds| { disk::File::options().write(true).open(&path).unwrap().set_times("
+        },
+        {
+          "line": 1413,
+          "text": "        set_time(98);"
+        },
+        {
+          "line": 1414,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,2,&mut causes).unwrap(),Attributed(name) if name==\"docs/task.md\"));"
+        },
+        {
+          "line": 1415,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Unavailable{reason} if reason.contains(\"1 rapport(s) antérieur(s)\")));"
+        },
+        {
+          "line": 1416,
+          "text": "        set_time(100);"
+        },
+        {
+          "line": 1417,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Attributed(_)));"
+        },
+        {
+          "line": 1418,
+          "text": "        let second=fixture.0.join(\"docs/task-other-handoff.md\");disk::write(&second,\"second\").unwrap();"
+        },
+        {
+          "line": 1419,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Unavailable{reason} if reason.contains(\"plusieurs rapports\") && reason.contains(\"docs/task.md\") && reason.contains(\"docs/task-other-handoff.md\")));"
+        },
+        {
+          "line": 1421,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Unavailable{reason} if reason==\"aucun rapport lisible et non vide sous docs/ pour cette tâche\"));"
+        },
+        {
+          "line": 1423,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Attributed(_)));"
+        },
+        {
+          "line": 1425,
+          "text": "        assert!(proven_report(&fixture.0,&agent,-1,&mut causes).is_err());"
+        },
+        {
+          "line": 1427,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Unavailable{reason} if reason==\"date de départ de la tentative illisible\"));"
+        },
+        {
+          "line": 1428,
+          "text": "        assert_eq!(causes.len(),1);assert!(std::error::Error::source(&causes[0]).is_some());"
+        },
+        {
+          "line": 1436,
+          "text": "        disk::create_dir(fixture.0.join(\"docs\")).unwrap();"
+        },
+        {
+          "line": 1437,
+          "text": "        let path=fixture.0.join(\"docs/task.md\");disk::write(&path,\"owned\").unwrap();"
+        },
+        {
+          "line": 1438,
+          "text": "        let agent=Agent { task_id:\"task\".into(), started:\"1970-01-01T00:00:00Z\".into(), ..Default::default() };"
+        },
+        {
+          "line": 1439,
+          "text": "        let mut causes=Vec::new();assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Attributed(_)));"
+        },
+        {
+          "line": 1440,
+          "text": "        let original=disk::read(&path).unwrap();disk::write(foreign.0.join(\"report\"),\"foreign\").unwrap();"
+        },
+        {
+          "line": 1441,
+          "text": "        disk::remove_file(&path).unwrap();std::os::unix::fs::symlink(foreign.0.join(\"report\"),&path).unwrap();"
+        },
+        {
+          "line": 1442,
+          "text": "        assert!(proven_report(&fixture.0,&agent,0,&mut causes).is_err());"
+        },
+        {
+          "line": 1444,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Attributed(_)));"
+        }
+      ],
+      "functions": [
+        {
+          "line": 15,
+          "text": "fn cause(code: &'static str, cause: impl Error + Send + Sync + 'static) -> E {"
+        },
+        {
+          "line": 24,
+          "text": "fn close<T>(result: Result<T, E>, file: File) -> Result<T, E> {"
+        },
+        {
+          "line": 33,
+          "text": "fn directory(file: &File) -> Result<std::fs::Metadata, E> {"
+        },
+        {
+          "line": 50,
+          "text": "fn walk("
+        },
+        {
+          "line": 160,
+          "text": "pub(super) fn task_reports(root: &Path, task: &str) -> Result<Vec<String>, E> {"
+        },
+        {
+          "line": 196,
+          "text": "fn proven_report(root: &Path, agent: &Agent, skew: i64, causes: &mut Vec<E>)"
+        },
+        {
+          "line": 230,
+          "text": "fn unsubmitted_pair(task: &crate::Task, agent: &Agent) -> bool {"
+        },
+        {
+          "line": 238,
+          "text": "fn trace(reason: &str) -> Result<String, E> {"
+        },
+        {
+          "line": 260,
+          "text": "fn category(reason: &str) -> &'static str {"
+        },
+        {
+          "line": 315,
+          "text": "fn item(category: &str, reason: &str, trace: String) -> DiagnosticItem {"
+        },
+        {
+          "line": 341,
+          "text": "pub(super) fn terminal_diagnostics(agents: &[Agent]) -> Result<Vec<AttemptDiagnostic>, E> {"
+        },
+        {
+          "line": 413,
+          "text": "pub(super) fn environment_recovery(agent: &Agent, diagnostic: &AttemptDiagnostic) -> bool {"
+        },
+        {
+          "line": 427,
+          "text": "pub(super) fn diagnostics(agents: &[Agent]) -> Result<Vec<AttemptDiagnostic>, E> {"
+        },
+        {
+          "line": 455,
+          "text": "fn planned_pair(task: &crate::Task, agent: &Agent) -> bool {"
+        },
+        {
+          "line": 469,
+          "text": "fn review_requires_projection(task: &crate::Task) -> bool {"
+        },
+        {
+          "line": 475,
+          "text": "fn matching_review(task:&crate::Task,agent:&Agent)->bool {"
+        },
+        {
+          "line": 482,
+          "text": "fn review_shape(work:&crate::Work,task:&crate::Task,agents:&[Agent])->bool {"
+        },
+        {
+          "line": 523,
+          "text": "pub(super) fn supported(work: &crate::Work, agents: &[Agent]) -> Result<(), E> {"
+        },
+        {
+          "line": 637,
+          "text": "pub(super) fn supported_view(work: &crate::Work, agents: &[Agent]) -> Result<(), E> {"
+        },
+        {
+          "line": 651,
+          "text": "pub(super) fn agent_observations<'a>("
+        },
+        {
+          "line": 680,
+          "text": "pub(super) fn observed_result_inputs(root:&Path,work:&crate::Work,task:&crate::Task,agent:Option<&Agent>,settings:&crate::EngineSettingsDocument,causes:&mut Vec<E>,mut facts:super::TaskFreshnessEvidence)->Result<crate::mission_status_tasks::ResultObservation,E> {"
+        },
+        {
+          "line": 701,
+          "text": "pub(super) fn result_inputs(root:&Path,task:&crate::Task,agent:Option<&Agent>,freshness:crate::mission_status_tasks::FreshnessObservation,gate:crate::mission_status_tasks::GateObservation)->Result<crate::mission_status_tasks::ResultObservation,E> {"
+        },
+        {
+          "line": 722,
+          "text": "fn result_inputs_with_review("
+        },
+        {
+          "line": 772,
+          "text": "pub(super) fn active_cooldowns("
+        },
+        {
+          "line": 820,
+          "text": "    fn mission_status_accepted_guard_keeps_review_and_recovery_refusals() {"
+        },
+        {
+          "line": 844,
+          "text": "    fn mission_status_active_guard_requires_running_task_and_real_reports() {"
+        },
+        {
+          "line": 876,
+          "text": "    fn mission_status_selected_active_cooldown_is_observable() {"
+        },
+        {
+          "line": 935,
+          "text": "    fn mission_status_trace_clips_terminal_cells_not_utf8_bytes() {"
+        },
+        {
+          "line": 947,
+          "text": "        fn new() -> Self {"
+        },
+        {
+          "line": 957,
+          "text": "        fn drop(&mut self) {"
+        },
+        {
+          "line": 968,
+          "text": "    fn mission_status_reports_contained_scan_symlinks_refusal_recovery() {"
+        },
+        {
+          "line": 1080,
+          "text": "    fn mission_status_reports_permission_refusal_preserves_cause_and_recovery() {"
+        },
+        {
+          "line": 1106,
+          "text": "    fn mission_status_reports_terminal_diagnostic_real_fallback_and_refusals() {"
+        },
+        {
+          "line": 1179,
+          "text": "    fn mission_status_reports_completed_submitted_uses_retained_report_without_scan() {"
+        },
+        {
+          "line": 1403,
+          "text": "    fn mission_status_unsubmitted_report_selection_and_recovery() {"
+        },
+        {
+          "line": 1433,
+          "text": "    fn mission_status_unsubmitted_report_path_error_is_not_absence() {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 1,
+          "text": "//! Real active/terminal report discovery and Go fallback diagnostics. No"
+        },
+        {
+          "line": 8,
+          "text": "    error::Error,"
+        },
+        {
+          "line": 14,
+          "text": "/// Preserve the original typed IO/encoding cause behind the safe existing error."
+        },
+        {
+          "line": 36,
+          "text": "        .map_err(|e| cause(\"mission-status-reports-metadata\", e))?;"
+        },
+        {
+          "line": 38,
+          "text": "        return Err(E::Refused(\"mission-status-reports-not-directory\"));"
+        },
+        {
+          "line": 57,
+          "text": "    let before = directory(file)?;"
+        },
+        {
+          "line": 64,
+          "text": "        let entry = entry.map_err(|e| cause(\"mission-status-reports-read\", e))?;"
+        },
+        {
+          "line": 69,
+          "text": "        let name = std::str::from_utf8(raw).map_err(|e| cause(\"mission-status-reports-name\", e))?;"
+        },
+        {
+          "line": 75,
+          "text": "            .map_err(|e| cause(\"mission-status-reports-stat\", e))?;"
+        },
+        {
+          "line": 85,
+          "text": "            .map_err(|e| cause(\"mission-status-reports-open-directory\", e))?"
+        },
+        {
+          "line": 88,
+          "text": "                let actual = directory(&child)?;"
+        },
+        {
+          "line": 90,
+          "text": "                    return Err(E::Refused(\"mission-status-reports-directory-changed\"));"
+        },
+        {
+          "line": 92,
+          "text": "                walk(root, &child, &path, task, found)?;"
+        },
+        {
+          "line": 94,
+          "text": "                    .map_err(|e| cause(\"mission-status-reports-restat\", e))?;"
+        },
+        {
+          "line": 96,
+          "text": "                    return Err(E::Refused(\"mission-status-reports-directory-changed\"));"
+        },
+        {
+          "line": 100,
+          "text": "            close(result, child)?;"
+        },
+        {
+          "line": 103,
+          "text": "                .map_err(|cause| E::Gate(crate::GateContractError::Evaluation(cause)))?;"
+        },
+        {
+          "line": 105,
+          "text": "                .map_err(|e| cause(\"mission-status-reports-restat\", e))?;"
+        },
+        {
+          "line": 123,
+          "text": "                return Err(E::Refused(\"mission-status-reports-file-changed\"));"
+        },
+        {
+          "line": 130,
+          "text": "                return Err(E::Refused(\"mission-status-reports-file-changed\"));"
+        },
+        {
+          "line": 138,
+          "text": "    let after = directory(file)?;"
+        },
+        {
+          "line": 150,
+          "text": "        return Err(E::Refused(\"mission-status-reports-directory-changed\"));"
+        },
+        {
+          "line": 162,
+          "text": "        return Err(E::Refused(\"mission-status-report-task-invalid\"));"
+        },
+        {
+          "line": 171,
+          "text": "        Err(rustix::io::Errno::NOENT) => return Ok(Vec::new()),"
+        },
+        {
+          "line": 172,
+          "text": "        Err(e) => return Err(cause(\"mission-status-reports-open\", e)),"
+        },
+        {
+          "line": 175,
+          "text": "        let before = directory(&file)?;"
+        },
+        {
+          "line": 177,
+          "text": "        walk(root, &file, \"docs\", task, &mut found)?;"
+        },
+        {
+          "line": 179,
+          "text": "            .map_err(|e| cause(\"mission-status-reports-path\", e))?;"
+        },
+        {
+          "line": 181,
+          "text": "            return Err(E::Refused(\"mission-status-reports-directory-changed\"));"
+        },
+        {
+          "line": 190,
+          "text": "/// fallback. Nonempty regular candidates at/after start-minus-margin are fresh;"
+        },
+        {
+          "line": 199,
+          "text": "    if skew < 0 { return Err(E::Refused(\"mission-status-report-clock-skew-invalid\")); }"
+        },
+        {
+          "line": 202,
+          "text": "        Err(error) => {"
+        },
+        {
+          "line": 203,
+          "text": "            causes.push(cause(\"mission-status-report-start-invalid\", error));"
+        },
+        {
+          "line": 212,
+          "text": "    for name in task_reports(root, &agent.task_id)? {"
+        },
+        {
+          "line": 214,
+          "text": "            .map_err(|e| E::Gate(crate::GateContractError::Evaluation(e)))?;"
+        },
+        {
+          "line": 224,
+          "text": "        _ => Ok(Unavailable { reason: format!(\"plusieurs rapports candidats pour cette tentative ({})\", fresh.join(\", \")) }),"
+        },
+        {
+          "line": 234,
+          "text": "/// Go operationText masking and terminal-cell clipping for fallback traces."
+        },
+        {
+          "line": 257,
+          "text": "        .map_err(|error| cause(\"mission-status-diagnostic-width\", error))"
+        },
+        {
+          "line": 272,
+          "text": "        \"cifs error\","
+        },
+        {
+          "line": 313,
+          "text": "/// Construct the single real fallback item (no structured tool failure supplied)."
+        },
+        {
+          "line": 321,
+          "text": "        _=>(\"Cause inconnue\",\"La cause exacte n’est pas disponible dans les événements structurés de cette tentative.\",\"Le résultat de la tentative reste indéterminé ; aucune reprise automatique sûre ne peut être déduite.\",\"Ouvrir les traces conservées et établir la cause avant de choisir une reprise.\",\"inspect_traces\"),"
+        },
+        {
+          "line": 339,
+          "text": "/// Failed/nonoperator-interrupted causes receive the real fallback."
+        },
+        {
+          "line": 349,
+          "text": "                return Err(E::Refused(\"mission-status-agent-classification-unported\"));"
+        },
+        {
+          "line": 375,
+          "text": "            let item = item(category, &format!(\"{reason}.\"), trace(reason)?);"
+        },
+        {
+          "line": 424,
+          "text": "/// terminal fallback. Real structured items/errors are retained; active activity"
+        },
+        {
+          "line": 454,
+          "text": "/// No IO, mutation, hidden policy or fallback to success for unknown states."
+        },
+        {
+          "line": 460,
+          "text": "        _ => false,"
+        },
+        {
+          "line": 533,
+          "text": "        return Err(E::Refused(\"mission-status-active-task-mismatch\"));"
+        },
+        {
+          "line": 544,
+          "text": "            return Err(E::Refused(\"mission-status-planning-unported\"));"
+        },
+        {
+          "line": 558,
+          "text": "            return Err(E::Refused(\"mission-status-planning-initial-tasks-unported\"));"
+        },
+        {
+          "line": 564,
+          "text": "                return Err(E::Refused(\"mission-status-planning-lease-shape-invalid\"));"
+        },
+        {
+          "line": 568,
+          "text": "                    .map_err(|error| cause(\"mission-status-planning-lease-invalid\", error))?;"
+        },
+        {
+          "line": 577,
+          "text": "        })?;"
+        },
+        {
+          "line": 585,
+          "text": "        return Err(E::Refused(\"mission-status-agent-classification-unported\"));"
+        },
+        {
+          "line": 598,
+          "text": "                _ => false,"
+        },
+        {
+          "line": 612,
+          "text": "                return Err(E::Refused(\"mission-status-terminal-task-branch-unported\"));"
+        },
+        {
+          "line": 616,
+          "text": "                return Err(E::Refused(\"mission-status-task-history-unported\"));"
+        },
+        {
+          "line": 625,
+          "text": "                return Err(E::Refused(\"mission-status-profile-task-branch-unported\"));"
+        },
+        {
+          "line": 642,
+          "text": "        return Err(E::Refused(\"mission-status-task-history-unported\"));"
+        },
+        {
+          "line": 656,
+          "text": "        return Err(E::Refused("
+        },
+        {
+          "line": 683,
+          "text": "        Some(agent) if task.status!=\"accepted\"=>Some(super::mission_status_review::observe(root,work,task,agent,settings,causes)?),"
+        },
+        {
+          "line": 691,
+          "text": "                    .map_err(E::Settings)?, causes)?)"
+        },
+        {
+          "line": 693,
+          "text": "        _ => None,"
+        },
+        {
+          "line": 739,
+          "text": "            return Err(E::Refused(\"mission-status-terminal-review-unported\"));"
+        },
+        {
+          "line": 744,
+          "text": "            return Err(E::Refused(\"mission-status-completed-unsubmitted-unported\"));"
+        },
+        {
+          "line": 753,
+          "text": "            ReportListing::Observed(task_reports(root, &task.id)?)"
+        },
+        {
+          "line": 805,
+          "text": "            .map_err(|e| E::Launch(Box::new(e)))?;"
+        },
+        {
+          "line": 823,
+          "text": "        supported(&work,std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 824,
+          "text": "        work.tasks.as_mut().unwrap()[0].status = \"accepted\".into();"
+        },
+        {
+          "line": 825,
+          "text": "        supported(&work,std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 826,
+          "text": "        supported(&work,&[]).unwrap();"
+        },
+        {
+          "line": 829,
+          "text": "        let task = &work.tasks.as_ref().unwrap()[0];"
+        },
+        {
+          "line": 831,
+          "text": "            FreshnessObservation::NotCurrent { blockers: vec![\"Gate manquante\".into()] },GateObservation::Absent).unwrap();"
+        },
+        {
+          "line": 832,
+          "text": "        assert_eq!(result_presentation(task,None,&facts).unwrap().state,\"validation_stale\");"
+        },
+        {
+          "line": 835,
+          "text": "        work.tasks.as_mut().unwrap()[0].planning_retry = true;"
+        },
+        {
+          "line": 837,
+          "text": "        work.tasks.as_mut().unwrap()[0].planning_retry = false;"
+        },
+        {
+          "line": 838,
+          "text": "        work.tasks.as_mut().unwrap()[0].independent_review = Some(Box::default());"
+        },
+        {
+          "line": 860,
+          "text": "        supported(&work, std::slice::from_ref(&agent)).unwrap();"
+        },
+        {
+          "line": 861,
+          "text": "        work.tasks.as_mut().unwrap()[0].planning_retry = true;"
+        },
+        {
+          "line": 863,
+          "text": "        work.tasks.as_mut().unwrap()[0].planning_retry = false;"
+        },
+        {
+          "line": 864,
+          "text": "        work.tasks.as_mut().unwrap()[0].status = \"submitted\".into();"
+        },
+        {
+          "line": 885,
+          "text": "        assert!(active_cooldowns(&fixture.0, &work, 0).unwrap().is_empty());"
+        },
+        {
+          "line": 887,
+          "text": "        disk::create_dir_all(&dir).unwrap();"
+        },
+        {
+          "line": 888,
+          "text": "        disk::set_permissions(&dir, disk::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 897,
+          "text": "        let bytes = crate::encode_model(&value).unwrap();"
+        },
+        {
+          "line": 898,
+          "text": "        disk::write(&path, &bytes).unwrap();"
+        },
+        {
+          "line": 899,
+          "text": "        disk::set_permissions(&path, disk::Permissions::from_mode(0o600)).unwrap();"
+        },
+        {
+          "line": 901,
+          "text": "            active_cooldowns(&fixture.0, &work, 0).unwrap(),"
+        },
+        {
+          "line": 910,
+          "text": "        assert_eq!(disk::read(&path).unwrap(), bytes);"
+        },
+        {
+          "line": 913,
+          "text": "        disk::write(&path, crate::encode_model(&expired).unwrap()).unwrap();"
+        },
+        {
+          "line": 915,
+          "text": "            active_cooldowns(&fixture.0, &work, 9).unwrap(),"
+        },
+        {
+          "line": 918,
+          "text": "        assert!(active_cooldowns(&fixture.0, &work, 10).unwrap().is_empty());"
+        },
+        {
+          "line": 921,
+          "text": "        disk::write(&path, crate::encode_model(&cleared).unwrap()).unwrap();"
+        },
+        {
+          "line": 922,
+          "text": "        assert!(active_cooldowns(&fixture.0, &work, 0).unwrap().is_empty());"
+        },
+        {
+          "line": 923,
+          "text": "        crate::agent_launch::cooldown(&fixture.0, \"fixture\").unwrap();"
+        },
+        {
+          "line": 925,
+          "text": "        disk::write(&path, crate::encode_model(&cleared).unwrap()).unwrap();"
+        },
+        {
+          "line": 926,
+          "text": "        let error = active_cooldowns(&fixture.0, &work, 0).unwrap_err();"
+        },
+        {
+          "line": 927,
+          "text": "        assert!(matches!(error, E::Launch(_)));"
+        },
+        {
+          "line": 928,
+          "text": "        assert!(!format!(\"{error:?}\").contains(\"PRIVATE-MALFORMED\"));"
+        },
+        {
+          "line": 929,
+          "text": "        disk::write(&path, bytes).unwrap();"
+        },
+        {
+          "line": 930,
+          "text": "        assert_eq!(active_cooldowns(&fixture.0, &work, 0).unwrap().len(), 1);"
+        },
+        {
+          "line": 936,
+          "text": "        assert_eq!(trace(&\"x\".repeat(600)).unwrap(), \"x\".repeat(600));"
+        },
+        {
+          "line": 938,
+          "text": "            trace(&\"\\u{2e3b}\".repeat(200)).unwrap(),"
+        },
+        {
+          "line": 941,
+          "text": "        assert_eq!(trace(&\"é\".repeat(600)).unwrap(), \"é\".repeat(600));"
+        },
+        {
+          "line": 949,
+          "text": "                std::env::temp_dir().join(crate::generate_identifier(\"status-reports-\").unwrap());"
+        },
+        {
+          "line": 950,
+          "text": "            disk::create_dir(&path).unwrap();"
+        },
+        {
+          "line": 951,
+          "text": "            disk::set_permissions(&path, disk::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 961,
+          "text": "                disk::remove_dir_all(&self.0).unwrap();"
+        },
+        {
+          "line": 970,
+          "text": "        assert!(task_reports(&fixture.0, \"task\").unwrap().is_empty());"
+        },
+        {
+          "line": 971,
+          "text": "        disk::create_dir(fixture.0.join(\"docs\")).unwrap();"
+        },
+        {
+          "line": 972,
+          "text": "        disk::create_dir(fixture.0.join(\"docs/nested\")).unwrap();"
+        },
+        {
+          "line": 973,
+          "text": "        disk::write(fixture.0.join(\"docs/task.md\"), \"A real partial report\").unwrap();"
+        },
+        {
+          "line": 978,
+          "text": "        .unwrap();"
+        },
+        {
+          "line": 979,
+          "text": "        disk::write(fixture.0.join(\"docs/other.md\"), \"Unrelated\").unwrap();"
+        },
+        {
+          "line": 983,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 985,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 987,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 989,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 994,
+          "text": "        assert_eq!(task_reports(&fixture.0, \"task\").unwrap(), expected);"
+        },
+        {
+          "line": 1001,
+          "text": "        .unwrap();"
+        },
+        {
+          "line": 1010,
+          "text": "        assert_eq!(task_reports(&fixture.0, \"task\").unwrap(), expected);"
+        },
+        {
+          "line": 1015,
+          "text": "        .unwrap();"
+        },
+        {
+          "line": 1016,
+          "text": "        disk::write(fixture.0.join(\"inside.md\"), \"Contained target is a report\").unwrap();"
+        },
+        {
+          "line": 1018,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 1020,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 1025,
+          "text": "        .unwrap();"
+        },
+        {
+          "line": 1026,
+          "text": "        symlink(\"../inside.md\", fixture.0.join(\"docs/task-handoff-link.md\")).unwrap();"
+        },
+        {
+          "line": 1034,
+          "text": "        assert_eq!(task_reports(&fixture.0, \"task\").unwrap(), linked);"
+        },
+        {
+          "line": 1036,
+          "text": "        symlink(\"nested\", fixture.0.join(\"docs/linked-dir\")).unwrap();"
+        },
+        {
+          "line": 1037,
+          "text": "        assert_eq!(task_reports(&fixture.0, \"task\").unwrap(), linked);"
+        },
+        {
+          "line": 1039,
+          "text": "        disk::write(outside.0.join(\"report.md\"), \"Outside project\").unwrap();"
+        },
+        {
+          "line": 1040,
+          "text": "        disk::remove_file(fixture.0.join(\"docs/task-handoff-link.md\")).unwrap();"
+        },
+        {
+          "line": 1045,
+          "text": "        .unwrap();"
+        },
+        {
+          "line": 1046,
+          "text": "        let error = task_reports(&fixture.0, \"task\")"
+        },
+        {
+          "line": 1048,
+          "text": "        let E::Gate(crate::GateContractError::Evaluation(error)) = error else {"
+        },
+        {
+          "line": 1049,
+          "text": "            panic!(\"outside path must preserve Gate cause\")"
+        },
+        {
+          "line": 1051,
+          "text": "        assert_eq!(error.reason(), \"artifact-path\");"
+        },
+        {
+          "line": 1053,
+          "text": "            error"
+        },
+        {
+          "line": 1060,
+          "text": "        disk::remove_file(fixture.0.join(\"docs/task-handoff-link.md\")).unwrap();"
+        },
+        {
+          "line": 1061,
+          "text": "        symlink(\"../inside.md\", fixture.0.join(\"docs/task-handoff-link.md\")).unwrap();"
+        },
+        {
+          "line": 1062,
+          "text": "        assert_eq!(task_reports(&fixture.0, \"task\").unwrap(), linked);"
+        },
+        {
+          "line": 1063,
+          "text": "        disk::remove_file(fixture.0.join(\"docs/task-handoff-link.md\")).unwrap();"
+        },
+        {
+          "line": 1064,
+          "text": "        assert_eq!(task_reports(&fixture.0, \"task\").unwrap(), expected);"
+        },
+        {
+          "line": 1065,
+          "text": "        disk::remove_file(fixture.0.join(\"docs/task.md\")).unwrap();"
+        },
+        {
+          "line": 1066,
+          "text": "        disk::create_dir(fixture.0.join(\"docs/task.md\")).unwrap();"
+        },
+        {
+          "line": 1069,
+          "text": "            task_reports(&fixture.0, \"task\").unwrap(),"
+        },
+        {
+          "line": 1074,
+          "text": "            Err(E::Refused(\"mission-status-report-task-invalid\"))"
+        },
+        {
+          "line": 1085,
+          "text": "        disk::create_dir(fixture.0.join(\"docs\")).unwrap();"
+        },
+        {
+          "line": 1086,
+          "text": "        disk::write(fixture.0.join(\"docs/task.md\"), \"partial\").unwrap();"
+        },
+        {
+          "line": 1088,
+          "text": "            task_reports(&fixture.0, \"task\").unwrap(),"
+        },
+        {
+          "line": 1091,
+          "text": "        disk::set_permissions(fixture.0.join(\"docs\"), disk::Permissions::from_mode(0o000)).unwrap();"
+        },
+        {
+          "line": 1093,
+          "text": "        disk::set_permissions(fixture.0.join(\"docs\"), disk::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 1094,
+          "text": "        let error = failed"
+        },
+        {
+          "line": 1096,
+          "text": "        assert!(std::error::Error::source(&error).is_some());"
+        },
+        {
+          "line": 1098,
+          "text": "            task_reports(&fixture.0, \"task\").unwrap(),"
+        },
+        {
+          "line": 1102,
+          "text": "    /// Go terminal fallback preserves structured observations, explicit operator"
+        },
+        {
+          "line": 1115,
+          "text": "            terminal_diagnostics(&[agent.clone()]).unwrap()[0],"
+        },
+        {
+          "line": 1121,
+          "text": "        let diagnostic = terminal_diagnostics(&[agent.clone()]).unwrap().remove(0);"
+        },
+        {
+          "line": 1123,
+          "text": "            diagnostic.items.as_ref().unwrap()[0].category,"
+        },
+        {
+          "line": 1130,
+          "text": "            terminal_diagnostics(&[agent.clone()]).unwrap()[0]"
+        },
+        {
+          "line": 1133,
+          "text": "                .unwrap()[0]"
+        },
+        {
+          "line": 1139,
+          "text": "        let diagnostic = terminal_diagnostics(&[agent.clone()]).unwrap().remove(0);"
+        },
+        {
+          "line": 1144,
+          "text": "            terminal_diagnostics(&[agent.clone()]).unwrap()[0]"
+        },
+        {
+          "line": 1147,
+          "text": "                .unwrap()[0]"
+        },
+        {
+          "line": 1150,
+          "text": "                .unwrap()[0],"
+        },
+        {
+          "line": 1155,
+          "text": "            terminal_diagnostics(&[agent.clone()]).unwrap()[0],"
+        },
+        {
+          "line": 1160,
+          "text": "        let clipped = terminal_diagnostics(&[agent.clone()]).unwrap();"
+        },
+        {
+          "line": 1162,
+          "text": "            clipped[0].items.as_ref().unwrap()[0]"
+        },
+        {
+          "line": 1165,
+          "text": "                .unwrap()[0],"
+        },
+        {
+          "line": 1182,
+          "text": "        disk::create_dir(fixture.0.join(\"docs\")).unwrap();"
+        },
+        {
+          "line": 1183,
+          "text": "        disk::write(fixture.0.join(\"docs/task.md\"), \"actual scanner control\").unwrap();"
+        },
+        {
+          "line": 1185,
+          "text": "            task_reports(&fixture.0, \"task\").unwrap(),"
+        },
+        {
+          "line": 1220,
+          "text": "        supported(&work, &agents).unwrap();"
+        },
+        {
+          "line": 1221,
+          "text": "        let diagnostics = terminal_diagnostics(&agents).unwrap();"
+        },
+        {
+          "line": 1222,
+          "text": "        // Go does not interpret completed activity as a failure fallback."
+        },
+        {
+          "line": 1224,
+          "text": "        assert!(!diagnostics[1].items.as_ref().unwrap().is_empty());"
+        },
+        {
+          "line": 1225,
+          "text": "        let observations = agent_observations(&agents, &diagnostics).unwrap();"
+        },
+        {
+          "line": 1226,
+          "text": "        disk::set_permissions(fixture.0.join(\"docs\"), disk::Permissions::from_mode(0o000)).unwrap();"
+        },
+        {
+          "line": 1232,
+          "text": "            &work.tasks.as_ref().unwrap()[0],"
+        },
+        {
+          "line": 1239,
+          "text": "        .unwrap();"
+        },
+        {
+          "line": 1240,
+          "text": "        disk::set_permissions(fixture.0.join(\"docs\"), disk::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 1261,
+          "text": "        .unwrap();"
+        },
+        {
+          "line": 1277,
+          "text": "        assert_eq!(terminal_diagnostics(&agents).unwrap()[0], diagnostics[1]);"
+        },
+        {
+          "line": 1281,
+          "text": "        supported(&work, &agents).unwrap();"
+        },
+        {
+          "line": 1282,
+          "text": "        work.tasks.as_mut().unwrap()[0].status = \"blocked\".into();"
+        },
+        {
+          "line": 1284,
+          "text": "        work.tasks.as_mut().unwrap()[0].status = \"submitted\".into();"
+        },
+        {
+          "line": 1285,
+          "text": "        supported(&work, &agents).unwrap();"
+        },
+        {
+          "line": 1286,
+          "text": "        work.tasks.as_mut().unwrap()[0].independent_review = Some(Box::default());"
+        },
+        {
+          "line": 1290,
+          "text": "            &work.tasks.as_ref().unwrap()[0],"
+        },
+        {
+          "line": 1296,
+          "text": "        work.tasks.as_mut().unwrap()[0].independent_review = None;"
+        },
+        {
+          "line": 1297,
+          "text": "        supported(&work, &agents).unwrap();"
+        },
+        {
+          "line": 1298,
+          "text": "        work.tasks.as_mut().unwrap()[0].previous_reviews = Some(vec![Default::default()]);"
+        },
+        {
+          "line": 1300,
+          "text": "        work.tasks.as_mut().unwrap()[0].previous_reviews = None;"
+        },
+        {
+          "line": 1301,
+          "text": "        supported(&work, &agents).unwrap();"
+        },
+        {
+          "line": 1303,
+          "text": "        supported(&work, &agents).unwrap();"
+        },
+        {
+          "line": 1307,
+          "text": "            let diagnostics = terminal_diagnostics(agents).unwrap();"
+        },
+        {
+          "line": 1308,
+          "text": "            let observations = agent_observations(agents, &diagnostics).unwrap();"
+        },
+        {
+          "line": 1311,
+          "text": "                &work.tasks.as_ref().unwrap()[0],"
+        },
+        {
+          "line": 1318,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 1332,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 1337,
+          "text": "        let mut recent_task = window_work.tasks.as_ref().unwrap()[0].clone();"
+        },
+        {
+          "line": 1339,
+          "text": "        window_work.tasks.as_mut().unwrap().push(recent_task);"
+        },
+        {
+          "line": 1350,
+          "text": "        supported(&window_work, &window_agents).unwrap();"
+        },
+        {
+          "line": 1351,
+          "text": "        supported(&window_work, &window_agents[..200]).unwrap();"
+        },
+        {
+          "line": 1352,
+          "text": "        supported(&window_work, &window_agents[..0]).unwrap();"
+        },
+        {
+          "line": 1353,
+          "text": "        supported(&window_work, &window_agents).unwrap();"
+        },
+        {
+          "line": 1354,
+          "text": "        supported(&work, &[]).unwrap();"
+        },
+        {
+          "line": 1363,
+          "text": "        refused.tasks.as_mut().unwrap()[0].planning_retry = true;"
+        },
+        {
+          "line": 1365,
+          "text": "        refused.tasks.as_mut().unwrap()[0].planning_retry = false;"
+        },
+        {
+          "line": 1366,
+          "text": "        refused.tasks.as_mut().unwrap()[0].independent_review = Some(Box::default());"
+        },
+        {
+          "line": 1368,
+          "text": "        refused.tasks.as_mut().unwrap()[0].independent_review = None;"
+        },
+        {
+          "line": 1369,
+          "text": "        refused.tasks.as_mut().unwrap()[0].status = \"blocked\".into();"
+        },
+        {
+          "line": 1371,
+          "text": "        refused.tasks.as_mut().unwrap()[0].status = \"submitted\".into();"
+        },
+        {
+          "line": 1372,
+          "text": "        supported(&refused, &[]).unwrap();"
+        },
+        {
+          "line": 1381,
+          "text": "        work.tasks.as_mut().unwrap()[0].status = \"blocked\".into();"
+        },
+        {
+          "line": 1383,
+          "text": "        supported(&work, &agents).unwrap();"
+        },
+        {
+          "line": 1392,
+          "text": "        supported(&work, &agents).unwrap();"
+        },
+        {
+          "line": 1395,
+          "text": "        work.tasks.as_mut().unwrap()[0].status = \"submitted\".into();"
+        },
+        {
+          "line": 1396,
+          "text": "        supported(&work, &agents).unwrap();"
+        },
+        {
+          "line": 1398,
+          "text": "        supported(&work, &agents).unwrap();"
+        },
+        {
+          "line": 1408,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,2,&mut causes).unwrap(),Unavailable { .. }));"
+        },
+        {
+          "line": 1409,
+          "text": "        disk::create_dir(fixture.0.join(\"docs\")).unwrap();"
+        },
+        {
+          "line": 1410,
+          "text": "        let path=fixture.0.join(\"docs/task.md\");disk::write(&path,\"actual report\").unwrap();"
+        },
+        {
+          "line": 1411,
+          "text": "        let set_time=|seconds| { disk::File::options().write(true).open(&path).unwrap().set_times("
+        },
+        {
+          "line": 1412,
+          "text": "            disk::FileTimes::new().set_modified(std::time::UNIX_EPOCH + std::time::Duration::from_secs(seconds))).unwrap(); };"
+        },
+        {
+          "line": 1414,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,2,&mut causes).unwrap(),Attributed(name) if name==\"docs/task.md\"));"
+        },
+        {
+          "line": 1415,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Unavailable{reason} if reason.contains(\"1 rapport(s) antérieur(s)\")));"
+        },
+        {
+          "line": 1417,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Attributed(_)));"
+        },
+        {
+          "line": 1418,
+          "text": "        let second=fixture.0.join(\"docs/task-other-handoff.md\");disk::write(&second,\"second\").unwrap();"
+        },
+        {
+          "line": 1419,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Unavailable{reason} if reason.contains(\"plusieurs rapports\") && reason.contains(\"docs/task.md\") && reason.contains(\"docs/task-other-handoff.md\")));"
+        },
+        {
+          "line": 1420,
+          "text": "        disk::remove_file(second).unwrap();disk::write(&path,\"\").unwrap();"
+        },
+        {
+          "line": 1421,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Unavailable{reason} if reason==\"aucun rapport lisible et non vide sous docs/ pour cette tâche\"));"
+        },
+        {
+          "line": 1422,
+          "text": "        disk::write(&path,\"restored\").unwrap();"
+        },
+        {
+          "line": 1423,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Attributed(_)));"
+        },
+        {
+          "line": 1427,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Unavailable{reason} if reason==\"date de départ de la tentative illisible\"));"
+        },
+        {
+          "line": 1428,
+          "text": "        assert_eq!(causes.len(),1);assert!(std::error::Error::source(&causes[0]).is_some());"
+        },
+        {
+          "line": 1436,
+          "text": "        disk::create_dir(fixture.0.join(\"docs\")).unwrap();"
+        },
+        {
+          "line": 1437,
+          "text": "        let path=fixture.0.join(\"docs/task.md\");disk::write(&path,\"owned\").unwrap();"
+        },
+        {
+          "line": 1439,
+          "text": "        let mut causes=Vec::new();assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Attributed(_)));"
+        },
+        {
+          "line": 1440,
+          "text": "        let original=disk::read(&path).unwrap();disk::write(foreign.0.join(\"report\"),\"foreign\").unwrap();"
+        },
+        {
+          "line": 1441,
+          "text": "        disk::remove_file(&path).unwrap();std::os::unix::fs::symlink(foreign.0.join(\"report\"),&path).unwrap();"
+        },
+        {
+          "line": 1443,
+          "text": "        disk::remove_file(&path).unwrap();disk::write(&path,original).unwrap();"
+        },
+        {
+          "line": 1444,
+          "text": "        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Attributed(_)));"
+        }
+      ]
+    },
+    "version_history.json": {
+      "policies": [
+        {
+          "line": 2,
+          "text": "  \"schema_version\": 1,"
+        },
+        {
+          "line": 103,
+          "text": "        \"en\": \"Rust candidate: initial hierarchical missions show provider waits with UTC expiry or explicit intervention, without clearing quotas or implicit retries.\""
+        },
+        {
+          "line": 175,
+          "text": "        \"en\": \"Memory and mission state: an unreadable pause refuses affected launches and operations, retains a safe diagnostic and no longer becomes a false “launches allowed” state.\""
+        },
+        {
+          "line": 182,
+          "text": "        \"fr\": \"Migration Rust en qualification : lecture structurée des avis et trois limites UTF-8 persistantes réglables dans Admin, sans acceptation implicite ni remplacement du serveur.\","
+        },
+        {
+          "line": 183,
+          "text": "        \"en\": \"Rust migration under qualification: structured review reply parsing and three persisted UTF-8 limits editable in Admin, without implicit acceptance or server replacement.\""
+        },
+        {
+          "line": 219,
+          "text": "        \"en\": \"Go/Rust sources under qualification: required criterion bindings from task.add, blank criteria refused and Admin limit consumed by Rust creation; historical task adoption remains open.\""
+        },
+        {
+          "line": 227,
+          "text": "        \"en\": \"Rust migration: persisted configurable default check phases with FR/EN Admin choices; existing task requirements and criteria remain protected. Explicit legacy-setting adoption, safe errors and recovery verified by scope; verification evidence is scoped, while installation and cutover remain separate.\""
+        },
+        {
+          "line": 318,
+          "text": "        \"fr\": \"Recettes Admin : les états de refus visibles remontent hors du polling, avec régressions conservées et sans timeout global arbitraire ; les essais restent distincts du service installé.\","
+        },
+        {
+          "line": 319,
+          "text": "        \"en\": \"Admin recipes: visible refusal states propagate outside polling, with retained regression checks and no arbitrary global timeout; verification remains distinct from the installed service.\""
+        },
+        {
+          "line": 327,
+          "text": "        \"en\": \"Rust migration, verified component: per-attempt frozen Admin failure-window policy, diagnostic CLI replay and shared SQLite retries verified; actual supervision and cutover remain open, no process enabled.\""
+        },
+        {
+          "line": 358,
+          "text": "        \"fr\": \"Candidat Rust non installé : routage natif explicite vérifié sur huit parcours locaux, avec sources relues avant exécution, format modèle v1, limites Admin et reprises ; 566 tests workspace et quatre parcours Admin passent. Migration globale encore partielle.\","
+        },
+        {
+          "line": 359,
+          "text": "        \"en\": \"Uninstalled Rust candidate: explicit native routing verified in eight local journeys, with sources reread before execution, v1 model format, Admin limits and recovery; 566 workspace tests and four Admin journeys pass. Overall migration remains partial.\""
+        },
+        {
+          "line": 366,
+          "text": "        \"fr\": \"Candidat Rust non installé : création et lecture fournisseur par CLI vérifiées sans écrasement ; courses, erreurs de stockage/durabilité/sortie et reprises couvertes. 140 tests de recette, 593 tests workspace tous features et dix parcours natifs passent. Migration globale partielle.\","
+        },
+        {
+          "line": 367,
+          "text": "        \"en\": \"Uninstalled Rust candidate: provider-file CLI create/readback verified without overwrite; creation races, storage/durability/output errors and recovery covered. 140 recipe tests, 593 all-features workspace tests and ten native journeys pass. Overall migration stays partial.\""
+        },
+        {
+          "line": 370,
+          "text": "        \"fr\": \"Candidat Rust86 non installé : édition et restauration fournisseur vérifiées avec aperçu lié au Root, CAS, sauvegardes exactes et reprise. 151 tests Rust, 13 parcours natifs, Clippy et Rustdoc passent ; migration globale partielle.\","
+        },
+        {
+          "line": 371,
+          "text": "        \"en\": \"Uninstalled Rust86 candidate: provider update/restore verified with Root-bound preview, CAS, exact snapshots and recovery. 151 Rust tests, 13 native journeys, Clippy and Rustdoc pass; overall migration partial.\""
+        },
+        {
+          "line": 374,
+          "text": "        \"fr\": \"Candidat Rust87 non installé : choix de modèle par tâche conservé/rejoué et réellement appliqué au processus, avec refus des divergences et reprise. Compatibilité JSON Go et erreurs de transaction/sortie vérifiées. 155 tests de recette, 10 transactionnels et 14 parcours natifs passent ; migration partielle.\","
+        },
+        {
+          "line": 375,
+          "text": "        \"en\": \"Uninstalled Rust87 candidate: task model choice persists/replays and reaches actual process argv, with conflict refusals and recovery. Go JSON compatibility and transaction/output failures verified. 155 recipe tests, 10 transaction tests and 14 native journeys pass; overall migration partial.\""
+        },
+        {
+          "line": 378,
+          "text": "        \"fr\": \"Candidat Rust88 non installé : import/export de politiques explicites avec sauvegarde et refus/reprise ; confirmation UI liée au Root, choix par défaut conservé et règles Admin appliquées. 161 tests Rust et 15 parcours natifs, 4 parcours navigateur passent. Aucun modèle implicite ajouté ; migration globale partielle.\","
+        },
+        {
+          "line": 379,
+          "text": "        \"en\": \"Uninstalled Rust88 candidate: explicit policy import/export with snapshots/refusal/recovery; Root-bound UI confirmation, preserved default choice and saved Admin rules. 161 Rust tests, 15 native and 4 browser journeys pass. No implicit named model added; overall migration partial.\""
+        },
+        {
+          "line": 382,
+          "text": "        \"fr\": \"Candidat Rust89 non installé : mission manuelle worker/rapport/soumission/gate/validation opérateur vérifiée ; identités SQL/corps incohérentes refusées par les lecteurs. 169 tests Rust de recette, 15 parcours de routage et 4 missions passent. Migration globale partielle.\","
+        },
+        {
+          "line": 383,
+          "text": "        \"en\": \"Uninstalled Rust89 candidate: verified manual worker/report/submission/gate/operator acceptance; readers refuse inconsistent SQL/body identities. 169 Rust recipe tests, 15 routing and 4 mission journeys pass. Overall migration partial.\""
+        },
+        {
+          "line": 386,
+          "text": "        \"fr\": \"Candidat Rust90–91 non installé : garde HTTP local et routage typé partiel vers le vrai Root ; datastore lié par descripteur, refus des chemins remplacés, état conservé après échecs tardifs. Session locale persistante qualifiée :202tests Rust, Clippy/Rustdoc et parcours CLI vérifiés ; transport réseau et serveur Go inchangés.\","
+        },
+        {
+          "line": 387,
+          "text": "        \"en\": \"Uninstalled Rust90–91 candidate: local HTTP gate and limited typed routing into actual Root; descriptor-bound datastore, replacement-path refusal, retained state after late failures. Persistent local session qualified:202Rust tests, Clippy/Rustdoc and CLI journeys verified; network transport and Go server unchanged.\""
+        },
+        {
+          "line": 391,
+          "text": "        \"en\": \"Uninstalled Rust92 candidate: retained configuration after init/settings apply/replay output or close failure; refusals without false publication markers. Local qualification206Rust tests, Clippy/Rustdoc and CLI journeys verified.\""
+        },
+        {
+          "line": 430,
+          "text": "        \"fr\": \"Migration Rust102 : commandes Work sous bail vérifiées dans la transaction et avant commit, rollback budgétaire sur expiration et reprise de tests sans timeout arbitraire. Journal, conduite complète et bascule globale restent ouverts ; serveur Go conservé.\","
+        },
+        {
+          "line": 431,
+          "text": "        \"en\": \"Rust migration102: Work commands lease-checked inside the transaction and before commit, budget rollback on expiry and recovered verification without arbitrary timeout. Journal, complete conductor and global cutover remain open; serving Go preserved.\""
+        },
+        {
+          "line": 474,
+          "text": "        \"fr\": \"Candidat Rust113/114 vérifié localement : réservation et décisions task/delegate, refus atomiques et adoption explicite v24→v25 ; réglages Admin FR/EN réellement consommés. Conduite complète et bascule restent ouvertes ; application en service inchangée.\","
+        },
+        {
+          "line": 475,
+          "text": "        \"en\": \"Rust113/114 locally verified candidate: scope claims and task/delegate decisions, atomic refusal and explicit v24→v25 adoption; FR/EN Admin settings consumed by actual operations. Complete orchestration and cutover remain open; the running application is unchanged.\""
+        },
+        {
+          "line": 527,
+          "text": "        \"en\": \"Rust migration: structured-provider waiting and ownership renewal declared as persisted Admin settings; the lease does not become a model-duration limit, runner still in progress.\""
+        },
+        {
+          "line": 531,
+          "text": "        \"en\": \"Rust CLOCK_BOOTTIME clock and absolute timerfd wake primitive, without fallback or new product timeout; planner integration remains in progress.\""
+        },
+        {
+          "line": 534,
+          "text": "        \"fr\": \"Le contrôleur Rust peut réveiller le poll du processus possédé via un descripteur noyau ; vérification locale en cours, sans nouveau timeout global ni raccord planner implicite.\","
+        },
+        {
+          "line": 535,
+          "text": "        \"en\": \"The Rust controller can wake the owned-process poll via a kernel descriptor; local verification in progress, with no new global timeout or implicit planner integration.\""
+        },
+        {
+          "line": 650,
+          "text": "        \"fr\": \"Rust : raccord JSON historique de mission status pour les missions ordinaires sans profil, Agent ni planification ; santé stockage réelle et seuils persistés dans Admin (schéma réglages 38). Qualification du parcours en cours, aucune installation revendiquée.\","
+        },
+        {
+          "line": 651,
+          "text": "        \"en\": \"Rust: historical mission status JSON wired for ordinary missions without profiles, Agents or planning; actual storage health and persisted Admin thresholds (settings schema 38). Journey qualification in progress; no installation claimed.\""
+        },
+        {
+          "line": 665,
+          "text": "      \"version\": \"v0.1.0\","
+        },
+        {
+          "line": 666,
+          "text": "      \"date\": \"2026-10-06\","
+        },
+        {
+          "line": 681,
+          "text": "      \"release_url\": \"https://github.com/mo0ogly/swarm/releases/tag/v0.1.0\""
+        }
+      ],
+      "functions": [],
+      "errors": [
+        {
+          "line": 223,
+          "text": "        \"en\": \"Rust migration: continuous policy, function, error and documentation review, with hash/evidence checks in qualification. This method does not establish exhaustive semantic correctness or deployment.\""
+        },
+        {
+          "line": 243,
+          "text": "        \"en\": \"Rust candidate: ordinary hierarchical projection combines review, gate and dependencies; typed staleness and retained error causes, under verification without cutover.\""
+        },
+        {
+          "line": 267,
+          "text": "        \"en\": \"Worker framing: policy, function documentation and error-handling rules are delivered as a canonical embedded source. No extra rights or raised limits; verification in progress.\""
+        },
+        {
+          "line": 335,
+          "text": "        \"en\": \"Rust migration: manual agent run with private helper, execve without shell fallback, sealed prompt, stream guards and settlement without acceptance. Elapsed duration is observation only; native verification and replay recipe in progress. No service restarted.\""
+        },
+        {
+          "line": 439,
+          "text": "        \"en\": \"Rust migration104: cycle error/recovery journal, shared owner checks and rollback on journal failure.48targeted tests and2HTTP flows pass. Complete conductor and cutover remain open.\""
+        },
+        {
+          "line": 446,
+          "text": "        \"fr\": \"Migration Rust106 : consentement, révocation, pause et autonomie lus sans fallback ; corruption refusée sans mutation, reprise SQL vérifiée.33tests ciblés et2parcours HTTP passent. Configuration et départ automatique restent ouverts.\","
+        },
+        {
+          "line": 447,
+          "text": "        \"en\": \"Rust migration106:consent, revocation, pause and autonomy read without fallback; corruption refused without mutation and SQL recovery verified.33targeted tests and2HTTP flows pass. Configuration and automatic launch remain open.\""
+        },
+        {
+          "line": 531,
+          "text": "        \"en\": \"Rust CLOCK_BOOTTIME clock and absolute timerfd wake primitive, without fallback or new product timeout; planner integration remains in progress.\""
+        },
+        {
+          "line": 611,
+          "text": "        \"en\": \"Rust: read-only reviewer original inputs, saved limits and precise context error reasons; reviewer invocation remains unported.\""
+        }
+      ]
+    }
+  },
+  "independent_review": false,
+  "semantic_guarantee": false,
+  "runtime_acceptance": false
+}

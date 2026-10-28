@@ -1,0 +1,10 @@
+{
+  "pid": 2586491,
+  "proc_start_ticks": "4455840",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-archive-pilot-confirmed.py",
+    "run"
+  ],
+  "at": "2026-10-16T00:22:14.258076+00:00"
+}

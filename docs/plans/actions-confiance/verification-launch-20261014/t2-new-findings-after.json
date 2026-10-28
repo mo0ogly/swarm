@@ -1,0 +1,257 @@
+{
+  "root": "/tmp/swarm-current-contract-fq5lfycg",
+  "binary_sha256": "631c8da29c435c909986077f4c7327e91a5801a2f57453af2bfac2446984de9e",
+  "records": [
+    {
+      "argv": [
+        "/tmp/swarm-actions-confiance-launch/t2-new-findings-fixed-binary",
+        "--root",
+        "/tmp/swarm-current-contract-fq5lfycg",
+        "--json",
+        "init"
+      ],
+      "input": null,
+      "identity": null,
+      "exit_code": 0,
+      "stdout": "{\n  \"root\": \"/tmp/swarm-current-contract-fq5lfycg\",\n  \"schema_version\": 1,\n  \"state\": \".swarm/state.db\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/swarm-actions-confiance-launch/t2-new-findings-fixed-binary",
+        "--root",
+        "/tmp/swarm-current-contract-fq5lfycg",
+        "--json",
+        "trust",
+        "config-apply",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "85c407050a0f400ab3d078b950a29c05",
+        "expected_revision": 0,
+        "reason": "isolated current contract reproduction",
+        "policy": {
+          "mandate_ttl_seconds": 3600,
+          "unknown_reconcile_seconds": 0,
+          "evidence_retention_days": 365,
+          "require_separation": true
+        },
+        "identities": [
+          {
+            "subject": "admin",
+            "token": "admin-token-new-findings-fixture",
+            "integrity": 3,
+            "roles": [
+              "admin"
+            ]
+          },
+          {
+            "subject": "alice",
+            "token": "alice-token-new-findings-fixture",
+            "integrity": 1,
+            "roles": [
+              "requester"
+            ]
+          },
+          {
+            "subject": "bob",
+            "token": "bob-token-new-findings-fixture",
+            "integrity": 2,
+            "roles": [
+              "approver"
+            ]
+          },
+          {
+            "subject": "effect",
+            "token": "effect-token-new-findings-fixture",
+            "integrity": 2,
+            "roles": [
+              "effect"
+            ]
+          }
+        ]
+      },
+      "identity": null,
+      "exit_code": 0,
+      "stdout": "{\n  \"actions\": {},\n  \"amount_minor_text\": {},\n  \"evidence_count\": 0,\n  \"identities\": [\n    {\n      \"integrity\": 3,\n      \"roles\": [\n        \"admin\"\n      ],\n      \"subject\": \"admin\"\n    },\n    {\n      \"integrity\": 1,\n      \"roles\": [\n        \"requester\"\n      ],\n      \"subject\": \"alice\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"approver\"\n      ],\n      \"subject\": \"bob\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"effect\"\n      ],\n      \"subject\": \"effect\"\n    }\n  ],\n  \"ledger\": [],\n  \"limits\": [\n    \"aucun paiement réel\",\n    \"jetons du pilote local\",\n    \"preuve locale non ancrée par un tiers\"\n  ],\n  \"mandates\": {},\n  \"originals_missing\": 0,\n  \"policy\": {\n    \"mandate_ttl_seconds\": 3600,\n    \"unknown_reconcile_seconds\": 0,\n    \"evidence_retention_days\": 365,\n    \"require_separation\": true\n  },\n  \"policy_bounds\": {\n    \"evidence_retention_days\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"mandate_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"unknown_reconcile_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    }\n  },\n  \"revision\": 1,\n  \"schema_version\": 1,\n  \"simulation\": true\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/swarm-actions-confiance-launch/t2-new-findings-fixed-binary",
+        "--root",
+        "/tmp/swarm-current-contract-fq5lfycg",
+        "--json",
+        "trust",
+        "mandate-create",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "6721606128ad49a28e5257cc57094099",
+        "mandate_id": "fixture-mandate",
+        "subject": "alice",
+        "actions": [
+          "settle"
+        ],
+        "resource": "invoice/acme",
+        "max_amount_minor": 50000,
+        "currency": "EUR",
+        "beneficiary": "ACME"
+      },
+      "identity": "admin",
+      "exit_code": 0,
+      "stdout": "{\n  \"id\": \"fixture-mandate\",\n  \"subject\": \"alice\",\n  \"delegator\": \"admin\",\n  \"actions\": [\n    \"settle\"\n  ],\n  \"resource\": \"invoice/acme\",\n  \"max_amount_minor\": 50000,\n  \"currency\": \"EUR\",\n  \"beneficiary\": \"ACME\",\n  \"version\": 1,\n  \"policy_revision\": 1,\n  \"integrity\": 2,\n  \"starts_at\": \"2026-10-15T03:56:01Z\",\n  \"expires_at\": \"2026-10-15T04:56:01Z\",\n  \"content_digest\": \"307db3f4d1fcb7da9ec2c5dde630eb7dec62169190bc04b73cd609c5b922c130\",\n  \"original_digest\": \"cfc9a5003aea06b2fb3168ee76ddcbd93594dfd5f59224523727d24a08119090\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/swarm-actions-confiance-launch/t2-new-findings-fixed-binary",
+        "--root",
+        "/tmp/swarm-current-contract-fq5lfycg",
+        "--json",
+        "trust",
+        "request",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "8eae7ce6e22749e28fa5939f018a1d2e",
+        "actor": "admin",
+        "integrity": 3,
+        "mandate_id": "fixture-mandate",
+        "resource": "invoice/acme",
+        "amount_minor": 4200,
+        "currency": "EUR",
+        "beneficiary": "ACME",
+        "idempotency_key": "fixture-business-key"
+      },
+      "identity": "alice",
+      "exit_code": 0,
+      "stdout": "{\n  \"id\": \"act-f05d92a2534c322c260b\",\n  \"mandate_id\": \"fixture-mandate\",\n  \"requester\": \"alice\",\n  \"resource\": \"invoice/acme\",\n  \"amount_minor\": 4200,\n  \"currency\": \"EUR\",\n  \"beneficiary\": \"ACME\",\n  \"idempotency_key\": \"fixture-business-key\",\n  \"content_digest\": \"f05d92a2534c322c260b225e12a1cba44842ad20e889db61b9d2f602519f64ff\",\n  \"original_digest\": \"1f6e4dac094208c954a0fae6e23210b9fa6787663dace34bec94ac304d637bcc\",\n  \"state\": \"pending_approval\",\n  \"next_action\": \"approbation séparée requise\",\n  \"created_at\": \"2026-10-15T03:56:01.194037698Z\",\n  \"updated_at\": \"2026-10-15T03:56:01.194037698Z\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/swarm-actions-confiance-launch/t2-new-findings-fixed-binary",
+        "--root",
+        "/tmp/swarm-current-contract-fq5lfycg",
+        "--json",
+        "trust",
+        "request",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "8eae7ce6e22749e28fa5939f018a1d2e",
+        "mandate_id": "fixture-mandate",
+        "resource": "invoice/acme",
+        "amount_minor": 4200,
+        "currency": "EUR",
+        "beneficiary": "ACME",
+        "idempotency_key": "fixture-business-key"
+      },
+      "identity": "alice",
+      "exit_code": 0,
+      "stdout": "{\n  \"id\": \"act-f05d92a2534c322c260b\",\n  \"mandate_id\": \"fixture-mandate\",\n  \"requester\": \"alice\",\n  \"resource\": \"invoice/acme\",\n  \"amount_minor\": 4200,\n  \"currency\": \"EUR\",\n  \"beneficiary\": \"ACME\",\n  \"idempotency_key\": \"fixture-business-key\",\n  \"content_digest\": \"f05d92a2534c322c260b225e12a1cba44842ad20e889db61b9d2f602519f64ff\",\n  \"original_digest\": \"1f6e4dac094208c954a0fae6e23210b9fa6787663dace34bec94ac304d637bcc\",\n  \"state\": \"pending_approval\",\n  \"next_action\": \"approbation séparée requise\",\n  \"created_at\": \"2026-10-15T03:56:01.194037698Z\",\n  \"updated_at\": \"2026-10-15T03:56:01.194037698Z\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/swarm-actions-confiance-launch/t2-new-findings-fixed-binary",
+        "--root",
+        "/tmp/swarm-current-contract-fq5lfycg",
+        "--json",
+        "trust",
+        "request",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "eca36ca9a66e47c18f5e9a6538c5b6a6",
+        "mandate_id": "fixture-mandate",
+        "resource": "invoice/acme",
+        "amount_minor": 4201,
+        "currency": "EUR",
+        "beneficiary": "ACME",
+        "idempotency_key": "fixture-business-key"
+      },
+      "identity": "alice",
+      "exit_code": 3,
+      "stdout": "",
+      "stderr": "{\n  \"error\": \"même clé avec contenu différent\",\n  \"failure\": {\n    \"code\": \"idempotency_conflict\",\n    \"message\": \"même clé avec contenu différent\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n"
+    },
+    {
+      "argv": [
+        "/tmp/swarm-actions-confiance-launch/t2-new-findings-fixed-binary",
+        "--root",
+        "/tmp/swarm-current-contract-fq5lfycg",
+        "--json",
+        "trust",
+        "approve",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "2146dd5e11c74eadac01981fa929e435",
+        "action_id": "act-f05d92a2534c322c260b",
+        "mandate_id": "fixture-mandate",
+        "amount_minor": 4200,
+        "currency": "EUR",
+        "beneficiary": "ACME"
+      },
+      "identity": "bob",
+      "exit_code": 0,
+      "stdout": "{\n  \"business_mutated\": false,\n  \"next_action\": \"corriger le mandat, l’identité ou l’accord\",\n  \"reason\": \"accord non exact\",\n  \"state\": \"denied\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/swarm-actions-confiance-launch/t2-new-findings-fixed-binary",
+        "--root",
+        "/tmp/swarm-current-contract-fq5lfycg",
+        "--json",
+        "trust",
+        "approve",
+        "--input",
+        "-"
+      ],
+      "input": {
+        "schema_version": 1,
+        "event_id": "d3552d98756f4fc1be14e48022693195",
+        "action_id": "act-f05d92a2534c322c260b",
+        "content_digest": "f05d92a2534c322c260b225e12a1cba44842ad20e889db61b9d2f602519f64ff",
+        "mandate_id": "fixture-mandate",
+        "amount_minor": 4200,
+        "currency": "EUR",
+        "beneficiary": "ACME"
+      },
+      "identity": "bob",
+      "exit_code": 0,
+      "stdout": "{\n  \"id\": \"act-f05d92a2534c322c260b\",\n  \"mandate_id\": \"fixture-mandate\",\n  \"requester\": \"alice\",\n  \"approver\": \"bob\",\n  \"resource\": \"invoice/acme\",\n  \"amount_minor\": 4200,\n  \"currency\": \"EUR\",\n  \"beneficiary\": \"ACME\",\n  \"idempotency_key\": \"fixture-business-key\",\n  \"content_digest\": \"f05d92a2534c322c260b225e12a1cba44842ad20e889db61b9d2f602519f64ff\",\n  \"original_digest\": \"1f6e4dac094208c954a0fae6e23210b9fa6787663dace34bec94ac304d637bcc\",\n  \"state\": \"approved\",\n  \"next_action\": \"engager le connecteur simulé\",\n  \"created_at\": \"2026-10-15T03:56:01.194037698Z\",\n  \"updated_at\": \"2026-10-15T03:56:01.756062496Z\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/swarm-actions-confiance-launch/t2-new-findings-fixed-binary",
+        "--root",
+        "/tmp/swarm-current-contract-fq5lfycg",
+        "--json",
+        "trust",
+        "show"
+      ],
+      "input": null,
+      "identity": null,
+      "exit_code": 0,
+      "stdout": "{\n  \"actions\": {\n    \"act-f05d92a2534c322c260b\": {\n      \"id\": \"act-f05d92a2534c322c260b\",\n      \"mandate_id\": \"fixture-mandate\",\n      \"requester\": \"alice\",\n      \"approver\": \"bob\",\n      \"resource\": \"invoice/acme\",\n      \"amount_minor\": 4200,\n      \"currency\": \"EUR\",\n      \"beneficiary\": \"ACME\",\n      \"idempotency_key\": \"fixture-business-key\",\n      \"content_digest\": \"f05d92a2534c322c260b225e12a1cba44842ad20e889db61b9d2f602519f64ff\",\n      \"original_digest\": \"1f6e4dac094208c954a0fae6e23210b9fa6787663dace34bec94ac304d637bcc\",\n      \"state\": \"approved\",\n      \"next_action\": \"engager le connecteur simulé\",\n      \"created_at\": \"2026-10-15T03:56:01.194037698Z\",\n      \"updated_at\": \"2026-10-15T03:56:01.756062496Z\"\n    }\n  },\n  \"amount_minor_text\": {\n    \"act-f05d92a2534c322c260b\": \"4200\"\n  },\n  \"evidence_count\": 5,\n  \"identities\": [\n    {\n      \"integrity\": 3,\n      \"roles\": [\n        \"admin\"\n      ],\n      \"subject\": \"admin\"\n    },\n    {\n      \"integrity\": 1,\n      \"roles\": [\n        \"requester\"\n      ],\n      \"subject\": \"alice\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"approver\"\n      ],\n      \"subject\": \"bob\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"effect\"\n      ],\n      \"subject\": \"effect\"\n    }\n  ],\n  \"ledger\": [],\n  \"limits\": [\n    \"aucun paiement réel\",\n    \"jetons du pilote local\",\n    \"preuve locale non ancrée par un tiers\"\n  ],\n  \"mandates\": {\n    \"fixture-mandate\": {\n      \"id\": \"fixture-mandate\",\n      \"subject\": \"alice\",\n      \"delegator\": \"admin\",\n      \"actions\": [\n        \"settle\"\n      ],\n      \"resource\": \"invoice/acme\",\n      \"max_amount_minor\": 50000,\n      \"currency\": \"EUR\",\n      \"beneficiary\": \"ACME\",\n      \"version\": 1,\n      \"policy_revision\": 1,\n      \"integrity\": 2,\n      \"starts_at\": \"2026-10-15T03:56:01Z\",\n      \"expires_at\": \"2026-10-15T04:56:01Z\",\n      \"content_digest\": \"307db3f4d1fcb7da9ec2c5dde630eb7dec62169190bc04b73cd609c5b922c130\",\n      \"original_digest\": \"cfc9a5003aea06b2fb3168ee76ddcbd93594dfd5f59224523727d24a08119090\"\n    }\n  },\n  \"originals_missing\": 0,\n  \"policy\": {\n    \"mandate_ttl_seconds\": 3600,\n    \"unknown_reconcile_seconds\": 0,\n    \"evidence_retention_days\": 365,\n    \"require_separation\": true\n  },\n  \"policy_bounds\": {\n    \"evidence_retention_days\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"mandate_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"unknown_reconcile_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    }\n  },\n  \"revision\": 1,\n  \"schema_version\": 1,\n  \"simulation\": true\n}\n",
+      "stderr": ""
+    }
+  ]
+}

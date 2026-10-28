@@ -1,0 +1,32 @@
+[
+  {
+    "command": [
+      "go",
+      "vet",
+      "./internal/engine"
+    ],
+    "start": "2026-10-17T07:55:28.801025+00:00",
+    "end": "2026-10-17T07:55:34.424723+00:00",
+    "exit_code": 0,
+    "input_files": 1056,
+    "changed_inputs": [],
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "go",
+      "build",
+      "-o",
+      "/tmp/swarm-identity-plan-build-fq7ssgss/swarm",
+      "./cmd/swarm"
+    ],
+    "start": "2026-10-17T07:55:34.640681+00:00",
+    "end": "2026-10-17T07:55:51.601587+00:00",
+    "exit_code": 0,
+    "input_files": 1056,
+    "changed_inputs": [],
+    "stdout": "",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "kind": "quotas",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "expected_revision": 750,
+  "quotas": {
+    "limits": {
+      "planning_activations": 88,
+      "planning_decisions": 70,
+      "review_calls": 100
+    },
+    "reason": "Autorisation utilisateur existante. Recalcul après incidents/réservations de la réserve de deux décisions/activations par tâche restante plus clôture ; aucune consommation remboursée."
+  },
+  "event_id": "T3-fourth-supervision-reserve-1f1b9ec7a5be4dad99bd83e517c15f14"
+}

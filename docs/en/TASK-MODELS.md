@@ -39,6 +39,18 @@ are not included.
 Exact model and effort are configured under **AI and connections → Configure levels**;
 the task selects a level from that policy.
 
+For Sonnet and Opus, Admin offers explicit Claude effort choices: `low`, `medium`,
+`high`, `xhigh` and `max`. This is a saved, previewed and versioned policy;
+the engine does not automatically replace a blank choice.
+**Inherited Claude Code setting** means the client resolves its own setting,
+possibly a personal one, rather than a verified effort level. An explicit choice
+is passed as `--effort` on subsequent calls. Claude may lower it for the resolved
+model or a managed cap; the saved route records requested effort, not evidence
+of applied effort. See [Claude documentation](https://code.claude.com/docs/en/model-config#adjust-effort-level).
+The legacy Haiku alias and custom models without verified capabilities retain
+a blank effort. Changing effort refunds no calls and prevents reusing opinions
+produced under another configuration.
+
 
 ## Planner, subplanners and reviewer
 

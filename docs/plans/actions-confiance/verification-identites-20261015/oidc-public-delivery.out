@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_t2.py", line 96, in <module>
+    if a.criterion in (0,n):all_cases.extend(fn())
+                                             ~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_t2.py", line 77, in c4
+    uiout=base/'ui';r=subprocess.run(['node','tests/actions_confiance_t2_ui.cjs',str(binary),str(uiout)],cwd=repo,text=True,capture_output=True,timeout=a.timeout_seconds);assert r.returncode==0,r.stderr
+                                                                                                                                                                                  ^^^^^^^^^^^^^^^
+AssertionError: AssertionError [ERR_ASSERTION]: {"skip":true,"targets":[{"id":"trust-theme","height":44,"width":181.90625},{"id":"Retour au cockpit","height":44,"width":159.046875},{"id":"trust-refresh","height":44,"width":90.875},{"id":"trust-oidc-login","height":0,"width":0},{"id":"trust-oidc-logout","height":0,"width":0},{"id":"trust-config-open","height":44,"width":185.171875}],"fonts":[{"name":"mandate_ttl_seconds","size":16},{"name":"unknown_reconcile_seconds","size":16},{"name":"evidence_retention_days","size":16},{"name":"identities","size":16},{"name":"oidc_issuer","size":16},{"name":"oidc_client_id","size":16},{"name":"oidc_redirect_uri","size":16},{"name":"oidc_request_timeout_seconds","size":16},{"name":"oidc_login_ttl_seconds","size":16},{"name":"oidc_session_ttl_seconds","size":16},{"name":"oidc_mappings","size":16},{"name":"reason","size":16}]}
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_t2_ui.cjs:12:2013 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+

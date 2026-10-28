@@ -1,0 +1,6 @@
+# Local raw proofs, private model streams and copied binaries stay retained here.
+# Maintained recipes/tests live in repository sources; concise reports are saved.
+*
+!.gitignore
+!PLAN.md
+!RESULT.md

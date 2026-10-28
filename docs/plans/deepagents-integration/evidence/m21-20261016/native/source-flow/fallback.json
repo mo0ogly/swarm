@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "protocol": "swarm-extractive-summary-v1",
+  "result": "FALLBACK",
+  "scope": {
+    "work": "w-721d716d9c0c6ae95e59fbcd",
+    "task": "t1"
+  },
+  "source_sha256": "02dd64d4208aca6f3d21de29866806244f9f022a851f9f70f5f8f115c0d16d94",
+  "source_message_count": 5,
+  "cutoff": 0,
+  "parent_sha256": null,
+  "covered_prefix_sha256": null,
+  "summary_entries": [],
+  "recent_messages": [
+    {
+      "id": "current-task-snapshot",
+      "role": "user",
+      "content": "{\"project_sha256\":\"f9308036446982ec87999f8d035b8d9bdbf99c5a3004247fa9a9715a550ff1dd\",\"work_title\":\"Summary source fixture\",\"work_objective\":\"Keep attributed history\",\"work_scope\":\"Owned fixture\",\"work_criteria\":[\"Sources remain available\"],\"task\":{\"plan_checks\":{\"plan-criterion-1\":\"validation\",\"plan-delivery\":\"delivery\",\"plan-entry\":\"entry\",\"plan-validation\":\"validation\"},\"id\":\"t1\",\"title\":\"Future worker\",\"owner\":\"\",\"deliverable\":\"report.txt\",\"criteria\":[\"Current contract changed; recheck before reuse\"],\"depends\":null,\"status\":\"todo\",\"blocker\":\"\",\"next\":\"Inspect sources\",\"attempts\":[]}}"
+    },
+    {
+      "id": "dialogue-4277908c0f2ee663ec1452cbab7a18b23094193eb33f4377397745ca6f8dd29e-question",
+      "role": "user",
+      "content": "Intention future : vérifier avant de déployer."
+    },
+    {
+      "id": "dialogue-4277908c0f2ee663ec1452cbab7a18b23094193eb33f4377397745ca6f8dd29e-answer",
+      "role": "assistant",
+      "content": "Réponse historique conservée <source> ; aucun succès courant déclaré."
+    },
+    {
+      "id": "dialogue-abb36841bf292b794a5e376d8dcbde4cd4ede2be81b9fb5185f5f9916d6882a8-question",
+      "role": "user",
+      "content": "Incident ouvert : effet incertain à examiner avant reprise."
+    },
+    {
+      "id": "dialogue-abb36841bf292b794a5e376d8dcbde4cd4ede2be81b9fb5185f5f9916d6882a8-answer",
+      "role": "assistant",
+      "content": "Réponse historique conservée <source> ; aucun succès courant déclaré."
+    }
+  ],
+  "omitted_message_ids": [],
+  "reasons": [
+    "parent_or_sources_changed"
+  ],
+  "reference_only": true,
+  "model_effectiveness": "NOT TESTED",
+  "receipt_sha256": "76873d60b006aa2a3d14d7fdce41cbe42ab99c8e539013bb91c5a24f2ecfa9e9"
+}

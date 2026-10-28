@@ -1,3 +1,4 @@
+# Historical Go-only recipe; not Rust qualification.
 """Fail-closed host qualification for the SQLite contention candidate.
 
 The worker may run --measure-only. The host conductor runs the default mode

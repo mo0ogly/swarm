@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "citation-compact-resume-cd28a4a7cde1",
+  "expected_revision": 374,
+  "reason": "Diagnostic transport counterexamples corrected: first rejected citation, one serialization, exact-original windows; all final questions and original replies retained. Remaining-message preflight and native-input sizing pass with unchanged transport and 681 text tokens remaining. Nine targeted main tests/six subcases pass with race, vet and method context checks pass; resume existing candidate and attempts."
+}

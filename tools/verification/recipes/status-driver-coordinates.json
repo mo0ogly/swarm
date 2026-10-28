@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "status-driver-coordinates",
+  "inputs": [
+    "tests/rust_status_driver_coordinates_test.py",
+    "tests/rust_mission_status_contract.py",
+    "tools/verification/recipes/status-driver-coordinates.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "relative-input-child-cwd",
+      "command": [
+        "python3",
+        "tests/rust_status_driver_coordinates_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "OWNED_DRIVER_FIXTURE"
+      ],
+      "required_stderr": [
+        "test_relative_evidence_survives_child_root_cwd",
+        "Ran 1 test",
+        "OK"
+      ]
+    }
+  ]
+}

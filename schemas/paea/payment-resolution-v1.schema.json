@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:paea:payment-resolution:v1",
+  "title": "Offline payment resolution v1; no authority or snapshot continuity",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/registry"
+    },
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/report"
+    }
+  ],
+  "$defs": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "not": {
+        "pattern": "[^A-Za-z0-9_-]"
+      }
+    },
+    "debt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "debt_id",
+        "supplier_id",
+        "invoice_references",
+        "invoice_version",
+        "amount_minor",
+        "currency",
+        "beneficiary_account_id"
+      ],
+      "properties": {
+        "debt_id": {
+          "$ref": "#/$defs/name"
+        },
+        "supplier_id": {
+          "$ref": "#/$defs/name"
+        },
+        "invoice_references": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/name"
+          }
+        },
+        "invoice_version": {
+          "$ref": "#/$defs/name"
+        },
+        "amount_minor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 19,
+          "pattern": "^[1-9]",
+          "not": {
+            "pattern": "[^0-9]"
+          },
+          "description": "Canonical positive decimal string; semantic admission additionally requires <= 9223372036854775807, the existing i64 representation, not an operator monetary limit."
+        },
+        "currency": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 3,
+          "not": {
+            "pattern": "[^A-Z]"
+          },
+          "description": "Representation only: actual supported currency must be resolved by the service."
+        },
+        "beneficiary_account_id": {
+          "$ref": "#/$defs/name"
+        }
+      }
+    },
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "project_id",
+        "revision",
+        "debts"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "project_id": {
+          "$ref": "#/$defs/name"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9223372036854775807
+        },
+        "debts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/debt"
+          }
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "request_id",
+        "project_id",
+        "supplier_id",
+        "invoice_reference",
+        "expected_registry_revision",
+        "expected_invoice_version"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/name"
+        },
+        "project_id": {
+          "$ref": "#/$defs/name"
+        },
+        "supplier_id": {
+          "$ref": "#/$defs/name"
+        },
+        "invoice_reference": {
+          "$ref": "#/$defs/name"
+        },
+        "expected_registry_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9223372036854775807
+        },
+        "expected_invoice_version": {
+          "$ref": "#/$defs/name"
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "scope",
+        "authority",
+        "registry_authenticity",
+        "effect",
+        "registry_sha256",
+        "request_sha256",
+        "registry_revision",
+        "proposal"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "scope": {
+          "const": "offline-data-only"
+        },
+        "authority": {
+          "const": "not-established"
+        },
+        "registry_authenticity": {
+          "const": "not-established"
+        },
+        "effect": {
+          "const": "not-established"
+        },
+        "registry_sha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "not": {
+            "pattern": "[^a-f0-9]"
+          }
+        },
+        "request_sha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "not": {
+            "pattern": "[^a-f0-9]"
+          }
+        },
+        "registry_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9223372036854775807
+        },
+        "proposal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "request_id",
+            "action"
+          ],
+          "properties": {
+            "schema_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/name"
+            },
+            "action": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "invoice_id",
+                "invoice_version",
+                "amount_minor",
+                "currency",
+                "beneficiary_account_id"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "payment.settle"
+                },
+                "invoice_id": {
+                  "$ref": "#/$defs/name"
+                },
+                "invoice_version": {
+                  "$ref": "#/$defs/name"
+                },
+                "amount_minor": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 19,
+                  "pattern": "^[1-9]",
+                  "not": {
+                    "pattern": "[^0-9]"
+                  },
+                  "description": "Canonical positive decimal string; semantic admission additionally requires <= 9223372036854775807, the existing i64 representation, not an operator monetary limit."
+                },
+                "currency": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 3,
+                  "not": {
+                    "pattern": "[^A-Z]"
+                  },
+                  "description": "Representation only: actual supported currency must be resolved by the service."
+                },
+                "beneficiary_account_id": {
+                  "$ref": "#/$defs/name"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

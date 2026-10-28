@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:paea:http-inspection-check:v1",
+  "title": "PAEA single original document inspection request",
+  "description": "Exact UTF-8 document string; not a server path, parsed object or authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "document"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "document": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "command": [
+    "go",
+    "build",
+    "-o",
+    "/tmp/swarm-enrollment-request-build-s8r8z_g4/swarm",
+    "./cmd/swarm"
+  ],
+  "start": "2026-10-17T11:45:45.113161+00:00",
+  "end": "2026-10-17T11:45:54.111496+00:00",
+  "exit": 0,
+  "input_count": 1080,
+  "changed_inputs": [],
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  }
+}

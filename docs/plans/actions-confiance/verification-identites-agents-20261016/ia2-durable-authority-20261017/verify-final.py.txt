@@ -1,0 +1,76 @@
+import pathlib,json,hashlib,subprocess,re,urllib.parse,datetime,difflib
+root=pathlib.Path('/home/fpizzi/Documents/ChatGPT/swarm');b=root/'docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017'
+def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def read(n):return json.loads((b/n).read_text())
+def events(n):return [json.loads(x) for x in (b/n).read_text().splitlines()]
+def named(n):
+ ev=events(n);out={a:[e['Test'] for e in ev if e.get('Test') and e['Action']==a] for a in ['run','pass','fail','skip']}
+ assert len(out['run'])==len(set(out['run'])) and sorted(out['run'])==sorted(out['pass']) and not out['fail'] and not out['skip']
+ return out
+final=named('tests-final.jsonl');race=named('race-final.jsonl')
+assert len(final['pass'])==181 and len([n for n in final['pass'] if '/' not in n])==42
+assert len([n for n in final['pass'] if n.startswith('TestAgentIdentityRegistry')])==33 and len(race['pass'])==52
+assert set(race['pass'])<=set(final['pass'])
+for n in ['tests-final-run.json','race-final-run.json']:
+ d=read(n);assert d['exit_code']==0 and not d['changed_inputs']
+inputs=read('inputs-final.json');changed=[p for p,h in inputs.items() if not (root/p).is_file() or digest(root/p)!=h]
+assert len(inputs)==1052 and not changed,changed
+assert all(x['exit_code']==0 for x in read('static-build-final.json'))
+binary=read('binary-final.json');assert not binary['deployed'] and digest(pathlib.Path(binary['path']))==binary['sha256']
+source_archives={}
+for p in (b/'source-final').glob('*.txt'):
+ target=root/p.name.removesuffix('.txt').replace('__','/');assert p.read_bytes()==target.read_bytes(),str(target)
+ source_archives[str(target.relative_to(root))]=digest(p)
+expected_sources={str(p.relative_to(root)) for p in (root/'internal/engine').glob('agent_identity*.go')} | {'internal/engine/'+n for n in ['model.go','store.go','trust_actions.go']}
+assert set(source_archives)==expected_sources,(sorted(set(source_archives)-expected_sources),sorted(expected_sources-set(source_archives)))
+base=read('baseline.json');preimage_errors=[]
+for p,h in base['files'].items():
+ q=b/'preimages'/(p.replace('/','__')+'.txt')
+ if not q.exists() or digest(q)!=h:preimage_errors.append(p)
+assert not preimage_errors,preimage_errors
+changed_existing_go=sorted(p for p,h in base['files'].items() if p.endswith('.go') and digest(root/p)!=h)
+assert changed_existing_go==['internal/engine/agent_identity_authority.go','internal/engine/model.go','internal/engine/store.go','internal/engine/trust_actions.go'],changed_existing_go
+for n in ['agents_store.go','agents_process.go']:
+ p='internal/engine/'+n;assert digest(root/p)==base['files'][p]
+new_go=['internal/engine/agent_identity_registry_'+n+'.go' for n in ['schema','types','store','publish','test','atomic_test']]
+commands=[]
+for cmd in [['git','diff','--check'],['gofmt','-l',*changed_existing_go,*new_go]]:
+ r=subprocess.run(cmd,cwd=root,capture_output=True,text=True);commands.append(dict(command=cmd,exit_code=r.returncode,stdout=r.stdout,stderr=r.stderr));assert r.returncode==0 and not r.stdout and not r.stderr,commands[-1]
+docs=['docs/architecture/AGENT-IDENTITY-CONTRACT.md','docs/en/AGENT-IDENTITY-CONTRACT.md','docs/plans/actions-confiance/identites-agents-replan.md','docs/plans/actions-confiance/identites-agents-contrat-IA2.md','docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md','docs/publications/20261005-cursor-moteur/programme-recherche.md']
+links=0;missing=[]
+for p in docs+[str((b/n).relative_to(root)) for n in ['RAPPORT-IA2.3b.md','review-local-final.md']]:
+ q=root/p
+ for target in re.findall(r'\]\(([^)]+)\)',q.read_text()):
+  target=target.strip('<>');u=urllib.parse.urlparse(target)
+  if u.scheme or target.startswith('#'):continue
+  target=urllib.parse.unquote(target.split('#')[0]);dest=pathlib.Path(target) if target.startswith('/') else q.parent/target;links+=1
+  if not dest.exists():missing.append([p,target])
+assert not missing,missing
+for lang,p in [('fr',docs[0]),('en',docs[1])]:
+ blocks=re.findall(r'```mermaid\n(.*?)\n```',(root/p).read_text(),re.S);assert len(blocks)==3
+ for i,block in enumerate(blocks,1):
+  stem=b/f'contract-{lang}-{i}';assert stem.with_suffix('.mmd').read_text()==block+'\n'
+  for ext in ['.svg','.png']:assert stem.with_suffix(ext).stat().st_size>0
+assert len(read('diagrams.json'))==12 and all(r['exit_code']==0 for r in read('diagrams.json'))
+assert len(read('diagrams-layout-fix.json'))==4 and all(r['exit_code']==0 for r in read('diagrams-layout-fix.json'))
+red={}
+for n in ['atomic-before.jsonl','registry-initial.jsonl','missing-work-before.jsonl','version-before.jsonl']:
+ fail=[e['Test'] for e in events(n) if e.get('Test') and e['Action']=='fail'];assert fail,n;red[n]=fail
+owned=changed_existing_go+new_go+docs+[str((b/n).relative_to(root)) for n in ['RAPPORT-IA2.3b.md','review-local-final.md']]
+patch=[]
+for p in owned:
+ q=root/p;before=b/'preimages'/(p.replace('/','__')+'.txt')
+ if p.endswith('/identites-autorite-cycle-vie.md'):before=b/'research-note-before.txt'
+ if p.endswith('/programme-recherche.md'):before=b/'research-programme-before.txt'
+ old=before.read_text() if before.exists() else '';new=q.read_text()
+ diff=list(difflib.unified_diff(old.splitlines(True),new.splitlines(True),fromfile='before/'+p,tofile='after/'+p));patch+=diff
+ for line in diff:
+  if line.startswith('+') and not line.startswith('+++'):assert line[1:].rstrip('\r\n').rstrip()==line[1:].rstrip('\r\n'),(p,line)
+(b/'owned-changes.patch').write_text(''.join(patch))
+# The verifier is archived as text; it is not a second Go package or runtime tool.
+(b/'verify-final.py.txt').write_bytes(pathlib.Path(__file__).read_bytes())
+manifest={str(p.relative_to(root)):digest(p) for p in sorted(b.rglob('*')) if p.is_file() and p.name!='checks-final.json'}
+for p in docs+changed_existing_go+new_go:manifest[p]=digest(root/p)
+result=dict(at=datetime.datetime.now(datetime.timezone.utc).isoformat(),status='PASS_INTERNAL_DURABLE_AUTHORITY_COMPONENT_ONLY',baseline_head=base['head'],test_names=dict(run=len(final['run']),passed=len(final['pass']),top_level=42,registry_subset=33,failed=0,skipped=0),race=dict(run=52,passed=52,failed=0,skipped=0,repeated_subset=True),inputs=dict(files=1052,changed_since_checks=changed,manifest='inputs-final.json'),source_final_archives=source_archives,changed_existing_go=changed_existing_go,new_go=new_go,launchers_unchanged_since_baseline=True,commands=commands,local_markdown_links=dict(checked=links,missing=missing),diagrams=dict(sources=6,render_commands_initial=12,layout_fix_commands=4,visually_inspected_current_pngs=6),original_red_counterexamples=red,environment=dict(file='environment.json',captured_after_checks=True),independent_review=False,deployed=False,public_admission=False,real_human_permit_issuer=False,external_current_checkpoint_issuer=False,real_adopted_plan_producer=False,remote_model_calls=0,open=['F01','F02','F03','F04','F05','F06','F07','public admission and launch consumption/recovery','IA4 memory rights','IA5 and global RETEX'],artifacts_sha256=manifest)
+(b/'checks-final.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({k:result[k] for k in ['status','test_names','race','local_markdown_links','diagrams','changed_existing_go']},ensure_ascii=False,indent=2));print('Manifest entries:',len(manifest))

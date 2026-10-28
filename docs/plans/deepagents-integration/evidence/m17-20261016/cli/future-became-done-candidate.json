@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "source_sha256": "1b845aff917a74451f9f242132777a719579160388ddc3e7a2032192c653ad1e",
+  "cutoff": 6,
+  "parent_sha256": null,
+  "status": "ok",
+  "entries": [
+    {
+      "id": "originals",
+      "message": "m1",
+      "kind": "requirement",
+      "state": "open",
+      "source_sha256": "ac44c2e2ed970e8f65719648f0e5e062fad0900600deab975106fa6d0e238b7b",
+      "text": "Exigence ouverte : conserver les preuves originales."
+    },
+    {
+      "id": "old-control",
+      "message": "m2",
+      "kind": "evidence",
+      "state": "historical",
+      "source_sha256": "052dba82ae966b16f8b66297df5021aa0bfc255b0ce19347884f2826d0cbd932",
+      "text": "Le contrôle de l'ancien candidat a passé ; il ne prouve pas l'état courant."
+    },
+    {
+      "id": "deployment",
+      "message": "m3",
+      "kind": "intention",
+      "state": "done",
+      "source_sha256": "b328d5b8dd6d0e78b4d4851740486170e91ff58cbb9e394e6a95668ecc1563ca",
+      "text": "Déployer seulement après des contrôles frais et une décision autorisée ; ce n'est pas encore fait."
+    },
+    {
+      "id": "uncertain-write",
+      "message": "m4",
+      "kind": "incident",
+      "state": "open",
+      "source_sha256": "e47199554c3f9e7e1382b747ed9ab410cd746b34c53daaa320c4cfed7f572d38",
+      "text": "Incident ouvert : effet d'écriture incertain ; vérifier avant de rejouer."
+    }
+  ]
+}

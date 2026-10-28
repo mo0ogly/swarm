@@ -1,0 +1,1122 @@
+{
+  "changes_since_visit": {
+    "from_revision": 0,
+    "to_revision": 17,
+    "first_visit": true,
+    "more": false,
+    "items": []
+  },
+  "spending": {
+    "calls": [
+      {
+        "id": "agent/auto-0a2f3785ced73543e990",
+        "record_type": "producer_attempt",
+        "kind": "worker",
+        "role": "worker",
+        "scope": "root",
+        "task": "plan-68b50cc82e-T1",
+        "attempt": "a-a1e83462f4bae22c52ecb05e",
+        "provider": "codex",
+        "requested_model": "gpt-5.6-sol",
+        "state": "completed",
+        "registered_at": "2026-10-14T20:07:06.123333007Z",
+        "usage": {
+          "cached_input_tokens": 3637632,
+          "input_tokens": 3791681,
+          "output_tokens": 42833,
+          "source": "événement fournisseur turn.completed",
+          "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+          "at": "2026-10-14T20:12:41.866451931Z"
+        }
+      },
+      {
+        "id": "planning/review-7191bdca102c7e18b7cfbb05",
+        "record_type": "planning_reservation",
+        "kind": "reviewer",
+        "role": "reviewer",
+        "scope": "reviewer",
+        "state": "finished",
+        "registered_at": "2026-10-14T20:12:49.043132131Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 58379,
+          "output_tokens": 1409,
+          "source": "événement fournisseur turn.completed",
+          "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+          "at": "2026-10-14T20:13:12.774500028Z"
+        }
+      },
+      {
+        "id": "planning/planning-claim-4d74b98cedbbd3cf3bddf81b",
+        "record_type": "planning_reservation",
+        "kind": "planner",
+        "role": "planner",
+        "scope": "root",
+        "state": "finished",
+        "registered_at": "2026-10-14T20:13:14.736507653Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 27625,
+          "output_tokens": 504,
+          "source": "événement fournisseur turn.completed",
+          "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+          "at": "2026-10-14T20:13:27.025546749Z"
+        }
+      },
+      {
+        "id": "agent/auto-e2979000265b0af18da6",
+        "record_type": "producer_attempt",
+        "kind": "worker",
+        "role": "worker",
+        "scope": "root",
+        "task": "plan-68b50cc82e-T2",
+        "attempt": "a-769ed89815896246f9ba4af5",
+        "provider": "codex",
+        "requested_model": "gpt-5.6-sol",
+        "state": "running",
+        "registered_at": "2026-10-14T20:13:19.07987139Z",
+        "usage": null
+      }
+    ],
+    "observed_at": "2026-10-14T20:15:58.983079884Z",
+    "measurement_source": "agent.lifecycle + agent.progress + provider.result + task.review-history + planning_calls + events",
+    "rows": [
+      {
+        "kind": "planner",
+        "id": "root",
+        "label": "Responsable : root",
+        "recorded_calls": 1,
+        "observed_tool_calls": 0,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 27625,
+        "output_tokens": 504,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "reviews_recorded": 0,
+        "task_retries": 0,
+        "recorded_process_ms": null,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "reviewer",
+        "id": "reviewer",
+        "label": "Vérificateur indépendant",
+        "recorded_calls": 1,
+        "observed_tool_calls": 0,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 58379,
+        "output_tokens": 1409,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "reviews_recorded": 0,
+        "task_retries": 0,
+        "recorded_process_ms": null,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "worker",
+        "id": "plan-68b50cc82e-T1",
+        "label": "Définir l’architecture complète",
+        "recorded_calls": 1,
+        "observed_tool_calls": 29,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 3791681,
+        "output_tokens": 42833,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "reviews_recorded": 1,
+        "task_retries": 0,
+        "recorded_process_ms": 336679,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "worker",
+        "id": "plan-68b50cc82e-T2",
+        "label": "Livrer le pilote avec Biba",
+        "recorded_calls": 1,
+        "observed_tool_calls": 2,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "calls_without_usage": 1,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "reviews_recorded": 0,
+        "task_retries": 0,
+        "recorded_process_ms": null,
+        "attempts_without_duration": 1
+      }
+    ],
+    "recorded_control_executions": 7,
+    "worker_retries": 0,
+    "note": "Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur.",
+    "attempts": [
+      {
+        "task": "plan-68b50cc82e-T1",
+        "label": "Définir l’architecture complète",
+        "agent": "auto-0a2f3785ced73543e990",
+        "attempt": "a-a1e83462f4bae22c52ecb05e",
+        "role": "worker",
+        "requested_model": "gpt-5.6-sol",
+        "process_state": "completed",
+        "task_acceptance_recorded": true,
+        "measurement": "observed",
+        "recorded_calls": 1,
+        "observed_tool_calls": 29,
+        "measured": true,
+        "tool_reads": 0,
+        "tool_writes": 10,
+        "tool_unclassified": 19,
+        "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+        "tool_errors_total": 2,
+        "tool_repeats_total": 1,
+        "input_tokens": 3791681,
+        "output_tokens": 42833,
+        "usage_missing": false,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "started": "2026-10-14T20:07:06.123333007Z",
+        "ended": "2026-10-14T20:12:42.803234054Z",
+        "recorded_process_ms": 336679
+      },
+      {
+        "task": "plan-68b50cc82e-T2",
+        "label": "Livrer le pilote avec Biba",
+        "agent": "auto-e2979000265b0af18da6",
+        "attempt": "a-769ed89815896246f9ba4af5",
+        "role": "worker",
+        "requested_model": "gpt-5.6-sol",
+        "process_state": "running",
+        "task_acceptance_recorded": false,
+        "measurement": "observed",
+        "recorded_calls": 1,
+        "observed_tool_calls": 2,
+        "measured": true,
+        "tool_reads": 0,
+        "tool_writes": 1,
+        "tool_unclassified": 1,
+        "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+        "tool_errors_total": 0,
+        "tool_repeats_total": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "usage_missing": true,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "started": "2026-10-14T20:13:19.07987139Z",
+        "recorded_process_ms": null
+      }
+    ]
+  },
+  "guidance": {
+    "what": "1 tâche(s) sont en cours et 1 tentative(s) active(s) sont observées.",
+    "next": "Attendez les résultats ou ouvrez les sessions pour voir les faits reçus.",
+    "actor": "L’agent",
+    "primary": {
+      "kind": "follow",
+      "label": "Suivre cette tâche",
+      "effect": "Ouvre le journal de cette tâche ; l’agent poursuit son travail.",
+      "task": "plan-68b50cc82e-T2",
+      "tone": "info"
+    }
+  },
+  "runtime": {
+    "state": "ready",
+    "launch_allowed": true,
+    "observed_at": "2026-10-14T20:15:58.799054694Z",
+    "message": "Le stockage est disponible.",
+    "next_step": "Les autres conditions de lancement restent contrôlées par le moteur.",
+    "volumes": [
+      {
+        "kind": "store",
+        "path": "/home/fpizzi/Documents/ChatGPT/swarm/.swarm",
+        "available_bytes": 93844332544,
+        "available_inodes": 26527973,
+        "state": "ready"
+      },
+      {
+        "kind": "temporary",
+        "path": "/tmp",
+        "available_bytes": 6053199872,
+        "available_inodes": 1035686,
+        "state": "ready"
+      }
+    ],
+    "version": {
+      "binary": {
+        "version": "devel",
+        "commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+        "modified": true,
+        "build_date": "2026-10-14T19:57:58Z",
+        "provenance": "injected"
+      },
+      "source": {
+        "available": true,
+        "commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+        "modified": true,
+        "compared": true,
+        "matches_binary": true
+      },
+      "history": {
+        "schema_version": 1,
+        "available": true,
+        "releases": [
+          {
+            "version": "v0.1.0",
+            "date": "2026-10-06",
+            "summary": {
+              "fr": "Première release expérimentale : édition du graphe avec prévisualisation, automatisation durable, administration des paramètres, validation indépendante et reprise tracée des contrats bloqués.",
+              "en": "First experimental release: graph editing with previews, durable automation, configurable administration, independent validation and audited recovery of blocked contracts."
+            },
+            "commits": [
+              {
+                "sha": "191616999c5f4b30e901042b51898cfbb21a3e06",
+                "url": "https://github.com/mo0ogly/swarm/commit/191616999c5f4b30e901042b51898cfbb21a3e06"
+              },
+              {
+                "sha": "2d08f0510d7f6da36d7f03cb9481dde7de249fe8",
+                "url": "https://github.com/mo0ogly/swarm/commit/2d08f0510d7f6da36d7f03cb9481dde7de249fe8"
+              }
+            ],
+            "release_url": "https://github.com/mo0ogly/swarm/releases/tag/v0.1.0"
+          }
+        ]
+      }
+    },
+    "version_diagnostic": {
+      "installed_cli": {
+        "available": false,
+        "version": null,
+        "commit": null,
+        "modified": null,
+        "provenance": "browser",
+        "hint": "Le navigateur ne peut pas inspecter le CLI local. Lancez swarm version --server URL_DE_SESSION."
+      },
+      "active_server": {
+        "available": true,
+        "version": "devel",
+        "commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+        "modified": true,
+        "provenance": "injected"
+      },
+      "candidate": {
+        "available": true,
+        "version": null,
+        "commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+        "modified": true,
+        "provenance": "git"
+      },
+      "state": "unknown",
+      "differences": [],
+      "next_step": "Rendez accessibles les identités manquantes (installed_cli) puis relancez le diagnostic. Pour le serveur actif, fournissez son URL de session avec --server."
+    }
+  },
+  "evidence_stage": "Parcours de cette mission non encore vérifié jusqu’à la clôture. Une recette isolée ou une installation ne vaut pas cette preuve.",
+  "organization": {
+    "ready": true,
+    "label": "Organisation autonome configurée",
+    "issues": [],
+    "next": "Consulter les responsables et les contrôles autorisés.",
+    "verification": "Vérificateur IA indépendant : codex · 1/40 appels. Avis requis avant acceptation. Contrôles configurés ; aucune revue IA indépendante implicite."
+  },
+  "authorized": true,
+  "enabled": true,
+  "paused": false,
+  "summary": "1/8 résultats validés · 0 à examiner · 1 tâche(s) en cours · 1 agent(s) actif(s) confirmé(s) · 0 état(s) agent incertain(s)",
+  "next": "Attendez les résultats ou ouvrez les sessions pour voir les faits reçus.",
+  "validated": 1,
+  "review": 0,
+  "running": 1,
+  "active_agents": 1,
+  "uncertain_agents": 0,
+  "total": 8,
+  "supervision": {
+    "state": "active",
+    "source": "mission watch",
+    "observed_at": "2026-10-14T20:15:58.512187118Z",
+    "last_check_at": "2026-10-14T20:15:58.512187118Z",
+    "last_check_relative": "à l’instant",
+    "reconciled_at": "2026-10-14T20:07:06.224054812Z",
+    "next_check_at": "2026-10-14T20:16:00.512187118Z",
+    "next_check_relative": "dans moins de 2 s",
+    "late": false,
+    "last_action": {
+      "at": "2026-10-14T20:07:06.217751516Z",
+      "relative": "il y a environ 9 min",
+      "actor": "Conducteur Swarm",
+      "kind": "dispatch",
+      "summary": "plan-68b50cc82e-T1 : départ automatique · codex · rôle worker · espace /home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T1-1"
+    }
+  },
+  "understanding": {
+    "what": "1 tâche(s) sont en cours et 1 tentative(s) active(s) sont observées.",
+    "next_step": "Attendez les résultats ou ouvrez les sessions pour voir les faits reçus.",
+    "actor": "L’agent",
+    "actor_kind": "agent",
+    "situation": "en_cours"
+  },
+  "coordination": [
+    {
+      "kind": "work",
+      "label": "Travail",
+      "summary": "1 tâche(s) en cours ; 1 agent(s) actif(s) confirmé(s).",
+      "actor": "Les agents",
+      "next_step": "Attendre le résultat ou ouvrir leur journal."
+    },
+    {
+      "kind": "wait",
+      "label": "Attente",
+      "summary": "Intégrer les identités d’entreprise — Attend Livrer le pilote avec Biba · 5 autre(s) attente(s)",
+      "actor": "Le superviseur",
+      "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie."
+    },
+    {
+      "kind": "exchange",
+      "label": "Échanges",
+      "summary": "Aucun échange structuré enregistré.",
+      "actor": "Personne pour le moment",
+      "next_step": "Les remises et demandes d’aide apparaîtront ici."
+    },
+    {
+      "kind": "validation",
+      "label": "Vérification",
+      "summary": "Aucun résultat n’attend actuellement de vérification.",
+      "actor": "Personne pour le moment",
+      "next_step": "Les contrôles apparaîtront après une remise de résultat."
+    }
+  ],
+  "tasks": [
+    {
+      "waiting_on": [],
+      "recovery_preview": {
+        "work": "w-68b50cc82ec3fe55624f9549",
+        "task": "plan-68b50cc82e-T1",
+        "revision": 17,
+        "agent": "auto-0a2f3785ced73543e990",
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Fournisseur et espace de la tentative sélectionnée, sous réserve des règles du lancement.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative.",
+          "Une nouvelle tentative d’agent ; l’ancienne reste dans l’historique."
+        ],
+        "correction": "Résultat intégré et vérifié : a2d6410389c03e16270fa43d3f50b5deeb04f313",
+        "criteria": [
+          "R01–R20 et les quatorze stories reliées aux mécanismes existants, écarts, propriétaires et contrôles.",
+          "Variante Biba, sujets/objets, admission, mandats et frontières d’effet définis ; contournements et reprise spécifiés.",
+          "Choix d’identité, données, processus, clés, connecteurs et eBPF justifiés ; UX séparables, FR/EN et Admin conçus.",
+          "Découpage et interfaces des lots exécutables, critères et recettes négatives définis ; revue indépendante de spécification."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Voir le résultat",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-68b50cc82e-T1",
+        "tone": "attention"
+      },
+      "attempts_used": 1,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-68b50cc82e-T1",
+      "title": "Définir l’architecture complète",
+      "state": "validated",
+      "reason": "Gate delivery et preuves actuelles ; la tâche est acceptée.",
+      "action": "report",
+      "label": "Voir le résultat",
+      "target": "plan-68b50cc82e-T1",
+      "impact": 7,
+      "deliverable": "docs/actions-confiance-T1.md",
+      "validation_mode": "automatic",
+      "validation_receipt": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-0a2f3785ced73543e990/receipt.json",
+      "result": {
+        "process_label": "Processus terminé",
+        "report_label": "Rapport soumis, contenu à vérifier",
+        "validation_label": "Preuves actuelles",
+        "state": "validated",
+        "label": "Validé",
+        "process_state": "completed",
+        "report_state": "submitted",
+        "validation_state": "fresh",
+        "reason": "Gate delivery et preuves actuelles ; la tâche est acceptée.",
+        "next_step": "Consulter le résultat ; revalider si une preuve change.",
+        "attempt_id": "a-a1e83462f4bae22c52ecb05e",
+        "gate_id": "Contrôles sur révision intégrée",
+        "receipt_id": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-0a2f3785ced73543e990/receipt.json"
+      },
+      "understanding": {
+        "what": "Gate delivery et preuves actuelles ; la tâche est acceptée.",
+        "next_step": "Aucune action requise ; le résultat reste consultable.",
+        "actor": "Personne pour le moment",
+        "actor_kind": "none",
+        "situation": "termine"
+      },
+      "diagnostic": {
+        "agent_id": "auto-0a2f3785ced73543e990",
+        "attempt_id": "a-a1e83462f4bae22c52ecb05e",
+        "observed_errors": 2,
+        "consecutive_error_limit": 3,
+        "limit_reached": false,
+        "consecutive_error_limit_reached": false,
+        "summary": "2 erreurs d’outil observées pendant cette tentative. Le plafond configuré est de 3 erreurs consécutives ; ce plafond est distinct du nombre total constaté.",
+        "items": [
+          {
+            "category": "tool",
+            "label": "Outil",
+            "count": 2,
+            "cause": "Un outil appelé pendant la tentative a signalé un échec (2 constats regroupés).",
+            "consequence": "L’opération demandée à cet outil n’est pas démontrée comme terminée.",
+            "action": "Examiner la trace et les paramètres de l’outil, corriger la cause, puis demander explicitement la reprise.",
+            "action_kind": "fix_tool_call",
+            "traces": [
+              "Exécution d’une commande · /bin/bash -lc \"sed -n '1,230p' internal/engine/managed_review_sources.go && sed -n '1,220p' internal/engine/managed_review_delivery_sources.go\" · //go:build linux  package engine  import (  \"errors\"  \"fmt\"  \"os\"  \"os/exec\"  \"path\"  \"path/filepath\"  \"strconv\"  \"strings\"  \"unicode/utf8\" )  type ReviewSource struct {  Path    string `json:\"path\"`  Blob    string `json:\"git_blob\"`  Digest  string `json:\"sha256\"`  Bytes   int    `json:\"bytes\"`  Content string `json:\"content\"` }  const managedReviewSourceBytesExceeded = \"sources de contexte supérieures à 128 Kio ; aucun c…",
+              "Exécution d’une commande · /bin/bash -lc \"set -e python3 -m json.tool docs/architecture/actions-confiance-contract.json >/dev/null python3 -m json.tool docs/plan-68b50cc82e-T1.review-context.json >/dev/null python3 -m json.tool docs/plan-68b50cc82e-T1.delivery.json >/dev/null python3 - <<'PY' import json, subprocess from pathlib import Path root=Path('.') files=[ 'docs/architecture/actions-confiance-contract.json', 'docs/architecture/ACTIONS-CONFIANCE.md', 'docs/en/ACTIONS-CONFIANCE.md', 'docs/plan-68b50cc82e-T1.md', 'docs/plan-68b50cc82e-T1.delivery.json', 'docs/plan-68b50cc82e-T1.review-con…"
+            ]
+          }
+        ]
+      },
+      "attempt": {
+        "agent_id": "auto-0a2f3785ced73543e990",
+        "attempt_id": "a-a1e83462f4bae22c52ecb05e",
+        "role": "worker",
+        "process_state": "completed",
+        "activity": "Processus terminé ; résultat à examiner, tâche non acceptée",
+        "validation_state": "accepted",
+        "requested_model": "gpt-5.6-sol",
+        "cost_state": "unknown"
+      }
+    },
+    {
+      "waiting_on": [],
+      "recovery_preview": {
+        "work": "w-68b50cc82ec3fe55624f9549",
+        "task": "plan-68b50cc82e-T2",
+        "revision": 17,
+        "agent": "auto-e2979000265b0af18da6",
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Fournisseur et espace de la tentative sélectionnée, sous réserve des règles du lancement.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative.",
+          "Une nouvelle tentative d’agent ; l’ancienne reste dans l’historique."
+        ],
+        "correction": "Examiner le handoff et les preuves après exécution",
+        "criteria": [
+          "R01–R05/R09 : identité et intégrité authentifiées ; accord exact ; mandat absent/expiré/révoqué, élévation d’intégrité et accès direct refusés sans mutation.",
+          "R06 : concurrence, coupure et réponse perdue réconciliées après redémarrage ; effet unique et conflit sur contenu modifié.",
+          "R07/R08 : preuve attribuée, originaux conservés et paramètres Admin/API/CLI/Go persistés ; aperçu sans mutation et révisions anciennes refusées.",
+          "R10–R12 : pilote accessible FR/EN/thèmes/mobile, recettes publiques nommées, documentation et limites de simulation."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Suivre l’agent",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-68b50cc82e-T2",
+        "tone": "attention"
+      },
+      "attempts_used": 1,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-68b50cc82e-T2",
+      "title": "Livrer le pilote avec Biba",
+      "state": "running",
+      "reason": "Le processus est actif ; aucun résultat final n’est encore affirmé.",
+      "action": "inspect",
+      "label": "Suivre l’agent",
+      "target": "plan-68b50cc82e-T2",
+      "impact": 6,
+      "deliverable": "docs/actions-confiance-T2.md",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Agent actif",
+        "report_label": "Aucun rapport soumis",
+        "validation_label": "En attente de la fin du processus",
+        "state": "in_progress",
+        "label": "En cours",
+        "process_state": "running",
+        "report_state": "absent",
+        "validation_state": "pending_process",
+        "reason": "Le processus est actif ; aucun résultat final n’est encore affirmé.",
+        "next_step": "Voir la session ou attendre la fin de la tentative.",
+        "attempt_id": "a-769ed89815896246f9ba4af5"
+      },
+      "understanding": {
+        "what": "Un agent travaille sur cette tâche.",
+        "next_step": "Attendez son résultat ou ouvrez sa session pour voir les faits reçus.",
+        "actor": "L’agent",
+        "actor_kind": "agent",
+        "situation": "en_cours"
+      },
+      "attempt": {
+        "agent_id": "auto-e2979000265b0af18da6",
+        "attempt_id": "a-769ed89815896246f9ba4af5",
+        "role": "worker",
+        "process_state": "running",
+        "activity": "2 appels · 2 résultats · dernier outil : file_change",
+        "validation_state": "running",
+        "requested_model": "gpt-5.6-sol",
+        "cost_state": "unknown"
+      }
+    },
+    {
+      "waiting_on": [
+        {
+          "task": "plan-68b50cc82e-T2",
+          "title": "Livrer le pilote avec Biba",
+          "state": "running",
+          "reason": "Ce résultat n’est pas encore validé."
+        }
+      ],
+      "recovery_preview": {
+        "work": "w-68b50cc82ec3fe55624f9549",
+        "task": "plan-68b50cc82e-T3",
+        "revision": 17,
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative."
+        ],
+        "correction": "Périmètre : OIDC personnes/services, cycle de vie et délégations R13 ; moteur/API/CLI/Admin/UI. Issuer factice isolé pour les tests.\nPreuves : Preuves R01–R20 du candidat exact.\nGate entry : Prérequis acceptés/frais ; droits courants.\nGate validation : Recette publique tests/actions_confiance_t3.py et tests Go nommés.\nGate delivery : Contrôles et revue indépendante frais avant acceptation.\nConditions d’arrêt : Replan sans reprise inchangée ; conserver preuves et droits.\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : Livrer Actions de confiance dans Swarm : pilote Biba, identités d’entreprise, politiques de données, processus métier, preuves durables, simulations adversariales, connecteurs, référentiels et observation eBPF ; recette complète puis RETEX.\nHypothèses : Les paiements et autres effets destructifs restent simulés ; aucun accès bancaire ou déploiement externe. ; La réalisation couvre les quatorze stories ; le socle existant est inspecté et réutilisé. ; Le chargement eBPF dépend des capacités réellement disponibles ; toute autorité système manquante reste un blocage visible. ; Les contrôles utilisent un validateur opérateur et des fixtures isolées ; les preuves de simulation et d’exécution réelle restent distinctes.\nÉtape produit : implement\nStory s07-identites — Relier les identités d’entreprise ; utilisateur : Opérateur Swarm ; valeur : Relier les identités d’entreprise ; critères : Protocole choisi, cycle de vie et révocation vérifiés. ; dépendances stories : s01-mandat\nCadre de gate obligatoire : checks plan-entry (entry), plan-validation (validation), plan-delivery (delivery) et plan-criterion-N pour chaque critère (validation). Tous mandatory=true, avec résultats et preuves réelles. Aucun PASS avant exécution.\n",
+        "criteria": [
+          "R13 : identité issue d’un émetteur autorisé ; signature, issuer, audience, nonce et expiration contrôlés.",
+          "Cycle de vie, délégation et séparation des responsabilités ; révocation persistée sans hausse implicite de droits.",
+          "Isolation des identités et ressources ; usurpation, mauvaise audience et jeton périmé refusés sans mutation.",
+          "Configuration/connexion/Admin FR/EN et recettes API/CLI/UI ; migration et fonctionnement local conservés."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Examiner le prérequis",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-68b50cc82e-T3",
+        "tone": "attention"
+      },
+      "attempts_used": 0,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-68b50cc82e-T3",
+      "title": "Intégrer les identités d’entreprise",
+      "state": "waiting",
+      "reason": "Attend Livrer le pilote avec Biba",
+      "action": "inspect",
+      "label": "Examiner le prérequis",
+      "target": "plan-68b50cc82e-T2",
+      "impact": 5,
+      "deliverable": "docs/actions-confiance-T3.md",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Pas encore commencé",
+        "report_label": "Aucun rapport soumis",
+        "validation_label": "Pas encore commencé",
+        "state": "not_started",
+        "label": "Pas encore commencé",
+        "process_state": "not_started",
+        "report_state": "absent",
+        "validation_state": "not_started",
+        "reason": "Aucune tentative terminée ni validation actuelle n’est établie.",
+        "next_step": "Lancer la tâche lorsque ses conditions sont réunies."
+      },
+      "understanding": {
+        "what": "Attend Livrer le pilote avec Biba",
+        "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie.",
+        "actor": "Le superviseur",
+        "actor_kind": "supervisor",
+        "situation": "attente_normale"
+      },
+      "attempt": {
+        "validation_state": "todo",
+        "cost_state": "unknown"
+      }
+    },
+    {
+      "waiting_on": [
+        {
+          "task": "plan-68b50cc82e-T3",
+          "title": "Intégrer les identités d’entreprise",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        }
+      ],
+      "recovery_preview": {
+        "work": "w-68b50cc82ec3fe55624f9549",
+        "task": "plan-68b50cc82e-T4",
+        "revision": 17,
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative."
+        ],
+        "correction": "Périmètre : Classification, destinations, secrets et protection des flux R14 ; refuser les configurations non démontrées.\nPreuves : Preuves R01–R20 du candidat exact.\nGate entry : Prérequis acceptés/frais ; droits courants.\nGate validation : Recette publique tests/actions_confiance_t4.py et tests Go nommés.\nGate delivery : Contrôles et revue indépendante frais avant acceptation.\nConditions d’arrêt : Replan sans reprise inchangée ; conserver preuves et droits.\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : Livrer Actions de confiance dans Swarm : pilote Biba, identités d’entreprise, politiques de données, processus métier, preuves durables, simulations adversariales, connecteurs, référentiels et observation eBPF ; recette complète puis RETEX.\nHypothèses : Les paiements et autres effets destructifs restent simulés ; aucun accès bancaire ou déploiement externe. ; La réalisation couvre les quatorze stories ; le socle existant est inspecté et réutilisé. ; Le chargement eBPF dépend des capacités réellement disponibles ; toute autorité système manquante reste un blocage visible. ; Les contrôles utilisent un validateur opérateur et des fixtures isolées ; les preuves de simulation et d’exécution réelle restent distinctes.\nÉtape produit : implement\nStory s08-donnees — Limiter données et secrets transmis ; utilisateur : Opérateur Swarm ; valeur : Limiter données et secrets transmis ; critères : Classification, destinations et secrets par action contrôlés. ; dépendances stories : s07-identites\nCadre de gate obligatoire : checks plan-entry (entry), plan-validation (validation), plan-delivery (delivery) et plan-criterion-N pour chaque critère (validation). Tous mandatory=true, avec résultats et preuves réelles. Aucun PASS avant exécution.\n",
+        "criteria": [
+          "R14 : flux autorisés et interdits contrôlés au point effectif d’envoi ; entrées non fiables ne modifient pas la politique.",
+          "Secrets limités à l’action et au service ; absence de secret dans contexte, logs, erreurs et exports vérifiée.",
+          "API/CLI/Admin partagent classification et valeurs persistées ; restrictions non appliquées signalées et action sensible refusée.",
+          "Tests d’exfiltration simulée, contournement et reprise avec état inchangé sur refus ; frontières des fournisseurs non médiés documentées."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Examiner le prérequis",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-68b50cc82e-T4",
+        "tone": "attention"
+      },
+      "attempts_used": 0,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-68b50cc82e-T4",
+      "title": "Maîtriser les données et secrets",
+      "state": "waiting",
+      "reason": "Attend Intégrer les identités d’entreprise",
+      "action": "inspect",
+      "label": "Examiner le prérequis",
+      "target": "plan-68b50cc82e-T3",
+      "impact": 4,
+      "deliverable": "docs/actions-confiance-T4.md",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Pas encore commencé",
+        "report_label": "Aucun rapport soumis",
+        "validation_label": "Pas encore commencé",
+        "state": "not_started",
+        "label": "Pas encore commencé",
+        "process_state": "not_started",
+        "report_state": "absent",
+        "validation_state": "not_started",
+        "reason": "Aucune tentative terminée ni validation actuelle n’est établie.",
+        "next_step": "Lancer la tâche lorsque ses conditions sont réunies."
+      },
+      "understanding": {
+        "what": "Attend Intégrer les identités d’entreprise",
+        "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie.",
+        "actor": "Le superviseur",
+        "actor_kind": "supervisor",
+        "situation": "attente_normale"
+      },
+      "attempt": {
+        "validation_state": "todo",
+        "cost_state": "unknown"
+      }
+    },
+    {
+      "waiting_on": [
+        {
+          "task": "plan-68b50cc82e-T2",
+          "title": "Livrer le pilote avec Biba",
+          "state": "running",
+          "reason": "Ce résultat n’est pas encore validé."
+        },
+        {
+          "task": "plan-68b50cc82e-T3",
+          "title": "Intégrer les identités d’entreprise",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        },
+        {
+          "task": "plan-68b50cc82e-T4",
+          "title": "Maîtriser les données et secrets",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        }
+      ],
+      "recovery_preview": {
+        "work": "w-68b50cc82ec3fe55624f9549",
+        "task": "plan-68b50cc82e-T5",
+        "revision": 17,
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative."
+        ],
+        "correction": "Périmètre : Définitions versionnées, dossiers, validations et UX séparables R15 ; appliquer .claude/skills/swarm-model-design/SKILL.md.\nPreuves : Preuves R01–R20 du candidat exact.\nGate entry : Prérequis acceptés/frais ; droits courants.\nGate validation : Recette publique tests/actions_confiance_t5.py et tests Go nommés.\nGate delivery : Contrôles et revue indépendante frais avant acceptation.\nConditions d’arrêt : Replan sans reprise inchangée ; conserver preuves et droits.\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : Livrer Actions de confiance dans Swarm : pilote Biba, identités d’entreprise, politiques de données, processus métier, preuves durables, simulations adversariales, connecteurs, référentiels et observation eBPF ; recette complète puis RETEX.\nHypothèses : Les paiements et autres effets destructifs restent simulés ; aucun accès bancaire ou déploiement externe. ; La réalisation couvre les quatorze stories ; le socle existant est inspecté et réutilisé. ; Le chargement eBPF dépend des capacités réellement disponibles ; toute autorité système manquante reste un blocage visible. ; Les contrôles utilisent un validateur opérateur et des fixtures isolées ; les preuves de simulation et d’exécution réelle restent distinctes.\nÉtape produit : implement\nStory s09-processus — Suivre des processus et dossiers versionnés ; utilisateur : Opérateur Swarm ; valeur : Suivre des processus et dossiers versionnés ; critères : Versions, validations, exceptions et UX livrable séparément. ; dépendances stories : s06-recette, s07-identites, s08-donnees\nCadre de gate obligatoire : checks plan-entry (entry), plan-validation (validation), plan-delivery (delivery) et plan-criterion-N pour chaque critère (validation). Tous mandatory=true, avec résultats et preuves réelles. Aucun PASS avant exécution.\n",
+        "criteria": [
+          "R15 : chaque dossier suit une version précise et conserve son historique ; changer une définition ne réécrit pas les dossiers existants.",
+          "Validations humaines, dépendances, droits et exceptions appliqués via opérations publiques ; aucun contournement par l’UX.",
+          "UX orientée dossiers, recherche, états et reprise accessibles FR/EN ; builds Projets/Processus séparables et composants communs.",
+          "Recette complète d’un dossier simulé, changement de version, rejet, panne et reprise ; modèles vérifiés avant adoption."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Examiner le prérequis",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-68b50cc82e-T5",
+        "tone": "attention"
+      },
+      "attempts_used": 0,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-68b50cc82e-T5",
+      "title": "Livrer les processus et dossiers métier",
+      "state": "waiting",
+      "reason": "Attend Livrer le pilote avec Biba",
+      "action": "inspect",
+      "label": "Examiner le prérequis",
+      "target": "plan-68b50cc82e-T2",
+      "impact": 1,
+      "deliverable": "docs/actions-confiance-T5.md",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Pas encore commencé",
+        "report_label": "Aucun rapport soumis",
+        "validation_label": "Pas encore commencé",
+        "state": "not_started",
+        "label": "Pas encore commencé",
+        "process_state": "not_started",
+        "report_state": "absent",
+        "validation_state": "not_started",
+        "reason": "Aucune tentative terminée ni validation actuelle n’est établie.",
+        "next_step": "Lancer la tâche lorsque ses conditions sont réunies."
+      },
+      "understanding": {
+        "what": "Attend Livrer le pilote avec Biba",
+        "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie.",
+        "actor": "Le superviseur",
+        "actor_kind": "supervisor",
+        "situation": "attente_normale"
+      },
+      "attempt": {
+        "validation_state": "todo",
+        "cost_state": "unknown"
+      }
+    },
+    {
+      "waiting_on": [
+        {
+          "task": "plan-68b50cc82e-T2",
+          "title": "Livrer le pilote avec Biba",
+          "state": "running",
+          "reason": "Ce résultat n’est pas encore validé."
+        },
+        {
+          "task": "plan-68b50cc82e-T4",
+          "title": "Maîtriser les données et secrets",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        }
+      ],
+      "recovery_preview": {
+        "work": "w-68b50cc82ec3fe55624f9549",
+        "task": "plan-68b50cc82e-T6",
+        "revision": 17,
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative."
+        ],
+        "correction": "Périmètre : Preuves/rotation/ancrage/rétention R16, labo isolé R17, second connecteur simulé R18, référentiels R19.\nPreuves : Preuves R01–R20 du candidat exact.\nGate entry : Prérequis acceptés/frais ; droits courants.\nGate validation : Recette publique tests/actions_confiance_t6.py et tests Go nommés.\nGate delivery : Contrôles et revue indépendante frais avant acceptation.\nConditions d’arrêt : Replan sans reprise inchangée ; conserver preuves et droits.\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : Livrer Actions de confiance dans Swarm : pilote Biba, identités d’entreprise, politiques de données, processus métier, preuves durables, simulations adversariales, connecteurs, référentiels et observation eBPF ; recette complète puis RETEX.\nHypothèses : Les paiements et autres effets destructifs restent simulés ; aucun accès bancaire ou déploiement externe. ; La réalisation couvre les quatorze stories ; le socle existant est inspecté et réutilisé. ; Le chargement eBPF dépend des capacités réellement disponibles ; toute autorité système manquante reste un blocage visible. ; Les contrôles utilisent un validateur opérateur et des fixtures isolées ; les preuves de simulation et d’exécution réelle restent distinctes.\nÉtape produit : implement\nStory s10-conservation — Renforcer la conservation et les clés ; utilisateur : Opérateur Swarm ; valeur : Renforcer la conservation et les clés ; critères : Rotation, révocation, ancrage externe et rétention testés. ; dépendances stories : s04-preuve\nStory s11-simulation — Éprouver une politique sans effet ; utilisateur : Opérateur Swarm ; valeur : Éprouver une politique sans effet ; critères : Scénarios adversariaux et rejeu isolés avec refus observables. ; dépendances stories : s06-recette\nStory s12-connecteurs — Ajouter un autre connecteur sensible ; utilisateur : Opérateur Swarm ; valeur : Ajouter un autre connecteur sensible ; critères : Invariants, isolation, idempotence et reprise qualifiés. ; dépendances stories : s06-recette\nStory s13-referentiels — Évaluer les référentiels applicables ; utilisateur : Opérateur Swarm ; valeur : Évaluer les référentiels applicables ; critères : Applicabilité, contrôles, preuves et écarts établis. ; dépendances stories : s06-recette\nCadre de gate obligatoire : checks plan-entry (entry), plan-validation (validation), plan-delivery (delivery) et plan-criterion-N pour chaque critère (validation). Tous mandatory=true, avec résultats et preuves réelles. Aucun PASS avant exécution.\n",
+        "criteria": [
+          "R16 : signature et vérification avec ancre indépendante ; rotation/révocation/rétention persistées ; altération, réordre et omission détectés.",
+          "R17 : rejeu et attaques simulées sans effet en production ; résultats et limites observables, contrôles persistés Admin.",
+          "R18 : catalogue et second connecteur avec autorisation, invariants, isolation, idempotence et réconciliation éprouvés.",
+          "R19 : applicabilité et couverture des référentiels reliées aux preuves ; aucun statut de certification inventé."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Examiner le prérequis",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-68b50cc82e-T6",
+        "tone": "attention"
+      },
+      "attempts_used": 0,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-68b50cc82e-T6",
+      "title": "Renforcer les preuves et éprouver les contrôles",
+      "state": "waiting",
+      "reason": "Attend Livrer le pilote avec Biba",
+      "action": "inspect",
+      "label": "Examiner le prérequis",
+      "target": "plan-68b50cc82e-T2",
+      "impact": 1,
+      "deliverable": "docs/actions-confiance-T6.md",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Pas encore commencé",
+        "report_label": "Aucun rapport soumis",
+        "validation_label": "Pas encore commencé",
+        "state": "not_started",
+        "label": "Pas encore commencé",
+        "process_state": "not_started",
+        "report_state": "absent",
+        "validation_state": "not_started",
+        "reason": "Aucune tentative terminée ni validation actuelle n’est établie.",
+        "next_step": "Lancer la tâche lorsque ses conditions sont réunies."
+      },
+      "understanding": {
+        "what": "Attend Livrer le pilote avec Biba",
+        "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie.",
+        "actor": "Le superviseur",
+        "actor_kind": "supervisor",
+        "situation": "attente_normale"
+      },
+      "attempt": {
+        "validation_state": "todo",
+        "cost_state": "unknown"
+      }
+    },
+    {
+      "waiting_on": [
+        {
+          "task": "plan-68b50cc82e-T2",
+          "title": "Livrer le pilote avec Biba",
+          "state": "running",
+          "reason": "Ce résultat n’est pas encore validé."
+        },
+        {
+          "task": "plan-68b50cc82e-T4",
+          "title": "Maîtriser les données et secrets",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        }
+      ],
+      "recovery_preview": {
+        "work": "w-68b50cc82ec3fe55624f9549",
+        "task": "plan-68b50cc82e-T7",
+        "revision": 17,
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative."
+        ],
+        "correction": "Périmètre : Collecteur Linux optionnel R20, transport local, attribution et Admin ; sondes limitées au projet et à ses descendants.\nPreuves : Preuves R01–R20 du candidat exact.\nGate entry : Prérequis acceptés/frais ; droits courants.\nGate validation : Recette publique tests/actions_confiance_t7.py et tests Go nommés.\nGate delivery : Contrôles et revue indépendante frais avant acceptation.\nConditions d’arrêt : Replan sans reprise inchangée ; conserver preuves et droits.\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : Livrer Actions de confiance dans Swarm : pilote Biba, identités d’entreprise, politiques de données, processus métier, preuves durables, simulations adversariales, connecteurs, référentiels et observation eBPF ; recette complète puis RETEX.\nHypothèses : Les paiements et autres effets destructifs restent simulés ; aucun accès bancaire ou déploiement externe. ; La réalisation couvre les quatorze stories ; le socle existant est inspecté et réutilisé. ; Le chargement eBPF dépend des capacités réellement disponibles ; toute autorité système manquante reste un blocage visible. ; Les contrôles utilisent un validateur opérateur et des fixtures isolées ; les preuves de simulation et d’exécution réelle restent distinctes.\nÉtape produit : implement\nStory s14-ebpf — Observer les agents avec eBPF ; utilisateur : Responsable exploitation ; valeur : Relier activité système et exécution des agents ; critères : Processus, disque et réseau attribués aux tentatives ; permissions, pertes et surcoût mesurés ; politique Admin persistée et absence du collecteur visible. ; dépendances stories : s06-recette, s08-donnees\nCadre de gate obligatoire : checks plan-entry (entry), plan-validation (validation), plan-delivery (delivery) et plan-criterion-N pour chaque critère (validation). Tous mandatory=true, avec résultats et preuves réelles. Aucun PASS avant exécution.\n",
+        "criteria": [
+          "R20 : événements de processus, disque et réseau corrélés aux missions/tâches/tentatives avec identité PID/cgroup vérifiée.",
+          "Disponibilité noyau/BTF/permissions, événements perdus et absence du collecteur visibles ; aucun succès métier déduit d’une mesure.",
+          "Activation, sondes, échantillonnage et rétention persistés Admin/API/CLI ; secrets et contenus sensibles exclus.",
+          "Collecte réelle en fixture isolée, nettoyage et surcoût mesuré avec/sans collecte ; autorité manquante bloque cette preuve sans arrêter les lots indépendants."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Examiner le prérequis",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-68b50cc82e-T7",
+        "tone": "attention"
+      },
+      "attempts_used": 0,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-68b50cc82e-T7",
+      "title": "Intégrer le collecteur eBPF",
+      "state": "waiting",
+      "reason": "Attend Livrer le pilote avec Biba",
+      "action": "inspect",
+      "label": "Examiner le prérequis",
+      "target": "plan-68b50cc82e-T2",
+      "impact": 1,
+      "deliverable": "docs/actions-confiance-T7.md",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Pas encore commencé",
+        "report_label": "Aucun rapport soumis",
+        "validation_label": "Pas encore commencé",
+        "state": "not_started",
+        "label": "Pas encore commencé",
+        "process_state": "not_started",
+        "report_state": "absent",
+        "validation_state": "not_started",
+        "reason": "Aucune tentative terminée ni validation actuelle n’est établie.",
+        "next_step": "Lancer la tâche lorsque ses conditions sont réunies."
+      },
+      "understanding": {
+        "what": "Attend Livrer le pilote avec Biba",
+        "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie.",
+        "actor": "Le superviseur",
+        "actor_kind": "supervisor",
+        "situation": "attente_normale"
+      },
+      "attempt": {
+        "validation_state": "todo",
+        "cost_state": "unknown"
+      }
+    },
+    {
+      "waiting_on": [
+        {
+          "task": "plan-68b50cc82e-T2",
+          "title": "Livrer le pilote avec Biba",
+          "state": "running",
+          "reason": "Ce résultat n’est pas encore validé."
+        },
+        {
+          "task": "plan-68b50cc82e-T3",
+          "title": "Intégrer les identités d’entreprise",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        },
+        {
+          "task": "plan-68b50cc82e-T4",
+          "title": "Maîtriser les données et secrets",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        },
+        {
+          "task": "plan-68b50cc82e-T5",
+          "title": "Livrer les processus et dossiers métier",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        },
+        {
+          "task": "plan-68b50cc82e-T6",
+          "title": "Renforcer les preuves et éprouver les contrôles",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        },
+        {
+          "task": "plan-68b50cc82e-T7",
+          "title": "Intégrer le collecteur eBPF",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        }
+      ],
+      "recovery_preview": {
+        "work": "w-68b50cc82ec3fe55624f9549",
+        "task": "plan-68b50cc82e-T8",
+        "revision": 17,
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative."
+        ],
+        "correction": "Périmètre : Recette indépendante R01–R20 et quatorze stories, documentation et RETEX ; aucun changement du candidat pendant la revue.\nPreuves : Preuves R01–R20 du candidat exact.\nGate entry : Prérequis acceptés/frais ; droits courants.\nGate validation : Recette publique tests/actions_confiance_t8.py et tests Go nommés.\nGate delivery : Contrôles et revue indépendante frais avant acceptation.\nConditions d’arrêt : Replan sans reprise inchangée ; conserver preuves et droits.\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : Livrer Actions de confiance dans Swarm : pilote Biba, identités d’entreprise, politiques de données, processus métier, preuves durables, simulations adversariales, connecteurs, référentiels et observation eBPF ; recette complète puis RETEX.\nHypothèses : Les paiements et autres effets destructifs restent simulés ; aucun accès bancaire ou déploiement externe. ; La réalisation couvre les quatorze stories ; le socle existant est inspecté et réutilisé. ; Le chargement eBPF dépend des capacités réellement disponibles ; toute autorité système manquante reste un blocage visible. ; Les contrôles utilisent un validateur opérateur et des fixtures isolées ; les preuves de simulation et d’exécution réelle restent distinctes.\nÉtape produit : retex\nCadre de gate obligatoire : checks plan-entry (entry), plan-validation (validation), plan-delivery (delivery) et plan-criterion-N pour chaque critère (validation). Tous mandatory=true, avec résultats et preuves réelles. Aucun PASS avant exécution.\n",
+        "criteria": [
+          "Toutes les quatorze stories et R01–R20 vérifiées sur le candidat exact ; critère non prouvé bloque la clôture.",
+          "API/CLI/UI, refus sans mutation, concurrence, redémarrage, intégrité, données et observation système vérifiés avec originaux.",
+          "Revues et contrôles frais du même candidat ; simulation, fournisseur réel, activation eBPF et interventions séparés.",
+          "Documentation et recette reproductibles ; RETEX avec échecs, consommations connues/inconnues et limites ; fin décidée sous preuves."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Examiner le prérequis",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-68b50cc82e-T8",
+        "tone": "attention"
+      },
+      "attempts_used": 0,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-68b50cc82e-T8",
+      "title": "Qualifier l’ensemble et livrer le RETEX",
+      "state": "waiting",
+      "reason": "Attend Livrer le pilote avec Biba",
+      "action": "inspect",
+      "label": "Examiner le prérequis",
+      "target": "plan-68b50cc82e-T2",
+      "impact": 0,
+      "deliverable": "docs/actions-confiance-T8.md",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Pas encore commencé",
+        "report_label": "Aucun rapport soumis",
+        "validation_label": "Pas encore commencé",
+        "state": "not_started",
+        "label": "Pas encore commencé",
+        "process_state": "not_started",
+        "report_state": "absent",
+        "validation_state": "not_started",
+        "reason": "Aucune tentative terminée ni validation actuelle n’est établie.",
+        "next_step": "Lancer la tâche lorsque ses conditions sont réunies."
+      },
+      "understanding": {
+        "what": "Attend Livrer le pilote avec Biba",
+        "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie.",
+        "actor": "Le superviseur",
+        "actor_kind": "supervisor",
+        "situation": "attente_normale"
+      },
+      "attempt": {
+        "validation_state": "todo",
+        "cost_state": "unknown"
+      }
+    }
+  ]
+}

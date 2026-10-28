@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "docs/plans/actions-confiance/verification-globale-20261016/run-kernel-positive.py",
+    "--prepared",
+    "docs/plans/actions-confiance/verification-globale-20261016/kernel-positive-prepared",
+    "--environment-change",
+    "guard verification only; environment deliberately unchanged"
+  ],
+  "exit_code": 3,
+  "result": {
+    "executed": false,
+    "available": false,
+    "reason": "environment_unchanged",
+    "bpf_attempted": false
+  },
+  "native_process_started": false
+}

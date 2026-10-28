@@ -1,0 +1,44 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T17:50:14.971672+00:00",
+  "end": "2026-10-11T18:00:12.291143+00:00",
+  "seconds": 597.32148762,
+  "exit": 0,
+  "output": "/tmp/swarm-fragment-partial-scope-qualified-v1-full.out",
+  "output_sha256": "dabf178beab4e494e4f6cdf09d0f3c1f03a7025b5d3656362e321313a2010fa4",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  },
+  "source_manifest_sha256": "3d6df956da8789b64cbb1a63e2f45d70ca690315be3e698fbfa4c04939cf0582",
+  "candidate_digest": "6e5d70a75c09b33779958665c2efe1177551cee6369cc0fde0e247292e3bd655",
+  "paths": 1176,
+  "source_drift": [],
+  "manifest_changed": false,
+  "driver": {
+    "start": "2026-10-11T17:50:14.971672+00:00",
+    "driver_pid": 2247460,
+    "pgid": 2247460,
+    "sid": 2247460,
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "manifest_sha256": "3d6df956da8789b64cbb1a63e2f45d70ca690315be3e698fbfa4c04939cf0582",
+    "source_digest": "6e5d70a75c09b33779958665c2efe1177551cee6369cc0fde0e247292e3bd655",
+    "paths": 1176,
+    "precondition": "Replan17: adverse local inspection must preserve findings and inspect all packets before independent global decision. Original RED and legacy expectation FAIL retained; complete negative, refuted-original receipt, transport and UTF-8 capacity boundaries targeted PASS. Immutable isolated1176 snapshot; no native mission DB.",
+    "go_pid": 2247477
+  }
+}

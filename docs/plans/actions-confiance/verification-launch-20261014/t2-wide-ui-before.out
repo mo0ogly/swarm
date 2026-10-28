@@ -1,0 +1,9 @@
+AssertionError [ERR_ASSERTION]: browser rounded the original minor-unit amount
+    at /home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-2/tests/actions_confiance_t2_ui.cjs:13:830 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

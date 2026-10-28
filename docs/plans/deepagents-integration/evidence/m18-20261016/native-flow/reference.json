@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "protocol": "swarm-extractive-summary-v1",
+  "result": "PASS",
+  "scope": {
+    "work": "w-1be9c4bcfb234c039b0c2273",
+    "task": "t1"
+  },
+  "source_sha256": "bbe65d22fe562fecd39a0ad180b5afa872d043fa129431043c00cf2f27ab51b6",
+  "source_message_count": 5,
+  "cutoff": 4,
+  "parent_sha256": null,
+  "covered_prefix_sha256": "929f5b4f6d7e7f7af1bcfbc473e4480ffec40a2613af88be6a320a1aaf6a3428",
+  "summary_entries": [
+    {
+      "id": "snapshot",
+      "message": "current-task-snapshot",
+      "kind": "evidence",
+      "state": "historical",
+      "source_sha256": "81cb27c9cee170771ec3122fdae3173c89293b427d09319f441542baa32cc08a",
+      "text": "{\"project_sha256\":\"06727cae85529a8873dde8b47f3dfb6a280b3f08d13c067daec410c0cf1c9854\",\"work_title\":\"Summary source fixture\",\"work_objective\":\"Keep attributed history\",\"work_scope\":\"Owned fixture\",\"work_criteria\":[\"Sources remain available\"],\"task\":{\"id\":\"t1\",\"title\":\"Future worker\",\"owner\":\"\",\"deliverable\":\"report.txt\",\"criteria\":[\"Recheck current evidence\"],\"depends\":null,\"status\":\"todo\",\"blocker\":\"\",\"next\":\"Inspect sources\",\"attempts\":[]}}"
+    },
+    {
+      "id": "future",
+      "message": "dialogue-0857c7f44f19fff0f60fa452a437a401040039c79a8bcb9de93820f9f2e76812-question",
+      "kind": "intention",
+      "state": "future",
+      "source_sha256": "61957afec0fcb3b2f2c9e0477ecb6a037ced95aab22041cfb55232292e1ba9af",
+      "text": "Intention future : vérifier avant de déployer."
+    },
+    {
+      "id": "prior",
+      "message": "dialogue-0857c7f44f19fff0f60fa452a437a401040039c79a8bcb9de93820f9f2e76812-answer",
+      "kind": "evidence",
+      "state": "historical",
+      "source_sha256": "4587971d9ad6e1f4f7f6b06bc061db913e2c7af21986f80467522a3bb92f07a4",
+      "text": "Réponse historique conservée <source> ; aucun succès courant déclaré."
+    },
+    {
+      "id": "incident",
+      "message": "dialogue-cd41c55dc4098ca9ef9e02896ce0af35899d96fbde5c0b69cf03327f43f0f353-question",
+      "kind": "incident",
+      "state": "open",
+      "source_sha256": "dec1bf3b91514094c3cad3a2c6fad25cdd45f3c85442e799e2fa01c7c5dede47",
+      "text": "Incident ouvert : effet incertain à examiner avant reprise."
+    }
+  ],
+  "recent_messages": [
+    {
+      "id": "dialogue-cd41c55dc4098ca9ef9e02896ce0af35899d96fbde5c0b69cf03327f43f0f353-answer",
+      "role": "assistant",
+      "content": "Réponse historique conservée <source> ; aucun succès courant déclaré."
+    }
+  ],
+  "omitted_message_ids": [],
+  "reasons": [],
+  "reference_only": true,
+  "model_effectiveness": "NOT TESTED",
+  "receipt_sha256": "f1ea78703335271444fd90a961756a53e062afb7e311ca14f3e48d8c06fff748"
+}

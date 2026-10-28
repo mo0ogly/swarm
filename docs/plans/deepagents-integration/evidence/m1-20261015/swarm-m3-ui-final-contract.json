@@ -1,0 +1,19 @@
+{
+  "executor": "Codex direct audit",
+  "argv": [
+    "node",
+    "tests/project_memory_ui.cjs",
+    "/tmp/swarm-memory-m3-jdee3kwu/swarm",
+    "/tmp/swarm-memory-m3-jdee3kwu/source.zip",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m3-20261015/browser-final-contract"
+  ],
+  "cwd": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "environment_keys": [
+    "HOME",
+    "PATH"
+  ],
+  "started_at_utc": "2026-10-15T20:37:17.378893+00:00",
+  "ended_at_utc": "2026-10-15T20:37:28.819047+00:00",
+  "exit_code": 0,
+  "log_sha256": "29c12f6d02a9112dfc6706c28065fb45f7f2c5e4353375c347e048cb9b109ec9"
+}

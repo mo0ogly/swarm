@@ -1,0 +1,44 @@
+{
+  "at": "2026-10-11T10:33:17.252964+00:00",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "patch_sha256": "6c202d64b1261082d78842c3ccc5d554437135c862197f0b4edaa30929aae13b",
+  "operations": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "event": "instruction-learning-retex-T3-20261011",
+      "from_revision": 138,
+      "to_revision": 139,
+      "verified_revision": 139,
+      "next_sha256": "f1739f63b6361cb5f2e5f53bc0bf56cb63153afc8c8ebfac05e3ce735b145c8b",
+      "prior_instructions_preserved": true,
+      "source": "Successful public mutation output revision139 plus subsequent public read"
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "event": "instruction-learning-retex-T4-20261011",
+      "from_revision": 139,
+      "to_revision": 140,
+      "next_sha256": "3c81d152901972614230953d8c97ad066ff690375eead1d8937b60443038894a",
+      "prior_instructions_preserved": true,
+      "criteria_dependencies_attempts_budgets_unchanged": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "event": "instruction-learning-retex-T5-20261011",
+      "from_revision": 140,
+      "to_revision": 141,
+      "next_sha256": "8e4a498b6048d2fec1e7dc367821df4a40f4f3a1cb581e97ec92c036e3a18c15",
+      "prior_instructions_preserved": true,
+      "criteria_dependencies_attempts_budgets_unchanged": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "event": "instruction-learning-retex-T7-20261011",
+      "from_revision": 141,
+      "to_revision": 142,
+      "next_sha256": "ca25458b9fd6e8f2120ac68e866001e142279ae339a2fae232a28241f9dc7c47",
+      "prior_instructions_preserved": true,
+      "criteria_dependencies_attempts_budgets_unchanged": true
+    }
+  ]
+}

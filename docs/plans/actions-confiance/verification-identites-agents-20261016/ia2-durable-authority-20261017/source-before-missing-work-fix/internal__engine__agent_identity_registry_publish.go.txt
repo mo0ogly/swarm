@@ -1,0 +1,191 @@
+//go:build linux
+
+package engine
+
+import (
+	"context"
+	"database/sql"
+	"encoding/json"
+	"time"
+)
+
+// Test-only failure injection at completed durability boundaries. A production
+// caller uses nil. This cannot authorize, modify or execute a business effect.
+type agentIdentityPublicationFault func(string) error
+
+func (s *Store) publishAgentIdentityRegistry(ctx context.Context, raw []byte, token string, permit agentIdentityRegistryPermit, fault agentIdentityPublicationFault) (agentIdentityRegistryCheckpoint, error) {
+	return s.changeAgentIdentityRegistry(ctx, raw, token, permit, false, fault)
+}
+
+// Recovery requires the original private permit and exact snapshot. It can
+// only finish that already prepared/committed publication, never prepare a new
+// one. This controller capability is separate from a business/admin role.
+func (s *Store) recoverAgentIdentityRegistry(ctx context.Context, raw []byte, permit agentIdentityRegistryPermit) (agentIdentityRegistryCheckpoint, error) {
+	return s.changeAgentIdentityRegistry(ctx, raw, "", permit, true, nil)
+}
+
+func (s *Store) changeAgentIdentityRegistry(ctx context.Context, raw []byte, token string, permit agentIdentityRegistryPermit, recovering bool, fault agentIdentityPublicationFault) (agentIdentityRegistryCheckpoint, error) {
+	var result agentIdentityRegistryCheckpoint
+	if ctx == nil || !permit.base.valid() || permit.base.projectRoot != s.root || !permit.scope.valid() || permit.scope.WorkID != permit.base.workID ||
+		!permit.publisher.valid() || !safeName(permit.eventID) || permit.trustRevision <= 0 || !agentIdentityHashValid(permit.nextDigest) {
+		return result, agentIdentityError("agent_identity_publication_permit_required")
+	}
+	snapshot, err := decodeAgentIdentitySnapshot(raw)
+	if err != nil {
+		return result, err
+	}
+	head := agentIdentityRegistryHead{Schema: 1, ProjectDigest: hash([]byte(s.root)), Scope: permit.scope, Revision: snapshot.Revision, SnapshotDigest: permit.nextDigest,
+		TrustRevision: permit.trustRevision, Roots: append([]string(nil), permit.roots...), Publisher: permit.publisher, EventID: permit.eventID, Previous: permit.base.headDigest}
+	if err = validateAgentIdentityRegistrySnapshot(snapshot, head); err != nil {
+		return result, err
+	}
+	canonical, err := json.Marshal(snapshot)
+	if err != nil {
+		return result, err
+	}
+	headBytes, err := json.Marshal(head)
+	if err != nil {
+		return result, err
+	}
+	headDigest := hash(headBytes)
+	nextCheckpoint := agentIdentityRegistryCheckpoint{s.root, permit.base.workID, headDigest}
+	_, err = s.withTrustPublicationLockUsing(true, nil, true, func(state *trustState) (any, error) {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		tx, err := s.db.BeginTx(ctx, nil)
+		if err != nil {
+			return nil, err
+		}
+		defer tx.Rollback()
+		// Reserve SQLite before any reads and before sampling authorization time.
+		if _, err = tx.ExecContext(ctx, `UPDATE agent_identity_snapshots SET revision=revision WHERE work_id=?`, permit.base.workID); err != nil {
+			return nil, err
+		}
+		var version int
+		if err = tx.QueryRowContext(ctx, "PRAGMA user_version").Scan(&version); err != nil {
+			return nil, err
+		}
+		if version != schemaVersion {
+			return nil, agentIdentityError("storage_version_conflict")
+		}
+		if !recovering {
+			caller, err := resolveAgentIdentityCaller(s.root, state, token, time.Now().UTC())
+			if err != nil {
+				return nil, err
+			}
+			if caller.actor.Principal != permit.publisher || state.Revision != permit.trustRevision {
+				return nil, agentIdentityError("agent_identity_publication_permit_stale")
+			}
+		}
+		current := state.AgentIdentities[permit.base.workID]
+		if current.Head != nil {
+			digest, _ := agentIdentityDigest(*current.Head)
+			if digest == headDigest && current.Pending == nil {
+				// Authenticate before this idempotent result on the normal path.
+				if _, _, err = loadAgentIdentityRegistry(ctx, tx, state, nextCheckpoint); err != nil {
+					return nil, err
+				}
+				return nextCheckpoint, nil
+			}
+		}
+		if recovering {
+			if current.Pending == nil {
+				return nil, agentIdentityError("agent_identity_recovery_not_prepared")
+			}
+			pendingDigest, _ := agentIdentityDigest(current.Pending.Head)
+			pendingSnapshot, e := decodeAgentIdentitySnapshot(current.Pending.Snapshot)
+			pendingContent, e2 := agentIdentityDigest(pendingSnapshot)
+			if e != nil || e2 != nil || pendingDigest != headDigest || pendingContent != permit.nextDigest {
+				return nil, agentIdentityError("agent_identity_recovery_conflict")
+			}
+		} else if current.Pending != nil {
+			return nil, agentIdentityError("agent_identity_publication_pending")
+		}
+		// Pending blocks ordinary readers; validate the previous head using an
+		// owned state projection that removes only this exact pending marker.
+		projection := *state
+		projection.AgentIdentities = map[string]agentIdentityPublicationState{permit.base.workID: {Head: current.Head}}
+		if current.Head == nil {
+			var rows int
+			if permit.base.headDigest != "" || snapshot.Revision != 1 {
+				return nil, agentIdentityError("agent_identity_checkpoint_mismatch")
+			}
+			if err = tx.QueryRowContext(ctx, `SELECT (SELECT count(*) FROM agent_identity_snapshots WHERE work_id=?)+(SELECT count(*) FROM agent_identity_publications WHERE work_id=?)`, permit.base.workID, permit.base.workID).Scan(&rows); err != nil {
+				return nil, err
+			}
+			if rows != 0 && !recovering {
+				return nil, agentIdentityError("agent_identity_import_not_authority")
+			}
+		} else {
+			previous, _, err := loadAgentIdentityRegistry(ctx, tx, &projection, permit.base)
+			if err != nil {
+				return nil, err
+			}
+			if err = validateAgentIdentityTransition(previous, snapshot); err != nil {
+				return nil, err
+			}
+		}
+		var existing string
+		err = tx.QueryRowContext(ctx, `SELECT head_digest FROM agent_identity_publications WHERE event_id=?`, permit.eventID).Scan(&existing)
+		if err != nil && err != sql.ErrNoRows {
+			return nil, err
+		}
+		if err == nil && (!recovering || existing != headDigest) {
+			return nil, agentIdentityError("agent_identity_publication_conflict")
+		}
+		if state.AgentIdentities == nil {
+			state.AgentIdentities = map[string]agentIdentityPublicationState{}
+		}
+		if !recovering {
+			current.Pending = &agentIdentityRegistryIntent{Head: head, Snapshot: canonical}
+			state.AgentIdentities[permit.base.workID] = current
+			prepared, err := encodeTrustState(*state)
+			if err != nil {
+				return nil, err
+			}
+			path, _, _ := s.trustPaths()
+			if err = atomicWrite(path, prepared); err != nil {
+				return nil, err
+			}
+			if fault != nil {
+				if err = fault("intent_persisted"); err != nil {
+					return nil, err
+				}
+			}
+		}
+		if existing == "" {
+			if _, err = tx.ExecContext(ctx, `INSERT INTO agent_identity_snapshots(work_id,revision,digest,body) VALUES(?,?,?,?)`, permit.base.workID, snapshot.Revision, permit.nextDigest, canonical); err != nil {
+				return nil, err
+			}
+			if _, err = tx.ExecContext(ctx, `INSERT INTO agent_identity_publications(event_id,work_id,head_digest,body) VALUES(?,?,?,?)`, permit.eventID, permit.base.workID, headDigest, headBytes); err != nil {
+				return nil, err
+			}
+		} else {
+			// The SQLite side was already committed before the interrupted
+			// finalization. Verify the entire target, never insert it twice.
+			target := *state
+			target.AgentIdentities = map[string]agentIdentityPublicationState{permit.base.workID: {Head: &head}}
+			if _, _, err = loadAgentIdentityRegistry(ctx, tx, &target, nextCheckpoint); err != nil {
+				return nil, err
+			}
+		}
+		if err = tx.Commit(); err != nil {
+			return nil, err
+		}
+		if fault != nil {
+			if err = fault("sqlite_committed"); err != nil {
+				return nil, err
+			}
+		}
+		// The enclosing Trust writer durably finalizes this head. A failure
+		// leaves either the prepared marker or this exact finalized head;
+		// recovery verifies both, with no process start or counter reset.
+		state.AgentIdentities[permit.base.workID] = agentIdentityPublicationState{Head: &head}
+		return nextCheckpoint, nil
+	})
+	if err != nil {
+		return result, err
+	}
+	return nextCheckpoint, nil
+}

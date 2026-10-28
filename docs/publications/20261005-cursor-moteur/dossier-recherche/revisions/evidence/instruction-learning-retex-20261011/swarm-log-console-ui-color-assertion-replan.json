@@ -1,0 +1,7 @@
+{
+  "at": "2026-10-11T18:34:03.530363+00:00",
+  "observed": "Colour assertion inspected the first header span, which combines level and timestamp decorations; timestamp correctly uses discreet neutral colour in all levels.",
+  "proof": "v3 screenshot shows four distinct level colours and warning/error bands; no JS/CSP errors.",
+  "correction": "Assert actual labelled level span outside the timestamp decoration; retain distinct colour requirement and original screenshot.",
+  "native_work": "No mutation"
+}

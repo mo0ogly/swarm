@@ -9,11 +9,7 @@ rapport et fournit son contenu au planificateur. Celui-ci répond par une décis
 structurée, rattachée aux événements reçus. Le moteur reste responsable des
 autorisations, des dépendances et de l'acceptation.
 
-Dans le modèle final présenté par [Cursor en février 2026](https://cursor.com/blog/self-driving-codebases),
-les exécutants travaillent sur leur copie et leur retour remonte au planificateur
-par le système. Un fichier de coordination modifié librement par tous était une
-expérience antérieure qui avait échoué. Les règles de preuve et de revue indépendante
-ci-dessous sont des choix de Swarm, pas une certification Cursor.
+Les références retenues sont [Cursor janvier 2026](https://cursor.com/blog/scaling-agents) et [février 2026](https://cursor.com/blog/self-driving-codebases) : les planificateurs créent les tâches et les workers les terminent sans coordination entre workers. Les copies individuelles et les remises routées par le moteur décrites ci-dessous sont aussi décrites en février ; leur réalisation Swarm reste à vérifier. La revue d’un candidat ne démontre pas le juge de fin de cycle et le démarrage frais prévus par la référence de janvier.
 
 ```mermaid
 flowchart LR

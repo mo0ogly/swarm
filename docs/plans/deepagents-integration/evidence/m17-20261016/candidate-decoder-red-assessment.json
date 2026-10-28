@@ -1,0 +1,11 @@
+{
+  "original_receipt": "candidate-decoder-red.json",
+  "original_log_sha256": "a2927cf59acad0e312d088847bc081a9a6fcd5d16e25efb59ce60e9551b00c85",
+  "named_tests_observed": [
+    "test_cli_invalid_json_duplicate_fields_and_nonfinite_values_fall_back"
+  ],
+  "actual_tests_ran": 1,
+  "result": "FAIL",
+  "cause": "Original counter matched only methods ending directly in ok/FAIL/ERROR; subtest failure left the top-level line unfinished.",
+  "correction": "Match method start independently of its final outcome; original receipt is not overwritten."
+}

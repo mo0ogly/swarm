@@ -1,87 +1,15 @@
 'use strict';
 const tr_web_admin_js = source => globalThis.SwarmI18n?.t(source) ?? source;
 
-Object.assign(globalThis.SwarmEnglish || {}, {
- 'Attente du stockage SQLite':'SQLite storage wait',
- 'Ces réglages traitent uniquement la cause stockage sqlite_busy. Ils ne relancent ni fournisseur ni agent et n’affichent aucun secret ou contenu de requête.':'These settings only handle the sqlite_busy storage cause. They do not restart a provider or agent and show no secret or query content.',
- 'Reprises après contention':'Retries after contention',
- 'Délai entre reprises (ms)':'Delay between retries (ms)',
- 'Attente SQLite par tentative (ms)':'SQLite wait per attempt (ms)',
- 'Enregistrer l’attente':'Save wait settings',
- 'Chargement des valeurs effectives…':'Loading effective values…',
- 'Source':'Source', 'Persisté':'Persisted', 'oui':'yes', 'non':'no', 'Valeurs configurées':'Configured values', 'Valeurs effectives':'Effective values',
- 'Cause stockage visible':'Visible storage cause', 'Attente totale maximale':'Maximum total wait',
- 'Valeurs effectives chargées.':'Effective values loaded.',
- 'Réglages de stockage enregistrés et relus.':'Storage settings saved and read back.',
-});
-
 const runLimitsFieldList = [
  ['observation_mode', 'Mode d’exécution'],
- ['silence_seconds', 'Silence maximal avant relance'],
- ['tool_seconds', 'Durée maximale par outil'],
+ ['silence_seconds', 'Seuil d’observation du silence'],
+ ['tool_seconds', 'Seuil d’observation d’un outil'],
  ['max_tool_calls', 'Nombre maximal d’appels d’outil'],
  ['max_repeated_calls', 'Répétitions identiques tolérées'],
  ['max_consecutive_errors', 'Erreurs consécutives tolérées'],
 ];
 let runLimitsAdmin = null, runLimitsLoading = false;
-let storageRetryLoading = false;
-
-function mountStorageRetryAdmin() {
- if ($('storage-retry-admin')) return;
- const article=node('article',undefined,'card'); article.id='storage-retry-admin'; article.setAttribute('aria-labelledby','storage-retry-title');
- const title=node('h3',tr_web_admin_js('Attente du stockage SQLite')); title.id='storage-retry-title';
- const description=node('p',tr_web_admin_js('Ces réglages traitent uniquement la cause stockage sqlite_busy. Ils ne relancent ni fournisseur ni agent et n’affichent aucun secret ou contenu de requête.'));
- const form=node('form',undefined,'toolbar'); form.id='storage-retry-form';
- const addNumber=(id,name,label,min,max)=>{const wrap=node('label',tr_web_admin_js(label));wrap.htmlFor=id;const input=node('input');input.id=id;input.name=name;input.type='number';input.min=String(min);input.max=String(max);input.step='1';input.required=true;wrap.append(input);form.append(wrap)};
- addNumber('storage-busy-retries','busy_retries','Reprises après contention',0,10);
- addNumber('storage-retry-delay','busy_retry_delay_ms','Délai entre reprises (ms)',0,1000);
- addNumber('storage-busy-timeout','busy_timeout_ms','Attente SQLite par tentative (ms)',1,60000);
- const save=node('button',tr_web_admin_js('Enregistrer l’attente'),'primary');save.id='storage-retry-save';save.type='submit';form.append(save);
- const state=node('p',tr_web_admin_js('Chargement des valeurs effectives…'),'notice info');state.id='storage-retry-state';state.setAttribute('role','status');state.tabIndex=-1;
- const effective=node('pre');effective.id='storage-retry-effective';effective.tabIndex=0;effective.hidden=true;
- article.append(title,description,form,state,effective);
- $('admin').insertBefore(article,$('admin-scope-form'));
- form.addEventListener('submit',saveStorageRetryAdmin);
-}
-
-function storageRetryDescription(data) {
- const policy=p=>`busy_retries=${p.busy_retries}\nbusy_retry_delay_ms=${p.busy_retry_delay_ms}\nbusy_timeout_ms=${p.busy_timeout_ms}`;
- return [
-  tr_web_admin_js('Source')+' : '+data.source,
-  tr_web_admin_js('Persisté')+' : '+tr_web_admin_js(data.persisted?'oui':'non'),
-  tr_web_admin_js('Valeurs configurées')+' :\n'+policy(data.configured),
-  tr_web_admin_js('Valeurs effectives')+' :\n'+policy(data.effective),
-  tr_web_admin_js('Cause stockage visible')+' : '+data.storage_failure_cause,
-  tr_web_admin_js('Attente totale maximale')+' : '+data.maximum_total_wait_ms+' ms',
- ].join('\n\n');
-}
-
-async function loadStorageRetryAdmin() {
- if(storageRetryLoading)return; storageRetryLoading=true;
- const state=$('storage-retry-state');state.className='notice info';state.textContent=tr_web_admin_js('Chargement des valeurs effectives…');
- try{
-  const data=await api('/api/v1/storage-retry');
-  $('storage-busy-retries').value=data.configured.busy_retries;
-  $('storage-retry-delay').value=data.configured.busy_retry_delay_ms;
-  $('storage-busy-timeout').value=data.configured.busy_timeout_ms;
-  $('storage-retry-effective').textContent=storageRetryDescription(data);$('storage-retry-effective').hidden=false;
-  state.textContent=tr_web_admin_js('Valeurs effectives chargées.');
- }catch(e){state.className='notice alert';state.textContent=e.message}
- finally{storageRetryLoading=false}
-}
-
-async function saveStorageRetryAdmin(event) {
- event.preventDefault();const form=event.currentTarget;if(!form.reportValidity())return;
- const state=$('storage-retry-state'),save=$('storage-retry-save');state.className='notice info';save.disabled=true;
- try{
-  const data=await api('/api/v1/storage-retry',{schema_version:1,busy_retries:Number($('storage-busy-retries').value),busy_retry_delay_ms:Number($('storage-retry-delay').value),busy_timeout_ms:Number($('storage-busy-timeout').value)});
-  $('storage-retry-effective').textContent=storageRetryDescription(data);$('storage-retry-effective').hidden=false;
-  state.textContent=tr_web_admin_js('Réglages de stockage enregistrés et relus.');state.focus();
- }catch(e){state.className='notice alert';state.textContent=e.message;state.tabIndex=-1;state.focus()}
- finally{save.disabled=false}
-}
-
-mountStorageRetryAdmin();
 
 // Open the exact task scope; never silently edit limits or restart an agent.
 function openTaskRunLimits(taskID) {
@@ -104,7 +32,6 @@ function runLimitsValueRow(values) {
  return runLimitsFieldList.map(([key, label]) => tr_web_admin_js(label) + ' : ' + runLimitsDisplay(key, values[key])).join('\n');
 }
 async function loadRunLimitsAdmin() {
- loadStorageRetryAdmin();
  if (runLimitsLoading) return; runLimitsLoading = true;
  $('admin-state').className = 'notice info'; $('admin-state').textContent = tr_web_admin_js('Chargement de cette portée…');
  try {
@@ -135,6 +62,7 @@ function renderRunLimitsCurrent() {
  const agent=snapshot?.agents.map(x=>x.agent).filter(a=>a.task_id===task?.id).sort((a,b)=>(b.started||'').localeCompare(a.started||''))[0];
  if(runLimitsScopeQuery().scope==='task'&&agent){const used=agent.progress?.tool_calls,cap=agent.limits?.max_tool_calls;card.append(node('p',tr_web_admin_js('Dernière tentative : ')+agent.attempt_id+' · '+tr_web_admin_js('Appels d’outils : ')+(used??tr_web_admin_js('Non rapporté'))+' / '+(cap||tr_web_admin_js('Sans plafond'))+' · '+tr_web_admin_js('Restant : ')+(typeof used==='number'&&cap?Math.max(0,cap-used):tr_web_admin_js('Non rapporté'))));}
  const actions = node('div', undefined, 'toolbar');
+ if(snapshot?.work.planning){const limits=button(tr_web_admin_js('Réglages du moteur'),()=>Quotas.open().catch(e=>notice(e.message,true)));limits.id='admin-engine-limits';actions.append(limits)}
  actions.append(button(entry.revision ? tr_web_admin_js('Modifier cette portée') : tr_web_admin_js('Configurer cette portée'), () => openRunLimitsConfigModal()));
  card.append(actions); host.append(card);
 }
@@ -165,7 +93,7 @@ function renderRunLimitsHistory() {
 function openRunLimitsConfigModal() {
  const q = runLimitsScopeQuery(); const entry = runLimitsAdmin.entry;
  openModal(entry.revision ? tr_web_admin_js('Modifier les limites — ') + (q.scope) : tr_web_admin_js('Configurer les limites — ') + (q.scope),
-  tr_web_admin_js('Ces limites bornent le silence, la durée d’outil et les répétitions autorisées pour de nouvelles tentatives. Elles ne changent jamais une tentative déjà lancée (REQ-ADM-05).'),
+  tr_web_admin_js('Les durées signalent une observation au responsable, sans arrêt automatique. Les plafonds d’appels, de répétitions et d’erreurs restent applicables. Ces réglages sont figés pour chaque nouveau départ (REQ-ADM-05).'),
   { action: 'admin-config', scope: q.scope, mission: q.mission_id, key: q.scope_key, revision: entry.revision });
  for (const [key, label] of runLimitsFieldList) {
   if(key === 'observation_mode') {
@@ -263,19 +191,21 @@ Object.assign(globalThis.SwarmEnglish || {}, {
   const frozen=structuredClone(config),dialog=node('dialog'),header=node('header',undefined,'modal-header'),heading=node('h2',tr('Modifier les objectifs de performance')),close=button(tr('Fermer'),()=>dialog.close());heading.id='graph-performance-modal-title';dialog.id='graph-performance-modal';dialog.setAttribute('aria-labelledby',heading.id);header.append(heading,close);
   const form=node('form'),body=node('div',undefined,'modal-body'),footer=node('footer',undefined,'modal-footer');body.append(node('p',tr('Les prochaines recettes utilisent une copie figée de ces valeurs. Les résultats antérieurs gardent leurs seuils et leur verdict.'),'notice info'),node('p',tr('p95 : 95 % des mesures doivent rester sous le délai choisi. Une mesure de 30 ms est un résultat, pas un réglage.')));
   function numeric(parent,id,label,value,key){const {min,max}=frozen.bounds[key];const lab=node('label',label),input=node('input');input.id=id;input.type='number';input.required=true;input.min=String(min);input.max=String(max);input.step='1';input.value=String(value);lab.htmlFor=id;lab.append(input);parent.append(lab);return input}
-  const fields=node('div',undefined,'toolbar'),keyboard=numeric(fields,'performance-keyboard',tr('Clavier — p95 maximal (ms)'),frozen.values.keyboard_p95_ms,'keyboard_p95_ms'),samples=numeric(fields,'performance-samples',tr('Échantillons par charge'),frozen.values.samples,'samples');body.append(fields);
+  body.append(node('p',tr('Les maxima affichés protègent la représentation entière exacte, pas une limite de durée ou de charge. La taille des requêtes et de l’historique reste bornée.')));
+ const fields=node('div',undefined,'toolbar'),keyboard=numeric(fields,'performance-keyboard',tr('Clavier — p95 maximal (ms)'),frozen.values.keyboard_p95_ms,'keyboard_p95_ms'),samples=numeric(fields,'performance-samples',tr('Échantillons par charge'),frozen.values.samples,'samples');body.append(fields);
   const loads=node('div');body.append(loads);let rows=[],serial=0,pending=null;
   function invalidate(){pending=null;proposal.hidden=true;submit.textContent=tr('Prévisualiser')}
   function addRow(value){const row=node('div',undefined,'toolbar'),id=serial++,cards=numeric(row,'performance-cards-'+id,tr('Nombre de cartes'),value.cards,'cards'),render=numeric(row,'performance-render-'+id,tr('Rendu — p95 maximal (ms)'),value.render_p95_ms,'render_p95_ms');const item={row,cards,render};rows.push(item);row.append(button(tr('Retirer cette charge'),()=>{rows=rows.filter(x=>x!==item);row.remove();invalidate()}));loads.append(row)}
-  const add=button(tr('Ajouter une charge'),()=>{if(rows.length<frozen.bounds.loads.max){addRow({cards:rows.length?Number(rows.at(-1).cards.value)+1:frozen.bounds.cards.min,render:Number(rows.at(-1)?.render.value||keyboard.value)});invalidate()}});add.id='performance-add-load';body.append(add);
+  const add=button(tr('Ajouter une charge'),()=>{if(rows.length<frozen.bounds.loads.max){addRow({cards:rows.length?Number(rows.at(-1).cards.value)+1:frozen.bounds.cards.min,render_p95_ms:Number(rows.at(-1)?.render.value||keyboard.value)});invalidate()}});add.id='performance-add-load';body.append(add);
   const reasonLabel=node('label',tr('Motif de ce changement')),reason=node('textarea');reason.id='performance-reason';reason.required=true;reason.minLength=8;reason.maxLength=2000;reasonLabel.htmlFor=reason.id;reasonLabel.append(reason);body.append(reasonLabel);
   const error=node('p',undefined,'notice alert');error.id='performance-error';error.hidden=true;error.setAttribute('role','alert');const proposal=node('div',undefined,'card');proposal.id='performance-preview';proposal.hidden=true;body.append(error,proposal);
   const submit=node('button',tr('Prévisualiser'),'primary');submit.id='performance-confirm';submit.type='submit';footer.append(button(tr('Fermer'),()=>dialog.close()),submit);form.append(body,footer);dialog.append(header,form);frozen.values.loads.forEach(addRow);
   form.addEventListener('input',invalidate);let sending=false;
   form.addEventListener('submit',async e=>{e.preventDefault();if(sending)return;sending=true;submit.disabled=true;error.hidden=true;try{
    const request={schema_version:1,event_id:pending?.event_id||crypto.randomUUID(),expected_revision:frozen.revision,values:{keyboard_p95_ms:Number(keyboard.value),samples:Number(samples.value),loads:rows.map(x=>({cards:Number(x.cards.value),render_p95_ms:Number(x.render.value)}))},reason:reason.value.trim()};
+   for(const value of [request.values.keyboard_p95_ms,request.values.samples,...request.values.loads.flatMap(row=>[row.cards,row.render_p95_ms])])if(!Number.isSafeInteger(value))throw Error(tr('Saisissez des nombres entiers représentables sans perte.'));
    if(!pending){const result=await api('/api/v1/graph-performance/preview',request);if(!dialog.open)return;pending=request;proposal.replaceChildren(node('h3',tr('Valeurs proposées')),describe(result.config.values));proposal.hidden=false;submit.textContent=tr('Enregistrer les seuils')}
-   else {await api('/api/v1/graph-performance/apply',pending);if(!dialog.open)return;dialog.close();await load();state.textContent=tr('Seuils enregistrés.')+' '+tr('Révision ')+config.revision}
+   else {await api('/api/v1/graph-performance/apply',pending);if(!dialog.open)return;dialog.close();await load();if(config)state.textContent=tr('Seuils enregistrés.')+' '+tr('Révision ')+config.revision;if(!document.querySelector('dialog[open]'))(edit.disabled?reload:edit).focus()}
   }catch(e){if(dialog.open){error.textContent=e.message;error.hidden=false;pending=null;proposal.hidden=true;submit.textContent=tr('Prévisualiser')}}finally{sending=false;submit.disabled=false}});
   dialog.addEventListener('close',()=>{dialog.remove();edit.focus()},{once:true});document.body.append(dialog);dialog.showModal();keyboard.focus();
  }

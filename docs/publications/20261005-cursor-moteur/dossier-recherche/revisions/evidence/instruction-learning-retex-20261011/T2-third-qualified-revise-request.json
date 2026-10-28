@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-third-bounded-original-evidence-qualified-repair-20261011",
+  "expected_revision": 315,
+  "task_id": "plan-ca937edf4e-T2",
+  "agent_id": "auto-a23c60f03a732c02841f",
+  "attempt_id": "a-2f9e1debb1548be96273f0d3",
+  "confirm_recovery": true,
+  "result_tree": "ad247d51e040a737335e3672d6a9687750256cd0",
+  "reason": "Production native3 terminée, refus avant appel de revue :20sources144927octets dépassaient131072. Réparation opérateur attribuée,17sources130040octets complètes : garder5Go/score,contratFR,architectureFR/EN,sortie16tests incluant7Judge et suitecanonique1096/19 ; exclure uniquementcontratENnormatifredondant,ancienf5/filtré et doublonsmetadata, originaux conservés. Corriger date native13:40 antérieure au lancement14:12 avec bornes publiques14:13:29→14:14:21 sans inventerhorodatage decommande ; archivermetadata natif. Go5inchangés, checker/D03/parts PASS. Arbread247d51 préparéindépendamment puis transféré àcopienativeinactive surpréimagesexactes. Consommations/tentatives conservées, nouvelle validation/revue du même candidat exigée ; runtimequalifié0f619612 installé horsbaux/appels, aucuneacceptation. Réparations10/11/12 qualifiées full Go484,358s/race/vet/méthodes, source1172 digest981af32b sans drift ; runtime12SHA7c87e87a réellement installé au repos/santé ready. Entrées futures publiques308..315 conservées, T1/T2contrat/reçus inchangés. Ancienne requête307 refusée sans mutation ; présente requête reprend précondition vérifiée315."
+}

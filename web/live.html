@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr" data-theme="etat">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Swarm — agents en direct</title><link id="live-favicon" rel="icon" href="/swarm-logo.png" type="image/png">
+<link rel="stylesheet" href="/live/themes.css"><link rel="stylesheet" href="/live/swarm-design.css"><link rel="stylesheet" href="/live/live.css">
+<script src="/live/live-common.js"></script><script src="/live/live-metrics.js"></script>
+<script src="/live/english.js" defer></script><script src="/live/i18n.js" defer></script><script src="/live/live.js" defer></script>
+</head>
+<body class="live-page">
+<header class="live-rail">
+ <div class="live-brand"><img src="/swarm-logo.png" width="44" height="44" alt=""><div><p class="live-kicker">Observation en lecture seule</p><h1>Agents en direct</h1></div></div>
+ <nav class="live-tools" aria-label="Affichage">
+  <label>Mission <select id="live-filter"><option value="">Toutes les missions</option></select></label>
+  <label class="live-check"><input type="checkbox" id="live-active-only"> Actifs seulement</label>
+  <button type="button" id="live-pause" aria-pressed="false">Mettre en pause</button>
+  <button type="button" id="live-theme">Changer de thème</button>
+  <button type="button" id="live-notify" aria-pressed="false" title="Notifier les échecs et alertes (n)">Notifications</button>
+  <button type="button" id="live-export" title="Exporter la vue (e)">Exporter</button>
+ </nav>
+</header>
+<main>
+ <section class="live-load" aria-labelledby="live-load-title">
+  <h2 id="live-load-title">Charge</h2>
+  <div class="live-load-body">
+   <p class="live-metric"><strong id="live-active">—</strong> <span>agents actifs</span></p>
+   <figure class="live-spark"><svg id="live-spark" viewBox="0 0 300 48" preserveAspectRatio="none" role="img" aria-label="Agents actifs, trois dernières minutes"></svg><figcaption>Agents actifs, trois dernières minutes</figcaption></figure>
+   <div class="live-stack-wrap"><div id="live-stack" class="live-stack" role="img" aria-label="Répartition des agents par état"></div><ul id="live-legend" class="live-legend"></ul></div>
+   <p class="live-metric"><strong id="live-active-time">—</strong> <span>activité cumulée des agents actifs</span></p>
+   <p class="live-metric"><strong id="live-ram">—</strong> <span>RAM des agents actifs</span></p>
+   <p class="live-metric"><strong id="live-cpu">—</strong> <span>CPU (% d’un cœur)</span></p>
+  </div>
+  <div class="live-load-body live-consumption-row">
+   <div class="live-metric live-metric-wide"><strong id="live-tokens">—</strong> <span>jetons déclarés</span><small id="live-unknown" class="live-warn" hidden></small><div id="live-tokens-bar"></div></div>
+   <p class="live-metric live-pulse"><strong id="live-pulse">—</strong> <span>changements observés / min</span><svg id="live-pulse-wave" class="live-ekg" viewBox="0 0 300 48" preserveAspectRatio="none" aria-hidden="true"></svg></p>
+   <p class="live-metric"><strong id="live-cost">—</strong> <span>coût déclaré par les fournisseurs</span></p>
+  </div>
+  <p id="live-status" class="live-status" role="status">Chargement…</p>
+ </section>
+ <div class="live-panels">
+  <section class="live-panel" aria-labelledby="live-attention-title"><h2 id="live-attention-title">À surveiller <span id="live-attention-count" class="live-count">0</span></h2><ol id="live-attention" class="live-attention"></ol></section>
+  <section class="live-panel" aria-labelledby="live-alerts-title"><h2 id="live-alerts-title">Alertes <span id="live-alerts-count" class="live-count">0</span></h2><ol id="live-alerts" class="live-attention" aria-live="polite"></ol><p id="live-alerts-state" class="live-alerts-state" role="status"></p><details class="live-alerts-history"><summary>Historique <span id="live-alerts-history-count" class="live-count">0</span></summary><ol id="live-alerts-history" class="live-attention"></ol></details><button id="live-alerts-test" type="button" class="live-alerts-test">Tester la notification</button><p id="live-retention" class="live-retention"></p><p id="live-server-eval" class="live-retention" role="status"></p></section>
+  <section class="live-panel" aria-labelledby="live-causes-title"><h2 id="live-causes-title">Causes d’échec <span id="live-causes-count" class="live-count">0</span></h2><ol id="live-causes" class="live-causes"></ol></section>
+  <section class="live-panel" aria-labelledby="live-queue-title"><h2 id="live-queue-title">À annoter <span id="live-queue-count" class="live-count">0</span></h2><ol id="live-queue" class="live-queue"></ol><p id="live-queue-state" class="live-retention" role="status"></p></section>
+  <section class="live-panel" aria-labelledby="live-model-title"><h2 id="live-model-title">Jetons par fournisseur · modèle</h2><div id="live-by-model"></div></section>
+  <section class="live-panel" aria-labelledby="live-top-title"><h2 id="live-top-title">Plus gros consommateurs</h2><div id="live-top"></div></section>
+ </div>
+ <div id="live-works" class="live-works"></div>
+ <p id="live-empty" class="live-empty" hidden>Aucun agent enregistré pour ce filtre.</p>
+ <p class="live-keys"><span>Raccourcis :</span> <kbd>p</kbd> <span>pause</span> · <kbd>a</kbd> <span>actifs seulement</span> · <kbd>t</kbd> <span>thème</span> · <kbd>n</kbd> <span>notifications</span> · <kbd>e</kbd> <span>exporter</span> · <kbd>←</kbd><kbd>→</kbd> <span>naviguer entre agents</span> · <kbd>Entrée</kbd> <span>ouvrir le harnais</span></p>
+</main>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "command": [
+    "python3",
+    "tools/agent-workflows/check.py"
+  ],
+  "start": "2026-10-17T13:03:15.972550+00:00",
+  "end": "2026-10-17T13:03:25.563460+00:00",
+  "exit": 0,
+  "scope": "Shared workflow configuration check, not authority acceptance"
+}

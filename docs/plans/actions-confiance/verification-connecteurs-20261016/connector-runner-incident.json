@@ -1,0 +1,7 @@
+{
+  "cause": "input inventory hashed web/lib directory as file",
+  "product_tests_executed": false,
+  "owner": "Codex",
+  "original": "connector-qualified-runner.out",
+  "corrected_precondition": "recursive regular-file inventory, no source change"
+}

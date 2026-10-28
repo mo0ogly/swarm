@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-11T16:26:20.964632+00:00",
+  "revision": 383,
+  "review": "review-754dbd4d247114000994bbc6",
+  "candidate": "6089c4fb54e72b344e2950628ca8662da38c1b07",
+  "started": "2026-10-11T16:18:52.793731089Z",
+  "calls": 33,
+  "journal": {
+    "inspection_task": "plan-ca937edf4e-T2",
+    "inspection_attempt": "a-2f9e1debb1548be96273f0d3",
+    "inspection_producer": "auto-a23c60f03a732c02841f",
+    "workflow_sha256": "0b5d056832b3443734c933d91b6681c63439e70d3e6f886e4215fe47988ca809",
+    "model_config_sha256": "287e072417ff801b554e1277b3f5db31086cd0c9f0a47525cb0c16058dd502a5",
+    "plan": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-5b04e8f1bdec705c/review-754dbd4d247114000994bbc6-plan.json",
+    "plan_sha256": "e60caeb253e422c95320e3b32de2906d0c9a01277684b8cee551fd1d54c13210",
+    "journal": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-5b04e8f1bdec705c/fragment-journal-afbccb2c89f513106b0c7819e6787e6b113add7fd8605e6d6ce0c4afd628cc0f.json",
+    "journal_sha256": "afbccb2c89f513106b0c7819e6787e6b113add7fd8605e6d6ce0c4afd628cc0f"
+  },
+  "journal_keys": [
+    "version",
+    "plan_sha256",
+    "attempt",
+    "provider_sha256",
+    "entries"
+  ],
+  "entries": [
+    [
+      "entries",
+      4
+    ]
+  ],
+  "limit": "Public anchored immutable journal verified; raw opinions only, no private provider reasoning. Original observer assumed path instead of journal key, corrected read without mutation/retry."
+}

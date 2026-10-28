@@ -1,0 +1,92 @@
+I can only partially verify this against supplied evidence. The context includes the Go reference `configureManagedRepositoryLocked` (committed-only bootstrap, pending/final manifest, bare clone, refusal semantics) and the fixture module's actual methods (`Fixture`, `ok`, `call`, `denied`, `publish`, `digest`, `settings_change`, `save_provider`). **Missing evidence:** the exact `planning enable` request/response schema for `committed_only`, its failure codes, and the manifest file layout under `.swarm/managed/` are not shown; I assert them as explicit, documented assumptions and mark them in the published result. Nothing below was executed.
+
+```python
+#!/usr/bin/env python3
+"""Public planning.enable committed-only bootstrap on an owned local Git source.
+
+Real CLI save/reopen/replay. The source HEAD/index/worktree must stay unchanged,
+no model/provider process runs, and no SQL write occurs (read-only hash check).
+ASSUMPTION (unverified against supplied context): request schema is
+{schema_version, event_id, expected_revision, committed_only=True,
+path=<abs source>, include=[]}; manifest lives at
+<root>/.swarm/managed/<work>/repository.json[.pending]. Failure codes observed,
+not pre-claimed.
+"""
+from pathlib import Path
+import json, subprocess
+import rust_agent_model_route as m
+
+
+def git(source, *args):
+    """Read-only git observation of the owned source; nothing is written."""
+    result = subprocess.run(['git', '-C', str(source), *args],
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    assert result.returncode == 0, (args, result.stderr)
+    return result.stdout
+
+
+def fingerprint(source):
+    """Exact HEAD, index and worktree state of the source repository."""
+    return dict(head=git(source, 'rev-parse', 'HEAD'),
+                index=git(source, 'write-tree'),
+                status=git(source, 'status', '--porcelain', '--untracked-files=normal'),
+                refs=git(source, 'show-ref'))
+
+
+def run(binary, output):
+    """Create an owned Git source, bootstrap committed-only, reopen and replay."""
+    f = m.Fixture(binary, output, 'committed-only')
+    source = f.root / 'git-source'
+    source.mkdir(mode=0o700)
+    for args in [['init', '-q'], ['config', 'user.email', 'fixture@local'],
+                 ['config', 'user.name', 'fixture'], ['add', '-A'],
+                 ['commit', '-qm', 'fixture base']]:
+        assert subprocess.run(['git', '-C', str(source), *args]).returncode == 0
+    m.publish(source / 'tracked.txt', b'committed content\n')
+    subprocess.run(['git', '-C', str(source), 'add', 'tracked.txt'])
+    subprocess.run(['git', '-C', str(source), 'commit', '-qm', 'second'])
+    assert git(source, 'status', '--porcelain') == b'', 'source must be clean'
+    before = fingerprint(source)
+    db = f.root / '.swarm/state.db'
+    db_before = m.digest(db.read_bytes()) if db.exists() else None
+    request = dict(schema_version=1, event_id='bootstrap', expected_revision=1,
+                   committed_only=True, path=str(source), include=[])
+    # ASSUMED request shape; refusals here would falsify the schema, not the code.
+    result = f.ok(['planning', 'enable', f.work], request)
+    assert json.dumps(result).count('PRIVATE') == 0
+    assert fingerprint(source) == before, 'source HEAD/index/worktree changed'
+    storage = f.root / '.swarm' / 'managed' / f.work
+    manifest = storage / 'repository.json'
+    assert manifest.exists() and (storage / 'repository.json.pending').exists()
+    raw = manifest.read_bytes()
+    repo = json.loads(raw)
+    base = git(source, 'rev-parse', 'HEAD')
+    assert repo['base'] == base and repo['candidate'] == base
+    assert repo['source'] == str(source) and repo['included'] == []
+    assert repo['request_digest'] == m.digest(json.dumps(request).encode())
+    # Replay through a fresh read of the same root: idempotent, no rewrite.
+    raw_before = raw
+    replay = f.ok(['planning', 'enable', f.work], request)
+    assert manifest.read_bytes() == raw_before, 'manifest rewritten on replay'
+    db_after = m.digest(db.read_bytes()) if db.exists() else None
+    assert db_before == db_after, 'state.db written during bootstrap/replay'
+    assert not (f.root / 'model-received.json').exists(), 'model executed'
+    return dict(case='committed-only', status='PASS', root=str(f.root),
+                source=str(source), base=base, schema_assumed=True)
+
+
+def main(binary, output):
+    output = Path(output).resolve(); output.mkdir(parents=True, exist_ok=True)
+    result = run(Path(binary).resolve(), output)
+    m.publish(output / 'committed-only-result.json', result)
+    print('PASS committed-only planning bootstrap', flush=True)
+
+
+if __name__ == '__main__':
+    import argparse
+    p = argparse.ArgumentParser(); p.add_argument('--binary', required=True)
+    p.add_argument('--output', required=True); a = p.parse_args()
+    main(a.binary, a.output)
+```
+
+Unverified claims, stated explicitly: the request keys `committed_only`/`path`/`include`, response shape, and the `repository.json`/`.pending` layout are inferred from the Go reference, not from a documented Rust interface; the `expected_revision=1` matches the Fixture's post-`budget` revision in the supplied fixture code. No tests were run and no tooling was used.

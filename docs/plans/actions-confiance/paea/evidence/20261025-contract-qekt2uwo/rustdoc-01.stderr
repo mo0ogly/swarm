@@ -1,0 +1,4 @@
+    Checking swarm-identity-contract v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-identity-contract)
+ Documenting swarm-protection-contract v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-protection-contract)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.14s
+   Generated /home/fpizzi/Documents/ChatGPT/swarm/.cache/paea-contract-target/doc/swarm_protection_contract/index.html

@@ -1,0 +1,30 @@
+{
+  "status": "INSTALLED_VERIFIED",
+  "version": "v0.1.1-dev.78",
+  "binary_sha256": "bef3310cab879016fdc84973d0a11aa47ab27a9bd0a2d34b0948ec9473c43f1c",
+  "pid": 2462270,
+  "build_profile_effective_inputs": 439,
+  "default_native_profile": true,
+  "evidence_directory": "docs/plans/migration-rust/evidence/20261025-preparation-writes/private/delivery-5xptu6ez",
+  "checks": {
+    "public_cli_api_assertions": 49,
+    "historical_keys": 8,
+    "sdk_named_tests": 2,
+    "historical_adoption_assertions": 6,
+    "admin_browser_assertions_per_fixture_journey": 45,
+    "installed_version_browser_assertions": 14,
+    "installed_http_identity_resource_assertions": 11,
+    "paused_missions_unchanged": 2
+  },
+  "limits": [
+    "No global migration acceptance or Biba/SCALING qualification",
+    "Historical settings not automatically adopted",
+    "No commit/push, provider calls or mission restart"
+  ],
+  "retained_failures": [
+    "Concurrent-input refusal during first78 build",
+    "Incorrect v42 baseline initially supplied for historical-v41 test; rerun uses retained dev74",
+    "Historical unused Go executable accidentally selected by an auxiliary read; corrected to actual /proc executable"
+  ],
+  "screenshot_probe": "English title verified visible by element capture and computed color/opacity; full-page capture discrepancy retained without a demonstrated product defect"
+}

@@ -1,0 +1,46 @@
+{
+  "independent_reviewer": "GLM via SKYNET, tool-free static review",
+  "request": "private/review-focused",
+  "source_binding": "request inputs.json contains exact reviewed hashes; final patch checked by principal and regression, not a second independent execution",
+  "known_successful_usage_tokens": 206415,
+  "failed_request_usage": "unknown HTTP504; excluded from known sum",
+  "findings": [
+    {
+      "id": "D1",
+      "status": "reproduced-before-fixed-after",
+      "contract": "Current revision receipt must match stored content before projection",
+      "proof": "private/receipt-integrity-before.log, receipt-integrity-after.log; permanent preparation_current_receipt_content_must_match_stored_state",
+      "fix": "Reject p.revision == current.revision && p != current. Historical snapshot remains explicitly historical. Not OS protection against arbitrary DB writers."
+    },
+    {
+      "id": "D2",
+      "status": "contract-clarified-and-regression-added",
+      "contract": "Cap applies to supplied UTF8 title before trimming; editorial default exempt",
+      "reference": "ignored Go prephase_contract.go lines90 and153-157; current Admin help already says supplied title",
+      "fix": "Clarify exemption FR/EN catalogue/help; add zero, whitespace and exact-cap tests. No additional policy."
+    },
+    {
+      "id": "D3",
+      "status": "disproved-by-current-source-and-8-public-witnesses",
+      "contract": "valid_preparation_key delegates shared 128-byte preparation syntax; not generic agent100",
+      "proof": "private/writes-recipe7 step2, private/key-before-http actual prior dev74 defect"
+    },
+    {
+      "id": "D4",
+      "status": "retained-hypothesis-not-reproduced",
+      "contract": "Possible duplicate ancillary observations across clean SQLite BUSY retries, not loss of cause or business mutation",
+      "decision": "Do not clear prior causes without a tested observation/provenance contract. Shared loop requires autocommit and clean release; commit/cleanup compound errors do not retry. No reproduced wrong final state. Follow-up after cutover.",
+      "owner": "Codex",
+      "resumption": "Controlled post-catalogue BUSY witness plus required final-vs-attempt observation contract; do not inject arbitrary retries/timeouts"
+    }
+  ],
+  "context_questions": {
+    "event_scope": "Go primary key and query explicitly preparation_id,event_id (prephase_store.go:15,145)",
+    "empty_document": "Existing public zero-byte save witness passes; no implicit nonempty requirement",
+    "updated_at": "Set unconditionally before persistence in both writers (Go prephase_store.go:266)",
+    "auth": "Public protected route auth/CSRF refusal witnesses run; method handler relies on shared service",
+    "linux": "Root writer module gated Linux in root_store.rs; exercised native Linux profile only",
+    "method_source": "Read helper/bundled catalogue inspected; unavailable method creates draft with sidecar, no fresh authority"
+  },
+  "limits": "Static independent review is not global conformance, OS isolation, provider execution, independent runtime acceptance or installation. D4 remains a recorded improvement hypothesis."
+}

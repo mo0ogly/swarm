@@ -1,0 +1,14 @@
+{
+  "name": "frozen-vet",
+  "command": [
+    "go",
+    "vet",
+    "-overlay",
+    "/tmp/swarm-m24-identity-view-flm5m5vn/overlay.json",
+    "./internal/engine"
+  ],
+  "start": "2026-10-17T09:07:37.357486+00:00",
+  "end": "2026-10-17T09:07:56.405024+00:00",
+  "exit_code": 0,
+  "log": "frozen-vet.log"
+}

@@ -1,0 +1,5 @@
+# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]
+internal/engine/managed_review_retry_delivery_test.go:69:6: strconvQuote redeclared in this block
+	internal/engine/graph_draft_projection_test.go:18:6: other declaration of strconvQuote
+FAIL	swarm.local/companion/internal/engine [build failed]
+FAIL

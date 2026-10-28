@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "node",
+    "tests/actions_confiance_evidence_ui.cjs",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/review-corrections/public-evidence-browser",
+    "--effect-proof"
+  ],
+  "pid": 439149,
+  "start_ticks": "6935913",
+  "started_unix": 1792134934.990357,
+  "status": "failed",
+  "binary_sha256": "c0030271a0c2108a6d872b954b0be7556f69642463e28e3070f6bde1edfd8ec8",
+  "exit_code": 1,
+  "ended_unix": 1792134953.3152008,
+  "inputs_unchanged": true,
+  "changed_inputs": []
+}

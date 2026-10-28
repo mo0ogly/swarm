@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "sh",
+    "build.sh",
+    "bin/swarm-actions-confiance-effect-proof"
+  ],
+  "pid": 307683,
+  "start_ticks": "6768279",
+  "started_unix": 1792133258.6455915,
+  "status": "passed",
+  "exit_code": 0,
+  "ended_unix": 1792133284.1984904,
+  "inputs_unchanged": true,
+  "binary_sha256": "aab3e5704d26e97c143cd604fc87f0a215fa34c834660bb3bf2624a483e7b5ae"
+}

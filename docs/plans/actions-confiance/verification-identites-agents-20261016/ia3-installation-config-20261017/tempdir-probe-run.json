@@ -1,0 +1,12 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "/tmp/swarm-config-mode-probe-sx3nj9jo/probe_test.go",
+    "-count=1",
+    "-timeout=0"
+  ],
+  "exit": 0,
+  "diagnostic_only": true
+}

@@ -1,0 +1,14 @@
+{
+  "kind": "role-model",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "expected_revision": 727,
+  "role_model": {
+    "scope": "",
+    "reviewer": true,
+    "provider": "codex",
+    "level": "standard",
+    "model_policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+    "inherit": false
+  },
+  "event_id": "T3-codex-reviewer-model-0f36eb8bf9014abab8121e4b5b0ad74b"
+}

@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/home/fpizzi/.npm-global/bin/mmdc",
+    "-i",
+    "/tmp/swarm-review-latency-replan.mmd",
+    "-o",
+    "/tmp/swarm-review-latency-replan.png",
+    "-p",
+    "/tmp/swarm-mermaid-puppeteer.json",
+    "-w",
+    "1250",
+    "-b",
+    "white"
+  ],
+  "start": "2026-10-11T16:25:17.320076+00:00",
+  "end": "2026-10-11T16:25:20.873131+00:00",
+  "seconds": 3.553069911999046,
+  "exit": 0,
+  "source": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261011-instruction-learning-retex.md",
+  "render": "/tmp/swarm-review-latency-replan.png",
+  "sha256": "080006846d82e34964accdbcb7de330ef0a532a439498d2005df764164853064",
+  "limit": "Documentary flow render, no native behavior proof."
+}

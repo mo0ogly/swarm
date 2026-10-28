@@ -1,0 +1,48 @@
+//go:build linux
+
+package engine
+
+import (
+	"encoding/json"
+	"os"
+	"strings"
+	"testing"
+)
+
+func TestMemorySummarySelectionReceiptDriftPreventsProvider(t *testing.T) {
+	for _, scenario := range []string{"edited-selection", "missing-receipt"} {
+		t.Run(scenario, func(t *testing.T) {
+			s, w, r := summarySelectionFixture(t)
+			script := summaryCaptureProvider(t, s)
+			a := prepareSummaryAgent(t, s, w, r)
+			if scenario == "missing-receipt" {
+				a.Context.Summary = nil
+			} else {
+				a.Context.Summary.Selection.Reason = "Changed after confirmation"
+				raw, err := json.Marshal(a.Context.Summary.Selection)
+				if err != nil {
+					t.Fatal(err)
+				}
+				a.Context.Summary.SelectionSHA = hash(raw)
+			}
+			// Corruption fixture only. No public operation to alter this receipt
+			// is claimed, and this is not a test against a live mission database.
+			if err := s.saveAgent(a); err != nil {
+				t.Fatal(err)
+			}
+			if err := s.supervise(a.ID); err != nil {
+				t.Fatal(err)
+			}
+			stored, err := s.agent(a.ID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := os.Stat(script + ".calls"); !os.IsNotExist(err) {
+				t.Fatalf("provider invoked despite %s: status=%s activity=%s err=%v", scenario, stored.Status, stored.Activity, err)
+			}
+			if stored.Status != "failed" || stored.Child != 0 || !strings.Contains(stored.Activity, "reçu extractif") {
+				t.Fatal("receipt drift not explained before provider start", stored.Status, stored.Activity)
+			}
+		})
+	}
+}

@@ -1,0 +1,5 @@
+--- FAIL: TestPlanningHistoricalInputsCannotPoisonCurrentDecision (0.03s)
+    planning_historical_delivery_test.go:93: historical acknowledgement lost continuation or delivery history
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.051s
+FAIL

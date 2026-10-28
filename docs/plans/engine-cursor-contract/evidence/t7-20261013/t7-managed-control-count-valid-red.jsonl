@@ -1,0 +1,9 @@
+{"Time":"2026-10-13T10:01:07.274244839+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-13T10:01:07.300533969+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCountsManagedAndAutomaticControlEvents"}
+{"Time":"2026-10-13T10:01:07.300616394+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCountsManagedAndAutomaticControlEvents","Output":"=== RUN   TestMissionSpendingCountsManagedAndAutomaticControlEvents\n"}
+{"Time":"2026-10-13T10:01:07.34921292+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCountsManagedAndAutomaticControlEvents","Output":"    mission_insights_test.go:196: recorded managed controls missing: got=1 err=\u003cnil\u003e\n"}
+{"Time":"2026-10-13T10:01:07.350477388+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCountsManagedAndAutomaticControlEvents","Output":"--- FAIL: TestMissionSpendingCountsManagedAndAutomaticControlEvents (0.05s)\n"}
+{"Time":"2026-10-13T10:01:07.350510079+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCountsManagedAndAutomaticControlEvents","Elapsed":0.05}
+{"Time":"2026-10-13T10:01:07.350648529+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-13T10:01:07.353822215+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.079s\n"}
+{"Time":"2026-10-13T10:01:07.353863353+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.08}

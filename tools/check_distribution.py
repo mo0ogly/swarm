@@ -1,4 +1,10 @@
-"""Offline distribution checks. Never opens a mission database or calls an AI."""
+"""Check entry links, tracked privacy and Rust-only delivery commands offline.
+
+Lexical guards cover explicit operational files, not arbitrary shell indirection
+or absence of all Go mentions. Historical proofs/compatibility references remain;
+failures report candidates for semantic review, never imply runtime acceptance.
+No mission database, network, model call or source mutation.
+"""
 from pathlib import Path
 import re
 import subprocess
@@ -19,6 +25,8 @@ for name in documents:
 tracked = subprocess.check_output(['git', 'ls-files', '-z'], cwd=root).decode().split('\0')
 for name in filter(None, tracked):
     p = Path(name)
+    if p.suffix == '.go':
+        errors.append(f'Legacy Go source still tracked in Rust distribution: {name}')
     if '.swarm' in p.parts or p.name in ('install.env', '.env') or p.suffix in ('.db', '.sqlite', '.sqlite3'):
         errors.append(f'Private runtime file tracked: {name}')
 for name in ['install.sh', 'deploy/entrypoint.sh', 'swarm.sh']:
@@ -27,6 +35,10 @@ for name in ['install.sh', 'deploy/entrypoint.sh', 'swarm.sh']:
 for name in ['swarm.sh', 'tools/swarm_local.py', 'tests/test_swarm_local.py']:
     if name not in tracked or not (root / name).is_file():
         errors.append(f'Missing published launcher dependency: {name}')
+# Only operational delivery entries: historical Go proofs remain valid records.
+for name in ['install.sh', 'Dockerfile', 'Makefile', '.github/workflows/ci.yml', 'build.sh', 'swarm.sh']:
+    if re.search(r'golang:|actions/setup-go|\bgo (?:build|mod|vet|test)\b|command -v go\b|supervision_go_suite', (root / name).read_text()):
+        errors.append(f'Obsolete Go dependency in active delivery entry: {name}')
 if errors:
     raise SystemExit('\n'.join(errors))
 print('PASS: entry docs links, executable scripts, no tracked runtime databases or env files')

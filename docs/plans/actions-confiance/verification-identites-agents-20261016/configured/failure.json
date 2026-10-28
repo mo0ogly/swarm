@@ -1,0 +1,17 @@
+{
+  "error": "Traceback (most recent call last):\n  File \"/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia1_audit.py\", line 213, in main\n    identity_failure = cli([\"trust\", \"identity-context\"], {}, token=invalid_token, want=3)\n  File \"/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia1_audit.py\", line 134, in cli\n    assert result.returncode == want, (argv, result.returncode, result.stderr)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: (['trust', 'identity-context'], 4, '{\\n  \"error\": \"identité non reconnue ou suspendue\",\\n  \"failure\": {\\n    \"code\": \"authorization_required\",\\n    \"message\": \"identité non reconnue ou suspendue\",\\n    \"retryable\": false\\n  },\\n  \"schema_version\": 1\\n}\\n')\n",
+  "root": "/tmp/swarm-ia1-agents-t8b4bfu4",
+  "checks": [],
+  "failures": [
+    {
+      "id": "IA1-F01",
+      "scenario": "CLI without an identity token",
+      "security_result": "FAIL",
+      "observed": {
+        "agent": "c8479e2a-dbc2-4943-89d4-763042f11518",
+        "status": "completed"
+      },
+      "expected": "Authenticate requester before creating or starting an agent"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "cause": "one unnecessary hunk cited a non-existent sentence in the inventory",
+  "observed_error": "apply_patch verification failed: expected context missing",
+  "recovery": "inspect whether any earlier file changed, then apply only matching scoped edits",
+  "application_code_changed": false
+}

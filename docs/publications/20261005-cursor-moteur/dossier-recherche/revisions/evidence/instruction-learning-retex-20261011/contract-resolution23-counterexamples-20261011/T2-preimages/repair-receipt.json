@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-11T21:21:29.506315+00:00",
+  "examined_tree": "b64901e7c9f3b75d81420a80f0103a3911c4fe82",
+  "sources": 23,
+  "source_bytes": 130989,
+  "remaining_bytes": 83,
+  "original_go_sources": 519,
+  "original_go_drift": [],
+  "original_helper_sha256": "4e190bce0ee367c5b490b495b0c1f1c6c4a821df11ab8a33f7568289fb6c586d",
+  "preimages": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T2-budget-original-source-preimages-20261011",
+  "new_originals": [
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/own-scope-budget.out",
+      "sha256": "4c099033561aca4f94767cb7eea7370af7621a1c0cdb567d114bf10eeda67319",
+      "bytes": 767
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/own-scope-budget-receipt.json",
+      "sha256": "61bac137847a9151af93ba3b3cea88288279b388d4873e35ff23c2cdca89d2ff",
+      "bytes": 835
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/own-scope-budget-harness.go.txt",
+      "sha256": "2b8ed0b754f68d87debd0f331d8988d0e796421a788331d8d9cadae370baea18",
+      "bytes": 2320
+    }
+  ],
+  "limits": "Inactive producer source documentation/evidence only; original proofs and native state unchanged; controls and independent review still required."
+}

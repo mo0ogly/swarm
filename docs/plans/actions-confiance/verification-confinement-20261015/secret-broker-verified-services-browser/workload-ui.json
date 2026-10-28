@@ -1,0 +1,27 @@
+{
+  "checks": [
+    "fr: service settings render on mobile with visible keyboard focus",
+    "fr: invalid local service mapping is rejected in the selected language",
+    "fr: preview performs no discovery, then exact configuration persists",
+    "fr: saved public keys and durations reopen",
+    "fr: private_key_jwt CLI login authorizes an exact approved effect through the public API and UI",
+    "fr: signed groups restrict the service to its local effect role and bind the committed evidence",
+    "fr: raw assertion/session are absent from storage and explicit logout succeeds",
+    "en: service settings render on mobile with visible keyboard focus",
+    "en: invalid local service mapping is rejected in the selected language",
+    "en: preview performs no discovery, then exact configuration persists",
+    "en: saved public keys and durations reopen",
+    "en: private_key_jwt CLI login authorizes an exact approved effect through the public API and UI",
+    "en: signed groups restrict the service to its local effect role and bind the committed evidence",
+    "en: raw assertion/session are absent from storage and explicit logout succeeds"
+  ],
+  "errors": [],
+  "expectedDiagnostics": [
+    "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+    "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+  ],
+  "exchanges": 2,
+  "discoveries": 2,
+  "root": "/tmp/swarm-workload-ui-ZqVgYh",
+  "at": "2026-10-15T21:46:25.030Z"
+}

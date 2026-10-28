@@ -1,0 +1,11 @@
+=== RUN   TestPreparedOrganizationRepositoryRollback
+=== RUN   TestPreparedOrganizationRepositoryRollback/initial
+    prephase_organization_test.go:604: rejected operation retained a frozen snapshot repository.git <nil>
+=== RUN   TestPreparedOrganizationRepositoryRollback/late
+    prephase_organization_test.go:604: rejected operation retained a frozen snapshot repository.git <nil>
+--- FAIL: TestPreparedOrganizationRepositoryRollback (0.34s)
+    --- FAIL: TestPreparedOrganizationRepositoryRollback/initial (0.17s)
+    --- FAIL: TestPreparedOrganizationRepositoryRollback/late (0.17s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.367s
+FAIL

@@ -1,0 +1,11 @@
+{
+  "task": "plan-68b50cc82e-T1",
+  "status": "accepted",
+  "review_state": "passed",
+  "review_verdict": null,
+  "review_id": "review-7191bdca102c7e18b7cfbb05",
+  "review_calls": 1,
+  "planning_calls": 1,
+  "planning_failure": null,
+  "running_task": "plan-68b50cc82e-T2"
+}

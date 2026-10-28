@@ -1,0 +1,79 @@
+{
+  "mission": {
+    "authorized": true,
+    "enabled": true,
+    "paused": false,
+    "running": 1,
+    "total": 8,
+    "validated": 0
+  },
+  "supervision": "active",
+  "organization_ready": true,
+  "root": {
+    "id": "root",
+    "state": "waiting",
+    "activations": 0,
+    "holder": null
+  },
+  "planning_failure": null,
+  "planning_calls": 0,
+  "planning_budget": 40,
+  "review_calls": 0,
+  "review_budget": 40,
+  "active_agents": [
+    {
+      "id": "auto-0a2f3785ced73543e990",
+      "task_id": "plan-68b50cc82e-T1",
+      "status": "running",
+      "provider": "codex",
+      "role": "worker",
+      "child_pid": 532444,
+      "workspace": "/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T1-1",
+      "tool_calls": 10,
+      "tool_errors": 0
+    }
+  ],
+  "tasks": [
+    {
+      "id": "plan-68b50cc82e-T1",
+      "status": "running",
+      "blocker": ""
+    },
+    {
+      "id": "plan-68b50cc82e-T2",
+      "status": "todo",
+      "blocker": ""
+    },
+    {
+      "id": "plan-68b50cc82e-T3",
+      "status": "todo",
+      "blocker": ""
+    },
+    {
+      "id": "plan-68b50cc82e-T4",
+      "status": "todo",
+      "blocker": ""
+    },
+    {
+      "id": "plan-68b50cc82e-T5",
+      "status": "todo",
+      "blocker": ""
+    },
+    {
+      "id": "plan-68b50cc82e-T6",
+      "status": "todo",
+      "blocker": ""
+    },
+    {
+      "id": "plan-68b50cc82e-T7",
+      "status": "todo",
+      "blocker": ""
+    },
+    {
+      "id": "plan-68b50cc82e-T8",
+      "status": "todo",
+      "blocker": ""
+    }
+  ],
+  "unrelated_works_preserved": 4
+}

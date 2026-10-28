@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "binary": "/tmp/swarm-ui-20261010/swarm-next",
+  "root": "/tmp/swarm-training-ui-Mk3kid",
+  "work": "w-1a8b95053992ca861995515d",
+  "revision": 7,
+  "recorded": "2026-10-10",
+  "languages": [
+    "fr",
+    "en"
+  ],
+  "themes": [
+    "etat",
+    "sombre"
+  ],
+  "agents": 0,
+  "policies_applied": 0,
+  "errors": [],
+  "failures": [],
+  "captures": [
+    "00-besoin-en.png",
+    "00-besoin-fr.png",
+    "13-graphe-en.png",
+    "13-graphe-fr.png",
+    "14-tache-en.png",
+    "14-tache-fr.png",
+    "15-humaine-en.png",
+    "15-humaine-fr.png",
+    "16-controle-en.png",
+    "16-controle-fr.png",
+    "17-apercu-en.png",
+    "17-apercu-fr.png",
+    "18-graphe-sombre.png",
+    "19-commande-en.png",
+    "19-commande-fr.png",
+    "overview-01.png",
+    "overview-02.png",
+    "overview-03.png",
+    "overview-04.png"
+  ],
+  "binary_sha256": "14e3e24825334673c868371a8abf94911332bb870a98a5ffcf6228908ae6a75d"
+}

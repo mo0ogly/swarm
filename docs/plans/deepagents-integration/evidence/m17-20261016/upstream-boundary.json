@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "scope": "Pinned static method extracted from AST, not the installed middleware",
+  "upstream_commit": "29d646fd2d832a44c476964333eddecb0ec1c0cd",
+  "upstream_sha256": "976c2d1b1e604802a2f05046f188b6b0509be06ba2f14013d9d21b3ad29f7c7f",
+  "observations": [
+    {
+      "cutoff": 2,
+      "actual": [
+        "summary",
+        "m3"
+      ]
+    },
+    {
+      "cutoff": -1,
+      "actual": [
+        "summary",
+        "m3"
+      ]
+    },
+    {
+      "cutoff": 4,
+      "actual": [
+        "summary"
+      ]
+    },
+    {
+      "cutoff": true,
+      "actual": [
+        "summary",
+        "m2",
+        "m3"
+      ]
+    }
+  ],
+  "warnings": [
+    "Summarization cutoff_index 4 exceeds message count 3; remaining slice will be empty"
+  ],
+  "model_calls": 0
+}

@@ -1,0 +1,28 @@
+{
+  "pid": 424247,
+  "proc_start_ticks": "1847891",
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-oidc",
+    "--root",
+    "/tmp/swarm-actions-preview-g81kfiuh",
+    "web",
+    "127.0.0.1:36525"
+  ],
+  "binary_sha256": "4e1888d24220777fcae11bd98df224f15bfcea5368cd29514fcfea1b9f206050",
+  "origin": "http://127.0.0.1:36525",
+  "fixture_root": "/tmp/swarm-actions-preview-g81kfiuh",
+  "old_process": {
+    "pid": 268160,
+    "identity_verified": true,
+    "stopped": true
+  },
+  "actions": 2,
+  "ledger_entries": 1,
+  "state_sha256_unchanged": "d3b01d34c5c750ca91cbe1591ccd1c978ecb3a52a6416ffbbb0d610cfddd48c1",
+  "oidc_admin_present": true,
+  "oidc_enabled": false,
+  "public_api_and_html_verified": true,
+  "browser_reload_observed": false,
+  "private_startup_log": "/tmp/swarm-oidc-preview-mvbnkqaz.log",
+  "created_at_utc": "2026-10-15T17:07:35.275113+00:00"
+}

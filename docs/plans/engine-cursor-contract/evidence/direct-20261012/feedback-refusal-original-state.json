@@ -1,0 +1,39 @@
+{
+  "work": "w-871bc6486e65ce697c27ce93",
+  "revision": 5,
+  "instructions": [
+    {
+      "id": "future",
+      "next": "Keep <source> and verify the actual received context before retry.\n\nOriginal instruction",
+      "additions": [
+        {
+          "id": "instruction-b11cb38f01dba6b08e45bf0a",
+          "addition": "Keep <source> and verify the actual received context before retry.",
+          "reason": "Feedback indicates missing receipt verification",
+          "scope": "root",
+          "holder": "fixture-supervisor",
+          "generation": 1,
+          "input_events": [
+            "10928a44-8574-46f7-b8f6-4060162fd0d4"
+          ],
+          "decision": "d889182b-9f0e-48bd-b27d-cb13f85d1fe6",
+          "at": "2026-10-12T20:20:43.809855538Z",
+          "state": "applied",
+          "attempts_at_creation": 0,
+          "before_sha256": "272e32db06894c62131f9b01d6be2cf5c851be2780c6da6d4b4b4654857714e5",
+          "after_sha256": "335a255fcb0d339095e5f56a4e7e524444bc8a8cc58f01fe7c2df19d25adefb4"
+        }
+      ]
+    }
+  ],
+  "feedback": [
+    [
+      "w-871bc6486e65ce697c27ce93|instruction-b11cb38f01dba6b08e45bf0a",
+      {
+        "text": "Rejection not applied: révision périmée : attendue 4, courante 5 ; relire le travail",
+        "error": true,
+        "pending": false
+      }
+    ]
+  ]
+}

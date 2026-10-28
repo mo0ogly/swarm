@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "at": "2026-10-17T13:01:56.950443+00:00",
+  "artifact": "final-recipe-bundle.zip",
+  "sha256": "7225b2c058510f92e719d6ef510fc8fb9532652adbcb1161ec4cf9de175060cd",
+  "work_schema": 1,
+  "event_count": 6,
+  "work_revision": 6,
+  "files": {
+    "proof.txt": "c1cda26362828b69266512052b97cb3729e3b052e4ade47c0a1e3383defe73c7"
+  },
+  "missing": [],
+  "scope": "Synthetic fixture archive only, not user acceptance or identity authority"
+}

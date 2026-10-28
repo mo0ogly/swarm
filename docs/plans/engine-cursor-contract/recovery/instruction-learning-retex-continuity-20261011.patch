@@ -1,0 +1,183 @@
+diff --git a/docs/architecture/AGENT-ENGINE-PROTOCOL.md b/docs/architecture/AGENT-ENGINE-PROTOCOL.md
+index 2f2ddc1eaeea9545cd7c6e56ce3ff4c71cf28e50..48e521a790fa33b5a374646e431e94c35cb370d2 100644
+--- a/docs/architecture/AGENT-ENGINE-PROTOCOL.md
++++ b/docs/architecture/AGENT-ENGINE-PROTOCOL.md
+@@ -152,3 +152,9 @@ Les budgets et droits restent contrôlés. Une autorisation utilisateur explicit
+ peut permettre leur augmentation par les opérations publiques ; la démarche
+ replan, un agent ou une documentation ne crée pas cette autorité. Les dépenses
+ et les refus précédents restent visibles.
++
++Quand le dernier lot historique est acquitté sans autre entrée en attente, le
++moteur remet `historical_acknowledged` au responsable. Ce constat courant permet
++une nouvelle décision sur les exigences ouvertes ou une proposition de clôture
++avec les vérifications ordinaires ; le moteur ne choisit aucune de ces actions.
++Le reçu, la décision source, les consommations et l’historique restent durables.
+diff --git a/docs/en/AGENT-ENGINE-PROTOCOL.md b/docs/en/AGENT-ENGINE-PROTOCOL.md
+index 96ed593b8abca33a2da1e06ee3fc099449cb99aa..da42a4cb4474b5bac9438fd8a1e3e28db2bc34bc 100644
+--- a/docs/en/AGENT-ENGINE-PROTOCOL.md
++++ b/docs/en/AGENT-ENGINE-PROTOCOL.md
+@@ -135,3 +135,9 @@ acknowledgement preserves history, attempts and costs.
+ Rights and budgets remain enforced. Explicit user authority may permit an
+ increase through public operations; replan, agents and documentation do not
+ create that authority. Earlier expenses and refusals remain visible.
++
++When the last historical batch is acknowledged and no other input remains, the
++engine delivers `historical_acknowledged` to the owner. This current receipt
++enables a new decision about open requirements or a closure proposal subject
++to ordinary checks; the engine chooses neither action. The receipt, source
++decision, consumption and history remain durable.
+diff --git a/internal/engine/planning.go b/internal/engine/planning.go
+index cac05f55c60fecc0e824b1eadad9282f3950b5a6..2509eca7fa56d75d580a842d19b3cf41a4ba4c7b 100644
+--- a/internal/engine/planning.go
++++ b/internal/engine/planning.go
+@@ -628,6 +628,13 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
+ 					scope.State = "ready"
+ 				}
+ 			}
++			if scope.State == "waiting" && scope.Delivery != nil && scope.Delivery.HistoricalOnly {
++				// The old returns authorize acknowledgement only. Wake the owner
++				// on a current receipt so it can reassess the original objective;
++				// the engine neither chooses an operation nor closes the scope.
++				p.Inbox = append(p.Inbox, PlanningEvent{ID: planningEventID(r.EventID, "historical-acknowledged"), Scope: scopeID, Kind: "historical_acknowledged", Message: "Retours historiques acquittés sans opération par " + r.EventID + ". Réexaminer le besoin et les exigences encore ouvertes sur l’état actuel ; aucune acceptation nouvelle n’est établie.", At: at.Format(time.RFC3339Nano)})
++				scope.State = "ready"
++			}
+ 		}
+ 		return nil
+ 	default:
+diff --git a/internal/engine/planning_historical_delivery_test.go b/internal/engine/planning_historical_delivery_test.go
+index f77f8988c3b10039d2541f87958a4df4e6db4d22..393f8ce239bfddb53d5ab4a0444a08119aa79aa6 100644
+--- a/internal/engine/planning_historical_delivery_test.go
++++ b/internal/engine/planning_historical_delivery_test.go
+@@ -89,6 +89,18 @@ func TestPlanningHistoricalInputsCannotPoisonCurrentDecision(t *testing.T) {
+ 	}
+ 	r.Operations = nil
+ 	w = planningDo(t, s, w, "decide", r)
++	if w.Planning.Scopes[0].State != "ready" || w.Planning.Scopes[0].Delivery.HistoricalOnly == false {
++		t.Fatal("historical acknowledgement lost continuation or delivery history")
++	}
++	pending := []PlanningEvent{}
++	for _, event := range w.Planning.Inbox {
++		if event.Decision == "" {
++			pending = append(pending, event)
++		}
++	}
++	if len(pending) != 1 || pending[0].Kind != "historical_acknowledged" || len(w.Tasks) != 2 {
++		t.Fatal("no current continuation after final historical acknowledgement", pending)
++	}
+ 	second, err := openStore(s.root, false)
+ 	if err != nil {
+ 		t.Fatal(err)
+@@ -98,6 +110,16 @@ func TestPlanningHistoricalInputsCannotPoisonCurrentDecision(t *testing.T) {
+ 	if err != nil || len(persisted.Tasks) != 2 || persisted.Planning.Inbox[0].Decision == "" || len(persisted.Tasks[0].Attempts) != 2 || persisted.Planning.Activations != 3 || persisted.Planning.Decisions != 3 {
+ 		t.Fatal("acknowledgement, original attempts or consumption lost after restart", persisted, err)
+ 	}
++	persisted, next := claim(persisted)
++	owner, _ = persisted.Planning.scope("root")
++	if owner.Delivery.HistoricalOnly || !reflect.DeepEqual(next.Inputs, []string{pending[0].ID}) {
++		t.Fatal("continuation delivered as historical or missing", owner.Delivery)
++	}
++	next.Operations = []PlanningOperation{{Kind: "revise-instructions", ID: "final-retex", Next: "Préserver les acquittements historiques et vérifier les exigences encore ouvertes."}}
++	persisted = planningDo(t, s, persisted, "decide", next)
++	if len(persisted.Tasks) != 2 || len(persisted.Tasks[1].InstructionRevisions) != 1 || persisted.Planning.Scopes[0].State == "closed" {
++		t.Fatal("continuation cannot act or engine invented completion", persisted)
++	}
+ }
+ 
+ func TestPlanningContextMissingTaskIsHistoricalEvenWithoutAttempt(t *testing.T) {
+diff --git a/internal/engine/planning_test.go b/internal/engine/planning_test.go
+index d35363060b31071c2d8b0ef14e0944d827f53b9a..06f47ce4dae16f2ea7a07a07d09795b8aad8b04b 100644
+--- a/internal/engine/planning_test.go
++++ b/internal/engine/planning_test.go
+@@ -36,12 +36,7 @@ func planningClaim(t *testing.T, s *Store, w Work, scope string) (Work, Planning
+ 	owner, _ := w.Planning.scope(scope)
+ 	w = planningDo(t, s, w, "claim", PlanningRequest{Scope: scope, ScopeRevision: owner.Revision, Holder: "test-owner", LeaseSeconds: 60})
+ 	owner, _ = w.Planning.scope(scope)
+-	ids := []string{}
+-	for _, e := range w.Planning.Inbox {
+-		if e.Scope == scope && e.Decision == "" {
+-			ids = append(ids, e.ID)
+-		}
+-	}
++	ids := append([]string(nil), owner.Delivery.Events...)
+ 	return w, PlanningRequest{Schema: 1, EventID: newID("decision-"), Revision: w.Revision, Scope: scope, ScopeRevision: owner.Revision, Generation: owner.Generation, Holder: owner.Holder, Inputs: ids, Reason: "Décision fondée sur les retours"}
+ }
+ func planningTask(id string) PlanningOperation {
+@@ -529,10 +524,10 @@ func TestPlanningTaskForConfidedRequirementRefusedGuidingRetry(t *testing.T) {
+ }
+ 
+ // R4: an old attempt event superseded by a later attempt (stale, per
+-// currentTaskAttempt) must be acknowledged with a no-operation decision before
+-// the current return is decided on, and a task that has exhausted
++// currentTaskAttempt) is excluded from current inputs and later acknowledged
++// with a no-operation decision. A task that has exhausted
+ // plan_max_attempts stays refused instead of retrying forever.
+-func TestPlanningStaleAttemptEventAcknowledgedWithoutOperationBeforeCurrentReturn(t *testing.T) {
++func TestPlanningStaleAttemptAcknowledgementPreservesCurrentReturnAndRetryBudget(t *testing.T) {
+ 	s, w := planningFixture(t)
+ 	w, r := planningClaim(t, s, w, "root")
+ 	r.Operations = []PlanningOperation{planningTask("first")}
+@@ -562,33 +557,51 @@ func TestPlanningStaleAttemptEventAcknowledgedWithoutOperationBeforeCurrentRetur
+ 		t.Fatal(e)
+ 	}
+ 	w, r = planningClaim(t, s, w, "root")
+-	if len(r.Inputs) != 2 {
+-		t.Fatal("expected both the stale and the current return pending", r.Inputs)
++	if len(r.Inputs) != 1 || r.Inputs[0] == staleID {
++		t.Fatal("claim must admit the current return only", r.Inputs)
+ 	}
+ 	decisionsBefore := w.Planning.Decisions
+-
+ 	staleOnly := r
+ 	staleOnly.Inputs = []string{staleID}
+ 	staleOnly.Operations = []PlanningOperation{{Kind: "retry", ID: "first", Next: "Corriger le contrôle X"}}
+ 	if _, e := s.planningChange(w.ID, "decide", staleOnly); e == nil {
+ 		t.Fatal("stale attempt return accepted an operation instead of being refused")
+ 	}
+-
+ 	staleOnly.Operations = nil
+-	w, e = s.planningChange(w.ID, "decide", staleOnly)
++	if _, e := s.planningChange(w.ID, "decide", staleOnly); e == nil {
++		t.Fatal("unadmitted historical input acknowledged in a current claim")
++	}
++	r.Operations = []PlanningOperation{{Kind: "retry", ID: "first", Next: "Corriger le contrôle Y"}}
++	if _, e := s.planningChange(w.ID, "decide", r); e == nil {
++		t.Fatal("retry beyond plan_max_attempts must stay bounded, never loop indefinitely")
++	}
++	r.Operations = nil
++	w, e = s.planningChange(w.ID, "decide", r)
+ 	if e != nil {
+-		t.Fatal("stale attempt return was not acknowledged by a no-operation decision", e)
++		t.Fatal("current exhaustion diagnostic could not be acknowledged", e)
+ 	}
+-	if w.Planning.Decisions != decisionsBefore+1 {
+-		t.Fatal("acknowledgement must count as exactly one bounded decision, no more", w.Planning)
++	w, r = planningClaim(t, s, w, "root")
++	if len(r.Inputs) != 1 || r.Inputs[0] != staleID || !w.Planning.Scopes[0].Delivery.HistoricalOnly {
++		t.Fatal("only the historical return should remain admitted", r.Inputs)
++	}
++	r.Operations = []PlanningOperation{{Kind: "retry", ID: "first", Next: "Corriger le contrôle X"}}
++	if _, e := s.planningChange(w.ID, "decide", r); e == nil {
++		t.Fatal("historical acknowledgement authorized production")
++	}
++	r.Operations = nil
++	w, e = s.planningChange(w.ID, "decide", r)
++	if e != nil {
++		t.Fatal("historical no-operation acknowledgement refused", e)
++	}
++	if w.Planning.Decisions != decisionsBefore+2 || len(w.Tasks[0].Attempts) != 2 {
++		t.Fatal("exact acknowledgement consumption or attempt history changed", w.Planning)
+ 	}
+-
+ 	w, r = planningClaim(t, s, w, "root")
+-	if len(r.Inputs) != 1 || r.Inputs[0] == staleID {
+-		t.Fatal("only the current return should remain pending", r.Inputs)
++	if w.Planning.Scopes[0].Delivery.HistoricalOnly {
++		t.Fatal("continuation is not a current input")
+ 	}
+-	r.Operations = []PlanningOperation{{Kind: "retry", ID: "first", Next: "Corriger le contrôle Y"}}
++	r.Operations = []PlanningOperation{{Kind: "retry", ID: "first", Next: "Reprendre après examen des deux retours"}}
+ 	if _, e := s.planningChange(w.ID, "decide", r); e == nil {
+-		t.Fatal("retry beyond plan_max_attempts must stay bounded, never loop indefinitely")
++		t.Fatal("historical acknowledgement bypassed the retry budget")
+ 	}
+ }

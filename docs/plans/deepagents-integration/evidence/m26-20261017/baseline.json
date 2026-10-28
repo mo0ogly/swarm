@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-17T12:41:11.564311+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "preimages": [
+    "internal/engine/memory_summary_selection.go",
+    "docs/PROJECT-MEMORY.md",
+    "docs/en/PROJECT-MEMORY.md",
+    "docs/plans/deepagents-integration/PLAN.md",
+    "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+    "internal/engine/memory_summary_selection_test.go",
+    "internal/engine/memory_summary_source_test.go"
+  ],
+  "read_only": {
+    "internal/engine/agents_store.go": "6d0a96e05f6e155377ed8d9287c40f0b475c7a62b13542f81655888cb7204f21",
+    "internal/engine/agents_process.go": "00d74a35555c8c4fb2f2ac56d5482bc3b8a8ca0bbb97755a14f5cb02dfec256f",
+    "internal/engine/agent_context.go": "772ab3e440c07fbeef89dd9a9792af2226a5d74998bd8417e7c4ffce65f94e1c",
+    "internal/engine/memory_summary_source.go": "d0a5552fe9a5a93d68e9f4e8eb62d096ac7e1503d842e93bb77744aff8cdadfa",
+    "internal/engine/memory_usage_binding.go": "f4a4b59697fefb69749687c461e93fa9400e376970932e064e3909b8e95cd9fb",
+    "internal/engine/memory_usage_decision.go": "df2832128f653aa22c4134fa42fddf12de489382b692f06f0367573cff29d2b0"
+  },
+  "watchdog": "No justified global watchdog: go test -timeout=0 and subprocess without timeout; observe process progress"
+}

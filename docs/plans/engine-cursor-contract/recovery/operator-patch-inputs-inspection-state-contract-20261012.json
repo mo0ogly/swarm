@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-11T22:29:55.666803+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-inspection-state-contract-20261012.bundle",
+  "sha256": "256a46f21919d7f1e66667c642a819a38b72380ff81f5cb74827035a97e23c9a",
+  "commit": "6aac4410ae60da0dafaac1c95df16cbe226deb9d",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 114,
+  "manifest_sha256": "bf041cc7c691f2875f2b6476aa719ba74057695b253b9b4c0e945cff7fb384e0",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/inspection-state24-inputs-whkcx82v",
+  "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/inspection-state24-import-grvc1dd0",
+  "old110_originals_preserved": true,
+  "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+  "limits": "Cumulative110 originals preserved byte-for-byte, including six-example controls/feedback documentation, plus qualified24 inspector-state and supervisor operation output contracts with exact versioned preimages. Apply a patch only to its verified recorded preimage. T3 integrates all cumulative fixes then qualifies its own complete candidate; T4 checks invalid and legacy proof/operation variants; T7 verifies actual reception, decision, application and effect; T8 RETEX after recipe. No native acceptance inferred; original methods, schema29, budgets, refusals and spending preserved."
+}

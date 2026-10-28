@@ -1,0 +1,7 @@
+{
+  "files": {
+    "rust/crates/swarm-engine/src/git_metadata.rs": "5ae5f6e625af9715a9e65e425f02084a01733f592238aea4833afc34be0d578f",
+    "rust/crates/swarm-engine/src/agent_launch_error.rs": "67d8d32f62289989378e4a894e6f1a515ac085d5958ed8226c2dfe95d721a73d"
+  },
+  "context_sha256": "adffb3a0ab76856766bcac12525f054bb2664d0afeded074ef42a517e2d25e93"
+}

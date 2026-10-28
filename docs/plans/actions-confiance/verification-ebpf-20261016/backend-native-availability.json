@@ -1,0 +1,13 @@
+{
+  "available": false,
+  "error": "kernel backend ring: creating map: map create: operation not permitted (MEMLOCK may be too low, consider rlimit.RemoveMemlock)",
+  "global_qualification": false,
+  "native_event_coverage_verified": false,
+  "permission_denied": true,
+  "privilege_change": false,
+  "public_cli_exit_code_observed": false,
+  "scope": "owned_test_process_main_thread_only",
+  "source": "ebpf",
+  "target_pid": 3308207,
+  "target_start": "5349504"
+}

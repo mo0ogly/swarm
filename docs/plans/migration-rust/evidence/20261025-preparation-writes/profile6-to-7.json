@@ -1,0 +1,9 @@
+{
+  "changed_inputs": [
+    "rust/crates/swarm-web/src/service.rs"
+  ],
+  "change": "Rustdoc only: restore recorded_work contract to its public function; no runtime code changed",
+  "profile6_binary": "a2d035d176d24d9f30177f3750be2a118ece4128ac0352b258243427635c00b4",
+  "profile7_binary": "e29d294e60621744c18f6e1a1b6181d8eddbdff4ea2a6e66c4e5ea6c65dd2e7d",
+  "tests": "fresh profile7 recipes tracked separately"
+}

@@ -1,0 +1,2 @@
+{"version":1,"task":"T2","criterion":3,"cases":[{"id":"preview-version-persistence","status":"pass","assertions":7,"observed":{"preview_applied":false,"revision":1,"stale_exit":3,"replay_revision":1}},{"id":"attributed-proof-and-separate-key","status":"pass","assertions":9,"observed":{"symlink_anchor_exit":2,"key_target_unchanged":true,"sequence":4,"verified":true,"tamper_exit":2,"secrets_exported":false,"original_bytes_preserved":true,"originals":4}}]}
+{"task": "T2", "mode": "c3", "cases": 2, "status": "pass"}

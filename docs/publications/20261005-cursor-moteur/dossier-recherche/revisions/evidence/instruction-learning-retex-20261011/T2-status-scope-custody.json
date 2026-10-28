@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T13:28:59.332560+00:00",
+  "work_revision": 261,
+  "producer": "auto-f2abbcfe6bed66fd1a5e",
+  "status": "interrupted",
+  "review_id": "review-f5cb258178e80a4bdc4778d3",
+  "before_tree": "1ded4021e9c822ccb8b2ce3e427f075bfdc9d7ff",
+  "after_tree": "b5b49c7b16ef7409257302cc92d39a8aa22a0024",
+  "accepted_head_preserved": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+  "native_copy": "/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-2",
+  "owned_recovery": "/tmp/swarm-T2-operator-recovery-20261011-i8yzie71",
+  "paths": [
+    "docs/plan-ca937edf4e-T2.delivery.json",
+    "docs/plan-ca937edf4e-T2.md",
+    "docs/plan-ca937edf4e-T2.review-context.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/review-status-scope.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/status-scope-validation.out"
+  ],
+  "patch_sha256": "d8ada19cbad441baf4ef40b350d3ef80487c133f1e532935271c5f1fd026d9da",
+  "limits": "Only stopped producer copy updated after fresh public state and exact preimage; original reports archived separately, Go unchanged. No live database edit, inference, refund or acceptance."
+}

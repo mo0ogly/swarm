@@ -1,0 +1,7 @@
+{
+  "files": {
+    "rust/crates/swarm-engine/src/work_engine.rs": "e9190ac30bfa591a984adcf0cc22429d4daf5e03ec3fd83043ebd30e85034555",
+    "rust/crates/swarm-engine/src/planning_control.rs": "674d4fbe9583cd5387a57ba0d328b3a215ad54f405d4e7a1bec7b5eb2dc4ba77"
+  },
+  "context_sha256": "3ceb1c2ab31bb8decadc4fc53abecda36769ddb53fcc685e4a46a0010efbfe7f"
+}

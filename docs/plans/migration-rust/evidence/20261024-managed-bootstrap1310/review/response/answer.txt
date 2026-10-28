@@ -1,0 +1,23 @@
+**Review verdict: plan is orderable, but the following concrete checks are required before this can be accepted.**
+
+**Premature grant / spend risks**
+
+1. **Replay precedes all IO.** The plan states replay returns before IO; verify the Enable branch in `work_engine` runs `require_planning_mission` / state validation / `validate_planning_enable_target` **before** any `managed_repository::prepare` or `reviewer_bootstrap::prepare` call. Preparation creates durable manifests; it must never run on a path that could later refuse (e.g., `planning-enable-new-work-required`, repository field set with `committed_only != true`, non-empty `include_dirty`).
+
+2. **Prepared-repository binding check.** Mirror the provider pattern: after `prepare`, `apply_planning_control_prepared` must refuse unless the returned `ManagedRepository` matches the ORIGINAL request (request digest, source, subdir, included paths, base == candidate, candidate == actual immutable commit). A mismatch must refuse with a distinct safe code (analog of `planning-enable-provider-preparation-mismatch`), not silently adopt.
+
+3. **Pure path stays refused.** `apply_planning_control` (public, `provider=None`) must still refuse any request with `repository.is_some()`. Only the root transaction adapter may pass a prepared value. Verify no refactor routes repository handling into the shared function unconditionally.
+
+4. **No unported fallback.** `validate_planning_enable_target` currently refuses `request.repository.is_some()` with `command_not_ported`. If this check moves behind a "prepared supplied" branch, ensure the public-only refusal is preserved exactly; otherwise a pure caller could reach repository handling.
+
+**Transaction ordering risks**
+
+5. **Replay must not re-run `prepare`.** On replay, planning.repository is already set; the transaction must verify via a `validatePreparedRepository`-equivalent (manifest digest, request digest, rev-parse `^{commit}` for base and candidate, exact request/paths) and never invoke `prepare` again. Re-running preparation on replay would re-publish bare repos/manifests outside atomicity.
+
+6. **Refuse-without-overwrite.** Unknown/orphan/divergent manifests must refuse and preserve originals, matching the Go reference; check the Rust plan includes the pending-vs-final divergence refusal and that a bare repo present *without* a manifest refuses (Go does: `dépôt préparé sans manifeste`).
+
+7. **Publication order and close errors.** Verify pending manifest → bare no-replace publication → final manifest ordering, and that both reservation/directory closes and the operation go through `AgentLaunchError::caused`/`finish` so a close failure cannot mask the primary refusal or leak the lock.
+
+8. **No source mutation.** The stripping step must be read-only against the local clone; nothing in the plan shows it, so require explicit evidence that no checkout/HEAD/index write touches the source path, and the saved `git_command_timeout_seconds` setting is used, not a literal.
+
+No tests were run; no repository or `managed_repository`/`reviewer_bootstrap` contract source was supplied, so checks 5–8 are conditions on the plan, not verified behavior.

@@ -1,0 +1,27 @@
+[
+  {
+    "patch": "instruction-learning-retex-20261011.patch",
+    "sha256": "6c202d64b1261082d78842c3ccc5d554437135c862197f0b4edaa30929aae13b",
+    "preimage_apply_check": "PASS"
+  },
+  {
+    "patch": "instruction-learning-retex-continuity-20261011.patch",
+    "sha256": "459949e903fdc72b155cdca2bdd06a0a4a6b2cd7eeaeae4f87b67527eabe373c",
+    "preimage_apply_check": "PASS"
+  },
+  {
+    "patch": "instruction-learning-retex-routing-20261011.patch",
+    "sha256": "8b957486beef8e95e02061e79c678a145f11a4d620086d853a26527c2ee291cc",
+    "preimage_apply_check": "PASS"
+  },
+  {
+    "patch": "reviewer-method-source-snapshot-20261011.patch",
+    "sha256": "9c2d11dcf761088bcd9eb45f0cab17c17ffb4e4228a9cbb9da705ce36fe7e4af",
+    "preimage_apply_check": "PASS"
+  },
+  {
+    "patch": "planning-exact-envelope-20261011.patch",
+    "sha256": "f719102703429f3a31c4e391e2d7b8b76b65ea7504abaf5be177fad75923fd29",
+    "preimage_apply_check": "PASS"
+  }
+]

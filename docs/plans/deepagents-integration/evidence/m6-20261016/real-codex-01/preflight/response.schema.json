@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decision",
+    "actions",
+    "admission",
+    "acceptance",
+    "reason"
+  ],
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": [
+        "restore_and_evaluate",
+        "rebuild_evidence",
+        "admit_directly",
+        "accept_task"
+      ]
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "verify_archive",
+          "restore_artifact",
+          "evaluate_current",
+          "block_admission",
+          "request_fresh_evidence",
+          "import_acceptance"
+        ]
+      }
+    },
+    "admission": {
+      "type": "string",
+      "enum": [
+        "after_fresh_pass",
+        "blocked",
+        "now"
+      ]
+    },
+    "acceptance": {
+      "type": "string",
+      "enum": [
+        "unchanged",
+        "accepted"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    }
+  }
+}

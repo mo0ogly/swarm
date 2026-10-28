@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_evidence.py", line 63, in <module>
+    checked=call(absent,'evidence','verify',dict(verify,trusted_checkpoint=checkpoint),who=None);assert checked['checkpoint_verified'] and checked['checkpoint_sequence']==checkpoint['anchor']['sequence'];checks.append('separate witness checkpoint verifies exact history without local project root')
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_evidence.py", line 14, in call
+    raise AssertionError('public evidence command failed; private diagnostics retained')
+AssertionError: public evidence command failed; private diagnostics retained

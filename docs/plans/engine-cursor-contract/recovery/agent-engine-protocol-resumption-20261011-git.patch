@@ -1,0 +1,594 @@
+diff --git a/internal/engine/managed_recovery_handoff.go b/internal/engine/managed_recovery_handoff.go
+--- a/internal/engine/managed_recovery_handoff.go
++++ b/internal/engine/managed_recovery_handoff.go
+@@ -32,6 +32,7 @@
+ 	Report          string                   `json:"report_in_result,omitempty"`
+ 	Review          *IndependentReview       `json:"independent_review,omitempty"`
+ 	ReviewEvidence  *reviewEvidenceInventory `json:"review_evidence_inventory,omitempty"`
++	ExternalRepair  *RecoveredResult         `json:"external_repair,omitempty"`
+ 	Receipt         json.RawMessage          `json:"receipt,omitempty"`
+ 	Limit           string                   `json:"limit,omitempty"`
+ }
+@@ -79,7 +80,24 @@
+ 		h.Limit = "Aucun résultat Git immuable enregistré ; les fichiers non remis de l’ancienne copie ne sont pas importés."
+ 	} else {
+ 		bare := filepath.Join(w.Planning.Repository.Storage, "repository.git")
+-		bound, e := managedGit(bare, "rev-parse", "--verify", "refs/swarm/attempts/"+a.ID+"^{commit}")
++		ref := "refs/swarm/attempts/" + a.ID
++		// A public corrective repair retains the producer's original ref and
++		// binds the replacement to its own immutable repair ref. Never fall
++		// back to another result when either attribution or that ref fails.
++		if repair := t.RecoveredResult; repair != nil && (repair.Agent == a.ID || repair.Attempt == last.ID) {
++			if !recoveredResultMatches(t, a, item) {
++				return nil, fmt.Errorf("reprise : réparation non attribuable au résultat précédent")
++			}
++			if repair.ProofKey != "" {
++				ref = "refs/swarm/repairs/" + repair.ProofKey
++			}
++			tree, err := managedGit(bare, "rev-parse", "--verify", h.Result+"^{tree}")
++			if err != nil || repair.Tree == "" || tree != repair.Tree {
++				return nil, fmt.Errorf("reprise : arbre de réparation absent ou modifié")
++			}
++			h.ExternalRepair = repair
++		}
++		bound, e := managedGit(bare, "rev-parse", "--verify", ref+"^{commit}")
+ 		if e != nil || bound != h.Result {
+ 			return nil, fmt.Errorf("reprise : résultat Git absent ou attribution modifiée")
+ 		}
+diff --git a/internal/engine/managed_recovery_repaired_handoff_test.go b/internal/engine/managed_recovery_repaired_handoff_test.go
+new file mode 100644
+--- /dev/null
++++ b/internal/engine/managed_recovery_repaired_handoff_test.go
+@@ -0,0 +1,124 @@
++//go:build linux
++
++package engine
++
++import (
++	"encoding/json"
++	"os"
++	"path/filepath"
++	"testing"
++)
++
++func managedRepairedRefusal(t *testing.T) (*Store, Work, Agent) {
++	t.Helper()
++	s, w := managedFixture(t)
++	a := managedCompleted(t, s, w, "first", "initial work\n")
++	managedReviewMode(t, s, "fail")
++	if err := s.finishAgent(a, "completed", "", nil); err != nil {
++		t.Fatal(err)
++	}
++	a, _ = s.agent(a.ID)
++	if err := s.integrateManagedAttempt(a); err != nil {
++		t.Fatal(err)
++	}
++	w, _ = s.get(w.ID)
++	task, _ := w.task(a.TaskID)
++	if err := os.WriteFile(filepath.Join(a.CWD, "docs/first.md"), []byte("Externally corrected proof, retained original execution"), 0600); err != nil {
++		t.Fatal(err)
++	}
++	body, _ := json.Marshal(completeDelivery(task, a))
++	if err := os.WriteFile(filepath.Join(a.CWD, "docs/first.delivery.json"), body, 0600); err != nil {
++		t.Fatal(err)
++	}
++	gitTest(t, a.CWD, "add", "-A")
++	req := PlanningRequest{Schema: 1, EventID: "repair-before-worker-retry", Revision: w.Revision, Task: a.TaskID, Agent: a.ID, Attempt: a.Attempt, ConfirmRecovery: true, ReviewID: task.IndependentReview.ID, ResultTree: gitTest(t, a.CWD, "write-tree"), Reason: "Repair evidence before an independent review; preserve the original producer"}
++	w, err := s.planningChange(w.ID, "revise-recovered-result", req)
++	if err != nil {
++		t.Fatal(err)
++	}
++	task, _ = w.task(a.TaskID)
++	if task.IndependentReview.State != "changes_requested" || task.RecoveredResult.ProofKey == "" {
++		t.Fatal("fixture did not create a repaired, rejected result")
++	}
++	w, decision := planningClaim(t, s, w, "root")
++	decision.Operations = []PlanningOperation{{Kind: "retry", ID: a.TaskID, Next: "Correct the freshly rejected repair in a new owned worker attempt"}}
++	w, err = s.planningChange(w.ID, "decide", decision)
++	if err != nil {
++		t.Fatal(err)
++	}
++	return s, w, a
++}
++
++func TestManagedRecoveryHandoffAfterExternalRepair(t *testing.T) {
++	s, w, previous := managedRepairedRefusal(t)
++	task, _ := w.task(previous.TaskID)
++	bare := filepath.Join(w.Planning.Repository.Storage, "repository.git")
++	original := gitTest(t, bare, "rev-parse", "refs/swarm/attempts/"+previous.ID)
++	if original == task.RecoveredResult.Result {
++		t.Fatal("fixture must retain distinct original and repaired results")
++	}
++	r := Launch{Schema: 1, EventID: "worker-after-repair", Revision: w.Revision, TaskID: previous.TaskID, Provider: "managed-review-fixture", Role: "worker", Instruction: "Correct only the attributed repaired result", Timeout: 60}
++	a, created, err := s.prepare(w.ID, r)
++	if err != nil || !created {
++		t.Fatal("repaired-result handoff refused", created, err)
++	}
++	raw, err := os.ReadFile(filepath.Join(a.CWD, managedRecoveryFile))
++	if err != nil {
++		t.Fatal(err)
++	}
++	var packet ManagedRecoveryHandoff
++	if err = json.Unmarshal(raw, &packet); err != nil {
++		t.Fatal(err)
++	}
++	if packet.Result != task.RecoveredResult.Result || packet.PreviousAttempt != previous.Attempt || packet.Review.ID != task.IndependentReview.ID || gitTest(t, a.CWD, "rev-parse", managedRecoveryRef) != packet.Result {
++		t.Fatal("wrong repaired-result attribution", packet)
++	}
++	if got := gitTest(t, a.CWD, "show", managedRecoveryRef+":docs/first.md"); got != "Externally corrected proof, retained original execution" {
++		t.Fatal("original rather than repaired work was supplied", got)
++	}
++	after, _ := s.get(w.ID)
++	if after.Planning.Repository.Candidate != w.Planning.Repository.Candidate || gitTest(t, a.CWD, "rev-parse", "HEAD") != w.Planning.Repository.Candidate || len(after.Tasks[0].Attempts) != 2 || managedReviewCalls(t, s) != 2 || gitTest(t, bare, "rev-parse", "refs/swarm/attempts/"+previous.ID) != original {
++		t.Fatal("handoff changed canonical candidate, historical result or consumed review calls")
++	}
++}
++
++func TestManagedRecoveryHandoffRejectsAlteredRepair(t *testing.T) {
++	for _, change := range []string{"repair-ref", "agent", "attempt", "result", "process", "tree", "proof-key", "base", "receipt"} {
++		t.Run(change, func(t *testing.T) {
++			s, w, previous := managedRepairedRefusal(t)
++			task, _ := w.task(previous.TaskID)
++			bare := filepath.Join(w.Planning.Repository.Storage, "repository.git")
++			switch change {
++			case "repair-ref":
++				gitTest(t, bare, "update-ref", "refs/swarm/repairs/"+task.RecoveredResult.ProofKey, w.Planning.Repository.Candidate)
++			case "agent":
++				task.RecoveredResult.Agent = "another-agent"
++			case "attempt":
++				task.RecoveredResult.Attempt = "another-attempt"
++			case "result":
++				task.RecoveredResult.Result = w.Planning.Repository.Candidate
++			case "process":
++				task.RecoveredResult.ProcessStatus = "interrupted"
++			case "tree":
++				task.RecoveredResult.Tree = w.Planning.Repository.Candidate
++			case "proof-key":
++				task.RecoveredResult.ProofKey = "another-repair"
++			case "base":
++				if _, err := s.db.Exec("UPDATE managed_attempts SET base_commit=? WHERE agent_id=?", "absent-base", previous.ID); err != nil {
++					t.Fatal(err)
++				}
++			case "receipt":
++				if err := os.WriteFile(filepath.Join(s.root, task.IndependentReview.Receipt), []byte(`{}`), 0600); err != nil {
++					t.Fatal(err)
++				}
++			}
++			if _, err := s.managedRecoveryHandoff(w, task); err == nil {
++				t.Fatal("altered repair accepted")
++			}
++			after, _ := s.get(w.ID)
++			if after.Revision != w.Revision || len(after.Tasks[0].Attempts) != 1 || managedReviewCalls(t, s) != 2 {
++				t.Fatal("invalid handoff changed revision, attempts or calls")
++			}
++		})
++	}
++}
+diff --git a/internal/engine/agents_store.go b/internal/engine/agents_store.go
+--- a/internal/engine/agents_store.go
++++ b/internal/engine/agents_store.go
+@@ -25,38 +25,40 @@
+ COMMIT;`
+ 
+ type Launch struct {
+-	Skills               []ActionSkillSelection `json:"skills,omitempty"`
+-	PreconditionEvidence string                 `json:"precondition_evidence,omitempty"`
+-	ConductorID          string                 `json:"conductor_id,omitempty"`
+-	ProviderDigest       string                 `json:"provider_digest,omitempty"`
+-	Mode                 string                 `json:"mode,omitempty"`
+-	Limits               *RunLimits             `json:"limits,omitempty"`
+-	Level                string                 `json:"level,omitempty"`
+-	ModelPolicyHash      string                 `json:"model_policy_hash,omitempty"`
+-	PlanBriefHash        string                 `json:"plan_brief_hash,omitempty"`
+-	References           []DialogueRef          `json:"references,omitempty"`
+-	ContextHash          string                 `json:"context_hash,omitempty"`
+-	Brainstorm           bool                   `json:"brainstorm,omitempty"`
+-	Schema               int                    `json:"schema_version"`
+-	EventID              string                 `json:"event_id"`
+-	Revision             int                    `json:"expected_revision"`
+-	TaskID               string                 `json:"task_id"`
+-	Origin               string                 `json:"origin,omitempty"`
+-	Provider             string                 `json:"provider"`
+-	Workspace            string                 `json:"workspace"`
+-	Instruction          string                 `json:"instruction"`
+-	Role                 string                 `json:"role"`
+-	Parent               string                 `json:"parent,omitempty"`
+-	Previous             string                 `json:"previous,omitempty"`
+-	Timeout              int                    `json:"timeout_seconds"`
+-	Capture              bool                   `json:"capture_output"`
++	SkillRefresh         *PreparedSkillRefreshReceipt `json:"prepared_skill_refresh,omitempty"`
++	Skills               []ActionSkillSelection       `json:"skills,omitempty"`
++	PreconditionEvidence string                       `json:"precondition_evidence,omitempty"`
++	ConductorID          string                       `json:"conductor_id,omitempty"`
++	ProviderDigest       string                       `json:"provider_digest,omitempty"`
++	Mode                 string                       `json:"mode,omitempty"`
++	Limits               *RunLimits                   `json:"limits,omitempty"`
++	Level                string                       `json:"level,omitempty"`
++	ModelPolicyHash      string                       `json:"model_policy_hash,omitempty"`
++	PlanBriefHash        string                       `json:"plan_brief_hash,omitempty"`
++	References           []DialogueRef                `json:"references,omitempty"`
++	ContextHash          string                       `json:"context_hash,omitempty"`
++	Brainstorm           bool                         `json:"brainstorm,omitempty"`
++	Schema               int                          `json:"schema_version"`
++	EventID              string                       `json:"event_id"`
++	Revision             int                          `json:"expected_revision"`
++	TaskID               string                       `json:"task_id"`
++	Origin               string                       `json:"origin,omitempty"`
++	Provider             string                       `json:"provider"`
++	Workspace            string                       `json:"workspace"`
++	Instruction          string                       `json:"instruction"`
++	Role                 string                       `json:"role"`
++	Parent               string                       `json:"parent,omitempty"`
++	Previous             string                       `json:"previous,omitempty"`
++	Timeout              int                          `json:"timeout_seconds"`
++	Capture              bool                         `json:"capture_output"`
+ 	// Les champs recovery* sont calculés par le conducteur. Ils ne font pas
+ 	// partie du contrat JSON externe : un client ne peut ni s'accorder un
+ 	// budget supplémentaire ni choisir sa propre catégorie de reprise.
+-	recoveryCategory  string
+-	recoveryCause     string
+-	recoveryOperation string
+-	recoveryNext      string
++	recoveryCategory     string
++	recoveryCause        string
++	recoveryOperation    string
++	recoveryNext         string
++	preparedSkillRefresh bool
+ }
+ 
+ type RecoveryState struct {
+@@ -437,6 +439,9 @@
+ 	} else if e != sql.ErrNoRows {
+ 		return a, false, e
+ 	}
++	if r.SkillRefresh != nil && !r.preparedSkillRefresh {
++		return a, false, fmt.Errorf("actualisation des skills réservée à la reprise explicite du lancement préparé")
++	}
+ 	if err := s.storageGuard(); err != nil {
+ 		return a, false, err
+ 	}
+diff --git a/internal/engine/managed_preparation.go b/internal/engine/managed_preparation.go
+--- a/internal/engine/managed_preparation.go
++++ b/internal/engine/managed_preparation.go
+@@ -30,6 +30,7 @@
+ }
+ 
+ func preparedRequestDigest(r Launch) string {
++	r.SkillRefresh = nil // Receipt records authorization, not a frozen setting.
+ 	r.Revision, r.EventID, r.Origin, r.ConductorID, r.ProviderDigest = 0, "", "", "", ""
+ 	if r.Role == "" {
+ 		r.Role = "worker"
+@@ -43,6 +44,12 @@
+ 
+ // Resumption may lower an explicit tool budget; all other frozen settings stay exact.
+ func preparedRequestCompatible(saved, requested Launch) bool {
++	if requested.preparedSkillRefresh {
++		if !samePreparedSkillPaths(saved.Skills, requested.Skills) {
++			return false
++		}
++		saved.Skills = requested.Skills
++	}
+ 	if preparedRequestDigest(saved) == preparedRequestDigest(requested) {
+ 		return true
+ 	}
+@@ -120,6 +127,13 @@
+ 	}
+ 	r := record.Request
+ 	p.Provider, p.Workspace, p.Instruction, p.Timeout, p.Limits = r.Provider, filepath.Join(record.Path, w.Planning.Repository.Subdir), r.Instruction, r.Timeout, r.Limits
++	for _, selected := range r.Skills {
++		item, _, err := s.readActionSkill(selected.Path)
++		if err != nil || selected.SHA256 == "" || item.SHA256 != selected.SHA256 {
++			p.Reason = "Skill préparé modifié : examiner son empreinte actuelle puis confirmer explicitement l’actualisation avec agent resume-launch."
++			return p, nil
++		}
++	}
+ 	p.Ready = true
+ 	return p, nil
+ }
+@@ -138,7 +152,7 @@
+ 	return verifyManagedCopy(w.Planning.Repository, record.Path)
+ }
+ 
+-func (s *Store) resumePreparedLaunch(work, id string, revision int) (Agent, bool, error) {
++func (s *Store) resumePreparedLaunch(work, id string, revision int, refresh ...PreparedSkillRefresh) (Agent, bool, error) {
+ 	if !safeName(id) {
+ 		return Agent{}, false, fmt.Errorf("identifiant de préparation invalide")
+ 	}
+@@ -194,6 +208,15 @@
+ 		return Agent{}, false, e
+ 	}
+ 	r := *record.Request
++	if len(refresh) > 1 {
++		return Agent{}, false, fmt.Errorf("une seule actualisation de skills autorisée")
++	}
++	if len(refresh) == 1 {
++		r, e = s.refreshPreparedSkills(r, refresh[0])
++		if e != nil {
++			return Agent{}, false, e
++		}
++	}
+ 	r.Revision, r.Origin, r.ConductorID = revision, originOperator, ""
+ 	// An explicit resume retains the reservation while respecting the provider ceiling.
+ 	// Never change the saved manifest or the task profile, nor raise a smaller budget.
+diff --git a/internal/engine/console_cli.go b/internal/engine/console_cli.go
+--- a/internal/engine/console_cli.go
++++ b/internal/engine/console_cli.go
+@@ -302,9 +302,12 @@
+ 				return e
+ 			}
+ 			var r struct {
+-				Schema   int    `json:"schema_version"`
+-				ID       string `json:"prepared_id"`
+-				Revision int    `json:"expected_revision"`
++				Schema   int                    `json:"schema_version"`
++				ID       string                 `json:"prepared_id"`
++				Revision int                    `json:"expected_revision"`
++				Confirm  bool                   `json:"confirm_action_skill_refresh,omitempty"`
++				Reason   string                 `json:"reason,omitempty"`
++				Skills   []ActionSkillSelection `json:"skills,omitempty"`
+ 			}
+ 			if e = strict(b, &r); e != nil {
+ 				return e
+@@ -312,7 +315,11 @@
+ 			if r.Schema != 1 {
+ 				return fmt.Errorf("schema_version doit valoir 1")
+ 			}
+-			a, created, e := s.resumePreparedLaunch(arg(2), r.ID, r.Revision)
++			var refresh []PreparedSkillRefresh
++			if r.Confirm || r.Reason != "" || r.Skills != nil {
++				refresh = append(refresh, PreparedSkillRefresh{Confirm: r.Confirm, Reason: r.Reason, Skills: r.Skills})
++			}
++			a, created, e := s.resumePreparedLaunch(arg(2), r.ID, r.Revision, refresh...)
+ 			if e == nil && (created || a.Status == "queued") {
+ 				e = s.spawnAgent(a)
+ 			}
+diff --git a/internal/engine/prepared_skill_refresh.go b/internal/engine/prepared_skill_refresh.go
+new file mode 100644
+--- /dev/null
++++ b/internal/engine/prepared_skill_refresh.go
+@@ -0,0 +1,59 @@
++//go:build linux
++
++package engine
++
++import (
++	"fmt"
++	"strings"
++)
++
++type PreparedSkillRefresh struct {
++	Confirm bool
++	Reason  string
++	Skills  []ActionSkillSelection
++}
++
++// Engine-produced receipt; external launch requests cannot grant this exception.
++type PreparedSkillRefreshReceipt struct {
++	Prepared string                 `json:"prepared_id"`
++	Original string                 `json:"original_request_sha256"`
++	Previous []ActionSkillSelection `json:"previous_skills"`
++	Reason   string                 `json:"reason"`
++	Actor    string                 `json:"actor"`
++}
++
++func samePreparedSkillPaths(old, next []ActionSkillSelection) bool {
++	if len(old) == 0 || len(old) != len(next) {
++		return false
++	}
++	for i := range old {
++		if old[i].Path != next[i].Path {
++			return false
++		}
++	}
++	return true
++}
++
++func (s *Store) refreshPreparedSkills(r Launch, choice PreparedSkillRefresh) (Launch, error) {
++	if !choice.Confirm || len(strings.TrimSpace(choice.Reason)) < 8 || len(choice.Reason) > 2000 || !samePreparedSkillPaths(r.Skills, choice.Skills) {
++		return r, fmt.Errorf("confirmation, motif et mêmes chemins de skills préparés requis")
++	}
++	changed := false
++	for i, selection := range choice.Skills {
++		item, _, err := s.readActionSkill(selection.Path)
++		if err != nil {
++			return r, err
++		}
++		if selection.SHA256 == "" || item.SHA256 != selection.SHA256 {
++			return r, fmt.Errorf("empreinte actuelle du skill requise : %s", selection.Path)
++		}
++		changed = changed || selection.SHA256 != r.Skills[i].SHA256
++	}
++	if !changed {
++		return r, fmt.Errorf("aucun skill préparé modifié ; utiliser la reprise ordinaire")
++	}
++	r.SkillRefresh = &PreparedSkillRefreshReceipt{Prepared: r.EventID, Original: preparedRequestDigest(r), Previous: append([]ActionSkillSelection(nil), r.Skills...), Reason: strings.TrimSpace(choice.Reason), Actor: operatorIdentity()}
++	r.Skills = append([]ActionSkillSelection(nil), choice.Skills...)
++	r.preparedSkillRefresh = true
++	return r, nil
++}
+diff --git a/internal/engine/prepared_skill_refresh_test.go b/internal/engine/prepared_skill_refresh_test.go
+new file mode 100644
+--- /dev/null
++++ b/internal/engine/prepared_skill_refresh_test.go
+@@ -0,0 +1,115 @@
++//go:build linux
++
++package engine
++
++import (
++	"encoding/json"
++	"os"
++	"path/filepath"
++	"strings"
++	"testing"
++)
++
++func preparedChangedSkill(t *testing.T) (*Store, Work, Launch, ActionSkill, []byte) {
++	t.Helper()
++	s, w, _, r := managedRejectedRetry(t)
++	old := skillFixture(t, s, ".claude/skills/check/SKILL.md", "ORIGINAL_PREPARED_SKILL")
++	r.Skills = []ActionSkillSelection{{old.Path, old.SHA256}}
++	if _, err := s.ensureManagedAttempt(w, r); err != nil {
++		t.Fatal(err)
++	}
++	manifest, err := os.ReadFile(filepath.Join(w.Planning.Repository.Storage, "copy-"+r.EventID+".json"))
++	if err != nil {
++		t.Fatal(err)
++	}
++	next := skillFixture(t, s, old.Path, "CURRENT_PREPARED_SKILL")
++	return s, w, r, next, manifest
++}
++
++func TestPreparedSkillRefreshPreservesCopyAndFrozenSettings(t *testing.T) {
++	s, w, r, next, original := preparedChangedSkill(t)
++	p, err := s.preparedLaunchForTask(w, &w.Tasks[0])
++	if err != nil || p == nil || p.Ready || p.Reason == "" {
++		t.Fatal("stale skill advertised as ready", p, err)
++	}
++	if _, created, err := s.resumePreparedLaunch(w.ID, r.EventID, w.Revision); err == nil || created {
++		t.Fatal("ordinary resume silently adopted a changed skill")
++	}
++	choice := PreparedSkillRefresh{Confirm: true, Reason: "Reviewed the updated method before resuming the retained launch", Skills: []ActionSkillSelection{{next.Path, next.SHA256}}}
++	a, created, err := s.resumePreparedLaunch(w.ID, r.EventID, w.Revision, choice)
++	if err != nil || !created {
++		t.Fatal("explicit skill refresh failed", created, err)
++	}
++	if !strings.Contains(a.Prompt, "CURRENT_PREPARED_SKILL") || strings.Contains(a.Prompt, "ORIGINAL_PREPARED_SKILL") || a.Provider != r.Provider || a.Timeout != r.Timeout || a.Role != r.Role {
++		t.Fatal("wrong actual prompt or changed frozen settings")
++	}
++	manifest, err := os.ReadFile(filepath.Join(w.Planning.Repository.Storage, "copy-"+r.EventID+".json"))
++	if err != nil || hash(manifest) != hash(original) {
++		t.Fatal("original preparation rewritten", err)
++	}
++	var saved []byte
++	if err = s.db.QueryRow("SELECT request FROM agents WHERE id=?", a.ID).Scan(&saved); err != nil {
++		t.Fatal(err)
++	}
++	var actual Launch
++	if err = json.Unmarshal(saved, &actual); err != nil || actual.SkillRefresh == nil || actual.SkillRefresh.Prepared != r.EventID || actual.SkillRefresh.Original != preparedRequestDigest(r) || actual.SkillRefresh.Previous[0].SHA256 != r.Skills[0].SHA256 || actual.Skills[0].SHA256 != next.SHA256 || actual.SkillRefresh.Reason != choice.Reason {
++		t.Fatal("lost recorded refresh attribution", err)
++	}
++	replay, duplicate, err := s.resumePreparedLaunch(w.ID, r.EventID, w.Revision, choice)
++	if err != nil || duplicate || replay.ID != a.ID {
++		t.Fatal("duplicate worker reservation", err)
++	}
++	after, _ := s.get(w.ID)
++	if len(after.Tasks[0].Attempts) != 2 || after.Tasks[0].PlanMaxAttempts != w.Tasks[0].PlanMaxAttempts || managedReviewCalls(t, s) != 1 || after.Planning.Repository.Candidate != w.Planning.Repository.Candidate {
++		t.Fatal("refresh changed calls, canonical candidate or limits")
++	}
++}
++
++func TestPreparedSkillRefreshRequiresExactExplicitSelection(t *testing.T) {
++	for _, mode := range []string{"no-confirm", "no-reason", "wrong-hash", "different-path", "empty", "forged-receipt", "changed-provider", "raised-timeout"} {
++		t.Run(mode, func(t *testing.T) {
++			s, w, r, next, original := preparedChangedSkill(t)
++			choice := PreparedSkillRefresh{Confirm: true, Reason: "Explicitly adopt the reviewed current skill", Skills: []ActionSkillSelection{{next.Path, next.SHA256}}}
++			switch mode {
++			case "no-confirm":
++				choice.Confirm = false
++			case "no-reason":
++				choice.Reason = ""
++			case "wrong-hash":
++				choice.Skills[0].SHA256 = r.Skills[0].SHA256
++			case "different-path":
++				choice.Skills[0].Path = ".claude/skills/other/SKILL.md"
++			case "empty":
++				choice.Skills = nil
++			case "forged-receipt":
++				r.SkillRefresh = &PreparedSkillRefreshReceipt{Prepared: r.EventID, Reason: choice.Reason}
++				if _, created, err := s.prepare(w.ID, r); err == nil || created {
++					t.Fatal("client forged engine refresh authority")
++				}
++			case "changed-provider", "raised-timeout":
++				requested, err := s.refreshPreparedSkills(r, choice)
++				if err != nil {
++					t.Fatal(err)
++				}
++				if mode == "changed-provider" {
++					requested.Provider = "another-provider"
++				} else {
++					requested.Timeout++
++				}
++				if preparedRequestCompatible(r, requested) {
++					t.Fatal("skill refresh expanded frozen launch settings")
++				}
++			}
++			if mode != "forged-receipt" && mode != "changed-provider" && mode != "raised-timeout" {
++				if _, created, err := s.resumePreparedLaunch(w.ID, r.EventID, w.Revision, choice); err == nil || created {
++					t.Fatal("invalid selection launched a worker")
++				}
++			}
++			after, _ := s.get(w.ID)
++			manifest, err := os.ReadFile(filepath.Join(w.Planning.Repository.Storage, "copy-"+r.EventID+".json"))
++			if err != nil || hash(manifest) != hash(original) || after.Revision != w.Revision || len(after.Tasks[0].Attempts) != 1 || managedReviewCalls(t, s) != 1 {
++				t.Fatal("invalid refresh changed historical evidence or counters")
++			}
++		})
++	}
++}
+diff --git a/docs/architecture/AGENT-ENGINE-PROTOCOL.md b/docs/architecture/AGENT-ENGINE-PROTOCOL.md
+--- a/docs/architecture/AGENT-ENGINE-PROTOCOL.md
++++ b/docs/architecture/AGENT-ENGINE-PROTOCOL.md
+@@ -100,3 +100,30 @@
+ ne prétend pas réexécuter ces contrôles.
+ Un refus sémantique, une réservation active, un verdict final engagé ou des preuves
+ altérées ne peuvent pas être effacés par ce parcours.
++
++## Transmission d’un résultat réparé vers un nouveau producteur
++
++Une correction publique externe conserve la référence Git de la production
++initiale et enregistre une référence distincte `refs/swarm/repairs/PROOF_KEY`.
++Après un refus sémantique de ce résultat réparé, le dossier de reprise du worker
++suivant doit porter ce résultat, son arbre, sa provenance externe et son avis.
++Le moteur vérifie agent, tentative, état terminal, résultat enregistré, référence
++de réparation, arbre et ascendance avant de transmettre. Aucun repli sur la
++production initiale n’est autorisé si cette liaison échoue. Le nouveau worker
++démarre sur le candidat accepté ; le résultat refusé est une référence privée à
++examiner et corriger, jamais une nouvelle base acceptée. Les originaux, tentatives
++et appels antérieurs restent conservés.
++
++## Skill sélectionné modifié dans un lancement déjà préparé
++
++La sélection d’action est liée à ses empreintes. Le moteur annonce une préparation
++non prête si son skill a changé ; une reprise ordinaire n’adopte jamais le nouveau
++texte implicitement. Le parcours public `agent resume-launch` accepte une
++actualisation explicite avec `confirm_action_skill_refresh: true`, `reason` et
++`skills` (mêmes chemins, empreintes actuelles exactes). Il conserve le manifeste
++original et la copie, puis enregistre dans le lancement le reçu moteur
++`prepared_skill_refresh` : préparation, empreinte de demande originale, anciennes
++sélections, motif et acteur. Ce reçu ne peut pas être forgé par `agent start`.
++Fournisseur, rôle, candidat et paramètres gelés restent exigés ; les plafonds
++existants restent applicables et une répétition retrouve le même agent.
++La mise à jour de skill ne constitue ni une nouvelle revue ni une acceptation.
+diff --git a/docs/en/AGENT-ENGINE-PROTOCOL.md b/docs/en/AGENT-ENGINE-PROTOCOL.md
+--- a/docs/en/AGENT-ENGINE-PROTOCOL.md
++++ b/docs/en/AGENT-ENGINE-PROTOCOL.md
+@@ -87,3 +87,28 @@
+ rechecks the same-candidate checkpoint and retains original control receipts;
+ this method change does not claim another control execution. Semantic refusals, active reservations,
+ engaged final decisions and altered evidence cannot be erased by this route.
++
++## Passing a repaired result to a new producer
++
++An explicit external correction retains the original producer Git reference and
++records a separate `refs/swarm/repairs/PROOF_KEY` reference. After a semantic
++refusal of that repaired result, the next worker’s recovery packet carries the
++repaired result, its tree, external provenance and independent review. The engine
++checks producer, attempt, terminal status, recorded result, repair reference, tree
++and ancestry before supplying it. A failed binding never falls back to the
++original production. The new worker starts at the accepted candidate; rejected
++work is a private reference to inspect and correct, never an accepted new base.
++Originals, consumed attempts and earlier calls are retained.
++
++## A selected skill changed after launch preparation
++
++Action skills are bound to their hashes. A preparation is reported as not ready
++when a selected skill changes; ordinary resumption never silently adopts its
++new contents. Public `agent resume-launch` allows an explicit update using
++`confirm_action_skill_refresh: true`, `reason` and `skills` (the same paths with
++exact current hashes). It retains the original manifest and copy, then records
++an engine-produced `prepared_skill_refresh` receipt in the launch: preparation,
++original request digest, previous selections, reason and actor. External
++`agent start` requests cannot forge this receipt. Provider, role, candidate and
++frozen settings remain checked, existing ceilings apply and repeated resumption
++retrieves the same agent. Skill updates are neither new reviews nor acceptance.

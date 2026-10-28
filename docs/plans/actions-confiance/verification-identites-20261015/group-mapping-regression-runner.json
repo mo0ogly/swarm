@@ -1,0 +1,10 @@
+{
+  "pid": 1175665,
+  "proc_start_ticks": "2755365",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-group-mapping-regression-check.py",
+    "run"
+  ],
+  "at": "2026-10-15T19:38:49.506187+00:00"
+}

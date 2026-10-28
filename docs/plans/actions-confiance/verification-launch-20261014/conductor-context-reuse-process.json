@@ -1,0 +1,17 @@
+{
+  "pid": 423881,
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-context-reuse",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm",
+    "mission",
+    "watch",
+    "w-68b50cc82ec3fe55624f9549"
+  ],
+  "started_at_utc": "2026-10-15T10:34:04.935550+00:00",
+  "executable": "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-context-reuse",
+  "binary_sha256": "560a19612a0ff22346f000cf3860682f7fc76afa4f789aa93cc7a267ff5d7adf",
+  "source_proof": "context-reuse-source-proof.json",
+  "proc_start_ticks": "6087269",
+  "start_revision": 434
+}

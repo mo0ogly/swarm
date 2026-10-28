@@ -1,0 +1,69 @@
+{
+  "at": "2026-10-12T14:20:00.320908+00:00",
+  "old_pid": 3786056,
+  "new_pid": 3975914,
+  "old_sha256": "cc4dc7ad7d72e38cc546125efac07176170142691e02c0954cda408bd2db0ae8",
+  "installed_sha256": "1cc9723d090ceea7b24458cb54fac498acb98c4fef31a1de24f173ee5279d174",
+  "executed_sha256": "1cc9723d090ceea7b24458cb54fac498acb98c4fef31a1de24f173ee5279d174",
+  "source_digest": "3876dc260921b698fca67e4a632e88893329d71bd85c8ae20bbae183b37289dc",
+  "schema": 31,
+  "idle_before": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 775,
+      "paused": false,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    }
+  ],
+  "idle_after": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 777,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    }
+  ],
+  "public_work_post_pause_bodies_exact": true,
+  "public_cli_init_for_contract_upgrade": true,
+  "direct_storage_operation_or_copy": false,
+  "private_log_mode": "0600",
+  "health": "ready",
+  "launch_allowed": true,
+  "scope": "Qualified two-budget Go control runtime installed quiescent; mission paused for explicit Admin configuration and retained-result recovery. No native acceptance inferred."
+}

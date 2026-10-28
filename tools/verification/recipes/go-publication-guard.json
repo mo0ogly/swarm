@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "go-publication-inventory-unit-guards",
+  "inputs": [
+    "tools/verification/go_publication_inventory.py",
+    "tools/verification/test_go_publication_inventory.py",
+    "tools/verification/recipe.py",
+    "tools/verification/README.md",
+    ".gitignore"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "publication-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/verification",
+        "-p",
+        "test_go_publication_inventory.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 10 tests",
+        "OK",
+        "test_unrecognized_patch_format_cannot_hide_renamed_source",
+        "test_cached_removal_preserves_local_original_and_restores_guard",
+        "test_git_context_override_refuses_before_fixture_initialization"
+      ]
+    }
+  ]
+}

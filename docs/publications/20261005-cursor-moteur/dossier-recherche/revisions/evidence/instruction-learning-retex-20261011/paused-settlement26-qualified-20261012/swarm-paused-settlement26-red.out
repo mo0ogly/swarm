@@ -1,0 +1,13 @@
+--- FAIL: TestManagedSettlementRetainsPublicRetryUntilBothPausesResume (2.25s)
+    --- FAIL: TestManagedSettlementRetainsPublicRetryUntilBothPausesResume/planning (1.13s)
+        managed_settlement_pause_test.go:20: sizes 164551 168165 21899 parts 1
+        managed_settlement_pause_test.go:81: paused intent changed or spent a call: work=false item=false calls=1 errors=<nil>/<nil>
+    --- FAIL: TestManagedSettlementRetainsPublicRetryUntilBothPausesResume/mission (0.61s)
+        managed_settlement_pause_test.go:20: sizes 164551 168167 21899 parts 1
+        managed_settlement_pause_test.go:75: pause became settlement error intégration suspendue : mission en pause
+    --- FAIL: TestManagedSettlementRetainsPublicRetryUntilBothPausesResume/both (0.51s)
+        managed_settlement_pause_test.go:20: sizes 164551 168167 21899 parts 1
+        managed_settlement_pause_test.go:75: pause became settlement error intégration suspendue : mission en pause
+FAIL
+FAIL	swarm.local/companion/internal/engine	2.272s
+FAIL

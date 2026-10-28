@@ -1,0 +1,14 @@
+=== RUN   TestActionsConfianceT4RemoteDestination
+    trust_remote_test.go:35: server destination not used: exit=2, output= error={
+          "error": "lstat /tmp/TestActionsConfianceT4RemoteDestination3578743846/002/must-not-exist: no such file or directory",
+          "failure": {
+            "code": "command_failed",
+            "message": "lstat /tmp/TestActionsConfianceT4RemoteDestination3578743846/002/must-not-exist: no such file or directory",
+            "retryable": false
+          },
+          "schema_version": 1
+        }
+--- FAIL: TestActionsConfianceT4RemoteDestination (1.01s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.501s
+FAIL

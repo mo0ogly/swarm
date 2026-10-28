@@ -1,3 +1,5 @@
+> Historical Go engine guide: these are not Rust commands. Use native engine settings `storage_busy_timeout_ms`, `storage_busy_retries`, `storage_busy_retry_delay_ms` and `swarm engine-settings show|preview|apply`. Go evidence remains historical.
+
 # SQLite contention recovery
 
 ## What changes

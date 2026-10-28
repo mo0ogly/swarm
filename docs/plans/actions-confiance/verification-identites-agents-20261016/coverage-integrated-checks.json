@@ -1,0 +1,24 @@
+{
+  "result": "PASS",
+  "at_unix": 1792183958.7414312,
+  "scope": "Documentation only, no application test rerun",
+  "prior_receipt": "coverage-checks.json",
+  "source_sha256": {
+    "docs/plans/actions-confiance/identites-agents-replan.md": "19274e12c767d2a39269e40ca476d56581513c8dbfb243e3eb98f7581de1c33a",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/COUVERTURE-RISQUES.md": "e38e4a377ffc62be9ad09f4c99e61de2021be002760bdb7eab13e976f71c3234",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md": "05366cf1d634f18a94018e0a1da432225355b61a85ce136e38c3aa80ebe48deb"
+  },
+  "scenarios": 18,
+  "counts": {
+    "FAIL": 4,
+    "PARTIAL": 4,
+    "NOT TESTED": 10
+  },
+  "integrated_coverage_variants": 6,
+  "links": "PASS",
+  "git_diff_check": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+}

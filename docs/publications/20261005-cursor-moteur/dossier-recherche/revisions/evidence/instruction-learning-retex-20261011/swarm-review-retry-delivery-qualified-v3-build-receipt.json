@@ -1,0 +1,17 @@
+{
+  "command": [
+    "go",
+    "build",
+    "./..."
+  ],
+  "start": "2026-10-11T16:57:22.529701+00:00",
+  "end": "2026-10-11T16:57:35.183246+00:00",
+  "seconds": 12.653572041002917,
+  "exit": 0,
+  "output": "/tmp/swarm-review-retry-delivery-qualified-v3-build.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  }
+}

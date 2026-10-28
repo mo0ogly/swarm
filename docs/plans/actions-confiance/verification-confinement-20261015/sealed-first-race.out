@@ -1,0 +1,14 @@
+=== RUN   TestActionsConfianceT4SealedPublicPolicy
+--- PASS: TestActionsConfianceT4SealedPublicPolicy (0.99s)
+=== RUN   TestActionsConfianceT4SealedHelper
+--- PASS: TestActionsConfianceT4SealedHelper (0.00s)
+=== RUN   TestActionsConfianceT4SealedBoundary
+--- PASS: TestActionsConfianceT4SealedBoundary (1.68s)
+=== RUN   TestActionsConfianceT4SealedValidationAndPersistence
+--- PASS: TestActionsConfianceT4SealedValidationAndPersistence (1.38s)
+=== RUN   TestActionsConfianceT4SealedDisabledAndInvalidRequest
+--- PASS: TestActionsConfianceT4SealedDisabledAndInvalidRequest (1.01s)
+=== RUN   TestActionsConfianceT4SealedCancellation
+--- PASS: TestActionsConfianceT4SealedCancellation (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	6.511s

@@ -1,0 +1,42 @@
+{
+  "at": "2026-10-12T08:24:59.996012+00:00",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "revision": 693,
+  "task": "plan-ca937edf4e-T2",
+  "producer": "auto-5aee345f1c5aa09f51fb",
+  "attempt": "a-67814a677979c23767c4e6c5",
+  "status": "running",
+  "context": {
+    "sha256": "803b751da61cef5b2fd433fbde81c06511c9d43dc7ed6611974ca824588a9f01",
+    "bytes": 64581,
+    "included": [],
+    "excluded": [],
+    "references": null,
+    "paths": null
+  },
+  "progress": {
+    "elapsed_seconds": 282,
+    "tool_wait_seconds": 68,
+    "action": "Annonce de l’agent : Run named required tests with generous timeout",
+    "detail": "go test ./internal/engine -run 'TestGraphDeliveryD03QualificationManifest|TestManagedFragmentHistoricalPublicRecovery|TestPlanningJudge' -count=1 -v -timeout 120s 2>&1 | tee /tmp/go-test-named-T2-4.out | tail -60; echo \"EXIT=${PIPESTATUS[0]}\"",
+    "tool_calls": 20,
+    "tool_results": 19,
+    "pending_tools": 1,
+    "last_tool": "Bash",
+    "last_result_at": "2026-10-12T08:23:45.913063422Z",
+    "last_output_at": "2026-10-12T08:24:52.59674123Z",
+    "output_state": "recent",
+    "tool_state": "waiting",
+    "provider_vitality": "unknown",
+    "metrics_version": 1,
+    "tool_reads": 3,
+    "tool_unclassified": 17
+  },
+  "previous_attempt_count": 3,
+  "current_attempt_count": 4,
+  "calls_preserved": 82,
+  "recovery_receipt_path": "/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-4/.git/swarm-recovery.json",
+  "recovery_receipt_sha256": "3c3bad9aaac23545036d469b22acfdd4cb0342fc61c13cd320359ac5458e10d6",
+  "result_received": "7bfc163eef748ef321e3e80f8de02cc4b2b669f7",
+  "limit": "Running native corrective worker, reception verified. A new production or passing progress does not establish acceptance."
+}

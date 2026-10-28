@@ -1,0 +1,15 @@
+{
+  "cooldown": {
+    "provider": "claude",
+    "observed_at": "2026-10-11T15:18:42.477218207Z",
+    "resets_at": 1791739800,
+    "source": "fragment-call-b4041f7801a466b589f6f114",
+    "signal": "result.api_error_status.429",
+    "cleared_at": "2026-10-11T15:34:42.859676102Z",
+    "clear_event": "claude-account-changed-explicit-recovery-20261011",
+    "clear_reason": "Utilisateur : « j’ai changer de compte cest reset donc reprends ». Connexion Claude active observée ; autorise une nouvelle vérification réelle, conserve quota précédent, appels et tentatives.",
+    "clear_actor": "local-uid-1001",
+    "clear_account_change": true
+  },
+  "message": "Attente levée explicitement. Disponibilité du fournisseur non démontrée ; aucune exécution lancée et aucun budget remboursé."
+}

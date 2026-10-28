@@ -1,0 +1,81 @@
+{
+  "base_commit": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6",
+  "scope": "Uncommitted direct UI increment; unrelated existing engine edits retained",
+  "sources": {
+    "web/swarm-design.css": "09c407722e4f1a470904c7e83213c08bd71a22dbb0e85300a138472e56406e3d",
+    "web/swarm-shell.js": "ec5974b717991c3b4e10b67270e69a96d2be4c36f16c25b9253ddf4611a879a4",
+    "web/context-help.js": "d51c7a20420602e7797096224f5451a2646dffd3c9c163eeef97368455dfa4f6",
+    "web/prephase.js": "e48900fec82fd5f6ca5a1a4aeaccf937a0702a6f51ef1085cb7099860be6230a",
+    "web/index.html": "75d24a8c1048e42842fa988328099d06a9e1e61916a22b6c73a088786ed5379e",
+    "web/prepare.html": "49c1839521fb466c74e8d4d8dc374d3491e347bfc268c6e561f3a443d99be73c",
+    "web/terminal.html": "7835483128046cbdfcc42eda7dd7fdb2a914ee3d535f2a39d1e1e4c2d34fe9c6",
+    "web/log-console.html": "59658c0ad1be5389cbdf235cd515aef1369ff91fe9e776b0227215eeca2a3323",
+    "web/log-console.js": "14e339c17b75b07941337bf20e5ba82eaa770913efd3bfbaf781bc46ae87ff28",
+    "web/processes.html": "ca1dd08b30ac1c751e1af2ab8d00d2d24a1e5d8f815f504bd4fa30ccbe7d6c10",
+    "web/trust-actions.html": "749b20a980ecc9bb1743814aceb9b6cf93fc259454db629c80bb88303069c99f",
+    "web/trust-oidc-callback.html": "78511bb282a617ef53611579e582a63584d8c388caddbff4072fa6f42253e0ec"
+  },
+  "binaries": {
+    "baseline": {
+      "path": "/tmp/swarm-windows-20261017-baseline",
+      "sha256": "23f9a7726d4940018aa02edc17ea57fa658712e91d62bf92b527ee7f0d130d46"
+    },
+    "candidate": {
+      "path": "/tmp/swarm-windows-20261017-candidate",
+      "sha256": "553ea9388640bfdd6d16b75c3b2f76abed1010380783cf389895b949454c7a6a"
+    },
+    "final": {
+      "path": "/tmp/swarm-windows-20261017-final",
+      "sha256": "898174b3e08615b379de68f84c69482ebd5eb6f81f9a5280900118b3eb3f7f28"
+    },
+    "verified": {
+      "path": "/tmp/swarm-windows-20261017-verified",
+      "sha256": "0494dabfbf4653922257ed5c454bcf942bdaa7cb66290e762cbd786278fc7744"
+    }
+  },
+  "checks": [
+    {
+      "command": "node tests/window_identity_ui.cjs /tmp/swarm-windows-20261017-verified /tmp/swarm-windows-20261017/verified-windows",
+      "exit_code": 0,
+      "result": "windows-result.json",
+      "result_written_at": "2026-10-17T16:15:08.955369+00:00"
+    },
+    {
+      "command": "node tests/design_system_ui.cjs /tmp/swarm-windows-20261017-verified /tmp/swarm-windows-20261017/verified-design",
+      "exit_code": 0,
+      "result": "design-result.json",
+      "result_written_at": "2026-10-17T16:14:59.869273+00:00"
+    },
+    {
+      "command": "node tests/log_console_visibility_ui.cjs /tmp/swarm-windows-20261017-verified /tmp/swarm-windows-20261017/verified-log-visibility",
+      "exit_code": 0,
+      "result": "log-visibility-result.json",
+      "result_written_at": "2026-10-17T16:14:16.890805+00:00"
+    },
+    {
+      "command": "node tests/log_console_ui.cjs /tmp/swarm-windows-20261017-verified /tmp/swarm-windows-20261017/verified-logs",
+      "exit_code": 0,
+      "result": "logs-result.json",
+      "result_written_at": "2026-10-17T16:14:23.204875+00:00"
+    },
+    {
+      "command": "node tests/context_help_ui.cjs /tmp/swarm-windows-20261017-final /tmp/swarm-windows-20261017/final-context-help",
+      "exit_code": 0,
+      "result": "context-help-result.json",
+      "result_written_at": "2026-10-17T16:06:31.747808+00:00"
+    },
+    {
+      "command": "node tests/agent_terminal_ui.cjs /tmp/swarm-windows-20261017-final /tmp/swarm-windows-20261017/final-terminal",
+      "exit_code": 0,
+      "result": "terminal-result.json",
+      "result_written_at": "2026-10-17T16:08:21.146863+00:00"
+    },
+    {
+      "command": "node tests/projects_method_ui.cjs /tmp/swarm-windows-20261017-candidate /tmp/swarm-windows-20261017/method",
+      "exit_code": 0,
+      "result": "method-result.json",
+      "result_written_at": "2026-10-17T16:03:50.570101+00:00"
+    }
+  ],
+  "limits": "Local isolated Chrome fixtures; no paid models, no independent review, no installed server restart. Deterministic terminal/log suites use local fixture programs."
+}

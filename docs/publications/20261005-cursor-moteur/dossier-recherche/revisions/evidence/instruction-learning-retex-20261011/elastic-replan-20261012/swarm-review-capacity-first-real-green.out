@@ -1,0 +1,6 @@
+=== RUN   TestFreshCapacityCurrentPublicDossier
+    managed_review_capacity_first_test.go:151: aucune capacité restante pour les preuves finales
+--- FAIL: TestFreshCapacityCurrentPublicDossier (40.44s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	40.669s
+FAIL

@@ -1,0 +1,13 @@
+{
+  "missing_errno_guard_cases": [
+    2,
+    3
+  ],
+  "permission_error_propagated": true,
+  "normal_completion": true,
+  "timeout_rejected": true,
+  "child_not_running": true,
+  "observed_child_state": "Z",
+  "source_sha256": "70c68059fcfadcc1dfd115c29daee6eea38995f404548cad84e85c80bb1a1d53",
+  "at": "2026-10-15T20:56:16.817265+00:00"
+}

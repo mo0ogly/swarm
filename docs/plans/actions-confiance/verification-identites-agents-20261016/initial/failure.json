@@ -1,0 +1,6 @@
+{
+  "error": "Traceback (most recent call last):\n  File \"/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia1_audit.py\", line 196, in main\n    cli([\"trust\", \"config-apply\"], config(0, False))\n    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia1_audit.py\", line 132, in cli\n    assert result.returncode == want, (argv, result.returncode, result.stderr)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: (['trust', 'config-apply'], 2, '{\\n  \"error\": \"au moins trois identités séparées sont requises\",\\n  \"failure\": {\\n    \"code\": \"command_failed\",\\n    \"message\": \"au moins trois identités séparées sont requises\",\\n    \"retryable\": false\\n  },\\n  \"schema_version\": 1\\n}\\n')\n",
+  "root": "/tmp/swarm-ia1-agents-f8u7xxnt",
+  "checks": [],
+  "failures": []
+}

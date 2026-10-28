@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "recipe": "mission-watch-registered-observer",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "running-barrier-guards",
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_report_relay_guards.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 0.26621933199930936,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    },
+    {
+      "id": "metadata-read-close-guards",
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_mission_control_helpers.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 0.3115374759945553,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    },
+    {
+      "id": "observer-partial-resource-refusal",
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_registered_observer_resources.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 0.3529091009986587,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    },
+    {
+      "id": "registered-observer-public-journey",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nb=Path(tempfile.mkdtemp(prefix='registered-observer-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_watch_registered.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(b))\n"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 14.444152323005255,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "d8aa97bd8be7790194d417c539c34af2844914576dc7703993e6a59598ec46e1",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "e6ca74685950ba602e01fa74a9cfe8d0258fb8bfd8996ab7b2bcee8ae67cab86",
+    "declared-inputs.tar.gz": "d71075d47eecd6ab586fb02c70b75eb8d20b4a33544c2d3d975f578169f2e2be",
+    "environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "step-0001.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.stderr": "d3d37dd3c59574428e06175e4e72880897987dc0f21213ba0566f4cc6bdb09cc",
+    "step-0001.json": "42c52a2e48c13588bfd5cfc5a4e26c2650b70461d1b83b3387f48be9be14b718",
+    "step-0002.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0002.stderr": "e38312409cc3c0042166eecaa55a8c0770fdae5b89a15a04f7377a42498521f0",
+    "step-0002.json": "48bafc8b1cea615dec7c640c1e6594c089cdec138ca6bd49fa55147a84314a0c",
+    "step-0003.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0003.stderr": "d00851736cc3d48ec85474d2a8f322c99514f37439bd23fb68ba9934eb4fb765",
+    "step-0003.json": "1cd7d5505d0585746cdc85bd3bd95b88c2c9aa6d46fb9e7aba31d27fc2836f33",
+    "step-0004.stdout": "baaff9a6f7cd7b8f99f7f805b7e37738b82d190d40f836846ae9fb2f64047fab",
+    "step-0004.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0004.json": "8a1dcd2a03652ea89a05b16d6e7af0361b5595d16a2157b29b4a9c58efd9aa68",
+    "inputs.after.json": "e6ca74685950ba602e01fa74a9cfe8d0258fb8bfd8996ab7b2bcee8ae67cab86"
+  }
+}

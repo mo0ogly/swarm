@@ -1,0 +1,18 @@
+{
+  "name": "build",
+  "argv": [
+    "go",
+    "build",
+    "-o",
+    "/tmp/swarm-qualified-binary-preflight-inspection-build",
+    "./cmd/swarm"
+  ],
+  "started": "2026-10-12T15:05:34.072300+00:00",
+  "finished": "2026-10-12T15:05:43.525165+00:00",
+  "exit": 0,
+  "wall_seconds": 9.452879225995275,
+  "output": "/tmp/swarm-binary-preflight-inspection-build.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "drift": [],
+  "binary_sha256": "476e602235d5f631eba521f6ab12e3f3dcd574b7d583a391018985c2d7c55b94"
+}

@@ -1,0 +1,79 @@
+=== RUN   TestReferencedCitationInstructionsAloneCannotRestart
+--- PASS: TestReferencedCitationInstructionsAloneCannotRestart (1.29s)
+=== RUN   TestCorrectiveCandidateRetainsClosedFragmentMethodEvidence
+    managed_review_context_policy_test.go:286: sizes 164551 168226 22003 parts 1
+    managed_review_context_policy_test.go:313: closed method evidence blocks a changed corrective candidate
+--- FAIL: TestCorrectiveCandidateRetainsClosedFragmentMethodEvidence (18.82s)
+=== RUN   TestRecoveredResultEvidencePreflightPreservesStateAndAllowsCorrection
+=== RUN   TestRecoveredResultEvidencePreflightPreservesStateAndAllowsCorrection/submit
+=== RUN   TestRecoveredResultEvidencePreflightPreservesStateAndAllowsCorrection/revise
+--- PASS: TestRecoveredResultEvidencePreflightPreservesStateAndAllowsCorrection (3.96s)
+    --- PASS: TestRecoveredResultEvidencePreflightPreservesStateAndAllowsCorrection/submit (1.71s)
+    --- PASS: TestRecoveredResultEvidencePreflightPreservesStateAndAllowsCorrection/revise (2.25s)
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown/valid
+    recovered_result_evidence_test.go:81: sizes 164551 168226 22003 parts 1
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown/confirmation
+    recovered_result_evidence_test.go:81: sizes 164551 168226 22003 parts 1
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown/unchanged
+    recovered_result_evidence_test.go:81: sizes 164551 168226 22003 parts 1
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown/stale
+    recovered_result_evidence_test.go:81: sizes 164551 168224 22003 parts 1
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown/active
+    recovered_result_evidence_test.go:81: sizes 164551 168224 22003 parts 1
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown/tampered
+    recovered_result_evidence_test.go:81: sizes 164551 168226 22003 parts 1
+--- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown (34.46s)
+    --- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown/valid (8.52s)
+    --- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown/confirmation (4.67s)
+    --- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown/unchanged (6.09s)
+    --- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown/stale (5.92s)
+    --- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown/active (4.79s)
+    --- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown/tampered (4.48s)
+=== RUN   TestRecoveredResultNewAttemptPreservesPreviousRepair
+--- PASS: TestRecoveredResultNewAttemptPreservesPreviousRepair (2.58s)
+=== RUN   TestRecoveredResultCorrectionAfterPublicPolicyChange
+--- PASS: TestRecoveredResultCorrectionAfterPublicPolicyChange (2.09s)
+=== RUN   TestRecoveredResultCompletedSourceCapacityRefusalCanBeCorrected
+--- PASS: TestRecoveredResultCompletedSourceCapacityRefusalCanBeCorrected (2.00s)
+=== RUN   TestRecoveredResultChecksReviewAndPreservesInterruptedAttempt
+--- PASS: TestRecoveredResultChecksReviewAndPreservesInterruptedAttempt (1.55s)
+=== RUN   TestRecoveredResultRefusesUnexaminedOrIncompleteInput
+=== RUN   TestRecoveredResultRefusesUnexaminedOrIncompleteInput/confirmation
+=== RUN   TestRecoveredResultRefusesUnexaminedOrIncompleteInput/revision
+=== RUN   TestRecoveredResultRefusesUnexaminedOrIncompleteInput/attempt
+=== RUN   TestRecoveredResultRefusesUnexaminedOrIncompleteInput/changed
+=== RUN   TestRecoveredResultRefusesUnexaminedOrIncompleteInput/partial
+=== RUN   TestRecoveredResultRefusesUnexaminedOrIncompleteInput/active
+=== RUN   TestRecoveredResultRefusesUnexaminedOrIncompleteInput/reviewer-fail
+--- PASS: TestRecoveredResultRefusesUnexaminedOrIncompleteInput (6.33s)
+    --- PASS: TestRecoveredResultRefusesUnexaminedOrIncompleteInput/confirmation (0.79s)
+    --- PASS: TestRecoveredResultRefusesUnexaminedOrIncompleteInput/revision (0.81s)
+    --- PASS: TestRecoveredResultRefusesUnexaminedOrIncompleteInput/attempt (0.93s)
+    --- PASS: TestRecoveredResultRefusesUnexaminedOrIncompleteInput/changed (0.80s)
+    --- PASS: TestRecoveredResultRefusesUnexaminedOrIncompleteInput/partial (0.93s)
+    --- PASS: TestRecoveredResultRefusesUnexaminedOrIncompleteInput/active (0.77s)
+    --- PASS: TestRecoveredResultRefusesUnexaminedOrIncompleteInput/reviewer-fail (1.30s)
+=== RUN   TestRecoveredResultReplayResumesContextPreflightOnly
+--- PASS: TestRecoveredResultReplayResumesContextPreflightOnly (1.34s)
+=== RUN   TestRecoveredResultRevisionPreservesRefusalAndChecksNewCandidate
+--- PASS: TestRecoveredResultRevisionPreservesRefusalAndChecksNewCandidate (2.18s)
+=== RUN   TestRecoveredResultRevisionOfCompletedProducer
+--- PASS: TestRecoveredResultRevisionOfCompletedProducer (1.55s)
+=== RUN   TestRecoveredResultReviewRetryIsDrivenWithoutNewProducer
+--- PASS: TestRecoveredResultReviewRetryIsDrivenWithoutNewProducer (1.73s)
+=== RUN   TestRecoveredResultResumesPersistedPassWithoutNewReview
+=== RUN   TestRecoveredResultResumesPersistedPassWithoutNewReview/fresh
+=== RUN   TestRecoveredResultResumesPersistedPassWithoutNewReview/changed_context
+--- PASS: TestRecoveredResultResumesPersistedPassWithoutNewReview (3.36s)
+    --- PASS: TestRecoveredResultResumesPersistedPassWithoutNewReview/fresh (1.81s)
+    --- PASS: TestRecoveredResultResumesPersistedPassWithoutNewReview/changed_context (1.55s)
+=== RUN   TestRecoveredResultTerminalAcrossReboot
+--- PASS: TestRecoveredResultTerminalAcrossReboot (0.00s)
+=== RUN   TestRecoveredResultRevisionAfterLegacyFragmentRefusal
+=== RUN   TestRecoveredResultRevisionAfterLegacyFragmentRefusal/valid
+    recovered_result_test.go:415: not a fragment review
+=== RUN   TestRecoveredResultRevisionAfterLegacyFragmentRefusal/transport
+signal: interrupt
+FAIL	swarm.local/companion/internal/engine	85.928s
+FAIL

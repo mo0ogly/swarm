@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "tests/memory_summary_admission.py",
+    "/tmp/swarm-m19-bin-o0uuhvjr/swarm",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native"
+  ],
+  "started_at": "2026-10-16T21:03:07.554712+00:00",
+  "finished_at": "2026-10-16T21:03:14.058076+00:00",
+  "exit_code": 0,
+  "binary_sha256": "026fcf377d64cd43951e5c7fc3a6d20ee5ea42c9323e3ffeaf65b1566895f7e2",
+  "binary_scope": "retained M19 binary; Go source/embedded-method changes after M19 not qualified by this recipe",
+  "inputs": {
+    "tools/memory-evaluation/swarm_source.py": "8716fdc2aa0e12d74dd97a41745da1ec98feccfbe9eb06708575b4de2280cfac",
+    "tools/memory-evaluation/admission.py": "a089c56d814ae67150bc925b23d874325f08ccf23744af22c7376796dcb96e35",
+    "tools/memory-evaluation/summarization.py": "afd798a44cc78a78d3baf2bdc2d8e9b8e58a9a29240a1c0dc6276572429834a2",
+    "tests/memory_summary_admission.py": "a6793da414fd8a499316f13a51591f67d6d161a5704f0315c1c28dd6944d1d15",
+    "tests/memory_summary_source.py": "68b8de79ee70adda022edcb9d81a19b356a4159a27817c64f12e6febf44175d1"
+  },
+  "inputs_unchanged": true
+}

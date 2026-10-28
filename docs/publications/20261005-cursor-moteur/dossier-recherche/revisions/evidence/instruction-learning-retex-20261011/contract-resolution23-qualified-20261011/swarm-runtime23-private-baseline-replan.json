@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-11T21:35:08.722162+00:00",
+  "cause": "Public-export confidentiality guard was incorrectly applied to a private0600 exact-equality baseline containing legacy session links",
+  "observed_revision": 554,
+  "paused": true,
+  "old_binary_unchanged": true,
+  "correction": "Resume applied owned pause at exact revision; keep raw baseline private0600 without output/public archive; public exports retain confidentiality guard",
+  "limits": "No sensitive field emitted, no second pause or native DB mutation"
+}

@@ -1,0 +1,14 @@
+{
+  "provenance": "Reconstructed summary of original live control outputs retained in chat; actual fixture originals and keyboard stderr archived separately",
+  "first_check_failure": "Expected SHA copied from dev36 via brittle string substitution; actual dev37 was the tested d5dcab17665f57591c3a20dcf19487788f82add86acaf35dd8d3e1fb6bd5b063. Corrected controller uses explicitly identified delivery-build result. No installation mismatch established.",
+  "live_initial_refusal": {
+    "work_id": "w-a77d9f4799712a6c6d96c662",
+    "HTTP": 500,
+    "CLI_exit": 2,
+    "code": "command_not_ported",
+    "reason": "managed-review-batch-protocol-not-ported"
+  },
+  "decision": "No guard removed. Typed unsupported projection now501; recorded-data route separately selected by explicit UI gesture and visibly unvalidated. Batch projection remains open.",
+  "keyboard_failure": "Actual pre could not reliably receive focus. first-installed-ui.stderr retained. Added tabindex0/accessibility label and permanent checks; actual dev39 rerun21 unique assertions.",
+  "count_review": "Original25 included4digest observations. Original report retained; corrected21unique actual assertions and4separate digest observations, rerun passed."
+}

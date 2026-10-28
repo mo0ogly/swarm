@@ -1,0 +1,119 @@
+{
+  "status": "PASS",
+  "work": "w-630ae432039dbb236949d842",
+  "started": "2026-10-13T19:24:33.311926+00:00",
+  "operator_interventions_after_start": 0,
+  "candidate": "8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+  "root_judge": {
+    "verdict": "end",
+    "reason": "La tentative corrigée de recover-number est terminée, son candidat 8f44756859bb6c6b6d30c796d25d8d0635cc5c5d a reçu une revue indépendante positive, a été intégré puis marqué accepted. Le rapport conserve la reproduction du défaut initial 0 != 42 et la garde sémantique vérifiant désormais le retour exact de 42. L’unique exigence req-1 est donc couverte par un résultat accepté et frais ; aucun travail utile ne reste dans ce cycle.",
+    "evidence_ref": "8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+    "at": "2026-10-13T19:28:16.240941757Z",
+    "cycle": 1,
+    "max_cycles": 0,
+    "closed": true,
+    "history": [
+      {
+        "verdict": "end",
+        "reason": "La tentative corrigée de recover-number est terminée, son candidat 8f44756859bb6c6b6d30c796d25d8d0635cc5c5d a reçu une revue indépendante positive, a été intégré puis marqué accepted. Le rapport conserve la reproduction du défaut initial 0 != 42 et la garde sémantique vérifiant désormais le retour exact de 42. L’unique exigence req-1 est donc couverte par un résultat accepté et frais ; aucun travail utile ne reste dans ce cycle.",
+        "evidence_ref": "8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+        "at": "2026-10-13T19:28:16.240941757Z",
+        "cycle": 1
+      }
+    ]
+  },
+  "max_simultaneous_workers": 1,
+  "review_refusals": [
+    {
+      "result_event": "review-04d276b724b90b6334467e39",
+      "model_route": {
+        "level": "standard",
+        "model": "gpt-5.6-sol",
+        "effort": "medium",
+        "billing": "external",
+        "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+        "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+      },
+      "reply_path": ".swarm/managed/w-630ae432039dbb236949d842/proofs/63f69a2552004043a6b682ef4c2f8a4d/review-04d276b724b90b6334467e39-reply.json",
+      "reply_sha256": "57d80aea2fc712f15fecfbb454722780abe543d49ff5aff3c5dcef354c9492ec",
+      "workflow": {
+        "version": 1,
+        "role": "reviewer",
+        "methods": [
+          "audit-pdca",
+          "code-reviewer",
+          "product-review"
+        ],
+        "sha256": "28b293cca11cf97690380d482960742c94ed7df9cb0ce899b70fc82201bdcb50"
+      },
+      "git_report": "docs/recover-number.md",
+      "candidate_commit": "91f57dc2841a816033ebdf3601c9f536ee08e180",
+      "previous_candidate": "e646456fe07e45dd5a033d753f43f1d539899d8a",
+      "receipt": ".swarm/managed/w-630ae432039dbb236949d842/proofs/63f69a2552004043a6b682ef4c2f8a4d/receipt.json",
+      "receipt_sha256": "2ee39d4a021d3205016eb7ecab0742d691fb7eac2f9e04770e69aaa1966bd690",
+      "context": ".swarm/managed/w-630ae432039dbb236949d842/proofs/63f69a2552004043a6b682ef4c2f8a4d/review-context.json",
+      "context_sha256": "dc2709b80a9ee37b8687981483b99724218cadb12af29427e23b598d26c4080a",
+      "managed_tasks": [
+        {
+          "task": "recover-number",
+          "attempt": "a-95de4baab71f0d8f98a41f03",
+          "producer": "63f69a2552004043a6b682ef4c2f8a4d",
+          "contract": "21a51506ba70948d6c9f6e792a85547483326286c1c7fafb2ec4925b2a7644c4",
+          "policy": "422d4e07112468d5ebb26ba9099978eecdfdda8307a8f81a6dfa2d3ae83641fd",
+          "report": "docs/recover-number.md",
+          "report_sha256": "533be14d0a7d827b4a00bcc1014a83404f5653990620c485dacc63ff7a6f1830",
+          "reason": "Défaut démontré sur le commit candidat : la source complète fournie définit answer() avec return 0, alors que le critère exige 42. Le contrôle reçu vérifie seulement que le résultat est un entier ; il ne teste donc pas la valeur exigée. Le rapport et le bilan du producteur reconnaissent explicitement que leur déclaration positive est volontairement erronée. Correction à transmettre au responsable pour ACT : faire retourner 42 et ajouter un contrôle de régression affirmant number.answer() == 42, puis renouveler les contrôles et la revue sur le nouveau commit.",
+          "criteria": [
+            {
+              "index": 1,
+              "verdict": "fail",
+              "evidence": "La source candidate fournie contient `return 0`; number.answer() ne retourne donc pas la valeur 42 exigée."
+            }
+          ]
+        }
+      ],
+      "id": "review-04d276b724b90b6334467e39",
+      "attempt": "a-95de4baab71f0d8f98a41f03",
+      "producer": "63f69a2552004043a6b682ef4c2f8a4d",
+      "reviewer": "reviewer://codex",
+      "report": ".swarm/managed/w-630ae432039dbb236949d842/proofs/63f69a2552004043a6b682ef4c2f8a4d/reports/recover-number.md",
+      "sha256": "533be14d0a7d827b4a00bcc1014a83404f5653990620c485dacc63ff7a6f1830",
+      "contract": "21a51506ba70948d6c9f6e792a85547483326286c1c7fafb2ec4925b2a7644c4",
+      "state": "changes_requested",
+      "reason": "Revue indépendante des critères sur le candidat 91f57dc2841a816033ebdf3601c9f536ee08e180 ; recover-number : Défaut démontré sur le commit candidat : la source complète fournie définit answer() avec return 0, alors que le critère exige 42. Le contrôle reçu vérifie seulement que le résultat est un entier ; il ne teste donc pas la valeur exigée. Le rapport et le bilan du producteur reconnaissent explicitement que leur déclaration positive est volontairement erronée. Correction à transmettre au responsable pour ACT : faire retourner 42 et ajouter un contrôle de régression affirmant number.answer() == 42, puis renouveler les contrôles et la revue sur le nouveau commit.",
+      "criteria": [
+        {
+          "index": 1,
+          "verdict": "fail",
+          "evidence": "La source candidate fournie contient `return 0`; number.answer() ne retourne donc pas la valeur 42 exigée."
+        }
+      ],
+      "started": "2026-10-13T19:24:33.973740056Z",
+      "finished": "2026-10-13T19:24:45.028716033Z",
+      "usage": {
+        "cached_input_tokens": 0,
+        "input_tokens": 16292,
+        "output_tokens": 272,
+        "source": "événement fournisseur turn.completed",
+        "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+        "at": "2026-10-13T19:24:44.445599872Z"
+      }
+    }
+  ],
+  "tasks": 1,
+  "planning_calls": 3,
+  "review_calls": 2,
+  "bundle_sha256": "e785c39b808cb5fde2cffcc478e41ad87a5ca59d61051a6a544ee1ce32abd552",
+  "functional_check": {
+    "command": [
+      "/usr/bin/python3",
+      "-B",
+      "-c",
+      "import number;assert number.answer()==42"
+    ],
+    "exit": 0
+  },
+  "scope": "Controlled faulty initial producer; subsequent decisions/reviews/repair are real Codex",
+  "finished": "2026-10-13T19:28:18.527657+00:00",
+  "elapsed_seconds": 225.2157531970006
+}

@@ -1,0 +1,93 @@
+{
+  "status": "PASS",
+  "at": "2026-10-17T08:32:40.326874+00:00",
+  "owned_files": {
+    "web/project-memory.html": "26bc72ba4551db35d89ecfe4e617f2fb7063763d2e59e8f68435be357e3a217a",
+    "web/project-memory.js": "644c51f5cef3b18118c004446925c2de4814177c245d315ad47a7ceb31fe2b18",
+    "web/project-memory.css": "32404c65ddd6075386cb9ab1a72a30865d7ef2b69f667ad70616258045e04fdd",
+    "tests/project_memory_ui.cjs": "8f12b3c68a4fb021042c3ace9b6f3f77bf2d333b0247930adc832626ad492759",
+    "docs/SEMANTIC-SIGNALS.md": "33e14710c9683fd166a2dd764157a5670d18fdbaeef7617cee3d3761e5bd695b",
+    "docs/en/SEMANTIC-SIGNALS.md": "5f2c908b73f72800655e8809d18f9c2df3ec3c40b6b37b0bbde3271813685a4f",
+    "docs/PROJECT-MEMORY.md": "9ae4f25911bc745a8cec1b1f65d043555cf9ead8c827d3edaa96680efe6ea9c5",
+    "docs/en/PROJECT-MEMORY.md": "3882abd977631722bd7848bb137d3303f74aa96e3d495f91f108fe2af30bfda5",
+    "docs/UI-DESIGN.md": "5dcc632feefd080849407796346c37cde040f6f1de57d9b8a57dde7312c48d6e",
+    "docs/plans/deepagents-integration/PLAN.md": "945d6230f187e2d4ec6ec288d2c90da1b8726b166e93df376614eb947702f6bd",
+    "frontend/embed-signals.mjs": "fe9f24125314819551609b4b5917ab29e20ceddcc4919d487bcb8f076f8705eb",
+    "web/signals.js": "38fa9e333b2b874d165f33436823ce6bb6dc4fe37e04a80637239d961c39cb99",
+    "web/signals.css": "69136aecc40063438ace306231d1e1b5aa18a059be8b79503828e1ae58f51c8a",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-19.md": "50e93db9828ca2cb906d23857004692578dadf004fe8b93344e80625a78a55fe",
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-19.md": "d0298a76d9de70fc7a0f8a426025da72d801e20df816085cd4a55b7948f9b7c8"
+  },
+  "relative_links_checked": 32,
+  "checks": [
+    {
+      "command": [
+        "node",
+        "frontend/embed-signals.mjs",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"mode\":\"check\",\"assets\":{\"signals.js\":\"38fa9e333b2b874d165f33436823ce6bb6dc4fe37e04a80637239d961c39cb99\",\"signals.css\":\"69136aecc40063438ace306231d1e1b5aa18a059be8b79503828e1ae58f51c8a\"}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "--check",
+        "web/project-memory.js"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "--check",
+        "tests/project_memory_ui.cjs"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "--check",
+        "frontend/embed-signals.mjs"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "browser_receipt": "browser-final/checks.json",
+  "browser_groups": 11,
+  "rendering_configs": 20,
+  "contrast_minima": {
+    "contrast-en-etat": 5.750614836508003,
+    "contrast-en-sombre": 8.019744080685664,
+    "contrast-fr-etat": 5.750614836508003,
+    "contrast-fr-sombre": 8.019744080685664
+  },
+  "browser_source_unchanged": true,
+  "generated_copies_equal": true,
+  "canonical_component_unchanged": true,
+  "embedded_resources_verified": 5,
+  "current_engine_build": false,
+  "user_server_restarted": false,
+  "real_model_calls": 0,
+  "interchat_messages": 0,
+  "independent_review": false,
+  "identity_sources_owned": []
+}

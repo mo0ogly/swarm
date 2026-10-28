@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-25T18:06:31.658476+00:00",
+  "revision": "d566ed35c42a362f59e48a025d58b2b68a25b179",
+  "branch": "codex/clear-product-method-names",
+  "runtime_exit": 0,
+  "source_snapshot": "selected analysis inputs after documentation/contract edits, before first tests; not an atomic pre-edit repository snapshot",
+  "source_archive_sha256": "e5d87c2b8f9b9d7d8c2e9163ae88a76204f4276167d8689ab4fd7c9f45344aee",
+  "input_count": 28,
+  "user_e3_resources": "No independent evaluator or third-party team available (user response in this conversation)",
+  "authority": "PA-00/01 and independent preparation; existing migration/IA3/AC-02 prerequisites retained",
+  "scope": "No paid calls, delegation, authority activation or live mission mutation"
+}

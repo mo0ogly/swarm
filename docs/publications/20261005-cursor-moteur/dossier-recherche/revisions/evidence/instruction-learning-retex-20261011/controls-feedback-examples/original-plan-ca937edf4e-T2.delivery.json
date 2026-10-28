@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "task": "plan-ca937edf4e-T2",
+  "attempt": "a-2f9e1debb1548be96273f0d3",
+  "contract": "42322681531fbc222f795d153904f9b002b1f11c597af097c3c7660509100044",
+  "outcome": "complete",
+  "criteria": [
+    {
+      "index": 1,
+      "status": "pass",
+      "reason": "PASS local : go test ./internal/engine -run '...|TestPlanningJudge' -v exécute nommément TestPlanningJudgeVerdictDistinctFromCandidateReview et TestPlanningJudgeEndRejectsMatchingCandidateWithoutProofs (exit 0, 8.302s, reçu daté ci-dessous), fermant l'écart signalé par le refus payé f613 où le reçu cité ne couvrait aucune fonction TestPlanningJudge*. Le juge conserve un verdict continue/end dans Judge.Verdict, séparé du champ Review du candidat. Bilan local, pas une acceptation indépendante.",
+      "controls": [
+        "plan-entry",
+        "plan-validation",
+        "plan-delivery",
+        "plan-criterion-1"
+      ],
+      "evidence": [
+        "internal/engine/planning_judge.go",
+        "internal/engine/planning_judge_test.go",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.out",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.exit",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json"
+      ]
+    },
+    {
+      "index": 2,
+      "status": "pass",
+      "reason": "PASS local : TestPlanningJudgeRenewalPreservesContextAndHistory exécuté nommément dans le même reçu plan-validation (exit 0). Renouvellement reconstruit global_cycle depuis l'état durable, conserve objectif/exigences/compteurs/historique ; TestManagedCheckpointRecovery exerce le parcours CLI public rejouable sur dépôt géré dans le même reçu.",
+      "controls": [
+        "plan-entry",
+        "plan-validation",
+        "plan-delivery",
+        "plan-criterion-2"
+      ],
+      "evidence": [
+        "internal/engine/planning_judge.go",
+        "internal/engine/planning_judge_test.go",
+        "internal/engine/planning_context.go",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.out",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.exit"
+      ]
+    },
+    {
+      "index": 3,
+      "status": "pass",
+      "reason": "PASS local : TestPlanningJudgeReplayStaleAndDoubleVerdictRefused, TestPlanningJudgePausedAndQuotaRefuseEffects et TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess (3 sous-cas review/control/active) exécutés nommément dans le même reçu plan-validation, tous PASS. Rejeu, avis périmé, processus actif, pause et quota refusent l'effet sans double appel ni changement de compteur. Nouvelle preuve complète brute go test ./... sur code inchangé, exit0, reçue et empreinte conservées ; ancien résumé shardé historique, aucun avis annulé.",
+      "controls": [
+        "plan-entry",
+        "plan-validation",
+        "plan-delivery",
+        "plan-criterion-3"
+      ],
+      "evidence": [
+        "internal/engine/planning_judge.go",
+        "internal/engine/planning_judge_test.go",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.out",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.exit",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-canonical-20261011.out",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-canonical-20261011-receipt.json"
+      ]
+    },
+    {
+      "index": 4,
+      "status": "pass",
+      "reason": "PASS local : TestPlanningJudgeEndRequiresFreshMatchingCandidate et TestPlanningJudgeEndRejectsMatchingCandidateWithoutProofs exécutés nommément dans le même reçu plan-validation, tous PASS : end refuse sans preuves fraîches (acceptedFresh, enfants clos, retours traités). Architecture FR/EN documentée dans ce même candidat (docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md, docs/en/...), contrôle mécanique check-evolution-docs.py T2 PASS (reçu daté ci-dessous). Vérification structurelle du script uniquement ; conformité sémantique de l’architecture à décider par la revue indépendante de ce candidat. Aucun PASS sémantique déduit de la présence documentaire.",
+      "controls": [
+        "plan-entry",
+        "plan-validation",
+        "plan-delivery",
+        "plan-criterion-4"
+      ],
+      "evidence": [
+        "internal/engine/planning_judge.go",
+        "internal/engine/planning_judge_test.go",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.out",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.exit",
+        "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+        "docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md",
+        "docs/architecture/CURSOR-ENGINE-CONTRACT.md",
+        "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/check-evolution-docs.out"
+      ]
+    }
+  ]
+}

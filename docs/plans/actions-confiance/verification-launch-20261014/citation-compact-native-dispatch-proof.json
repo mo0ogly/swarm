@@ -1,0 +1,55 @@
+{
+  "at_utc": "2026-10-15T07:31:30.285765+00:00",
+  "work_revision": 378,
+  "candidate": "3d66a1fdd7d6a16f848f1f3f79890c6fcb0fcd43",
+  "review": "review-d9ea32fa4816bae18021ddaa",
+  "task_status": "blocked",
+  "review_state": "running",
+  "review_calls": 78,
+  "final_journal": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-7e3dd19f9678448a/fragment-final-9e3582cce413915b35e1061cb71a5f148b8a1f26bb35cb1a723e367a9b78940e.json",
+  "final_journal_sha256": "9e3582cce413915b35e1061cb71a5f148b8a1f26bb35cb1a723e367a9b78940e",
+  "latest_call": {
+    "retry_directive": {
+      "citation_diagnostic": {
+        "version": 1,
+        "review": "review-d9ea32fa4816bae18021ddaa",
+        "candidate_commit": "3d66a1fdd7d6a16f848f1f3f79890c6fcb0fcd43",
+        "call_id": "fragment-final-bf121f8e36c2257339da9ff6",
+        "reply_sha256": "5b9173ecb1dad1e1fbac2853d3c51360638ba447b890132137cadaae1eed5c33",
+        "issues": [
+          {
+            "packet": 0,
+            "artifact": 20,
+            "need_index": 0,
+            "rejected_quote": "if a.mode=='race':\n    argv=[sys.executable,str(source.with_name('verify.py')),a.task,'delivery','--timeout-seconds',str(a.timeout_seconds)]\nelse:\n    env['GOARCH']='386'",
+            "quote_sha256": "efdb3b6fef1640c2c9603af8c218d4c35914429f726b03f9ae2fcd0ec2db6ec7",
+            "originals": [
+              {
+                "name": "selected/13",
+                "sha256": "620609f4b75567cb3de7cfd0f9a26fc34e0ec5d7792f8964952c065dd167d12f",
+                "line": 27,
+                "byte_offset": 955,
+                "original_text": "+if a.mode=='race':\n+    argv=[sys.executable,str(source.with_name('verify.py')),a.task,'delivery','--timeout-seconds',str(a.timeout_seconds)]\n+else:\n+    env['GOARCH']='386'\n+    env['CGO_ENABLED']='0'\n+    env.pop('GOFLAGS',None)\n+    argv=['go','test','",
+                "truncated": true
+              }
+            ]
+          }
+        ]
+      },
+      "decision": "citation-compact-retry-8ab08b7be637",
+      "scope": "root",
+      "result_event": "review-d9ea32fa4816bae18021ddaa-result-632993a2cc0150c1",
+      "review": "review-d9ea32fa4816bae18021ddaa",
+      "candidate_commit": "3d66a1fdd7d6a16f848f1f3f79890c6fcb0fcd43",
+      "attempt": "a-b4669e24bbfb91f7a9686499",
+      "failure_code": "review_fragment_protocol",
+      "cause": "résolution sans preuve originale visible : packet=0 artifact=20 need_index=0 ; citation_sha256=efdb3b6fef1640c2c9603af8c218d4c35914429f726b03f9ae2fcd0ec2db6ec7 citation_rejetée=\"if a.mode=='race':\\n argv=[sys.executable,str(source.with_name('verify.py')),a.task,'delivery','--timeout-seconds',str(a.timeout_seconds)]\\nelse:\\n env['GOARCH']='386'\" ; le texte cité est absent, cela ne démontre pas l’absence du fichier",
+      "instruction": "Corriger la citation selon le diagnostic exact attribué ; conserver toute réserve et la décision indépendante."
+    },
+    "phase": "decision",
+    "call_id": "fragment-final-58af3c552bf17c850db2fc75",
+    "prompt_sha256": "41b75be3dae4c765e8d42bd4ce2b35366fe2b4e4b14faec2b753bf8fdbaf52ee",
+    "state": "reserved"
+  },
+  "limit": "Reservation and anchored directive prove the prepared call; no final model verdict or task acceptance is established by this snapshot."
+}

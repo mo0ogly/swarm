@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "cutover-fixture-restore",
+  "inputs": [
+    "tools/rust-migration/cutover_snapshot.py",
+    "tools/verification/verify_native_profile.py",
+    "tests/test_cutover_snapshot.py",
+    "tests/rust_cutover_restore.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "snapshot-refusal-and-recovery-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_cutover_snapshot.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_manifest_symlink_refuses_before_reading",
+        "test_enospc_retains_original_and_new_destination_absent",
+        "Ran 6 tests",
+        "\nOK\n"
+      ]
+    },
+    {
+      "id": "public-native-root-capture-mutate-restore",
+      "command": [
+        "python3",
+        "tests/rust_cutover_restore.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "CUTOVER_FIXTURE_RESTORE_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

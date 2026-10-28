@@ -1,0 +1,15 @@
+
+running 5 tests
+test planning_scope_context::tests::managed_candidate_changes_the_scoped_contract_without_private_paths ... FAILED
+test planning_scope_context::tests::scope_context_contract_freshness_matches_rendered_owned_fields ... ok
+test planning_scope_context::tests::scope_context_isolation_latest_instruction_and_undelivered_events_are_preserved ... ok
+test planning_scope_context::tests::scope_context_binds_root_judge_without_disclosing_it_to_children ... ok
+test planning_scope_context::tests::scope_context_report_change_dependency_and_specialized_inputs_refuse_then_recover ... ok
+
+failures:
+
+failures:
+    planning_scope_context::tests::managed_candidate_changes_the_scoped_contract_without_private_paths
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 451 filtered out; finished in 0.01s
+

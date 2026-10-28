@@ -1,0 +1,22 @@
+{
+  "status": "DELIVERED_LOCAL_EXISTING_BUDGET_EDIT",
+  "version": "v0.1.1-dev.29",
+  "browser_assertions": 229,
+  "budget_route_checks": 13,
+  "observation_route_checks": 9,
+  "graph_identifier_assertions": 13,
+  "graph_cache_regression": "PASS",
+  "recipe_integrity": "VERIFIED",
+  "provider_execution": false,
+  "live_budget_changes": false,
+  "archive_sha256": "644d333ced553896c92682392b063312446fd86534fd8c659fad20877e3901b4",
+  "original_failure": "Original invalid financial date caused HTTP500; typed caller error mapping corrected and real recovery verified.",
+  "GLM": "One complete backend proposal integrated with corrections,2971declaredtokens,no automatic retry.",
+  "limits": [
+    "Preview is financial/revision validation, not reservation or launch admission.",
+    "Other screens/commands/global migration acceptance remain open.",
+    "Second refresh-consumer anomaly has original source and corrected public variant, no executed old-binary reproduction claimed.",
+    "No independent acceptance or new nonzero-spending/active-agent fixture claimed."
+  ],
+  "finalization_diagnostic": "Unsupported terminal-newline assertion and subsequent non-idempotent finalizer replay preserved. Product bytes unchanged; duplicate PLAN append consolidated preserving original; package rebuilt separately without reapplying completed edits."
+}

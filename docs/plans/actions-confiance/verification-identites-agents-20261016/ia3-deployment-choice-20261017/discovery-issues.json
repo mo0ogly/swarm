@@ -1,0 +1,29 @@
+[
+  {
+    "stage": "first path search",
+    "exit": 2,
+    "original_error_excerpt": "rg: internal/engine/trust_config*.go: No such file or directory (os error 2)\nrg: internal/engine/trust_web*.go: No such file or directory (os error 2)",
+    "cause": "Assumed filenames before inventory",
+    "changed_precondition": "rg --files internal/engine returned actual trust source names; subsequently read trust_actions_http.go and trust_remote.go",
+    "owner": "Codex",
+    "state": "Inspection recovered; no product mutation"
+  },
+  {
+    "stage": "second path search",
+    "command": "rg -n config|modal|trust|install internal/engine/trust_actions.go internal/engine/trust_service_runtime.go web/admin.html internal/engine/web_server.go docs/INSTALL.md docs/INSTALLATION.md",
+    "exit": 2,
+    "cause": "Assumed document/UI paths; output also included unrelated matches",
+    "original_output": "Full nested output was truncated by the tool budget and is not retained here; no original transcript is fabricated",
+    "changed_precondition": "rg --files established INSTALL.md and docs/en/INSTALL.md; read both and actual web/admin.js",
+    "owner": "Codex",
+    "state": "Inspection recovered; original output completeness remains limited"
+  },
+  {
+    "stage": "batched reads",
+    "cause": "Combined outputs exceeded useful display size",
+    "observed": "Tool output reports truncation",
+    "action": "Subsequent reads narrowed; exact sources and before/after hashes retained",
+    "owner": "Codex",
+    "state": "No outcome inferred from uninspected output"
+  }
+]

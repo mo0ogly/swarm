@@ -1,0 +1,118 @@
+=== RUN   TestActionsConfianceT2EmptyLedgerIsAnArrayWithoutMutation
+--- PASS: TestActionsConfianceT2EmptyLedgerIsAnArrayWithoutMutation (0.19s)
+=== RUN   TestActionsConfianceT2PolicyHasNoArbitraryBusinessCeilings
+--- PASS: TestActionsConfianceT2PolicyHasNoArbitraryBusinessCeilings (0.00s)
+=== RUN   TestActionsConfianceT2ReconcileHonorsDelayWithoutAnotherEffect
+--- PASS: TestActionsConfianceT2ReconcileHonorsDelayWithoutAnotherEffect (0.24s)
+=== RUN   TestActionsConfianceT2HTTPVerifyAndStrictInput
+--- PASS: TestActionsConfianceT2HTTPVerifyAndStrictInput (0.23s)
+=== RUN   TestActionsConfianceT2HTTPRejectsTrailingJSONWithoutMutation
+--- PASS: TestActionsConfianceT2HTTPRejectsTrailingJSONWithoutMutation (0.22s)
+=== RUN   TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource
+--- PASS: TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource (2.02s)
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState/committed
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState/unknown
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState/reconciled
+--- PASS: TestActionsConfianceT2ApprovalCannotRegressEffectState (0.68s)
+    --- PASS: TestActionsConfianceT2ApprovalCannotRegressEffectState/committed (0.23s)
+    --- PASS: TestActionsConfianceT2ApprovalCannotRegressEffectState/unknown (0.21s)
+    --- PASS: TestActionsConfianceT2ApprovalCannotRegressEffectState/reconciled (0.24s)
+=== RUN   TestActionsConfianceT2ConfigReplayRetainsOriginalAcrossLaterChanges
+--- PASS: TestActionsConfianceT2ConfigReplayRetainsOriginalAcrossLaterChanges (0.24s)
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/requester-token-012345
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Basic_requester-token-012345
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer__requester-token-012345
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer_
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/#00
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer_requester-token-012345
+--- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays (1.26s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/requester-token-012345 (0.21s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Basic_requester-token-012345 (0.21s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer__requester-token-012345 (0.22s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer_ (0.20s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/#00 (0.21s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer_requester-token-012345 (0.21s)
+=== RUN   TestActionsConfianceT2OriginalBytesPersistAndVerify
+=== RUN   TestActionsConfianceT2OriginalBytesPersistAndVerify/altered
+=== RUN   TestActionsConfianceT2OriginalBytesPersistAndVerify/missing
+=== RUN   TestActionsConfianceT2OriginalBytesPersistAndVerify/extra
+--- PASS: TestActionsConfianceT2OriginalBytesPersistAndVerify (1.20s)
+    --- PASS: TestActionsConfianceT2OriginalBytesPersistAndVerify/altered (0.00s)
+    --- PASS: TestActionsConfianceT2OriginalBytesPersistAndVerify/missing (0.00s)
+    --- PASS: TestActionsConfianceT2OriginalBytesPersistAndVerify/extra (0.00s)
+=== RUN   TestActionsConfianceT2OriginalsCoverDecisionsAndRejectCredentialFields
+--- PASS: TestActionsConfianceT2OriginalsCoverDecisionsAndRejectCredentialFields (0.54s)
+=== RUN   TestActionsConfianceT2BusinessReplayPreservesIntegerPrecision
+--- PASS: TestActionsConfianceT2BusinessReplayPreservesIntegerPrecision (0.21s)
+=== RUN   TestActionsConfianceT2RevocationBindsUpdatedMandate
+--- PASS: TestActionsConfianceT2RevocationBindsUpdatedMandate (0.21s)
+=== RUN   TestActionsConfianceT2StateBoundIncludesFinalNewline
+=== RUN   TestActionsConfianceT2StateBoundIncludesFinalNewline/last-readable-byte
+=== RUN   TestActionsConfianceT2StateBoundIncludesFinalNewline/newline-overflow
+=== RUN   TestActionsConfianceT2StateBoundIncludesFinalNewline/body-overflow
+--- PASS: TestActionsConfianceT2StateBoundIncludesFinalNewline (6.99s)
+    --- PASS: TestActionsConfianceT2StateBoundIncludesFinalNewline/last-readable-byte (2.38s)
+    --- PASS: TestActionsConfianceT2StateBoundIncludesFinalNewline/newline-overflow (1.70s)
+    --- PASS: TestActionsConfianceT2StateBoundIncludesFinalNewline/body-overflow (1.68s)
+=== RUN   TestActionsConfianceT2ExampleCredentialsAreRejectedWithoutMutation
+=== RUN   TestActionsConfianceT2ExampleCredentialsAreRejectedWithoutMutation/remplacer-par-un-secret-admin
+=== RUN   TestActionsConfianceT2ExampleCredentialsAreRejectedWithoutMutation/replace-with-a-secret-admin
+--- PASS: TestActionsConfianceT2ExampleCredentialsAreRejectedWithoutMutation (0.40s)
+    --- PASS: TestActionsConfianceT2ExampleCredentialsAreRejectedWithoutMutation/remplacer-par-un-secret-admin (0.20s)
+    --- PASS: TestActionsConfianceT2ExampleCredentialsAreRejectedWithoutMutation/replace-with-a-secret-admin (0.20s)
+=== RUN   TestActionsConfianceT2ReplayBindsAuthenticatedAuthority
+--- PASS: TestActionsConfianceT2ReplayBindsAuthenticatedAuthority (0.45s)
+=== RUN   TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation
+=== RUN   TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation/anchor
+=== RUN   TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation/config
+--- PASS: TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation (0.41s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation/anchor (0.20s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsSymlinkWithoutMutation/config (0.20s)
+=== RUN   TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap
+=== RUN   TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/changed-role
+=== RUN   TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/changed-integrity
+=== RUN   TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/legacy-missing-binding
+=== RUN   TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/credential-rotation
+--- PASS: TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap (0.85s)
+    --- PASS: TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/changed-role (0.21s)
+    --- PASS: TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/changed-integrity (0.21s)
+    --- PASS: TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/legacy-missing-binding (0.21s)
+    --- PASS: TestActionsConfianceT2ReplayAuthorityChangeAndLegacyGap/credential-rotation (0.23s)
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/short
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/invalid-hex
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/public-permissions
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/directory
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/fifo
+=== RUN   TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/missing
+--- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey (1.22s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/short (0.20s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/invalid-hex (0.20s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/public-permissions (0.20s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/directory (0.21s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/fifo (0.20s)
+    --- PASS: TestActionsConfianceT2ProofKeyRejectsInvalidFilesAndMissingHistoricalKey/missing (0.20s)
+=== RUN   TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey
+=== RUN   TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/regular
+=== RUN   TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/hardlink
+--- PASS: TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey (0.39s)
+    --- PASS: TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/regular (0.19s)
+    --- PASS: TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/hardlink (0.20s)
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/absent
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/expired
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/revoked
+--- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba (0.33s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/absent (0.01s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/expired (0.02s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/revoked (0.03s)
+=== RUN   TestActionsConfianceT2IdempotencyRestartAndReconciliation
+--- PASS: TestActionsConfianceT2IdempotencyRestartAndReconciliation (1.01s)
+=== RUN   TestActionsConfianceT2ConfigProofAndInvalidInputs
+--- PASS: TestActionsConfianceT2ConfigProofAndInvalidInputs (0.47s)
+=== RUN   TestActionsConfianceT2HTTPAuthenticationAndPersistence
+--- PASS: TestActionsConfianceT2HTTPAuthenticationAndPersistence (0.24s)
+PASS
+ok  	swarm.local/companion/internal/engine	21.129s

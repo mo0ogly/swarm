@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "candidate_commit": "a27e175eb4f3e38f9cede1c888956a5ca5a0310f",
+  "executor": "host operator; isolated clone; not an engine receipt",
+  "command": [
+    "go",
+    "test",
+    "./...",
+    "-json",
+    "-count=1",
+    "-timeout15m"
+  ],
+  "started_at": "2026-10-10T19:21:08.727561+00:00",
+  "finished_at": "2026-10-10T19:21:32.416319+00:00",
+  "exit_code": 1,
+  "outputs": [
+    {
+      "path": "go-suite.jsonl",
+      "bytes": 12574,
+      "sha256": "45501afeb5b4380b91aab66e3a0559947b67b53b1698b62306eb8376cb31985e"
+    },
+    {
+      "path": "go-suite.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

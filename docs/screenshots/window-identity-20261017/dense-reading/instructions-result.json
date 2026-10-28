@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "checks": [
+    "fr/etat: frame, keyboard rejection, persistence, mobile, fresh recipe, optional RETEX, sourced preparation with no launch",
+    "fr/sombre: frame, keyboard rejection, persistence, mobile, fresh recipe, optional RETEX, sourced preparation with no launch",
+    "en/etat: frame, keyboard rejection, persistence, mobile, fresh recipe, optional RETEX, sourced preparation with no launch",
+    "en/sombre: frame, keyboard rejection, persistence, mobile, fresh recipe, optional RETEX, sourced preparation with no launch"
+  ],
+  "errors": [],
+  "failed": [],
+  "root": "/tmp/swarm-instruction-retex-ui-Q1fDkT"
+}

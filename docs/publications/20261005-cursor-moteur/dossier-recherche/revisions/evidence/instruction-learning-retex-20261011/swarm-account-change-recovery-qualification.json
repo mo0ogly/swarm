@@ -1,0 +1,91 @@
+[
+  {
+    "command": [
+      "go",
+      "test",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "start": "2026-10-11T15:31:45.414535+00:00",
+    "end": "2026-10-11T15:39:37.986846+00:00",
+    "seconds": 472.572304841,
+    "exit": 0,
+    "output": "/tmp/swarm-account-change-recovery-full.out",
+    "output_sha256": "9f94e3b63f3ca865dd64874afb1b8f542fcc94bb726632f47e855785f1997334",
+    "source_manifest_sha256": "9f2b0f58e235f592ed0c3fac2ed5246e9d8ed601614c4f49455290491e4e4d80",
+    "candidate_digest": "0311c86726f5e09c46bb29061efdc3f894fcef658d57602fc4cde877c2c8f28c",
+    "paths": 1172,
+    "source_drift": [],
+    "manifest_changed": false
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "./internal/engine",
+      "-run",
+      "TestProviderCooldown|TestManagedReviewFragmentResume|TestManagedReviewProviderRecovery",
+      "-count=1",
+      "-timeout=120s"
+    ],
+    "start": "2026-10-11T15:31:45.415044+00:00",
+    "end": "2026-10-11T15:32:25.211759+00:00",
+    "seconds": 39.79672645199753,
+    "exit": 0,
+    "output": "/tmp/swarm-account-change-recovery-race.out",
+    "output_sha256": "4592306293c133abc9fd6c552f36160378b513026561a8865712e51e4e955193"
+  },
+  {
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "start": "2026-10-11T15:31:45.415562+00:00",
+    "end": "2026-10-11T15:31:56.987908+00:00",
+    "seconds": 11.572368697001366,
+    "exit": 0,
+    "output": "/tmp/swarm-account-change-recovery-vet.out",
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "python3",
+      "tools/agent-workflows/check.py"
+    ],
+    "start": "2026-10-11T15:31:45.416922+00:00",
+    "end": "2026-10-11T15:31:49.011211+00:00",
+    "seconds": 3.5942980630024977,
+    "exit": 0,
+    "output": "/tmp/swarm-account-change-recovery-workflows.out",
+    "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "start": "2026-10-11T15:31:49.012257+00:00",
+    "end": "2026-10-11T15:31:49.069367+00:00",
+    "seconds": 0.05710893099967507,
+    "exit": 0,
+    "output": "/tmp/swarm-account-change-recovery-diff.out",
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "sh",
+      "./build.sh",
+      "/tmp/swarm-account-change-recovery-candidate"
+    ],
+    "start": "2026-10-11T15:31:49.069729+00:00",
+    "end": "2026-10-11T15:31:59.599983+00:00",
+    "seconds": 10.53028108899889,
+    "exit": 0,
+    "output": "/tmp/swarm-account-change-recovery-build.out",
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

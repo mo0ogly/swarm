@@ -1,0 +1,48 @@
+--- internal/engine/agents_store.go (preexisting)
++++ internal/engine/agents_store.go (M9)
+@@ -132,6 +132,7 @@
+ 	ModelRoute           *ModelRoute       `json:"model_route,omitempty"`
+ 	ReportedModel        *ReportedModel    `json:"reported_model,omitempty"`
+ 	Context              *ContextManifest  `json:"context,omitempty"`
++	PreparedContext      *ContextManifest  `json:"prepared_context,omitempty"`
+ 	Brainstorm           bool              `json:"brainstorm,omitempty"`
+ 	Reply                string            `json:"reply,omitempty"`
+ 	Usage                *Usage            `json:"usage,omitempty"`
+@@ -996,11 +997,8 @@
+ 	manifest := contextManifest(w, t.ID, r.References, prompt)
+ 	manifest.Memory = append([]MemoryReference{}, t.MemorySelections...)
+ 	manifest.MemoryDecision = t.MemoryDecision
+-	if len(prompt) > 128000 {
++	if len(prompt) > agentContextTransportBytes {
+ 		return a, false, fmt.Errorf("Contexte supérieur à 128000 octets : réduire les pièces jointes ou le brief.")
+-	}
+-	if r.ContextHash != "" && manifest.SHA256 != r.ContextHash {
+-		return a, false, fmt.Errorf("Contexte modifié : examiner un nouvel aperçu avant envoi.")
+ 	}
+ 	p = synchronousAttemptProvider(p, r.Mode)
+ 	recovery := recoveryForLaunch(r, previous)
+@@ -1009,9 +1007,12 @@
+ 	if w.Planning != nil && w.Planning.Repository != nil && r.Role == "worker" && r.Mode == "" {
+ 		a.DeliveryVersion = 2
+ 		a.Prompt += managedDeliveryInstructions(t, a.Attempt)
+-		if len(a.Prompt) > 128000 {
+-			return Agent{}, false, fmt.Errorf("Contexte supérieur à 128000 octets : réduire les pièces jointes ou le brief.")
+-		}
++	}
++	if err := bindAgentContext(&a); err != nil {
++		return Agent{}, false, err
++	}
++	if r.ContextHash != "" && a.Context.SHA256 != r.ContextHash {
++		return a, false, fmt.Errorf("Contexte modifié : examiner un nouvel aperçu avant envoi.")
+ 	}
+ 	if r.Mode == "terminal" {
+ 		if len(s.terminalSocket(a.ID)) >= 108 {
+@@ -1038,7 +1039,7 @@
+ 		}
+ 	}
+ 	if t.Brainstorm {
+-		t.Contexts = append(t.Contexts, SavedContext{a.ID, a.Started, prompt, manifest})
++		t.Contexts = append(t.Contexts, SavedContext{a.ID, a.Started, a.Prompt, *a.Context})
+ 	}
+ 	b, _ := json.Marshal(a)
+ 	if _, e = tx.Exec("INSERT INTO agents(id,work_id,task_id,cwd,status,body,request) VALUES(?,?,?,?,?,?,?)", a.ID, work, t.ID, cwd, a.Status, b, raw); e != nil {

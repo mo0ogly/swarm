@@ -1,0 +1,11 @@
+from pathlib import Path
+import sys,json,subprocess
+sys.path.insert(0,'.cache/rust-git-port');from editlib import atomic
+b=Path('docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260')
+raw=subprocess.run(['git','show','553593a2ffa3823d16784a6fedc291eebf390837:internal/engine/conductor.go'],capture_output=True,check=True).stdout.decode()
+s='GO producer:\n'+''.join(raw.splitlines(True)[154:194])
+for name,start,end in [('rust/crates/swarm-engine/src/root_store/mission_status_reports.rs',154,195),('rust/crates/swarm-engine/src/gate_evaluation.rs',125,184),('rust/crates/swarm-engine/src/root_store/mission_status_reports.rs',625,704)]:
+ s+='\nSOURCE '+name+'\n'+''.join(Path(name).read_text().splitlines(True)[start:end])
+atomic(b/'focused-context.txt',s)
+atomic(b/'focused-prompt.txt','''Scoped replan of truncated advice. No code patch requested. Answer in <=350 words: For real read-only historical status attribution, list the exact required selection outcomes/reasons and priority, then classify metadata/close failures as retained errors versus legitimate absence. Existing Root task_reports already refuses outside-root/nonregular/IO/close faults rather than Go's hidden skip. User forbids discarding errors or successful empty fallback. Preserve that existing contract: do not recommend swallowing per-file errors. Margin uses persisted EngineSettingsValues::report_clock_skew_seconds, validated nonnegative; do not invent constant2. Need only completed+blocked with ReviewObservation::NotApplicable and no incomplete-delivery blocker; other producer/review branches remain unchanged. Tell us whether root scope or agent cwd is consumed by Go's final completed branch. State missing context instead of assuming. You have no tools and cannot run tests or approve implementation.''')
+atomic(b/'replan1261.json',json.dumps(dict(cause='GLM4000 output exhausted:2923 reasoning +1077 text, length; full context38729 prompt tokens',original='glm/result.json',decision='No automatic retry or allocation increase; replace broad patch task with <=350-word selection/error audit and ~200-line context',model_user='GLM5.3',api_model='glm-5.2',owner='Codex',remaining='Root must implement and test real CLI/HTTP status; partial pseudo-patch skips errors and is rejected'),indent=2)+'\n')

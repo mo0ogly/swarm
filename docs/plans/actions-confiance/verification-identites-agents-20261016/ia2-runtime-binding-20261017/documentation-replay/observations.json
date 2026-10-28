@@ -1,0 +1,463 @@
+{
+  "root": "/tmp/swarm-ia2-runtime-_um1fn23",
+  "cages": [
+    {
+      "id": "A",
+      "command": [
+        "/usr/bin/bwrap",
+        "--unshare-user",
+        "--unshare-pid",
+        "--unshare-net",
+        "--unshare-ipc",
+        "--unshare-uts",
+        "--die-with-parent",
+        "--new-session",
+        "--cap-drop",
+        "ALL",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--symlink",
+        "usr/bin",
+        "/bin",
+        "--symlink",
+        "usr/sbin",
+        "/sbin",
+        "--symlink",
+        "usr/lib",
+        "/lib",
+        "--symlink",
+        "usr/lib64",
+        "/lib64",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--ro-bind",
+        "/tmp/swarm-ia2-runtime-_um1fn23/worker.py",
+        "/worker.py",
+        "--ro-bind",
+        "/tmp/swarm-ia2-runtime-_um1fn23/broker.sock",
+        "/broker.sock",
+        "--clearenv",
+        "--setenv",
+        "PATH",
+        "/usr/bin",
+        "--info-fd",
+        "5",
+        "--block-fd",
+        "6",
+        "--",
+        "/usr/bin/python3",
+        "/worker.py",
+        "A"
+      ],
+      "active": false,
+      "inodes": {
+        "pid": 4026533654,
+        "mnt": 4026533651
+      },
+      "bootstrap": {
+        "child-pid": 2955596,
+        "ipc-namespace": 4026533653,
+        "mnt-namespace": 4026533651,
+        "net-namespace": 4026533655,
+        "pid-namespace": 4026533654,
+        "uts-namespace": 4026533652
+      },
+      "worker_namespaces": {
+        "pid": "pid:[4026533654]",
+        "mnt": "mnt:[4026533651]",
+        "user": "user:[4026533693]"
+      }
+    },
+    {
+      "id": "B",
+      "command": [
+        "/usr/bin/bwrap",
+        "--unshare-user",
+        "--unshare-pid",
+        "--unshare-net",
+        "--unshare-ipc",
+        "--unshare-uts",
+        "--die-with-parent",
+        "--new-session",
+        "--cap-drop",
+        "ALL",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--symlink",
+        "usr/bin",
+        "/bin",
+        "--symlink",
+        "usr/sbin",
+        "/sbin",
+        "--symlink",
+        "usr/lib",
+        "/lib",
+        "--symlink",
+        "usr/lib64",
+        "/lib64",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--ro-bind",
+        "/tmp/swarm-ia2-runtime-_um1fn23/worker.py",
+        "/worker.py",
+        "--ro-bind",
+        "/tmp/swarm-ia2-runtime-_um1fn23/broker.sock",
+        "/broker.sock",
+        "--clearenv",
+        "--setenv",
+        "PATH",
+        "/usr/bin",
+        "--info-fd",
+        "8",
+        "--block-fd",
+        "11",
+        "--",
+        "/usr/bin/python3",
+        "/worker.py",
+        "B"
+      ],
+      "active": true,
+      "inodes": {
+        "pid": 4026533698,
+        "mnt": 4026533695
+      },
+      "bootstrap": {
+        "child-pid": 2955609,
+        "ipc-namespace": 4026533697,
+        "mnt-namespace": 4026533695,
+        "net-namespace": 4026533699,
+        "pid-namespace": 4026533698,
+        "uts-namespace": 4026533696
+      },
+      "worker_namespaces": {
+        "pid": "pid:[4026533698]",
+        "mnt": "mnt:[4026533695]",
+        "user": "user:[4026533779]"
+      }
+    }
+  ],
+  "messages": [
+    {
+      "channel": "A",
+      "peer_pid": 2955600,
+      "peer_uid": 1001,
+      "peer_instance": "A",
+      "message_pid": 2955600,
+      "message_uid": 1001,
+      "actual_instance": "A",
+      "namespace_inodes": {
+        "pid": 4026533654,
+        "mnt": 4026533651
+      },
+      "accepted": true,
+      "payload": {
+        "claimed_instance": "A",
+        "operation": "hello",
+        "inside_pid": 2,
+        "namespaces": {
+          "pid": "pid:[4026533654]",
+          "mnt": "mnt:[4026533651]",
+          "user": "user:[4026533693]"
+        }
+      }
+    },
+    {
+      "channel": "B",
+      "peer_pid": 2955613,
+      "peer_uid": 1001,
+      "peer_instance": "B",
+      "message_pid": 2955613,
+      "message_uid": 1001,
+      "actual_instance": "B",
+      "namespace_inodes": {
+        "pid": 4026533698,
+        "mnt": 4026533695
+      },
+      "accepted": true,
+      "payload": {
+        "claimed_instance": "B",
+        "operation": "hello",
+        "inside_pid": 2,
+        "namespaces": {
+          "pid": "pid:[4026533698]",
+          "mnt": "mnt:[4026533695]",
+          "user": "user:[4026533779]"
+        }
+      }
+    },
+    {
+      "channel": "A",
+      "peer_pid": 2955600,
+      "peer_uid": 1001,
+      "peer_instance": "A",
+      "message_pid": 2955600,
+      "message_uid": 1001,
+      "actual_instance": "A",
+      "namespace_inodes": {
+        "pid": 4026533654,
+        "mnt": 4026533651
+      },
+      "accepted": false,
+      "payload": {
+        "claimed_instance": "B",
+        "operation": "send"
+      }
+    },
+    {
+      "channel": "A",
+      "peer_pid": 2955600,
+      "peer_uid": 1001,
+      "peer_instance": "A",
+      "message_pid": 2955628,
+      "message_uid": 1001,
+      "actual_instance": "A",
+      "namespace_inodes": {
+        "pid": 4026533654,
+        "mnt": 4026533651
+      },
+      "accepted": true,
+      "payload": {
+        "claimed_instance": "A",
+        "operation": "child"
+      }
+    },
+    {
+      "channel": "A",
+      "peer_pid": 2955600,
+      "peer_uid": 1001,
+      "peer_instance": "A",
+      "message_pid": 2955600,
+      "message_uid": 1001,
+      "actual_instance": "A",
+      "namespace_inodes": {
+        "pid": 4026533654,
+        "mnt": 4026533651
+      },
+      "accepted": true,
+      "payload": {
+        "claimed_instance": "A",
+        "operation": "child-complete"
+      }
+    },
+    {
+      "channel": "B",
+      "peer_pid": 2955613,
+      "peer_uid": 1001,
+      "peer_instance": "B",
+      "message_pid": 2955613,
+      "message_uid": 1001,
+      "actual_instance": "B",
+      "namespace_inodes": {
+        "pid": 4026533698,
+        "mnt": 4026533695
+      },
+      "accepted": true,
+      "payload": {
+        "claimed_instance": "B",
+        "operation": "transfer"
+      }
+    },
+    {
+      "channel": "B",
+      "peer_pid": 2955613,
+      "peer_uid": 1001,
+      "peer_instance": "B",
+      "message_pid": 2955573,
+      "message_uid": 1001,
+      "actual_instance": null,
+      "namespace_inodes": {
+        "pid": 4026531836,
+        "mnt": 4026531832
+      },
+      "accepted": false,
+      "payload": {
+        "claimed_instance": "B",
+        "operation": "host-borrowed"
+      }
+    },
+    {
+      "channel": "B",
+      "peer_pid": 2955613,
+      "peer_uid": 1001,
+      "peer_instance": "B",
+      "message_pid": 2955600,
+      "message_uid": 1001,
+      "actual_instance": "A",
+      "namespace_inodes": {
+        "pid": 4026533654,
+        "mnt": 4026533651
+      },
+      "accepted": false,
+      "payload": {
+        "claimed_instance": "B",
+        "operation": "borrowed"
+      }
+    },
+    {
+      "channel": "A",
+      "peer_pid": 2955600,
+      "peer_uid": 1001,
+      "peer_instance": "A",
+      "message_pid": 2955600,
+      "message_uid": 1001,
+      "actual_instance": "A",
+      "namespace_inodes": {
+        "pid": 4026533654,
+        "mnt": 4026533651
+      },
+      "accepted": true,
+      "payload": {
+        "claimed_instance": "A",
+        "operation": "borrow-complete"
+      }
+    },
+    {
+      "channel": "A",
+      "peer_pid": 2955600,
+      "peer_uid": 1001,
+      "peer_instance": "A",
+      "message_pid": 2955600,
+      "message_uid": 1001,
+      "actual_instance": "A",
+      "namespace_inodes": {
+        "pid": 4026533654,
+        "mnt": 4026533651
+      },
+      "accepted": true,
+      "payload": {
+        "claimed_instance": "A",
+        "operation": "spoof-result",
+        "blocked": true,
+        "errno": 1
+      }
+    },
+    {
+      "channel": "A",
+      "peer_pid": 2955600,
+      "peer_uid": 1001,
+      "peer_instance": "A",
+      "message_pid": 2955600,
+      "message_uid": 1001,
+      "actual_instance": "A",
+      "namespace_inodes": {
+        "pid": 4026533654,
+        "mnt": 4026533651
+      },
+      "accepted": true,
+      "payload": {
+        "claimed_instance": "A",
+        "operation": "join-result",
+        "attempts": [
+          {
+            "joined": false,
+            "errno": 1
+          },
+          {
+            "joined": false,
+            "errno": 1
+          },
+          {
+            "joined": false,
+            "errno": 1
+          }
+        ]
+      }
+    },
+    {
+      "channel": "A",
+      "peer_pid": 2955600,
+      "peer_uid": 1001,
+      "peer_instance": "A",
+      "message_pid": 2955600,
+      "message_uid": 1001,
+      "actual_instance": "A",
+      "namespace_inodes": {
+        "pid": 4026533654,
+        "mnt": 4026533651
+      },
+      "accepted": false,
+      "payload": {
+        "claimed_instance": "A",
+        "operation": "send"
+      }
+    }
+  ],
+  "checks": [
+    {
+      "name": "legitimate-A",
+      "result": "PASS"
+    },
+    {
+      "name": "legitimate-B",
+      "result": "PASS"
+    },
+    {
+      "name": "distinct-pinned-namespaces",
+      "result": "PASS"
+    },
+    {
+      "name": "forged-instance-label-denied",
+      "result": "PASS"
+    },
+    {
+      "name": "authorized-tool-child-attributed",
+      "result": "PASS"
+    },
+    {
+      "name": "tool-child-completed",
+      "result": "PASS"
+    },
+    {
+      "name": "endpoint-copy-fixture",
+      "result": "PASS"
+    },
+    {
+      "name": "copied-endpoint-host-denied",
+      "result": "PASS"
+    },
+    {
+      "name": "copied-endpoint-sibling-denied",
+      "result": "PASS"
+    },
+    {
+      "name": "sibling-copy-completed",
+      "result": "PASS"
+    },
+    {
+      "name": "kernel-pid-forgery-denied",
+      "result": "PASS"
+    },
+    {
+      "name": "copied-namespace-descriptors-cannot-join-sibling",
+      "result": "PASS"
+    },
+    {
+      "name": "revoked-instance-channel-denied",
+      "result": "PASS"
+    }
+  ],
+  "cleanup": [
+    {
+      "id": "A",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "id": "B",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

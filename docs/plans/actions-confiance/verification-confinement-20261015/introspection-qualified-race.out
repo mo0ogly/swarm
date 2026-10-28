@@ -1,0 +1,66 @@
+=== RUN   TestActionsConfianceT3IntrospectionPolicyContract
+--- PASS: TestActionsConfianceT3IntrospectionPolicyContract (0.96s)
+=== RUN   TestActionsConfianceT3IntrospectionActiveRevokedAndRestart
+--- PASS: TestActionsConfianceT3IntrospectionActiveRevokedAndRestart (1.75s)
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/future-nbf
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/inactive
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/null-active
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/string-active
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/issuer
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/audience
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/multiple-audiences
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/extended
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/future-iat
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/subject
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/client
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/expired
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/missing-exp
+--- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity (0.03s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/future-nbf (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/inactive (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/null-active (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/string-active (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/issuer (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/audience (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/multiple-audiences (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/extended (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/future-iat (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/subject (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/client (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/expired (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/missing-exp (0.00s)
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/enabled
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/endpoint
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/client_id
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/timeout_seconds
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/validation_window_seconds
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/max_sessions
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/max_token_bytes
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-timeout_seconds
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-validation_window_seconds
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-max_sessions
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-max_token_bytes
+--- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs (1.41s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/enabled (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/endpoint (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/client_id (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/timeout_seconds (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/validation_window_seconds (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/max_sessions (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/max_token_bytes (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-timeout_seconds (0.01s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-validation_window_seconds (0.01s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-max_sessions (0.01s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-max_token_bytes (0.01s)
+=== RUN   TestActionsConfianceT3IntrospectionNoNetworkLockAndFreshDecision
+--- PASS: TestActionsConfianceT3IntrospectionNoNetworkLockAndFreshDecision (1.55s)
+=== RUN   TestActionsConfianceT3IntrospectionTransportFailsClosed
+=== RUN   TestActionsConfianceT3IntrospectionTransportFailsClosed/unauthorized
+=== RUN   TestActionsConfianceT3IntrospectionTransportFailsClosed/redirect
+=== RUN   TestActionsConfianceT3IntrospectionTransportFailsClosed/malformed
+=== RUN   TestActionsConfianceT3IntrospectionTransportFailsClosed/oversized
+=== RUN   TestActionsConfianceT3IntrospectionTransportFailsClosed/timeout
+2026/10/16 00:14:39 httptest.Server blocked in Close after 5 seconds, waiting for connections:
+  *net.TCPConn 0xc000584098 127.0.0.1:49200 in state active

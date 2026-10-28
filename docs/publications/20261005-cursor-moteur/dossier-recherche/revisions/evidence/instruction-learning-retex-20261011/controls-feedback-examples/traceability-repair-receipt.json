@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T20:01:16.589855+00:00",
+  "original_index_tree": "3f4ddf6990e07c3895f88b223c8269fe5d7eec9d",
+  "citation_validation": [
+    {
+      "id": "SRC-CUR-03",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-CUR-04",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-CUR-05",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-GOO-01",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-GOO-02",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-OAI-01",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-OAI-02",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-ANT-01",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-ANT-02",
+      "exact_date_source_cell": true
+    }
+  ],
+  "source_original_sha256": "1c7e84b87fc2e7baa53383be0c494658f6d0c1615962daf40511d99c7301934a",
+  "source_go_manifest_sha256": "46d5667a01bd38a935c49b19097fe89d3fe95f305a2093de3a46f4eaaa89acd4",
+  "source_go_drift": [],
+  "local_receipt_exit": 0,
+  "local_stdout_hash_verified": true,
+  "native_review_result_preserved": "review-14a105dc677c088e4121afb7-result-5617cbea21b4b611",
+  "limits": [
+    "Local evidence repair only; independent native controls/review required",
+    "No provider quota delay cleared; no consumed call refunded"
+  ]
+}

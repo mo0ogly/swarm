@@ -1,0 +1,20 @@
+{
+  "at_utc": "2026-10-15T10:18:57.853729+00:00",
+  "pid": 27445,
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-original-references",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm",
+    "mission",
+    "watch",
+    "w-68b50cc82ec3fe55624f9549"
+  ],
+  "start_ticks": "5616490",
+  "executable": "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-original-references",
+  "sha256": "163d097f6eb0991a1b95a211a4637cb149693c3921d60331c10e973357eb38a7",
+  "children": [],
+  "reason": "Paused work 427; replace its owned conductor after local context-window qualification. No other process is targeted.",
+  "exit_observed_utc": "2026-10-15T10:19:05.886752+00:00",
+  "proc_state": null,
+  "stopped": true
+}

@@ -1,0 +1,7 @@
+{
+  "path": "proof-test-before-copy-fix.go.txt",
+  "reconstructed_by": "reverse only copied-handle concurrency and JSON-import additions; gofmt without checkout mutation",
+  "original_pre_run_sha256": "ec5b102650745555864e89d375d457ebb5645ea302557c78cf6bd986f32bc924",
+  "restored_sha256": "ec5b102650745555864e89d375d457ebb5645ea302557c78cf6bd986f32bc924",
+  "exact_match": true
+}

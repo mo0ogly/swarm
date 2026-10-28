@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-12T14:17:44.556860+00:00",
+  "candidate_digest": "3876dc260921b698fca67e4a632e88893329d71bd85c8ae20bbae183b37289dc",
+  "paths_transferred": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/control_command_deadline_test.go",
+    "internal/engine/control_runtime_limits.go",
+    "internal/engine/model.go",
+    "internal/engine/store.go"
+  ],
+  "source_inputs_verified": 1228,
+  "preimages_verified": true,
+  "backup": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-command-deadline-primary-preimages",
+  "operator_patch": "control-command-deadline-20261012.patch",
+  "patch_sha256": "3389782cc1f5f30cdf11576fee37880e5fedb1ca42092f011e601251fbec0607",
+  "runtime": "original T3 unchanged; qualification of runtime-T3 does not install it"
+}

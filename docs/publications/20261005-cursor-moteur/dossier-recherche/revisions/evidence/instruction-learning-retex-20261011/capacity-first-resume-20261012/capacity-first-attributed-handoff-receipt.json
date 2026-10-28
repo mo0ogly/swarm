@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "event_id": "capacity-first-attributed-handoff-935b3f95c3dd4518b1279f1f61891772",
+  "expected_revision": 818,
+  "scope": "root",
+  "task_id": "plan-ca937edf4e-T3",
+  "attempt_id": "a-cd4afa7836a7687fe0e466c5",
+  "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+  "reason": "Remise par opérateur explicite sur résultat arrêté existant, sans action attribuée à une IA productrice : correction du transport qualifiée et appliquée ; voici l’inventaire public original complet et son coût courant pour décider review-plan. Même candidat, tentative, contrôles et dépenses ; cette remise ne vaut aucun verdict. PrioritéT3 puisT2–T8RETEX.",
+  "artifacts": [
+    {
+      "path": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T3-4/docs/T3-operator-current-scope-20261012.json",
+      "sha256": "2957890e13405817e7fc636f6989841922df7d10d7d047c22c089eeb29413ce9"
+    }
+  ]
+}

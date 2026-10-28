@@ -1,0 +1,5002 @@
+{
+  "coverage_status": "PASS",
+  "contract_status": "DECLARED_REVIEW_COMPLETE",
+  "files": 8,
+  "open_findings": [],
+  "lexical_candidates": {
+    "rust/crates/swarm-engine/src/managed_repository.rs": {
+      "policies": [
+        {
+          "line": 20,
+          "text": "    let timeout = settings"
+        },
+        {
+          "line": 24,
+          "text": "    let deadline = timeout"
+        },
+        {
+          "line": 38,
+          "text": "        \"core.fsmonitor=false\","
+        },
+        {
+          "line": 40,
+          "text": "        \"commit.gpgsign=false\","
+        },
+        {
+          "line": 61,
+          "text": "        .env(\"GIT_CONFIG_NOSYSTEM\", \"1\")"
+        },
+        {
+          "line": 63,
+          "text": "        .env(\"GIT_TERMINAL_PROMPT\", \"0\")"
+        },
+        {
+          "line": 64,
+          "text": "        .env(\"GIT_OPTIONAL_LOCKS\", \"0\");"
+        },
+        {
+          "line": 124,
+          "text": "        crate::work::decode_mode(&bytes, crate::models::shape_managed_repository(), true)"
+        },
+        {
+          "line": 133,
+          "text": "    if !matches!(oid.len(), 40 | 64)"
+        },
+        {
+          "line": 163,
+          "text": "    if repo.snapshot_digest.len() != 64"
+        },
+        {
+          "line": 172,
+          "text": "        dir.child(\"repository.git\", false)"
+        },
+        {
+          "line": 235,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 243,
+          "text": "                            .child(\"managed\", true)"
+        },
+        {
+          "line": 248,
+          "text": "                                    .child(work, true)"
+        },
+        {
+          "line": 252,
+          "text": "                                        .reserve(true, true)"
+        },
+        {
+          "line": 323,
+          "text": "                dir.child(&staging_name, true)"
+        },
+        {
+          "line": 349,
+          "text": "                            .child(\"repository.git\", false)"
+        },
+        {
+          "line": 435,
+          "text": "                    .child(\"managed\", false)"
+        },
+        {
+          "line": 440,
+          "text": "                            .child(&work.id, false)"
+        },
+        {
+          "line": 444,
+          "text": "                                .reserve(false, false)"
+        },
+        {
+          "line": 461,
+          "text": "                                    dir.child(\"repository.git\", false)"
+        },
+        {
+          "line": 526,
+          "text": "        let child = dir.child(\"owned\", true).unwrap();"
+        },
+        {
+          "line": 529,
+          "text": "        assert!(dir.child(\"owned\", true).is_err());"
+        },
+        {
+          "line": 535,
+          "text": "        assert!(dir.child(\"../outside\", true).is_err());"
+        },
+        {
+          "line": 549,
+          "text": "        let staging = dir.child(\"staging\", true).unwrap();"
+        },
+        {
+          "line": 550,
+          "text": "        let source = staging.child(\"repository.git\", true).unwrap();"
+        },
+        {
+          "line": 552,
+          "text": "        let prior = dir.child(\"repository.git\", true).unwrap();"
+        },
+        {
+          "line": 567,
+          "text": "        dir.child(\"repository.git\", false).unwrap().close().unwrap();"
+        }
+      ],
+      "functions": [
+        {
+          "line": 19,
+          "text": "fn git(root: &Path, args: &[&str], settings: &EngineSettingsDocument) -> Result<Vec<u8>, E> {"
+        },
+        {
+          "line": 90,
+          "text": "fn hash(bytes: &[u8]) -> String {"
+        },
+        {
+          "line": 94,
+          "text": "fn text(bytes: Vec<u8>) -> Result<String, E> {"
+        },
+        {
+          "line": 98,
+          "text": "fn inside<T>("
+        },
+        {
+          "line": 113,
+          "text": "fn read_manifest(dir: &LocalDirectory, name: &str) -> Result<Option<ManagedRepository>, E> {"
+        },
+        {
+          "line": 132,
+          "text": "fn commit(dir: &Path, oid: &str, settings: &EngineSettingsDocument) -> Result<(), E> {"
+        },
+        {
+          "line": 148,
+          "text": "fn validate("
+        },
+        {
+          "line": 186,
+          "text": "pub(crate) fn prepare("
+        },
+        {
+          "line": 273,
+          "text": "fn locked("
+        },
+        {
+          "line": 411,
+          "text": "pub(crate) fn observe("
+        },
+        {
+          "line": 491,
+          "text": "    fn manifest_empty_list_matches_omission_without_rewriting_original_bytes() {"
+        },
+        {
+          "line": 521,
+          "text": "    fn directories_pin_inodes_and_refuse_symlink_children() {"
+        },
+        {
+          "line": 544,
+          "text": "    fn repository_rename_never_replaces_a_prior_target() {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 23,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 30,
+          "text": "        .transpose()?;"
+        },
+        {
+          "line": 69,
+          "text": "        Err(cause) => Err(E::caused("
+        },
+        {
+          "line": 76,
+          "text": "        Ok(run) if run.timed_out || !run.usage.status.success() => Err(E::caused("
+        },
+        {
+          "line": 116,
+          "text": "        .map_err(|e| E::caused(\"managed-manifest-list\", e))?;"
+        },
+        {
+          "line": 122,
+          "text": "        .map_err(|e| E::caused(\"managed-manifest-read\", e))?;"
+        },
+        {
+          "line": 125,
+          "text": "            .map_err(|e| E::caused(\"managed-manifest-invalid\", e))?;"
+        },
+        {
+          "line": 138,
+          "text": "        return Err(E::Refused(\"managed-commit-invalid\"));"
+        },
+        {
+          "line": 141,
+          "text": "    if text(git(dir, &[\"rev-parse\", \"--verify\", &expression], settings)?)? != oid {"
+        },
+        {
+          "line": 142,
+          "text": "        return Err(E::Refused(\"managed-commit-not-canonical\"));"
+        },
+        {
+          "line": 161,
+          "text": "        return Err(E::Refused(\"managed-manifest-binding-mismatch\"));"
+        },
+        {
+          "line": 169,
+          "text": "        return Err(E::Refused(\"managed-snapshot-invalid\"));"
+        },
+        {
+          "line": 173,
+          "text": "            .map_err(|e| E::caused(\"managed-repository-open\", e))?,"
+        },
+        {
+          "line": 175,
+          "text": "            commit(&bare.process_path(), &repo.base_commit, settings)?;"
+        },
+        {
+          "line": 193,
+          "text": "        return Err(E::Refused(\"managed-work-id-invalid\"));"
+        },
+        {
+          "line": 201,
+          "text": "        return Err(E::Refused(\"managed-dirty-snapshot-unported\"));"
+        },
+        {
+          "line": 204,
+          "text": "        crate::canonical_project_root(root).map_err(|e| E::caused(\"managed-project-path\", e))?;"
+        },
+        {
+          "line": 206,
+          "text": "        .map_err(|e| E::caused(\"managed-source-path\", e))?;"
+        },
+        {
+          "line": 208,
+          "text": "        LocalDirectory::open_owned(&source).map_err(|e| E::caused(\"managed-source-open\", e))?,"
+        },
+        {
+          "line": 214,
+          "text": "            )?)?);"
+        },
+        {
+          "line": 217,
+          "text": "                .map_err(|e| E::caused(\"managed-project-outside-repository\", e))?;"
+        },
+        {
+          "line": 220,
+          "text": "                    .map_err(|e| E::caused(\"managed-request-encode\", e))?,"
+        },
+        {
+          "line": 231,
+          "text": "                    .ok_or(E::Refused(\"managed-project-encoding\"))?"
+        },
+        {
+          "line": 239,
+          "text": "                    .map_err(|e| E::caused(\"managed-state-directory\", e))?,"
+        },
+        {
+          "line": 244,
+          "text": "                            .map_err(|e| E::caused(\"managed-parent-directory\", e))?,"
+        },
+        {
+          "line": 249,
+          "text": "                                    .map_err(|e| E::caused(\"managed-work-directory\", e))?,"
+        },
+        {
+          "line": 253,
+          "text": "                                        .map_err(|e| E::caused(\"managed-operation-busy\", e))?;"
+        },
+        {
+          "line": 272,
+          "text": "/// original and present canonical commit objects. No source fallback is permitted."
+        },
+        {
+          "line": 279,
+          "text": "    let final_manifest = read_manifest(dir, \"repository.json\")?;"
+        },
+        {
+          "line": 280,
+          "text": "    let pending = read_manifest(dir, \"repository.json.pending\")?;"
+        },
+        {
+          "line": 287,
+          "text": "            return Err(E::Refused(\"managed-manifest-divergence\"));"
+        },
+        {
+          "line": 289,
+          "text": "        validate(retained, expected, dir, settings)?;"
+        },
+        {
+          "line": 293,
+          "text": "                .map_err(|e| E::caused(\"managed-pending-read\", e))?;"
+        },
+        {
+          "line": 299,
+          "text": "            .map_err(|e| E::caused(\"managed-manifest-publish\", e))?;"
+        },
+        {
+          "line": 305,
+          "text": "        .map_err(|e| E::caused(\"managed-storage-list\", e))?"
+        },
+        {
+          "line": 309,
+          "text": "        return Err(E::Refused(\"managed-orphan-repository\"));"
+        },
+        {
+          "line": 312,
+          "text": "        LocalDirectory::open_owned(top).map_err(|e| E::caused(\"managed-source-top\", e))?,"
+        },
+        {
+          "line": 318,
+          "text": "            )?)?;"
+        },
+        {
+          "line": 319,
+          "text": "            commit(&source.process_path(), &base, settings)?;"
+        },
+        {
+          "line": 321,
+          "text": "                .map_err(|e| E::caused(\"managed-staging-id\", e))?;"
+        },
+        {
+          "line": 324,
+          "text": "                    .map_err(|e| E::caused(\"managed-staging-directory\", e))?,"
+        },
+        {
+          "line": 338,
+          "text": "                                .ok_or(E::Refused(\"managed-source-encoding\"))?,"
+        },
+        {
+          "line": 341,
+          "text": "                                .ok_or(E::Refused(\"managed-storage-encoding\"))?,"
+        },
+        {
+          "line": 344,
+          "text": "                    )?;"
+        },
+        {
+          "line": 346,
+          "text": "                        .map_err(|e| E::caused(\"managed-copy-permissions\", e))?;"
+        },
+        {
+          "line": 350,
+          "text": "                            .map_err(|e| E::caused(\"managed-copy-open\", e))?,"
+        },
+        {
+          "line": 352,
+          "text": "                            commit(&bare.process_path(), &base, settings)?;"
+        },
+        {
+          "line": 358,
+          "text": "                                    top.to_str().ok_or(E::Refused(\"managed-source-encoding\"))?,"
+        },
+        {
+          "line": 361,
+          "text": "                            )?;"
+        },
+        {
+          "line": 366,
+          "text": "                            )?;"
+        },
+        {
+          "line": 371,
+          "text": "                            )?;"
+        },
+        {
+          "line": 374,
+          "text": "                    )?;"
+        },
+        {
+          "line": 380,
+          "text": "                            .map_err(|e| E::caused(\"managed-snapshot-encode\", e))?,"
+        },
+        {
+          "line": 383,
+          "text": "                        .map_err(|e| E::caused(\"managed-manifest-encode\", e))?;"
+        },
+        {
+          "line": 389,
+          "text": "                    .map_err(|e| E::caused(\"managed-pending-publish\", e))?;"
+        },
+        {
+          "line": 391,
+          "text": "                        .map_err(|e| E::caused(\"managed-copy-publish\", e))?;"
+        },
+        {
+          "line": 397,
+          "text": "                    .map_err(|e| E::caused(\"managed-manifest-publish\", e))?;"
+        },
+        {
+          "line": 420,
+          "text": "        .ok_or(E::Refused(\"managed-repository-required\"))?;"
+        },
+        {
+          "line": 422,
+          "text": "        return Err(E::Refused(\"managed-work-id-invalid\"));"
+        },
+        {
+          "line": 425,
+          "text": "        crate::canonical_project_root(root).map_err(|e| E::caused(\"managed-project-path\", e))?;"
+        },
+        {
+          "line": 427,
+          "text": "        return Err(E::Refused(\"managed-storage-binding-mismatch\"));"
+        },
+        {
+          "line": 431,
+          "text": "            .map_err(|e| E::caused(\"managed-state-directory\", e))?,"
+        },
+        {
+          "line": 436,
+          "text": "                    .map_err(|e| E::caused(\"managed-parent-directory\", e))?,"
+        },
+        {
+          "line": 441,
+          "text": "                            .map_err(|e| E::caused(\"managed-work-directory\", e))?,"
+        },
+        {
+          "line": 445,
+          "text": "                                .map_err(|e| E::caused(\"managed-operation-busy\", e))?;"
+        },
+        {
+          "line": 447,
+          "text": "                                let retained = read_manifest(dir, \"repository.json\")?"
+        },
+        {
+          "line": 448,
+          "text": "                                    .ok_or(E::Refused(\"managed-manifest-required\"))?;"
+        },
+        {
+          "line": 449,
+          "text": "                                if read_manifest(dir, \"repository.json.pending\")?"
+        },
+        {
+          "line": 452,
+          "text": "                                    return Err(E::Refused(\"managed-manifest-divergence\"));"
+        },
+        {
+          "line": 457,
+          "text": "                                    return Err(E::Refused(\"managed-manifest-baseline-mismatch\"));"
+        },
+        {
+          "line": 459,
+          "text": "                                validate(&retained, repo, dir, settings)?;"
+        },
+        {
+          "line": 462,
+          "text": "                                        .map_err(|e| E::caused(\"managed-repository-open\", e))?,"
+        },
+        {
+          "line": 492,
+          "text": "        let root = std::env::temp_dir().join(crate::generate_identifier(\"managed-wire-\").unwrap());"
+        },
+        {
+          "line": 493,
+          "text": "        std::fs::create_dir(&root).unwrap();"
+        },
+        {
+          "line": 494,
+          "text": "        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 495,
+          "text": "        let dir = LocalDirectory::open(&root).unwrap();"
+        },
+        {
+          "line": 496,
+          "text": "        dir.publish(\"nil.json\", b\"{}\").unwrap();"
+        },
+        {
+          "line": 497,
+          "text": "        dir.publish(\"empty.json\", br#\"{\"included\":[]}\"#).unwrap();"
+        },
+        {
+          "line": 499,
+          "text": "            read_manifest(&dir, \"nil.json\").unwrap(),"
+        },
+        {
+          "line": 500,
+          "text": "            read_manifest(&dir, \"empty.json\").unwrap()"
+        },
+        {
+          "line": 502,
+          "text": "        assert_eq!(dir.read(\"empty.json\").unwrap(), br#\"{\"included\":[]}\"#);"
+        },
+        {
+          "line": 504,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 507,
+          "text": "                .unwrap()"
+        },
+        {
+          "line": 508,
+          "text": "                .unwrap()"
+        },
+        {
+          "line": 512,
+          "text": "        dir.close().unwrap();"
+        },
+        {
+          "line": 513,
+          "text": "        std::fs::remove_dir_all(root).unwrap();"
+        },
+        {
+          "line": 522,
+          "text": "        let root = std::env::temp_dir().join(crate::generate_identifier(\"managed-dir-\").unwrap());"
+        },
+        {
+          "line": 523,
+          "text": "        std::fs::create_dir(&root).unwrap();"
+        },
+        {
+          "line": 524,
+          "text": "        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 525,
+          "text": "        let dir = LocalDirectory::open(&root).unwrap();"
+        },
+        {
+          "line": 526,
+          "text": "        let child = dir.child(\"owned\", true).unwrap();"
+        },
+        {
+          "line": 527,
+          "text": "        std::fs::rename(root.join(\"owned\"), root.join(\"moved\")).unwrap();"
+        },
+        {
+          "line": 528,
+          "text": "        symlink(root.join(\"moved\"), root.join(\"owned\")).unwrap();"
+        },
+        {
+          "line": 530,
+          "text": "        std::fs::write(child.process_path().join(\"pinned\"), b\"actual inode\").unwrap();"
+        },
+        {
+          "line": 532,
+          "text": "            std::fs::read(root.join(\"moved/pinned\")).unwrap(),"
+        },
+        {
+          "line": 536,
+          "text": "        child.close().unwrap();"
+        },
+        {
+          "line": 537,
+          "text": "        dir.close().unwrap();"
+        },
+        {
+          "line": 538,
+          "text": "        std::fs::remove_dir_all(root).unwrap();"
+        },
+        {
+          "line": 545,
+          "text": "        let root = std::env::temp_dir().join(crate::generate_identifier(\"managed-move-\").unwrap());"
+        },
+        {
+          "line": 546,
+          "text": "        std::fs::create_dir(&root).unwrap();"
+        },
+        {
+          "line": 547,
+          "text": "        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 548,
+          "text": "        let dir = LocalDirectory::open(&root).unwrap();"
+        },
+        {
+          "line": 549,
+          "text": "        let staging = dir.child(\"staging\", true).unwrap();"
+        },
+        {
+          "line": 550,
+          "text": "        let source = staging.child(\"repository.git\", true).unwrap();"
+        },
+        {
+          "line": 551,
+          "text": "        source.close().unwrap();"
+        },
+        {
+          "line": 552,
+          "text": "        let prior = dir.child(\"repository.git\", true).unwrap();"
+        },
+        {
+          "line": 553,
+          "text": "        prior.close().unwrap();"
+        },
+        {
+          "line": 554,
+          "text": "        std::fs::write(root.join(\"repository.git/original\"), b\"preserve\").unwrap();"
+        },
+        {
+          "line": 559,
+          "text": "            std::fs::read(root.join(\"repository.git/original\")).unwrap(),"
+        },
+        {
+          "line": 563,
+          "text": "        std::fs::remove_dir_all(root.join(\"repository.git\")).unwrap();"
+        },
+        {
+          "line": 565,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 567,
+          "text": "        dir.child(\"repository.git\", false).unwrap().close().unwrap();"
+        },
+        {
+          "line": 568,
+          "text": "        staging.close().unwrap();"
+        },
+        {
+          "line": 569,
+          "text": "        dir.close().unwrap();"
+        },
+        {
+          "line": 570,
+          "text": "        std::fs::remove_dir_all(root).unwrap();"
+        }
+      ]
+    },
+    "rust/crates/swarm-engine/src/planning_activation.rs": {
+      "policies": [
+        {
+          "line": 12,
+          "text": "    if request.schema_version != 1 {"
+        },
+        {
+          "line": 64,
+          "text": "        ..Default::default()"
+        },
+        {
+          "line": 102,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 140,
+          "text": "/// additional timeout or a guarantee of monotonic clocks/commit completion time."
+        },
+        {
+          "line": 220,
+          "text": "    if scope.generation < 0 {"
+        },
+        {
+          "line": 225,
+          "text": "        .checked_add(1)"
+        },
+        {
+          "line": 293,
+          "text": "        return Err(E::Refused(\"planning-prompt-byte-limit-exceeded\"));"
+        },
+        {
+          "line": 303,
+          "text": "        .checked_add(1)"
+        },
+        {
+          "line": 313,
+          "text": "            .checked_add(1)"
+        },
+        {
+          "line": 373,
+          "text": "        generation: 0,"
+        },
+        {
+          "line": 376,
+          "text": "    if request.generation < 1 {"
+        },
+        {
+          "line": 433,
+          "text": "                \"2026-10-20T12:00:00Z\".into(),"
+        },
+        {
+          "line": 437,
+          "text": "                schema_version: 1,"
+        },
+        {
+          "line": 442,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 448,
+          "text": "                    schema_version: 1,"
+        },
+        {
+          "line": 450,
+          "text": "                    max_tasks: 3,"
+        },
+        {
+          "line": 451,
+          "text": "                    max_activations: 3,"
+        },
+        {
+          "line": 452,
+          "text": "                    max_decisions: 3,"
+        },
+        {
+          "line": 453,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 455,
+          "text": "                \"2026-10-20T12:00:00Z\","
+        },
+        {
+          "line": 465,
+          "text": "        /// One explicit five-second test request; this is no production default."
+        },
+        {
+          "line": 468,
+          "text": "                schema_version: 1,"
+        },
+        {
+          "line": 471,
+          "text": "                scope_revision: 1,"
+        },
+        {
+          "line": 473,
+          "text": "                lease_seconds: 5,"
+        },
+        {
+          "line": 474,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 494,
+          "text": "        let first = claim(&f.root, &f.work, &r, \"2026-10-20T12:00:00Z\", &f.settings).unwrap();"
+        },
+        {
+          "line": 496,
+          "text": "        assert_eq!(first.planning.as_ref().unwrap().activations, 1);"
+        },
+        {
+          "line": 498,
+          "text": "            claim(&f.root, &first, &r, \"2026-10-20T12:00:04Z\", &f.settings)"
+        },
+        {
+          "line": 503,
+          "text": "        let second = claim(&f.root, &first, &r, \"2026-10-20T12:00:05Z\", &f.settings).unwrap();"
+        },
+        {
+          "line": 505,
+          "text": "            second.planning.as_ref().unwrap().scopes.as_ref().unwrap()[0].generation,"
+        },
+        {
+          "line": 506,
+          "text": "            2"
+        },
+        {
+          "line": 508,
+          "text": "        assert_eq!(second.planning.as_ref().unwrap().activations, 2);"
+        },
+        {
+          "line": 509,
+          "text": "        let third = claim(&f.root, &second, &r, \"2026-10-20T12:00:10Z\", &f.settings).unwrap();"
+        },
+        {
+          "line": 511,
+          "text": "            claim(&f.root, &third, &r, \"2026-10-20T12:00:15Z\", &f.settings)"
+        },
+        {
+          "line": 516,
+          "text": "        assert_eq!(third.planning.as_ref().unwrap().activations, 3);"
+        },
+        {
+          "line": 521,
+          "text": "                schema_version: 1,"
+        },
+        {
+          "line": 522,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 524,
+          "text": "            \"2026-10-20T12:00:01Z\","
+        },
+        {
+          "line": 529,
+          "text": "            claim(&f.root, &paused, &r, \"2026-10-20T12:00:02Z\", &f.settings)"
+        },
+        {
+          "line": 534,
+          "text": "        assert_eq!(paused.planning.as_ref().unwrap().activations, 1);"
+        },
+        {
+          "line": 536,
+          "text": "            paused.planning.as_ref().unwrap().scopes.as_ref().unwrap()[0]"
+        },
+        {
+          "line": 548,
+          "text": "        let control = || claim(&f.root, &f.work, &r, \"2026-10-20T12:00:00Z\", &f.settings).unwrap();"
+        },
+        {
+          "line": 551,
+          "text": "        bad.planning.as_mut().unwrap().scopes.as_mut().unwrap()[0].lease_until ="
+        },
+        {
+          "line": 553,
+          "text": "        let error = claim(&f.root, &bad, &r, \"2026-10-20T12:00:01Z\", &f.settings).unwrap_err();"
+        },
+        {
+          "line": 558,
+          "text": "        bad.planning.as_mut().unwrap().scopes.as_mut().unwrap()[0].generation = i64::MAX;"
+        },
+        {
+          "line": 560,
+          "text": "            claim(&f.root, &bad, &r, \"2026-10-20T12:00:00Z\", &f.settings)"
+        },
+        {
+          "line": 567,
+          "text": "        request.max_tasks = 9;"
+        },
+        {
+          "line": 573,
+          "text": "                \"2026-10-20T12:00:00Z\","
+        },
+        {
+          "line": 586,
+          "text": "            \"2026-10-20T12:00:00Z\".into(),"
+        },
+        {
+          "line": 596,
+          "text": "                \"2026-10-20T12:00:00Z\","
+        },
+        {
+          "line": 626,
+          "text": "                self.first = false;"
+        },
+        {
+          "line": 637,
+          "text": "            (\"2026-10-20T12:00:04Z\", false, \"2026-10-20T12:00:04Z\"),"
+        },
+        {
+          "line": 638,
+          "text": "            (\"2026-10-20T12:00:04Z\", false, \"2026-10-20T12:00:06Z\"),"
+        },
+        {
+          "line": 639,
+          "text": "            (\"2026-10-20T12:00:06Z\", true, \"\"),"
+        },
+        {
+          "line": 646,
+          "text": "            let mut store = crate::RootStore::open(&f.root, true).unwrap();"
+        },
+        {
+          "line": 647,
+          "text": "            let created=store.execute_external(\"\",\"work.create\",&serde_json::to_vec(&serde_json::json!({\"schema_version\":1,\"event_id\":\"clock-create\",\"expected_revision\":0,\"title\":\"Clock witness\",\"objective\":\"Observe lease publication\",\"scope\":\"Owned fixture\",\"criteria\":[\"No expired publication\"]})).unwrap(),&mut crate::SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 648,
+          "text": "            let enabled=store.execute_external(&created.id,\"planning.enable\",&serde_json::to_vec(&serde_json::json!({\"schema_version\":1,\"event_id\":\"clock-enable\",\"expected_revision\":created.revision,\"max_activations\":3,\"max_tasks\":3,\"max_decisions\":3})).unwrap(),&mut crate::SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 659,
+          "text": "                    first: true,"
+        },
+        {
+          "line": 660,
+          "text": "                    initial: \"2026-10-20T12:00:00Z\","
+        },
+        {
+          "line": 675,
+          "text": "                    \"SELECT count(*) FROM planning_calls WHERE work_id=?1\","
+        },
+        {
+          "line": 677,
+          "text": "                    |r| r.get(0),"
+        },
+        {
+          "line": 683,
+          "text": "                if expired { 0 } else { 1 },"
+        },
+        {
+          "line": 698,
+          "text": "                assert_eq!(after.planning.as_ref().unwrap().activations, 1);"
+        },
+        {
+          "line": 700,
+          "text": "                    schema_version: 1,"
+        },
+        {
+          "line": 704,
+          "text": "                    scope_revision: 1,"
+        },
+        {
+          "line": 706,
+          "text": "                    generation: 1,"
+        },
+        {
+          "line": 709,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 711,
+          "text": "                let mut store = crate::RootStore::open(&f.root, true).unwrap();"
+        },
+        {
+          "line": 716,
+          "text": "                    generation: 1,"
+        },
+        {
+          "line": 724,
+          "text": "                        first: true,"
+        },
+        {
+          "line": 725,
+          "text": "                        initial: \"2026-10-20T12:00:04Z\","
+        },
+        {
+          "line": 729,
+          "text": "                if decision_publication == \"2026-10-20T12:00:06Z\" {"
+        },
+        {
+          "line": 735,
+          "text": "                    assert_eq!(p.activations, 1);"
+        },
+        {
+          "line": 736,
+          "text": "                    assert_eq!(p.decisions, 0);"
+        },
+        {
+          "line": 744,
+          "text": "                    assert_eq!(scope.generation, 1);"
+        },
+        {
+          "line": 745,
+          "text": "                    assert_eq!(scope.revision, 1);"
+        },
+        {
+          "line": 746,
+          "text": "                    assert_eq!(scope.lease_until, \"2026-10-20T12:00:09Z\");"
+        },
+        {
+          "line": 755,
+          "text": "                        first: true,"
+        },
+        {
+          "line": 756,
+          "text": "                        initial: \"2026-10-20T12:00:04Z\","
+        },
+        {
+          "line": 760,
+          "text": "                if decision_publication == \"2026-10-20T12:00:06Z\" {"
+        },
+        {
+          "line": 780,
+          "text": "                                first: true,"
+        },
+        {
+          "line": 781,
+          "text": "                                initial: \"2026-10-20T12:00:06Z\","
+        },
+        {
+          "line": 782,
+          "text": "                                publication: \"2026-10-20T12:00:06Z\","
+        },
+        {
+          "line": 788,
+          "text": "                    assert_eq!(reclaimed.planning.as_ref().unwrap().activations, 2);"
+        },
+        {
+          "line": 795,
+          "text": "                                generation: 2,"
+        },
+        {
+          "line": 800,
+          "text": "                                first: true,"
+        },
+        {
+          "line": 801,
+          "text": "                                initial: \"2026-10-20T12:00:06Z\","
+        },
+        {
+          "line": 802,
+          "text": "                                publication: \"2026-10-20T12:00:07Z\","
+        },
+        {
+          "line": 806,
+          "text": "                    assert_eq!(recovered.result.work.planning.unwrap().decisions, 1);"
+        },
+        {
+          "line": 808,
+          "text": "                    assert_eq!(result.unwrap().result.work.planning.unwrap().decisions, 1);"
+        }
+      ],
+      "functions": [
+        {
+          "line": 11,
+          "text": "pub(crate) fn validate_request(request: &PlanningRequest) -> Result<(), E> {"
+        },
+        {
+          "line": 46,
+          "text": "pub(crate) fn observe_model("
+        },
+        {
+          "line": 143,
+          "text": "pub(crate) fn validate_publication(work: &Work, scope: &str, at: &str) -> Result<(), E> {"
+        },
+        {
+          "line": 177,
+          "text": "pub(crate) fn prepare_claim("
+        },
+        {
+          "line": 349,
+          "text": "fn claim("
+        },
+        {
+          "line": 366,
+          "text": "pub(crate) fn renew("
+        },
+        {
+          "line": 424,
+          "text": "        fn new() -> Self {"
+        },
+        {
+          "line": 466,
+          "text": "        fn request(&self) -> PlanningRequest {"
+        },
+        {
+          "line": 480,
+          "text": "        fn drop(&mut self) {"
+        },
+        {
+          "line": 490,
+          "text": "    fn scope_claim_busy_expiry_budgets_pause_and_recovery_use_observed_clock() {"
+        },
+        {
+          "line": 545,
+          "text": "    fn scope_claim_malformed_fields_generation_and_representation_refuse_safely() {"
+        },
+        {
+          "line": 609,
+          "text": "    fn scope_claim_renewal_and_decision_late_clock_refuse_before_publication() {"
+        },
+        {
+          "line": 617,
+          "text": "            fn identifier(&mut self, prefix: &str) -> Result<String, crate::RuntimeError> {"
+        },
+        {
+          "line": 620,
+          "text": "            fn timestamp(&mut self) -> Result<String, crate::RuntimeError> {"
+        },
+        {
+          "line": 629,
+          "text": "            fn operator(&mut self) -> Result<String, crate::RuntimeError> {"
+        },
+        {
+          "line": 632,
+          "text": "            fn git(&mut self, root: &Path) -> Result<crate::GitObservation, crate::RuntimeError> {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 13,
+          "text": "        return Err(E::Refused(\"planning-schema-required\"));"
+        },
+        {
+          "line": 16,
+          "text": "        .map_err(|e| E::caused(\"planning-claim-request-encoding\", e))?;"
+        },
+        {
+          "line": 18,
+          "text": "        .map_err(|e| E::caused(\"planning-claim-request-encoding\", e))?;"
+        },
+        {
+          "line": 31,
+          "text": "        return Err(E::Refused(\"planning-claim-field-not-applicable\"));"
+        },
+        {
+          "line": 36,
+          "text": "        return Err(E::Refused(\"planning-claim-holder-or-scope-invalid\"));"
+        },
+        {
+          "line": 56,
+          "text": "        .ok_or(E::Refused(\"planning-not-enabled\"))?;"
+        },
+        {
+          "line": 58,
+          "text": "        .map_err(|e| E::caused(\"planning-claim-ancestors-invalid\", e))?;"
+        },
+        {
+          "line": 70,
+          "text": "            return Err(E::Refused(\"planning-claim-local-model-inconsistent\"));"
+        },
+        {
+          "line": 75,
+          "text": "        return Err(E::Refused(\"planning-claim-provider-digest-required\"));"
+        },
+        {
+          "line": 78,
+          "text": "    // selected inherited provider, not a sibling/global fallback; source cooldown"
+        },
+        {
+          "line": 80,
+          "text": "    crate::agent_launch::cooldown(root, &model.provider)?;"
+        },
+        {
+          "line": 84,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 86,
+          "text": "        .map_err(|e| E::caused(\"planning-claim-provider-directory\", e))?;"
+        },
+        {
+          "line": 90,
+          "text": "            .map_err(|e| E::caused(\"planning-claim-provider-reservation\", e))?;"
+        },
+        {
+          "line": 106,
+          "text": "            )?;"
+        },
+        {
+          "line": 108,
+          "text": "                return Err(E::Refused(\"planning-claim-provider-changed\"));"
+        },
+        {
+          "line": 117,
+          "text": "                _ => return Err(E::Refused(\"planning-claim-model-changed\")),"
+        },
+        {
+          "line": 147,
+          "text": "        .ok_or(E::Refused(\"planning-not-enabled\"))?;"
+        },
+        {
+          "line": 154,
+          "text": "        .ok_or(E::Refused(\"planning-scope-not-found\"))?;"
+        },
+        {
+          "line": 156,
+          "text": "        .map_err(|e| E::caused(\"planning-publication-clock-invalid\", e))?;"
+        },
+        {
+          "line": 158,
+          "text": "        .map_err(|e| E::caused(\"planning-publication-deadline-invalid\", e))?;"
+        },
+        {
+          "line": 160,
+          "text": "        return Err(E::Refused(\"planning-claim-expired-before-publication\"));"
+        },
+        {
+          "line": 184,
+          "text": "    validate_request(request)?;"
+        },
+        {
+          "line": 185,
+          "text": "    settings.validate().map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 187,
+          "text": "        .map_err(|e| E::caused(\"planning-claim-state-invalid\", e))?;"
+        },
+        {
+          "line": 191,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 194,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 198,
+          "text": "        .ok_or(E::Refused(\"planning-not-enabled\"))?;"
+        },
+        {
+          "line": 200,
+          "text": "        return Err(E::Refused(\"planning_paused\"));"
+        },
+        {
+          "line": 203,
+          "text": "        return Err(E::Refused(\"planning-stopped\"));"
+        },
+        {
+          "line": 209,
+          "text": "        .ok_or(E::Refused(\"planning-scope-not-found\"))?;"
+        },
+        {
+          "line": 212,
+          "text": "        return Err(E::Refused(\"revision_conflict\"));"
+        },
+        {
+          "line": 215,
+          "text": "        return Err(E::Refused(\"planning-scope-closed\"));"
+        },
+        {
+          "line": 218,
+          "text": "        return Err(E::Refused(\"planning-scope-state-invalid\"));"
+        },
+        {
+          "line": 221,
+          "text": "        return Err(E::Refused(\"planning-generation-negative\"));"
+        },
+        {
+          "line": 226,
+          "text": "        .ok_or(E::Refused(\"planning-generation-overflow\"))?;"
+        },
+        {
+          "line": 228,
+          "text": "        .map_err(|e| E::caused(\"planning-claim-clock-invalid\", e))?;"
+        },
+        {
+          "line": 232,
+          "text": "        return Err(E::Refused(\"planning-scope-lease-inconsistent\"));"
+        },
+        {
+          "line": 236,
+          "text": "            .map_err(|e| E::caused(\"planning-scope-lease-invalid\", e))?;"
+        },
+        {
+          "line": 238,
+          "text": "            return Err(E::Refused(\"lease_busy\"));"
+        },
+        {
+          "line": 243,
+          "text": "        .ok_or(E::Refused(\"planning-lease-timestamp-representation\"))?"
+        },
+        {
+          "line": 245,
+          "text": "        .map_err(|e| E::caused(\"planning-lease-timestamp-format\", e))?;"
+        },
+        {
+          "line": 248,
+          "text": "        .map_err(|e| E::caused(\"planning-claim-clock-format\", e))?;"
+        },
+        {
+          "line": 250,
+          "text": "        .map_err(|e| E::caused(\"planning-rejection-state-invalid\", e))?"
+        },
+        {
+          "line": 252,
+          "text": "        return Err(E::Refused(\"rejection_requires_change\"));"
+        },
+        {
+          "line": 254,
+          "text": "    crate::check_planning_activation_budget(work, &scope.id).map_err(|e| E::caused(e.code(), e))?;"
+        },
+        {
+          "line": 256,
+          "text": "        .map_err(|e| E::caused(\"planning-claim-ancestors-invalid\", e))?"
+        },
+        {
+          "line": 263,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 267,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 278,
+          "text": "    .map_err(|e| E::caused(\"planning-claim-workflow-invalid\", e))?;"
+        },
+        {
+          "line": 280,
+          "text": "        crate::managed_repository::observe(root,work,settings)?;"
+        },
+        {
+          "line": 282,
+          "text": "    let context = crate::planning_scope_context::observe(root, work, scope, settings)?;"
+        },
+        {
+          "line": 287,
+          "text": "        .ok_or(E::Refused(\"planning-prompt-size-representation\"))?;"
+        },
+        {
+          "line": 291,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 293,
+          "text": "        return Err(E::Refused(\"planning-prompt-byte-limit-exceeded\"));"
+        },
+        {
+          "line": 295,
+          "text": "    let model = observe_model(root, work, &scope.id, settings, &at)?;"
+        },
+        {
+          "line": 300,
+          "text": "        .ok_or(E::Refused(\"planning-not-enabled\"))?;"
+        },
+        {
+          "line": 304,
+          "text": "        .ok_or(E::Refused(\"planning-activation-overflow\"))?;"
+        },
+        {
+          "line": 314,
+          "text": "            .ok_or(E::Refused(\"planning-activation-overflow\"))?;"
+        },
+        {
+          "line": 320,
+          "text": "        .ok_or(E::Refused(\"planning-scope-not-found\"))?;"
+        },
+        {
+          "line": 328,
+          "text": "        .map_err(|e| E::caused(\"planning-claim-result-invalid\", e))?;"
+        },
+        {
+          "line": 375,
+          "text": "    })?;"
+        },
+        {
+          "line": 377,
+          "text": "        return Err(E::Refused(\"stale_lease\"));"
+        },
+        {
+          "line": 379,
+          "text": "    settings.validate().map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 381,
+          "text": "        .map_err(|e| E::caused(\"planning-renew-state-invalid\", e))?;"
+        },
+        {
+          "line": 382,
+          "text": "    crate::planning_decision::fence(work, request, at)?;"
+        },
+        {
+          "line": 386,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 389,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 391,
+          "text": "        .map_err(|e| E::caused(\"planning-renew-clock-invalid\", e))?;"
+        },
+        {
+          "line": 394,
+          "text": "        .ok_or(E::Refused(\"planning-lease-timestamp-representation\"))?"
+        },
+        {
+          "line": 396,
+          "text": "        .map_err(|e| E::caused(\"planning-lease-timestamp-format\", e))?;"
+        },
+        {
+          "line": 403,
+          "text": "        .ok_or(E::Refused(\"planning-scope-not-found\"))?;"
+        },
+        {
+          "line": 406,
+          "text": "        .map_err(|e| E::caused(\"planning-renew-result-invalid\", e))?;"
+        },
+        {
+          "line": 427,
+          "text": "                std::env::temp_dir().join(crate::generate_identifier(\"scope-claim113-\").unwrap());"
+        },
+        {
+          "line": 428,
+          "text": "            std::fs::create_dir(&root).unwrap();"
+        },
+        {
+          "line": 429,
+          "text": "            std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 431,
+          "text": "                EngineSettingsValues::installation_defaults().unwrap(),"
+        },
+        {
+          "line": 435,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 458,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 482,
+          "text": "                std::fs::remove_dir_all(&self.root).unwrap();"
+        },
+        {
+          "line": 494,
+          "text": "        let first = claim(&f.root, &f.work, &r, \"2026-10-20T12:00:00Z\", &f.settings).unwrap();"
+        },
+        {
+          "line": 496,
+          "text": "        assert_eq!(first.planning.as_ref().unwrap().activations, 1);"
+        },
+        {
+          "line": 503,
+          "text": "        let second = claim(&f.root, &first, &r, \"2026-10-20T12:00:05Z\", &f.settings).unwrap();"
+        },
+        {
+          "line": 505,
+          "text": "            second.planning.as_ref().unwrap().scopes.as_ref().unwrap()[0].generation,"
+        },
+        {
+          "line": 508,
+          "text": "        assert_eq!(second.planning.as_ref().unwrap().activations, 2);"
+        },
+        {
+          "line": 509,
+          "text": "        let third = claim(&f.root, &second, &r, \"2026-10-20T12:00:10Z\", &f.settings).unwrap();"
+        },
+        {
+          "line": 516,
+          "text": "        assert_eq!(third.planning.as_ref().unwrap().activations, 3);"
+        },
+        {
+          "line": 527,
+          "text": "        .unwrap();"
+        },
+        {
+          "line": 534,
+          "text": "        assert_eq!(paused.planning.as_ref().unwrap().activations, 1);"
+        },
+        {
+          "line": 536,
+          "text": "            paused.planning.as_ref().unwrap().scopes.as_ref().unwrap()[0]"
+        },
+        {
+          "line": 548,
+          "text": "        let control = || claim(&f.root, &f.work, &r, \"2026-10-20T12:00:00Z\", &f.settings).unwrap();"
+        },
+        {
+          "line": 551,
+          "text": "        bad.planning.as_mut().unwrap().scopes.as_mut().unwrap()[0].lease_until ="
+        },
+        {
+          "line": 553,
+          "text": "        let error = claim(&f.root, &bad, &r, \"2026-10-20T12:00:01Z\", &f.settings).unwrap_err();"
+        },
+        {
+          "line": 554,
+          "text": "        assert_eq!(error.code(), \"planning-scope-lease-invalid\");"
+        },
+        {
+          "line": 555,
+          "text": "        assert!(!error.to_string().contains(\"PRIVATE\"));"
+        },
+        {
+          "line": 558,
+          "text": "        bad.planning.as_mut().unwrap().scopes.as_mut().unwrap()[0].generation = i64::MAX;"
+        },
+        {
+          "line": 588,
+          "text": "        .unwrap();"
+        },
+        {
+          "line": 643,
+          "text": "                .unwrap()"
+        },
+        {
+          "line": 645,
+          "text": "                .unwrap();"
+        },
+        {
+          "line": 646,
+          "text": "            let mut store = crate::RootStore::open(&f.root, true).unwrap();"
+        },
+        {
+          "line": 647,
+          "text": "            let created=store.execute_external(\"\",\"work.create\",&serde_json::to_vec(&serde_json::json!({\"schema_version\":1,\"event_id\":\"clock-create\",\"expected_revision\":0,\"title\":\"Clock witness\",\"objective\":\"Observe lease publication\",\"scope\":\"Owned fixture\",\"criteria\":[\"No expired publication\"]})).unwrap(),&mut crate::SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 648,
+          "text": "            let enabled=store.execute_external(&created.id,\"planning.enable\",&serde_json::to_vec(&serde_json::json!({\"schema_version\":1,\"event_id\":\"clock-enable\",\"expected_revision\":created.revision,\"max_activations\":3,\"max_tasks\":3,\"max_decisions\":3})).unwrap(),&mut crate::SystemEnvironment).unwrap().result.work;"
+        },
+        {
+          "line": 653,
+          "text": "            let before = store.read_work(&created.id).unwrap();"
+        },
+        {
+          "line": 657,
+          "text": "                &crate::encode_planning_request(&request).unwrap(),"
+        },
+        {
+          "line": 664,
+          "text": "            let after = store.read_work(&created.id).unwrap();"
+        },
+        {
+          "line": 665,
+          "text": "            store.close().unwrap();"
+        },
+        {
+          "line": 672,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 675,
+          "text": "                    \"SELECT count(*) FROM planning_calls WHERE work_id=?1\","
+        },
+        {
+          "line": 679,
+          "text": "                .unwrap();"
+        },
+        {
+          "line": 680,
+          "text": "            db.close().map_err(|(_, e)| e).unwrap();"
+        },
+        {
+          "line": 689,
+          "text": "                    result.err().unwrap().code(),"
+        },
+        {
+          "line": 698,
+          "text": "                assert_eq!(after.planning.as_ref().unwrap().activations, 1);"
+        },
+        {
+          "line": 711,
+          "text": "                let mut store = crate::RootStore::open(&f.root, true).unwrap();"
+        },
+        {
+          "line": 712,
+          "text": "                let lease_before = store.read_work(&created.id).unwrap();"
+        },
+        {
+          "line": 722,
+          "text": "                    &crate::encode_planning_request(&renewal).unwrap(),"
+        },
+        {
+          "line": 730,
+          "text": "                    assert_eq!(renewed.err().unwrap().code(), \"stale_lease\");"
+        },
+        {
+          "line": 731,
+          "text": "                    assert_eq!(store.read_work(&created.id).unwrap(), lease_before);"
+        },
+        {
+          "line": 733,
+          "text": "                    let work = renewed.unwrap().result.work;"
+        },
+        {
+          "line": 734,
+          "text": "                    let p = work.planning.as_ref().unwrap();"
+        },
+        {
+          "line": 740,
+          "text": "                        .unwrap()"
+        },
+        {
+          "line": 743,
+          "text": "                        .unwrap();"
+        },
+        {
+          "line": 748,
+          "text": "                decision.expected_revision = store.read_work(&created.id).unwrap().revision;"
+        },
+        {
+          "line": 749,
+          "text": "                let before = store.read_work(&created.id).unwrap();"
+        },
+        {
+          "line": 753,
+          "text": "                    &crate::encode_planning_request(&decision).unwrap(),"
+        },
+        {
+          "line": 761,
+          "text": "                    assert_eq!(result.err().unwrap().code(), \"stale_lease\");"
+        },
+        {
+          "line": 763,
+          "text": "                        store.read_work(&created.id).unwrap(),"
+        },
+        {
+          "line": 778,
+          "text": "                            .unwrap(),"
+        },
+        {
+          "line": 785,
+          "text": "                        .unwrap()"
+        },
+        {
+          "line": 788,
+          "text": "                    assert_eq!(reclaimed.planning.as_ref().unwrap().activations, 2);"
+        },
+        {
+          "line": 798,
+          "text": "                            .unwrap(),"
+        },
+        {
+          "line": 805,
+          "text": "                        .unwrap();"
+        },
+        {
+          "line": 806,
+          "text": "                    assert_eq!(recovered.result.work.planning.unwrap().decisions, 1);"
+        },
+        {
+          "line": 808,
+          "text": "                    assert_eq!(result.unwrap().result.work.planning.unwrap().decisions, 1);"
+        },
+        {
+          "line": 810,
+          "text": "                store.close().unwrap();"
+        }
+      ]
+    },
+    "rust/crates/swarm-engine/src/planning_call_preview.rs": {
+      "policies": [
+        {
+          "line": 54,
+          "text": "    if r.schema_version != 1"
+        },
+        {
+          "line": 55,
+          "text": "        || r.expected_revision < 1"
+        },
+        {
+          "line": 56,
+          "text": "        || r.scope_revision < 1"
+        },
+        {
+          "line": 57,
+          "text": "        || r.generation < 1"
+        },
+        {
+          "line": 67,
+          "text": "/// columns prevent positional contract swaps; none is a default/authority grant."
+        },
+        {
+          "line": 86,
+          "text": "    if !crate::planning_call_inputs::schema(tx, false)? {"
+        },
+        {
+          "line": 91,
+          "text": "        let value=Binding{owner:r.get(0)?,scope_id:r.get(1)?,generation:r.get(2)?,scope_revision:r.get(3)?,claim_revision:r.get(4)?,holder:r.get(5)?,context:r.get(6)?,context_sha:r.get(7)?,workflow_json:r.get(8)?,workflow_prompt:r.get(9)?,workflow_prompt_sha:r.get(10)?,model_json:r.get(11)?,recorded_at:r.get(12)?};"
+        },
+        {
+          "line": 97,
+          "text": "/// Original lease duration comes from the recorded claim, never a current default."
+        },
+        {
+          "line": 156,
+          "text": "/// authority/default, process, acceptance or mutation; propagate typed failures."
+        },
+        {
+          "line": 177,
+          "text": "        schema_version: 1,"
+        },
+        {
+          "line": 182,
+          "text": "        ..Default::default()"
+        },
+        {
+          "line": 226,
+          "text": "                row.get(0)?,"
+        },
+        {
+          "line": 227,
+          "text": "                row.get(1)?,"
+        },
+        {
+          "line": 228,
+          "text": "                row.get(2)?,"
+        },
+        {
+          "line": 229,
+          "text": "                row.get(3)?,"
+        },
+        {
+          "line": 230,
+          "text": "                row.get(4)?,"
+        },
+        {
+          "line": 234,
+          "text": "    let original = crate::decode_planning_request(&event.4)"
+        },
+        {
+          "line": 236,
+          "text": "    if (event.0, event.1, event.2, event.3)"
+        },
+        {
+          "line": 259,
+          "text": "        true,"
+        },
+        {
+          "line": 288,
+          "text": "        true,"
+        },
+        {
+          "line": 403,
+          "text": "        return Err(E::Refused(\"planning-prompt-byte-limit-exceeded\"));"
+        },
+        {
+          "line": 424,
+          "text": "        schema_version: 1,"
+        },
+        {
+          "line": 441,
+          "text": "        prepared_inputs_verified: true,"
+        },
+        {
+          "line": 442,
+          "text": "        process_started: false,"
+        },
+        {
+          "line": 443,
+          "text": "        execution_available: true,"
+        },
+        {
+          "line": 445,
+          "text": "    if original.lease_seconds < 1 {"
+        }
+      ],
+      "functions": [
+        {
+          "line": 51,
+          "text": "pub fn decode(raw: &[u8]) -> Result<PlanningCallPreviewRequest, E> {"
+        },
+        {
+          "line": 85,
+          "text": "fn binding(tx: &rusqlite::Connection, claim: &str) -> Result<Binding, E> {"
+        },
+        {
+          "line": 108,
+          "text": "pub(crate) fn inspect("
+        },
+        {
+          "line": 123,
+          "text": "pub(crate) fn verified("
+        },
+        {
+          "line": 139,
+          "text": "pub(crate) fn verified_result("
+        },
+        {
+          "line": 157,
+          "text": "fn verified_with_funding("
+        }
+      ],
+      "errors": [
+        {
+          "line": 53,
+          "text": "        serde_json::from_slice(raw).map_err(|e| E::caused(\"planning-call-request-format\", e))?;"
+        },
+        {
+          "line": 62,
+          "text": "        return Err(E::Refused(\"planning-call-request-invalid\"));"
+        },
+        {
+          "line": 86,
+          "text": "    if !crate::planning_call_inputs::schema(tx, false)? {"
+        },
+        {
+          "line": 87,
+          "text": "        return Err(E::Refused(\"planning-call-binding-required\"));"
+        },
+        {
+          "line": 89,
+          "text": "    crate::agent_launch::query(tx,\"SELECT work_id,scope_id,generation,scope_revision,claim_revision,holder,context_json,context_sha256,workflow_json,workflow_prompt,workflow_prompt_sha256,model_json,recorded_at FROM native_planning_claims WHERE claim_id=?\",[claim],|rows|{"
+        },
+        {
+          "line": 90,
+          "text": "        let r=rows.next()?.ok_or(E::Refused(\"planning-call-binding-required\"))?;"
+        },
+        {
+          "line": 91,
+          "text": "        let value=Binding{owner:r.get(0)?,scope_id:r.get(1)?,generation:r.get(2)?,scope_revision:r.get(3)?,claim_revision:r.get(4)?,holder:r.get(5)?,context:r.get(6)?,context_sha:r.get(7)?,workflow_json:r.get(8)?,workflow_prompt:r.get(9)?,workflow_prompt_sha:r.get(10)?,model_json:r.get(11)?,recorded_at:r.get(12)?};"
+        },
+        {
+          "line": 92,
+          "text": "        if rows.next()?.is_some(){return Err(E::Refused(\"planning-call-binding-ambiguous\"));}Ok(value)"
+        },
+        {
+          "line": 166,
+          "text": "        return Err(E::Refused(\"planning-call-transaction-required\"));"
+        },
+        {
+          "line": 169,
+          "text": "        .map_err(|e| E::caused(\"planning-call-work-invalid\", e))?;"
+        },
+        {
+          "line": 171,
+          "text": "        return Err(E::Refused(\"revision_conflict\"));"
+        },
+        {
+          "line": 173,
+          "text": "    crate::validate_planning_state(&w).map_err(|e| E::caused(\"planning-call-state-invalid\", e))?;"
+        },
+        {
+          "line": 175,
+          "text": "        .map_err(|e| E::caused(e.code(), e))?;"
+        },
+        {
+          "line": 186,
+          "text": "        .map_err(|e| E::caused(\"planning-call-clock\", e))?;"
+        },
+        {
+          "line": 187,
+          "text": "    crate::planning_decision::fence(&w, &fence, &at)?;"
+        },
+        {
+          "line": 193,
+          "text": "        .ok_or(E::Refused(\"planning-scope-not-found\"))?;"
+        },
+        {
+          "line": 208,
+          "text": "    } = binding(tx, &r.claim_id)?;"
+        },
+        {
+          "line": 215,
+          "text": "        return Err(E::Refused(\"planning-call-binding-mismatch\"));"
+        },
+        {
+          "line": 219,
+          "text": "        \"SELECT work_id,revision,kind,at,request FROM main.events WHERE id=?\","
+        },
+        {
+          "line": 223,
+          "text": "                .next()?"
+        },
+        {
+          "line": 224,
+          "text": "                .ok_or(E::Refused(\"planning-call-event-missing\"))?;"
+        },
+        {
+          "line": 226,
+          "text": "                row.get(0)?,"
+        },
+        {
+          "line": 227,
+          "text": "                row.get(1)?,"
+        },
+        {
+          "line": 228,
+          "text": "                row.get(2)?,"
+        },
+        {
+          "line": 229,
+          "text": "                row.get(3)?,"
+        },
+        {
+          "line": 230,
+          "text": "                row.get(4)?,"
+        },
+        {
+          "line": 233,
+          "text": "    )?;"
+        },
+        {
+          "line": 235,
+          "text": "        .map_err(|e| E::caused(\"planning-call-event-invalid\", e))?;"
+        },
+        {
+          "line": 242,
+          "text": "        return Err(E::Refused(\"planning-call-event-mismatch\"));"
+        },
+        {
+          "line": 248,
+          "text": "        .ok_or(E::Refused(\"planning-call-delivery-missing\"))?;"
+        },
+        {
+          "line": 254,
+          "text": "        return Err(E::Refused(\"planning-call-input-hash-mismatch\"));"
+        },
+        {
+          "line": 261,
+          "text": "    .map_err(|e| E::caused(\"planning-call-workflow-invalid\", e))?;"
+        },
+        {
+          "line": 272,
+          "text": "            .map_err(|e| E::caused(e.reason(), e))?,"
+        },
+        {
+          "line": 276,
+          "text": "            .map_err(|e| E::caused(e.reason(), e))?,"
+        },
+        {
+          "line": 278,
+          "text": "    .map_err(|e| E::caused(\"planning-call-workflow-read\", e))?;"
+        },
+        {
+          "line": 283,
+          "text": "        return Err(E::Refused(\"planning-call-workflow-changed\"));"
+        },
+        {
+          "line": 290,
+          "text": "    .map_err(|e| E::caused(\"planning-call-model-invalid\", e))?;"
+        },
+        {
+          "line": 292,
+          "text": "        return Err(E::Refused(\"planning-call-model-binding-changed\"));"
+        },
+        {
+          "line": 295,
+          "text": "        return Err(E::Refused(\"planning-call-provider-required\"));"
+        },
+        {
+          "line": 298,
+          "text": "        crate::planning_activation::observe_model(root, &w, &r.scope, settings, &at)?;"
+        },
+        {
+          "line": 302,
+          "text": "        return Err(E::Refused(\"planning-call-model-changed\"));"
+        },
+        {
+          "line": 305,
+          "text": "        serde_json::from_str(&context).map_err(|e| E::caused(\"planning-call-context-format\", e))?;"
+        },
+        {
+          "line": 313,
+          "text": "        return Err(E::Refused(\"planning-call-context-owner-mismatch\"));"
+        },
+        {
+          "line": 318,
+          "text": "        .ok_or(E::Refused(\"planning-call-context-events-invalid\"))?;"
+        },
+        {
+          "line": 323,
+          "text": "    let ids = ids.ok_or(E::Refused(\"planning-call-context-events-invalid\"))?;"
+        },
+        {
+          "line": 325,
+          "text": "        return Err(E::Refused(\"planning-call-context-events-mismatch\"));"
+        },
+        {
+          "line": 330,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 340,
+          "text": "            .ok_or(E::Refused(\"planning-call-input-not-pending\"))?;"
+        },
+        {
+          "line": 341,
+          "text": "        if serde_json::to_value(event).map_err(|e| E::caused(\"planning-call-event-encoding\", e))?"
+        },
+        {
+          "line": 344,
+          "text": "            return Err(E::Refused(\"planning-call-input-changed\"));"
+        },
+        {
+          "line": 361,
+          "text": "            return Err(E::Refused(\"planning-call-input-stale-attempt\"));"
+        },
+        {
+          "line": 364,
+          "text": "            .map_err(|e| E::caused(\"planning-call-report-invalid\", e))?;"
+        },
+        {
+          "line": 369,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 373,
+          "text": "        return Err(E::Refused(\"planning-call-current-context-policy\"));"
+        },
+        {
+          "line": 382,
+          "text": "        crate::managed_repository::observe(root,&w,settings)?;"
+        },
+        {
+          "line": 385,
+          "text": "        serde_json::to_value(crate::planning_scope_context::contract(&w, scope)?)"
+        },
+        {
+          "line": 386,
+          "text": "            .map_err(|e| E::caused(\"planning-call-contract-encoding\", e))?;"
+        },
+        {
+          "line": 389,
+          "text": "            return Err(E::Refused(\"planning-call-scope-contract-changed\"));"
+        },
+        {
+          "line": 395,
+          "text": "        .ok_or(E::Refused(\"planning-prompt-size-representation\"))?;"
+        },
+        {
+          "line": 399,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?"
+        },
+        {
+          "line": 403,
+          "text": "        return Err(E::Refused(\"planning-prompt-byte-limit-exceeded\"));"
+        },
+        {
+          "line": 418,
+          "text": "    .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 421,
+          "text": "        .map_err(|e| E::caused(\"planning-call-clock\", e))?;"
+        },
+        {
+          "line": 422,
+          "text": "    crate::planning_decision::fence(&w, &fence, &now)?;"
+        },
+        {
+          "line": 446,
+          "text": "        return Err(E::Refused(\"planning-call-original-lease-invalid\"));"
+        }
+      ]
+    },
+    "rust/crates/swarm-engine/src/planning_decision.rs": {
+      "policies": [
+        {
+          "line": 11,
+          "text": "    if r.schema_version != 1 {"
+        },
+        {
+          "line": 99,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 121,
+          "text": "            .find(|(n, _)| format!(\"req-{}\", n + 1) == *req)"
+        },
+        {
+          "line": 123,
+          "text": "        criteria.push(owned.1.clone());"
+        },
+        {
+          "line": 135,
+          "text": "                .and_then(|v| v.checked_add(1))"
+        },
+        {
+          "line": 143,
+          "text": "            control.id = format!(\"check-{}\", &hash[..24]);"
+        },
+        {
+          "line": 224,
+          "text": "        || !op.judge_verdict.is_empty() || op.judge_cycle != 0 || !op.expected_candidate.is_empty()"
+        },
+        {
+          "line": 225,
+          "text": "        || op.max_tasks != 0 || op.max_activations != 0 {"
+        },
+        {
+          "line": 228,
+          "text": "    P::check(policy.max_title_characters, op.title.chars().count(), \"planning-operation-title-limit\")?;"
+        },
+        {
+          "line": 249,
+          "text": "        p.inbox.get_or_insert_default().push(crate::PlanningEvent { id: event_id(&[&r.event_id, \"closed\", scope])?, scope: parent, kind: \"scope_closed\".into(), message: op.title.clone(), at: at.into(), ..Default::default() });"
+        },
+        {
+          "line": 263,
+          "text": "        || op.max_tasks != 0 || op.max_activations != 0 || !op.judge_verdict.is_empty() || op.judge_cycle != 0 || !op.expected_candidate.is_empty() {"
+        },
+        {
+          "line": 264,
+          "text": "        return Err(E::Refused(\"planning-retry-field-not-applicable\"));"
+        },
+        {
+          "line": 266,
+          "text": "    P::check(policy.max_instruction_bytes, op.next.len(), \"planning-operation-instruction-limit\")?;"
+        },
+        {
+          "line": 268,
+          "text": "    let task = tasks.next().ok_or(E::Refused(\"planning-retry-task-missing\"))?;"
+        },
+        {
+          "line": 270,
+          "text": "        || task.launch_held || task.planning_retry || task.next == op.next || task.plan_max_attempts <= 0"
+        },
+        {
+          "line": 271,
+          "text": "        || task.attempts.as_ref().map_or(0, Vec::len) as u128 >= task.plan_max_attempts as u128 {"
+        },
+        {
+          "line": 272,
+          "text": "        return Err(E::Refused(\"planning-retry-unavailable\"));"
+        },
+        {
+          "line": 276,
+          "text": "            .map_err(|e| E::caused(\"planning-retry-current-evidence\", e))?.ok_or(E::Refused(\"planning-retry-current-review-required\"))?.review_id"
+        },
+        {
+          "line": 279,
+          "text": "        { crate::RootStore::failed_worker_retry_input(root, w, &task.id).map_err(|e| E::caused(\"planning-retry-worker-evidence\", e))?.event }"
+        },
+        {
+          "line": 281,
+          "text": "        { return Err(E::Refused(\"planning-retry-worker-platform-unported\")); }"
+        },
+        {
+          "line": 283,
+          "text": "    if !r.input_events.iter().flatten().any(|id| *id == input) { return Err(E::Refused(\"planning-retry-original-input-required\")); }"
+        },
+        {
+          "line": 285,
+          "text": "    task.planning_retry = true; task.next = op.next.clone(); Ok(())"
+        },
+        {
+          "line": 298,
+          "text": "        || op.max_tasks != 0 || op.max_activations != 0 || !op.judge_verdict.is_empty() || op.judge_cycle != 0 || !op.expected_candidate.is_empty() {"
+        },
+        {
+          "line": 299,
+          "text": "        return Err(E::Refused(\"planning-review-retry-field-not-applicable\"));"
+        },
+        {
+          "line": 301,
+          "text": "    P::check(policy.max_instruction_bytes, op.next.len(), \"planning-operation-instruction-limit\")?;"
+        },
+        {
+          "line": 302,
+          "text": "    let task = w.tasks.iter().flatten().find(|t| t.id == op.id).ok_or(E::Refused(\"planning-review-retry-task-required\"))?;"
+        },
+        {
+          "line": 303,
+          "text": "    let planning = w.planning.as_deref().ok_or(E::Refused(\"planning-review-retry-planning-required\"))?;"
+        },
+        {
+          "line": 304,
+          "text": "    let delivery = planning.scopes.iter().flatten().find(|s| s.id == r.scope).and_then(|s| s.delivery.as_deref()).ok_or(E::Refused(\"planning-review-retry-delivery-required\"))?;"
+        },
+        {
+          "line": 306,
+          "text": "        || delivery.review_retry_unavailable || planning.reviewer.as_deref().is_none_or(|v| v.calls < 0 || v.calls >= v.max_calls) {"
+        },
+        {
+          "line": 307,
+          "text": "        return Err(E::Refused(\"planning-review-retry-unavailable\"));"
+        },
+        {
+          "line": 310,
+          "text": "        .map_err(|e| E::caused(\"planning-review-retry-original\", e))?.ok_or(E::Refused(\"planning-review-retry-original-required\"))?;"
+        },
+        {
+          "line": 317,
+          "text": "            && v.operation == \"review-retry\" && !v.producer_correction_required && v.candidate_commit.is_empty())"
+        },
+        {
+          "line": 319,
+          "text": "    if !direct && !fresh { return Err(E::Refused(\"planning-review-retry-input-required\")); }"
+        },
+        {
+          "line": 341,
+          "text": "        || op.judge_cycle != 0"
+        },
+        {
+          "line": 343,
+          "text": "        || op.kind == \"task\" && (op.max_tasks != 0 || op.max_activations != 0)"
+        },
+        {
+          "line": 353,
+          "text": "        \"planning-operation-title-limit\","
+        },
+        {
+          "line": 359,
+          "text": "            \"planning-operation-instruction-limit\","
+        },
+        {
+          "line": 399,
+          "text": "            .checked_add(1)"
+        },
+        {
+          "line": 401,
+          "text": "        if p.max_depth > 0 && depth as u128 > p.max_depth as u128"
+        },
+        {
+          "line": 402,
+          "text": "            || p.max_scopes > 0 && scopes.len() as u128 >= p.max_scopes as u128"
+        },
+        {
+          "line": 404,
+          "text": "            return Err(E::Refused(\"planning-delegation-configured-limit\"));"
+        },
+        {
+          "line": 411,
+          "text": "        let task_limit = if scope.max_tasks == 0 {"
+        },
+        {
+          "line": 416,
+          "text": "        let activation_limit = if scope.max_activations == 0 {"
+        },
+        {
+          "line": 421,
+          "text": "        if op.max_tasks < 0"
+        },
+        {
+          "line": 423,
+          "text": "            || op.max_activations < 0"
+        },
+        {
+          "line": 433,
+          "text": "            revision: 1,"
+        },
+        {
+          "line": 435,
+          "text": "            max_tasks: if op.max_tasks == 0 {"
+        },
+        {
+          "line": 440,
+          "text": "            max_activations: if op.max_activations == 0 {"
+        },
+        {
+          "line": 445,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 453,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 471,
+          "text": "        return Err(E::Refused(\"planning-blocked-requirement-requires-retry\"));"
+        },
+        {
+          "line": 477,
+          "text": "        \"planning-task-dependency-limit\","
+        },
+        {
+          "line": 498,
+          "text": "        return Err(E::Refused(\"planning-task-criteria-limit\"));"
+        },
+        {
+          "line": 504,
+          "text": "            \"planning-task-criterion-bytes-limit\","
+        },
+        {
+          "line": 515,
+          "text": "            schema_version: 1,"
+        },
+        {
+          "line": 523,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 545,
+          "text": "/// same-task retry only from changes_requested. Re-read Root job/event/private/"
+        },
+        {
+          "line": 572,
+          "text": "            && operations.iter().all(|op| op.kind == \"retry\") && operations.iter().any(|op| op.id == event.task);"
+        },
+        {
+          "line": 573,
+          "text": "        let reviewer_retry = original.retry_failure.is_some() && operations.iter().all(|op| op.kind == \"review-retry\")"
+        },
+        {
+          "line": 603,
+          "text": "/// for ordinary actions; changes_requested for production retry, known protocol"
+        },
+        {
+          "line": 668,
+          "text": "        \"planning-decision-input-limit\","
+        },
+        {
+          "line": 673,
+          "text": "        \"planning-decision-operation-limit\","
+        },
+        {
+          "line": 678,
+          "text": "        \"planning-decision-reason-limit\","
+        },
+        {
+          "line": 750,
+          "text": "            if operations.len() != 1 { return Err(E::Refused(\"planning-closure-exclusive-operation\")); }"
+        },
+        {
+          "line": 752,
+          "text": "        } else if op.kind == \"review-retry\" {"
+        },
+        {
+          "line": 754,
+          "text": "        } else if op.kind == \"retry\" {"
+        },
+        {
+          "line": 763,
+          "text": "        .checked_add(1)"
+        },
+        {
+          "line": 786,
+          "text": "        .checked_add(1)"
+        },
+        {
+          "line": 790,
+          "text": "        .checked_add(1)"
+        },
+        {
+          "line": 796,
+          "text": "        p.inbox.get_or_insert_default().push(crate::PlanningEvent{id:event_id(&[&r.event_id,\"historical-acknowledged\"])?,scope:r.scope.clone(),kind:\"historical_acknowledged\".into(),message:format!(\"Retours historiques acquittés sans opération par {}. Réexaminer le besoin et les exigences encore ouvertes sur l’état actuel ; aucune acceptation nouvelle n’est établie.\",r.event_id),at:at.into(),..Default::default()});"
+        },
+        {
+          "line": 810,
+          "text": "        let settings = crate::EngineSettingsDocument::initial(crate::EngineSettingsValues::installation_defaults().unwrap(), \"fixture\".into(), \"2026-10-22T12:00:00Z\".into()).unwrap();"
+        },
+        {
+          "line": 811,
+          "text": "        let w = Work { schema_version: 1, id: \"closure-work\".into(), criteria: Some(vec![\"Requirement\".into()]), ..Default::default() };"
+        },
+        {
+          "line": 812,
+          "text": "        crate::apply_planning_control(&w, crate::PlanningControlAction::Enable, &PlanningRequest { schema_version: 1, event_id: \"closure-brief\".into(), max_tasks: 3, max_activations: 3, max_decisions: 3, ..Default::default() }, \"2026-10-22T12:00:00Z\", &settings).unwrap()"
+        },
+        {
+          "line": 819,
+          "text": "        w.tasks = Some(vec![crate::Task { id: \"task\".into(), scope_id: \"root\".into(), status: \"accepted\".into(), requirements: Some(vec![\"req-1\".into()]), ..Default::default() }]);"
+        },
+        {
+          "line": 821,
+          "text": "        w.tasks.as_mut().unwrap()[0].status = \"submitted\".into();"
+        },
+        {
+          "line": 829,
+          "text": "        p.scopes.as_mut().unwrap()[0].requirements = Some(vec![]);"
+        },
+        {
+          "line": 830,
+          "text": "        p.scopes.as_mut().unwrap().push(crate::PlanningScope { id: \"child\".into(), parent: \"root\".into(), state: \"ready\".into(), revision: 1, requirements: Some(vec![\"req-1\".into()]), ..Default::default() });"
+        },
+        {
+          "line": 832,
+          "text": "        w.planning.as_mut().unwrap().scopes.as_mut().unwrap()[1].state = \"closed\".into();"
+        },
+        {
+          "line": 842,
+          "text": "            \"2026-10-20T12:00:00Z\".into(),"
+        },
+        {
+          "line": 849,
+          "text": "                    \"req-1\".into(),"
+        },
+        {
+          "line": 854,
+          "text": "                        criteria: Some(vec![1]),"
+        },
+        {
+          "line": 855,
+          "text": "                        timeout_seconds: 30,"
+        },
+        {
+          "line": 856,
+          "text": "                        ..Default::default()"
+        },
+        {
+          "line": 859,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 861,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 864,
+          "text": "            requirements: Some(vec![\"req-1\".into()]),"
+        },
+        {
+          "line": 866,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 868,
+          "text": "        inherit_checks(&work, &mut task, &settings, \"2026-10-20T12:00:00Z\").unwrap();"
+        },
+        {
+          "line": 872,
+          "text": "            \"2026-10-20T12:00:00Z\""
+        }
+      ],
+      "functions": [
+        {
+          "line": 10,
+          "text": "fn envelope(r: &PlanningRequest) -> Result<(), E> {"
+        },
+        {
+          "line": 45,
+          "text": "pub(crate) fn fence(w: &Work, r: &PlanningRequest, at: &str) -> Result<(), E> {"
+        },
+        {
+          "line": 76,
+          "text": "pub(crate) fn event_id(parts: &[&str]) -> Result<String, E> {"
+        },
+        {
+          "line": 84,
+          "text": "fn inherit_checks("
+        },
+        {
+          "line": 191,
+          "text": "pub(crate) fn closure_structure(w: &Work, scope: &str) -> Result<(), E> {"
+        },
+        {
+          "line": 217,
+          "text": "fn close_scope(root: &Path, w: &mut Work, op: &PlanningOperation,"
+        },
+        {
+          "line": 259,
+          "text": "fn retry_task(root: &Path, w: &mut Work, op: &PlanningOperation, r: &PlanningRequest, settings: &crate::EngineSettingsDocument, policy: &P) -> Result<(), E> {"
+        },
+        {
+          "line": 294,
+          "text": "fn retry_review(root: &Path, w: &mut Work, op: &PlanningOperation, r: &PlanningRequest, settings: &crate::EngineSettingsDocument, policy: &P) -> Result<(), E> {"
+        },
+        {
+          "line": 328,
+          "text": "fn operation("
+        },
+        {
+          "line": 554,
+          "text": "fn current_native_review_input("
+        },
+        {
+          "line": 612,
+          "text": "pub(crate) fn decide("
+        },
+        {
+          "line": 809,
+          "text": "    fn closure_work() -> Work {"
+        },
+        {
+          "line": 816,
+          "text": "    fn closure_structure_requires_own_requirement_coverage() {"
+        },
+        {
+          "line": 826,
+          "text": "    fn closure_structure_requires_closed_children() {"
+        },
+        {
+          "line": 838,
+          "text": "    fn decision_inherited_checks_preserve_original_authorization() {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 12,
+          "text": "        return Err(E::Refused(\"planning-schema-required\"));"
+        },
+        {
+          "line": 15,
+          "text": "        .map_err(|e| E::caused(\"planning-decision-encoding\", e))?;"
+        },
+        {
+          "line": 17,
+          "text": "        serde_json::from_slice(&raw).map_err(|e| E::caused(\"planning-decision-encoding\", e))?;"
+        },
+        {
+          "line": 33,
+          "text": "        return Err(E::Refused(\"planning-decision-field-not-applicable\"));"
+        },
+        {
+          "line": 39,
+          "text": "        return Err(E::Refused(\"planning-decision-envelope-invalid\"));"
+        },
+        {
+          "line": 49,
+          "text": "        .ok_or(E::Refused(\"planning-not-enabled\"))?;"
+        },
+        {
+          "line": 55,
+          "text": "        .ok_or(E::Refused(\"planning-scope-not-found\"))?;"
+        },
+        {
+          "line": 57,
+          "text": "        return Err(E::Refused(\"planning-decision-stopped\"));"
+        },
+        {
+          "line": 60,
+          "text": "        return Err(E::Refused(\"revision_conflict\"));"
+        },
+        {
+          "line": 63,
+          "text": "        return Err(E::Refused(\"stale_lease\"));"
+        },
+        {
+          "line": 66,
+          "text": "        .map_err(|e| E::caused(\"planning-decision-clock-invalid\", e))?;"
+        },
+        {
+          "line": 68,
+          "text": "        .map_err(|e| E::caused(\"planning-decision-deadline-invalid\", e))?;"
+        },
+        {
+          "line": 70,
+          "text": "        return Err(E::Refused(\"stale_lease\"));"
+        },
+        {
+          "line": 78,
+          "text": "        .map_err(|e| E::caused(\"planning-decision-event-encoding\", e))?;"
+        },
+        {
+          "line": 93,
+          "text": "        .ok_or(E::Refused(\"planning-not-enabled\"))?;"
+        },
+        {
+          "line": 122,
+          "text": "            .ok_or(E::Refused(\"planning-task-requirement-missing\"))?;"
+        },
+        {
+          "line": 138,
+          "text": "            ))?]);"
+        },
+        {
+          "line": 153,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 163,
+          "text": "    .map_err(|e| E::caused(\"planning-task-checks-invalid\", e))?;"
+        },
+        {
+          "line": 180,
+          "text": "        .map_err(|e| E::caused(\"planning-task-check-mapping-invalid\", e))?,"
+        },
+        {
+          "line": 183,
+          "text": "        .map_err(|e| E::caused(\"planning-task-check-coverage-invalid\", e))?;"
+        },
+        {
+          "line": 192,
+          "text": "    let p = w.planning.as_deref().ok_or(E::Refused(\"planning-not-enabled\"))?;"
+        },
+        {
+          "line": 194,
+          "text": "    let owner = scopes.iter().find(|s| s.id == scope).ok_or(E::Refused(\"planning-scope-not-found\"))?;"
+        },
+        {
+          "line": 196,
+          "text": "        return Err(E::Refused(\"planning-closure-child-open\"));"
+        },
+        {
+          "line": 200,
+          "text": "        if task.scope_id.is_empty() { return Err(E::Refused(\"planning-closure-task-unscoped\")); }"
+        },
+        {
+          "line": 202,
+          "text": "            .map_err(|e| E::caused(\"planning-closure-tree-invalid\", e))?;"
+        },
+        {
+          "line": 204,
+          "text": "            return Err(E::Refused(\"planning-closure-task-not-accepted\"));"
+        },
+        {
+          "line": 209,
+          "text": "        return Err(E::Refused(\"planning-closure-requirement-uncovered\"));"
+        },
+        {
+          "line": 226,
+          "text": "        return Err(E::Refused(\"planning-closure-field-not-applicable\"));"
+        },
+        {
+          "line": 228,
+          "text": "    P::check(policy.max_title_characters, op.title.chars().count(), \"planning-operation-title-limit\")?;"
+        },
+        {
+          "line": 229,
+          "text": "    closure_structure(w, scope)?;"
+        },
+        {
+          "line": 230,
+          "text": "    if w.planning.as_deref().unwrap().inbox.iter().flatten().any(|e|"
+        },
+        {
+          "line": 232,
+          "text": "        return Err(E::Refused(\"planning-closure-input-pending\"));"
+        },
+        {
+          "line": 234,
+          "text": "    let limits = settings.values.mutation_limits().map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 235,
+          "text": "    let quality = settings.quality_policy_snapshot().map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 238,
+          "text": "        let ancestors = crate::planning_scope_ancestors(w, &task.scope_id).map_err(|e| E::caused(\"planning-closure-tree-invalid\", e))?;"
+        },
+        {
+          "line": 241,
+          "text": "                .map_err(|e| E::caused(\"planning-closure-evidence-invalid\", e))?;"
+        },
+        {
+          "line": 244,
+          "text": "    let p = w.planning.as_deref_mut().unwrap();"
+        },
+        {
+          "line": 245,
+          "text": "    let s = p.scopes.as_mut().unwrap().iter_mut().find(|s| s.id == scope).unwrap();"
+        },
+        {
+          "line": 248,
+          "text": "        p.scopes.as_mut().unwrap().iter_mut().find(|s| s.id == parent).ok_or(E::Refused(\"planning-closure-parent-missing\"))?.state = \"ready\".into();"
+        },
+        {
+          "line": 249,
+          "text": "        p.inbox.get_or_insert_default().push(crate::PlanningEvent { id: event_id(&[&r.event_id, \"closed\", scope])?, scope: parent, kind: \"scope_closed\".into(), message: op.title.clone(), at: at.into(), ..Default::default() });"
+        },
+        {
+          "line": 264,
+          "text": "        return Err(E::Refused(\"planning-retry-field-not-applicable\"));"
+        },
+        {
+          "line": 266,
+          "text": "    P::check(policy.max_instruction_bytes, op.next.len(), \"planning-operation-instruction-limit\")?;"
+        },
+        {
+          "line": 268,
+          "text": "    let task = tasks.next().ok_or(E::Refused(\"planning-retry-task-missing\"))?;"
+        },
+        {
+          "line": 272,
+          "text": "        return Err(E::Refused(\"planning-retry-unavailable\"));"
+        },
+        {
+          "line": 276,
+          "text": "            .map_err(|e| E::caused(\"planning-retry-current-evidence\", e))?.ok_or(E::Refused(\"planning-retry-current-review-required\"))?.review_id"
+        },
+        {
+          "line": 279,
+          "text": "        { crate::RootStore::failed_worker_retry_input(root, w, &task.id).map_err(|e| E::caused(\"planning-retry-worker-evidence\", e))?.event }"
+        },
+        {
+          "line": 281,
+          "text": "        { return Err(E::Refused(\"planning-retry-worker-platform-unported\")); }"
+        },
+        {
+          "line": 283,
+          "text": "    if !r.input_events.iter().flatten().any(|id| *id == input) { return Err(E::Refused(\"planning-retry-original-input-required\")); }"
+        },
+        {
+          "line": 284,
+          "text": "    let task = w.tasks.as_mut().unwrap().iter_mut().find(|t| t.id == op.id).unwrap();"
+        },
+        {
+          "line": 299,
+          "text": "        return Err(E::Refused(\"planning-review-retry-field-not-applicable\"));"
+        },
+        {
+          "line": 301,
+          "text": "    P::check(policy.max_instruction_bytes, op.next.len(), \"planning-operation-instruction-limit\")?;"
+        },
+        {
+          "line": 302,
+          "text": "    let task = w.tasks.iter().flatten().find(|t| t.id == op.id).ok_or(E::Refused(\"planning-review-retry-task-required\"))?;"
+        },
+        {
+          "line": 303,
+          "text": "    let planning = w.planning.as_deref().ok_or(E::Refused(\"planning-review-retry-planning-required\"))?;"
+        },
+        {
+          "line": 304,
+          "text": "    let delivery = planning.scopes.iter().flatten().find(|s| s.id == r.scope).and_then(|s| s.delivery.as_deref()).ok_or(E::Refused(\"planning-review-retry-delivery-required\"))?;"
+        },
+        {
+          "line": 307,
+          "text": "        return Err(E::Refused(\"planning-review-retry-unavailable\"));"
+        },
+        {
+          "line": 310,
+          "text": "        .map_err(|e| E::caused(\"planning-review-retry-original\", e))?.ok_or(E::Refused(\"planning-review-retry-original-required\"))?;"
+        },
+        {
+          "line": 319,
+          "text": "    if !direct && !fresh { return Err(E::Refused(\"planning-review-retry-input-required\")); }"
+        },
+        {
+          "line": 320,
+          "text": "    let task = w.tasks.as_mut().unwrap().iter_mut().find(|t| t.id == op.id).unwrap();"
+        },
+        {
+          "line": 338,
+          "text": "        return Err(E::Refused(\"planning-operation-unported\"));"
+        },
+        {
+          "line": 345,
+          "text": "        return Err(E::Refused(\"planning-operation-field-not-applicable\"));"
+        },
+        {
+          "line": 348,
+          "text": "        return Err(E::Refused(\"planning-operation-id-title-invalid\"));"
+        },
+        {
+          "line": 354,
+          "text": "    )?;"
+        },
+        {
+          "line": 360,
+          "text": "        )?;"
+        },
+        {
+          "line": 365,
+          "text": "        .ok_or(E::Refused(\"planning-not-enabled\"))?;"
+        },
+        {
+          "line": 370,
+          "text": "        .ok_or(E::Refused(\"planning-scope-not-found\"))?;"
+        },
+        {
+          "line": 384,
+          "text": "        return Err(E::Refused(\"planning-operation-requirements-invalid\"));"
+        },
+        {
+          "line": 391,
+          "text": "            return Err(E::Refused(\"planning-delegation-task-fields-invalid\"));"
+        },
+        {
+          "line": 394,
+          "text": "            return Err(E::Refused(\"planning-scope-already-present\"));"
+        },
+        {
+          "line": 397,
+          "text": "            .map_err(|e| E::caused(\"planning-delegation-tree-invalid\", e))?"
+        },
+        {
+          "line": 400,
+          "text": "            .ok_or(E::Refused(\"planning-depth-representation\"))?;"
+        },
+        {
+          "line": 404,
+          "text": "            return Err(E::Refused(\"planning-delegation-configured-limit\"));"
+        },
+        {
+          "line": 409,
+          "text": "            return Err(E::Refused(\"planning-requirement-already-assigned\"));"
+        },
+        {
+          "line": 426,
+          "text": "            return Err(E::Refused(\"planning-child-budget-invalid\"));"
+        },
+        {
+          "line": 448,
+          "text": "            id: event_id(&[&r.event_id, &op.id])?,"
+        },
+        {
+          "line": 455,
+          "text": "        let p = w.planning.as_deref_mut().unwrap();"
+        },
+        {
+          "line": 460,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 471,
+          "text": "        return Err(E::Refused(\"planning-blocked-requirement-requires-retry\"));"
+        },
+        {
+          "line": 473,
+          "text": "    crate::check_planning_task_budget(w, scope_id).map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 478,
+          "text": "    )?;"
+        },
+        {
+          "line": 486,
+          "text": "            return Err(E::Refused(\"planning-task-dependency-outside-scope\"));"
+        },
+        {
+          "line": 492,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 494,
+          "text": "        return Err(E::Refused(\"planning-worker-attempts-above-task-policy\"));"
+        },
+        {
+          "line": 498,
+          "text": "        return Err(E::Refused(\"planning-task-criteria-limit\"));"
+        },
+        {
+          "line": 505,
+          "text": "        )?;"
+        },
+        {
+          "line": 511,
+          "text": "        .ok_or(E::Refused(\"task-gate-defaults-not-configured\"))?;"
+        },
+        {
+          "line": 527,
+          "text": "    .map_err(|e| E::caused(\"planning-task-definition-invalid\", e))?;"
+        },
+        {
+          "line": 531,
+          "text": "        .unwrap()"
+        },
+        {
+          "line": 533,
+          "text": "        .ok_or(E::Refused(\"planning-created-task-missing\"))?;"
+        },
+        {
+          "line": 538,
+          "text": "    inherit_checks(w, &mut task, settings, at)?;"
+        },
+        {
+          "line": 540,
+          "text": "        .map_err(|e| E::caused(\"planning-task-dependency-invalid\", e))?;"
+        },
+        {
+          "line": 541,
+          "text": "    w.tasks.as_mut().unwrap().push(task);"
+        },
+        {
+          "line": 548,
+          "text": "/// A known current original protocol error permits only reviewer correction;"
+        },
+        {
+          "line": 564,
+          "text": "        let _ = (root, work, event, settings, report_limit, operations);"
+        },
+        {
+          "line": 565,
+          "text": "        Err(E::Refused(\"planning-decision-specialized-input-unported\"))"
+        },
+        {
+          "line": 570,
+          "text": "            .map_err(|e| E::caused(\"planning-native-review-input-original\", e))?;"
+        },
+        {
+          "line": 576,
+          "text": "            return Err(E::Refused(\"planning-native-review-current-passed-required\"));"
+        },
+        {
+          "line": 583,
+          "text": "        let current = evidence.map_err(|e| E::caused(\"planning-native-review-input-current\", e))?"
+        },
+        {
+          "line": 584,
+          "text": "            .ok_or(E::Refused(\"planning-native-review-current-required\"))?;"
+        },
+        {
+          "line": 588,
+          "text": "            return Err(E::Refused(\"planning-native-review-current-changed\"));"
+        },
+        {
+          "line": 595,
+          "text": "            return Err(E::Refused(\"planning-native-review-report-binding\"));"
+        },
+        {
+          "line": 604,
+          "text": "/// error for reviewer-only correction)"
+        },
+        {
+          "line": 619,
+          "text": "    envelope(r)?;"
+        },
+        {
+          "line": 620,
+          "text": "    settings.validate().map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 622,
+          "text": "        .map_err(|e| E::caused(\"planning-decision-state-invalid\", e))?;"
+        },
+        {
+          "line": 623,
+          "text": "    fence(w, r, at)?;"
+        },
+        {
+          "line": 627,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 631,
+          "text": "        .ok_or(E::Refused(\"planning-not-enabled\"))?;"
+        },
+        {
+          "line": 634,
+          "text": "            return Err(E::Refused(\"planning-decision-managed-operation-unported\"));"
+        },
+        {
+          "line": 637,
+          "text": "        crate::managed_repository::observe(root,w,settings)?;"
+        },
+        {
+          "line": 639,
+          "text": "        return Err(E::Refused(\"planning-managed-platform-unported\"));"
+        },
+        {
+          "line": 642,
+          "text": "        return Err(E::Refused(\"planning-decision-budget-exhausted\"));"
+        },
+        {
+          "line": 649,
+          "text": "        .ok_or(E::Refused(\"planning-scope-not-found\"))?;"
+        },
+        {
+          "line": 653,
+          "text": "        .ok_or(E::Refused(\"planning-decision-delivery-required\"))?;"
+        },
+        {
+          "line": 655,
+          "text": "        return Err(E::Refused(\"planning-delivery-already-decided\"));"
+        },
+        {
+          "line": 660,
+          "text": "        return Err(E::Refused(\"planning-delegation-not-delivered\"));"
+        },
+        {
+          "line": 663,
+          "text": "        return Err(E::Refused(\"planning-decision-inputs-required\"));"
+        },
+        {
+          "line": 669,
+          "text": "    )?;"
+        },
+        {
+          "line": 674,
+          "text": "    )?;"
+        },
+        {
+          "line": 679,
+          "text": "    )?;"
+        },
+        {
+          "line": 681,
+          "text": "        return Err(E::Refused(\"planning-historical-acknowledgement-only\"));"
+        },
+        {
+          "line": 687,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 690,
+          "text": "            return Err(E::Refused(\"planning-decision-input-not-delivered\"));"
+        },
+        {
+          "line": 697,
+          "text": "            .ok_or(E::Refused(\"planning-decision-input-not-pending\"))?;"
+        },
+        {
+          "line": 705,
+          "text": "                return Err(E::Refused(\"planning-decision-input-unavailable\"));"
+        },
+        {
+          "line": 708,
+          "text": "                return Err(E::Refused(\"planning-decision-specialized-input-unported\"));"
+        },
+        {
+          "line": 711,
+          "text": "                Some(current_native_review_input(root, w, event, settings, report_limit, operations)?)"
+        },
+        {
+          "line": 729,
+          "text": "                return Err(E::Refused(\"planning-decision-stale-attempt\"));"
+        },
+        {
+          "line": 734,
+          "text": "                    .map_err(|e| E::caused(\"planning-decision-report-invalid\", e))?,"
+        },
+        {
+          "line": 741,
+          "text": "                return Err(E::Refused(\"planning-decision-artifact-unverified\"));"
+        },
+        {
+          "line": 748,
+          "text": "            crate::planning_judge::apply(&mut next, op, r, at, &policy)?;"
+        },
+        {
+          "line": 750,
+          "text": "            if operations.len() != 1 { return Err(E::Refused(\"planning-closure-exclusive-operation\")); }"
+        },
+        {
+          "line": 751,
+          "text": "            close_scope(root, &mut next, op, r, at, settings, &policy)?;"
+        },
+        {
+          "line": 753,
+          "text": "            retry_review(root, &mut next, op, r, settings, &policy)?;"
+        },
+        {
+          "line": 755,
+          "text": "            retry_task(root, &mut next, op, r, settings, &policy)?;"
+        },
+        {
+          "line": 757,
+          "text": "            operation(&mut next, &r.scope, op, r, at, settings, &policy)?;"
+        },
+        {
+          "line": 760,
+          "text": "    let p = next.planning.as_deref_mut().unwrap();"
+        },
+        {
+          "line": 764,
+          "text": "        .ok_or(E::Refused(\"planning-decision-count-overflow\"))?;"
+        },
+        {
+          "line": 778,
+          "text": "        .unwrap()"
+        },
+        {
+          "line": 781,
+          "text": "        .unwrap();"
+        },
+        {
+          "line": 783,
+          "text": "    scope.delivery.as_deref_mut().unwrap().decision = r.event_id.clone();"
+        },
+        {
+          "line": 787,
+          "text": "        .ok_or(E::Refused(\"planning-scope-revision-overflow\"))?;"
+        },
+        {
+          "line": 791,
+          "text": "        .ok_or(E::Refused(\"planning-generation-overflow\"))?;"
+        },
+        {
+          "line": 796,
+          "text": "        p.inbox.get_or_insert_default().push(crate::PlanningEvent{id:event_id(&[&r.event_id,\"historical-acknowledged\"])?,scope:r.scope.clone(),kind:\"historical_acknowledged\".into(),message:format!(\"Retours historiques acquittés sans opération par {}. Réexaminer le besoin et les exigences encore ouvertes sur l’état actuel ; aucune acceptation nouvelle n’est établie.\",r.event_id),at:at.into(),..Default::default()});"
+        },
+        {
+          "line": 800,
+          "text": "        .map_err(|e| E::caused(\"planning-decision-result-invalid\", e))?;"
+        },
+        {
+          "line": 810,
+          "text": "        let settings = crate::EngineSettingsDocument::initial(crate::EngineSettingsValues::installation_defaults().unwrap(), \"fixture\".into(), \"2026-10-22T12:00:00Z\".into()).unwrap();"
+        },
+        {
+          "line": 812,
+          "text": "        crate::apply_planning_control(&w, crate::PlanningControlAction::Enable, &PlanningRequest { schema_version: 1, event_id: \"closure-brief\".into(), max_tasks: 3, max_activations: 3, max_decisions: 3, ..Default::default() }, \"2026-10-22T12:00:00Z\", &settings).unwrap()"
+        },
+        {
+          "line": 818,
+          "text": "        assert!(matches!(closure_structure(&w, \"root\"), Err(E::Refused(\"planning-closure-requirement-uncovered\"))));"
+        },
+        {
+          "line": 820,
+          "text": "        closure_structure(&w, \"root\").unwrap();"
+        },
+        {
+          "line": 821,
+          "text": "        w.tasks.as_mut().unwrap()[0].status = \"submitted\".into();"
+        },
+        {
+          "line": 822,
+          "text": "        assert!(matches!(closure_structure(&w, \"root\"), Err(E::Refused(\"planning-closure-task-not-accepted\"))));"
+        },
+        {
+          "line": 828,
+          "text": "        let p = w.planning.as_mut().unwrap();"
+        },
+        {
+          "line": 829,
+          "text": "        p.scopes.as_mut().unwrap()[0].requirements = Some(vec![]);"
+        },
+        {
+          "line": 830,
+          "text": "        p.scopes.as_mut().unwrap().push(crate::PlanningScope { id: \"child\".into(), parent: \"root\".into(), state: \"ready\".into(), revision: 1, requirements: Some(vec![\"req-1\".into()]), ..Default::default() });"
+        },
+        {
+          "line": 831,
+          "text": "        assert!(matches!(closure_structure(&w, \"root\"), Err(E::Refused(\"planning-closure-child-open\"))));"
+        },
+        {
+          "line": 832,
+          "text": "        w.planning.as_mut().unwrap().scopes.as_mut().unwrap()[1].state = \"closed\".into();"
+        },
+        {
+          "line": 833,
+          "text": "        closure_structure(&w, \"root\").unwrap();"
+        },
+        {
+          "line": 840,
+          "text": "            crate::EngineSettingsValues::installation_defaults().unwrap(),"
+        },
+        {
+          "line": 844,
+          "text": "        .unwrap();"
+        },
+        {
+          "line": 868,
+          "text": "        inherit_checks(&work, &mut task, &settings, \"2026-10-20T12:00:00Z\").unwrap();"
+        },
+        {
+          "line": 871,
+          "text": "            task.validation_policy.as_ref().unwrap().authorized_at,"
+        },
+        {
+          "line": 874,
+          "text": "        assert!(!task.validation_policy.as_ref().unwrap().actor.is_empty());"
+        }
+      ]
+    },
+    "rust/crates/swarm-engine/src/planning_scope_context.rs": {
+      "policies": [
+        {
+          "line": 27,
+          "text": "            source:\"PRIVATE_SOURCE\".into(),storage:\"PRIVATE_STORAGE\".into(),candidate_commit:\"a\".repeat(40),project_subdir:\"subproject\".into(),..Default::default()"
+        },
+        {
+          "line": 31,
+          "text": "        assert_eq!(before[\"repository\"],serde_json::json!({\"candidate_commit\":\"a\".repeat(40),\"project_subdir\":\"subproject\",\"operations\":[\"delegate\",\"task\"]}));"
+        },
+        {
+          "line": 34,
+          "text": "        f.work.planning.as_mut().unwrap().repository.as_mut().unwrap().candidate_commit=\"b\".repeat(40);"
+        },
+        {
+          "line": 53,
+          "text": "            values.planning_context_max_events = Some(SettingCap(Some(SettingCount(1))));"
+        },
+        {
+          "line": 57,
+          "text": "                \"2026-10-20T12:00:00Z\".into(),"
+        },
+        {
+          "line": 61,
+          "text": "                schema_version: 1,"
+        },
+        {
+          "line": 70,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 76,
+          "text": "                    schema_version: 1,"
+        },
+        {
+          "line": 78,
+          "text": "                    max_tasks: 3,"
+        },
+        {
+          "line": 79,
+          "text": "                    max_activations: 3,"
+        },
+        {
+          "line": 80,
+          "text": "                    max_decisions: 3,"
+        },
+        {
+          "line": 81,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 83,
+          "text": "                \"2026-10-20T12:00:00Z\","
+        },
+        {
+          "line": 89,
+          "text": "            scopes[0].requirements = Some(vec![\"req-1\".into()]);"
+        },
+        {
+          "line": 91,
+          "text": "                (\"child\", \"Child objective\", \"req-2\"),"
+        },
+        {
+          "line": 92,
+          "text": "                (\"sibling\", \"SIBLING_PRIVATE_OBJECTIVE\", \"req-3\"),"
+        },
+        {
+          "line": 99,
+          "text": "                    revision: 1,"
+        },
+        {
+          "line": 101,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 108,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 118,
+          "text": "                    requirements: Some(vec![\"req-2\".into()]),"
+        },
+        {
+          "line": 120,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 128,
+          "text": "                    requirements: Some(vec![\"req-3\".into()]),"
+        },
+        {
+          "line": 129,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 210,
+          "text": "        w.criteria.as_mut().unwrap()[1] = \"Changed own requirement\".into();"
+        },
+        {
+          "line": 229,
+          "text": "                \"attempts_used\" => task.attempts = Some(vec![crate::Attempt::default()]),"
+        },
+        {
+          "line": 230,
+          "text": "                \"attempts_max\" => task.plan_max_attempts += 1,"
+        },
+        {
+          "line": 232,
+          "text": "                    task.instruction_revisions = Some(vec![crate::InstructionRevision::default()])"
+        },
+        {
+          "line": 234,
+          "text": "                \"review_coordination\" => task.review_coordination = Some(Box::default()),"
+        },
+        {
+          "line": 245,
+          "text": "        w.criteria.as_mut().unwrap()[2] = \"Changed sibling requirement\".into();"
+        },
+        {
+          "line": 262,
+          "text": "        let at = \"2026-10-22T12:00:00Z\";"
+        },
+        {
+          "line": 265,
+          "text": "        j.history=Some(vec![crate::JudgeCycleRecord { cycle:1,verdict:j.verdict.clone(),reason:j.reason.clone(),at:at.into(),..Default::default() }]);"
+        },
+        {
+          "line": 271,
+          "text": "        let value = observe(&f.root,&f.work,root,&f.settings).unwrap();let projected:serde_json::Value=serde_json::from_slice(&value.bytes).unwrap();assert_eq!(projected[\"judge\"],before[\"judge\"]);assert_eq!(projected[\"judge_end_available\"],false);"
+        },
+        {
+          "line": 272,
+          "text": "        let mut changed=f.work.clone();changed.planning.as_mut().unwrap().judge.as_mut().unwrap().max_cycles=2;"
+        },
+        {
+          "line": 293,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 300,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 309,
+          "text": "        assert_eq!(value[\"pending_events_total\"], 3);"
+        },
+        {
+          "line": 357,
+          "text": "        f.work.tasks.as_mut().unwrap()[0].depends = Some(vec![\"SIBLING_PRIVATE_TASK\".into()]);"
+        },
+        {
+          "line": 419,
+          "text": "    operations: [&'static str;2],"
+        },
+        {
+          "line": 501,
+          "text": "            .and_then(|n| n.checked_sub(1))"
+        },
+        {
+          "line": 577,
+          "text": "                        return false;"
+        },
+        {
+          "line": 585,
+          "text": "                        false"
+        },
+        {
+          "line": 630,
+          "text": "            false"
+        },
+        {
+          "line": 633,
+          "text": "                None => true,"
+        },
+        {
+          "line": 662,
+          "text": "        selected.insert(0, latest);"
+        },
+        {
+          "line": 668,
+          "text": "        return Err(E::Refused(if pending == 0 {"
+        },
+        {
+          "line": 697,
+          "text": "        return Err(E::Refused(\"planning-context-event-limit-exceeded\"));"
+        },
+        {
+          "line": 748,
+          "text": "                        operation: \"review-retry\".into(), producer_correction_required: false,"
+        },
+        {
+          "line": 811,
+          "text": "                || settings.values.planning_decision_policy().map_err(|e| E::caused(e.reason(), e))?.max_operations == Some(0)"
+        },
+        {
+          "line": 813,
+          "text": "                || planning.reviewer.as_deref().is_none_or(|r| r.calls < 0 || r.calls >= r.max_calls)"
+        },
+        {
+          "line": 816,
+          "text": "        && settings.values.planning_decision_policy().map_err(|e| E::caused(e.reason(), e))?.max_operations != Some(0);"
+        },
+        {
+          "line": 817,
+          "text": "    let (judge_available, renew_available) = if decision_available { crate::planning_judge::availability(work, &scope.id) } else { (false, false) };"
+        },
+        {
+          "line": 830,
+          "text": "        judge_end_available: false,"
+        },
+        {
+          "line": 847,
+          "text": "        return Err(E::Refused(\"planning-context-byte-limit-exceeded\"));"
+        },
+        {
+          "line": 855,
+          "text": "            judge_end_available: false,"
+        },
+        {
+          "line": 856,
+          "text": "            judge_cycle: if scope.id == \"root\" { planning.judge.as_deref().map_or(0, |j| j.cycle) } else { 0 },"
+        },
+        {
+          "line": 873,
+          "text": "                    == Some(0)"
+        },
+        {
+          "line": 875,
+          "text": "                true"
+        },
+        {
+          "line": 880,
+          "text": "                || settings.values.planning_decision_policy().map_err(|e| E::caused(e.reason(), e))?.max_operations == Some(0)"
+        },
+        {
+          "line": 882,
+          "text": "                    Ok(()) => false,"
+        },
+        {
+          "line": 883,
+          "text": "                    Err(E::Refused(\"planning-closure-child-open\" | \"planning-closure-task-not-accepted\" | \"planning-closure-requirement-uncovered\")) => true,"
+        },
+        {
+          "line": 891,
+          "text": "                || settings.values.planning_decision_policy().map_err(|e| E::caused(e.reason(), e))?.max_operations == Some(0)"
+        },
+        {
+          "line": 893,
+          "text": "                    && t.plan_max_attempts > 0 && (t.attempts.as_ref().map_or(0, Vec::len) as u128) < t.plan_max_attempts as u128"
+        },
+        {
+          "line": 898,
+          "text": "            ..Default::default()"
+        }
+      ],
+      "functions": [
+        {
+          "line": 24,
+          "text": "    fn managed_candidate_changes_the_scoped_contract_without_private_paths() {"
+        },
+        {
+          "line": 46,
+          "text": "        fn new() -> Self {"
+        },
+        {
+          "line": 140,
+          "text": "        fn observe(&self) -> Result<Observed, E> {"
+        },
+        {
+          "line": 157,
+          "text": "        fn drop(&mut self) {"
+        },
+        {
+          "line": 167,
+          "text": "    fn scope_context_contract_freshness_matches_rendered_owned_fields() {"
+        },
+        {
+          "line": 260,
+          "text": "    fn scope_context_binds_root_judge_without_disclosing_it_to_children() {"
+        },
+        {
+          "line": 279,
+          "text": "    fn scope_context_isolation_latest_instruction_and_undelivered_events_are_preserved() {"
+        },
+        {
+          "line": 326,
+          "text": "    fn scope_context_report_change_dependency_and_specialized_inputs_refuse_then_recover() {"
+        },
+        {
+          "line": 491,
+          "text": "pub(crate) fn contract<'a>("
+        },
+        {
+          "line": 565,
+          "text": "fn native_review_reference(work: &Work, event: &PlanningEvent) -> bool {"
+        },
+        {
+          "line": 602,
+          "text": "pub(crate) fn observe("
+        }
+      ],
+      "errors": [
+        {
+          "line": 26,
+          "text": "        f.work.planning.as_mut().unwrap().repository=Some(Box::new(crate::ManagedRepository{"
+        },
+        {
+          "line": 29,
+          "text": "        let value=|w:&Work|serde_json::to_value(contract(w,w.planning.as_ref().unwrap().scopes.as_ref().unwrap().iter().find(|s|s.id==\"child\").unwrap()).unwrap()).unwrap();"
+        },
+        {
+          "line": 32,
+          "text": "        assert!(!serde_json::to_string(&before).unwrap().contains(\"PRIVATE_SOURCE\"));"
+        },
+        {
+          "line": 33,
+          "text": "        assert!(!serde_json::to_string(&before).unwrap().contains(\"PRIVATE_STORAGE\"));"
+        },
+        {
+          "line": 34,
+          "text": "        f.work.planning.as_mut().unwrap().repository.as_mut().unwrap().candidate_commit=\"b\".repeat(40);"
+        },
+        {
+          "line": 49,
+          "text": "                std::env::temp_dir().join(crate::generate_identifier(\"scope-context113-\").unwrap());"
+        },
+        {
+          "line": 50,
+          "text": "            std::fs::create_dir(&root).unwrap();"
+        },
+        {
+          "line": 51,
+          "text": "            std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();"
+        },
+        {
+          "line": 52,
+          "text": "            let mut values = EngineSettingsValues::installation_defaults().unwrap();"
+        },
+        {
+          "line": 59,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 86,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 87,
+          "text": "            let p = work.planning.as_mut().unwrap();"
+        },
+        {
+          "line": 88,
+          "text": "            let scopes = p.scopes.as_mut().unwrap();"
+        },
+        {
+          "line": 103,
+          "text": "                p.inbox.as_mut().unwrap().push(PlanningEvent {"
+        },
+        {
+          "line": 132,
+          "text": "            crate::validate_planning_state(&work).unwrap();"
+        },
+        {
+          "line": 145,
+          "text": "                .unwrap()"
+        },
+        {
+          "line": 148,
+          "text": "                .unwrap()"
+        },
+        {
+          "line": 151,
+          "text": "                .unwrap();"
+        },
+        {
+          "line": 159,
+          "text": "                std::fs::remove_dir_all(&self.root).unwrap();"
+        },
+        {
+          "line": 173,
+          "text": "                .unwrap()"
+        },
+        {
+          "line": 176,
+          "text": "                .unwrap()"
+        },
+        {
+          "line": 179,
+          "text": "                .unwrap();"
+        },
+        {
+          "line": 180,
+          "text": "            serde_json::to_value(contract(w, scope).unwrap()).unwrap()"
+        },
+        {
+          "line": 184,
+          "text": "            serde_json::from_slice(&f.observe().unwrap().bytes).unwrap();"
+        },
+        {
+          "line": 188,
+          "text": "        let text = serde_json::to_string(&original).unwrap();"
+        },
+        {
+          "line": 195,
+          "text": "                .unwrap()"
+        },
+        {
+          "line": 198,
+          "text": "                .unwrap();"
+        },
+        {
+          "line": 204,
+          "text": "                _ => unreachable!(),"
+        },
+        {
+          "line": 210,
+          "text": "        w.criteria.as_mut().unwrap()[1] = \"Changed own requirement\".into();"
+        },
+        {
+          "line": 224,
+          "text": "                .unwrap()"
+        },
+        {
+          "line": 227,
+          "text": "                .unwrap();"
+        },
+        {
+          "line": 235,
+          "text": "                _ => unreachable!(),"
+        },
+        {
+          "line": 245,
+          "text": "        w.criteria.as_mut().unwrap()[2] = \"Changed sibling requirement\".into();"
+        },
+        {
+          "line": 249,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 252,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 263,
+          "text": "        let j = f.work.planning.as_mut().unwrap().judge.as_mut().unwrap();"
+        },
+        {
+          "line": 266,
+          "text": "        crate::validate_planning_state(&f.work).unwrap();"
+        },
+        {
+          "line": 267,
+          "text": "        let child: serde_json::Value = serde_json::from_slice(&f.observe().unwrap().bytes).unwrap();"
+        },
+        {
+          "line": 269,
+          "text": "        let root = f.work.planning.as_ref().unwrap().scopes.as_ref().unwrap().iter().find(|s| s.id==\"root\").unwrap();"
+        },
+        {
+          "line": 270,
+          "text": "        let before = serde_json::to_value(contract(&f.work,root).unwrap()).unwrap();assert_eq!(before[\"judge\"][\"reason\"],\"ROOT_PRIVATE_JUDGE_REASON\");"
+        },
+        {
+          "line": 271,
+          "text": "        let value = observe(&f.root,&f.work,root,&f.settings).unwrap();let projected:serde_json::Value=serde_json::from_slice(&value.bytes).unwrap();assert_eq!(projected[\"judge\"],before[\"judge\"]);assert_eq!(projected[\"judge_end_available\"],false);"
+        },
+        {
+          "line": 272,
+          "text": "        let mut changed=f.work.clone();changed.planning.as_mut().unwrap().judge.as_mut().unwrap().max_cycles=2;"
+        },
+        {
+          "line": 273,
+          "text": "        assert_ne!(serde_json::to_value(contract(&changed,root).unwrap()).unwrap(),before);"
+        },
+        {
+          "line": 274,
+          "text": "        assert_eq!(serde_json::to_value(contract(&f.work,root).unwrap()).unwrap(),before);"
+        },
+        {
+          "line": 282,
+          "text": "        let control = f.observe().unwrap();"
+        },
+        {
+          "line": 283,
+          "text": "        let text = String::from_utf8(control.bytes).unwrap();"
+        },
+        {
+          "line": 287,
+          "text": "        let inbox = f.work.planning.as_mut().unwrap().inbox.as_mut().unwrap();"
+        },
+        {
+          "line": 303,
+          "text": "        let observed = f.observe().unwrap();"
+        },
+        {
+          "line": 308,
+          "text": "        let value: serde_json::Value = serde_json::from_slice(&observed.bytes).unwrap();"
+        },
+        {
+          "line": 315,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 318,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 328,
+          "text": "        f.observe().unwrap();"
+        },
+        {
+          "line": 330,
+          "text": "        std::fs::write(f.root.join(\"report.md\"), report).unwrap();"
+        },
+        {
+          "line": 335,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 338,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 341,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 348,
+          "text": "        assert!(String::from_utf8(f.observe().unwrap().bytes)"
+        },
+        {
+          "line": 349,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 351,
+          "text": "        std::fs::write(f.root.join(\"report.md\"), b\"PRIVATE changed bytes\").unwrap();"
+        },
+        {
+          "line": 352,
+          "text": "        let error = f.observe().err().unwrap();"
+        },
+        {
+          "line": 353,
+          "text": "        assert_eq!(error.code(), \"planning-context-report-invalid\");"
+        },
+        {
+          "line": 354,
+          "text": "        assert!(!error.to_string().contains(\"PRIVATE\"));"
+        },
+        {
+          "line": 355,
+          "text": "        std::fs::write(f.root.join(\"report.md\"), report).unwrap();"
+        },
+        {
+          "line": 356,
+          "text": "        f.observe().unwrap();"
+        },
+        {
+          "line": 357,
+          "text": "        f.work.tasks.as_mut().unwrap()[0].depends = Some(vec![\"SIBLING_PRIVATE_TASK\".into()]);"
+        },
+        {
+          "line": 359,
+          "text": "            f.observe().err().unwrap().code(),"
+        },
+        {
+          "line": 363,
+          "text": "        f.observe().unwrap();"
+        },
+        {
+          "line": 367,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 370,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 373,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 376,
+          "text": "            f.observe().err().unwrap().code(),"
+        },
+        {
+          "line": 380,
+          "text": "        f.observe().unwrap();"
+        },
+        {
+          "line": 502,
+          "text": "            .ok_or(E::Refused(\"planning-requirement-invalid\"))?;"
+        },
+        {
+          "line": 508,
+          "text": "            .ok_or(E::Refused(\"planning-requirement-missing\"))?;"
+        },
+        {
+          "line": 523,
+          "text": "            return Err(E::Refused(\"planning-task-dependency-outside-scope\"));"
+        },
+        {
+          "line": 611,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 615,
+          "text": "        .ok_or(E::Refused(\"planning-not-enabled\"))?;"
+        },
+        {
+          "line": 627,
+          "text": "            return Err(E::Refused(\"planning-specialized-event-context-unported\"));"
+        },
+        {
+          "line": 636,
+          "text": "                        return Err(E::Refused(\"planning-event-task-owner-mismatch\"));"
+        },
+        {
+          "line": 657,
+          "text": "        .ok_or(E::Refused(\"planning-context-count-representation\"))?;"
+        },
+        {
+          "line": 668,
+          "text": "        return Err(E::Refused(if pending == 0 {"
+        },
+        {
+          "line": 674,
+          "text": "    let contract = contract(work, scope)?;"
+        },
+        {
+          "line": 678,
+          "text": "        .map_err(|e| E::caused(e.reason(), e))?;"
+        },
+        {
+          "line": 688,
+          "text": "    // exact current native error on a fresh activation, under the same caps."
+        },
+        {
+          "line": 693,
+          "text": "            t.independent_review.as_deref().is_some_and(|r| r.id == e.id && r.state == \"error\")"
+        },
+        {
+          "line": 697,
+          "text": "        return Err(E::Refused(\"planning-context-event-limit-exceeded\"));"
+        },
+        {
+          "line": 704,
+          "text": "                .map_err(|e| E::caused(\"planning-worker-completion-evidence\", e))?);"
+        },
+        {
+          "line": 706,
+          "text": "            return Err(E::Refused(\"planning-worker-completion-platform-unported\"));"
+        },
+        {
+          "line": 710,
+          "text": "            return Err(E::Refused(\"planning-specialized-event-context-unported\"));"
+        },
+        {
+          "line": 715,
+          "text": "                        .map_err(|e| E::caused(\"planning-native-review-evidence\", e))?;"
+        },
+        {
+          "line": 730,
+          "text": "                    let evidence = evidence.map_err(|e| E::caused(\"planning-native-review-current-evidence\", e))?"
+        },
+        {
+          "line": 731,
+          "text": "                        .ok_or(E::Refused(\"planning-native-review-current-required\"))?;"
+        },
+        {
+          "line": 733,
+          "text": "                        return Err(E::Refused(\"planning-native-review-current-changed\"));"
+        },
+        {
+          "line": 741,
+          "text": "                        .map_err(|e| E::caused(\"planning-native-review-protocol-current\", e))?"
+        },
+        {
+          "line": 742,
+          "text": "                        .ok_or(E::Refused(\"planning-native-review-protocol-required\"))?;"
+        },
+        {
+          "line": 743,
+          "text": "                    if evidence.review_id != event.id || evidence.attempt_id != event.attempt { return Err(E::Refused(\"planning-native-review-protocol-changed\")); }"
+        },
+        {
+          "line": 747,
+          "text": "                        candidate_commit: String::new(), failure_code: observed.retry_failure.ok_or(E::Refused(\"planning-review-failure-required\"))?.code().into(), owner: observed.retry_failure.ok_or(E::Refused(\"planning-review-failure-required\"))?.owner().into(),"
+        },
+        {
+          "line": 772,
+          "text": "                    return Err(E::Refused(\"planning-native-review-report-binding\"));"
+        },
+        {
+          "line": 776,
+          "text": "                        .map_err(|e| E::caused(\"planning-native-review-report\", e))?;"
+        },
+        {
+          "line": 785,
+          "text": "            .map_err(|e| E::caused(\"planning-context-report-invalid\", e))?"
+        },
+        {
+          "line": 806,
+          "text": "            return Err(E::Refused(\"planning-context-artifact-kind-unported\"));"
+        },
+        {
+          "line": 811,
+          "text": "                || settings.values.planning_decision_policy().map_err(|e| E::caused(e.reason(), e))?.max_operations == Some(0)"
+        },
+        {
+          "line": 816,
+          "text": "        && settings.values.planning_decision_policy().map_err(|e| E::caused(e.reason(), e))?.max_operations != Some(0);"
+        },
+        {
+          "line": 842,
+          "text": "        crate::encode_model(&context).map_err(|e| E::caused(\"planning-context-encoding\", e))?;"
+        },
+        {
+          "line": 847,
+          "text": "        return Err(E::Refused(\"planning-context-byte-limit-exceeded\"));"
+        },
+        {
+          "line": 871,
+          "text": "                    .map_err(|e| E::caused(e.reason(), e))?"
+        },
+        {
+          "line": 880,
+          "text": "                || settings.values.planning_decision_policy().map_err(|e| E::caused(e.reason(), e))?.max_operations == Some(0)"
+        },
+        {
+          "line": 883,
+          "text": "                    Err(E::Refused(\"planning-closure-child-open\" | \"planning-closure-task-not-accepted\" | \"planning-closure-requirement-uncovered\")) => true,"
+        },
+        {
+          "line": 884,
+          "text": "                    Err(error) => return Err(error),"
+        },
+        {
+          "line": 891,
+          "text": "                || settings.values.planning_decision_policy().map_err(|e| E::caused(e.reason(), e))?.max_operations == Some(0)"
+        }
+      ]
+    },
+    "rust/crates/swarm-engine/src/root_store/planning_step.rs": {
+      "policies": [
+        {
+          "line": 77,
+          "text": "        // separately; this guard never fabricates that delivery or a retry grant."
+        },
+        {
+          "line": 121,
+          "text": "    /// default lease, then use normal authoritative claim and protected run."
+        },
+        {
+          "line": 122,
+          "text": "    /// New claims spend the original budgets; no hidden CAS/inference retry,"
+        },
+        {
+          "line": 130,
+          "text": "        let reservation = self.directory.reserve(false, false).map_err(E::Storage)?;"
+        },
+        {
+          "line": 134,
+          "text": "            false,"
+        },
+        {
+          "line": 150,
+          "text": "                        policy.default_lease_seconds.0,"
+        },
+        {
+          "line": 163,
+          "text": "                schema_version: 1,"
+        },
+        {
+          "line": 165,
+          "text": "                accepted: false,"
+        },
+        {
+          "line": 182,
+          "text": "                schema_version: 1,"
+        },
+        {
+          "line": 189,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 227,
+          "text": "                schema_version: 1,"
+        },
+        {
+          "line": 255,
+          "text": "            schema_version: 1,"
+        },
+        {
+          "line": 257,
+          "text": "            accepted: false,"
+        }
+      ],
+      "functions": [
+        {
+          "line": 24,
+          "text": "fn launch(e: A) -> E {"
+        },
+        {
+          "line": 38,
+          "text": "fn choose(db: &rusqlite::Connection, work: &Work, at: &str) -> Result<Option<Choice>, A> {"
+        },
+        {
+          "line": 126,
+          "text": "    pub fn step_planning(&mut self, work: &str) -> Result<PlanningStepOutcome, E> {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 10,
+          "text": "/// Idle means no open-scope input exists; denied/busy/invalid input is an error."
+        },
+        {
+          "line": 36,
+          "text": "/// becomes an empty result. All-blocked is an error; only no open input is idle."
+        },
+        {
+          "line": 40,
+          "text": "        .map_err(|e| A::caused(\"planning-step-state-invalid\", e))?;"
+        },
+        {
+          "line": 44,
+          "text": "        .ok_or(A::Refused(\"planning-not-enabled\"))?;"
+        },
+        {
+          "line": 46,
+          "text": "        return Err(A::Refused(\"planning_paused\"));"
+        },
+        {
+          "line": 49,
+          "text": "        return Err(A::Refused(\"planning-stopped\"));"
+        },
+        {
+          "line": 54,
+          "text": "        swarm_wire_json::go_rfc3339::parse(at).map_err(|e| A::caused(\"planning-step-clock\", e))?;"
+        },
+        {
+          "line": 66,
+          "text": "            .ok_or(A::Refused(\"planning-scope-not-found\"))?;"
+        },
+        {
+          "line": 70,
+          "text": "        let runs = crate::planning_run_store::scope_runs(db, &work.id, &scope.id)?;"
+        },
+        {
+          "line": 86,
+          "text": "                .map_err(|e| A::caused(\"planning-scope-lease-invalid\", e))?;"
+        },
+        {
+          "line": 93,
+          "text": "            .map_err(|e| A::caused(e.code(), e))?"
+        },
+        {
+          "line": 98,
+          "text": "        if let Err(e) = crate::check_planning_activation_budget(work, &scope.id) {"
+        },
+        {
+          "line": 100,
+          "text": "            let error = A::caused(e.reason(), e);"
+        },
+        {
+          "line": 102,
+          "text": "                blocked.get_or_insert(error);"
+        },
+        {
+          "line": 105,
+          "text": "                return Err(error);"
+        },
+        {
+          "line": 114,
+          "text": "        Some(error) => Err(error),"
+        },
+        {
+          "line": 128,
+          "text": "            return Err(E::Refused(\"root-read-only\"));"
+        },
+        {
+          "line": 130,
+          "text": "        let reservation = self.directory.reserve(false, false).map_err(E::Storage)?;"
+        },
+        {
+          "line": 136,
+          "text": "                let mut tx = db.transaction().map_err(E::Sql)?;"
+        },
+        {
+          "line": 139,
+          "text": "                    let value = crate::read_recorded_work(&tx, work).map_err(E::Work)?;"
+        },
+        {
+          "line": 140,
+          "text": "                    let at = crate::system_timestamp().map_err(E::Runtime)?;"
+        },
+        {
+          "line": 141,
+          "text": "                    let choice = choose(&tx, &value, &at).map_err(launch)?;"
+        },
+        {
+          "line": 145,
+          "text": "                        .map_err(E::Settings)?;"
+        },
+        {
+          "line": 158,
+          "text": "            Err(e) => return finished(Err(e), reservation.close().map_err(E::Storage)),"
+        },
+        {
+          "line": 161,
+          "text": "            reservation.close().map_err(E::Storage)?;"
+        },
+        {
+          "line": 180,
+          "text": "                .ok_or(E::Refused(\"planning-scope-not-found\"))?;"
+        },
+        {
+          "line": 183,
+          "text": "                event_id: crate::generate_identifier(\"planning-claim-\").map_err(E::Runtime)?,"
+        },
+        {
+          "line": 187,
+          "text": "                holder: crate::generate_identifier(\"native-planner-\").map_err(E::Runtime)?,"
+        },
+        {
+          "line": 191,
+          "text": "            let raw = crate::encode_planning_request(&claim).map_err(E::Encode)?;"
+        },
+        {
+          "line": 196,
+          "text": "            Err(e) => return finished(Err(e), reservation.close().map_err(E::Storage)),"
+        },
+        {
+          "line": 216,
+          "text": "            })?;"
+        },
+        {
+          "line": 225,
+          "text": "                .ok_or(E::Refused(\"planning-scope-not-found\"))?;"
+        },
+        {
+          "line": 242,
+          "text": "        })?;"
+        },
+        {
+          "line": 253,
+          "text": "        })?;"
+        }
+      ]
+    },
+    "rust/crates/swarm-engine/src/work_engine.rs": {
+      "policies": [
+        {
+          "line": 108,
+          "text": "    /// classification performs no IO, retry, state change or authority decision."
+        },
+        {
+          "line": 137,
+          "text": "                rolled_back: true, .."
+        },
+        {
+          "line": 144,
+          "text": "    /// storage retry. No retry, event renaming or consumption reset occurs."
+        },
+        {
+          "line": 150,
+          "text": "                    rolled_back: false,"
+        },
+        {
+          "line": 261,
+          "text": "    /// no IO, default adoption or operation occurs in this builder."
+        },
+        {
+          "line": 284,
+          "text": "    /// v25 decisions apply task/delegation, same-task native production retry"
+        },
+        {
+          "line": 293,
+          "text": "    /// supports ordinary actions; changes_requested supports only same-task retry."
+        },
+        {
+          "line": 319,
+          "text": "    /// records consent=false. Unpause preserves mode/consent, never dispatches or"
+        },
+        {
+          "line": 323,
+          "text": "    /// explicit local consent; resume requires a current true record and preserves"
+        },
+        {
+          "line": 375,
+          "text": "            (Request{schema_version:change.schema_version,event_id:change.event_id.clone(),expected_revision:change.expected_revision,id:change.task_id.clone(),..Default::default()},"
+        },
+        {
+          "line": 385,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 399,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 409,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 424,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 435,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 447,
+          "text": "                    ..Default::default()"
+        },
+        {
+          "line": 560,
+          "text": "/// transaction as closure or retry. Runtime statuses are protocol, not a policy"
+        },
+        {
+          "line": 569,
+          "text": "            \"SELECT id FROM main.agents WHERE work_id=? AND task_id=? AND status IN ('queued','starting','running','stopping') LIMIT 1\","
+        },
+        {
+          "line": 637,
+          "text": "        let empty = Work::default();"
+        },
+        {
+          "line": 652,
+          "text": "                replayed: true,"
+        },
+        {
+          "line": 658,
+          "text": "            schema_version: 1,"
+        },
+        {
+          "line": 664,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 830,
+          "text": "                for op in request.operations.iter().flatten().filter(|op| matches!(op.kind.as_str(), \"retry\" | \"review-retry\")) {"
+        },
+        {
+          "line": 831,
+          "text": "                    require_native_task_idle(tx, &candidate.id, &op.id, \"planning-retry-worker-active\")?;"
+        },
+        {
+          "line": 884,
+          "text": "                apply_work_creation(&mut candidate, r, crate::GitState::default())"
+        },
+        {
+          "line": 887,
+          "text": "                apply_checkpoint(&mut candidate, r, root, crate::GitState::default())"
+        },
+        {
+          "line": 938,
+          "text": "                gate.document.0.get().as_bytes(),"
+        },
+        {
+          "line": 1021,
+          "text": "        .checked_add(1)"
+        },
+        {
+          "line": 1062,
+          "text": "                replayed: false,"
+        },
+        {
+          "line": 1068,
+          "text": "            replayed: true,"
+        }
+      ],
+      "functions": [
+        {
+          "line": 21,
+          "text": "    fn check(&self, db: &Connection, work: &str, now: &str) -> Result<(), WorkEngineError>;"
+        },
+        {
+          "line": 24,
+          "text": "    fn check_agent(&self, db:&Connection,work:&str,now:&str,_settings:&crate::EngineSettingsDocument)->Result<(),WorkEngineError>{self.check(db,work,now)}"
+        },
+        {
+          "line": 27,
+          "text": "    fn mission_conductor(&self)->Option<&str>{None}"
+        },
+        {
+          "line": 29,
+          "text": "    fn mission_profile(&self)->Option<&crate::LaunchProfile>{None}"
+        },
+        {
+          "line": 34,
+          "text": "    fn mission_binding(&self,_db:&Connection,_agent:&crate::Agent,_receipt:MutationFenceReceipt<'_>)->Result<Option<crate::GoRaw>,WorkEngineError>{Ok(None)}"
+        },
+        {
+          "line": 39,
+          "text": "    fn finishing_planner(&self, _db: &Connection, _run: &crate::planning_run_store::Run, _event: &str, _now: &str) -> Result<(), WorkEngineError> {"
+        },
+        {
+          "line": 44,
+          "text": "    fn stage_receipt("
+        },
+        {
+          "line": 109,
+          "text": "    pub fn code(&self) -> &'static str {"
+        },
+        {
+          "line": 145,
+          "text": "    pub fn requires_reconciliation(&self) -> bool {"
+        },
+        {
+          "line": 161,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 178,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 183,
+          "text": "    fn source(&self) -> Option<&(dyn Error + 'static)> {"
+        },
+        {
+          "line": 218,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 237,
+          "text": "    pub fn new("
+        },
+        {
+          "line": 255,
+          "text": "    pub fn with_quality_policy(mut self, policy: Option<&'a crate::QualityPolicySnapshot>) -> Self {"
+        },
+        {
+          "line": 262,
+          "text": "    pub fn with_planning_settings(mut self, settings: &'a crate::EngineSettingsDocument) -> Self {"
+        },
+        {
+          "line": 269,
+          "text": "    pub(crate) fn with_mutation_fence(mut self, fence: Option<&'a dyn MutationFence>) -> Self {"
+        },
+        {
+          "line": 329,
+          "text": "    pub fn execute_external("
+        },
+        {
+          "line": 564,
+          "text": "fn require_native_task_idle(db: &Connection, work: &str, task: &str, worker_refusal: &'static str) -> Result<(), WorkEngineError> {"
+        },
+        {
+          "line": 603,
+          "text": "fn apply<E: WorkEnvironment>("
+        }
+      ],
+      "errors": [
+        {
+          "line": 14,
+          "text": "use std::{collections::BTreeMap, error::Error, fmt, path::Path};"
+        },
+        {
+          "line": 40,
+          "text": "        Err(WorkEngineError::PlanningActivation(Box::new(crate::AgentLaunchError::Refused(\"planning-closure-native-run-active\"))))"
+        },
+        {
+          "line": 142,
+          "text": "    /// A commit error or transaction loss requires observing actual state before"
+        },
+        {
+          "line": 173,
+          "text": "            _ => f.write_str(self.code()),"
+        },
+        {
+          "line": 208,
+          "text": "            _ => None,"
+        },
+        {
+          "line": 336,
+          "text": "            Some(((if action==crate::MissionControlAction::Start {crate::decode_mission_start_request(raw)} else if action==crate::MissionControlAction::Priority {crate::decode_mission_priority_request(raw)} else {crate::decode_mission_control_request(raw)}).map_err(|e| WorkEngineError::Mission(Box::new(e)))?, action))"
+        },
+        {
+          "line": 339,
+          "text": "            Some(crate::decode_quota_change(raw).map_err(WorkEngineError::Quota)?)"
+        },
+        {
+          "line": 342,
+          "text": "            Some(crate::decode_task_report_request(raw).map_err(WorkEngineError::TaskReport)?)"
+        },
+        {
+          "line": 347,
+          "text": "            Some(crate::decode_task_model_request(raw).map_err(WorkEngineError::TaskModel)?)"
+        },
+        {
+          "line": 353,
+          "text": "                crate::decode_planning_request(raw).map_err(WorkEngineError::PlanningRequest)?;"
+        },
+        {
+          "line": 355,
+          "text": "                .map_err(WorkEngineError::PlanningControl)?;"
+        },
+        {
+          "line": 361,
+          "text": "            let mut change = crate::decode_budget_change(raw).map_err(WorkEngineError::Budget)?;"
+        },
+        {
+          "line": 362,
+          "text": "            crate::validate_budget_change(&change).map_err(WorkEngineError::Budget)?;"
+        },
+        {
+          "line": 370,
+          "text": "            Some(crate::decode_gate_request(raw).map_err(WorkEngineError::GateRequest)?)"
+        },
+        {
+          "line": 376,
+          "text": "             crate::encode_model(change).map_err(|e|WorkEngineError::Mission(Box::new(crate::mission_control_request::cause(\"mission-control-request-encoding\",e))))?)"
+        },
+        {
+          "line": 392,
+          "text": "                })?,"
+        },
+        {
+          "line": 401,
+          "text": "                crate::AgentLaunchError::caused(\"quota-request-encoding\", e)))?)"
+        },
+        {
+          "line": 416,
+          "text": "                })?,"
+        },
+        {
+          "line": 427,
+          "text": "                    .map_err(WorkEngineError::PlanningEncoding)?,"
+        },
+        {
+          "line": 438,
+          "text": "                    .map_err(|error| WorkEngineError::Budget(crate::BudgetError::Decode(error)))?,"
+        },
+        {
+          "line": 449,
+          "text": "                crate::encode_gate_request_intent(gate).map_err(WorkEngineError::GateRequest)?,"
+        },
+        {
+          "line": 452,
+          "text": "            let request = decode_external_request(raw).map_err(WorkEngineError::Request)?;"
+        },
+        {
+          "line": 453,
+          "text": "            validate_work_request(kind, &request).map_err(WorkEngineError::Definition)?;"
+        },
+        {
+          "line": 454,
+          "text": "            let intent = encode_work_mutation_intent(&request).map_err(WorkEngineError::Request)?;"
+        },
+        {
+          "line": 457,
+          "text": "        let mut tx = self.db.transaction().map_err(WorkEngineError::Sql)?;"
+        },
+        {
+          "line": 463,
+          "text": "                    .map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 464,
+          "text": "                fence.check(&tx, work, &at)?;"
+        },
+        {
+          "line": 489,
+          "text": "            )?;"
+        },
+        {
+          "line": 496,
+          "text": "                    })?;"
+        },
+        {
+          "line": 506,
+          "text": "                    )?;"
+        },
+        {
+          "line": 511,
+          "text": "                    .map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 512,
+          "text": "                fence.check(&tx, work, &at)?;"
+        },
+        {
+          "line": 519,
+          "text": "                tx.rollback().map_err(WorkEngineError::ReplayRollback)?;"
+        },
+        {
+          "line": 524,
+          "text": "                Err(cause) => {"
+        },
+        {
+          "line": 531,
+          "text": "                    Err(WorkEngineError::Commit {"
+        },
+        {
+          "line": 541,
+          "text": "            Err(primary) => {"
+        },
+        {
+          "line": 544,
+          "text": "                    return Err(WorkEngineError::TransactionLost {"
+        },
+        {
+          "line": 549,
+          "text": "                    Ok(()) => Err(primary),"
+        },
+        {
+          "line": 550,
+          "text": "                    Err(cleanup) => Err(WorkEngineError::Rollback {"
+        },
+        {
+          "line": 566,
+          "text": "        crate::root_store::require_validation_idle(db, work, task)?;"
+        },
+        {
+          "line": 567,
+          "text": "        crate::RootStore::require_idle_task_review(db, work, task)?;"
+        },
+        {
+          "line": 569,
+          "text": "            \"SELECT id FROM main.agents WHERE work_id=? AND task_id=? AND status IN ('queued','starting','running','stopping') LIMIT 1\","
+        },
+        {
+          "line": 570,
+          "text": "            rusqlite::params![work, task], |rows| Ok(rows.next()?.is_some()))?;"
+        },
+        {
+          "line": 571,
+          "text": "        if active { return Err(crate::AgentLaunchError::Refused(worker_refusal)); }"
+        },
+        {
+          "line": 595,
+          "text": "/// a typed guard, validation, observation, overflow or storage error. Git reads"
+        },
+        {
+          "line": 597,
+          "text": "/// must roll back/discard on error and separately reconcile a failed commit."
+        },
+        {
+          "line": 628,
+          "text": "            .map_err(WorkEngineError::Guard)?;"
+        },
+        {
+          "line": 645,
+          "text": "                .map_err(|e| WorkEngineError::Definition(WorkDefinitionError::RequestFields(e)))?;"
+        },
+        {
+          "line": 661,
+          "text": "                .map_err(WorkEngineError::Runtime)?,"
+        },
+        {
+          "line": 662,
+          "text": "            created: environment.timestamp().map_err(WorkEngineError::Runtime)?,"
+        },
+        {
+          "line": 670,
+          "text": "        ))?;"
+        },
+        {
+          "line": 672,
+          "text": "            .map_err(WorkEngineError::PlanningControl)?;"
+        },
+        {
+          "line": 676,
+          "text": "        let task = if kind == \"gate\" {gate.ok_or(WorkEngineError::UnportedStatus)?.task_id.as_str()} else {r.id.as_str()};"
+        },
+        {
+          "line": 677,
+          "text": "        crate::root_store::require_validation_idle(tx,&candidate.id,task).map_err(|e|WorkEngineError::ValidationController(Box::new(e)))?;"
+        },
+        {
+          "line": 696,
+          "text": "            let (request, action)=mission.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 697,
+          "text": "            let settings=planning_settings.ok_or_else(||WorkEngineError::Mission(Box::new(crate::MissionSupervisionError::Refused(\"mission-control-settings-required\"))))?;"
+        },
+        {
+          "line": 698,
+          "text": "            let at=environment.timestamp().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 699,
+          "text": "            let actor=environment.operator().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 701,
+          "text": "            crate::root_store::stage_mission_control(tx,root,&mut candidate,action,request,settings,(&at,&actor)).map_err(|e|WorkEngineError::Mission(Box::new(e)))?;"
+        },
+        {
+          "line": 703,
+          "text": "            {let _=(request,action,settings,at,actor);return Err(WorkEngineError::UnportedStatus);}"
+        },
+        {
+          "line": 706,
+          "text": "            let change = quota.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 708,
+          "text": "                crate::AgentLaunchError::Refused(\"quota-settings-required\")))?;"
+        },
+        {
+          "line": 710,
+          "text": "                WorkEngineError::Quota(crate::AgentLaunchError::caused(e.reason(), e)))?;"
+        },
+        {
+          "line": 711,
+          "text": "            let at = environment.timestamp().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 712,
+          "text": "            let actor = environment.operator().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 714,
+          "text": "                .map_err(WorkEngineError::Quota)?;"
+        },
+        {
+          "line": 717,
+          "text": "            let request = task_report.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 720,
+          "text": "            ))?;"
+        },
+        {
+          "line": 722,
+          "text": "                .map_err(WorkEngineError::TaskReport)?;"
+        },
+        {
+          "line": 725,
+          "text": "            let request = task_model.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 728,
+          "text": "            ))?;"
+        },
+        {
+          "line": 730,
+          "text": "                .map_err(WorkEngineError::TaskModel)?;"
+        },
+        {
+          "line": 733,
+          "text": "            let change = budget.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 734,
+          "text": "            let at = environment.timestamp().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 735,
+          "text": "            let actor = environment.operator().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 737,
+          "text": "                .map_err(WorkEngineError::Budget)?;"
+        },
+        {
+          "line": 747,
+          "text": "            let (request, action) = planning.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 750,
+          "text": "            ))?;"
+        },
+        {
+          "line": 751,
+          "text": "            let at = environment.timestamp().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 760,
+          "text": "                )?;"
+        },
+        {
+          "line": 762,
+          "text": "                return Err(WorkEngineError::UnportedStatus);"
+        },
+        {
+          "line": 774,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 778,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 788,
+          "text": "                    .map_err(WorkEngineError::Budget)?;"
+        },
+        {
+          "line": 792,
+          "text": "                    return Err(WorkEngineError::UnportedStatus);"
+        },
+        {
+          "line": 796,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 800,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(crate::AgentLaunchError::caused(\"planning-judge-native-owner-active\",e))))?;"
+        },
+        {
+          "line": 802,
+          "text": "                return Err(WorkEngineError::UnportedStatus);"
+        },
+        {
+          "line": 805,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 808,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 815,
+          "text": "                        let ancestors = crate::planning_scope_ancestors(&candidate, &scope.id).map_err(|e| WorkEngineError::PlanningActivation(Box::new(crate::AgentLaunchError::caused(\"planning-closure-tree-invalid\", e))))?;"
+        },
+        {
+          "line": 818,
+          "text": "                            require_native_task_idle(tx, &candidate.id, &task.id, \"planning-closure-worker-active\")?;"
+        },
+        {
+          "line": 821,
+          "text": "                            .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))? {"
+        },
+        {
+          "line": 823,
+          "text": "                                fence.ok_or_else(|| WorkEngineError::PlanningActivation(Box::new(crate::AgentLaunchError::Refused(\"planning-closure-native-run-active\"))))?"
+        },
+        {
+          "line": 824,
+          "text": "                                    .finishing_planner(tx, &run, &request.event_id, &at)?;"
+        },
+        {
+          "line": 831,
+          "text": "                    require_native_task_idle(tx, &candidate.id, &op.id, \"planning-retry-worker-active\")?;"
+        },
+        {
+          "line": 843,
+          "text": "                        .map_err(WorkEngineError::PlanningControl)?;"
+        },
+        {
+          "line": 848,
+          "text": "                                .map_err(|e| WorkEngineError::PlanningBootstrap(Box::new(e)))?,"
+        },
+        {
+          "line": 853,
+          "text": "                        return Err(WorkEngineError::UnportedStatus);"
+        },
+        {
+          "line": 866,
+          "text": "                .map_err(WorkEngineError::PlanningControl)?;"
+        },
+        {
+          "line": 872,
+          "text": "                                .map_err(|e|WorkEngineError::PlanningBootstrap(Box::new(e)))?;"
+        },
+        {
+          "line": 873,
+          "text": "                            candidate.planning.as_mut().ok_or(WorkEngineError::UnportedStatus)?.repository=Some(Box::new(prepared));"
+        },
+        {
+          "line": 874,
+          "text": "                            crate::validate_planning_state(&candidate).map_err(|e|WorkEngineError::PlanningControl(crate::PlanningControlError::State(e)))?;"
+        },
+        {
+          "line": 877,
+          "text": "                        return Err(WorkEngineError::UnportedStatus);"
+        },
+        {
+          "line": 885,
+          "text": "                    .map_err(WorkEngineError::Definition)?;"
+        },
+        {
+          "line": 888,
+          "text": "                    .map_err(WorkEngineError::Checkpoint)?;"
+        },
+        {
+          "line": 890,
+          "text": "            let observed = environment.git(root).map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 895,
+          "text": "            apply_work_definition(&mut candidate, r).map_err(WorkEngineError::Definition)?"
+        },
+        {
+          "line": 899,
+          "text": "            // have no authority to invent a runtime fallback or hidden ceiling."
+        },
+        {
+          "line": 904,
+          "text": "                return Err(WorkEngineError::Task(crate::TaskDefinitionError::Refused("
+        },
+        {
+          "line": 914,
+          "text": "                )))?;"
+        },
+        {
+          "line": 916,
+          "text": "                .map_err(WorkEngineError::Definition)?"
+        },
+        {
+          "line": 918,
+          "text": "        \"ooda\" => apply_ooda(&mut candidate, r).map_err(WorkEngineError::Definition)?,"
+        },
+        {
+          "line": 921,
+          "text": "            let gate = gate.ok_or_else(|| refused(\"gate-request-not-prepared\"))?;"
+        },
+        {
+          "line": 923,
+          "text": "                quality_policy.ok_or_else(|| refused(\"gate-policy-observation-required\"))?;"
+        },
+        {
+          "line": 930,
+          "text": "                .ok_or_else(|| refused(\"gate-task-not-found\"))?;"
+        },
+        {
+          "line": 935,
+          "text": "                    .ok_or_else(|| refused(\"gate-task-not-found\"))?[index],"
+        },
+        {
+          "line": 942,
+          "text": "            .map_err(WorkEngineError::Gate)?;"
+        },
+        {
+          "line": 943,
+          "text": "            let at = environment.timestamp().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 945,
+          "text": "                return Err(WorkEngineError::Gate(crate::GateContractError::Refused("
+        },
+        {
+          "line": 952,
+          "text": "                .ok_or_else(|| refused(\"gate-preparation-incomplete\"))?"
+        },
+        {
+          "line": 957,
+          "text": "                .ok_or_else(|| refused(\"gate-task-not-found\"))?[index] = prepared;"
+        },
+        {
+          "line": 970,
+          "text": "                    ))?;"
+        },
+        {
+          "line": 977,
+          "text": "                        require_native_task_idle(tx, &candidate.id, &r.id, \"scoped-initial-decision-worker-active\")?;"
+        },
+        {
+          "line": 979,
+          "text": "                        return Err(WorkEngineError::Lifecycle(crate::TaskLifecycleError::HierarchyNotPorted));"
+        },
+        {
+          "line": 986,
+          "text": "                }.map_err(WorkEngineError::Lifecycle)?;"
+        },
+        {
+          "line": 991,
+          "text": "                    .ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 995,
+          "text": "                    environment.timestamp().map_err(WorkEngineError::Runtime)?"
+        },
+        {
+          "line": 1000,
+          "text": "                    environment.operator().map_err(WorkEngineError::Runtime)?"
+        },
+        {
+          "line": 1010,
+          "text": "                apply_task_metadata(&mut candidate, r, &context).map_err(WorkEngineError::Task)?;"
+        },
+        {
+          "line": 1013,
+          "text": "        _ => return Err(WorkEngineError::UnportedStatus),"
+        },
+        {
+          "line": 1018,
+          "text": "        .map_err(WorkEngineError::Planning)?;"
+        },
+        {
+          "line": 1022,
+          "text": "        .ok_or(WorkEngineError::Overflow)?;"
+        },
+        {
+          "line": 1023,
+          "text": "    candidate.updated = environment.timestamp().map_err(WorkEngineError::Runtime)?;"
+        },
+        {
+          "line": 1025,
+          "text": "        let (request, _) = planning.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 1031,
+          "text": "        .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 1034,
+          "text": "        let (request, _) = planning.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 1036,
+          "text": "            .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        },
+        {
+          "line": 1048,
+          "text": "    .map_err(WorkEngineError::Change)?;"
+        },
+        {
+          "line": 1053,
+          "text": "                let (request, action) = planning.ok_or(WorkEngineError::UnportedStatus)?;"
+        },
+        {
+          "line": 1055,
+          "text": "                    return Err(WorkEngineError::UnportedStatus);"
+        },
+        {
+          "line": 1058,
+          "text": "                    .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;"
+        }
+      ]
+    },
+    "version_history.json": {
+      "policies": [
+        {
+          "line": 2,
+          "text": "  \"schema_version\": 1,"
+        },
+        {
+          "line": 115,
+          "text": "        \"en\": \"Rust candidate: initial hierarchical missions show provider waits with UTC expiry or explicit intervention, without clearing quotas or implicit retries.\""
+        },
+        {
+          "line": 187,
+          "text": "        \"en\": \"Memory and mission state: an unreadable pause refuses affected launches and operations, retains a safe diagnostic and no longer becomes a false “launches allowed” state.\""
+        },
+        {
+          "line": 194,
+          "text": "        \"fr\": \"Migration Rust en qualification : lecture structurée des avis et trois limites UTF-8 persistantes réglables dans Admin, sans acceptation implicite ni remplacement du serveur.\","
+        },
+        {
+          "line": 195,
+          "text": "        \"en\": \"Rust migration under qualification: structured review reply parsing and three persisted UTF-8 limits editable in Admin, without implicit acceptance or server replacement.\""
+        },
+        {
+          "line": 231,
+          "text": "        \"en\": \"Go/Rust sources under qualification: required criterion bindings from task.add, blank criteria refused and Admin limit consumed by Rust creation; historical task adoption remains open.\""
+        },
+        {
+          "line": 239,
+          "text": "        \"en\": \"Rust migration: persisted configurable default check phases with FR/EN Admin choices; existing task requirements and criteria remain protected. Explicit legacy-setting adoption, safe errors and recovery verified by scope; verification evidence is scoped, while installation and cutover remain separate.\""
+        },
+        {
+          "line": 330,
+          "text": "        \"fr\": \"Recettes Admin : les états de refus visibles remontent hors du polling, avec régressions conservées et sans timeout global arbitraire ; les essais restent distincts du service installé.\","
+        },
+        {
+          "line": 331,
+          "text": "        \"en\": \"Admin recipes: visible refusal states propagate outside polling, with retained regression checks and no arbitrary global timeout; verification remains distinct from the installed service.\""
+        },
+        {
+          "line": 339,
+          "text": "        \"en\": \"Rust migration, verified component: per-attempt frozen Admin failure-window policy, diagnostic CLI replay and shared SQLite retries verified; actual supervision and cutover remain open, no process enabled.\""
+        },
+        {
+          "line": 370,
+          "text": "        \"fr\": \"Candidat Rust non installé : routage natif explicite vérifié sur huit parcours locaux, avec sources relues avant exécution, format modèle v1, limites Admin et reprises ; 566 tests workspace et quatre parcours Admin passent. Migration globale encore partielle.\","
+        },
+        {
+          "line": 371,
+          "text": "        \"en\": \"Uninstalled Rust candidate: explicit native routing verified in eight local journeys, with sources reread before execution, v1 model format, Admin limits and recovery; 566 workspace tests and four Admin journeys pass. Overall migration remains partial.\""
+        },
+        {
+          "line": 378,
+          "text": "        \"fr\": \"Candidat Rust non installé : création et lecture fournisseur par CLI vérifiées sans écrasement ; courses, erreurs de stockage/durabilité/sortie et reprises couvertes. 140 tests de recette, 593 tests workspace tous features et dix parcours natifs passent. Migration globale partielle.\","
+        },
+        {
+          "line": 379,
+          "text": "        \"en\": \"Uninstalled Rust candidate: provider-file CLI create/readback verified without overwrite; creation races, storage/durability/output errors and recovery covered. 140 recipe tests, 593 all-features workspace tests and ten native journeys pass. Overall migration stays partial.\""
+        },
+        {
+          "line": 382,
+          "text": "        \"fr\": \"Candidat Rust86 non installé : édition et restauration fournisseur vérifiées avec aperçu lié au Root, CAS, sauvegardes exactes et reprise. 151 tests Rust, 13 parcours natifs, Clippy et Rustdoc passent ; migration globale partielle.\","
+        },
+        {
+          "line": 383,
+          "text": "        \"en\": \"Uninstalled Rust86 candidate: provider update/restore verified with Root-bound preview, CAS, exact snapshots and recovery. 151 Rust tests, 13 native journeys, Clippy and Rustdoc pass; overall migration partial.\""
+        },
+        {
+          "line": 386,
+          "text": "        \"fr\": \"Candidat Rust87 non installé : choix de modèle par tâche conservé/rejoué et réellement appliqué au processus, avec refus des divergences et reprise. Compatibilité JSON Go et erreurs de transaction/sortie vérifiées. 155 tests de recette, 10 transactionnels et 14 parcours natifs passent ; migration partielle.\","
+        },
+        {
+          "line": 387,
+          "text": "        \"en\": \"Uninstalled Rust87 candidate: task model choice persists/replays and reaches actual process argv, with conflict refusals and recovery. Go JSON compatibility and transaction/output failures verified. 155 recipe tests, 10 transaction tests and 14 native journeys pass; overall migration partial.\""
+        },
+        {
+          "line": 390,
+          "text": "        \"fr\": \"Candidat Rust88 non installé : import/export de politiques explicites avec sauvegarde et refus/reprise ; confirmation UI liée au Root, choix par défaut conservé et règles Admin appliquées. 161 tests Rust et 15 parcours natifs, 4 parcours navigateur passent. Aucun modèle implicite ajouté ; migration globale partielle.\","
+        },
+        {
+          "line": 391,
+          "text": "        \"en\": \"Uninstalled Rust88 candidate: explicit policy import/export with snapshots/refusal/recovery; Root-bound UI confirmation, preserved default choice and saved Admin rules. 161 Rust tests, 15 native and 4 browser journeys pass. No implicit named model added; overall migration partial.\""
+        },
+        {
+          "line": 394,
+          "text": "        \"fr\": \"Candidat Rust89 non installé : mission manuelle worker/rapport/soumission/gate/validation opérateur vérifiée ; identités SQL/corps incohérentes refusées par les lecteurs. 169 tests Rust de recette, 15 parcours de routage et 4 missions passent. Migration globale partielle.\","
+        },
+        {
+          "line": 395,
+          "text": "        \"en\": \"Uninstalled Rust89 candidate: verified manual worker/report/submission/gate/operator acceptance; readers refuse inconsistent SQL/body identities. 169 Rust recipe tests, 15 routing and 4 mission journeys pass. Overall migration partial.\""
+        },
+        {
+          "line": 398,
+          "text": "        \"fr\": \"Candidat Rust90–91 non installé : garde HTTP local et routage typé partiel vers le vrai Root ; datastore lié par descripteur, refus des chemins remplacés, état conservé après échecs tardifs. Session locale persistante qualifiée :202tests Rust, Clippy/Rustdoc et parcours CLI vérifiés ; transport réseau et serveur Go inchangés.\","
+        },
+        {
+          "line": 399,
+          "text": "        \"en\": \"Uninstalled Rust90–91 candidate: local HTTP gate and limited typed routing into actual Root; descriptor-bound datastore, replacement-path refusal, retained state after late failures. Persistent local session qualified:202Rust tests, Clippy/Rustdoc and CLI journeys verified; network transport and Go server unchanged.\""
+        },
+        {
+          "line": 403,
+          "text": "        \"en\": \"Uninstalled Rust92 candidate: retained configuration after init/settings apply/replay output or close failure; refusals without false publication markers. Local qualification206Rust tests, Clippy/Rustdoc and CLI journeys verified.\""
+        },
+        {
+          "line": 442,
+          "text": "        \"fr\": \"Migration Rust102 : commandes Work sous bail vérifiées dans la transaction et avant commit, rollback budgétaire sur expiration et reprise de tests sans timeout arbitraire. Journal, conduite complète et bascule globale restent ouverts ; serveur Go conservé.\","
+        },
+        {
+          "line": 443,
+          "text": "        \"en\": \"Rust migration102: Work commands lease-checked inside the transaction and before commit, budget rollback on expiry and recovered verification without arbitrary timeout. Journal, complete conductor and global cutover remain open; serving Go preserved.\""
+        },
+        {
+          "line": 486,
+          "text": "        \"fr\": \"Candidat Rust113/114 vérifié localement : réservation et décisions task/delegate, refus atomiques et adoption explicite v24→v25 ; réglages Admin FR/EN réellement consommés. Conduite complète et bascule restent ouvertes ; application en service inchangée.\","
+        },
+        {
+          "line": 487,
+          "text": "        \"en\": \"Rust113/114 locally verified candidate: scope claims and task/delegate decisions, atomic refusal and explicit v24→v25 adoption; FR/EN Admin settings consumed by actual operations. Complete orchestration and cutover remain open; the running application is unchanged.\""
+        },
+        {
+          "line": 539,
+          "text": "        \"en\": \"Rust migration: structured-provider waiting and ownership renewal declared as persisted Admin settings; the lease does not become a model-duration limit, runner still in progress.\""
+        },
+        {
+          "line": 543,
+          "text": "        \"en\": \"Rust CLOCK_BOOTTIME clock and absolute timerfd wake primitive, without fallback or new product timeout; planner integration remains in progress.\""
+        },
+        {
+          "line": 546,
+          "text": "        \"fr\": \"Le contrôleur Rust peut réveiller le poll du processus possédé via un descripteur noyau ; vérification locale en cours, sans nouveau timeout global ni raccord planner implicite.\","
+        },
+        {
+          "line": 547,
+          "text": "        \"en\": \"The Rust controller can wake the owned-process poll via a kernel descriptor; local verification in progress, with no new global timeout or implicit planner integration.\""
+        },
+        {
+          "line": 662,
+          "text": "        \"fr\": \"Rust : raccord JSON historique de mission status pour les missions ordinaires sans profil, Agent ni planification ; santé stockage réelle et seuils persistés dans Admin (schéma réglages 38). Qualification du parcours en cours, aucune installation revendiquée.\","
+        },
+        {
+          "line": 663,
+          "text": "        \"en\": \"Rust: historical mission status JSON wired for ordinary missions without profiles, Agents or planning; actual storage health and persisted Admin thresholds (settings schema 38). Journey qualification in progress; no installation claimed.\""
+        },
+        {
+          "line": 677,
+          "text": "      \"version\": \"v0.1.0\","
+        },
+        {
+          "line": 678,
+          "text": "      \"date\": \"2026-10-06\","
+        },
+        {
+          "line": 693,
+          "text": "      \"release_url\": \"https://github.com/mo0ogly/swarm/releases/tag/v0.1.0\""
+        }
+      ],
+      "functions": [],
+      "errors": [
+        {
+          "line": 235,
+          "text": "        \"en\": \"Rust migration: continuous policy, function, error and documentation review, with hash/evidence checks in qualification. This method does not establish exhaustive semantic correctness or deployment.\""
+        },
+        {
+          "line": 255,
+          "text": "        \"en\": \"Rust candidate: ordinary hierarchical projection combines review, gate and dependencies; typed staleness and retained error causes, under verification without cutover.\""
+        },
+        {
+          "line": 279,
+          "text": "        \"en\": \"Worker framing: policy, function documentation and error-handling rules are delivered as a canonical embedded source. No extra rights or raised limits; verification in progress.\""
+        },
+        {
+          "line": 347,
+          "text": "        \"en\": \"Rust migration: manual agent run with private helper, execve without shell fallback, sealed prompt, stream guards and settlement without acceptance. Elapsed duration is observation only; native verification and replay recipe in progress. No service restarted.\""
+        },
+        {
+          "line": 451,
+          "text": "        \"en\": \"Rust migration104: cycle error/recovery journal, shared owner checks and rollback on journal failure.48targeted tests and2HTTP flows pass. Complete conductor and cutover remain open.\""
+        },
+        {
+          "line": 458,
+          "text": "        \"fr\": \"Migration Rust106 : consentement, révocation, pause et autonomie lus sans fallback ; corruption refusée sans mutation, reprise SQL vérifiée.33tests ciblés et2parcours HTTP passent. Configuration et départ automatique restent ouverts.\","
+        },
+        {
+          "line": 459,
+          "text": "        \"en\": \"Rust migration106:consent, revocation, pause and autonomy read without fallback; corruption refused without mutation and SQL recovery verified.33targeted tests and2HTTP flows pass. Configuration and automatic launch remain open.\""
+        },
+        {
+          "line": 543,
+          "text": "        \"en\": \"Rust CLOCK_BOOTTIME clock and absolute timerfd wake primitive, without fallback or new product timeout; planner integration remains in progress.\""
+        },
+        {
+          "line": 623,
+          "text": "        \"en\": \"Rust: read-only reviewer original inputs, saved limits and precise context error reasons; reviewer invocation remains unported.\""
+        }
+      ]
+    }
+  },
+  "independent_review": false,
+  "semantic_guarantee": false,
+  "runtime_acceptance": false
+}

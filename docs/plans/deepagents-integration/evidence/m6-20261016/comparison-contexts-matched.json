@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestProjectMemoryComparisonContexts$",
+    "-count=1",
+    "-v",
+    "-timeout=60s"
+  ],
+  "cwd": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "started_at_utc": "2026-10-16T06:31:11.805213+00:00",
+  "output_directory": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m6-20261016/pack",
+  "exit_code": 0,
+  "ended_at_utc": "2026-10-16T06:31:54.391778+00:00",
+  "changed_inputs": [],
+  "log_sha256": "b1c4230fac73c76a12a872bd7a11169d76f8600353bf53df83a9a1221bee1181"
+}

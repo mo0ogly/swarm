@@ -1,0 +1,1 @@
+You are a tool-free authorized GLM Rust migration contributor. Use only actual supplied interfaces. Propose public Python test for new committed-only planning.enable: create owned local Git source, real CLI save/reopen/replay, source HEAD/index/worktree unchanged, no model; no SQL writes. Use actual Fixture methods. <=100 lines.

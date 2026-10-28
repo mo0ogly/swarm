@@ -1,0 +1,8 @@
+{
+  "phase": "input collection; tests not started",
+  "observed": "ValueError: generated go-build testmain file is outside repository root",
+  "original": "tool output exec session 47094; no original stderr file was captured",
+  "before_script": "engine-runner-before-input-fix.py.txt",
+  "correction": "retain cache-generated input under absolute path instead of requiring repository-relative paths",
+  "next_attempt": "engine-normal-02"
+}

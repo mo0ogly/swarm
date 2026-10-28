@@ -1,0 +1,18 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "TestPlanningJudge|TestRecoveredResultCompletedSourceCapacity|TestInstructionRevisionOperator|TestAdminDurationThreshold",
+    "-count=1",
+    "-timeout=120s"
+  ],
+  "start": "2026-10-11T14:53:00.851579+00:00",
+  "end": "2026-10-11T14:53:52.660970+00:00",
+  "seconds": 51.80940362099864,
+  "exit": 0,
+  "output": "/tmp/swarm-T2-primary12-preview-race.out",
+  "output_sha256": "24f2900a7b0e981825b9c56266881cb3ec37a0d974ce66c61b19518e50183a24"
+}

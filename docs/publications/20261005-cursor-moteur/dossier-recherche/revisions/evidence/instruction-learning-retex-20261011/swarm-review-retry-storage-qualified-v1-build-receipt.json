@@ -1,0 +1,17 @@
+{
+  "command": [
+    "sh",
+    "./build.sh",
+    "/tmp/swarm-review-retry-storage-candidate"
+  ],
+  "start": "2026-10-11T17:13:26.218241+00:00",
+  "end": "2026-10-11T17:13:28.877467+00:00",
+  "seconds": 2.6592534349983907,
+  "exit": 0,
+  "output": "/tmp/swarm-review-retry-storage-qualified-v1-build.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  }
+}

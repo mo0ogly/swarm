@@ -1,0 +1,204 @@
+GO SUITE package=swarm.local/companion/internal/engine tests=1117 shards=19 coverage=disjoint-complete compile=once
+SHARD 0 exit_code=0 elapsed=0.6s covered=1/1 passed=1
+SHARD 1 exit_code=0 elapsed=0.8s covered=1/1 passed=1
+SHARD 2 exit_code=0 elapsed=1.0s covered=1/1 passed=1
+SHARD 3 RUN TestManagedFragmentHistoricalPublicRecovery/exit elapsed=30.3s
+SHARD 3 exit_code=0 elapsed=46.3s covered=1/1 passed=1
+SHARD 4 RUN TestManagedFragmentRuntimeProviderProtocol/questions-omitted elapsed=15.9s
+SHARD 4 exit_code=0 elapsed=18.3s covered=1/1 passed=1
+SHARD 5 RUN TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/exit-second elapsed=18.4s
+SHARD 5 RUN TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/questions-open elapsed=33.6s
+SHARD 5 exit_code=0 elapsed=36.3s covered=1/1 passed=1
+SHARD 6 exit_code=0 elapsed=13.5s covered=32/32 passed=32
+SHARD 9 RUN TestReviewCoordinationCoverageDAGAndIdentity elapsed=15.2s
+SHARD 8 RUN TestRecoveredResultResumesPersistedPassWithoutNewReview/changed_context elapsed=15.5s
+SHARD 7 RUN TestManagedPreflightRetryRecoveredFalseBinary elapsed=16.9s
+SHARD 8 exit_code=0 elapsed=18.7s covered=81/81 passed=80
+{"optional_skip": "TestCorrectiveRecoveryBrowserRecipe", "observed_output": ["=== RUN   TestScore94AndPathProtection", "--- PASS: TestScore94AndPathProtection (0.02s)", "=== RUN   TestCorrectiveRecoveryBrowserRecipe", "    corrective_recovery_test.go:234: set SWARM_CORRECTIVE_UI_BINARY and SWARM_CORRECTIVE_UI_OUT", "--- SKIP: TestCorrectiveRecoveryBrowserRecipe (0.00s)"]}
+SHARD 10 RUN TestManagedBatchVerdictsRequireCompleteExactCoverage elapsed=15.9s
+SHARD 9 exit_code=0 elapsed=29.4s covered=85/85 passed=84
+{"optional_skip": "TestManagedRecoveryBrowserRecipe", "observed_output": ["=== RUN   TestManagedPreparedLaunchConcurrentResume", "--- PASS: TestManagedPreparedLaunchConcurrentResume (0.16s)", "=== RUN   TestManagedRecoveryBrowserRecipe", "    managed_recovery_ui_test.go:15: set SWARM_RECOVERY_UI_BINARY and SWARM_RECOVERY_UI_OUT", "--- SKIP: TestManagedRecoveryBrowserRecipe (0.00s)"]}
+SHARD 7 exit_code=0 elapsed=29.8s covered=64/64 passed=64
+SHARD 11 RUN TestManagedFragmentQuestionsCannotDisappear/resolved elapsed=15.2s
+SHARD 10 RUN TestManagedIndependentReviewBindsReportsContractAndCandidate elapsed=30.9s
+SHARD 13 RUN TestIntegrationRetryRejectsChangedInputs/attempt elapsed=15.1s
+SHARD 12 RUN TestManagedReviewSchemaBoundsRationaleBeforeProviderCall elapsed=15.9s
+SHARD 11 RUN TestRecoveredResultRevisionAfterLegacyFragmentRefusal/transport elapsed=31.5s
+SHARD 10 FAIL TestReplayGLMRetryEventShapes
+=== RUN   TestPlanningRejectsUnownedRequirementAndUnprovedClosure/budget
+--- PASS: TestPlanningRejectsUnownedRequirementAndUnprovedClosure/budget (0.04s)
+--- PASS: TestPlanningRejectsUnownedRequirementAndUnprovedClosure (0.11s)
+=== RUN   TestPreflightCLIAndWebShareVerdict
+--- PASS: TestPreflightCLIAndWebShareVerdict (0.04s)
+=== RUN   TestPreparedSkillRefreshPreservesCopyAndFrozenSettings
+--- PASS: TestPreparedSkillRefreshPreservesCopyAndFrozenSettings (0.70s)
+=== RUN   TestPreparationConversionRollbackStaleAndConcurrency
+--- PASS: TestPreparationConversionRollbackStaleAndConcurrency (0.07s)
+=== RUN   TestPreparationRetainsOnlyExactOperatorDecisions
+--- PASS: TestPreparationRetainsOnlyExactOperatorDecisions (0.04s)
+=== RUN   TestPreparationTimeoutRejectsInvalidPolicy
+--- PASS: TestPreparationTimeoutRejectsInvalidPolicy (0.03s)
+=== RUN   TestPricingInvalidAndConcurrentWrites
+--- PASS: TestPricingInvalidAndConcurrentWrites (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/missing
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/missing (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/outside
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/outside (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/settings
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/settings (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/binary
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/binary (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/secret
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/secret (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/oversized
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/oversized (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/aggregate
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/aggregate (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/unknown-role
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/unknown-role (0.03s)
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources (0.23s)
+=== RUN   TestProviderCooldownOldLogsCannotUndoClearOrNewObservation
+--- PASS: TestProviderCooldownOldLogsCannotUndoClearOrNewObservation (0.03s)
+=== RUN   TestRecoveredResultReplayResumesContextPreflightOnly
+--- PASS: TestRecoveredResultReplayResumesContextPreflightOnly (0.73s)
+=== RUN   TestOverrideBlockedByPersistedAgent
+--- PASS: TestOverrideBlockedByPersistedAgent (0.06s)
+=== RUN   TestReviewTimeoutConfigurationPreservesBudgetAndHistory
+--- PASS: TestReviewTimeoutConfigurationPreservesBudgetAndHistory (0.10s)
+=== RUN   TestRunLimitsActualLaunchFreezesConfiguration
+--- PASS: TestRunLimitsActualLaunchFreezesConfiguration (0.10s)
+=== RUN   TestRuntimeHealthBlocksWithoutChargeAndResumesConductor
+--- PASS: TestRuntimeHealthBlocksWithoutChargeAndResumesConductor (0.24s)
+=== RUN   TestDoctorReadsWithoutOpeningDatabase
+--- PASS: TestDoctorReadsWithoutOpeningDatabase (0.02s)
+=== RUN   TestReplayGLMRetryEventShapes
+    stream_regression_test.go:116: genuine stall not bounded
+--- FAIL: TestReplayGLMRetryEventShapes (0.00s)
+SHARD 10 FAIL 
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/settings (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/binary
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/binary (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/secret
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/secret (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/oversized
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/oversized (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/aggregate
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/aggregate (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/unknown-role
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/unknown-role (0.03s)
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources (0.23s)
+=== RUN   TestProviderCooldownOldLogsCannotUndoClearOrNewObservation
+--- PASS: TestProviderCooldownOldLogsCannotUndoClearOrNewObservation (0.03s)
+=== RUN   TestRecoveredResultReplayResumesContextPreflightOnly
+--- PASS: TestRecoveredResultReplayResumesContextPreflightOnly (0.73s)
+=== RUN   TestOverrideBlockedByPersistedAgent
+--- PASS: TestOverrideBlockedByPersistedAgent (0.06s)
+=== RUN   TestReviewTimeoutConfigurationPreservesBudgetAndHistory
+--- PASS: TestReviewTimeoutConfigurationPreservesBudgetAndHistory (0.10s)
+=== RUN   TestRunLimitsActualLaunchFreezesConfiguration
+--- PASS: TestRunLimitsActualLaunchFreezesConfiguration (0.10s)
+=== RUN   TestRuntimeHealthBlocksWithoutChargeAndResumesConductor
+--- PASS: TestRuntimeHealthBlocksWithoutChargeAndResumesConductor (0.24s)
+=== RUN   TestDoctorReadsWithoutOpeningDatabase
+--- PASS: TestDoctorReadsWithoutOpeningDatabase (0.02s)
+=== RUN   TestReplayGLMRetryEventShapes
+    stream_regression_test.go:116: genuine stall not bounded
+--- FAIL: TestReplayGLMRetryEventShapes (0.00s)
+=== RUN   TestSupervisionR3UnknownVitalityHasNoInventedProgress
+--- PASS: TestSupervisionR3UnknownVitalityHasNoInventedProgress (0.00s)
+=== RUN   TestTaskActionsRunningSansAgent
+--- PASS: TestTaskActionsRunningSansAgent (0.04s)
+=== RUN   TestTaskRestartDoesNotRequirePriorResultHandoff
+--- PASS: TestTaskRestartDoesNotRequirePriorResultHandoff (0.12s)
+=== RUN   TestValidationPolicyCLIUsesSamePreviewToken
+--- PASS: TestValidationPolicyCLIUsesSamePreviewToken (0.06s)
+=== RUN   TestVersionCLIIsStableAndDoesNotOpenStorage
+--- PASS: TestVersionCLIIsStableAndDoesNotOpenStorage (0.04s)
+=== RUN   TestPreparationWebCLIParityAndSecurity
+--- PASS: TestPreparationWebCLIParityAndSecurity (0.04s)
+=== RUN   TestPreparationFallbackAndStaticCache
+--- PASS: TestPreparationFallbackAndStaticCache (0.05s)
+=== RUN   TestWebTrainingAssetsAndAuthentication
+--- PASS: TestWebTrainingAssetsAndAuthentication (0.14s)
+=== RUN   TestRecoveryFocusPreservesTaskAndAttributedReviewWithoutFreshness
+--- PASS: TestRecoveryFocusPreservesTaskAndAttributedReviewWithoutFreshness (0.04s)
+=== RUN   TestWorkspaceReservationsAllowDisjointWritersAndCleanupKeepsFiles
+--- PASS: TestWorkspaceReservationsAllowDisjointWritersAndCleanupKeepsFiles (0.13s)
+FAIL
+SHARD 10 exit_code=1 elapsed=38.6s covered=86/86 passed=85
+SHARD 10 missing=[] incomplete=['TestReplayGLMRetryEventShapes'] required_skips=[]
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/settings (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/binary
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/binary (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/secret
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/secret (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/oversized
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/oversized (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/aggregate
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/aggregate (0.03s)
+=== RUN   TestProjectProfileRefusesUnsafeOrOversizedSources/unknown-role
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources/unknown-role (0.03s)
+--- PASS: TestProjectProfileRefusesUnsafeOrOversizedSources (0.23s)
+=== RUN   TestProviderCooldownOldLogsCannotUndoClearOrNewObservation
+--- PASS: TestProviderCooldownOldLogsCannotUndoClearOrNewObservation (0.03s)
+=== RUN   TestRecoveredResultReplayResumesContextPreflightOnly
+--- PASS: TestRecoveredResultReplayResumesContextPreflightOnly (0.73s)
+=== RUN   TestOverrideBlockedByPersistedAgent
+--- PASS: TestOverrideBlockedByPersistedAgent (0.06s)
+=== RUN   TestReviewTimeoutConfigurationPreservesBudgetAndHistory
+--- PASS: TestReviewTimeoutConfigurationPreservesBudgetAndHistory (0.10s)
+=== RUN   TestRunLimitsActualLaunchFreezesConfiguration
+--- PASS: TestRunLimitsActualLaunchFreezesConfiguration (0.10s)
+=== RUN   TestRuntimeHealthBlocksWithoutChargeAndResumesConductor
+--- PASS: TestRuntimeHealthBlocksWithoutChargeAndResumesConductor (0.24s)
+=== RUN   TestDoctorReadsWithoutOpeningDatabase
+--- PASS: TestDoctorReadsWithoutOpeningDatabase (0.02s)
+=== RUN   TestReplayGLMRetryEventShapes
+    stream_regression_test.go:116: genuine stall not bounded
+--- FAIL: TestReplayGLMRetryEventShapes (0.00s)
+=== RUN   TestSupervisionR3UnknownVitalityHasNoInventedProgress
+--- PASS: TestSupervisionR3UnknownVitalityHasNoInventedProgress (0.00s)
+=== RUN   TestTaskActionsRunningSansAgent
+--- PASS: TestTaskActionsRunningSansAgent (0.04s)
+=== RUN   TestTaskRestartDoesNotRequirePriorResultHandoff
+--- PASS: TestTaskRestartDoesNotRequirePriorResultHandoff (0.12s)
+=== RUN   TestValidationPolicyCLIUsesSamePreviewToken
+--- PASS: TestValidationPolicyCLIUsesSamePreviewToken (0.06s)
+=== RUN   TestVersionCLIIsStableAndDoesNotOpenStorage
+--- PASS: TestVersionCLIIsStableAndDoesNotOpenStorage (0.04s)
+=== RUN   TestPreparationWebCLIParityAndSecurity
+--- PASS: TestPreparationWebCLIParityAndSecurity (0.04s)
+=== RUN   TestPreparationFallbackAndStaticCache
+--- PASS: TestPreparationFallbackAndStaticCache (0.05s)
+=== RUN   TestWebTrainingAssetsAndAuthentication
+--- PASS: TestWebTrainingAssetsAndAuthentication (0.14s)
+=== RUN   TestRecoveryFocusPreservesTaskAndAttributedReviewWithoutFreshness
+--- PASS: TestRecoveryFocusPreservesTaskAndAttributedReviewWithoutFreshness (0.04s)
+=== RUN   TestWorkspaceReservationsAllowDisjointWritersAndCleanupKeepsFiles
+--- PASS: TestWorkspaceReservationsAllowDisjointWritersAndCleanupKeepsFiles (0.13s)
+FAIL
+SHARD 12 exit_code=0 elapsed=24.5s covered=90/90 passed=89
+{"optional_skip": "TestRecoveryHealthBrowserRecipe", "observed_output": ["=== RUN   TestRuntimeHealthEndpointSurvivesDatabaseFailure", "--- PASS: TestRuntimeHealthEndpointSurvivesDatabaseFailure (0.04s)", "=== RUN   TestRecoveryHealthBrowserRecipe", "    runtime_health_ui_test.go:14: set SWARM_HEALTH_UI_BINARY and SWARM_HEALTH_UI_OUT", "--- SKIP: TestRecoveryHealthBrowserRecipe (0.00s)"]}
+SHARD 11 exit_code=0 elapsed=39.4s covered=89/89 passed=88
+{"optional_skip": "TestMissingReportRecoveryBrowserRecipe", "observed_output": ["=== RUN   TestRetexTaskExportAndVerifiedGuide", "--- PASS: TestRetexTaskExportAndVerifiedGuide (0.09s)", "=== RUN   TestMissingReportRecoveryBrowserRecipe", "    missing_report_recovery_test.go:73: browser recipe opt-in", "--- SKIP: TestMissingReportRecoveryBrowserRecipe (0.00s)"]}
+SHARD 13 RUN TestMissionHelpGroundsLastAttemptAndRelay elapsed=30.6s
+SHARD 13 exit_code=0 elapsed=36.2s covered=91/91 passed=91
+SHARD 14 RUN TestManagedBatchRuntimeExplicitRetryReusesPaidPass/tampered-pass elapsed=17.0s
+SHARD 15 RUN TestCoordinatedReviewExecutesAndPersists/decision-fail elapsed=17.5s
+SHARD 16 RUN TestManagedFragmentSaveRejectsStaleJournalAnchor elapsed=15.3s
+SHARD 17 RUN TestFragmentDiagnosticNeverAcceptsOrRepeatsCall elapsed=15.1s
+SHARD 14 RUN TestDialogueSearchScopeVersionsAndBounds elapsed=32.2s
+SHARD 15 RUN TestManagedFragmentHistoricalCapacityPreservesKnownInputs elapsed=32.6s
+SHARD 14 exit_code=0 elapsed=38.1s covered=113/113 passed=111
+{"optional_skip": "TestOperatorPreview", "observed_output": ["=== RUN   TestA9EnvironmentBlockExplainsRequiredNewCondition", "--- PASS: TestA9EnvironmentBlockExplainsRequiredNewCondition (0.00s)", "=== RUN   TestOperatorPreview", "    activity_description_test.go:70: optional visual artifact", "--- SKIP: TestOperatorPreview (0.00s)"]}
+{"optional_skip": "TestHistoricalRequalificationBrowser", "observed_output": ["=== RUN   TestGraphDraftB02BilingualHelp", "--- PASS: TestGraphDraftB02BilingualHelp (2.01s)", "=== RUN   TestHistoricalRequalificationBrowser", "    historical_requalification_ui_test.go:13: explicit browser recipe", "--- SKIP: TestHistoricalRequalificationBrowser (0.00s)"]}
+SHARD 16 RUN TestExhaustedMissionExposesDecisionInsteadOfGenericRetry elapsed=33.1s
+SHARD 16 exit_code=0 elapsed=35.1s covered=95/95 passed=95
+SHARD 17 exit_code=0 elapsed=29.0s covered=95/95 passed=94
+{"optional_skip": "TestEngineContractTruthBrowser", "observed_output": ["--- PASS: TestEngineContractOwnershipParentCannotCloseIncompleteDescendants/cli/child-a (0.06s)", "--- PASS: TestEngineContractOwnershipParentCannotCloseIncompleteDescendants (0.21s)", "=== RUN   TestEngineContractTruthBrowser", "    engine_contract_truth_test.go:116: mandatory via engine_acceptance.cjs --case truth", "--- SKIP: TestEngineContractTruthBrowser (0.00s)"]}
+SHARD 15 exit_code=0 elapsed=44.1s covered=94/94 passed=94
+SHARD 18 RUN TestManagedBatchRuntimeInterruptedPersistence/reply-not-durable elapsed=15.4s
+SHARD 18 RUN TestReviewerLaunchContractRejectsLegacyOmission elapsed=30.5s
+SHARD 18 exit_code=0 elapsed=31.3s covered=96/96 passed=95
+{"optional_skip": "TestLiveProviderStreamReplay", "observed_output": ["=== RUN   TestOversizedEventDegradesTimingWithoutFalseFailure", "--- PASS: TestOversizedEventDegradesTimingWithoutFalseFailure (0.00s)", "=== RUN   TestLiveProviderStreamReplay", "    stream_regression_test.go:143: optional local provider stream", "--- SKIP: TestLiveProviderStreamReplay (0.00s)"]}

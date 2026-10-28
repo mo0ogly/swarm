@@ -1,0 +1,5 @@
+{
+  "root": "/tmp/swarm-model83-s3iptakc",
+  "schema_version": 1,
+  "state": ".swarm/state.db"
+}

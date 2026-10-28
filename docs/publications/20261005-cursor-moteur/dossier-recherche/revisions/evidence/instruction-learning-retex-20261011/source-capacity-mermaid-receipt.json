@@ -1,0 +1,44 @@
+[
+  {
+    "source": "docs/ATTEMPT-RECOVERY.md",
+    "command": [
+      "/home/fpizzi/.npm-global/bin/mmdc",
+      "-i",
+      "/tmp/swarm-source-capacity-fr.mmd",
+      "-o",
+      "/tmp/swarm-source-capacity-fr.png",
+      "-p",
+      "/tmp/swarm-mermaid-puppeteer.json",
+      "-w",
+      "1250",
+      "-b",
+      "white"
+    ],
+    "at": "2026-10-11T14:38:18.507060+00:00",
+    "exit": 0,
+    "sha256": "fba3017f7d55b77912724bbfbdd6d3e9ab3474b2ce410b3d7b45d0a527f5739e",
+    "render": "/tmp/swarm-source-capacity-fr.png",
+    "log": "/tmp/swarm-source-capacity-fr.out"
+  },
+  {
+    "source": "docs/en/ATTEMPT-RECOVERY.md",
+    "command": [
+      "/home/fpizzi/.npm-global/bin/mmdc",
+      "-i",
+      "/tmp/swarm-source-capacity-en.mmd",
+      "-o",
+      "/tmp/swarm-source-capacity-en.png",
+      "-p",
+      "/tmp/swarm-mermaid-puppeteer.json",
+      "-w",
+      "1250",
+      "-b",
+      "white"
+    ],
+    "at": "2026-10-11T14:38:22.394295+00:00",
+    "exit": 0,
+    "sha256": "fad1f3149cda92b692deface720125827642f3c825125b1b18c4736f868e3fa0",
+    "render": "/tmp/swarm-source-capacity-en.png",
+    "log": "/tmp/swarm-source-capacity-en.out"
+  }
+]

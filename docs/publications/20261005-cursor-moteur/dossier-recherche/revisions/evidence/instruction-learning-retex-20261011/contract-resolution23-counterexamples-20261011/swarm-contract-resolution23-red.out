@@ -1,0 +1,27 @@
+=== RUN   TestManagedFragmentResolutionAcceptsVisibleTaskContract
+=== RUN   TestManagedFragmentResolutionAcceptsVisibleTaskContract/Matrice_JAN-1..JAN-7_et_FEB-1..FEB-4_avec_faits,_hypothèses_et_preuves_distincts.
+    managed_review_fragment_contract_evidence_test.go:89: visible original task contract was rejected: state="" err=résolution sans preuve originale visible
+=== RUN   TestManagedFragmentResolutionAcceptsVisibleTaskContract/Evidence_must_cover_a_fresh_candidate_and_its_current_scope.
+    managed_review_fragment_contract_evidence_test.go:89: visible original task contract was rejected: state="" err=résolution sans preuve originale visible
+=== RUN   TestManagedFragmentResolutionAcceptsVisibleTaskContract/Préserver_les_"droits"_<actuels>_&_les_preuves_avec_leur_attribution.
+    managed_review_fragment_contract_evidence_test.go:89: visible original task contract was rejected: state="" err=résolution sans preuve originale visible
+--- FAIL: TestManagedFragmentResolutionAcceptsVisibleTaskContract (0.00s)
+    --- FAIL: TestManagedFragmentResolutionAcceptsVisibleTaskContract/Matrice_JAN-1..JAN-7_et_FEB-1..FEB-4_avec_faits,_hypothèses_et_preuves_distincts. (0.00s)
+    --- FAIL: TestManagedFragmentResolutionAcceptsVisibleTaskContract/Evidence_must_cover_a_fresh_candidate_and_its_current_scope. (0.00s)
+    --- FAIL: TestManagedFragmentResolutionAcceptsVisibleTaskContract/Préserver_les_"droits"_<actuels>_&_les_preuves_avec_leur_attribution. (0.00s)
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Producer_opinion_must_not_resolve_a_question
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Prior_review_opinion_must_not_resolve_a_question
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/"criteria":["An_obsolete_criterion_from_another_candidate."]
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Invented_evidence_absent_from_every_original
+--- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts (0.00s)
+    --- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Producer_opinion_must_not_resolve_a_question (0.00s)
+    --- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Prior_review_opinion_must_not_resolve_a_question (0.00s)
+    --- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/"criteria":["An_obsolete_criterion_from_another_candidate."] (0.00s)
+    --- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Invented_evidence_absent_from_every_original (0.00s)
+=== RUN   TestManagedFragmentTaskContractCannotProveImplementationPass
+    managed_review_fragment_contract_evidence_test.go:125: resolution should accept the contract, but business pass must refuse it: résolution sans preuve originale visible
+--- FAIL: TestManagedFragmentTaskContractCannotProveImplementationPass (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.028s
+FAIL

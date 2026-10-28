@@ -1,0 +1,16 @@
+test_failed_build_preserves_running_artifact_and_last_number (__main__.LocalVersion.test_failed_build_preserves_running_artifact_and_last_number) ... Version locale inchangée : v0.1.1-dev.1
+ok
+test_go_stream_is_parsed_without_assumed_package_paths (__main__.LocalVersion.test_go_stream_is_parsed_without_assumed_package_paths) ... ok
+test_malformed_local_notes_are_rejected_before_building (__main__.LocalVersion.test_malformed_local_notes_are_rejected_before_building) ... Version locale inchangée : v0.1.1-dev.1
+Version locale inchangée : v0.1.1-dev.1
+Version locale inchangée : v0.1.1-dev.1
+Version locale inchangée : v0.1.1-dev.1
+Version locale inchangée : v0.1.1-dev.1
+ok
+test_number_advances_only_for_changed_inputs (__main__.LocalVersion.test_number_advances_only_for_changed_inputs) ... ok
+test_real_root_embed_and_effective_overlay_bytes_change_identity (__main__.LocalVersion.test_real_root_embed_and_effective_overlay_bytes_change_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.013s
+
+OK

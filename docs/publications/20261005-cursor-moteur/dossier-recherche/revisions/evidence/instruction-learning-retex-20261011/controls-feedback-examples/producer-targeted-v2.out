@@ -1,0 +1,56 @@
+=== RUN   TestManagedRecoveryHandoffSuppliesRejectedWorkWithoutPublishingIt
+--- PASS: TestManagedRecoveryHandoffSuppliesRejectedWorkWithoutPublishingIt (0.40s)
+=== RUN   TestManagedRecoveryHandoffCorrectedResultNeedsNewChecksAndReview
+--- PASS: TestManagedRecoveryHandoffCorrectedResultNeedsNewChecksAndReview (0.81s)
+=== RUN   TestManagedRecoveryHandoffResumeAndTampering
+=== RUN   TestManagedRecoveryHandoffResumeAndTampering/none
+=== RUN   TestManagedRecoveryHandoffResumeAndTampering/packet
+=== RUN   TestManagedRecoveryHandoffResumeAndTampering/packet-link
+=== RUN   TestManagedRecoveryHandoffResumeAndTampering/local-ref
+=== RUN   TestManagedRecoveryHandoffResumeAndTampering/source-ref
+=== RUN   TestManagedRecoveryHandoffResumeAndTampering/receipt
+--- PASS: TestManagedRecoveryHandoffResumeAndTampering (2.50s)
+    --- PASS: TestManagedRecoveryHandoffResumeAndTampering/none (0.41s)
+    --- PASS: TestManagedRecoveryHandoffResumeAndTampering/packet (0.41s)
+    --- PASS: TestManagedRecoveryHandoffResumeAndTampering/packet-link (0.42s)
+    --- PASS: TestManagedRecoveryHandoffResumeAndTampering/local-ref (0.44s)
+    --- PASS: TestManagedRecoveryHandoffResumeAndTampering/source-ref (0.42s)
+    --- PASS: TestManagedRecoveryHandoffResumeAndTampering/receipt (0.40s)
+=== RUN   TestManagedRecoveryHandoffMissingResultIsExplicit
+--- PASS: TestManagedRecoveryHandoffMissingResultIsExplicit (0.11s)
+=== RUN   TestManagedCheckpointRecovery
+--- PASS: TestManagedCheckpointRecovery (0.09s)
+=== RUN   TestPlanningJudgeEndRejectsMatchingCandidateWithoutProofs
+--- PASS: TestPlanningJudgeEndRejectsMatchingCandidateWithoutProofs (0.02s)
+=== RUN   TestPlanningJudgeVerdictDistinctFromCandidateReview
+--- PASS: TestPlanningJudgeVerdictDistinctFromCandidateReview (0.02s)
+=== RUN   TestPlanningJudgeEndRequiresFreshMatchingCandidate
+--- PASS: TestPlanningJudgeEndRequiresFreshMatchingCandidate (0.67s)
+=== RUN   TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess
+=== RUN   TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess/review
+=== RUN   TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess/control
+=== RUN   TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess/active
+--- PASS: TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess (2.06s)
+    --- PASS: TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess/review (0.68s)
+    --- PASS: TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess/control (0.67s)
+    --- PASS: TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess/active (0.72s)
+=== RUN   TestPlanningJudgeRenewalPreservesContextAndHistory
+--- PASS: TestPlanningJudgeRenewalPreservesContextAndHistory (0.04s)
+=== RUN   TestPlanningJudgeReplayStaleAndDoubleVerdictRefused
+--- PASS: TestPlanningJudgeReplayStaleAndDoubleVerdictRefused (0.05s)
+=== RUN   TestPlanningJudgePausedAndQuotaRefuseEffects
+--- PASS: TestPlanningJudgePausedAndQuotaRefuseEffects (0.04s)
+=== RUN   TestPlanningParentSeesDelegationAndUnverifiedDescendant
+--- PASS: TestPlanningParentSeesDelegationAndUnverifiedDescendant (0.02s)
+=== RUN   TestPlanningParentValidationFollowsProofFreshness
+--- PASS: TestPlanningParentValidationFollowsProofFreshness (0.05s)
+=== RUN   TestPlanningReportRelayIsAtomicScopedAndIdempotent
+--- PASS: TestPlanningReportRelayIsAtomicScopedAndIdempotent (0.10s)
+=== RUN   TestPreparedOrganizationManagedRepository
+=== RUN   TestPreparedOrganizationManagedRepository/automatic
+=== RUN   TestPreparedOrganizationManagedRepository/human
+--- PASS: TestPreparedOrganizationManagedRepository (0.24s)
+    --- PASS: TestPreparedOrganizationManagedRepository/automatic (0.18s)
+    --- PASS: TestPreparedOrganizationManagedRepository/human (0.05s)
+PASS
+ok  	swarm.local/companion/internal/engine	7.274s

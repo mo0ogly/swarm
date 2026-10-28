@@ -1,0 +1,7 @@
+=== RUN   TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen
+    managed_review_retry_delivery_test.go:16: sizes 164551 168167 21899 parts 1
+    managed_review_retry_delivery_test.go:42: supervisor correction did not reach resumed reviewer: state=error error=exit status 19 ; sortie fournisseur : 0 octets, 0 événements JSON, dernier type=none, événement final=false ; messages assistant=0, événements système=0, relances API signalées=0, dernier sous-type système= ; types système=null ; ceci ne vaut pas validation ; diagnostic : 
+--- FAIL: TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen (0.95s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.978s
+FAIL

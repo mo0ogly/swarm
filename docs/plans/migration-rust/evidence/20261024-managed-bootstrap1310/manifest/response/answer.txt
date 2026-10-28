@@ -1,0 +1,54 @@
+```rust
+// rust/crates/swarm-engine/src/managed_repository.rs (proposed private helper)
+// Pure prevalidation of a prepared manifest. Actual git objects are checked
+// separately by the caller. No IO here.
+
+/// Validates a prior manifest against the canonicalized request and canonical paths.
+/// Mirrors Go validatePreparedRepository minus the `rev-parse --verify oid^{commit}`
+/// loop (actual git objects are checked separately by the caller).
+fn validate_manifest(
+    prior: &ManagedRepository,
+    expected: &ManagedRepositoryRequest,
+    storage: &str,
+    source: &str,
+    subdir: &str,
+    request_digest: &str,
+) -> Result<(), AgentLaunchError> {
+    let included_matches = match (&prior.included, &expected.include) {
+        (None, empty) if empty.is_empty() => true,
+        (Some(prior_included), expected_include) => prior_included == expected_include,
+        _ => false,
+    };
+    if prior.request_digest != request_digest
+        || prior.storage != storage
+        || prior.source != source
+        || prior.project_subdir != subdir
+        || !included_matches
+    {
+        return Err(AgentLaunchError::new(
+            "manifeste du dépôt incompatible avec la sélection et ses chemins canoniques ; réconcilier avant reprise",
+        ));
+    }
+    let snapshot = hex::decode(&prior.snapshot_digest)
+        .map_err(|_| AgentLaunchError::new("empreinte SHA-256 du dépôt préparé absente ou invalide"))?;
+    if snapshot.len() != 32 {
+        return Err(AgentLaunchError::new(
+            "empreinte SHA-256 du dépôt préparé absente ou invalide",
+        ));
+    }
+    for oid in [&prior.base_commit, &prior.candidate_commit] {
+        if oid.is_empty() {
+            return Err(AgentLaunchError::new(
+                "identité Git du dépôt préparé absente",
+            ));
+        }
+    }
+    Ok(())
+}
+```
+
+Notes / missing evidence (stated, not assumed):
+- **Digest syntax**: Go computes `hash(json.Marshal(r))` — context indicates SHA-256 (`independent_review.go`), but I cannot verify the Rust `request_digest` computation or a canonical-JSON helper (`encode_model` in work.rs serializes through `swarm_wire_json`, whose canonical byte form I cannot confirm equals Go's `json.Marshal`). The caller must supply `request_digest` computed the exact same way; this helper only compares strings.
+- **`ManagedRepositoryRequest`**: only `include`, `committed_only` referenced via the implementation contract; the struct definition was not supplied. The include equality assumes `Vec<String>` with exact element order (Go `slices.Equal` semantics).
+- **`AgentLaunchError`**: exact constructors (`new`, typed cause + finish for independent close errors) were described in the contract but not shown; adapt construction to the actual API.
+- **Base/candidate OIDs**: canonical 40-hex form and object existence are NOT validated here — actual git `rev-parse --verify oid^{commit}` checks are done separately by the caller, per the contract.

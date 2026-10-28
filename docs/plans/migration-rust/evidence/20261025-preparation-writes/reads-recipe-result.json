@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "recipe": "preparation-reads-rust",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "preparation-public-read-and-admin",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-reads-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_reads.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_REPLAY_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 35.31440940400353,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "f5a79104500926af3ed7bbde5cd90900b4aa1f6a706d3515ea5c1e06fee64e5c",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "0f64a33daecd1526905bb1cb5472ecd8dea902262510ecf91d7e4d64906c64ef",
+    "declared-inputs.tar.gz": "c80d4b06b1be6cb7e11b3d5c5d05bb2c99d4561ad83727d8e9f54f0cbb8e21a0",
+    "environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "step-0001.stdout": "cb39441a7e793707d705dee0befdfd96cae17df987367d93798387855eb83bbd",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "f814970e64f82a2ae13318b75366bed8debc77cfe0522310eee169bc53bbe980",
+    "inputs.after.json": "0f64a33daecd1526905bb1cb5472ecd8dea902262510ecf91d7e4d64906c64ef"
+  }
+}

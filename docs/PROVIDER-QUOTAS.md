@@ -65,9 +65,31 @@ et un motif décrivant cette vérification :
 swarm --root /chemin/du/projet --json providers cooldown clear claude --input verification.json
 ```
 
-Cette commande enregistre le motif et l’opérateur local. Elle refuse de lever un
-délai connu encore futur, ne lance aucun agent, ne valide aucun résultat et ne
-prouve pas que le quota est rétabli. Un état modifié depuis `show` doit être relu.
+Cette commande enregistre le motif et l’opérateur local. Par défaut, elle refuse
+de lever un délai connu encore futur. Elle ne lance aucun agent, ne valide aucun
+résultat et ne prouve pas que le quota est rétabli. Un état modifié depuis `show`
+doit être relu.
+
+## Après un changement de compte confirmé
+
+L’attente correspond au compte qui a refusé l’appel. Lorsque l’utilisateur confirme
+avoir changé de compte et demande la reprise, l’opérateur peut ajouter
+`"confirm_account_change": true` à la même demande publique, avec le digest courant
+et un motif attribué à cette confirmation. Cette précondition permet de lever
+l’attente future de l’ancien compte ; elle n’est jamais inférée d’un login actif,
+d’une phrase d’agent ou d’un test réussi.
+
+Le moteur archive le refus original complet, conserve son échéance, son origine
+et sa date, et enregistre `clear_account_change`, le motif et l’opérateur. Aucun
+compteur, appel consommé, tentative ou budget n’est remis à zéro. Lever l’attente
+et reprendre la revue sont deux opérations distinctes : une reprise explicite
+vérifie toujours le candidat, les preuves et les appels disponibles. Le premier
+nouvel appel réel établit la disponibilité ; un nouveau refus 429 bloque à nouveau.
+Un rejeu du même événement avec une confirmation différente est refusé.
+
+Les anciens contrôleurs qui ne comprennent pas cette provenance doivent être
+remplacés avant son usage ; une lecture incompatible échoue plutôt que d’ignorer
+la protection. Aucun identifiant de compte ni secret n’est stocké dans la preuve.
 
 ## Périmètre actuel
 

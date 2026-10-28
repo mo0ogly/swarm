@@ -1,0 +1,11 @@
+=== RUN   TestManagedFragmentSelectedSourceKeepsOriginalTextBytes
+=== RUN   TestManagedFragmentSelectedSourceKeepsOriginalTextBytes/unselected
+=== RUN   TestManagedFragmentSelectedSourceKeepsOriginalTextBytes/selected
+    managed_review_fragment_contract_evidence_test.go:164: literal selected source text rejected: "" tâche bounded-task : critère 1 : citation exacte introuvable dans les preuves fournies ; reprendre après correction du format de citation ; extrait refusé : Two lines with "quotes", <tags> and & Unicode é.
+        Preserve the	whitespace exactly.
+--- FAIL: TestManagedFragmentSelectedSourceKeepsOriginalTextBytes (0.00s)
+    --- PASS: TestManagedFragmentSelectedSourceKeepsOriginalTextBytes/unselected (0.00s)
+    --- FAIL: TestManagedFragmentSelectedSourceKeepsOriginalTextBytes/selected (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.026s
+FAIL

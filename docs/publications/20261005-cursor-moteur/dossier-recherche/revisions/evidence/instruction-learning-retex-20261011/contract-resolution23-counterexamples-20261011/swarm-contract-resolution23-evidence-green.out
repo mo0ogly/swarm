@@ -1,0 +1,60 @@
+=== RUN   TestManagedFragmentResolutionAcceptsVisibleTaskContract
+=== RUN   TestManagedFragmentResolutionAcceptsVisibleTaskContract/Matrice_JAN-1..JAN-7_et_FEB-1..FEB-4_avec_faits,_hypothèses_et_preuves_distincts.
+=== RUN   TestManagedFragmentResolutionAcceptsVisibleTaskContract/Evidence_must_cover_a_fresh_candidate_and_its_current_scope.
+=== RUN   TestManagedFragmentResolutionAcceptsVisibleTaskContract/Préserver_les_"droits"_<actuels>_&_les_preuves_avec_leur_attribution.
+--- PASS: TestManagedFragmentResolutionAcceptsVisibleTaskContract (0.00s)
+    --- PASS: TestManagedFragmentResolutionAcceptsVisibleTaskContract/Matrice_JAN-1..JAN-7_et_FEB-1..FEB-4_avec_faits,_hypothèses_et_preuves_distincts. (0.00s)
+    --- PASS: TestManagedFragmentResolutionAcceptsVisibleTaskContract/Evidence_must_cover_a_fresh_candidate_and_its_current_scope. (0.00s)
+    --- PASS: TestManagedFragmentResolutionAcceptsVisibleTaskContract/Préserver_les_"droits"_<actuels>_&_les_preuves_avec_leur_attribution. (0.00s)
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Producer_opinion_must_not_resolve_a_question
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Prior_review_opinion_must_not_resolve_a_question
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/"criteria":["An_obsolete_criterion_from_another_candidate."]
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Invented_evidence_absent_from_every_original
+--- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts (0.00s)
+    --- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Producer_opinion_must_not_resolve_a_question (0.00s)
+    --- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Prior_review_opinion_must_not_resolve_a_question (0.00s)
+    --- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/"criteria":["An_obsolete_criterion_from_another_candidate."] (0.00s)
+    --- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Invented_evidence_absent_from_every_original (0.00s)
+=== RUN   TestManagedFragmentTaskContractCannotProveImplementationPass
+--- PASS: TestManagedFragmentTaskContractCannotProveImplementationPass (0.00s)
+=== RUN   TestManagedFragmentSelectedSourceKeepsOriginalTextBytes
+=== RUN   TestManagedFragmentSelectedSourceKeepsOriginalTextBytes/unselected
+=== RUN   TestManagedFragmentSelectedSourceKeepsOriginalTextBytes/selected
+    managed_review_fragment_contract_evidence_test.go:169: selected source paraphrase/flattened whitespace admitted
+--- FAIL: TestManagedFragmentSelectedSourceKeepsOriginalTextBytes (0.00s)
+    --- PASS: TestManagedFragmentSelectedSourceKeepsOriginalTextBytes/unselected (0.00s)
+    --- FAIL: TestManagedFragmentSelectedSourceKeepsOriginalTextBytes/selected (0.00s)
+=== RUN   TestManagedFragmentQuestionsCannotDisappear
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/resolved
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/missing
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/duplicate
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/invented
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/unknown
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/bare
+--- PASS: TestManagedFragmentQuestionsCannotDisappear (0.39s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/resolved (0.02s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/missing (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/duplicate (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/invented (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/unknown (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/bare (0.01s)
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/resolved
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/missing
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/unknown
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/old-excerpt
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/report
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/path-only
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/invented
+--- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact (0.52s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/resolved (0.05s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/missing (0.04s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/unknown (0.04s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/old-excerpt (0.02s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/report (0.02s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/path-only (0.02s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/invented (0.02s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.947s
+FAIL

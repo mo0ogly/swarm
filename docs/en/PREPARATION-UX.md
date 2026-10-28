@@ -230,3 +230,19 @@ provider content. A rejected proposal changes no document and triggers no automa
 retry. Correct the cause before sending again; history and usage remain recorded.
 Old generic errors cannot be diagnosed retrospectively when the original answer
 was not retained.
+
+## Preparation dialogue deadline
+
+Administration → Preparation dialogue exposes the default timeout and maximum,
+in seconds. Both values are editable, previewed before saving, persisted with
+revision, actor and reason, and listed in history. Restore an older setting by
+applying its values as a new revision. CLI: `swarm run-limits preparation
+show|history|preview|apply`; the CLI and authenticated API use the same validation.
+
+Initial values live in `config/preparation-timeout.json`; no 120, 300 or 600-second
+policy ceiling remains in the Go runtime. Positive values must satisfy timeout ≤
+maximum and fit a Go duration. The policy applies to new preparation exchanges;
+each exchange freezes both values. Existing calls retain their original deadline.
+Manual cancellation and absence of automatic retry remain in force. Worker and
+review deadlines are separate settings. Restart with the corrected binary to use
+these controls.

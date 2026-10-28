@@ -1,0 +1,165 @@
+// Package enrollmentauthority validates the versioned human-authority payload
+// above enrollmentstate. It returns data, never a private engine capability.
+// Authentication, independently current heads and final-use freshness remain
+// separate obligations of the protected service and engine adapter.
+package enrollmentauthority
+
+import (
+	"bytes"
+	"crypto/ed25519"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"math"
+	"time"
+
+	"swarm.local/companion/internal/enrollmentproof"
+	"swarm.local/companion/internal/enrollmentstate"
+	"swarm.local/companion/internal/identitycontract"
+)
+
+var (
+	ErrDocument = errors.New("enrollment authority: invalid canonical document")
+	ErrBinding  = errors.New("enrollment authority: expected context does not match")
+	ErrInactive = errors.New("enrollment authority: outside explicit validity window")
+)
+
+// Document is immutable enrollment data, not current status. The journal derives
+// revocation and EnrolledSequence from its authenticated history.
+type Document struct {
+	Schema        int                           `json:"schema_version"`
+	EnrollmentID  string                        `json:"enrollment_id"`
+	Generation    int64                         `json:"generation"`
+	ProjectDigest string                        `json:"project_context_digest"`
+	Principal     identitycontract.Principal    `json:"principal"`
+	Scope         identitycontract.Scope        `json:"scope"`
+	TrustRevision int                           `json:"trust_configuration_revision"`
+	Permissions   []identitycontract.Permission `json:"permissions"`
+	Delegable     []identitycontract.Permission `json:"delegable"`
+	NotBefore     time.Time                     `json:"not_before"`
+	ExpiresAt     time.Time                     `json:"expires_at"`
+}
+
+// Expected must be resolved by trusted control: never copied from the payload
+// being checked. RequestDigest binds the full resolved issuance request; this
+// package does not define or reconstruct that engine request (EP-02 remains open).
+type Expected struct {
+	Head          enrollmentstate.Head
+	EnrollmentID  string
+	Generation    int64
+	ProjectDigest string
+	Principal     identitycontract.Principal
+	Scope         identitycontract.Scope
+	TrustRevision int
+	RequestDigest string
+}
+
+func (d Document) valid() bool {
+	if d.Schema != 1 || !identitycontract.Text(d.EnrollmentID) || d.Generation <= 0 || !identitycontract.Digest(d.ProjectDigest) ||
+		!d.Principal.Valid() || d.Principal.Kind != "human" || !d.Scope.Valid() || d.TrustRevision <= 0 || len(d.Permissions) == 0 ||
+		d.NotBefore.IsZero() || !d.NotBefore.Before(d.ExpiresAt) {
+		return false
+	}
+	rights := map[identitycontract.Permission]bool{}
+	for _, p := range d.Permissions {
+		if !p.Valid() || rights[p] {
+			return false
+		}
+		rights[p] = true
+	}
+	delegable := map[identitycontract.Permission]bool{}
+	for _, p := range d.Delegable {
+		if !p.Valid() || delegable[p] || !rights[p] {
+			return false
+		}
+		delegable[p] = true
+	}
+	return true
+}
+
+// Encode validates first and canonicalizes dates to UTC and empty ceilings to [].
+// No issuer/subject normalization, duration default or business cap is applied.
+func Encode(d Document) ([]byte, error) {
+	if !d.valid() {
+		return nil, ErrDocument
+	}
+	d.NotBefore, d.ExpiresAt = d.NotBefore.UTC(), d.ExpiresAt.UTC()
+	if d.Delegable == nil {
+		d.Delegable = []identitycontract.Permission{}
+	}
+	raw, err := json.Marshal(d)
+	if err != nil {
+		return nil, ErrDocument
+	}
+	return raw, nil
+}
+
+// Decode requires the exact encoding produced by Encode. Canonical comparison
+// rejects unknown/duplicate/folded keys, nulls, omitted fields and trailing data
+// at every nested level rather than normalizing hostile input into authority.
+func Decode(raw []byte) (Document, error) {
+	var d Document
+	if err := json.Unmarshal(raw, &d); err != nil {
+		return Document{}, ErrDocument
+	}
+	canonical, err := Encode(d)
+	if err != nil || !bytes.Equal(raw, canonical) {
+		return Document{}, ErrDocument
+	}
+	return d, nil
+}
+
+// SignEnrollment validates the body before signing the journal proposal.
+// Generation equals the actual next event sequence; Apply still has to accept
+// the exact expected base. This function grants no right to call the signer.
+func SignEnrollment(key ed25519.PrivateKey, project [sha256.Size]byte, base enrollmentstate.Head, d Document) ([]byte, error) {
+	body, err := Encode(d)
+	if err != nil {
+		return nil, err
+	}
+	if base.Sequence < 0 || base.Sequence == math.MaxInt64 || d.Generation != base.Sequence+1 || d.ProjectDigest != hex.EncodeToString(project[:]) {
+		return nil, ErrBinding
+	}
+	return enrollmentstate.SignChange(key, project, base, "enroll", d.EnrollmentID, body)
+}
+
+// DecodeActive checks authenticated bytes against independent expected context
+// and an explicit observation time. It does not reread the source: a historical
+// Statement with an old expected Head can still pass. Final-use integration must
+// serialize the protected current source with the decision consuming authority.
+func DecodeActive(statement enrollmentproof.Statement, expected Expected, at time.Time) (Document, error) {
+	if expected.Head.Sequence <= 0 || !identitycontract.Digest(expected.Head.Digest) || !identitycontract.Text(expected.EnrollmentID) ||
+		expected.Generation <= 0 || expected.Generation > expected.Head.Sequence || !identitycontract.Digest(expected.ProjectDigest) ||
+		!identitycontract.Digest(expected.RequestDigest) || !expected.Principal.Valid() || expected.Principal.Kind != "human" || !expected.Scope.Valid() || expected.TrustRevision <= 0 {
+		return Document{}, ErrBinding
+	}
+	r := statement.Request()
+	if r.ProjectDigest != expected.ProjectDigest || r.RequestDigest != expected.RequestDigest {
+		return Document{}, ErrBinding
+	}
+	raw := statement.Payload()
+	var active enrollmentstate.ActiveReply
+	if err := json.Unmarshal(raw, &active); err != nil {
+		return Document{}, ErrDocument
+	}
+	canonical, err := json.Marshal(active)
+	if err != nil || !bytes.Equal(raw, canonical) {
+		return Document{}, ErrDocument
+	}
+	if active.Head != expected.Head || active.Record.ID != expected.EnrollmentID || active.Record.EnrolledSequence != expected.Generation {
+		return Document{}, ErrBinding
+	}
+	d, err := Decode(active.Record.Body)
+	if err != nil {
+		return Document{}, err
+	}
+	if d.EnrollmentID != active.Record.ID || d.Generation != active.Record.EnrolledSequence || d.ProjectDigest != expected.ProjectDigest ||
+		d.Principal != expected.Principal || d.Scope != expected.Scope || d.TrustRevision != expected.TrustRevision {
+		return Document{}, ErrBinding
+	}
+	if at.IsZero() || at.Before(d.NotBefore) || !at.Before(d.ExpiresAt) {
+		return Document{}, ErrInactive
+	}
+	return d, nil
+}

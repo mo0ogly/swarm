@@ -1,0 +1,159 @@
+{
+  "result": "PASS_DOCUMENTATION_AND_REUSED_COMPONENT_EVIDENCE",
+  "at": "2026-10-17T06:16:44.529306+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "local_links_checked": 76,
+  "missing_links": [],
+  "whitespace_findings": [],
+  "go_evidence": {
+    "reused_not_rerun": true,
+    "named_runs": 114,
+    "named_pass": 114,
+    "failures": 0,
+    "input_files": 1042,
+    "changed_inputs": [],
+    "manifest": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/inputs-final.json"
+  },
+  "channel_evidence": {
+    "distinct_checks": 13,
+    "documentation_replay_pass": 13,
+    "repeated_checks_are_not_additional_scenarios": true,
+    "source_hash_matches_frozen_recipes": true,
+    "sha256": "9253af47218b7fe8edddd4ca954b49f4856904c7a054a222e6193efc16c1f065"
+  },
+  "diagrams": {
+    "contract_fr_en_source_unchanged_since_successful_render": true,
+    "channel_rendered": true,
+    "channel_visually_inspected": true,
+    "original_failure_retained": "diagram.json"
+  },
+  "git_diff_check": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "gofmt": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "model_calls": 0,
+  "deployed": false,
+  "launchers_integrated": false,
+  "protected_authority_producer": false,
+  "independent_review": false,
+  "still_open": [
+    "F01-F07 and global IDA qualification",
+    "Protected authority/broker and Trust/SQLite commitment",
+    "Launch, human approval and memory integration",
+    "Scientific comparison and evidence of novelty",
+    "IA5 and final RETEX"
+  ],
+  "previous_indexes": "checks-combined.json and IA2.2/checks-final.json are historical checkpoints; this index records current documentation without changing original test results",
+  "files": [
+    {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "sha256": "a94a1439f0cd3060621b06afbac841ffe0d2c6322104dc308ab9e298582d02da"
+    },
+    {
+      "path": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "sha256": "0c11b1215eda7be31ed03d8af0a1f4ae982ed952e11d444a8f6926429d86ffca"
+    },
+    {
+      "path": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "sha256": "5224d5a5f644b5782ea5f3ea791a0cdbe04e8b503c249b0f45f7e0c7dbe9e709"
+    },
+    {
+      "path": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "sha256": "4ebc90aa1850b4f93dba8c002e1f555726bb38f1fcd39c5ce78903a16a19252d"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "sha256": "7295bd3da42848924b3f87b6c7e0195bf821155666e53ad9e4f20316442672b7"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+      "sha256": "945859853318397e7d9a430939941cb2af2b9866084030617117b53dc17af5f4"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md",
+      "sha256": "ba8a59982c72e1ff752c5a0f9b45348521b71601e03c5c0b1b94fde89238fe72"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md",
+      "sha256": "2f0dbc6cb2fbf7de4c39c4d4aceb8bdbb7c5aa4245193743b5abf83b55396948"
+    },
+    {
+      "path": "internal/engine/agent_identity_authority.go",
+      "sha256": "cd335869ae1b6a80959e64432f0759fde44d94bc5846c48417d1ce8dcc32a150"
+    },
+    {
+      "path": "internal/engine/agent_identity_authority_test.go",
+      "sha256": "cddd3ac48c73a36c70f2b82fffaed7a293c6438356e2957e3b89ccb8edc30808"
+    },
+    {
+      "path": "internal/engine/agent_identity_contract.go",
+      "sha256": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55"
+    },
+    {
+      "path": "internal/engine/agent_identity_contract_test.go",
+      "sha256": "942cb255b11065db4b47b5cd1a50820d663566256cf68baff9d292a1b1c2e4e9"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2_runtime_binding.py",
+      "sha256": "9253af47218b7fe8edddd4ca954b49f4856904c7a054a222e6193efc16c1f065"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/channel.mmd",
+      "sha256": "7be07cdfac4f6227131870e2bc13124b5a0f490484ecd7122d2e13c45ffb5871"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/channel.svg",
+      "sha256": "dee91e1ddb5d3fba5a2ff12631d5be096bb0bbf29f3b4c7a0b934499d35c28ae"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/channel.png",
+      "sha256": "8ba6552fd6d0f6036a94732e5004bdbc7775242ac393b13660a35d7387b7fbba"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/diagram-final.json",
+      "sha256": "d85f82de0bfd877c13d6b4bd42dc8290455f91dc6496250dd2a185dbec765413"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/documentation-replay-run.json",
+      "sha256": "4933891ef444804dda77405280dac349c3f80e9e990e596817c806b0d87bff36"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/documentation-replay/results.json",
+      "sha256": "3a60ffb297348e2f7664efb595b035751fd547f3970a1a96e895b47029b5799c"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/with-setns-run.json",
+      "sha256": "5f1998309d188dc4f221d41c386e118b8a1d8501b1e2d825e89c740bd5b5ea7a"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/with-setns/results.json",
+      "sha256": "3a60ffb297348e2f7664efb595b035751fd547f3970a1a96e895b47029b5799c"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/tests-final-run.json",
+      "sha256": "84987125df477c78a80d8bd6602f848bece12f29bf7a47af6c7b508195a50c52"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/inputs-final.json",
+      "sha256": "51f164f841266a07ab9a9fa09ebed6e95d5909745581bcb8c1fbb201400c55af"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/static-build-final.json",
+      "sha256": "6766d85580b3d780ac79519c50fa5d8d14af2f3f5daab07bce28db6fe0e4b585"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/research-note-before-20261017.md.txt",
+      "sha256": "db3147544e57c1f54837efb6a6f1a75d47567aca187881cfc5b37e1ebafff495"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/research-programme-before-20261017.md.txt",
+      "sha256": "85f70bece9ef25ae9fa863aa39c9cea8eeeba4be7f62a1c20ccd38b734982446"
+    }
+  ]
+}

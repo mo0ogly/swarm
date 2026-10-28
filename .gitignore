@@ -18,6 +18,9 @@ node_modules/
 /deploy/.install-env.*
 /deploy/local-web.json
 /deploy/local-web.tmp
+/deploy/local-build.json
+/deploy/local-build.tmp
+/deploy/.local-build.lock
 
 # Local qualification output is retained outside published source.
 *.test
@@ -40,3 +43,143 @@ node_modules/
 **/[Ii]nstallation_[Ss]kynet*.pdf
 **/*[Ss][Kk][Yy][Nn][Ee][Tt]*.docx
 **/*[Ss][Kk][Yy][Nn][Ee][Tt]*.pdf
+
+# Full Git recovery archives stay local; sources and bounded evidence are saved.
+/docs/plans/engine-cursor-contract/recovery/*.bundle
+/docs/plans/engine-cursor-contract/recovery/T3-native-base-cumulative-20261012.patch
+/docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/T3-native-source-recovery-20261012/T3-native-base-cumulative-20261012.patch
+
+# Legacy Go sources/modules: keep local migration references out of new additions.
+# Already tracked files remain tracked until an explicit index removal.
+*.go
+go.mod
+go.sum
+go.work
+go.work.sum
+
+# Local Go-source reference artifacts (including recovery history).
+# Originals/hashes are retained locally; do not publish by accidental re-add.
+# Go-free evidence remains eligible; check go_publication_inventory.py before publication.
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/owned-changes.patch
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/owned-changes.patch
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/before-error-context-fix.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/before-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/final-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/source.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-authority-20261017/agent_identity_contract.go.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-authority-20261017/final-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-authority-20261017/journal.go.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-authority-20261017/model.go.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-reply-20261017/authority.go.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-reply-20261017/authority_test.go.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-reply-20261017/final-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-reply-20261017/journal.go.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-reply-20261017/request_test.go.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-request-20261017/caller.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-request-20261017/final-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/before-regression-fixes.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/final-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/identity-owned.patch
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/existing-code-phase.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/before-closure-fix.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/before-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/candidate-01.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/final-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/source.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-service-20261017/before-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-service-20261017/candidate-01.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-service-20261017/final-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-service-20261017/source.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/owned-changes.patch
+/docs/plans/actions-confiance/verification-launch-20261014/canonical-pilot-integration-20261015/integration.patch
+/docs/plans/deepagents-integration/evidence/m10-20261016/m10-changes.patch
+/docs/plans/deepagents-integration/evidence/m11-20261016/m11-changes.patch
+/docs/plans/deepagents-integration/evidence/m12-20261016/m12-changes.patch
+/docs/plans/deepagents-integration/evidence/m13-20261016/m13-changes.patch
+/docs/plans/deepagents-integration/evidence/m14-20261016/candidate.diff
+/docs/plans/deepagents-integration/evidence/m15-20261016/candidate.diff
+/docs/plans/deepagents-integration/evidence/m16-20261016/candidate.diff
+/docs/plans/deepagents-integration/evidence/m16-20261016/review-candidate.diff
+/docs/plans/deepagents-integration/evidence/m18-20261016/candidate.diff
+/docs/plans/deepagents-integration/evidence/m19-20261016/candidate.diff
+/docs/plans/deepagents-integration/evidence/m24-20261017/identity-view.zip
+/docs/plans/deepagents-integration/evidence/m24-20261017/owned.diff
+/docs/plans/deepagents-integration/evidence/m25-20261017/owned.diff
+/docs/plans/deepagents-integration/evidence/m26-20261017/owned.diff
+/docs/plans/deepagents-integration/evidence/m27-20261017/owned.diff
+/docs/plans/deepagents-integration/evidence/m28-20261017/owned.diff
+/docs/plans/deepagents-integration/evidence/m3-20261015/preexisting.patch
+/docs/plans/deepagents-integration/evidence/m7-20261016/original-pack-preserved.zip
+/docs/plans/deepagents-integration/evidence/m9-20261016/agents_process.go.patch
+/docs/plans/deepagents-integration/evidence/m9-20261016/agents_store.go.patch
+/docs/plans/engine-cursor-contract/evidence/t7-20261013/delivery.bundle
+/docs/plans/engine-cursor-contract/recovery/T3-effective-provider-recovery-20261012.patch
+/docs/plans/engine-cursor-contract/recovery/T3-exploration-concurrent-recovery-20261012.patch
+/docs/plans/engine-cursor-contract/recovery/admin-duration-launch-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/agent-engine-protocol-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/agent-engine-protocol-resumption-20261011-git.patch
+/docs/plans/engine-cursor-contract/recovery/agent-engine-protocol-resumption-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/binary-preflight-inspection-20261012.patch
+/docs/plans/engine-cursor-contract/recovery/claude-effort-recovery-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/control-command-deadline-20261012.patch
+/docs/plans/engine-cursor-contract/recovery/control-diagnostic-public-20261012.patch
+/docs/plans/engine-cursor-contract/recovery/control-infrastructure-recovery-20261012.patch
+/docs/plans/engine-cursor-contract/recovery/defect-citation-contract-recovery-20261012.patch
+/docs/plans/engine-cursor-contract/recovery/inspection-state-contract-recovery-20261012.patch
+/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-continuity-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-routing-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/instruction-operator-composition-20261011-packaging-invalid.patch
+/docs/plans/engine-cursor-contract/recovery/instruction-operator-composition-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/log-console-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/paused-settlement-recovery-20261012.patch
+/docs/plans/engine-cursor-contract/recovery/plan-phases-20261010.patch
+/docs/plans/engine-cursor-contract/recovery/planning-exact-envelope-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/planning-input-capacity-cumulative-20261012.patch
+/docs/plans/engine-cursor-contract/recovery/planning-owner-rejection-diagnostic-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/planning-rejection-artifact-preservation-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/provider-account-change-recovery-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/provider-wait-20261010.patch
+/docs/plans/engine-cursor-contract/recovery/recovery-repaired-handoff-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/recovery-source-preflight-20261010.patch
+/docs/plans/engine-cursor-contract/recovery/review-capacity-first-20261012.patch
+/docs/plans/engine-cursor-contract/recovery/review-current-event-feedback-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/review-evidence-20261010.patch
+/docs/plans/engine-cursor-contract/recovery/review-evidence-capacity-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/review-fragment-global-decision-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/review-local-negative-recovery-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/review-missing-result-diagnostic-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/review-retry-delivery-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/review-retry-storage-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/review-status-owner-context-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/run-supervision-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/selection-capacity-recovery-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/source-capacity-recovery-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/storage-future-version-fixture-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/typed-original-evidence-recovery-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/unpaid-preflight-revision-20261011.patch
+/docs/plans/engine-cursor-contract/recovery/unresolved-review-recovery-20261011.patch
+/docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/T3-effective-provider-replan-20261012/T3-effective-provider-recovery-20261012.patch
+/docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/T3-qualified-installed-20261012/T3-exploration-concurrent-recovery-20261012.patch
+/docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/T3-qualified-installed-20261012/swarm-T2-native-fourth-go-delta.patch
+/docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/contract-resolution23-qualified-20261011/recovery/typed-original-evidence-recovery-20261011.patch
+/docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/inspection-state24-qualified-20261012/inspection-state-contract-recovery-20261012.patch
+/docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/paused-settlement26-qualified-20261012/paused-settlement-recovery-20261012.patch
+/docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/quote-citation25-qualified-20261012/defect-citation-contract-recovery-20261012.patch
+
+# Local migration proof bundles can retain legacy Go source for parity replay.
+# Keep them on disk; they are not part of the Rust GitHub source distribution.
+/docs/plans/migration-rust/evidence/**/*.tar.gz
+/docs/plans/migration-rust/evidence/**/*.tgz
+/docs/plans/migration-rust/evidence/**/*.tar
+/docs/plans/migration-rust/evidence/**/*.tar.xz
+/docs/plans/migration-rust/evidence/**/*.tar.bz2
+/docs/plans/migration-rust/evidence/**/*.zip
+
+# Local build caches/input fixtures are excluded from Git capture/publication.
+# Maintained recipe sources remain under rust/, tests/, tools/ and docs/.
+/.cache/
+/rust/target/
+
+# Personal internal GLM agent skill (local only)
+/.claude/skills/skynet-agents

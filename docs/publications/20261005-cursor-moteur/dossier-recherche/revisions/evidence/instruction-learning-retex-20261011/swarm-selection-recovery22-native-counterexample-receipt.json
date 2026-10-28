@@ -1,0 +1,18 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "TestOperatorInventory21OriginalCounterexample|TestOperatorSelection22NativePrecondition",
+    "-count=1",
+    "-timeout=50s",
+    "-v"
+  ],
+  "end_observed": "2026-10-11T19:39:17.436465+00:00",
+  "exit": 0,
+  "package_seconds": 1.157,
+  "source_sha256": "0f94a5ddec54f99215ab4d558f4137f2846dfbd57c8e1b2f5a82547adea40e34",
+  "output_sha256": "56819f24937d3147ebb0046899b194d1c0856d6964a64e4f649d1f1b46700180",
+  "scope": "Exact copied originals and read-only current native proof files via Store root only, no DB opened/copied/edited, no provider invoked. Historical reviewer method unchanged despite new planner/worker prevention rules. Supervisor choice and native runtime effect pending."
+}

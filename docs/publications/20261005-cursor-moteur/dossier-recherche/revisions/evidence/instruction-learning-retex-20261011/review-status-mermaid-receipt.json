@@ -1,0 +1,18 @@
+[
+  {
+    "source": "docs/architecture/REVIEW-EVIDENCE.md",
+    "diagram": "/tmp/swarm-review-status-fr.mmd",
+    "render": "/tmp/swarm-review-status-fr.png",
+    "exit": 0,
+    "sha256": "d9e13910185a5552f5022d38b5cf7963ef25f2cbb67f0290a0a5d36f140c1e0e",
+    "log": "/tmp/swarm-review-status-fr.out"
+  },
+  {
+    "source": "docs/en/REVIEW-EVIDENCE.md",
+    "diagram": "/tmp/swarm-review-status-en.mmd",
+    "render": "/tmp/swarm-review-status-en.png",
+    "exit": 0,
+    "sha256": "da0558ee2ec3db97ad85fef234b34001c5d54b31955615a666ae633acbb0d688",
+    "log": "/tmp/swarm-review-status-en.out"
+  }
+]

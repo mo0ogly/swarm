@@ -1,0 +1,13 @@
+flowchart TD
+    I[Incident et original attribues] --> G{Schema, droits, fraicheur}
+    G -->|Refus| D[Diagnostic exploitable conserve]
+    D --> S[Sous-superviseur du perimetre]
+    S -->|Transversal| R[Superviseur racine]
+    S --> C[Decision de correction]
+    R --> C
+    C --> M[Moteur applique la decision autorisee]
+    M --> P[Preuve de reception et effet observe]
+    P -->|Echec| I
+    P -->|Corrige| N[Reprendre le besoin initial]
+    N --> A[Recette et revue requises]
+    A --> T[RETEX propose a utilisateur]

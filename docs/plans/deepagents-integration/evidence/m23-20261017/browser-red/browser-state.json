@@ -1,0 +1,81 @@
+{
+  "state": {
+    "message": "Décision enregistrée. Les anciens contextes sont conservés.",
+    "forms": [
+      {
+        "id": "memory-query",
+        "value": "",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "memory-task",
+        "value": "",
+        "valid": false,
+        "validation": "Please select an item in the list."
+      },
+      {
+        "id": "memory-selection-reason",
+        "value": "",
+        "valid": false,
+        "validation": "Please fill out this field."
+      },
+      {
+        "id": "memory-id",
+        "value": "lesson-e9f05f72-3d4d-418b-8da1-1558f5b37cdd",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "memory-source",
+        "value": "memory-source",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "memory-kind",
+        "value": "procedure",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "memory-body",
+        "value": "Vérifier le parcours affecté",
+        "valid": true,
+        "validation": ""
+      },
+      {
+        "id": "memory-conditions",
+        "value": "",
+        "valid": false,
+        "validation": "Please fill out this field."
+      },
+      {
+        "id": "memory-reason",
+        "value": "",
+        "valid": false,
+        "validation": "Please fill out this field."
+      }
+    ]
+  },
+  "checks": [
+    "Imported history does not certify current files; fixture evidence restored and checked through the public CLI evaluator",
+    "Empty catalogue and authenticated loading",
+    "Admission preview, Escape/focus, application and text-only rendering"
+  ],
+  "errors": [],
+  "failed": [],
+  "responses": [],
+  "navigationCancelled": [
+    {
+      "url": "http://127.0.0.1:36991/api/v1/snapshot?work=w-c1fd9bb8846558e9adf95778",
+      "error": "net::ERR_ABORTED",
+      "origin": "http://127.0.0.1:36991/"
+    },
+    {
+      "url": "http://127.0.0.1:36991/api/v1/runtime-health",
+      "error": "net::ERR_ABORTED",
+      "origin": "http://127.0.0.1:36991/"
+    }
+  ]
+}

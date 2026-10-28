@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-12T21:24:25.378284+00:00",
+  "status": "SHARED_API_TOTAL_DURATION_VERIFIED_ON_LOCAL_FIXTURES_NOT_NATIVE_ACCEPTANCE",
+  "base_head": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+  "source_sha256": {
+    "internal/engine/ai_connections.go": "ad53aea85b2b45f43c5e0585e1760bc01774c3e326847c88fed5866b9817da35",
+    "internal/engine/agents_store.go": "790939c7d988adfb74164d2ca0c3339204feef26dfd7e6fd1cbc27e132fd024d",
+    "internal/engine/assist_store.go": "c8c520b1d7bbdabda0990794332ac867b688e96b790f89ba708061d94a2950a9",
+    "internal/engine/assist_run.go": "600fd3244f2ba9b4eea782375c85dc77e9899a0e94dbb5c160b0f4709771683f",
+    "internal/engine/ai_connection_policy_test.go": "9537d44b0f9a7f1deccd8cabcfff0a6376e9eb1e068965f7660d696e140825bc",
+    "web/ai-connections.js": "623d9cf675c4e612da024da2414b71fa4b4c402170379c2df736080b84492a9b",
+    "web/assistant.js": "61ef14fde20d12396b46d20970ccd0979220703d40494905bde814b0bf19b890",
+    "web/provider-wait-admin.js": "fe82dd53e6859bee899ff8a1eab8468b04be5ea5ff6e499d786170cce317a663",
+    "web/swarm-design.css": "d55669ed658866d62b19069a7255ce72b5af9304c65d18894fe6592b0b94c12e",
+    "locales/en.json": "078e44451a60a5bf60d40a96ddac05bb8c16617e07a7879f63defb8abd83fb38",
+    "web/i18n-en.js": "2a556d386214e9829f8ed779eb6d65f2daaa57c42de77c267e2b0a0170acbfe7",
+    "tests/api_wait_admin_ui.cjs": "293359b67270290d3e7031d7c7e6ab478e4c1d71d5fedac36fa060794c642c6f",
+    "docs/engine-cursor-source-manifest.json": "2d2aa1a467979fbadd661877f6532a0efd95b2d91819a5821157b40a4871b71e"
+  },
+  "fixture_binary": {
+    "path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-direct-api-policy",
+    "sha256": "49da664684b8259c1452048db63f9ddd1895ecd75cd6ac191b70b12bdd66311e"
+  },
+  "native_binary_sha256": "ae2e5f9d63c421859a57a2d3f7e4de3ff9cb098f5a25dbe1cd6e90640a611d37",
+  "native_binary_replaced": false,
+  "checks": {
+    "race_passed_cases": [
+      "TestAIConnectionNetworkErrors",
+      "TestAIConnectionDebugWire",
+      "TestAIConnectionTransportDoesNotInventDeadline",
+      "TestAIConnectionPublicTestReceivesPersistedTotalPolicy",
+      "TestPageAssistanceInheritsTotalPolicyWithoutSecondCeiling",
+      "TestPageAssistanceWaitingPolicyFreshnessAndInvalidValues",
+      "TestPageAssistanceZeroDeadlineCompletesAndCancellationStillWorks/complete",
+      "TestPageAssistanceZeroDeadlineCompletesAndCancellationStillWorks/cancel",
+      "TestPageAssistanceZeroDeadlineCompletesAndCancellationStillWorks",
+      "TestAIConnectionsLifecycle",
+      "TestAIConnectionWire",
+      "TestConductorExactPreviewAndIdempotencyIsolation",
+      "TestConductorDeadlineSurvivesClosedStdout",
+      "TestConductorDeadSupervisorDoesNotLeaveInfiniteWait",
+      "TestProviderWaitExplicitTotalAndRevocation/explicit_maximum",
+      "TestProviderWaitExplicitTotalAndRevocation/manual_stop_without_timers",
+      "TestProviderWaitExplicitTotalAndRevocation"
+    ],
+    "browser_cases": [
+      "fr/etat: Admin preview/save, frozen page preview, real local HTTP expiry and no-limit result, diagnostics, no retry, reload, no agent",
+      "fr/sombre: Admin preview/save, frozen page preview, real local HTTP expiry and no-limit result, diagnostics, no retry, reload, no agent",
+      "en/etat: Admin preview/save, frozen page preview, real local HTTP expiry and no-limit result, diagnostics, no retry, reload, no agent",
+      "en/sombre: Admin preview/save, frozen page preview, real local HTTP expiry and no-limit result, diagnostics, no retry, reload, no agent"
+    ],
+    "local_http_calls": 8,
+    "expected_http_cancellations": 4,
+    "real_model_calls": 0,
+    "vet": "PASS",
+    "methods_check": "PASS",
+    "i18n": "PASS",
+    "diff_check": "PASS"
+  },
+  "proof_sha256": {
+    "direct-ai-policy-red.jsonl": "ea25af8f6123c7c7dfd1a2e26930baf2308d597f192a0e413e915bbfd8c059ec",
+    "direct-ai-policy-contracts.jsonl": "14d975b016bdd4bfa24180089ebeb5a93ce60ae5d5f938594db17005819c3db4",
+    "direct-ai-policy-final-race.jsonl": "2e602a197b8c9d617b5d0fba9742276ef65b3a4d476c0a2a065549748bc81aa4",
+    "direct-ai-policy-vet.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "direct-ai-policy-i18n-test.out": "94c4242e4cb9df422cf05c573c69050b25542e37bc027d0739c019c65d35380f",
+    "direct-save-method-check.out": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+    "direct-ai-policy-source-manifest.out": "ac8a62b3ce621c3b7f652580b21c3f0b9fa4ce3c68e4a7fad1fe0dd871b06f5b",
+    "api-policy-ui-result.json": "6f819b3640309088ea79e3fc976bffc7782d31a25a3bfc2055d126b61edaddd9",
+    "api-policy-menu-overlap-original-failure.json": "977b0ab5cbe6b4cdd6053b6f7b64bc855f31b588fbe4d4652fc819af3b0d8bee",
+    "api-policy-menu-overlap-original.png": "a9c906e119a767f2bf903baa40f44628504d0fdbe3627061669e7774731193a6",
+    "api-policy-en-result.png": "f5ca800048932fa6515f56ac88054b9df249e55ab3dc4655a49798c09c01f433",
+    "api-policy-fr-preview.png": "1466b623b9946aa0ff3334f5d2cad8d30e121d0d6aacce75b78f68a2963efe9a"
+  },
+  "limits": [
+    "Red output preserved; red sources were not separately archived/hashed",
+    "Race backend checks precede the final CSS-only menu placement correction; final browser recipe and binary include it",
+    "Global zero-hardcoding is not established; editor-loading policy and machine-specific tooling remain to address",
+    "Real provider/independent T7 review and native relocation remain unproven",
+    "UX-GRAPH-01 was added to the plan; its implementation and final quick wins/RETEX remain outstanding"
+  ]
+}

@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant A as Worker A
+    participant B as Worker B
+    participant M as Engine inbox
+    participant S as Child owning A
+    participant R as Root owning B
+    A->>M: Attempt A elapsed-time observation
+    B->>M: Attempt B tool-wait observation
+    M->>S: A scope event and counters
+    M->>R: B scope event and counters
+    par Decision on A
+        S->>M: continue-run with A event and current lease
+        M-->>A: Preserve process without added budget
+    and Decision on B
+        R->>M: stop-run with B event and current lease
+        M->>B: Request stop
+        B-->>M: Actual process exit
+    end
+    M-->>R: B result awaits diagnosis or inspection

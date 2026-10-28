@@ -1,0 +1,23 @@
+{
+  "state": "finished",
+  "started": "2026-10-12T10:51:16.367263+00:00",
+  "finished": "2026-10-12T11:02:34.539266+00:00",
+  "argv": [
+    "go",
+    "test",
+    "-json",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-effective-provider-3el54ztk",
+  "candidate_digest": "1dba385b5ee3b3b8d29e2588f3d35d9ce624f4659a8dbf179147141d335e85fe",
+  "manifest_sha256": "5c19a0eb9e709d2e591bdc78f5953d68244e1c3cb1e56b53f3ff24cfda93fc6b",
+  "frozen_paths": 2127,
+  "wall_seconds": 678.1743992630072,
+  "exit": 0,
+  "output": "/tmp/swarm-T3-effective-provider-linked-full.out",
+  "output_sha256": "f725a1117665408cbcd90f190a27325f083bcc647d30b185c2b5a5e0485539fe",
+  "drift": [],
+  "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+}

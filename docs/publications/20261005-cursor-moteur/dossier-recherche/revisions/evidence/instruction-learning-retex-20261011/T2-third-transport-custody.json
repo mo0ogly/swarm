@@ -1,0 +1,42 @@
+{
+  "at": "2026-10-11T14:27:55.495257+00:00",
+  "revision": 307,
+  "original_result": "ffb528573fe3d3e12e4fa39cb833d7c19a6eb719",
+  "own": "/tmp/swarm-T2-third-transport-recovery-20261011-bm63bvna",
+  "native": "/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3",
+  "native_head": "736460f60459595c61df1d953dec77ac132db9e5",
+  "paths": [
+    {
+      "path": "docs/plan-ca937edf4e-T2.delivery.json",
+      "before_sha256": "60d7ff21756f3d9f623cfb76a120ec57b714b2be54c031a04d7959b88b381d8b",
+      "after_sha256": "a5ef60c3e7b85d8219a4d1ff7c480e7be0d17bef1a3ea08a2f8c007e2a0cea63"
+    },
+    {
+      "path": "docs/plan-ca937edf4e-T2.review-context.json",
+      "before_sha256": "7d18d547966ad8608580ac2df80b11bbee9d29224f9fe2f4885c60f955e37688",
+      "after_sha256": "5636e68046a811b0a1fdbab7b5b379c6b810a60fabcf4935a2083b375c5b01ba"
+    },
+    {
+      "path": "docs/plan-ca937edf4e-T2.md",
+      "before_sha256": "513d45a590503aac6ed45ef97f6028cfb39dc43a102a3b0dd37e86470e30c52e",
+      "after_sha256": "5cdab60a72f915ee59bebc572ac4497b52bfe6a36921a5c52704cf1453b9cac4"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json",
+      "before_sha256": "69e7ad880d6551d4f08e77c1981896b148951c279855cb9c19445b5f2c114113",
+      "after_sha256": "4f355ad577ad2148cc9816d31585a62c67ba1f958306a75ccc4ac30799f57bfe"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.native-original.json",
+      "before_sha256": null,
+      "after_sha256": "69e7ad880d6551d4f08e77c1981896b148951c279855cb9c19445b5f2c114113"
+    }
+  ],
+  "source_count": 17,
+  "source_bytes": 130040,
+  "tree": "ad247d51e040a737335e3672d6a9687750256cd0",
+  "own_tree": "ad247d51e040a737335e3672d6a9687750256cd0",
+  "patch_sha256": "26d827742cde43fed136f03e70fbcd76d4954319f229b56545045f5d3478acfc",
+  "code_changed": false,
+  "provider_calls_at_repair": 23
+}

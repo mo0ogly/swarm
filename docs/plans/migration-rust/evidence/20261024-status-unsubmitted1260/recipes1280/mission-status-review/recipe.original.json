@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "mission-status-review",
+  "inputs": [
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_mission_status_contract.py",
+    "tests/rust_native_review_acceptance.py",
+    "tests/rust_native_review_inputs.py",
+    "tests/rust_native_review_preview.py",
+    "tests/rust_native_reviewer.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_status_review.py",
+    "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_evidence.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_results.rs",
+    "tools/verification/recipes/mission-status-review.json",
+    "rust/crates/swarm-engine/src/root_store/mission_status_review.rs",
+    "rust/crates/swarm-engine/src/mission_status_tasks.rs",
+    "rust/crates/swarm-engine/src/mission_status_tasks/tests.rs",
+    "rust/crates/swarm-engine/src/root_store.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "review-acceptance-status",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='status-review-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_status_review.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS delegated final review, explicit acceptance and freshness recovery",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

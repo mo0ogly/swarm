@@ -1,0 +1,16 @@
+[
+  "internal/engine/store.go",
+  "internal/engine/memory_work.go",
+  "docs/PROJECT-MEMORY.md",
+  "docs/en/PROJECT-MEMORY.md",
+  "docs/plans/deepagents-integration/PLAN.md",
+  "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+  "REFERENCE.md",
+  "docs/en/REFERENCE.md",
+  "internal/engine/work_row.go",
+  "internal/engine/work_row_test.go",
+  "docs/architecture/WORK-ROW-CONTRACT.md",
+  "docs/en/WORK-ROW-CONTRACT.md",
+  "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-24.md",
+  "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-24.md"
+]

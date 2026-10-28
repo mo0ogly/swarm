@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "w-828dde98ae06ebe97f58dfb1",
+  "revision": 3,
+  "title": "Requested model fixture",
+  "objective": "Observe route",
+  "scope": "Owned local program",
+  "criteria": [
+    "Observed, not accepted"
+  ],
+  "next": "",
+  "summary": "",
+  "memory": null,
+  "created": "2026-10-24T11:26:55.99534589Z",
+  "updated": "2026-10-24T11:26:56.163137234Z",
+  "git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "tasks": [
+    {
+      "plan_checks": {
+        "plan-criterion-1": "validation",
+        "plan-delivery": "delivery",
+        "plan-entry": "entry",
+        "plan-validation": "validation"
+      },
+      "id": "task",
+      "title": "Run",
+      "owner": "",
+      "deliverable": "Evidence",
+      "criteria": [
+        "Observed, not accepted"
+      ],
+      "depends": null,
+      "status": "todo",
+      "blocker": "",
+      "next": "",
+      "attempts": []
+    }
+  ]
+}

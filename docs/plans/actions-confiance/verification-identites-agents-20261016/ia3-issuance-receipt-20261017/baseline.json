@@ -1,0 +1,11 @@
+{
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "at": "2026-10-17T08:55:22.456576+00:00",
+  "source": {
+    "internal/engine/agent_identity_issuer_linux.go": "7761ac4fe4323a9b32bde176d4b1d6e02ce2a58294a8ea8697d2ed0ae85253d3",
+    "internal/engine/agent_identity_registry_types.go": "20f04785449e42af3e1715c955cb9d7fd1de782c372c669b93030c694d2a153e",
+    "internal/engine/agent_identity_registry_publish.go": "a81f304ec3c42044c6536a2311cee58954151feeecd370024aa7a4a4aea18a65",
+    "internal/engine/agent_identity_registry_store.go": "28b3ea847f75b80945b6167c389397401b1ee7d203dc76d215776f5db27a5bfd"
+  },
+  "runtime_deployed": false
+}

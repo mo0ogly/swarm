@@ -1,0 +1,5 @@
+--- FAIL: TestControlDiagnosticPublicHTTPPreservesOriginalAndHasNoWrite (0.65s)
+    managed_control_diagnostic_api_test.go:49: original diagnostic unavailable: 404 404 page not found
+FAIL
+FAIL	swarm.local/companion/internal/engine	3.590s
+FAIL

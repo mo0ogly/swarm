@@ -1,0 +1,18 @@
+{
+  "pid": 2601560,
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-citation",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm",
+    "mission",
+    "watch",
+    "w-68b50cc82ec3fe55624f9549"
+  ],
+  "proc_start_ticks": "3394597",
+  "started_at_utc": "2026-10-15T03:05:18.218746+00:00",
+  "executable": "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-citation",
+  "binary_sha256": "49f99952f99e527a194971545e047fddd957b678fdf5a76848d280003990baec",
+  "source_proof": "cross-artifact-source-proof.json",
+  "stopped_at_utc": "2026-10-15T03:38:33.777489+00:00",
+  "stop_reason": "Public pause and terminal unknown, no descendants, corrected candidate ready"
+}

@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "python3",
+    "tests/test_memory_summarization.py",
+    "-k",
+    "cli_invalid_json"
+  ],
+  "started_at_utc": "2026-10-16T19:34:53.426471+00:00",
+  "duration_seconds": 0.45,
+  "exit_code": 1,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "a2927cf59acad0e312d088847bc081a9a6fcd5d16e25efb59ce60e9551b00c85",
+  "model_calls": 0
+}

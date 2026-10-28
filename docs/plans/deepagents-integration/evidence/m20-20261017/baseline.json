@@ -1,0 +1,25 @@
+{
+  "at_utc": "2026-10-17T08:07:44.344827+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "files": {
+    "docs/plans/deepagents-integration/PLAN.md": "8ff85cff5cf6caeeb7de4d639cb658f0de77118d4fb527ff2de589fd799c1e3f",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-16.md": "a5a32b55e1bfb31a41687f6be5c52384aeae5e78fd81dc350b46a6798e1e291e",
+    "docs/plans/deepagents-integration/AUDIT-PROVENANCE-M20.md": "7688085f7edf3bde5290aed2ccba7c4c657cff90fd37679b612db695cb1b0403",
+    "docs/PROJECT-MEMORY.md": "75aa602dbb7f9ba43675cc02324f1029ffc008e8b798e69e6abb9ba929d22b3a",
+    "docs/en/PROJECT-MEMORY.md": "1888b5f6c8875d5d8f5ff8f792ab157842d37b5e8766cc82bb4f935ed17fdaef"
+  },
+  "read_only_contracts": {
+    "internal/engine/agent_identity_contract.go": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+    "internal/engine/agent_identity_authority.go": "464b7b450c6f9eea4917eaf27c6e3949a53d2bc7c3944ef05a4bb92e3324ab53",
+    "internal/engine/agent_identity_registry_store.go": "28b3ea847f75b80945b6167c389397401b1ee7d203dc76d215776f5db27a5bfd",
+    "internal/engine/agent_identity_registry_types.go": "31e18f0fe132fd499e08dcb61914135a6f396da26675301b2209accd1d540391",
+    "internal/engine/agent_identity_plan_linux.go": "d4c19975145926a24b7e60df731034f92d52474fd7a8aac7baaba8730b916381",
+    "internal/engine/agent_identity_runtime_linux.go": "74ccc6b2c91aecf0c9fe87c818eca43c23e79c14c133dae07574f0232241c2e7",
+    "internal/engine/memory_summary_source.go": "d0a5552fe9a5a93d68e9f4e8eb62d096ac7e1503d842e93bb77744aff8cdadfa",
+    "internal/engine/memory_summary_selection.go": "97a7c589e1196ad5335778bb6e438e1e58571bdde0b0c69bb56369595970fe38",
+    "internal/engine/dialogue_context.go": "510d596e9f20ee3e27c3791b3ebf1ef2c96cf2d3eb348907b5e76725f99bf079"
+  },
+  "new_file": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+  "scope": "memory contract preparation from delivered private identity types; identity chat active; no Go edits, builds, migrations, messages or process changes"
+}

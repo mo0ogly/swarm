@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "witness-plan-nonexecutable",
+  "expected_revision": 1,
+  "provider": "fixture",
+  "level": "standard",
+  "max_activations": 3,
+  "max_tasks": 10,
+  "max_decisions": 10,
+  "max_review_calls": 2
+}

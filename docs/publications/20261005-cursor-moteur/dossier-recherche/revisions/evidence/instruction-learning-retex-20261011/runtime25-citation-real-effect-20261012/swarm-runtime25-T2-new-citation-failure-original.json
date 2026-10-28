@@ -1,0 +1,80 @@
+{
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "revision": 649,
+  "review": {
+    "result_event": "review-8e5cc55c66eca0c86032c505-result-117cf964e765b5e8",
+    "failure_code": "review_fragment_protocol",
+    "fragment_journal": {
+      "inspection_task": "plan-ca937edf4e-T2",
+      "inspection_attempt": "a-2f9e1debb1548be96273f0d3",
+      "inspection_producer": "auto-a23c60f03a732c02841f",
+      "workflow_sha256": "0b5d056832b3443734c933d91b6681c63439e70d3e6f886e4215fe47988ca809",
+      "model_config_sha256": "287e072417ff801b554e1277b3f5db31086cd0c9f0a47525cb0c16058dd502a5",
+      "plan": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-09384746d4a1a8a1/review-8e5cc55c66eca0c86032c505-plan.json",
+      "plan_sha256": "92873dcaa5a6e0cf446dbde239b264ba0bd545f011ad65ff354f57ec0bbbbf34",
+      "journal": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-09384746d4a1a8a1/fragment-journal-3a0d077258031b4d23f09bd8097e887ec2b71aaa41fa38e7aec3e1801ad9a4bf.json",
+      "journal_sha256": "3a0d077258031b4d23f09bd8097e887ec2b71aaa41fa38e7aec3e1801ad9a4bf"
+    },
+    "model_route": {
+      "level": "standard",
+      "model": "sonnet",
+      "effort": "medium",
+      "billing": "external",
+      "policy_hash": "1bf3b70b3c0dc5153cf4fab9db87ff0e23668d2744a9cf3f7483e6cd2fa506f9",
+      "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+    },
+    "batch_provider_sha256": "eb426997b856a8ffad9b9101dfeda98886b0a2d7ea3f3b4ff5e7665103aebc23",
+    "workflow": {
+      "version": 1,
+      "role": "reviewer",
+      "methods": [
+        "audit-pdca",
+        "code-reviewer",
+        "product-review"
+      ],
+      "sha256": "28b293cca11cf97690380d482960742c94ed7df9cb0ce899b70fc82201bdcb50"
+    },
+    "git_report": "docs/plan-ca937edf4e-T2.md",
+    "candidate_commit": "4af006a35e56d799a26eae29dd197326bf6288f5",
+    "previous_candidate": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+    "receipt": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-09384746d4a1a8a1/receipt.json",
+    "receipt_sha256": "f5a442fc4455a4581a079aa23f011354c9c06d715ac9cbcf9f6f85c9c1fdc265",
+    "context": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-09384746d4a1a8a1/review-8e5cc55c66eca0c86032c505-context.json",
+    "context_sha256": "9447afa420c653cd39f0b28f88d760a1f382e9d2c35cadf7b5213650fa993da5",
+    "id": "review-8e5cc55c66eca0c86032c505",
+    "attempt": "a-2f9e1debb1548be96273f0d3",
+    "producer": "auto-a23c60f03a732c02841f",
+    "reviewer": "reviewer://claude",
+    "report": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-09384746d4a1a8a1/review-8e5cc55c66eca0c86032c505-report-948e0a7f068fb4715f6285e8f731219e20b268ca3c584f906614fe26524dabb5.md",
+    "sha256": "3657d29f2375af9594686862258be1bb5136360d2b76950b313935298055cdce",
+    "contract": "42322681531fbc222f795d153904f9b002b1f11c597af097c3c7660509100044",
+    "state": "error",
+    "reason": "inspection de fragment : failed artifact without actionable defect",
+    "started": "2026-10-12T07:42:44.738890172Z",
+    "finished": "2026-10-12T07:46:43.948265831Z"
+  },
+  "journal": {
+    "version": 1,
+    "plan_sha256": "92873dcaa5a6e0cf446dbde239b264ba0bd545f011ad65ff354f57ec0bbbbf34",
+    "attempt": "a-2f9e1debb1548be96273f0d3",
+    "provider_sha256": "eb426997b856a8ffad9b9101dfeda98886b0a2d7ea3f3b4ff5e7665103aebc23",
+    "entries": [
+      {
+        "prompt_sha256": "ee2509623f0452054004af2fa3b5d83a0634be7d8420239369b53d0d3426cf5d",
+        "packet": 0,
+        "packet_sha256": "6bb02e46829aefa1e8d9e694d877743ac870b2b794f2e921a9146269ef877042",
+        "call_id": "fragment-call-b6f0a3fd4b9dce2235529ea8",
+        "state": "unknown",
+        "reply": "{\"candidate_commit\":\"4af006a35e56d799a26eae29dd197326bf6288f5\",\"context_sha256\":\"9447afa420c653cd39f0b28f88d760a1f382e9d2c35cadf7b5213650fa993da5\",\"defects\":[],\"findings\":{\"0\":{\"e\":0,\"n\":[\"diff of internal/engine/planning_judge.go implementing planning.judge/planning.renew actions\",\"diff of internal/engine/planning_judge_test.go containing the seven named tests\",\"diff of internal/engine/planning.go and planning_api.go routing changes referenced in the doc\"],\"r\":\"no src diff\",\"v\":\"unknown\"},\"1\":{\"e\":0,\"n\":[\"diff of internal/engine/planning_judge.go implementing planning.judge/planning.renew actions\",\"diff of internal/engine/planning_judge_test.go containing the seven named tests (TestPlanningJudge...)\",\"diff of internal/engine/planning.go and planning_api.go routing changes referenced in the doc\"],\"r\":\"no src diff\",\"v\":\"unknown\"},\"2\":{\"e\":0,\"n\":[\"diff of internal/engine/planning_judge.go implementing planning.judge/planning.renew actions\",\"diff of internal/engine/planning_judge_test.go containing the seven named tests\",\"diff of internal/engine/planning.go and planning_api.go routing changes referenced in the doc\"],\"r\":\"no src diff\",\"v\":\"unknown\"},\"3\":{\"e\":0,\"n\":[\"diff of internal/engine/planning_judge.go implementing planning.judge/planning.renew actions\",\"diff of internal/engine/planning_judge_test.go containing the seven named tests\",\"diff of internal/engine/planning.go and planning_api.go routing changes referenced in the doc\"],\"r\":\"no src diff\",\"v\":\"unknown\"},\"4\":{\"e\":0,\"r\":\"manifest listing\",\"v\":\"inspected\"},\"5\":{\"e\":0,\"r\":\"manifest listing\",\"v\":\"inspected\"}},\"packet_sha256\":\"6bb02e46829aefa1e8d9e694d877743ac870b2b794f2e921a9146269ef877042\"}",
+        "reply_sha256": "5c83b54de22d92a1a4b00e69f7aba72202dab528aabaaec1d6ace91ee4e93bb6"
+      },
+      {
+        "prompt_sha256": "4a9ae139d32a3dd2f8c9038f24be407133a96fe6fba072715e0346950f7f8411",
+        "packet": 1,
+        "packet_sha256": "43a39931b4ab0710c1395482de63314cfef6d0422c7e3aedaa6208b1aee759ea",
+        "call_id": "fragment-call-2380670cb56252c9fb983b1f",
+        "state": "interrupted"
+      }
+    ]
+  }
+}

@@ -1,0 +1,264 @@
+{
+  "at": "2026-10-11T18:11:40.692387+00:00",
+  "cause": "/tmp tmpfs nearly saturated by retained compiler temporaries and generated operator binaries; actual Swarm guard blocked starts. Root volume has29GB free, no guard changed.",
+  "before_free_bytes": 329142272,
+  "after_free_bytes": 3414622208,
+  "no_active_go_compiler_or_test": true,
+  "removed_regenerable_compiler_temporaries": [
+    {
+      "path": "/tmp/go-build1043739734",
+      "estimated_bytes": 32768,
+      "kind": "Inactive regenerable compiler temporary directory; no source/evidence/native DB."
+    },
+    {
+      "path": "/tmp/go-build751775466",
+      "estimated_bytes": 76996608,
+      "kind": "Inactive regenerable compiler temporary directory; no source/evidence/native DB."
+    },
+    {
+      "path": "/tmp/go-build2867882181",
+      "estimated_bytes": 76996608,
+      "kind": "Inactive regenerable compiler temporary directory; no source/evidence/native DB."
+    },
+    {
+      "path": "/tmp/go-build1614619485",
+      "estimated_bytes": 76996608,
+      "kind": "Inactive regenerable compiler temporary directory; no source/evidence/native DB."
+    },
+    {
+      "path": "/tmp/go-build1422957117",
+      "estimated_bytes": 76996608,
+      "kind": "Inactive regenerable compiler temporary directory; no source/evidence/native DB."
+    },
+    {
+      "path": "/tmp/go-build3338845117",
+      "estimated_bytes": 352808960,
+      "kind": "Inactive regenerable compiler temporary directory; no source/evidence/native DB."
+    }
+  ],
+  "moved_owned_inactive_generated_binaries_exact_bytes": [
+    {
+      "original_path": "/tmp/swarm-unresolved-review-resume-qualified-bin",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-unresolved-review-resume-qualified-bin",
+      "sha256": "b74379a3b08ebf990c19cb787effe1e022ca2dc30deb147749192f65ae59f999",
+      "bytes": 78379042,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-fragment-partial-scope-qualified-bin",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-fragment-partial-scope-qualified-bin",
+      "sha256": "162b7995a5f9d22f7aa307dce3ce026e86959c3a63e34d7caa95ed04d86b5d04",
+      "bytes": 78368498,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-review-retry-storage-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-review-retry-storage-candidate",
+      "sha256": "df593d310c85b8a1ace46082ef977524d717eea27147167d767460c25b677ba4",
+      "bytes": 78263814,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-review-retry-delivery-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-review-retry-delivery-candidate",
+      "sha256": "21f67560ebeda3331741e90de50d616472e120d6348fce612a4dab6d3d9d076c",
+      "bytes": 78264790,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-T2-primary12-preview-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-T2-primary12-preview-candidate",
+      "sha256": "8530f63dc4b12a21f10efb4e038697ded6361b67cad3d6adfc69d35beea6d282",
+      "bytes": 78259916,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-before-admin-duration-launch-install",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-before-admin-duration-launch-install",
+      "sha256": "604418755b085a863c270b3c6c8db14ad7d21048023cb73df56e87371d3cb98c",
+      "bytes": 78335779,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-before-review-status-owner-context-install",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-before-review-status-owner-context-install",
+      "sha256": "5e8b55d8416632fca9ba6501cfcd9ab78a37d1a56a48fb4067dc4c2996460a79",
+      "bytes": 78222334,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-T2-complement9-runtime-preview-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-T2-complement9-runtime-preview-candidate",
+      "sha256": "4bbaff4388c5dc5c9d0a82cef4e2f2472156b08c6caa402d72a69c5999dc13c0",
+      "bytes": 78348099,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-review-status-owner-context-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-review-status-owner-context-candidate",
+      "sha256": "604418755b085a863c270b3c6c8db14ad7d21048023cb73df56e87371d3cb98c",
+      "bytes": 78335779,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-T2-runtime-integration-preview-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-T2-runtime-integration-preview-candidate",
+      "sha256": "9e645131ba24597be9c78af4c0968e3097df6b8831a7357eb6cba2cdf4edd5e9",
+      "bytes": 78341409,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-before-planning-rejection-install",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-before-planning-rejection-install",
+      "sha256": "77ce352705e16f6c5d468e7ae30ac500d4a2a01fc79918d5d19e95c2a7947be5",
+      "bytes": 78194023,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-planning-rejection-qualified-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-planning-rejection-qualified-candidate",
+      "sha256": "5e8b55d8416632fca9ba6501cfcd9ab78a37d1a56a48fb4067dc4c2996460a79",
+      "bytes": 78222334,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-planning-rejection-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-planning-rejection-candidate",
+      "sha256": "db78387e8e87cd90e0fa5443020dee96dcc0507bfcb1ff76bcb0ecca20618fcf",
+      "bytes": 78224502,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-before-review-current-event-install",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-before-review-current-event-install",
+      "sha256": "1ac9e841f3097d065b58b05364c33d3d93f74dcc1b1198ae6e443494fec1f1f2",
+      "bytes": 78191623,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-review-current-event-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-review-current-event-candidate",
+      "sha256": "77ce352705e16f6c5d468e7ae30ac500d4a2a01fc79918d5d19e95c2a7947be5",
+      "bytes": 78194023,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-before-exact-envelope-install",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-before-exact-envelope-install",
+      "sha256": "a318dc5c76bc4a25322e9a2fa1d59346ff05c84e3d9a8e46039938397373c5b8",
+      "bytes": 78190207,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-planning-exact-envelope-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-planning-exact-envelope-candidate",
+      "sha256": "1ac9e841f3097d065b58b05364c33d3d93f74dcc1b1198ae6e443494fec1f1f2",
+      "bytes": 78191623,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-before-native-current-protocol-install",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-before-native-current-protocol-install",
+      "sha256": "28292093fb2154838baf312c74e289de2c62dad9ac8e00bb5f3f3fb5b4d6c352",
+      "bytes": 78180567,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-native-current-protocol-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-native-current-protocol-candidate",
+      "sha256": "a318dc5c76bc4a25322e9a2fa1d59346ff05c84e3d9a8e46039938397373c5b8",
+      "bytes": 78190207,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-before-learning-retex-install",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-before-learning-retex-install",
+      "sha256": "3b523e12b9d71b59f8fb424ea13f50b4c6611fc27eedad6c9dd21960736de2d3",
+      "bytes": 78131971,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-learning-retex-continuity-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-learning-retex-continuity-candidate",
+      "sha256": "28292093fb2154838baf312c74e289de2c62dad9ac8e00bb5f3f3fb5b4d6c352",
+      "bytes": 78180567,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-learning-retex-historical-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-learning-retex-historical-candidate",
+      "sha256": "58fda78d7da16062627df8b31b620d5b4c121f6f98751323bb4cde59a0073a31",
+      "bytes": 78273031,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-learning-retex-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-learning-retex-candidate",
+      "sha256": "938f61d8786a275fea9627902f26414f0b55c7730f8b4439861e4be8ae5a5d13",
+      "bytes": 78175901,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-before-unpaid-source-parts-install",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-before-unpaid-source-parts-install",
+      "sha256": "4512a96c184cfa894272c3e02d67bd2916a06dd84c62a6da4fa7eb930a09f278",
+      "bytes": 78134667,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-unpaid-source-parts-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-unpaid-source-parts-candidate",
+      "sha256": "3b523e12b9d71b59f8fb424ea13f50b4c6611fc27eedad6c9dd21960736de2d3",
+      "bytes": 78131971,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-before-time-supervision-install",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-before-time-supervision-install",
+      "sha256": "a3859c6f7e308476e22166d17d3a229dd3df17c1ddf9377675b8c2ddd9bfb349",
+      "bytes": 78107928,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-time-supervision-installed-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-time-supervision-installed-candidate",
+      "sha256": "4512a96c184cfa894272c3e02d67bd2916a06dd84c62a6da4fa7eb930a09f278",
+      "bytes": 78134667,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-time-supervision-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-time-supervision-candidate",
+      "sha256": "8717f804371627caeb4117785d6f8183ee81fc3e46ccab110811d559b3dbb596",
+      "bytes": 78123787,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-prepared-skill-refresh-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-prepared-skill-refresh-candidate",
+      "sha256": "a3859c6f7e308476e22166d17d3a229dd3df17c1ddf9377675b8c2ddd9bfb349",
+      "bytes": 78107928,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-repaired-handoff-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-repaired-handoff-candidate",
+      "sha256": "a6c177e259310317eb9b29880ada6f343c15b3608eb27ffc27584ebf6f79e2c2",
+      "bytes": 78097017,
+      "original_path_preserved_as_symlink": true
+    },
+    {
+      "original_path": "/tmp/swarm-protocol-candidate",
+      "actual_path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/moved-temp-binaries/swarm-protocol-candidate",
+      "sha256": "8db9b24711563abd415b3acd6d14a180e9bc0b7050d72aba8a097034d36a7146",
+      "bytes": 78094969,
+      "original_path_preserved_as_symlink": true
+    }
+  ],
+  "protected": [
+    "Native .swarm and managed source/proofs untouched",
+    "Qualified source snapshots, operator patches, original receipts/stdout retained",
+    "Current/next executable candidates and active process images untouched"
+  ],
+  "resumption_condition": "Recheck authenticated runtime launch_allowed and new full qualification on unchanged1179 source with compiler scratch on root volume."
+}

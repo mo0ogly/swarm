@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "id": "mission-legacy-intent",
+  "inputs": [
+    "rust/crates/swarm-cli/examples/legacy_mission_intent.rs",
+    "tools/verification/recipe.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_mission_legacy_intent.py",
+    "tests/rust_mission_task_profile.py",
+    "tests/rust_native_production_retry.py",
+    "tests/rust_native_review_acceptance.py",
+    "tests/rust_native_review_decision.py",
+    "tests/rust_native_review_inputs.py",
+    "tests/rust_native_review_preview.py",
+    "tests/rust_native_reviewer.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_native_worker_failure_retry.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md",
+    "tests/rust_*.py",
+    "tests/test_rust_mission_legacy_intent_guards.py",
+    "rust/crates/swarm-cli/examples/mission_watch_worker.rs",
+    "rust/crates/swarm-engine/src/mission_agent.rs",
+    "rust/crates/swarm-engine/src/agent_store.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/legacy-intent-contract201.md",
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/sdk-late-probe-plan62.md",
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/harness-late-probe-handoff62.md",
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/legacy-fixture-helper-next.md",
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/legacy-fixture-inputs95/**/*"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "historical-absence-provenance-refusal-recovery-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_mission_legacy_intent_guards.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_historical_bindings_reject_new_identity_fifo_null_and_numeric_schema",
+        "test_json_comparison_preserves_boolean_and_blob_types",
+        "test_business_snapshot_masks_only_owned_pulse_fields",
+        "test_history_preserves_duplicate_rows_and_typed_audit_bodies",
+        "test_archived_bundle_requires_exact_old_binary_and_source_bytes",
+        "test_loaded_historical_modules_cannot_fallback_to_current_checkout",
+        "test_fresh_current_witness_uses_real_probe_and_checked_subreaper_scope",
+        "test_peer_finish_preserves_primary_transport_and_reap_failures",
+        "test_actual_refusal_consumer_cancels_only_after_exact_typed_denial",
+        "test_required_refusal_does_not_accept_generic_wrapper_or_message",
+        "Ran 11 tests",
+        "OK",
+        "test_optimized_python_refuses_before_historical_assert_helpers"
+      ]
+    },
+    {
+      "id": "fresh-v4-control-then-historical-no-new-grant-cancellation-replay-and-eof",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile,sys\nif sys.flags.optimize != 0:raise ValueError('historical verification requires Python assertions enabled')\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='mission-legacy-v1-',dir='.cache')).resolve()\nprint('REPLAY_EVIDENCE '+str(base),flush=True)\nargs=['python3','tests/rust_mission_legacy_intent.py','--binding-schema','1']\nfor key,var in [('binary', 'SWARM_LEGACY_NEW_BINARY'), ('profile', 'SWARM_LEGACY_NEW_PROFILE'), ('old-binary', 'SWARM_LEGACY_OLD_BINARY'), ('old-profile', 'SWARM_LEGACY_OLD_PROFILE'), ('legacy-sdk', 'SWARM_LEGACY_SDK'), ('legacy-profile', 'SWARM_LEGACY_SDK_PROFILE'), ('current-sdk', 'SWARM_LEGACY_CURRENT_SDK'), ('current-sdk-profile', 'SWARM_LEGACY_CURRENT_SDK_PROFILE'), ('old-helpers-manifest', 'SWARM_LEGACY_HELPERS_MANIFEST'), ('old-helpers-root', 'SWARM_LEGACY_HELPERS_ROOT')]:\n value=Path(os.environ[var]).resolve()\n if not value.exists():raise ValueError('legacy-input-missing:'+var)\n args+=['--'+key,str(value)]\nsubprocess.run(args+['--output',str(base/'run')],check=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS current v4 worker witness before historical intention",
+        "PASS historical v1 intention refuses new grant; cancellation and replay preserve provenance",
+        "PASS exact old control request replay preserves consent and events",
+        "PASS legacy EOF refuses with original cause and owner exit",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

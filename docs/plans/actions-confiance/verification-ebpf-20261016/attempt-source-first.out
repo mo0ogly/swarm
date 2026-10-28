@@ -1,0 +1,40 @@
+=== RUN   TestKernelAttemptSourceRegisteredInput
+    kernel_attempt_source_linux_test.go:36: observation attempt was superseded or stopped
+--- FAIL: TestKernelAttemptSourceRegisteredInput (0.13s)
+=== RUN   TestKernelAttemptSourceInvalid
+=== RUN   TestKernelAttemptSourceInvalid/mode
+=== RUN   TestKernelAttemptSourceInvalid/provider
+=== RUN   TestKernelAttemptSourceInvalid/prompt
+=== RUN   TestKernelAttemptSourceInvalid/context
+=== RUN   TestKernelAttemptSourceInvalid/workflow
+=== RUN   TestKernelAttemptSourceInvalid/status
+=== RUN   TestKernelAttemptSourceInvalid/desired
+=== RUN   TestKernelAttemptSourceInvalid/host
+=== RUN   TestKernelAttemptSourceInvalid/pid
+=== RUN   TestKernelAttemptSourceInvalid/start
+=== RUN   TestKernelAttemptSourceInvalid/agent
+=== RUN   TestKernelAttemptSourceInvalid/work
+=== RUN   TestKernelAttemptSourceInvalid/task
+=== RUN   TestKernelAttemptSourceInvalid/attempt
+=== RUN   TestKernelAttemptSourceInvalid/paused
+=== RUN   TestKernelAttemptSourceInvalid/missing
+--- PASS: TestKernelAttemptSourceInvalid (2.54s)
+    --- PASS: TestKernelAttemptSourceInvalid/mode (0.14s)
+    --- PASS: TestKernelAttemptSourceInvalid/provider (0.17s)
+    --- PASS: TestKernelAttemptSourceInvalid/prompt (0.16s)
+    --- PASS: TestKernelAttemptSourceInvalid/context (0.16s)
+    --- PASS: TestKernelAttemptSourceInvalid/workflow (0.20s)
+    --- PASS: TestKernelAttemptSourceInvalid/status (0.16s)
+    --- PASS: TestKernelAttemptSourceInvalid/desired (0.16s)
+    --- PASS: TestKernelAttemptSourceInvalid/host (0.15s)
+    --- PASS: TestKernelAttemptSourceInvalid/pid (0.14s)
+    --- PASS: TestKernelAttemptSourceInvalid/start (0.15s)
+    --- PASS: TestKernelAttemptSourceInvalid/agent (0.15s)
+    --- PASS: TestKernelAttemptSourceInvalid/work (0.14s)
+    --- PASS: TestKernelAttemptSourceInvalid/task (0.14s)
+    --- PASS: TestKernelAttemptSourceInvalid/attempt (0.15s)
+    --- PASS: TestKernelAttemptSourceInvalid/paused (0.19s)
+    --- PASS: TestKernelAttemptSourceInvalid/missing (0.18s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	2.740s
+FAIL

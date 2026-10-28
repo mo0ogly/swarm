@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-17T06:59:03.771233+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "files": {
+    "internal/engine/agent_identity_authority.go": "cd335869ae1b6a80959e64432f0759fde44d94bc5846c48417d1ce8dcc32a150",
+    "internal/engine/agent_identity_authority_test.go": "cddd3ac48c73a36c70f2b82fffaed7a293c6438356e2957e3b89ccb8edc30808",
+    "internal/engine/agent_identity_contract_test.go": "942cb255b11065db4b47b5cd1a50820d663566256cf68baff9d292a1b1c2e4e9",
+    "internal/engine/agent_identity_contract.go": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+    "internal/engine/agent_identity_runtime_linux_test.go": "8ff373547cd9ce2be571b258c44df6cd0ee3d41e499c85500cff609ba5a8bcf0",
+    "internal/engine/agent_identity_runtime_linux.go": "74ccc6b2c91aecf0c9fe87c818eca43c23e79c14c133dae07574f0232241c2e7",
+    "internal/engine/agent_identity_channel_linux_test.go": "d4a0eb6debdb63ae5f795a8e58015d66926b09519a23644fdc58d6b998c3dab8",
+    "internal/engine/agent_identity_channel_linux.go": "3528f0eed5ce77171d4e5506c387f50936314b8f24296c566e16c7045f2a91e3",
+    "internal/engine/store.go": "85ddbecfcbfb4a9554eee520d6e78fdd65904b711525eb4b37879d9d3531940a",
+    "internal/engine/model.go": "3f26b76f62a1150019989d6695573991a04de16d0b1db1778f3259f9ade8c023",
+    "internal/engine/trust_actions.go": "e73e91cd406eff822d06333f58997b4d681102f0eeff63ecd6f5a6d1b3f9d58a",
+    "internal/engine/agents_store.go": "6d0a96e05f6e155377ed8d9287c40f0b475c7a62b13542f81655888cb7204f21",
+    "internal/engine/agents_process.go": "00d74a35555c8c4fb2f2ac56d5482bc3b8a8ca0bbb97755a14f5cb02dfec256f",
+    "docs/plans/actions-confiance/identites-agents-replan.md": "68f151ae42897ba2f8a39c12bddef5beb31cdcf9215c8083ca0b4ae0cca24c3f",
+    "docs/plans/actions-confiance/identites-agents-contrat-IA2.md": "bd48eda08aa0c54efa8b00a2e3eadf88c58a81b2612e91b1a436f4cd3256ba54",
+    "docs/architecture/AGENT-IDENTITY-CONTRACT.md": "1d115da506438a02fb118bc64214e893166f4767f99db717759f972629bce93d",
+    "docs/en/AGENT-IDENTITY-CONTRACT.md": "12e96475b0d0580d68a12b504459cf47aab56e504991040f7600191c464a5297"
+  }
+}

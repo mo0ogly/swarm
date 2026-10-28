@@ -1,0 +1,7 @@
+{
+  "message": "blank age must not become zero",
+  "stack": "AssertionError [ERR_ASSERTION]: blank age must not become zero\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_step_up_ui.cjs:23:350",
+  "checks": [],
+  "errors": [],
+  "root": "/tmp/swarm-step-up-ui-jM0qAL"
+}

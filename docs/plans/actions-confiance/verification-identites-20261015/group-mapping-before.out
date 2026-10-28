@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT3GroupMappingPublicPolicy
+    trust_group_mapping_test.go:40: group mapping contract missing json: unknown field "group_mapping"
+--- FAIL: TestActionsConfianceT3GroupMappingPublicPolicy (1.07s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.654s
+FAIL

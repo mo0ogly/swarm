@@ -1,0 +1,10 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "exit": 0,
+  "owned_untracked_files_whitespace": [],
+  "owned_files_inspected": 11
+}

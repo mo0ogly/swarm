@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "id": "native-agent-controlled-process",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/**/*",
+    ".claude/skills/*/SKILL.md",
+    "contracts/work-request-fields.v1.json",
+    "internal/engine/testdata/*.json",
+    "locales/en.json",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/agent-workflows/templates/*.md"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r25",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "owned-core",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "validation_run::"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "controlled_input_registration_refusal_keeps_gate_closed_and_recovers ... ok",
+        "controlled_stop_is_applied_after_real_output_and_drains_final_bytes ... ok",
+        "controlled_refusals_preserve_causes_and_due_wake_is_not_a_timeout ... ok",
+        "shared_runner_drains_both_streams_and_preserves_sink_failure ... ok",
+        "group_signal_refusal_keeps_unreaped_leader_and_primary_cause_then_recovers ... ok",
+        "kernel_not_child_refusal_is_diagnostic_without_a_stale_signal_capability ... ok",
+        "8 passed; 0 failed",
+        "shared_runner_refuses_plain_text_exec_without_implicit_shell_and_recovers ... ok",
+        "shared_runner_retains_text_busy_refusal_and_recovers_after_writer_closes ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "git-consumers",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "git_metadata",
+        "--test",
+        "git_report"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "root_legacy_and_mutation_git_reads_disable_external_filters_and_preserve_index ... ok",
+        "unavailable_fields_keep_original_failures_and_recover_after_real_git_initialization ... ok",
+        "saved_git_deadline_refuses_before_work_publication_and_recovers_after_reopen ... ok",
+        "legacy_policy_absence_is_explicit_without_invented_deadline_and_adoption_recovers ... ok",
+        "committed_report_exact_and_historical_bytes_refusals_and_recovery ... ok",
+        "v4_history_and_replay_require_explicit_git_adoption ... ok",
+        "persisted_root_deadline_controls_actual_git_and_recovers_without_history_reset ... ok",
+        "stored_review_context_and_git_are_current_data_without_acceptance_authority ... ok",
+        "4 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "validation-consumer",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "validation_run",
+        "actual_process_retains_configured_bytes_counts_streams_and_reports_exit_without_shell",
+        "--",
+        "--exact"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "actual_process_retains_configured_bytes_counts_streams_and_reports_exit_without_shell ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

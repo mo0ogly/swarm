@@ -1,0 +1,463 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-10T18:49:33.735835+00:00",
+  "scope": "Audit only; temporary fixtures; no production state or policy mutation.",
+  "source": {
+    "schema_version": 1,
+    "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+    "modified": true,
+    "scope": "internal/engine/*.go (including tests)",
+    "count": 521,
+    "sha256": "d57301e0f960fa1ce7de56f1b3e229b5c19a974e79b1f34e64b9d93e469d0182"
+  },
+  "environment": {
+    "go": "go1.24.3 linux/amd64",
+    "logical_cpus_available": 12
+  },
+  "manifest": {
+    "selected_manifest": "docs/ui-redesign-source-manifest.json",
+    "manifest_status": "UI_REDESIGN_SOURCE_SNAPSHOT_NOT_INDEPENDENT_ACCEPTANCE",
+    "base_commit": "d4539e0041000a38acb162a17f053e318fb3db5d",
+    "total_inputs": 1081,
+    "mismatches": [
+      {
+        "path": "PREPARATION-UX.md",
+        "expected": "f0ce90e1a0ae2559bcef55aedea21225c19ffe07f475c9d72ee1dafcabfc0092",
+        "actual": "5d6e1016aff21ef22ff9b5d4f27d10c75a21e6f617801ca02cac3dcb1947d06f",
+        "tracked_head_sha256": "5d6e1016aff21ef22ff9b5d4f27d10c75a21e6f617801ca02cac3dcb1947d06f",
+        "dirty": ""
+      },
+      {
+        "path": "README.en.md",
+        "expected": "7d92fa2fdb37345bbc0ff947a2a7a507f7715def912615a31d8fc42317f1532e",
+        "actual": "a1c483bb1564c8569b7db1924b5abafb5154f6c5c9b10e76fcac894920f02a60",
+        "tracked_head_sha256": "a1c483bb1564c8569b7db1924b5abafb5154f6c5c9b10e76fcac894920f02a60",
+        "dirty": ""
+      },
+      {
+        "path": "docs/en/PREPARATION-UX.md",
+        "expected": "c9ffe55379a50af599fdade16425a52657802ce4f0bd8c8a0197bfe176c7c306",
+        "actual": "db7d457076a0e8f409a37046809a4a27e2cf138358fd030288d06eee4d0b55b5",
+        "tracked_head_sha256": "db7d457076a0e8f409a37046809a4a27e2cf138358fd030288d06eee4d0b55b5",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/assist_run.go",
+        "expected": "da8f9ad6c06cb6fa2778a8b4323d7a89a0a1f8194383f6cf75362b72d5be0282",
+        "actual": "cc48d47ca3a6327e1811da423b2906d0b5b71b23b56692c0e15372f8a9403ac9",
+        "tracked_head_sha256": "cc48d47ca3a6327e1811da423b2906d0b5b71b23b56692c0e15372f8a9403ac9",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/historical_requalification.go",
+        "expected": "a766af37cec3af5edc19ee1c07c9460a1f0f5e270aadf449e2fe3e036a7d4366",
+        "actual": "d0e7b76cd4e5e9478c8bda064d9e27d65f34c1205eaeec178d2cf82fcf16accd",
+        "tracked_head_sha256": "a766af37cec3af5edc19ee1c07c9460a1f0f5e270aadf449e2fe3e036a7d4366",
+        "dirty": "M internal/engine/historical_requalification.go"
+      },
+      {
+        "path": "internal/engine/independent_review.go",
+        "expected": "287af86a257b483f4a7cd6ec9c0afc9377c0ec7b64a9092bfeb68f96d4284f4d",
+        "actual": "d05dae995ab6d5fa298cde8f64ed63cd8179890ba8d2b6d1a88a48b33a4593bd",
+        "tracked_head_sha256": "d05dae995ab6d5fa298cde8f64ed63cd8179890ba8d2b6d1a88a48b33a4593bd",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/independent_review_runtime.go",
+        "expected": "f9b0105d0f69d950177ebdc921067dc846fdc835d016cfcdc1765993d164fb72",
+        "actual": "c7cb36203b36c1c19f143ffd239ab7ba842be44b568019ab1f5418a67fe6d4d0",
+        "tracked_head_sha256": "c7cb36203b36c1c19f143ffd239ab7ba842be44b568019ab1f5418a67fe6d4d0",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/managed_delivery_contract.go",
+        "expected": "f85df8595f08ef67aecb8ba58d1d9984c2fd8ad4d0b0b68f85c19dc0076f1e32",
+        "actual": "cf6a1b068469fcb556bf44fc47a19793786264dcf63cd09615d0bb42387681d1",
+        "tracked_head_sha256": "f85df8595f08ef67aecb8ba58d1d9984c2fd8ad4d0b0b68f85c19dc0076f1e32",
+        "dirty": "M internal/engine/managed_delivery_contract.go"
+      },
+      {
+        "path": "internal/engine/managed_integration.go",
+        "expected": "6c31168e50a937ca0c1cae1795b21605ead706d5ed1cb0ee46611ae1bc697777",
+        "actual": "125340e96f6d2ea9e94d9a5e999b60a4765e127dbd720dfe5131ff38edd0c046",
+        "tracked_head_sha256": "6c31168e50a937ca0c1cae1795b21605ead706d5ed1cb0ee46611ae1bc697777",
+        "dirty": "M internal/engine/managed_integration.go"
+      },
+      {
+        "path": "internal/engine/managed_recovery_handoff.go",
+        "expected": "3cda1feebf4ce46fcb5155ed8f1806d454d84ec2c6308702d30eacd5c7d842b3",
+        "actual": "2ad07c99d35efd76468fd11f688cf2b0dab5acebc471394bd5498b65cbc7bce1",
+        "tracked_head_sha256": "3cda1feebf4ce46fcb5155ed8f1806d454d84ec2c6308702d30eacd5c7d842b3",
+        "dirty": "M internal/engine/managed_recovery_handoff.go"
+      },
+      {
+        "path": "internal/engine/managed_review.go",
+        "expected": "9de9af887a2c70cdc54c63b680203bdb4a95b67e47d56782da78b7ce76fc1e12",
+        "actual": "2f63fe262a071cd4f9b7418e7f83ceea76010855968bad5965e51c725f8b0090",
+        "tracked_head_sha256": "2f63fe262a071cd4f9b7418e7f83ceea76010855968bad5965e51c725f8b0090",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/managed_review_batch_runtime.go",
+        "expected": "8f3f761f8a150280d757dc20e25015c693ca622a1ec84aaaa43e42ba9d9be9ac",
+        "actual": "98f7fa2ad89bae0ca321d0f049a7c6172509c85355d82bb659dddcabe4515360",
+        "tracked_head_sha256": "98f7fa2ad89bae0ca321d0f049a7c6172509c85355d82bb659dddcabe4515360",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/managed_review_diagnostic.go",
+        "expected": "41a3664666fd9fa9c3d9cdda7667cbd0cee038cd49f0fb11c759b0f508a249f9",
+        "actual": "40a686d13184e00b33cf47a4f9be99182d04814a69177f62e8f59f16f62c97bb",
+        "tracked_head_sha256": "40a686d13184e00b33cf47a4f9be99182d04814a69177f62e8f59f16f62c97bb",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/managed_review_fragment_resume_test.go",
+        "expected": "400f361cb505acf8242e97e0ac9c5f28bdca5c15d74662837a5dc3c3c1a7d715",
+        "actual": "fa06455ebf2a8dfcf7e945405fccd9f416cd218262e2fe3dd972638f0064a91d",
+        "tracked_head_sha256": "fa06455ebf2a8dfcf7e945405fccd9f416cd218262e2fe3dd972638f0064a91d",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/managed_review_fragment_runtime.go",
+        "expected": "514f8917bf3e362f5132c15651d5c2e7031787163b7eca08fef2f95bf550edd3",
+        "actual": "b8706fbb4ce3ead0fa55f1607bfbc558c4ca6966d7947e8e4c62be1afd109368",
+        "tracked_head_sha256": "b8706fbb4ce3ead0fa55f1607bfbc558c4ca6966d7947e8e4c62be1afd109368",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/managed_review_sources.go",
+        "expected": "547d09b7ed2b3b9a4c4362f6c39f0c1b36fc2eb1dee15c80327adfabf192d626",
+        "actual": "85d5a79e1d4be212fbc97ef574ed2a4a482463e1d35b5968b919c6434a738ab5",
+        "tracked_head_sha256": "547d09b7ed2b3b9a4c4362f6c39f0c1b36fc2eb1dee15c80327adfabf192d626",
+        "dirty": "M internal/engine/managed_review_sources.go"
+      },
+      {
+        "path": "internal/engine/planning_context.go",
+        "expected": "42a5fdc105302c3ee048e70ed5dc60b2bf27a0bb6cb582b77e12bd0606c54491",
+        "actual": "7b2f48dd320c8934bb8d760438936c2af17d01db9878bea2290215e5d6866f60",
+        "tracked_head_sha256": "42a5fdc105302c3ee048e70ed5dc60b2bf27a0bb6cb582b77e12bd0606c54491",
+        "dirty": "M internal/engine/planning_context.go"
+      },
+      {
+        "path": "internal/engine/planning_delivery.go",
+        "expected": "cbebf10872229c274ca1408ca43360f57ea251b5b2ef66dec45dd8f6bbf0c2f0",
+        "actual": "a07dadd6d278ff3c51c31253dd824277ca27d25e9c39142de369e5104b477dc7",
+        "tracked_head_sha256": "cbebf10872229c274ca1408ca43360f57ea251b5b2ef66dec45dd8f6bbf0c2f0",
+        "dirty": "M internal/engine/planning_delivery.go"
+      },
+      {
+        "path": "internal/engine/planning_runner.go",
+        "expected": "ab1918fd4c21b85b54510560c9449b6b16a0bb63a3560e39c548f17f52961764",
+        "actual": "37f2fcfe1b9bd92d6c7aa504dcc00e9d294edff16c41758b9075338cba8f2f9e",
+        "tracked_head_sha256": "37f2fcfe1b9bd92d6c7aa504dcc00e9d294edff16c41758b9075338cba8f2f9e",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/prephase_dialogue.go",
+        "expected": "11260f41fc9befbed999e7dd69da436165317dc588cfaf407e7c61b97365220c",
+        "actual": "f0fb1f836d1942b0c48eeaf2c3bd8bcbac7cb665b47d4ff302cf3aa62d77ab5f",
+        "tracked_head_sha256": "f0fb1f836d1942b0c48eeaf2c3bd8bcbac7cb665b47d4ff302cf3aa62d77ab5f",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/prephase_organization.go",
+        "expected": "340a028ab5a6fe0f906c91c44f1e892849e1a999d1c5753aadb8677e93213c36",
+        "actual": "80693d70f630ebbb01a5db3c56e520584bed3c4776f964a093be6a8ff66914c1",
+        "tracked_head_sha256": "80693d70f630ebbb01a5db3c56e520584bed3c4776f964a093be6a8ff66914c1",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/prephase_organization_test.go",
+        "expected": "a949ccd8b0f05407f83fb6ccb57b6419b6918144b45023b2a19216cb910ba986",
+        "actual": "87f4934394f9b0ef2f5e138839329681103e38473a0832bf3031d31c4495f15f",
+        "tracked_head_sha256": "87f4934394f9b0ef2f5e138839329681103e38473a0832bf3031d31c4495f15f",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/prephase_runtime.go",
+        "expected": "bc18bf94b5ebe8af4315b2ae8a7476b5075cb8482b92913361241370ade226a1",
+        "actual": "6bf95c470320c8fbb6ffd4c867c58f2880feb25ad45bde8679ce0d1d6a5e4989",
+        "tracked_head_sha256": "6bf95c470320c8fbb6ffd4c867c58f2880feb25ad45bde8679ce0d1d6a5e4989",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/review_timeout_test.go",
+        "expected": "7f433067affa235e56d81c61972c9f83e9f062707f4db95692126d0e6b7a58d7",
+        "actual": "93bcccdc0632071f77b6fe9d69883219bb53335a68d06d8e1395100d22800ab3",
+        "tracked_head_sha256": "93bcccdc0632071f77b6fe9d69883219bb53335a68d06d8e1395100d22800ab3",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/run_limits_cli.go",
+        "expected": "0005ca16a33a39fa7dae0c881a68b1915fd73189839b781af1b4316b5c6453ce",
+        "actual": "9c2ef6e4212743ac4f681c28a1213a1304403febf89889d64016b0ed8f8d6516",
+        "tracked_head_sha256": "9c2ef6e4212743ac4f681c28a1213a1304403febf89889d64016b0ed8f8d6516",
+        "dirty": ""
+      },
+      {
+        "path": "internal/engine/run_limits_web.go",
+        "expected": "a688ce04b392adc0196c8ed96bd270ec73e6d2eaa01335f745e02e3ed72cc342",
+        "actual": "5107cbdbb4a161a1d526cb700244f14224f5eb8385f6c024383193ecba069e1c",
+        "tracked_head_sha256": "5107cbdbb4a161a1d526cb700244f14224f5eb8385f6c024383193ecba069e1c",
+        "dirty": ""
+      },
+      {
+        "path": "resources.go",
+        "expected": "eaa22f55292f13b55eae1b61788c9baf15d47e150ecfa72dadcddde159dc1d24",
+        "actual": "4a42c26834e1118f6f4e2d67f3404fe24b79ab349f087deb4ca764b26738fe9a",
+        "tracked_head_sha256": "4a42c26834e1118f6f4e2d67f3404fe24b79ab349f087deb4ca764b26738fe9a",
+        "dirty": ""
+      },
+      {
+        "path": "web/index.html",
+        "expected": "a940a6d04569490ba75ddd403f6424feea5d9d6e25cf70aa7b3d86dc892ee9c3",
+        "actual": "83862c94bff7b6319beee36a19b312e2ec4221ee3ea3a4c1e0e1206652beb874",
+        "tracked_head_sha256": "83862c94bff7b6319beee36a19b312e2ec4221ee3ea3a4c1e0e1206652beb874",
+        "dirty": ""
+      },
+      {
+        "path": "web/planning.js",
+        "expected": "e024bfb90c01d130fbd02e1f425cafcbe75e4d7f4560a7ea6154abf2a82bc12a",
+        "actual": "9588279d684a9f653381e20b3baa9405e7b13558216936ce18e8d103b3782aad",
+        "tracked_head_sha256": "9588279d684a9f653381e20b3baa9405e7b13558216936ce18e8d103b3782aad",
+        "dirty": ""
+      },
+      {
+        "path": "web/prephase.js",
+        "expected": "0cfd6e567f70ccfad815aef1fc2366c749551d0815c1e21ca7ddb9ac3575cc1a",
+        "actual": "0e1de05e04d537029f039f3243195b062543e50d80df7243e3867d5981c38e2c",
+        "tracked_head_sha256": "0e1de05e04d537029f039f3243195b062543e50d80df7243e3867d5981c38e2c",
+        "dirty": ""
+      }
+    ],
+    "committed_baseline": {
+      "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+      "mismatch_count": 23,
+      "mismatch_paths": [
+        "PREPARATION-UX.md",
+        "README.en.md",
+        "docs/en/PREPARATION-UX.md",
+        "internal/engine/assist_run.go",
+        "internal/engine/independent_review.go",
+        "internal/engine/independent_review_runtime.go",
+        "internal/engine/managed_review.go",
+        "internal/engine/managed_review_batch_runtime.go",
+        "internal/engine/managed_review_diagnostic.go",
+        "internal/engine/managed_review_fragment_resume_test.go",
+        "internal/engine/managed_review_fragment_runtime.go",
+        "internal/engine/planning_runner.go",
+        "internal/engine/prephase_dialogue.go",
+        "internal/engine/prephase_organization.go",
+        "internal/engine/prephase_organization_test.go",
+        "internal/engine/prephase_runtime.go",
+        "internal/engine/review_timeout_test.go",
+        "internal/engine/run_limits_cli.go",
+        "internal/engine/run_limits_web.go",
+        "resources.go",
+        "web/index.html",
+        "web/planning.js",
+        "web/prephase.js"
+      ],
+      "isolated_test_exit_code": 1
+    },
+    "first_input_expected_matches_manifest_base_commit": true
+  },
+  "schedule": {
+    "discovered_tests": 1099,
+    "groups": 19,
+    "isolated_groups": 6,
+    "parallelism": 4,
+    "group_timeout_seconds": 240,
+    "estimated_serial_seconds": 1236.34,
+    "unmeasured_tests": 1002,
+    "coverage_disjoint_complete": true
+  },
+  "isolated_tests": [
+    {
+      "test": "TestGraphDeliveryD03QualificationManifest",
+      "verdict": "fail",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "test": "TestManagedFragmentHistoricalPublicRecovery/pass",
+      "verdict": "pass",
+      "elapsed_seconds": 22.77
+    },
+    {
+      "test": "TestManagedFragmentHistoricalPublicRecovery/fail",
+      "verdict": "pass",
+      "elapsed_seconds": 19.61
+    },
+    {
+      "test": "TestManagedFragmentHistoricalPublicRecovery/exit",
+      "verdict": "pass",
+      "elapsed_seconds": 21.03
+    },
+    {
+      "test": "TestManagedFragmentHistoricalPublicRecovery",
+      "verdict": "pass",
+      "elapsed_seconds": 63.41
+    },
+    {
+      "test": "TestManagedFragmentHistoricalCapacityPreservesKnownInputs",
+      "verdict": "pass",
+      "elapsed_seconds": 0.88
+    }
+  ],
+  "profile": {
+    "test": "TestManagedFragmentHistoricalPublicRecovery/pass",
+    "exit_code": 0,
+    "package_elapsed_seconds": 15.739,
+    "cpu_samples_seconds": 15.89,
+    "cumulative_allocation_gib": 4.95,
+    "not_peak_or_resident_memory": true,
+    "managed_review_files_intact_seen_cpu_cumulative_percent": 42.54,
+    "managed_review_files_intact_seen_alloc_cumulative_percent": 55.15,
+    "limits": "Single fixture run with a deterministic provider; percentages of nested stacks overlap. Not a production latency measurement."
+  },
+  "full_suite": {
+    "command": "go test ./... -json -count=1 -timeout 15m",
+    "state": "completed",
+    "exit_code": 1,
+    "package_elapsed_seconds": 504.624,
+    "top_level_tests_completed": 1099,
+    "counts": {
+      "pass": 1090,
+      "skip": 8,
+      "fail": 1
+    },
+    "failures": [
+      {
+        "test": "TestGraphDeliveryD03QualificationManifest",
+        "elapsed_seconds": 0.01
+      }
+    ],
+    "skipped": [
+      "TestOperatorPreview",
+      "TestCorrectiveRecoveryBrowserRecipe",
+      "TestEngineContractTruthBrowser",
+      "TestHistoricalRequalificationBrowser",
+      "TestManagedRecoveryBrowserRecipe",
+      "TestMissingReportRecoveryBrowserRecipe",
+      "TestRecoveryHealthBrowserRecipe",
+      "TestLiveProviderStreamReplay"
+    ],
+    "slowest_top_level_tests": [
+      {
+        "test": "TestManagedFragmentHistoricalPublicRecovery",
+        "elapsed_seconds": 46.31
+      },
+      {
+        "test": "TestManagedFragmentIntegrationPublishesOnlyFinalVerdict",
+        "elapsed_seconds": 38.59
+      },
+      {
+        "test": "TestManagedFragmentRuntimeProviderProtocol",
+        "elapsed_seconds": 20.25
+      },
+      {
+        "test": "TestCoordinatedReviewExecutesAndPersists",
+        "elapsed_seconds": 12.8
+      },
+      {
+        "test": "TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift",
+        "elapsed_seconds": 10.75
+      },
+      {
+        "test": "TestEngineContractDeliveryEvidenceAndPublication",
+        "elapsed_seconds": 10.43
+      },
+      {
+        "test": "TestIntegrationRetryRejectsChangedInputs",
+        "elapsed_seconds": 9.56
+      },
+      {
+        "test": "TestEngineContractRecoveryCompleteCoverage",
+        "elapsed_seconds": 7.07
+      },
+      {
+        "test": "TestManagedBatchCitationRetryReceivesDiagnostic",
+        "elapsed_seconds": 7.06
+      },
+      {
+        "test": "TestRecoveredResultRevisionAfterLegacyFragmentRefusal",
+        "elapsed_seconds": 6.79
+      }
+    ],
+    "no_timeout": true,
+    "limits": "Audit fixtures only; no opt-in recipes or real-provider quality implied."
+  },
+  "artifacts": [
+    {
+      "path": "/tmp/swarm-go-audit-source-digest.json",
+      "sha256": "aff8dbd16ee277721901612b864d0c4f220ec38412b9928a21cd312ff9902889",
+      "bytes": 251
+    },
+    {
+      "path": "/tmp/swarm-go-audit-manifest.json",
+      "sha256": "042de68dd71a3e6d8a977e52024c3c50718ad07737491de69a0c541bdde0c621",
+      "bytes": 12205
+    },
+    {
+      "path": "/tmp/swarm-go-audit-schedule.json",
+      "sha256": "bde553f745b2855c32f4f3499b55eb6c18569afb9d50f54a307600442245a325",
+      "bytes": 228
+    },
+    {
+      "path": "/tmp/swarm-go-audit-isolated.jsonl",
+      "sha256": "0764f563da12a737156c9fc27e14f6db3c0bb4b7ee1639539d494ec8fb326263",
+      "bytes": 6275
+    },
+    {
+      "path": "/tmp/swarm-go-audit-baseline.jsonl",
+      "sha256": "d323076865d9080c8172ab8e0bca08ff745e525e025b7f8d1a5fb4171104aac9",
+      "bytes": 1623
+    },
+    {
+      "path": "/tmp/swarm-go-audit-profile.log",
+      "sha256": "feed5c5fb368716feea62fea2074657353d0a54397dd3a76e004c02d71ed0be8",
+      "bytes": 51
+    },
+    {
+      "path": "/tmp/swarm-go-audit-profile-top.txt",
+      "sha256": "8982ba8d5c8edfc5e419f4939841e89def806a2ec23c3c8e8ac3cde830e2e509",
+      "bytes": 1428
+    },
+    {
+      "path": "/tmp/swarm-go-audit-profile-cumulative.txt",
+      "sha256": "28a79620512b18fc29657043a6c7e1d7f4fed1aee2df158a671681ff1d1d592c",
+      "bytes": 2194
+    },
+    {
+      "path": "/tmp/swarm-go-audit-profile-alloc.txt",
+      "sha256": "78bb62342e94a46f831e5389fbdfbe4b6d2e5c24d9cb5e491ac7d380b321b887",
+      "bytes": 1319
+    },
+    {
+      "path": "/tmp/swarm-go-audit-profile-alloc-cumulative.txt",
+      "sha256": "e5042e9144969bc811c791b3d0bbdec3db3a7145dc85baf77061eb446f06046a",
+      "bytes": 2515
+    },
+    {
+      "path": "/tmp/swarm-go-audit-fragment.cpu",
+      "sha256": "c5350a0527744d1c910cd297e3a422cc2d9edd53ccf8033c015d63d5c0ddd16e",
+      "bytes": 54802
+    },
+    {
+      "path": "/tmp/swarm-go-audit-fragment.mem",
+      "sha256": "a3b4f8dcbeaa20d077858741ffbea8ec94b84f7430cbea99d1e2608fb2ea3762",
+      "bytes": 77936
+    },
+    {
+      "path": "/tmp/swarm-go-audit-full.jsonl",
+      "sha256": "0409b1f5bed443171207131101555f24addcd2f0378351d3967cf1769a94af8a",
+      "bytes": 1665235
+    },
+    {
+      "path": "/tmp/swarm-go-audit-full.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ]
+}

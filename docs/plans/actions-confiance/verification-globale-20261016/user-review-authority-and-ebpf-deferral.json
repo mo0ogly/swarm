@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-16T06:26:44.712091+00:00",
+  "user_original": "ok 1 et deux on dcomente pour plus tard",
+  "review": {
+    "authorized": true,
+    "scope": "one separate Codex review context, read only",
+    "task": "/root/review_actions_candidate",
+    "candidate_packet": "candidate-current/review-packet.json",
+    "candidate_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+    "status": "received_by_reviewer"
+  },
+  "r20": {
+    "status": "DEFERRED_BY_USER",
+    "remaining": "native positive collection, owned foreign fixture exclusion, loss/restart/cleanup and paired overhead",
+    "resumption": "future explicit user request and authorized BPF environment",
+    "install_vm_authorized": false,
+    "linux_privilege_change_authorized": false
+  },
+  "candidate_modified": false,
+  "global_acceptance": false
+}

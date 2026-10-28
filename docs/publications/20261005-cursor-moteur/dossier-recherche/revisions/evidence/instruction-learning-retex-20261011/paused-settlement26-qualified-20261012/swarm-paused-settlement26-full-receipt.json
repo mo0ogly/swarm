@@ -1,0 +1,22 @@
+{
+  "state": "finished",
+  "started": "2026-10-12T07:47:28.540720+00:00",
+  "finished": "2026-10-12T07:56:26.415537+00:00",
+  "argv": [
+    "go",
+    "test",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/paused-settlement26-8vsuigt1",
+  "candidate_digest": "2232f9c7573b2e404cc383ba0b64fdd7c53e5e6ae0a77d9ec7c72e3c960e6150",
+  "manifest_sha256": "a6a466fcc0cf8c8b61fa8f58b2550bd729e553eec27da7fb7466ad17488bb6c2",
+  "frozen_paths": 2119,
+  "wall_seconds": 537.8748136570066,
+  "exit": 0,
+  "output": "/tmp/swarm-paused-settlement26-full.out",
+  "output_sha256": "acbb16575196c3d9d8caa10f28687f4d96929e64556fa72ed48c266681ad68da",
+  "drift": [],
+  "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+}

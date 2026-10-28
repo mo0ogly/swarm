@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "event_id": "preview-claim",
+  "expected_revision": 2,
+  "scope": "root",
+  "scope_revision": 1,
+  "holder": "fixture-planner",
+  "lease_seconds": 60
+}

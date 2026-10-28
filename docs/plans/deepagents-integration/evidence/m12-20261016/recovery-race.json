@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "^(TestDialogueRecoveryPreviewKeepsBoundaryAndUnknownAuthority|TestDialogueRecoveryCLIAPIReadOnlyAndScoped|TestDialogueRecoveryQualifiesIncompleteAndChangedContracts|TestDialogueRecoverySelectionIgnoresRecentHistoryWindow|TestDialogueCheckpointAPIReadAndForeignWorkRefusal)$",
+    "-count=1",
+    "-v",
+    "-timeout=150s"
+  ],
+  "started_at_utc": "2026-10-16T14:18:53.831251+00:00",
+  "elapsed_seconds": 72.9655592009949,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestDialogueCheckpointAPIReadAndForeignWorkRefusal",
+    "TestDialogueRecoveryPreviewKeepsBoundaryAndUnknownAuthority",
+    "TestDialogueRecoveryCLIAPIReadOnlyAndScoped",
+    "TestDialogueRecoveryQualifiesIncompleteAndChangedContracts",
+    "TestDialogueRecoverySelectionIgnoresRecentHistoryWindow"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "4bc2e0f8ee77ddefd7e17c789b47eed25bd963f089f8c5859efd1235073648f8",
+  "real_model_calls": 0
+}

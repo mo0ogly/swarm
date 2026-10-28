@@ -1,0 +1,93 @@
+=== RUN   TestIncrementalFinalTransportDistinguishesOmittedAndEmptyDiff
+--- PASS: TestIncrementalFinalTransportDistinguishesOmittedAndEmptyDiff (1.45s)
+=== RUN   TestIncrementalHistoricalPrefixRemainsStable
+--- PASS: TestIncrementalHistoricalPrefixRemainsStable (0.00s)
+=== RUN   TestCoordinatedFragmentsCoverageAndBudget
+=== RUN   TestCoordinatedFragmentsCoverageAndBudget/omission
+=== RUN   TestCoordinatedFragmentsCoverageAndBudget/order
+=== RUN   TestCoordinatedFragmentsCoverageAndBudget/scope
+=== RUN   TestCoordinatedFragmentsCoverageAndBudget/criteria
+=== RUN   TestCoordinatedFragmentsCoverageAndBudget/stale
+--- PASS: TestCoordinatedFragmentsCoverageAndBudget (3.34s)
+    --- PASS: TestCoordinatedFragmentsCoverageAndBudget/omission (0.33s)
+    --- PASS: TestCoordinatedFragmentsCoverageAndBudget/order (0.27s)
+    --- PASS: TestCoordinatedFragmentsCoverageAndBudget/scope (0.33s)
+    --- PASS: TestCoordinatedFragmentsCoverageAndBudget/criteria (0.26s)
+    --- PASS: TestCoordinatedFragmentsCoverageAndBudget/stale (0.29s)
+=== RUN   TestManagedFragmentCompleteEvidence
+--- PASS: TestManagedFragmentCompleteEvidence (1.71s)
+=== RUN   TestManagedFragmentRejectsTampering
+=== RUN   TestManagedFragmentRejectsTampering/missing
+=== RUN   TestManagedFragmentRejectsTampering/duplicate
+=== RUN   TestManagedFragmentRejectsTampering/content
+=== RUN   TestManagedFragmentRejectsTampering/candidate
+=== RUN   TestManagedFragmentRejectsTampering/report
+=== RUN   TestManagedFragmentRejectsTampering/source
+=== RUN   TestManagedFragmentRejectsTampering/receipt
+=== RUN   TestManagedFragmentRejectsTampering/order
+=== RUN   TestManagedFragmentRejectsTampering/executable
+=== RUN   TestManagedFragmentRejectsTampering/budget
+--- PASS: TestManagedFragmentRejectsTampering (9.09s)
+    --- PASS: TestManagedFragmentRejectsTampering/missing (0.91s)
+    --- PASS: TestManagedFragmentRejectsTampering/duplicate (0.93s)
+    --- PASS: TestManagedFragmentRejectsTampering/content (1.10s)
+    --- PASS: TestManagedFragmentRejectsTampering/candidate (0.84s)
+    --- PASS: TestManagedFragmentRejectsTampering/report (0.84s)
+    --- PASS: TestManagedFragmentRejectsTampering/source (0.96s)
+    --- PASS: TestManagedFragmentRejectsTampering/receipt (0.87s)
+    --- PASS: TestManagedFragmentRejectsTampering/order (0.91s)
+    --- PASS: TestManagedFragmentRejectsTampering/executable (0.88s)
+    --- PASS: TestManagedFragmentRejectsTampering/budget (0.84s)
+=== RUN   TestManagedFragmentHistoricalSavingsAndIdentity
+    managed_review_fragment_reuse_test.go:70: full=8 calls, differential=4 calls, historical groups=4
+--- PASS: TestManagedFragmentHistoricalSavingsAndIdentity (2.52s)
+=== RUN   TestManagedFragmentHistoricalTampering
+=== RUN   TestManagedFragmentHistoricalTampering/duplicate
+=== RUN   TestManagedFragmentHistoricalTampering/omitted
+=== RUN   TestManagedFragmentHistoricalTampering/reply
+=== RUN   TestManagedFragmentHistoricalTampering/origin
+=== RUN   TestManagedFragmentHistoricalTampering/delta
+=== RUN   TestManagedFragmentHistoricalTampering/charged
+--- PASS: TestManagedFragmentHistoricalTampering (10.32s)
+    --- PASS: TestManagedFragmentHistoricalTampering/duplicate (1.73s)
+    --- PASS: TestManagedFragmentHistoricalTampering/omitted (1.79s)
+    --- PASS: TestManagedFragmentHistoricalTampering/reply (1.73s)
+    --- PASS: TestManagedFragmentHistoricalTampering/origin (1.67s)
+    --- PASS: TestManagedFragmentHistoricalTampering/delta (1.64s)
+    --- PASS: TestManagedFragmentHistoricalTampering/charged (1.75s)
+=== RUN   TestManagedFragmentTokenPlanPreservesLegacyAndEvidence
+--- PASS: TestManagedFragmentTokenPlanPreservesLegacyAndEvidence (36.44s)
+=== RUN   TestManagedFragmentTokenPlanKeepsHistoricalObligations
+--- PASS: TestManagedFragmentTokenPlanKeepsHistoricalObligations (12.41s)
+=== RUN   TestIncrementalReviewNewVerdictAndHistoricalEvidence
+--- PASS: TestIncrementalReviewNewVerdictAndHistoricalEvidence (2.10s)
+=== RUN   TestIncrementalReviewRejectsUnverifiedBaseline
+=== RUN   TestIncrementalReviewRejectsUnverifiedBaseline/missing-proof
+=== RUN   TestIncrementalReviewRejectsUnverifiedBaseline/policy
+=== RUN   TestIncrementalReviewRejectsUnverifiedBaseline/verdict
+--- PASS: TestIncrementalReviewRejectsUnverifiedBaseline (4.73s)
+    --- PASS: TestIncrementalReviewRejectsUnverifiedBaseline/missing-proof (1.64s)
+    --- PASS: TestIncrementalReviewRejectsUnverifiedBaseline/policy (1.58s)
+    --- PASS: TestIncrementalReviewRejectsUnverifiedBaseline/verdict (1.51s)
+=== RUN   TestIncrementalReviewStillRequiresFreshPass
+--- PASS: TestIncrementalReviewStillRequiresFreshPass (1.77s)
+=== RUN   TestIncrementalReviewUsesVerifiedBaselineWhenContextFits
+--- PASS: TestIncrementalReviewUsesVerifiedBaselineWhenContextFits (1.45s)
+=== RUN   TestIncrementalBaselineScopeReachesFragmentInspection
+=== RUN   TestIncrementalBaselineScopeReachesFragmentInspection/0
+=== RUN   TestIncrementalBaselineScopeReachesFragmentInspection/1
+=== RUN   TestIncrementalBaselineScopeReachesFragmentInspection/2
+=== RUN   TestIncrementalBaselineScopeReachesFragmentInspection/3
+--- PASS: TestIncrementalBaselineScopeReachesFragmentInspection (0.01s)
+    --- PASS: TestIncrementalBaselineScopeReachesFragmentInspection/0 (0.00s)
+    --- PASS: TestIncrementalBaselineScopeReachesFragmentInspection/1 (0.00s)
+    --- PASS: TestIncrementalBaselineScopeReachesFragmentInspection/2 (0.00s)
+    --- PASS: TestIncrementalBaselineScopeReachesFragmentInspection/3 (0.00s)
+=== RUN   TestIncrementalFittingContextRefusesCorruptedAcceptedBaseline
+--- PASS: TestIncrementalFittingContextRefusesCorruptedAcceptedBaseline (1.38s)
+=== RUN   TestManagedFragmentEveryInspectionReceivesCurrentCriteria
+--- PASS: TestManagedFragmentEveryInspectionReceivesCurrentCriteria (1.79s)
+=== RUN   TestManagedFragmentRejectsUnknownScopeVersion
+--- PASS: TestManagedFragmentRejectsUnknownScopeVersion (0.32s)
+PASS
+ok  	swarm.local/companion/internal/engine	92.028s

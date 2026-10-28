@@ -1,0 +1,267 @@
+=== RUN   TestAgentWorkflowRolesAreBounded
+=== RUN   TestAgentWorkflowRolesAreBounded/planner
+    agent_workflow_test.go:44: planner workflow: 32192 bytes
+=== RUN   TestAgentWorkflowRolesAreBounded/subplanner
+    agent_workflow_test.go:44: subplanner workflow: 32198 bytes
+=== RUN   TestAgentWorkflowRolesAreBounded/worker
+    agent_workflow_test.go:44: worker workflow: 31255 bytes
+=== RUN   TestAgentWorkflowRolesAreBounded/reviewer
+    agent_workflow_test.go:44: reviewer workflow: 18694 bytes
+--- PASS: TestAgentWorkflowRolesAreBounded (0.01s)
+    --- PASS: TestAgentWorkflowRolesAreBounded/planner (0.00s)
+    --- PASS: TestAgentWorkflowRolesAreBounded/subplanner (0.00s)
+    --- PASS: TestAgentWorkflowRolesAreBounded/worker (0.00s)
+    --- PASS: TestAgentWorkflowRolesAreBounded/reviewer (0.00s)
+=== RUN   TestManagedBatchRuntimePublishesOnlyCompleteCandidate
+--- PASS: TestManagedBatchRuntimePublishesOnlyCompleteCandidate (7.47s)
+=== RUN   TestManagedBatchRuntimeBudgetFailsBeforeCalls
+--- PASS: TestManagedBatchRuntimeBudgetFailsBeforeCalls (2.52s)
+=== RUN   TestManagedBatchRuntimeExplicitRetryReusesPaidPass
+=== RUN   TestManagedBatchRuntimeExplicitRetryReusesPaidPass/resume
+=== RUN   TestManagedBatchRuntimeExplicitRetryReusesPaidPass/tampered-pass
+--- PASS: TestManagedBatchRuntimeExplicitRetryReusesPaidPass (14.87s)
+    --- PASS: TestManagedBatchRuntimeExplicitRetryReusesPaidPass/resume (9.09s)
+    --- PASS: TestManagedBatchRuntimeExplicitRetryReusesPaidPass/tampered-pass (5.78s)
+=== RUN   TestManagedBatchRuntimeInterruptedPersistence
+=== RUN   TestManagedBatchRuntimeInterruptedPersistence/all-passed
+=== RUN   TestManagedBatchRuntimeInterruptedPersistence/reply-not-durable
+--- PASS: TestManagedBatchRuntimeInterruptedPersistence (17.51s)
+    --- PASS: TestManagedBatchRuntimeInterruptedPersistence/all-passed (8.62s)
+    --- PASS: TestManagedBatchRuntimeInterruptedPersistence/reply-not-durable (8.89s)
+=== RUN   TestManagedBatchRuntimeNegativeVerdicts
+=== RUN   TestManagedBatchRuntimeNegativeVerdicts/fail
+=== RUN   TestManagedBatchRuntimeNegativeVerdicts/unknown
+=== RUN   TestManagedBatchRuntimeNegativeVerdicts/wrong-sha
+=== RUN   TestManagedBatchRuntimeNegativeVerdicts/missing-task
+--- PASS: TestManagedBatchRuntimeNegativeVerdicts (15.75s)
+    --- PASS: TestManagedBatchRuntimeNegativeVerdicts/fail (3.89s)
+    --- PASS: TestManagedBatchRuntimeNegativeVerdicts/unknown (4.08s)
+    --- PASS: TestManagedBatchRuntimeNegativeVerdicts/wrong-sha (3.88s)
+    --- PASS: TestManagedBatchRuntimeNegativeVerdicts/missing-task (3.90s)
+=== RUN   TestManagedBatchRuntimeProviderChangeInvalidatesPublication
+--- PASS: TestManagedBatchRuntimeProviderChangeInvalidatesPublication (6.17s)
+=== RUN   TestManagedBatchReferenceFailureDoesNotRetryUnchanged
+--- PASS: TestManagedBatchReferenceFailureDoesNotRetryUnchanged (4.99s)
+=== RUN   TestManagedBatchPreflightPreservesGlobalEvidenceAndCoverage
+--- PASS: TestManagedBatchPreflightPreservesGlobalEvidenceAndCoverage (0.27s)
+=== RUN   TestManagedBatchPreflightFailsBeforeAnyUsablePlan
+=== RUN   TestManagedBatchPreflightFailsBeforeAnyUsablePlan/global-too-large
+=== RUN   TestManagedBatchPreflightFailsBeforeAnyUsablePlan/single-too-large
+=== RUN   TestManagedBatchPreflightFailsBeforeAnyUsablePlan/unassigned
+=== RUN   TestManagedBatchPreflightFailsBeforeAnyUsablePlan/unknown-task
+=== RUN   TestManagedBatchPreflightFailsBeforeAnyUsablePlan/unknown-source
+=== RUN   TestManagedBatchPreflightFailsBeforeAnyUsablePlan/changed-source
+=== RUN   TestManagedBatchPreflightFailsBeforeAnyUsablePlan/duplicate-source
+=== RUN   TestManagedBatchPreflightFailsBeforeAnyUsablePlan/task-source-limit
+=== RUN   TestManagedBatchPreflightFailsBeforeAnyUsablePlan/empty-criteria
+--- PASS: TestManagedBatchPreflightFailsBeforeAnyUsablePlan (0.28s)
+    --- PASS: TestManagedBatchPreflightFailsBeforeAnyUsablePlan/global-too-large (0.05s)
+    --- PASS: TestManagedBatchPreflightFailsBeforeAnyUsablePlan/single-too-large (0.11s)
+    --- PASS: TestManagedBatchPreflightFailsBeforeAnyUsablePlan/unassigned (0.00s)
+    --- PASS: TestManagedBatchPreflightFailsBeforeAnyUsablePlan/unknown-task (0.00s)
+    --- PASS: TestManagedBatchPreflightFailsBeforeAnyUsablePlan/unknown-source (0.00s)
+    --- PASS: TestManagedBatchPreflightFailsBeforeAnyUsablePlan/changed-source (0.00s)
+    --- PASS: TestManagedBatchPreflightFailsBeforeAnyUsablePlan/duplicate-source (0.00s)
+    --- PASS: TestManagedBatchPreflightFailsBeforeAnyUsablePlan/task-source-limit (0.11s)
+    --- PASS: TestManagedBatchPreflightFailsBeforeAnyUsablePlan/empty-criteria (0.00s)
+=== RUN   TestManagedBatchSingleContextKeepsLegacyPrompt
+--- PASS: TestManagedBatchSingleContextKeepsLegacyPrompt (0.02s)
+=== RUN   TestManagedBatchSourceOwnershipUsesImmutableManifests
+--- PASS: TestManagedBatchSourceOwnershipUsesImmutableManifests (0.14s)
+=== RUN   TestManagedBatchVerdictsRequireCompleteExactCoverage
+--- PASS: TestManagedBatchVerdictsRequireCompleteExactCoverage (0.11s)
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/missing-reply
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/missing-batch
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/duplicate-task
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/foreign-sha
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/changed-diff
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/changed-report
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/changed-source
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/missing-criteria
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/extra-task
+--- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence (1.86s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/missing-reply (0.28s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/missing-batch (0.20s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/duplicate-task (0.16s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/foreign-sha (0.21s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/changed-diff (0.17s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/changed-report (0.25s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/changed-source (0.17s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/missing-criteria (0.26s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/extra-task (0.16s)
+=== RUN   TestManagedBatchSourcesBoundPerTask
+--- PASS: TestManagedBatchSourcesBoundPerTask (0.14s)
+=== RUN   TestCitationCatalogPreservesOriginalBytesWithoutAgentCopy
+=== RUN   TestCitationCatalogPreservesOriginalBytesWithoutAgentCopy/patch_indentation
+=== RUN   TestCitationCatalogPreservesOriginalBytesWithoutAgentCopy/captured_JSON_output
+=== RUN   TestCitationCatalogPreservesOriginalBytesWithoutAgentCopy/multi-line_patch
+--- PASS: TestCitationCatalogPreservesOriginalBytesWithoutAgentCopy (0.00s)
+    --- PASS: TestCitationCatalogPreservesOriginalBytesWithoutAgentCopy/patch_indentation (0.00s)
+    --- PASS: TestCitationCatalogPreservesOriginalBytesWithoutAgentCopy/captured_JSON_output (0.00s)
+    --- PASS: TestCitationCatalogPreservesOriginalBytesWithoutAgentCopy/multi-line_patch (0.00s)
+=== RUN   TestCitationCatalogCoversUnicodeAndTailWithoutTruncation
+--- PASS: TestCitationCatalogCoversUnicodeAndTailWithoutTruncation (0.00s)
+=== RUN   TestCitationCatalogRejectsForeignAndMalformedReferences
+--- PASS: TestCitationCatalogRejectsForeignAndMalformedReferences (0.00s)
+=== RUN   TestCitationCatalogDeduplicatesTextAndRetainsAttribution
+--- PASS: TestCitationCatalogDeduplicatesTextAndRetainsAttribution (0.00s)
+=== RUN   TestStructuredCitationContractRequiresOriginalReferences
+--- PASS: TestStructuredCitationContractRequiresOriginalReferences (2.12s)
+=== RUN   TestCitationCatalogSharesCapturedJSONWithoutLosingOriginals
+--- PASS: TestCitationCatalogSharesCapturedJSONWithoutLosingOriginals (0.00s)
+=== RUN   TestFinalCitationRecoveryReplacesLegacyContractAfterReopen
+=== RUN   TestFinalCitationRecoveryReplacesLegacyContractAfterReopen/operator
+    managed_review_citation_feedback_test.go:196: sizes 164551 168226 22007 parts 1
+=== RUN   TestFinalCitationRecoveryReplacesLegacyContractAfterReopen/supervisor
+    managed_review_citation_feedback_test.go:196: sizes 164551 168226 22007 parts 1
+--- PASS: TestFinalCitationRecoveryReplacesLegacyContractAfterReopen (32.78s)
+    --- PASS: TestFinalCitationRecoveryReplacesLegacyContractAfterReopen/operator (16.30s)
+    --- PASS: TestFinalCitationRecoveryReplacesLegacyContractAfterReopen/supervisor (16.48s)
+=== RUN   TestReferencedCitationFinalContractMaterializesNativeFailureForms
+=== RUN   TestReferencedCitationFinalContractMaterializesNativeFailureForms/715b8e9984fe
+=== RUN   TestReferencedCitationFinalContractMaterializesNativeFailureForms/8a87bd5e73d5
+=== RUN   TestReferencedCitationFinalContractMaterializesNativeFailureForms/a95c0e9944d0
+--- PASS: TestReferencedCitationFinalContractMaterializesNativeFailureForms (6.11s)
+    --- PASS: TestReferencedCitationFinalContractMaterializesNativeFailureForms/715b8e9984fe (1.98s)
+    --- PASS: TestReferencedCitationFinalContractMaterializesNativeFailureForms/8a87bd5e73d5 (2.11s)
+    --- PASS: TestReferencedCitationFinalContractMaterializesNativeFailureForms/a95c0e9944d0 (2.02s)
+=== RUN   TestReferencedCitationSingleAndBatchContracts
+--- PASS: TestReferencedCitationSingleAndBatchContracts (0.46s)
+=== RUN   TestReferencedCitationBatchSchemaMatchesAssignment
+--- PASS: TestReferencedCitationBatchSchemaMatchesAssignment (0.08s)
+=== RUN   TestReferencedCitationWireBoundPrecedesMaterialization
+--- PASS: TestReferencedCitationWireBoundPrecedesMaterialization (0.40s)
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/pass
+    managed_review_citation_runtime_test.go:51: sizes 164551 168224 22007 parts 1
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/questions-resolved
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/questions-open
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/reference-invalid
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/reference-stale
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+--- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard (101.54s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/pass (24.15s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/questions-resolved (23.91s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/questions-open (19.21s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/reference-invalid (16.99s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/reference-stale (17.26s)
+=== RUN   TestReferencedCitationOrdinaryRetryRequiresChangedPrecondition
+--- PASS: TestReferencedCitationOrdinaryRetryRequiresChangedPrecondition (0.76s)
+=== RUN   TestReferencedCitationInstructionsAloneCannotRestart
+--- PASS: TestReferencedCitationInstructionsAloneCannotRestart (0.74s)
+=== RUN   TestReferencedCitationUsesExistingLiteralAndScopeGuards
+--- PASS: TestReferencedCitationUsesExistingLiteralAndScopeGuards (0.01s)
+=== RUN   TestReferencedCitationRejectsInvalidWireBeforeMaterialization
+=== RUN   TestReferencedCitationRejectsInvalidWireBeforeMaterialization/foreign_catalogue
+=== RUN   TestReferencedCitationRejectsInvalidWireBeforeMaterialization/foreign_candidate
+=== RUN   TestReferencedCitationRejectsInvalidWireBeforeMaterialization/unknown_reference
+=== RUN   TestReferencedCitationRejectsInvalidWireBeforeMaterialization/negative_reference
+=== RUN   TestReferencedCitationRejectsInvalidWireBeforeMaterialization/text_alongside_reference
+=== RUN   TestReferencedCitationRejectsInvalidWireBeforeMaterialization/null_text_alongside_reference
+=== RUN   TestReferencedCitationRejectsInvalidWireBeforeMaterialization/null_reference
+=== RUN   TestReferencedCitationRejectsInvalidWireBeforeMaterialization/unknown_field
+=== RUN   TestReferencedCitationRejectsInvalidWireBeforeMaterialization/duplicate_field
+=== RUN   TestReferencedCitationRejectsInvalidWireBeforeMaterialization/invalid_UTF8
+--- PASS: TestReferencedCitationRejectsInvalidWireBeforeMaterialization (0.01s)
+    --- PASS: TestReferencedCitationRejectsInvalidWireBeforeMaterialization/foreign_catalogue (0.00s)
+    --- PASS: TestReferencedCitationRejectsInvalidWireBeforeMaterialization/foreign_candidate (0.00s)
+    --- PASS: TestReferencedCitationRejectsInvalidWireBeforeMaterialization/unknown_reference (0.00s)
+    --- PASS: TestReferencedCitationRejectsInvalidWireBeforeMaterialization/negative_reference (0.00s)
+    --- PASS: TestReferencedCitationRejectsInvalidWireBeforeMaterialization/text_alongside_reference (0.00s)
+    --- PASS: TestReferencedCitationRejectsInvalidWireBeforeMaterialization/null_text_alongside_reference (0.00s)
+    --- PASS: TestReferencedCitationRejectsInvalidWireBeforeMaterialization/null_reference (0.00s)
+    --- PASS: TestReferencedCitationRejectsInvalidWireBeforeMaterialization/unknown_field (0.00s)
+    --- PASS: TestReferencedCitationRejectsInvalidWireBeforeMaterialization/duplicate_field (0.00s)
+    --- PASS: TestReferencedCitationRejectsInvalidWireBeforeMaterialization/invalid_UTF8 (0.00s)
+=== RUN   TestReferencedCitationSchemaConstrainsChoicesAndPreservesUnknown
+--- PASS: TestReferencedCitationSchemaConstrainsChoicesAndPreservesUnknown (0.00s)
+=== RUN   TestManagedFragmentRuntimeProviderProtocol
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/pass
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168226 22007 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/fail
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168226 22007 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/unknown
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168226 22007 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/exit
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168226 22007 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/selection-unknown
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168226 22007 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/decision-fail
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168226 22007 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/questions-resolved
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168222 22007 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/questions-open
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168226 22007 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/questions-omitted
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168226 22007 parts 1
+--- PASS: TestManagedFragmentRuntimeProviderProtocol (149.59s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/pass (22.93s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/fail (19.52s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/unknown (16.02s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/exit (4.41s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/selection-unknown (11.22s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/decision-fail (17.69s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/questions-resolved (23.47s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/questions-open (17.83s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/questions-omitted (16.51s)
+=== RUN   TestReviewMethodRestartRequiresExplicitCorrectionAndKeepsHistory
+    managed_review_method_restart_test.go:28: sizes 164551 168226 22007 parts 1
+--- PASS: TestReviewMethodRestartRequiresExplicitCorrectionAndKeepsHistory (3.55s)
+=== RUN   TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal
+=== RUN   TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/journal
+    managed_review_method_restart_test.go:112: sizes 164551 168222 22007 parts 1
+=== RUN   TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/receipt
+    managed_review_method_restart_test.go:112: sizes 164551 168226 22007 parts 1
+=== RUN   TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/semantic_refusal
+    managed_review_method_restart_test.go:112: sizes 164551 168224 22007 parts 1
+=== RUN   TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/budget
+    managed_review_method_restart_test.go:112: sizes 164551 168226 22007 parts 1
+--- PASS: TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal (8.37s)
+    --- PASS: TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/journal (2.08s)
+    --- PASS: TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/receipt (2.03s)
+    --- PASS: TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/semantic_refusal (1.93s)
+    --- PASS: TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal/budget (2.33s)
+=== RUN   TestManagedIndependentReviewPublishesSameSHAAndSeparateProcess
+--- PASS: TestManagedIndependentReviewPublishesSameSHAAndSeparateProcess (0.85s)
+=== RUN   TestManagedIndependentReviewRejectsFailuresUnknownAndWrongSHA
+=== RUN   TestManagedIndependentReviewRejectsFailuresUnknownAndWrongSHA/fail
+=== RUN   TestManagedIndependentReviewRejectsFailuresUnknownAndWrongSHA/unknown
+=== RUN   TestManagedIndependentReviewRejectsFailuresUnknownAndWrongSHA/exit
+=== RUN   TestManagedIndependentReviewRejectsFailuresUnknownAndWrongSHA/wrong-sha
+=== RUN   TestManagedIndependentReviewRejectsFailuresUnknownAndWrongSHA/missing-task
+--- PASS: TestManagedIndependentReviewRejectsFailuresUnknownAndWrongSHA (3.66s)
+    --- PASS: TestManagedIndependentReviewRejectsFailuresUnknownAndWrongSHA/fail (0.70s)
+    --- PASS: TestManagedIndependentReviewRejectsFailuresUnknownAndWrongSHA/unknown (0.72s)
+    --- PASS: TestManagedIndependentReviewRejectsFailuresUnknownAndWrongSHA/exit (0.70s)
+    --- PASS: TestManagedIndependentReviewRejectsFailuresUnknownAndWrongSHA/wrong-sha (0.76s)
+    --- PASS: TestManagedIndependentReviewRejectsFailuresUnknownAndWrongSHA/missing-task (0.77s)
+=== RUN   TestManagedIndependentReviewMissingOrBudgetExhaustedCannotPublish
+=== RUN   TestManagedIndependentReviewMissingOrBudgetExhaustedCannotPublish/missing
+=== RUN   TestManagedIndependentReviewMissingOrBudgetExhaustedCannotPublish/budget
+--- PASS: TestManagedIndependentReviewMissingOrBudgetExhaustedCannotPublish (1.16s)
+    --- PASS: TestManagedIndependentReviewMissingOrBudgetExhaustedCannotPublish/missing (0.57s)
+    --- PASS: TestManagedIndependentReviewMissingOrBudgetExhaustedCannotPublish/budget (0.59s)
+=== RUN   TestManagedIndependentReviewBindsReportsContractAndCandidate
+--- PASS: TestManagedIndependentReviewBindsReportsContractAndCandidate (0.83s)
+=== RUN   TestManagedIndependentReviewRestartAfterVerdictDoesNotPayTwice
+--- PASS: TestManagedIndependentReviewRestartAfterVerdictDoesNotPayTwice (0.88s)
+=== RUN   TestManagedIndependentReviewInterruptedCallRequiresExplicitBoundedRetry
+--- PASS: TestManagedIndependentReviewInterruptedCallRequiresExplicitBoundedRetry (1.23s)
+=== RUN   TestManagedIndependentReviewRechecksPreviouslyAcceptedTasksOnNewSHA
+--- PASS: TestManagedIndependentReviewRechecksPreviouslyAcceptedTasksOnNewSHA (1.43s)
+=== RUN   TestManagedIndependentReviewLegacyFlagCannotBypassAcceptance
+--- PASS: TestManagedIndependentReviewLegacyFlagCannotBypassAcceptance (0.80s)
+=== RUN   TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation
+=== RUN   TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation/binary
+=== RUN   TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation/oversize
+    managed_review_test.go:434: unreviewable context silently truncated or accepted
+--- FAIL: TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation (2.33s)
+    --- PASS: TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation/binary (0.63s)
+    --- FAIL: TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation/oversize (1.70s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	392.029s
+FAIL

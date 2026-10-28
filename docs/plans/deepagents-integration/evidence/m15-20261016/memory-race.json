@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "^(TestDialogueRestoreMemoryRechecksAncestorAfterPreflight|TestProjectMemoryDialogueInheritedUseAndWithdrawal|TestProjectMemoryConcurrentReplacement|TestDialogueRestoreConcurrentRequestsCreateOneExecution)$",
+    "-count=1",
+    "-v",
+    "-timeout=150s"
+  ],
+  "started_at_utc": "2026-10-16T18:23:59.914701+00:00",
+  "duration_seconds": 324.763,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestDialogueRestoreConcurrentRequestsCreateOneExecution",
+    "TestProjectMemoryDialogueInheritedUseAndWithdrawal",
+    "TestDialogueRestoreMemoryRechecksAncestorAfterPreflight",
+    "TestProjectMemoryConcurrentReplacement"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "fee40f5a92c6679299c97ed961e727d52c36fcf4d5b579100721e7c42e6a367e",
+  "real_model_calls": 0
+}

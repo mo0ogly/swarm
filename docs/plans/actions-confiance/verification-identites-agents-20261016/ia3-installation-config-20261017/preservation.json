@@ -1,0 +1,10 @@
+{
+  "checked": 19,
+  "changed": [],
+  "new_package_files": [
+    "internal/enrollmentconfig/config.go",
+    "internal/enrollmentconfig/store_linux_test.go",
+    "internal/enrollmentconfig/store_linux.go",
+    "internal/enrollmentconfig/config_test.go"
+  ]
+}

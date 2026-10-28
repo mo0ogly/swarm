@@ -1,0 +1,7 @@
+{
+  "cause": "Unbounded multiline replacement crossed Go function boundaries and removed historical test sections",
+  "observed_failure": "TestPlanningHistoricalInputsCannotPoisonCurrentDecision",
+  "failed_output": "/tmp/swarm-inspection-state24-planner-targeted-final.out",
+  "correction": "Restore qualified parent file, edit only two named function regions, assert complete test inventory unchanged",
+  "limits": "Corrected fixture adaptation still requires verification"
+}

@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-15T21:14:00.375495+00:00",
+  "pid": 1636937,
+  "start_ticks": "3312308",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-trust-remote-final-check.py",
+    "run"
+  ],
+  "reason": "client cancellation returned, server witness waited indefinitely; owned test group stopped; no PASS claim",
+  "signal": "SIGTERM"
+}

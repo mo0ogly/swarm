@@ -29,11 +29,10 @@ owner role, scope/files, inputs, deliverable, acceptance checks and recovery rou
 Include planning and independent verification responsibilities when the mission
 requires them; a list of workers is not a complete coordination design.
 
-Check for cycles, absent prerequisites, overlapping writes, missing review,
-unavailable providers and incompatible budgets. Use the engine's plan format and
-public validation commands; do not invent a second acceptance schema.
-Preserve the canonical plan on resume. A plan-only request ends with a reviewable
-plan and remaining questions, never a claim that execution has occurred.
+Check prerequisites, cycles, write ownership, review, providers and budgets.
+Use existing engine formats and public validation. Preserve the canonical plan
+on resume; planning-only ends with a reviewable plan and unresolved questions,
+never an execution claim.
 
 ## Execute within the assigned role
 
@@ -42,9 +41,14 @@ bounded action, implement it, then observe its effect. First reproduce a reporte
 defect with a meaningful failing case where feasible. Make the smallest coherent
 change; preserve unrelated work. Maintain short decision and evidence notes.
 
-After failure, diagnose the concrete cause and change the precondition or approach.
-Use `replan` for a structural obstacle. Keep original attempts and budgets; never
-start a new mission simply to escape a ceiling. Delegate only when already authorized.
+Apply `replan` on resume, failure, blockage, insufficient evidence or changed
+assumptions. Diagnose and correct the cause before retrying; revise structural
+obstacles. Preserve attempts, originals and budgets; never replace a mission to
+escape a ceiling. Delegate only with existing authorization.
+
+After each result, apply the shared contract's recursive diagnosis and recovery
+loop to the engine, context handoff and your own assumptions. Preserve original
+proofs, verify receipt and decision, then return to the initial requirement.
 
 ## Verify and close
 
@@ -56,3 +60,9 @@ tests and independent review to the same candidate SHA before engine acceptance.
 Deliver: result in plain language; requirements/evidence matrix; revision and dirty
 state; commands and outcomes; report/artifact paths; remaining limits and next action.
 A critical failed or untested criterion means incomplete delivery. Report it plainly.
+
+
+## Go → Rust migration
+
+For migration work, read and apply [the adopted method](references/rust-migration.md).
+Tool-free roles need this reference supplied in context; report its absence.

@@ -1,0 +1,386 @@
+{
+  "kind": "scoped-semantic-review-not-global-qualification",
+  "reviewer": "Codex principal",
+  "delivered_version": "v0.1.1-dev.92",
+  "binary_sha256": "4bce925735d788fb76fb80c8501922b1870e851f3ab6add08ecae3742ec18645",
+  "effective_input_count": 446,
+  "qualified_build": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/local-delivery/rust-80w7z2hy",
+  "entries": [
+    {
+      "path": "rust/crates/swarm-engine/src/preparation_command.rs",
+      "sha256": "c68f499f5a8061af770329f14d66a08b23cf6402a7b75cdfed58bd094c3a2def",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/preparation_models.rs",
+      "sha256": "d156de03e94ae1eb03677744a13c442903466a990911293eaf3cbb63ceb5ad66",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_write.rs",
+      "sha256": "f516e6d67c9281a645b773e4ea13c49dbca8e11a0121300a8dfc0b2ac293f6a1",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_read.rs",
+      "sha256": "851e9db99b0ab2d9d53f4e8fe3a30a07e44601a8cad5d14712b439dcdff7c67f",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_plan.rs",
+      "sha256": "8c6859b79ac43b79a108e88a4b901a8b3047059472aac0e884ba2d90f563b33c",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "rule/over/safe_name/story_name/references_ok/acyclic/validate reviewed. Shared authoritative identity; known/duplicate refs checked before iterative Kahn, checked counters avoid panics. Nil/list requirements, answered questions, required task fields and product coverage/risk/refs ported. Returns plan unchanged because Go validate-plan discards ordered tasks.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/engine_settings.rs",
+      "sha256": "463cac278ddaf86ffcccf3c9fd111186bad251b9f22d24363cd95f1aa60fc48d",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "has_preparation_plan_policy, preparation_plan_policy, validate and schema_version, request/document versions1..43 reviewed. Complete group required; absent vs Some(null) distinct; counts convert with authoritative representation errors. Existing defaults/read/write groups preserve dependencies.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/lib.rs",
+      "sha256": "765c0bacc9c240492f126e25864a76b6760db86e3d3bfed804e16b469a96151c",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store.rs",
+      "sha256": "d27376b1a30eed9b8094ab081a95f867b7194a32b6572e4b19af8b3cbbf393a9",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/config/engine-settings.json",
+      "sha256": "e57f7158f51b298adc58e6c54d8945ea83bd1038d82ed095f40e5a67ddfa348b",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+      "sha256": "cdd675498ae50a2891da869aeec70fd24ecb0612dbf1f943555575f4bd38dfc4",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-cli/src/preparation.rs",
+      "sha256": "ffe92c6432548d547e65c501b9b449a0adda559da439600917a2f25a98baaac5",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-cli/src/lib.rs",
+      "sha256": "21448cc8a23ceed96d27b32de36ba77997c55a4f5aa86f70c0bba4dccb458bdb",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service.rs",
+      "sha256": "8f56f227fa9fefaddd5f44c56c95c2c4176a89b8874a17e164754d51e2152a63",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service/preparations.rs",
+      "sha256": "b09a87cdc3a659f78b55c743521b393eb8ef15cc6e49f1bd76feef2910df8a07",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/tests/preparation_plan.rs",
+      "sha256": "cc11dd90988342b12445bcc2c7d7f3078dda7bbb83801a8b5e12a713d2cdbeaa",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Fixture counts/IDs/text and triggered faults only; operator changes use supported preview/apply or actual Admin modal. No arbitrary global watchdog/provider/live DB. Catalog version43 expectations updated to current defaults, old schemas retained as explicit controls.",
+        "functions": "Test helpers main/check/save/draft/request/refused/task/plan/product_plan or named Rust tests reviewed against real APIs. Save fixture events have distinct explicit namespace. Valid controls precede corruption, trigger and /dev/full faults. New product graph cases included in final98, not historical95.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/tests/engine_settings_catalog.rs",
+      "sha256": "e504fbd4b59532be483a383ec082f2668088117362cd236595185c631b686ee6",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Fixture counts/IDs/text and triggered faults only; operator changes use supported preview/apply or actual Admin modal. No arbitrary global watchdog/provider/live DB. Catalog version43 expectations updated to current defaults, old schemas retained as explicit controls.",
+        "functions": "Test helpers main/check/save/draft/request/refused/task/plan/product_plan or named Rust tests reviewed against real APIs. Save fixture events have distinct explicit namespace. Valid controls precede corruption, trigger and /dev/full faults. New product graph cases included in final98, not historical95.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "tests/rust_preparation_plan.py",
+      "sha256": "fb04b4e9290ef54314c17049953dae59dbe444f66146778c866ec80187c994ce",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Fixture counts/IDs/text and triggered faults only; operator changes use supported preview/apply or actual Admin modal. No arbitrary global watchdog/provider/live DB. Catalog version43 expectations updated to current defaults, old schemas retained as explicit controls.",
+        "functions": "Test helpers main/check/save/draft/request/refused/task/plan/product_plan or named Rust tests reviewed against real APIs. Save fixture events have distinct explicit namespace. Valid controls precede corruption, trigger and /dev/full faults. New product graph cases included in final98, not historical95.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "tests/rust_preparation_plan_integrity.py",
+      "sha256": "bfcf59400635b99efc2613423899d058018fc230c94d349282da2ab98a5f4a29",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Fixture counts/IDs/text and triggered faults only; operator changes use supported preview/apply or actual Admin modal. No arbitrary global watchdog/provider/live DB. Catalog version43 expectations updated to current defaults, old schemas retained as explicit controls.",
+        "functions": "Test helpers main/check/save/draft/request/refused/task/plan/product_plan or named Rust tests reviewed against real APIs. Save fixture events have distinct explicit namespace. Valid controls precede corruption, trigger and /dev/full faults. New product graph cases included in final98, not historical95.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "tests/rust_preparation_plan_upgrade.py",
+      "sha256": "ada52ff973725a3837fe04645567b16213aae9b0a547a91402503a108c578403",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Fixture counts/IDs/text and triggered faults only; operator changes use supported preview/apply or actual Admin modal. No arbitrary global watchdog/provider/live DB. Catalog version43 expectations updated to current defaults, old schemas retained as explicit controls.",
+        "functions": "Test helpers main/check/save/draft/request/refused/task/plan/product_plan or named Rust tests reviewed against real APIs. Save fixture events have distinct explicit namespace. Valid controls precede corruption, trigger and /dev/full faults. New product graph cases included in final98, not historical95.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "tests/rust_preparation_writes.py",
+      "sha256": "016cbcf1edd39f40388133ba947b49f0d81fc2aca35546c1ef6664a25696094d",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Fixture counts/IDs/text and triggered faults only; operator changes use supported preview/apply or actual Admin modal. No arbitrary global watchdog/provider/live DB. Catalog version43 expectations updated to current defaults, old schemas retained as explicit controls.",
+        "functions": "Test helpers main/check/save/draft/request/refused/task/plan/product_plan or named Rust tests reviewed against real APIs. Save fixture events have distinct explicit namespace. Valid controls precede corruption, trigger and /dev/full faults. New product graph cases included in final98, not historical95.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "tests/rust_preparation_upgrade.py",
+      "sha256": "b94973cb3a94b4543c890feefcade854de0456f31d6305709ad296383f300d4c",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Fixture counts/IDs/text and triggered faults only; operator changes use supported preview/apply or actual Admin modal. No arbitrary global watchdog/provider/live DB. Catalog version43 expectations updated to current defaults, old schemas retained as explicit controls.",
+        "functions": "Test helpers main/check/save/draft/request/refused/task/plan/product_plan or named Rust tests reviewed against real APIs. Save fixture events have distinct explicit namespace. Valid controls precede corruption, trigger and /dev/full faults. New product graph cases included in final98, not historical95.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "tests/rust_preparation_admin_ui.cjs",
+      "sha256": "ea09cfa7473914db23b1a28aacbec364a1d1e7ad7639bb6a36b8f70fcd188eea",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Fixture counts/IDs/text and triggered faults only; operator changes use supported preview/apply or actual Admin modal. No arbitrary global watchdog/provider/live DB. Catalog version43 expectations updated to current defaults, old schemas retained as explicit controls.",
+        "functions": "Test helpers main/check/save/draft/request/refused/task/plan/product_plan or named Rust tests reviewed against real APIs. Save fixture events have distinct explicit namespace. Valid controls precede corruption, trigger and /dev/full faults. New product graph cases included in final98, not historical95.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "tools/verification/recipes/preparation-writes-rust.json",
+      "sha256": "b70de1f669e4ca10d24f82162771a58e1c9f3f0db263732866c05dc0a36ef647",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "tools/verification/recipes/preparation-upgrade-rust.json",
+      "sha256": "849afa244fa090150613e749a83144caa9ab22e10cc27c35eeef939d13612bdd",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "tools/verification/recipes/preparation-plan-upgrade-rust.json",
+      "sha256": "5f1023bf1dd49e048c346ba1493619122fa7d2df07381df565bd9c65b57be5e0",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "locales/en.json",
+      "sha256": "06e9f3629372645d34c184732e8969ab3f0cd15f0006467fab4bc0575c740bf6",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "Generated English dictionary or canonical locale only; no business function changed. Existing i18n builder used; i18n locale/build guards PASS.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "web/i18n-en.js",
+      "sha256": "69124ee51c5c22fa562b00c0b0485e254a2d523b43b5159325e044153174e892",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "Generated English dictionary or canonical locale only; no business function changed. Existing i18n builder used; i18n locale/build guards PASS.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "version_history.json",
+      "sha256": "08841c697d659fa85e33d583741d3027c30fbf2c17819dd4d71ba1cff78e42ff",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "New/changed plan validation path reviewed with current producers: validate action/sha; WriteContext stable settings; current_method_hash shared capability observation; apply CAS/receipt before new verdict; preparation_command preserves effects/errors. New hash helpers and read projection detect corruption but permit public repair. No conversion/mission/provider authority.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "docs/architecture/RUST-MIGRATION.md",
+      "sha256": "9097f799d62cb6bd2711432410f2477e5196f6c6919436836b7426fd7b7932da",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "Operational documentation only; no product function. Examples specify explicit action/ID/revision/hash; protocol vs configurable caps, errors, no conversion and supported repair described.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "docs/en/RUST-MIGRATION.md",
+      "sha256": "ff4b679ee83e24f1b50004b82b8efd2164552fdc5301924f5861db0baf000644",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "Operational documentation only; no product function. Examples specify explicit action/ID/revision/hash; protocol vs configurable caps, errors, no conversion and supported repair described.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "docs/RUNTIME-RECOVERY.md",
+      "sha256": "8a2b5803b6ea350033d536e4f2d05da31b6cbf3a2703a6d524bec899f96ca5e1",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "Operational documentation only; no product function. Examples specify explicit action/ID/revision/hash; protocol vs configurable caps, errors, no conversion and supported repair described.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "docs/en/RUNTIME-RECOVERY.md",
+      "sha256": "ca4e5ba170e35ea19d2e1f1f4093366c2370d631714199726375c39e1ab1ceb6",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "Operational documentation only; no product function. Examples specify explicit action/ID/revision/hash; protocol vs configurable caps, errors, no conversion and supported repair described.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "docs/plans/migration-rust/REPLAYS.md",
+      "sha256": "b714f3f2d37c2273d90a17759ebf3f728e1c823fef024a9365727533a348cd37",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "Operational documentation only; no product function. Examples specify explicit action/ID/revision/hash; protocol vs configurable caps, errors, no conversion and supported repair described.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    },
+    {
+      "path": "docs/en/RUST-MIGRATION-REPLAYS.md",
+      "sha256": "f438eaeafda9973365377a1c083070b563f68afa0af390d976c48d98de368414",
+      "scope": "plan v43/digest-consistency delta only; unrelated concurrent hunks excluded",
+      "axes": {
+        "policies": "Four saved nullable v43 plan caps, initial32000/8/16/16, source config -> validation -> Admin/API/CLI -> actual plan consumer. No fallback for legacy absence. Task ceilings reuse saved mutation limits. Version1, worker, modes/phases, local32/64 ID representation, complexity1..4 are Go protocol/rubric. Zero/null behavior and raised execution limits proven.",
+        "functions": "Operational documentation only; no product function. Examples specify explicit action/ID/revision/hash; protocol vs configurable caps, errors, no conversion and supported repair described.",
+        "errors": "Static plan rules wrapped in invalid-plan preserve safe causes; strict codec errors do not echo marker. Invalid400/stale409/integrity500 (CLI2), conflictCLI3, disabledCLI4. Receipt SQL insert failure rolls back fully; known output failure retains receipt and replays. Earlier method/adopt/save guards reexamined, original failures retained.",
+        "documentation": "FR/EN operational contract, Rustdoc, defaults/catalog labels/help, generated translations and recipe counters updated together. Current readiness is Go hash projection, not rerun under changed caps or human identity. Future conversion must revalidate; historical live settings not silently adopted."
+      }
+    }
+  ],
+  "limits": "GLM static implementation/review, pre-fix counterexample then principal correction/verification. Not independent runtime acceptance; Biba/SCALING and global migration unqualified. Lexical prompts remain private.",
+  "workspace_after_delivery": "workspace-scope-after-delivery.json: exact allowed concurrent delta; original reviewed hashes still bind immutable build92, not new review-check code"
+}

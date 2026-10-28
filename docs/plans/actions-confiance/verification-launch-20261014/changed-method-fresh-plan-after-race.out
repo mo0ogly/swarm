@@ -1,0 +1,7 @@
+=== RUN   TestReferencedCitationInstructionsAloneCannotRestart
+--- PASS: TestReferencedCitationInstructionsAloneCannotRestart (0.85s)
+=== RUN   TestCorrectiveFragmentPlanDoesNotReuseAChangedMethod
+    managed_review_context_policy_test.go:324: sizes 164551 168226 22003 parts 1
+--- PASS: TestCorrectiveFragmentPlanDoesNotReuseAChangedMethod (16.07s)
+PASS
+ok  	swarm.local/companion/internal/engine	18.075s

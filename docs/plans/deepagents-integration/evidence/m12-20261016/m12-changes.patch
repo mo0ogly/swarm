@@ -1,0 +1,1220 @@
+--- /dev/null
++++ after/internal/engine/dialogue_recovery.go
+@@ -0,0 +1,223 @@
++//go:build linux
++
++package engine
++
++import (
++	"database/sql"
++	"encoding/json"
++	"fmt"
++	"os"
++	"reflect"
++)
++
++type DialogueRecoveryCheck struct {
++	Code    string `json:"code"`
++	Status  string `json:"status"`
++	Message string `json:"message"`
++}
++
++// A diagnosis is neither an authorization nor a successful provider preflight.
++// No provider command, reservation or recovery mutation belongs on this path.
++type DialogueRecoveryPreview struct {
++	Boundary         *DialogueBoundaryView   `json:"boundary"`
++	Path             string                  `json:"recommended_path"`
++	Recommendation   string                  `json:"recommendation"`
++	ResumeSupported  bool                    `json:"resume_supported"`
++	DecisionRecorded bool                    `json:"decision_recorded"`
++	DecisionOwner    string                  `json:"decision_owner"`
++	ObservedAt       string                  `json:"observed_at"`
++	FactsSHA256      string                  `json:"facts_sha256"`
++	Checks           []DialogueRecoveryCheck `json:"checks"`
++}
++
++func dialogueRecoveryCheckLabel(status string) string {
++	switch status {
++	case "pass":
++		return "Vérifié"
++	case "fail":
++		return "Bloquant"
++	default:
++		return "Non vérifié"
++	}
++}
++
++func dialogueRecoveryRecommendation(path string) string {
++	switch path {
++	case "select_latest_attempt":
++		return "Examiner la tentative la plus récente."
++	case "wait_for_stop":
++		return "Confirmer la fin du processus avant toute nouvelle exécution."
++	case "inspect_history":
++		return "État historique incomplet : diagnostiquer avant de choisir une nouvelle tentative."
++	case "reconcile_effects":
++		return "Vérifier les effets incertains ; ne pas rejouer automatiquement les outils."
++	case "review_current_contract":
++		return "Réexaminer le contrat courant et la cause des refus avant de décider."
++	default:
++		return "Frontière confirmée à examiner ; la session et la décision de reprise restent à vérifier."
++	}
++}
++
++// Select from retained storage, independently of the recent UI history window.
++func (s *Store) recoveryAgent(work, task, id string) (*Agent, error) {
++	if id != "" {
++		a, err := s.agent(id)
++		if err != nil {
++			return nil, err
++		}
++		if a.WorkID != work || a.TaskID != task {
++			return nil, fmt.Errorf("tentative hors tâche ou introuvable")
++		}
++		return &a, nil
++	}
++	var body []byte
++	var status, desired string
++	err := s.db.QueryRow("SELECT body,status,desired FROM agents WHERE work_id=? AND task_id=? ORDER BY rowid DESC LIMIT 1", work, task).Scan(&body, &status, &desired)
++	if err == sql.ErrNoRows {
++		return nil, nil
++	}
++	if err != nil {
++		return nil, err
++	}
++	a, err := decodeAgentRow(body, status, desired)
++	return &a, err
++}
++
++func (s *Store) dialogueRecovery(w Work, t *Task, a *Agent) (*DialogueRecoveryPreview, error) {
++	if a == nil || a.Mode != "dialogue" {
++		return nil, nil
++	}
++	boundary, c, err := s.readDialogueBoundary(*a)
++	if err != nil {
++		return nil, err
++	}
++	r := &DialogueRecoveryPreview{Boundary: boundary, Path: "review_boundary", DecisionOwner: "responsible_supervisor_or_local_operator", ObservedAt: now(), Checks: []DialogueRecoveryCheck{}}
++	add := func(code, status, message string) {
++		r.Checks = append(r.Checks, DialogueRecoveryCheck{code, status, message})
++	}
++	latest, err := s.recoveryAgent(w.ID, t.ID, "")
++	if err != nil {
++		return nil, err
++	}
++	current := latest != nil && latest.ID == a.ID && len(t.Attempts) > 0 && t.Attempts[len(t.Attempts)-1].ID == a.Attempt
++	if current {
++		add("latest_attempt", "pass", "La tentative sélectionnée est la dernière de cette tâche.")
++	} else {
++		add("latest_attempt", "fail", "La tentative sélectionnée ne correspond pas à l’état courant de la tâche.")
++	}
++	ended := recoveryProcessEnded(*a, hostIdentity(), processStamp(a.Child))
++	if ended {
++		add("process_ended", "pass", "La fin du processus fournisseur est confirmée.")
++	} else {
++		add("process_ended", "fail", "La fin du processus fournisseur n’est pas confirmée ; aucun second départ.")
++	}
++	if !boundary.Available {
++		add("confirmed_boundary", "unknown", "Aucun état de dialogue exploitable ; examiner l’historique sans reconstituer des gardes supposées.")
++		add("effects_observed", "unknown", "Les effets antérieurs restent à vérifier avant toute nouvelle exécution.")
++		add("historical_guards", "unknown", "Les gardes cumulées de la conversation sont inconnues.")
++	} else {
++		if boundary.Confirmed {
++			add("confirmed_boundary", "pass", "La fin du tour et son statut répondu sont confirmés.")
++		} else {
++			add("confirmed_boundary", "fail", "Le dernier tour ne possède pas une fin et un statut répondu confirmés.")
++		}
++		if len(c.Guard.Pending) > 0 || c.Guard.Degraded != "" {
++			add("effects_observed", "fail", "Un résultat d’outil manque ou sa visibilité est perdue ; qualifier les effets avant toute reprise.")
++		} else if boundary.Confirmed {
++			add("effects_observed", "pass", "Les résultats des outils observés sont reçus à cette frontière.")
++		} else {
++			add("effects_observed", "unknown", "Un état de début ou interrompu ne prouve pas les effets ultérieurs.")
++		}
++		if c.Guard.Reason != "" || c.Guard.Degraded != "" {
++			add("historical_guards", "fail", "Une garde historique bloque la poursuite ; examiner sa cause sans remettre les compteurs à zéro.")
++		} else {
++			add("historical_guards", "pass", "Les gardes historiques sont conservées sans remise à zéro.")
++		}
++	}
++	providerSHA := ""
++	providers, providerErr := s.providers()
++	provider, exists := providers.Providers[a.Provider]
++	configuration, caps := "unknown", "unknown"
++	if providerErr == nil {
++		configuration = "fail"
++		if exists {
++			raw, _ := json.Marshal(provider)
++			providerSHA = hash(raw)
++			purpose := "work"
++			if a.Brainstorm {
++				purpose = "brainstorm"
++			}
++			level := ""
++			if a.ModelRoute != nil {
++				level = a.ModelRoute.Level
++			}
++			resolved, route, routeErr := resolveModel(provider, level, purpose)
++			info, statErr := os.Stat(provider.Command)
++			if dialogueProvider(provider) == nil && routeErr == nil && statErr == nil && info.Mode().IsRegular() && info.Mode()&0111 != 0 && resolved.Command == a.Command && reflect.DeepEqual(resolved.Args, a.Args) && reflect.DeepEqual(resolved.Env, a.Env) && reflect.DeepEqual(route, a.ModelRoute) {
++				configuration = "pass"
++			}
++			admin, capErr := configuredRunLimitsWith(s.db, w.ID, a.Role, t.ID)
++			if capErr == nil {
++				caps = "fail"
++				bounded := a.Limits.cappedBy(provider.Limits).cappedBy(admin)
++				bounded = administrativeDurationThresholds(bounded, admin)
++				bounded.ObservationMode = admin.ObservationMode
++				if bounded == a.Limits {
++					caps = "pass"
++				}
++			}
++		}
++	}
++	if configuration == "pass" {
++		add("launch_configuration", configuration, "Les paramètres de commande, de modèle et d’environnement autorisé correspondent au lancement conservé.")
++	} else {
++		add("launch_configuration", configuration, "La configuration fournisseur est différente ou indisponible ; examiner le contrat actuel.")
++	}
++	if caps == "pass" {
++		add("current_caps", caps, "Les plafonds historiques restent compatibles avec les réglages courants.")
++	} else {
++		add("current_caps", caps, "Les réglages courants imposent un nouvel examen des gardes ; aucun plafond n’est relevé.")
++	}
++	if s.projectMemoryGuard(*a) == nil {
++		add("memory_sources", "pass", "Les références mémoire sélectionnées restent valides à cette lecture.")
++	} else {
++		add("memory_sources", "fail", "Une référence mémoire reçue est retirée, périmée ou inaccessible ; refaire la sélection avant une nouvelle exécution.")
++	}
++	if s.providerCooldownGuard(a.Provider) == nil {
++		add("provider_wait", "pass", "Aucune attente fournisseur enregistrée ne bloque cette lecture ; cela ne prouve pas sa disponibilité.")
++	} else {
++		add("provider_wait", "fail", "Une attente fournisseur ou son état illisible bloque la poursuite ; aucun délai n’est effacé.")
++	}
++	add("launch_preflight", "unknown", "Session fournisseur, accès actuels et réservations non vérifiés par cet aperçu.")
++	add("supervisor_decision", "unknown", "Le responsable doit décider de la suite sur des preuves fraîches ; cet aperçu n’enregistre aucune autorisation.")
++	switch {
++	case !current:
++		r.Path = "select_latest_attempt"
++	case !ended:
++		r.Path = "wait_for_stop"
++	case !boundary.Available:
++		r.Path = "inspect_history"
++	case !boundary.Confirmed:
++		r.Path = "reconcile_effects"
++	default:
++		for _, check := range r.Checks {
++			if check.Status == "fail" || check.Status == "unknown" && (check.Code == "launch_configuration" || check.Code == "current_caps") {
++				r.Path = "review_current_contract"
++				break
++			}
++		}
++	}
++	r.Recommendation = dialogueRecoveryRecommendation(r.Path)
++	// Fingerprint observed facts, excluding the observation clock. This is not
++	// an approval token and is never accepted by a mutation endpoint.
++	raw, _ := json.Marshal(struct {
++		Work                      string
++		Revision                  int
++		Agent                     string
++		Status, Desired, Provider string
++		Boundary                  *DialogueBoundaryView
++		Checks                    []DialogueRecoveryCheck
++	}{w.ID, w.Revision, a.ID, a.Status, a.Desired, providerSHA, boundary, r.Checks})
++	r.FactsSHA256 = hash(raw)
++	return r, nil
++}
+--- /dev/null
++++ after/internal/engine/dialogue_recovery_test.go
+@@ -0,0 +1,310 @@
++//go:build linux
++
++package engine
++
++import (
++	"bytes"
++	"encoding/json"
++	"fmt"
++	"net/http"
++	"net/http/httptest"
++	"os"
++	"path/filepath"
++	"reflect"
++	"strings"
++	"testing"
++)
++
++func dialogueRecoveryFixture(t *testing.T, events []string) (*Store, Agent, string) {
++	t.Helper()
++	s, a, provider := dialogueReceiptFixture(t, "codex", events)
++	m, err := runDialogueReceiptWrapper(t, s, a, "/fin\n")
++	a.Progress, a.Usage, _, _ = m.snapshot()
++	state := "completed"
++	if err != nil {
++		state = "interrupted"
++	}
++	if err := s.finishAgent(a, state, "fixture ended without task acceptance", nil); err != nil {
++		t.Fatal(err)
++	}
++	a, err = s.agent(a.ID)
++	if err != nil {
++		t.Fatal(err)
++	}
++	return s, a, provider
++}
++
++func TestDialogueRecoveryPreviewKeepsBoundaryAndUnknownAuthority(t *testing.T) {
++	s, a, _ := dialogueRecoveryFixture(t, []string{`{"type":"thread.started","thread_id":"recovery-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
++	p, err := s.recoveryPreview(a.WorkID, a.TaskID, a.ID)
++	if err != nil {
++		t.Fatal(err)
++	}
++	raw, err := json.Marshal(p)
++	if err != nil {
++		t.Fatal(err)
++	}
++	var result struct {
++		Dialogue *struct {
++			Path      string               `json:"recommended_path"`
++			Supported bool                 `json:"resume_supported"`
++			Boundary  DialogueBoundaryView `json:"boundary"`
++			Checks    []any                `json:"checks"`
++		} `json:"dialogue"`
++	}
++	if err := json.Unmarshal(raw, &result); err != nil {
++		t.Fatal(err)
++	}
++	if result.Dialogue == nil || !result.Dialogue.Boundary.Confirmed || result.Dialogue.Supported || len(result.Dialogue.Checks) == 0 || result.Dialogue.Path != "review_boundary" {
++		t.Fatal("recovery preview ignores the retained conversation boundary and missing authorization")
++	}
++	for _, check := range p.Dialogue.Checks {
++		want := "pass"
++		if check.Code == "launch_preflight" || check.Code == "supervisor_decision" {
++			want = "unknown"
++		}
++		if check.Status != want {
++			t.Fatal("wrong qualification", check)
++		}
++	}
++	if p.Dialogue.DecisionRecorded || p.Dialogue.FactsSHA256 == "" {
++		t.Fatal("preview invented a decision or lacks attribution")
++	}
++}
++
++func recoverySnapshotTest(t *testing.T, s *Store) string {
++	t.Helper()
++	all := map[string][][]any{}
++	for _, table := range []string{"works", "agents", "agent_dialogue_turns", "reservations", "events", "agent_logs", "cockpit_events"} {
++		rows, err := s.db.Query("SELECT * FROM " + table + " ORDER BY rowid")
++		if err != nil {
++			t.Fatal(err)
++		}
++		cols, err := rows.Columns()
++		if err != nil {
++			rows.Close()
++			t.Fatal(err)
++		}
++		for rows.Next() {
++			values := make([]any, len(cols))
++			refs := make([]any, len(cols))
++			for i := range values {
++				refs[i] = &values[i]
++			}
++			if err := rows.Scan(refs...); err != nil {
++				rows.Close()
++				t.Fatal(err)
++			}
++			all[table] = append(all[table], values)
++		}
++		if err := rows.Err(); err != nil {
++			rows.Close()
++			t.Fatal(err)
++		}
++		rows.Close()
++	}
++	raw, err := json.Marshal(all)
++	if err != nil {
++		t.Fatal(err)
++	}
++	return string(raw)
++}
++
++func TestDialogueRecoveryCLIAPIReadOnlyAndScoped(t *testing.T) {
++	s, a, script := dialogueRecoveryFixture(t, []string{`{"type":"thread.started","thread_id":"private-fixture-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
++	foreign := taskTest(t, s, createTest(t, s))
++	before := recoverySnapshotTest(t, s)
++	callsBefore, err := os.ReadFile(script + ".calls")
++	if err != nil {
++		t.Fatal(err)
++	}
++	var out, stderr bytes.Buffer
++	if code := run([]string{"--root", s.root, "--json", "mission", "recovery", a.WorkID, a.TaskID, a.ID}, &out, &stderr); code != 0 {
++		t.Fatal(code, stderr.String())
++	}
++	var cli RecoveryPreview
++	if err := json.Unmarshal(out.Bytes(), &cli); err != nil {
++		t.Fatal(err)
++	}
++	handler := newWebHandler(s, "localhost:18787", "recovery-fixture-token")
++	for _, auth := range []bool{false, true} {
++		req := httptest.NewRequest(http.MethodGet, "http://localhost:18787/api/v1/recovery-preview?work="+a.WorkID+"&task="+a.TaskID+"&agent="+a.ID, nil)
++		if auth {
++			req.AddCookie(&http.Cookie{Name: "swarm_session", Value: "recovery-fixture-token"})
++		}
++		rr := httptest.NewRecorder()
++		handler.ServeHTTP(rr, req)
++		if !auth {
++			if rr.Code != http.StatusForbidden || strings.Contains(rr.Body.String(), "private-fixture-session") {
++				t.Fatal("unauthenticated response violates the session contract", rr.Code)
++			}
++			continue
++		}
++		var api RecoveryPreview
++		if rr.Code != http.StatusOK || json.Unmarshal(rr.Body.Bytes(), &api) != nil || api.Dialogue == nil || cli.Dialogue == nil || api.Dialogue.FactsSHA256 != cli.Dialogue.FactsSHA256 || !reflect.DeepEqual(api.Dialogue.Checks, cli.Dialogue.Checks) {
++			t.Fatal("public views differ", rr.Code, rr.Body.String())
++		}
++		if strings.Contains(rr.Body.String(), "SignatureCounts") {
++			t.Fatal("private guards exposed")
++		}
++	}
++	if _, err := s.recoveryPreview(foreign.ID, "t1", a.ID); err == nil {
++		t.Fatal("foreign agent accepted")
++	}
++	if before != recoverySnapshotTest(t, s) {
++		t.Fatal("refused preview mutated storage")
++	}
++	if before != recoverySnapshotTest(t, s) {
++		t.Fatal("preview changed attempts, counters, reservations or history")
++	}
++	callsAfter, err := os.ReadFile(script + ".calls")
++	if err != nil || !bytes.Equal(callsBefore, callsAfter) {
++		t.Fatal("preview invoked provider", err)
++	}
++	var plain bytes.Buffer
++	printRecoveryPreview(&plain, cli)
++	if !strings.Contains(plain.String(), "Reprise de conversation") || !strings.Contains(plain.String(), "Non vérifié") || !strings.Contains(plain.String(), "aucun agent") {
++		t.Fatal("plain CLI hides qualification")
++	}
++	if dir := os.Getenv("SWARM_DIALOGUE_RECOVERY_OUT"); dir != "" {
++		if !filepath.IsAbs(dir) {
++			t.Fatal("output must be absolute")
++		}
++		if err := os.MkdirAll(dir, 0700); err != nil {
++			t.Fatal(err)
++		}
++		f, err := os.OpenFile(filepath.Join(dir, "preview.json"), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
++		if err != nil {
++			t.Fatal(err)
++		}
++		if _, err = f.Write(out.Bytes()); err != nil {
++			f.Close()
++			t.Fatal(err)
++		}
++		f.Close()
++	}
++}
++
++func TestDialogueRecoveryQualifiesIncompleteAndChangedContracts(t *testing.T) {
++	for _, kind := range []string{"pending_tool", "missing_end", "legacy", "corrupt", "active", "provider_changed", "caps_tightened", "memory_missing"} {
++		t.Run(kind, func(t *testing.T) {
++			events := []string{`{"type":"thread.started","thread_id":"recovery-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`}
++			if kind == "pending_tool" {
++				events = append(events[:1], `{"type":"item.started","item":{"id":"pending","type":"command_execution","command":"fixture effect"}}`, events[1])
++			}
++			if kind == "missing_end" {
++				events = events[:1]
++			}
++			s, a, _ := dialogueRecoveryFixture(t, events)
++			wantPath, wantCode, wantStatus := "reconcile_effects", "effects_observed", "fail"
++			switch kind {
++			case "missing_end":
++				wantStatus = "unknown"
++			case "legacy":
++				if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET checkpoint='' WHERE agent_id=?", a.ID); err != nil {
++					t.Fatal(err)
++				}
++				wantPath, wantCode, wantStatus = "inspect_history", "confirmed_boundary", "unknown"
++			case "corrupt":
++				if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET checkpoint='private malformed input' WHERE agent_id=?", a.ID); err != nil {
++					t.Fatal(err)
++				}
++			case "active":
++				a.Status = "running"
++				a.Ended = ""
++				if err := s.saveAgent(a); err != nil {
++					t.Fatal(err)
++				}
++				wantPath, wantCode = "wait_for_stop", "process_ended"
++			case "provider_changed":
++				ps, err := s.providersFile()
++				if err != nil {
++					t.Fatal(err)
++				}
++				p := ps.Providers[a.Provider]
++				p.Args = append(p.Args, "--unexpected")
++				ps.Providers[a.Provider] = p
++				raw, _ := json.Marshal(ps)
++				if err := os.WriteFile(filepath.Join(s.root, ".swarm/providers.json"), raw, 0600); err != nil {
++					t.Fatal(err)
++				}
++				wantPath, wantCode = "review_current_contract", "launch_configuration"
++			case "caps_tightened":
++				if _, err := s.configureRunLimits(RunLimitsConfigChange{Schema: 1, EventID: "tighten-for-diagnosis", Scope: ScopeProject, Values: RunLimits{MaxToolCalls: 1}, Reason: "Fixture restriction"}); err != nil {
++					t.Fatal(err)
++				}
++				wantPath, wantCode = "review_current_contract", "current_caps"
++			case "memory_missing":
++				a.Context.Memory = []MemoryReference{{Work: "missing-work", ID: "missing-memory", Version: 1, SHA256: strings.Repeat("a", 64)}}
++				if err := s.saveAgent(a); err != nil {
++					t.Fatal(err)
++				}
++				wantPath, wantCode = "review_current_contract", "memory_sources"
++			}
++			before := recoverySnapshotTest(t, s)
++			p, err := s.recoveryPreview(a.WorkID, a.TaskID, a.ID)
++			if kind == "corrupt" {
++				if err == nil {
++					t.Fatal("corrupt state became empty success")
++				}
++				if before != recoverySnapshotTest(t, s) {
++					t.Fatal("corrupt read mutated state")
++				}
++				return
++			}
++			if err != nil || p.Dialogue == nil || p.Dialogue.Path != wantPath || p.Dialogue.ResumeSupported || p.Dialogue.DecisionRecorded {
++				t.Fatal("wrong recovery path", p.Dialogue, err)
++			}
++			found := false
++			for _, check := range p.Dialogue.Checks {
++				if check.Code == wantCode {
++					found = check.Status == wantStatus
++				}
++			}
++			if !found {
++				t.Fatal("missing qualification", wantCode, wantStatus, p.Dialogue.Checks)
++			}
++			if before != recoverySnapshotTest(t, s) {
++				t.Fatal("diagnosis changed stored state")
++			}
++		})
++	}
++}
++
++func TestDialogueRecoverySelectionIgnoresRecentHistoryWindow(t *testing.T) {
++	s, a, _ := dialogueRecoveryFixture(t, []string{`{"type":"thread.started","thread_id":"retained-session"}`, `{"type":"turn.completed"}`})
++	for i := 0; i < 201; i++ {
++		other := Agent{ID: fmt.Sprintf("retained-padding-%d", i), WorkID: a.WorkID, TaskID: "other-task", CWD: s.root, Status: "completed"}
++		raw, _ := json.Marshal(other)
++		if _, err := s.db.Exec("INSERT INTO agents(id,work_id,task_id,cwd,status,body,request) VALUES(?,?,?,?,?,?,'{}')", other.ID, other.WorkID, other.TaskID, other.CWD, other.Status, raw); err != nil {
++			t.Fatal(err)
++		}
++	}
++	recent, err := s.agents(a.WorkID)
++	if err != nil || len(recent) != 200 {
++		t.Fatal("fixture did not exceed history window", len(recent), err)
++	}
++	for _, item := range recent {
++		if item.ID == a.ID {
++			t.Fatal("target still in recent history")
++		}
++	}
++	for _, id := range []string{"", a.ID} {
++		p, err := s.recoveryPreview(a.WorkID, a.TaskID, id)
++		if err != nil || p.Agent != a.ID || p.Dialogue == nil || p.Dialogue.Path != "review_boundary" {
++			t.Fatal("retained attempt hidden by recent window", id, err)
++		}
++	}
++	later := a
++	later.ID = "later-agent"
++	later.Attempt = "later-attempt"
++	later.Mode = ""
++	raw, _ := json.Marshal(later)
++	if _, err := s.db.Exec("INSERT INTO agents(id,work_id,task_id,cwd,status,body,request) VALUES(?,?,?,?,?,?,'{}')", later.ID, later.WorkID, later.TaskID, later.CWD, later.Status, raw); err != nil {
++		t.Fatal(err)
++	}
++	p, err := s.recoveryPreview(a.WorkID, a.TaskID, a.ID)
++	if err != nil || p.Dialogue == nil || p.Dialogue.Path != "select_latest_attempt" {
++		t.Fatal("explicit older attempt became current", err)
++	}
++}
+--- before/internal/engine/dialogue_checkpoint_store.go
++++ after/internal/engine/dialogue_checkpoint_store.go
+@@ -85,40 +85,45 @@
+ }
+ 
+ func (s *Store) dialogueBoundary(a Agent) (*DialogueBoundaryView, error) {
++	v, _, err := s.readDialogueBoundary(a)
++	return v, err
++}
++
++func (s *Store) readDialogueBoundary(a Agent) (*DialogueBoundaryView, *dialogueCheckpoint, error) {
+ 	if a.Mode != "dialogue" {
+-		return nil, nil
++		return nil, nil, nil
+ 	}
+ 	v := &DialogueBoundaryView{Scope: "Aucun état de frontière conservé ; gardes et usages historiques inconnus"}
+ 	var raw []byte
+ 	err := s.db.QueryRow("SELECT id,status,checkpoint FROM agent_dialogue_turns WHERE agent_id=? ORDER BY rowid DESC LIMIT 1", a.ID).Scan(&v.Turn, &v.Status, &raw)
+ 	if err == sql.ErrNoRows {
+-		return v, nil
++		return v, nil, nil
+ 	}
+ 	if err != nil {
+-		return nil, err
++		return nil, nil, err
+ 	}
+ 	if len(raw) == 0 {
+-		return v, nil
++		return v, nil, nil
+ 	}
+ 	var c dialogueCheckpoint
+ 	if err = strict(raw, &c); err != nil {
+-		return nil, fmt.Errorf("État de dialogue illisible ; aucune reprise autorisée")
++		return nil, nil, fmt.Errorf("État de dialogue illisible ; aucune reprise autorisée")
+ 	}
+ 	if c.Turn != v.Turn {
+-		return nil, fmt.Errorf("État de dialogue hors tour")
++		return nil, nil, fmt.Errorf("État de dialogue hors tour")
+ 	}
+ 	g, err := c.restoreGuard(a, s.root)
+ 	if err != nil {
+-		return nil, err
++		return nil, nil, err
+ 	}
+ 	if v.Status == "answered" && c.Phase != "confirmed" {
+-		return nil, fmt.Errorf("Tour répondu sans état de fin confirmé")
++		return nil, nil, fmt.Errorf("Tour répondu sans état de fin confirmé")
+ 	}
+ 	v.Available, v.Phase, v.Session, v.At, v.SHA256 = true, c.Phase, c.Session, c.At, c.SHA256
+ 	v.Confirmed = v.Status == "answered" && c.Phase == "confirmed"
+ 	at, err := time.Parse(time.RFC3339Nano, c.At)
+ 	if err != nil {
+-		return nil, fmt.Errorf("Date de frontière invalide")
++		return nil, nil, fmt.Errorf("Date de frontière invalide")
+ 	}
+ 	progress := g.summaryAt(at)
+ 	v.Progress, v.Usage = &progress, c.Usage
+@@ -126,5 +131,5 @@
+ 	if c.Phase == "running" {
+ 		v.Scope = "État au début du tour ; effets et usages ultérieurs inconnus"
+ 	}
+-	return v, nil
++	return v, &c, nil
+ }
+--- before/internal/engine/mission_insights.go
++++ after/internal/engine/mission_insights.go
+@@ -20,20 +20,21 @@
+ 	Reason string `json:"reason"`
+ }
+ type RecoveryPreview struct {
+-	Work         string             `json:"work"`
+-	Task         string             `json:"task"`
+-	Revision     int                `json:"revision"`
+-	Agent        string             `json:"agent,omitempty"`
+-	Kept         []string           `json:"kept"`
+-	Redone       []string           `json:"redone"`
+-	Correction   string             `json:"correction"`
+-	Criteria     []string           `json:"criteria"`
+-	Limits       string             `json:"limits"`
+-	SinceRefusal *MissionChanges    `json:"since_refusal,omitempty"`
+-	Evidence     []RecoveryEvidence `json:"evidence,omitempty"`
+-	Remaining    []string           `json:"remaining_criteria"`
+-	RefusalNote  string             `json:"refusal_note"`
+-	EvidenceNote string             `json:"evidence_note"`
++	Dialogue     *DialogueRecoveryPreview `json:"dialogue,omitempty"`
++	Work         string                   `json:"work"`
++	Task         string                   `json:"task"`
++	Revision     int                      `json:"revision"`
++	Agent        string                   `json:"agent,omitempty"`
++	Kept         []string                 `json:"kept"`
++	Redone       []string                 `json:"redone"`
++	Correction   string                   `json:"correction"`
++	Criteria     []string                 `json:"criteria"`
++	Limits       string                   `json:"limits"`
++	SinceRefusal *MissionChanges          `json:"since_refusal,omitempty"`
++	Evidence     []RecoveryEvidence       `json:"evidence,omitempty"`
++	Remaining    []string                 `json:"remaining_criteria"`
++	RefusalNote  string                   `json:"refusal_note"`
++	EvidenceNote string                   `json:"evidence_note"`
+ }
+ 
+ // RecoveryEvidence (REQ-QW4): one entry per report/artifact bound to the task's
+@@ -238,24 +239,18 @@
+ 	if e != nil {
+ 		return RecoveryPreview{}, e
+ 	}
+-	agents, e := s.agents(work)
++	a, e := s.recoveryAgent(work, task, agent)
+ 	if e != nil {
+ 		return RecoveryPreview{}, e
+ 	}
+-	var p RecoveryPreview
+-	found := false
+-	for i := range agents {
+-		a := &agents[i]
+-		if a.TaskID == task && (agent == "" || a.ID == agent) {
+-			p, found = recoveryPreviewFor(w, t, a), true
+-			break
+-		}
+-	}
+-	if !found {
+-		if agent != "" {
+-			return RecoveryPreview{}, fmt.Errorf("tentative hors tâche ou introuvable")
+-		}
+-		p = recoveryPreviewFor(w, t, nil)
++	p := recoveryPreviewFor(w, t, a)
++	p.Dialogue, e = s.dialogueRecovery(w, t, a)
++	if e != nil {
++		return RecoveryPreview{}, e
++	}
++	if p.Dialogue != nil {
++		p.Kept = append(p.Kept, "État de dialogue conservé avec sa portée, ses gardes et les usages reçus.")
++		p.Redone = append(p.Redone, "Restauration de conversation distincte d’une nouvelle tentative ; aucune restauration autorisée par cet aperçu.")
+ 	}
+ 	if v, at, ok, err := s.lastRefusalRevision(w, task); err != nil {
+ 		p.RefusalNote = "Historique du refus indisponible ; aucun changement n’est supposé."
+@@ -857,6 +852,14 @@
+ }
+ func printRecoveryPreview(out io.Writer, p RecoveryPreview) {
+ 	fmt.Fprintln(out, uiText("Avant une relance"))
++	if p.Dialogue != nil {
++		fmt.Fprintln(out, uiText("Reprise de conversation"))
++		fmt.Fprintln(out, uiText(p.Dialogue.Recommendation))
++		fmt.Fprintln(out, uiText("La restauration de conversation n’est pas disponible ; cet aperçu ne lance aucun agent."))
++		for _, check := range p.Dialogue.Checks {
++			fmt.Fprintln(out, "- "+uiText(dialogueRecoveryCheckLabel(check.Status))+" · "+uiEngineText(check.Message))
++		}
++	}
+ 	for _, section := range []struct {
+ 		label string
+ 		items []string
+--- before/web/mission-insights.js
++++ after/web/mission-insights.js
+@@ -74,6 +74,13 @@
+  spending(){this.readOnly(trMissionInsights('Où vont les appels et les coûts ?'),trMissionInsights('Appels IA, outils et contrôles sont présentés séparément.')).append(this.spendingView(snapshot.mission.spending))},
+  recoveryPreviewView(p){
+   const box=node('section',undefined,'field-wide');box.dataset.recoveryPreview=p.task;box.append(node('h3',trMissionInsights('Avant une relance')));
++  if(p.dialogue){
++   const dialogue=node('section',undefined,'mission-current field-wide');dialogue.dataset.dialogueRecovery=p.dialogue.recommended_path;
++   dialogue.append(node('h4',trMissionInsights('Reprise de conversation')),node('p',missionText(p.dialogue.recommendation),'notice attention'),node('p',trMissionInsights('La restauration de conversation n’est pas disponible ; cet aperçu ne lance aucun agent.')));
++   const labels={pass:'Vérifié',fail:'Bloquant',unknown:'Non vérifié'},checks=node('ul'),passed=node('ul');
++   for(const check of p.dialogue.checks||[]){const row=node('li',trMissionInsights(labels[check.status]||'Non vérifié')+' · '+missionText(check.message));row.dataset.dialogueCheck=check.code;row.dataset.checkStatus=check.status;(check.status==='pass'?passed:checks).append(row)}
++   dialogue.append(checks);if(passed.children.length){const verified=node('details');verified.dataset.dialogueVerified='';verified.append(node('summary',trMissionInsights('Voir les contrôles vérifiés')),passed);dialogue.append(verified)}box.append(dialogue);
++  }
+   box.append(node('h4',trMissionInsights('Depuis le refus')),node('p',missionText(p.refusal_note||'Historique du refus indisponible ; aucun changement n’est supposé.')));
+   if(p.since_refusal){const list=node('ul');for(const item of p.since_refusal.items||[])list.append(node('li','r'+item.revision+' · '+item.at+' · '+missionText(item.label)));box.append(list);if(p.since_refusal.more)box.append(node('p',trMissionInsights('Historique partiel : d’autres événements restent à examiner.'),'notice attention'))}
+   box.append(node('h4',trMissionInsights('Preuves à reprendre')),node('p',missionText(p.evidence_note||'Aucune preuve liée à un avis disponible ; réutilisation non démontrée.')));
+--- before/locales/en.json
++++ after/locales/en.json
+@@ -4289,5 +4289,42 @@
+   "Actions métier : public/internal sur les chemins locaux disponibles. Matière secrète : restricted/local-attestation/swarm/sealed-attestation, uniquement vers le helper fixe.": "Business actions: public/internal on available local paths. Secret material: restricted/local-attestation/swarm/sealed-attestation, to the fixed helper only.",
+   "Les listes actives s’appliquent aussi au chargement et à l’octroi de secrets. La classification restricted est imposée à la matière ; les ressources de l’action restent classées séparément.": "Active allowlists also govern secret loading and grants. Material is always classified restricted; action resources remain classified separately.",
+   "Les fournisseurs externes, fichiers et URL arbitraires restent refusés.": "External providers, arbitrary files and URLs remain denied.",
+-  "Ce navigateur ne conserve pas exactement les nombres de cette preuve. Utilisez le CLI.": "This browser cannot preserve the numbers in this proof exactly. Use the CLI."
++  "Ce navigateur ne conserve pas exactement les nombres de cette preuve. Utilisez le CLI.": "This browser cannot preserve the numbers in this proof exactly. Use the CLI.",
++  "Reprise de conversation": "Conversation recovery",
++  "Bloquant": "Blocking",
++  "Non vérifié": "Not verified",
++  "La restauration de conversation n’est pas disponible ; cet aperçu ne lance aucun agent.": "Conversation restoration is unavailable; this preview starts no agent.",
++  "Examiner la tentative la plus récente.": "Examine the latest attempt.",
++  "Confirmer la fin du processus avant toute nouvelle exécution.": "Confirm that the process has ended before any new execution.",
++  "État historique incomplet : diagnostiquer avant de choisir une nouvelle tentative.": "Incomplete historical state: diagnose before choosing a new attempt.",
++  "Vérifier les effets incertains ; ne pas rejouer automatiquement les outils.": "Verify uncertain effects; do not automatically replay tools.",
++  "Réexaminer le contrat courant et la cause des refus avant de décider.": "Re-examine the current contract and reasons for refusal before deciding.",
++  "Frontière confirmée à examiner ; la session et la décision de reprise restent à vérifier.": "Confirmed boundary for review; the session and recovery decision still require verification.",
++  "La tentative sélectionnée est la dernière de cette tâche.": "The selected attempt is the latest for this task.",
++  "La tentative sélectionnée ne correspond pas à l’état courant de la tâche.": "The selected attempt does not match the current task state.",
++  "La fin du processus fournisseur est confirmée.": "The provider process is confirmed to have ended.",
++  "La fin du processus fournisseur n’est pas confirmée ; aucun second départ.": "The provider process has not been confirmed to have ended; no second launch.",
++  "Aucun état de dialogue exploitable ; examiner l’historique sans reconstituer des gardes supposées.": "No usable dialogue state; examine history without inventing reconstructed guards.",
++  "Les effets antérieurs restent à vérifier avant toute nouvelle exécution.": "Earlier effects still require verification before any new execution.",
++  "Les gardes cumulées de la conversation sont inconnues.": "Cumulative conversation guards are unknown.",
++  "La fin du tour et son statut répondu sont confirmés.": "Turn completion and answered status are confirmed.",
++  "Le dernier tour ne possède pas une fin et un statut répondu confirmés.": "The last turn lacks both confirmed completion and answered status.",
++  "Un résultat d’outil manque ou sa visibilité est perdue ; qualifier les effets avant toute reprise.": "A tool result is missing or visibility is lost; qualify effects before any recovery.",
++  "Les résultats des outils observés sont reçus à cette frontière.": "Results of observed tools have been received at this boundary.",
++  "Un état de début ou interrompu ne prouve pas les effets ultérieurs.": "A start or interrupted state does not establish later effects.",
++  "Une garde historique bloque la poursuite ; examiner sa cause sans remettre les compteurs à zéro.": "A historical guard blocks continuation; examine its cause without resetting counters.",
++  "Les gardes historiques sont conservées sans remise à zéro.": "Historical guards are retained without resetting counters.",
++  "Les paramètres de commande, de modèle et d’environnement autorisé correspondent au lancement conservé.": "Command, model and allowed environment parameters match the recorded launch.",
++  "La configuration fournisseur est différente ou indisponible ; examiner le contrat actuel.": "Provider configuration differs or is unavailable; examine the current contract.",
++  "Les plafonds historiques restent compatibles avec les réglages courants.": "Historical limits remain compatible with current settings.",
++  "Les réglages courants imposent un nouvel examen des gardes ; aucun plafond n’est relevé.": "Current settings require guard review; no limit is raised.",
++  "Les références mémoire sélectionnées restent valides à cette lecture.": "Selected memory references remain valid at this observation.",
++  "Une référence mémoire reçue est retirée, périmée ou inaccessible ; refaire la sélection avant une nouvelle exécution.": "A received memory reference is withdrawn, stale or inaccessible; select again before a new execution.",
++  "Aucune attente fournisseur enregistrée ne bloque cette lecture ; cela ne prouve pas sa disponibilité.": "No recorded provider cooldown blocks this observation; this does not establish availability.",
++  "Une attente fournisseur ou son état illisible bloque la poursuite ; aucun délai n’est effacé.": "A provider cooldown or unreadable state blocks continuation; no delay is cleared.",
++  "Session fournisseur, accès actuels et réservations non vérifiés par cet aperçu.": "Provider session, current access and reservations are not verified by this preview.",
++  "Le responsable doit décider de la suite sur des preuves fraîches ; cet aperçu n’enregistre aucune autorisation.": "The responsible supervisor must decide the next step using fresh evidence; this preview records no authorization.",
++  "État de dialogue conservé avec sa portée, ses gardes et les usages reçus.": "Dialogue state retained with its scope, guards and reported usage.",
++  "Restauration de conversation distincte d’une nouvelle tentative ; aucune restauration autorisée par cet aperçu.": "Conversation restoration differs from a new attempt; this preview authorizes no restoration.",
++  "Voir les contrôles vérifiés": "Show verified checks"
+ }
+--- before/web/i18n-en.js
++++ after/web/i18n-en.js
+@@ -4291,5 +4291,42 @@
+   "Actions métier : public/internal sur les chemins locaux disponibles. Matière secrète : restricted/local-attestation/swarm/sealed-attestation, uniquement vers le helper fixe.": "Business actions: public/internal on available local paths. Secret material: restricted/local-attestation/swarm/sealed-attestation, to the fixed helper only.",
+   "Les listes actives s’appliquent aussi au chargement et à l’octroi de secrets. La classification restricted est imposée à la matière ; les ressources de l’action restent classées séparément.": "Active allowlists also govern secret loading and grants. Material is always classified restricted; action resources remain classified separately.",
+   "Les fournisseurs externes, fichiers et URL arbitraires restent refusés.": "External providers, arbitrary files and URLs remain denied.",
+-  "Ce navigateur ne conserve pas exactement les nombres de cette preuve. Utilisez le CLI.": "This browser cannot preserve the numbers in this proof exactly. Use the CLI."
++  "Ce navigateur ne conserve pas exactement les nombres de cette preuve. Utilisez le CLI.": "This browser cannot preserve the numbers in this proof exactly. Use the CLI.",
++  "Reprise de conversation": "Conversation recovery",
++  "Bloquant": "Blocking",
++  "Non vérifié": "Not verified",
++  "La restauration de conversation n’est pas disponible ; cet aperçu ne lance aucun agent.": "Conversation restoration is unavailable; this preview starts no agent.",
++  "Examiner la tentative la plus récente.": "Examine the latest attempt.",
++  "Confirmer la fin du processus avant toute nouvelle exécution.": "Confirm that the process has ended before any new execution.",
++  "État historique incomplet : diagnostiquer avant de choisir une nouvelle tentative.": "Incomplete historical state: diagnose before choosing a new attempt.",
++  "Vérifier les effets incertains ; ne pas rejouer automatiquement les outils.": "Verify uncertain effects; do not automatically replay tools.",
++  "Réexaminer le contrat courant et la cause des refus avant de décider.": "Re-examine the current contract and reasons for refusal before deciding.",
++  "Frontière confirmée à examiner ; la session et la décision de reprise restent à vérifier.": "Confirmed boundary for review; the session and recovery decision still require verification.",
++  "La tentative sélectionnée est la dernière de cette tâche.": "The selected attempt is the latest for this task.",
++  "La tentative sélectionnée ne correspond pas à l’état courant de la tâche.": "The selected attempt does not match the current task state.",
++  "La fin du processus fournisseur est confirmée.": "The provider process is confirmed to have ended.",
++  "La fin du processus fournisseur n’est pas confirmée ; aucun second départ.": "The provider process has not been confirmed to have ended; no second launch.",
++  "Aucun état de dialogue exploitable ; examiner l’historique sans reconstituer des gardes supposées.": "No usable dialogue state; examine history without inventing reconstructed guards.",
++  "Les effets antérieurs restent à vérifier avant toute nouvelle exécution.": "Earlier effects still require verification before any new execution.",
++  "Les gardes cumulées de la conversation sont inconnues.": "Cumulative conversation guards are unknown.",
++  "La fin du tour et son statut répondu sont confirmés.": "Turn completion and answered status are confirmed.",
++  "Le dernier tour ne possède pas une fin et un statut répondu confirmés.": "The last turn lacks both confirmed completion and answered status.",
++  "Un résultat d’outil manque ou sa visibilité est perdue ; qualifier les effets avant toute reprise.": "A tool result is missing or visibility is lost; qualify effects before any recovery.",
++  "Les résultats des outils observés sont reçus à cette frontière.": "Results of observed tools have been received at this boundary.",
++  "Un état de début ou interrompu ne prouve pas les effets ultérieurs.": "A start or interrupted state does not establish later effects.",
++  "Une garde historique bloque la poursuite ; examiner sa cause sans remettre les compteurs à zéro.": "A historical guard blocks continuation; examine its cause without resetting counters.",
++  "Les gardes historiques sont conservées sans remise à zéro.": "Historical guards are retained without resetting counters.",
++  "Les paramètres de commande, de modèle et d’environnement autorisé correspondent au lancement conservé.": "Command, model and allowed environment parameters match the recorded launch.",
++  "La configuration fournisseur est différente ou indisponible ; examiner le contrat actuel.": "Provider configuration differs or is unavailable; examine the current contract.",
++  "Les plafonds historiques restent compatibles avec les réglages courants.": "Historical limits remain compatible with current settings.",
++  "Les réglages courants imposent un nouvel examen des gardes ; aucun plafond n’est relevé.": "Current settings require guard review; no limit is raised.",
++  "Les références mémoire sélectionnées restent valides à cette lecture.": "Selected memory references remain valid at this observation.",
++  "Une référence mémoire reçue est retirée, périmée ou inaccessible ; refaire la sélection avant une nouvelle exécution.": "A received memory reference is withdrawn, stale or inaccessible; select again before a new execution.",
++  "Aucune attente fournisseur enregistrée ne bloque cette lecture ; cela ne prouve pas sa disponibilité.": "No recorded provider cooldown blocks this observation; this does not establish availability.",
++  "Une attente fournisseur ou son état illisible bloque la poursuite ; aucun délai n’est effacé.": "A provider cooldown or unreadable state blocks continuation; no delay is cleared.",
++  "Session fournisseur, accès actuels et réservations non vérifiés par cet aperçu.": "Provider session, current access and reservations are not verified by this preview.",
++  "Le responsable doit décider de la suite sur des preuves fraîches ; cet aperçu n’enregistre aucune autorisation.": "The responsible supervisor must decide the next step using fresh evidence; this preview records no authorization.",
++  "État de dialogue conservé avec sa portée, ses gardes et les usages reçus.": "Dialogue state retained with its scope, guards and reported usage.",
++  "Restauration de conversation distincte d’une nouvelle tentative ; aucune restauration autorisée par cet aperçu.": "Conversation restoration differs from a new attempt; this preview authorizes no restoration.",
++  "Voir les contrôles vérifiés": "Show verified checks"
+ };
+--- before/tests/recovery_evidence_test.cjs
++++ after/tests/recovery_evidence_test.cjs
+@@ -10,5 +10,10 @@
+  assert.match(text,lang==='fr'?/Depuis le refus/:/Since the refusal/);assert.match(text,/r42/);assert.match(text,/same.md/);assert.match(text,/changed.md/);assert.match(text,/missing.md/);assert.match(text,lang==='fr'?/pas comme validation/:/never as acceptance/);assert.match(text,lang==='fr'?/périmée/:/stale/);assert.match(text,lang==='fr'?/non démontrée/:/not demonstrated/);assert.match(text,lang==='fr'?/Historique partiel/:/Partial history/);
+  const index=box.children.findIndex(e=>e.tag==='h4'&&e.textContent===tr('Critères restant à vérifier'));assert.equal(box.children[index+1].children.length,1);assert.equal(box.children[index+1].children[0].textContent,'criterion 2');
+  assert.equal(box.children.filter(e=>e.tag==='button').length,0,'preview must never execute recovery');
++ p.dialogue={recommended_path:'reconcile_effects',recommendation:'Vérifier les effets incertains ; ne pas rejouer automatiquement les outils.',resume_supported:false,decision_recorded:false,checks:[{code:'effects_observed',status:'fail',message:'Un résultat d’outil manque ou sa visibilité est perdue ; qualifier les effets avant toute reprise.'},{code:'launch_preflight',status:'unknown',message:'Session fournisseur, accès actuels et réservations non vérifiés par cet aperçu.'},{code:'untrusted',status:'unknown',message:'<img src=x onerror=alert(1)>'}]};
++ const qualified=c.Mission.recoveryPreviewView(p),content=flatten(qualified).join('\n'),section=qualified.children.find(e=>e.dataset.dialogueRecovery);
++ assert(section);assert.equal(section.dataset.dialogueRecovery,'reconcile_effects');
++ assert.match(content,lang==='fr'?/Reprise de conversation/:/Conversation recovery/);assert.match(content,lang==='fr'?/Bloquant/:/Blocking/);assert.match(content,lang==='fr'?/Non vérifié/:/Not verified/);assert.match(content,lang==='fr'?/ne lance aucun agent/:/starts no agent/);assert(content.includes('<img src=x onerror=alert(1)>'));
++ const all=e=>[e,...e.children.flatMap(all)];assert.equal(all(qualified).filter(e=>['img','script','button'].includes(e.tag)).length,0,'diagnosis renders text and has no launch controls');
+ }
+ console.log('PASS FR/EN recovery delta, changed/unknown inputs and remaining criteria without approval');
+--- /dev/null
++++ after/tests/dialogue_recovery_ui.cjs
+@@ -0,0 +1,67 @@
++'use strict';
++// Real CLI, supervisor, API and browser against an owned fixture project.
++const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),crypto=require('node:crypto'),assert=require('node:assert/strict');
++const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
++const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
++const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-dr-ui-'));
++const cli=(args,input)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{encoding:'utf8',input:input?JSON.stringify(input):undefined}));
++const stop=id=>execFileSync(binary,['--root',root,'agent','stop',id],{stdio:'pipe'});
++const workOf=value=>value.work||value;
++const request=(w,extra)=>({schema_version:1,event_id:crypto.randomUUID(),expected_revision:w.revision,...extra});
++const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
++const redact=value=>String(value).replace(/\/session\/[^\s/?]+/g,'/session/[private]');
++async function waitFor(check,description,timeout=15000){const until=Date.now()+timeout;while(Date.now()<until){const value=check();if(value)return value;await sleep(100)}throw Error(description)}
++let server,browser,page,agent,work;const errors=[],failures=[],checks=[];
++(async()=>{try{
++ cli(['init']);
++ const script=path.join(root,'codex');
++ fs.writeFileSync(script,"#!/bin/sh\ncat >/dev/null\nprintf 'call\\n' >>\"$0.calls\"\nprintf '%s\\n' '{\"type\":\"thread.started\",\"thread_id\":\"browser-fixture-session\"}' '{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":10,\"output_tokens\":2}}'\n",{mode:0o700});
++ fs.writeFileSync(path.join(root,'.swarm/providers.json'),JSON.stringify({schema_version:1,providers:{fixture:{command:script,args:['exec','--json','--sandbox','workspace-write','-']}}}));
++ work=workOf(cli(['work','create'],request({revision:0},{title:'Dialogue recovery fixture',objective:'Inspect retained boundaries',scope:'Owned local fixture',criteria:['Qualified recovery'],next:'Inspect'})));
++ work=workOf(cli(['task','add',work.id],request(work,{id:'t1',title:'Inspect dialogue boundary',deliverable:'fixture.txt',criteria:['No implicit provider restart'],next:'Examine the retained boundary'})));
++ agent=cli(['agent','start',work.id],request(work,{task_id:'t1',provider:'fixture',role:'worker',mode:'dialogue',workspace:'.',instruction:'Local fixture without a model',capture_output:true,timeout_seconds:30})).agent;
++ await waitFor(()=>cli(['agent','show',agent.id]).dialogue?.boundary_confirmed,'No confirmed provider boundary');
++ stop(agent.id);
++ await waitFor(()=>{const a=cli(['agent','show',agent.id]).agent;return !['queued','starting','running','stopping'].includes(a.status)},'Owned dialogue did not stop');
++ const baseline=JSON.stringify(cli(['work','show',work.id]).work),calls=fs.readFileSync(script+'.calls','utf8');assert.equal(calls,'call\n');
++ server=spawn(binary,['--root',root,'web','127.0.0.1:0'],{stdio:['ignore','pipe','pipe']});
++ const address=await new Promise((resolve,reject)=>{let text='';server.stdout.on('data',chunk=>{text+=chunk;const match=text.match(/http:\/\/\S+\/session\/\S+/);if(match)resolve(match[0])});server.once('exit',code=>reject(Error('Fixture web server exited: '+code)))});
++ browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});page=await browser.newPage();
++ page.on('pageerror',e=>errors.push(redact(e.message)));page.on('console',message=>{if(message.type()==='error')errors.push(redact(message.text()))});
++ page.on('requestfailed',r=>failures.push({url:redact(r.url()),error:r.failure()?.errorText}));page.on('response',r=>{if(r.status()>=400)failures.push({url:redact(r.url()),status:r.status()})});
++ const url=new URL(address);url.searchParams.set('work',work.id);
++ for(const lang of ['fr','en']){
++  url.searchParams.set('lang',lang);await page.setViewport({width:1440,height:1100});await page.goto(url.href);await page.waitForFunction(()=>snapshot?.work?.tasks.some(t=>t.id==='t1'));
++  for(const theme of ['etat','sombre']){
++   await page.evaluate(t=>setTheme(t),theme);
++   await page.waitForSelector('#mission-results > summary');if(!await page.$eval('#mission-results',n=>n.open))await page.click('#mission-results > summary');
++   await page.waitForSelector('[data-mission-action="recovery-preview-t1"]');await page.click('[data-mission-action="recovery-preview-t1"]');
++   await page.waitForSelector('[data-dialogue-recovery="review_boundary"]');
++   const text=await page.$eval('[data-dialogue-recovery]',n=>n.textContent);
++   assert.match(text,lang==='fr'?/Reprise de conversation/:/Conversation recovery/);assert.match(text,lang==='fr'?/Non vérifié/:/Not verified/);assert.match(text,lang==='fr'?/ne lance aucun agent/:/starts no agent/);
++   assert.equal(await page.$$eval('[data-dialogue-check][data-check-status="unknown"]',nodes=>nodes.length),2);
++   assert.equal(await page.$eval('#confirm',n=>n.hidden),true);
++   assert.equal(await page.$eval('[data-dialogue-verified]',n=>n.open),false);await page.click('[data-dialogue-verified] summary');assert.equal(await page.$eval('[data-dialogue-verified]',n=>n.open),true);await page.click('[data-dialogue-verified] summary');
++   const contrasts=await page.evaluate(()=>{
++    const rgb=s=>s.match(/[\d.]+/g)?.map(Number),lum=c=>c.slice(0,3).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4}).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0),values=[];
++    for(const n of document.querySelectorAll('[data-dialogue-recovery] h4,[data-dialogue-recovery] p,[data-dialogue-recovery] li,[data-dialogue-recovery] summary')){
++     if(!n.getClientRects().length)continue;let b=n,bg;
++     while(b){const c=rgb(getComputedStyle(b).backgroundColor);if(c&&(c.length===3||c[3]>0)){bg=c;break}b=b.parentElement}
++     if(!bg)continue;const a=lum(rgb(getComputedStyle(n).color)),c=lum(bg);values.push((Math.max(a,c)+.05)/(Math.min(a,c)+.05));
++    }return values;
++   });assert(contrasts.length>=5);assert(contrasts.every(value=>value>=4.5),`${lang}/${theme}: contrast ${contrasts}`);
++   for(const width of [1440,760,390,320]){await page.setViewport({width,height:1100});assert(await page.$eval('#modal',n=>n.scrollWidth<=n.clientWidth+1),`${lang}/${theme}/${width}: modal overflow`)}
++   await page.screenshot({path:path.join(out,`dialogue-${lang}-${theme}-mobile.png`)});
++   await page.setViewport({width:1440,height:1100});await page.screenshot({path:path.join(out,`dialogue-${lang}-${theme}.png`)});
++   await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('#modal').open);assert.equal(await page.evaluate(()=>document.activeElement?.dataset.missionAction),'recovery-preview-t1','Escape restores action focus after refresh');
++  }
++ }
++ checks.push('Actual provider boundary and stopped process inspected through recovery-preview; no provider restart','FR/EN, both themes, 1440/760/390/320 widths, Escape and semantic action focus restoration','Two unknown checks remain visible, verified checks expand on demand and confirmation is hidden','Rendered diagnostic text contrast is at least 4.5:1');
++ const xss=await page.evaluate(()=>{const p={task:'t1',kept:[],redone:[],criteria:[],dialogue:{recommended_path:'reconcile_effects',recommendation:'<img src=x onerror=alert(1)>',checks:[{code:'untrusted',status:'unknown',message:'<script>window.injected=true</script>'}]}};const view=Mission.recoveryPreviewView(p);return {text:view.textContent,executable:view.querySelectorAll('img,script,button').length,executed:!!window.injected}});
++ assert.equal(xss.executable,0);assert.equal(xss.executed,false);assert(xss.text.includes('<img src=x onerror=alert(1)>'));checks.push('Untrusted diagnostic text is rendered as text without executable nodes');
++ assert.equal(JSON.stringify(cli(['work','show',work.id]).work),baseline,'Preview changed work or attempts');assert.equal(fs.readFileSync(script+'.calls','utf8'),calls,'Preview invoked provider');
++ assert.deepEqual(errors,[]);assert.deepEqual(failures,[]);
++ fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({status:'PASS',root,checks,errors,failures,provider_invocations:1,model_calls:0},null,2));console.log(JSON.stringify({status:'PASS',checks:checks.length,provider_invocations:1,model_calls:0}));
++}catch(error){const focus=page?await page.evaluate(()=>({active:{id:document.activeElement?.id,action:document.activeElement?.dataset.missionAction},returnTarget:typeof returnFocus!=='undefined'?{id:returnFocus?.id,connected:returnFocus?.isConnected,action:returnFocus?.dataset.missionAction}:null})).catch(()=>null):null;fs.writeFileSync(path.join(out,'failure.json'),JSON.stringify({error:redact(error.stack||error),errors,failures,focus},null,2));if(page)await page.screenshot({path:path.join(out,'failure.png')}).catch(()=>{});throw Error(redact(error.message))
++}finally{await browser?.close();if(server){server.kill('SIGTERM');await Promise.race([new Promise(resolve=>server.once('exit',resolve)),sleep(5000)])}if(agent){try{const a=cli(['agent','show',agent.id]).agent;if(['queued','starting','running','stopping'].includes(a.status)){stop(agent.id);await waitFor(()=>!['queued','starting','running','stopping'].includes(cli(['agent','show',agent.id]).agent.status),'Fixture supervisor cleanup failed',6000)}}catch(error){console.error(redact(error.message));process.exitCode=1}}}
++})().catch(error=>{console.error(redact(error.stack||error));process.exitCode=1});
+--- before/docs/PROJECT-MEMORY.md
++++ after/docs/PROJECT-MEMORY.md
+@@ -290,3 +290,50 @@
+ ```sh
+ go test ./internal/engine -run '^(TestDialogueBoundaryHasDurableStateBeforeHeartbeat|TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing|TestDialogueCheckpointWriteFailureStopsBeforeNextProvider)$' -count=1 -v
+ ```
++
++## Diagnostic avant une reprise de conversation
++
++`swarm --json mission recovery TRAVAIL TACHE [AGENT]`, sa sortie texte et
++`GET /api/v1/recovery-preview?work=TRAVAIL&task=TACHE&agent=AGENT` consultent
++désormais la frontière du dialogue. Le panneau **Avant une relance** présente
++le même diagnostic, sous **Reprise de conversation**, en lecture seule. La
++sélection explicite vise l’identité exacte conservée ; sans identifiant, le
++moteur lit la dernière tentative de la tâche, même si elle n’est plus parmi les
++200 agents récents affichés. Une tentative ancienne sélectionnée est signalée.
++
++L’objet `dialogue` de cet aperçu contient `boundary`, `checks`,
++`recommended_path`, `recommendation`, `observed_at`, `facts_sha256`,
++`decision_owner`, `decision_recorded` et `resume_supported`. Chaque contrôle a
++un code, un statut `pass`, `fail` ou `unknown`, et une explication. Le responsable
++ou l’opérateur local reçoit ce diagnostic ; il n’enregistre aucune décision.
++
++| Parcours recommandé | Signification |
++| --- | --- |
++| `select_latest_attempt` | La sélection ne correspond pas à la dernière tentative courante. |
++| `wait_for_stop` | La fin du processus fournisseur n’est pas confirmée. |
++| `inspect_history` | Aucun checkpoint exploitable ; gardes et effets historiques restent à qualifier. |
++| `reconcile_effects` | Le dernier tour n’a pas une frontière de fin confirmée ; vérifier les effets avant tout rejeu. |
++| `review_current_contract` | Une garde, la configuration, les plafonds, la mémoire ou l’attente fournisseur demandent un nouvel examen. |
++| `review_boundary` | Frontière confirmée à examiner ; précontrôle et décision restent inconnus. |
++
++Les contrôles relisent la configuration du programme, du modèle et des noms
++d’environnement autorisés, la compatibilité des plafonds historiques avec les
++réglages actuels, les sources mémoire sélectionnées et l’attente fournisseur
++enregistrée. Ils ne lancent ni fournisseur ni précontrôle. La présence d’un
++exécutable et une configuration identique ne prouvent ni l’authentification, ni
++les permissions effectives, ni la disponibilité de la session. Accès, réservations,
++contrat complet de départ et décision fraîche restent à vérifier au lancement.
++
++`facts_sha256` attribue les faits exposés, sans inclure l’heure de consultation ;
++ce n’est pas un jeton d’approbation et aucune mutation ne l’accepte comme tel.
++Une erreur de lecture du checkpoint non vide est refusée, sans résultat vide
++réussi. Une configuration non consultable reste inconnue. L’absence de session
++web est refusée selon le contrat existant, et une tentative d’un autre travail
++ou d’une autre tâche n’est pas exposée.
++
++`decision_recorded` et `resume_supported` restent `false`, y compris pour
++`review_boundary`. Les opérations existantes de nouvelle tentative et de reprise
++corrective gardent leurs propres règles ; elles ne restaurent pas implicitement
++la conversation. L’aperçu ne crée aucun agent, réservation, remise à zéro ou
++acceptation. Les contrôles de démarrage devront être refaits sur des preuves
++fraîches par une future opération explicite de restauration.
+--- before/docs/en/PROJECT-MEMORY.md
++++ after/docs/en/PROJECT-MEMORY.md
+@@ -267,3 +267,47 @@
+ ```sh
+ go test ./internal/engine -run '^(TestDialogueBoundaryHasDurableStateBeforeHeartbeat|TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing|TestDialogueCheckpointWriteFailureStopsBeforeNextProvider)$' -count=1 -v
+ ```
++
++## Diagnosis before conversation recovery
++
++`swarm --json mission recovery WORK TASK [AGENT]`, its plain-text output and
++`GET /api/v1/recovery-preview?work=WORK&task=TASK&agent=AGENT` now inspect dialogue
++boundaries. **Before restarting** presents the same read-only diagnosis under
++**Conversation recovery**. An explicit selection addresses the retained identity;
++without an ID, the engine reads the latest attempt of that task, even beyond the
++200 recent agents displayed in history. A selected older attempt is identified.
++
++The preview's `dialogue` object contains `boundary`, `checks`, `recommended_path`,
++`recommendation`, `observed_at`, `facts_sha256`, `decision_owner`,
++`decision_recorded` and `resume_supported`. Each check has a code, a `pass`,
++`fail` or `unknown` status and an explanation. The responsible supervisor or local
++operator receives this diagnosis; it records no decision.
++
++| Recommended path | Meaning |
++| --- | --- |
++| `select_latest_attempt` | The selection does not match the current latest attempt. |
++| `wait_for_stop` | Provider process termination has not been confirmed. |
++| `inspect_history` | No usable checkpoint; historical guards and effects need qualification. |
++| `reconcile_effects` | The last turn lacks a confirmed end boundary; verify effects before replay. |
++| `review_current_contract` | A guard, configuration, limits, memory or provider cooldown needs review. |
++| `review_boundary` | A confirmed boundary to examine; preflight and decision remain unknown. |
++
++Checks re-read program, model and allowed environment-name configuration,
++compatibility of historical limits with current settings, selected memory sources
++and recorded provider cooldown. They execute neither a provider nor preflight.
++An available executable and unchanged configuration establish neither
++authentication, effective permissions nor provider session availability. Access,
++reservations, the complete launch contract and a fresh decision still require
++verification at launch.
++
++`facts_sha256` attributes the exposed facts, excluding the observation clock;
++it is not an approval token and no mutation accepts it as one. A failed read of
++nonempty checkpoint state is refused rather than returned as empty success.
++Unavailable configuration remains unknown. An absent web session is refused
++under the existing contract; attempts from another work or task are not exposed.
++
++`decision_recorded` and `resume_supported` remain `false`, including for
++`review_boundary`. Existing new-attempt and corrective-recovery operations retain
++their rules and do not implicitly restore a conversation. The preview creates
++no agent, reservation, counter reset or acceptance. A future explicit restoration
++operation must repeat launch checks using fresh evidence.
+--- /dev/null
++++ after/docs/plans/deepagents-integration/INCREMENT-MEMOIRE-08.md
+@@ -0,0 +1,51 @@
++# Diagnostic de reprise fondé sur l’état du dialogue
++
++16 octobre 2026, reprise « next », Codex seul, APEX et `replan`.
++Exigences MEM-U08, MEM-U12, MEM-U13 ; cas MEM-C15 et MEM-C16.
++
++## Constat et choix
++
++M11 conserve les gardes et usages, mais `mission recovery` et l’API
++`recovery-preview` ne les consultent pas. `recoveryPreviewFor` décrit toujours
++une nouvelle tentative. Le responsable doit pouvoir distinguer une frontière
++confirmée, un échange encore actif, un état ancien absent et un effet incertain.
++
++Une restauration directe demanderait aussi de rouvrir les réservations,
++réacquérir l’espace, vérifier la session chez le fournisseur et enregistrer une
++décision fraîche. Les opérations actuelles de `task.restart` et de reprise
++corrective autorisent une nouvelle production ; elles ne restaurent pas la même
++conversation. Réutiliser ces noms pour restaurer implicitement serait incorrect.
++
++Choix : enrichir le diagnostic public existant, reçu par la CLI et le panneau
++« Avant une relance ». Il utilise le même lecteur validé de checkpoint que M11,
++sépare contrôles réussis, refus et inconnus, compare les paramètres de lancement,
++les plafonds administratifs et la mémoire sélectionnée, et indique le traitement
++recommandé. Les permissions effectives et la disponibilité de session restent
++non vérifiées : aucun précontrôle ni fournisseur n’est exécuté par une lecture.
++Le responsable conserve la décision ; le diagnostic n’enregistre aucune
++autorisation, ne modifie pas la consommation et ne permet pas de reprise.
++
++La sélection d’une tentative utilise son identité exacte ou la dernière de la
++tâche en stockage, sans dépendre des 200 agents récents de l’affichage. Une
++tentative plus ancienne ne devient pas la dernière parce qu’elle est sélectionnée.
++
++| Lot | Responsable / périmètre | Preuve attendue |
++| --- | --- | --- |
++| M12.1 | Codex, producteurs et contre-exemple | Diagnostic actuel sans distinction de frontière ; état M11 et sources préservés. |
++| M12.2 | Codex, qualification commune | Frontière confirmée, effet manquant, état absent/altéré, processus actif, ancienne tentative, contrat actuel modifié ; aucun droit déduit d’un checkpoint. |
++| M12.3 | Codex, CLI/API/panneau existants | Même diagnostic, sélection exacte au-delà de la liste récente, aucun effet d’écriture ni invocation ; affichage FR/EN accessible et texte hostile rendu comme texte. |
++| M12.4 | Codex, vérification et RETEX | Tests ciblés, concurrence, compilation/analyse statique, recette navigateur isolée, docs FR/EN et résultats. |
++
++Le serveur déjà ouvert est conservé. Aucun appel de modèle, processus utilisateur,
++migration ou mission native n’est modifié. La restauration publique de conversation
++reste explicitement non disponible ; elle devra appliquer une décision fraîche
++sous les réservations et preuves requises, pas seulement afficher un avis favorable.
++
++## Résultat
++
++M12.1 à M12.4 sont réalisés et vérifiés localement : contre-exemple exécuté,
++diagnostic commun, CLI/API et panneau FR/EN, onze tests Go distincts dont cinq
++avec `-race`, analyse statique, compilation et vraie recette navigateur isolée.
++Le RETEX et les incidents conservés sont dans
++[RESULTATS-MEMOIRE-08.md](RESULTATS-MEMOIRE-08.md). La restauration reste non
++disponible ; aucun avis du diagnostic n’accorde de droit d’exécution.
+--- /dev/null
++++ after/docs/plans/deepagents-integration/RESULTATS-MEMOIRE-08.md
+@@ -0,0 +1,118 @@
++# Le diagnostic de reprise consulte la frontière de conversation
++
++16 octobre 2026, après « next ». M12.1 à M12.4 de
++[l’incrément 8](INCREMENT-MEMOIRE-08.md) sont réalisés et vérifiés localement.
++Codex seul, sans appel de modèle réel, déploiement ou migration. Le serveur
++utilisateur observé à la reprise est conservé.
++
++## Constat, réalisation et consommateurs
++
++Le premier test échoue : `mission recovery` ne consulte pas l’état M11, alors
++qu’une fin de dialogue est conservée. `recoveryPreviewFor` décrit une nouvelle
++tentative sans qualifier la frontière de conversation. Le journal original et
++la source exacte sont dans `evidence/m12-20261016/recovery-red.json/.log` et
++`preimages/`. Ce manque de diagnostic est distinct de la persistance M11.
++
++Le nouveau producteur commun `dialogue_recovery.go` distingue contrôles réussis,
++refus et inconnus : dernière tentative, fin du processus, frontière confirmée,
++résultats d’outils, gardes historiques, commande/modèle/environnement autorisé,
++compatibilité des plafonds, références mémoire et attente fournisseur. Il réutilise
++`resolveModel`, `configuredRunLimitsWith`, `projectMemoryGuard`,
++`providerCooldownGuard` et le lecteur validé de checkpoint M11.
++
++Une absence historique reste inconnue ; un état non vide altéré est refusé.
++Six traitements sont distingués : examiner la dernière tentative, attendre la
++fin du processus, examiner l’histoire absente, qualifier les effets incertains,
++réexaminer le contrat courant ou examiner une frontière confirmée. Les contrôles
++de session/accès/réservation et de décision restent inconnus. Aucun fournisseur
++ou précontrôle n’est exécuté. `decision_recorded` et `resume_supported` restent
++`false`, même sur la frontière confirmée. `facts_sha256` attribue les faits
++exposés, sans l’heure de consultation ; aucun endpoint ne le traite comme une
++approbation.
++
++La sélection lit l’identité exacte ou la dernière ligne de la tâche en stockage.
++Elle ne dépend plus des 200 agents récents de l’affichage. Le test place 201
++autres lignes après la tentative, vérifie son absence des 200 lignes affichées,
++puis sa sélection correcte avec et sans identifiant. Une tentative ultérieure
++empêche ensuite de présenter l’ancienne comme courante.
++
++La CLI JSON/texte, l’API authentifiée et **Avant une relance → Reprise de
++conversation** reçoivent le même diagnostic. Les blocages/inconnus restent
++visibles ; les contrôles réussis se déplient dans un détail natif. Le catalogue
++commun FR/EN est régénéré par son outil. Aucun style ou bouton de restauration
++n’est ajouté. Un texte hostile reste du texte.
++
++Les tables des travaux, agents, tours, réservations, événements et journaux
++sont identiques avant/après les lectures et refus. Les réponses CLI/API ont
++les mêmes contrôles et empreinte. Le fournisseur local n’est pas rappelé.
++Une session absente est refusée avec 403 selon le contrat existant ; une autre
++tâche ou un autre travail ne permet pas de consulter cette tentative.
++
++## Preuves et limites
++
++| Contrôle | Résultat | Preuve sous `evidence/m12-20261016/` |
++| --- | --- | --- |
++| Aperçu ignorant la frontière avant réalisation | FAIL exécuté | `recovery-red.json/.log` |
++| Qualification, sélection, CLI/API sans mutation, consommateurs M11 | PASS, 11 tests nommés et 17 sous-tests | `recovery-final-ui.json/.log` |
++| Concurrence et wrappers locaux | PASS, 5 tests nommés et 8 sous-tests avec `-race` | `recovery-race.json/.log` |
++| Outil manquant, fin absente, état ancien/altéré, processus actif, fournisseur changé, plafond resserré, mémoire inaccessible | Huit variantes exécutées | Même lot moteur final |
++| Analyse statique et compilation | PASS | `engine-vet.json/.log`, `build-final.json/.log`, `built-binary-final.json` |
++| Catalogue et rendu textuel FR/EN | PASS | Tests Node et contrôles finaux dans `final-audit.json` |
++| Vraie CLI, superviseur, arrêt public, serveur isolé, API et bouton | PASS | `browser-flow.json/.log`, `browser-flow/result.json` |
++| FR/EN, deux thèmes, 1440/760/390/320 px, Échap/focus, détail et contraste rendu ≥ 4,5:1 | PASS | Même recette, huit captures dans `browser-flow/` |
++| Décision enregistrée/appliquée et restauration fournisseur réelle | NOT IMPLEMENTED / NOT TESTED | Aucun droit déduit du diagnostic. |
++
++Il y a **11 noms de test Go distincts** ; les cinq tests `-race` recoupent le
++lot normal. Le repli des contrôles réussis a ensuite changé seulement les
++ressources web et le catalogue. Les sources Go testées avec `-race` sont
++identiques. Le lot normal et le binaire ont été reconstruits avec les ressources
++finales, puis la recette navigateur a été vérifiée. Les manifestes conservent
++cette distinction ; une revue locale ne vaut pas approbation indépendante.
++
++La recette crée son projet par la CLI, lance un script Codex local, attend une
++frontière confirmée puis arrête cet agent par l’opération publique. Les
++consultations suivantes ne créent aucun appel : une invocation locale, aucun
++modèle et aucune acceptation. Les captures finales anglaises et mobiles ont été
++inspectées. Les états d’erreur navigateur hérités n’ont pas été rejoués ; les
++refus moteur et d’authentification gardent leur propre couverture.
++
++## RETEX et récupération des erreurs
++
++Le premier lot de 11 tests échoue sur une assertion HTTP : le test attend 401,
++le middleware existant renvoie 403. La déclaration réelle a été lue puis
++l’assertion corrigée, sans modifier le middleware ni accepter plusieurs codes.
++`recovery-green.json/.log` reste un FAIL malgré son nom. La source du premier
++lot est conservée par empreinte ; les résultats finaux sont distincts.
++
++La première recette compare le focus à une instance DOM susceptible d’être
++remplacée à l’actualisation. Le contrat restaure une action identifiable. La
++seconde attend le bouton avant le détail qui le construit à la demande. Après
++lecture de `Mission.renderResults` et de `mission-results`, la recette ouvre
++ce détail, clique le vrai bouton et vérifie le retour du focus vers son action.
++Les deux FAIL et captures restent dans `browser/` et `browser-final/`.
++La capture initiale a aussi motivé le repli des neuf contrôles réussis, en
++gardant les inconnus visibles. Le résultat final ne supprime aucun contrôle.
++
++Des recherches ont encore supposé des chemins absents ou rencontré du code
++tiers compacté ; elles ont été resserrées sur les producteurs réels. Un patch
++documentaire utilisait une ancre absente du plan : il a été refusé avant toute
++mutation, puis appliqué après relecture du point de reprise. Aucun de ces
++incidents ne constitue un test produit réussi ni une correction du moteur.
++
++Leçon réutilisable : le diagnostic qui oriente le responsable doit consommer
++le reçu mémoire, séparer preuves/refus/inconnus et ne transformer aucun avis
++en autorisation. Les tests de parcours suivent les détails construits à la
++demande et l’identité fonctionnelle du focus. Ces règles sont appliquées par
++le code commun, ses lecteurs, leurs tests et les documents
++[FR](../../PROJECT-MEMORY.md) et [EN](../../en/PROJECT-MEMORY.md).
++
++## Prochaine frontière
++
++La vue n’est ni un précontrôle d’exécution ni un instantané transactionnel de
++tous les systèmes. Les observations peuvent évoluer. La prochaine opération
++explicite doit recevoir une décision fraîche, revérifier dernier état, accès,
++contrat et réservations, puis appliquer une restauration autorisée sans effacer
++compteurs, coûts ou histoire. Les nouvelles tentatives gardent leur contrat.
++Codex reste responsable de cette suite. MEM-C15/MEM-C16 restent PARTIAL ; résumé,
++suppression et qualité LLM restent ouverts. Aucun résultat de ce candidat n’est
++attribué au serveur utilisateur resté en cours.
+--- before/docs/plans/deepagents-integration/PLAN.md
++++ after/docs/plans/deepagents-integration/PLAN.md
+@@ -43,6 +43,7 @@
+ | M9 Traçabilité du contexte de reprise | Défaut moteur corrigé et vérifié localement | Deux défauts d’empreinte reproduits avant correction ; manifeste préparé conservé, contexte final lié au texte et enregistré avant départ, refus de capacité et d’écriture. 20 tests ciblés puis 6 avec `-race`, soit 21 noms distincts, CLI/API, analyse statique et compilation. Voir `RESULTATS-MEMOIRE-05.md`. |
+ | M10 Confirmation de fin des tours | Défaut moteur corrigé et vérifié localement | Trois faux `answered` reproduits, puis confirmation par le moniteur avant écriture. 10 tests distincts, dont 6 avec `-race` ; vrai superviseur, terminal et CLI avec fournisseurs locaux. Docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-06.md`. Restauration après arrêt toujours non réalisée. |
+ | M11 État durable aux frontières | Réalisé et vérifié localement | Gardes et usages conservés avant autorisations, vue CLI/API qualifiée, migration isolée 33 → 34 et restauration locale de corbeille ; 32 tests distincts, dont 16 avec `-race`, vrai binaire et RETEX dans `RESULTATS-MEMOIRE-07.md`. Aucun redémarrage fournisseur activé. |
++| M12 Diagnostic de reprise du dialogue | Réalisé et vérifié localement | Frontière M11 consommée par CLI/API/panneau FR/EN, sélection exacte hors liste récente, 11 tests Go distincts dont 5 avec `-race`, vraie recette navigateur. Voir `RESULTATS-MEMOIRE-08.md`. Aucune décision ou restauration fournisseur enregistrée. |
+ 
+ **Point de reprise au 16 octobre :** les quatre appels M6 et leurs résultats
+ mixtes sont conservés, sans renotation. M7 prépare puis, après accord « oui »,
+@@ -92,6 +93,14 @@
+ fraîcheur et qualification des effets incertains, avant toute opération publique
+ de restauration. Aucun appel de modèle supplémentaire n’a été effectué.
+ 
++Après « next », M12 relie l’état M11 au diagnostic public de reprise. Le panneau
++expose les faits vérifiés, refus et inconnus ; les contrôles réussis se déplient.
++Les tentatives conservées restent consultables au-delà de la liste récente.
++Lire `RESULTATS-MEMOIRE-08.md` et `evidence/m12-20261016/`. La suite reste
++l’opération explicite qui recevra une décision fraîche et revérifiera les gardes
++de départ avant une restauration. Le diagnostic ne lui accorde aucun droit.
++Le serveur observé à cette reprise est conservé, sans déploiement ni appel LLM.
++
+ À chaque reprise, lire ce point, l’audit et le manifeste ; contrôler les empreintes
+ concernées, conserver les acquis et poursuivre le prochain travail autorisé.
+ Actualiser le référentiel en cas de dérive, sans écraser les observations initiales.
+@@ -221,6 +230,7 @@
+ | 2026-10-15 | L’utilisateur fournit le texte du guide pratique `langgraph/add-memory`, distinct de la page conceptuelle ouverte précédemment. | Erreur de méthode sur l’identité du document diagnostiquée ; contenu joint conservé. Sections fonctionnelles analysées, sources discriminantes inspectées, 2 sondes LangGraph passent. Reprise, projection/résumé et effets distincts de suppression ajoutés au cadrage ; aucun backend externe ni donnée réelle modifiée. |
+ | 2026-10-16 | M10, reprise après « next » : trois tours incomplets marqués répondus sont reproduits avant correction. | Confirmation de fin et de persistance par le moniteur ; dix tests distincts et vrai parcours superviseur/terminal/CLI avec fournisseurs locaux. Restauration après arrêt encore ouverte ; aucun nouvel appel de modèle. |
+ | 2026-10-16 | M11, reprise « suite » après lancement de l’interface. | État durable sur le tour, usage avant battement, gardes complètes et lecture datée ; stockage 34 testé isolément, 32 tests distincts dont 16 avec `-race`. Serveur réel conservé, restauration fournisseur encore ouverte. |
++| 2026-10-16 | M12, reprise « next » : le diagnostic existant ne consulte pas les checkpoints. | Qualification commune et sélection exacte, CLI/API/panneau FR/EN vérifiés ; 11 tests distincts dont 5 avec `-race` et vraie recette navigateur. Aucune décision ni restauration implicite. |
+ 
+ ## Réalisation M3 — décision technique et critères
+ 
+--- before/docs/plans/deepagents-integration/cas-evaluation.json
++++ after/docs/plans/deepagents-integration/cas-evaluation.json
+@@ -689,6 +689,25 @@
+           "scope": "Pending tools and cumulative usage are durable at observed boundaries; a start boundary does not assert later effects, and confirmed phase without answered status remains unconfirmed. Historical progress uses stored boundary time. No provider conversation projection, summarization or structured tool-message restoration is implemented."
+         }
+       ]
++    },
++    {
++      "id": "memory-08-dialogue-recovery-diagnosis",
++      "date": "2026-10-16",
++      "report": "RESULTATS-MEMOIRE-08.md",
++      "environment": "Actual local dialogue wrapper, read-only CLI/API and built browser flow using a local provider script; exact retained-attempt selection, refusal cases, targeted race tests and FR/EN rendering; running user server preserved",
++      "model_calls": 0,
++      "cases": [
++        {
++          "id": "MEM-C15",
++          "result": "PARTIAL",
++          "scope": "Recovery diagnosis now consumes the retained conversation boundary, current configuration/caps/memory and process evidence, including attempts outside recent UI history. Confirmed, incomplete, absent, corrupt, active and stale selections remain distinct. The responsible decision, provider-session preflight and authorized restoration are not implemented by this preview."
++        },
++        {
++          "id": "MEM-C16",
++          "result": "PARTIAL",
++          "scope": "Missing results and incomplete visibility prevent a positive effects qualification; API, CLI and browser preserve observed counts and show unknowns without replay or mutation. No structured conversation projection, summarization or restored tool-message sequence is executed."
++        }
++      ]
+     }
+   ]
+ }

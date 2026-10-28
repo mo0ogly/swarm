@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "recipe": "mission-worker-completion-recovery",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "real-native-worker-completion-recovery",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nb=Path(tempfile.mkdtemp(prefix='worker-recovery-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_worker_recovery.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(b))\n"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 17.524503730004653,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "2efa308739acc2cf38183960ebf7e82035e9404ad859ce42c439fa924b46b283",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "457ca8be95410b3f1e01b5ca6aed1a062ec88496f68779b01016dfcdc12255b8",
+    "declared-inputs.tar.gz": "74f66233c7cf7e997d5fa2c7ec460b426483627319aacbe732e3ef89f1e5cc1c",
+    "environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "step-0001.stdout": "42a39b5fc8c3ef5606c63aae29449ee212e5e092b0f38a8eb329340e10f210f7",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "7a75cbdaade887d776f5fba990c4cd433594b41cf0d3349d95507a93625e7308",
+    "inputs.after.json": "457ca8be95410b3f1e01b5ca6aed1a062ec88496f68779b01016dfcdc12255b8"
+  }
+}

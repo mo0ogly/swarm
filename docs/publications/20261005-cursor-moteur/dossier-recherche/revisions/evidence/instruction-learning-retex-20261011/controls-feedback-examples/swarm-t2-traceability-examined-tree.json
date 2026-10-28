@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-11T20:04:57.384860+00:00",
+  "result_tree": "f7382a0f0ab3f311a0fb779eb9c3711d33f608e2",
+  "old_tree": "3f4ddf6990e07c3895f88b223c8269fe5d7eec9d",
+  "declared_texts": 17,
+  "declared_bytes": 122185,
+  "Go_sources_unchanged": 517,
+  "exact_citations": 9,
+  "old_counterexamples_retained": true,
+  "local_exit": 0,
+  "no_native_independent_acceptance": true,
+  "whole_T1_originals_in_T1_packet_verified": true,
+  "source_limits_unchanged": true,
+  "preflight_failure_unpaid_and_retained": true
+}

@@ -1,0 +1,119 @@
+{
+  "status": "PASS",
+  "checks": [
+    "fr/etat: persisted/CLI parity, read-only preview, current/reloaded/other-page settings, observed timeout, zero duration, no replay, stale refusal, Escape/focus, mobile, delayed readback focus",
+    "fr/sombre: persisted/CLI parity, read-only preview, current/reloaded/other-page settings, observed timeout, zero duration, no replay, stale refusal, Escape/focus, mobile, delayed readback focus",
+    "en/etat: persisted/CLI parity, read-only preview, current/reloaded/other-page settings, observed timeout, zero duration, no replay, stale refusal, Escape/focus, mobile, delayed readback focus",
+    "en/sombre: persisted/CLI parity, read-only preview, current/reloaded/other-page settings, observed timeout, zero duration, no replay, stale refusal, Escape/focus, mobile, delayed readback focus"
+  ],
+  "errors": [],
+  "failed": [],
+  "cancelled": [
+    {
+      "path": "/log-console.html",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/snapshot",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/providers/connections/test",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/log-console.html",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/provider-wait",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/snapshot",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/assist/turns",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/runtime-health",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/run-limits",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/providers/connections/test",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/log-console.html",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/snapshot",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/assist/meta",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/web-requests",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/preparation-timeout",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/provider-wait",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/graph-performance",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/run-limits",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/runtime-health",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/providers/connections/test",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/log-console.html",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/snapshot",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/run-limits",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/runtime-health",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/assist/turns",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/providers/connections/test",
+      "reason": "net::ERR_ABORTED"
+    }
+  ],
+  "root": "/tmp/swarm-web-requests-ui-rrGnGx",
+  "provider_started": false
+}

@@ -1,0 +1,999 @@
+diff --git a/docs/architecture/AUTORECURSIVE-RECOVERY.md b/docs/architecture/AUTORECURSIVE-RECOVERY.md
+index 3725a88..b6a924c 100644
+--- a/docs/architecture/AUTORECURSIVE-RECOVERY.md
++++ b/docs/architecture/AUTORECURSIVE-RECOVERY.md
+@@ -483,3 +483,55 @@ web embarqués sans liste parallèle de noms supposés. Les manifestes historiqu
+ et leurs résultats restent inchangés ; un nouvel inventaire n'en renouvelle pas
+ l'acceptation. Les entrées observées de l'utilisateur ne deviennent pas des
+ changements attribués à l'opérateur.
++
++## Rendre les états de constat compatibles avec leur schéma
++
++Le rejet natif d'une inspection peut venir d'une contradiction de forme : déclarer
++`inspected` tout en demandant des originaux supplémentaires. Une ancre valide ne
++supprime pas cette contradiction. Le diagnostic sépare désormais une citation
++absente d'un état incompatible avec les besoins ; aucun état n'est converti par
++le moteur en avis favorable. Une incertitude reste `unknown` et un défaut exige
++toujours son original et sa reproduction.
++
++Les nouveaux paquets ancrent `finding_contract_version=1`, indépendant des
++versions de plan, réutilisation et budget d'entrée. Leur schéma distingue deux
++formes : `inspected` fournit `v/r/e` sans champ `n` ; `unknown` ou `fail` fournit
++`v/r/e/n`. Les unions partagent leurs définitions pour ne pas répéter une union
++par original. L'ancien marqueur absent conserve exactement le schéma et le
++message historiques ; les anciens constats valides restent lisibles et vérifiés
++sous leur original. Un marqueur inconnu reste refusé. Le parseur conserve aussi
++ses gardes de preuve et rejette une ancienne forme contradictoire après transport.
++
++[Anthropic documente](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)
++le support d'`anyOf` et des références locales, ainsi que la transformation de
++contraintes non prises en charge. L'absence structurale du champ évite de faire
++reposer cette règle sur `maxItems=0`. L'oracle JSON Schema indépendant vérifie
++le contre-exemple natif, les cas mixtes valides et les entrées invalides. Ce
++contrôle local ne prouve pas encore le comportement du fournisseur : réception
++du nouveau contrat, nouvelle réponse et effet natif doivent être observés.
++
++```mermaid
++flowchart LR
++    C[Paquet et contrat de constat ancre] --> M[Modele choisit librement son constat]
++    M --> I[inspected avec v r e]
++    M --> U[unknown ou fail avec v r e n]
++    I --> V[Moteur verifie identites et originaux]
++    U --> V
++    V --> D[Constat local remis a la synthese independante]
++    V --> E[Incident attribue si contradiction ou preuve invalide]
++    E --> R[Superviseur diagnostique et corrige dans ses droits]
++    R --> C
++```
++
++Le même principe vaut pour les décisions du superviseur. Le schéma courant
++distingue chaque type d'opération : `review-retry`, `revise-instructions`,
++`continue-run`, `stop-run` et `retry` n'offrent que `kind/id/next`. Un titre ou
++des exigences ajoutés à une reprise de revue sont refusés dès la génération
++structurée, comme ils l'étaient déjà par le contrat d'exécution. Les opérations
++`task`, `delegate`, `review-plan` et `close` conservent leurs champs propres.
++Les restrictions de disponibilité et les identifiants d'événements reçus restent
++ancrés au lot courant ; aucune reprise ni clôture ne devient automatiquement
++autorisée. L'ancien format complet reste une représentation historique lisible.
++Le contre-exemple natif et les neuf formes valides sont vérifiés séparément par
++l'oracle de schéma ; seule une nouvelle décision reçue et appliquée montrera
++l'effet réel sur le superviseur.
+diff --git a/docs/en/AUTORECURSIVE-RECOVERY.md b/docs/en/AUTORECURSIVE-RECOVERY.md
+index f9666ff..1098839 100644
+--- a/docs/en/AUTORECURSIVE-RECOVERY.md
++++ b/docs/en/AUTORECURSIVE-RECOVERY.md
+@@ -446,3 +446,53 @@ embedded configuration, schemas, instructions and web files without a second lis
+ of assumed names. Historical manifests and results remain unchanged; a new
+ inventory does not renew their acceptance. Observed user inputs are not changes
+ attributed to the operator.
++
++## Align finding states with their supplied schema
++
++A native inspection can be rejected because its shape is contradictory: claiming
++`inspected` while requesting additional originals. A valid anchor does not remove
++that contradiction. Diagnostics distinguish an absent quotation from a state
++incompatible with its needs; the engine never converts either into a favorable
++opinion. Uncertainty remains `unknown`; defects still require their original and
++reproduction.
++
++New packets bind `finding_contract_version=1`, independently from plan, reuse and
++input-budget versions. Their schema separates two shapes: `inspected` supplies
++`v/r/e` without `n`; `unknown` or `fail` supplies `v/r/e/n`. Union definitions are
++shared rather than repeated for each original. An absent marker preserves the
++exact historical schema and prompt; valid historical findings remain readable
++and authenticated against their original. Unknown markers are rejected. Parsing
++also retains original-evidence guards and rejects contradictory legacy shapes
++after transport.
++
++[Anthropic documents](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)
++`anyOf`, local references and transformation of unsupported constraints. Structural
++field omission avoids relying on `maxItems=0`. An independent JSON Schema oracle
++checks the native counterexample, valid mixed states and invalid inputs. Local
++validation does not establish provider behavior: reception of the new contract,
++a fresh response and its native effect still require observation.
++
++```mermaid
++flowchart LR
++    C[Packet and anchored finding contract] --> M[Model freely chooses its finding]
++    M --> I[inspected with v r e]
++    M --> U[unknown or fail with v r e n]
++    I --> V[Engine verifies identities and originals]
++    U --> V
++    V --> D[Local finding delivered to independent synthesis]
++    V --> E[Attributed incident for contradictions or invalid evidence]
++    E --> R[Supervisor diagnoses and corrects within authority]
++    R --> C
++```
++
++The same principle applies to supervisor decisions. The current schema separates
++each operation kind: `review-retry`, `revise-instructions`, `continue-run`,
++`stop-run` and `retry` offer only `kind/id/next`. A title or requirements added
++to a review restart are rejected by structured generation, matching the existing
++execution contract. `task`, `delegate`, `review-plan` and `close` retain their
++own fields. Availability restrictions and received event identifiers remain
++bound to the current batch; retries and closure gain no automatic authorization.
++The complete older wire format remains readable as a historical representation.
++The native counterexample and nine valid shapes are checked independently by
++the schema oracle; only a newly received and applied decision establishes the
++actual supervisor effect.
+diff --git a/docs/engine-cursor-source-inputs-001.json b/docs/engine-cursor-source-inputs-001.json
+index cfdbb03..7edb965 100644
+--- a/docs/engine-cursor-source-inputs-001.json
++++ b/docs/engine-cursor-source-inputs-001.json
+@@ -422,7 +422,7 @@
+   {
+     "path": "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+     "kind": "doc",
+-    "sha256": "070cad54ed1ad57568671b4247183b7a9aa8cc89aa6ab646960725c2765b03bb"
++    "sha256": "6ac2aed2a4e402d3af87bbbbd7ad0fe63bf404675be9a25ea9bb682cebe6abb5"
+   },
+   {
+     "path": "docs/architecture/CONTROLS-AND-FEEDBACK.md",
+@@ -517,7 +517,7 @@
+   {
+     "path": "docs/en/AUTORECURSIVE-RECOVERY.md",
+     "kind": "doc",
+-    "sha256": "31821b14f5866391d506ebcce8ab093d6232fd068d2c16c4dc816d3bd2929a78"
++    "sha256": "c01202007ce90662471b1f30867557462927b586bd82cf5d8dc7b95c124a4500"
+   },
+   {
+     "path": "docs/en/BUDGETS.md",
+diff --git a/docs/engine-cursor-source-inputs-003.json b/docs/engine-cursor-source-inputs-003.json
+index 9279d42..03c07cd 100644
+--- a/docs/engine-cursor-source-inputs-003.json
++++ b/docs/engine-cursor-source-inputs-003.json
+@@ -809,6 +809,16 @@
+     "kind": "test",
+     "sha256": "4c0b507fd87c30a7d2e0574ed71e0acc222afdaa9d7f849e5d49ff7131f3525b"
+   },
++  {
++    "path": "internal/engine/managed_review_fragment_finding_contract.go",
++    "kind": "source",
++    "sha256": "3a01d0bc54564d3b62341bb4ccb16a562d641f26aae96e26a22eb5a3d1f053dd"
++  },
++  {
++    "path": "internal/engine/managed_review_fragment_finding_contract_test.go",
++    "kind": "test",
++    "sha256": "c595a7dedc0ff76ada9f8051cb6cea3b21ad9fd5562fd7fa3bc43e95ad693bdb"
++  },
+   {
+     "path": "internal/engine/managed_review_fragment_finish.go",
+     "kind": "source",
+@@ -852,7 +862,7 @@
+   {
+     "path": "internal/engine/managed_review_fragment_plan.go",
+     "kind": "source",
+-    "sha256": "b3ee51ee93f92460f191788752396bd097c866395a205bc5ccb71bf039804d85"
++    "sha256": "a662623c031e0fb5749899a5670f5dfb636027cae93d7c72c23366d6a4d49168"
+   },
+   {
+     "path": "internal/engine/managed_review_fragment_plan_test.go",
+@@ -862,7 +872,7 @@
+   {
+     "path": "internal/engine/managed_review_fragment_prompt.go",
+     "kind": "source",
+-    "sha256": "8a1d089a5ae785834403430508304d0156959ea2d9aeb94170fdfef93df0001f"
++    "sha256": "f10398d2d64713cc9b382bd2d712b235d1cee37f87ad3c87b7c7dfeeeadbcc80"
+   },
+   {
+     "path": "internal/engine/managed_review_fragment_prompt_test.go",
+@@ -907,7 +917,7 @@
+   {
+     "path": "internal/engine/managed_review_fragment_reply.go",
+     "kind": "source",
+-    "sha256": "5835e2d0073f4e490aab1e9205e81edb3f287f518de844bb197b58957eb83080"
++    "sha256": "99b64e5af88d4dfb62f7f9d8b1c3d10558144e53a462bb87a2b0850f126432e5"
+   },
+   {
+     "path": "internal/engine/managed_review_fragment_reply_test.go",
+@@ -947,7 +957,7 @@
+   {
+     "path": "internal/engine/managed_review_fragment_reuse.go",
+     "kind": "source",
+-    "sha256": "4e147a22217457394f7d951132ef1d91bfcf93194c671e1e9fbff41dc9694606"
++    "sha256": "5232b0bc2590b5fec68e743224e6fa16f7b9eb9552ebbf522d78e5550720e195"
+   },
+   {
+     "path": "internal/engine/managed_review_fragment_reuse_test.go",
+@@ -992,7 +1002,7 @@
+   {
+     "path": "internal/engine/managed_review_fragment_tokens.go",
+     "kind": "source",
+-    "sha256": "e2496a2f7376740a9405ffb6268c924b6e55fc72a4cca963280fa8c06fbc7917"
++    "sha256": "3852c466f0c039700ec8c227db4490a0add0e70c7e6b14c75843a5cb36c89116"
+   },
+   {
+     "path": "internal/engine/managed_review_fragment_tokens_store_test.go",
+@@ -1402,7 +1412,12 @@
+   {
+     "path": "internal/engine/planning_historical_delivery_test.go",
+     "kind": "test",
+-    "sha256": "e136403a41554e2d6f20ceed208cad870bdab06883ebb9aca9c95902fb28b62d"
++    "sha256": "6b57169a92f7b823f4926a68b8df123463759c1ad09efa3d9bec60d55ae09f85"
++  },
++  {
++    "path": "internal/engine/planning_operation_schema_contract_test.go",
++    "kind": "test",
++    "sha256": "5932c3fcd38ad57ff943b479ab3ee8b2d2a9aa9a6f0649851af55e1eaab2aba0"
+   },
+   {
+     "path": "internal/engine/planning_parent_context_test.go",
+@@ -1413,20 +1428,5 @@
+     "path": "internal/engine/planning_prompt.go",
+     "kind": "source",
+     "sha256": "9f3ae975cac269d2c38ece3499bf0044f09b1c7d4338fd5eb208e8702dfba38b"
+-  },
+-  {
+-    "path": "internal/engine/planning_prompt_envelope_test.go",
+-    "kind": "test",
+-    "sha256": "54251cdce4df178ac77b3ff8ee6173436eb40b017a5d0173f8cac9b8b6445ec8"
+-  },
+-  {
+-    "path": "internal/engine/planning_rejection.go",
+-    "kind": "source",
+-    "sha256": "381526bc3d7aa6928c5f3162aba9740f7fff490df0c751098b8a475c720e0d0a"
+-  },
+-  {
+-    "path": "internal/engine/planning_rejection_state.go",
+-    "kind": "source",
+-    "sha256": "fd192f643d76ff613108ce662719c2ca0afb6fe2e9a300f0b6b5f18cd9d3c400"
+   }
+ ]
+diff --git a/docs/engine-cursor-source-inputs-004.json b/docs/engine-cursor-source-inputs-004.json
+index 7256435..7b5fe1e 100644
+--- a/docs/engine-cursor-source-inputs-004.json
++++ b/docs/engine-cursor-source-inputs-004.json
+@@ -1,4 +1,19 @@
+ [
++  {
++    "path": "internal/engine/planning_prompt_envelope_test.go",
++    "kind": "test",
++    "sha256": "54251cdce4df178ac77b3ff8ee6173436eb40b017a5d0173f8cac9b8b6445ec8"
++  },
++  {
++    "path": "internal/engine/planning_rejection.go",
++    "kind": "source",
++    "sha256": "381526bc3d7aa6928c5f3162aba9740f7fff490df0c751098b8a475c720e0d0a"
++  },
++  {
++    "path": "internal/engine/planning_rejection_state.go",
++    "kind": "source",
++    "sha256": "fd192f643d76ff613108ce662719c2ca0afb6fe2e9a300f0b6b5f18cd9d3c400"
++  },
+   {
+     "path": "internal/engine/planning_rejection_test.go",
+     "kind": "test",
+@@ -22,12 +37,12 @@
+   {
+     "path": "internal/engine/planning_runner.go",
+     "kind": "source",
+-    "sha256": "68a898290d259f6e8cf6db09bcecdc47640dd7898a8317810819380d1f108774"
++    "sha256": "ec77377665a2d1b2a0f0edc901f19681eed59d8a1312d90863dda416a361f597"
+   },
+   {
+     "path": "internal/engine/planning_schema.go",
+     "kind": "source",
+-    "sha256": "36d84958ad192190abd6d628f3d6b9c80748ce18f52328bc47121213afe8fd66"
++    "sha256": "a805fbe6e959bb82e70ea3780dba80ed80fd79a4ecae525c7729a1bd782b3150"
+   },
+   {
+     "path": "internal/engine/planning_schema_events_test.go",
+@@ -1503,20 +1518,5 @@
+     "path": "web/mission-insights.js",
+     "kind": "source",
+     "sha256": "3961431fecb2d594ee6ba896114c8ca3eaad34eb465db1d76c116c746c77b164"
+-  },
+-  {
+-    "path": "web/mission.css",
+-    "kind": "source",
+-    "sha256": "5a5dd39a1e96c0909ec175be72a42ab285d27ccab7846dcd5d4ddf9bb3262e42"
+-  },
+-  {
+-    "path": "web/mission.js",
+-    "kind": "source",
+-    "sha256": "7dc576612eb5e023178ad6215b45316e5b41745abf08cfcd79d75ac06e707413"
+-  },
+-  {
+-    "path": "web/pilot-actions.js",
+-    "kind": "source",
+-    "sha256": "55bf5c3a85db92ded11d6f675cf6f7066099ae7d65fb8c642ba9bdbf9a7f5fd0"
+   }
+ ]
+diff --git a/docs/engine-cursor-source-inputs-005.json b/docs/engine-cursor-source-inputs-005.json
+index 1b365ca..d1fb05e 100644
+--- a/docs/engine-cursor-source-inputs-005.json
++++ b/docs/engine-cursor-source-inputs-005.json
+@@ -1,4 +1,19 @@
+ [
++  {
++    "path": "web/mission.css",
++    "kind": "source",
++    "sha256": "5a5dd39a1e96c0909ec175be72a42ab285d27ccab7846dcd5d4ddf9bb3262e42"
++  },
++  {
++    "path": "web/mission.js",
++    "kind": "source",
++    "sha256": "7dc576612eb5e023178ad6215b45316e5b41745abf08cfcd79d75ac06e707413"
++  },
++  {
++    "path": "web/pilot-actions.js",
++    "kind": "source",
++    "sha256": "55bf5c3a85db92ded11d6f675cf6f7066099ae7d65fb8c642ba9bdbf9a7f5fd0"
++  },
+   {
+     "path": "web/pilot-batch.js",
+     "kind": "source",
+diff --git a/docs/engine-cursor-source-manifest.json b/docs/engine-cursor-source-manifest.json
+index d571991..a39103e 100644
+--- a/docs/engine-cursor-source-manifest.json
++++ b/docs/engine-cursor-source-manifest.json
+@@ -2,8 +2,8 @@
+   "schema_version": 1,
+   "manifest_status": "ENGINE_CURSOR_SOURCE_SNAPSHOT_NOT_INDEPENDENT_ACCEPTANCE",
+   "base_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+-  "candidate_id": "1169df70bec73d50fd23f640245b8ffd1317b9de+sha256:982ca76a2310bd67407536ec01df27faae84bd9e0a15caa879facdd7ff536a17",
+-  "candidate_digest": "982ca76a2310bd67407536ec01df27faae84bd9e0a15caa879facdd7ff536a17",
++  "candidate_id": "1169df70bec73d50fd23f640245b8ffd1317b9de+sha256:780e0c1d47c2dd6fbeb77c39ac9f393400204cda11fb87abcf0c0c1ec2936aac",
++  "candidate_digest": "780e0c1d47c2dd6fbeb77c39ac9f393400204cda11fb87abcf0c0c1ec2936aac",
+   "coverage_digest": "10155b4f69c55665a7e1830b4654d905c4b62892a56b196e41375c62568353a2",
+   "historical_manifest": "docs/ui-redesign-source-manifest.json",
+   "requirements": [
+@@ -176,7 +176,7 @@
+   "input_parts": [
+     {
+       "path": "docs/engine-cursor-source-inputs-001.json",
+-      "sha256": "fb489e69593a183204990857185acea354cb41b4d3c6a8bca3e32e21892a1157"
++      "sha256": "0e0377c8d81ff47dbbfeb598c764aab620153eb3d2077c04ed5569a0ac555139"
+     },
+     {
+       "path": "docs/engine-cursor-source-inputs-002.json",
+@@ -184,15 +184,15 @@
+     },
+     {
+       "path": "docs/engine-cursor-source-inputs-003.json",
+-      "sha256": "1225ac13293c51ef6ecf8d624089050ff9affa8c98538bb6e05278956e76295a"
++      "sha256": "ce7fe256208ad474fe34cb2460b47701824283c5f84bbd621ba90fbf95e8b2be"
+     },
+     {
+       "path": "docs/engine-cursor-source-inputs-004.json",
+-      "sha256": "045a7bcb1095867990a69172a10543594eb0a6fc7bf8ce3f793b31199ed7ea0c"
++      "sha256": "2b2411a49778bc7bf33f39af408139ca2ea27ec7d470d51291f6f1e579e4a462"
+     },
+     {
+       "path": "docs/engine-cursor-source-inputs-005.json",
+-      "sha256": "0a3512b8af3e01e388713d3549a78fb8e45b7e829c0c3965435d1cc803fd268b"
++      "sha256": "d3b175563e2adb424cbc4afbeee13c29b31c31f855fb6a708ea3512d5795ce74"
+     }
+   ]
+ }
+diff --git a/internal/engine/managed_review_fragment_finding_contract.go b/internal/engine/managed_review_fragment_finding_contract.go
+new file mode 100644
+index 0000000..d86b36c
+--- /dev/null
++++ b/internal/engine/managed_review_fragment_finding_contract.go
+@@ -0,0 +1,53 @@
++//go:build linux
++
++package engine
++
++import "strconv"
++
++// Independent from plan/reuse/input-budget versions. Zero preserves the exact
++// historical prompt and schema; new packets bind their finding shape explicitly.
++const managedFragmentFindingContractVersion = 1
++
++func supportedFragmentFindingContract(version int) bool {
++	return version == 0 || version == managedFragmentFindingContractVersion
++}
++
++// Use reusable union definitions rather than a distinct union per artifact.
++// An inspected result has no needs field; uncertainty and demonstrated defects
++// carry needs. Omission is structural and does not depend on unsupported maxItems0
++// or conditional-schema keywords. The engine still checks every original and
++// rejects contradictory legacy representations after transport.
++func managedFragmentStatefulFindingSchema(defs map[string]any, quoteCount int) map[string]any {
++	count := quoteCount
++	if count == 0 {
++		count = 1
++	}
++	suffix := strconv.Itoa(count)
++	complete, pending, choice := "finding-complete-"+suffix, "finding-pending-"+suffix, "finding-choice-"+suffix
++	if _, exists := defs[pending]; !exists {
++		indexes := []int{0}
++		if count > 1 {
++			indexes = append(indexes, 1)
++		}
++		properties := func(verdicts []string) map[string]any {
++			return map[string]any{
++				"v": map[string]any{"type": "string", "enum": verdicts},
++				"r": map[string]any{"$ref": "#/$defs/t"},
++				"e": map[string]any{"type": "integer", "enum": indexes},
++			}
++		}
++		inspected := properties([]string{"inspected"})
++		uncertain := properties([]string{"unknown", "fail"})
++		uncertain["n"] = map[string]any{"$ref": "#/$defs/n"}
++		defs[complete] = map[string]any{"type": "object", "additionalProperties": false, "required": []string{"v", "r", "e"}, "properties": inspected}
++		defs[pending] = map[string]any{"type": "object", "additionalProperties": false, "required": []string{"v", "r", "e", "n"}, "properties": uncertain}
++		defs[choice] = map[string]any{"anyOf": []any{
++			map[string]any{"$ref": "#/$defs/" + complete},
++			map[string]any{"$ref": "#/$defs/" + pending},
++		}}
++	}
++	if quoteCount == 0 {
++		return map[string]any{"$ref": "#/$defs/" + pending}
++	}
++	return map[string]any{"$ref": "#/$defs/" + choice}
++}
+diff --git a/internal/engine/managed_review_fragment_finding_contract_test.go b/internal/engine/managed_review_fragment_finding_contract_test.go
+new file mode 100644
+index 0000000..0250ab3
+--- /dev/null
++++ b/internal/engine/managed_review_fragment_finding_contract_test.go
+@@ -0,0 +1,142 @@
++//go:build linux
++
++package engine
++
++import (
++	"encoding/json"
++	"os"
++	"path/filepath"
++	"strings"
++	"testing"
++)
++
++func nativeInspectedNeedsFixture(t *testing.T) (managedReviewFragmentPacket, []byte) {
++	t.Helper()
++	var packet managedReviewFragmentPacket
++	raw, err := os.ReadFile("testdata/fragment-inspected-needs-native-packet.json")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err = json.Unmarshal(raw, &packet); err != nil {
++		t.Fatal(err)
++	}
++	reply, err := os.ReadFile("testdata/fragment-inspected-needs-native-reply.json")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if hash(reply) != "4e59aff7aa67c15e56c29148d1de159f17e39f78fa8f16da2cc327599ba198d3" {
++		t.Fatal("original native reply changed")
++	}
++	return packet, reply
++}
++
++func rebindFindingFixture(t *testing.T, packet managedReviewFragmentPacket, original []byte, repair bool) map[string]any {
++	t.Helper()
++	var reply map[string]any
++	if err := json.Unmarshal(original, &reply); err != nil {
++		t.Fatal(err)
++	}
++	raw, _ := json.Marshal(packet)
++	reply["packet_sha256"] = hash(raw)
++	if repair {
++		for _, value := range reply["findings"].(map[string]any) {
++			finding := value.(map[string]any)
++			if finding["v"] == "inspected" && len(finding["n"].([]any)) > 0 {
++				finding["v"] = "unknown"
++			}
++		}
++	}
++	return reply
++}
++
++func TestFragmentFindingContractNativeInspectedNeeds(t *testing.T) {
++	packet, original := nativeInspectedNeedsFixture(t)
++	var decoded managedFragmentInspection
++	if err := decodeManagedFragmentInspection(original, packet, &decoded); err != nil {
++		t.Fatal(err)
++	}
++	contradictions := 0
++	for _, finding := range decoded.Findings {
++		if finding.Verdict == "inspected" {
++			if !fragmentEvidencePresent(packet.Artifacts[finding.Artifact], finding.Evidence) {
++				t.Fatal("native anchor was not present")
++			}
++			if len(finding.Needs) == 0 {
++				t.Fatal("counterexample no longer requests proofs")
++			}
++			contradictions++
++		}
++	}
++	if contradictions != 5 {
++		t.Fatalf("got %d contradictory inspected findings", contradictions)
++	}
++	if _, _, err := parseManagedFragmentInspection(string(original), packet); err == nil || !strings.Contains(err.Error(), "inspected incompatible") {
++		t.Fatalf("native contradiction admitted or obscured: %v", err)
++	}
++
++	current := packet
++	current.FindingContractVersion = managedFragmentFindingContractVersion
++	uncertain := rebindFindingFixture(t, current, original, true)
++	encoded, _ := json.Marshal(uncertain)
++	state, _, err := parseManagedFragmentInspection(string(encoded), current)
++	if err != nil || state != "unknown" {
++		t.Fatalf("uncertainty must remain unknown: %s %v", state, err)
++	}
++	current.FindingContractVersion++
++	if _, _, err = parseManagedFragmentInspection(string(encoded), current); err == nil {
++		t.Fatal("unregistered finding contract accepted")
++	}
++}
++
++// Export the actual engine-produced schemas and original counterexample for an
++// independent JSON Schema validator during qualification. This fixture export
++// never mutates native proofs or creates an independent business verdict.
++func TestFragmentFindingContractSchemaOracle(t *testing.T) {
++	packet, original := nativeInspectedNeedsFixture(t)
++	legacySchema := managedFragmentPacketSchema(packet)
++	current := packet
++	current.FindingContractVersion = managedFragmentFindingContractVersion
++	currentSchema := managedFragmentPacketSchema(current)
++	if legacySchema == currentSchema {
++		t.Fatal("finding contract has no effect on schema")
++	}
++	var schema map[string]any
++	if err := json.Unmarshal([]byte(currentSchema), &schema); err != nil {
++		t.Fatal(err)
++	}
++	defs := schema["$defs"].(map[string]any)
++	for _, name := range []string{"finding-complete-1", "finding-pending-1"} {
++		object := defs[name].(map[string]any)
++		props := object["properties"].(map[string]any)
++		_, needs := props["n"]
++		if needs != strings.Contains(name, "pending") || object["additionalProperties"] != false {
++			t.Fatalf("invalid state boundary %s", name)
++		}
++	}
++	bad := rebindFindingFixture(t, current, original, false)
++	uncertain := rebindFindingFixture(t, current, original, true)
++	mixed := rebindFindingFixture(t, current, original, true)
++	first := mixed["findings"].(map[string]any)["0"].(map[string]any)
++	first["v"] = "inspected"
++	delete(first, "n")
++	encoded, _ := json.Marshal(mixed)
++	if state, _, err := parseManagedFragmentInspection(string(encoded), current); err != nil || state != "unknown" {
++		t.Fatalf("valid mixed local outcomes rejected: %s %v", state, err)
++	}
++	output := os.Getenv("SWARM_FINDING_SCHEMA_ORACLE_DIR")
++	if output != "" {
++		if err := os.MkdirAll(output, 0700); err != nil {
++			t.Fatal(err)
++		}
++		cases := map[string]any{"legacy-schema.json": json.RawMessage(legacySchema), "current-schema.json": json.RawMessage(currentSchema), "original-native-reply.json": json.RawMessage(original), "current-contradiction.json": bad, "current-unknown.json": uncertain, "current-mixed.json": mixed}
++		for name, value := range cases {
++			raw, err := json.MarshalIndent(value, "", "  ")
++			if err != nil {
++				t.Fatal(err)
++			}
++			if err = os.WriteFile(filepath.Join(output, name), raw, 0600); err != nil {
++				t.Fatal(err)
++			}
++		}
++	}
++}
+diff --git a/internal/engine/managed_review_fragment_plan.go b/internal/engine/managed_review_fragment_plan.go
+index 0f7d0a6..59969da 100644
+--- a/internal/engine/managed_review_fragment_plan.go
++++ b/internal/engine/managed_review_fragment_plan.go
+@@ -20,15 +20,16 @@ type managedReviewFragmentArtifact struct {
+ 	Content string `json:"content"`
+ }
+ type managedReviewFragmentPacket struct {
+-	LotContract   *ReviewCoordinationLot          `json:"lot_contract,omitempty"`
+-	LotCriteria   map[string]string               `json:"lot_criteria,omitempty"`
+-	Lot           string                          `json:"lot,omitempty"`
+-	InputBudget   *managedReviewInputBudget       `json:"input_budget,omitempty"`
+-	Version       int                             `json:"version"`
+-	Candidate     string                          `json:"candidate_commit"`
+-	ContextDigest string                          `json:"context_sha256"`
+-	Index         int                             `json:"index"`
+-	Artifacts     []managedReviewFragmentArtifact `json:"artifacts"`
++	FindingContractVersion int                             `json:"finding_contract_version,omitempty"`
++	LotContract            *ReviewCoordinationLot          `json:"lot_contract,omitempty"`
++	LotCriteria            map[string]string               `json:"lot_criteria,omitempty"`
++	Lot                    string                          `json:"lot,omitempty"`
++	InputBudget            *managedReviewInputBudget       `json:"input_budget,omitempty"`
++	Version                int                             `json:"version"`
++	Candidate              string                          `json:"candidate_commit"`
++	ContextDigest          string                          `json:"context_sha256"`
++	Index                  int                             `json:"index"`
++	Artifacts              []managedReviewFragmentArtifact `json:"artifacts"`
+ }
+ type managedReviewFragmentPlan struct {
+ 	Coordination       *ReviewCoordinationProposal   `json:"coordination,omitempty"`
+@@ -128,7 +129,7 @@ func packManagedFragmentArtifactsWithLot(c managedReviewContext, artifacts []man
+ 	empty := managedReviewFragmentPlan{}
+ 	canonical, _ := json.Marshal(c)
+ 	plan := managedReviewFragmentPlan{Version: 2, ContextDigest: hash(canonical), Candidate: c.Candidate, AvailableCalls: available, ReservedFinalCalls: finalCalls}
+-	packet := managedReviewFragmentPacket{Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: 0}
++	packet := managedReviewFragmentPacket{FindingContractVersion: managedFragmentFindingContractVersion, Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: 0}
+ 	// New plans reserve workflow space in addition to the variable schema and
+ 	// anchor table. Historical packets keep their original validation contract.
+ 	fits := func(p managedReviewFragmentPacket) bool {
+@@ -143,7 +144,7 @@ func packManagedFragmentArtifactsWithLot(c managedReviewContext, artifacts []man
+ 				return empty, fmt.Errorf("pièce indivisible trop grande : %s", artifact.Name)
+ 			}
+ 			plan.Packets = append(plan.Packets, packet)
+-			packet = managedReviewFragmentPacket{Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: len(plan.Packets), Artifacts: []managedReviewFragmentArtifact{artifact}}
++			packet = managedReviewFragmentPacket{FindingContractVersion: managedFragmentFindingContractVersion, Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: len(plan.Packets), Artifacts: []managedReviewFragmentArtifact{artifact}}
+ 			if !fits(packet) {
+ 				return empty, fmt.Errorf("pièce indivisible trop grande : %s", artifact.Name)
+ 			}
+@@ -178,7 +179,7 @@ func validateManagedReviewFragments(c managedReviewContext, p managedReviewFragm
+ 	actual := []managedReviewFragmentArtifact{}
+ 	for i, packet := range p.Packets {
+ 		raw, err := json.Marshal(packet)
+-		if err != nil || packet.Version != p.Version || packet.Index != i || packet.Candidate != p.Candidate || packet.ContextDigest != p.ContextDigest || len(packet.Artifacts) == 0 || (p.Version < 4 && len(raw)+managedFragmentPromptReserve > managedReviewPromptLimit) || !reflect.DeepEqual(packet.InputBudget, p.InputBudget) {
++		if err != nil || !supportedFragmentFindingContract(packet.FindingContractVersion) || packet.Version != p.Version || packet.Index != i || packet.Candidate != p.Candidate || packet.ContextDigest != p.ContextDigest || len(packet.Artifacts) == 0 || (p.Version < 4 && len(raw)+managedFragmentPromptReserve > managedReviewPromptLimit) || !reflect.DeepEqual(packet.InputBudget, p.InputBudget) {
+ 			return fmt.Errorf("paquet de revue modifié ou trop grand")
+ 		}
+ 		// Structural rechecks run inside journal/cancellation checks. Count the
+diff --git a/internal/engine/managed_review_fragment_prompt.go b/internal/engine/managed_review_fragment_prompt.go
+index c08b961..daf17b4 100644
+--- a/internal/engine/managed_review_fragment_prompt.go
++++ b/internal/engine/managed_review_fragment_prompt.go
+@@ -12,7 +12,7 @@ import (
+ const managedFragmentInspectionSchema = `{"type":"object","additionalProperties":false,"properties":{"candidate_commit":{"type":"string"},"context_sha256":{"type":"string"},"packet_sha256":{"type":"string"},"findings":{"type":"array","minItems":1,"items":{"type":"object","additionalProperties":false,"properties":{"artifact":{"type":"integer","minimum":0},"sha256":{"type":"string"},"verdict":{"type":"string","enum":["inspected","fail","unknown"]},"reason":{"type":"string","minLength":8,"maxLength":16},"evidence":{"type":"string","minLength":8,"maxLength":16,"pattern":"^\\S[\\s\\S]*\\S$"},"needs":{"type":"array","maxItems":16,"items":{"type":"string","minLength":3,"maxLength":240}}},"required":["artifact","sha256","verdict","reason","evidence","needs"]}}},"required":["candidate_commit","context_sha256","packet_sha256","findings"]}`
+ 
+ func managedFragmentInspectionPrompt(prefix string, p managedReviewFragmentPacket) (string, error) {
+-	if (p.Version != 1 && p.Version != 2 && p.Version != 3 && p.Version != 4) || p.Candidate == "" || p.ContextDigest == "" || len(p.Artifacts) == 0 || p.Index < 0 {
++	if !supportedFragmentFindingContract(p.FindingContractVersion) || (p.Version != 1 && p.Version != 2 && p.Version != 3 && p.Version != 4) || p.Candidate == "" || p.ContextDigest == "" || len(p.Artifacts) == 0 || p.Index < 0 {
+ 		return "", fmt.Errorf("paquet d’inspection incomplet")
+ 	}
+ 	if err := validateFragmentInputBudget(p.Version, p.InputBudget); err != nil {
+@@ -41,6 +41,9 @@ findings est indexé par numéro de pièce : v=verdict, r=raison, e=numéro d’
+ 	if p.Version >= 2 {
+ 		instructions += "\nPROTOCOLE V2 : joindre defects (vide si aucun fail). Chaque fail exige une entrée avec artifact, line (1-based dans le texte source pour une pièce source, dans le patch pour une pièce diff), quote (extrait exact et contigu commençant à un caractère de cette ligne, y compris au milieu ; conserver espaces, signes du patch et sauts de ligne), explanation (cause et conséquence), reproduction (condition ou contrôle permettant de constater le défaut), expected (comportement attendu). Ne pas inventer un test exécuté. Maximum quatre défauts : signaler les autres soupçons unknown avec besoin précis. Une ancre e ne constitue pas la démonstration du défaut.\n"
+ 	}
++	if p.FindingContractVersion == managedFragmentFindingContractVersion {
++		instructions += "\nCONTRAT DE CONSTAT1 : inspected fournit seulement v/r/e, sans champ n. Si une preuve supplémentaire est nécessaire, choisir unknown avec n précis ; inspected ne valide toujours aucune tâche. Ne jamais convertir une incertitude en inspected pour éviter une demande.\n"
++	}
+ 	prompt := prefix + "\n" + instructions + "\nSWARM_FRAGMENT_ANCHORS\n" + managedFragmentAnchorsJSON(p) + "\npacket_sha256=" + hash(raw) + "\nSWARM_FRAGMENT_PACKET\n" + string(raw)
+ 	if err := fragmentInputFits(p.InputBudget, prompt, managedFragmentPacketSchema(p)); err != nil {
+ 		return "", fmt.Errorf("consignes et paquet d’inspection dépassent la limite ; aucun envoi tronqué")
+@@ -86,6 +89,10 @@ func managedFragmentPacketSchema(p managedReviewFragmentPacket) string {
+ 		if len(quotes) > 1 {
+ 			indexes = append(indexes, 1)
+ 		}
++		if p.FindingContractVersion == managedFragmentFindingContractVersion {
++			entries[key] = managedFragmentStatefulFindingSchema(schema["$defs"].(map[string]any), len(fragmentQuoteChoices(a.Content)))
++			continue
++		}
+ 		entries[key] = map[string]any{"type": "object", "additionalProperties": false, "required": []string{"v", "r", "e", "n"}, "properties": map[string]any{
+ 			"v": verdict, "r": map[string]any{"$ref": "#/$defs/t"}, "n": map[string]any{"$ref": "#/$defs/n"}, "e": map[string]any{"type": "integer", "enum": indexes},
+ 		}}
+diff --git a/internal/engine/managed_review_fragment_reply.go b/internal/engine/managed_review_fragment_reply.go
+index 14e0057..ee8fe6d 100644
+--- a/internal/engine/managed_review_fragment_reply.go
++++ b/internal/engine/managed_review_fragment_reply.go
+@@ -43,6 +43,9 @@ func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPa
+ 	fail := func(reason string) (string, managedFragmentInspection, error) {
+ 		return "", managedFragmentInspection{}, &CommandError{Code: reviewFragmentProtocolError, Message: "inspection de fragment : " + reason}
+ 	}
++	if !supportedFragmentFindingContract(packet.FindingContractVersion) {
++		return fail("contrat de constat non pris en charge")
++	}
+ 	limit := managedFragmentReplyLimit
+ 	if packet.Version >= 2 {
+ 		limit += managedFragmentDefectReserve
+@@ -77,8 +80,11 @@ func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPa
+ 		}
+ 		switch finding.Verdict {
+ 		case "inspected":
+-			if len(strings.TrimSpace(finding.Evidence)) < 8 || !fragmentEvidencePresent(artifact, finding.Evidence) || len(finding.Needs) != 0 {
+-				return fail("extrait original absent ou preuve encore demandée")
++			if len(finding.Needs) != 0 {
++				return fail(fmt.Sprintf("pièce %d : inspected incompatible avec %d demande(s) de preuve ; retourner unknown", finding.Artifact, len(finding.Needs)))
++			}
++			if len(strings.TrimSpace(finding.Evidence)) < 8 || !fragmentEvidencePresent(artifact, finding.Evidence) {
++				return fail(fmt.Sprintf("pièce %d : extrait original absent", finding.Artifact))
+ 			}
+ 		case "fail":
+ 			state = "changes_requested"
+diff --git a/internal/engine/managed_review_fragment_reuse.go b/internal/engine/managed_review_fragment_reuse.go
+index b8b84dc..993ebbe 100644
+--- a/internal/engine/managed_review_fragment_reuse.go
++++ b/internal/engine/managed_review_fragment_reuse.go
+@@ -148,7 +148,7 @@ func differentialFragmentPlan(c managedReviewContext, old managedReviewContext,
+ 	for _, r := range reused {
+ 		r.Packet = len(p.Packets)
+ 		p.Reused = append(p.Reused, r)
+-		p.Packets = append(p.Packets, managedReviewFragmentPacket{Version: 3, Candidate: c.Candidate, ContextDigest: p.ContextDigest, Index: r.Packet, Artifacts: r.Original.Artifacts})
++		p.Packets = append(p.Packets, managedReviewFragmentPacket{FindingContractVersion: managedFragmentFindingContractVersion, Version: 3, Candidate: c.Candidate, ContextDigest: p.ContextDigest, Index: r.Packet, Artifacts: r.Original.Artifacts})
+ 	}
+ 	if err = validateManagedReviewFragments(c, p); err != nil {
+ 		return managedReviewFragmentPlan{}, err
+diff --git a/internal/engine/managed_review_fragment_tokens.go b/internal/engine/managed_review_fragment_tokens.go
+index c7b2283..79c92de 100644
+--- a/internal/engine/managed_review_fragment_tokens.go
++++ b/internal/engine/managed_review_fragment_tokens.go
+@@ -66,7 +66,7 @@ func planTokenManagedFragments(c managedReviewContext, previous managedReviewFra
+ 	}
+ 	p := managedReviewFragmentPlan{Coordination: previous.Coordination, CoordinationFiles: previous.CoordinationFiles, Version: 4, InputBudget: &budget, Candidate: previous.Candidate, ContextDigest: previous.ContextDigest, AvailableCalls: available, ReservedFinalCalls: 2, ChangeDiff: previous.ChangeDiff}
+ 	packet := func() managedReviewFragmentPacket {
+-		return managedReviewFragmentPacket{Version: 4, InputBudget: &budget, Candidate: p.Candidate, ContextDigest: p.ContextDigest, Index: len(p.Packets)}
++		return managedReviewFragmentPacket{FindingContractVersion: managedFragmentFindingContractVersion, Version: 4, InputBudget: &budget, Candidate: p.Candidate, ContextDigest: p.ContextDigest, Index: len(p.Packets)}
+ 	}
+ 	current := packet()
+ 	for i, old := range previous.Packets {
+@@ -103,7 +103,7 @@ func planTokenManagedFragments(c managedReviewContext, previous managedReviewFra
+ 	for _, ref := range previous.Reused {
+ 		ref.Packet = len(p.Packets)
+ 		p.Reused = append(p.Reused, ref)
+-		p.Packets = append(p.Packets, managedReviewFragmentPacket{Version: 4, InputBudget: &budget, Candidate: p.Candidate, ContextDigest: p.ContextDigest, Index: ref.Packet, Artifacts: ref.Original.Artifacts})
++		p.Packets = append(p.Packets, managedReviewFragmentPacket{FindingContractVersion: managedFragmentFindingContractVersion, Version: 4, InputBudget: &budget, Candidate: p.Candidate, ContextDigest: p.ContextDigest, Index: ref.Packet, Artifacts: ref.Original.Artifacts})
+ 	}
+ 	if required := fragmentPaidInspections(p) + p.ReservedFinalCalls; required > available {
+ 		return empty, fmt.Errorf("budget insuffisant : %d inspections et %d appels finaux pour %d disponibles", fragmentPaidInspections(p), p.ReservedFinalCalls, available)
+diff --git a/internal/engine/planning_historical_delivery_test.go b/internal/engine/planning_historical_delivery_test.go
+index b57b928..80378ed 100644
+--- a/internal/engine/planning_historical_delivery_test.go
++++ b/internal/engine/planning_historical_delivery_test.go
+@@ -162,19 +162,7 @@ func TestPlanningDeliveryExcludesUnavailableProductionRetry(t *testing.T) {
+ 	owner, _ := w.Planning.scope("root")
+ 	w = planningDo(t, s, w, "claim", PlanningRequest{Scope: "root", ScopeRevision: owner.Revision, Holder: "strict-owner", LeaseSeconds: 60})
+ 	owner, _ = w.Planning.scope("root")
+-	var schema struct {
+-		Properties map[string]struct {
+-			Items struct {
+-				Properties map[string]struct {
+-					Enum []string `json:"enum"`
+-				} `json:"properties"`
+-			} `json:"items"`
+-		} `json:"properties"`
+-	}
+-	if err = json.Unmarshal([]byte(planningSchemaForDelivery(*owner.Delivery)), &schema); err != nil {
+-		t.Fatal(err)
+-	}
+-	kinds := schema.Properties["operations"].Items.Properties["kind"].Enum
++	kinds := planningOperationSchemaKinds(t, planningSchemaForDelivery(*owner.Delivery))
+ 	if containsString(kinds, "retry") || !containsString(kinds, "review-retry") {
+ 		t.Fatal("provider offered forbidden production retry", kinds)
+ 	}
+@@ -199,7 +187,7 @@ func TestPlanningDeliveryExcludesUnavailableProductionRetry(t *testing.T) {
+ 	if err != nil {
+ 		t.Fatal(err)
+ 	}
+-	if err = json.Unmarshal([]byte(planningSchemaForDelivery(d)), &schema); err != nil || !containsString(schema.Properties["operations"].Items.Properties["kind"].Enum, "retry") {
++	if !containsString(planningOperationSchemaKinds(t, planningSchemaForDelivery(d)), "retry") {
+ 		t.Fatal("valid production correction was removed", string(raw), err)
+ 	}
+ }
+@@ -232,19 +220,7 @@ func TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult(t *testin
+ 			if err != nil {
+ 				t.Fatal(err)
+ 			}
+-			var schema struct {
+-				Properties map[string]struct {
+-					Items struct {
+-						Properties map[string]struct {
+-							Enum []string `json:"enum"`
+-						} `json:"properties"`
+-					} `json:"items"`
+-				} `json:"properties"`
+-			}
+-			if err = json.Unmarshal([]byte(planningSchemaForDelivery(d)), &schema); err != nil {
+-				t.Fatal(err)
+-			}
+-			offered := containsString(schema.Properties["operations"].Items.Properties["kind"].Enum, "review-retry")
++			offered := containsString(planningOperationSchemaKinds(t, planningSchemaForDelivery(d)), "review-retry")
+ 			if offered != (mode == "current") {
+ 				t.Fatal("review retry offer does not match received current event", mode, d.Events, offered)
+ 			}
+diff --git a/internal/engine/planning_operation_schema_contract_test.go b/internal/engine/planning_operation_schema_contract_test.go
+new file mode 100644
+index 0000000..d7a7dbc
+--- /dev/null
++++ b/internal/engine/planning_operation_schema_contract_test.go
+@@ -0,0 +1,82 @@
++package engine
++
++import (
++	"encoding/json"
++	"os"
++	"path/filepath"
++	"testing"
++)
++
++func TestPlanningOperationSchemaSeparatesMutationKinds(t *testing.T) {
++	var schema map[string]any
++	if err := json.Unmarshal([]byte(planningSchemaForDelivery(PlanningDelivery{})), &schema); err != nil {
++		t.Fatal(err)
++	}
++	items := schema["properties"].(map[string]any)["operations"].(map[string]any)["items"].(map[string]any)
++	variants := items["anyOf"].([]any)
++	if len(variants) != 9 {
++		t.Fatalf("operation kinds lost: %d", len(variants))
++	}
++	for _, value := range variants {
++		object := value.(map[string]any)
++		props := object["properties"].(map[string]any)
++		kind := props["kind"].(map[string]any)["enum"].([]any)[0].(string)
++		if kind == "review-retry" || kind == "revise-instructions" || kind == "continue-run" || kind == "stop-run" {
++			if len(props) != 3 || props["id"] == nil || props["next"] == nil || object["additionalProperties"] != false {
++				t.Fatalf("%s can still contain unrelated plan fields", kind)
++			}
++		}
++	}
++	output := os.Getenv("SWARM_FINDING_SCHEMA_ORACLE_DIR")
++	if output != "" {
++		if err := os.MkdirAll(output, 0700); err != nil {
++			t.Fatal(err)
++		}
++		cases := map[string]any{
++			"planner-current-schema.json":    json.RawMessage(planningSchemaForDelivery(PlanningDelivery{})),
++			"planner-no-retries-schema.json": json.RawMessage(planningSchemaForDelivery(PlanningDelivery{ProductionRetryUnavailable: true, ReviewRetryUnavailable: true})),
++			"planner-legacy-schema.json":     json.RawMessage(planningProposalSchema),
++		}
++		for name, value := range cases {
++			raw, err := json.MarshalIndent(value, "", "  ")
++			if err != nil {
++				t.Fatal(err)
++			}
++			if err = os.WriteFile(filepath.Join(output, name), raw, 0600); err != nil {
++				t.Fatal(err)
++			}
++		}
++	}
++}
++
++// Inspect the offered operations, without coupling availability assertions to
++// the old flat object representation. Every current branch carries one kind.
++func planningOperationSchemaKinds(t *testing.T, raw string) []string {
++	t.Helper()
++	var schema struct {
++		Properties map[string]struct {
++			Items struct {
++				AnyOf []struct {
++					Properties map[string]struct {
++						Enum []string `json:"enum"`
++					} `json:"properties"`
++				} `json:"anyOf"`
++			} `json:"items"`
++		} `json:"properties"`
++	}
++	if err := json.Unmarshal([]byte(raw), &schema); err != nil {
++		t.Fatal(err)
++	}
++	kinds := []string{}
++	for _, branch := range schema.Properties["operations"].Items.AnyOf {
++		values := branch.Properties["kind"].Enum
++		if len(values) != 1 {
++			t.Fatalf("operation branch has %d kinds", len(values))
++		}
++		kinds = append(kinds, values[0])
++	}
++	if len(kinds) == 0 {
++		t.Fatal("no operation branches")
++	}
++	return kinds
++}
+diff --git a/internal/engine/planning_runner.go b/internal/engine/planning_runner.go
+index 46ff5cd..e986214 100644
+--- a/internal/engine/planning_runner.go
++++ b/internal/engine/planning_runner.go
+@@ -274,7 +274,7 @@ func runPlanningProviderObserved(provider Provider, prompt string, deadline time
+ 	return runPlanningProviderRouted(provider, nil, prompt, deadline, valid, record)
+ }
+ func runPlanningProviderRouted(provider Provider, route *ModelRoute, prompt string, deadline time.Duration, valid func() bool, record func(*Usage), observers ...func(*ProviderCooldown) error) (string, error) {
+-	return runStructuredProvider(provider, route, prompt, planningProposalSchema, deadline, valid, record, observers...)
++	return runStructuredProvider(provider, route, prompt, planningSchemaForDelivery(PlanningDelivery{}), deadline, valid, record, observers...)
+ }
+ func runStructuredProvider(provider Provider, route *ModelRoute, prompt, schema string, deadline time.Duration, valid func() bool, record func(*Usage), observers ...func(*ProviderCooldown) error) (string, error) {
+ 	return runStructuredProviderClock(provider, route, prompt, schema, deadline, valid, record, suspendAwareNow, observers...)
+diff --git a/internal/engine/planning_schema.go b/internal/engine/planning_schema.go
+index b7c981a..d95a5fa 100644
+--- a/internal/engine/planning_schema.go
++++ b/internal/engine/planning_schema.go
+@@ -59,9 +59,45 @@ func planningSchemaForDelivery(delivery PlanningDelivery) string {
+ 		}
+ 		kinds["enum"] = available
+ 	}
++	// Match the operation-specific contract before generation. The historical
++	// full wire schema remains available for reading old representations.
++	operations := properties["operations"].(map[string]any)
++	legacyItem := operations["items"].(map[string]any)
++	legacyProperties := legacyItem["properties"].(map[string]any)
++	kinds := legacyProperties["kind"].(map[string]any)["enum"].([]any)
++	variants := []any{}
++	for _, rawKind := range kinds {
++		kind := rawKind.(string)
++		fields := planningOperationSchemaFields(kind)
++		props := map[string]any{"kind": map[string]any{"type": "string", "enum": []string{kind}}}
++		required := []string{"kind"}
++		for _, field := range fields {
++			props[field] = legacyProperties[field]
++			required = append(required, field)
++		}
++		variants = append(variants, map[string]any{"type": "object", "additionalProperties": false, "required": required, "properties": props})
++	}
++	operations["items"] = map[string]any{"anyOf": variants}
+ 	raw, err := json.Marshal(schema)
+ 	if err != nil {
+ 		panic(err)
+ 	}
+ 	return string(raw)
+ }
++
++// Only meaningful fields of each existing engine operation are supplied. This
++// changes output shape, not scope, evidence, rights or execution authorization.
++func planningOperationSchemaFields(kind string) []string {
++	switch kind {
++	case "task":
++		return []string{"id", "title", "requirements", "deliverable", "criteria", "depends", "next"}
++	case "delegate":
++		return []string{"id", "title", "requirements", "next", "max_tasks", "max_activations"}
++	case "review-plan":
++		return []string{"id", "deliverable"}
++	case "close":
++		return []string{"title"}
++	default:
++		return []string{"id", "next"}
++	}
++}
+diff --git a/internal/engine/testdata/fragment-inspected-needs-native-packet.json b/internal/engine/testdata/fragment-inspected-needs-native-packet.json
+new file mode 100644
+index 0000000..167c3cf
+--- /dev/null
++++ b/internal/engine/testdata/fragment-inspected-needs-native-packet.json
+@@ -0,0 +1,50 @@
++{
++  "version": 2,
++  "candidate_commit": "95e2afb9ca56b48ae2f393396cb2d83e0ba7b309",
++  "context_sha256": "f01653114085721584f9ee3ba137fe6271155cb325afe3274e3066f17bca6223",
++  "index": 5,
++  "artifacts": [
++    {
++      "kind": "source",
++      "name": "internal/engine/planning.go",
++      "sha256": "bdf56336463d036a09479edb7c9ba52e5cd18139d31981121ec954853815fc35",
++      "content": "{\"path\":\"internal/engine/planning.go\",\"git_blob\":\"99ff11bcd84a468b8a29f57728cb83e0025e588d\",\"sha256\":\"c3d8ac967e7b800ca5c8124da586f33afee83d967d4370e608a8b27ffab97fa6\",\"bytes\":39763,\"content\":\"package engine\\n\\nimport (\\n\\t\\\"database/sql\\\"\\n\\t\\\"encoding/json\\\"\\n\\t\\\"fmt\\\"\\n\\t\\\"time\\\"\\n)\\n\\n// PlanningState is stored inside the existing atomic work/event transaction.\\n// No parallel persistence path: exports, rollback and optimistic locking retain\\n// the same boundary as tasks. Absence means legacy, never inferred adoption.\\ntype PlanningState struct {\\n\\tQuotaAuthorization    *QuotaAuthorization            `json:\\\"quota_authorization,omitempty\\\"`\\n\\tReviewerRequired      bool                           `json:\\\"reviewer_required,omitempty\\\"`\\n\\tReviewer              *ReviewerConfig                `json:\\\"reviewer,omitempty\\\"`\\n\\tModelRoute            *ModelRoute                    `json:\\\"model_route,omitempty\\\"`\\n\\tHumanReviewAuthorized string                         `json:\\\"human_review_authorized,omitempty\\\"`\\n\\tChecks                map[string][]ValidationControl `json:\\\"checks,omitempty\\\"`\\n\\tRepository            *ManagedRepository             `json:\\\"repository,omitempty\\\"`\\n\\tProvider              string                         `json:\\\"provider,omitempty\\\"`\\n\\tProviderDigest        string                         `json:\\\"provider_digest,omitempty\\\"`\\n\\tActivations           int                            `json:\\\"activations\\\"`\\n\\tMaxActivations        int                            `json:\\\"max_activations\\\"`\\n\\tFailure               string                         `json:\\\"failure,omitempty\\\"`\\n\\tVersion               int                            `json:\\\"version\\\"`\\n\\tPaused                bool                           `json:\\\"paused\\\"`\\n\\tMaxTasks              int                            `json:\\\"max_tasks\\\"`\\n\\tMaxDecisions          int                            `json:\\\"max_decisions\\\"`\\n\\tDecisions             int                            `json:\\\"decisions\\\"`\\n\\tScopes                []PlanningScope                `json:\\\"scopes\\\"`\\n\\tInbox                 []PlanningEvent                `json:\\\"inbox\\\"`\\n\\tJudge                 *JudgeState                    `json:\\\"judge,omitempty\\\"`\\n}\\ntype PlanningScope struct {\\n\\tModelSelection  *RoleModel        `json:\\\"model_selection,omitempty\\\"`\\n\\tLastModel       *RoleModel        `json:\\\"last_model,omitempty\\\"`\\n\\tDelivery        *PlanningDelivery `json:\\\"delivery,omitempty\\\"`\\n\\tWorkflow        *AgentWorkflow    `json:\\\"workflow,omitempty\\\"`\\n\\tTaskLimit       int               `json:\\\"max_tasks,omitempty\\\"`\\n\\tActivationLimit int               `json:\\\"max_activations,omitempty\\\"`\\n\\tActivations     int               `json:\\\"activations\\\"`\\n\\tID              string            `json:\\\"id\\\"`\\n\\tParent          string            `json:\\\"parent,omitempty\\\"`\\n\\tObjective       string            `json:\\\"objective\\\"`\\n\\tRequirements    []string          `json:\\\"requirements\\\"`\\n\\tRevision        int               `json:\\\"revision\\\"`\\n\\tGeneration      int               `json:\\\"generation\\\"`\\n\\tHolder          string            `json:\\\"holder,omitempty\\\"`\\n\\tUntil           string            `json:\\\"lease_until,omitempty\\\"`\\n\\tState           string            `json:\\\"state\\\"`\\n}\\ntype PlanningEvent struct {\\n\\tHandoff   *ExchangeArtifact  `json:\\\"handoff,omitempty\\\"`\\n\\tID        string             `json:\\\"id\\\"`\\n\\tScope     string             `json:\\\"scope\\\"`\\n\\tKind      string             `json:\\\"kind\\\"`\\n\\tTask      string             `json:\\\"task,omitempty\\\"`\\n\\tAttempt   string             `json:\\\"attempt,omitempty\\\"`\\n\\tMessage   string             `json:\\\"message\\\"`\\n\\tArtifacts []ExchangeArtifact `json:\\\"artifacts,omitempty\\\"`\\n\\tDecision  string             `json:\\\"decision,omitempty\\\"`\\n\\tAt        string             `json:\\\"at\\\"`\\n}\\ntype PlanningOperation struct {\\n\\tMaxTasks       int      `json:\\\"max_tasks,omitempty\\\"`\\n\\tMaxActivations int      `json:\\\"max_activations,omitempty\\\"`\\n\\tKind           string   `json:\\\"kind\\\"`\\n\\tID             string   `json:\\\"id\\\"`\\n\\tTitle          string   `json:\\\"title\\\"`\\n\\tRequirements   []string `json:\\\"requirements\\\"`\\n\\tDeliverable    string   `json:\\\"deliverable,omitempty\\\"`\\n\\tCriteria       []string `json:\\\"criteria,omitempty\\\"`\\n\\tDepends        []string `json:\\\"depends,omitempty\\\"`\\n\\tNext           string   `json:\\\"next,omitempty\\\"`\\n}\\ntype PlanningRequest struct {\\n\\tMissingReport            bool `json:\\\"missing_report,omitempty\\\"`\\n\\tpreparedReviewInputs     map[string]any\\n\\tcoordinationInputs       map[string]*preparedCoordination\\n\\tScopeFiles               []string                       `json:\\\"scope_files,omitempty\\\"`\\n\\tConfirmReviewErrorRepair bool                           `json:\\\"confirm_review_error_repair,omitempty\\\"`\\n\\tMaxReviewCalls           int                            `json:\\\"max_review_calls,omitempty\\\"`\\n\\tResultCommit             string                         `json:\\\"result_commit,omitempty\\\"`\\n\\tExpectedCandidate        string                         `json:\\\"expected_candidate,omitempty\\\"`\\n\\tResultTree               string                         `json:\\\"result_tree,omitempty\\\"`\\n\\tConfirmRecovery          bool                           `json:\\\"confirm_recovery,omitempty\\\"`\\n\\tReviewID                 string                         `json:\\\"review_id,omitempty\\\"`\\n\\tRecoveryInstruction      string                         `json:\\\"recovery_instruction,omitempty\\\"`\\n\\tReviewTimeoutSeconds     int                            `json:\\\"review_timeout_seconds,omitempty\\\"`\\n\\tLevel                    string                         `json:\\\"level,omitempty\\\"`\\n\\tPolicyHash               string                         `json:\\\"model_policy_hash,omitempty\\\"`\\n\\tChecks                   map[string][]ValidationControl `json:\\\"checks,omitempty\\\"`\\n\\tRepository               *ManagedRepositoryRequest      `json:\\\"repository,omitempty\\\"`\\n\\tProvider                 string                         `json:\\\"provider,omitempty\\\"`\\n\\tMaxActivations           int                            `json:\\\"max_activations,omitempty\\\"`\\n\\tAgent                    string                         `json:\\\"agent_id,omitempty\\\"`\\n\\tTask                     string                         `json:\\\"task_id,omitempty\\\"`\\n\\tAttempt                  string                         `json:\\\"attempt_id,omitempty\\\"`\\n\\tArtifacts                []ExchangeArtifact             `json:\\\"artifacts,omitempty\\\"`\\n\\tSchema                   int                            `json:\\\"schema_version\\\"`\\n\\tEventID                  string                         `json:\\\"event_id\\\"`\\n\\tRevision                 int                            `json:\\\"expected_revision\\\"`\\n\\tScope                    string                         `json:\\\"scope,omitempty\\\"`\\n\\tScopeRevision            int                            `json:\\\"scope_revision,omitempty\\\"`\\n\\tHolder                   string                         `json:\\\"holder,omitempty\\\"`\\n\\tGeneration               int                            `json:\\\"generation,omitempty\\\"`\\n\\tLeaseSeconds             int                            `json:\\\"lease_seconds,omitempty\\\"`\\n\\tMaxTasks                 int                            `json:\\\"max_tasks,omitempty\\\"`\\n\\tMaxDecisions             int                            `json:\\\"max_decisions,omitempty\\\"`\\n\\tInputs                   []string                       `json:\\\"input_events,omitempty\\\"`\\n\\tOperations               []PlanningOperation            `json:\\\"operations,omitempty\\\"`\\n\\tReason                   string                         `json:\\\"reason,omitempty\\\"`\\n\\tJudgeVerdict             string                         `json:\\\"judge_verdict,omitempty\\\"`\\n\\tJudgeCycle               int                            `json:\\\"judge_cycle,omitempty\\\"`\\n\\tMaxJudgeCycles           int                            `json:\\\"max_judge_cycles,omitempty\\\"`\\n}\\n\\nfunc (p *PlanningState) scope(id string) (*PlanningScope, error) {\\n\\tfor i := range p.Scopes {\\n\\t\\tif p.Scopes[i].ID == id {\\n\\t\\t\\treturn \\u0026p.Scopes[i], nil\\n\\t\\t}\\n\\t}\\n\\treturn nil, fmt.Errorf(\\\"périmètre inconnu : %s\\\", id)\\n}\\nfunc planningError(code, message string) error { return \\u0026CommandError{Code: code, Message: message} }\\n\\n// All mutations, including lease changes, share the work revision. Replays are\\n// checked by mutate before executing this closure, even after lease expiry.\\nfunc (s *Store) planningChange(work, action string, r PlanningRequest) (Work, error) {\\n\\tif r.Schema != 1 {\\n\\t\\treturn Work{}, fmt.Errorf(\\\"schema_version doit valoir 1\\\")\\n\\t}\\n\\tif len(r.ScopeFiles) \\u003e 0 {\\n\\t\\treturn Work{}, fmt.Errorf(\\\"scope_files est réservé à scope-patch ; aucune modification implicite du périmètre\\\")\\n\\t}\\n\\tif r.MaxReviewCalls != 0 \\u0026\\u0026 (action != \\\"enable\\\" || r.Provider == \\\"\\\" || r.MaxReviewCalls \\u003c 1 || r.MaxReviewCalls \\u003e 100) {\\n\\t\\treturn Work{}, planningError(\\\"invalid_review_budget\\\", \\\"max_review_calls doit être compris entre 1 et 100, uniquement lors de enable avec un fournisseur\\\")\\n\\t}\\n\\tif action == \\\"claim\\\" {\\n\\t\\tw, e := s.get(work)\\n\\t\\tif e != nil {\\n\\t\\t\\treturn Work{}, e\\n\\t\\t}\\n\\t\\tr.preparedReviewInputs = s.planningReviewInputs(w, r.Scope)\\n\\t}\\n\\tif action == \\\"decide\\\" {\\n\\t\\tr.coordinationInputs = map[string]*preparedCoordination{}\\n\\t\\tfor _, op := range r.Operations {\\n\\t\\t\\tif op.Kind == \\\"review-plan\\\" {\\n\\t\\t\\t\\te, err := s.readManagedPreflightEvidence(work, op.ID)\\n\\t\\t\\t\\tif err != nil {\\n\\t\\t\\t\\t\\treturn Work{}, err\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tpreview, err := s.managedScopePreview(work, PlanningRequest{Task: op.ID}, false)\\n\\t\\t\\t\\tif err != nil {\\n\\t\\t\\t\\t\\treturn Work{}, err\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tr.coordinationInputs[op.ID] = \\u0026preparedCoordination{Evidence: e, Files: preview.Files}\\n\\t\\t\\t}\\n\\t\\t}\\n\\t}\\n\\tif action == \\\"restart-task\\\" {\\n\\t\\treturn s.restartTask(work, r)\\n\\t}\\n\\tif action == \\\"requalify\\\" {\\n\\t\\treturn s.requalifyHistorical(work, r)\\n\\t}\\n\\tif action == \\\"retry-integration\\\" {\\n\\t\\treturn s.retryManagedIntegration(work, r)\\n\\t}\\n\\tif action == \\\"diagnose-review\\\" {\\n\\t\\treturn s.diagnoseManagedFragmentReview(work, r)\\n\\t}\\n\\tif action == \\\"retry-review\\\" {\\n\\t\\treturn s.retryIndependentReview(work, r)\\n\\t}\\n\\tif action == \\\"configure-reviewer\\\" {\\n\\t\\treturn s.configureReviewer(work, r)\\n\\t}\\n\\tif action == \\\"review-timeout\\\" {\\n\\t\\treturn s.setReviewTimeout(work, r)\\n\\t}\\n\\tif action == \\\"extend-attempt\\\" {\\n\\t\\treturn s.extendAttempt(work, r)\\n\\t}\\n\\tif action == \\\"authorize-recovery\\\" {\\n\\t\\treturn s.authorizeCorrectiveRecovery(work, r)\\n\\t}\\n\\tif action == \\\"revise-recovered-result\\\" {\\n\\t\\treturn s.recoverResult(work, r, true)\\n\\t}\\n\\tif action == \\\"submit-recovered-result\\\" {\\n\\t\\treturn s.submitRecoveredResult(work, r)\\n\\t}\\n\\traw, err := json.Marshal(r)\\n\\tif err != nil {\\n\\t\\treturn Work{}, err\\n\\t}\\n\\tif len(raw) \\u003e 65536 {\\n\\t\\treturn Work{}, fmt.Errorf(\\\"décision limitée à 64 Kio\\\")\\n\\t}\\n\\tvar repository *ManagedRepository\\n\\tif action == \\\"enable\\\" \\u0026\\u0026 r.Repository != nil {\\n\\t\\tcurrent, e := s.get(work)\\n\\t\\tif e != nil {\\n\\t\\t\\treturn Work{}, e\\n\\t\\t}\\n\\t\\tif current.Planning == nil {\\n\\t\\t\\tif current.Revision != r.Revision || len(current.Tasks) \\u003e 0 {\\n\\t\\t\\t\\treturn Work{}, fmt.Errorf(\\\"révision ou mission non disponible\\\")\\n\\t\\t\\t}\\n\\t\\t\\trepository, e = s.configureManagedRepository(work, *r.Repository)\\n\\t\\t\\tif e != nil {\\n\\t\\t\\t\\treturn Work{}, e\\n\\t\\t\\t}\\n\\t\\t}\\n\\t}\\n\\treturn s.mutateWithHook(work, \\\"planning.\\\"+action, r.EventID, r.Revision, raw, func(w *Work) error {\\n\\t\\tif action == \\\"claim\\\" \\u0026\\u0026 w.Planning != nil \\u0026\\u0026 w.Planning.Provider != \\\"\\\" {\\n\\t\\t\\tif e := s.providerCooldownGuard(w.Planning.Provider); e != nil {\\n\\t\\t\\t\\treturn e\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tif err := s.applyPlanning(w, action, r, time.Now().UTC()); err != nil {\\n\\t\\t\\treturn err\\n\\t\\t}\\n\\t\\tvar providerDigest string\\n\\t\\tif action == \\\"enable\\\" \\u0026\\u0026 r.Provider != \\\"\\\" {\\n\\t\\t\\tps, e := s.providers()\\n\\t\\t\\tif e != nil {\\n\\t\\t\\t\\treturn e\\n\\t\\t\\t}\\n\\t\\t\\tprovider, ok := ps.Providers[r.Provider]\\n\\t\\t\\tif !ok {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"fournisseur inconnu\\\")\\n\\t\\t\\t}\\n\\t\\t\\tif _, e = assistantProvider(provider); e != nil {\\n\\t\\t\\t\\treturn e\\n\\t\\t\\t}\\n\\t\\t\\t_, route, routeErr := resolveModel(provider, r.Level, \\\"planning\\\")\\n\\t\\t\\tif routeErr != nil {\\n\\t\\t\\t\\treturn routeErr\\n\\t\\t\\t}\\n\\t\\t\\tif r.PolicyHash != \\\"\\\" \\u0026\\u0026 (route == nil || route.PolicyHash != r.PolicyHash) {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"politique de modèles modifiée\\\")\\n\\t\\t\\t}\\n\\t\\t\\tw.Planning.ModelRoute = route\\n\\t\\t\\tencoded, _ := json.Marshal(provider)\\n\\t\\t\\tproviderDigest = hash(encoded)\\n\\t\\t}\\n\\n\\t\\tif action == \\\"enable\\\" {\\n\\t\\t\\tw.Planning.ProviderDigest = providerDigest\\n\\t\\t\\tw.Planning.Repository = repository\\n\\t\\t\\tif r.Provider != \\\"\\\" {\\n\\t\\t\\t\\tmaxReviews := r.MaxReviewCalls\\n\\t\\t\\t\\tif maxReviews == 0 {\\n\\t\\t\\t\\t\\tmaxReviews = min(w.Planning.MaxActivations, 100)\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tconfig, e := s.reviewerConfig(r.Provider, r.Level, maxReviews)\\n\\t\\t\\t\\tif e != nil {\\n\\t\\t\\t\\t\\treturn e\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tw.Planning.Reviewer = config\\n\\t\\t\\t\\tw.Planning.ReviewerRequired = true\\n\\t\\t\\t}\\n\\t\\t}\\n\\n\\t\\treturn nil\\n\\t}, func(tx *sql.Tx, w *Work) error {\\n\\t\\tif action == \\\"claim\\\" || action == \\\"decide\\\" || action == \\\"judge\\\" || action == \\\"renew\\\" {\\n\\t\\t\\tvar paused int\\n\\t\\t\\terr := tx.QueryRow(\\\"SELECT paused FROM cockpit_controls WHERE work_id=?\\\", work).Scan(\\u0026paused)\\n\\t\\t\\tif err != nil \\u0026\\u0026 err != sql.ErrNoRows {\\n\\t\\t\\t\\treturn err\\n\\t\\t\\t}\\n\\t\\t\\tif paused != 0 {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"mission en pause\\\")\\n\\t\\t\\t}\\n\\t\\t\\tvar archived int\\n\\t\\t\\tif err = tx.QueryRow(\\\"SELECT count(*) FROM mission_lifecycle WHERE work_id=?\\\", work).Scan(\\u0026archived); err != nil {\\n\\t\\t\\t\\treturn err\\n\\t\\t\\t}\\n\\t\\t\\tif archived \\u003e 0 {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"mission archivée\\\")\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tif action == \\\"judge\\\" \\u0026\\u0026 r.JudgeVerdict == \\\"end\\\" {\\n\\t\\t\\tvar active int\\n\\t\\t\\tif err := tx.QueryRow(\\\"SELECT count(*) FROM agents WHERE work_id=? AND status IN ('queued','starting','running','stopping')\\\", work).Scan(\\u0026active); err != nil {\\n\\t\\t\\t\\treturn err\\n\\t\\t\\t}\\n\\t\\t\\tif active \\u003e 0 {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"tentative encore active ; jugement de fin refusé\\\")\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tif action == \\\"claim\\\" {\\n\\t\\t\\tif err := reservePlanningCall(tx, work, r.Scope, r.EventID); err != nil {\\n\\t\\t\\t\\treturn err\\n\\t\\t\\t}\\n\\t\\t}\\n\\n\\t\\tif action == \\\"handoff\\\" {\\n\\t\\t\\tvar body []byte\\n\\t\\t\\tif e := tx.QueryRow(\\\"SELECT body FROM agents WHERE id=? AND work_id=?\\\", r.Agent, work).Scan(\\u0026body); e != nil {\\n\\t\\t\\t\\treturn e\\n\\t\\t\\t}\\n\\t\\t\\tvar agent Agent\\n\\t\\t\\tif e := json.Unmarshal(body, \\u0026agent); e != nil {\\n\\t\\t\\t\\treturn e\\n\\t\\t\\t}\\n\\t\\t\\tif agent.TaskID != r.Task || agent.Attempt != r.Attempt || agent.Role != \\\"worker\\\" {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"origine de remise non attribuable à cette tentative\\\")\\n\\t\\t\\t}\\n\\t\\t\\tif e := s.verifyPlanningHandoffArtifacts(agent, r.Artifacts); e != nil {\\n\\t\\t\\t\\treturn e\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tfor _, op := range r.Operations {\\n\\t\\t\\tif op.Kind == \\\"retry\\\" {\\n\\t\\t\\t\\tif w.Planning.Repository != nil {\\n\\t\\t\\t\\t\\tvar pending int\\n\\t\\t\\t\\t\\tif e := tx.QueryRow(\\\"SELECT count(*) FROM managed_attempts m JOIN agents a ON a.id=m.agent_id WHERE m.work_id=? AND m.task_id=? AND m.state IN ('ready','integrating') AND a.status='completed'\\\", work, op.ID).Scan(\\u0026pending); e != nil {\\n\\t\\t\\t\\t\\t\\treturn e\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\tif pending \\u003e 0 {\\n\\t\\t\\t\\t\\t\\treturn fmt.Errorf(\\\"attendre le verdict du contrôleur avant reprise\\\")\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tvar active int\\n\\t\\t\\t\\tif e := tx.QueryRow(\\\"SELECT count(*) FROM agents WHERE work_id=? AND task_id=? AND status IN ('queued','starting','running','stopping')\\\", work, op.ID).Scan(\\u0026active); e != nil {\\n\\t\\t\\t\\t\\treturn e\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tif active \\u003e 0 {\\n\\t\\t\\t\\t\\treturn fmt.Errorf(\\\"tentative encore active\\\")\\n\\t\\t\\t\\t}\\n\\t\\t\\t}\\n\\t\\t\\tif op.Kind == \\\"close\\\" {\\n\\t\\t\\t\\tvar count int\\n\\t\\t\\t\\tif e := tx.QueryRow(\\\"SELECT count(*) FROM agents WHERE work_id=? AND status IN ('queued','starting','running','stopping')\\\", work).Scan(\\u0026count); e != nil {\\n\\t\\t\\t\\t\\treturn e\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tif count \\u003e 0 {\\n\\t\\t\\t\\t\\treturn fmt.Errorf(\\\"tentative encore active ; clôture refusée\\\")\\n\\t\\t\\t\\t}\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\treturn nil\\n\\t})\\n}\\nfunc (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time.Time) error {\\n\\tif action == \\\"enable\\\" {\\n\\t\\tif w.Planning != nil || len(w.Tasks) \\u003e 0 {\\n\\t\\t\\treturn fmt.Errorf(\\\"activer sur une mission neuve sans tâches ; adoption historique non implicite\\\")\\n\\t\\t}\\n\\t\\tif r.MaxActivations \\u003c 1 || r.MaxActivations \\u003e 200 {\\n\\t\\t\\treturn fmt.Errorf(\\\"max_activations : 1 à 200 requis\\\")\\n\\t\\t}\\n\\t\\tif r.MaxTasks \\u003c 1 || r.MaxTasks \\u003e 100 || r.MaxDecisions \\u003c 1 || r.MaxDecisions \\u003e 100 {\\n\\t\\t\\treturn fmt.Errorf(\\\"max_tasks et max_decisions : 1 à 100 requis\\\")\\n\\t\\t}\\n\\t\\tif len(w.Criteria) == 0 || len(w.Criteria) \\u003e 100 {\\n\\t\\t\\treturn fmt.Errorf(\\\"1 à 100 exigences requises\\\")\\n\\t\\t}\\n\\t\\tmaxJudgeCycles := r.MaxJudgeCycles\\n\\t\\tif maxJudgeCycles == 0 {\\n\\t\\t\\tmaxJudgeCycles = defaultMaxJudgeCycles\\n\\t\\t}\\n\\t\\tif maxJudgeCycles \\u003c 1 || maxJudgeCycles \\u003e maxJudgeCyclesBound {\\n\\t\\t\\treturn fmt.Errorf(\\\"max_judge_cycles : 0 (défaut) ou 1 à %d requis\\\", maxJudgeCyclesBound)\\n\\t\\t}\\n\\t\\trequirements := []string{}\\n\\t\\tfor i := range w.Criteria {\\n\\t\\t\\trequirements = append(requirements, fmt.Sprintf(\\\"req-%d\\\", i+1))\\n\\t\\t}\\n\\t\\tw.Planning = \\u0026PlanningState{Provider: r.Provider, MaxActivations: r.MaxActivations, Version: 1, MaxTasks: r.MaxTasks, MaxDecisions: r.MaxDecisions, Scopes: []PlanningScope{{ID: \\\"root\\\", Objective: w.Objective, Requirements: requirements, Revision: 1, State: \\\"ready\\\"}}, Inbox: []PlanningEvent{{ID: r.EventID, Scope: \\\"root\\\", Kind: \\\"brief\\\", Message: w.Objective, At: at.Format(time.RFC3339Nano)}}, Judge: \\u0026JudgeState{Cycle: 1, MaxCycles: maxJudgeCycles}}\\n\\t\\tchecks, e := normalizePlanningChecks(w, r.Checks)\\n\\t\\tif e != nil {\\n\\t\\t\\treturn e\\n\\t\\t}\\n\\t\\tif r.Repository != nil {\\n\\t\\t\\tfor _, req := range requirements {\\n\\t\\t\\t\\tif len(checks[req]) == 0 {\\n\\t\\t\\t\\t\\treturn fmt.Errorf(\\\"autoriser les contrôles de %s avant de gérer les intégrations\\\", req)\\n\\t\\t\\t\\t}\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tw.Planning.Checks = checks\\n\\t\\treturn nil\\n\\t}\\n\\tp := w.Planning\\n\\tif p == nil {\\n\\t\\treturn fmt.Errorf(\\\"planification hiérarchique non activée\\\")\\n\\t}\\n\\tif action == \\\"pause\\\" || action == \\\"resume\\\" {\\n\\t\\tp.Paused = action == \\\"pause\\\"\\n\\t\\tif action == \\\"resume\\\" {\\n\\t\\t\\tp.Failure = \\\"\\\"\\n\\t\\t\\tif nonempty(r.Reason) {\\n\\t\\t\\t\\tif len(r.Reason) \\u003e 4000 {\\n\\t\\t\\t\\t\\treturn fmt.Errorf(\\\"motif limité à 4000 octets\\\")\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tscopeID := r.Scope\\n\\t\\t\\t\\tif scopeID == \\\"\\\" {\\n\\t\\t\\t\\t\\tscopeID = \\\"root\\\"\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\towner, e := p.scope(scopeID)\\n\\t\\t\\t\\tif e != nil {\\n\\t\\t\\t\\t\\treturn e\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\towner.State = \\\"ready\\\"\\n\\t\\t\\t\\tp.Inbox = append(p.Inbox, PlanningEvent{ID: r.EventID, Scope: scopeID, Kind: \\\"operator_resume\\\", Message: r.Reason, At: at.Format(time.RFC3339Nano)})\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\t// Revoke all outstanding activations; a paused response must not land later.\\n\\t\\tfor i := range p.Scopes {\\n\\t\\t\\tp.Scopes[i].Generation++\\n\\t\\t\\tp.Scopes[i].Holder = \\\"\\\"\\n\\t\\t\\tp.Scopes[i].Until = \\\"\\\"\\n\\t\\t}\\n\\t\\treturn nil\\n\\t}\\n\\tif action == \\\"handoff\\\" {\\n\\t\\ttask, e := w.task(r.Task)\\n\\t\\tif e != nil {\\n\\t\\t\\treturn e\\n\\t\\t}\\n\\t\\tif r.Scope != \\\"\\\" \\u0026\\u0026 r.Scope != task.ScopeID {\\n\\t\\t\\treturn fmt.Errorf(\\\"remise hors périmètre : seul le responsable propriétaire %s peut la recevoir\\\", task.ScopeID)\\n\\t\\t}\\n\\t\\tif !currentTaskAttempt(task, r.Attempt) || task.ScopeID == \\\"\\\" || !nonempty(r.Reason) || len(r.Reason) \\u003e 4000 || len(r.Artifacts) == 0 || len(r.Artifacts) \\u003e 32 {\\n\\t\\t\\treturn fmt.Errorf(\\\"remise : tentative actuelle, constats et artefacts requis\\\")\\n\\t\\t}\\n\\t\\tif e = s.verifyExchangeArtifacts(r.Artifacts); e != nil {\\n\\t\\t\\treturn e\\n\\t\\t}\\n\\t\\tfor _, event := range p.Inbox {\\n\\t\\t\\tif event.Kind == \\\"handoff\\\" \\u0026\\u0026 event.Attempt == r.Attempt {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"une remise existe déjà pour cette tentative\\\")\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tscope, e := p.scope(task.ScopeID)\\n\\t\\tif e != nil {\\n\\t\\t\\treturn e\\n\\t\\t}\\n\\t\\tscope.State = \\\"ready\\\"\\n\\t\\tp.Inbox = append(p.Inbox, PlanningEvent{ID: r.EventID, Scope: scope.ID, Kind: \\\"handoff\\\", Task: task.ID, Attempt: r.Attempt, Message: r.Reason, Artifacts: r.Artifacts, At: at.Format(time.RFC3339Nano)})\\n\\t\\treturn nil\\n\\t}\\n\\tif p.Paused {\\n\\t\\treturn planningError(\\\"planning_paused\\\", \\\"planification en pause\\\")\\n\\t}\\n\\tscope, err := p.scope(r.Scope)\\n\\tif err != nil {\\n\\t\\treturn err\\n\\t}\\n\\tif scope.Revision != r.ScopeRevision {\\n\\t\\treturn planningError(\\\"revision_conflict\\\", \\\"périmètre modifié ; relire le contexte\\\")\\n\\t}\\n\\tswitch action {\\n\\tcase \\\"claim\\\":\\n\\t\\tif !safeName(r.Holder) || r.LeaseSeconds \\u003c 5 || r.LeaseSeconds \\u003e 300 {\\n\\t\\t\\treturn fmt.Errorf(\\\"holder requis, lease_seconds entre 5 et 300\\\")\\n\\t\\t}\\n\\t\\tuntil, _ := time.Parse(time.RFC3339Nano, scope.Until)\\n\\t\\tif scope.Holder != \\\"\\\" \\u0026\\u0026 at.Before(until) {\\n\\t\\t\\treturn planningError(\\\"lease_busy\\\", \\\"un planificateur possède déjà ce périmètre\\\")\\n\\t\\t}\\n\\t\\tpending := false\\n\\t\\tfor _, event := range p.Inbox {\\n\\t\\t\\tif event.Scope == scope.ID \\u0026\\u0026 event.Decision == \\\"\\\" {\\n\\t\\t\\t\\tpending = true\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tif !pending || scope.State == \\\"closed\\\" {\\n\\t\\t\\treturn fmt.Errorf(\\\"aucun retour à traiter\\\")\\n\\t\\t}\\n\\t\\tif p.Activations \\u003e= p.MaxActivations {\\n\\t\\t\\treturn fmt.Errorf(\\\"budget d’activations atteint\\\")\\n\\t\\t}\\n\\t\\tif p.Failure != \\\"\\\" {\\n\\t\\t\\treturn fmt.Errorf(\\\"planification arrêtée : %s\\\", p.Failure)\\n\\t\\t}\\n\\t\\tif p.Decisions \\u003e= p.MaxDecisions {\\n\\t\\t\\treturn fmt.Errorf(\\\"budget de décisions atteint\\\")\\n\\t\\t}\\n\\t\\tif err := checkScopeActivation(p, scope.ID); err != nil {\\n\\t\\t\\treturn err\\n\\t\\t}\\n\\t\\tworkflow, workflowPrompt, err := s.projectAgentWorkflow(planningWorkflowRole(scope))\\n\\t\\tif err != nil {\\n\\t\\t\\treturn err\\n\\t\\t}\\n\\t\\t_, delivery, err := s.planningDeliveryContext(*w, scope.ID, 64000-len(workflowPrompt)-3000, r.preparedReviewInputs)\\n\\t\\tif err != nil {\\n\\t\\t\\treturn err\\n\\t\\t}\\n\\t\\tscope.Delivery = \\u0026delivery\\n\\t\\tscope.Workflow = \\u0026workflow\\n\\t\\tselectedModel := effectivePlanningScope(p, scope)\\n\\t\\tscope.LastModel = \\u0026RoleModel{Provider: selectedModel.Provider, ProviderDigest: selectedModel.ProviderDigest, Route: selectedModel.ModelRoute, At: now()}\\n\\t\\tfor _, owner := range planningAncestors(p, scope.ID) {\\n\\t\\t\\towner.Activations++\\n\\t\\t}\\n\\t\\tp.Activations++\\n\\t\\tscope.Generation++\\n\\t\\tscope.Holder = r.Holder\\n\\t\\tscope.Until = at.Add(time.Duration(r.LeaseSeconds) * time.Second).Format(time.RFC3339Nano)\\n\\t\\treturn nil\\n\\tcase \\\"decide\\\":\\n\\t\\tuntil, _ := time.Parse(time.RFC3339Nano, scope.Until)\\n\\t\\tif scope.Holder == \\\"\\\" || scope.Holder != r.Holder || scope.Generation != r.Generation || !at.Before(until) {\\n\\t\\t\\treturn planningError(\\\"stale_lease\\\", \\\"activation expirée ou remplacée ; décision refusée\\\")\\n\\t\\t}\\n\\t\\tif p.Decisions \\u003e= p.MaxDecisions {\\n\\t\\t\\treturn fmt.Errorf(\\\"budget de décisions atteint\\\")\\n\\t\\t}\\n\\t\\tif len(r.Inputs) == 0 || len(r.Inputs) \\u003e 100 || len(r.Operations) \\u003e 20 || !nonempty(r.Reason) || len(r.Reason) \\u003e 4000 {\\n\\t\\t\\treturn fmt.Errorf(\\\"événements d’entrée et justification requis ; maximum 20 opérations\\\")\\n\\t\\t}\\n\\t\\tseen := map[string]bool{}\\n\\t\\tfor _, id := range r.Inputs {\\n\\t\\t\\tif seen[id] {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"événement répété\\\")\\n\\t\\t\\t}\\n\\t\\t\\tseen[id] = true\\n\\t\\t\\tfound := false\\n\\t\\t\\tfor _, event := range p.Inbox {\\n\\t\\t\\t\\tif event.ID == id \\u0026\\u0026 event.Scope == scope.ID \\u0026\\u0026 event.Decision == \\\"\\\" {\\n\\t\\t\\t\\t\\tif event.Task != \\\"\\\" {\\n\\t\\t\\t\\t\\t\\ttask, e := w.task(event.Task)\\n\\t\\t\\t\\t\\t\\tif (e != nil || (event.Attempt != \\\"\\\" \\u0026\\u0026 !currentTaskAttempt(task, event.Attempt))) \\u0026\\u0026 len(r.Operations) \\u003e 0 {\\n\\t\\t\\t\\t\\t\\t\\treturn fmt.Errorf(\\\"retour d’une tentative périmée : %s\\\", id)\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\tif e := s.verifyExchangeArtifacts(event.Artifacts); e != nil \\u0026\\u0026 len(r.Operations) \\u003e 0 {\\n\\t\\t\\t\\t\\t\\treturn e\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\tfound = true\\n\\t\\t\\t\\t}\\n\\t\\t\\t}\\n\\t\\t\\tif !found {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"événement absent, déjà traité ou hors périmètre : %s\\\", id)\\n\\t\\t\\t}\\n\\t\\t\\tif scope.Delivery != nil \\u0026\\u0026 !containsString(scope.Delivery.Events, id) {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"événement non fourni dans cette activation : %s\\\", id)\\n\\t\\t\\t}\\n\\t\\t\\tif scope.Delivery != nil \\u0026\\u0026 scope.Delivery.Unavailable[id] != \\\"\\\" \\u0026\\u0026 len(r.Operations) \\u003e 0 {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"rapport indisponible : seul un constat sans opération est autorisé : %s\\\", id)\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tscopeID := scope.ID\\n\\t\\tfor _, op := range r.Operations {\\n\\t\\t\\tif err := s.applyPlanningOperation(w, scopeID, op, r, at); err != nil {\\n\\t\\t\\t\\treturn err\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tscope, _ = p.scope(scopeID) // delegation can reallocate the slice\\n\\t\\tif scope.Delivery != nil {\\n\\t\\t\\tscope.Delivery.Decision = r.EventID\\n\\t\\t}\\n\\t\\tfor i := range p.Inbox {\\n\\t\\t\\tif seen[p.Inbox[i].ID] {\\n\\t\\t\\t\\tp.Inbox[i].Decision = r.EventID\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tscope.Revision++\\n\\t\\tscope.Generation++\\n\\t\\tscope.Holder = \\\"\\\"\\n\\t\\tscope.Until = \\\"\\\"\\n\\t\\tp.Decisions++\\n\\t\\tif scope.State != \\\"closed\\\" {\\n\\t\\t\\tscope.State = \\\"waiting\\\"\\n\\t\\t\\tfor _, event := range p.Inbox {\\n\\t\\t\\t\\tif event.Scope == scopeID \\u0026\\u0026 event.Decision == \\\"\\\" {\\n\\t\\t\\t\\t\\tscope.State = \\\"ready\\\"\\n\\t\\t\\t\\t}\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\treturn nil\\n\\tcase \\\"judge\\\":\\n\\t\\tif scope.ID != \\\"root\\\" {\\n\\t\\t\\treturn fmt.Errorf(\\\"juge global : périmètre racine requis\\\")\\n\\t\\t}\\n\\t\\tif err := s.applyJudgeVerdict(w, r, at); err != nil {\\n\\t\\t\\treturn err\\n\\t\\t}\\n\\t\\tscope.Revision++\\n\\t\\treturn nil\\n\\tcase \\\"renew\\\":\\n\\t\\tif scope.ID != \\\"root\\\" {\\n\\t\\t\\treturn fmt.Errorf(\\\"renouvellement de cycle : périmètre racine requis\\\")\\n\\t\\t}\\n\\t\\tif err := applyJudgeRenewal(w, r, at); err != nil {\\n\\t\\t\\treturn err\\n\\t\\t}\\n\\t\\tscope.Revision++\\n\\t\\treturn nil\\n\\tdefault:\\n\\t\\treturn fmt.Errorf(\\\"action de planification inconnue : %s\\\", action)\\n\\t}\\n}\\n\\nfunc (s *Store) applyPlanningOperation(w *Work, id string, op PlanningOperation, r PlanningRequest, at time.Time) error {\\n\\tp := w.Planning\\n\\tscope, _ := p.scope(id)\\n\\tif scope.State == \\\"closed\\\" {\\n\\t\\treturn fmt.Errorf(\\\"périmètre déjà clos\\\")\\n\\t}\\n\\tswitch op.Kind {\\n\\tcase \\\"review-plan\\\":\\n\\t\\treturn s.adoptReviewCoordination(w, id, op, r)\\n\\tcase \\\"task\\\", \\\"delegate\\\":\\n\\t\\tif !safeName(op.ID) {\\n\\t\\t\\treturn fmt.Errorf(\\\"identifiant de l’opération invalide : %q\\\", op.ID)\\n\\t\\t}\\n\\t\\tif !nonempty(op.Title) || len([]rune(op.Title)) \\u003e 500 {\\n\\t\\t\\treturn fmt.Errorf(\\\"titre requis, limité à 500 caractères (reçu : %d)\\\", len([]rune(op.Title)))\\n\\t\\t}\\n\\t\\tif len(op.Requirements) == 0 {\\n\\t\\t\\treturn fmt.Errorf(\\\"exigences requises pour %s\\\", op.ID)\\n\\t\\t}\\n\\t\\tif len(op.Next) \\u003e 4000 {\\n\\t\\t\\treturn fmt.Errorf(\\\"consigne limitée à 4000 octets\\\")\\n\\t\\t}\\n\\t\\tseen := map[string]bool{}\\n\\t\\tfor _, req := range op.Requirements {\\n\\t\\t\\tif seen[req] || !containsString(scope.Requirements, req) {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"exigence répétée ou non possédée : %s\\\", req)\\n\\t\\t\\t}\\n\\t\\t\\tseen[req] = true\\n\\t\\t}\\n\\t\\tif op.Kind == \\\"delegate\\\" {\\n\\t\\t\\tif _, err := p.scope(op.ID); err == nil {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"périmètre déjà présent\\\")\\n\\t\\t\\t}\\n\\t\\t\\tdepth := 1\\n\\t\\t\\tparent := scope\\n\\t\\t\\tfor parent.Parent != \\\"\\\" {\\n\\t\\t\\t\\tdepth++\\n\\t\\t\\t\\tparent, _ = p.scope(parent.Parent)\\n\\t\\t\\t}\\n\\t\\t\\tif depth \\u003e= 3 || len(p.Scopes) \\u003e= 20 {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"limite de délégation atteinte : profondeur 3, 20 périmètres\\\")\\n\\t\\t\\t}\\n\\t\\t\\tfor _, task := range w.Tasks {\\n\\t\\t\\t\\tif task.ScopeID == id {\\n\\t\\t\\t\\t\\tfor _, req := range task.Requirements {\\n\\t\\t\\t\\t\\t\\tif seen[req] {\\n\\t\\t\\t\\t\\t\\t\\treturn fmt.Errorf(\\\"exigence déjà confiée à une tâche\\\")\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t}\\n\\t\\t\\ttaskLimit := scope.TaskLimit\\n\\t\\t\\tif taskLimit == 0 {\\n\\t\\t\\t\\ttaskLimit = p.MaxTasks\\n\\t\\t\\t}\\n\\t\\t\\tactivationLimit := scope.ActivationLimit\\n\\t\\t\\tif activationLimit == 0 {\\n\\t\\t\\t\\tactivationLimit = p.MaxActivations\\n\\t\\t\\t}\\n\\t\\t\\tif op.MaxTasks \\u003c 0 || op.MaxTasks \\u003e taskLimit || op.MaxActivations \\u003c 0 || op.MaxActivations \\u003e activationLimit {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"budget enfant supérieur au budget parent\\\")\\n\\t\\t\\t}\\n\\t\\t\\tif op.MaxTasks \\u003e 0 {\\n\\t\\t\\t\\ttaskLimit = op.MaxTasks\\n\\t\\t\\t}\\n\\t\\t\\tif op.MaxActivations \\u003e 0 {\\n\\t\\t\\t\\tactivationLimit = op.MaxActivations\\n\\t\\t\\t}\\n\\t\\t\\tkept := []string{}\\n\\t\\t\\tfor _, req := range scope.Requirements {\\n\\t\\t\\t\\tif !seen[req] {\\n\\t\\t\\t\\t\\tkept = append(kept, req)\\n\\t\\t\\t\\t}\\n\\t\\t\\t}\\n\\t\\t\\tscope.Requirements = kept\\n\\t\\t\\tp.Scopes = append(p.Scopes, PlanningScope{TaskLimit: taskLimit, ActivationLimit: activationLimit, ID: op.ID, Parent: id, Objective: op.Title + \\\"\\\\n\\\" + op.Next, Requirements: op.Requirements, Revision: 1, State: \\\"ready\\\"})\\n\\t\\t\\tp.Inbox = append(p.Inbox, PlanningEvent{ID: planningEventID(r.EventID, op.ID), Scope: op.ID, Kind: \\\"delegation\\\", Message: op.Title, At: at.Format(time.RFC3339Nano)})\\n\\t\\t\\treturn nil\\n\\t\\t}\\n\\t\\t// A requirement already confided to a task that is now blocked must be\\n\\t\\t// resumed via \\\"retry\\\" on that task, never re-delegated to a fresh \\\"task\\\"\\n\\t\\t// op: otherwise unbounded new tasks pay for fresh activations on the same\\n\\t\\t// requirement instead of correcting and retrying the one already stuck.\\n\\t\\t// Tasks that are not blocked may still legitimately share a requirement\\n\\t\\t// (e.g. an initial batch, or a discovery handoff from a running task).\\n\\t\\tfor _, task := range w.Tasks {\\n\\t\\t\\tif task.ScopeID == id \\u0026\\u0026 task.Status == \\\"blocked\\\" {\\n\\t\\t\\t\\tfor _, req := range task.Requirements {\\n\\t\\t\\t\\t\\tif seen[req] {\\n\\t\\t\\t\\t\\t\\treturn fmt.Errorf(\\\"exigence déjà confiée à la tâche bloquée %s ; utiliser retry\\\", task.ID)\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tif err := checkScopeTask(w, id); err != nil {\\n\\t\\t\\treturn err\\n\\t\\t}\\n\\t\\tif len(w.Tasks) \\u003e= p.MaxTasks {\\n\\t\\t\\treturn fmt.Errorf(\\\"budget de tâches atteint\\\")\\n\\t\\t}\\n\\t\\tif len(op.Criteria) \\u003e 12 || len(op.Depends) \\u003e 100 || len(op.Deliverable) \\u003e 4000 || len(op.Next) \\u003e 4000 {\\n\\t\\t\\treturn fmt.Errorf(\\\"contrat de tâche trop grand\\\")\\n\\t\\t}\\n\\t\\tfor _, criterion := range op.Criteria {\\n\\t\\t\\tif !nonempty(criterion) || len(criterion) \\u003e 1000 {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"critère invalide\\\")\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tfor _, dep := range op.Depends {\\n\\t\\t\\ttask, err := w.task(dep)\\n\\t\\t\\tif err != nil || task.ScopeID != id {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"prérequis hors périmètre : %s\\\", dep)\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\terr := s.apply(w, \\\"task.add\\\", Request{ID: op.ID, Title: op.Title, Deliverable: op.Deliverable, Criteria: op.Criteria, Depends: op.Depends, Next: op.Next, Owner: id})\\n\\t\\tif err != nil {\\n\\t\\t\\treturn err\\n\\t\\t}\\n\\t\\ttask, _ := w.task(op.ID)\\n\\t\\ttask.ScopeID = id\\n\\t\\ttask.Requirements = op.Requirements\\n\\t\\ttask.PlanRole = \\\"worker\\\"\\n\\t\\ttask.PlanMaxAttempts = 2\\n\\t\\treturn inheritPlanningChecks(w, task)\\n\\tcase \\\"retry\\\":\\n\\t\\ttask, err := w.task(op.ID)\\n\\t\\tif err != nil {\\n\\t\\t\\treturn err\\n\\t\\t}\\n\\t\\tif task.ScopeID != id || task.Status != \\\"blocked\\\" || task.LaunchHeld || task.PlanningRetry {\\n\\t\\t\\treturn fmt.Errorf(\\\"reprise non disponible\\\")\\n\\t\\t}\\n\\t\\tif len(task.Attempts) \\u003e= task.PlanMaxAttempts || !nonempty(op.Next) || op.Next == task.Next || len(op.Next) \\u003e 4000 {\\n\\t\\t\\treturn fmt.Errorf(\\\"reprise bornée exigeant une nouvelle correction explicite\\\")\\n\\t\\t}\\n\\t\\ttask.PlanningRetry = true\\n\\t\\ttask.Next = op.Next\\n\\t\\treturn nil\\n\\tcase \\\"close\\\":\\n\\t\\tif err := s.validatePlanningClosure(w, id, r); err != nil {\\n\\t\\t\\treturn err\\n\\t\\t}\\n\\t\\tscope.State = \\\"closed\\\"\\n\\t\\tif scope.Parent != \\\"\\\" {\\n\\t\\t\\tparent, _ := p.scope(scope.Parent)\\n\\t\\t\\tparent.State = \\\"ready\\\"\\n\\t\\t\\tp.Inbox = append(p.Inbox, PlanningEvent{ID: planningEventID(r.EventID, \\\"closed\\\", id), Scope: scope.Parent, Kind: \\\"scope_closed\\\", Message: op.Title, At: at.Format(time.RFC3339Nano)})\\n\\t\\t}\\n\\t\\treturn nil\\n\\tdefault:\\n\\t\\treturn fmt.Errorf(\\\"opération non autorisée : %s\\\", op.Kind)\\n\\t}\\n}\\n\\n// A process ending wakes the owner, but is deliberately not a validation.\\n// Called in the same transaction as task settlement; recovery cannot lose it.\\nfunc planningAttemptEnded(w *Work, a Agent, outcome string, artifacts ...ExchangeArtifact) {\\n\\tif w.Planning == nil {\\n\\t\\treturn\\n\\t}\\n\\ttask, err := w.task(a.TaskID)\\n\\tif err != nil || task.ScopeID == \\\"\\\" {\\n\\t\\treturn\\n\\t}\\n\\tid := planningEventID(\\\"attempt-ended\\\", a.Attempt)\\n\\tfor _, event := range w.Planning.Inbox {\\n\\t\\tif event.ID == id {\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t}\\n\\tscope, err := w.Planning.scope(task.ScopeID)\\n\\tif err != nil {\\n\\t\\treturn\\n\\t}\\n\\tscope.State = \\\"ready\\\"\\n\\tmessage := outcome + \\\" : \\\" + a.Activity\\n\\tif len(artifacts) \\u003e 0 {\\n\\t\\tmessage += fmt.Sprintf(\\\" · Bilan moteur conservé : %d/%d appels d’outils, %d résultats reçus. Ce bilan ne valide aucun critère et ne remplace pas le rapport du producteur.\\\", a.Progress.ToolCalls, a.Limits.MaxToolCalls, a.Progress.ToolResults)\\n\\t}\\n\\tw.Planning.Inbox = append(w.Planning.Inbox, PlanningEvent{ID: id, Scope: scope.ID, Kind: \\\"attempt_ended\\\", Task: task.ID, Attempt: a.Attempt, Message: message, Artifacts: artifacts, At: now()})\\n}\\n\\n// Validation is a distinct input. A planner that has already read a process\\n// result must wake again when the controller validates (or reopens) the task.\\nfunc (s *Store) planningValidationSignals(w *Work, before map[string]string, kind, eventID string) {\\n\\tif w.Planning == nil {\\n\\t\\treturn\\n\\t}\\n\\tfor _, task := range w.Tasks {\\n\\t\\tif task.ScopeID == \\\"\\\" || before[task.ID] == task.Status || (task.Status != \\\"accepted\\\" \\u0026\\u0026 before[task.ID] != \\\"accepted\\\") {\\n\\t\\t\\tcontinue\\n\\t\\t}\\n\\t\\tscope, err := w.Planning.scope(task.ScopeID)\\n\\t\\tif err != nil {\\n\\t\\t\\tcontinue\\n\\t\\t}\\n\\t\\tattempt := \\\"\\\"\\n\\t\\tif len(task.Attempts) \\u003e 0 {\\n\\t\\t\\tattempt = task.Attempts[len(task.Attempts)-1].ID\\n\\t\\t}\\n\\t\\tscope.State = \\\"ready\\\"\\n\\t\\tw.Planning.Inbox = append(w.Planning.Inbox, PlanningEvent{ID: planningEventID(eventID, \\\"validation\\\", task.ID), Scope: scope.ID, Kind: \\\"validation_changed\\\", Task: task.ID, Attempt: attempt, Message: task.Status, At: now()})\\n\\t\\tfor scope.Parent != \\\"\\\" {\\n\\t\\t\\tscope, _ = w.Planning.scope(scope.Parent)\\n\\t\\t\\tscope.State = \\\"ready\\\"\\n\\t\\t}\\n\\t}\\n\\tif kind == \\\"task.auto-validation\\\" || kind == \\\"task.auto-validation-reviewed\\\" || kind == \\\"managed.integrated\\\" || kind == \\\"managed.recovered-result\\\" {\\n\\t\\ts.autoCloseProvenPlanningScopes(w, eventID)\\n\\t}\\n}\\n\\n// A controller acceptance is already a versioned engine decision. For the\\n// common, non-delegated root scope, do not spend another planner activation\\n// merely to restate that every requirement has fresh evidence. Delegated\\n// graphs retain their explicit child/parent handoff contract.\\nfunc (s *Store) autoCloseProvenPlanningScopes(w *Work, eventID string) {\\n\\tif w.Planning == nil || w.Planning.Reviewer == nil || len(w.Planning.Scopes) != 1 {\\n\\t\\treturn\\n\\t}\\n\\tscope := \\u0026w.Planning.Scopes[0]\\n\\tif scope.ID != \\\"root\\\" || scope.State == \\\"closed\\\" {\\n\\t\\treturn\\n\\t}\\n\\tdecision := planningEventID(eventID, \\\"auto-close\\\")\\n\\thasWork, ready := false, true\\n\\tcovered := map[string]bool{}\\n\\tfor i := range w.Tasks {\\n\\t\\ttask := \\u0026w.Tasks[i]\\n\\t\\tif task.ScopeID != \\\"root\\\" {\\n\\t\\t\\tcontinue\\n\\t\\t}\\n\\t\\thasWork = true\\n\\t\\tif task.Status != \\\"accepted\\\" || task.IndependentReview == nil || task.IndependentReview.State != \\\"passed\\\" || !s.acceptedFresh(w, task, map[string]bool{}) {\\n\\t\\t\\tready = false\\n\\t\\t\\tcontinue\\n\\t\\t}\\n\\t\\tfor _, req := range task.Requirements {\\n\\t\\t\\tcovered[req] = true\\n\\t\\t}\\n\\t}\\n\\tfor _, req := range scope.Requirements {\\n\\t\\tready = ready \\u0026\\u0026 covered[req]\\n\\t}\\n\\tif !hasWork || !ready {\\n\\t\\treturn\\n\\t}\\n\\tscope.State, scope.Holder, scope.Until = \\\"closed\\\", \\\"\\\", \\\"\\\"\\n\\tscope.Revision++\\n\\tscope.Generation++\\n\\tfor i := range w.Planning.Inbox {\\n\\t\\tif w.Planning.Inbox[i].Scope == \\\"root\\\" \\u0026\\u0026 w.Planning.Inbox[i].Decision == \\\"\\\" {\\n\\t\\t\\tw.Planning.Inbox[i].Decision = decision\\n\\t\\t}\\n\\t}\\n}\\n\\nfunc revokePlanningTx(tx *sql.Tx, work string) error {\\n\\tvar raw []byte\\n\\tif err := tx.QueryRow(\\\"SELECT body FROM works WHERE id=?\\\", work).Scan(\\u0026raw); err != nil {\\n\\t\\treturn err\\n\\t}\\n\\tvar w Work\\n\\tif err := json.Unmarshal(raw, \\u0026w); err != nil {\\n\\t\\treturn err\\n\\t}\\n\\tif w.Planning == nil {\\n\\t\\treturn nil\\n\\t}\\n\\tfor i := range w.Planning.Scopes {\\n\\t\\tw.Planning.Scopes[i].Generation++\\n\\t\\tw.Planning.Scopes[i].Holder = \\\"\\\"\\n\\t\\tw.Planning.Scopes[i].Until = \\\"\\\"\\n\\t}\\n\\tw.Revision++\\n\\tw.Updated = now()\\n\\tbody, err := json.Marshal(w)\\n\\tif err != nil {\\n\\t\\treturn err\\n\\t}\\n\\tif _, err = tx.Exec(\\\"UPDATE works SET revision=?,body=? WHERE id=?\\\", w.Revision, body, work); err != nil {\\n\\t\\treturn err\\n\\t}\\n\\trequest := []byte(`{\\\"reason\\\":\\\"mission paused: planner leases revoked\\\"}`)\\n\\t_, err = tx.Exec(\\\"INSERT INTO events VALUES(?,?,?,?,?,?,?)\\\", newID(\\\"planning-revoke-\\\"), work, w.Revision, \\\"planning.revoke\\\", w.Updated, request, request)\\n\\treturn err\\n}\\n\\n// Imported history never supplies an unchecked tree to ownership traversal.\\nfunc validatePlanningState(w *Work) error {\\n\\tif err := validateRequirementPrerequisites(w); err != nil {\\n\\t\\treturn err\\n\\t}\\n\\tp := w.Planning\\n\\tif p == nil {\\n\\t\\treturn nil\\n\\t}\\n\\tif p.Version != 1 || len(p.Scopes) \\u003c 1 || len(p.Scopes) \\u003e 20 || p.MaxTasks \\u003c 1 || p.MaxTasks \\u003e 100 || len(w.Tasks) \\u003e p.MaxTasks || p.MaxDecisions \\u003c 1 || p.MaxDecisions \\u003e 100 || p.MaxActivations \\u003c 1 || p.MaxActivations \\u003e 200 || p.Activations \\u003c 0 || p.Activations \\u003e p.MaxActivations || p.Decisions \\u003c 0 || p.Decisions \\u003e p.MaxDecisions {\\n\\t\\treturn fmt.Errorf(\\\"contrat de planification invalide\\\")\\n\\t}\\n\\tids := map[string]bool{}\\n\\trequirements := map[string]bool{}\\n\\tfor _, scope := range p.Scopes {\\n\\t\\tif !safeName(scope.ID) || ids[scope.ID] || scope.Revision \\u003c 1 {\\n\\t\\t\\treturn fmt.Errorf(\\\"périmètre invalide\\\")\\n\\t\\t}\\n\\t\\tids[scope.ID] = true\\n\\t\\tfor _, req := range scope.Requirements {\\n\\t\\t\\tif requirements[req] {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"exigence possédée plusieurs fois\\\")\\n\\t\\t\\t}\\n\\t\\t\\trequirements[req] = true\\n\\t\\t}\\n\\t}\\n\\troot, e := p.scope(\\\"root\\\")\\n\\tif e != nil || root.Parent != \\\"\\\" {\\n\\t\\treturn fmt.Errorf(\\\"racine absente ou invalide\\\")\\n\\t}\\n\\tfor _, scope := range p.Scopes {\\n\\t\\tseen := map[string]bool{}\\n\\t\\tnode := scope\\n\\t\\tfor node.ID != \\\"root\\\" {\\n\\t\\t\\tif seen[node.ID] {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"cycle de propriété\\\")\\n\\t\\t\\t}\\n\\t\\t\\tseen[node.ID] = true\\n\\t\\t\\tparent, e := p.scope(node.Parent)\\n\\t\\t\\tif e != nil {\\n\\t\\t\\t\\treturn e\\n\\t\\t\\t}\\n\\t\\t\\tnode = *parent\\n\\t\\t}\\n\\t\\tif len(seen) \\u003e 2 {\\n\\t\\t\\treturn fmt.Errorf(\\\"profondeur de délégation excessive\\\")\\n\\t\\t}\\n\\t}\\n\\tif len(requirements) != len(w.Criteria) {\\n\\t\\treturn fmt.Errorf(\\\"couverture des exigences incomplète\\\")\\n\\t}\\n\\tfor i := range w.Criteria {\\n\\t\\tif !requirements[fmt.Sprintf(\\\"req-%d\\\", i+1)] {\\n\\t\\t\\treturn fmt.Errorf(\\\"exigence non possédée\\\")\\n\\t\\t}\\n\\t}\\n\\tfor _, task := range w.Tasks {\\n\\t\\tscope, e := p.scope(task.ScopeID)\\n\\t\\tif e != nil {\\n\\t\\t\\treturn e\\n\\t\\t}\\n\\t\\t// In a hierarchical mission, planners are represented by scopes and run\\n\\t\\t// through the tool-free planning path. Executable tasks are workers only.\\n\\t\\t// Failing closed here also prevents an imported or historical payload from\\n\\t\\t// turning a planner label into a coding-agent launch.\\n\\t\\tif task.PlanRole != \\\"\\\" \\u0026\\u0026 task.PlanRole != \\\"worker\\\" {\\n\\t\\t\\treturn fmt.Errorf(\\\"tâche hiérarchique non exécutante : %s\\\", task.ID)\\n\\t\\t}\\n\\t\\tif len(task.Requirements) == 0 {\\n\\t\\t\\treturn fmt.Errorf(\\\"tâche sans exigence\\\")\\n\\t\\t}\\n\\t\\tfor _, req := range task.Requirements {\\n\\t\\t\\tif !containsString(scope.Requirements, req) {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"tâche hors propriété\\\")\\n\\t\\t\\t}\\n\\t\\t}\\n\\t}\\n\\tevents := map[string]bool{}\\n\\tfor _, event := range p.Inbox {\\n\\t\\tif !safeName(event.ID) || events[event.ID] || !ids[event.Scope] {\\n\\t\\t\\treturn fmt.Errorf(\\\"événement de planification invalide\\\")\\n\\t\\t}\\n\\t\\tevents[event.ID] = true\\n\\t}\\n\\treturn nil\\n}\\n\\n// Proof drift can happen without a database write. Reopen a closed owner once,\\n// leaving the controller's original record intact and never relaunching by fiat.\\nfunc (s *Store) reconcilePlanningProofs(w Work) (Work, error) {\\n\\tvar err error\\n\\tw, err = s.signalDependencyProofDrift(w)\\n\\tif err != nil {\\n\\t\\treturn w, err\\n\\t}\\n\\tif w.Planning == nil {\\n\\t\\treturn w, nil\\n\\t}\\n\\tstale := []string{}\\n\\tfor _, task := range w.Tasks {\\n\\t\\towner, e := w.Planning.scope(task.ScopeID)\\n\\t\\tif e == nil \\u0026\\u0026 owner.State == \\\"closed\\\" \\u0026\\u0026 !s.acceptedFresh(\\u0026w, \\u0026task, map[string]bool{}) {\\n\\t\\t\\tstale = append(stale, task.ID)\\n\\t\\t}\\n\\t}\\n\\tif len(stale) == 0 {\\n\\t\\treturn w, nil\\n\\t}\\n\\tevent := newID(\\\"planning-proof-\\\")\\n\\traw, _ := json.Marshal(map[string]any{\\\"stale_tasks\\\": stale})\\n\\treturn s.mutate(w.ID, \\\"planning.proof-stale\\\", event, w.Revision, raw, func(current *Work) error {\\n\\t\\tfor _, id := range stale {\\n\\t\\t\\ttask, _ := current.task(id)\\n\\t\\t\\tscope, _ := current.Planning.scope(task.ScopeID)\\n\\t\\t\\tscope.State = \\\"ready\\\"\\n\\t\\t\\tscope.Generation++\\n\\t\\t\\tscope.Holder = \\\"\\\"\\n\\t\\t\\tscope.Until = \\\"\\\"\\n\\t\\t\\tattempt := \\\"\\\"\\n\\t\\t\\tif len(task.Attempts) \\u003e 0 {\\n\\t\\t\\t\\tattempt = task.Attempts[len(task.Attempts)-1].ID\\n\\t\\t\\t}\\n\\t\\t\\tcurrent.Planning.Inbox = append(current.Planning.Inbox, PlanningEvent{ID: planningEventID(event, id), Scope: scope.ID, Kind: \\\"proof_stale\\\", Task: id, Attempt: attempt, Message: \\\"La preuve n’est plus actuelle ; décision de reprise requise.\\\", At: now()})\\n\\t\\t\\tfor scope.Parent != \\\"\\\" {\\n\\t\\t\\t\\tscope, _ = current.Planning.scope(scope.Parent)\\n\\t\\t\\t\\tscope.State = \\\"ready\\\"\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\treturn nil\\n\\t})\\n}\\n\\nfunc planningEventID(parts ...string) string {\\n\\traw, _ := json.Marshal(parts)\\n\\treturn \\\"plan-\\\" + hash(raw)\\n}\\n\\n// Shared by scope closure and the global judge: an AI end proposal never\\n// replaces the existing acceptance, descendant and requirement proof checks.\\nfunc (s *Store) validatePlanningClosure(w *Work, id string, r PlanningRequest) error {\\n\\tp := w.Planning\\n\\tscope, err := p.scope(id)\\n\\tif err != nil {\\n\\t\\treturn err\\n\\t}\\n\\tfor _, event := range p.Inbox {\\n\\t\\tif event.Scope == id \\u0026\\u0026 event.Decision == \\\"\\\" \\u0026\\u0026 !containsString(r.Inputs, event.ID) {\\n\\t\\t\\treturn fmt.Errorf(\\\"retour non traité : %s\\\", event.ID)\\n\\t\\t}\\n\\t}\\n\\tfor _, child := range p.Scopes {\\n\\t\\tif child.Parent == id \\u0026\\u0026 child.State != \\\"closed\\\" {\\n\\t\\t\\treturn fmt.Errorf(\\\"périmètre enfant non terminé\\\")\\n\\t\\t}\\n\\t}\\n\\tfor _, task := range w.Tasks {\\n\\t\\tif task.ScopeID == \\\"\\\" {\\n\\t\\t\\treturn fmt.Errorf(\\\"tâche sans périmètre\\\")\\n\\t\\t}\\n\\t\\towner, err := p.scope(task.ScopeID)\\n\\t\\tif err != nil {\\n\\t\\t\\treturn err\\n\\t\\t}\\n\\t\\tfor owner.ID != id \\u0026\\u0026 owner.Parent != \\\"\\\" {\\n\\t\\t\\towner, _ = p.scope(owner.Parent)\\n\\t\\t}\\n\\t\\tif owner.ID == id \\u0026\\u0026 (task.Status != \\\"accepted\\\" || !s.acceptedFresh(w, \\u0026task, map[string]bool{})) {\\n\\t\\t\\treturn fmt.Errorf(\\\"preuve descendante non valide : %s\\\", task.ID)\\n\\t\\t}\\n\\t}\\n\\tcovered := map[string]bool{}\\n\\tfor i := range w.Tasks {\\n\\t\\ttask := \\u0026w.Tasks[i]\\n\\t\\tif task.ScopeID == id {\\n\\t\\t\\tif task.Status != \\\"accepted\\\" || !s.acceptedFresh(w, task, map[string]bool{}) {\\n\\t\\t\\t\\treturn fmt.Errorf(\\\"tâche non validée ou preuve périmée : %s\\\", task.ID)\\n\\t\\t\\t}\\n\\t\\t\\tfor _, req := range task.Requirements {\\n\\t\\t\\t\\tcovered[req] = true\\n\\t\\t\\t}\\n\\t\\t}\\n\\t}\\n\\tfor _, req := range scope.Requirements {\\n\\t\\tif !covered[req] {\\n\\t\\t\\treturn fmt.Errorf(\\\"exigence sans preuve : %s\\\", req)\\n\\t\\t}\\n\\t}\\n\\treturn nil\\n}\\n\"}"
++    },
++    {
++      "kind": "source",
++      "name": "internal/engine/planning_api.go",
++      "sha256": "38eabe54acc66d8ea8d4311d74818d2e68507095ef8ff53cf6d9483ca05fd319",
++      "content": "{\"path\":\"internal/engine/planning_api.go\",\"git_blob\":\"cede08156420367ca58d8413922060c56f8d409b\",\"sha256\":\"9004ed00bfb31b5209972516dddf53c85cea6ebcfcb9385a45c0cd49e29b9d94\",\"bytes\":6018,\"content\":\"package engine\\n\\nimport (\\n\\t\\\"encoding/json\\\"\\n\\t\\\"fmt\\\"\\n\\t\\\"io\\\"\\n\\t\\\"net/http\\\"\\n)\\n\\n// The local authenticated API and CLI call the same transaction contract.\\nfunc (s *Store) planningCLI(pos []string, input string, out io.Writer) error {\\n\\tif len(pos) == 4 \\u0026\\u0026 pos[1] == \\\"bundle\\\" {\\n\\t\\treturn s.managedBundle(pos[2], pos[3])\\n\\t}\\n\\tif len(pos) != 3 {\\n\\t\\treturn fmt.Errorf(\\\"usage : planning show|enable|claim|decide|handoff|step|configure-reviewer|review-timeout|extend-attempt|restart-task|authorize-recovery|requalify|recovery-preview|fragment-preview|scope-preview|scope-patch|review-cost|review-dossier|submit-recovered-result|retry-review|diagnose-review|retry-integration|review-step|pause|resume|judge|renew WORK [--input requête.json]\\\")\\n\\t}\\n\\tif pos[1] == \\\"review-step\\\" {\\n\\t\\treturn s.independentReviewStep(pos[2])\\n\\t}\\n\\tif pos[1] == \\\"step\\\" {\\n\\t\\treturn s.planningStep(pos[2])\\n\\t}\\n\\tif pos[1] == \\\"history\\\" {\\n\\t\\tv, e := s.planningHistory(pos[2])\\n\\t\\tif e != nil {\\n\\t\\t\\treturn e\\n\\t\\t}\\n\\t\\treturn printJSON(out, v)\\n\\t}\\n\\tif pos[1] == \\\"show\\\" {\\n\\t\\tw, err := s.get(pos[2])\\n\\t\\tif err != nil {\\n\\t\\t\\treturn err\\n\\t\\t}\\n\\t\\treturn printJSON(out, w)\\n\\t}\\n\\tif input == \\\"\\\" {\\n\\t\\treturn fmt.Errorf(\\\"--input requis\\\")\\n\\t}\\n\\traw, err := readInput(input)\\n\\tif err != nil {\\n\\t\\treturn err\\n\\t}\\n\\tif pos[1] == \\\"cleanup-preview\\\" || pos[1] == \\\"cleanup\\\" {\\n\\t\\tvar request ManagedCleanupRequest\\n\\t\\tif e := strict(raw, \\u0026request); e != nil {\\n\\t\\t\\treturn e\\n\\t\\t}\\n\\t\\tv, e := s.managedCleanup(pos[2], request, pos[1] == \\\"cleanup\\\")\\n\\t\\tif e != nil {\\n\\t\\t\\treturn e\\n\\t\\t}\\n\\t\\treturn printJSON(out, v)\\n\\t}\\n\\tvar r PlanningRequest\\n\\tif err = strict(raw, \\u0026r); err != nil {\\n\\t\\treturn err\\n\\t}\\n\\tif pos[1] == \\\"scope-preview\\\" || pos[1] == \\\"scope-patch\\\" {\\n\\t\\tv, e := s.managedScopePreview(pos[2], r, pos[1] == \\\"scope-patch\\\")\\n\\t\\tif e != nil {\\n\\t\\t\\treturn e\\n\\t\\t}\\n\\t\\treturn printJSON(out, v)\\n\\t}\\n\\tif pos[1] == \\\"recovery-preview\\\" {\\n\\t\\tv, e := s.reviewRecoveryPreview(pos[2], r.Task)\\n\\t\\tif e != nil {\\n\\t\\t\\treturn e\\n\\t\\t}\\n\\t\\treturn printJSON(out, v)\\n\\t}\\n\\tif pos[1] == \\\"review-dossier\\\" {\\n\\t\\tv, e := s.managedReviewDossier(pos[2], r.Task)\\n\\t\\tif e != nil {\\n\\t\\t\\treturn e\\n\\t\\t}\\n\\t\\treturn printJSON(out, v)\\n\\t}\\n\\tif pos[1] == \\\"review-cost\\\" {\\n\\t\\tv, e := s.managedReviewCostPreview(pos[2], r.Task)\\n\\t\\tif e != nil {\\n\\t\\t\\treturn e\\n\\t\\t}\\n\\t\\treturn printJSON(out, v)\\n\\t}\\n\\tif pos[1] == \\\"fragment-preview\\\" {\\n\\t\\tp, e := s.previewManagedFragments(pos[2], r.Task)\\n\\t\\tif e != nil {\\n\\t\\t\\treturn e\\n\\t\\t}\\n\\t\\treturn printJSON(out, p)\\n\\t}\\n\\tw, err := s.planningChange(pos[2], pos[1], r)\\n\\tif err != nil {\\n\\t\\treturn err\\n\\t}\\n\\treturn printJSON(out, w)\\n}\\nfunc (s *Store) registerPlanning(mux *http.ServeMux, send func(http.ResponseWriter, any), fail func(http.ResponseWriter, error)) {\\n\\ts.registerPlanningBundle(mux, fail)\\n\\ts.registerManagedCleanup(mux, send, fail)\\n\\tmux.HandleFunc(\\\"/api/v1/planning-history\\\", func(w http.ResponseWriter, r *http.Request) {\\n\\t\\tif r.Method != \\\"GET\\\" {\\n\\t\\t\\thttp.Error(w, \\\"GET requis\\\", 405)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\tv, e := s.planningHistory(r.URL.Query().Get(\\\"work\\\"))\\n\\t\\tif e != nil {\\n\\t\\t\\tfail(w, e)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\tsend(w, v)\\n\\t})\\n\\tmux.HandleFunc(\\\"/api/v1/planning\\\", func(w http.ResponseWriter, r *http.Request) {\\n\\t\\twork := r.URL.Query().Get(\\\"work\\\")\\n\\t\\tif r.Method == \\\"GET\\\" \\u0026\\u0026 r.URL.Query().Get(\\\"action\\\") == \\\"scope-preview\\\" {\\n\\t\\t\\tv, e := s.managedScopePreview(work, PlanningRequest{Task: r.URL.Query().Get(\\\"task\\\")}, false)\\n\\t\\t\\tif e != nil {\\n\\t\\t\\t\\tfail(w, e)\\n\\t\\t\\t\\treturn\\n\\t\\t\\t}\\n\\t\\t\\tsend(w, v)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\tif r.Method == \\\"GET\\\" \\u0026\\u0026 r.URL.Query().Get(\\\"action\\\") == \\\"recovery-preview\\\" {\\n\\t\\t\\tv, e := s.reviewRecoveryPreview(work, r.URL.Query().Get(\\\"task\\\"))\\n\\t\\t\\tif e != nil {\\n\\t\\t\\t\\tfail(w, e)\\n\\t\\t\\t\\treturn\\n\\t\\t\\t}\\n\\t\\t\\tsend(w, v)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\tif r.Method == \\\"GET\\\" \\u0026\\u0026 r.URL.Query().Get(\\\"action\\\") == \\\"review-dossier\\\" {\\n\\t\\t\\tv, e := s.managedReviewDossier(r.URL.Query().Get(\\\"work\\\"), r.URL.Query().Get(\\\"task\\\"))\\n\\t\\t\\tif e != nil {\\n\\t\\t\\t\\tfail(w, e)\\n\\t\\t\\t\\treturn\\n\\t\\t\\t}\\n\\t\\t\\tsend(w, v)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\tif r.Method == \\\"GET\\\" \\u0026\\u0026 r.URL.Query().Get(\\\"action\\\") == \\\"review-cost\\\" {\\n\\t\\t\\tv, e := s.managedReviewCostPreview(work, r.URL.Query().Get(\\\"task\\\"))\\n\\t\\t\\tif e != nil {\\n\\t\\t\\t\\tfail(w, e)\\n\\t\\t\\t\\treturn\\n\\t\\t\\t}\\n\\t\\t\\tsend(w, v)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\tif r.Method == \\\"GET\\\" \\u0026\\u0026 r.URL.Query().Get(\\\"action\\\") == \\\"fragment-preview\\\" {\\n\\t\\t\\tp, e := s.previewManagedFragments(work, r.URL.Query().Get(\\\"task\\\"))\\n\\t\\t\\tif e != nil {\\n\\t\\t\\t\\tfail(w, e)\\n\\t\\t\\t\\treturn\\n\\t\\t\\t}\\n\\t\\t\\tsend(w, p)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\tif r.Method == \\\"GET\\\" \\u0026\\u0026 r.URL.Query().Get(\\\"action\\\") == \\\"requalify-preview\\\" {\\n\\t\\t\\tv, err := s.historicalRequalificationRequest(work, r.URL.Query().Get(\\\"task\\\"))\\n\\t\\t\\tif err != nil {\\n\\t\\t\\t\\tfail(w, err)\\n\\t\\t\\t\\treturn\\n\\t\\t\\t}\\n\\t\\t\\tsend(w, v)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\tif r.Method == \\\"GET\\\" {\\n\\t\\t\\tv, err := s.get(work)\\n\\t\\t\\tif err != nil {\\n\\t\\t\\t\\tfail(w, err)\\n\\t\\t\\t\\treturn\\n\\t\\t\\t}\\n\\t\\t\\tsend(w, v)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\tif r.Method != \\\"POST\\\" {\\n\\t\\t\\thttp.Error(w, \\\"GET ou POST requis\\\", 405)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\traw, err := io.ReadAll(http.MaxBytesReader(w, r.Body, 65536))\\n\\t\\tif err != nil {\\n\\t\\t\\tfail(w, err)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\tvar request PlanningRequest\\n\\t\\tif err = strict(raw, \\u0026request); err != nil {\\n\\t\\t\\tfail(w, err)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\tif r.URL.Query().Get(\\\"action\\\") == \\\"scope-patch\\\" {\\n\\t\\t\\tv, e := s.managedScopePreview(work, request, true)\\n\\t\\t\\tif e != nil {\\n\\t\\t\\t\\tfail(w, e)\\n\\t\\t\\t\\treturn\\n\\t\\t\\t}\\n\\t\\t\\tsend(w, v)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\tresult, err := s.planningChange(work, r.URL.Query().Get(\\\"action\\\"), request)\\n\\t\\tif err != nil {\\n\\t\\t\\tfail(w, err)\\n\\t\\t\\treturn\\n\\t\\t}\\n\\t\\tsend(w, result)\\n\\t})\\n}\\n\\ntype PlanningDecisionView struct {\\n\\tID         string              `json:\\\"id\\\"`\\n\\tAt         string              `json:\\\"at\\\"`\\n\\tScope      string              `json:\\\"scope\\\"`\\n\\tReason     string              `json:\\\"reason\\\"`\\n\\tOperations []PlanningOperation `json:\\\"operations\\\"`\\n}\\n\\nfunc (s *Store) planningHistory(work string) ([]PlanningDecisionView, error) {\\n\\tevents, e := s.events(work)\\n\\tif e != nil {\\n\\t\\treturn nil, e\\n\\t}\\n\\tout := []PlanningDecisionView{}\\n\\tfor _, event := range events {\\n\\t\\tif event.Kind != \\\"planning.decide\\\" {\\n\\t\\t\\tcontinue\\n\\t\\t}\\n\\t\\tvar r PlanningRequest\\n\\t\\tif e = json.Unmarshal(event.Payload, \\u0026r); e != nil {\\n\\t\\t\\treturn nil, e\\n\\t\\t}\\n\\t\\tout = append(out, PlanningDecisionView{ID: event.ID, At: event.At, Scope: r.Scope, Reason: r.Reason, Operations: r.Operations})\\n\\t}\\n\\treturn out, nil\\n}\\n\"}"
++    },
++    {
++      "kind": "source",
++      "name": "internal/engine/score.go",
++      "sha256": "8f823f401f4f3b2b863c4456a7d475872bdfc199b4de5b035f67cac9bbfdfe52",
++      "content": "{\"path\":\"internal/engine/score.go\",\"git_blob\":\"b2292c7c5befac3a7a1f2c94c73f257d39d3d830\",\"sha256\":\"449fd157d53cc656f103984a997ec8d11297c660df5aaf6f32f1a3e94f1df62d\",\"bytes\":11988,\"content\":\"package engine\\n\\nimport (\\n\\t\\\"bytes\\\"\\n\\t\\\"crypto/sha256\\\"\\n\\t\\\"encoding/hex\\\"\\n\\t\\\"encoding/json\\\"\\n\\t\\\"fmt\\\"\\n\\t\\\"io\\\"\\n\\t\\\"math\\\"\\n\\t\\\"os\\\"\\n\\t\\\"sort\\\"\\n\\t\\\"strconv\\\"\\n\\t\\\"strings\\\"\\n)\\n\\ntype Evaluation struct {\\n\\tMethod              string             `json:\\\"method_version\\\"`\\n\\tScope               string             `json:\\\"scope_id\\\"`\\n\\tPhase               string             `json:\\\"phase\\\"`\\n\\tConfigDigest        string             `json:\\\"config_digest\\\"`\\n\\tApplicabilityDigest string             `json:\\\"applicability_digest\\\"`\\n\\tArtifacts           map[string]string  `json:\\\"artifacts\\\"`\\n\\tScores              map[string]float64 `json:\\\"domain_scores\\\"`\\n\\tQuality             *float64           `json:\\\"quality\\\"`\\n\\tProvisional         bool               `json:\\\"provisional\\\"`\\n\\tBand                string             `json:\\\"quality_band\\\"`\\n\\tProgress            Progress           `json:\\\"progress\\\"`\\n\\tSeverity            string             `json:\\\"max_severity\\\"`\\n\\tBlockers            []string           `json:\\\"blockers\\\"`\\n\\tAllowed             bool               `json:\\\"allowed\\\"`\\n\\tShip                bool               `json:\\\"ship_allowed\\\"`\\n}\\ntype Progress struct {\\n\\tPassed     int      `json:\\\"passed\\\"`\\n\\tApplicable int      `json:\\\"applicable\\\"`\\n\\tPercent    *float64 `json:\\\"percent\\\"`\\n}\\ntype GateRecord struct {\\n\\tName       string          `json:\\\"name,omitempty\\\"`\\n\\tDocument   json.RawMessage `json:\\\"document\\\"`\\n\\tEvaluation Evaluation      `json:\\\"evaluation\\\"`\\n\\tAt         string          `json:\\\"at\\\"`\\n}\\ntype scoreRow struct {\\n\\tid, domain, gate, severity, status string\\n\\tmandatory                          bool\\n\\tcount, penalty, max                float64\\n}\\n\\nfunc hash(b []byte) string { d := sha256.Sum256(b); return hex.EncodeToString(d[:]) }\\nfunc decodeAny(b []byte) (map[string]any, error) {\\n\\td := json.NewDecoder(bytes.NewReader(b))\\n\\td.UseNumber()\\n\\tvar m map[string]any\\n\\te := d.Decode(\\u0026m)\\n\\tif e != nil {\\n\\t\\treturn nil, e\\n\\t}\\n\\tvar extra any\\n\\tif err := d.Decode(\\u0026extra); err != io.EOF {\\n\\t\\treturn nil, fmt.Errorf(\\\"un seul document JSON requis\\\")\\n\\t}\\n\\tif m == nil {\\n\\t\\treturn nil, fmt.Errorf(\\\"objet JSON requis\\\")\\n\\t}\\n\\treturn m, nil\\n}\\nfunc numeric(v any) (float64, error) {\\n\\tn, ok := v.(json.Number)\\n\\tif !ok {\\n\\t\\treturn 0, fmt.Errorf(\\\"nombre fini positif ou nul requis\\\")\\n\\t}\\n\\tf, e := n.Float64()\\n\\tif e != nil || math.IsNaN(f) || math.IsInf(f, 0) || f \\u003c 0 {\\n\\t\\treturn 0, fmt.Errorf(\\\"nombre fini positif ou nul requis\\\")\\n\\t}\\n\\treturn f, nil\\n}\\nfunc str(v any) string { s, _ := v.(string); return s }\\nfunc records(v any) ([]map[string]any, error) {\\n\\ta, ok := v.([]any)\\n\\tif !ok {\\n\\t\\treturn nil, fmt.Errorf(\\\"liste requise\\\")\\n\\t}\\n\\tseen := map[string]bool{}\\n\\tout := []map[string]any{}\\n\\tfor _, v := range a {\\n\\t\\tr, ok := v.(map[string]any)\\n\\t\\tif !ok || !nonempty(str(r[\\\"id\\\"])) || seen[str(r[\\\"id\\\"])] {\\n\\t\\t\\treturn nil, fmt.Errorf(\\\"identifiant absent ou dupliqué\\\")\\n\\t\\t}\\n\\t\\tseen[str(r[\\\"id\\\"])] = true\\n\\t\\tout = append(out, r)\\n\\t}\\n\\treturn out, nil\\n}\\n\\n// Python json.dumps(sort_keys=True, ensure_ascii=False) separators for method 2.\\nfunc canonical(v any) string {\\n\\tswitch x := v.(type) {\\n\\tcase map[string]any:\\n\\t\\tkeys := []string{}\\n\\t\\tfor k := range x {\\n\\t\\t\\tkeys = append(keys, k)\\n\\t\\t}\\n\\t\\tsort.Strings(keys)\\n\\t\\ta := []string{}\\n\\t\\tfor _, k := range keys {\\n\\t\\t\\ta = append(a, canonical(k)+\\\": \\\"+canonical(x[k]))\\n\\t\\t}\\n\\t\\treturn \\\"{\\\" + strings.Join(a, \\\", \\\") + \\\"}\\\"\\n\\tcase []any:\\n\\t\\ta := []string{}\\n\\t\\tfor _, i := range x {\\n\\t\\t\\ta = append(a, canonical(i))\\n\\t\\t}\\n\\t\\treturn \\\"[\\\" + strings.Join(a, \\\", \\\") + \\\"]\\\"\\n\\tdefault:\\n\\t\\tvar b bytes.Buffer\\n\\t\\te := json.NewEncoder(\\u0026b)\\n\\t\\te.SetEscapeHTML(false)\\n\\t\\t_ = e.Encode(v)\\n\\t\\treturn strings.TrimSuffix(b.String(), \\\"\\\\n\\\")\\n\\t}\\n}\\nfunc round2(v float64) *float64 {\\n\\tv, _ = strconv.ParseFloat(strconv.FormatFloat(v, 'f', 2, 64), 64)\\n\\treturn \\u0026v\\n}\\nfunc evaluate(raw []byte, root, phase string) (Evaluation, error) {\\n\\treturn evaluateWithDigests(raw, root, phase, nil)\\n}\\nfunc evaluateWithDigests(raw []byte, root, phase string, digests map[string]string) (Evaluation, error) {\\n\\tout := Evaluation{Method: \\\"2\\\", Phase: phase, Artifacts: map[string]string{}, Scores: map[string]float64{}, Blockers: []string{}, Severity: \\\"none\\\"}\\n\\tfail := func(s string) (Evaluation, error) { return out, fmt.Errorf(\\\"évaluation invalide : %s\\\", s) }\\n\\tranks := map[string]int{\\\"entry\\\": 0, \\\"validation\\\": 1, \\\"delivery\\\": 2, \\\"audit\\\": 2}\\n\\trank, ok := ranks[phase]\\n\\tif !ok {\\n\\t\\treturn fail(\\\"phase inconnue\\\")\\n\\t}\\n\\td, e := decodeAny(raw)\\n\\tif e != nil {\\n\\t\\treturn out, e\\n\\t}\\n\\tif d[\\\"method_version\\\"] != \\\"2\\\" || !nonempty(str(d[\\\"scope_id\\\"])) {\\n\\t\\treturn fail(\\\"method_version ou scope_id\\\")\\n\\t}\\n\\tout.Scope = str(d[\\\"scope_id\\\"])\\n\\tarts, ok := d[\\\"artifacts\\\"].(map[string]any)\\n\\tif !ok || len(arts) == 0 {\\n\\t\\treturn fail(\\\"empreintes absentes\\\")\\n\\t}\\n\\tprotected := map[string]bool{}\\n\\tfor name, v := range arts {\\n\\t\\tp, e := localFile(root, name)\\n\\t\\tif e != nil {\\n\\t\\t\\treturn out, e\\n\\t\\t}\\n\\t\\tdigest, known := digests[p]\\n\\t\\tif !known {\\n\\t\\t\\tb, e := os.ReadFile(p)\\n\\t\\t\\tif e != nil {\\n\\t\\t\\t\\treturn out, e\\n\\t\\t\\t}\\n\\t\\t\\tdigest = hash(b)\\n\\t\\t\\tif digests != nil {\\n\\t\\t\\t\\tdigests[p] = digest\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tif digest != str(v) {\\n\\t\\t\\treturn fail(\\\"empreinte périmée : \\\" + name)\\n\\t\\t}\\n\\t\\tout.Artifacts[name] = str(v)\\n\\t\\tprotected[p] = true\\n\\t}\\n\\tdomains, ok := d[\\\"domains\\\"].(map[string]any)\\n\\tif !ok || len(domains) == 0 {\\n\\t\\treturn fail(\\\"domaines absents\\\")\\n\\t}\\n\\tweights := map[string]float64{}\\n\\tfor k, v := range domains {\\n\\t\\tf, e := numeric(v)\\n\\t\\tif !nonempty(k) || e != nil || f == 0 {\\n\\t\\t\\treturn fail(\\\"poids invalide\\\")\\n\\t\\t}\\n\\t\\tweights[k] = f\\n\\t}\\n\\tchecks, e := records(d[\\\"checks\\\"])\\n\\tif e != nil || len(checks) == 0 {\\n\\t\\treturn fail(\\\"contrôles invalides\\\")\\n\\t}\\n\\tresults, e := records(d[\\\"results\\\"])\\n\\tif e != nil {\\n\\t\\treturn out, e\\n\\t}\\n\\tobs := map[string]map[string]any{}\\n\\tknown := map[string]bool{}\\n\\tfor _, c := range checks {\\n\\t\\tknown[str(c[\\\"id\\\"])] = true\\n\\t}\\n\\tfor _, r := range results {\\n\\t\\tif !known[str(r[\\\"id\\\"])] {\\n\\t\\t\\treturn fail(\\\"résultat inconnu\\\")\\n\\t\\t}\\n\\t\\tobs[str(r[\\\"id\\\"])] = r\\n\\t}\\n\\trows := []scoreRow{}\\n\\tappIDs := []any{}\\n\\tpenalties := map[string]float64{}\\n\\tseverities := map[string]int{\\\"none\\\": 0, \\\"minor\\\": 1, \\\"major\\\": 2, \\\"critical\\\": 3}\\n\\tblocks := map[string]bool{}\\n\\tfor _, c := range checks {\\n\\t\\tid := str(c[\\\"id\\\"])\\n\\t\\tdomain := str(c[\\\"domain\\\"])\\n\\t\\tif c[\\\"domain\\\"] != nil {\\n\\t\\t\\tif _, ok := c[\\\"domain\\\"].(string); !ok || weights[domain] == 0 {\\n\\t\\t\\t\\treturn fail(id + \\\": domaine inconnu\\\")\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tmandatory, ok := c[\\\"mandatory\\\"].(bool)\\n\\t\\tif !ok {\\n\\t\\t\\treturn fail(id + \\\": mandatory doit être booléen\\\")\\n\\t\\t}\\n\\t\\tgate := str(c[\\\"gate\\\"])\\n\\t\\tif gate != \\\"entry\\\" \\u0026\\u0026 gate != \\\"validation\\\" \\u0026\\u0026 gate != \\\"delivery\\\" {\\n\\t\\t\\treturn fail(id + \\\": gate invalide\\\")\\n\\t\\t}\\n\\t\\tsev := str(c[\\\"severity\\\"])\\n\\t\\tif _, ok := severities[sev]; !ok {\\n\\t\\t\\treturn fail(id + \\\": sévérité invalide\\\")\\n\\t\\t}\\n\\t\\tpenalty, e := numeric(c[\\\"penalty\\\"])\\n\\t\\tif e != nil {\\n\\t\\t\\treturn out, e\\n\\t\\t}\\n\\t\\tmax, e := numeric(c[\\\"max_penalty\\\"])\\n\\t\\tif e != nil {\\n\\t\\t\\treturn out, e\\n\\t\\t}\\n\\t\\tr, ok := obs[id]\\n\\t\\tif !ok {\\n\\t\\t\\tr = map[string]any{\\\"id\\\": id, \\\"status\\\": \\\"NON TESTÉ\\\", \\\"count\\\": json.Number(\\\"0\\\")}\\n\\t\\t}\\n\\t\\tfor k := range r {\\n\\t\\t\\tif k != \\\"id\\\" \\u0026\\u0026 k != \\\"status\\\" \\u0026\\u0026 k != \\\"count\\\" \\u0026\\u0026 k != \\\"evidence\\\" \\u0026\\u0026 k != \\\"reason\\\" {\\n\\t\\t\\t\\treturn fail(id + \\\": résultat modifiant le barème\\\")\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tstatus := str(r[\\\"status\\\"])\\n\\t\\tif !strings.Contains(\\\"|PASS|FAIL|PARTIEL|NON TESTÉ|NON APPLICABLE|\\\", \\\"|\\\"+status+\\\"|\\\") || status == \\\"\\\" {\\n\\t\\t\\treturn fail(id + \\\": statut invalide\\\")\\n\\t\\t}\\n\\t\\tcount, e := numeric(r[\\\"count\\\"])\\n\\t\\tif e != nil {\\n\\t\\t\\treturn out, e\\n\\t\\t}\\n\\t\\tif status == \\\"FAIL\\\" \\u0026\\u0026 count == 0 || (status == \\\"PASS\\\" || status == \\\"NON APPLICABLE\\\") \\u0026\\u0026 count != 0 {\\n\\t\\t\\treturn fail(id + \\\": count incompatible\\\")\\n\\t\\t}\\n\\t\\tif status == \\\"NON APPLICABLE\\\" \\u0026\\u0026 !nonempty(str(r[\\\"reason\\\"])) {\\n\\t\\t\\treturn fail(id + \\\": justification requise\\\")\\n\\t\\t}\\n\\t\\tev := []any{}\\n\\t\\tif v, exists := r[\\\"evidence\\\"]; exists {\\n\\t\\t\\tvar ok bool\\n\\t\\t\\tev, ok = v.([]any)\\n\\t\\t\\tif !ok {\\n\\t\\t\\t\\treturn fail(id + \\\": liste de preuves requise\\\")\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tif (status == \\\"PASS\\\" || status == \\\"FAIL\\\") \\u0026\\u0026 len(ev) == 0 {\\n\\t\\t\\treturn fail(id + \\\": preuves absentes\\\")\\n\\t\\t}\\n\\t\\tfor _, v := range ev {\\n\\t\\t\\tp, e := localFile(root, str(v))\\n\\t\\t\\tif e != nil {\\n\\t\\t\\t\\treturn out, e\\n\\t\\t\\t}\\n\\t\\t\\tif !protected[p] {\\n\\t\\t\\t\\treturn fail(id + \\\": preuve hors inventaire\\\")\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tif status == \\\"NON APPLICABLE\\\" {\\n\\t\\t\\tcontinue\\n\\t\\t}\\n\\t\\tappIDs = append(appIDs, id)\\n\\t\\trow := scoreRow{id, domain, gate, sev, status, mandatory, count, penalty, max}\\n\\t\\trows = append(rows, row)\\n\\t\\tif domain != \\\"\\\" {\\n\\t\\t\\tif _, ok := penalties[domain]; !ok {\\n\\t\\t\\t\\tpenalties[domain] = 0\\n\\t\\t\\t}\\n\\t\\t\\tif status == \\\"FAIL\\\" {\\n\\t\\t\\t\\tpenalties[domain] += math.Min(count*penalty, max)\\n\\t\\t\\t}\\n\\t\\t\\tif status != \\\"PASS\\\" \\u0026\\u0026 status != \\\"FAIL\\\" {\\n\\t\\t\\t\\tout.Provisional = true\\n\\t\\t\\t}\\n\\t\\t}\\n\\t}\\n\\tsum, weight := 0.0, 0.0\\n\\tkeys := []string{}\\n\\tfor domain := range penalties {\\n\\t\\tkeys = append(keys, domain)\\n\\t}\\n\\tsort.Strings(keys)\\n\\tfor _, domain := range keys {\\n\\t\\tscore := math.Max(0, 100-penalties[domain])\\n\\t\\tout.Scores[domain] = score\\n\\t\\tsum += score * weights[domain]\\n\\t\\tweight += weights[domain]\\n\\t}\\n\\tvar quality *float64\\n\\tif weight \\u003e 0 {\\n\\t\\tq := sum / weight\\n\\t\\tquality = \\u0026q\\n\\t\\tout.Quality = round2(q)\\n\\t}\\n\\tfor _, r := range rows {\\n\\t\\tif ranks[r.gate] \\u003e rank {\\n\\t\\t\\tcontinue\\n\\t\\t}\\n\\t\\tout.Progress.Applicable++\\n\\t\\tif r.status == \\\"PASS\\\" {\\n\\t\\t\\tout.Progress.Passed++\\n\\t\\t}\\n\\t\\tif phase == \\\"audit\\\" {\\n\\t\\t\\tif r.status != \\\"PASS\\\" \\u0026\\u0026 r.status != \\\"FAIL\\\" || r.domain == \\\"\\\" \\u0026\\u0026 r.mandatory \\u0026\\u0026 r.status != \\\"PASS\\\" {\\n\\t\\t\\t\\tblocks[r.id] = true\\n\\t\\t\\t}\\n\\t\\t} else {\\n\\t\\t\\tif r.mandatory \\u0026\\u0026 r.status != \\\"PASS\\\" || r.status == \\\"FAIL\\\" \\u0026\\u0026 severities[r.severity] \\u003e= 2 {\\n\\t\\t\\t\\tblocks[r.id] = true\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tif r.status == \\\"FAIL\\\" \\u0026\\u0026 severities[r.severity] \\u003e severities[out.Severity] {\\n\\t\\t\\tout.Severity = r.severity\\n\\t\\t}\\n\\t}\\n\\tif out.Progress.Applicable == 0 {\\n\\t\\tblocks[\\\"empty-applicable-inventory\\\"] = true\\n\\t} else {\\n\\t\\tout.Progress.Percent = round2(100 * float64(out.Progress.Passed) / float64(out.Progress.Applicable))\\n\\t}\\n\\tif phase == \\\"delivery\\\" {\\n\\t\\tif out.Provisional || quality == nil {\\n\\t\\t\\tblocks[\\\"quality-incomplete\\\"] = true\\n\\t\\t}\\n\\t\\tif quality != nil \\u0026\\u0026 *quality \\u003c 70 {\\n\\t\\t\\tblocks[\\\"quality-below-70\\\"] = true\\n\\t\\t}\\n\\t\\tfor _, s := range out.Scores {\\n\\t\\t\\tif s \\u003c 50 {\\n\\t\\t\\t\\tblocks[\\\"domain-below-50\\\"] = true\\n\\t\\t\\t}\\n\\t\\t}\\n\\t}\\n\\tout.Band = \\\"INCOMPLETE\\\"\\n\\tif quality != nil \\u0026\\u0026 !out.Provisional {\\n\\t\\tswitch {\\n\\t\\tcase *quality \\u003e= 80:\\n\\t\\t\\tout.Band = \\\"OK\\\"\\n\\t\\tcase *quality \\u003e= 70:\\n\\t\\t\\tout.Band = \\\"WARN\\\"\\n\\t\\tcase *quality \\u003e= 50:\\n\\t\\t\\tout.Band = \\\"BLOQUÉ\\\"\\n\\t\\tdefault:\\n\\t\\t\\tout.Band = \\\"STOP\\\"\\n\\t\\t}\\n\\t}\\n\\tfor k := range blocks {\\n\\t\\tout.Blockers = append(out.Blockers, k)\\n\\t}\\n\\tsort.Strings(out.Blockers)\\n\\tout.Allowed = len(blocks) == 0\\n\\tout.Ship = phase == \\\"delivery\\\" \\u0026\\u0026 out.Allowed\\n\\tsort.Slice(checks, func(i, j int) bool { return str(checks[i][\\\"id\\\"]) \\u003c str(checks[j][\\\"id\\\"]) })\\n\\tca := []any{}\\n\\tfor _, c := range checks {\\n\\t\\tca = append(ca, c)\\n\\t}\\n\\tsort.Slice(appIDs, func(i, j int) bool { return str(appIDs[i]) \\u003c str(appIDs[j]) })\\n\\tout.ConfigDigest = hash([]byte(canonical(map[string]any{\\\"domains\\\": domains, \\\"checks\\\": ca})))\\n\\tout.ApplicabilityDigest = hash([]byte(canonical(appIDs)))\\n\\treturn out, nil\\n}\\nfunc (s *Store) validGate(t *Task) bool {\\n\\tif t.Gate == nil || t.EvidenceStaleReason != \\\"\\\" || !t.Gate.Evaluation.Ship || requiredPlanChecks(t, t.Gate.Document) != nil {\\n\\t\\treturn false\\n\\t}\\n\\tev, e := evaluateWithDigests(t.Gate.Document, s.root, \\\"delivery\\\", s.readDigests)\\n\\treturn e == nil \\u0026\\u0026 ev.Ship \\u0026\\u0026 ev.Scope == t.ID \\u0026\\u0026 revalidationGate(t, ev) == nil\\n}\\n\\n// A reopened or stale upstream task invalidates downstream acceptance as well.\\nfunc (s *Store) acceptedFresh(w *Work, t *Task, seen map[string]bool) bool {\\n\\treturn s.acceptedFreshMemo(w, t, seen, map[string]bool{})\\n}\\n\\n// Memoization is local to one traversal: never retained across filesystem checks.\\nfunc (s *Store) acceptedFreshMemo(w *Work, t *Task, seen, memo map[string]bool) bool {\\n\\tif t != nil \\u0026\\u0026 s.independentReviewGuard(w, t) != nil {\\n\\t\\treturn false\\n\\t}\\n\\tif t == nil || seen[t.ID] {\\n\\t\\treturn false\\n\\t}\\n\\tif result, ok := memo[t.ID]; ok {\\n\\t\\treturn result\\n\\t}\\n\\tmemo[t.ID] = false\\n\\tif (t.Status != \\\"accepted\\\" || !s.validGate(t)) \\u0026\\u0026 !(t.Status == \\\"waived\\\" \\u0026\\u0026 t.Override != nil \\u0026\\u0026 nonempty(t.Override.Reason)) {\\n\\t\\treturn false\\n\\t}\\n\\tseen[t.ID] = true\\n\\tdefer delete(seen, t.ID)\\n\\tfor _, id := range t.Depends {\\n\\t\\tdep, e := w.task(id)\\n\\t\\tif e != nil || !s.acceptedFreshMemo(w, dep, seen, memo) {\\n\\t\\t\\treturn false\\n\\t\\t}\\n\\t}\\n\\tmemo[t.ID] = true\\n\\treturn true\\n}\\n\"}"
++    },
++    {
++      "kind": "source",
++      "name": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-vet.out",
++      "sha256": "389de30b46f82d1ab9009453bcee95378ef10e3315d81e844ef24b989224ebae",
++      "content": "{\"path\":\"docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-vet.out\",\"git_blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"bytes\":0,\"content\":\"\"}"
++    },
++    {
++      "kind": "source",
++      "name": "internal/engine/planning_budget.go",
++      "sha256": "5100595994bd46a0833e1ade9788168909f788f064153bdb436bdfa49e5edd08",
++      "content": "{\"path\":\"internal/engine/planning_budget.go\",\"git_blob\":\"4ede5af14a25190363e6d50fca2f45bbe3772cf4\",\"sha256\":\"4e190bce0ee367c5b490b495b0c1f1c6c4a821df11ab8a33f7568289fb6c586d\",\"bytes\":2980,\"content\":\"package engine\\n\\nimport (\\n\\t\\\"database/sql\\\"\\n\\t\\\"encoding/json\\\"\\n\\t\\\"fmt\\\"\\n)\\n\\nconst planningRuntimeMigration = `BEGIN IMMEDIATE;\\nCREATE TABLE IF NOT EXISTS planning_calls(id TEXT PRIMARY KEY,work_id TEXT NOT NULL REFERENCES works(id) ON DELETE CASCADE,scope_id TEXT NOT NULL,estimate REAL NOT NULL,usage BLOB,state TEXT NOT NULL,created_at TEXT NOT NULL);\\nCREATE TABLE IF NOT EXISTS managed_attempts(agent_id TEXT PRIMARY KEY,work_id TEXT NOT NULL REFERENCES works(id) ON DELETE CASCADE,task_id TEXT NOT NULL,base_commit TEXT NOT NULL,path TEXT NOT NULL,state TEXT NOT NULL,result_commit TEXT NOT NULL DEFAULT '',detail TEXT NOT NULL DEFAULT '');\\nPRAGMA user_version=19; COMMIT;`\\n\\nfunc planningCommitted(tx *sql.Tx, work string) (float64, error) {\\n\\tvar value float64\\n\\terr := tx.QueryRow(\\\"SELECT coalesce(sum(estimate),0) FROM planning_calls WHERE work_id=? AND state!='released'\\\", work).Scan(\\u0026value)\\n\\treturn value, err\\n}\\nfunc reservePlanningCall(tx *sql.Tx, work, scope, id string) error {\\n\\tif err := checkLaunchBudget(tx, work, id, false); err != nil {\\n\\t\\treturn err\\n\\t}\\n\\tvar raw []byte\\n\\treserve := 0.0\\n\\terr := tx.QueryRow(\\\"SELECT body FROM budgets WHERE work_id=?\\\", work).Scan(\\u0026raw)\\n\\tif err != nil \\u0026\\u0026 err != sql.ErrNoRows {\\n\\t\\treturn err\\n\\t}\\n\\tif err == nil {\\n\\t\\tvar b Budget\\n\\t\\tif err = json.Unmarshal(raw, \\u0026b); err != nil {\\n\\t\\t\\treturn err\\n\\t\\t}\\n\\t\\tif b.Limit \\u003e 0 {\\n\\t\\t\\treserve = b.Reserve\\n\\t\\t}\\n\\t}\\n\\t_, err = tx.Exec(\\\"INSERT INTO planning_calls(id,work_id,scope_id,estimate,state,created_at) VALUES(?,?,?,?,'estimated',?)\\\", id, work, scope, reserve, now())\\n\\treturn err\\n}\\nfunc (s *Store) savePlanningUsage(id string, u *Usage) error {\\n\\traw, err := json.Marshal(u)\\n\\tif err != nil {\\n\\t\\treturn err\\n\\t}\\n\\t_, err = s.db.Exec(\\\"UPDATE planning_calls SET usage=?,state='finished' WHERE id=?\\\", raw, id)\\n\\treturn err\\n}\\n\\nfunc planningAncestors(p *PlanningState, id string) []*PlanningScope {\\n\\tout := []*PlanningScope{}\\n\\tfor id != \\\"\\\" {\\n\\t\\tscope, err := p.scope(id)\\n\\t\\tif err != nil || len(out) \\u003e 20 {\\n\\t\\t\\treturn nil\\n\\t\\t}\\n\\t\\tout = append(out, scope)\\n\\t\\tid = scope.Parent\\n\\t}\\n\\treturn out\\n}\\nfunc planningScopeTaskCount(w *Work, scope string) int {\\n\\tn := 0\\n\\tfor _, t := range w.Tasks {\\n\\t\\tfor _, owner := range planningAncestors(w.Planning, t.ScopeID) {\\n\\t\\t\\tif owner.ID == scope {\\n\\t\\t\\t\\tn++\\n\\t\\t\\t\\tbreak\\n\\t\\t\\t}\\n\\t\\t}\\n\\t}\\n\\treturn n\\n}\\nfunc checkScopeActivation(p *PlanningState, id string) error {\\n\\tfor _, scope := range planningAncestors(p, id) {\\n\\t\\tlimit := scope.ActivationLimit\\n\\t\\tif limit == 0 {\\n\\t\\t\\tlimit = p.MaxActivations\\n\\t\\t}\\n\\t\\tif scope.Activations \\u003e= limit {\\n\\t\\t\\treturn planningError(\\\"budget_exhausted\\\", fmt.Sprintf(\\\"budget d’activations du périmètre %s atteint\\\", scope.ID))\\n\\t\\t}\\n\\t}\\n\\treturn nil\\n}\\nfunc checkScopeTask(w *Work, id string) error {\\n\\tfor _, scope := range planningAncestors(w.Planning, id) {\\n\\t\\tlimit := scope.TaskLimit\\n\\t\\tif limit == 0 {\\n\\t\\t\\tlimit = w.Planning.MaxTasks\\n\\t\\t}\\n\\t\\tif planningScopeTaskCount(w, scope.ID) \\u003e= limit {\\n\\t\\t\\treturn fmt.Errorf(\\\"budget de tâches du périmètre %s atteint\\\", scope.ID)\\n\\t\\t}\\n\\t}\\n\\treturn nil\\n}\\n\"}"
++    },
++    {
++      "kind": "source",
++      "name": "internal/engine/planning_context.go",
++      "sha256": "357a1b5c8e35a0a276332bf1cb649f867779274d4660d1bbab18291f32fa6c3e",
++      "content": "{\"path\":\"internal/engine/planning_context.go\",\"git_blob\":\"942d142bc889b229be3a6077dac9d7bf53c779bd\",\"sha256\":\"66176ec869f60bded108597cd81b18549a370b7c4dd11cc9903881ac8c605cc9\",\"bytes\":4376,\"content\":\"package engine\\n\\nimport (\\n\\t\\\"encoding/json\\\"\\n\\t\\\"fmt\\\"\\n)\\n\\n// Exact bounded projections: no gate documents or past transcripts are copied\\n// into each activation. Pending events are batched, never marked consumed by\\n// compression. The remainder will cause another activation after this one.\\nfunc planningContext(w Work, id string) ([]byte, error) {\\n\\treturn planningContextLimit(w, id, 8)\\n}\\n\\nfunc planningContextLimit(w Work, id string, eventLimit int) ([]byte, error) {\\n\\tp := w.Planning\\n\\tscope, e := p.scope(id)\\n\\tif e != nil {\\n\\t\\treturn nil, e\\n\\t}\\n\\tevents := []PlanningEvent{}\\n\\tactionable, current, historical := []PlanningEvent{}, []PlanningEvent{}, []PlanningEvent{}\\n\\tfor _, event := range p.Inbox {\\n\\t\\tif event.Scope != id || event.Decision != \\\"\\\" {\\n\\t\\t\\tcontinue\\n\\t\\t}\\n\\t\\tstale, needsAction := false, false\\n\\t\\tif event.Task != \\\"\\\" \\u0026\\u0026 event.Attempt != \\\"\\\" {\\n\\t\\t\\ttask, err := w.task(event.Task)\\n\\t\\t\\tstale = err != nil || !currentTaskAttempt(task, event.Attempt)\\n\\t\\t\\tneedsAction = !stale \\u0026\\u0026 task.Status == \\\"blocked\\\"\\n\\t\\t}\\n\\t\\tif stale {\\n\\t\\t\\thistorical = append(historical, event)\\n\\t\\t} else if needsAction {\\n\\t\\t\\tactionable = append(actionable, event)\\n\\t\\t} else {\\n\\t\\t\\tcurrent = append(current, event)\\n\\t\\t}\\n\\t}\\n\\t// Prioritize blocked current attempts, then other current events, then\\n\\t// historical attempts. Preserve relative order within each group and keep\\n\\t// every event pending until explicitly acknowledged by a decision.\\n\\tpending := len(actionable) + len(current) + len(historical)\\n\\trelevant := map[string]bool{}\\n\\tfor _, event := range append(append(actionable, current...), historical...) {\\n\\t\\tif len(events) \\u003c eventLimit {\\n\\t\\t\\tevents = append(events, event)\\n\\t\\t\\trelevant[event.Task] = true\\n\\t\\t}\\n\\t}\\n\\ttasks := []map[string]any{}\\n\\tcounts := map[string]int{}\\n\\tomitted := 0\\n\\tfor _, task := range w.Tasks {\\n\\t\\tif task.ScopeID != id {\\n\\t\\t\\tcontinue\\n\\t\\t}\\n\\t\\tcounts[task.Status]++\\n\\t\\tif !relevant[task.ID] \\u0026\\u0026 len(tasks) \\u003e= 20 {\\n\\t\\t\\tomitted++\\n\\t\\t\\tcontinue\\n\\t\\t}\\n\\t\\ttasks = append(tasks, map[string]any{\\\"id\\\": task.ID, \\\"title\\\": task.Title, \\\"status\\\": task.Status, \\\"requirements\\\": task.Requirements, \\\"dependencies\\\": task.Depends, \\\"next\\\": guardBlock(task.Next, 1000), \\\"review_coordination\\\": task.ReviewCoordination, \\\"attempts_used\\\": len(task.Attempts), \\\"attempts_max\\\": task.PlanMaxAttempts, \\\"blocker\\\": task.Blocker})\\n\\t}\\n\\trequirements := map[string]string{}\\n\\tfor _, req := range scope.Requirements {\\n\\t\\tfor i, text := range w.Criteria {\\n\\t\\t\\tif req == fmt.Sprintf(\\\"req-%d\\\", i+1) {\\n\\t\\t\\t\\trequirements[req] = text\\n\\t\\t\\t}\\n\\t\\t}\\n\\t}\\n\\t// Rebuild the root's live cycle from durable state; full historical reasons\\n\\t// remain in the work/event log, outside this bounded activation.\\n\\tvar cycle map[string]any\\n\\tif id == \\\"root\\\" \\u0026\\u0026 p.Judge != nil {\\n\\t\\tj := p.Judge\\n\\t\\tcycle = map[string]any{\\\"cycle\\\": j.Cycle, \\\"max_cycles\\\": j.MaxCycles, \\\"verdict\\\": j.Verdict, \\\"reason\\\": j.Reason, \\\"evidence_ref\\\": j.EvidenceRef, \\\"closed\\\": j.Closed, \\\"history_records\\\": len(j.History)}\\n\\t}\\n\\tdelegated := map[string]string{}\\n\\tchildren := []map[string]any{}\\n\\tfor _, child := range p.Scopes {\\n\\t\\tif child.ID != id \\u0026\\u0026 planningScopeWithin(p, child.ID, id) {\\n\\t\\t\\tfor _, req := range child.Requirements {\\n\\t\\t\\t\\tfor i, text := range w.Criteria {\\n\\t\\t\\t\\t\\tif req == fmt.Sprintf(\\\"req-%d\\\", i+1) {\\n\\t\\t\\t\\t\\t\\tdelegated[req] = text\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t}\\n\\t\\t}\\n\\t\\tif child.Parent == id {\\n\\t\\t\\tchildren = append(children, map[string]any{\\\"id\\\": child.ID, \\\"state\\\": child.State, \\\"requirements\\\": child.Requirements})\\n\\t\\t}\\n\\t}\\n\\treturn json.Marshal(map[string]any{\\\"delivery_evidence_contract\\\": deliveryEvidenceBoundary, \\\"global_cycle\\\": cycle, \\\"scope\\\": scope, \\\"requirements\\\": requirements, \\\"events\\\": events, \\\"pending_events_total\\\": pending, \\\"tasks\\\": tasks, \\\"task_counts\\\": counts, \\\"tasks_not_in_projection\\\": omitted, \\\"children\\\": children, \\\"task_capacity_remaining\\\": p.MaxTasks - len(w.Tasks), \\\"delegated_requirements\\\": delegated, \\\"projection_note\\\": \\\"Historique et documents de preuve exclus. Les événements restants seront remis au prochain tour ; next est un extrait d’affichage limité à 1000 caractères. La clôture est contrôlée sur l’état complet.\\\"})\\n}\\n\\nfunc planningScopeWithin(p *PlanningState, ownerID, ancestor string) bool {\\n\\tseen := map[string]bool{}\\n\\tfor !seen[ownerID] {\\n\\t\\tseen[ownerID] = true\\n\\t\\towner, err := p.scope(ownerID)\\n\\t\\tif err != nil {\\n\\t\\t\\treturn false\\n\\t\\t}\\n\\t\\tif owner.ID == ancestor {\\n\\t\\t\\treturn true\\n\\t\\t}\\n\\t\\tif owner.Parent == \\\"\\\" {\\n\\t\\t\\treturn false\\n\\t\\t}\\n\\t\\townerID = owner.Parent\\n\\t}\\n\\treturn false\\n}\\n\"}"
++    },
++    {
++      "kind": "source",
++      "name": "docs/architecture/CURSOR-ENGINE-CONTRACT.md",
++      "sha256": "92df5c4aa3bf6b5a4160b1dd5cfd8820312a6adb67764e7352b1309158b25504",
++      "content": "{\"path\":\"docs/architecture/CURSOR-ENGINE-CONTRACT.md\",\"git_blob\":\"49295a1c2e13e9c2cb711a8ecf80794401110fe7\",\"sha256\":\"c124f521d7938dd5933ffccbd38774ec23fc4bdb6a66ada652a29177645a4988\",\"bytes\":13405,\"content\":\"# Contrat du moteur : références Cursor de janvier et février 2026\\n\\n[English](../en/CURSOR-ENGINE-CONTRACT.md)\\n\\nRéférences retenues : [Cursor — Scaling long-running autonomous coding](https://cursor.com/blog/scaling-agents), 14 janvier 2026, et [Towards self-driving codebases](https://cursor.com/blog/self-driving-codebases), 5 février 2026.\\n\\nClarification utilisateur du 10 octobre 2026 : les deux publications sont retenues. La correction précédente avait exclu février à tort. Janvier reste la référence des exigences JAN-1 à JAN-7 ; février complète l’architecture et explicite son évolution. Les différences entre versions doivent être documentées, sans déclarer une conformité par addition de leurs descriptions. Cette correction documentaire ne modifie pas le moteur.\\n\\nConfirmation lot T1 (10 octobre 2026) : les états « partiel » et « non démontré » ci-dessous ont été recoupés par relecture de code et par exécution réelle de `TestCursorContract*`, `TestManaged*` et `TestPlanning*` (tous `PASS`) ainsi que par une recherche négative de code pour un juge global et une instrumentation de débit. Détail, commandes exactes et décision d'architecture dans le [rapport T1](../plans/engine-cursor-contract/evidence/T1-handoff.md).\\n\\nCe document distingue une règle de conception, son contrôle par le moteur et sa\\npreuve d'exécution. « Conforme Cursor » n'est pas une certification : l'article\\ndécrit une expérience de recherche, avec des compromis. Les tests déterministes\\nde Swarm ne prouvent pas à eux seuls qu'une mission réelle se termine sans aide.\\n\\n## Répartition des responsabilités\\n\\n| Rôle | Responsabilité | Effet autorisé |\\n|---|---|---|\\n| Responsable racine | Possède l'ensemble du besoin ; décompose et adapte le travail. | Décisions structurées de planification, aucune commande de codage. |\\n| Responsable de périmètre | Possède la partie explicitement déléguée ; peut déléguer à son tour dans les bornes. | Tâches et décisions dans son périmètre, aucune commande de codage. |\\n| Exécutant | Réalise une tâche bornée dans sa copie du dépôt. | Modifications locales et remise au responsable propriétaire. |\\n| Vérificateur indépendant | Examine le résultat et les preuves sur la révision candidate. | Avis motivé, sans outil d'écriture ni pouvoir d'autoacceptation. |\\n| Contrôleur déterministe | Exécute les commandes de contrôle et applique les règles de publication. | Reçus, refus et transition atomique si toutes les conditions sont réunies. |\\n\\nLa publication de janvier sépare planificateurs et workers, autorise des sous-planificateurs récursifs et prévoit un juge en fin de cycle, puis un démarrage frais de l’itération suivante. La revue indépendante d’un candidat dans Swarm ne remplace pas ce juge global. Les garanties supplémentaires de preuve et d’acceptation de Swarm doivent être distinguées de ces exigences. L’absence d’un mécanisme démontré de jugement global et de renouvellement des cycles reste un écart à traiter, pas une dérogation autorisée.\\n\\nLes copies isolent les modifications et les références Git. Elles ne constituent\\npas une frontière de sécurité contre un processus malveillant disposant des droits\\ndu compte hôte. Les contrôles décrits ici s'appliquent aux opérations publiques du\\nmoteur ; un administrateur capable de modifier sa base ou ses exécutables reste\\nhors de cette garantie.\\n\\n## Exigences de la référence de janvier à vérifier\\n\\nCette matrice définit la cible ; elle ne décrit pas des fonctions déjà livrées.\\nLes plafonds locaux et les garanties de Swarm ne sont pas des prescriptions de\\nCursor. Toute preuve doit distinguer examen du code, tests simulés et exécution\\navec un fournisseur réel.\\n\\n| ID | Comportement attendu | Preuve attendue | État de cet audit |\\n|---|---|---|---|\\n| JAN-1 | Les planificateurs explorent continuellement le code et créent les tâches. | Montrer les informations du dépôt réellement accessibles au planificateur et une adaptation fondée sur une découverte nouvelle. | Partiel : décisions événementielles présentes ; exploration continue du dépôt non démontrée par un prompt sans outils. |\\n| JAN-2 | La planification peut être récursive et parallèle. | Observer deux sous-planificateurs actifs simultanément, propriétaires de périmètres distincts, puis leurs décisions persistées. | Délégation présente ; parallélisme réel des sous-planificateurs non démontré dans cet audit. |\\n| JAN-3 | Les workers terminent leurs tâches sans coordination directe entre workers et publient leurs changements. | Observer deux tâches indépendantes en parallèle, les refus des canaux latéraux et la remontée de leurs résultats. | Tests ciblés réussis ; chemin d’intégration central de Swarm à distinguer du fonctionnement décrit par Cursor. |\\n| JAN-4 | Un juge de fin de cycle décide si le travail doit continuer. | Verdict portant sur l’objectif et les résultats du cycle, avec décision persistée de poursuite ou de fin. | Implémenté au lot T2 (action `planning.judge`, `internal/engine/planning_judge.go`) et testé par Go (`TestPlanningJudgeVerdictDistinctFromCandidateReview`, `TestPlanningJudgeEndRequiresFreshMatchingCandidate`) : verdict distinct de la revue de candidat, clôture refusée sans candidat attesté correspondant. Recette avec fournisseur réel non faite ce lot. |\\n| JAN-5 | L’itération suivante démarre avec un contexte frais. | Observer le passage entre deux cycles, le nouveau contexte et la conservation de l’objectif, des preuves et des limites. | Implémenté au lot T2 (action `planning.renew`) et testé (`TestPlanningJudgeRenewalPreservesContextAndHistory`) : transition entre deux cycles observée, objectif/exigences/compteurs/historique conservés, seul le verdict vivant est renouvelé. Reste partiel : un seul redémarrage testé par cas, pas une mission longue à répétitions multiples. |\\n| JAN-6 | La coordination permet d’augmenter le débit sans attente centrale excessive. | Mesurer temps de calcul, attente des verrous, contrôles, revue, publication et débit pour plusieurs niveaux de concurrence. | Non mesuré ; plafond de 16 workers par mission et voie de publication sérialisée identifiés. |\\n| JAN-7 | Les prompts et le choix de modèle conviennent à chaque rôle. | Examiner les prompts effectifs et comparer les comportements sur des missions longues avec modèles et coûts identifiés. | Routes distinctes présentes ; adéquation et endurance non démontrées. |\\n\\nLes tests ciblés de coordination réussis le 10 octobre 2026, y compris avec\\n`-race`, ne couvrent pas à eux seuls JAN-1 à JAN-7. Une absence de preuve ne\\nprouve pas une absence de fonction ; elle interdit de déclarer l’alignement\\ncomplet. L’audit du moteur reste à compléter sur ces points.\\n\\n## Apports de février et articulation des deux références\\n\\nFévrier décrit une hiérarchie continue, des copies propres aux workers et des remises au propriétaire. Il retire le juge dans une évolution intermédiaire et l’intégrateur central. JAN-4 et JAN-5 restent des exigences Swarm conservées dans ce cadrage ; elles ne sont pas présentées comme des invariants du système final de février. Comparer une hiérarchie continue avec des points de jugement et des cycles explicites avant de choisir leur articulation.\\n\\n| ID | Complément à vérifier | Preuve attendue | État |\\n|---|---|---|---|\\n| FEB-1 | Propriété récursive et remise au responsable | Retour durable, propriétaire exact, réactivation après redémarrage | Partiel : mécanismes présents, recette réelle à compléter |\\n| FEB-2 | Remise contenant limites et découvertes | Contenu réel exploité dans une décision suivante | Non démontré |\\n| FEB-3 | Fraîcheur pendant le travail continu | Renouvellement observé sans perte d’objectif ni de preuves | Implémenté au lot T2 (action `planning.renew`, même preuve que JAN-5 ci-dessus) : renouvellement sans perte d’objectif, d’exigences, de compteurs ni d’historique de verdicts. Mission longue réelle avec plusieurs renouvellements successifs non rejouée. |\\n| FEB-4 | Débit et compromis de qualité explicites | Mesures et politique distincte de publication validée | Non mesuré ; contrôles Swarm maintenus |\\n\\n## Règles à vérifier dans le moteur\\n\\n| Invariant | Refus attendu | Preuve à conserver |\\n|---|---|---|\\n| Un planificateur ne code pas dans une mission hiérarchique | Un départ explicitement demandé avec rôle planner/subplanner est refusé, jamais transformé silencieusement en worker. | Réponse CLI et HTTP, absence d'agent, de réservation et de copie résiduelle. |\\n| Délégation exclusive | Une exigence déjà confiée ne peut être réattribuée ou traitée par le mauvais responsable. | Décision rejetée, révision et événements non consommés. |\\n| Isolation des exécutants | Deux tentatives n'utilisent pas une même copie pour écrire. | Chemins, références et contenu observés sur deux copies réelles de test. |\\n| Remise au propriétaire | Périmètre étranger, ancienne tentative, fichier d'une autre copie ou empreinte incorrecte sont refusés. | Même état avant/après refus ; retour valide reçu une seule fois par son propriétaire. |\\n| Réactivation | Un retour courant réveille son responsable ; le rejeu ne duplique pas l'événement. | Réouverture du Store, identités de tentative et d'événement conservées. |\\n| Clôture descendante | Un parent ne se ferme pas avec enfant ouvert, tâche inachevée ou preuve périmée. | Refus de clôture sur chaque cas et contrôle des preuves fraîches. |\\n| Acceptation indépendante | Contrôles réussis sans avis favorable, avis périmé, inconnu ou défavorable ne suffisent pas. | SHA candidat, tentative, contrat, contexte de revue et reçus empreintés. |\\n| Reprise bornée | Quota connu, limite atteinte ou appel déjà réservé ne donnent pas droit à une tentative supplémentaire. | Compteurs et historique inchangés, attente durable et motif explicite. |\\n\\nLes détails du quota et de sa levée explicite sont dans le\\n[guide des attentes fournisseur](../PROVIDER-QUOTAS.md).\\n\\nLes anciens lancements manuels sans organisation hiérarchique restent compatibles.\\nIls ne constituent pas une mission autonome démontrant ces propriétés ; le départ\\nautonome exige l'organisation complète.\\n\\n## Ce qui reste à démontrer\\n\\n1. **Qualité des remises.** Le contrat courant transporte des constats et des\\n   artefacts. Il ne rend pas encore obligatoires des champs séparés pour changements,\\n   limites, écarts et décisions attendues. Un bon routage ne prouve pas cette qualité.\\n2. **Autonomie réelle.** Il faut observer un besoin, une délégation, une production,\\n   un refus motivé, une correction et une clôture avec un fournisseur réel. Les\\n   réponses simulées et les interventions de l'hôte sont comptées séparément.\\n3. **Reprise visible.** Après une levée manuelle d'attente sans échéance, les traces\\n   historiques doivent rester consultables sans être présentées comme un nouveau\\n   refus actif. L'autorisation d'un nouvel essai ne garantit pas la disponibilité.\\n4. **Débit et concurrence.** Mesurer le verrou d'intégration pendant contrôles et\\n   revue, ainsi que la taille du contexte cumulatif. La sérialisation actuelle et\\n   le refus de contexte trop grand doivent rester visibles.\\n\\n## Définition de « terminé »\\n\\nUne sortie normale du processus ne suffit pas. Pour un résultat accepté, conserver\\nla révision vérifiée, les commandes réellement exécutées avec dates et codes de\\nsortie, le rapport, l'avis indépendant, la décision, la fraîcheur des preuves, les\\nlivrables et le nombre d'interventions externes. Un correctif écrit par l'hôte peut\\nrenforcer Swarm ; il ne doit pas devenir une réussite autonome inventée dans la\\nmission qui l'évalue.\\n\\n## Taille des preuves et transport du dossier\\n\\nLa limite du prompt de revue reste de 192 Kio, consignes comprises. Le moteur\\nconserve le diff depuis la base, les rapports, les reçus et les sources du même\\ncandidat. Il réduit d'abord les lignes inchangées autour des modifications et\\nretire uniquement les sources nouvelles déjà reproduites intégralement dans le\\ndiff, après comparaison exacte.\\n\\nSi l'échappement JSON dépasse encore la limite, les textes sont transportés en\\nblocs UTF-8 intégraux, identifiés par champ, nombre d'octets et SHA-256. Les autres\\nmétadonnées restent en JSON. Le contexte canonique conservé sur disque et son\\nempreinte ne changent pas. Aucun résumé ne remplace une preuve, aucun changement\\nantérieur n'est retiré du diff. Si ce transport dépasse encore le plafond, la\\nrevue reste bloquée avant tout appel fournisseur. Les tests reconstruisent le\\ndossier dans un processus distinct et comparent tous ses champs au contexte\\nconservé ; ils vérifient aussi le refus d'un dossier réellement trop grand.\\n\\nUn rapport nouveau déjà reproduit intégralement dans le diff peut aussi être\\nréférencé à cet endroit : le moteur exige une identité exacte du texte, et le\\ntransport conserve sa taille et son empreinte. Un rapport modifié ou partiellement\\nprésent reste joint en entier. En cas de refus, le journal indique la taille\\nréelle et la part occupée par les consignes, sans exposer le contenu.\\n\"}"
++    }
++  ]
++}
+diff --git a/internal/engine/testdata/fragment-inspected-needs-native-reply.json b/internal/engine/testdata/fragment-inspected-needs-native-reply.json
+new file mode 100644
+index 0000000..7a7d7e0
+--- /dev/null
++++ b/internal/engine/testdata/fragment-inspected-needs-native-reply.json
+@@ -0,0 +1 @@
++{"candidate_commit":"95e2afb9ca56b48ae2f393396cb2d83e0ba7b309","context_sha256":"f01653114085721584f9ee3ba137fe6271155cb325afe3274e3066f17bca6223","defects":[],"findings":{"0":{"e":0,"n":["applyJudgeVerdict non fourni ici","normalizePlanningChecks non fourni ici","mutateWithHook non fourni ici","planningDeliveryContext non fourni ici"],"r":"cohérent local","v":"inspected"},"1":{"e":0,"n":["managedScopePreview non fourni ici","managedReviewDossier non fourni ici"],"r":"handlers ok ici","v":"inspected"},"2":{"e":0,"n":["localFile non fourni ici","requiredPlanChecks non fourni ici","revalidationGate non fourni ici"],"r":"calcul cohérent","v":"inspected"},"3":{"e":0,"n":["preuve vet absente ou tronquée","commande go vet non consignée ici"],"r":"fichier vide","v":"unknown"},"4":{"e":0,"n":["checkLaunchBudget non fourni ici","type Budget non fourni ici"],"r":"budget correct","v":"inspected"},"5":{"e":0,"n":["currentTaskAttempt non fourni ici","guardBlock non fourni ici"],"r":"projection ok","v":"inspected"},"6":{"e":0,"n":["planning_judge.go absent de ce paquet","tests TestPlanningJudge* non vus ici"],"r":"claims non vus","v":"unknown"}},"packet_sha256":"6cd923093f7f40e7d672a10aa69406410024b367a23ddb73aa406a3936f7feaf"}
+\ No newline at end of file

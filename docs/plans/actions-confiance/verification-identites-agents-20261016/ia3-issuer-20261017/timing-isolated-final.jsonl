@@ -1,0 +1,8 @@
+{"Time":"2026-10-17T10:31:20.590935419+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-17T10:31:20.750854312+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestEngineContractRevisionKillsInferenceOnContractMutation"}
+{"Time":"2026-10-17T10:31:20.75100753+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestEngineContractRevisionKillsInferenceOnContractMutation","Output":"=== RUN   TestEngineContractRevisionKillsInferenceOnContractMutation\n"}
+{"Time":"2026-10-17T10:31:23.000119155+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestEngineContractRevisionKillsInferenceOnContractMutation","Output":"--- PASS: TestEngineContractRevisionKillsInferenceOnContractMutation (2.25s)\n"}
+{"Time":"2026-10-17T10:31:23.000954047+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestEngineContractRevisionKillsInferenceOnContractMutation","Elapsed":2.25}
+{"Time":"2026-10-17T10:31:23.002302064+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"PASS\n"}
+{"Time":"2026-10-17T10:31:23.03546595+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"ok  \tswarm.local/companion/internal/engine\t2.430s\n"}
+{"Time":"2026-10-17T10:31:23.035682197+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Elapsed":2.445}

@@ -1,0 +1,40 @@
+{
+  "records": [
+    {
+      "schema_version": 1,
+      "event": "web-bound",
+      "address": "127.0.0.1:39723",
+      "settings_revision": "1",
+      "runtime_ready": false
+    },
+    {
+      "schema_version": 1,
+      "event": "web-outcome",
+      "outcome": {
+        "schema_version": 1,
+        "status": 200,
+        "error": null,
+        "recorded_work": null,
+        "configuration_may_be_recorded": false
+      }
+    }
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/v1/mission?work=w-bafc8cc3dc9f29c239b9f66a&action=show",
+      "status": 200,
+      "response": {
+        "revision": 11,
+        "paused": false,
+        "autonomy": "autonome",
+        "slots": 1,
+        "consent_enabled": true,
+        "archived": false
+      }
+    }
+  ],
+  "exit": 0,
+  "start": 1792836486.217997,
+  "end": 1792836486.540361
+}

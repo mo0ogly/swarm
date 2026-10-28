@@ -1,0 +1,93 @@
+{
+  "at": "2026-10-12T07:56:33.059273+00:00",
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/paused-settlement26-8vsuigt1",
+  "candidate_digest": "2232f9c7573b2e404cc383ba0b64fdd7c53e5e6ae0a77d9ec7c72e3c960e6150",
+  "checks": [
+    {
+      "state": "finished",
+      "started": "2026-10-12T07:47:28.540720+00:00",
+      "finished": "2026-10-12T07:56:26.415537+00:00",
+      "argv": [
+        "go",
+        "test",
+        "./...",
+        "-count=1",
+        "-timeout=12m"
+      ],
+      "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/paused-settlement26-8vsuigt1",
+      "candidate_digest": "2232f9c7573b2e404cc383ba0b64fdd7c53e5e6ae0a77d9ec7c72e3c960e6150",
+      "manifest_sha256": "a6a466fcc0cf8c8b61fa8f58b2550bd729e553eec27da7fb7466ad17488bb6c2",
+      "frozen_paths": 2119,
+      "wall_seconds": 537.8748136570066,
+      "exit": 0,
+      "output": "/tmp/swarm-paused-settlement26-full.out",
+      "output_sha256": "acbb16575196c3d9d8caa10f28687f4d96929e64556fa72ed48c266681ad68da",
+      "drift": [],
+      "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+    },
+    {
+      "state": "finished",
+      "started": "2026-10-12T07:56:26.904415+00:00",
+      "finished": "2026-10-12T07:56:28.829108+00:00",
+      "argv": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/paused-settlement26-8vsuigt1",
+      "candidate_digest": "2232f9c7573b2e404cc383ba0b64fdd7c53e5e6ae0a77d9ec7c72e3c960e6150",
+      "manifest_sha256": "a6a466fcc0cf8c8b61fa8f58b2550bd729e553eec27da7fb7466ad17488bb6c2",
+      "frozen_paths": 2119,
+      "wall_seconds": 1.9247031139966566,
+      "exit": 0,
+      "output": "/tmp/swarm-paused-settlement26-vet.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "drift": [],
+      "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+    },
+    {
+      "state": "finished",
+      "started": "2026-10-12T07:56:29.231834+00:00",
+      "finished": "2026-10-12T07:56:31.107647+00:00",
+      "argv": [
+        "python3",
+        "tools/agent-workflows/check.py"
+      ],
+      "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/paused-settlement26-8vsuigt1",
+      "candidate_digest": "2232f9c7573b2e404cc383ba0b64fdd7c53e5e6ae0a77d9ec7c72e3c960e6150",
+      "manifest_sha256": "a6a466fcc0cf8c8b61fa8f58b2550bd729e553eec27da7fb7466ad17488bb6c2",
+      "frozen_paths": 2119,
+      "wall_seconds": 1.875849713003845,
+      "exit": 0,
+      "output": "/tmp/swarm-paused-settlement26-methods.out",
+      "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+      "drift": [],
+      "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+    },
+    {
+      "state": "finished",
+      "started": "2026-10-12T07:56:31.515563+00:00",
+      "finished": "2026-10-12T07:56:32.783695+00:00",
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/tmp/swarm-qualified26-build",
+        "./cmd/swarm"
+      ],
+      "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/paused-settlement26-8vsuigt1",
+      "candidate_digest": "2232f9c7573b2e404cc383ba0b64fdd7c53e5e6ae0a77d9ec7c72e3c960e6150",
+      "manifest_sha256": "a6a466fcc0cf8c8b61fa8f58b2550bd729e553eec27da7fb7466ad17488bb6c2",
+      "frozen_paths": 2119,
+      "wall_seconds": 1.2681285969883902,
+      "exit": 0,
+      "output": "/tmp/swarm-paused-settlement26-build.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "drift": [],
+      "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance.",
+      "binary_sha256": "78a21c7afd053d1cd81bb42657d76b67d23dc1150918e5bb4fd6e4e39ed274a5"
+    }
+  ],
+  "result": "PASS local qualification",
+  "limits": "Primary/runtime unchanged; public installation, reception, decision and effect remain required."
+}

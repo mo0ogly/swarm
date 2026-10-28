@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "citation-diagnostic-pause-24316d6be4e8",
+  "expected_revision": 369,
+  "reason": "Hold new review reservations while Codex reproduces repeated literal-citation failures and adds attributed exact-original diagnostic feedback. Preserve current candidate, all replies and spending; resume after verified correction."
+}

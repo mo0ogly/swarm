@@ -1,0 +1,254 @@
+{
+  "at_utc": "2026-10-16T10:32:09.788476+00:00",
+  "git_head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "scope": "M10 dialogue turn confirmation; no full conversation restoration",
+  "source_sha256": {
+    "internal/engine/agent_dialogue.go": "307a68e2c145fdda8f3f6fe6d4dabc31422a13172df513c8b6014b9b074e8f23",
+    "internal/engine/agent_dialogue_test.go": "bea4c518cbc84f49b341c99ed2c7127bb51103a81ba0201af6f3c059fbcff0b1",
+    "internal/engine/dialogue_turn_outcome.go": "b31f309f3fee39d0d12e7828bb49e475412782156b6d14c53201a7a1c37269d3",
+    "internal/engine/dialogue_receipt_test.go": "d8bdc6d008099aa7ee41527c726538eb2262b754152515e0cd501797f46889b3",
+    "internal/engine/dialogue_supervisor_receipt_test.go": "1b1904a50741d24868f7844eeb5f8de746d461731f483f0c40aad76106ca873a",
+    "docs/PROJECT-MEMORY.md": "60a0ca32cf41626c6ed25c53f778a497a889d43524a01324eb6a205f0b64feda",
+    "docs/en/PROJECT-MEMORY.md": "66ed08d06ebd972fa801410d102810270654ecd383a83c761e21dfcee614b222",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-06.md": "abb3a53f5af4f8439a591f91263089a5479ebcc40a0f8a5e13f2c35479014995",
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-06.md": "91f22e181599230d3a395897a55da588db58eaf62e9a78c711bfd0dce730b298",
+    "docs/plans/deepagents-integration/PLAN.md": "e8c87ecbd27ee8a9f4c9a91825fef542f098e2dc39f65dba18abd8711ee9495f",
+    "docs/plans/deepagents-integration/cas-evaluation.json": "c4cf42dfd7c8ae36279cf5ebbaf6f03f2ace8848afa14c3a2a2c9094567e08c5"
+  },
+  "bound_input_count": 1004,
+  "changed_compilation_inputs": [],
+  "checks": [
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "argv": [
+        "gofmt",
+        "-l",
+        "internal/engine/agent_dialogue.go",
+        "internal/engine/agent_dialogue_test.go",
+        "internal/engine/dialogue_turn_outcome.go",
+        "internal/engine/dialogue_receipt_test.go",
+        "internal/engine/dialogue_supervisor_receipt_test.go"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "internal/engine/dialogue_turn_outcome.go"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "internal/engine/dialogue_receipt_test.go"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "internal/engine/dialogue_supervisor_receipt_test.go"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/PROJECT-MEMORY.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/en/PROJECT-MEMORY.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-06.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-06.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/plans/deepagents-integration/PLAN.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/plans/deepagents-integration/cas-evaluation.json"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    }
+  ],
+  "local_links_checked": 5,
+  "link_errors": [],
+  "receipt_assessment": {
+    "dialogue-receipt-green": {
+      "receipt_sha256": "df918d0999af4b0f52c58673d820581c3ff1280d59eba4b7793fb01d5fe94548",
+      "log_sha256": "3ff74708fb87b949175b1cc4363d427772c733fb5d13d553c767704ff53e0ab0",
+      "named_tests": [
+        "TestDialogueCumulativeToolsAndIdle",
+        "TestDialogueResumeIdentityAndPermissions",
+        "TestDialogueUsageSnapshotDoesNotMutate",
+        "TestDialogueIncompleteTurnCannotBeAnswered",
+        "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+        "TestDialogueCompletionRejectsContradictoryAndPrivateFailures",
+        "TestDialogueConfirmationStorageFailureBlocksContinuation",
+        "TestStructuredProviderFailurePreservesSafeCause"
+      ],
+      "subtest_runs": 16
+    },
+    "dialogue-public": {
+      "receipt_sha256": "556666f7d39d3cf40ec05119f0b7b6e3f2e51da7586a795652fb0c7daf089b76",
+      "log_sha256": "c19d450683ac51d94bd3faa99e1be89da4140bde41851979ad2599b15aa7d435",
+      "named_tests": [
+        "TestDialogueProtocolRejectsReplayAndUnconfirmedEOF",
+        "TestDialogueActualSupervisorConfirmsTurnReceipts"
+      ],
+      "subtest_runs": 6
+    },
+    "dialogue-race": {
+      "receipt_sha256": "57e21760bd2451c9cb73632e9797cde777156c865bc863f45ac9b9dca364498f",
+      "log_sha256": "cb1bc24fb30941097cb42b342fe8575abc6eacd8275dd50da66c09b13da4f18b",
+      "named_tests": [
+        "TestDialogueUsageSnapshotDoesNotMutate",
+        "TestDialogueIncompleteTurnCannotBeAnswered",
+        "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+        "TestDialogueCompletionRejectsContradictoryAndPrivateFailures",
+        "TestDialogueConfirmationStorageFailureBlocksContinuation",
+        "TestDialogueProtocolRejectsReplayAndUnconfirmedEOF"
+      ],
+      "subtest_runs": 15
+    },
+    "engine-vet": {
+      "receipt_sha256": "6df9c8154f01c45db1ad0f918c8af3d807e66e76170b4fe707e3a4b331fd1dbe",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "named_tests": [],
+      "subtest_runs": 0
+    }
+  },
+  "distinct_named_tests": [
+    "TestDialogueActualSupervisorConfirmsTurnReceipts",
+    "TestDialogueCompletionRejectsContradictoryAndPrivateFailures",
+    "TestDialogueConfirmationStorageFailureBlocksContinuation",
+    "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+    "TestDialogueCumulativeToolsAndIdle",
+    "TestDialogueIncompleteTurnCannotBeAnswered",
+    "TestDialogueProtocolRejectsReplayAndUnconfirmedEOF",
+    "TestDialogueResumeIdentityAndPermissions",
+    "TestDialogueUsageSnapshotDoesNotMutate",
+    "TestStructuredProviderFailurePreservesSafeCause"
+  ],
+  "red_source_bound": true,
+  "evidence_sha256": {
+    "actual-supervisor/provider_failure.json": "9d9939cc62f6fc1ad15c4b1c43607d9560fd299f5860fc3bf502f8b3e4265acd",
+    "actual-supervisor/tool_result_missing.json": "145eab22db677318e1230a3d4efe0d886d8583df86873de160e3662547ab3926",
+    "actual-supervisor/two_confirmed_turns.json": "36601cf08cd02cef58eb1127a7fc42d1c3ea19992c811dfcb9c6e2fdf9b8ff58",
+    "baseline.json": "e127e9a1c61fcada8036646ca6191cf116b5f36eb7bbcb1395503940da03c40f",
+    "candidate-inputs-before-green.json": "83ea3a53ccc0e7ae46a58ea04b910842140b956cc486992f23057715217df11c",
+    "candidate-inputs-before-public.json": "94a6bf8911f17c2323906cc450419b624f1077519afa1dd7877811658eff8e22",
+    "candidate-inputs-before-static.json": "94a6bf8911f17c2323906cc450419b624f1077519afa1dd7877811658eff8e22",
+    "dialogue-public.json": "556666f7d39d3cf40ec05119f0b7b6e3f2e51da7586a795652fb0c7daf089b76",
+    "dialogue-public.log": "c19d450683ac51d94bd3faa99e1be89da4140bde41851979ad2599b15aa7d435",
+    "dialogue-race.json": "57e21760bd2451c9cb73632e9797cde777156c865bc863f45ac9b9dca364498f",
+    "dialogue-race.log": "cb1bc24fb30941097cb42b342fe8575abc6eacd8275dd50da66c09b13da4f18b",
+    "dialogue-receipt-green.json": "df918d0999af4b0f52c58673d820581c3ff1280d59eba4b7793fb01d5fe94548",
+    "dialogue-receipt-green.log": "3ff74708fb87b949175b1cc4363d427772c733fb5d13d553c767704ff53e0ab0",
+    "dialogue-receipt-red-short-root.json": "9bb2f41c36a07c8e5e614c0aae29c436da0d7a63d6449a3e0e410657af439462",
+    "dialogue-receipt-red-short-root.log": "39d54ad4fab54bf64a4d18965b4c3686a3305e46164c77a87f199d68e1afd2b4",
+    "dialogue-receipt-red.json": "100fdd8ba9a1f3c0d1d1a27592bbec549b73165daf0f551f2f1720f053f0f635",
+    "dialogue-receipt-red.log": "6aec5b0a6c7c5803f2aaf5ab842ac107dd75cb4353b4e2a3b5d89a6961f373bc",
+    "engine-vet.json": "6df9c8154f01c45db1ad0f918c8af3d807e66e76170b4fe707e3a4b331fd1dbe",
+    "engine-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m10-changes.patch": "68e2527ff11b5dfc96d1305ea5d10000302665d1c947dfb7b9a5246239e3ea63",
+    "method-observations.json": "9c1e9675c1af6cb0426af7bc9ffc3b39b6643f6b9971ee24bff664a8e25bf7be",
+    "preimages/dialogue_receipt_red_test.go.txt": "b9faa6da3dc881f62324f5d5e844ee6791f9efc65632d05a549e69cf21eac6c1",
+    "preimages/docs__PROJECT-MEMORY.md.txt": "76029f8bd8187fb12c3cac38a8b126631956e1d0e65a981b9a62be8d2d2990d5",
+    "preimages/docs__en__PROJECT-MEMORY.md.txt": "5649569a6d6ce7c5781d0591d3eb015b68cd3f70d7b2a6144896e44274eed645",
+    "preimages/internal__engine__agent_dialogue.go.txt": "9560564e0c409e446e33f4f14055251e42d6beac1b804fb859b631f1b600b25c",
+    "preimages/internal__engine__agent_dialogue_test.go.txt": "199b3d13ec7107e14b1986d222405ab33a73760e8ab50d87bdb1d38d82328869",
+    "preimages/internal__engine__agent_terminal_process.go.txt": "3521a9313a5ef4df6ef7fec296d13d72e58627c0c9f625efdf4759635060dee9"
+  },
+  "review": "local implementation-context review; not independent acceptance",
+  "real_model_calls": 0,
+  "deployed": false,
+  "full_provider_restart": "NOT IMPLEMENTED / NOT TESTED"
+}

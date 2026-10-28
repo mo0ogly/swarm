@@ -1,0 +1,18 @@
+{
+  "status": "LOCAL_VERIFIED",
+  "binary": ".cache/rust-migration-binaries/swarm-rust-f8c3ee20ca93948006c2265540385d16bee7447999de7a6005f4a920d81efbe1",
+  "binary_sha256": "f8c3ee20ca93948006c2265540385d16bee7447999de7a6005f4a920d81efbe1",
+  "effective_inputs": 340,
+  "normal_profile": "normal1373/result.json",
+  "unit_tests_passed": 15,
+  "public_recipe_assertions": 8,
+  "recipe_integrity": "VERIFIED",
+  "same_original_root_recovery": "same-root1376/result.json",
+  "clippy_passed": true,
+  "rustdoc_passed": true,
+  "source_review": "normal1373/source-review-result.json",
+  "independent_acceptance": false,
+  "managed_worker_execution": false,
+  "installed": false,
+  "global_watchdog": null
+}

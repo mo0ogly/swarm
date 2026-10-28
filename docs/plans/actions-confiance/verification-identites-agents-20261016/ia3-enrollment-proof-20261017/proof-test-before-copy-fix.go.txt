@@ -1,0 +1,392 @@
+package enrollmentproof
+
+import (
+	"bytes"
+	"crypto/ed25519"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/json"
+	"errors"
+	"io"
+	"sync"
+	"testing"
+)
+
+func fixture(t *testing.T) (*Verifier, ed25519.PrivateKey, *Challenge, []byte) {
+	t.Helper()
+	pub, priv, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	v, err := NewVerifier(pub, sha256.Sum256([]byte("project fixture")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err := v.NewChallenge(sha256.Sum256([]byte("entire resolved publication fixture")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	payload := []byte(`{"enrollment":"fixture-only","state":"active"}`)
+	raw, err := SignResponse(c.Request(), payload, priv)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return v, priv, c, raw
+}
+
+func TestPinnedKeyBindingAndOwnedPayload(t *testing.T) {
+	v, key, c, raw := fixture(t)
+	statement, err := v.Verify(c, raw)
+	if err != nil || !bytes.Equal(statement.Payload(), []byte(`{"enrollment":"fixture-only","state":"active"}`)) || statement.Request() != c.Request() {
+		t.Fatal("exact signed payload/context lost: ", err)
+	}
+	owned := statement.Payload()
+	owned[0] = '!'
+	if statement.Payload()[0] != '{' {
+		t.Fatal("statement payload is aliased")
+	}
+	if _, err = v.Verify(c, raw); !errors.Is(err, ErrSpent) {
+		t.Fatal("valid replay accepted: ", err)
+	}
+	// Mutating the constructor's key input cannot change the trusted pin.
+	pub := append(ed25519.PublicKey(nil), key.Public().(ed25519.PublicKey)...)
+	verifier, err := NewVerifier(pub, v.project)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pub[0] ^= 1
+	challenge, err := verifier.NewChallenge(sha256.Sum256([]byte("other request")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	signed, err := SignResponse(challenge.Request(), nil, key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	empty, err := verifier.Verify(challenge, signed)
+	if err != nil || len(empty.Payload()) != 0 {
+		t.Fatal("public-key input retained an alias: ", err)
+	}
+}
+
+func TestResponseNullIsNotAString(t *testing.T) {
+	v, key, c, _ := fixture(t)
+	raw, err := SignResponse(c.Request(), nil, key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	malformed := bytes.Replace(raw, []byte(`"payload":""`), []byte(`"payload":null`), 1)
+	if bytes.Equal(raw, malformed) {
+		t.Fatal("fixture did not alter the envelope")
+	}
+	if _, err = v.Verify(c, malformed); !errors.Is(err, ErrResponse) {
+		t.Fatal("null became a successful empty signed payload: ", err)
+	}
+	if _, err = v.Verify(c, raw); err != nil {
+		t.Fatal("invalid input consumed the challenge: ", err)
+	}
+}
+
+func TestResponseRejectsMalformedAndUnboundInputs(t *testing.T) {
+	variants := []struct {
+		name string
+		edit func(response) []byte
+	}{
+		{"payload-tamper", func(r response) []byte {
+			r.Payload = base64.RawURLEncoding.EncodeToString([]byte("forged"))
+			raw, _ := json.Marshal(r)
+			return raw
+		}},
+		{"signature-tamper", func(r response) []byte {
+			r.Signature = base64.RawURLEncoding.EncodeToString(make([]byte, ed25519.SignatureSize))
+			raw, _ := json.Marshal(r)
+			return raw
+		}},
+		{"wrong-challenge", func(r response) []byte {
+			r.Challenge = string(bytes.Repeat([]byte("1"), 64))
+			raw, _ := json.Marshal(r)
+			return raw
+		}},
+		{"protocol", func(r response) []byte { r.Protocol = "another-protocol"; raw, _ := json.Marshal(r); return raw }},
+		{"unknown-key", func(r response) []byte {
+			raw, _ := json.Marshal(r)
+			return append(raw[:len(raw)-1], []byte(`,"authority_key":"self-declared"}`)...)
+		}},
+		{"duplicate-key", func(r response) []byte {
+			raw, _ := json.Marshal(r)
+			return append(raw[:len(raw)-1], []byte(`,"payload":""}`)...)
+		}},
+		{"case-folded-key", func(r response) []byte {
+			raw, _ := json.Marshal(r)
+			return bytes.Replace(raw, []byte(`"payload"`), []byte(`"Payload"`), 1)
+		}},
+		{"missing-key", func(r response) []byte {
+			raw, _ := json.Marshal(r)
+			var m map[string]any
+			json.Unmarshal(raw, &m)
+			delete(m, "signature")
+			raw, _ = json.Marshal(m)
+			return raw
+		}},
+		{"trailing-object", func(r response) []byte { raw, _ := json.Marshal(r); return append(raw, []byte(` {}`)...) }},
+		{"array", func(response) []byte { return []byte(`[]`) }},
+		{"null", func(response) []byte { return []byte(`null`) }},
+		{"empty", func(response) []byte { return nil }},
+		{"numeric-value", func(r response) []byte {
+			raw, _ := json.Marshal(r)
+			return bytes.Replace(raw, []byte(`"protocol":"`+protocol+`"`), []byte(`"protocol":1`), 1)
+		}},
+		{"nested-value", func(r response) []byte {
+			raw, _ := json.Marshal(r)
+			return bytes.Replace(raw, []byte(`"protocol":"`+protocol+`"`), []byte(`"protocol":{}`), 1)
+		}},
+	}
+	for _, variant := range variants {
+		t.Run(variant.name, func(t *testing.T) {
+			v, _, c, valid := fixture(t)
+			var r response
+			if err := json.Unmarshal(valid, &r); err != nil {
+				t.Fatal(err)
+			}
+			statement, err := v.Verify(c, variant.edit(r))
+			if err == nil || len(statement.Payload()) != 0 {
+				t.Fatal("invalid response gained a statement")
+			}
+			if _, err = v.Verify(c, valid); err != nil {
+				t.Fatal("denial consumed valid challenge: ", err)
+			}
+		})
+	}
+}
+
+func TestFreshChallengeAndConcurrentReplay(t *testing.T) {
+	v, _, c, raw := fixture(t)
+	other, err := v.NewChallenge(sha256.Sum256([]byte("entire resolved publication fixture")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if other.Request().Nonce == c.Request().Nonce {
+		t.Fatal("challenges reused their nonce")
+	}
+	if _, err = v.Verify(other, raw); !errors.Is(err, ErrBinding) {
+		t.Fatal("previous challenge replay accepted: ", err)
+	}
+	const callers = 16 // Test sample size, not an execution policy.
+	var wg sync.WaitGroup
+	results := make(chan error, callers)
+	for i := 0; i < callers; i++ {
+		wg.Add(1)
+		go func() { defer wg.Done(); _, err := v.Verify(c, raw); results <- err }()
+	}
+	wg.Wait()
+	close(results)
+	success, spent := 0, 0
+	for err := range results {
+		if err == nil {
+			success++
+		} else if errors.Is(err, ErrSpent) {
+			spent++
+		} else {
+			t.Fatal(err)
+		}
+	}
+	if success != 1 || spent != callers-1 {
+		t.Fatalf("local replay effects: success=%d spent=%d", success, spent)
+	}
+}
+
+func TestContextAndKeyCannotComeFromResponse(t *testing.T) {
+	v, key, c, raw := fixture(t)
+	if _, err := NewVerifier(nil, v.project); !errors.Is(err, ErrKey) {
+		t.Fatal(err)
+	}
+	other, err := NewVerifier(key.Public().(ed25519.PublicKey), v.project)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = other.Verify(c, raw); !errors.Is(err, ErrChallenge) {
+		t.Fatal("challenge transferred across verifier owners: ", err)
+	}
+	if _, err = v.Verify(nil, raw); !errors.Is(err, ErrChallenge) {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"project", "request", "nonce", "key"} {
+		t.Run(name, func(t *testing.T) {
+			v, key, c, _ := fixture(t)
+			r := c.Request()
+			switch name {
+			case "project":
+				r.ProjectDigest = string(bytes.Repeat([]byte("2"), 64))
+			case "request":
+				r.RequestDigest = string(bytes.Repeat([]byte("3"), 64))
+			case "nonce":
+				r.Nonce = base64.RawURLEncoding.EncodeToString(make([]byte, 32))
+			case "key":
+				_, key, _ = ed25519.GenerateKey(rand.Reader)
+				r.KeyID = keyID(key.Public().(ed25519.PublicKey))
+			}
+			signed, err := SignResponse(r, nil, key)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err = v.Verify(c, signed); err == nil {
+				t.Fatal("different context/key accepted")
+			}
+		})
+	}
+}
+
+func TestProducerRejectsMalformedChallengeAndMissingEntropy(t *testing.T) {
+	v, key, c, _ := fixture(t)
+	if _, err := v.newChallenge(sha256.Sum256(nil), bytes.NewReader(nil)); !errors.Is(err, io.EOF) {
+		t.Fatal("entropy failure ignored: ", err)
+	}
+	var absent *Verifier
+	if _, err := absent.NewChallenge(sha256.Sum256(nil)); !errors.Is(err, ErrKey) {
+		t.Fatal(err)
+	}
+	if _, err := SignResponse(c.Request(), nil, nil); !errors.Is(err, ErrKey) {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"protocol", "key", "project", "request", "nonce"} {
+		t.Run(name, func(t *testing.T) {
+			r := c.Request()
+			switch name {
+			case "protocol":
+				r.Protocol = "bad"
+			case "key":
+				r.KeyID = "bad"
+			case "project":
+				r.ProjectDigest = "bad"
+			case "request":
+				r.RequestDigest = "bad"
+			case "nonce":
+				r.Nonce = "bad"
+			}
+			if _, err := SignResponse(r, nil, key); !errors.Is(err, ErrChallenge) {
+				t.Fatal("malformed request signed: ", err)
+			}
+		})
+	}
+}
+
+func TestAuthenticityDoesNotAttestCurrentEnrollment(t *testing.T) {
+	v, _, c, raw := fixture(t)
+	// The service could revoke its record after signing this response. There
+	// is deliberately no freshness lease, clock or live source in this package.
+	statement, err := v.Verify(c, raw)
+	if err != nil || !bytes.Contains(statement.Payload(), []byte(`"state":"active"`)) {
+		t.Fatal(err)
+	}
+	// Passing this assertion proves only the documented limit: the consumer
+	// must not promote a valid Statement into current authorization.
+}
+
+func TestRejectSignedMalformedPayloadEncoding(t *testing.T) {
+	v, key, c, valid := fixture(t)
+	var r response
+	if err := json.Unmarshal(valid, &r); err != nil {
+		t.Fatal(err)
+	}
+	r.Payload = "=invalid-base64="
+	r.Signature = base64.RawURLEncoding.EncodeToString(ed25519.Sign(key, signedBytes(r)))
+	raw, err := json.Marshal(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = v.Verify(c, raw); !errors.Is(err, ErrResponse) {
+		t.Fatal("signed malformed encoding accepted: ", err)
+	}
+	if _, err = v.Verify(c, valid); err != nil {
+		t.Fatal("bad encoding consumed challenge: ", err)
+	}
+}
+
+func TestCapturedResponseCannotBeReboundToNewChallenge(t *testing.T) {
+	v, key, old, captured := fixture(t)
+	next, err := v.NewChallenge(sha256.Sum256([]byte("entire resolved publication fixture")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var r response
+	if err = json.Unmarshal(captured, &r); err != nil {
+		t.Fatal(err)
+	}
+	r.Challenge = digestRequest(next.Request())
+	forged, err := json.Marshal(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = v.Verify(next, forged); !errors.Is(err, ErrSignature) {
+		t.Fatal("captured signature rebound to new challenge: ", err)
+	}
+	valid, err := SignResponse(next.Request(), []byte("new statement"), key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = v.Verify(next, valid); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = v.Verify(old, captured); err != nil {
+		t.Fatal("separate original challenge was consumed: ", err)
+	}
+}
+
+func TestValidSignatureFromUnpinnedKeyIsRejected(t *testing.T) {
+	v, _, c, raw := fixture(t)
+	_, untrusted, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var r response
+	if err = json.Unmarshal(raw, &r); err != nil {
+		t.Fatal(err)
+	}
+	r.Signature = base64.RawURLEncoding.EncodeToString(ed25519.Sign(untrusted, signedBytes(r)))
+	forged, err := json.Marshal(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = v.Verify(c, forged); !errors.Is(err, ErrSignature) {
+		t.Fatal("unpinned source gained trust: ", err)
+	}
+	if _, err = v.Verify(c, raw); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSignatureDomainSeparation(t *testing.T) {
+	v, key, c, raw := fixture(t)
+	var r response
+	if err := json.Unmarshal(raw, &r); err != nil {
+		t.Fatal(err)
+	}
+	r.Signature = ""
+	unsigned, err := json.Marshal(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r.Signature = base64.RawURLEncoding.EncodeToString(ed25519.Sign(key, append([]byte("other-protocol\x00response\x00"), unsigned...)))
+	forged, err := json.Marshal(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = v.Verify(c, forged); !errors.Is(err, ErrSignature) {
+		t.Fatal("foreign protocol signature accepted: ", err)
+	}
+	if _, err = v.Verify(c, raw); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestChallengeValueCopyCannotDuplicateConsumption(t *testing.T) {
+	v, _, original, raw := fixture(t)
+	copied := *original
+	if _, err := v.Verify(original, raw); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := v.Verify(&copied, raw); !errors.Is(err, ErrSpent) {
+		t.Fatal("copied challenge duplicated consumption: ", err)
+	}
+}

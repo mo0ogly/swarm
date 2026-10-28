@@ -5,21 +5,19 @@ SWARM_OUTPUT ?= bin/swarm
 build:
 	sh ./build.sh "$(SWARM_OUTPUT)"
 test:
-	python3 tests/supervision_go_suite.py
+	cargo test --manifest-path rust/Cargo.toml --locked --workspace --lib
 	npm test
 frontend:
 	cd frontend && npm ci --ignore-scripts --no-audit --no-fund && npm run build
 smoke: build
-	SWARM_BINARY="$(CURDIR)/bin/swarm" python3 tests/smoke.py
+	python3 tests/rust_native_http_cli.py --binary "$(abspath $(SWARM_OUTPUT))" --output .cache/native-smoke-$$(date +%s)-$$$$
 
 # Requires a local Docker Engine and a checkout without deploy/install.env.
 test-install:
-	python3 tests/install_smoke.py
+	python3 tests/rust_native_install.py --output .cache/install-native-$$(date +%s)-$$$$
+	python3 tests/rust_docker_install.py --output .cache/install-docker-$$(date +%s)-$$$$
 
 # Deterministic agent processes: no paid model or API calls.
 .PHONY: test-process
 test-process: build
-	python3 tests/automatic_validation_process.py bin/swarm test-results/process-validation
-	python3 tests/organized_coordination_process.py bin/swarm test-results/process-team nominal
-	python3 tests/organized_coordination_process.py bin/swarm test-results/process-shared shared
-	python3 tests/organized_coordination_process.py bin/swarm test-results/process-restart restart
+	SWARM_STATUS_CONTRACT_BINARY="$(abspath $(SWARM_OUTPUT))" python3 tools/verification/recipe.py run --recipe tools/verification/recipes/agent-logs-status-rust.json --output .cache/native-process-$$(date +%s)-$$$$

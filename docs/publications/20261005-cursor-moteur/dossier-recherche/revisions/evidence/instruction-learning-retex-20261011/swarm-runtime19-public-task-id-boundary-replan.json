@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-11T18:24:42.402375+00:00",
+  "observed": "Compact operator inspection wrongly assumed task id T3; public task IDs include plan prefix. Read-only StopIteration, no mutation.",
+  "correction": "Discover actual public IDs and match recorded plan suffix before any CAS update.",
+  "revision": 447,
+  "task_ids": [
+    "plan-ca937edf4e-T1",
+    "plan-ca937edf4e-T2",
+    "plan-ca937edf4e-T3",
+    "plan-ca937edf4e-T4",
+    "plan-ca937edf4e-T5",
+    "plan-ca937edf4e-T6",
+    "plan-ca937edf4e-T7",
+    "plan-ca937edf4e-T8"
+  ]
+}

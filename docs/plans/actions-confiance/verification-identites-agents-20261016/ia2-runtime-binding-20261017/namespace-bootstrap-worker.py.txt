@@ -1,0 +1,3 @@
+import os,json,sys
+print(json.dumps({"pid":os.getpid(),"namespaces":{n:os.readlink("/proc/self/ns/"+n) for n in ("pid","mnt","user")}}),flush=True)
+sys.stdin.readline()

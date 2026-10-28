@@ -1,0 +1,7 @@
+{
+  "at_utc": "2026-10-16T20:07:39.249221+00:00",
+  "reason": "Source freshness must also be checked by the actual supervisor immediately before starting the provider.",
+  "files": {
+    "internal/engine/agents_process.go": "1392f83d5062e846daf46b1c0458ad94d8278978726ade2ac0ad270c1890011f"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "error": "budget insuffisant : 3 inspections et 2 appels finaux pour 4 disponibles",
+  "failure": {
+    "code": "command_failed",
+    "message": "budget insuffisant : 3 inspections et 2 appels finaux pour 4 disponibles",
+    "retryable": false
+  },
+  "schema_version": 1
+}

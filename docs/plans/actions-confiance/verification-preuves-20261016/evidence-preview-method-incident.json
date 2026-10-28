@@ -1,0 +1,12 @@
+{
+  "observed_error": "NameError: name urllib is not defined",
+  "original_exit_code": 1,
+  "original_script": "preview-update-original.py",
+  "old_pid": 2220608,
+  "new_pid": 2414607,
+  "new_start_ticks": "4246332",
+  "recovery": "identified existing exact project argv/start/binary hash; resumed HTTP verification only",
+  "additional_server_started_during_recovery": false,
+  "business_state_unchanged": "d3b01d34c5c750ca91cbe1591ccd1c978ecb3a52a6416ffbbb0d610cfddd48c1",
+  "lesson": "write owned process identity immediately after spawn, then update verification status separately"
+}

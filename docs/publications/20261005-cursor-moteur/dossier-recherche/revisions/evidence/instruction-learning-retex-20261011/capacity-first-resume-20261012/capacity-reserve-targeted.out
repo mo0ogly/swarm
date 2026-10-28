@@ -1,0 +1,51 @@
+=== RUN   TestCandidateFragmentsUseObservedCapacityBeforeLegacyIndivisibleRefusal
+    managed_review_capacity_first_test.go:15: sizes 164551 168167 21899 parts 1
+--- PASS: TestCandidateFragmentsUseObservedCapacityBeforeLegacyIndivisibleRefusal (1.85s)
+=== RUN   TestFreshCapacityFragmentsRetainRefusals
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/calls
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/bytes
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/tokens
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/invalid-capacity
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/missing
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/duplicate
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/binary
+--- PASS: TestFreshCapacityFragmentsRetainRefusals (0.67s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/calls (0.00s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/bytes (0.09s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/tokens (0.54s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/invalid-capacity (0.00s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/missing (0.01s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/duplicate (0.01s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/binary (0.01s)
+=== RUN   TestFreshCapacityFragmentsPreserveCoordination
+--- PASS: TestFreshCapacityFragmentsPreserveCoordination (3.12s)
+=== RUN   TestMeasuredFinalCapacityCountsVariableFieldsOnce
+--- PASS: TestMeasuredFinalCapacityCountsVariableFieldsOnce (0.35s)
+=== RUN   TestMeasuredFinalReserveContractRejectsUnknownVersion
+--- PASS: TestMeasuredFinalReserveContractRejectsUnknownVersion (0.00s)
+=== RUN   TestCoordinatedFragmentsCoverageAndBudget
+=== RUN   TestCoordinatedFragmentsCoverageAndBudget/omission
+=== RUN   TestCoordinatedFragmentsCoverageAndBudget/order
+=== RUN   TestCoordinatedFragmentsCoverageAndBudget/scope
+=== RUN   TestCoordinatedFragmentsCoverageAndBudget/criteria
+=== RUN   TestCoordinatedFragmentsCoverageAndBudget/stale
+--- PASS: TestCoordinatedFragmentsCoverageAndBudget (0.91s)
+    --- PASS: TestCoordinatedFragmentsCoverageAndBudget/omission (0.05s)
+    --- PASS: TestCoordinatedFragmentsCoverageAndBudget/order (0.05s)
+    --- PASS: TestCoordinatedFragmentsCoverageAndBudget/scope (0.04s)
+    --- PASS: TestCoordinatedFragmentsCoverageAndBudget/criteria (0.04s)
+    --- PASS: TestCoordinatedFragmentsCoverageAndBudget/stale (0.04s)
+=== RUN   TestCoordinatedTokenPackingKeepsLotBoundaries
+--- PASS: TestCoordinatedTokenPackingKeepsLotBoundaries (5.34s)
+=== RUN   TestManagedFragmentDecisionCapacityBoundsActual
+--- PASS: TestManagedFragmentDecisionCapacityBoundsActual (0.35s)
+=== RUN   TestManagedFragmentDecisionCapacityCoversSerializedLocalDefects
+--- PASS: TestManagedFragmentDecisionCapacityCoversSerializedLocalDefects (0.36s)
+=== RUN   TestManagedFragmentTokenPlanPreservesLegacyAndEvidence
+--- PASS: TestManagedFragmentTokenPlanPreservesLegacyAndEvidence (5.23s)
+=== RUN   TestManagedFragmentTokenPlanKeepsHistoricalObligations
+--- PASS: TestManagedFragmentTokenPlanKeepsHistoricalObligations (2.21s)
+=== RUN   TestReviewInputTokensRejectUnsupportedOrUnderreservedContract
+--- PASS: TestReviewInputTokensRejectUnsupportedOrUnderreservedContract (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	20.451s

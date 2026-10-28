@@ -1,0 +1,70 @@
+{
+  "at_utc": "2026-10-16T07:56:52.960853+00:00",
+  "kind": "final_local_preparation_assessment",
+  "original": "final-preparation.json",
+  "original_sha256": "d570e2771714065ef5cc7074ac7bc8e83952d61285f99b43326f109f02d5ebe2",
+  "observed_cause": "git diff --no-index --check returns 1 for a clean new-file difference here; the first wrapper incorrectly treated any nonzero exit as a whitespace failure. No source whitespace error was reported.",
+  "controls": [
+    {
+      "fixture": "clean.txt",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "fixture": "trailing.txt",
+      "exit_code": 3,
+      "stdout": "/tmp/swarm-diff-check-0tc50l0q/trailing.txt:1: trailing whitespace.\n+trailing \n",
+      "stderr": ""
+    }
+  ],
+  "changed_since_original": {
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-03.md": {
+      "before": "d4433dfe734611524fe0b61fbc713690d6691e2a32e6ebcfb51d4d511b9999ab",
+      "after": "c39c05fca6520fb52033814f91eef47f87ddf22d7ed9617c2597966322e45174"
+    }
+  },
+  "checks": {
+    "git_diff_check": true,
+    "owned_new_files_diff_check": true,
+    "go_export_inputs_unchanged": true,
+    "safe-knowledge-tests": true,
+    "safe-legacy-tests": true,
+    "safe-collector-tests": true,
+    "go_named_test_and_two_subtests": true,
+    "exact_pack_and_schema_preflight": true,
+    "old_model_results_unchanged": true,
+    "original_v1_grader_preserved": true,
+    "original_v1_runner_preserved": true,
+    "no_new_model_reservations": true,
+    "no_m7_go_packages": true,
+    "local_markdown_links": true,
+    "case_map_valid_json": true,
+    "controlled_clean_and_bad_whitespace_fixtures": true,
+    "only_final_incident_documentation_changed": true
+  },
+  "source_sha256": {
+    "internal/engine/project_memory_knowledge_test.go": "7da5e10cd8350c38ecbf0527f3a2dc10872a557d918a5cd612fba2668f1b890b",
+    "tools/memory-evaluation/compare.py": "176fa733e8e025a674d08e54a9ba01c01566b2a9c193deca0182775d72f22b63",
+    "tools/memory-evaluation/knowledge.py": "af2a85696f512c99cc563136b9c823533050bd2d03a3b43c075f9e37f2000696",
+    "tools/memory-evaluation/run_codex.py": "113f90517bafa8efca19baf8f30ad6d4db2cf91d3c8cb63778272a0ac1562d1c",
+    "tools/memory-evaluation/README.md": "4a33ae2f89e898d52c25a7fe5e406d0349e015eebea60f9cff3e2d2bc8ad576e",
+    "tests/test_memory_knowledge.py": "a177c3bcdeb3b5764dc7dda2063e8b37a459b12ccf66debc3c6d37740098f377",
+    "tests/test_memory_comparison.py": "b5805aeb7784e21764ead0983532653c0b02174cbe5d31698a6355f6a660fb7c",
+    "tests/test_memory_codex_events.py": "e3fa9796e444b620c0e29746b256c4db869a8514e4c2c517af4efd5ade0700ac",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-03.md": "f8ef30adc8e391bacc1c592de591fb4fba72d616262c050303ac48f7abca5a4f",
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-03.md": "c39c05fca6520fb52033814f91eef47f87ddf22d7ed9617c2597966322e45174",
+    "docs/plans/deepagents-integration/PLAN.md": "49a2798730e0d79c5e2fa69ce78c825ae88ffee5ad869993e0b84bd45f6f7f60",
+    "docs/plans/deepagents-integration/cas-evaluation.json": "1c50b2c5d25c54fab23b836909071640d484558ea2c0758b8083da24d4694381"
+  },
+  "named_python_tests": 31,
+  "go_test": {
+    "named": 1,
+    "subtests": 2
+  },
+  "new_real_model_calls": 0,
+  "v2_model_effectiveness": "NOT TESTED",
+  "scope": "Same-session local verification only; no independent acceptance or deployment",
+  "errors": {},
+  "result": "PASS"
+}

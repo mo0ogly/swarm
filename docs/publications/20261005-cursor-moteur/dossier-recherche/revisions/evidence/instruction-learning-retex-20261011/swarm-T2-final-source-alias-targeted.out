@@ -1,0 +1,18 @@
+=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity
+=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/tampered
+=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/escape
+=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/duplicate
+=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/alias-dot
+=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/alias-parent
+=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/ambiguous
+=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/missing
+--- PASS: TestGraphDeliverySourcePartsPreserveIntegrity (0.00s)
+    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/tampered (0.00s)
+    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/escape (0.00s)
+    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/duplicate (0.00s)
+    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/alias-dot (0.00s)
+    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/alias-parent (0.00s)
+    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/ambiguous (0.00s)
+    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/missing (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	0.030s

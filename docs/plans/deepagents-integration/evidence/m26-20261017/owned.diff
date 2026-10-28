@@ -1,0 +1,973 @@
+--- a/internal/engine/memory_summary_selection.go
++++ b/internal/engine/memory_summary_selection.go
+@@ -80,6 +80,21 @@
+ 	if packet.SHA256 != choice.SourceSHA {
+ 		return "", nil, fmt.Errorf("sources du résumé modifiées : refaire l'export et examiner la sélection")
+ 	}
++	text, receipt, err := memorySummaryExtract(choice, sources)
++	if err != nil {
++		return "", nil, err
++	}
++	receipt.Work, receipt.Task, receipt.PreparedRevision = w.ID, r.TaskID, w.Revision
++	return text, receipt, nil
++}
++
++// Shared byte construction for admission and the before-start check. The
++// caller verifies the appropriate prepared or queued source packet separately:
++// queue transitions change its snapshot, but never the confirmed extracts.
++func memorySummaryExtract(choice MemorySummarySelection, sources []memorySummarySource) (string, *MemorySummaryReceipt, error) {
++	if choice.Schema != 1 || !nonempty(choice.Reason) || len(choice.Dialogues) == 0 || len(choice.Protected) == 0 {
++		return "", nil, fmt.Errorf("sélection extractive : schéma 1, sources, protections et motif explicites requis")
++	}
+ 	if choice.Cutoff < 2 || choice.Cutoff >= len(sources) {
+ 		return "", nil, fmt.Errorf("frontière extractive invalide : conserver un préfixe de dialogue et un suffixe récent")
+ 	}
+@@ -141,7 +156,7 @@
+ 		Entries      []entry               `json:"entries"`
+ 		Recent       []memorySummarySource `json:"recent_messages"`
+ 		Omitted      []string              `json:"omitted_message_ids"`
+-	}{"swarm-extractive-context-v1", packet.SHA256, hash(raw), entries, recent, omitted})
++	}{"swarm-extractive-context-v1", choice.SourceSHA, hash(raw), entries, recent, omitted})
+ 	if err != nil {
+ 		return "", nil, err
+ 	}
+@@ -150,7 +165,7 @@
+ 	if err = json.Unmarshal(raw, &retained); err != nil {
+ 		return "", nil, err
+ 	}
+-	receipt := &MemorySummaryReceipt{Schema: 1, Selection: retained, SelectionSHA: hash(raw), Work: w.ID, Task: r.TaskID, PreparedRevision: w.Revision, SourceCount: len(sources), Received: received, Omitted: omitted, AttachmentSHA: hash([]byte(text)), AttachmentBytes: len(text)}
++	receipt := &MemorySummaryReceipt{Schema: 1, Selection: retained, SelectionSHA: hash(raw), SourceCount: len(sources), Received: received, Omitted: omitted, AttachmentSHA: hash([]byte(text)), AttachmentBytes: len(text)}
+ 	return text, receipt, nil
+ }
+ 
+@@ -169,25 +184,20 @@
+ }
+ 
+ func (s *Store) checkMemorySummaryBeforeStart(a *Agent) error {
+-	if a.Context == nil || a.Context.Summary == nil {
++	receipt, err := s.checkedMemorySummaryReceipt(*a)
++	if err != nil {
++		return err
++	}
++	if receipt == nil {
+ 		return nil
+ 	}
+-	receipt := *a.Context.Summary
+-	q := MemorySummarySourceRequest{Schema: 1, Work: a.WorkID, Task: a.TaskID, Revision: receipt.QueuedRevision, Dialogues: receipt.Selection.Dialogues}
+-	raw, err := json.Marshal(q)
+-	if err != nil {
++	manifest := *a.Context
++	manifest.Summary = receipt // Preserve the prepared receipt's immutable metadata.
++	current := *a
++	current.Context = &manifest
++	if err := s.saveAgent(current); err != nil { // Failure prevents provider start.
+ 		return err
+ 	}
+-	packet, err := s.memorySummarySource(raw)
+-	if err != nil {
+-		return fmt.Errorf("sélection extractive périmée avant départ : %w", err)
+-	}
+-	if receipt.Work != a.WorkID || receipt.Task != a.TaskID || packet.SHA256 != receipt.QueuedSourceSHA {
+-		return fmt.Errorf("sources extractives modifiées avant départ : nouvel examen requis")
+-	}
+-	receipt.CheckedBeforeStart, receipt.CheckedSourceSHA = now(), packet.SHA256
+-	manifest := *a.Context
+-	manifest.Summary = &receipt // Preserve the prepared receipt's immutable metadata.
+-	a.Context = &manifest
+-	return s.saveAgent(*a) // Failure prevents provider start.
+-}
++	*a = current
++	return nil
++}
+--- a/docs/PROJECT-MEMORY.md
++++ b/docs/PROJECT-MEMORY.md
+@@ -382,10 +382,22 @@
+ de la pièce jointe. À la mise en file, il lie l'état après les transitions
+ normales de lancement. Le superviseur recontrôle cet état juste avant le
+ sous-processus et conserve `checked_before_start_at` / `checked_source_sha256`
+-avant de démarrer. Dérive ou erreur d'écriture empêche l'appel fournisseur.
++avant de démarrer. Il retrouve aussi la demande de lancement confirmée : la
++sélection, le reçu complet et les extraits reconstruits doivent concorder avec
++le préfixe préparé du prompt. Supprimer le reçu ne désactive pas ce contrôle si
++la demande comportait une sélection ; un reçu ajouté sans sélection est refusé.
++Dérive ou erreur d'écriture empêche l'appel fournisseur. Un enregistrement
++refusé ne marque pas le reçu comme vérifié ; le superviseur conserve l'échec
++et sa cause lorsqu'il peut encore écrire cet état.
+ Ce contrôle est daté, sans garantie de fraîcheur continue après l'observation.
+ Le prompt complet, y compris la reprise moteur, reste lié à `context.sha256` ;
+ `prepared_context` conserve la preuve préparée sans être réécrit.
++Il ne peut pas porter une estampille de contrôle avant départ ; seule
++l'observation du reçu courant peut être réévaluée puis renouvelée.
++Cette comparaison protège la cohérence des données conservées ; elle n'atteste
++pas l'identité d'un acteur capable de réécrire aussi la demande originale et
++ne fournit pas encore l'engagement atomique de M20. Vérification locale et
++limites : [rapport M26](plans/deepagents-integration/RESULTATS-MEMOIRE-22.md).
+ 
+ Le choix n'entre pas dans le profil réutilisable. Brainstorming, hiérarchie,
+ conducteur, parent, tentative antérieure, terminal, dialogue/restauration et
+@@ -406,7 +418,7 @@
+   M-->>O: Prompt et empreinte à confirmer
+   O->>M: Confirmer le même contexte
+   M->>S: Revérifier et conserver demande/réservation/reçu
+-  M->>S: Contrôler les sources avant démarrage
++  M->>S: Contrôler demande, reçu, sources et contexte avant démarrage
+   alt Contrôle ou écriture refusé
+     M-->>O: Départ refusé, originaux conservés
+   else Contrôle enregistré
+--- a/docs/en/PROJECT-MEMORY.md
++++ b/docs/en/PROJECT-MEMORY.md
+@@ -349,10 +349,20 @@
+ `context.summary` retains the choice, received/omitted source IDs and attachment
+ hash. Queue admission binds the state after normal launch transitions. Immediately
+ before starting the subprocess, the supervisor rechecks that state and persists
+-`checked_before_start_at` / `checked_source_sha256`. Drift or write failure prevents
+-the provider call. This is a dated check, not continuous freshness after the
++`checked_before_start_at` / `checked_source_sha256`. It also retrieves the confirmed
++launch request: the selection, complete receipt and rebuilt extracts must match
++the prepared prompt prefix. Removing the receipt does not disable this check if
++the request included a selection; a receipt added without a selection is refused.
++Drift or write failure prevents the provider call. A failed write does not mark
++the receipt as checked; the supervisor retains the failure and its cause when
++it can still persist that state. This is a dated check, not continuous freshness after the
+ observation. The full prompt, including engine recovery context, remains bound to
+ `context.sha256`; `prepared_context` retains the original prepared receipt.
++It cannot carry a before-start check stamp; only the current receipt's
++observation may be rechecked and renewed.
++This comparison protects consistency of retained data; it does not authenticate
++an actor able to rewrite the original request as well, and does not yet provide
++M20's atomic commitment. See [M26 results and limits](../plans/deepagents-integration/RESULTATS-MEMOIRE-22.md).
+ 
+ The choice is not saved in the reusable profile. Brainstorming, hierarchy,
+ conductor, parent, previous attempts, terminal, dialogue/restoration and concurrent
+@@ -372,7 +382,7 @@
+   E-->>O: Prompt and hash for confirmation
+   O->>E: Confirm the same context
+   E->>S: Recheck and retain request/reservation/receipt
+-  E->>S: Check sources before start
++  E->>S: Check request, receipt, sources and context before start
+   alt Check or write refused
+     E-->>O: Refuse launch, retain originals
+   else Check persisted
+--- a/docs/plans/deepagents-integration/PLAN.md
++++ b/docs/plans/deepagents-integration/PLAN.md
+@@ -57,6 +57,7 @@
+ | M23 Cachets dans la page mémoire | Intégration frontend vérifiée sur API conservée | Deux types et transitions réelles, identités/droits inconnus, 11 groupes de contrôle et 20 configurations FR/EN/thèmes/largeurs. Assets générés communs ; voir `RESULTATS-MEMOIRE-19.md` pour l'embarquement, les preuves et la limite du serveur non redémarré. |
+ | M24 Liaison des usages du résumé | Vérification locale sur vue identité figée | 34 noms PASS dont 32 du nouveau contrat ; replan après changement concurrent des entrées. Ressources exactes et demandes séparées sur les sources réelles M19, contenu/sélection/destinataire liés ; aucun raccord public ni identité fabriquée. Statique/compilation et périmètre de preuve dans `RESULTATS-MEMOIRE-20.md`. M20.2 partiel, M20.3/4 ouverts. |
+ | M25 Cloisonnement des sources et verdict complet | Vérifié localement, aucun raccord public | Alias v1 entre snapshots de tâches reproduit puis corrigé en v2 ; droits des deux acteurs vérifiés ensemble, aucun accord partiel. 12 tests principaux et 60 sous-cas PASS, watchdog global désactivé, docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-21.md`. Autorité protégée, affectation, propriété/auteur et engagement courant restent ouverts. |
++| M26 Reçu extractif au départ | Correction vérifiée localement dans le parcours existant | Reçu altéré/supprimé et fausse observation préparée reproduits puis refusés avant fournisseur. Demande confirmée, octets reconstruits, contexte et métadonnées contrôlés ; échec d’écriture sans fausse estampille. 81 noms du parcours final PASS et 33 sous race, 92 gardes source/usages réutilisées. Docs FR/EN et RETEX : `RESULTATS-MEMOIRE-22.md`. Identité et engagement atomique restent ouverts ; serveur non redémarré. |
+ 
+ **Point de reprise au 16 octobre :** les quatre appels M6 et leurs résultats
+ mixtes sont conservés, sans renotation. M7 prépare puis, après accord « oui »,
+@@ -274,6 +275,19 @@
+ 72 noms passent à sources stables, sans overlay ; voir `RESULTATS-MEMOIRE-21.md`.
+ La prochaine activation dépend toujours de l'autorité, des attributions et du
+ point d'engagement protégés ; aucun octroi ou effet n'est créé par ce résultat.
++
++Reprise « next » : la décision IA3c.2f est désormais adoptée (pilote local sous
++compte distinct, mode distant prévu) ; elle n'est pas redemandée. M26 renforce le
++parcours existant pendant que l'autorité protégée reste en construction. Deux
++corruptions de reçu démarrent le fournisseur dans les fixtures rouges ; après
++correction, la demande originale, le reçu complet, les extraits reconstruits et
++le préfixe confirmé doivent concorder avant départ. Une erreur d'écriture ne
++marque plus l'appelant vérifié. La revue reproduit puis corrige aussi une fausse
++observation du contexte préparé. Les preuves finales lient 81 noms PASS et
++33 sous race aux sources stables ; 92 gardes source/usages restent réutilisables
++à dépendances pertinentes inchangées. Voir `RESULTATS-MEMOIRE-22.md` et son audit.
++Aucun auteur/propriétaire/droit n'est créé ; les dix conformités M20, l'autorité
++avant plan et l'engagement/réception protégés restent ouverts.
+ 
+ À chaque reprise, lire ce point, l’audit et le manifeste ; contrôler les empreintes
+ concernées, conserver les acquis et poursuivre le prochain travail autorisé.
+--- a/docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md
++++ b/docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md
+@@ -49,8 +49,8 @@
+ (projet, tâche, périmètre et instance lorsque disponibles). Le digest doit lier
+ le contenu effectivement consulté, résumé ou transmis à tous ces paramètres.
+ 
+-Le format canonique d'une ressource mémoire exacte et de cette proposition reste
+-à spécifier côté mémoire puis à vérifier avec le noyau. Les ressources actuelles
++Le format canonique du pipeline extractif est réalisé en privé par M24/M25,
++décrit plus bas ; son raccord public reste à faire. Les ressources actuelles
+ interdisent `*?[]` : ne pas prendre un JSON arbitraire ou un préfixe de chemin pour
+ un sélecteur autorisant. Contrôler chaque source d'une liste ; un refus ne donne
+ ni paquet partiel présenté comme complet ni contexte vide présenté comme succès.
+@@ -98,7 +98,7 @@
+ 
+ ## Critères et prochaine réalisation
+ 
+-Tous ces critères restent **NON TESTÉS pour les droits mémoire**.
++Tous ces critères restent **NON TESTÉS pour la conformité des droits mémoire publics**.
+ 
+ | Critère | Déclencheur / effet requis |
+ | --- | --- |
+@@ -196,3 +196,24 @@
+ restent à raccorder. Aucun handler ou lanceur public ne consomme cet évaluateur.
+ M20-U01–U10 restent ouverts pour la conformité applicative. Voir
+ `INCREMENT-MEMOIRE-21.md` et `RESULTATS-MEMOIRE-21.md`.
++
++## M26 — cohérence du reçu au départ, sans autorité nouvelle
++
++Le parcours public M19 utilise désormais le même constructeur d'extraits à
++l'admission et au contrôle avant départ. `checkedMemorySummaryReceipt` retrouve
++la demande de lancement conservée dans `agents.request` avant de décider qu'il
++n'existe aucune sélection. Avec une sélection, le choix et son digest, les
++sources reçues/omises, les octets/empreintes, les identifiants et révisions sont
++comparés au reçu reconstruit. Le contexte préparé est lié à la confirmation
++d'origine et à son préfixe exact ; le manifeste courant couvre aussi la reprise
++ajoutée par le moteur. Une divergence ou une erreur d'écriture empêche le
++fournisseur de démarrer. La copie appelante n'est marquée vérifiée qu'après
++persistance réussie ; un échec conservé reste un échec, même si sa prise en
++charge par le superviseur retourne sans erreur technique.
++
++Cette garde compare des originaux conservés et des octets reconstruits. Elle
++ne protège pas contre la réécriture conjointe de tous ces originaux, ne donne
++aucun droit, ne remplace pas l'identité protégée et ne verrouille pas les sources
++jusqu'à l'effet. Aucune des dix conformités M20 publiques n'est close par M26.
++Les fixtures de corruption, de panne, de reprise et leurs limites sont dans
++[le rapport M26](RESULTATS-MEMOIRE-22.md).
+--- a/internal/engine/memory_summary_selection_test.go
++++ b/internal/engine/memory_summary_selection_test.go
+@@ -456,26 +456,28 @@
+ 		t.Fatal(err)
+ 	}
+ 	err = s.supervise(a.ID)
+-	if err == nil || !strings.Contains(err.Error(), "fixture summary receipt unavailable") {
+-		t.Fatal("unrecorded start check became success", err)
++	if err != nil {
++		t.Fatal("supervisor could not persist the failed start check", err)
++	}
++	stored, err := s.agent(a.ID)
++	if err != nil || stored.Status != "failed" || stored.Child != 0 || !strings.Contains(stored.Activity, "fixture summary receipt unavailable") || stored.Context.Summary.CheckedBeforeStart != "" {
++		t.Fatal("unrecorded start check became success", err, stored.Status, stored.Activity)
+ 	}
+ 	if _, err = os.Stat(script + ".calls"); !os.IsNotExist(err) {
+ 		t.Fatal("provider started without durable receipt", err)
+ 	}
+-	// Remove the injected storage failure, then settle this owned fixture through
+-	// the existing finish operation; no repeated provider execution is attempted.
++	// The supervisor has already recorded the failure without a false check
++	// stamp. Remove the fixture trigger and verify persistence after reopening.
+ 	if _, err = s.db.Exec("DROP TRIGGER summary_receipt_write_failure"); err != nil {
+ 		t.Fatal(err)
+ 	}
+-	stored, err := s.agent(a.ID)
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-	if err = s.finishAgent(stored, "failed", "Fixture storage failure removed; provider never started", nil); err != nil {
+-		t.Fatal(err)
+-	}
+-	stored, err = s.agent(a.ID)
+-	if err != nil || stored.Status != "failed" || stored.Child != 0 {
++	reopened, err := openStore(s.root, false)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer reopened.db.Close()
++	stored, err = reopened.agent(a.ID)
++	if err != nil || stored.Status != "failed" || stored.Child != 0 || stored.Context.Summary.CheckedBeforeStart != "" {
+ 		t.Fatal("fixture recovery", err)
+ 	}
+ }
+--- a/internal/engine/memory_summary_source_test.go
++++ b/internal/engine/memory_summary_source_test.go
+@@ -142,7 +142,18 @@
+ 			}
+ 			raw, _ := json.Marshal(w)
+ 			if scenario == "invalid-utf8" {
+-				raw = []byte{0xff}
++				// The current identity projection trigger rejects this malformed
++				// write before an export can occur. Keep that earlier protection;
++				// the source reader guard has its own isolated SQL fixture below.
++				before := recoverySnapshotTest(t, s)
++				if _, err := s.db.Exec("UPDATE works SET body=? WHERE id=?", []byte{0xff}, q["work"]); err == nil {
++					t.Fatal("invalid UTF-8 stored despite the identity projection boundary")
++				}
++				if before != recoverySnapshotTest(t, s) {
++					t.Fatal("rejected malformed write mutated storage")
++				}
++				t.Log("invalid UTF-8 refused at storage boundary; source CLI not invoked")
++				return
+ 			}
+ 			if _, err := s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, q["work"]); err != nil {
+ 				t.Fatal(err)
+--- /dev/null
++++ b/internal/engine/memory_summary_receipt.go
+@@ -0,0 +1,88 @@
++//go:build linux
++
++package engine
++
++import (
++	"encoding/json"
++	"fmt"
++	"reflect"
++	"strings"
++)
++
++// Check consistency against the original stored launch. Neither this row nor
++// its hashes authenticate an actor able to rewrite both it and the agent body.
++// Identity admission and atomic source/effect commitment remain separate work.
++func (s *Store) checkedMemorySummaryReceipt(a Agent) (*MemorySummaryReceipt, error) {
++	invalid := func() (*MemorySummaryReceipt, error) {
++		return nil, fmt.Errorf("reçu extractif incompatible avec la demande confirmée : nouvel examen requis")
++	}
++	var work, task string
++	var raw []byte
++	if err := s.db.QueryRow("SELECT work_id,task_id,request FROM agents WHERE id=?", a.ID).Scan(&work, &task, &raw); err != nil {
++		return nil, fmt.Errorf("demande du reçu extractif inaccessible : %w", err)
++	}
++	var request Launch
++	if err := strict(raw, &request); err != nil {
++		return nil, fmt.Errorf("demande du reçu extractif invalide : %w", err)
++	}
++	if request.Summary == nil {
++		if (a.Context != nil && a.Context.Summary != nil) || (a.PreparedContext != nil && a.PreparedContext.Summary != nil) {
++			return invalid()
++		}
++		return nil, nil // No new receipt is required for legacy non-summary runs.
++	}
++	if request.Schema != 1 || work != a.WorkID || task != a.TaskID || request.EventID != a.ID || request.TaskID != a.TaskID ||
++		request.Revision < 1 || a.Context == nil || a.Context.Summary == nil {
++		return invalid()
++	}
++	receipt := *a.Context.Summary
++	prepared := a.PreparedContext
++	if prepared == nil {
++		prepared = a.Context
++	}
++	if prepared.Summary == nil || request.ContextHash == "" || prepared.SHA256 != request.ContextHash ||
++		prepared.Bytes < 0 || prepared.Bytes > len(a.Prompt) || hash([]byte(a.Prompt[:prepared.Bytes])) != prepared.SHA256 ||
++		a.Context.Bytes != len(a.Prompt) || a.Context.SHA256 != hash([]byte(a.Prompt)) {
++		return invalid()
++	}
++	if a.PreparedContext != nil && (prepared.Summary.CheckedBeforeStart != "" || prepared.Summary.CheckedSourceSHA != "") {
++		return invalid()
++	}
++	// The prepared receipt has no start-check fields. A current receipt may
++	// have a previous dated observation, which is replaced only after recheck.
++	original := *prepared.Summary
++	original.CheckedBeforeStart, original.CheckedSourceSHA = "", ""
++	receipt.CheckedBeforeStart, receipt.CheckedSourceSHA = "", ""
++	if !reflect.DeepEqual(original, receipt) || !reflect.DeepEqual(receipt.Selection, *request.Summary) ||
++		receipt.Work != work || receipt.Task != task || receipt.PreparedRevision != request.Revision ||
++		receipt.QueuedRevision != request.Revision+1 {
++		return invalid()
++	}
++	q := MemorySummarySourceRequest{Schema: 1, Work: work, Task: task, Revision: receipt.QueuedRevision, Dialogues: request.Summary.Dialogues}
++	raw, err := json.Marshal(q)
++	if err != nil {
++		return nil, err
++	}
++	packet, err := s.memorySummarySource(raw)
++	if err != nil {
++		return nil, fmt.Errorf("sélection extractive périmée avant départ : %w", err)
++	}
++	if packet.SHA256 != receipt.QueuedSourceSHA {
++		return nil, fmt.Errorf("sources du reçu extractif modifiées avant départ : nouvel examen requis")
++	}
++	var payload memorySummarySources
++	if err := json.Unmarshal([]byte(packet.Payload), &payload); err != nil {
++		return nil, err
++	}
++	body, expected, err := memorySummaryExtract(*request.Summary, payload.Sources)
++	if err != nil {
++		return nil, fmt.Errorf("reconstruction du reçu extractif impossible : %w", err)
++	}
++	expected.Work, expected.Task, expected.PreparedRevision = work, task, request.Revision
++	expected.QueuedRevision, expected.QueuedSourceSHA = receipt.QueuedRevision, packet.SHA256
++	if !reflect.DeepEqual(receipt, *expected) || !strings.HasSuffix(a.Prompt[:prepared.Bytes], body) {
++		return invalid()
++	}
++	expected.CheckedBeforeStart, expected.CheckedSourceSHA = now(), packet.SHA256
++	return expected, nil
++}
+--- /dev/null
++++ b/internal/engine/memory_summary_receipt_test.go
+@@ -0,0 +1,308 @@
++//go:build linux
++
++package engine
++
++import (
++	"database/sql"
++	"encoding/json"
++	"os"
++	"reflect"
++	"strings"
++	"testing"
++)
++
++func TestMemorySummarySourceInvalidUTF8ReadBoundary(t *testing.T) {
++	// Minimal SQL read fixture, not a migrated Store or a mission database.
++	// The real migrated write boundary is exercised by the source tests; no
++	// identity trigger is removed or disabled to reach this reader guard.
++	db, err := sql.Open("sqlite", ":memory:")
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer db.Close()
++	db.SetMaxOpenConns(1)
++	if _, err := db.Exec("CREATE TABLE works(id TEXT PRIMARY KEY,revision INTEGER,body BLOB)"); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := db.Exec("INSERT INTO works(id,revision,body) VALUES(?,?,?)", "work", 1, []byte{0xff}); err != nil {
++		t.Fatal(err)
++	}
++	s := &Store{root: t.TempDir(), db: db}
++	q, _ := json.Marshal(MemorySummarySourceRequest{Schema: 1, Work: "work", Task: "task", Revision: 1, Dialogues: []DialogueRef{{Task: "source"}}})
++	packet, err := s.memorySummarySource(q)
++	if err == nil || !strings.Contains(err.Error(), "invalid UTF-8") || packet != (MemorySummarySourcePacket{}) {
++		t.Fatal("invalid UTF-8 reader returned a source packet", packet, err)
++	}
++	var body []byte
++	if err := db.QueryRow("SELECT body FROM works WHERE id=?", "work").Scan(&body); err != nil || !reflect.DeepEqual(body, []byte{0xff}) {
++		t.Fatal("source rejection rewrote the read fixture", err)
++	}
++}
++
++func TestMemorySummarySelectionReceiptDriftPreventsProvider(t *testing.T) {
++	for _, scenario := range []string{"edited-selection", "missing-receipt"} {
++		t.Run(scenario, func(t *testing.T) {
++			s, w, r := summarySelectionFixture(t)
++			script := summaryCaptureProvider(t, s)
++			a := prepareSummaryAgent(t, s, w, r)
++			if scenario == "missing-receipt" {
++				a.Context.Summary = nil
++			} else {
++				a.Context.Summary.Selection.Reason = "Changed after confirmation"
++				raw, err := json.Marshal(a.Context.Summary.Selection)
++				if err != nil {
++					t.Fatal(err)
++				}
++				a.Context.Summary.SelectionSHA = hash(raw)
++			}
++			// Corruption fixture only. No public operation to alter this receipt
++			// is claimed, and this is not a test against a live mission database.
++			if err := s.saveAgent(a); err != nil {
++				t.Fatal(err)
++			}
++			if err := s.supervise(a.ID); err != nil {
++				t.Fatal(err)
++			}
++			stored, err := s.agent(a.ID)
++			if err != nil {
++				t.Fatal(err)
++			}
++			if _, err := os.Stat(script + ".calls"); !os.IsNotExist(err) {
++				t.Fatalf("provider invoked despite %s: status=%s activity=%s err=%v", scenario, stored.Status, stored.Activity, err)
++			}
++			if stored.Status != "failed" || stored.Child != 0 || !strings.Contains(stored.Activity, "reçu extractif") {
++				t.Fatal("receipt drift not explained before provider start", stored.Status, stored.Activity)
++			}
++		})
++	}
++}
++
++func TestMemorySummarySelectionCompleteReceiptBeforeStart(t *testing.T) {
++	for _, scenario := range []string{
++		"schema", "selection", "selection-digest", "source-count", "received-missing", "received-order", "omitted-missing",
++		"attachment-digest", "attachment-bytes", "prepared-revision", "queued-revision", "snapshot-injected", "work", "task",
++		"missing-context", "missing-receipt", "missing-prepared-receipt", "prepared-digest", "prepared-bytes", "prompt",
++		"forged-prepared-digest", "current-digest", "current-bytes", "queued-digest",
++	} {
++		t.Run(scenario, func(t *testing.T) {
++			s, w, r := summarySelectionFixture(t)
++			a := prepareSummaryAgent(t, s, w, r)
++			if err := appendAgentRecoveryContext(&a, "\nEngine recovery fixture\n"); err != nil {
++				t.Fatal(err)
++			}
++			if err := s.saveAgent(a); err != nil {
++				t.Fatal(err)
++			}
++			switch scenario {
++			case "schema":
++				a.Context.Summary.Schema++
++			case "selection":
++				a.Context.Summary.Selection.Reason += " changed"
++				raw, _ := json.Marshal(a.Context.Summary.Selection)
++				a.Context.Summary.SelectionSHA = hash(raw)
++			case "selection-digest":
++				a.Context.Summary.SelectionSHA = hash([]byte("wrong"))
++			case "source-count":
++				a.Context.Summary.SourceCount++
++			case "received-missing":
++				a.Context.Summary.Received = a.Context.Summary.Received[:1]
++			case "received-order":
++				a.Context.Summary.Received[0], a.Context.Summary.Received[1] = a.Context.Summary.Received[1], a.Context.Summary.Received[0]
++			case "omitted-missing":
++				a.Context.Summary.Omitted = nil
++			case "attachment-digest":
++				a.Context.Summary.AttachmentSHA = hash([]byte("wrong"))
++			case "attachment-bytes":
++				a.Context.Summary.AttachmentBytes++
++			case "prepared-revision":
++				a.Context.Summary.PreparedRevision++
++			case "queued-revision":
++				a.Context.Summary.QueuedRevision++
++			case "snapshot-injected":
++				a.Context.Summary.SnapshotInjected = true
++			case "work":
++				a.Context.Summary.Work = "other"
++			case "task":
++				a.Context.Summary.Task = "other"
++			case "missing-context":
++				a.Context = nil
++			case "missing-receipt":
++				a.Context.Summary = nil
++			case "missing-prepared-receipt":
++				a.PreparedContext.Summary = nil
++			case "prepared-digest":
++				a.PreparedContext.SHA256 = hash([]byte("wrong"))
++			case "prepared-bytes":
++				a.PreparedContext.Bytes = -1
++			case "prompt":
++				a.Prompt = "changed" + a.Prompt
++			case "forged-prepared-digest":
++				a.Prompt = "changed" + a.Prompt
++				a.PreparedContext.Bytes += len("changed")
++				a.PreparedContext.SHA256 = hash([]byte(a.Prompt[:a.PreparedContext.Bytes]))
++				if err := bindAgentContext(&a); err != nil {
++					t.Fatal(err)
++				}
++			case "current-digest":
++				a.Context.SHA256 = hash([]byte("wrong"))
++			case "current-bytes":
++				a.Context.Bytes++
++			case "queued-digest":
++				a.Context.Summary.QueuedSourceSHA = hash([]byte("wrong"))
++			}
++			before, _ := json.Marshal(a)
++			state := recoverySnapshotTest(t, s)
++			if err := s.checkMemorySummaryBeforeStart(&a); err == nil {
++				t.Fatal("inconsistent receipt accepted", scenario)
++			}
++			after, _ := json.Marshal(a)
++			if string(before) != string(after) || state != recoverySnapshotTest(t, s) {
++				t.Fatal("refusal mutated its input or persisted state")
++			}
++			valid, err := s.agent(a.ID)
++			if err != nil {
++				t.Fatal(err)
++			}
++			prepared, _ := json.Marshal(valid.PreparedContext)
++			if err := s.checkMemorySummaryBeforeStart(&valid); err != nil {
++				t.Fatal("valid recovery refused", err)
++			}
++			stored, err := s.agent(a.ID)
++			if err != nil || stored.Context.Summary.CheckedBeforeStart == "" || stored.Context.Summary.CheckedSourceSHA != stored.Context.Summary.QueuedSourceSHA {
++				t.Fatal("valid check not persisted", err)
++			}
++			retained, _ := json.Marshal(stored.PreparedContext)
++			if string(prepared) != string(retained) {
++				t.Fatal("prepared historical receipt was rewritten")
++			}
++		})
++	}
++}
++
++func TestMemorySummarySelectionOriginalRequestRequired(t *testing.T) {
++	for _, scenario := range []string{"malformed", "unknown-field", "schema", "event", "task", "revision", "context-hash", "missing-selection"} {
++		t.Run(scenario, func(t *testing.T) {
++			s, w, r := summarySelectionFixture(t)
++			a := prepareSummaryAgent(t, s, w, r)
++			var raw []byte
++			if err := s.db.QueryRow("SELECT request FROM agents WHERE id=?", a.ID).Scan(&raw); err != nil {
++				t.Fatal(err)
++			}
++			var request map[string]any
++			if err := json.Unmarshal(raw, &request); err != nil {
++				t.Fatal(err)
++			}
++			switch scenario {
++			case "unknown-field":
++				request["forged"] = true
++			case "schema":
++				request["schema_version"] = 2
++			case "event":
++				request["event_id"] = "other"
++			case "task":
++				request["task_id"] = "other"
++			case "revision":
++				request["expected_revision"] = 0
++			case "context-hash":
++				request["context_hash"] = hash([]byte("wrong"))
++			case "missing-selection":
++				delete(request, "summary_selection")
++			}
++			raw, _ = json.Marshal(request)
++			if scenario == "malformed" {
++				raw = []byte("{")
++			}
++			if _, err := s.db.Exec("UPDATE agents SET request=? WHERE id=?", raw, a.ID); err != nil {
++				t.Fatal(err)
++			}
++			before := recoverySnapshotTest(t, s)
++			if err := s.checkMemorySummaryBeforeStart(&a); err == nil {
++				t.Fatal("invalid original launch accepted", scenario)
++			}
++			if before != recoverySnapshotTest(t, s) || a.Context.Summary.CheckedBeforeStart != "" {
++				t.Fatal("invalid original request marked as checked")
++			}
++		})
++	}
++}
++
++func TestMemorySummarySelectionCheckSaveFailureCanRecover(t *testing.T) {
++	s, w, r := summarySelectionFixture(t)
++	a := prepareSummaryAgent(t, s, w, r)
++	before, _ := json.Marshal(a)
++	if _, err := s.db.Exec("CREATE TRIGGER fixture_refuse_summary_check BEFORE UPDATE ON agents BEGIN SELECT RAISE(ABORT,'fixture summary check write failed'); END"); err != nil {
++		t.Fatal(err)
++	}
++	state := recoverySnapshotTest(t, s)
++	err := s.checkMemorySummaryBeforeStart(&a)
++	after, _ := json.Marshal(a)
++	if err == nil || !strings.Contains(err.Error(), "fixture summary check write failed") || string(before) != string(after) || state != recoverySnapshotTest(t, s) {
++		t.Fatal("save failure changed the check receipt or hid its cause", err)
++	}
++	if _, err := s.db.Exec("DROP TRIGGER fixture_refuse_summary_check"); err != nil {
++		t.Fatal(err)
++	}
++	if err := s.checkMemorySummaryBeforeStart(&a); err != nil || a.Context.Summary.CheckedBeforeStart == "" {
++		t.Fatal("recovery after persistence failure", err)
++	}
++}
++
++func TestMemorySummarySelectionNoReceiptWithoutSelection(t *testing.T) {
++	s, w, r := summarySelectionFixture(t)
++	r.Summary = nil
++	a, created, err := s.prepare(w.ID, r)
++	if err != nil || !created {
++		t.Fatal(created, err)
++	}
++	before := recoverySnapshotTest(t, s)
++	if err := s.checkMemorySummaryBeforeStart(&a); err != nil || before != recoverySnapshotTest(t, s) {
++		t.Fatal("legacy non-summary launch changed", err)
++	}
++	selected := MemorySummaryReceipt{Schema: 1}
++	a.Context.Summary = &selected
++	if err := s.checkMemorySummaryBeforeStart(&a); err == nil {
++		t.Fatal("injected receipt without original selection accepted")
++	}
++	if !reflect.DeepEqual(*a.Context.Summary, selected) || before != recoverySnapshotTest(t, s) {
++		t.Fatal("injected receipt refusal mutated state")
++	}
++}
++
++func TestMemorySummarySelectionPreparedReceiptCannotClaimStartCheck(t *testing.T) {
++	s, w, r := summarySelectionFixture(t)
++	a := prepareSummaryAgent(t, s, w, r)
++	if err := appendAgentRecoveryContext(&a, "\nEngine recovery fixture\n"); err != nil {
++		t.Fatal(err)
++	}
++	historical := *a.PreparedContext.Summary
++	historical.CheckedBeforeStart = now()
++	historical.CheckedSourceSHA = historical.QueuedSourceSHA
++	a.PreparedContext.Summary = &historical
++	before, _ := json.Marshal(a)
++	state := recoverySnapshotTest(t, s)
++	if err := s.checkMemorySummaryBeforeStart(&a); err == nil {
++		t.Fatal("prepared receipt falsely claims a before-start check")
++	}
++	after, _ := json.Marshal(a)
++	if string(before) != string(after) || state != recoverySnapshotTest(t, s) {
++		t.Fatal("false prepared observation refusal mutated state")
++	}
++}
++
++func TestMemorySummarySelectionCurrentObservationCanBeRechecked(t *testing.T) {
++	s, w, r := summarySelectionFixture(t)
++	a := prepareSummaryAgent(t, s, w, r)
++	if err := appendAgentRecoveryContext(&a, "\nEngine recovery fixture\n"); err != nil {
++		t.Fatal(err)
++	}
++	prepared, _ := json.Marshal(a.PreparedContext)
++	for i := 0; i < 2; i++ {
++		if err := s.checkMemorySummaryBeforeStart(&a); err != nil {
++			t.Fatal("valid current observation cannot be checked again", err)
++		}
++	}
++	retained, _ := json.Marshal(a.PreparedContext)
++	if string(prepared) != string(retained) || a.Context.Summary.CheckedBeforeStart == "" || a.Context.Summary.CheckedSourceSHA != a.Context.Summary.QueuedSourceSHA {
++		t.Fatal("current recheck rewrote prepared history or lost its observation")
++	}
++}
+--- /dev/null
++++ b/docs/plans/deepagents-integration/INCREMENT-MEMOIRE-22.md
+@@ -0,0 +1,131 @@
++# M26 — cohérence du reçu extractif avant départ
++
++17 octobre 2026, reprise « next ». Codex mémoire seul, replan/APEX borné.
++M25 conserve ses preuves. Lecture seule du chantier identité : décision IA3c.2f
++adoptée, service local sous compte distinct pour le pilote, distant prévu ;
++configuration privée en cours, principal initial et raccord public encore ouverts.
++Aucune demande inter-chat ni orchestration native.
++
++## Observation et décision
++
++`checkMemorySummaryBeforeStart` relit les sources et leur empreinte de mise en
++file, mais ne compare pas le reçu à la demande confirmée `agents.request`.
++Une dérive du reçu ou du prompt est une hypothèse à reproduire : ne pas la
++présenter comme une attaque publique démontrée. Les tests modifient uniquement
++une fixture isolée via son stockage moteur ; aucune base utilisateur n'est touchée.
++
++Deux voies : ajouter quelques comparaisons de champs sans reconstruire la pièce,
++ou partager la construction extractive entre admission et contrôle avant départ.
++Retenir la seconde avec la demande originale comme ancre de cohérence : même
++sélection, octets attendus, sources reçues/omises et contexte confirmé. Ne pas
++réinterpréter un reçu absent comme un lancement sans sélection si la demande
++originale en comportait une. Un hash local reste une preuve de concordance,
++pas une authentification face à un acteur capable de réécrire tous les originaux.
++
++Périmètre : constructeur extractif existant, garde du reçu dans un fichier mémoire
++dédié et tests ciblés ; docs mémoire FR/EN, contrat consommateur, plan et RETEX.
++Sources identité, autres lanceurs, API/schéma de stockage, assets et serveur
++utilisateur préservés. Aucun nouveau droit ni politique d'exécution.
++
++## Critères observables
++
++| ID | Observable et preuve attendue |
++| --- | --- |
++| M26-01 | Contre-exemple exécuté avant correction : reçu altéré accepté ou fournisseur appelé malgré la divergence ; original conservé. |
++| M26-02 | Sélection d'origine, digest et métadonnées complètes reconstruits/contrôlés ; modification, suppression ou injection de reçu refusée avant fournisseur. |
++| M26-03 | Préfixe préparé et prompt final concordent avec le contexte confirmé ; ajout de reprise moteur valide conservé, altération refusée. |
++| M26-04 | Refus et erreur d'enregistrement ne marquent pas la vérification réussie ; entrées et preuves historiques conservées ; reprise valide possible. |
++| M26-05 | Parcours réel Store/supervision/fournisseur scripté, réouverture et gardes CLI/API existantes passent ; M24/M25 restent compatibles. |
++| M26-06 | Entrées de test stables, statique/compilation ciblées, revue locale, docs FR/EN et RETEX ; limites d'identité et de fraîcheur explicites. |
++
++Séquence : reproducer, corriger le contrat commun, vérifier les refus et le
++parcours valide, relire le diff puis clôturer ce lot local. Tests publics de
++contrat écrits avant correction. `go test -timeout=0`, aucun timeout Python :
++aucune borne globale n'est justifiée ici ; progression suivie et lenteur diagnostiquée.
++Les délais fonctionnels du produit restent intacts. Élargir aux gardes extractives
++et M24/M25 parce que le constructeur devient partagé ; pas de suite entière.
++
++## Découverte de méthode
++
++Une lecture a supposé le chemin inexistant `internal/engine/agent_row.go` ;
++aucune donnée n'a été lue ou modifiée par cette sous-commande. Les symboles
++nécessaires ont été retrouvés avec `rg` dans les vrais producteurs. Prévention :
++chercher le chemin avant de le lire, y compris lors de la reprise. Propriétaire :
++Codex ; effet local vérifié par les lectures ciblées suivantes, aucune consigne
++embarquée ou preuve historique réécrite.
++
++## M26-I01 — défaut reproduit et contrat corrigé
++
++La série rouge exécute réellement les variantes `edited-selection` et
++`missing-receipt` : les deux appellent le fournisseur scripté et terminent
++`completed`. Trois noms de tests FAIL (parent et deux sous-cas), plus le paquet ;
++zéro PASS, entrées stables. Les sorties et le source exact sous son empreinte
++sont conservés dans `evidence/m26-20261017/red-*`. Aucun accès pirate réel
++n'est revendiqué : l'altération est injectée dans le stockage d'une fixture.
++
++La correction partage la construction des extraits, retrouve la demande
++originale avant de décider l'absence de sélection, compare les métadonnées
++complètes reconstruites et le préfixe du contexte confirmé. La reprise moteur
++reste ajoutable après ce préfixe ; le manifeste courant doit correspondre au
++prompt complet. La copie appelante n'est mise à jour qu'après l'écriture réussie
++du contrôle. Contrôles de panne et retour au cas valide ajoutés. Identité et
++engagement atomique demeurent des dépendances distinctes, pas des garanties
++déduites d'un hash ou d'un reçu local.
++
++## Replan de la première vérification
++
++M26-I02 : l'ancienne garde modifiait le reçu appelant avant une sauvegarde en
++échec ; `finishAgent` tentait ensuite de sauver ce même reçu estampillé et
++échouait à nouveau sur le trigger de fixture. La nouvelle garde conserve
++l'appelant, ce qui permet d'enregistrer normalement un état `failed`. Le test
++ancien doit vérifier cet état, la cause originale, l'absence d'estampille et
++l'absence d'appel fournisseur, puis rouvrir le stockage ; le seul retour nil
++du superviseur ne prouve pas un succès métier. Source initiale conservée.
++
++M26-I03 : la fixture UTF-8 malformée est désormais refusée par le trigger
++`agent_identity_plan_update`, avant la CLI d'export. Ne pas supprimer ce trigger
++pour atteindre le lecteur : vérifier le refus sans mutation à cette frontière,
++puis exercer le garde UTF-8 du lecteur sur une fixture SQL minimale dédiée,
++sans mission migrée. La première série conserve ses 167 noms PASS et ses trois
++noms FAIL, plus le paquet, avec entrées stables. Diagnostic et sources initiales
++dans `evidence/m26-20261017/candidate-*` et `before/`.
++
++La sélection de lectures a encore supposé un chemin `store_test.go` inexistant
++et demandé le reçu `final-run.json` avant la fin du processus. Aucun résultat
++n'en a été inféré. Correction de méthode : rechercher les symboles dans les
++chemins inventoriés, attendre la fin réelle de la session avant de lire son
++verdict ; les sorties de progression restent distinctes du reçu final. Ces
++erreurs de méthode sont conservées avec leurs limites, pas présentées comme
++des défauts du moteur.
++
++## M26-I04 — revue des observations historiques
++
++La relecture locale découvre une omission liée : la comparaison du reçu efface
++les champs d'observation du contexte préparé avant de les comparer. Cela peut
++conserver une fausse estampille historique dans ce contexte, alors qu'il doit
++rester antérieur au contrôle de départ. Propriétaire : Codex mémoire ; valeur :
++conserver l'état réel des preuves historiques. Ajouter le contre-exemple puis
++exiger l'absence de ces champs dans `prepared_context`, sans empêcher une
++réobservation valide du seul reçu courant. Attendre la fin du contrôle race en
++cours avant toute modification des sources ; conserver cette première preuve
++sur son candidat, puis vérifier la correction et ses parcours dépendants.
++
++M26-I04 est reproduit : le nouveau test échoue avant correction parce que le
++contexte préparé peut prétendre avoir été contrôlé au départ. Le source testé
++et les sorties `review-red-*` sont conservés, entrées stables. Correction :
++refuser ces deux champs dans le seul contexte préparé ; un second contrôle
++valide du reçu courant reste permis. Les parcours affectés (sélection, contexte
++préparé/reprise) sont revérifiés ; les gardes source et usages M24/M25 de la
++série verte précédente restent réutilisables, leurs producteurs et appelants
++n'ayant pas changé. Le premier contrôle race (31 noms PASS) reste lié au
++candidat précédent ; un nouveau lot couvre la garde finale et la concurrence.
++
++## Résultat du lot
++
++Le parcours final donne 81 noms PASS (21 principaux et 60 sous-cas), statique et
++compilation réussies, entrées stables ; le lot final race donne 33 noms PASS
++(sept principaux et 26 sous-cas), zéro FAIL/SKIP. Les 92 gardes source/usages
++antérieures sont réutilisées sur leurs dépendances inchangées, pas présentées
++comme rejouées après le dernier ajout. Sources possédées, diff, liens et
++empreintes dans `audit-final.json` ; limites et RETEX dans
++[RESULTATS-MEMOIRE-22.md](RESULTATS-MEMOIRE-22.md). Aucun droit M20 public activé.
+--- /dev/null
++++ b/docs/plans/deepagents-integration/RESULTATS-MEMOIRE-22.md
+@@ -0,0 +1,141 @@
++# M26 — reçu extractif contrôlé avant le fournisseur
++
++17 octobre 2026, Codex seul, reprise replan/APEX, revue locale code-reviewer et
++vérification du parcours verify-fix. Pas de revue indépendante ni d'acceptation
++globale M20. Le serveur utilisateur et les fichiers identité sont préservés.
++
++## Résultat dans le parcours existant
++
++Le premier lancement extractif M19 vérifie désormais la cohérence de la demande
++confirmée, du reçu et du contexte juste avant le sous-processus fournisseur.
++Le contrôle retrouve `agents.request` avant de décider qu'il n'y a pas de
++sélection : supprimer `context.summary` ne désactive plus la garde ; ajouter un
++reçu à un lancement sans sélection est refusé.
++
++`memorySummaryExtract` partage la construction des octets entre admission et
++contrôle. La sélection et son digest, les listes ordonnées reçues/omises, le
++compte de sources, les empreintes/tailles, les identifiants et révisions doivent
++correspondre au reçu reconstruit. Le préfixe préparé doit correspondre à la
++confirmation originale et se terminer par les extraits attendus. Le manifeste
++courant couvre le prompt complet, y compris une reprise moteur ajoutée ensuite.
++
++Le contexte préparé ne peut pas prétendre avoir déjà reçu un contrôle au départ.
++Le reçu courant peut être observé de nouveau sans réécrire cette histoire. La
++copie appelante n'est actualisée qu'après la sauvegarde réussie ; si cette
++sauvegarde échoue, le fournisseur ne part pas. Le superviseur peut alors
++conserver un état `failed` et la cause originale sans fausse estampille.
++Aucun nouveau champ public, schéma de stockage ou réglage opérateur n'est ajouté.
++
++## Défauts conservés et corrections
++
++**M26-I01 — reçu déconnecté de la confirmation.** Les deux variantes rouges
++`edited-selection` et `missing-receipt` démarrent réellement le fournisseur
++scripté avant correction et terminent `completed`. Trois noms FAIL (parent et
++deux sous-cas), plus le paquet ; zéro PASS, entrées stables. Le source exact et
++les sorties sont conservés dans `red-*`. L'altération est injectée dans une
++fixture isolée : aucun accès pirate via API ou navigateur n'est prétendu.
++
++**M26-I02 — échec d'écriture et test du mauvais observable.** L'ancienne garde
++modifiait l'appelant avant son écriture ; le traitement d'échec répétait alors
++l'écriture estampillée et échouait sur le même trigger. La copie préservée
++permet désormais de sauver normalement l'échec. L'ancien test attendait une
++erreur technique du superviseur : il vérifie maintenant l'état `failed`, la
++cause, l'absence de marque de contrôle et d'appel fournisseur, puis la
++persistance après réouverture. Aucun trigger de protection n'est retiré.
++
++**M26-I03 — fixture périmée face à une garde plus en amont.** Le trigger de
++projection identité refuse l'injection de Work UTF-8 malformé avant la CLI
++mémoire. Le test vérifie ce refus sans mutation. Le garde UTF-8 du lecteur est
++aussi exercé sur une fixture SQL minimale distincte, sans mission migrée : aucun
++trigger réel n'est supprimé pour atteindre ce cas. La première série conserve
++167 noms PASS et trois noms FAIL, plus le paquet, avec entrées stables.
++Diagnostic : `candidate-diagnosis.json` ; sources initiales dans `before/`.
++
++**M26-I04 — fausse observation dans le contexte préparé.** La revue locale
++constate que la première comparaison efface les champs d'observation avant de
++comparer l'histoire préparée. Le nouveau test échoue réellement sur ce défaut
++avant correction (`review-red-*`, un nom FAIL et le paquet). La garde refuse
++maintenant ces champs dans `prepared_context` et conserve le réexamen du seul
++reçu courant. Les deux versions et leurs preuves restent distinctes.
++
++Deux lectures de chemins supposés et une lecture trop précoce de reçu ont aussi
++échoué pendant la méthode ; aucun résultat n'en a été inféré. La reprise cherche
++les symboles dans les chemins réels et attend la fin du processus avant de
++consommer son reçu. Détails conservés dans le plan, sans effacer ces erreurs.
++
++## Vérification liée aux sources
++
++État initial : `evidence/m26-20261017/baseline.json`, `status-before.txt`,
++préimages sous `before/`. Les lanceurs enregistrent commandes, dates, sorties
++JSON originales, noms exécutés, toolchain et empreintes des dépendances locales
++Go réellement compilées (dont les ressources embarquées). `go test -timeout=0` ;
++aucun timeout Python. Les délais fonctionnels du produit sont conservés ; le
++travail du compilateur est observé, sans borne globale héritée.
++
++La série verte initiale `final` compte **171 noms PASS : 36 tests principaux et
++135 sous-cas**, zéro FAIL/SKIP ; statique et compilation réussies. Après le
++contre-exemple M26-I04, la série `verified` revérifie les parcours affectés : **81
++noms PASS, 21 tests principaux et 60 sous-cas**, zéro FAIL/SKIP ; statique et
++compilation finales réussies, entrées stables.
++
++Les 92 gardes source/usages M24/M25 restantes sont réutilisées : entre ces deux
++séries, seuls `memory_summary_receipt.go` et son test changent ; ni le constructeur
++partagé ni leurs producteurs/appelants ne changent. Elles ne consomment pas le
++nouveau garde d'historique et aucun init n'est ajouté. Cela représente **173
++noms distincts couverts**, avec la réutilisation explicitement liée au diff et
++aux entrées dans `audit-final.json`, pas une nouvelle exécution unique des 173.
++
++Le premier lot race conserve 31 noms PASS sur son candidat. Le lot final
++`verified-race` donne **33 noms PASS : sept tests principaux et 26 sous-cas**,
++zéro FAIL/SKIP, entrées stables. Il cible la garde complète, refus, panne/reprise, observations historiques et
++courantes, entrée fournisseur et confirmation concurrente. Ce contrôle n'est
++pas une preuve d'engagement atomique entre lecture et départ.
++
++| Critère | État / preuve locale |
++| --- | --- |
++| M26-01 | PASS : fournisseur scripté effectivement appelé dans les deux variantes rouges ; refus avant appel après correction. |
++| M26-02 | PASS : 24 variantes de reçu/contexte incohérent et huit de demande invalide refusées sans résultat favorable ni mutation ; retour au cas valide vérifié. |
++| M26-03 | PASS : contexte confirmé, extraits, reprise ajoutée et prompt complet concordent ; changement du préfixe, digest/tailles falsifiés refusés. |
++| M26-04 | PASS : erreur SQL conservée, appelant inchangé, reprise après retrait du défaut injecté ; départ fournisseur empêché et état `failed` relu après réouverture. Historique préparé conservé, observations courantes renouvelables. |
++| M26-05 | PASS : vrais Store, CLI/API en processus, supervision et sous-processus scripté ; octets reçus comparés au prompt/reçu, sources historiques conservées, refus d'authentification/API et idempotence couverts. Aucun compte fournisseur réel. |
++| M26-06 | PASS local : statique/compilation, race final, formatage/diff, liens et empreintes dans `audit-final.json`. Revue du même auteur ; aucune acceptation indépendante. |
++
++Les sorties sont dans `red-*`, `candidate-*`, `final-*`, `race-*`, `review-red-*`,
++`verified-*`. Le diff possédé et l'audit final lient les fichiers au résultat.
++Les variantes invalides directes ne modifient que leur fixture ; aucune base de
++mission réelle n'est employée. Les tests CLI/API sont en processus avec le code
++compilé par Go, pas une recette navigateur ou un test du binaire déjà installé.
++Aucun écran/asset n'est changé ; pas de nouvelle recette navigateur. Les libellés
++du schéma séquence FR/EN sont alignés, rendu graphique non vérifié dans ce lot.
++
++## Limites, reprise et RETEX
++
++Ce contrôle est une concordance locale avec la demande conservée, pas une
++attestation face à un acteur capable de réécrire conjointement demande, données
++et preuves. Il ne crée ni propriétaire, auteur, identité ou permission ; il ne
++réserve pas les sources jusqu'à l'effet et ne supprime pas la fenêtre après
++l'observation. Les dix conformités publiques M20 restent ouvertes.
++
++Le chantier identité a adopté le pilote local sous compte système distinct et
++prévoit une autorité distante ultérieure ; ce choix n'est plus à redemander.
++Le principal humain initial, le service protégé effectivement vérifié et le
++raccord courant restent les préconditions de l'activation. Propriétaires :
++identité pour le contrôle protégé/avant-plan et le service ; mémoire pour les
++attributions persistées et consommateurs ; opérateur pour le principal initial.
++Aucun message inter-chat, compte/service, fournisseur réel, mission native,
++redémarrage, commit, publication ou déploiement n'est réalisé ici.
++
++La reprise de fixture après suppression du défaut injecté démontre le garde,
++pas un outil public de réparation d'une base corrompue. Les échecs historiques
++restent conservés. La sélection M19 reste réservée au premier lancement manuel
++autorisé ; aucune reprise extractive ou hiérarchique supplémentaire n'est créée.
++
++Leçon réutilisable : vérifier la demande d'origine et la cohérence complète au
++consommateur, pas seulement la fraîcheur d'une source ; préserver l'appelant
++jusqu'au succès d'écriture et distinguer échec pris en charge et succès métier.
++Une garde nouvelle peut invalider une fixture de corruption plus ancienne :
++tester la première frontière réelle et isoler explicitement le lecteur sans
++retirer la garde. Transmission par les tests nommés, le constructeur partagé
++et les docs FR/EN du consommateur. Les consignes communes couvrent déjà cette
++méthode ; aucun contexte embarqué ni processus lancé n'est présenté comme mis à
++jour par cette documentation. Le RETEX du lot ne clôt pas le RETEX global M20.

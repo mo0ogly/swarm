@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "checks": [
+    "quota preview read-only",
+    "judge cycles persisted and audited",
+    "no fixed policy ceilings in inputs",
+    "web CLI parity",
+    "counts preserved",
+    "missing reviewer not invented",
+    "stale form refused",
+    "keyboard focus",
+    "FR EN both themes",
+    "Admin mobile entry"
+  ],
+  "root": "/tmp/swarm-budget-ui-O2PFDH",
+  "cancelled_navigation_requests": [
+    {
+      "path": "/log-console.html",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/favicon.svg",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/assist/turns",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "path": "/api/v1/snapshot",
+      "reason": "net::ERR_ABORTED"
+    }
+  ]
+}

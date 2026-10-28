@@ -1,0 +1,58 @@
+{
+  "at": "2026-10-12T07:59:43.451806+00:00",
+  "bundle": {
+    "at": "2026-10-12T07:58:08.678296+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-paused-settlement-20261012.bundle",
+    "sha256": "19ee4d26fc009f9469985737451644396d0e8f28034068037eedfea9ed316755",
+    "commit": "264ba4ecd8dc4111619953c2cd20889a3933c64e",
+    "ref": "refs/heads/operator-inputs",
+    "input_files": 120,
+    "manifest_sha256": "0622c1afbf383814e913197cddfe2bddb3083c88d17efb2de7510df233b22248",
+    "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/paused-settlement26-inputs-2jo_5orc",
+    "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/paused-settlement26-import-74ox_pn_",
+    "old116_originals_preserved": true,
+    "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+    "limits": "Cumulative116 original inputs unchanged, plus qualified26 pause settlement gate and FR/EN architecture. Public retry while either pause is active retains intent and counters; after both clear, same candidate resumes under existing controls/review. T3 integrates the full cumulative corrections and qualifies its own candidate; T4 covers pause variants and review recovery. T5 addresses observed UTC-clock/provider recovery projection and role communication constraints. T7 verifies actual native receipt/decision/application/effect, including correlation of fail to attributed defect and distinction between historical failures and current receipts. T8 RETEX after recipe. No native acceptance or runtime26 installation inferred."
+  },
+  "updates": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "revision": 664,
+      "operator_base_sha256": "d4244a78ffa0d8db8acd464b72591cd28ebbb2f02010772e33debbbde14c5478",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "revision": 665,
+      "operator_base_sha256": "386f368353b36000d35850a8fc537931b4325562fce5ef3c182023853af1ebff",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "revision": 666,
+      "operator_base_sha256": "0f276c3de09bfabc43567f497b69733b7d8c6bd4f2bfa6f025c1ec7d87e9ca52",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "revision": 667,
+      "operator_base_sha256": "c945e353fd982940ecdd4b4cebd245497a1639274d0c62ba664a75df53292044",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "revision": 668,
+      "operator_base_sha256": "a6db2ce2feb1289c89f6b2af1c7db39604b90c9494c0ef98fb22208368f989c5",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T8",
+      "revision": 669,
+      "operator_base_sha256": "8e48ec4b0eb588779f0f5aa1a0e6be0214551b77a79fb7ca9379e705fd89e3d9",
+      "criteria_dependencies_attempts_learning_preserved": true
+    }
+  ],
+  "native_revision": 669,
+  "runtime": "25 remains active, local26 qualified; inputs saved without pausing an active review",
+  "limit": "Saved future inputs do not prove worker reception or native acceptance."
+}

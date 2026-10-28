@@ -1,0 +1,79 @@
+{
+  "status": "PASS",
+  "checks": [
+    "w-a77d9f4799712a6c6d96c662-fr-explicit-recorded-read-no-validation",
+    "w-a77d9f4799712a6c6d96c662-fr-installed-exact-resume",
+    "w-a77d9f4799712a6c6d96c662-fr-installed-explicit-Work",
+    "w-a77d9f4799712a6c6d96c662-fr-installed-visit-OODA-disabled",
+    "w-a77d9f4799712a6c6d96c662-fr-installed-summary-keyboard-focus",
+    "w-a77d9f4799712a6c6d96c662-en-explicit-recorded-read-no-validation",
+    "w-a77d9f4799712a6c6d96c662-en-installed-exact-resume",
+    "w-a77d9f4799712a6c6d96c662-en-installed-explicit-Work",
+    "w-a77d9f4799712a6c6d96c662-en-installed-visit-OODA-disabled",
+    "w-a77d9f4799712a6c6d96c662-en-installed-summary-keyboard-focus",
+    "w-68b50cc82ec3fe55624f9549-fr-installed-exact-resume",
+    "w-68b50cc82ec3fe55624f9549-fr-installed-explicit-Work",
+    "w-68b50cc82ec3fe55624f9549-fr-installed-visit-OODA-disabled",
+    "w-68b50cc82ec3fe55624f9549-fr-installed-summary-keyboard-focus",
+    "w-68b50cc82ec3fe55624f9549-en-installed-exact-resume",
+    "w-68b50cc82ec3fe55624f9549-en-installed-explicit-Work",
+    "w-68b50cc82ec3fe55624f9549-en-installed-visit-OODA-disabled",
+    "w-68b50cc82ec3fe55624f9549-en-installed-summary-keyboard-focus",
+    "installed-no-page-errors",
+    "installed-no-POST",
+    "installed-resume-no-HTTP-failure"
+  ],
+  "digests": [
+    {
+      "work_id": "w-a77d9f4799712a6c6d96c662",
+      "language": "fr",
+      "sha256": "ec9bdf18dbf4ca244c6a2a66098e99ddc1fa5e3f25e9e443a1c748c865567072"
+    },
+    {
+      "work_id": "w-a77d9f4799712a6c6d96c662",
+      "language": "en",
+      "sha256": "c5412ad4c624127478964a3b6cac2e9fa840085b663a452852b6af8a312f5aa0"
+    },
+    {
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "language": "fr",
+      "sha256": "2bb268f45bd174eaa6b8b1a3dbf1fef1493c7b848e340286733ad7965b70210a"
+    },
+    {
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "language": "en",
+      "sha256": "89e08c5ccf877b67c06950b9c587651e4d973c7177035bb99505684640335793"
+    }
+  ],
+  "errors": [],
+  "posts": [],
+  "httpFailures": [
+    {
+      "path": "/api/v1/work-resume",
+      "status": 501
+    },
+    {
+      "path": "/api/v1/mission",
+      "status": 500
+    },
+    {
+      "path": "/api/v1/work-resume",
+      "status": 501
+    },
+    {
+      "path": "/api/v1/mission",
+      "status": 500
+    },
+    {
+      "path": "/api/v1/mission",
+      "status": 500
+    },
+    {
+      "path": "/api/v1/mission",
+      "status": 500
+    }
+  ],
+  "browser": "Chrome/130.0.6723.116",
+  "global_watchdog": null,
+  "scope": "Read-only installed resume. Other HTTP failures retained and not treated as global acceptance."
+}

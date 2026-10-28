@@ -1,0 +1,20 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T14:19:40.629411+00:00",
+  "end": "2026-10-11T14:27:31.584566+00:00",
+  "seconds": 470.9551053739997,
+  "exit": 0,
+  "output": "/tmp/swarm-admin-duration-launch-full.out",
+  "output_sha256": "e5f5f62f1fecd2dfd632843fcae6ab22734c064299245d535c354f21ebc9d49c",
+  "source_manifest_sha256": "6eb1733df97b130969b0566de690a1e73df8d6327abef7c25831c7f3a29399d0",
+  "candidate_digest": "bbbd3c8dde73dd1db325719a67542f3188d1da26516c65a19c4cc28805ac27e6",
+  "paths": 1171,
+  "source_drift": [],
+  "manifest_changed": false
+}

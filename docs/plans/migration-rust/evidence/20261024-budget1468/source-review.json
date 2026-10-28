@@ -1,0 +1,42 @@
+{
+  "status": "LOCAL_SEMANTIC_REVIEW_RECORDED",
+  "reviewer": "Codex principal, no independent acceptance",
+  "source_sha256": {
+    "rust/crates/swarm-web/src/service/work_budget.rs": "c88c8bc4acfd1beb1ab3750f04f3c3122ad5b0bfd87d40edc51c0e4d9fe22e5c",
+    "rust/crates/swarm-web/src/service.rs": "7ba0c051d529c67781ef3f7872bb19df65b58d0fb444d3571ddeead278ed718c",
+    "rust/crates/swarm-web/src/service/native_admin.rs": "23b5b077602c319810e6dd8fa2a5b5924bd05007556baa6a1879eef32ef83594",
+    "web/cockpit-native-budget.js": "d4396fc70cfa43b0fd265f38ced71f9fa40a74421778c860f48c4361589f11d7",
+    "web/cockpit-native.js": "2af7b8cd2097259b1bf19ca5790e81a923754f388c5f9e6018b7d0ae322301d9",
+    "tests/rust_native_cockpit_browser.py": "a4c0e870b21582795b72650c9f566efd57b92ac207d59a883d00a8eaf85eed2f",
+    "tests/rust_existing_cockpit_ui.cjs": "9ba73bd12aec9f01e70d9f3d5c61dd0d14cf99162e58fcaf0015cb8233672608",
+    "tools/verification/recipes/existing-cockpit-rust.json": "80a70752264fb1aaf28d99e76158ba0dc3ddab98d901b367e65fc0a4955975ec",
+    "tools/verification/recipes/native-cockpit-ux.json": "5974c48178ad4c4257469d5d093f3c67803426ee18e606f1f8fe2f5fbd5dd1a8",
+    "locales/en.json": "afb221582a9e146eb9165962065661fac20fc0f93850aa349c3dc9d8359b7cad",
+    "web/i18n-en.js": "cfe9a0b1f1080186f0f1b31ec7b963c802491222fe45fff900c1362218fd2584",
+    "version_history.json": "28e789130a3e16bca23884548f6221639270297f0b8d93766315e10f1420b191",
+    "docs/BUDGETS.md": "e15d8421885596ff7910cbb5ce331b79eb56a6f05e44077cb861d7f01ac144cb",
+    "docs/en/BUDGETS.md": "a9f6cd107b32ab5785f541bf4aeb8603c82daf513d1589afdad459726b481a82",
+    "docs/architecture/RUST-MIGRATION.md": "2682353053a054f4264456ea6728eda1365ca417e84aa178aaf2d73da7a2721e",
+    "docs/en/RUST-MIGRATION.md": "6ad549fbf9a91c43fc76e679b6bd2fcb21afa0042243024a45c6185e16d99240",
+    "docs/plans/migration-rust/PLAN.md": "fba9518eafd1b0649c9119047eccc269cb793a068ac21f24d56a49e77b6b5897",
+    "docs/plans/migration-rust/REPLAYS.md": "704a4e32bff10cdc928c613d923b93a9edcee7f189a18dba90a9021404f557ce"
+  },
+  "policies": "No new execution/operator policy, budget default, retry, deadline, concurrency limit, mutation permission or provider operation. USD, nonnegative finite numbers, zero-unlimited and revision>=1 are actual engine financial/wire contracts. Browser min0/stepany mirrors representation/invariant, no maximum. Missing policy leaves blank inputs, no default source/date/amount. UUID prefix is event protocol. Busy control lock matches existing native dialogs, preventing accidental close/reentry while delivering a request; no temporal watchdog introduced. Existing Root lane/session/Host/CSRF/transport and owned datastore binding unchanged.",
+  "functions": {
+    "backend": "Reviewed work_query, budget_input, work_budget_route and all dispatch/status additions. Real exported Budget DTO, nullable policy/state always serialized, safe Work query, read-only show/preview, final execute_external budget.configure for apply. GLM unused invented WorkBudget/u64 DTO and invalid error conversions removed before first compilation. Preview clears supplied actor/time; engine remains apply source of truth/CAS/event replay. Separate reads not atomic, preview not security token/reservation/admission. Known Work retained before encode/close; typed error causes preserved.",
+    "HTTP_error_classification": "Original invalid-date public refusal returned500. Mapping now only typed BudgetError Decode/Date/Refused on budget input/apply ->400; SQL/cleanup/clock and corrupt stored-policy paths remain server failures. Stale financial preview ->409. No error-text or mission-specific exception.",
+    "UI": "Reviewed request,budget,view,same,mount,controls,invalidate,failed,fill,prepare,preview,open,submit,setWork and input/close handlers. Existing modal/labels/focus/escape reused. Explicit open reads policy and CSRF; explicit preview has no writes; any edit invalidates retained exact proposal; second gesture applies. No user/source HTML interpolation. Validated ack and matching actual read-back required. Known 400/403/409 refusals distinguished from network/codec uncertainty and recorded_work known but unconfirmed UI read. All failed apply forms require close/reopen/re-read before another edit; no automatic replay. CSRF/intent not stored in preferences/logs. Known effect metadata survives post-ack read/reload error.",
+    "bootstrap": "load now returns a successful selected-panels observation instead of swallowing failure into write-consumer success. select clears prior state, records panelsObserved only after validation/render and preserves generation guard. Budget callback checks actual load outcome. Other read consumers ignore the added boolean, same visible errors.",
+    "tests": "Actual default-profile Rust binary serves private Root. Public CLI Work/tasks/budget; HTTP preview-no-write/CAS/replay/refusal/recovery;229browser assertions FR/EN/themes/widths, original modal focus/escape, save/re-read/provenance/reset, invalid date, explicit client denial, real apply then lost client response and real apply then malformed cockpit-read response. Client fault locations explicit, no real financial/provider calls. No global watchdog. Native Admin regression not rerun or claimed."
+  },
+  "errors": "Original FAIL immutable. Preview refusals preserve fields and permit correction; failed reads disable saving. Apply unknown never claims unchanged state, no automatic retry. Known recorded_work retained through encode/close and client post-ack refresh errors. Fresh reopen uses actual revision/current policy. Existing Root SQL/storage errors keep typed cause and server classification. Tests deliberately filter only expected400preview resource diagnostics; unrelated browser/HTTP failures still fail.",
+  "documentation": "FR/EN migration architecture and budget guide/schema, release notes, PLAN/REPLAYS updated in increment; current JSDoc/Rustdoc reviewed. Generated i18n/check passes. No Rustdoc/doctest examples introduced or compilation claimed. Backend helper unit tests present but not claimed executed; real route recipe covers behavior.",
+  "limits": [
+    "Financial preview is not full event/replay admission, budget reservation or spending guarantee.",
+    "No independent/global migration acceptance. Other cockpit writes/screens still open.",
+    "Bootstrap refresh source counterexample retained; second anomaly not executed on old binary, corrected public variant verified on candidate.",
+    "Canonical Version dialog remains unconnected; compiled identity/notes verified at protected native-version.",
+    "No retained nonzero-spending/active-agent new fixture; engine method unchanged and actual empty-ledger observations preserved in route fixture. Existing engine reservation proofs not relabelled as rerun."
+  ],
+  "finalization_diagnostic": "Unsupported terminal-newline assertion and subsequent non-idempotent finalizer replay preserved. Product bytes unchanged; duplicate PLAN append consolidated preserving original; package rebuilt separately without reapplying completed edits."
+}

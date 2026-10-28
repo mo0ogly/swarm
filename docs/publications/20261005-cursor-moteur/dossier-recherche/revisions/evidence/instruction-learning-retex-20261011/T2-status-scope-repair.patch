@@ -1,0 +1,215 @@
+diff --git a/docs/plan-ca937edf4e-T2.delivery.json b/docs/plan-ca937edf4e-T2.delivery.json
+index 322d0f3..9d687c2 100644
+--- a/docs/plan-ca937edf4e-T2.delivery.json
++++ b/docs/plan-ca937edf4e-T2.delivery.json
+@@ -8,7 +8,7 @@
+     {
+       "index": 1,
+       "status": "pass",
+-      "reason": "Verdict durable distinct des avis de candidats ; source complète et test de verdict. Réparation externe attribuée, nouvelle revue requise.",
++      "reason": "PASS local : verdict durable distinct des avis de candidats, code complet et contrôle du verdict. Ce bilan ne déclare ni acceptation indépendante ni clôture du projet.",
+       "controls": [
+         "plan-entry",
+         "plan-validation",
+@@ -20,7 +20,8 @@
+         "internal/engine/planning_judge_test.go",
+         "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+         "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-targeted.out",
+-        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-race.out"
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-race.out",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/review-status-scope.json"
+       ]
+     },
+     {
+@@ -39,7 +40,8 @@
+         "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+         "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-targeted.out",
+         "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-race.out",
+-        "internal/engine/planning_context.go"
++        "internal/engine/planning_context.go",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/review-status-scope.json"
+       ]
+     },
+     {
+@@ -57,7 +59,8 @@
+         "internal/engine/planning_judge_test.go",
+         "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+         "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-targeted.out",
+-        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-race.out"
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-race.out",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/review-status-scope.json"
+       ]
+     },
+     {
+@@ -77,7 +80,8 @@
+         "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-targeted.out",
+         "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-race.out",
+         "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+-        "docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md"
++        "docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/review-status-scope.json"
+       ]
+     }
+   ]
+diff --git a/docs/plan-ca937edf4e-T2.md b/docs/plan-ca937edf4e-T2.md
+index 983a585..cbe5085 100644
+--- a/docs/plan-ca937edf4e-T2.md
++++ b/docs/plan-ca937edf4e-T2.md
+@@ -13,6 +13,30 @@ sont conservés. Codex a examiné puis corrigé une copie indépendante opérate
+ Il s’agit d’une **réparation externe**, pas d’un achèvement autonome du worker.
+ L’index de preuves identifie cette filiation, les entrées et sorties originales.
+ 
++
++## Portée du bilan et reçu exact — correction du refus du 11 octobre
++
++`pass` et `complete` sont les résultats locaux de cette remise ; ils ne déclarent
++aucune acceptation indépendante. Le refus valide `review-f5cb258178e80a4bdc4778d3`
++sur `1ce2af045bef41baf4af808c610a921c7fe71224` reste conservé avec les 19 appels.
++Le reçu `review-status-scope.json` joint l’argv exact et la sortie originale du
++contrôle `plan-validation`, rejoué exit0 le 11 octobre à 13:12:05 UTC :
++
++```sh
++go test ./internal/engine -run 'TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff' -count=1 -timeout 25s
++```
++
++Ce contrôle sélectionne les tests nommés par `-run` ; le nom du paquet dans sa
++sortie ne signifie pas suite complète. La suite canonique actuelle est le reçu
++original `source-alias-full-suite.out`, commande `python3 tests/supervision_go_suite.py`,
++1 096 cibles, 19 groupes exit0 et skips optionnels explicites. Le vieux reçu
++`go-test-full-engine.out` échoué et son timeout restent historiques et conservés.
++Les cinq fichiers Go sont inchangés depuis le candidat refusé et la suite
++canonique corrigée ; aucune nouvelle exécution du futur commit natif n’est prétendue.
++Une pièce absente d’un paquet demande la lecture des autres originaux ; elle ne
++permet pas de présumer leur résultat. Cette correction documentaire et de portée
++exige toujours les contrôles natifs et une revue indépendante fraîche.
++
+ ## Effet et correction du diagnostic
+ 
+ `planning judge` conserve un verdict global `continue` ou `end`, distinct de
+diff --git a/docs/plan-ca937edf4e-T2.review-context.json b/docs/plan-ca937edf4e-T2.review-context.json
+index 205dd58..8328cc8 100644
+--- a/docs/plan-ca937edf4e-T2.review-context.json
++++ b/docs/plan-ca937edf4e-T2.review-context.json
+@@ -4,8 +4,7 @@
+     "internal/engine/planning.go",
+     "internal/engine/planning_api.go",
+     "internal/engine/score.go",
+-    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/adopted-validation.out",
+-    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-red.out",
++    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/status-scope-validation.out",
+     "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-targeted.out",
+     "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-race.out",
+     "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-vet.out",
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json b/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json
+index 56033ba..e6c8112 100644
+--- a/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json
++++ b/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json
+@@ -30,7 +30,8 @@
+     "source_path_alias_vet": "PASS exit 0",
+     "canonical_suite_source_alias": "PASS 1096 discovered targets, all 19 groups exit 0; optional skips explicit",
+     "localization_and_source_integrity": "PASS targeted public judge/checkpoint, full source integrity and alias cases, exit0 3.253s; judge code unchanged from canonical1096 receipt",
+-    "localization_structure": "PASS mechanical docs checker, not an independent semantic verdict"
++    "localization_structure": "PASS mechanical docs checker, not an independent semantic verdict",
++    "status_scope_validation": "PASS selected -run tests only; raw receipt + exact argv; not full suite"
+   },
+   "limits": [
+     "Provider doubles, no autonomous real-model judge/renewal observed",
+@@ -182,6 +183,14 @@
+     {
+       "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/unpaid-preflight-observation.json",
+       "sha256": "05495abd846f3ea9ec6a34f8f92aa163892c6718f911af367d7045166c4296ee"
++    },
++    {
++      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/review-status-scope.json",
++      "sha256": "a6e4f4982c0c6a7ff59425893f1b28434daf2785f9baff846acd711d2b3777e3"
++    },
++    {
++      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/status-scope-validation.out",
++      "sha256": "4aa00edbabbb2be14f82c1a21b7f79bfa46e4f787abb1f6df4983feba204e34c"
+     }
+   ],
+   "commands": {
+@@ -189,13 +198,14 @@
+     "race": "go test -race ./internal/engine -run '^(TestManagedCheckpointRecovery|TestPlanningJudge)' -count=1 -timeout 80s -v",
+     "full_suite": "python3 tests/supervision_go_suite.py",
+     "vet": "go vet ./...",
+-    "adopted_validation": "Exact command from live task validation_policy/plan-validation, unchanged",
++    "adopted_validation": "go test ./internal/engine -run 'TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff' -count=1 -timeout 25s",
+     "source_parts_targeted": "go test ./internal/engine -run '^(TestGraphDeliverySourceParts|TestGraphDeliveryD03|TestManagedCheckpointRecovery|TestPlanningJudge)' -count=1 -timeout 75s -v",
+     "source_alias_targeted": "go test ./internal/engine -run 'TestGraphDeliverySourceParts' -count=1",
+     "source_alias_race": "go test -race ./internal/engine -run 'TestGraphDeliverySourceParts' -count=1",
+     "source_alias_full_suite": "python3 tests/supervision_go_suite.py",
+     "localization_targeted": "go test ./internal/engine -run '^(TestGraphDeliveryD03|TestGraphDeliverySourceParts|TestManagedCheckpointRecovery|TestPlanningJudge)' -count=1 -timeout 90s",
+-    "localization_docs": "python3 docs/plans/engine-cursor-contract/check-evolution-docs.py T2"
++    "localization_docs": "python3 docs/plans/engine-cursor-contract/check-evolution-docs.py T2",
++    "status_scope_validation": "go test ./internal/engine -run 'TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff' -count=1 -timeout 25s"
+   },
+   "prior_unpaid_submission": {
+     "result": "60bdc8ad5b395b5abc972eb701ff244faed45e69",
+@@ -231,5 +241,13 @@
+     "revision": 175,
+     "calls": 16,
+     "accepted": false
++  },
++  "current_status_semantic_refusal": {
++    "review": "review-f5cb258178e80a4bdc4778d3",
++    "candidate": "1ce2af045bef41baf4af808c610a921c7fe71224",
++    "calls": 19,
++    "state": "changes_requested",
++    "accepted": false,
++    "repair": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/review-status-scope.json"
+   }
+ }
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/review-status-scope.json b/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/review-status-scope.json
+new file mode 100644
+index 0000000..6d16584
+--- /dev/null
++++ b/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/review-status-scope.json
+@@ -0,0 +1,40 @@
++{
++  "version": 1,
++  "executor": "Codex operator in separate owned recovery copy",
++  "command": [
++    "go",
++    "test",
++    "./internal/engine",
++    "-run",
++    "TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff",
++    "-count=1",
++    "-timeout",
++    "25s"
++  ],
++  "control": "plan-validation",
++  "scope": "Only tests selected by -run; package label does not mean full suite",
++  "start": "2026-10-11T13:11:58.851353+00:00",
++  "end": "2026-10-11T13:12:05.565979+00:00",
++  "exit": 0,
++  "output": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/status-scope-validation.out",
++  "sha256": "4aa00edbabbb2be14f82c1a21b7f79bfa46e4f787abb1f6df4983feba204e34c",
++  "go_sources": {
++    "internal/engine/planning.go": "c3d8ac967e7b800ca5c8124da586f33afee83d967d4370e608a8b27ffab97fa6",
++    "internal/engine/planning_api.go": "9004ed00bfb31b5209972516dddf53c85cea6ebcfcb9385a45c0cd49e29b9d94",
++    "internal/engine/planning_context.go": "66176ec869f60bded108597cd81b18549a370b7c4dd11cc9903881ac8c605cc9",
++    "internal/engine/planning_judge.go": "63de41bafd8f876fb90a667d9a3005233daf7fb274bbbce082ab448f8211986b",
++    "internal/engine/planning_judge_test.go": "2be9973bad1ba5dbf0a625cbb5984f30f1da80b0bf48965a78fd7b491e65c9dd"
++  },
++  "review_candidate_source_equivalence": "Go files equal candidate1ce2af045bef41baf4af808c610a921c7fe71224; no final Git commit execution claim",
++  "local_delivery": "status pass and outcome complete report local demonstrated coverage, not independent acceptance or project completion; native controls and independent review remain required.",
++  "latest_full_suite": {
++    "command": [
++      "python3",
++      "tests/supervision_go_suite.py"
++    ],
++    "output": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-full-suite.out",
++    "sha256": "14ac1d7a7423f8ca394e653013cc60ba07bae85bedf3ff8d443b3ca336308675",
++    "result": "1096 discovered targets; 19 groups exit0; optional skips explicit; original receipt required, not inferred from package label"
++  },
++  "history": "Original go-test-full-engine.out FAIL and timeout, earlier suites and adopted-validation.out remain retained; they are historical, not current full-suite success. New filtered control is not full suite."
++}
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/status-scope-validation.out b/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/status-scope-validation.out
+new file mode 100644
+index 0000000..bb9759f
+--- /dev/null
++++ b/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/status-scope-validation.out
+@@ -0,0 +1 @@
++ok  	swarm.local/companion/internal/engine	4.373s

@@ -1,0 +1,1 @@
+You are a tool-free authorized GLM Rust migration contributor. Use only actual supplied interfaces. Propose LocalDirectory child(name,create) and process_path() helpers plus rename_child_no_replace(from,to) using descriptor-relative rustix nofollow private owner checks/explicit sync; process_path uses parent PID /proc/PID/fd/FD for subprocesses. <=95 lines.

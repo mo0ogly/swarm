@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-11T13:00:05.567519+00:00",
+  "review_candidate": "1ce2af045bef41baf4af808c610a921c7fe71224",
+  "public_revision": 233,
+  "candidate_accepted": false,
+  "files": [
+    {
+      "path": "internal/engine/planning.go",
+      "sha256": "c3d8ac967e7b800ca5c8124da586f33afee83d967d4370e608a8b27ffab97fa6",
+      "exact_match": true
+    },
+    {
+      "path": "internal/engine/planning_api.go",
+      "sha256": "9004ed00bfb31b5209972516dddf53c85cea6ebcfcb9385a45c0cd49e29b9d94",
+      "exact_match": true
+    },
+    {
+      "path": "internal/engine/planning_context.go",
+      "sha256": "66176ec869f60bded108597cd81b18549a370b7c4dd11cc9903881ac8c605cc9",
+      "exact_match": true
+    },
+    {
+      "path": "internal/engine/planning_judge.go",
+      "sha256": "63de41bafd8f876fb90a667d9a3005233daf7fb274bbbce082ab448f8211986b",
+      "exact_match": true
+    },
+    {
+      "path": "internal/engine/planning_judge_test.go",
+      "sha256": "2be9973bad1ba5dbf0a625cbb5984f30f1da80b0bf48965a78fd7b491e65c9dd",
+      "exact_match": true
+    }
+  ]
+}

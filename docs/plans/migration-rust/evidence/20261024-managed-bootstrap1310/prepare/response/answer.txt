@@ -1,0 +1,18 @@
+## Committed-only preparation algorithm (proposal, no execution)
+
+**Scope.** `prepare(root, workid, request, settings) -> Result<ManagedRepository, AgentLaunchError>` handles only `committed_only == true` with `include_dirty` empty/absent; any other combination returns a typed refusal without IO. The existing pure apply path continues to reject `repository` entirely. Mutation intent/replay keeps the ORIGINAL request; only planning sets `planning.repository` to the prepared result and revalidates the actual candidate afterward.
+
+**Order of operations.**
+
+1. **Planning before IO.** Replay/`enable` decision, mutation-intent wiring, operation lock acquisition, and private-directory setup all precede any filesystem write, matching root's existing public replay ordering.
+2. **Safe source path.** `local_directory(root, request.path)` (CONTRACT) gives the canonical source; it enforces relative name, in-project resolution, directory type.
+3. **HEAD and subdir.** Run `git -C <source> rev-parse --show-toplevel`, then `filepath::rel(top, source)`; refuse `..` prefixes; map `"."` to `""`. Then `git rev-parse HEAD` for `base`. Both use the saved `git_command_timeout_seconds` from settings — no 90-second literal.
+4. **Resume check.** Read `repository.json` then `repository.json.pending` under `storage`. Missing → skip. Unparseable → typed error, **retain for diagnosis, never overwrite**. Existing manifests are validated against (digest of Go-encoded request JSON — exact Go `json.Marshal` field ordering via a matching serializer — storage, source, subdir, include). Divergent final/pending → refuse, keep originals. If only `.pending` survives, atomically republish it as final and return the retained repository.
+5. **Fresh build.** `MkdirTemp` staging under storage (removed on every exit path, including close errors folded into one `AgentLaunchError` via typed cause + `finish`). `git clone --bare --no-local --no-hardlinks <top> <staging>/repository.git`. `git status --porcelain` is observed but not required to be clean here (committed-only ignores dirt); `committed_only` + nonempty `include_dirty` refused up front.
+6. **Pending→bare→final ordering.** Write `manifest.pending` (base == candidate == actual HEAD commit, snapshot digest, request digest) **before** `rename(bare, storage/repository.git)`, then atomically write `manifest`. If `repository.git` already exists without a manifest → refuse ("prepared repo without manifest; examine before resume"), no overwrite.
+
+**Replay validation.** `rev-parse --verify <oid>^{commit}` for base and candidate; resolved OID must equal the manifest OID; digest/snapshot hex must be 32 bytes; request digest must match exactly; any mismatch refuses without rewrite.
+
+**Corner cases.** subdir==`"."`; pending-only resume republish; final-without-bare vs bare-without-manifest divergence; non-canonical OIDs; Go JSON digest byte-exactness; independent staging-close failures merged, not swallowed; timeout from settings only.
+
+No tests were run; this is a proposal only.

@@ -1,0 +1,14 @@
+{
+  "pid": 1320896,
+  "proc_start_ticks": "2929561",
+  "argv": [
+    "/tmp/swarm-t2-recipe-wp9o7u32/swarm",
+    "--root",
+    "/tmp/swarm-t2-ui-HXL7PV",
+    "web",
+    "127.0.0.1:0"
+  ],
+  "reason": "isolated browser child survived recipe timeout",
+  "signal": "SIGTERM",
+  "at": "2026-10-15T20:09:04.970493+00:00"
+}

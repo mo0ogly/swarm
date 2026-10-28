@@ -1,0 +1,34 @@
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/reason
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/sequence
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/previous
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/approval
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/direct
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/replay
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/reason
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/sequence
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/previous
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/approval
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/direct
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/replay
+--- PASS: TestActionsConfianceT6CorruptChainStopsEffects (13.18s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/false/reason (0.98s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/false/sequence (1.22s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/false/previous (1.29s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/false/approval (1.42s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/false/direct (1.44s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/false/replay (1.23s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/true/reason (1.14s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/true/sequence (1.10s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/true/previous (0.87s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/true/approval (0.99s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/true/direct (0.74s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/true/replay (0.74s)
+=== RUN   TestActionsConfianceT6ExportBindsEffectAndPolicy
+=== RUN   TestActionsConfianceT6ExportBindsEffectAndPolicy/false
+=== RUN   TestActionsConfianceT6ExportBindsEffectAndPolicy/true
+--- PASS: TestActionsConfianceT6ExportBindsEffectAndPolicy (1.77s)
+    --- PASS: TestActionsConfianceT6ExportBindsEffectAndPolicy/false (0.90s)
+    --- PASS: TestActionsConfianceT6ExportBindsEffectAndPolicy/true (0.87s)
+PASS
+ok  	swarm.local/companion/internal/engine	16.494s

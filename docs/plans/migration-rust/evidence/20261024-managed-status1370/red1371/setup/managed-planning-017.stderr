@@ -1,0 +1,26 @@
+{
+  "error": "root-cleanup",
+  "failure": {
+    "causes": [
+      "root-cleanup",
+      "root-cleanup",
+      "root-cleanup",
+      "root-cleanup",
+      "root-cleanup",
+      "mission-status-managed-automatic-readiness-unported",
+      "git-report",
+      "git-report",
+      "git-report",
+      "review-evidence-invalid",
+      "review-evidence-invalid",
+      "review-required",
+      "review-evidence-invalid",
+      "review-evidence-invalid",
+      "review-required"
+    ],
+    "code": "root-cleanup",
+    "message": "root-cleanup",
+    "retryable": false
+  },
+  "schema_version": 1
+}

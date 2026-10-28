@@ -1,0 +1,20 @@
+{
+  "executor": "Codex direct audit",
+  "argv": [
+    "/tmp/swarm-deepagents-memory-env-944lMS/bin/python",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m1-20261015/check_doc_constructors.py"
+  ],
+  "cwd": "/tmp/swarm-deepagents-audit-944lMS/libs/deepagents",
+  "environment_keys": [
+    "HOME",
+    "LANGCHAIN_TRACING_V2",
+    "LANGSMITH_TRACING",
+    "PATH",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD",
+    "PYTHONPATH"
+  ],
+  "started_at_utc": "2026-10-15T19:11:42.883069+00:00",
+  "ended_at_utc": "2026-10-15T19:11:55.848215+00:00",
+  "exit_code": 0,
+  "log_sha256": "30a956332373a9cac110154d68bcea4c74b813707285503581d86d59fe07f07d"
+}

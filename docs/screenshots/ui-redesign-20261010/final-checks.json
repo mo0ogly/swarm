@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "binary_sha256": "35dc4e13b70f8eda87eb175451c53e1e40b8737b775c19f68450fc7ebee0055a",
+  "preview_pid": 1525155,
+  "checks": [
+    "npm test",
+    "TestWebTrainingAssetsAndAuthentication",
+    "TestGraphDeliveryD03QualificationManifest",
+    "python3 tools/check_distribution.py",
+    "python3 tools/agent-workflows/check.py",
+    "git diff --check"
+  ],
+  "limits": "Full Go suite and vet are prior checkpoint evidence; graph browser recipe uses candidate-graph-cache, training reader recipe uses final delivered binary."
+}

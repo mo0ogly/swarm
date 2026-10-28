@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "protocol": "swarm-extractive-summary-v1",
+  "result": "FALLBACK",
+  "scope": {
+    "work": "summary-reference-fixture",
+    "task": "t1"
+  },
+  "source_sha256": "1b845aff917a74451f9f242132777a719579160388ddc3e7a2032192c653ad1e",
+  "source_message_count": 8,
+  "cutoff": 0,
+  "parent_sha256": null,
+  "covered_prefix_sha256": null,
+  "summary_entries": [],
+  "recent_messages": [
+    {
+      "id": "m1",
+      "role": "user",
+      "content": "Exigence ouverte : conserver les preuves originales."
+    },
+    {
+      "id": "m2",
+      "role": "assistant",
+      "content": "Le contrôle de l'ancien candidat a passé ; il ne prouve pas l'état courant."
+    },
+    {
+      "id": "m3",
+      "role": "user",
+      "content": "Déployer seulement après des contrôles frais et une décision autorisée ; ce n'est pas encore fait."
+    },
+    {
+      "id": "m4",
+      "role": "assistant",
+      "content": "Incident ouvert : effet d'écriture incertain ; vérifier avant de rejouer."
+    },
+    {
+      "id": "m5",
+      "role": "assistant",
+      "content": "Lecture diagnostique bornée.",
+      "tool_calls": [
+        "read-one"
+      ]
+    },
+    {
+      "id": "m6",
+      "role": "tool",
+      "content": "Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. Historical fixture detail. ",
+      "tool_call_id": "read-one"
+    },
+    {
+      "id": "m7",
+      "role": "user",
+      "content": "Examiner les preuves avant la prochaine décision."
+    },
+    {
+      "id": "m8",
+      "role": "assistant",
+      "content": "La vérification reste à faire."
+    }
+  ],
+  "omitted_message_ids": [],
+  "reasons": [
+    "summarization_failed"
+  ],
+  "reference_only": true,
+  "model_effectiveness": "NOT TESTED",
+  "receipt_sha256": "06a73830f4215ebab1b2fce1e4618d808b0994133beb8a74d3272217178b310d"
+}

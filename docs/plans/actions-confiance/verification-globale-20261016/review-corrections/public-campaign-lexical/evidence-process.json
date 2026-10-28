@@ -1,0 +1,27 @@
+{
+  "stage": "evidence",
+  "argv": [
+    "python3",
+    "tests/actions_confiance_evidence.py",
+    "--binary",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-proof-exact",
+    "--timeout-seconds",
+    "180",
+    "--evidence-dir",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/review-corrections/public-campaign-lexical/evidence",
+    "--archive",
+    "--checkpoint"
+  ],
+  "pid": 471566,
+  "start_ticks": "6972244",
+  "started_unix": 1792135298.2987247,
+  "status": "passed",
+  "binary_sha256": "5b9ce6f43d0498624d120c70ab72b8c6b3a66785f0d856df8a357115fedfd2c6",
+  "exit_code": 0,
+  "ended_unix": 1792135306.7193549,
+  "stdout_sha256": "6825512b14bef1cda6643ea956b6880f961f241207d5f8239026e773582de2d4",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "observed_results": 18,
+  "result_path": "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/public-campaign-lexical/evidence/evidence-public.json",
+  "result_sha256": "ed3a8d28c2a4bdae5ee3c78cc7bc5ee07d3225abf9cdc20d9e4fe14ef362f21f"
+}

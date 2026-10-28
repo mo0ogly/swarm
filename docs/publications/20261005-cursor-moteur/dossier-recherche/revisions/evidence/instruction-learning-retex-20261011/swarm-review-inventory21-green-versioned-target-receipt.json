@@ -1,0 +1,18 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "TestReviewEvidenceInventory|TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly|TestPlanningAcknowledgedProtocolIncident|TestManagedFragmentSelection|TestManagedFragmentAllCallsPreflight|TestManagedFragmentDecisionCapacity|TestManagedFragmentFinal|TestManagedFragmentToken",
+    "-count=1",
+    "-timeout=6m"
+  ],
+  "start": "2026-10-11T19:06:59.880435+00:00",
+  "end": "2026-10-11T19:07:48.943348+00:00",
+  "seconds": 49.06295575200056,
+  "exit": 0,
+  "output": "/tmp/swarm-review-inventory21-green-versioned-target.out",
+  "sha256": "3045450d87f9e27d15b8612318de1c72713d7db3abaf34a79835b0ec31c8496c",
+  "scope": "Isolated root/child attestation and read-only origin, full artifact capacity and version1 exact prompt replay/version2 new selection; final journals/stores/invalid transport guards."
+}

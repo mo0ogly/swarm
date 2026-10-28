@@ -1,0 +1,50 @@
+{
+  "status": "LOCAL_NATIVE_COMPLETION_RECOVERY_VERIFIED_INDEPENDENT_REVIEW_OPEN",
+  "binary": ".cache/rust-migration-binaries/swarm-rust-7292e53a8fc2c24a7c9b343bad79f7bfe0cd6ef6989bef6340e5c70baec0ca6b",
+  "sha256": "7292e53a8fc2c24a7c9b343bad79f7bfe0cd6ef6989bef6340e5c70baec0ca6b",
+  "effective_inputs": 339,
+  "changed_compiler_inputs": 8,
+  "artifacts": 110,
+  "no_fixture_feature": true,
+  "local_only": true,
+  "installed": false,
+  "restarted": false,
+  "committed": false,
+  "pushed": false,
+  "glm_calls_this_increment": 0,
+  "rust_named_tests_passed": 202,
+  "rust_optional_ignored": 1,
+  "ignored_reason": "continuation_keeps_real_reservation_rows requires separately supplied fresh owned ledger fixture",
+  "clippy": "PASS",
+  "rustdoc_engine_cli_web": "PASS",
+  "public_recipes": [
+    "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/recipes1252/mission-watch-registered-observer",
+    "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/recipes1252/mission-worker-completion-recovery",
+    "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/recipes1252/native-http-mission"
+  ],
+  "healthy_control": true,
+  "real_SQL_completion_refusal": true,
+  "restored_original_recovered_under_new_lease": true,
+  "reservation_estimated_preserved": true,
+  "workspace_turn_released_once": true,
+  "provider_rerun": false,
+  "task_acceptance": false,
+  "independent_candidate_acceptance": false,
+  "global_migration_complete": false,
+  "global_watchdog": null,
+  "retained_originals": [
+    "red1240/fault/failure.json",
+    "red1242/fault/baseline-recovery/watch.stdout",
+    "red1246/fault/failure.json",
+    "recipe1244/result.json",
+    "tests1243/clippy.stderr"
+  ],
+  "remaining": [
+    "historical HTTP completed/blocked unsubmitted projection without current review",
+    "planning.repository settlement",
+    "multi-task end-to-end journey",
+    "public stale-lease/wrong-Work/live-owner-with-original and post-commit output-failure variants not newly executed here",
+    "independent candidate/global acceptance",
+    "remaining G1–G12 groups, R6/R7 and RETEX"
+  ]
+}

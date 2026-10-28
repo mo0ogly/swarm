@@ -1,0 +1,13 @@
+{
+  "error": "stale_lease",
+  "failure": {
+    "causes": [
+      "stale_lease",
+      "stale_lease"
+    ],
+    "code": "stale_lease",
+    "message": "stale_lease",
+    "retryable": false
+  },
+  "schema_version": 1
+}

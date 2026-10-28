@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-12T15:07:13.765239+00:00",
+  "candidate_digest": "55ca089bb9b8d6986593cd401c898d8194ad3a493eb2407dbe544230bc748300",
+  "paths_transferred": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/managed_binary_preflight_inspection_test.go",
+    "internal/engine/managed_review.go",
+    "internal/engine/managed_review_preflight_retry.go",
+    "internal/engine/managed_scope.go"
+  ],
+  "source_inputs_verified": 1229,
+  "preimages_verified": true,
+  "backup": "/home/fpizzi/.cache/swarm-operator-replan-20261011/binary-preflight-inspection-primary-preimages",
+  "operator_patch": "binary-preflight-inspection-20261012.patch",
+  "patch_sha256": "cd2464d3e83c4ed21fb8aa16af37abbe64ff64ed68126c7f91e1386b25ebb804",
+  "runtime": "original T3 unchanged; qualification of runtime-T3 does not install it"
+}

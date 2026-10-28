@@ -1,0 +1,5 @@
+=== RUN   TestManagedFragmentResumePreservesUnknownQuestions
+    managed_review_fragment_questions_test.go:99: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentResumePreservesUnknownQuestions (1.51s)
+PASS
+ok  	swarm.local/companion/internal/engine	2.655s

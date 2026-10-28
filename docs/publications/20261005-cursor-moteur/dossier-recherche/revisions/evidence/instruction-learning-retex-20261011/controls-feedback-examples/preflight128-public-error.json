@@ -1,0 +1,6 @@
+{
+  "at": "2026-10-11T20:03:28.175033+00:00",
+  "error": "{'http': 400, 'public_error': {'error': 'sources de réparation non examinables avant soumission : sources de contexte supérieures à 128 Kio ; aucun contenu tronqué', 'failure': {'code': 'command_failed', 'message': 'sources de réparation non examinables avant soumission : sources de contexte supérieures à 128 Kio ; aucun contenu tronqué', 'retryable': False}}}",
+  "request_event": "T2-traceability-account-restored-3383533667c8404a89fed076312a12ec",
+  "action": "Inspect public state before any further operation; do not repeat unknown outcome"
+}

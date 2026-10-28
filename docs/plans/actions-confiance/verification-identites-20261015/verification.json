@@ -1,0 +1,45 @@
+{
+  "verified_at_utc": "2026-10-15T16:40:10.769837+00:00",
+  "scope": "R13 first slice: local identity suspension/reactivation; OIDC not implemented",
+  "go_race": {
+    "named": 139,
+    "main": 37,
+    "passed": 139
+  },
+  "public_recipe": {
+    "cases": 7,
+    "status": "pass",
+    "original": "public-lifecycle-delivery.out"
+  },
+  "browser_final": {
+    "checks": 23,
+    "unexpected_diagnostics": [],
+    "active_request_after_reactivation": true,
+    "languages": [
+      "fr",
+      "en"
+    ]
+  },
+  "i18n": "pass",
+  "vet": "pass",
+  "build": "pass",
+  "preview_process": "preview-process.json",
+  "source_sha256": {
+    "internal/engine/trust_identity.go": "6d38e348c69d24ccf026e87a3412f4f45b7cbf7739bbbac502c57374daab97bd",
+    "internal/engine/trust_identity_lifecycle_test.go": "b2d30723fa0681bd47f0b5f679370457586e4daab1343bda44ca19149097c84d",
+    "internal/engine/trust_actions.go": "9c5ffdd44a5b1fe0adabf6e21c8b1a590b4bbf6949b88bfe09336493644c3f21",
+    "web/trust-actions.html": "f6ea3422ed476956c2296a4bb3a6963ff02ee15f81933bbc8ba9eba37821afe1",
+    "web/trust-actions.js": "e3ab7bc0fb0dd0e2d9966871ab9fb0ab9797bef6999ff258aeb4e250094f6ca3",
+    "web/trust-actions-en.js": "095db3d49f12c299a5aa8206d2e6c89e682e9f0d02e8b93c750c658b9bcc8ed4",
+    "locales/trust-actions-en.json": "daba4408d74364457a5d2de7688713773530a3741797db7043eb8d753501327e",
+    "tests/actions_confiance_t2_ui.cjs": "e82d9a83674e6e3cf252be5e5a619c30cab88c16bb580303aa094791fd362709",
+    "docs/actions-confiance-T2.md": "06d61b7c5bb8274ffcf14176959e53b106e538d1ff42103204cc34813381571c",
+    "docs/en/actions-confiance-T2.md": "5b438e916f27fa5fdf5ba05db212d5779921b0260d480c9dda6c0c0e0ccbdffc"
+  },
+  "remaining": [
+    "OIDC/PKCE human login",
+    "private_key_jwt service authentication",
+    "enterprise mapping/delegation/step-up",
+    "remaining product extensions and RETEX"
+  ]
+}

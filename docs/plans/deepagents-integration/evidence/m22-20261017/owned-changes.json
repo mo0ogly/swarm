@@ -1,0 +1,92 @@
+[
+  {
+    "path": "docs/UI-DESIGN.md",
+    "sha256": "6ae3bb50ed0ad58bee8d50ec116311cad8ed668a2bfa471f83bdc2bb207f3c7d",
+    "added": 15,
+    "removed": 0
+  },
+  {
+    "path": "docs/PROJECT-MEMORY.md",
+    "sha256": "c6d3b5570b7e2984a548dbe6e0e159d757a89dea690ba8fdcbfdb1522b9918af",
+    "added": 5,
+    "removed": 0
+  },
+  {
+    "path": "docs/en/PROJECT-MEMORY.md",
+    "sha256": "d13676fd0b8d9f711d641245c90c183683955609aba8ef72708d6f2ad30618ad",
+    "added": 5,
+    "removed": 0
+  },
+  {
+    "path": "docs/plans/deepagents-integration/PLAN.md",
+    "sha256": "361cbb753591bf50c1530e7ca6ef5e40f14d8fb6dce7620b35b0153a69054ee8",
+    "added": 10,
+    "removed": 0
+  },
+  {
+    "path": "frontend/signals/signals.js",
+    "sha256": "38fa9e333b2b874d165f33436823ce6bb6dc4fe37e04a80637239d961c39cb99",
+    "added": 137,
+    "removed": 0
+  },
+  {
+    "path": "frontend/signals/signals.css",
+    "sha256": "69136aecc40063438ace306231d1e1b5aa18a059be8b79503828e1ae58f51c8a",
+    "added": 15,
+    "removed": 0
+  },
+  {
+    "path": "frontend/signals/catalogue.html",
+    "sha256": "e692c760466e829757a4554d07feaa6d7f2bef0bb0c0a717689325ced4428465",
+    "added": 12,
+    "removed": 0
+  },
+  {
+    "path": "frontend/signals/catalogue.js",
+    "sha256": "640faa8df6fba5f3c0b8c33c20c6334849c79909b5b91c91039816a5431f8c51",
+    "added": 36,
+    "removed": 0
+  },
+  {
+    "path": "frontend/signals/catalogue.css",
+    "sha256": "559ae399676e51cc46933b8341fc4ae1d3b67f6699bd0cf54844fbeb2e97bdc0",
+    "added": 25,
+    "removed": 0
+  },
+  {
+    "path": "frontend/build-signals.mjs",
+    "sha256": "0393639c712bf77a9e17de1baa596481ec23987d0c69fe57d7d3eda48092322f",
+    "added": 18,
+    "removed": 0
+  },
+  {
+    "path": "tests/semantic_signals_ui.cjs",
+    "sha256": "0b1d0e9bd7f571971b0a95d3e28b6caf9ac789d9b42ab997f6ccbe81f268f4c0",
+    "added": 89,
+    "removed": 0
+  },
+  {
+    "path": "docs/SEMANTIC-SIGNALS.md",
+    "sha256": "b7fc85c0738603b6b1b954b6594361807fd325d125108385c13f36b4fcd8888b",
+    "added": 118,
+    "removed": 0
+  },
+  {
+    "path": "docs/en/SEMANTIC-SIGNALS.md",
+    "sha256": "36188f88e7363af179d7f585bb0a15aff0c591e9822f844df64ff508b405ba11",
+    "added": 103,
+    "removed": 0
+  },
+  {
+    "path": "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-18.md",
+    "sha256": "ea2aa26183c06c4405e759c5a6cd33b73abbb86681b7056f92ce02953ffd0aa9",
+    "added": 30,
+    "removed": 0
+  },
+  {
+    "path": "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-18.md",
+    "sha256": "437e267d003f8b23841c9b46b90827d6ed2e0a14182578ae513456b0bcb5444f",
+    "added": 101,
+    "removed": 0
+  }
+]

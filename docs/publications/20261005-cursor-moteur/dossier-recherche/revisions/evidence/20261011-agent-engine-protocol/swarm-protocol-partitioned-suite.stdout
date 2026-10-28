@@ -1,0 +1,21 @@
+Full default-suite coverage: 1110 named tests/examples/fuzz targets; [273, 268, 272, 297] per group
+Group 4 exit 0 
+?   	swarm.local/companion	[no test files]
+?   	swarm.local/companion/cmd/swarm	[no test files]
+ok  	swarm.local/companion/internal/engine	87.669s
+
+Group 1 exit 0 
+?   	swarm.local/companion	[no test files]
+?   	swarm.local/companion/cmd/swarm	[no test files]
+ok  	swarm.local/companion/internal/engine	117.986s
+
+Group 3 exit 0 
+?   	swarm.local/companion	[no test files]
+?   	swarm.local/companion/cmd/swarm	[no test files]
+ok  	swarm.local/companion/internal/engine	125.422s
+
+Group 2 exit 0 
+?   	swarm.local/companion	[no test files]
+?   	swarm.local/companion/cmd/swarm	[no test files]
+ok  	swarm.local/companion/internal/engine	243.943s
+

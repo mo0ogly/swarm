@@ -1,0 +1,6 @@
+{
+  "error": "TimeoutError: Waiting for selector `#validation-mode` failed\n    at CSSQueryHandler.waitFor (/home/fpizzi/workspace/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/common/QueryHandler.js:214:46)\n    at async CdpFrame.waitForSelector (/home/fpizzi/workspace/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Frame.js:544:21)\n    at async CdpPage.waitForSelector (/home/fpizzi/workspace/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Page.js:1385:20)\n    at async openValidation (/home/fpizzi/workspace/swarm/tools/verification/training_ui_capture.cjs:28:124)\n    at async /home/fpizzi/workspace/swarm/tools/verification/training_ui_capture.cjs:61:37",
+  "errors": [],
+  "failures": [],
+  "root": "/tmp/swarm-training-ui-feLacb"
+}

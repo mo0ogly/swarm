@@ -1,0 +1,39 @@
+{
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "at": "2026-10-11T10:42:18.763322+00:00",
+  "patch_sha256": "459949e903fdc72b155cdca2bdd06a0a4a6b2cd7eeaeae4f87b67527eabe373c",
+  "operations": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "event": "instruction-learning-retex-continuity-T3-20261011",
+      "from_revision": 145,
+      "to_revision": 146,
+      "next_sha256": "aa124a5aec69d0752d41d62b631dfec7c12785e6c43beee29022d44bb646538c",
+      "original_instructions_contract_attempts_budgets_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "event": "instruction-learning-retex-continuity-T4-20261011",
+      "from_revision": 146,
+      "to_revision": 147,
+      "next_sha256": "901fec53dea6297c31f90f5bf1a3f6d8651216736c597547a6cec941e03d9ebc",
+      "original_instructions_contract_attempts_budgets_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "event": "instruction-learning-retex-continuity-T5-20261011",
+      "from_revision": 147,
+      "to_revision": 148,
+      "next_sha256": "274f0802db0f002892890531d12ffcd0af62358c30c597fe6495c21bdb07025a",
+      "original_instructions_contract_attempts_budgets_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "event": "instruction-learning-retex-continuity-T7-20261011",
+      "from_revision": 148,
+      "to_revision": 149,
+      "next_sha256": "39acd7ba0c0b8ffd912302ca08c6e1986c746ed7d17d3eb9f94aba31cd77edfa",
+      "original_instructions_contract_attempts_budgets_preserved": true
+    }
+  ]
+}

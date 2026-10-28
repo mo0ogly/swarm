@@ -1,0 +1,885 @@
+--- before/docs/plans/deepagents-integration/PLAN.md
++++ after/docs/plans/deepagents-integration/PLAN.md
+@@ -48,6 +48,7 @@
+ | M14 Reprise explicite de conversation | Réalisé et vérifié localement | Nouvelle tentative et réservation, même session, décision fraîche et gardes cumulées ; 42 tests distincts dont 8 avec `-race`, CLI/API/navigateur, inspections sans migration, docs FR/EN et RETEX. Voir `RESULTATS-MEMOIRE-10.md`. Fournisseurs réels et Git géré non qualifiés ; candidat non déployé. |
+ | M15 Retrait et mémoire héritée | Défauts reproduits, corrigés et vérifiés localement | Références des ancêtres suivies dans la garde et le catalogue, désélection incompatible refusée, fraîcheur après sonde ; 33 tests dont 4 avec `-race`, neuf contrôles navigateur, docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-11.md`. Aucune purge ni qualification réelle. |
+ | M16 Projection et omissions attribuées | Défauts reproduits, corrigés et vérifiés localement | Cinq contre-exemples, 18 tests Go distincts et sept contrôles de la vraie CLI/supervision/API. Sources et pertes attribuées, originaux conservés, docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-12.md`. Résumé automatique et séquences fournisseur restent ouverts. |
++| M17 Contrat de résumé progressif et référence | Référence hors moteur réalisée et vérifiée | Quatre sondes amont, 24 tests Python et 14 invocations CLI finales ; deux synthèses extractives et dix refus avec originaux conservés. Docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-13.md`. Qualité LLM, sources applicatives et intégration moteur restent ouvertes. |
+ 
+ **Point de reprise au 16 octobre :** les quatre appels M6 et leurs résultats
+ mixtes sont conservés, sans renotation. M7 prépare puis, après accord « oui »,
+@@ -150,6 +151,19 @@
+ avec sources, exigences/incidents conservés, refus explicites et comparaison
+ au contexte de référence. Aucun nouvel appel réel ou déploiement n'est autorisé
+ par cette vérification ; les acquis M3–M15 restent conservés.
++
++Après « suite », M17 définit puis vérifie une référence extractive hors moteur.
++Les états protégés distinguent exigence ouverte, intention future, preuve
++historique et incident ouvert ; une progression conserve leur provenance et
++un refus rend l'historique complet. Lire `RESULTATS-MEMOIRE-13.md` et
++`evidence/m17-20261016/` : 24 tests Python et 14 invocations CLI finales,
++deux projections progressives et dix refus, zéro appel de modèle. Les défauts
++locaux de traitement du vide d'outil et du décodage sont reproduits puis corrigés.
++MEM-C16/MEM-C17 restent partiels : oracle annoté de fixture, aucune paraphrase
++LLM ni admission moteur. Prochaine frontière : sources Swarm autorisées et
++contrat courant inspectable, puis proposition, contrôle de fraîcheur et reçu
++réellement consommé. Toute politique éventuelle doit suivre Admin/API/CLI/Go.
++Le serveur, les acquis M3–M16 et les huit appels réels restent conservés.
+ 
+ À chaque reprise, lire ce point, l’audit et le manifeste ; contrôler les empreintes
+ concernées, conserver les acquis et poursuivre le prochain travail autorisé.
+@@ -285,6 +299,7 @@
+ | 2026-10-16 | M14, accord « go » pour la reprise explicite. | Même conversation dans une nouvelle tentative, décision et réservation propres, compteurs cumulés séparés de l'usage d'exécution. 42 tests distincts dont huit avec `-race`, neuf contrôles navigateur, quatre refus natifs de migration implicite, docs FR/EN et RETEX. Aucun modèle réel ni déploiement. |
+ | 2026-10-16 | M15, reprise « next » : audit du retrait et de la filiation. | Deux contre-exemples reproduits ; références héritées contrôlées et attribuées, sélection courante requise. 33 tests distincts dont quatre avec `-race`, neuf contrôles du parcours compilé et documentation FR/EN. Retrait distinct d'une purge ; aucun modèle réel ni déploiement. |
+ | 2026-10-16 | M16, reprise « next » puis demande « replan et corrige ». | Cinq défauts de projection reproduits puis corrigés ; 18 tests Go et sept contrôles CLI/supervision/API, sources et consommations inchangées. Compilation de ressources impropre et collecteur incomplet diagnostiqués puis corrigés ; docs FR/EN et RETEX. Aucun modèle réel ni déploiement. |
++| 2026-10-16 | M17, reprise « suite » : contrat et référence de résumé progressif. | Méthode amont sondée à SHA fixe, référence extractive et retour aux originaux vérifiés ; 24 tests Python et 14 invocations CLI finales. Deux défauts locaux reproduits puis corrigés, docs FR/EN et RETEX. Aucun appel modèle ou raccordement moteur. |
+ 
+ ## Réalisation M3 — décision technique et critères
+ 
+--- before/docs/plans/deepagents-integration/cas-evaluation.json
++++ after/docs/plans/deepagents-integration/cas-evaluation.json
+@@ -779,6 +779,25 @@
+           "scope": "Prerequisite only: truncation cannot silently claim an unbounded deterministic excerpt. No progressive LLM summary, summary-failure recovery or fidelity comparison is executed. Upstream source is inspected at fixed SHA, including continuation after history-offload failure; no guarantee of preservation is inferred."
+         }
+       ]
++    },
++    {
++      "id": "memory-13-extractive-summary-reference",
++      "date": "2026-10-16",
++      "report": "RESULTATS-MEMOIRE-13.md",
++      "environment": "Read-only Python evaluation tool with synthetic annotated histories, exact protected quotes and typed states; 24 distinct tests and 14 final CLI invocations, two progressive references and ten refusals restoring originals. No engine/provider/browser execution or deployment.",
++      "model_calls": 0,
++      "cases": [
++        {
++          "id": "MEM-C16",
++          "result": "PARTIAL",
++          "scope": "Reference checks strict nonempty cutoff with recent messages retained, complete tool groups, empty tool content, source hashes, explicit omitted-message IDs and original files unchanged. Four pinned upstream private-method probes document cutoff behavior only. No provider wire-format or actual agent-context qualification."
++        },
++        {
++          "id": "MEM-C17",
++          "result": "PARTIAL",
++          "scope": "Extractive annotated reference preserves future intention, historical evidence, open incident and requirement over two progressive receipts. Empty, contradictory, stale, invalid-JSON and failed candidates fall back to all originals; invalid sources are explicit errors. Oracle-generated references and typed full quotes do not establish paraphrase fidelity, annotation correctness, model effectiveness, admission or automatic runtime summarization."
++        }
++      ]
+     }
+   ]
+ }
+--- before/docs/PROJECT-MEMORY.md
++++ after/docs/PROJECT-MEMORY.md
+@@ -256,6 +256,28 @@
+ automatiquement l’historique et ne prouve pas qu’un LLM applique correctement
+ la procédure. La recette et ses limites sont conservées dans
+ `docs/plans/deepagents-integration/`.
++
++## Référence de résumé progressif hors moteur
++
++Le dépôt fournit `tools/memory-evaluation/summarization.py` pour vérifier une
++projection extractive sur un historique annoté de fixture. Il conserve des
++citations intégrales pour les exigences ouvertes, intentions futures, preuves
++historiques et incidents ouverts, avec empreintes des sources, frontière et reçu
++parent. Les messages récents restent inchangés ; une paire appel/résultat d'outil
++ne peut pas être coupée. Un contenu d'outil vide reste compatible avec un groupe
++complet.
++
++Un candidat vide, contradictoire, périmé ou interrompant un groupe produit un
++résultat FALLBACK contenant l'historique complet. Un historique source invalide
++est une erreur explicite. La recette écrit seulement des fichiers nouveaux ;
++elle ne modifie ni base de mission ni contexte d'agent. Ses PASS concernent cette
++référence extractive, pas la fidélité d'une paraphrase ou une acceptation métier.
++Les annotations et étiquettes de portée ne constituent pas une autorisation.
++Voir la [recette et les formats](../tools/memory-evaluation/README.md#référence-extractive-de-résumé-progressif).
++
++La synthèse automatique, sa politique éventuelle dans Admin/API/CLI/Go et son
++consommateur réel restent à intégrer et qualifier. Cette référence ne lance
++aucun modèle ; elle ne purge pas les historiques et ne restaure pas une session.
+ 
+ ## Fin confirmée d’un tour de dialogue
+ 
+--- before/docs/en/PROJECT-MEMORY.md
++++ after/docs/en/PROJECT-MEMORY.md
+@@ -230,6 +230,25 @@
+ summarize history or establish that a real LLM correctly applies a procedure.
+ Verification evidence and limits are retained under
+ `docs/plans/deepagents-integration/`.
++
++## Progressive summary reference outside the engine
++
++`tools/memory-evaluation/summarization.py` checks an extractive projection against
++annotated fixture history. It retains full quotes for open requirements, future
++intentions, historical evidence and open incidents, with source hashes, a cutoff
++and a parent receipt. Recent messages remain unchanged; a tool-call/result group
++cannot be split. Empty tool content remains valid within a complete group.
++
++An empty, contradictory, stale or group-splitting candidate produces a FALLBACK
++containing all original messages. Invalid source history is an explicit error.
++The recipe writes only new files, changing no mission database or agent context.
++A PASS covers this extractive reference, not paraphrase fidelity or business
++acceptance. Annotations and scope labels grant no access authority. See the
++[recipe and formats](../../tools/memory-evaluation/README.md#référence-extractive-de-résumé-progressif).
++
++Automatic summarization, any persisted Admin/API/CLI/Go policy and its actual
++consumer still require integration and qualification. This reference calls no
++model, purges no history and restores no provider session.
+ 
+ ## Confirmed dialogue turn completion
+ 
+--- before/tools/memory-evaluation/README.md
++++ after/tools/memory-evaluation/README.md
+@@ -246,3 +246,76 @@
+ Le client sélectionne le schéma V3 et lie son précontrôle au paquet exact. Le
+ contrôle local utilise HTTP 503, sans modèle. La préparation V3 ne lance aucune
+ campagne réelle et n’attribue aucun droit d’appel au paquet de douze entrées.
++
++## Référence extractive de résumé progressif
++
++`summarization.py` évalue un candidat fourni face à un historique **annoté de
++fixture**. Il ne lit pas les bases de mission, n'appelle aucun fournisseur et ne
++remplace pas le contexte des agents. Ses reçus restent `reference_only: true`
++et `model_effectiveness: NOT TESTED`, même quand le résultat de référence est PASS.
++La justesse des annotations et la qualité d'une paraphrase ne sont pas établies
++par ce contrôle. La présente version exige des citations intégrales, pas une
++synthèse libre. Ne pas fournir l'oracle annoté au modèle d'une future comparaison.
++
++L'historique JSON version 1 comprend `scope: {work, task}`, `messages` et
++`protected`. Chaque message porte `id`, `role` (`user`, `assistant`, `tool`) et
++`content`. Un assistant peut déclarer `tool_calls`, liste d'identifiants uniques ;
++chaque résultat porte son `tool_call_id`. Le groupe doit être complet, y compris
++avec un contenu d'outil vide, et aucune frontière ne le coupe. Les objets de
++`protected` portent `id`, `message`, `kind`, `state` ; les quatre couples de cette
++référence sont `requirement/open`, `evidence/historical`, `intention/future` et
++`incident/open`. Un élément protégé doit référencer un message non vide.
++
++Le candidat comporte exactement `schema_version: 1`, `source_sha256`, `cutoff`,
++`parent_sha256`, `status` et `entries`. `cutoff` compte les messages couverts ;
++c'est un entier strict entre zéro exclu et la longueur exclue de l'historique,
++sur une frontière de groupe complète. `status: ok` est nécessaire. Chaque entrée
++reprend une annotation protégée du préfixe et ajoute `source_sha256` (empreinte
++du message) et `text` (son contenu intégral). La liste suit l'ordre des annotations
++et doit toutes les couvrir, sans doublon, ajout ou changement d'état.
++L'empreinte de l'historique et des messages utilise JSON canonique UTF-8 : clés
++triées, séparateurs `,` et `:`, caractères Unicode conservés, nombres non finis
++refusés. Les espaces du texte restent significatifs.
++
++Pour progresser, fournir le précédent reçu PASS avec `--previous`, citer son
++`receipt_sha256` et avancer strictement la frontière. Le précédent historique
++doit rester un préfixe inchangé, annotations comprises ; les protections restent
++cumulées. Les empreintes identifient les documents, sans authentification,
++permission ou preuve de fraîcheur métier. Les identifiants de portée sont des
++étiquettes de fixture. Le contrôle du parent fourni ne remplace pas un registre
++autoritaire ou une vérification de concurrence du futur moteur.
++
++Exemple reproductible avec les sources synthétiques conservées :
++
++```sh
++python3 tools/memory-evaluation/summarization.py \
++  --history docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json \
++  --reference-cutoff 6 --output /tmp/summary-reference-candidate.json
++python3 tools/memory-evaluation/summarization.py \
++  --history docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json \
++  --candidate /tmp/summary-reference-candidate.json --output /tmp/summary-reference-result.json
++python3 tests/test_memory_summarization.py
++```
++
++`--reference-cutoff` crée un candidat depuis l'oracle : ce n'est pas une réponse
++de modèle. Pour tester une sortie fournie, utiliser `--candidate`. Tous les
++fichiers de sortie doivent être nouveaux ; ils sont créés en mode 0600.
++Code 0 : candidat de référence émis ou projection PASS. Code 1 : FALLBACK avec
++`summary_entries` vide, `cutoff: 0` et tous les messages originaux dans
++`recent_messages`. Il couvre échec déclaré, sortie mal formée/vide, citation ou
++état contradictoire, source périmée, filiation ou frontière refusée. Ce résultat
++signale le refus ; il ne prétend pas qu'un résumé a réussi.
++Code 2 : entrée source/parent absente ou illisible, historique invalide, référence
++impossible ou sortie existante ; aucun résultat utilisable n'est promis.
++Les fichiers source et les anciens reçus ne sont jamais modifiés. Une écriture
++interrompue peut laisser une sortie partielle, qui n'est pas un reçu valide.
++
++Le reçu donne les entrées protégées, messages récents inchangés et identifiants
++des messages non cités. Sa frontière et son empreinte du préfixe sont explicites.
++Les noms d'états et la forme de l'oracle définissent une recette ; ils ne créent
++pas de politique d'exécution, de rétention ou de résumé automatique du produit.
++Cette version ne modélise pas la résolution ultérieure d'un incident ou l'abandon
++autorisé d'une exigence ; ces transitions demanderont un contrat de conservation
++des états historiques et de la décision, sans renoter les fixtures précédentes.
++Le raccordement API/CLI/UI, les sources Swarm réellement autorisées, la décision
++d'admission et la qualité LLM restent des travaux distincts au plan mémoire.
+--- before/tools/memory-evaluation/summarization.py
++++ after/tools/memory-evaluation/summarization.py
+@@ -0,0 +1,210 @@
++#!/usr/bin/env python3
++"""Read-only extractive reference for progressive summaries; never calls a model."""
++from __future__ import annotations
++
++import argparse
++import copy
++import json
++import os
++from pathlib import Path
++import sys
++
++from compare import InvalidComparison, digest, load_json
++
++PROTOCOL = "swarm-extractive-summary-v1"
++STATES = {("intention", "future"), ("evidence", "historical"), ("incident", "open"), ("requirement", "open")}
++RECEIPT_KEYS = {"schema_version", "protocol", "result", "scope", "source_sha256", "source_message_count", "cutoff", "parent_sha256", "covered_prefix_sha256", "summary_entries", "recent_messages", "omitted_message_ids", "reasons", "reference_only", "model_effectiveness", "receipt_sha256"}
++
++
++class InvalidSummary(ValueError):
++    pass
++
++
++def checksum(value):
++    return digest(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False).encode())
++
++
++def exact(value, keys):
++    return isinstance(value, dict) and set(value) == set(keys)
++
++
++def label(value):
++    return isinstance(value, str) and bool(value.strip())
++
++
++def hash_reference(value):
++    return isinstance(value, str) and len(value) == 64 and all(c in "0123456789abcdef" for c in value)
++
++
++def validate_history(history):
++    if not exact(history, ["schema_version", "scope", "messages", "protected"]) or type(history["schema_version"]) is not int or history["schema_version"] != 1:
++        raise InvalidSummary("Invalid version-1 history")
++    if not exact(history["scope"], ["work", "task"]) or not all(label(v) for v in history["scope"].values()):
++        raise InvalidSummary("Explicit work/task scope labels required; labels are not access authority")
++    if not isinstance(history["messages"], list) or len(history["messages"]) < 2:
++        raise InvalidSummary("At least two source messages required")
++    indexed, pending, calls = {}, set(), set()
++    boundaries = {0}
++    for i, message in enumerate(history["messages"]):
++        if not isinstance(message, dict) or not {"id", "role", "content"} <= set(message) or set(message) - {"id", "role", "content", "tool_calls", "tool_call_id"}:
++            raise InvalidSummary("Invalid message fields")
++        if not label(message["id"]) or message["id"] in indexed or message["role"] not in ["user", "assistant", "tool"] or not isinstance(message["content"], str):
++            raise InvalidSummary("Invalid or duplicate source message")
++        if not label(message["content"]) and message["role"] != "tool" and "tool_calls" not in message:
++            raise InvalidSummary("Empty message outside a tool exchange")
++        indexed[message["id"]] = message
++        if message["role"] == "tool":
++            call = message.get("tool_call_id")
++            if "tool_calls" in message or not label(call) or call not in pending:
++                raise InvalidSummary("Orphan or duplicate tool result")
++            pending.remove(call)
++        else:
++            if "tool_call_id" in message or pending:
++                raise InvalidSummary("Unfinished tool group before another message")
++            if "tool_calls" in message:
++                group = message["tool_calls"]
++                if message["role"] != "assistant" or not isinstance(group, list) or not group or any(not label(c) for c in group) or len(set(group)) != len(group) or calls.intersection(group):
++                    raise InvalidSummary("Invalid or reused tool-call identity")
++                pending.update(group)
++                calls.update(group)
++        if not pending:
++            boundaries.add(i + 1)
++    if pending:
++        raise InvalidSummary("Incomplete source tool group; no valid comparison")
++    if not isinstance(history["protected"], list) or not history["protected"]:
++        raise InvalidSummary("Annotated protected sources required")
++    anchors = set()
++    for anchor in history["protected"]:
++        if not exact(anchor, ["id", "message", "kind", "state"]) or not label(anchor["id"]) or anchor["id"] in anchors:
++            raise InvalidSummary("Invalid or duplicate protected item")
++        if not isinstance(anchor["message"], str) or anchor["message"] not in indexed or not isinstance(anchor["kind"], str) or not isinstance(anchor["state"], str) or (anchor["kind"], anchor["state"]) not in STATES:
++            raise InvalidSummary("Unknown protected source or state")
++        if not label(indexed[anchor["message"]]["content"]):
++            raise InvalidSummary("Protected source cannot be empty")
++        anchors.add(anchor["id"])
++    return indexed, boundaries
++
++
++def prefix(history, count):
++    value = copy.deepcopy(history)
++    value["messages"] = value["messages"][:count]
++    ids = {m["id"] for m in value["messages"]}
++    value["protected"] = [a for a in value["protected"] if a["message"] in ids]
++    return value
++
++
++def entries_for(history, cutoff):
++    indexed = {m["id"]: m for m in history["messages"][:cutoff]}
++    return [{**a, "source_sha256": checksum(indexed[a["message"]]), "text": indexed[a["message"]]["content"]}
++            for a in history["protected"] if a["message"] in indexed]
++
++
++def reference_candidate(history, cutoff, previous=None):
++    """Oracle baseline, never model input: copy protected source messages verbatim."""
++    validate_history(history)
++    return {"schema_version": 1, "source_sha256": checksum(history), "cutoff": cutoff,
++            "parent_sha256": previous["receipt_sha256"] if previous else None,
++            "status": "ok", "entries": entries_for(history, cutoff)}
++
++
++def receipt(history, entries, cutoff, parent, reasons):
++    covered = prefix(history, cutoff)
++    cited = {a["message"] for a in entries}
++    value = {"schema_version": 1, "protocol": PROTOCOL, "result": "FALLBACK" if reasons else "PASS",
++             "scope": copy.deepcopy(history["scope"]), "source_sha256": checksum(history),
++             "source_message_count": len(history["messages"]), "cutoff": cutoff, "parent_sha256": parent,
++             "covered_prefix_sha256": checksum(covered) if cutoff else None, "summary_entries": copy.deepcopy(entries),
++             "recent_messages": copy.deepcopy(history["messages"][cutoff:]),
++             "omitted_message_ids": [m["id"] for m in covered["messages"] if m["id"] not in cited],
++             "reasons": reasons, "reference_only": True, "model_effectiveness": "NOT TESTED"}
++    value["receipt_sha256"] = checksum(value)
++    return value
++
++
++def valid_parent(history, previous):
++    if not exact(previous, RECEIPT_KEYS):
++        return False
++    if type(previous["schema_version"]) is not int or previous["schema_version"] != 1 or previous["protocol"] != PROTOCOL or previous["result"] != "PASS":
++        return False
++    if previous["parent_sha256"] is not None and not hash_reference(previous["parent_sha256"]):
++        return False
++    count, cutoff = previous["source_message_count"], previous["cutoff"]
++    if type(count) is not int or not 2 <= count <= len(history["messages"]) or type(cutoff) is not int or not 0 < cutoff < count:
++        return False
++    old = prefix(history, count)
++    try:
++        _, boundaries = validate_history(old)
++    except InvalidSummary:
++        return False
++    if cutoff not in boundaries:
++        return False
++    expected = receipt(old, entries_for(old, cutoff), cutoff, previous["parent_sha256"], [])
++    # Compare canonical JSON to reject bool/int aliases as well as changed fields.
++    return checksum(previous) == checksum(expected)
++
++
++def project(history, candidate, previous=None):
++    """On candidate failure preserve all originals; invalid sources fail explicitly."""
++    _, boundaries = validate_history(history)
++    def refuse(reason):
++        return receipt(history, [], 0, None, [reason])
++    if previous is not None and not valid_parent(history, previous):
++        return refuse("parent_or_sources_changed")
++    if not exact(candidate, ["schema_version", "source_sha256", "cutoff", "parent_sha256", "status", "entries"]) or type(candidate["schema_version"]) is not int or candidate["schema_version"] != 1:
++        return refuse("invalid_candidate")
++    if candidate["source_sha256"] != checksum(history):
++        return refuse("source_changed")
++    parent = previous["receipt_sha256"] if previous else None
++    if candidate["parent_sha256"] != parent:
++        return refuse("parent_mismatch")
++    if candidate["status"] != "ok":
++        return refuse("summarization_failed")
++    cutoff = candidate["cutoff"]
++    if type(cutoff) is not int or not 0 < cutoff < len(history["messages"]) or cutoff not in boundaries:
++        return refuse("invalid_boundary")
++    if previous and cutoff <= previous["cutoff"]:
++        return refuse("non_progressive_boundary")
++    expected = entries_for(history, cutoff)
++    if not expected or not isinstance(candidate["entries"], list) or checksum(candidate["entries"]) != checksum(expected):
++        return refuse("protected_sources_or_states_lost")
++    return receipt(history, expected, cutoff, parent, [])
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--history", type=Path, required=True)
++    choice = parser.add_mutually_exclusive_group(required=True)
++    choice.add_argument("--candidate", type=Path)
++    choice.add_argument("--reference-cutoff", type=int, help="Emit an oracle candidate, not a model result")
++    parser.add_argument("--previous", type=Path)
++    parser.add_argument("--output", type=Path, required=True)
++    args = parser.parse_args(argv)
++    try:
++        history = load_json(args.history)
++        validate_history(history)
++        previous = load_json(args.previous) if args.previous else None
++        if args.reference_cutoff is not None:
++            candidate = reference_candidate(history, args.reference_cutoff, previous)
++            check = project(history, candidate, previous)
++            if check["result"] != "PASS":
++                raise InvalidSummary("Reference candidate refused: " + ",".join(check["reasons"]))
++            value, code = candidate, 0
++        else:
++            try:
++                candidate = load_json(args.candidate)
++            except ValueError:
++                candidate = None
++            value = project(history, candidate, previous)
++            code = 0 if value["result"] == "PASS" else 1
++        fd = os.open(args.output, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
++        with os.fdopen(fd, "w", encoding="utf-8") as file:
++            file.write(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
++        print(json.dumps({"result": value.get("result", "REFERENCE_CANDIDATE"), "reference_only": True, "model_effectiveness": "NOT TESTED"}))
++        return code
++    except (OSError, InvalidSummary, InvalidComparison, ValueError, TypeError, KeyError) as error:
++        print("Summary reference error: " + str(error), file=sys.stderr)
++        return 2
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- before/tests/test_memory_summarization.py
++++ after/tests/test_memory_summarization.py
+@@ -0,0 +1,243 @@
++"""Read-only summary reference: no provider, model or mission database."""
++import copy
++import json
++import os
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++
++ROOT = Path(__file__).resolve().parents[1]
++sys.path.insert(0, str(ROOT / "tools/memory-evaluation"))
++import summarization as S
++
++
++def history(extended=False):
++    messages = [
++        {"id": "m1", "role": "user", "content": "Exigence ouverte : conserver les preuves originales."},
++        {"id": "m2", "role": "assistant", "content": "Le contrôle de l'ancien candidat a passé ; il ne prouve pas l'état courant."},
++        {"id": "m3", "role": "user", "content": "Déployer seulement après des contrôles frais et une décision autorisée ; ce n'est pas encore fait."},
++        {"id": "m4", "role": "assistant", "content": "Incident ouvert : effet d'écriture incertain ; vérifier avant de rejouer."},
++        {"id": "m5", "role": "assistant", "content": "Lecture diagnostique bornée.", "tool_calls": ["read-one"]},
++        {"id": "m6", "role": "tool", "content": "Historical fixture detail. " * 400, "tool_call_id": "read-one"},
++        {"id": "m7", "role": "user", "content": "Examiner les preuves avant la prochaine décision."},
++        {"id": "m8", "role": "assistant", "content": "La vérification reste à faire."},
++    ]
++    protected = [{"id": item, "message": f"m{i+1}", "kind": kind, "state": state}
++                 for i, (item, kind, state) in enumerate([("originals", "requirement", "open"), ("old-control", "evidence", "historical"), ("deployment", "intention", "future"), ("uncertain-write", "incident", "open")])]
++    if extended:
++        messages += [{"id": "m9", "role": "user", "content": "Nouvelle exigence ouverte : vérifier aussi le refus sans mutation."},
++                     {"id": "m10", "role": "assistant", "content": "Contrôle complémentaire en attente."}]
++        protected.append({"id": "no-mutation", "message": "m9", "kind": "requirement", "state": "open"})
++    return {"schema_version": 1, "scope": {"work": "summary-reference-fixture", "task": "t1"}, "messages": messages, "protected": protected}
++
++
++class SummaryReference(unittest.TestCase):
++    def setUp(self):
++        self.history = history()
++        self.candidate = S.reference_candidate(self.history, 6)
++
++    def fallback(self, candidate, previous=None, source=None):
++        source = self.history if source is None else source
++        before = copy.deepcopy(source)
++        result = S.project(source, candidate, previous)
++        self.assertEqual(result["result"], "FALLBACK")
++        self.assertEqual(result["cutoff"], 0)
++        self.assertEqual(result["summary_entries"], [])
++        self.assertEqual(result["recent_messages"], source["messages"])
++        self.assertEqual(result["omitted_message_ids"], [])
++        self.assertEqual(source, before)
++        return result
++
++    def test_reference_preserves_types_quotes_recent_messages_and_sources(self):
++        value = S.project(self.history, self.candidate)
++        self.assertEqual(value["result"], "PASS")
++        self.assertEqual(value["recent_messages"], self.history["messages"][6:])
++        self.assertEqual(value["omitted_message_ids"], ["m5", "m6"])
++        self.assertEqual([(a["kind"], a["state"]) for a in value["summary_entries"]], [("requirement", "open"), ("evidence", "historical"), ("intention", "future"), ("incident", "open")])
++        self.assertLess(len(json.dumps(value["summary_entries"])) + len(json.dumps(value["recent_messages"])), len(json.dumps(self.history["messages"])))
++        self.assertTrue(value["reference_only"])
++        self.assertEqual(value["model_effectiveness"], "NOT TESTED")
++
++    def test_progressive_summary_preserves_old_and_new_protections(self):
++        first = S.project(self.history, self.candidate)
++        extended = history(True)
++        second = S.project(extended, S.reference_candidate(extended, 9, first), first)
++        self.assertEqual(second["result"], "PASS")
++        self.assertEqual(second["parent_sha256"], first["receipt_sha256"])
++        self.assertEqual(len(second["summary_entries"]), 5)
++        self.assertEqual(second["summary_entries"][:4], first["summary_entries"])
++        self.assertEqual(second["recent_messages"], extended["messages"][9:])
++
++    def test_model_failure_preserves_all_original_messages(self):
++        self.candidate["status"] = "failed"
++        self.assertEqual(self.fallback(self.candidate)["reasons"], ["summarization_failed"])
++
++    def test_empty_candidate_cannot_erase_history(self):
++        self.candidate["entries"] = []
++        self.fallback(self.candidate)
++
++    def test_missing_open_incident_cannot_be_accepted(self):
++        self.candidate["entries"].pop()
++        self.fallback(self.candidate)
++
++    def test_contradictory_intention_evidence_and_incident_states_are_refused(self):
++        for index, state in [(1, "current_verified"), (2, "done"), (3, "resolved")]:
++            with self.subTest(index=index, state=state):
++                candidate = copy.deepcopy(self.candidate)
++                candidate["entries"][index]["state"] = state
++                self.fallback(candidate)
++
++    def test_changed_or_invented_quote_is_refused(self):
++        self.candidate["entries"][2]["text"] = "Deployment already completed."
++        self.fallback(self.candidate)
++
++    def test_duplicate_or_added_claim_is_refused(self):
++        self.candidate["entries"].append(copy.deepcopy(self.candidate["entries"][0]))
++        self.fallback(self.candidate)
++
++    def test_stale_source_hash_is_refused(self):
++        self.candidate["source_sha256"] = "0" * 64
++        self.fallback(self.candidate)
++
++    def test_invalid_boundaries_never_drop_recent_messages(self):
++        for cutoff in [-1, 0, 8, 99, True, 1.0, "6"]:
++            with self.subTest(cutoff=cutoff):
++                candidate = copy.deepcopy(self.candidate)
++                candidate["cutoff"] = cutoff
++                self.assertEqual(self.fallback(candidate)["reasons"], ["invalid_boundary"])
++
++    def test_tool_call_and_result_cannot_be_split(self):
++        self.candidate["cutoff"] = 5
++        self.assertEqual(self.fallback(self.candidate)["reasons"], ["invalid_boundary"])
++
++    def test_empty_tool_messages_are_valid_source_records(self):
++        self.history["messages"][4]["content"] = ""
++        self.history["messages"][5]["content"] = ""
++        candidate = S.reference_candidate(self.history, 6)
++        self.assertEqual(S.project(self.history, candidate)["result"], "PASS")
++
++    def test_parallel_tool_results_remain_one_complete_group(self):
++        self.history["messages"][4]["tool_calls"].append("read-two")
++        self.history["messages"].insert(6, {"id": "m6-second", "role": "tool", "content": "", "tool_call_id": "read-two"})
++        candidate = S.reference_candidate(self.history, 7)
++        self.assertEqual(S.project(self.history, candidate)["result"], "PASS")
++        candidate["cutoff"] = 6
++        self.assertEqual(self.fallback(candidate)["reasons"], ["invalid_boundary"])
++
++    def test_wrong_parent_is_refused(self):
++        self.candidate["parent_sha256"] = "0" * 64
++        self.fallback(self.candidate)
++
++    def test_changed_old_source_refuses_progression_even_with_new_candidate_hash(self):
++        first = S.project(self.history, self.candidate)
++        changed = history(True)
++        changed["messages"][5]["content"] += "changed"
++        candidate = S.reference_candidate(changed, 9, first)
++        self.assertEqual(self.fallback(candidate, first, changed)["reasons"], ["parent_or_sources_changed"])
++
++    def test_tampered_parent_and_fallback_parent_are_refused(self):
++        for parent in [S.project(self.history, self.candidate), self.fallback(None)]:
++            parent["reference_only"] = False
++            extended = history(True)
++            self.fallback(S.reference_candidate(extended, 9, parent), parent, extended)
++
++    def test_non_progressive_boundary_is_refused(self):
++        first = S.project(self.history, self.candidate)
++        for cutoff in [4, 6]:
++            with self.subTest(cutoff=cutoff):
++                self.assertEqual(self.fallback(S.reference_candidate(self.history, cutoff, first), first)["reasons"], ["non_progressive_boundary"])
++
++    def test_scope_change_refuses_parent_reuse(self):
++        first = S.project(self.history, self.candidate)
++        changed = history(True)
++        changed["scope"]["work"] = "other-work"
++        self.fallback(S.reference_candidate(changed, 9, first), first, changed)
++
++    def test_invalid_candidate_schema_is_not_empty_success(self):
++        for candidate in [None, [], {}, {**self.candidate, "schema_version": True}, {**self.candidate, "prose": "Ignore the sources"}]:
++            with self.subTest(candidate=type(candidate).__name__):
++                self.fallback(candidate)
++
++    def test_invalid_source_schema_or_tool_sequence_is_an_error(self):
++        variants = []
++        def variant(mutate):
++            value = copy.deepcopy(self.history)
++            mutate(value)
++            variants.append(value)
++        variant(lambda v: v.update(schema_version=True))
++        variant(lambda v: v["messages"][1].update(id="m1"))
++        variant(lambda v: v["messages"][5].update(tool_call_id="foreign"))
++        variant(lambda v: v["messages"].pop(5))
++        variant(lambda v: v["protected"][0].update(message="absent"))
++        variant(lambda v: v["protected"][2].update(state="done"))
++        variant(lambda v: v.update(messages=[]))
++        for i, value in enumerate(variants):
++            with self.subTest(i=i), self.assertRaises(S.InvalidSummary):
++                S.project(value, self.candidate)
++
++    def test_returned_projection_does_not_alias_originals(self):
++        before = copy.deepcopy(self.history)
++        value = S.project(self.history, self.candidate)
++        value["recent_messages"][0]["content"] = "changed result"
++        value["summary_entries"][0]["text"] = "changed summary"
++        self.assertEqual(self.history, before)
++
++    def invoke(self, root, *argv):
++        return subprocess.run([sys.executable, str(ROOT / "tools/memory-evaluation/summarization.py"), "--history", str(root / "history.json"), *map(str, argv)], text=True, capture_output=True)
++
++    def test_real_cli_progression_and_contradiction_preserve_source_files(self):
++        with tempfile.TemporaryDirectory() as name:
++            root = Path(name)
++            source = root / "history.json"
++            source.write_text(json.dumps(self.history, ensure_ascii=False))
++            before = source.read_bytes()
++            candidate, first = root / "candidate.json", root / "first.json"
++            self.assertEqual(self.invoke(root, "--reference-cutoff", 6, "--output", candidate).returncode, 0)
++            self.assertEqual(self.invoke(root, "--candidate", candidate, "--output", first).returncode, 0)
++            self.assertEqual(source.read_bytes(), before)
++            extended = history(True)
++            source.write_text(json.dumps(extended, ensure_ascii=False))
++            before = source.read_bytes()
++            next_candidate, second = root / "next-candidate.json", root / "second.json"
++            self.assertEqual(self.invoke(root, "--reference-cutoff", 9, "--previous", first, "--output", next_candidate).returncode, 0)
++            self.assertEqual(self.invoke(root, "--candidate", next_candidate, "--previous", first, "--output", second).returncode, 0)
++            bad = json.loads(next_candidate.read_text())
++            bad["entries"][3]["state"] = "resolved"
++            (root / "bad.json").write_text(json.dumps(bad))
++            refused = root / "refused.json"
++            result = self.invoke(root, "--candidate", root / "bad.json", "--previous", first, "--output", refused)
++            self.assertEqual(result.returncode, 1, result.stderr)
++            self.assertEqual(json.loads(refused.read_text())["recent_messages"], extended["messages"])
++            self.assertEqual(source.read_bytes(), before)
++            self.assertEqual(os.stat(second).st_mode & 0o777, 0o600)
++
++    def test_cli_invalid_json_duplicate_fields_and_nonfinite_values_fall_back(self):
++        for raw in ["", "{", '{"schema_version":1,"schema_version":1}', '{"value":NaN}', '{"value":' + '9' * 5000 + '}']:
++            with self.subTest(prefix=raw[:40]), tempfile.TemporaryDirectory() as name:
++                root = Path(name)
++                (root / "history.json").write_text(json.dumps(self.history))
++                (root / "bad.json").write_text(raw)
++                result = self.invoke(root, "--candidate", root / "bad.json", "--output", root / "result.json")
++                self.assertEqual(result.returncode, 1, result.stderr)
++                self.assertEqual(json.loads((root / "result.json").read_text())["recent_messages"], self.history["messages"])
++
++    def test_cli_existing_output_and_invalid_history_are_explicit_errors(self):
++        with tempfile.TemporaryDirectory() as name:
++            root = Path(name)
++            source = root / "history.json"
++            source.write_text(json.dumps(self.history))
++            output = root / "existing.json"
++            output.write_text("retained proof")
++            result = self.invoke(root, "--reference-cutoff", 6, "--output", output)
++            self.assertEqual(result.returncode, 2)
++            self.assertEqual(output.read_text(), "retained proof")
++            source.write_text('{"schema_version":1,"schema_version":1}')
++            result = self.invoke(root, "--reference-cutoff", 6, "--output", root / "absent.json")
++            self.assertEqual(result.returncode, 2)
++            self.assertFalse((root / "absent.json").exists())
++
++
++if __name__ == "__main__":
++    unittest.main(verbosity=2)
+--- before/docs/plans/deepagents-integration/INCREMENT-MEMOIRE-13.md
++++ after/docs/plans/deepagents-integration/INCREMENT-MEMOIRE-13.md
+@@ -0,0 +1,74 @@
++# M17 — contrat et référence exécutable de résumé progressif
++
++16 octobre 2026, reprise « suite ». Codex seul ; `replan`, cadrage
++`spec-builder`, puis APEX pour la recette de référence. MEM-U07/U09/U13,
++cas MEM-C16 et MEM-C17 ; acquis et appels M6–M16 conservés.
++
++## Décision et portée
++
++Swarm ne produit pas encore de résumé progressif. Ses dialogues, checkpoints,
++sélections mémoire et projections de reprise sont des contrats distincts.
++Ajouter immédiatement un appel de synthèse et remplacer le contexte demanderait
++une politique persistée/Admin, une conservation vérifiable et une qualification
++de fidélité. Une simple instruction demandant un bon résumé ne les prouverait pas.
++
++L'autre voie est une référence extractive exécutable avant raccordement : mêmes
++sources et mêmes assertions pour un résumé fourni, frontières explicites,
++progression chaînée et récupération sur refus. Elle est retenue pour M17.
++L'outil vit dans `tools/memory-evaluation/`, hors du moteur. Aucun résumé n'est
++admis, aucun agent lancé, aucune politique produit ajoutée. Le contrat de sources
++annotées sert d'oracle de test ; une citation exacte ne prouve pas à elle seule
++une bonne paraphrase, et les annotations ne constituent pas une vérité métier.
++
++## Contrat testable
++
++| ID | Quand / précondition | Effet exigé dans la référence |
++| --- | --- | --- |
++| SUM-01 | Historique fourni | Identités uniques, portée explicite, messages et annotations liés par SHA-256 ; aucune entrée invalide transformée en historique vide. |
++| SUM-02 | Frontière proposée | Entier strict, préfixe non vide et messages récents conservés ; aucun appel/résultat coupé ou résultat orphelin. |
++| SUM-03 | Éléments protégés dans le préfixe | Exigences ouvertes, intention future, preuve historique et incident ouvert présents avec citation/source/état exacts. Pas de prose libre qualifiée implicitement. |
++| SUM-04 | Deuxième résumé | Reçu parent lié à son contenu et aux sources, préfixe d'origine inchangé, frontière strictement avancée et même portée ; protections du préfixe cumulées. |
++| SUM-05 | Échec, vide, contradiction ou source périmée | Candidat refusé, contexte effectif revenu aux originaux complets, sans modification du fichier d'historique ni faux succès. |
++| SUM-06 | Publication d'un résultat de recette | Fichier nouveau, contenu vérifié ; évaluation locale distincte d'une sortie de modèle, d'une admission et de l'acceptation du produit. |
++
++La représentation de référence distingue `intention/future`, `evidence/historical`,
++`incident/open` et `requirement/open`. Les fixtures ne prétendent pas couvrir
++tous les états d'une future synthèse métier. Les messages d'outil sont opaques
++et conservés tels quels ; le validateur contrôle leurs liaisons, sans les exécuter.
++Une frontière exprime un nombre de messages couverts, pas un budget de tokens.
++
++```mermaid
++flowchart LR
++  H[Historique et oracle annotés] --> V[Validation des sources]
++  C[Candidat fourni et parent éventuel] --> G[Frontière, citations, états et filiation]
++  V --> G
++  G -->|Conforme| P[Extrait structuré et messages récents]
++  G -->|Refus ou échec| F[Historique complet conservé]
++  P --> R[Reçu de référence, aucune admission moteur]
++  F --> R
++```
++
++## Lots et preuves
++
++| Lot | Propriétaire / dépendance | Livrable et preuve |
++| --- | --- | --- |
++| M17.1 | Codex ; M16 | Sources amont à SHA fixe, contrat ci-dessus, cas avant réalisation de la référence. |
++| M17.2 | Codex ; M17.1 | Outil pur, schémas stricts et fichiers exclusifs ; tests des cas normaux, progression, refus et originaux conservés. |
++| M17.3 | Codex ; M17.2 | Vraie CLI Python : deux synthèses successives, refus contradictoire, empreintes des originaux et sortie existante refusée ; aucun modèle. |
++| M17.4 | Codex ; preuves précédentes | Revue locale, docs FR/EN, évaluation ajoutée sans renotation et RETEX. |
++
++La future intégration doit lire des sources Swarm autorisées, lier le contrat
++courant, réserver et comptabiliser les appels, proposer un aperçu inspectable et
++persister tout déclenchement éventuel dans Admin/API/CLI/Go. Raccorder ensuite
++le consommateur réel et comparer les mêmes cas avec un modèle sous autorisation
++distincte. Ces travaux ne sont pas assimilés à la présente référence locale.
++
++## Résultat local
++
++M17.1 à M17.4 réalisés : contrat et outil de référence, quatre sondes de méthode
++amont à SHA fixe, 24 tests Python distincts, 14 invocations de la vraie CLI de
++l'outil et dix refus restituant les originaux. Un refus erroné d'outils vides est
++reproduit puis corrigé. Documentation FR/EN, revue locale et RETEX conservés dans
++[RESULTATS-MEMOIRE-13.md](RESULTATS-MEMOIRE-13.md).
++Le raccordement au moteur, le résumé automatique, la politique Admin et la
++qualité LLM restent ouverts ; aucun fournisseur ou serveur réel modifié.
+--- before/docs/plans/deepagents-integration/RESULTATS-MEMOIRE-13.md
++++ after/docs/plans/deepagents-integration/RESULTATS-MEMOIRE-13.md
+@@ -0,0 +1,142 @@
++# M17 — référence vérifiée avant résumé automatique
++
++16 octobre 2026, après « suite ». Le contrat et la référence exécutable de
++[l'incrément 13](INCREMENT-MEMOIRE-13.md) sont réalisés. L'outil est hors moteur :
++aucun contexte d'agent, base de mission ou fournisseur n'est modifié. Le résumé
++automatique du produit reste à intégrer et qualifier.
++
++## Sources et décision
++
++Le dépôt Swarm possède une synthèse de mission écrite par `checkpoint`, des
++échanges de préparation, une session fournisseur par dialogue et la projection
++déterministe M16. Aucun de ces producteurs ne constitue une synthèse progressive
++attribuée avec récupération sur échec. Ajouter un appel LLM et remplacer
++l'historique aurait introduit une politique et une nouvelle confiance sans recette.
++La voie retenue est une référence extractive testable avant ce raccordement.
++
++Le code Deep Agents au SHA `29d646fd2d832a44c476964333eddecb0ec1c0cd`
++conserve une frontière `cutoff_index`, un message de résumé et un chemin d'historique.
++La méthode `_apply_event_to_messages` reconstruit résumé puis suffixe. Quatre
++sondes exécutent uniquement cette méthode extraite par AST du fichier conservé,
++dont l'empreinte est vérifiée contre M16. Elles observent : frontière 2 sur trois
++messages → résumé et dernier message ; frontière -1 → même dernier message ;
++frontière 4 → résumé seul avec avertissement ; booléen vrai → résumé et suffixe
++à partir de l'index 1. Ce résultat ne prouve pas que le middleware complet crée
++ces frontières ; nous n'attribuons pas cette observation à tout son parcours.
++Source, sonde et résultats : `evidence/m17-20261016/upstream-boundary-probe.py`,
++`upstream-boundary.json`, `upstream.json/.log` ; original amont conservé en M16.
++
++## Contrat livré
++
++`tools/memory-evaluation/summarization.py` valide un historique annoté de fixture
++et un candidat fourni. Les messages, états protégés, portée et reçu parent sont
++liés par empreinte ; une empreinte n'est ni une authentification ni un droit.
++Le candidat doit conserver intégralement les messages protégés du préfixe :
++exigence ouverte, preuve historique, intention future et incident ouvert.
++Les états et citations contradictoires, absents ou ajoutés sont refusés.
++La liste suit l'ordre de l'oracle. Il n'y a pas d'évaluation de prose libre.
++
++La frontière est un entier strict, laisse des messages récents et ne coupe aucun
++groupe d'outils. Les résultats vides sont valides dans un groupe complet. Pour
++progresser, les anciens messages et annotations restent un préfixe inchangé et
++la nouvelle frontière avance ; les protections précédentes restent incluses.
++Un refus de candidat produit FALLBACK : aucun extrait admis et tous les messages
++sources restitués. Un historique invalide est une erreur, pas une liste vide.
++Les sorties sont exclusives et privées, les sources et anciens reçus intacts.
++
++Les annotations constituent un oracle de recette, sans preuve de leur justesse
++métier. La version ne modélise pas la résolution ultérieure d'un incident ou
++l'abandon autorisé d'une exigence. Les messages d'outil sont une représentation
++de référence ; aucune validité du protocole d'un fournisseur réel n'est déclarée.
++Les reçus restent `reference_only: true`, `model_effectiveness: NOT TESTED`.
++
++## Preuves et vérification
++
++| Exigence | Résultat local / preuve sous `evidence/m17-20261016/` |
++| --- | --- |
++| SUM-01 sources, portée, schéma, état protégé et entrées invalides | PASS, tests nommés dans `reference-final.json/.log`. JSON dupliqué/non fini et historique invalide refusés. |
++| SUM-02 frontières et outils | PASS, entiers négatifs/nuls/trop grands, booléens/flottants et coupure d'un groupe refusés. Groupes complets, contenus vides et résultats multiples couverts. |
++| SUM-03 éléments protégés et fidélité extractive | PASS sur la fixture : citations intégrales et états exacts ; omission de l'incident, invention et promotion du futur/historique refusées. Pas de fidélité LLM déduite. |
++| SUM-04 progression | PASS sur deux synthèses ; parent modifié, source ancienne changée, portée différente et frontière sans progression refusés. |
++| SUM-05 échec et originaux | PASS, échec déclaré, vide et contradictions donnent tous les messages originaux, sans alias mutable sur les entrées. |
++| SUM-06 publication de recette | PASS, vraie CLI de l'outil Python, fichiers nouveaux en 0600, sortie existante conservée et erreur explicite. |
++| Prévention du refus des outils vides | ERROR reproduit avant correction, puis PASS : `empty-source-red.json/.log` et préimages du module/test. |
++| Diff, sources courantes, anciens résultats et environnement | `audit-final.json`, `candidate.diff`, contrôle des empreintes M16 ; serveur utilisateur conservé. |
++
++**24 tests Python distincts** passent ; les 22 tests préliminaires ne s'y ajoutent
++pas. La vraie CLI de l'outil effectue **14 invocations sur la recette finale** : deux candidats de
++référence générés, deux projections progressives PASS et dix refus FALLBACK.
++Il s'agit d'invocations Python, pas d'appels fournisseur ou de la CLI applicative
++Swarm. Les sources synthétiques initiales et étendues restent byte à byte
++identiques après les essais ; originaux, arguments, sorties, codes et empreintes
++sont conservés sous `cli/`.
++
++Après la correction du décodeur, les preuves courantes sont sous `cli-final/`
++et `reference-final.json/.log` ; le premier parcours `cli/` reste historique.
++
++Le premier contexte de référence passe de 11 655 octets de messages sources à
++1 236 octets d'entrées protégées et messages récents, sur cette fixture contenant
++un long résultat d'outil synthétique. Les quatre protections restent présentes ;
++la seconde projection en conserve cinq. Cette mesure n'est pas un gain établi
++en tokens, coût ou qualité LLM. Aucun modèle, appel natif Swarm ou base réelle.
++
++La documentation [FR](../../PROJECT-MEMORY.md), [EN](../../en/PROJECT-MEMORY.md)
++et la [recette détaillée](../../../tools/memory-evaluation/README.md#référence-extractive-de-résumé-progressif)
++expliquent les formats, sorties, refus et limites. Les sources Go, ressources
++embarquées et paramètres de construction M16 n'ont pas changé ; ses preuves ne
++sont pas renommées en nouveaux tests. Pas de compilation ou campagne navigateur
++supplémentaire : aucun moteur ni écran modifié.
++
++## Replan et RETEX
++
++La revue du premier outil révèle une hypothèse trop stricte : « message vide »
++était assimilé à une source invalide, même pour un appel sans texte et un résultat
++d'outil vide. Le nouveau cas reproduit ce refus avant correction. Le validateur
++partagé accepte ensuite ces enregistrements dans un groupe complet, garde le
++refus d'une protection vide et ajoute le cas de résultats multiples. La correction
++ne repose ni sur une mission ni sur une formulation d'erreur. Les 24 tests et
++la recette passent avec ces sources corrigées.
++
++Un second cas reproduit une exception `ValueError` du décodeur JSON (entier
++dépassant sa capacité de conversion). Le candidat était refusé avec code 2,
++sans reçu de FALLBACK, alors que les originaux étaient disponibles. Toutes les
++erreurs de décodage de candidat de cette famille suivent désormais le même
++retour à l'historique, sans relever la limite du parseur. Cas et sources rouges :
++`candidate-decoder-red.json/.log` et préimages ; variantes JSON invalide,
++champs dupliqués et nombres non finis conservées dans le même test.
++Le collecteur omettait le nom d'un test dont seul le sous-test portait FAIL ;
++le journal prouve un test exécuté. Le reçu initial est conservé, son évaluation
++de comptage est séparée et le collecteur est corrigé pour les contrôles suivants.
++
++La première recherche de test amont utilisait un nom supposé absent. La découverte
++par `rg --files` identifie `test_summarization_middleware.py` ; aucun résultat de
++cette suite non exécutée n'est déclaré. Les sources réellement exécutées sont
++la méthode AST épinglée et l'outil de référence local. Les empreintes des sources
++Python sont inchangées entre les contrôles finaux et la revue ; les versions
++précédentes restent conservées. Les pages de documentation suivies par le
++collecteur ont évolué après les premiers contrôles, sans être des entrées de
++leur exécution Python.
++
++La revue locale examine schémas, chaînes de sources, états, messages d'outil,
++sorties exclusives, erreurs et absence de mutation. Ce n'est pas une revue
++indépendante. L'apprentissage réutilisable figure dans la recette et les docs :
++distinguer vide valide d'un outil, sortie vide de synthèse, contenu cité, état
++historique et autorisation. Le contrôle de citations n'est pas une analyse
++sémantique générale ; les étiquettes et empreintes ne remplacent pas les droits.
++
++## État restant et suite du plan
++
++MEM-C16 et MEM-C17 restent **PARTIAL** : frontières, attribution, fidélité
++extractive des éléments annotés et récupération sont vérifiées dans la référence,
++sans résumé LLM ni raccordement aux agents. Les évaluations historiques sont
++conservées sans renotation. Le serveur réel reste au PID 2186583, même URL ;
++aucun déploiement, migration, purge ou admission de résumé.
++
++La prochaine intégration doit d'abord produire des sources Swarm autorisées et
++un état courant inspectable, puis lier toute proposition à ce contrat, à ses
++originaux et au candidat réellement consommé. Une politique de déclenchement,
++taille ou rétention éventuelle doit être persistée et éditable dans Admin avec
++les mêmes validations API/CLI/Go. Il faudra vérifier le reçu réellement transmis,
++les erreurs de synthèse, la fraîcheur et la conservation avant remplacement.
++La comparaison LLM devra garder les mêmes cas et des reçus d'exécution séparés ;
++les huit appels M6/M7 restent consommés et aucun nouvel appel n'est inféré.

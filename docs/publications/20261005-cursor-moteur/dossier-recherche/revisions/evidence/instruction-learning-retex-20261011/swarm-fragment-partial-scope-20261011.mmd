@@ -1,0 +1,10 @@
+flowchart TD
+    I[Inspection locale defavorable] --> J[Journal original et empreinte]
+    J --> P[Inspection des autres paquets]
+    P --> S[Selection des originaux du candidat complet]
+    S --> R[Revue finale et resolution de chaque constat]
+    R -->|Defaut confirme| N[Refus global independant]
+    R -->|Preuve manquante| U[Unknown et replan du proprietaire]
+    R -->|Constat refute avec original| C[Controles frais et garde de publication]
+    P -->|Erreur de transport ou protocole| E[Cause reelle et constats locaux conserves]
+    E --> U

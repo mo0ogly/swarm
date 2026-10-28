@@ -1,0 +1,12 @@
+--- web/runtime-health.js@tested-dev35
++++ web/runtime-health.js@documented
+@@ -38,6 +38,9 @@
+    const modified=binary?.modified===true?'*':'';summary.textContent=(binary?.version||'devel')+' · '+this.short(binary?.commit)+modified;
+   }
+  },
++ /** Render only observed identity, notes and optional comparison. Native source
++  * observation stays explicitly absent; loading/errors replace stale content.
++  * Text rendering and restricted links never execute producer strings. */
+  paintDialog(){
+   const host=document.getElementById('version-dialog-content');if(!host)return;host.replaceChildren();
+   if(this.error){const p=document.createElement('p');p.className='notice alert';p.textContent=this.t('Version et historique indisponibles. Réessayez lorsque le serveur répond.');host.append(p);return}

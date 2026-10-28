@@ -1,0 +1,16 @@
+{
+  "pid": 2355997,
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-receipt",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm",
+    "mission",
+    "watch",
+    "w-68b50cc82ec3fe55624f9549"
+  ],
+  "proc_start_ticks": "3117319",
+  "started_at_utc": "2026-10-15T02:19:05.438314+00:00",
+  "executable": "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-receipt",
+  "binary_sha256": "9e00af8f8968cbafff8640eff72f3c6bc4012862a1e7563418446bc672b8b0b3",
+  "source_proof": "receipt-resolution-source-proof.json"
+}

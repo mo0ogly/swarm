@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "build.sh",
+    "bin/swarm-actions-confiance-proof-exact"
+  ],
+  "pid": 465467,
+  "start_ticks": "6965116",
+  "started_unix": 1792135227.0237608,
+  "status": "passed",
+  "exit_code": 0,
+  "ended_unix": 1792135254.90412,
+  "inputs_unchanged": true,
+  "changed_inputs": [],
+  "binary": "bin/swarm-actions-confiance-proof-exact",
+  "binary_sha256": "5b9ce6f43d0498624d120c70ab72b8c6b3a66785f0d856df8a357115fedfd2c6"
+}

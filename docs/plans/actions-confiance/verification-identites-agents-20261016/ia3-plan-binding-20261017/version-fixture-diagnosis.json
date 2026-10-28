@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-17T07:44:30.137145+00:00",
+  "original": "generation-after.jsonl",
+  "cause": "The old version guard fixture writes literal PRAGMA user_version=37. After migration to actual schema 37 this no longer creates an incompatible version.",
+  "correction": "Set schemaVersion+1 in the fixture; retain the exact storage_version_conflict assertion.",
+  "owner": "Codex",
+  "status": "pending verification"
+}

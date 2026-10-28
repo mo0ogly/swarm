@@ -1,0 +1,68 @@
+{
+  "at": "2026-10-11T15:37:31.262040+00:00",
+  "bundle": {
+    "at": "2026-10-11T15:36:25.267112+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-account-20261011.bundle",
+    "sha256": "bdf4a6d75d679ac06b45d1922e77c2514658016297795a24e53968fc5b4f99d1",
+    "bytes": 335258,
+    "ref": "refs/heads/operator-inputs",
+    "commit": "af878d99337e45da0948208b2becffe098adea6c",
+    "manifest_sha256": "671363c02c3168a386a30131edc08173eacae9ae506b61c1ab3f171a410dfe60",
+    "input_files": 53,
+    "source": "/tmp/swarm-operator-account-inputs-20261011-hxrp7ish",
+    "isolated_import_check": "/tmp/swarm-operator-account-input-check-yb96yvvz",
+    "verification": "PASS isolated fetch, exact commit/manifest/all53 full hashes",
+    "limits": "Operator inputs, no future native integration or acceptance claimed"
+  },
+  "receipts": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "before": 351,
+      "after": 352,
+      "next_sha256": "2f5d34882852d4632fae79460ab71f1b328a33c271b0a9a151371da06edc777c",
+      "learnings_preserved": true,
+      "consumed_calls": 29
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "before": 352,
+      "after": 353,
+      "next_sha256": "164d98e42174ae28cf5e7bfef3c6efab630004fe1ba60a6f43da96b184262939",
+      "learnings_preserved": true,
+      "consumed_calls": 29
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "before": 353,
+      "after": 354,
+      "next_sha256": "e195d6f75fb673809197fc5895e11ff838eb2235df6151c52fe07f6478be2828",
+      "learnings_preserved": true,
+      "consumed_calls": 29
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "before": 354,
+      "after": 355,
+      "next_sha256": "e351c088c6009b6f72a2e9e21f2dd2f5b4677cd273575a8f1fd32b28447bb067",
+      "learnings_preserved": true,
+      "consumed_calls": 29
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "before": 355,
+      "after": 356,
+      "next_sha256": "ea185b52a3cd996171dbf5f51e23646d16c8e258c907a95caa0d80cc10461f56",
+      "learnings_preserved": true,
+      "consumed_calls": 29
+    },
+    {
+      "task": "plan-ca937edf4e-T8",
+      "before": 356,
+      "after": 357,
+      "next_sha256": "b3b570524678d6dd5e21ddbd39f0180eb634b827cd1a0b08469aa0b47454a7b8",
+      "learnings_preserved": true,
+      "consumed_calls": 29
+    }
+  ],
+  "limit": "Public task inputs received, no native integration or future acceptance"
+}

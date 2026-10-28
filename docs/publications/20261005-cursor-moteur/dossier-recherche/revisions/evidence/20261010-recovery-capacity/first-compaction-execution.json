@@ -1,0 +1,30 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestAgentWorkflow|TestRecoveredResult|TestManagedDeliveryEvidence|TestManagedReviewSources)",
+    "-count=1",
+    "-json",
+    "-timeout",
+    "90s"
+  ],
+  "started_at": "2026-10-10T19:48:18.394642+00:00",
+  "finished_at": "2026-10-10T19:48:36.533790+00:00",
+  "exit_code": 1,
+  "executor": "host operator; isolated test fixtures; no live mission mutation",
+  "source": "dirty working tree; code/doc patch recorded separately",
+  "artifacts": [
+    {
+      "path": "/tmp/swarm-recovery-capacity-verification/stdout.jsonl",
+      "bytes": 53388,
+      "sha256": "4d0be640afe3a2d6adbe27817daa2aa35d424753fc0e3b83415a2299ed43eacb"
+    },
+    {
+      "path": "/tmp/swarm-recovery-capacity-verification/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "original": "finalize-original.py retained with terminal-newline assertion failure",
+  "observed": "work_budget.rs has no terminal newline; no trailing whitespace, compilation and public recipes PASS",
+  "diagnosis": "Ad hoc finalization assertion introduced a terminal-newline requirement absent from repository contract/git diff --check; not a Rust syntax, public flow or delivery failure. Do not change tested product to satisfy an invented gate.",
+  "correction": "Retain original, narrow diagnostic to required trailing whitespace/hash verification, explicitly record absent terminal newline rather than claiming newline compliance",
+  "owner": "Codex",
+  "product_source_changed": false
+}

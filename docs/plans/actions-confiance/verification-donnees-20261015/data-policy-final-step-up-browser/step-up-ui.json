@@ -1,0 +1,34 @@
+{
+  "checks": [
+    "fr: blank age is rejected without network preview or configuration mutation",
+    "fr: incomplete strong policy is rejected in the selected language without applying configuration",
+    "fr: Admin preview performs no discovery, then exact policy persists",
+    "fr: saved age, proof lifetime and ACR values reopen with keyboard focus and no mobile overflow",
+    "fr: static approval is denied and the UI requires an approver sign-in",
+    "fr: ordinary OIDC session cannot approve the action",
+    "fr: CLI start rejects missing identity before network and accepts the configured approver through SWARM_TRUST_TOKEN",
+    "fr: actual OIDC reauthentication validates max_age, essential ACR/auth_time, nonce and PKCE for the selected action",
+    "fr: strong proof rejects another action and permits exactly the approved content",
+    "fr: one simulated effect renders on mobile, credentials remain redacted and logout clears the identity",
+    "en: blank age is rejected without network preview or configuration mutation",
+    "en: incomplete strong policy is rejected in the selected language without applying configuration",
+    "en: Admin preview performs no discovery, then exact policy persists",
+    "en: saved age, proof lifetime and ACR values reopen with keyboard focus and no mobile overflow",
+    "en: static approval is denied and the UI requires an approver sign-in",
+    "en: ordinary OIDC session cannot approve the action",
+    "en: CLI start rejects missing identity before network and accepts the configured approver through SWARM_TRUST_TOKEN",
+    "en: actual OIDC reauthentication validates max_age, essential ACR/auth_time, nonce and PKCE for the selected action",
+    "en: strong proof rejects another action and permits exactly the approved content",
+    "en: one simulated effect renders on mobile, credentials remain redacted and logout clears the identity"
+  ],
+  "errors": [],
+  "expectedDiagnostics": [
+    "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+    "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+  ],
+  "discovery": 10,
+  "exchanges": 4,
+  "strongRequests": 2,
+  "root": "/tmp/swarm-step-up-ui-YY3ec1",
+  "at": "2026-10-15T20:19:54.849Z"
+}

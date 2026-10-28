@@ -1,0 +1,11 @@
+=== RUN   TestNativeReviewMandatePolicyRevisionMustRemainCurrent
+=== RUN   TestNativeReviewMandatePolicyRevisionMustRemainCurrent/approve
+    native_policy_epoch_regression_test.go:6: old mandate authority admitted after requester removal: approve engine.TrustAction{ID:"act-761b0c0db35dc97da35d", MandateID:"epoch-mandate", Requester:"alice", Approver:"bob", Resource:"invoice/acme", Amount:100, Currency:"EUR", Beneficiary:"ACME", IdempotencyKey:"epoch-key", ContentHash:"761b0c0db35dc97da35d20633b83480d3b9279aae484abaae0f86a12f055228b", OriginalHash:"4e233b07d92e99e2ec01c4ac16e3d699047d7d3f06d8ec9644ae380b9ed8a356", State:"approved", Reason:"", NextAction:"engager le connecteur simulé", CreatedAt:"2026-10-14T12:00:00Z", UpdatedAt:"2026-10-14T12:00:00Z"}
+=== RUN   TestNativeReviewMandatePolicyRevisionMustRemainCurrent/commit
+    native_policy_epoch_regression_test.go:6: old mandate authority admitted after requester removal: commit engine.TrustAction{ID:"act-761b0c0db35dc97da35d", MandateID:"epoch-mandate", Requester:"alice", Approver:"bob", Resource:"invoice/acme", Amount:100, Currency:"EUR", Beneficiary:"ACME", IdempotencyKey:"epoch-key", ContentHash:"761b0c0db35dc97da35d20633b83480d3b9279aae484abaae0f86a12f055228b", OriginalHash:"4e233b07d92e99e2ec01c4ac16e3d699047d7d3f06d8ec9644ae380b9ed8a356", State:"committed", Reason:"", NextAction:"consulter ou exporter les preuves", CreatedAt:"2026-10-14T12:00:00Z", UpdatedAt:"2026-10-14T12:00:00Z"}
+--- FAIL: TestNativeReviewMandatePolicyRevisionMustRemainCurrent (0.05s)
+    --- FAIL: TestNativeReviewMandatePolicyRevisionMustRemainCurrent/approve (0.03s)
+    --- FAIL: TestNativeReviewMandatePolicyRevisionMustRemainCurrent/commit (0.03s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.081s
+FAIL

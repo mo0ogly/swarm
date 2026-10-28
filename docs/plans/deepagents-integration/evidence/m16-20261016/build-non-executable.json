@@ -1,0 +1,9 @@
+{
+  "artifact": "/tmp/swarm-m16-bin-xz0f58zo/swarm",
+  "sha256": "77e558f68823ce966f31ce12ee526a5e080869041d0698e412d3e7152f37030a",
+  "type": "/tmp/swarm-m16-bin-xz0f58zo/swarm: current ar archive",
+  "cause": "go build . built the root resource library, not the public CLI. Exit 0 was compilation only, not executable verification.",
+  "native_result": "PermissionError before init or provider invocation; no model call.",
+  "owner": "Codex",
+  "resumption_condition": "Inspect actual entry point, build the CLI, verify executable mode and version before native recipe."
+}

@@ -1,0 +1,32 @@
+{
+  "at_utc": "2026-10-16T21:00:41.505503+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "files": {
+    "tools/memory-evaluation/swarm_source.py": "9719e13624c5aacd348f9b8b9d3eeb646aa84d53821c9aadbe1213a00e15a256",
+    "tools/memory-evaluation/admission.py": "a089c56d814ae67150bc925b23d874325f08ccf23744af22c7376796dcb96e35",
+    "tests/test_memory_swarm_source.py": "6d93db706d9d086653d93b48f7821f657c1a5150391dbb7ee767aee45521906f",
+    "tests/test_memory_summary_admission.py": "a1273a326eff766438e917edc7c0acab981307740c42738df5562a5be4c7ad82",
+    "tools/memory-evaluation/README.md": "b0d253487e376a1de0c2128bd939015bd479b46f66105b85acb9ca2058001697",
+    "docs/PROJECT-MEMORY.md": "f009622e713d5cf1d8aaefa89d646fbcd30d74b5361e93aea9c269b819ed2116",
+    "docs/en/PROJECT-MEMORY.md": "7cd2c2fdb057c9a984056e6bcae91e523953b2342adf7d7f4ddd4d6f9ba17a80",
+    "docs/plans/deepagents-integration/PLAN.md": "459379bcb3d71ff73c77d140d5576cebcbda164ab8c593b3d68f98b2f8454270",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-16.md": "01c1ed29409ad4a9c2821e67d12d87e3ac6527f65f963352bd22748276e4c4ae"
+  },
+  "read_only_contracts": {
+    "internal/engine/memory_summary_source.go": "d0a5552fe9a5a93d68e9f4e8eb62d096ac7e1503d842e93bb77744aff8cdadfa",
+    "internal/engine/memory_summary_selection.go": "97a7c589e1196ad5335778bb6e438e1e58571bdde0b0c69bb56369595970fe38",
+    "internal/engine/dialogue_context.go": "510d596e9f20ee3e27c3791b3ebf1ef2c96cf2d3eb348907b5e76725f99bf079",
+    "internal/engine/model.go": "3f26b76f62a1150019989d6695573991a04de16d0b1db1778f3259f9ade8c023",
+    "internal/engine/agents_store.go": "6d0a96e05f6e155377ed8d9287c40f0b475c7a62b13542f81655888cb7204f21",
+    "internal/engine/agents_process.go": "00d74a35555c8c4fb2f2ac56d5482bc3b8a8ca0bbb97755a14f5cb02dfec256f",
+    "internal/engine/store.go": "85ddbecfcbfb4a9554eee520d6e78fdd65904b711525eb4b37879d9d3531940a",
+    "internal/engine/brainstorm.go": "dc1dd724d07d6d963de53d13048609c619adbc3b7ba726d4234f06bb72b8ae10",
+    "internal/engine/assist_context.go": "b2f03faa289a8d2b5f4791bb34c63cb9e0175d29a677d1b1cea06120a355d711",
+    "internal/engine/worker_context.go": "972a8be5eb8bfc19ede1300f19e0843c4499e2e2a5b2c90e2250075f15a84857",
+    "internal/engine/retex.go": "0112c6e2b1d31de4f7d8c829f046cbe86c4cb2588123b8bfa13b6ff9f2b3f0ec",
+    "internal/engine/project_memory.go": "84873dfb728b17f34c0c3d2522fe6b77c220f664c4148f3bdbc1e87a9b2a5d35",
+    "internal/engine/archive.go": "7affca0bbc15f4878497696ba7b0fdffe0d5ac440008ea2dd6f5d6c4225b63da"
+  },
+  "coordination": "identity IA1 sources unchanged; memory owns tools/tests/memory docs; common engine and Trust sources read-only in this increment"
+}

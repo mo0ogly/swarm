@@ -1,0 +1,7 @@
+{
+  "at": "2026-10-12T09:22:05.277520+00:00",
+  "reason": "User requests T3 before this correction",
+  "pid": 1137721,
+  "qualification": "interrupted by explicit deferral, not PASS",
+  "source": "isolated27 preserved; runtime26 unchanged"
+}

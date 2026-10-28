@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "source_sha256": "b17a236b1a4ac3bb35c510b32940f88cc970b40ca167d46fbf0c85711f403530",
+  "protected": [
+    {
+      "id": "snapshot",
+      "message": "current-task-snapshot",
+      "kind": "evidence",
+      "state": "historical"
+    },
+    {
+      "id": "future",
+      "message": "dialogue-0857c7f44f19fff0f60fa452a437a401040039c79a8bcb9de93820f9f2e76812-question",
+      "kind": "intention",
+      "state": "future"
+    },
+    {
+      "id": "prior",
+      "message": "dialogue-0857c7f44f19fff0f60fa452a437a401040039c79a8bcb9de93820f9f2e76812-answer",
+      "kind": "evidence",
+      "state": "historical"
+    },
+    {
+      "id": "incident",
+      "message": "dialogue-cd41c55dc4098ca9ef9e02896ce0af35899d96fbde5c0b69cf03327f43f0f353-question",
+      "kind": "incident",
+      "state": "open"
+    }
+  ]
+}

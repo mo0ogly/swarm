@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "tests/test_memory_knowledge.py"
+  ],
+  "started_at_utc": "2026-10-16T08:09:29.160737+00:00",
+  "ended_at_utc": "2026-10-16T08:09:29.566179+00:00",
+  "exit_code": 0,
+  "source_sha256": {
+    "tools/memory-evaluation/compare.py": "4d54142fcd36d9f81cc0965e35b60dd5754a2ea4e8064e61f0dfdf642afe861e",
+    "tools/memory-evaluation/knowledge.py": "3f3fffdcc076f45cf53a2987b45d1f26900a8b11692a160be650cb50de37db25",
+    "tools/memory-evaluation/storage_plan.py": "6d835982e55b7c969ccbfea6df5b1a40f9efbed98fb9dd6705b9d95273660848",
+    "tools/memory-evaluation/run_codex.py": "90ad871cf1945e01bd0fcdebc763a2eea302cf1e30a0c89f64a3b57bbbda1cfd",
+    "tests/test_memory_storage_plan.py": "4a71c17f755f9866b0caf52713ae1a495c9da52aafffb7d0f1331d51210cfa80",
+    "tests/test_memory_codex_events.py": "a0c1f578f471570e8d6723a029030e0d9a265fff3ed86b23d893827e8d909e43",
+    "tests/test_memory_knowledge.py": "a177c3bcdeb3b5764dc7dda2063e8b37a459b12ccf66debc3c6d37740098f377",
+    "tests/test_memory_comparison.py": "b5805aeb7784e21764ead0983532653c0b02174cbe5d31698a6355f6a660fb7c"
+  },
+  "log_sha256": "16c54926b7932aac1cd04aa42f3d61a062e4f91d85bb0c921b651cdcc40da820",
+  "expected_named_tests": 11
+}

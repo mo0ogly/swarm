@@ -1,0 +1,210 @@
+#!/usr/bin/env python3
+"""Read-only extractive reference for progressive summaries; never calls a model."""
+from __future__ import annotations
+
+import argparse
+import copy
+import json
+import os
+from pathlib import Path
+import sys
+
+from compare import InvalidComparison, digest, load_json
+
+PROTOCOL = "swarm-extractive-summary-v1"
+STATES = {("intention", "future"), ("evidence", "historical"), ("incident", "open"), ("requirement", "open")}
+RECEIPT_KEYS = {"schema_version", "protocol", "result", "scope", "source_sha256", "source_message_count", "cutoff", "parent_sha256", "covered_prefix_sha256", "summary_entries", "recent_messages", "omitted_message_ids", "reasons", "reference_only", "model_effectiveness", "receipt_sha256"}
+
+
+class InvalidSummary(ValueError):
+    pass
+
+
+def checksum(value):
+    return digest(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False).encode())
+
+
+def exact(value, keys):
+    return isinstance(value, dict) and set(value) == set(keys)
+
+
+def label(value):
+    return isinstance(value, str) and bool(value.strip())
+
+
+def hash_reference(value):
+    return isinstance(value, str) and len(value) == 64 and all(c in "0123456789abcdef" for c in value)
+
+
+def validate_history(history):
+    if not exact(history, ["schema_version", "scope", "messages", "protected"]) or type(history["schema_version"]) is not int or history["schema_version"] != 1:
+        raise InvalidSummary("Invalid version-1 history")
+    if not exact(history["scope"], ["work", "task"]) or not all(label(v) for v in history["scope"].values()):
+        raise InvalidSummary("Explicit work/task scope labels required; labels are not access authority")
+    if not isinstance(history["messages"], list) or len(history["messages"]) < 2:
+        raise InvalidSummary("At least two source messages required")
+    indexed, pending, calls = {}, set(), set()
+    boundaries = {0}
+    for i, message in enumerate(history["messages"]):
+        if not isinstance(message, dict) or not {"id", "role", "content"} <= set(message) or set(message) - {"id", "role", "content", "tool_calls", "tool_call_id"}:
+            raise InvalidSummary("Invalid message fields")
+        if not label(message["id"]) or message["id"] in indexed or message["role"] not in ["user", "assistant", "tool"] or not isinstance(message["content"], str):
+            raise InvalidSummary("Invalid or duplicate source message")
+        if not label(message["content"]) and message["role"] != "tool" and "tool_calls" not in message:
+            raise InvalidSummary("Empty message outside a tool exchange")
+        indexed[message["id"]] = message
+        if message["role"] == "tool":
+            call = message.get("tool_call_id")
+            if "tool_calls" in message or not label(call) or call not in pending:
+                raise InvalidSummary("Orphan or duplicate tool result")
+            pending.remove(call)
+        else:
+            if "tool_call_id" in message or pending:
+                raise InvalidSummary("Unfinished tool group before another message")
+            if "tool_calls" in message:
+                group = message["tool_calls"]
+                if message["role"] != "assistant" or not isinstance(group, list) or not group or any(not label(c) for c in group) or len(set(group)) != len(group) or calls.intersection(group):
+                    raise InvalidSummary("Invalid or reused tool-call identity")
+                pending.update(group)
+                calls.update(group)
+        if not pending:
+            boundaries.add(i + 1)
+    if pending:
+        raise InvalidSummary("Incomplete source tool group; no valid comparison")
+    if not isinstance(history["protected"], list) or not history["protected"]:
+        raise InvalidSummary("Annotated protected sources required")
+    anchors = set()
+    for anchor in history["protected"]:
+        if not exact(anchor, ["id", "message", "kind", "state"]) or not label(anchor["id"]) or anchor["id"] in anchors:
+            raise InvalidSummary("Invalid or duplicate protected item")
+        if not isinstance(anchor["message"], str) or anchor["message"] not in indexed or not isinstance(anchor["kind"], str) or not isinstance(anchor["state"], str) or (anchor["kind"], anchor["state"]) not in STATES:
+            raise InvalidSummary("Unknown protected source or state")
+        if not label(indexed[anchor["message"]]["content"]):
+            raise InvalidSummary("Protected source cannot be empty")
+        anchors.add(anchor["id"])
+    return indexed, boundaries
+
+
+def prefix(history, count):
+    value = copy.deepcopy(history)
+    value["messages"] = value["messages"][:count]
+    ids = {m["id"] for m in value["messages"]}
+    value["protected"] = [a for a in value["protected"] if a["message"] in ids]
+    return value
+
+
+def entries_for(history, cutoff):
+    indexed = {m["id"]: m for m in history["messages"][:cutoff]}
+    return [{**a, "source_sha256": checksum(indexed[a["message"]]), "text": indexed[a["message"]]["content"]}
+            for a in history["protected"] if a["message"] in indexed]
+
+
+def reference_candidate(history, cutoff, previous=None):
+    """Oracle baseline, never model input: copy protected source messages verbatim."""
+    validate_history(history)
+    return {"schema_version": 1, "source_sha256": checksum(history), "cutoff": cutoff,
+            "parent_sha256": previous["receipt_sha256"] if previous else None,
+            "status": "ok", "entries": entries_for(history, cutoff)}
+
+
+def receipt(history, entries, cutoff, parent, reasons):
+    covered = prefix(history, cutoff)
+    cited = {a["message"] for a in entries}
+    value = {"schema_version": 1, "protocol": PROTOCOL, "result": "FALLBACK" if reasons else "PASS",
+             "scope": copy.deepcopy(history["scope"]), "source_sha256": checksum(history),
+             "source_message_count": len(history["messages"]), "cutoff": cutoff, "parent_sha256": parent,
+             "covered_prefix_sha256": checksum(covered) if cutoff else None, "summary_entries": copy.deepcopy(entries),
+             "recent_messages": copy.deepcopy(history["messages"][cutoff:]),
+             "omitted_message_ids": [m["id"] for m in covered["messages"] if m["id"] not in cited],
+             "reasons": reasons, "reference_only": True, "model_effectiveness": "NOT TESTED"}
+    value["receipt_sha256"] = checksum(value)
+    return value
+
+
+def valid_parent(history, previous):
+    if not exact(previous, RECEIPT_KEYS):
+        return False
+    if type(previous["schema_version"]) is not int or previous["schema_version"] != 1 or previous["protocol"] != PROTOCOL or previous["result"] != "PASS":
+        return False
+    if previous["parent_sha256"] is not None and not hash_reference(previous["parent_sha256"]):
+        return False
+    count, cutoff = previous["source_message_count"], previous["cutoff"]
+    if type(count) is not int or not 2 <= count <= len(history["messages"]) or type(cutoff) is not int or not 0 < cutoff < count:
+        return False
+    old = prefix(history, count)
+    try:
+        _, boundaries = validate_history(old)
+    except InvalidSummary:
+        return False
+    if cutoff not in boundaries:
+        return False
+    expected = receipt(old, entries_for(old, cutoff), cutoff, previous["parent_sha256"], [])
+    # Compare canonical JSON to reject bool/int aliases as well as changed fields.
+    return checksum(previous) == checksum(expected)
+
+
+def project(history, candidate, previous=None):
+    """On candidate failure preserve all originals; invalid sources fail explicitly."""
+    _, boundaries = validate_history(history)
+    def refuse(reason):
+        return receipt(history, [], 0, None, [reason])
+    if previous is not None and not valid_parent(history, previous):
+        return refuse("parent_or_sources_changed")
+    if not exact(candidate, ["schema_version", "source_sha256", "cutoff", "parent_sha256", "status", "entries"]) or type(candidate["schema_version"]) is not int or candidate["schema_version"] != 1:
+        return refuse("invalid_candidate")
+    if candidate["source_sha256"] != checksum(history):
+        return refuse("source_changed")
+    parent = previous["receipt_sha256"] if previous else None
+    if candidate["parent_sha256"] != parent:
+        return refuse("parent_mismatch")
+    if candidate["status"] != "ok":
+        return refuse("summarization_failed")
+    cutoff = candidate["cutoff"]
+    if type(cutoff) is not int or not 0 < cutoff < len(history["messages"]) or cutoff not in boundaries:
+        return refuse("invalid_boundary")
+    if previous and cutoff <= previous["cutoff"]:
+        return refuse("non_progressive_boundary")
+    expected = entries_for(history, cutoff)
+    if not expected or not isinstance(candidate["entries"], list) or checksum(candidate["entries"]) != checksum(expected):
+        return refuse("protected_sources_or_states_lost")
+    return receipt(history, expected, cutoff, parent, [])
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--history", type=Path, required=True)
+    choice = parser.add_mutually_exclusive_group(required=True)
+    choice.add_argument("--candidate", type=Path)
+    choice.add_argument("--reference-cutoff", type=int, help="Emit an oracle candidate, not a model result")
+    parser.add_argument("--previous", type=Path)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args(argv)
+    try:
+        history = load_json(args.history)
+        validate_history(history)
+        previous = load_json(args.previous) if args.previous else None
+        if args.reference_cutoff is not None:
+            candidate = reference_candidate(history, args.reference_cutoff, previous)
+            check = project(history, candidate, previous)
+            if check["result"] != "PASS":
+                raise InvalidSummary("Reference candidate refused: " + ",".join(check["reasons"]))
+            value, code = candidate, 0
+        else:
+            try:
+                candidate = load_json(args.candidate)
+            except (InvalidComparison, json.JSONDecodeError, UnicodeError):
+                candidate = None
+            value = project(history, candidate, previous)
+            code = 0 if value["result"] == "PASS" else 1
+        fd = os.open(args.output, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as file:
+            file.write(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
+        print(json.dumps({"result": value.get("result", "REFERENCE_CANDIDATE"), "reference_only": True, "model_effectiveness": "NOT TESTED"}))
+        return code
+    except (OSError, InvalidSummary, InvalidComparison, ValueError, TypeError, KeyError) as error:
+        print("Summary reference error: " + str(error), file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

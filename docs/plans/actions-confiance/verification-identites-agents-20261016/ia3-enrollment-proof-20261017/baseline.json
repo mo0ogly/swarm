@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-17T09:27:34.039202+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "owned_new_package": "internal/enrollmentproof",
+  "initial_candidate_sha256": "8515a2a5a3e4525491f430f36443de13b1963cd285920efff8f3fdd4ba6cc09d",
+  "consumer_integration": false,
+  "operator_boundary_choice": "pending asynchronous question",
+  "global_test_watchdog": 0
+}

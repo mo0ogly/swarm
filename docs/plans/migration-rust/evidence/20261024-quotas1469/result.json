@@ -1,0 +1,23 @@
+{
+  "status": "DELIVERED_LOCAL_EXISTING_QUOTAS",
+  "version": "v0.1.1-dev.31",
+  "browser_assertions": 273,
+  "budget_API_checks": 13,
+  "read_API_checks": 9,
+  "graph_identifier_assertions": 13,
+  "cache_regression": "PASS",
+  "recipe_integrity": "VERIFIED",
+  "archive_sha256": "c26d31c070aefe81c290452a81cebb2abcca1f627fdef277359fc103ebeb96df",
+  "actual_provider_execution": false,
+  "live_mission_or_budget_mutation": false,
+  "GLM_calls": 1,
+  "declared_GLM_tokens": 5143,
+  "automatic_retry": false,
+  "scope": "Shared quota dialog from existing cockpit plus preserved default native Admin caller. Existing engine policies/CAS preserved.",
+  "limits": [
+    "No independent/global acceptance",
+    "No new live/nonzero-spending quota test",
+    "Other UI journeys remain open",
+    "Incomplete organization status contract unchanged"
+  ]
+}

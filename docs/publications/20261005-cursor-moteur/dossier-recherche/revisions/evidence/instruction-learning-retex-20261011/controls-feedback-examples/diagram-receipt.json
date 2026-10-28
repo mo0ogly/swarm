@@ -1,0 +1,44 @@
+{
+  "checks": [
+    {
+      "command": [
+        "/home/fpizzi/.npm-global/bin/mmdc",
+        "-i",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/controls-feedback-docs-20261011/fr.mmd",
+        "-o",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/controls-feedback-docs-20261011/fr.png",
+        "-p",
+        "/tmp/swarm-mermaid-puppeteer.json",
+        "-w",
+        "1500",
+        "-b",
+        "white"
+      ],
+      "start": "2026-10-11T20:07:33.701704+00:00",
+      "end": "2026-10-11T20:07:37.217479+00:00",
+      "exit": 0,
+      "image_sha256": "977771e7b5959b9fefda774671b4b5efd91e000a68024ce09f2cd8c0585f7052"
+    },
+    {
+      "command": [
+        "/home/fpizzi/.npm-global/bin/mmdc",
+        "-i",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/controls-feedback-docs-20261011/en.mmd",
+        "-o",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/controls-feedback-docs-20261011/en.png",
+        "-p",
+        "/tmp/swarm-mermaid-puppeteer.json",
+        "-w",
+        "1500",
+        "-b",
+        "white"
+      ],
+      "start": "2026-10-11T20:07:33.702148+00:00",
+      "end": "2026-10-11T20:07:37.197319+00:00",
+      "exit": 0,
+      "image_sha256": "5c570d38416383149d2fc4211d4376d97812c1901a82374827dd2fff2a6282aa"
+    }
+  ],
+  "scope": "Documentation rendering only; no runtime or business acceptance proof",
+  "visual_inspection": "PASS FR/EN: full diagrams, legible labels and arrows, no clipping"
+}

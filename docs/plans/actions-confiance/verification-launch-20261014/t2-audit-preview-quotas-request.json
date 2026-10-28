@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "audit-preview-complete-originals-6ba161f62362441d",
+  "expected_revision": 235,
+  "limits": {
+    "review_context_files": 27,
+    "review_source_bytes": 98304,
+    "review_context_bytes": 344064,
+    "review_delivery_files": 100,
+    "planning_scopes": 0,
+    "delegation_depth": 0,
+    "planning_tasks": 20,
+    "planning_activations": 40,
+    "planning_decisions": 40,
+    "review_calls": 64
+  },
+  "reason": "Le correctif du refus natif ajoute la garde audit/aperçu et consomme le producteur commun commandFailure : fournir cockpit_service.go entier. Les 27 originaux font 332802 octets ; porter seulement la capacité de sources à 336 Kio et 27 fichiers selon autorisation utilisateur existante. Aucun remboursement ni hausse des budgets de revue, tentatives ou autres plafonds."
+}

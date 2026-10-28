@@ -1,0 +1,33 @@
+'use strict';
+/** Real calculated resume in canonical section; marked client faults follow
+ * actual read witnesses. Selection race is resolved by generation, no timeout,
+ * retry, provider, visit/OODA write or fabricated task acceptance. */
+module.exports=async function resumeFlow({page,cfg,label,lang,check}){
+ const show=()=>page.$eval('[data-view="resume"]',e=>{e.closest('details').open=true;e.click()});await show();
+ await page.waitForFunction(()=>!document.querySelector('#resume').hasAttribute('aria-busy')&&document.querySelector('#resume-text').textContent.includes('Task <b>plain</b>'));
+ const exact=await page.evaluate(async({id,lang})=>{const r=await fetch('/api/v1/work-resume?'+new URLSearchParams({work:id,lang}));if(!r.ok)throw Error('resume-test-witness-failed');return r.json()},{id:cfg.works[0],lang});
+ check(label+'-resume-exact-actual-markdown',await page.$eval('#resume-text',(e,s)=>e.textContent===s,exact.markdown));check(label+'-resume-literal-not-html',!(await page.$('#resume-text b'))&&!(await page.$('#resume-text img')));
+ await page.focus('#resume-text');check(label+'-resume-keyboard-focus',await page.$eval('#resume-text',e=>e===document.activeElement&&e.tabIndex===0&&!!e.getAttribute('aria-label')));
+ check(label+'-resume-no-implicit-decision-or-visit',await page.$eval('#visit',e=>e.disabled)&&await page.$eval('#ooda',e=>e.disabled));check(label+'-resume-correct-language',exact.language===lang&&await page.$eval('#native-resume-status',e=>e.textContent.includes(document.documentElement.lang==='en'?'Revision':'Révision')));
+ for(const width of [1440,390]){await page.setViewport({width,height:1000});check(label+'-resume-no-overflow-'+width,await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));if(width===390)await page.screenshot({path:require('node:path').join(cfg.output,label+'-resume-390.png'),fullPage:true})}
+ await page.select('#work',cfg.works[1]);await page.waitForFunction(()=>!document.querySelector('#resume').hasAttribute('aria-busy')&&!document.querySelector('#main-content').hasAttribute('aria-busy')&&document.querySelector('#resume-text').textContent.includes('Mes missions'));
+ check(label+'-resume-selection-clears-old-task',await page.$eval('#resume-text',e=>!e.textContent.includes('Task <b>plain</b>')));
+ await page.select('#work',cfg.works[0]);await page.waitForFunction(()=>!document.querySelector('#resume').hasAttribute('aria-busy')&&!document.querySelector('#main-content').hasAttribute('aria-busy')&&document.querySelector('#resume-text').textContent.includes('Task <b>plain</b>'));
+ if(lang==='fr'&&label==='fr-etat'){
+  await page.evaluate(()=>{window.partialResumeFetch=window.fetch;window.fetch=async(...args)=>new URL(args[0],location.href).pathname==='/api/v1/work-resume'?new Response(JSON.stringify({failure:{code:'command_not_ported'}}),{status:501,headers:{'Content-Type':'application/json'}}):window.partialResumeFetch(...args)});
+  await show();await page.waitForFunction(()=>!document.querySelector('#native-resume-recorded').hidden);check('resume-unsupported-not-automatic-success',await page.$eval('#resume-text',e=>e.textContent==='')&&await page.$eval('#native-resume-status',e=>e.classList.contains('alert')));
+  await page.click('#native-resume-recorded');await page.waitForFunction(()=>!document.querySelector('#resume').hasAttribute('aria-busy')&&document.querySelector('#resume-text').textContent.includes('Données enregistrées uniquement'));
+  check('resume-explicit-recorded-read-not-validation',await page.$eval('#native-resume-status',e=>e.classList.contains('attention')&&e.textContent.includes('validation non recalculée')));
+  await page.evaluate(()=>{window.fetch=window.partialResumeFetch;delete window.partialResumeFetch});await show();await page.waitForFunction(()=>document.querySelector('#resume-text').textContent.includes('Task <b>plain</b>')&&!document.querySelector('#resume').hasAttribute('aria-busy'));
+  await page.evaluate(()=>{window.resumeFetch=window.fetch;window.fetch=async(...args)=>new URL(args[0],location.href).pathname==='/api/v1/work-resume'?new Response('{}',{status:200,headers:{'Content-Type':'application/json'}}):window.resumeFetch(...args)});
+  await show();await page.waitForFunction(()=>document.querySelector('#native-resume-status').classList.contains('alert'));
+  check('resume-malformed-not-empty-success',await page.$eval('#resume-text',e=>e.textContent==='')&&await page.$eval('#native-resume-status',e=>e.textContent.includes('work-resume-view-invalid')));
+  await page.evaluate(()=>{window.fetch=window.resumeFetch;delete window.resumeFetch});await show();await page.waitForFunction(()=>document.querySelector('#resume-text').textContent.includes('Task <b>plain</b>')&&!document.querySelector('#resume').hasAttribute('aria-busy'));check('resume-explicit-recovery',await page.$eval('#native-resume-status',e=>!e.classList.contains('alert')));
+  await page.evaluate(id=>{window.resumeFetch=window.fetch;window.fetch=(...args)=>{const u=new URL(args[0],location.href);if(u.pathname==='/api/v1/work-resume'&&u.searchParams.get('work')===id)return new Promise(resolve=>{window.releaseResume=()=>window.resumeFetch(...args).then(response=>{const json=response.json.bind(response);response.json=async()=>{const value=await json();window.resumeBodyRead=true;return value};resolve(response)})});return window.resumeFetch(...args)}},cfg.works[0]);
+  await show();await page.waitForFunction(()=>typeof window.releaseResume==='function');check('resume-pending-clears-old-content',await page.$eval('#resume-text',e=>e.textContent===''));
+  await page.select('#work',cfg.works[1]);await page.waitForFunction(()=>!document.querySelector('#resume').hasAttribute('aria-busy')&&!document.querySelector('#main-content').hasAttribute('aria-busy')&&document.querySelector('#resume-text').textContent.includes('Mes missions'));
+  await page.evaluate(()=>window.releaseResume());await page.waitForFunction(()=>window.resumeBodyRead===true);check('resume-late-old-response-not-current',await page.$eval('#resume-text',e=>e.textContent.includes('Mes missions')&&!e.textContent.includes('Task <b>plain</b>')));
+  await page.evaluate(()=>{window.fetch=window.resumeFetch;delete window.resumeFetch;delete window.releaseResume;delete window.resumeBodyRead});await page.select('#work',cfg.works[0]);await page.waitForFunction(()=>!document.querySelector('#resume').hasAttribute('aria-busy')&&!document.querySelector('#main-content').hasAttribute('aria-busy')&&document.querySelector('#resume-text').textContent.includes('Task <b>plain</b>'));
+ }
+ await page.$eval('[data-view="budget"]',e=>{e.closest('details').open=true;e.click()});
+};

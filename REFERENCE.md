@@ -1,5 +1,8 @@
 # Swarm — référence technique
 
+> Référence historique du contrat Go. La CLI active est Rust, sans repli Go. Les commandes et exemples de compilation Go ci-dessous sont conservés comme historique, pas comme procédure actuelle d’installation. Consulter [INSTALL](INSTALL.md), l’aide native et le plan de migration pour les commandes disponibles.
+
+
 [English](docs/en/REFERENCE.md) · Français
 
 Pour la présentation du produit et le démarrage rapide, voir [le README](README.md) et le [guide utilisateur](GUIDE-UTILISATEUR.md).
@@ -73,6 +76,13 @@ Les champs communs aux mutations métier sont `schema_version: 1`, un `event_id`
 unique et `expected_revision` (0 à la création, révision courante ensuite).
 La sortie contient le travail, l’historique, les gates recalculées et la fiche.
 Les dates sont UTC. Les identifiants utilisent lettres ASCII, chiffres, `_`, `-`.
+
+Les lecteurs communs de travaux persistés vérifient ensemble clé SQL, révision
+positive et corps UTF-8/JSON de schéma 1. `work show`, `work list` et la liste
+HTTP refusent une incohérence avec erreur, sans publier de résultat partiel.
+Mutation et rejeu communs appliquent aussi cette garde avant leurs callbacks.
+Cette concordance ne prouve aucun auteur ou droit et ne couvre pas tous les
+lecteurs SQL explicites : voir le [contrat des lignes Work](docs/architecture/WORK-ROW-CONTRACT.md).
 
 Création (`work.json`) :
 
@@ -363,6 +373,14 @@ un double envoi idempotent ; une collision pendant restauration laisse toute la
 mission en corbeille. Le web utilise exactement le même moteur via les actions
 `lifecycle-preview` et `lifecycle-apply`.
 
+Pour la corbeille, aperçu et reçu exposent `snapshot_sha256` ; le jeton lie les
+octets exacts de la capture, revérifiés avant écriture. Une capture incohérente,
+une ligne liée étrangère ou un contenu remplacé est refusé sans restauration
+partielle ni perte de corbeille. Il faut obtenir un nouvel aperçu après tout
+changement. Le Work restauré conserve son identité/révision concordante ; cette
+cohérence n'atteste ni auteur ni droit d'usage. Voir le
+[contrat des captures](docs/architecture/WORK-ROW-CONTRACT.md#captures-dynamiques-et-restauration).
+
 Dans le cockpit, **Gérer les missions** regroupe recherche, filtres Active,
 Archivée et Corbeille récupérable, puis les actions **Archiver**, **Restaurer**,
 **Purger l’historique** et **Supprimer**. Chaque action ouvre d’abord l’aperçu du
@@ -466,3 +484,34 @@ fonctions au CLI. Voir les [contrats de préparation](PREPARATION-UX.md).
 ## Préparation, révision et modèles IA
 
 Voir [le parcours web et les contrats CLI](PREPARATION-UX.md) : formulaire de missions, responsable durable, validation explicite, révision avec historique et menu **IA et connexions**.
+
+### Statuts des résultats d’évaluation
+
+L’évaluateur accepte exactement un des cinq statuts : `PASS`, `FAIL`, `PARTIEL`,
+`NON TESTÉ`, `NON APPLICABLE`. Une composition (`FAIL|PARTIEL`), une valeur
+inconnue ou entourée d’espaces est refusée avant décision. Un échec critique ne
+peut pas être déguisé en composition pour éviter son blocage. Les règles de
+compteur, preuve et justification restent applicables à chaque statut admis.
+La correction est à livrer par le parcours habituel ; elle ne remplace pas
+automatiquement un binaire déjà lancé.
+
+Les poids d’évaluation doivent permettre un agrégat fini dans la représentation
+numérique utilisée. Un débordement produit un refus explicite ; il ne crée
+aucun plafond métier sur les poids. Si nécessaire, réduire leur échelle en
+conservant leurs proportions et préparer à nouveau les preuves du barème.
+Un échec d’écriture du résultat JSON renvoie aussi une erreur, même lorsque
+l’évaluation calculée était favorable.
+
+Les contrôles obligatoires d’un plan sont lus avec les mêmes clés JSON exactes
+que le calcul de score : `checks`, `id`, `gate`, `mandatory`. Des variantes de
+casse ne peuvent pas satisfaire des contrôles différents de ceux évalués.
+La présence des contrôles ne prouve pas leurs résultats, la fraîcheur des
+artefacts ou l’autorité d’accepter la tâche.
+
+La correction est vérifiée par la commande publique gate sur fixtures isolées ;
+la livraison du service actif reste une opération distincte.
+
+Une tâche en cours ne peut pas être terminée sans tentative courante conservée.
+Un état incohérent est refusé avec `attempt_state_invalid`, sans créer de
+tentative ni effacer l’historique. Une réparation doit établir les preuves
+manquantes ; un nouveau retry ne les remplace pas.

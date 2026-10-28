@@ -1,0 +1,30 @@
+{
+  "canonical_production_sha256": "0d4946df903359fd849e420b2ef2c5b209447aa676426d9710b40d75691cd163",
+  "tests_sha256": {
+    "internal/engine/trust_actions_test.go": "7fbd7e9920766f76e18701fa08c15197353a9246730c6667db846e226c0ad623",
+    "internal/engine/trust_actions_operator_regression_test.go": "879711e5c3c185d5f527fa6776dc8e43c045f4d42753d9694ce6c23cb4287800"
+  },
+  "mutations": [
+    {
+      "guard_removed": "resource",
+      "overlay": "/tmp/swarm-actions-confiance-launch/t2-current-mutant-resource.json",
+      "variant": "/tmp/swarm-actions-confiance-launch/t2-current-mutant-resource.go",
+      "variant_sha256": "dbf9f77804ab56c0c22c8cd89cda3637769728848611f7ff7242140cf14b4e00",
+      "test": "TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource"
+    },
+    {
+      "guard_removed": "state",
+      "overlay": "/tmp/swarm-actions-confiance-launch/t2-current-mutant-state.json",
+      "variant": "/tmp/swarm-actions-confiance-launch/t2-current-mutant-state.go",
+      "variant_sha256": "f21ded0f2eb23d2537d1fb47b62730e08fa9450940c46298f11546162f1133b8",
+      "test": "TestActionsConfianceT2ApprovalCannotRegressEffectState"
+    },
+    {
+      "guard_removed": "amount",
+      "overlay": "/tmp/swarm-actions-confiance-launch/t2-current-mutant-amount.json",
+      "variant": "/tmp/swarm-actions-confiance-launch/t2-current-mutant-amount.go",
+      "variant_sha256": "36458aeeea339cfcca79a6c726d01b0b45ded6904a4b552ae6a3a67f280b10d7",
+      "test": "TestActionsConfianceT2IdentityMandateApprovalAndBiba"
+    }
+  ]
+}

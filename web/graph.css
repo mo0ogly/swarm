@@ -79,3 +79,6 @@
 .graph-draft-fields select{min-height:40px;background:var(--wattson-champ);color:var(--wattson-texte);border:1px solid var(--wattson-ligne)}
 .graph-draft-controls{margin-top:12px}.graph-draft-status{font-weight:600}.graph-draft-error{display:flex;gap:12px;align-items:center}.graph-draft-error[hidden]{display:none}
 .graph-draft-panel ol{margin-bottom:0}.graph-draft-panel button:focus-visible,.graph-draft-panel select:focus-visible{outline:2px solid var(--wattson-lien);outline-offset:2px}
+
+/* Recorded native projection carries no command or inspector action. */
+.graph-noeud[role=img]{cursor:default}

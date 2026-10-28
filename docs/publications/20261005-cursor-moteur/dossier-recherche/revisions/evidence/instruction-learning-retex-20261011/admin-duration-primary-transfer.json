@@ -1,0 +1,31 @@
+{
+  "at": "2026-10-11T14:19:25.708102+00:00",
+  "isolated": "/tmp/swarm-admin-duration-isolated-20261011-4urggadl",
+  "preimages": [
+    {
+      "path": "internal/engine/agents_store.go",
+      "before_sha256": "1468762d24e079a8de37237a5c7f16abe72009b76fb2c62e3c0ebdcd15358162",
+      "after_sha256": "ea1f0a9788e6fa2a67538a15df48e9f501f6533671d65dd5ce4385e2ddf2bd89"
+    },
+    {
+      "path": "internal/engine/run_limits_admin.go",
+      "before_sha256": "0acc01a56a4b9334fc22bf96dbf8cb7b184e9d6e3ec117d8c1967c11bf03d0ce",
+      "after_sha256": "dcb133d944ac0ed56283866a370208fc74f43f6be0924a5e1cfb5e8394c15ca4"
+    },
+    {
+      "path": "internal/engine/run_limits_duration_launch_test.go",
+      "before_sha256": null,
+      "after_sha256": "0449fc3343521d34c1c64853d424e455b1d0320945b88f545dbe5b38a105df02"
+    },
+    {
+      "path": "docs/architecture/RUN-SUPERVISION.md",
+      "before_sha256": "1b7fb0316b308994473e6ded66c0ca000dd0a7f21203127daa2c5d24acc87b15",
+      "after_sha256": "2f4fd42207f11211af1fc2a9b27c4934571b15eda2356136a992e5fc30ddc70c"
+    },
+    {
+      "path": "docs/en/RUN-SUPERVISION.md",
+      "before_sha256": "e62b2436fee00944fd46089af1f39d9f59987860b66bc6ade9ee906649bac7d7",
+      "after_sha256": "7cbe43194814ec924e8b6e7f62f73a8a62f1c45ea92b7c689791eb75a669bd74"
+    }
+  ]
+}

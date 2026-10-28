@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-11T10:27:18.337252+00:00",
+  "native_head": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+  "original_stash_preserved": "a73f26244e8e0e59877fb30e8c88a8628b7ad33d",
+  "previous_tree": "6add0b67cfcc588f64bd92d1c2100cc29940b533",
+  "verified_new_tree": "a799c8d4e7f4f5eeb0b90b0bcf01dc3f21a6c03e",
+  "producer_status": "interrupted",
+  "producer_exit": 143,
+  "patch_sha256": "11bd7575dae141b348b4232d7f2069587ebf6616e4776f90350cf4bbf5b106f3"
+}

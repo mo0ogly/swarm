@@ -1,0 +1,18 @@
+actual loading state observed while the initial API response is held
+loading-empty-success states and real GET API
+first keyboard skip link moves focus to main
+touch targets >=44px and input fonts >=16px
+real public request renders a localized French action state
+exact amount above 2^53 renders without numeric rounding
+labelled Admin dialog and initial keyboard focus
+Admin identity template contains no usable preset credentials
+Admin refuses blank credentials before preview without mutation
+Escape closes and restores focus
+in-flight previews preserve newer input and ignore reordered or closed responses
+Admin preview is non-mutating
+Admin apply persists, reopens and exposes actual technical bounds without arbitrary ceilings
+État and sombre themes rendered with measured button contrast >= 4.5
+FR/EN layouts at 1440,1024,760,390,320px in both themes with long data, touch sizes and no overflow
+English locale includes the Admin fields and labels
+checkbox label target is measured and actually clickable in French and English at mobile widths
+visible network error state

@@ -10,8 +10,9 @@ if [ ! -d "$project_dir" ] || [ ! -w "$project_dir" ]; then
     echo "Projet absent ou non accessible en écriture : $project_dir (vérifier UID/GID)." >&2
     exit 2
 fi
-if [ ! -f "$project_dir/.swarm/state.db" ]; then
-    swarm --root "$project_dir" init
+if [ ! -f "$project_dir/.swarm/state.db" ] && [ "${1:-web}" != init ]; then
+    # Bootstrap is not the requested command output; keep JSON CLI output singular.
+    swarm --root "$project_dir" init >/dev/null
 fi
 if [ "$#" -eq 0 ]; then set -- web; fi
 if [ "$1" = web ] && [ "$#" -eq 1 ]; then set -- web "127.0.0.1:$web_port"; fi

@@ -1,0 +1,23 @@
+/* PAEA uses the shared semantic palette; no assurance is inferred from color. */
+*{box-sizing:border-box}
+body{margin:0;background:var(--wattson-page-fond);color:var(--wattson-texte);font-family:system-ui}
+header,main{max-width:64rem;margin:auto;padding:1rem}
+header,nav{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+h1{font-size:1.8rem}h1,h2{font-family:Georgia,serif}
+a{color:var(--wattson-lien)}
+fieldset,section{min-width:0;border:1px solid var(--wattson-ligne);background:var(--wattson-carte);border-radius:.4rem;padding:1rem;margin-block:1rem}
+label{display:block;margin-block:1rem .4rem}
+input,select{width:100%;min-width:0;padding:.65rem;background:var(--wattson-champ);color:var(--wattson-texte);border:1px solid var(--wattson-ligne);border-radius:.25rem;font:inherit}
+button{min-height:44px;padding:.65rem;font:inherit;border:1px solid var(--wattson-ligne);border-radius:.25rem;background:var(--wattson-carte-appuyee);color:var(--wattson-texte);cursor:pointer}
+/* Opposite theme foreground/background pairs switch together to keep contrast. */
+.paea-primary{background:var(--wattson-action-fond);color:var(--wattson-action-encre);border-color:var(--wattson-action-bordure);font-weight:600;transition:none}
+button:disabled{opacity:.65;cursor:default}
+:focus-visible{outline:3px solid var(--wattson-accent);outline-offset:3px}
+.paea-notice{padding:.8rem;border-inline-start:4px solid var(--wattson-lien);background:var(--wattson-carte)}
+#paea-status,#paea-summary,dt,dd,pre,#paea-sources li{overflow-wrap:anywhere;white-space:pre-wrap}
+dt{font-weight:600;margin-block-start:.75rem}dd{margin:.25rem 0;font-family:monospace}
+pre{max-height:28rem;overflow:auto}
+summary{cursor:pointer;min-height:44px;padding-block:.7rem}
+.paea-skip{position:absolute;inset-inline-start:1rem;transform:translateY(-200%)}
+.paea-skip:focus{transform:none;background:var(--wattson-carte);padding:.7rem}
+@media(max-width:760px){input,select{font-size:16px}header,main{padding:.75rem}}

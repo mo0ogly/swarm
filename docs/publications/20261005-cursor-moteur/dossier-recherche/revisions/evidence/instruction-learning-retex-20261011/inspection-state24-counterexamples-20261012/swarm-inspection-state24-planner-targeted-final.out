@@ -1,0 +1,5 @@
+--- FAIL: TestPlanningHistoricalInputsCannotPoisonCurrentDecision (0.05s)
+    planning_historical_delivery_test.go:63: provider offered forbidden production retry [task delegate close review-plan continue-run stop-run revise-instructions]
+FAIL
+FAIL	swarm.local/companion/internal/engine	13.089s
+FAIL

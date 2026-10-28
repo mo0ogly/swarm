@@ -1,0 +1,26 @@
+=== RUN   TestActionsConfianceT3DelegationConfigurationRejectsNegativeDepth
+--- PASS: TestActionsConfianceT3DelegationConfigurationRejectsNegativeDepth (0.06s)
+=== RUN   TestActionsConfianceT3DelegationChainEffectPersistenceAndRevocation
+--- PASS: TestActionsConfianceT3DelegationChainEffectPersistenceAndRevocation (0.10s)
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/start
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/missing-subject
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/amount
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/currency
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/actions
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/expiry
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/missing-parent
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/resource
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/beneficiary
+--- PASS: TestActionsConfianceT3DelegationRejectsAmplification (0.72s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/start (0.06s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/missing-subject (0.06s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/amount (0.07s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/currency (0.10s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/actions (0.07s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/expiry (0.08s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/missing-parent (0.11s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/resource (0.09s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/beneficiary (0.08s)
+PASS
+ok  	swarm.local/companion/internal/engine	0.942s

@@ -1,0 +1,7 @@
+{
+  "changed_since_build": [
+    "internal/enrollmentauthority/reply_version_test.go"
+  ],
+  "reason": "Only consumer test assertions were strengthened after the build; application compilation does not compile test files. No production source changed.",
+  "bound_graph_count": 1083
+}

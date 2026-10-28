@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-11T17:34:53.035832+00:00",
+  "start": "2026-10-11T17:34:50.993299+00:00",
+  "command": [
+    "sh",
+    "./build.sh",
+    "/tmp/swarm-review-retry-storage-qualified-candidate"
+  ],
+  "exit": 0,
+  "sha256": "20d067a54279fe4271614d55395cd3682f1a3ec8c8edfb8ca159a377d748c37e",
+  "source_digest": "aa71b5c2b7bb950ec73e89d79c0ad0beb36532df204b372ecfe84e1c8d5df53f",
+  "source_manifest_sha256": "818d49be64e86baa9eefa219e8acf8de1200ec455138b6d70a02bd764f0aabc8",
+  "full_qualification": "2026-10-11T17:31:30.181061+00:00",
+  "installed": false
+}

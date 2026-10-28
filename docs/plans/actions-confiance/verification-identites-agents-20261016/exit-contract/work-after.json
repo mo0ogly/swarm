@@ -1,0 +1,277 @@
+{
+  "launch_profile": {
+    "provider": "leaf",
+    "role": "worker",
+    "workspace": "/tmp/swarm-ia1-agents-v02zm3c3/workspaces/pivot-child",
+    "capture_output": true,
+    "updated": "2026-10-16T20:45:48.00278407Z",
+    "actor": "operateur"
+  },
+  "schema_version": 1,
+  "id": "w-f4ffd12d8eb35d1f7f9f5f27",
+  "revision": 25,
+  "title": "IA1 agent authority fixture",
+  "objective": "Reproduce missing identity boundaries",
+  "scope": "Isolated local fixture only",
+  "criteria": [
+    "No model calls or real mission mutation"
+  ],
+  "next": "Audit",
+  "summary": "",
+  "memory": null,
+  "created": "2026-10-16T20:45:42.119680455Z",
+  "updated": "2026-10-16T20:45:48.216028939Z",
+  "git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "tasks": [
+    {
+      "launch_profile": {
+        "provider": "leaf",
+        "role": "worker",
+        "workspace": "/tmp/swarm-ia1-agents-v02zm3c3/workspaces/anonymous",
+        "instruction": "IA1 isolated scripted observation",
+        "timeout_seconds": 30,
+        "capture_output": true,
+        "updated": "2026-10-16T20:45:43.257632844Z",
+        "actor": "operateur"
+      },
+      "id": "anonymous",
+      "title": "anonymous",
+      "owner": "leaf",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "blocked",
+      "blocker": "Processus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis",
+      "next": "Examiner logs/diff, puis soumettre ou relancer explicitement",
+      "attempts": [
+        {
+          "id": "a-88ac29c3475ebfde3944dbf6",
+          "status": "completed",
+          "started": "2026-10-16T20:45:43.257626011Z",
+          "ended": "2026-10-16T20:45:43.409447042Z"
+        }
+      ]
+    },
+    {
+      "launch_profile": {
+        "provider": "leaf",
+        "role": "worker",
+        "workspace": "/tmp/swarm-ia1-agents-v02zm3c3/workspaces/invalid",
+        "instruction": "IA1 isolated scripted observation",
+        "timeout_seconds": 30,
+        "capture_output": true,
+        "updated": "2026-10-16T20:45:43.708367839Z",
+        "actor": "operateur"
+      },
+      "id": "invalid",
+      "title": "invalid",
+      "owner": "leaf",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "blocked",
+      "blocker": "Processus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis",
+      "next": "Examiner logs/diff, puis soumettre ou relancer explicitement",
+      "attempts": [
+        {
+          "id": "a-464049578938d24e66dc4a91",
+          "status": "completed",
+          "started": "2026-10-16T20:45:43.708332292Z",
+          "ended": "2026-10-16T20:45:43.897519019Z"
+        }
+      ]
+    },
+    {
+      "launch_profile": {
+        "provider": "leaf",
+        "role": "worker",
+        "workspace": "/tmp/swarm-ia1-agents-v02zm3c3/workspaces/revoked",
+        "timeout_seconds": 30,
+        "updated": "2026-10-16T20:45:44.804471516Z",
+        "actor": "operateur"
+      },
+      "id": "revoked",
+      "title": "revoked",
+      "owner": "leaf",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "blocked",
+      "blocker": "Processus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis",
+      "next": "Examiner logs/diff, puis soumettre ou relancer explicitement",
+      "attempts": [
+        {
+          "id": "a-596f94e9fbefa08a67c2805b",
+          "status": "completed",
+          "started": "2026-10-16T20:45:44.80446303Z",
+          "ended": "2026-10-16T20:45:44.978615785Z"
+        }
+      ]
+    },
+    {
+      "launch_profile": {
+        "provider": "leaf",
+        "role": "worker",
+        "workspace": "/tmp/swarm-ia1-agents-v02zm3c3/workspaces/api",
+        "instruction": "IA1 public API fixture",
+        "timeout_seconds": 1800,
+        "capture_output": true,
+        "updated": "2026-10-16T20:45:46.466334481Z",
+        "actor": "operateur"
+      },
+      "id": "api",
+      "title": "api",
+      "owner": "leaf",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "blocked",
+      "blocker": "Processus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis",
+      "next": "Examiner logs/diff, puis soumettre ou relancer explicitement",
+      "attempts": [
+        {
+          "id": "a-36796a05fbb65fdc04466f5e",
+          "status": "completed",
+          "started": "2026-10-16T20:45:46.466330133Z",
+          "ended": "2026-10-16T20:45:46.69990514Z"
+        }
+      ]
+    },
+    {
+      "launch_profile": {
+        "provider": "leaf",
+        "role": "worker",
+        "workspace": "/tmp/swarm-ia1-agents-v02zm3c3/workspaces/api-revoked",
+        "instruction": "IA1 public API fixture",
+        "timeout_seconds": 1800,
+        "capture_output": true,
+        "updated": "2026-10-16T20:45:46.981914953Z",
+        "actor": "operateur"
+      },
+      "id": "api-revoked",
+      "title": "api-revoked",
+      "owner": "leaf",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "blocked",
+      "blocker": "Processus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis",
+      "next": "Examiner logs/diff, puis soumettre ou relancer explicitement",
+      "attempts": [
+        {
+          "id": "a-8448a60e1c01e872d6b40244",
+          "status": "completed",
+          "started": "2026-10-16T20:45:46.981910375Z",
+          "ended": "2026-10-16T20:45:47.157993352Z"
+        }
+      ]
+    },
+    {
+      "launch_profile": {
+        "provider": "leaf",
+        "role": "worker",
+        "workspace": "/tmp/swarm-ia1-agents-v02zm3c3/workspaces/spoof",
+        "instruction": "IA1 isolated scripted observation",
+        "timeout_seconds": 30,
+        "capture_output": true,
+        "updated": "2026-10-16T20:45:45.614040834Z",
+        "actor": "operateur"
+      },
+      "id": "spoof",
+      "title": "spoof",
+      "owner": "leaf",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "blocked",
+      "blocker": "Processus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis",
+      "next": "Examiner logs/diff, puis soumettre ou relancer explicitement",
+      "attempts": [
+        {
+          "id": "a-38712ccf566e6ce0bdf65219",
+          "status": "completed",
+          "started": "2026-10-16T20:45:45.614032668Z",
+          "ended": "2026-10-16T20:45:45.818603295Z"
+        }
+      ]
+    },
+    {
+      "launch_profile": {
+        "provider": "pivot",
+        "role": "worker",
+        "workspace": "/tmp/swarm-ia1-agents-v02zm3c3/workspaces/pivot",
+        "instruction": "IA1 isolated scripted observation",
+        "timeout_seconds": 30,
+        "capture_output": true,
+        "updated": "2026-10-16T20:45:47.453504462Z",
+        "actor": "operateur"
+      },
+      "id": "pivot",
+      "title": "pivot",
+      "owner": "pivot",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "blocked",
+      "blocker": "Processus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis",
+      "next": "Examiner logs/diff, puis soumettre ou relancer explicitement",
+      "attempts": [
+        {
+          "id": "a-896ca2e92f23f85e72ad92e2",
+          "status": "completed",
+          "started": "2026-10-16T20:45:47.4534929Z",
+          "ended": "2026-10-16T20:45:48.105000683Z"
+        }
+      ]
+    },
+    {
+      "launch_profile": {
+        "provider": "leaf",
+        "role": "worker",
+        "workspace": "/tmp/swarm-ia1-agents-v02zm3c3/workspaces/pivot-child",
+        "instruction": "IA1 scripted child only",
+        "timeout_seconds": 30,
+        "capture_output": true,
+        "updated": "2026-10-16T20:45:48.00278407Z",
+        "actor": "operateur"
+      },
+      "id": "unplanned-child",
+      "title": "Provider-created child",
+      "owner": "leaf",
+      "deliverable": "audit only",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "blocked",
+      "blocker": "Processus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis",
+      "next": "Examiner logs/diff, puis soumettre ou relancer explicitement",
+      "attempts": [
+        {
+          "id": "a-e42bb08906dd0245c50bc223",
+          "status": "completed",
+          "started": "2026-10-16T20:45:48.002775784Z",
+          "ended": "2026-10-16T20:45:48.216011406Z"
+        }
+      ]
+    }
+  ]
+}

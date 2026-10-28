@@ -1,0 +1,10 @@
+{
+  "pid": 2367420,
+  "proc_start_ticks": "4191708",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-evidence-disabled-revoke-before.py",
+    "run"
+  ],
+  "at": "2026-10-15T23:38:12.937432+00:00"
+}

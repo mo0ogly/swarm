@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "id": "preparation-answers-rust",
+  "inputs": [
+    "tests/rust_preparation_answers.py",
+    "tests/rust_preparation_plan.py",
+    "tests/rust_preparation_reads.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "rust/crates/swarm-engine/src/preparation_command.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_*.rs",
+    "rust/crates/swarm-cli/src/preparation.rs",
+    "rust/crates/swarm-web/src/service.rs"
+  ],
+  "steps": [
+    {
+      "id": "public-preparation-answers",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-answers-replay-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_answers.py','--binary',os.environ['SWARM_PREPARATION_WRITES_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_ANSWERS_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_ANSWERS_PASS",
+        "PASS answers-http-shared-store",
+        "PASS answers-receipt-rollback",
+        "PASS answers-output-known-receipt",
+        "PASS answers-never-freshen-source"
+      ],
+      "required_stderr": []
+    }
+  ],
+  "environment": {}
+}

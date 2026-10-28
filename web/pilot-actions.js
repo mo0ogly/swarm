@@ -9,8 +9,8 @@ const PilotActions={
   modalContext.prepared=p;
   $('modal-description').textContent=tr_web_pilot_actions_js('Le lancement a été préparé, puis interrompu avant la création de l’agent. Reprendre conserve la copie et les réglages ; les conditions seront vérifiées à nouveau.');
   const box=node('section',undefined,'notice info field-wide');box.id='prepared-launch-summary';
-  box.append(node('p',tr_web_pilot_actions_js('Fournisseur')+' : '+p.provider),node('p',tr_web_pilot_actions_js('Espace de travail')+' : '+p.workspace),node('p',tr_web_pilot_actions_js('Consigne pour l’agent')+' : '+p.instruction));
-  box.append(node('p',tr_web_pilot_actions_js('Durée maximale : ')+(p.timeout_seconds||1800)+' s'),node('p',tr_web_pilot_actions_js('Les plafonds de tentatives et d’outils sont conservés. Aucun résultat n’est validé par cette reprise.')));
+  box.append(node('p',tr_web_pilot_actions_js('Fournisseur')+' : '+p.provider),node('p',tr_web_pilot_actions_js('Espace de travail')+' : '+p.workspace),node('h4',tr_web_pilot_actions_js('Consigne pour l’agent')),SwarmTextReader.render(p.instruction,{stateKey:work+'/'+d.task.id+'/prepared'}));
+  box.append(node('p',tr_web_pilot_actions_js('Seuil d’observation de la durée : ')+(p.timeout_seconds??tr_web_pilot_actions_js('Non rapporté'))+' s'),node('p',tr_web_pilot_actions_js('Les plafonds de tentatives et d’outils sont conservés. Aucun résultat n’est validé par cette reprise.')));
   $('modal-fields').append(box);$('confirm').textContent=tr_web_pilot_actions_js('Reprendre le lancement préparé');
  },
  extensionFields(d){

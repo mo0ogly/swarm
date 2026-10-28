@@ -1,0 +1,7 @@
+{
+  "at": "2026-10-11T18:34:59.731945+00:00",
+  "observed": "v4 recipe expected ordinary spaces in Monaco DOM text; Monaco uses nonbreaking spaces while original model/fallback text and displayed unresolved label remain correct.",
+  "proof": "Original v4 screenshot shows exact acknowledged/unresolved label, decision and operations in coloured console. No JS/CSP errors.",
+  "correction": "Normalize DOM nonbreaking spaces for the label assertion only, keeping original exported/model strings unchanged. Reset viewport scroll before full-page captures.",
+  "limits": "A display screenshot is not a supervisor acceptance proof."
+}

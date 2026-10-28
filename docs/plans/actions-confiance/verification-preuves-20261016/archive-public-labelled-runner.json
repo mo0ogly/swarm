@@ -1,0 +1,10 @@
+{
+  "pid": 2574283,
+  "proc_start_ticks": "4443474",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-archive-public-labelled.py",
+    "run"
+  ],
+  "at": "2026-10-16T00:20:10.600305+00:00"
+}

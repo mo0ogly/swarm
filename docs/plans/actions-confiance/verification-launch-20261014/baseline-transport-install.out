@@ -1,0 +1,3 @@
+Binaire installé : /home/fpizzi/Documents/ChatGPT/swarm/bin/swarm
+Lancer : /home/fpizzi/Documents/ChatGPT/swarm/bin/swarm --root /chemin/du/projet web 127.0.0.1:18787
+Si nécessaire, ajoutez /home/fpizzi/Documents/ChatGPT/swarm/bin au PATH. Aucun profil shell modifié.

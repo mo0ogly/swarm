@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant S as Scope supervisor
+    participant M as Deterministic engine
+    participant R as Independent review
+    M->>S: Fresh input, exact original, before/after capacity
+    S->>M: Authorized review-retry with corrective instruction
+    M->>M: Evidence, authority, budget, producer ended in transaction
+    M->>M: Preserve history and create version 2 final journal
+    M->>R: Selection with received decision and original inspections
+    R->>M: Necessary originals or unknown
+    M->>R: Complete final message checked before reservation
+    R->>M: Independent final opinion, including rejection
+    M->>S: Attributed new result and public effect

@@ -1,0 +1,9 @@
+[
+  {
+    "id": "planning-claim-26f73f9cf4467421d8d60116-decision",
+    "at": "2026-10-12T14:49:44.72228784Z",
+    "scope": "root",
+    "reason": "La reprise opérateur apporte une précondition corrigée et traçable pour le contrôle Go de T3 (budget explicite 480 s, marge de 120 s, tentatives et preuves conservées), mais elle ne vaut ni résultat du contrôle ni acceptation. La première frontière désormais en échec est l’intégration : le candidat e32388fda21e7c225c3b2416d230d6f5450230cd contient 335 fichiers modifiés pour une limite de 100 ; aucun appel de revue n’a été dépensé et le candidat est conservé. Une opération review-plan ne peut pas être proposée sans inventer ses données obligatoires : l’empreinte evidence_sha256, l’inventaire des fichiers et les identifiants task#N du précontrôle ne sont pas fournis ; l’unique entrée de planification indique en outre une modification binaire non examinable. Les tentatives de production sont épuisées et production_retry_unavailable interdit une reprise de production. Propriétaire de la reprise : moteur/opérateur via le parcours public scope-preview. Condition concrète : fournir pour ce même candidat l’inventaire borné, l’empreinte des preuves et les critères de précontrôle permettant d’établir des lots coordonnés ; T3 restera bloquée jusque-là, sans déduction sur T2 ni sur la revue indépendante.",
+    "operations": null
+  }
+]

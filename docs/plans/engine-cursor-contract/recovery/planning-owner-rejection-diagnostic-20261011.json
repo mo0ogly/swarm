@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T12:20:02.942523+00:00",
+  "parent": "review-current-event-feedback-20261011.patch",
+  "parent_sha256": "d3c3be3c058a6f5141ddedd1143bd809a4459e053f9a69923018caefacb068b7",
+  "preimage_tree": "cf019f0d29b8c5f53222c41728af8f0dbe945415",
+  "patch": "docs/plans/engine-cursor-contract/recovery/planning-owner-rejection-diagnostic-20261011.patch",
+  "sha256": "3ab9828491f7d5b5056da906c8b329e3b16fd86e09e4bc0e834489b1d2d8314b",
+  "bytes": 36043,
+  "paths": [
+    "internal/engine/planning.go",
+    "internal/engine/planning_context.go",
+    "internal/engine/planning_runner.go",
+    "internal/engine/planning_rejection.go",
+    "internal/engine/planning_rejection_state.go",
+    "internal/engine/planning_rejection_test.go",
+    "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
+    "docs/en/AGENT-ENGINE-PROTOCOL.md"
+  ],
+  "purpose": "Route parsed transaction-refused proposal to owner with immutable adapter response, claim/workflow/receipt, failed operation index/kind/ID and complete operation-identity inventory. No global Failure for this category. Diagnostic-first next inference; identical operation/cause under unchanged relevant state becomes scoped persistent wait, claims guarded, leases/counters/unrelated scopes do not constitute new evidence. No automatic completion/acceptance/refund.",
+  "tests": "Behavioral RED using old runner overlay; successful correction and restart; same-proposal duplicate inventory, scoped wait/public claim, stale generation and competing valid-decision race; full/race/vet verification in progress.",
+  "limits": "Actual activation14 received current review event but failed task-already-present at revision203; old response was not retained by old pipeline, failing ID cannot honestly be reconstructed. This prototype handles parsed proposal transaction failures; provider/configuration/transport failure recovery and native cumulative qualification remain T3/T7."
+}

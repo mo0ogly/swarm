@@ -9,11 +9,7 @@ supplies its contents to the responsible planner. The planner returns a structur
 decision linked to the received events. The engine controls permissions,
 dependencies and acceptance.
 
-In [Cursor's February 2026 final design](https://cursor.com/blog/self-driving-codebases),
-workers use their own copies and the system forwards their handoffs to the assigning
-planner. A shared coordination file edited by all workers was an earlier failed
-experiment. Swarm's evidence and independent review rules are its own engineering
-choices, not a Cursor certification.
+The retained references are [Cursor January 2026](https://cursor.com/blog/scaling-agents) and [February 2026](https://cursor.com/blog/self-driving-codebases): planners create tasks and workers complete them without coordinating with other workers. The per-worker repository copies and engine-routed handoffs described below are also described in February; their Swarm implementation still requires verification. Candidate review does not demonstrate the end-of-cycle judge and fresh iteration required by the January reference.
 
 ```mermaid
 flowchart LR

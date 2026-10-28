@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestInspectionCLIRefusesImplicitStorageUpgrade|TestInspectionDoesNotCreateMissingStore|TestDialogueRestorePublicOperationExists|TestDialogueRestoreHTTPPreviewAuthenticationScopeAndNoMutation)$",
+    "-count=1",
+    "-v",
+    "-timeout=120s"
+  ],
+  "started_at_utc": "2026-10-16T17:58:11.015195+00:00",
+  "duration_seconds": 132.96,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestDialogueRestorePublicOperationExists",
+    "TestDialogueRestoreHTTPPreviewAuthenticationScopeAndNoMutation",
+    "TestInspectionCLIRefusesImplicitStorageUpgrade",
+    "TestInspectionDoesNotCreateMissingStore"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "78bb973f8ad02f186a3eba5371d55c2cbefdd24998a8705606ced391df338c47",
+  "real_model_calls": 0
+}

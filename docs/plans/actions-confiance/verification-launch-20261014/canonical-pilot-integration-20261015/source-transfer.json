@@ -1,0 +1,67 @@
+{
+  "created_at_utc": "2026-10-15T12:22:11.518734+00:00",
+  "source_path": "/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-2",
+  "source_tree": "08ede6843a08ffec564a4c009da7161478f60f0b",
+  "shared_patched": [
+    "internal/engine/main.go",
+    "internal/engine/web_server.go",
+    "scripts/i18n/build.cjs",
+    "tests/i18n_test.cjs"
+  ],
+  "identical_preserved": [
+    "internal/engine/review_timeout_test.go",
+    "internal/engine/web_requests_config_test.go",
+    "tools/actions-confiance/qualify.py"
+  ],
+  "new_sources": [
+    "docs/actions-confiance-T2.md",
+    "docs/en/actions-confiance-T2.md",
+    "internal/engine/trust_actions.go",
+    "internal/engine/trust_actions_cli.go",
+    "internal/engine/trust_actions_http.go",
+    "internal/engine/trust_actions_init.go",
+    "internal/engine/trust_actions_operator_regression_test.go",
+    "internal/engine/trust_actions_originals.go",
+    "internal/engine/trust_actions_test.go",
+    "locales/trust-actions-en.json",
+    "tests/actions_confiance_t2.py",
+    "tests/actions_confiance_t2_ui.cjs",
+    "web/trust-actions-en.js",
+    "web/trust-actions.css",
+    "web/trust-actions.html",
+    "web/trust-actions.js",
+    "docs/architecture/actions-confiance-contract.json",
+    "docs/architecture/ACTIONS-CONFIANCE.md",
+    "docs/en/ACTIONS-CONFIANCE.md"
+  ],
+  "historical_reports_preserved_at_source": [
+    "docs/plan-68b50cc82e-T2.md",
+    "docs/plan-68b50cc82e-T2.delivery.json",
+    "docs/plan-68b50cc82e-T2.review-context.json"
+  ],
+  "sha256": {
+    "docs/actions-confiance-T2.md": "14c3ee4d1e98e524e39e660b878e8cccd288fc881e0b882977e980e2192a26b2",
+    "docs/en/actions-confiance-T2.md": "b80b8a5b351b3d38ba32c3b387bb490f6e945537b870320171131a54d5c81ced",
+    "internal/engine/trust_actions.go": "a2a09761cdc368d2c7cc4188353c6db83eb592b48da3dcd4677b2193022daba6",
+    "internal/engine/trust_actions_cli.go": "39e44d4743a43120f8d64e960d0e74383d05c6923de573443f0823b0ed680bf0",
+    "internal/engine/trust_actions_http.go": "88a758807779411757e154ecf151d27910ca4b04e704a559d2035a13949f891e",
+    "internal/engine/trust_actions_init.go": "70d55fe26cbc6b9d5edf772b8e060710d6ca7e55aeee5e8f6dff07bdda7e1903",
+    "internal/engine/trust_actions_operator_regression_test.go": "160ac7cba1d13ec2f8c85260777ce0d3801285b5e1e19e1fb46a5f9839f5bd56",
+    "internal/engine/trust_actions_originals.go": "dd207a2582467e2b3b83a5fe189e7ed594be2421bf91379066eead8d838cbf1f",
+    "internal/engine/trust_actions_test.go": "6f0c10ea5748f71781023df2a17eb56a6c3ef5ea2b0ee63a4ca799c24c6a0af2",
+    "locales/trust-actions-en.json": "1a278a03932ae7795e14dc196850ebdd65305fa8daa0508749761b1d29c64cb4",
+    "tests/actions_confiance_t2.py": "ace67ab00174bfb7d78c40d4d0b1e9c6e194127905b47381cfe1c41d80b91d9c",
+    "tests/actions_confiance_t2_ui.cjs": "3db6cde43461514a9d55fefbe31c070123f2563cb49530709c4cd27fb92221a1",
+    "web/trust-actions-en.js": "56f953fef44149bb70b62d75f8af7c093e07b9a86e0340027f8de94c9150779d",
+    "web/trust-actions.css": "ea1db6cc44e2e6f81ea5d2477396edf3572193d6c8e04a9b5e6b49afdb87e919",
+    "web/trust-actions.html": "e9833c5d0bdde4eb941a35e02b9ad85f4f6227b62d2e0e9e982c982e0c287fc6",
+    "web/trust-actions.js": "5bedac1301f7daf8bb5f3a9c1562b2ec24a527e9e9729792cc10561ba91a6a6f",
+    "docs/architecture/actions-confiance-contract.json": "f22c60c9bcb335b173d710313149ce0e62ee031020b4104e15dc6b88366035ff",
+    "docs/architecture/ACTIONS-CONFIANCE.md": "185ac1db873f473cc20773247eb80746feb232aa276e203e4a795acc1e80d5ed",
+    "docs/en/ACTIONS-CONFIANCE.md": "b75bfc23fe10eb65e1052dc47978f24713b49a5ee96257cefcb84e39ebaed888",
+    "internal/engine/main.go": "7b0f5318cde3fefb8b3cf90fb15ac1045dc6e8a0067011d18da159c36039a18f",
+    "internal/engine/web_server.go": "ca1e32e3ae26f4058dbb484451e69a165c0eda86d528e1a72769242675b0e9c0",
+    "scripts/i18n/build.cjs": "868b3ffd89ec3232ad045e1b97ceb5ef2f6dab770a3a74f8a1f416bbefa64f19",
+    "tests/i18n_test.cjs": "9102cc2fa605b2fffe73c008b07b08e96e9d64563a6d0b142a1ba1fc3a884f3d"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T11:08:08.066315+00:00",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "task": "plan-ca937edf4e-T3",
+  "event_id": "T3-attributed-planning-failure-recovery-20261011",
+  "before_revision": 161,
+  "after_revision": 162,
+  "next_sha256": "6a45ee158dfb9a66301cc3bc23b54d0a179524668c44a73aec2328aa3639b569",
+  "observed_defect": "planning_runner.go p.Failure admission veto and planningFailure global flag on rejected proposal",
+  "scope": "T3 implementation and T7 real-provider qualification; not yet delivered"
+}

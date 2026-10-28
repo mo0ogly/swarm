@@ -1,0 +1,42 @@
+test_active_operations_and_runtime_options_refuse_then_recover (__main__.PublicContract.test_active_operations_and_runtime_options_refuse_then_recover)
+Unavailable operations/options cannot open a root or write an output artifact. ... ok
+test_all_frozen_vectors_match_public_bytes_in_both_languages (__main__.PublicContract.test_all_frozen_vectors_match_public_bytes_in_both_languages)
+Both domains, Unicode refs, large exact amounts and intent variants agree. ... ok
+test_comparison_exact_reports_both_domains_and_transport_equivalence (__main__.PublicContract.test_comparison_exact_reports_both_domains_and_transport_equivalence)
+File identities, exact changes, same intent and transport separation agree. ... ok
+test_comparison_invalid_either_file_refuses_then_recovers (__main__.PublicContract.test_comparison_invalid_either_file_refuses_then_recovers)
+Malformed, duplicate, missing and directory inputs retain exact safe errors. ... ok
+test_comparison_public_writer_failure_recovers (__main__.PublicContract.test_comparison_public_writer_failure_recovers)
+A /dev/full write refuses nonzero and the same comparison then recovers. ... ok
+test_comparison_runtime_options_and_stdin_refuse_then_recovers (__main__.PublicContract.test_comparison_runtime_options_and_stdin_refuse_then_recovers)
+Unsupported runtime/framing refuses without project or output creation. ... ok
+test_equivalent_input_encodings_preserve_exact_content (__main__.PublicContract.test_equivalent_input_encodings_preserve_exact_content)
+Whitespace, key order, valid Unicode escaping and label order are unambiguous. ... ok
+test_input_failures_refuse_without_mutation_then_recover (__main__.PublicContract.test_input_failures_refuse_without_mutation_then_recover)
+Missing/non-regular inputs and empty streams/files preserve diagnostic codes. ... ok
+test_output_failure_is_nonzero_after_valid_control_then_recovers (__main__.PublicContract.test_output_failure_is_nonzero_after_valid_control_then_recovers)
+Observe a public writer failure, without inferring success from partial output. ... ok
+test_raw_ambiguities_refuse_between_valid_control_and_recovery (__main__.PublicContract.test_raw_ambiguities_refuse_between_valid_control_and_recovery)
+Reject actual valid-shape mutations; dummy unknown-key objects cannot mask bugs. ... ok
+test_receipt_exact_correspondence_both_domains_and_languages (__main__.PublicContract.test_receipt_exact_correspondence_both_domains_and_languages)
+All permitted outcomes remain declared-only, including reconciled UNKNOWN. ... ok
+test_receipt_malformed_and_mismatched_data_refuse_then_recovers (__main__.PublicContract.test_receipt_malformed_and_mismatched_data_refuse_then_recovers)
+Exact content/intent/sink errors are distinguished from malformed data. ... ok
+test_receipt_public_writer_failure_recovers (__main__.PublicContract.test_receipt_public_writer_failure_recovers)
+Output failure is not an effect or successful command; valid recovery agrees. ... ok
+test_receipt_report_distinguishes_raw_receipt_and_document_bytes (__main__.PublicContract.test_receipt_report_distinguishes_raw_receipt_and_document_bytes)
+OBS-01: observation/whitespace bytes change v2 while v1 can stay identical. ... ok
+test_receipt_report_exact_both_domains_languages_and_legacy_shape (__main__.PublicContract.test_receipt_report_exact_both_domains_languages_and_legacy_shape)
+Both domains and every permitted observation keep v1 and v2 distinct. ... ok
+test_receipt_report_public_output_failure_then_recovery (__main__.PublicContract.test_receipt_report_public_output_failure_then_recovery)
+Failed output remains nonzero without fixture mutation; recovery gives v2. ... ok
+test_receipt_report_refusal_binding_lifecycle_and_framing_then_recovery (__main__.PublicContract.test_receipt_report_refusal_binding_lifecycle_and_framing_then_recovery)
+No report after malformed/missing input, binding/state or routing refusal. ... ok
+test_receipt_state_sink_and_runtime_refusals_then_recovery (__main__.PublicContract.test_receipt_state_sink_and_runtime_refusals_then_recovery)
+UNKNOWN/terminals cannot relabel or replay; syntax never chooses a default. ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 6.294s
+
+OK
+PAEA_PUBLIC_BINARY_STABLE

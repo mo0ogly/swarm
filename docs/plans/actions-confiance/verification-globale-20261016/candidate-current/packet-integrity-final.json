@@ -1,0 +1,12 @@
+{
+  "verified_at_unix": 1792128953.556386,
+  "packet_sha256": "ba442a030208b5b69ed2329339493d60c2a22d6d31f2dd2631d68cd9bbfed3d1",
+  "source_inputs": 1056,
+  "proofs": 42,
+  "all_hashes_match": true,
+  "preview_identity_verified": true,
+  "preview_restarted": false,
+  "bpf_attempted": false,
+  "independent_review_started": false,
+  "global_acceptance": false
+}

@@ -1,0 +1,649 @@
+--- a/internal/engine/agent_dialogue.go
++++ b/internal/engine/agent_dialogue.go
+@@ -32,12 +32,15 @@
+ 	}
+ 	return nil
+ }
++func validDialogueSession(session string) bool {
++	return preparationKey(session) && !strings.HasPrefix(session, "-")
++}
+ func dialogueResumeArgs(a Agent, session string) ([]string, error) {
+ 	args := append([]string{}, a.Args...)
+ 	if session == "" {
+ 		return args, nil
+ 	}
+-	if !preparationKey(session) || strings.HasPrefix(session, "-") {
++	if !validDialogueSession(session) {
+ 		return nil, fmt.Errorf("Identité de session fournisseur invalide")
+ 	}
+ 	switch filepath.Base(a.Command) {
+@@ -107,7 +110,8 @@
+ 				continue
+ 			}
+ 		}
+-		args, err := dialogueResumeArgs(a, session)
++		previousSession := session
++		args, err := dialogueResumeArgs(a, previousSession)
+ 		if err != nil {
+ 			return err
+ 		}
+@@ -166,7 +170,7 @@
+ 				candidate, _ = d["session_id"].(string)
+ 			}
+ 			if candidate != "" {
+-				if !preparationKey(candidate) || strings.HasPrefix(candidate, "-") || (observed != "" && candidate != observed || session != "" && candidate != session) {
++				if !validDialogueSession(candidate) || (observed != "" && candidate != observed || session != "" && candidate != session) {
+ 					parseErr = fmt.Errorf("Identité de session fournisseur modifiée")
+ 					break
+ 				}
+@@ -203,7 +207,7 @@
+ 		if _, e = io.ReadFull(authorization, ack[:]); e != nil || ack[0] != 1 {
+ 			return fmt.Errorf("Le superviseur refuse la confirmation de fin ; tour non répondu")
+ 		}
+-		result, err := s.db.Exec("UPDATE agent_dialogue_turns SET status='answered',session_id=? WHERE id=? AND agent_id=? AND status='running'", session, turnID, a.ID)
++		result, err := s.db.Exec("UPDATE agent_dialogue_turns SET status='answered',session_id=? WHERE id=? AND agent_id=? AND status='running' AND session_id=?", session, turnID, a.ID, previousSession)
+ 		if err != nil {
+ 			return err
+ 		}
+--- a/internal/engine/dialogue_checkpoint.go
++++ b/internal/engine/dialogue_checkpoint.go
+@@ -7,6 +7,7 @@
+ 	"encoding/json"
+ 	"fmt"
+ 	"maps"
++	"math"
+ 	"sort"
+ 	"time"
+ )
+@@ -172,8 +173,20 @@
+ 	if _, err := time.Parse(time.RFC3339Nano, v.At); err != nil || v.Phase != "running" && v.Phase != "confirmed" && v.Phase != "interrupted" {
+ 		return nil, fmt.Errorf("Frontière de dialogue invalide")
+ 	}
+-	if v.Usage != nil && (v.Usage.Input < 0 || v.Usage.Output < 0) {
+-		return nil, fmt.Errorf("Usage de dialogue invalide")
++	if v.Session != "" && !validDialogueSession(v.Session) {
++		return nil, fmt.Errorf("Identité de session fournisseur invalide")
++	}
++	if u := v.Usage; u != nil {
++		invalid := u.Input < 0 || u.Output < 0
++		for _, cached := range []*int64{u.CacheRead, u.CacheCreation, u.CachedInput} {
++			invalid = invalid || cached != nil && *cached < 0
++		}
++		if u.ReportedCost != nil {
++			invalid = invalid || *u.ReportedCost < 0 || math.IsNaN(*u.ReportedCost) || math.IsInf(*u.ReportedCost, 0)
++		}
++		if invalid {
++			return nil, fmt.Errorf("Usage de dialogue invalide")
++		}
+ 	}
+ 	if v.Phase == "confirmed" && (v.Session == "" || v.Failure != "" || v.Guard.Reason != "" || v.Guard.Degraded != "" || len(v.Guard.Pending) != 0) {
+ 		return nil, fmt.Errorf("Fin de dialogue sans confirmation cohérente")
+--- a/internal/engine/dialogue_checkpoint_store.go
++++ b/internal/engine/dialogue_checkpoint_store.go
+@@ -95,12 +95,16 @@
+ 	}
+ 	v := &DialogueBoundaryView{Scope: "Aucun état de frontière conservé ; gardes et usages historiques inconnus"}
+ 	var raw []byte
+-	err := s.db.QueryRow("SELECT id,status,checkpoint FROM agent_dialogue_turns WHERE agent_id=? ORDER BY rowid DESC LIMIT 1", a.ID).Scan(&v.Turn, &v.Status, &raw)
++	var session string
++	err := s.db.QueryRow("SELECT id,status,session_id,checkpoint FROM agent_dialogue_turns WHERE agent_id=? ORDER BY rowid DESC LIMIT 1", a.ID).Scan(&v.Turn, &v.Status, &session, &raw)
+ 	if err == sql.ErrNoRows {
+ 		return v, nil, nil
+ 	}
+ 	if err != nil {
+ 		return nil, nil, err
++	}
++	if v.Status != "running" && v.Status != "answered" && v.Status != "interrupted" {
++		return nil, nil, fmt.Errorf("Statut de tour inconnu ; aucune reprise autorisée")
+ 	}
+ 	if len(raw) == 0 {
+ 		return v, nil, nil
+@@ -119,6 +123,9 @@
+ 	if v.Status == "answered" && c.Phase != "confirmed" {
+ 		return nil, nil, fmt.Errorf("Tour répondu sans état de fin confirmé")
+ 	}
++	if v.Status == "answered" && session != c.Session {
++		return nil, nil, fmt.Errorf("Session du tour différente de l’état conservé ; aucune reprise autorisée")
++	}
+ 	v.Available, v.Phase, v.Session, v.At, v.SHA256 = true, c.Phase, c.Session, c.At, c.SHA256
+ 	v.Confirmed = v.Status == "answered" && c.Phase == "confirmed"
+ 	at, err := time.Parse(time.RFC3339Nano, c.At)
+--- /dev/null
++++ b/internal/engine/dialogue_boundary_integrity_test.go
+@@ -0,0 +1,152 @@
++//go:build linux
++
++package engine
++
++import (
++	"bytes"
++	"encoding/json"
++	"fmt"
++	"math"
++	"net/http"
++	"net/http/httptest"
++	"os"
++	"strings"
++	"testing"
++)
++
++func TestDialogueBoundaryRejectsInconsistentTurnAcrossConsumers(t *testing.T) {
++	for _, variant := range []string{"different_session", "missing_session", "unknown_status"} {
++		t.Run(variant, func(t *testing.T) {
++			s, a, script := dialogueRecoveryFixture(t, []string{`{"type":"thread.started","thread_id":"integrity-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
++			if variant == "unknown_status" {
++				if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET status='unexpected' WHERE agent_id=?", a.ID); err != nil {
++					t.Fatal(err)
++				}
++			} else {
++				session := "foreign-session"
++				if variant == "missing_session" {
++					session = ""
++				}
++				if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET session_id=? WHERE agent_id=?", session, a.ID); err != nil {
++					t.Fatal(err)
++				}
++			}
++			before := recoverySnapshotTest(t, s)
++			calls, err := os.ReadFile(script + ".calls")
++			if err != nil {
++				t.Fatal(err)
++			}
++			if _, err := s.dialogueBoundary(a); err == nil {
++				t.Error("inconsistent stored turn became a public boundary")
++			}
++			if _, err := s.recoveryPreview(a.WorkID, a.TaskID, a.ID); err == nil {
++				t.Error("recovery diagnosis accepted an inconsistent stored turn")
++			}
++			for _, args := range [][]string{{"agent", "show", a.ID}, {"mission", "recovery", a.WorkID, a.TaskID, a.ID}} {
++				var out, stderr bytes.Buffer
++				argv := append([]string{"--root", s.root, "--json"}, args...)
++				if code := run(argv, &out, &stderr); code == 0 || strings.Contains(out.String(), `"boundary_confirmed": true`) {
++					t.Errorf("CLI accepted inconsistent turn: %v; code=%d", args, code)
++				}
++			}
++			handler := newWebHandler(s, "localhost:18787", "integrity-fixture-token")
++			for _, endpoint := range []string{"agent-detail", "recovery-preview"} {
++				req := httptest.NewRequest(http.MethodGet, "http://localhost:18787/api/v1/"+endpoint+"?work="+a.WorkID+"&task="+a.TaskID+"&agent="+a.ID, nil)
++				req.AddCookie(&http.Cookie{Name: "swarm_session", Value: "integrity-fixture-token"})
++				response := httptest.NewRecorder()
++				handler.ServeHTTP(response, req)
++				if response.Code != http.StatusBadRequest || strings.Contains(response.Body.String(), "integrity-session") || strings.Contains(response.Body.String(), "foreign-session") {
++					t.Errorf("API accepted or exposed inconsistent state: %s; status=%d", endpoint, response.Code)
++				}
++			}
++			afterCalls, err := os.ReadFile(script + ".calls")
++			if err != nil || !bytes.Equal(calls, afterCalls) || recoverySnapshotTest(t, s) != before {
++				t.Fatal("rejection changed retained state or invoked the provider", err)
++			}
++		})
++	}
++}
++
++func TestDialogueCheckpointRejectsUnresumableSessionAndInvalidUsage(t *testing.T) {
++	s, a, _ := dialogueRecoveryFixture(t, []string{`{"type":"thread.started","thread_id":"integrity-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
++	original := loadDialogueCheckpointTest(t, s, a)
++	for _, variant := range []string{"option_session", "space_session", "cache_read", "cache_creation", "cached_input", "reported_cost", "nan_cost", "infinite_cost"} {
++		t.Run(variant, func(t *testing.T) {
++			raw, _ := json.Marshal(original)
++			var c dialogueCheckpoint
++			if err := json.Unmarshal(raw, &c); err != nil {
++				t.Fatal(err)
++			}
++			negative := int64(-1)
++			switch variant {
++			case "option_session":
++				c.Session = "--resume"
++			case "space_session":
++				c.Session = "invalid session"
++			case "cache_read":
++				c.Usage.CacheRead = &negative
++			case "cache_creation":
++				c.Usage.CacheCreation = &negative
++			case "cached_input":
++				c.Usage.CachedInput = &negative
++			case "reported_cost":
++				cost := -0.01
++				c.Usage.ReportedCost = &cost
++			case "nan_cost":
++				cost := math.NaN()
++				c.Usage.ReportedCost = &cost
++			case "infinite_cost":
++				cost := math.Inf(1)
++				c.Usage.ReportedCost = &cost
++			}
++			c.SHA256 = c.digest() // A valid digest does not establish semantic validity.
++			if _, err := c.restoreGuard(a, s.root); err == nil {
++				t.Error("invalid checkpoint payload restored its guards")
++			}
++		})
++	}
++}
++
++func TestDialogueConfirmationDoesNotOverwriteChangedSession(t *testing.T) {
++	for _, provider := range []string{"codex", "claude"} {
++		for _, target := range []int{1, 2} {
++			t.Run(fmt.Sprintf("%s/turn_%d", provider, target), func(t *testing.T) {
++				events := []string{`{"type":"thread.started","thread_id":"integrity-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`}
++				if provider == "claude" {
++					events = []string{`{"type":"system","subtype":"init","session_id":"integrity-session"}`, `{"type":"result","subtype":"success","session_id":"integrity-session","is_error":false,"usage":{"input_tokens":10,"output_tokens":2}}`}
++				}
++				s, a, script := dialogueReceiptFixture(t, provider, events)
++				// Reproduce the window after durable end, before the answer CAS.
++				trigger := fmt.Sprintf(`CREATE TRIGGER change_dialogue_session AFTER UPDATE OF checkpoint ON agent_dialogue_turns WHEN json_extract(NEW.checkpoint,'$.phase')='confirmed' AND (SELECT count(*) FROM agent_dialogue_turns WHERE agent_id=NEW.agent_id)=%d BEGIN UPDATE agent_dialogue_turns SET session_id='concurrent-session' WHERE id=NEW.id; END`, target)
++				if _, err := s.db.Exec(trigger); err != nil {
++					t.Fatal(err)
++				}
++				input := strings.Repeat("follow-up\n", target-1) + "must not run\n/fin\n"
++				_, wrapperErr := runDialogueReceiptWrapper(t, s, a, input)
++				var status, session string
++				if err := s.db.QueryRow("SELECT status,session_id FROM agent_dialogue_turns WHERE agent_id=? ORDER BY rowid DESC LIMIT 1", a.ID).Scan(&status, &session); err != nil {
++					t.Fatal(err)
++				}
++				calls, err := os.ReadFile(script + ".calls")
++				if wrapperErr == nil || err != nil || status == "answered" || session != "concurrent-session" || string(calls) != strings.Repeat("call\n", target) {
++					t.Fatal(fmt.Sprintf("changed session overwritten or provider continued: error=%v status=%s session=%s calls=%q read=%v", wrapperErr, status, session, calls, err))
++				}
++			})
++		}
++	}
++}
++
++func TestDialogueBoundaryAllowsUnconfirmedEndBeforeAnswer(t *testing.T) {
++	s, a, _ := dialogueRecoveryFixture(t, []string{`{"type":"thread.started","thread_id":"integrity-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
++	// The durable end precedes answer confirmation; the row can still carry
++	// the previous session, which is empty during the first turn.
++	for _, status := range []string{"running", "interrupted"} {
++		if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET status=?,session_id='' WHERE agent_id=?", status, a.ID); err != nil {
++			t.Fatal(err)
++		}
++		v, err := s.dialogueBoundary(a)
++		if err != nil || !v.Available || v.Confirmed || v.Phase != "confirmed" || v.Status != status || v.RestartSupported {
++			t.Fatal("valid transition was rejected or advertised as confirmed", v, err)
++		}
++	}
++}
+--- a/locales/en.json
++++ b/locales/en.json
+@@ -4326,5 +4326,9 @@
+   "Le responsable doit décider de la suite sur des preuves fraîches ; cet aperçu n’enregistre aucune autorisation.": "The responsible supervisor must decide the next step using fresh evidence; this preview records no authorization.",
+   "État de dialogue conservé avec sa portée, ses gardes et les usages reçus.": "Dialogue state retained with its scope, guards and reported usage.",
+   "Restauration de conversation distincte d’une nouvelle tentative ; aucune restauration autorisée par cet aperçu.": "Conversation restoration differs from a new attempt; this preview authorizes no restoration.",
+-  "Voir les contrôles vérifiés": "Show verified checks"
++  "Voir les contrôles vérifiés": "Show verified checks",
++  "Statut de tour inconnu ; aucune reprise autorisée": "Unknown dialogue turn status; no recovery authorized",
++  "Session du tour différente de l’état conservé ; aucune reprise autorisée": "Turn session differs from retained state; no recovery authorized",
++  "Identité de session fournisseur invalide": "Invalid provider session identity",
++  "Usage de dialogue invalide": "Invalid dialogue usage"
+ }
+--- a/web/i18n-en.js
++++ b/web/i18n-en.js
+@@ -4328,5 +4328,9 @@
+   "Le responsable doit décider de la suite sur des preuves fraîches ; cet aperçu n’enregistre aucune autorisation.": "The responsible supervisor must decide the next step using fresh evidence; this preview records no authorization.",
+   "État de dialogue conservé avec sa portée, ses gardes et les usages reçus.": "Dialogue state retained with its scope, guards and reported usage.",
+   "Restauration de conversation distincte d’une nouvelle tentative ; aucune restauration autorisée par cet aperçu.": "Conversation restoration differs from a new attempt; this preview authorizes no restoration.",
+-  "Voir les contrôles vérifiés": "Show verified checks"
++  "Voir les contrôles vérifiés": "Show verified checks",
++  "Statut de tour inconnu ; aucune reprise autorisée": "Unknown dialogue turn status; no recovery authorized",
++  "Session du tour différente de l’état conservé ; aucune reprise autorisée": "Turn session differs from retained state; no recovery authorized",
++  "Identité de session fournisseur invalide": "Invalid provider session identity",
++  "Usage de dialogue invalide": "Invalid dialogue usage"
+ };
+--- a/tests/dialogue_recovery_ui.cjs
++++ b/tests/dialogue_recovery_ui.cjs
+@@ -11,7 +11,7 @@
+ const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+ const redact=value=>String(value).replace(/\/session\/[^\s/?]+/g,'/session/[private]');
+ async function waitFor(check,description,timeout=15000){const until=Date.now()+timeout;while(Date.now()<until){const value=check();if(value)return value;await sleep(100)}throw Error(description)}
+-let server,browser,page,agent,work;const errors=[],failures=[],checks=[];
++let server,browser,page,agent,work,integrityFailure=false,navigating=false;const errors=[],failures=[],checks=[],expectedFailures=[],navigationAborts=[];
+ (async()=>{try{
+  cli(['init']);
+  const script=path.join(root,'codex');
+@@ -27,11 +27,13 @@
+  server=spawn(binary,['--root',root,'web','127.0.0.1:0'],{stdio:['ignore','pipe','pipe']});
+  const address=await new Promise((resolve,reject)=>{let text='';server.stdout.on('data',chunk=>{text+=chunk;const match=text.match(/http:\/\/\S+\/session\/\S+/);if(match)resolve(match[0])});server.once('exit',code=>reject(Error('Fixture web server exited: '+code)))});
+  browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});page=await browser.newPage();
+- page.on('pageerror',e=>errors.push(redact(e.message)));page.on('console',message=>{if(message.type()==='error')errors.push(redact(message.text()))});
+- page.on('requestfailed',r=>failures.push({url:redact(r.url()),error:r.failure()?.errorText}));page.on('response',r=>{if(r.status()>=400)failures.push({url:redact(r.url()),status:r.status()})});
++ const expectedFailure=(url,status)=>integrityFailure&&new URL(url).pathname==='/api/v1/recovery-preview'&&status===400;
++ page.on('pageerror',e=>errors.push(redact(e.message)));page.on('console',message=>{if(message.type()==='error'){if(expectedFailure(message.location().url||address,400)&&/400/.test(message.text()))expectedFailures.push({console:redact(message.text())});else errors.push(redact(message.text()))}});
++ page.on('requestfailed',r=>{const item={url:redact(r.url()),error:r.failure()?.errorText},u=new URL(r.url());if(navigating&&item.error==='net::ERR_ABORTED'&&u.pathname==='/api/v1/snapshot'&&u.searchParams.get('work')===work.id)navigationAborts.push(item);else failures.push(item)});page.on('response',r=>{if(r.status()>=400)(expectedFailure(r.url(),r.status())?expectedFailures:failures).push({url:redact(r.url()),status:r.status()})});
++ const navigate=async(target,options)=>{navigating=true;try{return await page.goto(target,options)}finally{navigating=false}};
+  const url=new URL(address);url.searchParams.set('work',work.id);
+  for(const lang of ['fr','en']){
+-  url.searchParams.set('lang',lang);await page.setViewport({width:1440,height:1100});await page.goto(url.href);await page.waitForFunction(()=>snapshot?.work?.tasks.some(t=>t.id==='t1'));
++  url.searchParams.set('lang',lang);await page.setViewport({width:1440,height:1100});await navigate(url.href);await page.waitForFunction(()=>snapshot?.work?.tasks.some(t=>t.id==='t1'));
+   for(const theme of ['etat','sombre']){
+    await page.evaluate(t=>setTheme(t),theme);
+    await page.waitForSelector('#mission-results > summary');if(!await page.$eval('#mission-results',n=>n.open))await page.click('#mission-results > summary');
+@@ -59,9 +61,28 @@
+  checks.push('Actual provider boundary and stopped process inspected through recovery-preview; no provider restart','FR/EN, both themes, 1440/760/390/320 widths, Escape and semantic action focus restoration','Two unknown checks remain visible, verified checks expand on demand and confirmation is hidden','Rendered diagnostic text contrast is at least 4.5:1');
+  const xss=await page.evaluate(()=>{const p={task:'t1',kept:[],redone:[],criteria:[],dialogue:{recommended_path:'reconcile_effects',recommendation:'<img src=x onerror=alert(1)>',checks:[{code:'untrusted',status:'unknown',message:'<script>window.injected=true</script>'}]}};const view=Mission.recoveryPreviewView(p);return {text:view.textContent,executable:view.querySelectorAll('img,script,button').length,executed:!!window.injected}});
+  assert.equal(xss.executable,0);assert.equal(xss.executed,false);assert(xss.text.includes('<img src=x onerror=alert(1)>'));checks.push('Untrusted diagnostic text is rendered as text without executable nodes');
++ if(process.argv.includes('--integrity')){
++  // This database belongs only to the isolated fixture created above.
++  const fixtureState=session=>execFileSync('python3',['-c',
++   "import sqlite3,sys,json; c=sqlite3.connect(sys.argv[1]); session=sys.argv[3]; c.execute('UPDATE agent_dialogue_turns SET session_id=? WHERE agent_id=?',(session,sys.argv[2])) if session else None; c.commit(); tables=['works','agents','agent_dialogue_turns','reservations','events','agent_logs','cockpit_events']; print(json.dumps({t:c.execute('SELECT * FROM '+t+' ORDER BY rowid').fetchall() for t in tables},default=lambda b:b.hex(),sort_keys=True))",
++   path.join(root,'.swarm/state.db'),agent.id,session||''],{encoding:'utf8'}).trim();
++  const corrupted=fixtureState('foreign-fixture-session');integrityFailure=true;
++  for(const lang of ['fr','en'])for(const theme of ['etat','sombre']){
++   url.searchParams.set('lang',lang);await navigate(url.href,{waitUntil:'networkidle0'});await page.waitForFunction(()=>snapshot?.work?.tasks.some(t=>t.id==='t1'));await page.evaluate(t=>setTheme(t),theme);
++   await page.waitForSelector('#mission-results > summary');if(!await page.$eval('#mission-results',n=>n.open))await page.click('#mission-results > summary');
++   const response=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v1/recovery-preview');await page.click('[data-mission-action="recovery-preview-t1"]');const refused=await response;assert.equal(refused.status(),400);
++   const body=await refused.text();assert(!body.includes('foreign-fixture-session'));assert(!body.includes('browser-fixture-session'));
++   await page.waitForFunction(()=>document.querySelector('#modal-fields')?.textContent.includes(document.documentElement.lang==='fr'?'Aperçu de reprise indisponible':'Recovery preview unavailable'));
++   const text=await page.$eval('#modal-fields',n=>n.textContent);assert.match(text,lang==='fr'?/Session du tour différente/:/Turn session differs/);assert.equal(await page.$eval('#confirm',n=>n.hidden),true);assert.equal(await page.$$eval('[data-dialogue-recovery]',nodes=>nodes.length),0);
++   for(const width of [1440,320]){await page.setViewport({width,height:1100});assert(await page.$eval('#modal',n=>n.scrollWidth<=n.clientWidth+1));await page.screenshot({path:path.join(out,`integrity-${lang}-${theme}-${width}.png`)})}
++   await page.setViewport({width:1440,height:1100});await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('#modal').open);assert.equal(await page.evaluate(()=>document.activeElement?.dataset.missionAction),'recovery-preview-t1');
++  }
++  assert.equal(fixtureState(),corrupted,'Refusing corrupt state modified the isolated database');integrityFailure=false;fixtureState('browser-fixture-session');assert(cli(['agent','show',agent.id]).dialogue.boundary_confirmed);
++  assert.equal(expectedFailures.filter(f=>f.status===400).length,4);checks.push('Inconsistent answered session rejected through the actual button: HTTP 400, FR/EN error, both themes, desktop/mobile, Escape/focus, no confirmation, no read mutation; exact isolated fixture repaired for positive reread');
++ }
+  assert.equal(JSON.stringify(cli(['work','show',work.id]).work),baseline,'Preview changed work or attempts');assert.equal(fs.readFileSync(script+'.calls','utf8'),calls,'Preview invoked provider');
+  assert.deepEqual(errors,[]);assert.deepEqual(failures,[]);
+- fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({status:'PASS',root,checks,errors,failures,provider_invocations:1,model_calls:0},null,2));console.log(JSON.stringify({status:'PASS',checks:checks.length,provider_invocations:1,model_calls:0}));
++ fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({status:'PASS',root,checks,errors,failures,expectedFailures,navigationAborts,provider_invocations:1,model_calls:0},null,2));console.log(JSON.stringify({status:'PASS',checks:checks.length,provider_invocations:1,model_calls:0}));
+ }catch(error){const focus=page?await page.evaluate(()=>({active:{id:document.activeElement?.id,action:document.activeElement?.dataset.missionAction},returnTarget:typeof returnFocus!=='undefined'?{id:returnFocus?.id,connected:returnFocus?.isConnected,action:returnFocus?.dataset.missionAction}:null})).catch(()=>null):null;fs.writeFileSync(path.join(out,'failure.json'),JSON.stringify({error:redact(error.stack||error),errors,failures,focus},null,2));if(page)await page.screenshot({path:path.join(out,'failure.png')}).catch(()=>{});throw Error(redact(error.message))
+-}finally{await browser?.close();if(server){server.kill('SIGTERM');await Promise.race([new Promise(resolve=>server.once('exit',resolve)),sleep(5000)])}if(agent){try{const a=cli(['agent','show',agent.id]).agent;if(['queued','starting','running','stopping'].includes(a.status)){stop(agent.id);await waitFor(()=>!['queued','starting','running','stopping'].includes(cli(['agent','show',agent.id]).agent.status),'Fixture supervisor cleanup failed',6000)}}catch(error){console.error(redact(error.message));process.exitCode=1}}}
++}finally{await browser?.close();if(server){server.kill('SIGTERM');await Promise.race([new Promise(resolve=>server.once('exit',resolve)),sleep(5000)])}if(agent&&!integrityFailure){try{const a=cli(['agent','show',agent.id]).agent;if(['queued','starting','running','stopping'].includes(a.status)){stop(agent.id);await waitFor(()=>!['queued','starting','running','stopping'].includes(cli(['agent','show',agent.id]).agent.status),'Fixture supervisor cleanup failed',6000)}}catch(error){console.error(redact(error.message));process.exitCode=1}}}
+ })().catch(error=>{console.error(redact(error.stack||error));process.exitCode=1});
+--- a/docs/PROJECT-MEMORY.md
++++ b/docs/PROJECT-MEMORY.md
+@@ -273,6 +273,37 @@
+ Les durées et états d’attente de cette projection sont calculés à la date `at`
+ de la frontière ; consulter un état interrompu plus tard ne les fait pas croître.
+ 
++Le lecteur commun vérifie aussi le statut du tour (`running`, `answered` ou
++`interrupted`). Pour un tour `answered`, la session enregistrée sur la ligne doit
++être exactement celle du checkpoint confirmé. Une session non vide doit respecter
++le même format que celui accepté par l'adaptateur de reprise. Les usages et caches
++conservés doivent être positifs ou nuls ; un coût rapporté doit être fini et positif
++ou nul. Une empreinte correcte ne remplace pas ces contrôles de cohérence.
++
++La confirmation écrit `answered` seulement si le statut est encore `running` et
++si la session de départ de la ligne n'a pas changé. Si une autre écriture l'a
++remplacée, le wrapper refuse la confirmation et l'échange suivant ; il ne répare
++pas silencieusement cette divergence. L'état transitoire `confirmed` avec une
++ligne encore `running` ou déjà `interrupted` reste consultable et non confirmé :
++la ligne peut encore porter la session précédente avant la confirmation.
++
++Une incohérence est une erreur explicite dans `agent show`, `agent-detail` et
++`recovery-preview` (HTTP 400 pour les deux API), sans retour de session ni
++modification de l'historique. Le panneau affiche l'erreur et ne propose pas de
++confirmation. Examiner les sources conservées avant de décider de la suite ;
++aucune lecture ne réécrit une session ou ne reconstitue des compteurs supposés.
++
++Vérification reproductible, dans les fixtures isolées des tests :
++
++```sh
++go test ./internal/engine -run '^TestDialogue(BoundaryRejectsInconsistentTurnAcrossConsumers|CheckpointRejectsUnresumableSessionAndInvalidUsage|ConfirmationDoesNotOverwriteChangedSession|BoundaryAllowsUnconfirmedEndBeforeAnswer)$' -count=1 -v
++node tests/dialogue_recovery_ui.cjs /chemin/absolu/du/binaire /dossier/de/preuves --integrity
++```
++
++La recette navigateur crée son propre projet et un fournisseur scripté local.
++L'altération puis la remise en cohérence portent seulement sur cette fixture,
++jamais sur la base d'une mission utilisateur. Aucun modèle réel n'est appelé.
++
+ Les tours restent conservés lors de la purge des journaux. Leur état est inclus
+ dans la suppression récupérable et sa restauration locale ; un export historique
+ standard ne devient pas pour autant un checkpoint exécutable. Un ancien tour
+--- a/docs/en/PROJECT-MEMORY.md
++++ b/docs/en/PROJECT-MEMORY.md
+@@ -250,6 +250,37 @@
+ Waiting durations and states in this projection are computed at the boundary's
+ `at` timestamp; inspecting interrupted state later does not make them grow.
+ 
++The shared reader also validates the turn status (`running`, `answered`, or
++`interrupted`). For an `answered` turn, the session stored in its row must exactly
++match the confirmed checkpoint session. A nonempty session must follow the same
++format accepted by the resume adapter. Retained usage and cache counts must be
++nonnegative; a reported cost must be finite and nonnegative. A correct digest
++does not replace these consistency checks.
++
++Confirmation writes `answered` only while the row remains `running` and its
++starting session is unchanged. If another write replaces that session, the
++wrapper refuses confirmation and the next exchange instead of silently repairing
++the discrepancy. A transient `confirmed` snapshot whose row is still `running`
++or already `interrupted` remains readable and unconfirmed: the row can still
++carry the previous session before answer confirmation.
++
++Inconsistent state produces an explicit error in `agent show`, `agent-detail`,
++and `recovery-preview` (HTTP 400 for both APIs), without returning a session or
++modifying history. The panel displays the error and offers no confirmation.
++Examine retained sources before deciding what comes next; reads never rewrite
++a session or reconstruct assumed counters.
++
++Reproducible verification using isolated test fixtures:
++
++```sh
++go test ./internal/engine -run '^TestDialogue(BoundaryRejectsInconsistentTurnAcrossConsumers|CheckpointRejectsUnresumableSessionAndInvalidUsage|ConfirmationDoesNotOverwriteChangedSession|BoundaryAllowsUnconfirmedEndBeforeAnswer)$' -count=1 -v
++node tests/dialogue_recovery_ui.cjs /absolute/path/to/binary /evidence/directory --integrity
++```
++
++The browser recipe creates its own project and local scripted provider. State
++corruption and repair affect only that fixture, never a user's mission database.
++No real model is called.
++
+ Turns remain retained when logs are purged. Their state is included in local
+ recoverable deletion and restoration; a standard historical export does not
+ thereby become an executable checkpoint. Legacy state is not reconstructed from
+--- a/docs/plans/deepagents-integration/PLAN.md
++++ b/docs/plans/deepagents-integration/PLAN.md
+@@ -44,6 +44,7 @@
+ | M10 Confirmation de fin des tours | Défaut moteur corrigé et vérifié localement | Trois faux `answered` reproduits, puis confirmation par le moniteur avant écriture. 10 tests distincts, dont 6 avec `-race` ; vrai superviseur, terminal et CLI avec fournisseurs locaux. Docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-06.md`. Restauration après arrêt toujours non réalisée. |
+ | M11 État durable aux frontières | Réalisé et vérifié localement | Gardes et usages conservés avant autorisations, vue CLI/API qualifiée, migration isolée 33 → 34 et restauration locale de corbeille ; 32 tests distincts, dont 16 avec `-race`, vrai binaire et RETEX dans `RESULTATS-MEMOIRE-07.md`. Aucun redémarrage fournisseur activé. |
+ | M12 Diagnostic de reprise du dialogue | Réalisé et vérifié localement | Frontière M11 consommée par CLI/API/panneau FR/EN, sélection exacte hors liste récente, 11 tests Go distincts dont 5 avec `-race`, vraie recette navigateur. Voir `RESULTATS-MEMOIRE-08.md`. Aucune décision ou restauration fournisseur enregistrée. |
++| M13 Cohérence du tour et du checkpoint | Défauts reproduits, corrigés et vérifiés localement | Session et statut validés par le lecteur partagé, confirmation conditionnée à la session attendue, usages invalides refusés ; 15 tests distincts dont 6 avec `-race`, vraie recette navigateur et docs FR/EN. Voir `RESULTATS-MEMOIRE-09.md`. Restauration toujours ouverte. |
+ 
+ **Point de reprise au 16 octobre :** les quatre appels M6 et leurs résultats
+ mixtes sont conservés, sans renotation. M7 prépare puis, après accord « oui »,
+@@ -101,6 +102,17 @@
+ de départ avant une restauration. Le diagnostic ne lui accorde aucun droit.
+ Le serveur observé à cette reprise est conservé, sans déploiement ni appel LLM.
+ 
++Après la parenthèse candidature, M13 audite ces préconditions et reproduit une
++divergence entre session de ligne et checkpoint, puis son écrasement lors de la
++confirmation. Le lecteur commun et la confirmation conditionnelle les refusent
++désormais ; usages invalides et états transitoires sont distingués. Lire
++`RESULTATS-MEMOIRE-09.md` et `evidence/m13-20261016/` : quinze tests distincts,
++six avec `-race`, recette navigateur positive/erreur et documentation FR/EN.
++Les sources vérifiées restent un candidat local. La décision fraîche et son
++application sous gardes, réservations et vérification fournisseur restent la
++prochaine frontière ; ni la cohérence d'un reçu ni sa lecture n'autorisent un
++redémarrage.
++
+ À chaque reprise, lire ce point, l’audit et le manifeste ; contrôler les empreintes
+ concernées, conserver les acquis et poursuivre le prochain travail autorisé.
+ Actualiser le référentiel en cas de dérive, sans écraser les observations initiales.
+@@ -231,6 +243,7 @@
+ | 2026-10-16 | M10, reprise après « next » : trois tours incomplets marqués répondus sont reproduits avant correction. | Confirmation de fin et de persistance par le moniteur ; dix tests distincts et vrai parcours superviseur/terminal/CLI avec fournisseurs locaux. Restauration après arrêt encore ouverte ; aucun nouvel appel de modèle. |
+ | 2026-10-16 | M11, reprise « suite » après lancement de l’interface. | État durable sur le tour, usage avant battement, gardes complètes et lecture datée ; stockage 34 testé isolément, 32 tests distincts dont 16 avec `-race`. Serveur réel conservé, restauration fournisseur encore ouverte. |
+ | 2026-10-16 | M12, reprise « next » : le diagnostic existant ne consulte pas les checkpoints. | Qualification commune et sélection exacte, CLI/API/panneau FR/EN vérifiés ; 11 tests distincts dont 5 avec `-race` et vraie recette navigateur. Aucune décision ni restauration implicite. |
++| 2026-10-16 | M13, reprise du projet après candidature et rappel de documentation. | Préconditions de reprise auditées ; divergence de session et écrasement à la confirmation reproduits, puis refusés par les producteurs communs. Quinze tests distincts dont six avec `-race`, vraie CLI/API/navigateur, documentation FR/EN et RETEX. Le serveur réel reste inchangé. |
+ 
+ ## Réalisation M3 — décision technique et critères
+ 
+--- a/docs/plans/deepagents-integration/cas-evaluation.json
++++ b/docs/plans/deepagents-integration/cas-evaluation.json
+@@ -708,6 +708,25 @@
+           "scope": "Missing results and incomplete visibility prevent a positive effects qualification; API, CLI and browser preserve observed counts and show unknowns without replay or mutation. No structured conversation projection, summarization or restored tool-message sequence is executed."
+         }
+       ]
++    },
++    {
++      "id": "memory-09-dialogue-boundary-integrity",
++      "date": "2026-10-16",
++      "report": "RESULTATS-MEMOIRE-09.md",
++      "environment": "Actual local wrappers for Codex and Claude, compare-and-set confirmation failure injected in isolated storage, shared CLI/API reader, built server and browser FR/EN error/positive flow; no user runtime change",
++      "model_calls": 0,
++      "cases": [
++        {
++          "id": "MEM-C15",
++          "result": "PARTIAL",
++          "scope": "Inconsistent stored session/status and invalid checkpoint usage rejected by common readers; answered confirmation binds the expected starting session. Actual provider restoration still unavailable."
++        },
++        {
++          "id": "MEM-C16",
++          "result": "PARTIAL",
++          "scope": "Cumulative guards preserved and incompatible state refused; 15 distinct Go tests including 6 with race detector and actual browser refusal without new provider invocation. Fresh execution decision, reservations and provider restoration remain open."
++        }
++      ]
+     }
+   ]
+ }
+--- /dev/null
++++ b/docs/plans/deepagents-integration/INCREMENT-MEMOIRE-09.md
+@@ -0,0 +1,41 @@
++# Cohérence de la frontière durable avant restauration
++
++16 octobre 2026, reprise du projet après la parenthèse candidature. Codex seul,
++méthodes APEX et `replan`. MEM-U08, MEM-U12, MEM-U13 ; MEM-C15/MEM-C16.
++
++## Observation et décision
++
++M12 fournit un diagnostic, sans droit de restauration. En examinant les
++préconditions d'une décision fraîche, le lecteur commun ne compare pas la
++session du checkpoint avec la session du tour répondu. Le wrapper réécrit
++également la session sans vérifier que la valeur de départ est inchangée.
++Ces constats de code doivent être reproduits avant correction. Un chemin de
++lecture supposait encore un nom de fichier absent (`prepared_launch.go`) ;
++la recherche a été corrigée vers les producteurs existants, sans relance ni
++mutation de produit.
++
++Deux voies : ajouter des exceptions dans le diagnostic M12, ou renforcer le
++contrat commun de lecture et de confirmation du tour. La seconde est retenue :
++elle couvre aussi `agent show`, `agent-detail` et les futurs restaurateurs.
++Un état de fin écrit avant l'accord du wrapper reste un état transitoire valide,
++mais jamais une frontière confirmée tant que le statut n'est pas `answered`.
++
++| Lot | Propriétaire et périmètre | Critère observable |
++| --- | --- | --- |
++| M13.1 | Codex, contre-exemples et préimages | Session de ligne divergente, statut inconnu, session non reprise en charge et usages invalides refusés ; échecs initiaux conservés. |
++| M13.2 | Codex, lecteur/confirmation communs | Une ligne répondue porte la même session que son checkpoint ; la confirmation refuse un remplacement concurrent ; état transitoire et historique absent restent qualifiés. |
++| M13.3 | Codex, vérification publique | CLI/API refusent sans mutation ; test wrapper/superviseur avec scripts locaux ; contrôles ciblés, concurrence et parcours navigateur existant. |
++| M13.4 | Codex, documentation et RETEX | Contrat FR/EN, preuves liées aux sources, plan et limites mis à jour. |
++
++Pas de nouveau plafond, de migration, de délégation ni d'appel de modèle.
++Le serveur utilisateur reste en place. La décision d'exécution et la restauration
++fournisseur demeurent ouvertes ; cette correction ne les simule pas.
++
++## Résultat local
++
++M13.1 à M13.4 sont réalisés et vérifiés : contre-exemples conservés, quinze
++tests Go distincts dont six avec `-race`, compilation, analyse statique, contrôles
++de configuration et de traduction, vraie recette navigateur FR/EN avec seize
++captures. Documentation et RETEX :
++[RESULTATS-MEMOIRE-09.md](RESULTATS-MEMOIRE-09.md). Aucun résultat n'est attribué
++au serveur utilisateur conservé ; la restauration après arrêt reste ouverte.
+--- /dev/null
++++ b/docs/plans/deepagents-integration/RESULTATS-MEMOIRE-09.md
+@@ -0,0 +1,108 @@
++# Cohérence du tour et du checkpoint avant reprise
++
++16 octobre 2026, reprise du chantier mémoire après la parenthèse candidature.
++Incrément : [INCREMENT-MEMOIRE-09.md](INCREMENT-MEMOIRE-09.md).
++Codex seul ; candidat local, sans migration, modèle réel ou déploiement.
++
++## Défaut reproduit et correction
++
++L'examen des préconditions d'une restauration a révélé un contrôle absent : le
++lecteur M11 ne comparait pas la session du tour répondu à celle du checkpoint.
++Les fixtures reproduisent une ligne divergente ou vide et un statut inconnu :
++la CLI, l'API et le diagnostic acceptaient ces états. Le même lecteur admettait
++une session non utilisable par l'adaptateur et certains champs d'usage négatifs,
++malgré une empreinte recalculée correcte.
++
++Une seconde reproduction modifie la session après l'écriture de fin et avant la
++confirmation : le wrapper écrasait cette valeur et démarrait l'échange suivant.
++Il s'agit d'un contre-exemple en stockage isolé, pas d'un incident déclaré sur
++une mission utilisateur. Les échecs d'origine et la source exacte restent dans
++`evidence/m13-20261016/boundary-red.json/.log` et `preimages/`.
++
++Le lecteur commun refuse désormais un statut inconnu, une session non conforme,
++une session répondue divergente et un usage incohérent. La vérification du format
++de session est partagée avec l'adaptateur existant ; aucun nouvel interpréteur
++de commandes n'est ajouté. La confirmation compare la session de départ dans
++son `UPDATE` conditionnel. Un remplacement empêche `answered` et l'appel suivant,
++sans écraser la valeur concurrente. Cette garde est exercée sur les premier et
++deuxième tours des deux adaptateurs Codex et Claude, avec fournisseurs scriptés.
++
++La fin persistée et le statut restent deux écritures successives. Un état
++`confirmed` dont la ligne est encore `running` ou déjà `interrupted` reste
++consultable, mais non confirmé. Les compteurs existants, les usages inconnus,
++les tours anciens sans checkpoint et les preuves historiques sont préservés.
++Le format de stockage reste 34 ; aucun redémarrage implicite n'est ajouté.
++
++## Vérifications et limites
++
++| Contrôle | Résultat | Preuve sous `evidence/m13-20261016/` |
++| --- | --- | --- |
++| Contre-exemples avant correction | FAIL : trois tests, contrôle positif PASS | `boundary-red.json/.log`, source exacte dans `preimages/` |
++| Lecteur commun, confirmation conditionnelle, sessions/usage, consommateurs M11/M12 et deux adaptateurs | PASS : 15 tests nommés, 36 sous-tests | `boundary-final.json/.log` |
++| Concurrence, wrappers et usages cumulés | PASS : six noms, inclus dans les quinze | `boundary-race.json/.log` |
++| Compilation et analyse statique | PASS | `build.json/.log`, `built-binary.json`, `static.json/.log` |
++| Catalogue FR/EN et rendu existant | PASS | `i18n.json/.log`, `web-unit.json/.log` |
++| Vraie CLI, superviseur, serveur et bouton ; état incohérent et retour cohérent de fixture | PASS : six contrôles, une invocation locale, zéro modèle | `browser-flow.json/.log`, `browser-flow/result.json` |
++| Erreur FR/EN, deux thèmes, 1440/320 px, absence de confirmation, Échap/focus ; parcours positif jusqu'à 320 px | PASS : 16 captures, refus attendus distingués | Même recette `--integrity`, sous-dossier `browser-flow/` |
++| Décision autorisée et restauration fournisseur après arrêt | NOT IMPLEMENTED / NOT TESTED | MEM-C15/MEM-C16 restent PARTIAL. |
++
++Les refus CLI/API comparent les tables avant/après et le nombre d'invocations :
++aucune mutation ni nouvel appel. Les deux endpoints renvoient HTTP 400 pour ces
++incohérences, sans exposer les identifiants de session. Les valeurs NaN/infinies
++sont contrôlées directement sur l'objet Go : elles ne sont pas présentées comme
++des nombres JSON valides. Les tests de session et d'usage ne démontrent pas une
++restauration réelle ni une disponibilité fournisseur.
++
++Les sources et entrées des contrôles sont empreintées avant/après. Les quinze
++noms ne sont pas additionnés aux six déjà inclus dans le lot `-race`. Les
++exécutions initiales et finales restent distinctes. La revue du diff est locale,
++sans approbation indépendante. Le serveur utilisateur reste séparé du candidat.
++
++La recette finale observe quatre HTTP 400 attendus, sans erreur de page ni
++échec réseau inattendu. Elle compare les sept tables avant/après les lectures
++de l'état altéré et rétablit seulement sa fixture pour une lecture positive.
++Les captures FR claires à 320 px et EN sombres à 1440 px ont été inspectées.
++Le contrôle de contraste du parcours positif est conservé ; le contraste de
++l'alerte d'erreur n'est pas mesuré séparément par cette recette.
++
++## Documentation et RETEX
++
++Le contrat, le refus, l'état transitoire et les recettes sont documentés dans
++[PROJECT-MEMORY FR](../../PROJECT-MEMORY.md) et
++[PROJECT-MEMORY EN](../../en/PROJECT-MEMORY.md). La leçon est appliquée par le
++lecteur partagé et sa confirmation : vérifier l'accord entre représentations,
++pas seulement l'empreinte de chacune ; confirmer avec la valeur attendue plutôt
++que corriger silencieusement une écriture concurrente. Les lecteurs actuels et
++les futurs consommateurs du même producteur reçoivent ce contrôle de code.
++
++La première recette navigateur échoue sur sa propre sélection de langue : elle
++écrit une clé de stockage supposée et conserve l'URL anglaise. Le code réel
++donne priorité au paramètre `lang` ; la recette reprend le parcours déjà utilisé
++par ses contrôles positifs, puis vérifie le thème par `setTheme`. Le refus moteur
++attendu est distinct de cet échec de recette. Les sorties et la source d'origine
++sont conservées dans `browser.json/.log`, `browser/failure.json` et `preimages/`.
++La fixture était déjà arrêtée avant son altération ; le nettoyage ne tente plus
++de lire sa vue volontairement incohérente pour confirmer ce même arrêt.
++
++La seconde recette atteint les quatre vues d'erreur attendues, puis échoue sur
++une requête `snapshot` annulée lors d'une navigation. La recette marque désormais
++la durée de navigation et conserve séparément les seuls `net::ERR_ABORTED`
++du suivi de cette même fixture pendant cette durée. Tous les autres échecs
++restent bloquants. `browser-final.json/.log` et sa source restent conservés ;
++la recette finale `browser-flow` passe et n'observe aucune annulation. Aucun
++nouveau correctif moteur ni nouvel appel de modèle n'a été nécessaire.
++
++Quelques recherches supposaient encore des noms de fichiers absents. Ces
++résultats ne constituent aucune preuve et n'ont entraîné aucune modification
++de produit ; les producteurs et le contrat de langue réels ont été relus.
++Le premier audit documentaire recherchait « en cours » dans toutes les pages et
++a rejeté une explication légitime sur le serveur déjà démarré. Le contrôle est
++resserré sur le statut du présent résultat ; le texte opérationnel reste intact.
++
++## Suite du besoin initial
++
++La décision fraîche, la réacquisition de l'espace et des réservations, le contrôle
++de session et l'application d'une restauration restent à réaliser. Une nouvelle
++tentative garde son contrat et ses coûts ; elle n'est pas renommée en reprise de
++conversation. Cette correction ferme le défaut de cohérence reproduit, pas les
++volets mémoire encore ouverts (restauration, résumé, suppression et qualité LLM).

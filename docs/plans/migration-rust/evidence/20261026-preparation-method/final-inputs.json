@@ -1,0 +1,23 @@
+{
+  "rust/crates/swarm-engine/src/preparation_command.rs": "09b00c960ba0a3f48d7edc366d13eff8dd8398b6f7ff3dae63691bfd648849a3",
+  "rust/crates/swarm-engine/src/root_store/preparation_write.rs": "5227b622321206f3a62783050cb109ad5c814ed931ddd9ba775cf30eb12e3f9f",
+  "rust/crates/swarm-cli/src/preparation.rs": "82c8fc013cb9d57bb07942e5da0651d289a767e002c135f485953e7e27f0ae57",
+  "rust/crates/swarm-cli/src/lib.rs": "313fb20dd8df44cdadf5bac8715d01ad7127545d5554dd79c6ff188ed79c3019",
+  "rust/crates/swarm-web/src/service/preparations.rs": "47e899bbc4d42576c4c92df3bd4b2970b4431b51653734ef055d6e9dfd906982",
+  "rust/crates/swarm-web/src/service.rs": "f25ae29a522f317f10def132fa76002fee070bab597f45d22128945a7e0d137b",
+  "rust/crates/swarm-engine/tests/preparation_writes.rs": "6a6421b627abedce7eeafc850130a41dbbb96f58cae905007874c4ba3e6a97b7",
+  "tests/rust_preparation_method.py": "d1e95ae9cec8314549e108f6bd59bef33ac15e4a247b9714ba9b2ebf87973b82",
+  "tools/verification/recipes/preparation-writes-rust.json": "4cee72c521f8af0151c73786f19c5e93902f9ccd293ac9a9bd69e9a6f4fa974c",
+  "version_history.json": "42a59d651795021551d95ca3133588de6f8e414d12aa5caee9423f865ee5949d",
+  "docs/architecture/RUST-MIGRATION.md": "64b34faf4e5812b86c59279b39b59e4568f252e8cb87cd3ce7c4c6f7e5f7a25f",
+  "docs/en/RUST-MIGRATION.md": "e74655f529f394d785a1f265cc97759975e51e3a796c375bfec6ceb7141892d1",
+  "docs/RUNTIME-RECOVERY.md": "41a42efa3fbb7539411e7e0b7e3b010b785b83169f312ba796c2c5f787665d70",
+  "docs/en/RUNTIME-RECOVERY.md": "88b45e74921766f282d8c4b315477fa269354ba9ec262e0e31dd21e86a2ef402",
+  "docs/plans/migration-rust/REPLAYS.md": "86715ee554629e9ae427f6cde48ae9112269502542fdeb3bae84c5d8b16adc67",
+  "docs/en/RUST-MIGRATION-REPLAYS.md": "7d13b35dcc68928f15ab9f13f01e15b04e22ad55a2a28ba6755f8b81e0ef8b09",
+  "tests/rust_preparation_writes.py": "c7a3ed5204e79c50db8dc6fe400ad9ad652938f9c506b695f5c2be7ef09f6e36",
+  "tests/native_build_metadata_test.py": "7e9ae8fd5b08b5d90777de92f81b09e76c8197a3c7f19ed18abe7317efde2a11",
+  "tools/rust-migration/build_native.py": "467006e36306f22d7053514c4c63cba0d5405e54fbf1fcba6c0b2bfe0e32d5f6",
+  "docs/plans/migration-rust/PLAN.md": "6be0bd778c13cab84f3b9251c12cb9b3dad6bf01cedbf8606bd60f404c61cb59",
+  "docs/plans/migration-rust/PREPARATION-METHOD-20261026.md": "85bccc7a84a4f7f931a866b28de00fa5fab5553bd0c7c1414a3995394a3dd4c3"
+}

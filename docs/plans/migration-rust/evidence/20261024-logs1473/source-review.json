@@ -1,0 +1,87 @@
+{
+  "status": "LOCAL_SEMANTIC_REVIEW_RECORDED",
+  "reviewer": "Codex principal; tool-free GLM pure codec review only, not full independent acceptance",
+  "previous_review": "docs/plans/migration-rust/evidence/20261024-resume1472/source-review.json",
+  "source_sha256": {
+    "rust/crates/swarm-web/src/service.rs": "f00b089d304a5b2be7086065e74f0ae9649aa6fb5a871e2b73f18a563945f108",
+    "rust/crates/swarm-web/src/service/agent_logs.rs": "76443d89ad19e82c0c4e57b91459f2f9884a259e6cd75b28dcf422990f6bcaad",
+    "rust/crates/swarm-web/src/service/native_admin.rs": "0cc17d4329c45d9aec13429ebf8f6d240b0034f876c30cd4a8c3d0b1d0bf1875",
+    "web/cockpit-native-logs.js": "3678d284d987636c2cd5aa04c4fcbd792f69204ae25d78ff43536993c72186cc",
+    "web/cockpit-native.js": "049d284b6d5ffdabcee5d6b748f263bf0068874da9b0b7dc945d6bb437d99086",
+    "tests/rust_existing_cockpit_ui.cjs": "6b3342ebdf475587a4c771a56fb60b57c6531a232ec36a1f9d70058376dd5dc5",
+    "tests/rust_agent_logs_http_ui.py": "0847264a5c7b99aa9f62cc5a7846d51b278b2e95a139592c15dc7e9c3f71b85d",
+    "tests/rust_agent_logs_ui.cjs": "00a8d8b3b516627b339316e1a48721450b724eb310c1d7123af6563672b69ef1",
+    "tests/rust_installed_agent_logs_read.cjs": "1c167a6db00f38e63beaef877a8c4290ac2c04ff6fb8c1a03e351db860ec25f0",
+    "tools/verification/recipes/existing-cockpit-rust.json": "1b54216e1c5c064cd02196a18fcc172121586021fe19a59de0979f0d68df9812",
+    "tools/verification/recipes/native-cockpit-ux.json": "c9f938a3556770b938cc6182ad1182a0e4761ac04c4fe5b23f2973ac400cda76",
+    "rust/crates/swarm-engine/src/model_wire.rs": "6d8f367389f95584e42c93270df70715f59fdcb891fc06d0cc3b2321816c03e3",
+    "rust/crates/swarm-engine/src/agent_supervision.rs": "81ddef6fc09e71b1034261bb04b83e8e5f849984a1720c37df00f033e299d189",
+    "rust/crates/swarm-engine/src/agent_execution_store.rs": "77a56de092c8023cb0e7db2e6477ed5225a6d5595b0376c9d7ab9580941a64d0",
+    "rust/crates/swarm-engine/src/agent_completion_journal.rs": "80d4bc80553c10d4be26908a600632b5f064251941bc029c9322e7a069a59702",
+    "locales/en.json": "0cbd63597b6bde5f742f1157dfda2f084066dc3ea344e6a11dba57d08c1d7951",
+    "web/i18n-en.js": "599972633fc5de9f0c1f6a0fa581d840e0c137cfdc7fb7213cbe25181c1ead73",
+    "version_history.json": "49162b7ddc76da55b843a30d248503a0b47eb7bffbcc7a6e62e8e79474de1a99",
+    "docs/RUNTIME-RECOVERY.md": "21dad89a2aa54ab4736fe9568f992ab0d9f4887285ef706bb0bfc59825693c71",
+    "docs/en/RUNTIME-RECOVERY.md": "c036d34664699ecf726b288f8a4371e8aea1f615502958b162a5e16991c01cb3",
+    "docs/architecture/RUST-MIGRATION.md": "5d504768df029457c2dcfa3065bb4259e52da3313d56daf5ea91151ec133b126",
+    "docs/en/RUST-MIGRATION.md": "2353102ca027c54feb9cff5d5aad3b0911efa313b4636682e9ac14f7f159ac89",
+    "docs/plans/migration-rust/PLAN.md": "6c0c49e72fe2307e80c348d9674f29416f041527b28effbb14408d0229f185a9",
+    "docs/plans/migration-rust/REPLAYS.md": "c926eacd2eefeda571b48ebfdd9dc04643ccc3f3cbe1ae04e080ec9fe8bc9744"
+  },
+  "consumed_contract_sha256": {
+    "rust/crates/swarm-engine/src/root_store/agent_log_history.rs": "4bcbf22ef1654ac4cae3c450de2639d556a7016064e009153a5f698f4f979a0a",
+    "rust/crates/swarm-engine/src/root_store.rs": "89397b066182d8549a380962f411e746075094eda7dbf7326f3199ab32608b52",
+    "rust/crates/swarm-engine/src/agent_models.rs": "18b63a00403e7d146497c46105551f272d0c7fe7a7504f1ea96d495498e01d8b",
+    "rust/crates/swarm-engine/src/work.rs": "5ce14f08318b6c3ca6bd67bed06d7987444bfda21fdbe135019607d32000c6c7",
+    "rust/crates/swarm-wire-json/src/lib.rs": "c65788600c8e00e2bd51f5d0bc55c89b1765ec647419919837cb6f946d5e812d"
+  },
+  "engine_owned_deltas": {
+    "rust/crates/swarm-engine/src/model_wire.rs": {
+      "before_sha256": "b3a5f16bf725671870c8840f6a98482a20451bfb14105746069829d94a1e7c58",
+      "after_sha256": "6d8f367389f95584e42c93270df70715f59fdcb891fc06d0cc3b2321816c03e3",
+      "baseline": "dev40 effective-source archive (before receipt correction)"
+    },
+    "rust/crates/swarm-engine/src/agent_supervision.rs": {
+      "before_sha256": "32a5f277766d2fb8b8eeb9e639eaeb69928a8a37f1044c64929abf0b0b116d74",
+      "after_sha256": "81ddef6fc09e71b1034261bb04b83e8e5f849984a1720c37df00f033e299d189",
+      "baseline": "dev40 effective-source archive (before receipt correction)"
+    },
+    "rust/crates/swarm-engine/src/agent_execution_store.rs": {
+      "before_sha256": "95b6fc5397481a59aee9e6fa1c97c350d506c86ca89fdd37f3ff2ad31187d960",
+      "after_sha256": "77a56de092c8023cb0e7db2e6477ed5225a6d5595b0376c9d7ab9580941a64d0",
+      "baseline": "dev40 effective-source archive (before receipt correction)"
+    },
+    "rust/crates/swarm-engine/src/agent_completion_journal.rs": {
+      "before_sha256": "8a639e21ba931f974d1d21ec85a4ceb4bdbdfb30abe1efbac13224a20d9c0763",
+      "after_sha256": "80d4bc80553c10d4be26908a600632b5f064251941bc029c9322e7a069a59702",
+      "baseline": "dev40 effective-source archive (before receipt correction)"
+    }
+  },
+  "policies": "No new operator timeout/retry/concurrency/budget/retention/default. Required cursor is protocol data: 0 latest, negative first, positive forward; existing CLI200 is transport pagination, no new ceiling. Schema1/methods/fixed paths/tabIndex0 are protocol/presentation. MAX_SAFE_INTEGER is browser exact representation, not operator policy. Shared session/Host/capacity/owned Root binding unchanged; readonly open(false), Work-Agent association checked before history. No provenance, admission, adoption or execution implied by history. No polling/provider runtime calls.",
+  "functions": "Reviewed query/AgentLogs/agent_logs and actual RootStore historical reader/read_agent/close; mount/read/render/clear/load/refresh/setWork, filter/export handlers and generation checks; bootstrap showView/select/setup with explicit lazy status on Logs and real refusal on another view. Reviewed persisted_raw, GoRaw Serialize/strict PartialEq, provider_facts, CompletionFacts::observe, supervision::run receipt producer and unchanged replace/owned/replay comparisons. Producer-only persisted normalization preserves duplicate keys/numeric lexemes, compacts outside strings and escapes HTML/separators before exact comparisons. New/changed nontrivial contracts documented; no executable Rustdoc examples added, named codec unit covers the helper.",
+  "errors": "Malformed/duplicate/missing/unsafe query, cursor and cross-Work reads refuse; method/body and cookie/CSRF variants tested after valid witnesses. Original IO/JSON/HTTP status/response causes preserved; read/encode/close typed causes survive. UI clears stale content/export, drops actually-consumed delayed responses, no automatic retry/fallback. Execution HTML failure reproduced on old candidate; normalization fixes producer bytes, never ignores strict readback. Failed completion original remains retained, no claim of automatic historical repair. GLM whitespace finding reproduced by named unit before fix. Console collector now records failures in finally. Terminal-status500 is observed and explicitly asserted only when leaving Logs, not hidden in a generic error allowlist. Purety witness compares actual stored Agent bytes/stable DTO fields, not moving heartbeat age.",
+  "documentation": "FR/EN runtime contract and Mermaid, architecture, notes/catalogue, compact PLAN and permanent REPLAYS updated. Actual lifecycle history distinguished from output capture/transcript; generated NDJSON Blob tested, final browser download-manager write not attested. Prior baseline/current engine byte delta retained to preserve older dirty work.",
+  "proof": {
+    "recipe": ".cache/existing-cockpit1473-verified",
+    "integrity": "VERIFIED",
+    "existing_browser_assertions": 404,
+    "logs_browser_assertions": 60,
+    "logs_HTTP_assertions": 22,
+    "codec_named_tests_passed": 1,
+    "installed_logs_assertions": 24,
+    "installed_version_assertions": 14,
+    "served_assets": 46,
+    "version": "v0.1.1-dev.42",
+    "binary_sha256": "cc433e99aa90d4dc9373c7b5c56ab7aff983b403c87eca569b69d574f3ad0a50",
+    "visual": "EN/sombre390 fixture inspected; FR/EN both themes1440/390 overflow and focus assertions",
+    "profile": "VERIFIED_DEFAULT_NATIVE_PROFILE; core features empty, no fixture feature, runtime exe hash equals tested candidate"
+  },
+  "limits": [
+    "1472-BATCH full managed batch projection remains refused",
+    "1472-STATUS legacy mission agent provenance remains missing",
+    "1473 terminal-task mission status branch remains unported/refused",
+    "No automatic repair of old interrupted execution receipts",
+    "Output transcript/live following and browser download-manager persistence not established by this slice",
+    "No global migration or full independent engine acceptance"
+  ]
+}

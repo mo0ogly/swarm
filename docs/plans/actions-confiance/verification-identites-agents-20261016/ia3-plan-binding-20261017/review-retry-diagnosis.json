@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-17T07:50:50.589236+00:00",
+  "scope": "Pre-existing review-recovery test, outside the plan-source contract",
+  "original_candidate_failure": "tests-expanded-before-recovery-diagnosis.jsonl",
+  "baseline_reproducer": "baseline-review-retry.jsonl",
+  "trial": "shared-writer-after.jsonl",
+  "facts": [
+    "Baseline source overlay also panics at task.IndependentReview.ID.",
+    "Original fixture uses citation v1; the current engine treats that as a full method restart and clears the active review.",
+    "Using a current-version fixture exposes the intentional prohibition against retrying an unchanged protocol by reformulating instructions.",
+    "This trial does not fix the contract contradiction; all three edited review test files restored byte-for-byte from retained preimages.",
+    "No production retry guard, budget or acceptance has been changed."
+  ],
+  "selection_correction": "TestPlan.* unintentionally also matched every TestPlanning*. Use TestPlan[A-Z].* plus the explicitly selected hierarchical writer paths. Retain the known baseline failure separately; do not claim whole-package green.",
+  "owner": "Codex, Cursor engine review-recovery tests",
+  "resumption": "Align obsolete same-protocol positive tests with the protected changed-contract recovery path, then verify receipt, decision, application and actual effect with current wire contracts.",
+  "status": "OPEN_BASELINE_TEST_CONTRACT_CONTRADICTION",
+  "identity_plan_wait": "Corrected fixture now observes sql.DB WaitCount before the single Trust probe; passes in shared-writer-after.jsonl"
+}

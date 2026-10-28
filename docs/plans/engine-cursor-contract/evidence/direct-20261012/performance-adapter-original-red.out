@@ -1,0 +1,17 @@
+evalmachine.<anonymous>:13
+function replace(before,after){if(source.split(before).length!==2)throw Error('Archived recipe changed; inspect adapter before running: '+before);source=source.replace(before,after)}
+                                                                  ^
+
+Error: Archived recipe changed; inspect adapter before running: initialP95<=(cards===500?2000:1000)
+    at replace (evalmachine.<anonymous>:13:73)
+    at evalmachine.<anonymous>:16:1
+    at Script.runInContext (node:vm:149:12)
+    at Script.runInNewContext (node:vm:154:17)
+    at Object.runInNewContext (node:vm:310:38)
+    at verdict (/home/fpizzi/Documents/ChatGPT/swarm/tests/graph_performance_adapter_test.cjs:6:475)
+    at Object.<anonymous> (/home/fpizzi/Documents/ChatGPT/swarm/tests/graph_performance_adapter_test.cjs:9:21)
+    at Module._compile (node:internal/modules/cjs/loader:1781:14)
+    at Object..js (node:internal/modules/cjs/loader:1913:10)
+    at Module.load (node:internal/modules/cjs/loader:1505:32)
+
+Node.js v22.23.2

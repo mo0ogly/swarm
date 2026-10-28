@@ -1,0 +1,11 @@
+--- before/internal/enrollmentrequest/request_test.go
++++ internal/enrollmentrequest/request_test.go
+@@ -236,7 +236,7 @@
+ 	altered := doc
+ 	altered.Permissions = []identitycontract.Permission{{Operation: "effect.execute", Resource: "external/target"}}
+ 	newBody, _ := enrollmentauthority.Encode(altered)
+-	payload, _ := json.Marshal(enrollmentstate.ActiveReply{Head: p.Enrollment.Head, Record: enrollmentstate.Record{ID: doc.EnrollmentID, Body: newBody, EnrolledSequence: 1}})
++	payload, _ := json.Marshal(enrollmentstate.ActiveReply{Schema: enrollmentstate.ActiveReplySchema, Head: p.Enrollment.Head, Record: enrollmentstate.Record{ID: doc.EnrollmentID, Body: newBody, EnrolledSequence: 1}})
+ 	ch, _ = prepared.NewChallenge(v)
+ 	reply, _ = enrollmentproof.SignResponse(ch.Request(), payload, key)
+ 	statement, err = v.Verify(ch, reply)

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "language",
+    "width": 104.78125,
+    "height": 44
+  },
+  {
+    "id": "theme",
+    "width": 157.265625,
+    "height": 44
+  },
+  {
+    "id": "memory",
+    "width": 407.28125,
+    "height": 44
+  },
+  {
+    "id": "protection",
+    "width": 407.28125,
+    "height": 44
+  },
+  {
+    "id": "identity",
+    "width": 407.28125,
+    "height": 44
+  },
+  {
+    "id": "reset",
+    "width": 407.28125,
+    "height": 44
+  }
+]

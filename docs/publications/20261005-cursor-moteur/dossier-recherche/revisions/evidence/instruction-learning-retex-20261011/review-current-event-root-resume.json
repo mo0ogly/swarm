@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-current-review-event-tab-feedback-through-retex-20261011",
+  "expected_revision": 195,
+  "scope": "root",
+  "reason": "REPLAN : correctif installé build2026-10-11T11:52:30Z, SHA25677ce352705e16f6c5d468e7ae30ac500d4a2a01fc79918d5d19e95c2a7947be5, suite complète PASS449.138s/race/vet et HTTP/proc vérifiés. Activation13 refusée car review-retry proposait un événement non reçu. Maintenant dernière consigne puis revue actuelle, schéma retire reprise si résultat absent ; utiliser uniquement events reçus. T2 revue actuellereview-f5cb258178e80a4bdc4778d3 erreur de protocole de tabulation, candidat1ce2af045bef41baf4af808c610a921c7fe71224. Proposer review-retry si son résultat exact est reçu, next décrit nouvelle vérification des citations JSON : tabulation originale et backslash+t distincts, diagnostic exact fourni ; aucun verdict brut réparé. Budget70,18consommés,6appels requis. Ne pas relancer production T2 ni confondre refus antérieurs avec état courant ; attendre la revue corrigée. Créer plan-ca937edf4e-T8 pour req-29 après plan-ca937edf4e-T7 : RETEX final preuves/limites/quick wins et docs FR/EN/Mermaid. Poursuivre T2..T8 ; anciens retours à constater sur état actuel, aucune ancienne erreur ne prouve le blocage du candidat réparé. T3 garde obligation de récupération autonome du refus de proposition, T5 UX état courant ; patches transmis publiquement. Autorisation utilisateur des augmentations nécessaires de droits/budgets par opérations publiques, consommation conservée."
+}

@@ -1,0 +1,11 @@
+=== RUN   TestActionsConfianceT3StepUpTypedPolicyRoundTrip
+=== RUN   TestActionsConfianceT3StepUpTypedPolicyRoundTrip/operations
+    trust_step_up_test.go:401: typed null policy accepted; persisted round trip: step-up : champs explicites non null requis
+=== RUN   TestActionsConfianceT3StepUpTypedPolicyRoundTrip/acr_values
+    trust_step_up_test.go:401: typed null policy accepted; persisted round trip: step-up : champs explicites non null requis
+--- FAIL: TestActionsConfianceT3StepUpTypedPolicyRoundTrip (0.12s)
+    --- FAIL: TestActionsConfianceT3StepUpTypedPolicyRoundTrip/operations (0.06s)
+    --- FAIL: TestActionsConfianceT3StepUpTypedPolicyRoundTrip/acr_values (0.06s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.184s
+FAIL

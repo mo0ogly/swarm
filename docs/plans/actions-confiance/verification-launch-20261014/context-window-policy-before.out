@@ -1,0 +1,7 @@
+=== RUN   TestReviewContextWindowPolicyPersistsWithoutSpending
+    managed_review_context_policy_test.go:59: sizes 164551 168226 22003 parts 1
+    managed_review_context_policy_test.go:60: public policy rejects an explicit client-supported context window json: unknown field "review_context_tokens"
+--- FAIL: TestReviewContextWindowPolicyPersistsWithoutSpending (0.68s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.708s
+FAIL

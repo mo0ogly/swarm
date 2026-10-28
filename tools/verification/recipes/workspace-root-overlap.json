@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "workspace-root-overlap",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-engine/src/**/*.rs",
+    "rust/crates/swarm-cli/src/*.rs",
+    "tools/verification/recipe.py",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_mission_task_order.py",
+    "tests/rust_workspace_root_overlap.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "both-actual-guard-query-branches",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,hashlib,subprocess\nfrom pathlib import Path\nbinary=Path(os.environ['SWARM_WORKSPACE_GUARD_TEST_BINARY']).resolve()\np=json.loads(Path(os.environ['SWARM_WORKSPACE_GUARD_TEST_PROFILE']).read_bytes())\nif hashlib.sha256(binary.read_bytes()).hexdigest()!=p['executable_sha256']:raise ValueError('guard-test-binary-mismatch')\nartifact=p['core_artifact']\nif artifact['target']['name']!='swarm_engine' or artifact['features']!=[] or not artifact['profile']['test']:raise ValueError('guard-test-profile-invalid')\nsubprocess.run([str(binary),'--exact','agent_launch::workspace_root_tests::canonical_root_overlap_and_sibling_boundaries_cover_both_guards','--nocapture'],check=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "canonical_root_overlap_and_sibling_boundaries_cover_both_guards ... ok",
+        "1 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-corrupted-observation-refusal-and-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='workspace-root-overlap-',dir='.cache')).resolve()\nargs=['python3','tests/rust_workspace_root_overlap.py']\nfor key,var in [('binary','SWARM_WORKSPACE_GUARD_BINARY'),('profile','SWARM_WORKSPACE_GUARD_PROFILE')]:\n value=Path(os.environ[var]).resolve()\n if not value.is_file():raise ValueError('workspace-input-missing:'+var)\n args+=['--'+key,str(value)]\nsubprocess.run(args+['--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base),flush=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS native root workspace observation refuses without mutation and recovers",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

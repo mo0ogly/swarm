@@ -1,0 +1,16 @@
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/null
+    trust_oidc_test.go:476: nonboolean enabled accepted
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/"true"
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/1
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/{}
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/[]
+--- FAIL: TestActionsConfianceT3OIDCEnabledRequiresBoolean (0.00s)
+    --- FAIL: TestActionsConfianceT3OIDCEnabledRequiresBoolean/null (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/"true" (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/1 (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/{} (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/[] (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.063s
+FAIL

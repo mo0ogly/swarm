@@ -1,0 +1,178 @@
+{
+  "status": "VERIFIED_PUBLIC_SEQUENTIAL_TWO_TASK_JOURNEY",
+  "calls": [
+    {
+      "role": "setup",
+      "usable_response": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 783,
+        "prompt_tokens": 14697,
+        "total_tokens": 15480,
+        "completion_tokens_details": {
+          "reasoning_tokens": 75,
+          "text_tokens": 708
+        }
+      },
+      "requested_model": "glm-5.2",
+      "reported_model": "glm-5.2",
+      "context_sha256": "035daff24802ed06f5313fcdd7047e19972bde428d22ffd8ddc2c3e43f731301",
+      "answer_sha256": "d27dd7f6c9e23f485556c6d88b527dcb7d0eedb09a71a5018384534be485f8bb"
+    },
+    {
+      "role": "provider",
+      "usable_response": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 646,
+        "prompt_tokens": 14704,
+        "total_tokens": 15350,
+        "completion_tokens_details": {
+          "reasoning_tokens": 56,
+          "text_tokens": 590
+        }
+      },
+      "requested_model": "glm-5.2",
+      "reported_model": "glm-5.2",
+      "context_sha256": "035daff24802ed06f5313fcdd7047e19972bde428d22ffd8ddc2c3e43f731301",
+      "answer_sha256": "6bd818eaf3172b66eefe230a4aa3920bffe1fc60db1c4fca2a0e1ff52c9de79a"
+    },
+    {
+      "role": "http-driver",
+      "usable_response": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 1298,
+        "prompt_tokens": 14699,
+        "total_tokens": 15997,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1,
+          "text_tokens": 1297
+        }
+      },
+      "requested_model": "glm-5.2",
+      "reported_model": "glm-5.2",
+      "context_sha256": "035daff24802ed06f5313fcdd7047e19972bde428d22ffd8ddc2c3e43f731301",
+      "answer_sha256": "c213ac0bbd9d805e3d33d42f4b617bf62d34ac935014063f217237c1be235d31"
+    },
+    {
+      "role": "resources",
+      "usable_response": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 911,
+        "prompt_tokens": 14696,
+        "total_tokens": 15607,
+        "completion_tokens_details": {
+          "reasoning_tokens": 55,
+          "text_tokens": 856
+        }
+      },
+      "requested_model": "glm-5.2",
+      "reported_model": "glm-5.2",
+      "context_sha256": "035daff24802ed06f5313fcdd7047e19972bde428d22ffd8ddc2c3e43f731301",
+      "answer_sha256": "3bcb14be0434133d313051919553b20b617117d97670b2f2fa5c32ca710e4d6c"
+    },
+    {
+      "role": "cleanup",
+      "usable_response": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 910,
+        "prompt_tokens": 14688,
+        "total_tokens": 15598,
+        "completion_tokens_details": {
+          "reasoning_tokens": 40,
+          "text_tokens": 870
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 64
+        }
+      },
+      "requested_model": "glm-5.2",
+      "reported_model": "glm-5.2",
+      "context_sha256": "035daff24802ed06f5313fcdd7047e19972bde428d22ffd8ddc2c3e43f731301",
+      "answer_sha256": "3b923522ffd1b2c5df1cf511d56425ccbda19aed7a7ea266ded163bef828a32c"
+    },
+    {
+      "role": "admission",
+      "usable_response": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 624,
+        "prompt_tokens": 14686,
+        "total_tokens": 15310,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1,
+          "text_tokens": 623
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 64
+        }
+      },
+      "requested_model": "glm-5.2",
+      "reported_model": "glm-5.2",
+      "context_sha256": "035daff24802ed06f5313fcdd7047e19972bde428d22ffd8ddc2c3e43f731301",
+      "answer_sha256": "a0151491e0d7f3d12ced9a35db2db98990516675f23cd05a528d735ad739d435"
+    },
+    {
+      "role": "recipe",
+      "usable_response": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 1299,
+        "prompt_tokens": 14695,
+        "total_tokens": 15994,
+        "completion_tokens_details": {
+          "reasoning_tokens": 419,
+          "text_tokens": 880
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 64
+        }
+      },
+      "requested_model": "glm-5.2",
+      "reported_model": "glm-5.2",
+      "context_sha256": "035daff24802ed06f5313fcdd7047e19972bde428d22ffd8ddc2c3e43f731301",
+      "answer_sha256": "6d8533a95ce3ea5196db251bf30286dd9aed138dd7929add056733d2c10b36ba"
+    },
+    {
+      "role": "review",
+      "usable_response": true,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 582,
+        "prompt_tokens": 14705,
+        "total_tokens": 15287,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1,
+          "text_tokens": 581
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 64
+        }
+      },
+      "requested_model": "glm-5.2",
+      "reported_model": "glm-5.2",
+      "context_sha256": "035daff24802ed06f5313fcdd7047e19972bde428d22ffd8ddc2c3e43f731301",
+      "answer_sha256": "9b300db931944ed40ce73cb779ddb5df5806eb89320e8d00c9cc44da42692a1b"
+    }
+  ],
+  "glm_calls": 8,
+  "glm_total_tokens": 124623,
+  "automatic_retries": 0,
+  "simultaneous_http": 2,
+  "first_run": "run1301",
+  "final_recipe": "recipe1303",
+  "integrity": "VERIFIED",
+  "binary_sha256": "61f08c78bd030a813d9c10722b7505b41d5f808bcba32835eecd5d42d90c0796",
+  "product_inputs_changed": false,
+  "installed": false,
+  "independent_acceptance": false,
+  "limitations": [
+    "controlled sequential fixture, not concurrent workers",
+    "blocked tasks, no submission/review/acceptance",
+    "managed Git settlement remains open",
+    "GLM advice not candidate review; next wave exact per-role context required"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "recorded_at": "2026-10-16T06:28:22.251848+00:00",
+  "campaign_seconds": 99.299,
+  "targeted_race_seconds": 263.914,
+  "identity_browser_sequential_seconds": 86.4,
+  "durations_not_summed": true,
+  "public_stages": 9,
+  "native_meaningful_cases": 407,
+  "identity_browser_checks": 104,
+  "external_cost": "unknown; not established by these receipts",
+  "review_status": "running",
+  "r20_status": "DEFERRED_BY_USER"
+}

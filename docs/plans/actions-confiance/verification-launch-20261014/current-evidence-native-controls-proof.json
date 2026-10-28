@@ -1,0 +1,88 @@
+{
+  "captured_at_utc": "2026-10-15T03:41:36.199636+00:00",
+  "candidate_commit": "9fecfc8acb9cddefd30b629f4bda8ff49900cb60",
+  "review_id": "review-4b43f0d3a78a3c830eac85ce",
+  "context_path": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-f806e01c57d77b7a/review-4b43f0d3a78a3c830eac85ce-context.json",
+  "context_sha256": "0b10844d5b0decccb35ebb31b45ec155b0bc8a3743e36d17868447bda10c4f60",
+  "controls": [
+    {
+      "id": "plan-entry",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 107,
+      "output_sha256": "7429e397894646ed0b6eacc028df2b90e0cecf1286f2b69221a95cb0fed76539",
+      "started_at": "2026-10-15T03:39:01.209498612Z",
+      "finished_at": "2026-10-15T03:39:01.261774952Z",
+      "original_path": "current-evidence-plan-entry.out"
+    },
+    {
+      "id": "plan-validation",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 64976,
+      "output_sha256": "b58c2da64694967de6a1c6609129ec4c4f169937a48128038a386f2e8d60fcce",
+      "started_at": "2026-10-15T03:39:01.265532943Z",
+      "finished_at": "2026-10-15T03:39:23.834089619Z",
+      "original_path": "current-evidence-plan-validation.out",
+      "passed_named_go_tests": 58
+    },
+    {
+      "id": "plan-delivery",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 8147,
+      "output_sha256": "6808e2b1888208d7b551505650110951432de611124f12af1c041acb7b36ccab",
+      "started_at": "2026-10-15T03:39:23.840784325Z",
+      "finished_at": "2026-10-15T03:39:33.156661857Z",
+      "original_path": "current-evidence-plan-delivery.out"
+    },
+    {
+      "id": "plan-criterion-1",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 541,
+      "output_sha256": "9b605d7ba8c4b71ae79eced1f0367c0ed6c447e3cb2a7a7e3661e59ac465f551",
+      "started_at": "2026-10-15T03:39:33.159451366Z",
+      "finished_at": "2026-10-15T03:39:35.060747474Z",
+      "original_path": "current-evidence-plan-criterion-1.out"
+    },
+    {
+      "id": "plan-criterion-2",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 595,
+      "output_sha256": "2ca43471b4ac410ce50492ab18741c73094486c48cc65d5cbd22a1075e3127f3",
+      "started_at": "2026-10-15T03:39:35.06449792Z",
+      "finished_at": "2026-10-15T03:39:36.685966283Z",
+      "original_path": "current-evidence-plan-criterion-2.out"
+    },
+    {
+      "id": "plan-criterion-3",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 517,
+      "output_sha256": "90b301f6acc6976080182910a007dda9292199befe41e0a55649c1b15be5ebb2",
+      "started_at": "2026-10-15T03:39:36.690425133Z",
+      "finished_at": "2026-10-15T03:39:38.281968681Z",
+      "original_path": "current-evidence-plan-criterion-3.out"
+    },
+    {
+      "id": "plan-criterion-4",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 6815,
+      "output_sha256": "07faee0ea37a406302ea03398fc57b161c03247b867cfa2b5697e0e0cac047b0",
+      "started_at": "2026-10-15T03:39:38.286948151Z",
+      "finished_at": "2026-10-15T03:39:46.601387337Z",
+      "original_path": "current-evidence-plan-criterion-4.out"
+    }
+  ],
+  "independent_verdict": "pending"
+}

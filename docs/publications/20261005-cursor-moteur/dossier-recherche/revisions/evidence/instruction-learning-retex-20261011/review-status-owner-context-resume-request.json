@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-installed-shared-contract-compact-context-through-retex-20261011",
+  "expected_revision": 264,
+  "scope": "root",
+  "reason": "Replan attribué : préflight254 corrigé par moteur60441875 installé, fullGo471.958s/race/vet/workflows PASS, exact contexte réduit seulement par aperçus next inactifs, entrées et contrats persistés intacts. Quotas publics60/60/70, consommations22/14/20 conservées. Réparation T2 portée locale et argv exact reçue publiquement, candidat 859996a7c72fa4f5bbb9fba8c257d9b47cb4b671 revue review-f61323bfa5817ab0f9bb4433 réellement en cours; attendre son résultat courant, aucun nouveau worker T2 ni prétendue acceptation. T8 existe, ne pas la recréer. Anciennes consignes décrivent états historiques, se référer aux preuves courantes. Consignes publiques T3..T8 complétées avec correctif9 et filiation. Après T2 acceptée poursuivre les lots utiles et la hiérarchie, puis T7 et T8 RETEX; fin appartient au juge IA, avec garanties moteur. Si erreur, diagnostic/proposition corrigée dans droits/budgets, pas simple journal. Aucun événement hors events reçus ne doit être acquitté."
+}

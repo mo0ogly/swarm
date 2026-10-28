@@ -1,0 +1,8 @@
+{
+  "binary": "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-observe",
+  "pid": 3773978,
+  "root": "/tmp/TestKernelObservePublicOwnedSource2992357425/001",
+  "source_kind": "registered owned Go test fixture, no provider",
+  "source_pid": 3773708,
+  "start": "5930655"
+}

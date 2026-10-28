@@ -1,0 +1,37 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestRecoveryProjection.*|TestRecoveryContext.*|TestRecoverySelectsPreviousRecordNotCurrentOrFuture|TestRecoveryFocusPreservesTaskAndAttributedReviewWithoutFreshness|TestMemory.*Context.*|TestOperationDescriptions)$",
+    "-count=1",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T19:18:57.769373+00:00",
+  "duration_seconds": 17.855,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestOperationDescriptions",
+    "TestMemoryPreparedContextIncludesManagedDelivery",
+    "TestMemoryRuntimeRecoveryContextMatchesProviderAndPersists",
+    "TestMemoryRuntimeContextCapacityStopsBeforeProvider",
+    "TestMemoryRuntimeContextWriteFailureStopsBeforeProvider",
+    "TestMemoryContextBindingPreservesMetadataAndRefusesOverflow",
+    "TestMemoryContextReceiptReadThroughCLIAndAPI",
+    "TestRecoveryContextIsBoundedScopedAndRedacted",
+    "TestRecoverySelectsPreviousRecordNotCurrentOrFuture",
+    "TestRecoveryFocusPreservesTaskAndAttributedReviewWithoutFreshness",
+    "TestRecoveryContextUsesRecentOperationsInsteadOfRepeatedInitialInventory",
+    "TestRecoveryProjectionSignalsTruncatedOperation",
+    "TestRecoveryProjectionSignalsEveryTruncatedFocusField",
+    "TestRecoveryProjectionRetainsDistinctLongOperations",
+    "TestRecoveryProjectionPropagatesCriterionOmission",
+    "TestRecoveryProjectionAccountsForEveryRetainedActivityRow",
+    "TestRecoveryProjectionSanitizationIsNotReportedAsWidthTruncation",
+    "TestRecoveryProjectionRejectsMissingTask"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "a69ec38ae934a075fc3d4431eb9aaa98cfa00116d694236881a7061e0b98e18c",
+  "real_model_calls": 0
+}

@@ -1,0 +1,23 @@
+{
+  "state": "finished",
+  "started": "2026-10-12T06:55:51.970396+00:00",
+  "finished": "2026-10-12T06:55:53.290592+00:00",
+  "argv": [
+    "go",
+    "build",
+    "-o",
+    "/tmp/swarm-qualified25-build",
+    "./cmd/swarm"
+  ],
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/quote-citation25-preview-6ff2n61k",
+  "candidate_digest": "6fb31492cf25976e3f4ab9ed187b7903defd1d95ee7224813cc28f3f36c11c0a",
+  "manifest_sha256": "3be750dd9f0ea73873b62601e58dc3fd284a04126349aa8c566de0745f799c13",
+  "frozen_paths": 2118,
+  "wall_seconds": 1.3202200090017868,
+  "exit": 0,
+  "output": "/tmp/swarm-quote-citation25-build.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "drift": [],
+  "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance.",
+  "binary_sha256": "aecba9b99d7d2d711d4da1a816329a391f2947c335a2eb3df444a6717163791f"
+}

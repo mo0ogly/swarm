@@ -1,0 +1,196 @@
+diff --git a/internal/engine/agents_store.go b/internal/engine/agents_store.go
+index dac9b99..be0c278 100644
+--- a/internal/engine/agents_store.go
++++ b/internal/engine/agents_store.go
+@@ -178,20 +178,21 @@ type AgentLog struct {
+ 	Message string `json:"message"`
+ }
+ type Provider struct {
+-	APIConnectionID   string       `json:"api_connection_id,omitempty"`
+-	InteractiveArgs   []string     `json:"interactive_args,omitempty"`
+-	PreflightRequired bool         `json:"preflight_required,omitempty"`
+-	PreflightArgs     []string     `json:"preflight_args,omitempty"`
+-	PreflightKind     string       `json:"preflight_kind,omitempty"`
+-	PreflightCaps     []string     `json:"preflight_capabilities,omitempty"`
+-	PreflightTimeout  int          `json:"preflight_timeout_seconds,omitempty"`
+-	PreflightTTL      int          `json:"preflight_ttl_seconds,omitempty"`
+-	ModelPolicy       *ModelPolicy `json:"model_policy,omitempty"`
+-	AssistantTimeout  int          `json:"assistant_timeout_seconds,omitempty"`
+-	Limits            RunLimits    `json:"limits,omitempty"`
+-	Command           string       `json:"command"`
+-	Args              []string     `json:"args"`
+-	Env               []string     `json:"env_allow"`
++	structuredContextTokens int
++	APIConnectionID         string       `json:"api_connection_id,omitempty"`
++	InteractiveArgs         []string     `json:"interactive_args,omitempty"`
++	PreflightRequired       bool         `json:"preflight_required,omitempty"`
++	PreflightArgs           []string     `json:"preflight_args,omitempty"`
++	PreflightKind           string       `json:"preflight_kind,omitempty"`
++	PreflightCaps           []string     `json:"preflight_capabilities,omitempty"`
++	PreflightTimeout        int          `json:"preflight_timeout_seconds,omitempty"`
++	PreflightTTL            int          `json:"preflight_ttl_seconds,omitempty"`
++	ModelPolicy             *ModelPolicy `json:"model_policy,omitempty"`
++	AssistantTimeout        int          `json:"assistant_timeout_seconds,omitempty"`
++	Limits                  RunLimits    `json:"limits,omitempty"`
++	Command                 string       `json:"command"`
++	Args                    []string     `json:"args"`
++	Env                     []string     `json:"env_allow"`
+ }
+ type Providers struct {
+ 	Schema    int                 `json:"schema_version"`
+@@ -797,6 +798,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
+ 			return a, false, fmt.Errorf("Une reprise conserve le mode de la tentative précédente.")
+ 		}
+ 		if requiresEnvironmentVerification(previous) {
++			if preflight.Verification != "verified" || preflight.Verdict != "ready" {
++				return a, false, &CommandError{Code: "environment_verification_required", Message: "Reprise retenue : le précontrôle doit vérifier les capacités du contexte fournisseur ; une déclaration opérateur ou un contrôle hôte compatible ne suffit pas."}
++			}
+ 			evidence := strings.TrimSpace(r.PreconditionEvidence)
+ 			if len([]rune(evidence)) < 8 {
+ 				return a, false, fmt.Errorf("Reprise retenue : décrivez la vérification nouvelle des droits, du montage ou de la ressource avant de relancer.")
+@@ -973,7 +977,7 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
+ 	a = Agent{Preflight: &preflight, PreconditionEvidence: r.PreconditionEvidence, Mode: r.Mode, ModelRoute: route, Context: &manifest, Brainstorm: t.Brainstorm, Limits: limits, Recovery: recovery, ID: r.EventID, WorkID: work, TaskID: r.TaskID, Origin: launchOrigin(r), Attempt: t.Attempts[len(t.Attempts)-1].ID, Provider: r.Provider, Role: r.Role, Parent: r.Parent, Previous: r.Previous, CWD: cwd, Status: "queued", Activity: "Lancement demandé ; processus non confirmé", Started: now(), Host: hostIdentity(), Timeout: r.Timeout, Capture: r.Capture, Prompt: prompt, Command: p.Command, Args: p.Args, Env: p.Env}
+ 	a.Workflow = &workflow
+ 	if w.Planning != nil && w.Planning.Repository != nil && r.Role == "worker" && r.Mode == "" {
+-		a.DeliveryVersion = 1
++		a.DeliveryVersion = 2
+ 		a.Prompt += managedDeliveryInstructions(t, a.Attempt)
+ 		if len(a.Prompt) > 128000 {
+ 			return Agent{}, false, fmt.Errorf("Contexte supérieur à 128000 octets : réduire les pièces jointes ou le brief.")
+@@ -1141,12 +1145,18 @@ func (s *Store) settleAgentTask(a Agent) error {
+ 		outcome = "interrupted"
+ 	}
+ 	var stopArtifacts []ExchangeArtifact
++	var preservationFailure string
+ 	if w.Planning != nil && (state == "failed" || state == "interrupted") {
+ 		if record, err := s.interruptionRecord(a); err != nil {
+ 			_ = s.log(a.ID, "warning", "Bilan d’arrêt non conservé : "+err.Error())
+ 		} else if record != nil {
+ 			stopArtifacts = append(stopArtifacts, *record)
+ 		}
++		if checkpoint, err := s.retainInterruptedSources(w, a); err != nil {
++			preservationFailure = "Conservation des sources interrompues impossible : " + err.Error() + " ; le responsable doit réconcilier la copie et son attribution avant reprise"
++		} else if checkpoint != nil {
++			stopArtifacts = append(stopArtifacts, *checkpoint)
++		}
+ 	}
+ 	// A crash after task.update(blocked) but before conduct leaves the exact
+ 	// attempt outcome durable. Resume that attributable handoff once. Relay on
+@@ -1163,12 +1173,23 @@ func (s *Store) settleAgentTask(a Agent) error {
+ 		return nil
+ 	}
+ 	r := Request{Schema: 1, EventID: newID("finish-"), Revision: w.Revision, ID: t.ID, Status: "blocked", Origin: conductorAuthor, Outcome: outcome, Blocker: a.Activity + " ; handoff et validation requis", Next: "Examiner logs/diff, puis soumettre ou relancer explicitement"}
++	if preservationFailure != "" {
++		r.Blocker += " ; " + preservationFailure
++		r.Next = preservationFailure
++	}
+ 	b, _ := json.Marshal(r)
+ 	_, e = s.mutate(w.ID, "task.update", r.EventID, r.Revision, b, func(w *Work) error {
+ 		if e := s.apply(w, "task.update", r); e != nil {
+ 			return e
+ 		}
+ 		planningAttemptEnded(w, a, outcome, stopArtifacts...)
++		if preservationFailure != "" {
++			for i := range w.Planning.Inbox {
++				if w.Planning.Inbox[i].ID == planningEventID("attempt-ended", a.Attempt) {
++					w.Planning.Inbox[i].Message += " ; " + preservationFailure
++				}
++			}
++		}
+ 		task, _ := w.task(a.TaskID)
+ 		if task.Brainstorm {
+ 			body, e := readBrainstormReport(s.root, task.ID)
+diff --git a/internal/engine/main.go b/internal/engine/main.go
+index 0ae56db..3e9026c 100644
+--- a/internal/engine/main.go
++++ b/internal/engine/main.go
+@@ -27,6 +27,7 @@ swarm run-limits show|history <portée> <mission> <clé>
+ swarm run-limits apply <portée> <mission> <clé> --input changement.json
+ swarm run-limits rollback <portée> <mission> <clé> <révision_cible> --input requête.json
+ swarm run-limits effective <mission> <rôle> <tâche>
++swarm trust identity-context|show|workload-login|workload-logout|oidc-start|oidc-finish|oidc-logout|oidc-session|oidc-backchannel-logout|config-preview|config-apply|mandate-create|mandate-revoke|request|approve|commit|reconcile|direct-write|elevate-integrity|export|anchor|verify
+ swarm automation list|show|preview|create|enable|pause|archive|cancel|params
+ swarm aide [sujet]
+ swarm providers init|show
+@@ -329,6 +330,12 @@ func run(args []string, out, errOut io.Writer) int {
+ 		}
+ 		return 0
+ 	}
++	if pos[0] == "trust" {
++		if e := s.trustActionsCLI(pos, input, out); e != nil {
++			return fail(e)
++		}
++		return 0
++	}
+ 	if pos[0] == "automation" {
+ 		if e := s.automationCLI(pos, input, out); e != nil {
+ 			return fail(e)
+diff --git a/internal/engine/web_server.go b/internal/engine/web_server.go
+index f014206..737ba64 100644
+--- a/internal/engine/web_server.go
++++ b/internal/engine/web_server.go
+@@ -397,6 +397,8 @@ func newWebHandler(s *Store, host, token string) http.Handler {
+ 	registerGraphDraftHTTP(s, mux, send, fail)
+ 	registerAutomationHTTP(s, mux, send, fail)
+ 	registerAutomationExternalHTTP(s, mux, time.Now)
++	registerTrustActionsHTTP(s, mux, send, fail)
++	registerTrustOIDCLogoutHTTP(s, mux)
+ 	s.registerPreparations(mux)
+ 	s.registerTerminals(mux, send, fail)
+ 	mux.HandleFunc("/api/v1/runtime-health", func(w http.ResponseWriter, r *http.Request) {
+@@ -843,6 +845,10 @@ func newWebHandler(s *Store, host, token string) http.Handler {
+ 			http.Error(w, "Configuration de session invalide", 500)
+ 			return
+ 		}
++		if (r.Method == "GET" || r.Method == "HEAD") && (r.URL.Path == "/trust-oidc-callback.html" || r.URL.Path == "/trust-oidc-callback.js") {
++			mux.ServeHTTP(w, r)
++			return
++		}
+ 		if r.URL.Path == "/login" {
+ 			webLogin(w, r, host, token, sessionMaxAge)
+ 			return
+@@ -851,6 +857,10 @@ func newWebHandler(s *Store, host, token string) http.Handler {
+ 			mux.ServeHTTP(w, r)
+ 			return
+ 		}
++		if r.URL.Path == trustOIDCLogoutPath {
++			mux.ServeHTTP(w, r)
++			return
++		}
+ 		if r.URL.Path == automationExternalPath {
+ 			mux.ServeHTTP(w, r)
+ 			return
+diff --git a/locales/en.json b/locales/en.json
+index e023fa6..d0c7abe 100644
+--- a/locales/en.json
++++ b/locales/en.json
+@@ -4105,5 +4105,11 @@
+   "limite de contexte de revue invalide : vérificateur requis, 0 sans plafond ou entier positif": "Invalid review context limit: a configured reviewer is required; use 0 for unlimited or a positive integer.",
+   "limite de fichiers de revue invalide : vérificateur requis, 0 sans plafond ou entier positif": "Invalid review file limit: a configured reviewer is required; use 0 for unlimited or a positive integer.",
+   "limite de contexte de revue négative": "Negative review context limit",
+-  "limite de fichiers négative": "Negative file limit"
++  "limite de fichiers négative": "Negative file limit",
++  "Reprise retenue : le précontrôle doit vérifier les capacités du contexte fournisseur ; une déclaration opérateur ou un contrôle hôte compatible ne suffit pas.": "Recovery held: preflight must verify provider-context capabilities; an operator statement or host-only compatibility check is insufficient.",
++  "Échec d’outil transmis au responsable de la tentative ; diagnostiquer la cause et vérifier toute correction avant reprise. Ce constat ne valide aucun critère.": "Tool failure delivered to the attempt owner; diagnose the cause and verify any correction before resuming. This observation validates no criterion.",
++  "la remise ready exige des contrôles automatiques autorisés": "a ready handoff requires authorized automatic controls",
++  "Fenêtre de contexte du vérificateur (tokens)": "Reviewer context window (tokens)",
++  "Défaut du client": "Client default",
++  "Revues fragmentées : tokens de la fenêtre totale. 0 conserve le défaut du client ; une valeur positive doit être prise en charge par ce client. Les réserves, sources et budgets restent appliqués. Une fenêtre plus grande peut augmenter le coût des entrées.": "Fragmented reviews: tokens in the total window. 0 keeps the client default; a positive value must be supported by that client. Reserves, source limits and budgets still apply. A larger window may increase input cost."
+ }
+diff --git a/web/i18n-en.js b/web/i18n-en.js
+index e472e92..da9b59e 100644
+--- a/web/i18n-en.js
++++ b/web/i18n-en.js
+@@ -4107,5 +4107,11 @@ globalThis.SwarmEnglish = {
+   "limite de contexte de revue invalide : vérificateur requis, 0 sans plafond ou entier positif": "Invalid review context limit: a configured reviewer is required; use 0 for unlimited or a positive integer.",
+   "limite de fichiers de revue invalide : vérificateur requis, 0 sans plafond ou entier positif": "Invalid review file limit: a configured reviewer is required; use 0 for unlimited or a positive integer.",
+   "limite de contexte de revue négative": "Negative review context limit",
+-  "limite de fichiers négative": "Negative file limit"
++  "limite de fichiers négative": "Negative file limit",
++  "Reprise retenue : le précontrôle doit vérifier les capacités du contexte fournisseur ; une déclaration opérateur ou un contrôle hôte compatible ne suffit pas.": "Recovery held: preflight must verify provider-context capabilities; an operator statement or host-only compatibility check is insufficient.",
++  "Échec d’outil transmis au responsable de la tentative ; diagnostiquer la cause et vérifier toute correction avant reprise. Ce constat ne valide aucun critère.": "Tool failure delivered to the attempt owner; diagnose the cause and verify any correction before resuming. This observation validates no criterion.",
++  "la remise ready exige des contrôles automatiques autorisés": "a ready handoff requires authorized automatic controls",
++  "Fenêtre de contexte du vérificateur (tokens)": "Reviewer context window (tokens)",
++  "Défaut du client": "Client default",
++  "Revues fragmentées : tokens de la fenêtre totale. 0 conserve le défaut du client ; une valeur positive doit être prise en charge par ce client. Les réserves, sources et budgets restent appliqués. Une fenêtre plus grande peut augmenter le coût des entrées.": "Fragmented reviews: tokens in the total window. 0 keeps the client default; a positive value must be supported by that client. Reserves, source limits and budgets still apply. A larger window may increase input cost."
+ };

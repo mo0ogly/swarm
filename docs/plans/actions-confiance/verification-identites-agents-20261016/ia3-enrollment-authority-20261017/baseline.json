@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-17T11:28:46.036343+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "files": {
+    "internal/engine/agent_identity_contract.go": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+    "internal/engine/model.go": "42815893ce43f92ec652985ed96785e66fae89cae5fcfb6cf6cc9bf0da5c899c",
+    "go.mod": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+    "go.sum": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+    "internal/enrollmentstate/recovery_test.go": "648eaa86435154bd94b04740dad651433f5c84970417d1386a2850c12e88a51d",
+    "internal/enrollmentstate/journal_test.go": "6794264e8eae25b8cb05dcf4c59f3a698395a073079a55f1e0ab4142a497c32a",
+    "internal/enrollmentstate/journal.go": "c00ba0227f2a229ec4a66ff438e93ad4391124bdbe52ae4b627b71ab49503755",
+    "internal/enrollmentproof/proof_test.go": "15898ca8835dc11be94a4f747045e2bdd5c4373ed9c104b861e64f2d64243530",
+    "internal/enrollmentproof/proof.go": "0b7b1976be1f34f64e9233e769acb084988fbf5df593442e9b69fcfb8217440f"
+  },
+  "global_test_watchdog": 0,
+  "operator_choice": "still unanswered; no activation"
+}

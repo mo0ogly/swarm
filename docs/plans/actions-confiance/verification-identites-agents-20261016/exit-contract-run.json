@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "python3",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia1_audit.py",
+    "/tmp/swarm-ia1-build-_bj_x21c/swarm",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/exit-contract",
+    "--require-protection"
+  ],
+  "started_unix": 1792183541.5826435,
+  "ended_unix": 1792183549.5508108,
+  "exit_code": 1,
+  "changed_precondition": "Respect actual CLI exit-code contract: authorization refusal 4, generic input error 2",
+  "parent_failure": "configured/failure.json"
+}

@@ -1,0 +1,9 @@
+{"Time":"2026-10-17T07:49:59.809020219+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-17T07:49:59.847766412+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityInternalConsumerRejectsForeignProject"}
+{"Time":"2026-10-17T07:49:59.847925441+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityInternalConsumerRejectsForeignProject","Output":"=== RUN   TestAgentIdentityInternalConsumerRejectsForeignProject\n"}
+{"Time":"2026-10-17T07:49:59.920217962+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityInternalConsumerRejectsForeignProject","Output":"    agent_identity_contract_test.go:322: an authority and decision from another project were accepted despite a different Store root\n"}
+{"Time":"2026-10-17T07:49:59.922362794+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityInternalConsumerRejectsForeignProject","Output":"--- FAIL: TestAgentIdentityInternalConsumerRejectsForeignProject (0.07s)\n"}
+{"Time":"2026-10-17T07:49:59.922424099+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityInternalConsumerRejectsForeignProject","Elapsed":0.07}
+{"Time":"2026-10-17T07:49:59.922667036+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-17T07:49:59.927315754+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.116s\n"}
+{"Time":"2026-10-17T07:49:59.927413688+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.118}

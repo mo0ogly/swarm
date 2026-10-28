@@ -1,0 +1,8 @@
+{
+  "source": "docs/plans/deepagents-integration/evidence/m21-20261016/native/source-flow/work-before.json",
+  "sha256": "0b993b27c98b6c736a0a49a98968c2d425eb7034a747d6f2cf53d46366fdf805",
+  "stored_work_has_adopted_plans": false,
+  "stored_work_has_hierarchical_planning": false,
+  "brainstorm_tasks": 2,
+  "observation": "retained M21/M19 public fixture, no new execution; identity current recorded-plan reader requires adopted plan or hierarchical planning"
+}

@@ -1,0 +1,25 @@
+{
+  "stage": "connectors",
+  "argv": [
+    "python3",
+    "tests/actions_confiance_connectors.py",
+    "--binary",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-proof-exact",
+    "--timeout-seconds",
+    "180",
+    "--evidence-dir",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/review-corrections/public-campaign-lexical/connectors"
+  ],
+  "pid": 470366,
+  "start_ticks": "6971706",
+  "started_unix": 1792135292.9145222,
+  "status": "passed",
+  "binary_sha256": "5b9ce6f43d0498624d120c70ab72b8c6b3a66785f0d856df8a357115fedfd2c6",
+  "exit_code": 0,
+  "ended_unix": 1792135297.6340475,
+  "stdout_sha256": "21ea92d1362ab9dd2183ff967944f87aeb0db8efa54414531a606eb033da063d",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "observed_results": 11,
+  "result_path": "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/public-campaign-lexical/connectors/connector-public.json",
+  "result_sha256": "cef832a62dc5a699b5434c655d0e97fb2b1006d04de804c4d1000c91930e15d7"
+}

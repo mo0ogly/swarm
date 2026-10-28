@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-11T11:04:29.483826+00:00",
+  "revision": 157,
+  "activations": 11,
+  "decisions": 7,
+  "failure": "Proposition non appliquée : réponse du vérificateur invalide ; corriger le protocole puis utiliser review-retry, sans nouvelle production",
+  "received": {
+    "context_sha256": "dc0f9e08e5558cb5714af5d1cbb5e178126894ee40ec5effa07b58aa239fb58f",
+    "events": [
+      "plan-9922c4588b251328fbc8aaac59da2b4b375db64adb24b42c054574e69a85d3d2",
+      "plan-f8cb4e759c322f85985c5f1d1229cc3ee0dcc9e5c5588f15005298a5ac338653",
+      "review-4b2233e89effd7e81afc1b5e-result-e45b628c56d3b42c",
+      "plan-a820e1c201db07fbbdad4505be0af4dc4a938eebf22f338ac164182b93978ad3",
+      "review-6eadd171c67897f10f4ec754-result-099dedcebec00430",
+      "plan-e1751250729a762736ed19a570369ba3db6a0ebf3bb3386b5849d85c5216ee84",
+      "operator-project-through-retex-20261011"
+    ]
+  },
+  "T8_exists": false,
+  "interpretation": "Current/stale boundary observed; invalid producer retry atomically refused, actual latest operator resume not admitted; no semantic acceptance or project completion."
+}

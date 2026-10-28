@@ -1,0 +1,8 @@
+{
+  "sha256": "371239add2a2ba968c3b1807d5bfd896eb6662c31d59d0644792753321f471ff",
+  "source_digest": "4398355922eb04e5eccd38b1ed3f8329c7af3af817c9fc97a9c754031546a696",
+  "root": "/home/fpizzi/.cache/swarm-operator-replan-20261011/log-console-preview-dkd9s9lj",
+  "binary": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-log-console20-candidate",
+  "ui_receipt": "/home/fpizzi/.cache/swarm-operator-replan-20261011/log-console-ui-v5/ui.json",
+  "full": "running; not installed"
+}

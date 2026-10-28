@@ -1,0 +1,248 @@
+=== RUN   TestActionsConfianceT3OIDCLogoutPolicySurface
+--- PASS: TestActionsConfianceT3OIDCLogoutPolicySurface (2.07s)
+=== RUN   TestActionsConfianceT3OIDCLogoutSessionAndSubject
+--- PASS: TestActionsConfianceT3OIDCLogoutSessionAndSubject (3.21s)
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/null-event
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/no-sub-or-sid
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/empty-sid
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/future-nbf
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/nonce
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/wrong-event
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/wrong-azp
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/empty-azp
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/no-jti
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/no-events
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/empty-sub
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/audience
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/expired
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/null-sub
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/multiple-aud-without-azp
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/issuer
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/future-iat
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/old-iat
+=== RUN   TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/no-exp
+--- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation (41.76s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/null-event (2.91s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/no-sub-or-sid (2.73s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/empty-sid (2.06s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/future-nbf (2.40s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/nonce (2.17s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/wrong-event (1.62s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/wrong-azp (1.81s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/empty-azp (2.23s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/no-jti (2.16s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/no-events (2.24s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/empty-sub (2.35s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/audience (2.41s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/expired (1.95s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/null-sub (2.14s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/multiple-aud-without-azp (2.17s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/issuer (2.46s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/future-iat (2.71s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/old-iat (1.65s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRejectsInvalidTokensWithoutMutation/no-exp (1.56s)
+=== RUN   TestActionsConfianceT3OIDCLogoutWrongSignatureTypeAndUnknownSession
+=== RUN   TestActionsConfianceT3OIDCLogoutWrongSignatureTypeAndUnknownSession/signature
+=== RUN   TestActionsConfianceT3OIDCLogoutWrongSignatureTypeAndUnknownSession/access-token-type
+=== RUN   TestActionsConfianceT3OIDCLogoutWrongSignatureTypeAndUnknownSession/unknown-sid
+=== RUN   TestActionsConfianceT3OIDCLogoutWrongSignatureTypeAndUnknownSession/wrong-sub-for-sid
+=== RUN   TestActionsConfianceT3OIDCLogoutWrongSignatureTypeAndUnknownSession/typ-absent
+--- PASS: TestActionsConfianceT3OIDCLogoutWrongSignatureTypeAndUnknownSession (8.44s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutWrongSignatureTypeAndUnknownSession/signature (1.54s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutWrongSignatureTypeAndUnknownSession/access-token-type (1.46s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutWrongSignatureTypeAndUnknownSession/unknown-sid (1.75s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutWrongSignatureTypeAndUnknownSession/wrong-sub-for-sid (1.89s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutWrongSignatureTypeAndUnknownSession/typ-absent (1.79s)
+=== RUN   TestActionsConfianceT3OIDCLogoutReplayPersistenceAndConfiguration
+--- PASS: TestActionsConfianceT3OIDCLogoutReplayPersistenceAndConfiguration (1.59s)
+=== RUN   TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI
+=== RUN   TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/host
+=== RUN   TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/get
+=== RUN   TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/bad-token
+=== RUN   TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/duplicate-token
+=== RUN   TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/operator-api-still-private
+--- PASS: TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI (1.56s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/host (0.02s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/get (0.02s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/bad-token (0.03s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/duplicate-token (0.01s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/operator-api-still-private (0.01s)
+=== RUN   TestActionsConfianceT3OIDCLogoutPolicyValidation
+--- PASS: TestActionsConfianceT3OIDCLogoutPolicyValidation (0.00s)
+=== RUN   TestActionsConfianceT3OIDCLogoutRetentionCoversSignedExpiry
+=== RUN   TestActionsConfianceT3OIDCLogoutRetentionCoversSignedExpiry/0
+=== RUN   TestActionsConfianceT3OIDCLogoutRetentionCoversSignedExpiry/600
+--- PASS: TestActionsConfianceT3OIDCLogoutRetentionCoversSignedExpiry (3.38s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRetentionCoversSignedExpiry/0 (1.20s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutRetentionCoversSignedExpiry/600 (2.18s)
+=== RUN   TestActionsConfianceT3OIDCLogoutRevokesStepUpAndKeepsEffect
+--- PASS: TestActionsConfianceT3OIDCLogoutRevokesStepUpAndKeepsEffect (2.52s)
+=== RUN   TestActionsConfianceT3OIDCLogoutConcurrentDelivery
+--- PASS: TestActionsConfianceT3OIDCLogoutConcurrentDelivery (1.83s)
+=== RUN   TestActionsConfianceT3OIDCLogoutKeepsWorkloadSession
+--- PASS: TestActionsConfianceT3OIDCLogoutKeepsWorkloadSession (1.64s)
+=== RUN   TestActionsConfianceT3OIDCLogoutFencesEarlierLogin
+=== RUN   TestActionsConfianceT3OIDCLogoutFencesEarlierLogin/sid-and-sub
+=== RUN   TestActionsConfianceT3OIDCLogoutFencesEarlierLogin/sid-only
+=== RUN   TestActionsConfianceT3OIDCLogoutFencesEarlierLogin/sub-only
+=== RUN   TestActionsConfianceT3OIDCLogoutFencesEarlierLogin/other-subject
+=== RUN   TestActionsConfianceT3OIDCLogoutFencesEarlierLogin/other-sid
+--- PASS: TestActionsConfianceT3OIDCLogoutFencesEarlierLogin (9.90s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutFencesEarlierLogin/sid-and-sub (1.51s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutFencesEarlierLogin/sid-only (1.46s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutFencesEarlierLogin/sub-only (2.17s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutFencesEarlierLogin/other-subject (2.16s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutFencesEarlierLogin/other-sid (2.59s)
+=== RUN   TestActionsConfianceT3OIDCLogoutDuringTokenExchange
+--- PASS: TestActionsConfianceT3OIDCLogoutDuringTokenExchange (1.56s)
+=== RUN   TestActionsConfianceT3OIDCConfigurationRejectsUnsafeInputs
+--- PASS: TestActionsConfianceT3OIDCConfigurationRejectsUnsafeInputs (1.65s)
+=== RUN   TestActionsConfianceT3OIDCLoginBusinessPersistenceAndRevocation
+--- PASS: TestActionsConfianceT3OIDCLoginBusinessPersistenceAndRevocation (2.65s)
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/unmapped-subject
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/expired
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/future-iat
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/missing-iat
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/signature
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/issuer
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/audience
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/nonce
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/future-nbf
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/wrong-azp
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/multiple-audiences-without-azp
+--- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures (15.40s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/unmapped-subject (2.31s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/expired (1.80s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/future-iat (1.31s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/missing-iat (1.26s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/signature (1.59s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/issuer (1.21s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/audience (1.20s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/nonce (1.11s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/future-nbf (1.36s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/wrong-azp (1.24s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/multiple-audiences-without-azp (1.00s)
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/browser-binding
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/configuration-revokes-pending
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/key-rotation
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/one-consumer
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/unavailable-provider
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/logout
+--- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency (7.36s)
+    --- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/browser-binding (1.22s)
+    --- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/configuration-revokes-pending (1.12s)
+    --- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/key-rotation (1.30s)
+    --- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/one-consumer (1.40s)
+    --- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/unavailable-provider (1.00s)
+    --- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/logout (1.32s)
+=== RUN   TestActionsConfianceT3OIDCPublicAPIAndCLI
+--- PASS: TestActionsConfianceT3OIDCPublicAPIAndCLI (1.41s)
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/zero-login
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/remote-http-redirect
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/duplicate-mapping
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/unknown-local-subject
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/issuer-credentials
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/zero-timeout
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/negative-session
+--- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview (1.36s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/zero-login (0.02s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/remote-http-redirect (0.03s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/duplicate-mapping (0.02s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/unknown-local-subject (0.03s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/issuer-credentials (0.02s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/zero-timeout (0.03s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/negative-session (0.03s)
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/null
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/"true"
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/1
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/{}
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/[]
+--- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/null (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/"true" (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/1 (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/{} (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/[] (0.00s)
+=== RUN   TestActionsConfianceT3OIDCRequestDeadline
+--- PASS: TestActionsConfianceT3OIDCRequestDeadline (2.10s)
+=== RUN   TestActionsConfianceT3StepUpPolicySurface
+--- PASS: TestActionsConfianceT3StepUpPolicySurface (1.27s)
+=== RUN   TestActionsConfianceT3StepUpExactApprovalPersistenceAndConsumption
+--- PASS: TestActionsConfianceT3StepUpExactApprovalPersistenceAndConsumption (1.68s)
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/missing-auth-time
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/old-auth-time
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/future-auth-time
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/missing-acr
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/weak-acr
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/changed-subject
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/wrong-nonce
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/invalid-auth-time-type
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/invalid-acr-type
+--- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims (11.77s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/missing-auth-time (1.48s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/old-auth-time (1.56s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/future-auth-time (1.22s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/missing-acr (1.27s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/weak-acr (1.13s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/changed-subject (1.31s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/wrong-nonce (1.11s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/invalid-auth-time-type (1.35s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/invalid-acr-type (1.34s)
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/other-action
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/expiry
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/revoked-mandate
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/suspended-identity
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/changed-revision
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/logout
+--- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation (8.08s)
+    --- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/other-action (1.45s)
+    --- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/expiry (1.28s)
+    --- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/revoked-mandate (1.47s)
+    --- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/suspended-identity (1.35s)
+    --- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/changed-revision (1.31s)
+    --- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/logout (1.22s)
+=== RUN   TestActionsConfianceT3StepUpStartRequiresAuthorityBeforeNetwork
+--- PASS: TestActionsConfianceT3StepUpStartRequiresAuthorityBeforeNetwork (1.32s)
+=== RUN   TestActionsConfianceT3StepUpNormalOIDCIsNotActionProof
+--- PASS: TestActionsConfianceT3StepUpNormalOIDCIsNotActionProof (1.28s)
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/zero-proof-duration
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/unknown-operation
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/no-operation
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/duplicate-operation
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/empty-acr
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/whitespace-acr
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/duplicate-acr
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/negative-age
+--- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs (0.01s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/zero-proof-duration (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/unknown-operation (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/no-operation (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/duplicate-operation (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/empty-acr (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/whitespace-acr (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/duplicate-acr (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/negative-age (0.00s)
+=== RUN   TestActionsConfianceT3StepUpFiniteAuthenticationAge
+--- PASS: TestActionsConfianceT3StepUpFiniteAuthenticationAge (0.00s)
+=== RUN   TestActionsConfianceT3StepUpWorkloadApproverCannotBypass
+--- PASS: TestActionsConfianceT3StepUpWorkloadApproverCannotBypass (1.45s)
+=== RUN   TestActionsConfianceT3StepUpConcurrentApprovalConsumesOnce
+--- PASS: TestActionsConfianceT3StepUpConcurrentApprovalConsumesOnce (1.18s)
+=== RUN   TestActionsConfianceT3StepUpMandateRevokedBeforeFinish
+--- PASS: TestActionsConfianceT3StepUpMandateRevokedBeforeFinish (1.33s)
+=== RUN   TestActionsConfianceT3StepUpTypedPolicyRoundTrip
+=== RUN   TestActionsConfianceT3StepUpTypedPolicyRoundTrip/operations
+=== RUN   TestActionsConfianceT3StepUpTypedPolicyRoundTrip/acr_values
+--- PASS: TestActionsConfianceT3StepUpTypedPolicyRoundTrip (2.09s)
+    --- PASS: TestActionsConfianceT3StepUpTypedPolicyRoundTrip/operations (1.14s)
+    --- PASS: TestActionsConfianceT3StepUpTypedPolicyRoundTrip/acr_values (0.95s)
+PASS
+ok  	swarm.local/companion/internal/engine	144.955s

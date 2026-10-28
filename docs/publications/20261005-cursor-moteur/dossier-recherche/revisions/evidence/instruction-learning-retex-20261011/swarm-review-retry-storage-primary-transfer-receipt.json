@@ -1,0 +1,65 @@
+{
+  "at": "2026-10-11T17:10:54.665663+00:00",
+  "base15": {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "start": "2026-10-11T17:01:48.567093+00:00",
+    "end": "2026-10-11T17:10:09.632924+00:00",
+    "seconds": 501.0664185479982,
+    "exit": 0,
+    "output": "/tmp/swarm-review-retry-delivery-qualified-v4-full.out",
+    "output_sha256": "ad26ed45a9cf7fe8502a238d6dad87dc2ecf5e7c27422650f03fa18f13b5e057",
+    "qualification_environment": {
+      "TMPDIR": "/tmp",
+      "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+    },
+    "source_manifest_sha256": "cd2fa1cb98ded543f40fa626570d79f82106f9e3632520e7b764c96dbe5ad92b",
+    "candidate_digest": "559483bd8fcba9ef9172403f744a9991d98cc074644c52549d47c3a88eb97716",
+    "paths": 1174,
+    "source_drift": [],
+    "manifest_changed": false,
+    "driver": {
+      "start": "2026-10-11T17:01:48.567093+00:00",
+      "driver_pid": 1697723,
+      "pgid": 1697723,
+      "sid": 1697723,
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "./...",
+        "-count=1",
+        "-timeout=12m"
+      ],
+      "manifest_sha256": "cd2fa1cb98ded543f40fa626570d79f82106f9e3632520e7b764c96dbe5ad92b",
+      "source_digest": "559483bd8fcba9ef9172403f744a9991d98cc074644c52549d47c3a88eb97716",
+      "paths": 1174,
+      "precondition": "Dedicated detached session for operator-owned qualification; previous coupled-session driver exited143 without a Go fail/package result. Same frozen source and12m test timeout.",
+      "go_pid": 1697736
+    }
+  },
+  "archive": "/tmp/swarm-review-retry-delivery-frozen-15",
+  "preimages": {
+    "internal/engine/model.go": "d09e6519e43ffd930d6aeda1a8378ac62aa4c163d4fc23b06a5641ded5b82efb",
+    "internal/engine/store.go": "0c6c29b5ad281591edbfec7acb3aaeef6db21f915132769f9e866642cbd4b2f9",
+    "internal/engine/managed_review_retry_storage_test.go": null,
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "377c6852872a034edb7d66e8535840fb21483dd2da2fe9ee583e248b5ac6d824",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "6902e399226b0dec67d43df097131cec9e3206cdd02356c1608c841244984ec3"
+  },
+  "postimages": {
+    "internal/engine/model.go": "fadce2e824c4f3ba07f11978d0b0ef557bf31e200e7c15ab3746ed1a24325a5b",
+    "internal/engine/store.go": "475c87496faab62e314a6e20ba749ea22ed4f26e15268e5731615f8e8b2741b4",
+    "internal/engine/managed_review_retry_storage_test.go": "dce74d665fe1b263a00a30d9097775665f0f45ec99c7b85f621884d7623fbd87",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "b2e905069f67e5132b947a5f9f8f7f3c121a1cc6794813551e37c3176559fb7e",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "5b6b4f1b670f19fd4e5b660ec90162c5cd35a31d90881f1958a5bd843dd2250c"
+  },
+  "isolated_red": "/tmp/swarm-review-retry-storage-red.out",
+  "isolated_green": "/tmp/swarm-review-retry-storage-green.out",
+  "no_native_database_modified": true
+}

@@ -1,0 +1,237 @@
+{
+  "at": "2026-10-11T14:45:32.241644+00:00",
+  "before_pid": 269871,
+  "before_sha256": "0f619612409b93915cee22614e1fbee3c00c6fdea62c94459d0766ba9d48f0c4",
+  "installed_sha256": "7c87e87adec51a145a00afb4ce8d0e609876b62486c388c009a0f64d4012b8d9",
+  "build_date": "2026-10-11T14:37:21Z",
+  "source_digest": "981af32b469a52a5efbe392a3bbb50dbd23b30519faf237857bb31774c16d6ac",
+  "source_paths": 1172,
+  "backup": "/tmp/swarm-before-source-capacity-recovery-install",
+  "full": {
+    "command": [
+      "go",
+      "test",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "start": "2026-10-11T14:37:17.821458+00:00",
+    "end": "2026-10-11T14:45:22.179226+00:00",
+    "seconds": 484.35775427800036,
+    "exit": 0,
+    "output": "/tmp/swarm-source-capacity-recovery-full.out",
+    "output_sha256": "809fc10f9268dcf7ff5455f87c8c46815fdddaeaa15692dc241390a9ae5da1a3",
+    "source_manifest_sha256": "3f04ea459630ace7c056e043162e42bf3aad9f5a4eaf16040c29d362d0b1a1b7",
+    "candidate_digest": "981af32b469a52a5efbe392a3bbb50dbd23b30519faf237857bb31774c16d6ac",
+    "paths": 1172,
+    "source_drift": [],
+    "manifest_changed": false
+  },
+  "checks": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "./internal/engine",
+        "-run",
+        "TestRecoveredResult|TestManagedPreflight|TestManagedReviewSources",
+        "-count=1",
+        "-timeout=120s"
+      ],
+      "start": "2026-10-11T14:37:17.821868+00:00",
+      "end": "2026-10-11T14:39:22.792769+00:00",
+      "seconds": 124.9709125010013,
+      "exit": 0,
+      "output": "/tmp/swarm-source-capacity-recovery-race.out",
+      "output_sha256": "572a248a37056cbfb2e3c3e523172c4c7fb9e14f22914110b67187fbd84e6158"
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "start": "2026-10-11T14:37:17.822236+00:00",
+      "end": "2026-10-11T14:37:29.051137+00:00",
+      "seconds": 11.228920215999096,
+      "exit": 0,
+      "output": "/tmp/swarm-source-capacity-recovery-vet.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "python3",
+        "tools/agent-workflows/check.py"
+      ],
+      "start": "2026-10-11T14:37:17.822983+00:00",
+      "end": "2026-10-11T14:37:21.677606+00:00",
+      "seconds": 3.854638478002016,
+      "exit": 0,
+      "output": "/tmp/swarm-source-capacity-recovery-workflows.out",
+      "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start": "2026-10-11T14:37:21.678135+00:00",
+      "end": "2026-10-11T14:37:21.738192+00:00",
+      "seconds": 0.060076304001995595,
+      "exit": 0,
+      "output": "/tmp/swarm-source-capacity-recovery-diff.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "sh",
+        "./build.sh",
+        "/tmp/swarm-source-capacity-recovery-candidate"
+      ],
+      "start": "2026-10-11T14:37:21.738731+00:00",
+      "end": "2026-10-11T14:37:31.757700+00:00",
+      "seconds": 10.018987168998137,
+      "exit": 0,
+      "output": "/tmp/swarm-source-capacity-recovery-build.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "idle": {
+    "at": "2026-10-11T14:45:31.462802+00:00",
+    "works": [
+      {
+        "work": "w-ca937edf4e0abd85f8d3d67b",
+        "revision": 315,
+        "active_agents": [],
+        "active_reviews": [],
+        "holders": []
+      },
+      {
+        "work": "w-fff7368010d114f6e2578985",
+        "revision": 31,
+        "active_agents": [],
+        "active_reviews": [],
+        "holders": []
+      },
+      {
+        "work": "w-5757437164b50815bee50a0c",
+        "revision": 55,
+        "active_agents": [],
+        "active_reviews": [],
+        "holders": []
+      }
+    ],
+    "provider_processes": [
+      {
+        "pid": 16038,
+        "executable": "codex"
+      },
+      {
+        "pid": 17572,
+        "executable": "codex"
+      },
+      {
+        "pid": 3635999,
+        "executable": "codex"
+      }
+    ]
+  },
+  "native_provider_processes": [],
+  "effect": "Qualified12 source installed idle, exact runtime executable and authenticated health verified. Native acceptance requires fresh review.",
+  "started_at": "2026-10-11T14:46:06.478952+00:00",
+  "pid": 458493,
+  "actual_executable_sha256": "7c87e87adec51a145a00afb4ce8d0e609876b62486c388c009a0f64d4012b8d9",
+  "runtime_health": {
+    "state": "ready",
+    "launch_allowed": true,
+    "observed_at": "2026-10-11T14:46:06.445440278Z",
+    "message": "Le stockage est disponible.",
+    "next_step": "Les autres conditions de lancement restent contr\u00f4l\u00e9es par le moteur.",
+    "volumes": [
+      {
+        "kind": "store",
+        "path": "/home/fpizzi/workspace/swarm/.swarm",
+        "available_bytes": 34972553216,
+        "available_inodes": 26342491,
+        "state": "ready"
+      },
+      {
+        "kind": "temporary",
+        "path": "/tmp",
+        "available_bytes": 1625563136,
+        "available_inodes": 1016374,
+        "state": "ready"
+      }
+    ],
+    "version": {
+      "binary": {
+        "version": "devel",
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "build_date": "2026-10-11T14:37:21Z",
+        "provenance": "injected"
+      },
+      "source": {
+        "available": true,
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "compared": true,
+        "matches_binary": true
+      },
+      "history": {
+        "schema_version": 1,
+        "available": true,
+        "releases": [
+          {
+            "version": "v0.1.0",
+            "date": "2026-10-06",
+            "summary": {
+              "fr": "Premi\u00e8re release exp\u00e9rimentale : \u00e9dition du graphe avec pr\u00e9visualisation, automatisation durable, administration des param\u00e8tres, validation ind\u00e9pendante et reprise trac\u00e9e des contrats bloqu\u00e9s.",
+              "en": "First experimental release: graph editing with previews, durable automation, configurable administration, independent validation and audited recovery of blocked contracts."
+            },
+            "commits": [
+              {
+                "sha": "191616999c5f4b30e901042b51898cfbb21a3e06",
+                "url": "https://github.com/mo0ogly/swarm/commit/191616999c5f4b30e901042b51898cfbb21a3e06"
+              },
+              {
+                "sha": "2d08f0510d7f6da36d7f03cb9481dde7de249fe8",
+                "url": "https://github.com/mo0ogly/swarm/commit/2d08f0510d7f6da36d7f03cb9481dde7de249fe8"
+              }
+            ],
+            "release_url": "https://github.com/mo0ogly/swarm/releases/tag/v0.1.0"
+          }
+        ]
+      }
+    },
+    "version_diagnostic": {
+      "installed_cli": {
+        "available": false,
+        "version": null,
+        "commit": null,
+        "modified": null,
+        "provenance": "browser",
+        "hint": "Le navigateur ne peut pas inspecter le CLI local. Lancez swarm version --server URL_DE_SESSION."
+      },
+      "active_server": {
+        "available": true,
+        "version": "devel",
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "provenance": "injected"
+      },
+      "candidate": {
+        "available": true,
+        "version": null,
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "provenance": "git"
+      },
+      "state": "unknown",
+      "differences": [],
+      "next_step": "Rendez accessibles les identit\u00e9s manquantes (installed_cli) puis relancez le diagnostic. Pour le serveur actif, fournissez son URL de session avec --server."
+    }
+  }
+}

@@ -8,6 +8,14 @@ specification writing and examination, code review, diagnosis, verification,
 replanning and lessons learned. They use explicit criteria, traceable decisions
 and observable evidence without requiring another installation.
 
+The user's standing preference is recursive improvement: every discovered
+improvement is valuable and remains traceable, even without a failure. Establish
+its origin and expected benefit, decide within the role's authority, act or route,
+verify the effect, then reassess the need and retain verified lessons. Any anomaly
+triggers `replan`. Deferred work keeps its owner and resumption condition. This
+method contract proves no autonomous improvement of the installed engine and
+grants no additional authority.
+
 ## Plain-language catalogue
 
 User-facing names follow the [README catalogue](../../README.en.md#working-methods). Specification methods cover both requirements writing and plan examination. Historical identifiers below are native commands and compatibility identifiers, not interface labels.
@@ -86,6 +94,11 @@ remains restricted to analysis and planning.
 
 ## Automatic engine framing
 
+Every change includes relevant documentation in the same increment, including
+methods and configuration. When no update applies, retain the reason in existing
+tracking. Keep FR/EN versions and diagrams aligned; their presence proves neither
+effect nor acceptance.
+
 For new attempts, the engine includes role-specific methods in the context sent
 to the provider. This does not depend on native skill discovery in Codex or Claude.
 
@@ -125,9 +138,19 @@ symbolic links must restore them before use. Edit the canonical source, then run
 
 ```sh
 python3 tools/agent-workflows/check.py
-go test ./... -run 'TestRepositoryPreparation|TestPreparationMethodCatalogue|TestPreparationDialogueLateProposalAndMethodDrift' -count=1
+go test ./internal/engine -run 'TestRepositoryPreparation|TestPreparationMethodCatalogue|TestPreparationDialogueLateProposalAndMethodDrift' -count=1 -timeout=0
 git diff --check
 ```
+
+The checker validates links and sources, then runs the actual
+TestAgentWorkflowRolesAreBounded test. It requires JSON run/pass events and
+package completion, rejects empty selectors, skip, fail and invalid formats, and
+prints the observed test/subtest count. Its global watchdog is explicitly
+disabled (-timeout 0): observe progress and diagnose abnormal lack of progress;
+this does not establish a product timing target. Its own guards can be checked
+with `python3 -m unittest discover -s tools/agent-workflows -p test_check.py -v`
+(controlled Go-output doubles, no model). A successful checker proves neither
+deployment nor mission acceptance.
 
 Changing a method or the shared contract changes its fingerprint. Existing
 preparations must apply the new version and repeat validation; earlier evidence
@@ -235,3 +258,36 @@ fingerprint prove the supplied context, not adherence or successful diagnosis.
 
 The portable version adapts the locally installed Debug skill, without mandatory
 connectors, machine paths or dependencies on another installation.
+
+### Verifying the engine during concurrent web work
+
+Embedded web assets and methods currently share the root `resources.go` package:
+a web change can invalidate engine-test compilation inputs. To freeze evidence,
+a compiler overlay can retain observed assets and their explicit file set without
+changing the shared checkout. Declare that view and its hashes; it does not verify
+the web interface being edited. Retaining a compiled test binary allows targeted
+checks without relinking the package for each command. Distinguish compilation,
+collected tests, partial results and final results. See the
+[IA3b diagnosis](../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md).
+
+
+### Justify a verification deadline
+
+While the code’s limits remain unclear, be cautious with timeouts and other
+added test guards: attempts, iterations, volume, concurrency or stop conditions.
+Identify their origin, scope and protected risk; observe progress and measure
+behavior before adding or tightening a bound. Distinguish slow progress, real
+stalls, functional limits and limits of the method. An arbitrary threshold does
+not replace diagnosis; existing security, authority and budget protections are
+not bypassed.
+
+A test watchdog needs an observable requirement and a justified cost; do not
+reuse a number merely because an earlier recipe used it. Distinguish it from
+engine policy and performance objectives. Without a justified bound, explicitly
+use `-test.timeout=0` to disable Go’s global deadline, follow named events and
+diagnose a lack of progress; individual operation contracts still apply. A
+timeout is an incomplete execution, not evidence that a business assertion is
+false. Splitting a batch may help diagnosis but does not justify the bound.
+Preserve original failures and their source/binary binding. The
+[IA3c.1 replan](../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md)
+retains the user objection, unsupported deadline and its removal.

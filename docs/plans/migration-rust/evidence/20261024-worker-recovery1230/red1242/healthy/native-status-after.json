@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "work": "w-860369f01d691f01c49a7652",
+  "revision": 10,
+  "controls": {
+    "revision": 10,
+    "paused": false,
+    "autonomy": "autonome",
+    "slots": 1,
+    "consent_enabled": true,
+    "archived": false
+  },
+  "supervision": {
+    "state": "stopped",
+    "generation": 1,
+    "last_check_at": "2026-10-24T09:49:23.416710139Z",
+    "heartbeat_observed_at": "2026-10-24T09:49:23.423785825Z",
+    "last_check_failed": false
+  },
+  "agents": [
+    {
+      "id": "watch-67973c23ed94132db8218b3a",
+      "task": "task",
+      "status": "completed",
+      "desired": "",
+      "supervisor_pid": 3324774,
+      "child_pid": 3324776
+    }
+  ],
+  "limitations": [
+    "native-status-is-not-historical-json",
+    "sequential-native-read-observations",
+    "stored-registration-is-not-process-liveness",
+    "no-task-acceptance-derived",
+    "read-only-no-conductor-action"
+  ]
+}

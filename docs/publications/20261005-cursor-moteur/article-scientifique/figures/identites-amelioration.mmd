@@ -1,0 +1,19 @@
+flowchart TB
+  O["Observation<br/>anomalie ou amélioration découverte"]
+  Q["Qualifier avec preuves<br/>origine, valeur, périmètre, propriétaire"]
+  D["Diagnostic et proposition<br/>cause, options, critère observable"]
+  A{"Décision dans les droits<br/>et budgets existants ?"}
+  X["Décision humaine / rôle compétent<br/>contexte transmis, réception à vérifier"]
+  C["Candidat versionné<br/>code, plan ou règle proposée"]
+  T["Vérifications pertinentes<br/>effet attendu et régressions"]
+  V{"Preuves suffisantes<br/>et application autorisée ?"}
+  E["Application contrôlée<br/>observer l'effet réel"]
+  K["Capitalisation vérifiée<br/>transmission aux prochains contextes"]
+  O --> Q --> D --> A
+  A -->|"oui"| C
+  A -->|"non"| X -->|"suite autorisée reçue"| C
+  C --> T --> V
+  V -->|"non / défaut lié"| D
+  V -->|"oui"| E --> K
+  E -->|"effet absent ou anomalie"| D
+  K -->|"réexaminer le besoin initial"| O

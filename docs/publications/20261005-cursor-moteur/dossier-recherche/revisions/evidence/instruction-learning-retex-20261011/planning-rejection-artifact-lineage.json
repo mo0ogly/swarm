@@ -1,0 +1,23 @@
+{
+  "patch": {
+    "schema_version": 1,
+    "at": "2026-10-11T12:26:59.693762+00:00",
+    "parent": "planning-owner-rejection-diagnostic-20261011.patch",
+    "parent_sha256": "3ab9828491f7d5b5056da906c8b329e3b16fd86e09e4bc0e834489b1d2d8314b",
+    "preimage_tree": "515a17f5dbe6e183ffa9b9d2ab59af974f7d1b29",
+    "patch": "docs/plans/engine-cursor-contract/recovery/planning-rejection-artifact-preservation-20261011.patch",
+    "sha256": "fc912259ef23d257645c298e496fdba6e920ab6f99940e81081cec9b289a8f36",
+    "bytes": 8202,
+    "paths": [
+      "internal/engine/planning.go",
+      "internal/engine/planning_rejection.go",
+      "internal/engine/planning_rejection_test.go",
+      "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
+      "docs/en/AGENT-ENGINE-PROTOCOL.md"
+    ],
+    "purpose": "Declare both diagnostic and adapter JSON response as exportable hash-bound artifacts on every refusal, including repeat. Unique per-claim event plus separate rejection_key for unchanged-state eligibility. Preserve both originals and scoped wait through export/import; imported proofs remain archived, not activated.",
+    "tests": "Missing artifact declaration RED using overlay; GREEN export/import reads archived blob hashes and path attribution for both refusals. Targeted/race/full/vet final verification in progress.",
+    "limits": "Initial test incorrectly expected import to promote archived files into live paths; corrected to established archive-only semantics, old failed output retained. Native autonomous use still pending."
+  },
+  "lineage": "PASS exact preimage with separate index"
+}

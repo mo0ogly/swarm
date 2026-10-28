@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "work_id": "w-ca937edf4e0abd85f8d3d67b",
+  "task_id": "plan-ca937edf4e-T3",
+  "agent_id": "auto-9335267bdccccc3dbb52",
+  "revision": 742,
+  "provider": "claude",
+  "cause": "quota refusé (429) · result.api_error_status.429",
+  "cooldown_known": true,
+  "cooldown_until": "2026-10-12T12:40:00Z",
+  "attempts_consumed": 2,
+  "attempts_allowed": 3,
+  "accounting_by_provider": {
+    "claude": {
+      "attempts_consumed": 2,
+      "reported_usd": 2.1113482,
+      "attempts_with_cost": 2,
+      "attempts_without_cost": 0,
+      "cost_complete": true,
+      "cost_text": "2.11 USD rapportés sur 2 tentative(s)"
+    }
+  },
+  "admissible_options": [
+    {
+      "action": "wait",
+      "label": "Attendre sans lancer de nouvelle tentative"
+    },
+    {
+      "action": "relay",
+      "provider": "codex",
+      "label": "Relayer explicitement vers le fournisseur configuré codex"
+    }
+  ],
+  "view_digest": "1134a5e22c9562ca70e489afec1900fbf4bc1f5f8285750f735977399bfb27cc"
+}

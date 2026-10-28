@@ -1,0 +1,10 @@
+{
+  "server_pid": 1413919,
+  "sha256": "4512a96c184cfa894272c3e02d67bd2916a06dd84c62a6da4fa7eb930a09f278",
+  "health": "/tmp/swarm-time-supervision-installed-runtime-health.json",
+  "build_date": "2026-10-11T09:14:45Z",
+  "active_preflight": "/tmp/swarm-time-supervision-install-preflight.json",
+  "production_threshold_stop": "removed",
+  "time_decisions": "owner continue-run / stop-run",
+  "real_provider_decision_exercised": false
+}

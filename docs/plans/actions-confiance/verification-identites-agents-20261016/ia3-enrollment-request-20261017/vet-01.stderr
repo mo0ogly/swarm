@@ -1,0 +1,6 @@
+# swarm.local/companion/internal/enrollmentrequest
+# [swarm.local/companion/internal/enrollmentrequest]
+internal/enrollmentrequest/request_test.go:30:18: swarm.local/companion/internal/identitycontract.Principal struct literal uses unkeyed fields
+internal/enrollmentrequest/request_test.go:32:10: swarm.local/companion/internal/identitycontract.Scope struct literal uses unkeyed fields
+internal/enrollmentrequest/request_test.go:191:242: swarm.local/companion/internal/identitycontract.Permission struct literal uses unkeyed fields
+internal/enrollmentrequest/request_test.go:237:54: swarm.local/companion/internal/identitycontract.Permission struct literal uses unkeyed fields

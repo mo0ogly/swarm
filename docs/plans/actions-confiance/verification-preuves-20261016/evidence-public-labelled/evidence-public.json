@@ -1,0 +1,18 @@
+{
+  "checks": [
+    "preparer cannot activate; second I3 admin activates exact key without denied mutation",
+    "public signature and verifier consume attributed process definition/case/approval evidence",
+    "public verification uses separately acquired pin without project root or private key",
+    "truncation, payload alteration, wrong signature and wrong pinned key are refused",
+    "rotation preserves historical verification with explicitly retired key",
+    "revoked key blocks trust acceptance, distinct from historical cryptographic validity",
+    "server restart loses only private material; old registry preserved and new signature fails closed",
+    "new dual controlled rotation restores signing after restart",
+    "emergency key withdrawal remains available while public signing policy is disabled",
+    "protected signing server memory cannot be opened by same UID parent",
+    "CLI uses persistent server exclusively; no local root fallback or private key export"
+  ],
+  "binary_sha256": "27d3004fd718a55dfa96337afe4d4b4096935a700420d6c84df9a4e78e5bccff",
+  "at": 1792107839.041849,
+  "simulation": true
+}

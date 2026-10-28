@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-12T15:46:11.633658+00:00",
+  "result": "PASS targeted affected contracts",
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestCandidateFragmentsUseObservedCapacityBeforeLegacyIndivisibleRefusal|TestFreshCapacityFragmentsRetainRefusals|TestFreshCapacityFragmentsPreserveCoordination)$",
+    "-count=1",
+    "-timeout=90s"
+  ],
+  "exit": 0,
+  "package_seconds": 23.882,
+  "source_hashes": {
+    "internal/engine/managed_review_capacity_first.go": "903254eecbb54e699d4f8ef657f7472401b792cd195fa4437313eba489207d61",
+    "internal/engine/managed_review_capacity_first_test.go": "459343a04dd5d6864836e3d28c3262ae14b6740b2f287442a906c9138deab841",
+    "internal/engine/managed_review_input_provider.go": "e56486f586476ade5a3af30f0be0a8f8901b4818deed83f36d68c5b380ae19a4",
+    "internal/engine/managed_review_fragment_plan.go": "66a87a389ad8e0ca5a6d1b7eea0f8cc962c12143459b38e573f814f26837855a"
+  },
+  "output_sha256": "a967f816a239f25c0c9590aaf19e6b86fcac12eca8817ddee6f462b105696d04",
+  "limits": "Actual public dossier currently refuses final capacity. No deployment or independent review; whole suite not run."
+}

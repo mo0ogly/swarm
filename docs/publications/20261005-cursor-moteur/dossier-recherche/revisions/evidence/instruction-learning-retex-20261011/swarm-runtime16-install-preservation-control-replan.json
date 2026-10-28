@@ -1,0 +1,31 @@
+{
+  "at": "2026-10-11T17:39:02.700064+00:00",
+  "public_difference_paths": [
+    "/revision",
+    "/updated",
+    "/planning/scopes/0/generation"
+  ],
+  "before_public_revision": 436,
+  "after_public_revision": 437,
+  "backup": "/home/fpizzi/workspace/swarm/.swarm/state-pre-v28-8e5397bcc754d83faeef5999.db",
+  "mode": "0600",
+  "mission_rows_before_after_identical": true,
+  "row_hashes": [
+    {
+      "id": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "body_sha256": "b09d0efb41754afc03db32eae373d9ab9e9aa13cf7575fbbe6abd200c9819f2b"
+    },
+    {
+      "id": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 437,
+      "body_sha256": "a2bfb24045305597766de9960d0b8e7d4faa886540a64583cfe7b14342c6d011"
+    },
+    {
+      "id": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "body_sha256": "4c9c4dfbda9ae682bde7b2cc94d171ae395514d7a121065c41863cee7ea2c28c"
+    }
+  ],
+  "reason": "Deployment helper compared public pre-pause projection against post-pause projection. Backup/current storage rows compared read-only by hash; no database edited or used as test fixture. Initial control failure retained."
+}

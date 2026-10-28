@@ -1,0 +1,75 @@
+{
+  "observed_at": "2026-10-14T20:44:41.261539+00:00",
+  "work": "w-68b50cc82ec3fe55624f9549",
+  "initial_incidents": 4,
+  "prevention": {
+    "guessed_source_path": "Local correction; file inventory guidance exists, no mechanical prevention established.",
+    "duplicate_containsString": "Compiler detects duplicate declaration; successful named tests establish correction of observed candidate, not absence of future duplicates.",
+    "two_wrong_tool_workdirs": "Worker omitted explicit workdir and used its verified CWD; Swarm sets provider CWD but does not validate every nested Codex tool workdir."
+  },
+  "new_blocker": "After recipe recovery fixes, native worker server launch fails: listen tcp 127.0.0.1:0: socket: operation not permitted. Three equivalent final failures caused consecutive-error stop.",
+  "recovery_limit": "Second attempt has no immutable result from first attempt and receives activity metadata without original outputs; old copy remains preserved, not imported.",
+  "host_probe": {
+    "status": "PASS",
+    "observation": "Ephemeral loopback socket bind succeeds in operator environment; no server or external connection started."
+  },
+  "original_public_records": [
+    {
+      "seq": 200071,
+      "agent_id": "auto-e2979000265b0af18da6",
+      "at": "2026-10-14T20:36:06.877448755Z",
+      "kind": "output",
+      "message": "{\"type\":\"item.completed\",\"item\":{\"id\":\"item_99\",\"type\":\"command_execution\",\"command\":\"/bin/bash -lc 'python3 /home/fpizzi/Documents/ChatGPT/swarm/tools/actions-confiance/verify.py T2 validation --timeout-seconds 150'\",\"aggregated_output\":\"Traceback (most recent call last):\\n  File \\\"/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-1/tests/actions_confiance_t2.py\\\", line 159, in <module>\\n    cases = [functions[index]() for index in selected]\\n             ~~~~~~~~~~~~~~~~^^\\n  File \\\"/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-1/tests/actions_confiance_t2.py\\\", line 151, in criterion_four\\n    raise AssertionError(run.stderr + run.stdout)\\nAssertionError: Error: server stopped with 2: Erreur : listen tcp 127.0.0.1:0: socket: operation not permitted\\n    at ChildProcess.<anonymous> (/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-1/tests/actions_confiance_t2_ui.cjs:33:60)\\n    at Object.onceWrapper (node:events:634:26)\\n    at ChildProcess.emit (node:events:519:28)\\n    at ChildProcess._handle.onexit (node:internal/child_process:293:12)\\n\\n\",\"exit_code\":1,\"status\":\"failed\"}}"
+    },
+    {
+      "seq": 200075,
+      "agent_id": "auto-e2979000265b0af18da6",
+      "at": "2026-10-14T20:36:11.571827417Z",
+      "kind": "output",
+      "message": "{\"type\":\"item.completed\",\"item\":{\"id\":\"item_100\",\"type\":\"command_execution\",\"command\":\"/bin/bash -lc 'python3 /home/fpizzi/Documents/ChatGPT/swarm/tools/actions-confiance/verify.py T2 delivery --timeout-seconds 15'\",\"aggregated_output\":\"Traceback (most recent call last):\\n  File \\\"/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-1/tests/actions_confiance_t2.py\\\", line 159, in <module>\\n    cases = [functions[index]() for index in selected]\\n             ~~~~~~~~~~~~~~~~^^\\n  File \\\"/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-1/tests/actions_confiance_t2.py\\\", line 151, in criterion_four\\n    raise AssertionError(run.stderr + run.stdout)\\nAssertionError: Error: server stopped with 2: Erreur : listen tcp 127.0.0.1:0: socket: operation not permitted\\n    at ChildProcess.<anonymous> (/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-1/tests/actions_confiance_t2_ui.cjs:33:60)\\n    at Object.onceWrapper (node:events:634:26)\\n    at ChildProcess.emit (node:events:519:28)\\n    at ChildProcess._handle.onexit (node:internal/child_process:293:12)\\n\\n\",\"exit_code\":1,\"status\":\"failed\"}}"
+    },
+    {
+      "seq": 200079,
+      "agent_id": "auto-e2979000265b0af18da6",
+      "at": "2026-10-14T20:36:15.613710419Z",
+      "kind": "output",
+      "message": "{\"type\":\"item.completed\",\"item\":{\"id\":\"item_101\",\"type\":\"command_execution\",\"command\":\"/bin/bash -lc 'python3 /home/fpizzi/Documents/ChatGPT/swarm/tools/actions-confiance/verify.py T2 c4 --timeout-seconds 25'\",\"aggregated_output\":\"Traceback (most recent call last):\\n  File \\\"/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-1/tests/actions_confiance_t2.py\\\", line 159, in <module>\\n    cases = [functions[index]() for index in selected]\\n             ~~~~~~~~~~~~~~~~^^\\n  File \\\"/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-1/tests/actions_confiance_t2.py\\\", line 151, in criterion_four\\n    raise AssertionError(run.stderr + run.stdout)\\nAssertionError: Error: server stopped with 2: Erreur : listen tcp 127.0.0.1:0: socket: operation not permitted\\n    at ChildProcess.<anonymous> (/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-1/tests/actions_confiance_t2_ui.cjs:33:60)\\n    at Object.onceWrapper (node:events:634:26)\\n    at ChildProcess.emit (node:events:519:28)\\n    at ChildProcess._handle.onexit (node:internal/child_process:293:12)\\n\\n\",\"exit_code\":1,\"status\":\"failed\"}}"
+    },
+    {
+      "seq": 200080,
+      "agent_id": "auto-e2979000265b0af18da6",
+      "at": "2026-10-14T20:36:16.223633425Z",
+      "kind": "lifecycle",
+      "message": "Limite d'erreurs d'outils consécutives atteinte ; arrêt en attente"
+    },
+    {
+      "seq": 200081,
+      "agent_id": "auto-e2979000265b0af18da6",
+      "at": "2026-10-14T20:36:16.256408871Z",
+      "kind": "lifecycle",
+      "message": "Limite d'erreurs d'outils consécutives atteinte ; fin du processus confirmée"
+    },
+    {
+      "seq": 200089,
+      "agent_id": "auto-c8053557575a81bb6164",
+      "at": "2026-10-14T20:36:40.245470986Z",
+      "kind": "message",
+      "message": "Je reprends la tentative conservée avec la méthode `replan` : je vais d’abord établir l’état exact (artefact d’interruption, dossier de reprise, diff, rapports existants), puis modifier uniquement la première précondition défaillante avant de rejouer les contrôles sur le candidat courant. Je crée immédiatement le rapport de tentative requis et je conserve les preuves utiles sans répéter les 78 opérations historiques."
+    },
+    {
+      "seq": 200095,
+      "agent_id": "auto-c8053557575a81bb6164",
+      "at": "2026-10-14T20:36:45.864057102Z",
+      "kind": "message",
+      "message": "Premier fait discriminant : la copie courante est propre, les trois livrables sont absents, l’artefact d’interruption n’est pas présent et le dossier de reprise ne contient aucun `result_commit`. Les modifications historiques ne sont donc pas récupérables depuis cette copie ; la répétition fautive ne peut être attribuée à une commande précise faute de sorties originales. Je consigne ce constat dans le rapport puis je vérifie si le candidat courant contient déjà les sources/tests T2 ou s’il faut reconstruire le lot depuis le socle."
+    },
+    {
+      "seq": 200105,
+      "agent_id": "auto-c8053557575a81bb6164",
+      "at": "2026-10-14T20:37:01.23695161Z",
+      "kind": "message",
+      "message": "Le candidat de base ne contient aucune implémentation T2 : seulement l’architecture T1. Je vais donc reconstruire le lot dans les frontières prévues par T1, en privilégiant un sous-système SQLite isolé et des opérations publiques CLI/HTTP existantes. Avant d’écrire, je vérifie les signatures réelles du moteur, du routeur web, de la configuration Admin et les invariants T2 documentés afin d’éviter un contrat parallèle."
+    }
+  ],
+  "limits": "Four initial incidents were an early observation, not total current errors. No feature acceptance or general recurrence guarantee."
+}

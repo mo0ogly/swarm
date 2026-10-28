@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-11T15:36:25.267112+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-account-20261011.bundle",
+  "sha256": "bdf4a6d75d679ac06b45d1922e77c2514658016297795a24e53968fc5b4f99d1",
+  "bytes": 335258,
+  "ref": "refs/heads/operator-inputs",
+  "commit": "af878d99337e45da0948208b2becffe098adea6c",
+  "manifest_sha256": "671363c02c3168a386a30131edc08173eacae9ae506b61c1ab3f171a410dfe60",
+  "input_files": 53,
+  "source": "/tmp/swarm-operator-account-inputs-20261011-hxrp7ish",
+  "isolated_import_check": "/tmp/swarm-operator-account-input-check-yb96yvvz",
+  "verification": "PASS isolated fetch, exact commit/manifest/all53 full hashes",
+  "limits": "Operator inputs, no future native integration or acceptance claimed"
+}

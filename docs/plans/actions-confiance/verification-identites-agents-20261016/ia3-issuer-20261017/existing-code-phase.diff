@@ -1,0 +1,32 @@
+--- before/internal/engine/agent_identity_registry_publish.go
++++ after/internal/engine/agent_identity_registry_publish.go
+@@ -76,6 +76,9 @@
+ 			}
+ 			if caller.actor.Principal != permit.publisher || state.Revision != permit.trustRevision {
+ 				return nil, agentIdentityError("agent_identity_publication_permit_stale")
++			}
++			if err = validateAgentIdentityPublicationIssuer(permit, caller, token, caller.verifiedAt); err != nil {
++				return nil, err
+ 			}
+ 		}
+ 		var workExists int
+@@ -166,6 +169,9 @@
+ 			if caller.actor.Principal != permit.publisher || state.Revision != permit.trustRevision {
+ 				return nil, agentIdentityError("agent_identity_publication_permit_stale")
+ 			}
++			if err = validateAgentIdentityPublicationIssuer(permit, caller, token, caller.verifiedAt); err != nil {
++				return nil, err
++			}
+ 			current.Pending = &agentIdentityRegistryIntent{Head: head, Snapshot: canonical}
+ 			state.AgentIdentities[permit.base.workID] = current
+ 			prepared, err := encodeTrustState(*state)
+--- before/internal/engine/agent_identity_registry_types.go
++++ after/internal/engine/agent_identity_registry_types.go
+@@ -43,6 +43,7 @@
+ }
+ 
+ type agentIdentityRegistryPermit struct {
++	issuer        *agentIdentityPublicationIssuerProof
+ 	base          agentIdentityRegistryCheckpoint
+ 	nextDigest    string
+ 	roots         []string

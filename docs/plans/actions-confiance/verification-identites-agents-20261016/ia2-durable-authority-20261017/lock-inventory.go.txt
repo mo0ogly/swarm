@@ -1,0 +1,23 @@
+package main
+import("encoding/json";"go/ast";"go/parser";"go/token";"os";"path/filepath";"sort";"strings")
+type Site struct{Name string `json:"name"`;Line int `json:"line"`}
+type Fn struct{Name string `json:"name"`;File string `json:"file"`;Line int `json:"line"`;Begin int `json:"sql_begin_line,omitempty"`;Calls []Site `json:"calls"`;Trust []Site `json:"trust_calls,omitempty"`}
+func main(){
+ root:=os.Args[1];set:=token.NewFileSet();var functions []Fn
+ entries,e:=os.ReadDir(root);if e!=nil{panic(e)}
+ for _,entry:=range entries{if entry.IsDir()||!strings.HasSuffix(entry.Name(),".go")||strings.HasSuffix(entry.Name(),"_test.go"){continue}
+ path:=filepath.Join(root,entry.Name());file,e:=parser.ParseFile(set,path,nil,0);if e!=nil{panic(e)}
+ for _,decl:=range file.Decls{f,ok:=decl.(*ast.FuncDecl);if !ok||f.Body==nil{continue};node:=Fn{Name:f.Name.Name,File:path,Line:set.Position(f.Pos()).Line}
+ ast.Inspect(f.Body,func(n ast.Node)bool{call,ok:=n.(*ast.CallExpr);if !ok{return true};name:="";switch c:=call.Fun.(type){case *ast.SelectorExpr:name=c.Sel.Name;case *ast.Ident:name=c.Name};line:=set.Position(call.Pos()).Line
+ if name!=""{node.Calls=append(node.Calls,Site{name,line})};if name=="Begin"||name=="BeginTx"{if node.Begin==0||line<node.Begin{node.Begin=line}}
+ if strings.HasPrefix(name,"withTrust"){node.Trust=append(node.Trust,Site{name,line})};return true});functions=append(functions,node)} }
+ sort.Slice(functions,func(i,j int)bool{if functions[i].File==functions[j].File{return functions[i].Line<functions[j].Line};return functions[i].File<functions[j].File})
+ byName:=map[string][]int{};for i,f:=range functions{byName[f.Name]=append(byName[f.Name],i)}
+ var candidates [][]Site;var inventory []Fn
+ for _,f:=range functions{if f.Begin==0&&len(f.Trust)==0{continue};inventory=append(inventory,f);if f.Begin==0{continue}
+ type Step struct{Name string;Path []Site};var queue []Step;for _,c:=range f.Calls{if c.Line>=f.Begin{queue=append(queue,Step{c.Name,[]Site{{f.Name,f.Begin},c}})}};seen:=map[string]bool{}
+ for len(queue)>0{step:=queue[0];queue=queue[1:];if seen[step.Name]{continue};seen[step.Name]=true
+ if strings.HasPrefix(step.Name,"withTrust"){candidates=append(candidates,step.Path);continue};for _,index:=range byName[step.Name]{for _,c:=range functions[index].Calls{path:=append([]Site(nil),step.Path...);queue=append(queue,Step{c.Name,append(path,c)})}}}
+ }
+ json.NewEncoder(os.Stdout).Encode(map[string]any{"method":"Go AST, function-level overapproximation; calls after first Begin; names only; callbacks/receiver types not resolved; commit boundaries not inferred","source_functions":len(functions),"lock_functions":inventory,"sqlite_to_trust_candidates":candidates})
+}

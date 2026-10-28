@@ -1,0 +1,114 @@
+{
+  "model_calls": 4,
+  "repeated_cases": 0,
+  "tool_activity_count": 0,
+  "distinct_threads": 4,
+  "pack_sha256": "f5fa8d5ad55fddd25116ffe634733c685a4ffcf94e52c7c3d60e38a5c48441b6",
+  "receipts": [
+    {
+      "case_id": "contract-current-without",
+      "thread_id": "01a143b8-c6e1-7cd3-b506-f434be030c51",
+      "receipt_sha256": "d23764ac70588c6e77576dcc9fe1c649d641467e20536a56120fb0ba59b25b20",
+      "reservation_sha256": "fb40308724f62b6da86c476675f2ed5c8006147b0161e6d4112b030fb88d3b49",
+      "answer_sha256": "c38b469b5adbb9d98af196d643ccbf2cd093ef96e87e6a07efc704b25ecb3cf7",
+      "events_sha256": "b105ae79c7d4ba470500dcae1673fc33fe7e677385fa15405c15891a13cdc78f",
+      "usage": {
+        "input_tokens": 16673,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 909,
+        "reasoning_output_tokens": 759
+      },
+      "elapsed_seconds": 23.87937044899445,
+      "diagnostics": [
+        {
+          "id": "item_0",
+          "type": "error",
+          "message": "Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."
+        }
+      ]
+    },
+    {
+      "case_id": "contract-current-with",
+      "thread_id": "01a143b9-63fe-7dd1-8250-21daafd1de29",
+      "receipt_sha256": "1a7f805a6011ceb55172e0b535adb7e6e59f3715eddd537f2e9b8b33addcc0f4",
+      "reservation_sha256": "51e1ae96dade48e88be317294fa0ec8224f34862673058be7906f33a72abc1b6",
+      "answer_sha256": "03315ad98f261bf222056033158d1bb5a0cb326565ad72261e4d3bdf4ae30b7f",
+      "events_sha256": "a26e82755f264aa2cedc66a68a1437926117e1ab50fbbd22bb0a1d57784eb8d2",
+      "usage": {
+        "input_tokens": 17125,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 337,
+        "reasoning_output_tokens": 144
+      },
+      "elapsed_seconds": 9.162755677003588,
+      "diagnostics": [
+        {
+          "id": "item_0",
+          "type": "error",
+          "message": "Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."
+        }
+      ]
+    },
+    {
+      "case_id": "contract-changed-without",
+      "thread_id": "01a143b9-8892-7023-92ff-5c0dd17e824d",
+      "receipt_sha256": "094848f02c52823c484899f552eacd44bbc5e8c6733e2bb2f762c5b30b1607c7",
+      "reservation_sha256": "8d6e914a16753025cafa6c55ec8706a8677168098c975a361cc4d99332ab0297",
+      "answer_sha256": "22b93c3ab6c36349bc7017d65f896c387ede427e2a6c506326c89b98092721d2",
+      "events_sha256": "75c4fecb255a6a2bf8fd91737cf4178bfcb0eac6330138e2dddb15990e9552eb",
+      "usage": {
+        "input_tokens": 16669,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 600,
+        "reasoning_output_tokens": 464
+      },
+      "elapsed_seconds": 17.1081836739977,
+      "diagnostics": [
+        {
+          "id": "item_0",
+          "type": "error",
+          "message": "Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."
+        }
+      ]
+    },
+    {
+      "case_id": "contract-changed-with",
+      "thread_id": "01a143b9-2514-7671-938b-f12b19c7acf2",
+      "receipt_sha256": "0b0801d9f7e1907b93d1c05eae165d4e6c5c58a6ebc9fc535b141707d53adc68",
+      "reservation_sha256": "539150d97d26dea101b5486ce52ead5e9b4c1a02ffb163009aeeda57bafea676",
+      "answer_sha256": "3898d908d0c7a2c7215ec2fb598beae3c94d5143d6147da803b2a797a70905c3",
+      "events_sha256": "4ad7363faee33ad4c8cca5b8a9e4de3f293ff286bc684d09e1e6723c9626c2d1",
+      "usage": {
+        "input_tokens": 17125,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 633,
+        "reasoning_output_tokens": 421
+      },
+      "elapsed_seconds": 15.886435983004048,
+      "diagnostics": [
+        {
+          "id": "item_0",
+          "type": "error",
+          "message": "Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "input_tokens": 67592,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2479,
+    "reasoning_output_tokens": 1788,
+    "elapsed_seconds_sum": 66.03674578299979,
+    "cost": null
+  },
+  "model_requested": "gpt-5.6-sol",
+  "effort_requested": "medium",
+  "model_reported": null,
+  "cost_note": "No monetary cost returned by CLI. Cached tokens and reasoning tokens are subsets, not additional totals."
+}

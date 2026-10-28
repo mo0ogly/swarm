@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Monaco visible dès ouverture interactive",
+    "lancement via formulaire, vrai PTY, couleurs ANSI, saisie aller-retour",
+    "réponse réseau perdue après écriture : saisie suspendue, aucune retransmission automatique",
+    "détails et validation accessibles depuis le terminal",
+    "deuxième vue en lecture seule, aucun vol de saisie",
+    "DOM rendu et jetons présents dans les deux thèmes",
+    "Échap ferme la vue, session vivante, clic graphe rouvre le même historique",
+    "redémarrage serveur web : même agent, même tentative, historique conservé",
+    "modale mobile dans le viewport",
+    "arrêt confirmé, saisie désactivée, aucune acceptation automatique"
+  ],
+  "errors": [],
+  "csp": [],
+  "external": [],
+  "root": "/tmp/swarm-term-3LPynm"
+}

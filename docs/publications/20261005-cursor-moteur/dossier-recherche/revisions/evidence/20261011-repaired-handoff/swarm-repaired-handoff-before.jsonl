@@ -1,0 +1,9 @@
+{"Time":"2026-10-11T09:54:40.257042749+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-11T09:54:40.277101638+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRecoveryHandoffAfterExternalRepair"}
+{"Time":"2026-10-11T09:54:40.277126845+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRecoveryHandoffAfterExternalRepair","Output":"=== RUN   TestManagedRecoveryHandoffAfterExternalRepair\n"}
+{"Time":"2026-10-11T09:54:40.637593574+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRecoveryHandoffAfterExternalRepair","Output":"    managed_recovery_repaired_handoff_test.go:53: révision corrective liée au dernier refus indépendant requise\n"}
+{"Time":"2026-10-11T09:54:40.647031766+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRecoveryHandoffAfterExternalRepair","Output":"--- FAIL: TestManagedRecoveryHandoffAfterExternalRepair (0.37s)\n"}
+{"Time":"2026-10-11T09:54:40.647079927+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRecoveryHandoffAfterExternalRepair","Elapsed":0.37}
+{"Time":"2026-10-11T09:54:40.647338103+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-11T09:54:40.652732314+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.395s\n"}
+{"Time":"2026-10-11T09:54:40.652762741+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.396}

@@ -1,0 +1,31 @@
+test_cli_invalid_json_is_an_explicit_error_without_output (test_memory_summary_admission.SummaryAdmission.test_cli_invalid_json_is_an_explicit_error_without_output) ... ok
+test_cli_preserves_inputs_private_output_and_refuses_replacement (test_memory_summary_admission.SummaryAdmission.test_cli_preserves_inputs_private_output_and_refuses_replacement) ... ok
+test_cli_refuses_relabelled_source_without_output_or_input_changes (test_memory_summary_admission.SummaryAdmission.test_cli_refuses_relabelled_source_without_output_or_input_changes) ... FAIL
+test_prepares_declarative_selection_without_operator_text_or_authority (test_memory_summary_admission.SummaryAdmission.test_prepares_declarative_selection_without_operator_text_or_authority) ... ok
+test_rejects_changed_unrelated_or_fallback_receipt (test_memory_summary_admission.SummaryAdmission.test_rejects_changed_unrelated_or_fallback_receipt) ... ok
+test_requires_reason_and_a_protected_dialogue_in_prefix (test_memory_summary_admission.SummaryAdmission.test_requires_reason_and_a_protected_dialogue_in_prefix) ... ok
+test_selection_refuses_relabelled_source_even_with_matching_reference (test_memory_summary_admission.SummaryAdmission.test_selection_refuses_relabelled_source_even_with_matching_reference) ... FAIL
+
+======================================================================
+FAIL: test_cli_refuses_relabelled_source_without_output_or_input_changes (test_memory_summary_admission.SummaryAdmission.test_cli_refuses_relabelled_source_without_output_or_input_changes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/test_memory_summary_admission.py", line 108, in test_cli_refuses_relabelled_source_without_output_or_input_changes
+    self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : {"result": "SELECTION_PREPARED", "engine_admission": false, "model_calls": 0}
+
+
+======================================================================
+FAIL: test_selection_refuses_relabelled_source_even_with_matching_reference (test_memory_summary_admission.SummaryAdmission.test_selection_refuses_relabelled_source_even_with_matching_reference)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/test_memory_summary_admission.py", line 93, in test_selection_refuses_relabelled_source_even_with_matching_reference
+    with self.assertRaises(ValueError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.475s
+
+FAILED (failures=2)

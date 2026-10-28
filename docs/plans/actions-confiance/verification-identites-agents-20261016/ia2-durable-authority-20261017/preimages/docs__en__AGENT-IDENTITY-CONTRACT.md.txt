@@ -1,0 +1,190 @@
+# Internal agent identity and authority contract
+
+17 October 2026 — [Français](../architecture/AGENT-IDENTITY-CONTRACT.md).
+Scope: the internal IA2.2 Go kernel, **not connected to launchers**.
+The [IA1 findings](../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md)
+remain open. This contract adds no public endpoint, CLI command, Admin setting,
+bootstrap mechanism or provider confinement.
+
+## Responsibilities and current flow
+
+The [IA2 semantic contract](../plans/actions-confiance/identites-agents-contrat-IA2.md)
+defines the full target. The kernel evaluates data and returns a decision
+receipt. A positive decision is not a reservation, human approval, attested
+process or observed business effect.
+
+```mermaid
+flowchart TD
+  R["Internal JSON request"] --> P["Strict schema: no asserted authority"]
+  P --> L["Shared Trust lock"]
+  L --> I["Resolve token against current state"]
+  A["Protected current authority frame<br/>IA2.3 producer still missing"] --> V
+  I --> V["Check plan, instance, grants and delegation"]
+  V --> D["Decision bound to exact request or refusal"]
+  D -. "IA2.3 / IA3: not connected" .-> E["Atomic commitment, launch and effects"]
+```
+
+Trust supplies the issuer, external subject, `local`/`human`/`service` kind,
+configuration revision and expiry. Local access is never promoted to a human,
+and business roles (`requester`, `approver`, `admin`, `effect`) never implicitly
+grant agent creation. A token alone does not establish an instance.
+
+## Data and authority sources
+
+Private types in `internal/engine/agent_identity_contract.go`:
+
+| Type | Meaning |
+| --- | --- |
+| `agentIdentityPrincipal` | Separate local ID, kind, issuer and external subject; no credential or credential digest in attribution. |
+| `agentIdentityActor` | Principal and optional controller-established instance. |
+| `agentIdentityScope` | Work, plan version and digest. The adopted-plan producer is not connected yet. |
+| `agentIdentityGrant` | Issuer, holder, parent, scope, Trust revision, exact and delegable permissions, validity and revocation. |
+| `agentIdentityInstance` | Instance, logical agent, principal, scope, grant and execution binding reference. Matching this reference is not process attestation. |
+| `agentIdentitySnapshot` | Serializable schema 1, revision, grants and instances. Imports and backups remain data. |
+| `agentIdentityRequest` | Schema 1, event, scope, grant, operation, resource and content digest. No author/approver/authority claim grants rights. |
+| `agentIdentityDecision` | Project context, event, actor, request/snapshot digests, revisions and upper expiry bound. No implicit consumption or effect. |
+
+`agentIdentityAuthority` is a private frame with no JSON-populatable fields:
+canonical project root, current snapshot digest/revision, Trust revision, current plan and explicitly
+recognized root grants. Its protected producer is **not implemented**. Computing
+this frame from the snapshot being checked would create circular authority.
+Tests construct a fixture frame, proving no host integrity or rollback anchor.
+
+Digests use lowercase hexadecimal SHA-256. IDs reuse `safeName`. Resources match
+exactly, without wildcards or implicit path-prefix rules. Recognized operations
+are `agent.create`, `memory.read`, `memory.summarize`, `memory.transmit`,
+`tool.invoke`, `effect.execute`; their consumers are not connected by this change.
+The kernel introduces no hidden operator timeout or execution ceiling.
+
+Issuer and subject are opaque strings: brackets in an IPv6 issuer or a subject
+are not treated as wildcards. Text validation rejects empty or invalid UTF-8
+strings, control characters and surrounding whitespace; the `*?[]` restriction
+applies only to permission resources.
+
+The content digest must come from the actual proposal, parameters and resolved
+context. Binding a receipt to the supplied digest does not prove that producer
+or its correspondence with a later effect. These remain IA2.3/IA3 obligations.
+
+## Checks and recovery
+
+`decodeAgentIdentityRequest` rejects unknown/case-variant fields, duplicate keys
+including nested and escaped duplicates, multiple documents, empty/null/invalid
+input, asserted authority and wildcard permissions. The snapshot decoder also
+rejects unknown fields, duplicate keys and absent objects.
+
+`evaluateAgentIdentity` requires a caller verified at the evaluation instant, a
+current private frame, a matching snapshot and the same scope. It checks holder,
+instance binding, permission, dates, revocations and each delegation hop up to a
+recognized root. Each child preserves scope, attenuates the parent's delegable
+permissions and stays within its validity interval. An iterative traversal
+detects cycles.
+
+The consumer binds the caller to `Store.root`, canonicalized on opening. The
+private frame must name that same root and the receipt includes a project-context
+digest. Projects with identical fixture names and tokens cannot exchange frames
+or receipts. This local check is not a durable cross-host project ID or proof of
+OS account ownership. Root relocation or federation requires an explicit new
+context and protected anchor in IA2.3.
+
+A Trust configuration change invalidates old grants under this conservative
+contract; renewal must be explicit. Reauthentication does not renew grants.
+Decision expiry cannot exceed the caller's or any contributing grant's expiry.
+
+`Store.evaluateAgentIdentityRequest` resolves and evaluates under the same Trust
+lock. Reuse reauthenticates first, reevaluates, then compares the full receipt.
+It never returns a cached result before authentication. The real clock is
+sampled after lock acquisition; internal tests can inject a fixture clock, but
+JSON cannot. This internal consumer has no runtime-agent caller path yet:
+that requires the protected broker.
+
+`validateAgentIdentityTransition` requires the next revision and retains all
+historical records. Revocation cannot be cleared or moved; other fields of a
+published grant/instance cannot be rewritten. A replacement needs a new ID.
+This check neither authorizes nor publishes an update. The future writer must
+validate against protected current state and atomically publish its new anchor.
+No production storage writer uses this validator yet.
+
+## Limits and required follow-up
+
+Evidence is retained in the
+[IA2.2 report](../plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md).
+Tests use isolated roots, simulated runtime bindings and local OIDC/service
+issuers. They prove neither a real provider boundary nor independent review.
+The cached-caller and cross-project frame regressions retain before/after evidence.
+
+Remaining: protected bootstrap/frame, storage/anchor and commitment lock order,
+runtime channel integration, real adopted-plan and prepared-content binding, exact
+human approval, single consumption, start/revocation races, crash reconciliation
+and **all** CLI/API/provider/memory consumers. Adding this evaluator does not make
+Trust JSON and mission SQLite atomic. IDA-01–18 and the retrospective remain
+required for overall qualification.
+
+## IA2.3 channel experiment, separate from the kernel
+
+The [17 October prototype](../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md)
+passes 13 local checks with two Linux sandboxes. The controller pins PID/mount
+namespaces before execution and attributes each message using kernel credentials.
+A connection copied from B to A retains peer B, but the message sender is A and
+the claimed B identity is denied. Joining B with three copied namespace
+descriptors is also denied. The user namespace changes during bootstrap and is
+not assumed stable. This Python prototype is neither an integrated Go broker
+nor an authority source; its registry and revocation are in memory. It does not
+qualify the launchers.
+
+## Go instance channel — IA2.3a
+
+The receiver and binding registry are now implemented in
+`agent_identity_channel_linux.go` and `agent_identity_runtime_linux.go`.
+`Store.evaluateAgentIdentityMessage` connects them internally to IA2.2.
+No server or launcher registers this path. The [IA2.3a report](../plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md)
+records this slice's checks and limits.
+
+```mermaid
+flowchart TD
+  C["Controller before releasing execution gate<br/>Bubblewrap tests ; launchers not connected"] --> N["Pin expected PID/mount namespace objects"]
+  N --> T["Private in-memory binding registry"]
+  M["Unix packet with per-message credentials and pidfd"] --> J["Decode strict request"]
+  J --> L["Shared Trust lock : current state"]
+  L --> R["Binding registry lock"]
+  T --> R
+  R --> P["Process namespaces through pidfd ioctl"]
+  P --> B["Match UID and pinned objects ; reject revocation"]
+  B --> H["Sample clock after coordination waits"]
+  H --> V["Evaluate IA2.2 ; decision or rejection"]
+  A["Protected authority frame<br/>durable producer still missing"] -.-> V
+```
+
+The controller calls `pin` using a gated launcher bootstrap and holds the resulting
+PID/mount namespace descriptors. It rejects the host PID namespace, mismatching
+references and reuse of an already reserved instance, binding or PID namespace.
+A first worker message cannot populate this table. Process-private state does not
+protect an unconfined controller account; a protected launcher/bootstrap remains
+an integration obligation.
+
+`configureAgentIdentityChannel` requires a Unix `SOCK_SEQPACKET` socket and enables
+`SO_PASSCRED` and `SO_PASSPIDFD`. Reception requires credentials and exactly one
+`SCM_PIDFD`. Namespaces are obtained from that descriptor, without reopening the
+message's PID number. An exited sender is not reidentified by its number. The
+connection peer does not determine message attribution. This identifies the
+process/thread group represented by the mechanism, not each thread or executable
+image. Missing kernel primitives fail closed, without a numeric fallback; only
+the report's platform was executed.
+
+The consumer supplies its transport buffer and deadline. No new operator ceiling
+or timeout is introduced. Truncated packets, missing credentials and injected
+file rights are rejected; received descriptors are closed on rejection. The
+consumer closes an accepted message. Namespace pins remain held until registry
+closure, including after revocation, to exclude reuse of historical references.
+An empty registry after restart cannot adopt the first sender's authority.
+
+Reception happens outside Trust. Evaluation takes the shared Trust lock, then
+the registry lock, checks current revision/binding/UID/namespaces, samples real
+time after those waits, and evaluates under both locks. Binding revocation and
+registry closure are serialized with evaluation. This is not Trust/SQLite
+commitment, single consumption or observed process termination. Authority frames
+and snapshots used by the tests remain fixtures.
+
+The runtime lock protects bindings, not maps in a snapshot supplied by another
+component. The remaining authority producer must own a current immutable state
+during evaluation or protect it through its own protocol. The channel does not
+make borrowed maps safe against concurrent mutation by another goroutine.

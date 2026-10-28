@@ -1,0 +1,3394 @@
+{
+  "files": [
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/binding-refusal.json",
+      "sha256": "4cbcf51aa1aa10a9c45bbf12d929eafaf3940bcca39b1376e79be35599136b7d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/fixture.json",
+      "sha256": "bd156b6b8179b37aaa8c1ded677d67382e1e30a7e009d5ee2af56773363aca9a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/malformed-refusal.json",
+      "sha256": "928a6957507fc7c08f4b774171c4a6f7621f84a3796c3037b9ebc4abfdf447ef"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/publication-fault-reached.json",
+      "sha256": "55689b4c6bf5db422fe4e9fb114f78f4002497326358aba203e58bbc265c42dd"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/publication-refusal.json",
+      "sha256": "acfc2d9a2a099e3440811a4c3c84e531eac025f88a731931ce1718632360fe40"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/result.json",
+      "sha256": "05fbe00edf39d0922e38db04dd30da0de57855756806464d63ee89f16e7f8516"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/retained-manifest.json",
+      "sha256": "bfb54b2d650a834e863acc020c45f3ac4c13f86e7016b5ba2bc32010bea92d52"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-001.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-001.stdout",
+      "sha256": "c7e420fe4d28248876bd345986c6f7796aec7376bf220c38c03aececcf7ecdde"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-002.input.json",
+      "sha256": "535f32c49df5d59662ee2694dbaab4704ec59003c84e1844f74ec4e59e833817"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-002.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-002.stdout",
+      "sha256": "3e29252d06f06f35b770897b777aded5071f7fec602c68a3768aaaa64261e0f6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-003.input.json",
+      "sha256": "b3de678baeb2ba4b253f9fe1386815902d847492fe0e3f8d4dd6a7faacaf7fbf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-003.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-003.stdout",
+      "sha256": "0a3a0355309afe944825a6349cfb7e3487bd757f8e2bdc2282852e78d89166f2"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-004.input.json",
+      "sha256": "b26c05d07e255069c8a78ac8767eb3642ff2794e2a701db3f131e0c9d9a4fdbc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-004.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-004.stdout",
+      "sha256": "f53dce4ae650dc077ba857e5e8e4353647cf655ce6d3a4d036a4e190b2a4e8e1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-005.input.json",
+      "sha256": "7badb9f9e807629a58a01b5a0953f382f043e816e2323905940f8057b5086c92"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-005.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-005.stdout",
+      "sha256": "2a8fba1a2fff1b0ee1b12de13cd491e14eb8d6ae583e7263da0cd6c51a58fe97"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-006.input.json",
+      "sha256": "26ea8c05f3d2afaab6a1664caf8d7585d49bbaf92c4663676e2fdbb0325d455f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-006.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-006.stdout",
+      "sha256": "efe90f5df81ae788ebb387c9c8123721d029eb48cba97e5d5137f59f5ce85d50"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-007.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-007.stdout",
+      "sha256": "804b8a30c624d101e32faac929d516e36bc4a58a511dd25aa90e1221ff726b95"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-008.input.json",
+      "sha256": "26ea8c05f3d2afaab6a1664caf8d7585d49bbaf92c4663676e2fdbb0325d455f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-008.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-008.stdout",
+      "sha256": "efe90f5df81ae788ebb387c9c8123721d029eb48cba97e5d5137f59f5ce85d50"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-009.input.json",
+      "sha256": "ab164ae14bae0771f1ac65c89ddaba25361934b6502a03355e470f74d8d2ed0a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-009.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-009.stdout",
+      "sha256": "05139356ce2c5519510b2e702765d5e1402daaee2c03b99324133250a03b1b48"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-010.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-010.stdout",
+      "sha256": "05139356ce2c5519510b2e702765d5e1402daaee2c03b99324133250a03b1b48"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-011.input.json",
+      "sha256": "0a8072f45607e5a033f9502973d7cae815db76cdd6a9c81ddd03c3fe987199a4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-011.stderr",
+      "sha256": "8bc9fcc795581a08c40ba56994ef5eca62e366c02c00a4165c0b092104f54940"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-011.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-012.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-012.stdout",
+      "sha256": "05139356ce2c5519510b2e702765d5e1402daaee2c03b99324133250a03b1b48"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-013.input.json",
+      "sha256": "0848df176eda2393c560a3d4660539b22134f99d62c0807a841bd88e2987e856"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-013.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-013.stdout",
+      "sha256": "b12ba09fc1ba3fb1c4149295ac5eae1ca258da91510a1a0a625a46c5465bc01f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-014.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-014.stdout",
+      "sha256": "b12ba09fc1ba3fb1c4149295ac5eae1ca258da91510a1a0a625a46c5465bc01f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-015.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-015.stderr",
+      "sha256": "21d79ab6c59d25b030c1012f2e14489407f32ebab1792edaa75702c9ba85220f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-015.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-016.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-016.stdout",
+      "sha256": "b12ba09fc1ba3fb1c4149295ac5eae1ca258da91510a1a0a625a46c5465bc01f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-017.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-017.stderr",
+      "sha256": "33e0620aa4abd216c8743febeac325c6d9abde24a131cd5886d2734927c0e6e4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-017.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-018.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-018.stdout",
+      "sha256": "b12ba09fc1ba3fb1c4149295ac5eae1ca258da91510a1a0a625a46c5465bc01f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-019.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-019.stderr",
+      "sha256": "a36c222dcd1ac86db29ece0f57f54e53ed92b7e8401032134276c66db6096ed5"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-019.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-020.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-020.stdout",
+      "sha256": "b12ba09fc1ba3fb1c4149295ac5eae1ca258da91510a1a0a625a46c5465bc01f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-021.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-021.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-021.stdout",
+      "sha256": "f24726ebc4b62f4e4498ae3e96afafdd0999bed717866b5605eee7c0abd95e3f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-commands.json",
+      "sha256": "a668602de509032293a59af32eb1fdb668a36715812580339065b037f0553c55"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/managed-bootstrap-fixture.json",
+      "sha256": "94c256a505a9ca0ba260273d2f8ce0bf3b6cf7ed147de2be4eb962188da25713"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-2kz3ujn2",
+      "path": "run/setup/owned-root-33b9e4e6cbcd7dd20475ba766b92846944434e3e352b7d89f4d8836f929078c4.json",
+      "sha256": "83c7b27adef266926849e62f33b157d1f406dc8aeef914e054eff9fc042da982"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/failure.json",
+      "sha256": "f0949573d2f1aa9d0660dc4f177d36191045879f6636e2d1c74dc9c5ee65b975"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/fixture.json",
+      "sha256": "27dcc49eefae769d89919239a4abbe5649a11d46e4ab8056eb593d4e739b0112"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-001.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-001.stdout",
+      "sha256": "df0e87c510e7a9c402eefaa3535b2c14f9af6b6a8e9cc83dca7fb7ba7e7ecebe"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-002.input.json",
+      "sha256": "535f32c49df5d59662ee2694dbaab4704ec59003c84e1844f74ec4e59e833817"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-002.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-002.stdout",
+      "sha256": "28fde604aec5631a9a29824b9c8067c8cb9458fae0e9360ef4f582198a7fe723"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-003.input.json",
+      "sha256": "b3de678baeb2ba4b253f9fe1386815902d847492fe0e3f8d4dd6a7faacaf7fbf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-003.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-003.stdout",
+      "sha256": "e7f0458b67fd7b04264bf19008751f8171ffb9431254e8b422701b3eade5586a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-004.input.json",
+      "sha256": "b26c05d07e255069c8a78ac8767eb3642ff2794e2a701db3f131e0c9d9a4fdbc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-004.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-004.stdout",
+      "sha256": "e56b83579a76218d8b3a62a1d8958c309680c0e1a0dcdd3ccf67a1a1244365ae"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-005.input.json",
+      "sha256": "7badb9f9e807629a58a01b5a0953f382f043e816e2323905940f8057b5086c92"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-005.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-005.stdout",
+      "sha256": "38ea1757aa79be411cd975cf1775e0b8462643afbe87578ca0b8cffe0dc62b56"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-006.input.json",
+      "sha256": "26ea8c05f3d2afaab6a1664caf8d7585d49bbaf92c4663676e2fdbb0325d455f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-006.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-006.stdout",
+      "sha256": "32a597afc3dbdeeb053f99fc61736b35809924e63c112650ddc969ab6a5ba9b2"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-007.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-007.stdout",
+      "sha256": "f9292c92accf0f131cdf67e7c92b5ec0b02cbe1f9da87f488930bd135a0f3cc3"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-008.input.json",
+      "sha256": "26ea8c05f3d2afaab6a1664caf8d7585d49bbaf92c4663676e2fdbb0325d455f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-008.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-008.stdout",
+      "sha256": "32a597afc3dbdeeb053f99fc61736b35809924e63c112650ddc969ab6a5ba9b2"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-009.input.json",
+      "sha256": "ab164ae14bae0771f1ac65c89ddaba25361934b6502a03355e470f74d8d2ed0a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-009.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-009.stdout",
+      "sha256": "0c876ce51fc53f091a1e327260c61d6c278e642d103830f87bad990fbd021569"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-010.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-010.stdout",
+      "sha256": "0c876ce51fc53f091a1e327260c61d6c278e642d103830f87bad990fbd021569"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-011.input.json",
+      "sha256": "0a8072f45607e5a033f9502973d7cae815db76cdd6a9c81ddd03c3fe987199a4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-011.stderr",
+      "sha256": "8bc9fcc795581a08c40ba56994ef5eca62e366c02c00a4165c0b092104f54940"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-011.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-012.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-012.stdout",
+      "sha256": "0c876ce51fc53f091a1e327260c61d6c278e642d103830f87bad990fbd021569"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-013.input.json",
+      "sha256": "0848df176eda2393c560a3d4660539b22134f99d62c0807a841bd88e2987e856"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-013.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-013.stdout",
+      "sha256": "4c87a878d26b70090040a5357ac2d89b16856c54ae367be47950f61250422020"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-014.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-014.stdout",
+      "sha256": "4c87a878d26b70090040a5357ac2d89b16856c54ae367be47950f61250422020"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-015.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-015.stderr",
+      "sha256": "62bd580ef2bda7ed43caba1b2daa54e707cd159975d7c7a4d30551519bc8c5f1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-015.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-016.stderr",
+      "sha256": "62bd580ef2bda7ed43caba1b2daa54e707cd159975d7c7a4d30551519bc8c5f1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-016.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-commands.json",
+      "sha256": "01b265d7c4f68dcdc15a0736142f4a6575c3d5a529e0683c61505558080797aa"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/managed-bootstrap-fixture.json",
+      "sha256": "1e4dec0706be1be00ccf5dcfea5acd6bcf3ed42812e23a3fad38c3f17c37ddb9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/setup/owned-root-ee18bcdcd73ceff83d5535c8949e6f6e78dcdec8b60175b488d9c4dd92b10f2d.json",
+      "sha256": "59d5e2c0f8f2b85d962a8c312d247f7cd461a0977b9736eef3b81e1d7ba51658"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-5mk67bl0",
+      "path": "run/sql-refusal.json",
+      "sha256": "0ce750f09f7082a725e915be34d5b1eaeeb5669f2959057a51ff5ed286ebc04a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/failure.json",
+      "sha256": "2426a236f4524c72ebb87dc8e5a10fa35fcca4b92ab697952a24c0d0f7165122"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/fixture.json",
+      "sha256": "57466acac973cba3a1b634c8c0da382f2f0e55b896aeacbf9136904ff5093fce"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/publication-refusal.json",
+      "sha256": "545b380bab31e7201584f33156af5f7ca3f86c36d75aae911453da03a650feff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-001.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-001.stdout",
+      "sha256": "647c1ae4820a64b76a5de0591c81c82a3ad0742dec48cf298c17fe2fc15bd181"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-002.input.json",
+      "sha256": "535f32c49df5d59662ee2694dbaab4704ec59003c84e1844f74ec4e59e833817"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-002.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-002.stdout",
+      "sha256": "f32d47eaec8c4b4e5bf654802cbd555e90c7c42609119d8fcc67e204d74c38f5"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-003.input.json",
+      "sha256": "b3de678baeb2ba4b253f9fe1386815902d847492fe0e3f8d4dd6a7faacaf7fbf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-003.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-003.stdout",
+      "sha256": "050ea508fd7174b68cdf0ffa4c790f7791ed0c29c84b636161a8c6f81461d7c1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-004.input.json",
+      "sha256": "b26c05d07e255069c8a78ac8767eb3642ff2794e2a701db3f131e0c9d9a4fdbc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-004.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-004.stdout",
+      "sha256": "db53cb26be7e9deea307cc01af8ea7080fde75b1db606e0f9e436d0808ad202c"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-005.input.json",
+      "sha256": "7badb9f9e807629a58a01b5a0953f382f043e816e2323905940f8057b5086c92"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-005.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-005.stdout",
+      "sha256": "31ca7f19319c9ed3224e18b98f34fe2b6e9720e70ef1279a6b7491015b94be5a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-006.input.json",
+      "sha256": "26ea8c05f3d2afaab6a1664caf8d7585d49bbaf92c4663676e2fdbb0325d455f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-006.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-006.stdout",
+      "sha256": "d7bfaa734aabf0ef17d4a75aba3c1a59857698d028957e82c9822bc50847b553"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-007.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-007.stdout",
+      "sha256": "99ae076258c9adb87557d52154f01e20c7a745a1081b498d8edd54096c3a161b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-008.input.json",
+      "sha256": "26ea8c05f3d2afaab6a1664caf8d7585d49bbaf92c4663676e2fdbb0325d455f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-008.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-008.stdout",
+      "sha256": "d7bfaa734aabf0ef17d4a75aba3c1a59857698d028957e82c9822bc50847b553"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-009.input.json",
+      "sha256": "ab164ae14bae0771f1ac65c89ddaba25361934b6502a03355e470f74d8d2ed0a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-009.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-009.stdout",
+      "sha256": "69d011430fdbe43e3b7cc78ad90dfc57f4cb13bd6a7f91c4b601774434e4f3e8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-010.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-010.stdout",
+      "sha256": "69d011430fdbe43e3b7cc78ad90dfc57f4cb13bd6a7f91c4b601774434e4f3e8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-011.input.json",
+      "sha256": "0a8072f45607e5a033f9502973d7cae815db76cdd6a9c81ddd03c3fe987199a4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-011.stderr",
+      "sha256": "8bc9fcc795581a08c40ba56994ef5eca62e366c02c00a4165c0b092104f54940"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-011.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-012.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-012.stdout",
+      "sha256": "69d011430fdbe43e3b7cc78ad90dfc57f4cb13bd6a7f91c4b601774434e4f3e8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-013.input.json",
+      "sha256": "0848df176eda2393c560a3d4660539b22134f99d62c0807a841bd88e2987e856"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-013.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-013.stdout",
+      "sha256": "be08f75fe08549d3f1ccf7c2b0dae8ce7ca4f9b5629f89934d7a4f6a6f9f93e9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-014.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-014.stdout",
+      "sha256": "be08f75fe08549d3f1ccf7c2b0dae8ce7ca4f9b5629f89934d7a4f6a6f9f93e9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-015.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-015.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-015.stdout",
+      "sha256": "aca3e153bb1bcafeccfdbc6f7760a182788ea81a66a903c2306847eff519746b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-commands.json",
+      "sha256": "37b305d749c3f454079a6511e17dc141ec0649c164200e6b6f5b90932a3f6fbd"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/managed-bootstrap-fixture.json",
+      "sha256": "13de1020296bc0df5c9019a21ed5b198323b8c1783b8fd1b02cf96f9fc7e8760"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-n0mqb7q0",
+      "path": "run/setup/owned-root-45c36133e0dc117ea17433fb6f7beef7a198ed8d3e37e6646903000d1a96f61e.json",
+      "sha256": "830abe9695886d985b2fe0e86cd7c3632fc1fe910d5d45c09b4eedb619ac558b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/binding-pending-refusal.json",
+      "sha256": "3644149dbd6890cf06e0d8b7d8d3d31ca01c36f36bbac2270cbe5f8f895706f0"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/binding-refusal.json",
+      "sha256": "4cbcf51aa1aa10a9c45bbf12d929eafaf3940bcca39b1376e79be35599136b7d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/commit-pending-refusal.json",
+      "sha256": "d843fbceccb12e5704ac0d725705eb3ea472c43a4d3b4f48b75c6998f1ed251b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/fixture.json",
+      "sha256": "2f0b69a404fedd2101b33a5d6cc25a8806ce58c3d8e4138f952e6b0aa735997c"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/malformed-refusal.json",
+      "sha256": "928a6957507fc7c08f4b774171c4a6f7621f84a3796c3037b9ebc4abfdf447ef"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/managed-claim-refusal.json",
+      "sha256": "f42b583a09488d5c9d3611bbd85a0da718d55173c245f2077c8ed13bd2a0882c"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/managed-http-process.json",
+      "sha256": "4186339e945271481fd5ed776b71847e1008d02281997b19fb13d8258a24df0b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/managed-http-records.json",
+      "sha256": "b70bd10dd1cf30bf5ec63d860e184d893a29a01bfa1c3dbbe88c824140550dc3"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/managed-http-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/publication-fault-reached.json",
+      "sha256": "64a1fc2987fd4a0fc4f228cc4d5e97f6a79664eb26d75942ca0a00290e2d2bdd"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/publication-refusal.json",
+      "sha256": "acfc2d9a2a099e3440811a4c3c84e531eac025f88a731931ce1718632360fe40"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/result.json",
+      "sha256": "277473152ea1df4d47c0c5a81c898d6a29676cf52418f16caeb82120ad48de72"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/retained-manifest.json",
+      "sha256": "a1993140bd410846987f70fdcb6e7a43bfe3a744508cbef99033f1a4d9d44995"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-001.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-001.stdout",
+      "sha256": "919e5157f5c3ba99c42e4562f0e70cfdbde1df78437293e609d06a2896f8a30e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-002.input.json",
+      "sha256": "535f32c49df5d59662ee2694dbaab4704ec59003c84e1844f74ec4e59e833817"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-002.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-002.stdout",
+      "sha256": "283e738bf1a826b190d288cf62c6a79bf627279047df6bb7601ea2c9eeb72cde"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-003.input.json",
+      "sha256": "b3de678baeb2ba4b253f9fe1386815902d847492fe0e3f8d4dd6a7faacaf7fbf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-003.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-003.stdout",
+      "sha256": "517aef169cf5e0e182585641f12c7208ff94d55bca439dc58e19f47e27f851be"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-004.input.json",
+      "sha256": "b26c05d07e255069c8a78ac8767eb3642ff2794e2a701db3f131e0c9d9a4fdbc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-004.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-004.stdout",
+      "sha256": "269cf2c357d3a0ee564151caadc2a6a58ddf86abe45e795a6a131ac0aa43682e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-005.input.json",
+      "sha256": "7badb9f9e807629a58a01b5a0953f382f043e816e2323905940f8057b5086c92"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-005.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-005.stdout",
+      "sha256": "0875a071172a7f366c5c9a7829abd0c8e514b33433ae57031a676bce31baffa8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-006.input.json",
+      "sha256": "26ea8c05f3d2afaab6a1664caf8d7585d49bbaf92c4663676e2fdbb0325d455f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-006.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-006.stdout",
+      "sha256": "b2556f3a666767d99262a20dc347e31aa6ee57fe92fb96e4485928b8c0095cb9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-007.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-007.stdout",
+      "sha256": "ca65651aab27291e7347efa3909b79cf9153c94ff024323c9505b7a2007cebdd"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-008.input.json",
+      "sha256": "26ea8c05f3d2afaab6a1664caf8d7585d49bbaf92c4663676e2fdbb0325d455f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-008.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-008.stdout",
+      "sha256": "b2556f3a666767d99262a20dc347e31aa6ee57fe92fb96e4485928b8c0095cb9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-009.input.json",
+      "sha256": "ab164ae14bae0771f1ac65c89ddaba25361934b6502a03355e470f74d8d2ed0a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-009.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-009.stdout",
+      "sha256": "d141714955dbf5ef9c1436de2266e4df33956369ddea21f40ff4e2659d973f6e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-010.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-010.stdout",
+      "sha256": "d141714955dbf5ef9c1436de2266e4df33956369ddea21f40ff4e2659d973f6e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-011.input.json",
+      "sha256": "0a8072f45607e5a033f9502973d7cae815db76cdd6a9c81ddd03c3fe987199a4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-011.stderr",
+      "sha256": "8bc9fcc795581a08c40ba56994ef5eca62e366c02c00a4165c0b092104f54940"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-011.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-012.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-012.stdout",
+      "sha256": "d141714955dbf5ef9c1436de2266e4df33956369ddea21f40ff4e2659d973f6e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-013.input.json",
+      "sha256": "0848df176eda2393c560a3d4660539b22134f99d62c0807a841bd88e2987e856"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-013.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-013.stdout",
+      "sha256": "7149c998b6612bee84e8e67254525c544dcc6a7640512bb5cfe724085af5c18d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-014.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-014.stdout",
+      "sha256": "7149c998b6612bee84e8e67254525c544dcc6a7640512bb5cfe724085af5c18d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-015.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-015.stderr",
+      "sha256": "21d79ab6c59d25b030c1012f2e14489407f32ebab1792edaa75702c9ba85220f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-015.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-016.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-016.stdout",
+      "sha256": "7149c998b6612bee84e8e67254525c544dcc6a7640512bb5cfe724085af5c18d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-017.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-017.stderr",
+      "sha256": "33e0620aa4abd216c8743febeac325c6d9abde24a131cd5886d2734927c0e6e4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-017.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-018.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-018.stdout",
+      "sha256": "7149c998b6612bee84e8e67254525c544dcc6a7640512bb5cfe724085af5c18d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-019.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-019.stderr",
+      "sha256": "a36c222dcd1ac86db29ece0f57f54e53ed92b7e8401032134276c66db6096ed5"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-019.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-020.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-020.stdout",
+      "sha256": "7149c998b6612bee84e8e67254525c544dcc6a7640512bb5cfe724085af5c18d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-021.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-021.stderr",
+      "sha256": "8f3f2a927714a0d6c3242c6935ef582f8d8750ccd4aad428cde433e94c84ceb4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-021.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-022.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-022.stdout",
+      "sha256": "7149c998b6612bee84e8e67254525c544dcc6a7640512bb5cfe724085af5c18d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-023.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-023.stderr",
+      "sha256": "801de4fa8aac46fbb5425c2821d87079028c60939aa54ff395fbe5a51b5856fa"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-023.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-024.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-024.stdout",
+      "sha256": "7149c998b6612bee84e8e67254525c544dcc6a7640512bb5cfe724085af5c18d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-025.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-025.stderr",
+      "sha256": "7c10194a77953222185cd4be30895aa7e86b866d7bb3b691fc822f7d7f3ad352"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-025.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-026.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-026.stdout",
+      "sha256": "7149c998b6612bee84e8e67254525c544dcc6a7640512bb5cfe724085af5c18d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-027.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-027.stderr",
+      "sha256": "5970bdb0717377088e0cc7c615db796dc184e8a12f2cfcfb322754a7164d3c0f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-027.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-028.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-028.stdout",
+      "sha256": "7149c998b6612bee84e8e67254525c544dcc6a7640512bb5cfe724085af5c18d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-029.input.json",
+      "sha256": "4db7148e3152d737ca30fff9e406d45e5c48bb77daa27e6992890bac4d17f0ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-029.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-029.stdout",
+      "sha256": "61a32383f94b7bedc8652ad612401d6a641feedf71f9cd851c154f6cca1b6c4a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-030.input.json",
+      "sha256": "aa63d0bd1ce0d827364b58f4a5b0bc721bc934e168822b5f5ebe5971d93fc9a9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-030.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-030.stdout",
+      "sha256": "3fe039a9f2bb9d6a043c786b5fe891afbbf5ff21f137defdbe2f4df7f29fbf99"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-031.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-031.stdout",
+      "sha256": "d8d792718c55ced6943f0aacc214756bea7d3fe2884c767e9b306b02abb52af8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-032.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-032.stdout",
+      "sha256": "d8d792718c55ced6943f0aacc214756bea7d3fe2884c767e9b306b02abb52af8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-033.input.json",
+      "sha256": "526792d263957f59e3267c2b767d355b501577ec1f0d43a000b63732260bbe00"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-033.stderr",
+      "sha256": "0d9e29ba6779222652873d577503d687d446fad0cdce97c4b69f7342d3e6b205"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-033.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-034.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-034.stdout",
+      "sha256": "d8d792718c55ced6943f0aacc214756bea7d3fe2884c767e9b306b02abb52af8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-commands.json",
+      "sha256": "f696b6000acdde270824c9f85210f16631b80ef43904e3c1c1dba276ee1712a8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/managed-bootstrap-fixture.json",
+      "sha256": "dd1e8b12096de44285774d2f16a8027666dc3b3a68aba7e5a7eb532b4639f9d0"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n",
+      "path": "run/setup/owned-root-18be7e58812deb133903dac767531ecb51a8f151d227fda6f0b4b0bf47be955b.json",
+      "sha256": "ab0826f3931fb1ac0f90140c30666dbf92d055a98401658f26df178efdbb6bca"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/.gitignore",
+      "sha256": "cdbcae15105d6b781e620813c79c7e868740d4e9cc53ce6f5fcbbc12387adf4b"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/engine-settings.json",
+      "sha256": "064669fa9bee4d34fe246486d9187e073a0b99ce7c5dbb62b25a31c1ab172753"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-0b01da24d4ba0c7400b80a2f/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-0b01da24d4ba0c7400b80a2f/repository.git/HEAD",
+      "sha256": "1b0f93469caa99507ebb0a72bf2f69c90818cc7b7781ef59880257d940716b3f"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-0b01da24d4ba0c7400b80a2f/repository.git/config",
+      "sha256": "af1da3caa476459aaad339261aaccb6907f05efd31d768fdaa2c66780f81e6d5"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-0b01da24d4ba0c7400b80a2f/repository.git/objects/pack/pack-1995c83374ff10034f0757bab006b41a3e8aca28.idx",
+      "sha256": "f26238ef42a06ae9c9f1d939e96ef499bcd59565324a9fc605c623e5f4603d5d"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-0b01da24d4ba0c7400b80a2f/repository.git/objects/pack/pack-1995c83374ff10034f0757bab006b41a3e8aca28.pack",
+      "sha256": "ebc9ea5b208eabb3ee4c44f76d8d90b2d236a5f65c3c5b53312e9c1f36247837"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-0b01da24d4ba0c7400b80a2f/repository.git/objects/pack/pack-1995c83374ff10034f0757bab006b41a3e8aca28.rev",
+      "sha256": "dfef99f77e3255f63bd7e8c719031ae36f5f7b359d63d6bf5bff89f59a6690ca"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-0b01da24d4ba0c7400b80a2f/repository.git/packed-refs",
+      "sha256": "5399a08e82bcd56cd08da05ed4adf087afda47730f97b9d35db63332c285bd69"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-0b01da24d4ba0c7400b80a2f/repository.git/refs/heads/swarm-result",
+      "sha256": "0c63b7194e1cc022bbafae70ae176cbe0ce22bf19cc86ec74a19dff0a2f337b1"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-0b01da24d4ba0c7400b80a2f/repository.json",
+      "sha256": "bfb54b2d650a834e863acc020c45f3ac4c13f86e7016b5ba2bc32010bea92d52"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-0b01da24d4ba0c7400b80a2f/repository.json.pending",
+      "sha256": "bfb54b2d650a834e863acc020c45f3ac4c13f86e7016b5ba2bc32010bea92d52"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-aec49c496301f414c82f35c6/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-aec49c496301f414c82f35c6/repository.git/HEAD",
+      "sha256": "1b0f93469caa99507ebb0a72bf2f69c90818cc7b7781ef59880257d940716b3f"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-aec49c496301f414c82f35c6/repository.git/config",
+      "sha256": "af1da3caa476459aaad339261aaccb6907f05efd31d768fdaa2c66780f81e6d5"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-aec49c496301f414c82f35c6/repository.git/objects/pack/pack-1995c83374ff10034f0757bab006b41a3e8aca28.idx",
+      "sha256": "f26238ef42a06ae9c9f1d939e96ef499bcd59565324a9fc605c623e5f4603d5d"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-aec49c496301f414c82f35c6/repository.git/objects/pack/pack-1995c83374ff10034f0757bab006b41a3e8aca28.pack",
+      "sha256": "ebc9ea5b208eabb3ee4c44f76d8d90b2d236a5f65c3c5b53312e9c1f36247837"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-aec49c496301f414c82f35c6/repository.git/objects/pack/pack-1995c83374ff10034f0757bab006b41a3e8aca28.rev",
+      "sha256": "dfef99f77e3255f63bd7e8c719031ae36f5f7b359d63d6bf5bff89f59a6690ca"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-aec49c496301f414c82f35c6/repository.git/packed-refs",
+      "sha256": "5399a08e82bcd56cd08da05ed4adf087afda47730f97b9d35db63332c285bd69"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-aec49c496301f414c82f35c6/repository.git/refs/heads/swarm-result",
+      "sha256": "0c63b7194e1cc022bbafae70ae176cbe0ce22bf19cc86ec74a19dff0a2f337b1"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-aec49c496301f414c82f35c6/repository.json",
+      "sha256": "b7ecf46b33f08993ca598999c9aa879c56a6c3adfabc31ee6c0ac2d274794f7d"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/managed/w-aec49c496301f414c82f35c6/repository.json.pending",
+      "sha256": "b7ecf46b33f08993ca598999c9aa879c56a6c3adfabc31ee6c0ac2d274794f7d"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/providers.json",
+      "sha256": "79af01628d065f515e8ab5f58289d7d5e0e1a91391f18105c019c4e9e3e42501"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/providers.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/state.db",
+      "sha256": "8956b2b62f9b9479c1aebe71b896baefe596cf1bc256d582b2e80645a2585f8c"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/views/w-0b01da24d4ba0c7400b80a2f.md",
+      "sha256": "be99afcdc7727af04c6dd8a487e4b7bb8507dea19a8e9211c5f022d4aca72f3c"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/views/w-314f7cb2ac67444e74dc8145.md",
+      "sha256": "d313d514039da1c23cd3e509291bdf81f63a05552d6b2f81238e45b9c6f79499"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/views/w-aec49c496301f414c82f35c6.md",
+      "sha256": "75aa5c3583710b49d62f854ce70ffa3677dfad600b5d4255734dc01df8f93e44"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": ".swarm/views/w-cde7fa6c6ba83bae77b397ef.md",
+      "sha256": "4c426794278a57bcc34fed5645cc9e6bdca3bb665fb355533caf951e91e3b6f2"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": "codex",
+      "sha256": "85ccc11672269dc6570c28ddefcc8178bfb45c367d2a7225732b6fc2bcf1c0dd"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": "codex-home/models_cache.json",
+      "sha256": "ffa10bbf7c6542e441608a1b4c3f4ac1410652360f269f51c6640f660a7c766c"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": "source/tracked.txt",
+      "sha256": "cc7384b68b8a98644c9230ce1953afbde216bd1e2eb56b64069595cf6719724b"
+    },
+    {
+      "root": "/tmp/swarm-model83-__6ylppj",
+      "path": "source/untracked.txt",
+      "sha256": "24fd9d2a2d2a455b86ed4d7500196f53ef421efb9c06b40a1f522bf98cc76c1f"
+    },
+    {
+      "root": "/tmp/swarm-model83-k27bttx9",
+      "path": ".swarm/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-k27bttx9",
+      "path": ".swarm/.gitignore",
+      "sha256": "cdbcae15105d6b781e620813c79c7e868740d4e9cc53ce6f5fcbbc12387adf4b"
+    },
+    {
+      "root": "/tmp/swarm-model83-k27bttx9",
+      "path": ".swarm/engine-settings.json",
+      "sha256": "67cc9e1168285b73eb601c9ce6e82d43fb30ffa93ddccb75c749fb5dba9ded6d"
+    },
+    {
+      "root": "/tmp/swarm-model83-k27bttx9",
+      "path": ".swarm/providers.json",
+      "sha256": "6e1ce1ebb1ee9043bbf5d91eb62d1a3ecf2665ddbf797aa569875f0f77032fdc"
+    },
+    {
+      "root": "/tmp/swarm-model83-k27bttx9",
+      "path": ".swarm/state.db",
+      "sha256": "ab0cb35dcb649d3948563b001f7e2fd6e4b228c36e1937df0792c4eab1134c0c"
+    },
+    {
+      "root": "/tmp/swarm-model83-k27bttx9",
+      "path": ".swarm/views/w-318fbbd7949e5a59c495ea4b.md",
+      "sha256": "409c37e753bf12b4d357384981e010da50f143a54fb3da846e8b70aaa212d5dc"
+    },
+    {
+      "root": "/tmp/swarm-model83-k27bttx9",
+      "path": ".swarm/views/w-abdf811a95f645f3130420cc.md",
+      "sha256": "d95206e28ebaacb0a0990d72d7c5bb68c8d93b6e26fb085caa2f8efd294109c7"
+    },
+    {
+      "root": "/tmp/swarm-model83-k27bttx9",
+      "path": "codex",
+      "sha256": "85ccc11672269dc6570c28ddefcc8178bfb45c367d2a7225732b6fc2bcf1c0dd"
+    },
+    {
+      "root": "/tmp/swarm-model83-k27bttx9",
+      "path": "codex-home/models_cache.json",
+      "sha256": "ffa10bbf7c6542e441608a1b4c3f4ac1410652360f269f51c6640f660a7c766c"
+    },
+    {
+      "root": "/tmp/swarm-model83-k27bttx9",
+      "path": "source/tracked.txt",
+      "sha256": "cc7384b68b8a98644c9230ce1953afbde216bd1e2eb56b64069595cf6719724b"
+    },
+    {
+      "root": "/tmp/swarm-model83-k27bttx9",
+      "path": "source/untracked.txt",
+      "sha256": "24fd9d2a2d2a455b86ed4d7500196f53ef421efb9c06b40a1f522bf98cc76c1f"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/.gitignore",
+      "sha256": "cdbcae15105d6b781e620813c79c7e868740d4e9cc53ce6f5fcbbc12387adf4b"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/engine-settings.json",
+      "sha256": "ff43b863c3f798145b2dda3bbf31277823b98d9c8a8d1e5ab15742aac15e99b6"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-d1955b58297fc4beeffc0e2d/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-d1955b58297fc4beeffc0e2d/repository.git/HEAD",
+      "sha256": "1b0f93469caa99507ebb0a72bf2f69c90818cc7b7781ef59880257d940716b3f"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-d1955b58297fc4beeffc0e2d/repository.git/config",
+      "sha256": "92208487ed445b61f0f450c8aaaa93a9caff4f8f47742c75c0917cce664c535e"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-d1955b58297fc4beeffc0e2d/repository.git/objects/pack/pack-7a9e9ad66ef634c2afff5272ba9298253b1b5a2d.idx",
+      "sha256": "42b0b26ecca8b103d496e30ec2aef1252e1ea6164163beeae032dddd7c40c2d7"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-d1955b58297fc4beeffc0e2d/repository.git/objects/pack/pack-7a9e9ad66ef634c2afff5272ba9298253b1b5a2d.pack",
+      "sha256": "2036c97940a5ed0578b5febfc8842859dcde1d6dd90f447d6bbe69b5d1f37de3"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-d1955b58297fc4beeffc0e2d/repository.git/objects/pack/pack-7a9e9ad66ef634c2afff5272ba9298253b1b5a2d.rev",
+      "sha256": "fb5e97a470bb7a89f586581aa270a96a9dfc50d043b5f9550e430d0622766ad4"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-d1955b58297fc4beeffc0e2d/repository.git/packed-refs",
+      "sha256": "d20144fe2c9d44f196d56450b437f8804a82fb01106f826c81fef582af770263"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-d1955b58297fc4beeffc0e2d/repository.git/refs/heads/swarm-result",
+      "sha256": "ac799602d969373195fee2dfb1993ff96b041d251329923a3462d8a581badd57"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-d1955b58297fc4beeffc0e2d/repository.json",
+      "sha256": "b410d1b6dba51aab9e262ddea6b5d2e44875f4e1930ff229b1f07d3f5f57cfc2"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-d1955b58297fc4beeffc0e2d/repository.json.pending",
+      "sha256": "b410d1b6dba51aab9e262ddea6b5d2e44875f4e1930ff229b1f07d3f5f57cfc2"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-e2b82dc1a741fd2f0a285621/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-e2b82dc1a741fd2f0a285621/repository.git/HEAD",
+      "sha256": "1b0f93469caa99507ebb0a72bf2f69c90818cc7b7781ef59880257d940716b3f"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-e2b82dc1a741fd2f0a285621/repository.git/config",
+      "sha256": "92208487ed445b61f0f450c8aaaa93a9caff4f8f47742c75c0917cce664c535e"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-e2b82dc1a741fd2f0a285621/repository.git/objects/pack/pack-7a9e9ad66ef634c2afff5272ba9298253b1b5a2d.idx",
+      "sha256": "42b0b26ecca8b103d496e30ec2aef1252e1ea6164163beeae032dddd7c40c2d7"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-e2b82dc1a741fd2f0a285621/repository.git/objects/pack/pack-7a9e9ad66ef634c2afff5272ba9298253b1b5a2d.pack",
+      "sha256": "2036c97940a5ed0578b5febfc8842859dcde1d6dd90f447d6bbe69b5d1f37de3"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-e2b82dc1a741fd2f0a285621/repository.git/objects/pack/pack-7a9e9ad66ef634c2afff5272ba9298253b1b5a2d.rev",
+      "sha256": "fb5e97a470bb7a89f586581aa270a96a9dfc50d043b5f9550e430d0622766ad4"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-e2b82dc1a741fd2f0a285621/repository.git/packed-refs",
+      "sha256": "d20144fe2c9d44f196d56450b437f8804a82fb01106f826c81fef582af770263"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-e2b82dc1a741fd2f0a285621/repository.git/refs/heads/swarm-result",
+      "sha256": "ac799602d969373195fee2dfb1993ff96b041d251329923a3462d8a581badd57"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-e2b82dc1a741fd2f0a285621/repository.json",
+      "sha256": "a72f8740d5c3588eea01ef8e0ae02288faf264477f80c0e651ccc46f64166f92"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/managed/w-e2b82dc1a741fd2f0a285621/repository.json.pending",
+      "sha256": "a72f8740d5c3588eea01ef8e0ae02288faf264477f80c0e651ccc46f64166f92"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/providers.json",
+      "sha256": "89eba9ee6e9f2175e73eb33c885bc021a5805c4390b8dbf46ccd4b0179b096d7"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/providers.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/state.db",
+      "sha256": "16774dc86e23a46c064a10336277bca9b38bc3ccb31061e9ce6a45ffcb3fe657"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/views/w-b3a3bcd70b5b881c73ba6d6d.md",
+      "sha256": "65735716e6e2e01e0cb781ecf35d9944ab74379fc4e606f32e024525dc03b836"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/views/w-d1955b58297fc4beeffc0e2d.md",
+      "sha256": "61f8fff8fc51d8fafbef108ae70f95dc7c7f9fb9714a82c1dcc1d42d966f5a8e"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/views/w-d56be8bc8de12a25024e079b.md",
+      "sha256": "b95e26e86b8224f7c2c785d5bed5615ac92e0c20047edbbfbfd3ce19489ae288"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": ".swarm/views/w-e2b82dc1a741fd2f0a285621.md",
+      "sha256": "3763b862f1f1d4ce8ff733ffd9cdb13e5cbb9d2df6d757a9e90cd76b2dea1fc7"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": "codex",
+      "sha256": "85ccc11672269dc6570c28ddefcc8178bfb45c367d2a7225732b6fc2bcf1c0dd"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": "codex-home/models_cache.json",
+      "sha256": "ffa10bbf7c6542e441608a1b4c3f4ac1410652360f269f51c6640f660a7c766c"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": "source/tracked.txt",
+      "sha256": "cc7384b68b8a98644c9230ce1953afbde216bd1e2eb56b64069595cf6719724b"
+    },
+    {
+      "root": "/tmp/swarm-model83-wy4x44qc",
+      "path": "source/untracked.txt",
+      "sha256": "24fd9d2a2d2a455b86ed4d7500196f53ef421efb9c06b40a1f522bf98cc76c1f"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/.gitignore",
+      "sha256": "cdbcae15105d6b781e620813c79c7e868740d4e9cc53ce6f5fcbbc12387adf4b"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/engine-settings.json",
+      "sha256": "56e985bb65e1cd1fddf22590245d48aed842bc8a804837b420184a8c94ba1d24"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-0986d6b6576e3a79a4d1329f/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-0986d6b6576e3a79a4d1329f/repository.git/HEAD",
+      "sha256": "1b0f93469caa99507ebb0a72bf2f69c90818cc7b7781ef59880257d940716b3f"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-0986d6b6576e3a79a4d1329f/repository.git/config",
+      "sha256": "1922a0430a20e4badd71655221f9c830f185da5c2e6bd4e5bc188cb485a2c644"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-0986d6b6576e3a79a4d1329f/repository.git/objects/pack/pack-6fa93f7af9c4102b7a85e34a2280e025aaec6415.idx",
+      "sha256": "5c10e2e7cfdd559ad3dcafeecdd52071c2fd8de116ded1b2ff5810851fe35d52"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-0986d6b6576e3a79a4d1329f/repository.git/objects/pack/pack-6fa93f7af9c4102b7a85e34a2280e025aaec6415.pack",
+      "sha256": "c59f939ace7b8b3289c9c1cfee29dde8dbb7ffb0b4473d4baa7a4aa302b861cf"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-0986d6b6576e3a79a4d1329f/repository.git/objects/pack/pack-6fa93f7af9c4102b7a85e34a2280e025aaec6415.rev",
+      "sha256": "4c2c7ad3dcdb267bae578e2c06d96ba205e20354e6c461ef0e3e0089d6a1e442"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-0986d6b6576e3a79a4d1329f/repository.git/packed-refs",
+      "sha256": "e22803bafcd19ac84b4f66726be03ed5f4209b15597132244da651d0be96fc19"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-0986d6b6576e3a79a4d1329f/repository.git/refs/heads/swarm-result",
+      "sha256": "4ae8d5e7e17dfc1e06dae112841cfca709de3c568188b7366f4a35f8e83ec2ac"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-0986d6b6576e3a79a4d1329f/repository.json",
+      "sha256": "d9fbad51bb337738f5fea1481fb83aeeb693a7f3c8aca484f26488b42c8df750"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-0986d6b6576e3a79a4d1329f/repository.json.pending",
+      "sha256": "d9fbad51bb337738f5fea1481fb83aeeb693a7f3c8aca484f26488b42c8df750"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-5bc2b49647942cfaa768b769/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-5bc2b49647942cfaa768b769/repository.git/HEAD",
+      "sha256": "1b0f93469caa99507ebb0a72bf2f69c90818cc7b7781ef59880257d940716b3f"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-5bc2b49647942cfaa768b769/repository.git/config",
+      "sha256": "1922a0430a20e4badd71655221f9c830f185da5c2e6bd4e5bc188cb485a2c644"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-5bc2b49647942cfaa768b769/repository.git/objects/pack/pack-6fa93f7af9c4102b7a85e34a2280e025aaec6415.idx",
+      "sha256": "5c10e2e7cfdd559ad3dcafeecdd52071c2fd8de116ded1b2ff5810851fe35d52"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-5bc2b49647942cfaa768b769/repository.git/objects/pack/pack-6fa93f7af9c4102b7a85e34a2280e025aaec6415.pack",
+      "sha256": "c59f939ace7b8b3289c9c1cfee29dde8dbb7ffb0b4473d4baa7a4aa302b861cf"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-5bc2b49647942cfaa768b769/repository.git/objects/pack/pack-6fa93f7af9c4102b7a85e34a2280e025aaec6415.rev",
+      "sha256": "4c2c7ad3dcdb267bae578e2c06d96ba205e20354e6c461ef0e3e0089d6a1e442"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-5bc2b49647942cfaa768b769/repository.git/packed-refs",
+      "sha256": "e22803bafcd19ac84b4f66726be03ed5f4209b15597132244da651d0be96fc19"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-5bc2b49647942cfaa768b769/repository.git/refs/heads/swarm-result",
+      "sha256": "4ae8d5e7e17dfc1e06dae112841cfca709de3c568188b7366f4a35f8e83ec2ac"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-5bc2b49647942cfaa768b769/repository.json",
+      "sha256": "5807b9db07e02ed108baf1c382c8519b0d9e2d4e5d338fe5d5dd2f18e144700a"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-5bc2b49647942cfaa768b769/repository.json.pending",
+      "sha256": "5807b9db07e02ed108baf1c382c8519b0d9e2d4e5d338fe5d5dd2f18e144700a"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-b437bd3c6e29662438b1bad5/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-b437bd3c6e29662438b1bad5/repository.git/HEAD",
+      "sha256": "1b0f93469caa99507ebb0a72bf2f69c90818cc7b7781ef59880257d940716b3f"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-b437bd3c6e29662438b1bad5/repository.git/config",
+      "sha256": "1922a0430a20e4badd71655221f9c830f185da5c2e6bd4e5bc188cb485a2c644"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-b437bd3c6e29662438b1bad5/repository.git/objects/pack/pack-6fa93f7af9c4102b7a85e34a2280e025aaec6415.idx",
+      "sha256": "5c10e2e7cfdd559ad3dcafeecdd52071c2fd8de116ded1b2ff5810851fe35d52"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-b437bd3c6e29662438b1bad5/repository.git/objects/pack/pack-6fa93f7af9c4102b7a85e34a2280e025aaec6415.pack",
+      "sha256": "c59f939ace7b8b3289c9c1cfee29dde8dbb7ffb0b4473d4baa7a4aa302b861cf"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-b437bd3c6e29662438b1bad5/repository.git/objects/pack/pack-6fa93f7af9c4102b7a85e34a2280e025aaec6415.rev",
+      "sha256": "4c2c7ad3dcdb267bae578e2c06d96ba205e20354e6c461ef0e3e0089d6a1e442"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-b437bd3c6e29662438b1bad5/repository.git/packed-refs",
+      "sha256": "e22803bafcd19ac84b4f66726be03ed5f4209b15597132244da651d0be96fc19"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-b437bd3c6e29662438b1bad5/repository.git/refs/heads/swarm-result",
+      "sha256": "4ae8d5e7e17dfc1e06dae112841cfca709de3c568188b7366f4a35f8e83ec2ac"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-b437bd3c6e29662438b1bad5/repository.json",
+      "sha256": "a1993140bd410846987f70fdcb6e7a43bfe3a744508cbef99033f1a4d9d44995"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/managed/w-b437bd3c6e29662438b1bad5/repository.json.pending",
+      "sha256": "a1993140bd410846987f70fdcb6e7a43bfe3a744508cbef99033f1a4d9d44995"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/providers.json",
+      "sha256": "56b6b9cc6af679a90bb03d59d76aed3fc9e767c01827fc090ecfc9c7f1539052"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/providers.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/state.db",
+      "sha256": "595b83172b8dc7b48fd3acddb88a6de84cfbe41e47b67f32d6ac229ec05dfeb5"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/views/w-0986d6b6576e3a79a4d1329f.md",
+      "sha256": "1afe0a1646cc26bea568a018a732777caaf958fc69af4b8858e0f9cc69980ef4"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/views/w-1346feb685b940c5684b79f5.md",
+      "sha256": "86a8ab0ba32ece1635d44dde33f0cb06cb9e4dd3a79b7e5cad5673e202b778ac"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/views/w-368eaec9d743fc25a4aaa642.md",
+      "sha256": "7ef2f46d6814ee5b7dc7bf2607a4f92acfffef82507cd777b84e0f2d6e75cc26"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/views/w-5bc2b49647942cfaa768b769.md",
+      "sha256": "eb93c0d60f0f40c34c5b631773395d53a0823d67d30448b8433d20e8b3554a1b"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": ".swarm/views/w-b437bd3c6e29662438b1bad5.md",
+      "sha256": "95518a5babeb42dc3cac00a1af41fd33bff0d43302748babe269aef50f8f022a"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": "codex",
+      "sha256": "85ccc11672269dc6570c28ddefcc8178bfb45c367d2a7225732b6fc2bcf1c0dd"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": "codex-home/models_cache.json",
+      "sha256": "ffa10bbf7c6542e441608a1b4c3f4ac1410652360f269f51c6640f660a7c766c"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": "source/tracked.txt",
+      "sha256": "cc7384b68b8a98644c9230ce1953afbde216bd1e2eb56b64069595cf6719724b"
+    },
+    {
+      "root": "/tmp/swarm-model83-xe4h_12q",
+      "path": "source/untracked.txt",
+      "sha256": "24fd9d2a2d2a455b86ed4d7500196f53ef421efb9c06b40a1f522bf98cc76c1f"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/.gitignore",
+      "sha256": "cdbcae15105d6b781e620813c79c7e868740d4e9cc53ce6f5fcbbc12387adf4b"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/engine-settings.json",
+      "sha256": "ca7a6f256d82a9742df58325f8025835038eeb0e4fd479fc7e16cb768638331d"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/managed/w-b62832c61bd68919d3829bcd/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/managed/w-b62832c61bd68919d3829bcd/repository.git/HEAD",
+      "sha256": "1b0f93469caa99507ebb0a72bf2f69c90818cc7b7781ef59880257d940716b3f"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/managed/w-b62832c61bd68919d3829bcd/repository.git/config",
+      "sha256": "c90a806590130318581064d861d48ad1bcdac742193b4fc775d114947586ee7b"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/managed/w-b62832c61bd68919d3829bcd/repository.git/objects/pack/pack-708616c159534d8d5c302c01360914d5aad81c38.idx",
+      "sha256": "75c7234ff57fada43aa6d24502d182e3e56e828233d56052050927b4e5227e53"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/managed/w-b62832c61bd68919d3829bcd/repository.git/objects/pack/pack-708616c159534d8d5c302c01360914d5aad81c38.pack",
+      "sha256": "b698364e8f54be2bdfbf1ced49877bfdafe0b24c20ce46df924b445ba26b1800"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/managed/w-b62832c61bd68919d3829bcd/repository.git/objects/pack/pack-708616c159534d8d5c302c01360914d5aad81c38.rev",
+      "sha256": "6c49bb257b34a75b770e843fa0924188397f7606d471873792e85647840b0ffa"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/managed/w-b62832c61bd68919d3829bcd/repository.git/packed-refs",
+      "sha256": "f20284e1376636a00d8b72a3819adc67c10be1efa4c2ce31b0bf0e33a9c07169"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/managed/w-b62832c61bd68919d3829bcd/repository.git/refs/heads/swarm-result",
+      "sha256": "ec10c54214b08ca206a16de03e344969fd01033e5ddc31c90e3ea38cd4a3b20d"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/managed/w-b62832c61bd68919d3829bcd/repository.json",
+      "sha256": "0df44a382797ece95dce18b48eee37d2a1d690731379502c046d9e8a410f06a6"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/managed/w-b62832c61bd68919d3829bcd/repository.json.pending",
+      "sha256": "0df44a382797ece95dce18b48eee37d2a1d690731379502c046d9e8a410f06a6"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/providers.json",
+      "sha256": "537be8b7aef1a47957bc792d956208218a9cc89e0147be03b4fd88b0abb6d3f9"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/providers.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/state.db",
+      "sha256": "692836c585da82cb85233f7a41c5771fefdfca6b1bb16e5a93d052c2da55af12"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/views/w-1328eabfa6c613f074b1d677.md",
+      "sha256": "dd5cecdcf1873c31631b8671f5f824eb09890883abebd7fec44fb8dc0d89679f"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/views/w-641c1a567c09680c7a360ff4.md",
+      "sha256": "3d16d0be07ef5848f59b4cf81a82711e94271ae0bd526ac3a10715de41252195"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/views/w-b62832c61bd68919d3829bcd.md",
+      "sha256": "0d595102b2546271a53a82722f39001656cfe8886845b757a021e299394cbfbd"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": ".swarm/views/w-c7d08f63f979ab2133c4a284.md",
+      "sha256": "58f25422150c50b532040b0d39e0bb6b3d98894040d60962771ca923946a3fab"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": "codex",
+      "sha256": "85ccc11672269dc6570c28ddefcc8178bfb45c367d2a7225732b6fc2bcf1c0dd"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": "codex-home/models_cache.json",
+      "sha256": "ffa10bbf7c6542e441608a1b4c3f4ac1410652360f269f51c6640f660a7c766c"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": "source/tracked.txt",
+      "sha256": "cc7384b68b8a98644c9230ce1953afbde216bd1e2eb56b64069595cf6719724b"
+    },
+    {
+      "root": "/tmp/swarm-model83-xo_k88dv",
+      "path": "source/untracked.txt",
+      "sha256": "24fd9d2a2d2a455b86ed4d7500196f53ef421efb9c06b40a1f522bf98cc76c1f"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-001.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-001.stdout",
+      "sha256": "7a5a55d6d70b47ba13739304907ea736af2de44f41598b5ce8a474666a75db60"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-002.input.json",
+      "sha256": "535f32c49df5d59662ee2694dbaab4704ec59003c84e1844f74ec4e59e833817"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-002.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-002.stdout",
+      "sha256": "3b911ae39f51747dce817583952d7c319469ed83a5c7130dd6b8e5b5901dda0d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-003.input.json",
+      "sha256": "b3de678baeb2ba4b253f9fe1386815902d847492fe0e3f8d4dd6a7faacaf7fbf"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-003.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-003.stdout",
+      "sha256": "9ed918a410ef1ea69c60461409d7417067e38c8d602d6b4cfe4b4572046c08c1"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-004.input.json",
+      "sha256": "b26c05d07e255069c8a78ac8767eb3642ff2794e2a701db3f131e0c9d9a4fdbc"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-004.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-004.stdout",
+      "sha256": "1e1eff90bcbc67eed4ba1ff74d39956dadebc7e94876aac8bdd650fdcd28905c"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-005.input.json",
+      "sha256": "4e6923c89597e084004d959c477d98bdf0fd6d805623c2bfa46312f357e9e45f"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-005.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-005.stdout",
+      "sha256": "1776ce2ce37d6da0eda6fd0da17fbc925df35a40d338b76adad62bdddbdbc2f5"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-006.input.json",
+      "sha256": "f80178ad46fa4ecc097849ca9b81f1ab0422390419cfdc9941d6a24d9bb4a601"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-006.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-006.stdout",
+      "sha256": "05c85635376ec5bd85a2852ad3f7fc2e082fe9a6416978a8cba258e1aefa10c0"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-007.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-007.stdout",
+      "sha256": "5bf6357683493ee09ab5086edfe2a508ceff8eee117eea82941405b745c86141"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-008.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-008.stdout",
+      "sha256": "0fbc41ee04990394464e5b67009cab1a1b22d4439496c07596bd104ccf81f7ff"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-009.input.json",
+      "sha256": "f80178ad46fa4ecc097849ca9b81f1ab0422390419cfdc9941d6a24d9bb4a601"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-009.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-009.stdout",
+      "sha256": "05c85635376ec5bd85a2852ad3f7fc2e082fe9a6416978a8cba258e1aefa10c0"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-010.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-010.stdout",
+      "sha256": "0fbc41ee04990394464e5b67009cab1a1b22d4439496c07596bd104ccf81f7ff"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-011.input.json",
+      "sha256": "3985747bc6c9087ecaf31bb7595898c3b958e823277f60612f4b14651b95496b"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-011.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-011.stdout",
+      "sha256": "8332156f59ac1ac10c63773e3cc7c42f342a7f13874e8a9c895009744f5a8bfe"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-012.input.json",
+      "sha256": "e48f98137835df2dbef4b5e4428039efcef28496e79cbaf7890788fd845a72ce"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-012.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-012.stdout",
+      "sha256": "b553e6e58af6c5ec2d2f720722841f350947966e729aeef3ee29015bba530f97"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-013.input.json",
+      "sha256": "b1d5822c2e337c4f3a4b1ed4afd753f87c130dfd27ff78ed67b4adee3ba54ba5"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-013.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-013.stdout",
+      "sha256": "d4be56358305fa2a62deaaad637cd8a9e46302ff60969b8b7836c46c2a7eeafc"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-014.input.json",
+      "sha256": "a2a2b0cf52802d5576f7026b908b3edfa67a9e81deb741834b1cdc3cd1df9bb4"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-014.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-014.stdout",
+      "sha256": "a6c71eb16d5fc4233dc41468722457b79386effa9c43b7439de6dd97ba67805b"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-015.input.json",
+      "sha256": "9ef6eb69973cecc84be6565064c853f0fa42670c7df698e0b4360675563fc68d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-015.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-015.stdout",
+      "sha256": "b65a2a79635f0ebe6121eacda9ead770d3e29abeda5db659919d92eb4dd29205"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-016.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-016.stdout",
+      "sha256": "b65a2a79635f0ebe6121eacda9ead770d3e29abeda5db659919d92eb4dd29205"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-017.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-017.stdout",
+      "sha256": "b65a2a79635f0ebe6121eacda9ead770d3e29abeda5db659919d92eb4dd29205"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-018.input.json",
+      "sha256": "fa2352617514b6800d73a118e241e4c9aacf7e396593559d58d9c6ad6a50318c"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-018.stderr",
+      "sha256": "959e0a5cd4de64c986b496963889040d5d79d3896d14849463ab7db34ee7d0f9"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-018.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-019.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-019.stdout",
+      "sha256": "b65a2a79635f0ebe6121eacda9ead770d3e29abeda5db659919d92eb4dd29205"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-020.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-020.stdout",
+      "sha256": "b65a2a79635f0ebe6121eacda9ead770d3e29abeda5db659919d92eb4dd29205"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-021.input.json",
+      "sha256": "5287feb3cab443f085299b8ee7743d836c693f9a9962ebacf38f91754a024758"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-021.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-021.stdout",
+      "sha256": "5719c81498549aa27d2cb3a2b094e36c10b55ff852068add29f969c29925b170"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-022.input.json",
+      "sha256": "6f32ea06536538d289a9c43609df18c9566841bd7ed203cb8d06e888ebf267a2"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-022.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-022.stdout",
+      "sha256": "33d5e023a296bd756ea64dbd454c3441a1055e3b4f1eb4f1c3ff701584d06e58"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-023.input.json",
+      "sha256": "28c51dee93c9ba262b4c879f09a5a263e4ebc88f4354c3482ed2460318db9768"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-023.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-023.stdout",
+      "sha256": "90ab30be518490f07e0be84a29f3247b8f1e5c38f154f2f310805ad2790fcf5d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-024.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-024.stdout",
+      "sha256": "90ab30be518490f07e0be84a29f3247b8f1e5c38f154f2f310805ad2790fcf5d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-025.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-025.stdout",
+      "sha256": "90ab30be518490f07e0be84a29f3247b8f1e5c38f154f2f310805ad2790fcf5d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-026.input.json",
+      "sha256": "1ff3e8f172e2a50737999793478ed595dafed15575ab780f90eeb64990931759"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-026.stderr",
+      "sha256": "4e141619deb223d9c3b26abea17d00b82e22a869a6eeefdd685c1fd1ac1057f6"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-026.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-027.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-027.stdout",
+      "sha256": "90ab30be518490f07e0be84a29f3247b8f1e5c38f154f2f310805ad2790fcf5d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-028.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-028.stdout",
+      "sha256": "90ab30be518490f07e0be84a29f3247b8f1e5c38f154f2f310805ad2790fcf5d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-029.input.json",
+      "sha256": "696d14064f47913b2c679deef1c0cd2c9328c4dba7f69cc6b41515d89da907a9"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-029.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-029.stdout",
+      "sha256": "2b681497a074e486dc732dd46e570fe70ec0e6e867fd756b8925afa0050ff4a2"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-030.input.json",
+      "sha256": "d7a2ebe8b9fa1db3417c3030814c154204096f606a53be93a5e64618f4d570b7"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-030.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-030.stdout",
+      "sha256": "17cdb5f4d064fd113796f41a14f9388445c7e05cb2a88505d6a62139235ff8d7"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-031.input.json",
+      "sha256": "c0e17aacfb583f781a69c4faae7b679fe34d375856140e54f6b3af4b6f059c5e"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-031.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-031.stdout",
+      "sha256": "10dea180c628b66b5a5ad3fbb8752e29301a48fd21a0254cb47a310b299e9da9"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-032.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-032.stdout",
+      "sha256": "10dea180c628b66b5a5ad3fbb8752e29301a48fd21a0254cb47a310b299e9da9"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-033.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-033.stdout",
+      "sha256": "10dea180c628b66b5a5ad3fbb8752e29301a48fd21a0254cb47a310b299e9da9"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-034.input.json",
+      "sha256": "7f1fb73e75b27670e8a0aeda46ebf8659a28983fa9d48ed3c9ff30ab99ef379f"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-034.stderr",
+      "sha256": "2d59250fa2bd178790d2a4d6101fc0e3f21127b8975f9218db6a7605e1dbd56c"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-034.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-035.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-035.stdout",
+      "sha256": "10dea180c628b66b5a5ad3fbb8752e29301a48fd21a0254cb47a310b299e9da9"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-036.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-036.stdout",
+      "sha256": "10dea180c628b66b5a5ad3fbb8752e29301a48fd21a0254cb47a310b299e9da9"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-037.input.json",
+      "sha256": "b958498ac15c3345c757b5075431245d89f338f7a1b81ff38cf94ac94bb71685"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-037.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-037.stdout",
+      "sha256": "fedd72186b636bc460760d659f3e73b110f846e259c4457ef600b2d348aff5bd"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-038.input.json",
+      "sha256": "2c6b0b4a876ef7d12ac546434f6d8e10cea9cb8e6c3c0db5b90f53405f7515b6"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-038.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-038.stdout",
+      "sha256": "4d6c2941b53c80334d7afef425829991cb7f800a2791e75cceea3fb8de08016f"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-039.input.json",
+      "sha256": "033b74b2587a2b3e17586b8a9fd1790797b18eaa15bbac7d9a2de6a1322f6c87"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-039.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-039.stdout",
+      "sha256": "8bba539a145c47bb66e04812751d2f8bf7bbd2cf5f4b6c3198eab85c6eda5599"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-040.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-040.stdout",
+      "sha256": "8bba539a145c47bb66e04812751d2f8bf7bbd2cf5f4b6c3198eab85c6eda5599"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-041.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-041.stdout",
+      "sha256": "8bba539a145c47bb66e04812751d2f8bf7bbd2cf5f4b6c3198eab85c6eda5599"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-042.input.json",
+      "sha256": "be8f3c7824c23eb71c70c84be56492be1954a996b68c6eb3b00407df86153bd2"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-042.stderr",
+      "sha256": "2d59250fa2bd178790d2a4d6101fc0e3f21127b8975f9218db6a7605e1dbd56c"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-042.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-043.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-043.stdout",
+      "sha256": "8bba539a145c47bb66e04812751d2f8bf7bbd2cf5f4b6c3198eab85c6eda5599"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-044.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-044.stdout",
+      "sha256": "8bba539a145c47bb66e04812751d2f8bf7bbd2cf5f4b6c3198eab85c6eda5599"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-045.input.json",
+      "sha256": "a43ac05fcf536ce072ecab64655bd02d49d0cc646aba0a1d5e5ccfcd9b8deb30"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-045.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-045.stdout",
+      "sha256": "25c20ecdcc5c870ae9c06819afc25b262eed299472c84b5492cfac0865569b97"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-046.input.json",
+      "sha256": "66f7c5dd215edc32e0e91b2d6b59ef8b7986f803f561c762d71b0ea93a2fdbf6"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-046.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-046.stdout",
+      "sha256": "bbb2c2c30242f283f890effb2bc951bbc539f7eb0a4d60cb607343fdb30b6dcf"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-047.input.json",
+      "sha256": "602d3a1f821195ec58d5c00c32315e81f5aadf143c4702418dbd7f7a78a00a67"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-047.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-047.stdout",
+      "sha256": "b4cdc7fa218b200190885967eeb4a5ee11bbab2e31843a6ae3171efdc8b35ab8"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-048.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-048.stdout",
+      "sha256": "b4cdc7fa218b200190885967eeb4a5ee11bbab2e31843a6ae3171efdc8b35ab8"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-049.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-049.stdout",
+      "sha256": "b4cdc7fa218b200190885967eeb4a5ee11bbab2e31843a6ae3171efdc8b35ab8"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-050.input.json",
+      "sha256": "daca5f3a3abd17c742b7e3982c700ceac12bd54080bf0359988718d0d5f3aaf9"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-050.stderr",
+      "sha256": "48e65d00ea656bda0221e23d8bccfb83792f753bc3e50fc2b1c07160bb4a425e"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-050.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-051.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-051.stdout",
+      "sha256": "b4cdc7fa218b200190885967eeb4a5ee11bbab2e31843a6ae3171efdc8b35ab8"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-052.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-052.stdout",
+      "sha256": "b4cdc7fa218b200190885967eeb4a5ee11bbab2e31843a6ae3171efdc8b35ab8"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-053.input.json",
+      "sha256": "363dd32a87ff5bba283d305d581c4ad089180cf77b56aa427e37e5daeb824811"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-053.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-053.stdout",
+      "sha256": "88a72c7c063614f3af28c2a584f9bb92968d5b18f084d49f05951eff04dd87f4"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-054.input.json",
+      "sha256": "4cd1a37e9a0c44b765f6652a8812126d9a3f9ccec271242ae64f838ce52f71be"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-054.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-054.stdout",
+      "sha256": "6a77cc5cbd9751c79d1b4d05899e323027c6c5904bb9e3c4a52afe4b0d73828a"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-055.input.json",
+      "sha256": "2d9f75a81462dd1a7b616447589c6c92301c863f724fa3d32c2c2d29df97d5e4"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-055.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-055.stdout",
+      "sha256": "fef62005075c946060b9dcb30da293afea0a991be6c7cf1e04ade5e8895acaa7"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-056.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-056.stdout",
+      "sha256": "fef62005075c946060b9dcb30da293afea0a991be6c7cf1e04ade5e8895acaa7"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-057.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-057.stdout",
+      "sha256": "fef62005075c946060b9dcb30da293afea0a991be6c7cf1e04ade5e8895acaa7"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-058.input.json",
+      "sha256": "85e23cea8445369f1397ed9ccebbfb5df070aec22447d2ffdd49990cf689dafe"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-058.stderr",
+      "sha256": "4a692fad23fd67867c504ee1511dac7d360daa3317f005553e5605fa7d6d116f"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-058.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-059.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-059.stdout",
+      "sha256": "fef62005075c946060b9dcb30da293afea0a991be6c7cf1e04ade5e8895acaa7"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-060.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-060.stdout",
+      "sha256": "fef62005075c946060b9dcb30da293afea0a991be6c7cf1e04ade5e8895acaa7"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-061.input.json",
+      "sha256": "73ebc212e5f6860e090f7da2fa682cb64701c6428dec40aee7a89982942358cd"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-061.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-061.stdout",
+      "sha256": "ab86a005c5fb93ceba3c9e1d81d6cd5eaff4800d651add30ff96f1478cb30f2a"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-062.input.json",
+      "sha256": "9bf576c1a7d78e22832cd1a851b897c3b2506c1cba19df5296b7316af9e39cce"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-062.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-062.stdout",
+      "sha256": "c9edc5af0f94fcb85439877a36f8bdb6c3f519d4ae76e10014c2b07463ce1402"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-063.input.json",
+      "sha256": "b69ea73070a38543b34fe18748e096c735197e3e1c172bf67a2a6181f06f0e98"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-063.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-063.stdout",
+      "sha256": "a177e8c9d4a5168111b5c5e4e4e613a014e768957b7bb18783e69f8f578fcf72"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-064.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-064.stdout",
+      "sha256": "a177e8c9d4a5168111b5c5e4e4e613a014e768957b7bb18783e69f8f578fcf72"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-065.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-065.stdout",
+      "sha256": "a177e8c9d4a5168111b5c5e4e4e613a014e768957b7bb18783e69f8f578fcf72"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-066.input.json",
+      "sha256": "4f7e5e923982fddeec4851ba994e05d9dd90bcca9e9ecfaa24ecf5b1e30c3a82"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-066.stderr",
+      "sha256": "dea9eedf4f88d39ce5ff265b4b38aa15d471086ffd9070a204d527d7c086f66d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-066.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-067.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-067.stdout",
+      "sha256": "a177e8c9d4a5168111b5c5e4e4e613a014e768957b7bb18783e69f8f578fcf72"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-068.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-068.stdout",
+      "sha256": "a177e8c9d4a5168111b5c5e4e4e613a014e768957b7bb18783e69f8f578fcf72"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-069.input.json",
+      "sha256": "f7092b6f0771d6d6435dfae0e75ee5406ad9b642e6dacb7b1475ca1ba79122d2"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-069.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-069.stdout",
+      "sha256": "dba01f2f71fbaf3c7cec8244b4670ab99699e39c6c62011ed1e6fd42a83c6a19"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-070.input.json",
+      "sha256": "d5c95afecf34a73f81c288291eb6690e55c9674c83381a826573c7e3878e1752"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-070.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-070.stdout",
+      "sha256": "5d2f044837cd6e478ec1e8d06f83f600ec76b1881660355dcbfeaaca0a5b3e42"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-071.input.json",
+      "sha256": "9a2e77f78eee98dcb304cbdbc9a986be25809194d45fe02d3a8f079623a5966e"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-071.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-071.stdout",
+      "sha256": "05bf367b7356529d13bfe2a13b8ced181c211b7e8febcf29f01d7baec730d020"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-072.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-072.stdout",
+      "sha256": "05bf367b7356529d13bfe2a13b8ced181c211b7e8febcf29f01d7baec730d020"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-073.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-073.stdout",
+      "sha256": "05bf367b7356529d13bfe2a13b8ced181c211b7e8febcf29f01d7baec730d020"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-074.input.json",
+      "sha256": "ebe0333e3efcf5870a52bb15e44662575ec3fc13d9d28fadcb8645473374dd63"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-074.stderr",
+      "sha256": "216276193cbd8edcc44a9960b10a1f4c0ecff4265a5ce55fa64875d09e15f924"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-074.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-075.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-075.stdout",
+      "sha256": "05bf367b7356529d13bfe2a13b8ced181c211b7e8febcf29f01d7baec730d020"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-076.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-076.stdout",
+      "sha256": "05bf367b7356529d13bfe2a13b8ced181c211b7e8febcf29f01d7baec730d020"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-077.input.json",
+      "sha256": "18cad2841b0df6ef59c4431a0705a4753f9b28275e132622ffe3bfb88dec8b1f"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-077.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-077.stdout",
+      "sha256": "6400e40e2fc4c15dab8e93e67e2e16ab2ea6af4332700264fedf9c606bc019eb"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-078.input.json",
+      "sha256": "5b8785ca1ada3c63363be04b623c459b50b23a52b7e82183d51f3356b9a85d11"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-078.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-078.stdout",
+      "sha256": "b3046efa18e6b1b2f7936c16253cc7a43df3d30250a721954d5cb7c156a70771"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-079.input.json",
+      "sha256": "80718366bee85a2a6dd90b766681b5e3ab67ec2bf74b6ea73cc0e8b93fee7bdc"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-079.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-079.stdout",
+      "sha256": "644f169c033f99677d799fbe21d408f4e0871e2750806a108f0ef0289722d5a6"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-080.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-080.stdout",
+      "sha256": "644f169c033f99677d799fbe21d408f4e0871e2750806a108f0ef0289722d5a6"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-081.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-081.stdout",
+      "sha256": "644f169c033f99677d799fbe21d408f4e0871e2750806a108f0ef0289722d5a6"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-082.input.json",
+      "sha256": "a0dca7b410add28ba9a13c716f010f7c9af78ec61f304485bd908066f054bd0f"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-082.stderr",
+      "sha256": "4553635b8aee6cb42838c231f754e582dab35ed809fb4c62938e0c8aa9c60e4c"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-082.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-083.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-083.stdout",
+      "sha256": "644f169c033f99677d799fbe21d408f4e0871e2750806a108f0ef0289722d5a6"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-084.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-084.stdout",
+      "sha256": "644f169c033f99677d799fbe21d408f4e0871e2750806a108f0ef0289722d5a6"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-commands.json",
+      "sha256": "f9fb2b37dc05b53a28031ac2b4f6e66cc4f6077eabf040ae35917839571394fb"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "bootstrap-fixture.json",
+      "sha256": "1f1b31a8fa51799ee66ffbf65c7029837333b02d6faa0418ebc3f1d99acf4ec5"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "inputs.json",
+      "sha256": "d97a3e06d127a9ea2ff051a4ab46de7ff6456a09a5fa63948bc4f23840b5a5a0"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "owned-root-0c8fe1bdb1bc0813dad06e47f8ae9032ae090429ed16f3741c45c9c7bffedf76.json",
+      "sha256": "40519beba690a0f1d3fd1e5bb0ff81a90e4917e8d8555deff5bea596b5e9f692"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "result.json",
+      "sha256": "e7672774eaa0c3805d64fca7bf5646f9792067f361ea8a19a04f10004c264cb4"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "source-rust_agent_model_route.py",
+      "sha256": "fa2bad462b761024c15d3705ac26996385cb53e7b41bf4ae409a11570bf18145"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/bootstrap1329",
+      "path": "source-rust_planning_bootstrap.py",
+      "sha256": "616030118522e7ecc039eecb38d93f86a964256bb6c5a72e13ceae550741f555"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "failure.json",
+      "sha256": "ddd30d527f1503d8d765a5c0ad52d21a033b37fe9d6f63653fe80aa9ceb40b93"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "fixture.json",
+      "sha256": "0267804c1b30f7cdb2fc2a7c5d0ddb5d790c3aa492ae8d067d7d1358e21e21e5"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-001.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-001.stdout",
+      "sha256": "96658936d5ebbd3c464e407f12dcd39c587f89d1b19cb0702d77d78991159b9d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-002.input.json",
+      "sha256": "535f32c49df5d59662ee2694dbaab4704ec59003c84e1844f74ec4e59e833817"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-002.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-002.stdout",
+      "sha256": "87e27ec2199512aefa52b137db6423a68636f66cd91b104a35e47d4a88d94b58"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-003.input.json",
+      "sha256": "b3de678baeb2ba4b253f9fe1386815902d847492fe0e3f8d4dd6a7faacaf7fbf"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-003.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-003.stdout",
+      "sha256": "7828601d0287b8274febe98e8ac3fb31d598f04948865f21d2a9711ecc0eb646"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-004.input.json",
+      "sha256": "b26c05d07e255069c8a78ac8767eb3642ff2794e2a701db3f131e0c9d9a4fdbc"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-004.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-004.stdout",
+      "sha256": "bc94331e2f199f89834410588c63800eccc593b22444b1a1fe82218402e67fad"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-005.input.json",
+      "sha256": "7badb9f9e807629a58a01b5a0953f382f043e816e2323905940f8057b5086c92"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-005.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-005.stdout",
+      "sha256": "a5b8897009846e11e5316885dc6b750e06bc96e29961a0d19a3e19bf63ce9d21"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-006.input.json",
+      "sha256": "26ea8c05f3d2afaab6a1664caf8d7585d49bbaf92c4663676e2fdbb0325d455f"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-006.stderr",
+      "sha256": "b8892ce97fd6aecb9977422ff50f749013421e6722d2e6bb3bf53654eec560cf"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-006.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-commands.json",
+      "sha256": "ff85ed410f6b2f61437b3f362b3d6c5007bb57658ff3050c86878c4e0566f213"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/managed-bootstrap-fixture.json",
+      "sha256": "0abc897b167432631c2e4877e59646489d0b75f9c28699ecd1b41435431ed0ea"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/red1316",
+      "path": "setup/owned-root-486439f43f2e63aac6ec7831073a307d6600d92c167ff9a2750f8d3aa04c4c75.json",
+      "sha256": "e94cd02a1b17c192772282c8ee9e5786751ed47b71993c6a0a5e34564d0cb038"
+    }
+  ],
+  "excluded": [
+    "/tmp/swarm-model83-__6ylppj/source/.git/COMMIT_EDITMSG",
+    "/tmp/swarm-model83-__6ylppj/source/.git/HEAD",
+    "/tmp/swarm-model83-__6ylppj/source/.git/config",
+    "/tmp/swarm-model83-__6ylppj/source/.git/description",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/applypatch-msg.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/commit-msg.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/fsmonitor-watchman.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/post-update.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/pre-applypatch.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/pre-commit.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/pre-merge-commit.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/pre-push.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/pre-rebase.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/pre-receive.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/prepare-commit-msg.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/push-to-checkout.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/sendemail-validate.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/hooks/update.sample",
+    "/tmp/swarm-model83-__6ylppj/source/.git/index",
+    "/tmp/swarm-model83-__6ylppj/source/.git/info/exclude",
+    "/tmp/swarm-model83-__6ylppj/source/.git/logs/HEAD",
+    "/tmp/swarm-model83-__6ylppj/source/.git/logs/refs/heads/master",
+    "/tmp/swarm-model83-__6ylppj/source/.git/objects/7c/5cd7b4c045d5c64d999cb7db687ca27b95be93",
+    "/tmp/swarm-model83-__6ylppj/source/.git/objects/9e/f146b908a36832d9631d9ad659a6985b6029fe",
+    "/tmp/swarm-model83-__6ylppj/source/.git/objects/da/6d43aa8af5d54c0f1352b785960d7acedde97b",
+    "/tmp/swarm-model83-__6ylppj/source/.git/refs/heads/master",
+    "/tmp/swarm-model83-k27bttx9/source/.git/COMMIT_EDITMSG",
+    "/tmp/swarm-model83-k27bttx9/source/.git/HEAD",
+    "/tmp/swarm-model83-k27bttx9/source/.git/config",
+    "/tmp/swarm-model83-k27bttx9/source/.git/description",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/applypatch-msg.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/commit-msg.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/fsmonitor-watchman.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/post-update.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/pre-applypatch.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/pre-commit.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/pre-merge-commit.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/pre-push.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/pre-rebase.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/pre-receive.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/prepare-commit-msg.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/push-to-checkout.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/sendemail-validate.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/hooks/update.sample",
+    "/tmp/swarm-model83-k27bttx9/source/.git/index",
+    "/tmp/swarm-model83-k27bttx9/source/.git/info/exclude",
+    "/tmp/swarm-model83-k27bttx9/source/.git/logs/HEAD",
+    "/tmp/swarm-model83-k27bttx9/source/.git/logs/refs/heads/master",
+    "/tmp/swarm-model83-k27bttx9/source/.git/objects/9e/f146b908a36832d9631d9ad659a6985b6029fe",
+    "/tmp/swarm-model83-k27bttx9/source/.git/objects/d7/c01a108a7807f02e43e5bcb27a47f1a9817bf9",
+    "/tmp/swarm-model83-k27bttx9/source/.git/objects/da/6d43aa8af5d54c0f1352b785960d7acedde97b",
+    "/tmp/swarm-model83-k27bttx9/source/.git/refs/heads/master",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/COMMIT_EDITMSG",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/HEAD",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/config",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/description",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/applypatch-msg.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/commit-msg.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/fsmonitor-watchman.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/post-update.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/pre-applypatch.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/pre-commit.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/pre-merge-commit.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/pre-push.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/pre-rebase.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/pre-receive.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/prepare-commit-msg.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/push-to-checkout.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/sendemail-validate.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/hooks/update.sample",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/index",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/info/exclude",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/logs/HEAD",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/logs/refs/heads/master",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/objects/44/f0afc9a81d25e3c1ca1919d0e8d5f10e6ca77f",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/objects/9e/f146b908a36832d9631d9ad659a6985b6029fe",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/objects/da/6d43aa8af5d54c0f1352b785960d7acedde97b",
+    "/tmp/swarm-model83-wy4x44qc/source/.git/refs/heads/master",
+    "/tmp/swarm-model83-xe4h_12q/.swarm/web-session-c06b14763cf4f82f",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/COMMIT_EDITMSG",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/HEAD",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/config",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/description",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/applypatch-msg.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/commit-msg.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/fsmonitor-watchman.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/post-update.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/pre-applypatch.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/pre-commit.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/pre-merge-commit.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/pre-push.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/pre-rebase.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/pre-receive.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/prepare-commit-msg.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/push-to-checkout.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/sendemail-validate.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/hooks/update.sample",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/index",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/info/exclude",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/logs/HEAD",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/logs/refs/heads/master",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/objects/22/dbb0dd8b22cd0f3aafb57c5371cc0361c61544",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/objects/9e/f146b908a36832d9631d9ad659a6985b6029fe",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/objects/da/6d43aa8af5d54c0f1352b785960d7acedde97b",
+    "/tmp/swarm-model83-xe4h_12q/source/.git/refs/heads/master",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/COMMIT_EDITMSG",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/HEAD",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/config",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/description",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/applypatch-msg.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/commit-msg.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/fsmonitor-watchman.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/post-update.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/pre-applypatch.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/pre-commit.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/pre-merge-commit.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/pre-push.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/pre-rebase.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/pre-receive.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/prepare-commit-msg.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/push-to-checkout.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/sendemail-validate.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/hooks/update.sample",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/index",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/info/exclude",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/logs/HEAD",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/logs/refs/heads/master",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/objects/5e/add3ebd618bff4fafe4a6c2a8543fd6e5fff0b",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/objects/9e/f146b908a36832d9631d9ad659a6985b6029fe",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/objects/da/6d43aa8af5d54c0f1352b785960d7acedde97b",
+    "/tmp/swarm-model83-xo_k88dv/source/.git/refs/heads/master"
+  ],
+  "archive_sha256": "a0d682d8ff2b9fac874b10cf518fae06a5603a4652f8f639ba42ac0e76ec78c9",
+  "verified": true
+}

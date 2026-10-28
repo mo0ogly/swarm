@@ -8,7 +8,7 @@ cette distinction est consignée dans les fiches de lecture du dépôt.
 
 ## 2.1 Orchestration d'agents et défaillances
 
-Les rapports de Cursor décrivent l'organisation la plus aboutie publiquement : des planificateurs
+Les rapports de Cursor décrivent une organisation d’agents à grande échelle : des planificateurs
 et sous-planificateurs répartissent le travail entre des exécutants à périmètre limité, reliés
 par des passations structurées [Lin 2026a]. Le retrait de l'intégrateur central et l'acceptation
 d'un taux d'erreur non nul y sont des choix d'ingénierie explicites. La version suivante consigne
@@ -17,15 +17,18 @@ discutant le coût selon le mélange de modèles [Lin 2026b]. Anthropic rapporte
 de recherche multi-agents, une consommation de l'ordre de quinze fois celle d'une conversation et
 recommande des protections déterministes comme la reprise et les points de sauvegarde
 [Hadfield 2025]. Ces textes sont des rapports d'ingénierie, non évalués par des pairs ; ils
-documentent surtout des travaux réversibles.
+documentent surtout la recherche et la production d’artefacts intermédiaires. Cursor décrit
+aussi des contrôles avant livraison et une infrastructure de coordination : notre proposition
+porte sur la médiation de chaque transition avant un effet externe, et non sur une absence
+supposée de contrôle déterministe chez Cursor.
 
 Du côté de l'analyse, Cemri et al. étudient 1 642 traces de systèmes multi-agents et proposent la
 taxonomie MAST : quatorze modes de défaillance répartis entre conception du système, désalignement
 entre agents et vérification des tâches, avec un accord inter-annotateurs de κ = 0,88
-[Cemri 2025]. La vérification absente, incomplète ou incorrecte y figure en bonne place. MAST ne
-contient en revanche aucune catégorie pour les défauts de l'orchestrateur lui-même : un moteur qui
-applique une règle erronée, ou une règle juste mais mal calibrée, n'y a pas de place. La question
-d'attribution QR3 part de ce manque.
+[Cemri 2025]. La vérification absente, incomplète ou incorrecte y figure en bonne place. MAST contient une catégorie de défauts de conception du système. Elle ne doit donc pas être
+présentée comme ignorant l’orchestration. QR3 propose une distinction opérationnelle plus fine
+entre défaut de moteur transactionnel, politique mal calibrée, faute de l’agent et environnement,
+à confronter aux catégories existantes plutôt qu’à supposer absente de toute analyse antérieure.
 
 ## 2.2 Contrôle des actions à l'exécution
 
@@ -47,8 +50,10 @@ irréversible et souligne que le blocage modifie lui-même la suite de l'exécut
 
 Une seconde famille sépare par conception ce que le modèle décide de ce qu'il exécute. CaMeL
 extrait les flux de contrôle et de données de la requête de confiance, de sorte que des données
-non fiables ne modifient jamais le flux du programme ; il résout 77 % des tâches d'AgentDojo avec
-une sécurité prouvable, contre 84 % sans défense [Debenedetti 2025]. Beurer-Kellner et al.
+non fiables ne modifient jamais le flux du programme ; le résumé de la v1 annonce
+67 % des tâches d'AgentDojo avec sécurité prouvable [Debenedetti 2025]. Ce chiffre
+corrige le 16 octobre une citation antérieure non justifiée, voir § 2.7.
+Beurer-Kellner et al.
 recensent six motifs de conception, dont « planifier puis exécuter », où le modèle formule une
 liste fixe d'actions exécutée ensuite [Beurer-Kellner 2025]. Notre séparation entre la préparation
 d'un lot et son règlement déterministe relève de ce motif. Ces travaux visent l'injection de
@@ -108,6 +113,49 @@ qualifie pas leur efficacité, qui relève de leurs propres évaluations.
 | Workflow fidelity [Huang 2026] | Trajectoire d'exécution | Métrique ; gardes déterministes | Non | 18 modèles, 90 000 tâches |
 | **Ce travail** | Cycle de vie de la tentative et exécution de l'effet | Moteur et exécutant déterministes | Oui | Banc synthétique, 8 types de fautes, 9 000 exécutions scriptées et 90 avec agent réel |
 
-Le manque que ce travail vise est donc précis : aucun des travaux recensés ne combine la
-médiation du cycle de vie des tentatives (lancement, reprise, acceptation), le lien entre la
-preuve et le candidat exécuté, et une évaluation sous fautes ordinaires avec et sans médiation.
+La question de composition visée relie le cycle de vie des tentatives (lancement,
+reprise, acceptation), la preuve liée au candidat et l'évaluation sous fautes avec
+et sans médiation. Ce tableau historique restreint ne suffit pas à prouver
+l'absence d'un travail équivalent. L'actualisation identité ci-dessous ajoute
+des antécédents directs à examiner avant toute revendication de nouveauté.
+
+
+## 2.6 Actualisation du corpus moteur — 10 octobre 2026
+
+Cursor reste le corpus prioritaire : janvier et février sont conservés, avec les évolutions
+sur les swarms de juillet [Lin 2026b], l’évaluation du moteur d’avril [Heule-Katz 2026] et
+l’efficacité du contexte de septembre [Katz et al. 2026]. Il faut comparer les versions plutôt
+que supposer une architecture fixe. Cette recherche est complétée par Google/Gemini
+[Google ADK 2026 ; Google Deep Research 2026], OpenAI [Bolin 2026 ; Lopopolo 2026] et
+Anthropic [Rajasekaran 2026 ; Martin et al. 2026]. Ce sont des sources industrielles primaires,
+pas une certification de Swarm. Les fiches distinguent mécanismes décrits, limites et hypothèses
+à tester ; les résultats fournisseurs ne sont pas transposés en résultats du dépôt.
+
+La [comparaison détaillée et le protocole](../article-scientifique/fiches-lecture.md#5-moteur-swarm--sources-industrielles-actualisées-au-10-octobre-2026)
+portent sur coordination, mémoire, jugement, contrôle du flux, débit et coût. Leur ajout est
+une actualisation documentaire ; il ne modifie pas les résultats expérimentaux des sections suivantes.
+
+## 2.7 Identité, délégation et gouvernance du parcours — 16 octobre 2026
+
+La [note dédiée](../article-scientifique/identites-autorite-cycle-vie.md)
+complète ce corpus par South et al. (délégation authentifiée, 2025), Agentic JWT
+(identité, délégation et étape du workflow, 2025), MI9 (gouvernance continue,
+v4 de 2025), les recommandations CoSAI et le projet NCCoE/NIST de 2026.
+Elle relit Policies on Paths sous l'angle identité/parcours et compare les
+annonces de TRUST OR et AgentRail aux documentations Entra Agent ID,
+SPIFFE/SPIRE et Temporal. Sources primaires, versions consultées et limites
+figurent dans cette note ; les fonctions commerciales n'ont pas été testées.
+
+Les formulations anciennes de ce chapitre centrées sur l'appel d'outil ne
+doivent donc pas être étendues à tout l'état de l'art. La nouveauté de
+l'identité tout au long du workflow et du contrôle continu **n'est pas établie**.
+La contribution candidate porte sur une composition précisément définie et
+évaluée : admission, ancrage d'instance, délégation, révocation, preuves et reprise.
+La comparaison doit inclure un workflow doté de contrôles équivalents.
+
+Correction bibliographique SCI-ID-04 : le résumé CaMeL de la
+[v1 du 24 mars 2025](https://arxiv.org/html/2503.18813v1), vérifié le 16 octobre,
+annonce 67 %. Le couple 77 % / 84 % précédemment cité sans justification est
+retiré de § 2.2 et de la fiche de lecture. L'origine exacte de l'ancienne erreur
+n'est pas établie. Les formulations antérieures restent consignées dans la note
+et ses preuves ; les résultats historiques de Swarm ne changent pas.

@@ -1,0 +1,6 @@
+=== RUN   TestKernelObserveFailedAcquisitionCleanup
+    kernel_observe_cleanup_test.go:17: failed cleanup reported clean after acquisition failure
+--- FAIL: TestKernelObserveFailedAcquisitionCleanup (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.104s
+FAIL

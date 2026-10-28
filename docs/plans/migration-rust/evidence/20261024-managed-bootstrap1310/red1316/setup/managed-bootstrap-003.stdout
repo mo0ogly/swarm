@@ -1,0 +1,182 @@
+{
+  "work": {
+    "schema_version": 1,
+    "id": "w-318fbbd7949e5a59c495ea4b",
+    "revision": 2,
+    "title": "Requested model fixture",
+    "objective": "Observe route",
+    "scope": "Owned local program",
+    "criteria": [
+      "Observed, not accepted"
+    ],
+    "next": "",
+    "summary": "",
+    "memory": null,
+    "created": "2026-10-24T11:15:10.897522413Z",
+    "updated": "2026-10-24T11:15:10.986951425Z",
+    "git": {
+      "head": "",
+      "branch": "",
+      "changes": ""
+    },
+    "tasks": [
+      {
+        "plan_checks": {
+          "plan-criterion-1": "validation",
+          "plan-delivery": "delivery",
+          "plan-entry": "entry",
+          "plan-validation": "validation"
+        },
+        "id": "task",
+        "title": "Run",
+        "owner": "",
+        "deliverable": "Evidence",
+        "criteria": [
+          "Observed, not accepted"
+        ],
+        "depends": null,
+        "status": "todo",
+        "blocker": "",
+        "next": "",
+        "attempts": []
+      }
+    ]
+  },
+  "validation": {
+    "state": "open",
+    "label": "OUVERT",
+    "validated": 0,
+    "historical": 0,
+    "stale": 0,
+    "tasks": {
+      "task": {
+        "state": "todo",
+        "fresh": false,
+        "blockers": [],
+        "owner": "Responsable à désigner",
+        "next": "",
+        "evidence": {
+          "attempt_id": "unknown",
+          "revision": 2,
+          "freshness": "unknown",
+          "observed_at": "unknown",
+          "report_review": {
+            "state": "not_configured",
+            "attempt_id": "unknown",
+            "reviewer": "unknown",
+            "at": "unknown",
+            "limits": [
+              "Aucune revue indépendante du rapport n’est configurée."
+            ]
+          },
+          "controls": {
+            "state": "unknown",
+            "items": [
+              {
+                "id": "unknown",
+                "attempt_id": "unknown",
+                "execution": "unknown",
+                "revision": "unknown",
+                "candidate_sha": "unknown",
+                "command": [],
+                "exit_code": null,
+                "started_at": "unknown",
+                "finished_at": "unknown",
+                "wall_duration_ms": null,
+                "cpu_duration_ms": null,
+                "cost": "unknown",
+                "tokens": "unknown",
+                "freshness": "unknown",
+                "result": "unknown",
+                "limits": [
+                  "Aucun reçu d’exécution moteur : une citation du rapport ou un statut de gate ne démontre ni la commande ni son code de sortie."
+                ]
+              }
+            ],
+            "history": [],
+            "longest_measured": []
+          },
+          "acceptance": {
+            "state": "not_accepted",
+            "revision": "unknown",
+            "at": "unknown"
+          },
+          "limits": [
+            "Les valeurs unknown ne constituent pas un succès."
+          ]
+        }
+      }
+    }
+  },
+  "events": [
+    {
+      "id": "create",
+      "work_id": "w-318fbbd7949e5a59c495ea4b",
+      "revision": 1,
+      "kind": "work.create",
+      "at": "2026-10-24T11:15:10.913324456Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "create",
+        "expected_revision": 0,
+        "title": "Requested model fixture",
+        "objective": "Observe route",
+        "scope": "Owned local program",
+        "criteria": [
+          "Observed, not accepted"
+        ]
+      }
+    },
+    {
+      "id": "add",
+      "work_id": "w-318fbbd7949e5a59c495ea4b",
+      "revision": 2,
+      "kind": "task.add",
+      "at": "2026-10-24T11:15:10.986951425Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "add",
+        "expected_revision": 1,
+        "id": "task",
+        "title": "Run",
+        "criteria": [
+          "Observed, not accepted"
+        ],
+        "deliverable": "Evidence"
+      }
+    }
+  ],
+  "current_gates": {},
+  "current_git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "resume_markdown": "# Requested model fixture\n\nTravail : w-318fbbd7949e5a59c495ea4b | révision 2 | OUVERT\nDernière activité : 2026-10-24T11:15:10.986951425Z\n\n## Objectif et résultat attendu\nObserve route\nPérimètre : Owned local program\n- Observed, not accepted\n\n## Situation actuelle\nnon renseigné\nHEAD enregistré : non renseigné\nBranche enregistrée : non renseigné\nHEAD courant : non renseigné\nBranche courante : non renseigné\nMétadonnée Git indisponible (HEAD) : git-command-failed.\nMétadonnée Git indisponible (branch) : git-command-failed.\nMétadonnée Git indisponible (changes) : git-command-failed.\n\n## Tâches actives et résultats attendus\nAucune tâche active déclarée.\n\n## Travail validé\nTâches acceptées (preuves ou dérogation) : 0/1.\nCe ratio est distinct de la progression des critères d’une gate.\n\n## Travail restant et blocages\n- task : Run — À FAIRE\n  Livrable : Evidence\n  Dépendances : non renseigné\n  Blocage : non renseigné\n  Critère : Observed, not accepted\n\n## Gates, qualité et progression vérifiée\n- task · preuve structurée : tentative=unknown ; révision=2 ; fraîcheur=unknown\n  Revue du rapport=not_configured ; contrôles exécutés=unknown ;\nacceptation=not_accepted\n  Contrôle unknown : tentative=unknown ; exécution=unknown ; révision=unknown ;\nsha_candidat=unknown ; commande=unknown ; code=unknown ; début=unknown ;\nfin=unknown ; fraîcheur=unknown\n- task : gate non renseignée.\n\n## Prochaine action du travail\nà définir\n\n## Décisions OODA et mémoire utile\nMémoire spécifique : non renseignée.\n\nLes tentatives enregistrées ne prouvent pas qu’un processus tourne encore.\nUne gate ne remplace pas une autorisation de publication.\n",
+  "git_diagnostics": [
+    {
+      "field": "head",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    },
+    {
+      "field": "branch",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    },
+    {
+      "field": "changes",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    }
+  ]
+}

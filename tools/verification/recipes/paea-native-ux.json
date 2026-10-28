@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "id": "paea-native-ux",
+  "inputs": [
+    "tests/paea_native_ui_test.cjs",
+    "tests/fixtures/paea/contract-v1.json",
+    "web/paea.*",
+    "web/i18n*.js",
+    "web/swarm-design.css",
+    "web/wattson_themes.css",
+    "web/swarm-logo.png",
+    "version_history.json",
+    "web/paea-payment.html",
+    "tests/fixtures/paea/payment-*.json",
+    "web/paea-compare.html",
+    "schemas/paea/comparison-v1.schema.json",
+    "web/paea-examples/v1/*.json",
+    "web/paea-inspect.html",
+    "schemas/paea/inspection-v1.schema.json",
+    "web/paea-approval.html",
+    "schemas/paea/approval-report-v1.schema.json"
+  ],
+  "environment": {
+    "SWARM_PAEA_NATIVE_SCOPE": "full"
+  },
+  "steps": [
+    {
+      "id": "real-native-browser-flow",
+      "command": [
+        "node",
+        "tests/paea_native_ui_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "all-twelve-native-browser-cases",
+        "no-unexpected-browser-diagnostics",
+        "PAEA_NATIVE_UI_PASS",
+        "all-twelve-payment-browser-cases",
+        "payment-unsupported-number-reader-refuses",
+        "payment-invalid-utf8-never-sent",
+        "payment-no-duplicate-gesture",
+        "en-sombre-320-payment-primary-contrast-AA",
+        "payment-registry-bom-preserved-and-native-refused",
+        "payment-registry-bom-native-recovery",
+        "payment-request-bom-preserved-and-native-refused",
+        "payment-request-bom-native-recovery",
+        "exactly-one-hundred-thirteen-native-refusals",
+        "all-twelve-comparison-browser-cases",
+        "en-sombre-320-comparison-repository.promote-real-download-exact",
+        "comparison-client-rejects-unordered-path",
+        "comparison-client-native-recovery",
+        "all-sixty-example-journeys",
+        "en-sombre-320-examples-compare-git-native-example-result",
+        "all-twelve-inspection-browser-cases",
+        "en-sombre-320-inspection-repository.promote-real-download-exact",
+        "inspection-unsupported-number-reader-refuses",
+        "inspection-invalid-utf8-never-sent",
+        "inspection-bom-preserved-and-native-refused",
+        "inspection-client-rejects-revision-float",
+        "inspection-client-native-recovery",
+        "all-twelve-approval-browser-cases",
+        "en-sombre-320-approval-repository.promote-real-download-exact",
+        "approval-client-rejects-inconsistent-match",
+        "approval-loading-clears-and-blocks",
+        "approval-no-duplicate-gesture",
+        "approval-paea-approval-invalid-utf8-never-sent",
+        "approval-paea-approval-bom-preserved-native-refused",
+        "en-sombre-320-examples-check-approval-git-native-example-result",
+        "en-sombre-1440-approval-theme-etat-all-frames-AA",
+        "en-sombre-1440-approval-theme-sombre-all-frames-AA"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "script-loss-aborts-pending-wait",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess; e=dict(os.environ);e['SWARM_PAEA_NATIVE_FAULT']='script';e['SWARM_PAEA_UI_EVIDENCE']=os.environ['SWARM_PAEA_UI_EVIDENCE']+'-script-fault'; raise SystemExit(subprocess.run(['node','tests/paea_native_ui_test.cjs'],env=e).returncode)"
+      ],
+      "expected_exit": 1,
+      "required_stdout": [
+        "actual-default-profile-executable",
+        "fr-etat-1440-payment.settle-recovery",
+        "INJECTED_NATIVE_PAEA_SCRIPT_FAILURE"
+      ],
+      "required_stderr": [
+        "unexpected-native-browser-diagnostic"
+      ]
+    }
+  ]
+}

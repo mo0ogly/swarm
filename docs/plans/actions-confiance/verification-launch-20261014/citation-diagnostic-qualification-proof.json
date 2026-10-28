@@ -1,0 +1,88 @@
+{
+  "at_utc": "2026-10-15T07:16:20.212396+00:00",
+  "state_revision": 372,
+  "native_review_calls": 77,
+  "accepted_lots": 1,
+  "total_lots": 8,
+  "tests": {
+    "targeted_race_main_pass": 9,
+    "targeted_race_subcases_pass": 6,
+    "vet_exit_code": 0,
+    "method_contexts": 12
+  },
+  "limitation": "Native retry preflight rejected before mutation or additional spending; original completed inspection packets were incorrectly included in future recovery capacity. Correction and qualification in progress. No native verdict or acceptance claimed.",
+  "proofs": {
+    "citation-feedback-before.out": {
+      "sha256": "ae5c5808e0dcec9c82a572d2389bc66a9c1d7650fd1bbb860f95bfed26a8eddf",
+      "bytes": 312
+    },
+    "citation-feedback-after-race.out": {
+      "sha256": "cf965f3d98d24abfabafc908d65f41648b77891eb1e267cdc915652f283ff911",
+      "bytes": 2221
+    },
+    "citation-feedback-public-race.out": {
+      "sha256": "52887c1c0a96a4bbaea83b804a97a5a1499375e383145511977c4800bb70d37e",
+      "bytes": 1317
+    },
+    "citation-conventions-final-race.out": {
+      "sha256": "61a9ae1eefb355eaa616e721c278d265f8121dac765b7fe4214899f01174e04c",
+      "bytes": 2486
+    },
+    "citation-conventions-vet.out": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "citation-conventions-methods.out": {
+      "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+      "bytes": 97
+    },
+    "citation-conventions-install.out": {
+      "sha256": "dc78acd44fb7abdd855e5439bf2459a4334f04844e98d38a5ed4fb554c084c25",
+      "bytes": 51
+    },
+    "citation-diagnostic-install.out": {
+      "sha256": "41a197b94fb8948e1c51ee6b1eb540d2e97ae947df1d1564a96be3678a7aed92",
+      "bytes": 448
+    },
+    "citation-diagnostic-source-proof.json": {
+      "sha256": "c6ca22092fc4883e5468884e9b317c1fa918a6d33ec62c6ad9bdcb479081eb38",
+      "bytes": 103639
+    },
+    "supervision-diagnostic-pause-request.json": {
+      "sha256": "3b1263ce39128c8b1644055716995aec9e30e9c2ef7db5685b33b830056fa719",
+      "bytes": 356
+    },
+    "supervision-diagnostic-paused.json": {
+      "sha256": "815235c6f5d2572d47a92930963ddd958f332b7d15bf07bcb4f4dfe34cdc145b",
+      "bytes": 421970
+    },
+    "conductor-unicode-stop-request.json": {
+      "sha256": "d56bffdfa2117d14b73b2b494b29f50c71c22528feb01b89100cd08f408d0385",
+      "bytes": 829
+    },
+    "citation-diagnostic-resume-request.json": {
+      "sha256": "37dee88af63039aa1db5dd2993f652f5fc86ebfe90b0a497e9938e35dc6a6343",
+      "bytes": 421
+    },
+    "citation-diagnostic-resumed.json": {
+      "sha256": "0f8469596aab47d3304c3b04df62bfa18fe942154a6361c997ead57b267424bc",
+      "bytes": 422468
+    },
+    "citation-diagnostic-retry-request.json": {
+      "sha256": "5f3749e9c608252fb44b760315cc31cdf17d846d931dbe958d9fe57acf8b5804",
+      "bytes": 766
+    },
+    "citation-diagnostic-work-dispatched.json": {
+      "sha256": "c2315871d6ab2f3a35866b2665edabaec9881588bb18a4f3f8a71f02cbb91493",
+      "bytes": 1987986
+    },
+    "citation-capacity-pause-request.json": {
+      "sha256": "6ee738aa516a951b1390dfd072aee4879350c34a0e873dffb9842aa56dbba666",
+      "bytes": 342
+    },
+    "citation-capacity-paused.json": {
+      "sha256": "5bed9958c02a98b2f9464ebff6032daedd86dc4d875b9a0c2e0fed0d7c886726",
+      "bytes": 422467
+    }
+  }
+}

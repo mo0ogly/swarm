@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-12T10:53:54.102553+00:00",
+  "revision": 732,
+  "activations": 69,
+  "decisions": 52,
+  "selected_root_provider": "codex",
+  "base_planning_provider": "claude",
+  "root_holder": null,
+  "T3_attempts": 2,
+  "T3_status": "blocked",
+  "limits": "Selected Codex role remains unclaimed under installed-T3 old default-provider guard. No Codex paid call is observed."
+}

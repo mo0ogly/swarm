@@ -1,0 +1,42 @@
+[
+  {
+    "role": "git-runner",
+    "exit": 0,
+    "seconds": 7.297
+  },
+  {
+    "role": "manifest",
+    "exit": 0,
+    "seconds": 4.328
+  },
+  {
+    "role": "directory",
+    "exit": 0,
+    "seconds": 7.715
+  },
+  {
+    "role": "prepare",
+    "exit": 0,
+    "seconds": 5.726
+  },
+  {
+    "role": "root-hook",
+    "exit": 2,
+    "seconds": 13.485
+  },
+  {
+    "role": "public-test",
+    "exit": 0,
+    "seconds": 10.533
+  },
+  {
+    "role": "negative-test",
+    "exit": 0,
+    "seconds": 6.006
+  },
+  {
+    "role": "review",
+    "exit": 0,
+    "seconds": 8.922
+  }
+]

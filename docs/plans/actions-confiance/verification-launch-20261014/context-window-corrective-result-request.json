@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "context-window-and-pilot-corrective-candidate-20261015",
+  "expected_revision": 429,
+  "task_id": "plan-68b50cc82e-T2",
+  "agent_id": "auto-c8053557575a81bb6164",
+  "attempt_id": "a-b4669e24bbfb91f7a9686499",
+  "review_id": "review-648b1d25ee01e0532390cff9",
+  "result_tree": "80d881f9873679ee63d99ae4935705caae7c870a",
+  "confirm_recovery": true,
+  "confirm_review_error_repair": true,
+  "reason": "Correction générale des deux constats R19 reproduits : recontrôle du mandat à l’approbation et initialisation de preuve attribuée récupérable après interruption. 75 cas Go race, sept cas publics CLI/navigateur, vingt dispositions FR/EN/thèmes passent localement. Sortie complète de qualification 20588 octets, sans troncature ; contrôles moteur et revue fraîche obligatoires. Ancien candidat, incident, deux tentatives et 84 appels conservés."
+}

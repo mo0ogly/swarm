@@ -1,0 +1,12 @@
+{
+  "kind": "task-model-preview",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "task": "plan-ca937edf4e-T3",
+  "expected_revision": 728,
+  "task_model": {
+    "provider": "codex",
+    "level": "standard",
+    "model_policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+    "inherit": false
+  }
+}

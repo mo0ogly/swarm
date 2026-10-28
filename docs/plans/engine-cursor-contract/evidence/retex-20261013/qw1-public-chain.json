@@ -1,0 +1,772 @@
+{
+  "work": "w-630ae432039dbb236949d842",
+  "revision": 22,
+  "tasks": [
+    {
+      "previous_reviews": [
+        {
+          "result_event": "review-04d276b724b90b6334467e39",
+          "model_route": {
+            "level": "standard",
+            "model": "gpt-5.6-sol",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "reply_path": ".swarm/managed/w-630ae432039dbb236949d842/proofs/63f69a2552004043a6b682ef4c2f8a4d/review-04d276b724b90b6334467e39-reply.json",
+          "reply_sha256": "57d80aea2fc712f15fecfbb454722780abe543d49ff5aff3c5dcef354c9492ec",
+          "workflow": {
+            "version": 1,
+            "role": "reviewer",
+            "methods": [
+              "audit-pdca",
+              "code-reviewer",
+              "product-review"
+            ],
+            "sha256": "28b293cca11cf97690380d482960742c94ed7df9cb0ce899b70fc82201bdcb50"
+          },
+          "git_report": "docs/recover-number.md",
+          "candidate_commit": "91f57dc2841a816033ebdf3601c9f536ee08e180",
+          "previous_candidate": "e646456fe07e45dd5a033d753f43f1d539899d8a",
+          "receipt": ".swarm/managed/w-630ae432039dbb236949d842/proofs/63f69a2552004043a6b682ef4c2f8a4d/receipt.json",
+          "receipt_sha256": "2ee39d4a021d3205016eb7ecab0742d691fb7eac2f9e04770e69aaa1966bd690",
+          "context": ".swarm/managed/w-630ae432039dbb236949d842/proofs/63f69a2552004043a6b682ef4c2f8a4d/review-context.json",
+          "context_sha256": "dc2709b80a9ee37b8687981483b99724218cadb12af29427e23b598d26c4080a",
+          "managed_tasks": [
+            {
+              "task": "recover-number",
+              "attempt": "a-95de4baab71f0d8f98a41f03",
+              "producer": "63f69a2552004043a6b682ef4c2f8a4d",
+              "contract": "21a51506ba70948d6c9f6e792a85547483326286c1c7fafb2ec4925b2a7644c4",
+              "policy": "422d4e07112468d5ebb26ba9099978eecdfdda8307a8f81a6dfa2d3ae83641fd",
+              "report": "docs/recover-number.md",
+              "report_sha256": "533be14d0a7d827b4a00bcc1014a83404f5653990620c485dacc63ff7a6f1830",
+              "reason": "Défaut démontré sur le commit candidat : la source complète fournie définit answer() avec return 0, alors que le critère exige 42. Le contrôle reçu vérifie seulement que le résultat est un entier ; il ne teste donc pas la valeur exigée. Le rapport et le bilan du producteur reconnaissent explicitement que leur déclaration positive est volontairement erronée. Correction à transmettre au responsable pour ACT : faire retourner 42 et ajouter un contrôle de régression affirmant number.answer() == 42, puis renouveler les contrôles et la revue sur le nouveau commit.",
+              "criteria": [
+                {
+                  "index": 1,
+                  "verdict": "fail",
+                  "evidence": "La source candidate fournie contient `return 0`; number.answer() ne retourne donc pas la valeur 42 exigée."
+                }
+              ]
+            }
+          ],
+          "id": "review-04d276b724b90b6334467e39",
+          "attempt": "a-95de4baab71f0d8f98a41f03",
+          "producer": "63f69a2552004043a6b682ef4c2f8a4d",
+          "reviewer": "reviewer://codex",
+          "report": ".swarm/managed/w-630ae432039dbb236949d842/proofs/63f69a2552004043a6b682ef4c2f8a4d/reports/recover-number.md",
+          "sha256": "533be14d0a7d827b4a00bcc1014a83404f5653990620c485dacc63ff7a6f1830",
+          "contract": "21a51506ba70948d6c9f6e792a85547483326286c1c7fafb2ec4925b2a7644c4",
+          "state": "changes_requested",
+          "reason": "Revue indépendante des critères sur le candidat 91f57dc2841a816033ebdf3601c9f536ee08e180 ; recover-number : Défaut démontré sur le commit candidat : la source complète fournie définit answer() avec return 0, alors que le critère exige 42. Le contrôle reçu vérifie seulement que le résultat est un entier ; il ne teste donc pas la valeur exigée. Le rapport et le bilan du producteur reconnaissent explicitement que leur déclaration positive est volontairement erronée. Correction à transmettre au responsable pour ACT : faire retourner 42 et ajouter un contrôle de régression affirmant number.answer() == 42, puis renouveler les contrôles et la revue sur le nouveau commit.",
+          "criteria": [
+            {
+              "index": 1,
+              "verdict": "fail",
+              "evidence": "La source candidate fournie contient `return 0`; number.answer() ne retourne donc pas la valeur 42 exigée."
+            }
+          ],
+          "started": "2026-10-13T19:24:33.973740056Z",
+          "finished": "2026-10-13T19:24:45.028716033Z",
+          "usage": {
+            "cached_input_tokens": 0,
+            "input_tokens": 16292,
+            "output_tokens": 272,
+            "source": "événement fournisseur turn.completed",
+            "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+            "at": "2026-10-13T19:24:44.445599872Z"
+          }
+        }
+      ],
+      "independent_review": {
+        "result_event": "review-42de5ab5e3e936f7eb9140b7",
+        "model_route": {
+          "level": "standard",
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "billing": "external",
+          "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+          "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+        },
+        "reply_path": ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/review-42de5ab5e3e936f7eb9140b7-reply.json",
+        "reply_sha256": "c75ced96d41fd386a78d69dd257ab7b4fdaa0052d3f20dfaf7df419299a0e57e",
+        "workflow": {
+          "version": 1,
+          "role": "reviewer",
+          "methods": [
+            "audit-pdca",
+            "code-reviewer",
+            "product-review"
+          ],
+          "sha256": "28b293cca11cf97690380d482960742c94ed7df9cb0ce899b70fc82201bdcb50"
+        },
+        "git_report": "docs/recover-number.md",
+        "candidate_commit": "8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+        "previous_candidate": "e646456fe07e45dd5a033d753f43f1d539899d8a",
+        "receipt": ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/receipt.json",
+        "receipt_sha256": "fac3a6e875346872f80d704bf52e0deef1a3629412cbaafcd97db47b296579d1",
+        "context": ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/review-context.json",
+        "context_sha256": "52c78f196a1c88a8e4a384e0a0d0a3a217ce26705d1f7badb7cb4f69dbf3e370",
+        "managed_tasks": [
+          {
+            "task": "recover-number",
+            "attempt": "a-6b4e1cdcc6259e87118114e7",
+            "producer": "auto-b283e98ca4f93a1a4c2b",
+            "contract": "21a51506ba70948d6c9f6e792a85547483326286c1c7fafb2ec4925b2a7644c4",
+            "policy": "422d4e07112468d5ebb26ba9099978eecdfdda8307a8f81a6dfa2d3ae83641fd",
+            "report": "docs/recover-number.md",
+            "report_sha256": "176f6fe7055e4442dccaa248b5de192f475d15597b0eabb351e9b942f86dafbc",
+            "reason": "La source complète number.py du commit candidat implémente directement et sans branche le retour exact de 42. Le test fourni ajoute une garde sémantique assertEqual(number.answer(), 42). Le reçu moteur ne vérifie que le type, mais cette faiblesse ne crée pas de lacune pour ce critère simple puisque la source complète établit le comportement demandé; les déclarations de tests locaux restent seulement corroborantes.",
+            "criteria": [
+              {
+                "index": 1,
+                "verdict": "pass",
+                "evidence": "def answer():\n    return 42\n"
+              }
+            ]
+          }
+        ],
+        "id": "review-42de5ab5e3e936f7eb9140b7",
+        "attempt": "a-6b4e1cdcc6259e87118114e7",
+        "producer": "auto-b283e98ca4f93a1a4c2b",
+        "reviewer": "reviewer://codex",
+        "report": ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/reports/recover-number.md",
+        "sha256": "176f6fe7055e4442dccaa248b5de192f475d15597b0eabb351e9b942f86dafbc",
+        "contract": "21a51506ba70948d6c9f6e792a85547483326286c1c7fafb2ec4925b2a7644c4",
+        "state": "passed",
+        "reason": "La source complète number.py du commit candidat implémente directement et sans branche le retour exact de 42. Le test fourni ajoute une garde sémantique assertEqual(number.answer(), 42). Le reçu moteur ne vérifie que le type, mais cette faiblesse ne crée pas de lacune pour ce critère simple puisque la source complète établit le comportement demandé; les déclarations de tests locaux restent seulement corroborantes.",
+        "criteria": [
+          {
+            "index": 1,
+            "verdict": "pass",
+            "evidence": "def answer():\n    return 42\n"
+          }
+        ],
+        "started": "2026-10-13T19:27:49.834869364Z",
+        "finished": "2026-10-13T19:27:59.433585627Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 20061,
+          "output_tokens": 265,
+          "source": "événement fournisseur turn.completed",
+          "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+          "at": "2026-10-13T19:27:58.610979872Z"
+        }
+      },
+      "scope_id": "root",
+      "requirements": [
+        "req-1"
+      ],
+      "validation_policy": {
+        "mode": "automatic",
+        "controls": [
+          {
+            "id": "check-ae650514b27cef465879c047",
+            "command": [
+              "python3",
+              "-B",
+              "-c",
+              "import number;assert isinstance(number.answer(),int)"
+            ],
+            "criteria": [
+              1
+            ],
+            "justification": "Structural smoke test only; it cannot prove 42. The independent reviewer must inspect the supplied source for the semantic criterion.",
+            "timeout_seconds": 15
+          }
+        ],
+        "authorized_at": "2026-10-13T19:22:00.461919382Z",
+        "actor": "autorisation initiale de la mission"
+      },
+      "automatic_validation": {
+        "delivery_version": 1,
+        "attempt_id": "a-6b4e1cdcc6259e87118114e7",
+        "revision": 0,
+        "candidate_sha": "8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+        "producer_agent_id": "auto-b283e98ca4f93a1a4c2b",
+        "controller": "controller://swarm-validation",
+        "policy_digest": "422d4e07112468d5ebb26ba9099978eecdfdda8307a8f81a6dfa2d3ae83641fd",
+        "policy": {
+          "mode": "automatic",
+          "controls": [
+            {
+              "id": "check-ae650514b27cef465879c047",
+              "command": [
+                "python3",
+                "-B",
+                "-c",
+                "import number;assert isinstance(number.answer(),int)"
+              ],
+              "criteria": [
+                1
+              ],
+              "justification": "Structural smoke test only; it cannot prove 42. The independent reviewer must inspect the supplied source for the semantic criterion.",
+              "timeout_seconds": 15
+            }
+          ],
+          "authorized_at": "2026-10-13T19:22:00.461919382Z",
+          "actor": "autorisation initiale de la mission"
+        },
+        "artifacts": {
+          ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/receipt.json": "fac3a6e875346872f80d704bf52e0deef1a3629412cbaafcd97db47b296579d1",
+          ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/report.md": "7febbbfcecfc85e5c1bb1ebe24216112026bc3c1cef16258159826de8d00e8e8"
+        },
+        "controls": [
+          {
+            "id": "check-ae650514b27cef465879c047",
+            "command": [
+              "python3",
+              "-B",
+              "-c",
+              "import number;assert isinstance(number.answer(),int)"
+            ],
+            "executed": true,
+            "passed": true,
+            "exit_code": 0,
+            "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "summary": "contrôle réussi",
+            "started_at": "2026-10-13T19:27:49.638729716Z",
+            "finished_at": "2026-10-13T19:27:49.668582318Z",
+            "wall_duration_ms": 29,
+            "cpu_duration_ms": 29
+          }
+        ],
+        "receipt": ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/receipt.json",
+        "state": "accepted",
+        "reason": "Révision intégrée vérifiée : 8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+        "at": "2026-10-13T19:27:59.531618164Z"
+      },
+      "launch_profile": {
+        "provider": "codex",
+        "role": "worker",
+        "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw1-preflight/store/.swarm/managed/w-630ae432039dbb236949d842/copies/recover-number-2",
+        "timeout_seconds": 1800,
+        "capture_output": true,
+        "updated": "2026-10-13T19:25:01.785242782Z",
+        "actor": "conducteur"
+      },
+      "plan_role": "worker",
+      "plan_max_attempts": 2,
+      "id": "recover-number",
+      "title": "Implement number.py",
+      "owner": "codex",
+      "deliverable": "number.py and docs/recover-number.md",
+      "criteria": [
+        "number.answer() returns 42"
+      ],
+      "depends": null,
+      "status": "accepted",
+      "blocker": "",
+      "next": "Résultat intégré et vérifié : 8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+      "attempts": [
+        {
+          "id": "a-95de4baab71f0d8f98a41f03",
+          "status": "completed",
+          "started": "2026-10-13T19:22:57.75297453Z",
+          "ended": "2026-10-13T19:22:57.884680601Z"
+        },
+        {
+          "id": "a-6b4e1cdcc6259e87118114e7",
+          "status": "completed",
+          "started": "2026-10-13T19:25:01.785237813Z",
+          "ended": "2026-10-13T19:27:49.428587853Z"
+        }
+      ],
+      "gate": {
+        "name": "Contrôles sur révision intégrée",
+        "document": {
+          "artifacts": {
+            ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/receipt.json": "fac3a6e875346872f80d704bf52e0deef1a3629412cbaafcd97db47b296579d1",
+            ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/report.md": "7febbbfcecfc85e5c1bb1ebe24216112026bc3c1cef16258159826de8d00e8e8"
+          },
+          "checks": [
+            {
+              "domain": "automation",
+              "gate": "delivery",
+              "id": "check-ae650514b27cef465879c047",
+              "mandatory": true,
+              "max_penalty": 100,
+              "penalty": 100,
+              "severity": "major"
+            }
+          ],
+          "domains": {
+            "automation": 1
+          },
+          "method_version": "2",
+          "results": [
+            {
+              "count": 0,
+              "evidence": [
+                ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/receipt.json",
+                ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/report.md"
+              ],
+              "id": "check-ae650514b27cef465879c047",
+              "status": "PASS"
+            }
+          ],
+          "scope_id": "recover-number"
+        },
+        "evaluation": {
+          "method_version": "2",
+          "scope_id": "recover-number",
+          "phase": "delivery",
+          "config_digest": "7eccbf738c09aa0085a3a33fa68171cb00cf67ff7ddd62fb4b789296d35c6c26",
+          "applicability_digest": "4fbfc668799801cc34d1ee01800e9eff197c9539e8bc22dfad92551c346ecac0",
+          "artifacts": {
+            ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/receipt.json": "fac3a6e875346872f80d704bf52e0deef1a3629412cbaafcd97db47b296579d1",
+            ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/report.md": "7febbbfcecfc85e5c1bb1ebe24216112026bc3c1cef16258159826de8d00e8e8"
+          },
+          "domain_scores": {
+            "automation": 100
+          },
+          "quality": 100,
+          "provisional": false,
+          "quality_band": "OK",
+          "progress": {
+            "passed": 1,
+            "applicable": 1,
+            "percent": 100
+          },
+          "max_severity": "none",
+          "blockers": [],
+          "allowed": true,
+          "ship_allowed": true
+        },
+        "at": "2026-10-13T19:27:59.531604879Z"
+      }
+    }
+  ],
+  "judge": {
+    "verdict": "end",
+    "reason": "La tentative corrigée de recover-number est terminée, son candidat 8f44756859bb6c6b6d30c796d25d8d0635cc5c5d a reçu une revue indépendante positive, a été intégré puis marqué accepted. Le rapport conserve la reproduction du défaut initial 0 != 42 et la garde sémantique vérifiant désormais le retour exact de 42. L’unique exigence req-1 est donc couverte par un résultat accepté et frais ; aucun travail utile ne reste dans ce cycle.",
+    "evidence_ref": "8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+    "at": "2026-10-13T19:28:16.240941757Z",
+    "cycle": 1,
+    "max_cycles": 0,
+    "closed": true,
+    "history": [
+      {
+        "verdict": "end",
+        "reason": "La tentative corrigée de recover-number est terminée, son candidat 8f44756859bb6c6b6d30c796d25d8d0635cc5c5d a reçu une revue indépendante positive, a été intégré puis marqué accepted. Le rapport conserve la reproduction du défaut initial 0 != 42 et la garde sémantique vérifiant désormais le retour exact de 42. L’unique exigence req-1 est donc couverte par un résultat accepté et frais ; aucun travail utile ne reste dans ce cycle.",
+        "evidence_ref": "8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+        "at": "2026-10-13T19:28:16.240941757Z",
+        "cycle": 1
+      }
+    ]
+  },
+  "validation": {
+    "state": "validated",
+    "label": "VALIDÉ",
+    "validated": 1,
+    "historical": 1,
+    "stale": 0,
+    "tasks": {
+      "recover-number": {
+        "state": "accepted",
+        "fresh": true,
+        "blockers": [],
+        "owner": "codex",
+        "next": "",
+        "evidence": {
+          "attempt_id": "a-6b4e1cdcc6259e87118114e7",
+          "revision": 22,
+          "freshness": "fresh",
+          "observed_at": "2026-10-13T19:27:59.531618164Z",
+          "report_review": {
+            "state": "passed",
+            "attempt_id": "a-6b4e1cdcc6259e87118114e7",
+            "reviewer": "reviewer://codex",
+            "at": "2026-10-13T19:27:59.433585627Z",
+            "limits": [
+              "La revue examine le candidat, les sources fournies et les reçus de contrôles ; elle n’exécute pas elle-même les commandes et ne vaut pas acceptation."
+            ]
+          },
+          "controls": {
+            "state": "passed",
+            "items": [
+              {
+                "id": "check-ae650514b27cef465879c047",
+                "attempt_id": "a-6b4e1cdcc6259e87118114e7",
+                "execution": "executed",
+                "revision": "unknown",
+                "candidate_sha": "8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+                "command": [
+                  "python3",
+                  "-B",
+                  "-c",
+                  "import number;assert isinstance(number.answer(),int)"
+                ],
+                "exit_code": 0,
+                "started_at": "2026-10-13T19:27:49.638729716Z",
+                "finished_at": "2026-10-13T19:27:49.668582318Z",
+                "wall_duration_ms": 29,
+                "cpu_duration_ms": 29,
+                "cost": "unknown",
+                "tokens": "unknown",
+                "freshness": "fresh",
+                "result": "passed",
+                "limits": [
+                  "Sortie non exposée ; seule son empreinte SHA-256 est conservée. Plafond 65536 octets."
+                ]
+              }
+            ],
+            "history": [],
+            "longest_measured": [
+              {
+                "id": "check-ae650514b27cef465879c047",
+                "attempt_id": "a-6b4e1cdcc6259e87118114e7",
+                "execution": "executed",
+                "revision": "unknown",
+                "candidate_sha": "8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+                "command": [
+                  "python3",
+                  "-B",
+                  "-c",
+                  "import number;assert isinstance(number.answer(),int)"
+                ],
+                "exit_code": 0,
+                "started_at": "2026-10-13T19:27:49.638729716Z",
+                "finished_at": "2026-10-13T19:27:49.668582318Z",
+                "wall_duration_ms": 29,
+                "cpu_duration_ms": 29,
+                "cost": "unknown",
+                "tokens": "unknown",
+                "freshness": "fresh",
+                "result": "passed",
+                "limits": [
+                  "Sortie non exposée ; seule son empreinte SHA-256 est conservée. Plafond 65536 octets."
+                ]
+              }
+            ]
+          },
+          "acceptance": {
+            "state": "accepted",
+            "revision": "unknown",
+            "at": "unknown"
+          },
+          "limits": [
+            "Les valeurs unknown ne constituent pas un succès.",
+            "Révision d’exécution inconnue pour cet ancien reçu."
+          ]
+        }
+      }
+    }
+  },
+  "events": [
+    {
+      "id": "2cef8320fc88459b9df6ca0fba06464b",
+      "work_id": "w-630ae432039dbb236949d842",
+      "revision": 4,
+      "kind": "planning.decide",
+      "at": "2026-10-13T19:22:00.461946083Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "2cef8320fc88459b9df6ca0fba06464b",
+        "expected_revision": 3,
+        "scope": "root",
+        "scope_revision": 1,
+        "holder": "fixture-setup",
+        "generation": 1,
+        "input_events": [
+          "519f30056264439e93792a412a6ab121"
+        ],
+        "operations": [
+          {
+            "kind": "task",
+            "id": "recover-number",
+            "title": "Implement number.py",
+            "requirements": [
+              "req-1"
+            ],
+            "deliverable": "number.py and docs/recover-number.md",
+            "criteria": [
+              "number.answer() returns integer 42"
+            ],
+            "next": "Implement number.answer() returning 42. Modify only that module and docs/recover-number.*. Test the exact value, declare source in delivery evidence and report actual checks. Stop after handoff; do not wait for review."
+          }
+        ],
+        "reason": "Affecter la tâche au responsable racine avec son critère explicite."
+      }
+    },
+    {
+      "id": "review-04d276b724b90b6334467e39-result",
+      "work_id": "w-630ae432039dbb236949d842",
+      "revision": 12,
+      "kind": "review.managed.result",
+      "at": "2026-10-13T19:24:45.033732343Z",
+      "payload": {
+        "result_event": "review-04d276b724b90b6334467e39",
+        "model_route": {
+          "level": "standard",
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "billing": "external",
+          "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+          "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+        },
+        "reply_path": ".swarm/managed/w-630ae432039dbb236949d842/proofs/63f69a2552004043a6b682ef4c2f8a4d/review-04d276b724b90b6334467e39-reply.json",
+        "reply_sha256": "57d80aea2fc712f15fecfbb454722780abe543d49ff5aff3c5dcef354c9492ec",
+        "workflow": {
+          "version": 1,
+          "role": "reviewer",
+          "methods": [
+            "audit-pdca",
+            "code-reviewer",
+            "product-review"
+          ],
+          "sha256": "28b293cca11cf97690380d482960742c94ed7df9cb0ce899b70fc82201bdcb50"
+        },
+        "git_report": "docs/recover-number.md",
+        "candidate_commit": "91f57dc2841a816033ebdf3601c9f536ee08e180",
+        "previous_candidate": "e646456fe07e45dd5a033d753f43f1d539899d8a",
+        "receipt": ".swarm/managed/w-630ae432039dbb236949d842/proofs/63f69a2552004043a6b682ef4c2f8a4d/receipt.json",
+        "receipt_sha256": "2ee39d4a021d3205016eb7ecab0742d691fb7eac2f9e04770e69aaa1966bd690",
+        "context": ".swarm/managed/w-630ae432039dbb236949d842/proofs/63f69a2552004043a6b682ef4c2f8a4d/review-context.json",
+        "context_sha256": "dc2709b80a9ee37b8687981483b99724218cadb12af29427e23b598d26c4080a",
+        "managed_tasks": [
+          {
+            "task": "recover-number",
+            "attempt": "a-95de4baab71f0d8f98a41f03",
+            "producer": "63f69a2552004043a6b682ef4c2f8a4d",
+            "contract": "21a51506ba70948d6c9f6e792a85547483326286c1c7fafb2ec4925b2a7644c4",
+            "policy": "422d4e07112468d5ebb26ba9099978eecdfdda8307a8f81a6dfa2d3ae83641fd",
+            "report": "docs/recover-number.md",
+            "report_sha256": "533be14d0a7d827b4a00bcc1014a83404f5653990620c485dacc63ff7a6f1830",
+            "reason": "Défaut démontré sur le commit candidat : la source complète fournie définit answer() avec return 0, alors que le critère exige 42. Le contrôle reçu vérifie seulement que le résultat est un entier ; il ne teste donc pas la valeur exigée. Le rapport et le bilan du producteur reconnaissent explicitement que leur déclaration positive est volontairement erronée. Correction à transmettre au responsable pour ACT : faire retourner 42 et ajouter un contrôle de régression affirmant number.answer() == 42, puis renouveler les contrôles et la revue sur le nouveau commit.",
+            "criteria": [
+              {
+                "index": 1,
+                "verdict": "fail",
+                "evidence": "La source candidate fournie contient `return 0`; number.answer() ne retourne donc pas la valeur 42 exigée."
+              }
+            ]
+          }
+        ],
+        "id": "review-04d276b724b90b6334467e39",
+        "attempt": "a-95de4baab71f0d8f98a41f03",
+        "producer": "63f69a2552004043a6b682ef4c2f8a4d",
+        "reviewer": "reviewer://codex",
+        "report": ".swarm/managed/w-630ae432039dbb236949d842/proofs/63f69a2552004043a6b682ef4c2f8a4d/reports/recover-number.md",
+        "sha256": "533be14d0a7d827b4a00bcc1014a83404f5653990620c485dacc63ff7a6f1830",
+        "contract": "21a51506ba70948d6c9f6e792a85547483326286c1c7fafb2ec4925b2a7644c4",
+        "state": "changes_requested",
+        "reason": "Revue indépendante des critères sur le candidat 91f57dc2841a816033ebdf3601c9f536ee08e180 ; recover-number : Défaut démontré sur le commit candidat : la source complète fournie définit answer() avec return 0, alors que le critère exige 42. Le contrôle reçu vérifie seulement que le résultat est un entier ; il ne teste donc pas la valeur exigée. Le rapport et le bilan du producteur reconnaissent explicitement que leur déclaration positive est volontairement erronée. Correction à transmettre au responsable pour ACT : faire retourner 42 et ajouter un contrôle de régression affirmant number.answer() == 42, puis renouveler les contrôles et la revue sur le nouveau commit.",
+        "criteria": [
+          {
+            "index": 1,
+            "verdict": "fail",
+            "evidence": "La source candidate fournie contient `return 0`; number.answer() ne retourne donc pas la valeur 42 exigée."
+          }
+        ],
+        "started": "2026-10-13T19:24:33.973740056Z",
+        "finished": "2026-10-13T19:24:45.028716033Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 16292,
+          "output_tokens": 272,
+          "source": "événement fournisseur turn.completed",
+          "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+          "at": "2026-10-13T19:24:44.445599872Z"
+        }
+      }
+    },
+    {
+      "id": "managed-fail-37491c87ff36dc4edd171f5959557e24",
+      "work_id": "w-630ae432039dbb236949d842",
+      "revision": 13,
+      "kind": "managed.conflict",
+      "at": "2026-10-13T19:24:45.045753727Z",
+      "payload": {
+        "agent": "63f69a2552004043a6b682ef4c2f8a4d",
+        "reason": "vérificateur indépendant : Revue indépendante des critères sur le candidat 91f57dc2841a816033ebdf3601c9f536ee08e180 ; recover-number : Défaut démontré sur le commit candidat : la source complète fournie définit answer() avec return 0, alors que le critère exige 42. Le contrôle reçu vérifie seulement que le résultat est un entier ; il ne teste donc pas la valeur exigée. Le rapport et le bilan du producteur reconnaissent explicitement que leur déclaration positive est volontairement erronée. Correction à transmettre au responsable pour ACT : faire retourner 42 et ajouter un contrôle de régression affirmant number.answer() == 42, puis renouveler les contrôles et la revue sur le nouveau commit."
+      }
+    },
+    {
+      "id": "planning-claim-2d7c4ad7abf03e4d291d009e-decision",
+      "work_id": "w-630ae432039dbb236949d842",
+      "revision": 15,
+      "kind": "planning.decide",
+      "at": "2026-10-13T19:25:00.59302409Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "planning-claim-2d7c4ad7abf03e4d291d009e-decision",
+        "expected_revision": 14,
+        "scope": "root",
+        "scope_revision": 2,
+        "holder": "planner-7cc741d83f23ff90c90b6efc",
+        "generation": 3,
+        "input_events": [
+          "review-04d276b724b90b6334467e39",
+          "plan-4b47e040174396e7015beb1eb29fd767cb0e112eb47b10dc08a0d18ce4c8b9e1",
+          "plan-146ed7fc95bd2ed40f46856126de964c6de30c7dae17ac9bfe077745212b4ff3"
+        ],
+        "operations": [
+          {
+            "kind": "retry",
+            "id": "recover-number",
+            "title": "",
+            "requirements": null,
+            "next": "Corriger le défaut sémantique démontré sur le candidat 91f57dc2841a816033ebdf3601c9f536ee08e180 : modifier number.answer() pour qu’elle retourne exactement 42. Ajouter ou renforcer le contrôle de régression afin qu’il affirme explicitement number.answer() == 42, et non seulement que le résultat est un entier. Conserver le cas initial fautif comme garde de régression, exécuter les vérifications locales autorisées, puis livrer un nouveau candidat avec les sources et preuves complètes requises pour les contrôles du moteur et une nouvelle revue indépendante. Ne pas reprendre la déclaration positive erronée du premier bilan."
+          }
+        ],
+        "reason": "La revue indépendante et l’échec d’intégration établissent un défaut de production précis, et non une erreur de protocole de revue : answer() retourne 0 alors que req-1 exige 42, tandis que le contrôle local était insuffisant. La première tentative est terminée, la tâche est bloquée, une seconde tentative reste disponible et la reprise change concrètement la précondition en imposant la valeur exacte ainsi qu’un test discriminant. Il faut donc reprendre la même tâche sans effacer l’incident, sans créer de remplacement et sans utiliser review-retry. Le jugement de fin de cycle est prématuré tant que le candidat corrigé n’est pas contrôlé, revu indépendamment et accepté avec une preuve fraîche."
+      }
+    },
+    {
+      "id": "review-42de5ab5e3e936f7eb9140b7-result",
+      "work_id": "w-630ae432039dbb236949d842",
+      "revision": 19,
+      "kind": "review.managed.result",
+      "at": "2026-10-13T19:27:59.438278142Z",
+      "payload": {
+        "result_event": "review-42de5ab5e3e936f7eb9140b7",
+        "model_route": {
+          "level": "standard",
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "billing": "external",
+          "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+          "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+        },
+        "reply_path": ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/review-42de5ab5e3e936f7eb9140b7-reply.json",
+        "reply_sha256": "c75ced96d41fd386a78d69dd257ab7b4fdaa0052d3f20dfaf7df419299a0e57e",
+        "workflow": {
+          "version": 1,
+          "role": "reviewer",
+          "methods": [
+            "audit-pdca",
+            "code-reviewer",
+            "product-review"
+          ],
+          "sha256": "28b293cca11cf97690380d482960742c94ed7df9cb0ce899b70fc82201bdcb50"
+        },
+        "git_report": "docs/recover-number.md",
+        "candidate_commit": "8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+        "previous_candidate": "e646456fe07e45dd5a033d753f43f1d539899d8a",
+        "receipt": ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/receipt.json",
+        "receipt_sha256": "fac3a6e875346872f80d704bf52e0deef1a3629412cbaafcd97db47b296579d1",
+        "context": ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/review-context.json",
+        "context_sha256": "52c78f196a1c88a8e4a384e0a0d0a3a217ce26705d1f7badb7cb4f69dbf3e370",
+        "managed_tasks": [
+          {
+            "task": "recover-number",
+            "attempt": "a-6b4e1cdcc6259e87118114e7",
+            "producer": "auto-b283e98ca4f93a1a4c2b",
+            "contract": "21a51506ba70948d6c9f6e792a85547483326286c1c7fafb2ec4925b2a7644c4",
+            "policy": "422d4e07112468d5ebb26ba9099978eecdfdda8307a8f81a6dfa2d3ae83641fd",
+            "report": "docs/recover-number.md",
+            "report_sha256": "176f6fe7055e4442dccaa248b5de192f475d15597b0eabb351e9b942f86dafbc",
+            "reason": "La source complète number.py du commit candidat implémente directement et sans branche le retour exact de 42. Le test fourni ajoute une garde sémantique assertEqual(number.answer(), 42). Le reçu moteur ne vérifie que le type, mais cette faiblesse ne crée pas de lacune pour ce critère simple puisque la source complète établit le comportement demandé; les déclarations de tests locaux restent seulement corroborantes.",
+            "criteria": [
+              {
+                "index": 1,
+                "verdict": "pass",
+                "evidence": "def answer():\n    return 42\n"
+              }
+            ]
+          }
+        ],
+        "id": "review-42de5ab5e3e936f7eb9140b7",
+        "attempt": "a-6b4e1cdcc6259e87118114e7",
+        "producer": "auto-b283e98ca4f93a1a4c2b",
+        "reviewer": "reviewer://codex",
+        "report": ".swarm/managed/w-630ae432039dbb236949d842/proofs/auto-b283e98ca4f93a1a4c2b/reports/recover-number.md",
+        "sha256": "176f6fe7055e4442dccaa248b5de192f475d15597b0eabb351e9b942f86dafbc",
+        "contract": "21a51506ba70948d6c9f6e792a85547483326286c1c7fafb2ec4925b2a7644c4",
+        "state": "passed",
+        "reason": "Revue indépendante des critères sur le candidat 8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+        "criteria": [
+          {
+            "index": 1,
+            "verdict": "pass",
+            "evidence": "def answer():\n    return 42\n"
+          }
+        ],
+        "started": "2026-10-13T19:27:49.834869364Z",
+        "finished": "2026-10-13T19:27:59.433585627Z",
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 20061,
+          "output_tokens": 265,
+          "source": "événement fournisseur turn.completed",
+          "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+          "at": "2026-10-13T19:27:58.610979872Z"
+        }
+      }
+    },
+    {
+      "id": "integrated-auto-b283e98ca4f93a1a4c2b",
+      "work_id": "w-630ae432039dbb236949d842",
+      "revision": 20,
+      "kind": "managed.integrated",
+      "at": "2026-10-13T19:27:59.531665052Z",
+      "payload": {
+        "agent_id": "auto-b283e98ca4f93a1a4c2b",
+        "attempt_id": "a-6b4e1cdcc6259e87118114e7",
+        "base_commit": "e646456fe07e45dd5a033d753f43f1d539899d8a",
+        "candidate_commit": "8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+        "controller": "controller://swarm-validation",
+        "controls": {
+          "recover-number": [
+            {
+              "id": "check-ae650514b27cef465879c047",
+              "command": [
+                "python3",
+                "-B",
+                "-c",
+                "import number;assert isinstance(number.answer(),int)"
+              ],
+              "executed": true,
+              "passed": true,
+              "exit_code": 0,
+              "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "summary": "contrôle réussi",
+              "started_at": "2026-10-13T19:27:49.638729716Z",
+              "finished_at": "2026-10-13T19:27:49.668582318Z",
+              "wall_duration_ms": 29,
+              "cpu_duration_ms": 29
+            }
+          ]
+        },
+        "previous_candidate": "e646456fe07e45dd5a033d753f43f1d539899d8a"
+      }
+    },
+    {
+      "id": "planning-claim-621abea550179a234aa8691a-decision",
+      "work_id": "w-630ae432039dbb236949d842",
+      "revision": 22,
+      "kind": "planning.decide",
+      "at": "2026-10-13T19:28:16.254951993Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "planning-claim-621abea550179a234aa8691a-decision",
+        "expected_revision": 21,
+        "scope": "root",
+        "scope_revision": 3,
+        "holder": "planner-119968a0ab1d7aa7e6c1b97b",
+        "generation": 5,
+        "input_events": [
+          "plan-20478c766b1af4952fdc63bce2fc734a5162e3ab69013517887f6d36a18b5ac1",
+          "review-42de5ab5e3e936f7eb9140b7",
+          "plan-119e372cc8339a6fcf846e85a2dd913f86e84d114203db2a1581311d86ef5e6c",
+          "plan-6c4a9e6256e4be17850ed7d4bafa068f1922865a592ead5dc95d3fdef6402184"
+        ],
+        "operations": [
+          {
+            "judge_verdict": "end",
+            "judge_cycle": 1,
+            "expected_candidate": "8f44756859bb6c6b6d30c796d25d8d0635cc5c5d",
+            "kind": "judge",
+            "id": "",
+            "title": "",
+            "requirements": null
+          }
+        ],
+        "reason": "La tentative corrigée de recover-number est terminée, son candidat 8f44756859bb6c6b6d30c796d25d8d0635cc5c5d a reçu une revue indépendante positive, a été intégré puis marqué accepted. Le rapport conserve la reproduction du défaut initial 0 != 42 et la garde sémantique vérifiant désormais le retour exact de 42. L’unique exigence req-1 est donc couverte par un résultat accepté et frais ; aucun travail utile ne reste dans ce cycle."
+      }
+    }
+  ]
+}

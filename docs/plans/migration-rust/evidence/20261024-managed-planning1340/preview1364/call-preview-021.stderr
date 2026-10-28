@@ -1,0 +1,13 @@
+{
+  "error": "planning-call-request-invalid",
+  "failure": {
+    "causes": [
+      "planning-call-request-invalid",
+      "planning-call-request-invalid"
+    ],
+    "code": "planning-call-request-invalid",
+    "message": "planning-call-request-invalid",
+    "retryable": false
+  },
+  "schema_version": 1
+}

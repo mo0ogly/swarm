@@ -1,0 +1,99 @@
+{
+  "binary": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/paea-contract-target/debug/swarm-rust",
+  "sha256": "addcc5eb6b32dd7d2ed963a01a80062155ccd9613985fb518c079f5a461f794f",
+  "bytes": 193449408,
+  "source_reference": "20261025-contract-qekt2uwo/recipe-01",
+  "owned_rust_inputs_unchanged": {
+    "rust/crates/swarm-cli/src/protection.rs": true,
+    "rust/crates/swarm-protection-contract/Cargo.toml": true,
+    "rust/crates/swarm-protection-contract/src/canonical.rs": true,
+    "rust/crates/swarm-protection-contract/src/lib.rs": true,
+    "rust/crates/swarm-protection-contract/src/strict_json.rs": true,
+    "rust/crates/swarm-protection-contract/src/types.rs": true,
+    "rust/crates/swarm-protection-contract/tests/contract.rs": true
+  },
+  "local_fingerprints_not_full_compiler_graph": {
+    ".cache/paea-contract-target/debug/.fingerprint/swarm-cli-9aea5613768b1ab3/bin-swarm-rust.json": {
+      "rustc": 16696009966390864400,
+      "features": "[]",
+      "declared_features": "[]",
+      "target": 7536849621001657834,
+      "profile": 8731458305071235362,
+      "path": 9475003592999080285,
+      "deps": [
+        [
+          1713407893597586805,
+          "tokio",
+          false,
+          17321704776711225872
+        ],
+        [
+          1780490417942452409,
+          "swarm_cli",
+          false,
+          7879470397522296313
+        ],
+        [
+          2706596000157355553,
+          "swarm_web",
+          false,
+          14494910161230431446
+        ],
+        [
+          3646101781514403606,
+          "rustix",
+          false,
+          9877186902597321395
+        ],
+        [
+          5150833351789356492,
+          "nix",
+          false,
+          17944107780157727106
+        ],
+        [
+          5646328575759228672,
+          "swarm_engine",
+          false,
+          847255216179702944
+        ],
+        [
+          8578586876803397814,
+          "serde_json",
+          false,
+          14537043585651661875
+        ],
+        [
+          12230788162839858797,
+          "swarm_enrollment_bootstrap",
+          false,
+          6020277416660590488
+        ],
+        [
+          13548984313718623784,
+          "serde",
+          false,
+          4627683902719735473
+        ],
+        [
+          16481557032836108487,
+          "swarm_protection_contract",
+          false,
+          13903435356429529921
+        ]
+      ],
+      "local": [
+        {
+          "CheckDepInfo": {
+            "dep_info": "debug/.fingerprint/swarm-cli-9aea5613768b1ab3/dep-bin-swarm-rust",
+            "checksum": false
+          }
+        }
+      ],
+      "rustflags": [],
+      "config": 8247474407144887393,
+      "compile_kind": 0
+    }
+  },
+  "scope": "Retained test artifact only. No compilation, source delivery, runtime installation or E2/E3 qualification."
+}

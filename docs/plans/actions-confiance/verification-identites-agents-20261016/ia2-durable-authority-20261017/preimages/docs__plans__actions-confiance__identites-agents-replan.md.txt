@@ -1,0 +1,314 @@
+# R01/R13 — identité des agents et autorité de création
+
+16 octobre 2026. Propriétaire du chantier : Codex, développement direct sans
+délégation. Méthode : `replan` et APEX pour la tranche de réalisation à venir.
+Statut : IA1, audit initial et sept contre-exemples reproduits en environnement
+isolé ; **contrôle de création des agents non implémenté**. Voir le
+[rapport IA1](verification-identites-agents-20261016/RAPPORT-IA1.md) pour les
+preuves, la couverture partielle des scénarios et les limites.
+
+Reprise du 17 octobre : le noyau privé IA2.2 est écrit et vérifié localement
+(100 noms de tests/sous-tests, plus 14 contrôles existants). Le
+[rapport IA2.2](verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md)
+conserve aussi deux défauts introduits, reproduits puis corrigés avant livraison.
+Le [contrat concret FR/EN](../../architecture/AGENT-IDENTITY-CONTRACT.md) décrit
+types, source Trust, délégation, révocation, rejeu et contexte de projet.
+**Aucun lanceur n'est raccordé : F01–F07, IA2.3 et IA3–IA5 restent ouverts.**
+
+## Besoin et périmètre
+
+Demande utilisateur : empêcher un attaquant de créer un agent présenté comme
+légitime ; empêcher aussi un agent légitime de créer un agent non autorisé.
+Une création hors plan nécessite une explication et une décision humaine
+explicite avant tout lancement. Ces exigences appartiennent à la gestion des
+identités de l'application et couvrent les usages développement et métier.
+
+L'ajout conserve R01/R13 et les preuves historiques des identités de confiance.
+Il étend leur périmètre au cycle de vie des agents. Il est également un préalable
+à [M20, propriété du cadrage](../deepagents-integration/INCREMENT-MEMOIRE-16.md) :
+propriétaire logique, auteur attesté et droits d'usage sont trois informations
+distinctes. Un nom, un fournisseur, un identifiant, un rôle, une filiation ou
+une empreinte de contenu ne constitue pas une preuve d'identité ni un droit.
+
+## État observé et première frontière manquante
+
+| Source inspectée | Observation | Conséquence |
+| --- | --- | --- |
+| `internal/engine/agents_store.go`, `prepareLaunch` | `event_id` lie les reprises au contenu ; validation de rôle, tâche, révision et gardes de lancement. | L'idempotence n'authentifie pas le demandeur ; raccorder identité et autorisation au contrat de création. |
+| `internal/engine/console_cli.go`, branche `agent` ; `web_server.go`, lancements et reprises | Les chemins rejoignent la préparation d'un lancement. | Une validation dans le seul écran serait contournable ; inventorier aussi les autres appelants. |
+| `trust_identity_context.go`, `trust_workload.go` | Contexte authentifié séparant `human`, `service` et `local`, sessions et révocation. | Réutiliser ces producteurs ; ne pas accepter d'identité déclarée dans le corps de la demande. |
+| `agents_process.go`, `spawnAgent`, `supervise`, `providerEnvironment` ; `agent_build_cache.go`, `workerLaunchEnvironment` | Processus fournisseur et environnement préparés ; le lancement général n'applique pas le confinement du helper Trust. | Un agent exécuté sous le même compte système ne doit pas pouvoir lire ou modifier le plan de contrôle et ses secrets. Cette séparation reste à construire et à vérifier. |
+| `model.go`, `brainstorm.go`, `dialogue_context.go`, `memory_summary_source.go` | Attribution technique partielle et chemins de diffusion du cadrage. | Légitimité de l'agent et autorisation d'utiliser chaque source doivent être contrôlées séparément. |
+
+Sonde locale en lecture seule de capacité : `bwrap --unshare-user --unshare-pid
+--ro-bind / / --proc /proc -- /bin/true` sort avec le code 0. Cela établit
+seulement la disponibilité de cette primitive sur cette machine, sans prouver
+le confinement d'un fournisseur, la protection de `.swarm` ou la portabilité.
+La télémétrie eBPF et le helper scellé existant ne prouvent pas cette protection.
+
+L'audit des appelants demeure ouvert : `console.go`, `console_dialog.go`,
+`dispatcher.go`, `assist_action.go`, `dialogue_restore.go`, `pilotage.go`,
+`mission_status.go` et les reprises de lancements préparés. Un inventaire de
+symboles ne vaut pas preuve de leur couverture effective.
+
+## Invariants requis
+
+1. Le moteur authentifie le demandeur et attribue lui-même l'identité d'une
+   instance d'agent, liée à sa mission, sa tâche, sa tentative et son autorisation.
+   Distinguer l'agent logique, ses instances et le service fournisseur. Un
+   fournisseur partagé n'est pas une identité individuelle d'agent.
+2. Être authentifié ne donne aucun droit de création implicite. Toute création
+   nécessite une autorisation courante, limitée à son contenu exact, au périmètre,
+   au plan/version concernés, aux capacités et aux ressources accordées. Le
+   parent ne délègue que les droits explicitement délégables ; un enfant ne les
+   étend pas et ne reçoit pas automatiquement les secrets du parent.
+3. Un contenu de cadrage, un template, une mémoire, un message ou une sortie
+   d'outil peut proposer une création ; seul un plan adopté et une autorité
+   vérifiée peuvent la permettre. Importer un plan ou une ancienne preuve ne
+   crée pas une autorisation locale active.
+4. Hors plan : bloquer le lancement, conserver une demande motivée et présenter
+   l'écart, le demandeur, l'agent proposé, sa mission, ses droits, son coût/sa
+   réservation prévus et le risque de l'exception. Une absence de réponse reste
+   en attente ; un refus reste un refus. La demande ne réserve pas implicitement
+   une exécution ni ne consomme un appel fournisseur.
+5. L'approbateur est une personne authentifiée et habilitée, distincte du
+   demandeur. Un service, un champ `human:true`, un texte « approuvé » ou la seule
+   session partagée du cockpit ne constitue pas une décision humaine attestée.
+   Le bootstrap de cette autorité doit être explicite, jamais déduit du premier
+   appelant. Une permission absente ne se résout pas en désactivant le contrôle.
+6. L'accord porte sur le contenu exact présenté. Modifier tâche, parent, rôle,
+   fournisseur/modèle, outils, périmètre de données, droits ou réservations rend
+   l'accord incompatible. Une validation humaine n'efface ni les refus de schéma,
+   ni les limites du fournisseur, ni les interdictions non dérogeables.
+7. Revalider identité, révocation, délégation, plan et accord au point qui engage
+   la création, puis au départ effectif du processus. Après révocation prise en
+   compte, aucun nouveau départ. Définir aussi le traitement des agents déjà en
+   cours et de leurs descendants ; ne pas déduire leur arrêt d'un statut affiché.
+8. Une autorisation ne permet qu'un effet prévu. Réserver et appliquer de façon
+   atomique, réconcilier les départs incertains après panne ; aucun double agent,
+   même sous concurrence ou après redémarrage. Garder les consommations cumulées.
+9. Les identités et droits contrôlent aussi lecture, résumé et transmission du
+   cadrage et de la mémoire. Un agent légitime n'accède pas aux autres périmètres
+   par un historique automatique, une citation ou un brief adopté.
+10. Le journal ajoute demande, refus/attente, décision attribuée, application et
+    effet observé. Il conserve les originaux sans jetons ni secrets. Protéger le
+    stockage, les clés et les mécanismes d'ancrage contre les processus agents :
+    « append-only » dans l'API ne garantit pas l'inaltérabilité du fichier hôte.
+
+## Matrice de scénarios à reproduire
+
+Chaque ligne décrit une recette attendue. L'état observé après IA1 est conservé
+dans le rapport : **4 FAIL, 4 PARTIAL et 10 NOT TESTED ; aucun scénario entièrement
+PASS**. Le succès exige le contrôle commun et les parcours publics concernés ; un refus
+doit conserver sa cause sans créer d'agent, de processus ou de réservation de
+lancement. Une demande d'exception explicite peut ajouter sa propre trace.
+
+| ID | Scénario | Résultat attendu |
+| --- | --- | --- |
+| IDA-01 | Attaquant anonyme, jeton inventé, signature invalide ou identité suspendue. | Refus avant toute création ; aucun rôle déduit des champs déclarés. |
+| IDA-02 | Copie du nom, `event_id`, rôle, fournisseur, parent ou identifiant d'un agent légitime. | Aucune appropriation de l'identité ni des droits ; collision de contenu refusée. |
+| IDA-03 | Agent authentifié demandant un enfant absent du plan ou sans droit de délégation. | Pas de lancement ; demande motivée à une personne habilitée pour une exception admissible. |
+| IDA-04 | Création prévue au plan adopté, identité et délégation valides. | Un seul agent, au contenu exact autorisé ; preuve de réception de son périmètre et de ses droits. |
+| IDA-05 | Enfant demandant davantage de droits, changeant de périmètre ou transmettant une autorisation non délégable. | Refus de l'extension ; aucune promotion par filiation. |
+| IDA-06 | Document, mémoire, template, réponse fournisseur ou message se présentant comme ordre officiel. | Proposition non autorisante ; passage obligé par le contrôle d'identité et d'admission. |
+| IDA-07 | Service ou agent tentant d'approuver sa propre exception, y compris avec rôle d'approbateur déclaré. | Refus ; seule une personne authentifiée et habilitée peut décider. |
+| IDA-08 | Changement d'outils, mission, parent, modèle, accès aux données ou réservations après aperçu/accord. | Accord incompatible ; nouvelle présentation et nouvelle décision nécessaires. |
+| IDA-09 | Rejeu d'un accord consommé, expiré, révoqué ou provenant d'un autre projet ; deux demandes concurrentes. | Aucun droit transporté entre projets ; effet unique ou conflit, jamais un enfant supplémentaire. |
+| IDA-10 | Révocation/suspension, changement de plan ou de politique entre demande, accord, mise en attente et départ. | Revalidation au point d'engagement et avant processus ; refus frais sans remise à zéro de l'historique. |
+| IDA-11 | Panne avant/après réservation ou départ ; réponse perdue ; reprise du serveur. | Réconciliation avec le résultat durable avant nouvelle action ; statut inconnu conservé tant que l'effet n'est pas établi. |
+| IDA-12 | Même demande via CLI, API, assistant, reprise de dialogue, lancement préparé ou dispatch automatique. | Même décision d'autorité ; aucun contournement par une voie secondaire. |
+| IDA-13 | Agent légitime lisant, résumant ou transmettant cadrage/mémoire d'un autre propriétaire ou usage interdit. | Refus au consommateur, y compris historique automatique ; aucun contenu interdit dans le prompt ou les logs. |
+| IDA-14 | Agent lisant les secrets du contrôle, modifiant registre/politiques/logs, lançant directement un binaire ou réutilisant un PID. | Frontière d'exécution vérifiée et attribution résistante à la réutilisation de PID ; aucun agent ainsi promu légitime. Distinguer processus OS et instance admise par Swarm. |
+| IDA-15 | Plan, archive, ancien agent ou preuve importés avec droits historiques. | Historique conservé ; aucune autorité locale réactivée sans admission actuelle. |
+| IDA-16 | Refus humain, absence de réponse ou indisponibilité du service d'identité. | Attente/refus explicites, sans approbation par délai ni lancement de repli. |
+| IDA-17 | Rafale de demandes d'exception ou arborescence récursive prévue mais excessive. | Limites de ressources appliquées et explicables, persistées et administrables ; aucun élargissement automatique des budgets. |
+| IDA-18 | Journal interrompu, altéré ou incomplet ; tentative d'effacer refus et filiation. | Lacune/altération détectée selon l'ancre vérifiée ; aucune clôture fabriquée ni preuve régénérée à partir d'un récit. |
+
+### Compléments de couverture après IA1
+
+Le [contrôle de couverture](verification-identites-agents-20261016/COUVERTURE-RISQUES.md)
+retrouve les demandes initiales et les risques historiques R01/R13. Il précise
+six variantes à intégrer aux critères IA2/IA3 et à la qualification IA5, sans
+modifier IDA-01–18 ni transformer les PASS historiques de Trust en validation
+des agents :
+
+| Référence | Variante à définir et vérifier | Rattachement |
+| --- | --- | --- |
+| COV-ID-01 | Vol/copie d'un jeton valide ou d'une autorisation, usage par une autre instance/processus et service privilégié utilisé comme intermédiaire. Définir l'ancrage attesté, pas seulement le secret présenté. | IDA-01/02/05/09/14 |
+| COV-ID-02 | Réexercer au consommateur agent les mauvais issuer/audience/type de jeton, rôles hors plafond, rotation/révocation des clés, révocation distante et expiration pendant le verrou. | IDA-01/07/09/10/12/16 |
+| COV-ID-03 | Homonymes entre émetteurs/projets, clone, reconnexion et remplacement d'une instance ; aucun transfert ou rétablissement implicite des droits. | IDA-02/09/15 |
+| COV-ID-04 | La cible de retrait des droits, arrêt des instances actives/descendants et réconciliation est explicitée dans le contrat IA2. Son application, la course au départ et l'extinction réelle restent à prouver avant IA3. | IDA-10/11/16 |
+| COV-ID-05 | Couvrir aussi les activations sans ligne `Agent`, les précontrôles et les métadonnées ; aucun exécutable fournisseur interdit lancé avant admission. | IDA-03/06/12/14/17 |
+| COV-ID-06 | Récupération après compromission et restauration d'une ancienne sauvegarde/ancre authentique, sans réactiver droits ou accords révoqués ; préciser autorité et modèle de menace. | IDA-09/10/15/18 |
+
+Ces variantes ne sont pas de nouveaux défauts runtime démontrés. Leur état reste
+NON TESTÉ pour le nouveau contrat. Codex en est propriétaire dans IA2/IA3/IA5 ;
+les critères détaillés figurent dans le contrôle de couverture. L'inventaire
+ne constitue pas une garantie d'absence d'autres risques.
+
+## Choix et séquence de réalisation
+
+Deux approches comparées : ajouter seulement des champs auteur/parent dans les
+requêtes, ou raccorder l'admission des agents à l'identité authentifiée et à une
+frontière de contrôle protégée. La première garde le problème d'usurpation et
+les voies de contournement. La seconde est retenue comme cible ; le mécanisme
+de confinement fournisseur sera choisi et vérifié avant toute garantie hôte.
+
+| Lot | Dépendance / propriétaire | Livrable et preuve de sortie |
+| --- | --- | --- |
+| IA1 Audit et contre-exemples | M19 conservé ; Codex | Audit initial livré : inventaire des créations, reprises, invocations de rôles et accès au contrôle ; sept contre-exemples CLI/API/processus, racines isolées, aucun modèle réel. Les voies inventoriées seulement et scénarios non testés restent explicités dans le rapport IA1. |
+| IA2 Contrat d'identité et de délégation | IA1 ; Codex | Liens principal/instance/plan, droits exacts, révocation, import et bootstrap ; tests invalides et refus sans mutation. Réutiliser `identity-context-v1` sans assimiler service et humain. |
+| IA3 Admission et décision humaine | IA2 ; Codex | Opérations publiques communes CLI/API, demande expliquée, décision humaine exacte, consommation atomique, rejeu et reprise ; protection du plan de contrôle testée. |
+| IA4 Droits du cadrage et interface | IA3 et M20 ; Codex | Propriétaire, auteur, consultation/résumé/transmission contrôlés ; attentes et refus visibles. Configuration éventuelle commune Go/API/CLI/Admin, FR/EN, thèmes et clavier. |
+| IA5 Qualification et RETEX | IA3/IA4 ; Codex | Matrice IDA-01–18, recettes réelles avec fournisseurs scriptés, preuves de persistance/concurrence/effet, docs FR/EN ; distinguer contrôle local, revue indépendante et déploiement. |
+
+Reprise après « c'est lancé ? » puis « fais » : IA2 est engagé en développement
+direct. Le [contrat sémantique IA2](identites-agents-contrat-IA2.md) distingue
+principal, agent logique, instance, canal, autorisation et effet. Il fixe la cible
+de révocation des instances actives et descendants, sans confondre retrait des
+droits et arrêt vérifié. L'administration de la source d'identité doit aussi être
+protégée ; les rôles Trust et le step-up actuels ne valent pas automatiquement
+droits de création. IA2.2/IA2.3 restent requis pour le contrat concret et les
+preuves ; aucun contrôle applicatif nouveau n'est déclaré opérationnel.
+
+Premier résultat IA2.3 : une expérience hôte isolée compare le même programme
+scripté avec/sans `bwrap`. Dix variantes d'accès au contrôle sont refusées,
+l'écriture autorisée dans le workspace persiste et registre/clé/SQLite restent
+inchangés. Aucun modèle réel ; réseau fournisseur, ancrage d'identité, approbation,
+révocation et intégration dans les lanceurs restent ouverts. Le contrat IA2
+référence les originaux de cette expérience ; ce PASS local ne clôt pas F07.
+
+Les opérations publiques, leurs schémas et paramètres restent à définir depuis les
+producteurs réels ; ce document n'invente aucun endpoint ni commande. Les
+invariants obligatoires ne doivent pas posséder de mode permettant leur
+contournement. Toute politique opérateur nouvelle doit être persistée et
+éditable dans Admin avec la même validation en Go/API/CLI.
+
+Condition de fermeture : demande reçue → décision attribuée → application
+autorisée → effet constaté pour les cas permis, refus sans effet pour les autres,
+et protection des accès directs démontrée dans le périmètre annoncé. Une suite
+OIDC verte, une règle écrite ou un test de primitive OS ne ferme pas ce chantier.
+Le propriétaire technique reste Codex ; une configuration d'identité réelle ou
+un déploiement manquant sera remis explicitement à l'administrateur compétent.
+
+## Reprise IA1 — conversation dédiée, 16 octobre 2026
+
+Périmètre retenu : audit et contre-exemples avant correction, Codex seul,
+`replan` puis `audit-pdca` en mode audit. Aucun lancement de modèle réel,
+aucune modification applicative ni intervention sur une mission existante.
+Référence de départ : `4e58f7cbf8200a58f69f1f4d03d657c3313fb642` avec changements
+locaux conservés ; les empreintes des entrées réellement compilées feront foi.
+
+Coordination des fichiers : ce chat possède la présente section et
+`verification-identites-agents-20261016/`. Le chantier mémoire conserve
+`docs/plans/deepagents-integration/`, les sources et tests mémoire. Les sources
+communes de lancement, de stockage, de contexte et de Trust sont lues seulement
+pendant IA1 ; annoncer et coordonner leur modification avant IA2/IA3. Le chat
+mémoire « Comparer Deep Agents à Swarm » a été consulté en lecture seule pour
+rétablir ce passage de relais ; aucun message ne lui a été envoyé.
+
+Critères IA1 : inventorier les producteurs et chemins secondaires de lancement,
+distinguer la session cockpit d'une identité individuelle, reproduire les
+premières frontières absentes par CLI/API et processus scripté, conserver les
+contrôles existants et les limites non testées. La présence d'un contre-exemple
+établit un défaut ; elle ne rend pas les autres scénarios conformes. IA2–IA5 et
+les droits effectifs de mémoire restent ouverts.
+
+Résultat de la reprise : sept contre-exemples aboutis, huit invocations de
+travail de fournisseurs scriptés, aucun modèle réel ; quatre tests Go et leurs
+neuf sous-tests PASS pour les contrôles existants. Les 1 038 entrées de source,
+tests et ressources inventoriées sont inchangées. Les défauts applicatifs
+restent ouverts pour IA2/IA3 ; ne pas convertir les tests verts de Trust en
+validation de la création des agents. Le rapport IA1 conserve aussi les deux
+échecs de prérequis de la recette et leur diagnostic, sans les compter comme
+tests de protection réussis.
+
+## Suite IA2.3 — canal d'instance, 17 octobre
+
+L'[expérience du canal](verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md)
+passe 13 contrôles sur deux cages scriptées. Une connexion authentique copiée
+de B à A ne transfère pas l'identité B lorsque chaque message est attribué par
+le kernel. PID/montage sont épinglés avant exécution ; le namespace utilisateur
+n'est pas supposé stable. Source d'autorité, persistance et raccord Go restent
+ouverts, ainsi que les constats IA1 et la qualification globale.
+
+## Documentation consolidée — 17 octobre
+
+Le [contrat opérationnel FR/EN](../../architecture/AGENT-IDENTITY-CONTRACT.md)
+décrit le composant réellement présent, les entrées, refus, sources d'autorité
+manquantes et responsabilités. Les rapports IA2.2/IA2.3 conservent sources,
+empreintes, échecs avant correction, commandes, résultats et schémas rendus.
+Le [dossier scientifique actualisé](../../publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md#8-état-réel-de-swarm-et-preuve-disponible)
+sépare précédents, hypothèses, contributions candidates et preuves locales.
+L'[index documentaire final](verification-identites-agents-20261016/ia2-runtime-binding-20261017/checks-documentation-final.json)
+lie cette version aux contrôles et vérifie leurs entrées ; les anciens index
+restent des checkpoints historiques.
+
+Les améliorations SCI-ID-06–10 consolident IA2-K01/K02 et les découvertes de
+canal/validation, avec origine, valeur, propriétaire, critère et état. Pas de
+nouvelle preuve d'autonomie, de réception par un autre chat ou de transmission
+à tous les futurs contextes. Les consignes permanentes existantes ne sont pas
+réinstallées ; le chantier mémoire conserve ses fichiers.
+
+Prochaine unité de réalisation, Codex : définir puis éprouver le courtier Go et
+son producteur d'autorité protégé, avec registre courant et engagement Trust /
+SQLite. Sortie requise : attribution réelle, contrôle frais, refus sans mutation,
+révocation et récupération vérifiés, avant raccord de tous les lanceurs IA3.
+Cette unité conserve le cas de connexion transférée et l'absence d'auto-ancrage
+par le premier message. Aucune nouvelle exécution native ni surveillance
+récurrente n'est autorisée par cette documentation. IA5 et le RETEX restent ouverts.
+
+## IA2.3a — portage du canal en Go, reprise du 17 octobre
+
+Besoin : remplacer l'identité d'instance simulée de IA2.2 par une attribution
+d'exécution vérifiée, sans accepter l'identité déclarée ou celle de la connexion.
+Deux options : rouvrir `/proc/<pid>` depuis les credentials du message, ou
+utiliser le pidfd remis par le noyau avec ce message et obtenir ses namespaces
+par ioctl. La première laisse une course de résolution du numéro de PID ; la
+seconde est retenue, avec refus si le noyau ne fournit pas les primitives requises.
+Cette course est une limite identifiée par inspection, pas un exploit reproduit.
+La sonde hôte confirme credentials, pidfd et ouverture PID/montage par ioctl.
+
+Propriétaire Codex, fichiers nouveaux `agent_identity_channel_linux.go`,
+`agent_identity_runtime_linux.go` et leurs tests ; contrat FR/EN et preuves dans
+`verification-identites-agents-20261016/ia2-go-channel-20261017/`. Aucun fichier
+mémoire, lanceur, stockage ou Trust préexistant modifié dans cette tranche.
+Ordre local prévu : réception hors verrou Trust, puis verrou Trust partagé,
+puis registre de liaisons en mémoire, puis évaluation IA2.2 sans effet métier.
+
+Critères : cages A/B épinglées par le contrôle avant ouverture de la porte ;
+message de A sur connexion B attribué à A ; refus de l'octroi B et acceptation
+de l'octroi A ; sous-processus légitime reconnu ; émetteur disparu, message
+tronqué, droits de fichier injectés et registre fermé/révoqué refusés ; fermeture
+des descripteurs reçus et absence de course de données. Rejouer les contrôles
+IA2.2 pertinents, puis analyse statique et compilation. Conserver commandes,
+sorties, sources et entrées exactes, sans annoncer de revue indépendante.
+
+Le registre de liaisons est privé au processus contrôleur ; la source durable
+d'autorité, bootstrap humain, protocole Trust/SQLite et raccord aux lanceurs
+restent des critères IA2.3/IA3 séparés. Un consommateur interne utilisant encore
+un cadre d'autorité de fixture ne prouvera pas leur réalisation. F01–F07 restent
+ouverts jusqu'à vérification des parcours concernés.
+
+### Résultat IA2.3a
+
+Le [canal Go et son rapport](verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md)
+relient une attribution réelle de message au noyau privé IA2.2 dans deux cages
+isolées. 133 noms de tests/sous-tests PASS, dont 19 nouveaux et 114 déjà présents ;
+les mêmes 19 nouveaux passent sous `-race`. Analyse statique et compilation
+réussies. La connexion reste attribuée à B côté pair, mais le message de A est
+évalué comme A : son octroi passe, celui de B est refusé. La table de liaison est
+tenue par le contrôle, non remplissable par le premier message.
+
+Une nouvelle course IA2-K03 est reproduite avant correction : expiration durant
+l'attente du verrou runtime. L'horloge est désormais lue après cette attente et
+la résolution des namespaces ; contrôle positif et refus après expiration passent.
+Le défaut initial de socket non bloquant partagé dans la fixture et sa correction
+sont aussi conservés. Les résultats sont liés à 1 046 entrées inchangées ; aucune
+source mémoire/lanceur/Trust préexistante n'a été modifiée par cette tranche.
+
+Ce résultat ferme seulement les critères locaux du portage IA2.3a. IA2.3b doit
+fournir l'autorité durable protégée et l'engagement Trust/SQLite, puis IA3 raccorder
+les opérations publiques et l'accord humain. Instantané/octrois/cadre sont encore
+des fixtures dans ces essais. F01–F07, IDA et le RETEX restent ouverts. Ne pas
+assimiler les 133 noms à 133 attaques ou ajouter les 19 répétitions `-race`.

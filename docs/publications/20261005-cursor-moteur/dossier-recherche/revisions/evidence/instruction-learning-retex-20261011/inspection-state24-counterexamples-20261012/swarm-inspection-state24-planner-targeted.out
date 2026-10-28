@@ -1,0 +1,50 @@
+=== RUN   TestPlanningReviewRetryCanRestartChangedMethod
+    managed_review_method_restart_test.go:66: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryCanRestartChangedMethod (0.65s)
+=== RUN   TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen
+    managed_review_retry_delivery_test.go:16: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen (2.24s)
+=== RUN   TestPlanningHistoricalInputsCannotPoisonCurrentDecision
+--- PASS: TestPlanningHistoricalInputsCannotPoisonCurrentDecision (0.05s)
+=== RUN   TestPlanningReviewRetryRestrictionTracksWholeReducedBatch
+    planning_historical_delivery_test.go:260: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryRestrictionTracksWholeReducedBatch (0.60s)
+=== RUN   TestPlanningOperationSchemaSeparatesMutationKinds
+--- PASS: TestPlanningOperationSchemaSeparatesMutationKinds (0.00s)
+=== RUN   TestPlanningSchemaAdmitsOnlyCurrentEventBatch
+--- PASS: TestPlanningSchemaAdmitsOnlyCurrentEventBatch (0.00s)
+=== RUN   TestPlanningProviderCreatesTaskWithoutHostDecision
+--- PASS: TestPlanningProviderCreatesTaskWithoutHostDecision (0.06s)
+=== RUN   TestPlanningProviderFailureDoesNotLoop
+--- PASS: TestPlanningProviderFailureDoesNotLoop (0.05s)
+=== RUN   TestPlanningReviewRetryQueuesSameCandidateWithoutProductionOrSpend
+    review_failure_routing_test.go:113: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryQueuesSameCandidateWithoutProductionOrSpend (0.64s)
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/wrong_scope
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/semantic_refusal
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/changed_candidate
+    review_failure_routing_test.go:146: sizes 164551 168165 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/changed_contract
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/no_budget
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/implicit_edit
+    review_failure_routing_test.go:146: sizes 164551 168165 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/unchanged_correction
+    review_failure_routing_test.go:146: sizes 164551 168165 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/active_producer
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically (4.72s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/wrong_scope (0.59s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/semantic_refusal (0.71s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/changed_candidate (0.54s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/changed_contract (0.55s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/no_budget (0.62s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/implicit_edit (0.52s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/unchanged_correction (0.55s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/active_producer (0.64s)
+PASS
+ok  	swarm.local/companion/internal/engine	9.053s

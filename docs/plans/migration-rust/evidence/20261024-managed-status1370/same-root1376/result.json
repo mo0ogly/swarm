@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "same_original_root": true,
+  "same_work": "w-478b9727dca017fe9bc93433",
+  "database_unchanged": true,
+  "copies_created": false,
+  "workers_started": false,
+  "binary_sha256": "f8c3ee20ca93948006c2265540385d16bee7447999de7a6005f4a920d81efbe1"
+}

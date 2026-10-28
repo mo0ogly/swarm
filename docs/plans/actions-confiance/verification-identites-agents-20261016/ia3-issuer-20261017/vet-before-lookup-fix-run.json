@@ -1,0 +1,24 @@
+{
+  "command": [
+    "go",
+    "vet",
+    "./internal/engine"
+  ],
+  "executor": "Codex alone; isolated fixture stores; local OIDC signed-token fixture, no real provider",
+  "start": "2026-10-17T08:15:09.152066+00:00",
+  "end": "2026-10-17T08:15:16.402571+00:00",
+  "elapsed_seconds": 7.250506926007802,
+  "exit": 0,
+  "input_count": 1058,
+  "changed_inputs": [],
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  }
+}

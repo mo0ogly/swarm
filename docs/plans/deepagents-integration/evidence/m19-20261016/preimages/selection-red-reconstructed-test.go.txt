@@ -1,0 +1,73 @@
+//go:build linux
+
+package engine
+
+import (
+	"encoding/json"
+	"strings"
+	"testing"
+)
+
+func summarySelectionRequest(t *testing.T, s *Store, w Work, r Launch) []byte {
+	t.Helper()
+	refs := []DialogueRef{dialogueHits(w)[0].Ref, dialogueHits(w)[1].Ref}
+	q, _ := json.Marshal(MemorySummarySourceRequest{Schema: 1, Work: w.ID, Task: r.TaskID, Revision: w.Revision, Dialogues: refs})
+	packet, err := s.memorySummarySource(q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var payload struct {
+		Sources []struct {
+			ID string `json:"id"`
+		} `json:"sources"`
+	}
+	if err := json.Unmarshal([]byte(packet.Payload), &payload); err != nil {
+		t.Fatal(err)
+	}
+	base, _ := json.Marshal(r)
+	var request map[string]any
+	if err := json.Unmarshal(base, &request); err != nil {
+		t.Fatal(err)
+	}
+	request["summary_selection"] = map[string]any{"schema_version": 1, "source_sha256": packet.SHA256, "dialogues": refs, "cutoff": 4, "reason": "Keep attributed history and the remaining recent source", "protected": []map[string]any{
+		{"id": "snapshot", "message": payload.Sources[0].ID, "kind": "evidence", "state": "historical"},
+		{"id": "intention", "message": payload.Sources[1].ID, "kind": "intention", "state": "future"},
+		{"id": "incident", "message": payload.Sources[2].ID, "kind": "incident", "state": "open"},
+	}}
+	raw, err := json.Marshal(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return raw
+}
+
+func TestMemorySummarySelectionPublicLaunchContract(t *testing.T) {
+	s := storeTest(t)
+	w, r := setupAgent(t, s)
+	w = memorySeed(t, s, w)
+	r.Revision = w.Revision
+	raw := summarySelectionRequest(t, s, w, r)
+	var launch Launch
+	if err := strict(raw, &launch); err != nil {
+		t.Fatalf("extractive selection absent from public launch contract: %v", err)
+	}
+	before := recoverySnapshotTest(t, s)
+	preview, created, err := s.prepareLaunch(w.ID, launch, true)
+	if err != nil || created {
+		t.Fatal("preview", created, err)
+	}
+	if !strings.Contains(preview.Prompt, "Réponse 0") || strings.Contains(preview.Prompt, "Décision numéro 1") || !strings.Contains(preview.Prompt, "Réponse 1") || strings.Contains(preview.Prompt, "work_criteria") {
+		t.Fatal("wrong selected sources or operator snapshot injected")
+	}
+	if recoverySnapshotTest(t, s) != before {
+		t.Fatal("preview mutated state")
+	}
+	launch.ContextHash = preview.Context.SHA256
+	agent, created, err := s.prepare(w.ID, launch)
+	if err != nil || !created || agent.Prompt != preview.Prompt {
+		t.Fatal("confirmed prompt", created, err)
+	}
+	if agent.Context.SHA256 != hash([]byte(agent.Prompt)) {
+		t.Fatal("selection absent from context receipt")
+	}
+}

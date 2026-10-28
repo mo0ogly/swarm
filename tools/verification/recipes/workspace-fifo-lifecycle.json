@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "workspace-fifo-lifecycle",
+  "inputs": [
+    "rust/crates/swarm-engine/src/**/*.rs",
+    "rust/crates/swarm-cli/src/*.rs",
+    "rust/crates/swarm-cli/examples/workspace_fifo_admission.rs",
+    "tests/rust_workspace_fifo.py",
+    "tests/rust_*.py",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "strict-writer-candidate-and-binding-unit-guards",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,hashlib,subprocess\nfrom pathlib import Path\nb=Path(os.environ['SWARM_FIFO_TEST_BINARY']).resolve();p=json.loads(Path(os.environ['SWARM_FIFO_TEST_PROFILE']).read_bytes())\nassert hashlib.sha256(b.read_bytes()).hexdigest()==p['executable_sha256']\na=p['core_artifact'];assert a['target']['name']=='swarm_engine' and a['features']==[] and a['profile']['test']\nfor name,count in [('workspace_turn_write::tests',5),('mission_candidates::tests',2),('mission_agent::tests',3)]:\n run=subprocess.run([str(b),name,'--nocapture'],capture_output=True,text=True)\n print(run.stdout,end='');print(run.stderr,end='',file=__import__('sys').stderr)\n assert run.returncode==0 and ('test result: ok. '+str(count)+' passed; 0 failed;') in run.stdout\n assert sum(line.startswith('test ') and line.endswith(' ... ok') for line in run.stdout.splitlines())==count\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "sql_fifo_cross_mission_root_siblings_and_idempotent_acquisition",
+        "sql_late_journal_failure_requires_rollback_and_recovers",
+        "5 passed",
+        "2 passed",
+        "terminal_workspace_proof_preserves_legacy_and_requires_exact_released_generation",
+        "3 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-two-work-fifo-denial-rollback-pause-recovery-and-worker",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='workspace-fifo-lifecycle-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_workspace_fifo.py','--binary',os.environ['SWARM_FIFO_BINARY'],'--profile',os.environ['SWARM_FIFO_PROFILE'],'--sdk-binary',os.environ['SWARM_FIFO_SDK_BINARY'],'--sdk-profile',os.environ['SWARM_FIFO_SDK_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS two publicly planned Works share one owned datastore",
+        "PASS named SDK FIFO assertions and persisted CLI queue after reopen",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

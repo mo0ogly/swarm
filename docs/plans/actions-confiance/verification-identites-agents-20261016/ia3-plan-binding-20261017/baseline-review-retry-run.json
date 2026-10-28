@@ -1,0 +1,53 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-overlay",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/baseline-overlay.json",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen$",
+    "-count=1",
+    "-timeout",
+    "90s"
+  ],
+  "start": "2026-10-17T07:46:57.126386+00:00",
+  "end": "2026-10-17T07:47:32.065011+00:00",
+  "exit_code": 1,
+  "overlay_sources": {
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_registry_store.go": {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/preimages/internal__engine__agent_identity_registry_store.go.txt",
+      "sha256": "4e997035c5619a4f437044515a94e50c3735917dab86c4c3e07b9be103367a8c"
+    },
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_registry_publish.go": {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/preimages/internal__engine__agent_identity_registry_publish.go.txt",
+      "sha256": "3c65d98d3ee52df65608448230f45bca79812af18674e4868632087b1c83aba8"
+    },
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_registry_test.go": {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/preimages/internal__engine__agent_identity_registry_test.go.txt",
+      "sha256": "fcf1ec3006a4c26d83626348422e0fa05c0a28019b5809a1ee578c25e2f17f09"
+    },
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/model.go": {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/preimages/internal__engine__model.go.txt",
+      "sha256": "4e622d923673dc3f8d06102959755751dface79a6417a83cc4ca6bfbd5cfab46"
+    },
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/store.go": {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/preimages/internal__engine__store.go.txt",
+      "sha256": "fc5ebf3b2ffd3a12cf561e032f733618c92db2467e3d029b6bf112496eba044d"
+    },
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_plan_linux.go": {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/baseline-neutral.go.txt",
+      "sha256": "825eb94560d6297f33cc97461f07ae6b7b20d6f4a71115a7a15803eda76e9037"
+    },
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_plan_schema_linux.go": {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/baseline-neutral.go.txt",
+      "sha256": "825eb94560d6297f33cc97461f07ae6b7b20d6f4a71115a7a15803eda76e9037"
+    },
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_plan_linux_test.go": {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/baseline-neutral.go.txt",
+      "sha256": "825eb94560d6297f33cc97461f07ae6b7b20d6f4a71115a7a15803eda76e9037"
+    }
+  },
+  "note": "Read-only Go overlay from retained start-of-IA3a source preimages. New IA3a Go files are neutralized; candidate checkout unchanged."
+}

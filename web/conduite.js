@@ -4,7 +4,6 @@ const tr_web_conduite_js = source => globalThis.SwarmI18n?.t(source) ?? source;
 // Mode Conduite : un seul écran, ce qui attend une décision, et rien d'autre.
 // Mode Expert : les mêmes données plus tous les outils. Aucune fonction n'est
 // retirée par le mode Conduite ; elle est rangée.
-const conduiteOnly = ['conduite', 'manage', 'providers'];
 let cockpitMode = 'conduite';
 
 function applyMode(mode) {
@@ -12,9 +11,10 @@ function applyMode(mode) {
   document.body.dataset.mode = cockpitMode;
   cockpitStorage.setItem('swarm-mode', cockpitMode);
   $('mode').textContent = cockpitMode === 'conduite' ? tr_web_conduite_js('Passer en mode expert') : tr_web_conduite_js('Revenir au mode conduite');
-  for (const b of $('tabs').children) b.hidden = cockpitMode === 'conduite' && !conduiteOnly.includes(b.dataset.view) && b.getAttribute('href') !== '/prepare.html';
-  $('assistant').hidden = false;
-  if (cockpitMode === 'conduite' && !conduiteOnly.includes(view)) showView('conduite');
+  // Both modes expose the same destinations; accordions organize their density.
+  for (const b of $('tabs').querySelectorAll('[data-view]')) b.hidden = false;
+  $('assistant').hidden = ['providers','manage','automation','admin'].includes(view);
+  globalThis.SwarmShell?.navigate(view,false);
 }
 
 function openDecision(d) {

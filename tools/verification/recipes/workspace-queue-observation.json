@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "workspace-queue-observation",
+  "inputs": [
+    "rust/crates/swarm-engine/src/**/*.rs",
+    "rust/crates/swarm-cli/src/*.rs",
+    "tests/rust_workspace_queue.py",
+    "tests/rust_mission_task_order.py",
+    "tests/rust_agent_model_route.py",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "strict-queue-and-error-tree-unit-projections",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,hashlib,subprocess\nfrom pathlib import Path\nb=Path(os.environ['SWARM_QUEUE_TEST_BINARY']).resolve();p=json.loads(Path(os.environ['SWARM_QUEUE_TEST_PROFILE']).read_bytes())\nassert hashlib.sha256(b.read_bytes()).hexdigest()==p['executable_sha256']\na=p['core_artifact'];assert a['target']['name']=='swarm_engine' and a['features']==[] and a['profile']['test']\nfor name in ['workspace_turn::tests','mission_workspace_queue::tests']:\n subprocess.run([str(b),name,'--nocapture'],check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "sql_cross_mission_fifo_disjoint_and_released_without_mutation",
+        "malformed_sql_types_states_and_owners_refuse_and_restore",
+        "finalize_translation_keeps_primary_and_secondary",
+        "5 passed",
+        "1 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-native-observation-refusal-and-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='workspace-queue-observation-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_workspace_queue.py','--binary',os.environ['SWARM_QUEUE_BINARY'],'--profile',os.environ['SWARM_QUEUE_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS native workspace queue observation, exact ordinals, refusals and recovery",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

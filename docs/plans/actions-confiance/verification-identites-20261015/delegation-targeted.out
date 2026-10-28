@@ -1,0 +1,73 @@
+=== RUN   TestActionsConfianceT3DelegationConfigurationRejectsNegativeDepth
+--- PASS: TestActionsConfianceT3DelegationConfigurationRejectsNegativeDepth (0.06s)
+=== RUN   TestActionsConfianceT3DelegationChainEffectPersistenceAndRevocation
+--- PASS: TestActionsConfianceT3DelegationChainEffectPersistenceAndRevocation (0.08s)
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/resource
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/currency
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/beneficiary
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/start
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/amount
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/actions
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/expiry
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/missing-subject
+=== RUN   TestActionsConfianceT3DelegationRejectsAmplification/missing-parent
+--- PASS: TestActionsConfianceT3DelegationRejectsAmplification (0.65s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/resource (0.08s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/currency (0.07s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/beneficiary (0.06s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/start (0.07s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/amount (0.06s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/actions (0.06s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/expiry (0.08s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/missing-subject (0.09s)
+    --- PASS: TestActionsConfianceT3DelegationRejectsAmplification/missing-parent (0.08s)
+=== RUN   TestActionsConfianceT3DelegationPreservesLegacyRootDigest
+--- PASS: TestActionsConfianceT3DelegationPreservesLegacyRootDigest (0.00s)
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger/null
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger/"2"
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger/1.5
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger/true
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger/{}
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger/[]
+--- PASS: TestActionsConfianceT3DelegationDepthRequiresInteger (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationDepthRequiresInteger/null (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationDepthRequiresInteger/"2" (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationDepthRequiresInteger/1.5 (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationDepthRequiresInteger/true (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationDepthRequiresInteger/{} (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationDepthRequiresInteger/[] (0.00s)
+=== RUN   TestActionsConfianceT3DelegationDepthAndAuthority
+=== RUN   TestActionsConfianceT3DelegationDepthAndAuthority/0
+    trust_delegation_test.go:185: disabled delegation admitted <nil> autorisation du rejeu absente ou différente ; événement historique conservé
+=== RUN   TestActionsConfianceT3DelegationDepthAndAuthority/1
+    trust_delegation_test.go:189: autorisation du rejeu absente ou différente ; événement historique conservé
+--- FAIL: TestActionsConfianceT3DelegationDepthAndAuthority (0.14s)
+    --- FAIL: TestActionsConfianceT3DelegationDepthAndAuthority/0 (0.08s)
+    --- FAIL: TestActionsConfianceT3DelegationDepthAndAuthority/1 (0.07s)
+=== RUN   TestActionsConfianceT3DelegationAncestorRevocationBeforeApprovalOrEffect
+=== RUN   TestActionsConfianceT3DelegationAncestorRevocationBeforeApprovalOrEffect/approve
+=== RUN   TestActionsConfianceT3DelegationAncestorRevocationBeforeApprovalOrEffect/commit
+--- PASS: TestActionsConfianceT3DelegationAncestorRevocationBeforeApprovalOrEffect (0.18s)
+    --- PASS: TestActionsConfianceT3DelegationAncestorRevocationBeforeApprovalOrEffect/approve (0.08s)
+    --- PASS: TestActionsConfianceT3DelegationAncestorRevocationBeforeApprovalOrEffect/commit (0.09s)
+=== RUN   TestActionsConfianceT3DelegationMalformedChainsTerminate
+=== RUN   TestActionsConfianceT3DelegationMalformedChainsTerminate/parent-digest
+=== RUN   TestActionsConfianceT3DelegationMalformedChainsTerminate/cycle
+=== RUN   TestActionsConfianceT3DelegationMalformedChainsTerminate/suspended-ancestor
+=== RUN   TestActionsConfianceT3DelegationMalformedChainsTerminate/missing-parent
+=== RUN   TestActionsConfianceT3DelegationMalformedChainsTerminate/altered-child
+--- PASS: TestActionsConfianceT3DelegationMalformedChainsTerminate (0.08s)
+    --- PASS: TestActionsConfianceT3DelegationMalformedChainsTerminate/parent-digest (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationMalformedChainsTerminate/cycle (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationMalformedChainsTerminate/suspended-ancestor (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationMalformedChainsTerminate/missing-parent (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationMalformedChainsTerminate/altered-child (0.00s)
+=== RUN   TestActionsConfianceT3DelegationConcurrentRevocationAndCommit
+--- PASS: TestActionsConfianceT3DelegationConcurrentRevocationAndCommit (0.07s)
+=== RUN   TestActionsConfianceT3DelegationDefaultExpiryBoundedByParent
+--- PASS: TestActionsConfianceT3DelegationDefaultExpiryBoundedByParent (0.06s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.417s
+FAIL

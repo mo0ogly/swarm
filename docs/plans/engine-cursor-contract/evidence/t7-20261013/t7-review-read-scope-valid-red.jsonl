@@ -1,0 +1,9 @@
+{"Time":"2026-10-13T10:27:10.803318138+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-13T10:27:10.835931443+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestIndependentReviewReadScopeReusesOnlyItsOwnSnapshot"}
+{"Time":"2026-10-13T10:27:10.83600969+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestIndependentReviewReadScopeReusesOnlyItsOwnSnapshot","Output":"=== RUN   TestIndependentReviewReadScopeReusesOnlyItsOwnSnapshot\n"}
+{"Time":"2026-10-13T10:27:10.873820639+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestIndependentReviewReadScopeReusesOnlyItsOwnSnapshot","Output":"    review_read_scope_test.go:34: same projection repeats physical guard: lstat /tmp/TestIndependentReviewReadScopeReusesOnlyItsOwnSnapshot435044330/001/docs/report.md: no such file or directory\n"}
+{"Time":"2026-10-13T10:27:10.876441753+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestIndependentReviewReadScopeReusesOnlyItsOwnSnapshot","Output":"--- FAIL: TestIndependentReviewReadScopeReusesOnlyItsOwnSnapshot (0.04s)\n"}
+{"Time":"2026-10-13T10:27:10.876557852+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestIndependentReviewReadScopeReusesOnlyItsOwnSnapshot","Elapsed":0.04}
+{"Time":"2026-10-13T10:27:10.876573982+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-13T10:27:10.884360709+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.081s\n"}
+{"Time":"2026-10-13T10:27:10.884459776+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.081}

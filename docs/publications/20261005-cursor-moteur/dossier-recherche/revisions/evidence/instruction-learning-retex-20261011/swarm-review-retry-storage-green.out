@@ -1,0 +1,8 @@
+=== RUN   TestReviewRetryStorageMigrationPreservesQueuedInstruction
+    managed_review_retry_storage_test.go:13: sizes 164551 168165 21899 parts 1
+--- PASS: TestReviewRetryStorageMigrationPreservesQueuedInstruction (0.78s)
+=== RUN   TestReviewRetryConnectedWriterRejectsChangedStorageBeforeMutation
+    managed_review_retry_storage_test.go:69: sizes 164551 168167 21899 parts 1
+--- PASS: TestReviewRetryConnectedWriterRejectsChangedStorageBeforeMutation (0.60s)
+PASS
+ok  	swarm.local/companion/internal/engine	1.409s

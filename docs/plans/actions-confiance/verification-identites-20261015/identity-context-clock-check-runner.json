@@ -1,0 +1,10 @@
+{
+  "pid": 1101595,
+  "proc_start_ticks": "2666623",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-identity-clock-check.py",
+    "run"
+  ],
+  "at": "2026-10-15T19:24:02.089962+00:00"
+}

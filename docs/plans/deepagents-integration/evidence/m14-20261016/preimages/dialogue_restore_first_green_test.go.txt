@@ -1,0 +1,293 @@
+//go:build linux
+
+package engine
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"sync"
+	"testing"
+	"time"
+)
+
+func TestDialogueRestorePublicOperationExists(t *testing.T) {
+	s, a, _ := dialogueRestoreFixture(t, "codex")
+	p, err := s.recoveryPreview(a.WorkID, a.TaskID, a.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request := map[string]any{"schema_version": 1, "event_id": "restore-public", "expected_revision": p.Revision, "checkpoint_sha256": p.Dialogue.Boundary.SHA256, "facts_sha256": p.Dialogue.FactsSHA256, "confirm": true, "reason": "Examine the same retained session", "instruction": "Continue the retained conversation after this confirmed boundary"}
+	raw, _ := json.Marshal(request)
+	file := filepath.Join(t.TempDir(), "request.json")
+	if err := os.WriteFile(file, raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	var out, stderr bytes.Buffer
+	code := run([]string{"--root", s.root, "--json", "agent", "resume-dialogue-preview", a.ID, "--input", file}, &out, &stderr)
+	if code != 0 {
+		t.Fatalf("explicit dialogue restoration preview is unavailable: %s%s", out.String(), stderr.String())
+	}
+}
+
+func dialogueRestoreFixture(t *testing.T, provider string) (*Store, Agent, string) {
+	t.Helper()
+	events := []string{`{"type":"thread.started","thread_id":"restore-session"}`, `{"type":"item.started","item":{"id":"tool_0","type":"command_execution","command":"fixture-command"}}`, `{"type":"item.completed","item":{"id":"tool_0","type":"command_execution","status":"completed","exit_code":0}}`, `{"type":"turn.completed","total_cost_usd":0.1,"usage":{"input_tokens":10,"output_tokens":2}}`}
+	if provider == "claude" {
+		events = []string{`{"type":"system","session_id":"restore-session"}`, `{"type":"assistant","message":{"content":[{"type":"tool_use","id":"tool_0","name":"Read","input":{"file_path":"fixture.txt"}}]}}`, `{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"tool_0","content":"fixture value"}]}}`, `{"type":"result","subtype":"success","is_error":false,"session_id":"restore-session","total_cost_usd":0.1,"usage":{"input_tokens":10,"output_tokens":2}}`}
+	}
+	s, a, script := dialogueReceiptFixture(t, provider, events)
+	a.Limits, _ = (RunLimits{MaxToolCalls: 4, MaxRepeatedCalls: 8, MaxConsecutiveErrors: 3}).normalized()
+	if err := s.saveAgent(a); err != nil {
+		t.Fatal(err)
+	}
+	providers, err := s.providers()
+	if err != nil {
+		t.Fatal(err)
+	}
+	p := providers.Providers[a.Provider]
+	p.Limits = a.Limits
+	p.PreflightArgs = []string{"--swarm-preflight"}
+	p.PreflightKind = "provider-context"
+	p.PreflightCaps = append([]string{}, requiredProviderCapabilities...)
+	p.PreflightTimeout = 5
+	providers.Providers[a.Provider] = p
+	raw, _ := json.Marshal(providers)
+	if err = os.WriteFile(filepath.Join(s.root, ".swarm/providers.json"), raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	body, err := os.ReadFile(script)
+	if err != nil {
+		t.Fatal(err)
+	}
+	prefix := `#!/bin/sh
+if [ "$1" = "--swarm-preflight" ]; then
+ if [ -f "$0.block" ]; then touch "$0.ready"; while [ ! -f "$0.release" ]; do sleep 0.01; done; fi
+ printf '%s\n' '{"schema_version":1,"capabilities":{"process":"verified","workspace_read":"verified","workspace_write":"verified"}}'
+ exit 0
+fi
+printf '%s\n' "$*" >>"$0.args"
+`
+	if err = os.WriteFile(script, []byte(prefix+strings.TrimPrefix(string(body), "#!/bin/sh\n")), 0700); err != nil {
+		t.Fatal(err)
+	}
+	m, err := runDialogueReceiptWrapper(t, s, a, "/fin\n")
+	if err != nil {
+		t.Fatal(err)
+	}
+	a.Progress, a.Usage, _, _ = m.executionSnapshot()
+	if err = s.finishAgent(a, "completed", "local source completed without acceptance", nil); err != nil {
+		t.Fatal(err)
+	}
+	a, err = s.agent(a.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return s, a, script
+}
+
+func dialogueRestoreRequestTest(t *testing.T, s *Store, a Agent) DialogueRestoreRequest {
+	t.Helper()
+	p, err := s.recoveryPreview(a.WorkID, a.TaskID, a.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return DialogueRestoreRequest{Schema: 1, Event: newID("restore-"), Revision: p.Revision, Checkpoint: p.Dialogue.Boundary.SHA256, Facts: p.Dialogue.FactsSHA256, Confirm: true, Reason: "Continue after reviewing this confirmed boundary", Instruction: "Continue the same conversation using the retained boundary and current task contract"}
+}
+
+func TestDialogueRestoreKeepsSessionGuardsAndSeparatesExecutionUsage(t *testing.T) {
+	for _, provider := range []string{"codex", "claude"} {
+		t.Run(provider, func(t *testing.T) {
+			s, source, script := dialogueRestoreFixture(t, provider)
+			original := loadDialogueCheckpointTest(t, s, source).SHA256
+			for step := 1; step <= 2; step++ {
+				r := dialogueRestoreRequestTest(t, s, source)
+				before := recoverySnapshotTest(t, s)
+				preview, created, err := s.resumeDialogue(source.ID, r, true)
+				if err != nil || created || preview.DialogueRestore == nil || preview.DialogueRestore.DecisionRecorded || before != recoverySnapshotTest(t, s) {
+					t.Fatal("preview mutated or granted a decision", err)
+				}
+				a, created, err := s.resumeDialogue(source.ID, r, false)
+				if err != nil || !created {
+					t.Fatal("restore not prepared", err)
+				}
+				if a.Attempt == source.Attempt || a.ID == source.ID || a.DialogueRestore.SourceAgent != source.ID || !a.DialogueRestore.DecisionRecorded || a.DialogueRestore.PriorTurns != step {
+					t.Fatal("execution identity or decision lost", a.DialogueRestore)
+				}
+				replay, again, err := s.resumeDialogue(source.ID, r, false)
+				if err != nil || again || replay.ID != a.ID || replay.DialogueRestore.At != a.DialogueRestore.At {
+					t.Fatal("replay duplicated execution or decision", err)
+				}
+				m, err := runDialogueReceiptWrapper(t, s, a, "/fin\n")
+				if err != nil {
+					t.Fatal("same session not resumed", err)
+				}
+				a.Progress, a.Usage, _, _ = m.executionSnapshot()
+				if a.Usage == nil || a.Usage.Input != 10 || a.Progress.ToolCalls != 1 || a.Progress.ToolResults != 1 {
+					t.Fatal("history counted twice", a.Usage, a.Progress)
+				}
+				if err = s.finishAgent(a, "completed", "local restored execution ended", nil); err != nil {
+					t.Fatal(err)
+				}
+				c := loadDialogueCheckpointTest(t, s, a)
+				if c.Session != "restore-session" || c.Guard.Calls != step+1 || c.Usage.Input != int64((step+1)*10) {
+					t.Fatal("conversation state reset", c.Guard.Calls, c.Usage)
+				}
+				cost, err := s.costSummary(a.WorkID)
+				if err != nil || cost.Reported < float64(step+1)*.1-.00001 || cost.Reported > float64(step+1)*.1+.00001 {
+					t.Fatal("cost double counted", cost, err)
+				}
+				if step == 1 && loadDialogueCheckpointTest(t, s, source).SHA256 != original {
+					t.Fatal("source checkpoint rewritten")
+				}
+				source, err = s.agent(a.ID)
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
+			args, err := os.ReadFile(script + ".args")
+			if err != nil || strings.Count(string(args), "resume restore-session") != 2 {
+				t.Fatal("provider resume arguments lost", string(args), err)
+			}
+		})
+	}
+}
+
+func TestDialogueRestoreRejectsStaleUnconfirmedAndUnverifiedWithoutMutation(t *testing.T) {
+	for _, variant := range []string{"confirmation", "facts", "checkpoint", "revision", "unconfirmed", "provider_preflight", "source_status", "unknown_field"} {
+		t.Run(variant, func(t *testing.T) {
+			s, a, script := dialogueRestoreFixture(t, "codex")
+			r := dialogueRestoreRequestTest(t, s, a)
+			switch variant {
+			case "confirmation":
+				r.Confirm = false
+			case "facts":
+				r.Facts = strings.Repeat("0", 64)
+			case "checkpoint":
+				r.Checkpoint = strings.Repeat("0", 64)
+			case "revision":
+				r.Revision--
+			case "unconfirmed":
+				if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET status='interrupted' WHERE agent_id=?", a.ID); err != nil {
+					t.Fatal(err)
+				}
+			case "source_status":
+				a.Status = "running"
+				a.Ended = ""
+				if err := s.saveAgent(a); err != nil {
+					t.Fatal(err)
+				}
+			case "provider_preflight":
+				providers, _ := s.providers()
+				p := providers.Providers[a.Provider]
+				p.PreflightArgs = nil
+				providers.Providers[a.Provider] = p
+				raw, _ := json.Marshal(providers)
+				if err := os.WriteFile(filepath.Join(s.root, ".swarm/providers.json"), raw, 0600); err != nil {
+					t.Fatal(err)
+				}
+				r = dialogueRestoreRequestTest(t, s, a)
+			case "unknown_field":
+				raw, _ := json.Marshal(r)
+				raw = append(raw[:len(raw)-1], []byte(`,"actor":"engine"}`)...)
+				var request DialogueRestoreRequest
+				if strict(raw, &request) == nil {
+					t.Fatal("unknown authority accepted")
+				}
+				return
+			}
+			before := recoverySnapshotTest(t, s)
+			calls, _ := os.ReadFile(script + ".calls")
+			if _, _, err := s.resumeDialogue(a.ID, r, false); err == nil {
+				t.Fatal("invalid restore accepted")
+			}
+			afterCalls, _ := os.ReadFile(script + ".calls")
+			if before != recoverySnapshotTest(t, s) || !bytes.Equal(calls, afterCalls) {
+				t.Fatal("refusal mutated state or executed provider")
+			}
+		})
+	}
+}
+
+func TestDialogueRestoreRechecksSourceAfterPreflight(t *testing.T) {
+	s, a, script := dialogueRestoreFixture(t, "codex")
+	r := dialogueRestoreRequestTest(t, s, a)
+	if err := os.WriteFile(script+".block", []byte("wait"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	done := make(chan error, 1)
+	go func() { _, _, err := s.resumeDialogue(a.ID, r, false); done <- err }()
+	until := time.Now().Add(3 * time.Second)
+	for {
+		if _, err := os.Stat(script + ".ready"); err == nil {
+			break
+		}
+		if time.Now().After(until) {
+			t.Fatal("preflight did not reach owned barrier")
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET session_id='changed-during-probe' WHERE agent_id=?", a.ID); err != nil {
+		t.Fatal(err)
+	}
+	before := recoverySnapshotTest(t, s)
+	if err := os.WriteFile(script+".release", []byte("release"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case err := <-done:
+		if err == nil {
+			t.Fatal("stale source accepted after probe")
+		}
+	case <-time.After(6 * time.Second):
+		t.Fatal("resume blocked after probe release")
+	}
+	if before != recoverySnapshotTest(t, s) {
+		t.Fatal("failed freshness check wrote a launch")
+	}
+}
+
+func TestDialogueRestoreConcurrentRequestsCreateOneExecution(t *testing.T) {
+	s, a, _ := dialogueRestoreFixture(t, "codex")
+	r := dialogueRestoreRequestTest(t, s, a)
+	var wg sync.WaitGroup
+	results := make(chan bool, 2)
+	for i := 0; i < 2; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			other, err := openStore(s.root, false)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			defer other.db.Close()
+			q := r
+			q.Event = fmt.Sprintf("restore-concurrent-%d", i)
+			_, created, err := other.resumeDialogue(a.ID, q, false)
+			results <- err == nil && created
+		}(i)
+	}
+	wg.Wait()
+	close(results)
+	count := 0
+	for success := range results {
+		if success {
+			count++
+		}
+	}
+	if count != 1 {
+		t.Fatal("concurrent restores created wrong execution count", count)
+	}
+	w, err := s.get(a.WorkID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	task, _ := w.task(a.TaskID)
+	if len(task.Attempts) != 2 {
+		t.Fatal("attempt history overwritten or duplicated", len(task.Attempts))
+	}
+}

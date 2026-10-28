@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "event_id": "managed-planning-enable",
+  "expected_revision": 1,
+  "provider": "fixture",
+  "level": "standard",
+  "max_activations": 6,
+  "max_tasks": 2,
+  "max_decisions": 10,
+  "max_review_calls": 2,
+  "repository": {
+    "path": "source",
+    "committed_only": true
+  },
+  "checks": {
+    "req-1": [
+      {
+        "id": "actual-handoff",
+        "command": [
+          "python3",
+          "-c",
+          "from pathlib import Path; assert Path('handoff.md').read_text().strip()"
+        ],
+        "criteria": [
+          1
+        ],
+        "inputs": [
+          "handoff.md"
+        ],
+        "justification": "Check owned handoff content"
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "node",
+    "tests/actions_confiance_workload_ui.cjs",
+    "bin/swarm-actions-confiance-introspection",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-confinement-20261015/introspection-current-services-services-browser",
+    "--group-mapping"
+  ],
+  "started_at": "2026-10-15T22:23:58.693633+00:00",
+  "ended_at": "2026-10-15T22:24:12.720080+00:00",
+  "exit_code": 0,
+  "sources_unchanged": true,
+  "output_sha256": "5eb69cf2ddc50a743f7b361014b6b0dea93852674381e3c3a941f0eff4bb3d1f",
+  "input_sha256": {
+    "bin/swarm-actions-confiance-introspection": "7f3b441a16fc7e1bffb4a690fe3b467910655231c6f4484b733096ee9f3840d7",
+    "web/trust-actions.js": "c0b891ec0df3e80b3329cf6033f8c3cad4cfce2cf8900de4d180692417b982c3",
+    "web/trust-actions.html": "e7dc6d17b078a0d7a08dcc8ecf385f0388326d6121c0653ac945b521b493e642",
+    "web/trust-actions-en.js": "3db7bd09aec75c9dc8f21bfd1459edec907e293c2b25d41f2386a08226182eb5",
+    "web/trust-secrets.js": "132532e28f08bca6099e029bb992e9f403aaa37f67cc8395d34bc8476b0e5fbd",
+    "tests/actions_confiance_workload_ui.cjs": "f4cbfa0d2ec0a6309cbaeba055b510c5d978b7e4f006c390c6b761e6761d83ce"
+  }
+}

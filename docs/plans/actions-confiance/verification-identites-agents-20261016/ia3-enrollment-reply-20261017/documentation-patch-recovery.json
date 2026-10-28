@@ -1,0 +1,9 @@
+{
+  "original_error": "apply_patch verification failed: Failed to find expected lines in /home/fpizzi/Documents/ChatGPT/swarm/docs/architecture/AGENT-IDENTITY-CONTRACT.md: #",
+  "cause": "Unrelated nonexistent context in second hunk of combined documentation patch",
+  "observed_effect": "Target deployment table re-read unchanged after rejection",
+  "changed_precondition": "Removed unrelated hunk; exact existing table context confirmed by read",
+  "recovery": "Focused table patch succeeded; FR/EN additions follow exact file reads",
+  "owner": "Codex",
+  "state": "documentary correction verified by final content and link checks"
+}

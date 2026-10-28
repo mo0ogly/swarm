@@ -1,0 +1,80 @@
+{
+  "checks": [
+    "fr: Admin preview does not mutate and saves effective data policy",
+    "fr: policy reopens with keyboard focus restored and visible mobile controls",
+    "fr: CLI request and approval bind data context, API commits one effect visible in UI",
+    "fr: unsupported path, symlink name, executable, provider and sensitive data are denied before capture",
+    "fr: administrator resource classification rejects both downgrading and uncatalogued resources",
+    "fr: API applies the same denial without mutation",
+    "fr: data context is readable in theme and mobile width without overflow",
+    "en: Admin preview does not mutate and saves effective data policy",
+    "en: policy reopens with keyboard focus restored and visible mobile controls",
+    "en: CLI request and approval bind data context, API commits one effect visible in UI",
+    "en: unsupported path, symlink name, executable, provider and sensitive data are denied before capture",
+    "en: administrator resource classification rejects both downgrading and uncatalogued resources",
+    "en: API applies the same denial without mutation",
+    "en: data context is readable in theme and mobile width without overflow"
+  ],
+  "errors": [],
+  "expected_denials": 2,
+  "denials": [
+    {
+      "lang": "fr",
+      "field": "destination"
+    },
+    {
+      "lang": "fr",
+      "field": "destination"
+    },
+    {
+      "lang": "fr",
+      "field": "destination"
+    },
+    {
+      "lang": "fr",
+      "field": "tool"
+    },
+    {
+      "lang": "fr",
+      "field": "provider"
+    },
+    {
+      "lang": "fr",
+      "field": "classification"
+    },
+    {
+      "lang": "fr",
+      "field": "classification"
+    },
+    {
+      "lang": "en",
+      "field": "destination"
+    },
+    {
+      "lang": "en",
+      "field": "destination"
+    },
+    {
+      "lang": "en",
+      "field": "destination"
+    },
+    {
+      "lang": "en",
+      "field": "tool"
+    },
+    {
+      "lang": "en",
+      "field": "provider"
+    },
+    {
+      "lang": "en",
+      "field": "classification"
+    },
+    {
+      "lang": "en",
+      "field": "classification"
+    }
+  ],
+  "root": "/tmp/swarm-data-policy-ui-OCJz8K",
+  "at": "2026-10-15T20:19:22.042Z"
+}

@@ -1,0 +1,52 @@
+{
+  "status": "PASS",
+  "observations": [
+    {
+      "work_id": "w-a77d9f4799712a6c6d96c662",
+      "language": "fr",
+      "revision": 50,
+      "observation": "recorded",
+      "calculated_refusal": {
+        "status": 501,
+        "failure": {
+          "code": "command_not_ported"
+        }
+      },
+      "markdown_sha256": "ec9bdf18dbf4ca244c6a2a66098e99ddc1fa5e3f25e9e443a1c748c865567072",
+      "characters": 621
+    },
+    {
+      "work_id": "w-a77d9f4799712a6c6d96c662",
+      "language": "en",
+      "revision": 50,
+      "observation": "recorded",
+      "calculated_refusal": {
+        "status": 501,
+        "failure": {
+          "code": "command_not_ported"
+        }
+      },
+      "markdown_sha256": "c5412ad4c624127478964a3b6cac2e9fa840085b663a452852b6af8a312f5aa0",
+      "characters": 619
+    },
+    {
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "language": "fr",
+      "revision": 469,
+      "observation": "calculated",
+      "calculated_refusal": null,
+      "markdown_sha256": "2bb268f45bd174eaa6b8b1a3dbf1fef1493c7b848e340286733ad7965b70210a",
+      "characters": 28319
+    },
+    {
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "language": "en",
+      "revision": 469,
+      "observation": "calculated",
+      "calculated_refusal": null,
+      "markdown_sha256": "89e08c5ccf877b67c06950b9c587651e4d973c7177035bb99505684640335793",
+      "characters": 28191
+    }
+  ],
+  "live_mutations": false
+}

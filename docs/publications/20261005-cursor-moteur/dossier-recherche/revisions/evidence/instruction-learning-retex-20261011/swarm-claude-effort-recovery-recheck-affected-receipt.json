@@ -1,0 +1,21 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "TestManagedFragmentHistoricalPublicRecovery|TestManagedReviewTimeoutRetryReusesCandidateWithoutRefund|TestClaudeConfiguredEffort|TestPolicyPreviewAtomic",
+    "-count=1",
+    "-timeout=120s"
+  ],
+  "start": "2026-10-11T16:08:33.395951+00:00",
+  "end": "2026-10-11T16:09:36.563349+00:00",
+  "seconds": 63.16739002599934,
+  "exit": 0,
+  "output": "/tmp/swarm-claude-effort-recovery-recheck-affected.out",
+  "output_sha256": "c99e2378296255f0f8f37f6c7dffe498a650c65572e436397909040e8eb11ec0",
+  "qualification_environment": {
+    "TMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  }
+}

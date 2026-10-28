@@ -1,0 +1,69 @@
+{
+  "at": "2026-10-12T13:57:09.699480+00:00",
+  "old_pid": 2833959,
+  "new_pid": 3786056,
+  "old_sha256": "ca75c3b3c6c0176cec4411a10fb27d5dbf6643a587e6e0174f7c904540dd9c83",
+  "installed_sha256": "cc4dc7ad7d72e38cc546125efac07176170142691e02c0954cda408bd2db0ae8",
+  "executed_sha256": "cc4dc7ad7d72e38cc546125efac07176170142691e02c0954cda408bd2db0ae8",
+  "source_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+  "schema": 30,
+  "idle_before": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 770,
+      "paused": false,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    }
+  ],
+  "idle_after": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 772,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    }
+  ],
+  "public_work_post_pause_bodies_exact": true,
+  "public_cli_init_for_contract_upgrade": false,
+  "direct_storage_operation_or_copy": false,
+  "private_log_mode": "0600",
+  "health": "ready",
+  "launch_allowed": true,
+  "scope": "Qualified public control-diagnostic reader installed quiescent; mission paused for original diagnostic and recovery. No native acceptance inferred."
+}

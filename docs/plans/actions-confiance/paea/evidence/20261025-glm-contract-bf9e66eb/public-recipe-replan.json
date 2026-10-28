@@ -1,0 +1,9 @@
+{
+  "parent": "public-recipe-01/result.json",
+  "cause": "New recipe incorrectly read root code instead of actual CLI report failure.code; KeyError in 17 assertions. Product returned expected nonzero refusals.",
+  "new_evidence": "Observed public-transcript.json stderr and source swarm-cli/src/lib.rs report() Failure envelope",
+  "decision": "Fix test consumer only; preserve first run and all raw output. No Rust source change or compilation.",
+  "changed_precondition": "Both refusal assertions now consume failure.code from the real public producer",
+  "secondary_edit_incident": "First docs patch refused on stale English anchor; tool applied no partial edits. Actual text inspected, then corrected before tests.",
+  "owner": "Root Codex"
+}

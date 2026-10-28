@@ -1,0 +1,11 @@
+# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]
+internal/engine/kernel_observation_linux_test.go:12:46: undefined: kernelObservationLease
+internal/engine/kernel_observation_linux_test.go:12:70: undefined: kernelObservation
+internal/engine/kernel_observation_linux_test.go:14:16: undefined: kernelObservationProcessStart
+internal/engine/kernel_observation_linux_test.go:17:12: undefined: newKernelObservationLease
+internal/engine/kernel_observation_linux_test.go:19:7: undefined: kernelObservation
+internal/engine/kernel_observation_linux_test.go:26:13: undefined: decodeKernelObservation
+internal/engine/kernel_observation_linux_test.go:33:48: undefined: decodeKernelObservation
+internal/engine/kernel_observation_linux_test.go:38:7: undefined: newKernelObservationStream
+FAIL	swarm.local/companion/internal/engine [build failed]
+FAIL

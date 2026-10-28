@@ -1,0 +1,9 @@
+flowchart TD
+  W["Insertion ou modification de Work"] --> T["Transaction SQLite<br/>projection v1 et génération du contrat"]
+  T --> S["Work et stamp du plan<br/>engagés ensemble"]
+  S --> R["Lecteur identité<br/>écrivain SQLite réservé"]
+  H["Tête Trust et checkpoint courant<br/>émetteur encore de fixture"] --> R
+  R --> C{"Même génération<br/>et même empreinte ?"}
+  C -->|Oui| V["Liaison runtime et contrôle des droits"]
+  C -->|Non| N["Refus : aucune autorité retournée"]
+  V --> F["COMMIT sans effet métier"]

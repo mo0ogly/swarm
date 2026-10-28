@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-11T17:25:32.726208+00:00",
+  "base_tree": "9c99b9bf3ee79a640fcfb8f64e734cb12b2efd2b",
+  "result_tree": "3f4ddf6990e07c3895f88b223c8269fe5d7eec9d",
+  "path": "docs/plan-ca937edf4e-T2.md",
+  "before_bytes": 22489,
+  "after_bytes": 4573,
+  "preimage_sha256": "51e846248353e79e49f719e431b7d2df87965ae9228452fd4a80d586c5ee8aa7",
+  "postimage_sha256": "96967d14c176524eb05e3f6fd0c2990f6a074f0b5693035d477ce55c1b3a3b08",
+  "original_git_commit": "96c0ea89013b71656b4259ee9ee5a6a880f4de57",
+  "original_backup": "/tmp/swarm-T2-report-before-capacity-replan.md",
+  "effect": "Concise current handoff retaining every criterion/source/execution limit and exact historical Git original. No source proof, Go, DB, attempts, consumption or opinion changed."
+}

@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "observation_kind": "host operator report of interrupted execution; not subprocess completion metadata",
+  "candidate": "a27e175eb4f3e38f9cede1c888956a5ca5a0310f",
+  "command": [
+    "go",
+    "test",
+    "./...",
+    "-json",
+    "-count=1",
+    "-timeout",
+    "15m"
+  ],
+  "observed_at": "2026-10-10T19:33:28.786275+00:00",
+  "runner_exit_code": 143,
+  "go_exit_code": null,
+  "completion_metadata_present": false,
+  "complete": false,
+  "cause": "unknown; last started test is correlation, not attribution",
+  "first_output_event_at": "2026-10-10T21:24:15.984876808+02:00",
+  "last_output_event_at": "2026-10-10T21:32:16.190025194+02:00",
+  "last_started_test": "TestSupervisionR3TotalTimeoutStillBoundsSilence",
+  "partial_top_level_outcomes": {
+    "pass": 979,
+    "skip": 8,
+    "fail": 1
+  },
+  "partial_outcomes_including_subtests": {
+    "pass": 1667,
+    "skip": 8,
+    "fail": 1
+  },
+  "failed_tests": [
+    "TestGraphDeliveryD03QualificationManifest"
+  ],
+  "artifacts": [
+    {
+      "path": "/tmp/swarm-T2-traceability-c1hvvch0/go-suite-corrected.jsonl",
+      "bytes": 1533239,
+      "sha256": "ab5489dcc72feb6c707cf948c11fe35e9aba90c9ae8eff470d54020a35c43242",
+      "versioned": false
+    },
+    {
+      "path": "/tmp/swarm-T2-traceability-c1hvvch0/go-suite-corrected.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "versioned": false
+    }
+  ]
+}

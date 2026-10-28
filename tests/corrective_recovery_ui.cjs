@@ -48,9 +48,12 @@ let browser,server,page,expectedConflict=false;const errors=[],failed=[];let con
   url.searchParams.set('lang',lang);await page.goto(url.href);await page.waitForFunction(()=>snapshot?.work?.planning?.reviewer);
   for(const theme of ['etat','sombre']){
    await page.evaluate(t=>setTheme(t),theme);
+   // The role settings live inside the mission's detailed-status disclosure.
+   await page.waitForSelector('[data-mission-detail="reading"] > summary');
+   if(!await page.$eval('[data-mission-detail="reading"]',e=>e.open))await page.click('[data-mission-detail="reading"] > summary');
    await page.click('#review-timeout-settings');
-   await page.waitForSelector('#field-review-timeout');assert.equal(await page.$eval('#field-review-timeout',e=>e.value),'90');
-   await page.$eval('#field-review-timeout',e=>e.value='901');assert.equal(await page.$eval('#action-form',e=>e.checkValidity()),false);
+   await page.waitForSelector('#field-review-timeout');assert.equal(await page.$eval('#field-review-timeout',e=>e.value),'0');
+   await page.$eval('#field-review-timeout',e=>e.value='-1');assert.equal(await page.$eval('#action-form',e=>e.checkValidity()),false);
    await page.$eval('#field-review-timeout',e=>e.value='300');await page.type('#field-planning-reason','Observed timeout during review; explicit operator correction.');
    await page.screenshot({path:path.join(out,`timeout-${lang}-${theme}.png`)});
    if(lang==='en'&&theme==='sombre'){await page.click('#confirm');await page.waitForFunction(()=>snapshot.work.planning.reviewer.timeout_seconds===300)}else await page.keyboard.press('Escape');

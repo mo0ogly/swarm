@@ -1,0 +1,13 @@
+{
+  "origin": "Explicit user correction: on-premise GLM, no requested4096 cap",
+  "cause": "principal imposed4096; helper required max-output-tokens; skill encouraged invented allocations",
+  "reproduced": {
+    "test": "DirectCall.test_no_client_output_cap_by_default_and_explicit_cap_remains_optional",
+    "exit": 1,
+    "observed": "argparse requires --max-output-tokens before HTTP; original test output retained in conversation",
+    "original_source": "skynet-before-call.py"
+  },
+  "correction": "optional argument defaults None; omit max_tokens field, keep explicit positive allocation support; skill default updated; no arbitrary reasoning-effort selection on next real call",
+  "owner": "Codex root",
+  "limits": "provider default can still limit output; omission is not unlimited generation or unlimited call authorization"
+}

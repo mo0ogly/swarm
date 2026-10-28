@@ -1,0 +1,77 @@
+{"Time":"2026-10-10T21:21:09.60940704+02:00","Action":"start","Package":"swarm.local/companion"}
+{"Time":"2026-10-10T21:21:09.609523509+02:00","Action":"output","Package":"swarm.local/companion","Output":"?   \tswarm.local/companion\t[no test files]\n"}
+{"Time":"2026-10-10T21:21:09.609549097+02:00","Action":"skip","Package":"swarm.local/companion","Elapsed":0}
+{"Time":"2026-10-10T21:21:17.734735143+02:00","Action":"start","Package":"swarm.local/companion/cmd/swarm"}
+{"Time":"2026-10-10T21:21:17.734824922+02:00","Action":"output","Package":"swarm.local/companion/cmd/swarm","Output":"?   \tswarm.local/companion/cmd/swarm\t[no test files]\n"}
+{"Time":"2026-10-10T21:21:17.734838478+02:00","Action":"skip","Package":"swarm.local/companion/cmd/swarm","Elapsed":0}
+{"Time":"2026-10-10T21:21:32.255198364+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-10T21:21:32.286713076+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"flag provided but not defined: -timeout15m\n"}
+{"Time":"2026-10-10T21:21:32.286787596+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"Usage of /tmp/go-build1463387607/b222/engine.test:\n"}
+{"Time":"2026-10-10T21:21:32.286794098+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.bench regexp\n"}
+{"Time":"2026-10-10T21:21:32.287078653+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \trun only benchmarks matching regexp\n"}
+{"Time":"2026-10-10T21:21:32.2870878+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.benchmem\n"}
+{"Time":"2026-10-10T21:21:32.287093461+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tprint memory allocations for benchmarks\n"}
+{"Time":"2026-10-10T21:21:32.28709838+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.benchtime d\n"}
+{"Time":"2026-10-10T21:21:32.287103139+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \trun each benchmark for duration d or N times if `d` is of the form Nx (default 1s)\n"}
+{"Time":"2026-10-10T21:21:32.288978606+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.blockprofile file\n"}
+{"Time":"2026-10-10T21:21:32.28901275+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \twrite a goroutine blocking profile to file\n"}
+{"Time":"2026-10-10T21:21:32.289018591+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.blockprofilerate rate\n"}
+{"Time":"2026-10-10T21:21:32.28902326+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tset blocking profile rate (see runtime.SetBlockProfileRate) (default 1)\n"}
+{"Time":"2026-10-10T21:21:32.289173803+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.count n\n"}
+{"Time":"2026-10-10T21:21:32.289179383+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \trun tests and benchmarks n times (default 1)\n"}
+{"Time":"2026-10-10T21:21:32.289184303+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.coverprofile file\n"}
+{"Time":"2026-10-10T21:21:32.289188901+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \twrite a coverage profile to file\n"}
+{"Time":"2026-10-10T21:21:32.28919335+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.cpu list\n"}
+{"Time":"2026-10-10T21:21:32.289197838+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tcomma-separated list of cpu counts to run each test with\n"}
+{"Time":"2026-10-10T21:21:32.289202477+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.cpuprofile file\n"}
+{"Time":"2026-10-10T21:21:32.289206835+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \twrite a cpu profile to file\n"}
+{"Time":"2026-10-10T21:21:32.289219609+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.failfast\n"}
+{"Time":"2026-10-10T21:21:32.289224689+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tdo not start new tests after the first test failure\n"}
+{"Time":"2026-10-10T21:21:32.289229397+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.fullpath\n"}
+{"Time":"2026-10-10T21:21:32.289234046+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tshow full file names in error messages\n"}
+{"Time":"2026-10-10T21:21:32.289238555+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.fuzz regexp\n"}
+{"Time":"2026-10-10T21:21:32.289243243+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \trun the fuzz test matching regexp\n"}
+{"Time":"2026-10-10T21:21:32.289247692+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.fuzzcachedir string\n"}
+{"Time":"2026-10-10T21:21:32.289252391+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tdirectory where interesting fuzzing inputs are stored (for use only by cmd/go)\n"}
+{"Time":"2026-10-10T21:21:32.2892571+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.fuzzminimizetime value\n"}
+{"Time":"2026-10-10T21:21:32.289261658+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \ttime to spend minimizing a value after finding a failing input (default 1m0s)\n"}
+{"Time":"2026-10-10T21:21:32.289266127+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.fuzztime value\n"}
+{"Time":"2026-10-10T21:21:32.289270595+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \ttime to spend fuzzing; default is to run indefinitely\n"}
+{"Time":"2026-10-10T21:21:32.289275624+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.fuzzworker\n"}
+{"Time":"2026-10-10T21:21:32.289280113+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tcoordinate with the parent process to fuzz random values (for use only by cmd/go)\n"}
+{"Time":"2026-10-10T21:21:32.289284591+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.gocoverdir string\n"}
+{"Time":"2026-10-10T21:21:32.28928901+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \twrite coverage intermediate files to this directory\n"}
+{"Time":"2026-10-10T21:21:32.289293558+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.list regexp\n"}
+{"Time":"2026-10-10T21:21:32.289298297+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tlist tests, examples, and benchmarks matching regexp then exit\n"}
+{"Time":"2026-10-10T21:21:32.289302715+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.memprofile file\n"}
+{"Time":"2026-10-10T21:21:32.289307234+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \twrite an allocation profile to file\n"}
+{"Time":"2026-10-10T21:21:32.289311853+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.memprofilerate rate\n"}
+{"Time":"2026-10-10T21:21:32.289316451+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tset memory allocation profiling rate (see runtime.MemProfileRate)\n"}
+{"Time":"2026-10-10T21:21:32.28932094+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.mutexprofile string\n"}
+{"Time":"2026-10-10T21:21:32.289325508+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \twrite a mutex contention profile to the named file after execution\n"}
+{"Time":"2026-10-10T21:21:32.289333403+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.mutexprofilefraction int\n"}
+{"Time":"2026-10-10T21:21:32.289823725+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tif \u003e= 0, calls runtime.SetMutexProfileFraction() (default 1)\n"}
+{"Time":"2026-10-10T21:21:32.289832171+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.outputdir dir\n"}
+{"Time":"2026-10-10T21:21:32.289837882+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \twrite profiles to dir\n"}
+{"Time":"2026-10-10T21:21:32.28984235+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.paniconexit0\n"}
+{"Time":"2026-10-10T21:21:32.289846768+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tpanic on call to os.Exit(0)\n"}
+{"Time":"2026-10-10T21:21:32.289851197+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.parallel n\n"}
+{"Time":"2026-10-10T21:21:32.289855655+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \trun at most n tests in parallel (default 12)\n"}
+{"Time":"2026-10-10T21:21:32.289860174+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.run regexp\n"}
+{"Time":"2026-10-10T21:21:32.289864562+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \trun only tests and examples matching regexp\n"}
+{"Time":"2026-10-10T21:21:32.28986901+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.short\n"}
+{"Time":"2026-10-10T21:21:32.289873408+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \trun smaller test suite to save time\n"}
+{"Time":"2026-10-10T21:21:32.289877917+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.shuffle string\n"}
+{"Time":"2026-10-10T21:21:32.289883267+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \trandomize the execution order of tests and benchmarks (default \"off\")\n"}
+{"Time":"2026-10-10T21:21:32.289889078+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.skip regexp\n"}
+{"Time":"2026-10-10T21:21:32.289894879+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tdo not list or run tests matching regexp\n"}
+{"Time":"2026-10-10T21:21:32.289900229+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.testlogfile file\n"}
+{"Time":"2026-10-10T21:21:32.289905799+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \twrite test action log to file (for use only by cmd/go)\n"}
+{"Time":"2026-10-10T21:21:32.289912221+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.timeout d\n"}
+{"Time":"2026-10-10T21:21:32.290475891+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tpanic test binary after duration d (default 0, timeout disabled)\n"}
+{"Time":"2026-10-10T21:21:32.290483095+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.trace file\n"}
+{"Time":"2026-10-10T21:21:32.290487583+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \twrite an execution trace to file\n"}
+{"Time":"2026-10-10T21:21:32.290494717+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"  -test.v\n"}
+{"Time":"2026-10-10T21:21:32.290499295+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"    \tverbose: print additional output\n"}
+{"Time":"2026-10-10T21:21:32.291035113+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.035s\n"}
+{"Time":"2026-10-10T21:21:32.296288131+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.041}

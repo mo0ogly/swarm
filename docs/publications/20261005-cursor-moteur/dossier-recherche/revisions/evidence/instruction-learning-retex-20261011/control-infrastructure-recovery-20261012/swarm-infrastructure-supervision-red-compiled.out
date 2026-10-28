@@ -1,0 +1,5 @@
+--- FAIL: TestInfrastructureFailuresDoNotConsumeWorkerErrorCeiling (0.00s)
+    infrastructure_supervision_test.go:21: infrastructure attributed to worker: streak=3 total=3 reason=Limite d'erreurs d'outils consécutives atteinte
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.039s
+FAIL

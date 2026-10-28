@@ -1,0 +1,23 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^(TestAgentIdentity.*|TestLaunchAtomicIdempotentAndWorkspaceExclusive|TestLaunchRejectsEscapeAndUnsatisfiedDependencies|TestActionsConfianceT3IdentityContextPublicReadOnly|TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation|TestActionsConfianceT3OIDCLogoutSessionAndSubject)$",
+    "-count=1",
+    "-timeout",
+    "60s"
+  ],
+  "executor": "Codex direct",
+  "start": "2026-10-17T05:52:23.509186+00:00",
+  "end": "2026-10-17T05:52:48.282514+00:00",
+  "exit_code": 0,
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "inputs": "inputs-final.json",
+  "input_files": 1042,
+  "changed_inputs": [],
+  "stdout": "tests-final.jsonl",
+  "stderr": "tests-final.stderr"
+}

@@ -1,0 +1,1 @@
+{"family": "evidence", "op": "archive-preview", "expected": 0, "exit": 2, "stdout": "", "stderr": "{\n  \"error\": \"op\u00e9ration evidence distante inconnue\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"op\u00e9ration evidence distante inconnue\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n"}

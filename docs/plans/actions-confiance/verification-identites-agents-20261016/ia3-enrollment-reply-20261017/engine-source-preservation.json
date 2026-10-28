@@ -1,0 +1,5 @@
+{
+  "internal/engine/agent_identity_contract.go": true,
+  "internal/engine/agent_identity_enrollment_request_linux.go": true,
+  "internal/engine/agent_identity_enrollment_request_linux_test.go": true
+}

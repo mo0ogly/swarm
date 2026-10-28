@@ -1,0 +1,283 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-10T17:38:13.053292+00:00",
+  "kind": "post-incident field observation; not a preregistered billing experiment",
+  "source": "public CLI swarm --json work show",
+  "source_head": "d4539e0041000a38acb162a17f053e318fb3db5d",
+  "source_dirty": true,
+  "installed_binary_sha256": "648c2a8b2a99e3af7f114eafbf4de472780317d406a0198a413859e093d7c0aa",
+  "work_id": "w-ca937edf4e0abd85f8d3d67b",
+  "work_revision": 19,
+  "task_id": "plan-ca937edf4e-T1",
+  "original_candidate": "38345bb1805ef56137087b3326d19f2c4d8cf204",
+  "review": {
+    "id": "review-849606d4679df263de116295",
+    "attempt": "a-d01bafdfcfe21d50ef1d7d8c",
+    "state": "changes_requested",
+    "started": "2026-10-10T17:29:47.604934808Z",
+    "finished": "2026-10-10T17:32:34.00073999Z",
+    "candidate_commit": "38345bb1805ef56137087b3326d19f2c4d8cf204",
+    "criteria": [
+      {
+        "index": 1,
+        "verdict": "pass",
+        "evidence": "en séparant explicitement ce qui a été observé ce lot (fait), ce qui reste supposé (hypothèse) et la preuve exacte."
+      },
+      {
+        "index": 2,
+        "verdict": "pass",
+        "evidence": "Couverture du juge global (JAN-4) | Natif : un juge dédié ferme chaque cycle sur l'objectif et les résultats."
+      },
+      {
+        "index": 3,
+        "verdict": "unknown",
+        "evidence": "Le fichier docs/publications/20261005-cursor-moteur/article-scientifique/fiches-lecture.md, cité dans le JSON de livraison comme preuve de l'examen des sources complémentaires (Google/OpenAI/Anthropic), n'est ni modifié par ce diff ni fourni comme source complémentaire dans ce contexte de revue ; son contenu réel ne peut être vérifié, donc l'examen de ces sources avant décision reste indémontré alors que la partie reprise/débit/qualité/effort/compatibilité et juillet Cursor (SRC-CUR-03) est bien présente dans le §3 fourni."
+      },
+      {
+        "index": 4,
+        "verdict": "pass",
+        "evidence": "Elle n'a pas été lue (base `.swarm` privée hors périmètre), pas modifiée, pas remise à zéro par ce lot."
+      }
+    ]
+  },
+  "planning": {
+    "activations": 2,
+    "max_activations": 30,
+    "decisions": 1,
+    "max_decisions": 30,
+    "max_tasks": 10,
+    "paused": false,
+    "failure": null
+  },
+  "review_budget": {
+    "calls": 2,
+    "max_calls": 30,
+    "timeout_seconds": null
+  },
+  "task_state_at_observation": "running",
+  "attempts": [
+    {
+      "id": "a-d01bafdfcfe21d50ef1d7d8c",
+      "status": "completed",
+      "started": "2026-10-10T17:01:27.733756516Z",
+      "ended": "2026-10-10T17:15:33.722874868Z"
+    },
+    {
+      "id": "a-29a7a2f21ea5f1f764409e08",
+      "status": "recorded",
+      "started": "2026-10-10T17:34:48.88659613Z"
+    }
+  ],
+  "policy": {
+    "schema_version": 1,
+    "revision": 1,
+    "values": {
+      "silence_seconds": 300,
+      "max_duration_seconds": 0,
+      "planning_lease_seconds": 120
+    },
+    "history": [
+      {
+        "revision": 1,
+        "values": {
+          "silence_seconds": 300,
+          "max_duration_seconds": 0,
+          "planning_lease_seconds": 120
+        },
+        "actor": "fpizzi/uid:1001",
+        "at": "2026-10-10T17:29:41.379221037Z",
+        "change": {
+          "schema_version": 1,
+          "event_id": "live-policy-469715e80c184604ab58710617f0d551",
+          "expected_revision": 0,
+          "values": {
+            "silence_seconds": 300,
+            "max_duration_seconds": 0,
+            "planning_lease_seconds": 120
+          },
+          "reason": "Demande utilisateur : remplacer le couperet arbitraire par surveillance du silence, durée totale désactivée et bail renouvelé."
+        }
+      }
+    ]
+  },
+  "public_events": [
+    {
+      "id": "review-321669c31cbace95ee1e9a4e",
+      "work_id": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 5,
+      "kind": "review.managed.claim",
+      "at": "2026-10-10T17:15:54.991133054Z",
+      "payload": {
+        "model_route": {
+          "level": "standard",
+          "model": "sonnet",
+          "effort": "",
+          "billing": "external",
+          "policy_hash": "1cb0234143e9aa8ed95f3cd427d818ab0066d8c33139ce7f75a31f670f609b17",
+          "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+        },
+        "timeout_seconds": 90,
+        "workflow": {
+          "version": 1,
+          "role": "reviewer",
+          "methods": [
+            "audit-pdca",
+            "code-reviewer",
+            "product-review"
+          ],
+          "sha256": "f2bca05c994157fe1ffba3897205cd5b9be5ca5bd8579c442f69d95c93dadbc3"
+        },
+        "git_report": "docs/plan-ca937edf4e-T1.md",
+        "candidate_commit": "38345bb1805ef56137087b3326d19f2c4d8cf204",
+        "previous_candidate": "6e8fcc7b69c4b5e4638cb36ec680be0f45ce5dc1",
+        "receipt": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-12f5d63624b255c3e70a/receipt.json",
+        "receipt_sha256": "7ebe488004ec358e4ed190221c5fc5817370fb846d06d99e6a110b0dca829cab",
+        "context": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-12f5d63624b255c3e70a/review-context.json",
+        "context_sha256": "27d36974a003f39f0f6a633cf04847626ca72f4a50a6d8383d1f25a5e7f942b6",
+        "id": "review-321669c31cbace95ee1e9a4e",
+        "attempt": "a-d01bafdfcfe21d50ef1d7d8c",
+        "producer": "auto-12f5d63624b255c3e70a",
+        "reviewer": "reviewer://claude",
+        "report": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-12f5d63624b255c3e70a/reports/plan-ca937edf4e-T1.md",
+        "sha256": "3c20b8d9aaa72ac87117a9b12e10e19a1df4b3c0b7b71607af981a371a040d75",
+        "contract": "ee6076064f841876a29444b9908c652bf0597b521f50e66606c716ad6f21427d",
+        "state": "running",
+        "reason": "Examen indépendant du diff Git, des rapports et des contrôles exécutés.",
+        "started": "2026-10-10T17:15:54.987627586Z"
+      }
+    },
+    {
+      "id": "review-849606d4679df263de116295",
+      "work_id": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 12,
+      "kind": "review.managed.claim",
+      "at": "2026-10-10T17:29:47.613472343Z",
+      "payload": {
+        "model_route": {
+          "level": "standard",
+          "model": "sonnet",
+          "effort": "",
+          "billing": "external",
+          "policy_hash": "1cb0234143e9aa8ed95f3cd427d818ab0066d8c33139ce7f75a31f670f609b17",
+          "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+        },
+        "workflow": {
+          "version": 1,
+          "role": "reviewer",
+          "methods": [
+            "audit-pdca",
+            "code-reviewer",
+            "product-review"
+          ],
+          "sha256": "71931f7bede43dc49b48759f113034a797dab4991114500c8711ef0bffa00683"
+        },
+        "git_report": "docs/plan-ca937edf4e-T1.md",
+        "candidate_commit": "38345bb1805ef56137087b3326d19f2c4d8cf204",
+        "previous_candidate": "6e8fcc7b69c4b5e4638cb36ec680be0f45ce5dc1",
+        "receipt": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-12f5d63624b255c3e70a/receipt.json",
+        "receipt_sha256": "7ebe488004ec358e4ed190221c5fc5817370fb846d06d99e6a110b0dca829cab",
+        "context": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-12f5d63624b255c3e70a/review-context.json",
+        "context_sha256": "27d36974a003f39f0f6a633cf04847626ca72f4a50a6d8383d1f25a5e7f942b6",
+        "id": "review-849606d4679df263de116295",
+        "attempt": "a-d01bafdfcfe21d50ef1d7d8c",
+        "producer": "auto-12f5d63624b255c3e70a",
+        "reviewer": "reviewer://claude",
+        "report": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-12f5d63624b255c3e70a/reports/plan-ca937edf4e-T1.md",
+        "sha256": "3c20b8d9aaa72ac87117a9b12e10e19a1df4b3c0b7b71607af981a371a040d75",
+        "contract": "ee6076064f841876a29444b9908c652bf0597b521f50e66606c716ad6f21427d",
+        "state": "running",
+        "reason": "Examen indépendant du diff Git, des rapports et des contrôles exécutés.",
+        "started": "2026-10-10T17:29:47.604934808Z"
+      }
+    },
+    {
+      "id": "lease-renew-22d573290b19891fd173ea55",
+      "work_id": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 16,
+      "kind": "planning.lease-renew",
+      "at": "2026-10-10T17:33:35.525609943Z",
+      "payload": {
+        "generation": 4,
+        "holder": "planner-6cdf975d84922d18ef1a6567",
+        "lease_seconds": 120,
+        "scope": "root"
+      }
+    },
+    {
+      "id": "lease-renew-ed95a3983ac582c7714fd077",
+      "work_id": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 17,
+      "kind": "planning.lease-renew",
+      "at": "2026-10-10T17:34:35.725704084Z",
+      "payload": {
+        "generation": 4,
+        "holder": "planner-6cdf975d84922d18ef1a6567",
+        "lease_seconds": 120,
+        "scope": "root"
+      }
+    },
+    {
+      "id": "planning-claim-d61f03603da48d818b2ba11e-decision",
+      "work_id": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 18,
+      "kind": "planning.decide",
+      "at": "2026-10-10T17:34:44.831099302Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "planning-claim-d61f03603da48d818b2ba11e-decision",
+        "expected_revision": 17,
+        "scope": "root",
+        "scope_revision": 1,
+        "holder": "planner-6cdf975d84922d18ef1a6567",
+        "generation": 4,
+        "input_events": [
+          "plan-b95015a3fedb2b903795364fbbf4e42bace086539b54d16868fa8b0ee08ea42f",
+          "review-321669c31cbace95ee1e9a4e",
+          "plan-786926de8c15f03a23739cb3e6b78deb21294b043fa8e35f8b01100827c8094f",
+          "review-849606d4679df263de116295",
+          "plan-3fa5268d1997bbf60cd77318c4a59702295262eb7520c1a5e97e19872d6a4fe0",
+          "live-planner-ebe670c5e4a14f10b59a6f5d0b6d2ef7"
+        ],
+        "operations": [
+          {
+            "kind": "retry",
+            "id": "plan-ca937edf4e-T1",
+            "title": "Confirmer les écarts et décider l'architecture de l'évolution",
+            "requirements": [
+              "req-1",
+              "req-2",
+              "req-3",
+              "req-4"
+            ],
+            "deliverable": "Document d'architecture confirmant les écarts (req-1, req-2) et décision motivée d'architecture (req-4), avec le critère 3 (req-3) rendu vérifiable par des preuves directement incluses dans le diff candidat.",
+            "criteria": [
+              "Critères 1, 2 et 4 (matrices JAN/FEB à colonnes fait/hypothèse/preuve, tableau comparatif couvrant JAN-4 et JAN-5, séparation documentée avec la mission historique) restent valides sans régression par rapport au candidat 38345bb1805ef56137087b3326d19f2c4d8cf204.",
+              "Critère 3 (req-3) corrigé : l'examen des 'sources complémentaires' s'appuie sur un contenu vérifiable inclus dans ce diff (citations exactes de fiches-lecture.md ou mise à jour de ce fichier dans le même commit), en plus de l'examen déjà accepté de la source Cursor de juillet (SRC-CUR-03) ; la preuve doit démontrer un examen sémantique réel, pas seulement l'exécution du script structurel ('semantic review still required').",
+              "Bilan local du producteur par critère (pass/unknown/fail) avec commande exécutée, fichier/extrait de preuve et justification ; aucune revendication d'acceptation du moteur ni de revue indépendante déjà rendue."
+            ],
+            "next": "Reprendre la révision candidate 38345bb1805ef56137087b3326d19f2c4d8cf204 (tentative 2/2 pour T1, dernière avant blocage définitif). La revue indépendante (review-849606d4679df263de116295) confirme les critères 1, 2 et 4 : ne pas les modifier. Seul le critère 3 (req-3) est en défaut : l'examen des 'sources complémentaires' repose sur fiches-lecture.md, fichier inchangé par ce diff et non fourni dans ce contexte, donc invérifiable (statut correct : unknown, pas pass). Corriger précisément ce point, au choix : (a) inclure dans ce diff les extraits exacts et citations de fiches-lecture.md réellement examinés, avec contenu vérifiable ; (b) mettre à jour fiches-lecture.md dans ce même commit pour le rendre lisible par une revue indépendante ; (c) documenter directement dans le livrable du critère 3 le contenu des sources complémentaires avec une preuve vérifiable équivalente à celle déjà acceptée pour SRC-CUR-03. Ne pas se contenter de relancer le script structurel : les reçus actuels ne prouvent que son exécution ('semantic review still required'), pas la suffisance sémantique attendue par req-3. Consigner un bilan local traçable (commande, fichier, résultat observé) par critère sans prétendre à une acceptation du moteur ni à une revue indépendante déjà rendue sur cette nouvelle preuve."
+          }
+        ],
+        "reason": "T1 reste bloquée. La première revue (review-321669c31cbace95ee1e9a4e / plan-786926de8c15f03a23739cb3e6b78deb21294b043fa8e35f8b01100827c8094f) avait échoué par expiration du délai planificateur, un défaut d'environnement depuis corrigé par l'opérateur (live-planner-ebe670c5e4a14f10b59a6f5d0b6d2ef7), budgets inchangés. La revue réelle qui a suivi (review-849606d4679df263de116295 / plan-3fa5268d1997bbf60cd77318c4a59702295262eb7520c1a5e97e19872d6a4fe0) valide les critères 1, 2 et 4 sur le candidat 38345bb1805ef56137087b3326d19f2c4d8cf204, mais marque le critère 3 (req-3, examen des sources complémentaires) comme 'unknown' : il s'appuie sur fiches-lecture.md, un fichier inchangé par ce diff et non fourni, donc invérifiable ; les reçus ne prouvent que l'exécution du script structurel, pas la suffisance sémantique. C'est un défaut concret et localisé, pas une répétition d'échec inchangé : il reste 1 tentative sur 2 pour T1, je propose donc un retry avec une correction précise et nouvelle ciblant uniquement ce point, sans toucher aux parties déjà validées. T2 à T7 dépendent de T1 et restent non actionnables ce tour ; aucune clôture n'est proposée tant que T1 n'est pas acceptée par le moteur."
+      }
+    }
+  ],
+  "source_file_sha256": {
+    "config/provider-wait.json": "0087893b8cfae0d762d34cbcea302819072a79cc63ad815d0c0c97d9128836b1",
+    "internal/engine/provider_wait_config.go": "933b9db16cfa5386af90debd515475c5b830e49d57eb24e8d29187f0bfc9fe79",
+    "internal/engine/provider_wait_test.go": "14f36a23caebf4e9d44eb008492fc8fe3407807ef53b715b0f36435e36d8b0d6",
+    "internal/engine/planning_runner.go": "37f2fcfe1b9bd92d6c7aa504dcc00e9d294edff16c41758b9075338cba8f2f9e",
+    "internal/engine/assist_run.go": "cc48d47ca3a6327e1811da423b2906d0b5b71b23b56692c0e15372f8a9403ac9",
+    "internal/engine/independent_review.go": "d05dae995ab6d5fa298cde8f64ed63cd8179890ba8d2b6d1a88a48b33a4593bd",
+    "web/provider-wait-admin.js": "5be8eee12c2a21a4090f6d3297e6c377ca11e2029a22e6f7f4b3001ee567708e",
+    "tests/provider_wait_admin_ui.cjs": "39ead873443877182fa8751782be8b9738071a94d069bb54709591af1d3c187c",
+    "tests/corrective_recovery_ui.cjs": "99d84458b5cf7a3b775772dcd53f7a0c92d7e43c3513037004ae45130225349f",
+    "docs/architecture/PROVIDER-LIVENESS.md": "9e8404e951b7f489e17d7bc322bc15f0e4bf324bd0fe4e5502ce226aa9b3793f"
+  },
+  "limits": [
+    "Single incident; no statistical estimate",
+    "No accepted T1 result demonstrated in this observation",
+    "No general vivacity or cost guarantee",
+    "No attribution of historical billing timeouts from this new case"
+  ]
+}

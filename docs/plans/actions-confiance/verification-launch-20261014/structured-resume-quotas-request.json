@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "qualified-state-and-originals-quota-1792038089953714272",
+  "expected_revision": 301,
+  "limits": {
+    "review_context_files": 31,
+    "review_source_bytes": 98304,
+    "review_context_bytes": 368640,
+    "review_delivery_files": 100,
+    "planning_scopes": 0,
+    "delegation_depth": 0,
+    "planning_tasks": 20,
+    "planning_activations": 40,
+    "planning_decisions": 40,
+    "review_calls": 80
+  },
+  "reason": "Insuffisance mesurée après correction de la lecture structurée et des deux défauts R14 : 60 appels conservés, 4 restants contre au moins trois inspections et deux étapes finales pour la nouvelle revue ; 31 sources complètes font 364903 octets, au-dessus des 360448 autorisés. Selon autorisation utilisateur existante, porter les appels à 80 et le contexte à 360 Kio, sans toucher tentatives, consommations, modèle, transport, autres limites ou critères. Cela ne corrige ni ne valide à lui seul la réponse coupée historique."
+}

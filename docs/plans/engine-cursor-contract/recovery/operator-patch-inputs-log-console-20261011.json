@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-11T18:47:56.469638+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-log-console-20261011.bundle",
+  "sha256": "e83b8428fc3391947c34a834157a9458c7bd3167dfb2f15da0422d487eddcecc",
+  "commit": "b03e53ca531953b4240ee0a727276836ed176091",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 89,
+  "manifest_sha256": "2c602607b5639cbf2b6bbcb6170de25683eebbc23f43203e28ff104247247de8",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/log-console20-inputs-renr51r2",
+  "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/log-console20-import-ewwh255_",
+  "verification": "PASS fetch and all89 original full bytes/hash; old84 preserved",
+  "limits": "Cumulative84 unchanged qualified recovery inputs plus console20 patch/metadata and3exact preimages,89files. Full1187 PASS497.550s without drift; browserFR-EN/themes/mobile/search/filter/export/stale/fallback PASS, actual Ctrl-F PASS, compatible19-to20 detached agent restart PASS. No global native acceptance: T2 current unknown after selection needs remains unresolved, producer attempt history preserved; T3 must merge all corrections plus Judge and qualify own combined candidate, T4..T8 still required."
+}

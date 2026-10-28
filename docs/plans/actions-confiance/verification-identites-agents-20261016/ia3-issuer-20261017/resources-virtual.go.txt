@@ -1,0 +1,47 @@
+// Package resources embeds canonical Swarm assets without copying their source trees.
+// This file remains at the module root because go:embed cannot traverse parent directories.
+package resources
+
+import "embed"
+
+//go:embed "web/access.css" "web/access.html" "web/access.js" "web/action-skills.js" "web/activity.js" "web/admin.js" "web/agent-terminal.css" "web/agent-terminal.js" "web/ai-connections.js" "web/assistant.css" "web/assistant.js" "web/automation.js" "web/brainstorm.js" "web/cockpit-help.js" "web/cockpit-ux.css" "web/cockpit.css" "web/cockpit.js" "web/conduite.css" "web/conduite.js" "web/context-help.css" "web/context-help.js" "web/evidence-contract.js" "web/favicon.svg" "web/graph-draft.js" "web/graph-studio.js" "web/graph.css" "web/graph.js" "web/i18n-en.js" "web/i18n.js" "web/index.html" "web/instruction-revisions.js" "web/journal-console.js" "web/lib/dagre.LICENSE.txt" "web/lib/dagre.min.js" "web/lib/monaco/LICENSE.txt" "web/lib/monaco/ThirdPartyNotices.txt" "web/lib/monaco/chunk-6NYP3BCE.js" "web/lib/monaco/chunk-LB5NC5KB.js" "web/lib/monaco/chunk-RFRKVIMS.js" "web/lib/monaco/chunk-SYF7BLLQ.js" "web/lib/monaco/codicon-KP4OV2OO.ttf" "web/lib/monaco/editor.css" "web/lib/monaco/editor.js" "web/lib/monaco/json-worker.js" "web/lib/monaco/jsonMode-FCANVPFQ.js" "web/lib/monaco/jsonMode-K4MMNWJG.css" "web/lib/monaco/markdown-MIPYNTKF.js" "web/lib/monaco/worker.js" "web/lib/preparation-security.js" "web/lib/terminal/LICENSE-fit.txt" "web/lib/terminal/LICENSE-xterm.txt" "web/lib/terminal/terminal.js" "web/lib/terminal/terminal.js.LEGAL.txt" "web/lib/terminal/xterm.css" "web/lifecycle-manager.js" "web/log-console.css" "web/log-console.html" "web/log-console.js" "web/mission-help.js" "web/mission-insights.js" "web/mission.css" "web/mission.js" "web/pilot-actions.js" "web/pilot-batch.js" "web/pilot-graph.js" "web/pilot-inspector.js" "web/pilotage.css" "web/pilotage.js" "web/plan.css" "web/plan.js" "web/planning.js" "web/post-delivery.js" "web/preparation-timeout-admin.css" "web/preparation-timeout-admin.js" "web/preparation-work-graph.js" "web/preparation-work-model.css" "web/prepare.html" "web/prephase-conversion.js" "web/prephase-decisions.js" "web/prephase-dialogue.js" "web/prephase-editor.js" "web/prephase-missions.js" "web/prephase-resources.js" "web/prephase-templates.js" "web/prephase.css" "web/prephase.js" "web/pricing.js" "web/processes.css" "web/processes.html" "web/processes.js" "web/product-graph.js" "web/product-views.css" "web/product-views.js" "web/project-memory.css" "web/project-memory.html" "web/project-memory.js" "web/project-profile-settings.css" "web/project-profile-settings.js" "web/project-profile.js" "web/projects.css" "web/projects.html" "web/projects.js" "web/provider-wait-admin.js" "web/providers.css" "web/providers.js" "web/quotas.js" "web/report-summary.js" "web/retex.js" "web/role-models.js" "web/runtime-health.js" "web/session-console.js" "web/signals.css" "web/signals.js" "web/status-contract.js" "web/swarm-design.css" "web/swarm-logo.png" "web/swarm-shell.js" "web/task-models.js" "web/terminal.html" "web/trust-actions-en.js" "web/trust-actions.css" "web/trust-actions.html" "web/trust-actions.js" "web/trust-connectors.js" "web/trust-controls.js" "web/trust-controls.json" "web/trust-evidence.js" "web/trust-kernel.js" "web/trust-laboratory.js" "web/trust-observe.js" "web/trust-oidc-callback.html" "web/trust-oidc-callback.js" "web/trust-secrets.js" "web/wattson_themes.css" "web/web-requests-admin.js" "web/web-requests.js"
+var Web embed.FS
+
+//go:embed docs/training/casa-pizza/*.pdf docs/training/casa-pizza/*.docx docs/training/casa-pizza/*.zip docs/training/casa-pizza/tutoriels/swarm-logo.png docs/training/casa-pizza/tutoriels/index.html docs/training/casa-pizza/tutoriels/player.css docs/training/casa-pizza/tutoriels/player.js docs/training/casa-pizza/tutoriels/frames/*.png docs/training/casa-pizza/tutoriels/media/*
+var Training embed.FS
+
+//go:embed tools/agent-workflows/CONTRACT.md tools/agent-workflows/templates/*.md tools/agent-workflows/templates/ks/*.md .claude/skills/*/SKILL.md .claude/commands/ks-*.md
+var AgentWorkflow embed.FS
+
+//go:embed tools/agent-workflows/templates/preparations.json
+var Preparations embed.FS
+
+//go:embed locales/en.json
+var Translations embed.FS
+
+//go:embed contracts/assistant-answer.v1.schema.json
+var AssistantAnswerSchema []byte
+
+//go:embed version_history.json
+var VersionHistory []byte
+
+//go:embed config/storage-retry.json
+var StorageRetry []byte
+
+//go:embed config/graph-performance.json
+var GraphPerformance []byte
+
+//go:embed config/automation.json
+var Automation []byte
+
+//go:embed config/web-session.json
+var WebSession []byte
+
+//go:embed config/preparation-timeout.json
+var PreparationTimeout []byte
+
+//go:embed config/provider-wait.json
+var ProviderWait []byte
+
+//go:embed config/web-requests.json
+var WebRequests []byte

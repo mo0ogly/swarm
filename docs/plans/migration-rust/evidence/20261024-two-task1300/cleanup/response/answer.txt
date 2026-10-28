@@ -1,0 +1,48 @@
+# Proposal: bounded cleanup for `run()` two-turn journey (tests/rust_native_web_conductor.py)
+
+**Scope.** Only the `run()` `finally` block and its helper ordering. Based solely on supplied sources. No execution or acceptance claimed; all referenced helpers exist in supplied files (`worker.retain_failure`, `public.reap_cleanup_helper`, `public.cleanup_owned_children`, `native.finish`).
+
+**Missing evidence.** I have not seen: `native.finish`, `native.Server.stop`, `worker.observation`, `worker.attach`, or the server's internal shutdown path; their exact re-entrancy/idempotency after `server=None` reassignment is unverified. The proposal therefore avoids calling them twice and preserves original errors.
+
+## Suggested cleanup ordering (drop-in `finally`, ≤45 lines)
+
+```python
+    finally:
+        if server is not None:
+            worker.retain_failure(errors, lambda: native.finish(server, primary))
+        if primary is not None:
+            release = root / 'watch-worker/release-worker.json'
+            if not release.exists():
+                worker.retain_failure(errors, lambda: fixture.publish(release, dict(nonce=nonce, release=True)))
+            if supervisor is not None and not reaped:
+                waited = None
+                try:
+                    waited, status = os.waitpid(supervisor['pid'], os.WNOHANG)
+                except BaseException as error:
+                    errors.append(error)
+                if waited == supervisor['pid']:
+                    reaped = True
+                elif waited == 0:
+                    # verify parentage + argv before any reap attempt; helpers
+                    # themselves refuse unknown identities and only ever
+                    # TERM/reap verified adopted children (reap_cleanup_helper).
+                    worker.retain_failure(errors, lambda: public.reap_cleanup_helper(supervisor))
+            worker.retain_failure(errors, lambda: public.cleanup_owned_children(binary, root, out))
+        if connection is not None:
+            worker.retain_failure(errors, connection.close)
+        if listener is not None:
+            worker.retain_failure(errors, listener.close)
+        for fd in (server_fd, supervisor_fd, provider_fd):
+            if fd is not None:
+                worker.retain_failure(errors, lambda fd=fd: os.close(fd))
+```
+
+## Rationale and guarantees
+
+1. **Original errors preserved.** `primary` is never overwritten; every cleanup step runs through `worker.retain_failure`, so publication/close failures append to `errors` without masking the primary. The final `BaseExceptionGroup` raise remains as-is.
+2. **Authenticated reap only.** The supervisor is reaped only via `public.reap_cleanup_helper`, which (per supplied source) verifies stamp, ppid == self, exact `_mission_worker_entry --root --json` argv, and exe digest before attaching a pidfd; a WNOHANG pre-check tolerates the live→zombie race without signalling. No signalling of any non-verified PID; `cleanup_owned_children` likewise never signals unmatched children and refuses if an unknown adopted live child remains.
+3. **Worker survival invariant.** On the success path the worker is released only by the owned `release-worker.json` (inotify gate in `provider_program`), never by signals; the failure-path release file is the same owned nonce-gated mechanism. `reap_cleanup_helper`'s SIGTERM applies only to the adopted supervisor helper during failure cleanup, consistent with "only this owned fixture's cleanup may release/signal it."
+4. **Sockets/fds.** `connection` and `listener` closed after process cleanup; each pidfd (`server_fd`, `supervisor_fd`, `provider_fd`) closed exactly once with the default-arg binding avoiding late-capture bugs.
+5. **Server shutdown.** `native.finish(server, primary)` is invoked at most once; subsequent `server=None` reassignments in the try body already prevent double-stop. `waitpid` ECHILD or other errors propagate into `errors` rather than being swallowed.
+
+**Not addressed (out of scope, no evidence):** `held_planner()` cleanup (already bounded in supplied source), root-directory removal (sources never delete fixtures), and any behavior of `native.finish` on already-stopped servers.

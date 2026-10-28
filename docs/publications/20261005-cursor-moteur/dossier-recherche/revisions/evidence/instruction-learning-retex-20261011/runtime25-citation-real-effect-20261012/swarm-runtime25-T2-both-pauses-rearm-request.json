@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "expected_revision": 641,
+  "event_id": "T2-both-pauses-cleared-19145a7e406c4b388075dd6f505d5720",
+  "task_id": "plan-ca937edf4e-T2",
+  "reason": "Replan : précondition changée à638, Planning.Paused=false ET pause globale=false maintenant confirmées par lecture publique. Le réarmement637 précédait la levée de la pause de planification et a retrouvé la même préparation périmée sans appel. Réarmer seulement maintenant le résultat conservé, mêmes candidat/tentative/contrôles, protocole de citation1 corrigé. Poursuivre vers la décision indépendante puis le plan T3..T8 et RETEX ; ne pas imposer de verdict ni refaire la production."
+}

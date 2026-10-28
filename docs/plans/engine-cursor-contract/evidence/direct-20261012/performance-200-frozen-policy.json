@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "revision": 0,
+  "values": {
+    "keyboard_p95_ms": 100,
+    "samples": 5,
+    "loads": [
+      {
+        "cards": 50,
+        "render_p95_ms": 1000
+      },
+      {
+        "cards": 200,
+        "render_p95_ms": 1000
+      },
+      {
+        "cards": 500,
+        "render_p95_ms": 2000
+      }
+    ]
+  },
+  "policy_sha256": "44b6e449b38776ebccbef0574e577d860480265da528eca2a3e7578934f2c451",
+  "recipe_sha256": "fe5937b05cf04d34aecedd83078be3775793da50e143f30359c16ea29b661881",
+  "adapter_sha256": "e12c19c03eea5d747fb037f197e10a985acd7085048498f2bf8ad70ff3c91ecd",
+  "scope": "frozen performance targets; not agent execution budgets",
+  "generated_recipe_sha256": "612a88e408e69dc4c8dc8f04aecdc7167b424b056b0bee3a9c949dadc48e7c64"
+}

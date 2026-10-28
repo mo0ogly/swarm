@@ -1,0 +1,30 @@
+?   	swarm.local/companion	[no test files]
+?   	swarm.local/companion/cmd/swarm	[no test files]
+2026/10/11 18:00:30 http: TLS handshake error from 127.0.0.1:57170: remote error: tls: bad certificate
+--- FAIL: TestManagedFragmentHistoricalPublicRecovery (0.30s)
+    --- FAIL: TestManagedFragmentHistoricalPublicRecovery/pass (0.10s)
+        managed_review_fragment_reuse_test.go:213: Stockage indisponible ou presque plein : nouveaux départs suspendus. Libérez de l’espace sur le volume signalé ou rétablissez son accès, puis vérifiez à nouveau. Swarm reprendra les opérations autorisées lorsque le stockage sera disponible ; les limites et les avis de revue restent applicables.
+    --- FAIL: TestManagedFragmentHistoricalPublicRecovery/fail (0.10s)
+        managed_review_fragment_reuse_test.go:213: Stockage indisponible ou presque plein : nouveaux départs suspendus. Libérez de l’espace sur le volume signalé ou rétablissez son accès, puis vérifiez à nouveau. Swarm reprendra les opérations autorisées lorsque le stockage sera disponible ; les limites et les avis de revue restent applicables.
+    --- FAIL: TestManagedFragmentHistoricalPublicRecovery/exit (0.09s)
+        managed_review_fragment_reuse_test.go:213: Stockage indisponible ou presque plein : nouveaux départs suspendus. Libérez de l’espace sur le volume signalé ou rétablissez son accès, puis vérifiez à nouveau. Swarm reprendra les opérations autorisées lorsque le stockage sera disponible ; les limites et les avis de revue restent applicables.
+--- FAIL: TestManagedReviewTimeoutRetryReusesCandidateWithoutRefund (0.39s)
+panic: runtime error: invalid memory address or nil pointer dereference [recovered]
+	panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0xfb7393]
+
+goroutine 115765 [running]:
+testing.tRunner.func1.2({0x114b3a0, 0x4db1fc0})
+	/usr/local/go/src/testing/testing.go:1734 +0x21c
+testing.tRunner.func1()
+	/usr/local/go/src/testing/testing.go:1737 +0x35e
+panic({0x114b3a0?, 0x4db1fc0?})
+	/usr/local/go/src/runtime/panic.go:792 +0x132
+swarm.local/companion/internal/engine.TestManagedReviewTimeoutRetryReusesCandidateWithoutRefund(0xc00082e8c0)
+	/home/fpizzi/workspace/swarm/internal/engine/review_timeout_test.go:94 +0x613
+testing.tRunner(0xc00082e8c0, 0x3ff6268)
+	/usr/local/go/src/testing/testing.go:1792 +0xf4
+created by testing.(*T).Run in goroutine 1
+	/usr/local/go/src/testing/testing.go:1851 +0x413
+FAIL	swarm.local/companion/internal/engine	387.675s
+FAIL

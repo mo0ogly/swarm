@@ -1,0 +1,9 @@
+{"Time":"2026-10-17T14:59:16.141440499+02:00","Action":"start","Package":"swarm.local/companion/internal/enrollmentconfig"}
+{"Time":"2026-10-17T14:59:16.144979908+02:00","Action":"run","Package":"swarm.local/companion/internal/enrollmentconfig","Test":"TestCoordinatedStorageErrorIdentifiesFailedStage"}
+{"Time":"2026-10-17T14:59:16.145135261+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentconfig","Test":"TestCoordinatedStorageErrorIdentifiesFailedStage","Output":"=== RUN   TestCoordinatedStorageErrorIdentifiesFailedStage\n"}
+{"Time":"2026-10-17T14:59:16.146936339+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentconfig","Test":"TestCoordinatedStorageErrorIdentifiesFailedStage","Output":"    coordinator_linux_test.go:455: missing failed stage or original cause: enrollment config: replacement observed but durable outcome uncertain: fixture I/O failure\n"}
+{"Time":"2026-10-17T14:59:16.147154391+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentconfig","Test":"TestCoordinatedStorageErrorIdentifiesFailedStage","Output":"--- FAIL: TestCoordinatedStorageErrorIdentifiesFailedStage (0.00s)\n"}
+{"Time":"2026-10-17T14:59:16.147197582+02:00","Action":"fail","Package":"swarm.local/companion/internal/enrollmentconfig","Test":"TestCoordinatedStorageErrorIdentifiesFailedStage","Elapsed":0}
+{"Time":"2026-10-17T14:59:16.147223812+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentconfig","Output":"FAIL\n"}
+{"Time":"2026-10-17T14:59:16.148427162+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentconfig","Output":"FAIL\tswarm.local/companion/internal/enrollmentconfig\t0.006s\n"}
+{"Time":"2026-10-17T14:59:16.14853723+02:00","Action":"fail","Package":"swarm.local/companion/internal/enrollmentconfig","Elapsed":0.007}

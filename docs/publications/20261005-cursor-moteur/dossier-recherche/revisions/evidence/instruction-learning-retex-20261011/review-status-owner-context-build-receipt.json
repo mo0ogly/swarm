@@ -1,0 +1,18 @@
+{
+  "command": [
+    "go",
+    "build",
+    "-ldflags",
+    "-X swarm.local/companion/internal/engine.buildVersion=devel -X swarm.local/companion/internal/engine.buildCommit=1169df70bec73d50fd23f640245b8ffd1317b9de -X swarm.local/companion/internal/engine.buildModified=true -X swarm.local/companion/internal/engine.buildDate=2026-10-11T13:28:59Z -X swarm.local/companion/internal/engine.buildProvenance=injected",
+    "-o",
+    "/tmp/swarm-review-status-owner-context-candidate",
+    "./cmd/swarm"
+  ],
+  "exit": 0,
+  "binary": "/tmp/swarm-review-status-owner-context-candidate",
+  "sha256": "604418755b085a863c270b3c6c8db14ad7d21048023cb73df56e87371d3cb98c",
+  "build_date": "2026-10-11T13:28:59Z",
+  "head": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+  "source_manifest": "8072b8e8c225768d145f4e363236ca039b53a9d34dfea9d06df2e1b3eb2ed752",
+  "qualified": "Full Go check still in progress; not installed"
+}

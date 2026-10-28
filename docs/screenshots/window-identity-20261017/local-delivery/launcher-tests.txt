@@ -1,0 +1,9 @@
+test_restart_retains_data_session_and_single_instance (__main__.LocalWeb.test_restart_retains_data_session_and_single_instance) ... ok
+test_foreign_listener_is_not_stopped (__main__.LocalWeb.test_foreign_listener_is_not_stopped) ... ok
+test_configure_retains_installed_binary_without_rebuilding (__main__.LocalWeb.test_configure_retains_installed_binary_without_rebuilding) ... ok
+test_stale_pid_does_not_kill_unrelated_process (__main__.LocalWeb.test_stale_pid_does_not_kill_unrelated_process) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 4.953s
+
+OK

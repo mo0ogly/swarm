@@ -1,0 +1,463 @@
+diff --git a/docs/architecture/AUTORECURSIVE-RECOVERY.md b/docs/architecture/AUTORECURSIVE-RECOVERY.md
+index 6676f4d..c3527ae 100644
+--- a/docs/architecture/AUTORECURSIVE-RECOVERY.md
++++ b/docs/architecture/AUTORECURSIVE-RECOVERY.md
+@@ -656,3 +656,19 @@ sequenceDiagram
+ ```
+ 
+ La conduite des incidents d’infrastructure est décrite dans [RUN-SUPERVISION.md](RUN-SUPERVISION.md). La reprise de contrôles ne prouve pas, à elle seule, une correction autonome de l’environnement par un modèle réel.
++
++## Original d’un contrôle refusé accessible par le parcours public
++
++Le parcours authentifié `GET /api/v1/control-diagnostic?work=…&task=…` retourne
++l’original du contrôle lié au résultat actuellement bloqué : commande, sortie
++conservée en base64, empreinte, code de sortie, dates, budget appliqué et borne de
++capture. Il ne reçoit aucun chemin privé arbitraire. Le moteur vérifie mission,
++tâche, producteur, tentative, conflit courant, commande approuvée, candidat conservé,
++empreintes et fraîcheur de la lecture. La consultation ne modifie aucun travail,
++ne dépense aucun appel et ne vaut ni correction ni acceptation. Une ancienne
++sortie absente reste absente ; une capture bornée n’est pas présentée comme complète.
++
++Une référence de fichier seule ne donne pas son contenu au superviseur sans outils.
++L’opérateur peut consulter cette preuve publiquement puis transmettre le diagnostic
++et les originaux par le handoff autorisé. Cette API ne prouve pas, à elle seule, une
++transmission automatique dans chaque contexte ni une décision autonome d’un modèle.
+diff --git a/docs/en/AUTORECURSIVE-RECOVERY.md b/docs/en/AUTORECURSIVE-RECOVERY.md
+index 579a36f..6f83b64 100644
+--- a/docs/en/AUTORECURSIVE-RECOVERY.md
++++ b/docs/en/AUTORECURSIVE-RECOVERY.md
+@@ -612,3 +612,19 @@ sequenceDiagram
+ ```
+ 
+ Infrastructure supervision is documented in [RUN-SUPERVISION.md](RUN-SUPERVISION.md). Control recovery alone does not establish autonomous real-model repair of the execution environment.
++
++## Original failed-control evidence through a public read
++
++Authenticated `GET /api/v1/control-diagnostic?work=…&task=…` returns the original
++control linked to the currently blocked result: command, retained base64 output,
++hash, exit status, timestamps, applied runtime allowance and capture bounds. It
++accepts no arbitrary private path. The engine checks work, task, producer, attempt,
++current conflict, approved command, retained candidate, hashes and read freshness.
++Reading changes no work, spends no call and supplies no correction or acceptance.
++Missing historical output remains missing; bounded capture is not represented as
++complete original output beyond that bound.
++
++A file reference alone does not deliver its contents to a tool-free supervisor.
++An operator can inspect this public evidence then send diagnosis and originals
++through an authorized handoff. This API alone does not establish automatic delivery
++in every role context or autonomous real-model judgment.
+diff --git a/docs/engine-cursor-source-inputs-001.json b/docs/engine-cursor-source-inputs-001.json
+index b14278a..c2db46e 100644
+--- a/docs/engine-cursor-source-inputs-001.json
++++ b/docs/engine-cursor-source-inputs-001.json
+@@ -207,7 +207,7 @@
+   {
+     "path": "AGENTS.md",
+     "kind": "doc",
+-    "sha256": "9c0541c8f6b449a36ff73727ac30049395f78a874b5cf4a1ae83eb7e8a362a49"
++    "sha256": "0d81273623771d257b0e2a449fbb2d9112339476534d79ad9fd48918e4ba369a"
+   },
+   {
+     "path": "CLAUDE.md",
+@@ -422,7 +422,7 @@
+   {
+     "path": "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+     "kind": "doc",
+-    "sha256": "c24cecdee8744eebd5950f03f3763e6231f037af7be5b7cea6840fc3e00e5a95"
++    "sha256": "44370936dcfc675075fcc8896748e2014aa3e71875a0472ba03547a340555c4a"
+   },
+   {
+     "path": "docs/architecture/CONTROLS-AND-FEEDBACK.md",
+@@ -517,7 +517,7 @@
+   {
+     "path": "docs/en/AUTORECURSIVE-RECOVERY.md",
+     "kind": "doc",
+-    "sha256": "301a64e736d2aee57adf9c24a603a39cb25278d8d37b6b0c65257d233caf9c76"
++    "sha256": "618c29654358ae50ee952d62fee686f20e98a0705935882599c6afe8c1ccd567"
+   },
+   {
+     "path": "docs/en/BUDGETS.md",
+diff --git a/docs/engine-cursor-source-inputs-003.json b/docs/engine-cursor-source-inputs-003.json
+index edfb172..87155c8 100644
+--- a/docs/engine-cursor-source-inputs-003.json
++++ b/docs/engine-cursor-source-inputs-003.json
+@@ -529,6 +529,16 @@
+     "kind": "source",
+     "sha256": "fe41a0d11c7330db7ae6be03bab4980c6dfac44d9b09159e5cf9bbc504c72303"
+   },
++  {
++    "path": "internal/engine/managed_control_diagnostic_api.go",
++    "kind": "source",
++    "sha256": "adee0d146b55c7abcd803bc709c6da1ad35aa400ac31061ec5b4b903ae1caa73"
++  },
++  {
++    "path": "internal/engine/managed_control_diagnostic_api_test.go",
++    "kind": "test",
++    "sha256": "7790dab1b8c48a32dff8b1dd0f1e43e3350a374048da7ec1625592d7ccbbf051"
++  },
+   {
+     "path": "internal/engine/managed_control_failure.go",
+     "kind": "source",
+@@ -1413,15 +1423,5 @@
+     "path": "internal/engine/plan_store.go",
+     "kind": "source",
+     "sha256": "befc144f32a059bb921bd31e5d0e6e6dad4266db7536783eda7fb770b13542ed"
+-  },
+-  {
+-    "path": "internal/engine/plan_test.go",
+-    "kind": "test",
+-    "sha256": "fd2ebe8093b19a23ead8c7ede999f574ecbd194734467e195599303f3303f777"
+-  },
+-  {
+-    "path": "internal/engine/planning.go",
+-    "kind": "source",
+-    "sha256": "d7602d31402f89ad687710efe8ea2266866b99d787bd1b6b650253a754ef596d"
+   }
+ ]
+diff --git a/docs/engine-cursor-source-inputs-004.json b/docs/engine-cursor-source-inputs-004.json
+index 831eaea..c52a849 100644
+--- a/docs/engine-cursor-source-inputs-004.json
++++ b/docs/engine-cursor-source-inputs-004.json
+@@ -1,8 +1,18 @@
+ [
++  {
++    "path": "internal/engine/plan_test.go",
++    "kind": "test",
++    "sha256": "fd2ebe8093b19a23ead8c7ede999f574ecbd194734467e195599303f3303f777"
++  },
++  {
++    "path": "internal/engine/planning.go",
++    "kind": "source",
++    "sha256": "d7602d31402f89ad687710efe8ea2266866b99d787bd1b6b650253a754ef596d"
++  },
+   {
+     "path": "internal/engine/planning_api.go",
+     "kind": "source",
+-    "sha256": "6680491c81a1b0d6b73f84d33128281a1352217ddf687fc49e435c80846e1027"
++    "sha256": "22e7ab79259945688fa7703feb487fa643b4e3589cab7b15b670021abd3f6d10"
+   },
+   {
+     "path": "internal/engine/planning_auto_close_test.go",
+@@ -1503,15 +1513,5 @@
+     "path": "web/lib/monaco/editor.css",
+     "kind": "source",
+     "sha256": "226731d9f973e1622b706415beebf19f2ca71479394f77c1f1e0331108c648f2"
+-  },
+-  {
+-    "path": "web/lib/monaco/editor.js",
+-    "kind": "source",
+-    "sha256": "384632ad369e562ee2255919cae155a1e5c09aa73f9819c7534a6ee2d91c7048"
+-  },
+-  {
+-    "path": "web/lib/monaco/json-worker.js",
+-    "kind": "source",
+-    "sha256": "e2090fd9d61977080c3e9dfc91bbabf7d6995feaba4852659a04d2e1be097ec7"
+   }
+ ]
+diff --git a/docs/engine-cursor-source-inputs-005.json b/docs/engine-cursor-source-inputs-005.json
+index ba7503a..df482d5 100644
+--- a/docs/engine-cursor-source-inputs-005.json
++++ b/docs/engine-cursor-source-inputs-005.json
+@@ -1,4 +1,14 @@
+ [
++  {
++    "path": "web/lib/monaco/editor.js",
++    "kind": "source",
++    "sha256": "384632ad369e562ee2255919cae155a1e5c09aa73f9819c7534a6ee2d91c7048"
++  },
++  {
++    "path": "web/lib/monaco/json-worker.js",
++    "kind": "source",
++    "sha256": "e2090fd9d61977080c3e9dfc91bbabf7d6995feaba4852659a04d2e1be097ec7"
++  },
+   {
+     "path": "web/lib/monaco/jsonMode-FCANVPFQ.js",
+     "kind": "source",
+diff --git a/docs/engine-cursor-source-manifest.json b/docs/engine-cursor-source-manifest.json
+index de2d887..6c2d536 100644
+--- a/docs/engine-cursor-source-manifest.json
++++ b/docs/engine-cursor-source-manifest.json
+@@ -2,8 +2,8 @@
+   "schema_version": 1,
+   "manifest_status": "ENGINE_CURSOR_SOURCE_SNAPSHOT_NOT_INDEPENDENT_ACCEPTANCE",
+   "base_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+-  "candidate_id": "1169df70bec73d50fd23f640245b8ffd1317b9de+sha256:21b1e7fe8a43f2e7f43929273e174dd2c27f296495b59faa3ddc008629de38e5",
+-  "candidate_digest": "21b1e7fe8a43f2e7f43929273e174dd2c27f296495b59faa3ddc008629de38e5",
++  "candidate_id": "1169df70bec73d50fd23f640245b8ffd1317b9de+sha256:8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
++  "candidate_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+   "coverage_digest": "10155b4f69c55665a7e1830b4654d905c4b62892a56b196e41375c62568353a2",
+   "historical_manifest": "docs/ui-redesign-source-manifest.json",
+   "requirements": [
+@@ -176,7 +176,7 @@
+   "input_parts": [
+     {
+       "path": "docs/engine-cursor-source-inputs-001.json",
+-      "sha256": "c8716802cf49dce1a6641f7530521512baaa2e63e9f9c0ce037536f24f93f199"
++      "sha256": "e28740023688ff8e55f96786f09374a0e63868c6acbea1e8e0aa2ab24c16eaa1"
+     },
+     {
+       "path": "docs/engine-cursor-source-inputs-002.json",
+@@ -184,15 +184,15 @@
+     },
+     {
+       "path": "docs/engine-cursor-source-inputs-003.json",
+-      "sha256": "f301d1de39f70f61b5fc4f0ead4230aa763dfbf8ce0bcef70456a5828c06c76c"
++      "sha256": "afeb2611617ba7fbbca7d4462f5625db68dd7b26e5f446cfb7079f84b1b9047d"
+     },
+     {
+       "path": "docs/engine-cursor-source-inputs-004.json",
+-      "sha256": "17b415e2d0e4979e6381f5953ee3b0ee519c554c54937b2b234d8e0c67e60f6e"
++      "sha256": "c5f0afa7a2721ffb5f1be825b708cd0b1dadf276b99e70c01979478996486ae8"
+     },
+     {
+       "path": "docs/engine-cursor-source-inputs-005.json",
+-      "sha256": "bc73c465dd57e3bcaad19b34aee7ca498b10cb9e1997b1eac0bc8e4f175f16e2"
++      "sha256": "eff907c870585defeda4be4f6e7796fb63e0865f10640e5fc3d0d50a8055ca47"
+     }
+   ]
+ }
+diff --git a/internal/engine/managed_control_diagnostic_api.go b/internal/engine/managed_control_diagnostic_api.go
+new file mode 100644
+index 0000000..1045e35
+--- /dev/null
++++ b/internal/engine/managed_control_diagnostic_api.go
+@@ -0,0 +1,89 @@
++//go:build linux
++
++package engine
++
++import (
++	"encoding/json"
++	"fmt"
++	"os"
++)
++
++type ManagedControlDiagnosticView struct {
++	Work       string                `json:"work_id"`
++	Task       string                `json:"task_id"`
++	Revision   int                   `json:"revision"`
++	Evidence   string                `json:"evidence_sha256"`
++	Diagnostic managedControlFailure `json:"diagnostic"`
++}
++
++// Only expose the engine-owned original linked to the current blocked result.
++// The client supplies task identity, never an arbitrary private file path.
++func (s *Store) managedControlDiagnostic(work, taskID string) (ManagedControlDiagnosticView, error) {
++	w, err := s.get(work)
++	if err != nil {
++		return ManagedControlDiagnosticView{}, err
++	}
++	task, err := w.task(taskID)
++	if err != nil || w.Planning == nil || w.Planning.Repository == nil || task.Status != "blocked" {
++		return ManagedControlDiagnosticView{}, fmt.Errorf("résultat bloqué avec diagnostic de contrôle attribué requis")
++	}
++	events, err := s.events(work)
++	if err != nil {
++		return ManagedControlDiagnosticView{}, err
++	}
++	for i := len(events) - 1; i >= 0; i-- {
++		event := events[i]
++		if event.Kind != "managed.conflict" {
++			continue
++		}
++		var failure struct {
++			Agent  string `json:"agent"`
++			Reason string `json:"reason"`
++		}
++		if json.Unmarshal(event.Payload, &failure) != nil || failure.Reason != task.Blocker {
++			continue
++		}
++		a, err := s.agent(failure.Agent)
++		if err != nil || a.WorkID != work || a.TaskID != taskID || !currentTaskAttempt(task, a.Attempt) || activeAgent(a) || a.Ended == "" {
++			continue
++		}
++		item, err := s.managedAttempt(a.ID)
++		if err != nil || item.Work != work || item.Task != taskID || item.State != "conflict" || item.Detail != task.Blocker {
++			continue
++		}
++		_, evidence, digest, legacy, err := s.integrationFailureBase(w, a, item)
++		if err != nil {
++			return ManagedControlDiagnosticView{}, err
++		}
++		if legacy {
++			return ManagedControlDiagnosticView{}, fmt.Errorf("sortie originale historique absente ; aucune trace inventée")
++		}
++		path, err := localFile(s.root, evidence)
++		if err != nil {
++			return ManagedControlDiagnosticView{}, err
++		}
++		raw, err := os.ReadFile(path)
++		if err != nil {
++			return ManagedControlDiagnosticView{}, err
++		}
++		if hash(raw) != digest {
++			return ManagedControlDiagnosticView{}, fmt.Errorf("diagnostic modifié pendant la lecture")
++		}
++		var d managedControlFailure
++		if err = json.Unmarshal(raw, &d); err != nil {
++			return ManagedControlDiagnosticView{}, err
++		}
++		if d.OutputBytes < len(d.Output) || d.Truncated != (d.OutputBytes > len(d.Output)) {
++			return ManagedControlDiagnosticView{}, fmt.Errorf("bornes de sortie incohérentes")
++		}
++		current, err := s.get(work)
++		if err != nil {
++			return ManagedControlDiagnosticView{}, err
++		}
++		if current.Revision != w.Revision {
++			return ManagedControlDiagnosticView{}, fmt.Errorf("travail modifié pendant la lecture ; relire le diagnostic courant")
++		}
++		return ManagedControlDiagnosticView{Work: work, Task: taskID, Revision: w.Revision, Evidence: digest, Diagnostic: d}, nil
++	}
++	return ManagedControlDiagnosticView{}, fmt.Errorf("aucun diagnostic original lié au résultat courant")
++}
+diff --git a/internal/engine/managed_control_diagnostic_api_test.go b/internal/engine/managed_control_diagnostic_api_test.go
+new file mode 100644
+index 0000000..1e50769
+--- /dev/null
++++ b/internal/engine/managed_control_diagnostic_api_test.go
+@@ -0,0 +1,121 @@
++//go:build linux
++
++package engine
++
++import (
++	"encoding/json"
++	"os"
++	"path/filepath"
++	"strings"
++	"testing"
++)
++
++func controlDiagnosticFixture(t *testing.T) (*Store, Work, Agent) {
++	t.Helper()
++	s, w, a, r := recoveredResultFixture(t)
++	var err error
++	w, err = s.mutate(w.ID, "fixture", "failed-control-policy", w.Revision, []byte(`{}`), func(w *Work) error {
++		task, _ := w.task(a.TaskID)
++		task.ValidationPolicy = automaticPolicy("python3", "-c", "print('retained control original');raise SystemExit(7)")
++		return nil
++	})
++	if err != nil {
++		t.Fatal(err)
++	}
++	task, _ := w.task(a.TaskID)
++	raw, _ := json.Marshal(completeDelivery(task, a))
++	if err = os.WriteFile(filepath.Join(a.CWD, "docs/first.delivery.json"), raw, 0600); err != nil {
++		t.Fatal(err)
++	}
++	gitTest(t, a.CWD, "add", "-A")
++	r.ResultTree = gitTest(t, a.CWD, "write-tree")
++	r.Revision = w.Revision
++	w, err = s.planningChange(w.ID, "submit-recovered-result", r)
++	if err != nil {
++		t.Fatal(err)
++	}
++	task, _ = w.task(a.TaskID)
++	if !strings.Contains(task.Blocker, "contrôle en échec") {
++		t.Fatal("not a control failure", task.Blocker)
++	}
++	return s, w, a
++}
++func TestControlDiagnosticPublicHTTPPreservesOriginalAndHasNoWrite(t *testing.T) {
++	s, w, a := controlDiagnosticFixture(t)
++	h := newWebHandler(s, "local.test", "diag-token")
++	path := "/api/v1/control-diagnostic?work=" + w.ID + "&task=" + a.TaskID
++	rr := runLimitsWebRequest(h, "GET", path, "diag-token", nil)
++	if rr.Code != 200 {
++		t.Fatalf("original diagnostic unavailable: %d %s", rr.Code, rr.Body.String())
++	}
++	var got struct {
++		Evidence   string                `json:"evidence_sha256"`
++		Diagnostic managedControlFailure `json:"diagnostic"`
++	}
++	if err := json.Unmarshal(rr.Body.Bytes(), &got); err != nil {
++		t.Fatal(err)
++	}
++	if got.Diagnostic.Work != w.ID || got.Diagnostic.Producer != a.ID || got.Diagnostic.Attempt != a.Attempt || got.Diagnostic.Result.ExitCode != 7 || string(got.Diagnostic.Output) != "retained control original\n" || len(got.Evidence) != 64 {
++		t.Fatal("provenance or original output lost", rr.Body.String())
++	}
++	after, _ := s.get(w.ID)
++	if after.Revision != w.Revision || after.Planning.Reviewer.Calls != w.Planning.Reviewer.Calls {
++		t.Fatal("read changed state or spent a call")
++	}
++	denied := runLimitsWebRequest(h, "GET", path, "wrong-token", nil)
++	if denied.Code == 200 {
++		t.Fatal("unauthenticated original exposed")
++	}
++}
++func TestControlDiagnosticPublicHTTPRejectsStaleOrCorruptBindings(t *testing.T) {
++	for _, mode := range []string{"other-task", "replaced-blocker", "new-attempt", "corrupt-output"} {
++		t.Run(mode, func(t *testing.T) {
++			s, w, a := controlDiagnosticFixture(t)
++			task, _ := w.task(a.TaskID)
++			if mode == "corrupt-output" {
++				parts := controlFailurePattern.FindStringSubmatch(task.Blocker)
++				path, err := localFile(s.root, parts[4])
++				if err != nil {
++					t.Fatal(err)
++				}
++				raw, err := os.ReadFile(path)
++				if err != nil {
++					t.Fatal(err)
++				}
++				var d managedControlFailure
++				if err = json.Unmarshal(raw, &d); err != nil {
++					t.Fatal(err)
++				}
++				d.Output = []byte("tampered")
++				raw, _ = json.Marshal(d)
++				if err = os.WriteFile(path, raw, 0600); err != nil {
++					t.Fatal(err)
++				}
++			}
++			if mode == "replaced-blocker" || mode == "new-attempt" {
++				var err error
++				w, err = s.mutate(w.ID, "fixture", "replace-binding", w.Revision, []byte(`{}`), func(w *Work) error {
++					task, _ := w.task(a.TaskID)
++					if mode == "replaced-blocker" {
++						task.Blocker = "different failure"
++					} else {
++						task.Attempts = append(task.Attempts, Attempt{ID: "replacement", Status: "interrupted"})
++					}
++					return nil
++				})
++				if err != nil {
++					t.Fatal(err)
++				}
++			}
++			id := a.TaskID
++			if mode == "other-task" {
++				id = "unrelated"
++			}
++			h := newWebHandler(s, "local.test", "diag-token")
++			rr := runLimitsWebRequest(h, "GET", "/api/v1/control-diagnostic?work="+w.ID+"&task="+id, "diag-token", nil)
++			if rr.Code == 200 || strings.Contains(rr.Body.String(), "retained control original") {
++				t.Fatal("stale or corrupt original exposed", rr.Code, rr.Body.String())
++			}
++		})
++	}
++}
+diff --git a/internal/engine/planning_api.go b/internal/engine/planning_api.go
+index bda74ae..3a8e12a 100644
+--- a/internal/engine/planning_api.go
++++ b/internal/engine/planning_api.go
+@@ -120,6 +120,18 @@ func (s *Store) registerPlanning(mux *http.ServeMux, send func(http.ResponseWrit
+ 		}
+ 		send(w, v)
+ 	})
++	mux.HandleFunc("/api/v1/control-diagnostic", func(w http.ResponseWriter, r *http.Request) {
++		if r.Method != "GET" {
++			http.Error(w, "GET requis", 405)
++			return
++		}
++		v, e := s.managedControlDiagnostic(r.URL.Query().Get("work"), r.URL.Query().Get("task"))
++		if e != nil {
++			fail(w, e)
++			return
++		}
++		send(w, v)
++	})
+ 	mux.HandleFunc("/api/v1/planning-history", func(w http.ResponseWriter, r *http.Request) {
+ 		if r.Method != "GET" {
+ 			http.Error(w, "GET requis", 405)

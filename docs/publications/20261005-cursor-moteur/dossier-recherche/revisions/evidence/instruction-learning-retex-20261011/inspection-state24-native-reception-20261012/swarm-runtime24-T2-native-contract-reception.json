@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-11T22:32:30.253161+00:00",
+  "revision": 604,
+  "review": "review-44f2da6a502adf1b1853484b",
+  "candidate": "4af006a35e56d799a26eae29dd197326bf6288f5",
+  "native_plan_sha256": "f18503e455c456a497d885446cd118afbbc50530bf320972db0047fc0d7ae897",
+  "native_context_sha256": "9447afa420c653cd39f0b28f88d760a1f382e9d2c35cadf7b5213650fa993da5",
+  "packet_contract_versions": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "old_helper_original_received_sha256": "4e190bce0ee367c5b490b495b0c1f1c6c4a821df11ab8a33f7568289fb6c586d",
+  "reviewer_calls": 70,
+  "previous_reviews": 4,
+  "limits": "Authenticated native plan/context reception after public corrective submission. Inspection responses, selection, final verdict and business effect still pending."
+}

@@ -1,0 +1,21 @@
+{
+  "status": "DELIVERED_LOCAL_EXISTING_VERSION",
+  "installed_version": "v0.1.1-dev.36",
+  "functional_recipe_version": "v0.1.1-dev.35",
+  "post_replay_runtime_change": "Documentation comment only, verified exact delta retained",
+  "browser_assertions": 366,
+  "version_browser_assertions": 45,
+  "installed_dialog_assertions": 14,
+  "served_assets_verified": 44,
+  "recipe_integrity": "VERIFIED",
+  "archive_sha256": "d6ca5a19ff73f0c6dfa79624afd05e6ef495242a53ff7217a655cf8aab052273",
+  "GLM_calls": 1,
+  "declared_GLM_tokens": 24977,
+  "automatic_retry": false,
+  "live_mutation_or_provider_execution": false,
+  "limits": [
+    "No global/independent acceptance",
+    "Source and CLI comparison unexamined",
+    "Other Rust migration journeys open"
+  ]
+}

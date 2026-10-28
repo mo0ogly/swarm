@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-11T15:18:45.357810+00:00",
+  "before": 332,
+  "after": 333,
+  "review_before": 70,
+  "review_after": 100,
+  "consumption_preserved": 28,
+  "attempts_preserved": true,
+  "limits": "Quota change only, no task acceptance or provider account change"
+}

@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "expected_revision": 324,
+  "task_id": "plan-68b50cc82e-T2",
+  "intent": "replace",
+  "policy": {
+    "mode": "automatic",
+    "controls": [
+      {
+        "review_output": true,
+        "inputs": [
+          "tools/actions-confiance/verify.py"
+        ],
+        "id": "plan-entry",
+        "command": [
+          "python3",
+          "/home/fpizzi/Documents/ChatGPT/swarm/tools/actions-confiance/verify.py",
+          "T2",
+          "entry",
+          "--timeout-seconds",
+          "15"
+        ],
+        "criteria": [
+          1
+        ],
+        "justification": "Vérifier le contrat observable du lot T2 : entry, avec contenu attribué et refus des preuves absentes.",
+        "timeout_seconds": 15
+      },
+      {
+        "review_output": true,
+        "inputs": [
+          "tools/actions-confiance/verify.py",
+          "tools/actions-confiance/qualify.py"
+        ],
+        "id": "plan-validation",
+        "command": [
+          "python3",
+          "/home/fpizzi/Documents/ChatGPT/swarm/tools/actions-confiance/qualify.py",
+          "T2",
+          "race",
+          "--timeout-seconds",
+          "140"
+        ],
+        "criteria": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "justification": "Exécuter les sept cas CLI/API/navigateur et tous les tests Go du pilote avec détection de courses, sorties originales et candidat exact.",
+        "timeout_seconds": 140
+      },
+      {
+        "review_output": true,
+        "inputs": [
+          "tools/actions-confiance/verify.py"
+        ],
+        "id": "plan-delivery",
+        "command": [
+          "python3",
+          "/home/fpizzi/Documents/ChatGPT/swarm/tools/actions-confiance/verify.py",
+          "T2",
+          "delivery",
+          "--timeout-seconds",
+          "15"
+        ],
+        "criteria": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "justification": "Vérifier le contrat observable du lot T2 : delivery, avec contenu attribué et refus des preuves absentes.",
+        "timeout_seconds": 15
+      },
+      {
+        "review_output": true,
+        "inputs": [
+          "tools/actions-confiance/verify.py"
+        ],
+        "id": "plan-criterion-1",
+        "command": [
+          "python3",
+          "/home/fpizzi/Documents/ChatGPT/swarm/tools/actions-confiance/verify.py",
+          "T2",
+          "c1",
+          "--timeout-seconds",
+          "25"
+        ],
+        "criteria": [
+          1
+        ],
+        "justification": "Vérifier le contrat observable du lot T2 : c1, avec contenu attribué et refus des preuves absentes.",
+        "timeout_seconds": 25
+      },
+      {
+        "review_output": true,
+        "inputs": [
+          "tools/actions-confiance/verify.py"
+        ],
+        "id": "plan-criterion-2",
+        "command": [
+          "python3",
+          "/home/fpizzi/Documents/ChatGPT/swarm/tools/actions-confiance/verify.py",
+          "T2",
+          "c2",
+          "--timeout-seconds",
+          "25"
+        ],
+        "criteria": [
+          2
+        ],
+        "justification": "Vérifier le contrat observable du lot T2 : c2, avec contenu attribué et refus des preuves absentes.",
+        "timeout_seconds": 25
+      },
+      {
+        "review_output": true,
+        "inputs": [
+          "tools/actions-confiance/verify.py"
+        ],
+        "id": "plan-criterion-3",
+        "command": [
+          "python3",
+          "/home/fpizzi/Documents/ChatGPT/swarm/tools/actions-confiance/verify.py",
+          "T2",
+          "c3",
+          "--timeout-seconds",
+          "25"
+        ],
+        "criteria": [
+          3
+        ],
+        "justification": "Vérifier le contrat observable du lot T2 : c3, avec contenu attribué et refus des preuves absentes.",
+        "timeout_seconds": 25
+      },
+      {
+        "review_output": true,
+        "inputs": [
+          "tools/actions-confiance/verify.py"
+        ],
+        "id": "plan-criterion-4",
+        "command": [
+          "python3",
+          "/home/fpizzi/Documents/ChatGPT/swarm/tools/actions-confiance/verify.py",
+          "T2",
+          "c4",
+          "--timeout-seconds",
+          "25"
+        ],
+        "criteria": [
+          4
+        ],
+        "justification": "Vérifier le contrat observable du lot T2 : c4, avec contenu attribué et refus des preuves absentes.",
+        "timeout_seconds": 25
+      },
+      {
+        "id": "plan-portability",
+        "command": [
+          "python3",
+          "/home/fpizzi/Documents/ChatGPT/swarm/tools/actions-confiance/qualify.py",
+          "T2",
+          "portability",
+          "--timeout-seconds",
+          "30"
+        ],
+        "criteria": [
+          3
+        ],
+        "justification": "Exécuter les trois tests 386 nommés des bornes configurables, sans acceptation fondée sur une déclaration locale.",
+        "timeout_seconds": 30,
+        "review_output": true,
+        "inputs": [
+          "tools/actions-confiance/qualify.py"
+        ]
+      }
+    ]
+  },
+  "preview_token": "8ffe608b190112c7e40b8349784c865671f07801fc07226a900385565f2290c7",
+  "event_id": "native-race-portability-c86fd63c0320"
+}

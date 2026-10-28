@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:paea:receipt-check:v1",
+  "title": "PAEA offline receipt correspondence output v1",
+  "description": "Offline Rust CLI correspondence output. Shape validation proves neither a valid transition nor receipt authenticity, authority or effect. The Rust checker enforces binding and lifecycle separately; build and execution provenance must be established separately.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "scope", "action_digest", "intent_id", "previous_state", "proposed_state", "authority", "receipt_authenticity", "effect"],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "scope": {"const": "offline-data-only"},
+    "action_digest": {"$ref": "#/$defs/digest"},
+    "intent_id": {"$ref": "#/$defs/digest"},
+    "previous_state": {"enum": ["PROPOSED", "ADMITTED", "APPROVAL_PENDING", "AUTHORIZED", "COMMIT_REQUESTED", "COMMITTED", "DENIED", "UNKNOWN", "RECONCILED_COMMITTED", "RECONCILED_NOT_COMMITTED"]},
+    "proposed_state": {"enum": ["COMMITTED", "DENIED", "UNKNOWN", "RECONCILED_COMMITTED", "RECONCILED_NOT_COMMITTED"]},
+    "authority": {"const": "not-established"},
+    "receipt_authenticity": {"const": "not-established"},
+    "effect": {"const": "not-established"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "minLength": 64, "maxLength": 64, "not": {"pattern": "[^a-f0-9]"}}
+  }
+}

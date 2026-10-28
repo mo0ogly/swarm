@@ -1,0 +1,26 @@
+{
+  "review": "review-f5cb258178e80a4bdc4778d3",
+  "candidate": "1ce2af045bef41baf4af808c610a921c7fe71224",
+  "originals": [
+    {
+      "path": "docs/plan-ca937edf4e-T2.delivery.json",
+      "preserved": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/T2-before-status-scope-repair/plan-ca937edf4e-T2.delivery.json",
+      "sha256": "f4da94d547cddecb7b77669427dd18e144a4472f403c3f77df0426d8f77731e5"
+    },
+    {
+      "path": "docs/plan-ca937edf4e-T2.review-context.json",
+      "preserved": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/T2-before-status-scope-repair/plan-ca937edf4e-T2.review-context.json",
+      "sha256": "1cf566e468c69a137a12d0c412413420acdb043e799a1ac86472a3c43f305941"
+    },
+    {
+      "path": "docs/plan-ca937edf4e-T2.md",
+      "preserved": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/T2-before-status-scope-repair/plan-ca937edf4e-T2.md",
+      "sha256": "60bc6ced811af650c5c09f97d07e6321e7b69b45840a57a5cc9f1a1502a2581d"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+      "preserved": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/T2-before-status-scope-repair/index.json",
+      "sha256": "0a01ec24a0c271109bf9c5c7992f2de765318eb3278b95fb020fa85ce50406dc"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "agent": "auto-f2abbcfe6bed66fd1a5e",
+  "attempt": "a-a349f9134d355713576b7166",
+  "status": "interrupted",
+  "ended": "2026-10-11T08:36:27.473812792Z",
+  "exit_code": 143,
+  "stop_kind": "delai",
+  "source_read_only": "/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-2",
+  "native_stash_commit": "a73f26244e8e0e59877fb30e8c88a8628b7ad33d",
+  "accepted_base": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+  "owned_recovery_workspace": "/tmp/swarm-T2-operator-recovery-20261011-i8yzie71",
+  "limits": "Independent operator copy only. Native source, stash and managed references unchanged. No submission or acceptance."
+}

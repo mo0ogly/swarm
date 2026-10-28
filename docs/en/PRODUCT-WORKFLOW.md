@@ -135,3 +135,42 @@ The user-facing name is **Application creation workflow**. Existing `ks-product`
 existing calls. They do not designate another engine. Existing preparations remain
 readable; changed method content must be reapplied and its plan revalidated before
 launch.
+
+## After acceptance: retrospective & quick wins
+
+An optional phase follows the accepted recipe. The cockpit offers a framed
+retrospective and quick wins area. The engine reads current acceptance evidence
+on every snapshot; hierarchical work also requires the root supervisor's closure.
+Stale evidence makes the offer unavailable despite retained historical acceptance.
+
+The user records a sourced fact or hypothesis, selects a quick win or structural
+evolution, and supplies the proposal, user value, effort, risk, criterion and
+proof. It remains a suggestion. **Prepare this evolution** opens a prefilled need
+with the suggestion and recipe hash; creation/adoption and execution authority
+are still required for the new increment. Viewing or saving starts no agent and
+preserves the accepted result. Dismissed suggestions cannot start this preparation.
+
+`planning post-delivery WORK` and snapshot `post_delivery` expose the same
+availability. `retex-save` with `source_kind: "acceptance"` requires the exact,
+still-fresh source. `GET /api/v1/retex-evolution?work=WORK&retex=ID` passes it to
+preparation without creating a mission. The optional plan phase `retex` is
+supported; executable ordering requires task `depends`, not just the phase label.
+The eleven core stages remain a method, with no automatic stage scheduler.
+
+```mermaid
+flowchart TD
+  R[Recipe: required checks and decision] --> F{Fresh evidence and supervisor closure?}
+  F -->|No| C[Correct and resume recipe]
+  F -->|Yes| T[Optional retrospective and quick wins]
+  T --> P[Fact or hypothesis, value, effort, risk, criterion]
+  P --> U{User choice}
+  U -->|Keep or dismiss| H[Preserved history]
+  U -->|Evolve| B[Prepare next increment]
+  B --> A[Adopt plan and authorize launch]
+  A --> E[Implement, verify and accept]
+  E --> T
+```
+
+[Instruction learning](INSTRUCTION-LEARNING.md) is a distinct recursive path:
+additions to future task instructions are validated by default and rejectable
+before reservation. This does not accept or execute project evolution suggestions.

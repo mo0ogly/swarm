@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "local-build-cache-ignore",
+  "inputs": [
+    ".gitignore",
+    "rust/.gitignore",
+    "tests/test_local_build_cache_ignore.py",
+    "tools/verification/recipes/reported-costs.json",
+    "docs/architecture/RUST-LOCAL-CACHES.md",
+    "docs/en/RUST-LOCAL-CACHES.md",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "git-ignore-data-and-source-regressions",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_local_build_cache_ignore.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_root_and_nested_caches_are_ignored",
+        "test_maintained_sources_and_recipes_remain_eligible",
+        "test_ignore_keeps_data_and_already_tracked_files",
+        "Ran 3 tests",
+        "OK"
+      ]
+    }
+  ]
+}

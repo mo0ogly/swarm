@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "tests/actions_confiance_t2.py",
+    "--binary",
+    "bin/swarm-actions-confiance-sealed",
+    "--criterion",
+    "0",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm",
+    "--timeout-seconds",
+    "120",
+    "--evidence-dir",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-public-evidence"
+  ],
+  "started_at": "2026-10-15T20:55:07.772095+00:00",
+  "ended_at": "2026-10-15T20:55:38.853301+00:00",
+  "exit_code": 0,
+  "sources_unchanged": true,
+  "output_sha256": "763ced78c9c8ebee064dfbcd1619b79abf2bc44847b610ef744a3fe6d0b653a9",
+  "input_sha256": {
+    "bin/swarm-actions-confiance-sealed": "77e92112aca0dec7e031388ad804d21bdfdaeb5ae5a5c9b323f507c609e403c8",
+    "web/trust-actions.js": "b57df2af16dd1891f443066d2a10f546140af6b58941886ef7489be2ff31ee6e",
+    "web/trust-actions.html": "2018714038e406b495252b800ed7dd7e50ca94d57d9978639efd06aaf5a1cdef",
+    "web/trust-actions-en.js": "28a4e562e8277639847a44a98cfa923ef6d2ff1aa9ade41a8752f632106ffd8e"
+  }
+}

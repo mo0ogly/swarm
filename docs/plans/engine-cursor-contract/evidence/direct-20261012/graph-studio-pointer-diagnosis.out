@@ -1,0 +1,8 @@
+{"pointer_hit":{"tag":"svg","cls":"graph-minimap"},"sourcePort":{"x":704.3533935546875,"y":704.795654296875,"height":17.6385498046875,"width":17.6385498046875},"targetPort":{"x":28.20883560180664,"y":938.0166015625,"height":17.6385498046875,"width":17.638553619384766},"proposal":{"ops":[],"hint":"Lien préparé. Prévisualisez puis confirmez dans le brouillon.","pending":false,"error":"Recharger et recréer le brouillon"}}
+TimeoutError: Waiting failed: 30000ms exceeded
+    at new WaitTask (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/common/WaitTask.js:49:34)
+    at IsolatedWorld.waitForFunction (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Realm.js:25:26)
+    at CdpFrame.waitForFunction (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Frame.js:583:43)
+    at CdpFrame.<anonymous> (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/util/decorators.js:109:27)
+    at CdpPage.waitForFunction (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Page.js:1445:37)
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/graph_studio_ui.cjs:23:1040

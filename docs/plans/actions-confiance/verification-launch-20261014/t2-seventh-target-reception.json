@@ -1,0 +1,220 @@
+{
+  "review_id": "review-481aead2af7d5e3314889c6e",
+  "candidate": "c6c13be3f3eb51065d6783a1b66675c2ca1d4738",
+  "context_sha256": "2f24553c908d9389fa9057ff5a2c3aec2a605b44d500a4834b5d002619d63276",
+  "target_task": "plan-68b50cc82e-T2",
+  "all_review_tasks": [
+    "plan-68b50cc82e-T1",
+    "plan-68b50cc82e-T2"
+  ],
+  "declared_target_files": 24,
+  "declared_target_bytes": 257196,
+  "all_sources": 34,
+  "all_source_bytes": 380555,
+  "literal_cli_http_originals": true,
+  "originals": [
+    {
+      "path": "tools/actions-confiance/verify.py",
+      "bytes": 6179,
+      "sha256": "546f96cf377d26f59b4ce8d489889b013b0695d52fcd8c4b77657729bd8afabe",
+      "blob": null
+    },
+    {
+      "path": "internal/engine/trust_actions.go",
+      "bytes": 34955,
+      "sha256": "1c806ced775c80e41dfbb087a9f244eeee701c66e436bffa9a3772e5bac1168f",
+      "blob": null
+    },
+    {
+      "path": "internal/engine/trust_actions_cli.go",
+      "bytes": 1521,
+      "sha256": "39e44d4743a43120f8d64e960d0e74383d05c6923de573443f0823b0ed680bf0",
+      "blob": null
+    },
+    {
+      "path": "internal/engine/trust_actions_http.go",
+      "bytes": 2089,
+      "sha256": "88a758807779411757e154ecf151d27910ca4b04e704a559d2035a13949f891e",
+      "blob": null
+    },
+    {
+      "path": "internal/engine/trust_actions_test.go",
+      "bytes": 14840,
+      "sha256": "37036704c1f6749da48b776b268f6acd1941a0ba1d06ba4f71943824cf1a9c8c",
+      "blob": null
+    },
+    {
+      "path": "tests/actions_confiance_t2.py",
+      "bytes": 10353,
+      "sha256": "099d0e07be9e02cf8fdbe250336e0fc1ac87d6934e5b8917035f84cdfe183b68",
+      "blob": null
+    },
+    {
+      "path": "tests/actions_confiance_t2_ui.cjs",
+      "bytes": 15245,
+      "sha256": "70988b7545da06254c3e26ddab10cfa60bf5cc34e7994b0458f8df715542bd50",
+      "blob": null
+    },
+    {
+      "path": "web/trust-actions.html",
+      "bytes": 4186,
+      "sha256": "2f73687d98cda427af9e6af16058937495fd48afea38c9071580cd9edd9e6a71",
+      "blob": null
+    },
+    {
+      "path": "web/trust-actions.css",
+      "bytes": 2763,
+      "sha256": "ea1db6cc44e2e6f81ea5d2477396edf3572193d6c8e04a9b5e6b49afdb87e919",
+      "blob": null
+    },
+    {
+      "path": "web/trust-actions.js",
+      "bytes": 6841,
+      "sha256": "9c5a12507d677a22ea88377e2b603daf0968dffd18e0ebb7785f8b1a66eae649",
+      "blob": null
+    },
+    {
+      "path": "docs/actions-confiance-T2.md",
+      "bytes": 12217,
+      "sha256": "774d1a112e9f3d36bf8c1cbbf2ac2d4dd78379c5d97780f81d5b6c44f28f7668",
+      "blob": null
+    },
+    {
+      "path": "docs/en/actions-confiance-T2.md",
+      "bytes": 8314,
+      "sha256": "a5da267576781e907c99ec2ddba70c15d741b14f4ce2a9c12741848e0cbc52bd",
+      "blob": null
+    },
+    {
+      "path": "locales/trust-actions-en.json",
+      "bytes": 4322,
+      "sha256": "868c16cd92eb177a51b13ba296e7503efe9671aed4ee2d990ed0d944e707fd27",
+      "blob": null
+    },
+    {
+      "path": "web/trust-actions-en.js",
+      "bytes": 4363,
+      "sha256": "90c784e13e19b88827185dc5da4f2f399ae37391351fec934a929976d7d6abfb",
+      "blob": null
+    },
+    {
+      "path": "scripts/i18n/build.cjs",
+      "bytes": 1348,
+      "sha256": "868b3ffd89ec3232ad045e1b97ceb5ef2f6dab770a3a74f8a1f416bbefa64f19",
+      "blob": null
+    },
+    {
+      "path": "web/i18n.js",
+      "bytes": 4230,
+      "sha256": "7bd0842eead0ceba3bbcaee7ac28a7b92c4c5086cdf169255da8db8ca3e7646e",
+      "blob": null
+    },
+    {
+      "path": "internal/engine/trust_actions_operator_regression_test.go",
+      "bytes": 23972,
+      "sha256": "fa4d2ecc57466682a1fdcc267e01196246afd763bca12cdd62a5b6600f4b9f1c",
+      "blob": null
+    },
+    {
+      "path": "docs/plan-68b50cc82e-T2.operator-verification.json",
+      "bytes": 14343,
+      "sha256": "6cb50c136f77ae6aa7e61f38d4779e388600a57d76a7e30aec4319a909d4f39d",
+      "blob": null
+    },
+    {
+      "path": "package.json",
+      "bytes": 3096,
+      "sha256": "4073f0842a06cc879f63827e90815f99a3dcefdf2d3ab1bff97f89bc37c4f93c",
+      "blob": null
+    },
+    {
+      "path": "internal/engine/main.go",
+      "bytes": 18242,
+      "sha256": "7b0f5318cde3fefb8b3cf90fb15ac1045dc6e8a0067011d18da159c36039a18f",
+      "blob": null
+    },
+    {
+      "path": "internal/engine/web_server.go",
+      "bytes": 31551,
+      "sha256": "ca1e32e3ae26f4058dbb484451e69a165c0eda86d528e1a72769242675b0e9c0",
+      "blob": null
+    },
+    {
+      "path": "web/swarm-design.css",
+      "bytes": 26601,
+      "sha256": "9a15b7bfa9163f32c8542d50e0ad62c8acb346a4e2e61a7a8f110c831c9740d3",
+      "blob": null
+    },
+    {
+      "path": "internal/engine/trust_actions_originals.go",
+      "bytes": 1496,
+      "sha256": "dd207a2582467e2b3b83a5fe189e7ed594be2421bf91379066eead8d838cbf1f",
+      "blob": null
+    },
+    {
+      "path": "tests/i18n_test.cjs",
+      "bytes": 4129,
+      "sha256": "9102cc2fa605b2fffe73c008b07b08e96e9d64563a6d0b142a1ba1fc3a884f3d",
+      "blob": null
+    }
+  ],
+  "controls": [
+    {
+      "id": "plan-entry",
+      "passed": true,
+      "executed": true,
+      "output_bytes": 107,
+      "output_sha256": "4d8c6e54851aeb1c07f17c7a0f5c6007edad6938fc370bdfdf5e9741865f4420",
+      "review_output_truncated": null
+    },
+    {
+      "id": "plan-validation",
+      "passed": true,
+      "executed": true,
+      "output_bytes": 51415,
+      "output_sha256": "b767d32e4cbdb42430823a7f85369d2003213a5f1f441c133e5b7ad2a5c12a5b",
+      "review_output_truncated": null
+    },
+    {
+      "id": "plan-delivery",
+      "passed": true,
+      "executed": true,
+      "output_bytes": 13526,
+      "output_sha256": "e2ecdbdd2e61bde8f3ba7d7f40d35f91129e9be9becd546e543745b6e97789dd",
+      "review_output_truncated": null
+    },
+    {
+      "id": "plan-criterion-1",
+      "passed": true,
+      "executed": true,
+      "output_bytes": 493,
+      "output_sha256": "79e80971a1020583f52e6e7ce6b9066144e5d1edc6a6b6a2898ac86669016724",
+      "review_output_truncated": null
+    },
+    {
+      "id": "plan-criterion-2",
+      "passed": true,
+      "executed": true,
+      "output_bytes": 583,
+      "output_sha256": "fd42d4ed22d843a0b5bf3b95ba82fe51e3eed03ba43554fb6d05a34e1db2ecff",
+      "review_output_truncated": null
+    },
+    {
+      "id": "plan-criterion-3",
+      "passed": true,
+      "executed": true,
+      "output_bytes": 505,
+      "output_sha256": "8de06413efec2abd317a2041391f8451fd9a49c4d2a0dd32bdbc8f729b5ebd41",
+      "review_output_truncated": null
+    },
+    {
+      "id": "plan-criterion-4",
+      "passed": true,
+      "executed": true,
+      "output_bytes": 12284,
+      "output_sha256": "7a3644e7bc37ab3916d6e6562e31f2b3e7b1194cda99b9649e09f6f1ccabcb4c",
+      "review_output_truncated": null
+    }
+  ],
+  "correction_note": "The first diagnostic selected tasks[0], which is accepted T1. This observation selects T2 by exact public task identity; both diagnostic snapshots are retained."
+}

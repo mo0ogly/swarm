@@ -1,0 +1,1284 @@
+{
+  "files": [
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/final-paused-process.json",
+      "sha256": "65aa9368679a485710bc2a9b1343c49ed17ffe5a8a8e8218ae7cb21dd988e826"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/final-paused-records.json",
+      "sha256": "62af5e102cb8889a1ac1ba506f100331b0acace743809c95f26e8ff915da002c"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/final-paused-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/fixture.json",
+      "sha256": "ab08bc0aa38c1d79ecca4a1d78bf249e76cd80ffeab9ca156de09260b81ee03d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/http-final-status.json",
+      "sha256": "0adde5bb1dbac71439e40ab80360be7b33b6d055147a70a6adebef5118782441"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/owned-root-e395286f1fa7d2448cad0faadea2e944e4543486a0ebfbb7070244012922d0ce.json",
+      "sha256": "758442aac7e6cbf6be7e3485ce88558dcc413037a30e899ca0da634b04f783f7"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-001.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-001.stdout",
+      "sha256": "891315a5f9cee1b69b817343f3f5abb1888feeab89f85f618983d8e140dbef20"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-002.input.json",
+      "sha256": "535f32c49df5d59662ee2694dbaab4704ec59003c84e1844f74ec4e59e833817"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-002.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-002.stdout",
+      "sha256": "c3536028415644ae5acaabcba76158afef936bfdfed41bef9f69cefd70caa4aa"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-003.input.json",
+      "sha256": "b3de678baeb2ba4b253f9fe1386815902d847492fe0e3f8d4dd6a7faacaf7fbf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-003.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-003.stdout",
+      "sha256": "ae9757e5b7413280b973725e94d29bd74b4045ebfe5ce0b934adebb2c60847ed"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-004.input.json",
+      "sha256": "b26c05d07e255069c8a78ac8767eb3642ff2794e2a701db3f131e0c9d9a4fdbc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-004.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-004.stdout",
+      "sha256": "ae300f393dca6bd7ccac6d1e3adcef0f1ad4d3ec69c0d886f95fc5a0216c7344"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-005.input.json",
+      "sha256": "7ad4e6ce777890b0dc1ae5133693076ba0f980db4012c56802ff2c3e26309f65"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-005.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-005.stdout",
+      "sha256": "9d341ba89af17a600e831fb2e505f9ed78741758ef6fb4345c8a683e1bd50a71"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-006.input.json",
+      "sha256": "15aa99832e883e0a6a3a071b715bc705af59e793467e3479ee9a3d758cce7c31"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-006.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-006.stdout",
+      "sha256": "49f56a62b3b3f8db5ac26f5d99e5e98a6935ff1b7249ce4d66cfc0f48bceb59a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-007.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-007.stdout",
+      "sha256": "6d2be647e522cb3cbbcc7659fafd2ce6482c76e4b81789214e5c91168892d0fb"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-008.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-008.stdout",
+      "sha256": "ae24559d33fd810c0333c30ba3e96837380135e7c91f793fac82cfa89ef3b47b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-009.input.json",
+      "sha256": "3ae1a669aacbb47786c9ba7ee51481e5506872a40233708f561eec6e061f747d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-009.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-009.stdout",
+      "sha256": "b734bffdc8e6b436fc7493cb01491fb6e3951963eeea4c39d310cd80b544358b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-010.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-010.stdout",
+      "sha256": "05d24e4fc817e1c21c4df31e1c795672387f5768d4ba6cc11223b73aa40baa23"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-011.input.json",
+      "sha256": "29cbdcaddcf848a4ae7b73b1adfbbdee05755fba1a7102198fb9f31c5da65f10"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-011.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-011.stdout",
+      "sha256": "753fd24a4e60f54a0eeae4b4f19faf8a2387218fb5bc9abd0f4fe8a1f5a94cf1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-012.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-012.stdout",
+      "sha256": "798bb59cc12689f95330d2ab7c008d01c8dc7ce76cacca4e58085cfbd6b29a9c"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-013.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-013.stdout",
+      "sha256": "0118bf5a14a9d0a9b3fa54391778bceed20b110120b0935c0a517b9133ae0da0"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-014.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-014.stdout",
+      "sha256": "57a1a6e3e681121779244ed2820b485f21cbe905b77b55f0cf05ff118a2ad004"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-015.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-015.stdout",
+      "sha256": "25762b45b173ffd32b13c98a28409b5fc356b3c897dfaf32cdbcc1011f859d9e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-016.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-016.stdout",
+      "sha256": "3ec92318bb652308d0a8dc64d4f54855e5da569a17671623f56b5b360bfc7ba7"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-017.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-017.stdout",
+      "sha256": "f6727651fe3f8a3d69dde17b764076c564eb1479cf59d75e256ebb772f9d8d01"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-018.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-018.stdout",
+      "sha256": "71b2a0be512b437fbc28b4f70c2f1eef73efbdc10333d070fad284af808ae109"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-019.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-019.stdout",
+      "sha256": "5f7868f56af6adc0ef506feb9dbb3d5a77d23c2911a4cf7ba28f431538acd8c9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-020.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-020.stdout",
+      "sha256": "acecd92358a7a131ae2dcfc97e80e632a79c48545b48d513a254d9364913f846"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-021.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-021.stdout",
+      "sha256": "71b2a0be512b437fbc28b4f70c2f1eef73efbdc10333d070fad284af808ae109"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-022.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-022.stdout",
+      "sha256": "e961ac04ebb77d819e8d99f91f80d02e4049d858545137e6a2319eb3595b3318"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-023.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-023.stdout",
+      "sha256": "71b2a0be512b437fbc28b4f70c2f1eef73efbdc10333d070fad284af808ae109"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-024.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-024.stdout",
+      "sha256": "32cc71639f526d1c93915ff342c9e73251816c3d832a8ffa47f2dd07e4122137"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-025.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-025.stdout",
+      "sha256": "e83e3e659d5165f39b15e8068dd877d21e092cc730a33fea7cbc9e83873cb46c"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-026.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-026.stdout",
+      "sha256": "cdf6d905c69526bc834fcce1de0cee846260b79c169a7ea444acc840c73418a8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-027.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-027.stdout",
+      "sha256": "29e684f64315ebd560612083baa384c271d7dd7ea0c3037eeef47cbff9e3e8a5"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-028.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-028.stdout",
+      "sha256": "d8edeebcd027dea4c27be32cec5e26986444fab11eca22c02927a2a0067e11de"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-029.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-029.stdout",
+      "sha256": "56f838518016da1e078f7bdeaeb54090731db0872ad4151d57414eb16714ea49"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-030.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-030.stdout",
+      "sha256": "6d3a2019208ee55f645b4ba723c985a233de0d69007c87bde5c1f2185d6ca4f1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-031.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-031.stdout",
+      "sha256": "294b9c15dd1be5a3f88dd1dc82608186a2b5ef5f42b6f69b02ce710006d1a0d4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-032.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-032.stdout",
+      "sha256": "d8edeebcd027dea4c27be32cec5e26986444fab11eca22c02927a2a0067e11de"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-033.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-033.stdout",
+      "sha256": "ff3b122bbc503a57417e92f904e9c64e326b7f1f22f60a9eb5266600b8172e82"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-034.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-034.stdout",
+      "sha256": "8be71f7a9710a0e8886b0dabfcea71cd5321c0e5e9c4f008c8cd62b4a2aed85d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-035.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-035.stdout",
+      "sha256": "294b9c15dd1be5a3f88dd1dc82608186a2b5ef5f42b6f69b02ce710006d1a0d4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-036.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-036.stdout",
+      "sha256": "d8edeebcd027dea4c27be32cec5e26986444fab11eca22c02927a2a0067e11de"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-037.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-037.stdout",
+      "sha256": "be14e3164ca71fb9231c47f7949680f1768fbf1b692e90e4fcfe67d3f28ef6ef"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-038.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-038.stdout",
+      "sha256": "de82529cf7e7c02ef2f7decba5753d45d30560275d1d6bb3ec9ad9bc0c95b8c4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-commands.json",
+      "sha256": "c7cd9d8a82b814cffb3ca77ea79df09aba966b8f76ac2440f71dc824a12c50ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/planning/public-worker-flow-fixture.json",
+      "sha256": "2527ac0c4579715317b247e531fd9099f5f5066a6be2b900c83f7d23afc803eb"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/provider-0/handoff.md",
+      "sha256": "41ebce5580c73e89f16a07cb4e1ea8a0a6dcd94a0611246f92ade61cfaca1589"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/provider-0/inventory.json",
+      "sha256": "e30c9a41783c97f1e3091415cf74656af2e4545000c1b2b2e92a3feef0b43ae7"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/provider-0/model-received.json",
+      "sha256": "048836016ccabce9d4d8fa4ff32a3acbff6636c1e9b8c7477524d3a632c26431"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/provider-0/release-worker.json",
+      "sha256": "4036c818bbc9f568239a4fccd0945355c8899d61a14f6439b95630baf09165cb"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/provider-1/handoff.md",
+      "sha256": "235ea1502acdec53b0a5930073d35414f60fe2643dc54aeef67f3234602d9151"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/provider-1/inventory.json",
+      "sha256": "ef6672f32a0e06cdf38ab72f146361daa0b638b91c64bf8ca3cc534f3f617244"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/provider-1/model-received.json",
+      "sha256": "cda8129da91c2f288d784222b71cc24008a391c38f48434fcc8563a6fbbd9538"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/provider-1/release-worker.json",
+      "sha256": "8046c55376405c306892a9fc745d68b8006fca1248f7b85fca64c0334c671023"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/result.json",
+      "sha256": "34c7f349c8f3c4ba35a0594e623f1a297367cf9e2e47dc80982da31c54dd27d0"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/turn-0-completed.json",
+      "sha256": "9564652a115f525644b8b85167b03e0eec3bc4e7bec5e9d73eb05aef2138112a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/turn-0-process.json",
+      "sha256": "3aee672696720b72d2856d0a51b6a4da4e91d81ea7660700a38af5955c912b9f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/turn-0-records.json",
+      "sha256": "ced9966909aaff20dd6ac2aa330e37b150e1d96fbc0614dfda67fe726ae09e58"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/turn-0-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/turn-1-completed.json",
+      "sha256": "a0455223b20ea223891835f63a51e4ab31346c8e9c448651cba2038b6f1d3543"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/turn-1-process.json",
+      "sha256": "44f736fd96579829193ade0cd77b2e6bf5a842cc21ac4e7efdaae86f7f355df4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/turn-1-records.json",
+      "sha256": "c1a39f9270b90b34b78a9e74fae9e94b6fbdf325cd0b1e6a42840c126581dbcf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/two-task-3pcylwxm",
+      "path": "run/turn-1-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "final-paused-process.json",
+      "sha256": "193edc704ffe55489eb8cd4ead4243cc59f0de7429c78da8ec7e27cc07fb657d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "final-paused-records.json",
+      "sha256": "7ac342cd06eddc3ff42cdc6a92adeeaccb944499b095300c2cc8d2e61ac9e636"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "final-paused-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "fixture.json",
+      "sha256": "94c8b83a72e0595bddd7f0db7f9c36a763fce39f566a763a6e67c0edd532281a"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "http-final-status.json",
+      "sha256": "2040d74e735d76856ccbda56f6447e88553675a8cf8a743978eaa53a306d0d2c"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/owned-root-90906e0b6c30a53f3065f8b46d8f86503f515fe4e3875e10ade815ff058199d3.json",
+      "sha256": "831f64d1fba55743ba57ad35fc318c53d70fdde34ea217f3ed94514ec429b15a"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-001.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-001.stdout",
+      "sha256": "c8b907a2072505f47888ac12625a8c0239266147bfd51955d367ab8e38f7d745"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-002.input.json",
+      "sha256": "535f32c49df5d59662ee2694dbaab4704ec59003c84e1844f74ec4e59e833817"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-002.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-002.stdout",
+      "sha256": "2951d7a4341d1b77b71048973baba04a27a0bc8cd9438a5e2c52e2ffe1691461"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-003.input.json",
+      "sha256": "b3de678baeb2ba4b253f9fe1386815902d847492fe0e3f8d4dd6a7faacaf7fbf"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-003.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-003.stdout",
+      "sha256": "d27767baff5242300d19eaeac20bf0d71d52a8ae8504e6de551a6b444a5135c5"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-004.input.json",
+      "sha256": "b26c05d07e255069c8a78ac8767eb3642ff2794e2a701db3f131e0c9d9a4fdbc"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-004.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-004.stdout",
+      "sha256": "b1b1918e3c0bef7ace38b0ef254a54c53482efc5c5a6574c01293fadd200d910"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-005.input.json",
+      "sha256": "7ad4e6ce777890b0dc1ae5133693076ba0f980db4012c56802ff2c3e26309f65"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-005.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-005.stdout",
+      "sha256": "7ee0ca7e68ebdce91a4978e3fedcccd6cf445d3d33d22d3640f21b5199219eda"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-006.input.json",
+      "sha256": "15aa99832e883e0a6a3a071b715bc705af59e793467e3479ee9a3d758cce7c31"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-006.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-006.stdout",
+      "sha256": "fc778f1164c973923628c77f832b09b9e853a6c51fb6dbbf122f95e6a29f705c"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-007.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-007.stdout",
+      "sha256": "ecfcbc3db2d9b72fc2b2f4bce1d58926bb34adb872def495a948533a7c043660"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-008.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-008.stdout",
+      "sha256": "c7a45197b9bdd55753ba2644041ab1e74ece3469304136fedb507b18dc5d54f8"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-009.input.json",
+      "sha256": "3ae1a669aacbb47786c9ba7ee51481e5506872a40233708f561eec6e061f747d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-009.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-009.stdout",
+      "sha256": "29882dff880c4dcf05c259641456004e9fa9d3dfce79c7834191776829468598"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-010.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-010.stdout",
+      "sha256": "beeaaa78f8778be58c493c303fedeb7bc5f3828403a7cf216653ed2c86f250e2"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-011.input.json",
+      "sha256": "29cbdcaddcf848a4ae7b73b1adfbbdee05755fba1a7102198fb9f31c5da65f10"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-011.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-011.stdout",
+      "sha256": "1b0ee1b82fa1a632751582dcb9cf364305b383899445e9043ad16ffe0dcffd36"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-012.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-012.stdout",
+      "sha256": "7471655cbbecc43c151fdbad63bb4c8a1a1305d020932d7b69a2934f08e73dee"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-013.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-013.stdout",
+      "sha256": "2edc99b6675e7ea3a2bcc702f59424e090db9013149f97fa99f1988701447ed8"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-014.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-014.stdout",
+      "sha256": "0c3b0c45f6af4223964fd59009480580c6e160f34eb91ad15a7a1f9b4831f8fa"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-015.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-015.stdout",
+      "sha256": "7d2c7979d807aa6fbb2d35f8c7afdcc6932b22716ce452f555f6b1ffee4073e4"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-016.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-016.stdout",
+      "sha256": "82dc1aa7a702a33030114074f387bf53e17480ba5f921431f55e0bea6b07b4bd"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-017.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-017.stdout",
+      "sha256": "a983ab6e0cb08f5f8c51352024b5b3f23dd3c0b800c9e2f7fa84ffbde0772805"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-018.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-018.stdout",
+      "sha256": "49e9d2710558ccd418d27efec5729d69d582e1f038a36f901ca92c2b694fed14"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-019.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-019.stdout",
+      "sha256": "b9e2e6312ee1e1c04cdd1d0ab18ae064706bcc4d7a970924702a6836ccd2cef8"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-020.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-020.stdout",
+      "sha256": "3561db635379a10978e9fde04a73b44dcaba5505d31add6f53f8241861b5c597"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-021.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-021.stdout",
+      "sha256": "49e9d2710558ccd418d27efec5729d69d582e1f038a36f901ca92c2b694fed14"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-022.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-022.stdout",
+      "sha256": "b7a9c2d2df428e3a7e6e45b9dbcaa5e2ac0c412c647475ead05f68db4bc2dd29"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-023.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-023.stdout",
+      "sha256": "49e9d2710558ccd418d27efec5729d69d582e1f038a36f901ca92c2b694fed14"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-024.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-024.stdout",
+      "sha256": "d3bf920daf9a2fea48b694b361883252b06e370ec575db55f4e6719f15ece9a8"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-025.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-025.stdout",
+      "sha256": "4d8db37aba6a7e7ed1cf51cc28a617e7300ef01e6109ba8acb43dce5f0866b8e"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-026.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-026.stdout",
+      "sha256": "fe5ba759b014f83671bf705b1e50ed31b191b5ab6e95bd6b9c646737bd3ca6e2"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-027.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-027.stdout",
+      "sha256": "f65acf447693422bba7e6c3251061d5380cc07506fa9e274be08e07cd71a0955"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-028.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-028.stdout",
+      "sha256": "610e7ac6f72dc2f2796ce8248e5f13d7648076e6484dd1dd6675f303955c9d2d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-029.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-029.stdout",
+      "sha256": "136f71d7e3c4ef598218a1a159df630231fdddc9f8749f66a00603f971857019"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-030.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-030.stdout",
+      "sha256": "75346f17f3761042156bbf24f8a2bd5129dc96ff484a771266ccc792cf7cc4e1"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-031.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-031.stdout",
+      "sha256": "6dc390916d73e71b9219d31b94d52bd2b2ccc06b00f54bbf281a7de3f4d2ad64"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-032.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-032.stdout",
+      "sha256": "610e7ac6f72dc2f2796ce8248e5f13d7648076e6484dd1dd6675f303955c9d2d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-033.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-033.stdout",
+      "sha256": "86c4be25e5c06e756710ad53d2f8a4933444adb4af67510ff1e577cf4b79591c"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-034.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-034.stdout",
+      "sha256": "86ded5dc530ebd8e762dea2df66228a78d76a445964fc9513ba749b1035961fe"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-035.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-035.stdout",
+      "sha256": "6dc390916d73e71b9219d31b94d52bd2b2ccc06b00f54bbf281a7de3f4d2ad64"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-036.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-036.stdout",
+      "sha256": "610e7ac6f72dc2f2796ce8248e5f13d7648076e6484dd1dd6675f303955c9d2d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-037.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-037.stdout",
+      "sha256": "f0963d86358d17d3070427d6939875043952f951731b67babb19de2976874795"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-038.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-038.stdout",
+      "sha256": "1b42d06546d11a953879d979172b33c5591c6a27d62065b49855e591290b1812"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-commands.json",
+      "sha256": "fde77ba60bf54ba01ee11cec667dae38172a4904b42f8496ce98763405726bd0"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "planning/public-worker-flow-fixture.json",
+      "sha256": "81787a9cb962f29d25e8ceb6454e1f684b4acdd818207c35b9b32a4fbb46bd7e"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "provider-0/handoff.md",
+      "sha256": "a5c1d037a82479300026b12397e145dbc807c184c24393e27e0ba8a7fb1280ec"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "provider-0/inventory.json",
+      "sha256": "40af51ae7ccf7c688793c752e3cefaf60659dd5dbf44ad341f4f430e138d3f01"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "provider-0/model-received.json",
+      "sha256": "ebe73001c1b545a088ee981b23ba4432bc673965e2208528262fc6b820a5962d"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "provider-0/release-worker.json",
+      "sha256": "3f8e4c06ab71d2918aa6ae6bf7fe0da19ad0011aa352106b35479a773c281f84"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "provider-1/handoff.md",
+      "sha256": "83d879e040114181a6a9460861a066181d67e0ce962f127ef77b38d589a935b3"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "provider-1/inventory.json",
+      "sha256": "83264b28f9de9cb5acbab3df514668cc8e1aeeccea59cebda1542fa919673ce8"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "provider-1/model-received.json",
+      "sha256": "2f7a992c57268a011a2ff5861c02f6e49e1074ea8c49adf6b766ec34dd5b950f"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "provider-1/release-worker.json",
+      "sha256": "9726fd9777c7470d710a77e4f7f670790aa9780b52f6a96f3701bc360ac4f420"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "result.json",
+      "sha256": "60e934891522aa61d96a0aa171849a8ebf24bd993a759eb44358031b9157cc2c"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "turn-0-completed.json",
+      "sha256": "e9902b79a078c87334ae0110812857578dd3fac3c6feb126e590384a3a350582"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "turn-0-process.json",
+      "sha256": "3a3100f22c8e27972a781cfc9a66e66b8a2204e3542f544ca7767656a59a1d0c"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "turn-0-records.json",
+      "sha256": "637b4dc995a5615caa7d0a94dae43e6a33a434db7b3b95d0aa421979b202c8a7"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "turn-0-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "turn-1-completed.json",
+      "sha256": "e730eedaaeacc8e16bfd5aac9cdee7fe5884f9ecdc74d5f8a741cbdc853294c5"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "turn-1-process.json",
+      "sha256": "86cb04399d0a6f7fa675f0b04925ccf312500fb7dad70606fd80ce46685d41c5"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "turn-1-records.json",
+      "sha256": "00d80b756efb1a88acda0e56444ade17a9ac756c9e878025c787a98c1c280d47"
+    },
+    {
+      "root": "docs/plans/migration-rust/evidence/20261024-two-task1300/run1301",
+      "path": "turn-1-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": ".swarm/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": ".swarm/.gitignore",
+      "sha256": "cdbcae15105d6b781e620813c79c7e868740d4e9cc53ce6f5fcbbc12387adf4b"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": ".swarm/engine-settings.json",
+      "sha256": "e5b7c9a335874df2f17f5b56451aa89f77b705665a81e6f9f80441b02fdc8389"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": ".swarm/native-completion-1508af54fc65c6d22c1b67025c1a45334de59b7bcd190cedd93f3ae41d485bb1.json",
+      "sha256": "48930899a6e7df4ddf1ff3935a5ac13fcdc1c59759ca1ccf71153638b96b16fc"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": ".swarm/native-completion-2d70d6fbc5f5fb6b3561638424ecdb21c0a8baae5624ed716727e2d658d6aea6.json",
+      "sha256": "6f2fc14d204182934e65ee529b25ea737769fd68668bc9801dc98e341e331e7a"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": ".swarm/native-planning-446924899ac681a4ca775ac2736fc49c02f3db2b424705bebaf9d3ec911f84dd.receipt",
+      "sha256": "3f9e43833011c182620050b01a62c308b9a0eed69f51cc8fafabb4c4f6af6962"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": ".swarm/native-planning-7b3bf6e3a7e643abf94e296f81d4d65e77c7c796afa53ed11be14e23b28fb2c9.receipt",
+      "sha256": "be0da10c4e2f14618c3a5fef2123dae4afaaaf097793f44aeda32dedb08cdcb0"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": ".swarm/providers.json",
+      "sha256": "bf1492deb718b32e3b40abed1cf435987f77f8ce7e07ca095a9a6167c78bfb49"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": ".swarm/providers.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": ".swarm/state.db",
+      "sha256": "3378aeee6a64a3585b9e55b350fd70f01ab60a9e84b0680a3903441c7bb3b635"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": ".swarm/views/w-a568bf441c906fa12d0258de.md",
+      "sha256": "235b40f2cef83065ae108095f558d99e117433526223bfe918243d4513e02701"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": ".swarm/views/w-e7ae8402e2502511d4b48de3.md",
+      "sha256": "15105f96ca91019e50b1475b3a308cf216b4f1e42918a4e04678f411a15bdf2f"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": "codex",
+      "sha256": "6d85d0386ff259c7723e894b999cac8c990e315281fb8c0ada55abd45d88fc9d"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": "codex-home/models_cache.json",
+      "sha256": "ffa10bbf7c6542e441608a1b4c3f4ac1410652360f269f51c6640f660a7c766c"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": "fixture-prompt-3585342.bin",
+      "sha256": "3c6ab1a69ca324afcfbd24d4f356bd60ee1bb78ca5903652cd69140822286182"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": "fixture-prompt-3585349.bin",
+      "sha256": "53caad96fe4d0a2823b0c72cf469e1744f223dcce753db20f8ab956c95eeefbf"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": "model-received-3585342.json",
+      "sha256": "b26ddaf660e6dcd64d9101890f41490b0e6f81c2b0f62ff5de54d74286a3594d"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": "model-received-3585349.json",
+      "sha256": "fe301c88681da0ed82cf9c89777ac16a8fd1c1a98a53f3be6043486448ab5e71"
+    },
+    {
+      "root": "/tmp/swarm-model83-k6woopoe",
+      "path": "planning-proposal.json",
+      "sha256": "7af5bea61e75579439f6dd434e85166794a773cb11992c9060224b7a43311ffa"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": ".swarm/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": ".swarm/.gitignore",
+      "sha256": "cdbcae15105d6b781e620813c79c7e868740d4e9cc53ce6f5fcbbc12387adf4b"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": ".swarm/engine-settings.json",
+      "sha256": "dee34e312e377a17b7eabcb23bf10c38e6247167937bc71329b5833242fab111"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": ".swarm/native-completion-9cb1a5a179d0720ccf89aadb7ca7e89c9b7898f4daf2e332c6780f19ea1b2959.json",
+      "sha256": "5d603e8f8de7326bfa259a08f77c8c2df962259cdd7ef4ffcb662734120fb0e0"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": ".swarm/native-completion-ac9a36f4cff820cf541941ec95b681145c6be06b8ae96eb11c5421a4ea7eba63.json",
+      "sha256": "18e1ba94fc17c728241fbc59d5e542379d692d89f61e6d4e767d27fc2231f32b"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": ".swarm/native-planning-390f1cbaa1819e0c8072a941745ad0d1a4448599858817451d390fd47ecaa58b.receipt",
+      "sha256": "01ccaa9174106afbf891b988dbb46e47db5c6cf9d6d24b92823ff9c15e3e8aaa"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": ".swarm/native-planning-8aa040ae072dddbc0262493dcbf24bfc14a96819e65a043695e47a5999144edf.receipt",
+      "sha256": "7d006e101cb4f8dfa540f9810fc587d5dc80e4a204498b001566fa2f5d903777"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": ".swarm/providers.json",
+      "sha256": "b5b088c94d984a4d51513b39b44ce51c430b09e08211614398a532b5111c1cba"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": ".swarm/providers.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": ".swarm/state.db",
+      "sha256": "ca3addba16076ae447ba7b2d2138d686d2af0b23db53a52511a6be2779ba199d"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": ".swarm/views/w-32ec0b728851684bad4cbf71.md",
+      "sha256": "f828a490d7ef52dbb633831cc6b27f1919b45ef07803df7b1210e157e9aa342e"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": ".swarm/views/w-ea3172b77b42d060cf520a3c.md",
+      "sha256": "1f639778f2e17c7a7b49828dcbc261217f6297d75ae020c48cd50705612001e4"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": "codex",
+      "sha256": "73c4d43d5ac0d4a4f8396997439ce7f896120d7ccba487d1b79f290fcbecca71"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": "codex-home/models_cache.json",
+      "sha256": "ffa10bbf7c6542e441608a1b4c3f4ac1410652360f269f51c6640f660a7c766c"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": "fixture-prompt-3581616.bin",
+      "sha256": "41c6295287f5c693a77c0cbea1841da42920b91aba52a1767861c30ba709eb3f"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": "fixture-prompt-3581649.bin",
+      "sha256": "b027f3b20b5ff7b4539ed00f296c3a83c3f0b743bbe0c76dcaba16949e496bc5"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": "model-received-3581616.json",
+      "sha256": "f976b224825949eeb562704d0ea785e9ec4620476d876646a69dcefd4942b120"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": "model-received-3581649.json",
+      "sha256": "516e804aff8a84cda3ffe5561590fce4d410b1c72356839c3848b03ec5df2d29"
+    },
+    {
+      "root": "/tmp/swarm-model83-yi65jsud",
+      "path": "planning-proposal.json",
+      "sha256": "f65e6f4b8b66586749567713392ee51bec35eff0f2cb1b26b8a183584eafbe44"
+    }
+  ],
+  "excluded": [
+    "/tmp/swarm-model83-k6woopoe/.swarm/web-session-07deb854cac8d3b8",
+    "/tmp/swarm-model83-k6woopoe/.swarm/web-session-3dae18625f74dc6a",
+    "/tmp/swarm-model83-k6woopoe/.swarm/web-session-8ff090b909767798",
+    "/tmp/swarm-model83-yi65jsud/.swarm/web-session-160dbf22c14aa89f",
+    "/tmp/swarm-model83-yi65jsud/.swarm/web-session-8d822d64338206a1",
+    "/tmp/swarm-model83-yi65jsud/.swarm/web-session-bc25b03eecb3192f"
+  ],
+  "archive_sha256": "7bb470f7ad375960dcbaebed91636aa4681047017f5adb94fd0e7a0b5ac741fd",
+  "verified": true
+}

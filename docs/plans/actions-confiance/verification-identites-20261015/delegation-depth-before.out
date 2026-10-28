@@ -1,0 +1,18 @@
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger/null
+    trust_delegation_test.go:166: noninteger delegation depth accepted
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger/"2"
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger/1.5
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger/true
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger/{}
+=== RUN   TestActionsConfianceT3DelegationDepthRequiresInteger/[]
+--- FAIL: TestActionsConfianceT3DelegationDepthRequiresInteger (0.00s)
+    --- FAIL: TestActionsConfianceT3DelegationDepthRequiresInteger/null (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationDepthRequiresInteger/"2" (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationDepthRequiresInteger/1.5 (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationDepthRequiresInteger/true (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationDepthRequiresInteger/{} (0.00s)
+    --- PASS: TestActionsConfianceT3DelegationDepthRequiresInteger/[] (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.061s
+FAIL

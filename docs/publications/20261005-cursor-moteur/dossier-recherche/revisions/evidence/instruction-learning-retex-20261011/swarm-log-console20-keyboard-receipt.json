@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "at": "2026-10-11T18:41:47.695Z",
+  "binary_sha256": "371239add2a2ba968c3b1807d5bfd896eb6662c31d59d0644792753321f471ff",
+  "checks": [
+    "Actual Ctrl+F while Monaco focused opens find widget",
+    "Escape closes search and preserves logs view",
+    "Actual authenticated isolated console frame; no response interception in this check"
+  ],
+  "accessibility": {
+    "role": "Console des journaux, lecture seule",
+    "inputs": 3
+  },
+  "limits": "Supplement to browserv5; fixture mission only, no model call/native mission DB."
+}

@@ -1,0 +1,14 @@
+{
+  "url": "https://raw.githubusercontent.com/torvalds/linux/v6.17/fs/pidfs.c",
+  "role": "primary kernel source, version pinned",
+  "claim": "On 64-bit Linux pidfs identifies struct pid by its inode; ordinary/anonymous inode pidfds and 32-bit representation are not accepted by this adapter.",
+  "local_header_magic": "PID_FS_MAGIC 0x50494446",
+  "observed_kernel": "6.17.0-41-generic",
+  "not_proven": [
+    "32-bit runtime test",
+    "legacy-kernel runtime test",
+    "persistence across boot",
+    "executable identity",
+    "human authentication"
+  ]
+}

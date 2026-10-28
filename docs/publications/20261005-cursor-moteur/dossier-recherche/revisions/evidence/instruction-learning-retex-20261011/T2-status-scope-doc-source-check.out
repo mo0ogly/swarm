@@ -1,0 +1,4 @@
+["python3", "docs/plans/engine-cursor-contract/check-evolution-docs.py", "T2"]
+T2: architecture/evidence structure verified; semantic review still required
+["go", "test", "./internal/engine", "-run", "TestGraphDeliveryD03|TestGraphDeliverySourceParts", "-count=1", "-timeout=60s"]
+ok  	swarm.local/companion/internal/engine	0.228s

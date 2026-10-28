@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "native-review-raw-capture",
+  "inputs": [
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_native_review_inputs.py",
+    "tests/rust_native_review_preview.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_reviewer_claim_candidate.py",
+    "tools/agent-workflows/check.py",
+    "tools/agent-workflows/test_check.py",
+    "tests/rust_native_reviewer.py",
+    "tools/verification/verify_native_profile.py",
+    "tools/verification/recipe.py",
+    "tools/verification/native_no_go.py",
+    "tests/rust_review_raw_capture.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r97",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "source-bound-raw-capture-streaming",
+      "command": [
+        "python3",
+        "-c",
+        "import tempfile,subprocess,sys; from pathlib import Path; out=Path(tempfile.mkdtemp(prefix='native-review-raw-',dir='.cache')).resolve()/'evidence'; subprocess.run([sys.executable,'tests/rust_review_raw_capture.py','--output',str(out)],check=True); print('REPLAY_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS raw capture streaming 9 tests",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

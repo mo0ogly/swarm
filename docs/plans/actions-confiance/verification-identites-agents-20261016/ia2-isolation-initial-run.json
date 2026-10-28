@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "python3",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2_isolation.py",
+    "/tmp/swarm-ia1-build-_bj_x21c/swarm",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-isolation-initial"
+  ],
+  "started_unix": 1792185304.3903666,
+  "ended_unix": 1792185306.7642732,
+  "exit_code": 0,
+  "stdout": "{\"result\": \"PASS\", \"blocked_variants\": 10, \"authorized_workspace_write\": true, \"control_unchanged\": true, \"engine_integration\": false, \"model_calls\": 0}\n",
+  "stderr": ""
+}

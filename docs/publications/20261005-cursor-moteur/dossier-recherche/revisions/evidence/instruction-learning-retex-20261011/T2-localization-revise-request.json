@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-localization-valid-semantic-repair-20261011",
+  "expected_revision": 175,
+  "task_id": "plan-ca937edf4e-T2",
+  "agent_id": "auto-f2abbcfe6bed66fd1a5e",
+  "attempt_id": "a-a349f9134d355713576b7166",
+  "review_id": "review-dec9eececb2d49ee384f93de",
+  "confirm_recovery": true,
+  "result_tree": "1ded4021e9c822ccb8b2ce3e427f075bfdc9d7ff",
+  "reason": "Correction du refus indépendant valide review-dec9eececb2d49ee384f93de : EN décrit désormais les mêmes valeurs Go explicites par défaut20/borne500 que FR, exposition Admin assignéeT5. Citation physique43/42 et refus original conservés. Code juge/checkpoint/alias inchangé depuis la suite canonique1096/19groupes PASS ; ciblés source/juge/checkpoint3.253s et checker mécanique PASS. Snapshot source1049lignes actualisé sans effacer historique. Tree1ded4021e9c822ccb8b2ce3e427f075bfdc9d7ff produit dans copie opérateur indépendante puis appliqué avec custody à copie native inactive, HEAD accepté e323 préservé ; aucune tentative ni appel remboursé. Sources originales déclarées127143octets, sous la borne existante sans troncature. Nouvelle recette et revue indépendante requises, aucune acceptation ni autonomie prétendue."
+}

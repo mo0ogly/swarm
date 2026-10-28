@@ -1,0 +1,4 @@
+# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]
+internal/engine/trust_workload.go:140:84: unknown field Audience in struct literal of type jwt.Expected
+FAIL	swarm.local/companion/internal/engine [build failed]
+FAIL

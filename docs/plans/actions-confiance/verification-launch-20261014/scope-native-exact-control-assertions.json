@@ -1,0 +1,73 @@
+{
+  "candidate": "3d66a1fdd7d6a16f848f1f3f79890c6fcb0fcd43",
+  "review": "review-b03fcdf22b23d6817513711b",
+  "checks": [
+    {
+      "id": "plan-entry",
+      "bytes": 107,
+      "exact_output_hash": true,
+      "passed": true,
+      "executed": true,
+      "exit_code": 0
+    },
+    {
+      "id": "plan-validation",
+      "bytes": 65071,
+      "exact_output_hash": true,
+      "passed": true,
+      "executed": true,
+      "exit_code": 0,
+      "named_tests": 58
+    },
+    {
+      "id": "plan-delivery",
+      "bytes": 8196,
+      "exact_output_hash": true,
+      "passed": true,
+      "executed": true,
+      "exit_code": 0
+    },
+    {
+      "id": "plan-criterion-1",
+      "bytes": 541,
+      "exact_output_hash": true,
+      "passed": true,
+      "executed": true,
+      "exit_code": 0
+    },
+    {
+      "id": "plan-criterion-2",
+      "bytes": 595,
+      "exact_output_hash": true,
+      "passed": true,
+      "executed": true,
+      "exit_code": 0
+    },
+    {
+      "id": "plan-criterion-3",
+      "bytes": 566,
+      "exact_output_hash": true,
+      "passed": true,
+      "executed": true,
+      "exit_code": 0,
+      "empty_proof_exit": 2
+    },
+    {
+      "id": "plan-criterion-4",
+      "bytes": 6815,
+      "exact_output_hash": true,
+      "passed": true,
+      "executed": true,
+      "exit_code": 0
+    },
+    {
+      "id": "plan-portability",
+      "bytes": 3362,
+      "exact_output_hash": true,
+      "passed": true,
+      "executed": true,
+      "exit_code": 0,
+      "named_tests": 3
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "at_utc": "2026-10-16T07:48:36.919407+00:00",
+  "archive": "docs/plans/deepagents-integration/evidence/m7-20261016/original-pack-preserved.zip",
+  "archive_sha256": "5a4b27c21024aa94977dbeb6320c78aaa516e4c3242458d9773b58a0e8159ff4",
+  "verified_original_files": 13,
+  "source_renames": {
+    "contract-model.go": "contract-model.go.archived.txt",
+    "contract-store.go": "contract-store.go.archived.txt"
+  },
+  "original_file_sha256": {
+    "contract-current-with.engine.txt": "0cfc7b195db452b3f5b30ac48945ab89eb33b95a3589a2d07847899a73bd6f18",
+    "contract-model.go": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+    "contract-store.go": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+    "manifest.json": "1ef51b2a3faa363467acb02bb446636a8dee83db816134868accae6e3f8a0f19",
+    "answers-template.json": "d93a106acb84d686dd409b7e73e0bf832272689634b22086fc12bb0f5005df1f",
+    "contract-changed-with.txt": "7d7ebcf60d97b3d6235ad73f3d8c88b0358f2e9dd41efac669620302b5bf98b6",
+    "contract-current-without.txt": "3dd093e69ab083f6affb9b98c85ebe19ac496bebe57c5247a0b4bb5edf4a305b",
+    "contract-current-without.engine.txt": "58a20854d48dabd310f455d5172800be021d857fb3ecbe98897ac3219b441a47",
+    "response.schema.json": "42f873cdb7f255e02438c0ac968a019447732383177c78371bbe912492994174",
+    "contract-changed-without.engine.txt": "7b8c3cda7d7d513457904291e6f6769d88dde4f1791bd5a2961ed7a0d9738cd6",
+    "contract-current-with.txt": "70c6342a8b9c860bf26d20c7a8681a17a807fdbe86fe6cb4a6271276a8b113aa",
+    "contract-changed-with.engine.txt": "663cfb8faa53a5b05a9150220ab2ab988e07ac45e6d4cf45356c00dc5fc908a2",
+    "contract-changed-without.txt": "610cb7dab5e06b703a8683e81bd389599f8fded392796a555c5be0bbeb986790"
+  }
+}

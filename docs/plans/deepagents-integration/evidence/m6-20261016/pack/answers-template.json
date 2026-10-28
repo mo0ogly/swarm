@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "source": {
+    "kind": "supplied_outputs",
+    "provider": "TO_CHOOSE",
+    "model": "TO_CHOOSE",
+    "effort": "TO_CHOOSE"
+  },
+  "answers": [
+    {
+      "case_id": "missing-recoverable-without",
+      "prompt_sha256": "aec3eec888a2d13d442c93abde379b4f9595f73bf077718b3ba330d9d76a2aec",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "missing-recoverable-with",
+      "prompt_sha256": "7c361beb6b7e9df0efada9ee5162706b1af3019b6487027d77a7dff47b5ac963",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "changed-unrecoverable-without",
+      "prompt_sha256": "5f7da0222796c68cdf5aeed9d774260351d8291b5895c0ea4f7ed260cd36e042",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "changed-unrecoverable-with",
+      "prompt_sha256": "9b3f625b4a957fe70be4abe8b8ca17f894aa57e7f50de199270d1924e04bbe9b",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "paea-invoice-encoding",
+  "inputs": [
+    "tests/paea_native_ui_test.cjs",
+    "tests/fixtures/paea/*.json",
+    "web/paea.js",
+    "web/paea-payment.html",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {
+    "SWARM_PAEA_NATIVE_SCOPE": "payment-encoding"
+  },
+  "steps": [
+    {
+      "id": "native-upload-bom",
+      "command": [
+        "node",
+        "tests/paea_native_ui_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "payment-encoding-exact-current-script",
+        "payment-registry-bom-valid-control",
+        "payment-registry-bom-preserved-and-native-refused",
+        "payment-registry-bom-native-recovery",
+        "payment-request-bom-valid-control",
+        "payment-request-bom-preserved-and-native-refused",
+        "payment-request-bom-native-recovery",
+        "one-native-payment-encoding-case",
+        "exactly-three-native-encoding-refusals",
+        "no-unexpected-browser-diagnostics",
+        "binary-stable",
+        "PAEA_NATIVE_UI_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

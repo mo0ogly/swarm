@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "subjects": [
+    "internal-tool",
+    "client-portal",
+    "service-api",
+    "inventory",
+    "data-pipeline",
+    "dashboard"
+  ],
+  "languages": [
+    "fr",
+    "en"
+  ],
+  "themes": [
+    "etat",
+    "sombre"
+  ],
+  "checks": [
+    "subject metadata",
+    "real theme button",
+    "CLI/HTTP projection equality",
+    "interventions",
+    "answers preserved across subjects/dialog",
+    "keyboard/escape focus",
+    "responsive 1024/760/390/320 dialog",
+    "defined theme tokens and visible fields",
+    "catalogue failure/retry",
+    "existing draft not overwritten",
+    "check failure/recovery",
+    "explicit save/debug method",
+    "no missions/LLM"
+  ],
+  "root": "/tmp/swarm-subjects-BaSrCd"
+}

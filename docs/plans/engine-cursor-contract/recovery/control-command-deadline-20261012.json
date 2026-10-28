@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-12T14:14:44.055638+00:00",
+  "parent": "control-diagnostic-public-20261012.patch",
+  "parent_tree": "194c18b8838a4ca94ef4d716efea50cf745ede52",
+  "preimage_tree": "194c18b8838a4ca94ef4d716efea50cf745ede52",
+  "preimage_extensions": [],
+  "preimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "44370936dcfc675075fcc8896748e2014aa3e71875a0472ba03547a340555c4a",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "618c29654358ae50ee952d62fee686f20e98a0705935882599c6afe8c1ccd567",
+    "docs/engine-cursor-source-inputs-001.json": "e28740023688ff8e55f96786f09374a0e63868c6acbea1e8e0aa2ab24c16eaa1",
+    "docs/engine-cursor-source-inputs-003.json": "afeb2611617ba7fbbca7d4462f5625db68dd7b26e5f446cfb7079f84b1b9047d",
+    "docs/engine-cursor-source-inputs-004.json": "c5f0afa7a2721ffb5f1be825b708cd0b1dadf276b99e70c01979478996486ae8",
+    "docs/engine-cursor-source-inputs-005.json": "eff907c870585defeda4be4f6e7796fb63e0865f10640e5fc3d0d50a8055ca47",
+    "docs/engine-cursor-source-manifest.json": "185f805ec66a630f4456ec9bc465d9f8bff8bd068e9904466685b1a46d617959",
+    "internal/engine/control_command_deadline_test.go": null,
+    "internal/engine/control_runtime_limits.go": "017238ec407a356734b734a9c6e8815e9db095d5c6d8e54423ffafbf6a54f021",
+    "internal/engine/model.go": "a748df6a2a9c9caae86d365ca42137aa50d15edf596b50745c069e781a55ae90",
+    "internal/engine/store.go": "21a44e8a6498a4235e2f9da04fa49b83a0793a57431797544c64267077f006d1"
+  },
+  "postimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "72d5dd8e40f54c16b33a76cd9231174187bd3f2123a5a0e0ebf51ee13edb6037",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "5588f117f597ca674ba9592a0ff520a12267257ab7d2bb813bd7a934fa1caac3",
+    "docs/engine-cursor-source-inputs-001.json": "fd672e4db0311fb91bf3eaae29796fb3ee4c2393038e0d24c8aabde5c10bfebe",
+    "docs/engine-cursor-source-inputs-003.json": "e3f9e58560610da271b6024d633922ee40006eba18398fd69bb6a16f780405ed",
+    "docs/engine-cursor-source-inputs-004.json": "55e64ba7568f874a4f9656cc2786adb91ca0192a2c881e6c15d219cdb5ea86c9",
+    "docs/engine-cursor-source-inputs-005.json": "dd8b44f3fd2c7f1ff9921b59af23e8913d9e8e846aa35dbfc7c71c03d9b2aeaa",
+    "docs/engine-cursor-source-manifest.json": "fe906cfa962781ae62bd9137a2f5e98ff6b416058ee232dd7a0392ee5077f26a",
+    "internal/engine/control_command_deadline_test.go": "120b1e9686c9f6a6876e4d81f4729c0e41098d1aea3858b71118ca74927b12c5",
+    "internal/engine/control_runtime_limits.go": "2243fdc6c84e0a779a1f022e4ed7e6827258da12f65256ec367bba36353bc593",
+    "internal/engine/model.go": "a9640177d552e947efe4aa8b70eaed70032b833147f9e91dcb47720b68edcec3",
+    "internal/engine/store.go": "87b25dd7b309eb2825c81e16dc3346083b2e3de7b4bec458e3bc2325f1eef32c"
+  },
+  "result_tree": "7227cb704ad7423cc60143e6f31866c98a9cac7d",
+  "patch": "control-command-deadline-20261012.patch",
+  "patch_sha256": "3389782cc1f5f30cdf11576fee37880e5fedb1ca42092f011e601251fbec0607",
+  "paths": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/control_command_deadline_test.go",
+    "internal/engine/control_runtime_limits.go",
+    "internal/engine/model.go",
+    "internal/engine/store.go"
+  ],
+  "candidate_digest": "3876dc260921b698fca67e4a632e88893329d71bd85c8ae20bbae183b37289dc",
+  "check": "PASS exact path diff, isolated refreshed-index apply, result tree and all postimages",
+  "qualification": {
+    "at": "2026-10-12T14:16:20.525662+00:00",
+    "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-command-deadline-v6lw54rd",
+    "candidate_digest": "3876dc260921b698fca67e4a632e88893329d71bd85c8ae20bbae183b37289dc",
+    "checks": [
+      {
+        "name": "targeted",
+        "exit": 0,
+        "drift": [],
+        "output": "/tmp/swarm-control-command-deadline-green-repaired.out",
+        "output_sha256": "60ccf18a6673c5d1889fcc640470ee49a88170e5d62f4cb1bb01ba46fb422b64",
+        "reused_passing_result": true,
+        "source_hashes_verified": {
+          "internal/engine/control_runtime_limits.go": "2243fdc6c84e0a779a1f022e4ed7e6827258da12f65256ec367bba36353bc593",
+          "internal/engine/control_command_deadline_test.go": "120b1e9686c9f6a6876e4d81f4729c0e41098d1aea3858b71118ca74927b12c5",
+          "internal/engine/model.go": "a9640177d552e947efe4aa8b70eaed70032b833147f9e91dcb47720b68edcec3",
+          "internal/engine/store.go": "87b25dd7b309eb2825c81e16dc3346083b2e3de7b4bec458e3bc2325f1eef32c"
+        },
+        "selection": "New Go deadline contract and directly affected retained-result retry, storage and public original diagnostic. No source or runtime execution input relevant to these isolated fixtures changed since passing runs."
+      },
+      {
+        "name": "dependent-regressions",
+        "exit": 0,
+        "drift": [],
+        "output": "/tmp/swarm-control-command-deadline-dependent-regressions.out",
+        "output_sha256": "521b500f5e5b6589c0881f61c199f29eb6bbb520ce328063804236a2175acad6",
+        "reused_passing_result": true,
+        "source_hashes_verified": {
+          "internal/engine/control_runtime_limits.go": "2243fdc6c84e0a779a1f022e4ed7e6827258da12f65256ec367bba36353bc593",
+          "internal/engine/control_command_deadline_test.go": "120b1e9686c9f6a6876e4d81f4729c0e41098d1aea3858b71118ca74927b12c5",
+          "internal/engine/model.go": "a9640177d552e947efe4aa8b70eaed70032b833147f9e91dcb47720b68edcec3",
+          "internal/engine/store.go": "87b25dd7b309eb2825c81e16dc3346083b2e3de7b4bec458e3bc2325f1eef32c"
+        },
+        "selection": "New Go deadline contract and directly affected retained-result retry, storage and public original diagnostic. No source or runtime execution input relevant to these isolated fixtures changed since passing runs."
+      },
+      {
+        "name": "vet",
+        "argv": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "started": "2026-10-12T14:13:36.460673+00:00",
+        "finished": "2026-10-12T14:14:45.898545+00:00",
+        "exit": 0,
+        "wall_seconds": 69.27954528300324,
+        "output": "/tmp/swarm-control-command-deadline-vet.out",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "drift": []
+      },
+      {
+        "name": "methods",
+        "argv": [
+          "python3",
+          "tools/agent-workflows/check.py"
+        ],
+        "started": "2026-10-12T14:15:01.210948+00:00",
+        "finished": "2026-10-12T14:15:36.088464+00:00",
+        "exit": 0,
+        "wall_seconds": 34.88270118999935,
+        "output": "/tmp/swarm-control-command-deadline-methods.out",
+        "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+        "drift": []
+      },
+      {
+        "name": "build",
+        "argv": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/swarm-qualified-control-command-deadline-build",
+          "./cmd/swarm"
+        ],
+        "started": "2026-10-12T14:15:51.154476+00:00",
+        "finished": "2026-10-12T14:16:12.589343+00:00",
+        "exit": 0,
+        "wall_seconds": 21.449108358996455,
+        "output": "/tmp/swarm-control-command-deadline-build.out",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "drift": [],
+        "binary_sha256": "1cc9723d090ceea7b24458cb54fac498acb98c4fef31a1de24f173ee5279d174"
+      }
+    ],
+    "result": "PASS proportionate targeted qualification",
+    "limits": "Full suite not rerun by explicit user instruction. No new synchronization primitive or concurrent memory operation; targeted storage/freshness semantics verified. Native installation/configuration/retry/acceptance remain unproved."
+  },
+  "purpose": "Explicit independent Admin Go-harness/process duration budgets, actual effective argv and attributed receipts, combined retry freshness and schema31 preservation. No default duration, criteria or historical control rewrite; deferred27 excluded.",
+  "preimage_scope": "Exact current primary preimages checked; any divergence from historical24 external packaging tree explicitly extended without rewriting its old objects."
+}

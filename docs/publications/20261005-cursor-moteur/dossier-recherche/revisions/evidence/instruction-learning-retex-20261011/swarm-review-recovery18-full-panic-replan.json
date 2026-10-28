@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-11T18:06:00.936018+00:00",
+  "original_full": "/tmp/swarm-unresolved-review-resume-qualified-v1-full-receipt.json",
+  "first_failed_boundary": "TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt dereferenced nil IndependentReview after integrateManagedAttempt returned nil. Original FAIL419.514s and stack retained; no full PASS.",
+  "facts": [
+    "The test passes alone with unchanged production source; subsequent explicit nil/origin diagnostics pass alone and through the preceding recovery test sequence14.019s.",
+    "Original nil-review cause was not captured by the historical fixture, so it is not attributed to storage29 or a provider.",
+    "New regression now fails with actual task blocker and managed-attempt detail instead of losing the first failure in a nil panic."
+  ],
+  "hypotheses": [
+    "Possible pre-review check or deferred publication; original data absent, no asserted root cause."
+  ],
+  "owner": "Operator qualification/fixture diagnostic; production owner if new first-boundary cause confirms a defect.",
+  "correction": "Preserve original failure; strengthen missing-review assertion without weakening quote/acceptance guard. New frozen cumulative qualification required.",
+  "related_confirmed_boundary19": "After a local negative and transport error, recovery preview and public retry wrongly reject completed local changes_requested. RED\u2192GREEN exact original opinion and consumption retained through independent global refusal. Needs mismatch feedback also corrected from wrong citation label to actual n=[]/unknown obligation."
+}

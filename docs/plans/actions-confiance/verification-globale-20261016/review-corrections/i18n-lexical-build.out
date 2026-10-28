@@ -1,0 +1,6 @@
+
+> i18n:build
+> node scripts/i18n/build.cjs
+
+{"mode":"build","source":"locales/en.json","source_sha256":"78190a1d2656bc714c9e61a1d7c578640a3baba72f4e6a2f34176d7927aca4a1","output":"web/i18n-en.js","output_sha256":"6470d7766ea3f86ed7106d681f4620512eb6c8655e01a7ab0b283518500d78fa","status":"pass"}
+{"mode":"build","source":"locales/trust-actions-en.json","source_sha256":"eba1c42e13b08256458813feadc295ce51e17d39abe0ed25281c6689e63563a2","output":"web/trust-actions-en.js","output_sha256":"74da2a1650960701fa0856e44d61313eecb7df7315d1b5a5c33fb9d4e7f3b8a5","status":"pass"}

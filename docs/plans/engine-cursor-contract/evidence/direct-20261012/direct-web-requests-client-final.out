@@ -1,0 +1,5 @@
+
+> test:web-requests
+> node tests/web_requests_test.cjs
+
+PASS: received category values, full body timeout, zero, long timer chunks, cancellation, cleanup, no replay, missing/invalid policy refusal

@@ -1,0 +1,5 @@
+{
+  "observation": "one documentation patch was rejected before mutation because an unused extra hunk quoted a missing context line",
+  "recovery": "discard the irrelevant hunk and apply only requested text changes; no source/tests repeated for this edit",
+  "prevention": "keep each patch to actual replacements and inspect the owned diff"
+}

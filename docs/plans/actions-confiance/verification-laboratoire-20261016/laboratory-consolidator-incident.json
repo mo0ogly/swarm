@@ -1,0 +1,11 @@
+{
+  "stage": "source manifest integrity read",
+  "owner": "Codex",
+  "observed_at": "2026-10-16T01:08:24Z",
+  "exit_code": 1,
+  "error": "TypeError: 'PosixPath' object is not subscriptable",
+  "cause": "consolidator indexed Path rather than joining path",
+  "original_source": "consolidate-laboratory-original.py",
+  "correction": "use repo / row path; no engine or verification source changed",
+  "resumption_condition": "same integrity checks finish successfully"
+}

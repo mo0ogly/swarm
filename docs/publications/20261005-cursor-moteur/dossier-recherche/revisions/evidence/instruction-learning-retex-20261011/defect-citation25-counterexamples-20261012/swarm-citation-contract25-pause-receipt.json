@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-12T06:04:22.739257+00:00",
+  "revision": 626,
+  "paused": true,
+  "activations": 57,
+  "review_calls": 73,
+  "cause": "inspection de fragment : defect quote absent at original line (artifact 11, line 4)",
+  "review": "review-44f2da6a502adf1b1853484b",
+  "owner": "operator output contract correction; supervisor remains responsible for business completion",
+  "limits": "Pause for general correction only; no budget refunded, no review accepted."
+}
