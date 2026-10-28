@@ -2592,3 +2592,19 @@ pub use preparation_calls::PreparationCallPolicy;
 
 mod report_read;
 pub use report_read::ReportReadPolicy;
+
+/// Build a test-only historical settings snapshot from the authoritative field
+/// introduction catalogue. Later groups are removed together, preserving older
+/// dependencies; invalid schema/catalogue/decode fails the fixture. This writes
+/// no saved state and does not change defaults or adoption policy at runtime.
+#[cfg(test)]
+pub(crate) fn historical_settings_fixture(schema: i64) -> EngineSettingsValues {
+    let catalog = crate::EngineSettingsCatalog::installation().unwrap();
+    let mut value = serde_json::to_value(EngineSettingsValues::installation_defaults().unwrap()).unwrap();
+    for field in &catalog.fields {
+        if field.introduced_schema_version > schema { value.as_object_mut().unwrap().remove(&field.name); }
+    }
+    let values = EngineSettingsValues::decode(&serde_json::to_vec(&value).unwrap()).unwrap();
+    assert_eq!(values.schema_version(), schema);
+    values
+}
