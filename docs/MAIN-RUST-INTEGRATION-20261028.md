@@ -23,3 +23,7 @@ La CI a observé ETXTBSY sur l’exécution directe d’un script de fixture jus
 Le témoin ETXTBSY emploie le type errno de la dépendance nix existante, sans nouvelle dépendance libc directe. Son premier échec de compilation est conservé ; il n’établissait aucun test exécuté.
 
 Le test unitaire du lanceur d’acceptation Go historique injecte désormais ses dépendances de fixture comme il injectait déjà Go et le DOM. Le checkout Rust réel reste explicitement vérifié : absence des entrées Go => code3 avant tout lancement. Les cas Go défaillant, zéro test, DOM refusé et cas inconnu sont maintenus ; aucun succès de ce test ne qualifie Rust ni n’exécute Go.
+
+La CI conserve désormais les sorties des étapes de recette cockpit et les erreurs navigateur ciblées. Les racines de travail, bases, entrées de configuration avec jeton, transcriptions privées et captures ne font pas partie de cet artefact. Le premier échec opaque de la recette reste conservé ; un résumé FAIL ne suffit pas à en attribuer la cause.
+
+La recette cockpit attend les19scripts explicitement publiés par le producteur Rust, y compris le client d’instructions natif. Elle refuse scripts manquants, doublons, inline et origines étrangères, puis compare les octets HTTP protégés aux entrées versionnées (quotas natifs : route vers native-quotas.js). La recette permanente et le manifeste du conducteur incluent ce client. Le premier refus d’inventaire est conservé ; ce changement ne crée aucune nouvelle action ni script produit.

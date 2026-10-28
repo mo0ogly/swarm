@@ -23,3 +23,7 @@ CI observed ETXTBSY while directly executing a just-created fixture script. The 
 The ETXTBSY witness uses the existing nix errno type, without adding a direct libc dependency. Its initial compilation failure is retained; it established no executed test.
 
 The historical Go acceptance-runner unit test now injects fixture dependencies just as it already injected Go and DOM results. The real Rust checkout is explicitly checked: absent Go inputs => code3 before any launch. Failed Go, zero tests, DOM failure and unknown-case guards remain; this unit test neither qualifies Rust nor executes Go.
+
+CI now retains cockpit recipe step channels and targeted browser errors. Work Roots, databases, token-bearing configuration, private transcripts and screenshots are excluded from that artifact. The initial opaque recipe failure is retained; a FAIL summary alone does not establish its cause.
+
+The cockpit recipe expects the19scripts explicitly published by the Rust producer, including the native instruction client. It rejects missing/duplicate/inline/foreign-origin scripts, then compares protected HTTP bytes to versioned inputs (native quotas route maps to native-quotas.js). The permanent recipe and driver inventory include that client. The original inventory refusal is retained; no product action or script is added.
