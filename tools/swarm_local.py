@@ -13,7 +13,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from swarm_version import prepare as prepare_versioned_build, session_request
+from swarm_version import prepare as prepare_versioned_build, prepare_recorded, require_prepared_not_older, session_request
 
 SOURCE = Path(__file__).resolve().parent.parent
 
@@ -129,6 +129,7 @@ def main():
     parser.add_argument("--root", default=os.environ.get("SWARM_PROJECT_ROOT", settings.get("root", str(SOURCE))))
     parser.add_argument("--address", default=os.environ.get("SWARM_WEB_ADDRESS", settings.get("address", "127.0.0.1:18792")))
     parser.add_argument("--binary", default=os.environ.get("SWARM_BINARY", settings.get("binary", "")))
+    parser.add_argument("--prepared-build", help="SHA256 exact du dernier candidat source qualifié à installer sans reconstruire les sources courantes")
     parser.add_argument("--startup-timeout", type=float, default=30)
     parser.add_argument("--stop-timeout", type=float, default=15)
     parser.add_argument("--no-open", action="store_true")
@@ -136,6 +137,7 @@ def main():
     parser.add_argument("--no-mask-cifs", dest="mask_cifs", action="store_false")
     parser.add_argument("--pid", type=int, help="PID exact de l’ancien serveur à adopter")
     args = parser.parse_args()
+    if args.prepared_build and args.action not in ("start","restart"):parser.error("--prepared-build exige start ou restart")
     root = Path(args.root).resolve()
     host, sep, port = args.address.rpartition(":")
     if not sep or host != "127.0.0.1" or not port.isdigit() or not 0 < int(port) < 65536:
@@ -182,12 +184,28 @@ def main():
                 print(line.split("/session/")[0] + "/session/[private]" if "/session/" in line else line)
             return 0
         source_binary = binary in (SOURCE / "bin/swarm", SOURCE / "bin/swarm-local")
+        if args.prepared_build and not source_binary:parser.error("--prepared-build exige le chemin binaire source géré")
         prepared = None
-        if args.action == "build" or source_binary and (args.action == "restart" or args.action == "start" and not running):
+        if args.action == "build" or source_binary and (args.action == "restart" or args.action == "start" and (not running or args.prepared_build)):
             (SOURCE / "deploy").mkdir(parents=True, exist_ok=True)
             build_lock = stack.enter_context((SOURCE / "deploy/.local-build.lock").open("a"))
             fcntl.flock(build_lock, fcntl.LOCK_EX)
-            prepared, _ = prepare_versioned_build(SOURCE, binary)
+            if args.prepared_build:
+                prepared,selected = prepare_recorded(SOURCE,binary,args.prepared_build)
+                try:
+                    if running:
+                        live,live_sha=running_version(args.address,root,state['pid'])
+                        if not owned(state):raise RuntimeError('Server identity changed during prepared selection')
+                        require_prepared_not_older(live['binary']['version'],selected['version'],live_sha,args.prepared_build)
+                        if args.action=="start":
+                            if live_sha!=args.prepared_build:raise RuntimeError('Prepared start requires restart to replace an active server')
+                            prepared.unlink();prepared=None
+                except BaseException as primary:
+                    try:
+                        if prepared is not None:prepared.unlink(missing_ok=True)
+                    except BaseException as cleanup:raise BaseExceptionGroup('Prepared refusal and candidate cleanup failed',[primary,cleanup])
+                    raise
+            else:prepared, _ = prepare_versioned_build(SOURCE, binary)
         if args.action in ("stop", "restart"):
             stop(state, args.stop_timeout, args.address)
             state_path.unlink(missing_ok=True)

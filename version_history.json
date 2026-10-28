@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Livraison locale : un candidat inchangé vérifie aussi ses preuves conservées ; preuves absentes entraînent une reconstruction, preuves incohérentes refusent avant arrêt du serveur.",
+        "en": "Local delivery: an unchanged candidate also checks retained qualification; missing proof triggers rebuilding, incoherent proof refuses before stopping the server."
+      },
+      {
         "fr": "Workers après publication native : récupération explicite du candidat publié avant création de la copie dépendante, sans retour silencieux à la base initiale. Les prérequis sont contrôlés avant toute copie pour éviter un blocage après refus.",
         "en": "Workers after native publication: explicitly fetch the published candidate before preparing its dependent copy, without silently falling back to the initial base. Prerequisites are checked before any copy to prevent a refusal from blocking the next admission."
       },
