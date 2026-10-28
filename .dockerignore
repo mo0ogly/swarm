@@ -6,6 +6,12 @@
 !.cargo/config.toml
 !locales/
 !locales/en.json
+!config/
+!config/provider-wait.json
+!config/log-read-policy.json
+!config/activity-policy.json
+!config/graph-performance.json
+!config/web-requests.json
 !contracts/
 !contracts/**
 !.claude/

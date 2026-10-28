@@ -1118,7 +1118,7 @@ mod tests {
             panic!("outside path must preserve Gate cause")
         };
         assert_eq!(error.reason(), "artifact-path");
-        assert!(super::mission_status_evidence::artifact_cause_matches(&error, |cause| matches!(
+        assert!(super::super::mission_status_evidence::artifact_cause_matches(&error, |cause| matches!(
             cause.downcast_ref::<crate::LocalPathError>(),
             Some(crate::LocalPathError::Refused(crate::PathRefusal::OutsideProject))
         )));

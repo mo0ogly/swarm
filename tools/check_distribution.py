@@ -39,6 +39,23 @@ for name in ['swarm.sh', 'tools/swarm_local.py', 'tests/test_swarm_local.py']:
 for name in ['install.sh', 'Dockerfile', 'Makefile', '.github/workflows/ci.yml', 'build.sh', 'swarm.sh']:
     if re.search(r'golang:|actions/setup-go|\bgo (?:build|mod|vet|test)\b|command -v go\b|supervision_go_suite', (root / name).read_text()):
         errors.append(f'Obsolete Go dependency in active delivery entry: {name}')
+# Source-owned embedded defaults must enter the allowlisted Docker context.
+# This guard is lexical for config literals; the real Docker build stays required.
+config_embeds = set()
+for source in (root / 'rust/crates').rglob('*.rs'):
+    for relative in re.findall(r'include_(?:str|bytes)!\(\s*"([^"\n]+)"\s*\)', source.read_text()):
+        target = (source.parent / relative).resolve()
+        try:
+            name = target.relative_to(root / 'config').as_posix()
+        except ValueError:
+            continue
+        config_embeds.add('config/' + name)
+allowlist = set((root / '.dockerignore').read_text().splitlines())
+for name in sorted(config_embeds):
+    if name not in tracked or not (root / name).is_file():
+        errors.append(f'Missing published embedded configuration: {name}')
+    if '!config/' not in allowlist or '!' + name not in allowlist:
+        errors.append(f'Embedded configuration excluded from Docker context: {name}')
 if errors:
     raise SystemExit('\n'.join(errors))
 print('PASS: entry docs links, executable scripts, no tracked runtime databases or env files')
