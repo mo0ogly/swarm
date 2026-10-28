@@ -21,3 +21,5 @@ The owner explicitly authorized namespace configuration on the disposable GitHub
 CI observed ETXTBSY while directly executing a just-created fixture script. The test now reproduces that condition with a retained writable descriptor, then verifies the same body through its explicit interpreter; the descriptor closes before Git verification. No sleep/retry or engine filter execution is added; marker, mutation refusal and recovery assertions remain required. The descriptor holder in the original failure has not been established.
 
 The ETXTBSY witness uses the existing nix errno type, without adding a direct libc dependency. Its initial compilation failure is retained; it established no executed test.
+
+The historical Go acceptance-runner unit test now injects fixture dependencies just as it already injected Go and DOM results. The real Rust checkout is explicitly checked: absent Go inputs => code3 before any launch. Failed Go, zero tests, DOM failure and unknown-case guards remain; this unit test neither qualifies Rust nor executes Go.

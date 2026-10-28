@@ -21,3 +21,5 @@ Le propriétaire a autorisé explicitement le réglage des namespaces sur la seu
 La CI a observé ETXTBSY sur l’exécution directe d’un script de fixture juste créé. Le test reproduit maintenant cette condition en conservant un descripteur d’écriture, puis vérifie le même corps via son interpréteur explicite ; le descripteur est fermé avant la vérification Git. Aucun délai/retry ajouté, aucune exécution de filtre autorisée par le moteur ; les témoins de marqueur, refus de mutation et restauration restent exigés. L’identité du détenteur du descripteur lors de l’échec initial n’est pas établie.
 
 Le témoin ETXTBSY emploie le type errno de la dépendance nix existante, sans nouvelle dépendance libc directe. Son premier échec de compilation est conservé ; il n’établissait aucun test exécuté.
+
+Le test unitaire du lanceur d’acceptation Go historique injecte désormais ses dépendances de fixture comme il injectait déjà Go et le DOM. Le checkout Rust réel reste explicitement vérifié : absence des entrées Go => code3 avant tout lancement. Les cas Go défaillant, zéro test, DOM refusé et cas inconnu sont maintenus ; aucun succès de ce test ne qualifie Rust ni n’exécute Go.
