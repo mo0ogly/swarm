@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "agent-archive-history-rust",
+  "inputs": [
+    "contracts/archive-history-wire.v1.json",
+    "tools/rust-migration/generate_archive_history_shapes.py",
+    "tools/rust-migration/test_generate_archive_history_shapes.py",
+    "rust/crates/swarm-engine/src/archive_history.rs",
+    "rust/crates/swarm-engine/src/archive_history_shapes.rs",
+    "rust/crates/swarm-engine/src/root_store/agent_archive_history.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-cli/src/agent_history.rs",
+    "rust/crates/swarm-cli/src/agent.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "tests/rust_agent_archive_history.py",
+    "tests/rust_agent_model_route.py",
+    "docs/architecture/NATIVE-AGENT-HISTORY.md",
+    "docs/en/NATIVE-AGENT-HISTORY.md",
+    "tools/rust-migration/check_archive_history_harness.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "generator",
+      "command": [
+        "python3",
+        "tools/rust-migration/test_generate_archive_history_shapes.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "fixture-connections",
+      "command": [
+        "python3",
+        "tools/rust-migration/check_archive_history_harness.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "ARCHIVE_HARNESS_CONNECTIONS_VERIFIED 2"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-cli",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='agent-history-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_agent_archive_history.py','--binary',os.environ['SWARM_AGENT_HISTORY_BINARY'],'--output',str(p)],check=True)\nprint('AGENT_HISTORY_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "AGENT_ARCHIVE_HISTORY_VERIFIED 102"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

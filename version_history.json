@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Consultation CLI : agent history lit les archives importées en JSON historique, sans adopter leurs agents, PID, décisions ou droits courants.",
+        "en": "CLI consultation: agent history reads imported archives as historical JSON without adopting their agents, PIDs, decisions or current authority."
+      },
+      {
         "fr": "PAEA : les erreurs de synchronisation de pack distinguent stdout et stderr tout en conservant la cause et le processus primaire ; reprise vérifiée. Service protégé encore à raccorder.",
         "en": "PAEA: pack sync errors distinguish stdout and stderr while preserving the cause and primary process; recovery verified. Protected-service integration remains open."
       },

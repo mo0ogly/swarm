@@ -11,6 +11,19 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## Point de reprise —28 octobre : consultation historique233 livrée
+
+`agent history` raccordé :102assertions/45cas et générateur3PASS, recette
+vérifiée ; image233 b11b4baf… installée via lanceur préparé. Livraison31contrôles
+(incluant Version FR/EN14) et8spécifiques ; cinq travaux/réglages conservés.
+[Lot et limites](AGENT-HISTORY-20261027.md). Le tableau27oct ci-dessous conserve
+son historique ; il ne décrit pas tous les apports parallèles PAEA/Biba récents.
+`agent list` reste un contrat composite à porter ; aucune clôture globale déduite.
+Deux contributions GLM terminées : avis lecteur rejeté après vérification,
+fermeture SQLite du banc améliorée et vérifiée ;60360tokens déclarés, aucun
+gain établi. Recette finale3steps (générateur3, ressources2, public102).
+Ces avis ne constituent pas une acceptation indépendante. PAEA77 reste sous son propriétaire.
+
 ## État courant consolidé —27 octobre, préparation et découverte web218, consultation CLI219
 
 Ce tableau prime sur les états historiques ci-dessous. Vérification locale bornée,

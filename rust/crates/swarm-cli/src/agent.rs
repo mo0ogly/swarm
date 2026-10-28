@@ -2,7 +2,7 @@
 use super::{json_bytes, write_output, Arguments, CliError};
 use std::{io::Write, path::Path};
 
-/// Execute show/stop/reconcile/logs and declared guard replay through native RootStore.
+/// Execute show/stop/reconcile/logs/history and declared guard replay through native RootStore.
 /// Strict argument checks precede opening; show never infers a live process from
 /// stored PID/heartbeat. Dialogue boundaries remain unsupported; manual preview/prepare dispatch below.
 /// Stop records intent only; reconcile cancels an unregistered manual attempt or,
@@ -20,6 +20,10 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         .is_some_and(|v| matches!(v.as_str(), "preview" | "prepare"))
     {
         return prepare(a, out);
+    }
+    #[cfg(target_os = "linux")]
+    if a.pos.get(1).is_some_and(|v| v == "history") {
+        return super::agent_history::execute(a, out);
     }
     if a.pos.get(1).is_some_and(|v| v == "logs") {
         return super::agent_logs::execute(a, out);

@@ -160,6 +160,12 @@ pub use agent_models::{
     Providers, RecoveryState, ReportedModel,
 };
 mod agent_contract;
+#[cfg(target_os = "linux")]
+mod archive_history;
+#[cfg(target_os = "linux")]
+mod archive_history_shapes;
+#[cfg(target_os = "linux")]
+pub use archive_history::{ArchivedAgentHistory, ArchivedCockpitHistory, ArchivedDecision, ArchivedVisit, ArchivedAgentLog};
 pub use agent_contract::{decode_agent, decode_agent_row, decode_launch, decode_providers};
 #[cfg(unix)]
 mod agent_storage_retry;
