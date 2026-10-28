@@ -15,11 +15,15 @@ concurrency:
   cancel-in-progress: true
 jobs:
   checks:
-    runs-on: ubuntu-latest
+    # Namespace-bound identity tests require a runner permitting unprivileged
+    # uid-map fixtures. Keep default security settings; never sudo/sysctl/skip.
+    runs-on: ubuntu-22.04
     env:
       PUPPETEER_SKIP_DOWNLOAD: 'true'
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Check owned namespace fixture prerequisite
+        run: /usr/bin/unshare --user --map-root-user --mount --pid --fork /bin/true # v4
       - run: rustup toolchain install 1.96.0 --profile minimal && rustup default 1.96.0
       - run: cargo fetch --locked --manifest-path rust/Cargo.toml
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
