@@ -1,0 +1,137 @@
+{
+ "schema_version": 1,
+ "id": "paea-owned-git-transfer-reconcile",
+ "inputs": [
+  "rust/Cargo.toml",
+  "rust/Cargo.lock",
+  ".cargo/config.toml",
+  "rust/crates/swarm-enrollment-authority/**/*",
+  "rust/crates/swarm-enrollment-state/**/*",
+  "rust/crates/swarm-identity-contract/**/*",
+  "rust/crates/swarm-protection-contract/**/*",
+  "rust/crates/swarm-engine/**/*",
+  "tools/verification/recipe.py",
+  "tools/verification/recipes/paea-owned-source-acquisition.json",
+  "docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01/result.json",
+  "docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/current71c-fixture01/result.json"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+  "CARGO_PROFILE_DEV_DEBUG": "0",
+  "CARGO_PROFILE_TEST_DEBUG": "0",
+  "CARGO_INCREMENTAL": "0",
+  "RUSTDOCFLAGS": "-D warnings",
+  "SWARM_PAEA_WRITER_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01",
+  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01",
+  "SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/current71c-fixture01"
+ },
+ "steps": [
+  {
+   "id": "owned-transfer-nine-native-states",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--lib",
+    "root_store::paea_git_repository::transfer::tests::",
+    "--message-format=json",
+    "--",
+    "--ignored",
+    "--nocapture",
+    "--test-threads=1"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "owned_transfer_real_candidate_objects_and_no_ref ... ok",
+    "owned_transfer_refusal_new_job_recovery ... ok",
+    "owned_transfer_unreaped_close_returns_owner_then_recovers ... ok",
+    "pending_builder_acquires_native_source_and_service_staging ... ok",
+    "pending_initial_refusal_keeps_custody_and_new_job_recovers ... ok",
+    "pending_unreaped_initial_failure_retains_all_owners ... ok",
+    "pending_builder_collision_and_wrong_service_refuse_without_adoption ... ok",
+    "pending_root_factory_defers_malformed_bare_to_owned_job ... ok",
+    "pending_factory_and_run_refuse_read_only_service ... ok",
+    "9 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "authority-consumes-one-exact-reconciliation",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--test",
+    "paea_git_transfer_call",
+    "transfer_call_current_authority_prepares_once_and_reports_receipt",
+    "--message-format=json",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "test transfer_call_current_authority_prepares_once_and_reports_receipt ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "wrong-service-root-refused-after-explicit-preparation",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--test",
+    "paea_git_transfer_call",
+    "transfer_call_refuses_other_service_root_without_preparation",
+    "--message-format=json",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "test transfer_call_refuses_other_service_root_without_preparation ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "engine-rustdoc-contracts",
+   "command": [
+    "cargo",
+    "doc",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--no-deps"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [],
+   "required_stderr": [
+    "Generated"
+   ]
+  }
+ ]
+}

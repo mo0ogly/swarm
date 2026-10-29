@@ -1,0 +1,250 @@
+{
+  "schema_version": 1,
+  "id": "paea-transfer-call-cli-rust",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-cli/src/**/*",
+    "rust/crates/swarm-cli/tests/paea_transfer.rs",
+    "rust/crates/swarm-cli/tests/paea_promote.rs",
+    "rust/crates/swarm-engine/src/**/*",
+    "rust/crates/swarm-engine/tests/paea_git_transfer_call.rs",
+    "rust/crates/swarm-enrollment-*/src/**/*",
+    "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+    "rust/crates/swarm-identity-contract/src/**/*",
+    "rust/crates/swarm-protection-contract/src/**/*",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-owned-git-transfer-reconcile.json",
+    "docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01/result.json",
+    "tests/rust_native_first_publication.py",
+    "tests/rust_agent_model_route.py",
+    ".cache/rust-migration-binaries/swarm-rust-b11b4bafabff1d3bf5d216fdb44f5614fb69a41a61b3b72e8623bc2a80b385cf",
+    "docs/plans/actions-confiance/paea/evidence/20261028-source77-q1k3fcxe/qualified-build04/profile/result.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-chain-test-20261029T161350Z/source-fixture-regen"
+  },
+  "steps": [
+    {
+      "id": "cli-consumes-exact-preparation-once",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_transfer",
+        "transfer_call_cli_consumes_exact_preparation_once",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "transfer_call_cli_consumes_exact_preparation_once ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "cli-refuses-bad-frame-without-consumption",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_transfer",
+        "transfer_call_cli_refuses_bad_frame_without_consumption",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "transfer_call_cli_refuses_bad_frame_without_consumption ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "promote-cli-commits-once-and-records-effect",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_promote",
+        "promote_call_cli_commits_once_and_records_effect",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "promote_call_cli_commits_once_and_records_effect ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "promote-cli-reconcile-before-commit-reports-not-committed",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_promote",
+        "promote_call_cli_reconciles_before_commit_reports_not_committed",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "promote_call_cli_reconciles_before_commit_reports_not_committed ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "promote-cli-refuses-bad-frame-without-consumption",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_promote",
+        "promote_call_cli_refuses_bad_frame_without_consumption",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "promote_call_cli_refuses_bad_frame_without_consumption ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "promote-cli-chain-transfer-promote-replay-reconcile-once",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_promote",
+        "promote_call_cli_chain_transfer_promote_replay_reconcile_once",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "promote_call_cli_chain_transfer_promote_replay_reconcile_once ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "promote-cli-revoked-current-authority-refuses-without-effect-then-recovers",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_promote",
+        "promote_call_cli_revoked_current_authority_refuses_without_effect_then_recovers",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "promote_call_cli_revoked_current_authority_refuses_without_effect_then_recovers ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "promote-cli-shared-root-guard-sensitivity",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_promote",
+        "shared_project_root_guard_admits_one_holder_at_a_time",
+        "--message-format=json",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "shared_project_root_guard_admits_one_holder_at_a_time ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

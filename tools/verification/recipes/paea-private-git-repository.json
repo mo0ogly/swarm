@@ -26,8 +26,6 @@
     "tools/agent-workflows/templates/TRACKING.md",
     "tools/agent-workflows/templates/preparations.json",
     "rust/crates/swarm-linux-prerequisites/**/*",
-    "rust/crates/swarm-biba-linux/Cargo.toml",
-    "rust/crates/swarm-biba-linux/src/lib.rs",
     "rust/crates/swarm-api-client/Cargo.toml",
     "rust/crates/swarm-api-client/src/lib.rs",
     "rust/crates/swarm-cli/Cargo.toml",
@@ -84,7 +82,8 @@
     "tests/paea_historical_publication_test.py",
     "docs/architecture/NATIVE-REVIEWER.md",
     "docs/en/NATIVE-REVIEWER.md",
-    "tools/verification/recipes/paea-private-git-repository.json"
+    "tools/verification/recipes/paea-private-git-repository.json",
+    "rust/crates/swarm-biba-linux/**/*"
   ],
   "environment": {
     "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
@@ -133,6 +132,7 @@
         "swarm-engine",
         "--test",
         "paea_git_repository",
+        "git_repository_",
         "--message-format=json",
         "--",
         "--ignored",

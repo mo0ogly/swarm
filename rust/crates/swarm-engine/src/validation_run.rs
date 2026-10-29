@@ -1500,3 +1500,12 @@ print('READY',flush=True)
         }
     }
 }
+
+#[cfg(target_os="linux")]
+#[path="validation_run_recovery.rs"]
+mod recovery;
+#[cfg(target_os="linux")]
+pub(crate) use recovery::{poll_retained_processes,has_unresolved_process};
+
+#[cfg(all(test,target_os="linux"))]
+pub(crate) use recovery::retained_child_for_owner_test;

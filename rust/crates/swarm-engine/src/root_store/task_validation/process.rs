@@ -1,6 +1,9 @@
 //! Protected native task-control transport. Commands come only from the
 //! current stored policy. Filesystem/UID trust is not OS confinement or a model
-//! identity proof; inherited PATH retains the existing named-program semantics.
+//! identity proof. The I0 profile is mandatory; named programs require PATH
+//! explicitly present in the persisted launch environment allowlist.
+#[path = "biba.rs"]
+mod biba;
 use super::{
     store::{self, Job, JobPhase, Step, StepPhase},
     Prepared, Request,
@@ -90,7 +93,7 @@ pub(super) fn source(store: &RootStore, job: &Job, managed: Option<&super::manag
 /// Prepare exact policy argv for this actual registered helper and committed
 /// slot. Peer/parent PID, starttime, process group, host and source are checked
 /// before returning the command; the caller must close Root before exec.
-fn gate_command(store: &RootStore, id: &str, peer: i64, managed: &mut Option<super::managed_execution::Session>) -> Result<Command, E> {
+fn gate_command(store: &RootStore, id: &str, peer: i64, managed: &mut Option<super::managed_execution::Session>) -> Result<biba::Prepared, E> {
     let (job, step) = store::step(&store.db, id).map_err(|e| E::Launch(Box::new(e)))?;
     let current = crate::SupervisorIdentity::current()
         .map_err(|e| caused("task-validation-child-observation", e))?;
@@ -136,14 +139,17 @@ fn gate_command(store: &RootStore, id: &str, peer: i64, managed: &mut Option<sup
         None => crate::local_directory(&store.root, &control.dir)
             .map_err(|e| caused("task-validation-gate-directory", e))?,
     });
-    command.stdin(Stdio::null());
-    Ok(command)
+    let workspace = managed.as_ref().ok_or(E::Refused("task-validation-i0-context-required"))?.workspace();
+    let environment = prepared.settings.values.agent_launch_policy().map_err(E::Settings)?.environment;
+    biba::Prepared::prepare(&store.root, &workspace, command, &environment)
 }
 /// Private CLI helper only. Actual Unix peer credentials and parent-death signal
 /// precede the one-byte grant; committed permission and fresh source precede
 /// exact command exec. The diagnostic socket is CLOEXEC and stdin becomes null.
 /// EOF alone proves no exec; caller must also observe the owned wait result.
 /// Failure returns typed causes and a private safe frame, never a zero success.
+/// An attributed managed I0 workspace and the saved environment allowlist are
+/// mandatory; historical Root-cwd controls refuse without an unconfined fallback.
 /// Same-UID mutation, executable/PATH attestation and escaped descendants remain
 /// outside this trust boundary; no task or independent review is accepted here.
 /// Shared raw credential validation rejects PID0/invalid UID-GID before grant or Root use.
@@ -174,11 +180,13 @@ pub(super) fn execute_gate(root: &Path, id: &str) -> Result<Infallible, E> {
             return Err(E::Refused("task-validation-gate-grant-invalid"));
         }
         let store = RootStore::open(root, false)?;
-        let mut command = finished(
-            gate_command(&store, id, i64::from(peer.pid()), &mut managed),
-            store.close(),
-        )?;
-        Err(caused("task-validation-command-exec", command.exec()))
+        let prepared = gate_command(&store, id, i64::from(peer.pid()), &mut managed);
+        let prepared = match (prepared, store.close()) {
+            (Ok(prepared), Ok(())) => Ok(prepared),
+            (Err(error), closed) => finished(Err(error), closed),
+            (Ok(prepared), Err(error)) => finished(Err(error), prepared.close()),
+        }?;
+        prepared.execute()
     })();
     // The outer owner survives Root close and helper exec. On an exec/Root
     // failure, preserve every candidate release cause before diagnostic output.

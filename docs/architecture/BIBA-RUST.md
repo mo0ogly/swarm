@@ -176,8 +176,9 @@ flowchart TD
 Les traits pointillés sont une cible, pas des contrôles actifs. La lecture de
 `agent_launch::prepare`, `agent_launch_preflight` et `mission_start` montre des
 contrôles propres de politique/révision/fournisseur, sans raccord Biba aux
-identités et objets `trust`. Un agent peut accéder aux fichiers selon ses droits
-OS ; le moniteur applicatif n’intercepte pas cet accès. Avant de qualifier Biba
+identités et objets `trust`. Sur la baseline auditée, un agent accédait aux fichiers selon ses droits
+OS. Le candidat ci-dessous ajoute une barrière aux helpers locaux ; cela ne
+raccorde pas encore toutes les voies au moniteur applicatif. Avant de qualifier Biba
 pour tout Swarm, il faut inventorier et raccorder lectures, écritures, commandes,
 mémoire, imports/restaurations et effets, ainsi que leurs chemins directs.
 
@@ -204,3 +205,54 @@ L’audit et ses résultats datés se trouvent dans
 `docs/plans/migration-rust/evidence/20261026-biba-integration-audit/`.
 Les résultats de l’ancien portage restent historiques ; ni leur réemploi borné,
 ni ce document, ni les schémas n’établissent une conformité globale.
+
+## Frontière Linux transversale — candidat en cours
+
+Le [plan BT01–BT05](../plans/actions-confiance/BIBA-TRANSVERSE-APEX.md) conserve
+les preuves, refus et critères ouverts. Les sources raccordent agent, planning,
+reviewer et préparation CLI au transport `native_provider_exec`. Une erreur
+refuse avant exec sans repli non confiné ; aucun privilège n’est augmenté.
+
+Le gate fournit l’inode attendu du workspace. `Sandbox::prepare_bound` ouvre et
+épingle cet inode avant inspection ; règles Landlock et `fchdir` utilisent ce
+même descripteur. Un remplacement refuse. La préparation CLI observe son
+répertoire temporaire privé après vérification du parent et du jeton ; le
+transfert du descripteur original depuis le parent reste à qualifier.
+
+Les sorties tool-free se trouvent sous `.swarm/biba-i0/planning/<claim_id>` ou
+`.swarm/biba-i0/reviewer/<event_id>`. Le moteur les ouvre relativement au
+répertoire privé possédé ; les relectures ne les créent pas. Le périmètre hôte
+persisté lie chemin et inode. Une sortie reste I0, jamais une autorisation.
+
+```mermaid
+flowchart TD
+  G[Gate privé : identité, politique, sources] --> W[Témoin du workspace]
+  W --> F[Ouverture et inode attendu]
+  F -->|différent ou erreur| R[Refus, causes et nettoyages conservés]
+  F --> P[FD épinglé, inspection des alias]
+  P --> S[Prompt scellé, memfd hors stdio]
+  S --> K[fchdir par FD, Landlock et seccomp]
+  K --> I[Fournisseur I0 et descendants]
+  I --> O[Sortie candidate dans le workspace]
+  I -->|écriture officielle directe| R
+  O -. Promotions restantes à qualifier .-> V[Objets officiels]
+```
+
+Le profil exige Linux/Landlock ABI6, un helper à un thread sans capacités
+privilégiées et aucune solution de repli. `FIOCLEX` pose seulement CLOEXEC ;
+le memfd est relogé hors 0/1/2 avant rattachement à stdin. Les descripteurs non
+stdio deviennent CLOEXEC. Les appels keyring sont refusés. Ces invariants ne
+sont pas de nouveaux réglages opérateur.
+
+La recette `tools/verification/recipes/biba-linux-boundary.json` vérifie le
+profil natif, ses refus et une substitution d’inode réellement injectée.
+`tests/rust_biba_stdin_transport.py` compare les sources réelles dans un adapter
+minimal ; elle ne qualifie pas le profil du moteur. Le plan conserve séparément
+les parcours publics sur leurs images exactes. Compiler n’installe rien.
+
+Limites : lectures hors racine privée et réseau Internet ne sont pas confinés
+par ce profil ; ce n’est pas un coffre général. Il ne fige pas un écrivain
+extérieur non confiné du même UID ni des montages privilégiés. Les autres
+lanceurs de contrôle, HTTP/SSE, mémoire, imports et promotions restent à traiter.
+Les parcours planning/reviewer modifiés, la vue Admin transversale, la revue du
+candidat final et l’installation restent ouverts. Aucun Biba global n’est qualifié.

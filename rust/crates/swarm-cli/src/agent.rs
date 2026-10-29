@@ -2,7 +2,8 @@
 use super::{json_bytes, write_output, Arguments, CliError};
 use std::{io::Write, path::Path};
 
-/// Execute show/stop/reconcile/logs/history and declared guard replay through native RootStore.
+/// Execute list/show/stop/reconcile/logs/history and declared guard replay through native RootStore.
+/// List currently supports ordinary Works without tasks/planning/agents only.
 /// Strict argument checks precede opening; show never infers a live process from
 /// stored PID/heartbeat. Dialogue boundaries remain unsupported; manual preview/prepare dispatch below.
 /// Stop records intent only; reconcile cancels an unregistered manual attempt or,
@@ -24,6 +25,9 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     #[cfg(target_os = "linux")]
     if a.pos.get(1).is_some_and(|v| v == "history") {
         return super::agent_history::execute(a, out);
+    }
+    if a.pos.get(1).is_some_and(|v| v == "list") {
+        return list(a, out);
     }
     if a.pos.get(1).is_some_and(|v| v == "logs") {
         return super::agent_logs::execute(a, out);
@@ -337,4 +341,55 @@ fn run(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
             primary
         }
     })
+}
+
+/// `agent list <work>`: emit the native cockpit snapshot document for one Work.
+///
+/// Dedicated helper, handled before show/stop/reconcile. Strict argument
+/// checks precede opening, exactly like the adjacent read paths. The Root is
+/// opened read-only; Linux projects the 14-key legacy JSON document with or
+/// without --json, matching the Go list behavior. Every path closes the
+/// store, and close and write/flush failures retain their causes. This first
+/// public slice is not the full agent list: works with nonempty tasks,
+/// planning or retained agents are refused by the Root projection with
+/// explicit unported codes; no launch, consent or mutation follows.
+fn list(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
+    if a.pos.len() != 3
+        || !a.input.is_empty()
+        || !a.output.is_empty()
+        || a.server
+        || !a.task.is_empty()
+        || a.phase != "delivery"
+    {
+        return Err(CliError::Usage);
+    }
+    list_snapshot(a, out)
+}
+
+/// Linux body: read-only Root open, `inspect_cockpit` projection and JSON
+/// output regardless of --json. Store close and output errors stay errors.
+#[cfg(target_os = "linux")]
+fn list_snapshot(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
+    let root_error = |e| CliError::Root(Box::new(e));
+    let mut store = swarm_engine::RootStore::open(Path::new(&a.root), false).map_err(root_error)?;
+    let result = store
+        .inspect_cockpit(&a.pos[2])
+        .map_err(root_error)
+        .and_then(|value| json_bytes(&value).map_err(CliError::Output));
+    match (result, store.close()) {
+        (Ok(bytes), Ok(())) => write_output(out, &bytes).map(|()| 0),
+        (Err(e), Ok(())) => Err(e),
+        (Ok(_), Err(e)) => Err(root_error(e)),
+        (Err(primary), Err(cleanup)) => Err(CliError::RootCleanup {
+            primary: Box::new(primary),
+            cleanup: Box::new(cleanup),
+        }),
+    }
+}
+
+/// Non-Linux: the cockpit snapshot slice needs the Linux material identity
+/// readers, so the capability is refused instead of guessed.
+#[cfg(not(target_os = "linux"))]
+fn list_snapshot(_a: &Arguments, _out: &mut dyn Write) -> Result<u8, CliError> {
+    Err(CliError::Unsupported)
 }

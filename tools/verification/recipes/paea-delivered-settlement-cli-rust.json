@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "id": "paea-delivered-settlement-cli-rust",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-cli/src/**/*",
+    "rust/crates/swarm-cli/tests/paea_settlement_delivered.rs",
+    "rust/crates/swarm-engine/src/**/*",
+    "rust/crates/swarm-enrollment-*/src/**/*",
+    "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+    "rust/crates/swarm-identity-contract/src/**/*",
+    "rust/crates/swarm-protection-contract/src/**/*",
+    "web/paea-examples/v1/payment-document.json",
+    "tools/verification/recipe.py",
+    "bin/swarm"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "SWARM_PAEA_DELIVERED_BIN": "{root}/bin/swarm",
+    "SWARM_PAEA_DELIVERED_BIN_SHA256": "47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a"
+  },
+  "steps": [
+    {
+      "id": "settlement-cli-delivered-commit-replay-reconcile-once",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_settlement_delivered",
+        "delivered_settlement_commit_replay_reconcile_once",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "delivered_settlement_commit_replay_reconcile_once ... ok",
+        "1 passed; 0 failed",
+        "delivered-binary-witness path=",
+        "sha256=47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a",
+        "delivered-settlement-argv --json paea settlement-call commit"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "settlement-cli-delivered-refuses-bad-frame-without-consumption",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_settlement_delivered",
+        "delivered_settlement_refuses_bad_frame_without_consumption",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "delivered_settlement_refuses_bad_frame_without_consumption ... ok",
+        "1 passed; 0 failed",
+        "delivered-binary-witness path=",
+        "sha256=47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "settlement-cli-delivered-revoked-current-authority-refuses-then-recovers",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_settlement_delivered",
+        "delivered_settlement_revoked_current_authority_refuses_without_effect_then_recovers",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "delivered_settlement_revoked_current_authority_refuses_without_effect_then_recovers ... ok",
+        "1 passed; 0 failed",
+        "delivered-binary-witness path=",
+        "sha256=47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a",
+        "revoked-window-1-refusal",
+        "paea-settlement-trust-revision",
+        "revoked-window-2-refusal",
+        "paea-settlement-effect-role"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "settlement-cli-delivered-two-instance-contention-single-effect",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_settlement_delivered",
+        "delivered_settlement_two_cli_instances_same_business_terms_single_effect",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "delivered_settlement_two_cli_instances_same_business_terms_single_effect ... ok",
+        "1 passed; 0 failed",
+        "delivered-binary-witness path=",
+        "sha256=47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a",
+        "delivered-settlement-argv --json paea settlement-call commit"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "settlement-cli-delivered-wrong-agreement-refuses-then-recovers",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_settlement_delivered",
+        "delivered_settlement_wrong_agreement_refuses_without_effect_then_recovers",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "delivered_settlement_wrong_agreement_refuses_without_effect_then_recovers ... ok",
+        "1 passed; 0 failed",
+        "delivered-binary-witness path=",
+        "sha256=47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a",
+        "agreement-mismatch-refusal",
+        "enrollment-control:permission"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "settlement-cli-delivered-lost-stdout-after-commit-replays-without-second-effect",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_settlement_delivered",
+        "delivered_settlement_lost_stdout_after_commit_replays_without_second_effect",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "delivered_settlement_lost_stdout_after_commit_replays_without_second_effect ... ok",
+        "1 passed; 0 failed",
+        "delivered-binary-witness path=",
+        "sha256=47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a",
+        "lost-response-code paea-settlement-call-output durable-effects 1",
+        "delivered-settlement-argv --json paea settlement-call commit"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

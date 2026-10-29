@@ -548,12 +548,19 @@ impl RootStore {
         else {
             return Err(E::Refused("preparation-cli-adapter-required"));
         };
+        use std::os::unix::fs::MetadataExt;
+        let observed = std::fs::symlink_metadata(workspace)
+            .map_err(|e| cause("preparation-cli-workspace-observation", e))?;
+        if !observed.is_dir() || observed.uid() != rustix::process::geteuid().as_raw()
+            || observed.mode() & 0o077 != 0 {
+            return Err(E::Refused("preparation-cli-workspace-not-private"));
+        }
         let prepared = crate::native_provider_exec::PreparedExec::prepare(
             &provider,
             &environment,
             workspace,
             t.prompt.as_bytes(),
-        )?;
+        )?.with_workspace_identity((observed.dev(), observed.ino()));
         // One final freshness observation; pathname executable replacement remains
         // the same unverified-host limitation as the existing native exec transport.
         let result = self
@@ -575,6 +582,8 @@ impl RootStore {
 /// Consume the owned helper's private gate and close Root before direct provider
 /// exec. Parent/kernel/token/source checks remain internal; argv carries no prompt.
 /// Returns only on refusal/setup/close/exec failure, retaining all cleanup causes.
+/// The shared transport additionally requires an isolated I0 Linux boundary.
+/// Unsafe workspace/backend failure refuses before provider exec, without fallback.
 pub fn execute_preparation_cli_gate(
     root: &Path,
     id: &str,
@@ -600,7 +609,8 @@ pub fn execute_preparation_cli_gate(
         let store = RootStore::open(root, false)?;
         let prepared = store.preparation_cli_prepare(id, token, workspace);
         match (prepared, store.close()) {
-            (Ok(prepared), Ok(())) => prepared.execute(),
+            // Shared exec requires the I0 boundary; failure never falls back to raw exec.
+            (Ok(prepared), Ok(())) => prepared.execute(root),
             (Err(primary), closed) => finished(Err(primary), closed),
             (Ok(prepared), Err(primary)) => finished(Err(primary), prepared.close()),
         }

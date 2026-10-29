@@ -1493,6 +1493,7 @@ dependencies = [
  "sha2 0.10.9",
  "sha2 0.11.1",
  "subtle",
+ "swarm-biba-linux",
  "swarm-enrollment-authority",
  "swarm-enrollment-bootstrap",
  "swarm-enrollment-config",

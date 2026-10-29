@@ -1,0 +1,147 @@
+{
+ "schema_version": 1,
+ "id": "paea-effect-reconcile",
+ "inputs": [
+  "rust/Cargo.toml",
+  "rust/Cargo.lock",
+  ".cargo/config.toml",
+  "rust/crates/swarm-enrollment-authority/**/*",
+  "rust/crates/swarm-enrollment-state/**/*",
+  "rust/crates/swarm-identity-contract/**/*",
+  "rust/crates/swarm-protection-contract/**/*",
+  "rust/crates/swarm-engine/**/*",
+  "rust/crates/swarm-cli/**/*",
+  "rust/crates/swarm-web/**/*",
+  "locales/en.json",
+  "frontend/engine-settings/admin.js",
+  "frontend/engine-settings/admin.css",
+  "tools/verification/recipe.py",
+  "tools/verification/recipes/paea-owned-source-acquisition.json",
+  "docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01/result.json",
+  "docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/current71c-fixture01/result.json"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+  "CARGO_PROFILE_DEV_DEBUG": "0",
+  "CARGO_PROFILE_TEST_DEBUG": "0",
+  "CARGO_INCREMENTAL": "0",
+  "RUSTDOCFLAGS": "-D warnings",
+  "SWARM_PAEA_WRITER_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01",
+  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01",
+  "SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/current71c-fixture01"
+ },
+ "steps": [
+  {
+   "id": "effect-reconcile-both-domains-and-corruption",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--test",
+    "paea_effect_reconcile",
+    "--",
+    "--ignored",
+    "--test-threads=1"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "test reconcile_refuses_self_reconciliation_of_one_root ... ok",
+    "test reconcile_reports_consistent_journals_and_explicit_uninitialized ... ok",
+    "test reconcile_detects_altered_effect_digest_as_unverified_finding ... ok",
+    "test reconcile_reports_missing_git_intent_as_unverified ... ok",
+    "4 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "effect-reconcile-cli-consumer",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-cli",
+    "--test",
+    "paea_reconcile"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "test paea_reconcile_effects_reports_explicit_uninitialized_without_mutation ... ok",
+    "test paea_reconcile_effects_refuses_shared_service_and_ledger_root ... ok",
+    "test paea_reconcile_effects_rejects_runtime_options_without_opening_roots ... ok",
+    "3 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "effect-reconcile-web-consumer",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_reconcile"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "test reconcile_effects_reports_explicit_uninitialized_from_saved_ledger_path ... ok",
+    "test reconcile_effects_refuses_shared_saved_root_and_mutation_never_occurs ... ok",
+    "test reconcile_effects_refuses_unauthenticated_and_malformed_requests_without_io ... ok",
+    "3 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "effect-reconcile-settings-policy",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--lib",
+    "engine_settings"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "test result: ok"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "effect-reconcile-module-rustdoc-contracts",
+   "command": [
+    "cargo",
+    "doc",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--no-deps"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [],
+   "required_stderr": [
+    "Generated"
+   ]
+  }
+ ]
+}

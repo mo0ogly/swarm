@@ -8,8 +8,8 @@ use swarm_engine::{
 #[test]
 fn catalog_covers_all_actual_values_and_nullable_fields_match_authoritative_validation() {
     let catalog = EngineSettingsCatalog::installation().unwrap();
-    assert_eq!(catalog.schema_version, 5);
-    assert_eq!(catalog.document_schema_version, 43);
+    assert_eq!(catalog.schema_version, 6);
+    assert_eq!(catalog.document_schema_version, 49);
     assert!(
         catalog
             .supported_document_versions
@@ -85,7 +85,7 @@ fn catalog_covers_all_actual_values_and_nullable_fields_match_authoritative_vali
 fn reported_cost_policy_preserves_legacy_absence_null_and_exact_counts() {
     use swarm_engine::{EngineSettingsValues, SettingCap};
     let values = EngineSettingsValues::installation_defaults().unwrap();
-    assert_eq!(values.schema_version(), 43);
+    assert_eq!(values.schema_version(), 49);
     assert_eq!(
         values.mission_dispatch_cost_reserve_percent,
         Some(SettingCap(Some(SettingCount(200))))

@@ -8,18 +8,18 @@ use std::{
     process::Command,
 };
 /// Create a disposable native Root with private storage, not a user mission.
-fn fresh() -> (tempfile::TempDir, RootStore) {
+pub(super) fn fresh() -> (tempfile::TempDir, RootStore) {
     let dir = tempfile::tempdir().unwrap();
     fs::set_permissions(dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let root = RootStore::initialize(dir.path(), &mut SystemEnvironment).unwrap();
     (dir, root)
 }
 /// Explicit actual first-publication result and its retained birth are required.
-/// This73 fixture is newly generated and may take read-only SQL transactions;
+/// This fresh owned fixture may reserve the real SQL writer without row writes;
 /// no accepted state, review or control receipt is inserted by the SDK.
-fn fixture() -> (PathBuf, RootStore, String, String) {
+pub(super) fn fixture() -> (PathBuf, RootStore, String, String) {
     let proof = PathBuf::from(
-        std::env::var_os("SWARM_PAEA_WRITER_FIXTURE").expect("explicit newly owned fixture73"),
+        std::env::var_os("SWARM_PAEA_WRITER_FIXTURE").expect("explicit newly owned native writer fixture"),
     );
     let result: serde_json::Value =
         serde_json::from_slice(&fs::read(proof.join("result.json")).unwrap()).unwrap();
@@ -105,7 +105,7 @@ fn writer_requires_actual_write_and_recovers() {
     root.close().unwrap();
 }
 /// Fixed real Git fixture setup, no inherited global/system config or hooks.
-fn bare(path: &Path, child: &str, format: &str) {
+pub(super) fn bare(path: &Path, child: &str, format: &str) {
     let directory = path.join(".swarm").join(child);
     fs::create_dir(&directory).unwrap();
     fs::set_permissions(&directory, fs::Permissions::from_mode(0o700)).unwrap();
@@ -133,7 +133,7 @@ fn bare(path: &Path, child: &str, format: &str) {
     assert!(r.status.success());
 }
 /// Valid data for actual immutable candidate and service-generated resource ID.
-fn proposal(binding: &PaeaGitRepositoryBinding, oid: &str) -> Proposal {
+pub(super) fn proposal(binding: &PaeaGitRepositoryBinding, oid: &str) -> Proposal {
     Proposal {
         schema_version: 1,
         request_id: "writer-fixture".into(),

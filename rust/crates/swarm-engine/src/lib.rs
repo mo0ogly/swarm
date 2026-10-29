@@ -102,7 +102,7 @@ pub use mission_supervision::{
 };
 #[cfg(target_os = "linux")]
 pub use root_store::{
-    MissionAutonomy, MissionConsentObservation, MissionControlSettings, MissionControlsObservation,
+    CockpitAutonomyObservation, MissionAutonomy, MissionConsentObservation, MissionControlSettings, MissionControlsObservation,
     CostSummary, CostTotal,
     TaskFreshnessEvidence, MissionResultObservation, MissionStatusObservation,
     MissionStatusInputs, MissionStatusVisit, MissionStatusPlanningCall, MissionStatusExchange, MissionStatusExchangeArtifact,
@@ -338,11 +338,23 @@ pub use root_store::TrustEnrollmentCallError;
 #[cfg(target_os = "linux")]
 pub use root_store::CurrentManagedGitPublication;
 #[cfg(target_os = "linux")]
-pub use root_store::{PaeaGitRepository,PaeaGitRepositoryBinding,PaeaGitRepositoryError, PaeaGitObjectFormat};
+pub use root_store::{PaeaGitRepository,PaeaGitRepositoryBinding,PaeaGitRepositoryError, PaeaGitObjectFormat,PaeaGitSource};
 #[cfg(target_os = "linux")]
 pub use root_store::{PaeaGitIntent,PaeaGitIntentReservation,PaeaGitIntentObservation,PaeaGitIntentError};
 #[cfg(target_os = "linux")]
 pub use root_store::{PaeaSettlementRequest,PaeaSettlementReceipt,PaeaSettlementOutcome,PaeaSettlementError,PaeaSettlementObservation,PaeaSettlementCallError};
+#[cfg(target_os = "linux")]
+pub use root_store::{PaeaGitTransferCall, PaeaGitTransferCallError, PaeaGitTransferReceipt};
+#[cfg(target_os = "linux")]
+pub use root_store::{
+    PaeaGitPromoteCall, PaeaGitPromoteCallError, PaeaGitPromoteOutcome, PaeaGitPromoteReceipt,
+};
+#[cfg(target_os = "linux")]
+pub use root_store::{
+    PaeaEffectReconcileFinding, PaeaEffectReconcileJournal, PaeaEffectReconcileReport,
+};
+#[cfg(target_os = "linux")]
+pub(crate) use root_store::TransferFailure;
 #[cfg(unix)]
 pub use root_store::QuotaPreview;
 #[cfg(target_os = "linux")]

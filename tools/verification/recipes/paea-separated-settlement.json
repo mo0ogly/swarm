@@ -27,8 +27,6 @@
     "tools/agent-workflows/templates/TRACKING.md",
     "tools/agent-workflows/templates/preparations.json",
     "rust/crates/swarm-linux-prerequisites/**/*",
-    "rust/crates/swarm-biba-linux/Cargo.toml",
-    "rust/crates/swarm-biba-linux/src/lib.rs",
     "rust/crates/swarm-api-client/Cargo.toml",
     "rust/crates/swarm-api-client/src/lib.rs",
     "rust/crates/swarm-cli/Cargo.toml",
@@ -77,7 +75,8 @@
     "tests/fixtures/paea/payment-request-v1.json",
     "tests/fixtures/paea_namespace_owner.py",
     "tests/fixtures/terminal_clip_go047.json",
-    "version_history.json"
+    "version_history.json",
+    "rust/crates/swarm-biba-linux/**/*"
   ],
   "environment": {
     "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",

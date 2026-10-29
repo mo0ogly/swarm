@@ -2207,3 +2207,58 @@ non installable conservés. Profil normal219 et contrôle vivant20+Version14+pag
 dans `evidence/20261027-mission-seen/`, avec journal des cinq constructions refusées.
 Les ressources effectives et la provenance/dirty sont contrôlées ; aucun résultat
 de fixture ne constitue une acceptation globale des chantiers partagés.
+
+## Cockpit — oracle Go/Rust conservé,28octobre2026
+
+Recette `tools/verification/recipes/cockpit-go-source-cost.json`, contrat FR/EN
+`docs/architecture/COCKPIT-COMPATIBILITY.md` et `docs/en/COCKPIT-COMPATIBILITY.md`.
+20cas exécutés sur les vrais producteurs Go et une image Rust de test figée.
+Le premier banc17cas avait perdu le signe de zéro en normalisant les arguments :
+échec original conservé ; correction des entrées brutes, pas du produit pour
+forcer la comparaison. Ne jamais régénérer un oracle à sa place pendant une
+compilation ; staging neuf, revue et adoption atomique sous verrou.
+L’image Rust80c9cf8eeefce89233ef3370f01a5dd53fc946ed871677f8648e9c52b0003eda
+a rejoué20cas sans Cargo ; elle est `cfg(test)`, non installable, liée à son
+archive510sources. Ce n’est ni la parité complète du cockpit ni une livraison.
+Les premiers runs et leurs échecs sont dans `.cache/migration-next-20261028/` ;
+conservation locale, aucune sauvegarde distante établie.
+
+## Cockpit initial — agent list241
+
+Recette permanente `cockpit-agent-list.json`, régression Python
+`tests/rust_cockpit_agent_list.py` et4tests de comparateur.52assertions publiques
+PASS sur image241, origine Go conservée et non installée, intégrité VERIFIED.
+Périmètre : travail sans tâche/planification/agent ; autres états explicitement
+refusés. Les vrais contrôles, réglages et Work restent identiques après lecture.
+Seul `pilotage.snapshot_as_of` varie et doit appartenir à sa fenêtre d’appel.
+Le Root se lie par les octets de son chemin canonique ; le Work JSON n’est pas
+ce chemin. Une description générique des « sections » avait amené GLM à inventer
+des clés : contexte futur = producteur réel ET JSON Go observé. Ne pas inférer
+l’absence de sous-processus d’un argv parent. Revue incrément4fichiers240→241 ;
+preuves .cache/migration-next-20261028/cockpit-agent-list-controls241 et
+cockpit-idle-review241, auto-revue distincte de l’acceptation globale.
+
+Cockpit agent-list243 : recette cockpit-agent-list.json actualisée avec
+--initial-tasks ;85assertions principales,15recouvrement global par vraie
+intention queued puis reconcile sans provider,4contre-exemples comparateur.
+PASS/intégrité VERIFIED : .cache/migration-next-20261028/cockpit-initial-task-permanent243 ;
+parcours .cache/cockpit-agent-list-1irabfji/journey. Les14unités Rust d’actions
+et1de priorité ont leurs sorties nommées cockpit-initial-task-unit-fixed et
+cockpit-initial-task-order-unit ; état des7entrées déclarées conservé, pas de
+prétention d’inventaire compilateur complet pour ces unités. Production normale
+liée au profil .cache/local-delivery/rust-yrtztb5c/build/profile, installation
+vérifiée dans cockpit-initial-task-installed243. Sources/tests maintenus au dépôt.
+Le test initial de la fixture bloquée GLM attendait une extension pourtant
+désactivée : original13/14conservé ; correction11actions, absence des2extensions
+puis14/14. La recette initial-tasks échoue avant correction sur241.
+
+Cockpit244 — même recette maintenue, --todo-dependencies : zéro/un/plusieurs
+liens et chaîne, priorité absente non inventée, motifs de première dépendance,
+évaluated_atborné par appels réels ; autres faits JSONstricts. Étatblocked
+créé publiquement après témoins valides puis refus sans document.
+PASS/VERIFIED .cache/migration-next-20261028/cockpit-dependencies-permanent244 :
+101principales+15globales+5comparateur. Parcours .cache/cockpit-agent-list-hd8b3_rq/journey.
+Contre-exemple243conservé dans cockpit-dependencies-before243 ; preuve de
+transitionblocked dans cockpit-dependencies-blocked-witness. Profilprod244
+.cache/local-delivery/rust-drponbk8/build/profile ; installation/Version/FR-EN
+vérifiées dans cockpit-dependencies-installed244. Contrat et limitesFR/EN actualisés.

@@ -1,5 +1,7 @@
-//! Explicit private Git resource declaration, retained custody and inspection.
-//! Not a protected effect service: no object transfer, current grant or ref write.
+//! Private Git resource custody and crate-owned object preparation.
+//! Not a protected service: no current grant, intent or reference commitment.
+mod source;
+pub(crate) mod transfer;
 use super::{
     finished, material_path, paea_git_intent, RootBinding, RootInstanceIdentity, RootStore,
     RootStoreError as E,
@@ -9,6 +11,7 @@ use crate::{
     CurrentManagedGitPublication,
 };
 use serde::Serialize;
+pub use source::PaeaGitSource;
 use std::{error::Error, fmt};
 use swarm_identity_contract::{digest, name};
 use swarm_protection_contract::{Action, Proposal};
@@ -284,6 +287,9 @@ impl PaeaGitRepository {
     /// non-bare state refuses before object transfer, intent or ref mutation.
     /// This is still an observation, not proof of stored objects or a last-use
     /// authority barrier; the effect owner must recheck under its own reservations.
+    /// Unlike sibling composed reads, no shared directory reservation is held:
+    /// the observed format is a point-in-time property of the private storage,
+    /// and a concurrent settings change cannot alter it after admission.
     pub fn inspect_object_format(
         &self,
         service: &RootStore,
@@ -323,6 +329,12 @@ impl PaeaGitRepository {
             finished(self.check(service, project), self.registered(service)),
         )
     }
+    /// Borrow the actual private directory path for a hardened Git command.
+    /// The returned path is only usable while this capability stays alive and
+    /// revalidated; it is never an effect permit or an operator-visible path.
+    pub(super) fn directory_path(&self) -> std::path::PathBuf {
+        self.directory.process_path()
+    }
     /// Explicitly close the held directory and both Root witnesses. All close
     /// causes survive independently; this never deletes a declaration or ref.
     pub fn close(self) -> Result<(), E> {
@@ -334,7 +346,10 @@ impl RootStore {
     /// already provisioned Git journal, distinct project/service datastores,
     /// a private single-component bare child prepared by the trusted operator,
     /// and its exact journal project pin. No directories, grants or refs created.
-    fn prepare_paea_git_repository(
+    /// Acquire and validate only physical Roots, declaration coordinates and
+    /// managed definition. No Git runs; every partial error checked-closes all
+    /// acquired descriptors. Bare state is checked by the owning consumer.
+    fn prepare_paea_git_repository_custody(
         &self,
         project: &RootStore,
         work: &str,
@@ -378,20 +393,6 @@ impl RootStore {
             if expected_pin != pin {
                 return Err(E::Refused("paea-git-project-pin"));
             }
-            let settings = self.read_settings()?;
-            let path = directory.process_path();
-            // The child first chdirs through OUR descriptor, then uses its OWN
-            // retained cwd. Relative explicit git-dir prevents ancestor discovery
-            // and never depends on a parent FD after an unreaped-process error.
-            let raw = crate::managed_repository::git(
-                &path,
-                &["--git-dir", ".", "rev-parse", "--is-bare-repository"],
-                &settings,
-            )
-            .map_err(|e| E::Launch(Box::new(e)))?;
-            if raw != b"true\n" {
-                return Err(E::Refused("paea-git-bare-required"));
-            }
             let record = Record {
                 schema_version: 1,
                 repository_id: resource(&service_id, directory_id)?,
@@ -420,6 +421,57 @@ impl RootStore {
                 }
             }
             Err(e) => finished(Err(e), close_parts(directory, service, project_binding)),
+        }
+    }
+    /// Legacy declared-repository preparation validates bare Git before returning.
+    /// The protected job factory below uses the FS-only custody helper instead,
+    /// so its first native command runs inside an already-owned Pending job.
+    fn prepare_paea_git_repository(
+        &self,
+        project: &RootStore,
+        work: &str,
+        child: &str,
+        pin: &str,
+    ) -> Result<PaeaGitRepository, E> {
+        let held = self.prepare_paea_git_repository_custody(project, work, child, pin)?;
+        let result = (|| {
+            let settings = self.read_settings()?;
+            let raw = crate::managed_repository::git(
+                &held.directory.process_path(),
+                &["--git-dir", ".", "rev-parse", "--is-bare-repository"],
+                &settings,
+            )
+            .map_err(|e| E::Launch(Box::new(e)))?;
+            if raw != b"true\n" {
+                return Err(E::Refused("paea-git-bare-required"));
+            }
+            held.check(self, project)
+        })();
+        match result {
+            Ok(()) => Ok(held),
+            Err(e) => finished(Err(e), held.close()),
+        }
+    }
+    /// Open an existing canonical declaration and both source/destination custody
+    /// with no Git subprocess. Missing frame never adopts a resource. Only the
+    /// returned job may perform native bare/source checks. Read-only service
+    /// mode refuses before opening storage. Staging is strict new
+    /// storage under this actual service Root. No business grant or ref effect.
+    pub(crate) fn paea_open_git_transfer_job(
+        &self,
+        project: &RootStore,
+        work: &str,
+        child: &str,
+        pin: &str,
+        staging: &str,
+    ) -> Result<transfer::GitTransferJob, E> {
+        if !self.writable {
+            return Err(E::Refused("root-read-only"));
+        }
+        let held = self.prepare_paea_git_repository_custody(project, work, child, pin)?;
+        match finished(held.registered(self), held.check(self, project)) {
+            Ok(()) => transfer::GitTransferJob::from_repository(held, self, project, staging),
+            Err(e) => finished(Err(e), held.close()),
         }
     }
     /// Trusted explicit provisioning, never an agent request. Publish an immutable

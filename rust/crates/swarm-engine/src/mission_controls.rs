@@ -12,6 +12,17 @@ pub enum MissionAutonomy {
     Assisted,
     Automatic,
 }
+impl MissionAutonomy {
+    /// Canonical Go-shaped saved token for this observed mode. A recorded
+    /// token is observed vocabulary, never a default or permission level.
+    fn token(self) -> &'static str {
+        match self {
+            MissionAutonomy::Manual => "manuel",
+            MissionAutonomy::Assisted => "assiste",
+            MissionAutonomy::Automatic => "autonome",
+        }
+    }
+}
 /// Latest canonical Go-shaped receipt. Actor/time are declarations, not
 /// authenticated identity or fresh authority. This is not an approved HTTP DTO.
 #[derive(Clone, PartialEq, Eq)]
@@ -131,6 +142,48 @@ impl std::fmt::Debug for MissionDispatchObservation {
         f.write_str("MissionDispatchObservation(<private>)")
     }
 }
+/// Safe narrow serializable cockpit projection of the user-approved saved
+/// initial autonomy choice. Additive observation; no Go key-parity claim is
+/// made for these keys.
+///
+/// Inputs: the actual saved mission controls and newest consent record of a
+/// valid existing Work, the saved installation default exposed by the
+/// parent-owned settings accessor, and the settings revision observed with it.
+/// Preconditions: unknown Work, malformed newest consent, malformed or invalid
+/// saved controls, invalid settings values and reservation/SQL/release
+/// failures already refuse with original typed causes; nothing is defaulted
+/// past an error.
+/// Errors: none after construction — every refusal happens during
+/// construction and never degrades into a configured value or empty success.
+/// Effects: none; inert data with no IO, no writes and no events.
+/// Limits: existing mission controls always win over the installation choice;
+/// a Work with no saved controls and no installation default serializes as
+/// `autonomy: null` with `source: "not_configured"` so historical cockpits
+/// stay readable and are never granted autonomy; `consent_enabled` mirrors
+/// only the newest consent record and a missing record is `false` (absent
+/// consent is never consent); `launch_authorized` is always `false`, so this
+/// value grants no launch, acceptance, capacity or other authority; no actor,
+/// timestamp or prompt data is carried.
+#[derive(Clone, serde::Serialize)]
+pub struct CockpitAutonomyObservation {
+    /// Recorded token ("manuel", "assiste", "autonome") or `null` when no
+    /// saved choice exists anywhere; never inferred, defaulted or clamped.
+    pub autonomy: Option<String>,
+    /// Exactly "mission", "installation" or "not_configured".
+    pub source: &'static str,
+    /// Settings revision observed alongside the installation default.
+    pub settings_revision: crate::SettingCount,
+    /// Newest actual consent record's enabled flag; a missing record is
+    /// `false`, never consent.
+    pub consent_enabled: bool,
+    /// Always `false`: an observation never authorizes a launch.
+    pub launch_authorized: bool,
+}
+impl std::fmt::Debug for CockpitAutonomyObservation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("CockpitAutonomyObservation(<private>)")
+    }
+}
 /// Require canonical mission pause/archive state before an activation mutation.
 /// Read inside the caller's Work write transaction. Missing controls are legacy
 /// absence, not consent; malformed controls/SQL/finalization failures refuse with
@@ -193,6 +246,71 @@ impl RootStore {
                 slots,
                 settings_revision: settings.revision,
                 policy,
+            })
+        })();
+        crate::mission_supervision::finish(
+            result,
+            reservation
+                .close()
+                .map_err(|e| root(RootStoreError::Storage(e))),
+        )
+    }
+
+    /// Read the cockpit autonomy observation for one valid existing Work,
+    /// holding the Root settings reservation through the read-only SQL
+    /// transaction and closing it via the shared finish helper so primary and
+    /// cleanup errors are both retained.
+    ///
+    /// Inputs: `work`, saved settings and actual mission controls/newest
+    /// consent. Missing historical choice remains None; a present choice uses
+    /// the closed typed settings accessor and every validation error propagates.
+    /// Preconditions: the settings reservation is acquirable and the Work
+    /// exists; the caller still owes Root.close.
+    /// Errors: unknown Work, malformed newest consent, malformed or invalid
+    /// saved controls, invalid settings values and reservation/read/release
+    /// failures refuse with their original typed causes. Malformed saved
+    /// controls are authoritative and are never replaced by the installation
+    /// default; no error is converted into a configured value.
+    /// Effects: read-only SQL plus in-memory selection only; no settings or SQL
+    /// mutation, no events, no launch, acceptance or permission change.
+    /// Limits: existing mission controls always win over the installation
+    /// choice; with no saved controls and no installation default the result
+    /// serializes as `autonomy: null`, `source: "not_configured"`, so
+    /// historical cockpits remain readable and are never granted autonomy;
+    /// consent_enabled mirrors only the newest consent record and a missing
+    /// record is false; launch_authorized is always false; no actor, timestamp
+    /// or prompt data is exposed.
+    pub fn read_cockpit_autonomy(&self, work: &str) -> Result<CockpitAutonomyObservation, E> {
+        let root = |e| E::Root(Box::new(e));
+        let reservation = self
+            .directory
+            .reserve(false, false)
+            .map_err(|e| root(RootStoreError::Storage(e)))?;
+        let result = (|| {
+            let settings = self.read_settings().map_err(root)?;
+            // Historical absence is explicit data, not an accessor error that
+            // may hide an invalid value. A present choice must validate.
+            let saved_default = if settings.values.cockpit_default_autonomy.is_some() {
+                Some(settings.values.cockpit_default_autonomy_mode().map_err(E::Settings)?)
+            } else {
+                None
+            };
+            // Existing mission controls always win; malformed saved controls
+            // already refused above and are never replaced by the default.
+            let observed = self.read_mission_controls(work)?;
+            let (autonomy, source) = match observed.controls.as_ref().map(|c| c.autonomy) {
+                Some(mode) => (Some(mode.token().to_owned()), "mission"),
+                None => match saved_default {
+                    Some(token) => (Some(token.to_owned()), "installation"),
+                    None => (None, "not_configured"),
+                },
+            };
+            Ok(CockpitAutonomyObservation {
+                autonomy,
+                source,
+                settings_revision: settings.revision,
+                consent_enabled: observed.consent.as_ref().is_some_and(|c| c.enabled),
+                launch_authorized: false,
             })
         })();
         crate::mission_supervision::finish(

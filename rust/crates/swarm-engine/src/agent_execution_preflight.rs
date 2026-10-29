@@ -429,10 +429,186 @@ pub(crate) fn inspect(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rusqlite::types::Value;
+    /// Snapshot the admission-touching rows: agents, reservations, events, logs,
+    /// work attempts. Not a full-schema dump; the refusal must change none of it.
+    fn admission_snapshot(db: &rusqlite::Connection) -> Vec<(String, Vec<Vec<Value>>)> {
+        let mut snapshot = Vec::new();
+        for (table, columns, order) in [
+            ("agents", "id,work_id,task_id,cwd,status,body", "id"),
+            ("reservations", "agent_id,work_id,amount,state", "agent_id"),
+            ("events", "id,kind,payload,request", "id"),
+            ("agent_logs", "agent_id,kind,message", "seq"),
+            ("works", "id,revision,body", "id"),
+        ] {
+            let mut statement = db
+                .prepare(&format!(
+                    "SELECT {columns} FROM {table} ORDER BY {order}"
+                ))
+                .unwrap();
+            let width = statement.column_count();
+            let rows: Vec<Vec<Value>> = statement
+                .query_map([], |row| {
+                    (0..width).map(|column| row.get(column)).collect()
+                })
+                .unwrap()
+                .map(Result::unwrap)
+                .collect();
+            snapshot.push((table.to_string(), rows));
+        }
+        snapshot
+    }
     /// The actual full queued preflight passes before each injection. Supplying
     /// output observations before permission refuses without mutation; restoring
     /// only the isolated fixture bytes permits the same intention to recover.
     /// No child, extra attempt, budget reset or live database is involved.
+    /// A valid admitted provider copy is the witness, then that actual admitted
+    /// artifact is mutated in place before consumption: the retained recheck at
+    /// the queued boundary must refuse with its exact typed code and no SQL
+    /// mutation, and restoration must permit the same intention again. The
+    /// provider is a test-owned copy, never an installed or shared binary; this
+    /// is not an OS confinement, identity or acceptance proof.
+    #[test]
+    fn preflight_admitted_provider_artifact_mutation_refuses_before_consumption_and_recovers() {
+        let root = std::env::temp_dir().join(crate::generate_identifier("toolsubst81-").unwrap());
+        {
+            use std::os::unix::fs::DirBuilderExt;
+            std::fs::DirBuilder::new()
+                .mode(0o700)
+                .create(&root)
+                .unwrap();
+        }
+        eprintln!("owned provider-substitution fixture: {}", root.display());
+        let mut store =
+            crate::RootStore::initialize(root.as_path(), &mut crate::SystemEnvironment).unwrap();
+        let work=store.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Title","objective":"Goal","scope":"Fixture","criteria":["Proof"]}"#,&mut crate::SystemEnvironment).unwrap().result.work.id;
+        store.execute_external(&work,"task.add",br#"{"schema_version":1,"event_id":"add","expected_revision":1,"id":"task","title":"Task","deliverable":"Report","criteria":["Proof"]}"#,&mut crate::SystemEnvironment).unwrap();
+        // Test-owned provider copy under the fixture root; never /bin/cat.
+        let provider_path = root.join("fixture-provider");
+        std::fs::write(&provider_path, b"#!/bin/cat\nfixture provider witness\n").unwrap();
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(&provider_path, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let setup = LocalDirectory::open(&root.join(".swarm")).unwrap();
+        let catalogue = format!(
+            "{{\"schema_version\":1,\"providers\":{{\"fixture\":{{\"command\":\"{}\",\"args\":[]}}}}}}",
+            provider_path.display()
+        );
+        setup
+            .publish("providers.json", catalogue.as_bytes())
+            .unwrap();
+        setup.close().unwrap();
+        let request=crate::decode_launch(br#"{"schema_version":1,"event_id":"session","expected_revision":2,"task_id":"task","provider":"fixture"}"#).unwrap();
+        // Valid admission precedes any mutation: the queued row exists and the
+        // digest of the actual admitted artifact is frozen in its preflight scope.
+        let launched = store.prepare_agent_launch(&work, &request, false, &mut crate::SystemEnvironment).unwrap();
+        assert!(launched.created);
+        assert_eq!(launched.agent.status, "queued");
+        let admitted = launched
+            .agent
+            .preflight
+            .expect("admission must retain its preflight receipt");
+        assert_eq!(admitted.verdict, "compatible");
+        assert!(!admitted.scope.is_empty());
+        let settings = store.settings().unwrap();
+        store.close().unwrap();
+        let before = {
+            let db = rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
+            let before = admission_snapshot(&db);
+            db.close().unwrap();
+            before
+        };
+        let digest = crate::agent_launch_preflight::hash;
+        let original_digest = digest(&std::fs::read(&provider_path).unwrap());
+        // Observation before mutation: the queued recheck must accept the witness.
+        {
+            let db = rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
+            let directory = LocalDirectory::open(&root.join(".swarm")).unwrap();
+            let tx = db.unchecked_transaction().unwrap();
+            assert!(inspect(
+                &tx,
+                root.as_path(),
+                &directory,
+                &settings,
+                "session",
+                ExecutionStage::Queued
+            )
+            .is_ok());
+            tx.rollback().unwrap();
+            db.close().unwrap();
+            directory.close().unwrap();
+        }
+        // Mutate the admitted artifact in place, before any consumption attempt.
+        std::fs::write(&provider_path, b"#!/bin/cat\nfixture provider WITNESS MUTATED\n").unwrap();
+        let mutated_digest = digest(&std::fs::read(&provider_path).unwrap());
+        assert_ne!(original_digest, mutated_digest, "mutation must change bytes");
+        {
+            let db = rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
+            let directory = LocalDirectory::open(&root.join(".swarm")).unwrap();
+            let tx = db.unchecked_transaction().unwrap();
+            let result = inspect(
+                &tx,
+                root.as_path(),
+                &directory,
+                &settings,
+                "session",
+                ExecutionStage::Queued
+            );
+            tx.rollback().unwrap();
+            db.close().unwrap();
+            directory.close().unwrap();
+            let error = match result {
+                Err(error) => error,
+                Ok(_) => panic!("mutated admitted artifact consumed"),
+            };
+            let mut code: Option<String> = None;
+            let mut current: Option<&(dyn std::error::Error + 'static)> = Some(&error);
+            while let Some(error) = current {
+                if let Some(error) = error.downcast_ref::<AgentLaunchError>() {
+                    code = Some(error.code().to_string());
+                }
+                current = error.source();
+            }
+            // The queued-boundary inspector re-hashes the observed scope first; the
+            // executable digest is part of it, so the consumer reports the changed
+            // scope (agent-execution-preflight-changed). The retained-input recheck
+            // beneath it reports agent-preflight-input-changed for the same mutation.
+            assert_eq!(
+                code.as_deref(),
+                Some("agent-execution-preflight-changed"),
+                "wrong refusal family for artifact mutation: {error}"
+            );
+        }
+        // No SQL mutation from the refused consumption; the admission stays intact.
+        {
+            let db = rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
+            let after = admission_snapshot(&db);
+            db.close().unwrap();
+            assert_eq!(after, before);
+        }
+        // Restore the exact original bytes: the same admitted intention revalidates.
+        std::fs::write(&provider_path, b"#!/bin/cat\nfixture provider witness\n").unwrap();
+        assert_eq!(digest(&std::fs::read(&provider_path).unwrap()), original_digest);
+        {
+            let db = rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
+            let directory = LocalDirectory::open(&root.join(".swarm")).unwrap();
+            let tx = db.unchecked_transaction().unwrap();
+            assert!(inspect(
+                &tx,
+                root.as_path(),
+                &directory,
+                &settings,
+                "session",
+                ExecutionStage::Queued
+            )
+            .is_ok());
+            tx.rollback().unwrap();
+            db.close().unwrap();
+            directory.close().unwrap();
+        }
+        let _ = admitted.scope;
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
     #[test]
     fn preflight_output_claims_before_permission_refuse_and_recover() {
         use std::os::unix::fs::DirBuilderExt;

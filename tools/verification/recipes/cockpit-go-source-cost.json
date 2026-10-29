@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "cockpit-go-source-cost",
+  "inputs": [
+    "tools/rust-migration/cockpit_post_delivery_oracle.py",
+    "tools/rust-migration/run_cockpit_oracle.py",
+    "tools/rust-migration/test_cockpit_oracle_retention.py",
+    "tools/rust-migration/current_cli_inventory.py",
+    "tools/rust-migration/fixtures/cockpit-*.json",
+    "tools/verification/verify_native_profile.py",
+    "docs/architecture/COCKPIT-COMPATIBILITY.md",
+    "docs/en/COCKPIT-COMPATIBILITY.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "retained-evidence-ownership",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/rust-migration",
+        "-p",
+        "test_cockpit_oracle_retention.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_existing_output_never_receives_a_new_failure_file",
+        "test_unit_runner_preserves_existing_output_before_build_or_replay",
+        "Ran 2 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "go-actual-producer",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='cockpit-differential-',dir='.cache')).resolve()/'go'\nsubprocess.run(['python3','tools/rust-migration/cockpit_post_delivery_oracle.py','--inputs','tools/rust-migration/fixtures/cockpit-source-inputs.json','--check-fixture','tools/rust-migration/fixtures/cockpit-post-delivery-go.json','--output',str(p)],check=True)\nprint('COCKPIT_DIFFERENTIAL_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "GO_COCKPIT_SOURCE_ORACLE_VERIFIED 20"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "rust-actual-producer",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='cockpit-differential-',dir='.cache')).resolve()/'rust'\nsubprocess.run(['python3','tools/rust-migration/run_cockpit_oracle.py','--replay-record',os.environ['SWARM_COCKPIT_UNIT_RECORD'],'--output',str(p)],check=True)\nprint('COCKPIT_DIFFERENTIAL_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "RUST_COCKPIT_GO_ORACLE_REPLAYED 20"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

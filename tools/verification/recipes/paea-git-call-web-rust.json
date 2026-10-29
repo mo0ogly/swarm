@@ -1,0 +1,110 @@
+{
+ "schema_version": 1,
+ "id": "paea-git-call-web-rust",
+ "inputs": [
+  "rust/Cargo.toml",
+  "rust/Cargo.lock",
+  ".cargo/config.toml",
+  "rust/crates/*/Cargo.toml",
+  "rust/crates/swarm-web/src/**/*",
+  "rust/crates/swarm-web/tests/paea_git_call.rs",
+  "rust/crates/swarm-engine/src/**/*",
+  "rust/crates/swarm-engine/tests/paea_git_transfer_call.rs",
+  "rust/crates/swarm-enrollment-*/src/**/*",
+  "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+  "rust/crates/swarm-identity-contract/src/**/*",
+  "rust/crates/swarm-protection-contract/src/**/*",
+  "tools/verification/recipe.py",
+  "tools/verification/recipes/paea-git-call-web-rust.json",
+  "docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01/result.json"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+  "CARGO_PROFILE_DEV_DEBUG": "0",
+  "CARGO_PROFILE_TEST_DEBUG": "0",
+  "CARGO_INCREMENTAL": "0",
+  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01"
+ },
+ "steps": [
+  {
+   "id": "web-route-refuses-without-source",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "git_call_route_refuses_without_source",
+    "--message-format=json",
+    "--",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "git_call_route_refuses_without_source ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "web-binds-exact-witnesses-and-refuses-wrong-root",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "git_call_http_binds_exact_witnesses_and_consumes_once",
+    "--message-format=json",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "git_call_http_binds_exact_witnesses_and_consumes_once ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "web-consumes-exact-transfer-once",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "git_call_http_consumes_exact_transfer_once",
+    "--message-format=json",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "git_call_http_consumes_exact_transfer_once ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  }
+ ]
+}

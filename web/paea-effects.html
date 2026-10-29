@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fr" data-theme="etat">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Swarm — PAEA</title>
+  <link rel="icon" href="/swarm-logo.png">
+  <link rel="stylesheet" href="/wattson_themes.css">
+  <link rel="stylesheet" href="/swarm-design.css">
+  <link rel="stylesheet" href="/paea.css">
+  <script src="/i18n-en.js" defer></script>
+  <script src="/i18n.js" defer></script>
+  <script src="/paea-effects.js" defer></script>
+</head>
+<body>
+<a class="paea-skip" href="#paea-main" data-i18n>Aller aux états d'effets</a>
+<header><a href="/">Swarm</a><h1 data-i18n>États d'effets PAEA</h1><nav aria-label="Navigation PAEA"><a href="/paea.html" data-paea-link data-i18n>Vérifications PAEA</a><button id="paea-theme" type="button" data-i18n>Changer de thème</button></nav></header>
+<main id="paea-main" tabindex="-1">
+<p id="effects-limits" class="paea-notice" data-i18n>Lecture seule : observation de capacité et rapprochement recalculé des journaux d'effets réels. Aucune consommation d'appel, aucune autorité, aucune réparation ; la correspondance recalculée n'établit pas l'authenticité.</p>
+<section aria-labelledby="gitcall-title"><h2 id="gitcall-title" data-i18n>Appel Git gardé — capacité observée</h2>
+<p id="gitcall-status" role="status" aria-live="polite" data-state="loading" data-i18n>Chargement…</p>
+<section id="gitcall-detail" hidden aria-labelledby="gitcall-cap-title"><h3 id="gitcall-cap-title" data-i18n>Capacité publique de l'appel préparé</h3><dl id="gitcall-capability"></dl></section>
+</section>
+<section aria-labelledby="reconcile-title"><h2 id="reconcile-title" data-i18n>Rapprochement des journaux d'effets (PA-09)</h2>
+<p id="reconcile-status" role="status" aria-live="polite" data-state="loading" data-i18n>Chargement…</p>
+<div id="reconcile-report" hidden>
+<section id="reconcile-settlement" aria-labelledby="settlement-title"><h3 id="settlement-title" data-i18n>Grand livre de règlement séparé</h3><div id="settlement-state"></div><ul id="settlement-findings"></ul></section>
+<section id="reconcile-git" aria-labelledby="git-title"><h3 id="git-title" data-i18n>Intentions et promotions Git</h3><div id="git-state"></div><ul id="git-findings"></ul></section>
+<details id="reconcile-raw"><summary data-i18n>Rapport technique</summary><pre id="reconcile-report-raw" tabindex="0"></pre></details>
+</div>
+</section>
+</main></body></html>

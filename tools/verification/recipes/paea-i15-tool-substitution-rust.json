@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "paea-i15-tool-substitution-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/agent_execution_preflight.rs",
+    "rust/crates/swarm-engine/src/agent_launch_preflight.rs",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/Cargo.toml",
+    "rust/Cargo.lock"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "/tmp/paea-i15-target",
+    "CARGO_NET_OFFLINE": "true"
+  },
+  "steps": [
+    {
+      "id": "named-substitution-test",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "agent_execution_preflight::tests::preflight_admitted_provider_artifact_mutation_refuses_before_consumption_and_recovers",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test result: ok"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

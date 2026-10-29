@@ -105,6 +105,7 @@ name = "validation_run_probe"
 required-features = ["test-fixtures"]
 
 [target.'cfg(target_os = "linux")'.dependencies]
+swarm-biba-linux = { path = "../swarm-biba-linux" }
 swarm-enrollment-authority = { path = "../swarm-enrollment-authority" }
 swarm-enrollment-state = { path = "../swarm-enrollment-state" }
 swarm-protection-contract = { path = "../swarm-protection-contract" }

@@ -190,6 +190,8 @@ pub(super) fn admit(root: &Path, id: &str, channel: &mut UnixStream) -> Result<M
 /// typed causes and close sealed stdin; caller must report/close its channel and
 /// exit. This private helper establishes no OS sandbox, model identity,
 /// complete wait, durable result, deadline supervisor or task acceptance.
+/// The shared transport additionally requires an isolated I0 Linux boundary.
+/// Unsafe workspace/backend failure refuses before provider exec, without fallback.
 pub(super) fn execute(
     root: &Path,
     id: &str,
@@ -206,7 +208,7 @@ pub(super) fn execute(
         &material.host.environment_names,
         &material.host.workspace,
         material.inputs.prompt.as_bytes(),
-    )?;
+    )?.with_workspace_identity(material.host.directory_identity);
     let fresh = material
         .fresh(root)
         .map_err(|error| E::Launch(Box::new(error)))
@@ -226,7 +228,8 @@ pub(super) fn execute(
         Ok(t) => t,
         Err(error) => return finished(Err(caused("review-telemetry-setup-failed", error)), transport.close()),
     };
-    transport.add_environment(telemetry.environment)?.add_leading_arguments(telemetry.arguments)?.execute()
+    // Shared exec requires the I0 boundary; failure never falls back to raw exec.
+    transport.add_environment(telemetry.environment)?.add_leading_arguments(telemetry.arguments)?.execute(root)
 }
 
 /// Own the private CLOEXEC channel through one exec attempt. Success never

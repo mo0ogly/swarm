@@ -7,7 +7,10 @@ use std::{collections::BTreeSet, error::Error, fmt};
 /// Highest supported journal/change envelope: protocol version, not an operator
 /// limit or permission to adopt missing historical settings. Group versions in
 /// `schema_version` remain fixed so old documents retain their declared shape.
-const SETTINGS_SCHEMA_MAX: i64 = 47;
+/// v48 adds the independent optional cockpit default autonomy display mode.
+/// v49 adds the independent optional separate settlement ledger root path for
+/// the read-only PA-09 reconciliation consumer.
+const SETTINGS_SCHEMA_MAX: i64 = 49;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SettingCount(pub i64);
 /// Providers with a supported telemetry injection (protocol capability, not an
@@ -993,6 +996,29 @@ pub struct EngineSettingsValues {
     /// the attempt id. Null turns evaluations off.
     #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_cap")]
     pub agent_evaluation_sample_percent: Option<SettingCap>,
+    /// v48: cockpit default display mode as the canonical protocol enum
+    /// (0 manuel, 1 assiste, 2 autonome). Display/default mode only: it is
+    /// never consent, mission start, authorization or an override of saved
+    /// mission controls. Historical absence requires explicit adoption; no
+    /// fallback, no migration and no other policy group is required.
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "present_count"
+    )]
+    pub cockpit_default_autonomy: Option<SettingCount>,
+    /// v49: configured absolute path of the SEPARATE settlement ledger Root
+    /// used by the read-only PA-09 reconciliation consumer. Pure operator
+    /// configuration: it designates no initialized ledger, grants no effect,
+    /// authority or acceptance, and the consumer still enforces two physically
+    /// distinct roots at every call. Historical absence requires explicit
+    /// adoption; path shape validation belongs to the policy module.
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "present_string"
+    )]
+    pub paea_settlement_ledger_root: Option<String>,
 }
 /// Preserve legacy absence separately from a validated explicit set; null and
 /// unknown phase names refuse. No task mutation, IO or authorization occurs.
@@ -1116,13 +1142,19 @@ impl EngineSettingsValues {
     /// Validate declared policies and version dependencies without adopting
     /// missing groups. Returns a safe typed format/policy error; no IO or state
     /// changes occur, and legacy absence never becomes implicit current defaults.
-    /// Validate supplied values, technical representation and complete versioned
-    /// policy groups through v47. The independent report-read group does not
+    /// Complete policy groups through v49; the independent scalar cockpit mode
+    /// and ledger root path require no other group. The independent report-read group does not
     /// adopt unrelated earlier groups. Historical absence remains absent; network20
     /// requires prior groups and never adopts defaults, opens sockets, changes
     /// Work/history or establishes active-server state. Typed validation causes
     /// survive rejection; caller still owes authority and publication freshness.
     pub fn validate(&self) -> Result<(), EngineSettingsError> {
+        if self.paea_settlement_ledger_root.is_some() {
+            self.paea_settlement_ledger_policy()?;
+        }
+        if self.has_cockpit_autonomy_policy() {
+            self.cockpit_default_autonomy_mode()?;
+        }
         if self.report_preview_max_bytes.is_some() || self.report_verification_max_bytes.is_some() { self.report_read_policy()?; }
         if self.has_preparation_call_policy() { self.preparation_call_policy()?; self.preparation_template_policy()?; self.preparation_source_policy()?; self.preparation_plan_policy()?; self.preparation_write_policy()?; self.preparation_read_policy()?; }
         if self.has_preparation_source_policy() { self.preparation_source_policy()?; self.preparation_plan_policy()?; self.preparation_write_policy()?; self.preparation_read_policy()?; }
@@ -1522,6 +1554,12 @@ impl EngineSettingsValues {
     /// Return the complete declared settings version, preserving historical
     /// absence. This does not adopt defaults, mutate history or grant authority.
     pub fn schema_version(&self) -> i64 {
+        if self.paea_settlement_ledger_root.is_some() {
+            return 49;
+        }
+        if self.has_cockpit_autonomy_policy() {
+            return 48;
+        }
         if self.report_preview_max_bytes.is_some() || self.report_verification_max_bytes.is_some() { return 47; }
         if self.has_preparation_call_policy() { return 46; }
         if self.has_preparation_template_policy() { return 45; }
@@ -2592,3 +2630,7 @@ pub use preparation_calls::PreparationCallPolicy;
 
 mod report_read;
 pub use report_read::ReportReadPolicy;
+
+mod cockpit_autonomy;
+
+mod settlement_ledger;

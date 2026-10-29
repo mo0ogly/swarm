@@ -8,7 +8,9 @@
 .engine-settings-dialog .modal-header h2{margin:0;min-width:0;overflow-wrap:anywhere}
 .engine-settings-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));gap:1rem}
 .engine-settings-field{min-width:0}
-.engine-settings-field :is(input,textarea){max-width:100%;width:100%}
+.engine-settings-field :is(input,select,textarea){max-width:100%;width:100%}
+/* Scalar choice selects share input metrics; focus inherits the shared semantic rule. */
+.engine-settings-field select{font:inherit}
 .engine-settings-unlimited{display:flex;align-items:center;gap:.5rem}
 .engine-settings-unlimited input{width:auto}
 .engine-settings-dialog .modal-footer{flex-wrap:wrap}

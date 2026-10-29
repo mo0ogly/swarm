@@ -15,3 +15,5 @@ pub use service::{
     NativeRequestError, NativeServerError, NativeServerReport, RecordedConfiguration,
     TrustEnrollmentSource, TrustEnrollmentSourceError,
 };
+#[cfg(target_os = "linux")]
+pub use service::{PaeaGitCallAuthority, PaeaGitCallSource, PaeaGitCallSourceError};

@@ -1,0 +1,103 @@
+{
+    "schema_version": 1,
+    "id": "paea-effects-ui",
+    "inputs": [
+        "rust/Cargo.toml",
+        "rust/Cargo.lock",
+        ".cargo/config.toml",
+        "rust/crates/swarm-cli/**/*",
+        "rust/crates/swarm-engine/src/**/*",
+        "rust/crates/swarm-web/src/**/*",
+        "rust/crates/swarm-web/tests/paea_effects_page.rs",
+        "web/paea-effects.html",
+        "web/paea-effects.js",
+        "web/paea.html",
+        "web/paea.css",
+        "web/i18n.js",
+        "web/i18n-en.js",
+        "web/wattson_themes.css",
+        "web/swarm-design.css",
+        "web/swarm-logo.png",
+        "locales/en.json",
+        "scripts/i18n/build.cjs",
+        "tests/paea_effects_ui.cjs",
+        "tests/paea_effects_ui_recipe.py",
+        "package.json",
+        "package-lock.json",
+        "tools/verification/recipe.py",
+        "tools/verification/recipes/paea-effects-ui.json",
+        "docs/architecture/PAEA-GIT-TRANSACTION.md",
+        "docs/en/PAEA-GIT-TRANSACTION.md"
+    ],
+    "environment": {
+        "CARGO_TARGET_DIR": "{root}/.cache/paea-effects-ui-target",
+        "CARGO_INCREMENTAL": "0"
+    },
+    "steps": [
+        {
+            "id": "i18n-generated",
+            "command": [
+                "node",
+                "scripts/i18n/build.cjs",
+                "--check"
+            ],
+            "expected_exit": 0,
+            "required_stdout": [
+                "\"mode\":\"check\"",
+                "\"status\":\"pass\""
+            ],
+            "required_stderr": []
+        },
+        {
+            "id": "workspace-page-tests",
+            "command": [
+                "cargo",
+                "test",
+                "--manifest-path",
+                "rust/Cargo.toml",
+                "--offline",
+                "--locked",
+                "-p",
+                "swarm-web",
+                "--test",
+                "paea_effects_page",
+                "--",
+                "--test-threads=1"
+            ],
+            "expected_exit": 0,
+            "required_stdout": [
+                "2 passed; 0 failed"
+            ],
+            "required_stderr": []
+        },
+        {
+            "id": "fresh-binary-build",
+            "command": [
+                "sh",
+                "-c",
+                "touch rust/crates/swarm-web/src/service/native_admin.rs && cargo build --manifest-path rust/Cargo.toml --offline --locked -p swarm-cli --bin swarm-rust"
+            ],
+            "expected_exit": 0,
+            "required_stdout": [],
+            "required_stderr": [
+                "Finished"
+            ]
+        },
+        {
+            "id": "real-browser-qualification",
+            "command": [
+                "python3",
+                "tests/paea_effects_ui_recipe.py",
+                "--binary",
+                "{root}/.cache/paea-effects-ui-target/debug/swarm-rust",
+                "--output",
+                "{root}/.cache/paea-effects-ui-browser-evidence"
+            ],
+            "expected_exit": 0,
+            "required_stdout": [
+                "PAEA_EFFECTS_UI_BROWSER_VERIFIED 5"
+            ],
+            "required_stderr": []
+        }
+    ]
+}

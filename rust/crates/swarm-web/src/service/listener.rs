@@ -244,11 +244,29 @@ impl NativeHttpServer {
     /// source prepared/provisioned outside HTTP. No request selects a source or
     /// grants a role. On bind refusal close the supplied owner explicitly too.
     pub fn bind_enrolled(root_path: &Path, address: Option<&str>, source: super::TrustEnrollmentSource) -> Result<Self, NativeServerError> {
-        match Self::bind_source(root_path,address,Some(&source)) {
+        match Self::bind_source(root_path,address,Some(&source),None) {
             Ok(mut server) => { server.service.trust_enrollment=Some(source); Ok(server) },
             Err(primary) => match source.close() {
                 Ok(()) => Err(primary),
                 Err(cause) => Err(NativeServerError::Cleanup {primary:Box::new(primary),cleanup:Box::new(NativeServerError::Service(HttpServiceError::EnrollmentSource {primary:None,cause:Box::new(cause)}))}),
+            },
+        }
+    }
+    /// Bind the ordinary saved loopback transport with one trusted prepared
+    /// PAEA Git call provisioned outside HTTP. The service Root path is the
+    /// trusted bind input; the project Root path held by the authority is
+    /// opened read-only during the bind check and both prepared witnesses are
+    /// compared against the actually opened roots before any session
+    /// publication, then rechecked at consumption. No request selects a call,
+    /// path, declaration or pin, or grants a role. On bind refusal close the
+    /// supplied authority explicitly too, retaining independent causes.
+    #[cfg(target_os = "linux")]
+    pub fn bind_git_call(root_path: &Path, address: Option<&str>, source: super::PaeaGitCallAuthority) -> Result<Self, NativeServerError> {
+        match Self::bind_source(root_path, address, None, Some(&source)) {
+            Ok(mut server) => { server.service.paea_git_call=Some(source); Ok(server) },
+            Err(primary) => match source.close() {
+                Ok(()) => Err(primary),
+                Err(cause) => Err(NativeServerError::Cleanup {primary:Box::new(primary),cleanup:Box::new(NativeServerError::Service(HttpServiceError::GitCallSource {primary:None,cause:Box::new(cause)}))}),
             },
         }
     }
@@ -258,15 +276,27 @@ impl NativeHttpServer {
     /// cap refuses before binding/session creation. Every failed step closes its
     /// owned store/socket and retains cleanup failures. Existing state is preserved.
     pub fn bind(root_path: &Path, address: Option<&str>) -> Result<Self, NativeServerError> {
-        Self::bind_source(root_path,address,None)
+        Self::bind_source(root_path,address,None,None)
     }
     /// Retain one opened Root across source check, policy and session bootstrap;
     /// an intervening pathname reopen cannot substitute another datastore.
-    fn bind_source(root_path:&Path,address:Option<&str>,source:Option<&super::TrustEnrollmentSource>)->Result<Self,NativeServerError>{
+    fn bind_source(root_path:&Path,address:Option<&str>,source:Option<&super::TrustEnrollmentSource>,git_call:Option<&super::PaeaGitCallAuthority>)->Result<Self,NativeServerError>{
         let store = RootStore::open(root_path, true)
             .map_err(|e| NativeServerError::Service(root("open", e)))?;
         let configured = (|| {
             if let Some(source)=source { source.check_root(&store).map_err(|e|NativeServerError::Service(root("trust-enrollment-root",e)))?; }
+            // Both prepared Git-call witnesses must match the actually opened
+            // service Root and the project Root opened read-only from the
+            // trusted startup path; consumption rechecks both under authority.
+            if let Some(git_call)=git_call {
+                let project = swarm_engine::RootStore::open(git_call.project_path(), false)
+                    .map_err(|e| NativeServerError::Service(root("paea-git-call-project-open", e)))?;
+                let result = git_call.check_roots(&store, &project);
+                let closed = project
+                    .close()
+                    .map_err(|e| NativeServerError::Service(root("paea-git-call-project-close", e)));
+                finish(result.map_err(|e| NativeServerError::Service(root("paea-git-call-root", e))), closed)?;
+            }
             let mut document = store
                 .settings()
                 .map_err(|e| NativeServerError::Service(root("settings", e)))?;

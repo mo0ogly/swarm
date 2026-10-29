@@ -568,7 +568,7 @@ fn agent_route_pages_logs_and_terminal_by_cursor() {
     assert!(!serde_json::to_string(&first).unwrap().contains("SECRET-DIGEST"), "no memory digest or content");
     assert_eq!(first["agent"]["resources"]["supervisor"]["state"], "not-recorded");
     let logs = first["logs"]["items"].as_array().unwrap();
-    assert_eq!(logs.len());
+    assert_eq!(logs.len(), TEST_LOG_PAGE_ROWS);
     assert_eq!(logs[0]["message"], "line 0");
     assert_eq!(first["logs"]["more"], true);
     assert!(logs.iter().all(|l| l["message"] != "not lead"));

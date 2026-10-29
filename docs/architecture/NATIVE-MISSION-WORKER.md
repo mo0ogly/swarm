@@ -1184,7 +1184,7 @@ lancés par ce watch ; les agents enregistrés se consultent séparément. Cela 
 clôt ni récupération de processus incohérents, ni ordonnanceur asynchrone complet,
 ni intégration web, ni acceptation globale. Rien n’est installé.
 
-### Rôles indépendants de la boucle de conduite
+### Rôles indépendants de la boucle de conduite — état historique1072
 
 Contrôles, reviewer et planner utilisent un job scoped à la fois, sous Root peer
 et bail réel. Le main continue observation/dispatch et publie après join ; arrêt
@@ -1192,3 +1192,53 @@ et causes sont conservés avant libération du bail. Le report pour worker actif
 est observé indépendamment de la phase. Voir le schéma courant dans
 [Rust migration](RUST-MIGRATION.md). Qualification locale1072 vérifiée ; ni concurrence
 Go complète, ni intégration web ou installation déclarées.
+
+### Rôles concurrents — candidat28octobre
+
+La phase unique ci-dessus est remplacée dans le candidat par trois familles possédées : contrôles, reviewer et planner. Chaque famille conserve son handle jusqu’à jointure ; seuls le main et sa cadence persistée publient les résultats. Le planner attend la libération des contextes workers actifs et respecte provider/pause/échec sauvegardés. Les writers moteur, baux, consentements et budgets gardent leur validation propre. Les trois identités sont le protocole existant, pas un nouveau plafond opérateur.
+
+Six tests ciblés passent, dont barrière à trois threads, panne/panique avec sorties des autres tâches conservées et interruptions propres classées séparément. Ces rapports synthétiques ne prouvent pas un arrêt OS ni une concurrence de fournisseurs. Parcours public, profil normal et installation du candidat restent à vérifier ; aucune clôture globale.
+
+Deux conflits restent distingués : avant claim, une garde de révision plus récente
+impose une nouvelle observation, sans fournisseur. Après claim, seule une porte
+native refusant le contexte périmé AVANT exec peut être observée comme stale,
+après reçu, consommation, feedback et fermeture réussis. Le refus reste une erreur
+pour la commande manuelle. Watch publie le claim conservé et ne transforme pas
+cette observation en permission. La prochaine activation doit satisfaire ses
+gardes et budgets ; aucun remboursement ni masquage des autres erreurs.
+
+```mermaid
+sequenceDiagram
+    participant C as Contrôles / revue
+    participant P as Planificateur
+    participant G as Porte native
+    participant W as Conducteur
+    P->>G: Claim et préparation du contexte
+    C->>C: État courant modifié
+    G-->>P: Contexte périmé, exec refusé
+    P->>P: Reçu + consommation + feedback durables
+    P-->>W: Refus conservé, marqueur privé vivant
+    W->>W: Observation stale, aucune acceptation
+    W->>G: Nouvelle observation sous gardes habituelles
+```
+
+Ce parcours reste candidat tant que sa recette publique n’est pas vérifiée.
+Une fermeture/écriture incertaine, une autre porte refusée ou un fournisseur
+exécuté restent des erreurs bloquantes, même si un arrêt local arrive en parallèle.
+
+### Aides cockpit historiques — préparation vérifiée, raccordement ouvert
+
+Trois projections internes sont compilées et couvertes par28tests : santé3,
+actions10, sources après livraison15. Elles consomment des observations fournies,
+ne lisent pas le stockage et n’accordent ni identité, lancement, fraîcheur ou
+acceptation. La liste des actions exige notamment la vraie raison de dépendance
+non satisfaite ; une dépendance déclarée peut être fraîche. Les sources après
+livraison conservent l’ordre des tâches et la sérialisation Go du contrat, avec
+une erreur explicite si une observation de fraîcheur manque.
+
+`agent list` n’est pas encore raccordé : fenêtre d’agents, données SQL, réglages,
+preuves de revue et préparations doivent être assemblés avec leur vrai producteur.
+Les producteurs natifs de coûts, Work et validation existent déjà et doivent être
+réutilisés. Ces28tests ne prouvent ni le cockpit complet, ni son oracle Go, ni une
+installation. L’absence de mode sauvegardé reste distincte d’une autorisation ;
+la valeur initiale configurable fait l’objet d’une décision utilisateur en attente.

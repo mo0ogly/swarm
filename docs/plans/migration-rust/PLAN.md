@@ -4120,3 +4120,44 @@ Le serveur normal garde la source enrôlée absente. Activation utilisateur sous
 ### Reprise GLM — disponibilité Admin et cache, version228
 
 Livraison locale vérifiée du28octobre : disponibilité du bouton enrôlé réparée,9casJS/27public/44navigateur sur image228, cycle de livraison et15testsPython passent. Panne de preuves de cache prise en charge par validation commune et reconstruction fraîche ; aucune preuve historique inventée. Image/profil/versionFR/EN et état public inchangé vérifiés. Dossier availability-20261028/verification.json, RETEX.md, source-review228 et delivery-tool-review. Les57 contrôles liés sur227 sont réutilisés sous comparaison exacte des entrées Rust/UI, pas réannoncés sur228. Activation réelle toujours distincte ; pas acceptation globale.
+
+### Migration hors PAEA — autonomie du cockpit livrée240
+
+Le28octobre, choix Autonome configurable Admin, priorités du mode de mission et
+absence de consentement implicite livrés en240.9cas UI/20CLI-API/78navigateur,
+plus lecture réelle14Version/16Admin,5Works préservés. Adoption ciblée du
+journal41au48 sans adoption d’autres politiques ; correction générale de la
+présence des groupes indépendants dans Admin. Voir
+[suivi hors PAEA](COMPLETION-HORS-PAEA-20261028.md) et
+[contrat cockpit](../../architecture/COCKPIT-COMPATIBILITY.md).
+Agent list14clés, positif du conducteur sous Biba et clôture R6/R7 demeurent
+ouverts. Aucune clôture globale ni acceptation indépendante revendiquée.
+
+### Premier raccord natif agent list —241
+
+14clés Go/Rust vérifiées pour un Work ordinaire sans tâches/planification/agents ;
+52assertions publiques,4tests de comparateur, profil normal241 installé et lecture
+réelle14Version/16Admin sans POST,5Works préservés. Refus explicites des autres
+états, pas de faux tableaux vides. Revue exacte du delta compilé240→241 :4fichiers,
+4axes et références originales archivées. Suites globales et limites dans le
+[suivi hors PAEA](COMPLETION-HORS-PAEA-20261028.md). Tranche initiale seulement ;
+la migration globale reste ouverte.
+
+Suite cockpit243 — tâchesTODO sans historique/dépendances, pas d’agent ni planning :
+raccordement public Go/Rust vérifié85+15assertions ; comparateur4tests ;
+actions14tests et priorité1test PASS. Profil normal, quatre entrées effectives
+modifiées depuis241, revue liée aux octets4/0ouvert sur ce delta uniquement.
+Installé via prepared-build9bc11252d9c37d1f76f2241325a6f05afee85a804c4e64d11e9aa6475fe909c3 ;
+PID1102767, version243et notesFR/EN/commit/dirty observés,4assets conformes,
+5Works/contrôles/réglages préservés. Échecs de module et fixture GLM originaux
+conservés. Suite horsPAEA dans COMPLETION-HORS-PAEA-20261028.md ; aucun verdict
+global, conducteur Biba et autres états cockpit restent ouverts.
+
+Suite244 — dépendances entre tâchesTODO raccordées : liens, waiting_on, premier
+motif de départ/dérogation, ordre et révision observés ; fraîcheur toujoursfausse
+pourTODO. Go/Rust101+15assertions et5comparateur PASS/intégrité VERIFIED.
+Source-review2/0sur lecteur/notes, actions et ordre15unités réutilisées avec
+empreintes inchangées. Installé244image2d28e0bc7fe061131617ee9c26ceb276bce74b2c36a304d85648b5b57e34015b,
+PID1130985 ;4assets/FR-ENVersion/Admin vérifiés,5Works et contrôles préservés.
+Recette cockpit-dependencies-permanent244, détails et propositionGLM dans suivi
+COMPLETION-HORS-PAEA-20261028. Autres états cockpit et migrationglobale ouverts.

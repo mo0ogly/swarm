@@ -32,6 +32,8 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/paea-linux.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-linux.html"))),
         "/paea-linux.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea-linux.js"))),
         "/paea-lab.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-lab.html"))),
+        "/paea-effects.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-effects.html"))),
+        "/paea-effects.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea-effects.js"))),
         "/paea-lab.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea-lab.js"))),
         "/paea.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea.js"))),
         "/paea.css"=>Some(("text/css; charset=utf-8",include_bytes!("../../../../../web/paea.css"))),

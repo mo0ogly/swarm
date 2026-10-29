@@ -13,6 +13,22 @@ pub struct CostTotal {
     pub attempts_without_cost: i64,
 }
 impl CostTotal {
+    /// Render Go CostTotal.Text using only these already validated observations.
+    /// Missing reports remain explicit, including a partial known sum. Two decimal
+    /// places and USD are the existing wire presentation, never tariff estimation
+    /// or rounded ledger mutation. No IO, reservation or invoice is produced.
+    pub fn text(&self) -> String {
+        if self.attempts_with_cost == 0 {
+            return if self.attempts_without_cost == 0 { "aucune tentative" }
+                else { "coût réel non rapporté" }.into();
+        }
+        let mut text = format!("{:.2} USD rapportés sur {} tentative(s)",
+            self.reported_usd.0, self.attempts_with_cost);
+        if self.attempts_without_cost > 0 {
+            text.push_str(&format!(" · {} sans coût rapporté", self.attempts_without_cost));
+        }
+        text
+    }
     /// Accumulate one retained declaration without rounding, hidden count caps,
     /// price lookup or side effects. Negative/nonfinite inputs, arithmetic and
     /// representation overflow refuse; absence never becomes a reported zero.

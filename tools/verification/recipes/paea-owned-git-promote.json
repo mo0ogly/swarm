@@ -1,0 +1,76 @@
+{
+ "schema_version": 1,
+ "id": "paea-owned-git-promote",
+ "inputs": [
+  "rust/Cargo.toml",
+  "rust/Cargo.lock",
+  ".cargo/config.toml",
+  "rust/crates/swarm-enrollment-authority/**/*",
+  "rust/crates/swarm-enrollment-state/**/*",
+  "rust/crates/swarm-identity-contract/**/*",
+  "rust/crates/swarm-protection-contract/**/*",
+  "rust/crates/swarm-engine/**/*",
+  "tools/verification/recipe.py",
+  "tools/verification/recipes/paea-owned-source-acquisition.json",
+  "docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01/result.json",
+  "docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/current71c-fixture01/result.json"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+  "CARGO_PROFILE_DEV_DEBUG": "0",
+  "CARGO_PROFILE_TEST_DEBUG": "0",
+  "CARGO_INCREMENTAL": "0",
+  "RUSTDOCFLAGS": "-D warnings",
+  "SWARM_PAEA_WRITER_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01",
+  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01",
+  "SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/current71c-fixture01"
+ },
+ "steps": [
+  {
+   "id": "promote-commit-replay-reconcile-and-recovery",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--test",
+    "paea_git_promote_call",
+    "--",
+    "--ignored",
+    "--test-threads=1"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "test promote_call_current_authority_commits_once_and_records_effect ... ok",
+    "test promote_call_replays_recorded_effect_and_reconciles ... ok",
+    "test promote_call_reconcile_before_commit_reports_not_committed ... ok",
+    "test promote_call_refuses_other_service_root_without_effect ... ok",
+    "4 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "promote-module-rustdoc-contracts",
+   "command": [
+    "cargo",
+    "doc",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--no-deps"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [],
+   "required_stderr": [
+    "Generated"
+   ]
+  }
+ ]
+}

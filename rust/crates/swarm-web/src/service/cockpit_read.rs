@@ -7,6 +7,11 @@ impl NativeHttpService {
     /// GET/HEAD only; duplicate/unknown/unsafe query data refuse before IO. Checks
     /// Work existence, returns saved budget observations and a deliberately narrow
     /// agent projection (no prompts, command, environment, workspace or contexts).
+    /// Adds one additive narrow autonomy_observation field for cockpit
+    /// consumption: the recorded initial autonomy choice, its source
+    /// ("mission", "installation" or "not_configured"), the settings revision
+    /// and the newest-consent flag; launch_authorized stays false and
+    /// schema_version stays 1 with budget and agents unchanged.
     /// Missing budget stays null (unlimited, figures unavailable), not zero costs.
     /// Recorded states/links are neither authenticated identity nor live probes.
     /// No reservations, visits, agents or providers start. Read/encode/close errors
@@ -29,12 +34,13 @@ impl NativeHttpService {
             store.read_work(&work).map_err(|cause| root("read", cause))?;
             let budget = store.work_budget_state(&work).map_err(|cause| root("budget-read", cause))?;
             let agents = store.list_agents(&work).map_err(|cause| root("agents-read", cause))?;
+            let autonomy = store.read_cockpit_autonomy(&work).map_err(|cause| root("autonomy-read", swarm_engine::RootStoreError::Mutation(swarm_engine::WorkEngineError::Mission(Box::new(cause)))))?;
             let agents: Vec<_> = agents.iter().map(|a| serde_json::json!({
                 "id":a.id,"work_id":a.work_id,"task_id":a.task_id,"attempt_id":a.attempt_id,
                 "status":a.status,"provider":a.provider,"role":a.role,"parent":a.parent,
                 "previous":a.previous,"started":a.started,"ended":a.ended
             })).collect();
-            serde_json::to_vec(&serde_json::json!({"schema_version":1,"work_id":work,"budget":budget,"agents":agents}))
+            serde_json::to_vec(&serde_json::json!({"schema_version":1,"work_id":work,"budget":budget,"agents":agents,"autonomy_observation":autonomy}))
                 .map(RouteBody::plain).map_err(E::ResponseJson)
         })();
         close(result, store.close())

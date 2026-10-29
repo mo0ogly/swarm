@@ -51,6 +51,7 @@ pub(crate) fn seccomp()->io::Result<()> {
         libc::SYS_pidfd_getfd,libc::SYS_mount,libc::SYS_umount2,libc::SYS_pivot_root,
         libc::SYS_chroot,libc::SYS_setns,libc::SYS_unshare,libc::SYS_open_by_handle_at,
         libc::SYS_io_uring_setup,libc::SYS_bpf,libc::SYS_perf_event_open,
+        libc::SYS_add_key,libc::SYS_request_key,libc::SYS_keyctl,
         libc::SYS_fchmod,libc::SYS_fchmodat,libc::SYS_fchmodat2,
         libc::SYS_fchown,libc::SYS_fchownat,libc::SYS_utimensat,
         libc::SYS_setxattr,libc::SYS_lsetxattr,libc::SYS_fsetxattr,
@@ -59,9 +60,14 @@ pub(crate) fn seccomp()->io::Result<()> {
     #[cfg(target_arch="x86_64")]
     for n in [libc::SYS_chmod,libc::SYS_chown,libc::SYS_lchown,libc::SYS_utime,libc::SYS_utimes,libc::SYS_futimesat] {f.extend([ins(0x15,0,1,n as u32),ins(0x06,0,0,deny)]);}
     // An outside Unix service must not become a same-UID authority bypass.
-    f.extend([ins(0x15,0,3,libc::SYS_socket as u32),ins(0x20,0,0,16),ins(0x15,0,1,libc::AF_UNIX as u32),ins(0x06,0,0,deny),ins(0x20,0,0,0)]);
+    // Datagram socketpairs can reconnect to an outside pathname service too.
+    for syscall in [libc::SYS_socket, libc::SYS_socketpair] {
+        f.extend([ins(0x15,0,3,syscall as u32),ins(0x20,0,0,16),ins(0x15,0,1,libc::AF_UNIX as u32),ins(0x06,0,0,deny),ins(0x20,0,0,0)]);
+    }
     let branch=f.len();f.push(ins(0x15,0,0,libc::SYS_ioctl as u32));f.push(ins(0x20,0,0,24));
-    for request in [libc::FIONREAD as u32,libc::FIONBIO as u32,libc::TCGETS as u32,libc::TIOCGWINSZ as u32] {f.extend([ins(0x15,0,1,request),ins(0x06,0,0,0x7fff0000)]);}
+    // FIOCLEX only sets FD_CLOEXEC: CPython requires it to open its script.
+    // It neither clears CLOEXEC nor grants a filesystem/device capability.
+    for request in [libc::FIOCLEX as u32,libc::FIONREAD as u32,libc::FIONBIO as u32,libc::TCGETS as u32,libc::TIOCGWINSZ as u32] {f.extend([ins(0x15,0,1,request),ins(0x06,0,0,0x7fff0000)]);}
     f.push(ins(0x06,0,0,deny));f[branch].jf=(f.len()-branch-1) as u8;
     f.push(ins(0x06,0,0,0x7fff0000));
     let program=libc::sock_fprog{len:f.len() as u16,filter:f.as_mut_ptr()};

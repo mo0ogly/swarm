@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "id": "paea-delivered-chain-cli-rust",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-cli/src/**/*",
+    "rust/crates/swarm-cli/tests/paea_promote.rs",
+    "rust/crates/swarm-engine/src/**/*",
+    "rust/crates/swarm-enrollment-*/src/**/*",
+    "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+    "rust/crates/swarm-identity-contract/src/**/*",
+    "rust/crates/swarm-protection-contract/src/**/*",
+    "tools/verification/recipe.py",
+    "bin/swarm",
+    "docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-chain-test-20261029T161350Z/source-fixture-regen/result.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-chain-test-20261029T161350Z/source-fixture-regen",
+    "SWARM_PAEA_DELIVERED_BIN": "{root}/bin/swarm",
+    "SWARM_PAEA_DELIVERED_BIN_SHA256": "47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a"
+  },
+  "steps": [
+    {
+      "id": "promote-cli-delivered-chain-transfer-promote-replay-reconcile-once",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_promote",
+        "delivered_chain_transfer_promote_replay_reconcile_once",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "delivered_chain_transfer_promote_replay_reconcile_once ... ok",
+        "1 passed; 0 failed",
+        "delivered-binary-witness path=",
+        "sha256=47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "promote-cli-shared-root-guard-sensitivity",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_promote",
+        "shared_project_root_guard_admits_one_holder_at_a_time",
+        "--message-format=json",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "shared_project_root_guard_admits_one_holder_at_a_time ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "promote-cli-delivered-binary-wrong-sha-refusal",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_promote",
+        "delivered_binary_refuses_wrong_sha256_witness",
+        "--message-format=json",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "delivered_binary_refuses_wrong_sha256_witness ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

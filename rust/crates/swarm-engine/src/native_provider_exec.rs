@@ -1,5 +1,9 @@
 //! Shared helper-side exec transport. It supplies no identity or permission.
 #![cfg(target_os = "linux")]
+#[path = "native_provider_biba.rs"]
+mod biba;
+pub(crate) use biba::{output_workspace, OutputRole};
+pub(crate) use biba::{prepare as prepare_boundary, enforce as enforce_boundary, close as close_boundary};
 use crate::{root_store::finished as finish, AgentLaunchError, Provider, RootStoreError as E};
 use std::{
     collections::BTreeSet,
@@ -8,7 +12,7 @@ use std::{
     ffi::CString,
     fs::File,
     io::{Seek, SeekFrom, Write},
-    os::unix::ffi::OsStrExt,
+    os::{fd::AsRawFd, unix::ffi::OsStrExt},
     path::{Path, PathBuf},
 };
 
@@ -27,6 +31,7 @@ pub(crate) struct PreparedExec {
     args: Vec<CString>,
     environment: Vec<CString>,
     workspace: PathBuf,
+    workspace_identity: Option<(u64, u64)>,
 }
 impl PreparedExec {
     /// Encode exact CLI arguments, observe only the supplied validated environment
@@ -76,6 +81,14 @@ impl PreparedExec {
             MemfdFlags::CLOEXEC | MemfdFlags::ALLOW_SEALING,
         )
         .map_err(|e| caused("agent-execution-input-create", e))?;
+        // A helper can intentionally close stdin before transport preparation.
+        // Keep the owned memfd outside stdio so attach/close cannot close fd0.
+        let fd = if fd.as_raw_fd() < 3 {
+            let high = rustix::io::fcntl_dupfd_cloexec(&fd, 3)
+                .map_err(|e| caused("agent-execution-input-relocate", e));
+            finish(high, nix::unistd::close(fd)
+                .map_err(|e| caused("agent-execution-input-close", e)))?
+        } else { fd };
         let mut input = File::from(fd);
         let fill = (|| {
             input
@@ -103,7 +116,16 @@ impl PreparedExec {
             args,
             environment,
             workspace: workspace.to_owned(),
+            workspace_identity: None,
         })
+    }
+
+    /// Attach the private gate's current workspace observation, never a caller
+    /// authority tuple. The consuming Linux profile compares its pinned inode
+    /// before granting output access. Missing/mismatched observations refuse.
+    pub(crate) fn with_workspace_identity(mut self, identity: (u64, u64)) -> Self {
+        self.workspace_identity = Some(identity);
+        self
     }
 
     /// Append engine-computed variables (LIVE-UX-03 telemetry exporter) after all
@@ -162,21 +184,30 @@ impl PreparedExec {
     /// argv and observed environment. Requires an independently checked committed
     /// gate, current identity/policy/source receipts and closed Root. This function
     /// cannot establish those preconditions itself and is never a public JSON API.
+    /// Require the validated Root and an attributed isolated I0 workspace. Prepare
+    /// and enforce the mandatory Linux boundary; no unconfined fallback exists.
     /// Changes cwd and fd0 only in the consuming helper, then calls execve directly
     /// without ENOEXEC shell fallback or PATH search. Successful exec never returns.
     /// All returning paths preserve setup/close/kernel failures; cwd/fd0 changes
     /// are not restored because the refusing helper must exit. It accepts no task.
-    pub(crate) fn execute(self) -> Result<Infallible, E> {
-        let setup = std::env::set_current_dir(&self.workspace)
-            .map_err(|e| caused("agent-execution-workspace-enter", e))
-            .and_then(|()| {
-                rustix::stdio::dup2_stdin(&self.input)
-                    .map_err(|e| caused("agent-execution-input-attach", e))
-            });
-        finish(
+    pub(crate) fn execute(self, root: &Path) -> Result<Infallible, E> {
+        let Some(identity) = self.workspace_identity else {
+            return finish(Err(E::Refused("agent-execution-workspace-witness-required")), self.close());
+        };
+        let sandbox = match biba::prepare(root, &self.workspace, identity) {
+            Ok(sandbox) => sandbox,
+            Err(error) => return finish(Err(error), self.close()),
+        };
+        let setup = rustix::stdio::dup2_stdin(&self.input)
+            .map_err(|e| caused("agent-execution-input-attach", e));
+        let attached = finish(
             setup,
             nix::unistd::close(self.input).map_err(|e| caused("agent-execution-input-close", e)),
-        )?;
+        );
+        if let Err(error) = attached {
+            return finish(Err(error), biba::close(sandbox));
+        }
+        biba::enforce(sandbox)?;
         nix::unistd::execve(&self.path, &self.args, &self.environment)
             .map_err(|e| caused("agent-provider-exec", e))
     }

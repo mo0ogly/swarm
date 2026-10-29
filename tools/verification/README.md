@@ -1160,15 +1160,24 @@ simple décompte de tests. Les sources/profils65 et124 restent distincts.
 texte/JSON/alias/refus et l’absence de création du Root. Fournir les variables
 `SWARM_STATUS_CONTRACT_BINARY` et `SWARM_STATUS_CONTRACT_PROFILE` vers un binaire
 figé qualifié et son profil exact ; la recette ne compile et n’installe rien.
-Le build explicite `tools/rust-migration/build_native.py` prépare séparément un
-candidat avec faits Git/date compilés et preuve de consommation. La présence et
-l’empreinte `native_build_metadata` du profil lient une entrée déclarée : elles
-ne prouvent seules ni consommation, ni authenticité.
+Le garde de refus vérifie qu’aucune valeur sensible passée en argv n’est renvoyée :
+chaque appel de refus utilise un jeton unique par exécution (dérivé de l’empreinte
+du binaire) et exige son absence exacte de stderr ; les placeholders de
+documentation de l’usage statique (ex. «PRIVATE_ANCHOR») ne sont pas un écho
+d’entrée et ne déclenchent plus le garde. Le build explicite
+`tools/rust-migration/build_native.py` prépare séparément un candidat avec faits
+Git/date compilés et preuve de consommation. La présence et l’empreinte
+`native_build_metadata` du profil lient une entrée déclarée : elles ne prouvent
+seules ni consommation, ni authenticité.
 
 `native-version-public.json` requires an exact frozen qualified binary/profile
 in `SWARM_STATUS_CONTRACT_BINARY` and `SWARM_STATUS_CONTRACT_PROFILE`. It verifies
 metadata guards, cold text/JSON/alias/refusal and no Root creation without building
-or installing. `build_native.py` separately produces a native candidate with
+or installing. The refusal guard checks that no sensitive argv value is echoed
+back: each refusal call uses a run-unique token (derived from the binary digest)
+and requires its exact absence from stderr; static usage-text placeholders
+(e.g. «PRIVATE_ANCHOR») are documentation, not an input echo, and no longer trip
+the guard. `build_native.py` separately produces a native candidate with
 observed Git/date facts and actual compiled-consumption proof. Metadata presence/
 hash alone establish neither consumption nor authenticity.
 
@@ -2292,3 +2301,256 @@ The pack recipe also reuses two existing common diagnostic regressions: the
 direct/launch/custom-IO/Root-cleanup wrapper matrix and transparent typed IO source
 with redaction. This extension is justified by the new shared native_error_links
 handler, beyond the pack-specific primary/secondary channel witness.
+
+
+Owned source lane: `recipes/paea-native-git-source.json` requires the immutable
+`SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE` for the six binding/format cases and a
+separate newly owned `SWARM_PAEA_SOURCE_FIXTURE` produced by
+`rust_native_first_publication.py --binary IMAGE --profile PROFILE --output NEW`.
+The source case checks actual shared-lane writer contention, retained custody
+after repository-capability close, wrong Root/candidate, bare and lock inode
+substitution/refusal/restoration, explicit source close/writer recovery and
+unchanged project DB bytes. One fresh source case plus six binding cases, strict
+Rustdoc. Binding-only recipe filters git_repository_ so it does not mutate or
+require the source fixture. No transfer/grant/ref effect or child lifecycle is
+proved by this guard.
+
+
+Source writer/context: `recipes/paea-native-git-source-context.json` requires
+immutable71 via SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE and a newly owned native
+first-publication fixture via BOTH SWARM_PAEA_WRITER_FIXTURE and
+SWARM_PAEA_SOURCE_FIXTURE. Steps are sequential because the final public-settings
+case durably advances that fixture's configuration history. One named lib-unit
+case checks no/read/write transaction, nested observer refusal without losing the
+writer, independent SQLITE_BUSY and rollback/recovery. Eight normal-library
+integration cases include the seven source/binding controls and a public no-policy-
+change settings preview/apply, same-candidate old-source refusal, fresh-source
+recovery and reopen persistence. Unit and normal-library evidence stay separate;
+this provides no business grant, pack transfer or protected ref effect.
+
+
+Private pack files: `recipes/paea-private-pack-files.json` runs four named
+lib-unit cases: exclusive directory/revision refusal, link rejection/recovery,
+real Git export/import with retained staging directory after rename, and pack
+inode substitution/refusal/recovery. Real commit identity, digest/size, unchanged
+refs and empty lookalike staging path are asserted. Files and source/destination
+handles stay owned through actual runner reap, then checked close leaves artifacts
+on disk. Unit cfg(test) coverage is not a production service/job-lifecycle proof;
+strict Rustdoc and separately qualified normal profile remain required.
+
+
+Owned Git object preparation: `recipes/paea-owned-git-transfer.json` runs three
+retained-child recovery adapter units and three job units against an explicit
+read-only genuine publication fixture. Real candidate object import/no ref
+mutation, first refusal/new-job recovery/source lane lifetime, and refused close
+with a real Child attached to a synthetic error are separate named cases.
+Synthetic attachment tests ownership adapters, not natural runner fault injection.
+All are cfg(test) units; production profile and protected service acceptance are
+separate. Strict Rustdoc is included; unknown wrappers/lost ownership stay open.
+
+Recovery includes actual external waitpid → ECHILD (no forged reap receipt),
+and an unsupported mutable wrapper whose read-only source still blocks release.
+
+The three job cases run sequentially: they share a read-only genuine source,
+and the exclusive source-lane witness must not race another test's valid guard.
+
+The recovery matrix includes the actual managed Git producer's Root → launch →
+GitReport Process → ValidationRunError chain, plus a separate GitPackError
+envelope case. Child attachment is synthetic with a real process; neither case
+claims a naturally injected production failure. Seven distinct units total.
+
+
+Owned source acquisition: `recipes/paea-owned-source-acquisition.json` runs seven
+sequential job units (four new Pending builder cases, three ready-source legacy
+compatibility cases), the actual-source writer unit, the normal-library source
+custody/rebinding SDK case and strict Rustdoc. New cases check Pending before any
+native observation, actual source import and service-root staging, refused initial
+observation/new-job recovery, real Child attached to a synthetic initial error,
+existing staging preservation and wrong-service refusal. The old ready-source job
+constructor is cfg(test) only. Recovery adapter and pack-envelope proofs from80
+remain reusable while their exact source inputs are unchanged; no protected service
+or complete lifecycle claim for unrelated legacy observers follows from this.
+
+
+Run this acquisition recipe under the cooperative local build lock when another
+session edits shared sources; release it before the launcher. An added compiler
+module after the declared inventory refuses closure even if all named tests pass.
+The normal source SDK performs reversible bare/lock substitutions in our inert
+fixture, restores originals before checking each observation, and checks DB bytes;
+this is not a filesystem-read-only test. Job source observations remain read only.
+
+The recipe now also includes the Root FS-only factory (eight job cases total) and
+normal-library object-format compatibility. A real malformed bare permits pure
+Pending construction, then refuses its native check inside the owner before pack
+writes, followed by restoration and a newly owned valid recovery job. Eleven
+named cases total: nine unit, two normal SDK. Public legacy provision/open are
+separate; the protected factory never calls their native observation-first path.
+
+
+PAEA input inventories retain the whole swarm-biba-linux crate, including new
+transitive modules such as kernel.rs, instead of just Cargo.toml/lib.rs. This
+expands declared source retention without changing recipe commands or policy.
+Historical evidence is not rewritten; the new dependency graph needs fresh proof.
+A passing declared-input run alone cannot bind an undeclared compiler input.
+
+
+For concurrent source work, run the source-acquisition contract with
+`python3 tests/paea_source_acquisition_inventory.py --recipe tools/verification/recipes/paea-owned-source-acquisition.json --output FRESH_DIRECTORY`.
+It freezes current candidates, compiles unit/normal-SDK targets without running
+cases, validates their actual workspace depfiles against prebound bytes using the
+native profiler, then invokes the existing recipe runner on explicit frozen paths.
+Actual new/changed compiled inputs still refuse; later unrelated file births are
+not silently treated as compiler inputs or admitted from a cache. The wrapper
+retains methods, environment, depfiles, argv, executable hashes and original recipe;
+no-run never counts as functional PASS. It introduces no global test watchdog.
+The read-only Root counterexample is retained separately; the final twelve named
+cases include actual mode refusal before staging and execution. Test-only ready
+constructors, normal code and protected service acceptance remain distinguished.
+
+
+Delivered-binary composed chain: `recipes/paea-delivered-chain-cli-rust.json`
+runs the `delivered_chain_transfer_promote_replay_reconcile_once` case, the
+shared-root guard sensitivity and the wrong-SHA refusal guard. The harness
+defaults to `CARGO_BIN_EXE_swarm-rust` and is unchanged without the override;
+when the explicit test environment sets `SWARM_PAEA_DELIVERED_BIN`, all four
+chain spawns — the public two-phase `paea transfer-call` preparation, the two
+guarded promotion preparations and the public `reconcile-effects` call — spawn
+that one externally designated file, re-proving its SHA-256 against the
+mandatory `SWARM_PAEA_DELIVERED_BIN_SHA256` witness at every spawn and printing
+a `delivered-binary-witness` line per spawn. `bin/swarm` and its expected hash
+are declared recipe inputs, compared before and after. The transfer step runs
+the same two-phase public CLI operation (`paea transfer-call`) with the exact
+permission-provisioning and fixture-enrollment pattern of the transfer harness,
+never a direct engine-library call. A separate plain-lot case proves that a
+designated binary whose actual hash differs from its witness refuses before any
+spawn. This proves the composed transfer→promotion→replay→reconciliation
+behavior of the designated binary's CLI on isolated owned fixtures; it does not
+prove build-profile qualification, delivery provenance of the file, service
+installation, UID separation or any accepted live mission.
+
+Chaîne composée sur binaire livré : la recette `paea-delivered-chain-cli-rust`
+exécute le cas `delivered_chain_transfer_promote_replay_reconcile_once`, la
+sensibilité du garde de racine partagée et le garde de refus de mauvaise
+empreinte. Le harnais garde `CARGO_BIN_EXE_swarm-rust` par défaut, sans
+surcharge ; quand l'environnement de test explicite pose
+`SWARM_PAEA_DELIVERED_BIN`, les quatre spawns de la chaîne — préparation
+publique deux-phases `paea transfer-call`, deux préparations de promotion
+gardées et appel public `reconcile-effects` — pointent ce seul fichier externe
+désigné, dont le SHA-256 est reposé à chaque spawn contre le témoin obligatoire
+`SWARM_PAEA_DELIVERED_BIN_SHA256`, avec une ligne `delivered-binary-witness`
+par spawn. `bin/swarm` et son empreinte attendue sont des entrées preuve
+déclarées, comparées avant et après. Le transfert passe par la même opération
+CLI publique deux-phases (`paea transfer-call`) avec le motif exact de
+provision de permission et d'enrôlement fixture du harnais transfert, jamais
+par un appel direct à la bibliothèque moteur. Un cas séparé du lot simple prouve
+qu'un binaire désigné dont l'empreinte réelle diffère du témoin refuse avant
+tout spawn. Cela prouve le comportement composé
+transfert→promotion→rejeu→rapprochement du CLI du binaire désigné sur fixtures
+isolées possédées ; cela ne prouve ni la qualification du profil de
+compilation, ni la provenance de livraison du fichier, ni l'installation du
+service, la séparation UID ou une mission vivante acceptée.
+
+
+Delivered-binary fictitious settlement chain: `recipes/paea-delivered-settlement-cli-rust.json`
+runs the second domain (separate fictitious ledger) through the same one
+designated delivered ELF. With fresh isolated owned project/ledger roots and the
+fictitious debt provisioned through the documented library initialization
+(`paea_initialize_settlement`, never first-request adoption), the composed case
+`delivered_settlement_commit_replay_reconcile_once` exercises the guarded public
+CLI `paea settlement-call commit` twice plus the read-only `paea
+reconcile-effects` call, all three business spawns on the externally designated
+`SWARM_PAEA_DELIVERED_BIN`, re-proving its SHA-256 against the mandatory
+`SWARM_PAEA_DELIVERED_BIN_SHA256` witness at every spawn (one
+`delivered-binary-witness` line per spawn, plus the printed spawn argv). The
+assertions check the actual producer semantics, not an invented receipt shape:
+exactly one durable `paea_settlement_effects` row whose receipt binds the
+invoice, the unchanged provisioned debt terms and the canonical payment action;
+the identical second commit replays `replayed=true` with the same
+`intent_id`/`action_digest` and no second row or debt change; the reconciliation
+report is `settlement.state=consistent`, `effectCount=1`, `verified=true` bound
+to that intent, and `git.state=uninitialized` on the project root never
+configured for Git. The refusal case
+`delivered_settlement_refuses_bad_frame_without_consumption` proves a wrong
+private frame refuses through the designated binary before any consumption, with
+Trust state, effect count and debt unchanged. Without the override the harness
+still runs `CARGO_BIN_EXE_swarm-rust`, unchanged. The revocation case
+`delivered_settlement_revoked_current_authority_refuses_without_effect_then_recovers`
+opens one real window between the prepared event and the private frame through the
+promote-motif `invoke_between`: a public project `config-apply` disabling the effect
+identity makes the still-signed grant refuse `paea-settlement-trust-revision`, then
+`paea-settlement-effect-role` with a revision-matched grant, each time with no effect
+row and the provisioned debt intact; the public restore recovers with exactly one
+fresh `recorded` consumption and a `consistent` reconciliation journal. Fictitious
+SQLite effects
+only: no real payment, live database, UID separation, human presence or accepted
+service; authority stays the explicitly simulated fixture enrollment, and
+build-profile qualification and delivery provenance remain separately retained.
+The contention case
+`delivered_settlement_two_cli_instances_same_business_terms_single_effect`
+proves ledger business uniqueness under two genuinely contending normal CLI
+instances: both public `settlement-call commit` processes concurrently prepare
+the SAME provisioned debt (same terms, same request document, same current
+fixture authority, simultaneously live preparations witnessed by distinct
+`root_digest`s and one identical canonical `action_digest`), then consume their
+private frames after an explicit harness barrier (`std::sync::Barrier`, no
+sleep or assumed ordering). Exactly one business effect is admissible whichever
+side wins the race: the loser either replays the exact same durable `intent_id`
+(`replayed=true`) or refuses explicitly — two distinct effects or zero effects
+fail the test — and the public reconciliation journal stays `consistent` with
+`effectCount=1`, the exact provisioned terms and the debt settled once, also
+read through SQLite connections opened read-only separately from the CLI. No
+UID separation, real payment or independent acceptance is claimed by this case.
+
+Chaîne de règlement fictif sur binaire livré : la recette
+`recipes/paea-delivered-settlement-cli-rust.json` exécute le second domaine
+(grand livre fictif séparé) à travers le même ELF livré désigné. Avec des racines
+projet/grand livre fraîches isolées possédées et la dette fictive provisionnée
+par l'initialisation documentée (`paea_initialize_settlement`, jamais une
+adoption de première demande), le cas composé
+`delivered_settlement_commit_replay_reconcile_once` exerce le CLI public gardé
+`paea settlement-call commit` deux fois plus l'appel lecture seule `paea
+reconcile-effects`, les trois spawns métier sur le fichier externe désigné
+`SWARM_PAEA_DELIVERED_BIN`, dont le SHA-256 est reposé à chaque spawn contre le
+témoin obligatoire `SWARM_PAEA_DELIVERED_BIN_SHA256` (une ligne
+`delivered-binary-witness` par spawn, plus l'argv affiché). Les assertions
+vérifient la sémantique réelle du producteur, pas une forme de reçu inventée :
+exactement une ligne durable `paea_settlement_effects` dont le reçu lie la
+facture, les termes de dette provisionnés inchangés et l'action de paiement
+canonique ; le second commit identique rejoue `replayed=true` avec le même
+`intent_id`/`action_digest` sans seconde ligne ni changement de dette ; le
+rapport de rapprochement vaut `settlement.state=consistent`, `effectCount=1`,
+`verified=true` lié à cette intention, et `git.state=uninitialized` sur la
+racine projet jamais configurée pour Git. Le cas de refus
+`delivered_settlement_refuses_bad_frame_without_consumption` prouve qu'une frame
+privée erronée refuse via le binaire désigné avant toute consommation, avec
+état Trust, compteur d'effets et dette inchangés. Sans surcharge, le harnais
+garde `CARGO_BIN_EXE_swarm-rust`, inchangé. Le cas de révocation
+`delivered_settlement_revoked_current_authority_refuses_without_effect_then_recovers`
+ouvre une fenêtre réelle entre l'événement préparé et la trame privée via
+`invoke_between` (motif promote) : un `config-apply` public sur le projet
+désactivant l'identité d'effet fait refuser le grant encore signé avec
+`paea-settlement-trust-revision`, puis `paea-settlement-effect-role` avec un
+grant lié à la révision révoquée, chaque fois sans ligne d'effet et avec la
+dette provisionnée intacte ; la restauration publique rétablit exactement une
+consommation `recorded` fraîche et un journal de rapprochement `consistent`.
+Effets SQLite fictifs seulement :
+aucun paiement réel, base vivante, séparation UID, présence humaine ou service
+accepté ; l'autorité reste l'enrôlement fixture explicitement simulé, et la
+qualification du profil de compilation et la provenance de livraison restent
+conservées séparément. Le cas de contention
+`delivered_settlement_two_cli_instances_same_business_terms_single_effect`
+prouve l'unicité métier du grand livre sous deux instances CLI normales
+réellement concurrentes : les deux processus publics `settlement-call commit`
+préparent simultanément LA MÊME dette provisionnée (mêmes termes, même
+document de requête, même autorité fixture courante, préparations vivantes
+simultanées attestées par des `root_digest` distincts et un `action_digest`
+canonique identique), puis consomment leurs trames privées après une barrière
+de harnais explicite (`std::sync::Barrier`, aucune temporisation ni ordre
+supposé). Un seul effet métier est admissible, quel que soit l'ordre gagnant :
+le perdant rejoue exactement le même `intent_id` durable (`replayed=true`) ou
+refuse explicitement — deux effets distincts ou zéro effet échouent au test —
+et le journal de rapprochement public reste `consistent` avec `effectCount=1`,
+les termes provisionnés exacts et la dette réglée une seule fois, lus aussi par
+des connexions SQLite lecture seule distinctes du CLI. Aucune preuve de
+séparation UID, de paiement réel ou d'acceptation indépendante n'est revendiquée
+par ce cas.

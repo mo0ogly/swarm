@@ -7,8 +7,76 @@
     },
     "items": [
       {
+        "fr": "PAEA : consommateur CLI gardé du settlement call — « swarm-rust paea settlement-call commit|reconcile PROJECT LEDGER DECLARATION --input REQUESTFILE » : PROJECT ouvert en premier (fence IMMEDIATE du plan), LEDGER consommateur en second, témoins tenus pendant la préparation, événement public « paea-settlement-prepared » (authority:false, restart_reusable:false), trame privée stdin swarm-trust-source-v1 (secret jamais émis), consommation réelle ledger.call_paea_settlement sous autorité tenue — commit = un effet de grand livre exact (recorded/replayed), reconcile = lecture pure (reconciled_not_committed) ; refus de trame/entrée/démarrage avant toute consommation, fermetures appariées causes chaînées. Qualification locale : aucun service accepté.",
+        "en": "PAEA: guarded CLI consumer of the settlement call — \"swarm-rust paea settlement-call commit|reconcile PROJECT LEDGER DECLARATION --input REQUESTFILE\": PROJECT opened first (IMMEDIATE plan fence), consuming LEDGER second, witnesses held through preparation, public \"paea-settlement-prepared\" event (authority:false, restart_reusable:false), private swarm-trust-source-v1 stdin frame (secret never emitted), real ledger.call_paea_settlement consumption under held authority — commit = one exact ledger effect (recorded/replayed), reconcile = pure journal read (reconciled_not_committed); frame/input/startup refusals before any consumption, paired closes with chained causes. Local qualification: no accepted service."
+      },
+      {
+        "fr": "PAEA : observation de capacité web du git-call — « GET /api/v1/paea/git-call », vue « paea-git-call-status » (bound:false explicite sans source liée, sinon capacité publique de démarrage) sous la même garde session ; aucune consommation de l'appel préparé one-shot, aucun IO de racine, aucun secret ; distinction configuré/appliqué/observé. Qualification locale : aucun service accepté.",
+        "en": "PAEA: web capability observation for the git-call — \"GET /api/v1/paea/git-call\", \"paea-git-call-status\" view (explicit bound:false with no bound source, otherwise public startup capability) behind the same session guard; no consumption of the one-shot prepared call, no Root IO, no secret; configured/applied/observed distinguished. Local qualification: no accepted service."
+      },
+      {
+        "fr": "PAEA : consommateur web gardé du transfer/promote call — « POST /api/v1/paea/git-call?call=transfer|promote », extension du mécanisme single-intent enrôlé (header « Authorization: Enrollment », corps = octets canoniques exacts comparés à action_digest) ; racine projet = entrée startup de confiance, jamais un champ de requête ; bind comparant les DEUX témoins préparés aux racines réellement ouvertes avant publication de session, sans remplacer le recheck moteur ; consommation one-shot avec fermetures appariées sans perte de cause ; sans source liée, refus sans consommation. Qualification locale : aucun service accepté.",
+        "en": "PAEA: guarded web consumer for the transfer/promote call — \"POST /api/v1/paea/git-call?call=transfer|promote\", extension of the enrolled single-intent mechanism (\"Authorization: Enrollment\" header, body = exact canonical bytes compared with action_digest); project root = trusted startup input, never a request field; bind comparing BOTH prepared witnesses against the roots actually opened before session publication, never replacing the engine recheck; one-shot consumption with paired closes losing no cause; without a bound source, refusal with no consumption. Local qualification: no accepted service."
+      },
+      {
+        "fr": "PAEA : consommateur CLI gardé de promotion de référence — « swarm-rust paea promote-call commit|reconcile SERVICE PROJECT WORK CHILD PIN DECLARATION --input DEMANDE.json », même motif deux phases interactives que le transfer call ; opération protocolaire explicite, résultat différencié « recorded »/« reconciled_not_committed » (négatif explicite, jamais un succès vide) ; pour commit, transaction de ref réelle avec OLD exact après transfert qualifié préalable. Qualification locale : aucun service accepté.",
+        "en": "PAEA: guarded CLI consumer for reference promotion — \"swarm-rust paea promote-call commit|reconcile SERVICE PROJECT WORK CHILD PIN DECLARATION --input REQUEST.json\", same interactive two-phase pattern as the transfer call; explicit protocol operation, differentiated \"recorded\"/\"reconciled_not_committed\" outcome (explicit negative, never an empty success); for commit, real ref transaction with exact OLD after a prior qualified transfer. Local qualification: no accepted service."
+      },
+      {
+        "fr": "PAEA : consommateur CLI gardé du transfer call — « swarm-rust paea transfer-call SERVICE PROJECT WORK CHILD PIN STAGING DECLARATION --input DEMANDE.json », deux phases interactives (préparation publique avec permission exacte liée au nonce, provisionnement hors bande, frame privée stdin « swarm-trust-source-v1 »), consommation one-shot native avec recheck des témoins, opération Reconcile sans effet ref. Qualification locale : aucun service accepté.",
+        "en": "PAEA: guarded CLI consumer for the transfer call — \"swarm-rust paea transfer-call SERVICE PROJECT WORK CHILD PIN STAGING DECLARATION --input REQUEST.json\", interactive two phases (public preparation with nonce-bound exact permission, out-of-band provisioning, private stdin frame \"swarm-trust-source-v1\"), one-shot native consumption with witness recheck, Reconcile operation with no ref effect. Local qualification: no accepted service."
+      },
+      {
+        "fr": "PAEA : consommateur web du vérificateur PA-09 — « GET /api/v1/paea/reconcile-effects », lecture seule sans effet ni autorité, session authentifiée ; réglage v49 « paea_settlement_ledger_root » désignant la racine du grand livre séparé (validation de forme, adoption explicite exigée) ; 501 sans réglage, 409 racine partagée, rapport uninitialized explicite. Admin : champ dans « Stockage et Git » et étiquettes d'erreur FR ; traductions EN manquantes corrigées. Qualification locale : aucun service accepté.",
+        "en": "PAEA: web consumer for the PA-09 verifier — \"GET /api/v1/paea/reconcile-effects\", read-only with no effect and no authority, authenticated session; setting v49 \"paea_settlement_ledger_root\" designating the separate ledger root (shape validation, explicit adoption required); 501 without a setting, 409 shared root, explicit uninitialized report. Admin: field in \"Stockage et Git\" with FR error labels; missing EN translations fixed. Local qualification: no accepted service."
+      },
+      {
+        "fr": "PAEA : consommateur CLI du vérificateur PA-09 — « swarm-rust paea reconcile-effects LEDGER --root RACINE --json », lecture seule sans effet ni autorité ; garde de séparation exigeant deux racines physiquement distinctes, binding old_oid de l'intention durable au reçu de promotion. Qualification locale : aucun service accepté.",
+        "en": "PAEA: CLI consumer for the PA-09 verifier — \"swarm-rust paea reconcile-effects LEDGER --root ROOT --json\", read-only with no effect and no authority; separation guard requiring two physically distinct roots, old_oid binding of the durable intent to the promotion receipt. Local qualification: no accepted service."
+      },
+      {
+        "fr": "PAEA : vérificateur de rapprochement des journaux d'effets réels (PA-09) — recomputation indépendante des actions canoniques depuis les octets durables, binding digest/intention/domaine, détection explicite des journaux corrompus, intentions manquantes et digests altérés, sans réparation ni autorité. Aucun service accepté : séparation UID, enrôlement humain et approbation indépendante restent requis.",
+        "en": "PAEA: real effect-journal reconciliation verifier (PA-09) — independent recomputation of canonical actions from durable bytes, digest/intent/domain binding, explicit detection of corrupt journals, missing intents and altered digests, with no repair and no authority. No accepted service: UID separation, human enrollment and independent approval remain required."
+      },
+      {
+        "fr": "PAEA : promotion de référence Git sous autorité courante signée — intention durable réservée avant tout Git, OLD exact sous verrou, effet enregistré et récupération de crash ; réconciliation sans Git. Transfert qualifié ordonné avant promotion ; recette permanente PASS sur fixtures vivantes. Aucun service accepté : séparation UID, enrôlement humain et approbation indépendante restent requis.",
+        "en": "PAEA: Git reference promotion under signed current authority — durable intent reserved before any Git, exact OLD under the lock, recorded effect and crash recovery; reconciliation without Git. Qualified transfer ordered before promotion; permanent recipe PASS on live fixtures. No accepted service: UID separation, human enrollment and independent approval remain required."
+      },
+      {
+        "fr": "Cockpit CLI Rust : dépendances entre tâches à faire affichées avec graphe et motifs de blocage ; aucune validation de dépendance ni autorisation de lancement n’est déduite.",
+        "en": "Rust CLI cockpit: dependencies between TODO tasks show graph edges and blocking reasons; no dependency approval or launch permission is inferred."
+      },
+      {
+        "fr": "Cockpit CLI Rust : affichage des tâches initiales sans dépendances ni historique, avec actions, priorité enregistrée et motifs de pause ou de budget ; les états non raccordés restent refusés explicitement.",
+        "en": "Rust CLI cockpit: initial tasks without dependencies or history show actions, saved priority and pause or budget reasons; unsupported states still refuse explicitly."
+      },
+      {
+        "fr": "PAEA : acquisition de la source et staging liés au service dans le job avant sa première observation Git ; échec initial conservé avec la lane et les capacités jusqu’au reap réel. Un service ouvert en lecture seule refuse la création et l’exécution du job.",
+        "en": "PAEA: source custody and service-bound staging belong to the job before its first Git observation; initial failures retain the lane and capabilities until actual reap. A read-only service refuses job creation and execution."
+      },
+      {
+        "fr": "PAEA : job interne possédant source, destination, fichiers et cause de transfert ; préparation d’objets sans ref, reprise du vrai Child et fermeture refusée tant que son ownership reste ouvert.",
+        "en": "PAEA: internal job owns source, destination, files and transfer failure; object preparation without refs, actual Child recovery and close refusal while ownership remains unresolved."
+      },
+      {
+        "fr": "PAEA : propriétaire interne de fichiers de pack privés, création exclusive et contrôle de l’inode avant import ; préparation du job de transfert, sans service protégé ajouté.",
+        "en": "PAEA: internal private pack-file owner with exclusive creation and inode verification before import; transfer-job preparation without adding a protected service."
+      },
+      {
+        "fr": "Conducteur : contrôles, revue et planification disposent de tâches concurrentes possédées ; chaque résultat et interruption est conservé avant libération du bail. Les observations planner périmées sont distinguées avant claim ou après refus natif avant exécution, avec consommation et erreurs indépendantes conservées.",
+        "en": "Conductor: controls, review and planning have owned concurrent jobs; each result and interruption is retained before lease release. Stale planner observations distinguish pre-claim conflicts from native pre-exec refusals, preserving consumption and independent errors."
+      },
+      {
+        "fr": "PAEA : inspection de source Git sous le vrai writer SQLite, sans transaction imbriquée ; une nouvelle révision de configuration exige de renouveler la garde même si le candidat et les politiques restent identiques.",
+        "en": "PAEA: Git source inspection under the actual SQLite writer without nested transactions; a new configuration revision requires renewing the guard even when candidate and policies remain identical."
+      },
+      {
         "fr": "Consultation CLI : agent history lit les archives importées en JSON historique, sans adopter leurs agents, PID, décisions ou droits courants.",
         "en": "CLI consultation: agent history reads imported archives as historical JSON without adopting their agents, PIDs, decisions or current authority."
+      },
+      {
+        "fr": "PAEA : garde possédée de la source Git native et de sa lane partagée, avec contrôle des inodes des parents, du bare et du lock ; aucun transfert ni mandat ajouté.",
+        "en": "PAEA: owned native Git source/shared-lane guard, checking parent, bare and lock inodes; no transfer or mandate added."
       },
       {
         "fr": "PAEA : les erreurs de synchronisation de pack distinguent stdout et stderr tout en conservant la cause et le processus primaire ; reprise vérifiée. Service protégé encore à raccorder.",
@@ -1265,6 +1333,18 @@
       {
         "fr": "PAEA : inspection du candidat natif réutilisable sous le vrai writer SQLite, sans transaction imbriquée ; contrôle du format Git privé avant transfert/intention. Trois tests unitaires et six tests d’intégration vérifient verrous, reprise, dépôt et incompatibilité SHA1/SHA256. Aucune autorité ou promotion Git protégée activée.",
         "en": "PAEA: native candidate inspection reusable under the actual SQLite writer without nested transactions; private Git format checked before transfer/intent. Three unit and six integration tests verify locks, recovery, repository and SHA1/SHA256 mismatch. No authority or protected Git promotion activated."
+      },
+      {
+        "fr": "Cockpit : autonomie initiale configurable dans Admin (Manuel, Assisté, Autonome), avec défaut Autonome pour les nouvelles installations. Le mode enregistré de la mission reste prioritaire et aucun consentement de lancement n’est inféré. Les anciens journaux exigent une adoption explicite. Admin conserve aussi les groupes indépendants non adoptés, même sous un journal plus récent.",
+        "en": "Cockpit: configurable initial autonomy in Admin (Manual, Assisted, Autonomous), defaulting to Autonomous for new installations. A mission’s saved mode takes precedence and launch consent is never inferred. Older settings journals require explicit adoption. Admin also preserves unadopted independent groups, even in a newer journal."
+      },
+      {
+        "fr": "CLI : première lecture native agent list au format cockpit historique, pour un travail sans tâche, planification ni tentative. Les autres états refusent explicitement leur projection encore non portée ; les réglages persistés et le consentement restent inchangés.",
+        "en": "CLI: initial native agent list read in the historical cockpit format, for a Work without tasks, planning or attempts. Other states explicitly refuse their still-unported projection; saved settings and consent remain unchanged."
+      },
+      {
+        "fr": "PAEA : surface navigateur des états d'effets (PA-08) — /paea-effects.html consommation lecture seule de la capacité git-call (GET /api/v1/paea/git-call) et du rapprochement PA-09 (GET /api/v1/paea/reconcile-effects) : états chargement/vide/cohérent/corrompu/refus explicites, jamais un faux succès, rapport brut replié, FR/EN, thèmes, clavier, mobile ; famille « Vérifications PAEA », aucun appel one-shot ni bouton d'effet.",
+        "en": "PAEA: browser surface for effect states (PA-08) — /paea-effects.html read-only consumption of the git-call capability (GET /api/v1/paea/git-call) and PA-09 reconciliation (GET /api/v1/paea/reconcile-effects): explicit loading/empty/consistent/corrupt/refusal states, never a fake success, collapsed raw report, FR/EN, themes, keyboard, mobile; \"Vérifications PAEA\" family, no one-shot call or effect button."
       }
     ]
   },

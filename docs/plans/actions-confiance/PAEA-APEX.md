@@ -896,3 +896,687 @@ Version06 :56assertions/garde de script PASS/VERIFIED, assets/notes FR/EN compil
 et captures inspectées. [Incrément76](paea/INCREMENT-76.md) · [Continuité76](paea/CONTINUITE-76.md).
 Transfert du service protégé/autorité courante/COMMIT de ref restent ouverts ;
 PA02/03partiels,0/17,PA13/RETEX final ouverts.
+
+
+### Incrément77 — garde possédée de source Git native
+
+Garde opaque Root/parents/bare/lane partagée, contrôles d'ascendance/inode lock et
+snapshot natif.7tests d'intégration normaux + Rustdoc strict PASS/VERIFIED, fixture
+source77 neuve et71 immuable : vrai writer BUSY, fermeture capacité dépôt, mauvais
+contextes, substitution bare/lock/refus/restauration, close/reprise et DB inchangée.
+Build initial refusé pour raccordement CLI historique ; original conservé, build
+normal corrigé par son propriétaire concurrent réutilisé sans double restart,
+puis requalification fraîche core03. Version233 active, ELF exact `b11b4bafabff1d3bf5d216fdb44f5614fb69a41a61b3b72e8623bc2a80b385cf`;
+687entrées normales/486communes, aucune différence, sansfixtures. Version06 :
+56assertions/garde de script PASS/VERIFIED, assets/notes FR/EN compilés et captures.
+[Incrément77](paea/INCREMENT-77.md) · [Continuité77](paea/CONTINUITE-77.md).
+Cycle de vie fichiers/job, transfert protégé/admission/COMMIT et témoin de mutation
+contexte restent ouverts ; PA02/03partiels,0/17,PA13/RETEX final ouverts.
+
+
+### Incrément78 — source dans le writer réel et contexte renouvelé
+
+1test unitaire writer et8SDK normaux PASS/VERIFIED, Rustdoc strict ; unit03 ciblé
+reréussi sur contexte/helper actualisés. Pas/read de transaction refuse, vrai
+WRITE même connexion accepte sans BEGIN imbriqué, writer indépendant BUSY/reprise.
+Preview/apply publics de valeurs identiques gardent le candidat et incrémentent la
+révision : ancienne source refusée, nouvelle garde/réouverture reprennent, histoire
+préservée. Version234 installée, ELF exact `883cdb18c7f1574c4b3f6207791960062874721fe7a8e5848f55cc6c09192dc9`;
+687entrées normales/486communes, aucune différence, sansfixtures. Version06 :
+56assertions/garde de script PASS/VERIFIED, assets/notes FR/EN compilés et captures.
+[Incrément78](paea/INCREMENT-78.md) · [Continuité78](paea/CONTINUITE-78.md).
+Cycle fichiers/job, transfert protégé/admission/intention/COMMIT/réconciliation
+restent ouverts ; PA02/03partiels,0/17,PA13/RETEX final ouverts.
+
+
+### Incrément79 — fichiers privés de pack, job restant
+
+Quatre tests unitaires nommés et Rustdoc strict PASS/VERIFIED : fichiers privés
+exclusifs, liens refusés/reprise, vrai Git par parents détenus, substitution de
+pack refusée/restauration. Objet commit exact, digest/taille et refs inchangées
+vérifiés. v0.1.1-dev.236 installée, ELF `087df5a966e2c4d346505b11c0e4c01aa96c49a2a50516249150b80c4cf363e4` ;
+688 entrées normales/487 communes,
+zéro différence, sansfixtures. 56 assertions navigateur/garde d'échec script
+PASS/VERIFIED, notes/assets FR/EN compilés et captures vérifiés. Les tests cfg(test)
+restent distincts du profil normal et d'un service protégé encore absent.
+[Incrément79](paea/INCREMENT-79.md) · [Continuité79](paea/CONTINUITE-79.md).
+Job propriétaire, admission/intention/COMMIT/réconciliation restent ouverts ;
+PA02/03 partiels, 0/17 invariants globaux, PA13/RETEX final ouverts.
+
+
+### Incrément80 — job propriétaire de préparation, acquisition protégée restante
+
+7unités distinctes/Rustdoc strict PASS/VERIFIED : candidat natif réellement importé,
+objet/PACK/digest/refs vérifiés, refus/nouveau job/reprise/lane, close rend le job
+avant reap réel, enveloppes metadata/pack, ECHILD réel reste bloqué, wrapper mutable
+inconnu protégé. Échec core01 de témoin concurrent conservé ;3jobs séquentiels.
+v0.1.1-dev.237 installée, ELF `9d3346aebb56f76fdb1d58415475aef500e7f569d01258081afcb00f8e7fb272` ; 690 entrées
+normales/489 communes, deux deltas documentaires : en-tête module2lignes et précision d’une note
+Conducteur concurrente, autres champs/corps identiques et Rustdoc actuel séparé, sansfixtures.56assertions
+navigateur/garde d'échec script PASS/VERIFIED, assets/notes FR/EN compilés.
+[Incrément80](paea/INCREMENT-80.md) · [Continuité80](paea/CONTINUITE-80.md).
+Job interne/preuves cfg(test), pas de consommateur protégé normal. Acquisition
+Source avant remise et staging lié à la Root service exigent encore un constructeur
+protégé ; admission/intention/COMMIT/réconciliation,0/17,PA13/RETEX final ouverts.
+
+
+### Incrément83 — promotion de référence Git sous autorité courante
+
+Raccordement protégé CONTINUITE-80 : journal d'effets service (intents préexigés),
+préparation Commit/Reconcile miroir settlement (policy attribuée à la Trust réelle
+au Commit, contexte historique au Reconcile), consommation sous `with_paea_action`
+(plan d'identité courant, rôle d'effet sous tx IMMEDIATE + Trust, Biba I2,
+séparations refusées au Commit). Commit : intention durable réservée AVANT tout
+Git, OLD exact sous verrou via `run_git_reference_transaction`, récupération de
+crash (ref déjà au candidat → enregistrement), OID réellement observé, COMMIT
+incertain conservé. Reconcile : lecture pure, `ReconciledNotCommitted` explicite.
+4 tests d'intégration PASS sur fixture native vivante writer78b, ordre métier réel
+transfert82→promotion exercé ; recette permanente `paea-owned-git-promote` PASS/
+VERIFIED ; doc FR/EN ; note FR/EN en tête de version_history. **v0.1.1-dev.246
+installée**, ELF réel `b23ac01e6644b70de4d1619dedc5358871ea77fd93ea793faead9172f0637235`
+(/proc/exe vérifié), version + notes FR/EN servies vérifiées via endpoint protégé
+authentifié. Aucun service accepté : séparation UID, enrôlement humain, approbation
+indépendante, raccordement parcours public restent requis ; PA02/03 partiels,
+0/17, PA13/RETEX final ouverts.
+[Incrément83](paea/INCREMENT-83.md).
+
+### Incrément84 — vérificateur PA-09 de rapprochement des journaux d'effets réels
+
+`RootStore::paea_reconcile_effect_journals(&ledger)` (lecture seule, module
+`paea_effect_reconcile.rs`) : rapprochement par recomputation des journaux
+durables RÉELS des deux domaines (settlement sur ledger séparé, git-promote +
+intentions sur le service). Schéma vérifié avec DDL exacts du producteur
+(`Uninitialized` explicite / `Corrupt{codes}` sans réparation), canonisation
+indépendante des octets d'intention stockés, binding digest/intent_id/domaine,
+pour settlement en plus dette provisionnée + forme autorité + horodatage, pour
+git en plus jointure intention-durable-avant-Git + colonnes reçu. Rapport v1
+`Uninitialized | Consistent{effect_count, findings} | Corrupt{codes}`, codes de
+refus exacts. 3 tests d'intégration PASS sur fixture native vivante writer78b
+(journaux cohérents + Uninitialized ; digest altéré détecté dans les 2 domaines ;
+intention manquante détectée) ; recette permanente `paea-effect-reconcile` ;
+doc FR/EN PAEA-GIT-TRANSACTION. `verified=true` = correspondance recalculée, pas
+authenticité (écrivain même-UID cohérent reste indétectable : prérequis ouverts).
+Aucun service accepté, aucune autorité ; PA-09 complet (ancres externes, revue
+indépendante) reste ouvert ; PA02/03 partiels, 0/17, PA13/RETEX final ouverts.
+[Incrément84](paea/INCREMENT-84.md).
+
+### Incrément85 — consommateur CLI public du vérificateur PA-09
+
+Premier parcours public réel du vérificateur 84 : `swarm-rust paea
+reconcile-effects LEDGER --root RACINE --json` (lecture seule, aucun effet, aucune
+autorité). Garde de séparation dans le vérificateur lui-même : deux racines
+physiquement distinctes exigées via identité d'instance (répertoire + base),
+sinon `paea-effect-reconcile-separate-ledger-required` — un même stockage ne peut
+pas fournir les deux côtés du rapprochement. Binding ajouté
+`expected_old_oid` intention durable ↔ `old_oid` du reçu git
+(`paea-effect-reconcile-git-old-oid`, défaut de couverture 84). CLI strict :
+options d'exécution refusées sans ouverture, fermetures appariées
+(`RootCleanup`), rapport retenu si une fermeture échoue. 4 tests engine + 3
+tests CLI PASS ; recette `paea-effect-reconcile` étendue (inputs CLI, étape CLI)
+; doc FR/EN PAEA-GIT-TRANSACTION à jour. Qualification locale : n'établit ni
+authenticité, ni raccordement web/UX, ni PA-09 complet ; prérequis ouverts
+inchangés. [Incrément85](paea/INCREMENT-85.md).
+
+### Incrément86 — consommateur web public du vérificateur PA-09
+
+Second parcours public du vérificateur 85 : `GET /api/v1/paea/reconcile-effects`
+(swarm-web, session authentifiée, lecture seule, aucun effet, aucune autorité).
+La racine du grand livre séparé devient une configuration d'opérateur persistée
+— réglage versionné v49 `paea_settlement_ledger_root` (motif v48 : module de
+politique de forme de chemin absolu canonique, adoption explicite exigée,
+catalogue v6, défauts portant le champ), consommée par l'endpoint : 501 sans
+réglage adopté, 409 racine partagée, rapport explicite `uninitialized` pour un
+grand livre désigné non initialisé, refus POST/corps/requête sans ouverture.
+Admin : champ dans « Stockage et Git » + étiquettes d'erreur FR. Revue de
+couverture i18n : lacunes réelles corrigées dans `locales/en.json` (étiquettes
+v49 + deux couples catalogue préexistants manquants). Défaut préexistant
+corrigé : `swarm-web/tests/live.rs` macro `assert_eq!` malformée bloquant la
+compilation des tests web. 17 tests lib settings + 3 tests web + 3 tests CLI +
+4 tests engine PASS ; recette étendue (étapes web et settings). Qualification
+locale : n'établit ni authenticité, ni PA-09 complet ; prérequis ouverts
+inchangés. [Incrément86](paea/INCREMENT-86.md).
+
+### Incrément87 — inspection Admin réelle, révision Trust et sérialisation des tests d'acquisition
+
+Limite 86 levée : inspection visuelle navigateur réelle du modal Admin sur le
+service v250 (login/parcours réels, champ v49 rendu dans « Stockage et Git (5) »,
+capture PNG + DOM authentifiés, `admin-visual-86/`). Deux défauts de test
+corrigés au contrat (aucun code src/) : `tests/paea_git_transfer_call.rs`
+codait en dur la révision Trust signée 1 au lieu de la révision réelle du
+fixture retenu (47) — `paea-git-transfer-trust-revision` ; motif
+promote/reconcile appliqué (révision lue après config-apply), 2/2 PASS.
+`tests/paea_git_repository.rs` en parallèle : `apply_settings` (réservation
+exclusive non-bloquante, produit correct) contre lecteurs partagés du même
+fixture → `local-storage` ; sérialisation `SOURCE_FIXTURE_MUTEX` des deux
+tests mutateurs + event_id lié à la révision observée (un event_id statique
+provoquait `settings-event-conflict` au second run), 7/7 PASS stables en
+parallèle. Régression manifeste corrigée : `paea-native-git-source-context.json`
+ne déclarait plus les fixtures `SWARM_PAEA_*` que la preuve core02
+historique passait par l'environnement ; recette 6 étapes PASS/VERIFIED.
+Recette `paea-owned-git-transfer-reconcile` : 4 étapes PASS/VERIFIED.
+Aucun binaire installé (v250 inchangée) ; PA-09 complet, revue indépendante,
+acceptation globale restent ouverts. [Incrément87](paea/INCREMENT-87.md).
+
+### Incrément88 — consommateur CLI gardé du transfer call (deux phases interactives)
+
+Raccord consommateur du `paea_git_transfer_call` : nouvelle commande CLI
+`swarm-rust paea transfer-call SERVICE PROJECT WORK CHILD PIN STAGING
+DECLARATION --input REQUESTFILE`, motif deux phases de `trust enrollment-call`
+(témoins mémoire vivants pendant le provisionnement hors bande de la
+permission exacte, frame privée stdin `swarm-trust-source-v1` pin+password,
+déclaration enrôlée de l'opérateur, opération Reconcile sans effet de ref).
+Fermetures explicites et causes retenues sur toute issue ; aucun auto-grant,
+compte ou adoption à distance. Variante `CliError::PaeaTransfer`, dispatch,
+USAGE + help FR/EN. Deux défauts de vérification corrigés au contrat :
+indices de grammaire 9 positions dans `run()` (échec `path` NotFound établi
+par instrumentation puis corrigé) et longueur de frame (password toujours
+présent après le séparateur pour le call, refus `paea-transfer-call-frame`
+avant consommation sinon). 2 tests CLI réels PASS (consommation exacte une
+fois ; refus frame sans consommation ni mutation Trust) ; nouvelle recette
+`paea-transfer-call-cli-rust.json` 2 étapes PASS/VERIFIED (08:38 UTC).
+Docs FR/EN § consommateur CLI gardé. Aucune installation de service, aucun
+commit/push ; raccord web/API, Commit réel (CONTINUITE-80), PA-09 complet,
+revue indépendante et acceptation globale restent ouverts.
+[Incrément88](paea/INCREMENT-88.md).
+
+### Incrément89 — consommateur CLI gardé de promotion de référence (raccord CONTINUITE-80)
+
+Limite 83 levée pour la partie CLI : nouvelle commande
+`swarm-rust paea promote-call commit|reconcile SERVICE PROJECT WORK CHILD PIN
+DECLARATION --input REQUESTFILE`, même motif deux phases que l'incrément 88
+(provisionnement hors bande de la permission exacte, frame privée stdin,
+déclaration enrôlée). Opération protocolaire explicite ; résultat différencié
+`recorded`/`reconciled_not_committed` (négatif explicite, jamais un succès
+vide). Pour Commit, transaction de ref réelle avec OLD exact ; l'ordre métier
+transfert qualifié préalable → promotion est reproduit par le harnais (le
+transfer consomme la permission signée courante avant la promotion CLI).
+Variante `CliError::PaeaPromote`, dispatch, USAGE + help FR/EN. Deux défauts
+d'indices de grammaire corrigés (opération pos[2], racines pos[3]/pos[4]),
+établis par reproduction binaire directe sans instrumentation. 3 tests CLI
+réels PASS (commit une fois avec rev-parse du ref réel ; réconciliation
+négative ; refus frame sans consommation ni mutation Trust) ; recette étendue
+5 étapes PASS/VERIFIED (08:45 UTC). Docs FR/EN § consommateur CLI de
+promotion. Aucun commit/push ; raccord web/API, séparation UID, enrôlement
+humain, approbation indépendante, PA-09 complet et acceptation globale
+restent ouverts. [Incrément89](paea/INCREMENT-89.md).
+
+### Incrément90 — consommateur web gardé du transfer/promote call
+
+Limite « CLI d'abord, web ensuite » des incréments 85/86/89 levée : le
+transfer call et la promotion sont joints au parcours web enrôlé par
+extension du mécanisme single-intent (`TrustEnrollmentSource`), pas un champ
+de réglage. La racine projet, absente du préparé (seuls témoins `RootBinding`
+d'inode), est une entrée startup de confiance fournie à
+`PaeaGitCallSource::new_transfer|new_promote`, jamais un champ de requête ;
+le bind (`open_git_call`/`bind_git_call`) compare les DEUX témoins préparés
+(`binding_matches`, nouveau sur les deux appels préparés — transport
+uniquement) aux racines réellement ouvertes avant toute publication de
+session, sans jamais remplacer le recheck moteur sous l'autorité maintenue.
+Route `POST /api/v1/paea/git-call?call=transfer|promote` (header
+`Authorization: Enrollment <base64url>`, corps = octets canoniques exacts
+comparés à `action_digest`), consommation one-shot
+`call_paea_git_transfer|promote` avec recheck des deux racines writables,
+fermetures appariées sans perte de cause (variante
+`HttpServiceError::GitCallSource`, `close()` joignant git_call + enrollment +
+binding), variantes `RootStoreError::PaeaGitTransferCall|PromoteCall`. Un
+défaut corrigé par replan : TempDir service non retenu dans le harnais (bind
+refusé « path » après suppression du répertoire), établi par sonde directe.
+3 tests web réels PASS (refus sans source, refus de bind sur mauvaise racine
+avant publication, consommation exacte complète one-shot) ; recette
+`paea-git-call-web-rust` PASS 3/3 VERIFIED, preuves
+`evidence/20261029-git-call-web-mvfdts57`. Docs FR/EN § consommateur web
+gardé. Aucun commit/push ; surface UX de `capability()`, séparation UID,
+enrôlement humain, approbation indépendante, PA-09 complet, PA-11/12 (E3) et
+acceptation globale restent ouverts. [Incrément90](paea/INCREMENT-90.md).
+
+### Incrément91 — observation de capacité web du git-call
+
+Limite 90 levée : `GET /api/v1/paea/git-call`, sous la même garde
+session/Host/CSRF, retourne la vue JSON v1 `paea-git-call-status` —
+`bound:false` + capability nulle sans source liée (200 explicite, jamais un
+refus), sinon la capacité publique de démarrage (scope, call, service,
+opération, root_digest, action_digest). Aucun IO de racine, aucune
+consommation, aucun secret : l'opérateur distingue configuré/appliqué/observé
+sans dépenser l'appel préparé one-shot, sur le motif
+`identity_authentication.held_enrollment` de la vue show trust.
+`#[allow(dead_code)]` de `capability()` supprimé. Tests : sans source →
+`bound:false` ; avec source → capacité exacte (action_digest capturé avant le
+move de la source) ; one-shot inchangé. 3/3 PASS ; recette réexécutée
+PASS/VERIFIED, preuves `evidence/20261029-git-call-status-mvfdts57`. Docs
+FR/EN § observation. Aucun commit/push ; surface navigateur, séparation UID,
+enrôlement humain, approbation indépendante, PA-09 complet, PA-11/12 (E3) et
+acceptation globale restent ouverts. [Incrément91](paea/INCREMENT-91.md).
+
+### Incrément92 — consommateur CLI gardé du settlement call
+
+Limite 91 levée : le settlement call était le troisième appel gardé PAEA sans
+consommateur public. Nouveau module CLI deux phases `paea settlement-call
+commit|reconcile PROJECT LEDGER DECLARATION --input REQUESTFILE` (motif
+transfer/promote) : PROJECT ouvert en premier (fence IMMEDIATE du plan
+courant), LEDGER en second (racine consommatrice), témoins tenus pendant la
+préparation, événement public `paea-settlement-prepared` (service
+payment.settle, authority:false, restart_reusable:false), trame privée stdin
+`swarm-trust-source-v1` (grammaire partagée, secret jamais émis), puis
+consommation réelle `ledger.call_paea_settlement` sous autorité tenue —
+commit = un effet de grand livre exact (recorded/replayed), reconcile =
+lecture pure (reconciled_not_committed). Fermetures appariées, causes
+chaînées RootCleanup ; `paea-settlement-action` porte les refus de préparation
+(dont separate-ledger-required), `paea-settlement-call-frame/-input/-startup`
+refusent avant toute consommation. Tests : 3/3 PASS (commit une fois avec
+effet durable, réconciliation négative sans ligne, trame erronée sans
+consommation ni mutation Trust) ; recette
+`paea-settlement-call-cli-rust.json` PASS/VERIFIED, preuves
+`evidence/20261029-settlement-call-cli-mvfdts57`. Docs FR/EN § consommateur
+CLI settlement. Aucun commit/push ; séparation UID, enrôlement humain,
+approbation indépendante, PA-09 complet, PA-11/12 (E3) et acceptation globale
+restent ouverts. [Incrément92](paea/INCREMENT-92.md).
+
+### Incrément93 — surface navigateur des états d'effets (PA-08)
+
+Limite 92 levée : capacité git-call (91) et rapprochement PA-09 (86)
+n'étaient lisibles que par HTTP brut. Nouvelle page
+`/paea-effects.html` + `/paea-effects.js` dans la famille « Vérifications
+PAEA » (décision de conception réversible argumentée, conformément à
+PRODUCT-ARCHITECTURE/UI-DESIGN : cohérence produit, contrat UI qualifié
+réutilisé, surface lecture seule) — consommation lecture seule des deux GET
+d'observation, capacité détaillée quand préparée (bound, scope, reason,
+service, opération, digests), rapport PA-09 par domaine
+(uninitialized/consistent/corrupt, findings par intent_id avec verified et
+codes de refus), rapport brut replié en `details` natif, refus réels affichés
+avec code exact (jamais un faux succès), aucun POST ni bouton d'effet, hub
+`paea.html` lié, FR/EN (24 clés), thèmes, clavier, mobile. Tests : 2/2 page
+Rust (servi sous session, 403 sans session, aucun POST, clés EN) ;
+qualification navigateur réelle 5 contrôles (états vides explicites FR/EN,
+refus visible exact, thème commuté, clavier ≥ 44 px, 1280/390 px sans
+débordement, refus anonyme page+API `web-access-refused`, tri
+`expected_denials=8` / `unexpected_diagnostics=0`). Recette permanente
+`paea-effects-ui.json` 4 étapes PASS/VERIFIED (i18n --check, tests page,
+binaire frais avec re-touch des assets embarqués, navigateur réel), preuves
+`evidence/20261029-paea-effects-ui-recipe-mvfdts57`. Défaut corrigé par
+replan : tri des refus attendus du test (fixture sans grand livre → refus
+« path » du RootStore) établi comme comportement réel, pas un défaut produit.
+Docs FR/EN § surface navigateur. Aucun commit/push ; séparation UID, enrôlement
+humain, approbation indépendante, PA-09 complet, PA-11/12 (E3) et acceptation
+globale restent ouverts. [Incrément93](paea/INCREMENT-93.md). Installation
+locale v257 (ELF vérifié, « Entrées compilées modifiées : 0 ») ; service réel :
+page + deux endpoints servis sous session, rapport réel `uninitialized` dans
+les deux domaines, navigateur réel hub→page avec états explicites FR/EN
+(preuves `evidence/20261029-paea-effects-live-mvfdts57`).
+
+### Incrément94 — liaison de portée PA10 des tests chaîne/révocation au profil livré (qualification, partiel)
+
+Inventaire borné lié aux empreintes (aucune compilation, aucun rebuild) : les harnais
+chaîne/révocation invoquent `CARGO_BIN_EXE_swarm-rust` ; ELF test exercé
+`.cache/paea-verification-target/debug/swarm-rust` sha256
+`a3a1785e64407ede7b16bb8da7d9e3550c201aa4cd1a644683e977fc4407cede` (métadonnées
+version `devel`, injectées seulement dans la chaîne de livraison), ELF harnais séparés
+`paea_promote-90473ecaf0852c19` = `48691c12fdedb37a…` (identique au FINAL du lot
+précédent, pas de rebuild) et `paea_transfer-ada84372b954e684` =
+`8af31d4275a965052242b31e9471607cf27fae0f795ed1a6f314c05d74eaaf67`. Features observées
+par cargo-json `[]` pour le harnais et la CLI recompilée dans le même graphe dev ; la
+feature `test-fixtures` de swarm-cli ne gate que des `[[example]]` authority — aucun
+profil alternatif à qualifier. Service actif : PID226484, `/proc/226484/exe → bin/swarm`
+sha256 `47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a` =
+`binary_sha256` de deploy/local-build.json = re-hash du candidat
+`bin/swarm.candidate-qym11ckf` (v0.1.1-dev.257/86c5ab2f3) — correspondance par
+empreinte, pas par nom/version. Comparaison des sources (union de 755 chemins re-hashés,
+0 manquant) : sources communes record↔recette 512/512 identiques ; record↔worktree frais
+713/713 identiques (aucun rebuild justifié par des changements de tests seuls) ;
+recette↔frais 554/554 identiques. Les chemins record-only (swarm-web, swarm-wire-json,
+biba, configs) n'entrent pas dans le graphe de compilation test ; les entrées
+recette-seules sont des tests/outils absents des effective_inputs de production par
+construction. Reste ouvert pour PA10 : aucun profil qualifié indépendant (conventions
+`verify_native_profile`) ne correspond à l'ELF installé — build04 = `b11b4bafabff…`
+(43 diffs sources), profile-current = `37c681a88c2a…` (21 diffs, sans métadonnées
+injected) ; l'ELF installé n'a que le record auto-déclaré de la chaîne de livraison.
+Prochaine étape bornée : exécuter l'outil maintenu
+`tools/verification/verify_native_profile.py` sur le graphe du build installé. Les tests
+ne prouvent pas le comportement du binaire installé (aucun test n'a exécuté `bin/swarm`),
+ni E2/E3, l'indépendance, l'enrôlement/confinement réels ou un service accepté. Preuves
+`evidence/20261028-acquisition81-mvfdts57/glm-profile-binding-20261029T175501Z`
+(inventory.json + fresh-sources.json + FINAL). Aucun commit/push ; limites de portée des
+harnais (autorité fixture, pas de séparation UID/présence humaine) inchangées.
+
+### Incrément95 — PA10 : profil qualifié lié à l'ELF livré (qualification, vérifiée)
+
+Résolution de l'écart nommé de l'Incrément94, sans nouvelle collecte ni compilation :
+l'évidence de livraison `deploy/local-build.json` → `.cache/local-delivery/rust-udnrqsq4/build/`
+contient déjà `profile/result.json` status `VERIFIED_DEFAULT_NATIVE_PROFILE` associé à l'ELF
+livré `47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a` (`bin/swarm`,
+v0.1.1-dev.257/86c5ab2f3, service géré PID226484 vérifié par `/proc/exe` et re-hash), avec le
+candidat producteur `VERIFIED_NATIVE_CANDIDATE` (git stable, forgery ignoré, cold root non créé).
+Authenticité établie par empreintes : `profile/method.py` ≡ outil maintenu courant
+(`a64a2135…`, hash inscrit dans `effective_inputs` du record) ; archive effective-sources
+conforme (405f6342…) et 713/713 inputs re-hashés contre le worktree actuel (0 écart) ;
+`.cargo/config.toml`/`rust/Cargo.toml`/`Cargo.lock` identiques au record. Écart suspecté puis
+résolu : le hash de métadonnées déclaré (7a5a8b22…) porte sur les octets exacts de
+`SWARM_NATIVE_BUILD_METADATA`, le fichier persisté ajoutant un `\n` final (723fcb50…) —
+aucune édition de result.json. Re-vérification indépendante depuis les données brutes :
+204 unités `compiler-artifact` relues — aucune feature `test-fixtures`/`test-util`, aucune
+unité test/example, 4 unités cœur `features=[]`/`test=false`, fingerprints `rustflags=[]` ;
+les dev-deps (tempfile, nix, rusqlite+functions, `swarm-enrollment-config/test-fixtures`
+via `[dev-dependencies]` de swarm-enrollment-authority) sont absents des 204 unités — la
+conclusion « même graphe » de l'Incrément94 est établie, plus supposée. Limites conservées :
+preuve de non-inclusion des dev-deps fondée sur le contrat `cargo build` plus l'absence
+d'unité (pas une lecture du resolve Cargo) ; flags C finaux hors périmètre déclaré de
+l'outil ; l'outil n'est pas une revue indépendante humaine. Écart PA10 résolu ; PAEA17
+(invariants, identité, UID, enrôlement, indépendance) reste ouvert. Preuves
+`evidence/20261028-acquisition81-mvfdts57/glm-native-profile-20261029T181332Z`
+(evidence.json + FINAL.md) et evidence root de livraison citée, non altérée. Aucun
+commit/push ; aucun redémarrage (service déjà conforme) ; processus d'autrui préservés.
+
+### Incrément96 — Inventaire de clôture : matrice exacte des 17 invariants (décision, GLM)
+
+Tâche bornée de décision (GLM seul, dossier
+`evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z`) :
+rapprochement des 17 invariants du registre (matrice ci-dessus, lignes I01–I17) avec les
+preuves réellement retenues. La matrice complète 17 lignes
+(`invariant-matrix.json` dans le dossier, validée 17 IDs uniques) réutilise les IDs et
+libellés exacts du registre et distingue pour chaque invariant : état implémenté,
+vérification locale (preuves + empreintes + portée), acceptation indépendante,
+lacune/action précise, propriétaire, autorité requise, tâche indépendante possible.
+
+Résumé par classes d'écart (les nombres de tests/incréments ne sont pas un %) :
+- **Vérification locale partielle réelle** (auth simulée, same-UID, ELF désigné
+  `47d31746…`) : I01, I04, I05 (lab), I08, I09 (recalcul), I12, I16 (lab),
+  I17 (promote) ; profil qualifié lié à l'ELF (Incrément95) pour la provenance
+  de construction (I03 partiel).
+- **Candidat non complet** : I06/I13 (BT02 candidat, egress internet NON confiné,
+  écrivain same-UID hors processus NON figé ; session Biba transverse propriétaire).
+- **NOT TESTED au sens du libellé / prérequis réel** : I02, I07, I10 (enrôlement,
+  secrets, approbateur humain), I03 (flux d'exécution), I14 (A2A).
+- **Acceptation externe** : I11 — évaluateur/équipe absents (constat commanditaire),
+  E3 non préenregistré, ancres externes PA-09 ouvertes. Aucun invariant n'est
+  indépendamment accepté : NON ÉTABLI partout.
+- Prérequis humains/OS pendants : newuidmap/newgidmap (administrateur local),
+  décision launcher distinct-UID/ptrace (`followup-cross-uid-namespace.json`, OPEN),
+  enrôlement réel/sorties IA3, évaluateur E3, arbitrage superviseur E2 PA-10/PAEA17.
+
+Prochaine tâche bornée recommandée (dans les droits, sans compilation) : répliquer le
+test de révocation à la consommation prouvé sur promote
+(`promote_call_cli_revoked_current_authority_refuses_without_effect_then_recovers`,
+dossier revocation-check 2789aff3…) sur le chemin **settlement-call** du même ELF
+désigné : révocation via `config-apply` public avant la frame privée, refus avant
+consommation, dette intacte, recette VERIFIED. Entrée/résultat/preuve/fin précisés
+dans la matrice. Ce rapprochement ne clôt pas PAEA ; PAEA17 reste ouvert ; remise au
+superviseur. Aucun commit/push.
+
+### Incrément97 — I17 : révocation courante à la consommation settlement-call du binaire livré (vérification, GLM)
+
+Tâche bornée recommandée par la matrice 96 réalisée (GLM seul, dossier
+`evidence/20261028-acquisition81-mvfdts57/glm-settlement-revocation-20261029T204333Z`) :
+répliquer la fenêtre de révocation à la consommation prouvée sur promote (Incrément
+revocation-check) sur le chemin **settlement-call** du même ELF désigné
+`bin/swarm` SHA-256 `47d31746…` (re-hashé à chaque spawn). Modifications
+confinées au harnais de test `rust/crates/swarm-cli/tests/paea_settlement_delivered.rs` :
+nouveau `invoke_between` (motif promote : fenêtre ouverte entre l'événement
+public `paea-settlement-prepared` et la trame privée, grant lié à la révision
+explicite fournie) et test nommé
+`delivered_settlement_revoked_current_authority_refuses_without_effect_then_recovers`.
+Les deux consommateurs existants d'`invoke` sont inchangés (3/3 PASS sur l'ELF).
+
+Un cas réel en trois fenêtres sur racines neuves possédées : (1) révocation via
+l'opération publique `config-apply` sur le projet entre préparation et
+consommation — le grant encore signé refuse avec le code exact
+`paea-settlement-trust-revision` (le CLI settlement expose le refus backend
+exact en `failure.code`, sans enveloppe promote-style, témoin JSON conservé) ;
+(2) même état révoqué avec un grant ré-émis à la révision révoquée — refus
+exact `paea-settlement-effect-role` ; aucune ligne d'effet, dette provisionnée
+intacte (v2, 420000, EUR, account-17), révision courant inchangée au-delà de la
+révocation explicite elle-même ; (3) restauration publique puis une
+consommation légitime fraîche exactement une fois : `recorded`, replayed=false,
+un effet durable lié aux termes, rapprochement `reconcile-effects` public
+`consistent` avec exactement une ligne vérifiée. Compilation TEST seule requise
+(hypothèse « aucune compilation » de la matrice non acquise) : le binaire livré
+`47d31746…` et les entrées de production sont inchangés, aucun
+rebuild/redémarrage de production. Recette permanente
+`paea-delivered-settlement-cli-rust.json` étendue au troisième step
+`settlement-cli-delivered-revoked-current-authority-refuses-then-recovers`,
+PASS/VERIFIED, preuves fraîches `recipe-run` dans le dossier. Portée : autorité
+fixture simulée, same-UID ; ni enrôlement humain réel, ni séparation UID, ni
+paiement réel, ni acceptation indépendante — I17 reste « vérification locale
+partielle » au sens de la matrice, désormais exercé sur promote ET
+settlement-call ; PAEA17 reste ouvert ; remise au superviseur, aucun commit/push.
+
+### Incrément98 — I08 : unicité métier du grand livre sous contention de deux instances CLI settlement (vérification, GLM)
+
+Tâche bornée recommandée par le reçu superviseur I17 (GLM seul, dossier
+`evidence/20261028-acquisition81-mvfdts57/glm-settlement-contention-20261029T211341Z`) :
+prouver que deux processus publics `settlement-call` normaux du même ELF désigné
+`bin/swarm` SHA-256 `47d31746…` (re-hashé à chaque spawn et après le run :
+inchangé) consommant LA MÊME dette/facture/grand livre fictif ne produisent
+jamais plus d'un effet métier. Aucun changement produit : le contrat moteur déjà
+livré (réservation IMMEDIATE du grand livre, `invoice_id UNIQUE`, rejeu du même
+intent canonique, refus explicite `paea-settlement-business-intent-conflict`
+sur termes incompatibles) est exercé, pas modifié ; la compilation TEST seule
+était requise, sans rebuild de production. Test nommé
+`delivered_settlement_two_cli_instances_same_business_terms_single_effect`
+(`rust/crates/swarm-cli/tests/paea_settlement_delivered.rs`, `#[ignore]`,
+exécution explicite par recette) : un seul jeu de racines projet/grand livre
+possédées avec la dette provisionée documentée ; les DEUX processus CLI
+préparent simultanément (préparations vivantes simultanées, mêmes termes et
+même document de requête, `action_digest` canonique identique et `root_digest`
+distincts par préparation — witnesses de nonce) puis consomment leurs trames
+privées après une barrière de harnais explicite `std::sync::Barrier` (aucune
+temporisation, aucun ordre supposé) ; aucun config-apply ni révocation dans la
+fenêtre de contention (pas un test de grant périmé). Témoin de validité
+préalable : le cas séquentiel existant
+`delivered_settlement_commit_replay_reconcile_once` (mêmes grants fixture, même
+provision, racines séparées fraîches) reste le premier step de la même recette.
+Verdict observé (test réel PASS, preuves `recipe-run` fraîches dans le
+dossier) : exactement un effet durable (`effectCount` 1), dettes provisionnées
+exactes (v7, 420000, EUR, account-17) réglées une seule fois ; le processus
+perdant rejoue le même `intent_id` durable (`replayed=true`, même
+`action_digest`) ou garde son refus explicite comme preuve terminale (un
+`paea-settlement-business-intent-conflict` après rejeu gagnant est admissible ;
+deux effets distincts ou zéro effet échouent) ; rapprochement
+`reconcile-effects` public `consistent`, `verified=true`, plus relectures SQL
+lecture seule distinctes du CLI. Refus/busy conservés avec leur cause exacte,
+jamais convertis en PASS vide. Recette
+`paea-delivered-settlement-cli-rust.json` étendue au quatrième step
+`settlement-cli-delivered-two-instance-contention-single-effect`,
+PASS/VERIFIED. Défaut de harnais corrigé dans le même incrément (aucun défaut
+produit) : la première version du verdict supposait l'ordre de spawn — elle
+échouait de façon intermittente (1 run sur 5 environ) quand cli-2 gagnait la
+course alors que le produit respectait le contrat (1 effet, gagnant
+`replayed=false`, perdant `replayed=true`, même `intent_id`) ; le verdict
+identifie désormais le gagnant par son reçu et non par l'ordre, et 8 exécutions
+consécutives sont PASS, avec les deux ordres de course observés. Découverte
+annexe du diagnostic : la fixture de déclaration v3 doit rester vivante jusqu'à
+la sortie du processus CLI (les répertoires de layout référencés disparaissent
+avec son `_root`, sinon refus déterministe `paea-settlement-call-startup`) —
+contrat documenté dans `provision`. Portée : autorité fixture explicitement
+simulée, same-UID, données fictives ; aucune preuve de séparation UID,
+d'enrôlement humain, de paiement réel, de contention OS inter-UID ou
+d'acceptation indépendante — I08 reste « vérification locale partielle » au
+sens de la matrice ; PAEA17 reste ouvert ; remise au superviseur, aucun
+commit/push.
+
+### Incrément99 — I04 : accord signé exact pour une AUTRE préparation refusé à la consommation settlement-call, sans effet (vérification, GLM)
+
+Tâche bornée recommandée par le superviseur (GLM seul, dossier
+`evidence/20261028-acquisition81-mvfdts57/glm-exact-agreement-20261029T214031Z`,
+prérequis I17 et I08 non rouverts) : prouver qu'un accord signé valide, courant
+(pas périmé, pas de révision obsolète, trame et démarrage corrects, bon
+projet/Trust) émis pour UNE AUTRE préparation est refusé à la consommation du
+même ELF livré `bin/swarm` SHA-256 `47d31746…` (re-hashé avant/après le run :
+inchangé) et ne produit AUCUN effet, puis que la reprise avec l'accord exact de
+la préparation produit exactement un effet légitime. Aucun changement produit :
+la chaîne d'autorité livrée (`exact_action` compare la permission exacte
+signée — root/service/opération/action digest — à la permission de la
+préparation tenue ; un `Error::Permission` refuse AVANT tout callback métier)
+est exercée, pas modifiée ; compilation TEST seule, pas de rebuild de
+production. Test nommé
+`delivered_settlement_wrong_agreement_refuses_without_effect_then_recovers`
+(`rust/crates/swarm-cli/tests/paea_settlement_delivered.rs`, `#[ignore]`,
+exécution explicite par recette) : DEUX préparations légitimes individuelles,
+même projet/même Trust/même révision — préparation A sur le grand livre 1
+(document d'origine, dette provisionnée invoice-17/v7/420000/EUR/account-17) et
+préparation B sur un second grand livre dédié du même projet (document
+alternatif reconstruit par re-sérialisation puis re-décodage via
+`swarm_protection_contract` : invoice-18/v8/420001/EUR/account-18, dette
+provisionnée séparément car l'initialisation documentée refuse un grand livre
+déjà initialisé et les dettes ne sont jamais réécrites — contrainte réelle
+respectée, aucun champ/protocole inventé). La préparation A est consommée avec
+l'accord signé exact de B provisionné à sa déclaration : refus exact observé
+`paea-settlement-authority` avec cause sûre `enrollment-control:permission`
+(bloc de permission, pas un grant périmé ni `paea-settlement-trust-revision`,
+ni root/password/format), effet 0 sur les DEUX grand livres, dettes intacts.
+Témoin de validité préalable sur données séparées : step 1 de la même recette
+(`delivered_settlement_commit_replay_reconcile_once`). Reprise : nouvelle
+préparation conforme A (même action canonique que A, root_digest frais) avec
+son propre accord exact → `recorded`, `replayed=false`, exactement un effet
+durable sur le grand livre 1 lié aux termes provisionnés d'origine, grand livre
+B reste à zéro effet, dettes inchangées, rapprochement public
+`reconcile-effects` `consistent`, `effectCount` 1, `verified=true`.
+Recette `paea-delivered-settlement-cli-rust.json` étendue au cinquième step
+`settlement-cli-delivered-wrong-agreement-refuses-then-recovers` (assertions
+obligatoires : témoin binaire, `agreement-mismatch-refusal`,
+`enrollment-control:permission`), 5 étapes PASS, `recipe.py verify` →
+VERIFIED, preuves fraîches `recipe-run/` dans le dossier. Défauts de harnais
+corrigés dans l'incrément (aucun défaut produit) : (1) la première version
+consommait la reprise avec les termes alternatifs contre la dette provisionnée
+d'origine — refus produit légitime `paea-settlement-debt-incompatible` (une
+dette par facture, termes jamais réécrits) reproduit puis le scénario a été
+restructuré en deux grands livres conformes au contrat ; (2) la permission de
+reprise ne peut pas égaler celle de la fenêtre de refus (nonce `root_digest`
+distinct par préparation) — l'assertion lie le digest d'action canonique, pas
+la ressource. 4 exécutions consécutives PASS. Portée : autorité fixture
+explicitement simulée, same-UID, données fictives ; aucune preuve de séparation
+UID, d'enrôlement humain, de paiement réel ou d'acceptation indépendante — I04
+reste « vérification locale partielle » ; PAEA17 reste ouvert ; remise au
+superviseur, aucun commit/push.
+
+### Incrément100 — I09 : réponse perdue après commit (canal stdout réellement cassé par le harnais), reprise sans second effet (vérification, GLM)
+
+Tâche bornée recommandée par le superviseur (GLM seul, dossier
+`evidence/20261028-acquisition81-mvfdts57/glm-fix-pipe-handshake-20261029T220620Z`,
+prérequis I17/I08/I99 non rouverts) : exercer l'invariant I09 « Réponse perdue →
+observation du service, sans duplication ni succès inventé » sur le chemin
+settlement-call du même ELF livré `bin/swarm` SHA-256 `47d31746…` (re-hashé à
+chaque spawn et après le run : inchangé). Aucun changement produit : le contrat
+déjà livré (l'écriture finale du reçu sur stdout cassé retourne l'erreur
+explicite `paea-settlement-call-output`, l'effet durable est conservé et le
+rejeu d'un nouveau `paea settlement-call commit` avec les mêmes termes retourne
+`recorded`, `replayed=true`, sans second effet ni mutation de dette) est
+exercé, pas modifié ; compilation TEST seule, pas de rebuild de production.
+
+Défaut de harnais corrigé dans le même incrément (aucun défaut produit, cause
+prouvée par deux observations /proc et conservée dans
+`glm-lost-response-20261029T215241Z/HANDSHAKE-REPRODUCER.json`) : le bloc
+« drained » du test appelait `read_to_string` sur le lecteur stdout détenu
+AVANT d'envoyer la trame stdin — l'enfant CLI attendait cette trame et le
+harnais attendait EOF stdout : attente croisée sans progression possible. La
+fermeture du canal est désormais réelle sans drain (prise puis drop du lecteur
+stdout détenu par le harnais, l'enfant garde son extrémité d'écriture), et la
+consommation passe par le nouveau chemin test-only
+`Prepared::consume_without_stdout` (trame → fermeture stdin explicite pour EOF →
+wait/récolte de l'enfant avec stderr exact conservé, aucune lecture stdout ;
+`Prepared::consume` normal inchangé et refusant un lecteur déjà pris).
+Reproducteur visant l'ordre réel des canaux, sans sleep ni timeout arbitraire ;
+les exécutions bloquées précédentes ont été terminées via pidfd (fixtures/tmp
+seulement), aucune exécution en place.
+
+Test nommé `delivered_settlement_lost_stdout_after_commit_replays_without_second_effect`
+(`rust/crates/swarm-cli/tests/paea_settlement_delivered.rs`, `#[ignore]`,
+exécution explicite par recette) : préparation légitime vivante validée, aucun
+effet préalable, le harnais casse son propre canal stdout (drop sans drain),
+répond la trame exacte de la préparation et ferme stdin : le CLI récolte le
+commit (un effet durable observé indépendamment par SQL lecture seule séparée,
+dette provisionnée intacte) mais son écriture finale du reçu échoue sur le
+canal réellement cassé — stderr JSON exact `paea-settlement-call-output` avec
+exit 2 (aucun succès caché), aucune ligne après l'événement préparé ;
+`paea reconcile-effects` public : journal `consistent`, `effectCount` 1,
+`verified=true`. Reprise : nouvelle préparation (nonce `root_digest` frais, pid
+différent) consommée normalement avec son accord exact → `recorded`,
+`replayed=true`, même `intent_id`/`action_digest`/reçu, grand livre inchangé (1
+effet), dette inchangée. Recette permanente
+`paea-delivered-settlement-cli-rust.json` étendue au sixième step
+`settlement-cli-delivered-lost-stdout-after-commit-replays-without-second-effect`
+(assertions obligatoires : témoin binaire désigné,
+`lost-response-code paea-settlement-call-output durable-effects 1`, argv
+settlement-call commit), exécution PASS, `recipe.py verify` → VERIFIED, preuves
+fraîches `recipe-run/` dans le dossier. Portée : autorité fixture explicitement
+simulée, same-UID, données fictives ; aucune preuve de séparation UID,
+d'enrôlement humain, de paiement réel ou d'acceptation indépendante — I09 passe
+de « recalcul » à « vérification locale partielle réelle » au sens de la
+matrice (I1x restant ouvert) ; PAEA17 reste ouvert ; remise au superviseur,
+aucun commit/push.
+
+### Incrément101 — I15/PA07 : substitution réelle d'un outil admis à sa consommation (vérification, GLM)
+
+Tâche bornée (GLM seul, dossier
+`evidence/20261028-acquisition81-mvfdts57/glm-tool-substitution-20261029T221416Z`)
+: exercer l'invariant I15 « Manifeste admis → exécutable/schéma observés ;
+mutation force réadmission » sur la barrière PRODUIT réelle, pas un SHA de
+harnais de test. Barrière qualifiée dans les sources : l'admission
+(`agent_launch_preflight::observe`, `rust/crates/swarm-engine/src/agent_launch_preflight.rs`)
+hache en SHA-256 l'exécutable provider (fichier absolu, exécutable, identité
+(dev,ino,len,mtime) comparée avant/après/chemin →
+`agent-provider-changed-during-observation`) et l'inscrit dans le scope admis ;
+la consommation rejoue le contrôle — au seuil en file
+(`agent_execution_preflight::inspect`, stage Queued/Child, appelée par
+`RootStore::prepare_agent_gate`) comme avant exécution
+(`agent_execution_gate::fresh`) — via `agent_launch_preflight::recheck` qui
+refuse `agent-preflight-input-changed` si le digest de l'exécutable a changé ;
+l'inspecteur de seuil re-hache d'abord le scope observé et refuse
+`agent-execution-preflight-changed`. Autres consommateurs du même reçu : revue
+(`review-guard-preparation-changed`) et planification
+(`planning-gate-preparation-changed`). Aucun artefact live/installé modifié.
+
+Test nommé
+`preflight_admitted_provider_artifact_mutation_refuses_before_consumption_and_recovers`
+(`rust/crates/swarm-engine/src/agent_execution_preflight.rs`) : témoin valide =
+copie provider test-owned sous la racine de fixture (`fixture-provider`, jamais
+un binaire partagé), `providers.json` publié, `prepare_agent_launch` admis avec
+reçu `preflight` verdict « compatible », contrôle `inspect`/Queued OK avant
+mutation ; puis mutation in place des octets exacts de l'artefact RÉELLEMENT
+admis (digest vérifié différent) ; la consommation suivante est refusée avec le
+code exact `agent-execution-preflight-changed` (barrière produit du moteur),
+snapshot SQL admission (agents, reservations, events, agent_logs, works)
+identique avant/après le refus — aucun effet, aucune mutation — ; restauration
+octets exacts → le même `inspect`/Queued revalide (reprise légitime, pas une
+réadmission forcée). Aucune modification produit : le contrat existait, il est
+désormais prouvé sur l'artefact vivant admis. Recette permanente dédiée
+`tools/verification/recipes/paea-i15-tool-substitution-rust.json` (test nommé,
+`--exact`), exécution fraîche PASS, `recipe.py verify` → VERIFIED, preuves
+`fresh-recipe-run/` dans le dossier. Portée : fixture test-owned, same-UID,
+données fictives ; aucune preuve d'enrôlement humain, de séparation UID, de
+paiement réel ou d'acceptation indépendante ; I15 passe de « constat de
+harnais » à « vérification locale réelle sur la barrière produit » (I1x restant
+ouvert) ; PAEA17 reste ouvert ; remise au superviseur, aucun commit/push.
+
+### Incrément102 — I15/PA07 : contrat effectif de `tool_manifest_digest` (cadrage borné, GLM)
+
+Tâche bornée (GLM seul, dossier
+`evidence/20261028-acquisition81-mvfdts57/glm-tool-manifest-contract-20261029T223044Z`)
+: déterminer le contrat minimal producteur→validation→persisté→admission→
+consommateur du champ `tool_manifest_digest` (`AdmissionContext`,
+swarm-protection-contract) et livrer une correction assignable au prochain
+paquet. Constat qualifié : le champ est **dormant** — validation de forme
+seulement (64 hex minuscules, `swarm-identity-contract::digest`, appliquée par
+`AdmissionContext::validate`), aucun producteur moteur, aucun contrôle
+d'admission ni d'invalidation ; consommateurs réels = canonicalisation
+paea-json-v1 (le champ change `action_digest`, jamais `intent_id`),
+comparaison (`/context/tool_manifest_digest`), inspection, affichage web.
+Aucun registre de manifestes d'outils dynamiques n'existe dans ce parcours ;
+les outils réellement admis restent couverts par la barrière preflight de
+l'Incrément101 (exécutable + configuration + scope modèle). Preuve locale hors
+ligne (oracle Python `tools/paea/make_contract_vectors.py`) : mutation du
+manifeste `b`×64 → `c`×64 change `action_digest`
+(`d09b83…` → `3733c3…`) sans changer `intent_id` (`a1dcd5…`) — la règle
+métier « Existing retains the original bytes » reste donc la barrière de
+réautorisation. Suite `swarm-protection-contract --test contract` : 17
+passed. Correction retenue (Route A, la plus petite qui couvre le vrai
+appel) : attribuer le champ à la préparation depuis les octets de la
+configuration provider effective non secrète déjà admise par la barrière I15
+(`providers.json`, `ai-connections.json`, scope `native_model_sources`, flags
+d'adaptateur statiques), préimage `paea-tool-manifest-v1` + JSON canonique,
+propriétaire = moteur (miroir de `policy::attribute`, jamais une assertion du
+modèle) ; refus si source absente/invalide ; Reconcile conserve le champ
+historique déclaré. Route de repli bornée : documentation « déclaratif non
+vérifié » sans producteur. Contrat complet, préimage exacte, test nommé
+exigé et liste minimale de fichiers dans
+`CONTRAT-BORNE.md` + `SOURCE-BINDING.json` du dossier. Portée : cadrage
+nécessaire au correctif I15, aucune modification produit, aucun refactor ;
+PAEA17 et I1x restent ouverts ; aucun commit/push.

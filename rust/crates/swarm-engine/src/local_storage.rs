@@ -3,6 +3,9 @@
 //! whole-backup rollback. External identity/witness/confinement remains separate.
 #![cfg(unix)]
 use crate::{generate_identifier, RuntimeError};
+#[cfg(target_os="linux")]
+#[path="local_pack_files.rs"]
+pub(crate) mod pack_files;
 use rustix::fs::{self as fs, AtFlags, FlockOperation, Mode, OFlags};
 use std::{
     error::Error,
@@ -304,6 +307,27 @@ impl LocalDirectory {
             Ok(())
         }
     }
+    /// Create a new private child without adopting an existing name. Parent
+    /// sync precedes the returned handle; an error after mkdir may leave the
+    /// visible directory, so callers retain the planned name and never retry
+    /// blindly. No recursive path or caller-controlled mode is accepted.
+    pub(crate) fn create_private_child(&self,name:&str)->Result<Self,LocalStorageError>{
+        Self::name(name)?;
+        fs::mkdirat(&self.file,name,Mode::RWXU).map_err(|e|LocalStorageError::new(LocalStorageOperation::CreateDirectory,e))?;
+        self.file.sync_all().map_err(|e|LocalStorageError::new(LocalStorageOperation::SyncDirectory,e))?;
+        self.child(name,false)
+    }
+    /// Create an empty private regular file exclusively, anchored to this
+    /// directory. Existing names/symlinks refuse unchanged. The caller owns
+    /// streaming, fsync, dependent child lifetime and explicit checked close.
+    pub(crate) fn create_stream(&self,name:&str)->Result<File,LocalStorageError>{self.open_file(name,OFlags::RDWR|OFlags::CREATE|OFlags::EXCL)}
+    /// Open a private single-link regular input at offset zero via NOFOLLOW.
+    /// Ownership/mode/link errors retain their cause and checked partial close.
+    /// This is a file capability, not data authenticity or effect permission.
+    pub(crate) fn open_stream(&self,name:&str)->Result<File,LocalStorageError>{self.open_file(name,OFlags::RDONLY)}
+    /// Close one owned stream explicitly. Consumes the descriptor even on error;
+    /// do not retry close on a potentially reused numeric FD. No fsync is implied.
+    pub(crate) fn close_stream(file:File)->Result<(),LocalStorageError>{close(file,LocalStorageOperation::CloseFile)}
     fn open_file(&self, name: &str, flags: OFlags) -> Result<File, LocalStorageError> {
         Self::name(name)?;
         let file: File = fs::openat(
@@ -884,6 +908,14 @@ pub(crate) struct LocalReservation {
     file: File,
 }
 impl LocalReservation {
+    /// Observe the actual retained private lock inode, not its current pathname.
+    /// This checks ownership/regular/single-link metadata but does not acquire a
+    /// new lock or prove confinement. Metadata failures preserve the IO cause.
+    pub(crate) fn identity(&self)->Result<(u64,u64),LocalStorageError>{
+        owned(&self.file,false)?;
+        let metadata=self.file.metadata().map_err(|e|LocalStorageError::new(LocalStorageOperation::Metadata,e))?;
+        Ok((metadata.dev(),metadata.ino()))
+    }
     pub(crate) fn close(self) -> Result<(), LocalStorageError> {
         let unlocked = fs::flock(&self.file, FlockOperation::Unlock)
             .map_err(|e| LocalStorageError::new(LocalStorageOperation::Unlock, e));

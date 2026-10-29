@@ -1,0 +1,703 @@
+[
+  {
+    "surface": "cli:help / --help / no-args (fr+en)",
+    "actual_source": "lib.rs execute(): inline HELP_FR/HELP_EN",
+    "classification": "wired",
+    "missing_contract": "help text/ordering parity vs Go aide/help unknown (Go source not supplied)",
+    "proof_needed": "help differential vs frozen Go output, both languages",
+    "next_action": "capture Go help oracle; diff; bind proof",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:init",
+    "actual_source": "lib.rs execute_root('init')",
+    "classification": "wired",
+    "missing_contract": "init JSON {schema_version,root,state} and refusal parity vs Go unproven",
+    "proof_needed": "differential JSON/refusal/exit vs frozen Go oracle",
+    "next_action": "decompose contract; bind behavior proofs; independent review",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:engine-settings show|describe|quality-profile|preview|apply|model-check",
+    "actual_source": "lib.rs execute_root",
+    "classification": "wired",
+    "missing_contract": "per-operation field/replay (`replayed`) parity vs Go unproven; unlisted subcommands refuse Usage",
+    "proof_needed": "differential outputs/refusals/replay vs Go oracle",
+    "next_action": "decompose per operation; bind proofs",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:pricing list|save|estimate",
+    "actual_source": "lib.rs execute_pricing",
+    "classification": "wired",
+    "missing_contract": "exact units, rational/float forms, missing-rate/conflict refusals, output/recovery parity open (historical matrix claims unverified current)",
+    "proof_needed": "differential parity incl. numeric representation",
+    "next_action": "qualify catalogue/save/quote contracts against frozen Go",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:planning show|enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions + cli:budget apply",
+    "actual_source": "lib.rs execute_control",
+    "classification": "wired",
+    "missing_contract": "request schemas, Root branches, outputs/refusals/effects/replay parity open; budget non-apply refuses Unsupported; unknown planning action refuses PlanningUnsupported",
+    "proof_needed": "differential parity incl. committed-Work retention paths",
+    "next_action": "decompose per action; bind proofs",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:planning call-preview|run|reconcile|step",
+    "actual_source": "lib.rs execute_planning_call_preview (linux)",
+    "classification": "wired",
+    "missing_contract": "FIFO step/run semantics, reconcile receipts, parity vs Go open; non-linux explicit Unsupported",
+    "proof_needed": "differential parity incl. platform gate",
+    "next_action": "qualify against frozen Go; verify non-linux refusal parity",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:work list + cli:resume (list form)",
+    "actual_source": "lib.rs execute_work_list",
+    "classification": "wired",
+    "missing_contract": "JSON/text list parity vs Go unproven",
+    "proof_needed": "differential list output both languages",
+    "next_action": "bind list proofs",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:work show|create|update; cli:task add|update|submit; cli:ooda; cli:checkpoint; cli:gate",
+    "actual_source": "lib.rs execute_work",
+    "classification": "wired",
+    "missing_contract": "request fields, rendered view, revision/replay, refusal, postcommit-output recovery parity open; gate 0/1 recorded-denial exit parity unproven",
+    "proof_needed": "differential parity incl. exit codes",
+    "next_action": "decompose per op; bind proofs",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:project-context|agent-workflow|planning-report",
+    "actual_source": "lib.rs inline readers",
+    "classification": "wired",
+    "missing_contract": "observed JSON parity and bounded planning-report decode parity vs Go unproven",
+    "proof_needed": "differential parity",
+    "next_action": "bind read proofs",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:evaluate",
+    "actual_source": "lib.rs execute_evaluation",
+    "classification": "wired",
+    "missing_contract": "method 2/3 parity, exit codes, U+2028/9 escaping parity vs Go unproven",
+    "proof_needed": "differential parity incl. allowed/denied exits",
+    "next_action": "bind evaluation proofs",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:planning-output check",
+    "actual_source": "lib.rs execute_planning_output",
+    "classification": "wired",
+    "missing_contract": "parity vs Go unproven (Go recheck-apply/preview separately refused)",
+    "proof_needed": "differential parity",
+    "next_action": "bind proofs; map recheck family",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:identity bootstrap-check",
+    "actual_source": "lib.rs inline BootstrapCheck",
+    "classification": "wired",
+    "missing_contract": "Go parity unknown; storage_verified:true semantics unverified against Go",
+    "proof_needed": "Go counterpart contract + differential",
+    "next_action": "supply Go source; qualify",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:<unmatched top-level>: aide|help|automation|autonomy|connections|console|control|dispatch|doctor|evidence|export|import|laboratory|memory|plan|process|profile|role-model|skills|validation|workspace|recheck|recheck-apply|recheck-preview",
+    "actual_source": "lib.rs final Err(CliError::Unsupported)",
+    "classification": "explicit_refusal",
+    "missing_contract": "typed refusal parity vs Go per name (code command_not_ported, fr/en, exit 2); Go contracts not supplied",
+    "proof_needed": "refusal parity per name; then full port contracts",
+    "next_action": "map each Go contract; port per adopted group order (spec, pending Codex validation)",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:agent show",
+    "actual_source": "agent.rs execute (show branch)",
+    "classification": "partial",
+    "missing_contract": "dialogue-mode agents refuse Unsupported; observed_status emits native-heartbeat/process-liveness-unverified or unknown/native-supervision-unported; never infers live process; Go show parity unproven",
+    "proof_needed": "differential show aggregate vs frozen Go",
+    "next_action": "qualify observation contract; port supervision axis",
+    "source_files": [
+      "rust/crates/swarm-cli/src/agent.rs"
+    ]
+  },
+  {
+    "surface": "cli:agent stop",
+    "actual_source": "agent.rs execute (stop branch)",
+    "classification": "wired",
+    "missing_contract": "records intent only; termination_confirmed always false; Go stop/termination-confirmation parity unproven",
+    "proof_needed": "differential stop semantics vs Go",
+    "next_action": "qualify stop contract",
+    "source_files": [
+      "rust/crates/swarm-cli/src/agent.rs"
+    ]
+  },
+  {
+    "surface": "cli:agent reconcile",
+    "actual_source": "agent.rs execute (reconcile branch)",
+    "classification": "wired",
+    "missing_contract": "linux reconcile_agent vs non-linux cancel_queued_agent divergence; cancellation never accepts task; Go reconcile parity unproven",
+    "proof_needed": "differential reconcile both platforms",
+    "next_action": "qualify; justify or remove platform divergence",
+    "source_files": [
+      "rust/crates/swarm-cli/src/agent.rs"
+    ]
+  },
+  {
+    "surface": "cli:agent run",
+    "actual_source": "agent.rs run() (linux)",
+    "classification": "wired",
+    "missing_contract": "foreground supervision; settled≠acceptance; RM-04 process-contract parity vs Go unproven; non-linux refuses Unsupported",
+    "proof_needed": "differential process contract vs Go",
+    "next_action": "qualify run lifecycle",
+    "source_files": [
+      "rust/crates/swarm-cli/src/agent.rs"
+    ]
+  },
+  {
+    "surface": "cli:agent prepare|preview",
+    "actual_source": "agent.rs prepare() (linux)",
+    "classification": "wired",
+    "missing_contract": "durable admission vs preview rollback visible; no process started; Go prepared/start protocol parity unproven (historical renamed-partial claim unverified)",
+    "proof_needed": "differential vs Go dialogue/terminal/prepared-launch protocol",
+    "next_action": "map Go protocol; qualify",
+    "source_files": [
+      "rust/crates/swarm-cli/src/agent.rs"
+    ]
+  },
+  {
+    "surface": "cli:agent guard",
+    "actual_source": "agent.rs guard()",
+    "classification": "wired",
+    "missing_contract": "Go counterpart mapping unknown; read-only replay parity unproven",
+    "proof_needed": "Go mapping + differential",
+    "next_action": "locate Go counterpart or record Rust-only",
+    "source_files": [
+      "rust/crates/swarm-cli/src/agent.rs"
+    ]
+  },
+  {
+    "surface": "cli:agent limits",
+    "actual_source": "agent.rs limits()",
+    "classification": "wired",
+    "missing_contract": "preview-only {limits,preview_only,launch_authorized:false}; Go run-limits counterpart parity unproven",
+    "proof_needed": "differential vs Go",
+    "next_action": "qualify preview contract",
+    "source_files": [
+      "rust/crates/swarm-cli/src/agent.rs"
+    ]
+  },
+  {
+    "surface": "cli:agent logs",
+    "actual_source": "agent.rs → agent_logs.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "handler behavior and parity unverifiable here; permanent log recipes not supplied",
+    "proof_needed": "handler source + differential vs Go",
+    "next_action": "supply agent_logs.rs for review",
+    "source_files": [
+      "rust/crates/swarm-cli/src/agent.rs",
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:agent history",
+    "actual_source": "agent.rs → agent_history.rs (linux; body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable; AGENT-HISTORY-20261027 evidence not supplied",
+    "proof_needed": "handler source + differential",
+    "next_action": "supply module and evidence for review",
+    "source_files": [
+      "rust/crates/swarm-cli/src/agent.rs"
+    ]
+  },
+  {
+    "surface": "cli:agent list",
+    "actual_source": "agent.rs list -> RootStore.inspect_cockpit:14-key empty Work and initial TODO DAG without history/planning/retained agents delivered244",
+    "classification": "partial",
+    "missing_contract": "Planning, retained-agent, later-task and history Root composition remain explicitly unported. TODO dependency DAG is publicly verified and installed244.",
+    "proof_needed": "Public complete-state scenarios for retained-agent health/attempts, gates/reviews/recovery and planning; current proof covers all-TODO DAG only",
+    "next_action": "Extend actual Root producer composition for remaining agent/history/planning states, preserving observation requirements and whole-document refusals",
+    "source_files": [
+      "rust/crates/swarm-cli/src/agent.rs"
+    ]
+  },
+  {
+    "surface": "cli:agent start",
+    "actual_source": "agent.rs: no branch → Usage/Unsupported",
+    "classification": "explicit_refusal",
+    "missing_contract": "historical prepare+run two-op split claim unverified; Go start contract not supplied",
+    "proof_needed": "Go start contract",
+    "next_action": "map before porting",
+    "source_files": [
+      "rust/crates/swarm-cli/src/agent.rs"
+    ]
+  },
+  {
+    "surface": "cli:agent attach|prepared|preflight|context-preview|resume-dialogue|resume-dialogue-preview|resume-launch",
+    "actual_source": "agent.rs: no branches → Usage/Unsupported",
+    "classification": "explicit_refusal",
+    "missing_contract": "Go dialogue/terminal/prepared-launch protocol contracts not supplied; historical NO_NATIVE labels not current proof",
+    "proof_needed": "Go contracts per name + refusal parity",
+    "next_action": "map protocols; port per group order",
+    "source_files": [
+      "rust/crates/swarm-cli/src/agent.rs"
+    ]
+  },
+  {
+    "surface": "cli:mission show",
+    "actual_source": "mission.rs (show branch, read-only)",
+    "classification": "wired",
+    "missing_contract": "mission_control_view vs Go missionStatus aggregate/guidance/changes/spending parity unproven (historical partial-renamed-view claim unverified)",
+    "proof_needed": "differential status aggregate vs frozen Go",
+    "next_action": "qualify control view",
+    "source_files": [
+      "rust/crates/swarm-cli/src/mission.rs"
+    ]
+  },
+  {
+    "surface": "cli:mission order|queue",
+    "actual_source": "mission.rs (read-only branches)",
+    "classification": "wired",
+    "missing_contract": "explicitly never eligibility/dispatch/FIFO turn; Go counterparts unknown",
+    "proof_needed": "Go mapping + differential",
+    "next_action": "locate Go counterparts or record Rust-only",
+    "source_files": [
+      "rust/crates/swarm-cli/src/mission.rs"
+    ]
+  },
+  {
+    "surface": "cli:mission priority",
+    "actual_source": "mission.rs → execute_external mission.priority",
+    "classification": "wired",
+    "missing_contract": "exact-ordinal audited change parity vs Go unproven; Go counterpart unknown",
+    "proof_needed": "differential mutation/refusal/replay",
+    "next_action": "qualify",
+    "source_files": [
+      "rust/crates/swarm-cli/src/mission.rs"
+    ]
+  },
+  {
+    "surface": "cli:mission pause|unpause|stop|start|resume",
+    "actual_source": "mission.rs → execute_external mission.*",
+    "classification": "wired",
+    "missing_contract": "audited event/revision request returning Work JSON; parity vs Go LaunchProfile/missionStatus outputs unproven (historical contract-different claim unverified); consent/mode guards unqualified",
+    "proof_needed": "differential JSON/plain/refusal/effect parity",
+    "next_action": "decompose per event; bind proofs",
+    "source_files": [
+      "rust/crates/swarm-cli/src/mission.rs"
+    ]
+  },
+  {
+    "surface": "cli:mission watch",
+    "actual_source": "mission.rs → mission_watch.rs → mission_watch/role_job.rs; three owned role families and typed stale observations",
+    "classification": "partial",
+    "missing_contract": "Current production238 positive provider setup refuses biba-workspace-overlaps-root; global concurrency, managed/registered recovery and acceptance are not established",
+    "proof_needed": "Owned I0 planner workspace then current public controls/review/refusal recovery; no guard bypass",
+    "next_action": "Resume public recipe after Biba workspace integration; retain235/237/238 failures and all consumed claims",
+    "source_files": [
+      "rust/crates/swarm-cli/src/mission.rs",
+      "rust/crates/swarm-cli/src/mission_watch.rs",
+      "rust/crates/swarm-cli/src/mission_watch/role_job.rs"
+    ]
+  },
+  {
+    "surface": "cli:mission status|status-native|changes|spending",
+    "actual_source": "mission.rs → mission_status.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "facts-only text / versioned DTO / subdocument guards unverifiable here; producer guards unknown",
+    "proof_needed": "module source + differential vs Go",
+    "next_action": "supply module for review",
+    "source_files": [
+      "rust/crates/swarm-cli/src/mission.rs"
+    ]
+  },
+  {
+    "surface": "cli:mission seen",
+    "actual_source": "mission.rs → session_visit.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "visit-writer behavior unverifiable; MISSION-SEEN-20261027 not supplied",
+    "proof_needed": "module + evidence + differential",
+    "next_action": "supply both for review",
+    "source_files": [
+      "rust/crates/swarm-cli/src/mission.rs"
+    ]
+  },
+  {
+    "surface": "cli:mission recovery|preview",
+    "actual_source": "mission.rs: op not in matches! → Usage",
+    "classification": "explicit_refusal",
+    "missing_contract": "Go contracts not supplied; refusal parity unproven",
+    "proof_needed": "Go contracts + refusal parity",
+    "next_action": "map before porting",
+    "source_files": [
+      "rust/crates/swarm-cli/src/mission.rs"
+    ]
+  },
+  {
+    "surface": "cli:budget show|preview",
+    "actual_source": "lib.rs → budget_history.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "historical producer connection and budget-history recipe unverifiable here",
+    "proof_needed": "module + recipe + differential",
+    "next_action": "supply module and recipe",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:budget <other>",
+    "actual_source": "lib.rs execute_control: action≠apply → Unsupported",
+    "classification": "explicit_refusal",
+    "missing_contract": "refusal parity vs Go for refused budget names",
+    "proof_needed": "Go contracts",
+    "next_action": "map",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:planning history",
+    "actual_source": "lib.rs → planning_history.rs (linux; body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "recorded-decisions reader behavior unverifiable; no execution authority claim unverified",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:lifecycle list",
+    "actual_source": "lib.rs → lifecycle_inventory.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "inventory behavior unverifiable",
+    "proof_needed": "module + differential vs Go lifecycle list",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:quotas show|preview|apply",
+    "actual_source": "lib.rs → quotas.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "field/preview/apply/error/replay parity unverifiable here",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:costs show",
+    "actual_source": "lib.rs → costs.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable; Go counterpart unknown",
+    "proof_needed": "module + Go mapping",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:task-model show|preview|apply",
+    "actual_source": "lib.rs → task_model.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "available_models flattening and launch-consumption claims unverified",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:task review|review-reconcile|review-retire-stale",
+    "actual_source": "lib.rs → task_review.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:task review-preview|review-inputs|review-check|baseline-preview|publication-preview|publish|validation-preview|validation-candidate|validate|validation-reconcile|validation-retire",
+    "actual_source": "lib.rs → task_validation.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "TaskValidationStatePreserved retention visible only at type level; behavior unverifiable",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:visit show|mark",
+    "actual_source": "lib.rs → session_visit.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:runtime-health",
+    "actual_source": "lib.rs → runtime_health.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable vs Go runtime-health",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:logs query",
+    "actual_source": "lib.rs → log_query.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:activity show + cli:run-limits activity *",
+    "actual_source": "lib.rs → activity.rs / activity_policy.rs (bodies not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable",
+    "proof_needed": "modules + differential",
+    "next_action": "supply modules",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:exchange list",
+    "actual_source": "lib.rs → exchange.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable vs Go exchanges surface",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:run-limits logs|performance|web-requests|provider-wait|show|history|preview|apply|effective|rollback-preview|rollback",
+    "actual_source": "lib.rs → log_read_policy/graph_performance/web_request_policy/provider_wait/run_limits_admin.rs (bodies not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable",
+    "proof_needed": "modules + differential",
+    "next_action": "supply modules",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:providers config * | policies export|preview|apply | connections show|preview|apply",
+    "actual_source": "lib.rs → provider_configuration/provider_policy/provider_connections.rs (bodies not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable; providers cooldown|relay have no dispatch branch and fall into config handler — outcome unknown",
+    "proof_needed": "modules + Go cooldown/relay contracts + differential",
+    "next_action": "supply modules; resolve cooldown/relay fallback",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:prepare *",
+    "actual_source": "lib.rs → preparation.rs (linux; body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable; PREPARATION-BUDGET-READ-20261026 not supplied",
+    "proof_needed": "module + report + differential",
+    "next_action": "supply module and report",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:web",
+    "actual_source": "lib.rs → native_web.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "server behavior unverifiable at CLI level",
+    "proof_needed": "module + service.rs + network-qualified recipes",
+    "next_action": "supply native_web.rs and service.rs",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "http:/api/v1/* (all paths/methods)",
+    "actual_source": "rust/crates/swarm-web/src/service.rs NOT SUPPLIED",
+    "classification": "unknown",
+    "missing_contract": "no route-level facts possible; historical 93-path labels are not current proof",
+    "proof_needed": "service.rs source + per-path/method differential vs frozen Go",
+    "next_action": "supply service.rs; decompose methods/bodies/effects",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:version",
+    "actual_source": "lib.rs → version.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable vs Go version",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:project-profile show|check|list|preview|apply|select",
+    "actual_source": "lib.rs → project_profile.rs (linux; body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:trust <non-enrollment ops>",
+    "actual_source": "lib.rs → trust.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:trust enrollment-call|enrollment-serve",
+    "actual_source": "lib.rs → trust_enrollment.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:identity initial-*|checkpoint-check|operator-check|service-export*|provisioning-check|linux-prerequisites|service-call|service-install|service-resume|service-reconcile|personal-*|control-check",
+    "actual_source": "lib.rs → identity_*.rs (linux; bodies not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable; unmatched identity subcommand refuses Usage (visible)",
+    "proof_needed": "modules + differential",
+    "next_action": "supply modules",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:admin-budget show|preview|apply",
+    "actual_source": "lib.rs → admin_budget.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "installed125 read-scope claim unverifiable here",
+    "proof_needed": "module + differential",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:_agent_gate|_planning_gate|_validation_gate|_reviewer_gate (private)",
+    "actual_source": "lib.rs inline arg gate → swarm_engine gate fns (crate not supplied)",
+    "classification": "wired",
+    "missing_contract": "private surface; engine bodies not supplied; Go counterpart mapping unknown",
+    "proof_needed": "engine sources; public-parity scope decision",
+    "next_action": "classify private vs Go-mapped",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:_prepare_turn|_prepare_cli_exec (private)",
+    "actual_source": "lib.rs → preparation_worker.rs (body not supplied)",
+    "classification": "unknown",
+    "missing_contract": "behavior unverifiable",
+    "proof_needed": "module",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "cli:<mission-worker private operation>",
+    "actual_source": "lib.rs → mission_worker_entry.rs (body not supplied; recognized before help)",
+    "classification": "unknown",
+    "missing_contract": "recognition grants no permission (visible comment); behavior unverifiable",
+    "proof_needed": "module",
+    "next_action": "supply module",
+    "source_files": [
+      "rust/crates/swarm-cli/src/lib.rs"
+    ]
+  },
+  {
+    "surface": "plan:R6 global recipe + data migration",
+    "actual_source": "PLAN.md NOT SUPPLIED; CHEMIN-CRITIQUE quotes (21 Oct, proposal)",
+    "classification": "unknown",
+    "missing_contract": "current lot state unknown; prerequisites (Work JSON/BLOB normalization spec, native check.py, corruption-refusal migration proofs) unevidenced",
+    "proof_needed": "current PLAN.md; R6 spec; migration recipes",
+    "next_action": "obtain current plan; arbitrate R6 scope",
+    "source_files": []
+  },
+  {
+    "surface": "plan:R7 cutover",
+    "actual_source": "PLAN.md NOT SUPPLIED; CHEMIN-CRITIQUE quotes only",
+    "classification": "unknown",
+    "missing_contract": "current status unknown; prerequisites (Go-free Build.sh/Makefile, verified rollback RM-08, install, smoke, RETEX) unevidenced",
+    "proof_needed": "current PLAN.md; cutover recipes",
+    "next_action": "obtain current plan; arbitrate R7 scope",
+    "source_files": []
+  },
+  {
+    "surface": "plan:final-recipe prerequisites (frozen Go oracle RM-01, frozen snapshots, independent review)",
+    "actual_source": "not supplied in any provided file",
+    "classification": "unknown",
+    "missing_contract": "no evidence any prerequisite is satisfied",
+    "proof_needed": "oracle-freeze artifact; snapshot procedure; review assignment",
+    "next_action": "request from plan owner before any acceptance claim",
+    "source_files": []
+  }
+]

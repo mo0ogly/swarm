@@ -116,29 +116,37 @@
  Object.assign(errorLabels,{
   'settings-review-response-not-configured':'Adoptez explicitement le plafond de réponse du reviewer dans les réglages.',
   'settings-review-response-value-invalid':'Le plafond de réponse du reviewer doit être positif, nul ou explicitement sans plafond.',
-  'settings-review-response-requires-quota-policy':'Adoptez les politiques précédentes avant le plafond de réponse du reviewer.'
+  'settings-review-response-requires-quota-policy':'Adoptez les politiques précédentes avant le plafond de réponse du reviewer.',
+  'settings-paea-ledger-root-not-configured':'Désignez explicitement la racine du grand livre de règlement séparé dans les réglages avant ce rapprochement.',
+  'settings-paea-ledger-root-invalid':'La racine du grand livre doit être un chemin absolu canonique (pas de traversée, ni séparateur redondant).'
  });
  const groups=[
   ['tasks','Tâches et contrôles',/^(task_|validation_)/u],
   ['quality','Qualité et revue',/^(quality_|review_|reviewer_|managed_)/u],
   ['context','Contexte et mémoire',/^project_/u],
   ['preparations','Préparations et documents',/^preparation_/u],
-  ['planning','Planification et délégation',/^(planning_|mission_)/u],
+ ['planning','Planification et délégation',/^(planning_|mission_|cockpit_)/u],
   ['models','Modèles et fournisseurs',/^agent_(model_|provider_|allow_unverified)/u],
   ['agents','Agents, exécution et reprise',/^(agent_|runtime_)/u],
-  ['storage','Stockage et Git',/^(storage_|git_)/u],
+  ['storage','Stockage et Git',/^(storage_|git_|paea_settlement_)/u],
   ['network','Serveur et accès',/^web_/u],
   ['display','Présentation et preuves',/^(work_view_|evidence_)/u],
   ['other','Autres paramètres',/.*/u]
  ];
  // Related families supply dependency context, not new permission or defaults.
  const relatedGroups={preparations:['context','quality','planning'],tasks:['quality','agents','planning'],quality:['tasks','context','storage','planning'],context:['quality','agents','models','planning'],planning:['tasks','agents','models','context'],models:['agents','planning','context'],agents:['models','planning','tasks','storage'],storage:['tasks','quality','agents','network'],network:['storage','agents'],display:['quality','context'],other:[]};
- /** Check flat catalogue wire types, exact decimal strings and known phase
-  * choices before touching controls. This is not semantic policy validation;
-  * Root preview owns bounds, dependencies, freshness and normalization. Pure. */
+/** Bounded scalar choice disclosure: the cockpit autonomy selects only the
+ * initial mode; the mode saved in the mission wins and explicit launch
+ * consent stays mandatory. No writer, admission or consent automation. */
+const choiceNotes={cockpit_default_autonomy:'Ce réglage choisit seulement le mode initial du poste de pilotage. Le mode enregistré dans la mission reste prioritaire ; le consentement au lancement de la mission reste obligatoire.'};
+/** Check flat catalogue wire types, exact decimal strings and known phase and
+ * choice values by exact catalog membership before touching controls. This is
+ * not semantic policy validation; Root preview owns bounds, dependencies,
+ * freshness and normalization. Pure. */
  function wireValue(field,value){
   if(value===null)return field.nullable===true;
   if(['strings','programs','phases'].includes(field.unit))return Array.isArray(value)&&value.every(v=>typeof v==='string'&&(field.unit!=='phases'||field.choices.some(c=>c.value===v)))&&new Set(value).size===value.length;
+  if(field.unit==='choice')return typeof value==='string'&&field.choices.some(c=>c.value===value);
   return typeof value==='string'&&(['address','text'].includes(field.unit)||/^(0|[1-9][0-9]*)$/u.test(value));
  }
  /** Return exactly one presentation family, retaining unknown fields. Pure. */
@@ -187,11 +195,13 @@
    * Empty generic string lists stay explicit; no default is adopted.
    * Null labels come from v4 metadata (session cookie differs from unlimited).
    * Phase labels follow catalog order, not wire-set sorting. Pure text only;
+ * Scalar choice values show their single exact catalog label, never a numeric guess;
    * no HTML, policy adoption or mutation. Unknown labels remain
    * visible as their raw value instead of becoming a successful empty display. */
   function valueText(value,field){
    if(value===undefined)return tr('Non configuré dans cette version');if(value===null)return tr(field?.null_label??'Sans plafond');
    if(Array.isArray(value)){if(field?.unit==='phases'){const known=field.choices.filter(c=>value.includes(c.value)).map(c=>tr(c.label));const unknown=value.filter(v=>!field.choices.some(c=>c.value===v)).map(String);return [...known,...unknown].join('\n')||tr('Aucun contrôle de phase supplémentaire')}return value.join('\n')||(field?.unit==='strings'?tr('Liste vide'):field?.name==='agent_environment_allow'?tr('Aucune variable héritée'):tr('Aucun programme'))}
+   if(field?.unit==='choice'){const known=field.choices.find(c=>c.value===value);return known?tr(known.label):String(value)}
    return String(value)
   }
   /** Build a read-only text table from validated catalog fields and saved values.
@@ -204,21 +214,29 @@
   function errorText(error){return errorLabels[error?.code]?tr(errorLabels[error.code]):error instanceof Error?error.message:tr('Réglages indisponibles. Recharger pour reprendre.')}
   /** Load the authoritative descriptor and settings through the supplied transport.
    * Malformed/failed reads show an actionable error and disable editing; late
-   * responses after unmount are ignored. No default is saved by rendering. */
+ * responses after unmount are ignored. No default is saved by rendering.
+ * Version introduction is availability, not proof that optional independent
+   * policy groups were adopted. Missing v1 core fields and future-present fields
+   * refuse; later absence stays unconfigured. Root validates group completeness.
+   * Choice descriptors need unique nonempty options plus member default and
+ * current values, without numeric coercion. */
   async function load(){
    if(!alive||loading)return;loading=true;edit.disabled=reload.disabled=true;status.className='notice info';status.textContent=tr('Chargement…');
    try {
     const [nextCatalog,nextDocument]=await Promise.all([transport.describe(),transport.show()]);if(!alive)return;
-    if(![1,2,3,4,5].includes(nextCatalog.schema_version)||!Array.isArray(nextCatalog.supported_document_versions)||!nextCatalog.supported_document_versions.includes(nextDocument.schema_version)||!nextCatalog.supported_document_versions.includes(nextCatalog.document_schema_version)||typeof nextDocument.revision!=='string'||!Array.isArray(nextCatalog.fields))throw Error(tr('Format des réglages incompatible.'));
-    const names=nextCatalog.fields.map(f=>f.name);if(new Set(names).size!==names.length||Object.keys(nextDocument.values).some(k=>!names.includes(k))||nextCatalog.fields.some(f=>!nextCatalog.supported_document_versions.includes(f.introduced_schema_version)||Object.hasOwn(nextDocument.values,f.name)!==(f.introduced_schema_version<=nextDocument.schema_version)))throw Error(tr('Format des réglages incompatible.'));
-    if(nextCatalog.fields.some(f=>f.unit==='phases'&&(nextCatalog.schema_version<2||!Array.isArray(f.choices)||!f.choices.length||f.choices.some(c=>!c||typeof c.value!=='string'||!c.value||typeof c.label!=='string'||!c.label.trim())||new Set(f.choices.map(c=>c.value)).size!==f.choices.length)))throw Error(tr('Format des réglages incompatible.'));
-    const units=['text','address','count','characters','seconds','milliseconds','bytes','percent','programs','phases','strings'];
-    if(nextCatalog.fields.some(f=>!units.includes(f.unit)||(f.unit==='text'&&nextCatalog.schema_version<5)||(f.unit==='strings'&&nextCatalog.schema_version<3)))throw Error(tr('Format des réglages incompatible.'));
+   if(![1,2,3,4,5,6].includes(nextCatalog.schema_version)||!Array.isArray(nextCatalog.supported_document_versions)||!nextCatalog.supported_document_versions.includes(nextDocument.schema_version)||!nextCatalog.supported_document_versions.includes(nextCatalog.document_schema_version)||typeof nextDocument.revision!=='string'||!Array.isArray(nextCatalog.fields))throw Error(tr('Format des réglages incompatible.'));
+    const names=nextCatalog.fields.map(f=>f.name);if(new Set(names).size!==names.length||Object.keys(nextDocument.values).some(k=>!names.includes(k))||nextCatalog.fields.some(f=>!nextCatalog.supported_document_versions.includes(f.introduced_schema_version)||(Object.hasOwn(nextDocument.values,f.name)?f.introduced_schema_version>nextDocument.schema_version:f.introduced_schema_version===1)))throw Error(tr('Format des réglages incompatible.'));
+   const describedChoices=choices=>Array.isArray(choices)&&choices.length&&choices.every(c=>c&&typeof c.value==='string'&&c.value.trim()&&typeof c.label==='string'&&c.label.trim())&&new Set(choices.map(c=>c.value)).size===choices.length;
+   if(nextCatalog.fields.some(f=>(f.unit==='phases'&&(nextCatalog.schema_version<2||!describedChoices(f.choices)))||(f.unit==='choice'&&(nextCatalog.schema_version<6||f.nullable!==false||!describedChoices(f.choices))))||nextCatalog.fields.some(f=>!['phases','choice'].includes(f.unit)&&f.choices!==undefined))throw Error(tr('Format des réglages incompatible.'));
+   const units=['text','address','count','characters','seconds','milliseconds','bytes','percent','programs','phases','choice','strings'];
+   if(nextCatalog.fields.some(f=>!units.includes(f.unit)||(f.unit==='text'&&nextCatalog.schema_version<5)||(f.unit==='strings'&&nextCatalog.schema_version<3)||(f.unit==='choice'&&nextCatalog.schema_version<6)))throw Error(tr('Format des réglages incompatible.'));
     if(nextCatalog.fields.some(f=>(f.unit==='address'&&nextCatalog.schema_version<4)||(f.technical_maximum!==undefined&&(nextCatalog.schema_version<4||typeof f.technical_maximum!=='string'||!/^(0|[1-9][0-9]*)$/u.test(f.technical_maximum)))||(f.null_label!==undefined&&(nextCatalog.schema_version<4||!f.nullable||typeof f.null_label!=='string'||!f.null_label.trim()))||(f.application!==undefined&&(nextCatalog.schema_version<4||f.application!=='server_restart'))))throw Error(tr('Format des réglages incompatible.'));
     if(nextCatalog.schema_version>=4&&(!nextCatalog.network_transport||['max_header_fields','minimum_connection_buffer_bytes','max_header_bytes','native_body_max_bytes','max_semaphore_permits'].some(k=>typeof nextCatalog.network_transport[k]!=='string'||!/^(0|[1-9][0-9]*)$/u.test(nextCatalog.network_transport[k]))))throw Error(tr('Format des réglages incompatible.'));
 
     for(const field of nextCatalog.fields.filter(f=>['programs','strings'].includes(f.unit))){if(!Object.hasOwn(nextDocument.values,field.name))continue;const selected=nextDocument.values[field.name];if(!Array.isArray(selected)||selected.some(value=>typeof value!=='string'))throw Error(tr('Format des réglages incompatible.'))}
     for(const field of nextCatalog.fields.filter(f=>f.unit==='phases')){if(!Object.hasOwn(nextDocument.values,field.name))continue;const selected=nextDocument.values[field.name];if(!Array.isArray(selected)||selected.some(value=>typeof value!=='string'||!field.choices.some(c=>c.value===value))||new Set(selected).size!==selected.length)throw Error(tr('Format des réglages incompatible.'))}
+   for(const field of nextCatalog.fields.filter(f=>f.unit==='choice')){if(!Object.hasOwn(nextDocument.values,field.name))continue;const selected=nextDocument.values[field.name];if(typeof selected!=='string'||!field.choices.some(c=>c.value===selected))throw Error(tr('Format des réglages incompatible.'))}
+   if(nextCatalog.fields.some(f=>f.unit==='choice'&&(!Object.hasOwn(nextCatalog.defaults,f.name)||typeof nextCatalog.defaults[f.name]!=='string'||!f.choices.some(c=>c.value===nextCatalog.defaults[f.name]))))throw Error(tr('Format des réglages incompatible.'));
     catalog=nextCatalog;documentValue=nextDocument;content.replaceChildren();
     for(const group of groups){const fields=catalog.fields.filter(field=>groupFor(field)===group);if(!fields.length)continue;const section=element('details');section.dataset.settingsSummaryGroup=group[0];section.append(element('summary',tr(group[1])+' ('+fields.length+')'),table(documentValue.values,true,fields));content.append(section)}
     if(catalog.fields.some(f=>f.application==='server_restart'))content.append(element('p',tr('Les paramètres HTTP marqués prennent effet au prochain redémarrage du serveur. Ces valeurs sont enregistrées ; elles ne prouvent pas le redémarrage.'),'notice info'));
@@ -231,13 +249,17 @@
    finally{loading=false;if(alive)reload.disabled=false}
   }
   /** Open an accessible editor for the current saved revision. Older documents
-   * propose current defaults without adopting them until preview/save. Errors
+   * propose current defaults without adopting them until preview/save, including
+   * newer journals that still omit independent policy groups. Errors
    * Generic string lists use newline arrays, including an explicit empty list;
    * semantic validation remains authoritative in the engine. Errors
    * remain visible, stale revisions refuse, and close restores the trigger focus.
    * Addresses remain raw strings for authoritative backend validation. Technical
    * maxima are visible metadata, never a second frontend clamp. Restart-only
    * effects are disclosed without claiming an active server.
+ * Scalar choice fields render one native select whose options are exactly the
+ * catalog choices with translated labels; drafts, previews and saves keep the
+ * exact string value.
    * This component delegates authority and persistence to its supplied transport. */
   function open(){
    if(!alive||!documentValue||dialog)return;
@@ -247,19 +269,24 @@
    const close=()=>modal.close(),closeButton=element('button',tr('Fermer'));closeButton.type='button';closeButton.addEventListener('click',close);header.append(title,closeButton);
    const form=element('form'),body=element('div',undefined,'modal-body'),grid=element('div',undefined,'engine-settings-fields'),footer=element('footer',undefined,'modal-footer');
    body.append(element('p',tr('Les valeurs initiales permettent de démarrer. Sans plafond signifie une décision explicite ; zéro garde le sens décrit pour chaque réglage.')));
-   if(current.schema_version<catalog.document_schema_version){body.append(element('p',tr('Ce journal utilise une ancienne version. Les nouvelles valeurs proposées ne deviennent effectives qu’après prévisualisation et enregistrement ; les anciennes entrées restent conservées.'),'notice info'));current.values={...catalog.defaults,...current.values}}
+   if(current.schema_version<catalog.document_schema_version||catalog.fields.some(field=>!Object.hasOwn(current.values,field.name))){body.append(element('p',tr('Ce journal utilise une ancienne version. Les nouvelles valeurs proposées ne deviennent effectives qu’après prévisualisation et enregistrement ; les anciennes entrées restent conservées.'),'notice info'));current.values={...catalog.defaults,...current.values}}
    const groupGrids=new Map();
    for(const group of groups){const fields=catalog.fields.filter(field=>groupFor(field)===group);if(!fields.length)continue;
     const section=element('details',undefined,'engine-settings-group'),summary=element('summary',tr(group[1])+' ('+fields.length+')'),fieldsGrid=element('div',undefined,'engine-settings-fields'),tools=element('div',undefined,'toolbar');
     section.dataset.settingsGroup=group[0];const help=element('button',tr('Aide du groupe')),ai=element('button',tr('Aidez-moi à choisir avec une IA'));help.type=ai.type='button';ai.dataset.settingsAdvice=group[0];ai.setAttribute('aria-haspopup','dialog');help.setAttribute('aria-haspopup','dialog');help.addEventListener('click',()=>showHelp(tr(group[1]),fields,help));ai.addEventListener('click',()=>showAdvice(group,fields,ai));tools.append(help,ai);section.append(summary,tools,fieldsGrid);grid.append(section);groupGrids.set(group[0],fieldsGrid);
    }
    for(const field of catalog.fields){
-    const container=element('div',undefined,'engine-settings-field'),phases=field.unit==='phases',input=element(phases?'fieldset':['programs','strings'].includes(field.unit)?'textarea':'input');input.id=prefix+'-'+field.name;input.dataset.setting=field.name;
+   const container=element('div',undefined,'engine-settings-field'),phases=field.unit==='phases',choice=field.unit==='choice',input=element(phases?'fieldset':choice?'select':['programs','strings'].includes(field.unit)?'textarea':'input');input.id=prefix+'-'+field.name;input.dataset.setting=field.name;
     if(phases){
      input.className='engine-settings-phase-list';input.append(element('legend',tr(field.label)));
      for(const choice of field.choices){const check=element('input');check.type='checkbox';check.value=choice.value;check.dataset.phaseChoice=choice.value;check.checked=current.values[field.name].includes(choice.value);const label=element('label',undefined,'engine-settings-unlimited');label.append(check,document.createTextNode(tr(choice.label)));input.append(label)}
      container.append(input,element('p',tr('Les contrôles des critères restent obligatoires. Les tâches existantes gardent leurs exigences.'),'assist-meta'));
-    }else{
+   }else if(choice){
+    for(const option of field.choices){const item=element('option',tr(option.label));item.value=option.value;input.append(item)}
+    input.value=typeof current.values[field.name]==='string'?current.values[field.name]:'';
+    input.required=current.values[field.name]!==null;
+    const label=element('label',tr(field.label));label.htmlFor=input.id;label.append(input);container.append(label);
+   }else{
      if(!['programs','strings','address','text'].includes(field.unit)){input.type='text';input.inputMode='numeric';input.pattern='0|[1-9][0-9]*'}else{input.spellcheck=false;input.setAttribute('autocapitalize','off');input.setAttribute('autocomplete','off')}
      input.value=current.values[field.name]===null?'':Array.isArray(current.values[field.name])?current.values[field.name].join('\n'):current.values[field.name];
      input.required=!['programs','strings'].includes(field.unit)&&current.values[field.name]!==null;
@@ -267,6 +294,7 @@
     }
     if(field.nullable){const check=element('input');check.type='checkbox';check.checked=current.values[field.name]===null;check.dataset.unlimited=field.name;const limitLabel=element('label',undefined,'engine-settings-unlimited');limitLabel.append(check,document.createTextNode(tr(field.null_label??'Sans plafond')));container.append(limitLabel);unlimited[field.name]=check;const change=()=>{input.disabled=check.checked;input.required=!check.checked};check.addEventListener('change',change);change()}
     if(field.application==='server_restart')container.append(element('p',tr('Après redémarrage HTTP'),'assist-meta'));
+   if(choiceNotes[field.name])container.append(element('p',tr(choiceNotes[field.name]),'assist-meta'));
     const help=element('button',tr('Comprendre ce réglage'));help.type='button';help.dataset.settingsHelp=field.name;help.setAttribute('aria-haspopup','dialog');help.setAttribute('aria-label',tr('Comprendre ce réglage')+' — '+tr(field.label));help.addEventListener('click',()=>showHelp(tr(field.label),[field],help));const ai=element('button',tr('Conseil IA pour ce réglage'));ai.type='button';ai.dataset.settingsAdviceField=field.name;ai.setAttribute('aria-haspopup','dialog');ai.setAttribute('aria-label',tr('Conseil IA pour ce réglage')+' — '+tr(field.label));ai.addEventListener('click',()=>showAdvice(groupFor(field),[field],ai));
     if(field.technical_maximum!==undefined){const bound=element('p',tr('Maximum technique : ')+field.technical_maximum,'assist-meta');bound.dataset.technicalMaximum=field.name;container.append(bound)}
     container.append(element('p',tr('Défaut initial : ')+valueText(catalog.defaults[field.name],field),'assist-meta'),help,ai);groupGrids.get(groupFor(field)[0]).append(container);inputs[field.name]=input;

@@ -1,5 +1,5 @@
-//! Conductor with one owned asynchronous role phase and independent workers.
-//! Complete Go role concurrency, registered/managed recovery, web integration
+//! Conductor with owned concurrent role phases and independent workers.
+//! Global Go concurrency parity, registered/managed recovery, web integration
 //! and global mission acceptance remain unestablished. The native web command
 //! reuses the owned session below; server-wide Go parity is not established.
 use crate::{Arguments, CliError};
@@ -658,7 +658,7 @@ fn planning_record(
 /// from the engine and known returned Work survive later read/render failures.
 /// The selected planner job calls this synchronously in its owned peer, while
 /// main only uses pending=true for non-executing deferral observations. Existing
-/// cleanup handles scoped stops; complete Go simultaneous roles remain unported.
+/// cleanup joins each owned role on stop; role scheduling alone grants nothing.
 fn planning_once(
     store: &mut RootStore,
     work: &str,
@@ -1010,11 +1010,13 @@ fn stop_withdrawn_report(error: RootError, work: &str, recorded: &Option<(String
 /// Worker work begins only through dispatch or queued-v4 adoption plus the private CLI
 /// bootstrap. Each iteration re-observes retained state without changing Binding4. Missing reviewer/validation roles produce a visible blocked
 /// state; no idle/terminal worker state is promoted to complete mission success.
-/// One owned controls/reviewer/planner peer may block while main observes/dispatches.
-/// Completion is polled at saved cadence, joined and published by this thread.
-/// Completed control/review outcomes drain in order before a planner activation.
-/// At most one role phase is owned, preserving the prior role-writer exclusion;
-/// complete Go simultaneous-role scheduling remains unported.
+/// Controls, reviewer and planner own independent scoped peers. Completion is
+/// polled at saved cadence, joined and published by this sole shared-output
+/// writer in protocol role order. One in-flight call per role prevents duplicate
+/// owned calls; engine leases/admission and persisted budgets remain authoritative.
+/// Planner defers while active worker contexts remain. Every peer is interrupted
+/// and joined before conductor release, even after another peer/publisher fails.
+/// This does not establish global scheduling or mission acceptance parity.
 fn drive(
     store: &mut RootStore,
     lease: &MissionLease,
@@ -1037,8 +1039,7 @@ fn drive(
     let mut waiting_reports = std::collections::BTreeMap::new();
     let mut recovery_waiting = std::collections::BTreeMap::new();
     std::thread::scope(|scope| {
-        let mut job = None;
-        let mut role = role_job::Role::Controls;
+        let mut jobs = std::collections::BTreeMap::new();
         let main = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
     loop {
         if !monitor.is_running() {
@@ -1047,13 +1048,13 @@ fn drive(
         if let Some(stop) = signals.ready()? {
             return Ok(stop);
         }
-        if job.as_ref().is_some_and(std::thread::ScopedJoinHandle::is_finished) {
-            let report = role_job::joined(job.take().expect("checked owned role"));
-            let produced = report.recorded.is_some();
-            if let Err(error) = role_job::publish(report,work,planning_recorded,out) {
-                return interrupted_phase(error,work,signals,planning_recorded,out);
+        for role in role_job::Role::ALL {
+            if jobs.get(&role).is_some_and(std::thread::ScopedJoinHandle::is_finished) {
+                let report = role_job::joined(jobs.remove(&role).expect("checked owned role"));
+                if let Err(error) = role_job::publish(report,work,planning_recorded,out) {
+                    return interrupted_phase(error,work,signals,planning_recorded,out);
+                }
             }
-            role = role.next(produced);
         }
         reap(store, work, children, out)?;
         if let Err(error) = relay_reports(
@@ -1077,14 +1078,14 @@ fn drive(
         if active_context {
             planning_once(store,work,true,out,planning_recorded)?;
         }
-        if job.is_none() {
-            // Existing roles remain ordered; worker observation/dispatch continues
-            // during each owned phase. No simultaneous role writer is introduced.
-            if role == role_job::Role::Planner && active_context {
-                role = role_job::Role::Controls;
-            } else {
-                job=Some(role_job::start(scope,role,root.to_owned(),work.to_owned(),lease,signals.source.clone())?);
+        for role in role_job::Role::ALL {
+            if jobs.contains_key(&role) { continue; }
+            if role == role_job::Role::Planner {
+                let current = store.read_work(work)?;
+                if active_context || !current.planning.as_ref().is_some_and(|p|
+                    !p.paused && p.failure.is_empty() && !p.provider.is_empty()) { continue; }
             }
+            jobs.insert(role,role_job::start(scope,role,root.to_owned(),work.to_owned(),lease,signals.source.clone())?);
         }
         if !monitor.is_running() {
             return Err(RootError::Refused("mission-watch-heartbeat-not-running"));
@@ -1214,11 +1215,8 @@ fn drive(
         }
     }
     })).unwrap_or_else(|payload|Err(role_job::panicked(payload)));
-        match job {
-            Some(handle) => {
-                role_job::finish(handle, main, work, signals, planning_recorded, out)
-            }
-            None => main,
+        if jobs.is_empty() { main } else {
+            role_job::finish(jobs.into_values().collect(), main, work, signals, planning_recorded, out)
         }
     })
 }
@@ -1257,7 +1255,7 @@ fn cycle_failure(error: MissionCycleFailure<Stop>) -> RootError {
 /// wait/failed-receipt paths before releasing the conductor; only clean durably
 /// recorded interruption plus actual delivered stop returns0. Granted independent
 /// workers are not killed/waited. Other cleanup failures remain errors. Full
-/// Go asynchronous scheduling remains open; cancellation is not its substitute.
+/// Role overlap does not establish global Go scheduling parity or acceptance.
 /// JSON mode is a versioned JSONL extension, not parity with Go's text watch.
 /// Known returned planner Work retains the highest same-Work revision on subsequent
 /// failure, independently of worker admission.

@@ -11,6 +11,15 @@ use std::{
 use swarm_engine::{RootStore, RootStoreError, SystemEnvironment};
 use swarm_protection_contract::{Action, Proposal};
 const PIN: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+/// Serialize tests against the shared retained source fixture: its real
+/// `.engine-settings.lock` guards the actual settings publication, and
+/// `apply_settings` takes the product's non-blocking exclusive reservation
+/// (no retry is invented). One in-process exclusive flock per test that
+/// mutates the shared fixture mirrors that contract under the parallel
+/// default runner; single-test filters and `--test-threads=1` are unaffected.
+/// Blocking on the same lock file cannot deadlock the checked readers, which
+/// hold only shared non-blocking reservations for the duration of a read.
+static SOURCE_FIXTURE_MUTEX: std::sync::Mutex<()> = std::sync::Mutex::new(());
 /// Resolve/pin actual installed Git, shared fixture pattern from protocol69.
 fn git_executable() -> &'static std::path::Path {
     use sha2::{Digest, Sha256};
@@ -450,4 +459,242 @@ fn git_repository_normal_library_object_format_compatibility() {
     held.close().unwrap();
     service.close().unwrap();
     project.close().unwrap();
+}
+
+/// A newly owned first-publication fixture is separate from immutable71 inputs.
+/// Check its actual birth and read the current candidate through the real reader.
+fn source_project() -> (PathBuf, RootStore, String, String) {
+    let proof = PathBuf::from(
+        std::env::var_os("SWARM_PAEA_SOURCE_FIXTURE").expect("explicit new source fixture"),
+    );
+    let value: Value =
+        serde_json::from_slice(&fs::read(proof.join("result.json")).unwrap()).unwrap();
+    assert_eq!(value["status"], "PASS");
+    assert_eq!(value["task_accepted"], true);
+    assert_eq!(value["paid_provider"], false);
+    let path = PathBuf::from(value["root"].as_str().unwrap());
+    assert!(born(&proof, path.to_str().unwrap()));
+    let project = RootStore::open(&path, false).unwrap();
+    let work = value["work"].as_str().unwrap().to_owned();
+    let current = project.current_managed_git_publication(&work).unwrap();
+    (path, project, work, current.candidate_commit)
+}
+/// One owned source fixture avoids parallel mutations of retained proofs. Valid
+/// control precedes each Root/candidate/bare/lock fault; actual flock contention
+/// survives repository capability close and resolves only after source close.
+/// Restore known path faults before asserting their observations, so an
+/// unexpected refusal leaves original artifacts under their original names.
+#[test]
+#[ignore = "requires explicit new owned native source fixture"]
+fn git_source_owned_lane_rebinding_and_recovery() {
+    // Serialized against the shared-fixture settings mutation test; see the
+    // SOURCE_FIXTURE_MUTEX contract at the top of this file.
+    let _guard = SOURCE_FIXTURE_MUTEX.lock().unwrap_or_else(|e| e.into_inner());
+    // Restore each known physical fault before asserting its observation, so an
+    // unexpected refusal cannot leave the original fixture under a held name.
+    use rustix::fs::{flock, FlockOperation};
+    use std::fs::OpenOptions;
+    let (path, project, work, candidate) = source_project();
+    let before = fs::read(path.join(".swarm/state.db")).unwrap();
+    let (dir, service) = service();
+    service
+        .paea_initialize_git_intents("fixture-project", PIN)
+        .unwrap();
+    bare(dir.path(), "bare");
+    let binding = service
+        .paea_provision_git_repository(&project, &work, "bare", PIN)
+        .unwrap();
+    let p = proposal(binding.repository_id(), &candidate);
+    let cap = service
+        .paea_open_git_repository(&project, &work, "bare", PIN)
+        .unwrap();
+    let source = cap.retain_source(&service, &project, &p).unwrap();
+    assert_eq!(source.candidate_oid(), candidate);
+    assert_eq!(
+        source
+            .inspect(&cap, &service, &project, &p)
+            .unwrap()
+            .candidate_commit,
+        candidate
+    );
+    let data = project.read_work(&work).unwrap();
+    let storage = PathBuf::from(
+        &data
+            .planning
+            .as_deref()
+            .unwrap()
+            .repository
+            .as_deref()
+            .unwrap()
+            .storage,
+    );
+    let writer = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(storage.join(".engine-settings.lock"))
+        .unwrap();
+    assert_eq!(
+        flock(&writer, FlockOperation::NonBlockingLockExclusive).unwrap_err(),
+        rustix::io::Errno::WOULDBLOCK
+    );
+    cap.close().unwrap();
+    assert_eq!(
+        flock(&writer, FlockOperation::NonBlockingLockExclusive).unwrap_err(),
+        rustix::io::Errno::WOULDBLOCK
+    );
+    let cap = service
+        .paea_open_git_repository(&project, &work, "bare", PIN)
+        .unwrap();
+    source.inspect(&cap, &service, &project, &p).unwrap();
+    let (_wrong_path, wrong) = self::service();
+    assert!(matches!(
+        source.inspect(&cap, &service, &wrong, &p),
+        Err(RootStoreError::Refused("paea-git-source-root-binding"))
+    ));
+    source.inspect(&cap, &service, &project, &p).unwrap();
+    let mut bad = p.clone();
+    if let Action::Git { candidate_oid, .. } = &mut bad.action {
+        *candidate_oid = "3".repeat(40)
+    }
+    assert!(matches!(
+        source.inspect(&cap, &service, &project, &bad),
+        Err(RootStoreError::Refused("paea-git-current-candidate"))
+    ));
+    source.inspect(&cap, &service, &project, &p).unwrap();
+    let original = storage.join("repository.git");
+    let held = storage.join("source-held.git");
+    fs::rename(&original, &held).unwrap();
+    fs::create_dir(&original).unwrap();
+    fs::set_permissions(&original, fs::Permissions::from_mode(0o700)).unwrap();
+    let observed = source.inspect(&cap, &service, &project, &p);
+    fs::remove_dir(&original).unwrap();
+    fs::rename(&held, &original).unwrap();
+    assert!(matches!(
+        observed,
+        Err(RootStoreError::Refused("paea-git-source-directory-rebound"))
+    ));
+
+    source.inspect(&cap, &service, &project, &p).unwrap();
+    let original = storage.join(".engine-settings.lock");
+    let held = storage.join("source-held.lock");
+    fs::rename(&original, &held).unwrap();
+    let replacement = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&original)
+        .unwrap();
+    fs::set_permissions(&original, fs::Permissions::from_mode(0o600)).unwrap();
+    nix::unistd::close(replacement).unwrap();
+    let observed = source.inspect(&cap, &service, &project, &p);
+    fs::remove_file(&original).unwrap();
+    fs::rename(&held, &original).unwrap();
+    assert!(matches!(
+        observed,
+        Err(RootStoreError::Refused("paea-git-source-lock-rebound"))
+    ));
+
+    source.inspect(&cap, &service, &project, &p).unwrap();
+    assert_eq!(
+        flock(&writer, FlockOperation::NonBlockingLockExclusive).unwrap_err(),
+        rustix::io::Errno::WOULDBLOCK
+    );
+    source.close().unwrap();
+    flock(&writer, FlockOperation::NonBlockingLockExclusive).unwrap();
+    flock(&writer, FlockOperation::Unlock).unwrap();
+    nix::unistd::close(writer).unwrap();
+    assert_eq!(fs::read(path.join(".swarm/state.db")).unwrap(), before);
+    cap.close().unwrap();
+    wrong.close().unwrap();
+    service.close().unwrap();
+    project.close().unwrap();
+}
+
+/// Save the same validated configuration values through the public preview/apply
+/// API. Revision changes while policy/candidate stay equal: old source refuses,
+/// new source recovers, and reopening preserves history. Uses only new fixture78.
+/// Serialized against the other shared-fixture tests: apply_settings takes the
+/// product's non-blocking exclusive settings reservation, which is correct to
+/// refuse under a parallel shared reader of the same retained fixture.
+#[test]
+#[ignore = "requires newly owned native context fixture78"]
+fn git_source_context_revision_refuses_old_guard_and_recovers() {
+    let _guard = SOURCE_FIXTURE_MUTEX.lock().unwrap_or_else(|e| e.into_inner());
+    use swarm_engine::{EngineSettingsChange, SystemEnvironment};
+    let (path, readonly, work, candidate) = source_project();
+    readonly.close().unwrap();
+    let project = RootStore::open(&path, true).unwrap();
+    let (dir, service) = service();
+    service
+        .paea_initialize_git_intents("fixture-project", PIN)
+        .unwrap();
+    bare(dir.path(), "bare");
+    let binding = service
+        .paea_provision_git_repository(&project, &work, "bare", PIN)
+        .unwrap();
+    let p = proposal(binding.repository_id(), &candidate);
+    let repository = service
+        .paea_open_git_repository(&project, &work, "bare", PIN)
+        .unwrap();
+    let old = repository.retain_source(&service, &project, &p).unwrap();
+    let before = old.inspect(&repository, &service, &project, &p).unwrap();
+    let settings = project.settings().unwrap();
+    // The shared retained fixture keeps each applied change in its durable
+    // history. Reusing one event_id across runs would misread an earlier run's
+    // recorded change as a conflicting replay, because expected_revision moves
+    // with the actual saved revision. The event id binds the revision this run
+    // observed, so a genuine re-run is a new change, never a forged replay.
+    let mut change = EngineSettingsChange {
+        schema_version: settings.schema_version,
+        event_id: format!("source-context-revision-{}", settings.revision.0),
+        expected_revision: settings.revision,
+        values: settings.values.clone(),
+        reason: "Owned fixture verifies source context freshness without policy changes".into(),
+        preview_token: String::new(),
+    };
+    change.preview_token = project.preview_settings(&change).unwrap().preview_token;
+    let (saved, replayed) = project
+        .apply_settings(&change, &mut SystemEnvironment)
+        .unwrap();
+    assert!(!replayed);
+    assert!(saved.revision.0 > settings.revision.0);
+    assert_eq!(saved.values, settings.values);
+    let current = repository.inspect(&service, &project, &p).unwrap();
+    assert_eq!(current.candidate_commit, before.candidate_commit);
+    assert_eq!(current.work_revision, before.work_revision);
+    assert_eq!(current.settings_revision, saved.revision);
+    assert_ne!(current.settings_revision, before.settings_revision);
+    assert!(matches!(
+        old.inspect(&repository, &service, &project, &p),
+        Err(RootStoreError::Refused(
+            "paea-git-source-publication-changed"
+        ))
+    ));
+    let fresh = repository.retain_source(&service, &project, &p).unwrap();
+    assert_eq!(
+        fresh.inspect(&repository, &service, &project, &p).unwrap(),
+        current
+    );
+    assert_eq!(old.candidate_oid(), fresh.candidate_oid());
+    old.close().unwrap();
+    fresh.close().unwrap();
+    repository.close().unwrap();
+    project.close().unwrap();
+    let reopened = RootStore::open(&path, false).unwrap();
+    let state = reopened.settings().unwrap();
+    assert_eq!(state, saved);
+    let repository = service
+        .paea_open_git_repository(&reopened, &work, "bare", PIN)
+        .unwrap();
+    let fresh = repository.retain_source(&service, &reopened, &p).unwrap();
+    assert_eq!(
+        fresh
+            .inspect(&repository, &service, &reopened, &p)
+            .unwrap()
+            .settings_revision,
+        saved.revision
+    );
+    fresh.close().unwrap();
+    repository.close().unwrap();
+    reopened.close().unwrap();
+    service.close().unwrap();
 }

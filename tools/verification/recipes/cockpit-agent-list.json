@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "id": "cockpit-agent-list",
+  "inputs": [
+    "tests/rust_cockpit_agent_list.py",
+    "tests/test_rust_cockpit_agent_list.py",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-cli/src/agent.rs",
+    "rust/crates/swarm-engine/src/root_store/cockpit_snapshot.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/reported_costs.rs",
+    "rust/crates/swarm-engine/src/mission_controls.rs",
+    "rust/crates/swarm-engine/src/mission_task_order.rs",
+    "rust/crates/swarm-engine/src/mission_dispatch_policy.rs",
+    "rust/crates/swarm-engine/src/root_store/material_path.rs",
+    "rust/crates/swarm-engine/config/engine-settings*.json",
+    "docs/architecture/COCKPIT-COMPATIBILITY.md",
+    "docs/en/COCKPIT-COMPATIBILITY.md",
+    "rust/crates/swarm-engine/src/root_store/cockpit_actions.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "comparator-oracle-counterexamples",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_cockpit_agent_list.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_project_identity_is_canonical_filesystem_bytes",
+        "test_exact_keys_refuse_an_invented_section_with_the_same_count",
+        "test_boolean_does_not_equal_a_zero_counter",
+        "test_other_changes_and_invalid_timestamp_offsets_refuse",
+        "Ran 5 tests",
+        "OK",
+        "test_dependency_clocks_are_validated_without_hiding_graph_facts"
+      ]
+    },
+    {
+      "id": "public-go-rust-todo-dependency-cockpit",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='cockpit-agent-list-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_cockpit_agent_list.py','--go-binary',os.environ['SWARM_COCKPIT_AGENT_LIST_GO_BINARY'],'--rust-binary',os.environ['SWARM_COCKPIT_AGENT_LIST_RUST_BINARY'],'--todo-dependencies','--output',str(p)],check=True)\nprint('COCKPIT_AGENT_LIST_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS agent-list-matches-except-snapshot-as-of",
+        "PASS post-pause-lists-match-except-snapshot-as-of",
+        "PASS post-unpause-lists-match-except-snapshot-as-of",
+        "PASS rust-list-json-without-flag",
+        "PASS rust-list-refuses-task-projection-unported",
+        "PASS reader-preserves-saved-settings-malformed-controls",
+        "PASS reader-preserves-mission-controls-malformed-controls",
+        "PASS initial-todo-documents-match",
+        "PASS initial-todo-paused-reason",
+        "PASS priority-contains-only-persisted-row",
+        "PASS initial-todo-budget-insufficient-reason",
+        "PASS initial-todo-budget-restored-ready-and-start",
+        "COCKPIT_GLOBAL_OVERLAP_VERIFIED 15",
+        "PASS todo-dependency-documents-match",
+        "PASS todo-dependency-waiting-and-not-ready",
+        "PASS todo-dependency-edge-is-unvalidated",
+        "PASS todo-dependency-start-reason",
+        "PASS todo-dependency-override-reason",
+        "PASS todo-dependency-priority-does-not-invent-default-row"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

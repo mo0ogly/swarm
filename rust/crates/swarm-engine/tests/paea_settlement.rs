@@ -987,3 +987,77 @@ fn settlement_receipt_metadata_refuses_then_recovers() {
         "incoherent metadata accepted: {accepted:?}"
     );
 }
+
+/// The declared tool manifest is transported, not engine-attributed: settlement
+/// consumes no provider catalogue (the admitted-tool barrier is the agent-launch
+/// preflight, Increment101), so the effective binding is canonical-bytes→signed
+/// permission→frozen prepared request→existing-intent refusal. A manifest change
+/// after preparation yields a different action digest for the same business
+/// intent and the recorded outcome refuses any reauthorization without a new
+/// effect; reconciliation retains the historical declared field. This proves the
+/// honest linkage and its limit: no engine recomputation, no ambient-provider
+/// barrier is claimed for this field.
+#[test]
+fn settlement_declared_tool_manifest_binding_and_existing_intent_refusal() {
+    let (_pd, project, scope) = project();
+    let (ld, ledger) = root();
+    let (p, c) = action();
+    assert_eq!(c.tool_manifest_digest, "b".repeat(64));
+    ledger
+        .paea_initialize_settlement(&c.project_id, &"0b".repeat(32), std::slice::from_ref(&p))
+        .unwrap();
+    let witness = project
+        .paea_settlement_request(&ledger, &p, &c, Operation::Commit)
+        .unwrap();
+    // Declaration is preserved verbatim at preparation (no engine attribution),
+    // while the canonical digest — which includes the manifest — is frozen into
+    // the exact signed permission resource and the in-memory prepared request.
+    assert_eq!(witness.context().tool_manifest_digest, c.tool_manifest_digest);
+    let witness_digest = witness.canonical().digest().to_owned();
+    let resource = witness.request().permission().resource;
+    assert!(
+        resource.contains(&format!("/commit/{witness_digest}")),
+        "signed permission must bind the canonical digest containing the manifest"
+    );
+    let receipt = recorded(invoke(&project, &ledger, &witness, &scope).unwrap(), false);
+    assert_eq!(receipt.action_digest, witness_digest);
+    assert_eq!(count(ld.path()), 1);
+    // Mutating only the manifest after publication: re-preparation is possible
+    // (declaration stays validated form-only), but the new canonical digest for
+    // the same business intent refuses against the recorded outcome with no new
+    // effect and the old known receipt retained — the consumption-time barrier.
+    let mut changed = c.clone();
+    changed.tool_manifest_digest = "c".repeat(64);
+    let attempt = project
+        .paea_settlement_request(&ledger, &p, &changed, Operation::Commit)
+        .unwrap();
+    assert_eq!(attempt.context().tool_manifest_digest, changed.tool_manifest_digest);
+    assert_ne!(attempt.canonical().digest(), witness_digest);
+    assert_eq!(attempt.canonical().intent_id(), witness.canonical().intent_id());
+    let error = invoke(&project, &ledger, &attempt, &scope).unwrap_err();
+    assert_eq!(error.code, "paea-settlement-business-intent-conflict");
+    match error.observation {
+        Observation::Known(old) => {
+            assert_eq!(recorded(*old, true).action_digest, witness_digest);
+        }
+        _ => panic!("lost recorded outcome on manifest mutation"),
+    }
+    assert_eq!(count(ld.path()), 1);
+    // Reconciliation keeps the historical declared manifest and replays the
+    // recorded effect without any new commitment.
+    let historical = project
+        .paea_settlement_request(&ledger, &p, witness.context(), Operation::Reconcile)
+        .unwrap();
+    assert_eq!(
+        historical.context().tool_manifest_digest,
+        c.tool_manifest_digest
+    );
+    assert_eq!(historical.canonical().digest(), witness_digest);
+    recorded(invoke(&project, &ledger, &historical, &scope).unwrap(), true);
+    assert_eq!(count(ld.path()), 1);
+    attempt.close().unwrap();
+    historical.close().unwrap();
+    witness.close().unwrap();
+    ledger.close().unwrap();
+    project.close().unwrap();
+}

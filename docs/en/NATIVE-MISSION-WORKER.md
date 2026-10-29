@@ -1130,7 +1130,7 @@ and spool/pidfd-refusal cleanup on owned fixtures without a paid provider. The
 agents are listed separately. Incoherent-process recovery, full asynchronous
 scheduling, web integration and global acceptance remain open. Nothing installed.
 
-### Roles independent of the conductor loop
+### Roles independent of the conductor loop — historical state1072
 
 Controls, reviewer and planner use one scoped job at a time under the actual
 Root peer and lease. Main keeps observing/dispatching and publishes after joining;
@@ -1138,3 +1138,52 @@ shutdown retains causes before lease release. Active-worker deferral is observed
 independently of the role phase. See the current diagram in
 [Rust migration](RUST-MIGRATION.md). Bounded qualification1072 is verified; full Go role
 concurrency, web integration and installation are not claimed.
+
+### Concurrent roles —28October candidate
+
+The single phase above is replaced in the candidate by three owned role families: controls, reviewer and planner. Every family retains its handle until joined; only main publishes using the saved cadence. Planning waits for active worker contexts and respects saved provider/pause/failure state. Engine writers, leases, consent and budget checks remain authoritative. These three identities are the existing protocol, not a new operator ceiling.
+
+Six targeted tests pass, including a three-thread barrier, panic/failure with sibling outputs retained, and individually classified clean interruptions. Synthetic reports do not prove OS termination or provider overlap. Public journeys, the normal profile and candidate installation still require verification; global acceptance remains open.
+
+Two conflicts remain distinct: before a claim, a newer revision guard requires
+fresh observation without a provider. After a claim, only a native gate refusing
+a stale scope BEFORE exec may become a stale observation, after successful
+receipt, consumption, feedback and cleanup. Manual commands still return an
+error. Watch publishes the retained claim without turning observation into
+permission. Any subsequent activation still passes current guards and budgets;
+there is no refund or suppression of other failures.
+
+```mermaid
+sequenceDiagram
+    participant C as Controls / review
+    participant P as Planner
+    participant G as Native gate
+    participant W as Conductor
+    P->>G: Claim and prepared context
+    C->>C: Current state changes
+    G-->>P: Stale context, exec refused
+    P->>P: Durable receipt + consumption + feedback
+    P-->>W: Retained refusal, private live marker
+    W->>W: Stale observation, no acceptance
+    W->>G: Fresh observation under normal guards
+```
+
+This journey remains a candidate until its public recipe is verified. Uncertain
+cleanup/publication, a different gate refusal or an executed provider remain
+blocking errors, even when a local stop occurs concurrently.
+
+### Historical cockpit helpers — verified preparation, integration open
+
+Three internal projections compile with28tests: health3, actions10 and
+post-delivery sources15. They consume supplied observations without storage
+reads and grant no identity, launch, freshness or acceptance. Action inputs must
+include the actual unsatisfied-dependency reason; a declared dependency may be
+current. Post-delivery sources preserve task order and Go contract serialization,
+with an explicit error when an actual freshness observation is missing.
+
+`agent list` is not connected yet: agent selection, SQL data, settings, review
+proofs and preparations still need their actual producers composed. Native cost,
+Work and validation producers already exist and must be reused. These28tests
+establish neither the full cockpit, its Go oracle nor installation. Missing saved
+mode remains distinct from consent; its configurable initial value awaits the
+user decision.

@@ -1,25 +1,15 @@
-//! One caller-owned ordered role job; no lease renewal or independent process authority.
+//! Caller-owned concurrent role jobs; no lease renewal or independent process authority.
 use super::*;
 use std::thread::{Scope, ScopedJoinHandle};
 
-/// Internal execution order, not a configurable concurrency or attempt ceiling.
-/// Controls drain before reviews; reviews drain before a planner activation.
-/// `recorded` means the actual producer returned a Work, never guessed eligibility.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+/// Structural role identities, not an operator concurrency/attempt ceiling.
+/// The conductor owns at most one in-flight call for each existing role; real
+/// engine admission, leases and saved provider/budget policies remain mandatory.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(super) enum Role { Controls, Reviewer, Planner }
 impl Role {
-    /// Advance only after successful join/publication. Revisit a producing control
-    /// or review to drain its next item; an empty phase advances without fake work.
-    /// A planner activation always yields back to current controls on the next pass.
-    pub(super) fn next(self, recorded: bool) -> Self {
-        match (self, recorded) {
-            (Self::Controls, true) => Self::Controls,
-            (Self::Controls, false) => Self::Reviewer,
-            (Self::Reviewer, true) => Self::Reviewer,
-            (Self::Reviewer, false) => Self::Planner,
-            (Self::Planner, _) => Self::Controls,
-        }
-    }
+    /// Deterministic publication order for independent owned role handles.
+    pub(super) const ALL: [Self; 3] = [Self::Controls, Self::Reviewer, Self::Planner];
     /// Diagnostic thread names are technical labels, never agent identities.
     fn thread_name(self) -> &'static str {
         match self { Self::Controls => "swarm-watch-controls", Self::Reviewer => "swarm-watch-reviewer", Self::Planner => "swarm-watch-planner" }
@@ -59,7 +49,8 @@ pub(super) fn panicked(payload: Box<dyn std::any::Any + Send>) -> RootError {
 }
 /// Start one selected phase in an owned scoped thread under the actual lease.
 /// One real controls/review outcome is buffered; None emits no successful record.
-/// The conductor chooses the next phase only after join and checked publication.
+/// Other roles may run concurrently; this role is restarted only after its join
+/// and checked publication. The conductor remains the sole shared-output writer.
 /// The Root opens inside that thread and is bound before the role's own writers.
 /// No output stream, heartbeat, new policy or process ownership crosses threads.
 /// Spawn/open/operation/close failures return in the report; known output survives.
@@ -109,13 +100,82 @@ pub(super) fn start<'scope, 'env>(
                 })
             }))
             .unwrap_or_else(|payload| Err(panicked(payload)));
-            Report {
-                result,
-                output,
-                recorded,
-            }
+            let result = deferred_scope_change(role, &work, result, &mut recorded, &mut output);
+            let result = deferred_selection(role, &work, result, recorded.as_ref(), &mut output);
+            Report { result, output, recorded }
         })
         .map_err(|error| phase("mission-watch-role-thread", error))
+}
+/// Publish a live settled pre-exec scope change without discarding its refusal.
+/// Only the real producer's private marker qualifies; no label matching, replay,
+/// compound cleanup, provider exit or printed error can synthesize this outcome.
+/// Preserve actual committed state and counts. Reobservation is not permission:
+/// any next activation still passes the engine's current guards and budgets.
+fn deferred_scope_change(role: Role, work: &str, result: Result<(), RootError>,
+    recorded: &mut Option<(String, i64)>, output: &mut Vec<u8>) -> Result<(), RootError> {
+    let Err(error) = result else { return result; };
+    if role != Role::Planner || !output.is_empty()
+        || recorded.as_ref().is_some_and(|(id, _)| id != work) { return Err(error); }
+    let Some((known, claim, scope, revision)) = error.recorded_planning_scope_change()
+        .filter(|(known, _, _, _)| *known == work) else { return Err(error); };
+    let (known, claim, scope) = (known.to_owned(), claim.to_owned(), scope.to_owned());
+    if recorded.as_ref().is_none_or(|(id, old)| id == &known && *old < revision) {
+        *recorded = Some((known.clone(), revision));
+    }
+    let wrapped = CliError::Root(Box::new(error));
+    let causes = crate::safe_causes(&wrapped);
+    match emit(output, &json!({"schema_version":1,"event":"mission-role-observation-stale",
+        "phase":"planner","work":known,"claim_id":claim,"scope":scope,
+        "recorded_revision":revision,"causes":causes,"claim_recorded":true,
+        "provider_attempted":false,"budget_consumption_preserved":true,
+        "fresh_observation_required":true,"provider_retry_authorized":false,
+        "mission_complete":false,"observation_is_permission":false})) {
+        Ok(()) => Ok(()),
+        Err(publication) => {
+            let CliError::Root(original) = wrapped else { unreachable!("constructed Root wrapper"); };
+            Err(join(Some(*original), publication))
+        }
+    }
+}
+/// Reobserve only a planner selection rejected by the exact pre-mutation
+/// revision guard after successful rollback and checked peer cleanup. In this
+/// producer every error after a recorded claim is WorkRecorded; any compound,
+/// output, recorded state or other role refuses classification. A newer revision
+/// is a changed precondition, not authority to retry a provider or reset budgets.
+/// Emit the retained cause and explicit no-claim/no-provider facts; output failure
+/// preserves both causes. The next saved-cadence pass rechecks every real guard.
+fn deferred_selection(
+    role: Role,
+    work: &str,
+    result: Result<(), RootError>,
+    recorded: Option<&(String, i64)>,
+    output: &mut Vec<u8>,
+) -> Result<(), RootError> {
+    let Err(error) = result else { return result; };
+    let revisions = if role == Role::Planner && recorded.is_none() && output.is_empty() {
+        match &error {
+            RootError::Mutation(swarm_engine::WorkEngineError::Guard(
+                swarm_engine::MutationGuardError::Revision { expected, observed: Some(observed) }
+            )) if *expected > 0 && observed > expected => Some((*expected, *observed)),
+            _ => None,
+        }
+    } else { None };
+    let Some((expected, observed)) = revisions else { return Err(error); };
+    let wrapped = CliError::Root(Box::new(error));
+    let causes = crate::safe_causes(&wrapped);
+    let publication = emit(output, &json!({"schema_version":1,"event":"mission-role-observation-stale",
+        "phase":"planner","work":work,"expected_revision":expected,"observed_revision":observed,
+        "causes":causes,"claim_attempted":true,"claim_recorded":false,
+        "provider_attempted":false,"fresh_observation_required":true,
+        "provider_retry_authorized":false,"mission_complete":false,
+        "observation_is_permission":false}));
+    match publication {
+        Ok(()) => Ok(()),
+        Err(publication) => {
+            let CliError::Root(original) = wrapped else { unreachable!("constructed Root wrapper"); };
+            Err(join(Some(*original), publication))
+        }
+    }
 }
 /// Join only our actual handle. An unexpected unwind is an error, never completion.
 pub(super) fn joined(handle: ScopedJoinHandle<'_, Report>) -> Report {
@@ -162,12 +222,15 @@ pub(super) fn publish(
     };
     result.map_err(|error| preserve_planning(recorded.as_ref(), error))
 }
-/// Before conductor release, stop and join the owned job, then publish its result.
+/// Before conductor release, wake all owned roles once and join every handle.
+/// Classify each clean recorded user interruption before aggregating failures;
+/// two clean stops must not become an unclassifiable compound failure.
+/// Publication and independent failures remain retained while later peers drain.
 /// A real observed stop retains its actual reason; a main error requests only local
 /// ControllerShutdown. Independent errors, failed wake/close/output remain errors.
 /// This never stops or waits for separately granted worker processes.
 pub(super) fn finish(
-    handle: ScopedJoinHandle<'_, Report>,
+    handles: Vec<ScopedJoinHandle<'_, Report>>,
     mut main: Result<Stop, RootError>,
     work: &str,
     signals: &mut Signals,
@@ -186,30 +249,33 @@ pub(super) fn finish(
             phase("mission-watch-role-shutdown", wake),
         ));
     }
-    let result = publish(joined(handle), work, recorded, out);
-    match (main, result) {
-        (Ok(stop), Ok(())) => Ok(stop),
-        (Ok(stop), Err(error)) => {
-            interrupted_phase(error, work, signals, recorded, out).map(|_| stop)
+    let stopping_cleanly = main.is_ok();
+    let stop = main.as_ref().ok().copied();
+    let mut failure = main.err();
+    for handle in handles {
+        if let Err(error) = publish(joined(handle), work, recorded, out) {
+            let observed = if stopping_cleanly {
+                interrupted_phase(error, work, signals, recorded, out).map(|_| ())
+            } else {
+                Err(error)
+            };
+            if let Err(error) = observed { failure = Some(join(failure, error)); }
         }
-        (Err(error), Ok(())) => Err(error),
-        (Err(error), Err(peer)) => Err(join(Some(error), peer)),
+    }
+    match failure {
+        Some(error) => Err(preserve_planning(recorded.as_ref(), error)),
+        None => Ok(stop.expect("successful main retained its stop")),
     }
 }
 #[cfg(test)]
 mod tests {
     use super::*;
-    /// Producing phases drain; empty phases advance and planner always yields.
-    /// These are ordering transitions, not provider or public publication evidence.
+    /// All protocol roles are distinct; publication order grants no authority.
     #[test]
-    fn ordered_role_phases_do_not_promote_empty_results_or_skip_receipts() {
-        use Role::*;
-        assert_eq!(Controls.next(true), Controls);
-        assert_eq!(Controls.next(false), Reviewer);
-        assert_eq!(Reviewer.next(true), Reviewer);
-        assert_eq!(Reviewer.next(false), Planner);
-        assert_eq!(Planner.next(true), Controls);
-        assert_eq!(Planner.next(false), Controls);
+    fn role_identities_cover_each_phase_once() {
+        let roles: std::collections::BTreeSet<_> = Role::ALL.into_iter().collect();
+        assert_eq!(roles.len(), Role::ALL.len());
+        assert_eq!(Role::ALL, [Role::Controls, Role::Reviewer, Role::Planner]);
     }
     /// Exercise actual local source and scoped join for main failure, clean
     /// interruption and independent failure. Cached Stop and Work are synthetic;
@@ -252,7 +318,7 @@ mod tests {
                 });
                 barrier.wait();
                 finish(
-                    handle,
+                    vec![handle],
                     stop.map_or_else(|| Err(RootError::Refused("fixture-main")), Ok),
                     "work",
                     &mut signals,
@@ -328,4 +394,124 @@ mod tests {
             assert!(causes.iter().any(|s| s.contains("BrokenPipe")));
         }
     }
+
+    /// Three scoped peers cross one barrier before collective join. This proves
+    /// owned thread overlap/publication only, not provider or role admission.
+    #[test]
+    fn concurrent_roles_overlap_and_publish_every_receipt() {
+        let mut signals = Signals::new().unwrap();
+        let barrier = std::sync::Arc::new(std::sync::Barrier::new(Role::ALL.len()));
+        let mut recorded = None;
+        let mut output = Vec::new();
+        let stop = std::thread::scope(|scope| {
+            let handles = Role::ALL.into_iter().enumerate().map(|(i, _)| {
+                let barrier = barrier.clone();
+                scope.spawn(move || {
+                    barrier.wait();
+                    Report { result: Ok(()), output: format!("{{\"peer\":{i}}}\n").into_bytes(), recorded: Some(("work".into(), i as i64 + 1)) }
+                })
+            }).collect();
+            finish(handles, Ok(Stop::ControllerShutdown), "work", &mut signals, &mut recorded, &mut output).unwrap()
+        });
+        assert_eq!(stop, Stop::ControllerShutdown);
+        assert_eq!(String::from_utf8(output).unwrap(), "{\"peer\":0}\n{\"peer\":1}\n{\"peer\":2}\n");
+        assert_eq!(recorded, Some(("work".into(), 3)));
+        signals.close().unwrap();
+    }
+
+    /// A panic and independent failures never hide later peer output or its
+    /// highest recorded revision. Synthetic reports grant no engine authority.
+    #[test]
+    fn concurrent_role_failures_drain_siblings_and_preserve_all_causes() {
+        let mut signals = Signals::new().unwrap();
+        let mut recorded = None;
+        let mut output = Vec::new();
+        let error = std::thread::scope(|scope| {
+            let panic = scope.spawn(|| -> Report { std::panic::panic_any(7_u32) });
+            let failed = scope.spawn(|| Report { result: Err(RootError::Refused("fixture-review")), output: b"review\n".to_vec(), recorded: Some(("work".into(), 3)) });
+            let later = scope.spawn(|| Report { result: Err(RootError::WorkRecorded { primary: Box::new(RootError::Refused("fixture-planner")), work: "work".into(), revision: 6 }), output: b"planner\n".to_vec(), recorded: Some(("work".into(), 4)) });
+            finish(vec![panic, failed, later], Err(RootError::Refused("fixture-main")), "work", &mut signals, &mut recorded, &mut output).unwrap_err()
+        });
+        assert_eq!(output, b"review\nplanner\n");
+        assert_eq!(recorded, Some(("work".into(), 6)));
+        assert_eq!(error.recorded_work(), Some(("work", 6)));
+        let causes = crate::safe_causes(&CliError::Root(Box::new(error)));
+        for code in ["fixture-main", "mission-watch-owned-job-panicked", "fixture-review", "fixture-planner"] {
+            assert!(causes.iter().any(|v| v.contains(code)), "missing {code}");
+        }
+        signals.close().unwrap();
+    }
+
+    /// Recognize each synthetic clean planner receipt before aggregation. The
+    /// cached signal is local test state, not an actual OS/provider stop proof.
+    #[test]
+    fn multiple_clean_role_receipts_do_not_become_compound_failure() {
+        let mut signals = Signals::new().unwrap();
+        signals.stopped = Some(Stop::Interrupt);
+        let mut recorded = None;
+        let mut output = Vec::new();
+        let stop = std::thread::scope(|scope| {
+            let handles = [2_i64, 5_i64].into_iter().map(|revision| scope.spawn(move || Report {
+                result: Err(RootError::WorkRecorded { primary: Box::new(RootError::Refused("planning-execution-interrupted")), work: "work".into(), revision }),
+                output: Vec::new(), recorded: None,
+            })).collect();
+            finish(handles, Ok(Stop::Interrupt), "work", &mut signals, &mut recorded, &mut output).unwrap()
+        });
+        assert_eq!(stop, Stop::Interrupt);
+        assert_eq!(recorded, Some(("work".into(), 5)));
+        let rows: Vec<serde_json::Value> = output.split(|b| *b == b'\n').filter(|v| !v.is_empty()).map(|v| serde_json::from_slice(v).unwrap()).collect();
+        assert_eq!(rows.len(), 2);
+        assert!(rows.iter().all(|v| v["event"] == "mission-planning-interrupted" && v["reason"] == "sigint"));
+        signals.close().unwrap();
+    }
+    /// The genuine pre-claim revision guard is the valid deferral witness.
+    /// No role, cleanup, uncertain/recorded result or stale direction is guessed.
+    #[test]
+    fn preclaim_revision_observation_defers_without_provider_retry() {
+        fn conflict(expected: i64, observed: Option<i64>) -> RootError {
+            RootError::Mutation(swarm_engine::WorkEngineError::Guard(
+                swarm_engine::MutationGuardError::Revision { expected, observed }))
+        }
+        let mut output = Vec::new();
+        deferred_selection(Role::Planner, "work", Err(conflict(2, Some(3))), None, &mut output).unwrap();
+        let value: serde_json::Value = serde_json::from_slice(&output).unwrap();
+        assert_eq!(value["event"], "mission-role-observation-stale");
+        assert_eq!(value["work"], "work");
+        assert_eq!(value["expected_revision"], 2);
+        assert_eq!(value["observed_revision"], 3);
+        assert_eq!(value["claim_recorded"], false);
+        assert_eq!(value["provider_attempted"], false);
+        assert_eq!(value["provider_retry_authorized"], false);
+        assert!(value["causes"].as_array().unwrap().iter().any(|v| v == "revision_conflict"));
+        for role in [Role::Controls, Role::Reviewer] {
+            assert!(deferred_selection(role, "work", Err(conflict(2, Some(3))), None, &mut Vec::new()).is_err());
+        }
+        for (expected, observed) in [(2,Some(1)),(2,Some(2)),(-1,Some(2)),(2,None)] {
+            assert!(deferred_selection(Role::Planner, "work", Err(conflict(expected,observed)), None, &mut Vec::new()).is_err());
+        }
+        assert!(deferred_selection(Role::Planner, "work", Err(conflict(2,Some(3))), Some(&("work".into(),2)), &mut Vec::new()).is_err());
+        assert!(deferred_selection(Role::Planner, "work", Err(conflict(2,Some(3))), None, &mut b"existing output".to_vec()).is_err());
+        for error in [RootError::Refused("revision_conflict"), RootError::WorkRecorded{primary:Box::new(conflict(2,Some(3))),work:"work".into(),revision:2}, RootError::Cleanup{primary:Some(Box::new(conflict(2,Some(3)))),cleanup:Box::new(RootError::Refused("fixture-close"))}] {
+            assert!(deferred_selection(Role::Planner, "work", Err(error), None, &mut Vec::new()).is_err());
+        }
+    }
+
+    /// Printed refusal text/recorded revision is insufficient to create the
+    /// private live marker. Existing bytes, roles and known state stay intact.
+    #[test]
+    fn scope_change_adapter_refuses_unmarked_or_compound_failures() {
+        for role in Role::ALL {
+            for bytes in [vec![], b"already-published".to_vec()] {
+                let mut output=bytes.clone();
+                let mut recorded=Some(("work".into(),9));
+                let error=RootError::WorkRecorded{work:"work".into(),revision:7,
+                    primary:Box::new(RootError::Refused("planning-provider-gate-refused"))};
+                let result=deferred_scope_change(role,"work",Err(error),&mut recorded,&mut output);
+                assert!(result.is_err());
+                assert_eq!(output,bytes);
+                assert_eq!(recorded,Some(("work".into(),9)));
+            }
+        }
+    }
+
 }

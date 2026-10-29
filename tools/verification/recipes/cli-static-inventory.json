@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "cli-static-inventory",
+  "inputs": [
+    "tools/rust-migration/current_cli_inventory.py",
+    "tools/rust-migration/test_current_cli_inventory.py",
+    "docs/architecture/CLI-COMPATIBILITY-INVENTORY.md",
+    "docs/en/CLI-COMPATIBILITY-INVENTORY.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "binding-publication-refusal-recovery",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/rust-migration",
+        "-p",
+        "test_current_cli_inventory.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_source_drift_refuses_without_rebinding_manifest",
+        "test_missing_binding_or_duplicate_row_refuses",
+        "test_external_source_alias_refuses",
+        "test_malformed_source_list_is_a_controlled_refusal",
+        "test_publication_failure_preserves_original_and_recovers",
+        "test_postpublication_sync_and_close_failures_keep_both_causes",
+        "Ran 6 tests",
+        "OK"
+      ]
+    }
+  ]
+}

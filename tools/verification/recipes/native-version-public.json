@@ -30,9 +30,11 @@
       "expected_exit": 0,
       "required_stdout": [],
       "required_stderr": [
+        "test_collector_signal_is_retained_before_refusal",
         "test_metadata_presence_hash_and_private_values",
         "test_release_label_matches_legacy_prerelease_rules",
-        "Ran 2 tests",
+        "test_status_path_change_preserves_accurate_build_metadata",
+        "Ran 4 tests",
         "\nOK\n"
       ]
     },

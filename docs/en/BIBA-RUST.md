@@ -200,3 +200,54 @@ Dated audit results:
 `docs/plans/migration-rust/evidence/20261026-biba-integration-audit/`.
 Earlier porting results remain historical; neither bounded reuse, this document
 nor its diagrams establish global conformance.
+
+## Transversal Linux boundary — candidate in progress
+
+The [BT01–BT05 plan](../plans/actions-confiance/BIBA-TRANSVERSE-APEX.md) retains
+proofs, refusals and open criteria. Sources connect agent, planner, reviewer and
+CLI preparation to `native_provider_exec`. Failures refuse before exec without
+an unconfined fallback; no privilege is increased.
+
+The gate supplies the expected workspace inode. `Sandbox::prepare_bound` opens
+and pins that inode before inspection; Landlock rules and `fchdir` use the same
+FD. Replacement refuses. CLI preparation observes its private temporary directory
+after checking parent and token; transfer of the parent's original FD remains
+unqualified.
+
+Tool-free output lives under `.swarm/biba-i0/planning/<claim_id>` or
+`.swarm/biba-i0/reviewer/<event_id>`. The engine opens these relative to its owned
+private directory; rechecks never create them. Persisted host scope binds path
+and inode. Output remains I0 and never grants authority.
+
+```mermaid
+flowchart TD
+  G[Private gate: identity, policy, sources] --> W[Workspace witness]
+  W --> F[Open and compare expected inode]
+  F -->|mismatch or error| R[Refusal with causes and cleanup]
+  F --> P[Pinned FD and alias inspection]
+  P --> S[Sealed prompt, memfd outside stdio]
+  S --> K[FD chdir, Landlock and seccomp]
+  K --> I[I0 provider and descendants]
+  I --> O[Candidate output in workspace]
+  I -->|direct official write| R
+  O -. Promotions still to qualify .-> V[Official objects]
+```
+
+The profile requires Linux/Landlock ABI6 and a single-threaded helper without
+privileged capabilities. There is no fallback. FIOCLEX only sets CLOEXEC; the
+memfd is relocated outside 0/1/2 before stdin attachment. Non-stdio descriptors
+become CLOEXEC. Keyring syscalls are denied. These invariants introduce no new
+operator setting.
+
+`tools/verification/recipes/biba-linux-boundary.json` verifies the native profile,
+its refusals and an actual injected inode swap. `tests/rust_biba_stdin_transport.py`
+compares real sources in a sparse adapter, not the normal engine profile. The
+plan separately retains public journeys on their exact images. Compilation does
+not install anything.
+
+Limits: reads outside the private Root and Internet networking are not confined
+by this profile; it is not a general vault. It cannot freeze an outside unconfined
+same-UID writer or privileged mounts. Other control launchers, HTTP/SSE, memory,
+imports and promotions remain open. Changed planner/reviewer journeys, transversal
+Admin UX, final candidate review and installation also remain open. Global Biba
+is not qualified.

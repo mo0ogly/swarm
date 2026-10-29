@@ -89,13 +89,31 @@ mod managed_git_current;
 #[cfg(target_os = "linux")]
 mod paea_git_repository;
 #[cfg(target_os = "linux")]
-pub use paea_git_repository::{PaeaGitRepository,PaeaGitRepositoryBinding,PaeaGitRepositoryError, PaeaGitObjectFormat};
+pub use paea_git_repository::{PaeaGitRepository,PaeaGitRepositoryBinding,PaeaGitRepositoryError, PaeaGitObjectFormat,PaeaGitSource};
 #[cfg(target_os = "linux")]
 pub use managed_git_current::CurrentManagedGitPublication;
 #[cfg(target_os = "linux")]
 pub use paea_git_intent::{PaeaGitIntent,PaeaGitIntentReservation,PaeaGitIntentObservation,PaeaGitIntentError};
 #[cfg(target_os = "linux")]
 pub use paea_settlement::{PaeaSettlementRequest,PaeaSettlementReceipt,PaeaSettlementOutcome,PaeaSettlementError,PaeaSettlementObservation,PaeaSettlementCallError};
+#[cfg(target_os = "linux")]
+mod paea_git_transfer_call;
+#[cfg(target_os = "linux")]
+pub use paea_git_transfer_call::{PaeaGitTransferCall, PaeaGitTransferCallError, PaeaGitTransferReceipt};
+#[cfg(target_os = "linux")]
+mod paea_git_promote_call;
+#[cfg(target_os = "linux")]
+pub use paea_git_promote_call::{
+    PaeaGitPromoteCall, PaeaGitPromoteCallError, PaeaGitPromoteOutcome, PaeaGitPromoteReceipt,
+};
+#[cfg(target_os = "linux")]
+mod paea_effect_reconcile;
+#[cfg(target_os = "linux")]
+pub use paea_effect_reconcile::{
+    PaeaEffectReconcileFinding, PaeaEffectReconcileJournal, PaeaEffectReconcileReport,
+};
+#[cfg(target_os = "linux")]
+pub(crate) use paea_git_repository::transfer::TransferFailure;
 #[cfg(target_os="linux")]
 mod trust_evidence_runtime;
 mod quotas;
@@ -149,6 +167,16 @@ pub enum RootStoreError {
     /// known reply and every independent authority/action cause remain retained.
     #[cfg(target_os = "linux")]
     TrustEnrollment(Box<TrustEnrollmentCallError>),
+    /// Guarded PAEA Git transfer consumption failed. The typed envelope retains
+    /// authority, backend and known-receipt branches; no rollback or retry
+    /// follows from this wrapper and the one-shot call never runs twice.
+    #[cfg(target_os = "linux")]
+    PaeaGitTransferCall(Box<PaeaGitTransferCallError>),
+    /// Guarded PAEA Git promotion consumption failed. The typed envelope retains
+    /// authority, backend and known-outcome branches, including the explicit
+    /// negative reconciliation; no rollback or retry follows from this wrapper.
+    #[cfg(target_os = "linux")]
+    PaeaGitPromoteCall(Box<PaeaGitPromoteCallError>),
     /// Recorded trust reply or visibly uncertain file publication. No rollback
     /// is inferred; consumer must expose this marker through close/output errors.
     TrustPublished { primary: Box<Self>, publication: &'static str },
@@ -272,6 +300,16 @@ impl RootStoreError {
             },_=>None,
         }
     }
+    /// Observe a live, durably settled pre-exec planner scope change only.
+    /// Receipt/usage/refusal feedback and cleanup succeeded; original refusal
+    /// remains an Err. Clean WorkRecorded wrappers preserve the actual settled
+    /// revision; independent cleanup/output failures refuse classification.
+    /// This neither refunds the claim nor grants retry, execution or acceptance.
+    /// A conductor may reobserve under the existing consent and saved budgets.
+    #[cfg(target_os="linux")]
+    pub fn recorded_planning_scope_change(&self) -> Option<(&str, &str, &str, i64)> {
+        planning_native::stale_gate::metadata(self)
+    }
     /// Observe a typed configuration-preservation marker through compound Root
     /// cleanup. It can mean known prior/replayed data or visible uncertain bytes;
     /// false is not proof of rollback. Never infer authority, new write or retry.
@@ -380,6 +418,10 @@ impl RootStoreError {
             Self::Trust(e)=>e.code(),
             #[cfg(target_os = "linux")]
             Self::TrustEnrollment(e)=>e.code(),
+            #[cfg(target_os = "linux")]
+            Self::PaeaGitTransferCall(e)=>e.code(),
+            #[cfg(target_os = "linux")]
+            Self::PaeaGitPromoteCall(e)=>e.code(),
             Self::TrustPublished{..}=>"trust-state-preserved",
             Self::Schema(e) => e.code(),
             #[cfg(target_os = "linux")]
@@ -499,6 +541,10 @@ impl Error for RootStoreError {
             Self::Trust(e)=>Some(e.as_ref()),
             #[cfg(target_os = "linux")]
             Self::TrustEnrollment(e)=>Some(e.as_ref()),
+            #[cfg(target_os = "linux")]
+            Self::PaeaGitTransferCall(e)=>Some(e.as_ref()),
+            #[cfg(target_os = "linux")]
+            Self::PaeaGitPromoteCall(e)=>Some(e.as_ref()),
             Self::TrustPublished{primary,..}=>Some(primary.as_ref()),
             Self::Schema(e) => Some(e.as_ref()),
             #[cfg(target_os = "linux")]
@@ -806,7 +852,7 @@ pub(crate) use mission_control_write::stage as stage_mission_control;
 pub(crate) use mission_controls::require_planning_mission_active;
 #[cfg(target_os = "linux")]
 pub use mission_controls::{
-    MissionAutonomy, MissionConsentObservation, MissionControlSettings, MissionControlsObservation,
+    CockpitAutonomyObservation, MissionAutonomy, MissionConsentObservation, MissionControlSettings, MissionControlsObservation,
     MissionDispatchObservation,
 };
 #[cfg(target_os = "linux")]
@@ -818,6 +864,11 @@ mod mission_producer;
 mod mission_supervision_store;
 #[cfg(target_os = "linux")]
 pub(crate) mod reported_costs;
+mod cockpit_health;
+mod cockpit_actions;
+mod cockpit_post_delivery;
+#[cfg(target_os = "linux")]
+mod cockpit_snapshot;
 #[cfg(target_os = "linux")]
 pub use reported_costs::{CostSummary, CostTotal};
 #[cfg(target_os = "linux")]

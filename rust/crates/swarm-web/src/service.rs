@@ -12,9 +12,16 @@ mod transport;
 pub use transport::{NativeOutcomeObserver, NativeRequestError, NativeServerReport};
 mod observation;
 mod settings;
+mod paea_reconcile;
 mod trust;
 mod trust_enrollment;
 pub use trust_enrollment::{TrustEnrollmentSource, TrustEnrollmentSourceError};
+#[cfg(target_os = "linux")]
+mod paea_git_call;
+#[cfg(target_os = "linux")]
+pub use paea_git_call::{PaeaGitCallAuthority, PaeaGitCallSourceError};
+#[cfg(target_os = "linux")]
+pub use paea_git_call::PaeaGitCallSource;
 mod paea;
 mod planning;
 mod lifecycle_inventory;
@@ -79,6 +86,10 @@ pub struct RecordedConfiguration {
 pub enum HttpServiceError {
     /// Independent trusted-source startup/close causes beside any earlier error.
     EnrollmentSource { primary: Option<Box<Self>>, cause: Box<TrustEnrollmentSourceError> },
+    /// Independent prepared-git-call startup/close causes beside any earlier
+    /// error. A close failure is never consumption; no grant or head exists.
+    #[cfg(target_os = "linux")]
+    GitCallSource { primary: Option<Box<Self>>, cause: Box<PaeaGitCallSourceError> },
     /// Local output failure after a manual probe; possible contact survives.
     ProviderProbe { primary: Box<Self>, receipt: std::sync::Arc<ProviderProbeReceipt> },
     /// A known preparation receipt preceded a later response/close failure.
@@ -159,6 +170,8 @@ impl HttpServiceError {
     /// encoding errors. None is unknown, never proof of rollback or retry safety.
     pub fn trust_publication(&self)->Option<&'static str>{match self{
       Self::EnrollmentSource{primary,..}=>primary.as_deref().and_then(Self::trust_publication),
+      #[cfg(target_os = "linux")]
+      Self::GitCallSource{primary,..}=>primary.as_deref().and_then(Self::trust_publication),
       Self::Root{cause,..}=>cause.trust_publication(),
       Self::Close{primary,cleanup}=>primary.as_deref().and_then(Self::trust_publication).or_else(||cleanup.trust_publication()),
       Self::ResponseEncoding{primary,..}|Self::AuxiliaryState{primary,..}|Self::Recorded{primary,..}|Self::ConfigurationState{primary}|Self::ConfigurationRecorded{primary,..}|Self::SessionState{primary}=>primary.trust_publication(),_=>None,
@@ -168,6 +181,8 @@ impl HttpServiceError {
     pub fn code(&self) -> &'static str {
         match self {
             Self::EnrollmentSource { .. } => "web-trust-enrollment-source",
+            #[cfg(target_os = "linux")]
+            Self::GitCallSource { .. } => "web-paea-git-call-source",
             Self::ProviderProbe { primary, .. } => primary.code(),
             Self::ConfigurationState { .. } | Self::ConfigurationRecorded { .. } => {
                 "web-configuration-state-preserved"
@@ -299,6 +314,8 @@ impl HttpServiceError {
         }
         match self {
             Self::EnrollmentSource { .. } => StatusCode::INTERNAL_SERVER_ERROR,
+            #[cfg(target_os = "linux")]
+            Self::GitCallSource { .. } => StatusCode::INTERNAL_SERVER_ERROR,
             Self::ProviderProbe {..}=>StatusCode::INTERNAL_SERVER_ERROR,
             Self::ConfigurationState { .. }
             | Self::ConfigurationRecorded { .. }
@@ -443,6 +460,12 @@ impl HttpServiceError {
                 "preparation-write-disabled" => StatusCode::FORBIDDEN,
                 "preparation-not-found" | "work-missing" | "unknown_work" | "unknown_task" => StatusCode::NOT_FOUND,
                 "authorization_required" => StatusCode::FORBIDDEN,
+                // Read-only PA-09 reconciliation: the typed separation refusal
+                // (shared service/ledger root) is a caller conflict, never a
+                // silent success; corrupt/uninitialized states stay in the
+                // report body and IO/close failures remain server errors.
+                "paea-effect-reconcile-separate-ledger-required" if *operation=="reconcile" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+                "settings-paea-ledger-root-not-configured" | "settings-paea-ledger-root-invalid" if *operation=="settings-ledger-root" && matches!(cause.as_ref(),RootStoreError::Settings(_))=>StatusCode::NOT_IMPLEMENTED,
                 "admin-budget-input-invalid"|"admin-budget-policy-invalid"|"admin-budget-intent-invalid"=>StatusCode::BAD_REQUEST,
                 "storage_unavailable" => StatusCode::INSUFFICIENT_STORAGE,
                 _ if matches!(*operation, "mutate" | "settings-preview" | "settings-apply" | "mission-input")
@@ -486,6 +509,8 @@ impl Error for HttpServiceError {
         match self {
             Self::ProviderProbe { primary, .. } => Some(primary.as_ref()),
             Self::EnrollmentSource { primary, cause } => primary.as_deref().map(|e|e as &(dyn Error+'static)).or(Some(cause.as_ref())),
+            #[cfg(target_os = "linux")]
+            Self::GitCallSource { primary, cause } => primary.as_deref().map(|e|e as &(dyn Error+'static)).or(Some(cause.as_ref())),
             Self::ConfigurationState { primary } | Self::ConfigurationRecorded { primary, .. } => {
                 Some(primary.as_ref())
             }
@@ -609,6 +634,8 @@ impl DispatchProfile {
 /// cockpit are not supplied by this dispatcher.
 pub struct NativeHttpService {
     trust_enrollment: Option<TrustEnrollmentSource>,
+    #[cfg(target_os = "linux")]
+    paea_git_call: Option<PaeaGitCallAuthority>,
     root: PathBuf,
     authority: LocalWebAuthority,
     binding: RootBinding,
@@ -625,6 +652,33 @@ impl NativeHttpService {
             Err(primary)=>match source.close() {
                 Ok(())=>Err(primary),
                 Err(cause)=>Err(HttpServiceError::EnrollmentSource{primary:Some(Box::new(primary)),cause:Box::new(cause)}),
+            },
+        }
+    }
+    /// Trusted typed bootstrap of one exact prepared/provisioned PAEA Git call.
+    /// Both root paths are trusted startup inputs supplied by the owner, never
+    /// request data. Both prepared witnesses are checked against the actually
+    /// opened service Root at bind (the project Root is rechecked at
+    /// consumption against its own prepared witness); failed setup also closes
+    /// the authority. Ordinary session/CSRF and the engine-side binding recheck
+    /// under the held authority remain independent guards.
+    #[cfg(target_os = "linux")]
+    pub fn open_git_call(
+        root_path: &Path,
+        authority: LocalWebAuthority,
+        source: PaeaGitCallAuthority,
+    ) -> Result<Self, HttpServiceError> {
+        match Self::open_checked_source(root_path, authority, None, Some(&source)) {
+            Ok(mut service) => {
+                service.paea_git_call = Some(source);
+                Ok(service)
+            }
+            Err(primary) => match source.close() {
+                Ok(()) => Err(primary),
+                Err(cause) => Err(HttpServiceError::GitCallSource {
+                    primary: Some(Box::new(primary)),
+                    cause: Box::new(cause),
+                }),
             },
         }
     }
@@ -675,6 +729,8 @@ impl NativeHttpService {
         match (prepared, store.close()) {
             (Ok((authority, binding)), Ok(())) => Ok(Self {
                 trust_enrollment: None,
+                #[cfg(target_os = "linux")]
+                paea_git_call: None,
                 root: root_path.to_path_buf(),
                 authority,
                 binding,
@@ -705,8 +761,30 @@ impl NativeHttpService {
     /// Bind the same opened descriptor checked against the prepared owner;
     /// source selection never comes from HTTP or an inferred principal.
     fn open_source(root_path:&Path,authority:LocalWebAuthority,source:Option<&TrustEnrollmentSource>)->Result<Self,HttpServiceError>{
+        Self::open_checked_source(root_path,authority,source,None)
+    }
+    /// Same bootstrap with the optional prepared Git-call witness check: the
+    /// service Root is opened read-only and retained, the project Root is
+    /// opened read-only from the trusted startup path, and both prepared
+    /// witnesses are compared before any session publication. Consumption
+    /// rechecks both witnesses on writable opens under the held authority.
+    #[cfg_attr(not(target_os = "linux"), allow(unused_variables))]
+    fn open_checked_source(root_path:&Path,authority:LocalWebAuthority,source:Option<&TrustEnrollmentSource>,git_call:Option<&PaeaGitCallAuthority>)->Result<Self,HttpServiceError>{
         let store = RootStore::open(root_path, false).map_err(|cause| root("open", cause))?;
         if let Some(source)=source { if let Err(error)=source.check_root(&store) { return close(Err(root("trust-enrollment-root",error)),store.close()); } }
+        #[cfg(target_os = "linux")]
+        if let Some(git_call)=git_call {
+            let project = match RootStore::open(git_call.project_path(), false).map_err(|cause| root("paea-git-call-project-open", cause)) {
+                Ok(project) => project,
+                Err(error) => return close(Err(error),store.close()),
+            };
+            let result = git_call
+                .check_roots(&store, &project)
+                .map_err(|cause| root("paea-git-call-root", cause));
+            if let Err(error) = close(result, project.close()) {
+                return close(Err(error),store.close());
+            }
+        }
         let cookie_max_age_seconds = match Self::cookie_age(&store) {
             Ok(age) => age,
             Err(error) => return close(Err(error), store.close()),
@@ -716,6 +794,8 @@ impl NativeHttpService {
             Ok(binding) => match store.close() {
                 Ok(()) => Ok(Self {
                     trust_enrollment: None,
+                    #[cfg(target_os = "linux")]
+                    paea_git_call: None,
                     root: root_path.to_path_buf(),
                     authority,
                     binding,
@@ -773,13 +853,56 @@ impl NativeHttpService {
     /// requests. Errors remain typed; Drop alone does not prove checked release.
     /// No project data, credential or agent is removed/stopped.
     pub fn close(self) -> Result<(), HttpServiceError> {
-        let source = self.trust_enrollment.map(TrustEnrollmentSource::close).transpose();
-        let binding = self.binding
-            .close()
-            .map_err(|cause| root("binding-close", cause));
-        match source {
-            Ok(_) => binding,
-            Err(cause) => Err(HttpServiceError::EnrollmentSource { primary:binding.err().map(Box::new), cause:Box::new(cause) }),
+        #[cfg(target_os = "linux")]
+        let git_call = self
+            .paea_git_call
+            .map(PaeaGitCallAuthority::close)
+            .transpose()
+            .err()
+            .map(|cause| {
+                HttpServiceError::GitCallSource {
+                    primary: None,
+                    cause: Box::new(cause),
+                }
+            });
+        #[cfg(not(target_os = "linux"))]
+        let git_call: Option<HttpServiceError> = None;
+        let source = self
+            .trust_enrollment
+            .map(TrustEnrollmentSource::close)
+            .transpose()
+            .err()
+            .map(|cause| {
+                HttpServiceError::EnrollmentSource {
+                    primary: None,
+                    cause: Box::new(cause),
+                }
+            });
+        // Independent source close failures pair without losing either cause;
+        // the enrollment error stays the typed cause of the joined wrapper.
+        let source = match (git_call, source) {
+            (None, None) => Ok(()),
+            (Some(git), None) => Err(git),
+            (None, Some(enrollment)) => Err(enrollment),
+            (Some(git), Some(enrollment)) => Err(HttpServiceError::EnrollmentSource {
+                primary: Some(Box::new(git)),
+                cause: match enrollment {
+                    HttpServiceError::EnrollmentSource { cause, .. } => cause,
+                    _ => unreachable!("constructed above"),
+                },
+            }),
+        };
+        let binding = self.binding.close();
+        match (source, binding) {
+            (Ok(()), Ok(())) => Ok(()),
+            (Ok(()), Err(cleanup)) => Err(root("binding-close", cleanup)),
+            // The joined source failure stays typed (enrollment or git-call
+            // wrapper); a failed binding close pairs as the retained cleanup.
+            (Err(primary), Ok(())) => Err(primary),
+            (Err(primary), Err(cleanup)) => Err(HttpServiceError::Close {
+                primary: Some(Box::new(primary)),
+                cleanup: Box::new(cleanup),
+            }),
         }
     }
     /// Gate every protected route before body decode/per-request Root open, then dispatch the
@@ -1003,7 +1126,10 @@ impl NativeHttpService {
             "/api/v1/quotas/apply" => self.quotas(quotas::Operation::Apply,request),
             "/api/v1/trust-actions" => self.trust_actions(request),
             #[cfg(target_os = "linux")]
+            "/api/v1/paea/git-call" => self.paea_git_call(request),
+            #[cfg(target_os = "linux")]
             "/api/v1/protection/linux-prerequisites" => paea::linux_prerequisites(request),
+            "/api/v1/paea/reconcile-effects" => self.reconcile_effects(request),
             "/api/v1/protection/receipt-report" => paea::receipt_report(request),
             "/api/v1/protection/resolve-payment" => paea::resolve_payment(request),
             "/api/v1/protection/compare" => paea::compare(request),

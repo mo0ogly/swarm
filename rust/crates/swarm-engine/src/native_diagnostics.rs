@@ -28,6 +28,13 @@ pub struct NativeErrorLinks<'a> {
 fn settlement_outcome_label(outcome:&crate::PaeaSettlementOutcome)->&'static str{
     match outcome {crate::PaeaSettlementOutcome::Recorded{replayed:false,..}=>"paea-settlement-recorded",crate::PaeaSettlementOutcome::Recorded{replayed:true,..}=>"paea-settlement-replayed",crate::PaeaSettlementOutcome::ReconciledNotCommitted{..}=>"paea-settlement-reconciled-not-committed"}
 }
+/// Classify one retained Git promotion observation without rendering receipt or
+/// authority data. ReconciledNotCommitted is the explicit negative, never a
+/// failed publication; these labels grant no retry or current authority.
+#[cfg(target_os="linux")]
+fn promote_outcome_label(outcome:&crate::PaeaGitPromoteOutcome)->&'static str{
+    match outcome {crate::PaeaGitPromoteOutcome::Recorded{replayed:false,..}=>"paea-git-promote-recorded",crate::PaeaGitPromoteOutcome::Recorded{replayed:true,..}=>"paea-git-promote-replayed",crate::PaeaGitPromoteOutcome::ReconciledNotCommitted{..}=>"paea-git-promote-reconciled-not-committed"}
+}
 /// Inspect known compound native families without rendering private messages.
 /// Root/launch/work/storage/process/mission/identity/budget cleanup branches are explicit;
 /// std IO inner errors are visited even when source() skips their wrapper. This
@@ -100,6 +107,23 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
         }.into());
         result.children.push(("primary",error.cause.as_ref()));
         result.children.extend(error.cleanup.iter().map(|cause|("cleanup",cause as &(dyn Error+'static))));explicit=true;
+    }
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::TransferFailure>(e,&mut result,&mut explicit){
+        result.labels.push(error.phase.into());
+        if let Some(cause)=std::error::Error::source(error){result.children.push(("source",cause));}explicit=true;
+    }
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::PaeaGitTransferCallError>(e,&mut result,&mut explicit){
+        result.labels.push(error.code().into());
+        if error.known_receipt().is_some(){result.labels.push("paea-git-transfer-known-receipt".into());}
+        result.children.extend(error.branches().into_iter().map(|cause|("source",cause)));explicit=true;
+    }
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::PaeaGitPromoteCallError>(e,&mut result,&mut explicit){
+        result.labels.push(error.code().into());
+        if let Some(known)=error.known_outcome(){result.labels.push(promote_outcome_label(known).into());}
+        result.children.extend(error.branches().into_iter().map(|cause|("source",cause)));explicit=true;
     }
     #[cfg(target_os="linux")]
     if let Some(error)=native_ref::<crate::PaeaSettlementCallError>(e,&mut result,&mut explicit){

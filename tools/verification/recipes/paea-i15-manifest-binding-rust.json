@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "paea-i15-manifest-binding-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/tests/paea_settlement.rs",
+    "rust/crates/swarm-engine/src/root_store/paea_settlement.rs",
+    "rust/crates/swarm-engine/src/root_store/paea_settlement/policy.rs",
+    "rust/crates/swarm-engine/src/root_store/paea_settlement/call.rs",
+    "rust/crates/swarm-protection-contract/src/types.rs",
+    "rust/crates/swarm-protection-contract/src/canonical.rs",
+    "rust/crates/swarm-protection-contract/src/lib.rs",
+    "rust/crates/swarm-enrollment-authority/src/control/paea_action.rs",
+    "rust/crates/swarm-engine/Cargo.toml",
+    "rust/Cargo.lock"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "/tmp/paea-i15-manifest-target",
+    "CARGO_NET_OFFLINE": "true"
+  },
+  "steps": [
+    {
+      "id": "named-manifest-binding-test",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "paea_settlement",
+        "settlement_declared_tool_manifest_binding_and_existing_intent_refusal",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test settlement_declared_tool_manifest_binding_and_existing_intent_refusal ... ok",
+        "test result: ok"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

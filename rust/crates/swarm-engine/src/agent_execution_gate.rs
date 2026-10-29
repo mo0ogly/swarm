@@ -101,7 +101,7 @@ fn prepare_exec(
         &prepared.host.environment_names,
         &prepared.host.workspace,
         prepared.agent.prompt.as_bytes(),
-    )
+    ).map(|command| command.with_workspace_identity(prepared.host.directory_identity))
 }
 /// Acquire the actual Root binding before helper-side gate inspection, then
 /// close the preparing store explicitly. On failure both the store and any
@@ -202,7 +202,9 @@ fn after_telemetry_error(error: RootStoreError, token_issued: bool) -> RootStore
 /// function cannot report a fabricated normal exit without starting the command.
 /// No task is accepted here. Requires the Swarm CLI host's private gate dispatch,
 /// Linux procfs/memfd/seals and the configured local-root operator authority;
-/// these checks do not provide cryptographic agent identity or OS confinement.
+/// these checks do not provide cryptographic identity. The shared exec transport
+/// additionally requires the mandatory I0 Linux boundary; an unsafe workspace
+/// or unavailable backend refuses before any provider exec.
 pub fn execute_agent_gate(root: &Path, id: &str) -> Result<Infallible, RootStoreError> {
     if !swarm_identity_contract::name(id.as_bytes()) {
         return Err(RootStoreError::Refused("agent-execution-id-invalid"));
@@ -257,7 +259,7 @@ pub fn execute_agent_gate(root: &Path, id: &str) -> Result<Infallible, RootStore
         }
         .map_err(|error| after_telemetry_error(error, token_issued))?;
         command
-            .execute()
+            .execute(root)
             .map_err(|error| after_telemetry_error(error, token_issued))
     })();
     // Every returning path is a pre-exec refusal. Keep the socket live until exec so

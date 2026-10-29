@@ -18,7 +18,7 @@ fn close(file:impl IntoRawFd)->Result<(),Error>{let fd=file.into_raw_fd();
     if unsafe{libc::close(fd)}<0{Err(err("biba-close",io::Error::last_os_error()))}else{Ok(())}
 }
 /// Prepared inode-bound ruleset. Construction does not change this process.
-pub struct Sandbox {rules:std::os::fd::OwnedFd,workspace:PathBuf}
+pub struct Sandbox {rules:std::os::fd::OwnedFd,workspace:File,private:File}
 /// Return the observed kernel ABI, without enforcing or changing any privilege.
 pub fn available()->Result<i32,Error>{let abi=kernel::abi().map_err(|e|err("biba-landlock-unavailable",e))?;if abi<6{return Err(invalid("biba-landlock-abi6-required"))}Ok(abi)}
 /// Build read-only leaves covering the filesystem except the private Root.
@@ -48,26 +48,44 @@ impl Sandbox {
     /// output must be distinct from/not ancestor of Root and contain no hardlinks.
     /// No enforcement/exec/identity grant occurs here; all IO failures refuse.
     pub fn prepare(root:&Path,workspace:&Path)->Result<Self,Error>{
+        let observed=workspace.metadata().map_err(|e|err("biba-workspace-metadata",e))?;
+        Self::prepare_bound(root,workspace,(observed.dev(),observed.ino()))
+    }
+    /// Prepare using the gate's recorded workspace device/inode. This observation
+    /// is not an identity or grant. Pin the exact directory before inspecting it;
+    /// every later rule and cwd consumes that FD, never a re-resolved pathname.
+    /// A replaced/symlink/unsafe directory refuses; all owned FD close causes
+    /// survive. This does not freeze writes by an outside unconfined same-UID actor.
+    pub fn prepare_bound(root:&Path,workspace:&Path,expected:(u64,u64))->Result<Self,Error>{
         available()?;
         let root=root.canonicalize().map_err(|e|err("biba-root",e))?;
-        let workspace=workspace.canonicalize().map_err(|e|err("biba-workspace",e))?;
-        if root.starts_with(&workspace)||!workspace.is_dir(){return Err(invalid("biba-workspace-overlaps-root"))}
-        let private=root.join(".swarm");if private.starts_with(&workspace){return Err(invalid("biba-workspace-overlaps-private-root"))} if !private.is_dir(){return Err(invalid("biba-private-root-required"))}
-        check_tree(&workspace)?;
-        let rules=kernel::ruleset().map_err(|e|err("biba-ruleset",e))?;
+        let path=workspace.canonicalize().map_err(|e|err("biba-workspace",e))?;
+        if root.starts_with(&path){return Err(invalid("biba-workspace-overlaps-root"))}
+        let private_path=root.join(".swarm");
+        if private_path.starts_with(&path){return Err(invalid("biba-workspace-overlaps-private-root"))}
+        let workspace=open(&path)?;
+        let checked=(||{
+            let m=workspace.metadata().map_err(|e|err("biba-workspace-metadata",e))?;
+            if !m.is_dir()||(m.dev(),m.ino())!=expected{return Err(invalid("biba-workspace-instance-changed"))}
+            check_tree(&PathBuf::from(format!("/proc/self/fd/{}",workspace.as_raw_fd())))
+        })();
+        if let Err(e)=checked{return finish(Err(e),close(workspace))}
+        let private=match open(&private_path){Ok(f)=>f,Err(e)=>return finish(Err(e),close(workspace))};
+        let checked=private.metadata().map_err(|e|err("biba-private-root-metadata",e)).and_then(|m|if m.is_dir(){Ok(())}else{Err(invalid("biba-private-root-required"))});
+        if let Err(e)=checked{return finish(finish(Err(e),close(workspace)),close(private))}
+        let rules=match kernel::ruleset(){Ok(r)=>r,Err(e)=>return finish(finish(Err(err("biba-ruleset",e)),close(workspace)),close(private))};
         let result=(||{
-            let mut leaves=Vec::new();read_leaves(Path::new("/"),&private,&mut leaves)?;
+            let mut leaves=Vec::new();read_leaves(Path::new("/"),&private_path,&mut leaves)?;
             for p in leaves {
                 let f=open(&p)?;let is_dir=f.metadata().map_err(|e|err("biba-rule-metadata",e))?.is_dir();
                 let access=if is_dir{kernel::READ}else{kernel::READ&!(1<<3)};
                 let added=kernel::add(&rules,&f,access).map_err(|e|err("biba-read-rule",e));
                 finish(added,close(f))?;
             }
-            let f=open(&workspace)?;let added=kernel::add(&rules,&f,kernel::ALL).map_err(|e|err("biba-output-rule",e));finish(added,close(f))?;
-            Ok(())
+            kernel::add(&rules,&workspace,kernel::ALL).map_err(|e|err("biba-output-rule",e))
         })();
-        if let Err(e)=result{return finish(Err(e),close(rules))}
-        Ok(Self{rules,workspace})
+        if let Err(e)=result{return finish(finish(finish(Err(e),close(rules)),close(workspace)),close(private))}
+        Ok(Self{rules,workspace,private})
     }
     /// Enter the ruleset only in a single-threaded, unprivileged helper. All
     /// subsequent descendants inherit it. Failure after restriction remains an
@@ -77,14 +95,16 @@ impl Sandbox {
             if fs::read_dir("/proc/self/task").map_err(|e|err("biba-thread-check",e))?.count()!=1{return Err(invalid("biba-single-thread-required"))}
             let status=fs::read_to_string("/proc/self/status").map_err(|e|err("biba-capability-check",e))?;
             if !status.lines().any(|l|l.strip_prefix("CapEff:").is_some_and(|v|v.trim()=="0000000000000000")){return Err(invalid("biba-unprivileged-helper-required"))}
-            std::env::set_current_dir(&self.workspace).map_err(|e|err("biba-workspace-enter",e))?;
+            check_tree(&PathBuf::from(format!("/proc/self/fd/{}",self.workspace.as_raw_fd())))?;
+            // SAFETY: retained O_PATH directory, consumed only in this helper.
+            if unsafe{libc::fchdir(self.workspace.as_raw_fd())}<0{return Err(err("biba-workspace-enter",io::Error::last_os_error()))}
             kernel::restrict(&self.rules).map_err(|e|err("biba-restrict",e))?;
             kernel::seccomp().map_err(|e|err("biba-seccomp",e))
         })();
-        finish(result,close(self.rules))
+        finish(finish(finish(result,close(self.rules)),close(self.workspace)),close(self.private))
     }
     /// Close an unused prepared profile after another gate check refuses.
-    pub fn close(self)->Result<(),Error>{close(self.rules)}
+    pub fn close(self)->Result<(),Error>{finish(finish(close(self.rules),close(self.workspace)),close(self.private))}
 }
 /// Retain both a primary failure and a cleanup error without converting to success.
 fn finish<T>(value:Result<T,Error>,cleanup:Result<(),Error>)->Result<T,Error>{
