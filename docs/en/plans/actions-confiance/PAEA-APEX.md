@@ -133,6 +133,38 @@ documentary integration changes neither identifiers nor coverage denominators.
 | BLP-06 Human declassification | PA-02/08/09 | I04/I05/I10/I11/I13/I17 | T04/T05/T10/T11/T13/T17/T22: exact approval, human identity, changed contents/destination and withdrawal |
 | BLP-07 Qualification/delivery/RETEX | PA-09/10/11/12/13 | Applicable invariants in the existing matrix, including I11 | Exercise affected scenarios on the same candidate; T12/T21 cover evidence and recovery; E3 remains under an independent evaluator |
 
+### Required reassessment of work already performed
+
+This mapping also applies to PAEA actions already implemented, tested, delivered
+or marked complete. On recovery, root Codex and the BLP owner must reassess them
+against **each of the seven subpackages BLP-01–07**. For every previous action,
+record in existing tracking the applicable subpackages (or verifiable reasons
+for non-applicability), actual producer and consumer, affected candidate/profile,
+reusable evidence, remaining gap, owner and recovery/closure condition.
+
+An earlier integrity, exact-approval or simulated-effect result does not establish
+confidentiality. Preserve its history and scope; reopen the affected criterion
+when confidentiality was not covered or relevant inputs changed. Reuse unchanged
+evidence only within its established scope; rerun affected controls with valid
+witnesses, refusals and recovery instead of blindly repeating every campaign.
+BLP-07 closure requires this reassessment and treatment of applicable gaps. An
+unexamined item or unverified blocking criterion remains open.
+
+**Applicability reassessment performed October 31**:
+[report and assigned findings](paea/BLP-REASSESSMENT-20261031.md),
+[per-action register](paea/BLP-REASSESSMENT-20261031-ANNEX.md),
+[sources and hashes](../../../plans/actions-confiance/paea/BLP-REASSESSMENT-20261031.json).
+115 documented actions were reassessed against all seven packages (805 decisions),
+using retained contracts and representative current boundaries. Eight findings
+BLP-RET-01–08 remain open. Applicable confidentiality criteria are reopened or
+retained open, including I03/I06/I13 and declassification tied to I04/I05/I10/I17.
+Earlier PASS results retain historical scope without new confidentiality
+acceptance. Local BLP foundation evidence, including delivery/UI recorded by the
+concurrent session, remains distinct from unqualified actual flows. Referenced
+E2 originals were not found in the checkout; historical declaration is not
+reaccepted by this review. BLP-07 remains open; reception by the recovery session
+and gap corrections/verification are not established.
+
 Confidentiality criteria to establish in those scenarios:
 
 - Read clearance covers both level and compartments; ordinary writes/transmissions

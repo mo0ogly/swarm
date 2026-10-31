@@ -4,6 +4,56 @@ Propriétaire : Codex racine. Autorisation : demande « Implement the plan ».
 Travail direct, sans délégation ni consommation fournisseur supplémentaire.
 Préserver les travaux PAEA, préparation et migration présents à la reprise.
 
+[English](../../en/plans/actions-confiance/BLP-APEX.md).
+
+## Rattachement au programme PAEA
+
+Ce plan décompose techniquement la confidentialité du [plan PAEA](PAEA-APEX.md).
+La section « Rattachement Bell-LaPadula » de ce dernier relie BLP-01–07 aux lots
+PA-00–13, invariants I01–I17 et tests T01–T22 existants, sans les renuméroter ni
+créer de second registre d'assurance. PAEA porte les critères de qualification
+et leur état ; ce suivi conserve les actions techniques, preuves et reprises BLP.
+La reprise GLM/SKYNET doit recevoir les deux plans et restituer les références
+PAEA correspondantes. Modifier ces fichiers ne met pas à jour une session déjà
+démarrée ni les instructions embarquées du moteur.
+
+Ce rattachement documentaire ne reprend pas le développement arrêté, ne démarre
+pas AC-02 complet et n'établit aucun nouvel invariant vérifié ou accepté. Les
+limites du WIP ci-dessous restent historiques ; ne pas les traiter comme un
+diagnostic courant de sources modifiées par une autre session sans vérification.
+
+Revue de cet incrément : documentation seulement, sans modification des politiques
+exécutées, schémas, fonctions ou chemins d'erreur. Les scénarios ajoutés sont des
+critères à vérifier, pas des résultats. Les notes de version et l'installation
+ne changent pas : aucun comportement produit n'est livré par ce rattachement.
+
+## Reprise des acquis PAEA — obligation explicite
+
+Les actions PAEA déjà réalisées, y compris livrées ou déclarées terminées,
+doivent être examinées à travers les sept lots BLP-01–07. La section « Reprise
+obligatoire des actions déjà réalisées » du [plan PAEA](PAEA-APEX.md#reprise-obligatoire-des-actions-déjà-réalisées)
+définit le relevé requis par action : applicabilité justifiée, producteurs et
+consommateurs, candidat/profil, preuves réutilisables, écarts, propriétaire et
+condition de reprise/clôture. Ce relevé reste dans le suivi existant.
+
+Conserver les preuves et résultats historiques ; ne pas leur attribuer une
+garantie de confidentialité non établie. Réouvrir les critères concernés et
+reprendre les seules vérifications affectées, en réutilisant les preuves dont
+les entrées et la portée restent valides. BLP-07 ne clôt pas sans réexamen des
+acquis et traitement des écarts applicables.
+
+État actualisé : [réexamen d'applicabilité réalisé](paea/BLP-REASSESSMENT-20261031.md),
+115 actions et 805 décisions dans le [relevé](paea/BLP-REASSESSMENT-20261031-ANNEX.md).
+Les huit écarts BLP-RET-01–08 ont un propriétaire et une condition de reprise ;
+ils rouvrent ou maintiennent ouverts les critères BLP applicables, sans effacer
+les acquis historiques. Les 150 intrants initiaux de revue sont archivés sous
+empreintes ; les preuves de livraison/UI ajoutées concurremment sont relevées
+séparément dans le rapport. Cette revue ne réinstalle rien et ne réécrit pas les
+preuves de livraison du socle de l’autre session. BLP-07 transversal ne peut clôturer avant les
+raccords, contrôles et écarts applicables, notamment BLP-01/04/05/06, même si le
+socle d'administration est livré et son RETEX rédigé. Réception de la revue par
+la session de reprise, corrections et vérifications de bout en bout restent ouvertes.
+
 ## Contrat adopté et ordre
 
 Confidentialité transversale Projets/Processus, complémentaire de Biba ; migration

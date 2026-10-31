@@ -53,6 +53,19 @@ La livraison 15 a qualifié ces commandes sur le profil natif et installé dev80
 La restriction historique de compilation a été levée ; les preuves des étapes
 antérieures restent conservées avec leur portée d’origine.
 
+## Confidentialité Bell-LaPadula : rattachement de qualification
+
+Le [rattachement du plan BLP à PAEA](../plans/actions-confiance/PAEA-APEX.md#rattachement-bell-lapadula--31-octobre-2026)
+précise les critères de confidentialité, distincts de Biba : niveaux et
+compartiments, propagation aux dérivés, contrôle des destinataires réels et
+déclassification humaine exacte. Ils complètent les lots PA-02/04/05/06/08/09
+et leurs vérifications, sans changer le schéma de données v1 ni les octets
+canoniques historiques. Les labels fournis restent non autorisants ; leur
+attribution et leur consommation protégées doivent être démontrées séparément.
+Cette correspondance documentaire ne prouve ni confinement, ni absence de
+divulgation, ni qualification transversale ; les états demeurent dans le registre
+PAEA et les preuves techniques dans le [suivi BLP](../plans/actions-confiance/BLP-APEX.md).
+
 ## Représentations
 
 Le schéma `schemas/paea/contract-v1.schema.json` décrit les documents, propositions,

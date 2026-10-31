@@ -152,6 +152,41 @@ n'est modifié par ce rattachement documentaire.
 | BLP-06 Déclassification humaine | PA-02/08/09 | I04/I05/I10/I11/I13/I17 | T04/T05/T10/T11/T13/T17/T22 : accord exact, identité humaine, changement de contenu/destination et retrait |
 | BLP-07 Qualification/livraison/RETEX | PA-09/10/11/12/13 | Invariants applicables de la matrice existante, dont I11 | Reprendre les scénarios concernés sur le même candidat ; T12/T21 pour les preuves et reprises ; E3 reste sous évaluateur indépendant |
 
+### Reprise obligatoire des actions déjà réalisées
+
+Le rattachement s'applique aussi aux actions PAEA déjà implémentées, testées,
+livrées ou déclarées terminées. À la reprise, Codex racine et le responsable BLP
+doivent les réexaminer au regard de **chacun des sept sous-lots BLP-01–07**.
+Pour chaque action antérieure, consigner dans le suivi existant les sous-lots
+applicables (ou le motif vérifiable de non-applicabilité), le producteur et le
+consommateur réels, le candidat/profil concerné, les preuves réutilisables,
+l'écart restant, son propriétaire et la condition de reprise/clôture.
+
+Un résultat antérieur sur l'intégrité, l'accord exact ou un effet simulé ne
+démontre pas la confidentialité. Conserver son historique et sa portée ; rouvrir
+le critère concerné si la confidentialité n'était pas couverte ou si ses entrées
+ont changé. Réutiliser une preuve inchangée seulement dans sa portée établie ;
+reprendre les contrôles affectés avec témoins, refus et récupération, sans
+réexécuter aveuglément toutes les campagnes. La clôture BLP-07 exige cette revue
+des acquis et le traitement des écarts applicables ; une ligne non examinée ou
+un critère bloquant non vérifié reste ouvert.
+
+**Réexamen d'applicabilité effectué le 31 octobre** :
+[rapport et écarts assignés](paea/BLP-REASSESSMENT-20261031.md),
+[relevé par action](paea/BLP-REASSESSMENT-20261031-ANNEX.md),
+[sources et empreintes](paea/BLP-REASSESSMENT-20261031.json).
+115 actions documentées ont été réexaminées au regard des sept lots (805 décisions),
+sur leurs contrats et des frontières courantes représentatives ; huit écarts
+BLP-RET-01–08 restent ouverts. Les critères de confidentialité applicables sont
+rouverts ou maintenus ouverts, notamment I03/I06/I13 et la déclassification liée
+à I04/I05/I10/I17. Les anciens PASS gardent leur portée historique, sans nouvel
+accord de confidentialité. Les preuves locales du socle BLP, y compris la
+livraison/UI consignées par la session concurrente, restent distinctes des flux
+réels non qualifiés. Les originaux E2 référencés n'ont pas été retrouvés dans le
+checkout ; la déclaration historique n'est pas réacceptée par cette revue.
+BLP-07 reste ouvert ; la réception de cette revue par la session de reprise et
+les corrections/vérifications de ces écarts restent à établir.
+
 Critères de confidentialité à démontrer dans ces scénarios :
 
 - Lecture seulement sous habilitation couvrant niveau et compartiments ; aucune
