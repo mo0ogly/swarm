@@ -185,6 +185,25 @@ p50/p95/p99 latency, cost/consumption/operator load and coverage separate.
 Preregister volumes and budgets without universal magic numbers. Statistical
 intervals require their assumptions. Publish low/no benefit against B2 honestly.
 
+### Adaptive campaigns T18–T22
+
+Extended campaigns; adaptive attacks must be built by a team that did not author
+the system, then repeated per the [E3 protocol](../../../plans/actions-confiance/paea/E3-PROTOCOL.md)
+(preregistration, valid control before each fault, separate observer).
+
+| Test | Extended method | Verifiable result |
+|---|---|---|
+| T18 — multi-agent | Multi-turn, tool renaming, source→target context, label loss, summary/compaction. | No instruction promotion and no out-of-mandate effect. |
+| T19 — paths | Fuzzing of FS paths, DNS, HTTP, symlinks, redirects, FDs, port-forward, IPC and bounded side channels. | No unmediated consequence path in the inventory. |
+| T20 — canonicalization | JSON mutation, numbers, Unicode, ordering, business aliases, MCP schema, ambiguous encodings. | Same act ⇒ same representation, different act ⇒ distinct digest, or explicit rejection. |
+| T21 — chaos | Crash between decision and commit, cut before/after effect, retries, restart and key rotations. | Effect accounting without double commitment or fabricated success. |
+| T22 — human | Authorized campaign with false positives, harmless trap actions, overload and four-eyes control. | Measured vigilance; invalid approvals refused at the sink. |
+
+Per-invariant coverage (from the matrix above): T18 → I03/I14; T19 → I06/I13;
+T20 → I04/I15; T21 → I09/I11/I17; T22 → I10. These campaigns are E3 scope
+(PA-11/PA-12, independent evaluator); no local trial of PA-01…PA-10 replaces
+them.
+
 ## Delivery and current state
 
 Every increment retains exact inputs/candidate, policy/function-doc/error/document
