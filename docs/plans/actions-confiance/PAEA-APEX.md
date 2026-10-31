@@ -133,6 +133,60 @@ préparation indépendante des contrats et du protocole E3 n’attend pas une
 activation publique. IA3 → usages mémoire → IA4 conserve les remises de phase
 existantes ; ni IA5 entière ni MEM-P5 entière ne deviennent une dépendance ajoutée.
 
+## Rattachement Bell-LaPadula — 31 octobre 2026
+
+Bell-LaPadula précise le contrôle de confidentialité attendu par PAEA, en
+complément de Biba pour l'intégrité. Le [plan BLP](BLP-APEX.md) constitue la
+décomposition technique de ces lots PAEA, pas un programme d'assurance parallèle.
+PAEA conserve les invariants I01–I17, les campagnes T01–T22, les critères de
+clôture et le registre d'assurance existants ; aucun identifiant ni dénominateur
+n'est modifié par ce rattachement documentaire.
+
+| Sous-lot technique | Lots PAEA de rattachement | Invariants concernés | Scénarios à compléter dans les tests existants |
+|---|---|---|---|
+| BLP-01 Inventaire/frontières | PA-00/01 | I03/I06/I13 | T02/T07/T13 : sources, lecteurs et sorties réels, voies directes comprises |
+| BLP-02 Moniteur commun | PA-01/02/06 | I01/I02/I03/I13 | T01/T02/T13 : dominance, compartiments incomparables, source inconnue et absence d'auto-autorisation |
+| BLP-03 Politique/migration/Admin | PA-02/08 | I02/I05/I17 | T03/T05/T11/T17 : attribution autorisée, aperçu sans mutation, persistance, conflit et révocation |
+| BLP-04 Contexte/mémoire/sorties | PA-06 | I03/I13/I14 | T02/T13/T14/T18 : propagation aux résumés, compactions, reprises, caches et échanges A2A |
+| BLP-05 Barrières effectives | PA-04/05 | I06/I07/I12/I13 | T07/T08/T13/T19 : fichiers, fournisseurs, outils, descendants, destinations et voies alternatives |
+| BLP-06 Déclassification humaine | PA-02/08/09 | I04/I05/I10/I11/I13/I17 | T04/T05/T10/T11/T13/T17/T22 : accord exact, identité humaine, changement de contenu/destination et retrait |
+| BLP-07 Qualification/livraison/RETEX | PA-09/10/11/12/13 | Invariants applicables de la matrice existante, dont I11 | Reprendre les scénarios concernés sur le même candidat ; T12/T21 pour les preuves et reprises ; E3 reste sous évaluateur indépendant |
+
+Critères de confidentialité à démontrer dans ces scénarios :
+
+- Lecture seulement sous habilitation couvrant niveau et compartiments ; aucune
+  écriture/transmission ordinaire vers une classification ne dominant pas le
+  domaine exposé. Intégrité Biba et permissions métier restent exigées séparément.
+- Classification inconnue bloquante pour les nouveaux usages protégés ; migration
+  explicite conservant les originaux. Les restrictions se propagent à tout le
+  contexte exposé, aux dérivés, journaux et preuves, sans baisse par résumé ou LLM.
+- Contrôle de la destination effective avant le premier octet transmis au modèle
+  ou à un tiers ; témoin légitime, puis oracle de réception vérifiant le refus,
+  y compris par outil, processus descendant ou chemin alternatif inventorié.
+- Déclassification exceptionnelle par création d'une copie, après accord humain
+  authentifié lié aux octets exacts, à la classification cible, aux destinataires
+  et à la politique courante. Changement pertinent ou révocation invalide l'accord
+  avant engagement ; l'original garde sa classification et l'historique subsiste.
+- Aperçu non mutant, application révisionnée, relecture Admin/API/CLI, refus et
+  reprise après redémarrage ; politique configurée, contrôle appliqué, effet
+  observé et acceptation indépendante restent des preuves distinctes.
+
+Codex racine reste propriétaire de l'intégration PAEA ; la session GLM/SKYNET
+choisie pour la reprise BLP reçoit ce rattachement dans son contexte et référence
+les exigences/tests PAEA dans ses remises. L'enregistrement présent ne démontre
+ni réception par une session déjà démarrée, ni application par le moteur.
+Le sous-ensemble fichiers/réseau nécessaire à BLP conserve les préconditions
+PA-04/05 ; il ne démarre pas le reste d'AC-02 différé et ne supprime aucune barrière
+requise. Une protection manquante laisse le parcours concerné ouvert/refusé.
+
+État : rattachement spécifié. Le commit BLP `0aa7335e1` est un instantané WIP,
+pas une qualification transversale. Ses limites et défauts historiques restent
+dans le plan BLP ; les corrections ultérieures exigent leurs propres preuves.
+Aucun PASS de campagne, invariant accepté, installation ou score supplémentaire
+ne se déduit de cette section. Le registre d'assurance ci-dessous conserve
+l'autorité sur les états PAEA ; le suivi BLP conserve le détail technique et ses
+preuves, sans réécrire les résultats antérieurs.
+
 ## Matrice d’assurance et tests
 
 | Invariant | Lots | Tests | Source/consommateur et preuve à établir |
@@ -258,7 +312,9 @@ réel, évaluateur E3, arbitrage superviseur distinct) ; matrice détaillée
 [invariant-matrix.json](paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json).
 Note : la ligne « binaire installé actuel : dev.263 90c3bf90… » du
 [POINT-ETAPE-20261029.md](paea/POINT-ETAPE-20261029.md) est dépassée par le
-candidat dev.267 ci-dessus.
+candidat dev.267 ci-dessus. Tableau de bord de réalisation (instantané 31 octobre
+2026, T01–T22 et pourcentages sourcés) :
+[DASHBOARD-T20261031.md](paea/DASHBOARD-T20261031.md).
 
 ### Point du 25 octobre 2026
 
@@ -2417,7 +2473,13 @@ sans `dir=` corrigés (import nu côté `tests/`, shim borné côté `tools/`,
 `swarm_version.py` embarqué portant sa propre aire autonome), ~95 fichiers `.cjs`
 écartés de `os.tmpdir()`, `recipe.py` épingle désormais `TMPDIR` sous
 `.swarm-fixtures/runner-tmp` (couverture Python/Rust/Node/Go pour les runs de
-recettes, preuve par recette `env` PASS), `test_swarm_local.py` re-pointé du
+recettes, preuve par recette `env` PASS ; depuis le 2026-10-31, bascule
+automatique sur `~/.local/state/swarm-recipe-fallback-fixtures/runner-tmp`
+quand un ancêtre de l'aire configurée est inscriptible groupe/autres — les
+contrats de répertoire privé, p. ex. `open_private_directory` dans
+swarm-enrollment-config, refusent un ancêtre inscriptible groupe — jamais
+`/tmp` ; voir `tools/verification/README.md`),
+`test_swarm_local.py` re-pointé du
 défaut `/tmp/swarm-stable-site-candidate` vers `bin/swarm`. Garde de non-récidive
 permanente : `tools/check_tmp_interdiction.py` (scan AST, exit 1 s'il reste une
 allocation sans `dir=` — état final 0 violation ; `mkstemp(dir=destination.parent)`

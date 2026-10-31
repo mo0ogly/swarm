@@ -63,6 +63,14 @@ POINT-ETAPE date. Include open criteria count, candidate SHA/version and human/O
 blockers, each sourced. Numerators require registers/evidence; otherwise write
 "non mesuré", never invent percentages.
 
+Build the dashboard from [dashboard-template.md](dashboard-template.md), then
+persist it for later resumption: save the filled template as
+`docs/plans/actions-confiance/paea/DASHBOARD-T<YYYYMMDD>.md` (one file per date,
+never overwrite an earlier one), add a one-line pointer to the newest dashboard
+in the APEX plan's current-state block (FR and EN), and keep FR/EN parity — the
+EN plan points to the FR file, like POINT-ETAPE. The dashboard is a sourced
+state snapshot, not a claim.
+
 ## Go → Rust migration
 
 For migration work, read and apply [the adopted method](references/rust-migration.md).

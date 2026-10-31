@@ -115,6 +115,58 @@ AC-02 retains Rust qualification prerequisites. Independent contract/protocol
 preparation can proceed. Preserve IA3 → protected memory use → IA4 handoffs;
 whole IA5/MEM-P5 closure is not an added circular dependency.
 
+## Bell-LaPadula integration — October 31, 2026
+
+Bell-LaPadula specifies PAEA's expected confidentiality controls, complementing
+Biba integrity. The [BLP plan](BLP-APEX.md) is the technical breakdown of these
+PAEA packages, not a separate assurance program. PAEA retains invariants I01–I17,
+campaigns T01–T22, closure criteria and the existing assurance register. This
+documentary integration changes neither identifiers nor coverage denominators.
+
+| Technical subpackage | Parent PAEA packages | Relevant invariants | Scenarios to extend within existing tests |
+|---|---|---|---|
+| BLP-01 Inventory/boundaries | PA-00/01 | I03/I06/I13 | T02/T07/T13: actual sources, readers and outputs, including direct paths |
+| BLP-02 Shared monitor | PA-01/02/06 | I01/I02/I03/I13 | T01/T02/T13: dominance, incomparable compartments, unknown sources and no self-authorization |
+| BLP-03 Policy/migration/Admin | PA-02/08 | I02/I05/I17 | T03/T05/T11/T17: authorized attribution, non-mutating preview, persistence, conflicts and revocation |
+| BLP-04 Context/memory/outputs | PA-06 | I03/I13/I14 | T02/T13/T14/T18: propagation through summaries, compaction, recovery, caches and A2A exchanges |
+| BLP-05 Effective barriers | PA-04/05 | I06/I07/I12/I13 | T07/T08/T13/T19: files, providers, tools, descendants, destinations and alternative paths |
+| BLP-06 Human declassification | PA-02/08/09 | I04/I05/I10/I11/I13/I17 | T04/T05/T10/T11/T13/T17/T22: exact approval, human identity, changed contents/destination and withdrawal |
+| BLP-07 Qualification/delivery/RETEX | PA-09/10/11/12/13 | Applicable invariants in the existing matrix, including I11 | Exercise affected scenarios on the same candidate; T12/T21 cover evidence and recovery; E3 remains under an independent evaluator |
+
+Confidentiality criteria to establish in those scenarios:
+
+- Read clearance covers both level and compartments; ordinary writes/transmissions
+  cannot target a classification that does not dominate the exposed domain. Biba
+  integrity and business permissions remain independently required.
+- Unknown classification blocks new protected uses; explicit migration preserves
+  originals. Restrictions propagate across all exposed context, derived outputs,
+  logs and evidence, without lowering through summaries or LLM decisions.
+- Check the effective destination before transmitting the first byte to a model
+  or third party. After a legitimate control, a receiving oracle verifies refusal,
+  including tools, descendants and inventoried alternative paths.
+- Exceptional declassification creates a copy after authenticated human approval
+  bound to exact bytes, target classification, recipients and current policy.
+  Relevant changes or revocation invalidate approval before commitment; original
+  classification and history remain intact.
+- Non-mutating preview, revisioned application, Admin/API/CLI readback, refusal
+  and restart recovery. Configured policy, applied control, observed effect and
+  independent acceptance require distinct evidence.
+
+Root Codex retains PAEA integration ownership. The GLM/SKYNET session selected
+for BLP recovery must receive this mapping in context and reference PAEA
+requirements/tests in its handoffs. This record establishes neither reception
+by an already running session nor engine application. The bounded filesystem/
+network subset needed by BLP retains PA-04/05 prerequisites; it starts neither
+the deferred remainder of AC-02 nor removes required barriers. Missing protection
+keeps the affected journey open/refused.
+
+State: integration specified. BLP commit `0aa7335e1` is a WIP snapshot, not
+transversal qualification. Its historical limits and defects remain in the BLP
+plan; subsequent corrections need their own evidence. This section grants no
+campaign PASS, accepted invariant, installation or additional score. The assurance
+register below remains authoritative for PAEA states; BLP tracking retains
+technical details and evidence without rewriting earlier results.
+
 ## Assurance and experimental protocol
 
 | Invariant | Packages | Tests | Required observation |
@@ -169,7 +221,9 @@ point, oracle, tests, implemented/locally verified/independently accepted
 state, gap class, required authority) is maintained in
 [paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json](../../../plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json),
 single source of the detailed state; recovery synthesis in
-[POINT-ETAPE-20261029.md](../../../plans/actions-confiance/paea/POINT-ETAPE-20261029.md).
+[POINT-ETAPE-20261029.md](../../../plans/actions-confiance/paea/POINT-ETAPE-20261029.md);
+realization dashboard (snapshot 31 October 2026, T01–T22 with sourced
+percentages): [DASHBOARD-T20261031.md](../../../plans/actions-confiance/paea/DASHBOARD-T20261031.md).
 State summary as of 31 October 2026: local partial verification I01, I04, I05,
 I08, I09, I12, I16, I17; incomplete candidates I06, I13 (BT02, egress not
 confined); human/OS prerequisites I02, I07, I10; missing design I14 (A2A);
@@ -2363,7 +2417,12 @@ files / 219 `mkdtemp`/`TemporaryDirectory` calls without `dir=` fixed (bare
 import on the `tests/` side, bounded shim on the `tools/` side, embedded
 `swarm_version.py` carrying its own autonomous area), ~95 `.cjs` files moved off
 `os.tmpdir()`, `recipe.py` now pins `TMPDIR` under `.swarm-fixtures/runner-tmp`
-(Python/Rust/Node/Go coverage for recipe runs, proven by a PASS `env` recipe),
+(Python/Rust/Node/Go coverage for recipe runs, proven by a PASS `env` recipe;
+since 2026-10-31 it automatically falls back to
+`~/.local/state/swarm-recipe-fallback-fixtures/runner-tmp` when any ancestor of
+the configured area is group/other-writable — private-directory contracts, e.g.
+`open_private_directory` in swarm-enrollment-config, refuse a group-writable
+ancestor — never `/tmp`; see `tools/verification/README.md`),
 `test_swarm_local.py` re-pointed from the `/tmp/swarm-stable-site-candidate`
 default to `bin/swarm`. Permanent non-regression guard:
 `tools/check_tmp_interdiction.py` (AST scan, exit 1 if any allocation without
