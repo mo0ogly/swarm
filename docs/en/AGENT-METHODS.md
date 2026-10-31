@@ -26,6 +26,14 @@ running processes.
 
 For the Rust migration, [APEX](../../.claude/skills/apex/SKILL.md) includes the method adopted on 22 October 2026: strict contracts and a differential bench, journey-based rewrites, vertical lots, risk-based evidence, deferred hardening, a short plan, owned files and early R6/R7 preparation. Writes retain a single cutover; an earlier read-only service awaits explicit confirmation. This persistent instruction does not update already running contexts. All eight points remain in the conditional APEX reference `references/rust-migration.md`: load it for migration work without enlarging every native role body. Tool-free preparation must receive this reference explicitly.
 
+The October 31 APEX condensation retains stages, roles, the PAEA dashboard and
+migration reference while removing repeated shared-contract wording. Preflight
+bodies move from 33,022/33,025 to 31,953/31,956 bytes for affected roles, without
+changing the initial 32,000-byte policy. Text review does not establish execution
+of the four Rust contexts or receipt: a rebuild is required; already running
+processes remain unchanged.
+[Origin, measurements and limits](../plans/migration-rust/GRAPH-REGRESSION-20261031.md).
+
 ## Plain-language catalogue
 
 User-facing names follow the [README catalogue](../../README.en.md#working-methods). Specification methods cover both requirements writing and plan examination. Historical identifiers below are native commands and compatibility identifiers, not interface labels.
@@ -57,6 +65,7 @@ Examples to enter in the conversation:
 
 ```text
 $apex --plan-only Specify quota recovery with the same web and CLI rules.
+$apex PAEA dashboard: campaign T01–T22 and invariant I01–I17 status as percentages, with sources.
 $audit-pdca Audit result acceptance; report only, without making corrections.
 $audit-pdca --fix Repair confirmed defects within this scope and rerun the checks.
 $verify-fix Verify that a refused launch creates neither an agent nor a reservation.
