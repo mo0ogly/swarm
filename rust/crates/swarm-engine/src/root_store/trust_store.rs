@@ -68,6 +68,7 @@ impl RootStore {
         let readonly = matches!(
             operation,
             "show" | "export" | "anchor" | "config-preview" | "read-object" | "read-original" | "public-anchor"
+                | "blp-show" | "blp-policy-preview" | "blp-check"
         );
         if !readonly && !self.writable {
             return Err(R::Refused("read-only-root"));
@@ -109,6 +110,10 @@ impl RootStore {
             } else { "local-operator".to_owned() };
             let mut planned = None;
             let bytes = match operation {
+                "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" => {
+                    let (bytes, state)=trust::confidentiality::execute(&mut st,operation,raw,token,now).map_err(failure)?;
+                    planned=state; bytes
+                }
                 #[cfg(target_os="linux")]
                 "public-anchor"=>super::trust_evidence_runtime::anchor(self,&st,raw,token,now)?,
                 #[cfg(target_os="linux")]

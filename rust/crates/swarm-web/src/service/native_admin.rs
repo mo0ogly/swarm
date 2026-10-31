@@ -52,6 +52,7 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/paea-examples/v1/git-after.json"=>Some(("application/json; charset=utf-8",include_bytes!("../../../../../web/paea-examples/v1/git-after.json"))),
         "/trust-actions.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/trust-native.html"))),
         "/trust-native.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/trust-native.js"))),
+        "/trust-confidentiality.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/trust-confidentiality.js"))),
         "/trust-native.css"=>Some(("text/css; charset=utf-8",include_bytes!("../../../../../web/trust-native.css"))),
 
         "/cockpit.css" => Some(("text/css; charset=utf-8", include_bytes!("../../../../../web/cockpit.css"))),

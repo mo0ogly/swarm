@@ -20,6 +20,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     if !matches!(
         op,
         "show"
+            | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check"
             | "export"
             | "anchor"
             | "verify"
@@ -63,7 +64,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         write_output(out, &bytes)?;
         return Ok(0);
     }
-    let readonly = read || matches!(op, "config-preview" | "read-object" | "read-original" | "public-anchor");
+    let readonly = read || matches!(op, "config-preview" | "read-object" | "read-original" | "public-anchor" | "blp-show" | "blp-policy-preview" | "blp-check");
     let store = swarm_engine::RootStore::open(Path::new(&a.root), !readonly)
         .map_err(|e| CliError::Root(Box::new(e)))?;
     let token = std::env::var("SWARM_TRUST_TOKEN").unwrap_or_default();

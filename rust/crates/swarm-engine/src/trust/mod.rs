@@ -4,6 +4,7 @@ pub(crate) mod authentication;
 pub(crate) mod command;
 pub(crate) mod audit;
 pub(crate) mod config;
+pub(crate) mod confidentiality;
 pub(crate) mod extensions;
 pub mod error;
 pub(crate) mod json;

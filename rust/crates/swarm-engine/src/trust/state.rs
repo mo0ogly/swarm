@@ -12,6 +12,8 @@ fn null_vec<'de, D: Deserializer<'de>, T: Deserialize<'de>>(d: D) -> Result<Vec<
 /// Persisted version1. This is not a credential dump or an authorization token.
 #[derive(Clone, Serialize, Deserialize)]
 pub(crate) struct State {
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="super::confidentiality::present")]
+    pub confidentiality:Option<super::confidentiality::Record>,
     #[serde(default,skip_serializing_if="Option::is_none")]
     pub public_evidence_registry:Option<super::public_evidence::Registry>,
     #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="super::separation::present")]
@@ -55,6 +57,7 @@ impl State {
             raw,
             &[
                 "schema_version",
+                "confidentiality",
                 "role_separation",
                 "public_evidence_registry",
                 "revision",
@@ -79,6 +82,7 @@ impl State {
     /// and private identities. This performs no IO and grants no operation.
     pub fn initial() -> Self {
         Self {
+            confidentiality:None,
             role_separation:None,
             public_evidence_registry:None,
             schema_version: 1,
@@ -109,6 +113,7 @@ impl State {
             return Err(TrustError::Integrity("trust-state-revision"));
         }
         self.policy.validate().map_err(TrustError::Invalid)?;
+        if let Some(record)=&self.confidentiality{record.validate()?;}
         // A mapping never carries an alternative bearer credential. Duplicate
         // issuer/subject identities would bypass canonical-person separation.
         for (index, id) in self.identities.iter().enumerate() {
@@ -215,6 +220,7 @@ impl State {
         }).collect();
         let mut view = serde_json::json!({"schema_version":1,"revision":self.revision,"policy":self.policy,"identities":identities,"mandates":self.mandates,"actions":self.actions,"ledger":self.ledger,"access_ledger":self.access_ledger,"effect_receipts":self.connector_receipts,"evidence_count":self.evidence.len(),"simulation":true,"originals_missing":self.evidence.iter().filter(|e|self.originals.get(&e.original_digest).is_none_or(|v|v.is_empty())).count(),"limits":["aucun paiement réel","identités locales authentifiées","politiques avancées actives non portées : refus fermé"],"biba":{"model":"strict-with-named-endorsement-v1","scope":"trust-actions-only","os_confinement":false},"amount_minor_text":self.actions.iter().map(|(id,a)|(id.clone(),Value::String(a.get("amount_minor").and_then(Value::as_i64).unwrap_or(0).to_string()))).collect::<BTreeMap<_,_>>()});
         view["identity_authentication"]=serde_json::json!({"local_bearer":true,"held_enrollment":{"root_api_available":cfg!(target_os="linux"),"http_available":false,"reason":"trusted-enrollment-startup-not-bound"}});
+        view["confidentiality"]=super::confidentiality::capability(self)?;
         for (name, raw) in self.controls()? {
             view[&name] = serde_json::from_str(raw.raw())?;
         }
