@@ -254,7 +254,9 @@ persistée + dérivation CSRF d'adresse, aucune donnée projet dans `/tmp`) :
 Qualification UI par navigateur réel (Chrome headless, script
 `.swarm-fixtures/blp-ui-qualification.cjs`, preuves
 `.swarm-fixtures/blp-ui-evidence/` : 3 captures + `checks.json`) — **9/9
-vérifications, 0 erreur console/page/HTTP inattendue** :
+vérifications, 0 erreur console/page/HTTP inattendue**. Preuves et harnais
+retenus dans le dépôt :
+[verification-blp/20261031-ui-qualification/](verification-blp/20261031-ui-qualification/).
 - page `/trust-actions.html` servie 200, asset `trust-confidentiality.js`
   référencé ; dialog Admin ouvert ; `blp-load` affiche le refus typé FR
   « Identité ou autorité insuffisante… » avec un seul 403 classé.

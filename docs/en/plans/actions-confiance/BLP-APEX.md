@@ -135,7 +135,9 @@ The French record above remains the detailed canonical log. Summary:
   (protocol unconfigured); positive BLP administration therefore requires the
   trust bootstrap, an operator decision not taken in this increment.
 - Real browser qualification (Chrome headless, script and evidence under
-  `.swarm-fixtures/`): served page + embedded BLP asset, Admin dialog, typed
+  `.swarm-fixtures/`, retained in-repo at
+  [verification-blp/20261031-ui-qualification/](verification-blp/20261031-ui-qualification/)):
+  served page + embedded BLP asset, Admin dialog, typed
   FR/EN refusal messages, 4-level no-clearance example, save disabled without
   preview, theme sombre→etat verified by attribute, no horizontal overflow at
   390 px — 9/9 checks, no unexpected console/page/HTTP errors.
