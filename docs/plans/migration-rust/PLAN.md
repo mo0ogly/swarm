@@ -20,9 +20,9 @@ vérifiée dans les quatre langues/thèmes. Création refusée sur l’ancien bi
 reproduite. Correctif de route `task-add`, éditeur/ports et rafraîchissement attendu vérifiés.
 Dix tests HTTP examinés : neuf existants passent, nouveau cas passe après correction
 d’une attente du banc (code public `format`, pas motif interne du cycle).
-Rust280 installé et actif : c7fe8753… ;262contrôles graphe FR/EN/thèmes sur279
-réutilisés pour les entrées inchangées,7assets réellement servis sur280 et Version14
-PASS. Consignes APEX compactées sous le cap32000,4rôles/9tests et témoin Biba
+Rust281 installé et actif :5ae98571… ;270contrôles graphe FR/EN/thèmes sur
+l’image281 exacte PASS/verify VERIFIED,7assets réellement servis et Version14
+PASS ; notice d’édition alignée. Consignes APEX compactées sous le cap32000,4rôles/9tests et témoin Biba
 public avec refus/reprise vérifiés ; aucune limite relevée. Revue locale liée aux
 octets, pas d’acceptation indépendante ni de conformité Biba globale.
 Brouillons atomiques historiques/aperçu/undo restent distincts et ouverts.

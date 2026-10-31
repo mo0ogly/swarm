@@ -25,7 +25,7 @@ Plan et critères :
 5. G5 : build normal, empreintes des ressources servies, livraison locale et
    dialogue Version. Un candidat ou une doc ne prouve pas l’installation.
 
-État : diagnostic source établi ; critères fonctionnels non encore vérifiés.
+État initial de cette étape : diagnostic source établi ; critères fonctionnels alors non vérifiés.
 Preuves originales : `.cache/graph-regression-20261031/` ; échecs conservés.
 La parité des brouillons atomiques historiques, annuler/rétablir et inspection
 reste un critère distinct à examiner, jamais déduite de simples contrôles visuels.
@@ -100,7 +100,7 @@ démarrant le stub inerte avec même politique. Ancienne skill conservée dans
 `apex-before.md` ; écriture canonique propagée à l’alias .agents, pas aux processus
 déjà lancés. Tests natifs/rebuild/réexécution et installation restent à vérifier.
 
-## Résultat livré et RETEX borné
+## Livraison intermédiaire280 et RETEX borné (historique)
 
 **Instance locale active : Rust280**, image
 `c7fe8753a82d972dbd9476ac8ebd6f4c76f803e96023af364bc2e6c6fcd204d1`,
@@ -150,3 +150,43 @@ recette atomique, sans simuler par écritures partielles). Le message public de
 cycle `format` reste peu détaillé (G4, reprise : contrat de diagnostic sûr compatible
 avec le wire). Aucune clôture de migration globale ni acceptation indépendante
 n’est déduite de cette livraison.
+
+## Clôture locale courante —281
+
+La dernière relecture a corrigé la notice « autres commandes à raccorder » de
+Conduite et le commentaire Rust du service d’assets : le graphe possède désormais
+des écritures de tâches/liens explicitement portées. Nouveau témoin de notice
+FR/EN ajouté à la recette. Premier build281 refusé car un éditeur concurrent
+modifiait locales/en.json, i18n-en.js et paea-approval-form.js pendant compilation ;
+originaux conservés,280resté actif. Contrôle de cohérence et observations
+d’empreintes stabilisées, puis nouveau build sur ces nouveaux octets accepté.
+
+**Courant : v0.1.1-dev.281, PID1866377**, image
+`5ae9857108767ecd305687cb7879206c489172a1a94b7b40ee0fc6f09e17b0d3`.
+`permanent281` :2steps PASS, verify VERIFIED,270contrôles fonctionnels navigateur
+(109navigation/161édition), plus diagnostics sans erreur inattendue.
+`biba281-frozen` :3cas ciblés PASS, limites de sécurité inchangées.
+`installed281` : processus hashé,7assets protégés conformes à l’inventaire
+compilateur, capacité d’édition et14assertions Version FR/EN PASS, sans POST.
+Sources compilées plus récentes en attente à l’activation :0.
+
+`review281` complète la revue liée aux octets de la notice, traduction, commentaire
+et delta de présentation PAEA conservé séparément ; ce dernier n’est pas chargé
+par le graphe et aucune acceptation globale PAEA n’est inférée. Les preuves274,
+277/278/279/280 et les échecs intermédiaires restent intacts. Aucun commit/push exécuté par cette session.
+Les limites des brouillons par lots/aperçu/undo restent celles indiquées ci-dessus.
+
+Dernière observation Git : HEAD a évolué pendant ce travail via des actions
+concurrentes (final observé f9ff5821…, build281 enregistré8d9eb325…). Cette
+session n’a exécuté aucune commande commit/push et conserve ces évolutions.
+Comparaison finale avec l’inventaire effectif281 :0entrée compilée différente ;
+les nouveaux changements documentaires/tests ne remplacent pas la provenance
+du binaire. Le dialogue conserve le vrai commit de build et sa déclaration dirty.
+
+## Publication Git demandée ensuite
+
+L’utilisateur a ensuite autorisé « commit push ». Les mentions précédentes
+d’absence de commit/push décrivent l’étape de développement avant cette demande.
+Le code du graphe est déjà dans l’historique partagé ; cette étape conserve le
+bilan final et pousse la branche courante sans inclure les modifications non
+commitées des autres chantiers ni réécrire les commits existants.
