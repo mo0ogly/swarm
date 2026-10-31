@@ -1,0 +1,825 @@
+{
+  "schema_version": 1,
+  "scope": "Reviewed source-level Rust provider/context/output boundaries; static inventory freshness only, not exhaustive dynamic mediation or production qualification.",
+  "runtime_enforced": false,
+  "references": [
+    {
+      "id": "project",
+      "path": "rust/crates/swarm-engine/src/project_context.rs",
+      "sha256": "e3c5b8c8e353c4aece7e4a23e67041d28ae6459461d302b1dd0c21b4f10ae029",
+      "line": 411,
+      "anchor": "pub fn read_project_context("
+    },
+    {
+      "id": "memory_source",
+      "path": "rust/crates/swarm-engine/src/project_memory_source.rs",
+      "sha256": "7c400a11f3a371402cf56ecd17875d0ac120dade6396eb1c0923719d4eb44b73",
+      "line": 34,
+      "anchor": "pub(super) fn check(root:"
+    },
+    {
+      "id": "methods",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_methods.rs",
+      "sha256": "22087245bb2fbe67dc3989768245929c6b5e2cba124e91fcdc56f57d23f70dd4",
+      "line": 64,
+      "anchor": "pub(super) fn prompt_sources("
+    },
+    {
+      "id": "method_read",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_source.rs",
+      "sha256": "4db8d82bbc1f87ce51ab2a73d9f5ea835e4e49f612411edf4d756c0d3b710b1c",
+      "line": 32,
+      "anchor": "pub(super) fn read_source("
+    },
+    {
+      "id": "send",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+      "sha256": "89a89fd1a3ebed93f507584071f27e916de94ae3de8726317c9ebb67cc07df0a",
+      "line": 484,
+      "anchor": "pub fn preparation_send<"
+    },
+    {
+      "id": "capture",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_capture.rs",
+      "sha256": "dca0e3307a3142268348b25067c4ebb31d47d246873cb4de0dc15dd7d7cf2025",
+      "line": 274,
+      "anchor": "pub(super) fn excerpt("
+    },
+    {
+      "id": "attachment",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_attachments.rs",
+      "sha256": "d4e95168e72d271aee9026961059f86c5c83861088ac8078998f86ac2712f1e0",
+      "line": 11,
+      "anchor": "pub(super) fn edit("
+    },
+    {
+      "id": "prep_http",
+      "path": "rust/crates/swarm-web/src/service/preparations.rs",
+      "sha256": "93556516a71625b8d6ef2ad405255c25c56f8650d3075fcc64a5b047e81616c9",
+      "line": 43,
+      "anchor": "fn source_query("
+    },
+    {
+      "id": "history",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_dialogue.rs",
+      "sha256": "c102774b9cc996560067b68a6cc821a934d21140bff317ece19bdd278e62e62b",
+      "line": 15,
+      "anchor": "pub(super) fn read("
+    },
+    {
+      "id": "claim",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+      "sha256": "89a89fd1a3ebed93f507584071f27e916de94ae3de8726317c9ebb67cc07df0a",
+      "line": 718,
+      "anchor": "pub fn preparation_worker_claim("
+    },
+    {
+      "id": "storage",
+      "path": "rust/crates/swarm-engine/src/local_storage.rs",
+      "sha256": "a0a2bc944ad37c03ab3ebc6ee25fc84e490aee0599c6c7bacc5b2397c12cfbd0",
+      "line": 773,
+      "anchor": "pub(crate) fn publish("
+    },
+    {
+      "id": "prep_cli",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs",
+      "sha256": "8ed4016593df7dbb4bec6d423e777a8590f225cb961174d4eeced2620785de4f",
+      "line": 575,
+      "anchor": "let prepared = crate::native_provider_exec::PreparedExec::prepare("
+    },
+    {
+      "id": "exec",
+      "path": "rust/crates/swarm-engine/src/native_provider_exec.rs",
+      "sha256": "5353b08a79da916d28bf81f2fd1327f75306100f6c7dc097a5388f45fcc5c5cb",
+      "line": 211,
+      "anchor": "nix::unistd::execve("
+    },
+    {
+      "id": "api_worker",
+      "path": "rust/crates/swarm-cli/src/preparation_worker.rs",
+      "sha256": "95adf90e6799466b9ebde2e8f38b24345de7d75ec5e1916bfcc665f4bd5eabea",
+      "line": 132,
+      "anchor": "async fn run("
+    },
+    {
+      "id": "api_client",
+      "path": "rust/crates/swarm-api-client/src/lib.rs",
+      "sha256": "927a8df91e683f195f2d4db22f613a1596dc6f79987ef250024d15a0f4cb7b2e",
+      "line": 326,
+      "anchor": "async fn request("
+    },
+    {
+      "id": "probe_prepare",
+      "path": "rust/crates/swarm-engine/src/provider_connection_probe.rs",
+      "sha256": "d08bd026471666183fe851a52dcf96b7d187062082d4712eb407da8479e2e0f2",
+      "line": 36,
+      "anchor": "pub fn prepare_api_connection_probe("
+    },
+    {
+      "id": "probe_send",
+      "path": "rust/crates/swarm-web/src/service/api_connection_probe.rs",
+      "sha256": "32012436ef09dd4a9eb45ebc6bb6e74fd5a1025054d18fa8b15b2e5efc878567",
+      "line": 108,
+      "anchor": "swarm_api_client::probe(request,&contact)"
+    },
+    {
+      "id": "worker_context",
+      "path": "rust/crates/swarm-engine/src/agent_worker_context.rs",
+      "sha256": "5d3ae89c03992159f73e807ccd20c4e488d758aa45c4750769cb194bdc772a56",
+      "line": 28,
+      "anchor": "pub(crate) fn current("
+    },
+    {
+      "id": "worker_exec",
+      "path": "rust/crates/swarm-engine/src/agent_execution_gate.rs",
+      "sha256": "d1be982b198a7f574cd249a0eec2584d2511fe1918ee508339f377680734aec8",
+      "line": 90,
+      "anchor": "fn prepare_exec("
+    },
+    {
+      "id": "planner",
+      "path": "rust/crates/swarm-engine/src/root_store/planning_native.rs",
+      "sha256": "383b6d58827212b0755886b32e8cb9f16dfe7added9a80930c8d39d5356cf762",
+      "line": 506,
+      "anchor": "let transport = crate::native_provider_exec::PreparedExec::prepare("
+    },
+    {
+      "id": "reviewer",
+      "path": "rust/crates/swarm-engine/src/root_store/reviewer_native/gate.rs",
+      "sha256": "71a67747192681df90070c50d714c7ff42957507938c2685c7d1f538c6eb68e2",
+      "line": 206,
+      "anchor": "let transport = crate::native_provider_exec::PreparedExec::prepare("
+    },
+    {
+      "id": "control",
+      "path": "rust/crates/swarm-engine/src/root_store/task_validation/process.rs",
+      "sha256": "28dee9dc494c145c856bfc12d527cb30f67cc7d7702749eb2165407fcd218da3",
+      "line": 96,
+      "anchor": "fn gate_command("
+    },
+    {
+      "id": "control_biba",
+      "path": "rust/crates/swarm-engine/src/root_store/task_validation/biba.rs",
+      "sha256": "53587d66dfc5c5cdeb98d8d0c44744439ac271172bfd51eec3c02f6a96589867",
+      "line": 46,
+      "anchor": "pub(super) fn execute(mut self)"
+    },
+    {
+      "id": "sandbox",
+      "path": "rust/crates/swarm-biba-linux/src/lib.rs",
+      "sha256": "69f680809dbf08b5fc547b749854592b1fb78d8603e00b586363ac4ef7fbfd77",
+      "line": 41,
+      "anchor": "fn read_leaves("
+    },
+    {
+      "id": "seccomp",
+      "path": "rust/crates/swarm-biba-linux/src/kernel.rs",
+      "sha256": "ab8ca32bddd4e0d06a16ce58de5f07b6244814e5addbc0624b8f3b2438053acd",
+      "line": 76,
+      "anchor": "for syscall in [libc::SYS_socket, libc::SYS_socketpair]"
+    },
+    {
+      "id": "otel",
+      "path": "rust/crates/swarm-engine/src/telemetry_endpoint.rs",
+      "sha256": "2b6fc3feba9f43ceea3ea22c5af29868b9d59e6481532c668c50120249444195",
+      "line": 252,
+      "anchor": "pub fn launch_telemetry_environment("
+    },
+    {
+      "id": "logs",
+      "path": "rust/crates/swarm-web/src/service/agent_logs.rs",
+      "sha256": "b4e1cba69aaa75b3644c5b386e8aba755acdc60cfbf8c7fead1b255e89988701",
+      "line": 69,
+      "anchor": "pub(super) fn agent_logs("
+    },
+    {
+      "id": "finish",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+      "sha256": "89a89fd1a3ebed93f507584071f27e916de94ae3de8726317c9ebb67cc07df0a",
+      "line": 867,
+      "anchor": "pub fn preparation_worker_finish<"
+    },
+    {
+      "id": "stream",
+      "path": "rust/crates/swarm-engine/src/agent_native_stream.rs",
+      "sha256": "59cca3bb7178d36c5ed2e731c6d68ee3d0aa4611f5b93d1b8913c1c5426622f3",
+      "line": 124,
+      "anchor": "fn public("
+    },
+    {
+      "id": "log_file",
+      "path": "rust/crates/swarm-cli/src/agent_logs.rs",
+      "sha256": "ccb39c5c00517a037d931f5156d3e11638690701bc11e75c5e7ea72b01ea623e",
+      "line": 63,
+      "anchor": "fn publish_file("
+    },
+    {
+      "id": "archives",
+      "path": "rust/crates/swarm-engine/src/root_store/agent_archive_history.rs",
+      "sha256": "659a734a7f5f112b0ea043edc02300fe3ed6d8607030154f426786654ff48d32",
+      "line": 30,
+      "anchor": "pub fn archived_agent_history("
+    },
+    {
+      "id": "memory",
+      "path": "rust/crates/swarm-engine/src/memory_files.rs",
+      "sha256": "1f69f4d4d0d38a4b4522a64b39bcc65b6369c20d4d683883ce5f5e57770b8de0",
+      "line": 49,
+      "anchor": "pub(crate) fn managed_paths("
+    },
+    {
+      "id": "paea_types",
+      "path": "rust/crates/swarm-protection-contract/src/types.rs",
+      "sha256": "4cf2a9869422eff1d9aaf8bc9d019600b8ef179ac9132e6fbbba3101cbf76c42",
+      "line": 45,
+      "anchor": "pub struct SourceRef"
+    },
+    {
+      "id": "paea_api",
+      "path": "rust/crates/swarm-web/src/service/paea.rs",
+      "sha256": "c0b4d8244d52bae7f9f1161caf2632b74237e55fb42a6d1bf192564c38002a06",
+      "line": 68,
+      "anchor": "pub(super) fn receipt_report("
+    },
+    {
+      "id": "pack",
+      "path": "rust/crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs",
+      "sha256": "5f85d5eb71556fc8da0fb1a56892901a7574d2338e6288a7c8c50398ae0625f9",
+      "line": 103,
+      "anchor": "pub(crate) struct GitTransferJob"
+    },
+    {
+      "id": "git_transfer",
+      "path": "rust/crates/swarm-engine/src/root_store/paea_git_transfer_call.rs",
+      "sha256": "95cabf877f06dbaf11d05e41dbb734083c76fe3ad2db6137176b83f0cbc4fbd8",
+      "line": 137,
+      "anchor": "pub struct PaeaGitTransferReceipt"
+    },
+    {
+      "id": "git_promote",
+      "path": "rust/crates/swarm-engine/src/root_store/paea_git_promote_call.rs",
+      "sha256": "1255d665e4ef6b7183253bbca39193904519466850e75d66c501593ccb9fd6e2",
+      "line": 383,
+      "anchor": "Operation::Commit"
+    },
+    {
+      "id": "preview",
+      "path": "rust/crates/swarm-web/src/service/paea_git_call_preview.rs",
+      "sha256": "29c75597cc6fc741421a7bf01e60125d71ef8ef82a3b922ed35bf4cdd10666b0",
+      "line": 26,
+      "anchor": "pub(super) fn paea_git_call_preview("
+    },
+    {
+      "id": "reconcile",
+      "path": "rust/crates/swarm-engine/src/root_store/paea_effect_reconcile.rs",
+      "sha256": "1a62d87a9ad1fc34f376138dcb2208ed6d8bc9e19e930b853e5d1a51d32b36e5",
+      "line": 58,
+      "anchor": "pub struct PaeaEffectReconcileReport"
+    },
+    {
+      "id": "settlement",
+      "path": "rust/crates/swarm-engine/src/root_store/paea_settlement/call.rs",
+      "sha256": "c41900334e838ac3b38dfe2094bca94696c8e56c2764c085e726a391928c8b1b",
+      "line": 17,
+      "anchor": "pub enum PaeaSettlementCallError"
+    },
+    {
+      "id": "approval",
+      "path": "rust/crates/swarm-web/src/service/paea_git_call_approval.rs",
+      "sha256": "b0e6306dbaa58c954f94be7bb898154275145939e7983046847c8855616ddb98",
+      "line": 1,
+      "anchor": "//!"
+    },
+    {
+      "id": "trust_store",
+      "path": "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+      "sha256": "fa20f7d25bed352ea746ab7658645ac472053db92db902ce295e936642b6766b",
+      "line": 54,
+      "anchor": "pub fn trust("
+    },
+    {
+      "id": "blp_diag",
+      "path": "rust/crates/swarm-engine/src/trust/confidentiality.rs",
+      "sha256": "920eeccb7317d18f822662de7622d6b07c2c69f3bb0a8cc2bdaa2a5186fc215f",
+      "line": 99,
+      "anchor": "\"runtime_enforced\":false"
+    }
+  ],
+  "flows": [
+    {
+      "id": "BF-01",
+      "name_fr": "Profil projet",
+      "name_en": "Project profile",
+      "producer": "swarm.project.json and declared local documents",
+      "consumer": "ProjectContext.prompt",
+      "references": [
+        "project",
+        "memory_source"
+      ],
+      "material": "instructions, document text, path/digest metadata",
+      "current_controls": "contained paths, secret-pattern rejection and freshness are independent of BLP",
+      "missing_blp": [
+        "BLP-03",
+        "BLP-04"
+      ],
+      "owner": "Project-context/BLP",
+      "required_observable": "read exact labelled source under current authority; substituted/unknown source refuses before prompt exposure",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-02",
+      "name_fr": "Méthodes locales et embarquées",
+      "name_en": "Local and embedded methods",
+      "producer": "method catalogue/local source with missing-only bundled fallback",
+      "consumer": "preparation prompt method_sources",
+      "references": [
+        "methods",
+        "method_read",
+        "send"
+      ],
+      "material": "complete method text and workflow instructions",
+      "current_controls": "NOFOLLOW descriptor walk, caps and strict missing-only fallback; no classification attribution",
+      "missing_blp": [
+        "BLP-03",
+        "BLP-04"
+      ],
+      "owner": "Preparation/BLP",
+      "required_observable": "classify local and bundled versions independently; changes invalidate the exposed domain",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-03",
+      "name_fr": "Pièces jointes et extraits",
+      "name_en": "Attachments and excerpts",
+      "producer": "project file capture",
+      "consumer": "preparation retained sources and source HTTP response",
+      "references": [
+        "capture",
+        "attachment",
+        "prep_http"
+      ],
+      "material": "full-file digest, selected lines and retained text",
+      "current_controls": "current full-file hash and saved source policy; pattern filters do not establish confidentiality",
+      "missing_blp": [
+        "BLP-03",
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "Preparation-sources/BLP",
+      "required_observable": "bind full source version and excerpt lineage; unauthorized reader receives no excerpt",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-04",
+      "name_fr": "Historique et mode recent",
+      "name_en": "History and recent mode",
+      "producer": "retained question/answer/status",
+      "consumer": "future preparation prompt",
+      "references": [
+        "history",
+        "send"
+      ],
+      "material": "questions, model answers and omitted-turn metadata",
+      "current_controls": "native history checks, prompt redacted from DTO; recent mode does not declassify prior received data",
+      "missing_blp": [
+        "BLP-03",
+        "BLP-04"
+      ],
+      "owner": "Preparation-history/BLP",
+      "required_observable": "carry classifications for every reused turn; a smaller history is not a lower domain",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-05",
+      "name_fr": "Assemblage et persistance du prompt",
+      "name_en": "Prompt assembly and persistence",
+      "producer": "documents, adopted brief, methods, project, history, user message",
+      "consumer": "private preparation_turns row then worker claim",
+      "references": [
+        "send",
+        "claim",
+        "storage"
+      ],
+      "material": "complete combined prompt and private native envelope",
+      "current_controls": "Root/settings/SQL snapshots, digest/revision/caps and budget admission; no BLP labels on all inputs",
+      "missing_blp": [
+        "BLP-03",
+        "BLP-04"
+      ],
+      "owner": "Preparation/BLP",
+      "required_observable": "protected producer attributes each source and fixed combined domain, including instructions and user text",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-06",
+      "name_fr": "Préparation CLI",
+      "name_en": "CLI preparation",
+      "producer": "registered CLI worker and saved prompt",
+      "consumer": "sealed stdin of configured CLI",
+      "references": [
+        "prep_cli",
+        "exec"
+      ],
+      "material": "full prompt, selected environment, account configuration",
+      "current_controls": "fresh private gate and mandatory I0 sandbox; provider identity is not clearance",
+      "missing_blp": [
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "Preparation-CLI/BLP",
+      "required_observable": "current clearance and destination policy checked before exec; descendants cannot use alternative output",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-07",
+      "name_fr": "Préparation HTTP JSON/SSE",
+      "name_en": "HTTP JSON/SSE preparation",
+      "producer": "PreparationApiRequest",
+      "consumer": "configured chat/completions endpoint",
+      "references": [
+        "claim",
+        "api_worker",
+        "api_client"
+      ],
+      "material": "serialized prompt, model identifier and bearer key",
+      "current_controls": "saved deadline/cancellation, redirects/retries disabled; no BLP engagement reservation",
+      "missing_blp": [
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "API-transport/BLP",
+      "required_observable": "bind exact serialized bytes, effective endpoint/account/proxy path and current policy before first byte",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-08",
+      "name_fr": "Sonde manuelle de connexion",
+      "name_en": "Manual connection probe",
+      "producer": "fixed probe text and draft effective key/destination",
+      "consumer": "HTTP probe endpoint",
+      "references": [
+        "probe_prepare",
+        "probe_send",
+        "api_client"
+      ],
+      "material": "fixed protocol text plus credential/model/network metadata",
+      "current_controls": "explicit manual probe, draft/current key-destination checks; not project context",
+      "missing_blp": [
+        "BLP-03",
+        "BLP-05"
+      ],
+      "owner": "Connections/secrets/BLP",
+      "required_observable": "classify credential use separately from fixed text; deny unauthorized destination without credential transmission",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-09",
+      "name_fr": "Agent travailleur",
+      "name_en": "Worker agent",
+      "producer": "current Work contract and prepared agent prompt",
+      "consumer": "provider CLI and workspace",
+      "references": [
+        "worker_context",
+        "worker_exec",
+        "exec"
+      ],
+      "material": "task/supervisor contract, instructions and project material",
+      "current_controls": "scope/freshness/owned workspace and current launch authority; no authenticated BLP domain",
+      "missing_blp": [
+        "BLP-03",
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "Agent-launch/BLP",
+      "required_observable": "record complete exposed sources and current instance clearance before private gate consumption",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-10",
+      "name_fr": "Planificateur",
+      "name_en": "Planner",
+      "producer": "planning current material and method context",
+      "consumer": "tool-free provider CLI",
+      "references": [
+        "planner",
+        "exec"
+      ],
+      "material": "planning prompt and policy/decision context",
+      "current_controls": "owned claim/lease and private gate; tool-free arguments alone are not isolation",
+      "missing_blp": [
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "Planning/BLP",
+      "required_observable": "same source/destination checks as worker, including retries and supervisor outputs",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-11",
+      "name_fr": "Relecteur",
+      "name_en": "Reviewer",
+      "producer": "held review candidate/evidence context",
+      "consumer": "reviewer CLI",
+      "references": [
+        "reviewer",
+        "exec"
+      ],
+      "material": "candidate, review attachments and exact prompt",
+      "current_controls": "candidate/source rechecks and private gate; no BLP source admission",
+      "missing_blp": [
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "Review/BLP",
+      "required_observable": "independent review context may receive only authorized source classifications; keep review independence",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-12",
+      "name_fr": "Commandes de validation",
+      "name_en": "Validation commands",
+      "producer": "saved current control command/workspace",
+      "consumer": "program and descendants",
+      "references": [
+        "control",
+        "control_biba"
+      ],
+      "material": "command argv/environment, workspace file reads and tool outputs",
+      "current_controls": "current committed slot, managed I0 workspace, environment allowlist and mandatory Biba profile",
+      "missing_blp": [
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "Validation/confinement/BLP",
+      "required_observable": "classify argv/env/workspace and outputs; external tool reads/egress cannot bypass domain",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-13",
+      "name_fr": "Transport exec commun",
+      "name_en": "Shared exec transport",
+      "producer": "private caller-prepared command/prompt/environment",
+      "consumer": "foreign provider executable",
+      "references": [
+        "exec",
+        "sandbox",
+        "seccomp"
+      ],
+      "material": "sealed stdin, argv, environment and inherited descriptors",
+      "current_controls": "exact execve, pinned workspace, CLOEXEC and I0 profile; not general secrecy boundary",
+      "missing_blp": [
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "Native transport/BLP",
+      "required_observable": "consume a current protected exposure authorization; no raw prompt can bypass the producer path",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-14",
+      "name_fr": "Lectures et sorties indirectes",
+      "name_en": "Indirect reads and outputs",
+      "producer": "provider/validation code and descendants",
+      "consumer": "host readable leaves and network services",
+      "references": [
+        "sandbox",
+        "seccomp",
+        "control_biba"
+      ],
+      "material": "files, caches, SDK sessions, sockets and descendant channels",
+      "current_controls": "Biba excludes private authority, limits writes and denies AF_UNIX; Internet destination control absent",
+      "missing_blp": [
+        "BLP-01",
+        "BLP-05"
+      ],
+      "owner": "Confinement/BLP",
+      "required_observable": "close actual read/egress paths with positive control and receiver-side canary observation",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-15",
+      "name_fr": "Télémétrie et token ingest",
+      "name_en": "Telemetry and ingest token",
+      "producer": "provider exporter configuration",
+      "consumer": "local ingest service, storage and UI readers",
+      "references": [
+        "otel",
+        "exec",
+        "logs"
+      ],
+      "material": "usage, logs/traces/metrics, per-attempt ingest token and metadata",
+      "current_controls": "opt-in saved provider policy, token-bound ingest, prompt logging disabled in Codex recipe; BLP domain still unbound",
+      "missing_blp": [
+        "BLP-03",
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "Telemetry/BLP",
+      "required_observable": "bind actual exporter destination/reader to domain, including error and trace values",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-16",
+      "name_fr": "Réponse et propositions de préparation",
+      "name_en": "Preparation response and proposals",
+      "producer": "provider HTTP/CLI response",
+      "consumer": "retained answer/proposed brief/plan",
+      "references": [
+        "api_worker",
+        "finish",
+        "history"
+      ],
+      "material": "returned text, proposals and provider-declared usage",
+      "current_controls": "response parsing/limits/state/publication and explicit operator adoption; no confidentiality lowering",
+      "missing_blp": [
+        "BLP-04"
+      ],
+      "owner": "Preparation-results/BLP",
+      "required_observable": "result inherits exposed context domain even if short/empty; subsequent memory/use keeps restrictions",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-17",
+      "name_fr": "Logs et transcription",
+      "name_en": "Logs and transcript",
+      "producer": "native stream/provider stdout and stderr",
+      "consumer": "log API, console and explicit CLI output file",
+      "references": [
+        "stream",
+        "logs",
+        "log_file"
+      ],
+      "material": "messages, tool results, errors and transcript metadata",
+      "current_controls": "saved capture limits, typed errors and session admission; not per-reader BLP",
+      "missing_blp": [
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "Logs/UX/BLP",
+      "required_observable": "authorized reader/export only; identify silent leakage in error, metadata and truncated output paths",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-18",
+      "name_fr": "Archives et reprise",
+      "name_en": "Archives and recovery",
+      "producer": "historical stored/archived agent records",
+      "consumer": "history reader and future recovered context",
+      "references": [
+        "archives",
+        "history",
+        "memory"
+      ],
+      "material": "historical messages, evidence, memory references and replay state",
+      "current_controls": "stored provenance/row identity and read isolation; not current BLP permission",
+      "missing_blp": [
+        "BLP-03",
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "History/memory/BLP",
+      "required_observable": "migrate unclassified retained data explicitly; old grant/replay never bypasses current reader clearance",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-19",
+      "name_fr": "Documents PAEA hors ligne",
+      "name_en": "Offline PAEA documents",
+      "producer": "declared proposal/context/SourceRef",
+      "consumer": "canonicalization/check report and HTTP client",
+      "references": [
+        "paea_types",
+        "paea_api"
+      ],
+      "material": "supplied labels, canonical action, hashes and reports",
+      "current_controls": "strict data contracts and independent exact hashes; fields confer no authority",
+      "missing_blp": [
+        "BLP-03",
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "PAEA-contracts/BLP",
+      "required_observable": "protected adapter resolves source labels from authority, never trusts labels deserialized from user JSON",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-20",
+      "name_fr": "Transfert d’objets Git",
+      "name_en": "Git object transfer",
+      "producer": "held source candidate and pack",
+      "consumer": "service staging/object database before ref publication",
+      "references": [
+        "pack",
+        "git_transfer"
+      ],
+      "material": "Git objects/pack bytes, private staging files and receipts",
+      "current_controls": "retained source/destination/Root descriptors and separate permission; no BLP write-down check",
+      "missing_blp": [
+        "BLP-04",
+        "BLP-05",
+        "BLP-06"
+      ],
+      "owner": "Git-transfer/BLP",
+      "required_observable": "authorize destination before exporting/importing pack; lower-classified copy requires exact human declassification",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-21",
+      "name_fr": "Publication de référence Git",
+      "name_en": "Git ref publication",
+      "producer": "candidate/intent and exact agreement",
+      "consumer": "held target ref/effect journal/returned receipt",
+      "references": [
+        "git_promote",
+        "preview",
+        "reconcile"
+      ],
+      "material": "ref metadata, candidate objects, action and receipts",
+      "current_controls": "OLD fencing, exact current agreement and idempotence; publishing is not declassification authority",
+      "missing_blp": [
+        "BLP-04",
+        "BLP-05",
+        "BLP-06"
+      ],
+      "owner": "Git-effects/BLP",
+      "required_observable": "preserve existing effect guards plus destination confidentiality; revocation precedes any new disclosure",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-22",
+      "name_fr": "Ledger et reçu de règlement",
+      "name_en": "Settlement ledger and receipt",
+      "producer": "guarded settlement call",
+      "consumer": "separate SQLite ledger and output consumer",
+      "references": [
+        "settlement",
+        "reconcile"
+      ],
+      "material": "invoice/account metadata, canonical context and recorded/replayed receipt",
+      "current_controls": "held account/permission/SQL uniqueness and known-uncertain outcomes; no BLP source/reader binding",
+      "missing_blp": [
+        "BLP-03",
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "Settlement/BLP",
+      "required_observable": "classify ledger/context/receipt and consumers; reconciliation does not authorize broader disclosure",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-23",
+      "name_fr": "Aperçu et accord humain",
+      "name_en": "Preview and human agreement",
+      "producer": "bound engine action/terms",
+      "consumer": "native UI reader and prepared approval request",
+      "references": [
+        "preview",
+        "approval"
+      ],
+      "material": "full proposal/context, exact terms, approver metadata and credential use",
+      "current_controls": "session/CSRF, prepared exact action and existing approval channel; no right to declassify",
+      "missing_blp": [
+        "BLP-04",
+        "BLP-05",
+        "BLP-06"
+      ],
+      "owner": "Approvals/UX/BLP",
+      "required_observable": "reader clearance before preview, then authenticated specific declassification of exact copy/destination if required",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-24",
+      "name_fr": "Preuves, audit et export",
+      "name_en": "Evidence, audit and export",
+      "producer": "Trust/PAEA histories and source inventories",
+      "consumer": "operator show/export, verifier report and retained archives",
+      "references": [
+        "trust_store",
+        "reconcile",
+        "blp_diag",
+        "storage"
+      ],
+      "material": "originals, policy history, identifiers, proofs and diagnostics",
+      "current_controls": "operator authority, attribution/hashes and publication errors; diagnostics explicitly non-authorizing",
+      "missing_blp": [
+        "BLP-04",
+        "BLP-05",
+        "BLP-07"
+      ],
+      "owner": "Evidence/BLP",
+      "required_observable": "protect evidence contents/readers and report leaks; external acceptance and history integrity remain separate",
+      "status": "OPEN"
+    }
+  ],
+  "exclusions": [
+    "No provider/account call, live mission or secret file read.",
+    "Historical Go source is not a delivered Rust flow.",
+    "Host administrator, privileged kernel attacker, covert channels and arbitrary outside same-UID writers remain outside this application inventory.",
+    "Unsupported import/restore/protocol branches are not made available by inventory."
+  ],
+  "remaining_evidence": [
+    "Actual classified source producer and migration binding to authenticated current authority.",
+    "All dynamic SDK/tool/cache/proxy/descendant channels need runtime observation and explicit deny coverage.",
+    "Public positive paths and refusal/recovery on exact shipped profile; every OPEN row remains a qualification gap."
+  ]
+}
