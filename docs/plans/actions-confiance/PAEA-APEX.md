@@ -155,6 +155,45 @@ existantes ; ni IA5 entière ni MEM-P5 entière ne deviennent une dépendance aj
 | I16 Temps/ordre | 02/03/07 | T16/T05 | Horloge/epoch contrôle → ordre de décision, jamais l’heure déclarée par agent. |
 | I17 Révocation au service | 02/03/05 | T17/T21 | Révocation effective → première consommation d’un jeton préémis refusée. |
 
+Exigences opérationnelles abrégées du registre (chaque ligne doit être reliée à
+un propriétaire, un point d’application, un oracle d’effet et des tests ; I06
+couvre la médiation, I02/I04/I05 l’autorité, I12 la réaction sûre — ces
+obligations ne sont pas interchangeables) : I01 aucun contenu d’agent, de
+mémoire ou d’outil ne crée ni n’étend une permission · I02 principal authentifié
+et droits du descendant inclus dans ceux effectivement délégables du parent ·
+I03 tout contexte consommé conserve provenance/labels ; une donnée non fiable ne
+peut piloter un flux de commande privilégié · I04 le digest d’une action
+canonique/versionnée approuvée correspond à celui consommé au sink · I05 la
+politique, le mandat et les révocations sont vérifiés au point d’engagement ·
+I06 tous chemins protégés inventoriés passent par une barrière non contournable
+dans le modèle déclaré · I07 agent/descendants ne détiennent ni clé maître ni
+capacité d’effet non bornée · I08 pas d’effet doublé pour une même intention
+métier quand l’unicité est requise · I09 UNKNOWN impose
+consultation/réconciliation avant un nouvel engagement risquant duplication ·
+I10 approbateur habilité, distinct si requis, décision liée à l’acte et charge
+de vigilance contrôlée · I11 événement, candidat, décision et effet liés à une
+preuve attribuable et à ses limites · I12 sur défaillance, pas de nouvel effet
+sensible non autorisé ; sécurité physique selon analyse de sûreté · I13 toute
+sortie de données sensible vers réseau, modèle ou canal tiers passe par contrôle
+de destination/labels · I14 message/délégation A2A authentifiés, liés à mandat
+réduit et provenance conservée ; canal mTLS ou signature selon le modèle · I15
+outil et schéma effectifs liés à un manifeste admis ; changement pertinent
+bloque jusqu’à réadmission · I16 durées locales fondées sur temps monotone ;
+décisions de concurrence sur epochs/séquences transactionnelles, jamais heure
+agent · I17 un jeton pré-émis ne peut engager après révocation effective ; sinon
+limite de propagation déclarée et action critique suspendue.
+
+État par invariant : la matrice de clôture par invariant (propriétaire, point
+d’application, oracle, tests, état implémenté/vérifié localement/accepté
+indépendamment, classe d’écart, autorité requise) est maintenue dans
+[paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json](paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json),
+source unique de l’état détaillé ; synthèse de reprise dans
+[POINT-ETAPE-20261029.md](paea/POINT-ETAPE-20261029.md). Résumé d’état au
+31 octobre 2026 : vérification locale partielle I01, I04, I05, I08, I09, I12,
+I16, I17 ; candidats incomplets I06, I13 (BT02, egress non confiné) ; prérequis
+humain/OS I02, I07, I10 ; conception manquante I14 (A2A) ; provenance partielle
+I03 ; acceptation indépendante 0/17 (I11).
+
 T11 complète I04/I05/I11/I15 : mutation politique/source/candidat invalide la
 preuve concernée. T09 couvre aussi le fractionnement et le cumul multi-agents.
 Chaque injection exige un témoin valide sous les mêmes préconditions. L’oracle
@@ -181,6 +220,27 @@ Le programme reste ouvert après M4. La désactivation d’un projet protégé e
 une décision autorisée ; aucun repli permissif automatique.
 
 ## État réel et reprise
+
+### État courant — 31 octobre 2026
+
+Candidat unique livré localement : `bin/swarm` SHA-256
+`1d3f9da1408a82b14b5ae5d76328b58c52f1f92051824af52f1d413be8dd41fd`
+(v0.1.1-dev.267). Déclaration E2 locale bornée **émise** le 31 octobre 2026 :
+[DECLARATION-E2.md](paea/evidence/claude-e2-arbitrage-20261031T135859Z/DECLARATION-E2.md)
+— règlement 6/6 et chaîne 4/4 PASS VERIFIED sur la fixture regen-5, elle clôt
+seulement l'étape PA-10 ; ses sept critères ouverts explicites restent
+opérants : aucune acceptation indépendante, aucun enrôlement humain réel,
+aucune séparation UID distincte, aucun confinement egress, aucune clôture E3,
+inventaire I15/ACS en attente, effets SQLite fictifs. Acceptation indépendante :
+0/17 invariants, inchangée. Triages PAEA17 : voir le suivi ouvert dédié.
+Blocages principaux = prérequis humain/OS (newuidmap/newgidmap, enrôlement
+réel, évaluateur E3, arbitrage superviseur distinct) ; matrice détaillée
+[invariant-matrix.json](paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json).
+Note : la ligne « binaire installé actuel : dev.263 90c3bf90… » du
+[POINT-ETAPE-20261029.md](paea/POINT-ETAPE-20261029.md) est dépassée par le
+candidat dev.267 ci-dessus.
+
+### Point du 25 octobre 2026
 
 25 octobre 2026 : PA-00 et PA-01 sont partiellement réalisés. La bibliothèque
 `swarm-protection-contract`, le schéma, quatorze vecteurs et la commande publique
@@ -959,6 +1019,27 @@ Job interne/preuves cfg(test), pas de consommateur protégé normal. Acquisition
 Source avant remise et staging lié à la Root service exigent encore un constructeur
 protégé ; admission/intention/COMMIT/réconciliation,0/17,PA13/RETEX final ouverts.
 
+### Incrément81 — acquisition source dans le propriétaire et staging service (candidat non livré)
+
+Lot enregistré dans [Incrément81](paea/INCREMENT-81.md) ·
+[Continuité81](paea/CONTINUITE-81.md), preuves
+`paea/evidence/20261028-acquisition81-mvfdts57` : garde FS extraite en fabrique
+Root interne (déclaration existante vérifiée, job créé Pending), staging ancré à
+la vraie Root service, gardes read-only reproduites en rouge puis vert sur un
+composant, collecteur de recette borné aux entrées réellement compilées (depfiles
+gelés avant `--no-run`). Qualification globale refusée : des sources d'une autre
+session (dépendance moteur `swarm-biba-linux`/`kernel.rs`, fichiers Cockpit de
+`root_store.rs`) sont apparues après les gels déclarés ; aucune installation81 —
+v237 reste le dernier livré, installée pendant le lot 80. Ce lot ne doit pas être
+présenté comme terminé ; condition de reprise inchangée (fenêtre de sources
+stables + recette complète + raccordement service protégé + prérequis
+administrateur/UID).
+
+**Numéro 82** : aucun lot attribué — aucun fichier `INCREMENT-82.md` ni
+`CONTINUITE-82.md` sous `paea/`, aucune mention d'un exercice numéroté 82 dans
+ce journal ou les dossiers d'évidence au 31 octobre 2026 ; la numérotation
+conservée passe de 81 à 83. Constat enregistré tel quel, sans reconstruction.
+
 
 ### Incrément83 — promotion de référence Git sous autorité courante
 
@@ -1580,3 +1661,729 @@ exigé et liste minimale de fichiers dans
 `CONTRAT-BORNE.md` + `SOURCE-BINDING.json` du dossier. Portée : cadrage
 nécessaire au correctif I15, aucune modification produit, aucun refactor ;
 PAEA17 et I1x restent ouverts ; aucun commit/push.
+
+### Incrément103 — I15/PA07 : liaison réelle du `tool_manifest_digest` settlement, préparation ET consommation (vérification, GLM)
+
+Tâche bornée (GLM seul, dossier
+`evidence/20261028-acquisition81-mvfdts57/glm-manifest-binding-20261029T224756Z`)
+: lier autoritairement le contexte outil pour settlement — préparation ET
+consommation — sans fausse barrière. **Refus structurel qualifié de la Route A
+du lot précédent (non adoptée, confirmé par sources réelles)** : settlement ne
+consomme aucun outil — `paea_settle` → `settlement_locked` est un enregistrement
+SQL du ledger, sans lancement de provider ni lecture `providers.json`/
+`ai-connections.json` (celles-ci appartiennent au parcours agent-launch, barrière
+admis→consommation déjà prouvée Incrément101) ; le seul candidat « outils
+déclarés » côté Trust (`data_policy.tools/providers`) est dormant et refusé à
+l'activation (`trust-active-extension-not-ported`, `trust/state.rs:196`) ;
+`context.sources` n'a aucun consommateur moteur. Hacher la configuration
+provider ambiante aurait rempli un champ dormant d'une dépendance jamais
+consommée par cet effet : aucune implémentation de producteur fictif.
+
+**Liaison réelle prouvée** (test nommé
+`settlement_declared_tool_manifest_binding_and_existing_intent_refusal`,
+`rust/crates/swarm-engine/tests/paea_settlement.rs`, 1 passed) : le champ
+déclaré entre dans les octets canoniques paea-json-v1 (`canonicalize:84` →
+`action_digest`) ; le digest d'action exact est lié dans la ressource de
+permission signée `paea-action-v1/…/{operation}/{action_digest}`
+(`paea_action.rs Request::permission:72`) ; la demande préparée est figée en
+mémoire seule (restart-destroyed) : toute mutation post-préparation du
+document exige une re-préparation ; le manifeste muté donne un `action_digest`
+différent pour le même `intent_id` et la consommation refuse avec
+`paea-settlement-business-intent-conflict` (observation `Known` conservée,
+**zéro nouvel effet**), puis Reconcile rejoue avec le champ historique. Le
+recheck de consommation des champs attribués moteur (`policy_revision/
+policy_digest`) existe et reste prouvé (`current_actor:73` →
+`paea-settlement-policy-stale`). **Limite honnête** : `tool_manifest_digest`
+reste une déclaration de forme validée (64 hex) transportée, sans producteur
+moteur — le raccord manquant est précisément l'absence de tout consommateur
+d'outils dans settlement, pas un hook manquant.
+
+Recette permanente dédiée `tools/verification/recipes/paea-i15-manifest-binding-rust.json`
+(schéma v1, test nommé `--exact`) : run frais **PASS** (`source_stable=true`),
+`recipe.py verify` → **VERIFIED** ; archive des entrées déclarées SHA-256
+`9dada4b0847500c886cab96b9562d2d7954d2e3e2b789030580597d9b3841358`. Suite :
+`paea_settlement` 14 passed (0 failed), `swarm-protection-contract --test
+contract` 17 passed (0 régression). Incident ENOSPC tmpfs (`/tmp` saturé) :
+uniquement notre cache identifié supprimé, run échoué conservé
+(`failed-run-tmpfs-enospc/`), recette relocalisée sur `/home`. Liaison sources
+`SOURCE-BINDING.json` du dossier. Portée : settlement seulement, aucune
+copie du motif dans Git avant preuve propre ; PAEA17 et I1x restent ouverts ;
+aucun commit/push/installation.
+
+### Incrément104 — I16/PA-07 : ordre logique d'engagement deux domaines, remise probante (vérification, GLM)
+
+Tâche bornée (GLM seul, dossier
+`evidence/20261028-acquisition81-mvfdts57/glm-order-receipt-20261030T075024Z`)
+: terminer la remise I16 interrompue après preuve PASS, sans refaire les tests
+ni ouvrir un autre front. Scénario et recette déjà livrés par le lot précédent
+(`glm-order-check-20261029T231755Z`) ; ce paquet en établit la remise
+vérifiable : relecture des assertions réelles, comparaison des entrées
+actuelles aux entrées retenues, SHA du binaire réellement exercé comparé à son
+profil retenu, FINAL/SOURCE-BINDING et documentation même incrément.
+
+**Preuve** : recette permanente `paea-delivered-chain-cli-rust.json`, 4 étapes
+exit 0, `recipe.py verify` → **VERIFIED**, `source_stable=true` ; étape nommée
+`promote-cli-composed-git-settlement-order` (test composé
+`composed_git_settlement_stale_preparations_refuse_then_fresh_recover`,
+`tests/paea_promote.rs:1259`) : «1 passed; 0 failed». Deux préparations
+vivantes (promotion Git + règlement) à la MÊME révision Trust, changement
+public `config-apply` entre préparations et consommations ; refus exacts
+`paea-git-promote-trust-revision` (`paea_git_promote_call.rs:628`, avant toute
+publication, référence inchangée) et `paea-settlement-trust-revision`
+(`paea_settlement/policy.rs:81`, avant tout effet, dette inchangée) ; reprises
+fraîches, cardinalité exacte (1 effet Git = candidat exact, 1 effet
+settlement lié aux termes provisionnés) ; `paea reconcile-effects` lecture
+seule : les deux journaux `consistent`, 1 vérifié chacun, liés aux intents.
+
+**Liaison** : binaire exercé `bin/swarm` SHA-256
+`47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a` — épingle
+de recette, témoin `delivered-binary-witness` à chaque spawn, empreinte
+re-vérifiée à la remise : identique. **Aucune nouvelle compilation** :
+`inputs.before.json` == `inputs.after.json` (550 clés) et sources courantes
+identiques aux entrées gelées. Sorties préservées : `p16-run.log` copié
+(SHA identique aux deux chemins), `recipe-evidence/` complet.
+
+**Limites exactes** : autorité fixture, même UID, SQLite fictif et Git de
+fixture ; ordre local ≠ distribué — chaque refus décidé par l'état courant à
+sa propre consommation, aucune atomicité inter-services prétendue. Non
+prouvé : enrôlement réel, indépendance/UID, acceptation globale. I16 reste
+ouvert sur générations/epochs et anciens baux après reprise (prochaine tâche
+technique indépendante proposée, non commencée). I15 manifest settlement
+reste déclaré sans consommateur d'outil réel, non rouvert. Aucun
+commit/push/installation.
+
+### Incrément105 — I16/PA-07 : ancien bail/génération après reprise du porteur, un cas vérifié (vérification, GLM)
+
+Tâche bornée (GLM seul, dossier
+`evidence/20261028-acquisition81-mvfdts57/glm-lease-case-20261030T090908Z`,
+reprise après l'incident DNS 500 du lot précédent, incident conservé dans
+`status.json`, aucune recherche historique refaite) : terminer UN test
+d'ancien bail/génération après reprise du porteur, sur les entrées établies
+(live()/check()/fence de `planning_native.rs` et `planning_decision.rs`,
+pause/resume publics de `planning_control.rs` incrémentant chaque génération
+de portée d'un et vidant holder/until), périmètre planificateur/cycle de vie
+seulement, distinct des effets Git/règlement (l'ordre composé deux domaines
+reste l'Incrément104, non rejoué).
+
+**Preuve** (test nommé `lease_reopen_case`,
+`tests/rust_planning_lease_reopen.py`, PASS run13 ; recette permanente
+`paea-i16-lease-reopen-rust.json`, 1 étape exit 0, `recipe.py verify` →
+**VERIFIED**, `source_stable=true`) : binaire natif figé qualifié
+`.cache/rust-migration-binaries/swarm-rust-1a021b7e…` (sha256
+`1a021b7e…e3e1`) avec témoin de profil `no_fixture_feature` lié ; une Root
+inactive possédée, un fournisseur inerte retenu à une barrière socket UNIX
+possédée (SO_PEERCRED, ligne `permitted` persistée aux pids exacts), opérations
+CLI publiques seulement. Ordre dicté par le contrat produit, cause établie au
+run8 : le porteur d'un run se refuse lui-même à son propre fence `live()`
+(`planning-provider-process … stale_lease`) dès que pause/resume vide son
+bail, et une portée rouverte ne garde aucun bail à faire expirer — donc :
+porteur gelé (SIGSTOP) → dépassement réel du bail initial observé via
+`expiry_ns` (aucun sleep, aucune horloge agent) → rejeux périmés refusés avant
+tout nouvel effet durable (`planning-run-already-recorded` pour le rejeu exact
+du run, `stale_lease` pour preview/renew portant révision courante + ancien
+holder/génération ; la garde de révision `mutation_guard` précède le fence) →
+pause/resume publics (génération témoin 1 → 3, holder/until vidés et omis du
+JSON public) → refus stale à nouveau (`stale_lease` sur la génération
+rouverte) → libération du porteur, disposition terminale `refused` de son
+propre fence, attente bornée par la cadence sauvegardée
+`agent_supervision_poll_interval_ms` (pas un watchdog), le registre
+`require_claim_available` libérant la propriété d'exécution seulement à
+disposition terminale → acquisition légitime exactement une fois (génération
+4), second claim → `lease_busy`. Cause et état avant/après vérifiés à chaque
+refus (work/snapshot/ledger, marqueur fournisseur inchangé) ; ledger d'origine
+comparé exactement, le nouveau claim ajoutant une réservation exactement.
+
+**Limites exactes** : autorité fixture, même UID, SQLite fictif, fournisseur
+inerte ; preuve planificateur/cycle de vie (baux/générations après reprise),
+pas d'effet Git/règlement, pas d'identité authentifiée, pas d'installation,
+pas d'acceptation indépendante ; limites distribuées restent séparées. Test
+seulement : aucune modification produit, aucune compilation, aucune
+installation. Documentation FR/EN même incrément (README recettes,
+POINT-ETAPE, APEX FR/EN). Aucun commit/push.
+
+### Incrément106 — I04/PA-08 : aperçu protégé de l'action préparée, destiné à l'approbateur (production, GLM)
+
+Premier raccord réel du parcours d'approbation exacte : une route de lecture
+GET/HEAD `/api/v1/paea/git-call/preview` (gate session/Host/CSRF ordinaire)
+présente l'action préparée exacte détenue par le moteur (`PaeaGitCallAuthority`,
+source liée au démarrage), adressée à un approbateur futur — sans créer de
+droit, sans consommer l'appel one-shot, sans capturer de consentement, sans
+simuler un humain. Contenu : `capability` publique existante ; `proposal` et
+`context` déclarés verbatim (aucun modèle parallèle — mêmes structures
+`swarm-protection-contract`) ; identité canonique recalculée sur place par
+`canonicalize(proposal, context)` avec la canonicalisation même de la
+préparation, comparée à l'action_digest lié (`digest_matches`, un écart reste
+signalé, jamais normalisé) ; état courant des témoins physiques des deux racines
+(`roots_bound`) ; révision de confiance observée du projet (`trust_revision`,
+nouvelle lecture présentation-only `RootStore::trust_revision()` distinguant
+journal absent de révision lisible) à côté de la révision déclarée
+(`trust_revision_current`). Sans source liée : 200 explicite
+`available:false` + `reason:paea-git-call-preview-source-unavailable` (pas un
+succès vide). Limites explicites dans la réponse : `consent:none-captured`,
+`consumption:none`, `human_presence:not-established`. Aucun secret affiché ;
+un hash/proposition n'est jamais présenté comme un accord.
+
+**Preuve** (recette permanente `paea-git-call-preview-rust.json`, 4 étapes,
+PASS frais puis `recipe.py verify` → **VERIFIED**, `source_stable=true` ;
+dossier `evidence/20261028-acquisition81-mvfdts57/glm-approval-preview-20261030T094105Z/recipe-preview-run`) :
+- `preview_route_reports_explicit_absence_without_source` : absence explicite
+  sans source + refus typés (POST sans source, GET avec corps, GET avec query).
+- `preview_route_presents_exact_bound_action_with_current_state` (--ignored,
+  fixture source native retenue `/tmp/swarm-model83-lne5t7vx`, PASS de
+  `source-fixture-regen`, work `w-971652946e893cc0092551fc`) : aperçu exact
+  complet, digest_matches, révisions courantes égales, et POST
+  `/api/v1/paea/git-call` encore `bound:true` après (l'aperçu n'a rien
+  consommé). Note de replan : la même fixture a d'abord rendu NotFound sur le
+  helper `current_managed_git_publication` ; preuve nouvelle — le test livré
+  `composed_git_settlement_stale_preparations_refuse_then_fresh_recover`
+  passe sur la même fixture (5,5 s) puis le test aperçu passe à préconditions
+  identiques ; échec antérieur non reproductible, aucune modification produit
+  sur cette cause.
+- `paea_effects_page` : page `paea-effects.html` étendue (section « Aperçu de
+  l'action préparée — destiné à l'approbateur », deux thèmes etat/sombre,
+  FR/EN via catalogue `locales/en.json` + `i18n:build`, aucun bouton de
+  consentement) ; qualification navigateur réelle
+  `tests/paea_effects_ui_recipe.py` → `PAEA_EFFECTS_UI_BROWSER_VERIFIED 7`
+  (7 contrôles : aperçu explicitement indisponible sans source dans les deux
+  langues, aucun contrôle de consentement, refus 403 sans session).
+
+**Limites exactes** : aperçu de présentation seulement — aucun consentement
+capturé, aucun grant, aucune identité créée, aucune identité humaine fixture
+sur base live, l'appel one-shot reste consommable uniquement par le parcours
+gardé existant ; la révision de confiance est lue sans réservation flock du
+journal (observation documentée) ; la fixture source vit en tmpfs (chemin
+persisté dans `source-fixture/` du dossier, régénérable par la voie documentée
+`tests/rust_native_first_publication.py`). Le consentement réel sur cette
+même action (tranche suivante) n'est pas commencé. Aucun commit/push ;
+PA08/PAEA restent ouverts.
+
+### Incrément114 — I04/PA08 : qualification navigateur de l'aperçu lié, fraîche puis périmée, et dialogue Version du profil livré (reprise, GLM)
+
+> Erratum de numérotation (2026-10-31) : cette entrée était dupliquée sous le
+> numéro 104 — le premier Incrément104 (I16/PA-07) reste inchangé. Exécution
+> chronologique entre les Incréments106 et 107 ; dossiers de preuve inchangés.
+
+Reprise factuelle du lot interrompu
+`glm-preview-bound-browser-20261030T102610Z` (client et superviseur disparus
+sans exit/FINAL ; cause d'arrêt non établie). **Cause du blocage établie** :
+la dernière action du lot était `cargo build -p swarm-web --tests` ; dix
+fichiers linker orphelins de ~270 Mo datés 12:30:48 prouvent une liaison
+interrompue en masse sur disque plein (empreintes SHA-256 conservées dans le
+lot de reprise, fichiers supprimés après conservation). Le binaire de test
+servant le serveur fixture n'avait donc jamais été relié au
+`web/paea-effects.js` corrigé — relancer le navigateur sur l'ancien binaire
+n'aurait prouvé que l'ancien asset.
+
+**Frontière n°1 reconstruite** : build borné aux deux binaires de test requis
+(`--test paea_git_call --test paea_effects_page --no-run`, environnement de
+recette, offline/locked) ; le binaire frais `paea_git_call-f9e094d8c7f76673`
+(sha256 `bdb9ed6b0121dfea2096b01f8cb5a4fe2da53a860e1316f952c1b5dab153b8aa`)
+contient l'asset corrigé (vérification octets : message FR « Aperçu exact »,
+route `git-call/preview`, ids DOM preview). Qualification navigateur réelle
+`tests/paea_preview_bound_ui_recipe.py` sur ce binaire exact : **PASS**
+(2 contrôles : fraîche — digest/termes déclarés exacts présentés FR/EN, deux
+thèmes, aucun contrôle de consentement, pas de débordement 1280/390 px ;
+périmée — erreur visible FR/EN après `config-apply` Trust public réel
+révision 60→61, sans normalisation, appel one-shot jamais consommé) ;
+`preview_bound_serves_real_browser_session ... ok`, zéro diagnostic inattendu,
+captures `preview-{fresh,stale}-{fr,en}.png`.
+
+**Deux défauts de harnais corrigés** (ni produit ni protection) :
+`tests/paea_preview_bound_ui_recipe.py` lançait le harnais Node avant le test
+Rust qui publie `server.json` (ENOENT garanti, reproduit) — ordre inversé et
+sortie Rust archivée sur tous les chemins ; `tests/paea_preview_bound_ui.cjs`
+aligné sur le catalogue EN livré (« engine-held ») et sur la classification
+des refus attendus du GET `/api/v1/paea/reconcile-effects` (500 sans racine
+ledger utilisable + doublons console sans URL), même classification que le
+harnais non lié `tests/paea_effects_ui.cjs`. Tentatives conservées :
+`browser-run-attempt1-en-assert/`, `browser-run-attempt2-reconcile-500-classification/`.
+
+**Recette permanente** `paea-git-call-preview-rust.json` : 4 étapes **PASS**
+fresh (`source_stable=true`), `recipe.py verify` → **VERIFIED**
+(`recipe-run/`). **Dialogue Version du profil livré** : serveur géré local
+(`swarm.sh start`, binaire exercé vérifié `bin/swarm` =
+`25ee2f54b42ebb388f2306a7ad691afeb25931ec0b9f00ac50c6c0e0ed2519dc`,
+**v0.1.1-dev.259**, commit 6706e201, modified=true) — parcours réel
+`/api/v1/native-version` (403 sans session, 200 avec) et vraie boîte de
+dialogue navigateur FR et EN : numéro, commit + marqueur dirty `*`, date de
+build, liens GitHub (commit, release, commits de release), notes FR/EN
+embarquées (336 items, incrément PA08 aperçu inclus), zéro erreur page ;
+captures `version-dialog-dev259-{fr,en}.png`, charge archivée
+`native-version-dev259.json`.
+
+**Limites exactes** : l'ELF de référence historique dev.257
+(`47d31746…`) est remplacé par dev.258 puis dev.259 livrés localement — la
+référence du dialogue Version est dev.259, les preuves dev.257 restent
+historiques valides pour leur lot ; la qualification navigateur s'exécute sur
+le binaire de test debug `bdb9ed6b…` (recette, pas le binaire installé) ;
+aucun consentement réel, PA08/PAEA restent ouverts ; aucun commit/push.
+
+### Incrément115 — I04/PA08 : garde de consommation par accord exact capturé — approbateur Trust authentifié lié aux octets canoniques de l'action Git (production, GLM)
+
+> Erratum de numérotation (2026-10-31) : cette entrée était dupliquée sous le
+> numéro 105 — le premier Incrément105 (I16/PA-07) reste inchangé. Exécution
+> chronologique entre les Incréments106 et 107 ; dossiers de preuve inchangés.
+
+Lot borné PA08/I04-I10
+(`glm-consent-binding-20261030T133845Z`) : le consommateur d'accord lie
+l'identité/mandat exact d'un approbateur Trust authentifié et l'action
+canonique détenue moteur (digest/intention/termes/portée), contrôle la
+fraîcheur (révision courante) au dernier usage, avant toute ouverture de
+racine. **Aucun système d'approbation parallèle, aucun fallback
+absence→permission, aucun auto-grant** : le garde réutilise uniquement les
+producteurs Trust existants (mandate-create avec admin porteur I3,
+request exigé sujet porteur, approve exigé rôle approver + séparation des
+devoirs + termes exacts — refus conservés), et l'absence d'accord refuse
+typé `paea-git-call-agreement` (la capture d'accord n'est pas une exécution
+Git ; l'effet exige l'autorité existante inchangée, témoin/plan/politique).
+**L'authentification fixture est étiquetée simulée** — une session locale ou
+un mot de passe fixture ne prouve pas de consentement humain ; l'enrôlement
+humain réel et l'approbation par cette personne restent requis pour toute
+exécution live et l'acceptation.
+
+**Moteur** (`rust/crates/swarm-engine/src/root_store/paea_git_agreement.rs`,
+nouveau, Linux) : observation `RootStore::paea_git_agreement_match(action_bytes)`
+sous flock partagé — un match exige une preuve `approve`/`approved` courante
+en révision (fraîcheur atomique dans la même lecture verrouillée), le digest
+de l'original conservé qui rehash vers `original_digest` (sinon
+`paea-git-agreement-original-altered`), la même `content_digest` et le même
+approbateur que la preuve, et la liaison aux octets exacts via P1
+(originaux == action_bytes) ou la recette P2 figée
+`paea-git-agreement-v1` (canonique `repository.promote` :
+resource `{projet}/{dépôt}/{ref}/{candidat}` grammar `name`, montant 1,
+devise `OID`, bénéficiaire = ancien OID). Rejeu et refus (mauvais rôle,
+mauvais termes) ne matchent jamais. 5 tests nommés verts
+(`root_store::paea_git_agreement`, `--test-threads=1`).
+
+**Web** (`rust/crates/swarm-web/src/service/paea_git_call.rs`) : garde dans
+`call()` après le contrôle de digest, avant tout `RootStore::open` — le
+navigateur ne fournit ni autorité ni action de remplacement. 3 tests nommés
+nouveau + 2 adaptés, séquentiels (fixture partagée, exécution parallèle
+bannie des preuves) : absence → refus typé sans effet ; refus mauvais rôle
+et mauvais termes entre producteurs → aucun accord ; rejeu de l'approbation
+→ état Trust inchangé ; consommation unique avec accord ; changement de
+révision Trust (`config-apply` réel) → accord nul, refus typé, reprise
+fraîche conforme. `git_call_http_consumes_exact_transfer_once` adapté à la
+garde (capture d'accord réelle avant le POST réussi).
+
+**Recette permanente** `paea-git-call-agreement-rust.json` : 6 étapes
+**PASS** fresh (`source_stable=true`), `recipe.py verify` → **VERIFIED**
+(`recipe-agreement/`). Disque : diagnostic avant build (~2,5 Go libres),
+nettoyage restreint à notre cache régénérable (`debug/incremental`,
+artefacts >40 Mo périmés >30 min, empreintes conservées), plus de 3 Go
+libres après.
+
+**Limites exactes** : exécution fixture isolée étiquetée auth simulée —
+aucun enrôlement humain réel, aucune approbation par une personne réelle,
+aucune base live, aucune acceptation indépendante ; la liaison d'approbateur
+authentifié reste à prouver sur un enrôlement réel pour l'exécution live ;
+PA08/PAEA restent ouverts ; aucun commit/push.
+
+### Incrément116 — I05/PA08 : fraîcheur de l'accord exact au dernier usage — révocation publique entre lookup et effet Git refuse sans publication (production, GLM)
+
+> Erratum de numérotation (2026-10-31) : cette entrée était dupliquée sous le
+> numéro 106 — le premier Incrément106 (I04/PA-08) reste inchangé. Exécution
+> chronologique entre les Incréments106 et 107 ; dossiers de preuve inchangés.
+
+Lot borné PA08/I05 (`glm-last-use-network-20261030T164710Z`, reprise après
+panne réseau) : la fenêtre restante entre le lookup d'accord côté transport
+(flock partagé relâché, `paea-git-call-agreement`) et la consommation moteur
+était ouverte — une révocation de mandat pouvait s'intercaler, le recheck
+`current_actor` au commit ne revalidant que révision+digest policy, pas l'état
+du mandat.
+
+**Moteur** (`rust/crates/swarm-engine/src/root_store/paea_git_promote_call.rs`)
+: `Operation::Commit` revalide désormais l'accord exact
+(`paea_git_agreement_match` sur les octets canoniques de l'appel préparé)
+**sous la réservation Trust partagée déjà tenue** au point de consommation,
+avant `effect::commit`. L'exclusion est par construction : toute écriture
+Trust (révocation) exige le flock exclusif, impossible pendant la réservation
+partagée tenue par le promote — aucun sleep, aucune seconde synchronisation.
+Refus typé durable `paea-git-promote-agreement-stale`, sans publication de
+réf ni ligne d'effet ; `Reconcile` observe le journal et n'exige pas d'accord.
+La revalidation consulte les mêmes octets canoniques et la même révision
+d'état Trust que le lookup consulté — le lien révision consultée/révision
+revalidée est le même verrou, la même lecture bornée
+(`trust::operations::active` : révoqué, bornes temporelles, révision courante).
+
+**Contre-ordre nommé** `promote_call_refuses_mandate_revoked_after_agreement_then_readmits_once`
+(`rust/crates/swarm-engine/tests/paea_git_promote_call.rs`, `--ignored`,
+fixture native retenue regénérée par le producteur documenté — zéro
+compilation) : chaîne d'accord réelle (mandate-create/request/approve,
+bénéficiaire = OLD semé) → match Some → révocation publique **sans** changement
+de révision → commit refuse `paea-git-promote-agreement-stale`, ref nu du bare
+inchangé (aucune publication) → réadmission + accord fraîchement lié →
+`Recorded replayed:false`, ref `refs/heads/release` au candidat → replay
+identique `replayed:true` (exactement une fois). Harnais : `seed_agreement`
+général (chaîne Trust réelle, ids uniques par run), `effect_config_agreement`
+idempotent regimes frais/repris (révision 0 + id stable / révision courante +
+id par run — précédent CLI INCREMENT-87) ; les deux tests Commit préexistants
+sèment désormais un accord valide — le contrat produit exige un accord à
+chaque commit, aucune exception par id, garde non contournée.
+
+**Régressions ciblées vertes** : suite `paea_git_promote_call --ignored`
+5 passed (22,79 s) ; lib `root_store::paea_git_agreement` 6 passed (1,86 s).
+
+**Recette permanente** `paea-git-call-agreement-last-use-rust.json`
+(fresh-verify attendu `source_stable=true`) : 3 étapes — contre-ordre exact,
+régressions promote, tests lib accord ; `paea-git-call-agreement-rust.json`
+mis à jour (5→6 tests lib). `SOURCE-BINDING.json` du lot lie les preuves
+originales du lot consent-binding (`recipe-agreement/result.json/`,
+historique inchangé) aux sources courantes (empreintes à l'heure du liage).
+
+**Limites exactes** : autorité fixture étiquetée auth simulée (jetons porteurs
+isolés), same UID, aucune enrôlement humain réel ni approbation par une
+personne réelle — requis pour toute exécution live, ne bloque pas ce check
+indépendant ; fixture isolée via opérations publiques supportées, aucune base
+live ; pas d'acceptation globale ; aucun commit/push.
+
+### Increment107 — I04/PA-08 : termes d'accord exacts du moteur exposés dans l'aperçu protégé (implémentation, GLM)
+
+Deuxième tranche du parcours d'approbation exacte : le champ `agreement_terms`
+de `GET /api/v1/paea/git-call/preview` expose, pour LES octets canoniques de
+l'action préparée (les mêmes que l'aperçu recalcule déjà et compare à
+l'empreinte liée), les termes que la garde d'accord existante
+(`paea_git_agreement_match`) reconnaît — dérivés côté moteur par la recette
+fixe `paea-git-agreement-v1` via `RootStore::paea_git_agreement_terms`
+(lecture seule, même réservation partagée et état validé que la garde ; type
+public `PaeaGitAgreementTerms` exporté par swarm-engine), jamais calculés,
+amendés ou sélectionnés par le navigateur. Contenu : `binding:"recipe"` quand
+l'action est un `repository.promote` canonique dont l'identité tient dans la
+grammaire de ressource Trust (`resource={projet}/{dépôt}/{réf}/{candidat}`,
+`amount_minor=1`, `currency="OID"`, `beneficiary=expected_old_oid`,
+`revision` courante, `action_id`/`content_digest` vides placeholders) ;
+absence explicite `null` quand aucune recette ne dérive (liaison P1 par
+octets exacts seulement) — l'état honnête, jamais un fallback synthétisé ;
+erreur typée `paea-git-call-preview-terms` si le moteur refuse
+(intégrité), jamais convertie en succès vide.
+
+**Parcours prouvé** (`approver_ux_preview_terms_then_existing_trust_channel_captures_agreement`,
+`--ignored`, fixture native liée) : l'approbateur lit les termes du preview →
+refus réel mauvais rôle par la garde approve existante (`denied`) → refus
+termes dérivés (montant dérivé du preview) → approbation exacte avec les
+termes du preview verbatim via les producteurs Trust réels du root PROJET →
+`paea_git_agreement_match` reconnaît l'accord sur ces octets canoniques
+exactement ; autre candidat (`e`×40) jamais reconnu ; aucun effet Git, aucune
+consommation, aucun consentement capturé par l'aperçu.
+
+**Frontière observée et routée (non implémentée ici)** : la route HTTP
+`/api/v1/trust-actions` sert le root SERVICE (`self.root` du service web) et
+refuse un bearer métier avant toute résolution d'identité
+(`authorization_required`) ; le routage du canal approbateur authentifié vers
+le root projet de l'action préparée est la tranche suivante (intégration
+consentement). Aucun formulaire UI, aucune route approve nouvelle, aucun
+changement de politique.
+
+**Preuves** : fixture native régénérée par la voie documentée
+`tests/rust_native_first_publication.py` (binaire retenu
+b11b4baf… empreinte vérifiée, profil qualifié c7a5f1a1… vérifié, 35 helpers
+gelés intacts, 0 compilation, naissance `owned_inert_fixture_birth` prouvée,
+`result.json` PASS/task_accepted/paid_provider=false) — les racines tmpfs des
+lots antérieurs (approval-preview, last-use-network) disparues de /tmp sont
+conservées en archives sans aucune édition de `result.json` historique.
+Recette permanente `paea-git-call-agreement-terms-rust.json` (5 étapes :
+moteur accord+termes 7/7, absence explicite, aperçu termes exacts, parcours
+termes→capture→garde, catalogue i18n) **PASS fresh puis VERIFIED**
+(`source_stable=true`) ; régressions cibles vertes : suite accord web 4/4
+(refus sans accord, consommation avec accord, vide après changement de
+révision, transfert exact une fois). Documentation FR/EN même incrément
+(README recettes, POINT-ETAPE n°12, APEX FR/EN).
+
+**Limites exactes** : auth simulée étiquetée (bearers fixture isolés), aucune
+présence humaine, aucun enrôlement réel, aucune acceptation indépendante ;
+l'aperçu reste une présentation — il ne capture pas le consentement ; aucun
+commit/push ; backend262 reste preuve historique valide mais ne prouve pas ce
+helper (tests de ce lot sur sources courantes).
+
+### Increment108 — I04/PA-08 : livraison locale installée des termes d'accord exacts (livraison, GLM)
+
+Correction d'une limite fausse de l'Increment107 : « aucun binaire produit
+modifié » ne signifiait pas « rien à livrer » — l'audit des 715 entrées
+effectives du profil v262 (PID 714638, `1bd71fb5…`) a montré que les 4
+fichiers termes (`paea_git_agreement.rs`, `paea_git_call_preview.rs`,
+`root_store.rs`, `lib.rs`) y différaient des octets testés par Codex
+(`v262-gap-audit.json` dans glm-terms-delivery-20261030T200154Z) : le helper
+et le champ API n'étaient pas dans la livraison active.
+
+**Livraison par le chemin supporté** : `./swarm.sh build` →
+`v0.1.1-dev.263` qualifié sans fixture (`VERIFIED_NATIVE_CANDIDATE` +
+`VERIFIED_DEFAULT_NATIVE_PROFILE`, flags no_fixture/features vides, 715
+sources effectives archivées et vérifiées membre à membre, octets termes
+`a039a2d5…`/`29c75597…` liés au profil et à l'archive, `native_build_metadata`
+présent), build achevé AVANT tout arrêt ; puis
+`./swarm.sh restart --prepared-build 90c3bf90…` → service actif PID 1052200,
+version servie v263, ELF en exécution = fichier livré (SHA vérifié).
+`version_history.json` : item FR/EN honnête n°339 (périmètre + limites de
+l'exposition), servi octet-égal par `/api/v1/native-version`.
+
+**Surface réellement servie** (session locale possédée via
+`session_request`, même UID, aucun faux UID) : `/api/v1/native-version` 200
+v263 avec 339 notes FR/EN ; `/api/v1/paea/git-call/preview` 200
+`{available:false, reason:paea-git-call-preview-source-unavailable}` sur la
+base live sans source liée — indisponibilité explicite, aucune fixture
+injectée pour afficher des termes ; `/api/v1/paea/git-call` 200 `bound:false` ;
+login FR/EN corps distincts ; actifs allowlist 200 ; le reste 403. Parcours
+public Version PASS (12 assertions, `version-public/`), dialogue texte
+`Swarm v0.1.1-dev.263 (commit 6706e201…; modified=true; built=…; provenance=injected)`.
+
+**Preuves réutilisées, pas rejouées** : les 5 étapes de la recette terms
+(PASS/VERIFIED, `source_stable=true`, rerun Codex 195927Z) ne sont pas
+re-exécutées ; les 536 entrées déclarées de ce rerun sont re-hachées toutes
+octet-identiques à la livraison — la preuve reste liée aux mêmes octets.
+
+**Limites exactes** : profil livré dev/debug (contrat du chemin supporté),
+pas de build release ; le champ `agreement_terms` avec valeurs réelles reste
+prouvé par les tests source-liés Codex et les tests moteur/web debug sur ces
+octets, PAS par la surface HTTP live (sans source liée) ; aucune capture HTTP
+de consentement (trust-actions sert toujours le root SERVICE) ; la route
+approbateur vers le root PROJET n'est pas commencée ; aucune présence
+humaine, aucun commit/push, aucune acceptation globale.
+
+### Increment109 — I04/PA-08 : route d'approbation liée (retex de la tranche GLM, dette de journal réglée)
+
+Retex de la tranche précédente (implémentation GLM, preuves retenues dans
+`evidence/20261028-acquisition81-mvfdts57/glm-approval-fresh-fixture-20261030T204930Z/`
+et `claude-verify-recipe-20261031T0715Z/`), absente de ce journal à son incrément :
+route protégée unique `POST /api/v1/paea/git-call/approval` (octets figés
+comparés sha256 avant toute ouverture de racine, identifiant Enrollment,
+réponse médiée Biba `trust-status-ack-v1`), observation
+`GET …/approval` (capability digest-only), préparation
+`PaeaGitCallSource::prepare_approval`, recette permanente
+`paea-git-call-approval-rust.json` (5 étapes) passée fraîche puis VERIFIED
+(`source_stable=true`) par vérification indépendante Claude. Le point de
+l'incrément est la dette : toute tranche livrée reçoit son entrée APEX dans
+le même incrément ; les entrées manquantes sont réglées au plus tôt, sans
+réécriture de l'historique.
+
+### Increment110 — I04/PA-08 : surface navigateur du consentement approbateur (implémentation, Claude)
+
+Le canal d'approbation reçoit sa surface opérateur réelle :
+`/paea-consent.html` + `/paea-consent.js`, lien hub, entrées d'actifs
+embarqués (`native_admin.rs`), catalogue i18n (`web/i18n-en.js` +
+`locales/en.json` synchronisés), test d'actifs embarqués
+`rust/crates/swarm-web/tests/paea_consent_page.rs` (2 tests verts, exit 0 :
+présence sous session, POST unique à corps vide + identifiant Enrollment
+exigés dans le script — l'opposé délibéré du garde no-POST de la page
+effets ; absence d'entrée fichier imposée ; refus sans session 403 ;
+catalogue EN), bind serveur réel avec approbation
+`NativeHttpServer::bind_git_call_with_approval` (miroir de
+`open_git_call_with_approval`, fermetures chaînées conservées), harnais
+navigateur réel `paea_consent_browser.rs` + `tests/paea_consent_ui.cjs` +
+driver `tests/paea_consent_ui_recipe.py` + recette permanente
+`tools/verification/recipes/paea-consent-ui-rust.json` — **PASS puis
+VERIFIED** (source_stable=true, preuves `/tmp/paea-consent-recipe-run8`,
+vérification indépendante Claude) : serveur réellement lié, capability +
+action préparée exacte + formulaire FR/EN deux thèmes sans débordement ;
+corps non vide (octets dérivés, bon mot de passe) → refus typé visible
+`paea-git-call-approval-request` via fetch d'origine page ; corps vide +
+mot de passe erroné → `authorization_required`, FR/EN ; journal Trust
+projet octet-identique après chaque refus ; approbation jamais consommée ;
+échos console Chrome des refus attendus comptés un pour un.
+
+**Décision de conception qualifiée (contrat route authoritative)** : la
+route `POST /api/v1/paea/git-call/approval` exige un corps VIDE — la
+commande figée est détenue côté service par l'approbation liée
+(`paea_git_call_approval.rs` : tout corps non vide refuse
+`paea-git-call-approval-request` avant toute ouverture de racine). Le
+formulaire ne transporte donc aucun octet de commande (aucune entrée
+fichier) : il envoie uniquement le mot de passe enrôlé personnel
+(`Authorization: Enrollment <base64url>`) sur corps vide. Le comparatif
+hors bande reste l'empreinte `request_digest` affichée par la capability :
+l'humain vérifie hors canal que l'empreinte correspond à la commande qu'il
+accepte — la route ne peut pas comparer à sa place un octet qu'elle ne
+reçoit pas. Le mot de passe correct consomme l'approbation one-shot ;
+la qualification navigateur s'arrête donc volontairement aux deux refus
+typés, sans jamais consommer.
+
+**Limites exactes** : fixture tmpfs régénérée via
+`tests/rust_native_first_publication.py` (la racine retenue du lot
+approval-preview a purgé au redémarrage) ; auth simulée étiquetée, aucune
+présence humaine, aucun enrôlement réel, aucun appel Git, aucune
+acceptation globale ; aucun commit/push. Redécouverte de contrat en
+qualification : la page construite d'abord sur transport d'octets (entrée
+fichier) a été reprise sur le contrat réel à corps vide détenu par le
+service — un seul incrément, page + harnais + test d'actifs corrigés
+ensemble (aucune trace d'octets transmis restante).
+
+### Increment111 — I04/PA-08 : qualification navigateur du formulaire d'approbation consommé, fraîche puis périmée (qualification, GLM)
+
+Le formulaire déjà implémenté
+(`web/paea-approval-form.js`, section « Approbation » de `paea-effects.html`,
+route `POST /api/v1/paea/git-call/approval` de `paea_git_call_approval.rs`)
+est qualifié de bout en bout sur le contrat conservé (corps vide, commande
+figée détenue côté service, aucun octet de commande transporté) — sans
+redesign, sans code produit modifié. Test `--ignored` réel
+`approval_form_serves_real_browser_session` (`paea_git_call.rs`) : serveur
+natif réellement lié (fixture source retenue, session persistée ordinaire),
+vrai Chrome sur les ressources servies, une consommation explicite à corps
+vide via le formulaire avec le mot de passe fixture étiqueté (auth simulée),
+puis `config-apply` Trust public réel (révision 62 → 63) et observation de la
+péremption. Quatre contrôles harnais exacts : projection autorisée FR/EN
+sans champs privés (aucun champ de commande exposé), rejeu à révision
+courante = ack enregistré 200 `trust-status-ack-v1` (réponse retenue du même
+appel d'origine, jamais une seconde approbation fraîche), péremption réelle
+= erreur visible FR/EN sans confirmation sollicitée ni normalisation, et
+refus post-péremption typé 403 par le même canal réel (l'autorité enrôlée
+détenue est liée à la révision consommée — contrat moteur prouvé par
+`authentication.rs` et le test route voisin : le chemin rejeu est inatteignable
+après la mutation périmée, jamais de re-consommation ni de re-approbation).
+Cinq refus attendus classés, zéro diagnostic inattendu, arrêt owned propre
+(`phase2.done` → marqueur stop → `serve_until` drainé et fermé vérifié).
+
+**Premières causes corrigées (chaîne d'échecs observés, une à la fois)** :
+(1) la reconstruction d'identités du test navigateur omettait le porteur
+`agreement-admin` → jeton vide → refus `format` par `prepare_identities` —
+aligné sur les deux reconstructions voisines déjà prouvées ; (2) le harnais
+tentait un rejeu APRÈS la mutation périmée en attendant 200, contredisant le
+contrat moteur prouvé — le rejeu est déplacé avant la phase périmée et le
+refus post-péremption est classé refus attendu typé (drapeau armé, réponse +
+écho console classés un pour un) ; (3) l'écriture de marqueur non atomique
+(`writeFileSync`, fenêtre tronquer-écrire) a couru contre le sondage Rust à
+100 ms (« marker present but not ours » avec octets finaux corrects) —
+publication atomique tmp+rename et attente `phase2.ready` tolérante ; (4)
+quatrième contrôle jamais poussé et `phase2.done` jamais publié — le protocole
+possédé ne pouvait pas se terminer même en succès harnais (dette latente
+découverte à la qualification) ; (5) le driver traitait la sortie Rust 0
+pendant la fermeture du navigateur comme une mort (fail-fast sur sortie
+quelconque) — fail-fast restreint à la sortie non nulle (l'ordre de succès
+réel : arrêt owned terminé dès `phase2.done` consommé, fermeture navigateur
+encore en cours) et drainage complet des deux canaux avant tout verdict.
+
+**Recette permanente** `paea-approval-form-rust.json` : 6 étapes PASS fraîches
+(preuves `qualif-20261031T103528Z`, `evidence/20261028-acquisition81-mvfdts57/`),
+intégrité **VERIFIED** par `recipe.py verify`, `inputs.before == inputs.after`
+(stabilité des sources), binaire exercé résolu par flux CargoJSON
+`compiler-artifact` (`paea_git_call-f9e094d8c7f76673`, sha256
+`ee27866310e65c462b4bdd47d0578c13a25b2600619bf8ba72541ecd67508562`, digest
+avant/après identiques). Tentatives intermédiaires conservées intactes
+(091848/101406 incluses, aucune suppression ni écrasement). **Limites
+exactes** : auth simulée étiquetée, aucune présence humaine, aucun enrôlement
+réel, aucun appel Git, aucune acceptation globale ; code produit inchangé —
+aucune livraison `./swarm.sh` requise (l'actif et la route qualifiés sont déjà
+embarqués dans le binaire installé `bin/swarm` daté du 31 octobre 10:25, service
+local actif dessus) ; aucun commit/push.
+
+### Increment112 — I15/PA-07 : la mutation force la réadmission — fin de voie de l'admission retenue, réadmission lie l'empreinte mutée (vérification, Claude)
+
+Tâche 3 bornée (Claude seul, dossier
+`evidence/claude-i15-readmission-20261031T100227Z/`, reprise du parcours
+« mutation force réadmission » laissé ouvert par l'Incrément101) : prouver au
+niveau produit que, après la mutation réelle d'un artefact de fournisseur
+admis, l'admission retenue est une **fin de voie** — les seules continuations
+légitimes sont l'annulation (règlement de l'intention périmée) ou une
+**nouvelle admission** qui re-observe les octets courants et lie la nouvelle
+empreinte. L'Incrément101 prouvait mutation → refus typé → récupération par
+restauration ; il ne prouvait pas la réadmission forcée.
+
+Test nommé
+`preflight_admitted_artifact_mutation_forces_fresh_admission_binding_mutated_digest`
+(`rust/crates/swarm-engine/src/agent_execution_preflight.rs`, module `tests`,
+fixture identique à l'Incrément101 : copie provider test-owned `fixture-provider`,
+`providers.json` publié, admission `session` → work révision 3) — séquence en
+7 contrôles : (1) après mutation in place (digest vérifié différent),
+`inspect`/Queued refuse `agent-execution-preflight-changed`, snapshot SQL
+admission inchangé ; (2) le rejeu du MÊME event id retourne `created:false`
+avec l'agent toujours `queued` et la portée retenue inchangée — le rejeu ne
+ré-observe jamais (`agent_launch::existing` : octets de requête identiques →
+rangée rejouée, aucune observation fraîche), donc l'admission retenue ne
+peut pas se guérir elle-même ; (3) une admission parallèle à nouvel event id
+sur le même espace est refusée `agent-launch-workspace-busy` tant que la
+rangée périmée est en file — la voie est occupée, aucun contournement
+parallèle ; (4) `RootStore::cancel_queued_agent("session")` règle l'intention
+périmée : agent `interrupted`/`stop_kind operateur`/`desired stop`/`ended`
+non vide, activité « Démarrage annulé avant prise en charge », tâche bloquée,
+révision work 4, toutes réservations `released` ; (5) la réadmission à nouvel
+event id `readmit` + `expected_revision 4` réussit (`created:true`), la tâche
+passe `running` avec une tentative fraîche enregistrée, et la nouvelle
+portée preflight **diffère** de la portée d'origine — l'empreinte mutée est
+désormais l'observation liée ; (6) fermeture de symétrie : restauration des
+octets d'origine puis `inspect`/Queued sur le NOUVEL agent refuse
+`agent-execution-preflight-changed` — la réadmission a bien lié les octets
+mutés, pas les originaux ; (7) la rangée annulée n'est plus jamais
+consommable (`inspect` refuse : état terminal / desired stop).
+
+**Recette permanente** `tools/verification/recipes/paea-i15-tool-substitution-rust.json`
+étendue à 2 étapes (les deux tests nommés `--exact`, entrées étendues à
+`agent_store.rs` et `root_store.rs`) : run frais **PASS** (2/2 étapes,
+`source_stable=true`), `recipe.py verify` → **VERIFIED**, preuves brutes
+(stdout/stderr/exit réels, tar des entrées déclarées) dans `recipe-run/`.
+**Limites exactes** : fixture test-owned, same-UID, données fictives ;
+aucun enrôlement humain, aucune séparation UID, aucun paiement réel, aucune
+acceptation indépendante ; preuve locale de la barrière produit — les
+critères I15 restants (inventaire/correspondance ACS) et PAEA17 restent
+ouverts ; aucun commit/push.
+
+### Increment113 — PA-10 arbitrage E2 : deux domaines re-prouvés sur le candidat courant, déclaration E2 bornée émise (vérification, Claude)
+
+**Candidat unique** : `bin/swarm` SHA-256 `1d3f9da1408a82b14b5ae5d76328b58c52f1f92051824af52f1d413be8dd41fd`
+(v0.1.1-dev.267, 6706e201b + travail local 31-10, construit 2026-10-31T11:57Z), profil
+`VERIFIED_DEFAULT_NATIVE_PROFILE` lié au même SHA, octets `bin/swarm` cmp-identiques à l'archivé du
+profil, service natif PID 358364 exécutant exactement ce fichier (chaîne d'identité complète dans
+`claude-e2-arbitrage-20261031T135859Z/IDENTITY.md`). Les preuves de domaines Increment94–97 portaient
+sur l'ELF `47d31746…` (dev.257) ; PA-10 exige le même candidat — les deux recettes ont été re-pinnées
+et re-jouées sur `1d3f9da1…`.
+
+**Domaine settlement** : `paea-delivered-settlement-cli-rust` re-pinnée (témoin binaire + 6 fragments
+`required_stdout`), run frais 6/6 PASS, `source_stable=true`, 18/18 spawns témoins re-hashés
+`1d3f9da1…`, `recipe.py verify` → **VERIFIED** (`recipe-settlement-run/`).
+
+**Domaine Git/chaîne — blocage fixture et cause racine établie** : le fixture source du 29-10 pointait
+sur une racine tmpfs `/tmp` disparue (cycle de vie connu) ; échec initial conservé (`recipe-chain-run/`,
+panic `paea_promote.rs:209` `Err value: path`). La régénération documentée
+(`rust_native_first_publication.py`) sur le candidat courant échoue systématiquement : les deux agents
+de surveillance du scénario managed-auto meurent en ~0,3 s, tâches bloquées, scénario suspendu
+(`awaiting-managed-auto-provider-0`) — reproduit 2 fois (regen-2, regen-4), échecs et artefacts
+conservés. Capture native-completion : `PermissionError: [Errno 1] Operation not permitted` à
+`socket.socket(socket.AF_UNIX,…)` dans le programme fournisseur. Cause : le bac à sable Biba rendu
+obligatoire aux fournisseurs par 6706e201b (`native_provider_exec.rs` prepare+enforce inconditionnels ;
+b11b4baf du 28-10 n'avait **aucun** symbole `swarm_biba_linux`) refuse par conception
+`socket`/`socketpair` AF_UNIX (`swarm-biba-linux/src/kernel.rs:62-66`, « an outside Unix service must
+not become a same-UID authority bypass ») alors que le scénario `rust_managed_auto_worker.py` exige que
+le fournisseur joigne `watch-provider.sock`. Isolement causal confirmé : regen-5 avec le binaire retenu
+`b11b4baf…` (sans bac à sable fournisseur) + son profil vérifié (`rust-4ptnbjhy`, sha256 profil
+`c7a5f1a1…` — combinaison exacte du fixture d'origine, hash vérifiés dans ses inputs) exécute le même
+scénario jusqu'à `NATIVE_MANAGED_AUTO_PASS`. **Constat à transmettre** : le durcissement produit
+(légitime) rend le canal de contrôle du scénario de fixture impossible pour un fournisseur confiné ; le
+scénario devra soit renoncer à la socket fournisseur, soit documenter explicitement cette limite.
+
+**Domaine Git/chaîne — preuve sur le candidat courant** : fixture régénéré `source-fixture-regen-5/`
+(PASS complet), recette re-pinnée et re-pointée (`recipe-chain-repointed-regen5.json`, entrée + env
+`SWARM_PAEA_SOURCE_FIXTURE`), run frais 4/4 PASS (`source_stable=true`, témoins de spawn
+`1d3f9da1…`), `recipe.py verify` → **VERIFIED** (`recipe-chain-run-2/`).
+
+**Déclaration E2 bornée émise** (`DECLARATION-E2.md`) : conformément à PA-10 « deux parcours installés,
+déclaration E2 bornée et critères ouverts explicites ; pas clôture E3 ». Portée : candidat unique
+`1d3f9da1…`, deux parcours installés (service web natif PID 358364 + CLI métier), deux domaines
+PASS + VERIFIED. Critères ouverts explicites : aucune acceptation indépendante (E3/équipe tierce
+absents, constat 25-10), aucun enrôlement humain réel (fixtures simulés), pas de séparation distinct-UID
+(newuidmap absent), pas de confinement egress, M5/M6 ouverts, inventaire I15/ACS en attente d'entrées
+externes. **Triage PAEA17** séparé (`TRIAGE-PAEA17.md`, 5 volets avec états et suites). L'incident
+d'interférence du 31-10 (exécution du fournisseur d'un fixture vivant contre sa socket de contrôle,
+collapse de regen-2) est documenté et conservé ; règle enregistrée : ne jamais exécuter le fournisseur
+d'un fixture vivant contre sa socket de contrôle.
+
+**Limites exactes** : fixtures isolés, same-UID, données fictives, aucun paiement réel, aucune base
+vivante, aucune acceptation indépendante ; le binaire de régénération du fixture diffère du candidat
+prouvé par les recettes (précédent du 29-10, combinaison identique à l'original) ; aucun commit/push ;
+PAEA17 (0/17 invariants acceptés indépendamment) et PAEA restent ouverts.
+
+**Additif durabilité (même incrément, 31-10)** : balayage systématique — les 16
+recettes permanentes pinant `SWARM_PAEA_SOURCE_FIXTURE` (7 dossiers fixtures)
+pointaient toutes des racines `/tmp` mortes ; les recettes canoniques
+`paea-delivered-chain-cli-rust.json` et `paea-transfer-call-cli-rust.json` sont
+re-pointées vers `source-fixture-regen-5/`, run canonique frais 4/4 PASS +
+verify VERIFIED (`recipe-chain-run-3-canonical/`) ; règle de cycle de vie
+régénération/never-copy écrite dans `tools/verification/README.md` ; 14 autres
+recettes restent à re-pointer (conditions enregistrées).
+
+**Correction (même journée, suite interdiction opérateur)** : les racines de
+fixtures ne doivent pas vivre dans `/tmp` — création désormais routée par
+`rust_agent_model_route.fixture_root()` sous `<repo>/.swarm-fixtures/`
+(gitignored, 0700, socket AF_UNIX interne 95 octets < limite noyau), consommée
+par `Fixture.__init__` (227 scripts) et `rust_native_http_cli.py`. Fixture
+durable `source-fixture-regen-6-repo-root/` (PASS complet, socket de contrôle
+liée dans la racine) ; les deux recettes canoniques re-pointées sur ce fixture :
+chaîne 4/4 PASS + VERIFIED (`recipe-chain-run-4-durable/`), transfert 8/8 PASS +
+VERIFIED (`recipe-transfer-run-durable/`). ~120 autres scripts de test restent
+à migrer hors de `/tmp` (suivi enregistré). Preuves : dossier
+`claude-e2-arbitrage-20261031T135859Z`.
