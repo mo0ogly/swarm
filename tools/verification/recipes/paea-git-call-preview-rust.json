@@ -1,0 +1,127 @@
+{
+ "schema_version": 1,
+ "id": "paea-git-call-preview-rust",
+ "inputs": [
+  "rust/Cargo.toml",
+  "rust/Cargo.lock",
+  ".cargo/config.toml",
+  "rust/crates/*/Cargo.toml",
+  "rust/crates/swarm-web/src/**/*",
+  "rust/crates/swarm-web/tests/paea_git_call.rs",
+  "rust/crates/swarm-web/tests/paea_effects_page.rs",
+  "rust/crates/swarm-engine/src/**/*",
+  "rust/crates/swarm-engine/tests/paea_git_transfer_call.rs",
+  "rust/crates/swarm-enrollment-*/src/**/*",
+  "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+  "rust/crates/swarm-identity-contract/src/**/*",
+  "rust/crates/swarm-protection-contract/src/**/*",
+  "web/paea-effects.html",
+  "web/paea-effects.js",
+  "web/i18n.js",
+  "web/i18n-en.js",
+  "locales/en.json",
+  "tests/paea_effects_ui.cjs",
+  "tests/paea_effects_ui_recipe.py",
+  "tools/verification/recipe.py",
+  "tools/verification/recipes/paea-git-call-preview-rust.json",
+  "docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-preview-20261030T094105Z/source-fixture/result.json"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+  "CARGO_PROFILE_DEV_DEBUG": "0",
+  "CARGO_PROFILE_TEST_DEBUG": "0",
+  "CARGO_INCREMENTAL": "0",
+  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-preview-20261030T094105Z/source-fixture"
+ },
+ "steps": [
+  {
+   "id": "preview-route-explicit-absence-without-source",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "preview_route_reports_explicit_absence_without_source",
+    "--message-format=json",
+    "--",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "preview_route_reports_explicit_absence_without_source ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "preview-route-presents-exact-bound-action",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "preview_route_presents_exact_bound_action_with_current_state",
+    "--message-format=json",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "preview_route_presents_exact_bound_action_with_current_state ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "preview-page-embedded-assets",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_effects_page",
+    "--",
+    "--test-threads=1"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "2 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "preview-page-i18n-catalog",
+   "command": [
+    "node",
+    "scripts/i18n/build.cjs",
+    "--check"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "\"mode\":\"check\"",
+    "\"status\":\"pass\""
+   ],
+   "required_stderr": []
+  }
+ ]
+}

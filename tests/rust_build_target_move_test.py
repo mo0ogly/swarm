@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Reproduce shutil copy fallback and verify rename-only owned cache transfer."""
+from fixture_area import fixture_area
 from pathlib import Path
 import errno,importlib.util,shutil,tempfile,unittest
 from unittest.mock import patch
@@ -10,7 +11,7 @@ class MoveBuildTarget(unittest.TestCase):
     """Temporary owned directories only; no Cargo writer or repository data."""
     def test_missing_parent_copy_reproducer_and_rename_fix(self):
         """Missing parents trigger shutil copy; explicit parents preserve inode."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             root=Path(temporary);old=root/'old';old.mkdir();(old/'proof').write_bytes(b'cache')
             before=old.stat().st_ino;dest=root/'missing'/'parent'/'target'
             shutil.move(old,dest)
@@ -21,14 +22,14 @@ class MoveBuildTarget(unittest.TestCase):
 
     def test_existing_destination_preserves_both(self):
         """A prior output is not replaced and original cache remains intact."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             root=Path(temporary);source=root/'source';source.mkdir();dest=root/'dest';dest.mkdir()
             with self.assertRaises(FileExistsError):module.move_target(source,dest)
             self.assertTrue(source.is_dir());self.assertTrue(dest.is_dir())
 
     def test_cross_device_has_no_copy_fallback(self):
         """Injected EXDEV refuses without deleting or copying the original."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             source=Path(temporary)/'source';source.mkdir();(source/'proof').write_bytes(b'original');dest=Path(temporary)/'new'/'target'
             with patch.object(module.os,'rename',side_effect=OSError(errno.EXDEV,'fixture cross-device')):
                 with self.assertRaises(OSError):module.move_target(source,dest)

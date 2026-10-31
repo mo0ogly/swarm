@@ -3,7 +3,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
 const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-task-reading-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-task-reading-'));
 const cli=(args,data)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(data?['--input','-']:[])],{encoding:'utf8',input:data?JSON.stringify(data):undefined}));
 const req=(revision,fields)=>({schema_version:1,event_id:crypto.randomUUID(),expected_revision:revision,...fields});
 cli(['init']);let w=cli(['work','create'],req(0,{title:'Comprendre une tâche',objective:'Comprendre le blocage et les tâches liées.',scope:'Fixture locale',criteria:['Lecture claire'],next:'Examiner'})).work;

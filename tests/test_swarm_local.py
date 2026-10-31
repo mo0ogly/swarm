@@ -8,19 +8,24 @@ from pathlib import Path
 import socket
 import subprocess
 import tempfile
+from fixture_area import fixture_area
 import threading
 import unittest
+import urllib.error
 import urllib.request
 import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 SOURCE = Path(__file__).resolve().parent.parent
-BINARY = os.environ.get("SWARM_TEST_BINARY", "/tmp/swarm-stable-site-candidate")
+# Operator /tmp interdiction (2026-10-31): no project data under /tmp, and no
+# default binary path pointing there either. The candidate binary now lives in
+# the repository delivery area; override with SWARM_TEST_BINARY when needed.
+BINARY = os.environ.get("SWARM_TEST_BINARY", str(SOURCE / "bin" / "swarm"))
 
 
 class LocalWeb(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory(prefix="swarm-local-site-")
+        self.temp = tempfile.TemporaryDirectory(prefix="swarm-local-site-", dir=fixture_area())
         self.root = Path(self.temp.name) / "project with spaces"
         with socket.socket() as sock:
             sock.bind(("127.0.0.1", 0))
@@ -49,9 +54,54 @@ class LocalWeb(unittest.TestCase):
                                 text=True, capture_output=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         key = (self.root / ".swarm" / ("web-session-" + hashlib.sha256(self.address.encode()).hexdigest()[:16])).read_text().strip()
-        self.assertEqual(received.read_text(), self.url + "/login?next=/live.html")
+        # Fresh Root carries the v50 ticket lifetime: open hands the opener a
+        # single-use link (never printed), which signs in once and then refuses.
+        link = received.read_text()
+        self.assertTrue(link.startswith(self.url + "/login?ticket=ticket-"), link[:60])
+        self.assertTrue(link.endswith("&next=/live.html"))
+        ticket = link.split("ticket=", 1)[1].split("&", 1)[0]
+        self.assertNotIn(key, link)
         self.assertNotIn(key, result.stdout + result.stderr)
+        self.assertNotIn(ticket, result.stdout + result.stderr)
         self.assertIn(self.url + "/", result.stdout)
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, *args, **kwargs):
+                return None
+        client = urllib.request.build_opener(NoRedirect)
+        with self.assertRaises(urllib.error.HTTPError) as first:
+            client.open(link)
+        self.assertEqual(first.exception.code, 303)
+        self.assertEqual(first.exception.headers["Location"], "/live.html")
+        self.assertIn("HttpOnly", first.exception.headers["Set-Cookie"])
+        with self.assertRaises(urllib.error.HTTPError) as replay:
+            client.open(link)
+        self.assertEqual(replay.exception.code, 401)
+
+    def test_rotate_replaces_key_and_refuses_old_cookie(self):
+        """rotate: owned server stopped, key replaced, server ready again; the
+        old cookie and a ticket issued before rotation are refused, the new key
+        works, and neither key appears in launcher output."""
+        self.run_cli("start")
+        name = "web-session-" + hashlib.sha256(self.address.encode()).hexdigest()[:16]
+        old = (self.root / ".swarm" / name).read_text().strip()
+        cookie = lambda key: {"Cookie": "swarm_session_" + hashlib.sha256(self.address.encode()).hexdigest()[:12] + "=" + key}
+        probe = lambda key: urllib.request.urlopen(urllib.request.Request(self.url + "/api/v1/native-version", headers=cookie(key))).status
+        self.assertEqual(probe(old), 200)
+        stale = json.loads(subprocess.check_output([BINARY, "--root", str(self.root), "web-ticket", self.address, "--json"]))["url"]
+        before = json.loads(self.run_cli("status"))["pid"]
+        output = self.run_cli("rotate")
+        new = (self.root / ".swarm" / name).read_text().strip()
+        self.assertNotEqual(old, new)
+        self.assertNotIn(old, output); self.assertNotIn(new, output)
+        status = json.loads(self.run_cli("status"))
+        self.assertTrue(status["ready"]); self.assertNotEqual(before, status["pid"])
+        with self.assertRaises(urllib.error.HTTPError) as refused:
+            probe(old)
+        self.assertEqual(refused.exception.code, 403)
+        self.assertEqual(probe(new), 200)
+        with self.assertRaises(urllib.error.HTTPError) as orphan:
+            urllib.request.urlopen(stale)
+        self.assertEqual(orphan.exception.code, 401)
 
     def test_restart_retains_data_session_and_single_instance(self):
         first = self.run_cli("start")

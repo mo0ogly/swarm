@@ -50,8 +50,10 @@ fn get(f: &Fixture, s: &NativeHttpService, path: &str) -> HttpReply {
     )
     .unwrap()
 }
-/// The new page and its script are served with the right media types and the
-/// page really references the two guarded read endpoints; no other asset set.
+/// The new page and its scripts are served with the right media types and the
+/// page really references the guarded read endpoints; the approval form script
+/// is served beside the read-only observation script and POSTs only the exact
+/// approval channel.
 #[test]
 fn paea_effects_page_served_with_content_and_hub_link() {
     let f = Fixture::new();
@@ -63,9 +65,29 @@ fn paea_effects_page_served_with_content_and_hub_link() {
     let script = get(&f, &s, "/paea-effects.js");
     assert_eq!(script.response.status(), StatusCode::OK, "{:?}", script.failure);
     let js = String::from_utf8(script.response.body().to_vec()).unwrap();
+    assert!(js.contains("/api/v1/paea/git-call/preview"), "script must consume the preview endpoint");
     assert!(js.contains("/api/v1/paea/git-call"), "script must consume the status endpoint");
     assert!(js.contains("/api/v1/paea/reconcile-effects"), "script must consume the reconciliation endpoint");
     assert!(!js.contains("method:'POST'"), "read-only page must never POST");
+    assert!(!body.contains("submit"), "preview page must not offer a consent action");
+    // The explicit approval form is a separate script consumed by the same
+    // page: it POSTs only to the single-intent approval route, and the page
+    // really loads it.
+    let form = get(&f, &s, "/paea-approval-form.js");
+    assert_eq!(form.response.status(), StatusCode::OK, "{:?}", form.failure);
+    let form_js = String::from_utf8(form.response.body().to_vec()).unwrap();
+    assert!(
+        form_js.contains("/api/v1/paea/git-call/approval/presentation"),
+        "form script must consume the presentation endpoint"
+    );
+    assert!(
+        form_js.contains("/api/v1/paea/git-call/approval"),
+        "form script must consume the approval endpoints"
+    );
+    assert!(
+        body.contains("paea-approval-form.js"),
+        "page must load the approval form script"
+    );
     // The hub really links the new page so the family navigation stays coherent.
     let hub = get(&f, &s, "/paea.html");
     assert_eq!(hub.response.status(), StatusCode::OK);
@@ -97,6 +119,15 @@ fn paea_effects_page_refuses_without_session_and_en_catalog_covers_it() {
         "États d'effets PAEA",
         "Rapprochement des journaux d'effets (PA-09)",
         "Journal non initialisé : aucun effet rapproché (état explicite, pas un succès vide).",
+        "Aperçu de l'action préparée — destiné à l'approbateur",
+        "Aperçu explicitement indisponible : {code}. Aucun appel Git préparé n’est lié au démarrage du service ; la préparation deux phases reste la voie réelle.",
+        "Aperçu exact de l’action préparée détenue par le moteur, présenté avant tout accord. Aucun consentement n’est capturé ici : ce contenu n’est pas un accord ; poursuivre ensuite le consentement réel sur cette même action.",
+        "Approbation de l’action préparée — confirmation explicite",
+        "Aucun consentement n'est capturé par cet affichage : la confirmation ci-dessous est l'acte explicite qui consomme la commande figée sous l'autorité enrôlée détenue.",
+        "Je confirme l’action présentée ci-dessus, pour ses termes exacts.",
+        "Approuver l’action préparée",
+        "Approbation explicitement indisponible : {code}. Aucune commande d’approbation n’est liée au démarrage du service ; la préparation deux phases (CLI ou enrôlement) reste la voie réelle.",
+        "Approbation enregistrée par le moteur : décision reçue ({state}). Aucun effet Git n’a été exécuté par ce formulaire ; relire les états d’effets pour la suite.",
     ] {
         assert!(catalog.contains(french), "missing EN catalog source entry: {french}");
     }

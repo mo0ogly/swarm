@@ -14,6 +14,10 @@ import shutil
 import subprocess
 import tarfile
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 from recipe import publish
 
 _FILE_FIELDS = ("GoFiles", "CgoFiles", "CFiles", "CXXFiles", "MFiles", "HFiles",
@@ -249,7 +253,7 @@ def prepare(root, output, baseline=None, package="./internal/engine"):
     print(f"Go input archive: {len(before['project'])} project files; {len(delta)} new/changed", flush=True)
     # Compression takes place on private temporary storage; only an atomic,
     # read-back-checked publication is linked into the permanent proof directory.
-    with tempfile.TemporaryDirectory(prefix="swarm-go-source-") as temporary:
+    with tempfile.TemporaryDirectory(prefix="swarm-go-source-", dir=fixture_area()) as temporary:
         archive = Path(temporary) / "source.tar.gz"
         with tarfile.open(archive, "w:gz") as tar:
             for name, facts in delta.items():

@@ -10,7 +10,9 @@ use std::{collections::BTreeSet, error::Error, fmt};
 /// v48 adds the independent optional cockpit default autonomy display mode.
 /// v49 adds the independent optional separate settlement ledger root path for
 /// the read-only PA-09 reconciliation consumer.
-const SETTINGS_SCHEMA_MAX: i64 = 49;
+/// v50 adds the independent optional single-use cockpit login ticket lifetime.
+/// v51 adds the independent optional runtime temporary directory.
+const SETTINGS_SCHEMA_MAX: i64 = 51;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SettingCount(pub i64);
 /// Providers with a supported telemetry injection (protocol capability, not an
@@ -1019,6 +1021,27 @@ pub struct EngineSettingsValues {
         deserialize_with = "present_string"
     )]
     pub paea_settlement_ledger_root: Option<String>,
+    /// v50: lifetime in seconds of a single-use cockpit login ticket issued by
+    /// `web-ticket`. Strictly positive; historical absence refuses issuing
+    /// instead of adopting a default. It grants no authority beyond the owner
+    /// key the ticket stands for and does not expire existing cookies.
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "present_count"
+    )]
+    pub web_login_ticket_seconds: Option<SettingCount>,
+    /// v51: directory where Swarm processes write temporary files (exported as
+    /// `TMPDIR` to the engine process and its children) and where tests and
+    /// recipes allocate fixtures. Absolute, or relative to the project Root;
+    /// never implicitly `/tmp`. Historical absence leaves the inherited
+    /// environment unchanged and is reported, never silently adopted.
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "present_string"
+    )]
+    pub runtime_temporary_directory: Option<String>,
 }
 /// Preserve legacy absence separately from a validated explicit set; null and
 /// unknown phase names refuse. No task mutation, IO or authorization occurs.
@@ -1149,6 +1172,12 @@ impl EngineSettingsValues {
     /// Work/history or establishes active-server state. Typed validation causes
     /// survive rejection; caller still owes authority and publication freshness.
     pub fn validate(&self) -> Result<(), EngineSettingsError> {
+        if self.runtime_temporary_directory.is_some() {
+            self.runtime_temporary_directory()?;
+        }
+        if self.web_login_ticket_seconds.is_some() {
+            self.web_login_ticket_seconds()?;
+        }
         if self.paea_settlement_ledger_root.is_some() {
             self.paea_settlement_ledger_policy()?;
         }
@@ -1554,6 +1583,12 @@ impl EngineSettingsValues {
     /// Return the complete declared settings version, preserving historical
     /// absence. This does not adopt defaults, mutate history or grant authority.
     pub fn schema_version(&self) -> i64 {
+        if self.runtime_temporary_directory.is_some() {
+            return 51;
+        }
+        if self.web_login_ticket_seconds.is_some() {
+            return 50;
+        }
         if self.paea_settlement_ledger_root.is_some() {
             return 49;
         }
@@ -2634,3 +2669,7 @@ pub use report_read::ReportReadPolicy;
 mod cockpit_autonomy;
 
 mod settlement_ledger;
+
+mod web_login_ticket;
+
+mod runtime_temporary;

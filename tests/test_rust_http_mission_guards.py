@@ -1,6 +1,7 @@
 """Owned fixture restoration must survive both observation and retention failure."""
 from pathlib import Path
 import os,tempfile,unittest
+from fixture_area import fixture_area
 from unittest.mock import patch
 import rust_native_http_mission as mission
 
@@ -9,7 +10,7 @@ class OwnedDatabaseRestore(unittest.TestCase):
     """Valid original/copy witness precedes the shared restoration fault."""
     def test_identical_copy_has_distinct_inode_then_original_is_restored(self):
         """Exercise actual owned file substitution and exact physical recovery."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             database=Path(directory)/'state.db';database.write_bytes(b'owned fixture')
             identity=database.stat().st_ino
             with mission.foreign_inode(database):
@@ -22,7 +23,7 @@ class OwnedDatabaseRestore(unittest.TestCase):
         """Retaining a refused copy must not prevent the original restoration."""
         # Same complete successful witness before this fault injection.
         self.test_identical_copy_has_distinct_inode_then_original_is_restored()
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             database=Path(directory)/'state.db';database.write_bytes(b'owned fixture')
             identity=database.stat().st_ino;replace=os.replace
             def failing(source,target):
@@ -38,7 +39,7 @@ class OwnedDatabaseRestore(unittest.TestCase):
     def test_failed_original_restoration_preserves_source_and_explicit_recovery(self):
         """A failed restore remains failed, with original retained for owned recovery."""
         self.test_identical_copy_has_distinct_inode_then_original_is_restored()
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             database=Path(directory)/'state.db';database.write_bytes(b'owned fixture')
             identity=database.stat().st_ino;replace=os.replace
             def failing(source,target):

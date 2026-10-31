@@ -1,0 +1,53 @@
+{
+  "FR": {
+    "pages": 18,
+    "diagram_sha256": [
+      "00ca2c017ebb57f7f0ec5053e89d44e1b4f3882695e76ad456e723086412fc16",
+      "6b4ba1e1761952fe9e6c83f741656e0a679b6a6885a876cdeb94edef4a94d064",
+      "67046897d02578b5f255db9f194c80b331fa9d20e90e7d6b0655c46f417d2034",
+      "45883c9ed7cccd68ba5d5b84f8fcce3f7f55712c0ac9685ab2133264f8ecdcb9",
+      "216ee1f7a82fff5efd52e0331df0a5f8a87e71f8e1dbced3eb0733b2cc328d25",
+      "2fffd4b740bf8ce61cd1af1448ebe2b3f4a9c736e7c23d65738ae878fe475ed7",
+      "4303251b1ddb96ec4769f1c31dec1e887ad7526e49e1ebda8ffc4d974b093f2a",
+      "bf00f6efc074a58d5983e5fca3c94908a248451638e9854fcfe0589bb4238665",
+      "9e6e82108688518dd3ade21dcbd991b2dc5e13ffc2931a87fcd8454bb3643590",
+      "d42d4b814e05d2a3277680b13064171d3c396054faa3e0fd933ad2d1e79261b1",
+      "68f9d7ddb219a7ceeda5e220e66ee13a8dc06a0003bf15000528da2fc0ead3d8"
+    ],
+    "docx_sha256": "2a8e9c5cb7ad677f33d6771c4cbe79d2e535adacf5c1a4751c930dfd426c0407",
+    "pdf_sha256": "04f0874131855bd1a2d848d9aaf80d523ca74e6e6c5d21aab9f2199bdcccaa04",
+    "pagination_every_page": "PASS",
+    "no_export_bubble": "PASS",
+    "all_pages_visually_reviewed": true
+  },
+  "EN": {
+    "pages": 17,
+    "diagram_sha256": [
+      "1373a24be60b916ea6a834fc836584485c4949cd100e82685da750267db5a285",
+      "028f9511c7e411c25515da55029b36bd64ae504246d903dd0fb057437b3f03c1",
+      "c6ab53936987ed6cc557aec3557d1f2f5d857298bea4cb5c915631208ec8913d",
+      "a8fe4425f88b915fe0aca2a4ccb2a5ad725ef050e4aef150bcf829ead8234e96",
+      "8c2757519b506d35258d886aee68c39a9394ee81bbdea9c40bcf520622d75d4d",
+      "f6e3a4029736ed3f46614a657e765c55c13bd51cca250f33a702a6512c2779a5",
+      "000a470b3ca57bed6acbd8b109280d941be5184c34e9da382d7c898b04ce80f5",
+      "93f4f2f35fb14a9ab0c1498b39bb8ee1a3278f398ffbcccea71831e149c4df49",
+      "d407499161b428071d3ab852ac0c03eb4992e69e6aa6980a9245cea20a112f0d",
+      "d477d6ac03cb1ebe174e41d00d4d2c375ae8b7b780aa9f0ffe0fe0975aad805c",
+      "018eb019a0920f2696dd6a218f20878f3832fcb1b6d0ed31db06c4b693d952b1"
+    ],
+    "docx_sha256": "a5fbc46115cbc97e683e85537bda554f730ba606ee1faf42d1a106ec656ec121",
+    "pdf_sha256": "aa6c11b67cfb7552e214838f1402ef9b95f9a0e238270132155b731983c071cd",
+    "pagination_every_page": "PASS",
+    "no_export_bubble": "PASS",
+    "all_pages_visually_reviewed": true
+  },
+  "PAEA_F12_Guide_Finance_build.py": {
+    "sha256": "413462922063e7ddca37216f26e27959dd84565d459a73991c671855b811c85a"
+  },
+  "PAEA_F12_editorial.json": {
+    "sha256": "a1b6243e7114d2b5f64552434ebfce3b8ed95307b17d3ce05c87ac85a14c4c20"
+  },
+  "README-F12.md": {
+    "sha256": "6970448558b7e74c2a8d179a3054ff5ef12039ae496e082d33945961ccbce435"
+  }
+}

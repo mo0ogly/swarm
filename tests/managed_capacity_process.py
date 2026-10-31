@@ -1,6 +1,7 @@
 """Deterministic capacity recipe: twenty scripted tasks, three real fake-worker processes."""
 import json,pathlib,subprocess,sys,tempfile,time,uuid
-binary=str(pathlib.Path(sys.argv[1]).resolve());out=pathlib.Path(sys.argv[2]).resolve();out.mkdir(parents=True,exist_ok=True);root=pathlib.Path(tempfile.mkdtemp(prefix='swarm-capacity-'));project=root/'project';project.mkdir()
+from fixture_area import fixture_area
+binary=str(pathlib.Path(sys.argv[1]).resolve());out=pathlib.Path(sys.argv[2]).resolve();out.mkdir(parents=True,exist_ok=True);root=pathlib.Path(tempfile.mkdtemp(prefix='swarm-capacity-', dir=fixture_area()));project=root/'project';project.mkdir()
 def cli(args,data=None):
  p=subprocess.run([binary,'--root',str(root),'--json',*args]+(['--input','-'] if data else []),input=json.dumps(data) if data else None,text=True,capture_output=True,timeout=30)
  if p.returncode:raise RuntimeError(p.stdout+p.stderr)

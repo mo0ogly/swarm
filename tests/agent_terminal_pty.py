@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Real PTY attachment, detach and reattach; no model calls."""
 import fcntl,json,os,pathlib,pty,select,struct,subprocess,sys,tempfile,termios,time,uuid
+from fixture_area import fixture_area
 binary=str(pathlib.Path(sys.argv[1]).resolve());out=pathlib.Path(sys.argv[2]);out.mkdir(parents=True,exist_ok=True)
-root=tempfile.mkdtemp(prefix='swarm-attach-')
+root=tempfile.mkdtemp(prefix='swarm-attach-', dir=fixture_area())
 def cli(*args,payload=None):
  argv=[binary,'--root',root,'--json',*args]
  if payload is not None:argv+=['--input','-']

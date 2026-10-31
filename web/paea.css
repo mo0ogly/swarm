@@ -1,23 +1,46 @@
-/* PAEA uses the shared semantic palette; no assurance is inferred from color. */
+/* PAEA view styles on the shared semantic palette; no assurance is inferred
+ * from color. Sophisticated-modern direction (docs/UI-DESIGN.md): workshop
+ * identity, ledger surfaces, explicit states — never a dashboard cliché. */
 *{box-sizing:border-box}
-body{margin:0;background:var(--wattson-page-fond);color:var(--wattson-texte);font-family:system-ui}
+body{margin:0;background:var(--wattson-page-fond);color:var(--wattson-texte);font-family:system-ui;line-height:1.6}
 header,main{max-width:64rem;margin:auto;padding:1rem}
-header,nav{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
-h1{font-size:1.8rem}h1,h2{font-family:Georgia,serif}
+/* Header: quiet, persistent, hairline-separated; identity stays typographic. */
+header{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;padding-block:.75rem;background:color-mix(in srgb,var(--wattson-page-fond) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-block-end:1px solid var(--wattson-ligne)}
+nav{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-inline-start:auto}
+header a[href="/"]{font-weight:700;letter-spacing:.02em}
+h1{font-size:1.6rem;margin:0}h1,h2{font-family:Georgia,serif;line-height:1.25}
+h2{font-size:1.35rem;margin-block:2rem .75rem}
+h3{font-size:1.05rem;margin-block:1.25rem .5rem}
 a{color:var(--wattson-lien)}
-fieldset,section{min-width:0;border:1px solid var(--wattson-ligne);background:var(--wattson-carte);border-radius:.4rem;padding:1rem;margin-block:1rem}
+fieldset,section{min-width:0;border:1px solid var(--wattson-ligne);background:var(--wattson-carte);border-radius:.5rem;padding:1rem;margin-block:1rem}
+section section{margin-block:.75rem}
 label{display:block;margin-block:1rem .4rem}
-input,select{width:100%;min-width:0;padding:.65rem;background:var(--wattson-champ);color:var(--wattson-texte);border:1px solid var(--wattson-ligne);border-radius:.25rem;font:inherit}
-button{min-height:44px;padding:.65rem;font:inherit;border:1px solid var(--wattson-ligne);border-radius:.25rem;background:var(--wattson-carte-appuyee);color:var(--wattson-texte);cursor:pointer}
+input,select{width:100%;min-width:0;padding:.65rem;background:var(--wattson-champ);color:var(--wattson-texte);border:1px solid var(--wattson-ligne);border-radius:.3rem;font:inherit;transition:border-color .15s ease}
+input:focus,select:focus{border-color:var(--wattson-lien)}
+button{min-height:44px;padding:.65rem 1rem;font:inherit;border:1px solid var(--wattson-ligne);border-radius:.3rem;background:var(--wattson-carte-appuyee);color:var(--wattson-texte);cursor:pointer;transition:background-color .15s ease,border-color .15s ease}
+button:hover:not(:disabled){border-color:var(--wattson-lien)}
 /* Opposite theme foreground/background pairs switch together to keep contrast. */
 .paea-primary{background:var(--wattson-action-fond);color:var(--wattson-action-encre);border-color:var(--wattson-action-bordure);font-weight:600;transition:none}
+.paea-primary:hover:not(:disabled){filter:brightness(1.08)}
 button:disabled{opacity:.65;cursor:default}
 :focus-visible{outline:3px solid var(--wattson-accent);outline-offset:3px}
-.paea-notice{padding:.8rem;border-inline-start:4px solid var(--wattson-lien);background:var(--wattson-carte)}
-#paea-status,#paea-summary,dt,dd,pre,#paea-sources li{overflow-wrap:anywhere;white-space:pre-wrap}
-dt{font-weight:600;margin-block-start:.75rem}dd{margin:.25rem 0;font-family:monospace}
-pre{max-height:28rem;overflow:auto}
+/* Notices and explicit states: semantic pair + label, never color alone. */
+.paea-notice{padding:.8rem;border-inline-start:4px solid var(--wattson-lien);background:var(--wattson-carte);border-radius:.25rem}
+/* Status lines keep their role=status contract; data-state shapes the pill. */
+#paea-status,#preview-status,#gitcall-status,#reconcile-status,#approval-status,#result-status{display:inline-flex;align-items:center;gap:.5rem;padding:.45rem .75rem;border-radius:.3rem;border:1px solid var(--wattson-ligne);background:var(--wattson-carte);max-width:100%}
+#paea-status[data-state="loading"],#preview-status[data-state="loading"],#gitcall-status[data-state="loading"],#reconcile-status[data-state="loading"],#approval-status[data-state="loading"]{border-inline-start:4px solid var(--wattson-info-encre)}
+#paea-status[data-state="error"],#preview-status[data-state="error"],#gitcall-status[data-state="error"],#reconcile-status[data-state="error"],#approval-status[data-state="error"],#result-status[data-state="error"]{border-inline-start:4px solid var(--wattson-alerte-encre);background:var(--wattson-alerte-fond);color:var(--wattson-alerte-encre)}
+#paea-status[data-state="success"],#preview-status[data-state="success"],#gitcall-status[data-state="success"],#reconcile-status[data-state="success"],#approval-status[data-state="success"],#result-status[data-state="success"]{border-inline-start:4px solid var(--wattson-succes-encre);background:var(--wattson-succes-fond);color:var(--wattson-succes-encre)}
+#paea-status[data-state="empty"],#preview-status[data-state="empty"],#gitcall-status[data-state="empty"],#reconcile-status[data-state="empty"],#approval-status[data-state="empty"],#result-status[data-state="empty"]{border-inline-start:4px solid var(--wattson-ligne);color:var(--wattson-texte-discret)}
+#paea-status,#paea-summary,dt,dd,pre,#paea-sources li,#result-detail dd{overflow-wrap:anywhere;white-space:pre-wrap}
+/* Ledger presentation: term/value rows read like a signed register. */
+dl{margin:0}
+dt{font-weight:600;margin-block-start:.75rem;color:var(--wattson-libelle);font-size:.92rem}
+dd{margin:.15rem 0 .5rem;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92rem;border-block-end:1px solid var(--wattson-ligne);padding-block-end:.4rem}
+section > dl > dt:first-child{margin-block-start:0}
+pre{max-height:28rem;overflow:auto;background:var(--wattson-fond);border:1px solid var(--wattson-ligne);border-radius:.3rem;padding:.75rem;font-size:.88rem}
 summary{cursor:pointer;min-height:44px;padding-block:.7rem}
 .paea-skip{position:absolute;inset-inline-start:1rem;transform:translateY(-200%)}
 .paea-skip:focus{transform:none;background:var(--wattson-carte);padding:.7rem}
-@media(max-width:760px){input,select{font-size:16px}header,main{padding:.75rem}}
+@media(max-width:760px){input,select{font-size:16px}header,main{padding:.75rem}h1{font-size:1.3rem}h2{font-size:1.2rem}}
+@media(prefers-reduced-motion:reduce){input,button{transition:none}}

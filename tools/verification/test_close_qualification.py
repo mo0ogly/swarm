@@ -3,6 +3,10 @@ import importlib.util
 import hashlib
 from pathlib import Path
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import unittest
 
 spec=importlib.util.spec_from_file_location('close_qualification',Path(__file__).with_name('close_qualification.py'))
@@ -13,7 +17,7 @@ class ClosureTests(unittest.TestCase):
     """Valid witness precedes changed, missing and unresolved input refusals."""
     def test_all_namespaces_and_tamper_refusal(self):
         """Every source namespace is hashed; changing any retained file invalidates closure."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             base=Path(directory);root=base/'root';goroot=base/'goroot';registry=base/'registry';external=base/'generated'
             files=[root/'code.rs',goroot/'src/runtime.go',registry/'lib.rs',external/'generated.go']
             for path in files:path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(b'original')
@@ -32,7 +36,7 @@ class ClosureTests(unittest.TestCase):
 
     def test_unresolved_and_traversal_never_skip(self):
         """A valid witness precedes invalid paths; no missing external hash is ignored."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root=Path(directory);path=root/'code.rs';path.write_bytes(b'original')
             sha=hashlib.sha256(b'original').hexdigest();args=(root,{'code.rs':sha},{'GOROOT':str(root)},dict(packages=[]),[])
             module.verify_inputs(*args)

@@ -23,7 +23,7 @@ function check(name,value){assert(value,name);checks.push(name);console.log('PAS
   for(const view of ['tasks','agents','decisions','budget','providers','admin','conduite']){await page.$eval('[data-view="'+view+'"]',e=>{e.closest('details').open=true;e.click()});check(label+'-existing-navigation-'+view,await page.$eval('#'+view,e=>!e.hidden));}
   check(label+'-actual-graph-tasks',await page.$$eval('#graph .graph-noeud',nodes=>nodes.length===2&&nodes.some(n=>n.dataset.task==='ux-dependent')&&nodes.some(n=>n.getAttribute('aria-label').includes('Task <b>plain</b>'))));
   check(label+'-actual-prerequisite-direction',await page.$eval('#graph .graph-arete',e=>e.dataset.from==='ux-task'&&e.dataset.to==='ux-dependent'&&e.getAttribute('marker-end').includes('recorded-dependency-arrow')));
-  check(label+'-graph-nodes-no-command',await page.$$eval('#graph .graph-noeud',nodes=>nodes.every(n=>n.getAttribute('role')==='img')));
+  check(label+'-graph-cards-explicit-editor-controls',await page.$$eval('#graph .graph-noeud',nodes=>nodes.every(n=>n.getAttribute('role')==='group'&&n.querySelector('.graph-task-open[role=button]')&&n.querySelector('.graph-drag[role=button]'))));
   check(label+'-real-budget-from-CLI',await page.$eval('#budget-info',e=>e.textContent.includes('37.25')&&e.textContent.includes('1.5')));
   check(label+'-real-empty-agents',await page.$eval('#agents-list',e=>e.textContent.includes(document.documentElement.lang==='en'?'No recorded attempts.':'Aucune tentative enregistrée.')));
   check(label+'-budget-edit-explicitly-enabled',await page.$eval('#budget-edit',e=>!e.disabled));

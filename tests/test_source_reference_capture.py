@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from unittest import mock
 
@@ -26,7 +27,7 @@ class SourceReference(unittest.TestCase):
 
     def test_valid_added_source_refusal_and_same_tree_recovery(self):
         """Adding a name midcapture must not silently shrink the captured scope."""
-        with tempfile.TemporaryDirectory(prefix='source-reference-') as temporary:
+        with tempfile.TemporaryDirectory(prefix='source-reference-', dir=fixture_area()) as temporary:
             root = Path(temporary)
             (root / 'cmd').mkdir()
             (root / 'internal').mkdir()

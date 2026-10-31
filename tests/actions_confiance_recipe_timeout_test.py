@@ -1,8 +1,9 @@
 import ast,datetime,errno,hashlib,json,os,signal,subprocess,sys,tempfile
+from fixture_area import fixture_area
 from pathlib import Path
 repo=Path(__file__).resolve().parents[1];p=Path(sys.argv[1]);p.mkdir(parents=True,exist_ok=True);source=(repo/'tests/actions_confiance_t2.py').read_text();fn=next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name=='bounded_browser');namespace={'os':os,'signal':signal,'subprocess':subprocess,'repo':repo};exec(compile(ast.Module(body=[fn],type_ignores=[]),'bounded_browser','exec'),namespace)
 run=namespace['bounded_browser'];assert run([sys.executable,'-c','print("completed")'],2).stdout.strip()=='completed'
-root=Path(tempfile.mkdtemp(prefix='swarm-public-timeout-guard-'));pidfile=root/'child.pid';code='import subprocess,time,pathlib; c=subprocess.Popen(['+repr(sys.executable)+',"-c","import time;time.sleep(60)"]);pathlib.Path('+repr(str(pidfile))+').write_text(str(c.pid));time.sleep(60)'
+root=Path(tempfile.mkdtemp(prefix='swarm-public-timeout-guard-', dir=fixture_area()));pidfile=root/'child.pid';code='import subprocess,time,pathlib; c=subprocess.Popen(['+repr(sys.executable)+',"-c","import time;time.sleep(60)"]);pathlib.Path('+repr(str(pidfile))+').write_text(str(c.pid));time.sleep(60)'
 try:run([sys.executable,'-c',code],1)
 except AssertionError as e:assert 'owned process group terminated' in str(e)
 else:raise AssertionError('timeout was not enforced')

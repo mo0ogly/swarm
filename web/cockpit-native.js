@@ -92,15 +92,20 @@
  }
  /** Limitations sit in their original sections, with working navigation and an
   * actual link to the already supported Rust Admin. No unsupported action sends
-  * an HTTP request, records a visit, mutates a mission or starts an agent. */
+  * an HTTP request, records a visit, mutates a mission or starts an agent.
+  * Explicit graph editors register a separate awaited readback consumer; their
+  * protected writes are not inferred from the disabled historical controls. */
  function setup(){for(const section of document.querySelectorAll('.view')){
    for(const control of section.querySelectorAll('button,input,select,textarea'))control.disabled=true;
-   const note=document.createElement('p');note.className='notice info';note.textContent=section.id==='conduite'?tr('Les consignes attribuées sont consultables et rejetables avant transmission. Les autres commandes restent à raccorder.'):section.id==='budget'?tr('Budget, plafonds et tarifs sont réglables ici. Les autres commandes restent à raccorder.'):tr(['tasks','conduite','manage','budget','agents','resume','logs'].includes(section.id)?'Lecture Rust des données enregistrées. Les commandes restent à raccorder.':'Ce parcours de l’interface existante n’est pas encore raccordé au moteur Rust.');section.prepend(note);
+   const note=document.createElement('p');note.className='notice info';note.textContent=section.id==='conduite'?tr('Le graphe permet de créer des tâches et de modifier leurs liens. Les consignes attribuées sont consultables et rejetables avant transmission.'):section.id==='budget'?tr('Budget, plafonds et tarifs sont réglables ici. Les autres commandes restent à raccorder.'):tr(['tasks','conduite','manage','budget','agents','resume','logs'].includes(section.id)?'Lecture Rust des données enregistrées. Les commandes restent à raccorder.':'Ce parcours de l’interface existante n’est pas encore raccordé au moteur Rust.');section.prepend(note);
   }
   $('manage-search').disabled=false;$('manage-search').addEventListener('input',renderManager);$('manage-state').value='all';
   $('assistant').hidden=true;$('mode').disabled=true;$('help').disabled=true;$('version-open').disabled=false;
   const link=document.createElement('a');link.href=url('/native-runtime.html?view=admin');link.textContent=tr('Ouvrir les réglages Rust');$('admin-title').after(link);
   for(const a of document.querySelectorAll('a[href^="/"]')){if(a===link)continue;const target=new URL(a.href);if(target.pathname==='/prepare.html'){a.href=url('/prepare.html');continue;}if(target.pathname!=='/'){a.addEventListener('click',event=>{event.preventDefault();$('message').hidden=false;$('message').className='notice info';$('message').textContent=tr('Cette destination reste à raccorder au moteur Rust.');$('message').scrollIntoView({block:'nearest'})})}}
+  // Saving remains pending through the actual observation reload. The editor
+  // owns error display and duplicate-submit protection; preserve changed views.
+  SwarmRustDependencyGraph.setRefreshHandler(async(id,revision)=>{if(selected!==id)return;const observed=await load();if(selected===id&&(!observed||!current||!Number.isSafeInteger(current.work.revision)||current.work.revision<revision))throw failure('web-native-graph-refresh-unconfirmed')});
   $('tabs').addEventListener('click',event=>{const button=event.target.closest('[data-view]');if(button)showView(button.dataset.view,true)});$('work').addEventListener('change',()=>select($('work').value));$('refresh').addEventListener('click',load);
   $('theme').addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='etat'?'sombre':'etat';document.documentElement.dataset.theme=theme;$('theme').textContent=tr(theme==='etat'?'Passer au thème sombre':'Passer au thème clair');link.href=url('/native-runtime.html?view=admin')});
   instructions=document.createElement('div');instructions.id='native-instruction-history';$('conduite-plan').after(instructions);

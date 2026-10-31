@@ -3,7 +3,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),crypto=require('node:crypto');
 const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const temp=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-graph-studio-'));
+const temp=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-graph-studio-'));
 function cli(root,args,input){return JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{encoding:'utf8',input:input?JSON.stringify(input):undefined}))}
 function mutate(root,args,rev,fields){return cli(root,args,{schema_version:1,event_id:crypto.randomUUID(),expected_revision:rev,...fields}).work}
 async function server(root){const child=spawn(binary,['--root',root,'web','127.0.0.1:0']);return await new Promise((resolve,reject)=>{let text='';const timer=setTimeout(()=>reject(Error('startup failed')),15000);child.stdout.on('data',d=>{text+=d;const m=text.match(/http:\/\/\S+\/session\/\S+/);if(m){clearTimeout(timer);resolve({child,url:m[0]})}});child.on('exit',()=>reject(Error('server exited')));child.stderr.on('data',()=>{})})}

@@ -159,6 +159,53 @@ fn ordinary_errno(
             .and_then(|e| e.downcast_ref::<rustix::io::Errno>())
             .is_some_and(|e| *e == errno)
 }
+/// Inherited Go per-address file name; the 16-hex prefix is namespacing, not a
+/// secret-strength cutoff.
+fn file_name(address: SocketAddr) -> String {
+    let hash = format!("{:x}", Sha256::digest(address.to_string().as_bytes()));
+    format!("web-session-{}", &hash[..16])
+}
+/// Read the existing owner key for `address` without creating one. `None`
+/// when no server has ever been bound there; invalid/unsafe files refuse.
+pub(crate) fn read_existing(
+    directory: &LocalDirectory,
+    address: SocketAddr,
+) -> Result<Option<String>, WebSessionError> {
+    read(directory, &file_name(address))
+}
+/// Replace the owner key for a loopback `address` with a fresh OS-generated
+/// one (atomic replace: readers see the old or the new key, never a mix).
+/// Refuses non-loopback addresses and, before any write, an address where a
+/// listener is still bound (`web-rotate-server-running`): a running server
+/// keeps its old key in memory, so rotation is only meaningful while stopped.
+/// Effects: every cookie and unconsumed login ticket made with the old key
+/// stops working once a server starts with the new key. No other Root state
+/// changes; publication-uncertain storage errors stay typed.
+pub(crate) fn rotate(
+    directory: &LocalDirectory,
+    address: SocketAddr,
+) -> Result<WebSessionCredential, WebSessionError> {
+    if !matches!(address.ip(),IpAddr::V4(v) if v==Ipv4Addr::LOCALHOST)
+        && !matches!(address.ip(),IpAddr::V6(v) if v==Ipv6Addr::LOCALHOST)
+    {
+        return Err(WebSessionError::Refused("web-listener-loopback-required"));
+    }
+    match TcpListener::bind(address) {
+        Ok(probe) => drop(probe),
+        Err(e) if e.kind() == std::io::ErrorKind::AddrInUse => {
+            return Err(WebSessionError::Refused("web-rotate-server-running"))
+        }
+        Err(e) => return Err(WebSessionError::Listener(e)),
+    }
+    let secret = crate::generate_identifier("session-").map_err(WebSessionError::Entropy)?;
+    if !valid_web_session_credential(&secret) {
+        return Err(WebSessionError::Refused("web-session-entropy-format"));
+    }
+    directory
+        .publish(&file_name(address), secret.as_bytes())
+        .map_err(WebSessionError::Storage)?;
+    Ok(WebSessionCredential { address, secret, created: true })
+}
 /// Reuse existing bytes or publish an OS-generated credential without replacement.
 /// One atomic NOREPLACE collision reads the complete winning file once; this is
 /// race resolution, not a retry loop or operator policy. Failed writes preserve
@@ -184,8 +231,7 @@ fn load_or_create_using(
     fault: AtomicStorageFault,
 ) -> Result<WebSessionCredential, WebSessionError> {
     let address = observed(listener)?;
-    let hash = format!("{:x}", Sha256::digest(address.to_string().as_bytes()));
-    let name = format!("web-session-{}", &hash[..16]); // inherited Go namespace, not a secret-strength cutoff
+    let name = file_name(address);
     if let Some(secret) = read(directory, &name)? {
         return Ok(WebSessionCredential {
             address,
@@ -362,5 +408,33 @@ mod tests {
             directory.close().unwrap();
             fs::remove_dir_all(path).unwrap();
         }
+    }
+    /// Rotation: refused while a listener holds the address (witness first:
+    /// key exists), then replaces the key once stopped; non-loopback refuses;
+    /// the file stays private and the old key is gone.
+    #[test]
+    fn rotate_refuses_running_server_then_replaces_key() {
+        let base = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../.swarm-fixtures");
+        fs::create_dir_all(&base).unwrap();
+        let path = base.join(crate::generate_identifier("rotate-").unwrap());
+        fs::create_dir(&path).unwrap();
+        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+        let directory = LocalDirectory::open(&path).unwrap();
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let address = listener.local_addr().unwrap();
+        let old = load_or_create(&directory, &listener).unwrap().secret().to_owned();
+        assert_eq!(rotate(&directory, address).unwrap_err().code(), "web-rotate-server-running");
+        assert_eq!(read_existing(&directory, address).unwrap().as_deref(), Some(old.as_str()));
+        drop(listener);
+        let new = rotate(&directory, address).unwrap();
+        assert!(valid_web_session_credential(new.secret()) && new.secret() != old);
+        assert_eq!(read_existing(&directory, address).unwrap().as_deref(), Some(new.secret()));
+        let mode = fs::metadata(path.join(file_name(address))).unwrap().permissions().mode() & 0o777;
+        assert_eq!(mode, 0o600);
+        assert_eq!(
+            rotate(&directory, "10.0.0.1:80".parse().unwrap()).unwrap_err().code(),
+            "web-listener-loopback-required"
+        );
+        assert!(!format!("{new:?}").contains(new.secret()));
     }
 }

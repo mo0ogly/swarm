@@ -4,7 +4,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),crypto=require('node:crypto'),{spawnSync}=require('node:child_process');
 const runtime=require('./helpers/browser_verification_runtime.cjs');
 const hash=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-npm-baseline-')),repo=path.join(root,'repo'),modules=path.join(repo,'node_modules');
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-npm-baseline-')),repo=path.join(root,'repo'),modules=path.join(repo,'node_modules');
 fs.chmodSync(root,0o700);fs.mkdirSync(modules,{recursive:true});fs.symlinkSync(path.resolve('tools'),path.join(repo,'tools'));
 const moduleFile=path.join(modules,'module.cjs'),lock=path.join(repo,'package-lock.json');
 fs.writeFileSync(moduleFile,'original source');fs.writeFileSync(lock,'{}');fs.symlinkSync('module.cjs',path.join(modules,'alias'));

@@ -6,6 +6,10 @@ import pathlib
 import re
 import subprocess
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
@@ -38,7 +42,7 @@ assert referenced == set(images) and len(images) == 17
 assert 'French UI' in (ROOT / 'docs/en/INSTALL.md').read_text()
 run(['git', 'diff', '--check'])
 print('PASS 17 referenced images match the visual review; this is hash binding, not automatic image analysis', flush=True)
-with tempfile.TemporaryDirectory(prefix='swarm-t8-control-') as directory:
+with tempfile.TemporaryDirectory(prefix='swarm-t8-control-', dir=fixture_area()) as directory:
     binary = str(pathlib.Path(directory) / 'swarm')
     run(['go', 'build', '-trimpath', '-o', binary, './cmd/swarm'])
     output = run(['node', 'tools/verification/t8_saved_config_shots.cjs', binary, str(pathlib.Path(directory) / 'shots')])

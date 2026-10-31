@@ -3,10 +3,11 @@
 //! Deliberately narrow slice of the legacy Go `Store.cockpitSnapshot`
 //! document in `internal/engine/console.go`, restricted to one ordinary
 //! existing Work that has no planning state and no retained Agent, and whose
-//! tasks all sit in the supported initial todo shape: status `todo`, empty
-//! attempt history and no gate, independent-review,
-//! previous-review or revalidation record. This is not the full agent list:
-//! planning scopes, retained agent views, later task lifecycle states,
+//! tasks all sit in the supported initial shape: status `todo` or `blocked`
+//! with empty attempt history, no gate, independent-review, previous-review
+//! or revalidation record, and no corrective-recovery authorization. This is
+//! not the full agent list: planning scopes, retained agent views, later
+//! task lifecycle states beyond blocked with zero attempts,
 //! review/recovery history and every capability beyond that refuse with an
 //! explicit unported code instead of emitting invented rows.
 //!
@@ -20,7 +21,8 @@
 //! Read-only business observation: no Work, settings, event or agent mutation,
 //! launch, consent inference or acceptance. Reservation/descriptor bookkeeping
 //! follows the existing material reader. Empty `agents`/`health` reflect actual
-//! no-agent observations; `edges` mirrors the validated TODO dependencies;
+//! no-agent observations; `edges` mirrors the validated dependencies of
+//! these tasks;
 //! `priority` holds only actually persisted rows; per-task `ready`, reasons
 //! and action lists are preliminary UI mirrors of store admission predicates,
 //! never authority; unsupported task states refuse explicitly.
@@ -75,9 +77,10 @@ fn project_view_key(root: &RootStore) -> String {
 impl RootStore {
     /// Return the legacy fourteen-key cockpit JSON for an existing ordinary
     /// Work with no planning state, no retained agents and every task in the
-    /// supported initial todo shape: status `todo`, empty attempts, validated TODO
-    /// dependencies and no gate, independent-review, previous-review or
-    /// revalidation record. This slice is not the complete agent list. Unknown
+    /// supported initial shape: status `todo` or `blocked` with empty
+    /// attempts, validated dependencies of these tasks and no gate,
+    /// independent-review, previous-review, revalidation or
+    /// corrective-recovery record. This slice is not the complete agent list. Unknown
     /// Work retains its original typed cause; unsupported task shapes,
     /// planning and retained agents refuse with their explicit
     /// `cockpit-*-projection-unported` code rather than invented state.
@@ -115,9 +118,11 @@ impl RootStore {
     /// capabilities) precede the reserved policy, validation, cost, budget and
     /// priority reads.
     ///
-    /// Task shape contract: every persisted task must sit in the initial todo
-    /// state — status `todo`, empty attempt history, a valid dependency DAG of these TODO tasks, and
-    /// no gate, independent-review, previous-review or revalidation record.
+    /// Task shape contract: every persisted task must sit in the supported
+    /// initial state — status `todo` or `blocked`, empty attempt history, a
+    /// valid dependency DAG of these tasks, no corrective-recovery
+    /// authorization, and no gate, independent-review, previous-review or
+    /// revalidation record.
     /// Other task states, evidence or history refuse with
     /// `cockpit-task-projection-unported`. Invalid dependency DAGs retain the
     /// shared order validator refusal before any task projection is assembled. Fields this slice never consumes (planning inputs, model,
@@ -131,18 +136,28 @@ impl RootStore {
     /// the existing unlimited contract; otherwise
     /// `limit - committed >= reserve`, where the Native committed figure
     /// already includes every ledger and reservation and is never reset or
-    /// ignored). Unsatisfied TODO dependencies deny readiness. The todo status, the empty retained
+    /// ignored). Unsatisfied TODO dependencies deny readiness. The todo or zero-attempt blocked status, the empty retained
     /// agent set and a positive `plan_max_attempts` that zero attempts cannot
     /// exhaust make the remaining Go checks vacuous here. When a start is
     /// refused, the exact Go `startBlockReason` precedence is reproduced (see
     /// [`RootStore::initial_start_block_reason`]); otherwise
     /// `start_block_reason` stays unobserved instead of guessed. Review,
-    /// gate-file, repair, last-finished, extension and recovery facts stay
-    /// unobserved because the eligible todo branch never consumes them: the
-    /// Go recommendation for a todo task is fixed to `start` and the Go
-    /// extension/recovery reasons are necessarily nonempty for a non-blocked
-    /// task — no absent gate file, passed review or empty history is ever
-    /// claimed without observation. `prepared` is observed as `None` because
+    /// gate-file, repair and last-finished facts stay unobserved because
+    /// neither eligible branch consumes them. For a todo task the Go
+    /// recommendation is fixed to `start` and the Go extension/recovery
+    /// reasons are necessarily nonempty, so those four facts stay
+    /// unobserved; for a blocked task with zero attempts the extension
+    /// display predicate is observed false (a nonpositive cap disables it
+    /// and a positive cap cannot be exhausted by zero attempts), the nested
+    /// recovery display stays unobserved because the false extension display
+    /// never consumes it, and both Go reasons are necessarily their first
+    /// historical texts (zero attempts can neither equal a positive cap nor
+    /// supply the consumed-attempt history; an authorized recovery is
+    /// excluded by the shape walk) — the blocked recommendation therefore
+    /// stays `start` and no extension or recovery action is emitted. No
+    /// absent gate file, passed review, empty history or new numeric
+    /// threshold is ever claimed without observation. `prepared` is observed
+    /// as `None` because
     /// `w.planning == None` is proven, exactly where the Go
     /// `preparedLaunchForTask` returns before any SQL or filesystem access;
     /// `override_dependency_reason` is observed from the first saved dependency,
@@ -152,7 +167,7 @@ impl RootStore {
     /// `pilotage.tasks` carries the actual per-task delivery entry from the
     /// same work-validation observation used for the top-level document (a
     /// task missing from it refuses — no null fallback), a complete
-    /// `waiting_on` (all dependencies are TODO and not accepted-fresh), and the
+    /// `waiting_on` (no dependency is accepted, let alone accepted-fresh), and the
     /// native attempt projection for an absent attempt: empty agent/attempt
     /// fields, `validation_state` set to the actual task status and
     /// `cost_state: "unknown"`, with the struct's own omission semantics.
@@ -177,16 +192,19 @@ impl RootStore {
     fn cockpit_observation(&self, work: &str) -> Result<serde_json::Value, RootStoreError> {
         let saved = self.read_work(work)?;
         let tasks = saved.tasks.as_deref().unwrap_or(&[]);
-        // Supported initial task shape: reject unsupported task state,
-        // evidence and history before anything further is read
-        // or emitted. One declared code covers every unsupported shape.
+        // Supported initial task shape (todo, or blocked with zero
+        // attempts): reject unsupported task status, evidence and history —
+        // including any corrective-recovery authorization — before anything
+        // further is read or emitted. One declared code covers every
+        // unsupported shape.
         for task in tasks {
-            if task.status != "todo"
+            if (task.status != "todo" && task.status != "blocked")
                 || task.attempts.as_ref().is_some_and(|attempts| !attempts.is_empty())
                 || task.gate.is_some()
                 || task.independent_review.is_some()
                 || task.previous_reviews.as_ref().is_some_and(|reviews| !reviews.is_empty())
                 || task.revalidation.is_some()
+                || task.corrective_recovery.is_some()
             {
                 return Err(RootStoreError::Refused("cockpit-task-projection-unported"));
             }
@@ -233,7 +251,8 @@ impl RootStore {
             .is_some_and(|saved_controls| saved_controls.paused);
         // Validate the complete saved DAG and raw priority keys before any
         // branch derives readiness, reasons or graph facts. Every eligible
-        // task is TODO, so each dependency is observed not accepted-fresh.
+        // task is todo or blocked without attempts, so no dependency can be
+        // accepted, let alone accepted-fresh.
         let priorities =
             super::mission_task_order::read_priorities(&self.db, work).map_err(mission_cause)?;
         let order =
@@ -269,6 +288,41 @@ impl RootStore {
             } else {
                 Some(self.initial_start_block_reason(task, paused, brief_ok, budget_allows)?)
             };
+            // Blocked with zero attempts (proven by the shape walk above):
+            // the Go extension display predicate cannot hold — a nonpositive
+            // `plan_max_attempts` disables it and a positive cap cannot be
+            // exhausted by zero attempts — so it is observed false, and the
+            // nested recovery display stays unobserved because the false
+            // extension display never consumes it. Both Go reasons are
+            // necessarily their first historical texts here: zero attempts
+            // can neither equal a positive cap (extension) nor supply the
+            // consumed-attempt history the recovery guard requires, and an
+            // already-authorized recovery is excluded by the shape walk.
+            // These observed texts are read facts of the supplied Go source,
+            // compatibility vocabulary only: no numeric threshold is
+            // reintroduced and no offerable action or empty history is
+            // claimed. For a todo task all four facts stay unobserved — the
+            // non-blocked branch of `project` cannot consume them.
+            let (show_attempt_extension, attempt_extension_reason, corrective_recovery_reason) =
+                if task.status == "blocked" {
+                    (
+                        Observation::Observed(false),
+                        Observation::Observed(
+                            "Une tentative supplémentaire se prépare après épuisement du plafond d’une tâche bloquée."
+                                .to_owned(),
+                        ),
+                        Observation::Observed(
+                            "La reprise corrective exige une tâche bloquée après trois tentatives consommées."
+                                .to_owned(),
+                        ),
+                    )
+                } else {
+                    (
+                        Observation::Unobserved,
+                        Observation::Unobserved,
+                        Observation::Unobserved,
+                    )
+                };
             let facts = Facts {
                 can_start: Observation::Observed(can_start),
                 start_block_reason: match start_block_reason.as_deref() {
@@ -278,7 +332,7 @@ impl RootStore {
                 gate_files_present: Observation::Unobserved,
                 gate_current: Observation::Unobserved,
                 independent_review_reason: Observation::Unobserved,
-                // All dependencies are validated existing TODO tasks, hence
+                // All dependencies are validated existing TODO/blocked tasks, hence
                 // not accepted-fresh; preserve the saved first reason.
                 override_dependency_reason: Observation::Observed(dependencies.first().map(|id| {
                     format!("Acceptez d'abord la dépendance {id} (revue ou dérogation).")
@@ -288,10 +342,12 @@ impl RootStore {
                 // `w.planning == None` is proven, exactly where the Go
                 // `preparedLaunchForTask` returns before SQL/filesystem.
                 prepared: Observation::Observed(None),
-                show_attempt_extension: Observation::Unobserved,
+                show_attempt_extension,
+                // Consumed by `project` only while the extension display is
+                // observed true; proven impossible at zero attempts.
                 show_corrective_recovery: Observation::Unobserved,
-                attempt_extension_reason: Observation::Unobserved,
-                corrective_recovery_reason: Observation::Unobserved,
+                attempt_extension_reason,
+                corrective_recovery_reason,
             };
             let actions = project(task, &[], facts)?;
             // Native attempt projection for an absent attempt: empty
@@ -381,7 +437,8 @@ impl RootStore {
                 },
                 "tasks": pilotage_tasks_value,
             },
-            // A todo task is never delivery-ready and `sources` stays an
+            // A todo or zero-attempt blocked task is never delivery-ready and
+            // `sources` stays an
             // actual empty array, never null.
             "post_delivery": {"ready": false, "sources": []},
             "priority": priority_value,
@@ -392,9 +449,10 @@ impl RootStore {
         }))
     }
 
-    /// Go `startBlockReason` for one eligible todo task of this slice,
-    /// reproducing the exact Go precedence: held launch, paused saved
-    /// controls, the first unsatisfied TODO dependency,
+    /// Go `startBlockReason` for one eligible todo or zero-attempt blocked
+    /// task of this slice, reproducing the exact Go precedence: held launch,
+    /// paused saved
+    /// controls, the first unsatisfied initial-task dependency,
     /// plan-brief mismatch, the plan attempt cap, the global active workspace
     /// overlap, the budget, then the Go generic tail.
     ///
@@ -412,7 +470,7 @@ impl RootStore {
     /// reason or a zero count. A budget read failure has already refused the
     /// whole projection before this runs, so no error is stringified into a
     /// reason. The generic Go tail is kept for totality; on the supported
-    /// todo/no-agent shape it is unreachable because the only remaining
+    /// initial-task/no-agent shape it is unreachable because the only remaining
     /// denial cause is the budget. The returned text is a preliminary UI
     /// explanation, never a permission decision or a lease: any launcher
     /// rechecks the actual providers, workspace, budget and identity.

@@ -1,10 +1,12 @@
 'use strict';
-/** Read-only observation of real PAEA effect surfaces. Consumes only the two
- * public guarded reads: GET /api/v1/paea/git-call (startup capability, no
- * consumption) and GET /api/v1/paea/reconcile-effects (recomputed journal
- * reconciliation). No POST, no one-shot call consumption, no authority, no
- * repair: `verified=true` stays recomputed correspondence, never authenticity
- * or acceptance. Any failure keeps the exact refusal code visible.
+/** Read-only observation of real PAEA effect surfaces. Consumes only the three
+ * public guarded reads: GET /api/v1/paea/git-call/preview (protected preview of
+ * the exact held prepared action, addressed to a future approver, no consent),
+ * GET /api/v1/paea/git-call (startup capability, no consumption) and
+ * GET /api/v1/paea/reconcile-effects (recomputed journal reconciliation). No
+ * POST, no one-shot call consumption, no authority, no repair: a preview is not
+ * an agreement and `verified=true` stays recomputed correspondence, never
+ * authenticity or acceptance. Any failure keeps the exact refusal code visible.
  */
 (() => {
   const $=id=>document.getElementById(id),t=(s,v)=>globalThis.SwarmI18n.t(s,v);
@@ -58,11 +60,57 @@
     journal('git',view.git??{});
     status('reconcile-status','success','Rapprochement recalculé affiché pour les deux domaines réels. Correspondance recalculée n’établit pas l’authenticité ; séparation UID, ancrages externes et stockage immuable restent des prérequis ouverts.');
   }
-  /** Preserve language/theme between this page and existing PAEA views. */
+  /** Add one visible dt/dd pair; values are shown verbatim, never reinterpreted. */
+  function pair(dl,key,value){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=t(key);dd.textContent=String(value);dl.append(dt,dd)}
+  /** Explicit preview of the exact held action, addressed to a future approver.
+   * Refusals, unavailability and stale prerequisites stay visible failures;
+   * no consent button exists and no field is presented as an agreement. */
+  function preview(view){
+    if(view.schema_version!==1){status('preview-status','error',t('Rapport hors contrat (version de schéma inattendue) ; original conservé dans le rapport technique.'));$('preview-detail').hidden=false;$('preview-raw-body').textContent=JSON.stringify(view,null,2);return}
+    if(!view.available){
+      status('preview-status','empty',t('Aperçu explicitement indisponible : {code}. Aucun appel Git préparé n’est lié au démarrage du service ; la préparation deux phases reste la voie réelle.',{code:view.reason??''}));
+      for(const id of ['preview-identity','preview-witness','preview-declared','preview-limits-list'])$(id).replaceChildren();
+      $('preview-detail').hidden=true;
+      return;
+    }
+    $('preview-detail').hidden=false;$('preview-raw-body').textContent=JSON.stringify(view,null,2);
+    const canon=view.canonical??{},current=view.current??{},cap=view.capability??{},limits=view.limits??{};
+    const identity=$('preview-identity');identity.replaceChildren();
+    pair(identity,'Empreinte d’action',canon.action_digest??'');
+    pair(identity,'Intention métier',canon.intent_id??'');
+    pair(identity,'Empreinte de politique',canon.policy_digest??'');
+    pair(identity,'Correspondance de l’empreinte d’action',canon.digest_matches?t('oui'):t('non'));
+    const witness=$('preview-witness');witness.replaceChildren();
+    pair(witness,'Racines physiquement liées',current.roots_bound?t('oui'):t('non'));
+    pair(witness,'Révision de confiance déclarée',current.declared_trust_revision??'');
+    if(current.trust_revision===null||current.trust_revision===undefined){pair(witness,'Journal de confiance absent',t('non'))}
+    else{pair(witness,'Révision de confiance actuelle',current.trust_revision)}
+    pair(witness,'Révision de confiance courante',current.trust_revision_current?t('oui'):t('non'));
+    if(!current.trust_revision_current){status('preview-status','error',t('Préparation périmée : la révision de confiance observée diffère de la révision déclarée. Aucun accord n’est sollicité sur un état périmé ; reprendre la préparation avant toute suite.'));return}
+    if(!current.roots_bound){status('preview-status','error',t('Prérequis non réuni : les témoins physiques des deux racines ne correspondent plus à la préparation. Aucun accord n’est sollicité sur cet état ; reprendre la préparation avant toute suite.'));return}
+    if(!canon.digest_matches){status('preview-status','error',t('Empreinte d’action recalculée différente de l’empreinte liée : état signalé tel quel, aucune normalisation ni accord sollicité.'));return}
+    const declared=$('preview-declared');declared.replaceChildren();
+    for(const [key,value] of Object.entries(cap))pair(declared,key,String(value));
+    const proposal=view.proposal??{},action=proposal.action??{};
+    const labels={payment:{invoice_id:'Facture',invoice_version:'Version de facture',amount_minor:'Montant en unités mineures',currency:'Devise',beneficiary_account_id:'Compte bénéficiaire'},git:{repository_id:'Identifiant du service attendu',target_ref:'Référence Git cible',expected_old_oid:'OID précédent attendu',candidate_oid:'OID candidat'}};
+    for(const [key,value] of Object.entries(action)){
+      if(key==='kind')continue;
+      // Exact held value rendered verbatim as the visible term; the translated
+      // field label only names the term. Never substitute or normalize value.
+      pair(declared,labels[action.kind]?.[key]??key,String(value));
+    }
+    pair(declared,'Projet',view.context?.project_id??'');
+    pair(declared,'Mandat',view.context?.mandate_id??'');
+    pair(declared,'Révision de politique',view.context?.policy_revision??'');
+    const limitList=$('preview-limits-list');limitList.replaceChildren();
+    for(const [key,value] of Object.entries(limits))pair(limitList,key,String(value));
+    status('preview-status','success',t('Aperçu exact de l’action préparée détenue par le moteur, présenté avant tout accord. Aucun consentement n’est capturé ici : ce contenu n’est pas un accord ; poursuivre ensuite le consentement réel sur cette même action.'));
+  }
   function navigation(){for(const link of document.querySelectorAll('[data-paea-link]')){const url=new URL(link.href);url.searchParams.set('lang',globalThis.SwarmI18n.language);url.searchParams.set('theme',document.documentElement.dataset.theme);link.href=url.pathname+url.search}}
   async function load(){
-    status('gitcall-status','loading','Chargement…');status('reconcile-status','loading','Chargement…');
-    $('gitcall-detail').hidden=true;$('reconcile-report').hidden=true;
+    status('preview-status','loading','Chargement…');status('gitcall-status','loading','Chargement…');status('reconcile-status','loading','Chargement…');
+    $('preview-detail').hidden=true;$('gitcall-detail').hidden=true;$('reconcile-report').hidden=true;
+    try{preview(await read('/api/v1/paea/git-call/preview'))}catch(error){status('preview-status','error',t('Refus : {code}',{code:error.message}))}
     try{capability(await read('/api/v1/paea/git-call'))}catch(error){status('gitcall-status','error',t('Refus : {code}',{code:error.message}))}
     try{report(await read('/api/v1/paea/reconcile-effects'))}catch(error){status('reconcile-status','error',t('Refus : {code}',{code:error.message}))}
   }

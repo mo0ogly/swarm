@@ -2354,3 +2354,24 @@ re-pointed to it: chain 4/4 PASS + VERIFIED (`recipe-chain-run-4-durable/`),
 transfer 8/8 PASS + VERIFIED (`recipe-transfer-run-durable/`). About 120 other
 test scripts remain to migrate off `/tmp` (follow-up recorded). Evidence:
 `claude-e2-arbitrage-20261031T135859Z` folder.
+
+**Full migration (same day, completion)**: the "about 120 scripts remain" line
+is closed — the whole scope is migrated. Single contract `tests/fixture_area.py`
+(`fixture_root`, `fixture_area`) + Node mirror `tests/fixture_area.cjs`;
+`rust_agent_model_route.fixture_root` delegates (identity verified). 145 Python
+files / 219 `mkdtemp`/`TemporaryDirectory` calls without `dir=` fixed (bare
+import on the `tests/` side, bounded shim on the `tools/` side, embedded
+`swarm_version.py` carrying its own autonomous area), ~95 `.cjs` files moved off
+`os.tmpdir()`, `recipe.py` now pins `TMPDIR` under `.swarm-fixtures/runner-tmp`
+(Python/Rust/Node/Go coverage for recipe runs, proven by a PASS `env` recipe),
+`test_swarm_local.py` re-pointed from the `/tmp/swarm-stable-site-candidate`
+default to `bin/swarm`. Permanent non-regression guard:
+`tools/check_tmp_interdiction.py` (AST scan, exit 1 if any allocation without
+`dir=` remains — final state 0 violations; `mkstemp(dir=destination.parent)`
+exempted as adjacent-to-destination atomic-write scaffolding). Documented
+exemptions: `mission_status_runtime.rs` (capacity read, no allocation); Rust
+production `preparation_worker_run_cli` still allocates its workspace under
+`env::temp_dir()` — transmitted to the owner (installed binary pinned by E2
+`1d3f9da1…`, unilateral change not authorized). Remaining `/tmp` roots: live
+parallel-session work, untouched. Documentation: `tools/verification/README.md`
+(interdiction section), PRODUCT-WORKFLOW/T4/T6 FR+EN command examples re-pointed.

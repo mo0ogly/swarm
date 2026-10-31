@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "event_id": "biba-trace",
+  "expected_revision": 10,
+  "task_id": "task-2",
+  "provider": "fixture",
+  "capture_output": true
+}

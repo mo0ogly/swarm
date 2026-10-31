@@ -1,0 +1,50 @@
+{
+    "schema_version": 1,
+    "id": "paea-i16-lease-reopen-rust",
+    "inputs": [
+        "rust/crates/swarm-engine/src/planning_decision.rs",
+        "rust/crates/swarm-engine/src/planning_control.rs",
+        "rust/crates/swarm-engine/src/planning_activation.rs",
+        "rust/crates/swarm-engine/src/root_store/planning_native.rs",
+        "rust/crates/swarm-engine/src/root_store/planning_step.rs",
+        "rust/crates/swarm-engine/src/mutation_guard.rs",
+        "rust/crates/swarm-engine/src/work_engine.rs",
+        "rust/crates/swarm-engine/src/planning_run_store.rs",
+        "rust/crates/swarm-engine/src/planning_run_usage.rs",
+        "rust/crates/swarm-engine/src/engine_settings.rs",
+        "rust/crates/swarm-engine/config/engine-settings.json",
+        "rust/crates/swarm-cli/src/lib.rs",
+        "rust/crates/swarm-cli/src/main.rs",
+        "rust/crates/swarm-cli/Cargo.toml",
+        "rust/Cargo.toml",
+        "rust/Cargo.lock",
+        ".cargo/config.toml",
+        "tests/rust_planning_lease_reopen.py",
+        "tests/rust_agent_model_route.py",
+        "tests/rust_planning_activation.py",
+        "tests/rust_planning_bootstrap.py",
+        "tests/rust_planning_call_preview.py",
+        "tests/rust_planning_budget.py",
+        "tests/rust_planning_native_run.py",
+        "tests/rust_planning_step.py",
+        "tests/rust_planning_decision.py",
+        "tools/verification/recipe.py"
+    ],
+    "environment": {},
+    "steps": [
+        {
+            "id": "lease-reopen-stale-token-refused-before-new-effect",
+            "command": [
+                "python3",
+                "-c",
+                "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='paea-i16-lease-reopen-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_planning_lease_reopen.py','--binary','{root}/.cache/rust-migration-binaries/swarm-rust-1a021b7e6d1105de63d2d50d15d1c5a129d9902f444e4a8dfa2f7795b713e3e1','--profile','{root}/.cache/mission-watch-planning-hf3b_40f/run/profile.json','--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+            ],
+            "expected_exit": 0,
+            "required_stdout": [
+                "PASS lease-reopen-stale-token-refused-before-new-effect",
+                "REPLAY_EVIDENCE"
+            ],
+            "required_stderr": []
+        }
+    ]
+}

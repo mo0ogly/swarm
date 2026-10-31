@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -141,7 +142,7 @@ class SwarmSummarySource(unittest.TestCase):
 
     def test_cli_refuses_relabelled_source_without_creating_output(self):
         self.mutate_payload(lambda p: p["sources"][2].update(id="invented-answer-id"))
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root = Path(directory)
             source, annotations = root / "source.json", root / "annotations.json"
             source.write_text(json.dumps(self.packet)); annotations.write_text(json.dumps(self.annotations))
@@ -177,7 +178,7 @@ class SwarmSummarySource(unittest.TestCase):
         self.assertEqual(before, (self.packet, self.annotations))
 
     def test_cli_writes_new_private_bundle_and_preserves_sources(self):
-        with tempfile.TemporaryDirectory() as name:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as name:
             root = Path(name)
             source, annotations = root / "source.json", root / "annotations.json"
             source.write_text(json.dumps(self.packet)); annotations.write_text(json.dumps(self.annotations))

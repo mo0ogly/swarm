@@ -20,6 +20,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,7 +51,7 @@ class PublicContract(unittest.TestCase):
 
     def setUp(self):
         """Allocate a new isolated root per test; never use a live mission database."""
-        self.temporary = tempfile.TemporaryDirectory(prefix='paea-public-')
+        self.temporary = tempfile.TemporaryDirectory(prefix='paea-public-', dir=fixture_area())
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
 

@@ -1,0 +1,12 @@
+   Compiling libc v0.2.186
+   Compiling swarm-biba-linux v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-biba-linux)
+warning: unused import: `AsRawFd`
+ --> crates/swarm-biba-linux/src/lib.rs:7:52
+  |
+7 | use std::{fs::{self,File,OpenOptions},io,os::{fd::{AsRawFd,IntoRawFd},unix::fs::{OpenOptionsExt,MetadataExt}},path::{Path,PathBuf}};
+  |                                                    ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `swarm-biba-linux` (lib) generated 1 warning (run `cargo fix --lib -p swarm-biba-linux` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized] target(s) in 7.14s

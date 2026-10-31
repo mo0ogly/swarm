@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "job_id": "validation-291a4522e7c9991331eea039",
+  "controls_passed": true,
+  "task_accepted": false,
+  "retired": false,
+  "replayed": false,
+  "work": {
+    "launch_profile": {
+      "provider": "fixture",
+      "role": "worker",
+      "workspace": "/tmp/swarm-model83-xcm8zswe",
+      "capture_output": true,
+      "updated": "2026-10-28T17:35:05.098165025Z",
+      "actor": "operateur"
+    },
+    "schema_version": 1,
+    "id": "w-6f8a90ab5cc11d94d6eb2d0e",
+    "revision": 9,
+    "title": "Requested model fixture",
+    "objective": "Observe route",
+    "scope": "Owned local program",
+    "criteria": [
+      "Observed, not accepted"
+    ],
+    "next": "",
+    "summary": "",
+    "memory": null,
+    "created": "2026-10-28T17:35:04.414142654Z",
+    "updated": "2026-10-28T17:35:06.830160993Z",
+    "git": {
+      "head": "",
+      "branch": "",
+      "changes": ""
+    },
+    "tasks": [
+      {
+        "validation_policy": {
+          "mode": "human",
+          "controls": [
+            {
+              "review_output": true,
+              "inputs": [
+                "handoff.md"
+              ],
+              "id": "owned-report-test",
+              "command": [
+                "python3",
+                "-c",
+                "from pathlib import Path\ntext=Path('handoff.md').read_text()\ncode=text.split('\\nFIXTURE_CODE\\n',1)[1].split('\\nEND_FIXTURE_CODE\\n',1)[0]\nexec(compile(code,'<owned_i0_report>','exec'),{})\nfrom pathlib import Path\nimport os,json,re,hashlib\nraw=Path('handoff.md').read_bytes()\nassert re.search(rb'Input SHA256: [0-9a-f]{64}',raw)\nwith Path('validation-executed.json').open('x') as f:\n json.dump(dict(pid=os.getpid(),ppid=os.getppid(),cwd=os.getcwd(),report_sha256=hashlib.sha256(raw).hexdigest()),f)\n f.flush();os.fsync(f.fileno())\nprint('CONTROL-PROBE-SUCCESS',flush=True)\n"
+              ],
+              "criteria": [
+                1
+              ],
+              "justification": "Run owned report test code, never accept the task",
+              "timeout_seconds": 60
+            }
+          ],
+          "authorized_at": "2026-10-28T17:35:04.962387462Z",
+          "actor": "fpizzi/uid:1001"
+        },
+        "automatic_validation": {
+          "attempt_id": "a-b671c03d9b42001160a4a9a3",
+          "revision": 7,
+          "candidate_sha": "",
+          "producer_agent_id": "session",
+          "controller": "controller://swarm-validation",
+          "policy_digest": "f794e8a81cb226057d5f160c01fe55aa81d2e49b35c8d45c6cf63ae85f494554",
+          "policy": {
+            "mode": "human",
+            "controls": [
+              {
+                "review_output": true,
+                "inputs": [
+                  "handoff.md"
+                ],
+                "id": "owned-report-test",
+                "command": [
+                  "python3",
+                  "-c",
+                  "from pathlib import Path\ntext=Path('handoff.md').read_text()\ncode=text.split('\\nFIXTURE_CODE\\n',1)[1].split('\\nEND_FIXTURE_CODE\\n',1)[0]\nexec(compile(code,'<owned_i0_report>','exec'),{})\nfrom pathlib import Path\nimport os,json,re,hashlib\nraw=Path('handoff.md').read_bytes()\nassert re.search(rb'Input SHA256: [0-9a-f]{64}',raw)\nwith Path('validation-executed.json').open('x') as f:\n json.dump(dict(pid=os.getpid(),ppid=os.getppid(),cwd=os.getcwd(),report_sha256=hashlib.sha256(raw).hexdigest()),f)\n f.flush();os.fsync(f.fileno())\nprint('CONTROL-PROBE-SUCCESS',flush=True)\n"
+                ],
+                "criteria": [
+                  1
+                ],
+                "justification": "Run owned report test code, never accept the task",
+                "timeout_seconds": 60
+              }
+            ],
+            "authorized_at": "2026-10-28T17:35:04.962387462Z",
+            "actor": "fpizzi/uid:1001"
+          },
+          "artifacts": {
+            ".swarm/native-validation-public-584e213e1f0fb51189a7e9ff8eb6b2acbe0618b816a4c5be2ec90b259d87c6c1.json": "fb678487f7a0204c17693190c3268b40375a68e55ae8643778d94a4823328629",
+            "handoff.md": "c6d7358be683a94aea72e402a652a3da7d4d3b905baecd6e4d94f56a9a740efd"
+          },
+          "controls": [
+            {
+              "review_output": "OWNED_LOW_INPUT_OK\nCONTROL-PROBE-SUCCESS\n",
+              "output_bytes": 41,
+              "id": "owned-report-test",
+              "command": [
+                "python3",
+                "-c",
+                "from pathlib import Path\ntext=Path('handoff.md').read_text()\ncode=text.split('\\nFIXTURE_CODE\\n',1)[1].split('\\nEND_FIXTURE_CODE\\n',1)[0]\nexec(compile(code,'<owned_i0_report>','exec'),{})\nfrom pathlib import Path\nimport os,json,re,hashlib\nraw=Path('handoff.md').read_bytes()\nassert re.search(rb'Input SHA256: [0-9a-f]{64}',raw)\nwith Path('validation-executed.json').open('x') as f:\n json.dump(dict(pid=os.getpid(),ppid=os.getppid(),cwd=os.getcwd(),report_sha256=hashlib.sha256(raw).hexdigest()),f)\n f.flush();os.fsync(f.fileno())\nprint('CONTROL-PROBE-SUCCESS',flush=True)\n"
+              ],
+              "executed": true,
+              "passed": true,
+              "exit_code": 0,
+              "output_sha256": "f6df793ca5bb59558ad3f589f59a8c22df1449fda5dddffa689ab6392c057eb5",
+              "summary": "contrôle réussi",
+              "started_at": "2026-10-28T17:35:06.633297042Z",
+              "finished_at": "2026-10-28T17:35:06.795069814Z",
+              "wall_duration_ms": 161,
+              "cpu_duration_ms": 103
+            }
+          ],
+          "receipt": ".swarm/native-validation-public-584e213e1f0fb51189a7e9ff8eb6b2acbe0618b816a4c5be2ec90b259d87c6c1.json",
+          "state": "pending_human",
+          "reason": "controls-passed-review-required",
+          "at": "2026-10-28T17:35:06.795727572Z"
+        },
+        "evidence_stale_reason": "human-validation-required",
+        "launch_profile": {
+          "provider": "fixture",
+          "role": "worker",
+          "workspace": "/tmp/swarm-model83-xcm8zswe",
+          "timeout_seconds": 1800,
+          "capture_output": true,
+          "updated": "2026-10-28T17:35:05.098165025Z",
+          "actor": "operateur"
+        },
+        "plan_checks": {
+          "plan-criterion-1": "validation",
+          "plan-delivery": "delivery",
+          "plan-entry": "entry",
+          "plan-validation": "validation"
+        },
+        "id": "task",
+        "title": "Run",
+        "owner": "fixture",
+        "deliverable": "Evidence",
+        "criteria": [
+          "Observed, not accepted"
+        ],
+        "depends": null,
+        "status": "submitted",
+        "blocker": "",
+        "next": "Évaluer les preuves et la gate delivery ; handoff : handoff.md",
+        "attempts": [
+          {
+            "id": "a-b671c03d9b42001160a4a9a3",
+            "status": "completed",
+            "started": "2026-10-28T17:35:05.098117225Z",
+            "ended": "2026-10-28T17:35:05.500802047Z"
+          }
+        ]
+      }
+    ]
+  }
+}

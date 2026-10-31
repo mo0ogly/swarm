@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "facts": {
+    "private_read": false,
+    "database_write": false,
+    "private_write": false,
+    "official_write": false
+  },
+  "workspace": "/tmp/swarm-model83-ah8x69sh/.swarm/managed/w-85afc1bc04cf32629e12165b/copies/task-1",
+  "binary_sha256": "bf0e6dc0ffc32ecceccfed7970de33cbf8c7a18efbbac040188e8af21e5d655f",
+  "descendant_denied": true,
+  "prompt_exact": true,
+  "accepted": false,
+  "scope": "Same normal candidate for planner and managed worker; no task acceptance"
+}

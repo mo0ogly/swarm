@@ -8,6 +8,7 @@
     "rust/crates/*/Cargo.toml",
     "rust/crates/swarm-cli/src/**/*",
     "rust/crates/swarm-cli/tests/paea_promote.rs",
+    "rust/crates/swarm-cli/tests/paea_settlement_delivered.rs",
     "rust/crates/swarm-engine/src/**/*",
     "rust/crates/swarm-enrollment-*/src/**/*",
     "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
@@ -15,16 +16,17 @@
     "rust/crates/swarm-protection-contract/src/**/*",
     "tools/verification/recipe.py",
     "bin/swarm",
-    "docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-chain-test-20261029T161350Z/source-fixture-regen/result.json"
+    "web/paea-examples/v1/payment-document.json",
+    "docs/plans/actions-confiance/paea/evidence/claude-e2-arbitrage-20261031T135859Z/source-fixture-regen-6-repo-root/result.json"
   ],
   "environment": {
     "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
     "CARGO_PROFILE_DEV_DEBUG": "0",
     "CARGO_PROFILE_TEST_DEBUG": "0",
     "CARGO_INCREMENTAL": "0",
-    "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-chain-test-20261029T161350Z/source-fixture-regen",
+    "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/claude-e2-arbitrage-20261031T135859Z/source-fixture-regen-6-repo-root",
     "SWARM_PAEA_DELIVERED_BIN": "{root}/bin/swarm",
-    "SWARM_PAEA_DELIVERED_BIN_SHA256": "47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a"
+    "SWARM_PAEA_DELIVERED_BIN_SHA256": "1d3f9da1408a82b14b5ae5d76328b58c52f1f92051824af52f1d413be8dd41fd"
   },
   "steps": [
     {
@@ -52,7 +54,7 @@
         "delivered_chain_transfer_promote_replay_reconcile_once ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=47d317460026727498a1b93a0b752f1a06c21247e9a11e96842f0c53ad28907a"
+        "sha256=1d3f9da1408a82b14b5ae5d76328b58c52f1f92051824af52f1d413be8dd41fd"
       ],
       "required_stderr": []
     },
@@ -79,6 +81,37 @@
       "required_stdout": [
         "shared_project_root_guard_admits_one_holder_at_a_time ... ok",
         "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "promote-cli-composed-git-settlement-order",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_promote",
+        "composed_git_settlement_stale_preparations_refuse_then_fresh_recover",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "composed_git_settlement_stale_preparations_refuse_then_fresh_recover ... ok",
+        "1 passed; 0 failed",
+        "paea-git-promote-trust-revision",
+        "paea-settlement-trust-revision",
+        "delivered-binary-witness path=",
+        "sha256=1d3f9da1408a82b14b5ae5d76328b58c52f1f92051824af52f1d413be8dd41fd"
       ],
       "required_stderr": []
     },

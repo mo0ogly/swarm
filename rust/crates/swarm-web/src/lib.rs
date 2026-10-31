@@ -6,7 +6,7 @@ mod access;
 mod error;
 #[cfg(target_os = "linux")]
 mod service;
-pub use access::LocalWebAuthority;
+pub use access::{LocalWebAuthority, WebAuthMethod, WebPrincipal};
 pub use error::WebAccessError;
 #[cfg(target_os = "linux")]
 pub use service::{
@@ -16,4 +16,6 @@ pub use service::{
     TrustEnrollmentSource, TrustEnrollmentSourceError,
 };
 #[cfg(target_os = "linux")]
-pub use service::{PaeaGitCallAuthority, PaeaGitCallSource, PaeaGitCallSourceError};
+pub use service::{
+    PaeaGitCallApprovalSource, PaeaGitCallAuthority, PaeaGitCallSource, PaeaGitCallSourceError,
+};

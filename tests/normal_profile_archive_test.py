@@ -1,6 +1,7 @@
 """Effective-source archive guards on synthetic bytes, without Cargo or a Root."""
 from pathlib import Path
 import json,sys,tarfile,tempfile,unittest
+from fixture_area import fixture_area
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools/verification'))
 import verify_native_profile as profile
 
@@ -9,7 +10,7 @@ class EffectiveSourceArchive(unittest.TestCase):
     """A valid archive witness precedes source drift and its explicit recovery."""
     def setUp(self):
         """Create only two synthetic compiled-input stand-ins and private outputs."""
-        temp=tempfile.TemporaryDirectory(prefix='native-profile-archive-');self.addCleanup(temp.cleanup)
+        temp=tempfile.TemporaryDirectory(prefix='native-profile-archive-', dir=fixture_area());self.addCleanup(temp.cleanup)
         self.root=Path(temp.name);(self.root/'one.rs').write_bytes(b'synthetic source one')
         (self.root/'asset.txt').write_bytes(b'synthetic exact asset')
         self.inputs={name:profile.digest(self.root/name) for name in ['one.rs','asset.txt']}

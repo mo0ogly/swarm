@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('assert'),fs=require('fs'),path=require('path'),os=require('os'),cp=require('child_process'),crypto=require('crypto'),pup=require('puppeteer');
-const binary=path.resolve(process.argv[2]),outdir=path.resolve(process.argv[3]);fs.mkdirSync(outdir,{recursive:true});const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-secret-ui-')),checks=[],errors=[];
+const binary=path.resolve(process.argv[2]),outdir=path.resolve(process.argv[3]);fs.mkdirSync(outdir,{recursive:true});const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-secret-ui-')),checks=[],errors=[];
 const tokens={admin:'admin-secret-ui-fixture-token',alice:'alice-secret-ui-fixture-token',bob:'bob-secret-ui-fixture-token',effect:'effect-secret-ui-fixture-token'};
 const identities=[['admin','admin',3,'admin'],['alice','alice',1,'requester'],['bob','bob',2,'approver'],['effect','effect-service',2,'effect']].map(([key,subject,integrity,role])=>({subject,token:tokens[key],integrity,roles:[role]}));
 function cli(action,data,token=''){return JSON.parse(cp.execFileSync(binary,['--root',root,'--json','trust',action,...(data?['--input','-']:[])],{input:data?JSON.stringify(data):undefined,env:{...process.env,SWARM_TRUST_TOKEN:token},encoding:'utf8',stdio:['pipe','pipe','pipe']}))}

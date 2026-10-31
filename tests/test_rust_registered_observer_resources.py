@@ -2,6 +2,7 @@
 import errno
 import os
 import tempfile
+from fixture_area import fixture_area
 import subprocess
 import signal
 import sys
@@ -22,7 +23,7 @@ class ObserverResources(unittest.TestCase):
         child; this is descriptor evidence only, not signal or lifecycle proof.
         """
         for fault in (False, True, False):
-            with self.subTest(second_spool_refusal=fault), tempfile.TemporaryDirectory() as tmp:
+            with self.subTest(second_spool_refusal=fault), tempfile.TemporaryDirectory(dir=fixture_area()) as tmp:
                 reader, writer = os.pipe()
                 streams = []
                 expected = 'fixture-second-spool' if fault else 'fixture-no-process'
@@ -60,7 +61,7 @@ class ObserverResources(unittest.TestCase):
         No Swarm or provider runs. Popen is the test's own child handle, never an
         identifier from storage; original error and its actual reap both matter.
         """
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as tmp:
             child = subprocess.Popen([sys.executable, '-c', "import signal; print('READY',flush=True); signal.pause()"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
             reader, writer = os.pipe()
             try:

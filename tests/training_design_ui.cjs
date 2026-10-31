@@ -4,7 +4,7 @@ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),asse
 const {execFileSync,spawn}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);
 fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-training-reader-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-training-reader-'));
 execFileSync(binary,['--root',root,'init']);
 const server=spawn(binary,['--root',root,'web','127.0.0.1:0']);let browser,page;
 const errors=[],failures=[],checks=[];

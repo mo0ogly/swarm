@@ -11,12 +11,23 @@
   <script src="/i18n-en.js" defer></script>
   <script src="/i18n.js" defer></script>
   <script src="/paea-effects.js" defer></script>
+  <script src="/paea-approval-form.js" defer></script>
 </head>
 <body>
 <a class="paea-skip" href="#paea-main" data-i18n>Aller aux états d'effets</a>
 <header><a href="/">Swarm</a><h1 data-i18n>États d'effets PAEA</h1><nav aria-label="Navigation PAEA"><a href="/paea.html" data-paea-link data-i18n>Vérifications PAEA</a><button id="paea-theme" type="button" data-i18n>Changer de thème</button></nav></header>
 <main id="paea-main" tabindex="-1">
-<p id="effects-limits" class="paea-notice" data-i18n>Lecture seule : observation de capacité et rapprochement recalculé des journaux d'effets réels. Aucune consommation d'appel, aucune autorité, aucune réparation ; la correspondance recalculée n'établit pas l'authenticité.</p>
+<p id="effects-limits" class="paea-notice" data-i18n>Lecture seule : aperçu protégé de l'action préparée détenue par le moteur, observation de capacité et rapprochement recalculé des journaux d'effets réels. Aucune consommation d'appel, aucune autorité, aucune réparation ; un aperçu n'est pas un accord et la correspondance recalculée n'établit pas l'authenticité.</p>
+<section aria-labelledby="preview-title"><h2 id="preview-title" data-i18n>Aperçu de l'action préparée — destiné à l'approbateur</h2>
+<p id="preview-status" role="status" aria-live="polite" data-state="loading" data-i18n>Chargement…</p>
+<div id="preview-detail" hidden>
+<section id="preview-canonical" aria-labelledby="preview-canonical-title"><h3 id="preview-canonical-title" data-i18n>Identité d'action canonique exacte</h3><dl id="preview-identity"></dl></section>
+<section id="preview-current" aria-labelledby="preview-current-title"><h3 id="preview-current-title" data-i18n>État actuel des prérequis (témoins)</h3><dl id="preview-witness"></dl></section>
+<section id="preview-terms" aria-labelledby="preview-terms-title"><h3 id="preview-terms-title" data-i18n>Termes et portée déclarés de l'action préparée</h3><dl id="preview-declared"></dl></section>
+<section id="preview-limits" aria-labelledby="preview-limits-title"><h3 id="preview-limits-title" data-i18n>Limites explicites de cet aperçu</h3><dl id="preview-limits-list"></dl></section>
+<details id="preview-raw"><summary data-i18n>Rapport technique</summary><pre id="preview-raw-body" tabindex="0"></pre></details>
+</div>
+</section>
 <section aria-labelledby="gitcall-title"><h2 id="gitcall-title" data-i18n>Appel Git gardé — capacité observée</h2>
 <p id="gitcall-status" role="status" aria-live="polite" data-state="loading" data-i18n>Chargement…</p>
 <section id="gitcall-detail" hidden aria-labelledby="gitcall-cap-title"><h3 id="gitcall-cap-title" data-i18n>Capacité publique de l'appel préparé</h3><dl id="gitcall-capability"></dl></section>
@@ -27,6 +38,19 @@
 <section id="reconcile-settlement" aria-labelledby="settlement-title"><h3 id="settlement-title" data-i18n>Grand livre de règlement séparé</h3><div id="settlement-state"></div><ul id="settlement-findings"></ul></section>
 <section id="reconcile-git" aria-labelledby="git-title"><h3 id="git-title" data-i18n>Intentions et promotions Git</h3><div id="git-state"></div><ul id="git-findings"></ul></section>
 <details id="reconcile-raw"><summary data-i18n>Rapport technique</summary><pre id="reconcile-report-raw" tabindex="0"></pre></details>
+</div>
+</section>
+<section aria-labelledby="approval-title"><h2 id="approval-title" data-i18n>Approbation de l’action préparée — confirmation explicite</h2>
+<p id="approval-status" role="status" aria-live="polite" data-state="loading" data-i18n>Chargement…</p>
+<div id="approval-detail" hidden>
+<dl id="approval-command"></dl>
+<section id="approval-current" aria-labelledby="approval-current-title"><h3 id="approval-current-title" data-i18n>État actuel observé (témoins et révision)</h3><dl id="approval-witness"></dl></section>
+<section id="approval-terms" aria-labelledby="approval-terms-title"><h3 id="approval-terms-title" data-i18n>Termes exacts de la commande figée</h3><dl id="approval-declared"></dl></section>
+<p id="approval-agreement" class="paea-notice" data-i18n>Aucun consentement n’est capturé par cet affichage : la confirmation ci-dessous est l’acte explicite qui consomme la commande figée sous l’autorité enrôlée détenue.</p>
+<p><label for="approval-confirm"><input type="checkbox" id="approval-confirm"> <span data-i18n>Je confirme l’action présentée ci-dessus, pour ses termes exacts.</span></label></p>
+<p><label for="approval-password"><span data-i18n>Mot de passe d’enrôlement de l’approbateur</span></label>
+<input type="password" id="approval-password" autocomplete="off" maxlength="128"></p>
+<p><button type="button" id="approval-send" disabled data-i18n>Approuver l’action préparée</button></p>
 </div>
 </section>
 </main></body></html>

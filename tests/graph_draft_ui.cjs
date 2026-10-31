@@ -8,7 +8,7 @@ const puppeteer=require(process.env.PUPPETEER_MODULE||'puppeteer');
 const binary=path.resolve(process.argv[2]),outDir=path.resolve(process.argv[3]);
 if(!process.argv[2]||!process.argv[3])throw Error('usage: node tests/graph_draft_ui.cjs BINAIRE DOSSIER_SORTIE');
 fs.mkdirSync(outDir,{recursive:true});
-const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-b03-')),uuid=()=>crypto.randomUUID().replaceAll('-','');
+const temporary=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-b03-')),uuid=()=>crypto.randomUUID().replaceAll('-','');
 const cli=(root,args,input)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{encoding:'utf8',maxBuffer:16*1024*1024,input:input?JSON.stringify(input):undefined}));
 const mutate=(root,args,revision,fields)=>cli(root,args,{schema_version:1,event_id:uuid(),expected_revision:revision,...fields}).work;
 function fixture(root,count=6){

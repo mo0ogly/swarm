@@ -10,6 +10,35 @@ from pathlib import Path
 import urllib.request
 
 
+def _fixture_area():
+    """Return the temporary-work area for delivery qualification, creating it 0700.
+
+    Purpose: honor the operator /tmp interdiction (2026-10-31) — project data
+    must never live under `/tmp`. This module is shipped inside launcher
+    checkouts (`tools/swarm_version.py` next to `swarm_local.py`), where the
+    repository's `tests/fixture_area` module does not exist, so it carries its
+    own bounded implementation instead of importing one. Inputs: none. Output:
+    a directory path — `<source>/.swarm-fixtures/` when a repository checkout
+    is detected (`tools/` sibling of a checkout root), else `~/.swarm-fixtures/`
+    for an installed launcher. Errors: OSError propagates (read-only hosts
+    refuse). Side effects: creates the area (0700) on first use, never at
+    import. Limits: scratch for one qualification run; retention/cleanup stay
+    the caller's (the run deletes its own workspace).
+    """
+    candidate = Path(__file__).resolve().parent.parent
+    base = candidate if (candidate / 'tools').is_dir() else Path.home()
+    area = base / '.swarm-fixtures'
+    area.mkdir(mode=0o700, parents=True, exist_ok=True)
+    try:
+        area.chmod(0o700)
+    except OSError:
+        pass
+    return area
+
+
+fixture_area = _fixture_area
+
+
 def native_builder(source):
     """Load the repository's maintained native builder lazily; configure needs none.
 
@@ -86,7 +115,7 @@ def verify_candidate(candidate,version,notes,metadata=None):
     one local probe; launcher startup policy separately owns startup waiting.
     """
     print('Vérification isolée du serveur Rust et de sa version…',flush=True)
-    with tempfile.TemporaryDirectory(prefix='swarm-native-delivery-') as temporary:
+    with tempfile.TemporaryDirectory(prefix='swarm-native-delivery-', dir=fixture_area()) as temporary:
         root=Path(temporary)
         subprocess.run([str(candidate),'--root',str(root),'init'],check=True,stdout=subprocess.DEVNULL)
         with tempfile.TemporaryFile() as errors:

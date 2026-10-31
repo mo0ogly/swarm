@@ -9,13 +9,14 @@ mesure ce que le moteur a fait seul et ce qu'il a laisse a l'humain.
 Ce qui est verifie n'est pas qu'il ne plante pas : c'est qu'il tient ses
 promesses, y compris celles qui l'empechent d'agir.
 """
+from fixture_area import fixture_area
 import argparse, json, os, shutil, subprocess, sys, tempfile, time, uuid
 from pathlib import Path
 
 class Exercice:
     def __init__(self, binaire):
         self.binaire = os.path.abspath(binaire)
-        self.racine = tempfile.mkdtemp(prefix='swarm-exo-')
+        self.racine = tempfile.mkdtemp(prefix='swarm-exo-', dir=fixture_area())
         self.cli('init')
 
     def cli(self, *args, entree=None):

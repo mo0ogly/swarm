@@ -5,7 +5,7 @@ const {spawn,spawnSync}=require('node:child_process');
 const puppeteer=require(process.env.PUPPETEER_MODULE||'puppeteer');
 const binary=path.resolve(process.argv[2]),outDir=path.resolve(process.argv[3]);
 fs.mkdirSync(outDir,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-q7-')),uuid=()=>require('node:crypto').randomUUID().replace(/-/g,'');
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-q7-')),uuid=()=>require('node:crypto').randomUUID().replace(/-/g,'');
 const run=(args,input)=>{const r=spawnSync(binary,['--root',root,'--json',...args],{encoding:'utf8',input});if(r.status!==0)throw new Error(r.stderr||'commande échouée');return r.stdout?JSON.parse(r.stdout):null};
 const mutate=(args,revision,fields)=>run([...args,'--input','-'],JSON.stringify({schema_version:1,event_id:uuid(),expected_revision:revision,...fields})).work;
 run(['init']);let work=mutate(['work','create'],0,{title:'Recette Q7',objective:'Configurer une politique sans JSON dans le web',scope:'racine isolée',criteria:['parcours visible'],next:'configurer'});

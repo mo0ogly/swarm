@@ -202,3 +202,62 @@ verified: image2d28e0bc7fe061131617ee9c26ceb276bce74b2c36a304d85648b5b57e34015b,
 PID1130985;4matching assets,14Version and16Admin FR/EN checks,5Works and their
 controls preserved. Attempts, reviews, retained agents and planning remain
 outside this slice. Complete migration is not inferred.
+
+## Initial blocked tasks — October 30, 2026 candidate
+
+The source now covers `blocked` tasks without attempts, evidence, reviews, gates,
+revalidation or corrective authorization, in a Work without planning or retained
+agents. TODO/BLOCKED dependencies remain unaccepted; the reader preserves actual
+validation facts, order and first blocking reason. Zero attempts cannot exhaust
+a positive allowance, so no extension or corrective recovery is displayed.
+Inherited Go messages introduce no Rust policy threshold. An offered action is
+a read observation, never launch authority.
+
+The maintained `--initial-blocked` mode requires full Go/Rust document comparison,
+pause, insufficient then restored budget, return to TODO, and refusal without a
+document after a real abandoned transition. The263counterexample is retained;
+candidate compilation, execution and installation are not established yet.
+
+## Cockpit identity and Biba compatibility
+
+An available action authenticates no agent and assigns no integrity level.
+`inspect_cockpit` only assembles an observation; it starts no provider and changes
+no identity or permission. Existing instance, process and workspace checks remain
+on the execution path. The provider's Linux I0 boundary is distinct from business
+authentication and the Biba monitor: neither a display nor successful confinement
+establishes global conformity. I0 output remains a candidate, never acceptance.
+
+```mermaid
+flowchart TD
+    C[inspect_cockpit: observed facts] --> A[Proposed action without authority]
+    A -. Separate public request .-> P[agent prepare then run]
+    P --> G[execute_agent_gate: recheck identity and preconditions]
+    G --> W[Inode-bound workspace]
+    W --> B[Sandbox prepare_bound then enforce]
+    B --> I[I0 provider: candidate output]
+    G -->|Refusal| R[No provider launch]
+    B -->|Refusal| R
+```
+
+Candidate264passes156cockpit assertions,15overlap assertions and5comparator
+tests. The identity/Biba execution regression is delegated to GLM: valid I0
+workspace control, Root-workspace refusal, then inode replacement if its specific
+proof is established. No result of that regression is claimed yet;43selected
+identity/Biba sources are only verified unchanged since263. Concurrent PAEA
+changes are not qualified by this comparison and264installation remains pending.
+
+On frozen image264, the local provider control executes in its I0 workspace
+with matching child/parent PIDs. Root workspace is refused with
+`biba-workspace-overlaps-root` in `native_execution_result.pre_exec_failure`,
+with `provider_may_have_started:false`. Replacing the inode refuses with
+`agent-execution-preflight-changed`; restoring the original inode lets the same
+intent execute without resetting budget or granting new authority. The CLI can
+return0for an observed failed attempt: the test consumes the native outcome,
+not that exit alone. The original harness failure is preserved.
+
+Maintained recipe: `cockpit-biba-identity-compatibility.json`, driver
+`tests/rust_cockpit_biba_compatibility.py`, variable `SWARM_COCKPIT_BIBA_BINARY`.
+Work/budget before/after and causes are retained; no SQL access, real provider or
+privilege escalation. These controls establish neither cryptographic agent
+authentication nor mediation of every flow. Installation is separate and still
+requires qualification of the shared PAEA inputs.

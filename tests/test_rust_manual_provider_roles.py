@@ -6,6 +6,7 @@ The public mission recipe separately checks actual grants and recorded effects.
 import json
 import subprocess
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from pathlib import Path
 import rust_mission_manual_review as manual
@@ -26,7 +27,7 @@ class ProviderRoles(unittest.TestCase):
                               input=prompt, cwd=directory, capture_output=True)
 
     def test_current_planner_delivery_and_worker_use_same_frozen_program(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             context = dict(scope=dict(id='child'), events=[dict(id='current', scope='child')])
             prompt = 'Tu es le planificateur du périmètre reçu.\n\n'.encode() + json.dumps(context).encode()
             planner = self.invoke(directory, prompt)
@@ -42,7 +43,7 @@ class ProviderRoles(unittest.TestCase):
             self.assertEqual((Path(directory) / 'codex').read_bytes(), original)
 
     def test_malformed_planner_never_falls_back_to_successful_worker(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             result = self.invoke(directory, 'Tu es le planificateur du périmètre reçu.\n\n{}'.encode())
             self.assertNotEqual(result.returncode, 0)
             self.assertIn(b'KeyError', result.stderr)

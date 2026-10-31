@@ -1,6 +1,6 @@
 'use strict';
 const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert/strict'),{spawn,execFileSync}=require('child_process'),puppeteer=require('puppeteer');
-const binary=path.resolve(process.argv[2]||'bin/swarm'),out=path.resolve(process.argv[3]||'test-results/action-skills'),root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-skills-ui-'));fs.mkdirSync(out,{recursive:true});let app,browser;
+const binary=path.resolve(process.argv[2]||'bin/swarm'),out=path.resolve(process.argv[3]||'test-results/action-skills'),root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-skills-ui-'));fs.mkdirSync(out,{recursive:true});let app,browser;
 const cli=(args,input)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{input:input?JSON.stringify(input):undefined,encoding:'utf8'}));
 (async()=>{try{
 cli(['init']);let w=cli(['work','create'],{schema_version:1,event_id:'create',expected_revision:0,title:'Action skills test',objective:'Verify explicit task selection',scope:'isolated',criteria:['Selection remains explicit'],next:'Configure'}).work;

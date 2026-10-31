@@ -2,7 +2,7 @@
 const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert/strict'),crypto=require('crypto');
 const {spawn,execFileSync}=require('child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-extension-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-extension-'));
 const cli=(args,input)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{encoding:'utf8',input:input?JSON.stringify(input):undefined}));
 cli(['init']);let w=cli(['work','create'],{schema_version:1,event_id:'fixture',expected_revision:0,title:'Reprise contrôlée',objective:'Rendre une reprise accessible',scope:'Isolated fixture',criteria:['Evidence retained'],next:'Inspect'}).work;
 w=cli(['task','add',w.id],{schema_version:1,event_id:'task',expected_revision:w.revision,id:'exhausted',title:'E3 — Vérification des preuves',owner:'fixture',deliverable:'docs/report.md',criteria:['Evidence checked'],next:'Correct missing sources',max_attempts:2,max_tool_calls:100}).work;

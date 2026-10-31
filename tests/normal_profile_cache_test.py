@@ -5,6 +5,7 @@ positive process receipt. The real moved-cache counterexample is retained in170.
 """
 from pathlib import Path
 import tempfile,sys,unittest
+from fixture_area import fixture_area
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools/verification'))
 import verify_native_profile as profile
 
@@ -18,7 +19,7 @@ class ProfileCandidateAuthority(unittest.TestCase):
         Rejected stale paths stay preserved for diagnosis, never silently omitted
         from actual dependencies or admitted merely because an old build used them.
         """
-        with tempfile.TemporaryDirectory(prefix='profile-prior-authority-') as tmp:
+        with tempfile.TemporaryDirectory(prefix='profile-prior-authority-', dir=fixture_area()) as tmp:
             root=Path(tmp);source=root/'rust/crates/example/src';source.mkdir(parents=True)
             for name,body in [('rust/Cargo.toml','[workspace]\n'),('rust/Cargo.lock','# synthetic\n'),('rust/crates/example/Cargo.toml','[package]\nname="example"\nversion="0.1.0"\n'),('rust/crates/example/src/lib.rs','const CONTRACT: &str = include_str!("contract.txt");\n'),('rust/crates/example/src/contract.txt','current declared producer\n')]:
                 (root/name).write_text(body)
@@ -37,7 +38,7 @@ class ProfileCargoConfiguration(unittest.TestCase):
     """Local Cargo config is a real input even when rustc depfiles omit it."""
     def setUp(self):
         """Construct a minimal synthetic workspace; never launch Cargo."""
-        temporary=tempfile.TemporaryDirectory(prefix='profile-config-inputs-')
+        temporary=tempfile.TemporaryDirectory(prefix='profile-config-inputs-', dir=fixture_area())
         self.addCleanup(temporary.cleanup);self.root=Path(temporary.name)
         (self.root/'rust/crates/example/src').mkdir(parents=True)
         for name,body in [('rust/Cargo.toml','[workspace]\n'),('rust/Cargo.lock','# fixture\n'),

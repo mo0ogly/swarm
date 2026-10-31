@@ -184,8 +184,24 @@ def run_recipe(root, recipe_path, output):
         tracked.append('declared-inputs.tar.gz')
         environment = dict(os.environ)
         overrides = {key: item.replace('{root}', str(root)) for key, item in recipe['environment'].items()}
+        # Operator /tmp interdiction (2026-10-31): recipe steps must not allocate
+        # project data in the system temp directory. TMPDIR is pinned under the
+        # configured fixture area so every temp API honoring TMPDIR (Python
+        # tempfile, Rust env::temp_dir/TempDir, Node os.tmpdir(), Go t.TempDir())
+        # lands there for the duration of the run. Explicit dir=/temp_dir() uses
+        # that bypass TMPDIR remain a source-level obligation (see
+        # tools/check_tmp_interdiction.py) — this override is the runner net,
+        # not a substitute for the source contract.
+        # Area = Admin setting `runtime_temporary_directory` (saved value, else
+        # shipped installation default), resolved by tests/fixture_area.py.
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('fixture_area', root / 'tests' / 'fixture_area.py')
+        area = importlib.util.module_from_spec(spec); spec.loader.exec_module(area)
+        interdiction_dir = area.configured_area(root) / 'runner-tmp'
+        interdiction_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+        overrides['TMPDIR'] = str(interdiction_dir)
         environment.update(overrides)
-        save('environment.json', {'overrides': overrides, 'scope': 'Inherited environment not logged; compiler graph/profile needs separate qualification'})
+        save('environment.json', {'overrides': overrides, 'scope': 'Inherited environment not logged; compiler graph/profile needs separate qualification; TMPDIR pinned under the configured fixture area (Admin setting runtime_temporary_directory) per the 2026-10-31 operator interdiction'})
         for number, step in enumerate(recipe['steps'], 1):
             args = [arg.replace('{root}', str(root)) for arg in step['command']]
             search_path = os.pathsep.join(str(root / part) if not Path(part).is_absolute() else part for part in environment.get('PATH', os.defpath).split(os.pathsep))

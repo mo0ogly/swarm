@@ -1,0 +1,5 @@
+{
+  "path": "rust/crates/swarm-engine/src/native_provider_exec.rs",
+  "sha256": "ec3830d11f98fe5864d9622dccd7601da7213c08ff860dd7df93da3c575d331d",
+  "adapter_scope": "Append probe; real prepare body unchanged"
+}

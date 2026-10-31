@@ -1,11 +1,12 @@
 """Three real, isolated brief→planner→worker→verified Git deliveries; no manual acceptance."""
 import json,pathlib,subprocess,sys,tempfile,time,uuid
+from fixture_area import fixture_area
 binary=str(pathlib.Path(sys.argv[1]).resolve());out=pathlib.Path(sys.argv[2]).resolve();out.mkdir(parents=True,exist_ok=True)
 provider=json.loads(pathlib.Path(sys.argv[3]).read_text())['providers']['claude']
 provider['args']=['-p','--output-format','stream-json','--verbose','--allowedTools','Read,Write,Edit,Bash(python3:*),Bash(git:*),Bash(mkdir:*)']
 results=[]
 for run in range(1,4):
- root=pathlib.Path(tempfile.mkdtemp(prefix='swarm-planning-real-'));source=root/'project';source.mkdir()
+ root=pathlib.Path(tempfile.mkdtemp(prefix='swarm-planning-real-', dir=fixture_area()));source=root/'project';source.mkdir()
  def git(*args):
   return subprocess.run(['git','-c','user.name=Recipe','-c','user.email=recipe@localhost',*args],cwd=source,text=True,capture_output=True,check=True).stdout.strip()
  git('init');(source/'number.py').write_text('def answer():\n    return 0\n');(source/'test_number.py').write_text('import unittest\nfrom number import answer\nclass Check(unittest.TestCase):\n    def test_answer(self): self.assertEqual(answer(),42)\n');git('add','.');git('commit','-m','baseline');base=git('rev-parse','HEAD')

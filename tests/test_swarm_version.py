@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from unittest.mock import patch
 import subprocess
@@ -25,7 +26,7 @@ class LocalVersion(unittest.TestCase):
 
     def test_failure_preserves_running_artifact(self):
         """Missing native build prerequisites cannot overwrite the installed binary."""
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as tmp:
             root=Path(tmp);binary=root/'swarm';binary.write_bytes(b'previous verified binary')
             (root/'version_history.json').write_text(json.dumps({'releases':[], 'local_changes':{'summary':{'fr':'Oui','en':'Yes'},'items':[{'fr':'Note','en':'Note'}]}}))
             with self.assertRaises(FileNotFoundError):version.prepare(root,binary)
@@ -33,7 +34,7 @@ class LocalVersion(unittest.TestCase):
             self.assertFalse((root/'deploy/local-build.json').exists())
 
     def test_malformed_local_notes_are_rejected_before_building(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as tmp:
             root = Path(tmp)
             (root / "deploy").mkdir()
             binary = root / "swarm"

@@ -386,6 +386,10 @@
  $('live-notify').addEventListener('click',async()=>{if(notify){setNotify(false);return}if(typeof Notification!=='function'){status(tr('Notifications non prises en charge par ce navigateur'),true);return}
   const p=Notification.permission==='granted'?'granted':await Notification.requestPermission();setNotify(p==='granted');if(p!=='granted')status(tr('Notifications refusées par le navigateur'),true)});
  $('live-export').addEventListener('click',download);
+ /** Protected sign-out of this browser only (cookies cleared server-side);
+  * the local key stays valid. A refusal keeps the page and reports it. */
+ $('live-logout').addEventListener('click',async e=>{const b=e.currentTarget;b.disabled=true;try{if(!csrf)await session();const r=await fetch('/api/v1/logout',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json','X-Swarm-CSRF':csrf}});const body=r.ok?await r.json():null;if(body?.redirect!=='/login')throw {code:'http-'+r.status};location.assign('/login'+location.search)}catch{b.disabled=false;status(tr('Déconnexion impossible. Réessayez.'),true)}});
+ $('live-logout').disabled=false; // enabled only once its handler exists
  $('live-alerts-test').addEventListener('click',testNotification);
  /** Keyboard: p pause, a active-only, t theme, n notifications, e export, arrows move between agents. */
  addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||''))return;

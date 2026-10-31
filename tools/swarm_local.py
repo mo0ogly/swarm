@@ -123,9 +123,9 @@ def main():
     """
     config_path = SOURCE / "deploy" / "local-web.json"
     settings = json.loads(config_path.read_text()) if config_path.exists() else {}
-    parser = argparse.ArgumentParser(description="Swarm local : start, stop, restart, status, logs, open, build")
+    parser = argparse.ArgumentParser(description="Swarm local : start, stop, restart, status, logs, open, build, rotate")
     parser.add_argument("action", nargs="?", default="start",
-                        choices=["start", "stop", "restart", "status", "logs", "open", "build", "configure", "adopt"])
+                        choices=["start", "stop", "restart", "status", "logs", "open", "build", "configure", "adopt", "rotate"])
     parser.add_argument("--root", default=os.environ.get("SWARM_PROJECT_ROOT", settings.get("root", str(SOURCE))))
     parser.add_argument("--address", default=os.environ.get("SWARM_WEB_ADDRESS", settings.get("address", "127.0.0.1:18792")))
     parser.add_argument("--binary", default=os.environ.get("SWARM_BINARY", settings.get("binary", "")))
@@ -213,6 +213,17 @@ def main():
                 print("Serveur arrêté. Missions, données et agents conservés.")
                 return 0
             running = False
+        if args.action == "rotate":
+            # Owner key rotation: the server keeps its key in memory, so stop the
+            # owned server, replace the key with the native command (it refuses
+            # if anything still listens), then start again below without a build.
+            if running:
+                stop(state, args.stop_timeout, args.address)
+                state_path.unlink(missing_ok=True)
+                running = False
+            subprocess.run([str(binary), "--root", str(root), "web-rotate", args.address, "--json"],
+                           cwd=SOURCE, check=True, stdout=subprocess.DEVNULL)
+            print("Clé locale du cockpit remplacée : anciens cookies et liens de connexion refusés.")
         if args.action == "build":
             if not running and prepared != binary:
                 prepared.replace(binary)
@@ -276,11 +287,41 @@ def main():
             temporary.replace(state_path)
         print(f"Swarm : http://{args.address}/")
         if not args.no_open:
-            # Native login accepts a POSTed key; no credential-bearing URL exists.
             opener = os.environ.get("SWARM_BROWSER", "xdg-open")
-            subprocess.run([opener, f"http://{args.address}/login?next=/live.html"], check=True,
+            subprocess.run([opener, sign_in_url(binary, root, args.address)], check=True,
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return 0
+
+
+def sign_in_url(binary, root, address):
+    """Return the browser URL for `open`: a single-use ticket link when the
+    native `web-ticket` command issues one, else the plain login page.
+
+    The ticket URL is a short-lived secret (saved v50 lifetime, consumed on
+    first use): it is passed only to the opener, never printed or logged.
+    A refusal (older binary, Root that has not adopted the v50 setting, read
+    failure) is reported on stderr with its stable code and falls back to the
+    key form, which keeps working; no state is changed by the fallback.
+    """
+    plain = f"http://{address}/login?next=/live.html"
+    result = subprocess.run([str(binary), "--root", str(root), "web-ticket", address, "/live.html", "--json"],
+                            cwd=SOURCE, capture_output=True, text=True)
+    if result.returncode == 0:
+        try:
+            url = json.loads(result.stdout)["url"]
+        except (ValueError, KeyError, TypeError):
+            url = ""
+        if isinstance(url, str) and url.startswith(f"http://{address}/login?ticket="):
+            return url
+        print("Lien de connexion à usage unique illisible ; page de connexion classique ouverte.", file=sys.stderr)
+        return plain
+    try:
+        code = json.loads(result.stderr or "{}").get("failure", {}).get("code", "inconnu")
+    except (ValueError, AttributeError):
+        code = "inconnu"
+    hint = " Enregistrez une fois les réglages dans Admin pour adopter la durée du ticket (v50)." if code == "web-ticket-settings" else ""
+    print(f"Lien de connexion à usage unique indisponible ({code}) ; page de connexion classique ouverte.{hint}", file=sys.stderr)
+    return plain
 
 
 if __name__ == "__main__":

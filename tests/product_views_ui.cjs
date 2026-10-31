@@ -4,7 +4,7 @@ const fs=require('fs'),path=require('path'),os=require('os'),assert=require('ass
 const {spawn,execFileSync}=require('child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);
 fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-product-ui-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-product-ui-'));
 const fixture=JSON.parse(execFileSync('python3',['tests/product_recipe.py',binary,root],{encoding:'utf8'}));
 const app=spawn(binary,['--root',root,'web','127.0.0.1:0']);let browser;const errors=[];
 (async()=>{

@@ -73,7 +73,9 @@ fn access(a: &TrustIdentity, object: i64, kind: BibaAccess) -> Result<(), E> {
     check_biba(level(a.integrity)?, level(object)?, kind).map_err(|_| E::Authorization)
 }
 /// Recheck the stored mandate at current clock/revision; no child chain fallback.
-fn active(st: &State, id: &str, now: OffsetDateTime) -> Result<String, E> {
+/// Shared with the PAEA agreement guard: last-use freshness must also consult
+/// the mandate's current revocation/expiration state, not only the revision.
+pub(crate) fn active(st: &State, id: &str, now: OffsetDateTime) -> Result<String, E> {
     let Some(m) = st.mandates.get(id) else {
         return Ok("mandat absent".into());
     };

@@ -1,0 +1,55 @@
+# Revue sécurité — frontière Biba Linux (bornée, statique, sans outils)
+
+## 0. Méthode
+Sources: les 4 fichiers produits + 2 fixtures fournis. Analyse statique uniquement : aucune exécution, aucune compilation, aucun accès dépôt/compte/provider. Je ne prétends pas que des tests ont tourné ; le résultat déclaré du test natif est repris comme donnée d'entrée, non comme preuve. Repérage par fonction (numéros de ligne indisponibles hors dépôt).
+
+## 1. Faits (lisibles dans le code)
+1. `Sandbox::prepare` ré-ouvre `workspace` par pathname quatre fois (canonicalize, `is_dir`, `check_tree`, `open`) ; `Sandbox::enforce` le ré-résout encore (`set_current_dir(&self.workspace)`) ; `PreparedExec::execute` le ré-résout une fois de plus. Aucune comparaison `st_dev/st_ino` avec ce que le gate a validé.
+2. L'exclusion de `Root/.swarm` est par chaîne de chemins (`p==private`, `private.starts_with`) ; `private.is_dir()` suit les symlinks.
+3. `read_leaves` marche tout `/` — et non « la seule chaîne d'ancêtres » comme l'annonce son doc — et toute erreur (`EACCES`, `ENOENT` transitoire) refuse tout `prepare`.
+4. `check_tree` ne détecte que `nlink!=1` sur fichiers ; pas de détection de montage imbriqué (`st_dev`).
+5. seccomp : liste `denied` sans `SYS_add_key`/`SYS_request_key`/`SYS_keyctl` ; `socket(AF_UNIX)` refusé à la création, AF_INET laissé ouvert ; ioctl allowlist stricte ; garde arch + JGE `0x40000000` (x32) correcte ; `close_range(CLOEXEC)` avant execve.
+6. Le memfd d'entrée est attaché via `dup2_stdin` puis `close(self.input)` sans garantir fd>2.
+7. Continuité d'erreurs globalement saine : `finish`/`convert` préservent cause primaire + nettoyages, fermetures appariées sans double-close, `Display` n'expose aucun chemin.
+
+## 2. Hypothèses (non prouvées)
+- H1 : un acteur même-UID non confiné (p. ex. lanes cwd Root — problème connu ouvert) peut renommer/remplacer `workspace` ou `Root/.swarm`, ou créer des liens physiques, pendant les fenêtres ci-dessous.
+- H2 : le test natif vert implique un environnement restreint (pid-ns + proc monté, ou hidepid), sinon F2 rendrait `prepare` systématiquement refusant en non-root.
+- H3 : le helper est spawné avec 0/1/2 ouverts.
+- H4 : la lecture universelle hors privé et l'egress AF_INET sont des choix politiques assumés.
+
+## 3. Contexte manquant
+Code des 4 gates (ordre droits/politique/source, fermeture Root) ; l'autorité d'identité (hors paquet, non visible ici — je ne conclus pas à son absence) ; `agent_launch_policy::environment_name` ; existence de secrets même-UID (keyrings, fichiers) ; versions noyau/libc cibles ; recette moteur positive (déclarée absente) ; contrat « un seul écrivain même-UID pendant la fenêtre ».
+
+## 4. Défauts reproductibles
+
+**F1 — Majeur (intégrité) : identité du workspace ré-ouverte par pathname.**
+Précondition : gate valide la copie via dev/ino ; puis renommage/remplacement du chemin avant `open(&workspace)` dans `Sandbox::prepare`, ou entre `prepare` et le chdir de `enforce`. Variante la plus grave : le chemin workspace est remplacé par `Root/.swarm` lui-même (renommage inter-parents, H1). Localisation : `Sandbox::prepare`, `Sandbox::enforce`, `PreparedExec::execute`. Effet : la feuille Landlock `ALL` est liée à un inode jamais inspecté par `check_tree` ; s'il contient un lien physique vers un fichier privé (créé hors sandbox), le provider I0 écrit l'état privé via ce lien — write-up. Le test « hardlink refusé » ne couvre pas ce cas : `check_tree` a couru sur un autre inode. Correction générale : le gate conserve et transmet le fd `O_PATH|O_NOFOLLOW` du workspace validé (même processus, sinon SCM_RIGHTS) ; `prepare` lie les règles via ce fd, vérifie `fstat` dev/ino avant `add_rule` et avant `fchdir` ; supprimer `workspace:PathBuf` et toute ré-résolution par chemin. Même traitement pour `root`.
+
+**F2 — Majeur (disponibilité/DoS local) : `read_leaves` exige un FS entièrement lisible.**
+Précondition : tout sous-arbre non lisible par l'UID — `/proc/<pid>/fd` ou `map_files` d'un autre UID (noyau standard), `/sys/kernel/debug` ou `/root` 0700, un dossier 0700 créé par un utilisateur local — ou `/proc/<pid>` évanescence (ENOENT). Localisation : `read_leaves` (`fs::read_dir(...)?`, `file_type()?`) et boucle d'ouverture des feuilles dans `prepare` (`biba-path-open`). Effet : `prepare` refuse ; un utilisateur non privilégié peut bloquer durablement tout lancement. Fail-closed mais DoS. Correction générale : pour un sous-arbre inaccessible/évanescént, ne pas ajouter de feuille (default-deny lecture — strictement plus sûr, pas un repli non confiné) et continuer ; réserver le refus aux erreurs inattendues.
+
+**F3 — Majeur (écart doc/politique) : READ universel vs « Walk only its ancestor chain ».**
+Localisation : doc de `read_leaves` vs implémentation. Effet : feuille READ sur `/proc` et tous les fichiers même-UID ; seccomp bloque `ptrace`/`process_vm_*` mais pas `/proc/<pid>/environ|mem` (selon Yama/dumpable, H4) ni la lecture des fichiers de l'UID. Correction générale : trancher la politique (contexte manquant) — si lecture universelle voulue, corriger le doc et exiger Yama=1 comme prérequis plateforme (durcissement) ; sinon ne générer des feuilles que pour la chaîne d'ancêtres + workspace.
+
+**F4 — Moyen : exclusion du privé par chemin, pas par inode.**
+Précondition : `Root/.swarm` remplacé par un symlink avant `prepare` (`is_dir()` le suit), ou alias via bind-mount/second montage ou lien physique créé hors sandbox. Localisation : `Sandbox::prepare` (construction de `private`, comparaisons dans `read_leaves`). Effet : l'inode privé reçoit une feuille READ via son autre chemin. Correction générale : exclusion par `(st_dev,st_ino)` du fd privé ; refuser symlink sur `.swarm` (`lstat`) ; refuser toute collision d'inode.
+
+**F5 — Moyen (FDs) : collision fd 0–2 du memfd.**
+Précondition : helper spawné avec stdin (ou stdout/stderr) fermé → `memfd_create` rend 0/1/2. Localisation : `PreparedExec::prepare` + `execute`. Effet : si fd==0, `dup2(0,0)` est un no-op puis `close(0)` supprime stdin ; si fd==1, stdout perdu. Correction générale : reloger le memfd hors 0–2 (`fcntl(F_DUPFD_CLOEXEC,3)`) avant attach ; ne fermer l'original que si >2.
+
+**F6 — Moyen (seccomp) : syscalls keyring non refusés.**
+Précondition : entrées de keyring même-UID (contexte manquant). Localisation : `kernel::seccomp`, liste `denied`. Effet : lecture/invalidate de keyrings du même UID — canal « même-UID authority » que le filtre prétend fermer. Correction générale : ajouter `SYS_add_key`, `SYS_request_key`, `SYS_keyctl` à `denied`.
+
+**F7 — Moyen (TOCTOU `check_tree`) : liens physiques insérés pendant la fenêtre.**
+Précondition : acteur même-UID non confiné crée `link(hors_workspace, ws/x)` entre `check_tree` et `restrict` (H1). Localisation : `check_tree` vs `enforce`. Effet : écriture croisée via le lien vers un fichier même-UID hors workspace. Correction générale : re-walk de vérification via fd juste avant `restrict`, et contrat moteur « aucun autre écrivain même-UID pendant la fenêtre » (identité hors paquet) ; limite résiduelle entre vérification et execve à documenter.
+
+**F8 — Mineur : double `set_current_dir` (`execute` puis `enforce`)** — fenêtre de course redondante ; un seul changement de répertoire, par fd (couvert par F1).
+
+Positifs à garder : pas de repli non confiné, refuse-open systématique ; NNP+Landlock+seccomp empilés et hérités par l'enfant ; garde ABI6/arch/x32 ; `close_range(CLOEXEC)` ; memfd scellé, allowlist d'environnement, chemins absolus, chevauchements vérifiés par composants ; continuité d'erreurs (primaire + cleanups, pas de double-close, pas de fuite de chemins).
+
+## 5. Verdict
+**request_changes.** Blocants : F1 (chaîne d'intégrité concrète), F2 (refus systématique/DoS local), F5, F6. F3/F4/F7 à traiter dans la même itération ou à expliciter comme risques acceptés côté moteur. Passage à `approve` conditionné à : corrections F1/F2/F5/F6, décision documentée sur F3/F4, et une recette moteur positive (aujourd'hui absente, déclarée).
+
+## 6. Limites (non-certification)
+Revue statique bornée ; l'ordre réel des gates, la fermeture de Root, l'autorité d'identité et le comportement du helper spawné restent hors de vérification. Le test natif vert ne prouve pas le comportement sur hôte multi-utilisateur standard (H2). Politique de lecture universelle et egress AF_INET supposées voulues (H4) — à confirmer. Ceci n'est pas une certification ni une preuve d'absence d'autres défauts.

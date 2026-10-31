@@ -4,6 +4,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from controlled_business_fault import GOOD, check_feature
 
@@ -12,7 +13,7 @@ ADAPTER = Path(__file__).with_name('autonomy_worker_adapter.py').resolve()
 
 class AdapterTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = tempfile.TemporaryDirectory(dir=fixture_area())
         self.addCleanup(self.temp.cleanup)
         self.base = Path(self.temp.name)
         self.copy = self.base / 'copies' / 'first'

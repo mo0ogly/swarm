@@ -4,6 +4,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from types import SimpleNamespace
 from rust_managed_result_recovery import publication_fault_git
@@ -16,7 +17,7 @@ class PublicationFaultDevice(unittest.TestCase):
     """Forward real command outcomes and inject only after the matching success."""
     def test_real_success_control_precedes_publication_refusal_device(self):
         """Exact argv and unchanged streams/status establish the device's trigger."""
-        with tempfile.TemporaryDirectory(prefix='managed-result-device-') as directory:
+        with tempfile.TemporaryDirectory(prefix='managed-result-device-', dir=fixture_area()) as directory:
             root=Path(directory);log=root/'argv.json';real=root/'real-git'
             real.write_text(f'#!{sys.executable}\nimport json,sys\nfrom pathlib import Path\nPath({str(log)!r}).write_text(json.dumps(sys.argv[1:]))\nprint("git-stdout")\nprint("git-stderr",file=sys.stderr)\nsys.exit(7 if "fail" in sys.argv else 0)\n')
             real.chmod(0o700);target=root/'result/report.md';marker=root/'injected.json';wrapper=root/'git'
@@ -33,7 +34,7 @@ class PublicationFaultDevice(unittest.TestCase):
 
     def test_existing_original_is_preserved_and_injection_error_is_visible(self):
         """A conflicting target cannot silently become a successful fault test."""
-        with tempfile.TemporaryDirectory(prefix='managed-result-conflict-') as directory:
+        with tempfile.TemporaryDirectory(prefix='managed-result-conflict-', dir=fixture_area()) as directory:
             root=Path(directory);real=root/'real-git';real.write_text(f'#!{sys.executable}\n');real.chmod(0o700)
             target=root/'report.md';target.write_bytes(b'original');marker=root/'marker';wrapper=root/'git'
             wrapper.write_bytes(publication_fault_git(real,target,'refs/swarm/attempts/agent',marker));wrapper.chmod(0o700)
@@ -54,7 +55,7 @@ class WatchDiagnostics(unittest.TestCase):
         Byte counts are fault-fixture inputs, never product policy or a watchdog.
         """
         import os
-        with tempfile.TemporaryDirectory(prefix='managed-watch-diagnostics-') as directory:
+        with tempfile.TemporaryDirectory(prefix='managed-watch-diagnostics-', dir=fixture_area()) as directory:
             root=Path(directory);binary=root/'swarm-fixture'
             binary.write_text(f'''#!{sys.executable}
 import json,os,signal,sys
@@ -83,7 +84,7 @@ signal.pause()
     def test_invalid_stdout_line_is_retained_before_json_refusal(self):
         """A codec error preserves the consumed original, not only later tail."""
         import os
-        with tempfile.TemporaryDirectory(prefix='managed-watch-codec-') as directory:
+        with tempfile.TemporaryDirectory(prefix='managed-watch-codec-', dir=fixture_area()) as directory:
             root=Path(directory);binary=root/'swarm-fixture'
             binary.write_text(f'#!{sys.executable}\nimport sys\nsys.stdout.buffer.write(b"invalid-frame\\n");sys.stdout.flush()\n')
             binary.chmod(0o700)
@@ -99,7 +100,7 @@ class RecoveryCleanup(unittest.TestCase):
     def test_recovery_and_restore_failures_both_survive(self):
         """The parked original survives a failed recovery and failed restoration."""
         import os
-        with tempfile.TemporaryDirectory(prefix='managed-recovery-cleanup-') as directory:
+        with tempfile.TemporaryDirectory(prefix='managed-recovery-cleanup-', dir=fixture_area()) as directory:
             root=Path(directory);storage=root/'managed';storage.mkdir();clone=root/'copy';clone.mkdir()
             (clone/'original').write_bytes(b'retained')
             (storage/'native-worker-agent.json').write_text(json.dumps(dict(path=str(clone))))

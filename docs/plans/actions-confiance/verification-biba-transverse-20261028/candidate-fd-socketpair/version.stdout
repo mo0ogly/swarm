@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "binary": {
+    "version": "devel",
+    "commit": "86c5ab2f3b60512eecb46729c47ac02924aaf65b",
+    "modified": true,
+    "build_date": "2026-10-28T17:35:27Z",
+    "provenance": "injected"
+  },
+  "diagnostic": {
+    "installed_cli": {
+      "available": true,
+      "version": "devel",
+      "commit": "86c5ab2f3b60512eecb46729c47ac02924aaf65b",
+      "modified": true,
+      "provenance": "injected"
+    },
+    "active_server": {
+      "available": false,
+      "version": null,
+      "commit": null,
+      "modified": null,
+      "provenance": "http",
+      "hint": "Aucune URL de session serveur fournie."
+    },
+    "candidate": {
+      "available": false,
+      "version": null,
+      "commit": null,
+      "modified": null,
+      "provenance": "git",
+      "hint": "Aucun magasin Root : la politique Git persistée n’est pas disponible."
+    },
+    "state": "unknown",
+    "differences": [],
+    "next_step": "Rendez accessibles les identités manquantes (active_server, candidate) puis relancez le diagnostic. Pour le serveur actif, fournissez son URL de session avec --server."
+  }
+}

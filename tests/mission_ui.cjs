@@ -7,7 +7,7 @@ const {spawn,spawnSync}=require('node:child_process');
 const puppeteer=require(process.env.PUPPETEER_MODULE||'puppeteer');
 const binary=path.resolve(process.argv[2]),outDir=path.resolve(process.argv[3]);
 fs.mkdirSync(outDir,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-graph-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-graph-'));
 const checks=[],errors=[],external=[];
 // Some restricted runners report EPERM after a successful synchronous child
 // (status 0 and complete output). Accept only that exact contradiction; every

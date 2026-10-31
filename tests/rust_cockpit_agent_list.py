@@ -13,7 +13,11 @@ must survive every reader; the Rust list must also publish JSON without --json,
 refuse unknown work and invalid extra CLI arguments, and, once a task exists,
 in --initial-tasks mode compare TODO actions, pause, priority and budgets; then
 refuse a dependent task with cockpit-task-projection-unported instead of
-manufacturing empty task_actions/reviews.
+manufacturing empty task_actions/reviews. With --initial-blocked, a public
+blocked transition with a nonempty blocker is itself compared (zero attempts,
+no extension or recovery action, advised start on a dependency-free blocked
+task) across pause, unpause and budget changes before an unsupported abandoned
+variant restores the refusal.
 
 Preconditions: two frozen local executables (--go-binary legacy reference,
 --rust-binary native) and one fresh --output directory; no live Root, no
@@ -31,7 +35,9 @@ providers/watch call, no timeout, watchdog or retry, and no launch or consent
 is ever inferred.
 
 Limits: initial-task mode covers TODO tasks without dependencies/history or
-planning/agents; default mode retains the original empty-work baseline; malformed
+planning/agents; initial-blocked mode covers blocked tasks with zero attempts
+only, and its abandoned variant uses the public transition verified by the parent; default mode retains the original
+empty-work baseline; malformed
 controls/priority corruption fixtures are not part of this harness; malformed
 public control requests are checked. Leap-second60 is not representable by the
 Python datetime parser; ordinary timestamps are bounded only by actual calls.
@@ -45,6 +51,8 @@ import subprocess
 import tempfile
 import time
 import traceback
+
+from fixture_area import fixture_area
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -218,7 +226,7 @@ class Fixture:
         self.output = output
         self.environment, self.stripped = sanitized_environment()
         self.root = (owned.root if owned is not None else
-                     Path(tempfile.mkdtemp(prefix='swarm-cockpit-agent-list-'))).resolve()
+                     Path(tempfile.mkdtemp(prefix='swarm-cockpit-agent-list-', dir=fixture_area()))).resolve()
         if owned is not None:
             self.environment = {k: v for k, v in owned.environment.items()
                                 if not any(m in k.upper() for m in CREDENTIAL_MARKERS)}
@@ -389,6 +397,144 @@ def initial_task_journey(fixture):
              None if ready else 'Budget estimatif insuffisant pour un nouveau départ.')
 
 
+def blocked_no_attempts_journey(fixture):
+    """Compare the blocked-no-attempt projection on the public fixture work.
+
+    One public `task update status blocked` transition with a nonempty blocker
+    turns the dependent witness into the supported blocked shape: zero
+    attempts, no gate, independent-review, previous-review, revalidation or
+    corrective-recovery record. The complete fourteen-key Go/Rust documents
+    must then match again with the unsatisfied prerequisite, edge order and
+    saved priority preserved, no extension or recovery action displayed and
+    the actual task status carried into the attempt projection; a fresh
+    dependency-free blocked task observes the blocked recommendation
+    (advised `start`) across pause, unpause and budget changes, while the
+    TODO witness task stays untouched and remains the resumed reference;
+    a public transition back to TODO proves recovery; finally a real abandoned
+    transition restores the explicit refusal. The parent verified these
+    transition contracts against the actual producer and public witness. No attempt history,
+    review, recovery or acceptance is ever manufactured.
+    """
+    def pair(label, ready, reason=None, task_id='dependent-task'):
+        """Full document comparison plus one readiness/reason observation."""
+        before = fixture.witness()
+        left, lw = fixture.list_document(fixture.go)
+        right, rw = fixture.list_document(fixture.rust)
+        fixture.snapshots.append(compare_lists(left, right, 'go', 'rust', lw, rw, label, fixture.root))
+        retained.publish(fixture.output / 'snapshots.json', fixture.snapshots)
+        fixture.check(label + '-documents-match', True)
+        task = right['pilotage']['tasks'][task_id]
+        start = next(a for a in right['task_actions'][task_id] if a['kind'] == 'start')
+        fixture.check(label + '-ready-and-start', task['ready'] is ready and start['disponible'] is ready)
+        if reason is not None:
+            fixture.check(label + '-reason', start.get('raison') == reason, start)
+        fixture.reader_immutability(before, label)
+        return right
+
+    current, _ = fixture.ok(fixture.rust, ['work', 'show', fixture.work])
+    fixture.ok(fixture.rust, ['task', 'update', fixture.work], dict(
+        schema_version=1, event_id='cockpit-agent-list-blocked-no-attempts',
+        expected_revision=current['work']['revision'], id='dependent-task',
+        status='blocked', blocker='Owned blocked-no-attempts witness'))
+    right = pair('blocked-no-attempts', False,
+                 'Dépendance non validée ou périmée : fixture-task.')
+    actions = {a['kind']: a for a in right['task_actions']['dependent-task']}
+    fixture.check('blocked-no-attempts-no-extension-or-recovery-actions',
+                  'extend-attempt' not in actions and 'authorize-recovery' not in actions)
+    fixture.check('blocked-no-attempts-keeps-graph-and-priority',
+                  right['pilotage']['tasks']['dependent-task']['waiting_on'] == ['fixture-task']
+                  and any(e['from_task_id'] == 'fixture-task' and e['to_task_id'] == 'dependent-task'
+                          and e['satisfied_now'] is False for e in right['pilotage']['edges'])
+                  and right['priority'] == {'fixture-task': 7})
+    fixture.check('blocked-no-attempts-validation-status',
+                  right['pilotage']['tasks']['dependent-task']['attempt']['validation_state'] == 'blocked')
+    fixture.check('blocked-no-attempts-post-delivery-false', right['post_delivery']['ready'] is False)
+
+    current, _ = fixture.ok(fixture.rust, ['work', 'show', fixture.work])
+    fixture.ok(fixture.rust, ['task', 'add', fixture.work], dict(
+        schema_version=1, event_id='cockpit-add-blocked-witness',
+        expected_revision=current['work']['revision'], id='blocked-witness',
+        title='Blocked recommendation witness', deliverable='Read-only observation',
+        criteria=['Preserve blocked recommendation facts']))
+    current, _ = fixture.ok(fixture.rust, ['work', 'show', fixture.work])
+    fixture.ok(fixture.rust, ['task', 'update', fixture.work], dict(
+        schema_version=1, event_id='cockpit-block-blocked-witness',
+        expected_revision=current['work']['revision'], id='blocked-witness',
+        status='blocked', blocker='Owned blocked recommendation witness'))
+    right = pair('blocked-recommendation', True, None, task_id='blocked-witness')
+    actions = {a['kind']: a for a in right['task_actions']['blocked-witness']}
+    # A wrongly empty extension/recovery reason would steal the advice onto a
+    # non-emitted action, leaving no conseillee at all; ['start'] proves both
+    # Go reasons were read nonempty through the pure projection.
+    fixture.check('blocked-recommendation-advises-start',
+                  [a['kind'] for a in right['task_actions']['blocked-witness']
+                   if a.get('conseillee')] == ['start'])
+    fixture.check('blocked-recommendation-submit-available',
+                  actions['submit']['disponible'] is True)
+    fixture.check('blocked-recommendation-retry-unavailable',
+                  actions['retry']['disponible'] is False
+                  and actions['retry'].get('raison')
+                  == 'Aucune tentative à relancer : choisir Lancer un agent.')
+    fixture.check('blocked-recommendation-no-extension-or-recovery',
+                  'extend-attempt' not in actions and 'authorize-recovery' not in actions)
+
+    # A positive saved allowance must not be mistaken for exhausted attempts.
+    # Exercise its minimum and current operator maximum, not a new policy cap.
+    settings, _ = fixture.ok(fixture.rust, ['engine-settings', 'show'])
+    maximum = int(settings['values']['task_max_attempts'])
+    fixture.check('blocked-attempt-policy-is-positive', maximum >= 1)
+    for allowance in dict.fromkeys([1, maximum]):
+        current, _ = fixture.ok(fixture.rust, ['work', 'show', fixture.work])
+        fixture.ok(fixture.rust, ['task', 'update', fixture.work], dict(
+            schema_version=1, event_id='cockpit-blocked-allowance-' + str(allowance),
+            expected_revision=current['work']['revision'], id='blocked-witness',
+            max_attempts=allowance))
+        observed = pair('blocked-positive-allowance-' + str(allowance), True,
+                        task_id='blocked-witness')
+        fixture.check('blocked-positive-allowance-no-extension-' + str(allowance),
+                      all(a['kind'] not in ('extend-attempt', 'authorize-recovery')
+                          for a in observed['task_actions']['blocked-witness']))
+
+    current, _ = fixture.ok(fixture.rust, ['work', 'show', fixture.work])
+    fixture.ok(fixture.rust, ['mission', 'pause', fixture.work], dict(
+        schema_version=1, event_id='cockpit-blocked-no-attempts-pause',
+        expected_revision=current['work']['revision'],
+        reason='Owned blocked-no-attempts pause witness'))
+    pair('blocked-no-attempts-paused', False,
+         "Départs suspendus : réautoriez les départs depuis l'en-tête du cockpit.",
+         task_id='blocked-witness')
+    current, _ = fixture.ok(fixture.rust, ['work', 'show', fixture.work])
+    fixture.ok(fixture.rust, ['mission', 'unpause', fixture.work], dict(
+        schema_version=1, event_id='cockpit-blocked-no-attempts-unpause',
+        expected_revision=current['work']['revision'],
+        reason='Resume while preserving the manual controls'))
+    for label, limit, reserve, ready in [('insufficient', 1, 2, False), ('restored', 10, 1, True)]:
+        current, _ = fixture.ok(fixture.rust, ['work', 'show', fixture.work])
+        fixture.ok(fixture.rust, ['budget', 'apply', fixture.work], dict(
+            schema_version=1, event_id='cockpit-blocked-budget-' + label,
+            expected_revision=current['work']['revision'], budget=dict(
+                limit_usd=limit, reserve_per_launch_usd=reserve,
+                estimate_source='Owned deterministic fixture', reference_date='2026-10-28')))
+        pair('blocked-recommendation-budget-' + label, ready,
+             None if ready else 'Budget estimatif insuffisant pour un nouveau départ.',
+             task_id='blocked-witness')
+
+    current, _ = fixture.ok(fixture.rust, ['work', 'show', fixture.work])
+    fixture.ok(fixture.rust, ['task', 'update', fixture.work], dict(
+        schema_version=1, event_id='cockpit-blocked-return-to-todo',
+        expected_revision=current['work']['revision'], id='blocked-witness', status='todo'))
+    resumed = pair('blocked-back-to-todo', True, task_id='blocked-witness')
+    fixture.check('blocked-back-to-todo-status',
+                  resumed['pilotage']['tasks']['blocked-witness']['attempt']['validation_state'] == 'todo')
+
+    # Real unsupported variant after the valid blocked and TODO recovery controls.
+    current, _ = fixture.ok(fixture.rust, ['work', 'show', fixture.work])
+    fixture.ok(fixture.rust, ['task', 'update', fixture.work], dict(
+        schema_version=1, event_id='cockpit-agent-list-abandoned-variant',
+        expected_revision=current['work']['revision'], id='blocked-witness',
+        status='abandoned'))
+
+
 def global_workspace_journey(go, rust, output):
     """Prove global overlap reason precedence using a valid queued native intent.
 
@@ -441,7 +587,8 @@ def global_workspace_journey(go, rust, output):
     print('COCKPIT_GLOBAL_OVERLAP_VERIFIED ' + str(len(observed.checks)), flush=True)
 
 
-def run(go, rust, output, initial_tasks=False, todo_dependencies=False):
+def run(go, rust, output, initial_tasks=False, todo_dependencies=False,
+        initial_blocked=False):
     """Drive the whole closed-fixture contract and publish the final result.
 
     Publishes the fixture birth and inputs records, then executes the legacy
@@ -635,6 +782,11 @@ def run(go, rust, output, initial_tasks=False, todo_dependencies=False):
                 check('todo-multiple-dependency-first-reason', multi['start'].get('raison') ==
                       'Dépendance non validée ou périmée : extra-task.')
                 fixture.reader_immutability(before, 'todo-multiple-dependency')
+            if initial_blocked:
+                blocked_no_attempts_journey(fixture)
+            elif todo_dependencies:
+                # Mode ancien conservé pour le reproducteur 244 : la tâche
+                # bloquée n'est pas lue, le list doit refuser explicitement.
                 current, _ = fixture.ok(rust, ['work', 'show', fixture.work])
                 fixture.ok(rust, ['task', 'update', fixture.work], dict(
                     schema_version=1, event_id='cockpit-agent-list-blocked-task',
@@ -684,7 +836,9 @@ def run(go, rust, output, initial_tasks=False, todo_dependencies=False):
             'consent_granted': False, 'global_watchdog': None,
             'command_timeout': None, 'retries': 0,
             'priority_corruption_fixture': 'left_to_parent_no_actual_schema_evidence',
-            'slice': ('todo-dependencies-no-history-agents-planning' if todo_dependencies else
+            'slice': ('blocked-no-attempts-' + ('todo-dependencies' if todo_dependencies else 'initial-todo')
+                      if initial_blocked else
+                      'todo-dependencies-no-history-agents-planning' if todo_dependencies else
                       'initial-todo-no-dependencies-history-agents-planning' if initial_tasks
                       else 'no-tasks-planning-agents; rust refuses cockpit-task-projection-unported')})
         print('COCKPIT_AGENT_LIST_VERIFIED ' + str(len(fixture.checks)), flush=True)
@@ -703,12 +857,14 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--initial-tasks', action='store_true', help='Require initial TODO task projection')
     parser.add_argument('--todo-dependencies', action='store_true', help='Require TODO dependency graph projection')
+    parser.add_argument('--initial-blocked', action='store_true', help='Require blocked-no-attempts projection comparison')
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False, mode=0o700)
     retained.publish(output / 'driver.py', Path(__file__).read_bytes())
     run(args.go_binary.resolve(strict=True), args.rust_binary.resolve(strict=True), output,
-        args.initial_tasks or args.todo_dependencies, args.todo_dependencies)
+        args.initial_tasks or args.todo_dependencies or args.initial_blocked,
+        args.todo_dependencies or args.initial_blocked, args.initial_blocked)
 
 
 if __name__ == '__main__':

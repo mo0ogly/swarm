@@ -12,6 +12,10 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import threading
 import time
 
@@ -141,7 +145,7 @@ def preflight(out, binary, pack_root):
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
-        with tempfile.TemporaryDirectory(prefix="swarm-memory-preflight-") as temporary:
+        with tempfile.TemporaryDirectory(prefix="swarm-memory-preflight-", dir=fixture_area()) as temporary:
             cwd = Path(temporary)
             schema = out / "response.schema.json"
             write_new(schema, response_schema)
@@ -195,7 +199,7 @@ def execute_case(pack_root, case_id, out, binary):
                                                "pack_sha256": pack_hash, "at": utc(), "automatic_retries": 0})
     schema = destination / "response.schema.json"
     write_new(schema, response_schema)
-    with tempfile.TemporaryDirectory(prefix="swarm-memory-model-") as temporary:
+    with tempfile.TemporaryDirectory(prefix="swarm-memory-model-", dir=fixture_area()) as temporary:
         args = command(binary, Path(temporary), schema, destination / "answer.json")
         print(json.dumps({"case_id": case_id, "state": "started", "model": MODEL, "effort": EFFORT}), flush=True)
         receipt = invoke(args, (pack_root / case["prompt"]).read_bytes(), destination)

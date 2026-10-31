@@ -1,0 +1,13 @@
+{
+  "owner": "Codex Biba APEX",
+  "cause": "Invocation omitted required --target-dir; argparse exit 2 before compilation",
+  "original": "candidate-first.out",
+  "sha256": "add6843e1ffa62e4e2fa45eef249dc79c7539e8d45629cc1c37f20d34266f4d9",
+  "resumption": "Explicit project-owned target .cache/rust-build-local supplied; fresh build directory, production default profile, no source edits during compile",
+  "status": "build_running_not_qualified",
+  "other_open": [
+    "Planner uses Root cwd and must receive engine-owned I0 output workspace",
+    "Validation command launcher outside shared provider transport",
+    "Workspace inode binding at confinement boundary remains to verify"
+  ]
+}

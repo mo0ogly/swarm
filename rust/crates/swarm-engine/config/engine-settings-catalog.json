@@ -1439,6 +1439,22 @@
    "nullable": false,
    "help": "Chemin absolu canonique du Root séparé servant de grand livre de règlement pour le vérificateur PA-09 en lecture seule (paea reconcile-effects). Un chemin ne désigne pas un grand livre initialisé et n'établit pas la séparation : le consommateur exige deux racines physiquement distinctes à chaque appel. Aucun effet, aucune autorité.",
    "introduced_schema_version": 49
+  },
+  {
+   "name": "web_login_ticket_seconds",
+   "label": "Connexion — durée du ticket à usage unique",
+   "unit": "seconds",
+   "nullable": false,
+   "help": "Durée de validité, en secondes strictement positives, d'un lien de connexion à usage unique créé par swarm open (web-ticket). Le ticket est consommé à la première utilisation ; il ne donne que l'accès de la clé locale du projet et n'expire pas les cookies déjà posés.",
+   "introduced_schema_version": 50
+  },
+  {
+   "name": "runtime_temporary_directory",
+   "label": "Dossier temporaire",
+   "unit": "text",
+   "nullable": false,
+   "help": "Répertoire où Swarm écrit ses fichiers temporaires (exporté comme TMPDIR au moteur et à ses processus enfants) et où tests et recettes créent leurs fixtures. Chemin absolu, ou relatif à la racine du projet ; jamais /tmp implicitement, effacé à chaque redémarrage. Créé en 0700 s'il manque. Pris en compte au prochain lancement d'une commande ou du serveur.",
+   "introduced_schema_version": 51
   }
  ]
 }

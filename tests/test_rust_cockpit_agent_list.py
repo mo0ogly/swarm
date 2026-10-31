@@ -8,6 +8,7 @@ import hashlib
 import os
 from pathlib import Path
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from datetime import datetime, timezone
 import rust_cockpit_agent_list as bench
@@ -31,7 +32,7 @@ class Comparator(unittest.TestCase):
             (moment, moment), (moment, moment), 'comparator-only', root)
 
     def test_project_identity_is_canonical_filesystem_bytes(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root = Path(directory) / 'réel'
             root.mkdir()
             alias = Path(directory) / 'alias'

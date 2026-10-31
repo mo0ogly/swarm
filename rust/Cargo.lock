@@ -1441,6 +1441,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "swarm-authority"
+version = "0.1.0"
+dependencies = [
+ "rustix",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "swarm-enrollment-bootstrap",
+ "swarm-enrollment-config",
+ "swarm-identity-contract",
+]
+
+[[package]]
 name = "swarm-biba-linux"
 version = "0.1.0"
 dependencies = [

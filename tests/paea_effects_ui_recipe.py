@@ -5,7 +5,7 @@ Builds nothing itself: the recipe declares the cargo build and cargo test steps
 and passes the freshly built swarm-rust binary here. The driver runs the real
 served page against an isolated 0700 fixture root (real init, real web server,
 real session credential) and archives the full browser evidence. No provider,
-no paid call, no live mission database; the driver only reads the two guarded
+no paid call, no live mission database; the driver only reads the three guarded
 GET endpoints through the page and never performs a guarded call.
 """
 import argparse,json,os,subprocess,sys,traceback
@@ -31,7 +31,7 @@ def run(binary: Path, output: Path) -> None:
         print(result.stderr.decode(errors="replace"), file=sys.stderr)
         raise SystemExit(f"browser run failed: exit {result.returncode}")
     proof = json.loads((output / "paea-effects-ui.json").read_bytes())
-    assert len(proof["checks"]) == 5, proof["checks"]
+    assert len(proof["checks"]) == 7, proof["checks"]
     assert proof["unexpected_diagnostics"] == [], proof["unexpected_diagnostics"]
     assert proof["expected_denials"] >= 1, "expected fixture refusals must be recorded"
     digest = subprocess.run(
@@ -45,7 +45,7 @@ def run(binary: Path, output: Path) -> None:
         "binary_sha256": digest,
         "scope": "real served browser page, isolated 0700 fixture; no provider, no guarded call",
     }, indent=2) + "\n")
-    print("PAEA_EFFECTS_UI_BROWSER_VERIFIED 5", flush=True)
+    print("PAEA_EFFECTS_UI_BROWSER_VERIFIED 7", flush=True)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

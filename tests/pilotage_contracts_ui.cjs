@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto');
 const {spawn,execFileSync}=require('node:child_process'),assert=require('node:assert/strict'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-contracts-')),checks=[],errors=[];
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-contracts-')),checks=[],errors=[];
 const fingerprint=crypto.createHash('sha256').update(fs.readFileSync(binary)).digest('hex');
 const cli=(args,input)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{encoding:'utf8',input:input?JSON.stringify(input):undefined}));
 cli(['init']);const work=cli(['work','create'],{schema_version:1,event_id:crypto.randomUUID(),expected_revision:0,title:'Contrats pilotage',objective:'Recette isolée',scope:'Fixtures uniquement',criteria:['Identités exactes'],next:'Examiner'}).work.id;cli(['autonomy',work,'manuel']);

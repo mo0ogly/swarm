@@ -1,10 +1,11 @@
 'use strict';
 // Bounded browser qualification of the PA-08 effect-state page on the REAL
 // native web server (fresh binary, isolated 0700 fixture root, real session
-// login). Covers: loading → explicit empty states (unbound git-call +
-// uninitialized journals), refusal visibility without session, FR/EN, both
-// themes, keyboard focus and mobile widths. No effect, no one-shot call, no
-// acceptance authority; the page only reads the two guarded GET endpoints.
+// login). Covers: loading → explicit empty states (preview unavailable +
+// unbound git-call + uninitialized journals), refusal visibility without
+// session, FR/EN, both themes, keyboard focus and mobile widths. No effect,
+// no one-shot call, no acceptance authority; the page only reads the three
+// guarded GET endpoints.
 const assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),cp=require('node:child_process');
 const pup=require(path.join(process.cwd(),'node_modules','puppeteer'));
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);
@@ -61,6 +62,13 @@ let browser;
    // 1. Explicit empty states, never a fake success: git-call unbound and
    //    both journals uninitialized (fixture has no ledger setting → the
    //    reconciliation endpoint refuses 501 and the refusal stays visible).
+   await page.waitForFunction(()=>document.getElementById('preview-status').dataset.state!=='loading',{timeout:15000});
+   const prevState=await page.$eval('#preview-status',e=>({state:e.dataset.state,text:e.textContent}));
+   assert.equal(prevState.state,'empty','preview without bound source must be an explicit empty state');
+   if(lang==='fr')assert.ok(prevState.text.includes('Aperçu explicitement indisponible'),'FR unavailable message, got: '+prevState.text);
+   else assert.ok(/Preview explicitly unavailable/i.test(prevState.text),'EN unavailable message, got: '+prevState.text);
+   assert.ok(!await page.$eval('#preview-detail',e=>!e.hidden||e.querySelector('button')),'preview detail stays hidden with no consent control');
+   checks.push(lang+': explicit preview-unavailable state, no consent control (no fake approval)');
    await page.waitForFunction(()=>document.getElementById('gitcall-status').dataset.state!=='loading',{timeout:15000});
    const gitState=await page.$eval('#gitcall-status',e=>({state:e.dataset.state,text:e.textContent}));
    assert.equal(gitState.state,'empty','unbound git-call must be an explicit empty state');

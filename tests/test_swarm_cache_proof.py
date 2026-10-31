@@ -1,4 +1,5 @@
 """Cached local delivery must retain qualification; fake compiler, no live Root."""
+from fixture_area import fixture_area
 import importlib.util,json,tempfile,unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -8,7 +9,7 @@ class CacheProof(unittest.TestCase):
     """Exercise prepare's fast path; rebuilding is a sentinel, never Cargo."""
     def exercise(self,missing=False,invalid=False):
         """Use inert files and mocked proof/compiler outcomes; preserve image on refusal."""
-        with tempfile.TemporaryDirectory() as d:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as d:
             root=Path(d);(root/'deploy').mkdir();binary=root/'candidate';binary.write_bytes(b'image')
             notes={'summary':{'fr':'Note','en':'Note'},'items':[{'fr':'Note','en':'Note'}]};(root/'version_history.json').write_text(json.dumps({'local_changes':notes,'releases':[]}));state={'schema_version':2,'engine':'rust','candidate_digest':'same','version':'v0.1.1-dev.1','artifact':str(binary),'binary_sha256':'a'*64,'evidence':str(root/'.cache/proof'),'effective_inputs':{}};(root/'deploy/local-build.json').write_text(json.dumps(state))
             builder=SimpleNamespace(profile=SimpleNamespace(digest=lambda p:'a'*64),release=lambda v:True,build=lambda *a:(_ for _ in ()).throw(RuntimeError('fresh-build-selected')))

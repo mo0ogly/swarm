@@ -3,7 +3,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
 const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-guidance-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-guidance-'));
 const cli=(args,input,lang='fr',json=true)=>{const v=execFileSync(binary,['--root',root,'--lang',lang,...(json?['--json']:[]),...args,...(input?['--input','-']:[])],{encoding:'utf8',input:input?JSON.stringify(input):undefined});return json?JSON.parse(v):v};
 cli(['init']);
 fs.writeFileSync(path.join(root,'.swarm/providers.json'),JSON.stringify({schema_version:1,providers:{'fixture-worker':{command:'/usr/bin/python3',args:['-c','print("unused fixture")'],env_allow:[]}}}));

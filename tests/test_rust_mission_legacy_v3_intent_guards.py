@@ -7,6 +7,7 @@ from pathlib import Path
 import signal
 import sys
 import tempfile
+from fixture_area import fixture_area
 import types
 import unittest
 from unittest.mock import Mock, patch
@@ -102,7 +103,7 @@ class LegacyV3Guards(unittest.TestCase):
 
     def test_bundle_requires_exact_qualified_old_binary_and_confined_source_bytes(self):
         """A minimal inventory is valid locally; changed bytes, oldbinary or escaping paths refuse."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             base=Path(temporary); root=base/'root'; (root/'tests').mkdir(parents=True)
             source=root/'tests/rust_owned.py'; source.write_text('x=1\n')
             binary=base/'old'; binary.write_bytes(b'normal-qualified')
@@ -122,7 +123,7 @@ class LegacyV3Guards(unittest.TestCase):
 
     def test_loaded_historical_imports_reject_current_fallback_and_missing_module(self):
         """Only exact loaded rust_* inventory qualifies; preserve real stdlib modules in mocks."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             source=Path(temporary)/'rust_owned.py'; source.write_text('x=1\n')
             files={source:subject.digest(source.read_bytes())}
             kept={name:value for name,value in sys.modules.items() if not name.startswith('rust_')}

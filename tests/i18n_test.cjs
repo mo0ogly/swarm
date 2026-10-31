@@ -29,7 +29,7 @@ vm.runInNewContext(fs.readFileSync('web/pilot-graph.js','utf8'),graphContext);
 assert.equal(graphContext.module.exports.guidance({}), 'Complete: deliverable, success criterion, instructions');
 {
  const cp=require('node:child_process'),os=require('node:os'),path=require('node:path');
- const fixture=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-i18n-build-'));
+ const fixture=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-i18n-build-'));
  try{
   fs.mkdirSync(path.join(fixture,'locales'));fs.mkdirSync(path.join(fixture,'web'));
   fs.writeFileSync(path.join(fixture,'locales/en.json'),JSON.stringify({Langue:'Language'}));

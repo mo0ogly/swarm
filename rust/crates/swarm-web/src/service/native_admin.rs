@@ -34,6 +34,9 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/paea-lab.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-lab.html"))),
         "/paea-effects.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-effects.html"))),
         "/paea-effects.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea-effects.js"))),
+        "/paea-approval-form.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea-approval-form.js"))),
+        "/paea-consent.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-consent.html"))),
+        "/paea-consent.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea-consent.js"))),
         "/paea-lab.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea-lab.js"))),
         "/paea.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea.js"))),
         "/paea.css"=>Some(("text/css; charset=utf-8",include_bytes!("../../../../../web/paea.css"))),
@@ -193,8 +196,8 @@ fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
 
 /// Respond only after the caller checks the scoped cookie/exact Host and CSRF for
 /// non-GET/HEAD methods. Assets cannot mutate Root; unsupported methods return405.
-/// Shared CSP/no-store/HEAD behavior applies. The page truthfully hosts only native
-/// mission reads, settings and unused-instruction rejection, not complete parity.
+/// Shared CSP/no-store/HEAD behavior applies. The page hosts native reads and
+/// explicitly ported task/settings/instruction edits, not complete parity.
 /// Explicit writes reuse protected Root APIs and their revision/ownership checks;
 /// asset delivery itself grants no mutation or complete workflow authority.
 pub(super) fn reply(r: &Request<Vec<u8>>) -> Result<HttpReply, HttpServiceError> {

@@ -15,6 +15,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from unittest.mock import patch
 
@@ -41,7 +42,7 @@ class CanonicalVerifier(unittest.TestCase):
 
     def setUp(self):
         """Allocate one isolated root per method and preserve no live state."""
-        self.temporary = tempfile.TemporaryDirectory(prefix='paea-verifier-')
+        self.temporary = tempfile.TemporaryDirectory(prefix='paea-verifier-', dir=fixture_area())
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
 

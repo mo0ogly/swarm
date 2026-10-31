@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """T7 reproducible checks: isolated browser fixtures, fingerprints, no live DB."""
 import hashlib,json,pathlib,subprocess,sys,tempfile
+from fixture_area import fixture_area
 ROOT=pathlib.Path(__file__).resolve().parents[2]
 FILES=('web/mission.js','web/prephase-conversion.js','web/prephase-editor.js','web/prepare.html','web/prephase.js','web/i18n-en.js','locales/en.json','tests/prelaunch_diagnostic_ui.cjs')
 mode=sys.argv[1] if len(sys.argv)>1 else 'all'
@@ -14,7 +15,7 @@ if mode in ('entry','all'):
  assert (ROOT/'node_modules/puppeteer').is_dir()
  print('PASS prerequisites')
 if mode in ('browser','all'):
- with tempfile.TemporaryDirectory(prefix='swarm-t7-check-') as d:
+ with tempfile.TemporaryDirectory(prefix='swarm-t7-check-', dir=fixture_area()) as d:
   binary=str(pathlib.Path(d)/'swarm')
   run(['go','build','-o',binary,'./cmd/swarm'])
   run(['node','tests/prelaunch_diagnostic_ui.cjs',binary,str(out)])

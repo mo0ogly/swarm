@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -188,7 +189,7 @@ class SummaryReference(unittest.TestCase):
         return subprocess.run([sys.executable, str(ROOT / "tools/memory-evaluation/summarization.py"), "--history", str(root / "history.json"), *map(str, argv)], text=True, capture_output=True)
 
     def test_real_cli_progression_and_contradiction_preserve_source_files(self):
-        with tempfile.TemporaryDirectory() as name:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as name:
             root = Path(name)
             source = root / "history.json"
             source.write_text(json.dumps(self.history, ensure_ascii=False))
@@ -215,7 +216,7 @@ class SummaryReference(unittest.TestCase):
 
     def test_cli_invalid_json_duplicate_fields_and_nonfinite_values_fall_back(self):
         for raw in ["", "{", '{"schema_version":1,"schema_version":1}', '{"value":NaN}', '{"value":' + '9' * 5000 + '}']:
-            with self.subTest(prefix=raw[:40]), tempfile.TemporaryDirectory() as name:
+            with self.subTest(prefix=raw[:40]), tempfile.TemporaryDirectory(dir=fixture_area()) as name:
                 root = Path(name)
                 (root / "history.json").write_text(json.dumps(self.history))
                 (root / "bad.json").write_text(raw)
@@ -224,7 +225,7 @@ class SummaryReference(unittest.TestCase):
                 self.assertEqual(json.loads((root / "result.json").read_text())["recent_messages"], self.history["messages"])
 
     def test_cli_existing_output_and_invalid_history_are_explicit_errors(self):
-        with tempfile.TemporaryDirectory() as name:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as name:
             root = Path(name)
             source = root / "history.json"
             source.write_text(json.dumps(self.history))

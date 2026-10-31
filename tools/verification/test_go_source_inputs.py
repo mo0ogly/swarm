@@ -7,6 +7,10 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import unittest
 
 HERE = Path(__file__).resolve().parent
@@ -20,7 +24,7 @@ class GoSourceInputsTests(unittest.TestCase):
     """Preserve a failed private fixture; successful fixtures are regenerable."""
     def setUp(self):
         """Create a real local module with a selected embedded byte payload."""
-        self.root = Path(tempfile.mkdtemp(prefix="swarm-go-input-test107-"))
+        self.root = Path(tempfile.mkdtemp(prefix="swarm-go-input-test107-", dir=fixture_area()))
         subprocess.run(["git", "init", "--quiet", str(self.root)], check=True)
         language = re.search(r"(?m)^go\s+([0-9.]+)", (ROOT / "go.mod").read_text()).group(1)
         (self.root / "go.mod").write_text("module fixture.local/source\n\ngo " + language + "\n")

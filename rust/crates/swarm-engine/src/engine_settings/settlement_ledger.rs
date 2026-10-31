@@ -60,7 +60,8 @@ mod tests {
         // The installation default designates the standard separate ledger
         // location; a path never designates an initialized ledger nor proves
         // separation — the consumer enforces distinct roots at every call.
-        assert_eq!(s.schema_version(), 49);
+        // v50/v51 (login ticket, temporary directory) are later independent groups.
+        assert_eq!(s.schema_version(), 51);
         assert_eq!(
             s.paea_settlement_ledger_policy().unwrap(),
             "/var/lib/swarm/paea-settlement-ledger"
@@ -72,6 +73,8 @@ mod tests {
         let s = EngineSettingsValues::installation_defaults().unwrap();
         let mut v = serde_json::to_value(&s).unwrap();
         v.as_object_mut().unwrap().remove("paea_settlement_ledger_root");
+        v.as_object_mut().unwrap().remove("web_login_ticket_seconds");
+        v.as_object_mut().unwrap().remove("runtime_temporary_directory");
         let s: EngineSettingsValues = serde_json::from_value(v).unwrap();
         s.validate().unwrap();
         assert_eq!(s.schema_version(), 48);
@@ -91,7 +94,7 @@ mod tests {
                 .insert("paea_settlement_ledger_root".into(), raw.into());
             let s: EngineSettingsValues = serde_json::from_value(v).unwrap();
             s.validate().unwrap();
-            assert_eq!(s.schema_version(), 49);
+            assert_eq!(s.schema_version(), 51);
             assert_eq!(s.paea_settlement_ledger_policy().unwrap(), raw);
         }
     }

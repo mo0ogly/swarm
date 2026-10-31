@@ -609,6 +609,331 @@ mod tests {
         std::fs::remove_dir_all(root).unwrap();
     }
 
+    /// After the admitted artifact is mutated in place, the retained admission
+    /// must be a dead end and the only legitimate continuations must be cancel
+    /// (settling the stale intention) or a fresh admission binding the mutated
+    /// bytes. Concretely: the queued-boundary inspector refuses the mutated
+    /// consumption with its typed code and no SQL mutation; replaying the same
+    /// event id returns the stale queued row unchanged (replay never
+    /// re-observes, so it cannot heal the retained scope); a parallel fresh
+    /// admission on the same workspace is refused (agent-launch-workspace-busy)
+    /// while the stale row is still queued; cancelling settles the stale
+    /// intention (agent interrupted/desired stop, task blocked with the
+    /// interrupted outcome, attempt ended, work revision advanced, reservation
+    /// released); a fresh event id then re-observes the current bytes and
+    /// commits with a different preflight scope; restoring the original bytes
+    /// must then refuse the new agent's consumption (agent-execution-preflight-
+    /// changed), proving the new admission bound the mutated digest, not the
+    /// original one; the cancelled row itself can never be consumed (desired
+    /// stop / terminal status). The provider is a test-owned copy under the
+    /// fixture root, never an installed or shared binary; no child process,
+    /// live database, identity or OS-confinement claim is involved, and this
+    /// grants no execution permission.
+    #[test]
+    fn preflight_admitted_artifact_mutation_forces_fresh_admission_binding_mutated_digest() {
+        use std::os::unix::fs::DirBuilderExt;
+        use std::os::unix::fs::PermissionsExt;
+        let root = std::env::temp_dir().join(crate::generate_identifier("readmit82-").unwrap());
+        std::fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
+        eprintln!("owned readmission fixture: {}", root.display());
+        let mut store =
+            crate::RootStore::initialize(root.as_path(), &mut crate::SystemEnvironment).unwrap();
+        let work = store
+            .execute_external(
+                "",
+                "work.create",
+                br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Title","objective":"Goal","scope":"Fixture","criteria":["Proof"]}"#,
+                &mut crate::SystemEnvironment,
+            )
+            .unwrap()
+            .result
+            .work
+            .id;
+        store
+            .execute_external(
+                &work,
+                "task.add",
+                br#"{"schema_version":1,"event_id":"add","expected_revision":1,"id":"task","title":"Task","deliverable":"Report","criteria":["Proof"]}"#,
+                &mut crate::SystemEnvironment,
+            )
+            .unwrap();
+        // Test-owned provider copy under the fixture root; never /bin/cat.
+        let provider_path = root.join("fixture-provider");
+        std::fs::write(&provider_path, b"#!/bin/cat\nfixture provider witness\n").unwrap();
+        std::fs::set_permissions(
+            &provider_path,
+            std::fs::Permissions::from_mode(0o755),
+        )
+        .unwrap();
+        let setup = LocalDirectory::open(&root.join(".swarm")).unwrap();
+        let catalogue = format!(
+            "{{\"schema_version\":1,\"providers\":{{\"fixture\":{{\"command\":\"{}\",\"args\":[]}}}}}}",
+            provider_path.display()
+        );
+        setup.publish("providers.json", catalogue.as_bytes()).unwrap();
+        setup.close().unwrap();
+        // Admission "session": work.create (+1) → task.add (+1) → admission (+1).
+        let request = crate::decode_launch(
+            br#"{"schema_version":1,"event_id":"session","expected_revision":2,"task_id":"task","provider":"fixture"}"#,
+        )
+        .unwrap();
+        let launched = store
+            .prepare_agent_launch(&work, &request, false, &mut crate::SystemEnvironment)
+            .unwrap();
+        assert!(launched.created);
+        assert_eq!(launched.agent.status, "queued");
+        let original_scope = launched
+            .agent
+            .preflight
+            .expect("admission must retain its preflight receipt")
+            .scope;
+        assert!(!original_scope.is_empty());
+        let settings = store.settings().unwrap();
+        let digest = crate::agent_launch_preflight::hash;
+        let original_digest = digest(&std::fs::read(&provider_path).unwrap());
+        // Mutate the admitted artifact in place before any consumption attempt.
+        std::fs::write(&provider_path, b"#!/bin/cat\nfixture provider WITNESS MUTATED\n")
+            .unwrap();
+        let mutated_digest = digest(&std::fs::read(&provider_path).unwrap());
+        assert_ne!(original_digest, mutated_digest, "mutation must change bytes");
+        // 1. The retained admission can no longer pass the queued boundary.
+        {
+            let db = rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
+            let directory = LocalDirectory::open(&root.join(".swarm")).unwrap();
+            let tx = db.unchecked_transaction().unwrap();
+            let result = inspect(
+                &tx,
+                root.as_path(),
+                &directory,
+                &settings,
+                "session",
+                ExecutionStage::Queued,
+            );
+            tx.rollback().unwrap();
+            db.close().unwrap();
+            directory.close().unwrap();
+            let error = match result {
+                Err(error) => error,
+                Ok(_) => panic!("mutated admitted artifact consumed by retained admission"),
+            };
+            let mut code: Option<String> = None;
+            let mut current: Option<&(dyn std::error::Error + 'static)> = Some(&error);
+            while let Some(error) = current {
+                if let Some(error) = error.downcast_ref::<AgentLaunchError>() {
+                    code = Some(error.code().to_string());
+                }
+                current = error.source();
+            }
+            assert_eq!(
+                code.as_deref(),
+                Some("agent-execution-preflight-changed"),
+                "wrong refusal family for mutated retained admission: {error}"
+            );
+        }
+        let before = {
+            let db = rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
+            let before = admission_snapshot(&db);
+            db.close().unwrap();
+            before
+        };
+        // 2. Replaying the same event id never re-observes: the stale queued row
+        //    comes back unchanged, so the retained admission cannot heal itself.
+        let replay = store
+            .prepare_agent_launch(&work, &request, false, &mut crate::SystemEnvironment)
+            .unwrap();
+        assert!(!replay.created, "replay must not create a new admission");
+        assert_eq!(replay.agent.id, "session");
+        assert_eq!(replay.agent.status, "queued");
+        assert_eq!(
+            replay.agent.preflight.as_ref().map(|p| p.scope.as_str()),
+            Some(original_scope.as_str()),
+            "replay must return the retained scope unchanged"
+        );
+        {
+            let db = rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
+            let after = admission_snapshot(&db);
+            db.close().unwrap();
+            assert_eq!(after, before, "replay must mutate no recorded row");
+        }
+        // 3. A fresh admission on the same workspace is refused while the stale
+        //    row is still queued: the lane is occupied, no parallel bypass.
+        let bypass = crate::decode_launch(
+            br#"{"schema_version":1,"event_id":"bypass","expected_revision":3,"task_id":"task","provider":"fixture"}"#,
+        )
+        .unwrap();
+        {
+            let mut db =
+                rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
+            let mut env = crate::SystemEnvironment;
+            let directory = LocalDirectory::open(&root.join(".swarm")).unwrap();
+            let result = crate::agent_launch::prepare(
+                &mut db,
+                crate::agent_launch::PreparationRoot {
+                    root: root.as_path(),
+                    dir: &directory,
+                    settings: &settings,
+                    fence: None,
+                },
+                &work,
+                &bypass,
+                false,
+                &mut env,
+            );
+            directory.close().unwrap();
+            let error = match result {
+                Err(error) => error,
+                Ok(_) => panic!("parallel admission bypassed the stale queued lane"),
+            };
+            assert_eq!(
+                error.code(),
+                "agent-launch-workspace-busy",
+                "wrong refusal for parallel admission: {error}"
+            );
+        }
+        // 4. Cancelling settles the stale intention; no bytes change anywhere.
+        let mut store = crate::RootStore::open(root.as_path(), true).unwrap();
+        let cancelled = store
+            .cancel_queued_agent("session", &mut crate::SystemEnvironment)
+            .unwrap();
+        assert_eq!(cancelled.status, "interrupted");
+        assert_eq!(cancelled.stop_kind, "operateur");
+        assert_eq!(cancelled.desired, "stop");
+        assert!(!cancelled.ended.is_empty());
+        {
+            let db = rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
+            let after = admission_snapshot(&db);
+            db.close().unwrap();
+            // Same tables, but the settlement legitimately rewrote agents/works.
+            let agents = &after[0].1;
+            let rows = &before[0].1;
+            assert_eq!(agents.len(), rows.len(), "no extra agent row may appear");
+            let reservations = &after[1].1;
+            assert!(
+                reservations
+                    .iter()
+                    .all(|row| row[3] == Value::Text("released".into())),
+                "cancellation must release every reservation: {reservations:?}"
+            );
+            let work_revision: i64 = match &after[4].1[0][1] {
+                Value::Integer(v) => *v,
+                other => panic!("unexpected work revision cell: {other:?}"),
+            };
+            assert_eq!(work_revision, 4, "settlement must advance the work revision");
+            let body = match &after[0].1[0][5] {
+                Value::Text(t) => t.clone(),
+                Value::Blob(t) => String::from_utf8(t.clone()).unwrap(),
+                other => panic!("unexpected agent body cell: {other:?}"),
+            };
+            assert!(
+                body.contains("Démarrage annulé avant prise en charge"),
+                "cancelled agent must carry the settlement activity: {body}"
+            );
+        }
+        // 5. A fresh event id re-observes the current (mutated) bytes and binds
+        //    them: the new admission must commit with a different scope.
+        let readmission_request = crate::decode_launch(
+            br#"{"schema_version":1,"event_id":"readmit","expected_revision":4,"task_id":"task","provider":"fixture"}"#,
+        )
+        .unwrap();
+        let readmitted = {
+            let mut store = crate::RootStore::open(root.as_path(), true).unwrap();
+            let outcome = store
+                .prepare_agent_launch(
+                    &work,
+                    &readmission_request,
+                    false,
+                    &mut crate::SystemEnvironment,
+                )
+                .unwrap();
+            store.close().unwrap();
+            outcome
+        };
+        assert!(readmitted.created, "fresh admission must be created");
+        assert_eq!(readmitted.agent.status, "queued");
+        assert_ne!(readmitted.agent.id, cancelled.id);
+        let new_scope = readmitted
+            .agent
+            .preflight
+            .expect("fresh admission must retain its preflight receipt")
+            .scope;
+        assert_ne!(
+            original_scope, new_scope,
+            "fresh admission must bind the mutated bytes, not the original scope"
+        );
+        // The task moved blocked → running with a fresh recorded attempt owned
+        // by the new admission's identity.
+        {
+            let db = rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
+            let body: Vec<u8> = db
+                .prepare("SELECT CAST(body AS BLOB) FROM works WHERE id=?")
+                .unwrap()
+                .query_row([&work], |row| row.get(0))
+                .unwrap();
+            db.close().unwrap();
+            let body = String::from_utf8(body).unwrap();
+            assert!(
+                body.contains("\"status\":\"running\""),
+                "fresh admission must move the task to running: {body}"
+            );
+        }
+        // 6. Symmetry closure: restore the original bytes; the NEW admission's
+        //    consumption must refuse, proving it bound the mutated digest.
+        std::fs::write(&provider_path, b"#!/bin/cat\nfixture provider witness\n").unwrap();
+        assert_eq!(digest(&std::fs::read(&provider_path).unwrap()), original_digest);
+        {
+            let db = rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
+            let directory = LocalDirectory::open(&root.join(".swarm")).unwrap();
+            let tx = db.unchecked_transaction().unwrap();
+            let result = inspect(
+                &tx,
+                root.as_path(),
+                &directory,
+                &settings,
+                "readmit",
+                ExecutionStage::Queued,
+            );
+            tx.rollback().unwrap();
+            db.close().unwrap();
+            directory.close().unwrap();
+            let error = match result {
+                Err(error) => error,
+                Ok(_) => panic!("restored bytes must not satisfy the mutated binding"),
+            };
+            let mut code: Option<String> = None;
+            let mut current: Option<&(dyn std::error::Error + 'static)> = Some(&error);
+            while let Some(error) = current {
+                if let Some(error) = error.downcast_ref::<AgentLaunchError>() {
+                    code = Some(error.code().to_string());
+                }
+                current = error.source();
+            }
+            assert_eq!(
+                code.as_deref(),
+                Some("agent-execution-preflight-changed"),
+                "wrong refusal family for restored bytes on new admission: {error}"
+            );
+        }
+        // 7. The cancelled row can never be consumed again.
+        {
+            let db = rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
+            let directory = LocalDirectory::open(&root.join(".swarm")).unwrap();
+            let tx = db.unchecked_transaction().unwrap();
+            let result = inspect(
+                &tx,
+                root.as_path(),
+                &directory,
+                &settings,
+                "session",
+                ExecutionStage::Queued,
+            );
+            tx.rollback().unwrap();
+            db.close().unwrap();
+            directory.close().unwrap();
+            assert!(result.is_err(), "cancelled admission must never be consumable");
+        }
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
     #[test]
     fn preflight_output_claims_before_permission_refuse_and_recover() {
         use std::os::unix::fs::DirBuilderExt;

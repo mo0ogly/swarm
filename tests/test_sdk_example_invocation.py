@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools/verification'))
@@ -20,7 +21,7 @@ class InvocationTests(unittest.TestCase):
         exact boundary, not PASS. This checks record validation only; actual
         SDK feature/source qualification remains a separate retained build.
         """
-        with tempfile.TemporaryDirectory(prefix='sdk-invocation-') as directory:
+        with tempfile.TemporaryDirectory(prefix='sdk-invocation-', dir=fixture_area()) as directory:
             root = Path(directory)
             keys = ['RUSTFLAGS', 'CARGO_ENCODED_RUSTFLAGS', 'RUSTC_WRAPPER',
                     'RUSTC_WORKSPACE_WRAPPER', 'CARGO_BUILD_TARGET', 'RUSTUP_TOOLCHAIN', 'CARGO_HOME']

@@ -11,6 +11,7 @@ import select
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import time
 import traceback
 import urllib.error
@@ -23,7 +24,7 @@ def main():
     parser.add_argument("binary",type=Path);parser.add_argument("output",type=Path)
     args=parser.parse_args(); binary=args.binary.resolve(); out=args.output.resolve()
     out.mkdir(mode=0o700,parents=True,exist_ok=False)
-    root=Path(tempfile.mkdtemp(prefix="swarm-summary-source-")); repo=Path(__file__).resolve().parents[1]
+    root=Path(tempfile.mkdtemp(prefix="swarm-summary-source-", dir=fixture_area())); repo=Path(__file__).resolve().parents[1]
     commands=[];checks=[];server=None;active=None
     def sha(raw):return hashlib.sha256(raw).hexdigest()
     def save(name,value):

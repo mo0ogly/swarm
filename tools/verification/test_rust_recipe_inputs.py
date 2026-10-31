@@ -7,6 +7,10 @@ from pathlib import Path
 import json
 import sys
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -26,7 +30,7 @@ class RustRecipeInputs(unittest.TestCase):
             if not any(pattern.startswith('rust/') for pattern in manifest['inputs']):
                 continue
             recipes.append(path)
-            with self.subTest(recipe=path.name), tempfile.TemporaryDirectory() as temporary:
+            with self.subTest(recipe=path.name), tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
                 selected = snapshot(ROOT, manifest['inputs'], Path(temporary), path)
                 missing = sorted(str(p.relative_to(ROOT)) for p in assets
                                  if str(p.relative_to(ROOT)) not in selected)

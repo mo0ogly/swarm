@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('assert'),fs=require('fs'),path=require('path'),os=require('os'),cp=require('child_process'),pup=require('puppeteer');
-const binary=path.resolve(process.argv[2]),outdir=path.resolve(process.argv[3]);fs.mkdirSync(outdir,{recursive:true});const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-delegation-ui-')),checks=[],errors=[];
+const binary=path.resolve(process.argv[2]),outdir=path.resolve(process.argv[3]);fs.mkdirSync(outdir,{recursive:true});const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-delegation-ui-')),checks=[],errors=[];
 const identities=[{subject:'admin',token:'admin-token-delegation-ui-recipe',integrity:3,roles:['admin']},{subject:'alice',token:'alice-token-delegation-ui-recipe',integrity:1,roles:['requester']},{subject:'bob',token:'bob-token-delegation-ui-recipe',integrity:2,roles:['approver']},{subject:'effect-service',token:'effect-token-delegation-ui-recipe',integrity:2,roles:['effect']},{subject:'carol',token:'carol-token-delegation-ui-recipe',integrity:1,roles:['requester']},{subject:'dave',token:'dave-token-delegation-ui-recipe',integrity:1,roles:['requester']}];
 function cli(action,data,token=''){return JSON.parse(cp.execFileSync(binary,['--root',root,'--json','trust',action,...(data?['--input','-']:[])],{input:data?(typeof data==='string'?data:JSON.stringify(data)):undefined,encoding:'utf8',env:{...process.env,SWARM_TRUST_TOKEN:token}}))}
 const command=(event,fields={})=>({schema_version:1,event_id:event,...fields});

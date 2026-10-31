@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import argparse,base64,hashlib,hmac,json,os,signal,subprocess,tempfile,uuid
+from fixture_area import fixture_area
 from pathlib import Path
 
 p=argparse.ArgumentParser();p.add_argument('--criterion',type=int,choices=range(5),required=True);p.add_argument('--root',type=Path,required=True);p.add_argument('--timeout-seconds',type=int,required=True);p.add_argument('--evidence-dir',type=Path);p.add_argument('--binary',type=Path);a=p.parse_args();repo=a.root.resolve()
 if not (repo/'internal/engine/trust_actions.go').is_file():raise SystemExit('candidate T2 source missing')
-tmp=tempfile.TemporaryDirectory(prefix='swarm-t2-recipe-');base=Path(tmp.name);binary=a.binary.resolve() if a.binary else base/'swarm'
+tmp=tempfile.TemporaryDirectory(prefix='swarm-t2-recipe-', dir=fixture_area());base=Path(tmp.name);binary=a.binary.resolve() if a.binary else base/'swarm'
 if not a.binary:subprocess.run(['sh','build.sh',str(binary)],cwd=repo,check=True,stdout=subprocess.DEVNULL,timeout=a.timeout_seconds)
 assert binary.is_file() and os.access(binary,os.X_OK),'executable binary required'
 def bounded_browser(argv,timeout):

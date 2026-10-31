@@ -1,0 +1,76 @@
+[
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-909ae5d8726f5fa1d305b3b33c2f48e01579ac9502d46e66bcf7d03abce4f03d",
+      "work",
+      "show",
+      "w-3fac4614949c776f981ee01f",
+      "--root",
+      "/tmp/swarm-model83-gklfbako",
+      "--json"
+    ],
+    "start": 1793205714.4101765,
+    "end": 1793205715.6634161,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-909ae5d8726f5fa1d305b3b33c2f48e01579ac9502d46e66bcf7d03abce4f03d",
+      "budget",
+      "apply",
+      "w-3fac4614949c776f981ee01f",
+      "--root",
+      "/tmp/swarm-model83-gklfbako",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/managed-fioclex-fresh/managed-fioclex-fresh-002.input.json"
+    ],
+    "start": 1793205715.6909683,
+    "end": 1793205716.0046792,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-909ae5d8726f5fa1d305b3b33c2f48e01579ac9502d46e66bcf7d03abce4f03d",
+      "agent",
+      "prepare",
+      "w-3fac4614949c776f981ee01f",
+      "--root",
+      "/tmp/swarm-model83-gklfbako",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/managed-fioclex-fresh/managed-fioclex-fresh-003.input.json"
+    ],
+    "start": 1793205716.03898,
+    "end": 1793205717.8576887,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-909ae5d8726f5fa1d305b3b33c2f48e01579ac9502d46e66bcf7d03abce4f03d",
+      "agent",
+      "run",
+      "session",
+      "--root",
+      "/tmp/swarm-model83-gklfbako",
+      "--json"
+    ],
+    "start": 1793205717.885601,
+    "end": 1793205721.7997084,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-909ae5d8726f5fa1d305b3b33c2f48e01579ac9502d46e66bcf7d03abce4f03d",
+      "work",
+      "show",
+      "w-3fac4614949c776f981ee01f",
+      "--root",
+      "/tmp/swarm-model83-gklfbako",
+      "--json"
+    ],
+    "start": 1793205721.8359556,
+    "end": 1793205722.2018259,
+    "exit": 0
+  }
+]

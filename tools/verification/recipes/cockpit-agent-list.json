@@ -46,11 +46,11 @@
       ]
     },
     {
-      "id": "public-go-rust-todo-dependency-cockpit",
+      "id": "public-go-rust-initial-blocked-cockpit",
       "command": [
         "python3",
         "-c",
-        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='cockpit-agent-list-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_cockpit_agent_list.py','--go-binary',os.environ['SWARM_COCKPIT_AGENT_LIST_GO_BINARY'],'--rust-binary',os.environ['SWARM_COCKPIT_AGENT_LIST_RUST_BINARY'],'--todo-dependencies','--output',str(p)],check=True)\nprint('COCKPIT_AGENT_LIST_EVIDENCE '+str(p))"
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='cockpit-agent-list-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_cockpit_agent_list.py','--go-binary',os.environ['SWARM_COCKPIT_AGENT_LIST_GO_BINARY'],'--rust-binary',os.environ['SWARM_COCKPIT_AGENT_LIST_RUST_BINARY'],'--initial-blocked','--output',str(p)],check=True)\nprint('COCKPIT_AGENT_LIST_EVIDENCE '+str(p))"
       ],
       "expected_exit": 0,
       "required_stdout": [
@@ -72,7 +72,14 @@
         "PASS todo-dependency-edge-is-unvalidated",
         "PASS todo-dependency-start-reason",
         "PASS todo-dependency-override-reason",
-        "PASS todo-dependency-priority-does-not-invent-default-row"
+        "PASS todo-dependency-priority-does-not-invent-default-row",
+        "PASS blocked-no-attempts-documents-match",
+        "PASS blocked-no-attempts-no-extension-or-recovery-actions",
+        "PASS blocked-no-attempts-validation-status",
+        "PASS blocked-recommendation-advises-start",
+        "PASS blocked-no-attempts-paused-reason",
+        "PASS blocked-recommendation-budget-insufficient-reason",
+        "PASS blocked-back-to-todo-status"
       ],
       "required_stderr": []
     }

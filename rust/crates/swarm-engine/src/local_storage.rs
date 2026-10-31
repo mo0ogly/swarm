@@ -65,6 +65,8 @@ pub enum LocalStorageOperation {
     CloseLock,
     RemoveTemporary,
     Entropy,
+    /// Unlink of a named private file (single-use consumption).
+    Remove,
 }
 pub struct LocalStorageError {
     pub operation: LocalStorageOperation,
@@ -220,6 +222,23 @@ impl LocalDirectory {
             }
         }
         if let Some(error)=error {Err(error)}else{Ok(())}
+    }
+    /// Unlink one simple-name entry of this retained directory, then sync the
+    /// directory. Exactly one concurrent caller can succeed for a given entry,
+    /// so this is the consumption boundary for single-use files; a missing
+    /// entry returns the original NOENT cause under `Remove`. A sync failure
+    /// after a successful unlink is reported as `RenamedDurabilityUnknown`
+    /// (the entry is gone but its disappearance may not be durable).
+    #[cfg(target_os = "linux")]
+    pub(crate) fn remove(&self, name: &str) -> Result<(), LocalStorageError> {
+        Self::name(name)?;
+        fs::unlinkat(&self.file, name, AtFlags::empty())
+            .map_err(|e| LocalStorageError::new(LocalStorageOperation::Remove, e))?;
+        self.file.sync_all().map_err(|cause| {
+            let mut e = LocalStorageError::new(LocalStorageOperation::SyncDirectory, cause);
+            e.publication = PublicationState::RenamedDurabilityUnknown;
+            e
+        })
     }
     /// Borrow the retained directory only for the private gate transport. No
     /// pathname reopen, duplicate ownership or execution permission is created.

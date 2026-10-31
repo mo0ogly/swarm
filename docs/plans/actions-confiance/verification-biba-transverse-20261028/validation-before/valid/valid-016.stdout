@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "work_id": "w-6f8a90ab5cc11d94d6eb2d0e",
+  "work_revision": 7,
+  "task_id": "task",
+  "producer_agent_id": "session",
+  "attempt_id": "a-b671c03d9b42001160a4a9a3",
+  "settings_revision": "1",
+  "authority_mode": "operator-task-policy",
+  "scope_generation": null,
+  "execution_policy_generation": "0",
+  "authority_event": null,
+  "authority_revision": null,
+  "policy_mode": "human",
+  "control_count": 1,
+  "source_sha256": "1ab8b6b49d691a0ba81b617cc3322b318acfc533b01a73d64be5b8087a1e6e0f",
+  "artifacts": {
+    "handoff.md": "c6d7358be683a94aea72e402a652a3da7d4d3b905baecd6e4d94f56a9a740efd"
+  },
+  "execution_authorized": false,
+  "task_accepted": false
+}

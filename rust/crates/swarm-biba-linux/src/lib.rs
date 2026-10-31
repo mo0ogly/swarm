@@ -4,14 +4,28 @@
 //! provider/account activation, policy timeout or global-system observation.
 #![cfg(target_os="linux")]
 mod kernel;
-use std::{fs::{self,File,OpenOptions},io,os::{fd::{AsRawFd,IntoRawFd},unix::fs::{OpenOptionsExt,MetadataExt}},path::{Path,PathBuf}};
+use std::{fs::{self,File,OpenOptions},io,os::{fd::{AsRawFd,FromRawFd,IntoRawFd},unix::fs::{OpenOptionsExt,MetadataExt}},path::{Path,PathBuf}};
 /// Safe static failure family retaining the original IO cause, never raw paths.
 #[derive(Debug)] pub struct Error {pub stage:&'static str,cause:io::Error,cleanup:Vec<Error>}
 impl std::fmt::Display for Error {fn fmt(&self,f:&mut std::fmt::Formatter<'_>)->std::fmt::Result{f.write_str(self.stage)}}
 impl std::error::Error for Error {fn source(&self)->Option<&(dyn std::error::Error+'static)>{Some(&self.cause)}}
 fn err(stage:&'static str,cause:io::Error)->Error{Error{stage,cause,cleanup:Vec::new()}}
 fn invalid(stage:&'static str)->Error{err(stage,io::Error::from_raw_os_error(libc::EINVAL))}
-fn open(path:&Path)->Result<File,Error>{OpenOptions::new().read(true).custom_flags(libc::O_PATH|libc::O_CLOEXEC|libc::O_NOFOLLOW).open(path).map_err(|e|err("biba-path-open",e))}
+fn open(path:&Path)->Result<File,Error>{
+    let file=OpenOptions::new().read(true).custom_flags(libc::O_PATH|libc::O_CLOEXEC|libc::O_NOFOLLOW).open(path).map_err(|e|err("biba-path-open",e))?;
+    // The helper's caller owns fds 0-2 and may reassign them (stdin dup2) while
+    // a Sandbox lives. Owning a descriptor below 3 lets that reassignment close
+    // it behind this crate's back; never accept one — repin above 3 immediately.
+    if file.as_raw_fd()>=3{return Ok(file)}
+    let raw=file.as_raw_fd();
+    // SAFETY: raw is the owned descriptor just opened, still valid here.
+    let pinned=unsafe{libc::fcntl(raw,libc::F_DUPFD_CLOEXEC,3)};
+    if pinned<0{return Err(err("biba-path-repin",io::Error::last_os_error()))}
+    // SAFETY: adopt exactly the duplicate produced above; it is owned and unheld.
+    Ok(unsafe{File::from_raw_fd(pinned)})
+    // Dropping `file` closes the original low descriptor; the duplicate is the
+    // same open-file description, so the pinned inode is preserved.
+}
 /// Explicitly close an owned FD; preserve close failure rather than retrying it.
 fn close(file:impl IntoRawFd)->Result<(),Error>{let fd=file.into_raw_fd();
     // SAFETY: consume exactly the owned descriptor once, never a borrowed fd.
@@ -54,6 +68,9 @@ impl Sandbox {
     /// Prepare using the gate's recorded workspace device/inode. This observation
     /// is not an identity or grant. Pin the exact directory before inspecting it;
     /// every later rule and cwd consumes that FD, never a re-resolved pathname.
+    /// Every descriptor this crate returns is owned above 2 (`biba-path-repin`
+    /// otherwise): the caller owns 0-2 and may reassign them while the Sandbox
+    /// lives, which would close a low pinned FD behind its back.
     /// A replaced/symlink/unsafe directory refuses; all owned FD close causes
     /// survive. This does not freeze writes by an outside unconfined same-UID actor.
     pub fn prepare_bound(root:&Path,workspace:&Path,expected:(u64,u64))->Result<Self,Error>{
@@ -95,9 +112,21 @@ impl Sandbox {
             if fs::read_dir("/proc/self/task").map_err(|e|err("biba-thread-check",e))?.count()!=1{return Err(invalid("biba-single-thread-required"))}
             let status=fs::read_to_string("/proc/self/status").map_err(|e|err("biba-capability-check",e))?;
             if !status.lines().any(|l|l.strip_prefix("CapEff:").is_some_and(|v|v.trim()=="0000000000000000")){return Err(invalid("biba-unprivileged-helper-required"))}
-            check_tree(&PathBuf::from(format!("/proc/self/fd/{}",self.workspace.as_raw_fd())))?;
-            // SAFETY: retained O_PATH directory, consumed only in this helper.
-            if unsafe{libc::fchdir(self.workspace.as_raw_fd())}<0{return Err(err("biba-workspace-enter",io::Error::last_os_error()))}
+            // Walk the retained descriptor, never a re-resolved pathname:
+            // prepare_bound pinned the workspace above fd 2, so a caller-side
+            // stdin dup2 cannot have reassigned it. A duplicate is defensive;
+            // the retained O_PATH description is what check_tree observes.
+            let pinned=unsafe{libc::fcntl(self.workspace.as_raw_fd(),libc::F_DUPFD_CLOEXEC,3)};
+            if pinned<0{return Err(err("biba-workspace-repin",io::Error::last_os_error()))}
+            let walked=(||{
+                check_tree(&PathBuf::from(format!("/proc/self/fd/{}",pinned)))?;
+                // SAFETY: duplicate of the retained O_PATH descriptor.
+                if unsafe{libc::fchdir(pinned)}<0{return Err(err("biba-workspace-enter",io::Error::last_os_error()))}
+                Ok(())
+            })();
+            // SAFETY: pinned was produced by fcntl above and not stored elsewhere.
+            let closed=if unsafe{libc::close(pinned)}<0{Err(err("biba-close",io::Error::last_os_error()))}else{Ok(())};
+            finish(walked,closed)?;
             kernel::restrict(&self.rules).map_err(|e|err("biba-restrict",e))?;
             kernel::seccomp().map_err(|e|err("biba-seccomp",e))
         })();

@@ -15,14 +15,11 @@ import json,sys,os,time,hashlib
 from pathlib import Path
 base=Path(__BASE__)
 raw=sys.stdin.buffer.read();mode=(base/'mode').read_text()
+# The Biba boundary leaves the provider the workspace (cwd, I0) and reads the
+# Root; the Root itself is never writable to the provider. The execution
+# witness therefore rides the structured answer the engine already captures;
+# no file outside the workspace is written.
 record={'pid':os.getpid(),'ppid':os.getppid(),'argv':sys.argv[1:],'stdin_sha256':hashlib.sha256(raw).hexdigest(),'stdin_bytes':len(raw),'cwd':os.getcwd(),'environment_names':sorted(os.environ)}
-# Publish the witness only after its JSON is complete. The parent's existence
-# observation must not race an open-but-empty file; no timing retry is needed.
-pending=base/('pending-entered-'+str(os.getpid())+'.json')
-with pending.open('x') as out:
- json.dump(record,out);out.flush();os.fsync(out.fileno())
-os.link(pending,base/('entered-'+str(os.getpid())+'.json'))
-pending.unlink()
 if mode=='wait':
  while not (base/'release').exists():time.sleep(.02)
 if mode=='tool':print(json.dumps({'type':'assistant','message':{'content':[{'type':'tool_use','id':'fixture-tool','name':'Read','input':{}}]}}),flush=True)
@@ -30,7 +27,7 @@ if mode=='error':print(json.dumps({'type':'result','is_error':True,'result':'PRI
 elif mode=='incomplete':print(json.dumps({'type':'item.completed','item':{'type':'agent_message','text':'premature'}}),flush=True)
 elif mode=='overflow':print('x'*4096,flush=True)
 else:
- content=json.dumps({'message':'Owned CLI answer','brief':'Owned CLI brief'})
+ content=json.dumps({'message':'Owned CLI answer','brief':'Owned CLI brief','witness':record})
  if Path(sys.argv[0]).name=='claude':print(json.dumps({'type':'result','structured_output':json.loads(content),'usage':{'input_tokens':7,'output_tokens':8}}),flush=True)
  else:
   print(json.dumps({'type':'item.completed','item':{'type':'agent_message','text':content}}),flush=True)

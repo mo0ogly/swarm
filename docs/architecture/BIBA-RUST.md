@@ -215,9 +215,16 @@ refuse avant exec sans repli non confiné ; aucun privilège n’est augmenté.
 
 Le gate fournit l’inode attendu du workspace. `Sandbox::prepare_bound` ouvre et
 épingle cet inode avant inspection ; règles Landlock et `fchdir` utilisent ce
-même descripteur. Un remplacement refuse. La préparation CLI observe son
-répertoire temporaire privé après vérification du parent et du jeton ; le
-transfert du descripteur original depuis le parent reste à qualifier.
+même descripteur. Un remplacement refuse. Tout descripteur détenu par la crate
+vit au-dessus de 2 (`biba-path-repin` sinon) : l’appelant possède 0–2 et peut les
+réaffecter (dup2 stdin) pendant la vie du profil, ce qui refermerait sinon un
+descripteur épinglé bas. La préparation CLI observe son
+répertoire de travail privé après vérification du parent et du jeton ; ce
+répertoire vit sous `<Root>/preparation-cli/`, jamais sous `/tmp` (interdiction
+opérateur du 31 octobre 2026 : aucune donnée de projet dans le temporaire
+système) ni sous `.swarm` (les deux gardes de chevauchement Biba restent
+applicables). Le transfert du descripteur original depuis le parent reste à
+qualifier.
 
 Les sorties tool-free se trouvent sous `.swarm/biba-i0/planning/<claim_id>` ou
 `.swarm/biba-i0/reviewer/<event_id>`. Le moteur les ouvre relativement au

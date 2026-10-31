@@ -1,0 +1,4 @@
+usage: build_native.py [-h] [--root ROOT] [--output OUTPUT]
+                       [--target-dir TARGET_DIR] [--version VERSION]
+                       [--install-candidate INSTALL_CANDIDATE]
+build_native.py: error: --output and --target-dir required

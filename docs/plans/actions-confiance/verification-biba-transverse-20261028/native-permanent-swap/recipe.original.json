@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "biba-linux-boundary",
+  "inputs": [
+    "rust/crates/swarm-biba-linux/src/*.rs",
+    "rust/crates/swarm-biba-linux/Cargo.toml",
+    "rust/Cargo.lock",
+    "tests/rust_biba_boundary_driver.rs",
+    "tests/rust_biba_linux_boundary*.py",
+    "tests/rust_agent_model_route.py",
+    "docs/architecture/BIBA-RUST.md",
+    "docs/en/BIBA-RUST.md",
+    "tests/rust_biba_workspace_swap.py",
+    "tests/fixtures/biba_workspace_swap.c"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "native-boundary",
+      "command": [
+        "python3",
+        "-c",
+        "import pathlib,subprocess,tempfile; p=pathlib.Path(tempfile.mkdtemp(prefix='biba-boundary-',dir='.cache')).resolve(); subprocess.run(['python3','tests/rust_biba_linux_boundary_build.py','--target-dir',str(p/'target'),'--output',str(p/'proof')],check=True); print('BIBA_BOUNDARY_EVIDENCE '+str(p/'proof'))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "NATIVE_BIBA_BOUNDARY_PASS",
+        "BIBA_BOUNDARY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

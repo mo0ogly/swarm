@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 import json
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from unittest import mock
 
@@ -30,7 +31,7 @@ class CodexEvents(unittest.TestCase):
         schema_hash = RUNNER.compare.digest((json.dumps(schema, ensure_ascii=False, indent=2) + "\n").encode())
         pack = {"cases": [{"id": "fixture-case"}]}
         for key, bad in [("pack_sha256", "other-pack"), ("protocol", "other-protocol"), ("response_schema_sha256", "other-schema")]:
-            with self.subTest(key=key), tempfile.TemporaryDirectory(prefix="swarm-preflight-bind-") as temporary:
+            with self.subTest(key=key), tempfile.TemporaryDirectory(prefix="swarm-preflight-bind-", dir=fixture_area()) as temporary:
                 proof = {"result": "PASS", "pack_sha256": "pack-hash", "protocol": "protocol", "response_schema_sha256": schema_hash}
                 proof[key] = bad
                 with mock.patch.object(RUNNER, "evaluation_pack", return_value=(pack, "pack-hash", schema, "protocol")), mock.patch.object(RUNNER.compare, "load_json", return_value=proof), mock.patch.object(RUNNER.subprocess, "Popen") as process:
@@ -42,7 +43,7 @@ class CodexEvents(unittest.TestCase):
     def test_existing_case_is_not_retried(self):
         schema = {"type": "object"}
         proof = {"result": "PASS", "pack_sha256": "pack-hash", "protocol": "protocol", "response_schema_sha256": RUNNER.compare.digest((json.dumps(schema, ensure_ascii=False, indent=2) + "\n").encode())}
-        with tempfile.TemporaryDirectory(prefix="swarm-no-repeat-") as temporary:
+        with tempfile.TemporaryDirectory(prefix="swarm-no-repeat-", dir=fixture_area()) as temporary:
             root = Path(temporary)
             (root / "fixture-case").mkdir()
             with mock.patch.object(RUNNER, "evaluation_pack", return_value=({"cases": [{"id": "fixture-case"}]}, "pack-hash", schema, "protocol")), mock.patch.object(RUNNER.compare, "load_json", return_value=proof), mock.patch.object(RUNNER.subprocess, "Popen") as process:

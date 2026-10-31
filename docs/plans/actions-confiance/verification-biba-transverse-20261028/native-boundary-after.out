@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_biba_linux_boundary.py", line 65, in <module>
+    a=p.parse_args();run(a.driver.resolve(),a.output.resolve())
+                     ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_biba_linux_boundary.py", line 51, in run
+    observed=invoke('confined',[str(driver),str(root),str(workspace),str(script)])
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_biba_linux_boundary.py", line 45, in invoke
+    assert r.returncode==0,(label,r.returncode,r.stderr.decode())
+           ^^^^^^^^^^^^^^^
+AssertionError: ('confined', 2, "/usr/bin/python3: can't open file '/tmp/swarm-biba-boundary-x7zfz92v/provider.py': [Errno 1] Operation not permitted\n")

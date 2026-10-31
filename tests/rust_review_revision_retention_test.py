@@ -1,5 +1,6 @@
 """Pure revision-replay retention guards on synthetic files, never engine receipts."""
 import json,tempfile,unittest
+from fixture_area import fixture_area
 from pathlib import Path
 import rust_review_revision_continuity as replay
 
@@ -8,7 +9,7 @@ class RevisionRetention(unittest.TestCase):
     """Healthy copies precede marker, symlink and missing-original failures."""
     def setUp(self):
         """Own a synthetic Root marker and one ordinary source, without a database."""
-        temp=tempfile.TemporaryDirectory(prefix='review-revision-retention-');self.addCleanup(temp.cleanup)
+        temp=tempfile.TemporaryDirectory(prefix='review-revision-retention-', dir=fixture_area());self.addCleanup(temp.cleanup)
         self.base=Path(temp.name);self.root=self.base/'root';self.root.mkdir();(self.root/'.swarm').mkdir();self.out=self.base/'proof';self.out.mkdir()
         self.marker=self.root/'.swarm/owned-review-claim-fixture';self.marker.write_text('synthetic-token')
         self.name='owned-review-revision-observation.json';self.source=self.root/self.name;self.source.write_bytes(b'{"synthetic":true}')

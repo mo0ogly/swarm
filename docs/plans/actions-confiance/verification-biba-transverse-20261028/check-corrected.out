@@ -1,0 +1,300 @@
+    Checking typenum v1.20.1
+    Checking cfg-if v1.0.4
+    Checking itoa v1.0.18
+    Checking bitflags v2.13.2
+    Checking libc v0.2.186
+    Checking serde_core v1.0.228
+    Checking zeroize v1.9.0
+    Checking cpufeatures v0.2.17
+    Checking cmov v0.5.4
+    Checking zmij v1.0.21
+    Checking memchr v2.8.2
+    Checking num-conv v0.2.2
+    Checking time-core v0.1.9
+    Checking powerfmt v0.2.1
+    Checking subtle v2.6.1
+    Checking deranged v0.5.9
+    Checking memoffset v0.9.1
+    Checking ctutils v0.4.3
+    Checking foldhash v0.2.0
+    Checking const-oid v0.10.2
+    Checking signature v2.2.0
+    Checking base64 v0.22.1
+    Checking hashbrown v0.17.1
+    Checking libsqlite3-sys v0.38.2
+    Checking fallible-iterator v0.3.0
+    Checking ed25519 v2.2.3
+    Checking fallible-streaming-iterator v0.1.9
+    Checking base64ct v1.8.3
+    Checking smallvec v1.16.3
+    Checking linux-raw-sys v0.12.1
+    Checking cpufeatures v0.3.1
+    Checking psm v0.1.32
+    Checking regex-syntax v0.8.11
+    Checking bytes v1.12.1
+    Checking hashlink v0.12.2
+    Checking generic-array v0.14.7
+    Checking hybrid-array v0.4.15
+    Checking http v1.5.0
+    Checking rusqlite v0.40.2
+    Checking time v0.3.55
+    Checking nix v0.30.1
+    Checking getrandom v0.2.17
+    Checking getrandom v0.4.3
+    Checking stacker v0.1.25
+    Checking wait4 v0.2.0
+    Checking swarm-biba-linux v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-biba-linux)
+warning: unused import: `AsRawFd`
+ --> crates/swarm-biba-linux/src/lib.rs:7:52
+  |
+7 | use std::{fs::{self,File,OpenOptions},io,os::{fd::{AsRawFd,IntoRawFd},unix::fs::{OpenOptionsExt,MetadataExt}},path::{Path,PathBuf}};
+  |                                                    ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+    Checking phc v0.6.1
+    Checking crypto-common v0.2.2
+    Checking block-buffer v0.12.1
+    Checking crypto-common v0.1.7
+warning: `swarm-biba-linux` (lib) generated 1 warning (run `cargo fix --lib -p swarm-biba-linux` to apply 1 suggestion)
+    Checking block-buffer v0.10.4
+    Checking digest v0.10.7
+    Checking password-hash v0.6.1
+    Checking sha2 v0.10.9
+    Checking curve25519-dalek v4.1.3
+    Checking rustix v1.1.5
+    Checking serde v1.0.228
+    Checking serde_json v1.0.150
+    Checking serde_stacker v0.1.14
+    Checking regex-automata v0.4.18
+    Checking digest v0.11.3
+    Checking blake2 v0.11.0
+    Checking sha2 v0.11.1
+    Checking hmac v0.13.0
+    Checking swarm-identity-contract v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-identity-contract)
+    Checking argon2 v0.6.0
+    Checking ed25519-dalek v2.2.0
+    Checking swarm-protection-contract v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-protection-contract)
+    Checking swarm-wire-json v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-wire-json)
+    Checking regex v1.13.1
+    Checking swarm-linux-identity-channel v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-linux-identity-channel)
+    Checking swarm-linux-prerequisites v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-linux-prerequisites)
+    Checking swarm-enrollment-proof v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-enrollment-proof)
+    Checking swarm-enrollment-state v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-enrollment-state)
+    Checking swarm-enrollment-config v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-enrollment-config)
+    Checking swarm-enrollment-bootstrap v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-enrollment-bootstrap)
+    Checking swarm-enrollment-authority v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-enrollment-authority)
+    Checking swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+warning: unused import: `verify_candidate`
+  --> crates/swarm-engine/src/managed_repository.rs:19:78
+   |
+19 | pub(crate) use worker::{candidate_worker, prepare_worker, prepare_candidate, verify_candidate, pin_candidate, CandidateWitness, Mana...
+   |                                                                              ^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `verify_candidate` is never used
+   --> crates/swarm-engine/src/managed_repository_candidate_store.rs:501:15
+    |
+501 | pub(crate) fn verify_candidate(
+    |               ^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `has_unresolved_process` is never used
+ --> crates/swarm-engine/src/validation_run_recovery.rs:5:15
+  |
+5 | pub(crate) fn has_unresolved_process(error: &(dyn Error + 'static)) -> bool {
+  |               ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `poll_retained_processes` is never used
+  --> crates/swarm-engine/src/validation_run_recovery.rs:38:15
+   |
+38 | pub(crate) fn poll_retained_processes(e: &mut (dyn Error + 'static)) -> Vec<io::Error> {
+   |               ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `create_private_child`, `create_stream`, `open_stream`, and `close_stream` are never used
+   --> crates/swarm-engine/src/local_storage.rs:314:19
+    |
+178 | impl LocalDirectory {
+    | ------------------- associated items in this implementation
+...
+314 |     pub(crate) fn create_private_child(&self,name:&str)->Result<Self,LocalStorageError>{
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+323 |     pub(crate) fn create_stream(&self,name:&str)->Result<File,LocalStorageError>{self.open_file(name,OFlags::RDWR|OFlags::CREATE|OF...
+    |                   ^^^^^^^^^^^^^
+...
+327 |     pub(crate) fn open_stream(&self,name:&str)->Result<File,LocalStorageError>{self.open_file(name,OFlags::RDONLY)}
+    |                   ^^^^^^^^^^^
+...
+330 |     pub(crate) fn close_stream(file:File)->Result<(),LocalStorageError>{close(file,LocalStorageOperation::CloseFile)}
+    |                   ^^^^^^^^^^^^
+
+warning: struct `GitPackFiles` is never constructed
+ --> crates/swarm-engine/src/local_pack_files.rs:8:19
+  |
+8 | pub(crate) struct GitPackFiles {
+  |                   ^^^^^^^^^^^^
+
+warning: function `finish` is never used
+  --> crates/swarm-engine/src/local_pack_files.rs:18:4
+   |
+18 | fn finish<T>(result: Result<T, E>, cleanup: Result<(), E>) -> Result<T, E> {
+   |    ^^^^^^
+
+warning: function `missing` is never used
+  --> crates/swarm-engine/src/local_pack_files.rs:29:4
+   |
+29 | fn missing() -> E {
+   |    ^^^^^^^
+
+warning: multiple associated items are never used
+   --> crates/swarm-engine/src/local_pack_files.rs:39:19
+    |
+ 35 | impl GitPackFiles {
+    | ----------------- associated items in this implementation
+...
+ 39 |     pub(crate) fn create(parent: &LocalDirectory, name: &str) -> Result<Self, E> {
+    |                   ^^^^^^
+...
+ 66 |     pub(crate) fn write_revision(&mut self, bytes: &[u8]) -> Result<(), E> {
+    |                   ^^^^^^^^^^^^^^
+...
+ 89 |     pub(crate) fn export_streams(&mut self) -> Result<(&File, &mut File, &mut File), E> {
+    |                   ^^^^^^^^^^^^^^
+...
+ 98 |     pub(crate) fn prepare_import(&mut self) -> Result<(), E> {
+    |                   ^^^^^^^^^^^^^^
+...
+137 |     pub(crate) fn import_streams(&mut self) -> Result<(&File, &mut File, &mut File), E> {
+    |                   ^^^^^^^^^^^^^^
+...
+146 |     pub(crate) fn pack_identity(&mut self) -> Result<(u64, String), E> {
+    |                   ^^^^^^^^^^^^^
+...
+174 |     pub(crate) fn close(mut self) -> Result<(), E> {
+    |                   ^^^^^
+
+warning: methods `require_native_git_writer` and `current_managed_git_publication_for_effect` are never used
+  --> crates/swarm-engine/src/root_store/managed_git_current.rs:63:19
+   |
+36 | impl RootStore {
+   | -------------- methods in this implementation
+...
+63 |     pub(super) fn require_native_git_writer(&self) -> Result<(), E> {
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+75 |     pub(super) fn current_managed_git_publication_for_effect(
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `inspect_for_effect` is never used
+   --> crates/swarm-engine/src/root_store/paea_git_repository.rs:234:19
+    |
+160 | impl PaeaGitRepository {
+    | ---------------------- method in this implementation
+...
+234 |     pub(super) fn inspect_for_effect(
+    |                   ^^^^^^^^^^^^^^^^^^
+
+warning: method `paea_open_git_transfer_job` is never used
+   --> crates/swarm-engine/src/root_store/paea_git_repository.rs:450:19
+    |
+335 | impl RootStore {
+    | -------------- method in this implementation
+...
+450 |     pub(crate) fn paea_open_git_transfer_job(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `bare` and `inspect_for_effect` are never used
+  --> crates/swarm-engine/src/root_store/paea_git_repository/source.rs:61:19
+   |
+44 | impl PaeaGitSource {
+   | ------------------ methods in this implementation
+...
+61 |     pub(super) fn bare(&self) -> Result<&LocalDirectory, E> {
+   |                   ^^^^
+...
+81 |     pub(super) fn inspect_for_effect(
+   |                   ^^^^^^^^^^^^^^^^^^
+
+warning: struct `TransferReceipt` is never constructed
+ --> crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs:8:19
+  |
+8 | pub(crate) struct TransferReceipt {
+  |                   ^^^^^^^^^^^^^^^
+
+warning: struct `TransferFailure` is never constructed
+  --> crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs:15:19
+   |
+15 | pub(crate) struct TransferFailure {
+   |                   ^^^^^^^^^^^^^^^
+
+warning: enum `SourceState` is never used
+  --> crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs:36:6
+   |
+36 | enum SourceState {
+   |      ^^^^^^^^^^^
+
+warning: methods `custody`, `ready`, `acquire`, and `close` are never used
+  --> crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs:43:8
+   |
+41 | impl SourceState {
+   | ---------------- methods in this implementation
+42 |     /// Borrow the same physical witnesses in either acquisition phase.
+43 |     fn custody(&self) -> Result<&super::source::SourceCustody, E> {
+   |        ^^^^^^^
+...
+51 |     fn ready(&self) -> Result<&PaeaGitSource, E> {
+   |        ^^^^^
+...
+60 |     fn acquire(
+   |        ^^^^^^^
+...
+91 |     fn close(self) -> Result<(), E> {
+   |        ^^^^^
+
+warning: struct `GitTransferJob` is never constructed
+   --> crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs:103:19
+    |
+103 | pub(crate) struct GitTransferJob {
+    |                   ^^^^^^^^^^^^^^
+
+warning: struct `ClosedTransfer` is never constructed
+   --> crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs:115:19
+    |
+115 | pub(crate) struct ClosedTransfer {
+    |                   ^^^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs:148:19
+    |
+121 | impl GitTransferJob {
+    | ------------------- associated items in this implementation
+...
+148 |     pub(crate) fn from_repository(
+    |                   ^^^^^^^^^^^^^^^
+...
+185 |     pub(crate) fn receipt(&self) -> Option<&TransferReceipt> {
+    |                   ^^^^^^^
+...
+189 |     pub(crate) fn failure(&self) -> Option<&TransferFailure> {
+    |                   ^^^^^^^
+...
+196 |     pub(crate) fn run_once(
+    |                   ^^^^^^^^
+...
+225 |     fn git(&self, args: &[&str], settings: &EngineSettingsDocument) -> Result<Vec<u8>, E> {
+    |        ^^^
+...
+231 |     fn prepare(
+    |        ^^^^^^^
+...
+336 |     pub(crate) fn poll_recovery(&mut self) {
+    |                   ^^^^^^^^^^^^^
+...
+347 |     pub(crate) fn close(self) -> Result<ClosedTransfer, Box<Self>> {
+    |                   ^^^^^
+
+warning: `swarm-engine` (lib) generated 20 warnings (run `cargo fix --lib -p swarm-engine` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized] target(s) in 3m 18s

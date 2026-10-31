@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 import sqlite3
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 SPEC = importlib.util.spec_from_file_location("differential_bench", Path(__file__).resolve().parents[1] / "tools/rust-migration/differential_bench.py")
@@ -39,7 +40,7 @@ class DifferentialBenchTests(unittest.TestCase):
 
     def test_binary_changed_during_run_refuses_success(self):
         """Final hash validation rejects a changed executable despite equal outputs."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             roots, binaries = self.fixtures(directory)
             control = Path(directory) / "control"
             self.assertEqual(BENCH.run(*binaries, *roots, CORPUS, control, "w"), 0)
@@ -111,7 +112,7 @@ class DifferentialBenchTests(unittest.TestCase):
         return roots, binaries
 
     def test_real_double_invocation_and_private_retained_streams(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             roots, binaries = self.fixtures(directory)
             output = Path(directory) / "evidence"
             self.assertEqual(BENCH.run(*binaries, *roots, CORPUS, output, "w"), 0)
@@ -125,7 +126,7 @@ class DifferentialBenchTests(unittest.TestCase):
                 BENCH.run(*binaries, *roots, CORPUS, output, "w")
 
     def test_same_root_hardlinked_database_and_unmarked_roots_refused(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             roots, binaries = self.fixtures(directory)
             self.assertEqual(BENCH.logical_state(roots[0]), BENCH.logical_state(roots[1]))
             for pair in ((roots[0], roots[0]),):
@@ -141,7 +142,7 @@ class DifferentialBenchTests(unittest.TestCase):
                 BENCH.fixture_root(roots[0])
 
     def test_non_equivalent_baseline_runs_neither_binary(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             roots, binaries = self.fixtures(directory)
             self.assertEqual(BENCH.logical_state(roots[0]), BENCH.logical_state(roots[1]))
             with closing(sqlite3.connect(roots[1] / ".swarm/state.db")) as connection, connection:
@@ -152,7 +153,7 @@ class DifferentialBenchTests(unittest.TestCase):
             self.assertEqual(list(output.glob("*.command.json")), [])
 
     def test_failed_exit_and_invalid_json_keep_original_outputs(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             roots, binaries = self.fixtures(directory)
             self.assertEqual(BENCH.run(*binaries, *roots, CORPUS, Path(directory) / "control", "w"), 0)
             binaries[1].write_text("#!/usr/bin/env python3\nimport sys\nprint('invalid original')\nprint('PRIVATE child cause',file=sys.stderr)\nsys.exit(17)\n")
@@ -164,7 +165,7 @@ class DifferentialBenchTests(unittest.TestCase):
             self.assertNotIn("PRIVATE", (output / "result.json").read_text())
 
     def test_read_mutation_fails_even_when_outputs_and_final_databases_match(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             roots, binaries = self.fixtures(directory)
             self.assertEqual(BENCH.run(*binaries, *roots, CORPUS, Path(directory) / "control", "w"), 0)
             for binary in binaries:
@@ -178,7 +179,7 @@ class DifferentialBenchTests(unittest.TestCase):
     def test_sqlite_cell_types_bytes_and_duplicate_rows_are_not_collapsed(self):
         self.assertNotEqual(BENCH.cell(1), BENCH.cell(1.0))
         self.assertNotEqual(BENCH.cell("x"), BENCH.cell(b"x"))
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             roots, _ = self.fixtures(directory)
             before = BENCH.logical_state(roots[0])
             self.assertEqual(len(before["rows"]), 1)

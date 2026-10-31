@@ -4,7 +4,7 @@ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),asse
 const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]||'bin/swarm'),out=path.resolve(process.argv[3]||'test-results/window-identity');
 fs.mkdirSync(out,{recursive:true});
-const fixture=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-windows-'));
+const fixture=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-windows-'));
 const cli=args=>JSON.parse(execFileSync(binary,['--root',fixture,'--json',...args],{encoding:'utf8'}));
 cli(['init']);
 const app=spawn(binary,['--root',fixture,'web','127.0.0.1:0']);

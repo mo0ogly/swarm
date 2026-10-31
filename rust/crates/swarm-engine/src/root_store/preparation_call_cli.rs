@@ -4,7 +4,7 @@ use crate::{ModelRoute, Provider};
 use std::{
     collections::BTreeSet,
     io::{self, Write},
-    path::Path,
+    path::{Path, PathBuf},
     process::Command,
     time::{Duration, Instant},
 };
@@ -374,6 +374,15 @@ impl crate::validation_run::OwnedProcessControl for Control<'_> {
         Ok(None)
     }
 }
+/// Resolve the engine-owned private CLI workspace path inside the canonical
+/// Root, never under `.swarm` or the system temporary directory. The directory
+/// layout keeps the workspace outside both Biba overlap guards:
+/// `root.starts_with(workspace)` is false (workspace is deeper), and
+/// `root/.swarm.starts_with(workspace)` is false (sibling subtree). The name is
+/// random; no existing entry is ever inspected or reused by this constructor.
+fn workspace_path(root: &Path, name: String) -> PathBuf {
+    root.join("preparation-cli").join(name)
+}
 impl RootStore {
     /// Run only an already claimed turn behind a second private helper gate.
     /// Reuses pidfd/owned-group cleanup: leader remains unreaped until group kill.
@@ -402,8 +411,8 @@ impl RootStore {
             )
         };
         use std::os::unix::fs::DirBuilderExt;
-        let workspace = std::env::temp_dir()
-            .join(crate::generate_identifier("swarm-preparation-cli-").map_err(E::Runtime)?);
+        let name = crate::generate_identifier("swarm-preparation-cli-").map_err(E::Runtime)?;
+        let workspace = workspace_path(&self.root, name);
         let root_text = self
             .root
             .to_str()
@@ -413,7 +422,14 @@ impl RootStore {
             .ok_or(E::Refused("preparation-cli-workspace-utf8"))?;
         let (parent, child) = std::os::unix::net::UnixStream::pair()
             .map_err(|e| cause("preparation-cli-gate-create", e))?;
-        if let Err(error) = std::fs::DirBuilder::new().mode(0o700).create(&workspace) {
+        // Parent and child are both 0700 engine-owned directories inside the Root
+        // (never under .swarm). The child is removed on known cleanup; a retained
+        // failure keeps its witness across reboots, per the /tmp interdiction.
+        let created = std::fs::DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(&workspace);
+        if let Err(error) = created {
             return finished(
                 finished(
                     Err(cause("preparation-cli-workspace-create", error)),
@@ -471,6 +487,7 @@ impl RootStore {
         };
         // Preserve an unresolved owned process and its workspace on cleanup error;
         // remove after known cleanup; unknown ownership/reap keeps the directory.
+        // A removed last child leaves the empty private parent in place.
         let cleaned = if run.is_ok()
             || run.as_ref().is_err_and(|e| {
                 e.unresolved_process_id().is_none() && e.ownership_lost_process_id().is_none()
@@ -636,6 +653,27 @@ pub fn execute_preparation_cli_gate(
 #[cfg(test)]
 mod level_tests {
     use super::*;
+    #[test]
+    fn workspace_path_stays_inside_root_outside_private_scope_and_tmp() {
+        // Operator interdiction + Biba overlap guards: the CLI preparation
+        // workspace must resolve inside the canonical Root, outside `.swarm`
+        // (sibling subtree) and never under the system temporary directory.
+        // Pure path composition; no allocation, root or process is touched.
+        let root = Path::new("/owned/project-root");
+        let workspace = workspace_path(
+            root,
+            "swarm-preparation-cli-0123456789abcdef01234567".to_string(),
+        );
+        assert!(workspace.starts_with(root));
+        assert!(!workspace.starts_with(&root.join(".swarm")));
+        assert!(!root.join(".swarm").starts_with(&workspace));
+        assert!(!workspace.starts_with(std::env::temp_dir()));
+        assert!(!std::env::temp_dir().starts_with(&workspace));
+        assert_eq!(
+            workspace,
+            Path::new("/owned/project-root/preparation-cli/swarm-preparation-cli-0123456789abcdef01234567")
+        );
+    }
     #[test]
     fn only_typed_selection_refusals_become_unavailable_modes() {
         let expected = E::Launch(Box::new(crate::AgentLaunchError::caused(

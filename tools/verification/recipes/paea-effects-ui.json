@@ -95,7 +95,7 @@
             ],
             "expected_exit": 0,
             "required_stdout": [
-                "PAEA_EFFECTS_UI_BROWSER_VERIFIED 5"
+                "PAEA_EFFECTS_UI_BROWSER_VERIFIED 7"
             ],
             "required_stderr": []
         }

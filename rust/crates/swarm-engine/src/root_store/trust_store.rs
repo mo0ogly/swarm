@@ -22,6 +22,31 @@ fn retained(e: R, publication: Option<&'static str>) -> R {
     }
 }
 impl RootStore {
+    /// Read-only observation of the current persisted Trust revision, without
+    /// executing any trust operation or reserving the trust lock: a shared
+    /// reader is deliberately NOT taken because this is presentation-only
+    /// observation beside an already running protocol, not a transaction.
+    /// The bounded state file is decoded and validated like every other trust
+    /// read; `Ok(None)` distinguishes an absent journal (never initialized)
+    /// from a readable revision. Decode/validate failures refuse typed and
+    /// are never converted to a fabricated revision or empty success. The
+    /// observed value proves no current grant, authority or acceptance.
+    pub fn trust_revision(&self) -> Result<Option<i64>, R> {
+        match self.directory.read_bounded(STATE, MAX_STATE) {
+            Ok(raw) => {
+                let state = State::decode(&raw).map_err(failure)?;
+                state.validate().map_err(failure)?;
+                state
+                    .require_supported()
+                    .map_err(failure)?;
+                Ok(Some(state.revision))
+            }
+            // Absent journal: explicitly uninitialized trust state, a real
+            // observed prerequisite state for preview consumers, not an error.
+            Err(e) if absent(&e) => Ok(None),
+            Err(e) => Err(R::Storage(e)),
+        }
+    }
     /// Execute the trust protocol against this opened root under its historical
     /// flock. Local configuration requires operator ownership; business actions
     /// authenticate their own stored token. Late errors retain publication state.

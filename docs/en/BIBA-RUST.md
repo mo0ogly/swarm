@@ -210,9 +210,14 @@ an unconfined fallback; no privilege is increased.
 
 The gate supplies the expected workspace inode. `Sandbox::prepare_bound` opens
 and pins that inode before inspection; Landlock rules and `fchdir` use the same
-FD. Replacement refuses. CLI preparation observes its private temporary directory
-after checking parent and token; transfer of the parent's original FD remains
-unqualified.
+FD. Replacement refuses. Every descriptor this crate holds lives above 2
+(`biba-path-repin` otherwise): the caller owns 0–2 and may reassign them (stdin
+dup2) while the profile lives, which would otherwise close a pinned low FD
+behind the crate's back. CLI preparation observes its private working directory
+after checking parent and token; that directory lives under `<Root>/preparation-cli/`,
+never under `/tmp` (operator interdiction of 31 October 2026: no project data in
+the system temporary area) nor under `.swarm` (both Biba overlap guards remain
+applicable). Transfer of the parent's original FD remains unqualified.
 
 Tool-free output lives under `.swarm/biba-i0/planning/<claim_id>` or
 `.swarm/biba-i0/reviewer/<event_id>`. The engine opens these relative to its owned

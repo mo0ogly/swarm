@@ -1,0 +1,11 @@
+{
+  "files": [
+    {
+      "path": "/tmp/paea-f12-edit-20261030/prompt.txt",
+      "sha256": "13dc659ffac59d963d535e9824cbd884908eea6055d5c15dca0000716ad6cb28"
+    }
+  ],
+  "endpoint": "https://chat.skynet.cossi.internet/openai/chat/completions",
+  "timeout_seconds": null,
+  "script_sha256": "3eb953b843b64b71261e232f0599948d8523df8bada07d86c46e32348a81f1dc"
+}

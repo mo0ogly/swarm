@@ -9,6 +9,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -31,7 +32,7 @@ class RustDistribution(unittest.TestCase):
         Fake tools deliberately isolate the shell publication contract; they do
         not establish native compilation, Root initialization or runtime parity.
         """
-        with tempfile.TemporaryDirectory(prefix='swarm-installer-guard-') as td:
+        with tempfile.TemporaryDirectory(prefix='swarm-installer-guard-', dir=fixture_area()) as td:
             root=Path(td);repo=root/'repo';repo.mkdir();shutil.copy2(ROOT/'install.sh',repo/'install.sh');(repo/'rust').mkdir();(repo/'rust/Cargo.toml').write_text('[workspace]\n')
             fake=root/'tools';fake.mkdir();log=root/'calls';project=root/'project';project.mkdir();dest=root/'bin';dest.mkdir();binary=dest/'swarm';binary.write_bytes(b'ORIGINAL');binary.chmod(0o755)
             for tool in ['cargo','rustc','cc','git']:
@@ -48,7 +49,7 @@ class RustDistribution(unittest.TestCase):
         Verify persisted paths/port, private config and caller arguments without
         a daemon, Root mutation, shared installation config or model execution.
         """
-        with tempfile.TemporaryDirectory(prefix='swarm-compose-shell-') as td:
+        with tempfile.TemporaryDirectory(prefix='swarm-compose-shell-', dir=fixture_area()) as td:
             root=Path(td);repo=root/'repo';repo.mkdir();(repo/'deploy').mkdir();shutil.copy2(ROOT/'install.sh',repo/'install.sh')
             project=root/'project';project.mkdir();agents=root/'agents';fake=root/'tools';fake.mkdir();log=root/'calls'
             docker=fake/'docker';docker.write_text('#!/bin/sh\nprintf \'%s\\n\' "$*" >> "$INSTALL_GUARD_LOG"\nexit 0\n');docker.chmod(0o755)

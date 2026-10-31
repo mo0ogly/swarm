@@ -4,6 +4,7 @@ import json
 import unittest
 import errno
 import tempfile
+from fixture_area import fixture_area
 from pathlib import Path
 from unittest.mock import patch
 import rust_mission_watch_planning as replay
@@ -95,7 +96,7 @@ class PlanningGuards(unittest.TestCase):
         replay.require_terminal_replay(good,work,'claim')
 
     def test_backup_failure_preserves_original_and_partial_copy(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             source=Path(directory)/'original.db'
             connection=replay.sqlite3.connect(source)
             try:
@@ -139,7 +140,7 @@ class PlanningGuards(unittest.TestCase):
         replay.backup_progress(replay.sqlite3.SQLITE_DONE,0,0)
 
     def test_directory_sync_failure_is_not_swallowed(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             replay.sync_directory(Path(directory))
             cause=OSError(errno.ENOSPC,'explicit fixture sync refusal')
             with patch.object(replay.os,'fsync',side_effect=cause):
@@ -150,7 +151,7 @@ class PlanningGuards(unittest.TestCase):
     @replay.contextmanager
     def swap_fixture(self):
         """Create owned single-link files, with saved absent, for move-only checks."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root=Path(directory);private=root/'private';private.mkdir(mode=0o700)
             database=root/'state.db';copy=private/'copied.db';saved=private/'original.db'
             database.write_bytes(b'owned original inode');copy.write_bytes(b'fresh copied inode')

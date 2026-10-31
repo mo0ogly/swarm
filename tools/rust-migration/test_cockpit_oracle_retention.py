@@ -2,6 +2,10 @@
 import subprocess
 import sys
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import unittest
 from pathlib import Path
 
@@ -9,7 +13,7 @@ from pathlib import Path
 class Retention(unittest.TestCase):
     def test_existing_output_never_receives_a_new_failure_file(self):
         """Refuse before Go execution without changing an earlier owned proof."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root = Path(directory)
             output = root / 'old'
             output.mkdir()
@@ -28,7 +32,7 @@ class Retention(unittest.TestCase):
 
     def test_unit_runner_preserves_existing_output_before_build_or_replay(self):
         """Both unit modes reject an old output before consuming any record."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root = Path(directory)
             output = root / 'old'
             output.mkdir()

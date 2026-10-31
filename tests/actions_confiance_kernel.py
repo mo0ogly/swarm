@@ -10,6 +10,7 @@ import selectors
 import signal
 import subprocess
 import tempfile
+from fixture_area import fixture_area
 import time
 
 p=argparse.ArgumentParser()
@@ -18,7 +19,7 @@ p.add_argument('--evidence-dir',type=Path,required=True)
 p.add_argument('--timeout-seconds',type=int,default=120,help='recipe watchdog only')
 a=p.parse_args();assert a.timeout_seconds>0
 binary=a.binary.resolve();out=a.evidence_dir.resolve();out.mkdir(parents=True,exist_ok=True)
-root=Path(tempfile.mkdtemp(prefix='swarm-kernel-public-'));checks=[]
+root=Path(tempfile.mkdtemp(prefix='swarm-kernel-public-', dir=fixture_area()));checks=[]
 tokens={'admin':'kernel-public-admin-fixture-token','alice':'kernel-public-requester-fixture-token','bob':'kernel-public-approver-fixture-token','effect':'kernel-public-effect-fixture-token'}
 
 def cli(action=None,data=None,token='',server=None,session='',expected=0):

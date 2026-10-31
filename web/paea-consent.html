@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr" data-theme="etat">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Swarm — PAEA</title>
+  <link rel="icon" href="/swarm-logo.png">
+  <link rel="stylesheet" href="/wattson_themes.css">
+  <link rel="stylesheet" href="/swarm-design.css">
+  <link rel="stylesheet" href="/paea.css">
+  <script src="/i18n-en.js" defer></script>
+  <script src="/i18n.js" defer></script>
+  <script src="/paea-consent.js" defer></script>
+</head>
+<body>
+<a class="paea-skip" href="#paea-main" data-i18n>Aller au consentement</a>
+<header><a href="/">Swarm</a><h1 data-i18n>Approbation de l’action préparée</h1><nav aria-label="Navigation PAEA"><a href="/paea.html" data-paea-link data-i18n>Vérifications PAEA</a><a href="/paea-effects.html" data-paea-link data-i18n>États d'effets PAEA</a><button id="paea-theme" type="button" data-i18n>Changer de thème</button></nav></header>
+<main id="paea-main" tabindex="-1">
+<p id="consent-limits" class="paea-notice" data-i18n>Consentement réel d’approbateur enrôlé : cette page exécute la commande Trust figée exacte préparée au démarrage, sur le Root projet lié, sous votre autorité enrôlée personnelle. Un refus reste un refus visible ; aucun succès n’est jamais fabriqué. Aucun appel Git n’est déclenché ici.</p>
+<section aria-labelledby="approval-title"><h2 id="approval-title" data-i18n>Canal d’approbation lié</h2>
+<p id="approval-status" role="status" aria-live="polite" data-state="loading" data-i18n>Chargement…</p>
+<div id="approval-detail" hidden>
+<section id="approval-bound" aria-labelledby="approval-bound-title"><h3 id="approval-bound-title" data-i18n>Commande figée liée au démarrage</h3><dl id="approval-capability"></dl></section>
+<section id="approval-action" aria-labelledby="approval-action-title"><h3 id="approval-action-title" data-i18n>Action préparée visée</h3><p id="preview-status" role="status" aria-live="polite" data-state="empty" data-i18n>Aperçu non chargé.</p><dl id="approval-preview"></dl></section>
+</div>
+</section>
+<form id="consent-form" hidden aria-describedby="consent-limits">
+<fieldset id="consent-inputs">
+<legend data-i18n>Autorité enrôlée personnelle</legend>
+<p data-i18n>La commande figée est détenue par le service : le navigateur ne transmet aucun octet de commande, uniquement votre mot de passe enrôlé. Vérifiez hors canal que l’empreinte affichée ci-dessus est bien celle de la commande que vous acceptez ; la route ne peut pas comparer à votre place un octet qu’elle ne reçoit pas.</p>
+<label for="consent-password" data-i18n>Mot de passe personnel enrôlé</label>
+<input id="consent-password" type="password" autocomplete="current-password" required>
+</fieldset>
+<button id="consent-send" class="paea-primary" type="submit" data-i18n>Exécuter la commande d’approbation liée</button>
+<p data-i18n>Un refus de rôle, de termes, de révision ou d’identité s’affiche tel quel : la page ne reformule jamais un refus en succès et ne retente pas automatiquement.</p>
+</form>
+<section aria-labelledby="result-title"><h2 id="result-title" data-i18n>Résultat du canal d’approbation</h2>
+<p id="result-status" role="status" aria-live="polite" data-state="empty" data-i18n>Aucun envoi effectué depuis cette page.</p>
+<dl id="result-detail"></dl>
+<details id="result-raw-box" hidden><summary data-i18n>Rapport technique</summary><pre id="result-raw" tabindex="0"></pre></details>
+</section>
+</main></body></html>

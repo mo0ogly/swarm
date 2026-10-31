@@ -5,7 +5,7 @@ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),asse
 const {execFileSync,spawn}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);
 if(!process.argv[2]||!process.argv[3])throw Error('usage: training_ui_capture.cjs BINARY OUTPUT');
-fs.mkdirSync(out,{recursive:true});const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-training-ui-'));
+fs.mkdirSync(out,{recursive:true});const root=fs.mkdtempSync(path.join(__dirname,'../..','.swarm-fixtures','swarm-training-ui-'));
 fs.cpSync(path.resolve('docs/training/casa-pizza/projet-pizza'),root,{recursive:true});
 const cli=(args,input)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{encoding:'utf8',input:input?JSON.stringify(input):undefined}));
 cli(['init']);execFileSync('python3',['docs/training/casa-pizza/creer_plan_pedagogique.py','--swarm',binary,'--projet',root]);

@@ -1,0 +1,17 @@
+{
+  "error": "Contrôle de tâche : travail w-6f8a90ab5cc11d94d6eb2d0e révision 11 enregistré ; échec de commande : work state recorded (w-6f8a90ab5cc11d94d6eb2d0e, revision 11); operation refused or failed; re-read before retrying. Relire l’état et les reçus avant reprise ; ne pas relancer aveuglément le contrôle.",
+  "failure": {
+    "causes": [
+      "work-state-preserved",
+      "task-validation-private-gate-refused"
+    ],
+    "code": "work-state-preserved",
+    "message": "Contrôle de tâche : travail w-6f8a90ab5cc11d94d6eb2d0e révision 11 enregistré ; échec de commande : work state recorded (w-6f8a90ab5cc11d94d6eb2d0e, revision 11); operation refused or failed; re-read before retrying. Relire l’état et les reçus avant reprise ; ne pas relancer aveuglément le contrôle.",
+    "retryable": false
+  },
+  "recorded_work": {
+    "id": "w-6f8a90ab5cc11d94d6eb2d0e",
+    "revision": 11
+  },
+  "schema_version": 1
+}

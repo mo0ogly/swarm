@@ -1,0 +1,9 @@
+[
+  "cc",
+  "-shared",
+  "-fPIC",
+  "/home/fpizzi/Documents/ChatGPT/swarm/tests/fixtures/biba_workspace_swap.c",
+  "-ldl",
+  "-o",
+  "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/workspace-swap-fd-after/workspace-swap.so"
+]

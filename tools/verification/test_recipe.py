@@ -7,6 +7,10 @@ import json
 from pathlib import Path
 import sys
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import unittest
 
 spec = importlib.util.spec_from_file_location('recipe', Path(__file__).with_name('recipe.py'))
@@ -18,7 +22,7 @@ class RecipeTests(unittest.TestCase):
     """Exercise successful witnesses before failure, tamper and recovery variants."""
     def setUp(self):
         """Create a private source and explicit observable recipe, never a live DB."""
-        self.temporary = tempfile.TemporaryDirectory()
+        self.temporary = tempfile.TemporaryDirectory(dir=fixture_area())
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         (self.root/'source.txt').write_text('original\n')

@@ -32,7 +32,7 @@ async function shot(name){await page.screenshot({path:path.join(reportDir,name+'
 (async()=>{
  try{
  const url=await new Promise((resolve,reject)=>{let out='';const timer=setTimeout(()=>reject(new Error('Server did not start')),10000);server.stdout.on('data',d=>{out+=d;const m=out.match(/http:\/\/[^\s]+\/session\/[^\s]+/);if(m){clearTimeout(timer);resolve(m[0])}});server.on('exit',code=>reject(new Error('Server exited '+code)))});
- browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox'],userDataDir:fs.mkdtempSync(path.join(os.tmpdir(),'swarm-ui-'))});
+ browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox'],userDataDir:fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-ui-'))});
  page=await browser.newPage();page.setDefaultTimeout(15000);await page.setViewport({width:1440,height:1000});page.on('pageerror',e=>errors.push(e.message));
  await page.goto(url);await page.waitForSelector('#tasks-body [data-task="UI-01"]');await page.waitForSelector('#mode');if(await page.evaluate(()=>document.body.dataset.mode)==='conduite'){await page.click('#mode');await page.waitForFunction(()=>document.body.dataset.mode==='expert')};await shot('etat-tasks');
  await openTask('UI-01');assert.match(await text('#preview'),/Périmètre/);await page.keyboard.press('Escape');assert.equal(await page.$eval('#modal',e=>e.open),false);// Ce qui compte est le retour du focus sur le bouton qui a ouvert le dialogue,

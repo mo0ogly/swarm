@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "status": "applied",
+  "accepted": false,
+  "selected_scope": "root",
+  "input_event": "managed-planning-enable",
+  "settings_revision": "1",
+  "lease_seconds": 120,
+  "claim_id": "planning-claim-e7e48637b4b83dd603013f12",
+  "run": {
+    "schema_version": 1,
+    "claim_id": "planning-claim-e7e48637b4b83dd603013f12",
+    "decision_event": "planning-decision-a754c5c9932f4cad13052720",
+    "decision_applied": true,
+    "accepted": false,
+    "replayed": false,
+    "work": {
+      "planning": {
+        "reviewer_required": true,
+        "reviewer": {
+          "max_context_files": 24,
+          "max_source_bytes": 98304,
+          "max_context_bytes": 131072,
+          "max_files": 100,
+          "provider": "fixture",
+          "provider_digest": "9354aa3883900f6e505b8fc0272b52334058800bb0b30ab558a4fdcd6c949727",
+          "model_route": {
+            "level": "standard",
+            "model": "fixture-standard",
+            "effort": "fixture-medium",
+            "billing": "external",
+            "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+            "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+          },
+          "max_calls": 2,
+          "calls": 0,
+          "authorized": "2026-10-28T17:52:31.709374503Z"
+        },
+        "model_route": {
+          "level": "standard",
+          "model": "fixture-standard",
+          "effort": "fixture-medium",
+          "billing": "external",
+          "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+          "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+        },
+        "checks": {
+          "req-1": [
+            {
+              "review_output": true,
+              "inputs": [
+                "tracked.txt"
+              ],
+              "id": "biba-control",
+              "command": [
+                "python3",
+                "-c",
+                "from pathlib import Path\nimport os,json,hashlib\nassert Path('tracked.txt').read_bytes()==b'Committed planning input\\n'\nroot=next(p.parent for p in Path.cwd().parents if p.name=='.swarm')\nfacts={}\ntry:\n with (root/'.swarm/engine-settings.json').open('rb') as f:facts['private_read']=bool(f.read(1))\nexcept OSError:facts['private_read']=False\ntry:\n fd=os.open(root/'.swarm/state.db',os.O_RDWR);os.close(fd);facts['database_write']=True\nexcept OSError:facts['database_write']=False\ntry:\n with (root/'.swarm'/('biba-control-'+str(os.getpid()))).open('xb') as f:f.write(b'OWNED_SYNTHETIC_LOW_CONTROL')\n facts['private_write']=True\nexcept OSError:facts['private_write']=False\ntry:\n fd=os.open(root/'source/tracked.txt',os.O_WRONLY);os.close(fd);facts['official_write']=True\nexcept OSError:facts['official_write']=False\nwith Path('biba-control-result-'+str(os.getpid())+'.json').open('x') as f:json.dump(facts,f)\nprint('OWNED_BIBA_CONTROL '+json.dumps(facts),flush=True)\n"
+              ],
+              "criteria": [
+                1
+              ],
+              "justification": "Observe only owned synthetic Biba boundaries; never accept a task",
+              "timeout_seconds": 60
+            }
+          ]
+        },
+        "repository": {
+          "source": "/tmp/swarm-model83-74_5nz19/source",
+          "storage": "/tmp/swarm-model83-74_5nz19/.swarm/managed/w-10fb269432444817aedce668",
+          "base_commit": "70f9efba95ff9bafc4a303054ea9980735628fa2",
+          "candidate_commit": "70f9efba95ff9bafc4a303054ea9980735628fa2",
+          "snapshot_digest": "9a80f3fd1639c9cdee5aded2890a8abd5ec43aad80d1c572b38ef1001e09c2a0",
+          "request_digest": "44857e71ce04d382e59eda18dbe1bc3b7cbcace02e4cf93cc2118244ab49ad01"
+        },
+        "provider": "fixture",
+        "provider_digest": "9354aa3883900f6e505b8fc0272b52334058800bb0b30ab558a4fdcd6c949727",
+        "activations": 1,
+        "max_activations": 6,
+        "version": 1,
+        "paused": false,
+        "max_tasks": 2,
+        "max_decisions": 10,
+        "decisions": 1,
+        "scopes": [
+          {
+            "last_model": {
+              "provider": "fixture",
+              "provider_digest": "9354aa3883900f6e505b8fc0272b52334058800bb0b30ab558a4fdcd6c949727",
+              "route": {
+                "level": "standard",
+                "model": "fixture-standard",
+                "effort": "fixture-medium",
+                "billing": "external",
+                "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+                "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+              },
+              "actor": "",
+              "at": "2026-10-28T17:52:31.841990327Z"
+            },
+            "delivery": {
+              "judge_available": true,
+              "judge_cycle": 1,
+              "task_budget": 2,
+              "activation_budget": 6,
+              "closure_unavailable": true,
+              "review_retry_unavailable": true,
+              "production_retry_unavailable": true,
+              "context_sha256": "6605e2a8e3ed3e9a421a5ebec815c9a50a0f40a95c203de9c03a91d5a1bd147a",
+              "events": [
+                "managed-planning-enable"
+              ],
+              "decision": "planning-decision-a754c5c9932f4cad13052720"
+            },
+            "workflow": {
+              "version": 1,
+              "role": "planner",
+              "methods": [
+                "apex",
+                "audit-pdca",
+                "spec-builder",
+                "spec-audit",
+                "replan",
+                "debug",
+                "product-planning"
+              ],
+              "sha256": "0ee8956b70ffdc7971b868f62666fa89f4cd40edeb68fb9211755de537572e55"
+            },
+            "activations": 1,
+            "id": "root",
+            "objective": "Scoped fixture planning",
+            "requirements": [],
+            "revision": 2,
+            "generation": 2,
+            "state": "waiting"
+          },
+          {
+            "max_tasks": 2,
+            "max_activations": 3,
+            "activations": 0,
+            "id": "child",
+            "parent": "root",
+            "objective": "Owned child scope\nPlan the owned requirement",
+            "requirements": [
+              "req-1"
+            ],
+            "revision": 1,
+            "generation": 0,
+            "state": "ready"
+          }
+        ],
+        "inbox": [
+          {
+            "id": "managed-planning-enable",
+            "scope": "root",
+            "kind": "brief",
+            "message": "Scoped fixture planning",
+            "decision": "planning-decision-a754c5c9932f4cad13052720",
+            "at": "2026-10-28T17:52:31.709374503Z"
+          },
+          {
+            "id": "plan-167645b41f0e7f09b19d07486c766cb61e2ce797b3bf1640b4eb8b49b4d3a813",
+            "scope": "child",
+            "kind": "delegation",
+            "message": "Owned child scope",
+            "at": "2026-10-28T17:52:32.133197751Z"
+          }
+        ],
+        "judge": {
+          "cycle": 1,
+          "max_cycles": 0,
+          "closed": false
+        }
+      },
+      "schema_version": 1,
+      "id": "w-10fb269432444817aedce668",
+      "revision": 4,
+      "title": "Public planning bootstrap",
+      "objective": "Scoped fixture planning",
+      "scope": "Owned local bootstrap",
+      "criteria": [
+        "Configuration is persisted without model execution"
+      ],
+      "next": "",
+      "summary": "",
+      "memory": null,
+      "created": "2026-10-28T17:52:31.583683443Z",
+      "updated": "2026-10-28T17:52:32.149566742Z",
+      "git": {
+        "head": "",
+        "branch": "",
+        "changes": ""
+      },
+      "tasks": []
+    }
+  }
+}

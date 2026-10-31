@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "cockpit-biba-identity-compatibility",
+  "inputs": [
+    "tests/rust_cockpit_biba_compatibility.py",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-engine/src/root_store/cockpit_snapshot.rs",
+    "rust/crates/swarm-engine/src/agent_execution_gate.rs",
+    "rust/crates/swarm-engine/src/agent_execution_preflight.rs",
+    "rust/crates/swarm-engine/src/agent_launch_preflight.rs",
+    "rust/crates/swarm-engine/src/agent_supervision.rs",
+    "rust/crates/swarm-engine/src/native_provider_biba.rs",
+    "rust/crates/swarm-engine/src/native_provider_exec.rs",
+    "rust/crates/swarm-biba-linux/src/*.rs",
+    "docs/architecture/COCKPIT-COMPATIBILITY.md",
+    "docs/en/COCKPIT-COMPATIBILITY.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-i0-control-root-refusal-and-identity-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='cockpit-biba-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_cockpit_biba_compatibility.py','--binary',os.environ['SWARM_COCKPIT_BIBA_BINARY'],'--output',str(p)],check=True)\nprint('COCKPIT_BIBA_IDENTITY_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"qualified\": true",
+        "\"status\": \"passed\"",
+        "\"status\": \"biba-guard-validated\"",
+        "\"status\": \"workspace-identity-refused\"",
+        "COCKPIT_BIBA_IDENTITY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

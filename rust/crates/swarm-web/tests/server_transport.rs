@@ -79,7 +79,7 @@ fn native_transport_real_tcp_gates_before_root_and_drains_owned_jobs() {
     assert!(capabilities.starts_with("HTTP/1.1 200"));
     let capabilities: serde_json::Value =
         serde_json::from_str(capabilities.split_once("\r\n\r\n").unwrap().1).unwrap();
-    assert_eq!(capabilities["actions"], serde_json::json!(["task"]));
+    assert_eq!(capabilities["actions"], serde_json::json!(["task", "task-add"]));
     assert_eq!(
         capabilities["settings"],
         serde_json::json!(["describe", "show", "preview", "apply"])

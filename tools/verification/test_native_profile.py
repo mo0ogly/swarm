@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Source qualification guards on owned files; no Cargo/provider/live Root."""
 import errno,tempfile,unittest
+from fixture_area import fixture_area
 from pathlib import Path
 from unittest.mock import patch
 import verify_native_profile as profile
@@ -10,7 +11,7 @@ class NativeProfileInputs(unittest.TestCase):
     """New effective inputs and storage failures must not become a false PASS."""
     def setUp(self):
         """Create owned candidate inputs; no actual repository/Cargo mutation."""
-        self.temporary=tempfile.TemporaryDirectory(prefix='native-profile-contract-');self.root=Path(self.temporary.name).resolve()
+        self.temporary=tempfile.TemporaryDirectory(prefix='native-profile-contract-', dir=fixture_area());self.root=Path(self.temporary.name).resolve()
         for name,data in {'rust/Cargo.toml':'[workspace]\n','rust/Cargo.lock':'# fixture\n','rust/crates/engine/Cargo.toml':'[package]\n','rust/crates/engine/src/lib.rs':'const TEXT:&str=include_str!("../../../../docs/protocol.txt");','docs/protocol.txt':'complete fixture protocol','web/new.js':'// new effective embed','web/unused.js':'// not compiled'}.items():
             path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(data)
     def tearDown(self):
@@ -31,7 +32,7 @@ class NativeProfileInputs(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'effective-input-changed'):profile.effective_unchanged(self.root,before,profile.manifest(self.root,[used]))
     def test_effective_external_input_refuses(self):
         """An external effective path must refuse instead of disappearing."""
-        with tempfile.TemporaryDirectory(prefix='external-profile-input-') as directory:
+        with tempfile.TemporaryDirectory(prefix='external-profile-input-', dir=fixture_area()) as directory:
             external=Path(directory)/'outside.rs';external.write_text('// external source')
             with self.assertRaisesRegex(ValueError,'absent-or-external'):profile.manifest(self.root,[external])
     def test_enospc_before_rename_preserves_original(self):

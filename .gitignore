@@ -181,6 +181,7 @@ go.work.sum
 # Maintained recipe sources remain under rust/, tests/, tools/ and docs/.
 /.cache/
 /rust/target/
+/rust/.cache/
 
 # Personal internal GLM agent skill (local only)
 /.claude/skills/skynet-agents
@@ -242,3 +243,12 @@ go.work.sum
 /docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/vet-03-launch-sources.tar.gz
 /docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/workflow-02-launch-sources.tar.gz
 /docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/workflow-03-launch-sources.tar.gz
+/.swarm-fixtures/
+# Regenerable evidence executables (ELF), kept out of git; hashes stay in evidence JSON
+/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image
+/docs/plans/actions-confiance/verification-biba-transverse-20261028/**/probe
+/docs/plans/actions-confiance/verification-biba-transverse-20261028/boundary-after
+/docs/plans/actions-confiance/verification-biba-transverse-20261028/boundary-before
+/docs/plans/actions-confiance/verification-biba-transverse-20261028/boundary-linked-current
+/docs/plans/actions-confiance/verification-biba-transverse-20261028/workspace-swap-fd-after/workspace-swap.so
+/docs/plans/actions-confiance/verification-biba-transverse-20261028/workspace-swap.so

@@ -239,5 +239,7 @@
  "report_preview_max_bytes": "262144",
  "report_verification_max_bytes": null,
  "cockpit_default_autonomy": "2",
- "paea_settlement_ledger_root": "/var/lib/swarm/paea-settlement-ledger"
+ "paea_settlement_ledger_root": "/var/lib/swarm/paea-settlement-ledger",
+ "web_login_ticket_seconds": "60",
+ "runtime_temporary_directory": ".swarm-fixtures"
 }

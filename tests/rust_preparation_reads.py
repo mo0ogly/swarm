@@ -7,6 +7,7 @@ the Rust writer recipe. This proves readers, not creation/adoption or native
 agent authority. SQL fault injections touch only this owned Root, with valid
 controls, originals and recovery. No account/provider or global watchdog.
 """
+from fixture_area import fixture_area
 import argparse,hashlib,http.client,json,os,signal,sqlite3,subprocess,tempfile,threading,urllib.parse
 from pathlib import Path
 from rust_agent_model_route import publish
@@ -17,7 +18,7 @@ class Driver:
     """Owned CLI fixture with original outputs and public policy history."""
     def __init__(self,binary,out):
         """Retain fixture birth and binary hash before public initialization."""
-        self.binary=binary;self.out=out;self.root=Path(tempfile.mkdtemp(prefix='swarm-preparation-read-'));self.calls=[]
+        self.binary=binary;self.out=out;self.root=Path(tempfile.mkdtemp(prefix='swarm-preparation-read-', dir=fixture_area()));self.calls=[]
         publish(out/'birth.json',dict(root=str(self.root),binary_sha256=hashlib.sha256(binary.read_bytes()).hexdigest(),authority=False,kind='owned_historical_read_fixture'))
     def call(self,args,value=None):
         """Retain exact argv/inputs/channels; no implicit retry or shell execution."""

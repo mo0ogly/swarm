@@ -6,6 +6,7 @@ journal and the reproduced malformed-v47 initializer. No live Root, provider,
 watchdog, retry, direct SQL edit or historical defaults adoption by a read.
 """
 import argparse,hashlib,json,subprocess,tempfile
+from fixture_area import fixture_area
 from pathlib import Path
 from rust_agent_model_route import publish
 
@@ -16,7 +17,7 @@ def main():
     binaries={k:Path(getattr(a,k.replace('-','_'))).resolve() for k in ['binary','legacy-binary','broken-binary']};checks=[];commands=[]
     def root(label):
         """Attribute one owned Root before invoking any initializer."""
-        p=Path(tempfile.mkdtemp(prefix='swarm-schema-boundary-'));publish(out/('owned-root-'+label+'.json'),dict(root=str(p),label=label,scope='owned settings fixture only'));return p
+        p=Path(tempfile.mkdtemp(prefix='swarm-schema-boundary-', dir=fixture_area()));publish(out/('owned-root-'+label+'.json'),dict(root=str(p),label=label,scope='owned settings fixture only'));return p
     def run(which,r,args,doc=None):
         """Retain exact CLI channels/argv; return JSON without erasing refusals."""
         n=str(len(commands)+1);argv=[str(binaries[which]),*args,'--root',str(r),'--json']

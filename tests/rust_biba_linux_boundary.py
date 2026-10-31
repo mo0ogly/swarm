@@ -5,6 +5,7 @@ The driver is a separate fixture, never the product binary or acceptance proof.
 No account, live Root, global observation, retry or whole-test watchdog is used.
 """
 import argparse,hashlib,json,os,subprocess,tempfile,socket
+from fixture_area import fixture_area
 from pathlib import Path
 import rust_agent_model_route as proof
 
@@ -15,7 +16,7 @@ def run(driver,out):
     the owned Root for diagnosis rather than deleting it or retrying unchanged.
     """
     out.mkdir(parents=True,exist_ok=False)
-    root=Path(tempfile.mkdtemp(prefix='swarm-biba-boundary-'))
+    root=Path(tempfile.mkdtemp(prefix='swarm-biba-boundary-', dir=fixture_area()))
     private=root/'.swarm';private.mkdir();workspace=root/'out';workspace.mkdir()
     proof.publish(private/'state.synthetic',b'OWNED_SYNTHETIC_NO_SECRET')
     proof.publish(out/'fixture.json',dict(root=str(root),driver_sha256=proof.digest(driver.read_bytes()),source_sha256=proof.digest(Path(__file__).read_bytes()),global_watchdog=None))

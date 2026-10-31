@@ -1,0 +1,159 @@
+{
+ "schema_version": 1,
+ "id": "paea-approval-form-rust",
+ "inputs": [
+  "rust/Cargo.toml",
+  "rust/Cargo.lock",
+  ".cargo/config.toml",
+  "rust/crates/*/Cargo.toml",
+  "rust/crates/swarm-engine/src/**/*",
+  "rust/crates/swarm-web/src/**/*",
+  "rust/crates/swarm-web/tests/paea_git_call.rs",
+  "rust/crates/swarm-web/tests/paea_effects_page.rs",
+  "rust/crates/swarm-enrollment-*/src/**/*",
+  "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+  "rust/crates/swarm-identity-contract/src/**/*",
+  "rust/crates/swarm-protection-contract/src/**/*",
+  "web/paea-effects.html",
+  "web/paea-approval-form.js",
+  "web/paea-effects.js",
+  "web/i18n.js",
+  "web/i18n-en.js",
+  "locales/en.json",
+  "tests/paea-approval-form-ui.cjs",
+  "tests/paea_approval_form_ui_recipe.py",
+  "package.json",
+  "package-lock.json",
+  "tools/verification/recipe.py",
+  ".cache/paea-verification-target/debug/.fingerprint/swarm-web-*/test-integration-test-paea_git_call",
+  "tools/verification/recipes/paea-approval-form-rust.json",
+  "docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-fresh-fixture-20261030T204930Z/source-fixture-fresh/result.json"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+  "CARGO_PROFILE_DEV_DEBUG": "0",
+  "CARGO_PROFILE_TEST_DEBUG": "0",
+  "CARGO_INCREMENTAL": "0",
+  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-fresh-fixture-20261030T204930Z/source-fixture-fresh"
+ },
+ "steps": [
+  {
+   "id": "approval-presentation-absence-without-source",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "--",
+    "--exact",
+    "approval_presentation_reports_explicit_absence_without_source",
+    "--nocapture",
+    "--test-threads=1"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "approval_presentation_reports_explicit_absence_without_source ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "approval-presentation-frozen-command-and-terms",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "--",
+    "--ignored",
+    "--exact",
+    "approval_presentation_serves_frozen_command_and_terms",
+    "--nocapture",
+    "--test-threads=1"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "approval_presentation_serves_frozen_command_and_terms ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "approval-page-embedded-assets",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_effects_page",
+    "--",
+    "--test-threads=1"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "2 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "approval-page-i18n-catalog",
+   "command": [
+    "node",
+    "scripts/i18n/build.cjs",
+    "--check"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "\"mode\":\"check\"",
+    "\"status\":\"pass\""
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "approval-form-test-binary-build",
+   "command": [
+    "sh",
+    "-c",
+    "touch rust/crates/swarm-web/src/service/native_admin.rs && cargo test --manifest-path rust/Cargo.toml --offline --locked -p swarm-web --test paea_git_call --no-run --message-format=json"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [],
+   "required_stderr": [
+    "Finished"
+   ]
+  },
+  {
+   "id": "approval-form-real-browser-qualification",
+   "command": [
+    "python3",
+    "tests/paea_approval_form_ui_recipe.py",
+    "--binary",
+    "{root}/.cache/paea-verification-target/debug/deps/paea_git_call",
+    "--output",
+    "{root}/.cache/paea-approval-form-browser-evidence-20261031e"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "PAEA_APPROVAL_FORM_BROWSER_VERIFIED 4"
+   ],
+   "required_stderr": []
+  }
+ ]
+}

@@ -10,6 +10,7 @@ import signal
 import struct
 import subprocess
 import tempfile
+from fixture_area import fixture_area
 import termios
 import time
 import uuid
@@ -22,7 +23,7 @@ args = parser.parse_args()
 binary = str(Path(args.binary).resolve())
 checks = []
 
-with tempfile.TemporaryDirectory(prefix='swarm-cockpit-smoke-') as directory:
+with tempfile.TemporaryDirectory(prefix='swarm-cockpit-smoke-', dir=fixture_area()) as directory:
     root = Path(directory)
     def cli(*command, payload=None):
         argv = [binary, '--root', str(root), '--json', *command]
@@ -130,7 +131,7 @@ print("Handoff: fixture completed", flush=True)
     time.sleep(.3)
     archive = root / 'history.zip'
     cli('export', wid, '--output', str(archive))
-    with tempfile.TemporaryDirectory(prefix='swarm-cockpit-import-') as other:
+    with tempfile.TemporaryDirectory(prefix='swarm-cockpit-import-', dir=fixture_area()) as other:
         subprocess.run([binary, '--root', other, 'init'], check=True, capture_output=True)
         subprocess.run([binary, '--root', other, 'import', '--input', str(archive)], check=True, capture_output=True)
         result = subprocess.run([binary, '--root', other, '--json', 'agent', 'list', wid], check=True, capture_output=True, text=True)

@@ -436,7 +436,11 @@ impl RootStore {
     /// borrowed PAEA authority. The callback rechecks physical witness bindings
     /// against both actually opened Roots, the exact permission/service/
     /// operation, policy admission (current Trust revision, non-disabled
-    /// effect role, Biba Invoke at I2, freshness for Commit) and the current
+    /// effect role, Biba Invoke at I2, freshness for Commit, plus the exact
+    /// captured agreement revalidated under the held reservation for Commit —
+    /// refusing `paea-git-promote-agreement-stale` when no approval still
+    /// matches these canonical bytes with an active mandate at the current
+    /// revision) and the current
     /// plan scope, then executes under a project writer reservation and the
     /// project Trust reservation. Commit performs one exact reference
     /// transaction with OLD fencing after reserving the durable intent; a
@@ -497,7 +501,30 @@ impl RootStore {
                         policy::current_plan(project, identity)?;
                         policy::current_actor(project, identity, &prepared.context)?;
                         match prepared.request().operation() {
-                            Operation::Commit => effect::commit(self, project, prepared, identity),
+                            Operation::Commit => {
+                                // Last-use agreement freshness at the actual
+                                // consumption point: the durable Trust approval
+                                // binding these exact canonical bytes must still
+                                // match under the reservation held across the Git
+                                // effect. The shared reservation excludes a
+                                // concurrent public revocation (exclusive lock)
+                                // from this check through the reference
+                                // transaction, closing the window between the
+                                // transport-side lookup and this effect without
+                                // any sleep or second synchronization. A
+                                // revision change, a revocation/expiry of the
+                                // underlying mandate or a superseded approval
+                                // after the captured lookup is the same typed
+                                // refusal; Reconcile observes the journal and
+                                // needs no agreement.
+                                if project
+                                    .paea_git_agreement_match(prepared.canonical.bytes())?
+                                    .is_none()
+                                {
+                                    return Err(R::Refused("paea-git-promote-agreement-stale"));
+                                }
+                                effect::commit(self, project, prepared, identity)
+                            }
                             Operation::Reconcile => effect::reconcile(self, prepared),
                         }
                     })();

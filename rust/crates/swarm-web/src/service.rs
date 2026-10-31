@@ -18,10 +18,15 @@ mod trust_enrollment;
 pub use trust_enrollment::{TrustEnrollmentSource, TrustEnrollmentSourceError};
 #[cfg(target_os = "linux")]
 mod paea_git_call;
+mod paea_git_call_preview;
+#[cfg(target_os = "linux")]
+mod paea_git_call_approval;
 #[cfg(target_os = "linux")]
 pub use paea_git_call::{PaeaGitCallAuthority, PaeaGitCallSourceError};
 #[cfg(target_os = "linux")]
 pub use paea_git_call::PaeaGitCallSource;
+#[cfg(target_os = "linux")]
+pub use paea_git_call::PaeaGitCallApprovalSource;
 mod paea;
 mod planning;
 mod lifecycle_inventory;
@@ -617,10 +622,10 @@ impl DispatchProfile {
     fn capabilities(self) -> serde_json::Value {
         match self {
             Self::Typed => {
-                serde_json::json!({"schema_version":1,"profile":"rust-native-in-construction","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
+                serde_json::json!({"schema_version":1,"profile":"rust-native-in-construction","actions":["task","task-add"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
             }
             Self::ObservedHttp1 => {
-                serde_json::json!({"schema_version":1,"profile":"rust-native-http1-observed","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
+                serde_json::json!({"schema_version":1,"profile":"rust-native-http1-observed","actions":["task","task-add"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
             }
         }
     }
@@ -668,6 +673,36 @@ impl NativeHttpService {
         authority: LocalWebAuthority,
         source: PaeaGitCallAuthority,
     ) -> Result<Self, HttpServiceError> {
+        Self::open_git_call_with_approval(root_path, authority, source, None)
+    }
+    /// Same trusted bootstrap with one optional prepared approval command
+    /// (frozen operation + exact bytes bound to the project root) attached to
+    /// the held authority before any session publication. On any refusal the
+    /// supplied authority — approval witness included — is closed explicitly.
+    /// The approval binds nothing new: the request must still match the exact
+    /// frozen bytes under the held enrolled authority at consumption.
+    #[cfg(target_os = "linux")]
+    pub fn open_git_call_with_approval(
+        root_path: &Path,
+        authority: LocalWebAuthority,
+        mut source: PaeaGitCallAuthority,
+        approval: Option<super::PaeaGitCallApprovalSource>,
+    ) -> Result<Self, HttpServiceError> {
+        let approval_result = match approval {
+            Some(approval) => source.bind_approval(approval).err(),
+            None => None,
+        };
+        if let Some(cause) = approval_result {
+            // The bind refused: close the supplied authority (approval witness
+            // included) and retain both independent causes typed.
+            return match source.close() {
+                Ok(()) => Err(root("paea-git-call-approval-bind", cause)),
+                Err(cleanup) => Err(HttpServiceError::GitCallSource {
+                    primary: Some(Box::new(root("paea-git-call-approval-bind", cause))),
+                    cause: Box::new(cleanup),
+                }),
+            };
+        }
         match Self::open_checked_source(root_path, authority, None, Some(&source)) {
             Ok(mut service) => {
                 service.paea_git_call = Some(source);
@@ -817,11 +852,13 @@ impl NativeHttpService {
             .map(|p| p.cookie_max_age_seconds)
             .map_err(|cause| root("settings", RootStoreError::Settings(cause)))
     }
-    /// Exact local browser resources contain no datastore operation. The caller
+    /// Exact local browser resources contain no datastore operation (a ticket
+    /// sign-in consumes Root state and is excluded). The caller
     /// must additionally check an empty incoming body and authorize before using
     /// cancellable lane waiting; POST/API/unknown routes never gain this behavior.
     fn browser_resource<B>(&self, request: &Request<B>) -> bool {
         matches!(*request.method(), Method::GET | Method::HEAD)
+            && !login::ticket_request(request)
             && (login::public(request) || native_admin::resource(request) || live::resource(request))
     }
     /// Like Go's public landing, a GET/HEAD / without a usable session renders
@@ -846,7 +883,7 @@ impl NativeHttpService {
         if login::public(request) || self.root_login(request) {
             self.authority.authorize_login(request)
         } else {
-            self.authority.authorize(request)
+            self.authority.authorize(request).map(drop)
         }
     }
     /// Explicitly close the datastore binding after the owner has drained all
@@ -961,12 +998,22 @@ impl NativeHttpService {
                 })
                 .or_else(|error| error_reply(error, head));
         }
+        if request.uri().path() == "/api/v1/logout" {
+            // Protected like any API mutation (cookie + Origin + CSRF); only
+            // clears this browser's cookies, never the persisted owner key.
+            return self
+                .authority
+                .authorize(&request)
+                .map_err(HttpServiceError::Access)
+                .and_then(|_principal| self.logout_reply(&request))
+                .or_else(|error| error_reply(error, head));
+        }
         if live::owns(request.uri().path()) {
             return self
                 .authority
                 .authorize(&request)
                 .map_err(HttpServiceError::Access)
-                .and_then(|()| live::reply(&request))
+                .and_then(|_principal| live::reply(&request))
                 .or_else(|error| error_reply(error, head));
         }
         if native_admin::owns(request.uri().path()) {
@@ -974,14 +1021,19 @@ impl NativeHttpService {
                 .authority
                 .authorize(&request)
                 .map_err(HttpServiceError::Access)
-                .and_then(|()| native_admin::reply(&request))
+                .and_then(|_principal| native_admin::reply(&request))
                 .or_else(|error| error_reply(error, head));
         }
+        let mut request = request;
         let result = self
             .authority
             .authorize(&request)
             .map_err(HttpServiceError::Access)
-            .and_then(|()| self.route(&request, profile, peer_closed));
+            .and_then(|principal| {
+                // Attribution for route handlers; grants no right beyond the checks above.
+                request.extensions_mut().insert(principal);
+                self.route(&request, profile, peer_closed)
+            });
         match result {
             Ok(body) => {
                 let mut response = response(StatusCode::OK, body.bytes, head, None);
@@ -1128,6 +1180,14 @@ impl NativeHttpService {
             #[cfg(target_os = "linux")]
             "/api/v1/paea/git-call" => self.paea_git_call(request),
             #[cfg(target_os = "linux")]
+            "/api/v1/paea/git-call/preview" => self.paea_git_call_preview(request),
+            #[cfg(target_os = "linux")]
+            "/api/v1/paea/git-call/approval" => self.paea_git_call_approval(request),
+            #[cfg(target_os = "linux")]
+            "/api/v1/paea/git-call/approval/presentation" => {
+                self.paea_git_call_approval_presentation(request)
+            }
+            #[cfg(target_os = "linux")]
             "/api/v1/protection/linux-prerequisites" => paea::linux_prerequisites(request),
             "/api/v1/paea/reconcile-effects" => self.reconcile_effects(request),
             "/api/v1/protection/receipt-report" => paea::receipt_report(request),
@@ -1172,9 +1232,16 @@ impl NativeHttpService {
         Ok(())
     }
     /// Apply server-derived outer fields through Root's common external boundary;
+    /// Only task.update/task.add are selected by the validated outer vocabulary;
     /// no Request origin can impersonate engine/conductor authority. Known Work
     /// survives encoding/close failure; Root late-release metadata also propagates.
     fn task(&self, mut action: TaskAction) -> Result<RouteBody, HttpServiceError> {
+        // Fixed operation vocabulary, never a caller-selected engine command.
+        let kind = match action.kind.as_str() {
+            "task" => "task.update",
+            "task-add" => "task.add",
+            _ => return Err(HttpServiceError::Refused("web-operation-unported")),
+        };
         action.request.schema_version = 1;
         action.request.event_id = action.event_id;
         action.request.expected_revision = action.expected_revision;
@@ -1187,7 +1254,7 @@ impl NativeHttpService {
         let result = (|| {
             self.check_binding(&store)?;
             let outcome = store
-                .execute_external(&action.work, "task.update", &raw, &mut SystemEnvironment)
+                .execute_external(&action.work, kind, &raw, &mut SystemEnvironment)
                 .map_err(|cause| root("mutate", cause))?;
             let work = outcome.result.work;
             recorded = Some((work.id.clone(), work.revision));
@@ -1284,6 +1351,8 @@ struct TaskAction {
 /// Decode the common Go null/case/merge shape using the actual generated Request
 /// descriptor. Require task/event/work identities and positive revision before
 /// Root open; current business/revision/origin rules remain authoritative there.
+/// `task` updates and `task-add` creates via the same admission and publication
+/// path. Nested schema/event/revision/id/origin never override the outer fields.
 fn task_action(raw: &[u8]) -> Result<TaskAction, HttpServiceError> {
     swarm_engine::check_command_input_size(raw).map_err(HttpServiceError::Input)?;
     const FIELDS: Fields = &[
@@ -1296,7 +1365,7 @@ fn task_action(raw: &[u8]) -> Result<TaskAction, HttpServiceError> {
     ];
     let value = projection::project(raw, FIELDS, true).map_err(HttpServiceError::Projection)?;
     let action: TaskAction = serde_json::from_value(value).map_err(HttpServiceError::Json)?;
-    if action.kind != "task" {
+    if !matches!(action.kind.as_str(), "task" | "task-add") {
         return Err(HttpServiceError::Refused("web-operation-unported"));
     }
     if [&action.work, &action.task, &action.event_id]

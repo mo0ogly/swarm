@@ -2407,3 +2407,25 @@ chaîne 4/4 PASS + VERIFIED (`recipe-chain-run-4-durable/`), transfert 8/8 PASS 
 VERIFIED (`recipe-transfer-run-durable/`). ~120 autres scripts de test restent
 à migrer hors de `/tmp` (suivi enregistré). Preuves : dossier
 `claude-e2-arbitrage-20261031T135859Z`.
+
+**Migration complète (même journée, finalisation)** : la phrase « ~120 autres
+scripts restent à migrer » est closes — la totalité du périmètre est migrée.
+Contrat unique `tests/fixture_area.py` (`fixture_root`, `fixture_area`) + miroir
+Node `tests/fixture_area.cjs` ; `rust_agent_model_route.fixture_root` délègue
+(identité vérifiée). 145 fichiers Python / 219 appels `mkdtemp`/`TemporaryDirectory`
+sans `dir=` corrigés (import nu côté `tests/`, shim borné côté `tools/`,
+`swarm_version.py` embarqué portant sa propre aire autonome), ~95 fichiers `.cjs`
+écartés de `os.tmpdir()`, `recipe.py` épingle désormais `TMPDIR` sous
+`.swarm-fixtures/runner-tmp` (couverture Python/Rust/Node/Go pour les runs de
+recettes, preuve par recette `env` PASS), `test_swarm_local.py` re-pointé du
+défaut `/tmp/swarm-stable-site-candidate` vers `bin/swarm`. Garde de non-récidive
+permanente : `tools/check_tmp_interdiction.py` (scan AST, exit 1 s'il reste une
+allocation sans `dir=` — état final 0 violation ; `mkstemp(dir=destination.parent)`
+exempté comme échafaudage d'écriture atomique adjacente). Exemptions documentées :
+`mission_status_runtime.rs` (lecture capacité, pas d'allocation) ; production
+Rust `preparation_worker_run_cli` alloue toujours son espace de travail sous
+`env::temp_dir()` — transmis au propriétaire (binaire installé épinglé E2
+`1d3f9da1…`, modification non autorisée unilatéralement). Racines `/tmp` restantes :
+travaux de sessions parallèles vivantes, non touchés. Documentation :
+`tools/verification/README.md` (section interdiction), exemples commandes
+PRODUCT-WORKFLOW/T4/T6 FR+EN re-pointés.

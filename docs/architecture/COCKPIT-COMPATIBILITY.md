@@ -208,3 +208,65 @@ Installation vérifiée : image2d28e0bc7fe061131617ee9c26ceb276bce74b2c36a304d85
 PID1130985 ;4assets conformes,14Version et16AdminFR/EN,5Works et leurs contrôles
 préservés. Les états avec tentatives, revues, agents conservés ou planning
 restent explicitement hors de cette tranche. Aucune migration complète déduite.
+
+## Tâches bloquées initiales — candidat du 30 octobre 2026
+
+La source étend la lecture aux tâches `blocked` sans tentative ni preuve, revue,
+gate, revalidation ou autorisation corrective, dans un Work sans planning ni
+agent conservé. Les dépendances TODO/BLOCKED restent non acceptées ; le lecteur
+conserve les faits de validation, l’ordre et le premier motif de blocage.
+Zéro tentative ne peut épuiser un plafond positif : aucune extension ni reprise
+corrective n’est affichée. Les textes hérités du Go n’ajoutent pas de seuil Rust.
+La proposition d’action reste une lecture, jamais une autorisation de lancement.
+
+Le mode maintenu `--initial-blocked` exige la comparaison Go/Rust du document
+complet, la pause, un budget insuffisant puis rétabli, le retour à TODO et un
+refus sans document après une vraie transition vers abandonné. Le contre-exemple
+263 est conservé ; compilation, exécution du candidat et installation ne sont
+pas encore acquises à cette étape.
+
+## Compatibilité identité et Biba du cockpit
+
+Une action disponible n’authentifie pas un agent et ne lui donne pas de niveau
+d’intégrité. `inspect_cockpit` assemble uniquement une observation ; il ne lance
+aucun fournisseur et ne modifie ni identité ni droit. Les contrôles existants
+d’instance, de processus et de workspace restent dans le parcours d’exécution.
+La frontière Linux I0 du fournisseur est distincte de l’authentification métier
+et du moniteur Biba : aucune conformité globale ne se déduit d’un affichage ou
+d’un confinement réussi. Une sortie I0 reste candidate et ne vaut pas validation.
+
+```mermaid
+flowchart TD
+    C[inspect_cockpit : faits observés] --> A[Action proposée sans autorité]
+    A -. Demande publique distincte .-> P[agent prepare puis run]
+    P --> G[execute_agent_gate : identités et préconditions recontrôlées]
+    G --> W[Workspace lié à son inode]
+    W --> B[Sandbox prepare_bound puis enforce]
+    B --> I[Fournisseur I0 : sortie candidate]
+    G -->|Refus| R[Pas de lancement fournisseur]
+    B -->|Refus| R
+```
+
+Le candidat264 passe156assertions cockpit,15de recouvrement et5tests du
+comparateur. La régression d’exécution identité/Biba est déléguée à GLM : témoin
+valide en workspace I0, refus du workspace Root, puis remplacement d’inode si
+la preuve spécifique est établie. Aucun résultat de cette régression n’est
+encore revendiqué ; les43sources identité/Biba sélectionnées sont seulement
+vérifiées inchangées depuis263. Les changements PAEA concurrents ne sont pas
+qualifiés par cette comparaison et l’installation264 reste en attente.
+
+Résultat sur l’image264 figée : le témoin fournisseur local s’exécute dans le
+workspace I0 avec PID et parent concordants ; le workspace Root est refusé par
+`biba-workspace-overlaps-root`, dans `native_execution_result.pre_exec_failure`,
+avec `provider_may_have_started:false`. Le remplacement d’inode est refusé par
+`agent-execution-preflight-changed` ; restaurer l’inode original permet au même
+intent de s’exécuter, sans réinitialisation du budget ni nouvelle autorisation.
+Le CLI peut retourner0pour une tentative échouée observée : le test consomme
+le résultat natif, pas cet exit seul. L’échec initial du banc est conservé.
+
+Recette maintenue : `cockpit-biba-identity-compatibility.json`, programme
+`tests/rust_cockpit_biba_compatibility.py`, variable `SWARM_COCKPIT_BIBA_BINARY`.
+Elle conserve les états Work/budget avant/après et les causes ; aucun accès SQL,
+fournisseur réel ou élévation de privilèges. Ces témoins ne prouvent pas
+l’authentification cryptographique d’un agent ni la médiation de tous les flux.
+L’installation reste distincte et bloquée par la qualification PAEA partagée.

@@ -2,6 +2,19 @@
 (function () {
   const t = (source) => globalThis.SwarmI18n?.t ? globalThis.SwarmI18n.t(source) : source;
   const SVG_NS = 'http://www.w3.org/2000/svg';
+  let refreshWork = null;
+
+  /** Register the cockpit's asynchronous readback consumer. The callback takes
+   * Work ID and acknowledged revision, resolves after observations are reread,
+   * or rejects on refresh failure. It performs no mutation itself. A changed
+   * selection must be preserved. Missing handlers refuse editor completion.
+   * @param {(id:string, revision:number)=>Promise<void>} handler native consumer
+   * @throws {TypeError} for a non-function; no existing handler is replaced then
+   */
+  function setRefreshHandler(handler) {
+    if(typeof handler!=='function')throw new TypeError('graph-refresh-handler-required');
+    refreshWork=handler;
+  }
 
   /**
    * Text node helper using textContent (no innerHTML).
@@ -106,17 +119,165 @@
     host.replaceChildren(canvas);
   }
 
+  /** Open a task editor on one observed Work revision. Inputs remain visible on
+   * refusal. Explicit submit uses scoped CSRF and the engine's task contracts;
+   * no provider or automatic retry. A lost/malformed response is uncertain and
+   * disables resubmission until the operator closes and refreshes. Success needs
+   * a protected Work readback; the cockpit then reloads its actual observations.
+   * @param {object} work recorded Work, never a fabricated snapshot
+   * @param {object|null} task null creates, otherwise edits the recorded task
+   * @param {string[]|undefined} proposedDependencies optional unsaved link gesture
+   */
+  function editTask(work, task=null, proposedDependencies) {
+    const returnFocus=document.activeElement,dialog=document.createElement('dialog');let completionFocus=null;
+    dialog.className='native-graph-editor';dialog.setAttribute('aria-labelledby','native-graph-editor-title');
+    const form=document.createElement('form'),header=document.createElement('header'),heading=document.createElement('h2');
+    heading.id='native-graph-editor-title';heading.textContent=t(task?'Modifier la tâche':'Ajouter une tâche');
+    const close=document.createElement('button');close.type='button';close.textContent=t('Fermer');close.addEventListener('click',()=>dialog.close());header.append(heading,close);
+    const body=document.createElement('div');body.className='modal-body';
+    const fields={};
+    /** Add a named, labeled input; user values are plain text only. */
+    function field(name,label,value,multiline=false){const wrap=document.createElement('label');wrap.textContent=t(label);const input=document.createElement(multiline?'textarea':'input');input.name=name;input.id='native-graph-'+name;input.value=value;input.required=true;wrap.htmlFor=input.id;wrap.append(input);body.append(wrap);fields[name]=input;return input}
+    field('id','Identifiant',task?.id||'').readOnly=!!task;
+    field('title','Titre',task?.title||'');field('deliverable','Livrable',task?.deliverable||'');
+    field('criteria','Critères d’acceptation (un par ligne)',(task?.criteria||[]).join('\n'),true);
+    const label=document.createElement('label');label.textContent=t('Prérequis');label.htmlFor='native-graph-depends';
+    const dependencies=document.createElement('select');dependencies.id='native-graph-depends';dependencies.multiple=true;
+    for(const other of work.tasks||[]){if(other.id===task?.id)continue;const option=document.createElement('option');option.value=other.id;option.textContent=other.id+' — '+other.title;option.selected=!!(proposedDependencies??task?.depends)?.includes(other.id);dependencies.append(option)}label.append(dependencies);body.append(label);
+    const notice=document.createElement('p');notice.className='notice info';notice.textContent=t('Choisissez les prérequis. Enregistrer modifie le plan sans lancer d’agent.');body.append(notice);
+    const error=document.createElement('p');error.className='notice alert';error.setAttribute('role','alert');error.hidden=true;body.append(error);
+    const footer=document.createElement('footer'),save=document.createElement('button');save.type='submit';save.className='primary';save.id='native-graph-save';save.textContent=t('Enregistrer');footer.append(save);form.append(header,body,footer);dialog.append(form);document.body.append(dialog);
+    let pending=false;
+    dialog.addEventListener('cancel',e=>{if(pending)e.preventDefault()});
+    dialog.addEventListener('close',()=>{dialog.remove();if(completionFocus?.isConnected)completionFocus.focus();else if(returnFocus?.isConnected)returnFocus.focus()});
+    form.addEventListener('submit',async e=>{
+      e.preventDefault();if(pending)return;pending=true;save.disabled=true;close.disabled=true;error.hidden=true;let submitted=false;
+      const request={title:fields.title.value,deliverable:fields.deliverable.value,criteria:fields.criteria.value.split('\n').map(s=>s.trim()).filter(Boolean),depends:[...dependencies.selectedOptions].map(o=>o.value)};
+      const taskID=fields.id.value;for(const input of form.querySelectorAll('input,textarea,select'))input.disabled=true;
+      try{
+        const sessionResponse=await fetch('/api/v1/native-session',{credentials:'same-origin'}),session=await sessionResponse.json();
+        if(!sessionResponse.ok||typeof session.csrf_token!=='string')throw Error('web-native-session-invalid');
+        submitted=true;
+        const response=await fetch('/api/v1/action',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Swarm-CSRF':session.csrf_token},body:JSON.stringify({kind:task?'task':'task-add',work:work.id,task:taskID,event_id:'graph-'+crypto.randomUUID(),expected_revision:work.revision,request})});
+        const result=await response.json();
+        if(!response.ok){const code=result.failure?.code||result.error;const refusal=Error(typeof code==='string'&&/^[a-z][a-z0-9_.-]*$/.test(code)?code:'web-native-response-invalid');refusal.refused=!result.recorded_work&&[400,403,409,422,501].includes(response.status);throw refusal}
+        if(result.id!==work.id||result.revision!==work.revision+1)throw Error('web-native-response-invalid');
+        const read=await fetch('/api/v1/planning?'+new URLSearchParams({work:work.id}),{credentials:'same-origin'}),observed=await read.json(),actual=observed.tasks?.find(t=>t.id===taskID);
+        if(!read.ok||observed.id!==work.id||!Number.isSafeInteger(observed.revision)||observed.revision<result.revision||!actual||actual.title!==request.title||actual.deliverable!==request.deliverable||JSON.stringify(actual.criteria)!==JSON.stringify(request.criteria)||JSON.stringify(actual.depends||[])!==JSON.stringify(request.depends))throw Error('web-native-readback-unconfirmed');
+        if(!refreshWork)throw Error('web-native-graph-refresh-unavailable');
+        await refreshWork(work.id,observed.revision);
+        completionFocus=[...container().querySelectorAll('.graph-task-open')].find(n=>n.dataset.task===taskID);
+        dialog.close();
+      }catch(cause){error.hidden=false;error.textContent=t('Modification refusée ou résultat non confirmé. Fermez et actualisez avant de reprendre.')+' ('+cause.message+')';save.disabled=submitted&&!cause.refused}
+      finally{pending=false;close.disabled=false;for(const input of form.querySelectorAll('input,textarea,select'))input.disabled=false;if(!submitted)save.disabled=false}
+    });
+    dialog.showModal();fields[task?'title':'id'].focus();
+  }
+
+  /** Mount local presentation controls around a validated recorded graph.
+   * Coordinates/zoom are device preferences, scoped to origin, Work and direction;
+   * they grant no mutation or execution rights. Storage failure remains visible.
+   * Native modal semantics own focus/inertness/Escape in fullscreen.
+   * @param {Element} host existing graph container, replaced after mounting
+   * @param {HTMLElement} canvas scroll viewport containing the recorded SVG
+   * @param {SVGElement} svg validated Dagre layout, dimensions in SVG units
+   * @param {object} work recorded Work with validated tasks/dependencies
+   * @param {'LR'|'TB'} orientation displayed layout direction
+   * @returns {void} installs listeners and cleanup; storage refusals stay visible
+   */
+  function navigation(host, canvas, svg, work, orientation) {
+    const studio=document.createElement('section');studio.id='graph-studio';studio.className='graph-studio native-graph-studio';
+    const toolbar=document.createElement('div');toolbar.className='pilot-actions';
+    const status=document.createElement('p');status.className='graph-studio-hint';status.setAttribute('role','status');
+    const key='swarm-native-graph:v1:'+work.id+':'+orientation;
+    let positions=Object.create(null),zoom=1,gesture=null,connection=null,disposed=false;
+    try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(saved){if(Number.isFinite(saved.zoom))zoom=Math.max(.15,Math.min(2,saved.zoom));for(const [id,p]of Object.entries(saved.positions||{}))if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y))positions[id]={x:p.x,y:p.y}}}catch{status.textContent=t('Positions indisponibles ; placement automatique conservé.')}
+    const base={width:Number(svg.getAttribute('width')),height:Number(svg.getAttribute('height'))},units=new Map();
+    const map=svgNode('svg',{class:'graph-minimap',role:'img','aria-label':t('Mini-carte du graphe')});canvas.append(map);
+    canvas.id='pilot-canvas';canvas.classList.add('native-graph-canvas');
+    const modal=document.createElement('dialog');modal.className='native-graph-dialog';modal.setAttribute('aria-label',t('Graphe du travail'));
+    /** Persist presentation only; report refusal without claiming persistence. */
+    function save(){try{localStorage.setItem(key,JSON.stringify({zoom,positions}))}catch{status.textContent=t('Positions non mémorisées sur cet appareil.')}}
+    /** Recompute curves from moved endpoints and expand the scrollable extent. */
+    function update(){
+      let width=base.width,height=base.height;
+      for(const [id,u]of units){const p=positions[id]||{x:0,y:0};u.group.setAttribute('transform',`translate(${p.x} ${p.y})`);width=Math.max(width,u.x+p.x+u.w+30);height=Math.max(height,u.y+p.y+u.h+30)}
+      for(const edge of svg.querySelectorAll('.graph-arete')){const a=units.get(edge.dataset.from),b=units.get(edge.dataset.to);if(!a||!b)continue;const ap=positions[edge.dataset.from]||{x:0,y:0},bp=positions[edge.dataset.to]||{x:0,y:0},vertical=orientation==='TB';
+        const x1=a.x+ap.x+(vertical?a.w/2:a.w),y1=a.y+ap.y+(vertical?a.h:a.h/2),x2=b.x+bp.x+(vertical?b.w/2:0),y2=b.y+bp.y+(vertical?0:b.h/2),d=Math.max(60,Math.abs(vertical?y2-y1:x2-x1)/2);
+        edge.setAttribute('d',vertical?`M${x1},${y1} C${x1},${y1+d} ${x2},${y2-d} ${x2},${y2}`:`M${x1},${y1} C${x1+d},${y1} ${x2-d},${y2} ${x2},${y2}`);
+      }
+      svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.setAttribute('width',width*zoom);svg.setAttribute('height',height*zoom);
+      map.setAttribute('viewBox',`0 0 ${width} ${height}`);map.replaceChildren();
+      for(const edge of svg.querySelectorAll('.graph-arete'))map.append(svgNode('path',{d:edge.getAttribute('d'),class:'graph-minimap-edge'}));
+      for(const [id,u]of units){const p=positions[id]||{x:0,y:0};map.append(svgNode('rect',{x:u.x+p.x,y:u.y+p.y,width:u.w,height:u.h,rx:8,class:'graph-minimap-node'}))}
+      zoomText.textContent=Math.round(zoom*100)+' %';
+    }
+    /** Create a native action with textContent and scoped listener. */
+    function button(id,label,action){const b=document.createElement('button');b.type='button';b.id=id;b.textContent=t(label);b.addEventListener('click',action);toolbar.append(b);return b}
+    const zoomText=document.createElement('output');zoomText.setAttribute('aria-label',t('Zoom'));
+    button('pilot-zoom-out','Réduire le zoom',()=>{zoom=Math.max(.15,zoom-.15);update();save()});
+    toolbar.append(zoomText);
+    button('pilot-zoom-in','Agrandir le zoom',()=>{zoom=Math.min(2,zoom+.15);update();save()});
+    button('pilot-fit','Vue d’ensemble',()=>{zoom=Math.max(.15,Math.min(1,(canvas.clientWidth-24)/base.width,(canvas.clientHeight-24)/base.height));update();canvas.scrollTo(0,0);save()});
+    const full=button('pilot-fullscreen','Plein écran',()=>{if(modal.open){modal.close();return}modal.showModal();modal.append(studio);studio.classList.add('is-fullscreen');document.body.classList.add('graph-studio-open');full.textContent=t('Quitter le plein écran');full.setAttribute('aria-expanded','true');full.focus()});full.setAttribute('aria-expanded','false');
+    button('pilot-layout-reset','Ranger les cartes',()=>{positions=Object.create(null);update();save()});
+    button('pilot-add-task','Ajouter une tâche',()=>editTask(work));
+    const direction=document.createElement('select');direction.id='pilot-orientation';direction.setAttribute('aria-label',t('Orientation'));
+    for(const [value,label]of [['LR','Gauche → droite'],['TB','Haut → bas']]){const option=document.createElement('option');option.value=value;option.textContent=t(label);direction.append(option)}direction.value=orientation;
+    direction.addEventListener('change',()=>{host.dataset.orientation=direction.value;render(work)});toolbar.append(direction);
+    /** Convert pointer coordinates to unscaled SVG units; no engine state. */
+    function point(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
+    /** End or roll back a captured gesture; cancellation never persists changes. */
+    function finish(cancel=false){if(!gesture)return;const g=gesture;gesture=null;if(cancel&&g.id)positions[g.id]=g.origin;if(cancel&&!g.id&&!g.link)canvas.scrollTo(g.left,g.top);if(g.target.hasPointerCapture(g.pointer))g.target.releasePointerCapture(g.pointer);svg.querySelector('.graph-link-ghost')?.remove();update();if(!cancel&&g.id)save()}
+    /** Stage one link in the destination task form; never save from a gesture.
+     * The engine checks cycles/activity/revision on explicit confirmation.
+     */
+    function link(from,to){connection=null;if(from===to){status.textContent=t('Choisissez deux tâches différentes.');return}const target=work.tasks.find(t=>t.id===to);if(!target)return;editTask(work,target,[...new Set([...(target.depends||[]),from])])}
+    /** Keyboard/click ports provide the same proposal as a pointer connection. */
+    function activatePort(id,side){if(!connection){connection={id,side};status.textContent=t('Choisissez l’autre extrémité du lien. Échap annule.');return}if(connection.side===side){connection={id,side};return}const first=connection;link(side==='in'?first.id:id,side==='in'?id:first.id);status.textContent=''}
+    for(const group of svg.querySelectorAll('.graph-noeud')){
+      const rect=group.querySelector('rect'),id=group.dataset.task,x=Number(rect.getAttribute('x')),y=Number(rect.getAttribute('y')),w=Number(rect.getAttribute('width')),h=Number(rect.getAttribute('height'));
+      group.classList.add('graph-unit');group.dataset.node=id;units.set(id,{group,x,y,w,h});
+      const open=svgNode('g',{class:'graph-task-open',role:'button',tabindex:0,'aria-label':group.getAttribute('aria-label')});open.dataset.task=id;
+      while(group.firstChild)open.append(group.firstChild);group.append(open);group.setAttribute('role','group');
+      open.addEventListener('click',()=>editTask(work,work.tasks.find(t=>t.id===id)));
+      open.addEventListener('keydown',e=>{if(!['Enter',' '].includes(e.key))return;e.preventDefault();editTask(work,work.tasks.find(t=>t.id===id))});
+      const handle=svgNode('g',{class:'graph-drag',role:'button',tabindex:0,'aria-label':t('Déplacer la carte')+' '+id});handle.dataset.task=id;handle.append(svgNode('rect',{x:x+w-34,y:y+4,width:30,height:30,rx:6}),svgNode('text',{x:x+w-30,y:y+25},'⠿'));group.append(handle);
+      handle.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();e.stopPropagation();const p=positions[id]||{x:0,y:0};positions[id]={x:Math.max(-x,p.x+(e.key==='ArrowLeft'?-16:e.key==='ArrowRight'?16:0)),y:Math.max(-y,p.y+(e.key==='ArrowUp'?-16:e.key==='ArrowDown'?16:0))};update();save()});
+      handle.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();e.stopPropagation();handle.focus();gesture={id,target:handle,pointer:e.pointerId,origin:{...(positions[id]||{x:0,y:0})},start:point(e)};handle.setPointerCapture(e.pointerId)});
+      handle.addEventListener('pointermove',e=>{if(gesture?.id!==id)return;const p=point(e);positions[id]={x:Math.max(-x,gesture.origin.x+p.x-gesture.start.x),y:Math.max(-y,gesture.origin.y+p.y-gesture.start.y)};update()});
+      handle.addEventListener('pointerup',()=>finish());handle.addEventListener('pointercancel',()=>finish(true));
+      for(const side of ['in','out']){
+        const vertical=orientation==='TB',port=svgNode('circle',{class:'graph-port',role:'button',tabindex:0,r:9,cx:vertical?x+w/2:side==='in'?x:x+w,cy:vertical?(side==='in'?y:y+h):y+h/2,'aria-label':t(side==='out'?'Relier cette sortie':'Relier cette entrée')+' '+id});port.dataset.task=id;port.dataset.side=side;let suppressClick=false;group.append(port);
+        port.addEventListener('keydown',e=>{if(!['Enter',' '].includes(e.key))return;e.preventDefault();e.stopPropagation();activatePort(id,side)});
+        port.addEventListener('click',e=>{e.stopPropagation();if(suppressClick){suppressClick=false;return}activatePort(id,side)});
+        port.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();e.stopPropagation();port.focus();gesture={link:true,target:port,pointer:e.pointerId,start:point(e),moved:false};port.setPointerCapture(e.pointerId)});
+        port.addEventListener('pointermove',e=>{if(!gesture?.link||gesture.target!==port)return;const p=point(e);gesture.moved=Math.hypot(p.x-gesture.start.x,p.y-gesture.start.y)>4;svg.querySelector('.graph-link-ghost')?.remove();if(gesture.moved)svg.append(svgNode('path',{class:'graph-link-ghost',d:`M${gesture.start.x},${gesture.start.y} L${p.x},${p.y}`}))});
+        port.addEventListener('pointerup',e=>{e.stopPropagation();if(!gesture?.link)return;const moved=gesture.moved,other=document.elementFromPoint(e.clientX,e.clientY)?.closest('.graph-port,.graph-noeud');finish();if(moved){suppressClick=true;const target=other?.dataset.task;if(target)link(side==='out'?id:target,side==='out'?target:id)}});port.addEventListener('pointercancel',()=>{suppressClick=true;finish(true)});
+      }
+    }
+    canvas.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('.graph-noeud'))return;e.preventDefault();canvas.focus();gesture={target:canvas,pointer:e.pointerId,start:{x:e.clientX,y:e.clientY},left:canvas.scrollLeft,top:canvas.scrollTop};canvas.setPointerCapture(e.pointerId)});
+    canvas.addEventListener('pointermove',e=>{if(!gesture||gesture.id||gesture.link)return;canvas.scrollLeft=gesture.left+gesture.start.x-e.clientX;canvas.scrollTop=gesture.top+gesture.start.y-e.clientY});canvas.addEventListener('pointerup',()=>finish());canvas.addEventListener('pointercancel',()=>finish(true));
+    canvas.addEventListener('wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();zoom=Math.max(.15,Math.min(2,zoom+(e.deltaY<0?.15:-.15)));update();save()},{passive:false});
+    for(const edge of svg.querySelectorAll('.graph-arete')){edge.setAttribute('role','button');edge.setAttribute('tabindex','0');edge.setAttribute('aria-label',t('Retirer ce lien')+' '+edge.dataset.from+' → '+edge.dataset.to);const remove=()=>{const target=work.tasks.find(t=>t.id===edge.dataset.to);editTask(work,target,(target.depends||[]).filter(id=>id!==edge.dataset.from))};edge.addEventListener('click',remove);edge.addEventListener('keydown',e=>{if(['Enter',' ','Delete','Backspace'].includes(e.key)){e.preventDefault();remove()}})}
+    studio.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(gesture||connection){e.preventDefault();e.stopPropagation();finish(true);connection=null;status.textContent=''}else if(modal.open){e.preventDefault();modal.close()}});
+    modal.addEventListener('close',()=>{if(disposed)return;finish(true);host.insertBefore(studio,modal);studio.classList.remove('is-fullscreen');document.body.classList.remove('graph-studio-open');full.textContent=t('Plein écran');full.setAttribute('aria-expanded','false');full.focus()});
+    studio.append(toolbar,status,canvas);host.replaceChildren(studio,modal);host.graphCleanup=()=>{disposed=true;finish(true);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};update();
+  }
+
   /**
    * Render the dependency graph of a Work into the original #graph container.
-   * Read-only projection of the recorded task state: no inference, no buttons.
+   * Recorded projection with local navigation and explicit task-editor handlers.
+   * Rendering performs no writes; saving an editor uses protected engine operations.
    * Side effect: replaces the container's children (scrollable canvas + svg).
    * @param {object} work Work {id,title,tasks:[{id,title,status,depends?:string[]}]}
    * @throws {Error} on invalid Work, duplicate ids, unknown-shaped dependencies or cycles
    */
   function render(work) {
     const host = container();
+    host.graphCleanup?.();host.graphCleanup=null;
+    const orientation=host.dataset.orientation==='TB'?'TB':'LR';
     const { tasks, depPairs, unknown } = validateWork(work);
-    if (!tasks.length) { showEmpty(host, t('Aucune tâche : le graphe apparaîtra dès qu’un plan existe.')); return; }
     if (typeof graphNodeKey !== 'function' || typeof svgNode !== 'function' || typeof graphEdgePath !== 'function' || typeof graphTonalites !== 'object' || !globalThis.dagre || !globalThis.dagre.graphlib || !globalThis.dagre.layout) {
       throw new Error(t('Graphe : moteur dagre indisponible.'));
     }
@@ -133,20 +294,21 @@
 
     const nodeWidth = 260, nodeHeight = 72;
     const g = new globalThis.dagre.graphlib.Graph();
-    g.setGraph({ rankdir: 'LR', ranker: 'tight-tree', nodesep: 28, ranksep: 70, marginx: 20, marginy: 20 });
+    g.setGraph({ rankdir: orientation, ranker: 'tight-tree', nodesep: 28, ranksep: 70, marginx: 20, marginy: 20 });
     g.setDefaultEdgeLabel(() => ({}));
     for (const task of tasks) g.setNode(graphNodeKey(task.id), { width: nodeWidth, height: nodeHeight });
     for (const e of depPairs) g.setEdge(graphNodeKey(e.from), graphNodeKey(e.to));
     if (!depPairs.length) {
       tasks.forEach((task, i) => g.setNode(graphNodeKey(task.id), {
         width: nodeWidth, height: nodeHeight,
-        x: 20 + nodeWidth / 2 + i * (nodeWidth + 28), y: 20 + nodeHeight / 2
+        x: 20 + nodeWidth / 2 + (orientation==='LR'?i*(nodeWidth+28):0),
+        y: 20 + nodeHeight / 2 + (orientation==='TB'?i*(nodeHeight+28):0)
       }));
     } else {
       globalThis.dagre.layout(g);
     }
-    const totalWidth = depPairs.length ? g.graph().width : tasks.length * (nodeWidth + 28) + 12;
-    const totalHeight = depPairs.length ? g.graph().height : nodeHeight + 40;
+    const totalWidth = depPairs.length ? g.graph().width : orientation==='LR'?Math.max(nodeWidth+40,tasks.length*(nodeWidth+28)+12):nodeWidth+40;
+    const totalHeight = depPairs.length ? g.graph().height : orientation==='TB'?Math.max(nodeHeight+40,tasks.length*(nodeHeight+28)+12):nodeHeight+40;
 
     const svg = svgNode('svg', {});
     svg.setAttribute('width',String(totalWidth));svg.setAttribute('height',String(totalHeight));
@@ -206,6 +368,7 @@
     }
 
     canvas.append(svg);
+    if(!tasks.length){const empty=document.createElement('p');empty.textContent=t('Aucune tâche : le graphe apparaîtra dès qu’un plan existe.');canvas.append(empty)}
     if (unknown.length) {
       const warning = document.createElement('p');
       warning.setAttribute('role', 'alert');
@@ -213,12 +376,17 @@
         unknown.map(u => u.dep + ' → ' + u.taskId).join(', ');
       canvas.append(warning);
     }
-    host.replaceChildren(canvas);
+    navigation(host,canvas,svg,work,orientation);
   }
 
-  /** @param {SVGElement} text target text element */
+  /** Display at most 32 UTF-16 code units including the ellipsis to leave room
+   * for the card handle; retain full literal text in an SVG title when clipped.
+   * @param {SVGElement} text target text element, replaced without HTML parsing
+   * @param {string} value validated title or task/status label
+   * @returns {void} mutates only SVG text and optional tooltip
+   */
   function appendTruncated(text, value) {
-    const shown = value.length > 40 ? value.slice(0, 39) + '…' : value;
+    const shown = value.length > 32 ? value.slice(0, 31) + '…' : value;
     text.textContent = shown;
     if (shown !== value) {
       const full = document.createElementNS(SVG_NS, 'title');
@@ -242,10 +410,11 @@
    */
   function clear(message) {
     const host = container();
+    host.graphCleanup?.();host.graphCleanup=null;
     const p = document.createElement('p');
     p.textContent = typeof message === 'string' ? message : '';
     host.replaceChildren(p);
   }
 
-  globalThis.SwarmRustDependencyGraph = { render, clear };
+  globalThis.SwarmRustDependencyGraph = { render, clear, setRefreshHandler };
 })();

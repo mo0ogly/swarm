@@ -4,6 +4,10 @@ import errno
 import json
 from pathlib import Path
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import unittest
 from unittest.mock import patch
 import current_cli_inventory as inventory
@@ -12,7 +16,7 @@ import current_cli_inventory as inventory
 class Inventory(unittest.TestCase):
     """Owned text fixtures establish valid bindings before each poisoned case."""
     def setUp(self):
-        self.directory = tempfile.TemporaryDirectory()
+        self.directory = tempfile.TemporaryDirectory(dir=fixture_area())
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
         for name in inventory.ANCHORS:
@@ -41,7 +45,7 @@ class Inventory(unittest.TestCase):
 
     def test_external_source_alias_refuses(self):
         """A repo-looking symlink cannot cause an outside source read."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             target = Path(directory) / 'outside.rs'; target.write_text('outside private sentinel')
             path = self.root / inventory.ANCHORS[0]
             path.unlink(); path.symlink_to(target)

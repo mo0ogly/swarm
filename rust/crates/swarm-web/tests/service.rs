@@ -142,6 +142,70 @@ fn protected_task_action_uses_root_and_replays_without_forged_origin() {
     }
     service.close().unwrap();
 }
+
+/// Graph creation uses the existing external mutation boundary: valid creation
+/// precedes replay, duplicate/stale/schema/CSRF/cycle refusals, then recovery.
+/// Snapshot equality includes events, so a rejected edit cannot hide a commit.
+#[test]
+fn graph_task_add_and_dependency_edits_preserve_admission_replay_and_recovery() {
+    let f = Fixture::new();
+    let service = NativeHttpService::open(&f.root, f.authority()).unwrap();
+    let add = serde_json::json!({"kind":"task-add","work":f.work,"task":"added","event_id":"graph-add","expected_revision":3,"request":{"id":"forged","origin":"engine","schema_version":99,"expected_revision":999,"event_id":"forged","title":"Graph task","deliverable":"Report","criteria":["Proof"],"depends":["task"]}});
+    let send = |value: &serde_json::Value| service.handle(f.request("POST", "/api/v1/action", serde_json::to_vec(value).unwrap())).unwrap();
+    let reply = send(&add);
+    assert_eq!(reply.response.status(), StatusCode::OK);
+    let after = f.snapshot();
+    assert_eq!(after.0.revision, 4);
+    let task = after.0.tasks.as_ref().unwrap().last().unwrap();
+    assert_eq!(task.id, "added");
+    assert_eq!(task.status, "todo");
+    assert_eq!(task.depends.as_deref().unwrap(), ["task"]);
+    assert_eq!(send(&add).response.body(), reply.response.body());
+    assert_eq!(f.snapshot(), after);
+    for (event, revision, id) in [("duplicate", 4, "added"), ("stale", 3, "fresh")] {
+        let mut invalid = add.clone();
+        invalid["event_id"] = event.into();
+        invalid["expected_revision"] = revision.into();
+        invalid["task"] = id.into();
+        assert!(!send(&invalid).response.status().is_success());
+        assert_eq!(f.snapshot(), after);
+    }
+    for field in ["cookie", "origin", "x-swarm-csrf"] {
+        let mut request = f.request("POST", "/api/v1/action", serde_json::to_vec(&add).unwrap());
+        request.headers_mut().remove(field);
+        assert_eq!(service.handle(request).unwrap().response.status(), StatusCode::FORBIDDEN);
+        assert_eq!(f.snapshot(), after);
+    }
+    let mut invalid = add.clone();
+    invalid["event_id"] = "bad-fields".into();
+    invalid["expected_revision"] = 4.into();
+    invalid["task"] = "fresh".into();
+    invalid["request"]["criteria"] = serde_json::json!([]);
+    assert!(!send(&invalid).response.status().is_success());
+    assert_eq!(f.snapshot(), after);
+    invalid["request"]["criteria"] = serde_json::json!(["Proof"]);
+    invalid["request"]["depends"] = serde_json::json!(["unknown"]);
+    assert!(!send(&invalid).response.status().is_success());
+    assert_eq!(f.snapshot(), after);
+    let mut valid = f.action("graph-valid-link");
+    valid["request"] = serde_json::json!({"depends":["other"]});
+    assert_eq!(send(&valid).response.status(), StatusCode::OK);
+    let before_cycle = f.snapshot();
+    let mut cycle = f.action("graph-cycle");
+    cycle["request"] = serde_json::json!({"depends":["added"]});
+    let rejected = send(&cycle);
+    assert!(!rejected.response.status().is_success());
+    // TaskDefinitionError's public legacy code is "format"; its internal
+    // task-dependency-cycle reason is not advertised by this wire contract.
+    let failure: serde_json::Value = serde_json::from_slice(rejected.response.body()).unwrap();
+    assert_eq!(failure["failure"]["code"], "format");
+    assert_eq!(f.snapshot(), before_cycle);
+    let mut clear = f.action("graph-clear");
+    clear["task"] = "added".into();
+    clear["request"] = serde_json::json!({"depends":[]});
+    assert_eq!(send(&clear).response.status(), StatusCode::OK);
+    assert!(f.snapshot().0.tasks.unwrap().last().unwrap().depends.as_ref().unwrap().is_empty());
+}
 /// Cookie/CSRF success is insufficient: stale revision and task lifecycle guards
 /// still refuse without events/model mutation, then a fresh operator edit recovers.
 #[test]
@@ -286,7 +350,7 @@ fn list_capabilities_and_head_expose_only_observed_supported_contract() {
         v["command_input_transport"]["max_bytes"],
         swarm_engine::COMMAND_INPUT_MAX_BYTES.to_string()
     );
-    assert_eq!(v["actions"], serde_json::json!(["task"]));
+    assert_eq!(v["actions"], serde_json::json!(["task", "task-add"]));
     assert!(!String::from_utf8_lossy(reply.response.body()).contains(KEY));
     assert_eq!(reply.response.headers()["cache-control"], "no-store");
     assert_eq!(

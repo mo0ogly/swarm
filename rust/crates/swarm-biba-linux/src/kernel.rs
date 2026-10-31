@@ -11,13 +11,25 @@ pub(crate) const ALL:u64=(1<<16)-1;
 #[repr(C)] struct Ruleset {fs:u64,net:u64,scoped:u64}
 #[repr(C,packed)] struct Beneath {access:u64,fd:i32}
 /// Create a closed ruleset. Only the caller's later explicit leaves are allowed.
+/// The returned descriptor always lives above 2: the helper's caller owns 0-2
+/// and may reassign them (stdin dup2) while the Sandbox lives, which would
+/// otherwise close a low ruleset fd behind the crate's back (EBADFD at restrict).
 pub(crate) fn ruleset()->io::Result<OwnedFd>{
     let attr=Ruleset{fs:ALL,net:0,scoped:3};
     // SAFETY: initialized C-layout value and exact ABI size live through syscall.
     let fd=unsafe{libc::syscall(libc::SYS_landlock_create_ruleset,&attr,mem::size_of::<Ruleset>(),0)};
-    if fd<0 {Err(io::Error::last_os_error())} else {
+    if fd<0 {Err(io::Error::last_os_error())} else if fd>=3 {
         // SAFETY: successful syscall transfers a fresh owned descriptor.
         Ok(unsafe{OwnedFd::from_raw_fd(fd as i32)})
+    } else {
+        // SAFETY: fresh owned descriptor below 3; duplicate above 2, then the
+        // original is closed exactly once by the local OwnedFd drop below.
+        let _original=unsafe{OwnedFd::from_raw_fd(fd as i32)};
+        let pinned=unsafe{libc::fcntl(fd as i32,libc::F_DUPFD_CLOEXEC,3)};
+        if pinned<0{return Err(io::Error::last_os_error())}
+        // SAFETY: adopt exactly the duplicate produced above.
+        Ok(unsafe{OwnedFd::from_raw_fd(pinned)})
+        // `_original` drops here, closing the low descriptor.
     }
 }
 /// Add one already-opened inode. Caller chooses only this fixed profile's masks.

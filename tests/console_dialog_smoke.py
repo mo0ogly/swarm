@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Full operator path: select task, modal, provider, start/stop/retry. No model calls."""
+from fixture_area import fixture_area
 import re, argparse, hashlib, signal, json, os, subprocess, tempfile, uuid, pty, termios, fcntl, struct, select, time, shutil
 from pathlib import Path
 p=argparse.ArgumentParser();p.add_argument('--binary',required=True);p.add_argument('--report',required=True);args=p.parse_args()
 binary=str(Path(args.binary).resolve())
-with tempfile.TemporaryDirectory(prefix='swarm-dialog-') as temp:
+with tempfile.TemporaryDirectory(prefix='swarm-dialog-', dir=fixture_area()) as temp:
  root=Path(temp);proc=None;master=slave=None;history=bytearray();current=bytearray();snapshots={}
  def cli(*cmd,data=None):
   r=subprocess.run([binary,'--root',temp,'--json',*cmd,*(['--input','-'] if data is not None else [])],input=json.dumps(data) if data is not None else None,capture_output=True,text=True,timeout=10)

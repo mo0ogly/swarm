@@ -2,7 +2,7 @@
 // Isolated project, public configuration only; intercepted waiting probe never
 // reaches a provider endpoint. No real model or native mission is used.
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),crypto=require('node:crypto'),{spawn,spawnSync}=require('node:child_process'),puppeteer=require('puppeteer');
-const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-web-requests-ui-'));let app,browser,page;
+const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-web-requests-ui-'));let app,browser,page;
 function cli(args,input){const p=spawnSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{input:input?JSON.stringify(input):undefined,encoding:'utf8'});assert.equal(p.status,0,p.stderr+p.stdout);return p.stdout?JSON.parse(p.stdout):null}
 (async()=>{
  cli(['init']);const w=cli(['work','create'],{schema_version:1,event_id:'create',expected_revision:0,title:'Browser waiting policy',objective:'Prove persisted configuration and received browser effect',scope:'isolated',criteria:['No implicit retry or agent launch'],next:'Configure'}).work;

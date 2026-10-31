@@ -642,6 +642,85 @@ publication and the full exact consumption on the writer78b native fixture
 (capability observed without consumption, wrong password/body refused
 without consumption, second call refused).
 
+## Approval channel bound to the project root (single protected route)
+
+A prepared Git call may require a Trust approval on THE PROJECT root it
+actually opened. Preparation `PaeaGitCallSource::prepare_approval` runs
+BEFORE the service opens: it opens the project root writable, produces
+`trust_enrollment_request(Operation::Approve, frozen bytes)` (fresh physical
+witnesses) and closes the root (close cause chained via
+`RootStoreError::Cleanup`). At startup, `bind_approval` reopens the project
+root read-only and requires `TrustEnrollmentRequest::check_root` — a physical
+witness of the actually opened root; digests are NEVER compared against each
+other (the git-call witness lives in the `paea-git-transfer-roots-v1` domain,
+the enrollment witness in `trust-enrollment-root-v1`, heterogeneous domains
+whose equality is impossible by construction). On refusal the prepared source
+is closed and the route answers `paea-git-call-approval-root` with no effect.
+
+Observation: `GET /api/v1/paea/git-call/approval` (ordinary session/Host/CSRF
+gate) reports an explicit `bound:false` when nothing is prepared, otherwise
+the public capability `{scope:"single_prepared_git_call_approval",
+operation, request_digest}` — no identity, no secret, no IO.
+
+Consumption: `POST /api/v1/paea/git-call/approval` (same gate), header
+`Authorization: Enrollment <base64(password)>`, MANDATORY EMPTY BODY. The
+frozen command is never transported: it stays held service-side (bound
+approval), so no transportable bytes can drift. Any non-empty body refuses
+before any root open with the typed refusal `paea-git-call-approval-request`
+(no browser term, action or JSON field ever reaches the engine chain). The
+route then decodes the enrolled password and calls `call_approval(password)`,
+consuming the server-held command.
+The
+`call_trust_as_enrolled` call runs on the project root under the already-held
+enrolled authority: the engine rechecks the physical witness, the current SQL
+plan, the current Trust revision, resolves the enrolled human principal and
+applies the existing approve guard (approver role, separation of duties,
+exact terms, Biba I2 Write) — never JSON claims, cookies or booleans. An
+identical replay stays a legitimate retained reply of the same original. The
+approval reply is Biba-mediated: an I3 approver cannot read the I2 object, so
+the public reply is the `trust-status-ack-v1` acknowledgement (state +
+object_id). Capture performs NO Git: it records the agreement in the project
+Trust state, later recognized by the exact `paea_git_agreement_match` guard;
+the SERVICE root stays byte-for-byte identical.
+
+Verification: `tools/verification/recipes/paea-git-call-approval-rust.json`
+(5 steps, evidence `docs/plans/actions-confiance/paea/evidence/
+20261028-acquisition81-mvfdts57/glm-approval-fresh-fixture-20261030T204930Z/`)
+— engine agreement observation, the named test
+`approval_route_captures_project_agreement_and_refuses_wrong_body_revision`
+(bound status, wrong credential `authorization_required` 403, drifted body
+refused, exact POST → agreement captured + legitimate replay, real revision
+change → void agreement + stale POST refused + re-derivation at revision+1,
+SERVICE root intact) and three existing git-call regressions; fresh fixture
+produced by the supported producer `tests/rust_native_first_publication.py`.
+
+Browser surface: `/paea-consent.html` (script `/paea-consent.js`, linked from
+the `paea.html` hub) is the only surface that triggers the approval POST. It
+first reads both guarded observations (the approval channel for the
+capability, the preview for the exact prepared action), presents the
+capability, the verbatim terms and the prerequisites (current revision,
+bound roots) — each unmet prerequisite hides the form with its
+own explicit refusal, never a silent hide. The page submits ONLY the
+`Authorization: Enrollment` header and an empty body: the frozen command is
+never transported nor rebuilt browser-side, only the service holds the bytes
+and the route accepts an empty body only (typed refusal
+`paea-git-call-approval-request` otherwise). The `Authorization: Enrollment`
+header follows the trust-native pattern (UTF-8 password bytes, unpadded
+base64url); the password field is cleared after every submission, no
+automatic retry exists, and a refusal (role, terms, revision, identity,
+body) is shown as-is with `business_mutated`/`next_action` and a demanded
+state reread whenever `trust_state_may_be_recorded` is carried. Without a
+bound approval the page reports the explicit `bound:false` and prepares
+nothing. Qualification: `tools/verification/recipes/paea-consent-ui-rust.json`
+(embedded assets `paea_consent_page.rs`, real-browser harness
+`paea_consent_browser.rs` + `tests/paea_consent_ui.cjs` against a really
+bound server via `NativeHttpServer::bind_git_call_with_approval`: capability
++ exact action + form FR/EN both themes, non-empty body → visible typed
+refusal `paea-git-call-approval-request`, wrong password →
+`authorization_required`, project Trust journal unchanged, approval not
+consumed; fixture prerequisite: regenerate `SWARM_PAEA_SOURCE_FIXTURE` with
+`tests/rust_native_first_publication.py` when the tmpfs purged the root).
+
 ## Guarded CLI consumer of the settlement call (increment 92)
 
 The third guarded PAEA call receives its public CLI consumer:

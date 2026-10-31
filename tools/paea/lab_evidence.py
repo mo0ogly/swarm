@@ -12,6 +12,10 @@ from pathlib import Path, PurePosixPath
 import re
 import stat
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 
 from tools.verification.recipe import verify_evidence
 
@@ -229,7 +233,7 @@ def check_recipe(files):
     writes are removed on return/failure; originals stay untouched. A recorded
     failure, corrupt/missing artifact/source or wrong case contract refuses.
     """
-    with tempfile.TemporaryDirectory(prefix='paea-recipe-snapshot-') as temporary:
+    with tempfile.TemporaryDirectory(prefix='paea-recipe-snapshot-', dir=fixture_area()) as temporary:
         target = Path(temporary)
         for name, raw in files.items():
             if not relative_name(name):

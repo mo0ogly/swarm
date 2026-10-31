@@ -1,0 +1,22 @@
+[
+  {
+    "path": "rust/crates/swarm-engine/src/agent_execution_gate.rs",
+    "before": "0a351830c85011ae5de2d206b5b4c2b60abea9b9ca09ffe0d241df1060888312",
+    "after": "cebf7adbfdf2d10e8ac15f01fad00bfd150ebf08f4eb2f32ad9aa7c83fa368bd"
+  },
+  {
+    "path": "rust/crates/swarm-engine/src/root_store/planning_native.rs",
+    "before": "2071697e1014cca56bb27199a157d183f28e455912415baea24d56a100bc1e28",
+    "after": "2454b198da718e94c2c7bf3962e2ac16d9f0dda2986e5dd81a1c850e79fccf27"
+  },
+  {
+    "path": "rust/crates/swarm-engine/src/root_store/reviewer_native/gate.rs",
+    "before": "2864f4f36a41ba7a5aa9faac9ec23b8ec3029455dc4029de1b4387bfb8b92725",
+    "after": "e8fd7483a6bf0164124c6730a997d4746994c4de2cdd22c51a5d39a1bb896792"
+  },
+  {
+    "path": "rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs",
+    "before": "d8bc5af2d25e66776b6c77c9d218d36db556b65fddfbd8311015ee7c6f13e556",
+    "after": "043849dba6c88f52e6abaf78d1bd7e8af6333f2fd091966d2f826cf22c05a16c"
+  }
+]

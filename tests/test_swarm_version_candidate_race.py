@@ -3,6 +3,7 @@
 The real source_identity implementation hashes temporary files/metadata. No Cargo,
 provider, server restart or live Root. A fake probe is never runtime qualification.
 """
+from fixture_area import fixture_area
 import hashlib,importlib.util,json,os,tempfile,unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -26,7 +27,7 @@ class CandidateBoundary(unittest.TestCase):
         Actual test files never execute. Mutations model a concurrent writer after
         a qualified profile snapshot; refusals must leave old artifact/state intact.
         """
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root=Path(directory);binary=root/'swarm';publish(binary,b'old artifact')
             files=['build.sh','tools/swarm_version.py','tools/swarm_local.py','tools/rust-migration/build_native.py','tools/verification/verify_native_profile.py','actual.rs','unused.rs']
             for name in files:

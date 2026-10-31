@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+    "web",
+    "--root",
+    "/tmp/swarm-model83-74_5nz19",
+    "--json",
+    "--lang",
+    "en"
+  ],
+  "pid": 756372,
+  "start": 1793209963.3951988,
+  "global_watchdog": null,
+  "owned": true
+}

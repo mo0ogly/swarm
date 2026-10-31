@@ -3,7 +3,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
 const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-log-visibility-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-log-visibility-'));
 const cli=(args,data)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(data?['--input','-']:[])],{encoding:'utf8',input:data?JSON.stringify(data):undefined}));
 cli(['init']);const work=cli(['work','create'],{schema_version:1,event_id:crypto.randomUUID(),expected_revision:0,title:'Console visibility fixture',objective:'Keep logs readable after hidden resizing',scope:'UI only',criteria:['No hidden layout errors'],next:'Read logs'}).work;cli(['autonomy',work.id,'manuel']);
 const app=spawn(binary,['--root',root,'web','127.0.0.1:0']);let browser;const errors=[],pending=[];

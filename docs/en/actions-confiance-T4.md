@@ -71,7 +71,7 @@ context is refused while disabled.
 
 ```sh
 go test -race -count=1 -run '^TestActionsConfianceT4DataPolicy' -v ./internal/engine
-node tests/actions_confiance_data_policy_ui.cjs bin/swarm-actions-confiance-data-policy-resources /tmp/swarm-data-policy-recipe
+node tests/actions_confiance_data_policy_ui.cjs bin/swarm-actions-confiance-data-policy-resources .swarm-fixtures/swarm-data-policy-recipe
 ```
 
 The recipe creates its own root and local identities: read-only preview,
@@ -134,7 +134,7 @@ material; the dedicated channel below covers only the fixed helper.
 
 ```sh
 swarm --root PROJECT --json trust confinement-check
-node tests/actions_confiance_sealed_ui.cjs BINARY /tmp/swarm-sealed-recipe
+node tests/actions_confiance_sealed_ui.cjs BINARY .swarm-fixtures/swarm-sealed-recipe
 ```
 
 CLI exit5 means unavailable/busy state; exit6 means interruption/timeout. Correct

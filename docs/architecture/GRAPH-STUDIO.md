@@ -1,5 +1,42 @@
 # Atelier du graphe
 
+## Raccordement Rust
+
+Le cockpit natif utilise `web/cockpit-native-graph.js` sur les vrais objets Work.
+Le zoom (boutons ou Ctrl + molette), la vue d’ensemble, le déplacement du fond,
+les poignées souris/clavier des cartes, l’orientation et le plein écran sont des
+préférences de présentation. Les positions sont locales à l’origine HTTP, à la
+mission et à l’orientation ; elles ne modifient ni révision ni budget. Échap
+annule un déplacement en cours avant de fermer le plein écran. Ce dernier est
+un dialogue modal natif : focus contenu et retour au bouton à la fermeture.
+
+« Ajouter une tâche » et l’activation d’une carte ouvrent le formulaire de tâche.
+Titre, livrable, critères et prérequis sont enregistrés explicitement par
+`/api/v1/action` (`task-add` → `task.add`, `task` → `task.update`). Le moteur garde
+les contrôles de session/CSRF, Root lié, révision, activité, références et cycles.
+La mini-carte reflète les cartes déplacées. Relier une sortie à une entrée
+(souris ou clavier) prépare les prérequis de la destination dans le formulaire ;
+activer un lien ou Suppr prépare son retrait. Ces gestes ne sauvegardent rien.
+La sélection des prérequis ajoute ou retire des liens pour une seule tâche.
+Les champs restent visibles après refus ; un résultat incertain interdit une
+nouvelle soumission jusqu’à fermeture et actualisation. Le succès exige une
+relecture protégée, puis attend que le cockpit ait rechargé ses observations
+avant de fermer le formulaire. Aucun agent ne
+démarre. Sur un plan géré, les refus du moteur restent applicables.
+
+La recette native est `tests/rust_graph_navigation.py --binary bin/swarm
+--output DOSSIER_NEUF --editing`. Sans `--editing`, elle vérifie que tous les
+gestes de présentation laissent le Work identique. `--workspace-preview` est
+réservé à l’itération : son overlay ne prouve pas les ressources embarquées.
+
+**Limite de migration :** les brouillons atomiques par lots, leur aperçu moteur
+et l’annulation/rétablissement historique ne sont
+pas encore raccordés au cockpit Rust. Le contrat historique ci-dessous reste
+la cible pour ces capacités ; il ne décrit pas leur disponibilité native.
+Preuves et critères ouverts : [reprise APEX](../plans/migration-rust/GRAPH-REGRESSION-20261031.md).
+
+## Atelier historique et cible restante
+
 Le cockpit permet d'ouvrir le graphe en plein écran, de déplacer les cartes et de
 préparer des modifications de liens. Le placement visuel et les dépendances ont
 deux contrats distincts. `web/graph-studio.js` réutilise le rendu SVG/Dagre local,

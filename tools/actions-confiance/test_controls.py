@@ -1,4 +1,5 @@
 import importlib.util,json,sys,unittest
+from fixture_area import fixture_area
 from pathlib import Path
 path=Path(__file__).with_name('controls.py');spec=importlib.util.spec_from_file_location('swarm_controls',path);module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
 class MappingClaims(unittest.TestCase):
@@ -13,7 +14,7 @@ class MappingClaims(unittest.TestCase):
 import copy,hashlib,tempfile
 class MappingValidation(unittest.TestCase):
  def setUp(self):
-  self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.root=Path(self.tmp.name);repo=path.resolve().parents[2]
+  self.tmp=tempfile.TemporaryDirectory(dir=fixture_area());self.addCleanup(self.tmp.cleanup);self.root=Path(self.tmp.name);repo=path.resolve().parents[2]
   self.matrix=json.loads((repo/'web/trust-controls.json').read_text());self.reference=json.loads((repo/'docs/architecture/actions-confiance-controls-reference.json').read_text())
   primary={'catalog':{'metadata':{'version':self.reference['catalog_version']},'controls':[{'id':r['id'].lower(),'title':r['title']}for r in self.reference['controls']]}}
   self.put('catalog.json',primary);self.reference['source_path']='catalog.json';self.reference['source_sha256']=self.sha('catalog.json');self.matrix['framework']['source_sha256']=self.sha('catalog.json');self.update_reference()

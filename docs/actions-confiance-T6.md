@@ -114,8 +114,8 @@ Recettes isolées, sans fournisseur ni paiement :
 
 ```sh
 go test -race -count=1 -run '^TestActionsConfianceT6(Evidence|Archive)' -v ./internal/engine
-python3 tests/actions_confiance_evidence.py --binary BIN --evidence-dir /tmp/swarm-evidence-public
-node tests/actions_confiance_evidence_ui.cjs BIN /tmp/swarm-evidence-ui
+python3 tests/actions_confiance_evidence.py --binary BIN --evidence-dir .swarm-fixtures/swarm-evidence-public
+node tests/actions_confiance_evidence_ui.cjs BIN .swarm-fixtures/swarm-evidence-ui
 ```
 
 La signature d’une ancre ne rend pas chaque ligne de log immuable ni tout effet

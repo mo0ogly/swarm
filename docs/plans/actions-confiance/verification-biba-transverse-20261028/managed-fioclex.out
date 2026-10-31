@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/run-managed-fioclex.py", line 20, in <module>
+    f.ok(['task','add',f.work],dict(schema_version=1,event_id='biba-fioclex-task',expected_revision=current['revision'],id='biba-protected',title='Owned protected worker',deliverable='Synthetic confinement facts',criteria=['No acceptance']))
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_agent_model_route.py", line 143, in ok
+    assert code == 0, (self.label,args,code,value)
+           ^^^^^^^^^
+AssertionError: ('managed-fioclex', ['task', 'add', 'w-1ee0f388d866669a074bae9e'], 2, {'error': 'format', 'failure': {'causes': ['format', 'format'], 'code': 'format', 'message': 'format', 'retryable': False}, 'schema_version': 1})

@@ -14,6 +14,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+from fixture_area import fixture_area
 import traceback
 import signal
 import subprocess
@@ -237,7 +238,7 @@ def main():
     for label, path in [('method.py', Path(__file__)), ('shared.py', Path(shared.__file__)),
                         ('fixture.py', Path(shared.fixture.__file__)), ('profile.json', args.profile)]:
         shared.publish(output/label, path.read_bytes())
-    root = Path(tempfile.mkdtemp(prefix='swarm-active-'))
+    root = Path(tempfile.mkdtemp(prefix='swarm-active-', dir=fixture_area()))
     shared.publish(output/'owned-root.json', dict(root=str(root), scope='owned isolated fixture',
                    binary_sha256=profile['sha256'], actor_authenticated=False))
     driver = shared.Driver(binary, None, output, root, 'owned-active-operator', dict(os.environ))

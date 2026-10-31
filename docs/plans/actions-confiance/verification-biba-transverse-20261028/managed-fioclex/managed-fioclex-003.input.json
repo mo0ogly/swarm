@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "biba-fioclex-task",
+  "expected_revision": 13,
+  "id": "biba-protected",
+  "title": "Owned protected worker",
+  "deliverable": "Synthetic confinement facts",
+  "criteria": [
+    "No acceptance"
+  ]
+}

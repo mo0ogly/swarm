@@ -10,7 +10,7 @@ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),http
 const state=require('./helpers/engine_settings_admin_state.cjs'),runtimeTools=require('./helpers/browser_verification_runtime.cjs'),{finishOwnedResources}=require('./helpers/verification_cleanup.cjs');
 if(process.argv.length!==4)throw Error('Usage: rust_web_policy_admin_ui.cjs NATIVE_CLI OUTPUT');
 const repo=path.resolve(__dirname,'..'),binary=path.resolve(process.argv[2]),output=path.resolve(process.argv[3]);if(fs.existsSync(output))throw Error('Fresh output required');fs.mkdirSync(output,{recursive:true});
-const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'web-policy-admin94-'));fs.chmodSync(scratch,0o700);
+const scratch=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','web-policy-admin94-'));fs.chmodSync(scratch,0o700);
 const files={'/themes.css':'web/wattson_themes.css','/base.css':'web/processes.css','/design.css':'web/swarm-design.css','/admin.css':'frontend/engine-settings/admin.css','/admin.js':'frontend/engine-settings/admin.js','/english.js':'web/i18n-en.js','/swarm-logo.png':'web/swarm-logo.png'};
 const sources=[...Object.values(files),'locales/en.json','rust/crates/swarm-engine/config/engine-settings-catalog.json','rust/crates/swarm-engine/config/engine-settings.json','tests/rust_web_policy_admin_ui.cjs','tests/helpers/browser_verification_runtime.cjs','tests/helpers/engine_settings_admin_state.cjs','tests/helpers/verification_cleanup.cjs','package-lock.json',binary];
 const hash=file=>crypto.createHash('sha256').update(fs.readFileSync(path.isAbsolute(file)?file:path.join(repo,file))).digest('hex');

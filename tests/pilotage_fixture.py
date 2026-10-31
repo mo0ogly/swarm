@@ -1,7 +1,8 @@
 """Isolated browser corpus. Historical agent rows are fixtures, never live processes."""
+from fixture_area import fixture_area
 import json, sqlite3, subprocess, tempfile, uuid, sys, hashlib
 from pathlib import Path
-root=Path(tempfile.mkdtemp(prefix='swarm-pilotage-corpus-')); binary=sys.argv[1]
+root=Path(tempfile.mkdtemp(prefix='swarm-pilotage-corpus-', dir=fixture_area())); binary=sys.argv[1]
 def call(*args, data=None):
     p=subprocess.run([binary,'--root',str(root),'--json',*args,*(['--input','-'] if data is not None else [])],input=json.dumps(data) if data else None,text=True,capture_output=True,check=True)
     return json.loads(p.stdout)

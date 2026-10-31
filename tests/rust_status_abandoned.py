@@ -13,6 +13,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+from fixture_area import fixture_area
 import traceback
 
 import rust_mission_status_contract as shared
@@ -99,7 +100,7 @@ def main():
     for label, path in [('method.py', Path(__file__)), ('shared.py', Path(shared.__file__)),
                         ('fixture.py', Path(shared.fixture.__file__)), ('profile.json', args.profile)]:
         shared.publish(output/label, path.read_bytes())
-    root = Path(tempfile.mkdtemp(prefix='swarm-abandoned-'))
+    root = Path(tempfile.mkdtemp(prefix='swarm-abandoned-', dir=fixture_area()))
     shared.publish(output/'owned-root.json', dict(root=str(root), scope='owned inactive fixture',
                    binary_sha256=profile['sha256'], actor_authenticated=False))
     driver = shared.Driver(binary, None, output, root, 'owned-decision-operator', dict(os.environ))

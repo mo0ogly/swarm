@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 from test_memory_swarm_source import packet, ROOT
@@ -51,7 +52,7 @@ class SummaryAdmission(unittest.TestCase):
             A.selection(self.source, self.annotations, reference, "Operator choice")
 
     def test_cli_preserves_inputs_private_output_and_refuses_replacement(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root = Path(directory)
             names = ["source", "annotations", "reference"]
             for name, value in zip(names, [self.source, self.annotations, self.reference]):
@@ -71,7 +72,7 @@ class SummaryAdmission(unittest.TestCase):
             self.assertEqual({name:(root/name).read_bytes() for name in names},before)
 
     def test_cli_invalid_json_is_an_explicit_error_without_output(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root = Path(directory);(root/"bad").write_text('{"x":1,"x":2}')
             result = subprocess.run([sys.executable,str(ROOT/"tools/memory-evaluation/admission.py"),"--source",str(root/"bad"),"--annotations",str(root/"missing"),"--reference",str(root/"missing"),"--reason","Choice","--output",str(root/"output")],capture_output=True,text=True)
             self.assertEqual(result.returncode,2)
@@ -94,7 +95,7 @@ class SummaryAdmission(unittest.TestCase):
             A.selection(*self.relabelled_source(), "Operator choice")
 
     def test_cli_refuses_relabelled_source_without_output_or_input_changes(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root = Path(directory)
             names = ["source", "annotations", "reference"]
             for name, value in zip(names, self.relabelled_source()):

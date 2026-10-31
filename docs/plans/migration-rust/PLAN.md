@@ -11,6 +11,23 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## Régression graphe —31 octobre, APEX demandé
+
+G1/G11 : restituer zoom, fond/cartes, orientation et plein écran ; G4 : création
+et liens via les vrais Work/validations Rust. Codex seul, aucun agent/fournisseur.
+Témoin natif valide puis bouton de zoom absent reproduit ; navigation en overlay
+vérifiée dans les quatre langues/thèmes. Création refusée sur l’ancien binaire
+reproduite. Correctif de route `task-add`, éditeur/ports et rafraîchissement attendu vérifiés.
+Dix tests HTTP examinés : neuf existants passent, nouveau cas passe après correction
+d’une attente du banc (code public `format`, pas motif interne du cycle).
+Rust280 installé et actif : c7fe8753… ;262contrôles graphe FR/EN/thèmes sur279
+réutilisés pour les entrées inchangées,7assets réellement servis sur280 et Version14
+PASS. Consignes APEX compactées sous le cap32000,4rôles/9tests et témoin Biba
+public avec refus/reprise vérifiés ; aucune limite relevée. Revue locale liée aux
+octets, pas d’acceptation indépendante ni de conformité Biba globale.
+Brouillons atomiques historiques/aperçu/undo restent distincts et ouverts.
+[Plan, limites et originaux](GRAPH-REGRESSION-20261031.md).
+
 ## Point de reprise —28 octobre : consultation historique233 livrée
 
 `agent history` raccordé :102assertions/45cas et générateur3PASS, recette

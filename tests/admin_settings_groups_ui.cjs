@@ -3,7 +3,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),http=require('node:http'),crypto=require('node:crypto'),{spawnSync}=require('node:child_process'),assert=require('node:assert/strict'),puppeteer=require('puppeteer');
 assert.equal(process.argv.length,4,'Usage: node tests/admin_settings_groups_ui.cjs NATIVE_CLI OUTPUT');
 const binary=fs.realpathSync(process.argv[2]),output=path.resolve(process.argv[3]),repo=path.resolve(__dirname,'..');fs.mkdirSync(output,{recursive:true});
-const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-admin-groups-')),sha=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+const scratch=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-admin-groups-')),sha=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const sourcePaths=['frontend/engine-settings/admin.js','frontend/engine-settings/admin.css','locales/en.json','web/i18n-en.js','web/swarm-design.css','web/wattson_themes.css','web/processes.css','tests/admin_settings_groups_ui.cjs','package-lock.json'];
 const inputs=Object.fromEntries(sourcePaths.map(file=>[file,sha(path.join(repo,file))]));inputs.binary=sha(binary);
 let serial=0,browser,server;const groups=[],errors=[];

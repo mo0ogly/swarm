@@ -11,6 +11,7 @@ import re
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -84,7 +85,7 @@ def main() -> None:
     run([str(binary), "--lang", "fr", "aide", "cycle-vie"])
     run([str(binary), "--lang", "en", "help", "lifecycle"])
 
-    with tempfile.TemporaryDirectory(prefix="swarm-d02-docs-") as project:
+    with tempfile.TemporaryDirectory(prefix="swarm-d02-docs-", dir=fixture_area()) as project:
         run([str(binary), "--root", project, "--json", "init"])
         run([str(binary), "--root", project, "--json", "work", "list"])
         run([str(binary), "--root", project, "--json", "lifecycle", "list"])

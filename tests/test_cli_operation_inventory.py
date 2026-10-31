@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import subprocess
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 TOOL = Path('tools/rust-migration/collect_cli_operations.py')
@@ -88,7 +89,7 @@ class OperationInventory(unittest.TestCase):
 
     def test_stale_baseline_does_not_publish_operation_report(self):
         """Preserve partial evidence and refuse stale source-to-matrix continuity."""
-        with tempfile.TemporaryDirectory(prefix='cli-operation-inventory-') as temporary:
+        with tempfile.TemporaryDirectory(prefix='cli-operation-inventory-', dir=fixture_area()) as temporary:
             root = Path(temporary)
             baseline = root / 'baseline.json'
             baseline.write_text(json.dumps({'reference_commit': collector.REFERENCE, 'source_sha256': {collector.RUST_MAIN: '0' * 64}}))

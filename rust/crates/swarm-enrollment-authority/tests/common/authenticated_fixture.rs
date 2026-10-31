@@ -65,7 +65,11 @@ impl Fixture {
         enrolled: bool,
         action: Option<swarm_identity_contract::Permission>,
     ) -> Self {
-        Self::build_bound(enrolled, action, None)
+        Self::build_bound(
+            enrolled,
+            action.into_iter().collect(),
+            None,
+        )
     }
     /// Bind the same real producers to a consumer-owned current plan/revision.
     pub(crate) fn build_for_trust(
@@ -73,11 +77,23 @@ impl Fixture {
         scope: Scope,
         revision: i64,
     ) -> Self {
-        Self::build_bound(true, Some(action), Some((scope, revision)))
+        Self::build_bound(true, vec![action], Some((scope, revision)))
+    }
+    /// Same binding with several exact action permissions signed into the one
+    /// real grant at bootstrap (e.g. one paea-action permission plus the
+    /// trust-action permission of a frozen approval command); nothing else
+    /// changes. The journal accepts one enroll per enrollment id, so every
+    /// permission an account must hold has to be signed at construction.
+    pub(crate) fn build_for_trust_actions(
+        actions: Vec<swarm_identity_contract::Permission>,
+        scope: Scope,
+        revision: i64,
+    ) -> Self {
+        Self::build_bound(true, actions, Some((scope, revision)))
     }
     fn build_bound(
         enrolled: bool,
-        action: Option<swarm_identity_contract::Permission>,
+        actions: Vec<swarm_identity_contract::Permission>,
         binding: Option<(Scope, i64)>,
     ) -> Self {
         let root = tempfile::tempdir().unwrap();
@@ -134,7 +150,7 @@ impl Fixture {
             permissions: [Request::Read, Request::Create(change())]
                 .iter()
                 .map(|r| control::permission(&installation, r).unwrap())
-                .chain(action)
+                .chain(actions)
                 .collect(),
             delegable: vec![],
             not_before: now - Duration::hours(1),

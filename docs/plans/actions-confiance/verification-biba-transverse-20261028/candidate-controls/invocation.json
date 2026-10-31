@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "/home/fpizzi/Documents/ChatGPT/swarm/tools/verification/verify_native_profile.py",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm",
+    "--target-dir",
+    "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local",
+    "--output",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/candidate-controls/profile"
+  ],
+  "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "metadata_sha256": "61d0a4d23acd1835704aa35f43a0847cbd24c9ea2070f450420be9bdf628ccbb",
+  "global_watchdog": null
+}

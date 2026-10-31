@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert/strict'),{spawn,execFile}=require('child_process'),{promisify}=require('util'),puppeteer=require('puppeteer');
 const exec=promisify(execFile),binary=path.resolve(process.argv[2]||'bin/swarm'),out=path.resolve(process.argv[3]||'test-results/i18n');fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-readme-i18n-'));let app,browser,page;
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-readme-i18n-'));let app,browser,page;
 async function cli(args,input){return new Promise((resolve,reject)=>{const p=spawn(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])]);let text='',err='';p.stdout.on('data',x=>text+=x);p.stderr.on('data',x=>err+=x);p.on('exit',code=>code?reject(Error(err||text)):resolve(text?JSON.parse(text):null));p.stdin.end(input?JSON.stringify(input):undefined)})}
 (async()=>{
  await cli(['init']);let w=(await cli(['work','create'],{schema_version:1,event_id:'create',expected_revision:0,title:'À vérifier',objective:'Ne pas traduire mon besoin français.',scope:'UI fixture only',criteria:['Conserver mes données'],next:'Enregistrer'})).work;

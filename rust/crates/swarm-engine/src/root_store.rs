@@ -101,6 +101,10 @@ mod paea_git_transfer_call;
 #[cfg(target_os = "linux")]
 pub use paea_git_transfer_call::{PaeaGitTransferCall, PaeaGitTransferCallError, PaeaGitTransferReceipt};
 #[cfg(target_os = "linux")]
+mod paea_git_agreement;
+#[cfg(target_os = "linux")]
+pub use paea_git_agreement::{PaeaGitAgreementMatch, PaeaGitAgreementTerms};
+#[cfg(target_os = "linux")]
 mod paea_git_promote_call;
 #[cfg(target_os = "linux")]
 pub use paea_git_promote_call::{
@@ -1834,6 +1838,51 @@ impl RootStore {
             &self.db, &self.directory, false, |_, settings| Ok(settings.clone()),
         )
     }
+    /// Apply the saved v51 temporary directory to this process: resolve it
+    /// against `root`, create it (mode 0700, parents too) when missing, then
+    /// export `TMPDIR` so this process and every child it starts use it.
+    ///
+    /// Returns `Ok(None)` without effect when `root/.swarm` has no settings
+    /// file yet (before `init`) or the document predates v51 (absence is
+    /// reported by runtime health, never replaced by a default). Errors:
+    /// unreadable/invalid settings, an existing non-directory, or a creation
+    /// failure — the caller must refuse rather than continue in `/tmp`.
+    /// Precondition: call before starting threads (environment mutation).
+    #[cfg(unix)]
+    pub fn apply_runtime_temporary_directory(
+        root: &Path,
+    ) -> Result<Option<std::path::PathBuf>, RootStoreError> {
+        let private = root.join(".swarm");
+        if !private.join(SETTINGS).is_file() {
+            return Ok(None);
+        }
+        let directory = LocalDirectory::open(&private).map_err(RootStoreError::Storage)?;
+        let values = Self::read_settings_from(&directory)?.values;
+        if values.runtime_temporary_directory.is_none() {
+            return Ok(None);
+        }
+        let path = values
+            .runtime_temporary_path(root)
+            .map_err(RootStoreError::Settings)?;
+        use std::os::unix::fs::DirBuilderExt;
+        match std::fs::DirBuilder::new().recursive(true).mode(0o700).create(&path) {
+            Ok(()) if path.is_dir() => {}
+            Ok(()) => {
+                return Err(RootStoreError::Runtime(crate::RuntimeError::new(
+                    crate::RuntimeOperation::TemporaryDirectory,
+                    std::io::Error::from(std::io::ErrorKind::NotADirectory),
+                )))
+            }
+            Err(e) => {
+                return Err(RootStoreError::Runtime(crate::RuntimeError::new(
+                    crate::RuntimeOperation::TemporaryDirectory,
+                    e,
+                )))
+            }
+        }
+        std::env::set_var("TMPDIR", &path);
+        Ok(Some(path))
+    }
     /// Read this root's validated saved settings without adopting defaults.
     /// Owned-directory IO, syntax/history/policy errors retain typed causes.
     fn read_settings(&self) -> Result<EngineSettingsDocument, RootStoreError> {
@@ -1971,6 +2020,69 @@ impl RootStore {
             return Err(crate::WebSessionError::Refused("web-session-readonly"));
         }
         crate::web_session::load_or_create(&self.directory, listener)
+    }
+    /// Issue a single-use cockpit login ticket for the server bound at
+    /// `address`, valid for the saved v50 `web_login_ticket_seconds` and bound
+    /// to that address's current owner key. Requires a writable Root; settings
+    /// absence/invalidity refuses (no default is adopted), and an address with
+    /// no owner key yet refuses with `web-ticket-server-never-started`. Publishes one private expiry file; no cookie, account or
+    /// authority beyond the existing owner key is created. The caller must
+    /// deliver the token only to the operator's browser and never log it.
+    #[cfg(target_os = "linux")]
+    pub fn issue_web_login_ticket(
+        &self,
+        address: std::net::SocketAddr,
+    ) -> Result<crate::WebLoginTicket, crate::WebTicketError> {
+        if !self.writable {
+            return Err(crate::WebTicketError::Session(crate::WebSessionError::Refused("web-session-readonly")));
+        }
+        let lifetime = self
+            .read_settings()
+            .map_err(crate::WebTicketError::Settings)?
+            .values
+            .web_login_ticket_seconds()
+            .map_err(|e| crate::WebTicketError::Settings(RootStoreError::Settings(e)))?;
+        let key = crate::web_session::read_existing(&self.directory, address)
+            .map_err(crate::WebTicketError::Session)?
+            .ok_or(crate::WebTicketError::Session(crate::WebSessionError::Refused("web-ticket-server-never-started")))?;
+        let now = time::OffsetDateTime::now_utc().unix_timestamp();
+        crate::web_login_ticket::issue(&self.directory, address, &key, lifetime, now)
+            .map_err(crate::WebTicketError::Session)
+    }
+    /// Replace the owner key of the cockpit address `address` (server must be
+    /// stopped: a bound listener refuses with `web-rotate-server-running`).
+    /// Requires a writable Root. After the next server start, every existing
+    /// cookie and unconsumed login ticket of the old key is refused. Returns
+    /// the new credential (Debug-redacted); callers must not print its secret.
+    #[cfg(target_os = "linux")]
+    pub fn rotate_web_session(
+        &self,
+        address: std::net::SocketAddr,
+    ) -> Result<crate::WebSessionCredential, crate::WebSessionError> {
+        if !self.writable {
+            return Err(crate::WebSessionError::Refused("web-session-readonly"));
+        }
+        crate::web_session::rotate(&self.directory, address)
+    }
+    /// Consume a presented login ticket for the server bound at `address`
+    /// whose in-memory owner key is `owner_key` (a ticket of another key is
+    /// unknown).
+    /// Single use: the first call removes it whatever the outcome; only
+    /// `Accepted` may lead to a session. Requires a writable Root. Typed
+    /// storage causes are retained; no other Root state changes.
+    #[cfg(target_os = "linux")]
+    pub fn consume_web_login_ticket(
+        &self,
+        address: std::net::SocketAddr,
+        owner_key: &str,
+        token: &str,
+    ) -> Result<crate::WebTicketUse, crate::WebTicketError> {
+        if !self.writable {
+            return Err(crate::WebTicketError::Session(crate::WebSessionError::Refused("web-session-readonly")));
+        }
+        let now = time::OffsetDateTime::now_utc().unix_timestamp();
+        crate::web_login_ticket::consume(&self.directory, address, owner_key, token, now)
+            .map_err(crate::WebTicketError::Session)
     }
     pub fn read_work(&self, id: &str) -> Result<Work, RootStoreError> {
         crate::read_recorded_work(&self.db, id).map_err(RootStoreError::Work)

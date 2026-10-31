@@ -8,6 +8,10 @@ import contextlib
 import io
 import os
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 from pathlib import Path
 import runpy
 import subprocess
@@ -96,7 +100,7 @@ class WorkflowCheckerEvidenceTests(unittest.TestCase):
         not Rust execution; the permanent next step runs the real native tests.
         Only temporary scripts/environment passed to owned children are changed.
         """
-        with tempfile.TemporaryDirectory(prefix='swarm-native-role-shim141-') as tmp:
+        with tempfile.TemporaryDirectory(prefix='swarm-native-role-shim141-', dir=fixture_area()) as tmp:
             directory=Path(tmp); cargo=directory/'cargo'; go=directory/'go'
             cargo.write_text('#!'+sys.executable+'\nimport os,sys\nassert sys.argv[1]=="test" and "agent_workflow" in sys.argv\nsys.stdout.write(open(os.environ["SWARM_NATIVE_ROLE_FIXTURE"]).read())\n')
             go.write_text('#!'+sys.executable+'\nimport os\nfrom pathlib import Path\nPath(os.environ["SWARM_GO_TRAP"]).write_text("unexpected Go invocation")\nraise SystemExit(91)\n')

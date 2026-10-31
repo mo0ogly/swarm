@@ -1,0 +1,370 @@
+{
+  "planning": {
+    "reviewer_required": true,
+    "reviewer": {
+      "max_context_files": 24,
+      "max_source_bytes": 98304,
+      "max_context_bytes": 131072,
+      "max_files": 100,
+      "provider": "fixture",
+      "provider_digest": "697f28bcaf35af7d3b13f8ebc9da282bfd642e1dceea385aca2c33236ee6bb62",
+      "model_route": {
+        "level": "standard",
+        "model": "fixture-standard",
+        "effort": "fixture-medium",
+        "billing": "external",
+        "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+        "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+      },
+      "max_calls": 2,
+      "calls": 0,
+      "authorized": "2026-10-28T16:16:59.334545955Z"
+    },
+    "model_route": {
+      "level": "standard",
+      "model": "fixture-standard",
+      "effort": "fixture-medium",
+      "billing": "external",
+      "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+      "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+    },
+    "checks": {
+      "req-1": [
+        {
+          "inputs": [
+            "handoff.md"
+          ],
+          "id": "actual-handoff",
+          "command": [
+            "python3",
+            "-c",
+            "from pathlib import Path; assert Path('handoff.md').read_text().strip()"
+          ],
+          "criteria": [
+            1
+          ],
+          "justification": "Check owned handoff content",
+          "timeout_seconds": 60
+        }
+      ]
+    },
+    "repository": {
+      "source": "/tmp/swarm-model83-r65c72t0/source",
+      "storage": "/tmp/swarm-model83-r65c72t0/.swarm/managed/w-1ee0f388d866669a074bae9e",
+      "base_commit": "38de4dc4a026338887bef559cc8b37fb94cdb88e",
+      "candidate_commit": "38de4dc4a026338887bef559cc8b37fb94cdb88e",
+      "snapshot_digest": "88227409bc3a5a51811849a4be485d4d5f8ce1ffc7d5e3a2cdb56ca897f3a217",
+      "request_digest": "44857e71ce04d382e59eda18dbe1bc3b7cbcace02e4cf93cc2118244ab49ad01"
+    },
+    "provider": "fixture",
+    "provider_digest": "697f28bcaf35af7d3b13f8ebc9da282bfd642e1dceea385aca2c33236ee6bb62",
+    "activations": 2,
+    "max_activations": 6,
+    "version": 1,
+    "paused": false,
+    "max_tasks": 2,
+    "max_decisions": 10,
+    "decisions": 2,
+    "scopes": [
+      {
+        "last_model": {
+          "provider": "fixture",
+          "provider_digest": "697f28bcaf35af7d3b13f8ebc9da282bfd642e1dceea385aca2c33236ee6bb62",
+          "route": {
+            "level": "standard",
+            "model": "fixture-standard",
+            "effort": "fixture-medium",
+            "billing": "external",
+            "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+            "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+          },
+          "actor": "",
+          "at": "2026-10-28T16:17:00.019852641Z"
+        },
+        "delivery": {
+          "judge_available": true,
+          "judge_cycle": 1,
+          "task_budget": 2,
+          "activation_budget": 6,
+          "closure_unavailable": true,
+          "review_retry_unavailable": true,
+          "production_retry_unavailable": true,
+          "context_sha256": "25048ccc82a71e6e4e6ad9c868a568d8e81978b22bac68df67608e0c8277feb3",
+          "events": [
+            "managed-planning-enable"
+          ],
+          "decision": "planning-decision-60fd84867956340a57a66a8b"
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "0ee8956b70ffdc7971b868f62666fa89f4cd40edeb68fb9211755de537572e55"
+        },
+        "activations": 2,
+        "id": "root",
+        "objective": "Scoped fixture planning",
+        "requirements": [],
+        "revision": 2,
+        "generation": 2,
+        "state": "waiting"
+      },
+      {
+        "last_model": {
+          "provider": "fixture",
+          "provider_digest": "697f28bcaf35af7d3b13f8ebc9da282bfd642e1dceea385aca2c33236ee6bb62",
+          "route": {
+            "level": "standard",
+            "model": "fixture-standard",
+            "effort": "fixture-medium",
+            "billing": "external",
+            "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+            "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+          },
+          "actor": "",
+          "at": "2026-10-28T16:17:04.07788905Z"
+        },
+        "delivery": {
+          "task_budget": 2,
+          "activation_budget": 6,
+          "closure_unavailable": true,
+          "review_retry_unavailable": true,
+          "production_retry_unavailable": true,
+          "context_sha256": "a107704ca6f5f94fe042028b6ff977d00d27284831e2f24236d85ca8137bdc49",
+          "events": [
+            "plan-0400fecf795cc992995ee3c2301316e05fe691c95ab0e39b653afb9ef34b1a7f"
+          ],
+          "decision": "planning-decision-bc5c75e000669fdd92677a4a"
+        },
+        "workflow": {
+          "version": 1,
+          "role": "subplanner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "43738280430f12d723d0b5e40128bc92616cb0bfe6a38d2487aceb877eb2a206"
+        },
+        "max_tasks": 2,
+        "max_activations": 3,
+        "activations": 1,
+        "id": "child",
+        "parent": "root",
+        "objective": "Owned child scope\nPlan the owned requirement",
+        "requirements": [
+          "req-1"
+        ],
+        "revision": 2,
+        "generation": 2,
+        "state": "ready"
+      }
+    ],
+    "inbox": [
+      {
+        "id": "managed-planning-enable",
+        "scope": "root",
+        "kind": "brief",
+        "message": "Scoped fixture planning",
+        "decision": "planning-decision-60fd84867956340a57a66a8b",
+        "at": "2026-10-28T16:16:59.334545955Z"
+      },
+      {
+        "id": "plan-0400fecf795cc992995ee3c2301316e05fe691c95ab0e39b653afb9ef34b1a7f",
+        "scope": "child",
+        "kind": "delegation",
+        "message": "Owned child scope",
+        "decision": "planning-decision-bc5c75e000669fdd92677a4a",
+        "at": "2026-10-28T16:17:01.590582987Z"
+      },
+      {
+        "id": "plan-459b50e2d9fcc614f8c7bfda6ce86e5aa71a0e021b30efa2b632c39c9d662367",
+        "scope": "child",
+        "kind": "attempt_ended",
+        "task": "task",
+        "attempt": "a-0fbb24d607725df9078bda10",
+        "message": "failed : processus récolté ; validation requise",
+        "at": "2026-10-28T16:29:53.839570572Z"
+      },
+      {
+        "id": "plan-4b69a06b4af1cccf39c52415b730f7fe7c9dd2a81100b82af82b639d1a67001c",
+        "scope": "child",
+        "kind": "attempt_ended",
+        "task": "task-2",
+        "attempt": "a-1907cad5e7d4d94dca3a1545",
+        "message": "failed : processus récolté ; validation requise",
+        "at": "2026-10-28T16:31:18.061544164Z"
+      }
+    ],
+    "judge": {
+      "cycle": 1,
+      "max_cycles": 0,
+      "closed": false
+    }
+  },
+  "launch_profile": {
+    "provider": "fixture",
+    "role": "worker",
+    "workspace": "/tmp/swarm-model83-r65c72t0/.swarm/managed/w-1ee0f388d866669a074bae9e/copies/task-2-1",
+    "capture_output": true,
+    "updated": "2026-10-28T16:30:57.562247735Z",
+    "actor": "operateur"
+  },
+  "schema_version": 1,
+  "id": "w-1ee0f388d866669a074bae9e",
+  "revision": 13,
+  "title": "Public planning bootstrap",
+  "objective": "Scoped fixture planning",
+  "scope": "Owned local bootstrap",
+  "criteria": [
+    "Configuration is persisted without model execution"
+  ],
+  "next": "",
+  "summary": "",
+  "memory": null,
+  "created": "2026-10-28T16:16:58.755737933Z",
+  "updated": "2026-10-28T16:40:14.122617878Z",
+  "git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "tasks": [
+    {
+      "scope_id": "child",
+      "requirements": [
+        "req-1"
+      ],
+      "validation_policy": {
+        "mode": "automatic",
+        "controls": [
+          {
+            "inputs": [
+              "handoff.md"
+            ],
+            "id": "check-ccc6d5834ae3a4e245f553b7",
+            "command": [
+              "python3",
+              "-c",
+              "from pathlib import Path; assert Path('handoff.md').read_text().strip()"
+            ],
+            "criteria": [
+              1
+            ],
+            "justification": "Check owned handoff content",
+            "timeout_seconds": 60
+          }
+        ],
+        "authorized_at": "2026-10-28T16:17:05.432306232Z",
+        "actor": "autorisation initiale de la mission"
+      },
+      "launch_profile": {
+        "provider": "fixture",
+        "role": "worker",
+        "workspace": "/tmp/swarm-model83-r65c72t0/.swarm/managed/w-1ee0f388d866669a074bae9e/copies/task-1",
+        "timeout_seconds": 1800,
+        "capture_output": true,
+        "updated": "2026-10-28T16:29:50.63810805Z",
+        "actor": "operateur"
+      },
+      "plan_checks": {
+        "check-ccc6d5834ae3a4e245f553b7": "delivery"
+      },
+      "plan_role": "worker",
+      "plan_max_attempts": 2,
+      "id": "task",
+      "title": "Owned task",
+      "owner": "fixture",
+      "deliverable": "handoff.md",
+      "criteria": [
+        "Configuration is persisted without model execution"
+      ],
+      "depends": null,
+      "status": "blocked",
+      "blocker": "Processus terminé ; handoff, preuves et validation requis",
+      "next": "Examiner les preuves puis reprendre explicitement",
+      "attempts": [
+        {
+          "id": "a-0fbb24d607725df9078bda10",
+          "status": "failed",
+          "started": "2026-10-28T16:29:50.637914625Z",
+          "ended": "2026-10-28T16:29:53.851805032Z"
+        }
+      ]
+    },
+    {
+      "scope_id": "child",
+      "requirements": [
+        "req-1"
+      ],
+      "validation_policy": {
+        "mode": "automatic",
+        "controls": [
+          {
+            "inputs": [
+              "handoff.md"
+            ],
+            "id": "check-ccc6d5834ae3a4e245f553b7",
+            "command": [
+              "python3",
+              "-c",
+              "from pathlib import Path; assert Path('handoff.md').read_text().strip()"
+            ],
+            "criteria": [
+              1
+            ],
+            "justification": "Check owned handoff content",
+            "timeout_seconds": 60
+          }
+        ],
+        "authorized_at": "2026-10-28T16:17:05.432306232Z",
+        "actor": "autorisation initiale de la mission"
+      },
+      "launch_profile": {
+        "provider": "fixture",
+        "role": "worker",
+        "workspace": "/tmp/swarm-model83-r65c72t0/.swarm/managed/w-1ee0f388d866669a074bae9e/copies/task-2-1",
+        "timeout_seconds": 1800,
+        "capture_output": true,
+        "updated": "2026-10-28T16:30:57.562247735Z",
+        "actor": "operateur"
+      },
+      "plan_checks": {
+        "check-ccc6d5834ae3a4e245f553b7": "delivery"
+      },
+      "plan_role": "worker",
+      "plan_max_attempts": 2,
+      "id": "task-2",
+      "title": "Owned task-2",
+      "owner": "fixture",
+      "deliverable": "handoff.md",
+      "criteria": [
+        "Configuration is persisted without model execution"
+      ],
+      "depends": null,
+      "status": "blocked",
+      "blocker": "Processus terminé ; handoff, preuves et validation requis",
+      "next": "Examiner les preuves puis reprendre explicitement",
+      "attempts": [
+        {
+          "id": "a-1907cad5e7d4d94dca3a1545",
+          "status": "failed",
+          "started": "2026-10-28T16:30:57.562110116Z",
+          "ended": "2026-10-28T16:31:18.072334766Z"
+        }
+      ]
+    }
+  ]
+}

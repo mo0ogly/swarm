@@ -12,6 +12,7 @@ import select
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import time
 import traceback
 import urllib.error
@@ -28,7 +29,7 @@ def main():
     binary = args.binary.resolve()
     out = args.output.resolve()
     out.mkdir(mode=0o700, parents=True, exist_ok=False)
-    root = Path(tempfile.mkdtemp(prefix="swarm-recovery-projection-"))
+    root = Path(tempfile.mkdtemp(prefix="swarm-recovery-projection-", dir=fixture_area()))
     checks, commands = [], []
     server, active = None, None
 

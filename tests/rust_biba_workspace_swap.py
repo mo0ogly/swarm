@@ -5,6 +5,7 @@ inside a disposable driver; no live Root, account, real secret or DB is touched.
 No retry, cleanup of retained originals or whole-test watchdog is used.
 """
 import argparse,json,os,subprocess,tempfile
+from fixture_area import fixture_area
 from pathlib import Path
 import rust_agent_model_route as proof
 import rust_biba_linux_boundary as control
@@ -23,7 +24,7 @@ def run(driver,out):
     compiled=subprocess.run(argv,capture_output=True)
     proof.publish(out/'compiler.stdout',compiled.stdout);proof.publish(out/'compiler.stderr',compiled.stderr)
     assert compiled.returncode==0,compiled.stderr
-    root=Path(tempfile.mkdtemp(prefix='swarm-biba-swap-'));private=root/'.swarm';private.mkdir();workspace=root/'out';workspace.mkdir()
+    root=Path(tempfile.mkdtemp(prefix='swarm-biba-swap-', dir=fixture_area()));private=root/'.swarm';private.mkdir();workspace=root/'out';workspace.mkdir()
     synthetic=private/'synthetic';original=b'UNCHANGED_SYNTHETIC'
     proof.publish(synthetic,original);script=root/'provider.py'
     proof.publish(script,b"with open('alias','wb') as f:f.write(b'CORRUPTED_SYNTHETIC')\n")

@@ -1,6 +1,6 @@
 'use strict';
 const fs=require('fs'),os=require('os'),path=require('path'),assert=require('assert/strict');const {spawn,execFileSync}=require('child_process');const puppeteer=require('puppeteer');
-const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-dialogue-ui-'));
+const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-dialogue-ui-'));
 const cli=(args,data)=>JSON.parse(execFileSync(binary,['--root',root,...args,...(data?['--input','-']:[])],{encoding:'utf8',input:data?JSON.stringify(data):undefined}));cli(['init']);
 for(const name of ['.claude/skills/apex/SKILL.md','tools/agent-workflows/CONTRACT.md']){const p=path.join(root,name);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,'Préparation uniquement.')}
 const fake=path.join(root,'claude');fs.writeFileSync(fake,`#!/usr/bin/python3

@@ -1,0 +1,131 @@
+{
+ "schema_version": 1,
+ "id": "paea-consent-ui-rust",
+ "inputs": [
+  "rust/Cargo.toml",
+  "rust/Cargo.lock",
+  ".cargo/config.toml",
+  "rust/crates/*/Cargo.toml",
+  "rust/crates/swarm-web/src/**/*",
+  "rust/crates/swarm-web/tests/paea_git_call.rs",
+  "rust/crates/swarm-web/tests/paea_consent_page.rs",
+  "rust/crates/swarm-web/tests/paea_consent_browser.rs",
+  "rust/crates/swarm-engine/src/**/*",
+  "rust/crates/swarm-engine/tests/paea_git_transfer_call.rs",
+  "rust/crates/swarm-enrollment-*/src/**/*",
+  "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+  "rust/crates/swarm-identity-contract/src/**/*",
+  "rust/crates/swarm-protection-contract/src/**/*",
+  "web/paea.html",
+  "web/paea-consent.html",
+  "web/paea-consent.js",
+  "web/paea-effects.js",
+  "web/i18n.js",
+  "web/i18n-en.js",
+  "locales/en.json",
+  "tests/paea_consent_ui.cjs",
+  "tests/paea_consent_ui_recipe.py",
+  "tools/verification/recipe.py",
+  "tools/verification/recipes/paea-consent-ui-rust.json"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+  "CARGO_PROFILE_DEV_DEBUG": "0",
+  "CARGO_PROFILE_TEST_DEBUG": "0",
+  "CARGO_INCREMENTAL": "0",
+  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/consent-fixture-regen-20261031T0900Z"
+ },
+ "steps": [
+  {
+   "id": "approval-presentation-explicit-absence-without-source",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "approval_presentation_reports_explicit_absence_without_source",
+    "--message-format=json",
+    "--",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "approval_presentation_reports_explicit_absence_without_source ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "consent-page-embedded-assets",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_consent_page",
+    "--",
+    "--test-threads=1"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "2 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "consent-page-i18n-catalog",
+   "command": [
+    "node",
+    "scripts/i18n/build.cjs",
+    "--check"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "\"mode\":\"check\"",
+    "\"status\":\"pass\""
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "consent-test-binary-build",
+   "command": [
+    "sh",
+    "-c",
+    "rm -f .cache/paea-verification-target/debug/deps/paea_consent_browser-* && touch rust/crates/swarm-web/src/service/native_admin.rs && cargo test --manifest-path rust/Cargo.toml --offline --locked -p swarm-web --test paea_consent_browser --no-run"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [],
+   "required_stderr": [
+    "Finished"
+   ]
+  },
+  {
+   "id": "consent-page-real-browser-qualification",
+   "command": [
+    "python3",
+    "tests/paea_consent_ui_recipe.py",
+    "--binary",
+    "{root}/.cache/paea-verification-target/debug/deps/paea_consent_browser-*",
+    "--output",
+    "{root}/.cache/paea-consent-ui-browser-evidence"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "PAEA_CONSENT_BROWSER_VERIFIED 2"
+   ],
+   "required_stderr": []
+  }
+ ]
+}

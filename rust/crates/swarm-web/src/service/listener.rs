@@ -270,6 +270,36 @@ impl NativeHttpServer {
             },
         }
     }
+    /// Same trusted single-intent bootstrap with one optional prepared approval
+    /// command (frozen operation + exact bytes bound to the project root)
+    /// attached to the held authority before any session publication. Mirrors
+    /// `NativeHttpService::open_git_call_with_approval`: the approval binds
+    /// nothing new — the request must still match the exact frozen bytes under
+    /// the held enrolled authority at consumption. On any refusal the supplied
+    /// authority (approval witness included) is closed explicitly, retaining
+    /// both independent causes typed.
+    #[cfg(target_os = "linux")]
+    pub fn bind_git_call_with_approval(root_path: &Path, address: Option<&str>, mut source: super::PaeaGitCallAuthority, approval: Option<super::PaeaGitCallApprovalSource>) -> Result<Self, NativeServerError> {
+        let approval_result = match approval {
+            Some(approval) => source.bind_approval(approval).err(),
+            None => None,
+        };
+        if let Some(cause) = approval_result {
+            // The bind refused: close the supplied authority (approval witness
+            // included) and retain both independent causes typed.
+            return match source.close() {
+                Ok(()) => Err(NativeServerError::Service(root("paea-git-call-approval-bind", cause))),
+                Err(cleanup) => Err(NativeServerError::Cleanup {primary:Box::new(NativeServerError::Service(root("paea-git-call-approval-bind", cause))),cleanup:Box::new(NativeServerError::Service(HttpServiceError::GitCallSource {primary:None,cause:Box::new(cleanup)}))}),
+            };
+        }
+        match Self::bind_source(root_path, address, None, Some(&source)) {
+            Ok(mut server) => { server.service.paea_git_call=Some(source); Ok(server) },
+            Err(primary) => match source.close() {
+                Ok(()) => Err(primary),
+                Err(cause) => Err(NativeServerError::Cleanup {primary:Box::new(primary),cleanup:Box::new(NativeServerError::Service(HttpServiceError::GitCallSource {primary:None,cause:Box::new(cause)}))}),
+            },
+        }
+    }
     /// Read validated settings and establish session/binding from one writable
     /// Root. Optional address is a transient override using the same canonical
     /// loopback validator; it never persists a different policy. Zero connection

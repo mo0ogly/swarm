@@ -1,9 +1,10 @@
 """Public CLI recipe: two real fake-provider processes, no human approval between tasks."""
+from fixture_area import fixture_area
 import json, pathlib, subprocess, sys, tempfile, time, uuid
 config_path=pathlib.Path(sys.argv[3]).resolve()
 binary=str(pathlib.Path(sys.argv[1]).resolve())
 out=pathlib.Path(sys.argv[2]);out.mkdir(parents=True,exist_ok=True)
-root=pathlib.Path(tempfile.mkdtemp(prefix='swarm-auto-validation-'))
+root=pathlib.Path(tempfile.mkdtemp(prefix='swarm-auto-validation-', dir=fixture_area()))
 def cli(args,data=None):
  p=subprocess.run([binary,'--root',str(root),'--json',*args]+(['--input','-'] if data is not None else []),input=json.dumps(data) if data is not None else None,text=True,capture_output=True,timeout=15)
  if p.returncode:raise RuntimeError(p.stdout+p.stderr)

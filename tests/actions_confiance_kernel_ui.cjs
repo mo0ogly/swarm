@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('assert'),fs=require('fs'),path=require('path'),os=require('os'),cp=require('child_process'),pup=require('puppeteer');
-const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-kernel-ui-')),checks=[],errors=[];
+const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-kernel-ui-')),checks=[],errors=[];
 const identities=[['admin',3,'admin'],['alice',1,'requester'],['bob',2,'approver'],['effect',2,'effect']].map(([subject,integrity,role])=>({subject,integrity,roles:[role],token:subject+'-kernel-browser-fixture-token'}));
 function cli(action,data){return JSON.parse(cp.execFileSync(binary,['--root',root,'--json','trust',action,...(data?['--input','-']:[])],{input:data?JSON.stringify(data):undefined,encoding:'utf8',stdio:['pipe','pipe','pipe']}))}
 cp.execFileSync(binary,['--root',root,'--json','init']);cli('config-apply',{schema_version:1,event_id:'kernel-ui-init',expected_revision:0,policy:{mandate_ttl_seconds:3600,unknown_reconcile_seconds:0,evidence_retention_days:365,require_separation:true},identities,reason:'isolated kernel browser recipe'});

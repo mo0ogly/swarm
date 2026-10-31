@@ -27,6 +27,22 @@ use swarm_identity_contract::Scope;
 
 const PIN: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
+/// Run-unique suffix for fixture Trust event and mandate identifiers: the
+/// process id plus a per-invocation sequence. The process id alone is NOT
+/// run-unique inside one multi-test suite process (every test shares it), so
+/// a second config-apply or agreement seeding replayed a retained event under
+/// the same id with a different fingerprint (`expected_revision` is part of
+/// the digest) and refused with `event_conflict` — the reproduced six-test
+/// suite regression. The per-call sequence makes every apply and seeding
+/// within one process unique; the process id keeps reruns on a retained root
+/// unique across processes. No per-test exception: every identifier flows
+/// through this one helper.
+fn run_nonce() -> String {
+    use std::sync::atomic::{AtomicU64, Ordering};
+    static SEQ: AtomicU64 = AtomicU64::new(0);
+    format!("{}-{}", std::process::id(), SEQ.fetch_add(1, Ordering::SeqCst))
+}
+
 /// Exclusive in-process guard over the shared retained source fixture. The
 /// actual `SWARM_PAEA_SOURCE_FIXTURE` root is a single physical directory (its
 /// inode-bound copy is invalid), so every test of this harness serializes its
@@ -238,17 +254,107 @@ fn current_trust_revision(root: &Path) -> i64 {
 /// `trust-actions.json` yet) the apply creates the state; on a retained
 /// root already at revision N the exact same event replay is accepted without
 /// advancing further, so reruns never mutate the fixture Trust revision.
-fn effect_config() -> Vec<u8> {
+/// Real Trust agreement chain (mandate-create → request → approve) for one
+/// exact promotion resource, with the seeded OLD OID as the recipe beneficiary
+/// — the same producer chain the captured-agreement guard consults. All
+/// event/mandate identifiers derive from the resource plus the run nonce, so
+/// chains in one run and reruns on the retained root never collide with prior
+/// evidence. Returns the approved action reply.
+fn seed_agreement(project: &RootStore, old: &str, resource: &str) -> Value {
+    let nonce = run_nonce();
+    // Identifier grammar (`name`) excludes '/': derive run-unique ids from a
+    // sanitized prefix, never from the full resource string.
+    let tag: String = resource
+        .chars()
+        .filter(|c| c.is_ascii_alphanumeric() || *c == '-' || *c == '_')
+        .take(40)
+        .collect();
+    let event = move |name: &str| format!("{name}-{nonce}-{tag}");
+    let mandate_id = event("mandate");
+    let trust_as = |op: &str, value: Value, token: &str| -> Value {
+        serde_json::from_slice(
+            &project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+                .bytes,
+        )
+        .unwrap()
+    };
+    trust_as(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":event("mandate-create"),
+            "mandate_id":mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":1,
+            "currency":"OID",
+            "beneficiary":old,
+        }),
+        "fixture-agreement-admin-token",
+    );
+    let action = trust_as(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":event("request"),
+            "mandate_id":mandate_id,
+            "resource":resource,
+            "amount_minor":1,
+            "currency":"OID",
+            "beneficiary":old,
+            "idempotency_key":event("key"),
+        }),
+        "fixture-requester-token",
+    );
+    assert_eq!(action["state"], "pending_approval");
+    let approved = trust_as(
+        "approve",
+        json!({
+            "schema_version":1,
+            "event_id":event("approve"),
+            "action_id":action["id"],
+            "mandate_id":mandate_id,
+            "content_digest":action["content_digest"],
+            "resource":resource,
+            "amount_minor":1,
+            "currency":"OID",
+            "beneficiary":old,
+        }),
+        "fixture-approver-token",
+    );
+    assert_eq!(approved["state"], "approved");
+    approved
+}
+
+fn effect_config(project_path: &Path) -> Vec<u8> {
+    // Idempotent on both regimes (same contract as the engine promote-call
+    // harness): a fresh root (no state file) applies at expected revision 0
+    // with a stable event id; a retained root already configured applies a
+    // run-unique event at its actual current revision, so reruns never replay
+    // a conflicting fingerprint nor advance the fixture revision.
+    let fresh = !project_path.join(".swarm/trust-actions.json").exists();
+    let (event_id, expected) = if fresh {
+        ("promote-cli-effect-config".to_owned(), 0)
+    } else {
+        (
+            format!("promote-cli-effect-config-{}", run_nonce()),
+            current_trust_revision(project_path),
+        )
+    };
     serde_json::to_vec(&json!({
         "schema_version":1,
-        "event_id":"promote-cli-effect-config",
-        "expected_revision":0,
+        "event_id":event_id,
+        "expected_revision":expected,
         "reason":"Explicit fixture effect role for Git promotion CLI",
         "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":false},
         "identities":[
             {"subject":"enrolled-effect","integrity":3,"roles":["admin","effect"],"enrollment_principal":{"principal_id":"operator","principal_kind":"human","issuer":"https://fixture.invalid","subject":"stable-person"}},
             {"subject":"requester","token":"fixture-requester-token","integrity":1,"roles":["requester"]},
-            {"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]}
+            {"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]},
+            {"subject":"agreement-admin","token":"fixture-agreement-admin-token","integrity":3,"roles":["admin"]}
         ]
     }))
     .unwrap()
@@ -330,6 +436,11 @@ struct Owned {
     service: RootStore,
     work: String,
     candidate: String,
+    /// Seeded OLD OID (the agreement beneficiary and fencing reference).
+    old: String,
+    /// Provisioned repository binding id, for rebuilding the exact agreement
+    /// resource `fixture-project/{repository_id}/refs/heads/release/{candidate}`.
+    repository_id: String,
     trust_revision: i64,
     scope: Scope,
     document: Vec<u8>,
@@ -338,7 +449,7 @@ struct Owned {
 fn owned(operation: &str) -> Owned {
     let (project_path, project, work, candidate) = project();
     project
-        .trust("config-apply", &effect_config(), "")
+        .trust("config-apply", &effect_config(&project_path), "")
         .unwrap_or_else(|e| panic!("explicit fixture config refused: {}", e.code()));
     // The applied configuration advanced the Trust revision; the signed grant
     // and attributed context must both bind the actual post-configuration one.
@@ -358,6 +469,13 @@ fn owned(operation: &str) -> Owned {
     let repository_id = binding.repository_id().to_owned();
     drop(binding);
     let old = seed_old(service_dir.path(), "bare", "refs/heads/release");
+    // The commit path revalidates the captured agreement at last use; every
+    // commit expectation in this harness seeds a fresh compliant one for the
+    // exact promotion resource (seeded OLD OID = recipe beneficiary).
+    let agreement_resource = format!(
+        "fixture-project/{repository_id}/refs/heads/release/{candidate}"
+    );
+    seed_agreement(&project, &old, &agreement_resource);
     let proposal = serde_json::to_vec(&json!({
         "proposal":{"schema_version":1,"request_id":"promote-cli-fixture","action":{"kind":"repository.promote","repository_id":repository_id,"target_ref":"refs/heads/release","expected_old_oid":old,"candidate_oid":candidate}},
         "context":{"project_id":"fixture-project","principal_id":"operator","instance_id":"fixture-instance","mandate_id":"fixture-mandate","mandate_revision":1,"policy_revision":trust_revision,"policy_digest":"aa".repeat(32),"tool_manifest_digest":"bb".repeat(32),"sources":[{"source_id":"fixture-source","version":"1","digest":"cc".repeat(32),"integrity":2,"confidentiality_labels":[]}]}
@@ -388,6 +506,8 @@ fn owned(operation: &str) -> Owned {
         _service_dir: service_dir,
         service,
         work,
+        old: old.clone(),
+        repository_id,
         candidate,
         trust_revision,
         scope: fixture_scope,
@@ -984,7 +1104,7 @@ fn promote_call_cli_revoked_current_authority_refuses_without_effect_then_recove
             id["disabled"] = true.into();
         }
     }
-    let revision_before = trust_state(&owned.project_path);
+    let revision_before = current_trust_revision(&owned.project_path);
     // The event id binds the revision it applies to, matching the established
     // transfer-harness pattern: each run on the retained root creates fresh
     // events, never a conflicting replay of an older retained fingerprint.
@@ -1029,7 +1149,7 @@ fn promote_call_cli_revoked_current_authority_refuses_without_effect_then_recove
         error["failure"]["causes"]
     );
     // Refusal left no current change beyond the explicit revocation itself.
-    assert_eq!(trust_state(&owned.project_path), revision_before + 1);
+    assert_eq!(current_trust_revision(&owned.project_path), revision_before + 1);
     assert_eq!(read_ref(&owned), old_ref);
     assert_eq!(effects(&owned._service_dir.path()), effects_before);
     // --- Window 2: same revoked current state with a revision-matched grant. ---
@@ -1049,7 +1169,7 @@ fn promote_call_cli_revoked_current_authority_refuses_without_effect_then_recove
         "unexpected causes: {:?}",
         error["failure"]["causes"]
     );
-    assert_eq!(trust_state(&owned.project_path), revoked_revision);
+    assert_eq!(current_trust_revision(&owned.project_path), revoked_revision);
     assert_eq!(read_ref(&owned), old_ref);
     assert_eq!(effects(&owned._service_dir.path()), effects_before);
     // --- Legitimate recovery: public restore, then one exact consumption. ---
@@ -1066,7 +1186,18 @@ fn promote_call_cli_revoked_current_authority_refuses_without_effect_then_recove
     )
     .unwrap();
     assert_eq!(applied["revision"], revoked_revision + 1);
-    let restored_revision = trust_state(&owned.project_path);
+    let restored_revision = current_trust_revision(&owned.project_path);
+    // Last-use agreement freshness: the agreement seeded by owned() binds
+    // revision_before and is void at the current restored revision after the
+    // two public revision changes. The legitimate recovery commit therefore
+    // consumes a freshly linked agreement for the exact promotion resource,
+    // produced by the same real mandate/request/approve chain — never a
+    // bypass of the paea-git-promote-agreement-stale guard.
+    let recovery_resource = format!(
+        "fixture-project/{}/refs/heads/release/{}",
+        owned.repository_id, owned.candidate
+    );
+    seed_agreement(&owned.project, &owned.old, &recovery_resource);
     let (status, rest, stderr) =
         invoke_between(&owned, "commit", false, restored_revision, &|| {});
     assert!(status.success(), "stderr: {stderr}");
@@ -1077,9 +1208,589 @@ fn promote_call_cli_revoked_current_authority_refuses_without_effect_then_recove
     assert_eq!(reply["target_ref"], "refs/heads/release");
     assert_eq!(reply["new_oid"], owned.candidate);
     assert_eq!(reply["intent_id"].as_str().unwrap().len(), 64);
-    assert_eq!(trust_state(&owned.project_path), restored_revision);
+    assert_eq!(current_trust_revision(&owned.project_path), restored_revision);
     assert_eq!(effects(&owned._service_dir.path()), effects_before + 1);
     assert_eq!(read_ref(&owned), owned.candidate);
+    owned.service.close().unwrap();
+    owned.project.close().unwrap();
+}
+
+/// Fictitious payment document for the composed second-domain settlement
+/// invocation: the retained canonical example, unchanged producer bytes.
+fn payment_document() -> Vec<u8> {
+    let raw: &[u8] = include_bytes!("../../../../web/paea-examples/v1/payment-document.json");
+    raw.to_vec()
+}
+
+/// Read the single durable settlement effect's exact columns through a
+/// separately opened read-only DB; producer bytes, never a harness-invented
+/// shape. `None` proves the row is absent rather than assuming it.
+fn settlement_effect(
+    ledger_dir: &Path,
+) -> Option<(String, String, String, String)> {
+    let db = rusqlite::Connection::open_with_flags(
+        ledger_dir.join(".swarm/state.db"),
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+    )
+    .ok()?;
+    let row = db
+        .query_row(
+            "SELECT intent_id,invoice_id,action_digest,receipt FROM paea_settlement_effects",
+            [],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
+        )
+        .ok();
+    db.close().unwrap();
+    row
+}
+
+/// Count the ledger's durable settlement effect rows through a separately
+/// opened read-only DB. Errors refuse the check instead of becoming a count.
+fn settlement_effect_count(ledger_dir: &Path) -> i64 {
+    let db = rusqlite::Connection::open_with_flags(
+        ledger_dir.join(".swarm/state.db"),
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+    )
+    .unwrap();
+    let n = db
+        .query_row("SELECT count(*) FROM paea_settlement_effects", [], |r| {
+            r.get(0)
+        })
+        .unwrap();
+    db.close().unwrap();
+    n
+}
+
+/// Count the service's durable Git promotion effect rows through a separately
+/// opened read-only DB. Errors refuse the check instead of becoming a count.
+fn git_effect_count(service_dir: &Path) -> i64 {
+    let db = rusqlite::Connection::open_with_flags(
+        service_dir.join(".swarm/state.db"),
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+    )
+    .unwrap();
+    let n = db
+        .query_row("SELECT count(*) FROM paea_git_promote_effects", [], |r| {
+            r.get(0)
+        })
+        .unwrap();
+    db.close().unwrap();
+    n
+}
+
+/// Full two-phase settlement invocation with the provisioning window open: the
+/// same project/Trust roots as the Git promotion harness, its own fresh
+/// provisioned ledger, the preparation-time `revision` in the signed grant,
+/// and the explicit `between` window after the public prepared event. Outputs:
+/// exit status, stdout after the prepared event, stderr. Motif of
+/// `tests/paea_settlement_delivered.rs::invoke_between` on this harness's roots.
+fn invoke_settlement_between(
+    owned: &Owned,
+    ledger_dir: &Path,
+    document: &[u8],
+    revision: i64,
+    between: &dyn Fn(),
+) -> (std::process::ExitStatus, String, String) {
+    let project_dir = owned.project_path.clone();
+    let input = ledger_dir.join("settlement-request.json");
+    fs::write(&input, document).unwrap();
+    let declaration_dir = ledger_dir.join("operator-declaration");
+    fs::create_dir_all(&declaration_dir).unwrap();
+    fs::set_permissions(&declaration_dir, fs::Permissions::from_mode(0o700)).unwrap();
+    let declaration = declaration_dir.join("declaration.json");
+    let args = [
+        "--json",
+        "paea",
+        "settlement-call",
+        "commit",
+        project_dir.to_str().unwrap(),
+        ledger_dir.to_str().unwrap(),
+        declaration.to_str().unwrap(),
+        "--input",
+        input.to_str().unwrap(),
+    ];
+    println!("composed-settlement-argv {}", args.join(" "));
+    let mut child = delivered_binary()
+        .args(args)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let mut stdout = BufReader::new(child.stdout.take().unwrap());
+    let mut first = String::new();
+    let read = stdout.read_line(&mut first).unwrap();
+    if read == 0 {
+        let output = child.wait_with_output().unwrap();
+        return (
+            output.status,
+            String::new(),
+            String::from_utf8_lossy(&output.stderr).to_string(),
+        );
+    }
+    let prepared: Value = serde_json::from_str(&first).unwrap();
+    assert_eq!(prepared["event"], "paea-settlement-prepared");
+    assert_eq!(prepared["service"], "payment.settle");
+    assert_eq!(prepared["operation"], "commit");
+    assert_eq!(prepared["authority"], false);
+    assert_eq!(prepared["restart_reusable"], false);
+    let permission: swarm_identity_contract::Permission =
+        serde_json::from_value(prepared["permission"].clone()).unwrap();
+    between();
+    let f = fixture::Fixture::build_for_trust(permission, owned.scope.clone(), revision);
+    fs::copy(&f.path, &declaration).unwrap();
+    fs::set_permissions(&declaration, fs::Permissions::from_mode(0o600)).unwrap();
+    let mut packet = format!("swarm-trust-source-v1\n{}\n", f.pin).into_bytes();
+    packet.extend_from_slice(b"STARTUP_FIXTURE_PASSWORD");
+    child.stdin.take().unwrap().write_all(&packet).unwrap();
+    let mut rest = String::new();
+    stdout.read_to_string(&mut rest).unwrap();
+    let output = child.wait_with_output().unwrap();
+    assert!(!rest.contains("STARTUP_FIXTURE_PASSWORD"));
+    assert!(!String::from_utf8_lossy(&output.stderr)
+        .contains("STARTUP_FIXTURE_PASSWORD"));
+    f.close();
+    (
+        output.status,
+        rest,
+        String::from_utf8_lossy(&output.stderr).to_string(),
+    )
+}
+
+/// One composed two-domain decision-order scenario over the SAME project Trust
+/// authority, without any agent clock: a legitimate Git promotion preparation
+/// and a legitimate settlement preparation both hold live prepared witnesses
+/// at the SAME current Trust revision, then the supported public Trust change
+/// `config-apply` advances the current revision while both windows are open.
+/// The stale Git preparation is consumed first and must refuse through the
+/// exact `paea-git-promote-trust-revision` recheck BEFORE any publication: no
+/// Git reference change, no durable Git effect. The stale settlement
+/// preparation is then consumed and must refuse through the exact
+/// `paea-settlement-trust-revision` recheck BEFORE any ledger effect. After
+/// the public restore configuration, fresh legitimate preparations consume
+/// exactly once per domain: the Git reference moves to the exact candidate
+/// under OLD fencing with exactly one durable Git effect, and the ledger
+/// records exactly one durable settlement effect bound to the provisioned
+/// debt terms; the public read-only `paea reconcile-effects` CLI on the
+/// service root then reports BOTH journals consistent with exactly one
+/// verified finding each, bound to the recorded intents. The decision order is
+/// logical, not temporal: each refusal's exact cause is decided by the current
+/// storage state at its own consumption, and no cross-service atomicity or
+/// global ordering between the two domains is claimed or exercised. The
+/// pre-existing single-domain witnesses are
+/// `promote_call_cli_revoked_current_authority_refuses_without_effect_then_recovers`
+/// (Git) and
+/// `delivered_settlement_revoked_current_authority_refuses_without_effect_then_recovers`
+/// (settlement), run by their own recipes. Fixture authority only, same-UID,
+/// fictitious SQLite and fixture Git: no UID separation, human presence, real
+/// payment, accepted service or delivery provenance is proven here; without
+/// `SWARM_PAEA_DELIVERED_BIN` every spawn runs the cargo-launched binary.
+#[test]
+#[ignore = "guarded full-root composed two-domain scenario; run explicitly via its recipe"]
+fn composed_git_settlement_stale_preparations_refuse_then_fresh_recover() {
+    let _root = shared_project_root_guard();
+    let owned = owned("commit");
+    let ledger_dir = tempfile::tempdir().unwrap();
+    fs::set_permissions(ledger_dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
+    let ledger = RootStore::initialize(ledger_dir.path(), &mut SystemEnvironment).unwrap();
+    let document = payment_document();
+    let (proposal, context) = {
+        let doc = swarm_protection_contract::decode_document(&document).unwrap();
+        (doc.proposal, doc.context)
+    };
+    // Documented fixture provisioning path only: the fictitious ledger is
+    // provisioned for the document's declared project BEFORE any CLI call.
+    ledger
+        .paea_initialize_settlement(
+            &context.project_id,
+            &"0b".repeat(32),
+            std::slice::from_ref(&proposal),
+        )
+        .unwrap();
+    let revision_before = current_trust_revision(&owned.project_path);
+    assert_eq!(git_effect_count(owned._service_dir.path()), 0);
+    assert_eq!(settlement_effect_count(ledger_dir.path()), 0);
+    let read_ref = || -> String {
+        let refs = Command::new("git")
+            .args([
+                "--git-dir",
+                owned
+                    ._service_dir
+                    .path()
+                    .join(".swarm/bare")
+                    .to_str()
+                    .unwrap(),
+                "rev-parse",
+                "--verify",
+                "refs/heads/release",
+            ])
+            .output()
+            .unwrap();
+        assert!(refs.status.success());
+        String::from_utf8(refs.stdout).unwrap().trim().to_owned()
+    };
+    let old_ref = read_ref();
+    assert_ne!(old_ref, owned.candidate);
+
+    // --- Two live legitimate preparations at the SAME current revision. ---
+    // Git promotion preparation first: its prepared event is read and held
+    // (live child, own declaration path, no frame answered yet).
+    let input = owned._service_dir.path().join("promote-request.json");
+    fs::write(&input, &owned.document).unwrap();
+    let declaration_dir = owned._service_dir.path().join("operator-declaration");
+    fs::create_dir_all(&declaration_dir).unwrap();
+    fs::set_permissions(&declaration_dir, fs::Permissions::from_mode(0o700)).unwrap();
+    let git_declaration = declaration_dir.join("declaration.json");
+    let mut git_child = delivered_binary()
+        .args([
+            "--root",
+            owned._service_dir.path().to_str().unwrap(),
+            "--json",
+            "paea",
+            "promote-call",
+            "commit",
+            owned._service_dir.path().to_str().unwrap(),
+            owned.project_path.to_str().unwrap(),
+            &owned.work,
+            "bare",
+            PIN,
+            git_declaration.to_str().unwrap(),
+            "--input",
+            input.to_str().unwrap(),
+        ])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let mut git_stdout = BufReader::new(git_child.stdout.take().unwrap());
+    let mut git_first = String::new();
+    let git_read = git_stdout.read_line(&mut git_first).unwrap();
+    if git_read == 0 {
+        let output = git_child.wait_with_output().unwrap();
+        panic!(
+            "composed Git preparation produced no event: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+    let git_prepared: Value = serde_json::from_str(&git_first).unwrap();
+    assert_eq!(git_prepared["event"], "paea-promote-prepared");
+    assert_eq!(git_prepared["operation"], "commit");
+    assert_eq!(git_prepared["authority"], false);
+    assert_eq!(git_prepared["restart_reusable"], false);
+    let git_permission: swarm_identity_contract::Permission =
+        serde_json::from_value(git_prepared["permission"].clone()).unwrap();
+
+    // Settlement preparation second, same current revision, no Trust change in
+    // between: both live preparations now hold witnesses at revision_before.
+    // The settlement child is spawned and its prepared event read directly so
+    // BOTH preparations are simultaneously live before the authority change.
+    let settlement_input = ledger_dir.path().join("settlement-request.json");
+    fs::write(&settlement_input, &document).unwrap();
+    let settlement_declaration_dir = ledger_dir.path().join("operator-declaration");
+    fs::create_dir_all(&settlement_declaration_dir).unwrap();
+    fs::set_permissions(&settlement_declaration_dir, fs::Permissions::from_mode(0o700))
+        .unwrap();
+    let settlement_declaration = settlement_declaration_dir.join("declaration.json");
+    let settlement_args = [
+        "--json",
+        "paea",
+        "settlement-call",
+        "commit",
+        owned.project_path.to_str().unwrap(),
+        ledger_dir.path().to_str().unwrap(),
+        settlement_declaration.to_str().unwrap(),
+        "--input",
+        settlement_input.to_str().unwrap(),
+    ];
+    println!("composed-settlement-argv {}", settlement_args.join(" "));
+    let mut settlement_child = delivered_binary()
+        .args(&settlement_args)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let mut settlement_stdout = BufReader::new(settlement_child.stdout.take().unwrap());
+    let mut settlement_first = String::new();
+    let settlement_read = settlement_stdout.read_line(&mut settlement_first).unwrap();
+    if settlement_read == 0 {
+        let output = settlement_child.wait_with_output().unwrap();
+        panic!(
+            "composed settlement preparation produced no event: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+    let settlement_prepared: Value = serde_json::from_str(&settlement_first).unwrap();
+    assert_eq!(settlement_prepared["event"], "paea-settlement-prepared");
+    assert_eq!(settlement_prepared["service"], "payment.settle");
+    assert_eq!(settlement_prepared["operation"], "commit");
+    assert_eq!(settlement_prepared["authority"], false);
+    assert_eq!(settlement_prepared["restart_reusable"], false);
+    let settlement_permission: swarm_identity_contract::Permission =
+        serde_json::from_value(settlement_prepared["permission"].clone()).unwrap();
+    // Both live preparations exist at the same current revision; neither
+    // ledger nor Git has any durable effect yet.
+    assert_eq!(git_effect_count(owned._service_dir.path()), 0);
+    assert_eq!(settlement_effect_count(ledger_dir.path()), 0);
+
+    // Provision each preparation's own exact current grant BEFORE the change:
+    // the v3 declarations reference the fixtures' own layout directories, so
+    // each fixture stays owned until its CLI process has exited.
+    let git_fixture = fixture::Fixture::build_for_trust(
+        git_permission,
+        owned.scope.clone(),
+        revision_before,
+    );
+    fs::copy(&git_fixture.path, &git_declaration).unwrap();
+    fs::set_permissions(&git_declaration, fs::Permissions::from_mode(0o600)).unwrap();
+    let mut git_packet = format!("swarm-trust-source-v1\n{}\n", git_fixture.pin).into_bytes();
+    git_packet.extend_from_slice(b"STARTUP_FIXTURE_PASSWORD");
+    let settlement_fixture = fixture::Fixture::build_for_trust(
+        settlement_permission,
+        owned.scope.clone(),
+        revision_before,
+    );
+    fs::copy(&settlement_fixture.path, &settlement_declaration).unwrap();
+    fs::set_permissions(&settlement_declaration, fs::Permissions::from_mode(0o600)).unwrap();
+    let mut settlement_packet =
+        format!("swarm-trust-source-v1\n{}\n", settlement_fixture.pin).into_bytes();
+    settlement_packet.extend_from_slice(b"STARTUP_FIXTURE_PASSWORD");
+
+    // --- The supported public Trust change advances the current revision. ---
+    let view: Value = serde_json::from_slice(
+        &owned.project.trust("show", b"{}", "").unwrap().bytes,
+    )
+    .unwrap();
+    let mut identities = view["identities"].clone();
+    for id in identities.as_array_mut().unwrap() {
+        if id["enrollment_principal"].is_null() {
+            id["token"] = format!("fixture-{}-token", id["subject"].as_str().unwrap()).into();
+        }
+    }
+    let restored = identities.clone();
+    for id in identities.as_array_mut().unwrap() {
+        if id["subject"] == "enrolled-effect" {
+            id["disabled"] = true.into();
+        }
+    }
+    let change = |event: &str, revision: i64, ids: &Value| {
+        serde_json::to_vec(&json!({
+            "schema_version":1,
+            "event_id":format!("{event}-{revision}"),
+            "expected_revision":revision,
+            "reason":"Explicit fixture composed two-domain order change",
+            "policy":view["policy"],
+            "identities":ids
+        }))
+        .unwrap()
+    };
+    let applied: Value = serde_json::from_slice(
+        &owned
+            .project
+            .trust(
+                "config-apply",
+                &change("composed-git-settlement-revoke", revision_before, &identities),
+                "",
+            )
+            .unwrap()
+            .bytes,
+    )
+    .unwrap();
+    assert_eq!(applied["revision"], revision_before + 1);
+    let revoked_revision = revision_before + 1;
+
+    // --- Window 1: the stale Git preparation refuses before any publication. ---
+    git_child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(&git_packet)
+        .unwrap();
+    let mut git_rest = String::new();
+    git_stdout.read_to_string(&mut git_rest).unwrap();
+    let git_output = git_child.wait_with_output().unwrap();
+    let git_stderr = String::from_utf8_lossy(&git_output.stderr).to_string();
+    assert!(!git_rest.contains("STARTUP_FIXTURE_PASSWORD"));
+    assert!(!git_stderr.contains("STARTUP_FIXTURE_PASSWORD"));
+    drop(git_fixture);
+    assert!(!git_output.status.success());
+    assert!(git_rest.is_empty(), "unexpected stdout: {git_rest}");
+    let git_error: Value = serde_json::from_str(git_stderr.trim()).unwrap();
+    println!("composed-git-refusal {}", serde_json::to_string(&git_error).unwrap());
+    assert_eq!(git_error["failure"]["code"], "paea-git-promote-action");
+    assert!(
+        git_error["failure"]["causes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|cause| cause == "paea-git-promote-trust-revision"),
+        "unexpected causes: {:?}",
+        git_error["failure"]["causes"]
+    );
+    // The refusal left no Git publication and no durable Git effect; the
+    // reference still names the seeded OLD object.
+    assert_eq!(current_trust_revision(&owned.project_path), revoked_revision);
+    assert_eq!(read_ref(), old_ref);
+    assert_eq!(git_effect_count(owned._service_dir.path()), 0);
+
+    // --- Window 2: the stale settlement preparation refuses before any effect. ---
+    settlement_child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(&settlement_packet)
+        .unwrap();
+    let mut settlement_rest = String::new();
+    settlement_stdout.read_to_string(&mut settlement_rest).unwrap();
+    let settlement_output = settlement_child.wait_with_output().unwrap();
+    let settlement_stderr = String::from_utf8_lossy(&settlement_output.stderr).to_string();
+    assert!(!settlement_rest.contains("STARTUP_FIXTURE_PASSWORD"));
+    assert!(!settlement_stderr.contains("STARTUP_FIXTURE_PASSWORD"));
+    drop(settlement_fixture);
+    assert!(!settlement_output.status.success());
+    assert!(
+        settlement_rest.is_empty(),
+        "unexpected stdout: {settlement_rest}"
+    );
+    let settlement_error: Value = serde_json::from_str(settlement_stderr.trim()).unwrap();
+    println!(
+        "composed-settlement-refusal {}",
+        serde_json::to_string(&settlement_error).unwrap()
+    );
+    assert_eq!(
+        settlement_error["failure"]["code"],
+        "paea-settlement-trust-revision"
+    );
+    // The refusal left no durable ledger effect and no debt mutation.
+    assert_eq!(current_trust_revision(&owned.project_path), revoked_revision);
+    assert_eq!(settlement_effect_count(ledger_dir.path()), 0);
+
+    // --- Public restore, then fresh legitimate preparations consume exactly
+    // once per domain. ---
+    let applied: Value = serde_json::from_slice(
+        &owned
+            .project
+            .trust(
+                "config-apply",
+                &change("composed-git-settlement-restore", revoked_revision, &restored),
+                "",
+            )
+            .unwrap()
+            .bytes,
+    )
+    .unwrap();
+    assert_eq!(applied["revision"], revoked_revision + 1);
+    let restored_revision = current_trust_revision(&owned.project_path);
+    // The last-use agreement guard (paea-git-promote-agreement-stale) requires
+    // a durable approval whose recorded policy revision equals the CURRENT
+    // state revision at the exact commit consumption. The agreement seeded by
+    // owned() binds revision_before and is void after the two public revision
+    // changes, so the fresh legitimate commit needs a freshly linked agreement
+    // at the restored revision — the same real mandate/request/approve producer
+    // chain on the exact promotion resource, never a guard bypass or a
+    // per-test exception.
+    let fresh_agreement_resource = format!(
+        "fixture-project/{}/refs/heads/release/{}",
+        owned.repository_id, owned.candidate
+    );
+    seed_agreement(&owned.project, &owned.old, &fresh_agreement_resource);
+    // Fresh Git preparation at the restored revision, consumed immediately.
+    let (git_status, git_rest2, git_stderr2) =
+        invoke_between(&owned, "commit", false, restored_revision, &|| {});
+    assert!(git_status.success(), "stderr: {git_stderr2}");
+    let git_reply: Value = serde_json::from_str(git_rest2.trim()).unwrap();
+    assert_eq!(git_reply["event"], "paea-promote-result");
+    assert_eq!(git_reply["outcome"], "recorded");
+    assert_eq!(git_reply["replayed"], false);
+    assert_eq!(git_reply["target_ref"], "refs/heads/release");
+    assert_eq!(git_reply["new_oid"], owned.candidate);
+    let git_intent = git_reply["intent_id"].as_str().unwrap().to_owned();
+    let git_digest = git_reply["action_digest"].as_str().unwrap().to_owned();
+    assert_eq!(git_intent.len(), 64);
+    // The actual bare reference now names the exact candidate: exactly one
+    // publication happened, with exactly one durable Git effect.
+    assert_eq!(read_ref(), owned.candidate);
+    assert_eq!(git_effect_count(owned._service_dir.path()), 1);
+
+    // Fresh settlement preparation at the restored revision, consumed once.
+    let (settlement_status, settlement_rest2, settlement_stderr2) = invoke_settlement_between(
+        &owned,
+        ledger_dir.path(),
+        &document,
+        restored_revision,
+        &|| {},
+    );
+    assert!(settlement_status.success(), "stderr: {settlement_stderr2}");
+    let settlement_reply: Value = serde_json::from_str(settlement_rest2.trim()).unwrap();
+    assert_eq!(settlement_reply["event"], "paea-settlement-result");
+    assert_eq!(settlement_reply["outcome"], "recorded");
+    assert_eq!(settlement_reply["replayed"], false);
+    assert_eq!(settlement_reply["invoice_id"], "invoice-17");
+    assert_eq!(settlement_reply["trust_revision"], restored_revision);
+    let settlement_intent = settlement_reply["intent_id"].as_str().unwrap().to_owned();
+    let settlement_digest = settlement_reply["action_digest"].as_str().unwrap().to_owned();
+    // Exactly one durable ledger effect; the provisioned debt terms unchanged.
+    assert_eq!(settlement_effect_count(ledger_dir.path()), 1);
+    let (row_intent, row_invoice, row_digest, raw_receipt) =
+        settlement_effect(ledger_dir.path()).unwrap();
+    assert_eq!(row_intent, settlement_intent);
+    assert_eq!(row_invoice, "invoice-17");
+    assert_eq!(row_digest, settlement_digest);
+    let receipt: Value = serde_json::from_str(&raw_receipt).unwrap();
+    assert_eq!(receipt["invoice_id"], "invoice-17");
+    assert_eq!(receipt["trust_revision"], restored_revision);
+
+    // --- Public read-only reconciliation reports BOTH journals consistent. ---
+    let mut command = delivered_binary();
+    let report_raw = command
+        .args([
+            "paea",
+            "reconcile-effects",
+            ledger_dir.path().to_str().unwrap(),
+            "--json",
+            "--root",
+            owned._service_dir.path().to_str().unwrap(),
+        ])
+        .output()
+        .unwrap();
+    assert!(
+        report_raw.status.success(),
+        "{}",
+        String::from_utf8_lossy(&report_raw.stderr)
+    );
+    assert!(report_raw.stderr.is_empty());
+    let report: Value = serde_json::from_slice(&report_raw.stdout).unwrap();
+    assert_eq!(report["schema_version"], 1);
+    // The ledger root's settlement journal: exactly one verified effect.
+    assert_eq!(report["settlement"]["state"], "consistent");
+    assert_eq!(report["settlement"]["effectCount"], 1);
+    assert_eq!(
+        report["settlement"]["findings"][0]["intent_id"],
+        settlement_intent
+    );
+    assert_eq!(
+        report["settlement"]["findings"][0]["action_digest"],
+        settlement_digest
+    );
+    assert_eq!(
+        report["settlement"]["findings"][0]["verified"],
+        true,
+        "unexpected refusals: {:?}",
+        report["settlement"]["findings"][0]["refusals"]
+    );
+    // The service root's Git journal: exactly one verified effect.
+    assert_eq!(report["git"]["state"], "consistent");
+    assert_eq!(report["git"]["effectCount"], 1);
+    assert_eq!(report["git"]["findings"][0]["intent_id"], git_intent);
+    assert_eq!(report["git"]["findings"][0]["action_digest"], git_digest);
+    assert_eq!(
+        report["git"]["findings"][0]["verified"],
+        true,
+        "unexpected refusals: {:?}",
+        report["git"]["findings"][0]["refusals"]
+    );
+    ledger.close().unwrap();
     owned.service.close().unwrap();
     owned.project.close().unwrap();
 }

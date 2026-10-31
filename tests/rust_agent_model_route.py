@@ -10,6 +10,8 @@ stays failure; a source/binary hash establishes neither authenticity nor review.
 from pathlib import Path
 import argparse, hashlib, json, os, sqlite3, subprocess, tempfile, time, traceback
 
+from fixture_area import fixture_root
+
 
 def digest(raw):
     """Bind complete bytes, not a declared model, identity or price."""
@@ -68,8 +70,10 @@ class Fixture:
         before CLI initialization; partial initialization still leaves its Root
         path/binary/label for recovery. A marker is no actor authentication or
         permission. IO/CLI failures propagate, no cleanup or provider call is
-        inferred. An empty temporary directory can remain if birth publication
+        inferred. An empty fixture directory can remain if birth publication
         itself fails; no Root initialization runs before that write succeeds.
+        The Root lives in the repository fixture area, never `/tmp` (operator
+        interdiction): it must survive reboot as retained evidence.
         """
         binary = Path(binary)
         output = Path(output)
@@ -78,7 +82,7 @@ class Fixture:
         self.output.mkdir(parents=True, exist_ok=True)
         self.label = label
         binary_sha256 = digest(Path(self.binary).read_bytes())
-        self.root = Path(tempfile.mkdtemp(prefix='swarm-model83-'))
+        self.root = fixture_root('swarm-model83-')
         publish(self.output / ('owned-root-'+digest(str(self.root).encode())+'.json'),
                 dict(schema_version=1, kind='owned_inert_fixture_birth', root=str(self.root),
                      binary_sha256=binary_sha256, label=label,

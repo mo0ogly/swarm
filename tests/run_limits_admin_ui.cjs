@@ -5,7 +5,7 @@
 // Each language exercises its own "role" scope (same work, distinct scope_key)
 // so the two iterations never share mutable state.
 const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert/strict'),{spawn}=require('child_process'),puppeteer=require('puppeteer');
-const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-run-limits-ui-'));fs.mkdirSync(out,{recursive:true});let app,browser;
+const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-run-limits-ui-'));fs.mkdirSync(out,{recursive:true});let app,browser;
 async function cli(args,input){return new Promise((resolve,reject)=>{const p=spawn(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])]);let text='',err='';p.stdout.on('data',x=>text+=x);p.stderr.on('data',x=>err+=x);p.on('exit',c=>c?reject(Error(err||text)):resolve(text?JSON.parse(text):null));p.stdin.end(input?JSON.stringify(input):undefined)})}
 async function fillEffective(page,values){for(const [k,v] of Object.entries(values))await page.$eval('#admin-eff-'+k,(e,v)=>e.value=v,v)}
 (async()=>{

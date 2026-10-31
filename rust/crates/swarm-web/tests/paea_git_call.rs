@@ -21,6 +21,362 @@ use swarm_engine::{RootStore, SystemEnvironment};
 use swarm_identity_contract::Scope;
 use swarm_protection_contract::{Action, AdmissionContext, Proposal, SourceRef};
 use swarm_web::{LocalWebAuthority, NativeHttpService, PaeaGitCallSource};
+
+/// The preview observation without a bound source stays an explicit
+/// `available:false` 200 — never a refusal and never a success claiming a
+/// bound preparation. Refusals keep their typed codes for shape violations.
+#[test]
+fn preview_route_reports_explicit_absence_without_source() {
+    let (service_dir, service_root) = service();
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let s = NativeHttpService::open(
+        service_dir.path(),
+        LocalWebAuthority::from_listener(&listener, KEY).unwrap(),
+    )
+    .unwrap();
+    // Explicit absence, not an error and not a bound preview.
+    let reply = get(&listener, &s, "/api/v1/paea/git-call/preview");
+    assert!(reply.response.status().is_success());
+    assert!(reply.failure.is_none());
+    let body: Value = serde_json::from_slice(reply.response.body()).unwrap();
+    assert_eq!(body["event"], "paea-git-call-preview");
+    assert_eq!(body["available"], false);
+    assert_eq!(
+        body["reason"],
+        "paea-git-call-preview-source-unavailable"
+    );
+    // Shape violations keep typed refusals; no consumption or authority.
+    for (uri, method, body) in [
+        ("/api/v1/paea/git-call/preview", "POST", Vec::new()),
+        ("/api/v1/paea/git-call/preview", "GET", b"x".to_vec()),
+        (
+            "/api/v1/paea/git-call/preview?x=1",
+            "GET",
+            Vec::new(),
+        ),
+    ] {
+        let a = LocalWebAuthority::from_listener(&listener, KEY).unwrap();
+        let mut builder = Request::builder()
+            .method(method)
+            .uri(uri)
+            .header(HOST, a.host())
+            .header(COOKIE, format!("{}={}", a.cookie_name(), KEY))
+            .header(ORIGIN, format!("http://{}", a.host()))
+            .header("X-Swarm-CSRF", KEY);
+        if method != "POST" {
+            // GET/HEAD must not require Origin/CSRF for admission, but the
+            // route itself still refuses the shape; headers stay harmless.
+            builder = Request::builder()
+                .method(method)
+                .uri(uri)
+                .header(HOST, a.host())
+                .header(COOKIE, format!("{}={}", a.cookie_name(), KEY));
+        }
+        let reply = s.handle(builder.body(body).unwrap()).unwrap();
+        assert!(
+            !reply.response.status().is_success(),
+            "unexpected success for {method} {uri}"
+        );
+        assert!(reply.failure.is_some(), "expected typed refusal for {uri}");
+    }
+    s.close().unwrap();
+    service_root.close().unwrap();
+}
+
+/// With a real bound preparation on the retained native source fixture, the
+/// preview presents the exact held action: declared proposal/context verbatim,
+/// recomputed canonical identity matching the bound digest, current witness
+/// state and current Trust revision. No consent, grant or consumption occurs.
+#[test]
+#[ignore = "requires explicit retained native source fixture"]
+fn preview_route_presents_exact_bound_action_with_current_state() {
+    let owned = owned();
+    let action_digest = owned.prepared.request().action_digest().to_owned();
+    let trust_revision = owned.trust_revision;
+    let (repository_id, candidate) = match &owned.prepared.proposal().action {
+        Action::Git {
+            repository_id,
+            candidate_oid,
+            ..
+        } => (repository_id.clone(), candidate_oid.clone()),
+        _ => panic!("git proposal expected"),
+    };
+    let fixture = fixture::Fixture::build_for_trust(
+        owned.prepared.request().permission(),
+        owned.fixture_scope.clone(),
+        trust_revision,
+    );
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let authority = swarm_web::PaeaGitCallSource::open(
+        source,
+        fixture.path.to_str().unwrap(),
+        &fixture.pin,
+    )
+    .unwrap();
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let s = NativeHttpService::open_git_call(
+        &owned.service_path,
+        LocalWebAuthority::from_listener(&listener, KEY).unwrap(),
+        authority,
+    )
+    .unwrap_or_else(|e| panic!("exact bind refused: {}", e.code()));
+    let reply = get(&listener, &s, "/api/v1/paea/git-call/preview");
+    assert!(reply.response.status().is_success());
+    assert!(reply.failure.is_none());
+    let body: Value = serde_json::from_slice(reply.response.body()).unwrap();
+    assert_eq!(body["event"], "paea-git-call-preview");
+    assert_eq!(body["available"], true);
+    assert_eq!(body["capability"]["action_digest"], action_digest);
+    // The declared proposal and context are presented verbatim.
+    assert_eq!(body["proposal"]["schema_version"], 1);
+    assert_eq!(
+        body["proposal"]["action"]["target_ref"],
+        "refs/heads/release"
+    );
+    assert_eq!(body["context"]["policy_revision"], trust_revision);
+    // The canonical identity is recomputed and matches the bound digest.
+    assert_eq!(body["canonical"]["digest_matches"], true);
+    assert_eq!(body["canonical"]["action_digest"], action_digest);
+    assert!(body["canonical"]["intent_id"].as_str().unwrap().len() == 64);
+    // Current state is explicit and, on this fresh fixture, coherent.
+    assert_eq!(body["current"]["roots_bound"], true);
+    assert_eq!(body["current"]["trust_revision"], trust_revision);
+    assert_eq!(
+        body["current"]["declared_trust_revision"],
+        trust_revision
+    );
+    assert_eq!(body["current"]["trust_revision_current"], true);
+    // The engine-derived approval terms are presented: the fixed recipe the
+    // captured-agreement guard matches on, at the current Trust revision —
+    // nothing browser-computed, and the preview itself still captures no
+    // consent (the terms are a presentation, not an approval).
+    assert_eq!(body["agreement_terms"]["binding"], "recipe");
+    assert_eq!(
+        body["agreement_terms"]["resource"],
+        format!("fixture-project/{repository_id}/refs/heads/release/{candidate}")
+    );
+    assert_eq!(body["agreement_terms"]["amount_minor"], 1);
+    assert_eq!(body["agreement_terms"]["currency"], "OID");
+    assert_eq!(body["agreement_terms"]["beneficiary"], "1".repeat(40));
+    assert_eq!(body["agreement_terms"]["revision"], trust_revision);
+    assert_eq!(body["agreement_terms"]["action_id"], "");
+    // The preview captures no consent and performs no consumption.
+    assert_eq!(body["limits"]["consent"], "none-captured");
+    assert_eq!(body["limits"]["consumption"], "none");
+    assert_eq!(body["limits"]["human_presence"], "not-established");
+    // The one-shot call stays consumable afterwards: the preview consumed
+    // nothing (proven by the status observation still reporting bound).
+    let status = get(&listener, &s, "/api/v1/paea/git-call");
+    let status_body: Value = serde_json::from_slice(status.response.body()).unwrap();
+    assert_eq!(status_body["bound"], true);
+    let _ = s.close();
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    fixture.close();
+}
+/// Real prepared call bound to a real native HTTP server with its ordinary
+/// persisted session, held alive while a real browser qualification drives the
+/// served page through two public states: the exact fresh bound preparation,
+/// then the explicitly stale state after a real public Trust revision change
+/// on the project root (an actual `config-apply` through the engine — never a
+/// journal edit). Phase coordination with the browser harness uses owned
+/// marker files; every file the harness writes must carry the exact startup
+/// event nonce, so no other process can drive this server. The server closes
+/// checked on every path; no consent, grant, consumption or ref effect occurs
+/// (the preview route itself consumes nothing) and no acceptance is claimed.
+#[test]
+#[ignore = "requires explicit retained native source fixture and browser harness"]
+fn preview_bound_serves_real_browser_session() {
+    let owned = owned();
+    let action_digest = owned.prepared.request().action_digest().to_owned();
+    let trust_revision = owned.trust_revision;
+    let fixture = fixture::Fixture::build_for_trust(
+        owned.prepared.request().permission(),
+        owned.fixture_scope.clone(),
+        trust_revision,
+    );
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let authority = swarm_web::PaeaGitCallSource::open(
+        source,
+        fixture.path.to_str().unwrap(),
+        &fixture.pin,
+    )
+    .unwrap_or_else(|e| panic!("provisioned declaration refused: {:?}", e.branches()));
+    // Real bound listener with the ordinary served transport: serve_until owns
+    // the accept loop in its own thread until this test explicitly stops it
+    // through the owned stop marker (the shutdown future polls that file).
+    // Binding alone never accepts connections; without serving, the browser
+    // would hang exactly as an unstarted production server would.
+    let server = swarm_web::NativeHttpServer::bind_git_call(
+        &owned.service_path,
+        None,
+        authority,
+    )
+    .unwrap_or_else(|e| panic!("exact bind refused: {}", e.code()));
+    let address = server.local_addr().unwrap();
+    let stop_path = std::sync::Arc::new(
+        std::env::var_os("PREVIEW_BOUND_BROWSER_DIR")
+            .map(std::path::PathBuf::from)
+            .expect("harness control directory")
+            .join("server.stop"),
+    );
+    let stop_wait = std::sync::Arc::clone(&stop_path);
+    let server_thread = std::thread::spawn(move || {
+        server
+            .serve_until(
+                async move {
+                    loop {
+                        if stop_wait.exists() {
+                            break;
+                        }
+                        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+                    }
+                },
+                &mut |_| Ok(()),
+            )
+            .is_ok()
+    });
+    // Ordinary persisted session: bind_source opened the service Root writable
+    // and from_open_store published the ordinary credential through the
+    // engine's own web_session writer for this exact listener address — the
+    // browser reads that same file; no parallel authority path exists and no
+    // secret enters the startup event.
+    let session_name = fs::read_dir(owned.service_path.join(".swarm"))
+        .unwrap()
+        .filter_map(|entry| entry.ok())
+        .map(|entry| entry.file_name().to_string_lossy().into_owned())
+        .find(|name| name.starts_with("web-session-"))
+        .expect("bind must persist the ordinary web session credential");
+    let session_name = fs::read_dir(owned.service_path.join(".swarm"))
+        .unwrap()
+        .filter_map(|entry| entry.ok())
+        .map(|entry| entry.file_name().to_string_lossy().into_owned())
+        .find(|name| name.starts_with("web-session-"))
+        .expect("web_session must persist the ordinary web session credential");
+    let nonce = format!(
+        "preview-bound-browser-{}",
+        std::process::id()
+    );
+    let startup = serde_json::json!({
+        "schema_version":1,
+        "event":"preview-bound-browser-ready",
+        "nonce":nonce,
+        "address":address.to_string(),
+        "service_root":owned.service_path,
+        "project_root":owned.project_path,
+        "action_digest":action_digest,
+        "trust_revision":trust_revision,
+        // Same address-scoped protocol namespace as LocalWebAuthority (the
+        // first 12 hex bytes of the SHA-256 of the observed host string);
+        // derived here from the same session file stem, no second authority.
+        "cookie_name":format!(
+            "swarm_session_{}",
+            &{
+                use sha2::{Digest, Sha256};
+                let hash = Sha256::digest(address.to_string().as_bytes());
+                hash.iter().map(|b| format!("{b:02x}")).collect::<String>()
+            }[..12]
+        ),
+        "session_file":session_name,
+    });
+    let control_dir = std::path::PathBuf::from(
+        std::env::var_os("PREVIEW_BOUND_BROWSER_DIR").expect("harness control directory"),
+    );
+    fs::write(control_dir.join("server.json"), serde_json::to_vec(&startup).unwrap())
+        .unwrap();
+    // Phase 1: fresh state. The harness drives the real page, asserts the
+    // exact presented identity/declared terms and writes the phase-1 done
+    // marker with our nonce before we mutate anything.
+    wait_marker(&control_dir, &nonce, "phase1.done");
+    // Real public Trust revision change on the project root: an actual
+    // config-apply through the engine under the same local operator recovery
+    // path the engine tests use, exactly once, on the owned fixture. No
+    // journal file is edited and no state is fabricated. The public `show`
+    // view omits raw tokens, so the two token identities get their exact
+    // fixture tokens back and the enrolled identity keeps its principal
+    // mapping (same reconstruction the settlement tests apply).
+    let view: Value =
+        serde_json::from_slice(&owned.project.trust("show", b"{}", "").unwrap().bytes).unwrap();
+    let mut identities = view["identities"].clone();
+    for identity in identities.as_array_mut().unwrap() {
+        identity["disabled"] = false.into();
+        identity["token"] = match identity["subject"].as_str() {
+            Some("requester") => "fixture-requester-token".into(),
+            Some("approver") => "fixture-approver-token".into(),
+            _ => Value::String(String::new()),
+        };
+    }
+    let change = serde_json::json!({
+        "schema_version":1,
+        "event_id":format!("preview-bound-browser-stale-{}", std::process::id()),
+        "expected_revision":trust_revision,
+        "reason":"Explicit fixture Trust revision change for browser staleness qualification",
+        "policy":view["policy"],
+        "identities":identities,
+    });
+    owned
+        .project
+        .trust("config-apply", &serde_json::to_vec(&change).unwrap(), "")
+        .unwrap_or_else(|e| panic!("stale revision change refused: {}", e.code()));
+    let stale_revision = current_trust_revision(&owned.project_path);
+    assert_eq!(stale_revision, trust_revision + 1);
+    fs::write(control_dir.join("phase2.ready"), serde_json::to_vec(&serde_json::json!({
+        "nonce":nonce,
+        "trust_revision":stale_revision,
+    })).unwrap()).unwrap();
+    // Phase 2: stale state. The harness re-observes the page through the same
+    // session and asserts the visible stale refusal without any consent.
+    wait_marker(&control_dir, &nonce, "phase2.done");
+    // Explicit owned shutdown: the serving thread observes the stop marker and
+    // serve_until drains and checked-closes listener/binding there; the thread's
+    // success bit keeps that close outcome visible, never dropped.
+    fs::write(stop_path.as_path(), b"stop").unwrap();
+    let served = server_thread.join().expect("serve thread must not panic");
+    assert!(served, "serve_until must report a clean owned shutdown");
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    fixture.close();
+}
+
+/// Wait for one harness marker containing our exact nonce; bounded sleep loop
+/// owned by this test (no global watchdog), fails with the observed directory
+/// state after 600 seconds so a dead harness never hangs the run forever.
+fn wait_marker(control_dir: &Path, nonce: &str, marker: &str) {
+    let target = control_dir.join(marker);
+    for _ in 0..6000 {
+        if let Ok(bytes) = fs::read_to_string(&target) {
+            // The harness writes an error marker when its browser fails: the
+            // FIRST browser error is the real cause and must reach the test
+            // failure verbatim — never masked by a later assertion panic.
+            if let Ok(value) = serde_json::from_str::<Value>(&bytes) {
+                if value.get("nonce").and_then(|n| n.as_str()) == Some(nonce) {
+                    if let Some(error) = value.get("error").and_then(|e| e.as_str()) {
+                        panic!("browser failed before {marker}: {error}");
+                    }
+                }
+            }
+            assert!(
+                bytes.contains(nonce),
+                "marker {marker} present but not ours"
+            );
+            return;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+    panic!(
+        "harness marker {marker} never appeared in {}",
+        control_dir.display()
+    );
+}
+
 const PIN: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const KEY: &str = "session-0123456789abcdef01234567";
 const PASSWORD: &[u8] = b"STARTUP_FIXTURE_PASSWORD";
@@ -82,18 +438,61 @@ fn current_trust_revision(root: &Path) -> i64 {
 /// Actual project Trust configuration with an explicit effect role; the
 /// event_id binds the current revision so reruns apply exactly once.
 fn effect_config(root: &Path) -> Vec<u8> {
-    let revision = current_trust_revision(root);
+    effect_config_named(root, "git-call-http-effect-config", false)
+}
+/// Agreement variant adds one bearer I3 administrator on the isolated
+/// fixture (labeled auth simulated) so the real mandate-create producer can
+/// run; the enrolled identity also holds the approver role so the same held
+/// enrollment can approve through the protected approval channel (the single
+/// enrollment-principal mapping constraint keeps one identity per root).
+fn effect_config_agreement(root: &Path) -> Vec<u8> {
+    effect_config_named(root, "git-call-http-agreement-config", true)
+}
+/// Wrong-role variant: the same agreement fixture but the enrolled identity
+/// deliberately WITHOUT the approver role (and the mandate/request producers
+/// keep their simulator admin/requester tokens). The route's frozen approve
+/// must reach the existing approve guard and be visibly denied — never
+/// approved — and no separate role mapping may be mintable by the request.
+fn effect_config_agreement_no_approver(root: &Path) -> Vec<u8> {
+    let fresh = !root.join(".swarm/trust-actions.json").exists();
+    let revision = if fresh { 0 } else { current_trust_revision(root) };
     serde_json::to_vec(&json!({
         "schema_version":1,
-        "event_id":format!("git-call-http-effect-config-{revision}"),
+        "event_id":format!("git-call-http-agreement-no-approver-{revision}"),
+        "expected_revision":revision,
+        "reason":"Explicit fixture effect role without the approver role for Git call HTTP",
+        "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":false},
+        "identities":[
+            json!({"subject":"enrolled-effect","integrity":3,"roles":["admin","effect"],"enrollment_principal":{"principal_id":"operator","principal_kind":"human","issuer":"https://fixture.invalid","subject":"stable-person"}}),
+            json!({"subject":"requester","token":"fixture-requester-token","integrity":1,"roles":["requester"]}),
+            json!({"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]}),
+            json!({"subject":"agreement-admin","token":"fixture-admin-token","integrity":3,"roles":["admin"]}),
+        ],
+    }))
+    .unwrap()
+}
+fn effect_config_named(root: &Path, event: &str, agreement_admin: bool) -> Vec<u8> {
+    // Idempotent on both regimes: a fresh root (no state file yet) applies
+    // at expected revision 0 with a revision-stable event id, so repeated
+    // or parallel setup applies exactly once; a retained root keeps the
+    // original revision-bound event id at its actual current revision.
+    let fresh = !root.join(".swarm/trust-actions.json").exists();
+    let revision = if fresh { 0 } else { current_trust_revision(root) };
+    let mut identities = vec![
+        json!({"subject":"enrolled-effect","integrity":3,"roles":["admin","effect","approver"],"enrollment_principal":{"principal_id":"operator","principal_kind":"human","issuer":"https://fixture.invalid","subject":"stable-person"}}),
+        json!({"subject":"requester","token":"fixture-requester-token","integrity":1,"roles":["requester"]}),
+        json!({"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]}),
+    ];
+    if agreement_admin {
+        identities.push(json!({"subject":"agreement-admin","token":"fixture-admin-token","integrity":3,"roles":["admin"]}));
+    }
+    serde_json::to_vec(&json!({
+        "schema_version":1,
+        "event_id":format!("{event}-{revision}"),
         "expected_revision":revision,
         "reason":"Explicit fixture effect role for Git call HTTP",
         "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":false},
-        "identities":[
-            {"subject":"enrolled-effect","integrity":3,"roles":["admin","effect"],"enrollment_principal":{"principal_id":"operator","principal_kind":"human","issuer":"https://fixture.invalid","subject":"stable-person"}},
-            {"subject":"requester","token":"fixture-requester-token","integrity":1,"roles":["requester"]},
-            {"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]}
-        ]
+        "identities":identities,
     }))
     .unwrap()
 }
@@ -168,15 +567,36 @@ struct Owned {
     project: RootStore,
     service: RootStore,
     prepared: swarm_engine::PaeaGitTransferCall,
+    /// Exact paea-action permission of the prepared transfer call, retained so
+    /// a fixture account can be signed with it TOGETHER with the frozen
+    /// approval's trust-action permission (one enroll per enrollment id).
+    prepared_request_permission: swarm_identity_contract::Permission,
     repository_id: String,
     candidate: String,
+    /// The fixture's actual first-publication work id, needed by any second
+    /// preparation against the same project (wrong-holder bind test).
+    work: String,
     fixture_scope: Scope,
     trust_revision: i64,
 }
 fn owned() -> Owned {
+    owned_with(effect_config)
+}
+/// Agreement variant: same fixture with the extra simulated bearer
+/// administrator so the mandate/request/approve producers run.
+fn owned_agreement() -> Owned {
+    owned_with(effect_config_agreement)
+}
+/// Wrong-role variant: the enrolled principal maps to an identity holding
+/// admin+effect but NOT approver, so the frozen approve must be denied by
+/// the existing guard even through the fully legitimate enrolled channel.
+fn owned_agreement_no_approver() -> Owned {
+    owned_with(effect_config_agreement_no_approver)
+}
+fn owned_with(config: fn(&Path) -> Vec<u8>) -> Owned {
     let (project_path, project, work, candidate) = project();
     project
-        .trust("config-apply", &effect_config(&project_path), "")
+        .trust("config-apply", &config(&project_path), "")
         .unwrap_or_else(|e| panic!("explicit fixture config refused: {}", e.code()));
     let trust_revision = current_trust_revision(&project_path);
     let fixture_scope = scope(&project_path, &work);
@@ -218,6 +638,7 @@ fn owned() -> Owned {
         )
         .unwrap_or_else(|e| panic!("explicit preparation refused: {:?}", e));
     Owned {
+        prepared_request_permission: prepared.request().permission(),
         service_path: service_dir.path().to_path_buf(),
         _service_dir: service_dir,
         project_path,
@@ -226,6 +647,7 @@ fn owned() -> Owned {
         prepared,
         repository_id,
         candidate,
+        work,
         fixture_scope,
         trust_revision,
     }
@@ -435,7 +857,7 @@ fn git_call_http_binds_exact_witnesses_and_consumes_once() {
 #[test]
 #[ignore = "requires explicit retained native source fixture"]
 fn git_call_http_consumes_exact_transfer_once() {
-    let owned = owned();
+    let owned = owned_agreement();
     let fixture = fixture::Fixture::build_for_trust(
         owned.prepared.request().permission(),
         owned.fixture_scope.clone(),
@@ -492,6 +914,10 @@ fn git_call_http_consumes_exact_transfer_once() {
     .unwrap()
     .bytes()
     .to_vec();
+    // The captured-agreement guard now precedes consumption: the exact
+    // durable Trust approval must bind these bytes first, through the real
+    // mandate/request/approve producers (auth simulated, labeled fixture).
+    capture_agreement(&owned.project, &repository_id, &candidate);
     let reply = post(
         &listener,
         &s,
@@ -522,4 +948,2628 @@ fn git_call_http_consumes_exact_transfer_once() {
     let _ = owned.project.close();
     let _ = owned.service.close();
     fixture.close();
+}
+
+/// Capture the exact durable agreement for the prepared transfer action
+/// through the real Trust operations (mandate, request, exact approve) with
+/// the fixed recipe terms binding the full canonical Git-intent identity
+/// (project/repository/ref/candidate, beneficiary = old OID, amount 1 OID).
+/// Bearer tokens on the isolated fixture are labeled auth simulated — never
+/// human enrollment evidence. Returns nothing; panics on any producer refusal.
+fn capture_agreement(
+    project: &RootStore,
+    repository_id: &str,
+    candidate: &str,
+) {
+    let resource = format!("fixture-project/{repository_id}/refs/heads/release/{candidate}");
+    let mandate_id = format!("agreement-mandate-{}", std::process::id());
+    let trust = |op: &str, value: Value, token: &str| {
+        project
+            .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+            .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+    };
+    trust(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":format!("agreement-mandate-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":1,
+            "currency":"OID",
+            "beneficiary":"1".repeat(40),
+        }),
+        "fixture-admin-token",
+    );
+    let action: Value = serde_json::from_slice(&trust(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":format!("agreement-request-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "resource":resource,
+            "amount_minor":1,
+            "currency":"OID",
+            "beneficiary":"1".repeat(40),
+            "idempotency_key":format!("agreement-key-{mandate_id}"),
+        }),
+        "fixture-requester-token",
+    )
+    .bytes)
+    .unwrap();
+    assert_eq!(action["state"], "pending_approval");
+    let approved: Value = serde_json::from_slice(&trust(
+        "approve",
+        json!({
+            "schema_version":1,
+            "event_id":format!("agreement-approve-{mandate_id}"),
+            "action_id":action["id"],
+            "mandate_id":mandate_id,
+            "content_digest":action["content_digest"],
+            "resource":resource,
+            "amount_minor":1,
+            "currency":"OID",
+            "beneficiary":"1".repeat(40),
+        }),
+        "fixture-approver-token",
+    )
+    .bytes)
+    .unwrap();
+    assert_eq!(approved["state"], "approved");
+    assert_eq!(approved["approver"], "approver");
+}
+
+/// The captured-agreement guard on the consumption route: a prepared transfer
+/// with NO durable Trust approval bound to its exact canonical action bytes
+/// refuses with the typed `paea-git-call-agreement` code before any root
+/// opens or consumption — the browser provides neither authority nor a
+/// replacement action. Auth simulated on isolated fixtures (labeled, never a
+/// live mission database); no human presence or acceptance is claimed.
+#[test]
+#[ignore = "requires explicit retained native source fixture"]
+fn git_call_http_refuses_without_captured_agreement() {
+    let owned = owned();
+    let fixture = fixture::Fixture::build_for_trust(
+        owned.prepared.request().permission(),
+        owned.fixture_scope.clone(),
+        owned.trust_revision,
+    );
+    let (repository_id, candidate) = (owned.repository_id.clone(), owned.candidate.clone());
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let authority = swarm_web::PaeaGitCallSource::open(
+        source,
+        fixture.path.to_str().unwrap(),
+        &fixture.pin,
+    )
+    .unwrap();
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let s = NativeHttpService::open_git_call(
+        &owned.service_path,
+        LocalWebAuthority::from_listener(&listener, KEY).unwrap(),
+        authority,
+    )
+    .unwrap_or_else(|e| panic!("exact bind refused: {}", e.code()));
+    let good = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(PASSWORD));
+    let exact = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &context(owned.trust_revision),
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    // Exact digest, exact witnesses, held authority — but no captured
+    // agreement: the typed refusal, not a kind/digest/credential refusal.
+    let reply = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call?call=transfer",
+        exact,
+        Some(good),
+    );
+    assert!(
+        !reply.response.status().is_success(),
+        "consumption without agreement must refuse: {}",
+        String::from_utf8_lossy(reply.response.body())
+    );
+    let refusal = reply.failure.expect("typed refusal expected");
+    assert_eq!(refusal.code(), "paea-git-call-agreement");
+    let _ = s.close();
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    fixture.close();
+}
+
+/// Fresh compliant chain through the real web route: mandate, request and
+/// exact approval captured on the project root under the fixed agreement
+/// recipe (identity = project/repository/ref/candidate, beneficiary = old
+/// OID, amount 1 OID), then ONE authenticated consumption succeeds. The
+/// approval is captured through the real Trust operations (bearer tokens on
+/// the isolated fixture — labeled auth simulated, not human enrollment
+/// evidence); the engine authority/witness/plan checks still run after.
+#[test]
+#[ignore = "requires explicit retained native source fixture"]
+fn git_call_http_consumes_with_captured_agreement() {
+    let owned = owned_agreement();
+    let fixture = fixture::Fixture::build_for_trust(
+        owned.prepared.request().permission(),
+        owned.fixture_scope.clone(),
+        owned.trust_revision,
+    );
+    let (repository_id, candidate) = (owned.repository_id.clone(), owned.candidate.clone());
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let authority = swarm_web::PaeaGitCallSource::open(
+        source,
+        fixture.path.to_str().unwrap(),
+        &fixture.pin,
+    )
+    .unwrap();
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let s = NativeHttpService::open_git_call(
+        &owned.service_path,
+        LocalWebAuthority::from_listener(&listener, KEY).unwrap(),
+        authority,
+    )
+    .unwrap_or_else(|e| panic!("exact bind refused: {}", e.code()));
+    let good = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(PASSWORD));
+    let exact = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &context(owned.trust_revision),
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    // Before the agreement: typed refusal, no consumption.
+    let reply = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call?call=transfer",
+        exact.clone(),
+        Some(good.clone()),
+    );
+    assert_eq!(
+        reply.failure.expect("typed refusal expected").code(),
+        "paea-git-call-agreement"
+    );
+    // Wrong role refuses before any capture: the requester cannot approve.
+    {
+        let resource = format!("fixture-project/{repository_id}/refs/heads/release/{candidate}");
+        let mandate_id = format!("role-mandate-{}", std::process::id());
+        let trust = |op: &str, value: Value, token: &str| {
+            owned
+                .project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+        };
+        trust(
+            "mandate-create",
+            json!({
+                "schema_version":1,
+                "event_id":format!("agreement-mandate-{mandate_id}"),
+                "mandate_id":mandate_id,
+                "subject":"requester",
+                "actions":["settle"],
+                "resource":resource,
+                "max_amount_minor":1,
+                "currency":"OID",
+                "beneficiary":"1".repeat(40),
+            }),
+            "fixture-admin-token",
+        );
+        let action: Value = serde_json::from_slice(&trust(
+            "request",
+            json!({
+                "schema_version":1,
+                "event_id":format!("agreement-request-{mandate_id}"),
+                "mandate_id":mandate_id,
+                "resource":resource,
+                "amount_minor":1,
+                "currency":"OID",
+                "beneficiary":"1".repeat(40),
+                "idempotency_key":format!("agreement-key-{mandate_id}"),
+            }),
+            "fixture-requester-token",
+        )
+        .bytes)
+        .unwrap();
+        let wrong_role = json!({
+            "schema_version":1,
+            "event_id":format!("agreement-wrong-role-{mandate_id}"),
+            "action_id":action["id"],
+            "mandate_id":mandate_id,
+            "content_digest":action["content_digest"],
+            "resource":resource,
+            "amount_minor":1,
+            "currency":"OID",
+            "beneficiary":"1".repeat(40),
+        });
+        assert_eq!(
+            serde_json::from_slice::<Value>(
+                &trust("approve", wrong_role, "fixture-requester-token").bytes
+            )
+            .unwrap()["state"],
+            "denied"
+        );
+        // Wrong action (non-exact terms) refuses — no agreement.
+        let wrong_terms = json!({
+            "schema_version":1,
+            "event_id":format!("agreement-wrong-terms-{mandate_id}"),
+            "action_id":action["id"],
+            "mandate_id":mandate_id,
+            "content_digest":action["content_digest"],
+            "resource":resource,
+            "amount_minor":2,
+            "currency":"OID",
+            "beneficiary":"1".repeat(40),
+        });
+        assert_eq!(
+            serde_json::from_slice::<Value>(
+                &trust("approve", wrong_terms, "fixture-approver-token").bytes
+            )
+            .unwrap()["state"],
+            "denied"
+        );
+    }
+    // Capture the exact agreement through the real Trust producers.
+    capture_agreement(&owned.project, &repository_id, &candidate);
+    // Replaying the same producer events (same deterministic ids) is retained:
+    // the Trust state must not change and no second agreement is created.
+    let state_before = fs::read(owned.project_path.join(".swarm/trust-actions.json")).unwrap();
+    capture_agreement(&owned.project, &repository_id, &candidate);
+    assert_eq!(
+        fs::read(owned.project_path.join(".swarm/trust-actions.json")).unwrap(),
+        state_before
+    );
+    // Fresh compliant consumption: exactly one success.
+    let reply = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call?call=transfer",
+        exact.clone(),
+        Some(good.clone()),
+    );
+    assert!(
+        reply.response.status().is_success(),
+        "fresh compliant consumption refused: {}",
+        String::from_utf8_lossy(reply.response.body())
+    );
+    assert!(reply.failure.is_none());
+    let body: Value = serde_json::from_slice(reply.response.body()).unwrap();
+    assert_eq!(body["event"], "paea-git-call-result");
+    assert_eq!(body["outcome"], "prepared");
+    assert!(body["pack_bytes"].as_u64().unwrap() > 0);
+    // The one-shot call is consumed; a second identical request refuses.
+    let reply = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call?call=transfer",
+        exact,
+        Some(good),
+    );
+    assert!(
+        !reply.response.status().is_success(),
+        "second consumption must refuse"
+    );
+    let _ = s.close();
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    fixture.close();
+}
+
+/// A Trust configuration change on the project root after the approval voids
+/// the captured agreement at last use: the same typed refusal, no consumption,
+/// no fallback — recovery requires a fresh approval under the new revision.
+#[test]
+#[ignore = "requires explicit retained native source fixture"]
+fn git_call_http_agreement_void_after_revision_change() {
+    let owned = owned_agreement();
+    let fixture = fixture::Fixture::build_for_trust(
+        owned.prepared.request().permission(),
+        owned.fixture_scope.clone(),
+        owned.trust_revision,
+    );
+    let (repository_id, candidate) = (owned.repository_id.clone(), owned.candidate.clone());
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let authority = swarm_web::PaeaGitCallSource::open(
+        source,
+        fixture.path.to_str().unwrap(),
+        &fixture.pin,
+    )
+    .unwrap();
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let s = NativeHttpService::open_git_call(
+        &owned.service_path,
+        LocalWebAuthority::from_listener(&listener, KEY).unwrap(),
+        authority,
+    )
+    .unwrap_or_else(|e| panic!("exact bind refused: {}", e.code()));
+    let good = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(PASSWORD));
+    let exact = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &context(owned.trust_revision),
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    // Capture the exact agreement first.
+    let resource = format!("fixture-project/{repository_id}/refs/heads/release/{candidate}");
+    let mandate_id = format!("void-mandate-{}", std::process::id());
+    let trust = |op: &str, value: Value, token: &str| {
+        owned
+            .project
+            .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+            .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+    };
+    trust(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":format!("void-mandate-{}", std::process::id()),
+            "mandate_id":mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":1,
+            "currency":"OID",
+            "beneficiary":"1".repeat(40),
+        }),
+        "fixture-admin-token",
+    );
+    let action: Value = serde_json::from_slice(&trust(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":format!("void-request-{}", std::process::id()),
+            "mandate_id":mandate_id,
+            "resource":resource,
+            "amount_minor":1,
+            "currency":"OID",
+            "beneficiary":"1".repeat(40),
+            "idempotency_key":format!("void-key-{mandate_id}"),
+        }),
+        "fixture-requester-token",
+    )
+    .bytes)
+    .unwrap();
+    let approved: Value = serde_json::from_slice(&trust(
+        "approve",
+        json!({
+            "schema_version":1,
+            "event_id":format!("void-approve-{}", std::process::id()),
+            "action_id":action["id"],
+            "mandate_id":mandate_id,
+            "content_digest":action["content_digest"],
+            "resource":resource,
+            "amount_minor":1,
+            "currency":"OID",
+            "beneficiary":"1".repeat(40),
+        }),
+        "fixture-approver-token",
+    )
+    .bytes)
+    .unwrap();
+    assert_eq!(approved["state"], "approved");
+    // The agreement is captured but a consumption now would still need the
+    // engine chain; first prove the guard is satisfied by asserting the
+    // engine observation directly, then apply a real public revision change.
+    let guard_bytes = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &context(owned.trust_revision),
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    assert!(owned
+        .project
+        .paea_git_agreement_match(&guard_bytes)
+        .unwrap()
+        .is_some());
+    // Real public configuration change on the project root (same
+    // reconstruction the browser staleness phase uses): the captured
+    // agreement becomes stale at last use.
+    let view: Value =
+        serde_json::from_slice(&owned.project.trust("show", b"{}", "").unwrap().bytes).unwrap();
+    let mut identities = view["identities"].clone();
+    for identity in identities.as_array_mut().unwrap() {
+        identity["disabled"] = false.into();
+        // The enrolled identity keeps its principal mapping and gets no token;
+        // bearer identities get their exact fixture tokens back (the public
+        // view omits raw tokens). Unknown subjects are dropped rather than
+        // invented — an invalid empty token would refuse the whole change.
+        if identity["subject"] == "requester" {
+            identity["token"] = "fixture-requester-token".into();
+        } else if identity["subject"] == "approver" {
+            identity["token"] = "fixture-approver-token".into();
+        } else if identity["subject"] == "agreement-admin" {
+            identity["token"] = "fixture-admin-token".into();
+        } else if identity.get("enrollment_principal").is_none() {
+            identity["token"] = "".into();
+        }
+    }
+    let identities: Vec<Value> = identities
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|identity| {
+            identity.get("enrollment_principal").is_some()
+                || identity["token"].as_str().is_some_and(|t| t.len() >= 16)
+        })
+        .cloned()
+        .collect();
+    let change = serde_json::json!({
+        "schema_version":1,
+        "event_id":format!("agreement-void-stale-{}", std::process::id()),
+        "expected_revision":owned.trust_revision,
+        "reason":"Explicit fixture revision change voiding the captured agreement",
+        "policy":view["policy"],
+        "identities":identities,
+    });
+    owned
+        .project
+        .trust("config-apply", &serde_json::to_vec(&change).unwrap(), "")
+        .unwrap_or_else(|e| panic!("stale revision change refused: {}", e.code()));
+    assert_eq!(
+        current_trust_revision(&owned.project_path),
+        owned.trust_revision + 1
+    );
+    // The stale agreement no longer matches; the route refuses with the same
+    // typed code and nothing is consumed.
+    assert!(owned
+        .project
+        .paea_git_agreement_match(&guard_bytes)
+        .unwrap()
+        .is_none());
+    let reply = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call?call=transfer",
+        exact,
+        Some(good),
+    );
+    assert!(
+        !reply.response.status().is_success(),
+        "stale agreement must refuse: {}",
+        String::from_utf8_lossy(reply.response.body())
+    );
+    assert_eq!(
+        reply.failure.expect("typed refusal expected").code(),
+        "paea-git-call-agreement"
+    );
+    let _ = s.close();
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    fixture.close();
+}
+
+/// The approver journey for the PA08 terms exposure: an approver reads the
+/// engine-derived exact terms from the preview route, then captures the
+/// agreement through the EXISTING Trust producers of the PROJECT root (the
+/// only root where the business identities are configured — the HTTP
+/// trust-actions route serves the service root and refuses a business bearer
+/// with `authorization_required`, observed below as an explicit boundary, not
+/// silently assumed). The captured agreement is exactly the one the
+/// consumption guard recognizes. Negative branches stay visible refusals with
+/// no Git effect: wrong role (denied by the existing approve guard), stale
+/// terms (rejected as non-exact), wrong candidate (no match). The preview
+/// itself never captures consent; consumption is never attempted here. Auth
+/// simulated on isolated fixtures (labeled bearer tokens); no human presence
+/// or acceptance is claimed.
+#[test]
+#[ignore = "requires explicit retained native source fixture"]
+fn approver_ux_preview_terms_then_existing_trust_channel_captures_agreement() {
+    let owned = owned_agreement();
+    let fixture = fixture::Fixture::build_for_trust(
+        owned.prepared.request().permission(),
+        owned.fixture_scope.clone(),
+        owned.trust_revision,
+    );
+    let (repository_id, candidate) = (owned.repository_id.clone(), owned.candidate.clone());
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let authority = swarm_web::PaeaGitCallSource::open(
+        source,
+        fixture.path.to_str().unwrap(),
+        &fixture.pin,
+    )
+    .unwrap();
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let s = NativeHttpService::open_git_call(
+        &owned.service_path,
+        LocalWebAuthority::from_listener(&listener, KEY).unwrap(),
+        authority,
+    )
+    .unwrap_or_else(|e| panic!("exact bind refused: {}", e.code()));
+    let bearer = |token: &str| format!("Bearer {token}");
+
+    // Step 1: the approver opens the preview and reads the engine-derived
+    // terms (no consent captured, no consumption).
+    let reply = get(&listener, &s, "/api/v1/paea/git-call/preview");
+    assert!(reply.response.status().is_success());
+    let preview: Value = serde_json::from_slice(reply.response.body()).unwrap();
+    assert_eq!(preview["available"], true);
+    let terms = preview["agreement_terms"].clone();
+    assert_eq!(terms["binding"], "recipe");
+    let resource = terms["resource"].as_str().unwrap().to_owned();
+    let amount = terms["amount_minor"].as_i64().unwrap();
+    let currency = terms["currency"].as_str().unwrap().to_owned();
+    let beneficiary = terms["beneficiary"].as_str().unwrap().to_owned();
+    assert_eq!(
+        resource,
+        format!("fixture-project/{repository_id}/refs/heads/release/{candidate}")
+    );
+
+    // Step 2: the requester creates the mandate and the action through the
+    // same existing Trust channel (the preview does not do it for anyone).
+    let trust = |op: &str, value: Value, token: &str| {
+        owned
+            .project
+            .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+            .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+    };
+    let mandate_id = format!("ux-mandate-{}", std::process::id());
+    trust(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":format!("ux-mandate-create-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":1,
+            "currency":currency,
+            "beneficiary":beneficiary,
+        }),
+        "fixture-admin-token",
+    );
+    let action: Value = serde_json::from_slice(
+        &trust(
+            "request",
+            json!({
+                "schema_version":1,
+                "event_id":format!("ux-request-{mandate_id}"),
+                "mandate_id":mandate_id,
+                "resource":resource,
+                "amount_minor":amount,
+                "currency":currency,
+                "beneficiary":beneficiary,
+                "idempotency_key":format!("ux-key-{mandate_id}"),
+            }),
+            "fixture-requester-token",
+        )
+        .bytes,
+    )
+    .unwrap();
+    assert_eq!(action["state"], "pending_approval");
+
+    // Step 3 (boundary): the HTTP trust-actions route serves the SERVICE root,
+    // not the prepared project root — a business bearer is refused before any
+    // business identity lookup. This explicit boundary is observed here and
+    // routed for the NEXT tranche (consent integration); no silent fallback.
+    let http_refused = post(
+        &listener,
+        &s,
+        "/api/v1/trust-actions?action=approve",
+        serde_json::to_vec(&json!({
+            "schema_version":1,
+            "event_id":format!("ux-wrong-role-{mandate_id}"),
+            "action_id":action["id"],
+            "mandate_id":mandate_id,
+            "content_digest":action["content_digest"],
+            "resource":resource,
+            "amount_minor":amount,
+            "currency":currency,
+            "beneficiary":beneficiary,
+        }))
+        .unwrap(),
+        Some(bearer("fixture-requester-token")),
+    );
+    assert!(
+        !http_refused.response.status().is_success(),
+        "service-root approve must not accept a business bearer"
+    );
+    let refused: Value = serde_json::from_slice(http_refused.response.body()).unwrap();
+    assert_eq!(refused["error"], "authorization_required");
+
+    // Step 4 (negative, real producer): a wrong role through the existing
+    // approve guard on the project root is a visible denial — no agreement.
+    let denied: Value = serde_json::from_slice(
+        &trust(
+            "approve",
+            json!({
+                "schema_version":1,
+                "event_id":format!("ux-wrong-role-root-{mandate_id}"),
+                "action_id":action["id"],
+                "mandate_id":mandate_id,
+                "content_digest":action["content_digest"],
+                "resource":resource,
+                "amount_minor":amount,
+                "currency":currency,
+                "beneficiary":beneficiary,
+            }),
+            "fixture-requester-token",
+        )
+        .bytes,
+    )
+    .unwrap();
+    assert_eq!(denied["state"], "denied");
+
+    // Step 5 (negative, real producer): stale terms (amount drifted from the
+    // preview) are rejected by the existing exact-terms guard on the project
+    // root — still no agreement.
+    let drifted: Value = serde_json::from_slice(
+        &trust(
+            "approve",
+            json!({
+                "schema_version":1,
+                "event_id":format!("ux-drift-root-{mandate_id}"),
+                "action_id":action["id"],
+                "mandate_id":mandate_id,
+                "content_digest":action["content_digest"],
+                "resource":resource,
+                "amount_minor":amount + 1,
+                "currency":currency,
+                "beneficiary":beneficiary,
+            }),
+            "fixture-approver-token",
+        )
+        .bytes,
+    )
+    .unwrap();
+    assert_eq!(drifted["state"], "denied");
+    // No agreement yet: the consumption would refuse (never attempted here —
+    // the engine observation is the guard's own lookup).
+    let exact = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &context(owned.trust_revision),
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    assert!(owned
+        .project
+        .paea_git_agreement_match(&exact)
+        .unwrap()
+        .is_none());
+
+    // Step 6: the approver captures the agreement through the existing Trust
+    // producers of the project root, with the preview-derived terms verbatim.
+    let approved: Value = serde_json::from_slice(
+        &trust(
+            "approve",
+            json!({
+                "schema_version":1,
+                "event_id":format!("ux-approve-{mandate_id}"),
+                "action_id":action["id"],
+                "mandate_id":mandate_id,
+                "content_digest":action["content_digest"],
+                "resource":resource,
+                "amount_minor":amount,
+                "currency":currency,
+                "beneficiary":beneficiary,
+            }),
+            "fixture-approver-token",
+        )
+        .bytes,
+    )
+    .unwrap();
+    assert_eq!(approved["state"], "approved");
+    assert_eq!(approved["approver"], "approver");
+
+    // Step 6: the captured agreement is EXACTLY the one the consumption guard
+    // recognizes for this action/revision — one source of truth.
+    assert!(owned
+        .project
+        .paea_git_agreement_match(&exact)
+        .unwrap()
+        .is_some());
+    // Wrong candidate never matches.
+    let other = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &"e".repeat(40)),
+        &context(owned.trust_revision),
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    assert!(owned
+        .project
+        .paea_git_agreement_match(&other)
+        .unwrap()
+        .is_none());
+
+    let _ = s.close();
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    fixture.close();
+}
+
+/// PA08 approval channel end-to-end on the retained native source fixture.
+/// One exact business `approve` command is frozen at startup through the real
+/// `prepare_approval` producer (fresh project-root physical witness), signed
+/// into the operator's enrollment TOGETHER WITH the one-shot Git-call
+/// permission, bound via `open_git_call_with_approval`, and executed once
+/// through `POST /api/v1/paea/git-call/approval` under the held enrolled
+/// authority. The project guard then recognizes the exact agreement; the
+/// SERVICE root trust state stays byte-identical throughout. Refusals stay
+/// typed with no effect on either store: wrong credential, any non-empty body
+/// (the command is held server-side, so every body is refused before any Root
+/// open), a stale revision after a real public `config-apply` on the project
+/// root. The exact replay of the same approved command is the engine's
+/// retained reply of the same original, never a second effect. Auth simulated
+/// on isolated fixtures (labeled enrollment password); no human presence,
+/// acceptance or Git effect is claimed anywhere in this test.
+#[test]
+#[ignore = "requires explicit retained native source fixture"]
+fn approval_route_captures_project_agreement_and_refuses_wrong_body_revision() {
+    let owned = owned_agreement();
+    let (repository_id, candidate) = (owned.repository_id.clone(), owned.candidate.clone());
+    // The exact canonical action bytes the preparation digested; the frozen
+    // approve command carries the engine-derived recipe terms for them.
+    let exact = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &context(owned.trust_revision),
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    let terms = owned
+        .project
+        .paea_git_agreement_terms(&exact)
+        .unwrap()
+        .expect("recipe terms derivable for this canonical Git action");
+    assert_eq!(terms.binding, "recipe");
+    assert_eq!(terms.revision, owned.trust_revision);
+    let resource = terms.resource.clone();
+    // Frozen command chain through the real producers: mandate-create (admin
+    // bearer), request (requester bearer) — then approve only via the route.
+    let mandate_id = format!("approval-mandate-{}", std::process::id());
+    let trust = |op: &str, value: Value, token: &str| -> Value {
+        serde_json::from_slice(
+            &owned
+                .project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+                .bytes,
+        )
+        .unwrap()
+    };
+    trust(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-mandate-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+        }),
+        "fixture-admin-token",
+    );
+    let action: Value = trust(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-request-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "resource":resource,
+            "amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+            "idempotency_key":format!("approval-key-{mandate_id}"),
+        }),
+        "fixture-requester-token",
+    );
+    assert_eq!(action["state"], "pending_approval");
+    // The frozen approve command: exact terms of the pending action.
+    let approve = serde_json::to_vec(&json!({
+        "schema_version":1,
+        "event_id":format!("approval-approve-{mandate_id}"),
+        "action_id":action["id"],
+        "mandate_id":mandate_id,
+        "content_digest":action["content_digest"],
+        "resource":resource,
+        "amount_minor":terms.amount_minor,
+        "currency":terms.currency,
+        "beneficiary":terms.beneficiary,
+    }))
+    .unwrap();
+    // Freeze the approval against the source's own project root BEFORE open:
+    // the exact trust-action permission derived from these bytes is what the
+    // operator provisions into the same signed enrollment as the Git-call
+    // permission — no second account, no second agreement system.
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let approval_source = source
+        .prepare_approval(
+            swarm_enrollment_authority::trust_action::Operation::Approve,
+            &approve,
+        )
+        .unwrap_or_else(|e| panic!("approval preparation refused: {:?}", e.code()));
+    // One held account signed with BOTH permissions at bootstrap (the journal
+    // accepts one enroll per enrollment id, so nothing can be appended later);
+    // the same enrolled principal maps to the single identity holding
+    // approver+effect roles on this root.
+    let mut fixture = fixture::Fixture::build_for_trust_actions(
+        vec![
+            owned.prepared_request_permission.clone(),
+            approval_source.request().permission(),
+        ],
+        owned.fixture_scope.clone(),
+        owned.trust_revision,
+    );
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let authority = swarm_web::PaeaGitCallSource::open(
+        source,
+        fixture.path.to_str().unwrap(),
+        &fixture.pin,
+    )
+    .unwrap();
+    let s = swarm_web::NativeHttpService::open_git_call_with_approval(
+        &owned.service_path,
+        LocalWebAuthority::from_listener(&listener, KEY).unwrap(),
+        authority,
+        Some(approval_source),
+    )
+    .unwrap_or_else(|e| panic!("approval bind refused: {:?}", e.code()));
+    let good = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(PASSWORD));
+    let wrong = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(b"wrong-password"));
+    // Startup observation: the approval capability is public, bound, digest-only.
+    let status = get(&listener, &s, "/api/v1/paea/git-call/approval");
+    assert!(status.response.status().is_success());
+    assert!(status.failure.is_none());
+    let status_body: Value = serde_json::from_slice(status.response.body()).unwrap();
+    assert_eq!(status_body["event"], "paea-git-call-approval-status");
+    assert_eq!(status_body["bound"], true);
+    assert_eq!(status_body["capability"]["operation"], "approve");
+    assert_eq!(
+        status_body["capability"]["request_digest"].as_str().unwrap().len(),
+        64
+    );
+    // The service root trust state before any approval: observed, not assumed.
+    let service_before = service_trust_state(&owned.service_path);
+    // Wrong credential refuses typed before any business effect: the decoded
+    // password is non-empty so the shape gate passes, and the held personal
+    // authority itself refuses with the engine's typed pre-use code (403),
+    // consuming nothing.
+    let refused = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call/approval",
+        Vec::new(),
+        Some(wrong),
+    );
+    assert!(!refused.response.status().is_success());
+    assert_eq!(
+        refused.failure.expect("typed refusal").code(),
+        "authorization_required"
+    );
+    // A non-empty body refuses typed before any Root open: the command is
+    // held server-side, so no transportable bytes can ever match it. A
+    // drifted-terms body is exactly such a refusal case.
+    let drifted = serde_json::to_vec(&json!({
+        "schema_version":1,
+        "event_id":format!("approval-drift-{mandate_id}"),
+        "action_id":action["id"],
+        "mandate_id":mandate_id,
+        "content_digest":action["content_digest"],
+        "resource":resource,
+        "amount_minor":terms.amount_minor + 1,
+        "currency":terms.currency,
+        "beneficiary":terms.beneficiary,
+    }))
+    .unwrap();
+    let wrong_body = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call/approval",
+        drifted,
+        Some(good.clone()),
+    );
+    assert!(!wrong_body.response.status().is_success());
+    assert_eq!(
+        wrong_body.failure.expect("typed refusal").code(),
+        "paea-git-call-approval-request"
+    );
+    // No approval exists yet: the guard sees nothing for these exact bytes.
+    assert!(owned
+        .project
+        .paea_git_agreement_match(&exact)
+        .unwrap()
+        .is_none());
+    // Positive witness: the empty-body consumption under the held enrolled
+    // authority consumes the server-held approve command and captures the
+    // agreement on the project root.
+    let ok = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call/approval",
+        Vec::new(),
+        Some(good.clone()),
+    );
+    assert!(
+        ok.response.status().is_success(),
+        "approval must succeed: {}",
+        String::from_utf8_lossy(ok.response.body())
+    );
+    assert!(ok.failure.is_none());
+    let published: Value = serde_json::from_slice(ok.response.body()).unwrap();
+    // The enrolled approver is I3 and the action object is I2: Biba read-up is
+    // refused, so the public reply is the engine's status acknowledgement
+    // (state + object_id), not the action's fields. The durable approver is
+    // observed through the project guard below, never through this body.
+    assert_eq!(published["state"], "approved");
+    assert_eq!(published["kind"], "trust-status-ack-v1");
+    assert_eq!(published["content_redacted"], true);
+    // The project guard now recognizes the exact agreement: one source of truth.
+    let matched = owned
+        .project
+        .paea_git_agreement_match(&exact)
+        .unwrap()
+        .expect("exact agreement recognized by the project guard");
+    assert_eq!(matched.action_id, action["id"].as_str().unwrap());
+    assert_eq!(matched.approver, "enrolled-effect");
+    // The service root trust state is byte-identical: this channel never
+    // touched the service root's trust journal.
+    assert_eq!(service_before, service_trust_state(&owned.service_path));
+    // Legitimate replay: the same empty-body consumption replays the retained
+    // original — success, and the durable agreement state stays identical.
+    let replay = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call/approval",
+        Vec::new(),
+        Some(good.clone()),
+    );
+    assert!(replay.response.status().is_success());
+    assert_eq!(service_before, service_trust_state(&owned.service_path));
+    // Refusal: stale revision. A real public config change on the project root
+    // (the same reconstruction the staleness tests apply) voids the captured
+    // agreement; the same frozen command then refuses without any new approval
+    // or Git effect.
+    let view: Value =
+        serde_json::from_slice(&owned.project.trust("show", b"{}", "").unwrap().bytes).unwrap();
+    let mut identities = view["identities"].clone();
+    for identity in identities.as_array_mut().unwrap() {
+        identity["disabled"] = false.into();
+        identity["token"] = match identity["subject"].as_str() {
+            Some("requester") => "fixture-requester-token".into(),
+            Some("approver") => "fixture-approver-token".into(),
+            Some("agreement-admin") => "fixture-admin-token".into(),
+            _ => Value::String(String::new()),
+        };
+    }
+    let change = serde_json::json!({
+        "schema_version":1,
+        "event_id":format!("approval-stale-{}", std::process::id()),
+        "expected_revision":owned.trust_revision,
+        "reason":"Explicit fixture Trust revision change voiding the captured approval agreement",
+        "policy":view["policy"],
+        "identities":identities,
+    });
+    owned
+        .project
+        .trust("config-apply", &serde_json::to_vec(&change).unwrap(), "")
+        .unwrap_or_else(|e| panic!("stale revision change refused: {}", e.code()));
+    assert!(owned
+        .project
+        .paea_git_agreement_match(&exact)
+        .unwrap()
+        .is_none());
+    let stale = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call/approval",
+        Vec::new(),
+        Some(good.clone()),
+    );
+    assert!(
+        !stale.response.status().is_success(),
+        "stale revision must refuse: {}",
+        String::from_utf8_lossy(stale.response.body())
+    );
+    assert_eq!(service_before, service_trust_state(&owned.service_path));
+    // Legitimate recovery at the new revision: fresh recipe terms derive for
+    // the same canonical bytes, so a fresh preparation could re-bind and
+    // re-approve. The channel imposes no hidden one-strike lock.
+    let fresh_terms = owned
+        .project
+        .paea_git_agreement_terms(&exact)
+        .unwrap()
+        .expect("terms re-derivable at the new revision");
+    assert_eq!(fresh_terms.revision, owned.trust_revision + 1);
+    let _ = s.close();
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    fixture.close();
+}
+
+/// The approval presentation route serves only the authorized projection
+/// behind the ordinary session gate: the public operation, the request digest,
+/// the canonical identity of the underlying Git action, the engine-derived
+/// agreement terms and the current observed revision/witness state. The frozen
+/// command bytes and their private fields (action_id, mandate_id,
+/// content_digest) are NEVER served — the enrolled approver (I3) holds no Biba
+/// read right over the I2 object, the same redaction the engine already
+/// applies to its reply — so the browser never transports command bytes: the
+/// POST route consumes the command held server-side with an empty body. After
+/// a real approval through the POST route, the presentation stays the same
+/// read-only observation — never a second approval system. Without a bound
+/// approval it stays an explicit `available:false` 200. The held command then
+/// really consumes once through the POST route: the ack is the engine's, the
+/// agreement is recognized by the project guard, and a non-empty body still
+/// refuses typed before any Root open. A Biba read-object discriminant with
+/// the fixture's real roles proves the disclosure asymmetry the projection
+/// relies on: I2 reads its object, I3 is refused, and the served projection
+/// stays within the public preview class.
+#[test]
+#[ignore = "requires explicit retained native source fixture"]
+fn approval_presentation_serves_frozen_command_and_terms() {
+    let owned = owned_agreement();
+    let (repository_id, candidate) = (owned.repository_id.clone(), owned.candidate.clone());
+    let exact = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &context(owned.trust_revision),
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    let terms = owned
+        .project
+        .paea_git_agreement_terms(&exact)
+        .unwrap()
+        .expect("recipe terms derivable for this canonical Git action");
+    let resource = terms.resource.clone();
+    let mandate_id = format!("approval-presentation-mandate-{}", std::process::id());
+    let trust = |op: &str, value: Value, token: &str| -> Value {
+        serde_json::from_slice(
+            &owned
+                .project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+                .bytes,
+        )
+        .unwrap()
+    };
+    trust(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-presentation-mandate-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+        }),
+        "fixture-admin-token",
+    );
+    let action: Value = trust(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-presentation-request-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "resource":resource,
+            "amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+            "idempotency_key":format!("approval-presentation-key-{mandate_id}"),
+        }),
+        "fixture-requester-token",
+    );
+    assert_eq!(action["state"], "pending_approval");
+    let approve = serde_json::to_vec(&json!({
+        "schema_version":1,
+        "event_id":format!("approval-presentation-approve-{mandate_id}"),
+        "action_id":action["id"],
+        "mandate_id":mandate_id,
+        "content_digest":action["content_digest"],
+        "resource":resource,
+        "amount_minor":terms.amount_minor,
+        "currency":terms.currency,
+        "beneficiary":terms.beneficiary,
+    }))
+    .unwrap();
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let approval_source = source
+        .prepare_approval(
+            swarm_enrollment_authority::trust_action::Operation::Approve,
+            &approve,
+        )
+        .unwrap_or_else(|e| panic!("approval preparation refused: {:?}", e.code()));
+    let mut fixture = fixture::Fixture::build_for_trust_actions(
+        vec![
+            owned.prepared_request_permission.clone(),
+            approval_source.request().permission(),
+        ],
+        owned.fixture_scope.clone(),
+        owned.trust_revision,
+    );
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let authority = swarm_web::PaeaGitCallSource::open(
+        source,
+        fixture.path.to_str().unwrap(),
+        &fixture.pin,
+    )
+    .unwrap();
+    let s = swarm_web::NativeHttpService::open_git_call_with_approval(
+        &owned.service_path,
+        LocalWebAuthority::from_listener(&listener, KEY).unwrap(),
+        authority,
+        Some(approval_source),
+    )
+    .unwrap_or_else(|e| panic!("approval bind refused: {:?}", e.code()));
+    let good = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(PASSWORD));
+    // Shape refusals first: POST and non-empty query refuse typed before any
+    // Root open, exactly like the preview route.
+    let wrong_method = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call/approval/presentation",
+        Vec::new(),
+        None,
+    );
+    assert!(!wrong_method.response.status().is_success());
+    assert_eq!(
+        wrong_method.failure.expect("typed refusal").code(),
+        "web-method-refused"
+    );
+    let wrong_query = {
+        let a = LocalWebAuthority::from_listener(&listener, KEY).unwrap();
+        let builder = Request::builder()
+            .method("GET")
+            .uri("/api/v1/paea/git-call/approval/presentation?x=1")
+            .header(HOST, a.host())
+            .header(COOKIE, format!("{}={}", a.cookie_name(), KEY))
+            .header(ORIGIN, format!("http://{}", a.host()))
+            .header("X-Swarm-CSRF", KEY);
+        s.handle(builder.body(Vec::new()).unwrap()).unwrap()
+    };
+    assert!(!wrong_query.response.status().is_success());
+    assert_eq!(
+        wrong_query.failure.expect("typed refusal").code(),
+        "paea-git-call-approval-presentation-query-invalid"
+    );
+    // Bound presentation: the authorized projection only — the operation, the
+    // digest identity, the canonical identity and the engine-derived terms.
+    let presentation = get(&listener, &s, "/api/v1/paea/git-call/approval/presentation");
+    assert!(
+        presentation.response.status().is_success(),
+        "presentation must serve: {}",
+        String::from_utf8_lossy(presentation.response.body())
+    );
+    assert!(presentation.failure.is_none());
+    let body: Value = serde_json::from_slice(presentation.response.body()).unwrap();
+    assert_eq!(body["event"], "paea-git-call-approval-presentation");
+    assert_eq!(body["available"], true);
+    assert_eq!(body["operation"], "approve");
+    assert_eq!(body["request_digest"].as_str().unwrap().len(), 64);
+    // The private command identity is NEVER served: no bytes, no parsed
+    // fields — the same disclosure class the engine's reply redaction gives
+    // the I3 approver.
+    assert!(body.get("command_bytes_b64url").is_none());
+    assert!(body.get("command").is_none());
+    assert!(body
+        .to_string()
+        .contains(action["id"].as_str().unwrap()) == false);
+    assert!(body.to_string().contains(&mandate_id) == false);
+    assert!(body.to_string().contains(action["content_digest"].as_str().unwrap()) == false);
+    assert_eq!(body["canonical"]["digest_matches"], true);
+    assert_eq!(body["canonical"]["action_digest"].as_str().unwrap().len(), 64);
+    // The derived terms are the engine's own, for the underlying action, and
+    // derive from the public canonical proposal bytes the preview serves.
+    assert_eq!(body["agreement_terms"]["binding"], "recipe");
+    assert_eq!(body["agreement_terms"]["resource"], resource.as_str());
+    assert_eq!(body["agreement_terms"]["amount_minor"], terms.amount_minor);
+    assert_eq!(body["agreement_terms"]["currency"], terms.currency);
+    assert_eq!(body["agreement_terms"]["beneficiary"], terms.beneficiary);
+    assert_eq!(body["agreement_terms"]["revision"], owned.trust_revision);
+    assert_eq!(body["current"]["roots_bound"], true);
+    assert_eq!(body["current"]["declared_trust_revision"], owned.trust_revision);
+    assert_eq!(body["current"]["trust_revision_current"], true);
+    assert_eq!(body["limits"]["consent"], "none-captured");
+    assert_eq!(body["limits"]["consumption"], "none");
+    assert_eq!(body["limits"]["human_presence"], "not-established");
+    // No agreement exists yet: presentation captures nothing.
+    assert!(owned
+        .project
+        .paea_git_agreement_match(&exact)
+        .unwrap()
+        .is_none());
+    // Real consumption through the POST route with an EMPTY body: the command
+    // is held server-side (the bound approval), so the browser transports
+    // only the credential — nothing served is re-POSTed.
+    let ok = post(&listener, &s, "/api/v1/paea/git-call/approval", Vec::new(), Some(good.clone()));
+    assert!(
+        ok.response.status().is_success(),
+        "approval must succeed: {}",
+        String::from_utf8_lossy(ok.response.body())
+    );
+    let published: Value = serde_json::from_slice(ok.response.body()).unwrap();
+    assert_eq!(published["state"], "approved");
+    assert_eq!(published["kind"], "trust-status-ack-v1");
+    assert_eq!(published["content_redacted"], true);
+    let matched = owned
+        .project
+        .paea_git_agreement_match(&exact)
+        .unwrap()
+        .expect("exact agreement recognized by the project guard");
+    assert_eq!(matched.action_id, action["id"].as_str().unwrap());
+    assert_eq!(matched.approver, "enrolled-effect");
+    // After consumption the presentation stays the same read-only observation:
+    // still the same digest identity, still no second approval system.
+    let after = get(&listener, &s, "/api/v1/paea/git-call/approval/presentation");
+    assert!(after.response.status().is_success());
+    let after_body: Value = serde_json::from_slice(after.response.body()).unwrap();
+    assert_eq!(after_body["available"], true);
+    assert_eq!(
+        after_body["request_digest"], body["request_digest"],
+        "same frozen command after consumption"
+    );
+    // A non-empty body still refuses typed after the presentation existed:
+    // the channel never accepts request data again.
+    let wrong_body = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call/approval",
+        serde_json::to_vec(&json!({"schema_version":1,"resource":resource})).unwrap(),
+        Some(good),
+    );
+    assert!(!wrong_body.response.status().is_success());
+    assert_eq!(
+        wrong_body.failure.expect("typed refusal").code(),
+        "paea-git-call-approval-request"
+    );
+    // Biba read-object discriminant with the fixture's REAL roles on the same
+    // project root: the I2 approver token reads the pending action object,
+    // the I3 enrolled approver (projection consumer) is refused — proving the
+    // projection is not a new read-down channel. No event is journaled by
+    // these reads, so the stale config-apply below stays exactly aligned.
+    let project_state = service_trust_state(&owned.project_path);
+    let project = RootStore::open(&owned.project_path, false).unwrap();
+    let read_cmd = json!({
+        "schema_version":1,
+        "event_id":format!("approval-presentation-read-{}", std::process::id()),
+        "action_id":action["id"],
+    });
+    let visible = project
+        .trust(
+            "read-object",
+            &serde_json::to_vec(&read_cmd).unwrap(),
+            "fixture-approver-token",
+        )
+        .expect("I2 approver reads its own object");
+    let seen: Value = serde_json::from_slice(&visible.bytes).unwrap();
+    assert_eq!(seen["amount_minor"], terms.amount_minor);
+    assert_eq!(
+        project
+            .trust(
+                "read-object",
+                &serde_json::to_vec(&read_cmd).unwrap(),
+                "fixture-admin-token",
+            )
+            .err()
+            .expect("I3 read-down must refuse")
+            .code(),
+        "authorization_required"
+    );
+    drop(project);
+    assert_eq!(
+        project_state,
+        service_trust_state(&owned.project_path),
+        "read-object must not journal anything"
+    );
+    let _ = s.close();
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    fixture.close();
+}
+
+/// The presentation route without a bound approval is an explicit
+/// `available:false` 200 with a typed reason, and without any bound source it
+/// never refuses: absence is observable without any consumption. Shape
+/// refusals (POST, query) still refuse typed independent of the credential.
+#[test]
+fn approval_presentation_reports_explicit_absence_without_source() {
+    let (service_dir, service_root) = service();
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let s = NativeHttpService::open(
+        service_dir.path(),
+        LocalWebAuthority::from_listener(&listener, KEY).unwrap(),
+    )
+    .unwrap();
+    let reply = get(&listener, &s, "/api/v1/paea/git-call/approval/presentation");
+    assert!(reply.response.status().is_success());
+    assert!(reply.failure.is_none());
+    let body: Value = serde_json::from_slice(reply.response.body()).unwrap();
+    assert_eq!(body["event"], "paea-git-call-approval-presentation");
+    assert_eq!(body["available"], false);
+    assert_eq!(
+        body["reason"], "paea-git-call-approval-source-unavailable",
+        "no source bound: the reason names the missing source"
+    );
+    s.close().unwrap();
+    service_root.close().unwrap();
+}
+
+/// Real frozen approval command bound to a real native HTTP server with its
+/// ordinary persisted session, held alive while a real browser qualification
+/// drives the served approval form through two public states: the fresh
+/// presentation with the authorized projection (operation, request digest,
+/// engine-derived terms — no private command fields) and a REAL authenticated
+/// enrollment consumption through the form with an EMPTY body (labeled fixture
+/// password, ack `state:"approved"` shown, password erased), then the
+/// explicitly stale state after a real public Trust `config-apply` (never a
+/// journal edit), re-observed with no confirmation solicited and no success
+/// shown. Phase coordination with the browser harness uses owned marker files;
+/// every harness marker must carry the exact startup nonce, so no other
+/// process can drive this server, and an error marker fails the test with the
+/// FIRST browser error before any later assertion can mask it. The server
+/// closes checked on every path; no Git effect, ref change, second approval
+/// system or acceptance is claimed — the browser consumes the server-held
+/// command once, under the fixture enrollment.
+#[test]
+#[ignore = "requires explicit retained native source fixture and browser harness"]
+fn approval_form_serves_real_browser_session() {
+    let owned = owned_agreement();
+    let (repository_id, candidate) = (owned.repository_id.clone(), owned.candidate.clone());
+    // The exact canonical action bytes the preparation digested; the frozen
+    // approve command carries the engine-derived recipe terms for them.
+    let exact = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &context(owned.trust_revision),
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    let terms = owned
+        .project
+        .paea_git_agreement_terms(&exact)
+        .unwrap()
+        .expect("recipe terms derivable for this canonical Git action");
+    let resource = terms.resource.clone();
+    let mandate_id = format!("approval-form-mandate-{}", std::process::id());
+    let trust = |op: &str, value: Value, token: &str| -> Value {
+        serde_json::from_slice(
+            &owned
+                .project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+                .bytes,
+        )
+        .unwrap()
+    };
+    trust(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-form-mandate-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+        }),
+        "fixture-admin-token",
+    );
+    let action: Value = trust(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-form-request-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "resource":resource,
+            "amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+            "idempotency_key":format!("approval-form-key-{mandate_id}"),
+        }),
+        "fixture-requester-token",
+    );
+    assert_eq!(action["state"], "pending_approval");
+    let approve = serde_json::to_vec(&json!({
+        "schema_version":1,
+        "event_id":format!("approval-form-approve-{mandate_id}"),
+        "action_id":action["id"],
+        "mandate_id":mandate_id,
+        "content_digest":action["content_digest"],
+        "resource":resource,
+        "amount_minor":terms.amount_minor,
+        "currency":terms.currency,
+        "beneficiary":terms.beneficiary,
+    }))
+    .unwrap();
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let approval_source = source
+        .prepare_approval(
+            swarm_enrollment_authority::trust_action::Operation::Approve,
+            &approve,
+        )
+        .unwrap_or_else(|e| panic!("approval preparation refused: {:?}", e.code()));
+    let request_digest = approval_source.request().request_digest().to_owned();
+    let mut fixture = fixture::Fixture::build_for_trust_actions(
+        vec![
+            owned.prepared_request_permission.clone(),
+            approval_source.request().permission(),
+        ],
+        owned.fixture_scope.clone(),
+        owned.trust_revision,
+    );
+    let authority = swarm_web::PaeaGitCallSource::open(
+        source,
+        fixture.path.to_str().unwrap(),
+        &fixture.pin,
+    )
+    .unwrap_or_else(|e| panic!("provisioned declaration refused: {:?}", e.branches()));
+    // Real bound listener with the ordinary served transport; the approval is
+    // attached at bind time under the same two-root witness check, so the
+    // served startup is exactly the production approval-capable startup.
+    let server = swarm_web::NativeHttpServer::bind_git_call_with_approval(
+        &owned.service_path,
+        None,
+        authority,
+        Some(approval_source),
+    )
+    .unwrap_or_else(|e| panic!("exact approval bind refused: {:?}", e.code()));
+    let address = server.local_addr().unwrap();
+    let stop_path = std::sync::Arc::new(
+        std::env::var_os("APPROVAL_FORM_BROWSER_DIR")
+            .map(std::path::PathBuf::from)
+            .expect("harness control directory")
+            .join("server.stop"),
+    );
+    let stop_wait = std::sync::Arc::clone(&stop_path);
+    let server_thread = std::thread::spawn(move || {
+        server
+            .serve_until(
+                async move {
+                    loop {
+                        if stop_wait.exists() {
+                            break;
+                        }
+                        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+                    }
+                },
+                &mut |_| Ok(()),
+            )
+            .is_ok()
+    });
+    // Ordinary persisted session (bind_source opened the service Root writable
+    // and published the ordinary credential for this exact listener address);
+    // the browser reads that same file — no parallel authority path.
+    let session_name = fs::read_dir(owned.service_path.join(".swarm"))
+        .unwrap()
+        .filter_map(|entry| entry.ok())
+        .map(|entry| entry.file_name().to_string_lossy().into_owned())
+        .find(|name| name.starts_with("web-session-"))
+        .expect("bind must persist the ordinary web session credential");
+    let nonce = format!("approval-form-browser-{}", std::process::id());
+    let startup = serde_json::json!({
+        "schema_version":1,
+        "event":"approval-form-browser-ready",
+        "nonce":nonce,
+        "address":address.to_string(),
+        "service_root":owned.service_path,
+        "project_root":owned.project_path,
+        "request_digest":request_digest,
+        "mandate_id":mandate_id,
+        "resource":resource,
+        "amount_minor":terms.amount_minor,
+        "currency":terms.currency,
+        "beneficiary":terms.beneficiary,
+        "action_id":action["id"],
+        "content_digest":action["content_digest"],
+        "trust_revision":owned.trust_revision,
+        // Same address-scoped protocol namespace as LocalWebAuthority (the
+        // first 12 hex bytes of the SHA-256 of the observed host string);
+        // derived here from the same session file stem, no second authority.
+        "cookie_name":format!(
+            "swarm_session_{}",
+            &{
+                use sha2::{Digest, Sha256};
+                let hash = Sha256::digest(address.to_string().as_bytes());
+                hash.iter().map(|b| format!("{b:02x}")).collect::<String>()
+            }[..12]
+        ),
+        "session_file":session_name,
+    });
+    let control_dir = std::path::PathBuf::from(
+        std::env::var_os("APPROVAL_FORM_BROWSER_DIR").expect("harness control directory"),
+    );
+    fs::write(control_dir.join("server.json"), serde_json::to_vec(&startup).unwrap())
+        .unwrap();
+    // Phase 1: fresh state. The harness drives the real form, asserts the
+    // authorized projection (no private command fields), performs the explicit
+    // confirmation + empty-body enrollment consumption (fixture password,
+    // labeled simulated), observes the real approved ack and the erased
+    // password, then writes the phase-1 done marker with our nonce before we
+    // mutate anything. An error marker fails here with the browser's first
+    // error, before any agreement assertion can mask it.
+    wait_marker(&control_dir, &nonce, "phase1.done");
+    // The real consumption already happened through the form: the exact
+    // agreement must now be recognized by the project guard — proven here
+    // against the engine, not against any page-internal copy.
+    let matched = owned
+        .project
+        .paea_git_agreement_match(&exact)
+        .unwrap()
+        .expect("form consumption must capture the exact agreement");
+    assert_eq!(matched.action_id, action["id"].as_str().unwrap());
+    assert_eq!(matched.approver, "enrolled-effect");
+    // Real public Trust revision change on the project root: an actual
+    // config-apply through the engine under the same local operator recovery
+    // path the engine tests use, exactly once, on the owned fixture. No
+    // journal file is edited and no state is fabricated. The public `show`
+    // view omits raw tokens, so the three bearer identities (requester,
+    // approver, agreement-admin) get their exact fixture tokens back and the
+    // enrolled identity keeps its principal
+    // mapping (same reconstruction the settlement tests apply).
+    let view: Value =
+        serde_json::from_slice(&owned.project.trust("show", b"{}", "").unwrap().bytes).unwrap();
+    let mut identities = view["identities"].clone();
+    for identity in identities.as_array_mut().unwrap() {
+        identity["disabled"] = false.into();
+        identity["token"] = match identity["subject"].as_str() {
+            Some("requester") => "fixture-requester-token".into(),
+            Some("approver") => "fixture-approver-token".into(),
+            Some("agreement-admin") => "fixture-admin-token".into(),
+            _ => Value::String(String::new()),
+        };
+    }
+    let change = serde_json::json!({
+        "schema_version":1,
+        "event_id":format!("approval-form-browser-stale-{}", std::process::id()),
+        "expected_revision":owned.trust_revision,
+        "reason":"Explicit fixture Trust revision change for approval form staleness qualification",
+        "policy":view["policy"],
+        "identities":identities,
+    });
+    owned
+        .project
+        .trust("config-apply", &serde_json::to_vec(&change).unwrap(), "")
+        .unwrap_or_else(|e| panic!("stale revision change refused: {}", e.code()));
+    let stale_revision = current_trust_revision(&owned.project_path);
+    assert_eq!(stale_revision, owned.trust_revision + 1);
+    fs::write(control_dir.join("phase2.ready"), serde_json::to_vec(&serde_json::json!({
+        "nonce":nonce,
+        "trust_revision":stale_revision,
+    })).unwrap()).unwrap();
+    // Phase 2: stale state. The harness re-observes the form through the same
+    // session and asserts the visible stale refusal with no confirmation
+    // solicited and the send control disabled — never a success on a stale
+    // state, and never a second consumption.
+    wait_marker(&control_dir, &nonce, "phase2.done");
+    // Explicit owned shutdown: the serving thread observes the stop marker and
+    // serve_until drains and checked-closes listener/binding there; the thread's
+    // success bit keeps that close outcome visible, never dropped.
+    fs::write(stop_path.as_path(), b"stop").unwrap();
+    let served = server_thread.join().expect("serve thread must not panic");
+    assert!(served, "serve_until must report a clean owned shutdown");
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    fixture.close();
+}
+
+/// Wrong physical root refuses at bind, typed, with both stores untouched.
+/// One valid approval preparation binds for projectA (its own witness); a
+/// second preparation of the same family — same frozen approve bytes, same
+/// enrollment fixture — is presented against projectB, a physically distinct
+/// project root. `bind_approval` must refuse (the engine's physical-witness
+/// check compares the actually opened project root against the retained
+/// binding) BEFORE any session publication, close the supplied authority and
+/// witness on the refusal path. Observed no-effect assertions, no more and no
+/// less: the byte-identical Trust states of projectA, serviceA, the REAL
+/// projectB directory and serviceB; the byte-identical managed refs listing
+/// of projectA with the promotion target ref explicitly absent before AND
+/// after (through real Git); the unchanged durable effect journals (Git
+/// intents, promotion effects) of both service roots read through independent
+/// read-only connections; and the agreement still unbound. Bind prepares a
+/// witness only; it never writes Trust state.
+#[test]
+#[ignore = "requires explicit retained native source fixture"]
+fn approval_route_wrong_physical_project_root_refuses_without_effects() {
+    // projectA: the valid bind target (agreement variant for the producers).
+    let owned = owned_agreement();
+    // projectB: physically distinct project root on the same retained fixture
+    // family — a second explicit root on the same fixture path is refused by
+    // the store's own binding, so this uses a separate fresh service root,
+    // never a copy of projectA's state.
+    let (service_dir_b, service_b) = service();
+    // The exact canonical action bytes and the frozen approve command, built
+    // for projectA exactly like the positive test.
+    let exact = swarm_protection_contract::canonicalize(
+        &proposal(&owned.repository_id, &owned.candidate),
+        &context(owned.trust_revision),
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    let terms = owned
+        .project
+        .paea_git_agreement_terms(&exact)
+        .unwrap()
+        .expect("recipe terms derivable for this canonical Git action");
+    let resource = terms.resource.clone();
+    let mandate_id = format!("wrong-root-mandate-{}", std::process::id());
+    let trust = |op: &str, value: Value, token: &str| -> Value {
+        serde_json::from_slice(
+            &owned
+                .project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+                .bytes,
+        )
+        .unwrap()
+    };
+    trust(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":format!("wrong-root-mandate-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+        }),
+        "fixture-admin-token",
+    );
+    let action: Value = trust(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":format!("wrong-root-request-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "resource":resource,
+            "amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+            "idempotency_key":format!("wrong-root-key-{mandate_id}"),
+        }),
+        "fixture-requester-token",
+    );
+    assert_eq!(action["state"], "pending_approval");
+    let approve = serde_json::to_vec(&json!({
+        "schema_version":1,
+        "event_id":format!("wrong-root-approve-{mandate_id}"),
+        "action_id":action["id"],
+        "mandate_id":mandate_id,
+        "content_digest":action["content_digest"],
+        "resource":resource,
+        "amount_minor":terms.amount_minor,
+        "currency":terms.currency,
+        "beneficiary":terms.beneficiary,
+    }))
+    .unwrap();
+    // Physical witnesses read before any bind: both Trust stores (projectA,
+    // serviceA), the projectA managed refs (raw Git listing), the explicit
+    // absence observation of the promotion target ref and the actual effect
+    // journals (intents/promotions, read-only) of BOTH service roots. These
+    // are the comparison basis for "no mutation" — nothing is claimed beyond
+    // what is actually observed here.
+    let project_before = service_trust_state(&owned.project_path);
+    let service_before = service_trust_state(&owned.service_path);
+    let refs_before = managed_git_refs(&owned.project_path, &owned.work);
+    let target_ref_before = managed_git_target_ref(&owned.project_path, &owned.work, "refs/heads/release");
+    let intents_a_before = sqlite_effect_journal_state(&owned.service_path.join(".swarm/state.db"));
+    assert!(owned
+        .project
+        .paea_git_agreement_match(&exact)
+        .unwrap()
+        .is_none());
+    // Valid bind: same frozen bytes against projectA's own source — accepted.
+    let source_a = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let approval_a = source_a
+        .prepare_approval(
+            swarm_enrollment_authority::trust_action::Operation::Approve,
+            &approve,
+        )
+        .unwrap_or_else(|e| panic!("projectA approval preparation refused: {:?}", e.code()));
+    let fixture_a = fixture::Fixture::build_for_trust_actions(
+        vec![
+            owned.prepared_request_permission.clone(),
+            approval_a.request().permission(),
+        ],
+        owned.fixture_scope.clone(),
+        owned.trust_revision,
+    );
+    let authority_a = swarm_web::PaeaGitCallSource::open(
+        source_a,
+        fixture_a.path.to_str().unwrap(),
+        &fixture_a.pin,
+    )
+    .unwrap();
+    let listener_a = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let service_a = NativeHttpService::open_git_call_with_approval(
+        &owned.service_path,
+        LocalWebAuthority::from_listener(&listener_a, KEY).unwrap(),
+        authority_a,
+        Some(approval_a),
+    )
+    .unwrap_or_else(|e| panic!("projectA approval bind refused: {:?}", e.code()));
+    // Bind state observed through the public status route, not assumed:
+    // capability bound:true, digest-only.
+    let status_a = get(&listener_a, &service_a, "/api/v1/paea/git-call/approval");
+    assert!(status_a.response.status().is_success());
+    let body_a: Value = serde_json::from_slice(status_a.response.body()).unwrap();
+    assert_eq!(body_a["bound"], true);
+    // Wrong physical root: a same-family approval preparation whose witness
+    // targets a DIFFERENT physically distinct project root. projectB is a
+    // second initialized project directory (never a copy of projectA's
+    // state); service_b is its separate service root. prepare_approval
+    // prepares its fresh witness against projectB. The held transfer
+    // authority stays the projectA source: at bind, bind_approval opens
+    // projectA (the held source's project path) and check_root compares the
+    // projectB witness — the exact physical mismatch under test. It must
+    // refuse typed.
+    let project_b_dir = tempfile::tempdir().unwrap();
+    fs::set_permissions(project_b_dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
+    let project_b = RootStore::initialize(project_b_dir.path(), &mut SystemEnvironment).unwrap();
+    // The REAL projectB's Trust snapshot is taken right after its actual
+    // initialization and BEFORE any preparation/bind: this is the basis the
+    // final no-mutation check compares (the service B snapshot below covers
+    // serviceB only, not projectB).
+    let project_b_before = service_trust_state(project_b_dir.path());
+    // serviceB's own Trust snapshot and its journals, same basis rule.
+    let service_b_state_before = service_trust_state(service_dir_b.path());
+    let intents_b_before =
+        sqlite_effect_journal_state(&service_dir_b.path().join(".swarm/state.db"));
+    let disposable_b = PaeaGitCallSource::new_transfer(
+        service_b
+            .paea_git_transfer_call(
+                &project_b,
+                // Distinct valid oid bytes: same canonical family, different
+                // action identity from projectA's actual candidate.
+                &proposal("fixture-project-wrong-root", &"d".repeat(40)),
+                &context(owned.trust_revision),
+                "fixture-project-wrong-root",
+                "bare",
+                PIN,
+                "transfer-pack",
+            )
+            .unwrap_or_else(|e| panic!("projectB preparation refused: {:?}", e)),
+        service_dir_b.path().to_path_buf(),
+        // The approval witness targets projectB's path (this source's own
+        // project path); the transfer witness binds serviceB/projectB. Only
+        // the approval witness of this source reaches the held projectA bind.
+        project_b_dir.path().to_path_buf(),
+    );
+    project_b.close().unwrap_or_else(|e| {
+        panic!(
+            "projectB explicit close refused: {:?}",
+            e.code()
+        )
+    });
+    let approval_wrong = disposable_b
+        .prepare_approval(
+            swarm_enrollment_authority::trust_action::Operation::Approve,
+            &approve,
+        )
+        .unwrap_or_else(|e| panic!("projectB approval preparation refused: {:?}", e.code()));
+    // Same enrollment fixture family: the provisioned permission is valid for
+    // the approval command bytes; only the PHYSICAL root differs. The wrong
+    // approval binds onto a held projectA transfer authority — a fresh
+    // authority from the SAME provisioned declaration, since the first one is
+    // already bound inside the live projectA service above.
+    let fixture_wrong = fixture::Fixture::build_for_trust_actions(
+        vec![approval_wrong.request().permission()],
+        owned.fixture_scope.clone(),
+        owned.trust_revision,
+    );
+    // The disposable projectB transfer source never binds a service; its held
+    // transfer witnesses are released through the established public path:
+    // open the provisioned authority, then close it explicitly (closing the
+    // authority closes the source's prepared witnesses and retains causes).
+    let disposable_authority = disposable_b
+        .open(fixture_wrong.path.to_str().unwrap(), &fixture_wrong.pin)
+        .unwrap_or_else(|e| panic!("projectB disposable authority refused: {:?}", e));
+    disposable_authority
+        .close()
+        .unwrap_or_else(|e| panic!("projectB disposable authority close refused: {:?}", e));
+    let source_a_wrong = PaeaGitCallSource::new_transfer(
+        service_b
+            .paea_git_transfer_call(
+                &owned.project,
+                &proposal(&owned.repository_id, &owned.candidate),
+                &context(owned.trust_revision),
+                &owned.work,
+                "bare",
+                PIN,
+                "transfer-pack",
+            )
+            .unwrap_or_else(|e| panic!("projectA wrong-holder preparation refused: {:?}", e)),
+        service_dir_b.path().to_path_buf(),
+        owned.project_path.clone(),
+    );
+    let wrong_authority = swarm_web::PaeaGitCallSource::open(
+        source_a_wrong,
+        fixture_wrong.path.to_str().unwrap(),
+        &fixture_wrong.pin,
+    )
+    .unwrap();
+    let listener_wrong = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let wrong_bind = NativeHttpService::open_git_call_with_approval(
+        service_dir_b.path(),
+        LocalWebAuthority::from_listener(&listener_wrong, KEY).unwrap(),
+        wrong_authority,
+        Some(approval_wrong),
+    );
+    // Wrong physical root refuses typed: the engine's physical-witness check
+    // finds the retained projectB approval witness beside the actually opened
+    // projectA root and refuses "trust-enrollment-root" through the Root
+    // wrapper. The refused bind consumed the supplied authority (approval
+    // witness included), so nothing further is opened or closed for it.
+    let bind_error = match wrong_bind {
+        Err(error) => error,
+        Ok(_) => panic!("wrong physical root bind must refuse"),
+    };
+    assert_eq!(
+        bind_error.code(),
+        "trust-enrollment-root",
+        "typed wrong-root refusal, got: {}",
+        bind_error.code()
+    );
+    // No mutation from either bind or refusal: all three Trust stores byte-
+    // identical (projectA, serviceA, the REAL projectB directory), the
+    // projectA managed refs listing and the explicit promotion-target-ref
+    // observation unchanged (absence stays absence — no ref was created), the
+    // durable effect journals of both service roots unchanged, and no
+    // approval was captured anywhere.
+    assert_eq!(
+        project_before,
+        service_trust_state(&owned.project_path),
+        "projectA trust state must stay byte-identical through valid and wrong binds"
+    );
+    assert_eq!(
+        service_before,
+        service_trust_state(&owned.service_path),
+        "serviceA trust state must stay byte-identical"
+    );
+    assert_eq!(
+        refs_before,
+        managed_git_refs(&owned.project_path, &owned.work),
+        "projectA managed refs listing must stay byte-identical through both binds"
+    );
+    assert_eq!(
+        target_ref_before,
+        managed_git_target_ref(&owned.project_path, &owned.work, "refs/heads/release"),
+        "the promotion target ref must stay explicitly absent from projectA"
+    );
+    assert_eq!(
+        intents_a_before,
+        sqlite_effect_journal_state(&owned.service_path.join(".swarm/state.db")),
+        "serviceA durable effect journals must stay unchanged through both binds"
+    );
+    assert_eq!(
+        project_b_before,
+        service_trust_state(project_b_dir.path()),
+        "the REAL projectB trust state must stay byte-identical through the wrong bind"
+    );
+    assert_eq!(
+        service_b_state_before,
+        service_trust_state(service_dir_b.path()),
+        "serviceB trust state must stay byte-identical through the wrong bind"
+    );
+    assert_eq!(
+        intents_b_before,
+        sqlite_effect_journal_state(&service_dir_b.path().join(".swarm/state.db")),
+        "serviceB durable effect journals must stay unchanged through the wrong bind"
+    );
+    assert!(owned
+        .project
+        .paea_git_agreement_match(&exact)
+        .unwrap()
+        .is_none());
+    let _ = service_a.close();
+    let _ = service_b.close();
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    let _ = fixture_a.close();
+    let _ = fixture_wrong.close();
+}
+
+/// The wrong ROLE through the same legitimate enrolled channel is a visible
+/// denial by the existing approve guard, never an approval: the project is
+/// configured so the enrolled principal maps to an identity WITHOUT the
+/// approver role (the single enrollment-principal mapping constraint means
+/// the request cannot mint another identity or role). The signed permission
+/// injected here — the approve trust-action permission of the frozen
+/// command — is deliberately VALID: the refusal under test is the project
+/// Trust ROLE guard (`approver`), a business denial, never a signed
+/// permission refusal and never `authorization_required`. The frozen approve
+/// command travels the same protected route under the same held authority —
+/// every gate before the guard passes (bound source, exact digest bytes,
+/// real personal password, physical witness, current revision) — and the
+/// engine's approve guard itself denies with no action mutation and no
+/// captured agreement. Observed effects, no more and no less: the public
+/// reply is the guard's own denial (HTTP 200 with `denied`, since the
+/// project-side refusal is a business reply, not a transport failure); the
+/// denial is RECORDED in the project's Trust journal (the trust state bytes
+/// change — evidence of the visible refusal, not a hidden success); the
+/// action stays `pending_approval`; no agreement matches the canonical
+/// bytes; the service root's Trust state, the projectA managed refs listing
+/// and the service root's durable effect journals stay byte-identical; and
+/// a legitimate replay of the same frozen bytes retains the same denial
+/// without a second journal entry. No Git execution happens on this route.
+///
+/// A missing Trust role is then recovered ONLY through the supported public
+/// producers — no minted grant, no JSON claims, no lowered guard: a real
+/// `config-apply` grants the `approver` role to the SAME enrolled identity
+/// (the single enrollment-principal mapping forbids any second mapping) and
+/// bumps the Trust revision. The bump deactivates the old mandate and stales
+/// the old signed enrollment grant (enrolled authentication checks revision
+/// equality; one enroll per enrollment id forbids appending), so the
+/// recovery re-runs the whole supported chain at the CURRENT revision: fresh
+/// recipe terms for the same canonical bytes, a NEW mandate and request
+/// through the real producers, a fresh transfer preparation, a new approval
+/// preparation, a new enrollment signed at the current revision and a REAL
+/// HTTP approval. The project guard then recognizes the exact same canonical
+/// bytes as a NEW agreement (approver `enrolled-effect`, new action id,
+/// current revision); a replay retains it with no second journal entry and
+/// an identical match; the denied action stays `pending_approval` forever;
+/// and the service Trust state, the managed refs, the target-ref absence and
+/// the durable journals stay byte-identical through the whole recovery.
+#[test]
+#[ignore = "requires explicit retained native source fixture"]
+fn approval_route_wrong_role_denies_without_approval_or_service_effects() {
+    // ProjectA uses the no-approver agreement config: the enrolled identity
+    // holds admin+effect but not approver; the separate simulator approver
+    // bearer exists but the route never accepts a bearer (its credential is
+    // the held personal password, and the enrolled mapping is the one used).
+    let owned = owned_agreement_no_approver();
+    // The exact canonical action bytes and the frozen approve command, built
+    // exactly like the positive test on this project's recipe terms.
+    let exact = swarm_protection_contract::canonicalize(
+        &proposal(&owned.repository_id, &owned.candidate),
+        &context(owned.trust_revision),
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    let terms = owned
+        .project
+        .paea_git_agreement_terms(&exact)
+        .unwrap()
+        .expect("recipe terms derivable for this canonical Git action");
+    let resource = terms.resource.clone();
+    let mandate_id = format!("wrong-role-mandate-{}", std::process::id());
+    let trust = |op: &str, value: Value, token: &str| -> Value {
+        serde_json::from_slice(
+            &owned
+                .project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+                .bytes,
+        )
+        .unwrap()
+    };
+    // Real producers on the project root: mandate-create needs the simulator
+    // admin bearer, request needs the requester bearer — neither needs the
+    // approver role, so the pending action exists before the route runs.
+    trust(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":format!("wrong-role-mandate-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+        }),
+        "fixture-admin-token",
+    );
+    let action: Value = trust(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":format!("wrong-role-request-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "resource":resource,
+            "amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+            "idempotency_key":format!("wrong-role-key-{mandate_id}"),
+        }),
+        "fixture-requester-token",
+    );
+    assert_eq!(action["state"], "pending_approval");
+    let approve = serde_json::to_vec(&json!({
+        "schema_version":1,
+        "event_id":format!("wrong-role-approve-{mandate_id}"),
+        "action_id":action["id"],
+        "mandate_id":mandate_id,
+        "content_digest":action["content_digest"],
+        "resource":resource,
+        "amount_minor":terms.amount_minor,
+        "currency":terms.currency,
+        "beneficiary":terms.beneficiary,
+    }))
+    .unwrap();
+    // Physical witnesses read before any bind: the project Trust state, the
+    // service Trust state, the managed refs listing, the explicit absence
+    // observation of the promotion target ref, and the durable effect
+    // journals (intents/promotions) through independent read-only
+    // connections. The denial below must change ONLY the project's own
+    // Trust journal (the denial itself is recorded there), nothing else.
+    let project_before = service_trust_state(&owned.project_path);
+    let service_before = service_trust_state(&owned.service_path);
+    let refs_before = managed_git_refs(&owned.project_path, &owned.work);
+    let target_ref_before =
+        managed_git_target_ref(&owned.project_path, &owned.work, "refs/heads/release");
+    let intents_before =
+        sqlite_effect_journal_state(&owned.service_path.join(".swarm/state.db"));
+    // Valid bind first: the same frozen bytes against projectA's own source.
+    // The bind checks the physical witness only; the role refusal comes
+    // later, from the engine's approve guard inside the business call.
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let approval = source
+        .prepare_approval(
+            swarm_enrollment_authority::trust_action::Operation::Approve,
+            &approve,
+        )
+        .unwrap_or_else(|e| panic!("approval preparation refused: {:?}", e.code()));
+    let fixture = fixture::Fixture::build_for_trust_actions(
+        vec![
+            owned.prepared_request_permission.clone(),
+            approval.request().permission(),
+        ],
+        owned.fixture_scope.clone(),
+        owned.trust_revision,
+    );
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let authority = swarm_web::PaeaGitCallSource::open(
+        source,
+        fixture.path.to_str().unwrap(),
+        &fixture.pin,
+    )
+    .unwrap();
+    let s = swarm_web::NativeHttpService::open_git_call_with_approval(
+        &owned.service_path,
+        LocalWebAuthority::from_listener(&listener, KEY).unwrap(),
+        authority,
+        Some(approval),
+    )
+    .unwrap_or_else(|e| panic!("approval bind refused: {:?}", e.code()));
+    let good = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(PASSWORD));
+    // Startup observation: the approval capability is public, bound,
+    // digest-only — the wrong role is invisible at the capability layer
+    // because the capability never carried roles.
+    let status = get(&listener, &s, "/api/v1/paea/git-call/approval");
+    assert!(status.response.status().is_success());
+    let status_body: Value = serde_json::from_slice(status.response.body()).unwrap();
+    assert_eq!(status_body["bound"], true);
+    assert_eq!(status_body["capability"]["operation"], "approve");
+    // The empty-body consumption under the correct held password reaches the
+    // engine's approve guard with the server-held frozen command: the enrolled
+    // identity lacks the approver role, so the guard denies. The route returns
+    // HTTP 200 — a business denial reply from the project root is the engine's
+    // typed outcome, not a transport error — with the guard's own denial state
+    // and no redaction bypass.
+    let denied = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call/approval",
+        Vec::new(),
+        Some(good.clone()),
+    );
+    assert!(
+        denied.response.status().is_success(),
+        "denial reply must be visible: {}",
+        String::from_utf8_lossy(denied.response.body())
+    );
+    assert!(denied.failure.is_none());
+    let denial: Value = serde_json::from_slice(denied.response.body()).unwrap();
+    assert_eq!(denial["state"], "denied");
+    assert_eq!(denial["business_mutated"], false);
+    assert_eq!(
+        denial["reason"],
+        "séparation demandeur/approbateur ou intégrité insuffisante"
+    );
+    // The denial is recorded in the project's OWN Trust journal: the project
+    // Trust state changed (visible refusal, not a hidden success). Every
+    // other witness is byte-identical: the service root's Trust state, the
+    // managed refs, the explicitly absent target ref and both journals.
+    let project_after = service_trust_state(&owned.project_path);
+    assert_ne!(
+        project_before, project_after,
+        "the visible denial must be recorded in the project Trust journal"
+    );
+    assert_eq!(
+        service_before,
+        service_trust_state(&owned.service_path),
+        "serviceA trust state must stay byte-identical through the denial"
+    );
+    assert_eq!(
+        refs_before,
+        managed_git_refs(&owned.project_path, &owned.work),
+        "projectA managed refs listing must stay byte-identical through the denial"
+    );
+    assert_eq!(
+        target_ref_before,
+        managed_git_target_ref(&owned.project_path, &owned.work, "refs/heads/release"),
+        "the promotion target ref must stay explicitly absent through the denial"
+    );
+    assert_eq!(
+        intents_before,
+        sqlite_effect_journal_state(&owned.service_path.join(".swarm/state.db")),
+        "serviceA durable effect journals must stay unchanged through the denial"
+    );
+    // The action stays pending: a role denial never mutates the action.
+    let view: Value =
+        serde_json::from_slice(&owned.project.trust("show", b"{}", "").unwrap().bytes).unwrap();
+    let shown = view["actions"][action["id"].as_str().unwrap()]
+        .clone();
+    assert!(
+        shown.is_object(),
+        "requested action present in the project Trust view"
+    );
+    assert_eq!(shown["state"], "pending_approval");
+    // No agreement matches the exact canonical bytes: a denial captures none.
+    assert!(owned
+        .project
+        .paea_git_agreement_match(&exact)
+        .unwrap()
+        .is_none());
+    // Legitimate replay: the same empty-body consumption retains the SAME
+    // denial reply (the engine's replay path), with no further journal growth
+    // beyond the first denial's change. The project state stays at the
+    // post-denial bytes; no second denial entry appears.
+    let replay = post(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call/approval",
+        Vec::new(),
+        Some(good),
+    );
+    assert!(replay.response.status().is_success());
+    let replay_denial: Value = serde_json::from_slice(replay.response.body()).unwrap();
+    assert_eq!(replay_denial["state"], "denied");
+    assert_eq!(replay_denial["reason"], denial["reason"]);
+    assert_eq!(
+        project_after,
+        service_trust_state(&owned.project_path),
+        "the replay must retain the recorded denial without a new journal entry"
+    );
+    let _ = s.close();
+
+    // ---- Legitimate recovery at the current revision ----
+    // The denial proved the missing Trust role. Recovery uses only supported
+    // public producers: a real config-apply grants the `approver` role to the
+    // SAME enrolled identity (no second mapping is mintable), which bumps the
+    // revision. That bump deactivates the old mandate and stales the old
+    // signed grant, so the recovery re-runs the whole supported chain at the
+    // new revision: fresh terms, new mandate + request, fresh transfer and
+    // approval preparations, a new enrollment grant signed at the current
+    // revision, a fresh bind and a REAL HTTP approval.
+    let view: Value =
+        serde_json::from_slice(&owned.project.trust("show", b"{}", "").unwrap().bytes).unwrap();
+    assert_eq!(view["revision"], owned.trust_revision);
+    let mut identities = view["identities"].clone();
+    for identity in identities.as_array_mut().unwrap() {
+        identity["disabled"] = false.into();
+        identity["token"] = match identity["subject"].as_str() {
+            Some("requester") => "fixture-requester-token".into(),
+            Some("approver") => "fixture-approver-token".into(),
+            Some("agreement-admin") => "fixture-admin-token".into(),
+            _ => Value::String(String::new()),
+        };
+    }
+    // The role grant touches ONLY the enrolled identity's role list; the
+    // enrollment principal mapping is preserved exactly as the engine's show
+    // view returned it (the mapping cannot be duplicated or reassigned).
+    let enrolled = identities
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|i| i["subject"] == "enrolled-effect")
+        .expect("enrolled identity present in the project Trust view");
+    let roles = enrolled["roles"].as_array().unwrap().clone();
+    assert!(
+        !roles.iter().any(|r| r == "approver"),
+        "precondition: the enrolled identity still lacks the approver role"
+    );
+    let mut granted = roles;
+    granted.push(json!("approver"));
+    enrolled["roles"] = Value::Array(granted);
+    let grant = serde_json::json!({
+        "schema_version":1,
+        "event_id":format!("wrong-role-recovery-{}", std::process::id()),
+        "expected_revision":owned.trust_revision,
+        "reason":"Public recovery: grant the approver role to the enrolled identity after a recorded role denial",
+        "policy":view["policy"],
+        "identities":identities,
+    });
+    owned
+        .project
+        .trust("config-apply", &serde_json::to_vec(&grant).unwrap(), "")
+        .unwrap_or_else(|e| panic!("recovery config-apply refused: {}", e.code()));
+    let new_revision = current_trust_revision(&owned.project_path);
+    assert_eq!(new_revision, owned.trust_revision + 1);
+    // The old mandate is deactivated by the revision bump; the old pending
+    // action can never be approved at the new revision. A NEW mandate and
+    // request through the real producers produce the fresh pending action.
+    let fresh_terms = owned
+        .project
+        .paea_git_agreement_terms(&exact)
+        .unwrap()
+        .expect("fresh recipe terms derivable for the same canonical bytes");
+    assert_eq!(fresh_terms.revision, new_revision);
+    let recovery_mandate_id = format!("wrong-role-recovery-mandate-{}", std::process::id());
+    trust(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":format!("wrong-role-recovery-mandate-{recovery_mandate_id}"),
+            "mandate_id":recovery_mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+        }),
+        "fixture-admin-token",
+    );
+    let fresh_action: Value = trust(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":format!("wrong-role-recovery-request-{recovery_mandate_id}"),
+            "mandate_id":recovery_mandate_id,
+            "resource":resource,
+            "amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+            "idempotency_key":format!("wrong-role-recovery-key-{recovery_mandate_id}"),
+        }),
+        "fixture-requester-token",
+    );
+    assert_eq!(fresh_action["state"], "pending_approval");
+    assert_ne!(
+        fresh_action["id"], action["id"],
+        "the recovery must be a NEW action, never the denied one"
+    );
+    let fresh_approve = serde_json::to_vec(&json!({
+        "schema_version":1,
+        "event_id":format!("wrong-role-recovery-approve-{recovery_mandate_id}"),
+        "action_id":fresh_action["id"],
+        "mandate_id":recovery_mandate_id,
+        "content_digest":fresh_action["content_digest"],
+        "resource":resource,
+        "amount_minor":terms.amount_minor,
+        "currency":terms.currency,
+        "beneficiary":terms.beneficiary,
+    }))
+    .unwrap();
+    // Fresh transfer preparation at the current revision: same canonical
+    // bytes, current admission context. The old preparation's witnesses stay
+    // frozen; this new preparation rebinds under the current revision.
+    let fresh_prepared = owned
+        .service
+        .paea_git_transfer_call(
+            &owned.project,
+            &proposal(&owned.repository_id, &owned.candidate),
+            &context(new_revision),
+            &owned.work,
+            "bare",
+            PIN,
+            "transfer-pack",
+        )
+        .unwrap_or_else(|e| panic!("recovery transfer preparation refused: {:?}", e));
+    let fresh_prepared_permission = fresh_prepared.request().permission();
+    let fresh_source = PaeaGitCallSource::new_transfer(
+        fresh_prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let fresh_approval = fresh_source
+        .prepare_approval(
+            swarm_enrollment_authority::trust_action::Operation::Approve,
+            &fresh_approve,
+        )
+        .unwrap_or_else(|e| panic!("recovery approval preparation refused: {:?}", e.code()));
+    // New enrollment at the CURRENT revision: the old grant cannot
+    // authenticate (enrolled authentication checks revision equality) and the
+    // journal accepts one enroll per enrollment id, so nothing can be
+    // appended to the old fixture.
+    let fresh_fixture = fixture::Fixture::build_for_trust_actions(
+        vec![
+            fresh_prepared_permission,
+            fresh_approval.request().permission(),
+        ],
+        owned.fixture_scope.clone(),
+        new_revision,
+    );
+    let fresh_listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let fresh_authority = swarm_web::PaeaGitCallSource::open(
+        fresh_source,
+        fresh_fixture.path.to_str().unwrap(),
+        &fresh_fixture.pin,
+    )
+    .unwrap();
+    let fresh_service = swarm_web::NativeHttpService::open_git_call_with_approval(
+        &owned.service_path,
+        LocalWebAuthority::from_listener(&fresh_listener, KEY).unwrap(),
+        fresh_authority,
+        Some(fresh_approval),
+    )
+    .unwrap_or_else(|e| panic!("recovery approval bind refused: {:?}", e.code()));
+    let fresh_good = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(PASSWORD));
+    // The recovered capability is bound again: public, digest-only status.
+    let fresh_status = get(&fresh_listener, &fresh_service, "/api/v1/paea/git-call/approval");
+    assert!(fresh_status.response.status().is_success());
+    let fresh_status_body: Value = serde_json::from_slice(fresh_status.response.body()).unwrap();
+    assert_eq!(fresh_status_body["bound"], true);
+    assert_eq!(fresh_status_body["capability"]["operation"], "approve");
+    // REAL HTTP approval under the same held password: an empty-body
+    // consumption of the freshly server-held command. The enrolled identity
+    // now holds the approver role at the current revision, so the engine's
+    // approve guard admits it and captures the agreement.
+    let approved = post(
+        &fresh_listener,
+        &fresh_service,
+        "/api/v1/paea/git-call/approval",
+        Vec::new(),
+        Some(fresh_good),
+    );
+    assert!(
+        approved.response.status().is_success(),
+        "recovery approval must succeed: {}",
+        String::from_utf8_lossy(approved.response.body())
+    );
+    assert!(approved.failure.is_none());
+    let published: Value = serde_json::from_slice(approved.response.body()).unwrap();
+    assert_eq!(published["state"], "approved");
+    assert_eq!(published["kind"], "trust-status-ack-v1");
+    assert_eq!(published["content_redacted"], true);
+    // The project guard now recognizes the EXACT same canonical bytes as a
+    // NEW agreement captured at the CURRENT revision by the enrolled identity.
+    let matched = owned
+        .project
+        .paea_git_agreement_match(&exact)
+        .unwrap()
+        .expect("recovered exact agreement recognized by the project guard");
+    assert_eq!(matched.action_id, fresh_action["id"].as_str().unwrap());
+    assert_eq!(matched.approver, "enrolled-effect");
+    assert_eq!(matched.revision, new_revision);
+    // The recovery's effects, no more and no less: the project Trust state
+    // changed (the grant + the new mandate/request/approval chain are all
+    // recorded there); every other witness stays byte-identical.
+    assert_ne!(
+        project_after,
+        service_trust_state(&owned.project_path),
+        "the recovery must be recorded in the project Trust journal"
+    );
+    let project_recovered = service_trust_state(&owned.project_path);
+    assert_eq!(
+        service_before,
+        service_trust_state(&owned.service_path),
+        "serviceA trust state must stay byte-identical through the recovery"
+    );
+    assert_eq!(
+        refs_before,
+        managed_git_refs(&owned.project_path, &owned.work),
+        "projectA managed refs listing must stay byte-identical through the recovery"
+    );
+    assert_eq!(
+        target_ref_before,
+        managed_git_target_ref(&owned.project_path, &owned.work, "refs/heads/release"),
+        "the promotion target ref must stay explicitly absent through the recovery"
+    );
+    assert_eq!(
+        intents_before,
+        sqlite_effect_journal_state(&owned.service_path.join(".swarm/state.db")),
+        "serviceA durable effect journals must stay unchanged through the recovery"
+    );
+    // The denied action stays pending forever; only the NEW action is
+    // approved. A role recovery never retroactively approves a denial.
+    let final_view: Value =
+        serde_json::from_slice(&owned.project.trust("show", b"{}", "").unwrap().bytes).unwrap();
+    let denied_still = final_view["actions"][action["id"].as_str().unwrap()].clone();
+    assert_eq!(denied_still["state"], "pending_approval");
+    let recovered = final_view["actions"][fresh_action["id"].as_str().unwrap()].clone();
+    assert_eq!(recovered["state"], "approved");
+    assert_eq!(recovered["approver"], "enrolled-effect");
+    // Replay the same empty-body recovery consumption: legitimate replay
+    // retains the same approval with no second journal entry and no second
+    // agreement.
+    let recovery_replay = post(
+        &fresh_listener,
+        &fresh_service,
+        "/api/v1/paea/git-call/approval",
+        Vec::new(),
+        Some(format!("Enrollment {}", URL_SAFE_NO_PAD.encode(PASSWORD))),
+    );
+    assert!(recovery_replay.response.status().is_success());
+    let replay_published: Value = serde_json::from_slice(recovery_replay.response.body()).unwrap();
+    assert_eq!(replay_published["state"], "approved");
+    assert_eq!(replay_published["kind"], "trust-status-ack-v1");
+    let matched_again = owned
+        .project
+        .paea_git_agreement_match(&exact)
+        .unwrap()
+        .expect("replayed agreement still recognized");
+    assert_eq!(matched_again, matched);
+    assert_eq!(
+        project_recovered,
+        service_trust_state(&owned.project_path),
+        "the replay must retain the approval without a new journal entry"
+    );
+    let _ = fresh_service.close();
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    fixture.close();
+    fresh_fixture.close();
+}
+
+/// Read the service root's bounded trust state bytes; empty ONLY when the file
+/// is genuinely absent (an unconfigured root), never as a fallback for other
+/// read errors. The route must never touch the service root: byte-equality
+/// before/after the approval is the direct physical witness of that separation.
+fn service_trust_state(root: &Path) -> Vec<u8> {
+    match fs::read(root.join(".swarm/trust-actions.json")) {
+        Ok(bytes) => bytes,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Vec::new(),
+        Err(e) => panic!(
+            "trust state read failed on {}: {e} (an actual read error is not an absence)",
+            root.display()
+        ),
+    }
+}
+
+/// Actual Git ref lines of the work's managed bare repository, through the
+/// real Git binary with the hardened environment (same pattern as the
+/// engine's transfer/promote tests). Output is the raw `for-each-ref
+/// --format` listing, hashed for a stable comparison basis.
+fn managed_git_refs(root: &Path, work: &str) -> String {
+    let git_dir = root
+        .join(".swarm/managed")
+        .join(work)
+        .join("repository.git");
+    let mut git = Command::new(git_executable());
+    for (key, _) in std::env::vars_os() {
+        if key.as_encoded_bytes().starts_with(b"GIT_") {
+            git.env_remove(key);
+        }
+    }
+    let out = git
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .args([
+            "--git-dir",
+            git_dir.to_str().expect("managed git dir encoding"),
+            "for-each-ref",
+            "--format=%(refname) %(objectname)",
+        ])
+        .output()
+        .expect("git for-each-ref must run");
+    assert!(
+        out.status.success(),
+        "git for-each-ref failed on {}: {}",
+        git_dir.display(),
+        String::from_utf8_lossy(&out.stderr)
+    );
+    String::from_utf8(out.stdout).expect("git ref listing utf-8")
+}
+
+/// Explicit observation of the promotion target ref through real Git:
+/// Some(oid) when the ref exists, None when rev-parse --verify fails. A
+/// successful exit with unexpected output still refuses here (typed panic),
+/// so absence is never confused with a silent failure.
+fn managed_git_target_ref(root: &Path, work: &str, ref_name: &str) -> Option<String> {
+    let git_dir = root
+        .join(".swarm/managed")
+        .join(work)
+        .join("repository.git");
+    let mut git = Command::new(git_executable());
+    for (key, _) in std::env::vars_os() {
+        if key.as_encoded_bytes().starts_with(b"GIT_") {
+            git.env_remove(key);
+        }
+    }
+    let out = git
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .args([
+            "--git-dir",
+            git_dir.to_str().expect("managed git dir encoding"),
+            "rev-parse",
+            "--verify",
+            "--quiet",
+            ref_name,
+        ])
+        .output()
+        .expect("git rev-parse must run");
+    if out.status.success() {
+        let oid = String::from_utf8(out.stdout).expect("git oid utf-8");
+        assert_eq!(oid.trim().len(), 40, "canonical oid shape");
+        Some(oid.trim().to_owned())
+    } else {
+        assert!(
+            out.stdout.is_empty(),
+            "failing rev-parse must not emit an oid: {}",
+            String::from_utf8_lossy(&out.stdout)
+        );
+        None
+    }
+}
+
+/// Count rows of the actual durable effect journals (Git intents, promotion
+/// effects) in a service root's state.db through an independent read-only
+/// connection — the same reader pattern the settlement tests use. Table
+/// absence is an explicit observation (count 0 plus an explicit marker),
+/// never an error and never fabricated state; real read errors refuse.
+fn sqlite_effect_journal_state(db_path: &Path) -> String {
+    let db = rusqlite::Connection::open_with_flags(
+        db_path,
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+    )
+    .unwrap_or_else(|e| panic!("read-only state.db open failed on {db_path:?}: {e}"));
+    let mut report = String::new();
+    for table in ["paea_git_intent_meta", "paea_git_intents", "paea_git_promote_meta", "paea_git_promote_effects"] {
+        let exists: i64 = db
+            .query_row(
+                "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?",
+                [table],
+                |r| r.get(0),
+            )
+            .unwrap_or_else(|e| panic!("sqlite_master read failed for {table}: {e}"));
+        let rows: i64 = if exists == 1 {
+            db.query_row(&format!("SELECT count(*) FROM {table}"), [], |r| r.get(0))
+                .unwrap_or_else(|e| panic!("count read failed for {table}: {e}"))
+        } else {
+            0
+        };
+        report.push_str(&format!("{table}:{exists}:{rows};"));
+    }
+    db.close()
+        .unwrap_or_else(|e| panic!("read-only state.db close failed: {e:?}"));
+    report
 }

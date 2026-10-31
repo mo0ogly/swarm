@@ -5,6 +5,10 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import unittest
 
 spec = importlib.util.spec_from_file_location('snapshot_tool', Path(__file__).with_name('snapshot.py'))
@@ -31,7 +35,7 @@ class SnapshotTests(unittest.TestCase):
         return root, path
 
     def test_witness_copies_only_declared_inputs_and_links_dependencies(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as tmp:
             root, recipe = self.repo(tmp)
             snap = Path(tmp) / 'snap'
             inventory = module.freeze(root, recipe, snap, ['deps'])
@@ -43,7 +47,7 @@ class SnapshotTests(unittest.TestCase):
             self.assertTrue((snap / '.snapshot-inventory.json').exists())
 
     def test_refusals(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as tmp:
             root, recipe = self.repo(tmp)
             existing = Path(tmp) / 'exists'
             existing.mkdir()
@@ -60,7 +64,7 @@ class SnapshotTests(unittest.TestCase):
                 module.freeze(root, recipe, Path(tmp) / 's3', [])
 
     def test_undeclared_embedded_input_is_refused_before_copy(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as tmp:
             root, recipe = self.repo(tmp)
             (root / 'src/lib.rs').write_text('const A: &str = include_str!(\n    "a.txt"\n);\n'
                                              'const B: &[u8] = include_bytes!("../deps/lib.js");\n')
@@ -82,7 +86,7 @@ class SnapshotTests(unittest.TestCase):
                 module.freeze(root, recipe, Path(tmp) / 'snap2', [])
 
     def test_end_to_end_run_passes_in_snapshot_and_fails_on_undeclared_read(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as tmp:
             root, recipe = self.repo(tmp)
             tool = Path(__file__).with_name('snapshot.py')
             ok = subprocess.run([sys.executable, str(tool), '--root', str(root), '--recipe', str(recipe),

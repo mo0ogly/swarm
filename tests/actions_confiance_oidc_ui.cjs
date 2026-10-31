@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('assert'),fs=require('fs'),path=require('path'),os=require('os'),http=require('http'),crypto=require('crypto'),cp=require('child_process'),pup=require('puppeteer');
 const groupMode=process.argv.includes('--group-mapping');let groupClaims=['employees','administrators'];const binary=path.resolve(process.argv[2]),outdir=path.resolve(process.argv[3]);fs.mkdirSync(outdir,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-oidc-ui-')),checks=[],errors=[],codes=new Map();let discovery=0,exchanges=0;
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-oidc-ui-')),checks=[],errors=[],codes=new Map();let discovery=0,exchanges=0;
 const keys=crypto.generateKeyPairSync('ec',{namedCurve:'prime256v1'}),jwk={...keys.publicKey.export({format:'jwk'}),kid:'ui-key',alg:'ES256',use:'sig'};
 const b64=v=>Buffer.from(typeof v==='string'?v:JSON.stringify(v)).toString('base64url'),challenge=s=>crypto.createHash('sha256').update(s).digest('base64url');
 const identities=[{subject:'admin',token:'admin-token-oidc-ui-recipe',integrity:3,roles:['admin']},{subject:'alice',token:'requester-token-oidc-ui-recipe',integrity:1,roles:['requester']},{subject:'bob',token:'approver-token-oidc-ui-recipe',integrity:2,roles:['approver']},{subject:'effect-service',token:'effect-token-oidc-ui-recipe',integrity:2,roles:['effect']}];

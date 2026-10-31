@@ -1,5 +1,36 @@
 # Graph workbench
 
+## Rust integration
+
+The native cockpit uses `web/cockpit-native-graph.js` on actual Work objects.
+Zoom buttons or Ctrl + wheel, fit, canvas panning, keyboard/pointer card handles,
+orientation and full screen are presentation preferences. Positions are local to
+the HTTP origin, Work and orientation; they change no revision or budget. Escape
+cancels an active drag before closing full screen. Full screen uses a native modal
+dialog for keyboard isolation and restores focus to its opener on close.
+
+“Add task” and card activation open the task form. Title, deliverable, criteria
+and prerequisites are explicitly saved through `/api/v1/action` (`task-add` →
+`task.add`, `task` → `task.update`). The engine retains session/CSRF, bound Root,
+revision, activity, reference and cycle checks. The minimap reflects moved cards. Connecting output and input ports by pointer
+or keyboard stages destination prerequisites in the task form; activating a link
+or pressing Delete stages removal. Gestures do not save. Selecting prerequisites
+adds or removes links for one task. Refusals retain inputs; uncertain outcomes prevent
+resubmission until closing and refreshing. Success requires a protected readback
+and waiting for cockpit observations to reload before closing the form. No agent starts. Managed plans retain their
+engine refusals.
+
+Run `tests/rust_graph_navigation.py --binary bin/swarm --output FRESH_DIRECTORY
+--editing` for the native journey. Without `--editing`, every presentation gesture
+must leave the Work identical. `--workspace-preview` is an iteration overlay and
+does not establish embedded resource delivery.
+
+**Migration limit:** atomic batch drafts, their engine preview and historical undo/redo are not yet connected to the Rust cockpit. The historical
+contract below remains the target for these capabilities, not evidence of native
+availability. [APEX recovery and open criteria](../plans/migration-rust/GRAPH-REGRESSION-20261031.md).
+
+## Historical workbench and remaining target
+
 The cockpit supports full screen, movable cards and visual dependency proposals.
 `web/graph-studio.js` reuses the local SVG/Dagre renderer, cockpit preferences and
 public graph draft API. It adds no remote dependency or private storage operation.

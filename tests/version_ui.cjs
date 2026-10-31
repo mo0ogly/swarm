@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),{spawn}=require('node:child_process'),puppeteer=require('puppeteer');
-const binary=path.resolve(process.argv[2]||'bin/swarm'),out=path.resolve(process.argv[3]||'test-results/version-ui'),root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-version-ui-'));
+const binary=path.resolve(process.argv[2]||'bin/swarm'),out=path.resolve(process.argv[3]||'test-results/version-ui'),root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-version-ui-'));
 const fixture=process.argv.includes('--fixture'),web=path.resolve(__dirname,'../web');fs.mkdirSync(out,{recursive:true});let server,browser,fixtureHealth;
 const errors=[],failed=[],checks=[];
 function run(args){return new Promise((resolve,reject)=>{const child=spawn(binary,args);let out='',err='';child.stdout.on('data',chunk=>out+=chunk);child.stderr.on('data',chunk=>err+=chunk);child.on('error',reject);child.on('exit',code=>code===0?resolve(out):reject(Error(`${args.join(' ')}: ${code}: ${err||out}`)))})}

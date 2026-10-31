@@ -14,6 +14,10 @@ from pathlib import Path
 import shutil
 import sys
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 
 from recorded_process import capture
 
@@ -149,7 +153,7 @@ def main():
     parser.add_argument('--output',type=Path)
     args=parser.parse_args()
     if args.output is None:
-        parent=Path(tempfile.mkdtemp(prefix='swarm-budget-proof-'))
+        parent=Path(tempfile.mkdtemp(prefix='swarm-budget-proof-', dir=fixture_area()))
         output=parent/'evidence'
     else:
         output=args.output.resolve()

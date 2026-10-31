@@ -1,0 +1,8 @@
+{
+  "scope": "Real post-gate control module in sparse fixture; no Root authority or normal-profile claim",
+  "producer": "rust/crates/swarm-engine/src/root_store/task_validation/biba.rs",
+  "precondition": "Same native boundary valid witnesses passed; public write-up reproduced separately",
+  "failure_original": "candidate-controls/profile/cargo.stdout",
+  "blocking_symbol": "root_store::CockpitAutonomyObservation",
+  "current_global_qualification": false
+}

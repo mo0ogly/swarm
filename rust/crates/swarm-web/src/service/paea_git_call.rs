@@ -76,6 +76,84 @@ impl PaeaGitCallSource {
             Prepared::Promote(_) => "promote",
         }
     }
+    /// Declared proposal to review verbatim; presentation only, no authority.
+    pub fn proposal(&self) -> &swarm_protection_contract::Proposal {
+        match &self.prepared {
+            Prepared::Transfer(prepared) => prepared.proposal(),
+            Prepared::Promote(prepared) => prepared.proposal(),
+        }
+    }
+    /// Declared admission context retained verbatim; not an attestation.
+    pub fn context(&self) -> &swarm_protection_contract::AdmissionContext {
+        match &self.prepared {
+            Prepared::Transfer(prepared) => prepared.context(),
+            Prepared::Promote(prepared) => prepared.context(),
+        }
+    }
+    /// Trusted startup path of the separate project root; never request data.
+    /// Exposed read-only for the preview route's own root observation.
+    pub fn project_path(&self) -> &std::path::Path {
+        &self.project_path
+    }
+    /// Freeze one exact business Trust command (operation + canonical bytes)
+    /// and prepare its fresh physical witness against THIS source's own project
+    /// root. Trusted startup input only: no grant, no approval captured. Must
+    /// run BEFORE `open()` — the exact `trust-action` permission derived from
+    /// these bytes (witness root digest + operation + request digest) is what
+    /// the operator provisions into the signed enrollment, so the held grant can
+    /// never authorize a different operation, root or command. The returned
+    /// source is bound to the authority with `open_git_call_with_approval`.
+    /// Errors: prepare, project-close and witness-close failures stay typed
+    /// `RootStoreError`s. On any failure path the opened project and any
+    /// acquired witness are closed explicitly and every cause is retained
+    /// (a successful witness beside a failed project close is itself closed
+    /// and its outcome joined); nothing is left open.
+    pub fn prepare_approval(
+        &self,
+        operation: swarm_enrollment_authority::trust_action::Operation,
+        command: &[u8],
+    ) -> Result<super::PaeaGitCallApprovalSource, RootStoreError> {
+        let project = RootStore::open(&self.project_path, true)?;
+        let result = project.trust_enrollment_request(operation, command);
+        let closed = project.close();
+        match (result, closed) {
+            (Ok(prepared), Ok(())) => Ok(super::PaeaGitCallApprovalSource {
+                prepared,
+                operation,
+                command: command.to_vec(),
+            }),
+            (Err(cause), Ok(())) => Err(cause),
+            // The prepared witness succeeded but the project root failed to
+            // close: close the owned witness explicitly and retain its own
+            // outcome beside the close cause (no cause is dropped or replaced
+            // by a bare code).
+            (Ok(witness), Err(cleanup)) => match witness.close() {
+                Ok(()) => Err(cleanup),
+                Err(witness_close) => Err(RootStoreError::Cleanup {
+                    primary: Some(Box::new(cleanup)),
+                    cleanup: Box::new(witness_close),
+                }),
+            },
+            (Err(cause), Err(cleanup)) => Err(RootStoreError::Cleanup {
+                primary: Some(Box::new(cause)),
+                cleanup: Box::new(cleanup),
+            }),
+        }
+    }
+    /// Compare both prepared physical witnesses against the actually opened
+    /// service and project roots, exactly as bind and consumption do; the
+    /// preview route uses this read-only observation, which performs no IO
+    /// beyond the witnesses' inode observation and grants no authority.
+    pub fn binding_matches(
+        &self,
+        project: &RootStore,
+        service: &RootStore,
+    ) -> Result<bool, RootStoreError> {
+        match &self.prepared {
+            Prepared::Transfer(prepared) => prepared.binding_matches(project, service),
+            Prepared::Promote(prepared) => prepared.binding_matches(project, service),
+        }
+    }
     /// Exact permission data to provision separately, never an issued grant.
     pub fn request(&self) -> &PaeaRequest {
         match &self.prepared {
@@ -90,6 +168,33 @@ impl PaeaGitCallSource {
             Prepared::Promote(prepared) => prepared.close(),
         }
     }
+    /// Read-only observation of the durable Trust approval binding these exact
+    /// canonical action bytes in the project root's own state, current at this
+    /// last use. One bounded Trust read under the shared reservation decides
+    /// both binding and freshness atomically; no approval is created, amended
+    /// or re-interpreted here.
+    fn agreement(
+        &self,
+        raw: &[u8],
+    ) -> Result<Option<swarm_engine::PaeaGitAgreementMatch>, E> {
+        let project = RootStore::open(&self.project_path, false)
+            .map_err(|cause| root("paea-git-call-agreement-open", cause))?;
+        let result = project.paea_git_agreement_match(raw);
+        let closed = project.close();
+        let value = match (result, closed) {
+            (Ok(value), Ok(())) => Ok(value),
+            (Ok(_), Err(cleanup)) => Err(root("paea-git-call-agreement-close", cleanup.into())),
+            (Err(cause), Ok(())) => Err(root("paea-git-call-agreement", cause)),
+            (Err(cause), Err(cleanup)) => Err(root(
+                "paea-git-call-agreement",
+                RootStoreError::Cleanup {
+                    primary: Some(Box::new(cause)),
+                    cleanup: Box::new(cleanup),
+                },
+            )),
+        };
+        value
+    }
 }
 /// Startup/close causes are independent; a close failure is never consumption.
 /// No path, pin, password, proposal or private nested diagnostic is formatted.
@@ -97,6 +202,41 @@ pub struct PaeaGitCallSourceError {
     pub startup: Option<authenticated_startup::Error>,
     pub authority_close: Option<CloseError>,
     pub prepared_close: Option<RootStoreError>,
+}
+
+/// One exact business Trust command frozen at trusted startup and bound to the
+/// prepared call's own project-root witness: the enrolled permission, the
+/// operation and the canonical bytes are fixed here, never by a request. No IO
+/// beyond the prepare-time witness, no grant, no captured approval.
+pub struct PaeaGitCallApprovalSource {
+    prepared: swarm_engine::TrustEnrollmentRequest,
+    operation: swarm_enrollment_authority::trust_action::Operation,
+    command: Vec<u8>,
+}
+impl PaeaGitCallApprovalSource {
+    /// Exact permission data to provision separately for the operator, never
+    /// an issued grant. The same digest pair the status route reports.
+    pub fn request(&self) -> &swarm_enrollment_authority::trust_action::Request {
+        self.prepared.request()
+    }
+    /// Frozen operation; the approval route accepts no other.
+    pub fn operation(&self) -> swarm_enrollment_authority::trust_action::Operation {
+        self.operation
+    }
+    /// Canonical command bytes frozen at startup; the request body must be
+    /// exactly these bytes (digest comparison), never a caller-selected term.
+    pub fn command(&self) -> &[u8] {
+        &self.command
+    }
+    /// Engine-side prepared enrollment request; consumed only by the guarded
+    /// `call_trust_as_enrolled` chain, never exposed through any request path.
+    pub(super) fn engine_request(&self) -> &swarm_engine::TrustEnrollmentRequest {
+        &self.prepared
+    }
+    /// Explicitly release the held project witness on every refusal path.
+    pub(super) fn close_prepared(self) -> Result<(), RootStoreError> {
+        self.prepared.close()
+    }
 }
 impl PaeaGitCallSourceError {
     /// Complete retained causes; source() alone cannot enumerate cleanup errors.
@@ -130,11 +270,31 @@ impl std::error::Error for PaeaGitCallSourceError {
     }
 }
 /// One exact prepared call plus its current held authority, kept alive until
-/// the single authenticated consumption or an explicit source close.
+/// the single authenticated consumption or an explicit source close. An
+/// optional prepared approval command (frozen operation + exact bytes bound to
+/// the same project root) may be attached before serving; it is the only
+/// sanctioned business-command channel onto the project root and nothing about
+/// it is selectable by a request.
 pub struct PaeaGitCallAuthority {
     source: PaeaGitCallSource,
     authority: AuthenticatedControl,
     head: Head,
+    approval: Option<super::PaeaGitCallApprovalSource>,
+}
+impl PaeaGitCallAuthority {
+    /// Read-only held authority/head access for the approval execution; both
+    /// stay owned here and are never exposed through any request path.
+    pub(super) fn approval_parts(&self) -> (&AuthenticatedControl, &Head) {
+        (&self.authority, &self.head)
+    }
+    /// Read-only observation of the bound approval, if any.
+    pub(super) fn bound_approval(&self) -> Option<&super::PaeaGitCallApprovalSource> {
+        self.approval.as_ref()
+    }
+    /// Attach the prepared approval as the single bound approval command.
+    pub(super) fn attach_approval(&mut self, source: super::PaeaGitCallApprovalSource) {
+        self.approval = Some(source);
+    }
 }
 impl PaeaGitCallSource {
     /// Open only an independently provisioned protected declaration/pin for
@@ -153,6 +313,7 @@ impl PaeaGitCallSource {
                 source: self,
                 authority,
                 head,
+                approval: None,
             }),
             Err(startup) => Err(PaeaGitCallSourceError {
                 startup: Some(startup),
@@ -163,6 +324,11 @@ impl PaeaGitCallSource {
     }
 }
 impl PaeaGitCallAuthority {
+    /// Read-only access to the held preparation for the preview route; no
+    /// consumption, close or authority operation is reachable through it.
+    pub(super) fn source(&self) -> &PaeaGitCallSource {
+        &self.source
+    }
     /// Public startup observation only; this does not authenticate the next
     /// call or promise that the held grant remains current. No secret body.
     pub(super) fn capability(&self) -> serde_json::Value {
@@ -219,6 +385,18 @@ impl PaeaGitCallAuthority {
             .collect::<String>();
         if digest != self.source.request().action_digest() {
             return Err(E::Refused("paea-git-call-request"));
+        }
+        // Captured-agreement guard: a durable Trust approval must bind these
+        // exact canonical bytes and still be current at last use (one locked
+        // read decides binding and freshness atomically). Absence, a non-exact
+        // approval, a pending/denied action, a superseded approval and a
+        // revision change since the approval are all the same explicit
+        // refusal — the browser provides neither authority nor a replacement
+        // action, and no fallback grants the call without a real agreement.
+        // This precedes any root open and never substitutes the engine-side
+        // authority, witness, plan and policy checks that follow.
+        if self.source.agreement(raw)?.is_none() {
+            return Err(E::Refused("paea-git-call-agreement"));
         }
         let service = RootStore::open(&self.source.service_path, true)
             .map_err(|cause| root("paea-git-call-open", cause))?;
@@ -315,14 +493,23 @@ impl PaeaGitCallAuthority {
     /// Explicitly release the held authority and the prepared witnesses after
     /// all requests drain or on any refusal; all independent causes retained.
     /// This neither revokes the signed grant nor removes any persisted data.
-    pub fn close(self) -> Result<(), PaeaGitCallSourceError> {
+    pub fn close(mut self) -> Result<(), PaeaGitCallSourceError> {
+        let approval_close = self.approval.take().map(|a| a.close_prepared().err());
         let authority_close = self.authority.close().err();
         let prepared_close = self.source.close_prepared().err();
-        if authority_close.is_some() || prepared_close.is_some() {
+        let approval_close = approval_close.flatten();
+        if authority_close.is_some() || prepared_close.is_some() || approval_close.is_some() {
             Err(PaeaGitCallSourceError {
                 startup: None,
                 authority_close,
-                prepared_close,
+                prepared_close: match (prepared_close, approval_close) {
+                    (None, None) => None,
+                    (Some(single), None) | (None, Some(single)) => Some(single),
+                    (Some(primary), Some(cleanup)) => Some(RootStoreError::Cleanup {
+                        primary: Some(Box::new(primary)),
+                        cleanup: Box::new(cleanup),
+                    }),
+                },
             })
         } else {
             Ok(())

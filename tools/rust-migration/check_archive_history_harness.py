@@ -15,6 +15,10 @@ import json
 from pathlib import Path
 import sqlite3
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 from types import SimpleNamespace
 
 
@@ -53,7 +57,7 @@ def check(source):
         held.append(connection)
         return connection
 
-    with tempfile.TemporaryDirectory(prefix='archive-sql-close-') as directory:
+    with tempfile.TemporaryDirectory(prefix='archive-sql-close-', dir=fixture_area()) as directory:
         root = Path(directory)
         (root / '.swarm').mkdir()
         with closing(sqlite3.connect(root / '.swarm/state.db')) as connection:

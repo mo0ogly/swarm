@@ -4,6 +4,7 @@ import json
 import re
 import subprocess
 import tempfile
+from fixture_area import fixture_area
 import time
 from pathlib import Path
 
@@ -98,7 +99,7 @@ def main():
         raise SystemExit('Test package inventory changed: update shard coverage before running.')
     # Build every package; the disjoint schedule covers the one discovered test package.
     subprocess.run(['go', 'build', './...'], check=True)
-    with tempfile.TemporaryDirectory(prefix='swarm-go-suite-') as folder:
+    with tempfile.TemporaryDirectory(prefix='swarm-go-suite-', dir=fixture_area()) as folder:
         binary = Path(folder)/'companion.test'
         subprocess.run(['go', 'test', '-c', '-o', str(binary), engine], check=True)
         listing = subprocess.run([str(binary), '-test.list', '.'], capture_output=True, text=True, check=True)

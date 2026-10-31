@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Public versioned connector contract recipe using an isolated server and no provider."""
 import argparse,hashlib,json,os,re,signal,subprocess,tempfile,time
+from fixture_area import fixture_area
 from pathlib import Path
 p=argparse.ArgumentParser();p.add_argument('--binary',type=Path,required=True);p.add_argument('--evidence-dir',type=Path,required=True);p.add_argument('--timeout-seconds',type=int,default=120);a=p.parse_args();assert a.timeout_seconds>0
 binary=a.binary.resolve();proof=a.evidence_dir.resolve();proof.mkdir(parents=True,exist_ok=True);checks=[];token='connector-admin-public-fixture'
@@ -13,7 +14,7 @@ def cli(root,namespace,op=None,body=None,origin=None,session='',expected=0,auth=
   raise AssertionError('public connector flow failed; private diagnostics retained')
  return json.loads(r.stdout if expected==0 else r.stderr)
 def command(event,rev,**kw):return dict(schema_version=1,event_id=event,expected_revision=rev,reason='isolated fixed corpus public recipe',**kw)
-with tempfile.TemporaryDirectory(prefix='swarm-connector-public-')as tmp:
+with tempfile.TemporaryDirectory(prefix='swarm-connector-public-', dir=fixture_area())as tmp:
  base=Path(tmp);root=base/'server';root.mkdir();absent=base/'client-absent';cli(root,'init');ids=[{'subject':s,'token':token if role=='admin'else s+'-connector-fixture','integrity':i,'roles':[role]}for s,i,role in [('admin',3,'admin'),('requester',1,'requester'),('approver',2,'approver'),('effect',2,'effect')]]
  cli(root,'trust','config-apply',dict(command('lab-config',0),policy={'mandate_ttl_seconds':3600,'unknown_reconcile_seconds':0,'evidence_retention_days':365,'require_separation':True},identities=ids))
  log=base/'server.log';fd=os.open(log,os.O_CREAT|os.O_WRONLY,0o600);server=subprocess.Popen([str(binary),'--root',str(root),'web','127.0.0.1:0'],stdout=fd,stderr=fd,start_new_session=True);os.close(fd)

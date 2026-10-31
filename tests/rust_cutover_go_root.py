@@ -15,6 +15,7 @@ from pathlib import Path
 import sqlite3
 import subprocess
 import tempfile
+from fixture_area import fixture_area
 
 from rust_agent_model_route import publish
 
@@ -37,7 +38,7 @@ def data(root, original=None):
 def run(go, rust, output):
     """Own all fixture writes; retain command bytes and refusal/recovery evidence."""
     output.mkdir(mode=0o700, parents=True, exist_ok=False)
-    root = Path(tempfile.mkdtemp(prefix='swarm-cutover-'))
+    root = Path(tempfile.mkdtemp(prefix='swarm-cutover-', dir=fixture_area()))
     publish(output / 'birth.json', {'kind': 'owned_inert_fixture_birth', 'root': str(root), 'go_sha256': hashlib.sha256(go.read_bytes()).hexdigest(), 'rust_sha256': hashlib.sha256(rust.read_bytes()).hexdigest(), 'live_database': False})
     checks = []
     calls = []

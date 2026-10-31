@@ -346,6 +346,8 @@ pub use root_store::{PaeaSettlementRequest,PaeaSettlementReceipt,PaeaSettlementO
 #[cfg(target_os = "linux")]
 pub use root_store::{PaeaGitTransferCall, PaeaGitTransferCallError, PaeaGitTransferReceipt};
 #[cfg(target_os = "linux")]
+pub use root_store::{PaeaGitAgreementMatch, PaeaGitAgreementTerms};
+#[cfg(target_os = "linux")]
 pub use root_store::{
     PaeaGitPromoteCall, PaeaGitPromoteCallError, PaeaGitPromoteOutcome, PaeaGitPromoteReceipt,
 };
@@ -623,6 +625,49 @@ pub use work::encode_public_model;
 mod web_session;
 #[cfg(target_os = "linux")]
 pub use web_session::{valid_web_session_credential, WebSessionCredential, WebSessionError};
+#[cfg(target_os = "linux")]
+mod web_login_ticket;
+#[cfg(target_os = "linux")]
+pub use web_login_ticket::{valid_web_login_ticket, WebLoginTicket, WebTicketUse};
+/// Failure issuing or consuming a cockpit login ticket: saved-settings causes
+/// (including historical absence of the v50 lifetime) are kept apart from
+/// storage/entropy causes. Display shows a stable code only, never a token.
+#[cfg(target_os = "linux")]
+pub enum WebTicketError {
+    Settings(RootStoreError),
+    Session(WebSessionError),
+}
+#[cfg(target_os = "linux")]
+impl WebTicketError {
+    /// Stable diagnostic family; no token, path or raw cause text.
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::Settings(_) => "web-ticket-settings",
+            Self::Session(e) => e.code(),
+        }
+    }
+}
+#[cfg(target_os = "linux")]
+impl std::fmt::Display for WebTicketError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.code())
+    }
+}
+#[cfg(target_os = "linux")]
+impl std::fmt::Debug for WebTicketError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.code())
+    }
+}
+#[cfg(target_os = "linux")]
+impl std::error::Error for WebTicketError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Settings(e) => Some(e),
+            Self::Session(e) => Some(e),
+        }
+    }
+}
 
 mod web_policy;
 pub use web_policy::{WebTransportConstraints, WebTransportPolicy, WEB_POLICY_FIELDS};

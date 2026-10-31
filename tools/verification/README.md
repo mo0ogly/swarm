@@ -51,6 +51,49 @@ compiler graph, feature, dependency and production-binary qualification. A manif
 grants no live-state, provider or deployment authority. Review a recipe whenever
 its consumed contract changes.
 
+### Interdiction /tmp et aire de fixtures — /tmp interdiction and fixture area
+
+Interdiction opérateur (2026-10-31) : aucune donnée du projet sous `/tmp` (tmpfs
+perdue au redémarrage ; les preuves conservées pointeraient vers des racines
+disparues). Tout root de fixture, scratch et scratch de preuve est alloué sous
+le **réglage Admin `runtime_temporary_directory`** (« Dossier temporaire », v51 ;
+défaut d'installation `<repo>/.swarm-fixtures/`, 0700, gitignored, chemin court
+pour rester sous la limite noyau des sockets AF_UNIX). Valeur enregistrée lue
+dans `.swarm/engine-settings.json`, sinon défaut livré ; `/tmp` refusé. Le moteur
+exporte aussi ce dossier comme `TMPDIR` au démarrage de chaque commande et de
+`web`. Le contrat unique est `tests/fixture_area.py`
+(`fixture_root(prefix)`, `fixture_area()`) et son miroir Node
+`tests/fixture_area.cjs`. Deux niveaux de couverture : (1) à la source —
+`tools/check_tmp_interdiction.py` scanne les allocations tempfile sans `dir=`
+et échoue s'il en reste (garde de non-récidive ; les lectures gettempdir sont
+signalées pour revue) ; (2) au runner — `recipe.py` épingle `TMPDIR` sous
+`<dossier temporaire configuré>/runner-tmp` pour la durée de chaque run, couvrant Python
+tempfile, Rust `env::temp_dir()`/TempDir, Node `os.tmpdir()` et Go
+`t.TempDir()` qui l'honorent ; `env::temp_dir()` ou `dir=` explicites
+contournant TMPDIR restent une obligation source. `mkstemp(dir=destination.
+parent)` est un échafaudage d'écriture atomique adjacente à la destination,
+pas une allocation de fixture : exempté.
+
+Operator interdiction (2026-10-31): no project data under `/tmp` (tmpfs dies on
+reboot; retained evidence would point at vanished roots). Every fixture root,
+scratch and evidence scratch is allocated under the **Admin setting
+`runtime_temporary_directory`** ("Temporary directory", v51; installation default
+`<repo>/.swarm-fixtures/`, 0700, gitignored, short path keeping AF_UNIX sockets
+under the kernel limit). The saved value is read from `.swarm/engine-settings.json`,
+else the shipped default; `/tmp` is refused. The engine also exports it as
+`TMPDIR` when every command and `web` start. The
+single contract is `tests/fixture_area.py` (`fixture_root(prefix)`,
+`fixture_area()`) and its Node mirror `tests/fixture_area.cjs`. Two coverage
+levels: (1) at source — `tools/check_tmp_interdiction.py` scans tempfile
+allocations without `dir=` and fails if any remain (non-regression guard;
+gettempdir reads are reported for review); (2) at runner — `recipe.py` pins
+`TMPDIR` under `<configured temporary directory>/runner-tmp` for each run, covering Python
+tempfile, Rust `env::temp_dir()`/TempDir, Node `os.tmpdir()` and Go
+`t.TempDir()` which honor it; `env::temp_dir()` or explicit `dir=` uses
+bypassing TMPDIR remain a source-level obligation. `mkstemp(dir=
+destination.parent)` is adjacent-to-destination atomic-write scaffolding, not
+fixture allocation: exempt.
+
 ### Instantané figé des entrées déclarées / Frozen declared-input snapshot
 
 Quand un autre travail modifie le checkout pendant un run (`source_stable: false`),
@@ -2307,6 +2350,25 @@ Owned source lane: `recipes/paea-native-git-source.json` requires the immutable
 `SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE` for the six binding/format cases and a
 separate newly owned `SWARM_PAEA_SOURCE_FIXTURE` produced by
 `rust_native_first_publication.py --binary IMAGE --profile PROFILE --output NEW`.
+Fixture lifecycle (verified 2026-10-31, operator interdiction): fixture roots
+must NOT live in `/tmp` — tmpfs dies on reboot, the retained evidence then
+points at a vanished root, and 16 recipes were found in exactly that state
+(`RootStore::open` fails `Err value: path`). Fixture roots are created under
+`<repo>/.swarm-fixtures/` (gitignored, 0700, short path so AF_UNIX sockets
+inside the root stay under the 108-byte kernel limit) by
+`rust_agent_model_route.fixture_root()`; that area holds fixture evidence, not
+a disposable cache, and survives reboot. Never copy a live fixture root;
+regenerate the fixture with `rust_native_first_publication.py` into a NEW
+`--output` directory (the script refuses an existing path), then repoint the
+recipe's `SWARM_PAEA_SOURCE_FIXTURE` env and `result.json` declared input.
+Until the Biba provider sandbox interacts with the managed-auto scenario
+control socket (see PAEA-APEX Increment113), regenerate with the retained
+sandbox-less binary `.cache/rust-migration-binaries/swarm-rust-b11b4baf…`
+plus its own verified profile, the combination the original fixtures were
+built from; recipe binary witnesses stay pinned to the delivered candidate.
+Never run a live fixture's provider program against its control socket; that
+collapses the scenario run. Remaining sweep: about 120 other test scripts
+still create `/tmp` evidence dirs and must migrate to `fixture_root()`.
 The source case checks actual shared-lane writer contention, retained custody
 after repository-capability close, wrong Root/candidate, bare and lock inode
 substitution/refusal/restoration, explicit source close/writer recovery and
@@ -2428,7 +2490,50 @@ behavior of the designated binary's CLI on isolated owned fixtures; it does not
 prove build-profile qualification, delivery provenance of the file, service
 installation, UID separation or any accepted live mission.
 
-Chaîne composée sur binaire livré : la recette `paea-delivered-chain-cli-rust`
+
+Promote CLI suite regression: `recipes/paea-promote-cli-suite-regression-rust.json`
+runs the whole `paea_promote` test binary in ONE process with
+`--include-ignored --test-threads=1` — the exact precondition under which the
+October 30 2026 suite regression reproduced. Historical guard: the harness
+derived Trust event/mandate ids from the process id alone, which is NOT
+run-unique inside one suite process, so the second `config-apply` on the shared
+retained fixture refused with `event_conflict` (`expected_revision` is part of
+the replay fingerprint) and six tests panicked at the fixture setup; the
+composed two-domain test additionally consumed an agreement seeded at the
+pre-revocation revision, refused by the documented last-use freshness guard
+`paea-git-promote-agreement-stale`. The harness now derives every id from a
+pid+atomic-sequence nonce, re-seeds a fresh agreement (real
+mandate/request/approve chain) before every expected successful commit after a
+revision change, and names the agreement admin token
+`fixture-agreement-admin-token` to match the harness'
+`fixture-{subject}-token` reconstruction convention (`show` never serializes
+tokens). The recipe asserts each of the seven previously failing named cases
+green plus `9 passed; 0 failed` overall. Limits: fixture authority, same UID,
+no human enrollment, no live mission, no delivery profile qualification; the
+delivered-binary witness steps stay in `paea-delivered-chain-cli-rust`.
+
+Régression de suite CLI promote : la recette
+`recipes/paea-promote-cli-suite-regression-rust.json` exécute tout le binaire
+de test `paea_promote` en UN processus avec `--include-ignored
+--test-threads=1` — la précondition exacte sous laquelle la régression de
+suite du 30 octobre 2026 s'est reproduite. Garde historique : le harnais
+dérivait les identifiants Trust (événements/mandats) du seul PID, qui n'est
+PAS unique à l'exécution dans un processus de suite ; le second `config-apply`
+sur la fixture retenue partagée refusait avec `event_conflict`
+(`expected_revision` fait partie de l'empreinte de rejeu) et six tests
+paniquaient à l'installation de fixture ; le test composé bi-domaines
+consommait en outre un accord semé à la révision d'avant-révocation, refusé
+par la garde de fraîcheur au dernier usage documentée
+`paea-git-promote-agreement-stale`. Le harnais dérive désormais chaque
+identifiant d'un nonce pid+séquence atomique, re-sème un accord frais (chaîne
+réelle mandat/requête/approbation) avant chaque commit réussi attendu après un
+changement de révision, et nomme le token admin `fixture-agreement-admin-token`
+conformément à la convention de reconstruction `fixture-{subject}-token` du
+harnais (`show` ne sérialise jamais les tokens). La recette affirme chacun des
+sept cas nommés auparavant en échec, plus `9 passed; 0 failed` au total.
+Limites : autorité fixture, même UID, pas d'enrôlement humain, pas de mission
+vivante, pas de qualification du profil livré ; les étapes témoin du binaire
+livré restent dans `paea-delivered-chain-cli-rust`.
 exécute le cas `delivered_chain_transfer_promote_replay_reconcile_once`, la
 sensibilité du garde de racine partagée et le garde de refus de mauvaise
 empreinte. Le harnais garde `CARGO_BIN_EXE_swarm-rust` par défaut, sans
@@ -2554,3 +2659,415 @@ les termes provisionnés exacts et la dette réglée une seule fois, lus aussi p
 des connexions SQLite lecture seule distinctes du CLI. Aucune preuve de
 séparation UID, de paiement réel ou d'acceptation indépendante n'est revendiquée
 par ce cas.
+
+## PAEA I16 stale lease after holder reopen / Ancien bail après reprise du porteur (PA-07)
+
+EN: `recipes/paea-i16-lease-reopen-rust.json` runs the named scenario
+`lease_reopen_case` in `tests/rust_planning_lease_reopen.py` against the frozen
+qualified native binary (`.cache/rust-migration-binaries/swarm-rust-1a021b7e…`,
+sha256 `1a021b7e…`) and its profile witness (`.cache/mission-watch-planning-
+hf3b_40f/run/profile.json`, `no_fixture_feature`, bound sha256). One owned
+inactive Root, one inert local provider held at an owned UNIX-socket barrier
+(SO_PEERCRED uid check + persisted `permitted` row with the exact pids), and
+public CLI operations only: the run owner is frozen (SIGSTOP) while the actual
+product lease expiry is observed through `expiry_ns` (no sleep, no agent clock
+as ordering source); the exact recorded run replay refuses
+`planning-run-already-recorded` and stale preview/renew replay the lease fence
+`stale_lease`, each verified for cause with unchanged Work, snapshot, ledger
+and provider marker before any new durable effect; public pause/resume reopen
+bumps every scope generation by 1 per control (witness 1 → reopened 3) and
+clears holder/lease_until (omitted from public JSON), after which the stale
+token is refused again (`stale_lease` at the reopened generation); the frozen
+owner is then released, self-refuses at its own `live()` fence (terminal
+`refused` disposition, bounded by the saved
+`agent_supervision_poll_interval_ms` cadence, not a watchdog), the registry
+releases execution ownership (`require_claim_available`), and the legitimate
+new acquisition succeeds exactly once (generation 4) with a second claim
+refusing `lease_busy`. Original ledger rows are compared exactly; the fresh
+claim adds exactly one reservation. Declared inputs cover the fence/registry
+contracts consumed by the case; `source_stable` compares their digests
+before/after the step. This proves planner/lifecycle lease semantics
+(I16/PA-07) on an isolated fixture; it is not a Git/settlement effect proof,
+authenticated identity, service installation or acceptance.
+
+FR : la recette `recipes/paea-i16-lease-reopen-rust.json` exécute le scénario
+nommé `lease_reopen_case` de `tests/rust_planning_lease_reopen.py` sur le
+binaire natif figé qualifié (`.cache/rust-migration-binaries/swarm-rust-
+1a021b7e…`, sha256 `1a021b7e…`) et son témoin de profil (`.cache/mission-watch-
+planning-hf3b_40f/run/profile.json`, `no_fixture_feature`, empreinte liée).
+Une Root inactive possédée, un fournisseur local inerte retenu à une barrière
+socket UNIX possédée (contrôle SO_PEERCRED + ligne `permitted` persistée avec
+les pids exacts) et uniquement des opérations CLI publiques : le porteur du
+run est gelé (SIGSTOP) pendant que le dépassement réel du bail produit est
+observé via `expiry_ns` (aucun sleep, aucun ordre par horloge d'agent) ; le
+rejeu exact du run enregistré refuse `planning-run-already-recorded` et les
+rejeux preview/renew périmés traversent le fence du bail `stale_lease`, chacun
+vérifié en cause avec Work, snapshot, ledger et marqueur fournisseur inchangés
+avant tout nouvel effet durable ; la reprise publique pause/resume incrémente
+la génération de chaque portée d'un par contrôle (témoin 1 → reopen 3) et vide
+holder/lease_until (omis du JSON public) ; le jeton périmé est alors refusé à
+nouveau (`stale_lease` sur la génération rouverte) ; le porteur gelé est
+libéré, se refuse à son propre fence `live()` (disposition terminale `refused`,
+bornée par la cadence sauvegardée `agent_supervision_poll_interval_ms`, pas un
+watchdog), le registre libère la propriété d'exécution
+(`require_claim_available`), et la nouvelle acquisition légitime réussit
+exactement une fois (génération 4), un second claim refusant `lease_busy`. Les
+lignes d'origine du ledger sont comparées exactement ; le nouveau claim ajoute
+exactement une réservation. Les entrées déclarées couvrent les contrats
+fence/registre consommés par le cas ; `source_stable` compare leurs empreintes
+avant/après l'étape. Ceci prouve la sémantique de bail planificateur/cycle de
+vie (I16/PA-07) sur une fixture isolée ; ce n'est ni une preuve d'effets
+Git/règlement, d'identité authentifiée, d'installation de service ni
+d'acceptation.
+
+## Recette paea-git-call-preview-rust (aperçu protégé de l'action préparée)
+
+FR : la recette `recipes/paea-git-call-preview-rust.json` exécute le contrôle
+permanent du raccord I04/PA-08 : la route de lecture
+`GET/HEAD /api/v1/paea/git-call/preview` présente l'action préparée exacte
+détenue par le moteur à un approbateur futur. Quatre étapes : absence
+explicite sans source liée (`available:false` + raison, refus typés de forme) ;
+aperçu exact avec fixture native retenue (--ignored : proposal/context
+verbatim, identité canonique recalculée et comparée, témoins des racines,
+révision de confiance courante, aucun consentement ni consommation — le POST
+gardé reste `bound:true` ensuite) ; actifs embarqués de la page
+`paea-effects.html` étendue (section aperçu, aucun bouton de consentement) ;
+catalogue i18n généré à jour. `source_stable` compare les empreintes des
+entrées déclarées avant/après l'étape ; la fixture source vit en tmpfs
+(chemin persisté dans le dossier de preuve, régénérable par la voie
+documentée `tests/rust_native_first_publication.py`). Ceci prouve la
+présentation de l'action préparée seulement : aucun consentement capturé,
+aucun grant, aucun appel exécuté, aucune acceptation.
+
+## Recipe paea-git-call-preview-rust (protected preview of the prepared action)
+
+EN: `recipes/paea-git-call-preview-rust.json` runs the permanent check of the
+I04/PA-08 connection: the read route `GET/HEAD /api/v1/paea/git-call/preview`
+presents the exact prepared action held by the engine to a future approver.
+Four steps: explicit absence without a bound source (`available:false` +
+reason, typed shape refusals); exact preview with the retained native fixture
+(--ignored: proposal/context verbatim, recomputed and compared canonical
+identity, root witnesses, current Trust revision, no consent and no
+consumption — the guarded POST stays `bound:true` afterwards); embedded
+assets of the extended `paea-effects.html` page (preview section, no consent
+button); up-to-date generated i18n catalog. `source_stable` compares declared
+input digests before/after the steps; the source fixture lives on tmpfs (path
+persisted in the evidence directory, regenerable by the documented
+`tests/rust_native_first_publication.py` path). This proves presentation of
+the prepared action only: no consent captured, no grant, no executed call,
+no acceptance.
+
+## Recette paea-git-call-agreement-terms-rust (termes d'accord exacts dans l'aperçu)
+
+FR : la recette `recipes/paea-git-call-agreement-terms-rust.json` exécute le
+contrôle permanent de la tranche PA08 des termes exacts : le champ
+`agreement_terms` de l'aperçu protégé expose, pour LES octets canoniques de
+l'action préparée, les termes que la garde d'accord existante reconnaît —
+dérivés moteur par la recette fixe `paea-git-agreement-v1`
+(`paea_git_agreement_terms`, type public `PaeaGitAgreementTerms` exporté par
+swarm-engine), jamais calculés ni choisis par le navigateur. Cinq étapes :
+observation moteur accord+termes (7 tests, dont la boucle termes→approve
+réel→match de la garde) ; absence explicite sans source liée ; aperçu exposant
+les termes exacts (binding `recipe`, ressource projet/dépôt/réf/candidat,
+montant 1, devise OID, bénéficiaire = OLD, révision courante, `action_id`
+vide placeholder) ; parcours complet termes→capture via les producteurs Trust
+réels du root projet→reconnaissance exacte par la garde (mauvais rôle et
+termes dérivés refusés, autre candidat jamais reconnu) ; catalogue i18n. La
+frontière observée est documentée : la route HTTP `/api/v1/trust-actions`
+sert le root SERVICE et refuse un bearer métier
+(`authorization_required`) — le routage du canal d'approbateur authentifié
+est la tranche suivante, non implémentée ici. Fixture native liée au dossier
+de preuve (producteur documenté, régénérable) ; `source_stable` compare les
+empreintes des entrées déclarées avant/après. Ceci prouve l'exposition en
+lecture seule des termes exacts et leur correspondance avec la garde : aucun
+consentement capturé, aucun grant, aucun appel exécuté, aucune identité
+créée, aucune acceptation.
+
+## Recipe paea-git-call-agreement-terms-rust (exact agreement terms in the preview)
+
+EN: `recipes/paea-git-call-agreement-terms-rust.json` runs the permanent
+check of the PA08 exact-terms tranche: the `agreement_terms` field of the
+protected preview exposes, for the canonical bytes of the prepared action,
+the terms the existing agreement guard recognizes — derived engine-side by
+the fixed `paea-git-agreement-v1` recipe (`paea_git_agreement_terms`, public
+type `PaeaGitAgreementTerms` exported by swarm-engine), never computed or
+selected by the browser. Five steps: engine agreement+terms observation (7
+tests, including the terms→real approve→guard-match loop); explicit absence
+without a bound source; preview exposing the exact terms (binding `recipe`,
+project/repository/ref/candidate resource, amount 1, currency OID,
+beneficiary = OLD, current revision, empty placeholder `action_id`); full
+journey terms→capture through the PROJECT root's real Trust producers→exact
+guard recognition (wrong role and drifted terms denied, another candidate
+never matched); i18n catalog. The observed boundary is documented: the
+`/api/v1/trust-actions` HTTP route serves the SERVICE root and refuses a
+business bearer (`authorization_required`) — routing the authenticated
+approver channel is the NEXT tranche, not implemented here. Native fixture
+bound to the evidence directory (documented producer, regenerable);
+`source_stable` compares declared input digests before/after the steps. This
+proves read-only exposure of the exact terms and their agreement with the
+guard: no consent captured, no grant, no executed call, no identity created,
+no acceptance.
+
+## Recette paea-git-call-approval-rust (canal d'approbation protégé)
+
+FR : la recette `recipes/paea-git-call-approval-rust.json` exécute le contrôle
+permanent du canal HTTP `POST /api/v1/paea/git-call/approval` sur le test
+`paea_git_call` de swarm-web. Six étapes nommées : observation moteur des
+accords (7 tests `root_store::paea_git_agreement`) ; parcours positif
+`approval_route_captures_project_agreement_and_refuses_wrong_body_revision`
+(capture d'accord + refus corps/révision modifiés) ;
+`approval_route_wrong_role_denies_without_approval_or_service_effects` —
+acteur réellement enrôlé mais sans le rôle Trust `approver` : la permission
+signée injectée est VOLONTAIREMENT valide, le refus est la garde RÔLE du
+projet (refus métier HTTP 200 `denied`, enregistré au journal Trust projet,
+action intacte `pending_approval`, aucun accord, refs/journaux/Trust service
+octet pour octet inchangés, rejeu stable) PUIS reprise légitime réelle par
+les seuls producteurs publics (`config-apply` accordant `approver` à la
+MÊME identité enrôlée → révision+1, anciens mandat/grant invalidés, NOUVEAU
+mandat+requête, préparation transfert+approbation fraîches, NOUVEAU grant
+enrôlement signé à la révision courante, re-bind, POST HTTP réel →
+`approved`/`trust-status-ack-v1`, garde projet reconnaît les MÊMES octets
+canoniques comme NOUVEL accord à la révision courante, rejeu sans second
+entrant de journal, action refusée jamais rétro-approuvée) ; consommation
+avec accord capturé ; annulation d'accord après changement de révision ;
+aperçu d'action liée. Fixture native tmpfs via
+`SWARM_PAEA_SOURCE_FIXTURE` (producteur documenté
+`tests/rust_native_first_publication.py`, jamais la tmpfs saturée
+`/tmp/swarm-model83-0cxbra65`) ; chaque étape affine un `--exact --ignored`
+nommé. Ceci prouve le canal d'approbation protégé et sa reprise par rôle sur
+fixture isolée : aucun commit/push Git, aucun règlement, aucun enrôlement
+humain, aucune acceptation ; les étapes non couvertes par cette recette
+(autres tests du binaire, profils livrés) restent non rejugées ici.
+
+## Recipe paea-git-call-approval-rust (protected approval channel)
+
+EN: `recipes/paea-git-call-approval-rust.json` runs the permanent check of
+the `POST /api/v1/paea/git-call/approval` channel on the swarm-web
+`paea_git_call` test binary. Six named steps: engine agreement observation
+(7 `root_store::paea_git_agreement` tests); the positive journey
+`approval_route_captures_project_agreement_and_refuses_wrong_body_revision`
+(agreement capture + modified body/revision refusals);
+`approval_route_wrong_role_denies_without_approval_or_service_effects` — an
+actually enrolled actor WITHOUT the Trust `approver` role: the injected
+signed permission is deliberately VALID, the refusal under test is the
+project's ROLE guard (HTTP 200 business `denied`, recorded in the project
+Trust journal, action intact `pending_approval`, no agreement, refs/
+journals/service Trust byte-identical, stable replay) THEN a real
+legitimate recovery through supported public producers only (`config-apply`
+granting `approver` to the SAME enrolled identity → revision+1, old
+mandate/grant invalidated, NEW mandate+request, fresh transfer+approval
+preparations, NEW enrollment grant signed at the current revision, re-bind,
+real HTTP POST → `approved`/`trust-status-ack-v1`, project guard recognizes
+the SAME canonical bytes as a NEW agreement at the current revision, replay
+without a second journal entry, denied action never retro-approved);
+consumption with a captured agreement; agreement void after a revision
+change; bound-action preview. Native tmpfs fixture via
+`SWARM_PAEA_SOURCE_FIXTURE` (documented producer
+`tests/rust_native_first_publication.py`, never the saturated
+`/tmp/swarm-model83-0cxbra65` tmpfs); each step pins one named
+`--exact --ignored` case. This proves the protected approval channel and
+its role recovery on an isolated fixture: no Git commit/push, no settlement,
+no human enrollment, no acceptance; steps not covered by this recipe (the
+binary's other tests, delivered profiles) remain un-replayed here.
+
+## Recette paea-consent-ui-rust (surface navigateur du consentement approbateur)
+
+FR : la recette `recipes/paea-consent-ui-rust.json` qualifie la surface
+navigateur `/paea-consent.html` du consentement approbateur. Cinq étapes :
+aperçu explicite d'indisponibilité sans source liée (test nommé
+`approval_presentation_reports_explicit_absence_without_source`) ; actifs
+embarqués (`paea_consent_page`, contrat corps vide détenu par le service :
+aucune entrée fichier, POST unique, refus sans session 403, catalogue EN) ;
+catalogue i18n ; construction du binaire de test navigateur (élagage des
+binaires antérieurs du même nom dans le CARGO_TARGET_DIR partagé, touch du
+fichier embarquant, puis `cargo test --no-run`) ; qualification navigateur
+réelle (`paea_consent_browser` + `tests/paea_consent_ui.cjs` via le driver
+`tests/paea_consent_ui_recipe.py`) : serveur réellement lié par
+`NativeHttpServer::bind_git_call_with_approval`, page servie aux octets
+embarqués, formulaire FR/EN deux thèmes sans débordement, corps non vide
+(octets dérivés, bon mot de passe) → refus typé visible
+`paea-git-call-approval-request` via fetch d'origine page, corps vide + mot
+de passe erroné → `authorization_required` FR/EN, journal Trust projet
+octet-identique après chaque refus, échos console Chrome des refus attendus
+comptés un pour un, approbation jamais consommée. Fixture native tmpfs via
+`SWARM_PAEA_SOURCE_FIXTURE` (producteur
+`tests/rust_native_first_publication.py`). Ceci prouve la surface navigateur
+sur les deux refus typés : aucune consommation d'approbation, aucun
+enrôlement humain, aucun appel Git, aucune acceptation ; le parcours
+d'approbation effectif (mot de passe correct → consommation) reste prouvé
+par `paea-git-call-approval-rust.json` et le test route, pas par un
+navigateur.
+
+## Recipe paea-consent-ui-rust (approver-consent browser surface)
+
+EN: `recipes/paea-consent-ui-rust.json` qualifies the approver-consent
+browser surface `/paea-consent.html`. Five steps: explicit unavailability
+presentation without a bound source (named test
+`approval_presentation_reports_explicit_absence_without_source`); embedded
+assets (`paea_consent_page`, held-by-service empty-body contract: no file
+input, single POST, no-session refusal 403, EN catalog); i18n catalog;
+browser test-binary build (pruning prior same-name binaries from the shared
+CARGO_TARGET_DIR, touching the embedding file, then `cargo test --no-run`);
+real-browser qualification (`paea_consent_browser` +
+`tests/paea_consent_ui.cjs` via driver `tests/paea_consent_ui_recipe.py`):
+server really bound by `NativeHttpServer::bind_git_call_with_approval`,
+page served from the embedded bytes, FR/EN both-themes form without
+overflow, non-empty body (drifted bytes, good password) → visible typed
+refusal `paea-git-call-approval-request` via page-origin fetch, empty body +
+wrong password → `authorization_required` FR/EN, project Trust journal
+byte-identical after each refusal, Chrome console echoes of expected refusals
+counted one for one, approval never consumed. Native tmpfs fixture via
+`SWARM_PAEA_SOURCE_FIXTURE` (producer
+`tests/rust_native_first_publication.py`). This proves the browser surface
+on the two typed refusals: no approval consumption, no human enrollment, no
+Git call, no acceptance; the effective approval journey (correct password →
+consumption) stays proven by `paea-git-call-approval-rust.json` and the
+route test, not by a browser.
+
+Cockpit / identity-Biba compatibility: `recipes/cockpit-biba-identity-compatibility.json` runs the public safe-I0 control, Root-workspace pre-exec refusal and original-inode recovery on `SWARM_COCKPIT_BIBA_BINARY`. It is a scoped compatibility proof, not global Biba or cryptographic identity acceptance; retained native execution outcomes, not CLI exit0 alone, determine the result.
+
+## Recette paea-approval-form-rust (formulaire d'approbation consommé, fraîche puis périmée)
+
+FR : la recette `recipes/paea-approval-form-rust.json` qualifie de bout en
+bout le formulaire d'approbation déjà implémenté
+(`web/paea-approval-form.js`, section « Approbation » de `paea-effects.html`,
+route `POST /api/v1/paea/git-call/approval` à corps vide, commande figée
+détenue côté service) sur le contrat conservé, sans redesign. Six étapes :
+trois tests Rust `--exact` (absence explicite sans source liée, projection
+figée commandes+termes, actifs embarqués de la page) ; catalogue i18n à jour
+(`node scripts/i18n/build.cjs --check`) ; binaire de test reconstruit par
+flux CargoJSON (`cargo test --no-run --message-format=json`, touch du fichier
+embarquant) ; qualification navigateur réelle via le driver
+`tests/paea_approval_form_ui_recipe.py` (binaire résolu par le flux
+`compiler-artifact` — jamais par mtime —, deux canaux enfants streamés et
+drainés avant tout verdict, digest du binaire exécuté avant/après) et le
+harnais `tests/paea-approval-form-ui.cjs` : serveur natif réellement lié,
+vrai Chrome, une consommation explicite à corps vide via le formulaire avec
+le mot de passe fixture étiqueté (auth simulée), rejeu à révision courante =
+ack enregistré 200 `trust-status-ack-v1`, puis `config-apply` Trust réel
+(révision +1) : péremption visible FR/EN sans confirmation ni normalisation,
+refus post-péremption typé 403 par le même canal réel (l'autorité enrôlée
+détenue est liée à la révision consommée — le chemin rejeu est inatteignable
+après la mutation, jamais de re-consommation ni de re-approbation), 4
+contrôles harnais exigés par le driver, 5 refus attendus classés un pour un
+(réponse + écho console), arrêt owned (`phase2.done` → marqueur stop →
+`serve_until` fermé vérifié). Marqueurs publiés atomiquement (tmp+rename) :
+le sondage Rust à 100 ms ne voit jamais un fichier tronqué. Écriture de
+preuve NEUVE exigée (`recipe-output-must-be-new-outside-live-state`) ; les
+tentatives en échec restent conservées intactes. Limites : auth simulée
+étiquetée, aucune présence humaine, aucun enrôlement réel, aucun appel Git,
+aucune acceptation ; la consommation correcte n'est prouvée que sur cette
+fixture owned, jamais sur la base live.
+
+## Recipe paea-approval-form-rust (consumed approval form, fresh then stale)
+
+EN: `recipes/paea-approval-form-rust.json` qualifies end to end the
+already-implemented approval form (`web/paea-approval-form.js`, the
+"Approbation" section of `paea-effects.html`, route
+`POST /api/v1/paea/git-call/approval` with an empty body, frozen command
+held server-side) on the conserved contract, no redesign. Six steps: three
+`--exact` Rust tests (explicit absence without a bound source, frozen
+commands+terms projection, embedded page assets); up-to-date i18n catalog
+(`node scripts/i18n/build.cjs --check`); test binary rebuilt from the
+CargoJSON stream (`cargo test --no-run --message-format=json`, embedding
+file touched); real-browser qualification via driver
+`tests/paea_approval_form_ui_recipe.py` (binary resolved from the
+`compiler-artifact` stream — never mtimes —, both child channels streamed
+and drained before any verdict, executed-binary digest before/after) and
+harness `tests/paea-approval-form-ui.cjs`: really bound native server, real
+Chrome, one explicit empty-body consumption through the form with the
+labeled fixture password (simulated auth), replay at current revision =
+recorded 200 `trust-status-ack-v1` ack, then a real Trust `config-apply`
+(revision +1): visible FR/EN staleness with no confirmation and no
+normalization, post-stale typed 403 refusal over the same real channel (the
+held enrolled authority is bound to the consumed revision — the replay path
+is unreachable after the mutation, never a re-consumption or re-approval),
+4 harness checks enforced by the driver, 5 expected denials classified one
+for one (response + console echo), owned shutdown (`phase2.done` → stop
+marker → verified-closed `serve_until`). Markers published atomically
+(tmp+rename): the Rust 100ms poll never observes a truncated file. Fresh
+proof writing enforced (`recipe-output-must-be-new-outside-live-state`);
+failed attempts stay retained intact. Limits: labeled simulated auth, no
+human presence, no real enrollment, no Git call, no acceptance; the correct
+consumption is proven only on this owned fixture, never on the live base.
+
+### I15 mutation forces re-admission / La mutation force la réadmission
+
+FR : `recipes/paea-i15-tool-substitution-rust.json` qualifie la barrière
+I15 sur la barrière produit réelle, en deux tests nommés `--exact` du module
+`agent_execution_preflight::tests` (swarm-engine) : (1)
+`preflight_admitted_provider_artifact_mutation_refuses_before_consumption_and_recovers`
+— substitution réelle d'un artefact admis : refus typé
+`agent-execution-preflight-changed` avant consommation, aucun effet SQL, la
+restauration des octets exacts revalide la même intention (Incrément101) ;
+(2) `preflight_admitted_artifact_mutation_forces_fresh_admission_binding_mutated_digest`
+— après mutation, l'admission retenue est une fin de voie : le rejeu du même
+event id retourne l'agent en file sans ré-observation, une admission parallèle
+est refusée `agent-launch-workspace-busy`, l'annulation règle l'intention
+(agent `interrupted`, tâche bloquée, révision work +1, réservations libérées),
+la réadmission à nouvel event id lie les octets mutés (nouvelle portée preflight
+différente), la restauration des octets d'origine refuse la consommation du
+nouvel agent et l'agent annulé n'est plus jamais consommable (Incrément112,
+`evidence/claude-i15-readmission-20261031T100227Z/`). Fournisseur = copie
+test-owned sous la racine de fixture, jamais un binaire partagé ; aucune base
+live, aucun processus enfant. Exécution fraîche puis `recipe.py verify` sur le
+dossier de preuve ; entrées déclarées étendues à `agent_store.rs` et
+`root_store.rs`. Portée : fixture same-UID, données fictives ; aucune preuve
+d'enrôlement humain, de séparation UID ou d'acceptation indépendante.
+
+EN: `recipes/paea-i15-tool-substitution-rust.json` qualifies the I15 barrier
+on the real product barrier, through two `--exact` named tests of the
+`agent_execution_preflight::tests` module (swarm-engine): (1)
+`preflight_admitted_provider_artifact_mutation_refuses_before_consumption_and_recovers`
+— real substitution of an admitted artifact: typed refusal
+`agent-execution-preflight-changed` before consumption, no SQL effect,
+restoring the exact bytes revalidates the same intention (Increment101); (2)
+`preflight_admitted_artifact_mutation_forces_fresh_admission_binding_mutated_digest`
+— after mutation, the retained admission is a dead end: replaying the same
+event id returns the queued agent with no re-observation, a parallel admission
+is refused `agent-launch-workspace-busy`, cancellation settles the stale
+intention (agent `interrupted`, task blocked, work revision +1, reservations
+released), the re-admission with a new event id binds the mutated bytes (new
+preflight scope), restoring the original bytes refuses the new agent's
+consumption and the cancelled agent is never consumable again (Increment112,
+`evidence/claude-i15-readmission-20261031T100227Z/`). Provider = test-owned
+copy under the fixture root, never a shared binary; no live database, no child
+process. Fresh run then `recipe.py verify` on the evidence directory; declared
+inputs extended to `agent_store.rs` and `root_store.rs`. Scope: same-UID
+fixture, fictitious data; no human-enrollment, UID-separation or
+independent-acceptance evidence.
+
+### Lien de connexion à usage unique — Single-use sign-in link
+
+`recipes/web-login-ticket-rust.json` vérifie le ticket de `swarm open` : stockage
+moteur (usage unique par suppression, lié à l'adresse, échéance), réglage v50
+`web_login_ticket_seconds` et son catalogue, consommation web (303 + cookie owner,
+rejeu 401, `next` assaini, liaison à la clé), rotation de la clé, déconnexion protégée, principal owner, la suite du
+lanceur puis le parcours navigateur (FR/EN, deux thèmes, mobile, clavier) sur le
+binaire installé `bin/swarm`. Il ne prouve aucune séparation face aux agents
+(même UID, EP-07 ouvert) ni l'adoption du réglage par un Root existant.
+
+`recipes/web-login-ticket-rust.json` checks the `swarm open` ticket: engine
+storage (single use by unlink, address-bound, expiry), the v50
+`web_login_ticket_seconds` setting and catalog, web consumption (303 + owner
+cookie, replay 401, sanitized `next`, key binding), key rotation, protected sign-out, the owner principal,
+the launcher suite, then the browser journey (FR/EN, both themes, mobile,
+keyboard) against the installed `bin/swarm`. It proves no separation from agents
+(same UID, EP-07 open) nor adoption of the setting by an existing Root.
+
+### Native graph and installed identity
+
+`recipes/rust-graph-workbench.json` consumes `SWARM_GRAPH_BINARY` pointing to an
+immutable qualified image (`.cache/rust-migration-binaries/swarm-rust-SHA256`),
+not an ephemeral `bin/swarm.candidate-*` staging path consumed by local delivery.
+It checks navigation without Work mutation separately from explicit task/link
+saves, refusals, persistence and acknowledgement loss; no provider or live Root.
+The harness retains exact source bytes/hashes before/after, argv/exit and streams.
+A deliberate failing before-image is a counterexample, never a PASS recipe.
+
+For runtime checks use the same process/network visibility as the service:
+a sandbox unable to see host `/proc` can report an unobservable server as absent.
+Corroborate supported launcher status with protected HTTP, executable hash and
+Version dialog before diagnosing a stop. Modal `open=false` precedes `close`:
+wait for focus restoration and actual reload completion before the next gesture.
+See [the graph recovery evidence](../../docs/plans/migration-rust/GRAPH-REGRESSION-20261031.md).

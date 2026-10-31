@@ -159,18 +159,57 @@ fn current_trust_revision(root: &Path) -> i64 {
     state["revision"].as_i64().expect("fixture Trust revision")
 }
 /// Actual project Trust configuration with an explicit effect role; tokens only
-/// for local fixture identities, never enrolled ones.
+/// for local fixture identities, never enrolled ones. The fixed
+/// `expected_revision:0` shares the first-application idempotency of the CLI
+/// harness (INCREMENT-87): on an unconfigured fixture root (no
+/// `trust-actions.json` yet) the apply creates the state; on a retained root
+/// already at revision N the exact same event replay is accepted without
+/// advancing further, so reruns never mutate the fixture Trust revision.
 fn effect_config(root: &Path) -> Vec<u8> {
+    let _ = root;
     serde_json::to_vec(&json!({
         "schema_version":1,
-        "event_id":format!("promote-effect-config-{}", current_trust_revision(root)),
-        "expected_revision":current_trust_revision(root),
+        "event_id":"promote-effect-config",
+        "expected_revision":0,
         "reason":"Explicit fixture effect role for Git promotion",
         "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":false},
         "identities":[
             {"subject":"enrolled-effect","integrity":3,"roles":["admin","effect"],"enrollment_principal":{"principal_id":"operator","principal_kind":"human","issuer":"https://fixture.invalid","subject":"stable-person"}},
             {"subject":"requester","token":"fixture-requester-token","integrity":1,"roles":["requester"]},
             {"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]}
+        ]
+    }))
+    .unwrap()
+}
+/// Agreement variant of the promote fixture configuration: same identities
+/// plus one bearer I3 administrator on the isolated fixture (labeled auth
+/// simulated) so the real mandate-create/approve producers can run for the
+/// last-use freshness checks. Applied at initial configuration time, so the
+/// prepared calls bind the actual (single) post-configuration revision.
+fn effect_config_agreement(root: &Path) -> Vec<u8> {
+    // Idempotent on both regimes: a fresh root (no state file) applies at
+    // expected revision 0 with a stable event id; a retained root already
+    // configured applies a run-unique event at its actual current revision.
+    let fresh = !root.join(".swarm/trust-actions.json").exists();
+    let (event_id, expected) = if fresh {
+        ("promote-effect-config-agreement".to_owned(), 0)
+    } else {
+        (
+            format!("promote-effect-config-agreement-{}", std::process::id()),
+            current_trust_revision(root),
+        )
+    };
+    serde_json::to_vec(&json!({
+        "schema_version":1,
+        "event_id":event_id,
+        "expected_revision":expected,
+        "reason":"Explicit fixture effect role and agreement admin for Git promotion",
+        "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":false},
+        "identities":[
+            {"subject":"enrolled-effect","integrity":3,"roles":["admin","effect"],"enrollment_principal":{"principal_id":"operator","principal_kind":"human","issuer":"https://fixture.invalid","subject":"stable-person"}},
+            {"subject":"requester","token":"fixture-requester-token","integrity":1,"roles":["requester"]},
+            {"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]},
+            {"subject":"agreement-admin","token":"fixture-admin-token","integrity":3,"roles":["admin"]}
         ]
     }))
     .unwrap()
@@ -274,6 +313,8 @@ struct Owned {
     service: RootStore,
     work: String,
     candidate: String,
+    /// The seeded OLD OID: the exact promotion recipe beneficiary.
+    old: String,
     trust_revision: i64,
     transfer_receipt: swarm_engine::PaeaGitTransferReceipt,
     commit_prepared: swarm_engine::PaeaGitPromoteCall,
@@ -281,9 +322,15 @@ struct Owned {
     scope: Scope,
 }
 fn owned() -> Owned {
+    owned_with(effect_config)
+}
+/// Owned fixture set with an explicit fixture configuration builder, so a
+/// consumer test can add isolated identities (e.g. a bearer agreement admin)
+/// at initial application time instead of advancing the revision afterwards.
+fn owned_with(config: fn(&Path) -> Vec<u8>) -> Owned {
     let (project_path, project, work, candidate) = project();
     project
-        .trust("config-apply", &effect_config(&project_path), "")
+        .trust("config-apply", &config(&project_path), "")
         .unwrap_or_else(|e| panic!("explicit fixture config refused: {}", e.code()));
     // The applied configuration advanced the Trust revision; the signed grant
     // and attributed context must both bind the actual post-configuration one.
@@ -359,6 +406,7 @@ fn owned() -> Owned {
         service,
         work,
         candidate,
+        old,
         trust_revision,
         transfer_receipt,
         commit_prepared,
@@ -431,6 +479,88 @@ fn invoke(
     f.close();
     result
 }
+/// The exact agreement recipe resource for this fixture's commit proposal:
+/// `{project}/{repository}/{target_ref}/{candidate}`, matching the P2 recipe
+/// the captured-agreement guard consults.
+fn promotion_resource(owned: &Owned) -> String {
+    let Action::Git {
+        repository_id,
+        candidate_oid,
+        ..
+    } = &owned.commit_prepared.proposal().action
+    else {
+        panic!("git proposal expected");
+    };
+    format!("fixture-project/{repository_id}/refs/heads/release/{candidate_oid}")
+}
+/// Seed one fresh compliant agreement (mandate-create → request → approve)
+/// through the real Trust operations, for the exact promotion resource and the
+/// seeded OLD beneficiary — the same producer chain the captured-agreement
+/// guard consults. All event/mandate identifiers derive from `prefix` plus the
+/// run nonce, so chains in one run and reruns on a retained root never collide
+/// with prior evidence. Returns the approved action reply.
+fn seed_agreement(owned: &Owned, prefix: &str, resource: &str) -> Value {
+    let nonce = std::process::id();
+    let event = move |name: &str| format!("{name}-{nonce}-{prefix}");
+    let mandate_id = event("mandate");
+    let trust_as = |op: &str, value: Value, token: &str| -> Value {
+        serde_json::from_slice(
+            &owned
+                .project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+                .bytes,
+        )
+        .unwrap()
+    };
+    trust_as(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":event("mandate-create"),
+            "mandate_id":mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":1,
+            "currency":"OID",
+            "beneficiary":owned.old.clone(),
+        }),
+        "fixture-admin-token",
+    );
+    let action = trust_as(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":event("request"),
+            "mandate_id":mandate_id,
+            "resource":resource,
+            "amount_minor":1,
+            "currency":"OID",
+            "beneficiary":owned.old.clone(),
+            "idempotency_key":event("key"),
+        }),
+        "fixture-requester-token",
+    );
+    assert_eq!(action["state"], "pending_approval");
+    let approved = trust_as(
+        "approve",
+        json!({
+            "schema_version":1,
+            "event_id":event("approve"),
+            "action_id":action["id"],
+            "mandate_id":mandate_id,
+            "content_digest":action["content_digest"],
+            "resource":resource,
+            "amount_minor":1,
+            "currency":"OID",
+            "beneficiary":owned.old.clone(),
+        }),
+        "fixture-approver-token",
+    );
+    assert_eq!(approved["state"], "approved");
+    approved
+}
 /// Real authority consumes one exact commit: the durable intent is reserved,
 /// the reference is created at the candidate under OLD fencing and the effect
 /// row is recorded. The exact permission spelling is the GitPromotion commit one.
@@ -438,6 +568,9 @@ fn invoke(
 #[ignore = "requires explicit retained native source fixture"]
 fn promote_call_current_authority_commits_once_and_records_effect() {
     let owned = owned();
+    // The commit path revalidates the captured agreement at last use; a valid
+    // one must exist for the publication to be accepted.
+    seed_agreement(&owned, "commit-once", &promotion_resource(&owned));
     let outcome = invoke(&owned, &owned.commit_prepared).unwrap();
     let PaeaGitPromoteOutcome::Recorded {
         intent_id,
@@ -490,6 +623,9 @@ fn promote_call_current_authority_commits_once_and_records_effect() {
 #[ignore = "requires explicit retained native source fixture"]
 fn promote_call_replays_recorded_effect_and_reconciles() {
     let owned = owned();
+    // The commit path revalidates the captured agreement at last use; a valid
+    // one must exist for the publication to be accepted.
+    seed_agreement(&owned, "replay", &promotion_resource(&owned));
     let first = invoke(&owned, &owned.commit_prepared).unwrap();
     assert!(matches!(first, PaeaGitPromoteOutcome::Recorded { replayed: false, .. }));
     let replay = invoke(&owned, &owned.commit_prepared).unwrap();
@@ -515,6 +651,116 @@ fn promote_call_reconcile_before_commit_reports_not_committed() {
             target_ref: "refs/heads/release".into(),
         }
     );
+    owned.commit_prepared.close().unwrap();
+    owned.reconcile_prepared.close().unwrap();
+    owned.service.close().unwrap();
+    owned.project.close().unwrap();
+}
+/// Last-use agreement freshness at the engine consumption point: after a
+/// valid agreement is captured (the web captured-agreement guard would pass —
+/// its lookup succeeds here too), a public mandate revocation run BEFORE the
+/// engine consumption must refuse the commit without any Git publication or
+/// durable effect, even though the Trust revision and policy digest are
+/// unchanged. After re-admission (fresh mandate, request and exact approval
+/// re-captured) the same action succeeds exactly once. No sleeps: the
+/// revocation order completes before the commit starts, so no timing is
+/// relied on; the commit itself holds the shared Trust reservation, which
+/// excludes a concurrent revocation by construction. Auth simulated on the
+/// isolated fixture (labeled bearers); no human presence or acceptance.
+#[test]
+#[ignore = "requires explicit retained native source fixture"]
+fn promote_call_refuses_mandate_revoked_after_agreement_then_readmits_once() {
+    let owned = owned_with(effect_config_agreement);
+    let resource = promotion_resource(&owned);
+    let candidate = owned.candidate.clone();
+    // Run-unique event/mandate/keys: the retained fixture root keeps its Trust
+    // state across runs, so reruns must never collide with prior evidence.
+    let nonce = std::process::id();
+    let event = move |name: &str| format!("{name}-{nonce}");
+    // Fresh compliant agreement (mandate, request, exact approve) — the same
+    // producer chain the web captured-agreement guard consults at lookup.
+    let trust_as = |op: &str, value: Value, token: &str| -> Value {
+        serde_json::from_slice(
+            &owned
+                .project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+                .bytes,
+        )
+        .unwrap()
+    };
+    seed_agreement(&owned, "last-use", &resource);
+    // Valid control: the exact canonical bytes match the captured agreement
+    // now (the web lookup would succeed at this point).
+    assert!(
+        owned
+            .project
+            .paea_git_agreement_match(owned.commit_prepared.canonical().bytes())
+            .unwrap()
+            .is_some(),
+        "fresh agreement must match before revocation"
+    );
+    // Public revocation AFTER the successful agreement lookup, BEFORE the
+    // engine consumption: no revision change, evidence immutable.
+    let revision_before = current_trust_revision(&owned.project_path);
+    let revoked = trust_as(
+        "mandate-revoke",
+        json!({"schema_version":1,"event_id":event("last-use-revoke"),"mandate_id":format!("mandate-{nonce}-last-use")}),
+        "fixture-admin-token",
+    );
+    assert_eq!(revoked["state"], "revoked");
+    assert_eq!(
+        current_trust_revision(&owned.project_path),
+        revision_before,
+        "revocation must not change the configuration revision"
+    );
+    // The commit must now refuse: the agreement is void at last use.
+    let error = invoke(&owned, &owned.commit_prepared).unwrap_err();
+    assert!(
+        matches!(error, RootStoreError::Refused("paea-git-promote-agreement-stale")),
+        "revoked-mandate commit must refuse with the typed stale-agreement code, got {:?}",
+        error
+    );
+    // No publication and no durable effect happened.
+    let refs = Command::new(git_executable())
+        .args([
+            "--git-dir",
+            owned
+                ._service_dir
+                .path()
+                .join(".swarm/bare")
+                .to_str()
+                .unwrap(),
+            "rev-parse",
+            "--verify",
+            "refs/heads/release",
+        ])
+        .output()
+        .unwrap();
+    assert!(refs.status.success());
+    assert_ne!(
+        String::from_utf8(refs.stdout).unwrap().trim(),
+        &candidate,
+        "refused commit must not publish the candidate"
+    );
+    // Re-admission with a fresh agreement: the same action succeeds once.
+    seed_agreement(&owned, "last-use-2", &resource);
+    let outcome = invoke(&owned, &owned.commit_prepared).unwrap();
+    let PaeaGitPromoteOutcome::Recorded {
+        target_ref, new_oid, replayed, ..
+    } = &outcome
+    else {
+        panic!("re-admitted commit expected recorded outcome, got {outcome:?}");
+    };
+    assert!(!replayed);
+    assert_eq!(target_ref, "refs/heads/release");
+    assert_eq!(new_oid, &candidate);
+    // A second identical commit replays the same effect (exactly once).
+    let replay = invoke(&owned, &owned.commit_prepared).unwrap();
+    assert!(matches!(
+        replay,
+        PaeaGitPromoteOutcome::Recorded { replayed: true, .. }
+    ));
     owned.commit_prepared.close().unwrap();
     owned.reconcile_prepared.close().unwrap();
     owned.service.close().unwrap();

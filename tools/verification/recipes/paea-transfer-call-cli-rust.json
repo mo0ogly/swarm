@@ -17,7 +17,7 @@
     "rust/crates/swarm-protection-contract/src/**/*",
     "tools/verification/recipe.py",
     "tools/verification/recipes/paea-owned-git-transfer-reconcile.json",
-    "docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01/result.json",
+    "docs/plans/actions-confiance/paea/evidence/claude-e2-arbitrage-20261031T135859Z/source-fixture-regen-6-repo-root/result.json",
     "tests/rust_native_first_publication.py",
     "tests/rust_agent_model_route.py",
     ".cache/rust-migration-binaries/swarm-rust-b11b4bafabff1d3bf5d216fdb44f5614fb69a41a61b3b72e8623bc2a80b385cf",
@@ -28,7 +28,7 @@
     "CARGO_PROFILE_DEV_DEBUG": "0",
     "CARGO_PROFILE_TEST_DEBUG": "0",
     "CARGO_INCREMENTAL": "0",
-    "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-chain-test-20261029T161350Z/source-fixture-regen"
+    "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/claude-e2-arbitrage-20261031T135859Z/source-fixture-regen-6-repo-root"
   },
   "steps": [
     {

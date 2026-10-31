@@ -135,9 +135,9 @@ sans tâches. Le moteur ne crée aucune story d’après les titres d’une anci
 ## Recette reproductible
 
 ```sh
-sh build.sh /tmp/swarm-product
-python3 tests/product_recipe.py /tmp/swarm-product /tmp/swarm-product-project-neuf
-/tmp/swarm-product --root /tmp/swarm-product-project-neuf web 127.0.0.1:18844
+sh build.sh .swarm-fixtures/swarm-product
+python3 tests/product_recipe.py .swarm-fixtures/swarm-product .swarm-fixtures/swarm-product-project-neuf
+.swarm-fixtures/swarm-product --root .swarm-fixtures/swarm-product-project-neuf web 127.0.0.1:18844
 ```
 
 Choisir un port libre et une racine neuve. Ouvrir le lien de session affiché par le
