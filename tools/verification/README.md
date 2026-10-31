@@ -69,7 +69,13 @@ et échoue s'il en reste (garde de non-récidive ; les lectures gettempdir sont
 signalées pour revue) ; (2) au runner — `recipe.py` épingle `TMPDIR` sous
 `<dossier temporaire configuré>/runner-tmp` pour la durée de chaque run, couvrant Python
 tempfile, Rust `env::temp_dir()`/TempDir, Node `os.tmpdir()` et Go
-`t.TempDir()` qui l'honorent ; `env::temp_dir()` ou `dir=` explicites
+`t.TempDir()` qui l'honorent. Quand un ancêtre du dossier configuré est
+inscriptible groupe/autres (checkout 775 typique), l'épingle bascule sur la
+zone privée opérateur `~/.local/state/swarm-recipe-fallback-fixtures/runner-tmp`
+(jamais `/tmp`) : les fixtures vérifiant des contrats de répertoire privé
+(`swarm-enrollment-config` `open_private_directory` refuse tout ancêtre
+inscriptible groupe) l'exigent ; un placement non privé refuserait le run.
+`env::temp_dir()` ou `dir=` explicites
 contournant TMPDIR restent une obligation source. `mkstemp(dir=destination.
 parent)` est un échafaudage d'écriture atomique adjacente à la destination,
 pas une allocation de fixture : exempté.
@@ -89,7 +95,13 @@ allocations without `dir=` and fails if any remain (non-regression guard;
 gettempdir reads are reported for review); (2) at runner — `recipe.py` pins
 `TMPDIR` under `<configured temporary directory>/runner-tmp` for each run, covering Python
 tempfile, Rust `env::temp_dir()`/TempDir, Node `os.tmpdir()` and Go
-`t.TempDir()` which honor it; `env::temp_dir()` or explicit `dir=` uses
+`t.TempDir()` which honor it. When an ancestor of the configured area is
+group/other-writable (a typical 775 checkout), the pin falls back to the
+operator private area `~/.local/state/swarm-recipe-fallback-fixtures/runner-tmp`
+(never `/tmp`): fixtures verifying private-directory contracts
+(`swarm-enrollment-config` `open_private_directory` refuses any group-writable
+ancestor) require it; a non-private placement would refuse the run.
+`env::temp_dir()` or explicit `dir=` uses
 bypassing TMPDIR remain a source-level obligation. `mkstemp(dir=
 destination.parent)` is adjacent-to-destination atomic-write scaffolding, not
 fixture allocation: exempt.
@@ -181,6 +193,21 @@ recipe now saves all ten runtime fields and observes each default/ceiling/null
 choice through that actual production command, in FR/EN and both themes.
 The complete workspace is run only when the changed shared settings contract
 justifies it; incremental recipe checks are not a new full dependency qualification.
+
+Recette `recipes/blp-confidentiality-rust.json` : contrats purs de
+confidentialité Bell-LaPadula (10 tests `swarm-confidentiality` : dominance,
+combinaison, domaine fixe, refus sans repli) + intégration moteur (5 tests
+`--test confidentiality` : historique révisionné, replays, refus) + coexistence
+Biba (`--test trust_biba`). Administration de politique et diagnostics
+data-only : `runtime_enforced:false` conservé, aucun contenu réel classé, aucun
+fournisseur ni confinement exercé. Suivi : `docs/plans/actions-confiance/BLP-APEX.md`.
+Recipe `recipes/blp-confidentiality-rust.json`: pure Bell-LaPadula
+confidentiality contracts (10 `swarm-confidentiality` tests: dominance, join,
+fixed domain, refusals without fallback) + engine integration (5
+`--test confidentiality` tests: revisioned history, replays, refusals) + Biba
+coexistence (`--test trust_biba`). Policy administration and data-only
+diagnostics: `runtime_enforced:false` kept, no real content classified, no
+provider or confinement exercised. Tracking: `docs/plans/actions-confiance/BLP-APEX.md`.
 
 ## Terminal browser states instead of swallowed predicate errors
 

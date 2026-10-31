@@ -49,6 +49,29 @@ BLP-01/04/05/06, even with delivered policy administration and its completed
 retrospective. Reception by the recovery session, corrections and end-to-end
 verification remain open.
 
+## BLP-01 — static flow inventory, October 31
+
+[Bilingual contracts/threats](../../BLP-FLOWS.md) and the
+[24 source-bound flows](../../../architecture/blp-flow-inventory.json) bind
+43 anchors in 41 source files: actual assembly, CLI/HTTP transport, manual probe,
+validation, telemetry, history, Git/settlement effects and exports. Each records
+existing controls, owner, missing packages and required observable. All 24 actual
+runtime BLP criteria remain open.
+
+Permanent blp-flow-inventory recipe: two steps PASS; five checker tests actually
+executed (control, mutation/refusal/recovery, anchor, graph and path escape).
+This establishes declaration freshness, not disclosure prevention or dynamic
+channel completeness. Fresh evidence: verification-blp/20261031-flow-inventory-01/.
+
+Next chosen journey: BF-05 → BF-07 → BF-16, complete HTTP preparation context
+attribution, transmission and response inheritance, using a local fixture
+receiver. No implicit public classification, authorizing client label or free
+string may replace the protected producer. Existing Biba, budget and authority
+guards remain cumulative. BLP-01 stays partial until dynamic SDK/cache/tool/
+proxy/descendant access is inventoried/qualified; BLP-RET-01/02/03 remain open.
+This tracking/tooling increment changes no product behavior: no installation
+or release-note update is required.
+
 ## Contract and evidence
 
 Classification consists of an ordered level and compartments. Dominance requires
@@ -86,3 +109,48 @@ Increment review: documentation only; no runtime policy, schema, function or
 error path changes. Added scenarios are requirements, not test results. Release
 notes and installation are unchanged because this mapping delivers no product
 behavior.
+
+## Verification, local delivery and real-flow qualification — October 31 (Claude session)
+
+The French record above remains the detailed canonical log. Summary:
+
+- Fixed the two open defects from the WIP snapshot (HTTP routing in
+  `service/trust.rs`, E0308 fix verified by compilation) and the integration
+  fixture (third identity). Fresh evidence: `swarm-confidentiality` 10/10,
+  `confidentiality` 5/5, Biba coexistence 14/14 + 11/11 + 3/3, permanent recipe
+  `blp-confidentiality-rust.json` PASS (verify → VERIFIED).
+- EN translations (13 keys), CLI help FR/EN, operator and architecture docs
+  FR/EN with an honest Mermaid diagram (solid = verified, dotted = labeled
+  target), release notes in `version_history.json`.
+- Local delivery: disk rechecked (~72 GiB free) before `./swarm.sh build
+  --no-open`; candidate **v0.1.1-dev.282** verified by the collector
+  (`VERIFIED_NATIVE_CANDIDATE`, default native profile, commit 164915f73,
+  sha256 ea072ccc…). `./swarm.sh restart --no-open` installed it on the single
+  managed server; running binary identity confirmed (`/proc/<pid>/exe`,
+  sha256 match, `server.json` and `swarm.sh status` agree).
+- Real HTTP qualification on the installed server: POST `action=blp-show`
+  without an I3 token → 403 `authorization_required` (typed business refusal,
+  not 404/500); unknown BLP action → 400 `trust-action-unknown`; missing CSRF
+  and unauthenticated asset GET → 403. The real root has no `trust-actions.json`
+  (protocol unconfigured); positive BLP administration therefore requires the
+  trust bootstrap, an operator decision not taken in this increment.
+- Real browser qualification (Chrome headless, script and evidence under
+  `.swarm-fixtures/`): served page + embedded BLP asset, Admin dialog, typed
+  FR/EN refusal messages, 4-level no-clearance example, save disabled without
+  preview, theme sombre→etat verified by attribute, no horizontal overflow at
+  390 px — 9/9 checks, no unexpected console/page/HTTP errors.
+- Still open: RETEX; no independent acceptance. BLP-01 partial; BLP-04–06
+  open. `runtime_enforced:false` and `runtime_authorized:false` remain the
+  runtime truth; no real content classified, no protected execution.
+
+RETEX written: [paea/RETEX-BLP-20261031.en.md](../../paea/RETEX-BLP-20261031.en.md)
+(French original `.md`). BLP-07 stays open for independent acceptance;
+BLP-01 (partial) and BLP-04–06 stay open.
+
+Concurrent collision recorded at closure: a third-party session rebuilt and
+installed **v0.1.1-dev.283** (same commit, sha e8961b39…) during
+qualification; their `version_history.json` entry was re-inserted on top of
+their state and the BLP entry rewritten atomically (both coexist). Server 283
+does serve the repaired BLP routing (probe `blp-show` → identical 403
+`authorization_required`); its release notes lack the BLP entry (built before
+the rewrite) — it will be included in the next build.

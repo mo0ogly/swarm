@@ -36,7 +36,8 @@ fn config(revision:u64,event:&str)->Value {
     json!({"schema_version":1,"event_id":event,"expected_revision":revision,"reason":"Owned isolated BLP fixture",
         "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":true},
         "identities":[{"subject":"admin","integrity":3,"roles":["admin"],"token":"fixture-admin-token"},
-        {"subject":"worker","integrity":1,"roles":["requester"],"token":"fixture-worker-token"}]})
+        {"subject":"worker","integrity":1,"roles":["requester"],"token":"fixture-worker-token"},
+        {"subject":"approver","integrity":2,"roles":["approver"],"token":"fixture-approver-token"}]})
 }
 fn change(revision:u64,event:&str)->Value {
     json!({"schema_version":1,"event_id":event,"expected_revision":revision,"expected_trust_revision":1,"reason":"Explicit confidentiality policy fixture",

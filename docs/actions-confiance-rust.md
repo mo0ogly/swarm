@@ -117,6 +117,45 @@ validations. `GET /api/v1/trust-actions` lit l’audit. Les POST de lecture util
 `{}`. Le mode CLI distant `--server` historique n’est pas porté dans ce noyau ;
 utiliser le CLI local ou l’API protégée, sans repli vers une autre racine.
 
+## Confidentialité Bell-LaPadula — administration de politique, sans contrôle d’exécution
+
+Une politique de confidentialité Bell-LaPadula (niveau ordonné + compartiments,
+distincte de l’intégrité Biba) est préparée par la modale Admin de la page
+Trust et par les opérations suivantes. **État réel : administration et
+diagnostic seulement.** Aucun contenu de projet n’est classé, aucune exécution
+n’est médiée : `runtime_enforced:false` et `runtime_authorized:false` sont
+conservés dans chaque réponse et l’interface l’annonce. Ne pas les interpréter
+comme une protection active.
+
+```sh
+./swarm --root RACINE --json trust blp-show
+./swarm --root RACINE --json trust blp-policy-preview --input politique.json
+./swarm --root RACINE --json trust blp-policy-apply --input politique.json
+./swarm --root RACINE --json trust blp-check --input diagnostic.json
+```
+
+- `blp-show` (lecture) : état persisté, historique révisionné et capacité.
+  Exige un jeton I3/admin courant comme toute administration.
+- `blp-policy-preview` (lecture) : valide une proposition complète
+  (`schema_version`, `event_id`, `expected_revision`, `expected_trust_revision`,
+  `reason`, `policy` avec niveaux `public`→`restreint` définis par l’opérateur,
+  compartiments et habilitations). Aucune mutation.
+- `blp-policy-apply` (écriture) : application révisionnée avec preuve attribuée
+  ; un `event_id` déjà enregistré rejoue la réponse conservée, sans mutation.
+  Un changement de politique de confiance rend l’historique obsolète : il exige
+  un renouvellement explicite (`authority_current:false` le signale).
+- `blp-check` (lecture) : diagnostic sur étiquettes **fournies** — jamais une
+  attribution réelle d’un objet. Renvoie la combinaison/le refus et la
+  classification de sortie calculée, sans contenu ni étiquette d’autrui.
+
+Chaque habilitation désigne un sujet d’identité existant non suspendu ; les
+sujets inconnus refusent. Le catalogue ne peut pas supprimer ou réordonner des
+niveaux existants : cela relabellerait l’historique. Aucune déclassification
+n’existe : un résumé, une sortie vide ou un filtrage n’en est pas une. La
+protection transversale (attribution des contenus réels, moniteurs fichiers/
+réseau/fournisseurs, déclassification humaine liée aux octets) reste ouverte ;
+suivi dans [BLP-APEX](plans/actions-confiance/BLP-APEX.md).
+
 ## Refus et reprise
 
 `direct-write`, `elevate` et `elevate-integrity` refusent les contournements.

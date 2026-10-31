@@ -160,6 +160,40 @@ distinctes (CLI 2/4/3, HTTP 400/403/409 selon la cause). `verify` est pur : expo
 v2, ancre HMAC schéma 1 et clé acquise séparément. La vérification n’atteste ni
 heure tierce, ni protection contre le même UID, ni acceptation indépendante.
 
+## Confidentialité Bell-LaPadula — administration livrée, contrôle non livré
+
+Confidentialité distincte de l’intégrité Biba, indépendante et combinable :
+une classification est un niveau ordonné plus des compartiments ; la lecture
+exige que l’habilitation domine la source, la sortie une destination dominant
+le domaine d’exécution fixe. La crate `swarm-confidentiality` porte ces
+contrats de données purs, sans contenu privé dans les diagnostics. Ce qui est
+vérifié (tests unitaires et d’intégration datés du 31 octobre 2026) :
+validation et dominance/combinaison, domaine fixe lié à la révision de
+politique, historique persisté révisionné avec replays contrôlés, refus des
+sujets inconnus et des catalogues qui relabellisent l’historique. Ce qui ne
+l’est pas : attribution des contenus réels, médiation fichiers/réseau/
+fournisseurs, déclassification humaine — d’où `runtime_enforced:false` et
+`runtime_authorized:false`, maintenus dans chaque réponse.
+
+```mermaid
+flowchart TD
+  ADMIN[Admin I3 authentifié] --> CLI[CLI trust et HTTP trust-actions]
+  CLI --> OPS[trust/confidentiality.rs]
+  OPS --> POL[Historique révisionné trust-actions.json]
+  POL --> CHECK[blp-check : diagnostic sur étiquettes fournies]
+  CHECK --> OUT[Classification de sortie calculée]
+  OUT -. Attribution des contenus réels à construire .-> PROD[Producteurs protégés]
+  PROD -. Domaine fixe par exécution à construire .-> MON[Moniteur fichiers réseau fournisseurs]
+  MON -. Déclassification humaine exacte à construire .-> HUM[Validation humaine des octets et destinataires]
+```
+
+Arêtes pleines : administration et diagnostic vérifiés, non autorisants.
+Arêtes pointillées : cible étiquetée, aucun contrôle actif. Les réponses
+portent `runtime_enforced:false` ; le raccord des producteurs et consommateurs
+réels reste le critère d’activation, jamais le passage des drapeaux à true.
+Suivi et critères : [BLP-APEX](../plans/actions-confiance/BLP-APEX.md) ;
+preuves : `docs/plans/actions-confiance/verification-blp/`.
+
 ## Cible Biba transversale — raccordements non livrés
 
 ```mermaid
@@ -218,7 +252,8 @@ Le gate fournit l’inode attendu du workspace. `Sandbox::prepare_bound` ouvre e
 même descripteur. Un remplacement refuse. Tout descripteur détenu par la crate
 vit au-dessus de 2 (`biba-path-repin` sinon) : l’appelant possède 0–2 et peut les
 réaffecter (dup2 stdin) pendant la vie du profil, ce qui refermerait sinon un
-descripteur épinglé bas. La préparation CLI observe son
+descripteur épinglé bas. Le descripteur de ruleset Landlock est épinglé à la
+création (`landlock_restrict_self` le refuse `EBADFD` sinon, étape `biba-restrict`). La préparation CLI observe son
 répertoire de travail privé après vérification du parent et du jeton ; ce
 répertoire vit sous `<Root>/preparation-cli/`, jamais sous `/tmp` (interdiction
 opérateur du 31 octobre 2026 : aucune donnée de projet dans le temporaire

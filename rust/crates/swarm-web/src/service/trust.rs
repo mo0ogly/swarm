@@ -12,7 +12,6 @@ impl NativeHttpService {
     ) -> Result<RouteBody, HttpServiceError> {
         let op = if matches!(*r.method(), Method::GET | Method::HEAD) {
             "show"
-                | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check"
         } else if r.method() == Method::POST {
             r.uri()
                 .query()
@@ -41,6 +40,7 @@ impl NativeHttpService {
                 | "read-object"
                 | "read-original"
                 | "audit-transaction"
+                | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check"
                 | "public-anchor" | "public-verify" | "evidence-key-prepare" | "evidence-key-activate" | "evidence-key-revoke"
         ) {
             return Err(HttpServiceError::Refused("trust-action-unknown"));

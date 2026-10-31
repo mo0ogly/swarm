@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-confidentiality-rust",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "blp-confidentiality-unit-contracts",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-confidentiality",
+        "--lib",
+        "--",
+        "--list"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 6.326067251000495,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "blp-confidentiality-unit-run",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-confidentiality",
+        "--lib",
+        "--",
+        "--quiet"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 0.11022292999768979,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "blp-engine-integration-history-replay-and-refusals",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "confidentiality",
+        "--",
+        "--quiet"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 65.40841308200106,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "blp-engine-trust-biba-coexistence",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "trust_biba",
+        "--",
+        "--quiet"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 2.822776425000484,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "65eb706d198d0b23af863ce09c9bf4bf15e94ac5431cea132fab09dda2b81558",
+    "runner.py": "b2c8d496adb6946515873f1af2fa62363be71c9fa549c0dddafbd13907bc4562",
+    "inputs.before.json": "aa18fbd1b200006a5c223422fa857f6653ebaab5938fc93fde9e4ebcd8ab9650",
+    "declared-inputs.tar.gz": "5051fbc3a7324a8578550c6a912b50e7a237735da53c8a4d5f6b2c876715be15",
+    "environment.json": "94ef3d1259e7ac2775671464c494e015b73c156544825911a66a11851d487502",
+    "step-0001.stdout": "e1b58a19ad79bf9d20a748a8459e7f64af20a1bca2960fe24269d68d01f57f30",
+    "step-0001.stderr": "8eb45d63fda4e2852fde67ea68c6ac1d129564448c55bb9af330d57807aedd66",
+    "step-0001.json": "be7ad925e8f7798dbf5d49828c6f2072718ceb8094deb16d0b10b150785d6e6b",
+    "step-0002.stdout": "7742173cc9d98f4cbe90debabdf83ee6b5d3e9e965e25428a46d090582275222",
+    "step-0002.stderr": "af0e2414b1e983c01e4d7275b10847c44c34014cff88c729d74546c568f0d6ba",
+    "step-0002.json": "cf86a63f0af6f005e251da7aea92d1bd0bc74fc045276fc01ecf53b3ee1010a2",
+    "step-0003.stdout": "f148a038af5982aeb23ca9138d5aacc739a8e2b091b9a998e465eac44e21d0d0",
+    "step-0003.stderr": "1244ee9b870e64062f9b3dc1fc3d8e69216a582b71720166cbd1958582bb6f8f",
+    "step-0003.json": "032b202cffc36dbaea041217d70da865377772ae15731af14d853dee383042ee",
+    "step-0004.stdout": "6a850e0d14ec77c9962eac2ff1afc60bde6412b0095488c9e3aa76e14b06e39f",
+    "step-0004.stderr": "18dacc6fff71930b320fb01c113087d85545c1669b1f58cfd12bcd7204cbd5e0",
+    "step-0004.json": "c1f09138b586cdf0a0578f4eda0aa952c6ec3b5a20209ffc1e09f53eb9d6bfd4",
+    "inputs.after.json": "aa18fbd1b200006a5c223422fa857f6653ebaab5938fc93fde9e4ebcd8ab9650"
+  }
+}

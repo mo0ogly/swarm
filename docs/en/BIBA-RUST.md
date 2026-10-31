@@ -157,6 +157,39 @@ errors (CLI2/4/3, HTTP400/403/409 by cause). Pure `verify` takes a v2 export,
 schema1 HMAC anchor and separately acquired key. Verification establishes neither
 third-party time, protection against the same UID nor independent acceptance.
 
+## Bell-LaPadula confidentiality — delivered administration, undelivered control
+
+Confidentiality separate from Biba integrity, independent and combinable: a
+classification is an ordered level plus compartments; reading requires the
+clearance to dominate the source, output requires a destination dominating the
+fixed execution domain. The `swarm-confidentiality` crate holds these pure data
+contracts, with no private content in diagnostics. Verified (unit and
+integration tests dated 31 October 2026): validation and dominance/join, fixed
+domain bound to the policy revision, revisioned persisted history with
+controlled replays, refusal of unknown subjects and catalogs that relabel
+history. Not verified: attribution of real content, file/network/provider
+mediation, exact human declassification — hence `runtime_enforced:false` and
+`runtime_authorized:false`, kept in every response.
+
+```mermaid
+flowchart TD
+  ADMIN[Authenticated I3 Admin] --> CLI[trust CLI and trust-actions HTTP]
+  CLI --> OPS[trust/confidentiality.rs]
+  OPS --> POL[Revisioned history in trust-actions.json]
+  POL --> CHECK[blp-check: diagnostic on supplied labels]
+  CHECK --> OUT[Computed output classification]
+  OUT -. Real-content attribution to build .-> PROD[Protected producers]
+  PROD -. Fixed domain per execution to build .-> MON[File network provider monitor]
+  MON -. Exact human declassification to build .-> HUM[Human validation of bytes and recipients]
+```
+
+Solid edges: verified, non-authorizing administration and diagnostics.
+Dotted edges: labeled target, no active control. Responses carry
+`runtime_enforced:false`; connecting real producers and consumers is the
+activation criterion, never flipping the flags to true. Tracking and criteria:
+[BLP-APEX](../plans/actions-confiance/BLP-APEX.md); evidence:
+`docs/plans/actions-confiance/verification-blp/`.
+
 ## Cross-cutting Biba target — integration not delivered
 
 ```mermaid
@@ -213,7 +246,8 @@ and pins that inode before inspection; Landlock rules and `fchdir` use the same
 FD. Replacement refuses. Every descriptor this crate holds lives above 2
 (`biba-path-repin` otherwise): the caller owns 0–2 and may reassign them (stdin
 dup2) while the profile lives, which would otherwise close a pinned low FD
-behind the crate's back. CLI preparation observes its private working directory
+behind the crate's back. The Landlock ruleset FD is pinned at creation
+(otherwise `landlock_restrict_self` refuses `EBADFD`, stage `biba-restrict`). CLI preparation observes its private working directory
 after checking parent and token; that directory lives under `<Root>/preparation-cli/`,
 never under `/tmp` (operator interdiction of 31 October 2026: no project data in
 the system temporary area) nor under `.swarm` (both Biba overlap guards remain

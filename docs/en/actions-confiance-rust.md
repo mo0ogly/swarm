@@ -111,6 +111,43 @@ settlement; the second connector uses CLI/API.
 remote mode `--server` is not ported here: use local CLI or the protected API,
 without fallback to another root.
 
+## Bell-LaPadula confidentiality — policy administration, no runtime control
+
+A Bell-LaPadula confidentiality policy (ordered level + compartments, separate
+from Biba integrity) is prepared through the Trust page Admin dialog and the
+following operations. **Actual status: administration and diagnostics only.**
+No project content is classified and no execution is mediated:
+`runtime_enforced:false` and `runtime_authorized:false` are kept in every
+response and the interface states it. Do not read them as active protection.
+
+```sh
+./swarm --root ROOT --json trust blp-show
+./swarm --root ROOT --json trust blp-policy-preview --input policy.json
+./swarm --root ROOT --json trust blp-policy-apply --input policy.json
+./swarm --root ROOT --json trust blp-check --input diagnostic.json
+```
+
+- `blp-show` (read): persisted state, revisioned history and capability.
+  Requires a current I3/admin token like every administration operation.
+- `blp-policy-preview` (read): validates a complete proposal (`schema_version`,
+  `event_id`, `expected_revision`, `expected_trust_revision`, `reason`, `policy`
+  with operator-defined `public`→`restricted` levels, compartments and
+  clearances). No mutation.
+- `blp-policy-apply` (write): revisioned application with attributed evidence;
+  a recorded `event_id` replays the retained reply without mutation. A trust
+  policy change stales the history: an explicit renewal is required
+  (`authority_current:false` signals it).
+- `blp-check` (read): diagnostic on **supplied** labels — never a real object
+  attribution. Returns the join/refusal and computed output classification,
+  without content or third-party labels.
+
+Each clearance names an existing, non-disabled identity subject; unknown
+subjects refuse. The catalog cannot remove or reorder existing levels: that
+would relabel history. No declassification exists: a summary, an empty output
+or LLM filtering is not one. Cross-cutting protection (classification of real
+content, file/network/provider monitors, exact human declassification) remains
+open; tracked in [BLP-APEX](../plans/actions-confiance/BLP-APEX.md).
+
 ## Refusals, recovery and evidence
 
 `direct-write`, `elevate` and `elevate-integrity` deny bypasses. Business denials

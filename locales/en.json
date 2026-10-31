@@ -6454,5 +6454,18 @@
   "Ajouter une tâche": "Add task",
   "Modifier la tâche": "Edit task",
   "Orientation": "Orientation",
-  "Le graphe permet de créer des tâches et de modifier leurs liens. Les consignes attribuées sont consultables et rejetables avant transmission.": "The graph lets you create tasks and edit their links. Attributed instruction additions can be viewed and rejected before delivery."
+  "Le graphe permet de créer des tâches et de modifier leurs liens. Les consignes attribuées sont consultables et rejetables avant transmission.": "The graph lets you create tasks and edit their links. Attributed instruction additions can be viewed and rejected before delivery.",
+  "Catalogue, compartiments et habilitations": "Catalog, compartments and clearances",
+  "Confidentialité Bell-LaPadula": "Bell-LaPadula confidentiality",
+  "Enregistrer la politique de confidentialité": "Save the confidentiality policy",
+  "Exemple sans habilitation ; aucune modification enregistrée": "Example with no clearance; nothing saved",
+  "La politique enregistrée prépare les habilitations. Le contrôle transversal des données et des fournisseurs n’est pas encore actif.": "The saved policy prepares clearances. Cross-cutting data and provider control is not yet active.",
+  "Les niveaux sont ordonnés du moins au plus sensible. Les compartiments séparent les dossiers. Une habilitation ne prouve pas l’identité.": "Levels are ordered from least to most sensitive. Compartments separate case files. A clearance does not prove identity.",
+  "Motif de modification de confidentialité": "Confidentiality change reason",
+  "Politique de confidentialité — JSON": "Confidentiality policy — JSON",
+  "Politique enregistrée et relue ; protection transversale non active": "Policy saved and re-read; cross-cutting protection not active",
+  "Préparer un exemple sans habilitation": "Prepare an example with no clearance",
+  "Prévisualiser la confidentialité": "Preview confidentiality",
+  "Relire la politique avant prévisualisation": "Re-read the policy before previewing",
+  "Relire la politique de confidentialité": "Re-read the confidentiality policy"
 }
