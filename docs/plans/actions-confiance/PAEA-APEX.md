@@ -251,7 +251,8 @@ seulement l'étape PA-10 ; ses sept critères ouverts explicites restent
 opérants : aucune acceptation indépendante, aucun enrôlement humain réel,
 aucune séparation UID distincte, aucun confinement egress, aucune clôture E3,
 inventaire I15/ACS en attente, effets SQLite fictifs. Acceptation indépendante :
-0/17 invariants, inchangée. Triages PAEA17 : voir le suivi ouvert dédié.
+0/17 invariants, inchangée. Triage PAEA17 (5 volets) :
+[TRIAGE-PAEA17.md](paea/evidence/claude-e2-arbitrage-20261031T135859Z/TRIAGE-PAEA17.md).
 Blocages principaux = prérequis humain/OS (newuidmap/newgidmap, enrôlement
 réel, évaluateur E3, arbitrage superviseur distinct) ; matrice détaillée
 [invariant-matrix.json](paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json).
@@ -308,7 +309,7 @@ La [revue de l’incrément](paea/INCREMENT-01.md) conserve le périmètre test�
 les trois axes de revue, les limites et les conditions de reprise. Le programme
 PA-00…PA-13 et son RETEX final restent ouverts.
 
-### Incrément 02 — suite autorisée avec GLM, sans compilation
+### Incrément02 — suite autorisée avec GLM, sans compilation
 
 La demande « go next avec glm » autorise une contribution GLM interne ciblée.
 La consigne sans compilation reste active. La
@@ -319,7 +320,7 @@ Rust. L’avis GLM exploité porte seulement sur le décodeur brut ; premier app
 épuisé et première recette en échec conservés avec leur reprise vérifiée.
 PA-00/01 et les conditions de suite précédentes restent ouverts.
 
-### Incrément 03 — refus de routage avec GLM
+### Incrément03 — refus de routage avec GLM
 
 [Deux tests ajoutés](paea/INCREMENT-03.md) : six tests publics au total, 248 invocations,
 69 refus attendus et reprises exactes sur les deux domaines en FR/EN. Binaire
@@ -327,7 +328,7 @@ existant stable, sans compilation ni redémarrage. Proposition GLM corrigée ava
 exécution ; preuves conservées. PA-00/01 partiels et dépendances IA3/Rust/AC-02/E3
 inchangées ; aucun lot global clos.
 
-### Incrément 04 — consommateur d’export et méthode GLM corrigée
+### Incrément04 — consommateur d’export et méthode GLM corrigée
 
 [Outil de correspondance réalisé](paea/INCREMENT-04.md) : neuf tests nommés,
 42 observations CLI sur les deux domaines, sans compilation ni installation.
@@ -336,28 +337,28 @@ Plafond client GLM supprimé par défaut après correction explicite utilisateur
 neuf tests HTTP locaux et requête réelle sans champ de plafond conservés.
 PA-00/01 et les prérequis Rust/IA3/AC-02/E3 restent ouverts.
 
-### Incrément 05 — comparaison Rust non qualifiée
+### Incrément05 — comparaison Rust non qualifiée
 
 [Sources Rust et trois tests écrits](paea/INCREMENT-05.md), sans compilation ni
 exécution des tests. Nouvelle extension Python retirée après correction explicite
 de l’utilisateur ; originaux conservés. Aucun raccord CLI/API, installation ou
 verdict d’autorité. PA-01/08/09 restent partiels ; qualification et IA3/AC-02 ouvertes.
 
-### Incrément 06 — raccord CLI Rust non qualifié
+### Incrément06 — raccord CLI Rust non qualifié
 
 [Commande compare et quatre tests CLI écrits](paea/INCREMENT-06.md), sans
 compilation ni exécution. Lecteur existant, deux fichiers nommés, schéma de sortie
 et aide FR/EN ; recette adaptée, non lancée. Aucun projet/effet/accord activé.
 La consigne sans compilation persiste ; PA-01/08/09 et qualification restent ouverts.
 
-### Incrément 07 — liaison reçu/action/cycle en sources
+### Incrément07 — liaison reçu/action/cycle en sources
 
 [Contrôle Rust et quatre tests écrits](paea/INCREMENT-07.md), non compilés/non
 exécutés. Réemploi des digests d’action/intention, du service attendu et du cycle
 UNKNOWN/réconciliation ; aucun reçu authentifié ni service d’effet livré.
 PA-01/03/09 et dépendances PA-02/AC-02 restent ouverts. Aucun projet activé.
 
-### Incrément 08 — consommateur CLI du contrôle de reçu
+### Incrément08 — consommateur CLI du contrôle de reçu
 
 Reprise du programme et consigne **sans compilation ni redémarrage reconfirmée**
 par l’utilisateur. [Raccord CLI Rust et quatre tests écrits](paea/INCREMENT-08.md),
@@ -369,7 +370,7 @@ checkout appelant ; leur effet reste à vérifier. PA-01/03/09, qualification,
 installation, dépendances protégées et RETEX restent ouverts. Prochaine preuve :
 targets affectés et recette sur candidat figé après levée explicite de la consigne.
 
-### Incrément 09 — boucle de vérification sur candidat existant
+### Incrément09 — boucle de vérification sur candidat existant
 
 [14 tests publics réussis, 618 invocations](paea/INCREMENT-09.md), 167 refus
 attendus, recette PASS et intégrité VERIFIED. Le candidat existant dev75, construit
@@ -384,7 +385,7 @@ de bout en bout**. PA-02/03/08/09 protégés, installation, E2/E3 et RETEX ouver
 Consigne sans compilation/redémarrage active ; reprise des tests Rust sur levée
 explicite, des effets sur sortie protégée IA3/PA-02, d’E3 avec les tiers requis.
 
-### Incrément 10 — PAEA-OBS-01 réalisé en sources
+### Incrément10 — PAEA-OBS-01 réalisé en sources
 
 [Rapport autonome v2 et sept tests écrits](paea/INCREMENT-10.md) : empreintes des
 octets exacts du document/reçu, canonicalisation et même contrôle de liaison/cycle.
@@ -397,7 +398,7 @@ reste non vérifié fonctionnellement ; preuves de 09 conservées sur leurs sour
 archivées, sans qualification du nouveau code. PA-01/09 et programme global ouverts.
 
 
-### Incrément 11 — demande explicite de parcours UX
+### Incrément11 — demande explicite de parcours UX
 
 Après la question « ces tests, comment les mettre en œuvre ? », l’utilisateur
 précise « c’est à ajouter ». PA-08 inclut explicitement un accès depuis le menu.
@@ -412,7 +413,7 @@ partiel : accords protégés/configuré-appliqué-observé, deux UX et vigilance
 nécessitent toujours les interfaces PA-02…07 et les essais prévus.
 
 
-### Incrément 12 — qualification sur candidat existant
+### Incrément12 — qualification sur candidat existant
 
 [Preuves publiques et écran relié à la vraie CLI](paea/INCREMENT-12.md) : candidat
 dev77 construit par l’autre session, figé sans compilation/redémarrage ici.
@@ -428,7 +429,7 @@ accords protégés restent ouverts. Les preuves historiques 09…11 sont conserv
 sans qualification générale des 17 invariants ni clôture E2/E3/RETEX.
 
 
-### Incrément 13 — guide opérationnel et parcours UX
+### Incrément13 — guide opérationnel et parcours UX
 
 L’utilisateur fournit le guide opérationnel pour orienter l’implémentation.
 [Correspondance complète](paea/GUIDE-INTEGRATION.md) : copie originale conservée,
@@ -442,7 +443,7 @@ restent hors exécution autorisée. [Suivi et vérifications](paea/INCREMENT-13.
 conservent aussi le traitement borné du contraste PAEA-UX-02, avec tests de
 repos/survol/clavier et distinction entre composant et binaire installé.
 
-### Incrément 14 — deux effets de laboratoire et observation séparée
+### Incrément14 — deux effets de laboratoire et observation séparée
 
 [Dossier opérationnel](paea/PILOTE-OPERATIONNEL.md) : fiches règlement fictif/Git,
 autorités manquantes, carte d’accès et trois recettes exécutables sans build.
@@ -458,7 +459,7 @@ contre-exemple conservé, résolution protégée de dette obligatoire avant PA-0
 invariants de bout en bout**, PA-02/03 protégés, menu de campagnes, qualification
 native, installation/E2/E3/RETEX ouverts. Aucun build ni redémarrage.
 
-### Incrément 15 — qualification native et livraison autorisée
+### Incrément15 — qualification native et livraison autorisée
 
 La restriction de compilation est levée par l’utilisateur. Sur le checkout puis
 un worktree limité au socle publié et à PAEA : **5 tests Python et 45 tests Rust
@@ -473,7 +474,7 @@ Le menu de correspondance est qualifié ; les campagnes de laboratoire restent
 hors UX. Cette livraison ne clôt ni PA-02/03 protégés, ni les **17 invariants**,
 ni E2/E3/RETEX du programme.
 
-### Incrément 16 — identité de dette explicite
+### Incrément16 — identité de dette explicite
 
 [Décision et critères](paea/INCREMENT-16.md) : préserver le hash v1 et résoudre
 fournisseur/référence vers un objet de dette stable avant admission. Bibliothèque
@@ -486,7 +487,7 @@ Incrément 16 vérifié et installé **dev82** : 37 tests de contrat, 2 tests pu
 garde réseau de la recette vérifiée par échec attendu après témoin. Sources non
 commitées ; aucune nouvelle garantie protégée ni clôture E2/E3.
 
-### Incrément 17 — résolution de facture dans le menu
+### Incrément17 — résolution de facture dans le menu
 
 [Contrat, décision et preuves](paea/INCREMENT-17.md) : PA-08 expose le résolveur
 commun depuis Vérifications PAEA, sur une page dédiée avec aide et téléchargement.
@@ -503,7 +504,7 @@ Publication demandée le 26 octobre : commit isolé des incréments 16/17, sans
 push ni nouvelle livraison ; voir le suivi de publication en fin du rapport 17.
 Les mentions précommit ci-dessus conservent leur portée historique.
 
-### Incrément 18 — reprise GLM
+### Incrément18 — reprise GLM
 
 « reprends glm » autorise une contribution interne ciblée sur les contrats
 de résolution/API/UX livrés. [Suivi et critères](paea/INCREMENT-18.md) : chaque
@@ -516,7 +517,7 @@ Quatre inventaires de recettes corrigés ; aucun défaut produit établi, aucune
 modification du produit ni nouvelle installation attribuée à cette tranche.
 Les suites complètes et les garanties protégées ne sont pas déclarées closes.
 
-### Incrément 19 — comparaison depuis le menu avec GLM
+### Incrément19 — comparaison depuis le menu avec GLM
 
 [Tranche, critères et preuves](paea/INCREMENT-19.md) : exposer le comparateur
 existant via API/page commune PAEA, deux domaines, rapport sans valeurs et export
@@ -539,7 +540,7 @@ continuation directe par Codex, **sans GLM**. Préserver les prérequis protég�
 les droits et les budgets ; choisir la prochaine tranche sur l'état réel du plan.
 
 
-### Incrément 20 — exemples prêts à télécharger
+### Incrément20 — exemples prêts à télécharger
 
 [Tranche directe sans GLM](paea/INCREMENT-20.md) : huit fichiers fictifs versionnés,
 aide dans les trois vues et vérifications natives après téléchargement réel.
@@ -559,7 +560,7 @@ Git isolé, sans push ni nouvelle livraison ; les résultats dev96 et les limite
 restent ceux du [suivi20](paea/INCREMENT-20.md).
 
 
-### Incrément 21 — inspection exacte d’une action
+### Incrément21 — inspection exacte d’une action
 
 [Tranche directe](paea/INCREMENT-21.md) : rapport commun lié aux octets, CLI/API
 et lecture des termes/contexte/sources depuis le menu. Aucun accord ni effet ;
@@ -605,7 +606,7 @@ concurrent reste ouverte. [RETEX/preuves](paea/INCREMENT-23.md). Aucun commit23/
 PA-02/03protégés,exécution web de campagnes,E2/E3 et0/17invariants ouverts.
 
 
-### Incrément 24 — contention de révocation/engagement
+### Incrément24 — contention de révocation/engagement
 
 Commit23 `97933d8b7`, 27 fichiers, 108 entrées préparées étrangères préservées.
 [Qualification 24](paea/INCREMENT-24.md) : étendre T05/T17 aux vrais processus
@@ -874,15 +875,15 @@ Incrément53 vérifié localement dev189 :101Rust ciblés/8Go parents/3schéma,9
 
 Reprise PA-03 : [décision de raccord des services](paea/PA03-SERVICE-INTEGRATION.md), sources observées et séquence conditionnelle. Analyse seulement ; aucun effet protégé ni livraison supplémentaire établi.
 
-[Incrément65](paea/INCREMENT-65.md) : permission exacte PAEA distincte de Trust, bibliothèque vérifiée et compilée dans **v0.1.1-dev.218**, 8tests PAEA+3Trust+3refus de compilation, Rustdoc strict et56contrôles Version/UX+garde. Profil normal671entrées, même ELF effectif. Aucun service d’effet protégé activé ; PA02/03, 0sur17, E2/E3/PA13/RETEX ouverts.
+[Incrément65](paea/INCREMENT-65.md) : permission exacte PAEA distincte de Trust, bibliothèque vérifiée et compilée dans **v0.1.1-dev.218**, 8 tests PAEA + 3 Trust + 3 refus de compilation, Rustdoc strict et 56 contrôles Version/UX + garde. Profil normal 671 entrées, même ELF effectif. Aucun service d’effet protégé activé ; PA02/03, 0 sur 17, E2/E3/PA13/RETEX ouverts.
 
-[Incrément66](paea/INCREMENT-66.md) : noyau de règlement fictif séparé installé/vérifié **v0.1.1-dev.220**,12tests Rust et Rustdoc strict,56contrôles Version/UX+garde ; profil normal677entrées, même ELF effectif. Admission attribuée manquante : séparation activée refusée ; aucune activation de service protégé. PA02/03 partiels,0sur17/E2/E3/PA13/RETEX ouverts.
+[Incrément66](paea/INCREMENT-66.md) : noyau de règlement fictif séparé installé/vérifié **v0.1.1-dev.220**, 12 tests Rust et Rustdoc strict, 56 contrôles Version/UX + garde ; profil normal 677 entrées, même ELF effectif. Admission attribuée manquante : séparation activée refusée ; aucune activation de service protégé. PA02/03 partiels, 0 sur 17 / E2/E3/PA13/RETEX ouverts.
 
-[Incrément67](paea/INCREMENT-67.md) vérifié/installé **v0.1.1-dev.221** : quatre incohérences de reçu reproduites puis refusées,13Rust+Rustdoc strict,56Version/UX+garde, profil normal677 et mêmeELF. Aucune signature/protection globale déduite ; PA02/03/0sur17/E2/E3/PA13/RETEX ouverts.
+[Incrément67](paea/INCREMENT-67.md) vérifié/installé **v0.1.1-dev.221** : quatre incohérences de reçu reproduites puis refusées, 13 Rust + Rustdoc strict, 56 Version/UX + garde, profil normal 677 et même ELF. Aucune signature/protection globale déduite ; PA02/03/0 sur 17/E2/E3/PA13/RETEX ouverts.
 
-[Incrément68](paea/INCREMENT-68.md) : six essais Git réels qualifient prepare/type direct/commit-abort sous verrou, après contre-exemple no-deref. Tests/protocole seulement, pas de nouveau service ni version ;221 conservée. Intention durable, runner natif et réconciliation à intégrer ; PA03/global ouverts.
+[Incrément68](paea/INCREMENT-68.md) : six essais Git réels qualifient prepare/type direct/commit-abort sous verrou, après contre-exemple no-deref. Tests/protocole seulement, pas de nouveau service ni version ; 221 conservée. Intention durable, runner natif et réconciliation à intégrer ; PA03/global ouverts.
 
-[Incrément69](paea/INCREMENT-69.md) : primitive Git native en bibliothèque livrée/vérifiée **v0.1.1-dev.222**,8cas natifs/Rustdoc strict,56Version/UX+garde, profil normal678entrées et ELF effectif. Boucle Interrupted après annulation reproduite puis corrigée ; publication réelle sans ACK conservée incertaine. Aucun service Git/admission activé ; PA02/03/0sur17/E2/E3/PA13/RETEX ouverts.
+[Incrément69](paea/INCREMENT-69.md) : primitive Git native en bibliothèque livrée/vérifiée **v0.1.1-dev.222**, 8 cas natifs/Rustdoc strict, 56 Version/UX + garde, profil normal 678 entrées et ELF effectif. Boucle Interrupted après annulation reproduite puis corrigée ; publication réelle sans ACK conservée incertaine. Aucun service Git/admission activé ; PA02/03/0 sur 17/E2/E3/PA13/RETEX ouverts.
 
 ### Incrément70 — intentions Git persistantes
 
@@ -2056,7 +2057,7 @@ personne réelle — requis pour toute exécution live, ne bloque pas ce check
 indépendant ; fixture isolée via opérations publiques supportées, aucune base
 live ; pas d'acceptation globale ; aucun commit/push.
 
-### Increment107 — I04/PA-08 : termes d'accord exacts du moteur exposés dans l'aperçu protégé (implémentation, GLM)
+### Incrément107 — I04/PA-08 : termes d'accord exacts du moteur exposés dans l'aperçu protégé (implémentation, GLM)
 
 Deuxième tranche du parcours d'approbation exacte : le champ `agreement_terms`
 de `GET /api/v1/paea/git-call/preview` expose, pour LES octets canoniques de
@@ -2114,7 +2115,7 @@ l'aperçu reste une présentation — il ne capture pas le consentement ; aucun
 commit/push ; backend262 reste preuve historique valide mais ne prouve pas ce
 helper (tests de ce lot sur sources courantes).
 
-### Increment108 — I04/PA-08 : livraison locale installée des termes d'accord exacts (livraison, GLM)
+### Incrément108 — I04/PA-08 : livraison locale installée des termes d'accord exacts (livraison, GLM)
 
 Correction d'une limite fausse de l'Increment107 : « aucun binaire produit
 modifié » ne signifiait pas « rien à livrer » — l'audit des 715 entrées
@@ -2158,7 +2159,7 @@ de consentement (trust-actions sert toujours le root SERVICE) ; la route
 approbateur vers le root PROJET n'est pas commencée ; aucune présence
 humaine, aucun commit/push, aucune acceptation globale.
 
-### Increment109 — I04/PA-08 : route d'approbation liée (retex de la tranche GLM, dette de journal réglée)
+### Incrément109 — I04/PA-08 : route d'approbation liée (retex de la tranche GLM, dette de journal réglée)
 
 Retex de la tranche précédente (implémentation GLM, preuves retenues dans
 `evidence/20261028-acquisition81-mvfdts57/glm-approval-fresh-fixture-20261030T204930Z/`
@@ -2174,7 +2175,7 @@ l'incrément est la dette : toute tranche livrée reçoit son entrée APEX dans
 le même incrément ; les entrées manquantes sont réglées au plus tôt, sans
 réécriture de l'historique.
 
-### Increment110 — I04/PA-08 : surface navigateur du consentement approbateur (implémentation, Claude)
+### Incrément110 — I04/PA-08 : surface navigateur du consentement approbateur (implémentation, Claude)
 
 Le canal d'approbation reçoit sa surface opérateur réelle :
 `/paea-consent.html` + `/paea-consent.js`, lien hub, entrées d'actifs
@@ -2224,7 +2225,7 @@ fichier) a été reprise sur le contrat réel à corps vide détenu par le
 service — un seul incrément, page + harnais + test d'actifs corrigés
 ensemble (aucune trace d'octets transmis restante).
 
-### Increment111 — I04/PA-08 : qualification navigateur du formulaire d'approbation consommé, fraîche puis périmée (qualification, GLM)
+### Incrément111 — I04/PA-08 : qualification navigateur du formulaire d'approbation consommé, fraîche puis périmée (qualification, GLM)
 
 Le formulaire déjà implémenté
 (`web/paea-approval-form.js`, section « Approbation » de `paea-effects.html`,
@@ -2282,7 +2283,7 @@ aucune livraison `./swarm.sh` requise (l'actif et la route qualifiés sont déj�
 embarqués dans le binaire installé `bin/swarm` daté du 31 octobre 10:25, service
 local actif dessus) ; aucun commit/push.
 
-### Increment112 — I15/PA-07 : la mutation force la réadmission — fin de voie de l'admission retenue, réadmission lie l'empreinte mutée (vérification, Claude)
+### Incrément112 — I15/PA-07 : la mutation force la réadmission — fin de voie de l'admission retenue, réadmission lie l'empreinte mutée (vérification, Claude)
 
 Tâche 3 bornée (Claude seul, dossier
 `evidence/claude-i15-readmission-20261031T100227Z/`, reprise du parcours
@@ -2332,7 +2333,7 @@ acceptation indépendante ; preuve locale de la barrière produit — les
 critères I15 restants (inventaire/correspondance ACS) et PAEA17 restent
 ouverts ; aucun commit/push.
 
-### Increment113 — PA-10 arbitrage E2 : deux domaines re-prouvés sur le candidat courant, déclaration E2 bornée émise (vérification, Claude)
+### Incrément113 — PA-10 arbitrage E2 : deux domaines re-prouvés sur le candidat courant, déclaration E2 bornée émise (vérification, Claude)
 
 **Candidat unique** : `bin/swarm` SHA-256 `1d3f9da1408a82b14b5ae5d76328b58c52f1f92051824af52f1d413be8dd41fd`
 (v0.1.1-dev.267, 6706e201b + travail local 31-10, construit 2026-10-31T11:57Z), profil

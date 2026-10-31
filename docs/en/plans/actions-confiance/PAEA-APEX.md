@@ -229,7 +229,9 @@ only the PA-10 stage; its seven explicit open criteria remain in force: no
 independent acceptance, no real human enrollment, no distinct-UID separation,
 no egress confinement, no E3 closure, I15/ACS inventory pending, fictitious
 SQLite effects. Independent acceptance: 0/17 invariants, unchanged. PAEA17
-triages: see the dedicated open follow-up. Main blockers = human/OS
+triage (5 parts):
+[TRIAGE-PAEA17.md](../../../plans/actions-confiance/paea/evidence/claude-e2-arbitrage-20261031T135859Z/TRIAGE-PAEA17.md).
+Main blockers = human/OS
 prerequisites (newuidmap/newgidmap, real enrollment, E3 evaluator, distinct
 supervisor arbitration); detailed matrix in
 [invariant-matrix.json](../../../plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json).
@@ -279,7 +281,7 @@ The [increment review](paea/INCREMENT-01.md) retains tested scope, all three rev
 axes, limits and resumption conditions. PA-00…PA-13 and its final retrospective
 remain open.
 
-### Increment 02 — authorized GLM contribution, without compilation
+### Increment02 — authorized GLM contribution, without compilation
 
 The user's “go next avec glm” authorizes targeted internal GLM contribution.
 The no-compilation instruction remains active. The
@@ -290,7 +292,7 @@ The usable GLM contribution covers the raw decoder only. Exhausted first call
 and failed first recipe remain preserved with verified recovery. PA-00/01 and
 previous resumption conditions stay open.
 
-### Increment 03 — routing refusals with GLM
+### Increment03 — routing refusals with GLM
 
 [Two tests added](paea/INCREMENT-03.md): six public tests total, 248 invocations,
 69 expected refusals with exact recovery in both domains and FR/EN. Existing
@@ -298,7 +300,7 @@ binary stable, no compilation or restart. GLM proposal corrected before executio
 originals retained. PA-00/01 partial; IA3/Rust/AC-02/E3 dependencies unchanged.
 No full program lot closed.
 
-### Increment 04 — export consumer and corrected GLM method
+### Increment04 — export consumer and corrected GLM method
 
 [Correspondence tool implemented](paea/INCREMENT-04.md): nine named tests,
 42 CLI observations across both domains, no compilation or installation.
@@ -307,28 +309,28 @@ User correction removes default GLM client cap: nine local HTTP tests and actual
 request without limit fields retained. PA-00/01 and Rust/IA3/AC-02/E3 prerequisites
 remain open.
 
-### Increment 05 — Rust comparison, not qualified
+### Increment05 — Rust comparison, not qualified
 
 [Rust sources and three tests written](paea/INCREMENT-05.md), no compilation or
 Rust test execution. New Python extension withdrawn after explicit user correction,
 originals preserved. No CLI/API integration, installation or authority verdict.
 PA-01/08/09 remain partial; qualification and IA3/AC-02 prerequisites open.
 
-### Increment 06 — Rust CLI integration, not qualified
+### Increment06 — Rust CLI integration, not qualified
 
 [Compare command and four CLI tests written](paea/INCREMENT-06.md), without
 compilation or execution. Existing reader, two named files, output schema and
 FR/EN help; recipe updated, not run. No project/effect/approval activated.
 No-compilation persists; PA-01/08/09 and qualification remain open.
 
-### Increment 07 — receipt/action/lifecycle source contract
+### Increment07 — receipt/action/lifecycle source contract
 
 [Rust checker and four tests written](paea/INCREMENT-07.md), uncompiled/unexecuted.
 Reuses action/intent digests, expected sink and UNKNOWN/reconciliation lifecycle;
 no authenticated receipt or effect service delivered. PA-01/03/09 and PA-02/AC-02
 prerequisites stay open. No project activated.
 
-### Increment 08 — receipt checker CLI consumer
+### Increment08 — receipt checker CLI consumer
 
 The user resumed the program and explicitly reconfirmed **no compilation or
 restart**. [Rust CLI adapter and four tests written](paea/INCREMENT-08.md),
@@ -340,7 +342,7 @@ is unverified. PA-01/03/09, qualification, installation, protected dependencies 
 RETEX remain open. Next proof: affected targets and recipe on frozen inputs after
 explicit lifting of the instruction.
 
-### Increment 09 — verification loop on an existing candidate
+### Increment09 — verification loop on an existing candidate
 
 [14 public tests passed, 618 invocations](paea/INCREMENT-09.md), 167 expected
 refusals, recipe PASS and integrity VERIFIED. Existing dev75 candidate from
@@ -355,7 +357,7 @@ Protected PA-02/03/08/09, installation, E2/E3 and RETEX remain open. No-compilat
 restart instruction stays active: Rust tests after explicit lifting, effects after
 protected IA3/PA-02 output, E3 with required third parties.
 
-### Increment 10 — PAEA-OBS-01 implemented in source
+### Increment10 — PAEA-OBS-01 implemented in source
 
 [Standalone v2 report and seven tests written](paea/INCREMENT-10.md): exact raw
 document/receipt hashes, canonicalization and the same binding/lifecycle checker.
@@ -367,7 +369,7 @@ a build. PAEA-OBS-01 remains functionally unverified; increment-09 proofs retain
 their archived source scope and do not qualify new code. PA-01/09/program open.
 
 
-### Increment 11 — explicit UX request
+### Increment11 — explicit UX request
 
 After asking how to use the tests, the user explicitly requested adding UX access.
 PA-08 now explicitly includes a menu entry. [First journey written](paea/INCREMENT-11.md):
@@ -381,7 +383,7 @@ partial: protected approvals/configured-applied-observed, both UX products and
 vigilance still require PA-02…07 interfaces and the planned experiments.
 
 
-### Increment 12 — qualification on an existing candidate
+### Increment12 — qualification on an existing candidate
 
 [Public and actual-CLI screen evidence](paea/INCREMENT-12.md): dev77 candidate
 built by the other session, frozen without compilation/restart here. 434 effective
@@ -395,7 +397,7 @@ assets, installation and protected approvals remain open. Original 09…11 proof
 are preserved; no seventeen-invariant/E2/E3/RETEX closure.
 
 
-### Increment 13 — operational guide and UX journey
+### Increment13 — operational guide and UX journey
 
 The user supplied the operational guide to inform implementation.
 [Complete mapping](paea/GUIDE-INTEGRATION.md) retains the original, maps chapters
@@ -408,7 +410,7 @@ the sink. IAM/industrial execution remains out of scope. The [increment record](
 also retains bounded PAEA-UX-02 contrast work, normal/hover/keyboard tests and
 component-versus-installed-binary distinction.
 
-### Increment 14 — two laboratory effects and separate observation
+### Increment14 — two laboratory effects and separate observation
 
 [Operational dossier](paea/OPERATIONAL-PILOT.md): payment/Git cards, missing
 authorities, access graph and three executable recipes without a build.
@@ -424,7 +426,7 @@ counterexample retained, protected debt resolution required before PA-03.
 end-to-end invariants**, protected PA-02/03, campaign menu, native qualification,
 installation/E2/E3/RETEX open. No build or restart.
 
-### Increment 15 — native qualification and authorized delivery
+### Increment15 — native qualification and authorized delivery
 
 The user lifts the compilation ban. Checkout and targeted worktree on the
 published base: **5 Python and45 Rust tests PASS**, including the two previously
@@ -438,7 +440,7 @@ result retains actual remote commit and active version/PID/hash. Correspondence
 menu is qualified; lab campaigns remain outside UX. This delivery closes neither
 protected PA-02/03, the **17 invariants**, nor program E2/E3/RETEX.
 
-### Increment 16 — explicit debt identity
+### Increment16 — explicit debt identity
 
 [Decision and criteria](paea/INCREMENT-16.md): preserve the v1 hash and resolve
 supplier/reference to a stable debt object before admission. Pure library and
@@ -451,7 +453,7 @@ Increment 16 verified and installed as **dev82**: 37 contract tests, 2 public te
 failure guard verified with an expected failure after a valid control. Sources
 remain uncommitted; no new protected assurance or E2/E3 closure.
 
-### Increment 17 — invoice resolution from the menu
+### Increment17 — invoice resolution from the menu
 
 [Contract, decision and evidence](paea/INCREMENT-17.md): PA-08 exposes the shared
 resolver from PAEA checks, with a dedicated help/download page. Closed native API,
@@ -468,7 +470,7 @@ Publication requested on 26 October: isolated increments-16/17 commit, without
 push or a new delivery; see the publication follow-up at the end of report 17.
 The precommit statements above retain their historical scope.
 
-### Increment 18 — GLM resumed
+### Increment18 — GLM resumed
 
 “reprends glm” authorizes a targeted internal contribution on delivered invoice
 resolution/API/UI contracts. [Criteria and follow-up](paea/INCREMENT-18.md): each
@@ -480,7 +482,7 @@ PASS on stable frozen inputs, 28 native encoding assertions PASS. Four recipe
 inventories corrected; no established product defect, product change or new
 installation attributed to this slice. Full suites/protected guarantees stay open.
 
-### Increment 19 — menu comparison with GLM
+### Increment19 — menu comparison with GLM
 
 [Slice, criteria and evidence](paea/INCREMENT-19.md): expose the existing shared
 comparator through native API/PAEA page, both domains, value-free report and exact
@@ -502,7 +504,7 @@ directly with Codex, **without GLM**. Preserve protected prerequisites, rights
 and budgets; select the next slice from the plan's actual state.
 
 
-### Increment 20 — ready-to-download examples
+### Increment20 — ready-to-download examples
 
 [Direct slice without GLM](paea/INCREMENT-20.md): eight versioned fictional files,
 help in all three views and actual native checks after completed downloads.
@@ -568,7 +570,7 @@ source configuration preserved; concurrent engine compilation remains open.
 browser campaign execution,E2/E3 and0/17invariants stay open.
 
 
-### Increment 24 — revocation/commit contention
+### Increment24 — revocation/commit contention
 
 Commit23 `97933d8b7`, 27 files, 108 foreign staged entries preserved.
 [Qualification 24](paea/INCREMENT-24.md): extend T05/T17 to real overlapping
@@ -837,15 +839,15 @@ Increment53 verified locally dev189:101targetedRust/8Go parents/3schema,9install
 
 PA-03 resumption: [effect service integration decision](paea/PA03-SERVICE-INTEGRATION.md), inspected sources and conditional sequence. Analysis only; no additional protected effect or delivery established.
 
-[Increment65](../../../plans/actions-confiance/paea/INCREMENT-65.md): separate exact PAEA permission, library verified and compiled in **v0.1.1-dev.218**, 8PAEA+3Trust tests+3compile refusals, strict Rustdoc and56Version/UI checks+guard. Normal671-input profile, same actual ELF. No protected effect service activated; PA02/03,0of17,E2/E3/PA13/RETEX remain open.
+[Increment65](../../../plans/actions-confiance/paea/INCREMENT-65.md): separate exact PAEA permission, library verified and compiled in **v0.1.1-dev.218**, 8 PAEA + 3 Trust tests + 3 compile refusals, strict Rustdoc and 56 Version/UI checks + guard. Normal 671-input profile, same actual ELF. No protected effect service activated; PA02/03, 0 of 17, E2/E3/PA13/RETEX remain open.
 
-[Increment66](../../../plans/actions-confiance/paea/INCREMENT-66.md): separate fictitious settlement reference kernel installed and verified in **v0.1.1-dev.220**;12Rust tests, strict Rustdoc,56Version/UI assertions plus script guard. Normal profile677inputs, actual matching ELF. Enabled separation refuses pending attributed admission; no protected daemon activated. PA02/03 partial,0/17/E2/E3/PA13/RETEX remain open.
+[Increment66](../../../plans/actions-confiance/paea/INCREMENT-66.md): separate fictitious settlement reference kernel installed and verified in **v0.1.1-dev.220**; 12 Rust tests, strict Rustdoc, 56 Version/UI assertions plus script guard. Normal profile 677 inputs, actual matching ELF. Enabled separation refuses pending attributed admission; no protected daemon activated. PA02/03 partial, 0/17/E2/E3/PA13/RETEX remain open.
 
-[Increment67](../../../plans/actions-confiance/paea/INCREMENT-67.md) verified/installed **v0.1.1-dev.221**: four inconsistent receipt metadata cases reproduced then refused;13Rust tests,strictRustdoc,56Version/UI assertions plus script guard,normal677inputs and matchingELF. No receipt authenticity or global protection inferred;PA02/03/0of17/E2/E3/PA13/RETEX remain open.
+[Increment67](../../../plans/actions-confiance/paea/INCREMENT-67.md) verified/installed **v0.1.1-dev.221**: four inconsistent receipt metadata cases reproduced then refused; 13 Rust tests, strict Rustdoc, 56 Version/UI assertions plus script guard, normal 677 inputs and matching ELF. No receipt authenticity or global protection inferred; PA02/03/0 of 17/E2/E3/PA13/RETEX remain open.
 
-[Increment68](../../../plans/actions-confiance/paea/INCREMENT-68.md): six real Git experiments qualify prepared-lock/direct-ref/commit-abort primitives after a no-deref counterexample. Tests only; no new native service or delivery number,221 retained. Durable intent, native runner and reconciliation remain required;PA03/global stay open.
+[Increment68](../../../plans/actions-confiance/paea/INCREMENT-68.md): six real Git experiments qualify prepared-lock/direct-ref/commit-abort primitives after a no-deref counterexample. Tests only; no new native service or delivery number, 221 retained. Durable intent, native runner and reconciliation remain required; PA03/global stay open.
 
-[Increment69](../../../plans/actions-confiance/paea/INCREMENT-69.md): native Git protocol library delivered/verified in **v0.1.1-dev.222**;8native cases/strictRustdoc,56Version/UI assertions plus script guard,normal678inputs and matchingliveELF. Persistent Interrupted cancellation replay reproduced then corrected; real publication without ACK remains uncertain. No Git effect service or admission activated;PA02/03/0of17/E2/E3/PA13/RETEX open.
+[Increment69](../../../plans/actions-confiance/paea/INCREMENT-69.md): native Git protocol library delivered/verified in **v0.1.1-dev.222**; 8 native cases/strict Rustdoc, 56 Version/UI assertions plus script guard, normal 678 inputs and matching live ELF. Persistent Interrupted cancellation replay reproduced then corrected; real publication without ACK remains uncertain. No Git effect service or admission activated; PA02/03/0 of 17/E2/E3/PA13/RETEX open.
 
 ### Increment70 — durable Git intents
 
