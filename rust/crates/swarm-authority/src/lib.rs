@@ -18,6 +18,8 @@ pub mod config;
 pub mod sessions;
 /// Signed per-request assertion relayed to the engine (slice B5.1).
 pub mod assertion;
+/// HTTP front: sign-in, sessions and signed relay to the engine (slice B5.3).
+pub mod server;
 
 /// Facts established by [`check`], safe to print: UIDs and directories only,
 /// never pins' private material (the declaration holds none).

@@ -1445,8 +1445,14 @@ name = "swarm-authority"
 version = "0.1.0"
 dependencies = [
  "base64 0.22.1",
+ "cookie",
  "ed25519-dalek",
+ "form_urlencoded",
  "getrandom 0.4.3",
+ "http",
+ "http-body-util",
+ "hyper",
+ "hyper-util",
  "rustix",
  "serde",
  "serde_json",
@@ -1457,6 +1463,7 @@ dependencies = [
  "swarm-enrollment-state",
  "swarm-identity-contract",
  "tempfile",
+ "tokio",
 ]
 
 [[package]]

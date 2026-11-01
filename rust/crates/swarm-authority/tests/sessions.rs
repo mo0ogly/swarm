@@ -27,10 +27,10 @@ fn config_defaults_override_and_refusals() {
     assert_eq!(AuthorityConfig::load(t.path()).unwrap(), custom);
     for bad in [
         r#"{"schema_version":1}"#,
-        r#"{"schema_version":1,"session_absolute_seconds":10,"session_idle_seconds":20,"argon2":{"memory_kib":8,"passes":1,"parallelism":1}}"#,
-        r#"{"schema_version":1,"session_absolute_seconds":0,"session_idle_seconds":0,"argon2":{"memory_kib":8,"passes":1,"parallelism":1}}"#,
-        r#"{"schema_version":1,"session_absolute_seconds":10,"session_idle_seconds":5,"argon2":{"memory_kib":1,"passes":1,"parallelism":1}}"#,
-        r#"{"schema_version":1,"session_absolute_seconds":10,"session_idle_seconds":5,"argon2":{"memory_kib":8,"passes":1,"parallelism":1},"extra":1}"#,
+        r#"{"schema_version":1,"session_absolute_seconds":10,"session_idle_seconds":20,"argon2":{"memory_kib":8,"passes":1,"parallelism":1},"relay_body_max_bytes":1}"#,
+        r#"{"schema_version":1,"session_absolute_seconds":0,"session_idle_seconds":0,"argon2":{"memory_kib":8,"passes":1,"parallelism":1},"relay_body_max_bytes":1}"#,
+        r#"{"schema_version":1,"session_absolute_seconds":10,"session_idle_seconds":5,"argon2":{"memory_kib":1,"passes":1,"parallelism":1},"relay_body_max_bytes":1}"#,
+        r#"{"schema_version":1,"session_absolute_seconds":10,"session_idle_seconds":5,"argon2":{"memory_kib":8,"passes":1,"parallelism":1},"relay_body_max_bytes":1,"extra":1}"#,
     ] {
         std::fs::write(t.path().join("authority.json"), bad).unwrap();
         assert!(AuthorityConfig::load(t.path()).is_err(), "{bad}");

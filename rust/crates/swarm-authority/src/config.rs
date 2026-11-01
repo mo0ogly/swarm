@@ -5,7 +5,8 @@
 //! them as a whole. Admin editing arrives with B8 through the daemon API.
 //!
 //! Validation: lifetimes strictly positive with idle <= absolute; Argon2
-//! costs accepted by the Argon2 parameter contract. Unknown fields refuse.
+//! costs accepted by the Argon2 parameter contract; relay body limit
+//! strictly positive. Unknown fields refuse.
 use serde::{Deserialize, Serialize};
 use swarm_enrollment_authority::credentials::Parameters;
 
@@ -20,6 +21,8 @@ pub struct AuthorityConfig {
     pub session_idle_seconds: i64,
     /// Argon2id costs used for new password verifiers.
     pub argon2: Parameters,
+    /// Largest request body the daemon reads before relaying to the engine.
+    pub relay_body_max_bytes: i64,
 }
 
 /// Installation default, read from the shipped configuration file.
@@ -45,6 +48,7 @@ impl AuthorityConfig {
             || self.session_idle_seconds < 1
             || self.session_idle_seconds > self.session_absolute_seconds
             || self.argon2.validate().is_err()
+            || self.relay_body_max_bytes < 1
         {
             return Err("authority-config-invalid");
         }
