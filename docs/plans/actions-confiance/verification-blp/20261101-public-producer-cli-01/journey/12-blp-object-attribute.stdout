@@ -1,0 +1,1 @@
+{"actor":"admin","attributed":true,"canonical_digest":"52496607b734d45a6cf5aebc775596f79ca5a14fe6c4483aa2676358d92d1fbd","classification":{"compartments":["client-a"],"level":"confidential"},"policy_revision":"2","reason":"PRIVATE_BLP_HISTORY_FIXTURE","runtime_enforced":false,"schema_version":1,"trust_revision":"1"}

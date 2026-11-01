@@ -91,10 +91,10 @@ label désérialisé ou champ de provenance ne constitue une autorité.
 | BLP-01 | Inventaire sources, consommateurs, sorties et frontières, modèle de menace | — | EN COURS |
 | BLP-02 | Moniteur de dominance/combinaison, domaines fixes, erreurs sûres, indépendance Biba | 01 | VÉRIFIÉ (contrats purs ; 10/10 tests du 31/10/2026, voir « Reprise ») |
 | BLP-03 | Configuration persistée révisionnée, migration explicite, Admin/API/CLI | 02 | VÉRIFIÉ partiellement (historique, opérations, tests 5/5 du 31/10/2026 ; migration des objets existants non faite) |
-| BLP-04 | Attribution par producteurs, contexte/mémoire/sorties et replays | 03 | PARTIEL — provenance du prompt privé v3 ; classification, principal et héritage ouverts |
+| BLP-04 | Attribution par producteurs, contexte/mémoire/sorties et replays | 03 | PARTIEL — provenance du prompt privé v3 et contrôle d’objet API/CLI ; classification des sources, principal et héritage ouverts |
 | BLP-05 | Médiation réelle fichiers/réseau/fournisseurs/descendants, refus sans repli | 04 | À FAIRE |
 | BLP-06 | Identité humaine établie, validation des octets/destinataires, nouvelle copie | 03–05 | À FAIRE |
-| BLP-07 | Recettes, revue du candidat, livraison locale, ressources servies et RETEX | 01–06 | EN COURS (recette permanente PASS ; installé v0.1.1-dev.282 ; HTTP+UI qualifiés ; RETEX restant) |
+| BLP-07 | Recettes, revue du candidat, livraison locale, ressources servies et RETEX | 01–06 | EN COURS (incréments ciblés vérifiés ; installé v0.1.1-dev.295 ; recette globale et RETEX transversal ouverts) |
 
 Chaque lot inclut documentation FR/EN, contrats des fonctions et revue explicite
 politiques/fonctions/erreurs liée aux octets. Aucun critère critique non vérifié
@@ -455,3 +455,89 @@ de réparation historique n’est livré. Le journal Trust de l’instance obser
 absent, aucune migration ni initialisation de ses données réelles n’a été faite.
 **BLP-04 reste partiel et BLP-06 indisponible ; aucune confidentialité transversale
 ni acceptation indépendante n’est déclarée.**
+
+## Reprise après commit/push — producteur public, 1er novembre 2026
+
+Le correctif de monotonie est conservé par `a76fb3ef5`, poussé sur
+`origin/codex/clear-product-method-names`. Replan BLP-04 : l'opération moteur
+`blp-object-attribute` existe et est protégée I3/admin, mais les listes fixes
+HTTP et CLI la refusent avant son consommateur. Cela empêche l'opérateur de
+produire l'attribution requise par les lecteurs via ces interfaces.
+
+Deux voies examinées : attendre le registre complet des sources de préparation,
+ou raccorder maintenant le contrôle d'objet existant, sans élargir son autorité.
+Décision Codex : second chemin, incrément borné aux listes publiques, aide CLI,
+témoins de refus/autorisation/rejeu et documentation. Aucun endpoint choisi par
+le client, nouvelle politique, principal implicite ou classement automatique.
+L'Admin existant configure la politique ; aucun formulaire d'attribution d'objet
+n'est livré dans cet incrément. Le contrôle exact digest/chemin ne prouve pas
+une source physique ; préparation, héritage et médiation restent ouverts.
+
+Critères avant livraison : reproduire le refus HTTP courant avec une intention
+valide ; faire passer la même intention sur HTTP et CLI authentifiés ; vérifier
+absence d'autorité pour session seule/jeton faible, révisions périmées, rejeu
+exact, conflit sans mutation, déclassement refusé et reprise. Réutiliser les
+recettes permanentes avec résultats neufs, puis qualifier/installer le binaire
+normal et contrôler version/ressources réellement servies. Propriétaire : Codex.
+État : tests en cours d'écriture ; aucun nouveau comportement déclaré vérifié.
+
+Incident de méthode : le contre-exemple HTTP ad hoc n'avait pas de TMPDIR
+explicite et sa fixture temporaire a été créée puis détruite par `TempDir` dans
+le répertoire système, contraire à la règle du projet. Ses sorties originales
+restent conservées, sans qualification. Le contrôle suivant passe par la recette
+permanente, qui impose le TMPDIR privé configuré ; ce contrôle HTTP a passé avec
+intégrité vérifiée. Le contre-exemple CLI utilise sa propre racine durable privée.
+La recette CLI accepte désormais `SWARM_BLP_PROOF_OUTPUT` pour conserver aussi
+les requêtes/sorties de la traversée dans le dossier de preuve choisi, plutôt
+que seulement un lien vers la zone de fixtures locale. Aucun secret réel.
+
+### Résultat de l’incrément producteur public
+
+- HTTP `20261101-public-producer-web-01` : PASS, intégrité vérifiée ; un test
+  autonome exerce l’attribution HTTP, la session seule et le jeton faible refusés,
+  la révision périmée, le déclassement, le rejeu, le conflit et la reprise.
+- CLI `20261101-public-producer-cli-01` : PASS, intégrité vérifiée ; 25 assertions
+  sur l’image de production qualifiée, historique valide produit par opérations
+  publiques. Les 78 fichiers de requêtes/sorties et le manifeste final sont liés
+  à l’empreinte imprimée dans stdout et revérifiés ; seule l’histoire invalide est
+  injectée dans la fixture. Le contre-exemple CLI sur l’ancienne image refuse au
+  parseur `command_failed`, avant l’authentification attendue.
+- Livraison `20261101-public-producer-installed-01` : PASS ; redémarrage du seul
+  service géré avec `--prepared-build`, version **v0.1.1-dev.295**, image
+  `e1adea56e4cf53e0787d362f55e14bbd53d40c82a38b3815a081b0a33e203c73`.
+  Profil normal conservé, neuf sources d’exécution conformes, 56 assertions
+  navigateur FR/EN/thèmes/version/ressources protégées, aide CLI FR/EN contrôlée.
+  Commit compilé `a76fb3ef5`, changements non commités annoncés par le dialogue.
+
+Précision de preuve : le champ hérité `service_restarted:false` de la sonde
+immuable décrit la sonde de lecture seule, pas l’incrément.
+`delivery-scope.json` lie les sorties du redémarrage et le résultat original,
+avec `service_restarted_by_increment:true` ; le modèle local de sonde a été
+clarifié. Aucun résultat fonctionnel n’est réécrit. Le build unique a terminé
+en 5 min 34 s malgré le compactage Git concurrent ; progression CPU/étapes et
+pression mémoire sont conservées dans `20261101-public-producer-build-contention.json`.
+Aucun processus tiers arrêté, borne arbitraire ni seconde compilation lancée.
+
+Revue politiques/fonctions/erreurs :
+[empreintes et limites](verification-blp/20261101-public-producer-source-review.json).
+Listes fixes = vocabulaire de protocole ; aucun nouveau choix opérateur ni plafond.
+Les commentaires CLI/HTTP décrivent l’autorité réelle et les erreurs restent
+celles du producteur, avec fermeture/publication/sortie conservées. La preuve HTTP
+reste réutilisée pour ses sources web/moteur inchangées ; une clarification de
+l’aide CLI anglaise, non consommée par ce target, a précédé le build normal et
+a été vérifiée sur le binaire livré. Les seules modifications suivantes sont
+preuves/documentation, sans besoin de reconstruire un comportement inchangé.
+
+RETEX local : vérifier le raccord public d’un producteur avant d’en exiger les
+preuves des lecteurs ; ne pas confondre intention Admin et provenance physique.
+Retenir les canaux détaillés, pas seulement leur chemin local, et relire les
+champs de portée en dérivant une sonde. Utiliser le lanceur de recettes pour le
+TMPDIR configuré dès le contre-exemple ; la première exécution ad hoc reste une
+erreur de méthode conservée. Auto-revue uniquement ; aucune acceptation indépendante.
+
+Reprise suivante conservée : BF-05 → BF-07 → BF-16, attribution complète des
+sources de préparation puis liaison du principal/domaine et héritage du résultat.
+Le contrôle d’objet manuel nouvellement public ne remplit aucun de ces contrats.
+BLP-04 reste partiel ; BLP-05/06, migration explicite de l’existant et RETEX
+transversal restent ouverts. Aucune initialisation Trust des données réelles,
+aucun appel fournisseur, aucune déclassification ni conformité globale revendiquée.

@@ -6,7 +6,9 @@ use std::{
 };
 /// Validate the fixed namespace, read bounded input, run the shared engine and
 /// close Root before writing. Output/close failure retains known publication;
-/// the bearer comes only from SWARM_TRUST_TOKEN and is never rendered.
+/// the bearer comes only from SWARM_TRUST_TOKEN and is never rendered. Object
+/// attribution uses the existing authenticated I3/admin engine operation and
+/// current revisions; neither CLI input nor session creates classification authority.
 pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
     if a.pos.len() != 2
         || a.server
@@ -20,7 +22,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     if !matches!(
         op,
         "show"
-            | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check"
+            | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" | "blp-object-attribute"
             | "export"
             | "anchor"
             | "verify"

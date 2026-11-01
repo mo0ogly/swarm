@@ -326,3 +326,25 @@ Portée : attributions PAEA persistées et lecteurs raccordés. Le digest/chemin
 prouve pas à lui seul l’identité physique d’un fichier ni la filiation des copies.
 La classification complète des sources de préparation et le contrôle transversal
 des fichiers, réseaux et fournisseurs restent ouverts. Voir le [plan BLP](../plans/actions-confiance/BLP-APEX.md).
+
+### Attribution explicite par les interfaces publiques
+
+`swarm-rust trust blp-object-attribute --root RACINE --input INTENTION.json --json`
+(identité dans `SWARM_TRUST_TOKEN`) et
+`POST /api/v1/trust-actions?action=blp-object-attribute` (session, Host, Origin,
+CSRF puis `Authorization: Bearer …`) utilisent le même producteur moteur.
+Un Admin I3 courant et habilité fournit `schema_version:1`, `event_id`,
+`expected_revision` BLP, `expected_trust_revision`, `canonical_digest`
+(64 caractères hexadécimaux minuscules), `project_path` absolu UTF-8,
+`classification:{level,compartments}` et `reason` non vide. Les deux révisions
+sont celles de `blp-show`, jamais une valeur présumée.
+
+Le producteur vérifie l'autorité et la dominance avant publication ; même événement
+exact rejoué sans réécriture, autre événement pour le même objet/révision refusé,
+révisions périmées et déclassement refusés. Le lecteur recalcule le digest de son
+objet réel et consulte la politique courante : fournir un digest n'établit ni
+les octets source, ni la filiation physique, ni un droit de déclassification.
+Le formulaire Admin configure la politique ; il n'offre pas encore de formulaire
+d'attribution d'objet. Aucun classement implicite des sources de préparation ou
+contrôle transversal n'est introduit. Les erreurs de publication/conclusion
+conservent leur état connu ; après résultat incertain, relire avant reprise.

@@ -6,6 +6,9 @@ impl NativeHttpService {
     /// Decode only fixed operations behind Host/session/CSRF admission. No input
     /// selects a root, executable, URL or integrity authority. Close failures
     /// preserve the exact known trust publication, never a successful empty body.
+    /// Object attribution is an explicit mutating I3/admin control intent whose
+    /// bearer, revisions and label are checked by the existing engine producer.
+    /// Session admission alone grants no classification or declassification rights.
     pub(super) fn trust_actions(
         &self,
         r: &Request<Vec<u8>>,
@@ -40,7 +43,7 @@ impl NativeHttpService {
                 | "read-object"
                 | "read-original"
                 | "audit-transaction"
-                | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check"
+                | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" | "blp-object-attribute"
                 | "public-anchor" | "public-verify" | "evidence-key-prepare" | "evidence-key-activate" | "evidence-key-revoke"
         ) {
             return Err(HttpServiceError::Refused("trust-action-unknown"));

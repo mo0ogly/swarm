@@ -3280,3 +3280,17 @@ that production image with synthetic history in an inert Root. It verifies the
 public reader/refusal/recovery, not the producer or real migration. Object
 attribution is not currently exposed by the CLI; no new right is introduced to
 manufacture a runtime witness.
+
+BLP public attribution follow-up: `blp-attribution-renewal-web.json` now drives
+object admission through the protected HTTP route, including session-only/weak
+bearer, stale revision, duplicate, downgrade, replay and recovery cases.
+`blp-attribution-history-cli.json` expects 25 assertions: valid attributions now
+come from the public producer, with atomic fixture injection reserved for invalid
+histories. Retained earlier 15-assertion runs keep their narrower original scope.
+Neither recipe proves physical source lineage or complete preparation mediation.
+
+Set `SWARM_BLP_PROOF_OUTPUT` to a fresh journey directory when running the CLI
+recipe to retain raw requests/channels alongside its outer evidence. The script
+hashes those files in `result.json` and prints that result's SHA256 into the
+recipe's retained stdout. `recipe.py verify` verifies the outer receipt; also
+verify the journey manifest/hash before reusing its detailed channels.

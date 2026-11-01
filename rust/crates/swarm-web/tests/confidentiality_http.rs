@@ -1,7 +1,7 @@
 //! BLP history regression through the real protected HTTP service on a fresh
 //! inert Root. No accepted mission, retained source fixture, provider or human
-//! declassification is used or claimed. Producer calls use the public engine
-//! API: object attribution is not exposed as an HTTP operation yet.
+//! declassification is used or claimed. Attribution uses the same protected HTTP
+//! route and separately authenticated I3/admin as the policy operations.
 #![cfg(target_os="linux")]
 use http::{header::{COOKIE, HOST, ORIGIN}, Request};
 use serde_json::{json,Value};
@@ -14,13 +14,20 @@ const KEY:&str="session-0123456789abcdef01234567";
 /// Make a session/Host/Origin/CSRF-protected POST with an independent fixture
 /// bearer. Root and operation are fixed by the caller, never response content.
 fn post(service:&NativeHttpService,listener:&TcpListener,op:&str,body:Value)->swarm_web::HttpReply {
+    post_as(service,listener,op,body,Some("fixture-admin-token"))
+}
+
+/// Keep session admission identical while varying only authenticated bearer.
+/// Missing or weak credentials must never inherit the session administrator.
+fn post_as(service:&NativeHttpService,listener:&TcpListener,op:&str,body:Value,token:Option<&str>)->swarm_web::HttpReply {
     let authority=LocalWebAuthority::from_listener(listener,KEY).unwrap();
-    service.handle(Request::builder().method("POST")
+    let request=Request::builder().method("POST")
         .uri(format!("/api/v1/trust-actions?action={op}"))
         .header(HOST,authority.host()).header(COOKIE,format!("{}={KEY}",authority.cookie_name()))
         .header(ORIGIN,format!("http://{}",authority.host())).header("x-swarm-csrf",KEY)
-        .header("authorization","Bearer fixture-admin-token")
-        .body(serde_json::to_vec(&body).unwrap()).unwrap()).unwrap()
+        ;
+    let request=if let Some(token)=token {request.header("authorization",format!("Bearer {token}"))}else{request};
+    service.handle(request.body(serde_json::to_vec(&body).unwrap()).unwrap()).unwrap()
 }
 
 /// Publish bytes atomically only within this test's inactive trust journal,
@@ -35,16 +42,13 @@ fn inject(root:&Path,bytes:&[u8]) {
     std::fs::File::open(directory).unwrap().sync_all().unwrap();
 }
 
-/// Classify via the existing engine producer, reopen at each operation and
-/// preserve close failures. Returns the real result; no HTTP admission is
-/// fabricated and no object data is delivered by this helper.
-fn attribute(root:&Path,revision:u64,id:&str,level:&str)->Result<(),swarm_engine::RootStoreError> {
-    let store=RootStore::open(root,true).unwrap();
-    let body=json!({"schema_version":1,"event_id":id,"expected_revision":revision,
+/// Submit the exact object classification through session/CSRF and bearer
+/// admission. The client supplies an explicit control intent, never proof of
+/// source bytes, physical lineage or human declassification authority.
+fn attribute(service:&NativeHttpService,listener:&TcpListener,root:&Path,revision:u64,id:&str,level:&str)->swarm_web::HttpReply {
+    post(service,listener,"blp-object-attribute",json!({"schema_version":1,"event_id":id,"expected_revision":revision,
         "expected_trust_revision":1,"canonical_digest":"d".repeat(64),"project_path":root.to_str().unwrap(),
-        "classification":{"level":level,"compartments":["client-a"]},"reason":"PRIVATE_HTTP_BLP_FIXTURE"});
-    let result=store.trust("blp-object-attribute",&serde_json::to_vec(&body).unwrap(),"fixture-admin-token");
-    store.close().unwrap();result.map(|_|())
+        "classification":{"level":level,"compartments":["client-a"]},"reason":"PRIVATE_HTTP_BLP_FIXTURE"}))
 }
 
 /// Demonstrate HTTP bootstrap/policy control, public producer refusal without
@@ -73,13 +77,37 @@ fn policy_renewal_and_poisoned_history_refuse_through_http() {
             "event_id":format!("http-policy-{expected}"),"expected_revision":expected,
             "expected_trust_revision":1,"reason":"HTTP fixture policy renewal","policy":policy}));
         assert!(reply.response.status().is_success(),"policy: {}",String::from_utf8_lossy(reply.response.body()));
-        if expected==0 {attribute(root,1,"first","confidential").unwrap();}
+        if expected==0 {let reply=attribute(&service,&listener,root,1,"first","confidential"); assert!(reply.response.status().is_success(),"HTTP attribution: {}",String::from_utf8_lossy(reply.response.body()));}
     }
     let state=root.join(".swarm/trust-actions.json");let before=std::fs::read(&state).unwrap();
-    assert_eq!(attribute(root,2,"lower","public").unwrap_err().code(),"blp-declassification-required");
+    let intent=json!({"schema_version":1,"event_id":"equal","expected_revision":2,
+        "expected_trust_revision":1,"canonical_digest":"d".repeat(64),"project_path":root.to_str().unwrap(),
+        "classification":{"level":"confidential","compartments":["client-a"]},"reason":"PRIVATE_HTTP_BLP_FIXTURE"});
+    for token in [None,Some("fixture-worker-token")] {
+        let refused=post_as(&service,&listener,"blp-object-attribute",intent.clone(),token);
+        assert!(!refused.response.status().is_success());
+        let error:Value=serde_json::from_slice(refused.response.body()).unwrap();
+        assert_eq!(error["failure"]["code"],"authorization_required");
+        assert_eq!(std::fs::read(&state).unwrap(),before);
+    }
+    let stale=attribute(&service,&listener,root,1,"stale","confidential");
+    assert!(!stale.response.status().is_success());
+    assert_eq!(serde_json::from_slice::<Value>(stale.response.body()).unwrap()["failure"]["code"],"blp-policy-stale");
     assert_eq!(std::fs::read(&state).unwrap(),before);
-    attribute(root,2,"equal","confidential").unwrap();
+    let denied=attribute(&service,&listener,root,2,"lower","public");
+    assert!(!denied.response.status().is_success());
+    let error:Value=serde_json::from_slice(denied.response.body()).unwrap();
+    assert_eq!(error["failure"]["code"],"blp-declassification-required");
+    assert_eq!(std::fs::read(&state).unwrap(),before);
+    assert!(attribute(&service,&listener,root,2,"equal","confidential").response.status().is_success());
     let valid=std::fs::read(&state).unwrap();
+    let replay=attribute(&service,&listener,root,2,"equal","confidential");
+    assert!(replay.response.status().is_success());
+    assert_eq!(std::fs::read(&state).unwrap(),valid);
+    let conflict=attribute(&service,&listener,root,2,"duplicate","confidential");
+    assert!(!conflict.response.status().is_success());
+    assert_eq!(serde_json::from_slice::<Value>(conflict.response.body()).unwrap()["failure"]["code"],"blp-attribution-conflict");
+    assert_eq!(std::fs::read(&state).unwrap(),valid);
     let control=post(&service,&listener,"blp-show",json!({}));
     assert!(control.response.status().is_success());
     assert!(String::from_utf8_lossy(control.response.body()).contains("PRIVATE_HTTP_BLP_FIXTURE"));

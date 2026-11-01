@@ -1,0 +1,47 @@
+{
+  "observed_unix": 1793531098.059375,
+  "cause": "Concurrent detached git maintenance packs cruft using roughly 7 GiB; system memory PSI full near 25%. Owned single build progresses slowly.",
+  "ownership": "Build ancestry verified; detached maintenance parent is user systemd, initiating session unproven. No foreign process stopped.",
+  "decision": "Keep one supported build; inspect actual CPU/IO progression and preserve original records. No additional build, timeout or source edits.",
+  "measurements": [
+    {
+      "pid": 1290147,
+      "state": "S",
+      "cpu_ticks": 180422,
+      "io": [
+        "rchar: 21010",
+        "wchar: 0",
+        "syscr: 86",
+        "syscw: 0",
+        "read_bytes: 12293980160",
+        "write_bytes: 0",
+        "cancelled_write_bytes: 0"
+      ]
+    },
+    {
+      "pid": 1295915,
+      "state": "S",
+      "cpu_ticks": 6554,
+      "io": [
+        "rchar: 8041217",
+        "wchar: 30388775",
+        "syscr: 899",
+        "syscw: 492",
+        "read_bytes: 1068855296",
+        "write_bytes: 30375936",
+        "cancelled_write_bytes: 0"
+      ]
+    }
+  ],
+  "followup_cpu_ticks": [
+    {
+      "pid": 1290147,
+      "cpu_ticks": 194837
+    },
+    {
+      "pid": 1295915,
+      "cpu_ticks": 7428
+    }
+  ],
+  "progress": "CPU ticks increased for compiler and maintenance; contention observed, not a proven compiler deadlock."
+}

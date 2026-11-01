@@ -19,7 +19,7 @@ evidence and recovery, without a second assurance program or changed denominator
 | BLP-01 | Source/reader/output inventory, trust boundaries and threat model | — | PA-00/01 |
 | BLP-02 | Dominance/join monitor, fixed domains, safe errors and independence from Biba | BLP-01 | PA-01/02/06 |
 | BLP-03 | Revisioned persistent policy, explicit migration and Admin/API/CLI parity | BLP-02 | PA-02/08 |
-| BLP-04 | Protected attribution, context/memory/output propagation and replays | BLP-03 | PARTIAL — private v3 prompt provenance; classification, principal and inheritance open |
+| BLP-04 | Protected attribution, context/memory/output propagation and replays | BLP-03 | PARTIAL — private v3 prompt provenance and API/CLI object control; source classification, principal and inheritance open |
 | BLP-05 | Actual filesystem/network/provider/descendant mediation, no unconfined fallback | BLP-04 | PA-04/05 |
 | BLP-06 | Established human identity, approval of exact bytes/recipients, new copy | BLP-03–05 | PA-02/08/09 |
 | BLP-07 | Retained recipes, candidate review, local delivery, served assets and RETEX | BLP-01–06 | PA-09/10/11/12/13 |
@@ -312,3 +312,84 @@ lowered histories refuse; no historical repair command is delivered. The observe
 instance has no Trust journal; no real-data migration/bootstrap was performed.
 **BLP-04 remains partial and BLP-06 unavailable; no transversal confidentiality or
 independent acceptance is claimed.**
+
+## Resume after commit/push — public producer, 1 November 2026
+
+The monotonicity fix is retained in `a76fb3ef5`, pushed to
+`origin/codex/clear-product-method-names`. BLP-04 replan: the engine already
+provides I3/admin-protected `blp-object-attribute`, but the fixed HTTP and CLI
+allowlists refuse it before its consumer. Operators therefore cannot produce
+the attribution required by readers through those interfaces.
+
+Two options: wait for the complete preparation source registry, or connect the
+existing object control without extending its authority. Codex chooses the
+second, bounded to public allowlists, CLI help, admission/refusal/replay witnesses
+and documentation. No client-selected endpoint, new policy, implicit principal
+or automatic classification. Existing Admin configures policy; this increment
+adds no object-attribution form. Digest/path control proves no physical source;
+preparation, inheritance and mediation remain open.
+
+Delivery criteria: reproduce current HTTP refusal with a valid intent; admit
+the same authenticated HTTP/CLI operation; reject session-only/weak bearer,
+stale revisions, conflicts and downgrades without mutation; verify exact replay
+and recovery. Run permanent recipes into fresh evidence, then qualify/install
+the normal binary and check actual version/served resources. Owner: Codex.
+State: regression tests being written; no newly verified behavior claimed.
+
+Method incident: the ad hoc HTTP counterexample inherited no explicit TMPDIR;
+`TempDir` created and removed its owned fixture in the system temporary directory,
+contrary to the project rule. Original outputs remain, without qualification.
+The next HTTP check used the permanent recipe's configured private TMPDIR and
+passed with verified integrity. The CLI counterexample uses its own durable
+private fixture. CLI recipe now accepts `SWARM_BLP_PROOF_OUTPUT` to retain actual
+journey requests/channels in the chosen proof folder instead of only linking a
+local fixture path. No real credentials.
+
+### Public-producer increment result
+
+- HTTP `20261101-public-producer-web-01`: PASS, integrity verified; one autonomous
+  test covers HTTP attribution, session-only/weak bearer refusal, stale revisions,
+  downgrade, replay, conflict and recovery.
+- CLI `20261101-public-producer-cli-01`: PASS, integrity verified; 25 assertions
+  on the qualified production image. Public operations produce valid history;
+  only invalid history is fixture-injected. All 78 request/channel artifacts and
+  their final manifest are bound to the digest printed in stdout and reverified.
+  On the old image the CLI counterexample stops at `command_failed` parsing,
+  before expected authentication.
+- Delivery `20261101-public-producer-installed-01`: PASS; only the managed service
+  restarted using `--prepared-build`, **v0.1.1-dev.295**, image
+  `e1adea56e4cf53e0787d362f55e14bbd53d40c82a38b3815a081b0a33e203c73`.
+  Normal profile retained, nine runtime sources matched, 56 browser assertions
+  for FR/EN/themes/version/protected assets, plus FR/EN CLI help checks. Compiled
+  commit `a76fb3ef5`; the dialog discloses uncommitted changes.
+
+Evidence clarification: inherited `service_restarted:false` in the immutable
+probe result describes only that read-only probe. `delivery-scope.json` binds
+original results and restart channels with `service_restarted_by_increment:true`;
+the local probe template now uses an explicit field. No functional result is
+rewritten. The single build completed in 5m34s despite concurrent Git maintenance;
+CPU/stage progression and memory pressure remain in
+`20261101-public-producer-build-contention.json`. No foreign process stopped,
+arbitrary deadline or duplicate build.
+
+Policies/functions/errors review:
+[hashes and limits](verification-blp/20261101-public-producer-source-review.json).
+Fixed operation names are protocol vocabulary; no new operator policy or ceiling.
+CLI/HTTP contracts document actual authority; producer errors and existing
+close/publication/output handling remain intact. HTTP evidence is reused only for
+unchanged web/engine sources; the later English CLI-help clarification is not
+consumed by that target and was checked on the normal delivered image. Subsequent
+changes are evidence/documentation only and require no behavioral rebuild.
+
+Local RETEX: verify the public producer path before requiring its attribution
+from readers; Admin intent establishes no physical provenance. Retain detailed
+channels, not just local paths, and review scope fields when deriving a probe.
+Use the recipe runner's configured TMPDIR from the first counterexample; the
+initial ad hoc location mistake remains retained. Same-context review only,
+without independent acceptance.
+
+Next retained work: BF-05 → BF-07 → BF-16, complete preparation-source attribution,
+then authenticated principal/domain binding and result inheritance. Newly public
+manual object control supplies none of these contracts. BLP-04 stays partial;
+BLP-05/06, explicit existing-object migration and transversal RETEX remain open.
+No live Trust bootstrap, provider call, declassification or global conformance.

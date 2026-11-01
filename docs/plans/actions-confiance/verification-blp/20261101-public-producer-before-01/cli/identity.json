@@ -1,0 +1,7 @@
+{
+  "binary": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-4164953c841c2b22476bd552a12496aac2b7f95e9b26de04d986c3238e2ed83c",
+  "binary_sha256": "4164953c841c2b22476bd552a12496aac2b7f95e9b26de04d986c3238e2ed83c",
+  "profile": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/local-delivery/rust-3r0eves6/build/profile/result.json",
+  "root": "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-blp-history-bg9j2i0x",
+  "scope": "owned inert CLI history fixture; no production mutation"
+}

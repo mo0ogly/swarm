@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "version": "v0.1.1-dev.295",
+  "binary_sha256": "e1adea56e4cf53e0787d362f55e14bbd53d40c82a38b3815a081b0a33e203c73",
+  "runtime_sources_match": [
+    "rust/crates/swarm-engine/src/trust/confidentiality.rs",
+    "rust/crates/swarm-engine/src/trust/state.rs",
+    "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+    "rust/crates/swarm-engine/src/root_store/reader_guard.rs",
+    "rust/crates/swarm-engine/src/trust/error.rs",
+    "rust/crates/swarm-confidentiality/src/lib.rs",
+    "rust/crates/swarm-web/src/service/trust.rs",
+    "rust/crates/swarm-cli/src/trust.rs",
+    "rust/crates/swarm-cli/src/lib.rs"
+  ],
+  "profile": ".cache/local-delivery/rust-e1xcyddc/build/profile",
+  "service_restarted": false,
+  "global_watchdog": null,
+  "scope": "installed BLP increment and read-only PAEA/version/assets; no global BLP conformance"
+}

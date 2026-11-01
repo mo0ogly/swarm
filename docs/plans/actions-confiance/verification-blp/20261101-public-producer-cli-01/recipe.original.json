@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "blp-attribution-history-cli",
+  "inputs": [
+    "tests/blp_attribution_history_cli.py",
+    "tests/fixture_area.py",
+    "tests/rust_agent_model_route.py",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "qualified-cli-history-refusal-and-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,sys; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=Path(os.environ['SWARM_BLP_PROOF_OUTPUT']) if 'SWARM_BLP_PROOF_OUTPUT' in os.environ else fixture_root('blp-history-proof-')/'journey'; subprocess.run(['python3','tests/blp_attribution_history_cli.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',str(out)],check=True); print('BLP_HISTORY_CLI_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "BLP_HISTORY_CLI_PASS 25",
+        "PASS public-downgrade-refuses",
+        "PASS confidential-downgrade-refuses",
+        "PASS image-stayed-identical"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

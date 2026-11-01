@@ -1,0 +1,10 @@
+[
+  "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-4164953c841c2b22476bd552a12496aac2b7f95e9b26de04d986c3238e2ed83c",
+  "--root",
+  "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-blp-history-bg9j2i0x",
+  "--json",
+  "trust",
+  "blp-policy-apply",
+  "--input",
+  "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-public-producer-before-01/cli/03-blp-policy-apply.input.json"
+]

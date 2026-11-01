@@ -316,3 +316,24 @@ Scope: persisted PAEA attributions and connected readers. Digest/path alone prov
 neither physical source-file identity nor copy lineage. Complete preparation-source
 classification and transversal file/network/provider mediation remain pending.
 See the [BLP plan](plans/actions-confiance/BLP-APEX.md).
+
+### Explicit attribution through public interfaces
+
+`swarm-rust trust blp-object-attribute --root ROOT --input INTENT.json --json`
+(identity in `SWARM_TRUST_TOKEN`) and
+`POST /api/v1/trust-actions?action=blp-object-attribute` (session, Host, Origin,
+CSRF, then `Authorization: Bearer …`) share the existing engine producer.
+A current, appropriately cleared I3/admin supplies `schema_version:1`, `event_id`,
+BLP `expected_revision`, `expected_trust_revision`, `canonical_digest`
+(64 lowercase hexadecimal characters), absolute UTF-8 `project_path`,
+`classification:{level,compartments}` and nonempty `reason`. Both revisions come
+from `blp-show`, never guessed values.
+
+The producer checks authority and dominance before publication: identical events
+replay without rewriting; a different event for the same object/revision, stale
+revisions and downgrades refuse. Readers recompute their actual object's digest
+and consult current policy: supplying a digest establishes neither source bytes,
+physical lineage nor declassification authority. Admin configures policy but has
+no object-attribution form yet. This adds no implicit preparation-source labels
+or transversal control. Publication/close failures retain known outcome; reread
+before retrying an uncertain result.

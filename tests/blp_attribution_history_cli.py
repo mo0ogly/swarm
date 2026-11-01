@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Exercise the qualified production CLI's historical BLP validation.
 
-Only an owned inert Root is used. Public init/policy operations provide a valid
-control; synthetic attributions are then injected atomically into this fixture
-only, like the engine corruption regression. This tests read refusal/redaction
-and recovery, not the attribution producer or human declassification.
+Only an owned inert Root is used. Public init/policy/attribution operations
+produce the valid history and test authentication, freshness, replay and
+monotonicity. Only negative histories are injected atomically into this fixture.
+Read refusal/redaction and exact recovery prove no human declassification.
 """
 import argparse
 import hashlib
@@ -33,7 +33,8 @@ def main():
     """Assert exact qualified image, valid history, rejection and exact recovery.
 
     Arguments select immutable binary/profile and a fresh evidence directory.
-    Original channels, inputs and fixture identity are retained; no live state,
+    Original channels, inputs and fixture identity are hashed into the final result,
+    whose digest is printed for the recipe receipt. No live state,
     provider, watchdog or implicit retry. Fixture poisoning never grants rights.
     """
     parser=argparse.ArgumentParser(description=__doc__)
@@ -81,16 +82,35 @@ def main():
     check('trust-policy-produced',call('config-apply',config,token='')[0]==0)
     policy=dict(schema_version=1,levels=[dict(id='public',name_fr='Public',name_en='Public'),dict(id='confidential',name_fr='Confidentiel',name_en='Confidential')],
         compartments=['client-a'],clearances={'admin':dict(level='confidential',compartments=['client-a'])})
+    state=root/'.swarm/trust-actions.json'
+    marker='PRIVATE_BLP_HISTORY_FIXTURE';key=hashlib.sha256(marker.encode()).hexdigest()
     for revision in [0,1]:
         proposal=dict(schema_version=1,event_id=f'blp-policy-{revision}',expected_revision=revision,expected_trust_revision=1,reason='Explicit fixture policy',policy=policy)
         check(f'blp-revision-{revision+1}-produced',call('blp-policy-apply',proposal)[0]==0)
-    state=root/'.swarm/trust-actions.json';original=json.loads(state.read_bytes())
-    marker='PRIVATE_BLP_HISTORY_FIXTURE';key=hashlib.sha256(marker.encode()).hexdigest()
-    for index,entry in enumerate(original['confidentiality']['history']):
-        entry['attributions']=[dict(canonical_digest=key,project_path=list(str(root).encode()),policy_revision=index+1,
-            level='confidential',compartments=['client-a'],actor='admin',at='2026-11-01T00:00:00Z',reason=marker)]
+        intent=dict(schema_version=1,event_id=f'attribute-{revision+1}',expected_revision=revision+1,
+            expected_trust_revision=1,canonical_digest=key,project_path=str(root),
+            classification=dict(level='confidential',compartments=['client-a']),reason=marker)
+        before=state.read_bytes()
+        if revision==0:
+            for label,token in [('session',''),('worker','fixture-worker-token')]:
+                code,error=call('blp-object-attribute',intent,token=token)
+                check(f'{label}-cannot-attribute',code!=0 and error['failure']['code']=='authorization_required' and state.read_bytes()==before)
+        else:
+            stale=dict(intent,expected_revision=1,event_id='stale-attribution')
+            code,error=call('blp-object-attribute',stale)
+            check('stale-attribution-refuses',code!=0 and error['failure']['code']=='blp-policy-stale' and state.read_bytes()==before)
+            lower=dict(intent,event_id='lower-attribution',classification=dict(level='public',compartments=[]))
+            code,error=call('blp-object-attribute',lower)
+            check('producer-downgrade-refuses',code!=0 and error['failure']['code']=='blp-declassification-required' and state.read_bytes()==before)
+        code,reply=call('blp-object-attribute',intent)
+        check(f'public-attribution-{revision+1}-produced',code==0 and reply['attributed'] is True and reply['canonical_digest']==key)
+        saved=state.read_bytes()
+        replay_code,replay=call('blp-object-attribute',intent)
+        check(f'attribution-{revision+1}-exact-replay',replay_code==0 and replay==reply and state.read_bytes()==saved)
+        code,error=call('blp-object-attribute',dict(intent,event_id=f'duplicate-{revision+1}'))
+        check(f'attribution-{revision+1}-duplicate-refuses',code!=0 and error['failure']['code']=='blp-attribution-conflict' and state.read_bytes()==saved)
     assert root.parent==fixture_area().resolve() and root.name.startswith('swarm-blp-history-')
-    publish(state,original);valid=state.read_bytes();publish(out/'valid-history-state.json',valid)
+    valid=state.read_bytes();publish(out/'valid-history-state.json',valid)
     code,view=call('blp-show',{})
     check('equal-label-history-positive-control',code==0 and len(view['record']['history'])==2)
     check('positive-read-is-readonly',state.read_bytes()==valid)
@@ -105,7 +125,9 @@ def main():
         publish(state,valid)
         check(f'{label}-exact-fixture-recovery',call('blp-show',{})[0]==0 and state.read_bytes()==valid)
     check('image-stayed-identical',digest(binary)==sha)
-    publish(out/'result.json',dict(status='PASS',checks=checks,binary_sha256=sha,root=str(root),global_watchdog=None,limits='fixture-injected history, no producer/declassification/independent acceptance'))
+    artifacts={str(p.relative_to(out)):digest(p) for p in sorted(out.rglob('*')) if p.is_file()}
+    publish(out/'result.json',dict(status='PASS',checks=checks,artifacts=artifacts,binary_sha256=sha,root=str(root),global_watchdog=None,limits='public attribution controls; negative history fixture only; no physical source lineage/declassification/independent acceptance'))
+    print('BLP_HISTORY_JOURNEY_SHA256 '+digest(out/'result.json'),flush=True)
     print('BLP_HISTORY_CLI_PASS '+str(len(checks)),flush=True)
 
 

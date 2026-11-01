@@ -1,0 +1,10 @@
+[
+  "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-vov47k4z",
+  "--root",
+  "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-blp-history-dkd7bc3r",
+  "--json",
+  "trust",
+  "blp-object-attribute",
+  "--input",
+  "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-public-producer-cli-01/journey/06-blp-object-attribute.input.json"
+]

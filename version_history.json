@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Confidentialité : attribution explicite d’un objet par API et CLI, sous identité Admin I3 et révisions courantes. Les refus, le rejeu et la monotonie utilisent le même producteur moteur ; aucune classification automatique des sources de préparation.",
+        "en": "Confidentiality: explicit object attribution through API and CLI under a current I3 Admin identity and revisions. Refusal, replay and monotonicity share the existing engine producer; no automatic preparation-source classification."
+      },
+      {
         "fr": "Confidentialité PAEA : un renouvellement de politique ne permet plus d’abaisser la classification du même objet ni de retirer ses compartiments. Le refus préserve le journal ; les renouvellements égaux ou plus restrictifs restent possibles. Un historique déjà abaissé est refusé à la relecture. La déclassification humaine reste à implémenter.",
         "en": "PAEA confidentiality: policy renewal can no longer lower the same object’s classification or remove its compartments. Refusal preserves the journal; equal or stricter renewal remains possible. An already-lowered history is rejected on read. Human declassification remains to be implemented."
       },
