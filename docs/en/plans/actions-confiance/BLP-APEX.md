@@ -155,4 +155,10 @@ qualification; their `version_history.json` entry was re-inserted on top of
 their state and the BLP entry rewritten atomically (both coexist). Server 283
 does serve the repaired BLP routing (probe `blp-show` → identical 403
 `authorization_required`); its release notes lack the BLP entry (built before
-the rewrite) — it will be included in the next build.
+the rewrite.
+
+Resolved: the next build **v0.1.1-dev.284** (third-party session, commit
+`3b5191e2c5` = my delivery commit) contains the BLP entry — proof: the
+build's `effective-sources.tar.gz` (`.cache/local-delivery/rust-e4t0j_65/`),
+one real BLP entry. Probe re-qualified on the active 284 image:
+`blp-show` without an I3 token → identical 403 `authorization_required`.

@@ -283,5 +283,10 @@ qualification ; son entrée `version_history.json` a été réinsérée par-dess
 l'état tiers et l'entrée BLP réécrite atomiquement (les deux coexistent).
 Le serveur 283 exécute bien le routage BLP corrigé (sonde `blp-show` →
 403 `authorization_required` identique) ; sa note d'évolution ne contient
-pas l'entrée BLP (construction antérieure à la réécriture) — elle sera
-incluse au prochain build.
+pas l'entrée BLP (construction antérieure à la réécriture).
+
+Résolution : le build suivant **v0.1.1-dev.284** (session tierce, commit
+`3b5191e2c5` = mon commit de livraison) contient l'entrée BLP — preuve :
+`effective-sources.tar.gz` du build (`.cache/local-delivery/rust-e4t0j_65/`),
+une entrée BLP réelle. Sonde requalifiée sur l'image active 284 :
+`blp-show` sans jeton I3 → 403 `authorization_required` identique.
