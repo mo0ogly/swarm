@@ -270,6 +270,10 @@ mod linux {
                     attributes.insert(k.to_owned(), v.to_owned());
                 }
                 let profile = Profile { display_name: display.clone(), roles: roles.split(',').map(str::to_owned).collect(), integrity, attributes };
+                let policy = match Policy::load(&loaded.dir) { Ok(p) => p, Err(c) => return fail(c) };
+                if profile.roles.iter().any(|r| !policy.has_role(r)) {
+                    return fail("account-role-unknown");
+                }
                 match a.create(&Context::new(), subject, &profile, password.as_bytes(), config.argon2) {
                     Ok(_) => print(serde_json::json!({"schema_version": 1, "subject": subject, "created": true})),
                     Err(e) => fail(e.code()),

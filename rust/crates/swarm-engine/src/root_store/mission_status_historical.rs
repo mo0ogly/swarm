@@ -452,6 +452,14 @@ fn changes(input: &super::MissionStatusInputs, limit: Option<usize>) -> Result<M
     Ok(out)
 }
 
+/// A terminal (`completed`/`failed`/`interrupted`) automatic-origin Agent
+/// recorded before mission bindings became mandatory: no binding at all.
+fn legacy_unbound_terminal(agent: &crate::Agent) -> bool {
+    agent.origin == "conducteur"
+        && agent.native_mission.is_none()
+        && matches!(agent.status.as_str(), "completed" | "failed" | "interrupted")
+}
+
 impl RootStore {
     /// Recheck original first-worker attribution without requiring its mutable
     /// copy or invoking Git/provider operations. Errors retain launch causes;
@@ -459,18 +467,30 @@ impl RootStore {
     /// performs no INSERT or reservation change; its deferred read transaction
     /// and rollback preserve operation/cleanup causes. Sequential checks are not an
     /// atomic filesystem snapshot or protection from same-UID tampering.
-    fn status_managed_workers(&self, work: &crate::Work, agents: &[crate::Agent], settings: &crate::EngineSettingsDocument) -> Result<(), E> {
+    /// Verify the provenance of every managed worker for the status read.
+    /// Exception (read only): a *terminal* `conducteur` Agent without any
+    /// recorded mission binding predates the mandatory binding; it can never
+    /// be claimed, granted or relaunched (those paths keep the strict check),
+    /// so it is reported as unverified historical provenance instead of
+    /// refusing the whole status. Returns how many were not verified.
+    fn status_managed_workers(&self, work: &crate::Work, agents: &[crate::Agent], settings: &crate::EngineSettingsDocument) -> Result<usize, E> {
         // Original native provenance includes the FIFO journal, whose coherent
         // history reader requires an explicit read transaction. Close it before
         // the enclosing status performs other independent read transactions.
+        let mut unverified = 0;
         super::mission_supervision_store::read_transaction(&self.db, || {
             for agent in agents {
+                if legacy_unbound_terminal(agent) {
+                    unverified += 1;
+                    continue;
+                }
                 crate::managed_repository::verify_worker(&self.root, &self.db, work, agent, settings,
                     crate::managed_repository::WorkerCheck::Observe).map_err(|e|
                         crate::MissionSupervisionError::Root(Box::new(E::Launch(Box::new(e)))))?;
             }
             Ok(())
-        }).map_err(mission)
+        }).map_err(mission)?;
+        Ok(unverified)
     }
     /// Read the Go 21-key historical aggregate for supported ordinary Work and
     /// ready/waiting planning trees, including unstarted managed tasks. Initial
@@ -501,6 +521,7 @@ impl RootStore {
     ) -> Result<MissionStatusObservation, E> {
         let mut causes = Vec::new();
         let mut baseline = None;
+        let mut legacy_unverified = 0;
         let result = super::material_path::with_material_read(self, || {
             let input = self.mission_status_inputs(work, operator)?;
             let settings = self.read_settings()?;
@@ -508,7 +529,7 @@ impl RootStore {
             let now = crate::system_timestamp().map_err(E::Runtime)?;
             let result = (|| {
                 let managed = input.work.planning.as_deref().is_some_and(|p| p.repository.is_some());
-                if managed { self.status_managed_workers(&input.work, &input.agents, &settings)?; }
+                if managed { legacy_unverified = self.status_managed_workers(&input.work, &input.agents, &settings)?; }
                 if managed {
                     super::mission_status_reports::supported_observed(&input.work, &input.agents, true)?;
                 } else {
@@ -707,7 +728,14 @@ impl RootStore {
             )
         });
         match result {
-            Ok(status) => Ok(MissionStatusObservation { status, causes }),
+            Ok(status) => {
+                // Informational only, and only on success: attached to a
+                // failure it would turn the refusal into a cleanup code.
+                if legacy_unverified > 0 {
+                    causes.push(E::Refused("mission-status-legacy-provenance-unverified"));
+                }
+                Ok(MissionStatusObservation { status, causes })
+            }
             Err(error) => Err(retain(error, causes)),
         }
     }
@@ -715,6 +743,18 @@ impl RootStore {
 
 #[cfg(all(test, target_os = "linux"))]
 mod tests {
+    #[test]
+    fn only_terminal_unbound_conductor_agents_skip_status_provenance() {
+        let agent = |origin: &str, status: &str| crate::Agent { origin: origin.into(), status: status.into(), ..Default::default() };
+        for status in ["completed", "failed", "interrupted"] {
+            assert!(super::legacy_unbound_terminal(&agent("conducteur", status)), "{status}");
+        }
+        for status in ["queued", "starting", "running", "stopping"] {
+            assert!(!super::legacy_unbound_terminal(&agent("conducteur", status)), "active stays strict: {status}");
+        }
+        assert!(!super::legacy_unbound_terminal(&agent("operateur", "completed")));
+    }
+
     use super::*;
     use crate::SystemEnvironment;
     use std::{fs, os::unix::fs::PermissionsExt, path::PathBuf};

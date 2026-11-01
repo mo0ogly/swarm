@@ -1,9 +1,15 @@
 {
- "schema_version": 1,
+ "schema_version": 2,
+ "roles": [
+  {"key": "viewer", "label": "Lecteur", "description": "Consulte le cockpit et les préparations."},
+  {"key": "operator", "label": "Opérateur", "description": "Pilote les missions et mène les préparations."},
+  {"key": "approver", "label": "Approbateur", "description": "Consulte et approuve les actions de confiance."},
+  {"key": "admin", "label": "Administrateur", "description": "Toutes les habilitations (non modifiable)."}
+ ],
  "grants": [
-  {"role": "viewer", "actions": ["read"]},
-  {"role": "operator", "actions": ["read", "write"]},
-  {"role": "approver", "actions": ["read", "approve"]},
-  {"role": "admin", "actions": ["read", "write", "approve", "administer"]}
+  {"role": "viewer", "permissions": ["cockpit.read", "preparations.read"]},
+  {"role": "operator", "permissions": ["cockpit.read", "missions.write", "preparations.read", "preparations.write", "settings.read", "providers.read", "budgets.read"]},
+  {"role": "approver", "permissions": ["cockpit.read", "preparations.read", "approvals.approve"]},
+  {"role": "admin", "permissions": ["cockpit.read", "missions.write", "preparations.read", "preparations.write", "approvals.approve", "settings.read", "settings.write", "providers.read", "providers.write", "budgets.read", "budgets.write", "accounts.manage", "audit.read", "unclassified.write"]}
  ]
 }

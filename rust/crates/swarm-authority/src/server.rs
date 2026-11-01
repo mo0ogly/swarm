@@ -219,7 +219,7 @@ pub(crate) enum Credential {
 impl Credential {
     fn label(&self) -> String {
         match self {
-            Self::Session(_) => "session".into(),
+            Self::Session(token) => format!("session:{}", crate::sessions::token_id(token)),
             Self::Key { id, .. } => format!("key:{id}"),
         }
     }
@@ -300,7 +300,8 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
             match outcome {
                 Ok(Ok((token, _))) => {
                     // A refused audit line refuses the sign-in (fail closed).
-                    if front.audit.record(&audit::Event { at: now(), event: "sign-in", subject: named, ..Default::default() }).is_err() {
+                    let via = format!("session:{}", crate::sessions::token_id(&token));
+                    if front.audit.record(&audit::Event { at: now(), event: "sign-in", subject: named, credential: Some(&via), ..Default::default() }).is_err() {
                         let _ = front.sessions.logout(&token);
                         return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-audit-unavailable"));
                     }
@@ -324,7 +325,8 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
             let api = req.uri().path() == "/api/v1/logout";
             if let Some(t) = session_token(&req) {
                 if let Ok(Some(subject)) = front.sessions.logout(&t) {
-                    if front.audit.record(&audit::Event { at: now(), event: "sign-out", subject: Some(&subject), ..Default::default() }).is_err() {
+                    let via = format!("session:{}", crate::sessions::token_id(&t));
+                    if front.audit.record(&audit::Event { at: now(), event: "sign-out", subject: Some(&subject), credential: Some(&via), ..Default::default() }).is_err() {
                         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
                     }
                 }
@@ -400,7 +402,10 @@ async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Res
     } else {
         match authorize(&front, &view, req.method().as_str(), &path) {
             Ok(_) => "administer",
-            Err(r) => return Ok(r),
+            Err(r) => {
+                note(&front, "refused", &view.subject, &format!("session:{}", crate::sessions::token_id(&token)), req.method().as_str(), &path, Some(403));
+                return Ok(r);
+            }
         }
     };
     if req.method() == Method::GET || req.method() == Method::HEAD {
@@ -408,11 +413,12 @@ async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Res
     }
     let method = req.method().as_str().to_owned();
     let subject = view.subject.clone();
-    if let Err(r) = intent(&front, &subject, "session", None, &method, &path, action) {
+    let via = format!("session:{}", crate::sessions::token_id(&token));
+    if let Err(r) = intent(&front, &subject, &via, None, &method, &path, action) {
         return Ok(r);
     }
     let response = admin::handle(Arc::clone(&front), req, view, token).await;
-    outcome(&front, &subject, "session", None, &method, &path, action, response.status());
+    outcome(&front, &subject, &via, None, &method, &path, action, response.status());
     Ok(response)
 }
 
@@ -425,8 +431,15 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
     // is final for this request and carries only stable codes.
     let action = match authorize(&front, &view, req.method().as_str(), req.uri().path()) {
         Ok(a) => a,
-        Err(r) => return Ok(r),
+        Err(r) => {
+            note(&front, "refused", &view.subject, &credential.label(), req.method().as_str(), req.uri().path(), Some(403));
+            return Ok(r);
+        }
     };
+    // Page views (browser navigations) are recorded as consultations, best
+    // effort; API reads are not, to keep the audit at human scale.
+    let consultation = req.method() == Method::GET
+        && req.headers().get(header::ACCEPT).and_then(|v| v.to_str().ok()).is_some_and(|a| a.contains("text/html"));
     if let Credential::Key { scope, .. } = &credential {
         if action > *scope {
             let body = serde_json::json!({"error": "authority-policy-denied", "action": action, "reason": "key-scope"});
@@ -440,6 +453,7 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
     let nonce: String = nonce.iter().map(|b| format!("{b:02x}")).collect();
     let reference = format!("assertion:{nonce}");
     let via = credential.label();
+    let (view_subject, consulted) = (view.subject.clone(), req.uri().path().to_owned());
     let audited = (action != policy::Action::Read).then(|| (view.subject.clone(), req.method().as_str().to_owned(), req.uri().path().to_owned(), action_name(action)));
     if let Some((subject, method, p, a)) = &audited {
         if let Err(r) = intent(&front, subject, &via, Some(&reference), method, p, a) {
@@ -503,8 +517,19 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
     };
     if let Some((subject, method, p, a)) = &audited {
         outcome(&front, subject, &via, Some(&reference), method, p, a, response.status());
+    } else if consultation {
+        note(&front, "consultation", &view_subject, &via, "GET", &consulted, Some(response.status().as_u16()));
     }
     Ok(response)
+}
+
+/// Best-effort informational line (consultation, refusal): a write failure
+/// is reported on stderr and never changes the response.
+fn note(front: &Front, event: &str, subject: &str, via: &str, method: &str, path: &str, status: Option<u16>) {
+    let ev = audit::Event { at: now(), event, subject: Some(subject), credential: Some(via), method: Some(method), path: Some(path), status, ..Default::default() };
+    if front.audit.record(&ev).is_err() {
+        eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
+    }
 }
 
 fn action_name(a: policy::Action) -> &'static str {

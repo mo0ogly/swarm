@@ -2,6 +2,8 @@
 //! Supported Go paths are deliberately partial; unknown operations never fall back.
 use crate::{LocalWebAuthority, WebAccessError, WebPrincipal};
 mod listener;
+#[cfg(test)]
+mod status_tests;
 mod live;
 mod live_events;
 mod otel;
@@ -425,6 +427,8 @@ impl HttpServiceError {
                     if matches!(*operation,"preparation-read"|"preparation-command") && matches!(cause.as_ref(),RootStoreError::Refused(_)|RootStoreError::Preparation(_))=>StatusCode::BAD_REQUEST,
                 "preparation-dialogue-active-unported" if matches!(*operation,"preparation-read"|"preparation-call") && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_IMPLEMENTED,
                 "preparation-organization-mode-unported" | "preparation-organization-worker-role-required" | "preparation-release-scope-unported" => StatusCode::NOT_IMPLEMENTED,
+                // Declared port boundary of the planning-tree status read, not a server fault.
+                "mission-status-planning-unported" if *operation == "read" && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::NOT_IMPLEMENTED,
                 "command_not_ported" if *operation == "resume-read" && matches!(cause.as_ref(), RootStoreError::Projection(_)) => StatusCode::NOT_IMPLEMENTED,
                 "provider-configuration-preview-required" if *operation == "provider-policy-apply"
                     && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::CONFLICT,

@@ -21,8 +21,6 @@ use swarm_enrollment_authority::credentials::{self, Parameters, Record};
 use swarm_enrollment_state::{sign_change, Context, Head, Journal};
 use swarm_identity_contract::Principal;
 
-/// Closed role vocabulary of cockpit accounts (ABAC subject attribute).
-pub const ROLES: [&str; 4] = ["viewer", "operator", "approver", "admin"];
 /// Issuer of locally held human principals (distinct from `urn:swarm:local`).
 pub const ISSUER: &str = "urn:swarm:authority:local";
 
@@ -106,7 +104,8 @@ fn principal(subject: &str) -> Principal {
 
 /// Structural checks shared by create/update: subject is a contract `name`,
 /// display name non-empty without control characters, roles non-empty,
-/// unique and in [`ROLES`], integrity 1..=3, attribute keys contract names.
+/// unique contract names (their existence in the access policy is checked
+/// by the callers that know it), integrity 1..=3, attribute keys contract names.
 fn validate(subject: &str, p: &Profile) -> Result<(), Error> {
     if !swarm_identity_contract::name(subject.as_bytes()) {
         return Err(Error::Refused("account-subject-invalid"));
@@ -115,7 +114,7 @@ fn validate(subject: &str, p: &Profile) -> Result<(), Error> {
         return Err(Error::Refused("account-display-name-invalid"));
     }
     let mut seen = std::collections::BTreeSet::new();
-    if p.roles.is_empty() || p.roles.iter().any(|r| !ROLES.contains(&r.as_str()) || !seen.insert(r)) {
+    if p.roles.is_empty() || p.roles.iter().any(|r| !swarm_identity_contract::name(r.as_bytes()) || !seen.insert(r)) {
         return Err(Error::Refused("account-roles-invalid"));
     }
     if !(1..=3).contains(&p.integrity) {

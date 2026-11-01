@@ -18,7 +18,12 @@
 //!   integrity, attributes}`, `POST …/policy {policy, revision}`.
 //! - `GET  …/config`, `POST …/config/preview {config}`,
 //!   `POST …/config {config, revision}`.
-//! - `GET  …/audit` — every audit line ([`crate::audit`]) and `chain_valid`.
+//! - `GET  …/audit` — every audit line ([`crate::audit`]) and `chain_valid`;
+//!   `GET …/audit/sessions?from&to&subject` (connections per session),
+//!   `GET …/audit/sessions/CREDENTIAL` (lines of one session or key),
+//!   `GET …/audit/dashboard?from&to` (per day and account), `POST
+//!   …/audit/purge {older_than_days}` (≥ 1, no default; chain kept). All
+//!   need the `audit.read` permission.
 //! - B9 keys ([`crate::keys`]): `GET …/me/keys`, `POST …/me/keys {name,
 //!   scope, expires_in_seconds}` (secret returned once), `POST
 //!   …/me/keys/ID/revoke` (own keys, self-service); `GET …/keys`, `POST
@@ -177,6 +182,18 @@ struct ConfigIn {
     revision: Option<String>,
 }
 
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PurgeIn {
+    /// Lines older than this many days are removed (chosen by the admin;
+    /// no default retention exists).
+    older_than_days: i64,
+}
+
+fn q_i64(query: &[(String, String)], key: &str) -> Option<i64> {
+    query.iter().find(|(k, _)| k == key).and_then(|(_, v)| v.parse().ok())
+}
+
 #[allow(clippy::result_large_err)] // the Err is the ready HTTP refusal
 fn decode<T: serde::de::DeserializeOwned>(body: &Bytes) -> Result<T, http::Response<Body>> {
     serde_json::from_slice(body).map_err(|_| refuse(StatusCode::BAD_REQUEST, "authority-request-invalid"))
@@ -187,9 +204,17 @@ async fn blocking<T: Send + 'static>(f: impl FnOnce() -> T + Send + 'static) -> 
     tokio::task::spawn_blocking(f).await.ok()
 }
 
+/// Every role must exist in the live policy (`account-role-unknown`).
+#[allow(clippy::result_large_err)] // the Err is the ready HTTP refusal
+fn known_roles(front: &Front, roles: &[String]) -> Result<(), http::Response<Body>> {
+    let Ok(p) = front.policy.read() else { return Err(refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state")) };
+    if roles.iter().all(|r| p.has_role(r)) { Ok(()) } else { Err(refuse(StatusCode::BAD_REQUEST, "account-role-unknown")) }
+}
+
 fn account_refusal(code: &str) -> http::Response<Body> {
     let status = match code {
         "account-missing" | "key-missing" => StatusCode::NOT_FOUND,
+        "account-role-unknown" => StatusCode::BAD_REQUEST,
         "key-name-invalid" | "key-expiry-invalid" => StatusCode::BAD_REQUEST,
         "account-exists" => StatusCode::CONFLICT,
         "account-authentication-refused" => StatusCode::FORBIDDEN,
@@ -208,6 +233,7 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
     let path = req.uri().path().to_owned();
     let rest = path.strip_prefix(policy::AUTHORITY_PREFIX).unwrap_or("").to_owned();
     let segments: Vec<&str> = rest.split('/').filter(|s| !s.is_empty()).collect();
+    let query: Vec<(String, String)> = form_urlencoded::parse(req.uri().query().unwrap_or("").as_bytes()).into_owned().collect();
     let body = if method == Method::POST {
         match read_body(&front, req.into_body()).await {
             Ok(b) => b,
@@ -218,8 +244,15 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
     };
     match (method, segments.as_slice()) {
         (Method::GET, ["me"]) => {
-            let administer = front.policy.read().map(|p| policy::decide(&p, &subject_of(&caller), "GET", policy::AUTHORITY_PREFIX).allowed).unwrap_or(false);
-            ok(json!({"account": caller, "session": crate::sessions::token_id(&token), "administer": administer}))
+            let (administer, permissions) = front
+                .policy
+                .read()
+                .map(|p| {
+                    let held: Vec<&str> = policy::CATALOG.iter().map(|x| x.key).filter(|k| policy::holds(&p, &subject_of(&caller), k)).collect();
+                    (held.contains(&"accounts.manage"), held)
+                })
+                .unwrap_or((false, Vec::new()));
+            ok(json!({"account": caller, "session": crate::sessions::token_id(&token), "administer": administer, "permissions": permissions}))
         }
         (Method::POST, ["me", "password"]) => {
             let input: OwnPasswordIn = match decode(&body) { Ok(i) => i, Err(r) => return r };
@@ -299,6 +332,7 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
         }
         (Method::POST, ["accounts"]) => {
             let input: CreateIn = match decode(&body) { Ok(i) => i, Err(r) => return r };
+            if let Err(r) = known_roles(&front, &input.roles) { return r; }
             let f = Arc::clone(&front);
             let outcome = blocking(move || {
                 let params = f.config.read().map_err(|_| "authority-state")?.argon2;
@@ -316,6 +350,7 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
         (Method::POST, ["accounts", subject, "profile"]) => {
             let input: ProfileIn = match decode(&body) { Ok(i) => i, Err(r) => return r };
             let profile: Profile = input.into();
+            if let Err(r) = known_roles(&front, &profile.roles) { return r; }
             if *subject == caller.subject {
                 let keeps = front.policy.read().map(|p| can_administer(&p, &profile.roles, profile.integrity, &profile.attributes)).unwrap_or(false);
                 if !keeps {
@@ -377,7 +412,8 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
             Err(e) => refuse(StatusCode::INTERNAL_SERVER_ERROR, e.code()),
         },
         (Method::GET, ["policy"]) => match front.policy.read() {
-            Ok(p) => ok(json!({"policy": *p, "revision": revision(&*p), "source": source(&front.dir, "policy.json"), "floors": {
+            Ok(p) => ok(json!({"policy": *p, "revision": revision(&*p), "source": source(&front.dir, "policy.json"),
+                "catalog": policy::CATALOG, "builtin_roles": policy::BUILTIN_ROLES, "floors": {
                 "read": policy::integrity_floor(Action::Read), "write": policy::integrity_floor(Action::Write),
                 "approve": policy::integrity_floor(Action::Approve), "administer": policy::integrity_floor(Action::Administer)}})),
             Err(_) => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
@@ -400,12 +436,25 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
                 Ok(p) => p,
                 Err(code) => return refuse(StatusCode::BAD_REQUEST, code),
             };
-            let Ok(mut live) = front.policy.write() else { return refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state") };
-            if input.revision != revision(&*live) {
+            if input.revision != front.policy.read().map(|p| revision(&*p)).unwrap_or_default() {
                 return refuse(StatusCode::CONFLICT, "authority-revision-stale");
             }
             if !can_administer(&candidate, &caller.roles, caller.integrity, &caller.attributes) {
                 return refuse(StatusCode::CONFLICT, "authority-self-lockout");
+            }
+            // A role still held by an account cannot disappear.
+            let f = Arc::clone(&front);
+            let accounts = match blocking(move || f.accounts.list(&Context::new()).map_err(|e| e.code())).await {
+                Some(Ok(a)) => a,
+                Some(Err(c)) => return account_refusal(c),
+                None => return refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
+            };
+            let Ok(mut live) = front.policy.write() else { return refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state") };
+            if input.revision != revision(&*live) {
+                return refuse(StatusCode::CONFLICT, "authority-revision-stale");
+            }
+            if let Some(a) = accounts.iter().find(|a| a.roles.iter().any(|r| !candidate.has_role(r) && live.has_role(r))) {
+                return reply(StatusCode::CONFLICT, json!({"error": "authority-role-in-use", "subject": a.subject}));
             }
             let bytes = serde_json::to_vec_pretty(&candidate).unwrap_or_default();
             if let Err(code) = persist(&front.dir, "policy.json", &bytes) {
@@ -413,6 +462,42 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
             }
             *live = candidate;
             ok(json!({"applied": true, "revision": revision(&*live)}))
+        }
+        (Method::GET, ["audit", "sessions"]) | (Method::GET, ["audit", "dashboard"]) => {
+            let (from, to) = (q_i64(&query, "from").unwrap_or(0), q_i64(&query, "to").unwrap_or(i64::MAX));
+            let subject = query.iter().find(|(k, _)| k == "subject").map(|(_, v)| v.as_str()).filter(|v| !v.is_empty());
+            match front.audit.read() {
+                Ok((entries, chain_valid)) if segments[1] == "sessions" => ok(json!({"sessions": crate::audit::sessions(&entries, from, to, subject), "chain_valid": chain_valid})),
+                Ok((entries, chain_valid)) => {
+                    let (days, accounts) = crate::audit::dashboard(&entries, from, to);
+                    ok(json!({"days": days, "accounts": accounts, "chain_valid": chain_valid}))
+                }
+                Err(code) => refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
+            }
+        }
+        (Method::GET, ["audit", "sessions", credential]) => match front.audit.read() {
+            Ok((entries, _)) => {
+                let lines: Vec<_> = entries.into_iter().filter(|e| e.credential.as_deref() == Some(*credential)).collect();
+                ok(json!({"credential": credential, "entries": lines}))
+            }
+            Err(code) => refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
+        },
+        (Method::POST, ["audit", "purge"]) => {
+            let input: PurgeIn = match decode(&body) { Ok(i) => i, Err(r) => return r };
+            if input.older_than_days < 1 {
+                return refuse(StatusCode::BAD_REQUEST, "authority-purge-days-invalid");
+            }
+            let at = now();
+            let Some(before) = input.older_than_days.checked_mul(86_400).and_then(|d| at.checked_sub(d)) else {
+                return refuse(StatusCode::BAD_REQUEST, "authority-purge-days-invalid");
+            };
+            let (f, actor) = (Arc::clone(&front), caller.subject.clone());
+            match blocking(move || f.audit.purge(before, &actor, at)).await {
+                Some(Ok(removed)) => ok(json!({"removed": removed, "before": before})),
+                Some(Err(code @ "authority-audit-chain-broken")) => refuse(StatusCode::CONFLICT, code),
+                Some(Err(code)) => refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
+                None => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
+            }
         }
         (Method::GET, ["audit"]) => match front.audit.read() {
             Ok((entries, chain_valid)) => ok(json!({"entries": entries, "chain_valid": chain_valid})),

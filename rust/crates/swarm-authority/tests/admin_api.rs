@@ -163,7 +163,7 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     assert!(!created.body.contains("bob pass"));
     assert_eq!(error(&c.post("/api/v1/authority/accounts", &ana, bob)), "account-exists");
     let bad = c.post("/api/v1/authority/accounts", &ana, json!({"subject":"zed","display_name":"Z","roles":["root"],"integrity":1,"password":"x"}));
-    assert_eq!((bad.status, error(&bad).as_str()), (400, "account-roles-invalid"));
+    assert_eq!((bad.status, error(&bad).as_str()), (400, "account-role-unknown"));
     assert_eq!(error(&c.post("/api/v1/authority/accounts", &ana, json!({"subject":"zed","extra":1}))), "authority-request-invalid");
     let carol = json!({"subject":"carol","display_name":"Carol","roles":["approver"],"integrity":3,"password":"carol pass"});
     assert_eq!(c.post("/api/v1/authority/accounts", &ana, carol).status, 200);
@@ -239,17 +239,25 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     let pol = c.get("/api/v1/authority/policy", &ana).json();
     assert_eq!((pol["source"].as_str(), pol["floors"]["write"].as_i64()), (Some("installation"), Some(2)));
     let revision = pol["revision"].as_str().unwrap().to_owned();
+    assert_eq!(pol["catalog"].as_array().unwrap().len(), 14);
+    assert_eq!(pol["builtin_roles"], json!(["viewer", "operator", "approver", "admin"]));
+    // Removing admin's full grant is an invalid policy (no lockout by editing).
     let mut locked = pol["policy"].clone();
     locked["grants"].as_array_mut().unwrap().retain(|g| g["role"] != "admin");
-    let preview = c.post("/api/v1/authority/policy/preview", &ana, json!({"policy": locked, "method":"POST","path":"/api/v1/mission","roles":["admin"],"integrity":3}));
-    let preview = preview.json();
-    assert_eq!((preview["current"]["allowed"].as_bool(), preview["proposed"]["allowed"].as_bool(), preview["keeps_your_administration"].as_bool()), (Some(true), Some(false), Some(false)));
-    assert_eq!(error(&c.post("/api/v1/authority/policy", &ana, json!({"policy": locked, "revision": revision}))), "authority-self-lockout");
+    assert_eq!(error(&c.post("/api/v1/authority/policy/preview", &ana, json!({"policy": locked, "method":"POST","path":"/api/v1/mission","roles":["admin"],"integrity":3}))), "authority-policy-invalid");
+    assert_eq!(error(&c.post("/api/v1/authority/policy", &ana, json!({"policy": locked, "revision": revision}))), "authority-policy-invalid");
+    // Custom role "auditor": preview shows the proposed effect.
     let mut wider = pol["policy"].clone();
-    wider["grants"].as_array_mut().unwrap().push(json!({"role":"approver","actions":["write"],"when":{"team":"red"}}));
+    wider["roles"].as_array_mut().unwrap().push(json!({"key":"auditor","label":"Auditeur","description":"Lit le journal"}));
+    wider["grants"].as_array_mut().unwrap().push(json!({"role":"auditor","permissions":["cockpit.read","audit.read"],"when":{"team":"red"}}));
+    let preview = c.post("/api/v1/authority/policy/preview", &ana, json!({"policy": wider, "method":"GET","path":"/api/v1/authority/audit","roles":["auditor"],"integrity":3,"attributes":{"team":"red"}})).json();
+    assert_eq!((preview["current"]["allowed"].as_bool(), preview["proposed"]["allowed"].as_bool(), preview["proposed"]["permission"].as_str(), preview["keeps_your_administration"].as_bool()), (Some(false), Some(true), Some("audit.read"), Some(true)));
     assert_eq!(error(&c.post("/api/v1/authority/policy", &ana, json!({"policy": wider, "revision": "0"}))), "authority-revision-stale");
-    assert_eq!(error(&c.post("/api/v1/authority/policy", &ana, json!({"policy": {"schema_version":1,"grants":[]}, "revision": revision}))), "authority-policy-invalid");
+    assert_eq!(error(&c.post("/api/v1/authority/policy", &ana, json!({"policy": {"schema_version":2,"roles":[],"grants":[]}, "revision": revision}))), "authority-policy-invalid");
     assert!(!conf.join("policy.json").exists(), "refusals wrote nothing");
+    // A role must exist before an account can hold it.
+    let dan = json!({"subject":"dan","display_name":"Dan","roles":["auditor"],"integrity":3,"attributes":{"team":"red"},"password":"dan pass"});
+    assert_eq!(error(&c.post("/api/v1/authority/accounts", &ana, dan.clone())), "account-role-unknown");
     let applied = c.post("/api/v1/authority/policy", &ana, json!({"policy": wider, "revision": revision}));
     assert_eq!(applied.status, 200, "{}", applied.body);
     let saved: Value = serde_json::from_slice(&fs::read(conf.join("policy.json")).unwrap()).unwrap();
@@ -257,6 +265,16 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     assert_eq!(fs::metadata(conf.join("policy.json")).unwrap().permissions().mode() & 0o777, 0o600);
     let after = c.get("/api/v1/authority/policy", &ana).json();
     assert_eq!((after["source"].as_str(), after["revision"].as_str()), (Some("saved"), applied.json()["revision"].as_str()));
+    assert_eq!(c.post("/api/v1/authority/accounts", &ana, dan).status, 200, "custom role assignable now");
+    let dan_cookie = c.login("dan", "dan pass").cookie();
+    assert_eq!(c.get("/api/v1/authority/audit", &dan_cookie).status, 200, "auditor reads the audit");
+    assert_eq!(c.get("/api/v1/authority/accounts", &dan_cookie).status, 403, "but does not manage accounts");
+    // A role still held by an account cannot be deleted.
+    let mut without = after["policy"].clone();
+    without["roles"].as_array_mut().unwrap().retain(|r| r["key"] != "auditor");
+    without["grants"].as_array_mut().unwrap().retain(|g| g["role"] != "auditor");
+    let in_use = c.post("/api/v1/authority/policy", &ana, json!({"policy": without, "revision": after["revision"]})).json();
+    assert_eq!((in_use["error"].as_str(), in_use["subject"].as_str()), (Some("authority-role-in-use"), Some("dan")));
 
     // Configuration: preview, stale refusal, apply persisted and live.
     let cfg = c.get("/api/v1/authority/config", &ana).json();
@@ -296,6 +314,22 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     assert!(!audit.to_string().contains("ana pass") && !audit.to_string().contains("as1-"), "no secret in the audit");
     let seqs: Vec<u64> = entries.iter().map(|e| e["seq"].as_u64().unwrap()).collect();
     assert_eq!(seqs, (1..=seqs.len() as u64).collect::<Vec<_>>());
+    // Connections per session, session detail, dashboard (audit.read).
+    let conns = c.get("/api/v1/authority/audit/sessions", &fresh).json();
+    let rows = conns["sessions"].as_array().unwrap();
+    assert!(rows.iter().all(|r| r["credential"].as_str().unwrap().starts_with("session:") || r["credential"].as_str().unwrap().starts_with("key:")));
+    let carol_row = rows.iter().find(|r| r["subject"] == "carol").expect("carol session");
+    assert_eq!(carol_row["refusals"], 1, "policy refusal recorded");
+    let detail = c.get(&format!("/api/v1/authority/audit/sessions/{}", carol_row["credential"].as_str().unwrap()), &fresh).json();
+    assert!(detail["entries"].as_array().unwrap().iter().any(|e| e["event"] == "refused" && e["path"] == "/api/v1/authority/sessions"));
+    assert_eq!(c.get("/api/v1/authority/audit/sessions?subject=bob", &fresh).json()["sessions"].as_array().unwrap().iter().filter(|r| r["subject"] != "bob").count(), 0);
+    let dash = c.get("/api/v1/authority/audit/dashboard", &fresh).json();
+    assert!(!dash["days"].as_array().unwrap().is_empty() && dash["accounts"].as_array().unwrap().iter().any(|a| a["subject"] == "ana"));
+    assert_eq!(error(&c.post("/api/v1/authority/audit/purge", &fresh, json!({"older_than_days": 0}))), "authority-purge-days-invalid");
+    assert_eq!(error(&c.post("/api/v1/authority/audit/purge", &fresh, json!({}))), "authority-request-invalid", "no default retention");
+    let purge = c.post("/api/v1/authority/audit/purge", &fresh, json!({"older_than_days": 1})).json();
+    assert_eq!(purge["removed"], 0, "everything is recent");
+    assert_eq!(c.get("/api/v1/authority/audit", &fresh).json()["chain_valid"], true);
     // Fail closed: an unwritable audit refuses the mutation, with no effect.
     let log = conf.join("audit.jsonl");
     fs::set_permissions(&log, fs::Permissions::from_mode(0o400)).unwrap();

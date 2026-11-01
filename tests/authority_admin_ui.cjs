@@ -3,7 +3,7 @@
  * real `swarm-authority serve` in front of a real engine (`ENGINE_BIN`, built
  * with the embedded `web/native-authority-admin.js`) in `authority` mode.
  * Sign-in through the daemon `/login`, Admin view, then: account creation,
- * API key creation (secret shown once), policy preview refusing a self-lockout,
+ * API key creation (secret shown once), permission matrix with a new custom role,
  * audit view; FR/EN × both themes, 390 px mobile overflow, focus restoration.
  * Screenshots and checks go to OUTPUT (fresh). Fixtures: protected roots under
  * ~/.local/state/swarm-protected-fixtures, engine Root under .swarm-fixtures;
@@ -77,25 +77,37 @@ async function listening(port){for(;;){const ok=await new Promise(res=>{const c=
  await page.click('dialog[open] button[type=submit]');await page.waitForFunction(()=>!document.querySelector('dialog[open]'));
  const listed=await page.$eval('#native-authority-admin',e=>e.textContent);check('key-listed-without-secret',listed.includes('ci script')&&!listed.includes(secret.split('.')[1]));
  const viaKey=await fetch(origin+'/api/v1/native-version',{headers:{Authorization:'Bearer '+secret}});check('key-works',viaKey.status===200,viaKey.status);
- // Policy preview: removing admin grant is a self-lockout; save stays disabled.
- await page.click('[data-authority-policy]');await page.waitForSelector(dlg+'textarea');
- await page.$eval(dlg+'textarea',t=>{const p=JSON.parse(t.value);p.grants=p.grants.filter(g=>g.role!=='admin');t.value=JSON.stringify(p,null,1);t.dispatchEvent(new Event('input',{bubbles:true}))});
- const previewBtn=await page.$$(dlg+'footer button');await previewBtn[0].click();await page.waitForFunction(()=>document.querySelector('dialog[open] .notice.alert'));
- check('lockout-blocks-save',await page.$eval(dlg+'button[type=submit]',b=>b.disabled));
- await page.screenshot({path:path.join(output,'fr-policy-lockout.png')});await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('dialog[open]'));
+ // Habilitations: matrix (admin locked), new custom role in the draft, saved,
+ // then offered when creating an account.
+ await page.$$eval('#native-authority-admin details',ds=>ds.forEach(d=>d.open=true));await page.waitForSelector('[data-authority-matrix]');
+ check('admin-column-locked',await page.$$eval('[data-authority-matrix] input[data-role="admin"]',cs=>cs.length===14&&cs.every(c=>c.checked&&c.disabled)));
+ await page.click('[data-authority-role-new]');await page.waitForSelector(dlg);const rin=await page.$$(dlg+'input[type=text]');await rin[0].type('auditor');await rin[1].type('Auditeur');
+ await page.click(dlg+'button[type=submit]');await page.waitForFunction(()=>!document.querySelector('dialog[open]')&&document.querySelector('[data-authority-matrix] input[data-role="auditor"][data-permission="audit.read"]'));
+ await page.click('[data-authority-matrix] input[data-role="auditor"][data-permission="audit.read"]');await page.click('[data-authority-matrix] input[data-role="auditor"][data-permission="cockpit.read"]');
+ await page.screenshot({path:path.join(output,'fr-habilitations-draft.png'),fullPage:true});
+ await page.click('[data-authority-policy-save]');await page.waitForFunction(()=>document.querySelector('#native-authority-admin')?.textContent.includes('Habilitations enregistrées'));
+ const pol=await (await fetch(origin+'/api/v1/authority/policy',{headers:{Cookie:(await page.cookies()).map(c=>c.name+'='+c.value).join('; ')}})).json();
+ check('role-saved',pol.policy.roles.some(r=>r.key==='auditor')&&pol.policy.grants.some(g=>g.role==='auditor'&&g.permissions.includes('audit.read')),pol.policy.grants);
+ await page.click('[data-authority-add]');await page.waitForSelector(dlg);check('role-offered-for-accounts',await page.$eval(dlg,d=>d.textContent.includes('Auditeur')));await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('dialog[open]'));
  // Audit group lazily built on open.
- await page.$$eval('#native-authority-admin details',ds=>ds.forEach(d=>d.open=true));await page.waitForFunction(()=>document.querySelector('#native-authority-admin')?.textContent.includes('connexion acceptée'));
- await page.$eval('#native-authority-admin details:last-of-type .toolbar button',b=>b.click());await page.waitForFunction(()=>document.querySelector('#native-authority-admin details:last-of-type')?.textContent.includes('/api/v1/authority/accounts'));
- check('audit-shows-actions',await page.$eval('#native-authority-admin',e=>e.textContent.includes('/api/v1/authority/accounts')));
+ await page.$$eval('#native-authority-admin details',ds=>ds.forEach(d=>d.open=true));await page.waitForSelector('[data-audit-tab="connections"]');
+ await page.$$eval('#native-authority-admin button',bs=>bs.find(b=>b.textContent==='Filtrer').click());
+ await page.waitForSelector('[data-audit-session]');check('audit-connections',await page.$$eval('[data-audit-session]',b=>b.length>=1));
+ await page.click('[data-audit-session]');await page.waitForFunction(()=>document.querySelector('#native-authority-admin')?.textContent.includes('/api/v1/authority/accounts'));check('audit-shows-actions',true);
+ await page.screenshot({path:path.join(output,'fr-audit-detail.png')});
+ await page.click('[data-audit-tab="dashboard"]');await page.waitForFunction(()=>document.querySelector('#native-authority-admin')?.textContent.includes('Activité par jour'));check('audit-dashboard',true);
+ await page.screenshot({path:path.join(output,'fr-audit-dashboard.png')});
+ await page.click('[data-audit-tab="purge"]');await page.waitForSelector('[data-audit-purge]');await page.click('[data-audit-purge]');await page.waitForFunction(()=>document.querySelector('#native-authority-admin .notice.alert')?.textContent.includes('authority-purge-days-invalid'));check('purge-needs-days',true);
+ await page.click('[data-audit-tab="connections"]');
  // Languages × themes, full card screenshots; English must translate all fixed text.
  for(const lang of ['fr','en'])for(const theme of ['etat','sombre']){
   await open(lang);await page.click('[data-theme-choice="'+theme+'"]');await page.$$eval('#native-authority-admin details',ds=>ds.forEach(d=>d.open=true));
-  await page.waitForFunction(()=>[...document.querySelectorAll('#native-authority-admin details')].every(d=>d.querySelector('table,.notice.alert,div > p'))&&document.querySelector('[data-authority-policy]')&&document.querySelector('[data-authority-config]'));
+  await page.waitForFunction(()=>[...document.querySelectorAll('#native-authority-admin details')].every(d=>d.querySelector('table,.notice.alert,div > p'))&&document.querySelector('[data-authority-policy-save]')&&document.querySelector('[data-authority-config]'));
   const card=await page.$('#native-authority-admin');await card.screenshot({path:path.join(output,lang+'-'+theme+'-card.png')});
-  if(lang==='en'){const text=await page.$eval('#native-authority-admin',e=>e.innerText);for(const fr of ['Comptes et accès','Journal d’accès','Politique d’accès','Réglages du démon','Ajouter un compte','Créer une clé','Révoquer'])check('en-no-french:'+fr,!text.includes(fr))}
+  if(lang==='en'){const text=await page.$eval('#native-authority-admin',e=>e.innerText);for(const fr of ['Comptes et accès','Journal d’accès','Habilitations','Réglages du démon','Ajouter un compte','Créer une clé','Révoquer'])check('en-no-french:'+fr,!text.includes(fr))}
  }
  // Mobile: no global horizontal overflow (tables scroll locally).
- await page.setViewport({width:390,height:844});await open('fr');await page.$$eval('#native-authority-admin details',ds=>ds.forEach(d=>d.open=true));await page.waitForFunction(()=>[...document.querySelectorAll('#native-authority-admin details')].every(d=>d.querySelector('table,.notice.alert,div > p'))&&document.querySelector('[data-authority-policy]')&&document.querySelector('[data-authority-config]'));
+ await page.setViewport({width:390,height:844});await open('fr');await page.$$eval('#native-authority-admin details',ds=>ds.forEach(d=>d.open=true));await page.waitForFunction(()=>[...document.querySelectorAll('#native-authority-admin details')].every(d=>d.querySelector('table,.notice.alert,div > p'))&&document.querySelector('[data-authority-policy-save]')&&document.querySelector('[data-authority-config]'));
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);check('mobile-no-overflow',overflow<=0,overflow);
  await page.screenshot({path:path.join(output,'fr-mobile.png'),fullPage:true});
  failOnError();success=true;

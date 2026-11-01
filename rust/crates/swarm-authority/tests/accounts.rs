@@ -34,7 +34,7 @@ fn create_verify_change_disable_and_refusals() {
     let before = a.list(&ctx).unwrap();
     for (subject, p, code) in [
         ("ana b", profile(&["viewer"], 1), "account-subject-invalid"),
-        ("bob", profile(&["root"], 1), "account-roles-invalid"),
+        ("bob", profile(&["bad role"], 1), "account-roles-invalid"), // existence is the policy's check
         ("bob", profile(&["viewer", "viewer"], 1), "account-roles-invalid"),
         ("bob", profile(&[], 1), "account-roles-invalid"),
         ("bob", profile(&["viewer"], 0), "account-integrity-invalid"),
