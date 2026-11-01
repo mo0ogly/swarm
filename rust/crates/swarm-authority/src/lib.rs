@@ -18,6 +18,8 @@ pub mod config;
 pub mod sessions;
 /// Signed per-request assertion relayed to the engine (slice B5.1).
 pub mod assertion;
+/// Attribute-based access decision: route classes, grants, Biba floor (B6).
+pub mod policy;
 /// HTTP front: sign-in, sessions and signed relay to the engine (slice B5.3).
 pub mod server;
 

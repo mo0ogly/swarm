@@ -7,7 +7,9 @@
 #   sudo deploy/authority/install.sh --admin LOGIN --display "Full Name" [--dry-run]
 #   sudo deploy/authority/install.sh --uninstall [--purge]
 #
-# What it does (idempotent; nothing is replaced once created):
+# What it does (idempotent; accounts, key, pin and first user are never
+# replaced once created; the binary and unit are refreshed and a running
+# service is restarted):
 #   1. system account `swarm-authority` (no login shell, no home creation)
 #   2. root-owned binary /usr/local/lib/swarm-authority/swarm-authority
 #   3. private state /var/lib/swarm-authority (0700, owned by the account)
@@ -142,6 +144,9 @@ else
     install -o root -g root -m 0644 /dev/stdin "$UNIT" <<<"$unit_text"
 fi
 run systemctl daemon-reload
+# Reinstall: a running service picks up the new binary and policy now
+# (try-restart does nothing when the service is stopped).
+run systemctl try-restart swarm-authority.service
 # 6. first user (password asked on the terminal)
 if [ "$dry" = yes ]; then
     as_account init --declaration "$declaration" --pin "$pin" --admin "$admin" --display "$display" --json
@@ -167,7 +172,7 @@ Installé (service NON démarré). Étapes suivantes, dans cet ordre :
  2. Déplacer le moteur sur le port interne et le redémarrer :
       ./swarm.sh configure --address $engine && ./swarm.sh restart --no-open
  3. Démarrer le démon :  sudo systemctl enable --now swarm-authority
- 4. Ouvrir http://$listen/login et se connecter avec « $admin ».
+ 4. ./swarm.sh open (ouvre http://$listen/login) et se connecter avec « $admin ».
 Retour arrière : sudo systemctl disable --now swarm-authority, puis repasser
 le mode en owner-key avec la CLI locale (engine-settings apply) et
 ./swarm.sh configure --address $listen && ./swarm.sh restart.

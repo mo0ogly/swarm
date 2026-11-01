@@ -285,12 +285,60 @@ def main():
             temporary = state_path.with_suffix(".tmp")
             temporary.write_text(json.dumps(state))
             temporary.replace(state_path)
-        print(f"Swarm : http://{args.address}/")
+        try:
+            front = authority_front(binary, root)
+        except RuntimeError as error:
+            # The server itself is up; only the browser hand-off is impossible.
+            if not args.no_open:
+                raise
+            print("Avertissement : " + str(error), file=sys.stderr)
+            front = None
+        print(f"Swarm : http://{front or args.address}/" + (" (démon d’autorité ; moteur interne " + args.address + ")" if front else ""))
         if not args.no_open:
             opener = os.environ.get("SWARM_BROWSER", "xdg-open")
-            subprocess.run([opener, sign_in_url(binary, root, args.address)], check=True,
+            url = f"http://{front}/login" if front else sign_in_url(binary, root, args.address)
+            subprocess.run([opener, url], check=True,
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return 0
+
+
+def authority_front(binary, root):
+    """Return the authority daemon listen address when the Root is in
+    `authority` access mode, else None (owner-key mode, pre-v52 Root).
+
+    In authority mode the engine refuses the owner cookie on every route
+    except the launcher probes, so `open` must send the browser to the daemon
+    sign-in page instead of an owner ticket. The daemon address has one
+    source of truth: the `--listen` argument of the installed systemd unit
+    written by `deploy/authority/install.sh` (path overridable with
+    SWARM_AUTHORITY_UNIT for isolated tests). Errors: RuntimeError when the
+    settings cannot be read or the unit is absent/unreadable/malformed; the
+    owner fallback is never used silently in authority mode. No state change.
+    """
+    shown = subprocess.run([str(binary), "--root", str(root), "engine-settings", "show", "--json"],
+                           cwd=SOURCE, capture_output=True, text=True)
+    if shown.returncode != 0:
+        raise RuntimeError("Réglages du moteur illisibles ; mode d’accès inconnu.")
+    try:
+        mode = json.loads(shown.stdout)["values"].get("web_access_mode", "owner-key")
+    except (ValueError, KeyError, TypeError, AttributeError):
+        raise RuntimeError("Réglages du moteur illisibles ; mode d’accès inconnu.") from None
+    if mode != "authority":
+        return None
+    unit = Path(os.environ.get("SWARM_AUTHORITY_UNIT", "/etc/systemd/system/swarm-authority.service"))
+    try:
+        lines = unit.read_text().splitlines()
+    except OSError:
+        raise RuntimeError(f"Mode authority sans démon installé ({unit}) : sudo deploy/authority/install.sh") from None
+    for line in lines:
+        if line.startswith("ExecStart="):
+            words = line.split()
+            if "--listen" in words[:-1]:
+                listen = words[words.index("--listen") + 1]
+                host, _, port = listen.partition(":")
+                if host == "127.0.0.1" and port.isdigit():
+                    return listen
+    raise RuntimeError(f"Adresse d’écoute du démon introuvable dans {unit}.")
 
 
 def sign_in_url(binary, root, address):

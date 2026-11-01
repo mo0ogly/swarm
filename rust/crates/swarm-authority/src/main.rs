@@ -23,7 +23,13 @@
 //! - `add-account SUBJECT --roles R[,R] --integrity N --display NAME --json`:
 //!   create a further account; password read like `init` (never argv).
 //!   Meant to run as `sudo -u swarm-authority …`, outside any agent channel.
-//! - `serve --listen HOST:PORT --engine HOST:PORT`: run the HTTP front.
+//!   `--attributes k=v[,k=v]` sets ABAC attributes used by policy `when`.
+//! - `policy-check --method M --path P --integrity N [--roles R,..]
+//!   [--attributes k=v,..] --json`: preview the access decision of the saved
+//!   policy (`policy.json`, else shipped default) for these subject
+//!   attributes; reads only, changes nothing.
+//! - `serve --listen HOST:PORT --engine HOST:PORT`: run the HTTP front; the
+//!   policy is loaded once at start (restart the service after editing it).
 //!
 //! Output: JSON on stdout (exit 0) or `{"schema_version":1,"failure":{"code":…}}`
 //! on stderr (exit 2); usage errors exit 64.
@@ -31,7 +37,7 @@ use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 use std::{collections::BTreeMap, io::Write, path::Path, process::ExitCode, sync::Arc};
 
 fn usage() -> ExitCode {
-    eprintln!("usage: swarm-authority prepare --dir DIR --controller-uid UID --admin SUBJECT --json | check|init|add-account SUBJECT|serve --declaration PATH --pin SHA256 [options] [--json]");
+    eprintln!("usage: swarm-authority prepare --dir DIR --controller-uid UID --admin SUBJECT --json | check|init|add-account SUBJECT [--attributes k=v,...]|policy-check --method M --path P --integrity N [--roles r,..] [--attributes k=v,..]|serve --declaration PATH --pin SHA256 [options] [--json]");
     ExitCode::from(64)
 }
 
@@ -52,7 +58,7 @@ fn print(v: serde_json::Value) -> ExitCode {
 mod linux {
     use super::*;
     use std::os::unix::fs::{MetadataExt, OpenOptionsExt, PermissionsExt};
-    use swarm_authority::{accounts::{Accounts, Profile}, config::AuthorityConfig, server, sessions::Sessions};
+    use swarm_authority::{accounts::{Accounts, Profile}, config::AuthorityConfig, policy::Policy, server, sessions::Sessions};
     use swarm_enrollment_state::Context;
 
     pub const SEED: &str = "authority-signing-seed";
@@ -251,15 +257,37 @@ mod linux {
                 let config = match AuthorityConfig::load(&loaded.dir) { Ok(c) => c, Err(c) => return fail(c) };
                 let key = match pinned_seed(&loaded) { Ok(k) => k, Err(c) => return fail(c) };
                 let a = match accounts(&loaded, key) { Ok(a) => a, Err(c) => return fail(c) };
-                let profile = Profile { display_name: display.clone(), roles: roles.split(',').map(str::to_owned).collect(), integrity, attributes: BTreeMap::new() };
+                let mut attributes = BTreeMap::new();
+                for pair in opt.get("--attributes").map(|a| a.split(',').collect::<Vec<_>>()).unwrap_or_default() {
+                    let Some((k, v)) = pair.split_once('=') else { return usage() };
+                    attributes.insert(k.to_owned(), v.to_owned());
+                }
+                let profile = Profile { display_name: display.clone(), roles: roles.split(',').map(str::to_owned).collect(), integrity, attributes };
                 match a.create(&Context::new(), subject, &profile, password.as_bytes(), config.argon2) {
                     Ok(_) => print(serde_json::json!({"schema_version": 1, "subject": subject, "created": true})),
                     Err(e) => fail(e.code()),
                 }
             }
+            "policy-check" => {
+                // Preview of one decision, no mutation: uses the saved policy
+                // and the given subject attributes (not an account lookup).
+                let (Some(method), Some(path), Some(integrity)) =
+                    (opt.get("--method"), opt.get("--path"), opt.get("--integrity").and_then(|i| i.parse().ok()))
+                else { return usage() };
+                let policy = match Policy::load(&loaded.dir) { Ok(p) => p, Err(c) => return fail(c) };
+                let roles: Vec<String> = opt.get("--roles").map(|r| r.split(',').map(str::to_owned).collect()).unwrap_or_default();
+                let mut attributes = BTreeMap::new();
+                for pair in opt.get("--attributes").map(|a| a.split(',').collect::<Vec<_>>()).unwrap_or_default() {
+                    let Some((k, v)) = pair.split_once('=') else { return usage() };
+                    attributes.insert(k.to_owned(), v.to_owned());
+                }
+                let d = swarm_authority::policy::decide(&policy, &swarm_authority::policy::Subject { roles: &roles, integrity, attributes: &attributes }, method, path);
+                print(serde_json::json!({"schema_version": 1, "decision": d}))
+            }
             "serve" => {
                 let (Some(listen), Some(engine)) = (opt.get("--listen"), opt.get("--engine").and_then(|e| e.parse().ok())) else { return usage() };
                 let config = match AuthorityConfig::load(&loaded.dir) { Ok(c) => c, Err(c) => return fail(c) };
+                let policy = match Policy::load(&loaded.dir) { Ok(p) => p, Err(c) => return fail(c) };
                 let key = match pinned_seed(&loaded) { Ok(k) => k, Err(c) => return fail(c) };
                 let a = match accounts(&loaded, key.clone()) { Ok(a) => a, Err(c) => return fail(c) };
                 let rt = match tokio::runtime::Runtime::new() { Ok(r) => r, Err(_) => return fail("authority-runtime") };
@@ -267,7 +295,7 @@ mod linux {
                     let listener = match tokio::net::TcpListener::bind(listen).await { Ok(l) => l, Err(_) => return fail("authority-listen") };
                     let own_host = match listener.local_addr() { Ok(a) => a.to_string(), Err(_) => return fail("authority-listen") };
                     eprintln!("{}", serde_json::json!({"schema_version": 1, "listening": own_host, "engine": engine}));
-                    let front = Arc::new(server::Front { accounts: a, sessions: Sessions::new(config), signer: key, config, own_host, engine });
+                    let front = Arc::new(server::Front { accounts: a, sessions: Sessions::new(config), signer: key, config, own_host, engine, policy });
                     tokio::select! {
                         r = server::serve(listener, front) => if r.is_err() { return fail("authority-serve") },
                         _ = tokio::signal::ctrl_c() => {}

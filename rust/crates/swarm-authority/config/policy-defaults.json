@@ -1,0 +1,9 @@
+{
+ "schema_version": 1,
+ "grants": [
+  {"role": "viewer", "actions": ["read"]},
+  {"role": "operator", "actions": ["read", "write"]},
+  {"role": "approver", "actions": ["read", "approve"]},
+  {"role": "admin", "actions": ["read", "write", "approve", "administer"]}
+ ]
+}

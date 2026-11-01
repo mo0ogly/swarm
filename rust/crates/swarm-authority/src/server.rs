@@ -11,8 +11,11 @@
 //! every non-GET/HEAD request must carry `Origin: http://<own host>`; the
 //! client's own `Cookie`, `Host` and assertion headers are never forwarded.
 //! Bodies above the configured `relay_body_max_bytes` refuse with 413.
+//! Before relaying, the access decision ([`crate::policy::decide`]) runs on
+//! the session's current account; a refusal answers 403
+//! `authority-policy-denied` with the action family and reason code.
 //! Blocking work (SQLite journal, Argon2) runs on the blocking pool.
-use crate::{accounts::Accounts, assertion, config::AuthorityConfig, sessions::Sessions};
+use crate::{accounts::Accounts, assertion, config::AuthorityConfig, policy, sessions::Sessions};
 use ed25519_dalek::SigningKey;
 use http::{header, HeaderValue, Method, Request, Response, StatusCode};
 use http_body_util::{combinators::BoxBody, BodyExt, Full, Limited};
@@ -34,6 +37,8 @@ pub struct Front {
     pub own_host: String,
     /// Engine internal loopback address (v52 authority mode).
     pub engine: SocketAddr,
+    /// Access policy evaluated before every relay (B6).
+    pub policy: policy::Policy,
 }
 
 fn now() -> i64 {
@@ -200,6 +205,18 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
     let Ok(Ok(view)) = resolved else {
         return Ok(unauthenticated(&req, &path));
     };
+    // B6: decide before reading the body or touching the engine; a refusal
+    // is final for this request and carries only stable codes.
+    let decision = policy::decide(
+        &front.policy,
+        &policy::Subject { roles: &view.roles, integrity: view.integrity, attributes: &view.attributes },
+        req.method().as_str(),
+        req.uri().path(),
+    );
+    if !decision.allowed {
+        let body = serde_json::json!({"error": "authority-policy-denied", "action": decision.action, "reason": decision.reason});
+        return Ok(full(StatusCode::FORBIDDEN, "application/json", body.to_string()));
+    }
     let (parts, body) = req.into_parts();
     let body = match read_body(&front, body).await { Ok(b) => b, Err(r) => return Ok(r) };
     let mut nonce = [0u8; 16];

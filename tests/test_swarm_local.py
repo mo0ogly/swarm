@@ -77,6 +77,50 @@ class LocalWeb(unittest.TestCase):
             client.open(link)
         self.assertEqual(replay.exception.code, 401)
 
+    def switch_to_authority(self):
+        """Adopt `authority` access mode on the isolated Root via the CLI."""
+        run = lambda *a: json.loads(subprocess.run([BINARY, "--root", str(self.root), *a], text=True,
+                                                   capture_output=True, check=True).stdout)
+        shown = run("engine-settings", "show", "--json")
+        values = {**shown["values"], "web_access_mode": "authority",
+                  "web_authority_public_key": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8"}
+        change = {"schema_version": shown["schema_version"], "event_id": "launcher-authority-front",
+                  "expected_revision": shown["revision"], "values": values,
+                  "reason": "Launcher authority front test", "preview_token": ""}
+        request = Path(self.temp.name) / "authority-change.json"
+        request.write_text(json.dumps(change))
+        change["preview_token"] = run("engine-settings", "preview", "--input", str(request), "--json")["preview_token"]
+        request.write_text(json.dumps(change))
+        run("engine-settings", "apply", "--input", str(request), "--json")
+
+    def test_open_in_authority_mode_targets_daemon_sign_in(self):
+        self.run_cli("start")
+        self.switch_to_authority()
+        received = Path(self.temp.name) / "opener-url"
+        opener = Path(self.temp.name) / "browser-opener"
+        opener.write_text('#!/bin/sh\nprintf "%s" "$1" > "' + str(received) + '"\n')
+        opener.chmod(0o700)
+        unit = Path(self.temp.name) / "swarm-authority.service"
+        args = [arg for arg in self.args if arg != "--no-open"]
+        env = {**os.environ, "SWARM_BROWSER": str(opener), "SWARM_AUTHORITY_UNIT": str(unit)}
+        # Witness of the refusal first: no unit -> open refuses, no owner ticket.
+        missing = subprocess.run([*args, "open"], env=env, text=True, capture_output=True)
+        self.assertEqual(missing.returncode, 2, missing.stdout)
+        self.assertIn("sans démon installé", missing.stderr)
+        self.assertFalse(received.exists())
+        status = subprocess.run([*self.args, "start"], env=env, text=True, capture_output=True)
+        self.assertEqual(status.returncode, 0, status.stderr)
+        self.assertIn("Avertissement", status.stderr)
+        unit.write_text("[Service]\nExecStart=/x serve --pin P --listen 127.0.0.1:38999 --engine " + self.address + "\n")
+        result = subprocess.run([*args, "open"], env=env, text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(received.read_text(), "http://127.0.0.1:38999/login")
+        self.assertIn("http://127.0.0.1:38999/", result.stdout)
+        unit.write_text("[Service]\nExecStart=/x serve --listen 0.0.0.0:1\n")
+        bad = subprocess.run([*args, "open"], env=env, text=True, capture_output=True)
+        self.assertEqual(bad.returncode, 2)
+        self.assertIn("introuvable", bad.stderr)
+
     def test_rotate_replaces_key_and_refuses_old_cookie(self):
         """rotate: owned server stopped, key replaced, server ready again; the
         old cookie and a ticket issued before rotation are refused, the new key

@@ -184,6 +184,27 @@ fn daemon_front_signs_in_relays_and_engine_refuses_direct_access() {
     // A further user created with add-account can sign in too.
     let bob = http(front_port, "POST", "/login", &[origin.clone(), ("Content-Type", "application/x-www-form-urlencoded".into())], "subject=bob&password=bob+secret&next=%2F");
     assert_eq!(bob.0, 303);
+    // B6: the viewer reads through the relay but a write is refused by the
+    // daemon (Biba floor: integrity 1 < 2) before reaching the engine, while
+    // the admin's same request passes the policy (engine answers on its own).
+    let bob_cookie = bob.1.iter().find(|(k, _)| k == "set-cookie").map(|(_, v)| v.split(';').next().unwrap().to_owned()).unwrap();
+    assert_eq!(http(front_port, "GET", "/api/v1/native-version", &[("Cookie", bob_cookie.clone())], "").0, 200);
+    let json = ("Content-Type", "application/json".to_owned());
+    let denied = http(front_port, "POST", "/api/v1/mission", &[("Cookie", bob_cookie), origin.clone(), json.clone()], "{}");
+    assert_eq!(denied.0, 403, "{}", denied.2);
+    let denied: serde_json::Value = serde_json::from_str(&denied.2).unwrap();
+    assert_eq!((denied["error"].as_str(), denied["action"].as_str(), denied["reason"].as_str()), (Some("authority-policy-denied"), Some("write"), Some("policy-integrity-floor")));
+    let admin_write = http(front_port, "POST", "/api/v1/mission", &[("Cookie", cookie.clone()), origin.clone(), json], "{}");
+    assert!(!admin_write.2.contains("authority-policy-denied"), "{}", admin_write.2);
+    // Decision preview (no mutation) through the CLI, saved/default policy.
+    let check = |args: &[&str]| {
+        let o = Command::new(daemon_bin).arg("policy-check").args(base).args(args).arg("--json").output().unwrap();
+        assert!(o.status.success(), "{}", String::from_utf8_lossy(&o.stderr));
+        serde_json::from_slice::<serde_json::Value>(&o.stdout).unwrap()["decision"].clone()
+    };
+    assert_eq!(check(&["--method", "POST", "--path", "/api/v1/quotas/apply", "--integrity", "3", "--roles", "admin"])["allowed"], true);
+    let viewer = check(&["--method", "POST", "--path", "/api/v1/quotas/apply", "--integrity", "3", "--roles", "viewer"]);
+    assert_eq!((viewer["allowed"].as_bool(), viewer["reason"].as_str()), (Some(false), Some("policy-no-grant")));
     // Cockpit sign-out path ends the daemon session.
     let out = http(front_port, "POST", "/api/v1/logout", &[("Cookie", cookie.clone()), origin.clone()], "");
     assert_eq!((out.0, out.2.as_str()), (200, r#"{"redirect":"/login"}"#));
