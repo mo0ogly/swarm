@@ -347,9 +347,22 @@ réel, évaluateur E3, arbitrage superviseur distinct) ; matrice détaillée
 [invariant-matrix.json](paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json).
 Note : la ligne « binaire installé actuel : dev.263 90c3bf90… » du
 [POINT-ETAPE-20261029.md](paea/POINT-ETAPE-20261029.md) est dépassée par le
-candidat dev.267 ci-dessus. Tableau de bord de réalisation (instantané 31 octobre
-2026, T01–T22 et pourcentages sourcés) :
-[DASHBOARD-T20261031.md](paea/DASHBOARD-T20261031.md).
+candidat dev.267 ci-dessus. Tableau de bord de réalisation (instantané 1er
+novembre 2026, T01–T22 et pourcentages sourcés) :
+[DASHBOARD-T20261101.md](paea/DASHBOARD-T20261101.md).
+
+### État courant — 1er novembre 2026
+
+Candidat unique livré localement : `bin/swarm` SHA-256
+`4164953c841c2b22476bd552a12496aac2b7f95e9b26de04d986c3238e2ed83c`
+(v0.1.1-dev.292, commit 8cb05983175bfe6d4195337503aa75e39b4865a5 « authority
+sessions, signed assertions and engine access mode », `modified=true` — arbre
+sale au build). Recette `paea-delivered-settlement-cli-rust` re-jouée sur ce
+livré : 6/6 VERIFIED (`.swarm-fixtures/i17-rerun/i17-run-4/`) — l'étape I17
+(révocation du courant sur le chemin settlement-call → refus sans effet puis
+récupération) est localement prouvée sur le candidat courant ; la portée de
+T17 s'étend au chemin settlement-call (voir tableau de bord). Acceptation
+indépendante : 0/17, inchangée ; les sept critères ouverts E2 restent opérants.
 
 ### Point du 25 octobre 2026
 

@@ -254,8 +254,17 @@ state, gap class, required authority) is maintained in
 [paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json](../../../plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json),
 single source of the detailed state; recovery synthesis in
 [POINT-ETAPE-20261029.md](../../../plans/actions-confiance/paea/POINT-ETAPE-20261029.md);
-realization dashboard (snapshot 31 October 2026, T01–T22 with sourced
-percentages): [DASHBOARD-T20261031.md](../../../plans/actions-confiance/paea/DASHBOARD-T20261031.md).
+realization dashboard (snapshot 1 November 2026, T01–T22 with sourced
+percentages): [DASHBOARD-T20261101.md](../../../plans/actions-confiance/paea/DASHBOARD-T20261101.md).
+Current locally delivered candidate: `bin/swarm` SHA-256
+`4164953c841c2b22476bd552a12496aac2b7f95e9b26de04d986c3238e2ed83c`
+(v0.1.1-dev.292, commit 8cb05983175bfe6d4195337503aa75e39b4865a5, "authority
+sessions, signed assertions and engine access mode", `modified=true`). The
+`paea-delivered-settlement-cli-rust` recipe was replayed on this delivered
+ELF: 6/6 VERIFIED (`.swarm-fixtures/i17-rerun/i17-run-4/`) — the I17 step
+(current-authority revocation on the settlement-call path → refusal without
+effect, then recovery) is locally proven on the current candidate; the T17
+evidence scope extends to the settlement-call path (see dashboard).
 State summary as of 31 October 2026: local partial verification I01, I04, I05,
 I08, I09, I12, I16, I17; incomplete candidates I06, I13 (BT02, egress not
 confined); human/OS prerequisites I02, I07, I10; missing design I14 (A2A);
