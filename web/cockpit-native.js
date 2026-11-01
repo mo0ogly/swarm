@@ -35,9 +35,11 @@
   * separately observed lazy resume/log panels. Logs do not request calculated
   * mission status; opening another view observes it then, with its refusal intact. A generation
   * prevents delayed responses replacing newer selection. Errors are visible and
-  * data is read-only; controls do not establish conductor/process liveness. */
+  * data is read-only; controls do not establish conductor/process liveness.
+  * An empty/missing selection clears the owned graph modal and view memory;
+  * another Work cannot inherit that modal or its pending presentation. */
  async function select(id){const ticket=++generation,changedContext=selected!==id;selected=id;resumePanel?.setWork(id);logsPanel?.setWork(id);const work=works.find(w=>w.id===id);budgetEditor?.setWork(work?id:'');current=null;if(instructions){if(changedContext)SwarmNativeInstructions.clear(instructions);else instructions.replaceChildren()}SwarmRustCockpitPanels.clear(tr(id?'Lecture de la mission…':'Aucune mission sélectionnée.'));const u=new URL(location.href);if(id)u.searchParams.set('work',id);else u.searchParams.delete('work');history.replaceState(null,'',u);
-  if(!work){$('title').textContent=tr('Choisissez une mission');$('objective').textContent='';for(const id of ['task-count','accepted-count','active-count','decision-count'])$(id).textContent='—';for(const id of ['tasks-body','conduite-plan','graph'])$(id).replaceChildren();$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr('Aucune mission sélectionnée.');return}
+  if(!work){$('title').textContent=tr('Choisissez une mission');$('objective').textContent='';for(const id of ['task-count','accepted-count','active-count','decision-count'])$(id).textContent='—';for(const id of ['tasks-body','conduite-plan'])$(id).replaceChildren();SwarmRustDependencyGraph.clear(tr('Aucune mission sélectionnée.'));$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr('Aucune mission sélectionnée.');return}
   $('title').textContent=work.title;$('objective').textContent=work.objective;$('connection').textContent=tr('Lecture de la mission…');$('main-content').setAttribute('aria-busy','true');
   // Clear the previous mission before starting a potentially failing read.
   SwarmRustCockpitRead.render({work,mission:null,missionError:'web-native-read-pending',control:null});

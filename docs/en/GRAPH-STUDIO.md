@@ -28,6 +28,35 @@ and focuses its card. “Clear search” or Escape in the input clears highlight
 Zoom and positions remain unchanged. The query stays local, is not persisted
 and resets on a new render. No matches produces an explicit message.
 
+Ctrl + wheel keeps the graph point under the cursor; existing zoom limits and
+native scroll clamping still apply. Rerenders of the same work retain orientation,
+zoom, positions, scroll and full screen in memory, including outer studio scroll
+on short screens. An unfinished drag remains
+provisional even during zoom: persistence excludes it and rerender cancels it.
+Restoring full screen waits
+until the task editor closes so it cannot cover a pending form. Focusing the saved
+task does not scroll the restored view. This view memory resets on page reload;
+zoom and positions retain their existing local persistence. Another work starts
+with its own presentation and does not inherit full screen.
+
+“Highlight dependencies” chooses a card: a solid border marks the target, dashes
+mark direct prerequisites, dots mark direct dependents, and related links are
+emphasized. The status lists each group’s IDs. No cards or links are hidden.
+“Clear dependency highlights” removes the markers. Highlights reset on rerender. The form offers literal ID/title
+search regardless of case or accents. Selected prerequisites stay visible outside
+the filter and are listed separately. No matches is explicit and clears no choice.
+Escape clears a nonempty query; the next Escape closes the form. Enter in this
+query never submits the task form.
+
+“Export SVG” requests a local `swarm-graph.svg` download. It retains placement,
+links, labels and resolved theme colors with a theme background, omitting handles,
+ports, buttons and external resources. It opens outside the application; the
+canvas grid and mini-map are outside this SVG. The download performs no POST and
+contains no session credential. The status announces a download request, not
+confirmation that a file was saved. Generation failures remain visible and allow
+another explicit request. Characters not representable in XML are rejected
+without changing the work.
+
 “Add task” and card activation open the task form. Title, deliverable, criteria
 and prerequisites are explicitly saved through `/api/v1/action` (`task-add` →
 `task.add`, `task` → `task.update`). The engine retains session/CSRF, bound Root,

@@ -368,3 +368,196 @@ mémoire disparaît au rerender ; limite de zoom 15 % annoncée si insuffisante.
 Brouillons de liens atomiques et historique métier restent le chantier de migration
 précédemment ouvert, hors des cinq quick wins. Aucun push ni publication ici ;
 les commits concurrents observés sont conservés, sans réécriture d’historique.
+
+## Nouvelles pistes QG8–QG12 — demande de propositions
+
+Origine : inspection du cockpit natif après le lot Rust290, nouvelle question
+« tu pas plus de quickwin? ». État : propositions, sans réalisation autorisée
+par cette seule question. Propriétaire proposé : Codex, périmètre graphe local.
+Les limites ci-dessous sont établies par le code ; leur impact utilisateur reste
+à reproduire avant une correction. Priorité proposée : QG8 puis QG9.
+
+| ID | Origine et valeur attendue | Critère observable proposé | État et reprise |
+|---|---|---|---|
+| QG8 | Le handler Ctrl+molette change zoom sans compenser scrollLeft/scrollTop : zoomer autour du pointeur pour garder son repère | le point du graphe sous le curseur reste au même endroit à l’écran hors bornes de défilement ; Work inchangé | proposé ; reproduire puis adopter le lot navigation |
+| QG9 | save ne mémorise que zoom/positions ; orientation est dans dataset et cleanup ferme la modale au rerender : conserver la vue après édition | après sauvegarde confirmée, orientation, zone visible et plein écran sont restaurés sur le même Work ; changement de Work indépendant | proposé ; définir précisément les restaurations lors du prochain lot de navigation |
+| QG10 | La recherche souligne les correspondances ; pas de repérage local des voisins d’une carte : rendre prérequis et dépendants immédiatement lisibles | une commande nommée ou le focus souligne la carte, ses liens entrants/sortants et leurs voisins ; légende et effacement, aucun lien masqué ni modifié | proposé ; prochain lot de lecture des dépendances |
+| QG11 | Le formulaire liste tous les prérequis dans un select multiple sans recherche : faciliter les plans denses | filtre par titre/ID, choix sélectionnés toujours visibles et conservés en changeant le filtre ; refus moteur inchangés | proposé ; prochain lot du formulaire |
+| QG12 | Le toolbar natif n’a pas de téléchargement du SVG courant : partager le graphe sans capture d’écran | export SVG local fidèle au placement, liens et libellés, ouvrable hors application, sans contrôle interactif ni credential ; aucun POST | proposé ; prochain lot de partage local, vérifier la sérialisation et le rendu exporté |
+
+Aucune modification de comportement, de fonction ou de politique : cette mise à
+jour conserve les pistes et leurs critères. Pas de nouvelle livraison requise
+pour ce seul suivi ; les versions du produit restent celles réellement installées.
+
+## Lot QG8–QG12 adopté — « ok lances tout »
+
+Propriétaire : Codex seul, sans délégation. Parcours : manipuler/lire le graphe,
+éditer des prérequis, enregistrer puis exporter la vue. Risque C pour présentation ;
+les écritures de tâches gardent les contrats moteur existants. Les travaux BLP et
+Autorité parallèles sont préservés. Baseline installée Rust290, originaux dans
+`.cache/graph-qg8-12-20261101/`. Pas de commit/push implicite.
+
+Ordre et critères : QG8 conserve le point sous Ctrl+molette hors clamp natif ;
+QG9 conserve orientation/zoom/scroll/plein écran pendant les rerenders du même Work,
+sans imposer sa vue à un autre Work ni ouvrir le graphe par-dessus un formulaire ;
+QG10 commande explicite de repérage d’une carte et de ses voisins directs, tous
+les nœuds/liens restent visibles, effacement nommé ; QG11 filtre littéral titre/ID
+sans casse/accents, sélection toujours visible et conservée, même API/refus ;
+QG12 vrai téléchargement SVG autonome reflétant géométrie/couleurs/libellés,
+sans contrôles interactifs, credential ni ressource externe, et sans POST.
+
+Choix : réutiliser le renderer et ses préférences plutôt qu’un second moteur.
+Snapshot en mémoire de la vue pendant les rafraîchissements du même Work, sans
+persister le plein écran ou la recherche ; zéro changement de politique moteur.
+Le plein écran est différé jusqu’à la fermeture de l’éditeur pour respecter les
+couches modales. La recherche des prérequis conserve le select natif et expose
+les choix sélectionnés même hors filtre. Export : sérialisation d’un clone épuré
+avec les couleurs calculées, plutôt qu’une capture ou un endpoint serveur.
+
+Vérifications : contre-exemple sur image immuable, contrôles ciblés pendant les
+édits, puis recette native consolidée FR/EN, deux thèmes, mobile, erreurs/reprise,
+Work inchangé pour présentation. Docs, commentaires et traductions dans le même
+incrément, revue politiques/fonctions/erreurs liée aux empreintes. Installation
+via candidat qualifié, identité réelle/assets protégés et dialogue Version vérifiés.
+Clôture : cinq critères vérifiés localement et RETEX ; auto-revue distincte d’une
+acceptation indépendante, aucune qualification globale de travaux tiers.
+
+Replan QG11 : `preview/escape-diagnostic.json` établit qu’Échap dans une saisie
+search non vide efface le texte et conserve le formulaire ; le harnais attendait
+sa fermeture. La tentative est arrêtée proprement avec originaux conservés.
+Choix : contrat explicite cohérent avec la recherche du graphe, Échap efface le
+filtre puis un second ferme le dialogue. Handler et assertion de recalcul des
+options ajoutés ; ce n’est pas une preuve d’export ou de restauration de vue.
+
+Replan QG9 : `preview3/browser/fr-etat-view-control.json` montre TB/zoom2/plein
+écran valides, largeur 1410 > SVG1196, défilement vertical réel 58 mais horizontal
+nul. Le témoin exigeait à tort un défilement horizontal. L’assertion couvre
+maintenant tout axe réellement défilable ; aucune limite produit n’est modifiée.
+Pour l’export, ajout d’une validation XML avant téléchargement afin qu’un texte
+non représentable en XML soit refusé visiblement plutôt que livré illisible ;
+le cas invalide suit le téléchargement valide dans le garde permanent.
+
+Replan QG12 : `preview4` atteint 450 assertions d’interaction puis refuse au
+contrôle console : trois violations CSP par langue/thème lors du XML invalide.
+`xml-csp-diagnostic.json` confirme exactement les trois empreintes des styles de
+la page parsererror générée par Chrome. Le parseur de contrôle a été remplacé
+par la validation des caractères XML 1.0 avant sérialisation du SVG construit par
+le renderer. Aucun unsafe-inline ni exception console ajouté. Les plages Unicode
+sont un invariant du format, pas une politique opérateur. Original XML invalide,
+refus sûr et récupération restent dans le garde ; recette native finale attendue.
+Le premier affichage du fichier diagnostic était trop précoce et la commande
+suivante avait continué : la vérification du diagnostic a été terminée séparément,
+avec correspondance exacte. Les étapes dépendantes restantes sont séparées.
+
+Replan export : `download-refusal-before` reproduit un lien de téléchargement
+resté dans le DOM après SecurityError du clic navigateur. Le lien est désormais
+retiré dans finally, le refus conserve sa famille sûre et la récupération exige
+un nouveau vrai téléchargement. Le candidat291, techniquement préparé avant cette
+correction, n’est pas installé ; son record est conservé dans
+`candidate-before-download-cleanup.json`. Nouveau candidat requis pour la source
+corrigée et la documentation de nettoyage de sélection dans le cockpit.
+
+Replan QG8/QG9 : `unfinished-before` prouve qu’un rerender capturait un glisser
+inachevé ; `unfinished-zoom-before` prouve que le zoom pouvait aussi mémoriser ses
+coordonnées provisoires. Le snapshot commun `committedPositions` dessert désormais
+stockage et rerender ; le snapshot du défilement exclut de même un panoramique
+inachevé. Annulation, zoom, placement terminé et restauration doivent rester
+compatibles dans la recette finale. Le candidat292 est conservé mais non installé
+(`candidate-before-gesture-snapshot.json`) ; nouvelle image requise. Hypothèse
+hors critères courants conservée : vérifier séparément le défilement extérieur du
+studio quand ses commandes débordent sur mobile ; propriétaire UX, reprise si un
+parcours réel démontre une zone visible perdue malgré le canevas restauré.
+
+Recette embarquée293 initiale : échec du témoin de pan en anglais clair, après
+PASS des gardes glisser/zoom/rerender. La hauteur du toolbar anglais laissait le
+SVG entièrement visible verticalement après zoom : aucun pan n’était possible.
+Fixture corrigée sur largeur390 avec étendue horizontale constatée avant geste,
+sans changement produit ni nouveau build. Original `embedded-recipe/` conservé ;
+nouvelle preuve requise sur la même image293 et le harnais corrigé.
+
+QG9, hypothèse mobile reprise et confirmée : `outer-scroll-before` sur image293
+constate une fenêtre défilée à largeur390/hauteur600 puis un retour à zéro au
+rerender. Le snapshot conserve maintenant aussi le scroll extérieur du studio,
+y compris durant le double rendu sous l’éditeur. Le garde de sauvegarde réelle
+comprend un témoin positif de scroll extérieur ; son clamp natif reste applicable.
+La recette293 `embedded-recipe-2/` demeure PASS/verify VERIFIED pour son ancienne
+portée, sans prétendre vérifier ce critère ajouté ni la prochaine image.
+
+QG11 : `filter-enter-before` prouve qu’Entrée dans la recherche déclenchait une
+soumission native avec formulaire valide. Le garde capture cette tentative avant
+le gestionnaire applicatif, sans POST ni création de tâche. La saisie intercepte
+maintenant Entrée pour rester dans le filtre ; l’enregistrement explicite reste
+inchangé. Candidats291–293 non installés ; candidat final requis pour ces octets.
+
+Attente de livraison finale : `final-preview/result.json` PASS sur les sources
+corrigées, quatre variantes et éditions réelles, mais overlay explicite et donc
+pas preuve d’embarquement. `build4` attend le verrou du lanceur derrière une autre
+compilation native ; /proc confirme locks_lock_inode_wait. La maintenance Git
+concurrente (PID1114540, identité conservée dans maintenance-observation.json)
+consomme environ7Go et crée une forte pression mémoire/swap. Aucun processus
+tiers n’est arrêté. Autorisation de pause temporaire avec reprise automatique
+sollicitée à l’utilisateur, sans considérer le silence comme un accord. Propriété
+et reprise : maintenance/détenteur du verrou ; fin naturelle ou accord explicite,
+puis qualification/recette de l’image finale et activation. Le serveur290 reste
+actif à cette observation. Les progrès de source ne valent pas installation.
+
+## QG8–QG12 livrés localement — Rust294
+
+Les cinq critères adoptés sont réalisés et vérifiés sur l’image native finale.
+
+| Critère | Résultat local et preuve observable |
+|---|---|
+| QG8 Zoom autour du curseur | PASS : point conservé hors clamp ; zoom durant un glisser ne mémorise pas les coordonnées provisoires |
+| QG9 Conservation de la vue | PASS : même travail conserve orientation/zoom/positions/scroll du canevas ET du studio ; sauvegarde réelle à hauteur600, éditeur au-dessus durant Ack/Readback/Refresh ; contexte différent/sélection absente indépendants ; gestes inachevés annulés |
+| QG10 Repérage des voisins | PASS : carte, prérequis, dépendants et liens concernés distingués ; aucun élément masqué, effacement/focus |
+| QG11 Recherche des prérequis | PASS : titre/ID sans casse/accents, sélection visible et conservée hors filtre, absence de résultat et Échap ; Entrée ne soumet pas, sauvegarde explicite et refus/reprise conservés |
+| QG12 Export SVG | PASS : téléchargement réel, géométrie et palette conservées, ouverture hors application sans contrôle ni ressource externe ni credential ; XML invalide/génération/clic refusés sûrement, nettoyage et vrai téléchargement de reprise, zéro POST d’export |
+
+Preuves finales : `.cache/graph-qg8-12-20261101/embedded-final/`, deux étapes
+PASS, intégrité `recipe.py verify` VERIFIED. 905 assertions nommées (402
+navigation avec Work strictement inchangé +503 édition/refus/récupération),
+FR/EN, clair/sombre, largeurs320/390, écran bas et lecture SVG hors application.
+Les 14 contrôles Version après installation s’ajoutent à ces 905. Contrôles de
+syntaxe et i18n réussis, catalogue pertinent inchangé depuis le contrôle, diff
+sans erreur de whitespace. Captures visuelles contrôlées : mobile, prérequis et
+export, clair et sombre. Aucun fournisseur ou agent appelé ; racines isolées.
+
+`candidate-final.json` désigne v0.1.1-dev.294, empreinte complète
+`84a62c6d8f18387a5198db6bc2a80d6b075bb11c202176029b63fdca9f28c537`,
+profil natif normal sans feature fixture et sources effectives archivées dans
+`.cache/local-delivery/rust-byrhlo7_/build/profile/`.
+`restart.stdout` prouve la sélection exacte préparée, zéro entrée compilée en
+attente au redémarrage. `installed/result.json` confirme PID1200221, sept assets
+protégés conformes au build et dialogue Version FR/EN : commit compilé réel,
+lien Git, notes et modifications non commitées affichées, aucun POST sur le Root
+réel. Aucun serveur tiers, mission ou maintenance Git interrompu ; la pause
+sollicitée n’a pas été exécutée et n’était plus nécessaire après le build.
+
+Revue : `review-final/source-review.json`, `result.json` et archive des références
+lient les six entrées compilées de ce lot aux octets réellement livrés. La revue
+incrémentale complète couvre 30 entrées mais son contrat GLOBAL reste BLOCKED :
+24 producteurs Autorité/BLP parallèles restent sous leurs propriétaires et ne
+sont pas qualifiés par cette auto-revue. La livraison UI locale ne constitue ni
+leur acceptation, ni une conformité globale de la migration, ni une revue
+indépendante. Les limites historiques batch/undo métier restent inchangées.
+
+RETEX vérifié : les captures/mémorisations doivent utiliser le placement terminé,
+pas l’état transitoire d’un pointeur. Une vue plein écran contient deux niveaux
+de défilement, à conserver sous l’éditeur. Un champ search dans un formulaire
+métier doit distinguer Entrée de l’enregistrement ; le garde avant gestionnaire
+permet de reproduire sans mutation. Le parsererror de Chrome peut produire du
+style bloqué par CSP : conserver la CSP et éviter cette génération pour refuser
+les caractères XML. Un lien de téléchargement temporaire doit être nettoyé aussi
+sur exception. Ces règles sont dans les commentaires et gardes permanents ; les
+consignes natives embarquées et processus déjà lancés n’ont pas été modifiés.
+Les preuves des échecs et candidats291–293 restent intactes. Source preview et
+ancienne recette293 demeurent des preuves limitées à leurs propres octets.
+
+Amélioration de méthode conservée : deux contentions Git/compilation ont allongé
+la livraison ; le verrou a effectivement protégé les builds concurrents. Les
+métadonnées natives compilées dans swarm-engine (`version_identity.rs`) changent
+lors des livraisons UI ; mesurer leur effet sur la réutilisation des artefacts
+avant toute optimisation. Propriétaire : outillage/maintenance ; état à étudier,
+reprise sur chantier explicite de performance des builds avec témoin mesuré,
+identité/version/forgery guards préservés. Aucun réglage Git, priorité machine,
+politique de build ou contexte d’agent n’a été modifié pour fabriquer un PASS.

@@ -6503,5 +6503,18 @@
   "Accès — clé publique du démon d’autorité": "Access — authority daemon public key",
   "Clé publique Ed25519 du démon d’autorité (base64url, 32 octets) utilisée pour vérifier les assertions. Vide seulement en mode owner-key. Elle ne donne aucun droit : sans la clé privée du démon, aucune assertion ne peut être signée.": "Ed25519 public key of the authority daemon (base64url, 32 bytes) used to verify assertions. Empty only in owner-key mode. It grants no right: without the daemon's private key no assertion can be signed.",
   "Accès — fraîcheur des assertions": "Access — assertion freshness",
-  "Écart maximal, en secondes strictement positives, entre l’heure d’une assertion du démon et l’heure du moteur. Au-delà, la requête est refusée ; chaque assertion ne sert qu’une fois dans cette fenêtre.": "Maximum gap, in strictly positive seconds, between a daemon assertion's time and the engine's time. Beyond it the request is refused; each assertion is usable once within this window."
+  "Écart maximal, en secondes strictement positives, entre l’heure d’une assertion du démon et l’heure du moteur. Au-delà, la requête est refusée ; chaque assertion ne sert qu’une fois dans cette fenêtre.": "Maximum gap, in strictly positive seconds, between a daemon assertion's time and the engine's time. Beyond it the request is refused; each assertion is usable once within this window.",
+  "Rechercher un prérequis": "Find a prerequisite",
+  "Prérequis sélectionnés : ": "Selected prerequisites: ",
+  "Repérer les dépendances": "Highlight dependencies",
+  "Choisir une carte": "Choose a card",
+  "Dépendants : ": "Dependents: ",
+  "Effacer le repérage": "Clear dependency highlights",
+  "Exporter le SVG": "Export SVG",
+  "Export SVG demandé.": "SVG download requested.",
+  "Export SVG impossible.": "SVG export failed.",
+  "Ctrl + molette garde le point sous le curseur. La vue est conservée après l’enregistrement sur le même travail.": "Ctrl + wheel keeps the point under the cursor. The view is preserved after saving within the same work.",
+  "Repérer les dépendances distingue prérequis et dépendants sans masquer de carte.": "Dependency highlights distinguish prerequisites and dependents without hiding cards.",
+  "L’export SVG télécharge le placement affiché ; les boutons ne sont pas exportés.": "SVG export downloads the displayed layout; buttons are omitted.",
+  "Aucun prérequis correspondant.": "No matching prerequisite."
 }

@@ -31,6 +31,36 @@ en évidence les correspondances sans masquer de carte ou de lien ; Entrée ou
 les positions restent identiques ; la requête est locale, non enregistrée, et
 repart vide lors d’un nouveau rendu. Une absence de résultat est explicite.
 
+Le zoom Ctrl + molette conserve le point sous le curseur ; les bornes de zoom
+et les limites natives du défilement continuent de s’appliquer. Les rerenders du
+même travail conservent en mémoire orientation, zoom, positions, zone visible et
+plein écran, y compris le défilement extérieur du studio sur écran bas. Un glisser inachevé reste provisoire, y compris pendant un zoom :
+sa capture est exclue de la mémorisation et annulée lors du rerender. Le plein écran attend la fermeture de l’éditeur pour ne pas masquer
+le formulaire pendant la relecture. Le focus de la tâche enregistrée ne décale
+pas la zone restaurée. Cette mémoire de vue ne survit pas à un rechargement de
+page ; zoom et positions gardent leur persistance locale existante. Un autre
+travail repart avec sa propre présentation, sans hériter du plein écran.
+
+« Repérer les dépendances » choisit une carte : contour plein pour la cible,
+tirets pour ses prérequis directs, pointillés pour ses dépendants directs et
+liens concernés renforcés. Le statut écrit les identifiants de chaque groupe ;
+aucune carte ni flèche n’est masquée. « Effacer le repérage » retire ces repères.
+Le repérage repart vide au nouveau rendu.
+Le formulaire propose une recherche littérale titre/ID sans casse ni accents.
+Les prérequis sélectionnés restent visibles hors filtre et sont récapitulés ;
+un filtre sans correspondance est annoncé et ne supprime aucun choix. Échap
+efface une recherche non vide ; Échap suivant ferme le formulaire. Entrée dans
+ce filtre ne soumet pas le formulaire de tâche.
+
+« Exporter le SVG » demande au navigateur un fichier `swarm-graph.svg` local.
+Il conserve placement, liens, libellés et palette calculée, avec fond du thème,
+sans poignées, ports, boutons ou ressource externe. Il peut être ouvert hors de
+l’application ; la grille du canevas et la mini-carte ne font pas partie du SVG.
+Le téléchargement n’effectue aucun POST et n’emporte pas la session. Le statut
+annonce la demande de téléchargement, pas une confirmation d’écriture du fichier.
+Un échec de génération reste visible et permet une nouvelle demande explicite.
+Un caractère non représentable en XML est refusé sans modifier le travail.
+
 « Ajouter une tâche » et l’activation d’une carte ouvrent le formulaire de tâche.
 Titre, livrable, critères et prérequis sont enregistrés explicitement par
 `/api/v1/action` (`task-add` → `task.add`, `task` → `task.update`). Le moteur garde

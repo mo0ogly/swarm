@@ -119,8 +119,15 @@
     host.replaceChildren(canvas);
   }
 
+  /** Normalize literal search text for case/accent-insensitive substring
+   * matching. No regular expression is built from user input; no IO/storage.
+   * @param {string} value validated task ID/title or the local input value
+   * @returns {string} Unicode-decomposed, mark-free lowercase search key
+   */
+  function searchKey(value){return value.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase()}
+
   /** Open a task editor on one observed Work revision. Inputs remain visible on
-   * refusal. Explicit submit uses scoped CSRF and the engine's task contracts;
+   * refusal. Prerequisite search keeps selected options visible. Explicit submit uses scoped CSRF and the engine's task contracts;
    * no provider or automatic retry. A lost/malformed response is uncertain and
    * disables resubmission until the operator closes and refreshes. Success needs
    * a protected Work readback; the cockpit then reloads its actual observations.
@@ -145,14 +152,24 @@
     field('criteria','Critères d’acceptation (un par ligne)',(task?.criteria||[]).join('\n'),true);
     const label=document.createElement('label');label.textContent=t('Prérequis');label.htmlFor='native-graph-depends';
     const dependencies=document.createElement('select');dependencies.id='native-graph-depends';dependencies.multiple=true;
-    for(const other of work.tasks||[]){if(other.id===task?.id)continue;const option=document.createElement('option');option.value=other.id;option.textContent=other.id+' — '+other.title;option.selected=!!(proposedDependencies??task?.depends)?.includes(other.id);dependencies.append(option)}label.append(dependencies);body.append(label);
+    for(const other of work.tasks||[]){if(other.id===task?.id)continue;const option=document.createElement('option');option.value=other.id;option.textContent=other.id+' — '+other.title;option.selected=!!(proposedDependencies??task?.depends)?.includes(other.id);dependencies.append(option)}label.append(dependencies);
+    const dependencySearch=document.createElement('label');dependencySearch.htmlFor='native-graph-dependency-search';dependencySearch.textContent=t('Rechercher un prérequis');
+    const dependencyQuery=document.createElement('input');dependencyQuery.id='native-graph-dependency-search';dependencyQuery.type='search';dependencyQuery.setAttribute('aria-controls',dependencies.id);dependencySearch.append(dependencyQuery);
+    const selectedDependencies=document.createElement('output');selectedDependencies.id='native-graph-dependency-selection';selectedDependencies.setAttribute('aria-live','polite');
+    /** Filter literal IDs/titles without discarding selected options. Selected
+     * prerequisites remain visible outside the query; output lists exact IDs.
+     * No Work mutation or selection change occurs until explicit user choice.
+     * Enter in the query never submits the task form; Escape clears the query.
+     */
+    function filterDependencies(){const query=searchKey(dependencyQuery.value.trim());for(const option of dependencies.options)option.hidden=!option.selected&&!searchKey(option.textContent).includes(query);const ids=[...dependencies.selectedOptions].map(o=>o.value);selectedDependencies.textContent=t('Prérequis sélectionnés : ')+(ids.join(', ')||t('Aucun'))+(query&&![...dependencies.options].some(o=>searchKey(o.textContent).includes(query))?' · '+t('Aucun prérequis correspondant.'):'');}
+    dependencyQuery.addEventListener('input',filterDependencies);dependencyQuery.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopPropagation();filterDependencies()}else if(e.key==='Escape'&&dependencyQuery.value){e.preventDefault();e.stopPropagation();dependencyQuery.value='';filterDependencies()}});dependencies.addEventListener('change',filterDependencies);filterDependencies();body.append(dependencySearch,label,selectedDependencies);
     const notice=document.createElement('p');notice.className='notice info';notice.textContent=t('Choisissez les prérequis. Enregistrer modifie le plan sans lancer d’agent.');body.append(notice);
     const progress=document.createElement('p');progress.id='native-graph-progress';progress.setAttribute('role','status');progress.setAttribute('aria-live','polite');body.append(progress);
     const error=document.createElement('p');error.className='notice alert';error.setAttribute('role','alert');error.hidden=true;body.append(error);
     const footer=document.createElement('footer'),save=document.createElement('button');save.type='submit';save.className='primary';save.id='native-graph-save';save.textContent=t('Enregistrer');footer.append(save);form.append(header,body,footer);dialog.append(form);document.body.append(dialog);
     let pending=false;
     dialog.addEventListener('cancel',e=>{if(pending)e.preventDefault()});
-    dialog.addEventListener('close',()=>{dialog.remove();if(completionFocus?.isConnected)completionFocus.focus();else if(returnFocus?.isConnected)returnFocus.focus()});
+    dialog.addEventListener('close',()=>{dialog.remove();container().graphRestoreView?.();if(completionFocus?.isConnected)completionFocus.focus({preventScroll:true});else if(returnFocus?.isConnected)returnFocus.focus({preventScroll:true})});
     form.addEventListener('submit',async e=>{
       e.preventDefault();if(pending)return;pending=true;save.disabled=true;save.setAttribute('aria-busy','true');save.textContent=t('Enregistrement en cours…');progress.textContent=t('Enregistrement en cours…');close.disabled=true;error.hidden=true;let submitted=false;
       const request={title:fields.title.value,deliverable:fields.deliverable.value,criteria:fields.criteria.value.split('\n').map(s=>s.trim()).filter(Boolean),depends:[...dependencies.selectedOptions].map(o=>o.value)};
@@ -169,7 +186,7 @@
         if(!read.ok||observed.id!==work.id||!Number.isSafeInteger(observed.revision)||observed.revision<result.revision||!actual||actual.title!==request.title||actual.deliverable!==request.deliverable||JSON.stringify(actual.criteria)!==JSON.stringify(request.criteria)||JSON.stringify(actual.depends||[])!==JSON.stringify(request.depends))throw Error('web-native-readback-unconfirmed');
         if(!refreshWork)throw Error('web-native-graph-refresh-unavailable');
         await refreshWork(work.id,observed.revision);
-        completionFocus=[...container().querySelectorAll('.graph-task-open')].find(n=>n.dataset.task===taskID);
+        completionFocus=container().graphView?.().work===work.id?[...container().querySelectorAll('.graph-task-open')].find(n=>n.dataset.task===taskID):null;
         dialog.close();
       }catch(cause){error.hidden=false;error.textContent=t('Modification refusée ou résultat non confirmé. Fermez et actualisez avant de reprendre.')+' ('+cause.message+')';save.disabled=submitted&&!cause.refused}
       finally{pending=false;save.setAttribute('aria-busy','false');save.textContent=t('Enregistrer');progress.textContent='';close.disabled=false;for(const input of form.querySelectorAll('input,textarea,select'))input.disabled=false;if(!submitted)save.disabled=false}
@@ -180,34 +197,46 @@
   /** Mount local presentation controls around a validated recorded graph.
    * Coordinates/zoom are device preferences, scoped to origin, Work and direction;
    * they grant no mutation or execution rights. Storage failure remains visible.
-   * Native modal semantics own focus/inertness/Escape in fullscreen.
+   * Native modal semantics own focus/inertness/Escape in fullscreen. Same-Work
+   * view snapshots stay in memory; explicit SVG export initiates a local download
+   * and reports generation failures without a server write or saved-file claim.
    * @param {Element} host existing graph container, replaced after mounting
    * @param {HTMLElement} canvas scroll viewport containing the recorded SVG
    * @param {SVGElement} svg validated Dagre layout, dimensions in SVG units
    * @param {object} work recorded Work with validated tasks/dependencies
    * @param {'LR'|'TB'} orientation displayed layout direction
-   * @returns {void} installs listeners and cleanup; storage refusals stay visible
+   * @param {object|null} initial same-Work in-memory view, never an engine snapshot
+   * @returns {void} installs listeners, view capture and cleanup; storage refusals stay visible
    */
-  function navigation(host, canvas, svg, work, orientation) {
+  function navigation(host, canvas, svg, work, orientation, initial=null) {
     const studio=document.createElement('section');studio.id='graph-studio';studio.className='graph-studio native-graph-studio';
     const toolbar=document.createElement('div');toolbar.className='pilot-actions';
     const status=document.createElement('p');status.className='graph-studio-hint';status.setAttribute('role','status');
     const key='swarm-native-graph:v1:'+work.id+':'+orientation;
-    let positions=Object.create(null),previousPositions=null,zoom=1,gesture=null,connection=null,disposed=false,copying=false;
+    let positions=Object.create(null),previousPositions=null,zoom=1,gesture=null,connection=null,disposed=false,copying=false,exportUrl=null,resumeFullscreen=!!initial?.fullscreen;
+    let pendingScroll=initial?.orientation===orientation?{left:initial.left,top:initial.top}:null;
+    let pendingStudio=initial?{left:initial.studioLeft??0,top:initial.studioTop??0}:null;
     try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(saved){if(Number.isFinite(saved.zoom))zoom=Math.max(.15,Math.min(2,saved.zoom));for(const [id,p]of Object.entries(saved.positions||{}))if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y))positions[id]={x:p.x,y:p.y}}}catch{status.textContent=t('Positions indisponibles ; placement automatique conservé.')}
+    if(initial?.orientation===orientation){zoom=initial.zoom;positions=copyPositions(initial.positions)}
     const base={width:Number(svg.getAttribute('width')),height:Number(svg.getAttribute('height'))},units=new Map();
     const extent={width:base.width,height:base.height};
     const map=svgNode('svg',{class:'graph-minimap',role:'group',tabindex:0,'aria-label':t('Naviguer avec la mini-carte')});canvas.append(map);
     const viewport=svgNode('rect',{class:'graph-minimap-viewport','aria-hidden':'true'});
     canvas.id='pilot-canvas';canvas.classList.add('native-graph-canvas');
     const modal=document.createElement('dialog');modal.className='native-graph-dialog';modal.setAttribute('aria-label',t('Graphe du travail'));
-    /** Persist presentation only; report refusal without claiming persistence. */
-    function save(){try{localStorage.setItem(key,JSON.stringify({zoom,positions}))}catch{status.textContent=t('Positions non mémorisées sur cet appareil.')}}
+    /** Persist zoom and completed placement only; captured drags stay provisional.
+     * Storage refusal stays visible and never claims successful persistence. */
+    function save(){try{localStorage.setItem(key,JSON.stringify({zoom,positions:committedPositions()}))}catch{status.textContent=t('Positions non mémorisées sur cet appareil.')}}
     /** Copy only owned coordinate entries, including prototype-shaped IDs.
      * @param {object} source local positions, never Work data
      * @returns {object} independent null-prototype coordinate snapshot
      */
     function copyPositions(source=positions){const result=Object.create(null);for(const [id,p]of Object.entries(source))result[id]={x:p.x,y:p.y};return result}
+    /** Snapshot completed coordinates for persistence and rerender consumers.
+     * A captured drag supplies its original full placement; callers receive an
+     * independent copy. No storage, engine write or gesture completion occurs.
+     */
+    function committedPositions(){return copyPositions(gesture?.id?gesture.snapshot:positions)}
     /** Retain one previous placement only after a real completed change.
      * Cancellation/no-op preserve the previous undo; absent and zero offsets
      * describe the same placement. Memory resets on rerender;
@@ -240,10 +269,42 @@
     toolbar.append(zoomText);
     button('pilot-zoom-in','Agrandir le zoom',()=>{zoom=Math.min(2,zoom+.15);update();save()});
     button('pilot-fit','Vue d’ensemble',()=>{update();const required=Math.min(1,(canvas.clientWidth-24)/extent.width,(canvas.clientHeight-24)/extent.height);zoom=Math.max(.15,required);update();canvas.scrollTo(0,0);if(required<.15)status.textContent=t('Zoom minimum atteint. Rapprochez les cartes pour tout voir.');save()});
-    const full=button('pilot-fullscreen','Plein écran',()=>{if(modal.open){modal.close();return}modal.showModal();modal.append(studio);studio.classList.add('is-fullscreen');document.body.classList.add('graph-studio-open');full.textContent=t('Quitter le plein écran');full.setAttribute('aria-expanded','true');full.focus()});full.setAttribute('aria-expanded','false');
+    const full=button('pilot-fullscreen','Plein écran',()=>{resumeFullscreen=false;if(modal.open){modal.close();return}modal.showModal();modal.append(studio);studio.classList.add('is-fullscreen');document.body.classList.add('graph-studio-open');full.textContent=t('Quitter le plein écran');full.setAttribute('aria-expanded','true');full.focus()});full.setAttribute('aria-expanded','false');
     button('pilot-layout-reset','Ranger les cartes',()=>{const before=copyPositions();positions=Object.create(null);rememberPlacement(before);update();save()});
     const undo=button('pilot-layout-undo','Annuler le placement',()=>{if(!previousPositions)return;finish(true);positions=previousPositions;previousPositions=null;update();save()});undo.disabled=true;
     button('pilot-add-task','Ajouter une tâche',()=>editTask(work));
+    const neighbors=document.createElement('label');neighbors.className='native-graph-neighbors';neighbors.textContent=t('Repérer les dépendances');neighbors.htmlFor='pilot-neighbors';
+    const neighborSelect=document.createElement('select');neighborSelect.id='pilot-neighbors';const noNeighbor=document.createElement('option');noNeighbor.value='';noNeighbor.textContent=t('Choisir une carte');neighborSelect.append(noNeighbor);
+    for(const task of work.tasks){const option=document.createElement('option');option.value=task.id;option.textContent=task.id+' — '+task.title;neighborSelect.append(option)}neighbors.append(neighborSelect);toolbar.append(neighbors);
+    const neighborStatus=document.createElement('output');neighborStatus.id='pilot-neighbor-status';neighborStatus.setAttribute('role','status');
+    /** Highlight only direct recorded prerequisites/dependents. No node or link
+     * is hidden, no geometry or Work is changed. Empty selection clears markers.
+     */
+    function showNeighbors(){const id=neighborSelect.value,task=work.tasks.find(task=>task.id===id),incoming=new Set(task?.depends||[]),outgoing=new Set(work.tasks.filter(task=>(task.depends||[]).includes(id)).map(task=>task.id));for(const [node,u]of units){u.group.classList.toggle('graph-neighbor-focus',node===id);u.group.classList.toggle('graph-neighbor-in',incoming.has(node));u.group.classList.toggle('graph-neighbor-out',outgoing.has(node))}for(const edge of svg.querySelectorAll('.graph-arete'))edge.classList.toggle('graph-neighbor-link',!!id&&(edge.dataset.to===id||edge.dataset.from===id));neighborStatus.textContent=task?id+' · '+t('Prérequis : ')+([...incoming].join(', ')||t('Aucun'))+' · '+t('Dépendants : ')+([...outgoing].join(', ')||t('Aucun')):'';clearNeighbors.disabled=!task;}
+    neighborSelect.addEventListener('change',showNeighbors);const clearNeighbors=button('pilot-neighbors-clear','Effacer le repérage',()=>{neighborSelect.value='';showNeighbors();neighborSelect.focus()});clearNeighbors.disabled=true;
+
+    /** Download a standalone SVG of the current recorded layout. Resolve the
+     * local palette into presentation attributes, strip controls/active content
+     * and external references. No credentials or HTTP request are serialized.
+     * Browser download initiation is not an acknowledgement of a saved file.
+     * XML 1.0 character ranges reject unrepresentable text before download.
+     * The trusted SVG tree supplies element names; XMLSerializer escapes values.
+     * Generation errors produce a safe visible diagnostic and preserve Work.
+     * One blob URL is retained until next export or renderer cleanup.
+     */
+    function exportGraph(){
+      try{
+        const copy=svg.cloneNode(true),originals=[svg,...svg.querySelectorAll('*')],copies=[copy,...copy.querySelectorAll('*')];
+        const properties=['fill','stroke','stroke-width','stroke-dasharray','opacity','font-family','font-size','font-weight','text-anchor','dominant-baseline','paint-order','vector-effect'];
+        for(let i=0;i<copies.length;i++){const node=copies[i],style=getComputedStyle(originals[i]);for(const attribute of [...node.attributes])if(attribute.name==='style'||attribute.name==='tabindex'||attribute.name==='role'||attribute.name.startsWith('aria-')||attribute.name.startsWith('on')||attribute.localName==='href')node.removeAttributeNode(attribute);for(const property of properties){const value=style.getPropertyValue(property);if(value&&!/url\s*\(/i.test(value))node.setAttribute(property,value)}}
+        for(const node of copy.querySelectorAll('.graph-drag,.graph-copy,.graph-port,.graph-link-ghost,script,foreignObject,image,use,a,style,animate,animateTransform,set'))node.remove();
+        for(const node of copy.querySelectorAll('*'))for(const attribute of [...node.attributes])if(/url\s*\(/i.test(attribute.value)&&!/^url\(#[A-Za-z0-9_-]+\)$/.test(attribute.value))node.removeAttributeNode(attribute);
+        copy.setAttribute('xmlns',SVG_NS);copy.setAttribute('width',extent.width);copy.setAttribute('height',extent.height);copy.setAttribute('role','img');copy.setAttribute('aria-label',work.title);
+        const background=svgNode('rect',{x:0,y:0,width:extent.width,height:extent.height,fill:getComputedStyle(canvas).backgroundColor});copy.prepend(background);
+        const content=new XMLSerializer().serializeToString(copy);for(const character of content){const cp=character.codePointAt(0);if(!(cp===9||cp===10||cp===13||cp>=0x20&&cp<=0xD7FF||cp>=0xE000&&cp<=0xFFFD||cp>=0x10000&&cp<=0x10FFFF))throw new DOMException('Invalid XML character','InvalidStateError')}if(exportUrl)URL.revokeObjectURL(exportUrl);exportUrl=URL.createObjectURL(new Blob([content],{type:'image/svg+xml;charset=utf-8'}));const anchor=document.createElement('a');anchor.href=exportUrl;anchor.download='swarm-graph.svg';document.body.append(anchor);try{anchor.click()}finally{anchor.remove()}status.textContent=t('Export SVG demandé.');
+      }catch(cause){const name=/^[A-Za-z]+Error$/.test(cause?.name)?cause.name:'ExportError';status.textContent=t('Export SVG impossible.')+' ('+name+')'}
+    }
+    button('pilot-export','Exporter le SVG',exportGraph);
     const direction=document.createElement('select');direction.id='pilot-orientation';direction.setAttribute('aria-label',t('Orientation'));
     for(const [value,label]of [['LR','Gauche → droite'],['TB','Haut → bas']]){const option=document.createElement('option');option.value=value;option.textContent=t(label);direction.append(option)}direction.value=orientation;
     direction.addEventListener('change',()=>{host.dataset.orientation=direction.value;render(work)});toolbar.append(direction);
@@ -252,12 +313,6 @@
     const searchInput=document.createElement('input');searchInput.id='pilot-search';searchInput.type='search';searchInput.autocomplete='off';searchInput.setAttribute('aria-controls','pilot-canvas');
     const searchStatus=document.createElement('output');searchStatus.id='pilot-search-status';searchStatus.setAttribute('role','status');searchStatus.setAttribute('aria-live','polite');
     let matches=[],matchIndex=-1;
-    /** Normalize literal search text for case/accent-insensitive substring
-     * matching. No regular expression is built from user input; no IO/storage.
-     * @param {string} value validated task ID/title or the local input value
-     * @returns {string} Unicode-decomposed, mark-free lowercase search key
-     */
-    function searchKey(value){return value.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase()}
     /** Refresh local matches without hiding nodes/edges or changing layout.
      * Empty queries clear highlights; no match disables navigation and reports
      * it visibly. Query/matches are not persisted and reset with this renderer.
@@ -304,6 +359,9 @@
     const helpToggle=document.createElement('summary');helpToggle.id='pilot-graph-help-toggle';helpToggle.textContent=t('Aide des gestes');help.append(helpToggle);
     const helpList=document.createElement('ul');for(const text of [
       'Zoom : boutons ou Ctrl + molette. Vue d’ensemble inclut les cartes déplacées.',
+      'Ctrl + molette garde le point sous le curseur. La vue est conservée après l’enregistrement sur le même travail.',
+      'Repérer les dépendances distingue prérequis et dépendants sans masquer de carte.',
+      'L’export SVG télécharge le placement affiché ; les boutons ne sont pas exportés.',
       'Déplacez le fond pour naviguer et les poignées pour placer les cartes. Annuler le placement restaure le dernier déplacement ou rangement.',
       'Mini-carte : cliquez pour centrer ; utilisez les flèches, Début et Fin au clavier.',
       'Recherche : Entrée ou Suivant centre une correspondance ; Échap efface la saisie.',
@@ -355,26 +413,43 @@
     map.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key))return;e.preventDefault();e.stopPropagation();if(e.key==='Home')canvas.scrollTo(0,0);else if(e.key==='End')canvas.scrollTo(canvas.scrollWidth,canvas.scrollHeight);else{canvas.scrollLeft+=(e.key==='ArrowLeft'?-1:e.key==='ArrowRight'?1:0)*canvas.clientWidth/2;canvas.scrollTop+=(e.key==='ArrowUp'?-1:e.key==='ArrowDown'?1:0)*canvas.clientHeight/2}updateViewport()});canvas.addEventListener('scroll',updateViewport);
     canvas.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('.graph-noeud'))return;e.preventDefault();canvas.focus();gesture={target:canvas,pointer:e.pointerId,start:{x:e.clientX,y:e.clientY},left:canvas.scrollLeft,top:canvas.scrollTop};canvas.setPointerCapture(e.pointerId)});
     canvas.addEventListener('pointermove',e=>{if(!gesture||gesture.id||gesture.link)return;canvas.scrollLeft=gesture.left+gesture.start.x-e.clientX;canvas.scrollTop=gesture.top+gesture.start.y-e.clientY});canvas.addEventListener('pointerup',()=>finish());canvas.addEventListener('pointercancel',()=>finish(true));
-    canvas.addEventListener('wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();zoom=Math.max(.15,Math.min(2,zoom+(e.deltaY<0?.15:-.15)));update();save()},{passive:false});
+    /** Keep the graph point under the cursor stable on Ctrl+wheel. The native
+     * scroll clamp applies at edges and the existing zoom limits are unchanged.
+     * Ordinary wheel events retain browser scrolling; no engine operation.
+     */
+    function zoomAtCursor(e){if(!e.ctrlKey)return;e.preventDefault();const at=point(e),view=canvas.getBoundingClientRect(),x=e.clientX-view.left-canvas.clientLeft,y=e.clientY-view.top-canvas.clientTop;zoom=Math.max(.15,Math.min(2,zoom+(e.deltaY<0?.15:-.15)));update();canvas.scrollLeft=at.x*zoom-x;canvas.scrollTop=at.y*zoom-y;updateViewport();save()}
+    canvas.addEventListener('wheel',zoomAtCursor,{passive:false});
     for(const edge of svg.querySelectorAll('.graph-arete')){edge.setAttribute('role','button');edge.setAttribute('tabindex','0');edge.setAttribute('aria-label',t('Retirer ce lien')+' '+edge.dataset.from+' → '+edge.dataset.to);const remove=()=>{const target=work.tasks.find(t=>t.id===edge.dataset.to);editTask(work,target,(target.depends||[]).filter(id=>id!==edge.dataset.from))};edge.addEventListener('click',remove);edge.addEventListener('keydown',e=>{if(['Enter',' ','Delete','Backspace'].includes(e.key)){e.preventDefault();remove()}})}
     studio.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(gesture||connection){e.preventDefault();e.stopPropagation();finish(true);connection=null;status.textContent=''}else if(modal.open){e.preventDefault();modal.close()}});
     modal.addEventListener('close',()=>{if(disposed)return;finish(true);host.insertBefore(studio,modal);studio.classList.remove('is-fullscreen');document.body.classList.remove('graph-studio-open');full.textContent=t('Plein écran');full.setAttribute('aria-expanded','false');full.focus()});
     const viewportObserver=new ResizeObserver(updateViewport);viewportObserver.observe(canvas);
-    studio.append(toolbar,help,status,copyStatus,copyFallback,canvas);host.replaceChildren(studio,modal);host.graphCleanup=()=>{disposed=true;viewportObserver.disconnect();finish(true);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};update();
+    studio.append(toolbar,help,status,neighborStatus,copyStatus,copyFallback,canvas);host.replaceChildren(studio,modal);
+    /** Capture completed same-Work presentation, including deferred modal/scroll.
+     * In-progress card movement and canvas panning are excluded, as on cancel.
+     * Memory only; callers must compare Work IDs before restoring this object.
+     */
+    host.graphView=()=>({work:work.id,orientation,zoom,positions:committedPositions(),left:pendingScroll?.left??(gesture&&!gesture.id&&!gesture.link?gesture.left:canvas.scrollLeft),top:pendingScroll?.top??(gesture&&!gesture.id&&!gesture.link?gesture.top:canvas.scrollTop),studioLeft:pendingStudio?.left??studio.scrollLeft,studioTop:pendingStudio?.top??studio.scrollTop,fullscreen:modal.open||resumeFullscreen});
+    /** Restore after rerender, or after an editor closes. Never open a graph
+     * modal above a task editor; scroll is retained until its geometry is ready.
+     */
+    host.graphRestoreView=()=>{if(disposed||resumeFullscreen&&document.querySelector('.native-graph-editor[open]'))return;if(resumeFullscreen){resumeFullscreen=false;if(!modal.open)full.click()}if(pendingScroll){canvas.scrollTo(pendingScroll.left,pendingScroll.top);pendingScroll=null}if(pendingStudio){studio.scrollTo(pendingStudio.left,pendingStudio.top);pendingStudio=null}updateViewport()};
+    host.graphCleanup=()=>{disposed=true;viewportObserver.disconnect();finish(true);if(exportUrl)URL.revokeObjectURL(exportUrl);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};update();host.graphRestoreView();
   }
 
   /**
    * Render the dependency graph of a Work into the original #graph container.
    * Recorded projection with local navigation and explicit task-editor handlers.
-   * Rendering performs no writes; saving an editor uses protected engine operations.
+   * Rendering performs no engine writes; same-Work presentation survives rerender.
+   * Saving an editor uses protected engine operations; switching Work resets view.
    * Side effect: replaces the container's children (scrollable canvas + svg).
    * @param {object} work Work {id,title,tasks:[{id,title,status,depends?:string[]}]}
    * @throws {Error} on invalid Work, duplicate ids, unknown-shaped dependencies or cycles
    */
   function render(work) {
     const host = container();
-    host.graphCleanup?.();host.graphCleanup=null;
-    const orientation=host.dataset.orientation==='TB'?'TB':'LR';
+    const previous=host.graphView?.(),initial=previous?.work===work.id?previous:null;
+    host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;
+    const orientation=initial&&host.dataset.orientation==='TB'?'TB':'LR';host.dataset.orientation=orientation;
     const { tasks, depPairs, unknown } = validateWork(work);
     if (typeof graphNodeKey !== 'function' || typeof svgNode !== 'function' || typeof graphEdgePath !== 'function' || typeof graphTonalites !== 'object' || !globalThis.dagre || !globalThis.dagre.graphlib || !globalThis.dagre.layout) {
       throw new Error(t('Graphe : moteur dagre indisponible.'));
@@ -474,7 +549,7 @@
         unknown.map(u => u.dep + ' → ' + u.taskId).join(', ');
       canvas.append(warning);
     }
-    navigation(host,canvas,svg,work,orientation);
+    navigation(host,canvas,svg,work,orientation,initial);
   }
 
   /** Display at most 24 UTF-16 code units including the ellipsis to leave room
@@ -502,13 +577,15 @@
 
   /**
    * Clear the original #graph container and replace its content with a message.
+   * Close its owned modal, disconnect observers and discard in-memory view state.
+   * Cleanup failures propagate rather than claiming an empty successful graph.
    * Side effect: replaces the container's children.
    * @param {string} message literal message to display
    * @throws {Error} when the container is absent
    */
   function clear(message) {
     const host = container();
-    host.graphCleanup?.();host.graphCleanup=null;
+    host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;
     const p = document.createElement('p');
     p.textContent = typeof message === 'string' ? message : '';
     host.replaceChildren(p);

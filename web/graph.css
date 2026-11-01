@@ -120,3 +120,12 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .native-graph-help { padding:8px; border:1px solid var(--wattson-ligne); background:var(--wattson-carte); color:var(--wattson-texte); }
 .native-graph-help summary { cursor:pointer; }
 .native-graph-help li { margin-block:6px; }
+
+.native-graph-neighbors { display:grid; flex:1 1 220px; min-width:0; max-width:100%; gap:4px; }
+.native-graph-neighbors select { min-width:0; width:100%; max-width:100%; }
+#pilot-neighbor-status { display:block; overflow-wrap:anywhere; }
+.native-graph-studio .graph-neighbor-focus .graph-cadre { stroke:var(--wattson-lien); stroke-width:5; }
+.native-graph-studio .graph-neighbor-in .graph-cadre { stroke:var(--wattson-lien); stroke-width:3; stroke-dasharray:8 4; }
+.native-graph-studio .graph-neighbor-out .graph-cadre { stroke:var(--wattson-lien); stroke-width:3; stroke-dasharray:2 3; }
+.native-graph-studio .graph-neighbor-link { stroke:var(--wattson-lien); stroke-width:4; }
+#native-graph-dependency-selection { overflow-wrap:anywhere; }
