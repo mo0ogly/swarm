@@ -22,13 +22,16 @@ def main():
     parser.add_argument('--binary', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--workspace-preview', action='store_true', help='Explicit workspace JS/CSS overlay for iteration; never embedded-build evidence')
+    parser.add_argument('--analyst-only', action='store_true', help='Targeted analyst controls, plus empty graph and browser diagnostics; no editing proof')
     parser.add_argument('--editing', action='store_true', help='Additionally exercise task creation and dependency save/refusal in the actual engine')
     parser.add_argument('--skip-search-check', action='store_true', help='Diagnostic before-image only: exercise busy feedback before search exists')
     args = parser.parse_args()
+    if args.analyst_only and args.editing:
+        parser.error('--analyst-only does not exercise business editing')
     binary, out = args.binary.resolve(), args.output.resolve()
     out.mkdir(mode=0o700, parents=True, exist_ok=False)
     retained.publish(out / 'binary.json',dict(path=str(binary),sha256=hashlib.sha256(binary.read_bytes()).hexdigest()))
-    source_names=['tests/rust_graph_navigation.py','tests/rust_graph_navigation_ui.cjs','web/cockpit-native-graph.js','web/cockpit-native.js','web/graph.css','web/i18n-en.js']
+    source_names=['tests/rust_graph_navigation.py','tests/rust_graph_navigation_ui.cjs','tests/rust_graph_analyst_ui.cjs','web/cockpit-native-graph.js','web/cockpit-native.js','web/graph.css','web/i18n-en.js']
     source_hashes={name:hashlib.sha256(Path(name).read_bytes()).hexdigest() for name in source_names}
     retained.publish(out / 'inputs-before.json',source_hashes)
     for index,name in enumerate(source_names):
@@ -53,7 +56,7 @@ def main():
         server.capture_async(out / 'server.jsonl')
         assets = {route: hashlib.sha256(Path(source).read_bytes()).hexdigest() for route, source in {
             '/cockpit-native-graph.js': 'web/cockpit-native-graph.js', '/cockpit-native.js': 'web/cockpit-native.js', '/i18n-en.js':'web/i18n-en.js', '/graph.css': 'web/graph.css'}.items()}
-        cfg = dict(address=server.address, key=server.key, output=str(out / 'browser'), work=work['id'], empty_work=empty['id'], assets=assets, workspace_preview=args.workspace_preview, editing=args.editing, skip_search_check=args.skip_search_check)
+        cfg = dict(address=server.address, key=server.key, output=str(out / 'browser'), work=work['id'], empty_work=empty['id'], assets=assets, workspace_preview=args.workspace_preview, editing=args.editing, skip_search_check=args.skip_search_check, analyst_only=args.analyst_only)
         # Stream exact originals to fresh files so progress is inspectable during
         # an unbounded browser action; EOF/exit and cleanup remain authoritative.
         started=time.time()

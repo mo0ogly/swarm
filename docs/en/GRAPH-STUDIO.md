@@ -3,11 +3,140 @@
 ## Rust integration
 
 The native cockpit uses `web/cockpit-native-graph.js` on actual Work objects.
+The native business workflow below applies to **manual plans**. Hierarchical
+missions retain their contract revision workflow; batches do not bypass roles
+or the existing refusal of manual task creation.
 Zoom buttons or Ctrl + wheel, fit, canvas panning, keyboard/pointer card handles,
 orientation and full screen are presentation preferences. Positions are local to
 the HTTP origin, Work and orientation; they change no revision or budget. Escape
 cancels an active drag before closing full screen. Full screen uses a native modal
 dialog for keyboard isolation and restores focus to its opener on close.
+
+“Analyze and select” provides three exclusive disclosures: “Read a branch”,
+“Compare two tasks” and “Move a group”. Applying a filter or enabling selection
+closes the panel to free graph space; results and selection stay visible in the
+main flow. This local reading workflow is intended for analysts:
+
+- **Isolate branch** retains the chosen task and all transitive prerequisites and
+  dependents. Siblings are hidden without recalculating placement.
+- **Show paths** retains the union of directed paths from start to end, following
+  prerequisite→task links. Identical endpoints isolate one card; no path leaves
+  the previous view intact with an explicit message.
+- **Show entire graph** restores all cards and links. The mini-map, search and
+  export follow the filter; fit considers visible cards only.
+- **Select multiple cards** temporarily changes card activation (click, Enter or
+  Space) into selection. Text lists exact IDs; a patterned border and accessible
+  pressed state identify selected cards. Leaving this mode retains the group;
+  **Clear selection** empties it. A selected card’s handle moves the group with
+  pointer or arrow keys, preserving relative placement. An unselected handle
+  moves only its own card. Group translation clamps at the SVG origin without
+  negative coordinates. Escape during a gesture rolls back the entire group;
+  undo/redo cover a completed group move. Outside a gesture, Escape exits selection
+  mode before closing full screen.
+
+Filtering cancels provisional gestures and clears selection so hidden cards
+cannot move unexpectedly. Filters and selection reset on rerender and change no
+task, link, revision or permission. Business batch preview remains distinct from
+these reading filters. The permanent `tests/rust_graph_analyst_ui.cjs` journey,
+called by the native recipe, covers these rules in FR/EN, both themes, keyboard,
+pointer and mobile. Its diamond graph is an in-memory projection fixture, never
+evidence of an engine mutation.
+
+### Multi-task draft, preview and business undo
+
+**Multi-task draft** opens a workbench separate from the confirmed graph. Preparing
+or editing a task only adds a proposal. **Duplicate** copies title, deliverable,
+criteria and prerequisites into a blank identity; it copies no status, proof,
+model, budget or permission. **Duplicate task** in the individual editor also
+prepares a new task that requires explicit confirmation. An ID already used in the plan or draft refuses without converting creation into editing; input remains available.
+
+**Preview batch** calls the engine without changing Work or event history. The
+preview shows complete before/after definitions, including every prerequisite
+and criterion. Refusal invalidates the previous preview; cycles remain explicit.
+**Apply explicitly** rechecks content, revision, rights and activity inside one
+transaction, then records one event and one revision for the entire batch. New
+tasks can reference each other. Failure must never report a partially applied
+batch as successful. No command launches an agent or changes a budget.
+
+Local drafts use AES-GCM encryption with a session-derived key that is never
+stored; origin, Work and session isolate this preference. Storage contains only
+a versioned ciphertext envelope and technical nonce. Session rotation can make
+an old draft unreadable. Storage/crypto refusal stays visible and preserves the
+original. The exact application request is retained before POST; if that save
+fails, this workbench sends no new batch.
+
+
+Only one workbench may edit a draft per origin, Work and session. A Web Lock
+immediately refuses a second tab; closing the workbench releases protection.
+A proposal is accepted only after local saving; refusal preserves form input.
+Browser-managed local storage is not a server backup. Browsers without Web Locks
+or crypto explicitly refuse this workbench.
+
+After a lost response, draft editing freezes. **Resume the same request without
+duplication** requires an explicit action and reuses the same event and content.
+The engine reads its recorded result or revalidates the request; no new event is
+invented to bypass a conflict. A commit/close error never proves rollback.
+Acknowledgements distinguish applied revision, current Work readback and replay.
+
+**Draft options → Refresh draft baseline** explicitly rereads the plan while
+retaining proposals. Starting definitions become the current observations and
+must be inspected in a new preview. An ID created meanwhile or a missing task
+blocks this recovery: remove or rename the proposal. Refresh applies nothing.
+
+**Preview undo of last batch** requests a compensation derived from the actual
+recorded event. No intervening Work event is allowed. Prior definitions are
+proposed; a newly added task is removed only while still unused and without any
+agent history. Invalidated proofs are never revived. Applying undo appends a
+revision and event while preserving original history. Arbitrary historical
+mission undo and chains of business redo are not provided.
+
+Batch definitions are complete: title and deliverable cannot be empty or
+whitespace-only. The engine refuses these values without mutation; an empty field
+never means “keep the old value”. Preview must match the actual applied candidate,
+including compensation.
+
+### Native CLI/API contract
+
+This native format is separate from historical Go `graph_drafts`; their tables
+and documents remain unchanged. Persisted `graph_draft_authorizations` rows still
+apply: independent prepare/apply rights, changed-task scopes and current
+revocation, including replay. Without a row, historical local operator behavior
+applies; observed identity is neither remote authentication nor confinement
+against the OS owner.
+
+- `POST /api/v1/graph-batch/preview` and `/apply` require session/CSRF and the same
+  opened datastore, with `{ "work": "ID", "request": REQUEST }` as body.
+- `./bin/swarm task graph-preview WORK --input batch.json --json` and
+  `task graph-apply WORK --input batch.json --json` share preparation and
+  transaction handling. Both native commands return structured JSON.
+- `REQUEST` contains `schema_version:1`, `event_id`, `expected_revision`, `changes`,
+  `undo_of` and `preview_digest` (the last two default to empty strings). Each
+  change is `{before,after}`; definitions contain exactly
+  `id,title,deliverable,criteria,depends`. Adds use `before:null`. Arbitrary deletion
+  refuses; undo supplies `undo_of` with `changes:[]`.
+- Preview returns `work,revision,changes,preview_digest,no_implicit_launch:true`.
+  Application reuses that exact digest, binding content, candidate, revision and
+  rights. Acknowledgement returns `work,event_id,applied_revision,replayed`; Work
+  may be newer during replay and is never presented as a historical snapshot.
+- Unknown/duplicate fields and invalid types refuse. Transport and criterion
+  bounds use existing settings; there is no hidden batch, retry or time ceiling.
+- Public refusal reasons are static (cycle, permissions, stale baseline…). SQL,
+  private paths and cleanup causes never become form diagnostics. Errors
+  retaining a known effect remain distinct from ordinary refusals.
+
+```mermaid
+flowchart LR
+  D[Encrypted local draft] --> P[Read-only engine preview]
+  P -->|Refusal| D
+  P --> C[Explicit confirmation]
+  C --> T[Revalidation and Work transaction]
+  T --> E[One event and one revision]
+  E --> R[Acknowledgement and readback]
+  E --> U[Last-batch compensation]
+  U --> P
+  T -->|Uncertain outcome| I[Exact retained request]
+  I -->|Explicit same-event recovery| T
+```
 
 “Graph tools” groups arrangement, undo/redo, dependency highlights, orientation,
 navigation reset and export. Its default is collapsed on mobile, expanded on

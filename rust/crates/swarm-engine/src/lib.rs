@@ -19,6 +19,8 @@ mod agent_launch;
 pub use agent_launch::AgentLaunchOutcome;
 mod agent_launch_error;
 mod task_model;
+mod graph_batch;
+pub use graph_batch::{decode_graph_batch, GraphBatchRequest, GraphBatchPreview, GraphTaskChange, GraphTaskDefinition};
 mod task_report;
 pub use task_model::{decode_task_model_request, TaskModelPreview, TaskModelRequest};
 pub use task_report::{decode_task_report_request, TaskReportRequest};

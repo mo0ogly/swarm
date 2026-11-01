@@ -74,6 +74,8 @@ pub enum WorkEngineError {
     ValidationController(Box<crate::AgentLaunchError>),
     Budget(crate::BudgetError),
     TaskModel(crate::AgentLaunchError),
+    /// Strict graph proposal/rights failure, retaining safe code and cause.
+    Graph(crate::AgentLaunchError),
     Quota(crate::AgentLaunchError),
     TaskReport(crate::AgentLaunchError),
     Guard(MutationGuardError),
@@ -122,7 +124,7 @@ impl WorkEngineError {
             Self::PlanningControl(e) => e.code(),
             Self::PlanningBootstrap(e) | Self::PlanningActivation(e) | Self::ValidationController(e) => e.code(),
             Self::Budget(e) => e.code(),
-            Self::TaskModel(e) | Self::Quota(e) => e.code(),
+            Self::TaskModel(e) | Self::Quota(e) | Self::Graph(e) => e.code(),
             Self::TaskReport(e) => e.code(),
             Self::Guard(e) => e.code(),
             Self::Change(e) => e.code(),
@@ -165,7 +167,7 @@ impl fmt::Display for WorkEngineError {
             Self::PlanningControl(e) => fmt::Display::fmt(e, f),
             Self::PlanningBootstrap(e) | Self::PlanningActivation(e) | Self::ValidationController(e) => fmt::Display::fmt(e, f),
             Self::Budget(e) => fmt::Display::fmt(e, f),
-            Self::TaskModel(e) | Self::Quota(e) => fmt::Display::fmt(e, f),
+            Self::TaskModel(e) | Self::Quota(e) | Self::Graph(e) => fmt::Display::fmt(e, f),
             Self::TaskReport(e) => fmt::Display::fmt(e, f),
             Self::Task(e) => fmt::Display::fmt(e, f),
             Self::Gate(e) => fmt::Display::fmt(e, f),
@@ -195,7 +197,7 @@ impl Error for WorkEngineError {
             Self::PlanningControl(e) => Some(e),
             Self::PlanningBootstrap(e) | Self::PlanningActivation(e) | Self::ValidationController(e) => Some(e.as_ref()),
             Self::Budget(e) => Some(e),
-            Self::TaskModel(e) | Self::Quota(e) => Some(e),
+            Self::TaskModel(e) | Self::Quota(e) | Self::Graph(e) => Some(e),
             Self::TaskReport(e) => Some(e),
             Self::Guard(e) => Some(e),
             Self::Change(e) => Some(e),
@@ -332,6 +334,7 @@ impl<'a, E: WorkEnvironment> WorkEngine<'a, E> {
         kind: &str,
         raw: &[u8],
     ) -> Result<WorkMutationOutcome, WorkEngineError> {
+        let graph = if kind=="graph.batch" {Some(crate::decode_graph_batch(raw).map_err(WorkEngineError::Graph)?)}else{None};
         let mission = if let Some(action) = crate::MissionControlAction::from_kind(kind) {
             Some(((if action==crate::MissionControlAction::Start {crate::decode_mission_start_request(raw)} else if action==crate::MissionControlAction::Priority {crate::decode_mission_priority_request(raw)} else {crate::decode_mission_control_request(raw)}).map_err(|e| WorkEngineError::Mission(Box::new(e)))?, action))
         } else { None };
@@ -371,7 +374,9 @@ impl<'a, E: WorkEnvironment> WorkEngine<'a, E> {
         } else {
             None
         };
-        let (request, intent) = if let Some((change, _)) = &mission {
+        let (request, intent) = if let Some(change)=&graph {
+            (Request{schema_version:change.schema_version,event_id:change.event_id.clone(),expected_revision:change.expected_revision,..Default::default()},crate::encode_model(change).map_err(|e|WorkEngineError::Graph(crate::AgentLaunchError::caused("graph-batch-encoding",e)))?)
+        } else if let Some((change, _)) = &mission {
             (Request{schema_version:change.schema_version,event_id:change.event_id.clone(),expected_revision:change.expected_revision,id:change.task_id.clone(),..Default::default()},
              crate::encode_model(change).map_err(|e|WorkEngineError::Mission(Box::new(crate::mission_control_request::cause("mission-control-request-encoding",e))))?)
         } else if let Some(report) = &task_report {
@@ -478,6 +483,7 @@ impl<'a, E: WorkEnvironment> WorkEngine<'a, E> {
                     task_model: task_model.as_ref(),
                     task_report: task_report.as_ref(),
                     gate: gate.as_ref(),
+                    graph: graph.as_ref(),
                     budget: budget.as_ref(),
                     quality_policy: self.quality_policy,
                     planning: planning
@@ -561,7 +567,7 @@ impl<'a, E: WorkEnvironment> WorkEngine<'a, E> {
 /// ceiling; unknown/unresolved ownership is never released by time or PID data.
 /// Safe caller-owned refusal labels and original SQL/cleanup causes propagate.
 #[cfg(target_os = "linux")]
-fn require_native_task_idle(db: &Connection, work: &str, task: &str, worker_refusal: &'static str) -> Result<(), WorkEngineError> {
+pub(crate) fn require_native_task_idle(db: &Connection, work: &str, task: &str, worker_refusal: &'static str) -> Result<(), WorkEngineError> {
     let result = (|| {
         crate::root_store::require_validation_idle(db, work, task)?;
         crate::RootStore::require_idle_task_review(db, work, task)?;
@@ -583,6 +589,7 @@ struct Invocation<'a> {
     task_model: Option<&'a crate::TaskModelRequest>,
     task_report: Option<&'a crate::TaskReportRequest>,
     gate: Option<&'a crate::GateRequest>,
+    graph: Option<&'a crate::GraphBatchRequest>,
     budget: Option<&'a crate::BudgetChange>,
     quality_policy: Option<&'a crate::QualityPolicySnapshot>,
     planning: Option<(&'a crate::PlanningRequest, crate::PlanningControlAction)>,
@@ -613,6 +620,7 @@ fn apply<E: WorkEnvironment>(
         request: r,
         intent,
         gate,
+        graph,
         mission,
         quota,
         task_model,
@@ -633,6 +641,7 @@ fn apply<E: WorkEnvironment>(
         && quota.is_none()
         && task_model.is_none()
         && task_report.is_none()
+        && graph.is_none()
     {
         let empty = Work::default();
         let target = match &inspection {
@@ -647,6 +656,7 @@ fn apply<E: WorkEnvironment>(
     }
     let mut candidate = match inspection {
         MutationInspection::Replayed(w) => {
+            if let Some(graph)=graph {let actor=environment.operator().map_err(WorkEngineError::Runtime)?;crate::graph_batch::authorize_replay(tx,&w.id,graph,&actor)?;}
             return Ok(WorkMutationOutcome {
                 work: *w,
                 replayed: true,
@@ -692,6 +702,11 @@ fn apply<E: WorkEnvironment>(
     #[cfg(target_os = "linux")]
     let mut planning_inputs = None;
     match kind {
+        "graph.batch" => {
+            let request=graph.ok_or(WorkEngineError::UnportedStatus)?;
+            let actor=environment.operator().map_err(WorkEngineError::Runtime)?;
+            candidate=crate::graph_batch::prepare(tx,&candidate,request,limits,&actor,true)?.0;
+        }
         "mission.pause" | "mission.unpause" | "mission.stop" | "mission.start" | "mission.resume" | "mission.priority" => {
             let (request, action)=mission.ok_or(WorkEngineError::UnportedStatus)?;
             let settings=planning_settings.ok_or_else(||WorkEngineError::Mission(Box::new(crate::MissionSupervisionError::Refused("mission-control-settings-required"))))?;

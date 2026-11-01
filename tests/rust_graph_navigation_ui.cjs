@@ -30,6 +30,8 @@ function check(name,value){assert(value,name);checks.push(name);console.log('PAS
   check(label+'-translated-zoom',await page.$eval('#pilot-zoom-in',e=>e.textContent)===(lang==='en'?'Zoom in':'Agrandir le zoom'));
   check(label+'-minimap-reflects-nodes',await page.$$eval('.graph-minimap-node',nodes=>nodes.length)===expectedTasks);
   check(label+'-zoom100-control',!!await page.$('#pilot-zoom-100'));
+  await require('./rust_graph_analyst_ui.cjs')(page,label,cfg,check);
+  if(cfg.analyst_only){await context.close();continue}
   await page.setViewport({width:390,height:844});await page.waitForFunction(()=>!document.querySelector('#pilot-tools').open);
   check(label+'-compact-primary-controls',await page.$$eval('#pilot-zoom-in,#pilot-fullscreen,#pilot-search',nodes=>nodes.length===3&&nodes.every(e=>!e.closest('#pilot-tools')&&e.getClientRects().length)));
   const compactHeight=await page.$eval('#pilot-tools',e=>e.getBoundingClientRect().height);await page.click('#pilot-tools-toggle');check(label+'-tools-expand',await page.$eval('#pilot-tools',(e,height)=>e.open&&e.getBoundingClientRect().height>height,compactHeight));await page.focus('#pilot-tools-close');await page.keyboard.press('Escape');check(label+'-tools-escape-focus',await page.$eval('#pilot-tools',e=>!e.open&&document.activeElement.id==='pilot-tools-toggle'));await page.click('#pilot-tools-toggle');await page.click('#pilot-tools-close');check(label+'-tools-close-focus',await page.$eval('#pilot-tools',e=>!e.open&&document.activeElement.id==='pilot-tools-toggle'));

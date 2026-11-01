@@ -7,6 +7,14 @@
     },
     "items": [
       {
+        "fr": "Graphe : duplication de définition, brouillon multi-tâches chiffré localement, aperçu moteur et application atomique avec reprise sans doublon ; annulation compensatrice du dernier lot sous contrôle de révision, de droits et d’activité.",
+        "en": "Graph: definition duplication, locally encrypted multi-task draft, engine preview and atomic application with duplicate-safe recovery; compensating undo of the last batch under revision, rights and activity checks."
+      },
+      {
+        "fr": "Graphe analyste : isolation de branche, chemins orientés entre deux tâches et sélection multiple pour déplacer un groupe avec annulation/rétablissement, au clavier et au pointeur.",
+        "en": "Analyst graph: branch isolation, directed paths between two tasks and multiple selection to move a group with undo/redo using keyboard or pointer."
+      },
+      {
         "fr": "Graphe : outils secondaires repliables, retour à 100 %, recherche précédente avec Maj+Entrée, rétablissement du placement annulé et navigation locale retrouvée après rechargement, sans plein écran automatique.",
         "en": "Graph: collapsible secondary tools, reset to 100%, previous search with Shift+Enter, redo an undone placement and restore local navigation after reload without opening full screen."
       },

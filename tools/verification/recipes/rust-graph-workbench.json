@@ -4,6 +4,7 @@
   "inputs": [
     "tests/rust_graph_navigation.py",
     "tests/rust_graph_navigation_ui.cjs",
+    "tests/rust_graph_analyst_ui.cjs",
     "tests/rust_native_http_cli.py",
     "tests/rust_agent_model_route.py",
     "tests/fixture_area.py",
@@ -109,7 +110,15 @@
         "PASS fr-etat-view-rejects-negative-offset",
         "PASS fr-etat-view-rejects-fullscreen-field",
         "PASS fr-etat-view-read-refusal-safe",
-        "PASS fr-etat-view-reset-refusal-preserves-key"
+        "PASS fr-etat-view-reset-refusal-preserves-key",
+        "PASS en-sombre-analyst-branch-excludes-sibling",
+        "PASS en-sombre-analyst-no-path-keeps-view",
+        "PASS en-sombre-analyst-projection-fixture-all-diamond-paths",
+        "PASS en-sombre-analyst-keyboard-group-common-translation",
+        "PASS en-sombre-analyst-cancel-rolls-back-entire-group",
+        "PASS en-sombre-analyst-pointer-group-common-translation",
+        "PASS en-sombre-analyst-origin-clamp-retains-relative-offset",
+        "PASS en-sombre-analyst-mobile-filter-320"
       ],
       "required_stderr": []
     },

@@ -3,12 +3,149 @@
 ## Raccordement Rust
 
 Le cockpit natif utilise `web/cockpit-native-graph.js` sur les vrais objets Work.
+Le parcours métier natif décrit ci-dessous concerne les **plans manuels**.
+Une mission hiérarchique conserve son parcours de révision de contrat : le lot
+ne contourne ni ses rôles ni le refus existant de création manuelle de tâches.
 Le zoom (boutons ou Ctrl + molette), la vue d’ensemble, le déplacement du fond,
 les poignées souris/clavier des cartes, l’orientation et le plein écran sont des
 préférences de présentation. Les positions sont locales à l’origine HTTP, à la
 mission et à l’orientation ; elles ne modifient ni révision ni budget. Échap
 annule un déplacement en cours avant de fermer le plein écran. Ce dernier est
 un dialogue modal natif : focus contenu et retour au bouton à la fermeture.
+
+« Analyser et sélectionner » propose trois sections repliables exclusives :
+« Lire une branche », « Comparer deux tâches », « Déplacer un groupe ».
+Appliquer un filtre ou activer la sélection referme le panneau pour rendre la
+surface au graphe ; le résultat et la sélection restent visibles dans le flux.
+Cette lecture locale est destinée aux analystes :
+
+- **Isoler la branche** conserve la tâche choisie, ses prérequis et ses dépendants
+  transitifs. Les tâches sœurs sont masquées, sans recalculer le placement.
+- **Montrer les chemins** conserve l’union des chemins orientés du départ à
+  l’arrivée, dans le sens prérequis→tâche. Deux extrémités identiques isolent une
+  carte ; aucun chemin conserve la vue précédente avec un message explicite.
+- **Voir tout le graphe** restaure les cartes et liens. La mini-carte, la recherche
+  et l’export suivent le filtre ; le cadrage inclut les seules cartes visibles.
+- **Sélectionner plusieurs cartes** transforme temporairement l’activation des
+  cartes (clic, Entrée ou Espace) en sélection. Le texte liste les identifiants,
+  un contour à motif et l’état accessible distinguent les cartes choisies.
+  Quitter ce mode conserve le groupe ; **Effacer la sélection** le vide.
+  Déplacer la poignée d’une carte sélectionnée, au pointeur ou avec les flèches,
+  translate le groupe sans déformer son placement. Une poignée non sélectionnée
+  déplace sa carte seule. Le groupe est clampé à l’origine, sans coordonnées
+  négatives. Échap pendant le geste annule tout le groupe ; undo/redo s’appliquent
+  au groupe terminé. Hors geste, Échap quitte le mode sélection avant le plein écran.
+
+Filtrer annule le geste provisoire et vide la sélection pour éviter de déplacer
+des cartes masquées. Filtre et sélection restent éphémères au nouveau rendu et
+ne modifient aucune tâche, lien, révision ou autorisation. L’aperçu métier par lot
+reste distinct de ces filtres de lecture. Le parcours permanent
+`tests/rust_graph_analyst_ui.cjs`, appelé par la recette native, couvre ces règles,
+FR/EN, thèmes, clavier/pointeur et mobile ; son graphe diamant est une fixture de
+projection locale, jamais une preuve de mutation moteur.
+
+### Brouillon multi-tâches, aperçu et annulation métier
+
+**Brouillon multi-tâches** ouvre un atelier distinct du graphe confirmé. Préparer
+ou modifier une tâche ajoute seulement une proposition. **Dupliquer** copie
+identifiant vierge, titre, livrable, critères et prérequis ; statut, preuves,
+modèle, budget et habilitations ne sont pas copiés. Dans l’éditeur individuel,
+**Dupliquer la tâche** prépare également une nouvelle tâche à confirmer. Un identifiant déjà utilisé dans le plan ou le brouillon est refusé sans convertir l’ajout en modification ; la saisie reste disponible.
+
+**Prévisualiser le lot** appelle le moteur sans modifier le Work ou son journal.
+L’aperçu expose les définitions complètes avant/après, notamment tous les liens
+et critères. Un refus invalide l’aperçu précédent ; un cycle reste explicite.
+**Appliquer explicitement** revalide contenu, révision, droits et activité dans
+une transaction, puis enregistre un seul événement et une seule révision pour
+tout le lot. Les nouvelles tâches peuvent se référencer entre elles. Un échec
+ne doit jamais transformer la moitié du lot en succès. Aucune commande ne lance
+un agent ou ne change un budget.
+
+Le brouillon local est chiffré AES-GCM, avec une clé dérivée de la session et
+jamais conservée dans le stockage ; l’origine, le Work et la session isolent
+la préférence. Le stockage conserve uniquement l’enveloppe chiffrée versionnée,
+son nonce technique et le texte authentifié. Une rotation de session peut rendre
+un ancien brouillon illisible. Un refus de stockage/crypto reste visible et
+conserve l’original. L’application garde sa demande exacte avant l’envoi ; si
+cette sauvegarde échoue, aucun nouveau lot n’est envoyé depuis cet atelier.
+
+
+Un seul atelier peut modifier le même brouillon par origine, Work et session.
+Un Web Lock refuse immédiatement le second onglet ; fermer l’atelier libère
+la protection. Une proposition est acceptée seulement après sauvegarde locale ;
+un refus conserve la saisie du formulaire. La copie locale reste gérée par le
+navigateur, sans garantie de sauvegarde serveur. Un navigateur sans Web Locks ou
+crypto refuse explicitement cet atelier.
+
+Après une réponse perdue, les modifications du brouillon sont gelées.
+**Reprendre la même demande sans doublon** exige un geste explicite et réutilise
+le même événement et le même contenu. Le moteur relit le résultat enregistré
+ou revalide la demande ; aucun nouvel événement n’est inventé pour contourner
+un conflit. Une erreur d’enregistrement/fermeture n’est pas une preuve de rollback.
+L’acquittement distingue révision appliquée, Work actuellement relu et replay.
+
+**Options du brouillon → Actualiser la base** relit explicitement le plan en
+conservant les propositions. Les définitions de départ sont remplacées par les
+observations courantes, qui doivent être examinées dans un nouvel aperçu. Un
+identifiant ajouté entre-temps ou une tâche disparue bloque cette reprise : retirer
+ou renommer la proposition est nécessaire. Cette action n’applique rien.
+
+**Prévisualiser l’annulation du dernier lot** demande au moteur une compensation
+dérivée de l’événement réellement enregistré. Elle exige qu’aucun autre événement
+n’ait changé le Work. Les définitions antérieures sont proposées ; une tâche
+nouvelle n’est retirée que si elle est encore vierge et sans historique d’agent.
+Les preuves invalidées ne sont jamais réactivées. L’application de l’annulation
+ajoute une révision et un événement ; l’historique original demeure. Il n’y a
+pas d’undo arbitraire d’une ancienne mission ni de chaîne de rétablissements métier.
+
+Les définitions du lot sont complètes : titre et livrable ne peuvent être vides
+ou blancs. Le moteur refuse ces valeurs sans mutation ; un champ vide ne signifie
+jamais « conserver l’ancien ». L’aperçu doit correspondre au candidat réellement
+appliqué, y compris pour une compensation.
+
+### Contrat natif CLI/API
+
+Le format natif est distinct des anciens `graph_drafts` Go, dont les tables et
+documents restent inchangés. Les lignes persistées `graph_draft_authorizations`
+restent respectées : prepare/apply indépendants, scopes des tâches modifiées et
+révocation actuelle, y compris au replay. En l’absence de ligne, le comportement
+historique d’opérateur local s’applique ; cette identité observée n’est ni une
+authentification distante ni un confinement contre le propriétaire OS.
+
+- `POST /api/v1/graph-batch/preview` et `/apply` exigent session/CSRF et le même
+  datastore ouvert, avec un corps `{ "work": "ID", "request": REQUEST }`.
+- `./bin/swarm task graph-preview WORK --input batch.json --json` et
+  `task graph-apply WORK --input batch.json --json` utilisent la même préparation
+  et transaction. Les deux commandes natives rendent du JSON structuré.
+- `REQUEST` contient `schema_version:1`, `event_id`, `expected_revision`, `changes`,
+  `undo_of` et `preview_digest` (ces deux derniers sont des chaînes vides par défaut).
+  Chaque changement est `{before,after}` ; une définition contient exactement
+  `id,title,deliverable,criteria,depends`. Un ajout a `before:null`. Un retrait
+  arbitraire est refusé ; une annulation fournit `undo_of` avec `changes:[]`.
+- L’aperçu renvoie `work,revision,changes,preview_digest,no_implicit_launch:true`.
+  Appliquer réutilise le digest exact, lié au contenu, candidat, révision et droits.
+  L’acquittement renvoie `work,event_id,applied_revision,replayed` ; le Work peut
+  être plus récent lors d’un replay et n’est pas présenté comme un ancien snapshot.
+- Champs inconnus/dupliqués et types invalides sont refusés. Les limites de
+  transport et de critères proviennent des paramètres existants ; aucun plafond
+  secret de taille de lot, tentative ou délai n’est ajouté.
+- Les motifs publics sont statiques (cycle, autorisation, base périmée…). SQL,
+  fichiers privés et causes de nettoyage ne deviennent pas des diagnostics de
+  formulaire. Les erreurs conservant un effet connu restent distinctes des refus.
+
+```mermaid
+flowchart LR
+  D[Brouillon local chiffré] --> P[Aperçu moteur sans écriture]
+  P -->|Refus| D
+  P --> C[Confirmation explicite]
+  C --> T[Revalidation et transaction Work]
+  T --> E[Un événement et une révision]
+  E --> R[Acquittement et relecture]
+  E --> U[Compensation du dernier lot]
+  U --> P
+  T -->|Résultat incertain| I[Demande exacte conservée]
+  I -->|Reprise explicite du même événement| T
+```
 
 « Outils du graphe » regroupe rangement, undo/redo, repérage, orientation,
 réinitialisation de navigation et export. Il est replié par défaut sur mobile,

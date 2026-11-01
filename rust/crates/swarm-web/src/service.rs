@@ -50,6 +50,7 @@ mod activity;
 mod activity_policy;
 mod exchanges;
 mod graph_performance;
+mod graph_batch;
 mod web_request_policy;
 mod run_limits_admin;
 mod api_connection_probe;
@@ -310,6 +311,7 @@ impl HttpServiceError {
     /// revision/owners use409, invalid proposals400 and unsupported windows501.
     /// No retry, rollback or authentication decision is inferred from this code.
     fn status(&self) -> StatusCode {
+        if let Self::Root{operation,cause}=self {if let Some(status)=graph_batch::status(operation,cause){return status}}
         if self.trust_publication().is_some(){return StatusCode::INTERNAL_SERVER_ERROR;}
         if let Self::Root{cause,..}=self {if cause.trust_publication().is_some(){return StatusCode::INTERNAL_SERVER_ERROR;}
         if let Some(e)=cause.trust_failure(){return match e{swarm_engine::TrustError::Authorization=>StatusCode::FORBIDDEN,swarm_engine::TrustError::Conflict(_)|swarm_engine::TrustError::Integrity(_)=>StatusCode::CONFLICT,swarm_engine::TrustError::Unsupported(_)=>StatusCode::NOT_IMPLEMENTED,_=>StatusCode::BAD_REQUEST};}}
@@ -630,10 +632,10 @@ impl DispatchProfile {
     fn capabilities(self) -> serde_json::Value {
         match self {
             Self::Typed => {
-                serde_json::json!({"schema_version":1,"profile":"rust-native-in-construction","actions":["task","task-add"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
+                serde_json::json!({"schema_version":1,"profile":"rust-native-in-construction","actions":["task","task-add"],"graph_batch":["preview","apply","undo-last-batch"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
             }
             Self::ObservedHttp1 => {
-                serde_json::json!({"schema_version":1,"profile":"rust-native-http1-observed","actions":["task","task-add"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
+                serde_json::json!({"schema_version":1,"profile":"rust-native-http1-observed","actions":["task","task-add"],"graph_batch":["preview","apply","undo-last-batch"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
             }
         }
     }
@@ -1267,6 +1269,7 @@ impl NativeHttpService {
                 let action = task_action(request.body())?;
                 self.task(action)
             }
+            "/api/v1/graph-batch/preview"|"/api/v1/graph-batch/apply"=>self.graph_batch(request),
             #[cfg(target_os = "linux")]
             "/api/v1/admin-advice-budget"=>self.admin_budget(admin_budget::Operation::Show,request),
             #[cfg(target_os = "linux")]
@@ -1389,6 +1392,7 @@ fn error_reply(error: HttpServiceError, head: bool) -> Result<HttpReply, HttpSer
     if let Some(probe)=error.provider_probe(){document["provider_contact_may_have_occurred"]=probe.contact_may_have_occurred.into();}
     #[cfg(target_os="linux")]
     if let Some(reason)=project_profile::public_reason(&error){document["failure"]["reason"]=reason.into();}
+    if let Some(reason)=graph_batch::public_reason(&error){document["failure"]["reason"]=reason.into();}
     if let Some((work, revision)) = error.recorded_work() {
         document["recorded_work"] = serde_json::json!({"id":work,"revision":revision});
     }
@@ -1571,6 +1575,10 @@ mod tests {
             ("blp-preparation-provenance-required",StatusCode::CONFLICT),
             ("blp-preparation-parent-mismatch",StatusCode::CONFLICT),
             ("blp-preparation-check-invalid",StatusCode::BAD_REQUEST),
+            ("blp-preparation-attribute-invalid",StatusCode::BAD_REQUEST),
+            ("blp-classification-invalid",StatusCode::BAD_REQUEST),
+            ("blp-preparation-source-not-found",StatusCode::NOT_FOUND),
+            ("preparation-revision-conflict",StatusCode::CONFLICT),
             ("preparation-turn-not-found",StatusCode::NOT_FOUND),
             ("blp-preparation-platform-unsupported",StatusCode::NOT_IMPLEMENTED),
             ("preparation-prompt-provenance-invalid",StatusCode::INTERNAL_SERVER_ERROR),

@@ -679,3 +679,388 @@ Reconstruction du seul lot graphe avec un index temporaire privé et déplacemen
 atomique conditionnel de la branche ; fichiers et index partagés préservés.
 Prévention : sélectionner les octets avec un index privé pour les commits dans
 un checkout partagé ; ne pas déduire le contenu du commit d’un ancien statut.
+
+
+## Ergonomie analyste — reprise APEX du1novembre2026
+
+Demande : améliorer lecture et manipulation des graphes pour les analystes.
+Premier incrément autorisé issu de la priorité proposée : A1 isoler une branche
+(prérequis/dépendants transitifs, sans frères), A2 montrer tous les chemins
+orientés entre deux tâches (absence explicite), A3 sélection multiple et
+placement groupé pointeur/clavier avec annulation/rétablissement existants.
+Codex seul ; aucune délégation, aucun fournisseur, aucune écriture métier pour
+ces trois parcours. Duplication/aperçu/batch/undo métier restent des propositions
+à qualifier séparément ; clarification asynchrone envoyée sur leur engagement.
+
+Choix : masquer localement les éléments hors périmètre en conservant le placement,
+plutôt que recalculer Dagre et perdre les repères spatiaux. Mini-carte/recherche
+suivent la vue ; retour explicite au graphe complet. Une branche inclut sa racine,
+tous ses ancêtres et descendants ; un chemin est orienté prérequis→tâche, union
+des chemins, sans énumération exponentielle. Aucun résultat ne prétend un chemin.
+Sélection explicite par bouton de carte, accessible au toucher et clavier ; les
+poignées déplacent ensemble les cartes sélectionnées avec une translation commune
+clampée à l’origine. Les gestes restent provisoires jusqu’à leur fin ; annulation
+restaure tout le groupe, no-op conserve undo/redo. Sélection et filtres sont
+éphémères au nouveau rendu ; zoom/coordonnées gardent leur contrat existant.
+
+Livrables : JS/CSS, traductions/aide FR/EN, docs et recette navigateur permanente,
+témoins normaux/refus/no-op/reprise, thèmes/mobile/console, installation locale par
+lanceur après preuve sur l’image exacte. Revue locale politiques/fonctions/erreurs
+liée aux octets ; aucune acceptation indépendante ni conformité globale déduite.
+Preuves nouvelles sous `.cache/graph-analyst-20261101/` ; échecs préservés.
+
+Témoin v296 : contrôle natif valide puis `fr-etat-analyst-control` FAIL attendu
+(commandes absentes), originaux before/. Preview1 : filtre/compte corrects, mais
+le banc supposait getClientRects vide pour un groupe SVG display:none. Un cas
+Chromium minimal prouve un rectangle encore présent ; correction du banc vers
+style calculé/aria-hidden et Tab excluant les cartes masquées. Aucun contournement
+produit ni seuil ajouté. Reprise avec cette précondition de mesure corrigée.
+
+
+Preview2 a ensuite révélé un défaut réel : Tab pouvait encore atteindre une
+commande SVG masquée. setProjection retire explicitement tabindex des cartes et
+liens masqués et restaure0 au retour complet ; preview3 ciblé PASS. Aucune carte
+masquée ne doit rester dans le parcours clavier. Contrôle désormais permanent.
+Inspection mobile : panneau initial trop haut ; trois sections exclusives natives,
+fermeture après filtre/activation de sélection et statut hors panneau. Nouvelle
+preuve compact/ :161assertions, zéro diagnostic inattendu, quatre variantes et
+320/390px ; captures clair320/sombre390 inspectées. Test ajouté ensuite pour la
+remise à zéro filtre/sélection au rerender, à vérifier sur le candidat embarqué.
+Clarification optionnelle sans réponse : livraison du premier incrément priorisé
+A1/A2/A3 ; aucune adoption implicite des quatre propositions métier restantes.
+
+Replan build298 : compilation moteur plus lente que la précédente observée ;
+mesures build-pressure.json conservent CPU/threads et pression mémoire/IO système.
+Aucun échec de compilation observé ; pas de relance identique, seuil ajouté ou
+processus tiers arrêté. Serveur296 préservé pendant qualification du candidat.
+
+
+Recette embarquée initiale : navigation PASS654assertions, Work strictement
+inchangé ; édition fr-clair PASS puis fr-sombre FAIL sur compteur «2/3». Cause
+banc : les langues suivantes observent les tâches réellement créées par la
+première, donc le total n’est plus3. Capture des IDs courants avant filtrage et
+comparaison au total réel ; retour complet/rerender alignés sur le même témoin.
+Produit inchangé, image298 inchangée. L’échec original et son intégrité VERIFIED
+sont conservés dans embedded/. Une première édition a refusé sur contexte ancien
+(click devenu helper) ; aucune étape dépendante lancée avant relecture/correction.
+
+
+## Ergonomie analyste A1–A3 livrée — Rust298
+
+| Critère | Preuve locale |
+|---|---|
+| A1 Branche | PASS : racine/ancêtres/dépendants transitifs, frères exclus, retour complet, compteur réel, recherche/mini-carte/clavier filtrés |
+| A2 Chemins | PASS : direction prérequis→tâche, union du diamant multi-sauts, zéro chemin conserve la vue, extrémités identiques et IDs prototype traités |
+| A3 Groupe | PASS : clic/Entrée/Espace en mode sélection, texte/état accessible/motif, poignées clavier/pointeur, translation commune clampée, annulation complète, undo/redo, carte non sélectionnée indépendante |
+| Espace de travail | PASS : trois sections exclusives, fermeture après application, Escape/focus ; retour filtre/sélection au rerender ; FR/EN×clair/sombre,1440/1024/760/390/320 |
+
+`embedded2/` PASS, integrity VERIFIED :654 assertions navigation (Work inchangé),
+755 édition réelle (création/liens/refus/perte de réponse/reprise persistée).
+`responsive/` PASS, integrity VERIFIED :145 assertions, aucun POST et Work
+inchangé. Total1554 assertions navigateur. Les recettes permanentes sont
+`rust-graph-workbench.json` et `rust-graph-analyst-responsive.json` ; les sources
+responsive sont `tests/rust_graph_analyst_responsive.py/.cjs`. Aucun watchdog,
+fournisseur ou agent ; aucune donnée de mission réelle employée comme fixture.
+Échecs embedded/ et previews conservés avec leur état d’origine, pas écrasés.
+
+Build normal `.cache/local-delivery/rust-ch511cy4/build/profile/` :
+VERIFIED_DEFAULT_NATIVE_PROFILE, sans features fixture, inventaire/archive des
+entrées effectives. Candidat298 immuable SHA256
+f5a154da4555962647106954274d09ce9160464383d849ba33782c700d033df9.
+`candidate.json` et correspondance des cinq entrées UI conservés. `restart.stdout`
+confirme la sélection de cette image ; il observait1 entrée postérieure non
+installée. Observation suivante `pending-sources.json` :3 entrées de confidentialité
+moteur parallèles plus récentes, non installées. Ne pas déduire la livraison de
+ces sources du présent lot ; propriétaire : lot confidentialité/BLP. Reprise : leur
+qualification et leur propre livraison par le parcours pris en charge.
+
+`installed/result.json` PASS : PID1838935, version298, SHA exact du processus,
+sept assets protégés correspondant au build et14 contrôles Version FR/EN
+(notes, lien de commit réel, mention des modifications non commitées). La recette
+n’effectue aucun POST sur le Root réel. La page existante doit être rechargée.
+
+`review/source-review.json`, result et références originales archivées : couverture
+PASS, cinq entrées UI examinées sur quatre axes sur neuf entrées compilées
+modifiées depuis l’image296. Les quatre entrées Authority restent OPEN sous leur
+propriétaire ; GLOBAL BLOCKED, aucune conformité ou acceptation indépendante
+revendiquée. Les anciens problèmes ouverts ne sont pas clos par cette comparaison.
+Aucun Rust modifié par le lot UI ; pas de compilation Rustdoc applicable.
+
+RETEX vérifié : masquer un groupe SVG ne suffit pas pour conclure à son absence
+au clavier, retirer ses tab stops explicitement. Ne pas utiliser getClientRects
+comme témoin unique de masquage SVG. Les fixtures d’édition progressent réellement
+entre variantes : comparer les compteurs au témoin observé, pas à une valeur
+initiale. Dégager le graphe après un choix et limiter les panneaux ouverts à un
+seul usage ; garde d’exclusivité et largeurs désormais permanente. Ces apprentissages
+sont transmis par code/commentaires, docs FR/EN et recettes versionnées ; aucun
+contexte d’agent déjà lancé n’est mis à jour ou assimilé à une réception.
+
+Ce premier incrément termine A1/A2/A3. Duplication, aperçu métier, brouillons
+multi-tâches et annulation métier restent des propositions distinctes à qualifier,
+non réalisées et non présentées comme livrées. Aucun commit/push pour cet incrément.
+
+
+## Suite métier B1–B4 adoptée — « fais la suite »
+
+Reprise APEX : B1 duplication explicite d’une définition (sans preuves/statut/
+réservations), B2 aperçu moteur des tâches et liens avant application, B3 brouillon
+multi-tâches et application atomique, B4 annulation métier compensatrice du dernier
+lot sans réécriture d’historique. Autorisation de développement/installation locale,
+pas de commit/push. Codex seul, pas de délégation ni fournisseur. Risque A données :
+preuves de refus/intégrité/reprise et revue nécessaires ; auto-revue distincte de
+revue indépendante, aucune acceptation globale inventée.
+
+Choix comparés : boucle de task.add/update (rejetée, risque de demi-application)
+contre commande graph.batch dans la transaction WorkEngine existante (retenue).
+DTO natif strict séparé des graph_drafts Go, tables/formats historiques intacts.
+Réutiliser schéma/événement/revision/replay/Root reservation/contrôle d’activité et
+validation de définition. Les autorisations graph_draft_authorizations existantes
+restent applicables (prepare/apply/scopes), pas de contournement par nouvelle route.
+Les Work hiérarchiques gardent leur refus de création manuelle ; pas de nouvelle
+révision de contrat de mission dans ce lot. Aucune nouvelle politique de volume,
+délai, tentative ou exécution. Taille d’entrée et critères viennent des sources
+Admin actuelles. Aperçu sans mutation ; digest lie contenu, révision, candidat et
+autorisation. Apply revalide dans la même transaction puis publie une seule révision.
+Undo dérive l’inverse depuis l’événement exact du dernier lot enregistré ; aucun
+snapshot arbitraire fourni par le navigateur n’est restauré. Les preuves invalidées
+ne sont jamais réactivées par une annulation de définition.
+
+Plan : contrat/guards/tests moteur → CLI/API → brouillon/duplication/aperçu/undo UX
+FR/EN → tests publics isolés et refus/reprise → revue liée aux octets → build normal,
+image exacte, installation/version/assets → RETEX. Preuves sous
+`.cache/graph-business-20261101/`. Échecs conservés. Les fichiers Authority/BLP
+parallèles et leurs preuves restent préservés ; rechercher les producteurs réels
+avant lecture plutôt que supposer un nom de module (lectures initiales mal ciblées
+corrigées via inventaire/symboles, aucune action dépendante lancée sur ces erreurs).
+
+Suite métier : huit tests moteur ciblés PASS (profil test sans feature fixture).
+Premier essai HTTP : trois échecs avant route, clé de fixture hors format de
+LocalWebAuthority. Remplacement par la clé témoin déjà valide du banc service,
+sans modifier la validation produit ; échec initial conservé sous http-tests.*.
+Aucun résultat HTTP positif déduit de cette précondition refusée.
+
+
+Suite métier, contrats12 tests PASS (8 moteur +3HTTP +1CLI). Le premier parcours
+navigateur a franchi les quatre variantes complètes, puis FAIL sur diagnostics
+inattendus ; pas déclaré PASS. L’écriture du rapport étant placée après cette
+assertion, son contenu n’était pas conservé : le banc retient désormais les
+objets diagnostics même en échec. Revue de code : risque de pending fantôme en
+mémoire après quota local refusé avant POST ; ajout d’un contre-exemple ciblé
+fr-clair (fermer/rouvrir, stockage encore refusé), avant correction générale.
+Preuves initiales iteration/ conservées, binaire d’itération séparé du profil
+livré. Captures de l’aperçu développées ajoutées pour lecture mobile réelle.
+
+
+Contre-exemple before-ghost/ : refus quota n’envoie rien, puis fermeture/rouverture
+révèle un pending mémoire fantôme — FAIL attendu. Correction : effacer ce marqueur
+sur refus avant envoi, persister également avant reprise, lier le cache mémoire à
+la même session opaque et toujours valider/déchiffrer le disque avant ce cache.
+Une corruption ne peut plus être masquée par des propositions mémoire récentes.
+Ghost-fix/ a ensuite échoué avant ce parcours sur l’ancien formulaire de duplication
+encore présent : handoff désormais après l’événement close et assertion du banc
+sur formulaire réellement ouvert ; observateur permanent interdit les identités
+de champs dupliquées pendant cette transition. Pas de faux PASS de ces tentatives.
+
+
+Targeted2/ : tous parcours fonctionnels fr-clair PASS, y compris contre-exemple
+pending et corruption cachée par mémoire ; contrôle final diagnostics FAIL.
+Détail conservé : requestfailed /api/v1/action, tandis que le serveur a262 réponses
+complètes et zéro disconnected_replies/connection_failures. Hypothèse discriminante :
+le POST concurrent du banc lisait seulement les headers puis abandonnait son corps.
+La reprise attend maintenant son JSON et l’acquittement réel (id/révision), conserve
+failure.errorText et phase pour toute nouvelle anomalie. Aucun allowlist ajouté.
+Capture mobile : fermer se coupait en deux lignes ; bouton non rétrécissable et
+aperçu scrollé dans le corps pour inspecter réellement les valeurs avant/après.
+
+
+Targeted3/ PASS : parcours fr-clair complet, y compris60+ assertions métier,
+refus/reprise/storage/compensation, aucun diagnostic inattendu. Le corps JSON du
+POST concurrent est désormais consommé et son id/révision affirmés ; l’interruption
+navigateur n’est plus observée, sans allowlist ni modification serveur. Cela étaye
+la cause de mesure du banc. Source UI/contrats figés pour build et recette finale.
+Les panneaux de comparaison avant/après sont inspectés sur captures mobiles ;
+le bouton Fermer ne doit pas se couper, header reste visible et corps défilable.
+
+Observation avant build final : une livraison parallèle a activé299 (PID1983729,
+75ad879f…). Notre session n’a pas redémarré le service pour ce lot. Baseline exacte
+299 retenue dans graph-business…/baseline.json, sans qualifier les autres travaux
+par leur présence dans l’instance locale. Le journal298 précédent reste intact.
+
+
+Image300 : recette métier13 contrats +206assertions navigateur PASS/VERIFIED,
+recettes régression graphe et largeurs PASS. Ces preuves couvrent leurs scénarios
+et n’incluent pas encore le nouveau garde d’intention de création trouvé en
+revue : l’ajout d’un ID existant ne doit jamais devenir une modification.
+Contre-exemple natif300 lancé avant correction ; originaux conservés sous
+before-create-intent/. Le candidat n’a pas été activé par cette session.
+
+Qualification métier : la baseline299 intermédiaire a déjà embarqué des modules
+GraphBatch pendant le travail partagé. La comparer seule masquerait donc les
+nouveaux producteurs métier non encore revus. Conserver le record299 comme état
+observé, mais utiliser l’inventaire exact298 (dernier lot graphe propre vérifié)
+pour la revue complète298→candidat. Conserver les findings historiques ; aucun
+changement de baseline ne constitue une acceptation de299 ou des lots parallèles.
+Amélioration de livraison à conserver : associer la préparation d’un build partagé
+à l’état de qualification de ses propriétaires, pour éviter de co-livrer des
+sources en cours. Propriétaire : parcours de livraison locale/coordination racine ;
+reprise : contrat inter-lots de sources figées et témoin de refus/reprise avant
+activation. Non réalisée ici : conserver le développement direct choisi et ne
+pas modifier le lanceur parallèle ni fabriquer des droits ou une conformité.
+
+
+Before-create-intent/ FAIL attendu sur l’image native300 après témoin valide :
+un ID existant ferme le formulaire au lieu de refuser la création. Correction
+au contrat frontend : transmettre explicitement creating, refuser tout ID déjà
+présent dans le plan ou le brouillon, conserver le before d’une proposition éditée
+jusqu’au rebasage explicite. La validation serveur continue de distinguer ajout
+(before:null) et modification (before observé), sans nouveau bypass. Le formulaire
+conserve la saisie et affiche le motif ; busy/feedback couvre aussi le staging.
+Les preuves300 précédentes restent réelles mais ne suffisent pas à cette garde.
+
+
+Create-intent-fix/ PASS sur fr-clair avec overlay explicite du correctif UI :
+IDs du plan et IDs déjà proposés refusés, formulaire/saisie/propositions conservés,
+aucune écriture métier lors du staging ; reste du parcours complet et diagnostics
+PASS. Ce témoin ne qualifie pas des ressources embarquées. Le noyau Rust ne change
+pas depuis300 ; préparer une nouvelle image contenant ces octets UI puis relancer
+le corpus public sur cette image. Les succès et refus300 restent conservés.
+
+
+Reprise suivante : image301 qualifiée localement par les trois recettes métier,
+graphe et responsive, non activée par cette session. Deux contre-exemples
+supplémentaires sont conservés : before-rebase-refusal/ montre un refus de
+rebasage dont l’aperçu reste actif et un ID interprété comme code diagnostic ;
+before-two-tabs/ montre deux ateliers écrivains simultanés. Correction générale :
+invalider l’aperçu avant toute relecture, afficher les IDs comme texte littéral,
+et acquérir un Web Lock par origine/Work/session jusqu’à fermeture. Les éditions
+ne sont acceptées qu’après sauvegarde locale ; suppression du cache mémoire
+qui pouvait diverger du disque. Ce verrou technique n’est pas une politique
+de concurrence des agents ; aucun timer, plafond ou retry ajouté.
+
+Local-writer-fix/ PASS en fr-clair avec overlay explicitement déclaré : deuxième
+onglet refusé sans effacement, premier propriétaire conservé, rechargement et
+reprise idempotente, refus de rebasage et corruption conservée au réaccès.
+Aucune mutation native dans la projection synthétique de conflit (étiquetée
+dans son artefact) ; les autres événements passent réellement par CLI/HTTP.
+FR/EN et documentation actualisées. Préparation d’une nouvelle image embarquée ;
+indépendance de revue et installation restent à établir. Propriétaire : Codex.
+
+
+Candidat302 `02e4662938e85a50e631c9a1dfd3d27916d0357358da9eca370bb90234802a6e` :
+profil natif par défaut qualifié, sans test-fixtures. Trois recettes finales PASS
+et intégrité VERIFIED : métier13tests Rust +246assertions navigateur ; navigation/
+édition1409assertions ; responsive145assertions. Total1800assertions navigateur,
+FR/EN, clair/sombre, largeurs1440/1024/760/390/320. Captures avant/après fr-clair320
+et en-sombre390 inspectées : titre/fermeture lisibles, valeurs en panneaux empilés,
+texte hostile littéral, corps défilable. Aucune erreur navigateur inattendue.
+Résumé exact : `.cache/graph-business-20261101/final302-summary.json`.
+
+Revue locale des politiques/fonctions/erreurs/docs et empreintes :
+[GRAPH-BUSINESS-REVIEW-20261101.md](GRAPH-BUSINESS-REVIEW-20261101.md).
+Collecteur298→302 : couverture26/26 PASS, contrat BLOCKED attendu avec68axes
+non attestés globalement (fichiers parallèles ou ajouts partagés d’un autre
+propriétaire), pas68défauts Graph. Déclaration et résultat source-review*.json
+conservés ; aucun changement de baseline ou succès Graph ne clôt ces limites.
+Les onze entrées de livraison Graph contrôlées sont identiques au candidat302.
+Revue indépendante risqueA toujours ouverte : le choix utilisateur Codex seul
+n’accorde aucune délégation. Demander uniquement ce droit pour une revue
+lecture seule du candidat figé et ses interactions ; aucune écriture ni fournisseur.
+Activation locale/version/assets à vérifier ensuite par le parcours supporté.
+Pas de commit/push, pas d’installation revendiquée.
+
+RETEX intermédiaire vérifié : distinguer intention de création/modification,
+invalider l’aperçu avant toute reprise (même refusée), garder les identifiants
+hors du canal diagnostic et accepter un brouillon seulement après sauvegarde
+sous exclusion entre onglets. Les quatre contre-exemples conservés deviennent
+gardes permanentes du banc. Leçon pour livraison partagée : un build peut contenir
+les ajouts d’un autre propriétaire avant sa qualification ; garder une baseline
+propre et un registre par propriétaire, sans fabriquer une conformité globale.
+B1–B4 implémentés et vérifiés localement ; acceptation indépendante et activation
+restent ouvertes. Codex reste propriétaire de cette reprise.
+
+
+Reprise utilisateur « gfo » : délégation de revue indépendante lecture seule
+explicitement accordée. Agent graph_independent_review via code-reviewer ;
+candidat302 et sources conservés figés pendant son examen. Identité active
+toujours299 ; record préparé302 et tous inputs compilés inchangés au réaccès.
+Revue : défaut confirmé de contrat complet GraphTaskDefinition contre Request
+partiel de task.update. title/deliverable vides signifient « absent » pour le
+validateur hérité ; preview renvoie pourtant les vides demandés, journalise un
+après qui ne correspond pas au Work, compromet la compensation suivante.
+Reproduction sur image302 via CLI public en Root isolé :
+`.cache/graph-business-20261101/before-full-definition/result.json` : titre vide
+prévisualisé mais titre enregistré inchangé en révision3, puis même cas livrable
+en révision4. Owner Codex ; installation suspendue, preuves302 non supprimées.
+Options : changer globalement task.update (rejeté, casserait son contrat partiel)
+ou valider les champs complets à la frontière Graph et vérifier leur projection
+appliquée (retenu). Correction puis nouvelle revue sur nouveau candidat requises.
+
+
+Revue indépendante302 : request changes, un finding P2, aucun autre défaut
+confirmé. Original et périmètre dans GRAPH-BUSINESS-INDEPENDENT-20261101.md.
+Nouveau test complete_definitions_refuse_blank_fields_and_match_recorded_compensation
+FAIL avant correction (titre vide accepté), originaux before-full-definition-test.*
+conservés ; PASS après correction dans full-definition-fix.*. Couverture : témoin
+valide, titre/livrable vide ou blanc, refus preview/apply sans changement octets
+SQL/events/Work, correction valide avec aperçu=projection, compensation cohérente.
+HTTP existant étendu : mêmes refus422 et raisons statiques, aucune révision ajoutée.
+
+Correction dans graph_batch.rs : nonempty Go partagé pour les deux champs
+complets avant adaptateur partiel ; TaskDefinitionError typée existante pour
+422/public reason ; garde de projection appliquée==after, invariant interne
+refusé500 en cas de dérive future. Aucun nouveau réglage ou plafond ; aucune
+modification de task.update. Documentation contrat complet FR/EN actualisée.
+Une seule entrée compilée diffère de302 (graph_batch.rs), JS/CSS/locales/notes
+et chemins historiques inchangés : réutiliser les1409+145assertions302 pour leur
+périmètre inchangé, distinguer leurs binaires. Rejouer toute recette métier sur
+303 car le validateur complet et la compensation sont ses consommateurs réels.
+Build303 en cours ; revue indépendante ciblée à renouveler sur son SHA exact.
+
+
+## Clôture B1–B4 — Rust303
+
+Revue indépendante303 approve, finding302 corrigé et contre-exemple conservé.
+[Verdicts et limites](GRAPH-BUSINESS-INDEPENDENT-20261101.md).
+`.cache/graph-business-20261101/final303/business` PASS et intégrité VERIFIED :
+14tests nommés (10moteur/3HTTP/1CLI) et246assertions navigateur sur image303
+embarquée. Les1409graphe+145responsive302 restent réutilisées pour leurs
+producteurs identiques ; elles n’ont pas tourné de nouveau sur303.
+Revue corrective source-review303*.json : baseline302→303 effective, unique
+entrée graph_batch.rs, quatre axes complets, aucun finding ouvert pour ce
+correctif. Ce contrôle ne remplace ni la baseline298 d’introduction ni ses
+findings autres propriétaires : source-review*.json original et68axes non
+attestés globalement restent conservés. La revue indépendante couvre tous
+les ajouts Graph B1–B4 ; aucune conformité globale parallèle n’est déduite.
+
+Installation par restart --prepared-build SHA complet --no-open, aucun input
+compilé plus récent en attente. Instance locale PID2298105, version303, binaire
+exécuté SHA2565f22359a9b0acfed477b0e2e95b80d814a81b08d885362f6ac060be8164f518a.
+Preuves install303.*, installed303/result.json, installed303-business.json :
+7assets protégés identiques au profil, version réelle et fenêtre Version FR/EN
+14assertions, commit réel/état modifié, notes local_changes complètes identiques
+et capacités graph_batch preview/apply/undo-last-batch. Vérifications installées
+en lecture seule, aucun POST ou Root de mission utilisé comme fixture.
+
+| Critère | Résultat observable | Preuve |
+| --- | --- | --- |
+| B1 | Clone avec nouvelle identité, définition seule, original conservé | business303 + CLI readback |
+| B2 | Aperçu sans mutation, champs/liens complets, cycles et vides refusés | 10tests moteur/3HTTP + navigateur303 |
+| B3 | Un lot, un événement/révision ; quota refuse avant POST, réponse perdue reprise sans doublon | business303 + reprise après redémarrage des fixtures |
+| B4 | Compensation dérivée du dernier lot, historique conservé, refus après autre événement | moteur/CLI/HTTP/navigateur303 |
+| UX | FR/EN,2thèmes,5largeurs,focus/fermeture,aucune erreur inattendue | business303, producteurs302 réutilisés |
+| Livraison | Binaire303 réel,7assets,Version et notes/capacités concordants | installed303* |
+
+RETEX final : la revue indépendante a trouvé un défaut hors du corpus initial,
+malgré1800assertions navigateur vertes302. Une définition complète ne doit pas
+consommer sans adaptation un validateur de patch ; valider les champs requis
+et vérifier la projection réellement produite évite faux aperçu, événement
+mensonger et compensation impossible. Le garde permanent échoue avantfix et
+passe après ; les refus422 restent exploitables sans affaiblir task.update.
+Les leçons précédentes (intention créer/modifier, aperçu invalidé au refus,
+ID littéral, sauvegarde sous verrou) restent des assertions du banc maintenu.
+
+B1–B4 terminés pour les plans manuels et installés localement. Les missions
+hiérarchiques gardent leur parcours de révision de contrat, aucun undo général
+ni restauration de preuves n’est ajouté. RETEX et transmission au prochain
+contexte par PLAN.md + docs produit FR/EN + tests/recette versionnés ; aucun
+contexte d’agent natif en cours n’est prétendu réécrit. Commit/push non réalisés.
