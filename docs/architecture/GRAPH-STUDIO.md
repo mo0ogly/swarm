@@ -10,11 +10,20 @@ mission et à l’orientation ; elles ne modifient ni révision ni budget. Écha
 annule un déplacement en cours avant de fermer le plein écran. Ce dernier est
 un dialogue modal natif : focus contenu et retour au bouton à la fermeture.
 
+« Outils du graphe » regroupe rangement, undo/redo, repérage, orientation,
+réinitialisation de navigation et export. Il est replié par défaut sur mobile,
+déplié sur ordinateur ; passer le breakpoint existant réapplique ce défaut.
+Sa fermeture et Échap rendent le focus à son titre. Zoom, recherche, ajout et plein
+écran restent dans la barre principale. Le bouton 100 % conserve le centre de la
+vue sous clamp ; +/− sont désactivés aux bornes de 15 % et 200 % existantes.
+
 La vue d’ensemble utilise aussi l’étendue des cartes déplacées ; à la limite de
 zoom minimale existante (15 %), un message demande de rapprocher les cartes.
 « Annuler le placement » restaure le dernier déplacement terminé ou rangement,
-une seule fois. Cette mémoire disparaît au nouveau rendu ; le placement restauré
-est mémorisé localement. Une annulation de geste conserve cette mémoire.
+une seule fois. « Rétablir le placement » récupère cette annulation, une fois ;
+un nouveau placement terminé invalide ce témoin. Geste annulé ou sans mouvement
+le conserve. Undo/redo disparaissent au nouveau rendu ; les coordonnées restaurées
+sont mémorisées localement et ne modifient aucune tâche.
 La mini-carte affiche la zone visible : cliquer centre la vue, les flèches
 parcourent un demi-écran, Début revient à l’origine et Fin à l’extrémité.
 Le bouton **ID** copie l’identifiant exact sans ouvrir le formulaire. Le succès
@@ -27,6 +36,8 @@ pour ménager les commandes ; leur texte complet reste dans l’infobulle.
 La recherche par identifiant ou titre ignore la casse et les accents. Elle met
 en évidence les correspondances sans masquer de carte ou de lien ; Entrée ou
 « Suivant » centre la correspondance suivante et place le focus sur sa carte.
+« Précédent » ou Maj+Entrée dans la recherche parcourt les résultats à rebours,
+avec retour au dernier résultat depuis le premier.
 « Effacer la recherche » ou Échap dans la saisie efface les repères. Le zoom et
 les positions restent identiques ; la requête est locale, non enregistrée, et
 repart vide lors d’un nouveau rendu. Une absence de résultat est explicite.
@@ -37,9 +48,14 @@ même travail conservent en mémoire orientation, zoom, positions, zone visible 
 plein écran, y compris le défilement extérieur du studio sur écran bas. Un glisser inachevé reste provisoire, y compris pendant un zoom :
 sa capture est exclue de la mémorisation et annulée lors du rerender. Le plein écran attend la fermeture de l’éditeur pour ne pas masquer
 le formulaire pendant la relecture. Le focus de la tâche enregistrée ne décale
-pas la zone restaurée. Cette mémoire de vue ne survit pas à un rechargement de
-page ; zoom et positions gardent leur persistance locale existante. Un autre
-travail repart avec sa propre présentation, sans hériter du plein écran.
+pas la zone restaurée. Orientation, zone du canevas/studio et ouverture des outils
+sont mémorisées dans une préférence locale versionnée par travail et origine ;
+zoom et positions gardent leur format existant par orientation. Après rechargement,
+la vue est restaurée sous les clamps disponibles, sans ouvrir le plein écran.
+Un autre travail retrouve sa propre préférence. JSON invalide ou stockage refusé
+restent visibles ; un refus ne vaut pas mémorisation. « Réinitialiser la navigation »
+efface cette préférence et revient à gauche→droite/origine ; zoom et placements
+gardent leurs commandes dédiées.
 
 « Repérer les dépendances » choisit une carte : contour plein pour la cible,
 tirets pour ses prérequis directs, pointillés pour ses dépendants directs et

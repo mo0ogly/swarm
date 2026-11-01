@@ -127,18 +127,22 @@
    */
   function searchKey(value){return value.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase()}
 
+  /** Keep only known browser storage/JSON error families; never expose a raw
+   * message, stored value or arbitrary error name in the preference diagnostic.
+   */
+  function storageErrorFamily(cause){return ['SecurityError','QuotaExceededError','SyntaxError','InvalidStateError','TypeError'].includes(cause?.name)?cause.name:'StorageError'}
   /** Read only this Work's versioned presentation preference. Coordinates must
    * be finite/nonnegative; unknown fields, malformed JSON and invalid direction
    * are reported, never treated as a valid empty preference. No writes occur.
    * @param {string} workId validated recorded Work ID
-   * @returns {{view:object|null,error:string}} safe localized diagnostic on refusal
+   * @returns {{view:object|null,error:string,errorCode?:string}} safe localized diagnostic on refusal
    * Full screen is deliberately absent from storage and always false on reload.
    */
   function readStoredView(workId){
-    let raw;try{raw=localStorage.getItem(VIEW_PREFIX+workId)}catch{return{view:null,error:t('Vue mémorisée indisponible sur cet appareil.')}}
+    let raw;try{raw=localStorage.getItem(VIEW_PREFIX+workId)}catch(cause){const code=storageErrorFamily(cause);return{view:null,error:t('Vue mémorisée indisponible sur cet appareil.')+' ('+code+')',errorCode:code}}
     if(raw===null)return{view:null,error:''};
     try{const value=JSON.parse(raw),coords=['left','top','studioLeft','studioTop'],keys=new Set(['orientation','toolsOpen',...coords]);if(!value||typeof value!=='object'||Array.isArray(value)||!['LR','TB'].includes(value.orientation)||typeof value.toolsOpen!=='boolean'||!coords.every(key=>Number.isFinite(value[key])&&value[key]>=0)||!Object.keys(value).every(key=>keys.has(key)))throw Error('invalid-local-view');return{view:{work:workId,orientation:value.orientation,left:value.left,top:value.top,studioLeft:value.studioLeft,studioTop:value.studioTop,toolsOpen:value.toolsOpen,fullscreen:false},error:''}}
-    catch{return{view:null,error:t('Vue mémorisée invalide ; navigation par défaut.')}}
+    catch(cause){const code=cause?.name==='SyntaxError'?'SyntaxError':'InvalidViewError';return{view:null,error:t('Vue mémorisée invalide ; navigation par défaut.')+' ('+code+')',errorCode:code}}
   }
 
   /** Open a task editor on one observed Work revision. Inputs remain visible on
@@ -212,8 +216,9 @@
   /** Mount local presentation controls around a validated recorded graph.
    * Coordinates/zoom are device preferences, scoped to origin, Work and direction;
    * they grant no mutation or execution rights. Storage failure remains visible.
-   * Native modal semantics own focus/inertness/Escape in fullscreen. Same-Work
-   * view snapshots stay in memory; explicit SVG export initiates a local download
+   * Native modal semantics own focus/inertness/Escape in fullscreen. Full-screen
+   * state and undo/redo stay in memory; validated navigation fields may persist.
+   * Explicit SVG export initiates a local download
    * and reports generation failures without a server write or saved-file claim.
    * @param {Element} host existing graph container, replaced after mounting
    * @param {HTMLElement} canvas scroll viewport containing the recorded SVG
@@ -222,14 +227,15 @@
    * @param {'LR'|'TB'} orientation displayed layout direction
    * @param {object|null} initial same-Work view from memory or validated local storage
    * @param {string} viewError safe preference diagnostic, never raw stored content
+   * @param {string} viewErrorCode safe browser/validation family for inspection
    * @returns {void} installs listeners, view capture and cleanup; storage refusals stay visible
    */
-  function navigation(host, canvas, svg, work, orientation, initial=null, viewError='') {
+  function navigation(host, canvas, svg, work, orientation, initial=null, viewError='', viewErrorCode='') {
     const studio=document.createElement('section');studio.id='graph-studio';studio.className='graph-studio native-graph-studio';
     const toolbar=document.createElement('div');toolbar.className='pilot-actions';
     const status=document.createElement('p');status.className='graph-studio-hint';status.setAttribute('role','status');
     const key='swarm-native-graph:v1:'+work.id+':'+orientation,viewKey=VIEW_PREFIX+work.id;
-    const preferenceStatus=document.createElement('p');preferenceStatus.id='pilot-view-status';preferenceStatus.className='native-graph-preference-status';preferenceStatus.setAttribute('role','status');preferenceStatus.textContent=viewError||initial?.preferenceError||'';
+    const preferenceStatus=document.createElement('p');preferenceStatus.id='pilot-view-status';preferenceStatus.className='native-graph-preference-status';preferenceStatus.setAttribute('role','status');preferenceStatus.textContent=viewError||initial?.preferenceError||'';if(viewErrorCode||initial?.preferenceErrorCode)preferenceStatus.dataset.viewError=viewErrorCode||initial.preferenceErrorCode;
     const media=matchMedia('(min-width:761px)'),tools=document.createElement('details');tools.id='pilot-tools';tools.className='native-graph-tools';tools.open=initial?.toolsOpen??media.matches;
     const toolsToggle=document.createElement('summary');toolsToggle.id='pilot-tools-toggle';toolsToggle.textContent=t('Outils du graphe');const toolsBody=document.createElement('div');toolsBody.className='pilot-actions';tools.append(toolsToggle,toolsBody);
     let lastViewAttempt=null,resetting=false;
@@ -244,18 +250,20 @@
     const viewport=svgNode('rect',{class:'graph-minimap-viewport','aria-hidden':'true'});
     canvas.id='pilot-canvas';canvas.classList.add('native-graph-canvas');
     const modal=document.createElement('dialog');modal.className='native-graph-dialog';modal.setAttribute('aria-label',t('Graphe du travail'));
-    /** Persist zoom and completed placement only; captured drags stay provisional.
-     * Storage refusal stays visible and never claims successful persistence. */
+    /** Persist local zoom, completed placement and navigation as separate keys;
+     * captured drags stay provisional. A navigation-key refusal does not undo a
+     * successful coordinate write. Each refusal is visible, never a success. */
     function save(){try{localStorage.setItem(key,JSON.stringify({zoom,positions:committedPositions()}));persistView()}catch{status.textContent=t('Positions non mémorisées sur cet appareil.')}}
     /** Encode only validated presentation fields, never full screen or task data.
-     * Pending restore/gesture values come from the committed view snapshot.
+     * Pending restore/gesture values stay committed. This constant-size record
+     * does not clone card positions on each scroll event.
      */
-    function viewRecord(){const view=host.graphView?.();if(!view||view.work!==work.id)return null;return{orientation,left:view.left,top:view.top,studioLeft:view.studioLeft,studioTop:view.studioTop,toolsOpen:tools.open}}
+    function viewRecord(){if(host.graphView!==captureView)return null;return{orientation,left:pendingScroll?.left??(gesture&&!gesture.id&&!gesture.link?gesture.left:canvas.scrollLeft),top:pendingScroll?.top??(gesture&&!gesture.id&&!gesture.link?gesture.top:canvas.scrollTop),studioLeft:pendingStudio?.left??studio.scrollLeft,studioTop:pendingStudio?.top??studio.scrollTop,toolsOpen:tools.open}}
     /** Persist a changed local view, with no retry of an identical attempt.
      * Force is reserved for an explicit orientation change. Refusal is visible;
      * success clears only the preference diagnostic, not other graph messages.
      */
-    function persistView(force=false){if(disposed||resetting)return;const value=viewRecord();if(!value)return;const encoded=JSON.stringify(value);if(!force&&encoded===lastViewAttempt)return;lastViewAttempt=encoded;try{localStorage.setItem(viewKey,encoded);preferenceStatus.textContent=''}catch{preferenceStatus.textContent=t('Navigation non mémorisée sur cet appareil.')}}
+    function persistView(force=false){if(disposed||resetting)return;const value=viewRecord();if(!value)return;const encoded=JSON.stringify(value);if(!force&&encoded===lastViewAttempt)return;lastViewAttempt=encoded;try{localStorage.setItem(viewKey,encoded);preferenceStatus.textContent='';delete preferenceStatus.dataset.viewError}catch(cause){const code=storageErrorFamily(cause);preferenceStatus.dataset.viewError=code;preferenceStatus.textContent=t('Navigation non mémorisée sur cet appareil.')+' ('+code+')'}}
     /** Copy only owned coordinate entries, including prototype-shaped IDs.
      * @param {object} source local positions, never Work data
      * @returns {object} independent null-prototype coordinate snapshot
@@ -276,7 +284,8 @@
      * the graph extent. Only the minimap viewport marker changes; no IO/layout.
      */
     function updateViewport(){const x=Math.min(extent.width,canvas.scrollLeft/zoom),y=Math.min(extent.height,canvas.scrollTop/zoom);for(const [key,value]of Object.entries({x,y,width:Math.max(0,Math.min(canvas.clientWidth/zoom,extent.width-x)),height:Math.max(0,Math.min(canvas.clientHeight/zoom,extent.height-y))}))viewport.setAttribute(key,value)}
-    /** Recompute curves from moved endpoints and expand the scrollable extent. */
+    /** Recompute moved curves/extent and mirror zoom/undo/redo availability.
+     * Presentation only; this helper performs no storage or engine operation. */
     function update(){
       let width=base.width,height=base.height;
       for(const [id,u]of units){const p=positions[id]||{x:0,y:0};u.group.setAttribute('transform',`translate(${p.x} ${p.y})`);width=Math.max(width,u.x+p.x+u.w+30);height=Math.max(height,u.y+p.y+u.h+30)}
@@ -312,7 +321,7 @@
      * view; successful reset preserves an explicitly open full screen only in
      * memory. Cleanup must not rewrite the deleted preference.
      */
-    function resetNavigation(){finish(true);try{localStorage.removeItem(viewKey)}catch{preferenceStatus.textContent=t('Réinitialisation de navigation non confirmée.');return}resetting=true;host.dataset.orientation='LR';host.graphView=()=>({work:work.id,orientation:'LR',left:0,top:0,studioLeft:0,studioTop:0,fullscreen:modal.open,toolsOpen:media.matches});render(work)}
+    function resetNavigation(){finish(true);try{localStorage.removeItem(viewKey)}catch(cause){const code=storageErrorFamily(cause);preferenceStatus.dataset.viewError=code;preferenceStatus.textContent=t('Réinitialisation de navigation non confirmée.')+' ('+code+')';return}resetting=true;host.dataset.orientation='LR';host.graphView=()=>({work:work.id,orientation:'LR',left:0,top:0,studioLeft:0,studioTop:0,fullscreen:modal.open,toolsOpen:media.matches});render(work)}
     button('pilot-view-reset','Réinitialiser la navigation',resetNavigation);
     button('pilot-add-task','Ajouter une tâche',()=>editTask(work));
     const neighbors=document.createElement('label');neighbors.className='native-graph-neighbors';neighbors.textContent=t('Repérer les dépendances');neighbors.htmlFor='pilot-neighbors';
@@ -486,7 +495,8 @@
      * In-progress card movement and canvas panning are excluded, as on cancel.
      * Memory only; callers must compare Work IDs before restoring this object.
      */
-    host.graphView=()=>({work:work.id,orientation,zoom,positions:committedPositions(),left:pendingScroll?.left??(gesture&&!gesture.id&&!gesture.link?gesture.left:canvas.scrollLeft),top:pendingScroll?.top??(gesture&&!gesture.id&&!gesture.link?gesture.top:canvas.scrollTop),studioLeft:pendingStudio?.left??studio.scrollLeft,studioTop:pendingStudio?.top??studio.scrollTop,fullscreen:modal.open||resumeFullscreen,toolsOpen:tools.open,preferenceError:preferenceStatus.textContent});
+    function captureView(){return{work:work.id,zoom,positions:committedPositions(),...viewRecord(),fullscreen:modal.open||resumeFullscreen,preferenceError:preferenceStatus.textContent,preferenceErrorCode:preferenceStatus.dataset.viewError||''}}
+    host.graphView=captureView;
     /** Restore after rerender, or after an editor closes. Never open a graph
      * modal above a task editor; scroll is retained until its geometry is ready.
      */
@@ -498,7 +508,8 @@
    * Render the dependency graph of a Work into the original #graph container.
    * Recorded projection with local navigation and explicit task-editor handlers.
    * Rendering performs no engine writes; same-Work presentation survives rerender.
-   * Saving an editor uses protected engine operations; switching Work resets view.
+   * Saving an editor uses protected engine operations; another Work restores only
+   * its own validated preference and never inherits full screen or undo history.
    * Side effect: replaces the container's children (scrollable canvas + svg).
    * @param {object} work Work {id,title,tasks:[{id,title,status,depends?:string[]}]}
    * @throws {Error} on invalid Work, duplicate ids, unknown-shaped dependencies or cycles
@@ -608,7 +619,7 @@
         unknown.map(u => u.dep + ' → ' + u.taskId).join(', ');
       canvas.append(warning);
     }
-    navigation(host,canvas,svg,work,orientation,initial||recovered.view,recovered.error);
+    navigation(host,canvas,svg,work,orientation,initial||recovered.view,recovered.error,recovered.errorCode);
   }
 
   /** Display at most 24 UTF-16 code units including the ellipsis to leave room

@@ -9,10 +9,19 @@ the HTTP origin, Work and orientation; they change no revision or budget. Escape
 cancels an active drag before closing full screen. Full screen uses a native modal
 dialog for keyboard isolation and restores focus to its opener on close.
 
+“Graph tools” groups arrangement, undo/redo, dependency highlights, orientation,
+navigation reset and export. Its default is collapsed on mobile, expanded on
+desktop; crossing the existing layout breakpoint reapplies that default. Close
+or Escape restores summary focus. Zoom, search, creation and full screen remain
+in the main toolbar. The 100% button preserves the viewport center under clamping;
++/− are disabled at the existing 15%/200% bounds.
+
 Fit overview includes moved cards. At the existing minimum zoom (15%), a visible
 message asks to move cards closer. “Undo placement” restores the last completed
-move or arrangement once. This memory resets on rerender; the restored placement
-is saved locally. Cancelling a gesture preserves the previous undo.
+move or arrangement once. “Redo placement” recovers that undo once; a new
+completed placement invalidates it. Cancelled or unchanged gestures retain it.
+Undo/redo reset on rerender; restored coordinates are saved locally without
+changing tasks.
 The mini-map shows the visible area. Click to center, use arrow keys to move half
 a viewport, Home for the origin and End for the far edge.
 The **ID** button copies the exact identifier without opening the editor. Success
@@ -24,7 +33,8 @@ room for controls; their full text remains in the tooltip.
 
 Search matches task IDs and titles regardless of case or accents. It highlights
 matches without hiding cards or links; Enter or “Next” centers the next match
-and focuses its card. “Clear search” or Escape in the input clears highlights.
+and focuses its card. “Previous” or Shift+Enter in the query moves backward,
+wrapping to the last match from the first. “Clear search” or Escape in the input clears highlights.
 Zoom and positions remain unchanged. The query stays local, is not persisted
 and resets on a new render. No matches produces an explicit message.
 
@@ -35,9 +45,13 @@ on short screens. An unfinished drag remains
 provisional even during zoom: persistence excludes it and rerender cancels it.
 Restoring full screen waits
 until the task editor closes so it cannot cover a pending form. Focusing the saved
-task does not scroll the restored view. This view memory resets on page reload;
-zoom and positions retain their existing local persistence. Another work starts
-with its own presentation and does not inherit full screen.
+task does not scroll the restored view. Orientation, canvas/studio scroll and tools
+expansion are saved in a versioned local preference per work and origin; zoom and
+positions retain their existing per-direction format. Reload restores the view
+under available scroll clamps without opening full screen. Another work restores
+its own preference. Invalid JSON and storage refusal remain visible; refusal never
+claims persistence. “Reset navigation” clears this preference and returns to
+left→right/origin; zoom and placements retain their dedicated controls.
 
 “Highlight dependencies” chooses a card: a solid border marks the target, dashes
 mark direct prerequisites, dots mark direct dependents, and related links are

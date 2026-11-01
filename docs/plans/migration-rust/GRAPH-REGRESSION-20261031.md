@@ -604,3 +604,78 @@ et traductions FR/EN, revue politiques/fonctions/erreurs liée aux octets, activ
 via lanceur, assets protégés/Version et RETEX. Aucune autorisation de commit/push
 implicite dans cette demande. Temps de build et contentions observés, sans arrêter
 les autres processus. Ne pas réutiliser une ancienne demande de pause Git.
+
+Replan initial du banc : une recherche de ponctuation apparaissait deux fois et
+l’édition a refusé ; la commande suivante avait continué. Cette tentative before
+est arrêtée, pas comptée comme témoin. Édition et exécution sont ensuite séparées.
+`before-zoom100` prouve le vrai contrôle absent après témoin de graphe valide.
+
+Preview : nouveaux parcours PASS sur les premières variantes, puis attente sur
+l’ancien point de molette après resize. La connexion CDP de diagnostic appliquait
+son viewport par défaut et a perturbé l’observation (conservée dans preview/).
+Aucune cause produit déduite de cet état ; arrêt propre. Le banc attend désormais
+la disposition après resize, contrôle explicitement un point de fond visible
+avant molette/pan et affirme le résultat après rendu au lieu d’attendre uniquement
+le succès. Futurs diagnostics CDP : defaultViewport:null.
+
+Revue de source avant build : les erreurs locales conservent une famille sûre
+(SecurityError/QuotaExceededError/SyntaxError ou erreur de validation), sans valeur
+ni message privés. Le record de scroll est de taille constante et ne clone pas
+la carte des positions à chaque événement ; seul le snapshot complet de rerender
+copie les coordonnées. Aucun nouveau timer ou plafond opérateur.
+
+## QG13–QG17 livrés — Rust296
+
+| Critère | Résultat local observable |
+|---|---|
+| QG13 Barre compacte | PASS : essentiels visibles, outils repliés sur mobile, ouverture/fermeture/Escape/focus, rendu320/390 inspecté clair/sombre |
+| QG14 Zoom100% | PASS : centre conservé sous clamp, bornes15%/200% inchangées et boutons désactivés à leurs limites |
+| QG15 Recherche arrière | PASS : Précédent et Maj+Entrée, premier résultat arrière =dernier, boucle/focus/effacement ; les deux sens désactivés sans résultat |
+| QG16 Rétablir placement | PASS : déplacement et rangement rétablis, témoin consommé et invalidé par nouveau placement terminé, conservé sur annulation ; aucune mutation métier |
+| QG17 Navigation persistante | PASS : orientation/zone/état des outils retrouvés après reload, pas de plein écran automatique, JSON invalide/offset négatif/champ fullscreen refusés visiblement ; get/set/remove refusés avec famille sûre, reprise et reset de la seule navigation |
+
+Preuve native : `.cache/graph-qg13-17-20261101/embedded/`, deux étapes PASS,
+`recipe.py verify` VERIFIED ; 1137 assertions (518 navigation Work strictement
+identique +619 édition/refus/reprise), quatre variantes FR/EN×clair/sombre, mobile,
+éditeur et pertes de réponse historiques. Source preview reste un overlay, distinct
+de cette preuve. Syntaxe/i18n/diff vérifiés, captures mobile inspectées. Aucun
+fournisseur/agent appelé, aucun Root de mission réelle utilisé comme fixture.
+
+`build.stdout` : candidat déjà préparé296 réutilisé par le lanceur, sans rebuild
+inutile ; empreintes des cinq entrées UI comparées à l’inventaire effectif et
+identiques. `candidate.json` et `.cache/local-delivery/rust-0ukzkap_/build/profile/`
+conservent profil natif normal, absence de features fixtures et archive source.
+Image immuable SHA256
+e4a802c4dc4d32d90d036169604168c64db15196695d692885369b748686ca72.
+`restart.stdout` : sélection de cette empreinte exacte, zéro entrée compilée
+modifiée en attente à cette activation. `installed/result.json` : PID1460574,
+v0.1.1-dev.296, sept assets protégés identiques au build et 14 assertions Version
+FR/EN (commit/lien réels, notes, état non commité). Aucun POST sur le Root réel
+pendant cette vérification. Pas de pause Git ni d’interruption de processus tiers.
+
+Revue liée aux octets : `review/source-review.json`, `review/result.json` et
+archive des références ; cinq fichiers compilés du lot examinés sur politiques,
+fonctions, erreurs, docs. Sur douze entrées modifiées depuis la baseline295, sept
+producteurs Autorité/BLP parallèles restent ouverts sous leurs propriétaires :
+le statut GLOBAL est BLOCKED, sans déduire leur qualification de cette livraison
+UI locale. Pas de revue indépendante/acceptation moteur globale revendiquée.
+Les commits parallèles ff2ca179a/b4cbfa225 ont intégré une partie des fichiers
+pendant le travail ; historique conservé, aucune attribution ou réécriture ajoutée.
+
+RETEX : stabiliser un changement responsive avant de mesurer sa géométrie,
+vérifier un point de fond réellement visible avant un geste, et diagnostiquer
+sans laisser CDP imposer son viewport par défaut. Une préférence invalide doit
+rester visible après les deux rendus du chargement ; ne jamais persister le plein
+écran ni assimiler erreur à cache vide valide. Garder les snapshots de scroll en
+taille constante et les coordonnées provisoires hors stockage. Ces contrats
+persistent dans helpers/commentaires, docs FR/EN et recette versionnée ; ils ne
+modifient pas les instructions embarquées ou les contextes d’agents déjà lancés.
+La page navigateur existante doit être rechargée pour recevoir les nouveaux JS.
+
+Commit/push demandé : une écriture concurrente dans l’index partagé a ajouté le
+lot BLP au premier commit local. Push suspendu ; objet original conservé dans
+le reflog et son SHA dans `.cache/graph-qg13-17-20261101/git-recovery.json`.
+Reconstruction du seul lot graphe avec un index temporaire privé et déplacement
+atomique conditionnel de la branche ; fichiers et index partagés préservés.
+Prévention : sélectionner les octets avec un index privé pour les commits dans
+un checkout partagé ; ne pas déduire le contenu du commit d’un ancien statut.

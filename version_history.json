@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Graphe : outils secondaires repliables, retour à 100 %, recherche précédente avec Maj+Entrée, rétablissement du placement annulé et navigation locale retrouvée après rechargement, sans plein écran automatique.",
+        "en": "Graph: collapsible secondary tools, reset to 100%, previous search with Shift+Enter, redo an undone placement and restore local navigation after reload without opening full screen."
+      },
+      {
         "fr": "Confidentialité : diagnostic authentifié des sources du prompt de préparation enregistré, via API et CLI. Chaque partie exige une attribution courante ; source inconnue, révision périmée ou habilitation insuffisante refusent. Ce diagnostic ne donne aucun droit d’envoi au fournisseur.",
         "en": "Confidentiality: authenticated source diagnostic for the recorded preparation prompt via API and CLI. Every slice requires a current attribution; unknown sources, stale revisions or insufficient clearance refuse. This diagnostic grants no provider-send authority."
       },
