@@ -6483,5 +6483,21 @@ globalThis.SwarmEnglish = {
   "Effacer la recherche": "Clear search",
   "Aucune tâche correspondante.": "No matching task.",
   "Une tâche trouvée.": "One task found.",
-  "tâches trouvées.": "tasks found."
+  "tâches trouvées.": "tasks found.",
+  "Naviguer avec la mini-carte": "Navigate with the mini-map",
+  "Zoom minimum atteint. Rapprochez les cartes pour tout voir.": "Minimum zoom reached. Move cards closer to see everything.",
+  "Annuler le placement": "Undo placement",
+  "Identifiant à copier": "ID to copy",
+  "Copie en cours…": "Copying…",
+  "Identifiant copié : ": "ID copied: ",
+  "Copie non confirmée. Sélectionnez l’identifiant.": "Copy unconfirmed. Select the ID.",
+  "Copier l’identifiant": "Copy task ID",
+  "Aide des gestes": "Graph gestures",
+  "Zoom : boutons ou Ctrl + molette. Vue d’ensemble inclut les cartes déplacées.": "Zoom: buttons or Ctrl + wheel. Fit overview includes moved cards.",
+  "Déplacez le fond pour naviguer et les poignées pour placer les cartes. Annuler le placement restaure le dernier déplacement ou rangement.": "Drag the background to navigate and handles to place cards. Undo placement restores the last move or arrangement.",
+  "Mini-carte : cliquez pour centrer ; utilisez les flèches, Début et Fin au clavier.": "Mini-map: click to center; use arrow keys, Home and End on the keyboard.",
+  "Recherche : Entrée ou Suivant centre une correspondance ; Échap efface la saisie.": "Search: Enter or Next centers a match; Escape clears the input.",
+  "Liens : reliez une sortie à une entrée, puis confirmez dans le formulaire. Aucun geste ne sauvegarde un lien.": "Links: connect an output to an input, then confirm in the form. Gestures never save a link.",
+  "ID copie l’identifiant de la carte. Une copie non confirmée laisse le texte sélectionnable.": "ID copies the card identifier. An unconfirmed copy leaves selectable text.",
+  "Échap annule un geste en cours ou ferme le plein écran. Entrée ouvre la carte ciblée.": "Escape cancels an active gesture or closes full screen. Enter opens the focused card."
 };

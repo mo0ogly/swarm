@@ -193,14 +193,30 @@
     const toolbar=document.createElement('div');toolbar.className='pilot-actions';
     const status=document.createElement('p');status.className='graph-studio-hint';status.setAttribute('role','status');
     const key='swarm-native-graph:v1:'+work.id+':'+orientation;
-    let positions=Object.create(null),zoom=1,gesture=null,connection=null,disposed=false;
+    let positions=Object.create(null),previousPositions=null,zoom=1,gesture=null,connection=null,disposed=false,copying=false;
     try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(saved){if(Number.isFinite(saved.zoom))zoom=Math.max(.15,Math.min(2,saved.zoom));for(const [id,p]of Object.entries(saved.positions||{}))if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y))positions[id]={x:p.x,y:p.y}}}catch{status.textContent=t('Positions indisponibles ; placement automatique conservé.')}
     const base={width:Number(svg.getAttribute('width')),height:Number(svg.getAttribute('height'))},units=new Map();
-    const map=svgNode('svg',{class:'graph-minimap',role:'img','aria-label':t('Mini-carte du graphe')});canvas.append(map);
+    const extent={width:base.width,height:base.height};
+    const map=svgNode('svg',{class:'graph-minimap',role:'group',tabindex:0,'aria-label':t('Naviguer avec la mini-carte')});canvas.append(map);
+    const viewport=svgNode('rect',{class:'graph-minimap-viewport','aria-hidden':'true'});
     canvas.id='pilot-canvas';canvas.classList.add('native-graph-canvas');
     const modal=document.createElement('dialog');modal.className='native-graph-dialog';modal.setAttribute('aria-label',t('Graphe du travail'));
     /** Persist presentation only; report refusal without claiming persistence. */
     function save(){try{localStorage.setItem(key,JSON.stringify({zoom,positions}))}catch{status.textContent=t('Positions non mémorisées sur cet appareil.')}}
+    /** Copy only owned coordinate entries, including prototype-shaped IDs.
+     * @param {object} source local positions, never Work data
+     * @returns {object} independent null-prototype coordinate snapshot
+     */
+    function copyPositions(source=positions){const result=Object.create(null);for(const [id,p]of Object.entries(source))result[id]={x:p.x,y:p.y};return result}
+    /** Retain one previous placement only after a real completed change.
+     * Cancellation/no-op preserve the previous undo. Memory resets on rerender;
+     * neither history nor a task operation is persisted by this helper.
+     */
+    function rememberPlacement(before){if(JSON.stringify(before)!==JSON.stringify(positions))previousPositions=before}
+    /** Project native scroll bounds into unscaled SVG coordinates, clamped to
+     * the graph extent. Only the minimap viewport marker changes; no IO/layout.
+     */
+    function updateViewport(){const x=Math.min(extent.width,canvas.scrollLeft/zoom),y=Math.min(extent.height,canvas.scrollTop/zoom);for(const [key,value]of Object.entries({x,y,width:Math.max(0,Math.min(canvas.clientWidth/zoom,extent.width-x)),height:Math.max(0,Math.min(canvas.clientHeight/zoom,extent.height-y))}))viewport.setAttribute(key,value)}
     /** Recompute curves from moved endpoints and expand the scrollable extent. */
     function update(){
       let width=base.width,height=base.height;
@@ -209,10 +225,11 @@
         const x1=a.x+ap.x+(vertical?a.w/2:a.w),y1=a.y+ap.y+(vertical?a.h:a.h/2),x2=b.x+bp.x+(vertical?b.w/2:0),y2=b.y+bp.y+(vertical?0:b.h/2),d=Math.max(60,Math.abs(vertical?y2-y1:x2-x1)/2);
         edge.setAttribute('d',vertical?`M${x1},${y1} C${x1},${y1+d} ${x2},${y2-d} ${x2},${y2}`:`M${x1},${y1} C${x1+d},${y1} ${x2-d},${y2} ${x2},${y2}`);
       }
-      svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.setAttribute('width',width*zoom);svg.setAttribute('height',height*zoom);
+      extent.width=width;extent.height=height;svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.setAttribute('width',width*zoom);svg.setAttribute('height',height*zoom);
       map.setAttribute('viewBox',`0 0 ${width} ${height}`);map.replaceChildren();
       for(const edge of svg.querySelectorAll('.graph-arete'))map.append(svgNode('path',{d:edge.getAttribute('d'),class:'graph-minimap-edge'}));
       for(const [id,u]of units){const p=positions[id]||{x:0,y:0};map.append(svgNode('rect',{x:u.x+p.x,y:u.y+p.y,width:u.w,height:u.h,rx:8,class:'graph-minimap-node'}))}
+      map.append(viewport);updateViewport();undo.disabled=previousPositions===null;
       zoomText.textContent=Math.round(zoom*100)+' %';
     }
     /** Create a native action with textContent and scoped listener. */
@@ -221,9 +238,10 @@
     button('pilot-zoom-out','Réduire le zoom',()=>{zoom=Math.max(.15,zoom-.15);update();save()});
     toolbar.append(zoomText);
     button('pilot-zoom-in','Agrandir le zoom',()=>{zoom=Math.min(2,zoom+.15);update();save()});
-    button('pilot-fit','Vue d’ensemble',()=>{zoom=Math.max(.15,Math.min(1,(canvas.clientWidth-24)/base.width,(canvas.clientHeight-24)/base.height));update();canvas.scrollTo(0,0);save()});
+    button('pilot-fit','Vue d’ensemble',()=>{update();const required=Math.min(1,(canvas.clientWidth-24)/extent.width,(canvas.clientHeight-24)/extent.height);zoom=Math.max(.15,required);update();canvas.scrollTo(0,0);if(required<.15)status.textContent=t('Zoom minimum atteint. Rapprochez les cartes pour tout voir.');save()});
     const full=button('pilot-fullscreen','Plein écran',()=>{if(modal.open){modal.close();return}modal.showModal();modal.append(studio);studio.classList.add('is-fullscreen');document.body.classList.add('graph-studio-open');full.textContent=t('Quitter le plein écran');full.setAttribute('aria-expanded','true');full.focus()});full.setAttribute('aria-expanded','false');
-    button('pilot-layout-reset','Ranger les cartes',()=>{positions=Object.create(null);update();save()});
+    button('pilot-layout-reset','Ranger les cartes',()=>{const before=copyPositions();positions=Object.create(null);rememberPlacement(before);update();save()});
+    const undo=button('pilot-layout-undo','Annuler le placement',()=>{if(!previousPositions)return;finish(true);positions=previousPositions;previousPositions=null;update();save()});undo.disabled=true;
     button('pilot-add-task','Ajouter une tâche',()=>editTask(work));
     const direction=document.createElement('select');direction.id='pilot-orientation';direction.setAttribute('aria-label',t('Orientation'));
     for(const [value,label]of [['LR','Gauche → droite'],['TB','Haut → bas']]){const option=document.createElement('option');option.value=value;option.textContent=t(label);direction.append(option)}direction.value=orientation;
@@ -265,10 +283,41 @@
     searchInput.addEventListener('input',findMatches);
     searchInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopPropagation();centerMatch()}else if(e.key==='Escape'&&searchInput.value){e.preventDefault();e.stopPropagation();searchInput.value='';findMatches()}});
     search.append(searchLabel,searchInput,nextMatch,clearSearch,searchStatus);toolbar.append(search);findMatches();
+    const copyStatus=document.createElement('p');copyStatus.id='pilot-copy-status';copyStatus.setAttribute('role','status');copyStatus.setAttribute('aria-live','polite');
+    const copyFallback=document.createElement('label');copyFallback.className='native-graph-copy-fallback';copyFallback.hidden=true;copyFallback.htmlFor='pilot-copy-value';copyFallback.textContent=t('Identifiant à copier');
+    const copyValue=document.createElement('input');copyValue.id='pilot-copy-value';copyValue.readOnly=true;copyFallback.append(copyValue);
+    /** Copy the exact literal task ID only on explicit activation. Success is
+     * announced after clipboard acknowledgement. Rejection/unavailability is
+     * unconfirmed, exposes only a safe error family and selects a readonly ID.
+     * @param {string} id validated task ID
+     * @param {SVGElement} control activated copy button; busy prevents duplicates
+     * @returns {Promise<void>} handles clipboard errors locally, never writes Work
+     */
+    async function copyId(id,control){
+      if(copying||disposed)return;copying=true;control.setAttribute('aria-busy','true');copyStatus.dataset.copyState='pending';copyStatus.textContent=t('Copie en cours…');
+      try{if(typeof navigator.clipboard?.writeText!=='function'){const error=new Error();error.name='ClipboardUnavailableError';throw error}await navigator.clipboard.writeText(id);if(!disposed){copyFallback.hidden=true;copyStatus.dataset.copyState='copied';delete copyStatus.dataset.copyError;copyStatus.textContent=t('Identifiant copié : ')+id}}
+      catch(error){if(!disposed){copyStatus.dataset.copyState='unconfirmed';copyStatus.dataset.copyError=/^[A-Za-z]+Error$/.test(error?.name)?error.name:'ClipboardError';copyStatus.textContent=t('Copie non confirmée. Sélectionnez l’identifiant.');copyFallback.hidden=false;copyValue.value=id;copyValue.focus();copyValue.select()}}
+      finally{copying=false;control.setAttribute('aria-busy','false')}
+    }
+    const help=document.createElement('details');help.id='pilot-graph-help';help.className='native-graph-help';
+    const helpToggle=document.createElement('summary');helpToggle.id='pilot-graph-help-toggle';helpToggle.textContent=t('Aide des gestes');help.append(helpToggle);
+    const helpList=document.createElement('ul');for(const text of [
+      'Zoom : boutons ou Ctrl + molette. Vue d’ensemble inclut les cartes déplacées.',
+      'Déplacez le fond pour naviguer et les poignées pour placer les cartes. Annuler le placement restaure le dernier déplacement ou rangement.',
+      'Mini-carte : cliquez pour centrer ; utilisez les flèches, Début et Fin au clavier.',
+      'Recherche : Entrée ou Suivant centre une correspondance ; Échap efface la saisie.',
+      'Liens : reliez une sortie à une entrée, puis confirmez dans le formulaire. Aucun geste ne sauvegarde un lien.',
+      'ID copie l’identifiant de la carte. Une copie non confirmée laisse le texte sélectionnable.',
+      'Échap annule un geste en cours ou ferme le plein écran. Entrée ouvre la carte ciblée.'
+    ]){const item=document.createElement('li');item.textContent=t(text);helpList.append(item)}help.append(helpList);
+    const helpClose=document.createElement('button');helpClose.type='button';helpClose.id='pilot-graph-help-close';helpClose.textContent=t('Fermer l’aide');
+    /** Close only this disclosure and restore its summary focus. */
+    function closeHelp(){help.open=false;helpToggle.focus()}
+    helpClose.addEventListener('click',closeHelp);help.append(helpClose);help.addEventListener('keydown',e=>{if(e.key==='Escape'&&help.open){e.preventDefault();e.stopPropagation();closeHelp()}});
     /** Convert pointer coordinates to unscaled SVG units; no engine state. */
     function point(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
     /** End or roll back a captured gesture; cancellation never persists changes. */
-    function finish(cancel=false){if(!gesture)return;const g=gesture;gesture=null;if(cancel&&g.id)positions[g.id]=g.origin;if(cancel&&!g.id&&!g.link)canvas.scrollTo(g.left,g.top);if(g.target.hasPointerCapture(g.pointer))g.target.releasePointerCapture(g.pointer);svg.querySelector('.graph-link-ghost')?.remove();update();if(!cancel&&g.id)save()}
+    function finish(cancel=false){if(!gesture)return;const g=gesture;gesture=null;if(cancel&&g.id){if(g.hadPosition)positions[g.id]=g.origin;else delete positions[g.id]}if(cancel&&!g.id&&!g.link)canvas.scrollTo(g.left,g.top);if(g.target.hasPointerCapture(g.pointer))g.target.releasePointerCapture(g.pointer);svg.querySelector('.graph-link-ghost')?.remove();if(!cancel&&g.id)rememberPlacement(g.snapshot);update();if(!cancel&&g.id)save()}
     /** Stage one link in the destination task form; never save from a gesture.
      * The engine checks cycles/activity/revision on explicit confirmation.
      */
@@ -283,10 +332,11 @@
       open.addEventListener('click',()=>editTask(work,work.tasks.find(t=>t.id===id)));
       open.addEventListener('keydown',e=>{if(!['Enter',' '].includes(e.key))return;e.preventDefault();editTask(work,work.tasks.find(t=>t.id===id))});
       const handle=svgNode('g',{class:'graph-drag',role:'button',tabindex:0,'aria-label':t('Déplacer la carte')+' '+id});handle.dataset.task=id;handle.append(svgNode('rect',{x:x+w-34,y:y+4,width:30,height:30,rx:6}),svgNode('text',{x:x+w-30,y:y+25},'⠿'));group.append(handle);
-      handle.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();e.stopPropagation();const p=positions[id]||{x:0,y:0};positions[id]={x:Math.max(-x,p.x+(e.key==='ArrowLeft'?-16:e.key==='ArrowRight'?16:0)),y:Math.max(-y,p.y+(e.key==='ArrowUp'?-16:e.key==='ArrowDown'?16:0))};update();save()});
-      handle.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();e.stopPropagation();handle.focus();gesture={id,target:handle,pointer:e.pointerId,origin:{...(positions[id]||{x:0,y:0})},start:point(e)};handle.setPointerCapture(e.pointerId)});
+      handle.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();e.stopPropagation();const before=copyPositions(),p=positions[id]||{x:0,y:0};positions[id]={x:Math.max(-x,p.x+(e.key==='ArrowLeft'?-16:e.key==='ArrowRight'?16:0)),y:Math.max(-y,p.y+(e.key==='ArrowUp'?-16:e.key==='ArrowDown'?16:0))};rememberPlacement(before);update();save()});
+      handle.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();e.stopPropagation();handle.focus();gesture={id,target:handle,pointer:e.pointerId,snapshot:copyPositions(),hadPosition:Object.hasOwn(positions,id),origin:{...(positions[id]||{x:0,y:0})},start:point(e)};handle.setPointerCapture(e.pointerId)});
       handle.addEventListener('pointermove',e=>{if(gesture?.id!==id)return;const p=point(e);positions[id]={x:Math.max(-x,gesture.origin.x+p.x-gesture.start.x),y:Math.max(-y,gesture.origin.y+p.y-gesture.start.y)};update()});
       handle.addEventListener('pointerup',()=>finish());handle.addEventListener('pointercancel',()=>finish(true));
+      const copy=svgNode('g',{class:'graph-copy',role:'button',tabindex:0,'aria-label':t('Copier l’identifiant')+' '+id});copy.dataset.task=id;copy.append(svgNode('title',{},t('Copier l’identifiant')+' '+id),svgNode('rect',{x:x+w-82,y:y+2,width:44,height:44,rx:6}),svgNode('text',{x:x+w-68,y:y+28},'ID'));group.append(copy);copy.addEventListener('pointerdown',e=>e.stopPropagation());copy.addEventListener('click',e=>{e.stopPropagation();copyId(id,copy)});copy.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();e.stopPropagation();copyId(id,copy)}});
       for(const side of ['in','out']){
         const vertical=orientation==='TB',port=svgNode('circle',{class:'graph-port',role:'button',tabindex:0,r:9,cx:vertical?x+w/2:side==='in'?x:x+w,cy:vertical?(side==='in'?y:y+h):y+h/2,'aria-label':t(side==='out'?'Relier cette sortie':'Relier cette entrée')+' '+id});port.dataset.task=id;port.dataset.side=side;let suppressClick=false;group.append(port);
         port.addEventListener('keydown',e=>{if(!['Enter',' '].includes(e.key))return;e.preventDefault();e.stopPropagation();activatePort(id,side)});
@@ -296,13 +346,20 @@
         port.addEventListener('pointerup',e=>{e.stopPropagation();if(!gesture?.link)return;const moved=gesture.moved,other=document.elementFromPoint(e.clientX,e.clientY)?.closest('.graph-port,.graph-noeud');finish();if(moved){suppressClick=true;const target=other?.dataset.task;if(target)link(side==='out'?id:target,side==='out'?target:id)}});port.addEventListener('pointercancel',()=>{suppressClick=true;finish(true)});
       }
     }
+    /** Center a graph-space point selected through the minimap. Native scroll
+     * clamping applies; only viewport/focus changes, never geometry or Work.
+     */
+    function centerMap(x,y){canvas.scrollLeft=x*zoom-canvas.clientWidth/2;canvas.scrollTop=y*zoom-canvas.clientHeight/2;updateViewport()}
+    map.addEventListener('pointerdown',e=>e.stopPropagation());map.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const p=map.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const at=p.matrixTransform(map.getScreenCTM().inverse());centerMap(at.x,at.y);map.focus({preventScroll:true})});
+    map.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key))return;e.preventDefault();e.stopPropagation();if(e.key==='Home')canvas.scrollTo(0,0);else if(e.key==='End')canvas.scrollTo(canvas.scrollWidth,canvas.scrollHeight);else{canvas.scrollLeft+=(e.key==='ArrowLeft'?-1:e.key==='ArrowRight'?1:0)*canvas.clientWidth/2;canvas.scrollTop+=(e.key==='ArrowUp'?-1:e.key==='ArrowDown'?1:0)*canvas.clientHeight/2}updateViewport()});canvas.addEventListener('scroll',updateViewport);
     canvas.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('.graph-noeud'))return;e.preventDefault();canvas.focus();gesture={target:canvas,pointer:e.pointerId,start:{x:e.clientX,y:e.clientY},left:canvas.scrollLeft,top:canvas.scrollTop};canvas.setPointerCapture(e.pointerId)});
     canvas.addEventListener('pointermove',e=>{if(!gesture||gesture.id||gesture.link)return;canvas.scrollLeft=gesture.left+gesture.start.x-e.clientX;canvas.scrollTop=gesture.top+gesture.start.y-e.clientY});canvas.addEventListener('pointerup',()=>finish());canvas.addEventListener('pointercancel',()=>finish(true));
     canvas.addEventListener('wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();zoom=Math.max(.15,Math.min(2,zoom+(e.deltaY<0?.15:-.15)));update();save()},{passive:false});
     for(const edge of svg.querySelectorAll('.graph-arete')){edge.setAttribute('role','button');edge.setAttribute('tabindex','0');edge.setAttribute('aria-label',t('Retirer ce lien')+' '+edge.dataset.from+' → '+edge.dataset.to);const remove=()=>{const target=work.tasks.find(t=>t.id===edge.dataset.to);editTask(work,target,(target.depends||[]).filter(id=>id!==edge.dataset.from))};edge.addEventListener('click',remove);edge.addEventListener('keydown',e=>{if(['Enter',' ','Delete','Backspace'].includes(e.key)){e.preventDefault();remove()}})}
     studio.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(gesture||connection){e.preventDefault();e.stopPropagation();finish(true);connection=null;status.textContent=''}else if(modal.open){e.preventDefault();modal.close()}});
     modal.addEventListener('close',()=>{if(disposed)return;finish(true);host.insertBefore(studio,modal);studio.classList.remove('is-fullscreen');document.body.classList.remove('graph-studio-open');full.textContent=t('Plein écran');full.setAttribute('aria-expanded','false');full.focus()});
-    studio.append(toolbar,status,canvas);host.replaceChildren(studio,modal);host.graphCleanup=()=>{disposed=true;finish(true);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};update();
+    const viewportObserver=new ResizeObserver(updateViewport);viewportObserver.observe(canvas);
+    studio.append(toolbar,help,status,copyStatus,copyFallback,canvas);host.replaceChildren(studio,modal);host.graphCleanup=()=>{disposed=true;viewportObserver.disconnect();finish(true);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};update();
   }
 
   /**
@@ -419,14 +476,14 @@
     navigation(host,canvas,svg,work,orientation);
   }
 
-  /** Display at most 32 UTF-16 code units including the ellipsis to leave room
-   * for the card handle; retain full literal text in an SVG title when clipped.
+  /** Display at most 24 UTF-16 code units including the ellipsis to leave room
+   * for copy/movement controls; retain full literal text in a title when clipped.
    * @param {SVGElement} text target text element, replaced without HTML parsing
    * @param {string} value validated title or task/status label
    * @returns {void} mutates only SVG text and optional tooltip
    */
   function appendTruncated(text, value) {
-    const shown = value.length > 32 ? value.slice(0, 31) + '…' : value;
+    const shown = value.length > 24 ? value.slice(0, 23) + '…' : value;
     text.textContent = shown;
     if (shown !== value) {
       const full = document.createElementNS(SVG_NS, 'title');

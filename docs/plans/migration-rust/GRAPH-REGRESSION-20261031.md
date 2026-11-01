@@ -254,3 +254,51 @@ sur la réponse POST ; recherche sur le rendu courant plutôt que reconstruction
 ou masquage du plan. Les recettes permanentes réutilisent ces témoins et gardes.
 QG3/QG4 restent proposés : mini-carte navigable et historique de placement local,
 avec leurs critères et conditions de reprise conservés dans le tableau initial.
+
+## Quick wins complémentaires proposés —1 novembre2026
+
+Nouvelle demande utilisateur : « tu as d’autres quickwin ? ». Source observée :
+web/cockpit-native-graph.js et styles actuels ; aucune nouvelle réalisation
+adoptée par cette question. QG3 mini-carte navigable et QG4 annulation du dernier
+placement/rangement restent les propositions précédentes, sans doublon.
+
+| ID | Origine / bénéfice | Périmètre et propriétaire | Critère observable | État / reprise |
+|---|---|---|---|---|
+| QG5 | Vue d’ensemble calcule son zoom sur base.width/base.height, tandis que update étend le SVG selon les cartes déplacées : améliorer le cadrage des placements manuels | affichage local, Codex/G1 | dans un cas compatible avec la plage de zoom, carte déplacée hors des dimensions initiales entièrement cadrée, positions et Work conservés | proposé, priorité conseillée ; hypothèse de défaut UI à reproduire avant correction |
+| QG6 | L’identifiant est affiché dans la carte et le formulaire : copie directe pour support/échanges | carte/formulaire, Codex/G1 | copie le seul ID littéral ; succès annoncé seulement après confirmation, refus clipboard visible et texte sélectionnable | proposé ; reprise : prochain lot d’ergonomie |
+| QG7 | Les gestes existent (Ctrl+molette, poignées, ports, Entrée, Échap) mais leur découverte dépend de la documentation | aide contextuelle courte, Codex/G1 | contrôle Aide nommé, gestes actuels FR/EN, ouverture/fermeture/focus clavier sans masquer les erreurs | proposé ; reprise : prochain lot de découverte de l’interface |
+
+Ordre conseillé : QG5 puis QG4 pour retrouver le cadrage et récupérer un placement.
+Ces propositions ne valent ni implémentation, ni vérification navigateur, ni
+autorisation de modifier le moteur ou de revenir sur des tâches enregistrées.
+
+## Lot QG3–QG7 adopté — demande « fais tout »
+
+Codex prend les cinq propositions restantes : QG5 cadrage sur l’étendue réelle,
+QG4 annuler le dernier placement/rangement, QG3 mini-carte souris/clavier et
+repère de viewport, QG6 copie d’ID et refus récupérable, QG7 aide des gestes.
+Scope : UI locale et préférences ; aucun changement de tâche, de politique
+d’exécution, de droits ou de budget. Pas de délégation. Sources/état initial
+conservés dans `.cache/graph-five-quickwins-20261101/`.
+
+Choix : réutiliser le SVG/contrôles existants plutôt qu’un second moteur de
+navigation. Un seul placement précédent en mémoire par rendu, plutôt qu’un
+undo de données métier ou un historique persistant non demandé. La plage de
+zoom existante est conservée : un cadrage empêché par le zoom minimum doit
+être annoncé. La copie ne dit « copié » qu’après acknowledgement du navigateur ;
+refus/indisponibilité donnent un ID lisible/sélectionnable et une cause sûre.
+
+Critères observables :
+- témoin Vue d’ensemble valide, déplacement hors dimensions initiales puis
+  cadrage corrigé sans bouger les cartes (dans la plage de zoom) ;
+- annulation d’un déplacement ou rangement, geste annulé n’écrase pas le témoin,
+  sauvegarde des coordonnées restaurées, aucune révision Work changée ;
+- mini-carte clic/flèches/Début/Fin, focus visible et rectangle du viewport ;
+- vrai clipboard headless après action utilisateur, puis refus injecté après
+  témoin valide : pas de faux succès, ID sélectionné, aucun formulaire ouvert ;
+- aide FR/EN repliée, ouverture/fermeture/Escape/focus, dans les deux thèmes et
+  sur mobile ; recettes QG1/QG2 et édition/refus/reprise restent requises.
+
+Documentation/fonctions/traductions/recette sont dans le même incrément.
+Qualification sur image native immuable puis activation locale via le lanceur ;
+review dans ce contexte est une auto-revue, jamais acceptation indépendante.

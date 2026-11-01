@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Graphe : cadrage des cartes déplacées, annulation du dernier placement, mini-carte interactive au clavier et à la souris, copie de l’identifiant avec repli sélectionnable et aide des gestes.",
+        "en": "Graph: fit moved cards, undo the last placement, navigate the mini-map by keyboard or mouse, copy task IDs with a selectable fallback, and reveal gesture help."
+      },
+      {
         "fr": "Graphe : recherche par titre ou identifiant, sans distinction de casse ni d’accents, avec centrage et navigation entre résultats. Le formulaire affiche l’enregistrement en cours jusqu’à sa relecture et l’actualisation du graphe.",
         "en": "Graph: find tasks by title or ID regardless of case or accents, center matches and cycle through results. The task form shows saving progress through readback and graph refresh."
       },

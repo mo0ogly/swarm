@@ -9,6 +9,19 @@ the HTTP origin, Work and orientation; they change no revision or budget. Escape
 cancels an active drag before closing full screen. Full screen uses a native modal
 dialog for keyboard isolation and restores focus to its opener on close.
 
+Fit overview includes moved cards. At the existing minimum zoom (15%), a visible
+message asks to move cards closer. “Undo placement” restores the last completed
+move or arrangement once. This memory resets on rerender; the restored placement
+is saved locally. Cancelling a gesture preserves the previous undo.
+The mini-map shows the visible area. Click to center, use arrow keys to move half
+a viewport, Home for the origin and End for the far edge.
+The **ID** button copies the exact identifier without opening the editor. Success
+requires clipboard acknowledgement. Refusal or an unavailable API leaves a
+selected readonly identifier without claiming a successful copy.
+“Graph gestures” reveals the controls. Close or Escape collapses this help and
+restores summary focus. Card titles are abbreviated to 24 UTF-16 units to leave
+room for controls; their full text remains in the tooltip.
+
 Search matches task IDs and titles regardless of case or accents. It highlights
 matches without hiding cards or links; Enter or “Next” centers the next match
 and focuses its card. “Clear search” or Escape in the input clears highlights.

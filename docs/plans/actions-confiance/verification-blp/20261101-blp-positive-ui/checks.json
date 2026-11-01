@@ -1,0 +1,16 @@
+{
+  "checks": [
+    "real fixture-root page served",
+    "blp-load unconfigured: Aucune politique de confidentialité enregistrée",
+    "example filled: 4 levels, no clearances",
+    "preview validated: Prévisualisation validée ; aucun changement appliqué",
+    "saved+reloaded: Politique enregistrée et relue ; protection transversale non active",
+    "recorded policy visible in form after save",
+    "server history: 1 entry, actor admin, runtime_enforced false, policy_revision 1"
+  ],
+  "errors": [],
+  "expectedHttp": [],
+  "ROOT": "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/blp-positive-root-094829",
+  "address": "127.0.0.1:38499",
+  "at": "2026-11-01T08:48:59.881Z"
+}

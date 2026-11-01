@@ -10,6 +10,20 @@ mission et à l’orientation ; elles ne modifient ni révision ni budget. Écha
 annule un déplacement en cours avant de fermer le plein écran. Ce dernier est
 un dialogue modal natif : focus contenu et retour au bouton à la fermeture.
 
+La vue d’ensemble utilise aussi l’étendue des cartes déplacées ; à la limite de
+zoom minimale existante (15 %), un message demande de rapprocher les cartes.
+« Annuler le placement » restaure le dernier déplacement terminé ou rangement,
+une seule fois. Cette mémoire disparaît au nouveau rendu ; le placement restauré
+est mémorisé localement. Une annulation de geste conserve cette mémoire.
+La mini-carte affiche la zone visible : cliquer centre la vue, les flèches
+parcourent un demi-écran, Début revient à l’origine et Fin à l’extrémité.
+Le bouton **ID** copie l’identifiant exact sans ouvrir le formulaire. Le succès
+attend l’accord du presse-papiers ; un refus ou une API indisponible laisse
+l’identifiant en lecture seule, sélectionné, sans annoncer de copie réussie.
+« Aide des gestes » expose les commandes ; Fermer ou Échap referme l’aide et
+rend le focus à son titre. Les titres de carte sont abrégés à 24 unités UTF-16
+pour ménager les commandes ; leur texte complet reste dans l’infobulle.
+
 La recherche par identifiant ou titre ignore la casse et les accents. Elle met
 en évidence les correspondances sans masquer de carte ou de lien ; Entrée ou
 « Suivant » centre la correspondance suivante et place le focus sur sa carte.

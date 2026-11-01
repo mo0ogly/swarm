@@ -107,3 +107,16 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .native-graph-studio .graph-task-open { cursor:pointer; }
 .native-graph-studio .graph-task-open:focus { outline:none; }
 .native-graph-studio .graph-task-open:focus .graph-cadre { stroke:var(--wattson-lien); stroke-width:4; }
+.graph-studio.native-graph-studio .graph-minimap { pointer-events:auto; cursor:crosshair; touch-action:none; }
+.native-graph-studio .graph-minimap:focus-visible { outline:2px solid var(--wattson-lien); outline-offset:3px; }
+.graph-minimap-viewport { fill:none; stroke:var(--wattson-lien); stroke-width:2; stroke-dasharray:4 2; vector-effect:non-scaling-stroke; pointer-events:none; }
+.graph-copy { cursor:pointer; }
+.graph-copy rect { fill:var(--wattson-carte-appuyee); stroke:var(--wattson-ligne); }
+.graph-copy text { fill:var(--wattson-texte); font-size:12px; pointer-events:none; }
+.graph-copy:focus rect,.graph-copy:hover rect { stroke:var(--wattson-lien); stroke-width:4; }
+.native-graph-copy-fallback { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.native-graph-copy-fallback[hidden] { display:none; }
+.native-graph-copy-fallback input { min-width:0; max-width:100%; }
+.native-graph-help { padding:8px; border:1px solid var(--wattson-ligne); background:var(--wattson-carte); color:var(--wattson-texte); }
+.native-graph-help summary { cursor:pointer; }
+.native-graph-help li { margin-block:6px; }

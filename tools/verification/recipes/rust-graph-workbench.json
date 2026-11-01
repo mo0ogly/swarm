@@ -42,7 +42,22 @@
         "PASS en-sombre-search-title-accent",
         "PASS en-sombre-search-centers-visible-card",
         "PASS en-sombre-search-preserves-layout",
-        "PASS en-sombre-search-in-fullscreen"
+        "PASS en-sombre-search-in-fullscreen",
+        "PASS en-sombre-fit-includes-manual-extent",
+        "PASS en-sombre-undo-restores-rangement",
+        "PASS en-sombre-undo-consumed-once",
+        "PASS en-sombre-minimap-keyboard-end",
+        "PASS en-sombre-minimap-keyboard-arrow",
+        "PASS en-sombre-minimap-keyboard-home",
+        "PASS en-sombre-minimap-click-centers",
+        "PASS en-sombre-copy-id-real-clipboard",
+        "PASS en-sombre-copy-refusal-selectable-id",
+        "PASS en-sombre-copy-refusal-cause-safe",
+        "PASS en-sombre-copy-unavailable-selectable-id",
+        "PASS en-sombre-help-escape-focus",
+        "PASS en-sombre-cancel-preserves-previous-undo",
+        "PASS en-sombre-undo-restores-pointer-move",
+        "PASS en-sombre-undo-persisted"
       ],
       "required_stderr": []
     },
