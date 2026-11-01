@@ -297,3 +297,34 @@ BLP-04 commence par la provenance des octets réellement assemblés, sans étiqu
 ni autorisation d’envoi. Voir le [suivi et ses limites](BLP-PROVENANCE-20261031.md).
 Le lot reste ouvert ; la migration, le principal authentifié, le contrôle de
 destination et l’héritage restent à raccorder.
+
+## Administration BLP positive sur racine fixture — 1er novembre (session Claude)
+
+Expérience suivante du [RETEX](paea/RETEX-BLP-20261031.md), réalisée : le flux
+enregistré complet par l'UI réelle, indépendamment de toute décision de
+bootstrap de la racine de mission.
+
+- Racine fixture dédiée dans l'aire projet (jamais `/tmp`, jamais la mission),
+  initialisée avec le binaire installé (`swarm init`), bootstrap trust par la
+  voie CLI opérateur (`trust config-apply`, 3 identités de fixture étiquetées),
+  service réel `swarm web` sur 127.0.0.1:38499.
+- Chrome réel sur `/trust-actions.html` : `blp-load` affiche « Aucune politique
+  de confidentialité enregistrée » ; `blp-example` remplit le catalogue
+  4 niveaux sans habilitation ; motif saisi ; `blp-preview` → « Prévisualisation
+  validée ; aucun changement appliqué » ; `blp-save` → « Politique enregistrée
+  et relue ; protection transversale non active » ; politique relue dans le
+  formulaire.
+- Relecture serveur : `capability.configured:true`, `runtime_enforced:false`,
+  `policy_revision:1`, historique 1 entrée attribuée (actor `admin`, motif
+  conservé). **7/7 vérifications, 0 erreur.**
+- Preuves retenues :
+  [verification-blp/20261101-blp-positive-ui/](verification-blp/20261101-blp-positive-ui/)
+  (harnais, `checks.json`, capture, état trust de la racine fixture — données
+  de fixture étiquetées uniquement).
+
+Portée et limites : cette preuve établit le **parcours d'administration
+enregistré** (persistance, attribution, relecture, garde save-sans-preview) sur
+l'image servie ; elle n'établit ni la classification de contenu réel, ni une
+exécution protégée (`runtime_enforced:false` inchangé), ni une acceptation
+indépendante. La racine de mission reste sans état trust ; la décision de
+bootstrap opérateur reste requise avant toute administration réelle.

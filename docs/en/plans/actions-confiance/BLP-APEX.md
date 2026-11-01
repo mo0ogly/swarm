@@ -168,3 +168,33 @@ one real BLP entry. Probe re-qualified on the active 284 image:
 BLP-04 starts with actual assembled-byte provenance, without labels or disclosure
 authority. See the [record and limits](BLP-PROVENANCE-20261031.md). The lot stays
 open: migration, authenticated principal, sink checks and inheritance remain pending.
+
+## Positive BLP administration on a fixture root — November 1 (Claude session)
+
+The [RETEX](../../paea/RETEX-BLP-20261031.en.md) next experiment, executed: the
+full recorded administration flow through the real UI, independent of any
+mission-root bootstrap decision.
+
+- Dedicated fixture root in the project fixture area (never `/tmp`, never the
+  mission root), initialized with the installed binary (`swarm init`), trust
+  bootstrapped through the CLI operator path (`trust config-apply`, three
+  fixture-labeled identities), real `swarm web` serving 127.0.0.1:38499.
+- Real Chrome on `/trust-actions.html`: `blp-load` shows "No confidentiality
+  policy recorded"; `blp-example` fills the 4-level no-clearance catalog;
+  reason typed; `blp-preview` → "Preview validated; no change applied";
+  `blp-save` → "Policy recorded and re-read; transversal protection not
+  active"; the recorded policy is read back into the form.
+- Server readback: `capability.configured:true`, `runtime_enforced:false`,
+  `policy_revision:1`, one attributed history entry (actor `admin`, reason
+  preserved). **7/7 checks, 0 errors.**
+- Evidence retained:
+  [verification-blp/20261101-blp-positive-ui/](verification-blp/20261101-blp-positive-ui/)
+  (harness, `checks.json`, screenshot, fixture-root trust state — fixture-only
+  labeled data).
+
+Scope and limits: this proves the **recorded administration path**
+(persistence, attribution, readback, save-gated-on-preview) on the served
+image; it establishes neither real-content classification, nor protected
+execution (`runtime_enforced:false` unchanged), nor independent acceptance.
+The mission root still has no trust state; the operator bootstrap decision
+remains required before any real administration.
