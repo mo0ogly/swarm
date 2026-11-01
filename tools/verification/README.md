@@ -3294,3 +3294,35 @@ recipe to retain raw requests/channels alongside its outer evidence. The script
 hashes those files in `result.json` and prints that result's SHA256 into the
 recipe's retained stdout. `recipe.py verify` verifies the outer receipt; also
 verify the journey manifest/hash before reusing its detailed channels.
+
+### Sources de préparation classifiées / Classified preparation sources
+
+`recipes/blp-preparation-check.json` exerce le consommateur natif sous
+authentification Trust : attribution exacte de chaque tranche, combinaison,
+source manquante, compartiment refusé, intention périmée/forgée, parent erroné,
+prompt altéré et reprise, relecture readonly et renouvellement de politique.
+L’insertion du prompt natif est une fixture de consommateur ; elle ne prouve
+ni admission, ni dispatch, ni confinement d’un fournisseur. Aucun fournisseur appelé.
+
+`recipes/blp-preparation-check.json` exercises the native consumer with Trust
+authentication: exact slice attribution/join, missing source, denied compartment,
+stale/forged request, wrong parent, altered prompt/recovery, readonly reopen and
+policy renewal. Native-row insertion is a consumer fixture, not evidence of send
+admission, dispatch or provider confinement. No provider is called.
+
+`recipes/blp-preparation-check-public.json` exige `SWARM_BLP_BINARY` et
+`SWARM_BLP_PROFILE` (profil normal qualifié) ; `SWARM_BLP_PROOF_OUTPUT` peut
+sélectionner un dossier de parcours neuf. Il produit réellement un prompt via
+CLI avec un exécutable local inerte, observe sa provenance en SQL lecture seule
+dans sa propre fixture, attribue toutes les parties par opérations publiques,
+puis compare CLI et HTTP protégé. Les erreurs originales restent conservées.
+Le digest final imprimé lie le manifeste des canaux de parcours ; vérifier ses
+fichiers en plus du reçu externe de `recipe.py verify`.
+
+The public recipe requires `SWARM_BLP_BINARY` and `SWARM_BLP_PROFILE` for a
+qualified normal image; optional `SWARM_BLP_PROOF_OUTPUT` selects fresh journey
+evidence. It produces the real prompt using a local inert executable, observes
+its owned fixture provenance through readonly SQL, attributes all slices using
+public operations, then compares CLI and protected HTTP. Original failures stay
+retained. The printed final digest binds journey artifacts; verify them as well
+as the outer recipe receipt.

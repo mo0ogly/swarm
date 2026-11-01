@@ -52,6 +52,23 @@ pub(super) struct Manifest {
 fn hash(raw: &[u8]) -> String { format!("{:x}", Sha256::digest(raw)) }
 
 impl Manifest {
+    /// Resolve every exact transmitted slice against a validated current control
+    /// entry and project identity. Verifies provenance first; missing attribution
+    /// refuses, including framing/null/empty JSON. Does not infer classification
+    /// from origin, caller labels or clearance. No IO or disclosure occurs here.
+    pub(super) fn classifications(&self, prompt: &str, entry: &crate::trust::confidentiality::Entry,
+        project: &[u8]) -> Result<Vec<Option<swarm_confidentiality::Classification>>, E>
+    {
+        self.verify(prompt)?;
+        self.parts.iter().map(|part| {
+            let (level, _, compartments) = entry.attribution_for(&part.sha256, project)
+                .ok_or(E::Refused("blp-classification-required"))?;
+            Ok(Some(swarm_confidentiality::Classification {
+                level: level.into(), compartments: compartments.to_vec(),
+            }))
+        }).collect()
+    }
+
     /// Verify complete ordered coverage, UTF-8 boundaries, byte digests and
     /// origin-to-JSON-key correspondence in the producer's framing grammar.
     /// Refuses malformed/stale provenance without side effects or fallback.

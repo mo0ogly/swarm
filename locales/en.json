@@ -6516,5 +6516,18 @@
   "Ctrl + molette garde le point sous le curseur. La vue est conservée après l’enregistrement sur le même travail.": "Ctrl + wheel keeps the point under the cursor. The view is preserved after saving within the same work.",
   "Repérer les dépendances distingue prérequis et dépendants sans masquer de carte.": "Dependency highlights distinguish prerequisites and dependents without hiding cards.",
   "L’export SVG télécharge le placement affiché ; les boutons ne sont pas exportés.": "SVG export downloads the displayed layout; buttons are omitted.",
-  "Aucun prérequis correspondant.": "No matching prerequisite."
+  "Aucun prérequis correspondant.": "No matching prerequisite.",
+  "Outils du graphe": "Graph tools",
+  "Fermer les outils": "Close tools",
+  "Rétablir le placement": "Redo placement",
+  "Réinitialiser la navigation": "Reset navigation",
+  "Vue mémorisée indisponible sur cet appareil.": "Saved view unavailable on this device.",
+  "Vue mémorisée invalide ; navigation par défaut.": "Invalid saved view; using default navigation.",
+  "Navigation non mémorisée sur cet appareil.": "Navigation not saved on this device.",
+  "Réinitialisation de navigation non confirmée.": "Navigation reset unconfirmed.",
+  "100 %": "100%",
+  "Outils du graphe regroupe placement, orientation, repérage et export. Échap referme ce panneau.": "Graph tools groups placement, orientation, dependency highlights and export. Escape closes this panel.",
+  "100 % rétablit l’échelle autour du centre. Précédent ou Maj + Entrée remonte les résultats.": "100% resets the scale around the center. Previous or Shift + Enter moves backward through results.",
+  "Rétablir le placement récupère une annulation. Un nouveau déplacement terminé remplace ce témoin.": "Redo placement recovers an undo. A new completed move replaces this snapshot.",
+  "La navigation locale retrouve orientation et zone après rechargement, sans ouvrir le plein écran.": "Local navigation restores orientation and position after reload, without opening full screen."
 }

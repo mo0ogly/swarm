@@ -2,6 +2,7 @@
 (function () {
   const t = (source) => globalThis.SwarmI18n?.t ? globalThis.SwarmI18n.t(source) : source;
   const SVG_NS = 'http://www.w3.org/2000/svg';
+  const VIEW_PREFIX = 'swarm-native-graph-view:v1:';
   let refreshWork = null;
 
   /** Register the cockpit's asynchronous readback consumer. The callback takes
@@ -126,6 +127,20 @@
    */
   function searchKey(value){return value.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase()}
 
+  /** Read only this Work's versioned presentation preference. Coordinates must
+   * be finite/nonnegative; unknown fields, malformed JSON and invalid direction
+   * are reported, never treated as a valid empty preference. No writes occur.
+   * @param {string} workId validated recorded Work ID
+   * @returns {{view:object|null,error:string}} safe localized diagnostic on refusal
+   * Full screen is deliberately absent from storage and always false on reload.
+   */
+  function readStoredView(workId){
+    let raw;try{raw=localStorage.getItem(VIEW_PREFIX+workId)}catch{return{view:null,error:t('Vue mémorisée indisponible sur cet appareil.')}}
+    if(raw===null)return{view:null,error:''};
+    try{const value=JSON.parse(raw),coords=['left','top','studioLeft','studioTop'],keys=new Set(['orientation','toolsOpen',...coords]);if(!value||typeof value!=='object'||Array.isArray(value)||!['LR','TB'].includes(value.orientation)||typeof value.toolsOpen!=='boolean'||!coords.every(key=>Number.isFinite(value[key])&&value[key]>=0)||!Object.keys(value).every(key=>keys.has(key)))throw Error('invalid-local-view');return{view:{work:workId,orientation:value.orientation,left:value.left,top:value.top,studioLeft:value.studioLeft,studioTop:value.studioTop,toolsOpen:value.toolsOpen,fullscreen:false},error:''}}
+    catch{return{view:null,error:t('Vue mémorisée invalide ; navigation par défaut.')}}
+  }
+
   /** Open a task editor on one observed Work revision. Inputs remain visible on
    * refusal. Prerequisite search keeps selected options visible. Explicit submit uses scoped CSRF and the engine's task contracts;
    * no provider or automatic retry. A lost/malformed response is uncertain and
@@ -205,19 +220,24 @@
    * @param {SVGElement} svg validated Dagre layout, dimensions in SVG units
    * @param {object} work recorded Work with validated tasks/dependencies
    * @param {'LR'|'TB'} orientation displayed layout direction
-   * @param {object|null} initial same-Work in-memory view, never an engine snapshot
+   * @param {object|null} initial same-Work view from memory or validated local storage
+   * @param {string} viewError safe preference diagnostic, never raw stored content
    * @returns {void} installs listeners, view capture and cleanup; storage refusals stay visible
    */
-  function navigation(host, canvas, svg, work, orientation, initial=null) {
+  function navigation(host, canvas, svg, work, orientation, initial=null, viewError='') {
     const studio=document.createElement('section');studio.id='graph-studio';studio.className='graph-studio native-graph-studio';
     const toolbar=document.createElement('div');toolbar.className='pilot-actions';
     const status=document.createElement('p');status.className='graph-studio-hint';status.setAttribute('role','status');
-    const key='swarm-native-graph:v1:'+work.id+':'+orientation;
-    let positions=Object.create(null),previousPositions=null,zoom=1,gesture=null,connection=null,disposed=false,copying=false,exportUrl=null,resumeFullscreen=!!initial?.fullscreen;
+    const key='swarm-native-graph:v1:'+work.id+':'+orientation,viewKey=VIEW_PREFIX+work.id;
+    const preferenceStatus=document.createElement('p');preferenceStatus.id='pilot-view-status';preferenceStatus.className='native-graph-preference-status';preferenceStatus.setAttribute('role','status');preferenceStatus.textContent=viewError||initial?.preferenceError||'';
+    const media=matchMedia('(min-width:761px)'),tools=document.createElement('details');tools.id='pilot-tools';tools.className='native-graph-tools';tools.open=initial?.toolsOpen??media.matches;
+    const toolsToggle=document.createElement('summary');toolsToggle.id='pilot-tools-toggle';toolsToggle.textContent=t('Outils du graphe');const toolsBody=document.createElement('div');toolsBody.className='pilot-actions';tools.append(toolsToggle,toolsBody);
+    let lastViewAttempt=null,resetting=false;
+    let positions=Object.create(null),previousPositions=null,redoPositions=null,zoom=1,gesture=null,connection=null,disposed=false,copying=false,exportUrl=null,resumeFullscreen=!!initial?.fullscreen;
     let pendingScroll=initial?.orientation===orientation?{left:initial.left,top:initial.top}:null;
     let pendingStudio=initial?{left:initial.studioLeft??0,top:initial.studioTop??0}:null;
     try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(saved){if(Number.isFinite(saved.zoom))zoom=Math.max(.15,Math.min(2,saved.zoom));for(const [id,p]of Object.entries(saved.positions||{}))if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y))positions[id]={x:p.x,y:p.y}}}catch{status.textContent=t('Positions indisponibles ; placement automatique conservé.')}
-    if(initial?.orientation===orientation){zoom=initial.zoom;positions=copyPositions(initial.positions)}
+    if(initial?.orientation===orientation&&Number.isFinite(initial.zoom)&&initial.positions){zoom=initial.zoom;positions=copyPositions(initial.positions)}
     const base={width:Number(svg.getAttribute('width')),height:Number(svg.getAttribute('height'))},units=new Map();
     const extent={width:base.width,height:base.height};
     const map=svgNode('svg',{class:'graph-minimap',role:'group',tabindex:0,'aria-label':t('Naviguer avec la mini-carte')});canvas.append(map);
@@ -226,7 +246,16 @@
     const modal=document.createElement('dialog');modal.className='native-graph-dialog';modal.setAttribute('aria-label',t('Graphe du travail'));
     /** Persist zoom and completed placement only; captured drags stay provisional.
      * Storage refusal stays visible and never claims successful persistence. */
-    function save(){try{localStorage.setItem(key,JSON.stringify({zoom,positions:committedPositions()}))}catch{status.textContent=t('Positions non mémorisées sur cet appareil.')}}
+    function save(){try{localStorage.setItem(key,JSON.stringify({zoom,positions:committedPositions()}));persistView()}catch{status.textContent=t('Positions non mémorisées sur cet appareil.')}}
+    /** Encode only validated presentation fields, never full screen or task data.
+     * Pending restore/gesture values come from the committed view snapshot.
+     */
+    function viewRecord(){const view=host.graphView?.();if(!view||view.work!==work.id)return null;return{orientation,left:view.left,top:view.top,studioLeft:view.studioLeft,studioTop:view.studioTop,toolsOpen:tools.open}}
+    /** Persist a changed local view, with no retry of an identical attempt.
+     * Force is reserved for an explicit orientation change. Refusal is visible;
+     * success clears only the preference diagnostic, not other graph messages.
+     */
+    function persistView(force=false){if(disposed||resetting)return;const value=viewRecord();if(!value)return;const encoded=JSON.stringify(value);if(!force&&encoded===lastViewAttempt)return;lastViewAttempt=encoded;try{localStorage.setItem(viewKey,encoded);preferenceStatus.textContent=''}catch{preferenceStatus.textContent=t('Navigation non mémorisée sur cet appareil.')}}
     /** Copy only owned coordinate entries, including prototype-shaped IDs.
      * @param {object} source local positions, never Work data
      * @returns {object} independent null-prototype coordinate snapshot
@@ -239,10 +268,10 @@
     function committedPositions(){return copyPositions(gesture?.id?gesture.snapshot:positions)}
     /** Retain one previous placement only after a real completed change.
      * Cancellation/no-op preserve the previous undo; absent and zero offsets
-     * describe the same placement. Memory resets on rerender;
+     * describe the same placement. Undo/redo memory resets on rerender;
      * neither history nor a task operation is persisted by this helper.
      */
-    function rememberPlacement(before){const ids=new Set([...Object.keys(before),...Object.keys(positions)]);if([...ids].some(id=>(before[id]?.x??0)!==(positions[id]?.x??0)||(before[id]?.y??0)!==(positions[id]?.y??0)))previousPositions=before}
+    function rememberPlacement(before){const ids=new Set([...Object.keys(before),...Object.keys(positions)]);if([...ids].some(id=>(before[id]?.x??0)!==(positions[id]?.x??0)||(before[id]?.y??0)!==(positions[id]?.y??0))){previousPositions=before;redoPositions=null}}
     /** Project native scroll bounds into unscaled SVG coordinates, clamped to
      * the graph extent. Only the minimap viewport marker changes; no IO/layout.
      */
@@ -259,19 +288,32 @@
       map.setAttribute('viewBox',`0 0 ${width} ${height}`);map.replaceChildren();
       for(const edge of svg.querySelectorAll('.graph-arete'))map.append(svgNode('path',{d:edge.getAttribute('d'),class:'graph-minimap-edge'}));
       for(const [id,u]of units){const p=positions[id]||{x:0,y:0};map.append(svgNode('rect',{x:u.x+p.x,y:u.y+p.y,width:u.w,height:u.h,rx:8,class:'graph-minimap-node'}))}
-      map.append(viewport);updateViewport();undo.disabled=previousPositions===null;
+      map.append(viewport);updateViewport();undo.disabled=previousPositions===null;redo.disabled=redoPositions===null;zoomOut.disabled=zoom<=.15;zoomIn.disabled=zoom>=2;
       zoomText.textContent=Math.round(zoom*100)+' %';
     }
     /** Create a native action with textContent and scoped listener. */
     function button(id,label,action){const b=document.createElement('button');b.type='button';b.id=id;b.textContent=t(label);b.addEventListener('click',action);toolbar.append(b);return b}
     const zoomText=document.createElement('output');zoomText.setAttribute('aria-label',t('Zoom'));
-    button('pilot-zoom-out','Réduire le zoom',()=>{zoom=Math.max(.15,zoom-.15);update();save()});
+    const zoomOut=button('pilot-zoom-out','Réduire le zoom',()=>{zoom=Math.max(.15,zoom-.15);update();save()});
     toolbar.append(zoomText);
-    button('pilot-zoom-in','Agrandir le zoom',()=>{zoom=Math.min(2,zoom+.15);update();save()});
+    const zoomIn=button('pilot-zoom-in','Agrandir le zoom',()=>{zoom=Math.min(2,zoom+.15);update();save()});
+    /** Reset to the existing 100% scale around the viewport center, under the
+     * native scroll clamp. Placement and Work are untouched; preferences save.
+     */
+    function zoom100(){const x=(canvas.scrollLeft+canvas.clientWidth/2)/zoom,y=(canvas.scrollTop+canvas.clientHeight/2)/zoom;zoom=1;update();canvas.scrollLeft=x-canvas.clientWidth/2;canvas.scrollTop=y-canvas.clientHeight/2;updateViewport();save()}
+    button('pilot-zoom-100','100 %',zoom100);
     button('pilot-fit','Vue d’ensemble',()=>{update();const required=Math.min(1,(canvas.clientWidth-24)/extent.width,(canvas.clientHeight-24)/extent.height);zoom=Math.max(.15,required);update();canvas.scrollTo(0,0);if(required<.15)status.textContent=t('Zoom minimum atteint. Rapprochez les cartes pour tout voir.');save()});
     const full=button('pilot-fullscreen','Plein écran',()=>{resumeFullscreen=false;if(modal.open){modal.close();return}modal.showModal();modal.append(studio);studio.classList.add('is-fullscreen');document.body.classList.add('graph-studio-open');full.textContent=t('Quitter le plein écran');full.setAttribute('aria-expanded','true');full.focus()});full.setAttribute('aria-expanded','false');
     button('pilot-layout-reset','Ranger les cartes',()=>{const before=copyPositions();positions=Object.create(null);rememberPlacement(before);update();save()});
-    const undo=button('pilot-layout-undo','Annuler le placement',()=>{if(!previousPositions)return;finish(true);positions=previousPositions;previousPositions=null;update();save()});undo.disabled=true;
+    const undo=button('pilot-layout-undo','Annuler le placement',()=>{if(!previousPositions)return;finish(true);redoPositions=copyPositions();positions=previousPositions;previousPositions=null;update();save()});undo.disabled=true;
+    const redo=button('pilot-layout-redo','Rétablir le placement',()=>{if(redoPositions===null)return;finish(true);previousPositions=copyPositions();positions=redoPositions;redoPositions=null;update();save()});redo.disabled=true;
+    /** Remove only the navigation preference. Existing per-direction zoom and
+     * placements retain their dedicated controls. Failure changes no visible
+     * view; successful reset preserves an explicitly open full screen only in
+     * memory. Cleanup must not rewrite the deleted preference.
+     */
+    function resetNavigation(){finish(true);try{localStorage.removeItem(viewKey)}catch{preferenceStatus.textContent=t('Réinitialisation de navigation non confirmée.');return}resetting=true;host.dataset.orientation='LR';host.graphView=()=>({work:work.id,orientation:'LR',left:0,top:0,studioLeft:0,studioTop:0,fullscreen:modal.open,toolsOpen:media.matches});render(work)}
+    button('pilot-view-reset','Réinitialiser la navigation',resetNavigation);
     button('pilot-add-task','Ajouter une tâche',()=>editTask(work));
     const neighbors=document.createElement('label');neighbors.className='native-graph-neighbors';neighbors.textContent=t('Repérer les dépendances');neighbors.htmlFor='pilot-neighbors';
     const neighborSelect=document.createElement('select');neighborSelect.id='pilot-neighbors';const noNeighbor=document.createElement('option');noNeighbor.value='';noNeighbor.textContent=t('Choisir une carte');neighborSelect.append(noNeighbor);
@@ -321,24 +363,26 @@
     function findMatches(){
       const query=searchKey(searchInput.value.trim());matches=query?work.tasks.filter(task=>searchKey(task.id).includes(query)||searchKey(task.title).includes(query)):[];matchIndex=-1;
       const ids=new Set(matches.map(task=>task.id));for(const [id,u]of units)u.group.classList.toggle('graph-search-match',ids.has(id));
-      nextMatch.disabled=matches.length===0;clearSearch.disabled=!searchInput.value;
+      nextMatch.disabled=matches.length===0;previousMatch.disabled=matches.length===0;clearSearch.disabled=!searchInput.value;
       searchStatus.textContent=!query?'':matches.length===0?t('Aucune tâche correspondante.'):matches.length===1?t('Une tâche trouvée.'):matches.length+' '+t('tâches trouvées.');
     }
-    /** Center the next literal match in the available scroll extent and focus
+    /** Center a literal match in either direction in the available scroll extent and focus
      * its existing opener without scrolling the page. Clamping at graph edges
      * is native browser behavior. No task, coordinates, zoom or policy is saved.
+     * @param {number} direction internal +1 or -1, never an event object
      * @returns {void} no-op for empty matches or a detached renderer
      */
-    function centerMatch(){
-      if(!matches.length||disposed)return;matchIndex=(matchIndex+1)%matches.length;const task=matches[matchIndex],target=units.get(task.id)?.group.querySelector('.graph-task-open');if(!target)return;
+    function centerMatch(direction=1){
+      if(!matches.length||disposed)return;matchIndex=matchIndex<0?(direction<0?matches.length-1:0):(matchIndex+direction+matches.length)%matches.length;const task=matches[matchIndex],target=units.get(task.id)?.group.querySelector('.graph-task-open');if(!target)return;
       const rect=target.getBoundingClientRect(),view=canvas.getBoundingClientRect();canvas.scrollLeft+=rect.left+rect.width/2-view.left-view.width/2;canvas.scrollTop+=rect.top+rect.height/2-view.top-view.height/2;
       target.focus({preventScroll:true});searchStatus.textContent=(matchIndex+1)+' / '+matches.length+' · '+task.id+' — '+task.title;
     }
-    const nextMatch=button('pilot-search-next','Suivant',centerMatch);
+    const previousMatch=button('pilot-search-previous','Précédent',()=>centerMatch(-1));
+    const nextMatch=button('pilot-search-next','Suivant',()=>centerMatch(1));
     const clearSearch=button('pilot-search-clear','Effacer la recherche',()=>{searchInput.value='';findMatches();searchInput.focus()});
     searchInput.addEventListener('input',findMatches);
-    searchInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopPropagation();centerMatch()}else if(e.key==='Escape'&&searchInput.value){e.preventDefault();e.stopPropagation();searchInput.value='';findMatches()}});
-    search.append(searchLabel,searchInput,nextMatch,clearSearch,searchStatus);toolbar.append(search);findMatches();
+    searchInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopPropagation();centerMatch(e.shiftKey?-1:1)}else if(e.key==='Escape'&&searchInput.value){e.preventDefault();e.stopPropagation();searchInput.value='';findMatches()}});
+    search.append(searchLabel,searchInput,previousMatch,nextMatch,clearSearch,searchStatus);toolbar.append(search);findMatches();
     const copyStatus=document.createElement('p');copyStatus.id='pilot-copy-status';copyStatus.setAttribute('role','status');copyStatus.setAttribute('aria-live','polite');
     const copyFallback=document.createElement('label');copyFallback.className='native-graph-copy-fallback';copyFallback.hidden=true;copyFallback.htmlFor='pilot-copy-value';copyFallback.textContent=t('Identifiant à copier');
     const copyValue=document.createElement('input');copyValue.id='pilot-copy-value';copyValue.readOnly=true;copyFallback.append(copyValue);
@@ -359,6 +403,10 @@
     const helpToggle=document.createElement('summary');helpToggle.id='pilot-graph-help-toggle';helpToggle.textContent=t('Aide des gestes');help.append(helpToggle);
     const helpList=document.createElement('ul');for(const text of [
       'Zoom : boutons ou Ctrl + molette. Vue d’ensemble inclut les cartes déplacées.',
+      'Outils du graphe regroupe placement, orientation, repérage et export. Échap referme ce panneau.',
+      '100 % rétablit l’échelle autour du centre. Précédent ou Maj + Entrée remonte les résultats.',
+      'Rétablir le placement récupère une annulation. Un nouveau déplacement terminé remplace ce témoin.',
+      'La navigation locale retrouve orientation et zone après rechargement, sans ouvrir le plein écran.',
       'Ctrl + molette garde le point sous le curseur. La vue est conservée après l’enregistrement sur le même travail.',
       'Repérer les dépendances distingue prérequis et dépendants sans masquer de carte.',
       'L’export SVG télécharge le placement affiché ; les boutons ne sont pas exportés.',
@@ -376,7 +424,7 @@
     /** Convert pointer coordinates to unscaled SVG units; no engine state. */
     function point(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
     /** End or roll back a captured gesture; cancellation never persists changes. */
-    function finish(cancel=false){if(!gesture)return;const g=gesture;gesture=null;if(cancel&&g.id){if(g.hadPosition)positions[g.id]=g.origin;else delete positions[g.id]}if(cancel&&!g.id&&!g.link)canvas.scrollTo(g.left,g.top);if(g.target.hasPointerCapture(g.pointer))g.target.releasePointerCapture(g.pointer);svg.querySelector('.graph-link-ghost')?.remove();if(!cancel&&g.id)rememberPlacement(g.snapshot);update();if(!cancel&&g.id)save()}
+    function finish(cancel=false){if(!gesture)return;const g=gesture;gesture=null;if(cancel&&g.id){if(g.hadPosition)positions[g.id]=g.origin;else delete positions[g.id]}if(cancel&&!g.id&&!g.link)canvas.scrollTo(g.left,g.top);if(g.target.hasPointerCapture(g.pointer))g.target.releasePointerCapture(g.pointer);svg.querySelector('.graph-link-ghost')?.remove();if(!cancel&&g.id)rememberPlacement(g.snapshot);update();if(!cancel&&g.id)save();else if(!cancel)persistView()}
     /** Stage one link in the destination task form; never save from a gesture.
      * The engine checks cycles/activity/revision on explicit confirmation.
      */
@@ -410,7 +458,7 @@
      */
     function centerMap(x,y){canvas.scrollLeft=x*zoom-canvas.clientWidth/2;canvas.scrollTop=y*zoom-canvas.clientHeight/2;updateViewport()}
     map.addEventListener('pointerdown',e=>e.stopPropagation());map.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const p=map.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const at=p.matrixTransform(map.getScreenCTM().inverse());centerMap(at.x,at.y);map.focus({preventScroll:true})});
-    map.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key))return;e.preventDefault();e.stopPropagation();if(e.key==='Home')canvas.scrollTo(0,0);else if(e.key==='End')canvas.scrollTo(canvas.scrollWidth,canvas.scrollHeight);else{canvas.scrollLeft+=(e.key==='ArrowLeft'?-1:e.key==='ArrowRight'?1:0)*canvas.clientWidth/2;canvas.scrollTop+=(e.key==='ArrowUp'?-1:e.key==='ArrowDown'?1:0)*canvas.clientHeight/2}updateViewport()});canvas.addEventListener('scroll',updateViewport);
+    map.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key))return;e.preventDefault();e.stopPropagation();if(e.key==='Home')canvas.scrollTo(0,0);else if(e.key==='End')canvas.scrollTo(canvas.scrollWidth,canvas.scrollHeight);else{canvas.scrollLeft+=(e.key==='ArrowLeft'?-1:e.key==='ArrowRight'?1:0)*canvas.clientWidth/2;canvas.scrollTop+=(e.key==='ArrowUp'?-1:e.key==='ArrowDown'?1:0)*canvas.clientHeight/2}updateViewport()});canvas.addEventListener('scroll',()=>{updateViewport();persistView()});studio.addEventListener('scroll',()=>persistView());
     canvas.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('.graph-noeud'))return;e.preventDefault();canvas.focus();gesture={target:canvas,pointer:e.pointerId,start:{x:e.clientX,y:e.clientY},left:canvas.scrollLeft,top:canvas.scrollTop};canvas.setPointerCapture(e.pointerId)});
     canvas.addEventListener('pointermove',e=>{if(!gesture||gesture.id||gesture.link)return;canvas.scrollLeft=gesture.left+gesture.start.x-e.clientX;canvas.scrollTop=gesture.top+gesture.start.y-e.clientY});canvas.addEventListener('pointerup',()=>finish());canvas.addEventListener('pointercancel',()=>finish(true));
     /** Keep the graph point under the cursor stable on Ctrl+wheel. The native
@@ -422,18 +470,28 @@
     for(const edge of svg.querySelectorAll('.graph-arete')){edge.setAttribute('role','button');edge.setAttribute('tabindex','0');edge.setAttribute('aria-label',t('Retirer ce lien')+' '+edge.dataset.from+' → '+edge.dataset.to);const remove=()=>{const target=work.tasks.find(t=>t.id===edge.dataset.to);editTask(work,target,(target.depends||[]).filter(id=>id!==edge.dataset.from))};edge.addEventListener('click',remove);edge.addEventListener('keydown',e=>{if(['Enter',' ','Delete','Backspace'].includes(e.key)){e.preventDefault();remove()}})}
     studio.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(gesture||connection){e.preventDefault();e.stopPropagation();finish(true);connection=null;status.textContent=''}else if(modal.open){e.preventDefault();modal.close()}});
     modal.addEventListener('close',()=>{if(disposed)return;finish(true);host.insertBefore(studio,modal);studio.classList.remove('is-fullscreen');document.body.classList.remove('graph-studio-open');full.textContent=t('Plein écran');full.setAttribute('aria-expanded','false');full.focus()});
-    const viewportObserver=new ResizeObserver(updateViewport);viewportObserver.observe(canvas);
-    studio.append(toolbar,help,status,neighborStatus,copyStatus,copyFallback,canvas);host.replaceChildren(studio,modal);
+    const viewportObserver=new ResizeObserver(()=>{if(disposed)return;host.graphRestoreView?.();updateViewport();persistView()});viewportObserver.observe(canvas);
+    for(const id of ['pilot-layout-reset','pilot-layout-undo','pilot-layout-redo','pilot-view-reset','pilot-neighbors','pilot-neighbors-clear','pilot-export','pilot-orientation']){const control=toolbar.querySelector('#'+id);if(control)toolsBody.append(control===neighborSelect?neighbors:control)}
+    const closeTools=document.createElement('button');closeTools.type='button';closeTools.id='pilot-tools-close';closeTools.textContent=t('Fermer les outils');toolsBody.append(closeTools);
+    /** Collapse secondary actions with summary focus, without closing the graph. */
+    function collapseTools(){tools.open=false;toolsToggle.focus()}
+    closeTools.addEventListener('click',collapseTools);tools.addEventListener('keydown',e=>{if(e.key==='Escape'&&tools.open){e.preventDefault();e.stopPropagation();collapseTools()}});tools.addEventListener('toggle',()=>persistView());
+    /** Reapply the responsive default only when crossing the existing layout
+     * breakpoint; retain focus if the focused secondary control becomes hidden.
+     */
+    function resizeTools(e){if(!e.matches&&tools.contains(document.activeElement))toolsToggle.focus();tools.open=e.matches;persistView()}
+    media.addEventListener('change',resizeTools);
+    studio.append(toolbar,tools,help,status,preferenceStatus,neighborStatus,copyStatus,copyFallback,canvas);host.replaceChildren(studio,modal);
     /** Capture completed same-Work presentation, including deferred modal/scroll.
      * In-progress card movement and canvas panning are excluded, as on cancel.
      * Memory only; callers must compare Work IDs before restoring this object.
      */
-    host.graphView=()=>({work:work.id,orientation,zoom,positions:committedPositions(),left:pendingScroll?.left??(gesture&&!gesture.id&&!gesture.link?gesture.left:canvas.scrollLeft),top:pendingScroll?.top??(gesture&&!gesture.id&&!gesture.link?gesture.top:canvas.scrollTop),studioLeft:pendingStudio?.left??studio.scrollLeft,studioTop:pendingStudio?.top??studio.scrollTop,fullscreen:modal.open||resumeFullscreen});
+    host.graphView=()=>({work:work.id,orientation,zoom,positions:committedPositions(),left:pendingScroll?.left??(gesture&&!gesture.id&&!gesture.link?gesture.left:canvas.scrollLeft),top:pendingScroll?.top??(gesture&&!gesture.id&&!gesture.link?gesture.top:canvas.scrollTop),studioLeft:pendingStudio?.left??studio.scrollLeft,studioTop:pendingStudio?.top??studio.scrollTop,fullscreen:modal.open||resumeFullscreen,toolsOpen:tools.open,preferenceError:preferenceStatus.textContent});
     /** Restore after rerender, or after an editor closes. Never open a graph
      * modal above a task editor; scroll is retained until its geometry is ready.
      */
-    host.graphRestoreView=()=>{if(disposed||resumeFullscreen&&document.querySelector('.native-graph-editor[open]'))return;if(resumeFullscreen){resumeFullscreen=false;if(!modal.open)full.click()}if(pendingScroll){canvas.scrollTo(pendingScroll.left,pendingScroll.top);pendingScroll=null}if(pendingStudio){studio.scrollTo(pendingStudio.left,pendingStudio.top);pendingStudio=null}updateViewport()};
-    host.graphCleanup=()=>{disposed=true;viewportObserver.disconnect();finish(true);if(exportUrl)URL.revokeObjectURL(exportUrl);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};update();host.graphRestoreView();
+    host.graphRestoreView=()=>{if(disposed||resumeFullscreen&&document.querySelector('.native-graph-editor[open]'))return;if(!resumeFullscreen&&(!canvas.clientWidth||!canvas.clientHeight))return;if(resumeFullscreen){resumeFullscreen=false;if(!modal.open)full.click()}if(pendingScroll){canvas.scrollTo(pendingScroll.left,pendingScroll.top);pendingScroll=null}if(pendingStudio){studio.scrollTo(pendingStudio.left,pendingStudio.top);pendingStudio=null}updateViewport()};
+    host.graphCleanup=()=>{finish(true);persistView();disposed=true;viewportObserver.disconnect();media.removeEventListener('change',resizeTools);if(exportUrl)URL.revokeObjectURL(exportUrl);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};update();host.graphRestoreView();lastViewAttempt=JSON.stringify(viewRecord());if(initial&&initial.orientation!==orientation)persistView(true);
   }
 
   /**
@@ -447,10 +505,11 @@
    */
   function render(work) {
     const host = container();
-    const previous=host.graphView?.(),initial=previous?.work===work.id?previous:null;
-    host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;
-    const orientation=initial&&host.dataset.orientation==='TB'?'TB':'LR';host.dataset.orientation=orientation;
     const { tasks, depPairs, unknown } = validateWork(work);
+    const previous=host.graphView?.(),initial=previous?.work===work.id?previous:null;
+    const recovered=initial?{view:null,error:''}:readStoredView(work.id);
+    host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;
+    const orientation=initial?(host.dataset.orientation==='TB'?'TB':'LR'):(recovered.view?.orientation||'LR');host.dataset.orientation=orientation;
     if (typeof graphNodeKey !== 'function' || typeof svgNode !== 'function' || typeof graphEdgePath !== 'function' || typeof graphTonalites !== 'object' || !globalThis.dagre || !globalThis.dagre.graphlib || !globalThis.dagre.layout) {
       throw new Error(t('Graphe : moteur dagre indisponible.'));
     }
@@ -549,7 +608,7 @@
         unknown.map(u => u.dep + ' → ' + u.taskId).join(', ');
       canvas.append(warning);
     }
-    navigation(host,canvas,svg,work,orientation,initial);
+    navigation(host,canvas,svg,work,orientation,initial||recovered.view,recovered.error);
   }
 
   /** Display at most 24 UTF-16 code units including the ellipsis to leave room

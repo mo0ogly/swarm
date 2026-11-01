@@ -541,3 +541,27 @@ Le contrôle d’objet manuel nouvellement public ne remplit aucun de ces contra
 BLP-04 reste partiel ; BLP-05/06, migration explicite de l’existant et RETEX
 transversal restent ouverts. Aucune initialisation Trust des données réelles,
 aucun appel fournisseur, aucune déclassification ni conformité globale revendiquée.
+
+## Reprise BLP-04 — contrôle des sources enregistrées, 1 novembre 2026
+
+Codex reprend après le producteur public. Le prompt natif v3 couvre ses octets,
+mais aucun consommateur ne combine les attributions de contrôle de ses parties.
+Deux voies : activer directement une politique sur les envois existants, ou
+construire d’abord un diagnostic authentifié sur le prompt effectivement enregistré.
+La seconde évite de prétendre protéger les fournisseurs avant leur médiation.
+Incrément décidé : `blp-preparation-check` API/CLI, lecture seule sous réservation
+Trust ; identité authentifiée, révision explicite, attribution courante de chaque
+partie exacte (framing inclus), combinaison et habilitation. Aucune étiquette
+fournie par la requête, aucun défaut public, aucune mutation, aucun appel fournisseur.
+Les anciens enregistrements sans provenance refusent ce contrôle. Les erreurs,
+la fermeture et la sortie conservent leurs causes. Tests négatifs et reprise,
+documentation FR/EN et installation locale requises. Ce diagnostic ne lie pas
+encore le principal de l’envoi et n’autorise ni dispatch ni destination.
+État : réalisation en cours ; BLP-04 demeure partiel. Propriétaire : Codex.
+
+Incident de recette : `20261101-preparation-check-engine-01` est FAIL intact,
+bootstrap avec deux identités alors que `prepare_identities` en exige trois.
+Cause : fixture dérivée incomplète, avant le contrôle BLP ; ajout de la troisième
+identité de test, sans changer le contrat produit. Un build Rust tiers sur les
+mêmes sources est observé ; les écritures Rust attendent sa fin pour préserver
+ses entrées de compilation. Python/documentation indépendants avancent.

@@ -68,7 +68,7 @@ impl RootStore {
         let readonly = matches!(
             operation,
             "show" | "export" | "anchor" | "config-preview" | "read-object" | "read-original" | "public-anchor"
-                | "blp-show" | "blp-policy-preview" | "blp-check"
+                | "blp-show" | "blp-policy-preview" | "blp-check" | "blp-preparation-check"
         );
         if !readonly && !self.writable {
             return Err(R::Refused("read-only-root"));
@@ -110,6 +110,10 @@ impl RootStore {
             } else { "local-operator".to_owned() };
             let mut planned = None;
             let bytes = match operation {
+                #[cfg(target_os="linux")]
+                "blp-preparation-check" => super::preparation_call::confidentiality_check(self, &st, raw, token)?,
+                #[cfg(not(target_os="linux"))]
+                "blp-preparation-check" => return Err(R::Refused("blp-preparation-platform-unsupported")),
                 "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check"
                 | "blp-object-attribute" => {
                     let (bytes, state)=trust::confidentiality::execute(&mut st,operation,raw,token,now).map_err(failure)?;

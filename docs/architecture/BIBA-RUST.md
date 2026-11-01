@@ -348,3 +348,43 @@ Le formulaire Admin configure la politique ; il n'offre pas encore de formulaire
 d'attribution d'objet. Aucun classement implicite des sources de préparation ou
 contrôle transversal n'est introduit. Les erreurs de publication/conclusion
 conservent leur état connu ; après résultat incertain, relire avant reprise.
+
+### Diagnostic des sources de préparation
+
+`swarm-rust trust blp-preparation-check --root RACINE --input CONTROLE.json --json`
+utilise `SWARM_TRUST_TOKEN`. L’API équivalente est
+`POST /api/v1/trust-actions?action=blp-preparation-check` : protections session,
+Host, Origin et CSRF habituelles, puis authentification Trust indépendante.
+Le corps strict contient `schema_version:1`, `expected_revision` (révision BLP),
+`preparation_id` et `turn_id`. Aucune classification, identité ou destination
+n’est acceptée dans ce corps. Le contrôle est en lecture seule, sur racine
+physiquement liée ; le journal Trust reste réservé durant l’observation SQL.
+
+Le consommateur relit le prompt privé natif et vérifie sa provenance complète.
+Chaque tranche transmise doit avoir une attribution de contrôle courante, pour
+son SHA-256 exact et le chemin absolu exact de ce projet. Cela inclut instructions,
+contexte projet, contrat éventuel, neuf valeurs JSON et tout le cadrage JSON.
+Le producteur d’attribution reste `blp-object-attribute` sous Admin I3 ; aucune
+étiquette n’est déduite du nom de source ou de l’habilitation. Les valeurs
+structurées sont attribuées ensemble à ce stade (pas encore leurs fichiers ou
+éléments individuels). Une attribution de document brut ne couvre pas sa
+représentation JSON échappée. Les opérateurs doivent établir leurs digests sur
+les tranches réellement enregistrées ; aucun écran d’inventaire n’est livré.
+
+Un succès retourne uniquement acteur authentifié, révision BLP, digest du prompt,
+nombre de parties et classification combinée (niveau maximal, union des
+compartiments), avec `diagnostic_only:true` et `runtime_authorized:false`.
+L’habilitation doit dominer cette combinaison. Aucun texte du prompt n’est rendu.
+Identité inconnue/désactivée refuse l’autorisation avant lecture de la ligne ;
+politique absente/périmée, provenance historique absente, mauvais parent/racine,
+source non attribuée ou habilitation insuffisante refusent explicitement.
+Un prompt altéré refuse `preparation-prompt-provenance-invalid`. Les erreurs de
+stockage, SQL, rollback et fermeture conservent leurs causes ; aucun résultat
+vide ne remplace un refus. La réservation ne donne aucune autorité ultérieure.
+
+Reprise : corriger l’intention/révision ou produire explicitement les attributions
+manquantes sous la politique courante, puis relancer une nouvelle observation.
+Ne pas modifier une ligne historique pour fabriquer la provenance. Un changement
+de politique impose de nouvelles attributions à la révision courante. Ce
+diagnostic ne protège pas l’envoi, ne lie pas son principal ou destinataire et
+ne change pas `runtime_enforced:false` ; médiation et héritage restent à réaliser.

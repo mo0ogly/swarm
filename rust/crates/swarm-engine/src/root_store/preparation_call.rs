@@ -255,6 +255,56 @@ fn record(db: &Connection, id: &str) -> Result<(PreparationTurn, Option<Native>)
     })();
     finished(result, s.finalize().map_err(E::Sql))
 }
+
+/// Read-only BLP diagnostic for one recorded native prompt. Caller holds the
+/// Trust reservation over this validated state. Authenticate before row lookup;
+/// bind parent, physical Root, current policy revision and every source digest.
+/// Missing provenance/attribution or insufficient clearance refuses without
+/// prompt bytes. This observation grants no dispatch, destination or future
+/// authority. Material/SQL/rollback/encoding failures retain their causes.
+pub(super) fn confidentiality_check(root: &RootStore, state: &crate::trust::state::State,
+    raw: &[u8], source: crate::trust::authentication::Source<'_>) -> Result<Vec<u8>, E>
+{
+    use crate::trust::{authentication, TrustError};
+    let failure = |e| E::Trust(Box::new(e));
+    state.require_supported().map_err(failure)?;
+    let actor = authentication::authenticated(state, source).map_err(failure)?;
+    #[derive(Deserialize)]
+    #[serde(deny_unknown_fields)]
+    struct Check { schema_version: u32, expected_revision: u64, preparation_id: String, turn_id: String }
+    let request: Check = swarm_wire_json::decode(raw).map_err(|e| failure(TrustError::from(e)))?;
+    if request.schema_version != 1 || !crate::valid_preparation_key(&request.preparation_id)
+        || !crate::valid_preparation_key(&request.turn_id)
+    { return Err(E::Refused("blp-preparation-check-invalid")); }
+    let entry = state.confidentiality.as_ref().ok_or(E::Refused("blp-policy-required"))?
+        .current().map_err(failure)?;
+    if entry.revision() != request.expected_revision || entry.trust_revision() != state.revision {
+        return Err(E::Refused("blp-policy-stale"));
+    }
+    // Unknown readers must not learn row existence or source-attribution status.
+    if !entry.policy().clearances.contains_key(&actor.subject) {
+        return Err(E::Refused("blp-access-denied"));
+    }
+    super::material_path::with_material_read(root, || {
+        let mut tx = root.db.unchecked_transaction().map_err(E::Sql)?;
+        tx.set_drop_behavior(rusqlite::DropBehavior::Ignore);
+        let result = (|| {
+            let (turn, native) = record(&tx, &request.turn_id)?;
+            if turn.preparation_id != request.preparation_id { return Err(E::Refused("blp-preparation-parent-mismatch")); }
+            let native = native.ok_or(E::Refused("blp-preparation-provenance-required"))?;
+            if native.root != root.instance()? { return Err(E::Refused("preparation-root-instance-changed")); }
+            let manifest = native.prompt_provenance.as_ref().ok_or(E::Refused("blp-preparation-provenance-required"))?;
+            let sources = manifest.classifications(&turn.prompt, entry, root.root.as_os_str().as_encoded_bytes())?;
+            let domain = swarm_confidentiality::ExecutionDomain::prepare(entry.policy(), entry.revision(), &actor.subject, &sources)
+                .map_err(|e| E::Refused(e.code()))?;
+            crate::trust::encoded(&serde_json::json!({"schema_version":1,"diagnostic_only":true,
+                "runtime_authorized":false,"actor":actor.subject,"policy_revision":entry.revision().to_string(),
+                "prompt_sha256":hash(turn.prompt.as_bytes()),"source_count":sources.len(),
+                "output_classification":domain.output_classification()})).map_err(failure)
+        })();
+        finished(result, tx.rollback().map_err(E::Sql))
+    })
+}
 /// Require the native envelope before worker or dispatch operations.
 /// Historical rows never acquire process custody through a successful read.
 /// Underlying read errors remain unchanged; missing metadata refuses explicitly.
@@ -1179,7 +1229,7 @@ mod level_tests {
     }
     /// Produce a v3 private row using the same assembly/codec as send. The SQL
     /// fixture is in memory, never a live mission, provider or identity proof.
-    fn provenance_row() -> (PreparationTurn, Native) {
+    pub(super) fn provenance_row() -> (PreparationTurn, Native) {
         let data=serde_json::json!({"documents":null,"sources":[],"adopted_brief":null,
             "method":"apex","method_sources":[],"history":[],"history_mode":"full",
             "earlier_exchanges_not_sent":0,"user_message":"fixture-user-message"});
@@ -1215,3 +1265,7 @@ mod level_tests {
 
 #[path = "preparation_call_legacy.rs"]
 mod legacy;
+
+#[cfg(test)]
+#[path = "preparation_confidentiality_tests.rs"]
+mod confidentiality_tests;

@@ -393,3 +393,25 @@ then authenticated principal/domain binding and result inheritance. Newly public
 manual object control supplies none of these contracts. BLP-04 stays partial;
 BLP-05/06, explicit existing-object migration and transversal RETEX remain open.
 No live Trust bootstrap, provider call, declassification or global conformance.
+
+## BLP-04 resumption — recorded-source check, 1 November 2026
+
+Codex resumes after the public producer. Native v3 covers prompt bytes, but no
+consumer joins control attributions of its parts. Two routes: enforce a policy
+on existing sends immediately, or first build an authenticated diagnostic on
+the actual recorded prompt. The second avoids claiming provider mediation.
+Decided increment: readonly `blp-preparation-check` via API/CLI under the Trust
+reservation; authenticated identity, explicit revision, current attribution for
+every exact part (including framing), join and clearance check. No request
+labels, public default, mutation or provider call. Historical records without
+provenance refuse. Errors, close and output retain causes. Refusal/recovery
+tests, FR/EN documentation and local installation are required. This diagnostic
+does not bind the send principal or authorize dispatch/destination.
+Status: implementation underway; BLP-04 remains partial. Owner: Codex.
+
+Recipe incident: `20261101-preparation-check-engine-01` remains intact FAIL:
+bootstrap supplied two identities while `prepare_identities` requires three.
+Cause: incomplete derived fixture before the BLP check; add the third fixture
+identity without changing product rules. Another Rust build consumes the same
+sources, so Rust edits wait for completion to preserve its compiler inputs;
+independent Python/documentation work continues.

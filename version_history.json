@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Confidentialité : diagnostic authentifié des sources du prompt de préparation enregistré, via API et CLI. Chaque partie exige une attribution courante ; source inconnue, révision périmée ou habilitation insuffisante refusent. Ce diagnostic ne donne aucun droit d’envoi au fournisseur.",
+        "en": "Confidentiality: authenticated source diagnostic for the recorded preparation prompt via API and CLI. Every slice requires a current attribution; unknown sources, stale revisions or insufficient clearance refuse. This diagnostic grants no provider-send authority."
+      },
+      {
         "fr": "Confidentialité : attribution explicite d’un objet par API et CLI, sous identité Admin I3 et révisions courantes. Les refus, le rejeu et la monotonie utilisent le même producteur moteur ; aucune classification automatique des sources de préparation.",
         "en": "Confidentiality: explicit object attribution through API and CLI under a current I3 Admin identity and revisions. Refusal, replay and monotonicity share the existing engine producer; no automatic preparation-source classification."
       },

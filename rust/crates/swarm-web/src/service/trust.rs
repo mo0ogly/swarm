@@ -43,7 +43,7 @@ impl NativeHttpService {
                 | "read-object"
                 | "read-original"
                 | "audit-transaction"
-                | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" | "blp-object-attribute"
+                | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" | "blp-object-attribute" | "blp-preparation-check"
                 | "public-anchor" | "public-verify" | "evidence-key-prepare" | "evidence-key-activate" | "evidence-key-revoke"
         ) {
             return Err(HttpServiceError::Refused("trust-action-unknown"));
@@ -75,7 +75,7 @@ impl NativeHttpService {
         let readonly = matches!(
             op,
             "show" | "export" | "anchor" | "config-preview" | "read-object" | "read-original" | "public-anchor"
-                | "blp-show" | "blp-policy-preview" | "blp-check"
+                | "blp-show" | "blp-policy-preview" | "blp-check" | "blp-preparation-check"
         );
         let store = RootStore::open(&self.root, !readonly).map_err(|e| root("trust-open", e))?;
         let mut publication = None;

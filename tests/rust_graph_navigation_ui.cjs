@@ -25,6 +25,7 @@ function check(name,value){assert(value,name);checks.push(name);console.log('PAS
   check(label+'-translated-create',await page.$eval('#pilot-add-task',e=>e.textContent)===(lang==='en'?'Add task':'Ajouter une tâche'));
   check(label+'-translated-zoom',await page.$eval('#pilot-zoom-in',e=>e.textContent)===(lang==='en'?'Zoom in':'Agrandir le zoom'));
   check(label+'-minimap-reflects-nodes',await page.$$eval('.graph-minimap-node',nodes=>nodes.length)===expectedTasks);
+  check(label+'-zoom100-control',!!await page.$('#pilot-zoom-100'));
   if(!cfg.skip_search_check){
    check(label+'-search-control',!!await page.$('#pilot-search'));
    const geometry=await page.$$eval('.graph-unit',nodes=>nodes.map(n=>[n.dataset.task,n.getAttribute('transform')]));

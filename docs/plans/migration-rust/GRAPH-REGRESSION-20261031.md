@@ -561,3 +561,46 @@ avant toute optimisation. Propriétaire : outillage/maintenance ; état à étud
 reprise sur chantier explicite de performance des builds avec témoin mesuré,
 identité/version/forgery guards préservés. Aucun réglage Git, priorité machine,
 politique de build ou contexte d’agent n’a été modifié pour fabriquer un PASS.
+
+## Propositions QG13–QG17 — après Rust294
+
+Demande : « tu as encore des quickwin ? ». Inspection du renderer et du contrat
+Graph Studio actuels ; propositions uniquement, pas de nouveau lot exécuté.
+Propriétaire proposé : Codex/UX graphe. Aucune modification produit, fonction,
+API ou politique ; pas de rebuild/version nouvelle pour ce seul suivi.
+
+| ID | Origine observée et bénéfice attendu | Critère observable proposé | État / condition de reprise |
+|---|---|---|---|
+| QG13 | Toolbar contient toutes les actions, avec plusieurs rangées sur largeur390 ; dégager davantage de surface de graphe | outils secondaires dans un contrôle nommé dépliable ; zoom/recherche/plein écran restent accessibles ; clavier, focus, FR/EN et mobile sans perte de commande | proposé ; prochain lot d’ergonomie, priorité1 |
+| QG14 | Zoom affiche un pourcentage et deux boutons, sans retour direct à100% ; faciliter le retour à une échelle lisible | commande100% conserve le centre de la vue sous clamp ; boutons +/− désactivés aux bornes existantes, aucune borne modifiée | proposé ; même lot, priorité2 |
+| QG15 | centerMatch avance uniquement et Entrée/Maj+Entrée suivent actuellement la même branche | Précédent et Maj+Entrée parcourent les correspondances à rebours avec boucle/focus/centrage ; recherche et placement conservés | proposé ; prochain lot de recherche |
+| QG16 | undo consomme previousPositions puis le remet ànull, sans rétablissement | rétablir une fois le placement annulé, consommé/invalide après nouveau placement ; aucune donnée métier ni révision changée | proposé ; prochain lot de placement, distinct de l’historique métier G4 |
+| QG17 | save persiste zoom/positions ; vue/orientation/scroll restent en mémoire de rendu et disparaissent au rechargement | restaurer orientation et zone du même travail après reload ; état invalide/refus storage explicites, autre travail indépendant, remise à zéro accessible ; plein écran reste une action explicite | proposé ; prochain lot de préférences locales |
+
+Priorité proposée : QG13 puis QG14. Les constats source ne prouvent pas encore
+le gain utilisateur ; chaque adoption nécessitera son témoin et sa recette.
+
+## Lot QG13–QG17 adopté — « tu peux les mettre en place »
+
+Codex seul, risque C présentation ; mêmes API/droits/données. QG13 outils
+secondaires repliables (défaut mobile), commandes essentielles visibles et focus
+restauré ; QG14 retour100% autour du centre et bornes existantes reflétées par les
+boutons ; QG15 recherche précédente/Maj+Entrée ; QG16 rétablissement d’un seul
+placement annulé, invalidé au prochain déplacement terminé ; QG17 orientation,
+scroll canevas/studio et état des outils locaux par Work après rechargement,
+sans plein écran automatique. Navigation réinitialisable, zoom/positions gardent
+leurs commandes dédiées. Sources/propriétaires parallèles préservés.
+
+Choix : details natif et mêmes contrôles plutôt qu’un second toolbar mobile ;
+un seul undo/redo en mémoire plutôt qu’un historique métier. Préférence locale
+versionnée distincte des coordonnées existantes : validation stricte, clamp
+natif, diagnostic sûr sur JSON invalide ou stockage refusé. Les snapshots de
+placement restent terminés ; un geste annulé ne détruit pas redo. Aucune politique
+moteur, limite d’exécution, dépendance distante ou délégation ajoutée.
+
+Preuves dans `.cache/graph-qg13-17-20261101/` : contre-exemple avant modification,
+checks ciblés puis recette consolidée sur image immuable, documentation/commentaires
+et traductions FR/EN, revue politiques/fonctions/erreurs liée aux octets, activation
+via lanceur, assets protégés/Version et RETEX. Aucune autorisation de commit/push
+implicite dans cette demande. Temps de build et contentions observés, sans arrêter
+les autres processus. Ne pas réutiliser une ancienne demande de pause Git.

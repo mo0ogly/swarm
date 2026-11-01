@@ -337,3 +337,40 @@ physical lineage nor declassification authority. Admin configures policy but has
 no object-attribution form yet. This adds no implicit preparation-source labels
 or transversal control. Publication/close failures retain known outcome; reread
 before retrying an uncertain result.
+
+### Preparation-source diagnostic
+
+`swarm-rust trust blp-preparation-check --root ROOT --input CHECK.json --json`
+uses `SWARM_TRUST_TOKEN`. Equivalent API:
+`POST /api/v1/trust-actions?action=blp-preparation-check`, behind the usual
+session, Host, Origin and CSRF protections plus separate Trust authentication.
+The strict body contains `schema_version:1`, `expected_revision` (BLP revision),
+`preparation_id` and `turn_id`. It accepts no classification, identity or
+destination. The readonly diagnostic binds the physical Root and keeps the
+Trust reservation across the SQL observation.
+
+The consumer rereads the private native prompt and verifies complete provenance.
+Every transmitted slice needs a current control attribution for its exact SHA-256
+and this project's exact absolute path: instructions, project context, optional
+contract, nine JSON values and all JSON framing. `blp-object-attribute` remains
+the I3 Admin attribution producer; source names and clearance never invent labels.
+Structured values are attributed together at this stage, without their individual
+files/elements. A raw document attribution does not cover its JSON-escaped
+representation. Operators must establish digests from the actual recorded slices;
+this increment provides no inventory screen.
+
+Success returns only authenticated actor, BLP revision, prompt digest, part count
+and joined classification (maximum level, union of compartments), with
+`diagnostic_only:true` and `runtime_authorized:false`. Clearance must dominate the
+join. No prompt text is returned. Unknown/disabled identity refuses authorization
+before row lookup. Missing/stale policy, missing historical provenance, wrong
+parent/Root, unattributed source or insufficient clearance explicitly refuses.
+An altered prompt refuses `preparation-prompt-provenance-invalid`. Storage, SQL,
+rollback and close failures retain causes; no refusal becomes empty success.
+The reservation grants no future authority.
+
+Recovery: correct the request/revision or explicitly attribute missing slices
+under the current policy, then repeat the observation. Never rewrite historical
+rows to manufacture provenance. Policy renewal requires current attributions.
+This diagnostic does not protect sending or bind its principal/destination and
+leaves `runtime_enforced:false`; mediation and output inheritance remain open.
