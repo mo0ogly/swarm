@@ -351,22 +351,28 @@ candidat dev.267 ci-dessus. Tableau de bord de réalisation (instantané 1er
 novembre 2026, T01–T22 et pourcentages sourcés) :
 [DASHBOARD-T20261101.md](paea/DASHBOARD-T20261101.md).
 
-### État courant — 1er novembre 2026
+### État courant — 1er novembre 2026 (soir)
 
 Candidat unique livré localement : `bin/swarm` SHA-256
-`f5a154da4555962647106954274d09ce9160464383d849ba33782c700d033df9`
-(v0.1.1-dev.298, commit d4e219eeafcae5f90307a105ddaa93ba9874dc4f « feat(blp):
-typed HTTP status translation for preparation refusals », `modified=true` —
-arbre sale au build ; construit 2026-11-01T13:36:05Z). Les deux recettes
-delivered sont re-pinnées et re-jouées sur ce livré : settlement 6/6 VERIFIED
-(`.swarm-fixtures/i17-rerun/i17-run-5/`, témoins `delivered-binary-witness` à
-chaque spawn) et chaîne 4/4 VERIFIED (`.swarm-fixtures/i17-rerun/chain-run-2/`,
-y compris le refus de SHA erroné), `source_stable: true` partout. L'étape I17
-(révocation du courant sur le chemin settlement-call → refus sans effet puis
-récupération) reste localement prouvée sur le candidat courant. L'état
-précédent (dev.292/4164953c…, run-4) est conservé dans l'historique du
-tableau de bord. Acceptation indépendante : 0/17, inchangée ; les sept
-critères ouverts E2 restent opérants.
+`c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b`
+(4e remplacement du jour, 2026-11-01T19:44:34Z — la session parallèle livre
+plusieurs lots à la suite ; dev.308/e54a1dd5… commit 0eff289d1f puis dev.298/
+f5a154da… commit d4e219eea restent dans l'historique du tableau de bord).
+Les deux recettes delivered sont re-pinnées et re-jouées sur ce livré :
+settlement 6/6 VERIFIED (`.swarm-fixtures/i17-rerun/i17-run-8/`,
+`source_stable: true`, témoins `delivered-binary-witness` = livré courant à
+chaque spawn) et chaîne 4/4 VERIFIED (`.swarm-fixtures/i17-rerun/chain-run-3/`,
+y compris le refus de SHA erroné), après deux échecs de reprise documentés :
+run-6 (E0433 édition concurrente pendant compilation, `source_stable: false`)
+et run-7 (témoin interne a refusé la divergence épingle/réel provoquée par le
+remplacement binaire de 19:44:34Z, `source_stable: true`) — preuves conservées,
+aucune régression produit. L'étape I17 (révocation du courant sur le chemin
+settlement-call → refus sans effet puis récupération) reste localement prouvée
+sur le candidat courant. Acceptation indépendante : 0/17, inchangée ; les sept
+critères ouverts E2 restent opérants. Le bloc « État courant — 1er novembre
+2026 » ci-dessous est conservé comme historique de l'après-midi.
+
+### État courant — 1er novembre 2026 (après-midi, historique)
 
 ### Point du 25 octobre 2026
 

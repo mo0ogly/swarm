@@ -26,7 +26,7 @@
     "CARGO_INCREMENTAL": "0",
     "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/chain-fixture-regen-20261031b",
     "SWARM_PAEA_DELIVERED_BIN": "{root}/bin/swarm",
-    "SWARM_PAEA_DELIVERED_BIN_SHA256": "f5a154da4555962647106954274d09ce9160464383d849ba33782c700d033df9"
+    "SWARM_PAEA_DELIVERED_BIN_SHA256": "c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b"
   },
   "steps": [
     {
@@ -54,7 +54,7 @@
         "delivered_chain_transfer_promote_replay_reconcile_once ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=f5a154da4555962647106954274d09ce9160464383d849ba33782c700d033df9"
+        "sha256=c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b"
       ],
       "required_stderr": []
     },
@@ -111,7 +111,7 @@
         "paea-git-promote-trust-revision",
         "paea-settlement-trust-revision",
         "delivered-binary-witness path=",
-        "sha256=f5a154da4555962647106954274d09ce9160464383d849ba33782c700d033df9"
+        "sha256=c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b"
       ],
       "required_stderr": []
     },

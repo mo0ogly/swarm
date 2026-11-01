@@ -43,7 +43,7 @@ campagnes T01…T22 exécutées.
 | T14 | I02/I14 | conception manquante | — | Design A2A puis code |
 | T15 | I15 | PASS | même preuve que T11 (admission + substitution refusée) | Inventaire ACS (entrées externes) |
 | T16 | I12/I16 | PASS | `paea-i16-lease-reopen-rust.json` (30-10, bloc 9) + contrat 8 cas (glm-order-receipt-20261030T075024Z) | Limites distribuées séparées |
-| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-5` (ELF dev.298 f5a154da…, 01-11, 6/6 VERIFIED — révocation settlement-call refusée puis récupération ; run-4/dev.292 conservé) | Propagation production |
+| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-8` (ELF c12004bf…, 01-11 soir, 6/6 VERIFIED — révocation settlement-call refusée puis récupération ; run-5/dev.298 et run-4/dev.292 conservés) | Propagation production |
 | T18 | I03/I14 | non exercée | — | Périmètre E3 uniquement |
 | T19 | I06/I13 | non exercée | — | Périmètre E3 + confinement I06/I13 |
 | T20 | I04/I15 | non exercée | — | Périmètre E3 uniquement |
@@ -88,6 +88,21 @@ campagnes T01…T22 exécutées.
   `source_stable: true`. Deux refus préalables du runner (invocation incomplète,
   sortie non neuve) corrigés sans perte de preuve. T17 reste PASS ; portée
   inchangée, preuve étendue au livré courant.
+- Extension 01-11 soir : candidat dev.298/f5a154da… → dev.308/e54a1dd5…
+  (commit 0eff289d1f « phase B admin, audit, API keys », binaire 19:09Z) →
+  c12004bf… (4e remplacement du jour, 19:44:34Z, en pleine étape 3 du run-7).
+  run-6 FAIL (E0433 `AtomicStorageFault` — édition concurrente de
+  `preparation_admission.rs` à 19:19:43Z pendant la compilation,
+  `source_stable: false`) ; run-7 FAIL à l'étape 3 (le contrôle témoin du test
+  a refusé la divergence épingle/réel `e54a1dd5`/`c12004bf`,
+  `source_stable: true`) ; `.swarm-fixtures/i17-rerun/i17-run-{6,7}/` conservés.
+  Aucune régression produit : à chaque fois le livré a changé sous le run.
+- Reprise vérifiée (01-11 soir, porte de stabilité binaire 10 min) : les deux
+  recettes re-pinnées c12004bf… et re-jouées — settlement 6/6 VERIFIED
+  (`i17-run-8/`, `source_stable: true`, témoins = livré courant) et chaîne 4/4
+  VERIFIED (`chain-run-3/`, refus de SHA erroné compris). T17 reste PASS,
+  preuve étendue au livré courant ; run-6/run-7 restent conservés comme preuves
+  des deux incidents de reprise.
 
 ## Portée et limites
 
@@ -110,6 +125,14 @@ un pourcentage d'avancement » (invariant-matrix.json, global_limits).
   sur ELF dev.298/f5a154da… (01-11-2026, 15:03Z), `source_stable: true`
 - `.swarm-fixtures/i17-rerun/chain-run-2/` — recette `paea-delivered-chain-cli-rust`
   re-pinnée, 4/4 VERIFIED sur ELF dev.298/f5a154da… (01-11-2026, 15:06Z)
+- `.swarm-fixtures/i17-rerun/i17-run-6/` — FAIL (E0433 édition concurrente
+  pendant compilation, `source_stable: false`, 01-11-2026 19:17Z)
+- `.swarm-fixtures/i17-rerun/i17-run-7/` — FAIL étape 3 (témoin interne a
+  attrapé le remplacement binaire 19:44:34Z, `source_stable: true`)
+- `.swarm-fixtures/i17-rerun/i17-run-8/` — 6/6 VERIFIED sur ELF c12004bf…
+  (01-11-2026 19:56Z, `source_stable: true`, témoins livré courant)
+- `.swarm-fixtures/i17-rerun/chain-run-3/` — 4/4 VERIFIED sur ELF c12004bf…
+  (01-11-2026 19:57Z, refus de SHA erroné compris)
 - `paea/DASHBOARD-T20261031.md` — instantané précédent (31 octobre 2026)
 - `paea/PILOTE-OPERATIONNEL.md` — recettes initiales T04, T06/T21, T05/T17
 - `paea/E3-PROTOCOL.md` — périmètre des campagnes formelles
