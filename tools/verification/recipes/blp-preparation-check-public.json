@@ -20,7 +20,7 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "BLP_PREPARATION_PUBLIC_PASS 20",
+        "BLP_PREPARATION_PUBLIC_PASS 26",
         "PASS source-derived-join",
         "PASS http-join",
         "PASS http-refusal-session",

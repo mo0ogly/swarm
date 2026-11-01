@@ -1,0 +1,7 @@
+{
+  "status": "CORRECTED_BEFORE_CLOSURE",
+  "scope": "EN plan dependency table, fourth column is parent PAEA mapping, not technical status",
+  "observed_temporary_row": "| BLP-04 | Producer attribution, context/memory/outputs and replays | 03 | PARTIAL — private v3 provenance, public object control and authenticated recorded-source diagnostic; producer identity, original send principal and output inheritance remain open |",
+  "restored_row": "| BLP-04 | Protected attribution, context/memory/output propagation and replays | BLP-03 | PARTIAL — private v3 prompt provenance and API/CLI object control; source classification, principal and inheritance open |",
+  "verification": "original parent mapping retained; current technical status moved to dedicated paragraph; FR/EN final links/counts reviewed"
+}

@@ -374,3 +374,24 @@ under the current policy, then repeat the observation. Never rewrite historical
 rows to manufacture provenance. Policy renewal requires current attributions.
 This diagnostic does not protect sending or bind its principal/destination and
 leaves `runtime_enforced:false`; mediation and output inheritance remain open.
+
+```mermaid
+flowchart LR
+  I[API / CLI] --> T[Shared Trust reservation]
+  T --> A[Current identity and policy]
+  A --> N[Native turn bound to physical Root]
+  N --> V[Verified provenance over all bytes]
+  V --> C[Current attributions of exact slices]
+  C --> J[Join and clearance]
+  J --> D[Diagnostic without dispatch authority]
+```
+
+Any refusal stops this flow; no edge reaches a provider. The reservation protects
+this observation rather than a later use.
+
+HTTP distinguishes 400 (invalid intent), 403 (identity/clearance), 404 (missing turn)
+and 409 (missing/stale policy, unattributed source, absent historical provenance
+or wrong parent). An ungranted principal refuses before turn lookup. Incoherent
+provenance, incompatible private Root and storage/rollback/close failures remain
+server errors; client status never masks their cause. The operation explicitly
+refuses outside Linux (501), without runtime evidence on those platforms.

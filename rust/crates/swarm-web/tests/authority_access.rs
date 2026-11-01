@@ -50,10 +50,18 @@ fn authority_mode_requires_fresh_single_use_bound_assertion() {
     // Witness: signed GET opens the protected route.
     let ok = send("GET", "/api/v1/native-version", b"", Some(sign(&daemon, &claims("GET", "/api/v1/native-version", b"", t, "nonce-0000000000001")).unwrap()), false);
     assert_eq!(ok.response.status(), StatusCode::OK);
-    // The owner cookie no longer opens anything.
-    let owner = send("GET", "/api/v1/native-version", b"", None, true);
+    // The owner cookie only keeps the launcher's two read-only probes.
+    for probe in ["/api/v1/native-version", "/api/v1/native-capabilities"] {
+        assert_eq!(send("GET", probe, b"", None, true).response.status(), StatusCode::OK, "{probe}");
+        assert_eq!(send("GET", probe, b"", None, false).response.status(), StatusCode::FORBIDDEN, "{probe} without key");
+    }
+    let owner = send("GET", "/api/v1/works", b"", None, true);
     assert_eq!(owner.response.status(), StatusCode::FORBIDDEN);
     assert_eq!(owner.failure.as_ref().unwrap().code(), "web-assertion-required");
+    let probe_query = send("GET", "/api/v1/native-version?x=1", b"", None, true);
+    assert_eq!(probe_query.failure.as_ref().unwrap().code(), "web-assertion-required");
+    let owner_post = send("POST", "/api/v1/logout", b"", None, true);
+    assert_eq!(owner_post.failure.as_ref().unwrap().code(), "web-assertion-required");
     // Replay of the same header refuses.
     let h = sign(&daemon, &claims("GET", "/api/v1/native-version", b"", t, "nonce-0000000000002")).unwrap();
     assert_eq!(send("GET", "/api/v1/native-version", b"", Some(h.clone()), false).response.status(), StatusCode::OK);

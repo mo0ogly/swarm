@@ -357,6 +357,14 @@ impl HttpServiceError {
                 StatusCode::NOT_IMPLEMENTED
             }
             Self::Root { operation, cause } => match cause.code() {
+                // Only these typed Trust diagnostic refusals are caller states.
+                // Corrupt provenance, storage and wrapped cleanup stay server errors.
+                "blp-access-denied" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
+                "blp-policy-required"|"blp-policy-stale"|"blp-classification-required"|"blp-preparation-provenance-required"|"blp-preparation-parent-mismatch"
+                    if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+                "blp-preparation-check-invalid" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
+                "preparation-turn-not-found" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
+                "blp-preparation-platform-unsupported" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_IMPLEMENTED,
                 "project-profile-conflict" if matches!(*operation,"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
                 "project-profile-choice-unknown" if *operation=="project-profile-write" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
                 _ if project_profile::caller_invalid(operation,cause.as_ref()) && !matches!(cause.as_ref(),RootStoreError::Context(e) if e.reason()=="versioned-memory-source-guard-not-ported")=>StatusCode::BAD_REQUEST,
@@ -649,6 +657,15 @@ pub struct NativeHttpService {
     access: AccessGate,
     probe_shutdown: std::sync::atomic::AtomicBool,
 }
+/// Read-only identity/readiness probes of the local launcher (`swarm.sh
+/// status|restart`): GET/HEAD of the compiled version and native capabilities
+/// only. In `authority` mode these alone still accept the owner key; they
+/// expose no project data and change nothing.
+fn launcher_probe<B>(request: &Request<B>) -> bool {
+    matches!(*request.method(), Method::GET | Method::HEAD)
+        && matches!(request.uri().path(), "/api/v1/native-version" | "/api/v1/native-capabilities")
+        && request.uri().query().is_none()
+}
 /// Who may pass protected routes, fixed at server start from v52 settings.
 /// `Authority` keeps the replay memory for its freshness window.
 enum AccessGate {
@@ -890,12 +907,18 @@ impl NativeHttpService {
     /// Authorize a protected request whose body is already read. Owner-key
     /// mode: the existing cookie/Origin/CSRF head checks. Authority mode:
     /// exact Host, then the daemon assertion bound to method, path+query and
-    /// body, fresh and single-use; the owner cookie is not accepted.
+    /// body, fresh and single-use; the owner cookie is accepted only for the
+    /// launcher's read-only probes ([`launcher_probe`]).
     fn authorize_request(&self, request: &Request<Vec<u8>>) -> Result<WebPrincipal, WebAccessError> {
         match &self.access {
             AccessGate::OwnerKey => self.authority.authorize(request),
             AccessGate::Authority { key, max_age_seconds, nonces } => {
                 self.authority.authorize_host(request)?;
+                if launcher_probe(request) && request.headers().get(swarm_authority::assertion::HEADER).is_none() {
+                    // Local launcher identity/readiness probes keep the owner
+                    // key (unreadable by confined agents); nothing else does.
+                    return self.authority.authorize(request);
+                }
                 let header = request
                     .headers()
                     .get(swarm_authority::assertion::HEADER)
@@ -958,6 +981,9 @@ impl NativeHttpService {
             // Body not read yet: Host and assertion presence only; the full
             // signature/binding check runs in authorize_request.
             self.authority.authorize_host(request)?;
+            if launcher_probe(request) && request.headers().get(swarm_authority::assertion::HEADER).is_none() {
+                return self.authority.authorize(request).map(drop);
+            }
             request
                 .headers()
                 .get(swarm_authority::assertion::HEADER)
@@ -1532,6 +1558,34 @@ fn response(
 #[cfg(test)]
 mod tests {
     use super::*;
+    /// Diagnostic business refusals are exact typed client states; corrupt
+    /// native provenance and late cleanup remain server failures. A matching
+    /// code from another operation never inherits this diagnostic's mapping.
+    #[test]
+    fn blp_preparation_status_preserves_refusal_and_internal_failures() {
+        for (code,status) in [
+            ("blp-access-denied",StatusCode::FORBIDDEN),
+            ("blp-policy-required",StatusCode::CONFLICT),
+            ("blp-policy-stale",StatusCode::CONFLICT),
+            ("blp-classification-required",StatusCode::CONFLICT),
+            ("blp-preparation-provenance-required",StatusCode::CONFLICT),
+            ("blp-preparation-parent-mismatch",StatusCode::CONFLICT),
+            ("blp-preparation-check-invalid",StatusCode::BAD_REQUEST),
+            ("preparation-turn-not-found",StatusCode::NOT_FOUND),
+            ("blp-preparation-platform-unsupported",StatusCode::NOT_IMPLEMENTED),
+            ("preparation-prompt-provenance-invalid",StatusCode::INTERNAL_SERVER_ERROR),
+            ("preparation-root-instance-changed",StatusCode::INTERNAL_SERVER_ERROR),
+        ] {
+            let error=root("trust-command",RootStoreError::Refused(code));
+            assert_eq!(error.status(),status,"{code}");assert_eq!(error.code(),code);
+        }
+        assert_eq!(root("other-operation",RootStoreError::Refused("blp-access-denied")).status(),StatusCode::INTERNAL_SERVER_ERROR);
+        let error=root("trust-command",RootStoreError::Cleanup {
+            primary:Some(Box::new(RootStoreError::Refused("blp-access-denied"))),
+            cleanup:Box::new(RootStoreError::Refused("fixture-close-failed")),
+        });
+        assert_eq!(error.status(),StatusCode::INTERNAL_SERVER_ERROR);
+    }
     /// Quota validation refusals are client/state/capability responses. Corrupt
     /// history, encoding, clock and settings failures stay server errors; no
     /// prefix-based catch-all may hide an internal fault as invalid client data.

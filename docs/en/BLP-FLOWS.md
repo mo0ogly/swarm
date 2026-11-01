@@ -7,11 +7,11 @@
 
 ## State and scope
 
-BLP-01, October31: **24 documented flows, 45 anchors in 43 source files**,
+BLP-01, 1 November revision: **25 documented flows, 50 anchors in 46 source files**,
 reviewed at current producer/consumer boundaries. The JSON records exposed
 material, producer, recipient, existing controls, owner, missing packages and
 required observable per flow, with complete source hashes/anchor lines. Changes
-require review. All 24 runtime BLP criteria remain OPEN; this is not an exhaustive
+require review. All 25 runtime BLP criteria remain OPEN; this is not an exhaustive
 inventory of dynamic behavior.
 
 The permanent blp-flow-inventory recipe passes two steps and five checker tests
@@ -33,6 +33,7 @@ notes are therefore not required for this increment.
 | BF-19 | Supplied PAEA proposal/context → pure reports/CLI/API | Serialized labels remain claims; protected attribution must not change historical v1 preimages |
 | BF-20–22 | Git source/pack/ref or settlement/ledger → other stores/receipts | Pack transfer discloses before ref publication; effect authority and confidentiality are cumulative |
 | BF-23–24 | Preview/agreements, originals/evidence/audit → operator/verifier/archives | Reader clearance, distinct declassification right and protection of evidence itself |
+| BF-25 | Recorded-prompt diagnostic → CLI/HTTP | Current attribution of every slice and caller clearance; no send ticket or output-medium control |
 
 ```mermaid
 flowchart LR
@@ -155,3 +156,17 @@ are retained in the [resumption record](plans/actions-confiance/BLP-PROVENANCE-2
 recheck. Policy renewal preserves prior levels/compartments; coverage remains
 partial. Four drifted sources were reviewed (preview, presentation, Trust
 dispatch, BLP module); unrelated source hashes were not refreshed.
+
+### Revision: preparation-source diagnostic
+
+BF-25 records `blp-preparation-check` output to CLI/HTTP: authenticated principal,
+current control attributions for every slice, conservative join, typed refusals
+and no mutation. It remains OPEN for physical source identity and actual recipient/
+output-medium control; the diagnostic is no send ticket. BF-05 now distinguishes
+this post-hoc observation from prompt admission. BF-16 explicitly records that
+answers/proposals have no persisted BLP classification. Semantic review of three
+changed engine files precedes updated anchors; five new anchors cover the
+diagnostic/adapters. `20261101-preparation-flow-inventory-01` passes two steps and
+five checker tests with verified integrity. Stale inventory refusal remains in
+`20261101-preparation-flow-inventory-before-01`. Counts do not establish effective
+BLP controls or independent acceptance.

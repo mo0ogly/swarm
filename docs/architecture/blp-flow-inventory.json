@@ -34,8 +34,8 @@
     {
       "id": "send",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "615fcf28f61903a3baeeb8363b0966cda7bac96a1e4ccbffb36a36f24050d2d1",
-      "line": 504,
+      "sha256": "dc1a21530466bd7842816b4105f1ba7cb01bf615d09e6e95aa83f4ad56d704a8",
+      "line": 554,
       "anchor": "pub fn preparation_send<"
     },
     {
@@ -69,8 +69,8 @@
     {
       "id": "claim",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "615fcf28f61903a3baeeb8363b0966cda7bac96a1e4ccbffb36a36f24050d2d1",
-      "line": 737,
+      "sha256": "dc1a21530466bd7842816b4105f1ba7cb01bf615d09e6e95aa83f4ad56d704a8",
+      "line": 787,
       "anchor": "pub fn preparation_worker_claim("
     },
     {
@@ -195,8 +195,8 @@
     {
       "id": "finish",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "615fcf28f61903a3baeeb8363b0966cda7bac96a1e4ccbffb36a36f24050d2d1",
-      "line": 886,
+      "sha256": "dc1a21530466bd7842816b4105f1ba7cb01bf615d09e6e95aa83f4ad56d704a8",
+      "line": 936,
       "anchor": "pub fn preparation_worker_finish<"
     },
     {
@@ -293,7 +293,7 @@
     {
       "id": "trust_store",
       "path": "rust/crates/swarm-engine/src/root_store/trust_store.rs",
-      "sha256": "c1d21badd8a376c7cb270c9ae832f863c6e530d84d281939d8a1ec247041f783",
+      "sha256": "ce0b3808cf20260dab82bb7746817fc5b61faea884ca8572871133b9296b7d1b",
       "line": 54,
       "anchor": "pub fn trust("
     },
@@ -307,8 +307,8 @@
     {
       "id": "prompt_provenance",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
-      "sha256": "86d08b88a025ba481bd7665aaab92d17257086de41180eb3ff68ad4163cd88c4",
-      "line": 119,
+      "sha256": "95f3ffe4d4a03c7d0068868abae1b67be6ecb4e2341d0cbaf6e0c888cb6d98cd",
+      "line": 136,
       "anchor": "pub(super) fn assemble("
     },
     {
@@ -317,6 +317,41 @@
       "sha256": "237af07cab099cf7f320b3fd574fbe7d33205b2d33f1736fdd5fe7892d4b2975",
       "line": 73,
       "anchor": "pub fn paea_reader_verdict("
+    },
+    {
+      "id": "prompt_classifications",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
+      "sha256": "95f3ffe4d4a03c7d0068868abae1b67be6ecb4e2341d0cbaf6e0c888cb6d98cd",
+      "line": 59,
+      "anchor": "pub(super) fn classifications("
+    },
+    {
+      "id": "preparation_blp_check",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+      "sha256": "dc1a21530466bd7842816b4105f1ba7cb01bf615d09e6e95aa83f4ad56d704a8",
+      "line": 265,
+      "anchor": "pub(super) fn confidentiality_check("
+    },
+    {
+      "id": "trust_cli_route",
+      "path": "rust/crates/swarm-cli/src/trust.rs",
+      "sha256": "5649bc7d822f4ba8f80a9c647ef66fd5138114df1c29f0c8225607c30bc4e95e",
+      "line": 12,
+      "anchor": "pub(super) fn execute("
+    },
+    {
+      "id": "trust_http_route",
+      "path": "rust/crates/swarm-web/src/service/trust.rs",
+      "sha256": "0eb2bf8c2ba360cbd859a2ac16bbea270c465e9794efde41b9d00e730923e5a5",
+      "line": 12,
+      "anchor": "pub(super) fn trust_actions("
+    },
+    {
+      "id": "diagnostic_http_status",
+      "path": "rust/crates/swarm-web/src/service.rs",
+      "sha256": "849c76a1654d6c9895bfb22032c9180160b29df8b73f2fb4ce5857980dacb0ed",
+      "line": 362,
+      "anchor": "\"blp-access-denied\" if *operation==\"trust-command\""
     }
   ],
   "flows": [
@@ -413,10 +448,12 @@
         "send",
         "claim",
         "storage",
-        "prompt_provenance"
+        "prompt_provenance",
+        "prompt_classifications",
+        "preparation_blp_check"
       ],
       "material": "complete combined prompt and private native envelope",
-      "current_controls": "Root/settings/SQL snapshots, digest/revision/caps and budget admission; new native v3 records retain complete ordered prompt byte provenance, verified before worker use. No classified inputs, authenticated BLP principal or disclosure authority.",
+      "current_controls": "Root/settings/SQL snapshots, digests/revisions/caps and budget admission; native v3 provenance verifies every prompt byte before worker use. Authenticated readonly blp-preparation-check resolves current control attributions of every exact slice and joins them under the diagnostic caller clearance. It grants no send authority, original-sender binding, producer source labels or fixed transmission domain.",
       "missing_blp": [
         "BLP-03",
         "BLP-04"
@@ -645,7 +682,7 @@
         "history"
       ],
       "material": "returned text, proposals and provider-declared usage",
-      "current_controls": "response parsing/limits/state/publication and explicit operator adoption; no confidentiality lowering",
+      "current_controls": "response parsing/limits/state/publication and explicit operator adoption; no BLP classification is persisted on answers or proposals and no context-domain inheritance is established",
       "missing_blp": [
         "BLP-04"
       ],
@@ -825,6 +862,30 @@
       ],
       "owner": "Evidence/BLP",
       "required_observable": "protect evidence contents/readers and report leaks; external acceptance and history integrity remain separate",
+      "status": "OPEN"
+    },
+    {
+      "id": "BF-25",
+      "name_fr": "Diagnostic de confidentialité de préparation",
+      "name_en": "Preparation confidentiality diagnostic",
+      "producer": "recorded native prompt parts and current protected control attributions",
+      "consumer": "authenticated CLI stdout or protected HTTP response",
+      "references": [
+        "preparation_blp_check",
+        "prompt_classifications",
+        "trust_cli_route",
+        "trust_http_route",
+        "diagnostic_http_status",
+        "trust_store"
+      ],
+      "material": "joined classification, authenticated diagnostic actor, policy revision, prompt digest and part count; no prompt text",
+      "current_controls": "current Trust reservation/authentication/grant and BLP revision; physical Root/parent/provenance checks; every exact slice attributed, no default; conservative join/read clearance; typed HTTP refusals and explicit read-only rollback/close; runtime_authorized=false",
+      "missing_blp": [
+        "BLP-04",
+        "BLP-05"
+      ],
+      "owner": "Preparation/BLP",
+      "required_observable": "bind physical producer source identities and actual response recipient/output medium; do not reuse this observation as a dispatch ticket or persisted provider-result label",
       "status": "OPEN"
     }
   ],

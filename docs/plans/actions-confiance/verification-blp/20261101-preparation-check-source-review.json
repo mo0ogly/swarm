@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "review_kind": "same-context code-reviewer; not independent acceptance",
+  "scope": "BLP-04 recorded native prompt source diagnostic; no dispatch or destination authorization",
+  "files": {
+    "rust/crates/swarm-engine/src/root_store/preparation_call.rs": "dc1a21530466bd7842816b4105f1ba7cb01bf615d09e6e95aa83f4ad56d704a8",
+    "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs": "95f3ffe4d4a03c7d0068868abae1b67be6ecb4e2341d0cbaf6e0c888cb6d98cd",
+    "rust/crates/swarm-engine/src/root_store/trust_store.rs": "ce0b3808cf20260dab82bb7746817fc5b61faea884ca8572871133b9296b7d1b",
+    "rust/crates/swarm-engine/src/root_store/preparation_confidentiality_tests.rs": "7210592c18baf135d62fd3a4526c5cdc30a5996ddfa2572a976450dee88968c2",
+    "rust/crates/swarm-cli/src/trust.rs": "5649bc7d822f4ba8f80a9c647ef66fd5138114df1c29f0c8225607c30bc4e95e",
+    "rust/crates/swarm-cli/src/lib.rs": "f29e62ec76fcc186af78438522c02e27a066023f8faafe92694f37308ba6546b",
+    "rust/crates/swarm-web/src/service/trust.rs": "0eb2bf8c2ba360cbd859a2ac16bbea270c465e9794efde41b9d00e730923e5a5",
+    "tests/blp_preparation_check.py": "95e9b212f6e07b22f061b0e4542dceab2a696246e556d0abdfa77e29e86b943b",
+    "tools/verification/recipes/blp-preparation-check.json": "55516f369eb125c2d76f5204d169e74a67a2ce629c649d95ce1b5f1957c75240",
+    "tools/verification/recipes/blp-preparation-check-public.json": "f0063fa003e2ffb3ac9cfa00bd0638755fb996fdc6924ed02aabab3815d90e38",
+    "docs/architecture/BIBA-RUST.md": "b9157c4092bb73d3a3cad6314aeeeb92d1fd58b90669bd82615feaf88c8e6be3",
+    "docs/en/BIBA-RUST.md": "99b843d3ed137ddc8f629cea31927264821945575543635ca56b298d4c25fc47",
+    "tools/verification/README.md": "23f0874d21e525b77736cf47579eddf69e363ae939029df5559cb943226a7a6a",
+    "version_history.json": "792f45220ce3ad9bd0ac5b52569ef7923138e78c651580e2251dcbce08e02734",
+    "rust/crates/swarm-web/src/service.rs": "849c76a1654d6c9895bfb22032c9180160b29df8b73f2fb4ce5857980dacb0ed",
+    "tools/verification/recipes/blp-preparation-http-status.json": "c62720493b80c7aee957a04ee0c0aff9ed3fba13c3cad1fe54fb106fec87edfa",
+    "docs/architecture/blp-flow-inventory.json": "bc61f14af3907d11621d69a0acca132634c26df25ed8b62c68e9c98c2bf064aa",
+    "docs/architecture/BLP-FLOWS.md": "0aef8c03a86e677545c39f111ca62b23b573ffd1b8a279ac9efa4dbdb7295088",
+    "docs/en/BLP-FLOWS.md": "5ffd29ce35665040b8984969032ddc6fe5c860a2363413c3371d65d587b3f050",
+    "tools/verification/recipes/blp-flow-inventory.json": "d9f693787603d57ab0b5c1a6b3a15e03e53fe03edf7685a5a5e8da64e0357ee4",
+    "docs/plans/actions-confiance/BLP-APEX.md": "dbf78803a3c2c236ebe14467379353961c82735d95c56eeac2e636bb54a5b22e",
+    "docs/en/plans/actions-confiance/BLP-APEX.md": "4ec68a4f89828a2fd601eea224d4105de3d20d60a3de8d596d07087958f816db"
+  },
+  "policies": {
+    "protocol": "operation vocabulary, schema 1 and static refusal families are protocol invariants; runtime_authorized=false is scope truth, not an operator switch",
+    "operator": "no new execution policy, default classification, timeout or cap; existing saved policies remain unchanged",
+    "fixtures": "three identities required by existing prepare_identities; synthetic budgets, labels, credentials and dates are test inputs; .05s is observation cadence, not a deadline",
+    "resources": "no global watchdog; single Cargo job limits verification resource use, not product concurrency"
+  },
+  "functions": [
+    "Manifest::classifications: verify every slice then resolve current entry/project digest; no classification fallback or IO",
+    "confidentiality_check: authenticate, strict intent/current revision/grant, material binding, read transaction, parent/native Root/provenance, join/clearance, redacted diagnostic, explicit rollback",
+    "trust_scoped / CLI execute / HTTP trust_actions: fixed readonly routing; existing credential, close, publication and output paths preserved",
+    "native consumer fixture helpers and Python main/check/trust: actual named assertions, original channels, qualified image, cleanup cause aggregation, hash-bound evidence",
+    "HttpServiceError::status exact typed trust-command mapping and named regression: no prefix fallback; unrelated authority-probe edits preserved outside this BLP review"
+  ],
+  "errors": {
+    "authentication": "current Trust identity before row lookup; ungranted principal denied before object-existence/attribution observation",
+    "data": "missing/stale policy, wrong parent/physical Root, legacy provenance, missing source and insufficient clearance are explicit refusals; no prompt or label is returned on refusal",
+    "storage": "material pre/post checks and SQL/rollback/finalization errors retain typed causes; existing Root close and CLI output/flush wrappers remain authoritative",
+    "effects": "read-only Trust reservation; no planned publication, mutation, provider call, future permission or zero-success fallback",
+    "cleanup": "Python retains primary plus owned-server cleanup cause via BaseExceptionGroup; server driver has no global watchdog",
+    "http": "Exact direct Root refusals under trust-command =>400/403/404/409/501; corrupt native provenance, incompatible private Root, other operation context and cleanup remain500. Existing TrustError/publication mapping unchanged."
+  },
+  "evidence": {
+    "engine": "20261101-preparation-check-engine-02 PASS; 1 named regression, stable inputs and VERIFIED integrity",
+    "original_failure": "20261101-preparation-check-engine-01 intact FAIL, VERIFIED integrity, derived fixture omitted third identity",
+    "public": "20261101-preparation-check-public-01: PASS/VERIFIED,26 assertions,149 artifact hashes and final manifest SHA verified;8 exact HTTP cases",
+    "installation": "20261101-preparation-check-installed-01: PASS,13 runtime source hashes,56 browser assertions FR/EN/themes/version/compiled commit/dirty/served assets/focus,2 CLI help checks; delivery-scope binds17 public artifacts",
+    "counterexample": "20261101-preparation-check-public-before-01: qualified 295 produces real inert prompt and complete provenance, then CLI unknown-operation refusal; intact FAIL / VERIFIED integrity; journey artifact hashes in counterexample.json",
+    "build_refusal": "20261101-preparation-check-build-refusal-01: successful compile refused because concurrent service.rs changed; not installed; fresh prebind now underway",
+    "engine_reuse": {
+      "current_source_matches": {
+        "rust/crates/swarm-engine/src/root_store/preparation_call.rs": true,
+        "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs": true,
+        "rust/crates/swarm-engine/src/root_store/trust_store.rs": true,
+        "rust/crates/swarm-engine/src/root_store/preparation_confidentiality_tests.rs": true,
+        "rust/crates/swarm-engine/src/trust/confidentiality.rs": true,
+        "rust/crates/swarm-engine/src/trust/authentication.rs": true,
+        "rust/crates/swarm-confidentiality/src/lib.rs": true
+      },
+      "scope": "named engine regression only; web authority service changes require fresh public-image checks"
+    },
+    "http_status": "20261101-preparation-http-status-01: PASS, one named test, stable inputs and VERIFIED integrity",
+    "status_counterexample": "20261101-preparation-http-status-before-01: valid HTTP200 control then observed blp-access-denied HTTP500 on explicitly unqualified compiled image; defect proof only",
+    "interrupted_build": "20261101-preparation-check-build-interrupted-02: exit130, owned process group interrupted after HTTP defect found; no PASS or installation",
+    "inventory": "20261101-preparation-flow-inventory-01: PASS/VERIFIED,2 steps/5 checker tests;25 OPEN flows,50 anchors,46 source files; stale before run intact FAIL/VERIFIED"
+  },
+  "limits": [
+    "Structured JSON source fields remain aggregate slices, not individual physical file/element lineage",
+    "No public source inventory/attribution screen; operators must establish exact transmitted slice digests",
+    "Not bound to original send principal, endpoint/account or descendant capabilities",
+    "No sink mediation, output persistence inheritance, human declassification or global BLP acceptance",
+    "Non-Linux operation explicitly refuses unsupported platform; not executed here",
+    "Parallel commit b4cbfa2255 includes intermediate sources/open evidence; this session did not commit; final evidence and compiled Git facts are separate",
+    "Source service.rs contains concurrent Authority launcher-probe edits outside BLP review; no claim of complete Authority conformance"
+  ],
+  "inventory_semantic_review": {
+    "changed_prior_sources": [
+      "preparation_call.rs: new diagnostic, cfg(test) fixture helper visibility/module; existing producer/claim/finish unchanged",
+      "preparation_prompt.rs: new verified current-attribution slice resolution; existing assembly/verify unchanged",
+      "trust_store.rs: readonly namespace and guarded diagnostic dispatch; existing mutations unchanged"
+    ],
+    "new_boundary": "BF-25 joins stored source labels for diagnostic metadata to CLI/HTTP, not provider output or transmission authority",
+    "BF-05": "current diagnostic does not bind original sender/admission or classify physical producer sources",
+    "BF-16": "no classification persisted on provider answers, now explicit in inventory",
+    "policy": "new flow/ref identifiers are static inventory schema data, not execution policy; runtime_enforced remainsfalse",
+    "functions": "checker/test functions unchanged; no new callable documentation required for data-only inventory update",
+    "errors": "original drift refusal retained; current hashes only after semantic review; no checker fallback or changed error handling"
+  },
+  "delivery": {
+    "version": "v0.1.1-dev.296",
+    "sha256": "e4a802c4dc4d32d90d036169604168c64db15196695d692885369b748686ca72",
+    "compiled_commit": "b4cbfa22552140fe9a7bcf46ac91165b0abe120d",
+    "modified": true,
+    "normal_profile": "VERIFIED_DEFAULT_NATIVE_PROFILE",
+    "restart_by_increment": true,
+    "restart_by_readonly_probe": false
+  },
+  "retrospective": "Map business refusals through actual HTTP consumer and preserve corrupt/cleanup failures; fixture bootstrap needs3identities; bind nested artifacts; re-review static inventories with source changes. Qualification actually refused concurrent drift, prepared-build installed the exact qualified image. Cross-session write coordination remains proposed, not verified. Final EN dependency-table correction retained separately.",
+  "same_context_review_verdict": "bounded increment behavior verified and locally installed; no independent/global BLP acceptance"
+}

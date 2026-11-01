@@ -1,0 +1,156 @@
+{
+  "work": {
+    "schema_version": 1,
+    "id": "w-444af24acb4bfb3c70c0984a",
+    "revision": 2,
+    "title": "Requested model fixture",
+    "objective": "Observe route",
+    "scope": "Owned local program",
+    "criteria": [
+      "Observed, not accepted"
+    ],
+    "next": "",
+    "summary": "",
+    "memory": null,
+    "created": "2026-11-01T11:47:32.788493524Z",
+    "updated": "2026-11-01T11:47:33.09630826Z",
+    "git": {
+      "head": "b4cbfa22552140fe9a7bcf46ac91165b0abe120d",
+      "branch": "codex/clear-product-method-names",
+      "changes": "M docs/architecture/BIBA-RUST.md\n M docs/architecture/GRAPH-STUDIO.md\n M docs/en/BIBA-RUST.md\n M docs/en/GRAPH-STUDIO.md\n M docs/en/plans/actions-confiance/BLP-APEX.md\n M docs/plans/actions-confiance/BLP-APEX.md\n M docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/step-0001.stderr\n M docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/step-0001.stdout\n M docs/plans/migration-rust/GRAPH-REGRESSION-20261031.md\n M rust/crates/swarm-web/src/service.rs\n M rust/crates/swarm-web/tests/authority_access.rs\n M tests/blp_preparation_check.py\n M tests/rust_graph_navigation_ui.cjs\n M tools/verification/README.md\n M tools/verification/recipes/blp-preparation-check-public.json\n M tools/verification/recipes/rust-graph-workbench.json\n M version_history.json\n M web/cockpit-native-graph.js\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-build-interrupted-02/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-build-refusal-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/inputs.after.json\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/result.json\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/step-0001.json\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-public-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-public-before-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-source-review.json\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-http-status-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-http-status-before-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-resource-decision.json\n?? tools/verification/recipes/blp-preparation-http-status.json"
+    },
+    "tasks": [
+      {
+        "plan_checks": {
+          "plan-criterion-1": "validation",
+          "plan-delivery": "delivery",
+          "plan-entry": "entry",
+          "plan-validation": "validation"
+        },
+        "id": "task",
+        "title": "Run",
+        "owner": "",
+        "deliverable": "Evidence",
+        "criteria": [
+          "Observed, not accepted"
+        ],
+        "depends": null,
+        "status": "todo",
+        "blocker": "",
+        "next": "",
+        "attempts": []
+      }
+    ]
+  },
+  "validation": {
+    "state": "open",
+    "label": "OUVERT",
+    "validated": 0,
+    "historical": 0,
+    "stale": 0,
+    "tasks": {
+      "task": {
+        "state": "todo",
+        "fresh": false,
+        "blockers": [],
+        "owner": "Responsable à désigner",
+        "next": "",
+        "evidence": {
+          "attempt_id": "unknown",
+          "revision": 2,
+          "freshness": "unknown",
+          "observed_at": "unknown",
+          "report_review": {
+            "state": "not_configured",
+            "attempt_id": "unknown",
+            "reviewer": "unknown",
+            "at": "unknown",
+            "limits": [
+              "Aucune revue indépendante du rapport n’est configurée."
+            ]
+          },
+          "controls": {
+            "state": "unknown",
+            "items": [
+              {
+                "id": "unknown",
+                "attempt_id": "unknown",
+                "execution": "unknown",
+                "revision": "unknown",
+                "candidate_sha": "unknown",
+                "command": [],
+                "exit_code": null,
+                "started_at": "unknown",
+                "finished_at": "unknown",
+                "wall_duration_ms": null,
+                "cpu_duration_ms": null,
+                "cost": "unknown",
+                "tokens": "unknown",
+                "freshness": "unknown",
+                "result": "unknown",
+                "limits": [
+                  "Aucun reçu d’exécution moteur : une citation du rapport ou un statut de gate ne démontre ni la commande ni son code de sortie."
+                ]
+              }
+            ],
+            "history": [],
+            "longest_measured": []
+          },
+          "acceptance": {
+            "state": "not_accepted",
+            "revision": "unknown",
+            "at": "unknown"
+          },
+          "limits": [
+            "Les valeurs unknown ne constituent pas un succès."
+          ]
+        }
+      }
+    }
+  },
+  "events": [
+    {
+      "id": "create",
+      "work_id": "w-444af24acb4bfb3c70c0984a",
+      "revision": 1,
+      "kind": "work.create",
+      "at": "2026-11-01T11:47:32.882974788Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "create",
+        "expected_revision": 0,
+        "title": "Requested model fixture",
+        "objective": "Observe route",
+        "scope": "Owned local program",
+        "criteria": [
+          "Observed, not accepted"
+        ]
+      }
+    },
+    {
+      "id": "add",
+      "work_id": "w-444af24acb4bfb3c70c0984a",
+      "revision": 2,
+      "kind": "task.add",
+      "at": "2026-11-01T11:47:33.09630826Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "add",
+        "expected_revision": 1,
+        "id": "task",
+        "title": "Run",
+        "criteria": [
+          "Observed, not accepted"
+        ],
+        "deliverable": "Evidence"
+      }
+    }
+  ],
+  "current_gates": {},
+  "current_git": {
+    "head": "b4cbfa22552140fe9a7bcf46ac91165b0abe120d",
+    "branch": "codex/clear-product-method-names",
+    "changes": "M docs/architecture/BIBA-RUST.md\n M docs/architecture/GRAPH-STUDIO.md\n M docs/en/BIBA-RUST.md\n M docs/en/GRAPH-STUDIO.md\n M docs/en/plans/actions-confiance/BLP-APEX.md\n M docs/plans/actions-confiance/BLP-APEX.md\n M docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/step-0001.stderr\n M docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/step-0001.stdout\n M docs/plans/migration-rust/GRAPH-REGRESSION-20261031.md\n M rust/crates/swarm-web/src/service.rs\n M rust/crates/swarm-web/tests/authority_access.rs\n M tests/blp_preparation_check.py\n M tests/rust_graph_navigation_ui.cjs\n M tools/verification/README.md\n M tools/verification/recipes/blp-preparation-check-public.json\n M tools/verification/recipes/rust-graph-workbench.json\n M version_history.json\n M web/cockpit-native-graph.js\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-build-interrupted-02/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-build-refusal-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/inputs.after.json\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/result.json\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/step-0001.json\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-public-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-public-before-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-source-review.json\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-http-status-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-http-status-before-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-resource-decision.json\n?? tools/verification/recipes/blp-preparation-http-status.json"
+  },
+  "resume_markdown": "# Requested model fixture\n\nTravail : w-444af24acb4bfb3c70c0984a | révision 2 | OUVERT\nDernière activité : 2026-11-01T11:47:33.09630826Z\n\n## Objectif et résultat attendu\nObserve route\nPérimètre : Owned local program\n- Observed, not accepted\n\n## Situation actuelle\nnon renseigné\nHEAD enregistré : b4cbfa22552140fe9a7bcf46ac91165b0abe120d\nBranche enregistrée : codex/clear-product-method-names\nHEAD courant : b4cbfa22552140fe9a7bcf46ac91165b0abe120d\nBranche courante : codex/clear-product-method-names\nModifications locales présentes ; consulter git status.\n\n## Tâches actives et résultats attendus\nAucune tâche active déclarée.\n\n## Travail validé\nTâches acceptées (preuves ou dérogation) : 0/1.\nCe ratio est distinct de la progression des critères d’une gate.\n\n## Travail restant et blocages\n- task : Run — À FAIRE\n  Livrable : Evidence\n  Dépendances : non renseigné\n  Blocage : non renseigné\n  Critère : Observed, not accepted\n\n## Gates, qualité et progression vérifiée\n- task · preuve structurée : tentative=unknown ; révision=2 ; fraîcheur=unknown\n  Revue du rapport=not_configured ; contrôles exécutés=unknown ;\nacceptation=not_accepted\n  Contrôle unknown : tentative=unknown ; exécution=unknown ; révision=unknown ;\nsha_candidat=unknown ; commande=unknown ; code=unknown ; début=unknown ;\nfin=unknown ; fraîcheur=unknown\n- task : gate non renseignée.\n\n## Prochaine action du travail\nà définir\n\n## Décisions OODA et mémoire utile\nMémoire spécifique : non renseignée.\n\nLes tentatives enregistrées ne prouvent pas qu’un processus tourne encore.\nUne gate ne remplace pas une autorisation de publication.\n"
+}

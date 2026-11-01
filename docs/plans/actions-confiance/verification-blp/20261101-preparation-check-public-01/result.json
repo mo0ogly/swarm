@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-preparation-check-public",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "qualified-preparation-sources-cli-http",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,sys; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=Path(os.environ['SWARM_BLP_PROOF_OUTPUT']) if 'SWARM_BLP_PROOF_OUTPUT' in os.environ else fixture_root('blp-preparation-proof-')/'journey'; subprocess.run(['python3','tests/blp_preparation_check.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',str(out)],check=True); print('BLP_PREPARATION_CLI_HTTP_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 7.0514110419899225,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "f0063fa003e2ffb3ac9cfa00bd0638755fb996fdc6924ed02aabab3815d90e38",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "b40f027ad5f4ade10a8c16a05c895df56f7944043a1acc176cad29c7e2baac59",
+    "declared-inputs.tar.gz": "7ce98fe2ba06cad2f98e330fc4d32b5ca0e9c764c7350320eac8746e8b700986",
+    "environment.json": "7941c5c31a9da0bb823b0eab00827361ddc2326ac370f2c45bc2772429ddb99f",
+    "step-0001.stdout": "5fd013b349aa3a20099180763d5c85f6878a9be38c6bd77afb1c2888061f7882",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "02d028bad1c1a1366906b6e19e5eb295750b9778bbbe7252a9d87794e1ab48be",
+    "inputs.after.json": "b40f027ad5f4ade10a8c16a05c895df56f7944043a1acc176cad29c7e2baac59"
+  }
+}

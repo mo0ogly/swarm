@@ -388,3 +388,25 @@ Ne pas modifier une ligne historique pour fabriquer la provenance. Un changement
 de politique impose de nouvelles attributions à la révision courante. Ce
 diagnostic ne protège pas l’envoi, ne lie pas son principal ou destinataire et
 ne change pas `runtime_enforced:false` ; médiation et héritage restent à réaliser.
+
+```mermaid
+flowchart LR
+  I[API / CLI] --> T[Réservation Trust partagée]
+  T --> A[Identité et politique courantes]
+  A --> N[Tour natif lié à la racine physique]
+  N --> V[Provenance vérifiée de tous les octets]
+  V --> C[Attributions courantes des parties exactes]
+  C --> J[Combinaison et habilitation]
+  J --> D[Diagnostic sans autorisation de dispatch]
+```
+
+Tout refus interrompt ce parcours ; aucune flèche ne mène à un fournisseur.
+La réservation protège cette observation, pas une utilisation ultérieure.
+
+La réponse HTTP distingue 400 (intention invalide), 403 (identité/habilitation),
+404 (tour absent) et 409 (politique absente/périmée, source non attribuée,
+provenance historique absente ou mauvais parent). Un principal sans habilitation
+BLP refuse avant lecture du tour. La provenance incohérente, une racine privée
+incompatible et les échecs de stockage/rollback/fermeture restent des erreurs
+serveur ; leur cause n’est pas masquée par un statut client. L’opération refuse
+explicitement hors Linux (501), sans preuve d’exécution sur ces plateformes.

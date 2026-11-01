@@ -6,12 +6,12 @@
 
 ## État et périmètre
 
-BLP-01, 31 octobre 2026 : **24 flux documentés, 45 ancrages dans 43 fichiers
+BLP-01, révision du 1er novembre 2026 : **25 flux documentés, 50 ancrages dans 46 fichiers
 sources**, revus au niveau des producteurs et consommateurs actuels. Le JSON
 conserve pour chaque flux : matière exposée, producteur, destinataire, contrôles
 existants, responsable, lots manquants et observable de qualification. Il fige
 les empreintes complètes et lignes d'ancrage ; tout changement impose une revue.
-Les 24 flux restent `OPEN` pour leur contrôle BLP effectif. Leur recensement
+Les 25 flux restent `OPEN` pour leur contrôle BLP effectif. Leur recensement
 ne démontre pas un inventaire exhaustif des comportements dynamiques.
 
 La recette `blp-flow-inventory.json` passe ses deux étapes ; cinq tests du
@@ -34,6 +34,7 @@ build, installation et notes d'évolution ne sont donc pas requis pour ce lot.
 | BF-19 | Proposition/contexte PAEA fournis → rapports purs/CLI/API | Les labels sérialisés restent des déclarations ; attribution protégée distincte sans changer les préimages v1 historiques |
 | BF-20–22 | Source Git/pack/référence ou ledger/règlement → autres stockages et reçus | Le transfert pack divulgue avant la publication d'une ref ; permissions d'effet et confidentialité restent cumulatives |
 | BF-23–24 | Aperçu/accords, originaux, preuves et audit → opérateur, vérificateur et archives | Habilitation des lecteurs, droit de déclassifier distinct et protection des preuves elles-mêmes |
+| BF-25 | Diagnostic du prompt enregistré → CLI/HTTP | Attribution courante de chaque partie et habilitation du demandeur ; pas de ticket d’envoi ni de contrôle du support de sortie |
 
 ```mermaid
 flowchart LR
@@ -168,3 +169,19 @@ d’attribution courante. Les renouvellements de politique conservent les niveau
 et compartiments antérieurs ; le contrôle reste partiel. Les quatre fichiers
 dont les empreintes avaient dérivé ont été relus (aperçu, présentation, dispatch
 Trust, module BLP), sans rafraîchir les autres empreintes.
+
+### Révision : diagnostic des sources de préparation
+
+BF-25 recense le résultat de `blp-preparation-check` vers CLI/HTTP : principal
+authentifié, classifications de contrôle courantes de toutes les parties,
+combinaison conservatrice, refus typés et absence de mutation. Il reste `OPEN`
+pour l’identité physique des sources et la maîtrise réelle du destinataire/support
+de sortie ; ce diagnostic ne constitue pas un ticket d’envoi. BF-05 distingue
+désormais ce contrôle postérieur de l’admission du prompt. BF-16 précise qu’aucune
+classification n’est persistée sur les réponses/propositions. Après revue sémantique
+des trois fichiers moteur modifiés, les ancrages ont été actualisés ; cinq nouveaux
+ancrages couvrent le diagnostic et ses adaptateurs. La recette
+`20261101-preparation-flow-inventory-01` passe deux étapes et cinq tests du
+vérificateur, avec intégrité vérifiée. Le refus de l’ancien inventaire reste
+conservé dans `20261101-preparation-flow-inventory-before-01`. Ces comptes ne sont
+pas des comptes de contrôles BLP effectifs ni une acceptation indépendante.

@@ -1,0 +1,10 @@
+{
+  "observed_pack_pid": 1375186,
+  "observed_rss": "~8GiB",
+  "user_interruption_question": "requested while process present; withdrawn after process no longer present",
+  "foreign_process_interrupted_by_this_session": false,
+  "pack_exit_status": "not observed",
+  "observed_after": "~8.7GiB memory available; swap ~7.2GiB used instead of ~14GiB",
+  "scope": "process absence is not proof of successful Git maintenance; no acceptance or runtime authority inferred",
+  "next": "apply prepared status patch after active foreign web test ends, then qualify new image"
+}

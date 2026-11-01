@@ -1,0 +1,52 @@
+{
+  "enabled": true,
+  "policy": {
+    "message_max_bytes": 8000,
+    "context_max_bytes": 96000,
+    "turn_limit": 20,
+    "response_max_bytes": 1048576,
+    "timeout_seconds": 300,
+    "timeout_maximum_seconds": 600,
+    "refresh_ms": 2000,
+    "transport": "json"
+  },
+  "providers": [
+    {
+      "name": "fixture",
+      "model": "fixture-standard",
+      "digest": "79d4881fefeb04e3c351acf161ee7fc8960c24a305f8e57177783ab7e44f8723",
+      "levels": [
+        {
+          "level": "auto",
+          "available": true,
+          "model": "fixture-standard",
+          "policy_hash": "1fe3eaf59e14447dba38882e33056f1c767a93127d00d1b29de54d54c9ea3439",
+          "digest": "79d4881fefeb04e3c351acf161ee7fc8960c24a305f8e57177783ab7e44f8723"
+        },
+        {
+          "level": "simple",
+          "available": false,
+          "model": "",
+          "policy_hash": "",
+          "digest": "",
+          "reason": "agent-model-choice-not-announced"
+        },
+        {
+          "level": "standard",
+          "available": true,
+          "model": "fixture-standard",
+          "policy_hash": "1fe3eaf59e14447dba38882e33056f1c767a93127d00d1b29de54d54c9ea3439",
+          "digest": "e04eafa4932a65f9b8d5332162fdbbeea9b038cf75097de13811421a5f09cda1"
+        },
+        {
+          "level": "exigeant",
+          "available": false,
+          "model": "",
+          "policy_hash": "",
+          "digest": "",
+          "reason": "agent-model-choice-not-announced"
+        }
+      ]
+    }
+  ]
+}

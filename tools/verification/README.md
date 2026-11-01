@@ -3326,3 +3326,16 @@ its owned fixture provenance through readonly SQL, attributes all slices using
 public operations, then compares CLI and protected HTTP. Original failures stay
 retained. The printed final digest binds journey artifacts; verify them as well
 as the outer recipe receipt.
+
+`recipes/blp-preparation-http-status.json` vérifie un test nommé de traduction
+des refus métier typés ; provenance corrompue, racine incompatible, contexte
+d’opération différent et nettoyage conservent le statut serveur. La recette
+publique exige désormais 26 assertions, dont huit cas HTTP avec statuts et codes
+exacts (200/400/403/404/409). Le contre-exemple HTTP500 a été observé sur une image
+compilée non qualifiée, uniquement comme preuve du défaut, jamais livrée.
+
+The status recipe runs one named typed-refusal regression, keeping server errors
+for corrupted provenance, incompatible Root, different operation context and
+cleanup. The public recipe now requires 26 assertions, including eight exact
+HTTP status/code cases (200/400/403/404/409). The HTTP500 reproducer used an
+explicitly unqualified compiled image for defect evidence only, never delivery.

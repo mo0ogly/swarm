@@ -91,10 +91,10 @@ label désérialisé ou champ de provenance ne constitue une autorité.
 | BLP-01 | Inventaire sources, consommateurs, sorties et frontières, modèle de menace | — | EN COURS |
 | BLP-02 | Moniteur de dominance/combinaison, domaines fixes, erreurs sûres, indépendance Biba | 01 | VÉRIFIÉ (contrats purs ; 10/10 tests du 31/10/2026, voir « Reprise ») |
 | BLP-03 | Configuration persistée révisionnée, migration explicite, Admin/API/CLI | 02 | VÉRIFIÉ partiellement (historique, opérations, tests 5/5 du 31/10/2026 ; migration des objets existants non faite) |
-| BLP-04 | Attribution par producteurs, contexte/mémoire/sorties et replays | 03 | PARTIEL — provenance du prompt privé v3 et contrôle d’objet API/CLI ; classification des sources, principal et héritage ouverts |
+| BLP-04 | Attribution par producteurs, contexte/mémoire/sorties et replays | 03 | PARTIEL — provenance privée v3, contrôle d’objet et diagnostic authentifié des sources API/CLI ; identité producteur, principal d’envoi et héritage ouverts |
 | BLP-05 | Médiation réelle fichiers/réseau/fournisseurs/descendants, refus sans repli | 04 | À FAIRE |
 | BLP-06 | Identité humaine établie, validation des octets/destinataires, nouvelle copie | 03–05 | À FAIRE |
-| BLP-07 | Recettes, revue du candidat, livraison locale, ressources servies et RETEX | 01–06 | EN COURS (incréments ciblés vérifiés ; installé v0.1.1-dev.295 ; recette globale et RETEX transversal ouverts) |
+| BLP-07 | Recettes, revue du candidat, livraison locale, ressources servies et RETEX | 01–06 | EN COURS (incréments ciblés vérifiés ; installé v0.1.1-dev.296 ; recette globale et RETEX transversal ouverts) |
 
 Chaque lot inclut documentation FR/EN, contrats des fonctions et revue explicite
 politiques/fonctions/erreurs liée aux octets. Aucun critère critique non vérifié
@@ -565,3 +565,129 @@ Cause : fixture dérivée incomplète, avant le contrôle BLP ; ajout de la troi
 identité de test, sans changer le contrat produit. Un build Rust tiers sur les
 mêmes sources est observé ; les écritures Rust attendent sa fin pour préserver
 ses entrées de compilation. Python/documentation indépendants avancent.
+
+Incident de coordination : le commit concurrent `b4cbfa2255` a inclus les sources
+BLP et des preuves encore ouvertes, sans commit lancé par cette session. Aucun
+historique n’est réécrit. Les canaux du run moteur 02 ont ensuite terminé
+normalement : PASS, un test nommé, sources stables et intégrité VERIFIED.
+Les octets intermédiaires du commit ne constituent pas cette preuve finale.
+La recette publique reçoit encore ses contrôles et n’est pas déclarée passée.
+Le build normal 296 qualifie ses propres octets et métadonnées Git ; son commit
+compilé doit être lu dans l’artefact, jamais déduit du HEAD courant.
+
+Livraison 296 refusée : compilation réussie (1 min 23 s), mais
+`profile-effective-input-changed:rust/crates/swarm-web/src/service.rs` : la
+modification concurrente de la porte Authority a changé une entrée effective.
+Originaux et empreintes conservés dans `20261101-preparation-check-build-refusal-01`,
+image non qualifiée/non installée. Options : attendre un état réexaminé et
+requalifier les nouvelles entrées, ou créer une copie complète parallèle ;
+la première respecte le checkout direct et réutilise le cache sans contourner
+le contrôle. Le nouveau prébind doit inclure les octets observés de service.rs.
+
+Critères de cet incrément (pas de clôture transversale) : diagnostic sans mutation
+avec 1 test moteur nommé déjà PASS ; parcours public attendu sur image normale
+avec 21 assertions CLI/HTTP et émission réelle par double local ; identité de
+l’image et ressources/version FR/EN servies après installation. La classification
+calculée est celle du contexte observé, pas une attribution persistée à la réponse
+du fournisseur. Le principal contrôlé est celui du diagnostic, pas celui de
+l’envoi historique. Les documents opérationnels exposent aussi l’absence d’un
+écran d’inventaire et la granularité encore agrégée des valeurs JSON.
+
+Contre-exemple public : `20261101-preparation-check-public-before-01` sur l’image
+qualifiée 295. Trois témoins passent : véritable envoi public vers double local
+inerte, provenance du producteur, couverture complète. Le contrôle nouveau est
+ensuite refusé au CLI (opération indisponible), au lieu du refus typé de source
+non attribuée attendu. FAIL intact, intégrité VERIFIED ; canaux du parcours liés
+par `counterexample.json`. Ce test ne prétend pas que l’ancien envoi était protégé.
+
+Replan des erreurs HTTP : le diagnostic moteur utilise des refus typés Root
+qui n’étaient pas mappés par le consommateur HTTP (`trust-command`), donc 500
+par défaut. Reproduction `20261101-preparation-http-status-before-01` : contrôle
+BLP HTTP 200 valide, puis principal sans habilitation refusé `blp-access-denied`
+mais statut 500. Image compilée explicitement non qualifiée, copiée avant son
+remplacement ; preuve de défaut seulement, jamais installation/acceptation.
+Second build interrompu par SIGINT de son seul groupe vérifié : exit130,
+INCOMPLETE, originaux `20261101-preparation-check-build-interrupted-02`.
+Décision : mapping des seuls refus métier Root sous contexte trust-command
+(400/403/404/409/501), provenance corrompue et nettoyage restent500 ; matrice
+typée et parcours public désormais 26 assertions exactes. Les éditions Rust
+attendent la fin de la compilation/test tiers qui consomme ce même fichier.
+
+Préconditions de BF-07/BF-16 réexaminées pendant cette reprise : le send public
+actuel ne reçoit pas d’identité Trust authentifiée ; `Native` conserve une nonce,
+une racine et les digests fournisseur/settings, sans principal. Une nonce de
+worker ou le nom de fournisseur ne remplace pas cette liaison. Le prochain
+contrat doit lier l’identité issue du transport à l’intention et au rejeu,
+revalider l’autorité à l’engagement, puis conserver la classification des résultats
+y compris erreurs/résumés. Un hash de configuration fournisseur prouve la
+fraîcheur, pas l’identité du compte/destinataire externe. Ne pas ajouter de
+principal déclaré dans le JSON pour contourner cette précondition. Ce diagnostic
+ne doit jamais être réutilisé comme ticket d’envoi ; une médiation ultérieure
+doit recalculer les sources exactes et vérifier l’autorité courante.
+
+### Résultat vérifié — diagnostic des sources, 1er novembre 2026
+
+- Moteur `20261101-preparation-check-engine-02` : PASS, un test nommé, sources
+  stables et intégrité VERIFIED. Sept sources/contrats concernés sont encore
+  identiques ; ne pas réexécuter ce test pour les seules modifications HTTP.
+- Statuts `20261101-preparation-http-status-01` : PASS, un test nommé, sources
+  stables, intégrité VERIFIED. Le défaut HTTP500 reproduit auparavant est corrigé
+  par mapping des refus métier typés ; provenance corrompue et nettoyage restent500.
+- Public `20261101-preparation-check-public-01` : PASS, **26 assertions CLI/HTTP**,
+  véritable prompt produit par double local inerte ; toutes les attributions par
+  opérations publiques, lecture SQL seulement sur cette fixture. Les refus
+  préservent le journal, le résultat est rejouable ; huit cas HTTP ont statuts et
+  codes exacts. Les **149 artefacts** et leur manifeste final sont revérifiés ;
+  digest `9d5e8d828fb2ce014a8132576c993fe9a63deba4227e6918f9e1e698629d6b99`.
+- Livraison `20261101-preparation-check-installed-01` : **installé v0.1.1-dev.296**,
+  image `e4a802c4dc4d32d90d036169604168c64db15196695d692885369b748686ca72`, profil
+  normal qualifié `.cache/local-delivery/rust-0ukzkap_/build/profile`, sans fixture.
+  Compilation terminée en37s après libération mémoire. Redémarrage pris en charge
+  avec cette empreinte exacte, zéro entrée compilée plus récente à cet instant.
+  Treize sources d’exécution conformes, **56 assertions navigateur** FR/EN/thèmes/
+  version/ressources protégées/commit/modifications/focus, deux aides CLI contrôlées.
+  Commit compilé `b4cbfa22552140fe9a7bcf46ac91165b0abe120d`, modifié=true.
+  `delivery-scope.json` distingue le redémarrage de l’incrément et la sonde readonly.
+- Inventaire `20261101-preparation-flow-inventory-01` : PASS, deux étapes et cinq
+  tests du vérificateur, intégrité VERIFIED. Trois fichiers revus avant actualisation
+  de leurs empreintes/ancrages ; BF-25 et cinq références ajoutés : **25 flux,
+  50 ancrages,46 fichiers**, tous OPEN pour le contrôle BLP transversal. L’ancien
+  inventaire périmé reste FAIL intact et VERIFIED dans `...-before-01`.
+
+Revue des octets, politiques/fonctions/erreurs et limites :
+[registre de revue](verification-blp/20261101-preparation-check-source-review.json).
+La dernière tentative d’annuler notre troisième build en attente n’a envoyé
+aucun signal : le garde a constaté qu’il venait de commencer. Ce build a ensuite
+terminé et fourni le candidat qualifié ci-dessus. Un autre build concurrent
+avait refusé ses entrées changées (version_history.json/graph.js), sans transfert
+de qualification ni réécriture de ses preuves. La réservation du lanceur sérialise
+les builds, pas les écritures de toutes les sessions : observer la fin d’un PID
+ne prouve pas l’absence d’un nouveau compilateur. Le compactage Git a disparu
+sans intervention de cette session ; son statut de sortie n’a pas été observé.
+L’autorisation d’interruption demandée est devenue sans objet ; aucun processus
+tiers n’a été interrompu, et cette session n’a lancé ni commit ni push.
+
+RETEX local : suivre chaque refus jusqu’au statut HTTP, à la fermeture et à la
+sortie ; un moteur vert ne prouve pas le consommateur public. Reprendre les
+fixtures depuis le contrat réel (trois identités), conserver les échecs originaux
+et vérifier les manifestes imbriqués. Revoir les inventaires au même incrément.
+Le qualificateur a effectivement refusé la dérive et le sélecteur prepared-build
+a installé seulement l’image qualifiée. Amélioration de coordination conservée :
+origine = builds/écritures concurrents et maintenance Git ; valeur = réduire
+les requalifications et l’attente sans affaiblir les gardes ; périmètre = méthode
+de développement ; propriétaire = responsable du workflow local. Options :
+fenêtre d’écriture unique partagée, ou gel borné des entrées via le chemin de
+livraison pris en charge. État = proposition hors incrément BLP ; observable =
+qualification de sources stables pendant activité parallèle, sans simple
+consigne prise pour preuve. Reprise à la conception du contrat de coordination ;
+les sessions déjà démarrées ne reçoivent pas automatiquement cette note.
+
+**BLP-04 reste partiel** : contrôle de classifications administrées pour les
+tranches effectivement enregistrées, aucune attribution physique par producteur,
+aucun écran d’inventaire, principal de l’envoi et domaine destinataire non liés,
+aucun héritage persisté sur les résultats. BLP-05/06, migration de l’existant et
+recette/revue/RETEX transversaux restent ouverts. La suite BF-05 → BF-07 → BF-16
+conserve ces préconditions ; ne pas traiter ce diagnostic comme un ticket de
+dispatch. Aucun bootstrap Trust réel, appel payant, déclassification humaine ou
+conformité globale ; auto-revue seulement. Les derniers changements de suivi
+et d’inventaire ne modifient pas l’exécutable installé.

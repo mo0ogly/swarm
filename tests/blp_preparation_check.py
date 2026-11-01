@@ -34,6 +34,7 @@ def main():
     profile=json.loads(args.profile.read_bytes());sha=digest(binary)
     assert profile['sha256']==sha and profile['status']=='VERIFIED_DEFAULT_NATIVE_PROFILE'
     assert profile['no_fixture_feature'] and profile['all_core_features_empty'] and profile['all_core_test_false']
+    publish(out/'qualified-profile.json',profile)
     f=Fixture(binary,out,'blp-preparation');checks=[];web=None
 
     def check(name,condition):
@@ -74,6 +75,7 @@ print(json.dumps({'type':'turn.completed','usage':{'input_tokens':1,'output_toke
         row=json.loads(db.execute('SELECT body FROM preparation_turns WHERE id=?',(turn['id'],)).fetchone()[0])
     manifest=row['_native']['prompt_provenance'];raw=row['prompt'].encode()
     check('actual-producer-provenance',manifest['prompt_sha256']==hashlib.sha256(raw).hexdigest())
+    publish(out/'prompt-provenance.json',manifest)
     parts=manifest['parts'];cursor=0
     for part in parts:
         assert part['start']==cursor and part['end']>cursor
@@ -85,7 +87,7 @@ print(json.dumps({'type':'turn.completed','usage':{'input_tokens':1,'output_toke
     request=dict(schema_version=1,expected_revision=1,preparation_id=p['id'],turn_id=turn['id'])
     state=f.root/'.swarm/trust-actions.json';before=state.read_bytes()
     refused=trust('blp-preparation-check',request,success=False)
-    check('unattributed-source-refuses','blp-classification-required' in json.dumps(refused))
+    check('unattributed-source-refuses',refused.get('failure',{}).get('code')=='blp-classification-required')
     check('missing-attribution-does-not-mutate',state.read_bytes()==before)
     seen=set()
     for part in parts:
@@ -101,11 +103,12 @@ print(json.dumps({'type':'turn.completed','usage':{'input_tokens':1,'output_toke
     for name,token,value,reason in [
         ('session-alone','',request,'authorization_required'),
         ('clearance-compartment','fixture-worker-token',request,'blp-access-denied'),
+        ('no-grant-before-row-lookup','fixture-approver-token',{**request,'turn_id':'missing'},'blp-access-denied'),
         ('stale-policy','fixture-admin-token',{**request,'expected_revision':0},'blp-policy-stale'),
-        ('forged-label','fixture-admin-token',{**request,'classification':dict(level='public',compartments=[])},'trust'),
+        ('forged-label','fixture-admin-token',{**request,'classification':dict(level='public',compartments=[])},'format'),
         ('wrong-parent','fixture-admin-token',{**request,'preparation_id':'other'},'blp-preparation-parent-mismatch')]:
         result=trust('blp-preparation-check',value,token=token,success=False)
-        check(name,reason in json.dumps(result) and 'PRIVATE_BLP_SOURCE' not in json.dumps(result))
+        check(name,result.get('failure',{}).get('code')==reason and 'PRIVATE_BLP_SOURCE' not in json.dumps(result))
     check('cli-refusals-do-not-mutate',state.read_bytes()==before)
     check('exact-read-replay',trust('blp-preparation-check',request)==witness)
     primary=None
@@ -113,17 +116,27 @@ print(json.dumps({'type':'turn.completed','usage':{'input_tokens':1,'output_toke
         web=Server(binary,f.root,out,'blp-preparation-http',environment=f.environment)
         web.capture_async(out/'http-observer.raw')
         csrf=web.request('/api/v1/native-session',observe=False)['csrf_token']
-        for token,expected in [('fixture-admin-token',True),('',False),('fixture-worker-token',False)]:
+        cases=[('join','fixture-admin-token',request,200,None),
+            ('refusal-session','',request,403,'authorization_required'),
+            ('refusal-compartment','fixture-worker-token',request,403,'blp-access-denied'),
+            ('invalid-schema','fixture-admin-token',{**request,'schema_version':0},400,'blp-preparation-check-invalid'),
+            ('stale-policy','fixture-admin-token',{**request,'expected_revision':0},409,'blp-policy-stale'),
+            ('missing-turn','fixture-admin-token',{**request,'turn_id':'missing'},404,'preparation-turn-not-found'),
+            ('wrong-parent','fixture-admin-token',{**request,'preparation_id':'other'},409,'blp-preparation-parent-mismatch'),
+            ('forged-label','fixture-admin-token',{**request,'classification':dict(level='public',compartments=[])},400,'format')]
+        for name,token,value,expected_status,expected_code in cases:
             headers={'Origin':'http://'+web.address,'Cookie':web.cookie,'X-Swarm-CSRF':csrf,'Content-Type':'application/json'}
             if token:headers['Authorization']='Bearer '+token
             connection=http.client.HTTPConnection(web.host,web.port,timeout=None)
             try:
-                connection.request('POST','/api/v1/trust-actions?action=blp-preparation-check',body=json.dumps(request).encode(),headers=headers)
+                connection.request('POST','/api/v1/trust-actions?action=blp-preparation-check',body=json.dumps(value).encode(),headers=headers)
                 response=connection.getresponse();body=response.read();status=response.status
             finally:connection.close()
-            publish(out/('http-'+str(len(checks))+'.json'),dict(status=status,body=json.loads(body)))
-            check('http-'+('join' if expected else 'refusal-'+('session' if not token else 'compartment')),
-                (status==200 and json.loads(body)==witness) if expected else (status>=400 and b'PRIVATE_BLP_SOURCE' not in body))
+            observed=json.loads(body)
+            publish(out/('http-'+name+'.json'),dict(status=status,body=observed))
+            check('http-'+name,status==expected_status and
+                (observed==witness if expected_status==200 else observed.get('failure',{}).get('code')==expected_code)
+                and b'PRIVATE_BLP_SOURCE' not in body)
         check('http-read-does-not-mutate',state.read_bytes()==before)
     except BaseException as error:
         primary=error
