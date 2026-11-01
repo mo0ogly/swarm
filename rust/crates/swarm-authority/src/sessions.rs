@@ -155,3 +155,37 @@ impl Sessions {
         Ok(before - table.len())
     }
 }
+
+/// Forgotten-password requests awaiting an administrator, in memory (a
+/// restart forgets them; each one is also in the audit). A request is
+/// remembered with the account generation it was made under and disappears
+/// by itself once the password changed (any path: Admin, own change, the
+/// sudo `set-password` command) or the account is disabled.
+#[derive(Default)]
+pub struct ResetRequests {
+    table: Mutex<HashMap<String, (i64, i64)>>,
+}
+
+impl ResetRequests {
+    /// Record a request for `subject` at `generation`; `false` when one is
+    /// already pending for that generation (nothing new to record).
+    pub fn request(&self, subject: &str, generation: i64, now: i64) -> bool {
+        let Ok(mut t) = self.table.lock() else { return false };
+        match t.get(subject) {
+            Some((g, _)) if *g == generation => false,
+            _ => {
+                t.insert(subject.to_owned(), (generation, now));
+                true
+            }
+        }
+    }
+
+    /// Pending requests still valid against the current `accounts` view:
+    /// subject → request time. Stale entries (generation changed, account
+    /// gone) are dropped.
+    pub fn pending(&self, accounts: &[AccountView]) -> std::collections::BTreeMap<String, i64> {
+        let Ok(mut t) = self.table.lock() else { return Default::default() };
+        t.retain(|s, (g, _)| accounts.iter().any(|a| &a.subject == s && a.generation == *g));
+        t.iter().map(|(s, (_, at))| (s.clone(), *at)).collect()
+    }
+}

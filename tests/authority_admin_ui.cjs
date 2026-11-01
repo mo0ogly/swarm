@@ -41,10 +41,19 @@ async function listening(port){for(;;){const ok=await new Promise(res=>{const c=
  page.on('pageerror',e=>errors.push('pageerror: '+e.message));page.on('console',m=>{if(m.type()==='error')errors.push('console: '+m.text())});page.on('response',r=>{if(r.status()>=400)errors.push('http: '+r.status()+' '+r.request().method()+' '+r.url())});
  const failOnError=()=>{if(errors.some(e=>e.startsWith('pageerror')))throw Error(errors.join('\n'))};
  await page.setViewport({width:1440,height:960});
+ // Public pages: logo, forgotten password; FR/EN, light/dark, mobile.
+ for(const scheme of ['light','dark'])for(const lang of ['fr','en']){await page.emulateMediaFeatures([{name:'prefers-color-scheme',value:scheme}]);
+  await page.goto(origin+'/login?lang='+lang);check('logo-'+scheme+'-'+lang,await page.$eval('header img',i=>i.complete&&i.naturalWidth>0));await page.screenshot({path:path.join(output,'login-'+lang+'-'+scheme+'.png')});
+  await Promise.all([page.waitForNavigation(),page.click('main > p a')]);await page.screenshot({path:path.join(output,'forgot-'+lang+'-'+scheme+'.png')});}
+ await page.emulateMediaFeatures([{name:'prefers-color-scheme',value:'light'}]);
+ await page.goto(origin+'/login/forgot?lang=fr');await page.type('input[name=subject]','ana');await Promise.all([page.waitForNavigation(),page.click('button[type=submit]')]);
+ check('forgot-confirmation',await page.$eval('[role=status]',e=>e.textContent.includes('Si ce compte existe')));await page.screenshot({path:path.join(output,'forgot-sent-fr.png')});
+ await page.setViewport({width:390,height:844});await page.goto(origin+'/login');check('login-mobile-no-overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:path.join(output,'login-mobile.png')});await page.setViewport({width:1440,height:960});
  await page.goto(origin+'/login');await page.type('input[name=subject]','ana');await page.type('input[name=password]','ana pass');
  await Promise.all([page.waitForNavigation(),page.click('button[type=submit]')]);check('signed-in',!page.url().includes('/login'),page.url());const cookies=await page.cookies();checks.push({name:'debug-after-login',ok:true,detail:{url:page.url(),cookies:cookies.map(c=>c.name+' '+c.sameSite),title:await page.title()}});
  const open=async(lang)=>{await page.goto(origin+'/native-runtime.html?lang='+lang);await page.waitForFunction(()=>!document.getElementById('native-authority-admin').hidden&&document.querySelector('#native-authority-admin table'));failOnError();await page.click('[data-native-view="admin"]');await page.waitForSelector('#native-admin-view:not([hidden])')};
  await open('fr');
+ await page.waitForSelector('[data-authority-add]');check('reset-request-shown',await page.$eval('#native-authority-admin',e=>e.textContent.includes('réinitialisation demandée')));
  const who=await page.$eval('.native-session-user',e=>e.textContent);check('header-user',who==='Ana Admin (ana)',who);
  // Account creation through the dialog, focus back on the opener.
  await page.$$eval('#native-authority-admin details',ds=>ds.forEach(d=>d.open=true));await page.waitForSelector('[data-authority-add]');

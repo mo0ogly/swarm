@@ -24,6 +24,11 @@
 //!   create a further account; password read like `init` (never argv).
 //!   Meant to run as `sudo -u swarm-authority …`, outside any agent channel.
 //!   `--attributes k=v[,k=v]` sets ABAC attributes used by policy `when`.
+//! - `set-password SUBJECT --json`: replace an account's password (break-glass
+//!   when no administrator can sign in; `./swarm.sh authority reset-password`
+//!   runs it through sudo). Password read like `init`. The account's open
+//!   sessions end at their next request (new generation). A journal busy
+//!   refusal (`busy`) is returned as is: rerun.
 //! - `policy-check --method M --path P --integrity N [--roles R,..]
 //!   [--attributes k=v,..] --json`: preview the access decision of the saved
 //!   policy (`policy.json`, else shipped default) for these subject
@@ -39,7 +44,7 @@ use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 use std::{collections::BTreeMap, io::Write, path::Path, process::ExitCode, sync::Arc};
 
 fn usage() -> ExitCode {
-    eprintln!("usage: swarm-authority prepare --dir DIR --controller-uid UID --admin SUBJECT --json | check|init|add-account SUBJECT [--attributes k=v,...]|policy-check --method M --path P --integrity N [--roles r,..] [--attributes k=v,..]|serve --declaration PATH --pin SHA256 [options] [--json]");
+    eprintln!("usage: swarm-authority prepare --dir DIR --controller-uid UID --admin SUBJECT --json | check|init|add-account SUBJECT [--attributes k=v,...]|set-password SUBJECT|policy-check --method M --path P --integrity N [--roles r,..] [--attributes k=v,..]|serve --declaration PATH --pin SHA256 [options] [--json]");
     ExitCode::from(64)
 }
 
@@ -270,6 +275,19 @@ mod linux {
                     Err(e) => fail(e.code()),
                 }
             }
+            "set-password" => {
+                // Break-glass reset (e.g. the only admin forgot theirs): run
+                // as the service account via sudo; password read like `init`.
+                let Some(subject) = positional.first() else { return usage() };
+                let password = match read_password() { Ok(p) => p, Err(c) => return fail(c) };
+                let config = match AuthorityConfig::load(&loaded.dir) { Ok(c) => c, Err(c) => return fail(c) };
+                let key = match pinned_seed(&loaded) { Ok(k) => k, Err(c) => return fail(c) };
+                let a = match accounts(&loaded, key) { Ok(a) => a, Err(c) => return fail(c) };
+                match a.set_password(&Context::new(), subject, password.as_bytes(), config.argon2) {
+                    Ok(_) => print(serde_json::json!({"schema_version": 1, "subject": subject, "password_changed": true})),
+                    Err(e) => fail(e.code()),
+                }
+            }
             "policy-check" => {
                 // Preview of one decision, no mutation: uses the saved policy
                 // and the given subject attributes (not an account lookup).
@@ -298,7 +316,7 @@ mod linux {
                     let listener = match tokio::net::TcpListener::bind(listen).await { Ok(l) => l, Err(_) => return fail("authority-listen") };
                     let own_host = match listener.local_addr() { Ok(a) => a.to_string(), Err(_) => return fail("authority-listen") };
                     eprintln!("{}", serde_json::json!({"schema_version": 1, "listening": own_host, "engine": engine}));
-                    let front = Arc::new(server::Front { accounts: a, sessions: Sessions::new(config), signer: key, config: std::sync::RwLock::new(config), dir: loaded.dir.clone(), own_host, engine, policy: std::sync::RwLock::new(policy), audit });
+                    let front = Arc::new(server::Front { accounts: a, sessions: Sessions::new(config), signer: key, config: std::sync::RwLock::new(config), dir: loaded.dir.clone(), own_host, engine, policy: std::sync::RwLock::new(policy), audit, reset_requests: Default::default() });
                     tokio::select! {
                         r = server::serve(listener, front) => if r.is_err() { return fail("authority-serve") },
                         _ = tokio::signal::ctrl_c() => {}

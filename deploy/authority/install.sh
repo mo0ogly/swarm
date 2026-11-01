@@ -22,6 +22,8 @@
 # The engine must then switch to `authority` mode on an internal port before
 # the service is enabled (printed at the end). No other system change.
 set -euo pipefail
+# Name the exact failing command (coreutils messages can omit the path).
+trap 'printf "Erreur ligne %s : %s\n" "$LINENO" "$BASH_COMMAND" >&2' ERR
 
 LIB_DIR=/usr/local/lib/swarm-authority
 STATE=/var/lib/swarm-authority
@@ -37,6 +39,19 @@ admin='' display='' dry=no uninstall=no purge=no
 fail() { printf 'Erreur : %s\n' "$*" >&2; exit 2; }
 run() { if [ "$dry" = yes ]; then printf '[dry-run]'; printf ' %q' "$@"; printf '\n'; else "$@"; fi; }
 need() { [ "$#" -ge 2 ] && [ -n "$2" ] || fail "valeur manquante pour $1"; }
+# Write CONTENT (plus a newline) to a root-owned file with MODE, atomically:
+# temporary file in the target directory, owner/mode set, then rename. No
+# copy from /dev/stdin or /dev/null: coreutils `install` (uutils, under
+# sudo-rs) refused /dev/stdin as a source ("No such file or directory").
+write_root() {
+    local mode=$1 target=$2 content=$3 tmp
+    tmp=$(mktemp "$(dirname -- "$target")/.swarm-authority.XXXXXX")
+    if printf '%s\n' "$content" >"$tmp" && chown root:root "$tmp" && chmod "$mode" "$tmp" && mv -f -- "$tmp" "$target"; then
+        return 0
+    fi
+    rm -f -- "$tmp"
+    fail "écriture refusée : $target"
+}
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -103,8 +118,8 @@ else
     out=$(runuser -u "$ACCOUNT" -- "$LIB_DIR/swarm-authority" prepare --dir "$STATE" --controller-uid "$controller" --admin "$admin" --json)
     pin=$(printf '%s' "$out" | python3 -c 'import json,sys;print(json.load(sys.stdin)["pin"])')
     public_key=$(printf '%s' "$out" | python3 -c 'import json,sys;print(json.load(sys.stdin)["public_key"])')
-    install -o root -g root -m 0644 /dev/stdin "$ETC/pin" <<<"$pin"
-    install -o root -g root -m 0644 /dev/stdin "$ETC/public_key" <<<"$public_key"
+    write_root 0644 "$ETC/pin" "$pin"
+    write_root 0644 "$ETC/public_key" "$public_key"
 fi
 # 5. hardened unit (root-owned; carries the pin)
 unit_text="[Unit]
@@ -141,7 +156,7 @@ WantedBy=multi-user.target
 if [ "$dry" = yes ]; then
     printf '[dry-run] write %s:\n%s\n' "$UNIT" "$unit_text"
 else
-    install -o root -g root -m 0644 /dev/stdin "$UNIT" <<<"$unit_text"
+    write_root 0644 "$UNIT" "$unit_text"
 fi
 run systemctl daemon-reload
 # Reinstall: a running service picks up the new binary and policy now
@@ -158,7 +173,7 @@ else
         printf 'Création du premier utilisateur « %s » :\n' "$admin"
         runuser -u "$ACCOUNT" -- "$LIB_DIR/swarm-authority" init --declaration "$declaration" --pin "$pin" --admin "$admin" --display "$display" --json \
             || fail "init refusé (voir le code ci-dessus)"
-        install -o root -g root -m 0644 /dev/null "$ETC/initialized"
+        write_root 0644 "$ETC/initialized" ""
     fi
 fi
 

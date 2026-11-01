@@ -397,6 +397,9 @@ def unit_addresses():
 def set_access_mode(binary, root, mode, key):
     """Switch the Root's saved `web_access_mode` (and daemon public key) with
     the public engine-settings preview → apply flow; no-op when already set.
+    A Root saved under an older document version is adopted to the current
+    one (`describe` defaults fill the newer fields, saved values win), as the
+    Admin save does; the change envelope must carry that version.
     Takes effect at the next engine start. Errors: RuntimeError with the
     engine's refusal code."""
     def cli(*args):
@@ -412,10 +415,18 @@ def set_access_mode(binary, root, mode, key):
     values = dict(shown["values"])
     if values.get("web_access_mode") == mode and (key is None or values.get("web_authority_public_key") == key):
         return False
+    schema = shown["schema_version"]
+    described = cli("engine-settings", "describe", "--json")
+    if schema < described["document_schema_version"]:
+        # Older Root (e.g. v49): adopt the current document like the Admin
+        # does — saved values kept, newer fields from the versioned defaults.
+        values = {**described["defaults"], **values}
+        schema = described["document_schema_version"]
+        print(f"  (réglages adoptés en v{schema} : nouveaux champs aux valeurs d’installation)", flush=True)
     values["web_access_mode"] = mode
     if key is not None:
         values["web_authority_public_key"] = key
-    change = {"schema_version": shown["schema_version"], "event_id": "swarm-sh-authority-" + str(int(time.time())),
+    change = {"schema_version": schema, "event_id": "swarm-sh-authority-" + str(int(time.time())),
               "expected_revision": shown["revision"], "values": values,
               "reason": f"./swarm.sh authority : mode d’accès {mode}", "preview_token": ""}
     request = root / ".swarm" / "local-web" / "access-mode-change.json"
@@ -446,11 +457,16 @@ def authority(argv):
     - disable : `sudo systemctl disable --now`, back to `owner-key` mode, the
       engine on the daemon's former public address.
     - status : unit, service, installed/build identity, engine mode.
+    - reset-password LOGIN : break-glass password reset through sudo, as the
+      daemon account (`swarm-authority set-password`); the new password is
+      asked twice on this terminal. For when no administrator can sign in;
+      otherwise an administrator resets it from the Admin.
     Every step prints what it does; a failure stops at that step (rerun after
     fixing: completed steps are no-ops). Uses only public commands.
     """
     parser = argparse.ArgumentParser(prog="swarm.sh authority", description="Démon d’autorité du cockpit (comptes, connexion)")
-    parser.add_argument("step", choices=["install", "enable", "disable", "status"])
+    parser.add_argument("step", choices=["install", "enable", "disable", "status", "reset-password"])
+    parser.add_argument("login", nargs="?", help="compte (reset-password)")
     parser.add_argument("--admin")
     parser.add_argument("--display")
     parser.add_argument("--no-open", action="store_true")
@@ -488,6 +504,17 @@ def authority(argv):
                           "installed_matches_build": sha(AUTHORITY_INSTALLED) is not None and sha(AUTHORITY_INSTALLED) == sha(built)}, indent=1))
         return 0
     listen, engine = unit_addresses()
+    if args.step == "reset-password":
+        if not args.login:
+            parser.error("reset-password exige LOGIN")
+        unit = Path(os.environ.get("SWARM_AUTHORITY_UNIT", "/etc/systemd/system/swarm-authority.service"))
+        words = next(l for l in unit.read_text().splitlines() if l.startswith("ExecStart=")).split()
+        declaration, pin = words[words.index("--declaration") + 1], words[words.index("--pin") + 1]
+        step(f"Nouveau mot de passe pour « {args.login} » (sudo)")
+        subprocess.run(["sudo", "runuser", "-u", "swarm-authority", "--", str(AUTHORITY_INSTALLED), "set-password", args.login,
+                        "--declaration", declaration, "--pin", pin, "--json"], check=True)
+        print("Mot de passe remplacé ; les sessions ouvertes de ce compte prennent fin.")
+        return 0
     if args.step == "enable":
         if sha(AUTHORITY_INSTALLED) != sha(built):
             raise RuntimeError("Le démon installé diffère du dernier build : ./swarm.sh authority install --admin LOGIN --display NOM")
@@ -498,7 +525,12 @@ def authority(argv):
         step("Arrêt du moteur")
         subprocess.run([*me, "stop"], check=True)
         step("Réglage : mode d’accès authority + clé du démon")
-        set_access_mode(binary, root, "authority", key)
+        try:
+            set_access_mode(binary, root, "authority", key)
+        except RuntimeError:
+            # Nothing switched: give the engine back where it was.
+            subprocess.run([*me, "start", "--no-open"], check=False)
+            raise
         step(f"Moteur déplacé sur l’adresse interne {engine}")
         subprocess.run([*me, "configure", "--address", engine], check=True)
         subprocess.run([*me, "start", "--no-open"], check=True)
@@ -515,7 +547,11 @@ def authority(argv):
     step("Arrêt du moteur")
     subprocess.run([*me, "stop"], check=True)
     step("Réglage : mode d’accès owner-key")
-    set_access_mode(binary, root, "owner-key", "")  # owner-key requires an empty key
+    try:
+        set_access_mode(binary, root, "owner-key", "")  # owner-key requires an empty key
+    except RuntimeError:
+        subprocess.run([*me, "start", "--no-open"], check=False)
+        raise
     step(f"Moteur remis sur l’adresse publique {listen}")
     subprocess.run([*me, "configure", "--address", listen], check=True)
     subprocess.run([*me, "start"] + (["--no-open"] if args.no_open else []), check=True)

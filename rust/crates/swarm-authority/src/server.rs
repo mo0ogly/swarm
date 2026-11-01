@@ -53,6 +53,8 @@ pub struct Front {
     pub policy: RwLock<policy::Policy>,
     /// Access audit (B8 attribution): sign-in/out and every non-read request.
     pub audit: audit::Audit,
+    /// Pending forgotten-password requests shown to administrators.
+    pub reset_requests: crate::sessions::ResetRequests,
 }
 
 pub(crate) fn now() -> i64 {
@@ -110,24 +112,74 @@ fn login_response(status: StatusCode, html: String) -> Response<Body> {
     r
 }
 
-fn login_page(english: bool, next: &str, message: &str) -> String {
-    let (title, user, pass, button, lang) = if english {
-        ("Sign in to Swarm", "Account", "Password", "Sign in", "en")
-    } else {
-        ("Connexion à Swarm", "Compte", "Mot de passe", "Se connecter", "fr")
-    };
-    let alert = if message.is_empty() { String::new() } else { format!("<p role=\"alert\">{}</p>", escape(message)) };
+/// Logo and tab icon served by the daemon itself, without a session (the
+/// engine's copies sit behind the relay and need one).
+const LOGO: &[u8] = include_bytes!("../../../../web/swarm-logo.png");
+const ICON: &[u8] = include_bytes!("../../../../web/favicon.svg");
+
+/// Shared shell of the daemon's public pages (sign-in, forgotten password):
+/// logo, title, FR/EN switch keeping `next`; colors follow the system theme.
+fn page(english: bool, title: &str, body: &str, here: &str, next: &str) -> String {
+    let lang = if english { "en" } else { "fr" };
+    let next_q: String = form_urlencoded::byte_serialize(next.as_bytes()).collect();
     format!(
-        "<!doctype html><html lang=\"{lang}\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>{title}</title>\
-<style>:root{{color-scheme:light dark;--bg:#f7f5ef;--fg:#16233a;--line:#8a93a3;--accent:#0b2b4c}}@media(prefers-color-scheme:dark){{:root{{--bg:#0b1a2a;--fg:#e8edf4;--line:#4b5b70;--accent:#9cc7e8}}}}\
-body{{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--fg);font:16px system-ui,sans-serif}}main{{width:min(360px,calc(100% - 32px))}}\
-label{{display:block;margin-top:14px}}input{{width:100%;box-sizing:border-box;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:6px;background:transparent;color:inherit}}\
-button{{margin-top:18px;width:100%;padding:11px;border:0;border-radius:6px;background:var(--accent);color:var(--bg);font-weight:600}}:focus-visible{{outline:3px solid #e0a800;outline-offset:2px}}[role=alert]{{color:#c0392b}}</style></head>\
-<body><main><h1>{title}</h1>{alert}<form method=\"post\" action=\"/login\"><input type=\"hidden\" name=\"next\" value=\"{next}\">\
-<label>{user}<input name=\"subject\" autocomplete=\"username\" required autofocus></label><label>{pass}<input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label>\
-<button type=\"submit\">{button}</button></form></main></body></html>",
-        next = escape(next)
+        "<!doctype html><html lang=\"{lang}\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"/login/icon.svg\" type=\"image/svg+xml\"><title>{title}</title>\
+<style>:root{{color-scheme:light dark;--bg:#f7f5ef;--fg:#16233a;--muted:#4b5566;--line:#8a93a3;--accent:#0b2b4c}}@media(prefers-color-scheme:dark){{:root{{--bg:#0b1a2a;--fg:#e8edf4;--muted:#b7c2d0;--line:#4b5b70;--accent:#9cc7e8}}}}\
+body{{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--fg);font:16px system-ui,sans-serif}}main{{width:min(380px,calc(100% - 32px));padding:24px 0}}\
+header{{text-align:center}}header img{{width:96px;height:96px}}h1{{font-size:1.5rem;margin:.5rem 0 1rem}}p{{color:var(--muted);line-height:1.45}}\
+label{{display:block;margin-top:14px}}input{{width:100%;box-sizing:border-box;min-height:44px;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:6px;background:transparent;color:inherit;font-size:16px}}\
+button{{margin-top:18px;width:100%;min-height:44px;padding:11px;border:0;border-radius:6px;background:var(--accent);color:var(--bg);font-weight:600;font-size:16px;cursor:pointer}}\
+a{{color:var(--accent)}}.links{{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px}}.links a{{display:inline-block;min-height:44px;line-height:44px}}\
+:focus-visible{{outline:3px solid #e0a800;outline-offset:2px}}[role=alert]{{color:#c0392b}}[role=status]{{color:var(--fg)}}</style></head>\
+<body><main><header><img src=\"/login/logo.png\" alt=\"Swarm\" width=\"96\" height=\"96\"><h1>{title}</h1></header>{body}\
+<nav class=\"links\" aria-label=\"{langs}\"><a href=\"{here}?lang=fr&amp;next={next_q}\" lang=\"fr\">Français</a><a href=\"{here}?lang=en&amp;next={next_q}\" lang=\"en\">English</a></nav></main></body></html>",
+        title = escape(title),
+        langs = if english { "Language" } else { "Langue" },
     )
+}
+
+fn login_page(english: bool, next: &str, message: &str) -> String {
+    let (title, user, pass, button, forgot) = if english {
+        ("Sign in to Swarm", "Account", "Password", "Sign in", "Forgot your password?")
+    } else {
+        ("Connexion à Swarm", "Compte", "Mot de passe", "Se connecter", "Mot de passe oublié ?")
+    };
+    let lang = if english { "en" } else { "fr" };
+    let alert = if message.is_empty() { String::new() } else { format!("<p role=\"alert\">{}</p>", escape(message)) };
+    let next_q: String = form_urlencoded::byte_serialize(next.as_bytes()).collect();
+    let body = format!(
+        "{alert}<form method=\"post\" action=\"/login?lang={lang}\"><input type=\"hidden\" name=\"next\" value=\"{next}\">\
+<label>{user}<input name=\"subject\" autocomplete=\"username\" required autofocus></label><label>{pass}<input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label>\
+<button type=\"submit\">{button}</button></form><p><a href=\"/login/forgot?lang={lang}&amp;next={next_q}\">{forgot}</a></p>",
+        next = escape(next)
+    );
+    page(english, title, &body, "/login", next)
+}
+
+/// Forgotten-password page. `sent` shows the confirmation, identical for
+/// every identifier (no account oracle).
+fn forgot_page(english: bool, next: &str, sent: bool) -> String {
+    let lang = if english { "en" } else { "fr" };
+    let next_q: String = form_urlencoded::byte_serialize(next.as_bytes()).collect();
+    let back = format!("<p><a href=\"/login?lang={lang}&amp;next={next_q}\">{}</a></p>", if english { "Back to sign-in" } else { "Retour à la connexion" });
+    let body = if sent {
+        format!("<p role=\"status\">{}</p>{back}", if english {
+            "If this account exists, your request has been passed to the administrators. An administrator will give you a new password; your current one stays valid until then."
+        } else {
+            "Si ce compte existe, votre demande a été transmise aux administrateurs. Un administrateur vous communiquera un nouveau mot de passe ; l’actuel reste valable d’ici là."
+        })
+    } else {
+        let (intro, user, button, last) = if english {
+            ("Swarm runs locally without email: an administrator resets your password from Admin → Accounts and access.", "Account", "Ask for a reset",
+             "Only administrator and forgot your own password? On this machine, run <code>./swarm.sh authority reset-password LOGIN</code> (sudo).")
+        } else {
+            ("Swarm fonctionne en local, sans e-mail : un administrateur réinitialise votre mot de passe depuis Admin → Comptes et accès.", "Compte", "Demander une réinitialisation",
+             "Seul administrateur et mot de passe oublié ? Sur cette machine, lancez <code>./swarm.sh authority reset-password LOGIN</code> (sudo).")
+        };
+        format!("<p>{intro}</p><form method=\"post\" action=\"/login/forgot?lang={lang}\"><input type=\"hidden\" name=\"next\" value=\"{}\">\
+<label>{user}<input name=\"subject\" autocomplete=\"username\" required autofocus></label><button type=\"submit\">{button}</button></form><p>{last}</p>{back}", escape(next))
+    };
+    page(english, if english { "Forgot your password" } else { "Mot de passe oublié" }, &body, "/login/forgot", next)
 }
 
 fn session_token(req: &Request<Incoming>) -> Option<String> {
@@ -199,6 +251,40 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
     let query: Vec<(String, String)> = form_urlencoded::parse(req.uri().query().unwrap_or("").as_bytes()).into_owned().collect();
     let english = query.iter().any(|(k, v)| k == "lang" && v == "en");
     match (req.method().clone(), req.uri().path()) {
+        (Method::GET, "/login/logo.png") => {
+            let mut r = full(StatusCode::OK, "image/png", Bytes::from_static(LOGO));
+            r.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static("public, max-age=86400"));
+            Ok(r)
+        }
+        (Method::GET, "/login/icon.svg") => {
+            let mut r = full(StatusCode::OK, "image/svg+xml", Bytes::from_static(ICON));
+            r.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static("public, max-age=86400"));
+            Ok(r)
+        }
+        (Method::GET, "/login/forgot") => {
+            let next = query.iter().find(|(k, _)| k == "next").map(|(_, v)| v.as_str()).unwrap_or("/");
+            Ok(login_response(StatusCode::OK, forgot_page(english, safe_next(next), false)))
+        }
+        (Method::POST, "/login/forgot") => {
+            let body = match read_body(&front, req.into_body()).await { Ok(b) => b, Err(r) => return Ok(r) };
+            let form: Vec<(String, String)> = form_urlencoded::parse(&body).into_owned().collect();
+            let get = |k: &str| form.iter().find(|(n, _)| n == k).map(|(_, v)| v.clone()).unwrap_or_default();
+            let (subject, next) = (get("subject"), get("next"));
+            if swarm_identity_contract::name(subject.as_bytes()) {
+                let (f, s) = (Arc::clone(&front), subject.clone());
+                // Same answer whatever happens below (no account oracle);
+                // only a new request of an existing account is recorded.
+                if let Ok(Ok(Some(view))) = tokio::task::spawn_blocking(move || f.accounts.current(&Context::new(), &s)).await {
+                    if front.reset_requests.request(&view.subject, view.generation, now()) {
+                        let ev = audit::Event { at: now(), event: "reset-requested", subject: Some(&view.subject), ..Default::default() };
+                        if front.audit.record(&ev).is_err() {
+                            eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
+                        }
+                    }
+                }
+            }
+            Ok(login_response(StatusCode::OK, forgot_page(english, safe_next(&next), true)))
+        }
         (Method::GET, "/login") => {
             let next = query.iter().find(|(k, _)| k == "next").map(|(_, v)| v.as_str()).unwrap_or("/");
             Ok(login_response(StatusCode::OK, login_page(english, safe_next(next), "")))

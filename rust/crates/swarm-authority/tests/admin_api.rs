@@ -68,8 +68,9 @@ impl Client {
         req.push_str("\r\n");
         req.push_str(&body);
         s.write_all(req.as_bytes()).unwrap();
-        let mut raw = String::new();
-        s.read_to_string(&mut raw).unwrap();
+        let mut bytes = Vec::new();
+        s.read_to_end(&mut bytes).unwrap();
+        let raw = String::from_utf8_lossy(&bytes); // binary bodies (logo) stay readable
         let (head, body) = raw.split_once("\r\n\r\n").unwrap_or((&raw, ""));
         let mut lines = head.lines();
         let status = lines.next().unwrap().split(' ').nth(1).unwrap().parse().unwrap();
@@ -170,6 +171,28 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     let subjects: Vec<&str> = list["accounts"].as_array().unwrap().iter().map(|a| a["subject"].as_str().unwrap()).collect();
     assert_eq!(subjects, ["ana", "bob", "carol"]);
 
+    // Public sign-in assets and forgotten-password requests (no session).
+    let logo = c.send("GET", "/login/logo.png", None, None, false);
+    assert!(logo.status == 200 && logo.headers.iter().any(|(k, v)| k == "content-type" && v == "image/png"));
+    assert_eq!(c.send("GET", "/login/icon.svg", None, None, false).status, 200);
+    let login_page = c.send("GET", "/login", None, None, false);
+    assert!(login_page.body.contains("/login/logo.png") && login_page.body.contains("/login/forgot"));
+    assert!(c.send("GET", "/login/forgot?lang=en", None, None, false).body.contains("Ask for a reset"));
+    let forgot = |who: &str| {
+        let mut s = TcpStream::connect(("127.0.0.1", port)).unwrap();
+        let form = format!("subject={who}&next=%2F");
+        s.write_all(format!("POST /login/forgot HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nOrigin: http://127.0.0.1:{port}\r\nConnection: close\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: {}\r\n\r\n{form}", form.len()).as_bytes()).unwrap();
+        let mut raw = String::new();
+        s.read_to_string(&mut raw).unwrap();
+        raw.split_once("\r\n\r\n").map(|(h, b)| (h.lines().next().unwrap().to_owned(), b.to_owned())).unwrap()
+    };
+    let (known, unknown, invalid) = (forgot("bob"), forgot("nobody"), forgot("..%2Fx"));
+    assert_eq!((known.0.as_str(), &known.1), ("HTTP/1.1 200 OK", &unknown.1), "no account oracle");
+    assert_eq!(known.1, invalid.1);
+    forgot("bob");
+    let resets = c.get("/api/v1/authority/accounts", &ana).json()["reset_requests"].clone();
+    assert_eq!(resets.as_object().unwrap().keys().collect::<Vec<_>>(), ["bob"]);
+
     // Non-admins: `me` works, every admin route (GET included) is denied.
     let bob_cookie = c.login("bob", "bob pass").cookie();
     assert_eq!(c.get("/api/v1/authority/me", &bob_cookie).json()["administer"], false);
@@ -205,6 +228,7 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     // Admin password reset ends the target's sessions; disable ends sign-in.
     let reset = c.post("/api/v1/authority/accounts/bob/password", &ana, json!({"password":"bob new"}));
     assert_eq!((reset.status, reset.json()["sessions_ended"].as_u64()), (200, Some(1)));
+    assert!(c.get("/api/v1/authority/accounts", &ana).json()["reset_requests"].as_object().unwrap().is_empty(), "request answered by the reset");
     assert_eq!(c.get("/api/v1/authority/me", &bob_cookie).status, 401);
     let bob_cookie = c.login("bob", "bob new").cookie();
     assert_eq!(c.post("/api/v1/authority/accounts/bob/disable", &ana, json!({})).json()["disabled"], true);
@@ -284,6 +308,16 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     assert!(list["accounts"].as_array().unwrap().iter().all(|a| a["subject"] != "dave"), "no effect while refused");
     assert_eq!(c.post("/api/v1/authority/accounts", &fresh, dave).status, 200, "recovered");
     assert_eq!(c.get("/api/v1/authority/audit", &fresh).json()["chain_valid"], true);
+    let requested = c.get("/api/v1/authority/audit", &fresh).json()["entries"].as_array().unwrap().iter().filter(|e| e["event"] == "reset-requested").count();
+    assert_eq!(requested, 1, "repeated and unknown requests write nothing");
+    // Break-glass `set-password` (sudo path) while the daemon runs.
+    let mut cmd = Command::new(bin).args(["set-password", "ana"]).args(base).arg("--json")
+        .stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::piped()).spawn().unwrap();
+    cmd.stdin.take().unwrap().write_all(b"ana 3\n").unwrap();
+    let out = cmd.wait_with_output().unwrap();
+    assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
+    assert_eq!(c.get("/api/v1/authority/me", &fresh).status, 401, "sessions end with the new generation");
+    let fresh = c.login("ana", "ana 3").cookie();
     // Tampering is detected (not prevented).
     let text = fs::read_to_string(&log).unwrap().replacen("\"sign-in\"", "\"sign-out\"", 1);
     fs::write(&log, text).unwrap();

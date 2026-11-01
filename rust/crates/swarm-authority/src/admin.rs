@@ -289,7 +289,10 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
         (Method::GET, ["accounts"]) => {
             let f = Arc::clone(&front);
             match blocking(move || f.accounts.list(&Context::new()).map_err(|e| e.code())).await {
-                Some(Ok(list)) => ok(json!({"accounts": list})),
+                Some(Ok(list)) => {
+                    let pending = front.reset_requests.pending(&list);
+                    ok(json!({"accounts": list, "reset_requests": pending}))
+                }
                 Some(Err(c)) => account_refusal(c),
                 None => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
             }
