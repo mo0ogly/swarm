@@ -298,3 +298,31 @@ extérieur non confiné du même UID ni des montages privilégiés. Les autres
 lanceurs de contrôle, HTTP/SSE, mémoire, imports et promotions restent à traiter.
 Les parcours planning/reviewer modifiés, la vue Admin transversale, la revue du
 candidat final et l’installation restent ouverts. Aucun Biba global n’est qualifié.
+
+## Attribution BLP : une nouvelle politique ne déclassifie pas
+
+`blp-object-attribute` lie une classification explicite au digest canonique et
+au chemin projet, sous la révision BLP et la révision Trust courantes. L’acteur
+I3/admin doit aussi être habilité à lire cette classification. Une seconde
+attribution du même objet dans une même révision reste refusée ; le même événement
+exact peut être rejoué tant que son autorité reste courante.
+
+Entre révisions, la nouvelle classification doit dominer toutes les attributions
+antérieures du même digest/projet : niveau égal ou supérieur, tous les anciens
+compartiments conservés. Une baisse, un retrait ou un remplacement de compartiment
+refuse `blp-declassification-required` avant publication, sans modifier le journal.
+Une habilitation admin ou une nouvelle révision ne vaut pas accord humain BLP-06.
+Le renouvellement égal ou plus restrictif reste disponible.
+
+La relecture valide également l’historique : une baisse déjà enregistrée provoque
+`trust-proof-integrity`, cause sûre `blp-attribution-history-downgrade`, avant toute
+projection protégée. Elle n’est ni réparée automatiquement ni transformée en
+étiquette plus haute silencieuse. Conserver l’original, ne pas éditer un journal
+vivant ; un historique déjà incohérent exige une reprise autorisée préservant ses
+preuves (aucune commande de réparation n’est livrée ici). Le propriétaire reste
+l’opérateur de contrôle ; une déclassification exige le futur contrat BLP-06.
+
+Portée : attributions PAEA persistées et lecteurs raccordés. Le digest/chemin ne
+prouve pas à lui seul l’identité physique d’un fichier ni la filiation des copies.
+La classification complète des sources de préparation et le contrôle transversal
+des fichiers, réseaux et fournisseurs restent ouverts. Voir le [plan BLP](../plans/actions-confiance/BLP-APEX.md).

@@ -203,3 +203,112 @@ remains required before any real administration.
 284 installation confirmed; [updated record](BLP-PROVENANCE-20261031.md). Current
 local version is 290, preserved without reinstalling; those proofs do not qualify
 290. BLP-04 remains partial, with no transversal BLP enforcement.
+
+## 1 November resumption — attribution renewal and declassification
+
+Discovered while resuming BLP-04: `blp-object-attribute` refused a second attribution
+within one revision but admitted a lower label after policy renewal. Evidence
+`20261101-attribution-renewal-01-counterexample` reproduces confidential → public
+for the same digest/project in revision 2, allowing the public reader. This affects
+the producer and all history consumers, including PAEA previews. Earlier proofs
+retain their exercised scope and did not cover this revision transition.
+
+Decision (Codex, authorized scope): preserve the plan and close this bypass before
+adding another producer. Compared reader-only effective-label escalation against
+producer and stored-history rejection. Selected rejection: do not serve a label
+different from its recorded attribution or normalize corrupt history into success.
+
+Criteria: same digest/project, preserve/increase level and preserve/extend all
+compartments across revisions; lower/incompatible labels refuse without mutation;
+equal/stricter renewal, replay and actual authorized reading pass; already-lowered
+history refuses without disclosure or rewriting. A new revision or admin clearance
+never substitutes for BLP-06 human consent. Binding remains the existing digest +
+project-path contract; this fix establishes neither physical source-file identity,
+complete prompt provenance nor protection of copies without lineage.
+
+State: retained counterexample FAIL; correction/checks in progress through
+`tools/verification/recipes/blp-attribution-renewal.json`. No new right, budget,
+ceiling or operator setting. BLP-04 stays partial; BLP-06 remains unavailable.
+
+Verification journal:
+
+- `20261101-attribution-renewal-01-counterexample`: expected FAIL, lower label
+  admitted and public reader allowed by the previous producer.
+- `...-02`: 11/12 pass; test helper omitted the safe nested cause behind
+  `trust-proof-integrity`. Fixed diagnosis without weakening refusal; fixture
+  injection now reuses guarded atomic publication.
+- `...-03`: 12/12 pass but recipe FAIL due to two concurrently changed authority
+  sources. This is not stable-source evidence.
+- `...-04`: no-symbol build finished and raw output has 12/12, but recipe received
+  SIGTERM before final receipt (origin unknown): incomplete.
+- `20261101-attribution-renewal-05`: **PASS, integrity verified**, 12 tests actually
+  executed with stable declared sources, reusing the now-built test candidate.
+  This changed prerequisite is retained; no deadline was added.
+- `20261101-attribution-history-cli-01-baseline`: qualified delivered image 290
+  passes equal-history control then fails to reject a lowered history. Synthetic
+  fixture only; no live journal modified.
+
+Only owned runs were interrupted for memory pressure (retained interruption JSON
+records). Recipes use debug symbols 0 as delivery and one compiler job, with all
+functional cases and no global watchdog. Cancellation is not PASS. Object
+attribution is not yet exposed by the CLI; operator wiring stays in BLP-03. The
+new CLI journey tests the consumer on explicitly injected fixture history,
+without creating a testing right.
+
+HTTP verification replan: the proposed `paea_git_call` extension was removed from
+the candidate. That target requires `SWARM_PAEA_SOURCE_FIXTURE`, a previously
+accepted writable native fixture mission; no other actor's fixture was borrowed.
+Web attempts 01–05 are retained: interrupted compilation, new-test borrow error,
+missing native prerequisite, and binder stdout contract corrected for compact
+JSON. None is declared PASS. The recipe now compiles explicitly before binding,
+retaining complete Cargo diagnostics.
+
+`20261101-attribution-renewal-web-06`: **PASS, integrity verified**, one fresh
+mission-free `confidentiality_http` test: real HTTP bootstrap/policy, engine
+producer refusal without mutation, equal renewal, lowered-history HTTP refusal
+without material in body/headers, exact recovery. The test image is bound before/
+after with stable bytes. This does not replace the prepared-call PAEA-route
+qualification, which remains for a verifier-owned fresh native fixture.
+
+### Local correction result — 1 November 2026
+
+| Check | Result and scope |
+|---|---|
+| Engine `20261101-attribution-renewal-06` | PASS, 12 tests; equal authorized control before history injection, exact reader cause, refusal without mutation and recovery |
+| HTTP `20261101-attribution-renewal-web-06` | PASS, fresh mission-free Root, bound/stable test image, no borrowed native prerequisite |
+| CLI `20261101-attribution-history-cli-02` | PASS, 15 assertions on qualified normal image 292: control, level/compartment decrease refusal, redaction, unchanged journal and exact recovery |
+| Installed `20261101-attribution-installed-01` | PASS: loaded image, compiled notes and seven runtime sources match; 56 browser assertions covering FR/EN, themes, version/commit link and protected PAEA asset bytes against compiler inventory; no browser errors or writes |
+| Inventory `20261101-flow-inventory-01` | PASS: 24 flows, 45 anchors, five verifier tests; declared freshness only, not complete mediation |
+
+**v0.1.1-dev.292**, image
+`4164953c841c2b22476bd552a12496aac2b7f95e9b26de04d986c3238e2ed83c`,
+was installed by a parallel delivery before this closure. Its normal profile and
+FR/EN notes already contain the fix. Seven runtime source files and the loaded
+image were explicitly compared; no additional restart/service interruption was
+needed. My redundant 294 reconstruction was stopped, claiming neither qualification
+nor installation. Newer sources stay outside this proof. Launcher `status` was
+waiting for the lifecycle lock held by my build; final observation used the
+protected API and checked process identity before/after, without bypassing a
+mutating operation. Private browser profiles remain under Git-ignored `evidence/`.
+
+Byte-bound self-review: [source-review](../../../plans/actions-confiance/verification-blp/20261101-attribution-source-review.json).
+No new operator policy: historical dominance is a BLP invariant, schema/identifiers
+are protocol, fixture values are test inputs, image IO buffer size is technical
+allocation rather than a read cutoff. Modified/new functions have contracts;
+errors were traced through engine, HTTP and CLI with positive controls/recovery.
+Original compiler diagnostics and incomplete recipes are preserved.
+
+Local lesson: policy-edit authority is not declassification authority. Guard both
+producer and retained-history reads. A bounded recipe must create its prerequisites;
+a retained native-mission journey is not a generic HTTP fixture. Preserve compiler
+diagnostics before artifact binding and inspect the binder's actual stdout format.
+With concurrent work, inspect an already-qualified/installed image and its relevant
+inputs before rebuilding; do not wait on exclusive `status` behind your own build.
+
+Limits: self-review only; prepared-call PAEA routes were not qualified here;
+digest/path proves neither physical nor copy lineage. Full preparation attribution,
+authenticated principal, mediation and inheritance remain pending. Previously
+lowered histories refuse; no historical repair command is delivered. The observed
+instance has no Trust journal; no real-data migration/bootstrap was performed.
+**BLP-04 remains partial and BLP-06 unavailable; no transversal confidentiality or
+independent acceptance is claimed.**

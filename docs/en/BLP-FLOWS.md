@@ -7,7 +7,7 @@
 
 ## State and scope
 
-BLP-01, October31: **24 documented flows, 44 anchors in 42 source files**,
+BLP-01, October31: **24 documented flows, 45 anchors in 43 source files**,
 reviewed at current producer/consumer boundaries. The JSON records exposed
 material, producer, recipient, existing controls, owner, missing packages and
 required observable per flow, with complete source hashes/anchor lines. Changes
@@ -150,3 +150,8 @@ Recipe: `tools/verification/recipes/blp-preparation-provenance.json` (assembler
 and native-row consumer). The existing CLI recipe also checks coverage and the
 digest against stdin actually received by an inert provider. Results and delivery
 are retained in the [resumption record](plans/actions-confiance/BLP-PROVENANCE-20261031.md).
+
+1 November revision: BF-23/24 include the PAEA reader and current-attribution
+recheck. Policy renewal preserves prior levels/compartments; coverage remains
+partial. Four drifted sources were reviewed (preview, presentation, Trust
+dispatch, BLP module); unrelated source hashes were not refreshed.

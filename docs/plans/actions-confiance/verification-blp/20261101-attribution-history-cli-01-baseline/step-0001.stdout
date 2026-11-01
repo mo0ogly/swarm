@@ -1,0 +1,6 @@
+PASS qualified-image-init
+PASS trust-policy-produced
+PASS blp-revision-1-produced
+PASS blp-revision-2-produced
+PASS equal-label-history-positive-control
+PASS positive-read-is-readonly

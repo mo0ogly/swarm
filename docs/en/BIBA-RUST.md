@@ -290,3 +290,29 @@ same-UID writer or privileged mounts. Other control launchers, HTTP/SSE, memory,
 imports and promotions remain open. Changed planner/reviewer journeys, transversal
 Admin UX, final candidate review and installation also remain open. Global Biba
 is not qualified.
+
+## BLP attribution: a new policy does not declassify
+
+`blp-object-attribute` binds an explicit classification to the canonical digest
+and project path under current BLP and Trust revisions. The I3/admin actor must
+also have clearance for that label. A second attribution of the same object in
+one revision remains refused; the same exact event can replay while current.
+
+Across revisions the new classification must dominate every earlier attribution
+for that digest/project: equal/higher level and all previous compartments retained.
+Lowering, removing or replacing compartments refuses `blp-declassification-required`
+before publication, without journal mutation. Admin clearance or a new policy
+revision never substitutes for BLP-06 human consent. Equal/stricter renewal works.
+
+History reads enforce the same invariant. An already-recorded decrease yields
+`trust-proof-integrity`, safe cause `blp-attribution-history-downgrade`, before
+protected projection. It is neither automatically repaired nor silently served
+with a higher replacement label. Preserve originals; never edit a live journal.
+An inconsistent historical record requires authorized evidence-preserving recovery
+(no repair command is delivered here). The control operator owns that recovery;
+declassification requires the future BLP-06 contract.
+
+Scope: persisted PAEA attributions and connected readers. Digest/path alone proves
+neither physical source-file identity nor copy lineage. Complete preparation-source
+classification and transversal file/network/provider mediation remain pending.
+See the [BLP plan](plans/actions-confiance/BLP-APEX.md).

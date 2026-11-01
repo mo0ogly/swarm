@@ -1,0 +1,11 @@
+{
+  "scope": "only verified owned build subtree; service and other builds preserved",
+  "root_pid": 1019056,
+  "interrupted_pids": [
+    1021738,
+    1021600,
+    1019056
+  ],
+  "reason": "serialize owned verification after observed memory/swap pressure; no qualification or installation claimed",
+  "resume_when": "owned engine/web tests finish; build inputs and memory pressure reexamined"
+}

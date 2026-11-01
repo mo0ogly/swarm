@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Confidentialité PAEA : un renouvellement de politique ne permet plus d’abaisser la classification du même objet ni de retirer ses compartiments. Le refus préserve le journal ; les renouvellements égaux ou plus restrictifs restent possibles. Un historique déjà abaissé est refusé à la relecture. La déclassification humaine reste à implémenter.",
+        "en": "PAEA confidentiality: policy renewal can no longer lower the same object’s classification or remove its compartments. Refusal preserves the journal; equal or stricter renewal remains possible. An already-lowered history is rejected on read. Human declassification remains to be implemented."
+      },
+      {
         "fr": "Graphe : cadrage des cartes déplacées, annulation du dernier placement, mini-carte interactive au clavier et à la souris, copie de l’identifiant avec repli sélectionnable et aide des gestes.",
         "en": "Graph: fit moved cards, undo the last placement, navigate the mini-map by keyboard or mouse, copy task IDs with a selectable fallback, and reveal gesture help."
       },

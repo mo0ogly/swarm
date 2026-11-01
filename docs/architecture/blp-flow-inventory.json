@@ -265,8 +265,8 @@
     {
       "id": "preview",
       "path": "rust/crates/swarm-web/src/service/paea_git_call_preview.rs",
-      "sha256": "29c75597cc6fc741421a7bf01e60125d71ef8ef82a3b922ed35bf4cdd10666b0",
-      "line": 26,
+      "sha256": "6f24727867a11d2595176b4ebe24432282de9a157affcef636dd9ac31b8731f6",
+      "line": 42,
       "anchor": "pub(super) fn paea_git_call_preview("
     },
     {
@@ -286,23 +286,23 @@
     {
       "id": "approval",
       "path": "rust/crates/swarm-web/src/service/paea_git_call_approval.rs",
-      "sha256": "b0e6306dbaa58c954f94be7bb898154275145939e7983046847c8855616ddb98",
+      "sha256": "afe5357e78ca33466b229222329ea777cb839ae77f87eaf9fb7d68dac74e1ea4",
       "line": 1,
       "anchor": "//!"
     },
     {
       "id": "trust_store",
       "path": "rust/crates/swarm-engine/src/root_store/trust_store.rs",
-      "sha256": "fa20f7d25bed352ea746ab7658645ac472053db92db902ce295e936642b6766b",
+      "sha256": "c1d21badd8a376c7cb270c9ae832f863c6e530d84d281939d8a1ec247041f783",
       "line": 54,
       "anchor": "pub fn trust("
     },
     {
       "id": "blp_diag",
       "path": "rust/crates/swarm-engine/src/trust/confidentiality.rs",
-      "sha256": "920eeccb7317d18f822662de7622d6b07c2c69f3bb0a8cc2bdaa2a5186fc215f",
-      "line": 99,
-      "anchor": "\"runtime_enforced\":false"
+      "sha256": "4bad3731bf2089d97ef7000befd15b366e809e68aa29bc3e175fb22bf3dbe691",
+      "line": 263,
+      "anchor": "pub(crate) fn capability("
     },
     {
       "id": "prompt_provenance",
@@ -310,6 +310,13 @@
       "sha256": "86d08b88a025ba481bd7665aaab92d17257086de41180eb3ff68ad4163cd88c4",
       "line": 119,
       "anchor": "pub(super) fn assemble("
+    },
+    {
+      "id": "reader_guard",
+      "path": "rust/crates/swarm-engine/src/root_store/reader_guard.rs",
+      "sha256": "237af07cab099cf7f320b3fd574fbe7d33205b2d33f1736fdd5fe7892d4b2975",
+      "line": 73,
+      "anchor": "pub fn paea_reader_verdict("
     }
   ],
   "flows": [
@@ -782,10 +789,11 @@
       "consumer": "native UI reader and prepared approval request",
       "references": [
         "preview",
-        "approval"
+        "approval",
+        "reader_guard"
       ],
       "material": "full proposal/context, exact terms, approver metadata and credential use",
-      "current_controls": "session/CSRF, prepared exact action and existing approval channel; no right to declassify",
+      "current_controls": "session/Host/CSRF, exact prepared action and approval channel; preview and approval presentation re-read current Trust identity, BLP policy and digest/project attribution before projection; attribution renewal cannot lower prior level/compartments. No human declassification or general source mediation.",
       "missing_blp": [
         "BLP-04",
         "BLP-05",
@@ -805,10 +813,11 @@
         "trust_store",
         "reconcile",
         "blp_diag",
-        "storage"
+        "storage",
+        "reader_guard"
       ],
       "material": "originals, policy history, identifiers, proofs and diagnostics",
-      "current_controls": "operator authority, attribution/hashes and publication errors; diagnostics explicitly non-authorizing",
+      "current_controls": "operator authority, hashes/publication errors; connected PAEA readers validate current persisted attribution and monotone history. Diagnostics remain non-authorizing; remaining show/export/archive surfaces need BLP coverage.",
       "missing_blp": [
         "BLP-04",
         "BLP-05",

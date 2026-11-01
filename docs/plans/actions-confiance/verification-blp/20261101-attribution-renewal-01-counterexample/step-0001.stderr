@@ -147,3 +147,11 @@ warning: function `cockpit_post_delivery` is never used
 188 | pub(crate) fn cockpit_post_delivery(
     |               ^^^^^^^^^^^^^^^^^^^^^
 
+warning: `swarm-engine` (lib) generated 20 warnings (run `cargo fix --lib -p swarm-engine` to apply 2 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 48.95s
+     Running tests/confidentiality.rs (.cache/blp-verification-target/debug/deps/confidentiality-12f9c50fe1f64d74)
+
+thread 'policy_revision_cannot_lower_or_remove_object_classification' (1003115) panicked at crates/swarm-engine/tests/confidentiality.rs:289:9:
+policy renewal admitted implicit declassification: Ok(Object {"actor": String("admin"), "attributed": Bool(true), "canonical_digest": String("cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"), "classification": Object {"compartments": Array [], "level": String("public")}, "policy_revision": String("2"), "reason": String("Exact confidential fixture object"), "runtime_enforced": Bool(false), "schema_version": Number(1), "trust_revision": String("1")}); low-reader=Ok(Allowed)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p swarm-engine --test confidentiality`

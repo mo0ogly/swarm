@@ -47,7 +47,8 @@
     "rust/crates/swarm-web/src/service/paea_git_call_approval.rs",
     "rust/crates/swarm-web/src/service/paea_git_call_preview.rs",
     "rust/crates/swarm-web/src/service/preparations.rs",
-    "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs"
+    "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
+    "rust/crates/swarm-engine/src/root_store/reader_guard.rs"
   ],
   "environment": {},
   "steps": [
@@ -61,7 +62,7 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "\"reference_count\": 44",
+        "\"reference_count\": 45",
         "\"flow_count\": 24",
         "BLP_INVENTORY_CURRENT declared anchors and source hashes only; runtime protection not established"
       ],

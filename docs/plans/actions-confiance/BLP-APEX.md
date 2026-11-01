@@ -333,3 +333,125 @@ Reprise du 1er novembre : preuves de provenance (11 tests, CLI 29, HTTP 34) et
 installation historique 284 confirmées ; [suivi actualisé](BLP-PROVENANCE-20261031.md).
 La version locale observée est désormais 290, conservée sans réinstallation ; ces
 preuves ne qualifient pas 290. BLP-04 reste partiel, sans contrôle BLP transversal.
+
+## Reprise du 1er novembre — renouvellement d’attribution et déclassification
+
+Incident découvert en reprenant BLP-04 : `blp-object-attribute` refuse une seconde
+attribution dans une même révision, mais permettait une classification plus basse
+après renouvellement de politique. La recette
+`20261101-attribution-renewal-01-counterexample` reproduit l’admission du même
+digest/projet de confidentiel vers public en révision 2 ; le lecteur public reçoit
+alors `Allowed`. Le problème concerne le producteur et tous les consommateurs de
+l’historique, y compris les aperçus PAEA ; les preuves antérieures restent valables
+pour leurs cas exercés, sans couvrir ce changement de révision.
+
+Décision (Codex, périmètre autorisé) : conserver le plan et fermer ce contournement
+avant de créer un autre producteur. Deux voies comparées : recalculer une étiquette
+plus haute à la lecture seulement, ou refuser la baisse au producteur et dans
+l’historique relu. Choix : seconde voie, pour ne pas servir une étiquette différente
+de l’attribution enregistrée ni transformer une corruption en succès.
+
+Critères : même digest/projet, niveau conservé ou augmenté et compartiments
+conservés ou étendus entre toutes les révisions ; retrait/changement de compartiment
+et niveau inférieur refusés sans mutation ; renouvellement égal/plus restrictif,
+rejeu et relecture réelle autorisée vérifiés ; historique déjà abaissé refusé sans
+divulgation ni réécriture. Une révision ou une habilitation admin ne vaut jamais
+accord humain BLP-06. Le rapprochement reste celui du contrat existant digest +
+chemin projet ; ce correctif n’établit ni identité physique du fichier source, ni
+provenance complète du prompt, ni protection des copies sans filiation.
+
+État : contre-exemple FAIL conservé ; correction et contrôles en cours dans
+`tools/verification/recipes/blp-attribution-renewal.json`. Aucun droit, budget,
+plafond ou réglage opérateur ajouté. BLP-04 reste partiel ; BLP-06 reste indisponible.
+
+Journal de vérification du correctif :
+
+- `20261101-attribution-renewal-01-counterexample` : FAIL attendu, baisse admise
+  et lecteur public autorisé sur le producteur précédent.
+- `...-02` : 11/12 passent ; le helper de test n’exposait pas la cause sûre
+  derrière la famille `trust-proof-integrity`. Diagnostic corrigé sans assouplir
+  le refus ; injections de fixture réutilisant la publication atomique gardée.
+- `...-03` : 12/12 passent, mais recette FAIL pour deux sources d’autorité modifiées
+  concurremment. Ce résultat ne devient pas une preuve de sources stables.
+- `...-04` : compilation sans symboles terminée et sorties 12/12, mais processus
+  de recette terminé par SIGTERM avant reçu final (origine non établie) : incomplet.
+- `20261101-attribution-renewal-05` : **PASS, intégrité vérifiée**, 12 tests réellement
+  exécutés et sources déclarées stables, après réutilisation du candidat de test
+  désormais construit. Le changement de précondition est conservé, sans délai ajouté.
+- `20261101-attribution-history-cli-01-baseline` : l’image livrée 290 qualifiée
+  passe le témoin d’historique égal puis échoue au refus d’un historique abaissé.
+  Fixture synthétique uniquement, aucun journal vivant modifié.
+
+La lenteur a conduit à interrompre seulement les exécutions détenues (preuves
+`20261101-owned-build-interruption.json`, `20261101-owned-web-profile-replan.json`).
+Recettes : symboles de débogage à 0 comme la livraison, une compilation à la fois,
+cas fonctionnels conservés et aucun watchdog global. Une annulation n’est pas un PASS.
+L’attribution d’objet n’est pas encore exposée par la CLI ; son raccord opérateur
+reste au lot BLP-03. Le nouveau parcours CLI vérifie donc le consommateur sur une
+histoire de fixture explicitement injectée, sans créer un droit pour le test.
+
+Recadrage du contrôle HTTP : l’extension envisagée de `paea_git_call` a été
+retirée du candidat. Ce target exige `SWARM_PAEA_SOURCE_FIXTURE`, une mission
+native de fixture préalablement acceptée et modifiable ; aucune fixture d’autrui
+n’a été empruntée. Les essais `...-web-01` à `...-web-05` restent conservés :
+interruption de compilation, diagnostic d’emprunt du nouveau test, précondition
+native absente, puis contrat de sortie du lieur corrigé (JSON compact). Aucun de
+ces lots n’est déclaré PASS. La recette compile désormais explicitement avant
+liaison pour conserver le diagnostic Cargo complet.
+
+`20261101-attribution-renewal-web-06` : **PASS, intégrité vérifiée**, racine neuve
+sans mission, test `confidentiality_http::policy_renewal_and_poisoned_history_refuse_through_http` :
+bootstrap/politique HTTP réels, refus au producteur moteur sans mutation,
+renouvellement égal, refus HTTP d’un historique abaissé sans matière dans corps
+ou en-têtes, reprise exacte. Image de test liée avant/après, octets stables.
+Cela ne remplace pas la qualification des deux routes PAEA avec appel préparé :
+elle reste à reprendre sur une fixture native fraîche détenue par son vérificateur.
+
+### Résultat local du correctif — 1er novembre 2026
+
+| Contrôle | Résultat et portée |
+|---|---|
+| Moteur `20261101-attribution-renewal-06` | PASS, 12 tests ; témoin égal autorisé avant injection de l’historique abaissé, cause exacte aux lecteurs, refus sans mutation et reprise |
+| HTTP `20261101-attribution-renewal-web-06` | PASS, test autonome sur racine neuve ; image de test liée/stable, aucun prérequis de mission emprunté |
+| CLI `20261101-attribution-history-cli-02` | PASS, 15 assertions sur l’image normale qualifiée 292 ; témoin, niveau/compartiment retirés refusés, données absentes de l’erreur, journal inchangé, reprise exacte |
+| Instance `20261101-attribution-installed-01` | PASS ; processus chargé, notes compilées et sept sources d’exécution identiques au correctif testé ; 56 assertions navigateur FR/EN, thèmes, version/lien de commit, ressources protégées PAEA conformes à l’inventaire compilé, aucune écriture ni erreur navigateur |
+| Inventaire `20261101-flow-inventory-01` | PASS : 24 flux, 45 ancrages, cinq tests de vérificateur ; fraîcheur déclarative, pas médiation complète |
+
+La version **v0.1.1-dev.292**, image
+`4164953c841c2b22476bd552a12496aac2b7f95e9b26de04d986c3238e2ed83c`,
+a été installée par une livraison parallèle avant cette clôture. Son profil normal
+et ses notes FR/EN contiennent déjà le correctif. Comparaison explicite des sept
+fichiers moteur/moniteur/consommateurs, puis contrôle de l’image réellement chargée :
+aucun redémarrage supplémentaire ni arrêt du service n’a été nécessaire. Ma
+reconstruction redondante 294 a été interrompue, sans qualification ni installation
+revendiquée. Les autres sources plus récentes restent hors de cette preuve.
+Le `status` du lanceur attendait le verrou de cycle de vie tenu par mon build :
+l’observation finale a utilisé l’API protégée et l’identité du processus vérifiées
+avant/après, sans contourner une opération de mutation. Les profils navigateur
+privés restent dans le sous-dossier `evidence/` ignoré par Git.
+
+Revue liée aux octets : [source-review](verification-blp/20261101-attribution-source-review.json).
+Aucune politique opérateur ajoutée : la dominance historique est un invariant BLP,
+les schémas/identifiants sont des contrats, les valeurs de fixtures sont des entrées
+de test ; le tampon de lecture d’image est une allocation technique, pas une borne.
+Les contrats des fonctions modifiées/créées sont documentés ; les erreurs ont été
+suivies jusqu’aux consommateurs moteur, HTTP et CLI, avec témoins et reprises.
+Les anciens diagnostics de compilation et recettes incomplètes restent conservés.
+
+RETEX local : ne pas confondre droit de changer une politique et droit de
+déclassifier ; contrôler le producteur **et** la relecture de l’historique. Une
+preuve ciblée doit créer ses propres préconditions ; une recette de mission native
+retenue n’est pas une fixture HTTP générique. Compiler avec diagnostics conservés
+avant de lier l’image ; vérifier le format de sortie réel du lieur. En contexte
+concurrent, examiner d’abord l’image déjà qualifiée/installée et ses entrées
+pertinentes pour éviter une reconstruction redondante ; ne pas attendre un `status`
+exclusif derrière son propre build.
+
+Limites maintenues : auto-revue seulement ; le contrôle PAEA à appel préparé n’a
+pas été qualifié ici ; le digest/chemin n’établit pas la filiation physique ou des
+copies ; source complète de préparation, principal authentifié, médiation et
+héritage restent ouverts. Une ancienne histoire déjà abaissée refuse ; aucun outil
+de réparation historique n’est livré. Le journal Trust de l’instance observée est
+absent, aucune migration ni initialisation de ses données réelles n’a été faite.
+**BLP-04 reste partiel et BLP-06 indisponible ; aucune confidentialité transversale
+ni acceptation indépendante n’est déclarée.**

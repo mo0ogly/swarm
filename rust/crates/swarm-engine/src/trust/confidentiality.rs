@@ -49,7 +49,10 @@ pub(crate) struct Entry {
 /// only one: a later event that would store a contradicting label is refused
 /// (see `blp-object-attribute`), and any label change is an explicit policy
 /// decision recorded as a new revision, never an in-place overwrite or an
-/// implicit declassification. No per-id exception exists.
+/// implicit declassification. Across revisions the new label must dominate
+/// every previously recorded label for the same digest/project. An ordinary
+/// policy change never supplies BLP-06 human declassification. No per-id
+/// exception exists.
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct Attribution {
@@ -132,11 +135,14 @@ impl Record {
     /// empty or unknown level can never be read back coherently by the reader
     /// guard (`check_read`), so it invalidates the history at decode time
     /// instead of producing an incoherent success at consumption. Errors:
-    /// any violation is `E::Integrity("blp-history-invalid")` (or
-    /// `blp-policy-invalid` for a policy refusal) and refuses the whole
+    /// malformed attribution fields give `blp-history-invalid`; a
+    /// cross-revision decrease gives `blp-attribution-history-downgrade`
+    /// (both Integrity); invalid policy gives `blp-policy-invalid`. These
+    /// failures refuse the whole
     /// state at every open, replay and read — never a partial tolerance or
     /// a default level. Limits: this validates the stored record's internal
-    /// coherence; it does not re-run the producer's operator validation at
+    /// coherence, including monotone classifications across policy revisions;
+    /// it does not re-run the producer's operator validation at
     /// consumption time and claims no rollback protection.
     pub fn validate(&self) -> Result<(), E> {
         if self.schema_version != 1 || self.history.is_empty() {
@@ -187,6 +193,21 @@ impl Record {
                 if entry.trust_revision < self.history[index-1].trust_revision { return Err(E::Integrity("blp-authority-history-invalid")); }
             }
         }
+        // Catalog evolution was validated above. Every old label remains
+        // interpretable in its successor; changing policy cannot erase an
+        // object's prior level or compartments. Check retained histories too,
+        // so a pre-fix or injected downgrade cannot authorize a reader.
+        let mut previous=std::collections::BTreeMap::new();
+        for entry in &self.history {
+            for attribution in &entry.attributions {
+                let key=(attribution.canonical_digest.as_str(),attribution.project_path.as_slice());
+                if let Some(prior)=previous.insert(key,attribution) {
+                    if !classification_dominates(&entry.policy,attribution,prior)? {
+                        return Err(E::Integrity("blp-attribution-history-downgrade"));
+                    }
+                }
+            }
+        }
         Ok(())
     }
     /// Latest validated entry. Empty/corrupt history refuses, never defaults.
@@ -196,6 +217,17 @@ impl Record {
         self.validate()?;
         self.history.last().ok_or(E::Integrity("blp-history-invalid"))
     }
+}
+
+/// Compare two already attributed labels under a validated successor catalog.
+/// This pure consistency check preserves level and compartments, including
+/// historical ones; malformed labels return an integrity error. It grants no
+/// classification authority, declassification or permission to read content.
+fn classification_dominates(policy:&Policy, next:&Attribution, prior:&Attribution) -> Result<bool,E> {
+    policy.dominates(
+        &Classification{level:next.level.clone(),compartments:next.compartments.clone()},
+        &Classification{level:prior.level.clone(),compartments:prior.compartments.clone()},
+    ).map_err(|_|E::Integrity("blp-history-invalid"))
 }
 
 impl Entry {
@@ -242,7 +274,9 @@ pub(crate) fn capability(st: &State) -> Result<Value, E> {
 /// administration requires a current authenticated I3/admin; the local operator
 /// shortcut is deliberately absent. Preview/check/show never mutate. Apply
 /// binds the exact proposal, actor and current Trust/BLP revisions, appends one
-/// attributed proof and preserves idempotence. No input creates human identity.
+/// attributed proof and preserves idempotence. Object attribution cannot lower
+/// any previously recorded classification across revisions; that requires the
+/// separate, unavailable BLP-06 contract. No input creates human identity.
 pub(crate) fn execute(st: &mut State, op: &str, raw: &[u8], source: Source<'_>, now: OffsetDateTime)
     -> Result<(Vec<u8>, Option<&'static str>), E>
 {
@@ -320,16 +354,16 @@ pub(crate) fn execute(st: &mut State, op: &str, raw: &[u8], source: Source<'_>, 
             let reply=st.event_replies.get(&c.event_id).ok_or(E::Integrity("blp-replay-missing"))?;
             return Ok((reply.raw().as_bytes().to_vec(),Some("replayed")));
         }
-        let label=json!({"level":label.level,"compartments":label.compartments});
+        let classification=label.clone();
         let value=json!({"schema_version":1,"attributed":true,"canonical_digest":c.canonical_digest,
             "policy_revision":entry.revision.to_string(),"trust_revision":st.revision.to_string(),
-            "classification":label,"actor":actor.subject,"reason":c.reason,"runtime_enforced":false});
+            "classification":classification,"actor":actor.subject,"reason":c.reason,"runtime_enforced":false});
         let bytes=super::encoded(&value)?;
         let stamp=super::operations::stamp(now)?;
         let attribution=Attribution{canonical_digest:c.canonical_digest.clone(),
             project_path:c.project_path.clone().into_bytes(),
-            policy_revision:entry.revision,level:label["level"].as_str().unwrap_or_default().to_owned(),
-            compartments:label["compartments"].as_array().map(|a|a.iter().filter_map(|v|v.as_str().map(str::to_owned)).collect()).unwrap_or_default(),
+            policy_revision:entry.revision,level:classification.level,
+            compartments:classification.compartments,
             actor:actor.subject.clone(),at:stamp.clone(),reason:c.reason};
         // Exact-once admission: one control attribution per object under a
         // policy revision. A second event binding the same
@@ -337,13 +371,22 @@ pub(crate) fn execute(st: &mut State, op: &str, raw: &[u8], source: Source<'_>, 
         // contradict or repeat the recorded label (the identical event
         // replays above through its own event id) — so no contradicting pair
         // can ever be stored and no classification is changed or erased by
-        // side effect. Label evolution is a new policy revision, explicit.
+        // side effect. A new revision permits only equal/stricter renewal.
         // Checked before the current entry is borrowed mutably for the push.
         if st.confidentiality.as_ref().ok_or(E::Integrity("blp-history-missing"))?
             .history.last().ok_or(E::Integrity("blp-history-missing"))?
             .attributions.iter().any(|a|a.policy_revision==entry.revision
             && a.canonical_digest==c.canonical_digest && a.project_path==c.project_path.as_bytes())
         { return Err(E::Conflict("blp-attribution-conflict")); }
+        // The validated history is monotone, so its latest matching entry
+        // contains all earlier restrictions. Revisions never reset this floor.
+        let record=st.confidentiality.as_ref().ok_or(E::Integrity("blp-history-missing"))?;
+        if let Some(prior)=record.history.iter().rev().flat_map(|e|e.attributions.iter())
+            .find(|a|a.canonical_digest==attribution.canonical_digest && a.project_path==attribution.project_path) {
+            if !classification_dominates(&entry.policy,&attribution,prior)? {
+                return Err(E::Conflict("blp-declassification-required"));
+            }
+        }
         let current_entry=st.confidentiality.as_mut().ok_or(E::Integrity("blp-history-missing"))?
             .history.last_mut().ok_or(E::Integrity("blp-history-missing"))?;
         // The attribution binds to the CURRENT entry in place: it inherits the

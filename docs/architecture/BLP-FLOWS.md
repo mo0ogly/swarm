@@ -6,7 +6,7 @@
 
 ## État et périmètre
 
-BLP-01, 31 octobre 2026 : **24 flux documentés, 44 ancrages dans 42 fichiers
+BLP-01, 31 octobre 2026 : **24 flux documentés, 45 ancrages dans 43 fichiers
 sources**, revus au niveau des producteurs et consommateurs actuels. Le JSON
 conserve pour chaque flux : matière exposée, producteur, destinataire, contrôles
 existants, responsable, lots manquants et observable de qualification. Il fige
@@ -162,3 +162,9 @@ et consommateur de ligne native). La recette CLI existante vérifie également l
 couverture du manifeste et son égalité avec l’empreinte du stdin réellement reçu
 par un fournisseur inerte. Les résultats et la livraison sont conservés dans le
 [suivi de reprise](../plans/actions-confiance/BLP-PROVENANCE-20261031.md).
+
+Révision du 1er novembre : BF-23/24 incluent le lecteur PAEA et sa relecture
+d’attribution courante. Les renouvellements de politique conservent les niveaux
+et compartiments antérieurs ; le contrôle reste partiel. Les quatre fichiers
+dont les empreintes avaient dérivé ont été relus (aperçu, présentation, dispatch
+Trust, module BLP), sans rafraîchir les autres empreintes.

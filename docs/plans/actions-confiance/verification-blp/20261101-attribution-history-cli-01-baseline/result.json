@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-attribution-history-cli",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "qualified-cli-history-refusal-and-recovery",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,sys; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=fixture_root('blp-history-proof-')/'journey'; subprocess.run(['python3','tests/blp_attribution_history_cli.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',str(out)],check=True); print('BLP_HISTORY_CLI_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "exit": 1,
+      "seconds": 10.369030934001785,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-unexpected-exit",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "36f42f275d0f55413aa5b46b0688d3af68be9cc2a4f7e9baf551309ba51eeb7b",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "c9595c125179c469b0d1c900011f353cab5b007ad81ec06739db0ee4a8e27b40",
+    "declared-inputs.tar.gz": "d6930171b7d73516da26e66a481fac8a35241be34ce057d116ac1f8430ece826",
+    "environment.json": "7941c5c31a9da0bb823b0eab00827361ddc2326ac370f2c45bc2772429ddb99f",
+    "step-0001.stdout": "d063c6bf6a6a539f6be6de2120191f73cc8fd06ca153950b5ea09dd849b0a919",
+    "step-0001.stderr": "9a0e660b96d91feaa2eeb6859abc8aec4ef47507e742609086eee76dd13b2fcf",
+    "step-0001.json": "3a6404cba08ae3c72fd08f355a7348aa3c2b2b1e21ccd1c6c28f7c6ae45a6875",
+    "inputs.after.json": "c9595c125179c469b0d1c900011f353cab5b007ad81ec06739db0ee4a8e27b40"
+  }
+}

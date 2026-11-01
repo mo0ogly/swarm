@@ -264,11 +264,16 @@ fn classified_object_fixture() -> (Fixture, Value, Value) {
 }
 
 /// Reopen the actual fixture Root and use the public reader guard on the exact
-/// digest/path. Close on success/refusal; no bytes are projected to a provider.
+/// digest/path. Close on success/refusal, preserve safe nested cause diagnostics
+/// like Fixture::call; no bytes are projected to a provider.
 fn object_reader(f:&Fixture,token:&str)->Result<swarm_engine::ReaderVerdict,String> {
     let store=RootStore::open(&f.0,false).unwrap();
     let result=store.paea_reader_verdict(Some(token),&"c".repeat(64),&f.0);
-    store.close().unwrap();result.map_err(|e|e.to_string())
+    store.close().unwrap();result.map_err(|e|{
+        let mut text=e.to_string();let mut source=std::error::Error::source(&e);
+        while let Some(cause)=source {text.push_str(": ");text.push_str(&cause.to_string());source=cause.source();}
+        text
+    })
 }
 
 /// A new policy revision is not human declassification. Reproduce level loss,
@@ -309,9 +314,13 @@ fn policy_revision_cannot_lower_or_remove_object_classification() {
 /// exactly to demonstrate recovery without rewriting any production history.
 #[test]
 fn stored_cross_revision_downgrade_refuses_without_disclosure() {
-    let (f,mut policy,_)=classified_object_fixture();
+    let (f,mut policy,mut attribution)=classified_object_fixture();
     policy["expected_revision"]=1.into();policy["event_id"]="object-policy-two".into();
     f.call("blp-policy-apply",policy,"fixture-admin-token").unwrap();
+    attribution["expected_revision"]=2.into();attribution["event_id"]="stored-equal-control".into();
+    f.call("blp-object-attribute",attribution,"fixture-admin-token").unwrap();
+    assert_eq!(object_reader(&f,"fixture-admin-token").unwrap(),swarm_engine::ReaderVerdict::Allowed);
+    assert_ne!(object_reader(&f,"fixture-approver-token").unwrap(),swarm_engine::ReaderVerdict::Allowed);
     let before=f.state();
     let mut stored:Value=serde_json::from_slice(&before).unwrap();
     let history=stored["confidentiality"]["history"].as_array_mut().unwrap();
@@ -319,12 +328,13 @@ fn stored_cross_revision_downgrade_refuses_without_disclosure() {
     lower["policy_revision"]=2.into();lower["level"]="public".into();lower["compartments"]=json!([]);
     history[1]["attributions"]=json!([lower]);
     let corrupted=serde_json::to_vec_pretty(&stored).unwrap();
-    std::fs::write(f.0.join(".swarm/trust-actions.json"),&corrupted).unwrap();
+    f.rewrite_state(|_|corrupted.clone());
     assert!(f.call("blp-show",json!({}),"fixture-admin-token").unwrap_err().contains("blp-attribution-history-downgrade"));
     assert!(object_reader(&f,"fixture-approver-token").unwrap_err().contains("blp-attribution-history-downgrade"));
     assert_eq!(f.state(),corrupted,"validation must not rewrite historical evidence");
-    std::fs::write(f.0.join(".swarm/trust-actions.json"),&before).unwrap();
+    f.rewrite_state(|_|before.clone());
     assert!(f.call("blp-show",json!({}),"fixture-admin-token").is_ok());
+    assert_eq!(object_reader(&f,"fixture-admin-token").unwrap(),swarm_engine::ReaderVerdict::Allowed);
     assert_ne!(object_reader(&f,"fixture-approver-token").unwrap(),swarm_engine::ReaderVerdict::Allowed);
 }
 

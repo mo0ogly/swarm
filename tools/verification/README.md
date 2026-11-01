@@ -3228,3 +3228,55 @@ The sidecar requires an explicit configured area, a direct fixture child and its
 marker; /tmp stays forbidden. This fixture executable is outside the delivered
 profile. Recipe success does not establish BLP labels, sink mediation, independent
 review or paid-provider/account confinement.
+
+### Renouvellement d’attribution BLP / BLP attribution renewal
+
+`recipes/blp-attribution-renewal.json` exerce les 12 régressions d’historique et
+attribution, dont la conservation du niveau/compartiments entre révisions, le
+rejet sans mutation, le renouvellement égal/plus restrictif et le refus d’un
+historique déjà abaissé aux lecteurs réels. Le contre-exemple original conserve
+une admission confidentiel → public avec lecteur public autorisé. Aucun fournisseur
+ni journal vivant ne sert de fixture.
+
+`recipes/blp-attribution-renewal-web.json` exerce le test HTTP autonome du target
+`confidentiality_http` : politique via HTTP, refus au producteur moteur, renouvellement
+égal, relecture HTTP d’un historique abaissé refusée sans données et reprise exacte.
+Les routes PAEA à appel préparé demandent une fixture native distincte ; elles ne
+sont pas revendiquées comme exécutées par cette recette.
+La compilation de tests et les fixtures d’enrôlement sont distinctes du profil
+livré. La recette ne prouve ni déclassification humaine ni médiation générale.
+
+The engine recipe covers 12 history/attribution regressions, including cross-policy
+level/compartment preservation, refusal without mutation, equal/stricter renewal,
+and rejection of already-lowered history at real readers. Original failing
+counterexample remains retained. The web recipe runs one fresh `confidentiality_http` test: HTTP policy control,
+engine-producer refusal/equal renewal, HTTP lowered-history refusal/redaction and
+exact recovery. Prepared-call PAEA routes require a separate native fixture and
+are not claimed as executed by this recipe. Only isolated fixtures are used;
+test/enrollment fixtures are separate from the delivered profile. No provider,
+live-journal fixture, human declassification or general mediation is claimed.
+
+Ces deux recettes de renouvellement utilisent explicitement `CARGO_PROFILE_DEV_DEBUG=0`,
+`CARGO_PROFILE_TEST_DEBUG=0` (symboles, comme le profil de livraison) et
+`CARGO_BUILD_JOBS=1` : décision technique après observation d’environ 1 Gio de
+swap dans rustc et 25 % de blocage mémoire global le 1er novembre. Aucun test,
+condition métier ou contrôle n’est retiré ; aucun watchdog global n’est ajouté.
+La recette web lie l’image de test exacte résolue par Cargo avant/après les cas.
+
+`recipes/blp-attribution-history-cli.json` exige `SWARM_BLP_BINARY` et
+`SWARM_BLP_PROFILE` (preuve `verify_native_profile.py`) : 15 assertions sur le
+binaire produit, avec historique synthétique injecté dans une racine inerte,
+témoin positif, refus/redaction, journal inchangé et reprise exacte. Cela teste
+le consommateur public, pas le producteur d’attribution ni une migration réelle.
+La CLI n’expose pas encore `blp-object-attribute` ; ne pas ajouter un droit pour
+fabriquer une preuve. L’API moteur et les tests HTTP exercent le producteur.
+
+Renewal recipes explicitly select debug-symbol level 0 (as delivery) and one
+compiler job after measured swapping/memory stalls; functional cases/checks and
+absence of a global watchdog are unchanged. The web recipe binds Cargo's exact
+test image before/after execution. The CLI history recipe requires
+`SWARM_BLP_BINARY` and its `SWARM_BLP_PROFILE` proof, then runs 15 assertions on
+that production image with synthetic history in an inert Root. It verifies the
+public reader/refusal/recovery, not the producer or real migration. Object
+attribution is not currently exposed by the CLI; no new right is introduced to
+manufacture a runtime witness.

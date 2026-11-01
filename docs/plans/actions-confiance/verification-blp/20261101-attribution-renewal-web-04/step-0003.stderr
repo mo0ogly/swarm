@@ -1,0 +1,363 @@
+warning: unused import: `verify_candidate`
+  --> crates/swarm-engine/src/managed_repository.rs:19:78
+   |
+19 | pub(crate) use worker::{candidate_worker, prepare_worker, prepare_candidate, verify_candidate, pin_candidate, CandidateWitness, Mana...
+   |                                                                              ^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `SettingCount`
+  --> crates/swarm-engine/src/validation_run_recovery.rs:29:63
+   |
+29 | use crate::{AgentLaunchError, GitReportError, RootStoreError, SettingCount};
+   |                                                               ^^^^^^^^^^^^
+
+warning: unused import: `process::CommandExt`
+  --> crates/swarm-engine/src/root_store/task_validation/process.rs:20:33
+   |
+20 |     os::unix::{net::UnixStream, process::CommandExt},
+   |                                 ^^^^^^^^^^^^^^^^^^^
+
+warning: method `revision` is never used
+   --> crates/swarm-engine/src/trust/confidentiality.rs:238:19
+    |
+233 | impl Entry {
+    | ---------- method in this implementation
+...
+238 |     pub(crate) fn revision(&self) -> u64 { self.revision }
+    |                   ^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `verify_candidate` is never used
+   --> crates/swarm-engine/src/managed_repository_candidate_store.rs:501:15
+    |
+501 | pub(crate) fn verify_candidate(
+    |               ^^^^^^^^^^^^^^^^
+
+warning: function `poll_retained_processes` is never used
+  --> crates/swarm-engine/src/validation_run_recovery.rs:38:15
+   |
+38 | pub(crate) fn poll_retained_processes(e: &mut (dyn Error + 'static)) -> Vec<io::Error> {
+   |               ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `ATTRIBUTION_MISMATCH` is never used
+  --> crates/swarm-engine/src/root_store/reader_guard.rs:22:18
+   |
+22 | pub(crate) const ATTRIBUTION_MISMATCH: &str = "paea-reader-attribution-mismatch";
+   |                  ^^^^^^^^^^^^^^^^^^^^
+
+warning: method `inspect_for_effect` is never used
+  --> crates/swarm-engine/src/root_store/paea_git_repository/source.rs:81:19
+   |
+44 | impl PaeaGitSource {
+   | ------------------ method in this implementation
+...
+81 |     pub(super) fn inspect_for_effect(
+   |                   ^^^^^^^^^^^^^^^^^^
+
+warning: fields `failure` and `recovery_errors` are never read
+   --> crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs:117:9
+    |
+115 | pub(crate) struct ClosedTransfer {
+    |                   -------------- fields in this struct
+116 |     pub receipt: Option<TransferReceipt>,
+117 |     pub failure: Option<TransferFailure>,
+    |         ^^^^^^^
+118 |     pub cleanup: Result<(), E>,
+119 |     pub recovery_errors: Vec<io::Error>,
+    |         ^^^^^^^^^^^^^^^
+
+warning: methods `receipt`, `failure`, and `poll_recovery` are never used
+   --> crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs:189:19
+    |
+121 | impl GitTransferJob {
+    | ------------------- methods in this implementation
+...
+189 |     pub(crate) fn receipt(&self) -> Option<&TransferReceipt> {
+    |                   ^^^^^^^
+...
+193 |     pub(crate) fn failure(&self) -> Option<&TransferFailure> {
+    |                   ^^^^^^^
+...
+350 |     pub(crate) fn poll_recovery(&mut self) {
+    |                   ^^^^^^^^^^^^^
+
+warning: function `terminal` is never used
+ --> crates/swarm-engine/src/root_store/cockpit_health.rs:8:4
+  |
+8 | fn terminal(state: &str) -> bool { matches!(state, "completed" | "failed" | "interrupted") }
+  |    ^^^^^^^^
+
+warning: function `known` is never used
+  --> crates/swarm-engine/src/root_store/cockpit_health.rs:10:4
+   |
+10 | fn known(value: &str) -> &str { if value.is_empty() { "unknown" } else { value } }
+   |    ^^^^^
+
+warning: function `project` is never used
+  --> crates/swarm-engine/src/root_store/cockpit_health.rs:20:15
+   |
+20 | pub(super) fn project(agent: &crate::Agent, state: &str, same_host: bool,
+   |               ^^^^^^^
+
+warning: function `sha256_hex` is never used
+  --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:30:4
+   |
+30 | fn sha256_hex(raw: &[u8]) -> String {
+   |    ^^^^^^^^^^
+
+warning: struct `AcceptanceSourceBody` is never constructed
+  --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:41:8
+   |
+41 | struct AcceptanceSourceBody<'a> {
+   |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `PostDelivery` is never constructed
+  --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:61:19
+   |
+61 | pub(crate) struct PostDelivery {
+   |                   ^^^^^^^^^^^^
+
+warning: enum `PostDeliveryError` is never used
+  --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:67:17
+   |
+67 | pub(crate) enum PostDeliveryError {
+   |                 ^^^^^^^^^^^^^^^^^
+
+warning: function `not_ready` is never used
+  --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:98:4
+   |
+98 | fn not_ready() -> PostDelivery {
+   |    ^^^^^^^^^
+
+warning: function `acceptance_source` is never used
+   --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:121:15
+    |
+121 | pub(crate) fn acceptance_source(
+    |               ^^^^^^^^^^^^^^^^^
+
+warning: function `cockpit_post_delivery` is never used
+   --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:188:15
+    |
+188 | pub(crate) fn cockpit_post_delivery(
+    |               ^^^^^^^^^^^^^^^^^^^^^
+
+warning: `swarm-engine` (lib) generated 20 warnings (run `cargo fix --lib -p swarm-engine` to apply 2 suggestions)
+warning: unused import: `RootStore`
+ --> crates/swarm-web/src/service/paea_reconcile.rs:5:35
+  |
+5 | use swarm_engine::{ReaderVerdict, RootStore};
+  |                                   ^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `token`
+   --> crates/swarm-web/src/service/login.rs:252:14
+    |
+252 |         let (token, next) = match parsed {
+    |              ^^^^^ help: if this is intentional, prefix it with an underscore: `_token`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `approval_capability` is never used
+  --> crates/swarm-web/src/service/paea_git_call_approval.rs:94:19
+   |
+18 | impl super::PaeaGitCallAuthority {
+   | -------------------------------- method in this implementation
+...
+94 |     pub(super) fn approval_capability(&self) -> serde_json::Value {
+   |                   ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `swarm-web` (lib) generated 3 warnings (run `cargo fix --lib -p swarm-web` to apply 2 suggestions)
+warning: unused imports: `Response`, `authenticated_control::Context as ExecuteContext`, and `authenticated_startup`
+  --> crates/swarm-web/tests/../../swarm-enrollment-authority/tests/common/authenticated_fixture.rs:8:5
+   |
+ 8 |     authenticated_control::Context as ExecuteContext,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 9 |     authenticated_startup,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+10 |     control::{self, Request, Response},
+   |                              ^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `session_name`
+   --> crates/swarm-web/tests/paea_git_call.rs:323:9
+    |
+323 |     let session_name = fs::read_dir(owned.service_path.join(".swarm"))
+    |         ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_session_name`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `action_digest`
+   --> crates/swarm-web/tests/paea_git_call.rs:970:9
+    |
+970 |     let action_digest = owned.prepared.request().action_digest().to_owned();
+    |         ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_action_digest`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-web/tests/paea_git_call.rs:1992:9
+     |
+1992 |     let mut fixture = fixture::Fixture::build_for_trust_actions(
+     |         ----^^^^^^^
+     |         |
+     |         help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+    --> crates/swarm-web/tests/paea_git_call.rs:2345:9
+     |
+2345 |     let mut fixture = fixture::Fixture::build_for_trust_actions(
+     |         ----^^^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-web/tests/paea_git_call.rs:2776:9
+     |
+2776 |     let mut fixture = fixture::Fixture::build_for_trust_actions(
+     |         ----^^^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-web/tests/paea_git_call.rs:3200:9
+     |
+3200 |     let mut fixture = fixture::Fixture::build_for_trust_actions(
+     |         ----^^^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-web/tests/paea_git_call.rs:3864:9
+     |
+3864 |     let mut fixture = fixture::Fixture::build_for_trust_actions(
+     |         ----^^^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-web/tests/paea_git_call.rs:4356:9
+     |
+4356 |     let mut fixture = fixture::Fixture::build_for_trust_actions(
+     |         ----^^^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: associated functions `new`, `cold`, `build`, and `build_with_action` are never used
+  --> crates/swarm-web/tests/../../swarm-enrollment-authority/tests/common/authenticated_fixture.rs:52:19
+   |
+49 | impl Fixture {
+   | ------------ associated functions in this implementation
+...
+52 |     pub(crate) fn new() -> Self {
+   |                   ^^^
+...
+56 |     pub(crate) fn cold() -> Self {
+   |                   ^^^^
+...
+60 |     pub(crate) fn build(enrolled: bool) -> Self {
+   |                   ^^^^^
+...
+64 |     pub(crate) fn build_with_action(
+   |                   ^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: calls to `std::mem::drop` with a value that implements `Copy` does nothing
+    --> crates/swarm-web/tests/paea_git_call.rs:2747:5
+     |
+2747 |     drop(trust);
+     |     ^^^^^-----^
+     |          |
+     |          argument has type `{closure@crates/swarm-web/tests/paea_git_call.rs:2620:17: 2620:63}`
+     |
+     = note: `#[warn(dropping_copy_types)]` on by default
+help: use `let _ = ...` to ignore the expression or result
+     |
+2747 -     drop(trust);
+2747 +     let _ = trust;
+     |
+
+warning: calls to `std::mem::drop` with a value that implements `Copy` does nothing
+    --> crates/swarm-web/tests/paea_git_call.rs:2748:5
+     |
+2748 |     drop(trust_revision_of);
+     |     ^^^^^-----------------^
+     |          |
+     |          argument has type `{closure@crates/swarm-web/tests/paea_git_call.rs:2630:29: 2630:42}`
+     |
+help: use `let _ = ...` to ignore the expression or result
+     |
+2748 -     drop(trust_revision_of);
+2748 +     let _ = trust_revision_of;
+     |
+
+warning: calls to `std::mem::drop` with a value that implements `Copy` does nothing
+    --> crates/swarm-web/tests/paea_git_call.rs:3173:5
+     |
+3173 |     drop(trust);
+     |     ^^^^^-----^
+     |          |
+     |          argument has type `{closure@crates/swarm-web/tests/paea_git_call.rs:3053:17: 3053:63}`
+     |
+help: use `let _ = ...` to ignore the expression or result
+     |
+3173 -     drop(trust);
+3173 +     let _ = trust;
+     |
+
+warning: calls to `std::mem::drop` with a value that implements `Copy` does nothing
+    --> crates/swarm-web/tests/paea_git_call.rs:3174:5
+     |
+3174 |     drop(trust_revision_of);
+     |     ^^^^^-----------------^
+     |          |
+     |          argument has type `{closure@crates/swarm-web/tests/paea_git_call.rs:3063:29: 3063:42}`
+     |
+help: use `let _ = ...` to ignore the expression or result
+     |
+3174 -     drop(trust_revision_of);
+3174 +     let _ = trust_revision_of;
+     |
+
+warning: calls to `std::mem::drop` with a value that implements `Copy` does nothing
+    --> crates/swarm-web/tests/paea_git_call.rs:3831:5
+     |
+3831 |     drop(trust);
+     |     ^^^^^-----^
+     |          |
+     |          argument has type `{closure@crates/swarm-web/tests/paea_git_call.rs:3709:17: 3709:63}`
+     |
+help: use `let _ = ...` to ignore the expression or result
+     |
+3831 -     drop(trust);
+3831 +     let _ = trust;
+     |
+
+warning: calls to `std::mem::drop` with a value that implements `Copy` does nothing
+    --> crates/swarm-web/tests/paea_git_call.rs:3832:5
+     |
+3832 |     drop(trust_revision_of);
+     |     ^^^^^-----------------^
+     |          |
+     |          argument has type `{closure@crates/swarm-web/tests/paea_git_call.rs:3719:29: 3719:42}`
+     |
+help: use `let _ = ...` to ignore the expression or result
+     |
+3832 -     drop(trust_revision_of);
+3832 +     let _ = trust_revision_of;
+     |
+
+warning: `swarm-web` (test "paea_git_call") generated 16 warnings (run `cargo fix --test "paea_git_call" -p swarm-web` to apply 9 suggestions)
+    Finished `test` profile [unoptimized] target(s) in 0.18s
+     Running tests/paea_git_call.rs (.cache/blp-verification-target/debug/deps/paea_git_call-3d8e1c2c40e10a90)
+
+thread 'preview_reader_guard_enforces_produced_attribution' (1105622) panicked at crates/swarm-web/tests/paea_git_call.rs:489:55:
+explicit new source fixture
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p swarm-web --test paea_git_call`
