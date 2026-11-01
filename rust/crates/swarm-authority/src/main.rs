@@ -28,8 +28,10 @@
 //!   [--attributes k=v,..] --json`: preview the access decision of the saved
 //!   policy (`policy.json`, else shipped default) for these subject
 //!   attributes; reads only, changes nothing.
-//! - `serve --listen HOST:PORT --engine HOST:PORT`: run the HTTP front; the
-//!   policy is loaded once at start (restart the service after editing it).
+//! - `serve --listen HOST:PORT --engine HOST:PORT`: run the HTTP front;
+//!   `policy.json` and `authority.json` are read at start and then edited
+//!   live through the Admin (daemon API, [`swarm_authority::admin`]); the
+//!   audit `audit.jsonl` is opened (refuses to start if unreadable).
 //!
 //! Output: JSON on stdout (exit 0) or `{"schema_version":1,"failure":{"code":…}}`
 //! on stderr (exit 2); usage errors exit 64.
@@ -290,12 +292,13 @@ mod linux {
                 let policy = match Policy::load(&loaded.dir) { Ok(p) => p, Err(c) => return fail(c) };
                 let key = match pinned_seed(&loaded) { Ok(k) => k, Err(c) => return fail(c) };
                 let a = match accounts(&loaded, key.clone()) { Ok(a) => a, Err(c) => return fail(c) };
+                let audit = match swarm_authority::audit::Audit::open(&loaded.dir) { Ok(x) => x, Err(c) => return fail(c) };
                 let rt = match tokio::runtime::Runtime::new() { Ok(r) => r, Err(_) => return fail("authority-runtime") };
                 rt.block_on(async move {
                     let listener = match tokio::net::TcpListener::bind(listen).await { Ok(l) => l, Err(_) => return fail("authority-listen") };
                     let own_host = match listener.local_addr() { Ok(a) => a.to_string(), Err(_) => return fail("authority-listen") };
                     eprintln!("{}", serde_json::json!({"schema_version": 1, "listening": own_host, "engine": engine}));
-                    let front = Arc::new(server::Front { accounts: a, sessions: Sessions::new(config), signer: key, config, own_host, engine, policy });
+                    let front = Arc::new(server::Front { accounts: a, sessions: Sessions::new(config), signer: key, config: std::sync::RwLock::new(config), dir: loaded.dir.clone(), own_host, engine, policy: std::sync::RwLock::new(policy), audit });
                     tokio::select! {
                         r = server::serve(listener, front) => if r.is_err() { return fail("authority-serve") },
                         _ = tokio::signal::ctrl_c() => {}

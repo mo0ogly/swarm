@@ -165,7 +165,10 @@ fn daemon_front_signs_in_relays_and_engine_refuses_direct_access() {
     assert_eq!(nav.0, 303);
     assert!(nav.1.iter().any(|(k, v)| k == "location" && v.starts_with("/login?next=")));
     // Login page, wrong password, missing Origin.
-    assert!(http(front_port, "GET", "/login?lang=en", &[], "").2.contains("Sign in to Swarm"));
+    let page = http(front_port, "GET", "/login?lang=en", &[], "");
+    assert!(page.2.contains("Sign in to Swarm"));
+    // Regression: `no-referrer` made browsers send `Origin: null` on the form POST.
+    assert!(page.1.iter().any(|(k, v)| k == "referrer-policy" && v == "same-origin"), "{:?}", page.1);
     let form = "application/x-www-form-urlencoded".to_owned();
     assert_eq!(http(front_port, "POST", "/login", &[origin.clone(), ("Content-Type", form.clone())], "subject=ana&password=wrong&next=%2F").0, 401);
     assert_eq!(http(front_port, "POST", "/login", &[("Content-Type", form.clone())], "subject=ana&password=correct+horse&next=%2F").0, 403);
@@ -178,6 +181,18 @@ fn daemon_front_signs_in_relays_and_engine_refuses_direct_access() {
     let ok = http(front_port, "GET", "/api/v1/native-version", &[("Cookie", cookie.clone())], "");
     assert_eq!(ok.0, 200, "{}", ok.2);
     assert!(ok.2.contains("binary"));
+    // Regression: a browser loads many resources at once; concurrent session
+    // resolutions used to refuse with journal `sqlite` busy (seen as 401).
+    let parallel: Vec<u16> = std::thread::scope(|scope| {
+        let handles: Vec<_> = (0..20).map(|_| scope.spawn(|| http(front_port, "GET", "/api/v1/native-version", &[("Cookie", cookie.clone())], "").0)).collect();
+        handles.into_iter().map(|h| h.join().unwrap()).collect()
+    });
+    assert!(parallel.iter().all(|s| *s == 200), "{parallel:?}");
+    // Regression: `/` behind the daemon is the cockpit, not the engine's
+    // owner-key sign-in page (root_login is owner-key mode only).
+    let home = http(front_port, "GET", "/", &[("Cookie", cookie.clone()), ("Accept", "text/html".into())], "");
+    assert_eq!(home.0, 200);
+    assert!(!home.2.contains("access-key") && home.2.contains("Cockpit"), "{}", &home.2[..home.2.len().min(300)]);
     // The engine itself refuses direct access without an assertion.
     let direct = http(engine_port, "GET", "/api/v1/native-version", &[], "");
     assert_eq!(direct.0, 403);
@@ -194,7 +209,7 @@ fn daemon_front_signs_in_relays_and_engine_refuses_direct_access() {
     assert_eq!(denied.0, 403, "{}", denied.2);
     let denied: serde_json::Value = serde_json::from_str(&denied.2).unwrap();
     assert_eq!((denied["error"].as_str(), denied["action"].as_str(), denied["reason"].as_str()), (Some("authority-policy-denied"), Some("write"), Some("policy-integrity-floor")));
-    let admin_write = http(front_port, "POST", "/api/v1/mission", &[("Cookie", cookie.clone()), origin.clone(), json], "{}");
+    let admin_write = http(front_port, "POST", "/api/v1/mission", &[("Cookie", cookie.clone()), origin.clone(), json.clone()], "{}");
     assert!(!admin_write.2.contains("authority-policy-denied"), "{}", admin_write.2);
     // Decision preview (no mutation) through the CLI, saved/default policy.
     let check = |args: &[&str]| {
@@ -205,6 +220,43 @@ fn daemon_front_signs_in_relays_and_engine_refuses_direct_access() {
     assert_eq!(check(&["--method", "POST", "--path", "/api/v1/quotas/apply", "--integrity", "3", "--roles", "admin"])["allowed"], true);
     let viewer = check(&["--method", "POST", "--path", "/api/v1/quotas/apply", "--integrity", "3", "--roles", "viewer"]);
     assert_eq!((viewer["allowed"].as_bool(), viewer["reason"].as_str()), (Some(false), Some("policy-no-grant")));
+    // B9 personal API keys: created from the session (secret once), used as
+    // `Authorization: Bearer` without cookie or Origin, capped by scope.
+    let mk = |scope: &str, secs: i64| {
+        let r = http(front_port, "POST", "/api/v1/authority/me/keys", &[("Cookie", cookie.clone()), origin.clone(), json.clone()],
+            &serde_json::json!({"name": format!("script {scope}"), "scope": scope, "expires_in_seconds": secs}).to_string());
+        assert_eq!(r.0, 200, "{}", r.2);
+        let v: serde_json::Value = serde_json::from_str(&r.2).unwrap();
+        (v["secret"].as_str().unwrap().to_owned(), v["key"]["id"].as_str().unwrap().to_owned())
+    };
+    let (read_key, read_id) = mk("read", 600);
+    let bearer = |k: &str| ("Authorization", format!("Bearer {k}"));
+    assert_eq!(http(front_port, "GET", "/api/v1/native-version", &[bearer(&read_key)], "").0, 200, "read key reads through the relay");
+    let capped: serde_json::Value = serde_json::from_str(&http(front_port, "POST", "/api/v1/mission", &[bearer(&read_key), json.clone()], "{}").2).unwrap();
+    assert_eq!((capped["error"].as_str(), capped["reason"].as_str()), (Some("authority-policy-denied"), Some("key-scope")));
+    let (write_key, write_id) = mk("write", 600);
+    let written = http(front_port, "POST", "/api/v1/mission", &[bearer(&write_key), json.clone()], "{}");
+    assert!(!written.2.contains("authority-policy-denied") && written.0 != 401, "{} {}", written.0, written.2);
+    let scoped = http(front_port, "GET", "/api/v1/authority/me", &[bearer(&write_key)], "");
+    assert_eq!((scoped.0, scoped.2.as_str()), (403, r#"{"error":"authority-key-scope"}"#), "keys never reach daemon administration");
+    let listed = http(front_port, "GET", "/api/v1/authority/me/keys", &[("Cookie", cookie.clone())], "");
+    assert!(listed.2.contains(&read_id) && !listed.2.contains(&read_key[18..]), "listed without secret");
+    // Malformed, tampered, revoked and expired keys: 401, no redirect.
+    assert_eq!(http(front_port, "GET", "/api/v1/native-version", &[bearer("sak1-zz.nope")], "").0, 401);
+    let tampered = format!("{}x", &read_key[..read_key.len() - 1]);
+    assert_eq!(http(front_port, "GET", "/api/v1/native-version", &[bearer(&tampered)], "").0, 401);
+    let revoke = http(front_port, "POST", &format!("/api/v1/authority/me/keys/{read_id}/revoke"), &[("Cookie", cookie.clone()), origin.clone()], "");
+    assert_eq!(revoke.0, 200, "{}", revoke.2);
+    assert_eq!(http(front_port, "GET", "/api/v1/native-version", &[bearer(&read_key)], "").0, 401, "revoked");
+    assert_eq!(http(front_port, "POST", &format!("/api/v1/authority/me/keys/{read_id}/revoke"), &[("Cookie", cookie.clone()), origin.clone()], "").0, 404);
+    let (short, _) = mk("read", 1);
+    std::thread::sleep(std::time::Duration::from_millis(2100));
+    assert_eq!(http(front_port, "GET", "/api/v1/native-version", &[bearer(&short)], "").0, 401, "expired");
+    let zero = http(front_port, "POST", "/api/v1/authority/me/keys", &[("Cookie", cookie.clone()), origin.clone(), json.clone()], r#"{"name":"x","scope":"read","expires_in_seconds":0}"#);
+    assert_eq!(zero.0, 400);
+    // Attribution: the audit names the key used for the write.
+    let audit = http(front_port, "GET", "/api/v1/authority/audit", &[("Cookie", cookie.clone())], "").2;
+    assert!(audit.contains(&format!("key:{write_id}")), "{audit}");
     // Cockpit sign-out path ends the daemon session.
     let out = http(front_port, "POST", "/api/v1/logout", &[("Cookie", cookie.clone()), origin.clone()], "");
     assert_eq!((out.0, out.2.as_str()), (200, r#"{"redirect":"/login"}"#));

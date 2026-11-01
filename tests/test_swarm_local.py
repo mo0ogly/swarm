@@ -283,6 +283,61 @@ class LocalWeb(unittest.TestCase):
         finally:
             subprocess.run([*configured, "stop"], capture_output=True)
 
+    def test_authority_enable_disable_switches_engine_and_daemon(self):
+        """`./swarm.sh authority` on an isolated checkout: refusal witness for an
+        outdated installed daemon (no effect), then enable/disable through the
+        public commands; sudo is a logging stub, never the real one."""
+        checkout = Path(self.temp.name) / "launcher checkout"
+        (checkout / "tools").mkdir(parents=True)
+        for name in ["swarm.sh", "tools/swarm_local.py", "tools/swarm_version.py"]:
+            shutil.copy2(SOURCE / name, checkout / name)
+        launcher = [str(checkout / "swarm.sh")]
+        with socket.socket() as sock:
+            sock.bind(("127.0.0.1", 0))
+            internal = f"127.0.0.1:{sock.getsockname()[1]}"
+        fake = Path(self.temp.name) / "authority"
+        (fake / "bin").mkdir(parents=True)
+        sudo_log = fake / "sudo.log"
+        (fake / "bin" / "sudo").write_text('#!/bin/sh\necho "$*" >> "' + str(sudo_log) + '"\n')
+        (fake / "bin" / "sudo").chmod(0o700)
+        unit = fake / "swarm-authority.service"
+        unit.write_text(f"[Service]\nExecStart=/x serve --pin P --listen {self.address} --engine {internal}\n")
+        (fake / "etc").mkdir()
+        (fake / "etc" / "public_key").write_text("AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8\n")
+        installed = fake / "installed"
+        installed.write_bytes(b"daemon v1")
+        built = checkout / "rust/target/release/swarm-authority"
+        built.parent.mkdir(parents=True)
+        built.write_bytes(b"daemon v2")
+        env = {**os.environ, "PATH": str(fake / "bin") + os.pathsep + os.environ["PATH"], "SWARM_AUTHORITY_UNIT": str(unit),
+               "SWARM_AUTHORITY_ETC": str(fake / "etc"), "SWARM_AUTHORITY_INSTALLED": str(installed)}
+        run = lambda *a, code=0: self.assertEqual((r := subprocess.run([*launcher, *a], env=env, text=True, capture_output=True)).returncode, code, r.stderr) or r
+        mode = lambda: json.loads(subprocess.check_output([BINARY, "--root", str(self.root), "engine-settings", "show", "--json"]))["values"]["web_access_mode"]
+        run("configure", "--root", str(self.root), "--address", self.address, "--binary", BINARY, "--no-mask-cifs")
+        try:
+            run("start", "--no-open")
+            refused = run("authority", "enable", "--no-open", code=2)
+            self.assertIn("diffère du dernier build", refused.stderr)
+            self.assertEqual((mode(), sudo_log.exists()), ("owner-key", False), "refusal had no effect")
+            self.assertTrue(json.loads(run("status").stdout)["ready"])
+            built.write_bytes(b"daemon v1")
+            run("authority", "enable", "--no-open")
+            self.assertEqual(mode(), "authority")
+            self.assertEqual(sudo_log.read_text().splitlines(), ["systemctl enable --now swarm-authority"])
+            status = json.loads(run("status").stdout)
+            self.assertEqual((status["url"], status["ready"]), (f"http://{internal}/", True))
+            report = json.loads(run("authority", "status").stdout)
+            self.assertEqual((report["engine_mode"], report["engine_address"], report["installed_matches_build"]), ("authority", internal, True))
+            run("authority", "enable", "--no-open")  # rerun: completed steps are no-ops
+            self.assertEqual(mode(), "authority")
+            run("authority", "disable", "--no-open")
+            self.assertEqual(mode(), "owner-key")
+            self.assertEqual(sudo_log.read_text().splitlines()[-1], "systemctl disable --now swarm-authority")
+            status = json.loads(run("status").stdout)
+            self.assertEqual((status["url"], status["ready"]), (f"http://{self.address}/", True))
+        finally:
+            subprocess.run([*launcher, "stop"], env=env, capture_output=True)
+
     def test_stale_pid_does_not_kill_unrelated_process(self):
         sleeper = subprocess.Popen(["sleep", "60"])
         try:

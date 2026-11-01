@@ -164,16 +164,10 @@ fi
 
 cat <<EOF
 
-Installé (service NON démarré). Étapes suivantes, dans cet ordre :
- 1. Admin Swarm → Régler le moteur → « Serveur et accès » :
-      Accès — mode d’authentification du cockpit : authority
-      Accès — clé publique du démon d’autorité   : $public_key
-    puis Prévisualiser et Enregistrer.
- 2. Déplacer le moteur sur le port interne et le redémarrer :
-      ./swarm.sh configure --address $engine && ./swarm.sh restart --no-open
- 3. Démarrer le démon :  sudo systemctl enable --now swarm-authority
- 4. ./swarm.sh open (ouvre http://$listen/login) et se connecter avec « $admin ».
-Retour arrière : sudo systemctl disable --now swarm-authority, puis repasser
-le mode en owner-key avec la CLI locale (engine-settings apply) et
-./swarm.sh configure --address $listen && ./swarm.sh restart.
+Installé (service NON démarré). Suite, depuis votre compte (pas sudo) :
+  ./swarm.sh authority enable
+  (règle le moteur en mode authority avec la clé $public_key,
+   le déplace sur $engine, démarre le démon via sudo et ouvre
+   http://$listen/login ; connexion avec « $admin »).
+Retour arrière : ./swarm.sh authority disable
 EOF

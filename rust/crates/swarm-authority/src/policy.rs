@@ -79,7 +79,7 @@ const READ_ONLY_POSTS: [&str; 10] = [
 ];
 
 /// Ordinary work mutations (missions, preparations, annotations, visits...).
-const WRITE_PREFIXES: [&str; 13] = [
+const WRITE_PREFIXES: [&str; 14] = [
     "/api/v1/action",
     "/api/v1/mission",
     "/api/v1/lifecycle/missions",
@@ -93,16 +93,29 @@ const WRITE_PREFIXES: [&str; 13] = [
     "/api/v1/work-recorded-resume",
     "/api/v1/works",
     "/api/v1/paea/git-call",
+    "/api/v1/graph-batch",
 ];
 
-fn under(path: &str, prefix: &str) -> bool {
+/// `path` is `prefix` or below it (segment boundary, no string prefix match).
+pub fn under(path: &str, prefix: &str) -> bool {
     path == prefix || path.strip_prefix(prefix).is_some_and(|rest| rest.starts_with('/'))
 }
 
-/// Classify one request. `path` is the URI path without query. Previews,
-/// descriptions and estimates (`…/preview`, `…/describe`, `…/estimate`) are
-/// read-only by engine contract (they return a token, never mutate).
+/// Daemon-served account/session/policy administration (B8); every method,
+/// reads included, is `administer` (listing accounts is not a viewer right).
+/// The self-service `/api/v1/authority/me` subtree is handled before the
+/// policy by the daemon and never classified here.
+pub const AUTHORITY_PREFIX: &str = "/api/v1/authority";
+
+/// Classify one request. `path` is the URI path without query. Daemon
+/// administration ([`AUTHORITY_PREFIX`]) is `administer` for every method.
+/// Previews, descriptions and estimates (`…/preview`, `…/describe`,
+/// `…/estimate`) are read-only by engine contract (they return a token,
+/// never mutate).
 pub fn classify(method: &str, path: &str) -> Action {
+    if under(path, AUTHORITY_PREFIX) {
+        return Action::Administer;
+    }
     if matches!(method, "GET" | "HEAD") {
         return Action::Read;
     }

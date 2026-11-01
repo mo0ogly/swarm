@@ -9,7 +9,7 @@
 use crate::accounts::{AccountView, Accounts, Error};
 use crate::config::AuthorityConfig;
 use sha2::{Digest, Sha256};
-use std::{collections::HashMap, sync::Mutex};
+use std::{collections::HashMap, sync::{Mutex, RwLock}};
 use swarm_enrollment_state::Context;
 
 const PREFIX: &str = "as1-";
@@ -24,8 +24,27 @@ struct Session {
 /// In-memory session table. All methods take `now` (Unix seconds) explicitly
 /// so expiry is testable and no clock policy hides inside.
 pub struct Sessions {
-    config: AuthorityConfig,
+    config: RwLock<AuthorityConfig>,
     table: Mutex<HashMap<[u8; 32], Session>>,
+}
+
+/// Displayable session entry (no secret: the id is a hash prefix).
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct SessionInfo {
+    pub id: String,
+    pub subject: String,
+    pub created: i64,
+    pub last_seen: i64,
+}
+
+/// Public id of a session: first 8 bytes of the token hash, hex.
+fn public_id(k: &[u8; 32]) -> String {
+    k[..8].iter().map(|b| format!("{b:02x}")).collect()
+}
+
+/// Public id of a presented token (for marking the caller's own session).
+pub fn token_id(token: &str) -> String {
+    public_id(&key(token))
 }
 
 /// Hash a presented token; malformed tokens hash too but never match.
@@ -36,7 +55,37 @@ fn key(token: &str) -> [u8; 32] {
 impl Sessions {
     /// Empty table using `config` lifetimes.
     pub fn new(config: AuthorityConfig) -> Self {
-        Self { config, table: Mutex::new(HashMap::new()) }
+        Self { config: RwLock::new(config), table: Mutex::new(HashMap::new()) }
+    }
+
+    /// Replace the lifetimes used from the next resolution on (Admin edit of
+    /// `authority.json`); existing sessions are judged by the new values.
+    pub fn set_config(&self, config: AuthorityConfig) -> Result<(), Error> {
+        *self.config.write().map_err(|_| Error::Refused("session-state"))? = config;
+        Ok(())
+    }
+
+    /// Open sessions (expired ones excluded, never their token): public id
+    /// (first 16 hex of the token hash), subject, sign-in and last-seen
+    /// times, sorted by subject then sign-in time.
+    pub fn list(&self, now: i64) -> Result<Vec<SessionInfo>, Error> {
+        let config = *self.config.read().map_err(|_| Error::Refused("session-state"))?;
+        let table = self.table.lock().map_err(|_| Error::Refused("session-state"))?;
+        let mut out: Vec<SessionInfo> = table
+            .iter()
+            .filter(|(_, s)| now - s.created < config.session_absolute_seconds && now - s.last_seen < config.session_idle_seconds)
+            .map(|(k, s)| SessionInfo { id: public_id(k), subject: s.subject.clone(), created: s.created, last_seen: s.last_seen })
+            .collect();
+        out.sort_by(|a, b| (&a.subject, a.created).cmp(&(&b.subject, b.created)));
+        Ok(out)
+    }
+
+    /// End the session whose public id is `id`; `Ok(false)` when none matches.
+    pub fn revoke_id(&self, id: &str) -> Result<bool, Error> {
+        let mut table = self.table.lock().map_err(|_| Error::Refused("session-state"))?;
+        let before = table.len();
+        table.retain(|k, _| public_id(k) != id);
+        Ok(table.len() != before)
     }
 
     /// Verify `password` for `subject` and open a session. Returns the token
@@ -63,11 +112,12 @@ impl Sessions {
         if !token.starts_with(PREFIX) {
             return Err(refused());
         }
+        let config = *self.config.read().map_err(|_| Error::Refused("session-state"))?;
         let k = key(token);
         let (subject, generation) = {
             let mut table = self.table.lock().map_err(|_| Error::Refused("session-state"))?;
             let Some(s) = table.get(&k) else { return Err(refused()) };
-            if now - s.created >= self.config.session_absolute_seconds || now - s.last_seen >= self.config.session_idle_seconds {
+            if now - s.created >= config.session_absolute_seconds || now - s.last_seen >= config.session_idle_seconds {
                 table.remove(&k);
                 return Err(refused());
             }
@@ -91,10 +141,10 @@ impl Sessions {
         }
     }
 
-    /// End one session (sign-out). Unknown tokens are a no-op success.
-    pub fn logout(&self, token: &str) -> Result<(), Error> {
-        self.table.lock().map_err(|_| Error::Refused("session-state"))?.remove(&key(token));
-        Ok(())
+    /// End one session (sign-out). Unknown tokens are a no-op success
+    /// (`None`); otherwise returns the subject whose session ended.
+    pub fn logout(&self, token: &str) -> Result<Option<String>, Error> {
+        Ok(self.table.lock().map_err(|_| Error::Refused("session-state"))?.remove(&key(token)).map(|s| s.subject))
     }
 
     /// End every session of `subject` (admin action); returns how many ended.

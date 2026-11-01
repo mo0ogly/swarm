@@ -119,6 +119,7 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/native-runtime/log-read-policy.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/native-log-read-policy.js"))),
         "/native-runtime/activity-policy.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/native-activity-policy.js"))),
         "/native-runtime/graph-performance.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/native-graph-performance.js"))),
+        "/native-runtime/authority-admin.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/native-authority-admin.js"))),
         "/native-runtime/web-requests-admin.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/native-web-requests.js"))),
         "/native-runtime/provider-wait.js" => Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/native-provider-wait.js"))),
         "/native-runtime/settings.js" => Some((

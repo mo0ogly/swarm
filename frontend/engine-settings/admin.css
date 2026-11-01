@@ -1,4 +1,9 @@
 .engine-settings-table{overflow-x:auto;max-width:100%}
+.engine-settings-table-wrap{overflow-x:auto;max-width:100%}
+.native-session-user{align-self:center;overflow-wrap:anywhere}
+.authority-roles{display:flex;flex-wrap:wrap;gap:.25rem 1.5rem;border:1px solid var(--swarm-control-border);padding:.5rem 1rem}
+.authority-roles label{display:inline-flex;align-items:center;gap:.5rem;min-height:44px}
+.authority-roles input{width:auto;margin:0}
 .engine-settings-table :is(th,td){overflow-wrap:anywhere;white-space:pre-wrap;vertical-align:top}
 .engine-settings-dialog{width:min(64rem,calc(100vw - 2rem));max-height:calc(100dvh - 2rem)}
 .engine-settings-dialog[open]{display:flex;flex-direction:column;overflow:hidden}

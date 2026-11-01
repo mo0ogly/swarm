@@ -2,7 +2,8 @@
 //! costs. Never hard-coded in code: the installation defaults are the shipped
 //! file `config/authority-defaults.json` (embedded), and the operator's saved
 //! file `authority.json` in the declared configuration directory overrides
-//! them as a whole. Admin editing arrives with B8 through the daemon API.
+//! them as a whole. Edited from the Admin through the daemon API (B8,
+//! [`crate::admin`]), applied live.
 //!
 //! Validation: lifetimes strictly positive with idle <= absolute; Argon2
 //! costs accepted by the Argon2 parameter contract; relay body limit

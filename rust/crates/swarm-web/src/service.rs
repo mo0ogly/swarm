@@ -962,7 +962,11 @@ impl NativeHttpService {
     /// login only. Malformed/ambiguous headers and other access failures keep
     /// their typed refusal; no API/private asset receives this exception.
     fn root_login<B>(&self, request: &Request<B>) -> bool {
-        request.uri().path() == "/"
+    /// Owner-key mode only: in `authority` mode the daemon owns sign-in and
+    /// `/` is an ordinary assertion-checked page (the owner key page would
+    /// otherwise be shown to a signed-in daemon user).
+        matches!(self.access, AccessGate::OwnerKey)
+            && request.uri().path() == "/"
             && matches!(*request.method(), Method::GET | Method::HEAD)
             && matches!(
                 self.authority.authorize(request),

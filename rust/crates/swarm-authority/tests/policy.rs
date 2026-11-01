@@ -77,6 +77,9 @@ fn unknown_mutation_is_administer_and_classes_are_explicit() {
     assert_eq!(classify("POST", "/api/v1/paea/git-call/approval"), Action::Approve);
     assert_eq!(classify("POST", "/api/v1/paea/git-call/approval/presentation"), Action::Read);
     assert_eq!(classify("POST", "/api/v1/visit-state"), Action::Write);
+    assert_eq!(classify("POST", "/api/v1/graph-batch/apply"), Action::Write);
+    assert_eq!(classify("POST", "/api/v1/graph-batch/preview"), Action::Read);
+    assert_eq!(classify("GET", "/api/v1/authority/accounts"), Action::Administer);
     assert_eq!(classify("POST", "/api/v1/pricing"), Action::Administer);
     assert_eq!(classify("POST", "/api/v1/pricing/estimate"), Action::Read);
     // Every engine API route literal is reviewed: none may fall to the

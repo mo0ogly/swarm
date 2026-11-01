@@ -1,7 +1,7 @@
 //! Multi-account registry on the signed enrollment journal (phase B, slice B2.2).
 //!
 //! Each account generation is one journal record `account/<subject>/<nonce>`
-//! whose body is an [`AccountBody`] holding attributes (roles, integrity,
+//! whose body is an [`AccountBody`](crate::accounts::AccountBody) holding attributes (roles, integrity,
 //! free attributes) and an Argon2id verifier (`credentials::Record`); the
 //! password is never stored. A password change enrolls a new generation and
 //! then revokes the old one (a revoked id never comes back). Reads pick the
@@ -9,10 +9,11 @@
 //! leaves the new password effective; the stale generation is revoked by the
 //! next write on that subject.
 //!
-//! Limits of this slice: no rollback witness yet (the journal head is not
-//! compared with an independent copy — EP-06 stays open) and no listener; the
-//! daemon still runs nothing. Sessions live in [`crate::sessions`]. Argon2
-//! costs are supplied by the caller from [`crate::config::AuthorityConfig`].
+//! Limits: no rollback witness (the journal head is not compared with an
+//! independent copy — EP-06 stays open). Journal calls of this process are
+//! serialized (the journal has no busy wait by contract). Sessions live in
+//! [`crate::sessions`], API keys in [`crate::keys`] (same journal, `apikey/`
+//! records). Argon2 costs come from [`crate::config::AuthorityConfig`].
 use ed25519_dalek::SigningKey;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -89,10 +90,14 @@ impl std::error::Error for Error {}
 
 /// Registry bound to one journal, its signing key and installation identity.
 pub struct Accounts {
-    journal: Journal,
-    key: SigningKey,
-    project: [u8; 32],
+    pub(crate) journal: Journal,
+    pub(crate) key: SigningKey,
+    pub(crate) project: [u8; 32],
     installation: String,
+    /// Serializes this process's journal calls: the journal takes a write
+    /// reservation per call and has no busy wait by contract, so concurrent
+    /// browser requests would otherwise refuse with `sqlite` busy.
+    serial: std::sync::Mutex<()>,
 }
 
 fn principal(subject: &str) -> Principal {
@@ -123,6 +128,22 @@ fn validate(subject: &str, p: &Profile) -> Result<(), Error> {
 }
 
 impl Accounts {
+    fn serial(&self) -> Result<std::sync::MutexGuard<'_, ()>, Error> {
+        self.serial.lock().map_err(|_| Error::Refused("account-state"))
+    }
+    pub(crate) fn serial_snapshot(&self, ctx: &Context) -> Result<(Head, Vec<String>), swarm_enrollment_state::Error> {
+        let _g = self.serial().map_err(|_| swarm_enrollment_state::Error::State)?;
+        self.journal.snapshot(ctx)
+    }
+    pub(crate) fn serial_active<T>(&self, ctx: &Context, head: &Head, id: &str, f: impl FnOnce(swarm_enrollment_state::Record) -> Result<T, swarm_enrollment_state::Error>) -> Result<T, swarm_enrollment_state::Error> {
+        let _g = self.serial().map_err(|_| swarm_enrollment_state::Error::State)?;
+        self.journal.with_active(ctx, head, id, f)
+    }
+    pub(crate) fn serial_apply(&self, ctx: &Context, head: &Head, raw: &[u8]) -> Result<Head, swarm_enrollment_state::Error> {
+        let _g = self.serial().map_err(|_| swarm_enrollment_state::Error::State)?;
+        self.journal.apply(ctx, head, raw)
+    }
+
     /// Open (or create) the journal at `path`, verified with the public half
     /// of `key`. `installation` is the 64-hex installation digest bound into
     /// every verifier. No account is created. Journal errors stay typed.
@@ -134,16 +155,16 @@ impl Accounts {
         installation: &str,
     ) -> Result<Self, Error> {
         let journal = Journal::open(ctx, path, &key.verifying_key().to_bytes(), project).map_err(Error::Journal)?;
-        Ok(Self { journal, key, project, installation: installation.into() })
+        Ok(Self { journal, key, project, installation: installation.into(), serial: std::sync::Mutex::new(()) })
     }
 
     /// Active generations of `subject`, highest generation first, with the head.
     fn generations(&self, ctx: &Context, subject: &str) -> Result<(Head, Vec<(String, AccountBody)>), Error> {
-        let (head, ids) = self.journal.snapshot(ctx).map_err(Error::Journal)?;
+        let (head, ids) = self.serial_snapshot(ctx).map_err(Error::Journal)?;
         let prefix = format!("account/{subject}/");
         let mut out = Vec::new();
         for id in ids.into_iter().filter(|id| id.starts_with(&prefix)) {
-            let body = self.journal.with_active(ctx, &head, &id, |r| Ok(r.body)).map_err(Error::Journal)?;
+            let body = self.serial_active(ctx, &head, &id, |r| Ok(r.body)).map_err(Error::Journal)?;
             let parsed: AccountBody = serde_json::from_slice(&body).map_err(Error::Body)?;
             if parsed.subject != subject || parsed.schema_version != 1 {
                 return Err(Error::Refused("account-body-mismatch"));
@@ -172,10 +193,10 @@ impl Accounts {
         })
         .map_err(Error::Body)?;
         let raw = sign_change(&self.key, self.project, &head, "enroll", &id, &body).map_err(Error::Journal)?;
-        head = self.journal.apply(ctx, &head, &raw).map_err(Error::Journal)?;
+        head = self.serial_apply(ctx, &head, &raw).map_err(Error::Journal)?;
         for old in stale {
             let raw = sign_change(&self.key, self.project, &head, "revoke", &old, b"").map_err(Error::Journal)?;
-            head = self.journal.apply(ctx, &head, &raw).map_err(Error::Journal)?;
+            head = self.serial_apply(ctx, &head, &raw).map_err(Error::Journal)?;
         }
         Ok(head)
     }
@@ -232,6 +253,20 @@ impl Accounts {
         self.write(ctx, subject, &profile, credential, generation, head, stale)
     }
 
+    /// Replace the profile (display name, roles, integrity, attributes) of
+    /// `subject`, keeping its password verifier and generation: open
+    /// sessions survive and see the new attributes at their next request
+    /// (sessions re-read the account each time). Refuses an unknown subject
+    /// (`account-missing`) or an invalid profile (same checks as `create`).
+    pub fn update_profile(&self, ctx: &Context, subject: &str, profile: &Profile) -> Result<Head, Error> {
+        validate(subject, profile)?;
+        let (head, current) = self.generations(ctx, subject)?;
+        let Some((_, body)) = current.first() else { return Err(Error::Refused("account-missing")) };
+        let (credential, generation) = (body.credential.clone(), body.generation);
+        let stale = current.into_iter().map(|(id, _)| id).collect();
+        self.write(ctx, subject, profile, credential, generation, head, stale)
+    }
+
     /// Disable `subject`: revoke every active generation. Its history stays
     /// in the journal; a later `create` starts a new lineage.
     pub fn disable(&self, ctx: &Context, subject: &str) -> Result<Head, Error> {
@@ -241,7 +276,7 @@ impl Accounts {
         }
         for (id, _) in current {
             let raw = sign_change(&self.key, self.project, &head, "revoke", &id, b"").map_err(Error::Journal)?;
-            head = self.journal.apply(ctx, &head, &raw).map_err(Error::Journal)?;
+            head = self.serial_apply(ctx, &head, &raw).map_err(Error::Journal)?;
         }
         Ok(head)
     }
@@ -249,7 +284,7 @@ impl Accounts {
     /// All active accounts (current generation each), sorted by subject;
     /// verifier material is excluded.
     pub fn list(&self, ctx: &Context) -> Result<Vec<AccountView>, Error> {
-        let (_, ids) = self.journal.snapshot(ctx).map_err(Error::Journal)?;
+        let (_, ids) = self.serial_snapshot(ctx).map_err(Error::Journal)?;
         let mut subjects: Vec<String> = ids
             .iter()
             .filter_map(|id| id.strip_prefix("account/").and_then(|r| r.split('/').next()).map(str::to_owned))

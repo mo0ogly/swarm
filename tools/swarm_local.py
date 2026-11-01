@@ -372,8 +372,161 @@ def sign_in_url(binary, root, address):
     return plain
 
 
+AUTHORITY_ETC = Path(os.environ.get("SWARM_AUTHORITY_ETC", "/etc/swarm-authority"))
+AUTHORITY_INSTALLED = Path(os.environ.get("SWARM_AUTHORITY_INSTALLED", "/usr/local/lib/swarm-authority/swarm-authority"))
+
+
+def unit_addresses():
+    """Return (listen, engine) from the installed daemon unit `ExecStart`
+    (single source of truth written by install.sh). RuntimeError when the
+    unit is missing or lacks either address."""
+    unit = Path(os.environ.get("SWARM_AUTHORITY_UNIT", "/etc/systemd/system/swarm-authority.service"))
+    try:
+        words = next(l for l in unit.read_text().splitlines() if l.startswith("ExecStart=")).split()
+    except (OSError, StopIteration):
+        raise RuntimeError(f"Démon d’autorité non installé ({unit}) : ./swarm.sh authority install --admin LOGIN --display NOM") from None
+    found = {}
+    for flag in ("--listen", "--engine"):
+        if flag in words[:-1]:
+            found[flag] = words[words.index(flag) + 1]
+    if set(found) != {"--listen", "--engine"}:
+        raise RuntimeError(f"Adresses du démon introuvables dans {unit}.")
+    return found["--listen"], found["--engine"]
+
+
+def set_access_mode(binary, root, mode, key):
+    """Switch the Root's saved `web_access_mode` (and daemon public key) with
+    the public engine-settings preview → apply flow; no-op when already set.
+    Takes effect at the next engine start. Errors: RuntimeError with the
+    engine's refusal code."""
+    def cli(*args):
+        r = subprocess.run([str(binary), "--root", str(root), *args], cwd=SOURCE, capture_output=True, text=True)
+        if r.returncode != 0:
+            try:
+                code = json.loads(r.stderr)["failure"]["code"]
+            except (ValueError, KeyError, TypeError):
+                code = "inconnu"
+            raise RuntimeError(f"Réglages du moteur refusés ({code}).")
+        return json.loads(r.stdout)
+    shown = cli("engine-settings", "show", "--json")
+    values = dict(shown["values"])
+    if values.get("web_access_mode") == mode and (key is None or values.get("web_authority_public_key") == key):
+        return False
+    values["web_access_mode"] = mode
+    if key is not None:
+        values["web_authority_public_key"] = key
+    change = {"schema_version": shown["schema_version"], "event_id": "swarm-sh-authority-" + str(int(time.time())),
+              "expected_revision": shown["revision"], "values": values,
+              "reason": f"./swarm.sh authority : mode d’accès {mode}", "preview_token": ""}
+    request = root / ".swarm" / "local-web" / "access-mode-change.json"
+    request.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        request.write_text(json.dumps(change))
+        change["preview_token"] = cli("engine-settings", "preview", "--input", str(request), "--json")["preview_token"]
+        request.write_text(json.dumps(change))
+        cli("engine-settings", "apply", "--input", str(request), "--json")
+    finally:
+        request.unlink(missing_ok=True)
+    return True
+
+
+def authority(argv):
+    """`./swarm.sh authority install|enable|disable|status`: the one entry
+    point for the cockpit authority daemon (phase B).
+
+    - install --admin LOGIN --display NOM : build the release daemon, then run
+      `sudo deploy/authority/install.sh` (sudo password and the first user's
+      password are asked on this terminal; idempotent, restarts a running
+      service).
+    - enable : stop the engine, save `authority` mode + the installed daemon
+      key, move the engine to the unit's internal `--engine` address, start
+      it, `sudo systemctl enable --now swarm-authority`, open the sign-in page.
+      Refuses while the installed daemon differs from the last release build
+      (an outdated daemon would be activated).
+    - disable : `sudo systemctl disable --now`, back to `owner-key` mode, the
+      engine on the daemon's former public address.
+    - status : unit, service, installed/build identity, engine mode.
+    Every step prints what it does; a failure stops at that step (rerun after
+    fixing: completed steps are no-ops). Uses only public commands.
+    """
+    parser = argparse.ArgumentParser(prog="swarm.sh authority", description="Démon d’autorité du cockpit (comptes, connexion)")
+    parser.add_argument("step", choices=["install", "enable", "disable", "status"])
+    parser.add_argument("--admin")
+    parser.add_argument("--display")
+    parser.add_argument("--no-open", action="store_true")
+    args = parser.parse_args(argv)
+    me = [sys.executable, str(Path(__file__).resolve())]
+    built = SOURCE / "rust" / "target" / "release" / "swarm-authority"
+    sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest() if p.exists() else None
+    def step(text):
+        print("→ " + text, flush=True)
+    if args.step == "install":
+        if not args.admin or not args.display:
+            parser.error("install exige --admin LOGIN --display NOM")
+        step("Compilation du démon (release)")
+        subprocess.run(["cargo", "build", "--release", "-p", "swarm-authority"], cwd=SOURCE / "rust", check=True)
+        step("Installation système (sudo)")
+        subprocess.run(["sudo", str(SOURCE / "deploy/authority/install.sh"), "--admin", args.admin, "--display", args.display], check=True)
+        print("Démon installé. Suite : ./swarm.sh authority enable")
+        return 0
+    settings = json.loads((SOURCE / "deploy" / "local-web.json").read_text()) if (SOURCE / "deploy" / "local-web.json").exists() else {}
+    root = Path(os.environ.get("SWARM_PROJECT_ROOT", settings.get("root", str(SOURCE)))).resolve()
+    binary = Path(settings["binary"]).resolve() if settings.get("binary") else SOURCE / "bin" / "swarm-local"
+    service = lambda: subprocess.run(["systemctl", "is-active", "swarm-authority"], capture_output=True, text=True).stdout.strip()
+    if args.step == "status":
+        try:
+            listen, engine = unit_addresses()
+        except RuntimeError:
+            listen = engine = None
+        mode = None
+        if binary.exists():
+            shown = subprocess.run([str(binary), "--root", str(root), "engine-settings", "show", "--json"], cwd=SOURCE, capture_output=True, text=True)
+            with contextlib.suppress(ValueError, KeyError):
+                mode = json.loads(shown.stdout)["values"].get("web_access_mode", "owner-key")
+        print(json.dumps({"installed": listen is not None, "service": service(), "listen": listen, "engine": engine,
+                          "engine_mode": mode, "engine_address": settings.get("address"),
+                          "installed_matches_build": sha(AUTHORITY_INSTALLED) is not None and sha(AUTHORITY_INSTALLED) == sha(built)}, indent=1))
+        return 0
+    listen, engine = unit_addresses()
+    if args.step == "enable":
+        if sha(AUTHORITY_INSTALLED) != sha(built):
+            raise RuntimeError("Le démon installé diffère du dernier build : ./swarm.sh authority install --admin LOGIN --display NOM")
+        try:
+            key = (AUTHORITY_ETC / "public_key").read_text().strip()
+        except OSError:
+            raise RuntimeError(f"Clé publique du démon illisible ({AUTHORITY_ETC}/public_key).") from None
+        step("Arrêt du moteur")
+        subprocess.run([*me, "stop"], check=True)
+        step("Réglage : mode d’accès authority + clé du démon")
+        set_access_mode(binary, root, "authority", key)
+        step(f"Moteur déplacé sur l’adresse interne {engine}")
+        subprocess.run([*me, "configure", "--address", engine], check=True)
+        subprocess.run([*me, "start", "--no-open"], check=True)
+        step("Démarrage du démon (sudo)")
+        subprocess.run(["sudo", "systemctl", "enable", "--now", "swarm-authority"], check=True)
+        print(f"Bascule faite. Connexion : http://{listen}/login")
+        if not args.no_open:
+            subprocess.run([os.environ.get("SWARM_BROWSER", "xdg-open"), f"http://{listen}/login"], check=True,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return 0
+    # disable
+    step("Arrêt du démon (sudo)")
+    subprocess.run(["sudo", "systemctl", "disable", "--now", "swarm-authority"], check=True)
+    step("Arrêt du moteur")
+    subprocess.run([*me, "stop"], check=True)
+    step("Réglage : mode d’accès owner-key")
+    set_access_mode(binary, root, "owner-key", "")  # owner-key requires an empty key
+    step(f"Moteur remis sur l’adresse publique {listen}")
+    subprocess.run([*me, "configure", "--address", listen], check=True)
+    subprocess.run([*me, "start"] + (["--no-open"] if args.no_open else []), check=True)
+    print("Retour au mode clé locale fait.")
+    return 0
+
+
 if __name__ == "__main__":
     try:
+        if sys.argv[1:2] == ["authority"]:
+            sys.exit(authority(sys.argv[2:]))
         sys.exit(main())
     except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as error:
         # Do not include subprocess command lines: an opener argument is a credential.
