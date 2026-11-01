@@ -245,6 +245,89 @@ fn contradictory_re_attribution_of_same_object_is_refused_without_mutation() {
     assert_eq!(f.state(),before,"a contradictory refusal must not mutate");
 }
 
+/// Admit a real fixture policy and a confidential object under revision one.
+/// The admin can read both compartments; the approver has only public clearance.
+/// No human identity, declassification grant or provider is involved.
+fn classified_object_fixture() -> (Fixture, Value, Value) {
+    let f=Fixture::new();
+    let mut policy=change(0,"object-policy-one");
+    policy["policy"]["clearances"]["admin"]=json!({"level":"confidential","compartments":["client-a","client-b"]});
+    policy["policy"]["clearances"]["approver"]=json!({"level":"public","compartments":[]});
+    f.call("blp-policy-apply",policy.clone(),"fixture-admin-token").unwrap();
+    let attribution=json!({"schema_version":1,"event_id":"object-first","expected_revision":1,
+        "expected_trust_revision":1,"canonical_digest":"c".repeat(64),"project_path":f.0.to_str().unwrap(),
+        "classification":{"level":"confidential","compartments":["client-a"]},"reason":"Exact confidential fixture object"});
+    f.call("blp-object-attribute",attribution.clone(),"fixture-admin-token").unwrap();
+    assert_eq!(object_reader(&f,"fixture-admin-token").unwrap(),swarm_engine::ReaderVerdict::Allowed);
+    assert_ne!(object_reader(&f,"fixture-approver-token").unwrap(),swarm_engine::ReaderVerdict::Allowed);
+    (f,policy,attribution)
+}
+
+/// Reopen the actual fixture Root and use the public reader guard on the exact
+/// digest/path. Close on success/refusal; no bytes are projected to a provider.
+fn object_reader(f:&Fixture,token:&str)->Result<swarm_engine::ReaderVerdict,String> {
+    let store=RootStore::open(&f.0,false).unwrap();
+    let result=store.paea_reader_verdict(Some(token),&"c".repeat(64),&f.0);
+    store.close().unwrap();result.map_err(|e|e.to_string())
+}
+
+/// A new policy revision is not human declassification. Reproduce level loss,
+/// compartment removal and incompatible compartments; preserve exact state on
+/// refusal, then demonstrate stricter and equal renewal, replay and real reading.
+#[test]
+fn policy_revision_cannot_lower_or_remove_object_classification() {
+    for denied in [json!({"level":"public","compartments":[]}),
+        json!({"level":"confidential","compartments":[]}),
+        json!({"level":"confidential","compartments":["client-b"]})] {
+        let (f,mut policy,mut attribution)=classified_object_fixture();
+        policy["expected_revision"]=1.into();policy["event_id"]="object-policy-two".into();
+        f.call("blp-policy-apply",policy.clone(),"fixture-admin-token").unwrap();
+        let before=f.state();
+        attribution["expected_revision"]=2.into();attribution["event_id"]="object-lower".into();
+        attribution["classification"]=denied;
+        let result=f.call("blp-object-attribute",attribution.clone(),"fixture-admin-token");
+        assert!(result.is_err(),"policy renewal admitted implicit declassification: {result:?}; low-reader={:?}",object_reader(&f,"fixture-approver-token"));
+        assert!(result.unwrap_err().contains("blp-declassification-required"));
+        assert_eq!(f.state(),before,"refused downgrade must preserve all state bytes");
+        attribution["event_id"]="object-stricter".into();
+        attribution["classification"]=json!({"level":"confidential","compartments":["client-a","client-b"]});
+        let applied=f.call("blp-object-attribute",attribution.clone(),"fixture-admin-token").unwrap();
+        let after=f.state();assert_eq!(f.call("blp-object-attribute",attribution.clone(),"fixture-admin-token").unwrap(),applied);
+        assert_eq!(f.state(),after);
+        assert_eq!(object_reader(&f,"fixture-admin-token").unwrap(),swarm_engine::ReaderVerdict::Allowed);
+        assert_ne!(object_reader(&f,"fixture-approver-token").unwrap(),swarm_engine::ReaderVerdict::Allowed);
+        policy["expected_revision"]=2.into();policy["event_id"]="object-policy-three".into();
+        f.call("blp-policy-apply",policy,"fixture-admin-token").unwrap();
+        attribution["expected_revision"]=3.into();attribution["event_id"]="object-equal".into();
+        f.call("blp-object-attribute",attribution,"fixture-admin-token").unwrap();
+        assert_eq!(object_reader(&f,"fixture-admin-token").unwrap(),swarm_engine::ReaderVerdict::Allowed);
+    }
+}
+
+/// Reject a retained cross-revision downgrade at both administration and reader
+/// boundaries. Only this owned inert fixture is poisoned; originals are restored
+/// exactly to demonstrate recovery without rewriting any production history.
+#[test]
+fn stored_cross_revision_downgrade_refuses_without_disclosure() {
+    let (f,mut policy,_)=classified_object_fixture();
+    policy["expected_revision"]=1.into();policy["event_id"]="object-policy-two".into();
+    f.call("blp-policy-apply",policy,"fixture-admin-token").unwrap();
+    let before=f.state();
+    let mut stored:Value=serde_json::from_slice(&before).unwrap();
+    let history=stored["confidentiality"]["history"].as_array_mut().unwrap();
+    let mut lower=history[0]["attributions"][0].clone();
+    lower["policy_revision"]=2.into();lower["level"]="public".into();lower["compartments"]=json!([]);
+    history[1]["attributions"]=json!([lower]);
+    let corrupted=serde_json::to_vec_pretty(&stored).unwrap();
+    std::fs::write(f.0.join(".swarm/trust-actions.json"),&corrupted).unwrap();
+    assert!(f.call("blp-show",json!({}),"fixture-admin-token").unwrap_err().contains("blp-attribution-history-downgrade"));
+    assert!(object_reader(&f,"fixture-approver-token").unwrap_err().contains("blp-attribution-history-downgrade"));
+    assert_eq!(f.state(),corrupted,"validation must not rewrite historical evidence");
+    std::fs::write(f.0.join(".swarm/trust-actions.json"),&before).unwrap();
+    assert!(f.call("blp-show",json!({}),"fixture-admin-token").is_ok());
+    assert_ne!(object_reader(&f,"fixture-approver-token").unwrap(),swarm_engine::ReaderVerdict::Allowed);
+}
+
 /// Defect 3, sub-case (c): the producer contract announces `classification:
 /// null` as "the object is unclassified", but the stored attribution gets an
 /// EMPTY level string, and a reader presenting `Some(empty)` to

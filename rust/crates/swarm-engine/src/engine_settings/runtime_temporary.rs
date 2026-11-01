@@ -56,7 +56,7 @@ mod tests {
     fn installation_default_is_root_relative_and_current_schema() {
         let s = EngineSettingsValues::installation_defaults().unwrap();
         s.validate().unwrap();
-        assert_eq!(s.schema_version(), 51);
+        assert_eq!(s.schema_version(), 52);
         assert_eq!(s.runtime_temporary_directory().unwrap(), ".swarm-fixtures");
         assert_eq!(
             s.runtime_temporary_path(std::path::Path::new("/srv/p")).unwrap(),
@@ -67,6 +67,7 @@ mod tests {
     #[test]
     fn absence_tmp_and_traversal_refuse_absolute_kept() {
         let mut s = EngineSettingsValues::installation_defaults().unwrap();
+        s.web_access_mode = None; s.web_authority_public_key = None; s.web_assertion_max_age_seconds = None; // later independent v52 group
         s.runtime_temporary_directory = None;
         s.validate().unwrap();
         assert_eq!(s.schema_version(), 50);

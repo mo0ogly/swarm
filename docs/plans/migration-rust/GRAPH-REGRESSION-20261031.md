@@ -302,3 +302,69 @@ Critères observables :
 Documentation/fonctions/traductions/recette sont dans le même incrément.
 Qualification sur image native immuable puis activation locale via le lanceur ;
 review dans ce contexte est une auto-revue, jamais acceptation indépendante.
+
+### Replan du lot QG3–QG7
+
+- Défaut reproduit `noop-before/browser.stderr` : glisser une seconde carte puis
+  revenir à son origine crée une entrée de coordonnées zéro et remplace undo
+  malgré une géométrie identique. Critère concerné : annulation du dernier vrai
+  placement. Correction décidée : comparer les coordonnées effectives avec zéro
+  pour une entrée absente ; conserver le témoin navigateur avant/après.
+- Lenteur de build : maintenance Git cruft concurrente ~7 Gio RSS, swap presque
+  pleine, compilateur actif et compteurs IO/CPU progressants. Preuve
+  `build-pressure.json` ; aucun processus tiers interrompu, aucune relance sans
+  précondition changée. Le premier candidat ne sera pas livré avec le défaut.
+- Amélioration de méthode retenue, propriétaire maintenance du dépôt : planifier
+  les compilations et repacks lourds sans concurrence mémoire. État proposé hors
+  lot UI ; reprise lors du prochain réglage explicite de maintenance, critère
+  observable : progression du build sans saturation mémoire concurrente. Aucun
+  réglage Git global ni politique machine changé ici.
+
+### QG3–QG7 livrés — Rust290
+
+Les cinq critères du lot sont réalisés et vérifiés localement : cadrage des cartes
+manuelles, annulation d’un déplacement/rangement terminé (une fois), mini-carte
+clic/clavier avec viewport, copie exacte d’ID avec refus/indisponibilité récupérables,
+aide dépliable FR/EN. Les annulations et les glisser-retour sans changement gardent
+le témoin précédent ; les coordonnées restaurées sont mémorisées localement.
+
+Preuves sous `.cache/graph-five-quickwins-20261101/` :
+- `before/` : témoin de cadrage valide puis défaut original reproduit ;
+  `noop-before/` : glisser-retour écrasant undo avant correction ;
+- `preview/`, `preview2/` : originaux des défauts de préconditions du harnais
+  (permission clipboard distincte et ordre de nœuds), sans faux PASS ;
+- `after-noop/` : reprise navigateur après correction, Work inchangé ;
+- `embedded-recipe/` : deux étapes PASS, 613 assertions navigateur, FR/EN,
+  clair/sombre, mobile 390/320, édition/refus/réponse perdue/reprise ; intégrité
+  confirmée par `recipe.py verify`. Racines isolées, aucun fournisseur ;
+- `candidate.json` : profil natif normal, quatre artefacts cœur sans feature
+  fixture, 730 entrées effectives archivées. Le premier build est refusé pour
+  modification concurrente de Cargo.lock et du manifeste swarm-authority ;
+  originaux dans `.cache/local-delivery/rust-7z38_c2y/`. Second build qualifié dans
+  `.cache/local-delivery/rust-gj64thyb/`, sans contournement du contrôle ;
+- `review/source-review.json` et `review/result.json` : sept entrées de compilation
+  modifiées examinées (politiques, fonctions, erreurs, documentation). Dépendances
+  du workspace examinées pour leur effet sur ce binaire ; aucune qualification
+  globale des nouveaux modules d’autorité non liés, ni revue indépendante ;
+- `restart.stdout`, `installed/result.json` : service géré PID 933308,
+  v0.1.1-dev.290, SHA256
+  `2f104936daae347cbe46d21410a49c1485e135da9a2cfba15011e6d4eab39e2b` ;
+  sept ressources protégées identiques à l’inventaire compilé, 14 assertions
+  fenêtre Version FR/EN, commit réel `18bb6bb6b5ee987e12a1f51c5ccda70fcd9db508`,
+  modifications non commitées explicites, aucun POST sur l’instance réelle.
+
+RETEX du lot : une entrée de position absente et une entrée zéro ont la même
+signification visuelle ; la comparaison de représentations JSON ne suffisait pas
+pour protéger undo. Le contre-exemple est désormais dans la recette permanente.
+Le témoin clipboard réel précède chaque refus injecté ; l’attente de test observe
+aussi l’issue non confirmée au lieu d’attendre uniquement un succès. Les tests
+mini-carte choisissent une position géométrique, sans supposer l’ordre du moteur
+de placement. Cargo « Compiling » n’établit pas un artefact terminé : lire les
+événements JSON. Ces apprentissages persistent dans tests/recette/commentaires et
+ce suivi ; aucune consigne native embarquée n’a été modifiée dans ce lot.
+
+Limites maintenues : undo porte seulement sur le dernier placement local et sa
+mémoire disparaît au rerender ; limite de zoom 15 % annoncée si insuffisante.
+Brouillons de liens atomiques et historique métier restent le chantier de migration
+précédemment ouvert, hors des cinq quick wins. Aucun push ni publication ici ;
+les commits concurrents observés sont conservés, sans réécriture d’historique.

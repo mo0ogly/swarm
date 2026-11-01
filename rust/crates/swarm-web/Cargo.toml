@@ -5,6 +5,8 @@ edition = "2021"
 publish = false
 
 [dependencies]
+swarm-authority = { path = "../swarm-authority" }
+ed25519-dalek = "=2.2.0"
 http = "=1.5.0"
 cookie = { version = "=0.18.2", default-features = false }
 sha2 = "=0.10.9"

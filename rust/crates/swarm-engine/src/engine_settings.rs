@@ -12,7 +12,8 @@ use std::{collections::BTreeSet, error::Error, fmt};
 /// the read-only PA-09 reconciliation consumer.
 /// v50 adds the independent optional single-use cockpit login ticket lifetime.
 /// v51 adds the independent optional runtime temporary directory.
-const SETTINGS_SCHEMA_MAX: i64 = 51;
+/// v52 adds the cockpit access mode group (owner key or authority daemon).
+const SETTINGS_SCHEMA_MAX: i64 = 52;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SettingCount(pub i64);
 /// Providers with a supported telemetry injection (protocol capability, not an
@@ -1042,6 +1043,18 @@ pub struct EngineSettingsValues {
         deserialize_with = "present_string"
     )]
     pub runtime_temporary_directory: Option<String>,
+    /// v52 group (all three present or all absent): cockpit access mode
+    /// `owner-key` (persisted local key) or `authority` (every protected
+    /// request must carry an assertion signed by the authority daemon), the
+    /// daemon's Ed25519 public key (base64url, empty only in `owner-key`
+    /// mode) and the assertion freshness window in seconds. Network group:
+    /// applied at the next server start.
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_string")]
+    pub web_access_mode: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_string")]
+    pub web_authority_public_key: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_count")]
+    pub web_assertion_max_age_seconds: Option<SettingCount>,
 }
 /// Preserve legacy absence separately from a validated explicit set; null and
 /// unknown phase names refuse. No task mutation, IO or authorization occurs.
@@ -1172,6 +1185,9 @@ impl EngineSettingsValues {
     /// Work/history or establishes active-server state. Typed validation causes
     /// survive rejection; caller still owes authority and publication freshness.
     pub fn validate(&self) -> Result<(), EngineSettingsError> {
+        if self.has_web_access_policy() {
+            self.web_access_policy()?;
+        }
         if self.runtime_temporary_directory.is_some() {
             self.runtime_temporary_directory()?;
         }
@@ -1583,6 +1599,9 @@ impl EngineSettingsValues {
     /// Return the complete declared settings version, preserving historical
     /// absence. This does not adopt defaults, mutate history or grant authority.
     pub fn schema_version(&self) -> i64 {
+        if self.has_web_access_policy() {
+            return 52;
+        }
         if self.runtime_temporary_directory.is_some() {
             return 51;
         }
@@ -2673,3 +2692,6 @@ mod settlement_ledger;
 mod web_login_ticket;
 
 mod runtime_temporary;
+
+mod web_access;
+pub use web_access::{WebAccessMode, WebAccessPolicy};

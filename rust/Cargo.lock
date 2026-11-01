@@ -1444,6 +1444,7 @@ dependencies = [
 name = "swarm-authority"
 version = "0.1.0"
 dependencies = [
+ "base64 0.22.1",
  "ed25519-dalek",
  "getrandom 0.4.3",
  "rustix",
@@ -1685,6 +1686,7 @@ dependencies = [
  "sha2 0.11.1",
  "subtle",
  "swarm-api-client",
+ "swarm-authority",
  "swarm-engine",
  "swarm-enrollment-authority",
  "swarm-enrollment-bootstrap",

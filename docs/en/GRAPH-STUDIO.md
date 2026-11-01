@@ -19,7 +19,7 @@ The **ID** button copies the exact identifier without opening the editor. Succes
 requires clipboard acknowledgement. Refusal or an unavailable API leaves a
 selected readonly identifier without claiming a successful copy.
 “Graph gestures” reveals the controls. Close or Escape collapses this help and
-restores summary focus. Card titles are abbreviated to 24 UTF-16 units to leave
+restores summary focus. Card titles and labels are abbreviated to 24 UTF-16 units to leave
 room for controls; their full text remains in the tooltip.
 
 Search matches task IDs and titles regardless of case or accents. It highlights

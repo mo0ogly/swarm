@@ -12,6 +12,12 @@ use serde::Serialize;
 
 /// Multi-account registry on the signed journal (slice B2.2).
 pub mod accounts;
+/// Daemon configuration: session lifetimes, Argon2 costs (no hard-coded policy).
+pub mod config;
+/// Daemon-held sign-in sessions (slice B4).
+pub mod sessions;
+/// Signed per-request assertion relayed to the engine (slice B5.1).
+pub mod assertion;
 
 /// Facts established by [`check`], safe to print: UIDs and directories only,
 /// never pins' private material (the declaration holds none).

@@ -57,7 +57,8 @@
         "PASS en-sombre-help-escape-focus",
         "PASS en-sombre-cancel-preserves-previous-undo",
         "PASS en-sombre-undo-restores-pointer-move",
-        "PASS en-sombre-undo-persisted"
+        "PASS en-sombre-undo-persisted",
+        "PASS en-sombre-noop-drag-preserves-undo"
       ],
       "required_stderr": []
     },

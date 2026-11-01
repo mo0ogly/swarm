@@ -198,3 +198,8 @@ image; it establishes neither real-content classification, nor protected
 execution (`runtime_enforced:false` unchanged), nor independent acceptance.
 The mission root still has no trust state; the operator bootstrap decision
 remains required before any real administration.
+
+1 November resumption: provenance proofs (11 tests, CLI 29, HTTP 34) and historical
+284 installation confirmed; [updated record](BLP-PROVENANCE-20261031.md). Current
+local version is 290, preserved without reinstalling; those proofs do not qualify
+290. BLP-04 remains partial, with no transversal BLP enforcement.

@@ -21,7 +21,7 @@ Le bouton **ID** copie l’identifiant exact sans ouvrir le formulaire. Le succ�
 attend l’accord du presse-papiers ; un refus ou une API indisponible laisse
 l’identifiant en lecture seule, sélectionné, sans annoncer de copie réussie.
 « Aide des gestes » expose les commandes ; Fermer ou Échap referme l’aide et
-rend le focus à son titre. Les titres de carte sont abrégés à 24 unités UTF-16
+rend le focus à son titre. Les titres et libellés de carte sont abrégés à 24 unités UTF-16
 pour ménager les commandes ; leur texte complet reste dans l’infobulle.
 
 La recherche par identifiant ou titre ignore la casse et les accents. Elle met

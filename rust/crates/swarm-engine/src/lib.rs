@@ -737,6 +737,7 @@ pub use root_store::MissionReportRelayOutcome;
 mod preparation_models;
 pub use preparation_models::{Preparation, PreparationDocument, PreparationSource, PreparationVerdict, PreparationConversion};
 pub use engine_settings::{PreparationReadPolicy, PreparationWritePolicy, PreparationPlanPolicy, PreparationSourcePolicy, PreparationTemplatePolicy};
+pub use engine_settings::{WebAccessMode, WebAccessPolicy};
 pub use root_store::{PreparationReadError, PreparationReadObservation};
 pub use preparation_models::PreparationMethod;
 pub use root_store::PreparationList;

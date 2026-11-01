@@ -209,10 +209,11 @@
      */
     function copyPositions(source=positions){const result=Object.create(null);for(const [id,p]of Object.entries(source))result[id]={x:p.x,y:p.y};return result}
     /** Retain one previous placement only after a real completed change.
-     * Cancellation/no-op preserve the previous undo. Memory resets on rerender;
+     * Cancellation/no-op preserve the previous undo; absent and zero offsets
+     * describe the same placement. Memory resets on rerender;
      * neither history nor a task operation is persisted by this helper.
      */
-    function rememberPlacement(before){if(JSON.stringify(before)!==JSON.stringify(positions))previousPositions=before}
+    function rememberPlacement(before){const ids=new Set([...Object.keys(before),...Object.keys(positions)]);if([...ids].some(id=>(before[id]?.x??0)!==(positions[id]?.x??0)||(before[id]?.y??0)!==(positions[id]?.y??0)))previousPositions=before}
     /** Project native scroll bounds into unscaled SVG coordinates, clamped to
      * the graph extent. Only the minimap viewport marker changes; no IO/layout.
      */

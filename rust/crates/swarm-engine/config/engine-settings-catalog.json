@@ -1455,6 +1455,30 @@
    "nullable": false,
    "help": "Répertoire où Swarm écrit ses fichiers temporaires (exporté comme TMPDIR au moteur et à ses processus enfants) et où tests et recettes créent leurs fixtures. Chemin absolu, ou relatif à la racine du projet ; jamais /tmp implicitement, effacé à chaque redémarrage. Créé en 0700 s'il manque. Pris en compte au prochain lancement d'une commande ou du serveur.",
    "introduced_schema_version": 51
+  },
+  {
+   "name": "web_access_mode",
+   "label": "Accès — mode d’authentification du cockpit",
+   "unit": "text",
+   "nullable": false,
+   "help": "owner-key : clé locale du projet (comportement historique). authority : chaque requête protégée doit porter une assertion signée par le démon d’autorité ; la clé locale n’ouvre plus le cockpit. Pris en compte au prochain démarrage du serveur. Secours : repasser en owner-key avec la CLI locale (engine-settings apply).",
+   "introduced_schema_version": 52
+  },
+  {
+   "name": "web_authority_public_key",
+   "label": "Accès — clé publique du démon d’autorité",
+   "unit": "text",
+   "nullable": false,
+   "help": "Clé publique Ed25519 du démon d’autorité (base64url, 32 octets) utilisée pour vérifier les assertions. Vide seulement en mode owner-key. Elle ne donne aucun droit : sans la clé privée du démon, aucune assertion ne peut être signée.",
+   "introduced_schema_version": 52
+  },
+  {
+   "name": "web_assertion_max_age_seconds",
+   "label": "Accès — fraîcheur des assertions",
+   "unit": "seconds",
+   "nullable": false,
+   "help": "Écart maximal, en secondes strictement positives, entre l’heure d’une assertion du démon et l’heure du moteur. Au-delà, la requête est refusée ; chaque assertion ne sert qu’une fois dans cette fenêtre.",
+   "introduced_schema_version": 52
   }
  ]
 }

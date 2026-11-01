@@ -328,3 +328,8 @@ l'image servie ; elle n'établit ni la classification de contenu réel, ni une
 exécution protégée (`runtime_enforced:false` inchangé), ni une acceptation
 indépendante. La racine de mission reste sans état trust ; la décision de
 bootstrap opérateur reste requise avant toute administration réelle.
+
+Reprise du 1er novembre : preuves de provenance (11 tests, CLI 29, HTTP 34) et
+installation historique 284 confirmées ; [suivi actualisé](BLP-PROVENANCE-20261031.md).
+La version locale observée est désormais 290, conservée sans réinstallation ; ces
+preuves ne qualifient pas 290. BLP-04 reste partiel, sans contrôle BLP transversal.

@@ -1,6 +1,6 @@
 //! Typed HTTP dispatcher with a separate owner-observed HTTP/1 transport.
 //! Supported Go paths are deliberately partial; unknown operations never fall back.
-use crate::{LocalWebAuthority, WebAccessError};
+use crate::{LocalWebAuthority, WebAccessError, WebPrincipal};
 mod listener;
 mod live;
 mod live_events;
@@ -645,7 +645,19 @@ pub struct NativeHttpService {
     authority: LocalWebAuthority,
     binding: RootBinding,
     cookie_max_age_seconds: Option<i64>,
+    /// v52 access gate read at start (owner key or authority assertions).
+    access: AccessGate,
     probe_shutdown: std::sync::atomic::AtomicBool,
+}
+/// Who may pass protected routes, fixed at server start from v52 settings.
+/// `Authority` keeps the replay memory for its freshness window.
+enum AccessGate {
+    OwnerKey,
+    Authority {
+        key: ed25519_dalek::VerifyingKey,
+        max_age_seconds: i64,
+        nonces: std::sync::Mutex<swarm_authority::assertion::WindowNonces>,
+    },
 }
 impl NativeHttpService {
     /// Trusted typed bootstrap of one exact prepared/provisioned intent. No
@@ -747,6 +759,12 @@ impl NativeHttpService {
         listener: &std::net::TcpListener,
         cookie_max_age_seconds: Option<i64>,
     ) -> Result<Self, HttpServiceError> {
+        // v52 access gate from the same open Root as the transport policy
+        // (production `swarm-rust web` and `open_local` both pass here).
+        let access = match Self::access_gate(&store) {
+            Ok(access) => access,
+            Err(error) => return close(Err(error), store.close()),
+        };
         let prepared = match store.web_session(listener) {
             Err(error) => Err(HttpServiceError::Session(error)),
             Ok(session) => LocalWebAuthority::from_session(listener, &session)
@@ -770,6 +788,7 @@ impl NativeHttpService {
                 authority,
                 binding,
                 cookie_max_age_seconds,
+                access,
                 probe_shutdown:std::sync::atomic::AtomicBool::new(false),
             }),
             (Err(primary), cleanup) => close(Err(primary), cleanup),
@@ -824,6 +843,10 @@ impl NativeHttpService {
             Ok(age) => age,
             Err(error) => return close(Err(error), store.close()),
         };
+        let access = match Self::access_gate(&store) {
+            Ok(access) => access,
+            Err(error) => return close(Err(error), store.close()),
+        };
         match store.bind_root() {
             Err(cause) => close(Err(root("bind", cause)), store.close()),
             Ok(binding) => match store.close() {
@@ -835,6 +858,7 @@ impl NativeHttpService {
                     authority,
                     binding,
                     cookie_max_age_seconds,
+                    access,
                     probe_shutdown:std::sync::atomic::AtomicBool::new(false),
                 }),
                 Err(cause) => close(Err(root("bootstrap-close", cause)), binding.close()),
@@ -844,6 +868,54 @@ impl NativeHttpService {
     /// Snapshot saved v20 cookie policy through authoritative settings validation.
     /// No fallback/legacy file read, mutation, expiry/revocation or runtime hot reload.
     /// The older Go web-session.json still requires migration/arbitration before cutover.
+    /// Read the saved v52 access policy. A Root that predates v52 keeps the
+    /// historical owner-key behaviour (absence is not a new policy); a present
+    /// but invalid group refuses server start. No hot reload.
+    fn access_gate(store: &RootStore) -> Result<AccessGate, HttpServiceError> {
+        let values = store.settings().map_err(|cause| root("settings", cause))?.values;
+        match values.web_access_policy() {
+            Ok(policy) => match policy.mode {
+                swarm_engine::WebAccessMode::OwnerKey => Ok(AccessGate::OwnerKey),
+                swarm_engine::WebAccessMode::Authority { public_key } => Ok(AccessGate::Authority {
+                    key: ed25519_dalek::VerifyingKey::from_bytes(&public_key)
+                        .map_err(|_| HttpServiceError::Refused("web-access-key-invalid"))?,
+                    max_age_seconds: policy.assertion_max_age_seconds,
+                    nonces: std::sync::Mutex::new(Default::default()),
+                }),
+            },
+            Err(e) if e.reason() == "settings-web-access-not-configured" => Ok(AccessGate::OwnerKey),
+            Err(e) => Err(root("settings", RootStoreError::Settings(e))),
+        }
+    }
+    /// Authorize a protected request whose body is already read. Owner-key
+    /// mode: the existing cookie/Origin/CSRF head checks. Authority mode:
+    /// exact Host, then the daemon assertion bound to method, path+query and
+    /// body, fresh and single-use; the owner cookie is not accepted.
+    fn authorize_request(&self, request: &Request<Vec<u8>>) -> Result<WebPrincipal, WebAccessError> {
+        match &self.access {
+            AccessGate::OwnerKey => self.authority.authorize(request),
+            AccessGate::Authority { key, max_age_seconds, nonces } => {
+                self.authority.authorize_host(request)?;
+                let header = request
+                    .headers()
+                    .get(swarm_authority::assertion::HEADER)
+                    .and_then(|v| v.to_str().ok())
+                    .ok_or(WebAccessError::Refused("web-assertion-required"))?;
+                let path = request.uri().path_and_query().map(|p| p.as_str()).unwrap_or("/");
+                let now = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_secs() as i64)
+                    .map_err(|_| WebAccessError::Refused("web-assertion-clock"))?;
+                let mut memory = nonces.lock().map_err(|_| WebAccessError::Refused("web-assertion-state"))?;
+                memory.prune(now, *max_age_seconds);
+                let claims = swarm_authority::assertion::verify(
+                    key, header, request.method().as_str(), path, request.body(), now, *max_age_seconds, &mut *memory,
+                )
+                .map_err(WebAccessError::Refused)?;
+                Ok(WebPrincipal::authority(&claims.subject))
+            }
+        }
+    }
     fn cookie_age(store: &RootStore) -> Result<Option<i64>, HttpServiceError> {
         let document = store.settings().map_err(|cause| root("settings", cause))?;
         document
@@ -882,6 +954,15 @@ impl NativeHttpService {
         }
         if login::public(request) || self.root_login(request) {
             self.authority.authorize_login(request)
+        } else if matches!(self.access, AccessGate::Authority { .. }) {
+            // Body not read yet: Host and assertion presence only; the full
+            // signature/binding check runs in authorize_request.
+            self.authority.authorize_host(request)?;
+            request
+                .headers()
+                .get(swarm_authority::assertion::HEADER)
+                .map(drop)
+                .ok_or(WebAccessError::Refused("web-assertion-required"))
         } else {
             self.authority.authorize(request).map(drop)
         }
@@ -1002,32 +1083,28 @@ impl NativeHttpService {
             // Protected like any API mutation (cookie + Origin + CSRF); only
             // clears this browser's cookies, never the persisted owner key.
             return self
-                .authority
-                .authorize(&request)
+                .authorize_request(&request)
                 .map_err(HttpServiceError::Access)
                 .and_then(|_principal| self.logout_reply(&request))
                 .or_else(|error| error_reply(error, head));
         }
         if live::owns(request.uri().path()) {
             return self
-                .authority
-                .authorize(&request)
+                .authorize_request(&request)
                 .map_err(HttpServiceError::Access)
                 .and_then(|_principal| live::reply(&request))
                 .or_else(|error| error_reply(error, head));
         }
         if native_admin::owns(request.uri().path()) {
             return self
-                .authority
-                .authorize(&request)
+                .authorize_request(&request)
                 .map_err(HttpServiceError::Access)
                 .and_then(|_principal| native_admin::reply(&request))
                 .or_else(|error| error_reply(error, head));
         }
         let mut request = request;
         let result = self
-            .authority
-            .authorize(&request)
+            .authorize_request(&request)
             .map_err(HttpServiceError::Access)
             .and_then(|principal| {
                 // Attribution for route handlers; grants no right beyond the checks above.

@@ -10,9 +10,9 @@
 //! next write on that subject.
 //!
 //! Limits of this slice: no rollback witness yet (the journal head is not
-//! compared with an independent copy — EP-06 stays open), no sessions, no
-//! listener; the daemon still runs nothing. Argon2 costs are supplied by the
-//! caller and must come from an operator setting (EP-09).
+//! compared with an independent copy — EP-06 stays open) and no listener; the
+//! daemon still runs nothing. Sessions live in [`crate::sessions`]. Argon2
+//! costs are supplied by the caller from [`crate::config::AuthorityConfig`].
 use ed25519_dalek::SigningKey;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -208,6 +208,16 @@ impl Accounts {
             Err(credentials::Error::Password) => Err(refused()),
             Err(e) => Err(Error::Credential(e)),
         }
+    }
+
+    /// Current active generation of `subject` without checking any secret
+    /// (`None` when disabled or unknown). Used by sessions to re-check an
+    /// account at every request. Journal/body errors stay typed.
+    pub fn current(&self, ctx: &Context, subject: &str) -> Result<Option<AccountView>, Error> {
+        if !swarm_identity_contract::name(subject.as_bytes()) {
+            return Ok(None);
+        }
+        Ok(self.generations(ctx, subject)?.1.first().map(|(_, b)| view(b)))
     }
 
     /// Replace the password: new generation with the same profile, then the

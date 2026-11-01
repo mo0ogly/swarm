@@ -34,7 +34,7 @@ mod tests {
     fn installation_default_is_current_schema() {
         let s = EngineSettingsValues::installation_defaults().unwrap();
         s.validate().unwrap();
-        assert_eq!(s.schema_version(), 51);
+        assert_eq!(s.schema_version(), 52);
         assert_eq!(s.web_login_ticket_seconds().unwrap(), 60);
     }
 
@@ -42,6 +42,7 @@ mod tests {
     fn historical_absence_and_zero_refuse_without_fallback() {
         let mut s = EngineSettingsValues::installation_defaults().unwrap();
         s.runtime_temporary_directory = None; // later independent v51 group
+        s.web_access_mode = None; s.web_authority_public_key = None; s.web_assertion_max_age_seconds = None;
         s.web_login_ticket_seconds = None;
         s.validate().unwrap();
         assert_eq!(s.schema_version(), 49);
@@ -55,6 +56,7 @@ mod tests {
         let mut v = serde_json::to_value(EngineSettingsValues::installation_defaults().unwrap()).unwrap();
         v["web_login_ticket_seconds"] = "-1".into();
         v.as_object_mut().unwrap().remove("runtime_temporary_directory");
+        for k in ["web_access_mode", "web_authority_public_key", "web_assertion_max_age_seconds"] { v.as_object_mut().unwrap().remove(k); }
         assert!(serde_json::from_value::<EngineSettingsValues>(v).is_err());
     }
 }

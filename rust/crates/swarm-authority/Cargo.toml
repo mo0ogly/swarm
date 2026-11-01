@@ -18,6 +18,8 @@ swarm-enrollment-authority = { path = "../swarm-enrollment-authority" }
 swarm-identity-contract = { path = "../swarm-identity-contract", features = ["serde"] }
 ed25519-dalek = { version = "=2.2.0", features = ["zeroize"] }
 getrandom = "=0.4.3"
+sha2 = "=0.10.9"
+base64 = "=0.22.1"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 rustix = { version = "=1.1.5", features = ["fs", "process"] }

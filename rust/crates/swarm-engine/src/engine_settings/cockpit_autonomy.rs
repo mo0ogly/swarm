@@ -52,7 +52,7 @@ mod tests {
     fn installation_default_is_autonome_and_current_schema() {
         let s = EngineSettingsValues::installation_defaults().unwrap();
         s.validate().unwrap();
-        assert_eq!(s.schema_version(), 51);
+        assert_eq!(s.schema_version(), 52);
         assert_eq!(s.cockpit_default_autonomy_mode().unwrap(), "autonome");
     }
 
@@ -64,6 +64,7 @@ mod tests {
         v.as_object_mut().unwrap().remove("paea_settlement_ledger_root");
         v.as_object_mut().unwrap().remove("web_login_ticket_seconds");
         v.as_object_mut().unwrap().remove("runtime_temporary_directory");
+        for k in ["web_access_mode", "web_authority_public_key", "web_assertion_max_age_seconds"] { v.as_object_mut().unwrap().remove(k); }
         let s: EngineSettingsValues = serde_json::from_value(v).unwrap();
         s.validate().unwrap();
         assert_eq!(s.schema_version(), 47);

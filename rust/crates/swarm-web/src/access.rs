@@ -11,13 +11,14 @@ use std::{
     net::{IpAddr, Ipv4Addr, Ipv6Addr, TcpListener},
 };
 use subtle::ConstantTimeEq;
-/// How the caller of a protected request proved access. Only the persisted
-/// project owner key exists today; user sessions and API keys are planned
-/// additions and must extend this enum rather than reuse `Owner`.
+/// How the caller of a protected request proved access: the persisted owner
+/// key, or (v52 `authority` mode) an assertion signed by the authority daemon.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum WebAuthMethod {
     /// Scoped or legacy cookie carrying the project's private `.swarm` key.
     Owner,
+    /// Assertion signed by the authority daemon (v52 `authority` mode).
+    Authority,
 }
 /// Authenticated request subject produced by [`LocalWebAuthority::authorize`].
 /// It records who passed the head checks; it grants no business right by
@@ -36,6 +37,13 @@ impl WebPrincipal {
         Self {
             subject: Self::OWNER_SUBJECT.into(),
             method: WebAuthMethod::Owner,
+        }
+    }
+    /// Principal named by a verified authority-daemon assertion.
+    pub(crate) fn authority(subject: &str) -> Self {
+        Self {
+            subject: subject.into(),
+            method: WebAuthMethod::Authority,
         }
     }
     /// Stable account subject used for attribution; never a secret.

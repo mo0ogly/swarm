@@ -241,5 +241,8 @@
  "cockpit_default_autonomy": "2",
  "paea_settlement_ledger_root": "/var/lib/swarm/paea-settlement-ledger",
  "web_login_ticket_seconds": "60",
- "runtime_temporary_directory": ".swarm-fixtures"
+ "runtime_temporary_directory": ".swarm-fixtures",
+ "web_access_mode": "owner-key",
+ "web_authority_public_key": "",
+ "web_assertion_max_age_seconds": "30"
 }

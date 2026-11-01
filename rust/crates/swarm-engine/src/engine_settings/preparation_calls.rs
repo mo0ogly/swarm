@@ -94,8 +94,8 @@ mod tests {
     fn defaults_are_complete_disabled_and_versioned() {
         let s = EngineSettingsValues::installation_defaults().unwrap();
         let p = s.preparation_call_policy().unwrap();
-        // v51 adds the independent temporary directory above the v46 call group.
-        assert_eq!(s.schema_version(), 51);
+        // v52 adds the independent access mode group above the v46 call group.
+        assert_eq!(s.schema_version(), 52);
         assert!(!p.enabled);
         assert_eq!((p.timeout_seconds, p.timeout_maximum_seconds), (300, 600));
     }
@@ -114,6 +114,9 @@ mod tests {
                     && k != "paea_settlement_ledger_root"
                     && k != "web_login_ticket_seconds"
                     && k != "runtime_temporary_directory"
+                    && !k.starts_with("web_access")
+                    && k != "web_authority_public_key"
+                    && k != "web_assertion_max_age_seconds"
             });
         let s: EngineSettingsValues = serde_json::from_value(v).unwrap();
         s.validate().unwrap();
