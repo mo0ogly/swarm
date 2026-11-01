@@ -354,15 +354,19 @@ novembre 2026, T01–T22 et pourcentages sourcés) :
 ### État courant — 1er novembre 2026
 
 Candidat unique livré localement : `bin/swarm` SHA-256
-`4164953c841c2b22476bd552a12496aac2b7f95e9b26de04d986c3238e2ed83c`
-(v0.1.1-dev.292, commit 8cb05983175bfe6d4195337503aa75e39b4865a5 « authority
-sessions, signed assertions and engine access mode », `modified=true` — arbre
-sale au build). Recette `paea-delivered-settlement-cli-rust` re-jouée sur ce
-livré : 6/6 VERIFIED (`.swarm-fixtures/i17-rerun/i17-run-4/`) — l'étape I17
+`f5a154da4555962647106954274d09ce9160464383d849ba33782c700d033df9`
+(v0.1.1-dev.298, commit d4e219eeafcae5f90307a105ddaa93ba9874dc4f « feat(blp):
+typed HTTP status translation for preparation refusals », `modified=true` —
+arbre sale au build ; construit 2026-11-01T13:36:05Z). Les deux recettes
+delivered sont re-pinnées et re-jouées sur ce livré : settlement 6/6 VERIFIED
+(`.swarm-fixtures/i17-rerun/i17-run-5/`, témoins `delivered-binary-witness` à
+chaque spawn) et chaîne 4/4 VERIFIED (`.swarm-fixtures/i17-rerun/chain-run-2/`,
+y compris le refus de SHA erroné), `source_stable: true` partout. L'étape I17
 (révocation du courant sur le chemin settlement-call → refus sans effet puis
-récupération) est localement prouvée sur le candidat courant ; la portée de
-T17 s'étend au chemin settlement-call (voir tableau de bord). Acceptation
-indépendante : 0/17, inchangée ; les sept critères ouverts E2 restent opérants.
+récupération) reste localement prouvée sur le candidat courant. L'état
+précédent (dev.292/4164953c…, run-4) est conservé dans l'historique du
+tableau de bord. Acceptation indépendante : 0/17, inchangée ; les sept
+critères ouverts E2 restent opérants.
 
 ### Point du 25 octobre 2026
 

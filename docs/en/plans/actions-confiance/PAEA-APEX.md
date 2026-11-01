@@ -257,14 +257,18 @@ single source of the detailed state; recovery synthesis in
 realization dashboard (snapshot 1 November 2026, T01–T22 with sourced
 percentages): [DASHBOARD-T20261101.md](../../../plans/actions-confiance/paea/DASHBOARD-T20261101.md).
 Current locally delivered candidate: `bin/swarm` SHA-256
-`4164953c841c2b22476bd552a12496aac2b7f95e9b26de04d986c3238e2ed83c`
-(v0.1.1-dev.292, commit 8cb05983175bfe6d4195337503aa75e39b4865a5, "authority
-sessions, signed assertions and engine access mode", `modified=true`). The
-`paea-delivered-settlement-cli-rust` recipe was replayed on this delivered
-ELF: 6/6 VERIFIED (`.swarm-fixtures/i17-rerun/i17-run-4/`) — the I17 step
-(current-authority revocation on the settlement-call path → refusal without
-effect, then recovery) is locally proven on the current candidate; the T17
-evidence scope extends to the settlement-call path (see dashboard).
+`f5a154da4555962647106954274d09ce9160464383d849ba33782c700d033df9`
+(v0.1.1-dev.298, commit d4e219eeafcae5f90307a105ddaa93ba9874dc4f, "feat(blp):
+typed HTTP status translation for preparation refusals", `modified=true`;
+built 2026-11-01T13:36:05Z). Both delivered recipes were re-pinned and
+replayed on this delivered ELF: settlement 6/6 VERIFIED
+(`.swarm-fixtures/i17-rerun/i17-run-5/`, `delivered-binary-witness` at every
+spawn) and chain 4/4 VERIFIED (`.swarm-fixtures/i17-rerun/chain-run-2/`,
+including the wrong-SHA refusal), `source_stable: true` throughout. The I17
+step (current-authority revocation on the settlement-call path → refusal
+without effect, then recovery) remains locally proven on the current
+candidate; the previous state (dev.292/4164953c…, run-4) is kept in the
+dashboard history.
 State summary as of 31 October 2026: local partial verification I01, I04, I05,
 I08, I09, I12, I16, I17; incomplete candidates I06, I13 (BT02, egress not
 confined); human/OS prerequisites I02, I07, I10; missing design I14 (A2A);

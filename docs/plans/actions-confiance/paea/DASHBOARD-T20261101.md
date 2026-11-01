@@ -43,7 +43,7 @@ campagnes T01…T22 exécutées.
 | T14 | I02/I14 | conception manquante | — | Design A2A puis code |
 | T15 | I15 | PASS | même preuve que T11 (admission + substitution refusée) | Inventaire ACS (entrées externes) |
 | T16 | I12/I16 | PASS | `paea-i16-lease-reopen-rust.json` (30-10, bloc 9) + contrat 8 cas (glm-order-receipt-20261030T075024Z) | Limites distribuées séparées |
-| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-4` (ELF dev.292 4164953c…, 01-11, 6/6 VERIFIED — révocation settlement-call refusée puis récupération) | Propagation production |
+| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-5` (ELF dev.298 f5a154da…, 01-11, 6/6 VERIFIED — révocation settlement-call refusée puis récupération ; run-4/dev.292 conservé) | Propagation production |
 | T18 | I03/I14 | non exercée | — | Périmètre E3 uniquement |
 | T19 | I06/I13 | non exercée | — | Périmètre E3 + confinement I06/I13 |
 | T20 | I04/I15 | non exercée | — | Périmètre E3 uniquement |
@@ -79,6 +79,15 @@ campagnes T01…T22 exécutées.
   run-2 arbre non compilable (incrément v52 parallèle), run-3 décalage
   binaire/arbre (ELF parser v51, harnais v52 → `settings-format`) ;
   `.swarm-fixtures/i17-rerun/i17-run-{1,2,3}/` conservés.
+- Extension 01-11 après-midi : candidat dev.292/4164953c… →
+  dev.298/f5a154da… (commit d4e219eea « feat(blp): typed HTTP status
+  translation for preparation refusals », construit 13:36Z). Les deux recettes
+  delivered re-pinnées et re-jouées sur ce livré : settlement 6/6 VERIFIED
+  (`i17-run-5/`, témoins `delivered-binary-witness` à chaque spawn) et chaîne
+  4/4 VERIFIED (`chain-run-2/`, refus de SHA erroné compris),
+  `source_stable: true`. Deux refus préalables du runner (invocation incomplète,
+  sortie non neuve) corrigés sans perte de preuve. T17 reste PASS ; portée
+  inchangée, preuve étendue au livré courant.
 
 ## Portée et limites
 
@@ -97,6 +106,10 @@ un pourcentage d'avancement » (invariant-matrix.json, global_limits).
 - `.swarm-fixtures/i17-rerun/i17-run-4/` — recette `paea-delivered-settlement-cli-rust`
   6/6 VERIFIED sur ELF dev.292/4164953c… (01-11-2026, 11:05Z), témoin
   `delivered-binary-witness` à chaque spawn
+- `.swarm-fixtures/i17-rerun/i17-run-5/` — même recette re-pinnée, 6/6 VERIFIED
+  sur ELF dev.298/f5a154da… (01-11-2026, 15:03Z), `source_stable: true`
+- `.swarm-fixtures/i17-rerun/chain-run-2/` — recette `paea-delivered-chain-cli-rust`
+  re-pinnée, 4/4 VERIFIED sur ELF dev.298/f5a154da… (01-11-2026, 15:06Z)
 - `paea/DASHBOARD-T20261031.md` — instantané précédent (31 octobre 2026)
 - `paea/PILOTE-OPERATIONNEL.md` — recettes initiales T04, T06/T21, T05/T17
 - `paea/E3-PROTOCOL.md` — périmètre des campagnes formelles
