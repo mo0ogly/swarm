@@ -20,21 +20,23 @@
   "web/i18n.js",
   "web/i18n-en.js",
   "locales/en.json",
+  "tests/paea-reader-credential-erasure.cjs",
   "tests/paea-approval-form-ui.cjs",
   "tests/paea_approval_form_ui_recipe.py",
   "package.json",
   "package-lock.json",
   "tools/verification/recipe.py",
-  ".cache/paea-verification-target/debug/.fingerprint/swarm-web-*/test-integration-test-paea_git_call",
+  "tools/verification/bind_cargo_test_binary.py",
+  "tools/verification/test_bind_cargo_test_binary.py",
   "tools/verification/recipes/paea-approval-form-rust.json",
-  "docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-fresh-fixture-20261030T204930Z/source-fixture-fresh/result.json"
+  ".swarm-fixtures/source-fixture-fresh-regen-20261031/result.json"
  ],
  "environment": {
   "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
   "CARGO_PROFILE_DEV_DEBUG": "0",
   "CARGO_PROFILE_TEST_DEBUG": "0",
   "CARGO_INCREMENTAL": "0",
-  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-fresh-fixture-20261030T204930Z/source-fixture-fresh"
+  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/.swarm-fixtures/source-fixture-fresh-regen-20261031"
  },
  "steps": [
   {
@@ -127,6 +129,20 @@
    "required_stderr": []
   },
   {
+   "id": "approval-form-reader-credential-erasure",
+   "command": [
+    "node",
+    "tests/paea-reader-credential-erasure.cjs",
+    "{root}/.cache/paea-reader-credential-erasure-evidence"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "\"checks\":6",
+    "\"unexpected_diagnostics\":0"
+   ],
+   "required_stderr": []
+  },
+  {
    "id": "approval-form-test-binary-build",
    "command": [
     "sh",
@@ -140,6 +156,24 @@
    ]
   },
   {
+   "id": "approval-form-test-binary-bind",
+   "command": [
+    "python3",
+    "tools/verification/bind_cargo_test_binary.py",
+    "--deps",
+    "{root}/.cache/paea-verification-target/debug/deps",
+    "--target",
+    "paea_git_call",
+    "--output",
+    "{root}/.cache/paea-approval-form-bound-binary-20261031.json"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "\"status\":\"BOUND\""
+   ],
+   "required_stderr": []
+  },
+  {
    "id": "approval-form-real-browser-qualification",
    "command": [
     "python3",
@@ -147,13 +181,46 @@
     "--binary",
     "{root}/.cache/paea-verification-target/debug/deps/paea_git_call",
     "--output",
-    "{root}/.cache/paea-approval-form-browser-evidence-20261031e"
+    "{root}/.cache/paea-approval-form-browser-evidence"
    ],
    "expected_exit": 0,
    "required_stdout": [
     "PAEA_APPROVAL_FORM_BROWSER_VERIFIED 4"
    ],
    "required_stderr": []
+  },
+  {
+   "id": "approval-form-bound-binary-stable",
+   "command": [
+    "python3",
+    "tools/verification/bind_cargo_test_binary.py",
+    "--deps",
+    "{root}/.cache/paea-verification-target/debug/deps",
+    "--target",
+    "paea_git_call",
+    "--output",
+    "{root}/.cache/paea-approval-form-bound-binary-20261031.json",
+    "--verify-stable"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "\"status\":\"STABLE\""
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "approval-form-linked-output-counterproofs",
+   "command": [
+    "python3",
+    "tools/verification/test_bind_cargo_test_binary.py"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "\"state\": \"PASS\""
+   ],
+   "required_stderr": [
+    "OK"
+   ]
   }
  ]
 }

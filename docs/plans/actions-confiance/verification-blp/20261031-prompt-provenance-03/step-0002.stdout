@@ -1,0 +1,10 @@
+
+running 5 tests
+test root_store::preparation_call::level_tests::levels_normalize_routing_without_inventing_a_choice ... ok
+test root_store::preparation_call::level_tests::private_versions_refuse_ambiguous_or_api_explicit_level ... ok
+test root_store::preparation_call::level_tests::v1_encoding_omits_new_field_and_v2_retains_exact_request ... ok
+test root_store::preparation_call::level_tests::v3_requires_provenance_and_preserves_cli_level_validation ... ok
+test root_store::preparation_call::level_tests::private_record_refuses_changed_prompt_before_worker_and_recovers ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 742 filtered out; finished in 0.01s
+

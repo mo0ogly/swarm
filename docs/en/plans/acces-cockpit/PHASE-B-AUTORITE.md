@@ -136,7 +136,8 @@ B2 design decisions:
    `controller_uid` **and** proof of a human secret (password or bootstrap
    code); UID alone never suffices since agents share the operator UID.
 5. **B2.1 status: done** (31 October 2026) — crate `rust/crates/swarm-authority`, `swarm-authority check --declaration … --pin … --json`, tests `tests/check.rs` 2/2. Protected fixtures live under `~/.local/state/swarm-protected-fixtures`: the loader refuses any group-writable ancestor, and `ChatGPT/` and `swarm/` are `775`.
-6. Slices: B2.1 crate + declaration loading + `check` command; B2.2 account
+6. **B2.2 status: done** (1 November 2026) — `Journal::snapshot` (verified head + active ids, read-only) in `swarm-enrollment-state`; registry `swarm_authority::accounts`: multiple accounts `account/<subject>/<nonce>` (roles `viewer|operator|approver|admin`, integrity 1–3, free attributes, Argon2id verifier), creation, oracle-free verification, password change by new generation then revocation, disabling, listing without secret material. Tests `tests/accounts.rs` and `tests/snapshot.rs`. Still open: rollback witness (EP-06), Argon2 costs as an Admin setting (EP-09), sessions, listener.
+7. Slices: B2.1 crate + declaration loading + `check` command; B2.2 account
    journal (fixture, current UID as `service_uid`); B2.3 minimal HTTP listener
    `/login` + session; then B1 (`sudo` script) once the binary exists.
 

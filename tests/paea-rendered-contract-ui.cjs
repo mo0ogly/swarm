@@ -63,6 +63,40 @@ const parse=s=>{
     await pg.click('#paea-theme');
     const theme2=await pg.evaluate(()=>document.documentElement.dataset.theme);
     check('second-click-returns-etat',theme2==='etat','after second click data-theme='+theme2);
+    // Stable-state measurements only: the theme button carries a .15s
+    // background-color transition (paea.css `button` rule). Colors sampled
+    // immediately after the clicks land mid-interpolation (observed 2026-10-31:
+    // rgb(113,130,137) on the real cascade sombre #153344 → etat #eeeee7 at
+    // t≈0.42, a false 2.85 contrast against the static pairs' 9.79/11.14), so
+    // every awaited measurement first waits for the REAL end of the
+    // transitions on the measured element. The wait is condition-based (no
+    // arbitrary sleep): each running CSSTransition is awaited to its real
+    // `finished`, and the exit additionally requires the computed background
+    // to equal the element's own current --wattson-carte-appuyee token at
+    // both of two consecutive frames — a mid-flight blend and a not-yet-started
+    // old value both fail that test. The wait MUST be passed to
+    // page.evaluate as a real function object: a source STRING is evaluated
+    // as an expression and never invoked (silent no-op, diagnosed in
+    // tests/paea-rendered-contract-transition-guard.cjs runs 2–6).
+    const settledBody=async sel=>{
+      const SETTLE_FRAME_BOUND=600; // ≈10 s at 60 fps; coordination bound only
+      const node=document.querySelector(sel);
+      const bg=()=>getComputedStyle(node).backgroundColor;
+      const want=()=>{const t=getComputedStyle(node).getPropertyValue('--wattson-carte-appuyee').trim();
+        const m=t.match(/^#([0-9a-f]{6})$/i);
+        return m?'rgb('+parseInt(m[1].slice(0,2),16)+', '+parseInt(m[1].slice(2,4),16)+', '+parseInt(m[1].slice(4,6),16)+')':t};
+      const nextFrame=()=>new Promise(r=>requestAnimationFrame(r));
+      for(let frame=0;;frame++){
+        if(frame>=SETTLE_FRAME_BOUND) throw new Error('settled-wait-no-convergence after '+frame+' frames (bg='+bg()+' want='+want()+')');
+        const anims=node.getAnimations({subtree:true});
+        if(anims.length) await Promise.all(anims.map(a=>a.finished.catch(()=>{})));
+        const c1=bg(), w1=want();
+        if(c1!==w1){ await nextFrame(); continue; }
+        await nextFrame();
+        if(bg()===c1 && want()===w1) return;
+      }
+    };
+    await pg.evaluate(settledBody,'#paea-theme');
     // Colors must be computed per theme, not a dataset-only assertion: the
     // sombre body is the shared dark token; etat is its light counterpart.
     const computed=await pg.evaluate(()=>{
@@ -85,6 +119,7 @@ const parse=s=>{
     // Re-enter sombre through the page's own URL param (same startup path a
     // toggled navigation link produces) and take the dark measurements there.
     await pg.goto(base+'/paea-effects.html?theme=sombre',{waitUntil:'networkidle0'});
+    await pg.evaluate(settledBody,'#paea-theme');
     const sombre=await pg.evaluate(()=>{
       const cs=e=>getComputedStyle(e);
       return {

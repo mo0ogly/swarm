@@ -1,0 +1,13 @@
+{
+  "id": "public-cli",
+  "command": [
+    "/usr/bin/python3",
+    "-c",
+    "import os,sys,subprocess; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=fixture_root('blp-provenance-cli-')/'journey'; binary=Path(os.environ['SWARM_PREPARATION_UI_BINARY']).resolve(strict=True); subprocess.run(['python3','tests/rust_preparation_cli_calls.py','--binary',str(binary),'--output',str(out)],check=True); print('BLP_PROVENANCE_PUBLIC_EVIDENCE '+str(out))"
+  ],
+  "expected_exit": 0,
+  "exit": 0,
+  "seconds": 12.422486527997535,
+  "executable": "/usr/bin/python3.13",
+  "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+}

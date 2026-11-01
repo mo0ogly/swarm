@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "blp-preparation-provenance",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/*/src/**/*",
+    "rust/crates/swarm-engine/config/**/*",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/blp-verification-target",
+    "CARGO_INCREMENTAL": "0"
+  },
+  "steps": [
+    {
+      "id": "prompt-byte-origins",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::preparation_prompt::tests",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "actual_wire_bytes_and_all_sources_are_preserved",
+        "mutated_prompt_refuses_and_original_recovers",
+        "gaps_overlap_truncation_and_false_origins_refuse",
+        "new_or_missing_producer_inputs_require_schema_review",
+        "4 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-record-consumer",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::preparation_call::level_tests",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "private_record_refuses_changed_prompt_before_worker_and_recovers",
+        "v3_requires_provenance_and_preserves_cli_level_validation",
+        "5 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

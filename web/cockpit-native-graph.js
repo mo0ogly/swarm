@@ -124,6 +124,8 @@
    * no provider or automatic retry. A lost/malformed response is uncertain and
    * disables resubmission until the operator closes and refreshes. Success needs
    * a protected Work readback; the cockpit then reloads its actual observations.
+   * Visible/live saving feedback and the button busy state last through that
+   * entire sequence, then clear on refusal or uncertainty without enabling retry.
    * @param {object} work recorded Work, never a fabricated snapshot
    * @param {object|null} task null creates, otherwise edits the recorded task
    * @param {string[]|undefined} proposedDependencies optional unsaved link gesture
@@ -145,13 +147,14 @@
     const dependencies=document.createElement('select');dependencies.id='native-graph-depends';dependencies.multiple=true;
     for(const other of work.tasks||[]){if(other.id===task?.id)continue;const option=document.createElement('option');option.value=other.id;option.textContent=other.id+' — '+other.title;option.selected=!!(proposedDependencies??task?.depends)?.includes(other.id);dependencies.append(option)}label.append(dependencies);body.append(label);
     const notice=document.createElement('p');notice.className='notice info';notice.textContent=t('Choisissez les prérequis. Enregistrer modifie le plan sans lancer d’agent.');body.append(notice);
+    const progress=document.createElement('p');progress.id='native-graph-progress';progress.setAttribute('role','status');progress.setAttribute('aria-live','polite');body.append(progress);
     const error=document.createElement('p');error.className='notice alert';error.setAttribute('role','alert');error.hidden=true;body.append(error);
     const footer=document.createElement('footer'),save=document.createElement('button');save.type='submit';save.className='primary';save.id='native-graph-save';save.textContent=t('Enregistrer');footer.append(save);form.append(header,body,footer);dialog.append(form);document.body.append(dialog);
     let pending=false;
     dialog.addEventListener('cancel',e=>{if(pending)e.preventDefault()});
     dialog.addEventListener('close',()=>{dialog.remove();if(completionFocus?.isConnected)completionFocus.focus();else if(returnFocus?.isConnected)returnFocus.focus()});
     form.addEventListener('submit',async e=>{
-      e.preventDefault();if(pending)return;pending=true;save.disabled=true;close.disabled=true;error.hidden=true;let submitted=false;
+      e.preventDefault();if(pending)return;pending=true;save.disabled=true;save.setAttribute('aria-busy','true');save.textContent=t('Enregistrement en cours…');progress.textContent=t('Enregistrement en cours…');close.disabled=true;error.hidden=true;let submitted=false;
       const request={title:fields.title.value,deliverable:fields.deliverable.value,criteria:fields.criteria.value.split('\n').map(s=>s.trim()).filter(Boolean),depends:[...dependencies.selectedOptions].map(o=>o.value)};
       const taskID=fields.id.value;for(const input of form.querySelectorAll('input,textarea,select'))input.disabled=true;
       try{
@@ -169,7 +172,7 @@
         completionFocus=[...container().querySelectorAll('.graph-task-open')].find(n=>n.dataset.task===taskID);
         dialog.close();
       }catch(cause){error.hidden=false;error.textContent=t('Modification refusée ou résultat non confirmé. Fermez et actualisez avant de reprendre.')+' ('+cause.message+')';save.disabled=submitted&&!cause.refused}
-      finally{pending=false;close.disabled=false;for(const input of form.querySelectorAll('input,textarea,select'))input.disabled=false;if(!submitted)save.disabled=false}
+      finally{pending=false;save.setAttribute('aria-busy','false');save.textContent=t('Enregistrer');progress.textContent='';close.disabled=false;for(const input of form.querySelectorAll('input,textarea,select'))input.disabled=false;if(!submitted)save.disabled=false}
     });
     dialog.showModal();fields[task?'title':'id'].focus();
   }
@@ -225,6 +228,43 @@
     const direction=document.createElement('select');direction.id='pilot-orientation';direction.setAttribute('aria-label',t('Orientation'));
     for(const [value,label]of [['LR','Gauche → droite'],['TB','Haut → bas']]){const option=document.createElement('option');option.value=value;option.textContent=t(label);direction.append(option)}direction.value=orientation;
     direction.addEventListener('change',()=>{host.dataset.orientation=direction.value;render(work)});toolbar.append(direction);
+    const search=document.createElement('div');search.className='native-graph-search';search.setAttribute('role','search');search.setAttribute('aria-label',t('Rechercher une tâche'));
+    const searchLabel=document.createElement('label');searchLabel.htmlFor='pilot-search';searchLabel.textContent=t('Rechercher une tâche');
+    const searchInput=document.createElement('input');searchInput.id='pilot-search';searchInput.type='search';searchInput.autocomplete='off';searchInput.setAttribute('aria-controls','pilot-canvas');
+    const searchStatus=document.createElement('output');searchStatus.id='pilot-search-status';searchStatus.setAttribute('role','status');searchStatus.setAttribute('aria-live','polite');
+    let matches=[],matchIndex=-1;
+    /** Normalize literal search text for case/accent-insensitive substring
+     * matching. No regular expression is built from user input; no IO/storage.
+     * @param {string} value validated task ID/title or the local input value
+     * @returns {string} Unicode-decomposed, mark-free lowercase search key
+     */
+    function searchKey(value){return value.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase()}
+    /** Refresh local matches without hiding nodes/edges or changing layout.
+     * Empty queries clear highlights; no match disables navigation and reports
+     * it visibly. Query/matches are not persisted and reset with this renderer.
+     * @returns {void} updates classes, output and navigation control only
+     */
+    function findMatches(){
+      const query=searchKey(searchInput.value.trim());matches=query?work.tasks.filter(task=>searchKey(task.id).includes(query)||searchKey(task.title).includes(query)):[];matchIndex=-1;
+      const ids=new Set(matches.map(task=>task.id));for(const [id,u]of units)u.group.classList.toggle('graph-search-match',ids.has(id));
+      nextMatch.disabled=matches.length===0;clearSearch.disabled=!searchInput.value;
+      searchStatus.textContent=!query?'':matches.length===0?t('Aucune tâche correspondante.'):matches.length===1?t('Une tâche trouvée.'):matches.length+' '+t('tâches trouvées.');
+    }
+    /** Center the next literal match in the available scroll extent and focus
+     * its existing opener without scrolling the page. Clamping at graph edges
+     * is native browser behavior. No task, coordinates, zoom or policy is saved.
+     * @returns {void} no-op for empty matches or a detached renderer
+     */
+    function centerMatch(){
+      if(!matches.length||disposed)return;matchIndex=(matchIndex+1)%matches.length;const task=matches[matchIndex],target=units.get(task.id)?.group.querySelector('.graph-task-open');if(!target)return;
+      const rect=target.getBoundingClientRect(),view=canvas.getBoundingClientRect();canvas.scrollLeft+=rect.left+rect.width/2-view.left-view.width/2;canvas.scrollTop+=rect.top+rect.height/2-view.top-view.height/2;
+      target.focus({preventScroll:true});searchStatus.textContent=(matchIndex+1)+' / '+matches.length+' · '+task.id+' — '+task.title;
+    }
+    const nextMatch=button('pilot-search-next','Suivant',centerMatch);
+    const clearSearch=button('pilot-search-clear','Effacer la recherche',()=>{searchInput.value='';findMatches();searchInput.focus()});
+    searchInput.addEventListener('input',findMatches);
+    searchInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopPropagation();centerMatch()}else if(e.key==='Escape'&&searchInput.value){e.preventDefault();e.stopPropagation();searchInput.value='';findMatches()}});
+    search.append(searchLabel,searchInput,nextMatch,clearSearch,searchStatus);toolbar.append(search);findMatches();
     /** Convert pointer coordinates to unscaled SVG units; no engine state. */
     function point(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
     /** End or roll back a captured gesture; cancellation never persists changes. */

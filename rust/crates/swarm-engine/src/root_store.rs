@@ -72,6 +72,8 @@ mod admin_budget;
 pub use admin_budget::{AdminBudgetPolicy,AdminBudgetChange,AdminBudgetEntry,AdminBudgetView,AdminBudgetOutcome,AdminBudgetReservationRequest,AdminBudgetReservation};
 mod material_path;
 mod trust_store;
+mod reader_guard;
+pub use reader_guard::ReaderVerdict;
 #[cfg(target_os="linux")]
 mod trust_enrollment;
 #[cfg(target_os="linux")]
@@ -3883,6 +3885,8 @@ mod preparation_call_budget;
 
 #[cfg(target_os = "linux")]
 mod preparation_call;
+#[cfg(target_os = "linux")]
+mod preparation_prompt;
 #[cfg(target_os = "linux")]
 pub use preparation_call::{worker_error as preparation_worker_error,PreparationSend,PreparationCallCapabilities,PreparationApiRequest,execute_preparation_cli_gate,PreparationWorkerRequest,PreparationCliRequest,decode_send as decode_preparation_send,decode_stop as decode_preparation_stop,PreparationStop};
 

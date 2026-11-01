@@ -69,13 +69,7 @@ et échoue s'il en reste (garde de non-récidive ; les lectures gettempdir sont
 signalées pour revue) ; (2) au runner — `recipe.py` épingle `TMPDIR` sous
 `<dossier temporaire configuré>/runner-tmp` pour la durée de chaque run, couvrant Python
 tempfile, Rust `env::temp_dir()`/TempDir, Node `os.tmpdir()` et Go
-`t.TempDir()` qui l'honorent. Quand un ancêtre du dossier configuré est
-inscriptible groupe/autres (checkout 775 typique), l'épingle bascule sur la
-zone privée opérateur `~/.local/state/swarm-recipe-fallback-fixtures/runner-tmp`
-(jamais `/tmp`) : les fixtures vérifiant des contrats de répertoire privé
-(`swarm-enrollment-config` `open_private_directory` refuse tout ancêtre
-inscriptible groupe) l'exigent ; un placement non privé refuserait le run.
-`env::temp_dir()` ou `dir=` explicites
+`t.TempDir()` qui l'honorent ; `env::temp_dir()` ou `dir=` explicites
 contournant TMPDIR restent une obligation source. `mkstemp(dir=destination.
 parent)` est un échafaudage d'écriture atomique adjacente à la destination,
 pas une allocation de fixture : exempté.
@@ -95,13 +89,7 @@ allocations without `dir=` and fails if any remain (non-regression guard;
 gettempdir reads are reported for review); (2) at runner — `recipe.py` pins
 `TMPDIR` under `<configured temporary directory>/runner-tmp` for each run, covering Python
 tempfile, Rust `env::temp_dir()`/TempDir, Node `os.tmpdir()` and Go
-`t.TempDir()` which honor it. When an ancestor of the configured area is
-group/other-writable (a typical 775 checkout), the pin falls back to the
-operator private area `~/.local/state/swarm-recipe-fallback-fixtures/runner-tmp`
-(never `/tmp`): fixtures verifying private-directory contracts
-(`swarm-enrollment-config` `open_private_directory` refuses any group-writable
-ancestor) require it; a non-private placement would refuse the run.
-`env::temp_dir()` or explicit `dir=` uses
+`t.TempDir()` which honor it; `env::temp_dir()` or explicit `dir=` uses
 bypassing TMPDIR remain a source-level obligation. `mkstemp(dir=
 destination.parent)` is adjacent-to-destination atomic-write scaffolding, not
 fixture allocation: exempt.
@@ -193,21 +181,6 @@ recipe now saves all ten runtime fields and observes each default/ceiling/null
 choice through that actual production command, in FR/EN and both themes.
 The complete workspace is run only when the changed shared settings contract
 justifies it; incremental recipe checks are not a new full dependency qualification.
-
-Recette `recipes/blp-confidentiality-rust.json` : contrats purs de
-confidentialité Bell-LaPadula (10 tests `swarm-confidentiality` : dominance,
-combinaison, domaine fixe, refus sans repli) + intégration moteur (5 tests
-`--test confidentiality` : historique révisionné, replays, refus) + coexistence
-Biba (`--test trust_biba`). Administration de politique et diagnostics
-data-only : `runtime_enforced:false` conservé, aucun contenu réel classé, aucun
-fournisseur ni confinement exercé. Suivi : `docs/plans/actions-confiance/BLP-APEX.md`.
-Recipe `recipes/blp-confidentiality-rust.json`: pure Bell-LaPadula
-confidentiality contracts (10 `swarm-confidentiality` tests: dominance, join,
-fixed domain, refusals without fallback) + engine integration (5
-`--test confidentiality` tests: revisioned history, replays, refusals) + Biba
-coexistence (`--test trust_biba`). Policy administration and data-only
-diagnostics: `runtime_enforced:false` kept, no real content classified, no
-provider or confinement exercised. Tracking: `docs/plans/actions-confiance/BLP-APEX.md`.
 
 ## Terminal browser states instead of swallowed predicate errors
 
@@ -2388,6 +2361,14 @@ a disposable cache, and survives reboot. Never copy a live fixture root;
 regenerate the fixture with `rust_native_first_publication.py` into a NEW
 `--output` directory (the script refuses an existing path), then repoint the
 recipe's `SWARM_PAEA_SOURCE_FIXTURE` env and `result.json` declared input.
+Also watch the state-size bound: every `config-apply` on a shared retained
+fixture appends a full-state reply (~100 KB), and `trust-actions.json` is
+refused past `MAX_STATE` = 8 MiB with the typed code `format`
+(`trust-state-format-bound`, root_store/trust_store.rs) — a saturated fixture
+fails its recipes with `format` while `config-preview` still passes (verified
+2026-11-01 on a 8.31/8.39 MiB root). Diagnosis: compare file size against
+`MAX_STATE`, then regenerate per the rule above; do not raise the bound for
+fixtures.
 Until the Biba provider sandbox interacts with the managed-auto scenario
 control socket (see PAEA-APEX Increment113), regenerate with the retained
 sandbox-less binary `.cache/rust-migration-binaries/swarm-rust-b11b4baf…`
@@ -2752,12 +2733,18 @@ d'acceptation.
 FR : la recette `recipes/paea-git-call-preview-rust.json` exécute le contrôle
 permanent du raccord I04/PA-08 : la route de lecture
 `GET/HEAD /api/v1/paea/git-call/preview` présente l'action préparée exacte
-détenue par le moteur à un approbateur futur. Quatre étapes : absence
+détenue par le moteur à un approbateur futur. Cinq étapes : absence
 explicite sans source liée (`available:false` + raison, refus typés de forme) ;
 aperçu exact avec fixture native retenue (--ignored : proposal/context
 verbatim, identité canonique recalculée et comparée, témoins des racines,
 révision de confiance courante, aucun consentement ni consommation — le POST
-gardé reste `bound:true` ensuite) ; actifs embarqués de la page
+gardé reste `bound:true` ensuite) ; **frontière lecteur BLP-RET-05**
+(`preview_reader_guard_enforces_produced_attribution` : session seule →
+`paea-reader-authentication-required` exact, lecteur enrôlé non habilité →
+`paea-reader-access-denied` exact sans marqueur privé, lecteur autorisé par
+une attribution produite par les producteurs soutenus → projection exacte avec
+marqueur, politique périmée via `config-apply` réel →
+`paea-reader-policy-stale`) ; actifs embarqués de la page
 `paea-effects.html` étendue (section aperçu, aucun bouton de consentement) ;
 catalogue i18n généré à jour. `source_stable` compare les empreintes des
 entrées déclarées avant/après l'étape ; la fixture source vit en tmpfs
@@ -2771,15 +2758,21 @@ aucun grant, aucun appel exécuté, aucune acceptation.
 EN: `recipes/paea-git-call-preview-rust.json` runs the permanent check of the
 I04/PA-08 connection: the read route `GET/HEAD /api/v1/paea/git-call/preview`
 presents the exact prepared action held by the engine to a future approver.
-Four steps: explicit absence without a bound source (`available:false` +
+Five steps: explicit absence without a bound source (`available:false` +
 reason, typed shape refusals); exact preview with the retained native fixture
 (--ignored: proposal/context verbatim, recomputed and compared canonical
 identity, root witnesses, current Trust revision, no consent and no
-consumption — the guarded POST stays `bound:true` afterwards); embedded
-assets of the extended `paea-effects.html` page (preview section, no consent
-button); up-to-date generated i18n catalog. `source_stable` compares declared
-input digests before/after the steps; the source fixture lives on tmpfs (path
-persisted in the evidence directory, regenerable by the documented
+consumption — the guarded POST stays `bound:true` afterwards); **BLP-RET-05
+reader frontier** (`preview_reader_guard_enforces_produced_attribution`: bare
+session → exact `paea-reader-authentication-required`, enrolled-but-uncleared
+reader → exact `paea-reader-access-denied` without a private marker, reader
+authorized by an attribution produced through the supported producers → exact
+projection with marker, stale policy through a real `config-apply` →
+`paea-reader-policy-stale`); embedded assets of the extended
+`paea-effects.html` page (preview section, no consent button); up-to-date
+generated i18n catalog. `source_stable` compares declared input digests
+before/after the steps; the source fixture lives on tmpfs (path persisted in
+the evidence directory, regenerable by the documented
 `tests/rust_native_first_publication.py` path). This proves presentation of
 the prepared action only: no consent captured, no grant, no executed call,
 no acceptance.
@@ -2839,7 +2832,7 @@ no acceptance.
 
 FR : la recette `recipes/paea-git-call-approval-rust.json` exécute le contrôle
 permanent du canal HTTP `POST /api/v1/paea/git-call/approval` sur le test
-`paea_git_call` de swarm-web. Six étapes nommées : observation moteur des
+`paea_git_call` de swarm-web. Sept étapes nommées : observation moteur des
 accords (7 tests `root_store::paea_git_agreement`) ; parcours positif
 `approval_route_captures_project_agreement_and_refuses_wrong_body_revision`
 (capture d'accord + refus corps/révision modifiés) ;
@@ -2857,11 +2850,17 @@ enrôlement signé à la révision courante, re-bind, POST HTTP réel →
 canoniques comme NOUVEL accord à la révision courante, rejeu sans second
 entrant de journal, action refusée jamais rétro-approuvée) ; consommation
 avec accord capturé ; annulation d'accord après changement de révision ;
-aperçu d'action liée. Fixture native tmpfs via
+**frontière lecteur BLP-RET-05** (`preview_reader_guard_enforces_produced_attribution`
+sur l'aperçu de l'action liée : session seule → `paea-reader-authentication-required`
+exact, lecteur enrôlé non habilité → `paea-reader-access-denied` exact sans
+marqueur privé, lecteur autorisé par une attribution produite par les
+producteurs soutenus → projection exacte avec marqueur, politique périmée via
+`config-apply` réel → `paea-reader-policy-stale`). Fixture native tmpfs via
 `SWARM_PAEA_SOURCE_FIXTURE` (producteur documenté
 `tests/rust_native_first_publication.py`, jamais la tmpfs saturée
-`/tmp/swarm-model83-0cxbra65`) ; chaque étape affine un `--exact --ignored`
-nommé. Ceci prouve le canal d'approbation protégé et sa reprise par rôle sur
+`/tmp/swarm-model83-0cxbra65`) ; les étapes épinglent des cas
+`--exact --ignored` nommés (le cas frontière lecteur court sans filtre).
+Ceci prouve le canal d'approbation protégé et sa reprise par rôle sur
 fixture isolée : aucun commit/push Git, aucun règlement, aucun enrôlement
 humain, aucune acceptation ; les étapes non couvertes par cette recette
 (autres tests du binaire, profils livrés) restent non rejugées ici.
@@ -2870,7 +2869,7 @@ humain, aucune acceptation ; les étapes non couvertes par cette recette
 
 EN: `recipes/paea-git-call-approval-rust.json` runs the permanent check of
 the `POST /api/v1/paea/git-call/approval` channel on the swarm-web
-`paea_git_call` test binary. Six named steps: engine agreement observation
+`paea_git_call` test binary. Seven named steps: engine agreement observation
 (7 `root_store::paea_git_agreement` tests); the positive journey
 `approval_route_captures_project_agreement_and_refuses_wrong_body_revision`
 (agreement capture + modified body/revision refusals);
@@ -2888,36 +2887,61 @@ real HTTP POST → `approved`/`trust-status-ack-v1`, project guard recognizes
 the SAME canonical bytes as a NEW agreement at the current revision, replay
 without a second journal entry, denied action never retro-approved);
 consumption with a captured agreement; agreement void after a revision
-change; bound-action preview. Native tmpfs fixture via
+change; **BLP-RET-05 reader frontier**
+(`preview_reader_guard_enforces_produced_attribution` on the bound-action
+preview: bare session → exact `paea-reader-authentication-required`,
+enrolled-but-uncleared reader → exact `paea-reader-access-denied` without a
+private marker, reader authorized by an attribution produced through the
+supported producers → exact projection with marker, stale policy through a
+real `config-apply` → `paea-reader-policy-stale`). Native tmpfs fixture via
 `SWARM_PAEA_SOURCE_FIXTURE` (documented producer
 `tests/rust_native_first_publication.py`, never the saturated
-`/tmp/swarm-model83-0cxbra65` tmpfs); each step pins one named
-`--exact --ignored` case. This proves the protected approval channel and
-its role recovery on an isolated fixture: no Git commit/push, no settlement,
-no human enrollment, no acceptance; steps not covered by this recipe (the
-binary's other tests, delivered profiles) remain un-replayed here.
+`/tmp/swarm-model83-0cxbra65` tmpfs); steps pin named
+`--exact --ignored` cases (the reader-frontier case runs unfiltered). This
+proves the protected approval channel and its role recovery on an isolated
+fixture: no Git commit/push, no settlement, no human enrollment, no
+acceptance; steps not covered by this recipe (the binary's other tests,
+delivered profiles) remain un-replayed here.
 
 ## Recette paea-consent-ui-rust (surface navigateur du consentement approbateur)
 
 FR : la recette `recipes/paea-consent-ui-rust.json` qualifie la surface
-navigateur `/paea-consent.html` du consentement approbateur. Cinq étapes :
+navigateur `/paea-consent.html` du consentement approbateur. Dix étapes :
 aperçu explicite d'indisponibilité sans source liée (test nommé
 `approval_presentation_reports_explicit_absence_without_source`) ; actifs
 embarqués (`paea_consent_page`, contrat corps vide détenu par le service :
 aucune entrée fichier, POST unique, refus sans session 403, catalogue EN) ;
-catalogue i18n ; construction du binaire de test navigateur (élagage des
-binaires antérieurs du même nom dans le CARGO_TARGET_DIR partagé, touch du
-fichier embarquant, puis `cargo test --no-run`) ; qualification navigateur
+catalogue i18n (`scripts/i18n/build.cjs --check`) ; contre-exemple entretenu
+de la projection périmée (`tests/paea-consent-projection-erasure.cjs`,
+points d'extrémité prérequis explicitement synthétiques contre le vrai
+frontend dans Chrome réel — CSRF de session native servi comme le produit ;
+aucune identité, aucun enrôlement réel, aucune approbation produit) ;
+contre-exemples méthode/base/faille du contrat d'échec et de flush du driver
+(`tests/paea_consent_driver_control.py`, doublones étiquetés remplaçant
+subprocess/threading dans le module importé — sans build Rust réel, sans
+timeout, sans processus étranger) ; construction du binaire de test
+navigateur (touch du fichier embarquant, puis `cargo test --no-run
+--message-format=json`) ; liaison du binaire comme sortie liée
+(`bind_cargo_test_binary.py` : résolution par le flux `compiler-artifact` de
+cargo — jamais un mtime ou un glob —, publication atomique du record ; la
+sortie liée est distincte d'une entrée déclarée immuable, cf. incident
+run4 `paea-approval-form-rust` du 2026-10-31) ; qualification navigateur
 réelle (`paea_consent_browser` + `tests/paea_consent_ui.cjs` via le driver
-`tests/paea_consent_ui_recipe.py`) : serveur réellement lié par
-`NativeHttpServer::bind_git_call_with_approval`, page servie aux octets
-embarqués, formulaire FR/EN deux thèmes sans débordement, corps non vide
-(octets dérivés, bon mot de passe) → refus typé visible
-`paea-git-call-approval-request` via fetch d'origine page, corps vide + mot
-de passe erroné → `authorization_required` FR/EN, journal Trust projet
-octet-identique après chaque refus, échos console Chrome des refus attendus
-comptés un pour un, approbation jamais consommée. Fixture native tmpfs via
-`SWARM_PAEA_SOURCE_FIXTURE` (producteur
+`tests/paea_consent_ui_recipe.py`, résolution binaire par artefacts cargo) :
+serveur réellement lié par `NativeHttpServer::bind_git_call_with_approval`,
+page servie aux octets embarqués, formulaire FR/EN deux thèmes sans
+débordement, corps non vide (octets dérivés, bon mot de passe) → refus typé
+visible `paea-git-call-approval-request` via fetch d'origine page, corps
+vide + mot de passe erroné → `authorization_required` FR/EN, journal Trust
+projet octet-identique après chaque refus, échos console Chrome des refus
+attendus comptés un pour un, approbation jamais consommée ; garde de
+stabilité de la liaison (`--verify-stable` : un chemin ou un digest modifié
+refuse sans réécrire le record — une vraie recompilation concurrente d'une
+entrée compilée ne peut pas être masquée) ; contre-preuves typées du contrat
+de sortie liée (`test_bind_cargo_test_binary.py`, les deux directions :
+l'artefact produit par le pas passe, un fichier créé sous un motif d'entrée
+déclarée échoue toujours `recipe-declared-inputs-changed`). Fixture native
+tmpfs via `SWARM_PAEA_SOURCE_FIXTURE` (producteur
 `tests/rust_native_first_publication.py`). Ceci prouve la surface navigateur
 sur les deux refus typés : aucune consommation d'approbation, aucun
 enrôlement humain, aucun appel Git, aucune acceptation ; le parcours
@@ -2928,22 +2952,40 @@ navigateur.
 ## Recipe paea-consent-ui-rust (approver-consent browser surface)
 
 EN: `recipes/paea-consent-ui-rust.json` qualifies the approver-consent
-browser surface `/paea-consent.html`. Five steps: explicit unavailability
+browser surface `/paea-consent.html`. Ten steps: explicit unavailability
 presentation without a bound source (named test
 `approval_presentation_reports_explicit_absence_without_source`); embedded
 assets (`paea_consent_page`, held-by-service empty-body contract: no file
-input, single POST, no-session refusal 403, EN catalog); i18n catalog;
-browser test-binary build (pruning prior same-name binaries from the shared
-CARGO_TARGET_DIR, touching the embedding file, then `cargo test --no-run`);
-real-browser qualification (`paea_consent_browser` +
-`tests/paea_consent_ui.cjs` via driver `tests/paea_consent_ui_recipe.py`):
+input, single POST, no-session refusal 403, EN catalog); i18n catalog
+(`scripts/i18n/build.cjs --check`); maintained stale-projection counterexample
+(`tests/paea-consent-projection-erasure.cjs`, prerequisite endpoints being
+EXPLICIT synthetic fixtures against the real frontend in real Chrome —
+native-session CSRF served as the product ships it; no identity, no real
+enrollment, no product approval); method/baseline/fault counterexamples for
+the driver's failure-and-flush contract (`tests/paea_consent_driver_control.py`,
+labelled doubles replacing subprocess/threading inside the imported module —
+no real Rust build, no timeout, no foreign process); browser test-binary
+build (touching the embedding file, then `cargo test --no-run
+--message-format=json`); binary binding as a linked output
+(`bind_cargo_test_binary.py`: resolution through cargo's `compiler-artifact`
+stream — never an mtime or a glob —, atomic record publication; the linked
+output is distinct from a declared immutable input, cf. the 2026-10-31 run4
+`paea-approval-form-rust` incident); real-browser qualification
+(`paea_consent_browser` + `tests/paea_consent_ui.cjs` via driver
+`tests/paea_consent_ui_recipe.py`, binary resolved from cargo artifacts):
 server really bound by `NativeHttpServer::bind_git_call_with_approval`,
 page served from the embedded bytes, FR/EN both-themes form without
 overflow, non-empty body (drifted bytes, good password) → visible typed
 refusal `paea-git-call-approval-request` via page-origin fetch, empty body +
 wrong password → `authorization_required` FR/EN, project Trust journal
 byte-identical after each refusal, Chrome console echoes of expected refusals
-counted one for one, approval never consumed. Native tmpfs fixture via
+counted one for one, approval never consumed; binding stability guard
+(`--verify-stable`: a changed path or digest refuses without rewriting the
+record — a real concurrent rebuild of a compiled input cannot be masked);
+typed counter-proofs of the linked-output contract
+(`test_bind_cargo_test_binary.py`, both directions: a step-produced artifact
+passes, a file created under a declared-input pattern still fails
+`recipe-declared-inputs-changed`). Native tmpfs fixture via
 `SWARM_PAEA_SOURCE_FIXTURE` (producer
 `tests/rust_native_first_publication.py`). This proves the browser surface
 on the two typed refusals: no approval consumption, no human enrollment, no
@@ -2986,6 +3028,37 @@ tentatives en échec restent conservées intactes. Limites : auth simulée
 aucune acceptation ; la consommation correcte n'est prouvée que sur cette
 fixture owned, jamais sur la base live.
 
+FR (contrat du binaire lié, 2026-10-31) : la recette comporte huit étapes.
+L'identité du binaire de test est une SORTIE LIÉE, jamais une entrée
+déclarée — la recette ne doit déclarer aucun chemin que ses propres étapes
+créent (le run4 du 2026-10-31 échouait `recipe-declared-inputs-changed` sur
+les métadonnées `.fingerprint/swarm-web-*/test-integration-test-paea_git_call`
+créées par cargo lui-même, sans un octet de source modifié). Deux étapes
+ajoutées : `approval-form-test-binary-bind` résout le binaire exact par le
+flux `compiler-artifact` de cargo (`tools/verification/bind_cargo_test_binary.py`,
+jamais mtime ni glob) et publie atomiquement son identité (chemin émis,
+sha256, taille) dans le cache retenu
+`.cache/paea-approval-form-bound-binary-20261031.json` ; publication =
+tmp+fsync+`os.replace` (le cache est re-publié à chaque run, l'historique
+par run vit dans les dossiers de preuve — un lien exclusif provoquait
+`FileExistsError` au run2) ; toute résolution cargo échouée ou ambiguë refuse
+typé (exit 2, cause `cargo-artifact-resolution-failed`/`-ambiguous`) sans
+toucher au record. `approval-form-bound-binary-stable` relit `--verify-stable`
+après le parcours navigateur : même chemin+digest exigés, sinon refus typé
+exit 1 `bound-binary-unstable` sans réécriture du record. Contre-preuve
+typée : `tools/verification/test_bind_cargo_test_binary.py` (7 tests) +
+`test_recipe.py` (8 tests) : production d'un artefact hors entrées déclarées
+passe, création sous un pattern déclaré refuse toujours, toute édition réelle
+d'une source compilée refuse toujours. TMPDIR épinglé : Chrome lie son socket
+ProcessSingleton sous `$TMPDIR/.com.google.Chrome.XXXXXX/SingletonSocket`
+(+49 octets) et meurt en SIGTRAP silencieux (« Failed to launch the browser
+process! Code: null », stderr vide) quand le chemin dépasse la borne
+sockaddr_un (mesuré 2026-10-31 : 107 octets passe, 108 piège) ; le repli
+`~/.local/state/swarm-fixtures` (93 octets) garde la marge. Preuve fraîche :
+`evidence/20261028-acquisition81-mvfdts57/glm-form-qualify-execute-20261031T200316Z/qualification-fresh-20261031T200327Z/`
+(8/8 PASS, `source_stable true`, marqueur `PAEA_APPROVAL_FORM_BROWSER_VERIFIED 4`,
+`recipe.py verify` VERIFIED).
+
 ## Recipe paea-approval-form-rust (consumed approval form, fresh then stale)
 
 EN: `recipes/paea-approval-form-rust.json` qualifies end to end the
@@ -3017,6 +3090,38 @@ proof writing enforced (`recipe-output-must-be-new-outside-live-state`);
 failed attempts stay retained intact. Limits: labeled simulated auth, no
 human presence, no real enrollment, no Git call, no acceptance; the correct
 consumption is proven only on this owned fixture, never on the live base.
+
+EN (linked-binary contract, 2026-10-31): the recipe now has eight steps. The
+test-binary identity is a LINKED OUTPUT, never a declared input — the
+manifest must not declare any path its own steps create (run4 on 2026-10-31
+failed `recipe-declared-inputs-changed` on the
+`.fingerprint/swarm-web-*/test-integration-test-paea_git_call` metadata
+written by cargo itself, with no source byte changed). Two added steps:
+`approval-form-test-binary-bind` resolves the exact binary from cargo's
+`compiler-artifact` stream (`tools/verification/bind_cargo_test_binary.py`,
+never mtimes or globs) and atomically publishes its identity (emitted path,
+sha256, size) into the retained cache
+`.cache/paea-approval-form-bound-binary-20261031.json`; publication is
+tmp+fsync+`os.replace` (the cache is re-published by every run, per-run
+history lives in the evidence directories — an exclusive link caused
+`FileExistsError` on run2); a failed or ambiguous cargo resolution refuses
+typed (exit 2, cause `cargo-artifact-resolution-failed`/`-ambiguous`)
+without touching the record. `approval-form-bound-binary-stable` re-runs
+`--verify-stable` after the browser journey: same path+digest required,
+otherwise typed exit-1 refusal `bound-binary-unstable` without rewriting the
+record. Typed counter-proof: `tools/verification/test_bind_cargo_test_binary.py`
+(7 tests) + `test_recipe.py` (8 tests): producing an artifact outside
+declared inputs passes, creating under a declared pattern always refuses,
+any real edit of a compiled source always refuses. Pinned TMPDIR: Chrome
+binds its ProcessSingleton socket under
+`$TMPDIR/.com.google.Chrome.XXXXXX/SingletonSocket` (+49 bytes) and dies
+with a silent SIGTRAP ("Failed to launch the browser process! Code: null",
+empty stderr) when the path exceeds the sockaddr_un bound (measured
+2026-10-31: 107-byte path launches, 108 traps); the
+`~/.local/state/swarm-fixtures` fallback (93 bytes) keeps the margin. Fresh
+proof: `evidence/20261028-acquisition81-mvfdts57/glm-form-qualify-execute-20261031T200316Z/qualification-fresh-20261031T200327Z/`
+(8/8 PASS, `source_stable true`, marker `PAEA_APPROVAL_FORM_BROWSER_VERIFIED 4`,
+`recipe.py verify` VERIFIED).
 
 ### I15 mutation forces re-admission / La mutation force la réadmission
 
@@ -3098,3 +3203,28 @@ Corroborate supported launcher status with protected HTTP, executable hash and
 Version dialog before diagnosing a stop. Modal `open=false` precedes `close`:
 wait for focus restoration and actual reload completion before the next gesture.
 See [the graph recovery evidence](../../docs/plans/migration-rust/GRAPH-REGRESSION-20261031.md).
+
+### Provenance des prompts BLP / BLP prompt provenance
+
+`recipes/blp-preparation-provenance.json` exerce onze tests ciblés : assembleur
+(4), enveloppes/consommateur natif (5), reprise historique (2). Aucun fournisseur
+n’est invoqué ; le registre ne prouve aucune classification ou habilitation.
+`recipes/blp-preparation-provenance-public.json` exige
+`SWARM_PREPARATION_UI_BINARY` désignant le candidat natif déjà qualifié ; il
+construit séparément le sidecar mémoire de fixture, vérifie sa garde de placement,
+puis exerce CLI et HTTP avec programmes/serveur locaux inertes. Les racines sont
+créées par `fixture_area`, les preuves de parcours conservées sous ces racines
+et leur chemin imprimé dans les sorties du runner. Le sidecar exige le dossier
+configuré explicite, un enfant direct au nom de fixture et son marqueur ; /tmp
+reste interdit. Ce programme de fixture ne fait pas partie du profil livré.
+
+The unit recipe runs eleven named tests (4 assembly, 5 native envelope/consumer,
+2 historical recovery), without providers or confidentiality authorization.
+The public recipe requires `SWARM_PREPARATION_UI_BINARY` pointing to an already
+qualified native candidate. It separately builds the fixture-only memory sidecar,
+tests its placement guard, then exercises CLI/HTTP with inert local providers.
+`fixture_area` allocates retained journey evidence; stdout names its location.
+The sidecar requires an explicit configured area, a direct fixture child and its
+marker; /tmp stays forbidden. This fixture executable is outside the delivered
+profile. Recipe success does not establish BLP labels, sink mediation, independent
+review or paid-provider/account confinement.

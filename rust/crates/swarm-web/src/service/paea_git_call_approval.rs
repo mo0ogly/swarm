@@ -11,7 +11,7 @@
 //! identity, choose a root or rewrite a term. The producers are the existing
 //! engine Trust chain (`trust_enrollment_request` + `call_trust_as_enrolled`);
 //! there is no second approval system and no Git execution here.
-use super::{close, root, HttpServiceError as E, NativeHttpService, RouteBody};
+use super::{close, reader_bearer_token, root, HttpServiceError as E, NativeHttpService, RouteBody};
 use http::{Method, Request};
 use swarm_engine::{check_command_input_size, RootStore, RootStoreError};
 
@@ -73,8 +73,24 @@ impl super::PaeaGitCallAuthority {
             }
         }
     }
+    /// Minimal startup observation served by the cookie-only approval status
+    /// route (`GET /api/v1/paea/git-call/approval`): nothing but the
+    /// `bound` boolean (the capability stays `Null`). Nothing derived from
+    /// the selected frozen approval passes — not the `request_digest`, and
+    /// not the selected `operation` either: a closed vocabulary does not make
+    /// the selected value a constant, and no declassification right is
+    /// created (BLP-RET-05). The exact operation and command digest are
+    /// served exclusively by the guarded presentation route behind the
+    /// CURRENT reader verdict (`RootStore::paea_reader_verdict`). This
+    /// projection never authenticates, never promises currency and never
+    /// echoes any prior read.
+    pub(super) fn status_approval_capability(&self) -> serde_json::Value {
+        serde_json::Value::Null
+    }
     /// Public capability of the bound approval: operation and exact command
-    /// digest only. This authenticates nobody and grants nothing.
+    /// digest only, served ONLY by the guarded presentation route behind the
+    /// CURRENT BLP reader verdict. This authenticates nobody and grants
+    /// nothing by itself.
     pub(super) fn approval_capability(&self) -> serde_json::Value {
         self.bound_approval()
             .map(|a| {
@@ -145,10 +161,17 @@ fn reply_publication(result: &Result<RouteBody, E>) -> Option<&'static str> {
 
 impl NativeHttpService {
     /// Read-only startup observation behind the ordinary session/Host/CSRF
-    /// gate: `GET /api/v1/paea/git-call/approval` reports whether an approval
-    /// command is bound, with its public capability and no IO, secret or
-    /// consumption. An explicit `bound:false` distinguishes "no approval
-    /// prepared" from a refused request.
+    /// gate: `GET /api/v1/paea/git-call/approval` reports ONLY whether an
+    /// approval command is bound — `bound:true` with a Null `capability`, no
+    /// IO, secret or consumption. Under the BLP reader frontier (BLP-RET-05)
+    /// NOTHING derived from the selected frozen approval is served here — not
+    /// the exact command digest, and not the selected operation: not to a
+    /// bare session, an unknown token, a disabled identity or an uncleared
+    /// reader. Every refusal variant and the authorized full reading (exact
+    /// operation + command digest) stay on the guarded presentation route
+    /// (see `reader_bearer_token` and `RootStore::paea_reader_verdict`). An
+    /// explicit `bound:false` distinguishes "no approval prepared" from a
+    /// refused request.
     pub(super) fn paea_git_call_approval_status(&self) -> Result<RouteBody, E> {
         let bound = self
             .paea_git_call
@@ -157,7 +180,7 @@ impl NativeHttpService {
         let capability = self
             .paea_git_call
             .as_ref()
-            .map(|a| a.approval_capability())
+            .map(|a| a.status_approval_capability())
             .unwrap_or(serde_json::Value::Null);
         let reply = serde_json::json!({
             "schema_version":1,
@@ -196,6 +219,23 @@ impl NativeHttpService {
     /// Limits: `current` is an observation re-read from the live roots, not a
     /// promise; the engine consumer alone decides currency and terms at
     /// consumption, and a stale or altered credential still refuses there.
+    ///
+    /// BLP reader frontier (BLP-RET-05): the terms and the underlying prepared
+    /// action are classified material only under a CURRENT control attribution
+    /// bound to their exact canonical bytes, this project root and the current
+    /// BLP policy; the verdict is re-read at every consumption (see
+    /// `RootStore::paea_reader_verdict`) BEFORE any projection field is built,
+    /// exactly like the preview route. A bare session, an unknown provenance,
+    /// a stale policy or an unattributed object refuse with an explicit
+    /// `available:false` reason and NO classified byte — payload, identifier,
+    /// digest, error, header or log — even for the highest-cleared reader.
+    /// An unknown or disabled credential instead propagates the typed
+    /// `TrustError::Authorization` refusal (non-success status,
+    /// `authorization_required` in the typed failure and body); both paths
+    /// carry no classified byte. An optional `Authorization: Bearer <token>`
+    /// is the reader credential (see `reader_bearer_token`); it is distinct
+    /// from the POST route's `Enrollment` scheme and never bypasses the
+    /// session gate.
     pub(super) fn paea_git_call_approval_presentation(
         &self,
         r: &Request<Vec<u8>>,
@@ -234,6 +274,9 @@ impl NativeHttpService {
         let canonical = swarm_protection_contract::canonicalize(source.proposal(), source.context())
             .map_err(|_| E::Refused("paea-git-call-approval-presentation-canonical"))?;
         let digest_matches = canonical.digest() == source.request().action_digest();
+        // Reader credential shape is validated BEFORE any Root open; None is
+        // the bare session the guard treats as never-authorization.
+        let token = reader_bearer_token(r)?;
         // Read-only observation of the live roots, mirroring the preview: no
         // writable open, no consumption, no consent.
         let service = RootStore::open(&self.root, false).map_err(|e| root("open", e))?;
@@ -242,6 +285,22 @@ impl NativeHttpService {
             let project =
                 RootStore::open(source.project_path(), false).map_err(|e| root("open", e))?;
             let result = (|| -> Result<RouteBody, E> {
+                // Reader verdict FIRST, before any projection field: same
+                // contract as the preview route, no classified byte in any
+                // refusal reply, log line or close cause.
+                let verdict = project
+                    .paea_reader_verdict(
+                        token.as_deref(),
+                        canonical.digest(),
+                        source.project_path(),
+                    )
+                    .map_err(|e| root("paea-git-call-approval-presentation-reader", e))?;
+                match verdict {
+                    swarm_engine::ReaderVerdict::Allowed => {}
+                    swarm_engine::ReaderVerdict::Refused(reason) => {
+                        return reply(&unavailable(reason));
+                    }
+                }
                 let roots_bound = source
                     .binding_matches(&project, &service)
                     .map_err(|e| root("paea-git-call-approval-presentation-root", e))?;

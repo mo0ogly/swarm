@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "w-0ebe7f740b2acad20d691fe1",
+  "revision": 3,
+  "title": "Requested model fixture",
+  "objective": "Observe route",
+  "scope": "Owned local program",
+  "criteria": [
+    "Observed, not accepted"
+  ],
+  "next": "",
+  "summary": "",
+  "memory": null,
+  "created": "2026-10-31T20:44:04.592749443Z",
+  "updated": "2026-10-31T20:44:05.158744863Z",
+  "git": {
+    "head": "3b5191e2c50c79528bf9c55ee19e0af7fd65da5d",
+    "branch": "codex/clear-product-method-names",
+    "changes": "M REFERENCE.md\n M docs/architecture/BLP-FLOWS.md\n M docs/architecture/RUST-MIGRATION.md\n M docs/architecture/blp-flow-inventory.json\n M docs/en/BLP-FLOWS.md\n M docs/en/REFERENCE.md\n M docs/en/RUST-MIGRATION.md\n M docs/en/plans/actions-confiance/BLP-APEX.md\n M docs/plans/actions-confiance/BLP-APEX.md\n M rust/crates/swarm-engine/config/engine-settings.json\n M rust/crates/swarm-engine/src/root_store.rs\n M rust/crates/swarm-engine/src/root_store/preparation_call.rs\n M rust/crates/swarm-engine/tests/paea_effect_reconcile.rs\n M rust/crates/swarm-engine/tests/paea_git_promote_call.rs\n M rust/crates/swarm-engine/tests/paea_git_transfer_call.rs\n M tests/paea-approval-form-ui.cjs\n M tests/paea-rendered-contract-ui.cjs\n M tests/paea_approval_form_ui_recipe.py\n M tests/rust_preparation_cli_calls.py\n M tools/verification/README.md\n M tools/verification/recipe.py\n M tools/verification/recipes/blp-flow-inventory.json\n M tools/verification/recipes/paea-approval-form-rust.json\n M tools/verification/recipes/paea-delivered-chain-cli-rust.json\n M tools/verification/recipes/paea-delivered-settlement-cli-rust.json\n M tools/verification/recipes/paea-effect-reconcile.json\n M tools/verification/recipes/paea-git-call-agreement-last-use-rust.json\n M tools/verification/recipes/paea-git-call-agreement-rust.json\n M tools/verification/recipes/paea-git-call-agreement-terms-rust.json\n M tools/verification/recipes/paea-git-call-approval-rust.json\n M tools/verification/recipes/paea-git-call-preview-rust.json\n M tools/verification/recipes/paea-git-call-web-rust.json\n M tools/verification/recipes/paea-i15-tool-substitution-rust.json\n M tools/verification/recipes/paea-native-git-source-context.json\n M tools/verification/recipes/paea-owned-git-promote.json\n M tools/verification/recipes/paea-owned-git-transfer-reconcile.json\n M tools/verification/recipes/paea-owned-git-transfer.json\n M tools/verification/recipes/paea-owned-source-acquisition.json\n M tools/verification/recipes/paea-promote-cli-suite-regression-rust.json\n M tools/verification/recipes/preparation-calls-rust.json\n M tools/verification/recipes/preparation-cli-levels-rust.json\n M tools/verification/recipes/preparation-legacy-replay-rust.json\n M tools/verification/test_recipe.py\n M version_history.json\n?? depart-evidence.sha256\n?? docs/en/plans/actions-confiance/BLP-PROVENANCE-20261031.md\n?? docs/plans/actions-confiance/BLP-PROVENANCE-20261031.md\n?? docs/plans/actions-confiance/verification-blp/20261031-flow-inventory-01/\n?? docs/plans/actions-confiance/verification-blp/20261031-flow-inventory-02/\n?? docs/plans/actions-confiance/verification-blp/20261031-prompt-provenance-01/\n?? docs/plans/actions-confiance/verification-blp/20261031-prompt-provenance-02-counterexample/\n?? docs/plans/actions-confiance/verification-blp/20261031-prompt-provenance-03/\n?? docs/plans/actions-confiance/verification-blp/20261031-prompt-provenance-04/\n?? docs/plans/actions-confiance/verification-blp/20261031-provenance-cli-01/\n?? docs/plans/actions-confiance/verification-blp/20261031-provenance-http-01/\n?? docs/plans/actions-confiance/verification-blp/20261031-provenance-public-01/\n?? rust/crates/swarm-engine/src/root_store/preparation_prompt.rs\n?? tests/paea-rendered-contract-transition-guard.cjs\n?? tools/verification/bind_cargo_test_binary.py\n?? tools/verification/recipes/blp-preparation-provenance-public.json\n?? tools/verification/recipes/blp-preparation-provenance.json\n?? tools/verification/test_bind_cargo_test_binary.py"
+  },
+  "tasks": [
+    {
+      "plan_checks": {
+        "plan-criterion-1": "validation",
+        "plan-delivery": "delivery",
+        "plan-entry": "entry",
+        "plan-validation": "validation"
+      },
+      "id": "task",
+      "title": "Run",
+      "owner": "",
+      "deliverable": "Evidence",
+      "criteria": [
+        "Observed, not accepted"
+      ],
+      "depends": null,
+      "status": "todo",
+      "blocker": "",
+      "next": "",
+      "attempts": []
+    }
+  ]
+}

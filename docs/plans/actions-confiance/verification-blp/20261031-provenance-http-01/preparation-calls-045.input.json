@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "action": "create",
+  "event_id": "linked-preparation",
+  "expected_revision": 0,
+  "title": "Linked budget fixture",
+  "text": "Need linked fixture",
+  "work_id": "w-0ebe7f740b2acad20d691fe1"
+}

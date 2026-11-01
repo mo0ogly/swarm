@@ -17,6 +17,10 @@ pub(crate) struct Record {
 }
 
 /// One attributed policy revision, with no credentials or source contents.
+/// `attributions` (added after first persistence) holds object attributions
+/// produced by the supported `blp-object-attribute` control operation against
+/// this policy revision; an absent field decodes as none, so retained
+/// histories replay unchanged.
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct Entry {
@@ -28,6 +32,35 @@ pub(crate) struct Entry {
     reason: String,
     policy_digest: String,
     policy: Policy,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    attributions: Vec<Attribution>,
+}
+
+/// One control-attributed object classification bound to the exact canonical
+/// action bytes and the project root holding them, valid under the policy
+/// revision that produced it. Produced only by an authorized I3/admin
+/// operation; consumed by re-reading this persisted record, never by any
+/// request-supplied label or clearance inference.
+///
+/// Exact-once identity: an attribution is admitted only when no other
+/// attribution of the SAME entry already binds the same
+/// (`canonical_digest`, `project_path`, `policy_revision`) triple. The first
+/// control attribution of an object under a policy revision is therefore the
+/// only one: a later event that would store a contradicting label is refused
+/// (see `blp-object-attribute`), and any label change is an explicit policy
+/// decision recorded as a new revision, never an in-place overwrite or an
+/// implicit declassification. No per-id exception exists.
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct Attribution {
+    canonical_digest: String,
+    project_path: Vec<u8>,
+    policy_revision: u64,
+    level: String,
+    compartments: Vec<String>,
+    actor: String,
+    at: String,
+    reason: String,
 }
 
 /// All policy fields are explicit. No enabled flag can claim runtime protection.
@@ -52,14 +85,59 @@ struct Check {
     destination: Option<Classification>,
 }
 
+/// Control input for `blp-object-attribute`: one object attribution produced
+/// by an authorized I3/admin operator, bound to the exact canonical action
+/// digest and project root. The classification is explicit, validated under
+/// the current policy, and never inferred from clearance, labels or history.
+/// `project_path` is a readable absolute UTF-8 filesystem path string (the
+/// persisted attribution keeps the exact bytes, so a non-UTF-8 root can never
+/// be attributed through this contract); validation refuses empty, relative
+/// or NUL-containing paths.
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct AttributeChange {
+    schema_version: u32,
+    event_id: String,
+    expected_revision: u64,
+    expected_trust_revision: i64,
+    canonical_digest: String,
+    project_path: String,
+    classification: Option<Classification>,
+    reason: String,
+}
+
 /// Explicit null cannot erase or deactivate a stored policy history.
 pub(crate) fn present<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Option<Record>, D::Error> {
     Record::deserialize(d).map(Some)
 }
 
 impl Record {
-    /// Validate exact monotonic history, schema, catalog compatibility and policy
-    /// hashes. No identity or rollback resistance is inferred from stored bytes.
+    /// Validate exact monotonic history, schema, catalog compatibility, policy
+    /// hashes and every stored attribution. No identity or rollback resistance
+    /// is inferred from stored bytes.
+    ///
+    /// Attribution contract (storage/reopen): each attribution must bind the
+    /// entry it rides on (`policy_revision` == the entry's own revision), the
+    /// exact canonical-action digest shape (lowercase 64-hex, validated as
+    /// data form; the binding to real bytes stays the caller's prepared
+    /// canonicalization re-checked at consumption), a readable absolute UTF-8
+    /// project path, a named actor, an RFC3339 timestamp, a non-empty reason
+    /// and a classification the entry's own policy accepts (a real catalog
+    /// level and known, duplicate-free compartments). Attributions are
+    /// exact-once per entry: two attributions sharing a (canonical digest,
+    /// project path) key within one entry invalidate the history, mirroring
+    /// the producer's `blp-attribution-conflict` admission refusal — a stored
+    /// contradicting pair would let `attribution_for` serve whichever copy
+    /// decodes first. An attribution with an
+    /// empty or unknown level can never be read back coherently by the reader
+    /// guard (`check_read`), so it invalidates the history at decode time
+    /// instead of producing an incoherent success at consumption. Errors:
+    /// any violation is `E::Integrity("blp-history-invalid")` (or
+    /// `blp-policy-invalid` for a policy refusal) and refuses the whole
+    /// state at every open, replay and read — never a partial tolerance or
+    /// a default level. Limits: this validates the stored record's internal
+    /// coherence; it does not re-run the producer's operator validation at
+    /// consumption time and claims no rollback protection.
     pub fn validate(&self) -> Result<(), E> {
         if self.schema_version != 1 || self.history.is_empty() {
             return Err(E::Integrity("blp-history-invalid"));
@@ -74,6 +152,35 @@ impl Record {
                 || super::digest(&entry.policy)? != entry.policy_digest
             { return Err(E::Integrity("blp-history-invalid")); }
             entry.policy.validate().map_err(|_|E::Integrity("blp-policy-invalid"))?;
+            // Exact-once binding at storage level too: the producer refuses a
+            // second attribution for the same (policy_revision, digest,
+            // project) triple (`blp-attribution-conflict`) before mutating,
+            // so a stored history holding two attributions for the same
+            // (digest, project) inside one entry is a poisoned record — e.g.
+            // a contradicting re-classification injected by side effect —
+            // and must refuse at reopen rather than let `attribution_for`
+            // silently serve whichever copy comes first.
+            let mut bound=std::collections::BTreeSet::new();
+            for attribution in &entry.attributions {
+                if attribution.policy_revision!=entry.revision
+                    || attribution.canonical_digest.len()!=64
+                    || !attribution.canonical_digest.bytes().all(|b|b.is_ascii_hexdigit()&&b.to_ascii_lowercase()==b)
+                    || attribution.project_path.is_empty()
+                    || attribution.project_path.contains(&0)
+                    || attribution.project_path[0]!=b'/'
+                    || std::str::from_utf8(&attribution.project_path).is_err()
+                    || !swarm_identity_contract::name(attribution.actor.as_bytes())
+                    || OffsetDateTime::parse(&attribution.at,&time::format_description::well_known::Rfc3339).is_err()
+                    || attribution.reason.trim().is_empty()
+                { return Err(E::Integrity("blp-history-invalid")); }
+                if !bound.insert((attribution.canonical_digest.clone(),attribution.project_path.clone()))
+                { return Err(E::Integrity("blp-history-invalid")); }
+                entry.policy.dominates(&Classification{level:attribution.level.clone(),
+                    compartments:attribution.compartments.clone()},
+                    &Classification{level:attribution.level.clone(),
+                    compartments:attribution.compartments.clone()})
+                    .map_err(|_|E::Integrity("blp-history-invalid"))?;
+            }
             if index>0 {
                 self.history[index-1].policy.validate_successor(&entry.policy)
                     .map_err(|_|E::Integrity("blp-catalog-history-invalid"))?;
@@ -83,9 +190,39 @@ impl Record {
         Ok(())
     }
     /// Latest validated entry. Empty/corrupt history refuses, never defaults.
-    fn current(&self) -> Result<&Entry, E> {
+    /// Readable crate-wide: the reader guard re-reads the current entry for
+    /// its own currency/attribution checks with the same validation.
+    pub(crate) fn current(&self) -> Result<&Entry, E> {
         self.validate()?;
         self.history.last().ok_or(E::Integrity("blp-history-invalid"))
+    }
+}
+
+impl Entry {
+    /// Trust revision the entry was admitted at; the reader guard compares it
+    /// to the current state revision to decide currency without mutation.
+    pub(crate) fn trust_revision(&self) -> i64 { self.trust_revision }
+    /// Current policy's revision, for attribution-binding comparisons.
+    pub(crate) fn revision(&self) -> u64 { self.revision }
+    /// The validated policy of this entry; no credentials or object bytes.
+    pub(crate) fn policy(&self) -> &Policy { &self.policy }
+    /// Find the control attribution binding the exact canonical digest and
+    /// project path under THIS entry's policy revision. `None` is the explicit
+    /// unknown-provenance observed state, never a fallback to another entry
+    /// (a stale entry's attribution cannot authorize a current read). At most
+    /// one attribution matches: the admission contract refuses a second
+    /// attribution of the same triple, so this lookup never depends on
+    /// iteration order.
+    pub(crate) fn attribution_for(
+        &self,
+        canonical_digest: &str,
+        project_path: &[u8],
+    ) -> Option<(&str, &str, &[String])> {
+        self.attributions.iter().find(|a| {
+            a.policy_revision == self.revision
+                && a.canonical_digest == canonical_digest
+                && a.project_path.as_slice() == project_path
+        }).map(|a| (a.level.as_str(), a.actor.as_str(), a.compartments.as_slice()))
     }
 }
 
@@ -132,6 +269,95 @@ pub(crate) fn execute(st: &mut State, op: &str, raw: &[u8], source: Source<'_>, 
         if !value.is_empty() { return Err(E::Invalid("blp-show-body-invalid")); }
         return Ok((super::encoded(&json!({"trust_revision":st.revision.to_string(),"capability":capability(st)?,"record":st.confidentiality}))?,None));
     }
+    if op=="blp-object-attribute" {
+        let c:AttributeChange=swarm_wire_json::decode(raw)?;
+        if c.schema_version!=1 || !swarm_identity_contract::name(c.event_id.as_bytes())
+            || c.reason.trim().is_empty() || c.reason.chars().any(char::is_control)
+        { return Err(E::Invalid("blp-attribute-change-invalid")); }
+        // Exact canonical-action digest shape (lowercase 64-hex), validated as
+        // data form only; the binding to real bytes is the caller's prepared
+        // canonicalization, re-checked at consumption by the reader guard.
+        if c.canonical_digest.len()!=64 || !c.canonical_digest.bytes().all(|b|b.is_ascii_hexdigit()&&b.to_ascii_lowercase()==b)
+        { return Err(E::Invalid("blp-attribute-digest-invalid")); }
+        if c.project_path.is_empty() || c.project_path.contains('\0') || !c.project_path.starts_with('/')
+        { return Err(E::Invalid("blp-attribute-project-invalid")); }
+        // Policy must be configured, current and at the exact declared BLP
+        // revision: attribution is only meaningful under a current authority.
+        let entry=st.confidentiality.as_ref().ok_or(E::Conflict("blp-policy-required"))?.current()?;
+        if c.expected_trust_revision!=st.revision { return Err(E::Conflict("blp-trust-revision-conflict")); }
+        if c.expected_revision!=entry.revision || entry.trust_revision!=st.revision {
+            return Err(E::Conflict("blp-policy-stale"));
+        }
+        // The attributed classification is explicit and validated under the
+        // current policy by an actor whose clearance dominates it. An absent
+        // or null classification refuses typed: the reader contract evaluates
+        // an attribution with `check_read(Some(label))` under the recorded
+        // policy, so an admitted "unclassified" attribution would store an
+        // empty level that can never be read back coherently (always
+        // `blp-classification-invalid`). Declaring an object unclassified is
+        // an explicit policy decision — record it as a policy revision —
+        // never a null-field side effect of this producer.
+        let Some(label)=&c.classification else {
+            return Err(E::Invalid("blp-attribute-classification-required"));
+        };
+        entry.policy.validate().and_then(|_|entry.policy.check_read(&actor.subject,Some(label))).map_err(|e|E::Invalid(e.code()))?;
+        let fingerprint=super::digest(&json!({"operation":"blp-object-attribute","actor":actor.subject,"change":c}))?;
+        if let Some(prior)=st.event_digests.get(&c.event_id) {
+            if prior!=&fingerprint { return Err(E::Conflict("event_conflict")); }
+            let current=st.confidentiality.as_ref().ok_or(E::Integrity("blp-replay-history-missing"))?.current()?;
+            // Freshness is the replayed event's OWN recorded effect: on a
+            // well-formed history the fingerprint pins expected_revision, so
+            // a fresh replay's own attribution is necessarily on the CURRENT
+            // entry. Free-text `reason` is a human note, never an identity:
+            // another object's attribution sharing it does not freshen this
+            // event, and a history where the own effect is absent refuses
+            // stale instead of replaying a reply with no stored effect.
+            if current.event_id!=c.event_id && !current.attributions.iter().any(|a|
+                a.policy_revision==c.expected_revision
+                && a.canonical_digest==c.canonical_digest
+                && a.project_path==c.project_path.as_bytes())
+            { return Err(E::Conflict("blp-replay-stale")); }
+            let reply=st.event_replies.get(&c.event_id).ok_or(E::Integrity("blp-replay-missing"))?;
+            return Ok((reply.raw().as_bytes().to_vec(),Some("replayed")));
+        }
+        let label=json!({"level":label.level,"compartments":label.compartments});
+        let value=json!({"schema_version":1,"attributed":true,"canonical_digest":c.canonical_digest,
+            "policy_revision":entry.revision.to_string(),"trust_revision":st.revision.to_string(),
+            "classification":label,"actor":actor.subject,"reason":c.reason,"runtime_enforced":false});
+        let bytes=super::encoded(&value)?;
+        let stamp=super::operations::stamp(now)?;
+        let attribution=Attribution{canonical_digest:c.canonical_digest.clone(),
+            project_path:c.project_path.clone().into_bytes(),
+            policy_revision:entry.revision,level:label["level"].as_str().unwrap_or_default().to_owned(),
+            compartments:label["compartments"].as_array().map(|a|a.iter().filter_map(|v|v.as_str().map(str::to_owned)).collect()).unwrap_or_default(),
+            actor:actor.subject.clone(),at:stamp.clone(),reason:c.reason};
+        // Exact-once admission: one control attribution per object under a
+        // policy revision. A second event binding the same
+        // (digest, project, revision) triple refuses — whether it would
+        // contradict or repeat the recorded label (the identical event
+        // replays above through its own event id) — so no contradicting pair
+        // can ever be stored and no classification is changed or erased by
+        // side effect. Label evolution is a new policy revision, explicit.
+        // Checked before the current entry is borrowed mutably for the push.
+        if st.confidentiality.as_ref().ok_or(E::Integrity("blp-history-missing"))?
+            .history.last().ok_or(E::Integrity("blp-history-missing"))?
+            .attributions.iter().any(|a|a.policy_revision==entry.revision
+            && a.canonical_digest==c.canonical_digest && a.project_path==c.project_path.as_bytes())
+        { return Err(E::Conflict("blp-attribution-conflict")); }
+        let current_entry=st.confidentiality.as_mut().ok_or(E::Integrity("blp-history-missing"))?
+            .history.last_mut().ok_or(E::Integrity("blp-history-missing"))?;
+        // The attribution binds to the CURRENT entry in place: it inherits the
+        // entry's revision/trust_revision so currency stays exact, and the
+        // policy digest is unchanged by definition (no catalog transition).
+        current_entry.attributions.push(attribution);
+        let command:super::command::Command=swarm_wire_json::decode(b"{}")?;
+        super::operations::append(st,op,&command,&actor,"blp-attribution",&super::hash(&bytes),"recorded",
+            "Object attribution recorded under the current BLP policy; runtime integration not established",raw,now,None)?;
+        st.event_digests.insert(c.event_id.clone(),fingerprint);
+        let reply_text=std::str::from_utf8(&bytes).map_err(|_|E::Integrity("blp-reply-encoding"))?;
+        st.event_replies.insert(c.event_id,super::json::CompactJson::new(reply_text)?);
+        return Ok((bytes,Some("recorded")));
+    }
     if !matches!(op,"blp-policy-preview"|"blp-policy-apply") { return Err(E::Invalid("blp-operation-invalid")); }
     let c:Change=swarm_wire_json::decode(raw)?;
     if c.schema_version!=1 || !swarm_identity_contract::name(c.event_id.as_bytes())
@@ -165,6 +391,7 @@ pub(crate) fn execute(st: &mut State, op: &str, raw: &[u8], source: Source<'_>, 
     let bytes=super::encoded(&value)?;
     if op=="blp-policy-preview" { return Ok((bytes,None)); }
     let entry=Entry{revision:next,trust_revision:st.revision,event_id:c.event_id.clone(),actor:actor.subject.clone(),
+        attributions:Vec::new(),
         at:super::operations::stamp(now)?,reason:c.reason,policy_digest,policy:c.policy};
     st.confidentiality.get_or_insert_with(||Record{schema_version:1,history:vec![]}).history.push(entry);
     let command:super::command::Command=swarm_wire_json::decode(b"{}")?;

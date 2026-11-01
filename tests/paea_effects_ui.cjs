@@ -6,11 +6,13 @@
 // session, FR/EN, both themes, keyboard focus and mobile widths. No effect,
 // no one-shot call, no acceptance authority; the page only reads the three
 // guarded GET endpoints.
-const assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),cp=require('node:child_process');
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
 const pup=require(path.join(process.cwd(),'node_modules','puppeteer'));
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);
 fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'paea-effects-ui-'));
+// Operator rule: never create project fixtures under /tmp (tmpfs, wiped on
+// reboot) — use the repo fixture area like every other UI driver here.
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','paea-effects-ui-'));
 fs.chmodSync(root,0o700);
 const checks=[],errors=[];let expected=0;
 cp.execFileSync(binary,['--root',root,'--json','init']);

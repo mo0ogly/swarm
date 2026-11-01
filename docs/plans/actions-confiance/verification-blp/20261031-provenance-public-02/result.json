@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-preparation-provenance-public",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "fixture-placement-guard",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--example",
+        "memory_source_fixture",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 52.12630243100284,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "fixture-memory-sidecar",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--example",
+        "memory_source_fixture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 1.3630701459987904,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "public-cli",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,sys,subprocess; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=fixture_root('blp-provenance-cli-')/'journey'; binary=Path(os.environ['SWARM_PREPARATION_UI_BINARY']).resolve(strict=True); subprocess.run(['python3','tests/rust_preparation_cli_calls.py','--binary',str(binary),'--output',str(out)],check=True); print('BLP_PROVENANCE_PUBLIC_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 12.422486527997535,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    },
+    {
+      "id": "public-http",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,sys,subprocess; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=fixture_root('blp-provenance-http-')/'journey'; binary=Path(os.environ['SWARM_PREPARATION_UI_BINARY']).resolve(strict=True); subprocess.run(['python3','tests/rust_preparation_calls.py','--binary',str(binary),'--output',str(out)],check=True); print('BLP_PROVENANCE_PUBLIC_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 14.91289430300094,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "4d3b97d0aa7c0d530407d54eaa3905384874b2bc72b83274c1632891a5959618",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "fdf8669cacfa12f0b723860989856c63750fd875ffe1a9106bf05ccbe8a773ab",
+    "declared-inputs.tar.gz": "27069c7fc27783e28642149e097cda3b56f917f260c0da9988f5956806a552e0",
+    "environment.json": "3c0a8bb3b5097af770ebd88397a66d3da6f1fe02cd241980d61e2c6ef3a39814",
+    "step-0001.stdout": "0b93c1f7efa3d512c07e9f1b789781dbbb3a8e9bfc0f81d3d62dd9be53bc7b54",
+    "step-0001.stderr": "e64c68c467e57d31e2a8ec586cd71d677407bcf31e67f8013dc933c80cb5ed95",
+    "step-0001.json": "92901535a4c929a7f1ac6c256ffdfee1e43cf03c1a6d2d6907fe17e25ff5c734",
+    "step-0002.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0002.stderr": "6f2ce0ba133dc9b91dc67a1845df0034d1aad3752040d161f6b1e43c2c551166",
+    "step-0002.json": "e1e80aa21946f7b11a5be7dd9711d84804ae41b527e1b5034a0cf308d3ab3611",
+    "step-0003.stdout": "c3d8f456aecc9aae63f1e1b6bcf3ffe2af069ef2dcdf955f66e4be29c7029024",
+    "step-0003.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0003.json": "5686f20d08d76c3ab208b11757c5b0348fc6772eb6b4188e2e063e17eb0f65fd",
+    "step-0004.stdout": "4361027c17721a4dd9b87886f52f5a39c660052402759116afdd880f5b58dbbc",
+    "step-0004.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0004.json": "2561600b40aa4f8ea1e6fd68daf897ec7bd8e282bb9ba15b88a1bc5a2c069eea",
+    "inputs.after.json": "fdf8669cacfa12f0b723860989856c63750fd875ffe1a9106bf05ccbe8a773ab"
+  }
+}

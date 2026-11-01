@@ -9,6 +9,12 @@ the HTTP origin, Work and orientation; they change no revision or budget. Escape
 cancels an active drag before closing full screen. Full screen uses a native modal
 dialog for keyboard isolation and restores focus to its opener on close.
 
+Search matches task IDs and titles regardless of case or accents. It highlights
+matches without hiding cards or links; Enter or “Next” centers the next match
+and focuses its card. “Clear search” or Escape in the input clears highlights.
+Zoom and positions remain unchanged. The query stays local, is not persisted
+and resets on a new render. No matches produces an explicit message.
+
 “Add task” and card activation open the task form. Title, deliverable, criteria
 and prerequisites are explicitly saved through `/api/v1/action` (`task-add` →
 `task.add`, `task` → `task.update`). The engine retains session/CSRF, bound Root,
@@ -17,7 +23,10 @@ or keyboard stages destination prerequisites in the task form; activating a link
 or pressing Delete stages removal. Gestures do not save. Selecting prerequisites
 adds or removes links for one task. Refusals retain inputs; uncertain outcomes prevent
 resubmission until closing and refreshing. Success requires a protected readback
-and waiting for cockpit observations to reload before closing the form. No agent starts. Managed plans retain their
+and waiting for cockpit observations to reload before closing the form. The button and a live status region
+announce “Saving…” through readback and cockpit refresh. Refusal or an uncertain
+outcome clears the busy indication while retaining its diagnostic; uncertainty
+keeps resubmission disabled. No agent starts. Managed plans retain their
 engine refusals.
 
 Run `tests/rust_graph_navigation.py --binary bin/swarm --output FRESH_DIRECTORY

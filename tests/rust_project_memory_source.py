@@ -8,22 +8,26 @@ import argparse, hashlib, json, sqlite3, os, subprocess, tempfile
 from pathlib import Path
 import rust_agent_model_route as fixture
 import rust_native_http_cli as native
+from fixture_area import fixture_area
 
 
 def seed_work(root, work_id, raw):
     """Use the retained native fixture writer, preserving real identity triggers.
 
-    Only a marked /tmp fixture is allowed. Retain candidate, argv and raw channels;
+    Only a marked fixture directly under the configured fixture area is allowed.
+    Pass that explicit canonical area to the native guard, never infer /tmp from
+    a historical layout. Retain candidate, argv and raw channels;
     the sidecar decodes Work, restricts fields and CAS-checks revision. No
     live state, model, consumption or acceptance is involved; errors propagate.
     """
     root=Path(root).resolve()
-    assert root.parent==Path('/tmp') and root.name.startswith('swarm-model83-')
+    area=fixture_area().resolve()
+    assert root.parent==area and root.name.startswith('swarm-model83-')
     seeder=Path(os.environ['SWARM_PROJECT_MEMORY_SEEDER']).resolve()
     fixture.publish(root/'.swarm/memory-source-fixture-owner',f'swarm-memory-source-fixture-v1\n{root}\n{work_id}\n'.encode())
     fd,name=tempfile.mkstemp(prefix='memory-source-fixture-',suffix='.json',dir=root/'.swarm')
     with os.fdopen(fd,'wb') as stream:stream.write(raw);stream.flush();os.fsync(stream.fileno())
-    candidate=Path(name);argv=[str(seeder),str(root),work_id,str(candidate)]
+    candidate=Path(name);argv=[str(seeder),str(root),work_id,str(candidate),str(area)]
     fixture.publish(candidate.with_suffix('.argv.json'),argv)
     result=subprocess.run(argv,capture_output=True)
     fixture.publish(candidate.with_suffix('.stdout'),result.stdout);fixture.publish(candidate.with_suffix('.stderr'),result.stderr)

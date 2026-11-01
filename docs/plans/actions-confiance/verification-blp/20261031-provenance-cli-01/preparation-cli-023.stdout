@@ -1,0 +1,36 @@
+{
+  "budget": {
+    "limit_usd": 10,
+    "reserve_per_launch_usd": 0.5,
+    "estimate_source": "Synthetic fixture",
+    "reference_date": "2026-10-27",
+    "updated": "2026-10-31T20:43:54.521620692Z",
+    "actor": "fpizzi/uid:1001"
+  },
+  "id": "prep-688350fb6dec4e0d4b1bb93f",
+  "title": "Owned CLI preparation",
+  "method": "apex",
+  "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+  "revision": 3,
+  "created_at": "2026-10-31T20:43:54.406640451Z",
+  "updated_at": "2026-10-31T20:43:56.254387974Z",
+  "documents": {
+    "besoin": {
+      "kind": "besoin",
+      "text": "CLI fixture need",
+      "revision": 1,
+      "sha256": "33ab0cc40e2241837a3af80779ac3345b0bc7e9dea6ec9a0e9121ce7fbfd0a36",
+      "at": "2026-10-31T20:43:54.406640451Z"
+    },
+    "brief": {
+      "source_turn": "pt-f8448b02d8bd4855725da33fc55ff1a1",
+      "kind": "brief",
+      "text": "Owned CLI brief",
+      "revision": 1,
+      "sha256": "05d97f927d120795e16720be1c6afef2f2d477ac23e433370a7e0f89db9f6647",
+      "at": "2026-10-31T20:43:56.254387974Z",
+      "need_hash": "33ab0cc40e2241837a3af80779ac3345b0bc7e9dea6ec9a0e9121ce7fbfd0a36"
+    }
+  },
+  "plan_ready": false
+}

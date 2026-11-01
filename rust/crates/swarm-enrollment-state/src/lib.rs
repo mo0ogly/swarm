@@ -464,6 +464,29 @@ impl Journal {
             Ok(next.clone())
         })
     }
+    /// Read the verified current head and the sorted ids of active (enrolled,
+    /// not revoked) records, from one signed load under the journal's write
+    /// reservation. Read-only: nothing is appended. Errors: closed journal,
+    /// cancellation, Busy (no retry) and any load/signature failure. The head
+    /// is the caller's CAS base for the next `apply`; it is not a rollback
+    /// witness by itself (callers must compare it with an independent one).
+    pub fn snapshot(&self, ctx: &Context) -> Result<(Head, Vec<String>), Error> {
+        let closed = self.closed.read().map_err(|_| Error::State)?;
+        if *closed {
+            return Err(Error::Closed);
+        }
+        let c = self.connect(ctx)?;
+        self.transaction(ctx, &c, |c| {
+            let Loaded { head, records } = self.load(ctx, c)?;
+            let mut active: Vec<String> = records
+                .into_iter()
+                .filter(|(_, e)| !e.revoked)
+                .map(|(id, _)| id)
+                .collect();
+            active.sort();
+            Ok((head, active))
+        })
+    }
     /// Keep callbacks local and reversible. No reentry, close or waiting on writers.
     /// Commit can fail after callback execution; this is not an external-action permit.
     pub fn with_active<T>(

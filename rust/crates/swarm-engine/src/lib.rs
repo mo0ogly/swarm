@@ -12,7 +12,7 @@ mod trust_types;
 #[cfg(unix)]
 mod trust;
 #[cfg(unix)]
-pub use trust::{TrustError,TrustReply,verify_trust,verify_public_trust};
+pub use trust::{TrustError,TrustReply,verify_trust,verify_public_trust,digest_trust};
 #[cfg(target_os = "linux")]
 mod agent_launch;
 #[cfg(target_os = "linux")]
@@ -351,6 +351,8 @@ pub use root_store::{PaeaGitAgreementMatch, PaeaGitAgreementTerms};
 pub use root_store::{
     PaeaGitPromoteCall, PaeaGitPromoteCallError, PaeaGitPromoteOutcome, PaeaGitPromoteReceipt,
 };
+#[cfg(unix)]
+pub use root_store::ReaderVerdict;
 #[cfg(target_os = "linux")]
 pub use root_store::{
     PaeaEffectReconcileFinding, PaeaEffectReconcileJournal, PaeaEffectReconcileReport,

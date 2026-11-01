@@ -61,6 +61,17 @@ let browser;
  // ---------- Phase 1: fresh bound state ----------
  await open('fr','etat',1280);
  await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
+ // The classified presentation and exact preview sit behind the reader
+ // frontier: the harness types the fixture reader credential into the page's
+ // own EPHEMERAL reader input and drives the page's own re-read control (the
+ // same guarded path as load()). The credential is cleared by the page on
+ // every exit; the harness never injects a global Bearer.
+ await page.type('#approval-reader-credential',server.reader_token);
+ await page.click('#approval-reload');
+ await page.waitForFunction(digest=>document.getElementById('approval-capability').textContent.includes(digest),{timeout:20000},server.request_digest);
+ // The digest pair renders BEFORE the preview-driven terminal status lands;
+ // sync on the terminal state itself (run4 red of 2026-11-01 raced the two).
+ await page.waitForFunction(()=>['success','error','empty'].includes(document.getElementById('approval-status').dataset.state),{timeout:20000});
  const approvalStatus=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
  assert.equal(approvalStatus.state,'success','bound approval must render the explicit success state');
  assert.ok(approvalStatus.text.includes('Commande figée liée'),'FR bound message, got: '+approvalStatus.text);
@@ -85,9 +96,15 @@ let browser;
  assert.ok((await page.$eval('#consent-send',e=>e.textContent)).includes('Exécuter'),'explicit submit button present');
  assert(!await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),'1280px no overflow');
  await (await page.$('#consent-form')).screenshot({path:path.join(out,'consent-fresh-fr.png')});
- // EN + dark theme on the same fresh state (page reload refetches).
+ // EN + dark theme on the same fresh state (page reload refetches, so the
+ // reader credential is typed again for the same guarded re-read).
  await open('en','sombre',390);
  await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
+ await page.type('#approval-reader-credential',server.reader_token);
+ await page.click('#approval-reload');
+ await page.waitForFunction(digest=>document.getElementById('approval-capability').textContent.includes(digest),{timeout:20000},server.request_digest);
+ // Same terminal-state sync as the FR phase (run4 red race).
+ await page.waitForFunction(()=>['success','error','empty'].includes(document.getElementById('approval-status').dataset.state),{timeout:20000});
  const freshEn=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
  assert.equal(freshEn.state,'success');
  assert.ok(/Bound frozen command/i.test(freshEn.text),'EN bound message, got: '+freshEn.text);

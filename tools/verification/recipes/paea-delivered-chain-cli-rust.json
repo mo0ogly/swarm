@@ -17,16 +17,16 @@
     "tools/verification/recipe.py",
     "bin/swarm",
     "web/paea-examples/v1/payment-document.json",
-    "docs/plans/actions-confiance/paea/evidence/claude-e2-arbitrage-20261031T135859Z/source-fixture-regen-6-repo-root/result.json"
+    "docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/chain-fixture-regen-20261031b/result.json"
   ],
   "environment": {
     "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
     "CARGO_PROFILE_DEV_DEBUG": "0",
     "CARGO_PROFILE_TEST_DEBUG": "0",
     "CARGO_INCREMENTAL": "0",
-    "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/claude-e2-arbitrage-20261031T135859Z/source-fixture-regen-6-repo-root",
+    "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/chain-fixture-regen-20261031b",
     "SWARM_PAEA_DELIVERED_BIN": "{root}/bin/swarm",
-    "SWARM_PAEA_DELIVERED_BIN_SHA256": "1d3f9da1408a82b14b5ae5d76328b58c52f1f92051824af52f1d413be8dd41fd"
+    "SWARM_PAEA_DELIVERED_BIN_SHA256": "ea85065311e4bcf5b68578430df9dc4dd1ddee03aad363f7e7f582a31291cd3c"
   },
   "steps": [
     {
@@ -54,7 +54,7 @@
         "delivered_chain_transfer_promote_replay_reconcile_once ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=1d3f9da1408a82b14b5ae5d76328b58c52f1f92051824af52f1d413be8dd41fd"
+        "sha256=ea85065311e4bcf5b68578430df9dc4dd1ddee03aad363f7e7f582a31291cd3c"
       ],
       "required_stderr": []
     },
@@ -111,7 +111,7 @@
         "paea-git-promote-trust-revision",
         "paea-settlement-trust-revision",
         "delivered-binary-witness path=",
-        "sha256=1d3f9da1408a82b14b5ae5d76328b58c52f1f92051824af52f1d413be8dd41fd"
+        "sha256=ea85065311e4bcf5b68578430df9dc4dd1ddee03aad363f7e7f582a31291cd3c"
       ],
       "required_stderr": []
     },

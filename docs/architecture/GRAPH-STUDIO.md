@@ -10,6 +10,13 @@ mission et à l’orientation ; elles ne modifient ni révision ni budget. Écha
 annule un déplacement en cours avant de fermer le plein écran. Ce dernier est
 un dialogue modal natif : focus contenu et retour au bouton à la fermeture.
 
+La recherche par identifiant ou titre ignore la casse et les accents. Elle met
+en évidence les correspondances sans masquer de carte ou de lien ; Entrée ou
+« Suivant » centre la correspondance suivante et place le focus sur sa carte.
+« Effacer la recherche » ou Échap dans la saisie efface les repères. Le zoom et
+les positions restent identiques ; la requête est locale, non enregistrée, et
+repart vide lors d’un nouveau rendu. Une absence de résultat est explicite.
+
 « Ajouter une tâche » et l’activation d’une carte ouvrent le formulaire de tâche.
 Titre, livrable, critères et prérequis sont enregistrés explicitement par
 `/api/v1/action` (`task-add` → `task.add`, `task` → `task.update`). Le moteur garde
@@ -21,7 +28,11 @@ La sélection des prérequis ajoute ou retire des liens pour une seule tâche.
 Les champs restent visibles après refus ; un résultat incertain interdit une
 nouvelle soumission jusqu’à fermeture et actualisation. Le succès exige une
 relecture protégée, puis attend que le cockpit ait rechargé ses observations
-avant de fermer le formulaire. Aucun agent ne
+avant de fermer le formulaire. Le bouton et une zone de statut annoncent
+« Enregistrement en cours… » jusqu’à la fin de cette relecture et de
+l’actualisation. Après un refus ou une issue incertaine, cet état d’attente
+disparaît et le diagnostic reste visible ; une issue incertaine garde le
+renvoi désactivé. Aucun agent ne
 démarre. Sur un plan géré, les refus du moteur restent applicables.
 
 La recette native est `tests/rust_graph_navigation.py --binary bin/swarm

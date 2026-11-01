@@ -12,8 +12,8 @@
   "rust/crates/swarm-engine/**/*",
   "tools/verification/recipe.py",
   "tools/verification/recipes/paea-owned-source-acquisition.json",
-  "docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01/result.json",
-  "docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/current71c-fixture01/result.json"
+  "docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-writer78b-regen/result.json",
+  "docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-current-pub-regen-20261031/result.json"
  ],
  "environment": {
   "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
@@ -21,9 +21,9 @@
   "CARGO_PROFILE_TEST_DEBUG": "0",
   "CARGO_INCREMENTAL": "0",
   "RUSTDOCFLAGS": "-D warnings",
-  "SWARM_PAEA_WRITER_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01",
-  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/writer78b-fixture01",
-  "SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261029-fixture-regen-mvfdts57/current71c-fixture01"
+  "SWARM_PAEA_WRITER_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-writer78b-regen-20261031b",
+  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-writer78b-regen-20261031b",
+  "SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-current-pub-regen-20261031"
  },
  "steps": [
   {

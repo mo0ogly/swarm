@@ -125,6 +125,7 @@ response and the interface states it. Do not read them as active protection.
 ./swarm --root ROOT --json trust blp-policy-preview --input policy.json
 ./swarm --root ROOT --json trust blp-policy-apply --input policy.json
 ./swarm --root ROOT --json trust blp-check --input diagnostic.json
+./swarm --root ROOT --json trust blp-object-attribute --input attribution.json
 ```
 
 - `blp-show` (read): persisted state, revisioned history and capability.
@@ -139,7 +140,105 @@ response and the interface states it. Do not read them as active protection.
   (`authority_current:false` signals it).
 - `blp-check` (read): diagnostic on **supplied** labels — never a real object
   attribution. Returns the join/refusal and computed output classification,
-  without content or third-party labels.
+  without content or third-party labels. `runtime_authorized:false` is NEVER a
+  read authorization.
+- `blp-object-attribute` (write): current attribution of a classification to
+  exact canonical bytes (`canonical_digest` sha256 of the `paea-json-v1` bytes,
+  absolute `project_path`, current policy and trust revisions required) by an
+  I3/admin operator whose clearance DOMINATES the attributed label
+  (`check_read`). Persisted in the revisioned history and RE-READ at every
+  consumption; a revision change refuses it (`blp-policy-changed`) until
+  re-attribution. It is not a declassification nor a read right: it records the
+  classification that authorized control binds to the bytes.
+
+**Reader frontier (PAEA preview/presentation)**: `GET
+/api/v1/paea/git-call/preview` and
+`GET /api/v1/paea/git-call/approval/presentation` serve a projection containing
+classified fields only to a reader authorized by the `paea_reader_verdict`
+guard: a valid-shape `Bearer` token, a current policy bound to the Trust
+revision, a current attribution of the exact bytes, a dominating clearance.
+A policy, attribution or clearance failure keeps the reply
+`200 {available:false, reason:paea-reader-*}` with no classified byte —
+payload, identifier, digest, error, header, log — even for an enrolled
+top-of-catalog reader; an unknown token or a disabled identity instead produces
+the typed `authorization_required` refusal (non-success status, 403), also
+carrying no classified byte. A bare session stays `200 {available:false,
+reason:paea-reader-authentication-required}`: a bare session and enrollment are
+never an implicit authorization. `SourceRefJSON` labels and the browser cookie are not
+authoritative. A bound-source absence is still answered before the guard (no
+classified field exists then). The positive reply carries
+`runtime_enforced:false`: prompt-side byte provenance remains the other
+actor's open work. The public approval form (`web/paea-approval-form.js`)
+connects to this frontier without bypassing it: an ephemeral "Reader token"
+input is read at call time, carried as `Authorization: Bearer` on the guarded
+read only, then cleared on EVERY exit of the load — success, HTTP or network
+error, unbound capability, refused presentation, malformed reply (no storage,
+URL or log); `paea-reader-*` refusals stay visible with their exact code and
+the "Re-read the presentation" button re-reads the same endpoint after the
+credential is corrected; the input carries NO frontend maximum-length cutoff
+(the producer-side `credential_valid` shape check enforces a 16-byte minimum,
+forbidden whitespace and reserved prefixes, with no maximum — an arbitrary cap
+would reject valid tokens; too-short shapes are refused server-side with the
+exact typed verdict, never pre-cut); the approval POST stays enrollment-only
+(distinct password, never reinterpreted as clearance).
+
+**Minimal startup observations (cookie-only status routes)**: `GET
+/api/v1/paea/git-call` and `GET /api/v1/paea/git-call/approval` serve ONLY the
+`bound` boolean and literal protocol constants (`schema_version`, `event`)
+behind the ordinary session; the `capability` field stays `Null` whenever the
+source is bound. NO value derived from the prepared request passes — not the
+digests, and not the selected `call`/`service`/`operation` either: a closed
+vocabulary does not make the value selected by a classified action constant,
+and creates no declassification right (BLP-RET-05). HEAD serves an empty body.
+The exact metadata stays readable only through the guarded routes (preview and
+presentation) under the current reader verdict. The consuming pages
+(`web/paea-effects.js`, `web/paea-consent.js`, `web/paea-approval-form.js`)
+render this explicit state (never a blank line nor an unknown-shaped value)
+and treat a non-null `capability` as an out-of-contract report that visibly
+stops the load (`paea-status-out-of-contract` on the form). The consent page
+(`web/paea-consent.html`, `web/paea-consent.js`) connects its classified read
+to the same frontier without bypassing it: the exact digest and bound operation
+pass only through the guarded presentation read and the preview, with the same
+ephemeral reader token read at call time, carried as `Authorization: Bearer` on
+those reads only and erased on EVERY exit of the load (no storage, URL or log);
+a `paea-reader-*` refusal keeps its exact code visible, the "Relire la
+présentation" control re-reads the same endpoints after correcting the
+credential, and the consent form stays reachable (enrollment authority is never
+reinterpreted as read clearance — the out-of-band digest comparison remains the
+operator's decision). Every preview exit also renders a typed terminal state on
+the approval status: an unavailable or refused preview is never left "in
+flight", and the success wording is only set when the exact frozen-command
+metadata is actually displayed. A guarded read that THROWS (HTTP 403,
+transport, unreadable JSON) renders the same typed refusal pair as the
+`available:false` verdict: a `paea-reader-*` refusal stays an `empty` state
+carrying the exact code, any other error raises a visible `error` state —
+and every load first purges ALL previous exact projections (presentation and
+preview lists, the POST result containers) so no value from an earlier
+success survives under a refusal or "no data displayed" wording (defect
+reproduced then fixed on 2026-11-01: an HTTP 403 re-read after an authorized
+read left both previous digests in the DOM; maintained counterexample
+`tests/paea-consent-projection-erasure.cjs`, 11 checks on the real page in
+real Chrome, red then green runs retained in the evidence dossier). The
+`paea-consent-ui-rust` real-browser qualification now resolves the exact test
+binary from the Cargo artifact stream (`cargo test --no-run
+--message-format=json`, linked tool `bind_cargo_test_binary.py` +
+counter-proofs `test_bind_cargo_test_binary.py`) — no more `rm` purge, no
+glob, no global watchdog in the driver, whose two raw channels are streamed
+and awaited to their real exits. Driver failure/flush contract (maintained
+counterexamples `tests/paea_consent_driver_control.py`, 16 checks over 8
+variants, red measured on the 2026-11-01 declared-inputs snapshot then green):
+every streamer of BOTH children is tracked and joined after their real exits;
+a Rust failure while the harness runs fails immediately without waiting on a
+live child; the INVERSE fault is covered symmetrically (2026-11-01): a harness
+failure while Rust still waits on the phase marker kills live Rust BEFORE any
+wait (the harness primary cause is decided before the kill, so a -9 never
+masks it), meaning no wait() ever targets a live child on a failure path in
+EITHER direction; cleanup
+kills only the two owned Popen children; the verdict requires each channel's
+EOF marker (partial flush refused) and refuses any PASS without the complete
+raw channel. The counter-proof
+`status_does_not_discriminate_two_prepared_intentions` shows that two distinct
+prepared intentions produce byte-identical replies on these routes.
 
 Each clearance names an existing, non-disabled identity subject; unknown
 subjects refuse. The catalog cannot remove or reorder existing levels: that

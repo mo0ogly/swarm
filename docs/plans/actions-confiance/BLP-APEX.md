@@ -91,7 +91,7 @@ label désérialisé ou champ de provenance ne constitue une autorité.
 | BLP-01 | Inventaire sources, consommateurs, sorties et frontières, modèle de menace | — | EN COURS |
 | BLP-02 | Moniteur de dominance/combinaison, domaines fixes, erreurs sûres, indépendance Biba | 01 | VÉRIFIÉ (contrats purs ; 10/10 tests du 31/10/2026, voir « Reprise ») |
 | BLP-03 | Configuration persistée révisionnée, migration explicite, Admin/API/CLI | 02 | VÉRIFIÉ partiellement (historique, opérations, tests 5/5 du 31/10/2026 ; migration des objets existants non faite) |
-| BLP-04 | Attribution par producteurs, contexte/mémoire/sorties et replays | 03 | À FAIRE |
+| BLP-04 | Attribution par producteurs, contexte/mémoire/sorties et replays | 03 | PARTIEL — provenance du prompt privé v3 ; classification, principal et héritage ouverts |
 | BLP-05 | Médiation réelle fichiers/réseau/fournisseurs/descendants, refus sans repli | 04 | À FAIRE |
 | BLP-06 | Identité humaine établie, validation des octets/destinataires, nouvelle copie | 03–05 | À FAIRE |
 | BLP-07 | Recettes, revue du candidat, livraison locale, ressources servies et RETEX | 01–06 | EN COURS (recette permanente PASS ; installé v0.1.1-dev.282 ; HTTP+UI qualifiés ; RETEX restant) |
@@ -290,3 +290,10 @@ Résolution : le build suivant **v0.1.1-dev.284** (session tierce, commit
 `effective-sources.tar.gz` du build (`.cache/local-delivery/rust-e4t0j_65/`),
 une entrée BLP réelle. Sonde requalifiée sur l'image active 284 :
 `blp-show` sans jeton I3 → 403 `authorization_required` identique.
+
+## Reprise suivante — provenance du prompt
+
+BLP-04 commence par la provenance des octets réellement assemblés, sans étiquette
+ni autorisation d’envoi. Voir le [suivi et ses limites](BLP-PROVENANCE-20261031.md).
+Le lot reste ouvert ; la migration, le principal authentifié, le contrôle de
+destination et l’héritage restent à raccorder.

@@ -4,16 +4,24 @@
 // with the --ignored Rust test approval_form_serves_real_browser_session:
 // that test runs the real mandate/request producers, freezes the approve
 // command, binds it to a real native HTTP server with its ordinary persisted
-// session, publishes server.json, then waits for owned marker files
+// session, produces the REAL BLP reader authorization for the exact prepared
+// action (blp-policy-apply + blp-object-attribute), publishes server.json
+// (including the fixture reader_token), then waits for owned marker files
 // (nonce-bound). This harness drives the real served page in a real Chrome:
-// phase 1 performs the EXPLICIT confirmation + enrollment consumption through
-// the form (labeled fixture password — auth simulated, acknowledged), asserts
-// the real approved ack is shown (never a denied-as-success) and the password
-// field is erased; phase 2 runs a real public Trust config-apply through the
-// engine (inside the test) and re-observes the explicit stale refusal with no
-// confirmation solicited. The command is NEVER transported: consumption POSTs
-// an empty body and the server holds the frozen command (bound approval);
-// no mock HTTP/DOM, no Git effect, no second approval system, no acceptance;
+// the guarded presentation first refuses the bare session with its exact
+// paea-reader code (no projection), then the harness TYPES the reader token
+// into the page's ephemeral reader input and re-reads through the form's own
+// re-read control — no header injection, no storage: the page carries the
+// credential as a request-time Bearer and clears the input right after.
+// Phase 1 then performs the EXPLICIT confirmation + enrollment consumption
+// through the form (labeled fixture password — auth simulated, acknowledged),
+// asserts the real approved ack is shown (never a denied-as-success) and the
+// password field is erased; phase 2 runs a real public Trust config-apply
+// through the engine plus the real policy renewal/re-attribution (inside the
+// test) and re-observes the explicit stale refusal with no confirmation
+// solicited. The command is NEVER transported: consumption POSTs an empty
+// body and the server holds the frozen command (bound approval); no mock
+// HTTP/DOM, no Git effect, no second approval system, no acceptance;
 // screenshots and console/request assertions stay in the owned evidence dir.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const pup=require(path.join(process.cwd(),'node_modules','puppeteer'));
@@ -28,6 +36,19 @@ const secret=fs.readFileSync(path.join(root,'.swarm',server.session_file),'utf8'
 // human enrollment stays a declared open precondition of live operation.
 const PASSWORD='STARTUP_FIXTURE_PASSWORD';
 const checks=[],errors=[];let expected=0;
+// Exact refusal classification (correction of the earlier blanket filters):
+// the response listener classifies by EXACT URL+status — the fixture service
+// configures no settlement ledger root, so the guarded reconcile read refuses
+// with the typed settings-paea-ledger-root-not-configured cause which maps to
+// HTTP 500 for the reconcile operation (service.rs maps it to 501 only for
+// the settings-ledger-root operation). Any other status on that URL (404, 403,
+// …) stays unexpected, and any 500 on any other URL stays unexpected too.
+// The browser console error of a failed fetch carries NO URL (Chrome omits
+// it), so the console listener cannot classify by URL: it consumes exactly
+// one allowance per already-classified expected response with the same
+// status, and any console error without a matching pending allowance stays
+// unexpected. No blanket ignore of any status class remains.
+const pendingConsole=[];
 // Armed just before the deliberate post-stale refusal probe and never reset:
 // both the response and its browser-console duplicate must then classify as
 // the expected denial instead of unexpected diagnostics. Any other status on
@@ -39,18 +60,19 @@ let browser;
  const page=await browser.newPage();
  page.setDefaultTimeout(20000);
  page.on('pageerror',e=>errors.push(e.message));
- page.on('console',m=>{if(m.type()==='error'&&!m.text().includes('status of 500')&&!(staleRefusalArmed&&m.text().includes('status of 403')))errors.push(m.text())});
+ page.on('console',m=>{
+  if(m.type()!=='error')return;
+  const match=m.text().match(/status of (\d{3})/);
+  if(match){const i=pendingConsole.indexOf(match[1]);if(i>=0){pendingConsole.splice(i,1);return}}
+  errors.push(m.text());
+ });
  page.on('response',r=>{
   if(r.status()<400)return;
-  // The guarded reconcile read legitimately refuses on this fixture service
-  // (no usable settlement ledger root) and the page renders that refusal
-  // visibly; same expected-denial classification as the bound preview
-  // harness (tests/paea_preview_bound_ui.cjs). The armed post-stale approval
-  // POST refusal is the other classified denial; a browser console duplicate
-  // of either carries no URL, so the console listener above classifies it by
-  // the same armed flag and it never counts as unexpected diagnostics.
-  if(r.url().endsWith('/api/v1/paea/reconcile-effects')){expected+=1;return}
-  if(staleRefusalArmed&&r.status()===403&&r.url().endsWith('/api/v1/paea/git-call/approval')){expected+=1;return}
+  if(r.url().endsWith('/api/v1/paea/reconcile-effects')){
+   if(r.status()===500){expected+=1;pendingConsole.push('500');return}
+   errors.push(r.status()+' '+r.url());return;
+  }
+  if(staleRefusalArmed&&r.status()===403&&r.url().endsWith('/api/v1/paea/git-call/approval')){expected+=1;pendingConsole.push('403');return}
   errors.push(r.status()+' '+r.url());
  });
  // Real session: the ordinary persisted credential, set as the ordinary cookie.
@@ -68,11 +90,30 @@ let browser;
  function write(name,value){const tmp=path.join(control,'.'+name+'.tmp');fs.writeFileSync(tmp,JSON.stringify(Object.assign({nonce},value)));fs.renameSync(tmp,path.join(control,name))}
  function body(id){return page.$eval(id,e=>({text:e.textContent,rows:[...e.querySelectorAll('dt,dd')].map(x=>x.textContent)}))}
  // ---------- Phase 1: fresh frozen approval, explicit consumption ----------
+ // Reader frontier first: the bare persisted session alone refuses the guarded
+ // presentation with the exact typed code (HTTP 200 available:false) BEFORE
+ // any projection — this IS the real product refusal the correction connects.
  await open('fr','etat',1280);
  await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
+ const bareStatus=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
+ assert.equal(bareStatus.state,'empty','bare session must stay the explicit empty/refused state, never a success');
+ assert.ok(bareStatus.text.includes('paea-reader-authentication-required'),'bare-session refusal must name the exact reader code, got: '+bareStatus.text);
+ assert.equal(await page.$eval('#approval-send',e=>e.disabled),true,'refused presentation must keep send disabled');
+ assert.equal(await page.$eval('#approval-detail',e=>e.hidden),true,'refused presentation must show no projection');
+ // The real reader connection: type the fixture reader credential into the
+ // page's EPHEMERAL input and drive the form's own re-read control — the page
+ // then carries the Bearer itself (no setExtraHTTPHeaders, no page-side
+ // storage) and clears the input right after the guarded read.
+ await page.type('#approval-reader-credential',server.reader_token);
+ await page.click('#approval-reload');
+ await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
  const freshStatus=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
- assert.equal(freshStatus.state,'success','fresh approval presentation must be the explicit success state');
+ assert.equal(freshStatus.state,'success','reader-authorized presentation must be the explicit success state');
  assert.ok(freshStatus.text.includes('Approbation présentée'),'FR fresh message must name the presented approval, got: '+freshStatus.text);
+ // Reader credential erased by the page right after the guarded read: never
+ // in the input, the page source or any storage.
+ assert.equal(await page.$eval('#approval-reader-credential',e=>e.value),'','reader input must be cleared after the guarded read');
+ assert.ok(!JSON.stringify(await page.evaluate(()=>({html:document.documentElement.innerHTML,ls:localStorage.getItem('swarm-approval-password'),ss:sessionStorage.getItem('swarm-approval-password')}))).includes(server.reader_token),'reader credential must not persist anywhere in the page');
  // The send button starts disabled: no confirmation gesture yet.
  assert.equal(await page.$eval('#approval-send',e=>e.disabled),true,'send must start disabled without explicit confirmation');
  // Authorized projection, verbatim from the served payload: the engine-derived
@@ -109,19 +150,37 @@ let browser;
  assert.equal(await page.$eval('#approval-send',e=>e.disabled),true,'send must disable again after consumption');
  assert(!await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),'1280px no overflow');
  await (await page.$('#approval-detail')).screenshot({path:path.join(out,'approval-fresh-fr.png')});
- // EN + dark theme, 390px, on the same consumed state (reload refetches).
+ // EN + dark theme, 390px, on the same consumed state (reload refetches). The
+ // reload starts from the bare session again (the reader input is always
+ // empty after the page's guarded read), so the EN observation replays the
+ // same real reader connection: refusal of the bare session, then the typed
+ // credential through the form's re-read control.
  await open('en','sombre',390);
+ await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
+ const bareEn=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
+ assert.equal(bareEn.state,'empty','EN bare session must refuse identically');
+ assert.ok(bareEn.text.includes('Read refused'),'EN bare-session refusal must be translated, got: '+bareEn.text);
+ await page.type('#approval-reader-credential',server.reader_token);
+ await page.click('#approval-reload');
  await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
  const freshEn=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
  assert.equal(freshEn.state,'success');
  assert.ok(/Approval presented/i.test(freshEn.text),'EN fresh message, got: '+freshEn.text);
  assert.ok((await body('#approval-declared')).text.includes(server.resource),'EN declared projection presents the same exact resource');
+ assert.equal(await page.$eval('#approval-reader-credential',e=>e.value),'','EN reader input must be cleared after the guarded read');
  assert(!await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),'390px no overflow');
  await (await page.$('#approval-detail')).screenshot({path:path.join(out,'approval-fresh-en.png')});
- checks.push('fresh bound approval: authorized projection (operation+terms) presented FR/EN without private command fields, explicit consumption through the form, real approved ack shown, password erased, both themes, no overflow');
+ checks.push('reader frontier connected: bare session refuses with the exact paea-reader code FR/EN (no projection), typed ephemeral credential through the form re-read control authorizes the real projection, credential cleared after every read');
  // Direct API cross-check through the page context: the presented values come
  // from the real endpoint payload (same values asserted twice, two surfaces).
- const api=await page.evaluate(async()=>{const r=await fetch('/api/v1/paea/git-call/approval/presentation',{cache:'no-store',credentials:'same-origin'});return {status:r.status,body:await r.json()}});
+ // The guarded read carries the SAME reader credential the page used, typed
+ // here as the request-time Bearer of this one cross-check — a bare session
+ // fetch must refuse, which is asserted first through the same context.
+ const bareApi=await page.evaluate(async()=>{const r=await fetch('/api/v1/paea/git-call/approval/presentation',{cache:'no-store',credentials:'same-origin'});return {status:r.status,body:await r.json()}});
+ assert.equal(bareApi.status,200);
+ assert.equal(bareApi.body.available,false,'bare-session direct API must refuse the guarded presentation');
+ assert.equal(bareApi.body.reason,'paea-reader-authentication-required');
+ const api=await page.evaluate(async token=>{const r=await fetch('/api/v1/paea/git-call/approval/presentation',{cache:'no-store',credentials:'same-origin',headers:{Authorization:'Bearer '+token}});return {status:r.status,body:await r.json()}},server.reader_token);
  assert.equal(api.status,200);assert.equal(api.body.available,true);
  assert.equal(api.body.request_digest,server.request_digest);
  assert.equal(api.body.operation,'approve');
@@ -168,6 +227,12 @@ let browser;
  assert.equal(phase2.nonce,nonce);
  await open('fr','etat',1280);
  await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
+ const bareStaleFr=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
+ assert.equal(bareStaleFr.state,'empty','stale bare session must still refuse first, never project');
+ assert.ok(bareStaleFr.text.includes('paea-reader-authentication-required'),'stale bare-session refusal must keep the exact reader code, got: '+bareStaleFr.text);
+ await page.type('#approval-reader-credential',server.reader_token);
+ await page.click('#approval-reload');
+ await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
  const staleStatus=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
  assert.equal(staleStatus.state,'error','stale approval must stay a visible error, never a success');
  assert.ok(staleStatus.text.includes('périmée'),'FR stale message must name the stale state, got: '+staleStatus.text);
@@ -179,11 +244,14 @@ let browser;
  await (await page.$('#approval-detail')).screenshot({path:path.join(out,'approval-stale-fr.png')});
  await open('en','sombre',390);
  await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
+ await page.type('#approval-reader-credential',server.reader_token);
+ await page.click('#approval-reload');
+ await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
  const staleEn=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
  assert.equal(staleEn.state,'error');
  assert.ok(/Stale approval/i.test(staleEn.text),'EN stale message, got: '+staleEn.text);
  await (await page.$('#approval-detail')).screenshot({path:path.join(out,'approval-stale-en.png')});
- checks.push('stale: real Trust revision change → visible error FR/EN, no confirmation solicited, no normalization');
+ checks.push('stale: real Trust revision change (policy renewed through real producers) → visible error FR/EN behind the reader frontier, no confirmation solicited, no normalization');
  // Post-stale refusal cross-check: the same channel now refuses (the held
  // enrolled authority is bound to the consumed Trust revision — engine
  // contract proven by the server-route test). A browser console duplicate of

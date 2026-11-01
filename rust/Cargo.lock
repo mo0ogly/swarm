@@ -1444,13 +1444,18 @@ dependencies = [
 name = "swarm-authority"
 version = "0.1.0"
 dependencies = [
+ "ed25519-dalek",
+ "getrandom 0.4.3",
  "rustix",
  "serde",
  "serde_json",
  "sha2 0.10.9",
+ "swarm-enrollment-authority",
  "swarm-enrollment-bootstrap",
  "swarm-enrollment-config",
+ "swarm-enrollment-state",
  "swarm-identity-contract",
+ "tempfile",
 ]
 
 [[package]]

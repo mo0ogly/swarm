@@ -27,16 +27,47 @@
   "steps": [
     {
       "id": "native-graph-navigation-unchanged-work",
-      "command": ["python3", "-c", "import os,subprocess,tempfile; from pathlib import Path; p=Path(tempfile.mkdtemp(prefix='graph-navigation-',dir='.cache')).resolve()/'journey'; subprocess.run(['python3','tests/rust_graph_navigation.py','--binary',os.environ['SWARM_GRAPH_BINARY'],'--output',str(p)],check=True); print('GRAPH_NAVIGATION_EVIDENCE '+str(p))"],
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile; from pathlib import Path; p=Path(tempfile.mkdtemp(prefix='graph-navigation-',dir='.cache')).resolve()/'journey'; subprocess.run(['python3','tests/rust_graph_navigation.py','--binary',os.environ['SWARM_GRAPH_BINARY'],'--output',str(p)],check=True); print('GRAPH_NAVIGATION_EVIDENCE '+str(p))"
+      ],
       "expected_exit": 0,
-      "required_stdout": ["GRAPH_NAVIGATION_VERIFIED", "PASS fr-etat-background-panning", "PASS en-sombre-pointer-cancel-restores-card", "PASS en-sombre-modal-keyboard-contained", "PASS browser-no-unexpected-errors"],
+      "required_stdout": [
+        "GRAPH_NAVIGATION_VERIFIED",
+        "PASS fr-etat-background-panning",
+        "PASS en-sombre-pointer-cancel-restores-card",
+        "PASS en-sombre-modal-keyboard-contained",
+        "PASS browser-no-unexpected-errors",
+        "PASS en-sombre-search-title-accent",
+        "PASS en-sombre-search-centers-visible-card",
+        "PASS en-sombre-search-preserves-layout",
+        "PASS en-sombre-search-in-fullscreen"
+      ],
       "required_stderr": []
     },
     {
       "id": "native-graph-create-links-refuse-cycle-and-recover",
-      "command": ["python3", "-c", "import os,subprocess,tempfile; from pathlib import Path; p=Path(tempfile.mkdtemp(prefix='graph-editing-',dir='.cache')).resolve()/'journey'; subprocess.run(['python3','tests/rust_graph_navigation.py','--binary',os.environ['SWARM_GRAPH_BINARY'],'--output',str(p),'--editing'],check=True); print('GRAPH_EDITING_EVIDENCE '+str(p))"],
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile; from pathlib import Path; p=Path(tempfile.mkdtemp(prefix='graph-editing-',dir='.cache')).resolve()/'journey'; subprocess.run(['python3','tests/rust_graph_navigation.py','--binary',os.environ['SWARM_GRAPH_BINARY'],'--output',str(p),'--editing'],check=True); print('GRAPH_EDITING_EVIDENCE '+str(p))"
+      ],
       "expected_exit": 0,
-      "required_stdout": ["GRAPH_NAVIGATION_VERIFIED", "PASS fr-etat-task-create-acknowledged", "PASS en-sombre-keyboard-link-confirmed", "PASS en-sombre-cycle-refusal-preserves-work", "PASS en-sombre-creation-and-link-removal-persist", "PASS browser-no-unexpected-errors"],
+      "required_stdout": [
+        "GRAPH_NAVIGATION_VERIFIED",
+        "PASS fr-etat-task-create-acknowledged",
+        "PASS en-sombre-keyboard-link-confirmed",
+        "PASS en-sombre-cycle-refusal-preserves-work",
+        "PASS en-sombre-creation-and-link-removal-persist",
+        "PASS browser-no-unexpected-errors",
+        "PASS en-sombre-saving-feedback-Ack",
+        "PASS en-sombre-saving-feedback-Readback",
+        "PASS en-sombre-saving-feedback-Refresh",
+        "PASS en-sombre-saving-single-post-Refresh",
+        "PASS en-sombre-saving-feedback-cleared-after-refusal",
+        "PASS lost-acknowledgement-is-not-still-saving"
+      ],
       "required_stderr": []
     }
   ]

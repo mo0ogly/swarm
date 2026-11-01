@@ -23,6 +23,7 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--workspace-preview', action='store_true', help='Explicit workspace JS/CSS overlay for iteration; never embedded-build evidence')
     parser.add_argument('--editing', action='store_true', help='Additionally exercise task creation and dependency save/refusal in the actual engine')
+    parser.add_argument('--skip-search-check', action='store_true', help='Diagnostic before-image only: exercise busy feedback before search exists')
     args = parser.parse_args()
     binary, out = args.binary.resolve(), args.output.resolve()
     out.mkdir(mode=0o700, parents=True, exist_ok=False)
@@ -42,7 +43,7 @@ def main():
         title='Graph navigation', objective='Restore the graph workbench', scope='Private fixture', criteria=['Verified interactions']))
     for index, task in enumerate(['a', 'b', 'c']):
         work = mutate(['task', 'add', work['id']], dict(schema_version=1, event_id='add-'+task,
-            expected_revision=work['revision'], id=task, title='Task '+task,
+            expected_revision=work['revision'], id=task, title={'a':'Task a · Alpha','b':'Review','c':'Tâche Café · Alpha'}[task],
             deliverable='docs/'+task+'.md', criteria=['Verified'], depends=['a'] if index else []))
     empty = mutate(['work', 'create'], dict(schema_version=1, event_id='empty-create', expected_revision=0,
         title='Empty graph', objective='Create the first task', scope='Private fixture', criteria=['First task is real']))
@@ -52,7 +53,7 @@ def main():
         server.capture_async(out / 'server.jsonl')
         assets = {route: hashlib.sha256(Path(source).read_bytes()).hexdigest() for route, source in {
             '/cockpit-native-graph.js': 'web/cockpit-native-graph.js', '/cockpit-native.js': 'web/cockpit-native.js', '/i18n-en.js':'web/i18n-en.js', '/graph.css': 'web/graph.css'}.items()}
-        cfg = dict(address=server.address, key=server.key, output=str(out / 'browser'), work=work['id'], empty_work=empty['id'], assets=assets, workspace_preview=args.workspace_preview, editing=args.editing)
+        cfg = dict(address=server.address, key=server.key, output=str(out / 'browser'), work=work['id'], empty_work=empty['id'], assets=assets, workspace_preview=args.workspace_preview, editing=args.editing, skip_search_check=args.skip_search_check)
         # Stream exact originals to fresh files so progress is inspectable during
         # an unbounded browser action; EOF/exit and cleanup remain authoritative.
         started=time.time()

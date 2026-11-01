@@ -24,6 +24,23 @@ function check(name,value){assert(value,name);checks.push(name);console.log('PAS
   check(label+'-translated-create',await page.$eval('#pilot-add-task',e=>e.textContent)===(lang==='en'?'Add task':'Ajouter une tâche'));
   check(label+'-translated-zoom',await page.$eval('#pilot-zoom-in',e=>e.textContent)===(lang==='en'?'Zoom in':'Agrandir le zoom'));
   check(label+'-minimap-reflects-nodes',await page.$$eval('.graph-minimap-node',nodes=>nodes.length)===expectedTasks);
+  if(!cfg.skip_search_check){
+   check(label+'-search-control',!!await page.$('#pilot-search'));
+   const geometry=await page.$$eval('.graph-unit',nodes=>nodes.map(n=>[n.dataset.task,n.getAttribute('transform')]));
+   await page.type('#pilot-search','REVIEW');await page.keyboard.press('Enter');
+   check(label+'-search-title-case-and-focus',await page.$eval('.graph-task-open[data-task="b"]',e=>e===document.activeElement));
+   await page.click('#pilot-search-clear');await page.type('#pilot-search','b');await page.keyboard.press('Enter');check(label+'-search-literal-id',await page.$eval('.graph-task-open[data-task="b"]',e=>e===document.activeElement));
+   await page.click('#pilot-search-clear');await page.type('#pilot-search','cafe');await page.click('#pilot-search-next');
+   check(label+'-search-title-accent',await page.$eval('.graph-task-open[data-task="c"]',e=>e===document.activeElement));
+   await page.click('#pilot-search-clear');await page.type('#pilot-search','ALPHA');await page.keyboard.press('Enter');check(label+'-search-first-of-multiple',await page.$eval('.graph-task-open[data-task="a"]',e=>e===document.activeElement));await page.click('#pilot-search-next');check(label+'-search-next-match',await page.$eval('.graph-task-open[data-task="c"]',e=>e===document.activeElement));await page.click('#pilot-search-next');check(label+'-search-wraps',await page.$eval('.graph-task-open[data-task="a"]',e=>e===document.activeElement));
+   await page.setViewport({width:390,height:844});await page.$eval('#pilot-canvas',e=>{e.scrollLeft=e.scrollWidth});await page.click('#pilot-search-clear');await page.type('#pilot-search','Review');await page.keyboard.press('Enter');
+   check(label+'-search-centers-visible-card',await page.$eval('.graph-task-open[data-task="b"]',e=>{const card=e.getBoundingClientRect(),view=document.querySelector('#pilot-canvas').getBoundingClientRect();return card.left>=view.left&&card.right<=view.right&&card.top>=view.top&&card.bottom<=view.bottom}));
+   await page.setViewport({width:1440,height:1000});
+   await page.click('#pilot-search-clear');await page.type('#pilot-search','[no-match]');
+   check(label+'-search-no-match',await page.$eval('#pilot-search-next',e=>e.disabled)&&await page.$eval('#pilot-search-status',e=>e.textContent)===(lang==='en'?'No matching task.':'Aucune tâche correspondante.'));
+   await page.focus('#pilot-search');await page.keyboard.press('Escape');check(label+'-search-escape-clears',await page.$eval('#pilot-search',e=>e.value)===''&&(await page.$$('.graph-search-match')).length===0);
+   check(label+'-search-preserves-layout',JSON.stringify(await page.$$eval('.graph-unit',nodes=>nodes.map(n=>[n.dataset.task,n.getAttribute('transform')])))===JSON.stringify(geometry));
+  }
   for(const [route,expected]of Object.entries(cfg.assets)){
    const actual=await page.evaluate(async route=>{const r=await fetch(route);if(!r.ok)throw Error('protected-asset-refused');return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await r.arrayBuffer())),v=>v.toString(16).padStart(2,'0')).join('')},route);
    check(label+'-embedded-'+route,actual===expected);
@@ -31,6 +48,7 @@ function check(name,value){assert(value,name);checks.push(name);console.log('PAS
   const width=()=>page.$eval('#pilot-canvas .graph-svg',e=>Number(e.getAttribute('width')));
   const initial=await width();await page.click('#pilot-zoom-in');check(label+'-zoom-in',await width()>initial);await page.click('#pilot-zoom-out');check(label+'-zoom-out',Math.abs(await width()-initial)<1);
   await page.click('#pilot-fullscreen');check(label+'-fullscreen',await page.$eval('#graph-studio',e=>e.classList.contains('is-fullscreen')));
+  if(!cfg.skip_search_check){await page.type('#pilot-search','Review');await page.keyboard.press('Enter');check(label+'-search-in-fullscreen',await page.$eval('.graph-task-open[data-task="b"]',e=>e===document.activeElement));await page.click('#pilot-search-clear')}
   await page.focus('#pilot-orientation');await page.keyboard.press('Tab');check(label+'-modal-keyboard-contained',await page.$eval('#graph-studio',e=>e.contains(document.activeElement)));
   await page.$eval('.graph-drag[data-task="a"]',e=>e.focus());await page.keyboard.press('ArrowDown');
   const position=await page.$eval('.graph-unit[data-task="a"]',e=>e.getAttribute('transform'));
@@ -56,8 +74,18 @@ function check(name,value){assert(value,name);checks.push(name);console.log('PAS
    await page.click('#pilot-add-task');await page.waitForSelector('.native-graph-editor[open]');
    for(const [name,value]of Object.entries({id:task,title:'Created '+label,deliverable:'docs/'+task+'.md',criteria:'Visible proof'}))await page.type('#native-graph-'+name,value);
    await page.select('#native-graph-depends','a');
+   // Real server responses are held only in the browser fixture. Each release
+   // observes a distinct pending phase without a sleep, timeout or extra write.
+   await page.evaluate(()=>{const original=window.fetch;window.graphBusyFetch=original;const held=new Set();window.graphBusyPosts=0;window.fetch=async(...args)=>{const route=new URL(args[0],location.href).pathname;if(route==='/api/v1/action')window.graphBusyPosts++;const r=await original(...args);const phase=route==='/api/v1/action'?'Ack':route==='/api/v1/planning'?'Readback':route==='/api/v1/cockpit-read'?'Refresh':null;if(phase&&!held.has(phase)){held.add(phase);await new Promise(resolve=>{window['releaseGraph'+phase]=resolve})}return r}});
    const added=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v1/action');await page.click('#native-graph-save');const reply=await added;check(label+'-task-create-acknowledged',reply.ok());
+   for(const phase of ['Ack','Readback','Refresh']){
+    await page.waitForFunction(phase=>typeof window['releaseGraph'+phase]==='function',{},phase);
+    check(label+'-saving-feedback-'+phase,await page.$eval('#native-graph-save',e=>e.disabled&&e.getAttribute('aria-busy')==='true'&&e.textContent===(document.documentElement.lang==='en'?'Saving…':'Enregistrement en cours…'))&&await page.$eval('#native-graph-progress',e=>e.textContent===(document.documentElement.lang==='en'?'Saving…':'Enregistrement en cours…')));
+    await page.$eval('.native-graph-editor form',e=>e.dispatchEvent(new Event('submit',{cancelable:true,bubbles:true})));check(label+'-saving-single-post-'+phase,await page.evaluate(()=>window.graphBusyPosts===1));
+    await page.evaluate(phase=>window['releaseGraph'+phase](),phase);
+   }
    await page.waitForFunction(task=>!document.querySelector('.native-graph-editor')&&[...document.querySelectorAll('.graph-noeud')].some(n=>n.dataset.task===task),{},task);expectedTasks++;
+   await page.evaluate(()=>{window.fetch=window.graphBusyFetch;delete window.graphBusyFetch;for(const phase of ['Ack','Readback','Refresh'])delete window['releaseGraph'+phase]});
    check(label+'-created-task-linked',await page.$$eval('.graph-arete',(edges,task)=>edges.some(e=>e.dataset.from==='a'&&e.dataset.to===task),task));
    const proposedBefore=await page.evaluate(async work=>(await fetch('/api/v1/planning?'+new URLSearchParams({work}))).json(),cfg.work);
    await page.$eval('.graph-port[data-task="c"][data-side="out"]',e=>e.focus());await page.keyboard.press('Enter');
@@ -72,6 +100,7 @@ function check(name,value){assert(value,name);checks.push(name);console.log('PAS
    const before=await page.evaluate(async work=>(await fetch('/api/v1/planning?'+new URLSearchParams({work}))).json(),cfg.work);
    await page.$eval('.graph-task-open[data-task="a"]',e=>e.focus());await page.keyboard.press('Enter');await page.select('#native-graph-depends',task);
    const rejected=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v1/action');await page.click('#native-graph-save');const denied=await rejected;check(label+'-cycle-refused',!denied.ok());expectedHttpRefusals.push({url:denied.url(),status:denied.status()});await page.waitForSelector('.native-graph-editor .notice.alert:not([hidden])');
+   check(label+'-saving-feedback-cleared-after-refusal',await page.$eval('#native-graph-save',e=>!e.disabled&&e.getAttribute('aria-busy')==='false'&&e.textContent===(document.documentElement.lang==='en'?'Save':'Enregistrer'))&&await page.$eval('#native-graph-progress',e=>e.textContent===''));
    const after=await page.evaluate(async work=>(await fetch('/api/v1/planning?'+new URLSearchParams({work}))).json(),cfg.work);check(label+'-cycle-refusal-preserves-work',JSON.stringify(after)===JSON.stringify(before));
    await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('.native-graph-editor'));
    await page.$eval('.graph-task-open[data-task="'+task+'"]',e=>e.focus());await page.keyboard.press('Enter');await page.select('#native-graph-depends');
@@ -85,6 +114,7 @@ function check(name,value){assert(value,name);checks.push(name);console.log('PAS
     await page.click('#pilot-add-task');for(const [name,value]of Object.entries({id:'uncertain',title:'Uncertain acknowledgement',deliverable:'docs/uncertain.md',criteria:'Retain recorded task'}))await page.type('#native-graph-'+name,value);
     await page.click('#native-graph-save');await page.waitForSelector('.native-graph-editor .notice.alert:not([hidden])');
     check('lost-acknowledgement-blocks-resubmit',await page.$eval('#native-graph-save',e=>e.disabled)&&await page.$eval('#native-graph-id',e=>e.value)==='uncertain');
+    check('lost-acknowledgement-is-not-still-saving',await page.$eval('#native-graph-save',e=>e.getAttribute('aria-busy')==='false')&&await page.$eval('#native-graph-progress',e=>e.textContent===''));
     await page.evaluate(()=>{window.fetch=window.graphFixtureFetch;delete window.graphFixtureFetch});await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('.native-graph-editor'));await page.click('#refresh');await page.waitForFunction(()=>!document.querySelector('#refresh').disabled&&!document.querySelector('#main-content').hasAttribute('aria-busy')&&[...document.querySelectorAll('.graph-noeud')].some(n=>n.dataset.task==='uncertain'));expectedTasks++;
     check('lost-acknowledgement-explicit-refresh-observes-single-task',await page.$$eval('.graph-noeud',nodes=>nodes.filter(n=>n.dataset.task==='uncertain').length)===1);
    }

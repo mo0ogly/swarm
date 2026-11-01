@@ -12,7 +12,7 @@
     "rust/Cargo.lock"
   ],
   "environment": {
-    "CARGO_TARGET_DIR": "/tmp/paea-i15-target",
+    "CARGO_TARGET_DIR": ".cache/paea-i15-target",
     "CARGO_NET_OFFLINE": "true"
   },
   "steps": [

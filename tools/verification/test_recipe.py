@@ -5,6 +5,7 @@ No provider, live root, retry or global timeout; subprocesses are finite fixture
 import importlib.util
 import json
 from pathlib import Path
+import shutil
 import sys
 import tempfile
 import sys as _fa_sys
@@ -12,6 +13,8 @@ from pathlib import Path as _fa_Path
 _fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
 from fixture_area import fixture_area
 import unittest
+
+_REAL_TESTS = Path(__file__).resolve().parents[2] / 'tests'
 
 spec = importlib.util.spec_from_file_location('recipe', Path(__file__).with_name('recipe.py'))
 recipe = importlib.util.module_from_spec(spec)
@@ -21,10 +24,22 @@ spec.loader.exec_module(recipe)
 class RecipeTests(unittest.TestCase):
     """Exercise successful witnesses before failure, tamper and recovery variants."""
     def setUp(self):
-        """Create a private source and explicit observable recipe, never a live DB."""
+        """Create a private source and explicit observable recipe, never a live DB.
+
+        The fake repository carries the real supported fixture_area module at
+        tests/fixture_area.py plus an explicit runtime_temporary_directory
+        setting, exactly like a real checkout: run_recipe loads the area
+        resolver from the recipe's own root (never the runner's) and the area
+        must exist inside the fake repo.
+        """
         self.temporary = tempfile.TemporaryDirectory(dir=fixture_area())
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
+        (self.root/'tests').mkdir()
+        shutil.copy2(_REAL_TESTS/'fixture_area.py', self.root/'tests'/'fixture_area.py')
+        (self.root/'.swarm').mkdir()
+        (self.root/'.swarm'/'engine-settings.json').write_text(json.dumps(
+            {'values': {'runtime_temporary_directory': str(self.root/'.swarm-fixtures')}}))
         (self.root/'source.txt').write_text('original\n')
         self.path = self.root/'recipe.json'
         self.value = dict(schema_version=1, id='fixture', inputs=['source.txt'], environment={}, steps=[self.step("print('named-test PASS')")])
@@ -158,6 +173,74 @@ class RecipeTests(unittest.TestCase):
                 self.assertEqual(result['steps'][0]['executable'],str(real))
                 self.assertEqual(result['steps'][0]['launcher_sha256'],recipe.digest(real.read_bytes()))
                 self.assertEqual(recipe.verify_evidence(output)['recorded_status'],'PASS')
+
+    def test_tmpdir_pin_falls_back_when_checkout_ancestors_are_group_writable(self):
+        """The pinned TMPDIR never sits under a group/other-writable ancestor.
+
+        Reproducer: a configured fixture area whose ancestor is 775 (the
+        shipped checkout layout is group-writable) must not host the run
+        TMPDIR, because private-directory contracts (swarm-enrollment-config
+        open_private_directory) refuse any group/other-writable ancestor even
+        when each tempdir itself is 0700. The runner must then pin TMPDIR to
+        the operator private fallback area (never /tmp) and the run still
+        passes there. Healthy control: a fully private configured area keeps
+        that placement.
+        """
+        # A healthy chain cannot be built under the real checkout (its own
+        # ancestors are 775); the operator private fallback area provides one.
+        fallback_root = Path.home()/'.local/state/swarm-recipe-fallback-fixtures'
+        fallback_root.mkdir(mode=0o700, parents=True, exist_ok=True)
+        private = Path(tempfile.mkdtemp(prefix='recipe-ancestor-private-', dir=fallback_root))
+        self.addCleanup(self._prune, private)
+        (private/'runner-tmp').mkdir(mode=0o700)
+        self.assertTrue(recipe._ancestor_modes_private(private/'runner-tmp'),
+                        'healthy control: an all-0700 chain is private')
+        writable = Path(tempfile.mkdtemp(prefix='recipe-ancestor-775-', dir=fixture_area()))
+        self.addCleanup(self._prune, writable)
+        writable.chmod(0o775)
+        (writable/'runner-tmp').mkdir(mode=0o700)
+        self.assertFalse(recipe._ancestor_modes_private(writable/'runner-tmp'),
+                        'a 775 ancestor is not private')
+        # Runner behavior: a fake repo whose configured area has the 775
+        # ancestor gets TMPDIR pinned under the private fallback area.
+        repo = Path(tempfile.mkdtemp(prefix='recipe-fallback-repo-', dir=fixture_area()))
+        self.addCleanup(self._prune, repo)
+        (repo/'tests').mkdir()
+        shutil.copy2(_REAL_TESTS/'fixture_area.py', repo/'tests'/'fixture_area.py')
+        (repo/'.swarm').mkdir(mode=0o700)
+        (repo/'.swarm'/'engine-settings.json').write_text(json.dumps(
+            {'values': {'runtime_temporary_directory': str(repo/'configuration'/'area')}}))
+        (repo/'configuration').mkdir(mode=0o775)
+        (repo/'source.txt').write_text('original\n')
+        self.path = repo/'recipe.json'
+        self.value = dict(schema_version=1, id='fixture', inputs=['source.txt'],
+                          environment={}, steps=[self.step("print('named-test PASS')")])
+        self.write()
+        result, output = self.run_fixture_into(repo, 'fallback-run')
+        self.assertEqual(result['status'], 'PASS')
+        recorded = json.loads((output/'environment.json').read_text())['overrides']['TMPDIR']
+        self.assertTrue(recorded.startswith(str(Path.home()/'.local/state/swarm-fixtures')),
+                        'TMPDIR must be pinned under the private fallback area: '+recorded)
+        # Chrome binds its ProcessSingleton socket at
+        # `$TMPDIR/.com.google.Chrome.XXXXXX/SingletonSocket`; a path past the
+        # sockaddr_un usable bound (measured flip at 107→108 bytes, 2026-10-31)
+        # makes Chrome die by SIGTRAP before any log line. The pinned root must
+        # keep that path inside the bound with margin, so browser recipes work.
+        socket = recorded + '/.com.google.Chrome.ABCDEF/SingletonSocket'
+        self.assertLessEqual(len(socket), 107,
+                             'Chrome SingletonSocket path must stay within the '
+                             'sockaddr_un usable bound: '+socket)
+        self.assertEqual(recipe.verify_evidence(output)['recorded_status'], 'PASS')
+
+    def run_fixture_into(self, root, name):
+        """Execute the current recipe inside the given fake repository root."""
+        output = root/name
+        return recipe.run_recipe(root, self.path, output), output
+
+    def _prune(self, path):
+        """Remove a test-created area tree; cleanup helper, never evidence."""
+        import shutil
+        shutil.rmtree(path, ignore_errors=True)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

@@ -342,6 +342,20 @@ impl PaeaGitCallAuthority {
             "action_digest":self.source.request().action_digest(),
         })
     }
+    /// Minimal startup observation served by the cookie-only status route
+    /// (`GET /api/v1/paea/git-call`): the `bound` boolean ONLY. Nothing
+    /// derived from the selected prepared request passes — not the digests,
+    /// and not the selected `call`/`service`/`operation` either: a closed
+    /// vocabulary does not make the selected value a constant, and no
+    /// declassification right is created (BLP-RET-05). The full capability
+    /// (scope, reason, call, service, operation, exact digests) is served
+    /// exclusively by the guarded preview route behind the CURRENT reader
+    /// verdict (`RootStore::paea_reader_verdict`). This projection never
+    /// authenticates, never promises currency and never echoes any prior
+    /// read.
+    pub(super) fn status_capability(&self) -> serde_json::Value {
+        serde_json::Value::Null
+    }
     /// Compare the prepared physical witnesses against the actually opened
     /// service and project roots, before transport publication. Both bindings
     /// must match; this precedes and never replaces the engine-side recheck
@@ -523,12 +537,24 @@ impl NativeHttpService {
     /// IO. An explicit `bound:false` distinguishes "no source bound" from a
     /// refused request; the operator never has to consume the one-shot call
     /// to observe its state (configured/applied/observed stay distinct).
+    /// Read-only startup observation behind the ordinary session/Host/CSRF
+    /// gate: `GET /api/v1/paea/git-call` reports ONLY whether a prepared call
+    /// is bound — `bound:true` with a Null `capability`, no IO, secret or
+    /// consumption. Under the BLP reader frontier (BLP-RET-05) NOTHING
+    /// derived from the selected prepared request is served here — not the
+    /// exact digests, and not the selected call/service/operation: not to a
+    /// bare session, an unknown token, a disabled identity or an uncleared
+    /// reader. Every refusal variant and the authorized full reading (full
+    /// capability projection) stay on the guarded preview route (see
+    /// `reader_bearer_token` and `RootStore::paea_reader_verdict`). An
+    /// explicit `bound:false` distinguishes "no call prepared" from a refused
+    /// request.
     pub(super) fn paea_git_call_status(&self) -> Result<RouteBody, E> {
         let reply = serde_json::json!({
             "schema_version":1,
             "event":"paea-git-call-status",
             "bound":self.paea_git_call.is_some(),
-            "capability":self.paea_git_call.as_ref().map(|a|a.capability()),
+            "capability":self.paea_git_call.as_ref().map(|a|a.status_capability()),
         });
         Ok(RouteBody::plain(
             serde_json::to_vec(&reply).map_err(E::ResponseJson)?,

@@ -1160,9 +1160,12 @@ rôle sur une racine native initialisée. Rôles : `planner`, `subplanner`, `wor
 `reviewer`. Les sources canoniques sont incluses au build ; un fichier de skills
 dans le checkout du worker ne les remplace pas. Le descripteur extrait du vrai
 producteur Go fixe ordre, préfixes et limites du rôle ; Rust n'appelle pas Go
-au runtime. Le contexte projet ordinaire est lu sous ses limites propres.
-
-Le réglage v13 `agent_workflow_max_body_bytes` propose 32000 octets pour le
+au runtime. Le contexte projet ordinaire est lu sous ses limites propres. Le corpus figé
+des sources embarquées a dépassé la valeur 32000 du 31 octobre 2026 (corps
+worker mesuré 32441 octets) ; la valeur d'installation passe à 33000, appliquée
+aux nouvelles racines seulement — une racine existante garde sa politique
+sauvegardée.
+Le réglage v13 `agent_workflow_max_body_bytes` propose 33000 octets pour le
 **corps de base**, avant manifeste et projet. Zéro refuse, `null` retire ce cap ;
 un journal v12 nécessite une adoption explicite. Les limites du projet et la
 capacité modèle restent distinctes. Aucun texte n'est tronqué. La réponse expose

@@ -614,7 +614,7 @@ Known structured Claude/Codex tool call/result declarations also interrupt the C
 
 The `simple`, `standard`, `exigeant` levels appear in preparation CLI capabilities with their model, policy and digest, subject to saved announcements and restrictions. Automatic mode keeps its configured route; if denied, a human must choose an allowed explicit mode. No neighboring model is substituted. APIs keep their fixed model and refuse an explicit level. Manual reservations are neither pricing nor invoices.
 
-Explicit sends retain their level in private v2 metadata; API/automatic turns keep v1. An old worker refuses v2 before contact. Terminal receipts and budgets remain retained; finish/interrupt turns using a compatible version before downgrading. A pending event keeps its original payload after capability withdrawal, allowing known-state replay without an implicit new launch.
+New turns retain byte origins and digests in private v3 metadata; explicit CLI levels remain preserved. The manifest covers the complete prompt and its nine data fields, with consistency rechecked before worker handoff. It proves neither BLP classification nor disclosure authority. Historical v1/v2 turns remain readable without a manifest; older workers refuse v3 before contact. Terminal receipts and budgets remain retained; finish/interrupt turns using a compatible version before downgrading. A pending event keeps its original payload after capability withdrawal, allowing known-state replay without an implicit new launch.
 
 ### Profile sources and versioned memory — pilot201
 

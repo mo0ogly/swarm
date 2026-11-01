@@ -6,7 +6,7 @@
 
 ## État et périmètre
 
-BLP-01, 31 octobre 2026 : **24 flux documentés, 43 ancrages dans 41 fichiers
+BLP-01, 31 octobre 2026 : **24 flux documentés, 44 ancrages dans 42 fichiers
 sources**, revus au niveau des producteurs et consommateurs actuels. Le JSON
 conserve pour chaque flux : matière exposée, producteur, destinataire, contrôles
 existants, responsable, lots manquants et observable de qualification. Il fige
@@ -18,7 +18,7 @@ La recette `blp-flow-inventory.json` passe ses deux étapes ; cinq tests du
 vérificateur ont réellement été exécutés. Ces preuves portent sur la fraîcheur
 de l'inventaire, les refus et la reprise du vérificateur, **pas sur la prévention
 d'une divulgation**. Aucun appel fournisseur, donnée vivante, compte ou réglage
-de sécurité n'est modifié. Aucun comportement de l'exécutable produit ne change ;
+de sécurité n'est modifié. Pour ce premier lot d’inventaire, aucun comportement de l'exécutable produit ne change ;
 build, installation et notes d'évolution ne sont donc pas requis pour ce lot.
 
 ## Frontières recensées
@@ -127,3 +127,38 @@ et tests documentés ; les erreurs d'IO remontent à l'appelant de bibliothèque
 la CLI expose des codes sûrs, sans contenu privé. Le graphe ne crée aucun droit.
 Preuves : `docs/plans/actions-confiance/verification-blp/20261031-flow-inventory-01/`.
 BLP-01 demeure partiel pour les voies dynamiques ; BLP-RET-01/02/03 restent ouverts.
+
+## BLP-04 — provenance des octets de préparation (incrément du 31 octobre)
+
+Le producteur `preparation_send` assemble désormais le prompt avec
+`preparation_prompt::assemble`. Un manifeste privé couvre tous ses octets dans
+l’ordre, sans recopier les textes : contexte projet agrégé, instructions moteur,
+contrat de plan éventuel, cadrage JSON et chacun des neuf champs des données.
+Ces champs comprennent les documents, extraits conservés, brief adopté, méthode,
+sources de méthode, historique, mode, nombre d’échanges omis et message courant.
+Le texte envoyé reste identique à l’assemblage précédent. Les empreintes portent
+sur les représentations JSON effectivement incluses, pas sur un texte normalisé.
+Les sources agrégées ne deviennent pas une attribution de chaque fichier/version.
+
+Les nouveaux tours utilisent l’enveloppe native privée v3 et exigent le manifeste.
+Les formats historiques v1/v2 restent lisibles sans lui ; aucun manifeste n’est
+reconstruit rétroactivement. Un ancien worker refuse v3. La lecture native utilisée
+par le dispatch, la prise en charge du worker et le rejeu vérifie les empreintes,
+la couverture complète, les limites UTF-8 et la correspondance origines/clés JSON.
+Un format v3 sans manifeste ou avec `null` refuse ; une incohérence produit
+`preparation-prompt-provenance-invalid`, avant remise du prompt au fournisseur.
+Le DTO public continue à omettre prompt, manifeste et nonce.
+
+Ce manifeste est une preuve de cohérence des octets observés, **pas une preuve
+d’identité, de classification ou d’autorisation de divulgation**. Un écrivain du
+stockage peut réécrire les octets et leurs empreintes ; l’authenticité et les
+attributions persistées restent à construire. La préparation ne possède pas encore
+le principal BLP courant requis. Il n’y a ni domaine de confidentialité calculé,
+ni contrôle BLP de destination, ni héritage de réponse. BF-05/07/16 et BLP-04
+restent ouverts ; `runtime_enforced:false` reste exact.
+
+Recette : `tools/verification/recipes/blp-preparation-provenance.json` (assembleur
+et consommateur de ligne native). La recette CLI existante vérifie également la
+couverture du manifeste et son égalité avec l’empreinte du stdin réellement reçu
+par un fournisseur inerte. Les résultats et la livraison sont conservés dans le
+[suivi de reprise](../plans/actions-confiance/BLP-PROVENANCE-20261031.md).

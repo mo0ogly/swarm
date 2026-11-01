@@ -1,0 +1,19 @@
+{
+  "id": "prep-688350fb6dec4e0d4b1bb93f",
+  "title": "Owned CLI preparation",
+  "method": "apex",
+  "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+  "revision": 1,
+  "created_at": "2026-10-31T20:43:54.406640451Z",
+  "updated_at": "2026-10-31T20:43:54.406640451Z",
+  "documents": {
+    "besoin": {
+      "kind": "besoin",
+      "text": "CLI fixture need",
+      "revision": 1,
+      "sha256": "33ab0cc40e2241837a3af80779ac3345b0bc7e9dea6ec9a0e9121ce7fbfd0a36",
+      "at": "2026-10-31T20:43:54.406640451Z"
+    }
+  },
+  "plan_ready": false
+}

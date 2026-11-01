@@ -52,7 +52,8 @@
     "tests/rust_preparation_reads.py",
     "tests/rust_project_memory_source.py",
     "rust/crates/swarm-engine/examples/memory_source_fixture.rs",
-    "rust/crates/swarm-engine/src/root_store/preparation_call_legacy.rs"
+    "rust/crates/swarm-engine/src/root_store/preparation_call_legacy.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs"
   ],
   "environment": {
     "CARGO_INCREMENTAL": "0",

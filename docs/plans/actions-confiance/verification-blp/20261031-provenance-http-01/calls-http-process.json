@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-vtt3bjzt",
+    "web",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-t_n_0vt0",
+    "--json",
+    "--lang",
+    "en"
+  ],
+  "pid": 2448925,
+  "start": 1793479448.437807,
+  "global_watchdog": null,
+  "owned": true
+}

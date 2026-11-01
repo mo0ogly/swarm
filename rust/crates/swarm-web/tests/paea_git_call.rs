@@ -84,13 +84,17 @@ fn preview_route_reports_explicit_absence_without_source() {
 }
 
 /// With a real bound preparation on the retained native source fixture, the
-/// preview presents the exact held action: declared proposal/context verbatim,
-/// recomputed canonical identity matching the bound digest, current witness
-/// state and current Trust revision. No consent, grant or consumption occurs.
+/// preview presents the exact held action to an authorized Bearer reader:
+/// declared proposal/context verbatim, recomputed canonical identity matching
+/// the bound digest, current witness state and current Trust revision. No
+/// consent, grant or consumption occurs. The BLP reader frontier (BLP-RET-05)
+/// requires the policy and the attribution of the exact canonical bytes to be
+/// produced through the supported control producers before the read, exactly
+/// like the reader-guard test; a bare session gets no classified marker.
 #[test]
 #[ignore = "requires explicit retained native source fixture"]
 fn preview_route_presents_exact_bound_action_with_current_state() {
-    let owned = owned();
+    let owned = owned_agreement();
     let action_digest = owned.prepared.request().action_digest().to_owned();
     let trust_revision = owned.trust_revision;
     let (repository_id, candidate) = match &owned.prepared.proposal().action {
@@ -101,6 +105,73 @@ fn preview_route_presents_exact_bound_action_with_current_state() {
         } => (repository_id.clone(), candidate_oid.clone()),
         _ => panic!("git proposal expected"),
     };
+    // BLP reader frontier: produce the current policy and the current
+    // attribution of the exact canonical bytes through the same supported
+    // producers as the reader-guard test, before any read occurs.
+    let blp_revision = {
+        let show = owned
+            .project
+            .trust("blp-show", b"{}".as_slice(), "fixture-admin-token")
+            .unwrap_or_else(|e| panic!("blp-show refused: {}", e.code()));
+        serde_json::from_slice::<Value>(&show.bytes).unwrap()["record"]["history"]
+            .as_array()
+            .and_then(|h| h.last())
+            .and_then(|e| e["revision"].as_u64())
+            .unwrap_or(0)
+    };
+    let current_revision = current_trust_revision(&owned.project_path);
+    owned
+        .project
+        .trust(
+            "blp-policy-apply",
+            &serde_json::to_vec(&json!({
+                "schema_version":1,
+                "event_id":format!("preview-baseline-policy-{current_revision}"),
+                "expected_revision":blp_revision,
+                "expected_trust_revision":current_revision,
+                "reason":"Reader-guard policy for the preview baseline",
+                "policy":{
+                    "schema_version":1,
+                    "levels":[
+                        {"id":"public","name_fr":"Public","name_en":"Public"},
+                        {"id":"restricted","name_fr":"Diffusion restreinte","name_en":"Restricted"},
+                        {"id":"classified","name_fr":"Diffusion contrôlée","name_en":"Classified"},
+                    ],
+                    "compartments":[],
+                    "clearances":{
+                        "enrolled-effect":{"level":"classified","compartments":[]},
+                        "requester":{"level":"restricted","compartments":[]},
+                        "approver":{"level":"public","compartments":[]},
+                        "agreement-admin":{"level":"classified","compartments":[]},
+                    },
+                },
+            }))
+            .unwrap(),
+            "fixture-admin-token",
+        )
+        .unwrap_or_else(|e| panic!("blp-policy-apply refused: {}", e.code()));
+    owned
+        .project
+        .trust(
+            "blp-object-attribute",
+            &serde_json::to_vec(&json!({
+                "schema_version":1,
+                "event_id":format!("preview-baseline-attribute-{current_revision}"),
+                "expected_revision":blp_revision + 1,
+                "expected_trust_revision":current_revision,
+                "canonical_digest":swarm_protection_contract::canonicalize(
+                    &proposal(&repository_id, &candidate),
+                    &context(trust_revision),
+                ).unwrap().digest(),
+                "project_path":owned.project_path.to_str().unwrap(),
+                "classification":{"level":"classified","compartments":[]},
+                "reason":"Reader-guard attribution for the preview baseline",
+            }))
+            .unwrap(),
+            "fixture-admin-token",
+        )
+        .unwrap_or_else(|e| panic!("blp-object-attribute refused: {}", e.code()));
+    const READER: &str = "Bearer fixture-admin-token";
     let fixture = fixture::Fixture::build_for_trust(
         owned.prepared.request().permission(),
         owned.fixture_scope.clone(),
@@ -124,7 +195,7 @@ fn preview_route_presents_exact_bound_action_with_current_state() {
         authority,
     )
     .unwrap_or_else(|e| panic!("exact bind refused: {}", e.code()));
-    let reply = get(&listener, &s, "/api/v1/paea/git-call/preview");
+    let reply = get_with(&listener, &s, "/api/v1/paea/git-call/preview", Some(READER));
     assert!(reply.response.status().is_success());
     assert!(reply.failure.is_none());
     let body: Value = serde_json::from_slice(reply.response.body()).unwrap();
@@ -676,14 +747,46 @@ fn post(
 
 /// Authorized GET with a real Host/session/CSRF; no body, no credential.
 fn get(listener: &std::net::TcpListener, s: &NativeHttpService, uri: &str) -> swarm_web::HttpReply {
+    get_with(listener, s, uri, None)
+}
+
+/// Authorized HEAD with a real Host/session/CSRF; no body, no credential.
+fn head(
+    listener: &std::net::TcpListener,
+    s: &NativeHttpService,
+    uri: &str,
+) -> swarm_web::HttpReply {
     let a = LocalWebAuthority::from_listener(listener, KEY).unwrap();
     let builder = Request::builder()
+        .method("HEAD")
+        .uri(uri)
+        .header(HOST, a.host())
+        .header(COOKIE, format!("{}={}", a.cookie_name(), KEY))
+        .header(ORIGIN, format!("http://{}", a.host()))
+        .header("X-Swarm-CSRF", KEY);
+    s.handle(builder.body(Vec::new()).unwrap()).unwrap()
+}
+
+/// GET variant with an optional `Authorization` header value verbatim (e.g.
+/// `Bearer <token>`), mirroring `post`'s credential parameter. Nothing else
+/// differs: real Host/session/CSRF, empty body, no query.
+fn get_with(
+    listener: &std::net::TcpListener,
+    s: &NativeHttpService,
+    uri: &str,
+    auth: Option<&str>,
+) -> swarm_web::HttpReply {
+    let a = LocalWebAuthority::from_listener(listener, KEY).unwrap();
+    let mut builder = Request::builder()
         .method("GET")
         .uri(uri)
         .header(HOST, a.host())
         .header(COOKIE, format!("{}={}", a.cookie_name(), KEY))
         .header(ORIGIN, format!("http://{}", a.host()))
         .header("X-Swarm-CSRF", KEY);
+    if let Some(auth) = auth {
+        builder = builder.header("authorization", auth);
+    }
     s.handle(builder.body(Vec::new()).unwrap()).unwrap()
 }
 
@@ -885,18 +988,20 @@ fn git_call_http_consumes_exact_transfer_once() {
     .unwrap_or_else(|e| panic!("exact bind refused: {:?} / {e}", e.code()));
     let good = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(PASSWORD));
     let wrong = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(b"wrong-password"));
-    // The status observation with a bound source reports the public capability
-    // (call kind, digests) without consuming anything.
+    // The status observation with a bound source reports ONLY the `bound`
+    // boolean: nothing derived from the selected prepared request passes —
+    // not the digests, and not the selected call/service/operation either
+    // (a closed vocabulary does not make the selected value a constant,
+    // BLP-RET-05). The full capability stays behind the guarded preview route.
     let reply = get(&listener, &s, "/api/v1/paea/git-call");
     assert!(reply.response.status().is_success());
     let body: Value = serde_json::from_slice(reply.response.body()).unwrap();
     assert_eq!(body["event"], "paea-git-call-status");
     assert_eq!(body["bound"], true);
-    assert_eq!(body["capability"]["scope"], "single_prepared_git_call");
-    assert_eq!(body["capability"]["call"], "transfer");
     assert_eq!(
-        body["capability"]["action_digest"],
-        serde_json::Value::String(action_digest.clone())
+        body["capability"], serde_json::Value::Null,
+        "status must serve no request-derived capability: {}",
+        body
     );
     // A wrong password must refuse without consuming the one-shot call.
     let reply = post(&listener, &s, "/api/v1/paea/git-call?call=transfer", b"{}".to_vec(), Some(wrong));
@@ -1497,9 +1602,82 @@ fn approver_ux_preview_terms_then_existing_trust_channel_captures_agreement() {
     .unwrap_or_else(|e| panic!("exact bind refused: {}", e.code()));
     let bearer = |token: &str| format!("Bearer {token}");
 
+    // BLP reader frontier (BLP-RET-05): the preview is served to an authorized
+    // Bearer reader only. The policy and the attribution of the exact
+    // canonical bytes are produced through the same supported producers as the
+    // reader-guard test, before the approver's read below.
+    let blp_revision = {
+        let show = owned
+            .project
+            .trust("blp-show", b"{}".as_slice(), "fixture-admin-token")
+            .unwrap_or_else(|e| panic!("blp-show refused: {}", e.code()));
+        serde_json::from_slice::<Value>(&show.bytes).unwrap()["record"]["history"]
+            .as_array()
+            .and_then(|h| h.last())
+            .and_then(|e| e["revision"].as_u64())
+            .unwrap_or(0)
+    };
+    let current_revision = current_trust_revision(&owned.project_path);
+    owned
+        .project
+        .trust(
+            "blp-policy-apply",
+            &serde_json::to_vec(&json!({
+                "schema_version":1,
+                "event_id":format!("ux-preview-policy-{current_revision}"),
+                "expected_revision":blp_revision,
+                "expected_trust_revision":current_revision,
+                "reason":"Reader-guard policy for the approver journey preview",
+                "policy":{
+                    "schema_version":1,
+                    "levels":[
+                        {"id":"public","name_fr":"Public","name_en":"Public"},
+                        {"id":"restricted","name_fr":"Diffusion restreinte","name_en":"Restricted"},
+                        {"id":"classified","name_fr":"Diffusion contrôlée","name_en":"Classified"},
+                    ],
+                    "compartments":[],
+                    "clearances":{
+                        "enrolled-effect":{"level":"classified","compartments":[]},
+                        "requester":{"level":"restricted","compartments":[]},
+                        "approver":{"level":"public","compartments":[]},
+                        "agreement-admin":{"level":"classified","compartments":[]},
+                    },
+                },
+            }))
+            .unwrap(),
+            "fixture-admin-token",
+        )
+        .unwrap_or_else(|e| panic!("blp-policy-apply refused: {}", e.code()));
+    owned
+        .project
+        .trust(
+            "blp-object-attribute",
+            &serde_json::to_vec(&json!({
+                "schema_version":1,
+                "event_id":format!("ux-preview-attribute-{current_revision}"),
+                "expected_revision":blp_revision + 1,
+                "expected_trust_revision":current_revision,
+                "canonical_digest":swarm_protection_contract::canonicalize(
+                    &proposal(&repository_id, &candidate),
+                    &context(owned.trust_revision),
+                ).unwrap().digest(),
+                "project_path":owned.project_path.to_str().unwrap(),
+                "classification":{"level":"classified","compartments":[]},
+                "reason":"Reader-guard attribution for the approver journey preview",
+            }))
+            .unwrap(),
+            "fixture-admin-token",
+        )
+        .unwrap_or_else(|e| panic!("blp-object-attribute refused: {}", e.code()));
+
     // Step 1: the approver opens the preview and reads the engine-derived
     // terms (no consent captured, no consumption).
-    let reply = get(&listener, &s, "/api/v1/paea/git-call/preview");
+    let reply = get_with(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call/preview",
+        Some(bearer("fixture-admin-token").as_str()),
+    );
     assert!(reply.response.status().is_success());
     let preview: Value = serde_json::from_slice(reply.response.body()).unwrap();
     assert_eq!(preview["available"], true);
@@ -1835,17 +2013,20 @@ fn approval_route_captures_project_agreement_and_refuses_wrong_body_revision() {
     .unwrap_or_else(|e| panic!("approval bind refused: {:?}", e.code()));
     let good = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(PASSWORD));
     let wrong = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(b"wrong-password"));
-    // Startup observation: the approval capability is public, bound, digest-only.
+    // Startup observation: the approval status serves ONLY the `bound`
+    // boolean — the capability stays Null, because the selected operation
+    // (even inside a closed vocabulary) is derived from the frozen classified
+    // action and no declassification right is created (BLP-RET-05). The exact
+    // operation and command digest stay behind the guarded presentation route.
     let status = get(&listener, &s, "/api/v1/paea/git-call/approval");
     assert!(status.response.status().is_success());
     assert!(status.failure.is_none());
     let status_body: Value = serde_json::from_slice(status.response.body()).unwrap();
     assert_eq!(status_body["event"], "paea-git-call-approval-status");
     assert_eq!(status_body["bound"], true);
-    assert_eq!(status_body["capability"]["operation"], "approve");
     assert_eq!(
-        status_body["capability"]["request_digest"].as_str().unwrap().len(),
-        64
+        status_body["capability"], serde_json::Value::Null,
+        "approval status must serve no request-derived capability: {status_body}"
     );
     // The service root trust state before any approval: observed, not assumed.
     let service_before = service_trust_state(&owned.service_path);
@@ -2052,6 +2233,62 @@ fn approval_presentation_serves_frozen_command_and_terms() {
         )
         .unwrap()
     };
+    // BLP reader frontier (BLP-RET-05): the presentation projection is now
+    // served ONLY to a Bearer reader under a CURRENT, control-produced
+    // attribution of the exact canonical bytes. The baseline produces the
+    // policy and attribution through the same supported producers as the
+    // reader-guard test, then reads with the authorized credential; the
+    // approval POST path below stays untouched (bare Enrollment credential).
+    let blp_revision = trust("blp-show", json!({}), "fixture-admin-token")["record"]
+        ["history"]
+        .as_array()
+        .and_then(|h| h.last())
+        .and_then(|e| e["revision"].as_u64())
+        .unwrap_or(0);
+    trust(
+        "blp-policy-apply",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-presentation-policy-{}", current_trust_revision(&owned.project_path)),
+            "expected_revision":blp_revision,
+            "expected_trust_revision":current_trust_revision(&owned.project_path),
+            "reason":"Reader-guard policy for the approval presentation baseline",
+            "policy":{
+                "schema_version":1,
+                "levels":[
+                    {"id":"public","name_fr":"Public","name_en":"Public"},
+                    {"id":"restricted","name_fr":"Diffusion restreinte","name_en":"Restricted"},
+                    {"id":"classified","name_fr":"Diffusion contrôlée","name_en":"Classified"},
+                ],
+                "compartments":[],
+                "clearances":{
+                    "enrolled-effect":{"level":"classified","compartments":[]},
+                    "requester":{"level":"restricted","compartments":[]},
+                    "approver":{"level":"public","compartments":[]},
+                    "agreement-admin":{"level":"classified","compartments":[]},
+                },
+            },
+        }),
+        "fixture-admin-token",
+    );
+    trust(
+        "blp-object-attribute",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-presentation-attribute-{}", current_trust_revision(&owned.project_path)),
+            "expected_revision":blp_revision + 1,
+            "expected_trust_revision":current_trust_revision(&owned.project_path),
+            "canonical_digest":swarm_protection_contract::canonicalize(
+                &proposal(&repository_id, &candidate),
+                &context(owned.trust_revision),
+            ).unwrap().digest(),
+            "project_path":owned.project_path.to_str().unwrap(),
+            "classification":{"level":"classified","compartments":[]},
+            "reason":"Reader-guard attribution for the approval presentation baseline",
+        }),
+        "fixture-admin-token",
+    );
+    const READER: &str = "Bearer fixture-admin-token";
     trust(
         "mandate-create",
         json!({
@@ -2160,7 +2397,13 @@ fn approval_presentation_serves_frozen_command_and_terms() {
     );
     // Bound presentation: the authorized projection only — the operation, the
     // digest identity, the canonical identity and the engine-derived terms.
-    let presentation = get(&listener, &s, "/api/v1/paea/git-call/approval/presentation");
+    // The reader credential is required by the BLP reader frontier.
+    let presentation = get_with(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call/approval/presentation",
+        Some(READER),
+    );
     assert!(
         presentation.response.status().is_success(),
         "presentation must serve: {}",
@@ -2225,8 +2468,14 @@ fn approval_presentation_serves_frozen_command_and_terms() {
     assert_eq!(matched.action_id, action["id"].as_str().unwrap());
     assert_eq!(matched.approver, "enrolled-effect");
     // After consumption the presentation stays the same read-only observation:
-    // still the same digest identity, still no second approval system.
-    let after = get(&listener, &s, "/api/v1/paea/git-call/approval/presentation");
+    // still the same digest identity, still no second approval system. The
+    // reader credential stays required after the real approval effect.
+    let after = get_with(
+        &listener,
+        &s,
+        "/api/v1/paea/git-call/approval/presentation",
+        Some(READER),
+    );
     assert!(after.response.status().is_success());
     let after_body: Value = serde_json::from_slice(after.response.body()).unwrap();
     assert_eq!(after_body["available"], true);
@@ -2320,6 +2569,1568 @@ fn approval_presentation_reports_explicit_absence_without_source() {
     service_root.close().unwrap();
 }
 
+/// BLP reader frontier (BLP-RET-05) on a REAL bound approval: GET preview and
+/// GET approval/presentation both serve the classified projection to an
+/// authorized Bearer reader under a CURRENT, control-produced object
+/// attribution bound to the exact canonical bytes, the project and the policy
+/// revision — re-read at every consumption. The approval is the real
+/// mandate/request/prepare_approval rig (same as
+/// `approval_presentation_serves_frozen_command_and_terms`), so the
+/// presentation route reaches its reader guard instead of answering the
+/// no-source vacuity code; an `available:true` witness on BOTH routes with
+/// the produced attribution is the POSITIVE result of this test, and no
+/// `paea-git-call-approval-unavailable` reply counts as success anywhere.
+/// Refusal segments: a bare session and an enrolled-but-uncleared reader
+/// receive NO classified marker (exact source label, digest or request id)
+/// with the stable guard codes on BOTH routes; a stale policy revision
+/// refuses like an unknown one. Session alone is never authorization. The
+/// complementary exact refusal matrix (unknown credential, supported
+/// disablement with pre-observed staleness, absent/wrong-digest/wrong-project
+/// attribution, no-mutation brackets) is coded as
+/// `reader_refusal_matrix_on_bound_approval_both_routes`; the delivery
+/// qualification (production ELF/assets, FR/EN notes, installation) remains
+/// PENDING for the independent verifier.
+#[test]
+fn preview_reader_guard_enforces_produced_attribution() {
+    let owned = owned_agreement();
+    let (repository_id, candidate) = (owned.repository_id.clone(), owned.candidate.clone());
+    let trust_revision = owned.trust_revision;
+    // Policy produced by the supported producer BEFORE any guarded read; every
+    // clearance principal is a real fixture identity (blp-principal check).
+    // The current BLP revision and fixture Trust revision are both read live
+    // through supported operations (blp-show / the journal's own revision), so
+    // a retained fixture with an earlier recorded policy advances through the
+    // real apply path (a stale recorded entry is never revived) and the
+    // apply-once event id survives reruns.
+    let policy = json!({
+        "schema_version":1,
+        "levels":[
+            {"id":"public","name_fr":"Public","name_en":"Public"},
+            {"id":"restricted","name_fr":"Diffusion restreinte","name_en":"Restricted"},
+            {"id":"classified","name_fr":"Diffusion contrôlée","name_en":"Classified"},
+        ],
+        "compartments":[],
+        "clearances":{
+            "enrolled-effect":{"level":"classified","compartments":[]},
+            "requester":{"level":"restricted","compartments":[]},
+            "approver":{"level":"public","compartments":[]},
+            "agreement-admin":{"level":"classified","compartments":[]},
+        },
+    });
+    let trust = |op: &str, value: Value, token: &str| -> Value {
+        serde_json::from_slice(
+            &owned
+                .project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+                .bytes,
+        )
+        .unwrap()
+    };
+    let trust_revision_of = |path: &Path| current_trust_revision(path);
+    let blp_revision = trust("blp-show", json!({}), "fixture-admin-token")["record"]
+        ["history"]
+        .as_array()
+        .and_then(|h| h.last())
+        .and_then(|e| e["revision"].as_u64())
+        .unwrap_or(0);
+    let project_path = owned.project_path.clone();
+    trust(
+        "blp-policy-apply",
+        json!({
+            "schema_version":1,
+            "event_id":format!("blp-reader-guard-policy-{}", trust_revision_of(&project_path)),
+            "expected_revision":blp_revision,
+            "expected_trust_revision":trust_revision_of(&project_path),
+            "reason":"Reader-guard policy for the PAEA preview frontier fixture",
+            "policy":policy,
+        }),
+        "fixture-admin-token",
+    );
+    // Distinctive classified marker carried by the declared source, so any
+    // served proposal/context leak is observable client-side by exact string.
+    const PRIVATE_MARKER: &str = "fixture-classified-marker-blp-ret-05";
+    let mut classified_context = context(trust_revision);
+    classified_context.sources[0].confidentiality_labels = vec![PRIVATE_MARKER.to_owned()];
+    let exact = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &classified_context,
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    // The attribution is produced by the supported control operation (I3
+    // admin, same gate as blp-policy-apply) bound to the EXACT canonical
+    // bytes, the actual project root and the current policy revision; it is
+    // pushed on the current entry so its policy revision is the applied one.
+    let attribute = trust("blp-show", json!({}), "fixture-admin-token")["record"]
+        ["history"]
+        .as_array()
+        .and_then(|h| h.last())
+        .and_then(|e| e["revision"].as_u64())
+        .unwrap_or(0);
+    let attribute_reply = trust(
+        "blp-object-attribute",
+        json!({
+            "schema_version":1,
+            "event_id":format!("blp-reader-guard-attribute-{}", trust_revision_of(&project_path)),
+            "expected_revision":attribute,
+            "expected_trust_revision":trust_revision_of(&project_path),
+            "canonical_digest":swarm_protection_contract::canonicalize(
+                &proposal(&repository_id, &candidate),
+                &classified_context,
+            ).unwrap().digest(),
+            "project_path":owned.project_path.to_str().unwrap(),
+            "classification":{"level":"classified","compartments":[]},
+            "reason":"Reader-guard attribution for the exact prepared action fixture",
+        }),
+        "fixture-admin-token",
+    );
+    assert_eq!(attribute_reply["attributed"], true, "supported producer must attribute");
+    assert_eq!(attribute_reply["runtime_enforced"], false, "seam is explicit: no runtime enforcement beyond the served surface is claimed");
+    // REAL approval rig (the same producers as
+    // `approval_presentation_serves_frozen_command_and_terms`): the engine
+    // derives the recipe terms from the EXACT classified canonical bytes, a
+    // real mandate is created, the requester really files the action and the
+    // frozen approve command is bound server-side via `prepare_approval`, so
+    // BOTH guarded routes reach their reader guard with a real approval
+    // instead of the presentation route's no-source vacuity reply.
+    let terms = owned
+        .project
+        .paea_git_agreement_terms(&exact)
+        .unwrap()
+        .expect("recipe terms derivable for this canonical Git action");
+    let resource = terms.resource.clone();
+    let mandate_id = format!("approval-reader-guard-mandate-{}", std::process::id());
+    trust(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-reader-guard-mandate-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+        }),
+        "fixture-admin-token",
+    );
+    let action: Value = trust(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-reader-guard-request-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "resource":resource,
+            "amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+            "idempotency_key":format!("approval-reader-guard-key-{mandate_id}"),
+        }),
+        "fixture-requester-token",
+    );
+    assert_eq!(action["state"], "pending_approval");
+    let approve = serde_json::to_vec(&json!({
+        "schema_version":1,
+        "event_id":format!("approval-reader-guard-approve-{mandate_id}"),
+        "action_id":action["id"],
+        "mandate_id":mandate_id,
+        "content_digest":action["content_digest"],
+        "resource":resource,
+        "amount_minor":terms.amount_minor,
+        "currency":terms.currency,
+        "beneficiary":terms.beneficiary,
+    }))
+    .unwrap();
+    drop(trust);
+    drop(trust_revision_of);
+    let mut owned = owned;
+    owned.prepared = owned
+        .service
+        .paea_git_transfer_call(
+            &owned.project,
+            &proposal(&repository_id, &candidate),
+            &classified_context,
+            &owned.work,
+            "bare",
+            PIN,
+            "transfer-pack-reader-guard",
+        )
+        .unwrap_or_else(|e| panic!("classified preparation refused: {:?}", e));
+    owned.prepared_request_permission = owned.prepared.request().permission();
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let approval_source = source
+        .prepare_approval(
+            swarm_enrollment_authority::trust_action::Operation::Approve,
+            &approve,
+        )
+        .unwrap_or_else(|e| panic!("approval preparation refused: {:?}", e.code()));
+    // BOTH permissions are signed at fixture construction time (one enroll per
+    // enrollment id): the prepared transfer request AND the bound approval
+    // request, exactly like the reference approval rig.
+    let mut fixture = fixture::Fixture::build_for_trust_actions(
+        vec![
+            owned.prepared_request_permission.clone(),
+            approval_source.request().permission(),
+        ],
+        owned.fixture_scope.clone(),
+        trust_revision,
+    );
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let authority = swarm_web::PaeaGitCallSource::open(
+        source,
+        fixture.path.to_str().unwrap(),
+        &fixture.pin,
+    )
+    .unwrap();
+    let s = swarm_web::NativeHttpService::open_git_call_with_approval(
+        &owned.service_path,
+        LocalWebAuthority::from_listener(&listener, KEY).unwrap(),
+        authority,
+        Some(approval_source),
+    )
+    .unwrap_or_else(|e| panic!("approval bind refused: {:?}", e.code()));
+    // Bare session (no credential): the reader guard refuses BOTH routes with
+    // the stable no-credential code and NO private marker. With the approval
+    // now really bound, the presentation route reaches its guard instead of
+    // the no-source vacuity reply — a real positive witness must never accept
+    // `paea-git-call-approval-unavailable` as success.
+    for uri in [
+        "/api/v1/paea/git-call/preview",
+        "/api/v1/paea/git-call/approval/presentation",
+    ] {
+        let body: Value = serde_json::from_slice(get(&listener, &s, uri).response.body()).unwrap();
+        let raw = serde_json::to_string(&body).unwrap();
+        assert!(!raw.contains(PRIVATE_MARKER), "{uri} served the marker to a bare session after attribution");
+        assert_eq!(
+            body["available"], false,
+            "{uri} bare session must stay refused after attribution"
+        );
+        assert_eq!(
+            body["reason"], "paea-reader-authentication-required",
+            "{uri} bare session refuses with the stable no-credential code"
+        );
+    }
+    // Enrolled but NOT cleared for the attributed classification: refusal
+    // without any private marker, digest or identifier (payload, error, id)
+    // on BOTH routes — the guard is reached before any projection field.
+    for uri in [
+        "/api/v1/paea/git-call/preview",
+        "/api/v1/paea/git-call/approval/presentation",
+    ] {
+        let reply = get_with(
+            &listener,
+            &s,
+            uri,
+            Some("Bearer fixture-requester-token"),
+        );
+        let raw = String::from_utf8(reply.response.body().to_vec()).unwrap();
+        assert!(!raw.contains(PRIVATE_MARKER), "{uri} served the marker to an uncleared reader");
+        assert!(!raw.contains("action_digest"), "{uri} disclosed the classified digest to an uncleared reader");
+        let body: Value = serde_json::from_slice(reply.response.body()).unwrap();
+        assert_eq!(body["available"], false);
+        assert_eq!(
+            body["reason"], "paea-reader-access-denied",
+            "{uri} uncleared enrolled reader refuses with the access-denied code"
+        );
+    }
+    // POSITIVE witness on the preview route: the authorized reader
+    // (classified clearance) with the Bearer credential reads the EXACT
+    // permitted projection — full proposal/context with the marker, digest
+    // match and a success state. Provenance from the produced attribution,
+    // never from labels or cookies.
+    {
+        let uri = "/api/v1/paea/git-call/preview";
+        let reply = get_with(&listener, &s, uri, Some("Bearer fixture-admin-token"));
+        let raw = String::from_utf8(reply.response.body().to_vec()).unwrap();
+        assert!(raw.contains(PRIVATE_MARKER), "{uri} authorized reader must receive the exact permitted projection");
+        let body: Value = serde_json::from_slice(reply.response.body()).unwrap();
+        assert_eq!(body["available"], true, "{uri} authorized reader reads the projection");
+        assert_eq!(body["canonical"]["digest_matches"], true);
+    }
+    // POSITIVE witness on the approval/presentation route with the REAL bound
+    // approval: the authorized reader reads the exact permitted projection —
+    // the operation, the digest identity, the canonical identity and the
+    // engine-derived terms — with NO private command field (no bytes, no
+    // parsed fields, no action/mandate/digest identifier): the same
+    // disclosure class the engine's reply redaction gives the I3 approver.
+    {
+        let uri = "/api/v1/paea/git-call/approval/presentation";
+        let presentation = get_with(&listener, &s, uri, Some("Bearer fixture-admin-token"));
+        assert!(
+            presentation.response.status().is_success(),
+            "presentation must serve: {}",
+            String::from_utf8_lossy(presentation.response.body())
+        );
+        assert!(presentation.failure.is_none());
+        let body: Value = serde_json::from_slice(presentation.response.body()).unwrap();
+        assert_eq!(body["event"], "paea-git-call-approval-presentation");
+        assert_eq!(body["available"], true, "{uri} the real bound approval is presented under the produced attribution");
+        assert_eq!(body["operation"], "approve");
+        assert_eq!(body["request_digest"].as_str().unwrap().len(), 64);
+        assert!(body.get("command_bytes_b64url").is_none());
+        assert!(body.get("command").is_none());
+        assert!(body.to_string().contains(action["id"].as_str().unwrap()) == false);
+        assert!(body.to_string().contains(&mandate_id) == false);
+        assert!(body
+            .to_string()
+            .contains(action["content_digest"].as_str().unwrap()) == false);
+        assert_eq!(body["canonical"]["digest_matches"], true);
+        assert_eq!(body["canonical"]["action_digest"].as_str().unwrap().len(), 64);
+        assert_eq!(body["agreement_terms"]["binding"], "recipe");
+        assert_eq!(body["agreement_terms"]["resource"], resource.as_str());
+        assert_eq!(body["agreement_terms"]["amount_minor"], terms.amount_minor);
+        assert_eq!(body["agreement_terms"]["currency"], terms.currency);
+        assert_eq!(body["agreement_terms"]["beneficiary"], terms.beneficiary);
+        assert_eq!(body["agreement_terms"]["revision"], trust_revision);
+        assert_eq!(body["current"]["roots_bound"], true);
+        assert_eq!(body["current"]["declared_trust_revision"], trust_revision);
+        assert_eq!(body["current"]["trust_revision_current"], true);
+        assert_eq!(body["limits"]["consent"], "none-captured");
+        assert_eq!(body["limits"]["consumption"], "none");
+        assert_eq!(body["limits"]["human_presence"], "not-established");
+        assert!(String::from_utf8_lossy(presentation.response.body()).contains(PRIVATE_MARKER) == false,
+            "{uri} presentation never discloses the classified proposal/context marker");
+    }
+    // A REAL Trust configuration change (config-apply with a NEW event) moves
+    // the recorded policy out of currency: the attribution rides the old
+    // entry, so the guard refuses the same authorized reader on BOTH routes
+    // without any marker — stale provenance is never revived and no label is
+    // re-minted.
+    owned
+        .project
+        .trust(
+            "config-apply",
+            &effect_config_named(
+                &owned.project_path,
+                "git-call-http-reader-guard-stale",
+                true,
+            ),
+            "",
+        )
+        .unwrap_or_else(|e| panic!("stale config refused: {}", e.code()));
+    for uri in [
+        "/api/v1/paea/git-call/preview",
+        "/api/v1/paea/git-call/approval/presentation",
+    ] {
+        let raw = String::from_utf8(
+            get_with(&listener, &s, uri, Some("Bearer fixture-admin-token"))
+                .response
+                .body()
+                .to_vec(),
+        )
+        .unwrap();
+        assert!(!raw.contains(PRIVATE_MARKER), "{uri} served the marker after the policy lost currency");
+        let body: Value = serde_json::from_slice(raw.as_bytes()).unwrap();
+        assert_eq!(body["available"], false);
+        assert_eq!(
+            body["reason"], "paea-reader-policy-stale",
+            "{uri} stale policy refuses with the stable stale code"
+        );
+    }
+    let _ = s.close();
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    fixture.close();
+}
+
+/// Complementary reader-refusal matrix (BLP-RET-05 lot): BOTH guarded GET
+/// routes (`/api/v1/paea/git-call/preview` and
+/// `/api/v1/paea/git-call/approval/presentation`) are exercised against a REAL
+/// bound approval — the same rig as
+/// `preview_reader_guard_enforces_produced_attribution` (real policy, real
+/// `blp-object-attribute` attribution, real mandate/request/prepare_approval
+/// chain) — and every refusal variant is preceded, on the SAME preconditions,
+/// by a positive authorized witness (`available:true`, exact digest match), so
+/// no refusal can be explained by a missing approval, a missing source or the
+/// presentation route's no-source vacuity reply.
+///
+/// Refusal variants, each asserted with its exact observable code and with NO
+/// classified marker, digest or private identifier (action id, mandate id,
+/// content digest) anywhere in the reply, and never
+/// `paea-git-call-approval-unavailable`:
+/// - an unknown bearer credential refuses with the typed Err-path code
+///   `authorization_required` (non-success status; the body carries no
+///   projection field) on both routes;
+/// - the approver identity is DISABLED through a supported Trust operation
+///   (real `config-apply` reconstruction setting `disabled` on that identity),
+///   after which the BLP policy is renewed at the new revision WITHOUT the
+///   disabled principal's clearance and the object is re-attributed by the
+///   real producer — the pre-renewal `paea-reader-policy-stale` state is
+///   observed first, proving the renewal was necessary, so the disabled
+///   identity is then seen DIRECTLY as `authorization_required` and never
+///   masked by staleness;
+/// - attribution ABSENT at the current policy revision (a further real policy
+///   renewal without re-attribution): even the maximally-cleared reader is
+///   refused `available:false` with `paea-reader-attribution-required`;
+/// - attribution bound to a WRONG canonical digest (real producer, real digest
+///   of the unclassified canonical bytes) and then to a WRONG project root
+///   (the service root path): still `paea-reader-attribution-required` — the
+///   served contract is asserted as it exists (the defined-but-unused
+///   `paea-reader-attribution-mismatch` code is deliberately not expected);
+/// - recovery: the correct re-attribution at the current revision restores the
+///   positive witness on both routes, proving the refusals were
+///   attribution-state-driven and the channel intact.
+///
+/// No mutation: every refused batch is bracketed by byte equality of BOTH
+/// roots' trust journals (`service_trust_state`), the managed Git refs are
+/// byte-identical across the whole matrix, and refused reads journal nothing.
+///
+/// Preconditions: `SWARM_PAEA_SOURCE_FIXTURE` (via `owned_agreement`) and the
+/// permanent recipe environment; the same labeled fixture identities as the
+/// reference rig. Errors: panics on any unexpected reply — retained as the
+/// failing reproducer. Effects: none beyond the test's own fixture roots and
+/// the supported producer operations it drives; no guard or route code is
+/// exercised beyond the public HTTP surface. Limits: asserts the CURRENT
+/// public contract of the guard and both routes; introduces no declassification
+/// policy, fake identity, enrollment or confinement beyond the labeled
+/// fixture. Does not close BLP-RET-05 or PAEA.
+#[test]
+fn reader_refusal_matrix_on_bound_approval_both_routes() {
+    // ---- Same rig as `preview_reader_guard_enforces_produced_attribution`:
+    // real policy, real attribution, real bound approval, both routes open.
+    let owned = owned_agreement();
+    let (repository_id, candidate) = (owned.repository_id.clone(), owned.candidate.clone());
+    let trust_revision = owned.trust_revision;
+    let policy = json!({
+        "schema_version":1,
+        "levels":[
+            {"id":"public","name_fr":"Public","name_en":"Public"},
+            {"id":"restricted","name_fr":"Diffusion restreinte","name_en":"Restricted"},
+            {"id":"classified","name_fr":"Diffusion contrôlée","name_en":"Classified"},
+        ],
+        "compartments":[],
+        "clearances":{
+            "enrolled-effect":{"level":"classified","compartments":[]},
+            "requester":{"level":"restricted","compartments":[]},
+            "approver":{"level":"public","compartments":[]},
+            "agreement-admin":{"level":"classified","compartments":[]},
+        },
+    });
+    let trust = |op: &str, value: Value, token: &str| -> Value {
+        serde_json::from_slice(
+            &owned
+                .project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+                .bytes,
+        )
+        .unwrap()
+    };
+    let trust_revision_of = |path: &Path| current_trust_revision(path);
+    let blp_revision = trust("blp-show", json!({}), "fixture-admin-token")["record"]
+        ["history"]
+        .as_array()
+        .and_then(|h| h.last())
+        .and_then(|e| e["revision"].as_u64())
+        .unwrap_or(0);
+    let project_path = owned.project_path.clone();
+    trust(
+        "blp-policy-apply",
+        json!({
+            "schema_version":1,
+            "event_id":format!("reader-matrix-policy-{}", trust_revision_of(&project_path)),
+            "expected_revision":blp_revision,
+            "expected_trust_revision":trust_revision_of(&project_path),
+            "reason":"Reader-refusal-matrix policy for the PAEA both-route frontier fixture",
+            "policy":policy.clone(),
+        }),
+        "fixture-admin-token",
+    );
+    const PRIVATE_MARKER: &str = "fixture-classified-marker-blp-ret-05";
+    let mut classified_context = context(trust_revision);
+    classified_context.sources[0].confidentiality_labels = vec![PRIVATE_MARKER.to_owned()];
+    let exact = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &classified_context,
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    let classified_digest = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &classified_context,
+    )
+    .unwrap()
+    .digest()
+    .to_string();
+    let attribute = trust("blp-show", json!({}), "fixture-admin-token")["record"]
+        ["history"]
+        .as_array()
+        .and_then(|h| h.last())
+        .and_then(|e| e["revision"].as_u64())
+        .unwrap_or(0);
+    let attribute_reply = trust(
+        "blp-object-attribute",
+        json!({
+            "schema_version":1,
+            "event_id":format!("reader-matrix-attribute-{}", trust_revision_of(&project_path)),
+            "expected_revision":attribute,
+            "expected_trust_revision":trust_revision_of(&project_path),
+            "canonical_digest":classified_digest,
+            "project_path":owned.project_path.to_str().unwrap(),
+            "classification":{"level":"classified","compartments":[]},
+            "reason":"Reader-refusal-matrix attribution for the exact prepared action fixture",
+        }),
+        "fixture-admin-token",
+    );
+    assert_eq!(attribute_reply["attributed"], true, "supported producer must attribute");
+    assert_eq!(attribute_reply["runtime_enforced"], false, "seam is explicit");
+    // Real approval rig: engine-derived terms, real mandate, real pending
+    // request, frozen approve command bound server-side.
+    let terms = owned
+        .project
+        .paea_git_agreement_terms(&exact)
+        .unwrap()
+        .expect("recipe terms derivable for this canonical Git action");
+    let resource = terms.resource.clone();
+    let mandate_id = format!("reader-matrix-mandate-{}", std::process::id());
+    trust(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":format!("reader-matrix-mandate-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+        }),
+        "fixture-admin-token",
+    );
+    let action: Value = trust(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":format!("reader-matrix-request-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "resource":resource,
+            "amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+            "idempotency_key":format!("reader-matrix-key-{mandate_id}"),
+        }),
+        "fixture-requester-token",
+    );
+    assert_eq!(action["state"], "pending_approval");
+    let approve = serde_json::to_vec(&json!({
+        "schema_version":1,
+        "event_id":format!("reader-matrix-approve-{mandate_id}"),
+        "action_id":action["id"],
+        "mandate_id":mandate_id,
+        "content_digest":action["content_digest"],
+        "resource":resource,
+        "amount_minor":terms.amount_minor,
+        "currency":terms.currency,
+        "beneficiary":terms.beneficiary,
+    }))
+    .unwrap();
+    drop(trust);
+    drop(trust_revision_of);
+    let mut owned = owned;
+    owned.prepared = owned
+        .service
+        .paea_git_transfer_call(
+            &owned.project,
+            &proposal(&repository_id, &candidate),
+            &classified_context,
+            &owned.work,
+            "bare",
+            PIN,
+            "transfer-pack-reader-matrix",
+        )
+        .unwrap_or_else(|e| panic!("classified preparation refused: {:?}", e));
+    owned.prepared_request_permission = owned.prepared.request().permission();
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let approval_source = source
+        .prepare_approval(
+            swarm_enrollment_authority::trust_action::Operation::Approve,
+            &approve,
+        )
+        .unwrap_or_else(|e| panic!("approval preparation refused: {:?}", e.code()));
+    let mut fixture = fixture::Fixture::build_for_trust_actions(
+        vec![
+            owned.prepared_request_permission.clone(),
+            approval_source.request().permission(),
+        ],
+        owned.fixture_scope.clone(),
+        trust_revision,
+    );
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let authority = swarm_web::PaeaGitCallSource::open(
+        source,
+        fixture.path.to_str().unwrap(),
+        &fixture.pin,
+    )
+    .unwrap();
+    let s = swarm_web::NativeHttpService::open_git_call_with_approval(
+        &owned.service_path,
+        LocalWebAuthority::from_listener(&listener, KEY).unwrap(),
+        authority,
+        Some(approval_source),
+    )
+    .unwrap_or_else(|e| panic!("approval bind refused: {:?}", e.code()));
+    // Post-open producer operations (the trust closure borrows the project
+    // root again now that the partial moves are done).
+    let trust_post = |op: &str, value: Value, token: &str| -> Value {
+        serde_json::from_slice(
+            &owned
+                .project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+                .bytes,
+        )
+        .unwrap()
+    };
+    let blp_last = || {
+        trust_post("blp-show", json!({}), "fixture-admin-token")["record"]["history"]
+            .as_array()
+            .and_then(|h| h.last())
+            .and_then(|e| e["revision"].as_u64())
+            .unwrap_or(0)
+    };
+    const PREVIEW_URI: &str = "/api/v1/paea/git-call/preview";
+    const PRESENTATION_URI: &str = "/api/v1/paea/git-call/approval/presentation";
+    let action_id = action["id"].as_str().unwrap().to_string();
+    let content_digest = action["content_digest"].as_str().unwrap().to_string();
+    // Typed Err-path refusal (guard returns Err → HTTP refusal with the exact
+    // engine code): non-success, `authorization_required` in the typed failure
+    // AND the body, and zero classified byte or private identifier.
+    let assert_err_refusal = |uri: &str, token: &str, why: &str| {
+        let reply = get_with(&listener, &s, uri, Some(token));
+        assert!(
+            !reply.response.status().is_success(),
+            "{uri} {why} must refuse: {}",
+            String::from_utf8_lossy(reply.response.body())
+        );
+        assert_eq!(
+            reply
+                .failure
+                .as_ref()
+                .map(|f| f.code().to_string())
+                .unwrap_or_default(),
+            "authorization_required",
+            "{uri} {why}: exact typed code expected"
+        );
+        let raw = String::from_utf8(reply.response.body().to_vec()).unwrap();
+        let body: Value = serde_json::from_str(&raw).unwrap();
+        assert_eq!(body["error"], "authorization_required", "{uri} {why}: exact body error");
+        assert!(!raw.contains(PRIVATE_MARKER), "{uri} {why} leaked the marker");
+        assert!(!raw.contains("action_digest"), "{uri} {why} leaked a digest field");
+        assert!(!raw.contains(&action_id), "{uri} {why} leaked the action id");
+        assert!(!raw.contains(&mandate_id), "{uri} {why} leaked the mandate id");
+        assert!(!raw.contains(&content_digest), "{uri} {why} leaked the content digest");
+        assert!(
+            !raw.contains("paea-git-call-approval-unavailable"),
+            "{uri} {why}: approval-unavailable must never pose as a guard refusal"
+        );
+    };
+    // Refused-verdict refusal (guard refuses → 200 available:false with the
+    // exact reason): same zero-leak contract.
+    let assert_refused_verdict = |uri: &str, token: &str, expected: &str, why: &str| {
+        let reply = get_with(&listener, &s, uri, Some(token));
+        assert!(
+            reply.response.status().is_success(),
+            "{uri} {why} must be an explicit verdict: {}",
+            String::from_utf8_lossy(reply.response.body())
+        );
+        assert!(reply.failure.is_none(), "{uri} {why}: verdict, not a typed refusal");
+        let raw = String::from_utf8(reply.response.body().to_vec()).unwrap();
+        let body: Value = serde_json::from_str(&raw).unwrap();
+        assert_eq!(body["available"], false, "{uri} {why} must stay refused");
+        assert_eq!(body["reason"], expected, "{uri} {why}: exact guard code expected");
+        assert!(!raw.contains(PRIVATE_MARKER), "{uri} {why} leaked the marker");
+        assert!(!raw.contains("action_digest"), "{uri} {why} leaked a digest field");
+        assert!(!raw.contains(&action_id), "{uri} {why} leaked the action id");
+        assert!(!raw.contains(&mandate_id), "{uri} {why} leaked the mandate id");
+        assert!(!raw.contains(&content_digest), "{uri} {why} leaked the content digest");
+        assert!(
+            !raw.contains("paea-git-call-approval-unavailable"),
+            "{uri} {why}: approval-unavailable must never pose as a guard refusal"
+        );
+    };
+    // Positive witness on the SAME preconditions as the refusal variants.
+    let assert_positive = |uri: &str, token: &str, marker_expected: bool, why: &str| {
+        let reply = get_with(&listener, &s, uri, Some(token));
+        assert!(
+            reply.response.status().is_success(),
+            "{uri} {why} must serve: {}",
+            String::from_utf8_lossy(reply.response.body())
+        );
+        assert!(reply.failure.is_none(), "{uri} {why}: unexpected typed refusal");
+        let raw = String::from_utf8(reply.response.body().to_vec()).unwrap();
+        let body: Value = serde_json::from_str(&raw).unwrap();
+        assert_eq!(body["available"], true, "{uri} {why} must read the projection");
+        assert_eq!(body["canonical"]["digest_matches"], true, "{uri} {why}: exact digest identity");
+        assert_eq!(
+            raw.contains(PRIVATE_MARKER),
+            marker_expected,
+            "{uri} {why}: marker disclosure must match the route contract"
+        );
+        assert!(
+            !raw.contains("paea-git-call-approval-unavailable"),
+            "{uri} {why}: approval-unavailable must never pose as a witness"
+        );
+    };
+    // Both roots' trust journals, for the no-mutation brackets.
+    let roots_state = || {
+        (
+            service_trust_state(&owned.project_path),
+            service_trust_state(&owned.service_path),
+        )
+    };
+    let refs_before = managed_git_refs(&owned.project_path, &owned.work);
+    // POSITIVE witnesses FIRST, before any refusal variant, on the same
+    // preconditions: full field contract on the presentation route (frozen
+    // terms at the construction revision) and the marker only on preview.
+    {
+        let uri = PREVIEW_URI;
+        let reply = get_with(&listener, &s, uri, Some("Bearer fixture-admin-token"));
+        let raw = String::from_utf8(reply.response.body().to_vec()).unwrap();
+        assert!(raw.contains(PRIVATE_MARKER), "{uri} authorized reader must receive the exact permitted projection");
+        let body: Value = serde_json::from_slice(reply.response.body()).unwrap();
+        assert_eq!(body["available"], true);
+        assert_eq!(body["canonical"]["digest_matches"], true);
+    }
+    {
+        let uri = PRESENTATION_URI;
+        let presentation = get_with(&listener, &s, uri, Some("Bearer fixture-admin-token"));
+        assert!(
+            presentation.response.status().is_success(),
+            "presentation must serve: {}",
+            String::from_utf8_lossy(presentation.response.body())
+        );
+        assert!(presentation.failure.is_none());
+        let body: Value = serde_json::from_slice(presentation.response.body()).unwrap();
+        assert_eq!(body["event"], "paea-git-call-approval-presentation");
+        assert_eq!(body["available"], true);
+        assert_eq!(body["operation"], "approve");
+        assert_eq!(body["request_digest"].as_str().unwrap().len(), 64);
+        assert!(body.get("command_bytes_b64url").is_none());
+        assert!(body.get("command").is_none());
+        assert!(body.to_string().contains(action_id.as_str()) == false);
+        assert!(body.to_string().contains(&mandate_id) == false);
+        assert!(body.to_string().contains(content_digest.as_str()) == false);
+        assert_eq!(body["canonical"]["digest_matches"], true);
+        assert_eq!(body["agreement_terms"]["binding"], "recipe");
+        assert_eq!(body["agreement_terms"]["resource"], resource.as_str());
+        assert_eq!(body["agreement_terms"]["amount_minor"], terms.amount_minor);
+        assert_eq!(body["agreement_terms"]["currency"], terms.currency);
+        assert_eq!(body["agreement_terms"]["beneficiary"], terms.beneficiary);
+        assert_eq!(body["agreement_terms"]["revision"], trust_revision);
+        assert_eq!(body["current"]["roots_bound"], true);
+        assert_eq!(body["current"]["declared_trust_revision"], trust_revision);
+        assert_eq!(body["current"]["trust_revision_current"], true);
+        assert_eq!(body["limits"]["consent"], "none-captured");
+        assert_eq!(body["limits"]["consumption"], "none");
+        assert_eq!(body["limits"]["human_presence"], "not-established");
+        assert!(String::from_utf8_lossy(presentation.response.body()).contains(PRIVATE_MARKER) == false);
+    }
+    // VARIANT 1 — unknown bearer credential: typed Err-path refusal on both
+    // routes, no mutation of either root.
+    {
+        let before = roots_state();
+        assert_err_refusal(PREVIEW_URI, "Bearer fixture-no-such-reader-token", "unknown credential");
+        assert_err_refusal(PRESENTATION_URI, "Bearer fixture-no-such-reader-token", "unknown credential");
+        assert_eq!(before, roots_state(), "unknown-credential refusals must not mutate either root");
+    }
+    // VARIANT 2 — identity DISABLED via a supported Trust operation. First a
+    // real config-apply that disables the approver identity only; the
+    // attribution rides the old entry, so EVERY reader is policy-stale (the
+    // staleness that must never mask the disabled identity is observed here).
+    let view: Value =
+        serde_json::from_slice(&owned.project.trust("show", b"{}", "").unwrap().bytes).unwrap();
+    let mut identities = view["identities"].clone();
+    for identity in identities.as_array_mut().unwrap() {
+        identity["token"] = match identity["subject"].as_str() {
+            Some("requester") => "fixture-requester-token".into(),
+            Some("approver") => "fixture-approver-token".into(),
+            Some("agreement-admin") => "fixture-admin-token".into(),
+            _ => Value::String(String::new()),
+        };
+        identity["disabled"] = (identity["subject"].as_str() == Some("approver")).into();
+    }
+    owned
+        .project
+        .trust(
+            "config-apply",
+            &serde_json::to_vec(&json!({
+                "schema_version":1,
+                "event_id":format!("reader-matrix-disable-{}", current_trust_revision(&owned.project_path)),
+                "expected_revision":current_trust_revision(&owned.project_path),
+                "reason":"Reader matrix: supported disablement of the approver fixture identity",
+                "policy":view["policy"],
+                "identities":identities,
+            }))
+            .unwrap(),
+            "",
+        )
+        .unwrap_or_else(|e| panic!("disable config refused: {}", e.code()));
+    {
+        let before = roots_state();
+        assert_refused_verdict(
+            PREVIEW_URI,
+            "Bearer fixture-admin-token",
+            "paea-reader-policy-stale",
+            "post-config attribution rides the old entry",
+        );
+        assert_refused_verdict(
+            PRESENTATION_URI,
+            "Bearer fixture-admin-token",
+            "paea-reader-policy-stale",
+            "post-config attribution rides the old entry",
+        );
+        assert_eq!(before, roots_state(), "stale verdicts must not mutate either root");
+    }
+    // Renew the BLP policy at the new revision WITHOUT the disabled
+    // principal's clearance, then re-attribute the exact classified bytes with
+    // the real producer: currency is restored, the identity stays disabled.
+    let mut renewal_policy = policy.clone();
+    renewal_policy["clearances"]
+        .as_object_mut()
+        .expect("policy clearances object")
+        .remove("approver");
+    trust_post(
+        "blp-policy-apply",
+        json!({
+            "schema_version":1,
+            "event_id":format!("reader-matrix-renewal-{}", current_trust_revision(&owned.project_path)),
+            "expected_revision":blp_last(),
+            "expected_trust_revision":current_trust_revision(&owned.project_path),
+            "reason":"Reader matrix: policy renewal without the disabled approver clearance",
+            "policy":renewal_policy.clone(),
+        }),
+        "fixture-admin-token",
+    );
+    let renewed_attribute = trust_post(
+        "blp-object-attribute",
+        json!({
+            "schema_version":1,
+            "event_id":format!("reader-matrix-attribute-renewed-{}", current_trust_revision(&owned.project_path)),
+            "expected_revision":blp_last(),
+            "expected_trust_revision":current_trust_revision(&owned.project_path),
+            "canonical_digest":classified_digest,
+            "project_path":owned.project_path.to_str().unwrap(),
+            "classification":{"level":"classified","compartments":[]},
+            "reason":"Reader matrix: re-attribution at the renewed revision",
+        }),
+        "fixture-admin-token",
+    );
+    assert_eq!(
+        renewed_attribute["attributed"], true,
+        "re-attribution at the renewed revision must be producer-accepted"
+    );
+    // Same preconditions restored: the authorized reader reads again, then the
+    // DISABLED identity is refused DIRECTLY — authentication precedes the
+    // currency check, so staleness cannot mask it.
+    assert_positive(
+        PREVIEW_URI,
+        "Bearer fixture-admin-token",
+        true,
+        "authorized reader after the disablement renewal",
+    );
+    assert_positive(
+        PRESENTATION_URI,
+        "Bearer fixture-admin-token",
+        false,
+        "authorized reader after the disablement renewal",
+    );
+    {
+        let before = roots_state();
+        assert_err_refusal(PREVIEW_URI, "Bearer fixture-approver-token", "disabled identity");
+        assert_err_refusal(PRESENTATION_URI, "Bearer fixture-approver-token", "disabled identity");
+        assert_eq!(before, roots_state(), "disabled-identity refusals must not mutate either root");
+    }
+    // VARIANT 3 — attribution ABSENT at the current policy revision: a further
+    // real renewal WITHOUT re-attribution; even the maximally-cleared reader
+    // is refused with the attribution code, never a projection byte.
+    trust_post(
+        "blp-policy-apply",
+        json!({
+            "schema_version":1,
+            "event_id":format!("reader-matrix-renewal-unattributed-{}", current_trust_revision(&owned.project_path)),
+            "expected_revision":blp_last(),
+            "expected_trust_revision":current_trust_revision(&owned.project_path),
+            "reason":"Reader matrix: renewal WITHOUT re-attribution to observe the attribution-absent refusal",
+            "policy":renewal_policy.clone(),
+        }),
+        "fixture-admin-token",
+    );
+    {
+        let before = roots_state();
+        assert_refused_verdict(
+            PREVIEW_URI,
+            "Bearer fixture-admin-token",
+            "paea-reader-attribution-required",
+            "attribution absent for the maximally-cleared reader",
+        );
+        assert_refused_verdict(
+            PRESENTATION_URI,
+            "Bearer fixture-admin-token",
+            "paea-reader-attribution-required",
+            "attribution absent for the maximally-cleared reader",
+        );
+        assert_eq!(before, roots_state(), "attribution-absent refusals must not mutate either root");
+    }
+    // VARIANT 4 — attribution bound to a WRONG canonical digest: the REAL
+    // producer accepts a distinct (policy revision, digest, project) key — the
+    // digest of the same action under the UNCLASSIFIED context.
+    let wrong_digest = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &context(trust_revision),
+    )
+    .unwrap()
+    .digest()
+    .to_string();
+    assert_ne!(wrong_digest, classified_digest, "the wrong-digest variant must differ from the classified digest");
+    let wrong_digest_attribute = trust_post(
+        "blp-object-attribute",
+        json!({
+            "schema_version":1,
+            "event_id":format!("reader-matrix-attribute-wrong-digest-{}", current_trust_revision(&owned.project_path)),
+            "expected_revision":blp_last(),
+            "expected_trust_revision":current_trust_revision(&owned.project_path),
+            "canonical_digest":wrong_digest,
+            "project_path":owned.project_path.to_str().unwrap(),
+            "classification":{"level":"classified","compartments":[]},
+            "reason":"Reader matrix: producer-real attribution bound to a DIFFERENT canonical digest",
+        }),
+        "fixture-admin-token",
+    );
+    assert_eq!(
+        wrong_digest_attribute["attributed"], true,
+        "the wrong-digest attribution must be producer-accepted (real producer, real key)"
+    );
+    {
+        let before = roots_state();
+        assert_refused_verdict(
+            PREVIEW_URI,
+            "Bearer fixture-admin-token",
+            "paea-reader-attribution-required",
+            "attribution bound to the wrong digest",
+        );
+        assert_refused_verdict(
+            PRESENTATION_URI,
+            "Bearer fixture-admin-token",
+            "paea-reader-attribution-required",
+            "attribution bound to the wrong digest",
+        );
+        assert_eq!(before, roots_state(), "wrong-digest refusals must not mutate either root");
+    }
+    // VARIANT 5 — attribution bound to a WRONG project root (the service root
+    // path): same served contract.
+    assert_ne!(
+        owned.service_path, owned.project_path,
+        "the wrong-project variant must target a different root"
+    );
+    let wrong_project_attribute = trust_post(
+        "blp-object-attribute",
+        json!({
+            "schema_version":1,
+            "event_id":format!("reader-matrix-attribute-wrong-project-{}", current_trust_revision(&owned.project_path)),
+            "expected_revision":blp_last(),
+            "expected_trust_revision":current_trust_revision(&owned.project_path),
+            "canonical_digest":classified_digest,
+            "project_path":owned.service_path.to_str().unwrap(),
+            "classification":{"level":"classified","compartments":[]},
+            "reason":"Reader matrix: producer-real attribution bound to a DIFFERENT project root",
+        }),
+        "fixture-admin-token",
+    );
+    assert_eq!(
+        wrong_project_attribute["attributed"], true,
+        "the wrong-project attribution must be producer-accepted (real producer, real key)"
+    );
+    {
+        let before = roots_state();
+        assert_refused_verdict(
+            PREVIEW_URI,
+            "Bearer fixture-admin-token",
+            "paea-reader-attribution-required",
+            "attribution bound to the wrong project root",
+        );
+        assert_refused_verdict(
+            PRESENTATION_URI,
+            "Bearer fixture-admin-token",
+            "paea-reader-attribution-required",
+            "attribution bound to the wrong project root",
+        );
+        assert_eq!(before, roots_state(), "wrong-project refusals must not mutate either root");
+    }
+    // RECOVERY — the correct re-attribution at the current revision restores
+    // the positive witness on both routes: the refusals above were
+    // attribution-state-driven and the channel is intact.
+    let restored_attribute = trust_post(
+        "blp-object-attribute",
+        json!({
+            "schema_version":1,
+            "event_id":format!("reader-matrix-attribute-restored-{}", current_trust_revision(&owned.project_path)),
+            "expected_revision":blp_last(),
+            "expected_trust_revision":current_trust_revision(&owned.project_path),
+            "canonical_digest":classified_digest,
+            "project_path":owned.project_path.to_str().unwrap(),
+            "classification":{"level":"classified","compartments":[]},
+            "reason":"Reader matrix: correct re-attribution restores the positive witness",
+        }),
+        "fixture-admin-token",
+    );
+    assert_eq!(
+        restored_attribute["attributed"], true,
+        "the restoring attribution must be producer-accepted"
+    );
+    assert_positive(
+        PREVIEW_URI,
+        "Bearer fixture-admin-token",
+        true,
+        "authorized reader after the restoring attribution",
+    );
+    assert_positive(
+        PRESENTATION_URI,
+        "Bearer fixture-admin-token",
+        false,
+        "authorized reader after the restoring attribution",
+    );
+    assert_eq!(
+        refs_before,
+        managed_git_refs(&owned.project_path, &owned.work),
+        "the whole matrix must leave the managed Git refs untouched"
+    );
+    let _ = s.close();
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    fixture.close();
+}
+
+/// BLP-RET-05 remaining frontier (status siblings): the two cookie-only GET
+/// status routes — `GET /api/v1/paea/git-call` and
+/// `GET /api/v1/paea/git-call/approval` — must NOT serve ANY value derived
+/// from the selected prepared request to a session alone, while the guarded
+/// preview and presentation routes refuse that same bare session with the
+/// stable no-credential code. A closed vocabulary does NOT make the selected
+/// value a constant: the selected `call`/`service`/`operation` and every
+/// exact digest are request-derived classified selections, and no
+/// declassification right is created. The counterexample runs on the SAME rig
+/// as `preview_reader_guard_enforces_produced_attribution` (real BLP policy,
+/// real `blp-object-attribute` attribution bound to the exact classified
+/// canonical digest, real mandate/request/approve chain, `prepare_approval`,
+/// bound approval): a positive witness first (the guarded routes DO refuse a
+/// bare session on these exact preconditions, so the rig is real and no
+/// refusal can be vacuity — `paea-git-call-approval-unavailable` never
+/// counts), then the minimal status contract: each status serves `bound:true`
+/// with a NULL capability object — no root/action/request digest, no selected
+/// call/service/operation value or field name, no action/mandate identifier,
+/// no content digest, no classified marker — on GET and HEAD; the exact
+/// metadata stays readable only through the guarded routes already covered by
+/// the reference rig and the refusal matrix
+/// (`reader_refusal_matrix_on_bound_approval_both_routes`), and the
+/// approval status stays a real refusal code for consumption under a wrong
+/// credential.
+///
+/// Preconditions: `SWARM_PAEA_SOURCE_FIXTURE` (via `owned_agreement`) and the
+/// permanent recipe environment. Errors: panics on any unexpected reply — the
+/// failure output carries the served body as the reproducer evidence. Effects:
+/// the test's own fixture roots and supported producer operations only; the
+/// status routes are read-only observations. Limits: asserts the public
+/// contract of the two status siblings under a bare session; unknown-token,
+/// disabled-identity and missing/misbound-attribution variants keep their
+/// coverage in the refusal matrix; no global confidentiality or OS protection
+/// is claimed; does not close BLP-RET-05 or PAEA.
+#[test]
+fn status_siblings_serve_no_classified_digest_to_bare_session() {
+    // ---- Same rig as `preview_reader_guard_enforces_produced_attribution`:
+    // real policy, real attribution, real bound approval, all routes open.
+    let owned = owned_agreement();
+    let (repository_id, candidate) = (owned.repository_id.clone(), owned.candidate.clone());
+    let trust_revision = owned.trust_revision;
+    let policy = json!({
+        "schema_version":1,
+        "levels":[
+            {"id":"public","name_fr":"Public","name_en":"Public"},
+            {"id":"restricted","name_fr":"Diffusion restreinte","name_en":"Restricted"},
+            {"id":"classified","name_fr":"Diffusion contrôlée","name_en":"Classified"},
+        ],
+        "compartments":[],
+        "clearances":{
+            "enrolled-effect":{"level":"classified","compartments":[]},
+            "requester":{"level":"restricted","compartments":[]},
+            "approver":{"level":"public","compartments":[]},
+            "agreement-admin":{"level":"classified","compartments":[]},
+        },
+    });
+    let trust = |op: &str, value: Value, token: &str| -> Value {
+        serde_json::from_slice(
+            &owned
+                .project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+                .bytes,
+        )
+        .unwrap()
+    };
+    let trust_revision_of = |path: &Path| current_trust_revision(path);
+    let blp_revision = trust("blp-show", json!({}), "fixture-admin-token")["record"]
+        ["history"]
+        .as_array()
+        .and_then(|h| h.last())
+        .and_then(|e| e["revision"].as_u64())
+        .unwrap_or(0);
+    let project_path = owned.project_path.clone();
+    trust(
+        "blp-policy-apply",
+        json!({
+            "schema_version":1,
+            "event_id":format!("status-siblings-policy-{}", trust_revision_of(&project_path)),
+            "expected_revision":blp_revision,
+            "expected_trust_revision":trust_revision_of(&project_path),
+            "reason":"Status-siblings counterexample policy for the PAEA both-status frontier",
+            "policy":policy.clone(),
+        }),
+        "fixture-admin-token",
+    );
+    const PRIVATE_MARKER: &str = "fixture-classified-marker-blp-ret-05";
+    let mut classified_context = context(trust_revision);
+    classified_context.sources[0].confidentiality_labels = vec![PRIVATE_MARKER.to_owned()];
+    let exact = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &classified_context,
+    )
+    .unwrap()
+    .bytes()
+    .to_vec();
+    let classified_digest = swarm_protection_contract::canonicalize(
+        &proposal(&repository_id, &candidate),
+        &classified_context,
+    )
+    .unwrap()
+    .digest()
+    .to_string();
+    let attribute = trust("blp-show", json!({}), "fixture-admin-token")["record"]
+        ["history"]
+        .as_array()
+        .and_then(|h| h.last())
+        .and_then(|e| e["revision"].as_u64())
+        .unwrap_or(0);
+    let attribute_reply = trust(
+        "blp-object-attribute",
+        json!({
+            "schema_version":1,
+            "event_id":format!("status-siblings-attribute-{}", trust_revision_of(&project_path)),
+            "expected_revision":attribute,
+            "expected_trust_revision":trust_revision_of(&project_path),
+            "canonical_digest":classified_digest,
+            "project_path":owned.project_path.to_str().unwrap(),
+            "classification":{"level":"classified","compartments":[]},
+            "reason":"Status-siblings attribution for the exact prepared action fixture",
+        }),
+        "fixture-admin-token",
+    );
+    assert_eq!(attribute_reply["attributed"], true, "supported producer must attribute");
+    assert_eq!(attribute_reply["runtime_enforced"], false, "seam is explicit: no runtime enforcement beyond the served surface is claimed");
+    // Real approval rig: engine-derived terms, real mandate, real pending
+    // request, frozen approve command bound server-side.
+    let terms = owned
+        .project
+        .paea_git_agreement_terms(&exact)
+        .unwrap()
+        .expect("recipe terms derivable for this canonical Git action");
+    let resource = terms.resource.clone();
+    let mandate_id = format!("status-siblings-mandate-{}", std::process::id());
+    trust(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":format!("status-siblings-mandate-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+        }),
+        "fixture-admin-token",
+    );
+    let action: Value = trust(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":format!("status-siblings-request-{mandate_id}"),
+            "mandate_id":mandate_id,
+            "resource":resource,
+            "amount_minor":terms.amount_minor,
+            "currency":terms.currency,
+            "beneficiary":terms.beneficiary,
+            "idempotency_key":format!("status-siblings-key-{mandate_id}"),
+        }),
+        "fixture-requester-token",
+    );
+    assert_eq!(action["state"], "pending_approval");
+    let action_id = action["id"].as_str().unwrap().to_string();
+    let content_digest = action["content_digest"].as_str().unwrap().to_string();
+    let approve = serde_json::to_vec(&json!({
+        "schema_version":1,
+        "event_id":format!("status-siblings-approve-{mandate_id}"),
+        "action_id":action["id"],
+        "mandate_id":mandate_id,
+        "content_digest":action["content_digest"],
+        "resource":resource,
+        "amount_minor":terms.amount_minor,
+        "currency":terms.currency,
+        "beneficiary":terms.beneficiary,
+    }))
+    .unwrap();
+    drop(trust);
+    drop(trust_revision_of);
+    let mut owned = owned;
+    owned.prepared = owned
+        .service
+        .paea_git_transfer_call(
+            &owned.project,
+            &proposal(&repository_id, &candidate),
+            &classified_context,
+            &owned.work,
+            "bare",
+            PIN,
+            "transfer-pack-status-siblings",
+        )
+        .unwrap_or_else(|e| panic!("classified preparation refused: {:?}", e));
+    owned.prepared_request_permission = owned.prepared.request().permission();
+    // Exact digests held by the preparation and the bound approval, captured
+    // before the moves: the counterexample asserts their ABSENCE from the
+    // cookie-only siblings.
+    let root_digest = owned.prepared.request().root_digest().to_owned();
+    let action_digest = owned.prepared.request().action_digest().to_owned();
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let approval_source = source
+        .prepare_approval(
+            swarm_enrollment_authority::trust_action::Operation::Approve,
+            &approve,
+        )
+        .unwrap_or_else(|e| panic!("approval preparation refused: {:?}", e.code()));
+    let approval_request_digest = approval_source.request().request_digest().to_owned();
+    let mut fixture = fixture::Fixture::build_for_trust_actions(
+        vec![
+            owned.prepared_request_permission.clone(),
+            approval_source.request().permission(),
+        ],
+        owned.fixture_scope.clone(),
+        trust_revision,
+    );
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let authority = swarm_web::PaeaGitCallSource::open(
+        source,
+        fixture.path.to_str().unwrap(),
+        &fixture.pin,
+    )
+    .unwrap();
+    let s = swarm_web::NativeHttpService::open_git_call_with_approval(
+        &owned.service_path,
+        LocalWebAuthority::from_listener(&listener, KEY).unwrap(),
+        authority,
+        Some(approval_source),
+    )
+    .unwrap_or_else(|e| panic!("approval bind refused: {:?}", e.code()));
+    // TÉMOIN POSITIF D'ABORD: on these exact preconditions (real attribution,
+    // real bound approval) the guarded routes refuse a bare session with the
+    // stable no-credential code — the rig is real, so any later status-leak
+    // finding cannot be explained by an empty rig, and
+    // `paea-git-call-approval-unavailable` never counts as a guard refusal.
+    for uri in [
+        "/api/v1/paea/git-call/preview",
+        "/api/v1/paea/git-call/approval/presentation",
+    ] {
+        let body: Value = serde_json::from_slice(get(&listener, &s, uri).response.body()).unwrap();
+        let raw = serde_json::to_string(&body).unwrap();
+        assert!(!raw.contains(PRIVATE_MARKER), "{uri} served the marker to a bare session");
+        assert_eq!(body["available"], false, "{uri} bare session must stay refused");
+        assert_eq!(
+            body["reason"], "paea-reader-authentication-required",
+            "{uri} bare session refuses with the stable no-credential code"
+        );
+        assert!(
+            !raw.contains("paea-git-call-approval-unavailable"),
+            "{uri}: approval-unavailable must never pose as a guard refusal"
+        );
+    }
+    // CONTRE-EXEMPLE DES SIBLINGS STATUS: a bare session — the SAME ordinary
+    // cookie the guarded routes just refused — must read ONLY the observation
+    // boolean and literal protocol constants. NO request-derived value of any
+    // kind passes: digests AND the selected call/service/operation (a closed
+    // vocabulary does not make the selected value a constant — no
+    // declassification right is created). Asserted on GET and HEAD, against
+    // the exact known values and field names.
+    for method in ["GET", "HEAD"] {
+        for (uri, forbidden) in [
+            (
+                "/api/v1/paea/git-call",
+                vec![
+                    ("root_digest", root_digest.as_str()),
+                    ("action_digest", action_digest.as_str()),
+                    ("call", "transfer"),
+                    ("service", "repository.promote"),
+                    ("operation", "reconcile"),
+                ],
+            ),
+            (
+                "/api/v1/paea/git-call/approval",
+                vec![
+                    ("request_digest", approval_request_digest.as_str()),
+                    ("operation", "approve"),
+                ],
+            ),
+        ] {
+            let reply = if method == "GET" {
+                get(&listener, &s, uri)
+            } else {
+                head(&listener, &s, uri)
+            };
+            let raw = String::from_utf8_lossy(reply.response.body()).to_string();
+            // HEAD contract: success, no typed refusal, and NO body bytes —
+            // the digest/metadata non-disclosure on HEAD follows from the
+            // empty body itself, so nothing is parsed there.
+            if method == "HEAD" {
+                assert!(
+                    reply.response.status().is_success(),
+                    "HEAD {uri} must succeed: {}",
+                    String::from_utf8_lossy(reply.response.body())
+                );
+                assert!(reply.failure.is_none(), "HEAD {uri}: unexpected typed refusal");
+                assert!(
+                    reply.response.body().is_empty(),
+                    "HEAD {uri} must serve an empty body, got: {raw}"
+                );
+                continue;
+            }
+            let body: Value = serde_json::from_slice(reply.response.body()).unwrap();
+            assert_eq!(body["bound"], true, "{method} {uri} bound must stay observable");
+            assert_eq!(
+                body["capability"], serde_json::Value::Null,
+                "{method} {uri} must serve NO capability object under a bare session: {raw}"
+            );
+            for (field, value) in &forbidden {
+                assert!(
+                    raw.as_bytes().windows(value.len()).any(|w| w == value.as_bytes()) == false,
+                    "{method} {uri} served the request-derived {field} value to a bare session"
+                );
+            }
+            // Structural complement: the capability key carries NO derived
+            // field name at all — it is the JSON null, never an object
+            // (field-name presence on the raw body is not asserted: the
+            // event name itself legitimately contains "call").
+            assert!(
+                body["capability"].as_object().is_none(),
+                "{method} {uri} served a capability object under a bare session"
+            );
+            for leak in [
+                classified_digest.as_str(),
+                &action_id,
+                &mandate_id,
+                &content_digest,
+                PRIVATE_MARKER,
+            ] {
+                assert!(
+                    !raw.contains(leak),
+                    "{method} {uri} leaked a private identifier or marker"
+                );
+            }
+            assert!(
+                !raw.contains("paea-git-call-approval-unavailable"),
+                "{method} {uri}: approval-unavailable must never pose as a status reply"
+            );
+        }
+    }
+    // Positive status contract AFTER correction (kept from the first lot): on
+    // a bound source each status serves `bound:true` with a NULL capability
+    // for a bare session — the observation boolean is the whole cookie-only
+    // contract; the null-capability agreement route (the form's first read)
+    // keeps its explicit refusal code for consumption.
+    {
+        let approval_status: Value = serde_json::from_slice(
+            get(&listener, &s, "/api/v1/paea/git-call/approval").response.body(),
+        )
+        .unwrap();
+        assert_eq!(approval_status["bound"], true);
+        assert_eq!(approval_status["capability"], serde_json::Value::Null);
+        let refus = post(
+            &listener,
+            &s,
+            "/api/v1/paea/git-call/approval",
+            Vec::new(),
+            Some(format!("Enrollment {}", URL_SAFE_NO_PAD.encode(b"wrong-password"))),
+        );
+        assert!(
+            !refus.response.status().is_success(),
+            "approval consumption must stay refused under a wrong credential"
+        );
+    }
+    let _ = s.close();
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+    fixture.close();
+}
+
+/// Counter-evidence for the selection channel (BLP-RET-05): TWO different
+/// prepared intentions, bound to two separate real services, must yield
+/// BYTE-IDENTICAL status replies on both cookie-only routes. If any
+/// request-derived value (call kind, digests, repository/candidate identity,
+/// operation) leaked into the status projection, the two replies would differ
+/// and this equality would fail. Only presence (`bound`) may discriminate a
+/// bound service from an unbound one; two DISTINCT bound preparations may not.
+///
+/// Preconditions: `SWARM_PAEA_SOURCE_FIXTURE` (via `owned_agreement`). Errors:
+/// panics with both raw bodies on any discriminating byte. Effects: the test's
+/// own fixture roots only; status routes are read-only observations and the
+/// prepared calls are never consumed. Limits: proves non-discrimination of the
+/// status projection between two transfer preparations on the same fixture
+/// family; it does not close BLP-RET-05 and claims no global confidentiality.
+#[test]
+#[ignore = "requires explicit retained native source fixture"]
+fn status_does_not_discriminate_two_prepared_intentions() {
+    // Intention A: the ordinary owned agreement rig on the retained fixture.
+    let owned_a = owned_agreement();
+    // Intention B: a second prepared transfer from the SAME retained fixture
+    // but with DISTINCT proposal bytes (other repository id, other candidate
+    // oid) bound to its own fresh service root — a different classified
+    // intention, different action digest, same fixture family.
+    let (service_dir_b, service_b) = service();
+    service_b
+        .paea_initialize_git_intents("fixture-project", PIN)
+        .unwrap();
+    let bare = service_dir_b.path().join(".swarm/bare");
+    fs::create_dir(&bare).unwrap();
+    fs::set_permissions(&bare, fs::Permissions::from_mode(0o700)).unwrap();
+    let mut git = Command::new(git_executable());
+    for (key, _) in std::env::vars_os() {
+        if key.as_encoded_bytes().starts_with(b"GIT_") {
+            git.env_remove(key);
+        }
+    }
+    let result = git
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .args(["-c", "init.templateDir=", "init", "--bare"])
+        .arg(&bare)
+        .output()
+        .unwrap();
+    assert!(result.status.success());
+    let binding_b = service_b
+        .paea_provision_git_repository(&owned_a.project, &owned_a.work, "bare", PIN)
+        .unwrap();
+    let prepared_b = service_b
+        .paea_git_transfer_call(
+            &owned_a.project,
+            &proposal(binding_b.repository_id(), &"d".repeat(40)),
+            &context(owned_a.trust_revision),
+            &owned_a.work,
+            "bare",
+            PIN,
+            "transfer-pack-b",
+        )
+        .unwrap_or_else(|e| panic!("intention B preparation refused: {:?}", e));
+    // The two intentions really differ on the bytes the frontier protects.
+    assert_ne!(
+        owned_a.prepared.request().action_digest(),
+        prepared_b.request().action_digest(),
+        "the two prepared intentions must carry different action digests"
+    );
+    let source_b = PaeaGitCallSource::new_transfer(
+        prepared_b,
+        service_dir_b.path().to_path_buf(),
+        owned_a.project_path.clone(),
+    );
+    let fixture_b = fixture::Fixture::build_for_trust(
+        source_b.request().permission(),
+        owned_a.fixture_scope.clone(),
+        owned_a.trust_revision,
+    );
+    let authority_b = swarm_web::PaeaGitCallSource::open(
+        source_b,
+        fixture_b.path.to_str().unwrap(),
+        &fixture_b.pin,
+    )
+    .unwrap_or_else(|e| panic!("intention B authority refused: {:?}", e));
+    let listener_b = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let s_b = NativeHttpService::open_git_call(
+        service_dir_b.path(),
+        LocalWebAuthority::from_listener(&listener_b, KEY).unwrap(),
+        authority_b,
+    )
+    .unwrap_or_else(|e| panic!("intention B bind refused: {:?}", e.code()));
+    // Service A (bound to the owned rig's transfer authority, approval-less).
+    let source_a = PaeaGitCallSource::new_transfer(
+        owned_a.prepared,
+        owned_a.service_path.clone(),
+        owned_a.project_path.clone(),
+    );
+    let fixture_a = fixture::Fixture::build_for_trust(
+        owned_a.prepared_request_permission.clone(),
+        owned_a.fixture_scope.clone(),
+        owned_a.trust_revision,
+    );
+    let authority_a = swarm_web::PaeaGitCallSource::open(
+        source_a,
+        fixture_a.path.to_str().unwrap(),
+        &fixture_a.pin,
+    )
+    .unwrap_or_else(|e| panic!("intention A authority refused: {:?}", e));
+    let listener_a = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let s_a = NativeHttpService::open_git_call(
+        &owned_a.service_path,
+        LocalWebAuthority::from_listener(&listener_a, KEY).unwrap(),
+        authority_a,
+    )
+    .unwrap_or_else(|e| panic!("intention A bind refused: {:?}", e.code()));
+    // Both status replies, byte-exact, per route. The transfer route must be
+    // bound:true on both services (each holds its own prepared transfer); the
+    // approval route has no prepared approval on either service, so its
+    // observed `bound` value must match between the two services (whatever it
+    // is) — the discrimination proof is the byte equality itself.
+    for uri in ["/api/v1/paea/git-call", "/api/v1/paea/git-call/approval"] {
+        let reply_a = get(&listener_a, &s_a, uri);
+        let reply_b = get(&listener_b, &s_b, uri);
+        let raw_a = reply_a.response.body().to_vec();
+        let raw_b = reply_b.response.body().to_vec();
+        assert!(
+            raw_a == raw_b,
+            "{uri} discriminated the two prepared intentions:\nA: {}\nB: {}",
+            String::from_utf8_lossy(&raw_a),
+            String::from_utf8_lossy(&raw_b)
+        );
+        let body: Value = serde_json::from_slice(&raw_a).unwrap();
+        if uri == "/api/v1/paea/git-call" {
+            assert_eq!(body["bound"], true, "{uri} must report bound:true");
+        }
+        assert_eq!(
+            body["capability"], serde_json::Value::Null,
+            "{uri} served a capability object: {}",
+            String::from_utf8_lossy(&raw_a)
+        );
+    }
+    let _ = s_a.close();
+    let _ = s_b.close();
+    let _ = service_b.close();
+    let _ = owned_a.project.close();
+    let _ = owned_a.service.close();
+    fixture_a.close();
+    fixture_b.close();
+}
+
 /// Real frozen approval command bound to a real native HTTP server with its
 /// ordinary persisted session, held alive while a real browser qualification
 /// drives the served approval form through two public states: the fresh
@@ -2329,13 +4140,27 @@ fn approval_presentation_reports_explicit_absence_without_source() {
 /// password, ack `state:"approved"` shown, password erased), then the
 /// explicitly stale state after a real public Trust `config-apply` (never a
 /// journal edit), re-observed with no confirmation solicited and no success
-/// shown. Phase coordination with the browser harness uses owned marker files;
-/// every harness marker must carry the exact startup nonce, so no other
-/// process can drive this server, and an error marker fails the test with the
-/// FIRST browser error before any later assertion can mask it. The server
-/// closes checked on every path; no Git effect, ref change, second approval
-/// system or acceptance is claimed — the browser consumes the server-held
-/// command once, under the fixture enrollment.
+/// shown. The guarded presentation sits behind the BLP reader frontier
+/// (BLP-RET-05): a bare session refuses `paea-reader-authentication-required`
+/// before any projection, so the fixture produces REAL confidentiality
+/// authorization first — `blp-policy-apply` over the fixture identities and
+/// `blp-object-attribute` binding the EXACT canonical digest of the prepared
+/// action to this project root — and the harness types the fixture reader
+/// credential (server.json `reader_token`) into the page's EPHEMERAL reader
+/// input; the page carries it as a request-time Bearer on the guarded read
+/// only and clears it right after (no storage, URL or log; enrollment
+/// authority never reinterpreted as clearance). After the stale config-apply
+/// the recorded policy rides the old revision, so the fixture renews the
+/// policy and re-attributes through the same real producers at the NEW
+/// revision: the browser then observes the form's real stale comparison
+/// (`trust_revision_current:false`). Phase coordination with the browser
+/// harness uses owned marker files; every harness marker must carry the exact
+/// startup nonce, so no other process can drive this server, and an error
+/// marker fails the test with the FIRST browser error before any later
+/// assertion can mask it. The server closes checked on every path; no Git
+/// effect, ref change, second approval system or acceptance is claimed — the
+/// browser consumes the server-held command once, under the fixture
+/// enrollment.
 #[test]
 #[ignore = "requires explicit retained native source fixture and browser harness"]
 fn approval_form_serves_real_browser_session() {
@@ -2367,6 +4192,76 @@ fn approval_form_serves_real_browser_session() {
         )
         .unwrap()
     };
+    // Reader frontier (BLP-RET-05): the guarded presentation refuses a bare
+    // session, so the browser fixture must produce REAL confidentiality
+    // authorization through the supported control operations BEFORE any
+    // guarded read — a BLP policy over the real fixture identities
+    // (blp-policy-apply) then an attribution binding the EXACT canonical
+    // digest of the prepared action to this project root
+    // (blp-object-attribute). Event ids are bound to the live trust revision
+    // (apply-once per revision): reruns on the retained fixture advance
+    // through the real apply path and never revive a stale recorded entry.
+    let blp_revision = trust("blp-show", json!({}), "fixture-admin-token")["record"]
+        ["history"]
+        .as_array()
+        .and_then(|h| h.last())
+        .and_then(|e| e["revision"].as_u64())
+        .unwrap_or(0);
+    trust(
+        "blp-policy-apply",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-form-browser-policy-{}", owned.trust_revision),
+            "expected_revision":blp_revision,
+            "expected_trust_revision":owned.trust_revision,
+            "reason":"Reader-frontier policy for the approval form browser fixture",
+            "policy":{
+                "schema_version":1,
+                "levels":[
+                    {"id":"public","name_fr":"Public","name_en":"Public"},
+                    {"id":"restricted","name_fr":"Diffusion restreinte","name_en":"Restricted"},
+                    {"id":"classified","name_fr":"Diffusion contrôlée","name_en":"Classified"},
+                ],
+                "compartments":[],
+                "clearances":{
+                    "enrolled-effect":{"level":"classified","compartments":[]},
+                    "requester":{"level":"restricted","compartments":[]},
+                    "approver":{"level":"public","compartments":[]},
+                    "agreement-admin":{"level":"classified","compartments":[]},
+                },
+            },
+        }),
+        "fixture-admin-token",
+    );
+    let attribute_revision = trust("blp-show", json!({}), "fixture-admin-token")["record"]
+        ["history"]
+        .as_array()
+        .and_then(|h| h.last())
+        .and_then(|e| e["revision"].as_u64())
+        .unwrap_or(0);
+    let attribute_reply = trust(
+        "blp-object-attribute",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-form-browser-attribute-{}", owned.trust_revision),
+            "expected_revision":attribute_revision,
+            "expected_trust_revision":owned.trust_revision,
+            "canonical_digest":swarm_protection_contract::canonicalize(
+                &proposal(&repository_id, &candidate),
+                &context(owned.trust_revision),
+            )
+            .unwrap()
+            .digest(),
+            "project_path":owned.project_path.to_str().unwrap(),
+            "classification":{"level":"classified","compartments":[]},
+            "reason":"Reader-frontier attribution for the exact prepared action of the browser fixture",
+        }),
+        "fixture-admin-token",
+    );
+    assert_eq!(
+        attribute_reply["attributed"], true,
+        "supported producer must attribute the exact prepared action"
+    );
     trust(
         "mandate-create",
         json!({
@@ -2506,6 +4401,11 @@ fn approval_form_serves_real_browser_session() {
             }[..12]
         ),
         "session_file":session_name,
+        // Fixture reader credential the harness types into the page's
+        // EPHEMERAL reader input (agreement-admin, classified clearance): the
+        // guarded presentation read carries it as a request-time Bearer only —
+        // never stored, logged or transported anywhere else by the page.
+        "reader_token":"fixture-admin-token",
     });
     let control_dir = std::path::PathBuf::from(
         std::env::var_os("APPROVAL_FORM_BROWSER_DIR").expect("harness control directory"),
@@ -2564,6 +4464,78 @@ fn approval_form_serves_real_browser_session() {
         .unwrap_or_else(|e| panic!("stale revision change refused: {}", e.code()));
     let stale_revision = current_trust_revision(&owned.project_path);
     assert_eq!(stale_revision, owned.trust_revision + 1);
+    // The config-apply moved the trust revision: the recorded BLP policy lost
+    // currency (its entry rides the old revision), so the guarded presentation
+    // would refuse paea-reader-policy-stale BEFORE the projection exposes the
+    // real stale comparison. The browser phase-2 assertions observe the
+    // form's explicit stale state through that comparison, so the fixture
+    // renews the policy through the real producer at the NEW revision (same
+    // re-sealing the reader-refusal matrix applies) and re-attributes the
+    // exact prepared action: the reader then reaches the projection and the
+    // stale state is observed as `trust_revision_current:false` — provenance
+    // stays producer-real, and a real stale-policy refusal is the phase-1
+    // behavior for a not-yet-resealed state (no bypass, no label minted).
+    let blp_revision = trust("blp-show", json!({}), "fixture-admin-token")["record"]
+        ["history"]
+        .as_array()
+        .and_then(|h| h.last())
+        .and_then(|e| e["revision"].as_u64())
+        .unwrap_or(0);
+    trust(
+        "blp-policy-apply",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-form-browser-policy-renewal-{stale_revision}"),
+            "expected_revision":blp_revision,
+            "expected_trust_revision":stale_revision,
+            "reason":"Reader-frontier policy renewal after the stale Trust revision change",
+            "policy":{
+                "schema_version":1,
+                "levels":[
+                    {"id":"public","name_fr":"Public","name_en":"Public"},
+                    {"id":"restricted","name_fr":"Diffusion restreinte","name_en":"Restricted"},
+                    {"id":"classified","name_fr":"Diffusion contrôlée","name_en":"Classified"},
+                ],
+                "compartments":[],
+                "clearances":{
+                    "enrolled-effect":{"level":"classified","compartments":[]},
+                    "requester":{"level":"restricted","compartments":[]},
+                    "approver":{"level":"public","compartments":[]},
+                    "agreement-admin":{"level":"classified","compartments":[]},
+                },
+            },
+        }),
+        "fixture-admin-token",
+    );
+    let attribute_revision = trust("blp-show", json!({}), "fixture-admin-token")["record"]
+        ["history"]
+        .as_array()
+        .and_then(|h| h.last())
+        .and_then(|e| e["revision"].as_u64())
+        .unwrap_or(0);
+    let attribute_reply = trust(
+        "blp-object-attribute",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approval-form-browser-attribute-renewal-{stale_revision}"),
+            "expected_revision":attribute_revision,
+            "expected_trust_revision":stale_revision,
+            "canonical_digest":swarm_protection_contract::canonicalize(
+                &proposal(&repository_id, &candidate),
+                &context(owned.trust_revision),
+            )
+            .unwrap()
+            .digest(),
+            "project_path":owned.project_path.to_str().unwrap(),
+            "classification":{"level":"classified","compartments":[]},
+            "reason":"Reader-frontier re-attribution after the stale Trust revision change",
+        }),
+        "fixture-admin-token",
+    );
+    assert_eq!(
+        attribute_reply["attributed"], true,
+        "re-attribution at the stale revision must be producer-accepted"
+    );
     fs::write(control_dir.join("phase2.ready"), serde_json::to_vec(&serde_json::json!({
         "nonce":nonce,
         "trust_revision":stale_revision,
@@ -3078,14 +5050,17 @@ fn approval_route_wrong_role_denies_without_approval_or_service_effects() {
     )
     .unwrap_or_else(|e| panic!("approval bind refused: {:?}", e.code()));
     let good = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(PASSWORD));
-    // Startup observation: the approval capability is public, bound,
-    // digest-only — the wrong role is invisible at the capability layer
-    // because the capability never carried roles.
+    // Startup observation: the approval status is the minimal projection —
+    // the `bound` boolean only, no capability object (a closed vocabulary
+    // does not make the selected operation a constant, BLP-RET-05). The
+    // wrong role is therefore invisible at the startup layer entirely; the
+    // role denial is proven by the actual guarded consumption below.
     let status = get(&listener, &s, "/api/v1/paea/git-call/approval");
     assert!(status.response.status().is_success());
     let status_body: Value = serde_json::from_slice(status.response.body()).unwrap();
     assert_eq!(status_body["bound"], true);
-    assert_eq!(status_body["capability"]["operation"], "approve");
+    assert_eq!(status_body["capability"], serde_json::Value::Null,
+        "approval status must serve no request-derived capability: {status_body}");
     // The empty-body consumption under the correct held password reaches the
     // engine's approve guard with the server-held frozen command: the enrolled
     // identity lacks the approver role, so the guard denies. The route returns
@@ -3342,12 +5317,14 @@ fn approval_route_wrong_role_denies_without_approval_or_service_effects() {
     )
     .unwrap_or_else(|e| panic!("recovery approval bind refused: {:?}", e.code()));
     let fresh_good = format!("Enrollment {}", URL_SAFE_NO_PAD.encode(PASSWORD));
-    // The recovered capability is bound again: public, digest-only status.
+    // The recovered approval is bound again: minimal status only (the
+    // `bound` boolean, no capability object — BLP-RET-05).
     let fresh_status = get(&fresh_listener, &fresh_service, "/api/v1/paea/git-call/approval");
     assert!(fresh_status.response.status().is_success());
     let fresh_status_body: Value = serde_json::from_slice(fresh_status.response.body()).unwrap();
     assert_eq!(fresh_status_body["bound"], true);
-    assert_eq!(fresh_status_body["capability"]["operation"], "approve");
+    assert_eq!(fresh_status_body["capability"], serde_json::Value::Null,
+        "recovered approval status must serve no request-derived capability: {fresh_status_body}");
     // REAL HTTP approval under the same held password: an empty-body
     // consumption of the freshly server-held command. The enrolled identity
     // now holds the approver role at the current revision, so the engine's

@@ -110,7 +110,8 @@ impl RootStore {
             } else { "local-operator".to_owned() };
             let mut planned = None;
             let bytes = match operation {
-                "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" => {
+                "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check"
+                | "blp-object-attribute" => {
                     let (bytes, state)=trust::confidentiality::execute(&mut st,operation,raw,token,now).map_err(failure)?;
                     planned=state; bytes
                 }

@@ -34,8 +34,8 @@
     {
       "id": "send",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "89a89fd1a3ebed93f507584071f27e916de94ae3de8726317c9ebb67cc07df0a",
-      "line": 484,
+      "sha256": "615fcf28f61903a3baeeb8363b0966cda7bac96a1e4ccbffb36a36f24050d2d1",
+      "line": 504,
       "anchor": "pub fn preparation_send<"
     },
     {
@@ -69,8 +69,8 @@
     {
       "id": "claim",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "89a89fd1a3ebed93f507584071f27e916de94ae3de8726317c9ebb67cc07df0a",
-      "line": 718,
+      "sha256": "615fcf28f61903a3baeeb8363b0966cda7bac96a1e4ccbffb36a36f24050d2d1",
+      "line": 737,
       "anchor": "pub fn preparation_worker_claim("
     },
     {
@@ -195,8 +195,8 @@
     {
       "id": "finish",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "89a89fd1a3ebed93f507584071f27e916de94ae3de8726317c9ebb67cc07df0a",
-      "line": 867,
+      "sha256": "615fcf28f61903a3baeeb8363b0966cda7bac96a1e4ccbffb36a36f24050d2d1",
+      "line": 886,
       "anchor": "pub fn preparation_worker_finish<"
     },
     {
@@ -303,6 +303,13 @@
       "sha256": "920eeccb7317d18f822662de7622d6b07c2c69f3bb0a8cc2bdaa2a5186fc215f",
       "line": 99,
       "anchor": "\"runtime_enforced\":false"
+    },
+    {
+      "id": "prompt_provenance",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
+      "sha256": "86d08b88a025ba481bd7665aaab92d17257086de41180eb3ff68ad4163cd88c4",
+      "line": 119,
+      "anchor": "pub(super) fn assemble("
     }
   ],
   "flows": [
@@ -398,10 +405,11 @@
       "references": [
         "send",
         "claim",
-        "storage"
+        "storage",
+        "prompt_provenance"
       ],
       "material": "complete combined prompt and private native envelope",
-      "current_controls": "Root/settings/SQL snapshots, digest/revision/caps and budget admission; no BLP labels on all inputs",
+      "current_controls": "Root/settings/SQL snapshots, digest/revision/caps and budget admission; new native v3 records retain complete ordered prompt byte provenance, verified before worker use. No classified inputs, authenticated BLP principal or disclosure authority.",
       "missing_blp": [
         "BLP-03",
         "BLP-04"

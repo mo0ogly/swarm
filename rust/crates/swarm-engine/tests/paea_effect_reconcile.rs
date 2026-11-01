@@ -55,7 +55,8 @@ fn project() -> (tempfile::TempDir, RootStore, Scope) {
         "identities":[
             {"subject":"enrolled-effect","integrity":3,"roles":["admin","effect"],"enrollment_principal":{"principal_id":"operator","principal_kind":"human","issuer":"https://fixture.invalid","subject":"stable-person"}},
             {"subject":"requester","token":"fixture-requester-token","integrity":1,"roles":["requester"]},
-            {"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]}
+            {"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]},
+            {"subject":"agreement-admin","token":"fixture-admin-token","integrity":3,"roles":["admin"]}
         ]
     });
     store
@@ -220,17 +221,41 @@ fn current_trust_revision(root: &Path) -> i64 {
             .unwrap();
     state["revision"].as_i64().expect("fixture Trust revision")
 }
+/// Actual project Trust configuration with an explicit effect role; tokens only
+/// for local fixture identities, never enrolled ones. Idempotent on both
+/// regimes (same contract as the CLI harness and `paea_git_transfer_call`): a
+/// fresh root (no `trust-actions.json` yet) applies at `expected_revision:0`
+/// with a stable event id; a retained root already configured applies a
+/// run-unique event per harness call at its actual current revision, so reruns
+/// never replay a conflicting fingerprint nor advance the fixture Trust
+/// revision beyond one run-unique event per call.
 fn effect_config(root: &Path) -> Vec<u8> {
+    let fresh = !root.join(".swarm/trust-actions.json").exists();
+    static SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let nonce = format!(
+        "{}-{}",
+        std::process::id(),
+        SEQ.fetch_add(1, std::sync::atomic::Ordering::SeqCst)
+    );
+    let (event_id, expected) = if fresh {
+        ("promote-effect-config".to_owned(), 0)
+    } else {
+        (
+            format!("promote-effect-config-{nonce}"),
+            current_trust_revision(root),
+        )
+    };
     serde_json::to_vec(&json!({
         "schema_version":1,
-        "event_id":format!("promote-effect-config-{}", current_trust_revision(root)),
-        "expected_revision":current_trust_revision(root),
+        "event_id":event_id,
+        "expected_revision":expected,
         "reason":"Explicit fixture effect role for Git promotion",
         "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":false},
         "identities":[
             {"subject":"enrolled-effect","integrity":3,"roles":["admin","effect"],"enrollment_principal":{"principal_id":"operator","principal_kind":"human","issuer":"https://fixture.invalid","subject":"stable-person"}},
             {"subject":"requester","token":"fixture-requester-token","integrity":1,"roles":["requester"]},
-            {"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]}
+            {"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]},
+            {"subject":"agreement-admin","token":"fixture-admin-token","integrity":3,"roles":["admin"]}
         ]
     }))
     .unwrap()
@@ -323,12 +348,109 @@ struct Owned {
     commit_prepared: swarm_engine::PaeaGitPromoteCall,
     scope: Scope,
 }
+/// Seed one fresh compliant agreement (mandate-create → request → approve)
+/// through the real Trust operations, for the exact promotion resource of the
+/// owned fixture set. Contract (same as the promote harness,
+/// `paea_git_promote_call::seed_agreement`): the commit path revalidates the
+/// captured agreement at last use (`paea_git_agreement_match`), requiring an
+/// approved action whose terms bind the promotion's Git-intent identity
+/// (P2 recipe: resource `{project}/{repository}/{target_ref}/{candidate}`,
+/// amount 1 OID, beneficiary = expected old oid) and whose policy revision
+/// equals the current state revision. Newly generated first-publication
+/// fixtures carry no carried approvals, so each `owned()` seeds its own;
+/// the newest matching approval wins, so repeated seeding stays correct.
+/// Inputs: open project root, expected old and candidate oids. Output: unit;
+/// panics on any Trust refusal (fixture contract violation). Limits: token
+/// identities only (`fixture-admin-token`, `fixture-requester-token`,
+/// `fixture-approver-token`) — local fixture credentials, never enrolled ones.
+fn seed_agreement(project: &RootStore, resource: &str, old: &str) {
+    // Process id plus a per-call sequence: every seeded event id stays unique
+    // within the process (several tests seed in the same run) and distinct
+    // across runs, so replays never collide with a retained fixture's events.
+    static SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let nonce = format!(
+        "{}-{}",
+        std::process::id(),
+        SEQ.fetch_add(1, std::sync::atomic::Ordering::SeqCst)
+    );
+    let trust_as = |op: &str, value: Value, token: &str| -> Value {
+        serde_json::from_slice(
+            &project
+                .trust(op, &serde_json::to_vec(&value).unwrap(), token)
+                .unwrap_or_else(|e| panic!("{op} refused: {}", e.code()))
+                .bytes,
+        )
+        .unwrap()
+    };
+    trust_as(
+        "mandate-create",
+        json!({
+            "schema_version":1,
+            "event_id":format!("mandate-{nonce}-reconcile"),
+            "mandate_id":format!("mandate-{nonce}-reconcile"),
+            "subject":"requester",
+            "actions":["settle"],
+            "resource":resource,
+            "max_amount_minor":1,
+            "currency":"OID",
+            "beneficiary":old,
+        }),
+        "fixture-admin-token",
+    );
+    let action = trust_as(
+        "request",
+        json!({
+            "schema_version":1,
+            "event_id":format!("request-{nonce}-reconcile"),
+            "mandate_id":format!("mandate-{nonce}-reconcile"),
+            "resource":resource,
+            "amount_minor":1,
+            "currency":"OID",
+            "beneficiary":old,
+            "idempotency_key":format!("key-{nonce}-reconcile"),
+        }),
+        "fixture-requester-token",
+    );
+    assert_eq!(action["state"], "pending_approval");
+    let approved = trust_as(
+        "approve",
+        json!({
+            "schema_version":1,
+            "event_id":format!("approve-{nonce}-reconcile"),
+            "action_id":action["id"],
+            "mandate_id":format!("mandate-{nonce}-reconcile"),
+            "content_digest":action["content_digest"],
+            "resource":resource,
+            "amount_minor":1,
+            "currency":"OID",
+            "beneficiary":old,
+        }),
+        "fixture-approver-token",
+    );
+    assert_eq!(approved["state"], "approved");
+}
 fn owned() -> Owned {
     let (project_path, project, work, candidate) = git_project();
-    project
-        .trust("config-apply", &effect_config(&project_path), "")
-        .unwrap_or_else(|e| panic!("explicit fixture config refused: {}", e.code()));
+    // One Trust configuration per process, serialized: parallel tests share the
+    // same retained fixture root, and every additional config-apply advances
+    // its revision, voiding another test's approval captured under the previous
+    // revision (last-use freshness compares against the current revision). A
+    // single apply (fresh root: stable event at revision 0; retained root:
+    // already configured, nothing to do) keeps the revision stable for the
+    // whole process, so every approval binds the same revision and the
+    // agreement match stays valid regardless of test interleaving.
+    static CONFIG: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    static APPLIED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+    let _guard = CONFIG.lock().unwrap_or_else(|e| e.into_inner());
+    if !APPLIED.swap(true, std::sync::atomic::Ordering::SeqCst) {
+        if !project_path.join(".swarm/trust-actions.json").exists() {
+            project
+                .trust("config-apply", &effect_config(&project_path), "")
+                .unwrap_or_else(|e| panic!("explicit fixture config refused: {}", e.code()));
+        }
+    }
     let trust_revision = current_trust_revision(&project_path);
+    drop(_guard);
     let scope = scope_of(&project_path, &work);
     let (service_dir, service) = root();
     service
@@ -375,6 +497,23 @@ fn owned() -> Owned {
             PIN,
         )
         .unwrap_or_else(|e| panic!("explicit commit preparation refused: {:?}", e));
+    // The commit path revalidates the captured agreement at last use, so a
+    // compliant one must exist for every promotion: seed it through the real
+    // Trust operations instead of relying on approvals carried by a retained
+    // fixture (freshly generated fixtures carry none). Same self-healing
+    // pattern as the promote harness (`paea_git_promote_call::seed_agreement`):
+    // the newest approval binds the current revision and wins the match. The
+    // resource follows the P2 recipe over the proposal's actual Git identity
+    // (service-assigned repository id, target ref, candidate).
+    let Action::Git {
+        repository_id,
+        target_ref,
+        ..
+    } = &proposal.action
+    else {
+        panic!("git proposal expected");
+    };
+    seed_agreement(&project, &format!("fixture-project/{repository_id}/{target_ref}/{candidate}"), &old);
     Owned {
         project,
         _service_dir: service_dir,

@@ -19,7 +19,7 @@ evidence and recovery, without a second assurance program or changed denominator
 | BLP-01 | Source/reader/output inventory, trust boundaries and threat model | — | PA-00/01 |
 | BLP-02 | Dominance/join monitor, fixed domains, safe errors and independence from Biba | BLP-01 | PA-01/02/06 |
 | BLP-03 | Revisioned persistent policy, explicit migration and Admin/API/CLI parity | BLP-02 | PA-02/08 |
-| BLP-04 | Protected attribution, context/memory/output propagation and replays | BLP-03 | PA-06 |
+| BLP-04 | Protected attribution, context/memory/output propagation and replays | BLP-03 | PARTIAL — private v3 prompt provenance; classification, principal and inheritance open |
 | BLP-05 | Actual filesystem/network/provider/descendant mediation, no unconfined fallback | BLP-04 | PA-04/05 |
 | BLP-06 | Established human identity, approval of exact bytes/recipients, new copy | BLP-03–05 | PA-02/08/09 |
 | BLP-07 | Retained recipes, candidate review, local delivery, served assets and RETEX | BLP-01–06 | PA-09/10/11/12/13 |
@@ -155,10 +155,16 @@ qualification; their `version_history.json` entry was re-inserted on top of
 their state and the BLP entry rewritten atomically (both coexist). Server 283
 does serve the repaired BLP routing (probe `blp-show` → identical 403
 `authorization_required`); its release notes lack the BLP entry (built before
-the rewrite.
+the rewrite).
 
 Resolved: the next build **v0.1.1-dev.284** (third-party session, commit
 `3b5191e2c5` = my delivery commit) contains the BLP entry — proof: the
 build's `effective-sources.tar.gz` (`.cache/local-delivery/rust-e4t0j_65/`),
 one real BLP entry. Probe re-qualified on the active 284 image:
 `blp-show` without an I3 token → identical 403 `authorization_required`.
+
+## Next resumption — prompt provenance
+
+BLP-04 starts with actual assembled-byte provenance, without labels or disclosure
+authority. See the [record and limits](BLP-PROVENANCE-20261031.md). The lot stays
+open: migration, authenticated principal, sink checks and inheritance remain pending.

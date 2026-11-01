@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_preparation_calls.py", line 148, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_preparation_calls.py", line 131, in main
+    profile=f.root/'swarm.project.json';profile_before=profile.read_bytes() if profile.exists() else None;guide=f.root/'.claude/field-guide';guide.mkdir(parents=True);memory_work_before=seed_lesson(f.root,f.work);fixture.publish(guide/'index.md','[Managed source](g.md)');fixture.publish(profile,dict(version=1,name='Owned memory guard',source='custom',instructions=[dict(path='.claude/field-guide/index.md',roles=['preparation'])]));count=len(received);rows=len(f.ok(['prepare','dialogue',p['id']]))
+                                                                                                                                                                                          ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_project_memory_source.py", line 46, in seed_lesson
+    seed_work(root,work_id,json.dumps(value).encode())
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_project_memory_source.py", line 21, in seed_work
+    assert root.parent==Path('/tmp') and root.name.startswith('swarm-model83-')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

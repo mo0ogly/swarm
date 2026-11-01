@@ -2466,3 +2466,325 @@ production `preparation_worker_run_cli` still allocates its workspace under
 `1d3f9da1…`, unilateral change not authorized). Remaining `/tmp` roots: live
 parallel-session work, untouched. Documentation: `tools/verification/README.md`
 (interdiction section), PRODUCT-WORKFLOW/T4/T6 FR+EN command examples re-pointed.
+
+### Increment117 — BLP-RET-05: closing the reader frontier of the PAEA preview/presentation routes (production, GLM)
+
+Single observable objective: on `GET /api/v1/paea/git-call/preview` and
+`GET /api/v1/paea/git-call/approval/presentation`, an application-only session
+NO LONGER reads classified proposal/context/terms. The real reader identity,
+permission and categorization are taken from the actually bound control/project;
+`SourceRefJSON` labels, the browser cookie and any client declaration are NOT
+authoritative.
+
+**Reader guard `paea_reader_verdict`** (swarm-engine,
+`root_store/reader_guard.rs`, called by BOTH routes before ANY projection is
+built): optional `Authorization: Bearer` reader token shape-validated BEFORE
+any root open (`reader_bearer_token`, typed refusal `paea-reader-credential` /
+`trust-authentication-header`; absent = bare session, never a silent downgrade);
+missing BLP journal → `paea-reader-policy-required`; unsupported policy →
+`paea-reader-policy-required`; policy revision ≠ current Trust revision →
+`paea-reader-policy-stale`; NO current attribution bound to the EXACT canonical
+digest + project path → `paea-reader-attribution-required` — refusal without
+data EVEN for an enrolled top-of-catalog reader: bare session and an enrolled
+reader are never implicit authorization; attribution present → the real
+reader's `policy.check_read` (the clearance must dominate the attributed label)
+else `paea-reader-access-denied`. Every refusal answers `200
+{available:false, reason:paea-reader-*}` with NO classified byte (payload,
+identifier, digest, error, header, log) — absence observed on the real client
+side.
+
+**Attribution produced by authorized control** (never a coded constant nor
+inferred from a bool): the Trust operation `blp-object-attribute` (I3+admin,
+the attribuant must itself dominate the label via `check_read`), bound to the
+exact canonical digest of the bytes
+(`swarm-protection-contract::canonicalize(...).digest()`), the project path and
+the current policy revision; persisted in the validated history and RE-READ at
+every consumption by the guard (an attribution stale after a revision change
+refuses). `blp-object-attribute` is routed in `trust_scoped` to
+`trust::confidentiality::execute` (writable); the route order remains:
+source absence (`paea-git-call-preview-source-unavailable` /
+`paea-git-call-approval-unavailable`) answers BEFORE the guard — no classified
+field exists to serve then.
+
+**Witnesses**: pre-patch failure retained (`witness-fail-20261031T213410Z`,
+panic "served a classified marker without any reader attribution"); green guard
+(`reader-guard-pass-20261031T215030Z`). Test
+`preview_reader_guard_enforces_produced_attribution`: bare session → exact
+`paea-reader-authentication-required`; enrolled-but-uncleared reader → exact
+`paea-reader-access-denied`, no private marker in the raw response; authorized
+reader (attribution produced through the supported producers) → the exact
+permitted projection with the marker PRESENT observed client-side; stale policy
+through a real `config-apply` → `paea-reader-policy-stale` without marker.
+Engine probe
+`object_attribute_produces_binds_and_replays_under_current_policy`: refusal
+first (`blp-access-denied`, attribuant without a dominating clearance, state
+unchanged), production, idempotent replay. Baselines
+`preview_route_presents_exact_bound_action_with_current_state` and
+`approval_presentation_serves_frozen_command_and_terms` updated: policy +
+attribution produced before the read, read with an authorized `Bearer`; the
+approval POST stays unchanged (distinct Enrollment scheme).
+
+**Marked seam**: the positive reply carries `runtime_enforced:false` —
+prompt-side byte provenance remains the other actor's work; the guard does not
+claim to establish it. No policy modification through arbitrary JSON:
+everything goes through the existing Admin/API/CLI validations
+(`blp-policy-apply`, `blp-object-attribute`).
+
+**Evidence**: permanent recipes updated and fresh PASS
+(`paea-git-call-preview-rust.json` 5 steps including the
+`preview-route-reader-guard-refuses-unknown-provenance` step;
+`paea-git-call-agreement-rust.json` 7 steps including
+`web-reader-guard-refuses-unknown-provenance`; `blp-confidentiality-rust.json`
+re-pinned to 6 engine tests; `paea-git-call-approval-rust.json`,
+`paea-git-call-web-rust.json`, `paea-git-call-agreement-last-use-rust.json`,
+`paea-git-call-agreement-terms-rust.json`, `blp-preparation-provenance.json`,
+`blp-preparation-provenance-public.json` — the latter requiring
+`SWARM_PREPARATION_UI_BINARY`) — folders
+`recipe-*-run-*` under
+`docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-provenance-contract-20261031T211820Z/`.
+FR/EN UI: the effects page now distinguishes a reader refusal (`paea-reader-*`
+→ "Read refused: {code}. The prepared action is bound, but its classified
+content is presented only to a reader authorized by a current confidentiality
+attribution…") from no-source unavailability; the `locales/en.json` catalog
+regenerated (`scripts/i18n/build.cjs --check` PASS).
+
+**Local delivery**: `tools/swarm_local.py build` → qualified
+`v0.1.1-dev.285`; `restart` → service active, running ELF =
+`/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm` (sha256
+`ce55d8a65b1eae26ca9f96a2f41f2ba5c947c4c251ce78a6a42f8e9521f4aa2e`, real
+version v0.1.1-dev.285); guard, `paea-reader-*` codes, FR and EN strings and
+the corrected `paea-effects.js` verified EMBEDDED in the served binary
+(bytes).
+
+**Exact limits**: labeled simulated auth (isolated fixture bearers), same UID,
+no human presence nor real enrollment — required for any live execution;
+`runtime_enforced:false` owned (prompt provenance outside this tranche); the
+complete external frontier (other actor) is not proven here — the unknown
+guard stays closed, independent provenance remains to be produced by its
+owner; pre-existing cross-test failure on HEAD kept uncorrected outside this
+tranche (`git_call_http_consumes_exact_transfer_once` →
+`git_call_http_consumes_with_captured_agreement` in the SAME process:
+PID-derived event ids already applied + revision advanced by the first
+consumption; recipes run each test in its own cargo invocation — the supported
+path is green); no independent acceptance; no commit/push.
+
+**Two-route positive witness with a really bound approval** (lot
+`glm-bound-reader-positive-20261031T233304Z`, 2026-10-31): the test
+`preview_reader_guard_enforces_produced_attribution` no longer mounts the
+guard on an ABSENT approval — it builds the REAL
+mandate/request/prepare_approval chain (rig copied from
+`approval_presentation_serves_frozen_command_and_terms`) and binds the frozen
+approval via `open_git_call_with_approval`. Positive proof on BOTH routes
+with `Bearer fixture-admin-token` under the produced I3 attribution: preview
+`available:true` + classified marker + `digest_matches`; presentation
+`available:true` with the full projection (operation, request digest,
+canonical identity, engine terms, `current`, `limits`) and NO private command
+field. No `paea-git-call-approval-unavailable` is accepted as success; bare
+session and uncleared reader refusals are EXACT
+(`paea-reader-authentication-required`, `paea-reader-access-denied`) on both
+routes, and the stale case (`paea-reader-policy-stale`) is verified on both
+routes. Raw execution (stdout/stderr to fresh files, real exit, no pipeline):
+`1 passed; 0 failed`, EXIT=0; folder
+`docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-bound-reader-positive-20261031T233304Z/`
+(FINAL.md, status.json, 4 sha256-stamped raw runs, ENV-NOTES). Run TMPDIR
+outside the repo (`~/.local/state/swarm-fixtures/…/enginetmp`, 0700): the
+enrollment control requires ancestors without group-write, impossible under
+the repo path (0775). **Still PENDING after this lot** (closes neither
+BLP-RET05 nor PAEA): the complementary exact refusal matrix (disabled token,
+wrong-digest/project attribution, typed error shapes), delivery
+qualification, independent acceptance — Codex's lot.
+
+### Increment118 — BLP-RET-05: complementary reader-refusal matrix on both routes with a really bound approval (CODE/TEST, GLM)
+
+Bounded lot (`glm-reader-refusal-matrix-20261031T234828Z`, 2026-11-01): the
+new test `reader_refusal_matrix_on_bound_approval_both_routes`
+(rust/crates/swarm-web/tests/paea_git_call.rs, rig copied from the accepted
+`preview_reader_guard_enforces_produced_attribution` montage, no architecture
+rebuilt, no guard or route change) completes the reader matrix on
+`GET /api/v1/paea/git-call/preview` AND
+`GET /api/v1/paea/git-call/approval/presentation` with the approval really
+bound. Every refusal variant is preceded, on the SAME preconditions, by an
+authorized positive witness (`available:true`, `digest_matches:true`, the
+classified marker only on preview) — so no refusal can be explained by a
+missing approval or the presentation route's no-source vacuity, and no
+`paea-git-call-approval-unavailable` is accepted anywhere.
+
+**Observed variants** (exact code asserted, zero leak of marker, digest,
+action id, mandate id or content digest in body or error): unknown
+credential → typed 403 `authorization_required` refusal (both the `failure`
+channel AND the body `error`, zero projection field) on both routes; identity
+DISABLED through a supported operation (real `config-apply` reconstructing the
+identities with `disabled` on the approver only, then a `blp-policy-apply`
+renewal WITHOUT the approver clearance and re-attribution
+`blp-object-attribute` at the exact digest): the `paea-reader-policy-stale`
+staleness is first OBSERVED on both routes (the precondition the renewal was
+necessary to lift), then the direct `authorization_required` refusal proves
+authentication precedes currency — `paea-reader-policy-stale` never masks a
+disabled identity; attribution ABSENT at the current revision (a second
+renewal without re-attribution) → `available:false`
+`paea-reader-attribution-required` EVEN for the maximally-cleared reader;
+attribution bound to a WRONG digest (real producer accepted, the canonical
+digest of the same action under the UNCLASSIFIED context) then to a WRONG
+project (the service root path) → still `paea-reader-attribution-required` —
+the served contract is asserted as it exists (the defined-but-unused
+`paea-reader-attribution-mismatch` code is NOT expected); recovery: the
+correct re-attribution restores the positive witness on both routes. No
+mutation: every refusal batch is bracketed by byte equality of BOTH roots'
+Trust journals (`service_trust_state`), and the managed Git refs are identical
+across the whole matrix.
+
+**Raw execution** (stdout/stderr to fresh files, real exit read immediately,
+no pipeline/rtk/grep-wait): runs 1-3 on bytes bb1f3b12… then the final run 4
+on bytes c648a37c… (doc-comment fix of the reference test that still declared
+the matrix PENDING) — every run `1 passed; 0 failed; 17 filtered out`,
+EXIT=0. Permanent recipe extended: a 6th step
+`preview-route-reader-refusal-matrix-bound-approval` in
+`tools/verification/recipes/paea-git-call-preview-rust.json` (same shape as
+the guard step; TMPDIR pinned to `~/.local/state/swarm-fixtures/runner-tmp` by
+the runner, never /tmp; /tmp interdiction check green); the full pass is PASS
+6/6 on the final bytes (frozen inputs tar.gz, recorded executable
+fingerprints). Evidence folder:
+`docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-refusal-matrix-20261031T234828Z/`
+(stamped status.json, 4 raw runs, two recipe passes).
+
+**Still PENDING after this lot** (closes neither BLP-RET05 nor PAEA):
+delivery qualification (production ELF/assets, FR/EN version, browser/form
+qualification — a plain session fetch without a bearer can now refuse, to be
+verified and not presumed), authorized installation, independent acceptance —
+Codex's lot.
+
+### Increment119 — BLP-RET-05: real reader connection of the public approval form (CODE/TEST, GLM)
+
+Bounded IMPLEMENTATION/REGRESSION lot (`glm-form-reader-integration-20261101T001854Z/`,
+2026-11-01): Increment111 qualified the approval form WITHOUT the reader guard;
+Increment117 closed the frontier. Real-browser reproduction (run 5, the
+recipe-declared `source-fixture-fresh-regen-20261031` fixture): the first
+assertion refuses exactly (`paea-approval-form-ui.cjs:88` "fresh approval
+presentation must be the explicit success state", `'empty' !== 'success'`);
+true first cause: the form's `read()` loaded the guarded presentation with the
+session alone (no `Authorization: Bearer`) → the guard answers
+`available:false paea-reader-authentication-required` → the visible `empty`
+state. A session-only fetch can no longer read — regression confirmed, not a
+harness false positive.
+
+**Product correction (connection, never a bypass)**: `web/paea-approval-form.js`
+— the ephemeral `#approval-reader-credential` input (`paea-effects.html`,
+password type, FR source) is read AT CALL TIME by `load()` and cleared
+immediately after the guarded read (no variable beyond the one call, no
+storage/URL/log — harness witness: the value exists nowhere in the page after
+the read); `read()` carries `Authorization: Bearer` ONLY on this guarded GET
+(the approval POST stays Enrollment, distinct: enrollment authority is never
+reinterpreted as clearance); `unavailable()` distinguishes `paea-reader-*`
+refusals ("Read refused: {code}…") from source-less unavailability, and
+`paea-reader-policy-stale` keeps the exact stale wording (never presented as
+confirmable); the `#approval-reload` "Re-read the presentation" button: a
+reader refusal stays visible, the reader corrects the ephemeral credential and
+re-observes through the SAME guarded endpoint. `locales/en.json`: 2 keys
+(label + button), `i18n:build` + `--check` PASS.
+
+**Real producer fixtures**: the `approval_form_serves_real_browser_session`
+test produces REAL BLP authorization before any guarded read —
+`blp-policy-apply` (3 levels, clearances for the 4 fixture identities) then
+`blp-object-attribute` bound to the EXACT canonical digest of the prepared
+action, at both phases (after the real `config-apply` that moves the revision,
+re-sealing through the SAME producers at the NEW revision + re-attribution lets
+the guard reach the projection to observe the real stale state
+`trust_revision_current:false`; a real stale-policy refusal remains the
+phase-1 behavior of a not-yet-resealed state); `reader_token`
+(`fixture-admin-token`) published in `server.json` — the harness TYPES it into
+the real form's ephemeral input (no `setExtraHTTPHeaders`).
+
+**Harness** (`tests/paea-approval-form-ui.cjs`): BEFORE each fresh and stale
+FR/EN observation, the bare-session refusal is REQUIRED with the exact code
+(`empty` + `paea-reader-authentication-required`, no projection), then reader
+typing + `#approval-reload` → the real success/stale state; the direct API
+cross-check is corrected (bare session → exact `available:false`, then the
+Bearer carried explicitly); reader erasure witnessed at every read. 4 checks,
+zero unexpected diagnostics.
+
+**Infrastructure defect fixed in passing**: the recipe qualification step
+failed `FileExistsError` (output path saturated by a prior evidence
+directory — the driver lacked the archiving convention); the driver
+`paea_approval_form_ui_recipe.py` now follows the established consent
+convention: a leftover evidence directory is archived aside as
+`*-superseded-UTC` and the recipe output path is STABLE (no more suffix to
+bump); the prior PASS evidence `09d6fbc8…` remains retained intact at
+`.cache/paea-approval-form-browser-evidence-20261031g/` (outside the
+repository, git-ignored).
+
+**Evidence**: run 6 driver PASS (`browser-correction-run6/`, binary
+`paea_git_call-460ea6e2a8fa6747`, sha256
+`5ea34f7173e239393b5fe6eb2156be99f114c423e3fa8c2fac017a121bf238c1`); run 8
+permanent recipe `paea-approval-form-rust.json` PASS 8/8 steps,
+`source_stable:true`, `recipe.py verify` integrity VERIFIED, identical binary
+before/after (bind + verify-stable). Cargo unit diagnosis recorded:
+`CARGO_INCREMENTAL` and `CARGO_PROFILE_*_DEBUG` are part of the unit key
+(each variable changes the artifact hash) — the binder's resolution is
+deterministic under the recipe environment. Fixture roots outside /tmp
+(private 0700 runner-tmp + `.swarm-fixtures/`); no /tmp residue from our runs.
+
+**Exact limits**: labeled simulated auth, no human presence, no real
+enrollment, no Git effect, no second consumption; the fixture reader token
+lives only for the harness typing, never in the page after the read; no
+installation (`./swarm.sh`) and no commit/push — handed to Codex for delivery
+qualification and independent acceptance.
+
+### Increment120 — BLP-RET-05: reader credential erased on every load exit + arbitrary frontend bound removed (CODE/TEST, GLM)
+
+Same-GLM-session resume, fresh folder `glm-form-reader-erasure-20261101T011849Z/`
+(2026-11-01), after Codex's reception verdict **NOT_ACCEPTED_CORRECTION_REQUIRED**
+(`supervisor-reception-20261101T0117Z.json`): a real-browser counterexample on
+the previous lot's final bytes (source `37e0d89e…` stable,
+`supervisor-reader-erasure/verify.cjs`) — the reader credential erasure only
+covered the successful `native-session` + capability-read exit; a native-session
+HTTP error (503), a capability HTTP error (503) and an unbound capability
+(`bound:false`) each left the typed token in the DOM (`inputEmpty:false` on the
+three variants, `normal` correct).
+
+**General cause corrected** (`web/paea-approval-form.js`, `load()`): the input
+is now erased on EVERY exit of the load — success, HTTP or network error,
+unbound capability, refused presentation, malformed reply — through a
+finally-equivalent erase before the outcome renders; the token lives in one
+load-scoped variable and travels nowhere else (no storage/URL/log, no
+persistent closure, no sending to the prerequisite endpoints). The guard,
+authentication, endpoints and refusal shapes are unchanged; no test removed,
+no retention accepted.
+
+**Arbitrary frontend bound removed**: `maxlength=128` on the reader input
+(both reception points) has NO authoritative source — the real producer-side
+shape (`credential_valid`, `rust/crates/swarm-engine/src/trust_types.rs`)
+enforces a 16-byte MINIMUM, forbids whitespace (space/tab/CR/LF) and reserved
+`remplacer-`/`replace-` prefixes, with NO maximum; the only existing bounds
+are aggregate (16 MiB command document `COMMAND_INPUT_MAX_BYTES`, 8 MiB
+persisted state `MAX_STATE`). The cutoff is REMOVED (no invented backend
+policy); too-short or whitespace shapes reach the service and receive the
+exact typed refusal (`paea-reader-credential`/guard verdict), never pre-cut
+client-side. The enrollment input's `maxlength=128` is pre-existing (commit
+`f9ff58214`, outside this bounded lot) and is NOT touched here — the same rule
+applies to the lot that declares it.
+
+**Counterexample maintained in-repo** (`tests/paea-reader-credential-erasure.cjs`,
+the Codex script's method re-used under the maintained-file contract): the
+real workspace frontend in real Chrome, prerequisite endpoints as explicit
+synthetic fixtures; 6 checks — a 400-byte token accepted uncut into the
+guarded read (no frontend bound) and erased from input, HTML and storages on
+all five error exits (session 503, capability 503, unbound, malformed reply,
+refused presentation); authenticated recovery (a short <16-byte token SENT
+verbatim as Bearer — no frontend rejection — and erased after the read). The
+host page's three sibling-section 404s (preview/git-call/reconcile, outside
+the fixture server's scope) are classified one-for-one; any other diagnostic
+stays unexpected. **Results**: 6 checks, `unexpected_diagnostics:[]`, EXIT 0
+(evidence `.cache/reader-erasure-evidence-run1` BEFORE the non-classified
+correction — 3 sibling diagnostics — then `-run2` on the corrected bytes,
+clean).
+
+**Permanent recipe** `paea-approval-form-rust.json`: new input
+`tests/paea-reader-credential-erasure.cjs` + new step
+`approval-form-reader-credential-erasure` (requires `"checks":6` and
+`"unexpected_diagnostics":0`); 26 inputs, 9 steps. Full real-browser rerun
+after stable bytes recorded in the lot status.
+
+**Exact limits**: synthetic API fixtures against the real frontend (no
+simulated identity, no real enrollment, no product approval); the full
+guard/session-refusal/read/agreement/stale browser rerun remains required
+before any accepted handover; no build/install/server; no commit/push.

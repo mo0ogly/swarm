@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "action": "create",
+  "event_id": "plan-preparation",
+  "expected_revision": 0,
+  "title": "Plan proposal fixture",
+  "text": "Need plan fixture"
+}

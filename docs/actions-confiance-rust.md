@@ -132,6 +132,7 @@ comme une protection active.
 ./swarm --root RACINE --json trust blp-policy-preview --input politique.json
 ./swarm --root RACINE --json trust blp-policy-apply --input politique.json
 ./swarm --root RACINE --json trust blp-check --input diagnostic.json
+./swarm --root RACINE --json trust blp-object-attribute --input attribution.json
 ```
 
 - `blp-show` (lecture) : état persisté, historique révisionné et capacité.
@@ -147,6 +148,113 @@ comme une protection active.
 - `blp-check` (lecture) : diagnostic sur étiquettes **fournies** — jamais une
   attribution réelle d’un objet. Renvoie la combinaison/le refus et la
   classification de sortie calculée, sans contenu ni étiquette d’autrui.
+  `runtime_authorized:false` ne constitue JAMAIS une autorisation de lecture.
+- `blp-object-attribute` (écriture) : attribution courante d’une classification
+  à des octets canoniques exacts (`canonical_digest` sha256 des octets
+  `paea-json-v1`, `project_path` absolu, révision politique et de confiance
+  courantes exigées) par un opérateur I3/admin dont l’habilitation DOMINE le
+  label attribué (`check_read`). Persistée dans l’historique révisionné et
+  RELUE à chaque consommation ; un changement de révision la rend refusée
+  (`blp-policy-changed`) jusqu’à réattribution. Ce n’est pas une
+  déclassification ni un droit de lecture : elle constate la classification
+  que le contrôle autorisé lie aux octets.
+
+**Frontière lecteur (preview/presentation PAEA)** : `GET
+/api/v1/paea/git-call/preview` et `GET /api/v1/paea/git-call/approval/presentation`
+ne servent une projection contenant des champs classifiés qu’à un lecteur
+autorisé par la garde `paea_reader_verdict` : jeton `Bearer` en forme valide,
+politique courante liée à la révision de confiance, attribution courante des
+octets exacts, habilitation dominante. Un échec de politique, d’attribution ou
+d’habilitation garde la réponse `200 {available:false, reason:paea-reader-*}`
+sans aucun octet classifié — payload, identifiant, digest, erreur, header, log —
+y compris pour un lecteur enrôlé de sommet de catalogue ; un jeton inconnu ou
+une identité désactivée produit en revanche le refus typé
+`authorization_required` (statut non-succès, 403) sans aucun octet classifié
+non plus. La session seule reste `200 {available:false,
+reason:paea-reader-authentication-required}` : session seule et enrôlement ne
+sont jamais une autorisation implicite. Les labels `SourceRefJSON` et le cookie navigateur ne
+font pas autorité. L’absence de source liée reste répondue avant la garde
+(aucun champ classifié n’existe alors). La réponse positive porte
+`runtime_enforced:false` : la provenance d’octets côté prompt reste un travail
+ouvert de l’autre acteur. Le formulaire public d’approbation
+(`web/paea-approval-form.js`) se raccorde à cette frontière sans la contourner :
+une entrée éphémère « Jeton lecteur » est lue à l’appel, portée en
+`Authorization: Bearer` sur la seule lecture gardée puis effacée sur TOUTES les
+sorties du chargement — succès, erreur HTTP ou réseau, capacité non liée,
+présentation refusée, réponse illisible (aucun stockage, URL ni log) ; les
+refus `paea-reader-*` restent visibles avec leur code exact et le bouton
+« Relire la présentation » relit la même endpoint après correction de
+l’identifiant ; l’entrée ne porte aucune longueur maximale frontend (la forme
+producteur `credential_valid` impose un minimum de 16 octets, interdit les
+espacements et les préfixes réservés, sans maximum — une borne arbitraire
+couperait des jetons valides ; les formes trop courtes sont refusées côté
+service avec le verdict typé exact, jamais pré-coupées) ; la consommation POST
+reste exclusivement enrôlement (mot de passe distinct, jamais réinterprété
+comme clearance).
+
+**Observations de démarrage minimales (routes status cookie seul)** : `GET
+/api/v1/paea/git-call` et `GET /api/v1/paea/git-call/approval` ne servent
+derrière la session ordinaire QUE le booléen `bound` et des constantes
+littérales de protocole (`schema_version`, `event`) ; le champ `capability`
+reste `Null` dès que la source est liée. AUCUNE valeur dérivée de la requête
+préparée n'y passe — pas les digests, et pas le `call`/`service`/`operation`
+sélectionné non plus : un vocabulaire fermé ne rend pas constante la valeur
+sélectionnée par une action classifiée et ne crée aucun droit de
+déclassification (BLP-RET-05). HEAD sert un corps vide. La métadonnée exacte
+reste lisible uniquement via les routes gardées (preview et presentation)
+sous le verdict lecteur courant. Les pages consommatrices
+(`web/paea-effects.js`, `web/paea-consent.js`, `web/paea-approval-form.js`)
+affichent cet état explicite (jamais de ligne vide ni de valeur présentée
+comme inconnue) et traitent une `capability` non nulle comme un rapport hors
+contrat qui arrête visiblement le chargement (`paea-status-out-of-contract`
+côté formulaire). La page de consentement (`web/paea-consent.html`,
+`web/paea-consent.js`) raccorde sa lecture classifiée à la même frontière sans
+la contourner : l’empreinte exacte et l’opération liée ne passent que par la
+lecture gardée de la présentation et l’aperçu, avec le même identifiant lecteur
+éphémère lu à l’appel, porté en `Authorization: Bearer` sur ces seules lectures
+puis effacé sur TOUTES les sorties du chargement (aucun stockage, URL ni log) ;
+un refus `paea-reader-*` garde son code exact visible, le contrôle « Relire la
+présentation » relit les mêmes endpoints après correction, et le formulaire de
+consentement reste accessible (l’autorité d’enrôlement n’est jamais
+réinterprétée comme clearance de lecture — la comparaison hors canal de
+l’empreinte reste la décision de l’opérateur). Chaque sortie de l’aperçu rend
+aussi un état terminal typé sur le statut d’approbation : un aperçu indisponible
+ou refusé n’est jamais laissé dans un état « en cours », et la formulation de
+succès n’est posée que lorsque les métadonnées exactes de la commande sont
+réellement affichées. Une lecture gardée qui LÈVE (HTTP 403, transport, JSON
+illisible) rend la même paire de refus typé que le verdict `available:false` :
+un refus `paea-reader-*` reste un état `empty` portant le code exact, toute
+autre erreur lève un état `error` visible — et chaque chargement purge
+d’abord TOUTES les projections exactes antérieures (listes de présentation et
+d’aperçu, conteneurs du résultat d’envoi POST), pour qu’aucune valeur d’une
+réussite antérieure ne survive sous une formulation de refus ni de « données
+non affichées » (défaut reproduit puis corrigé du 2026-11-01 : une relecture
+HTTP 403 après une lecture autorisée laissait les deux digests antérieurs
+dans le DOM ; contre-exemple maintenu
+`tests/paea-consent-projection-erasure.cjs`, 11 vérifications sur la vraie
+page en Chrome réel, runs rouge puis vert conservés dans le dossier de
+preuve). La qualification navigateur réel `paea-consent-ui-rust` résout
+désormais le binaire de test exact depuis le flux d’artefacts Cargo
+(`cargo test --no-run --message-format=json`, outil lié
+`bind_cargo_test_binary.py` + contre-preuves `test_bind_cargo_test_binary.py`)
+— plus aucune purge `rm`, aucun glob ni watchdog global dans le driver, dont
+les deux canaux bruts sont capturés en flux et attendus jusqu’à leur exit
+réel. Contrat d’échec/vidage du driver (contre-exemples maintenus
+`tests/paea_consent_driver_control.py`, 16 vérifications sur 8 variantes,
+rouges mesurés sur l’instantané d’entrées déclaré du 2026-11-01 puis verts) :
+chaque fluxeur des DEUX enfants est suivi et joint après leurs exits réels ;
+un échec Rust pendant le harnais échoue immédiatement sans attendre un enfant
+vivant ; le défaut INVERSE est couvert symétriquement (2026-11-01) : un échec
+du harnais pendant que Rust attend encore la marque de phase tue Rust vivant
+AVANT tout wait (la cause primaire harnais est décidée avant le kill, donc
+jamais masquée par un -9), si bien qu’aucun wait ne vise un enfant vivant sur
+un chemin d’échec dans les DEUX sens ; le nettoyage ne tue que les deux
+enfants Popen possédés ; le verdict exige la
+marque EOF de chaque canal (vidage partiel refusé) et refuse tout PASS sans
+canal brut complet. La contre-preuve
+`status_does_not_discriminate_two_prepared_intentions`
+montre que deux intentions préparées distinctes produisent des réponses
+d'octets identiques sur ces routes.
 
 Chaque habilitation désigne un sujet d’identité existant non suspendu ; les
 sujets inconnus refusent. Le catalogue ne peut pas supprimer ou réordonner des

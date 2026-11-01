@@ -1,27 +1,32 @@
 #!/usr/bin/env python3
 """Permanent-recipe driver for the PAEA approval-form browser qualification.
 
-Builds nothing and mocks nothing: the recipe declares the cargo build/test
-steps and passes the freshly built test binary here. The driver runs the real
---ignored Rust test ``approval_form_serves_real_browser_session`` (real frozen
-approval command, real native server, real persisted session, real
-config-apply Trust revision change) and the real served approval form in real
-Chrome through the owned two-phase marker protocol. The browser performs the
-explicit confirmation + empty-body enrollment consumption once through the
-page with the labeled fixture password (auth simulated), then observes the
-stale refusal. No provider, no paid call, no live mission database; no Git
-effect. A failing run preserves both channels and the fixture roots for
-diagnosis.
+Mocks nothing: the recipe declares the cargo build/test steps and passes the
+freshly built test binary here. The driver runs the real --ignored Rust test
+``approval_form_serves_real_browser_session`` (real frozen approval command,
+real native server, real persisted session, real config-apply Trust revision
+change) and the real served approval form in real Chrome through the owned
+two-phase marker protocol. The browser performs the explicit confirmation +
+empty-body enrollment consumption once through the page with the labeled
+fixture password (auth simulated), then observes the stale refusal. No
+provider, no paid call, no live mission database; no Git effect. A failing
+run preserves both channels and the fixture roots for diagnosis.
 
 Proof method: the binary is resolved from the cargo JSON artifact stream
 (``cargo test --no-run --message-format=json``), never from modification
-times; the digest captured is the digest of the exact executed file, taken
+times. Note that this resolution MAY compile: cargo can build the test binary
+(or dependencies) when the shared CARGO_TARGET_DIR is not fresh — the
+recipe's separate build step is what guarantees the fresh build, this
+resolution only re-runs cargo to read the artifact path from the emitted
+JSON. The digest captured is the digest of the exact executed file, taken
 before and after the run. Both child processes stream their raw output to
-their own files as it arrives, both are awaited to their real exits, and a
-Rust test that dies while the browser harness runs fails the run immediately
-with its captured output.
+their own files as it arrives, both are awaited to their real exits, the
+streamer threads are joined with their liveness verified (a timeout is a
+hard failure, never a silent partial flush), and a Rust test that dies while
+the browser harness runs fails the run immediately with its captured output.
 """
 import argparse,json,os,subprocess,sys,threading,time,traceback
+from datetime import datetime, timezone
 from pathlib import Path
 
 def resolve_binary(spec: Path) -> Path:
@@ -93,6 +98,17 @@ def run(binary: Path, output: Path) -> None:
     captured output; control markers and server.json stay in the owned control
     directory under output for replay/diagnosis.
     """
+    # Evidence is never overwritten: a leftover directory from an earlier run
+    # (usually a prior failure kept for diagnosis) is archived aside with a
+    # timestamp and the fresh run starts empty at the declared path. The
+    # recipe therefore keeps one stable output path (same convention as the
+    # consent qualification driver) instead of bumping a suffix each run.
+    if output.exists():
+        archive = output.with_name(
+            f"{output.name}-superseded-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
+        )
+        output.rename(archive)
+        print(f"prior evidence archived aside: {archive}", flush=True)
     binary = resolve_binary(binary)
     output.mkdir(parents=True, exist_ok=False)
     control = output / "control"
@@ -154,10 +170,18 @@ def run(binary: Path, output: Path) -> None:
         harness.wait()
         rust.wait()
         # Drain both channels fully before any verdict: the stream threads
-        # finish only when the pipes close, so joining them guarantees every
-        # captured byte is on disk before result.json and the PASS line.
+        # finish only when the pipes close, so a completed join proves every
+        # captured byte is on disk. A thread still alive after the join bound
+        # is a hard failure (partial flush), never a silent continuation: the
+        # bound is a diagnosis aid for a stalled pipe — both children have
+        # already exited at this point, so a live streamer means the pipe
+        # never closed, which is itself the defect to surface.
         for thread in streamers:
             thread.join(timeout=30)
+            if thread.is_alive():
+                raise SystemExit(
+                    "output streamer still alive after both child processes "
+                    "exited: captured output may be incomplete (partial flush)")
     finally:
         for process in (harness, rust):
             if process is not None and process.poll() is None:

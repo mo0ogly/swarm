@@ -1385,6 +1385,36 @@ fn root(operation: &'static str, cause: RootStoreError) -> HttpServiceError {
         cause: Box::new(cause),
     }
 }
+/// Extract the optional reader Bearer credential of a served PAEA read
+/// projection (BLP-RET-05). `None` means "no Authorization header at all" =
+/// bare session, which the engine guard treats as never-authorization. The
+/// header shape is controlled like the POST approval route: more than one
+/// Authorization header, a non-Bearer scheme or an empty token refuses typed
+/// BEFORE any Root open — a malformed credential is never silently downgraded
+/// to a bare session, so no credential oracle and no fallback path exists.
+/// Input: the request; output `Ok(Some(token))` for exactly one
+/// `Authorization: Bearer <non-empty>` header, `Ok(None)` without any
+/// Authorization header; errors: `HttpServiceError::Refused` with a stable
+/// code for any other shape. No store is touched, no credential is echoed.
+fn reader_bearer_token(r: &Request<Vec<u8>>) -> Result<Option<String>, HttpServiceError> {
+    let mut values = r.headers().get_all(http::header::AUTHORIZATION).iter();
+    let first = match values.next() {
+        None => return Ok(None),
+        Some(value) => value,
+    };
+    if values.next().is_some() {
+        return Err(HttpServiceError::Refused("trust-authentication-header"));
+    }
+    let encoded = first
+        .to_str()
+        .map_err(|_| HttpServiceError::Refused("paea-reader-credential"))?
+        .strip_prefix("Bearer ")
+        .ok_or(HttpServiceError::Refused("paea-reader-credential"))?;
+    if encoded.is_empty() {
+        return Err(HttpServiceError::Refused("paea-reader-credential"));
+    }
+    Ok(Some(encoded.to_owned()))
+}
 /// Join primary result and explicit Root close, retaining both failures. No
 /// successful empty body, rollback or retry is inferred from a cleanup failure.
 fn close<T>(

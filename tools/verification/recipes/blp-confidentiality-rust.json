@@ -43,7 +43,7 @@
    "id": "blp-engine-integration-history-replay-and-refusals",
    "command": ["cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "swarm-engine", "--test", "confidentiality", "--", "--quiet"],
    "expected_exit": 0,
-   "required_stdout": ["5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out"],
+   "required_stdout": ["6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out"],
    "required_stderr": []
   },
   {

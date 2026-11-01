@@ -2,15 +2,21 @@
 //! the same owned two-phase control protocol as the preview-bound browser
 //! session (paea_git_call.rs). The Rust test freezes one exact approve command
 //! through the real `prepare_approval` producer, signs both permissions into
-//! the operator's enrollment, binds the real native server with the approval
-//! attached via `bind_git_call_with_approval`, publishes server.json and
-//! drives phase markers; the Node harness opens the real served
-//! /paea-consent.html in a real Chrome, asserts the bound capability, the
-//! exact prepared action and the consent form (phase 1), then a wrong-bytes
-//! submission visibly refuses and a correct-bytes/wrong-password submission
-//! visibly refuses before any retry is possible (phase 2, real route calls
-//! made by the PAGE, not by the harness fetches). No approval effect, grant,
-//! Git call or acceptance is claimed; auth simulated on isolated fixtures.
+//! the operator's enrollment, provisions REAL reader-frontier authorization
+//! for the guarded presentation/preview reads (blp-policy-apply then
+//! blp-object-attribute binding the EXACT canonical digest of the prepared
+//! action, mirroring the approval-form fixture), binds the real native server
+//! with the approval attached via `bind_git_call_with_approval`, publishes
+//! server.json (including the fixture reader credential the harness types
+//! into the page's ephemeral input) and drives phase markers; the Node
+//! harness opens the real served /paea-consent.html in a real Chrome, types
+//! the reader credential into the page's own control, asserts the exact
+//! frozen-command digest through the guarded presentation, the exact prepared
+//! action and the consent form (phase 1), then a wrong-bytes submission
+//! visibly refuses and a correct-bytes/wrong-password submission visibly
+//! refuses before any retry is possible (phase 2, real route calls made by
+//! the PAGE, not by the harness fetches). No approval effect, grant, Git call
+//! or acceptance is claimed; auth simulated on isolated fixtures.
 #![cfg(target_os = "linux")]
 // The shared fixture declares helpers consumed only by other including tests;
 // the warnings it generates here match the pattern of the parallel lots.
@@ -286,9 +292,6 @@ fn consent_page_serves_real_bound_approval_to_real_browser() {
         .unwrap()
         .expect("recipe terms derivable for this canonical Git action");
     let resource = terms.resource.clone();
-    // Real producers on the project root: mandate-create (admin bearer),
-    // request (requester bearer) — the pending action exists before the page.
-    let mandate_id = format!("consent-browser-mandate-{}", std::process::id());
     let trust = |op: &str, value: Value, token: &str| -> Value {
         serde_json::from_slice(
             &owned
@@ -299,6 +302,79 @@ fn consent_page_serves_real_bound_approval_to_real_browser() {
         )
         .unwrap()
     };
+    // Reader frontier (BLP-RET-05): the guarded presentation and preview
+    // refuse a bare session, so the browser fixture must produce REAL
+    // confidentiality authorization through the supported control operations
+    // BEFORE any guarded read — a BLP policy over the real fixture identities
+    // (blp-policy-apply) then an attribution binding the EXACT canonical
+    // digest of the prepared action to this project root
+    // (blp-object-attribute). Event ids are bound to the live trust revision
+    // (apply-once per revision): reruns on the retained fixture advance
+    // through the real apply path and never revive a stale recorded entry.
+    let blp_revision = trust("blp-show", json!({}), "fixture-admin-token")["record"]
+        ["history"]
+        .as_array()
+        .and_then(|h| h.last())
+        .and_then(|e| e["revision"].as_u64())
+        .unwrap_or(0);
+    trust(
+        "blp-policy-apply",
+        json!({
+            "schema_version":1,
+            "event_id":format!("consent-browser-policy-{}", owned.trust_revision),
+            "expected_revision":blp_revision,
+            "expected_trust_revision":owned.trust_revision,
+            "reason":"Reader-frontier policy for the consent browser fixture",
+            "policy":{
+                "schema_version":1,
+                "levels":[
+                    {"id":"public","name_fr":"Public","name_en":"Public"},
+                    {"id":"restricted","name_fr":"Diffusion restreinte","name_en":"Restricted"},
+                    {"id":"classified","name_fr":"Diffusion contrôlée","name_en":"Classified"},
+                ],
+                "compartments":[],
+                "clearances":{
+                    "enrolled-effect":{"level":"classified","compartments":[]},
+                    "requester":{"level":"restricted","compartments":[]},
+                    "approver":{"level":"public","compartments":[]},
+                    "agreement-admin":{"level":"classified","compartments":[]},
+                },
+            },
+        }),
+        "fixture-admin-token",
+    );
+    let attribute_revision = trust("blp-show", json!({}), "fixture-admin-token")["record"]
+        ["history"]
+        .as_array()
+        .and_then(|h| h.last())
+        .and_then(|e| e["revision"].as_u64())
+        .unwrap_or(0);
+    let attribute_reply = trust(
+        "blp-object-attribute",
+        json!({
+            "schema_version":1,
+            "event_id":format!("consent-browser-attribute-{}", owned.trust_revision),
+            "expected_revision":attribute_revision,
+            "expected_trust_revision":owned.trust_revision,
+            "canonical_digest":swarm_protection_contract::canonicalize(
+                &proposal(&repository_id, &candidate),
+                &context(owned.trust_revision),
+            )
+            .unwrap()
+            .digest(),
+            "project_path":owned.project_path.to_str().unwrap(),
+            "classification":{"level":"classified","compartments":[]},
+            "reason":"Reader-frontier attribution for the exact prepared action of the consent browser fixture",
+        }),
+        "fixture-admin-token",
+    );
+    assert_eq!(
+        attribute_reply["attributed"], true,
+        "supported producer must attribute the exact prepared action"
+    );
+    // Real producers on the project root: mandate-create (admin bearer),
+    // request (requester bearer) — the pending action exists before the page.
+    let mandate_id = format!("consent-browser-mandate-{}", std::process::id());
     trust(
         "mandate-create",
         json!({
@@ -441,6 +517,9 @@ fn consent_page_serves_real_bound_approval_to_real_browser() {
             }[..12]
         ),
         "session_file":session_name,
+        // Fixture reader credential the harness types into the page's
+        // EPHEMERAL reader input (request-time Bearer, cleared on every exit).
+        "reader_token":"fixture-admin-token",
         "frozen_bytes_b64":URL_SAFE_NO_PAD.encode(&approve),
         "drifted_bytes_b64":URL_SAFE_NO_PAD.encode(&drifted),
     });

@@ -2,7 +2,8 @@
 /** Read-only observation of real PAEA effect surfaces. Consumes only the three
  * public guarded reads: GET /api/v1/paea/git-call/preview (protected preview of
  * the exact held prepared action, addressed to a future approver, no consent),
- * GET /api/v1/paea/git-call (startup capability, no consumption) and
+ * GET /api/v1/paea/git-call (minimal startup observation: `bound` only, no
+ * consumption) and
  * GET /api/v1/paea/reconcile-effects (recomputed journal reconciliation). No
  * POST, no one-shot call consumption, no authority, no repair: a preview is not
  * an agreement and `verified=true` stays recomputed correspondence, never
@@ -14,20 +15,16 @@
   function status(id,kind,message){$(id).dataset.state=kind;$(id).textContent=t(message)}
   /** Read one guarded GET endpoint; refuse to hide a refusal code. */
   async function read(path){const r=await fetch(path,{method:'GET',cache:'no-store',credentials:'same-origin'});const raw=await r.text();let body;try{body=JSON.parse(raw)}catch{throw Error(t('Réponse illisible ; vérifier l’état avant reprise'))}if(!r.ok)throw Error(body?.failure?.code||body?.error||String(r.status));return body}
-  /** Public capability entries shown as-is; nothing is added or reinterpreted. */
+  /** Startup observation shown as-is; nothing is added or reinterpreted.
+   * The status route serves the minimal projection only (the `bound` boolean;
+   * `capability` stays Null — no request-derived call/service/operation or
+   * digest, BLP-RET-05): the exact capability metadata of the held action is
+   * presented solely through the guarded preview read. */
   function capability(view){
     if(!view.bound){status('gitcall-status','empty','Aucun appel Git préparé n’est lié au démarrage du service. La préparation deux phases (CLI ou enrôlement) reste la voie réelle.');return}
-    const cap=view.capability;
-    if(!cap||typeof cap!=='object'){status('gitcall-status','error','Capacité publique absente d’une source liée : état incohérent signalé, aucun appel effectué.');return}
-    const labels={scope:'Portée',reason:'Origine',call:'Appel',service:'Service',operation:'Opération',root_digest:'Empreinte de racine',action_digest:'Empreinte d’action'};
-    const dl=$('gitcall-capability');dl.replaceChildren();
-    for(const [key,value] of Object.entries(cap)){
-      if(!(key in labels))continue;
-      const dt=document.createElement('dt'),dd=document.createElement('dd');
-      dt.textContent=t(labels[key]);dd.textContent=String(value);dl.append(dt,dd);
-    }
+    if(view.capability!=null){status('gitcall-status','error','Rapport hors contrat : la route de statut a servi une capacité dérivée de la requête préparée, ce que la frontière lecteur interdit. Aucun appel effectué.');return}
     $('gitcall-detail').hidden=false;
-    status('gitcall-status','success','Un appel Git préparé est lié : capacité publique affichée. La consommation reste un appel one-shot gardé, jamais déclenché depuis cette page.');
+    status('gitcall-status','success','Un appel Git préparé est lié au démarrage du service : aucune métadonnée dérivée n’est exposée sous cette session (frontière lecteur). Le détail exact reste lisible via la lecture gardée, adressée à un futur approbateur.');
   }
   /** Explicit journal state per domain; findings list exact refusal codes. */
   function journal(domain,heading){
@@ -68,7 +65,15 @@
   function preview(view){
     if(view.schema_version!==1){status('preview-status','error',t('Rapport hors contrat (version de schéma inattendue) ; original conservé dans le rapport technique.'));$('preview-detail').hidden=false;$('preview-raw-body').textContent=JSON.stringify(view,null,2);return}
     if(!view.available){
-      status('preview-status','empty',t('Aperçu explicitement indisponible : {code}. Aucun appel Git préparé n’est lié au démarrage du service ; la préparation deux phases reste la voie réelle.',{code:view.reason??''}));
+      // Reader-frontier refusals (paea-reader-*) mean the prepared call IS
+      // bound but this session/credential holds no current classification
+      // authorization: say exactly that, never the "nothing bound" text —
+      // and show no held field (the reply carries none either).
+      const readerRefused=String(view.reason??'').startsWith('paea-reader-');
+      status('preview-status','empty',
+        readerRefused
+          ? t('Lecture refusée : {code}. L’action préparée est liée, mais son contenu classifié n’est présenté qu’à un lecteur autorisé par une attribution courante de confidentialité ; aucune donnée de l’action n’est affichée.',{code:view.reason??''})
+          : t('Aperçu explicitement indisponible : {code}. Aucun appel Git préparé n’est lié au démarrage du service ; la préparation deux phases reste la voie réelle.',{code:view.reason??''}));
       for(const id of ['preview-identity','preview-witness','preview-declared','preview-limits-list'])$(id).replaceChildren();
       $('preview-detail').hidden=true;
       return;

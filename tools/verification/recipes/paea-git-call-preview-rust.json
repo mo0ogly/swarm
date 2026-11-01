@@ -24,14 +24,14 @@
   "tests/paea_effects_ui_recipe.py",
   "tools/verification/recipe.py",
   "tools/verification/recipes/paea-git-call-preview-rust.json",
-  "docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-preview-20261030T094105Z/source-fixture/result.json"
+  ".swarm-fixtures/source-fixture-status-minimal-regen-20261101/result.json"
  ],
  "environment": {
   "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
   "CARGO_PROFILE_DEV_DEBUG": "0",
   "CARGO_PROFILE_TEST_DEBUG": "0",
   "CARGO_INCREMENTAL": "0",
-  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-preview-20261030T094105Z/source-fixture"
+  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/.swarm-fixtures/source-fixture-status-minimal-regen-20261101"
  },
  "steps": [
   {
@@ -83,6 +83,58 @@
    "expected_exit": 0,
    "required_stdout": [
     "preview_route_presents_exact_bound_action_with_current_state ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "preview-route-reader-guard-refuses-unknown-provenance",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "preview_reader_guard_enforces_produced_attribution",
+    "--message-format=json",
+    "--",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "preview_reader_guard_enforces_produced_attribution ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "preview-route-reader-refusal-matrix-bound-approval",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "reader_refusal_matrix_on_bound_approval_both_routes",
+    "--message-format=json",
+    "--",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "reader_refusal_matrix_on_bound_approval_both_routes ... ok",
     "1 passed; 0 failed"
    ],
    "required_stderr": []

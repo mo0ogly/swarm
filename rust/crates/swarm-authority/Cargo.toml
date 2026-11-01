@@ -13,11 +13,18 @@ path = "src/main.rs"
 serde = { version = "=1.0.228", features = ["derive"] }
 serde_json = "=1.0.150"
 swarm-enrollment-bootstrap = { path = "../swarm-enrollment-bootstrap" }
+swarm-enrollment-state = { path = "../swarm-enrollment-state" }
+swarm-enrollment-authority = { path = "../swarm-enrollment-authority" }
+swarm-identity-contract = { path = "../swarm-identity-contract", features = ["serde"] }
+ed25519-dalek = { version = "=2.2.0", features = ["zeroize"] }
+getrandom = "=0.4.3"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 rustix = { version = "=1.1.5", features = ["fs", "process"] }
 
 [dev-dependencies]
+tempfile = "=3.27.0"
+serde_json = "=1.0.150"
 sha2 = "=0.10.9"
 swarm-enrollment-config = { path = "../swarm-enrollment-config" }
 swarm-identity-contract = { path = "../swarm-identity-contract", features = ["serde"] }

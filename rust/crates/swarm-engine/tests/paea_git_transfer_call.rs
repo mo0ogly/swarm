@@ -140,11 +140,34 @@ fn current_trust_revision(root: &Path) -> i64 {
             .unwrap();
     state["revision"].as_i64().expect("fixture Trust revision")
 }
-fn effect_config() -> Vec<u8> {
+/// Actual project Trust configuration with an explicit effect role; tokens only
+/// for local fixture identities, never enrolled ones. Idempotent on both
+/// regimes (same contract as the CLI harness and `paea_effect_reconcile`): a
+/// fresh root (no `trust-actions.json` yet) applies at `expected_revision:0`
+/// with a stable event id; a retained root already configured applies a
+/// run-unique event per harness call at its actual current revision, so reruns
+/// never replay a conflicting fingerprint nor advance the fixture Trust
+/// revision beyond one run-unique event per call.
+fn effect_config(root: &Path) -> Vec<u8> {
+    let fresh = !root.join(".swarm/trust-actions.json").exists();
+    static SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let nonce = format!(
+        "{}-{}",
+        std::process::id(),
+        SEQ.fetch_add(1, std::sync::atomic::Ordering::SeqCst)
+    );
+    let (event_id, expected) = if fresh {
+        ("transfer-effect-config".to_owned(), 0)
+    } else {
+        (
+            format!("transfer-effect-config-{nonce}"),
+            current_trust_revision(root),
+        )
+    };
     serde_json::to_vec(&json!({
         "schema_version":1,
-        "event_id":"effect-config",
-        "expected_revision":0,
+        "event_id":event_id,
+        "expected_revision":expected,
         "reason":"Explicit fixture effect role for Git transfer",
         "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":false},
         "identities":[
@@ -234,11 +257,24 @@ struct Owned {
 }
 fn owned() -> Owned {
     let (project_path, project, work, candidate) = project();
-    project
-        .trust("config-apply", &effect_config(), "")
-        .unwrap_or_else(|e| panic!("explicit fixture config refused: {}", e.code()));
-    // The applied configuration advanced the Trust revision; the signed grant
-    // and attributed context must both bind the actual post-configuration one.
+    // One Trust configuration per process, serialized, and only when the root
+    // is fresh: a retained fixture is already configured, and every extra
+    // config-apply advances its revision above its carried approval, voiding
+    // the approval at last use (`paea-git-promote-agreement-stale` in suites
+    // that consume carried agreements). Parallel tests share the same retained
+    // fixture root; the single serialized apply keeps the revision stable for
+    // the whole process regardless of interleaving.
+    static CONFIG: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    static APPLIED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+    let _guard = CONFIG.lock().unwrap_or_else(|e| e.into_inner());
+    if !APPLIED.swap(true, std::sync::atomic::Ordering::SeqCst)
+        && !project_path.join(".swarm/trust-actions.json").exists()
+    {
+        project
+            .trust("config-apply", &effect_config(&project_path), "")
+            .unwrap_or_else(|e| panic!("explicit fixture config refused: {}", e.code()));
+    }
+    // The actual current revision binds the signed grant and attributed context.
     let trust_revision = current_trust_revision(&project_path);
     let scope = scope(&project_path, &work);
     let (service_dir, service) = service();

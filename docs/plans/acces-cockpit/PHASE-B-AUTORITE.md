@@ -139,7 +139,8 @@ Décisions de conception B2 :
    (mot de passe ou code d'amorçage) ; l'UID seul ne suffit jamais, puisque les
    agents partagent l'UID opérateur.
 5. **État B2.1 : fait** (31 octobre 2026) — crate `rust/crates/swarm-authority`, `swarm-authority check --declaration … --pin … --json`, tests `tests/check.rs` 2/2. Les fixtures protégées vivent sous `~/.local/state/swarm-protected-fixtures` : le chargeur refuse tout ancêtre inscriptible par le groupe, or `ChatGPT/` et `swarm/` sont en `775`.
-6. Tranches : B2.1 crate + chargement de la déclaration + commande `check` ;
+6. **État B2.2 : fait** (1er novembre 2026) — `Journal::snapshot` (tête vérifiée + identifiants actifs, lecture seule) dans `swarm-enrollment-state` ; registre `swarm_authority::accounts` : comptes multiples `account/<sujet>/<nonce>` (rôles `viewer|operator|approver|admin`, intégrité 1–3, attributs libres, vérificateur Argon2id), création, vérification sans oracle, changement de mot de passe par nouvelle génération puis révocation, désactivation, liste sans matériel secret. Tests `tests/accounts.rs` et `tests/snapshot.rs`. Restent ouverts : témoin anti-retour arrière (EP-06), coûts Argon2 en réglage Admin (EP-09), sessions, écoute.
+7. Tranches : B2.1 crate + chargement de la déclaration + commande `check` ;
    B2.2 journal des comptes (fixture, UID courant comme `service_uid`) ;
    B2.3 écoute HTTP minimale `/login` + session ; puis B1 (script `sudo`) quand
    le binaire existe.

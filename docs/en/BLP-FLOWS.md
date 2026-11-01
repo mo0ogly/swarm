@@ -7,7 +7,7 @@
 
 ## State and scope
 
-BLP-01, October31: **24 documented flows, 43 anchors in 41 source files**,
+BLP-01, October31: **24 documented flows, 44 anchors in 42 source files**,
 reviewed at current producer/consumer boundaries. The JSON records exposed
 material, producer, recipient, existing controls, owner, missing packages and
 required observable per flow, with complete source hashes/anchor lines. Changes
@@ -17,7 +17,7 @@ inventory of dynamic behavior.
 The permanent blp-flow-inventory recipe passes two steps and five checker tests
 actually execute. They establish inventory freshness/refusal/recovery, **not
 prevention of disclosure**. No provider, live data, account or security setting
-changes. No product-executable behavior changes: build, installation and release
+changes. In that initial inventory-only increment, no product-executable behavior changed: build, installation and release
 notes are therefore not required for this increment.
 
 ## Inventoried boundaries
@@ -120,3 +120,33 @@ documented; IO causes propagate to library callers, CLI uses safe codes without
 private content. The graph grants nothing. Evidence remains under
 docs/plans/actions-confiance/verification-blp/20261031-flow-inventory-01/.
 BLP-01 stays partial for dynamic channels; BLP-RET-01/02/03 remain open.
+
+## BLP-04 — preparation byte provenance (31 October increment)
+
+`preparation_send` now uses `preparation_prompt::assemble`. A private manifest
+covers every prompt byte in order without duplicating text: aggregate project
+context, engine instructions, optional plan contract, JSON framing and each of
+the nine data fields. These include documents, retained excerpts, adopted brief,
+method, method sources, history, mode, omitted exchange count and current message.
+Wire text remains identical to the previous assembly. Digests cover the actual
+serialized JSON bytes. Aggregate inputs do not establish per-file/version labels.
+
+New private native envelopes use v3 and require provenance. Historical v1/v2
+remain readable without it; no provenance is retrospectively invented. Older
+workers refuse v3. Native record reads used by dispatch, worker claim and replay
+check digests, full coverage, UTF-8 boundaries and origin/JSON-key correspondence.
+Missing/null v3 metadata refuses; inconsistent bytes yield
+`preparation-prompt-provenance-invalid` before provider handoff. Public DTOs
+continue to omit prompt, manifest and nonce.
+
+This establishes observed-byte consistency, **not identity, classification or
+disclosure authority**. A datastore writer can rewrite both bytes and digests;
+authentic attribution remains pending. Preparation still lacks its authenticated
+current BLP principal. No confidentiality domain, BLP sink check or response
+inheritance is implemented. BF-05/07/16 and BLP-04 remain open;
+`runtime_enforced:false` remains accurate.
+
+Recipe: `tools/verification/recipes/blp-preparation-provenance.json` (assembler
+and native-row consumer). The existing CLI recipe also checks coverage and the
+digest against stdin actually received by an inert provider. Results and delivery
+are retained in the [resumption record](plans/actions-confiance/BLP-PROVENANCE-20261031.md).

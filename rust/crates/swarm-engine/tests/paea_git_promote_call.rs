@@ -159,24 +159,40 @@ fn current_trust_revision(root: &Path) -> i64 {
     state["revision"].as_i64().expect("fixture Trust revision")
 }
 /// Actual project Trust configuration with an explicit effect role; tokens only
-/// for local fixture identities, never enrolled ones. The fixed
-/// `expected_revision:0` shares the first-application idempotency of the CLI
-/// harness (INCREMENT-87): on an unconfigured fixture root (no
-/// `trust-actions.json` yet) the apply creates the state; on a retained root
-/// already at revision N the exact same event replay is accepted without
-/// advancing further, so reruns never mutate the fixture Trust revision.
+/// for local fixture identities, never enrolled ones. Idempotent on both
+/// regimes (same contract as the CLI harness and `effect_config_agreement`):
+/// a fresh root (no `trust-actions.json` yet) applies at `expected_revision:0`
+/// with a stable event id; a retained root already configured applies a
+/// run-unique event per harness call at its actual current revision, so reruns
+/// never replay a conflicting fingerprint nor advance the fixture Trust
+/// revision. The identity set is self-contained — including the I3
+/// `agreement-admin` bearer `seed_agreement` requires — instead of relying on
+/// residual fixture state, and replaces the whole identity set on apply
+/// (`config::change` semantics).
 fn effect_config(root: &Path) -> Vec<u8> {
-    let _ = root;
+    let fresh = !root.join(".swarm/trust-actions.json").exists();
+    static SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let nonce = format!(
+        "{}-{}",
+        std::process::id(),
+        SEQ.fetch_add(1, std::sync::atomic::Ordering::SeqCst)
+    );
+    let (event_id, expected) = if fresh {
+        ("promote-effect-config".to_owned(), 0)
+    } else {
+        (format!("promote-effect-config-{nonce}"), current_trust_revision(root))
+    };
     serde_json::to_vec(&json!({
         "schema_version":1,
-        "event_id":"promote-effect-config",
-        "expected_revision":0,
+        "event_id":event_id,
+        "expected_revision":expected,
         "reason":"Explicit fixture effect role for Git promotion",
         "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":false},
         "identities":[
             {"subject":"enrolled-effect","integrity":3,"roles":["admin","effect"],"enrollment_principal":{"principal_id":"operator","principal_kind":"human","issuer":"https://fixture.invalid","subject":"stable-person"}},
             {"subject":"requester","token":"fixture-requester-token","integrity":1,"roles":["requester"]},
-            {"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]}
+            {"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]},
+            {"subject":"agreement-admin","token":"fixture-admin-token","integrity":3,"roles":["admin"]}
         ]
     }))
     .unwrap()

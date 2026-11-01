@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "preparation_id": "prep-688350fb6dec4e0d4b1bb93f",
+  "event_id": "preexec-failure",
+  "expected_revision": 3,
+  "provider": "fixture",
+  "capability_hash": "eb26cc45d59188e0d591553e8ee58d26db158875d8b158c03101c665e1a86004",
+  "model_policy_hash": "",
+  "level": "auto",
+  "message": "Propose brief",
+  "context_mode": "full"
+}

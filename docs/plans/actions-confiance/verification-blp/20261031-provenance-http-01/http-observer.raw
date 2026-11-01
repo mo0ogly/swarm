@@ -1,0 +1,11 @@
+{"schema_version":1,"event":"web-outcome","outcome":{"schema_version":1,"status":200,"error":null,"recorded_work":null,"configuration_may_be_recorded":false}}
+{"schema_version":1,"event":"web-outcome","outcome":{"schema_version":1,"status":200,"error":null,"recorded_work":null,"configuration_may_be_recorded":false}}
+{"schema_version":1,"event":"web-outcome","outcome":{"schema_version":1,"status":200,"error":null,"recorded_work":null,"configuration_may_be_recorded":false}}
+{"schema_version":1,"event":"web-outcome","outcome":{"schema_version":1,"status":200,"error":null,"recorded_work":null,"configuration_may_be_recorded":false}}
+{"schema_version":1,"event":"web-outcome","outcome":{"schema_version":1,"status":200,"error":null,"recorded_work":null,"configuration_may_be_recorded":false}}
+{"schema_version":1,"event":"web-outcome","outcome":{"schema_version":1,"status":200,"error":null,"recorded_work":null,"configuration_may_be_recorded":false}}
+{"schema_version":1,"event":"web-outcome","outcome":{"schema_version":1,"status":200,"error":null,"recorded_work":null,"configuration_may_be_recorded":false}}
+{"schema_version":1,"event":"web-outcome","outcome":{"schema_version":1,"status":200,"error":null,"recorded_work":null,"configuration_may_be_recorded":true,"recorded_configuration":{"event_id":"call-settings-7","event_revision":"4","current_revision":"4","replayed":false}}}
+{"schema_version":1,"event":"web-outcome","outcome":{"schema_version":1,"status":200,"error":null,"recorded_work":null,"configuration_may_be_recorded":false}}
+{"schema_version":1,"event":"web-outcome","outcome":{"schema_version":1,"status":200,"error":null,"recorded_work":null,"configuration_may_be_recorded":false}}
+{"schema_version":1,"event":"web-stopped","accepted_connections":11,"completed_jobs":10,"rejected_requests":1,"rejected_connections":0,"rejected_queued_jobs":0,"connection_failures":0,"disconnected_replies":0,"observed_outcomes":10,"configuration_outcomes":1,"work_outcomes":0,"provider_contact_may_have_occurred":false,"first_request_failure":"web-csrf-refused","first_service_failure":null,"first_connection_failure":null,"last_recorded_work":null,"last_recorded_configuration":{"event_id":"call-settings-7","event_revision":"4","current_revision":"4","replayed":false}}

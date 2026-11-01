@@ -190,3 +190,67 @@ d’absence de commit/push décrivent l’étape de développement avant cette d
 Le code du graphe est déjà dans l’historique partagé ; cette étape conserve le
 bilan final et pousse la branche courante sans inclure les modifications non
 commitées des autres chantiers ni réécrire les commits existants.
+
+## Quick wins proposés —1 novembre2026
+
+Origine : demande utilisateur « tu as des quickwin ? », puis inspection des
+sources actuelles. Propositions, pas décisions adoptées ni fonctions réalisées.
+Périmètre : présentation du graphe ; propriétaire proposé : Codex/G1. Aucun
+changement du moteur, des missions, des droits ou des politiques d’exécution.
+
+| ID | Proposition et valeur | Preuve actuelle | Critère observable | État / reprise |
+|---|---|---|---|---|
+| QG1 | Recherche par titre/identifiant avec centrage, utile sur les plans denses | navigation de cockpit-native-graph.js sans recherche | une recherche révèle et centre la bonne carte ; effacement conserve le placement et le Work | proposé, priorité1 ; reprise : réalisation de ce lot UX |
+| QG2 | Libellé « Enregistrement en cours… » jusqu’à la relecture, pour rendre l’attente explicite | editTask désactive les champs mais garde le libellé Enregistrer | état d’attente visible/accessible, retour correct après refus, un seul POST | proposé, priorité2 ; reprise : même lot UX |
+| QG3 | Mini-carte navigable, clic et clavier pour atteindre une zone | SVG role=img et pointer-events:none dans swarm-design.css | navigation atteint la zone indiquée, focus visible et aucune modification du plan | proposé ; reprise : lot de navigation |
+| QG4 | Annulation du dernier déplacement/rangement local des cartes | Ranger les cartes remet immédiatement les positions à zéro, sans historique local | restauration des positions précédentes, y compris après rangement, sans écrire de tâches/liens | proposé ; reprise : lot de placement, distinct de l’undo métier des brouillons |
+
+Priorité conseillée : QG1 puis QG2. Les brouillons atomiques multi-tâches restent
+un chantier moteur séparé, déjà conservé dans les critères ouverts précédents.
+
+## Reprise QG1/QG2 —1 novembre2026
+
+Utilisateur « reprends » : réalisation des deux priorités annoncées, Codex seul.
+QG1/QG2 décidés et réalisés en source ; preuve produit et installation attendues.
+QG3/QG4 restent proposés. Comparaison : filtrer/recalculer le graphe masquerait
+des dépendances et modifierait le placement ; recherche/repères/centrage sur le
+rendu existant retenus, sans requête réseau ni mutation de Work. La progression
+de sauvegarde suit le pending existant jusqu’au consommateur de rafraîchissement.
+Aucune nouvelle politique d’exécution, aucun délai, retry ou plafond de résultats.
+
+Critères : titre/ID, casse/accents, plusieurs résultats et cycle Suivant, aucun
+résultat, effacement, clavier/mobile/plein écran et géométrie/Work conservés ;
+attente visible pendant envoi, relecture et refresh, un seul POST ; refus et
+issue incertaine cessent de dire « en cours » sans réactiver un renvoi incertain.
+Docs FR/EN, commentaires des fonctions et recette native actualisés ensemble.
+
+Preuves originales `.cache/graph-quickwins-20261101/` : before-search échoue sur
+search-control après témoin3cartes ; before-busy échoue sur saving-feedback-Ack
+après un POST réel confirmé. Mode --skip-search-check uniquement pour isoler
+ce second contre-exemple ; aucune qualification positive ne l’emploie.
+Les travaux PAEA/BLP et les entrées d’index préexistantes sont conservés.
+
+### QG1/QG2 livrés — Rust289
+
+Recherche et progression de sauvegarde : réalisés, vérifiés et installés.
+Image `510bf69d75b13ef7a7183983909b1511b52f01ae1e314fb1684104d8032099af`,
+PID728136 au contrôle installé, v0.1.1-dev.289 active/prête.
+`permanent289` :2steps PASS/verify VERIFIED, 395assertions navigateur
+retenues (157navigation/238édition), diagnostics sans erreur inattendue.
+FR/EN, clair/sombre,320/390px, recherche sans mutation, sauvegarde maintenue sur
+les3phases avec un seul POST, refus et issue incertaine vérifiés. Premier
+passage overlay PASS explicitement distinct du vrai binaire qualifié.
+`installed` : identité du processus,7assets servis liés à l’inventaire compilateur
+et14contrôles Version FR/EN PASS ; aucun POST dans ce contrôle du vrai Root.
+
+Revue QG1/QG2 liée aux octets : politiques UI, fonctions, erreurs et documentation
+examinées (`review/owned-hashes.json` et `review/review.md`). La revue globale
+du delta compilateur reste explicitement ouverte pour les producteurs BLP/PAEA
+concurrents non modifiés par ce lot ; aucun verdict global, aucune acceptation
+indépendante ni conformité de ces autres parcours n’est inférée du graphe.
+
+RETEX borné : indicateur aligné sur la fin effective du consommateur, pas seulement
+sur la réponse POST ; recherche sur le rendu courant plutôt que reconstruction
+ou masquage du plan. Les recettes permanentes réutilisent ces témoins et gardes.
+QG3/QG4 restent proposés : mini-carte navigable et historique de placement local,
+avec leurs critères et conditions de reprise conservés dans le tableau initial.

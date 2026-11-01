@@ -20,17 +20,56 @@ impl Fixture {
         fixture.call("config-apply",config(0,"trust-init"),"").unwrap(); fixture
     }
     /// Exercise the public Root consumer and close it on both success/refusal.
+    /// Refusals render the stable code plus every retained safe cause reason,
+    /// since RootStoreError's own Display keeps only the top-level code.
     fn call(&self, op:&str, input:Value, token:&str)->Result<Value,String> {
         let store=RootStore::open(&self.0,true).unwrap();
         let result=store.trust_as_principal(op,&serde_json::to_vec(&input).unwrap(),token);
         store.close().unwrap();
-        result.map(|r|serde_json::from_slice(&r.bytes).unwrap()).map_err(|e|e.to_string())
+        result.map(|r|serde_json::from_slice(&r.bytes).unwrap()).map_err(|e|{
+            let mut text=e.to_string();
+            let mut source=std::error::Error::source(&e);
+            while let Some(cause)=source { text.push_str(": "); text.push_str(&cause.to_string()); source=cause.source(); }
+            text
+        })
     }
     fn state(&self)->Vec<u8>{std::fs::read(self.0.join(".swarm/trust-actions.json")).unwrap()}
+    /// Publish new state bytes through the same trust-lock protocol the engine
+    /// uses (exclusive reservation + atomic same-directory publish), only for
+    /// a test-owned fixture root. This exercises the storage/reopen contract
+    /// on histories no supported producer can produce; it is never used
+    /// against a real project root and no evidence or other process is touched.
+    /// The mapper receives the CURRENT bytes and returns the replacement bytes.
+    fn rewrite_state(&self,map:impl FnOnce(Vec<u8>)->Vec<u8>){
+        use std::os::unix::fs::OpenOptionsExt;
+        let lock_path=self.0.join(".swarm/trust-actions.lock");
+        let lock=std::fs::OpenOptions::new().create(true).write(true).mode(0o600)
+            .open(&lock_path).unwrap();
+        rustix::fs::flock(&lock,rustix::fs::FlockOperation::LockExclusive).unwrap();
+        let next=map(self.state());
+        crate_publish(&self.0,&next);
+        rustix::fs::flock(&lock,rustix::fs::FlockOperation::Unlock).unwrap();
+    }
     fn apply(&self)->Value{self.call("blp-policy-apply",change(0,"blp-init"),"fixture-admin-token").unwrap()}
 }
 impl Drop for Fixture {
     fn drop(&mut self){if !std::thread::panicking(){std::fs::remove_dir_all(&self.0).unwrap();}}
+}
+/// Atomic same-directory publish mirroring LocalDirectory::publish semantics
+/// for the test-owned fixture: write a sibling temp file, fsync, rename over
+/// the state file. A partial write never replaces the original.
+fn crate_publish(root:&std::path::Path,bytes:&[u8]){
+    use std::io::Write;
+    let target=root.join(".swarm/trust-actions.json");
+    let temp=root.join(".swarm/trust-actions.json.poison-tmp");
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        let mut file=std::fs::OpenOptions::new().create(true).write(true).truncate(true)
+            .mode(0o600).open(&temp).unwrap();
+        file.write_all(bytes).unwrap();
+        file.sync_all().unwrap();
+    }
+    std::fs::rename(&temp,&target).unwrap();
 }
 fn config(revision:u64,event:&str)->Value {
     json!({"schema_version":1,"event_id":event,"expected_revision":revision,"reason":"Owned isolated BLP fixture",
@@ -114,4 +153,293 @@ fn trust_revision_policy_revocation_and_old_replays_are_not_reactivated() {
     assert!(f.call("blp-check",input,"fixture-worker-token").unwrap_err().contains("blp-policy-stale")); assert_eq!(f.state(),before);
     let mut recovered=change(2,"explicit-renewal");recovered["expected_trust_revision"]=2.into();
     assert_eq!(f.call("blp-policy-apply",recovered,"fixture-admin-token").unwrap()["proposed_revision"],"3");
+}
+
+/// BLP-RET-05 control attribution: a produced attribution is bound to the
+/// exact canonical digest, project path and current policy revision, is
+/// replayed identically and is refused for a stale policy or bad digest
+/// shape without any mutation. The attributing admin must itself hold a
+/// clearance dominating the attributed label (classification authority is
+/// subordinated to habilitation); errors surface with their exact code.
+#[test]
+fn object_attribute_produces_binds_and_replays_under_current_policy() {
+    let f=Fixture::new(); f.apply();
+    // The default fixture policy grants no admin clearance, so attribution of
+    // a confidential label must refuse (no dominating clearance) and mutate
+    // nothing; the renewed policy grants admin the confidential clearance.
+    let digest="a".repeat(64);
+    let base=json!({"schema_version":1,"event_id":"blp-attribute-init","expected_revision":1,
+        "expected_trust_revision":1,"canonical_digest":digest,
+        "project_path":f.0.to_str().unwrap(),
+        "classification":{"level":"confidential","compartments":[]},
+        "reason":"Control attribution for the exact prepared action fixture"});
+    let before=f.state();
+    let refusal=f.call("blp-object-attribute",base.clone(),"fixture-admin-token").unwrap_err();
+    assert!(refusal.contains("blp-access-denied"),"actual refusal: {refusal}");
+    assert_eq!(f.state(),before);
+    let mut renewed=change(1,"blp-renewal-admin-clearance");renewed["expected_trust_revision"]=1.into();
+    renewed["policy"]["clearances"]["admin"]=json!({"level":"confidential","compartments":[]});
+    f.call("blp-policy-apply",renewed,"fixture-admin-token").unwrap();
+    let input=json!({"schema_version":1,"event_id":"blp-attribute-init","expected_revision":2,
+        "expected_trust_revision":1,"canonical_digest":digest,
+        "project_path":f.0.to_str().unwrap(),
+        "project_path":f.0.to_str().unwrap(),
+        "classification":{"level":"confidential","compartments":[]},
+        "reason":"Control attribution for the exact prepared action fixture"});
+    let reply=f.call("blp-object-attribute",input.clone(),"fixture-admin-token").unwrap_or_else(|e|panic!("attribute refused: {e}"));
+    assert_eq!(reply["attributed"],true); assert_eq!(reply["runtime_enforced"],false);
+    assert_eq!(reply["policy_revision"],"2");
+    assert_eq!(f.call("blp-object-attribute",input,"fixture-admin-token").unwrap()["attributed"],true);
+}
+
+/// BLP-RET-05 attribution conflict: a second accepted classification of the
+/// SAME canonical digest, project path and policy revision that contradicts
+/// the recorded one must never silently ride beside it (the reader takes the
+/// first) nor implicitly declassify it. The smallest public-path witness:
+/// attribute the object confidential, then attribute the same object public
+/// through the same supported producer. Either the producer refuses the
+/// contradictory change without mutation, or the record refuses such a
+/// history — the one outcome it must never have is a stored contradicting
+/// pair where the first classification stays authoritative by accident.
+#[test]
+fn contradictory_re_attribution_of_same_object_is_refused_without_mutation() {
+    let f=Fixture::new(); f.apply();
+    let mut renewed=change(1,"blp-renewal-admin-clearance");renewed["expected_trust_revision"]=1.into();
+    renewed["policy"]["clearances"]["admin"]=json!({"level":"confidential","compartments":[]});
+    f.call("blp-policy-apply",renewed,"fixture-admin-token").unwrap();
+    let digest="b".repeat(64);
+    let path=f.0.to_str().unwrap();
+    let first=json!({"schema_version":1,"event_id":"blp-attribute-first","expected_revision":2,
+        "expected_trust_revision":1,"canonical_digest":digest,"project_path":path,
+        "classification":{"level":"confidential","compartments":[]},
+        "reason":"Initial control attribution of the exact prepared action fixture"});
+    let reply=f.call("blp-object-attribute",first,"fixture-admin-token").unwrap_or_else(|e|panic!("first attribute refused: {e}"));
+    assert_eq!(reply["attributed"],true);
+    let before=f.state();
+    // Contradictory re-attribution of the exact same object under the same
+    // current policy revision: a DIFFERENT event with a LOWER label.
+    let second=json!({"schema_version":1,"event_id":"blp-attribute-second","expected_revision":2,
+        "expected_trust_revision":1,"canonical_digest":digest,"project_path":path,
+        "classification":{"level":"public","compartments":[]},
+        "reason":"Contradictory lower re-attribution of the same object fixture"});
+    let result=f.call("blp-object-attribute",second,"fixture-admin-token");
+    // The record must not end with both classifications stored for one object.
+    match result {
+        Err(refusal)=>assert!(!refusal.contains("blp-replay-stale"),
+            "identical-object re-attribution must refuse on the contradiction, not on stale replay: {refusal}"),
+        Ok(reply)=>{
+            let view=f.call("blp-show",json!({}),"fixture-admin-token").unwrap();
+            let entries=view["record"]["history"].as_array().unwrap();
+            let stored:Vec<&Value>=entries.iter()
+                .flat_map(|e|e["attributions"].as_array())
+                .flatten()
+                .filter(|a|a["canonical_digest"]==digest.as_str()
+                    &&a["project_path"].as_array().is_some_and(|b|
+                        b.iter().map(|v|v.as_u64().unwrap_or(256) as u8).collect::<Vec<u8>>()
+                            .as_slice()==path.as_bytes()))
+                .collect();
+            assert!(stored.len()==1,"at most one classification per object may persist; got {stored:?}");
+            let _=reply;
+        }
+    }
+    assert_eq!(f.state(),before,"a contradictory refusal must not mutate");
+}
+
+/// Defect 3, sub-case (c): the producer contract announces `classification:
+/// null` as "the object is unclassified", but the stored attribution gets an
+/// EMPTY level string, and a reader presenting `Some(empty)` to
+/// `check_read` meets `blp-classification-invalid` — an incoherent success
+/// at production turning into an always-refused attribution at consumption.
+/// The smallest public-path witness: an unclassified attribution either
+/// carries a real catalog level (explicit decision) or the producer refuses
+/// the null classification typed; it must never store an empty level that
+/// can never be read back coherently. This test FAILS before the fix.
+#[test]
+fn unclassified_attribution_never_stores_an_unreadable_empty_level() {
+    let f=Fixture::new(); f.apply();
+    let mut renewed=change(1,"blp-renewal-admin-clearance");renewed["expected_trust_revision"]=1.into();
+    renewed["policy"]["clearances"]["admin"]=json!({"level":"confidential","compartments":[]});
+    f.call("blp-policy-apply",renewed,"fixture-admin-token").unwrap();
+    let digest="c".repeat(64);
+    let before=f.state();
+    let input=json!({"schema_version":1,"event_id":"blp-attribute-null","expected_revision":2,
+        "expected_trust_revision":1,"canonical_digest":digest,
+        "project_path":f.0.to_str().unwrap(),
+        "classification":Value::Null,
+        "reason":"Unclassified control attribution fixture"});
+    let result=f.call("blp-object-attribute",input,"fixture-admin-token");
+    match result {
+        Err(refusal)=>assert!(refusal.contains("blp-attribute-classification-required"),
+            "a null classification refuses typed, got: {refusal}"),
+        Ok(_reply)=>{
+            // If admitted, the stored level MUST be a real catalog level that
+            // the reader guard can evaluate coherently.
+            let view=f.call("blp-show",json!({}),"fixture-admin-token").unwrap();
+            let stored:Vec<&Value>=view["record"]["history"].as_array().unwrap().iter()
+                .flat_map(|e|e["attributions"].as_array()).flatten()
+                .filter(|a|a["canonical_digest"]==digest.as_str()).collect();
+            assert_eq!(stored.len(),1,"the null classification admits exactly one attribution");
+            let level=stored[0]["level"].as_str().unwrap_or("");
+            assert!(!level.is_empty(),
+                "stored level must never be the unreadable empty string; got {level:?}");
+        }
+    }
+    let _=before;
+}
+
+/// Defect 3, sub-case (b): replay freshness of an attribution event must be
+/// bound to the exact recorded event identity — the replayed event's OWN
+/// attribution, bound to its digest, path, revision and label — never to any
+/// attribution that merely shares the free-text `reason`. Public-path note:
+/// for a WELL-FORMED state the entry guards plus the event fingerprint
+/// (which pins `expected_revision`) make the event's own effect always be on
+/// the current entry, so the reason-match line is only reachable on a
+/// HISTORY that no supported producer can produce today. The honest
+/// discriminator is therefore the storage contract itself: a test-owned
+/// poisoned history (written only inside this test's fixture root, by direct
+/// file publication under the trust lock protocol) where the current entry
+/// holds another object's attribution with the same reason while event A's
+/// own attribution is ABSENT. Reopening and replaying A must refuse
+/// `blp-replay-stale` — the poisoned state is rejected at open, and no
+/// replay revives an event whose recorded effect is not stored. Before the
+/// fix the free-text reason match accepts the replay despite the absent own
+/// effect: the FAILING witness.
+#[test]
+fn attribution_replay_is_not_freshened_by_another_objects_reason() {
+    let f=Fixture::new(); f.apply();
+    let mut renewed=change(1,"blp-renewal-admin-clearance");renewed["expected_trust_revision"]=1.into();
+    renewed["policy"]["clearances"]["admin"]=json!({"level":"confidential","compartments":[]});
+    f.call("blp-policy-apply",renewed,"fixture-admin-token").unwrap();
+    let digest_a="d".repeat(64);
+    let digest_b="e".repeat(64);
+    let shared_reason="Shared free-text reason of two different object attributions";
+    let path=f.0.to_str().unwrap();
+    let first=json!({"schema_version":1,"event_id":"blp-attribute-object-a","expected_revision":2,
+        "expected_trust_revision":1,"canonical_digest":digest_a,
+        "project_path":path,
+        "classification":{"level":"confidential","compartments":[]},
+        "reason":shared_reason});
+    f.call("blp-object-attribute",first,"fixture-admin-token")
+        .unwrap_or_else(|e|panic!("first attribute refused: {e}"));
+    let second=json!({"schema_version":1,"event_id":"blp-attribute-object-b","expected_revision":2,
+        "expected_trust_revision":1,"canonical_digest":digest_b,
+        "project_path":path,
+        "classification":{"level":"confidential","compartments":[]},
+        "reason":shared_reason});
+    f.call("blp-object-attribute",second,"fixture-admin-token")
+        .unwrap_or_else(|e|panic!("second attribute refused: {e}"));
+    // Poison the TEST-OWNED fixture history only: drop event A's own
+    // attribution from the current entry, keep object B's attribution (same
+    // free-text reason) and keep A's retained reply/digest intact. This is
+    // exactly the history shape the reason-match freshness check wrongly
+    // accepts, and no supported producer can produce it.
+    let poison=|bytes:Vec<u8>|{
+        let mut st:Value=serde_json::from_slice(&bytes).unwrap();
+        let history=st["confidentiality"]["history"].as_array_mut().unwrap();
+        let current=history.last_mut().unwrap();
+        let attributions=current["attributions"].as_array_mut().unwrap();
+        attributions.retain(|a|a["canonical_digest"]!=digest_a.as_str());
+        assert_eq!(attributions.len(),1,"poisoned history keeps only object B's attribution");
+        serde_json::to_vec_pretty(&st).unwrap()
+    };
+    f.rewrite_state(poison);
+    // Reopen (RootStore::open decodes and validates) then replay A exactly.
+    let replay=json!({"schema_version":1,"event_id":"blp-attribute-object-a","expected_revision":2,
+        "expected_trust_revision":1,"canonical_digest":digest_a,
+        "project_path":path,
+        "classification":{"level":"confidential","compartments":[]},
+        "reason":shared_reason});
+    let result=f.call("blp-object-attribute",replay,"fixture-admin-token");
+    match result {
+        Err(refusal)=>assert!(refusal.contains("blp-replay-stale")||refusal.contains("trust-proof-integrity"),
+            "a replay whose own effect is not the recorded one refuses stale or at storage validation, got: {refusal}"),
+        Ok(reply)=>panic!("replay accepted through another object's free-text reason: {reply}"),
+    }
+    // The poisoned history must not have been rewritten into a fabricated
+    // success: A's own attribution is still absent after the refusal.
+    let view=f.call("blp-show",json!({}),"fixture-admin-token").unwrap();
+    let stored:Vec<&Value>=view["record"]["history"].as_array().unwrap().last().unwrap()
+        ["attributions"].as_array().unwrap().iter()
+        .filter(|a|a["canonical_digest"]==digest_a.as_str()).collect();
+    assert!(stored.is_empty(),"a refused replay must not restore its own attribution");
+}
+
+/// Defect 3, sub-case (a): the storage/reopen contract. `Record::validate`
+/// previously checked NO attribution field, so a persisted attribution with
+/// an unknown/empty level, a mismatched policy revision or a malformed
+/// digest/path/actor decoded fine and only surfaced (if ever) as an
+/// incoherent refusal at the reader (`blp-classification-invalid`). Since
+/// the supported producer can no longer produce invalid attributions, the
+/// honest red witness is the storage contract itself: a test-owned poisoned
+/// history, published through the same lock/atomic-rename protocol, whose
+/// current entry carries attributions that violate the exact-once binding
+/// contract. Reopening must refuse typed (integrity) at decode/validate —
+/// never silently accept incoherent stored labels. Variants: unknown level,
+/// empty level, wrong policy_revision, bad digest shape, non-absolute path,
+/// duplicated same-triple attribution (contradicting pair).
+#[test]
+fn poisoned_stored_attribution_refuses_at_reopen() {
+    let f=Fixture::new(); f.apply();
+    let mut renewed=change(1,"blp-renewal-admin-clearance");renewed["expected_trust_revision"]=1.into();
+    renewed["policy"]["clearances"]["admin"]=json!({"level":"confidential","compartments":[]});
+    f.call("blp-policy-apply",renewed,"fixture-admin-token").unwrap();
+    let digest="a".repeat(64);
+    let path=f.0.to_str().unwrap();
+    let first=json!({"schema_version":1,"event_id":"blp-attribute-poison-baseline","expected_revision":2,
+        "expected_trust_revision":1,"canonical_digest":digest,
+        "project_path":path,
+        "classification":{"level":"confidential","compartments":[]},
+        "reason":"Baseline attribution before poisoning variants fixture"});
+    f.call("blp-object-attribute",first,"fixture-admin-token")
+        .unwrap_or_else(|e|panic!("baseline attribute refused: {e}"));
+    // Each variant poisons ONE field of the stored attribution in the
+    // test-owned history; after each rewrite the whole root must refuse.
+    let variants:Vec<(&str,Box<dyn Fn(&mut Value)>)>=vec![
+        ("unknown-level",Box::new(|a:&mut Value|{a["level"]="top-secret-unknown".into();})),
+        ("empty-level",Box::new(|a:&mut Value|{a["level"]="".into();})),
+        ("wrong-policy-revision",Box::new(|a:&mut Value|{a["policy_revision"]=999.into();})),
+        ("bad-digest-shape",Box::new(|a:&mut Value|{a["canonical_digest"]="ZZ".repeat(32).into();})),
+        ("relative-path",Box::new(|a:&mut Value|{a["project_path"]=serde_json::to_value(
+            "relative/path".as_bytes().to_vec()).unwrap();})),
+        ("empty-actor",Box::new(|a:&mut Value|{a["actor"]="".into();})),
+        ("contradicting-second",Box::new(|_a:&mut Value|{})),
+    ];
+    // The clean baseline captured BEFORE the loop. A refusal never mutates,
+    // so the poisoned bytes stay published after each variant: restore the
+    // clean baseline explicitly before each next poisoning.
+    let baseline=f.state();
+    for (name,poison_field) in variants {
+        let digest=digest.clone();
+        let clean=baseline.clone();
+        let expected=baseline.clone();
+        let restore=move |bytes:Vec<u8>|{
+            let _=&bytes;
+            clean.clone()
+        };
+        f.rewrite_state(restore);
+        let poisoned=move |bytes:Vec<u8>|{
+            assert_eq!(bytes,expected,"each variant starts from the clean baseline");
+            let mut st:Value=serde_json::from_slice(&bytes).unwrap();
+            let history=st["confidentiality"]["history"].as_array_mut().unwrap();
+            let current=history.last_mut().unwrap();
+            let attributions=current["attributions"].as_array_mut().unwrap();
+            if name=="contradicting-second" {
+                let mut second=attributions[0].clone();
+                second["level"]="public".into();
+                second["reason"]="Contradicting pair injected in the poisoned history fixture".into();
+                attributions.push(second);
+            } else {
+                let target=attributions.iter_mut()
+                    .find(|a|a["canonical_digest"]==digest.as_str())
+                    .unwrap_or_else(||panic!("variant {name}: baseline attribution not found"));
+                poison_field(target);
+            }
+            serde_json::to_vec_pretty(&st).unwrap()
+        };
+        f.rewrite_state(poisoned);
+        // Reopen + any read: decode/validate must refuse the poisoned history.
+        let result=f.call("blp-show",json!({}),"fixture-admin-token");
+        assert!(matches!(&result,Err(refusal) if refusal.contains("trust-proof-integrity")),
+            "poisoned variant {name} must refuse at reopen with an integrity cause, got: {result:?}");
+    }
 }

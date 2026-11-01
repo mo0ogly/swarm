@@ -54,7 +54,7 @@
  "planning_resume_max_reason_bytes": "4000",
  "planning_request_max_bytes": "65536",
  "planning_max_requirements": "100",
- "agent_workflow_max_body_bytes": "32000",
+ "agent_workflow_max_body_bytes": "33000",
  "planning_report_max_bytes": "64000",
  "runtime_silence_seconds_default": "180",
  "runtime_silence_seconds_ceiling": "86400",

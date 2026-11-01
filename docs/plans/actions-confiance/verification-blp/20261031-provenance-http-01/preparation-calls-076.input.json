@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "preparation_id": "prep-b0f3364296da8a02bb4c7164",
+  "event_id": "plan-proposal",
+  "expected_revision": 4,
+  "provider": "api-local",
+  "capability_hash": "c1c2d55d795f393d3774580aad8aad187614496b42559e4695c9d63073b7504e",
+  "message": "Propose a brief",
+  "context_mode": "full",
+  "target": "plan"
+}

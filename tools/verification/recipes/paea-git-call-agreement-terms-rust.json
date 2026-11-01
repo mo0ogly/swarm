@@ -15,14 +15,14 @@
   "rust/crates/swarm-protection-contract/src/**/*",
   "tools/verification/recipe.py",
   "tools/verification/recipes/paea-git-call-agreement-terms-rust.json",
-  "docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-terms-api-20261030T194108Z/source-fixture-regen/result.json"
+  ".swarm-fixtures/source-fixture-terms-api-regen-20261031/result.json"
  ],
  "environment": {
   "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
   "CARGO_PROFILE_DEV_DEBUG": "0",
   "CARGO_PROFILE_TEST_DEBUG": "0",
   "CARGO_INCREMENTAL": "0",
-  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-terms-api-20261030T194108Z/source-fixture-regen"
+  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/.swarm-fixtures/source-fixture-terms-api-regen-20261031"
  },
  "steps": [
   {
