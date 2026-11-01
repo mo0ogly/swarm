@@ -670,12 +670,22 @@ fn launcher_probe<B>(request: &Request<B>) -> bool {
 }
 /// Who may pass protected routes, fixed at server start from v52 settings.
 /// `Authority` keeps the replay memory for its freshness window.
+/// B8 attribution of one daemon-authenticated write (request extension).
+#[derive(Clone)]
+struct Attributed {
+    subject: String,
+    nonce: String,
+    method: String,
+    path: String,
+}
 enum AccessGate {
     OwnerKey,
     Authority {
         key: ed25519_dalek::VerifyingKey,
         max_age_seconds: i64,
         nonces: std::sync::Mutex<swarm_authority::assertion::WindowNonces>,
+        /// EP-06 witness and B8 attribution ledger (Root, operator UID).
+        records: crate::authority_ledger::AuthorityRecords,
     },
 }
 impl NativeHttpService {
@@ -900,6 +910,7 @@ impl NativeHttpService {
                         .map_err(|_| HttpServiceError::Refused("web-access-key-invalid"))?,
                     max_age_seconds: policy.assertion_max_age_seconds,
                     nonces: std::sync::Mutex::new(Default::default()),
+                    records: Default::default(),
                 }),
             },
             Err(e) if e.reason() == "settings-web-access-not-configured" => Ok(AccessGate::OwnerKey),
@@ -914,7 +925,7 @@ impl NativeHttpService {
     fn authorize_request(&self, request: &Request<Vec<u8>>) -> Result<WebPrincipal, WebAccessError> {
         match &self.access {
             AccessGate::OwnerKey => self.authority.authorize(request),
-            AccessGate::Authority { key, max_age_seconds, nonces } => {
+            AccessGate::Authority { key, max_age_seconds, nonces, records } => {
                 self.authority.authorize_host(request)?;
                 if launcher_probe(request) && request.headers().get(swarm_authority::assertion::HEADER).is_none() {
                     // Local launcher identity/readiness probes keep the owner
@@ -937,7 +948,9 @@ impl NativeHttpService {
                     key, header, request.method().as_str(), path, request.body(), now, *max_age_seconds, &mut *memory,
                 )
                 .map_err(WebAccessError::Refused)?;
-                Ok(WebPrincipal::authority(&claims.subject))
+                drop(memory);
+                records.check(&self.root, &claims.witness, claims.issued_at, now).map_err(WebAccessError::Refused)?;
+                Ok(WebPrincipal::authority(&claims.subject, &claims.nonce))
             }
         }
     }
@@ -961,10 +974,10 @@ impl NativeHttpService {
     /// Like Go's public landing, a GET/HEAD / without a usable session renders
     /// login only. Malformed/ambiguous headers and other access failures keep
     /// their typed refusal; no API/private asset receives this exception.
-    fn root_login<B>(&self, request: &Request<B>) -> bool {
     /// Owner-key mode only: in `authority` mode the daemon owns sign-in and
     /// `/` is an ordinary assertion-checked page (the owner key page would
     /// otherwise be shown to a signed-in daemon user).
+    fn root_login<B>(&self, request: &Request<B>) -> bool {
         matches!(self.access, AccessGate::OwnerKey)
             && request.uri().path() == "/"
             && matches!(*request.method(), Method::GET | Method::HEAD)
@@ -1139,10 +1152,39 @@ impl NativeHttpService {
             .authorize_request(&request)
             .map_err(HttpServiceError::Access)
             .and_then(|principal| {
+                // B8: attribute a daemon-authenticated write before it runs.
+                if let Some(entry) = self.attribution(&request, &principal) {
+                    self.attribute(&entry, "intent", None).map_err(HttpServiceError::Refused)?;
+                    request.extensions_mut().insert(entry);
+                }
                 // Attribution for route handlers; grants no right beyond the checks above.
                 request.extensions_mut().insert(principal);
                 self.route(&request, profile, peer_closed)
             });
+        let entry = request.extensions().get::<Attributed>().cloned();
+        let reply = self.reply_of(result, &request, head);
+        if let (Some(entry), Ok(r)) = (entry, &reply) {
+            if self.attribute(&entry, "outcome", Some(r.response.status().as_u16())).is_err() {
+                eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "web-attribution-unavailable", "path": entry.path}));
+            }
+        }
+        reply
+    }
+    /// Attribution entry for an authority-mode request that is not GET/HEAD.
+    fn attribution<B>(&self, request: &Request<B>, principal: &WebPrincipal) -> Option<Attributed> {
+        let nonce = principal.assertion()?;
+        if matches!(*request.method(), Method::GET | Method::HEAD) {
+            return None;
+        }
+        Some(Attributed { subject: principal.subject().into(), nonce: nonce.into(), method: request.method().as_str().into(), path: request.uri().path().into() })
+    }
+    fn attribute(&self, e: &Attributed, event: &str, status: Option<u16>) -> Result<(), &'static str> {
+        let AccessGate::Authority { records, .. } = &self.access else { return Ok(()) };
+        let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs() as i64).unwrap_or(0);
+        records.record(&self.root, event, &e.subject, &e.nonce, &e.method, &e.path, status, now)
+    }
+    /// Build the HTTP reply of a protected route result (unchanged behavior).
+    fn reply_of(&self, result: Result<RouteBody, HttpServiceError>, request: &Request<Vec<u8>>, head: bool) -> Result<HttpReply, HttpServiceError> {
         match result {
             Ok(body) => {
                 let mut response = response(StatusCode::OK, body.bytes, head, None);

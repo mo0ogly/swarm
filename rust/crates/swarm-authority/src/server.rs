@@ -408,11 +408,11 @@ async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Res
     }
     let method = req.method().as_str().to_owned();
     let subject = view.subject.clone();
-    if let Err(r) = intent(&front, &subject, "session", &method, &path, action) {
+    if let Err(r) = intent(&front, &subject, "session", None, &method, &path, action) {
         return Ok(r);
     }
     let response = admin::handle(Arc::clone(&front), req, view, token).await;
-    outcome(&front, &subject, "session", &method, &path, action, response.status());
+    outcome(&front, &subject, "session", None, &method, &path, action, response.status());
     Ok(response)
 }
 
@@ -433,21 +433,34 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
             return Ok(full(StatusCode::FORBIDDEN, "application/json", body.to_string()));
         }
     }
+    let mut nonce = [0u8; 16];
+    if getrandom::fill(&mut nonce).is_err() {
+        return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-entropy"));
+    }
+    let nonce: String = nonce.iter().map(|b| format!("{b:02x}")).collect();
+    let reference = format!("assertion:{nonce}");
     let via = credential.label();
     let audited = (action != policy::Action::Read).then(|| (view.subject.clone(), req.method().as_str().to_owned(), req.uri().path().to_owned(), action_name(action)));
     if let Some((subject, method, p, a)) = &audited {
-        if let Err(r) = intent(&front, subject, &via, method, p, a) {
+        if let Err(r) = intent(&front, subject, &via, Some(&reference), method, p, a) {
             return Ok(r);
         }
     }
     let (parts, body) = req.into_parts();
     let body = match read_body(&front, body).await { Ok(b) => b, Err(r) => return Ok(r) };
-    let mut nonce = [0u8; 16];
-    if getrandom::fill(&mut nonce).is_err() {
-        return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-entropy"));
-    }
+    // EP-06 witness: heads after the intent line, so a write's own intent is
+    // covered. A head read failure refuses (no unwitnessed assertion).
+    let f = Arc::clone(&front);
+    let witness = match tokio::task::spawn_blocking(move || f.accounts.head(&Context::new())).await {
+        Ok(Ok(head)) => match front.audit.tail() {
+            Ok((audit_seq, audit_digest)) => assertion::Witness { journal_seq: head.sequence, journal_digest: head.digest, audit_seq, audit_digest },
+            Err(code) => return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", code)),
+        },
+        Ok(Err(e)) => return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "application/json", serde_json::json!({"error": e.code()}).to_string())),
+        Err(_) => return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-state")),
+    };
     let claims = assertion::Claims {
-        v: 1,
+        v: 2,
         subject: view.subject,
         roles: view.roles,
         integrity: view.integrity,
@@ -455,7 +468,8 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
         path: path.clone(),
         body_sha256: assertion::body_digest(&body),
         issued_at: now(),
-        nonce: nonce.iter().map(|b| format!("{b:02x}")).collect(),
+        nonce,
+        witness,
     };
     let Ok(signed) = assertion::sign(&front.signer, &claims) else {
         return Ok(full(StatusCode::INTERNAL_SERVER_ERROR, "text/plain; charset=utf-8", "authority-sign"));
@@ -488,7 +502,7 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
         Err(_) => full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-unavailable"),
     };
     if let Some((subject, method, p, a)) = &audited {
-        outcome(&front, subject, &via, method, p, a, response.status());
+        outcome(&front, subject, &via, Some(&reference), method, p, a, response.status());
     }
     Ok(response)
 }
@@ -506,10 +520,11 @@ fn action_name(a: policy::Action) -> &'static str {
 /// write refuses the request with 503 `authority-audit-unavailable` (no
 /// unattributed effect).
 #[allow(clippy::result_large_err)] // the Err is the ready HTTP refusal
-fn intent(front: &Front, subject: &str, via: &str, method: &str, path: &str, action: &str) -> Result<(), Response<Body>> {
+#[allow(clippy::too_many_arguments)] // one audit line's fields
+fn intent(front: &Front, subject: &str, via: &str, reference: Option<&str>, method: &str, path: &str, action: &str) -> Result<(), Response<Body>> {
     front
         .audit
-        .record(&audit::Event { at: now(), event: "intent", subject: Some(subject), credential: Some(via), method: Some(method), path: Some(path), action: Some(action), status: None })
+        .record(&audit::Event { at: now(), event: "intent", subject: Some(subject), credential: Some(via), reference, method: Some(method), path: Some(path), action: Some(action), status: None })
         .map(|_| ())
         .map_err(|_| full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-audit-unavailable"))
 }
@@ -517,8 +532,8 @@ fn intent(front: &Front, subject: &str, via: &str, method: &str, path: &str, act
 /// Record the outcome status after execution (best effort: the effect has
 /// happened; a failure is reported on stderr, the response is unchanged).
 #[allow(clippy::too_many_arguments)] // one audit line's fields
-fn outcome(front: &Front, subject: &str, via: &str, method: &str, path: &str, action: &str, status: StatusCode) {
-    let ev = audit::Event { at: now(), event: "outcome", subject: Some(subject), credential: Some(via), method: Some(method), path: Some(path), action: Some(action), status: Some(status.as_u16()) };
+fn outcome(front: &Front, subject: &str, via: &str, reference: Option<&str>, method: &str, path: &str, action: &str, status: StatusCode) {
+    let ev = audit::Event { at: now(), event: "outcome", subject: Some(subject), credential: Some(via), reference, method: Some(method), path: Some(path), action: Some(action), status: Some(status.as_u16()) };
     if front.audit.record(&ev).is_err() {
         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable", "subject": subject, "path": path}));
     }

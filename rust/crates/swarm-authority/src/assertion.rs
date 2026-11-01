@@ -1,8 +1,11 @@
 //! Signed per-request assertion relayed from the authority daemon to the
 //! engine (phase B, slice B5.1). Pure functions: no IO, no clock, no policy.
 //!
-//! Wire: header `X-Swarm-Assertion: v1.<b64url(json claims)>.<b64url(sig)>`,
-//! Ed25519 over `swarm-authority-assertion-v1\0` + the exact claims bytes.
+//! Wire: header `X-Swarm-Assertion: v2.<b64url(json claims)>.<b64url(sig)>`,
+//! Ed25519 over `swarm-authority-assertion-v2\0` + the exact claims bytes.
+//! v2 adds the daemon's [`Witness`](crate::assertion::Witness) (heads of its account journal and audit)
+//! so the engine, under another UID, can detect a restored older copy
+//! (EP-06); v1 assertions are refused.
 //! The claims bind the authenticated subject and its ABAC attributes to one
 //! request (method, path with query, SHA-256 of the body) at one instant with
 //! a random nonce. The verifier checks signature, binding, freshness window
@@ -15,7 +18,20 @@ use sha2::{Digest, Sha256};
 
 /// HTTP header carrying the assertion.
 pub const HEADER: &str = "x-swarm-assertion";
-const DOMAIN: &[u8] = b"swarm-authority-assertion-v1\0";
+const DOMAIN: &[u8] = b"swarm-authority-assertion-v2\0";
+
+/// Heads of the daemon's persistent state at signing time: account journal
+/// (`journal_seq`, `journal_digest`) and access audit (`audit_seq`,
+/// `audit_digest` = SHA-256 of its last line). Sequences only grow; the
+/// engine keeps the highest it has seen (cross-UID rollback witness).
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Witness {
+    pub journal_seq: i64,
+    pub journal_digest: String,
+    pub audit_seq: u64,
+    pub audit_digest: String,
+}
 
 /// Claims about the authenticated human and the exact request.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -30,6 +46,7 @@ pub struct Claims {
     pub body_sha256: String,
     pub issued_at: i64,
     pub nonce: String,
+    pub witness: Witness,
 }
 
 /// SHA-256 hex of a request body (empty body included).
@@ -44,7 +61,7 @@ pub fn sign(key: &SigningKey, claims: &Claims) -> Result<String, &'static str> {
     let mut msg = DOMAIN.to_vec();
     msg.extend_from_slice(&raw);
     let sig = key.sign(&msg);
-    Ok(format!("v1.{}.{}", B64.encode(&raw), B64.encode(sig.to_bytes())))
+    Ok(format!("v2.{}.{}", B64.encode(&raw), B64.encode(sig.to_bytes())))
 }
 
 /// Replay memory supplied by the verifier owner: returns `true` when the
@@ -74,7 +91,7 @@ pub fn verify(
         return Err("assertion-window-invalid");
     }
     let mut parts = header.split('.');
-    let (Some("v1"), Some(c), Some(s), None) = (parts.next(), parts.next(), parts.next(), parts.next()) else {
+    let (Some("v2"), Some(c), Some(s), None) = (parts.next(), parts.next(), parts.next(), parts.next()) else {
         return Err("assertion-format");
     };
     let raw = B64.decode(c).map_err(|_| "assertion-format")?;
@@ -83,7 +100,7 @@ pub fn verify(
     msg.extend_from_slice(&raw);
     key.verify(&msg, &Signature::from_bytes(&sig)).map_err(|_| "assertion-signature")?;
     let claims: Claims = serde_json::from_slice(&raw).map_err(|_| "assertion-format")?;
-    if claims.v != 1 || claims.nonce.len() < 16 {
+    if claims.v != 2 || claims.nonce.len() < 16 {
         return Err("assertion-format");
     }
     if claims.method != method || claims.path != path || claims.body_sha256 != body_digest(body) {

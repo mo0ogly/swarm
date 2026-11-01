@@ -28,6 +28,9 @@ pub enum WebAuthMethod {
 pub struct WebPrincipal {
     subject: Box<str>,
     method: WebAuthMethod,
+    /// Nonce of the daemon assertion (authority mode): links engine-side
+    /// attribution to the daemon audit. `None` for the owner key.
+    assertion: Option<Box<str>>,
 }
 impl WebPrincipal {
     /// Fixed subject of the project owner key (break-glass local account).
@@ -37,14 +40,21 @@ impl WebPrincipal {
         Self {
             subject: Self::OWNER_SUBJECT.into(),
             method: WebAuthMethod::Owner,
+            assertion: None,
         }
     }
-    /// Principal named by a verified authority-daemon assertion.
-    pub(crate) fn authority(subject: &str) -> Self {
+    /// Principal named by a verified authority-daemon assertion (`nonce`
+    /// identifies that assertion).
+    pub(crate) fn authority(subject: &str, nonce: &str) -> Self {
         Self {
             subject: subject.into(),
             method: WebAuthMethod::Authority,
+            assertion: Some(nonce.into()),
         }
+    }
+    /// Nonce of the daemon assertion that authenticated this request.
+    pub fn assertion(&self) -> Option<&str> {
+        self.assertion.as_deref()
     }
     /// Stable account subject used for attribution; never a secret.
     pub fn subject(&self) -> &str {

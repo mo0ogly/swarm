@@ -457,6 +457,10 @@ def authority(argv):
     - disable : `sudo systemctl disable --now`, back to `owner-key` mode, the
       engine on the daemon's former public address.
     - status : unit, service, installed/build identity, engine mode.
+    - accept-restore : after a deliberate restore of the daemon state (the
+      engine then refuses assertions with `web-assertion-rollback`/`-fork`),
+      stop the engine, reset the Root rollback witness (recorded in the
+      Root attribution ledger) and start it again.
     - reset-password LOGIN : break-glass password reset through sudo, as the
       daemon account (`swarm-authority set-password`); the new password is
       asked twice on this terminal. For when no administrator can sign in;
@@ -465,7 +469,7 @@ def authority(argv):
     fixing: completed steps are no-ops). Uses only public commands.
     """
     parser = argparse.ArgumentParser(prog="swarm.sh authority", description="Démon d’autorité du cockpit (comptes, connexion)")
-    parser.add_argument("step", choices=["install", "enable", "disable", "status", "reset-password"])
+    parser.add_argument("step", choices=["install", "enable", "disable", "status", "reset-password", "accept-restore"])
     parser.add_argument("login", nargs="?", help="compte (reset-password)")
     parser.add_argument("--admin")
     parser.add_argument("--display")
@@ -483,7 +487,20 @@ def authority(argv):
         subprocess.run(["cargo", "build", "--release", "-p", "swarm-authority"], cwd=SOURCE / "rust", check=True)
         step("Installation système (sudo)")
         subprocess.run(["sudo", str(SOURCE / "deploy/authority/install.sh"), "--admin", args.admin, "--display", args.display], check=True)
-        print("Démon installé. Suite : ./swarm.sh authority enable")
+        settings = json.loads((SOURCE / "deploy" / "local-web.json").read_text()) if (SOURCE / "deploy" / "local-web.json").exists() else {}
+        root = Path(os.environ.get("SWARM_PROJECT_ROOT", settings.get("root", str(SOURCE)))).resolve()
+        binary = Path(settings["binary"]).resolve() if settings.get("binary") else SOURCE / "bin" / "swarm-local"
+        shown = subprocess.run([str(binary), "--root", str(root), "engine-settings", "show", "--json"], cwd=SOURCE, capture_output=True, text=True)
+        mode = None
+        with contextlib.suppress(ValueError, KeyError):
+            mode = json.loads(shown.stdout)["values"].get("web_access_mode")
+        if mode == "authority":
+            # Daemon and engine share the assertion format: refresh both.
+            step("Moteur reconstruit et redémarré (même format d’assertion que le démon)")
+            subprocess.run([*me, "restart", "--no-open"], check=True)
+            print("Démon et moteur à jour.")
+        else:
+            print("Démon installé. Suite : ./swarm.sh authority enable")
         return 0
     settings = json.loads((SOURCE / "deploy" / "local-web.json").read_text()) if (SOURCE / "deploy" / "local-web.json").exists() else {}
     root = Path(os.environ.get("SWARM_PROJECT_ROOT", settings.get("root", str(SOURCE)))).resolve()
@@ -502,6 +519,16 @@ def authority(argv):
         print(json.dumps({"installed": listen is not None, "service": service(), "listen": listen, "engine": engine,
                           "engine_mode": mode, "engine_address": settings.get("address"),
                           "installed_matches_build": sha(AUTHORITY_INSTALLED) is not None and sha(AUTHORITY_INSTALLED) == sha(built)}, indent=1))
+        return 0
+    if args.step == "accept-restore":
+        step("Arrêt du moteur")
+        subprocess.run([*me, "stop"], check=True)
+        step("Témoin de retour arrière remis à zéro (noté dans le registre d’attribution)")
+        try:
+            subprocess.run([str(binary), "--root", str(root), "web-authority-witness", "reset", "--json"], cwd=SOURCE, check=True)
+        finally:
+            subprocess.run([*me, "start"] + (["--no-open"] if args.no_open else []), check=True)
+        print("Restauration acceptée : le prochain accès rétablit le témoin.")
         return 0
     listen, engine = unit_addresses()
     if args.step == "reset-password":

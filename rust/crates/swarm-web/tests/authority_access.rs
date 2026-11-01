@@ -16,7 +16,7 @@ fn now() -> i64 {
 }
 
 fn claims(method: &str, path: &str, body: &[u8], at: i64, nonce: &str) -> Claims {
-    Claims { v: 1, subject: "ana".into(), roles: vec!["operator".into()], integrity: 2, method: method.into(), path: path.into(), body_sha256: body_digest(body), issued_at: at, nonce: nonce.into() }
+    Claims { v: 2, subject: "ana".into(), roles: vec!["operator".into()], integrity: 2, method: method.into(), path: path.into(), body_sha256: body_digest(body), issued_at: at, nonce: nonce.into(), witness: swarm_authority::assertion::Witness { journal_seq: 1, journal_digest: "a".repeat(64), audit_seq: 1, audit_digest: "b".repeat(64) } }
 }
 
 #[test]

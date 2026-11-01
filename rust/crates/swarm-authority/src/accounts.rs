@@ -299,6 +299,12 @@ impl Accounts {
         Ok(out)
     }
 
+    /// Current verified journal head (sequence, digest): the account part of
+    /// the rollback witness carried by assertions (EP-06).
+    pub fn head(&self, ctx: &Context) -> Result<Head, Error> {
+        Ok(self.serial_snapshot(ctx).map_err(Error::Journal)?.0)
+    }
+
     /// Close the journal; later calls refuse with the journal's `closed` code.
     pub fn close(&self) -> Result<(), Error> {
         self.journal.close().map_err(Error::Journal)

@@ -330,6 +330,10 @@ class LocalWeb(unittest.TestCase):
             self.assertEqual((report["engine_mode"], report["engine_address"], report["installed_matches_build"]), ("authority", internal, True))
             run("authority", "enable", "--no-open")  # rerun: completed steps are no-ops
             self.assertEqual(mode(), "authority")
+            restored = run("authority", "accept-restore", "--no-open")
+            self.assertIn("Restauration acceptée", restored.stdout)
+            self.assertTrue((self.root / ".swarm" / "web-attribution.jsonl").exists(), "reset recorded in the Root ledger")
+            self.assertTrue(json.loads(run("status").stdout)["ready"])
             run("authority", "disable", "--no-open")
             self.assertEqual(mode(), "owner-key")
             self.assertEqual(sudo_log.read_text().splitlines()[-1], "systemctl disable --now swarm-authority")

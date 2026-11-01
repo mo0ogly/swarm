@@ -110,3 +110,22 @@ pub(crate) fn execute_rotate(a: &Arguments, out: &mut dyn Write) -> Result<u8, C
     write_output(out, &json_bytes(&body).map_err(CliError::Output)?)?;
     Ok(0)
 }
+
+/// `web-authority-witness reset --json`: after a deliberate restore of the
+/// authority daemon state, remove the Root rollback witness (EP-06) so the
+/// next assertion re-establishes it; the reset is recorded in the Root
+/// attribution ledger under the local operator identity. Run with the
+/// engine stopped (`./swarm.sh authority accept-restore` does). Errors keep
+/// their stable code (`web-assertion-witness-io`, `web-attribution-unavailable`).
+pub(crate) fn execute_witness_reset(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
+    if a.pos.len() != 2 || a.pos[1] != "reset" || !a.json || !a.input.is_empty() || !a.output.is_empty() || !a.task.is_empty() || a.server {
+        return Err(CliError::Usage);
+    }
+    let refused = |code: &'static str| CliError::WebTicket(Box::new(swarm_engine::WebTicketError::Session(swarm_engine::WebSessionError::Refused(code))));
+    let actor = swarm_engine::operator_identity().map_err(|_| refused("web-assertion-witness-io"))?;
+    let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs() as i64).unwrap_or(0);
+    let existed = swarm_web::reset_witness(Path::new(&a.root), &actor, now).map_err(refused)?;
+    let body = serde_json::json!({"schema_version": 1, "witness_reset": true, "existed": existed, "restart_required": true});
+    write_output(out, &json_bytes(&body).map_err(CliError::Output)?)?;
+    Ok(0)
+}

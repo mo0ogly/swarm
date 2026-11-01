@@ -4,7 +4,7 @@ use swarm_authority::assertion::{body_digest, sign, verify, Claims, WindowNonces
 
 fn claims(now: i64, nonce: &str) -> Claims {
     Claims {
-        v: 1,
+        v: 2,
         subject: "ana".into(),
         roles: vec!["operator".into()],
         integrity: 2,
@@ -13,6 +13,7 @@ fn claims(now: i64, nonce: &str) -> Claims {
         body_sha256: body_digest(b"{}"),
         issued_at: now,
         nonce: nonce.into(),
+        witness: swarm_authority::assertion::Witness { journal_seq: 1, journal_digest: "a".repeat(64), audit_seq: 1, audit_digest: "b".repeat(64) },
     }
 }
 
@@ -39,9 +40,9 @@ fn assertion_binds_request_freshness_and_single_use() {
     // Tampered claims with the original signature.
     let parts: Vec<&str> = h2.split('.').collect();
     let tampered = sign(&key, &Claims { roles: vec!["admin".into()], ..claims(1000, "nonce-bbbbbbbbbbbb") }).unwrap();
-    let swapped = format!("v1.{}.{}", tampered.split('.').nth(1).unwrap(), parts[2]);
+    let swapped = format!("v2.{}.{}", tampered.split('.').nth(1).unwrap(), parts[2]);
     assert_eq!(v(&swapped, "POST", "/api/v1/action?x=1", b"{}", 1000, &mut fresh), "assertion-signature");
-    for bad in ["", "v2.a.b", "v1.a", "v1.!!.??", "v1.e30.AAAA"] {
+    for bad in ["", "v1.a.b", "v3.a.b", "v2.a", "v2.!!.??", "v2.e30.AAAA"] {
         assert_eq!(v(bad, "POST", "/api/v1/action?x=1", b"{}", 1000, &mut fresh), "assertion-format", "{bad}");
     }
     assert_eq!(verify(&pk, &h2, "POST", "/api/v1/action?x=1", b"{}", 1000, 0, &mut fresh).unwrap_err(), "assertion-window-invalid");

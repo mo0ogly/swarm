@@ -790,6 +790,10 @@ fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
         return web_ticket::execute_rotate(a, out);
     }
     #[cfg(target_os = "linux")]
+    if a.pos[0] == "web-authority-witness" {
+        return web_ticket::execute_witness_reset(a, out);
+    }
+    #[cfg(target_os = "linux")]
     if matches!(
         a.pos[0].as_str(),
         "_agent_gate" | "_planning_gate" | "_validation_gate" | "_reviewer_gate"

@@ -37,6 +37,10 @@ pub struct Entry {
     pub subject: Option<String>,
     /// `session` or `key:<id>` for intent/outcome (B9).
     pub credential: Option<String>,
+    /// `assertion:<nonce>` of a relayed request: the same reference is in
+    /// the engine's attribution ledger. Absent in older lines.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reference: Option<String>,
     pub method: Option<String>,
     pub path: Option<String>,
     /// Action family (`write`, `approve`, `administer`) for intent/outcome.
@@ -54,6 +58,7 @@ pub struct Event<'a> {
     pub event: &'a str,
     pub subject: Option<&'a str>,
     pub credential: Option<&'a str>,
+    pub reference: Option<&'a str>,
     pub method: Option<&'a str>,
     pub path: Option<&'a str>,
     pub action: Option<&'a str>,
@@ -106,9 +111,21 @@ impl Audit {
     /// not prevent opening (the daemon keeps serving and reports it through
     /// [`Audit::read`]); new lines chain from the last line present.
     pub fn open(dir: &Path) -> Result<Self, &'static str> {
-        let path = dir.join("audit.jsonl");
-        let (_, _, tail) = scan(&path)?;
-        Ok(Self { path, tail: Mutex::new(tail) })
+        Self::open_file(&dir.join("audit.jsonl"))
+    }
+
+    /// Open an audit file at an explicit path (the engine's attribution
+    /// ledger reuses this format in its Root).
+    pub fn open_file(path: &Path) -> Result<Self, &'static str> {
+        let (_, _, tail) = scan(path)?;
+        Ok(Self { path: path.to_path_buf(), tail: Mutex::new(tail) })
+    }
+
+    /// Current chain tail: last `seq` and SHA-256 of the last line (64 zeros
+    /// and 0 when empty). Used as the audit part of the rollback witness.
+    pub fn tail(&self) -> Result<(u64, String), &'static str> {
+        let t = self.tail.lock().map_err(|_| "authority-audit-state")?;
+        Ok((t.seq, t.prev.clone()))
     }
 
     /// Append one event; returns its `seq`. Errors: `authority-audit-io`
@@ -124,6 +141,7 @@ impl Audit {
             event: ev.event.into(),
             subject: ev.subject.map(str::to_owned),
             credential: ev.credential.map(str::to_owned),
+            reference: ev.reference.map(str::to_owned),
             method: ev.method.map(str::to_owned),
             path: ev.path.map(str::to_owned),
             action: ev.action.map(str::to_owned),
