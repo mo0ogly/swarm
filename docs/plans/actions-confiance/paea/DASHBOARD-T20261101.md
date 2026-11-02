@@ -141,6 +141,13 @@ campagnes T01…T22 exécutées.
   étapes VERIFIED sur ELF 186cc38b… (`.swarm-fixtures/i17-rerun/i17-run-13/`,
   `source_stable: true`). Le livré courant porte maintenant le scénario
   fractionnement/cumul ; l'ancien run-13 FAIL a été supprimé (recréé net).
+- Extension 02-11 après-midi — complétion chaîne sur le livré courant :
+  la recette chaîne, restée épinglée sur cdde554a…, est re-épinglée sur
+  186cc38b… depuis le hash réel `sha256sum` (cross-check épine=réel, 3/3
+  tokens) puis chain-run-7 : 4/4 VERIFIED
+  (`.swarm-fixtures/i17-rerun/chain-run-7/`, témoins = livré courant, refus de
+  SHA erroné compris, `source_stable: true`). Le livré courant est désormais
+  intégralement re-vérifié (settlement run-13 7/7 + chaîne chain-run-7 4/4).
 
 ## Portée et limites
 
@@ -190,6 +197,9 @@ un pourcentage d'avancement » (invariant-matrix.json, global_limits).
   étapes, 7/7 VERIFIED sur ELF 186cc38b…7853 (dev.315, 02-11-2026 midi,
   `source_stable: true`) — nouvelle étape T09 fractionnement/cumul (run
   précédent FAIL sur remplacement binaire concurrent, supprimé net)
+- `.swarm-fixtures/i17-rerun/chain-run-7/` — 4/4 VERIFIED sur ELF
+  186cc38b…7853 (02-11-2026 après-midi, refus de SHA erroné compris,
+  `source_stable: true`) — complétion chaîne du livré courant
 - `paea/DASHBOARD-T20261031.md` — instantané précédent (31 octobre 2026)
 - `paea/PILOTE-OPERATIONNEL.md` — recettes initiales T04, T06/T21, T05/T17
 - `paea/E3-PROTOCOL.md` — périmètre des campagnes formelles

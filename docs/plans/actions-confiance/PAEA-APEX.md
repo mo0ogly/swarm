@@ -337,7 +337,12 @@ Candidat unique livré localement : `bin/swarm` SHA-256
 La recette settlement est étendue à sept étapes avec le nouveau scénario T09
 fractionnement/cumul et re-épinglée sur ce livré : preuves fraîches
 `.swarm-fixtures/i17-rerun/i17-run-13/` (7/7 étapes PASS, `source_stable`,
-témoin binaire désigné = livré courant ; voir incrément 121). T09 est désormais
+témoin binaire désigné = livré courant ; voir incrément 121). La recette
+chaîne est re-épinglée sur ce livré depuis le `sha256sum` réel
+(cross-check épine=réel, 3/3 tokens) et re-jouée :
+`.swarm-fixtures/i17-rerun/chain-run-7/` (4/4 VERIFIED, `source_stable: true`,
+témoins = livré courant, refus de SHA erroné compris). Le livré courant est
+donc intégralement re-vérifié (settlement 7/7 + chaîne 4/4). T09 est désormais
 complète localement pour la fraction agent-actionnable. Acceptation
 indépendante : 0/17, inchangée ; les sept critères ouverts E2 restent opérants.
 Les blocs « État courant » précédents ci-dessous sont conservés comme

@@ -369,7 +369,12 @@ replacement). The settlement recipe is extended to seven steps with the new
 T09 splitting/accumulation scenario and re-pinned on this binary: fresh
 evidence `.swarm-fixtures/i17-rerun/i17-run-13/` (7/7 steps PASS,
 `source_stable`, designated-binary witness = current delivered binary; see
-increment 121). T09 is now locally complete for the agent-actionable fraction.
+increment 121). The chain recipe was re-pinned on this binary from the real
+`sha256sum` hash (pin=actual cross-check, 3/3 tokens) and replayed:
+`.swarm-fixtures/i17-rerun/chain-run-7/` (4/4 VERIFIED, `source_stable: true`,
+witnesses = current delivered binary, wrong-SHA refusal included). The current
+delivered binary is therefore fully re-verified (settlement 7/7 + chain 4/4).
+T09 is now locally complete for the agent-actionable fraction.
 Independent acceptance: 0/17, unchanged; the seven open E2 criteria remain in
 force. The "Current state" blocks below are kept as history (02-11 late
 morning: run-12 + chain-run-6 on cdde554a…).
