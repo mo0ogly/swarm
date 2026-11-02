@@ -1,5 +1,7 @@
 # Rust Biba — architecture and technical contract
 
+[Bell-LaPadula: available capabilities and limits](BELL-LAPADULA.md).
+
 Biba is Swarm’s reference integrity rule, confirmed by the user on 26 October
 2026. This is the target requirement; current integration covers the local
 `trust` core, not every Rust mission. This page describes inspected producers
@@ -395,3 +397,249 @@ or wrong parent). An ungranted principal refuses before turn lookup. Incoherent
 provenance, incompatible private Root and storage/rollback/close failures remain
 server errors; client status never masks their cause. The operation explicitly
 refuses outside Linux (501), without runtime evidence on those platforms.
+
+## Explicit preparation-send quarantine
+
+Delivered locally in version299 and verified against inert receivers: boolean policy field
+`preparation_quarantine` persists through blp-policy-preview/apply and is editable
+in Admin policy JSON. Absent/false retains legacy behavior/encoding, not an
+authorized classified-send mode. Null, strings and numbers refuse. True blocks
+new sends (including replay), pending claims and controlled API/CLI transport:
+`blp-preparation-quarantined` (send HTTP403). Capability exposes
+`preparation_quarantined`; transversal `runtime_enforced:false` remains truthful.
+
+A dedicated shared preparation-egress reservation covers admission/claim and actual transport. The Trust snapshot lock is released before IO, leaving unrelated business writes available.
+Exclusive policy apply waits for engaged emission to finish; it does not cancel
+it. Operators can stop the turn or use existing configured provider deadlines.
+No new whole-operation timeout, attempt or cap. Invalid/unreadable state refuses
+instead of becoming disabled. Stale authority cannot lift recorded quarantine;
+explicit lifting requires current policy/control revisions.
+
+Finalizing a refusal before an attempt releases only its unstarted reservation,
+never refunds an estimated attempt. If operation succeeds but releasing its lock
+fails, preparation-egress-operation-completed and cleanup cause remain visible;
+recorded admission also retains its receipt. A late error never proves absence
+of contact/remote effect. This lock does not classify sources, inherit response
+labels or confine direct access/descendants outside controlled transports.
+
+```mermaid
+flowchart LR
+  SEND[Admission and claim] --> SH[Shared egress lock]
+  API[API or CLI transport] --> SH
+  SH --> SNAP[Short Trust snapshot]
+  SNAP --> DENY[Quarantine true: refuse before callback]
+  SNAP --> LEGACY[Absent or false: legacy operation]
+  LEGACY --> RELEASE[Release after controlled operation]
+  ADMIN[Admin: config or policy apply] --> EX[Exclusive egress lock]
+  EX --> CHECK[Repeat current authentication]
+  CHECK --> SAVE[Publish Trust state]
+```
+
+This diagram describes quarantine only; the legacy branch does not check a
+classified domain. Old binaries and direct access do not participate in this protocol.
+
+## Attribution from a captured preparation source
+
+`blp-preparation-attribute` selects a recorded prompt slice using `preparation_id`,
+`turn_id`, `expected_turn_revision` (the DTO's `source_revision`) and zero-based
+`source_index`. The body also requires `schema_version:1`, `event_id`, BLP
+`expected_revision`, `expected_trust_revision`, an explicit `classification` and
+nonempty `reason`. Caller-supplied digest, path or actor fields are rejected.
+Example body (replace identifiers, revisions and classification with observed
+values and an explicit operator decision; these names are not a shipped catalog):
+
+```json
+{"schema_version":1,"event_id":"source-classification-1","expected_revision":1,"expected_trust_revision":1,"preparation_id":"PREPARATION","turn_id":"TURN","expected_turn_revision":2,"source_index":0,"classification":{"level":"confidential","compartments":[]},"reason":"Explicit classification decision"}
+```
+
+API/CLI share the mutating Trust operation, requiring an authenticated I3/admin
+cleared for the chosen label, checked before row lookup. The engine verifies the
+parent, revision, native Root instance and complete provenance, then obtains the
+slice digest and opened Root path itself. Existing attribution uniqueness,
+monotonicity, journal and replay rules apply. The capture selector participates
+in event identity; a changed index, turn or reason cannot replay. Identical byte
+slices are one object: a second attribution event refuses even for the same label.
+
+The result adds `producer_captured:true`, preparation/turn IDs, `turn_revision`
+(the source_revision as a string), `source_index` and `source_count` to the usual
+attribution. It returns no prompt text and provides no visual slice inventory.
+Classification remains explicit per slice, including instructions, null values
+and framing; missing labels never become public. After attributing every distinct
+digest, `blp-preparation-check` can check their join. Historical turns without
+provenance refuse without silent migration.
+
+HTTP refusals: malformed intent/label400, identity/role/clearance403, missing
+turn/index404, parent/revisions/policy/conflict409. Corrupt provenance, mismatched
+Root instance and storage/cleanup failures remain server errors. Source-read or
+validation failure publishes no attribution; late publication errors retain the
+existing Trust effect semantics. This post-capture control attribution does not
+establish admission-time classification, durable physical lineage, allowed
+classified egress, output inheritance or protection of every result reader.
+Quarantine and `runtime_enforced:false` retain their current meaning.
+
+Post-capture classification neither suspends a provider nor retracts bytes already
+sent. This operation does not change preparation_quarantine; explicit quarantine
+policy remains the delivered emission block. Successful attribution implies no
+recipient authorization.
+
+```mermaid
+flowchart LR
+  A[Cleared I3/admin intent] --> B[Current policy and revisions]
+  B --> C[Read native turn bound to Root]
+  C --> D[Full provenance then slice index]
+  D --> E[Engine-derived digest and path]
+  E --> F[Canonical attribution and Trust journal]
+  F --> G[Publication or replay without send authority]
+```
+
+## Immutable pre-transport admission
+
+Three Linux API/CLI operations reuse current Trust authentication:
+
+| Operation | Contract |
+| --- | --- |
+| `blp-preparation-input-attribute` | Cleared I3/admin explicitly chooses a label and assembled prompt slice index; engine-derived digest/path, canonical uniqueness/monotonicity |
+| `blp-preparation-admit` | Actual authenticated principal, including a non-admin, must dominate the join of EVERY currently attributed slice; no supplied actor/output label |
+| `blp-preparation-admission-show` | Metadata only for the current authenticated owner under still-current recorded policy/Root; Admin does not impersonate the owner |
+
+Admission input: `schema_version:1`, `event_id`, BLP `expected_revision`,
+`expected_trust_revision`, and `intent`, the existing `prepare send` intention
+(version, preparation/revision, provider, capability_hash, message, context/target,
+optional level/policy_hash according to its protocol). Schematic example:
+
+```json
+{"schema_version":1,"event_id":"domain-1","expected_revision":1,"expected_trust_revision":1,"intent":{"version":1,"event_id":"unsent-intent","preparation_id":"OBSERVED_ID","expected_revision":2,"provider":"CONFIGURED_PROVIDER","capability_hash":"OBSERVED_HASH","message":"Text to classify","context_mode":"full"}}
+```
+
+Pre-admission attribution adds zero-based `source_index`, explicit
+`classification` and nonempty `reason`. Each index is captured by the SAME
+historical send producer under SQL/settings and material Root snapshots. Capture
+creates no turn, reserves no budget and contacts no provider. Existing preparation
+activation, limits, source/capability freshness, active-turn and contention checks
+apply; no new ceiling/deadline. Role, origin, empty values or maximum clearance
+never imply a label. Instructions, null values, JSON framing and history also
+require attribution. Identical slices are one object: a second event refuses409
+instead of overwriting its label. Missing slice index refuses404.
+
+Admission fixes the actual principal and combined prompt classification before
+any possible emission by this path. Unknown sources, insufficient clearance,
+stale authority and changed intent under the same event refuse without a capsule.
+Private create-only `.swarm/blp-admission-HASH.receipt` records complete captured
+bytes/provenance, routing metadata without credentials, observed physical Root,
+policy revisions/digest and principal. Native framing checks observed extent/SHA
+before allocation; its format is neither an operator cap nor authenticated authority.
+
+Output: `admission_id`, `principal`, preparation/source revision, Trust/BLP
+revisions, `prompt_sha256`, `source_count`, `output_classification`,
+`state:admitted-no-transport`, `runtime_authorized:false`, `runtime_enforced:false`.
+Never prompt/key/gate bytes. Metadata read input contains only `schema_version`,
+`admission_id`, `expected_revision`, `expected_trust_revision`. Replay retains the
+fixed bytes/domain without recapturing history or reserving costs. Changed context
+requires explicit source attribution and a new admission event. A new policy never
+refreshes an old capsule implicitly: readmit from currently attributed sources.
+
+`admission-recorded`/`admission-replayed` publication is separate from a Trust
+business event and does not rewrite the policy journal. Post-rename sync failure
+retains `admission-durability-unknown`; late Root/release/output failures retain
+known effects. Err therefore never proves capsule absence. Before publication,
+refusals create no capsule/turn/reservation. This increment executes or purges no
+capsule; retirement/migration need explicit future history-preserving contracts.
+
+Legacy workers/readers do not enumerate these capsules; an ID does not create a
+`PreparationTurn`. The domain covers prompt bytes, not provider credentials or
+all trusted-engine memory. It authorizes no recipient/transport/descendant or
+future output read. Upstream producer labels still do not automatically inherit
+through all transformations. Legacy sending retains its current policy; quarantine
+can remain active during local classification/admission. HTTP refusals separate
+invalid intent400, authority403, absent object/index404, conflicts409; stored
+capsule/provenance/Root corruption and IO remain500. Same-UID confinement, backup
+rollback resistance, OS mediation and independent acceptance are unproven. No
+real data is automatically reclassified.
+
+```mermaid
+flowchart LR
+  A[Shared producer local capture] --> B[Explicit I3 admin source labels]
+  B --> C[Actual authenticated admitting principal]
+  C --> D[Every-source join and clearance]
+  D --> E[Immutable private capsule without turn]
+  E --> F[Revalidated metadata read]
+  E -. No transport authority yet .-> G[Account and recipient integration required]
+```
+
+Capsule reads/replay do not recapture the parent or establish current provider/
+execution-settings freshness. They prove the immutable observation and current
+read authority only; future transport must check those preconditions and actual
+rights/budgets.
+
+## Recipient binding and last-use transport
+
+Two Linux API/CLI operations extend the immutable admission to account/endpoint
+control, without emitting:
+
+| Operation | Contract |
+| --- | --- |
+| `blp-preparation-destination-attribute` | Privileged administrator records a destination label for the exact account/endpoint of an `api-` connection: name `api-`+catalogue id, mandatory echo of `base_url` and `model` taken from the current connection, config digest recomputed by the Root (never caller-supplied), key never an input |
+| `blp-preparation-transport` | The principal owning an admitted capsule observes a go/no-go decision at last use, under the shared egress lock, without emitting |
+
+The binding records `{policy_revision, provider_name, digest, label, base_url,
+model}` in the current policy Entry. It is re-recordable (last write wins, like
+a slice attribution) and disappears with the Entry: every `blp-policy-apply`
+wipes bindings just like attributions. The canonical digest is
+`hash(hash(ai-connections.json) ‖ 0 ‖ hash(providers.json)) ‖ 0 ‖
+settings_digest` — the same one the intent admission requires for an `api-`
+provider: the binding therefore covers exactly the account/endpoint/capability
+pair the capsule references.
+
+The transport decision fully re-verifies the capsule under the egress lock
+(current principal, instance, Trust/BLP revisions, policy digest, per-source
+join with their bytes, rebuilt output label), then checks freshness since
+admission: connection present/enabled with unchanged `base_url`/`model`,
+unchanged `provider_source`, unchanged settings digest (otherwise
+`blp-transport-connection-changed`, `blp-transport-provider-source-changed`,
+`blp-transport-settings-changed`). The current binding must match the exact
+digest (`blp-destination-not-attributed` otherwise) and its label must dominate
+the output label at last use (`blp-access-denied`, no-write-down). Read-only
+budget observation keeps the existing codes
+(`preparation-budget-exhausted`, `work-budget-exhausted`).
+
+The fixed reply carries `decision:granted|refused`,
+`state:transport-authorized-not-sent`, `runtime_authorized:false`,
+`runtime_enforced:false`, the principal, the destination (`connection` =
+catalogue id, `provider` = `api-` name, label, `base_url`, `model`, digest) and
+`source_count`. It never returns the key or an emission authority. The transport
+body carries `schema_version:1`, `admission_id`, `expected_revision` BLP,
+`expected_trust_revision` and the `connection`/`expected_base_url`/
+`expected_model` echo; it carries no `event_id` — the capsule is the
+observation's idempotence key, a replay returns the identical decision with no
+new effect. The destination echo is checked against the connection actually
+loaded under the lock (`blp-destination-echo-mismatch`, `blp-transport-invalid`
+otherwise).
+
+HTTP refusals distinguish grammar400, missing object404
+(`blp-destination-not-attributed`, unknown admission), freshness409,
+authority403, corruption/IO500. The binding goes through the existing
+`blp-object-attribute` producer: `recorded`/`replayed` publication, a
+`blp-attribution` journal entry, exact-once uniqueness per
+(digest, project, revision) and the anti-declassification guard inherited as
+is. The transport decision has no publication at all: a pure observation, with
+no state or journal write. No legacy send path is modified: existing workers
+ignore these capsules and bindings. The decision does not engage the real
+transport, inherits no results, confines no descendants and authorizes no
+emission; the real account/endpoint still cannot be read, and independent
+acceptance is not established. No real data is classified.
+
+```mermaid
+flowchart LR
+  A[Admitted immutable capsule] --> B{Shared egress lock}
+  B --> C[Capsule re-verification and account freshness]
+  C --> D[Current binding for this exact digest]
+  D --> E{No-write-down dominance at last use}
+  E -->|refusal| F[Fixed refusal without emission]
+  E -->|grant| G[Read-only budget observation]
+  G --> H[Fixed non-emissive reply transport-authorized-not-sent]
+```
+
+Re-recording a binding or renewing the policy invalidates previous
+observations; replaying an admitted capsule does not recapture the binding.
+Coexistence with the explicit quarantine stays the admission's: enabling local
+quarantine during classification does not change this contract.

@@ -1,5 +1,7 @@
 # Bell-LaPadula — APEX, 31 octobre 2026
 
+État opérationnel courant : [Bell-LaPadula dans Swarm](../../architecture/BELL-LAPADULA.md). Les sections datées ci-dessous conservent l’historique et les limites des preuves.
+
 Propriétaire : Codex racine. Autorisation : demande « Implement the plan ».
 Travail direct, sans délégation ni consommation fournisseur supplémentaire.
 Préserver les travaux PAEA, préparation et migration présents à la reprise.
@@ -92,9 +94,9 @@ label désérialisé ou champ de provenance ne constitue une autorité.
 | BLP-02 | Moniteur de dominance/combinaison, domaines fixes, erreurs sûres, indépendance Biba | 01 | VÉRIFIÉ (contrats purs ; 10/10 tests du 31/10/2026, voir « Reprise ») |
 | BLP-03 | Configuration persistée révisionnée, migration explicite, Admin/API/CLI | 02 | VÉRIFIÉ partiellement (historique, opérations, tests 5/5 du 31/10/2026 ; migration des objets existants non faite) |
 | BLP-04 | Attribution par producteurs, contexte/mémoire/sorties et replays | 03 | PARTIEL — provenance privée v3, contrôle d’objet et diagnostic authentifié des sources API/CLI ; identité producteur, principal d’envoi et héritage ouverts |
-| BLP-05 | Médiation réelle fichiers/réseau/fournisseurs/descendants, refus sans repli | 04 | À FAIRE |
+| BLP-05 | Médiation réelle fichiers/réseau/fournisseurs/descendants, refus sans repli | 04 | PARTIEL — quarantaine API/CLI livrée et vérifiée ; envoi classifié, fichiers/réseau/descendants ouverts |
 | BLP-06 | Identité humaine établie, validation des octets/destinataires, nouvelle copie | 03–05 | À FAIRE |
-| BLP-07 | Recettes, revue du candidat, livraison locale, ressources servies et RETEX | 01–06 | EN COURS (incréments ciblés vérifiés ; installé v0.1.1-dev.296 ; recette globale et RETEX transversal ouverts) |
+| BLP-07 | Recettes, revue du candidat, livraison locale, ressources servies et RETEX | 01–06 | EN COURS (incréments ciblés vérifiés ; installé v0.1.1-dev.299 ; recette globale et RETEX transversal ouverts) |
 
 Chaque lot inclut documentation FR/EN, contrats des fonctions et revue explicite
 politiques/fonctions/erreurs liée aux octets. Aucun critère critique non vérifié
@@ -691,3 +693,435 @@ conserve ces préconditions ; ne pas traiter ce diagnostic comme un ticket de
 dispatch. Aucun bootstrap Trust réel, appel payant, déclassification humaine ou
 conformité globale ; auto-revue seulement. Les derniers changements de suivi
 et d’inventaire ne modifient pas l’exécutable installé.
+
+## Reprise documentaire — état existant, 1er novembre 2026
+
+Demande utilisateur : documenter l’existant après clarification que l’intégration
+BLP n’est pas terminée. Replan : les contrats et preuves existent, mais leurs
+limites sont dispersées entre Biba, inventaire et historique du plan. Options :
+allonger encore cet historique, ou créer une référence opérationnelle FR/EN
+reliée aux entrées existantes. Second choix réalisé dans
+[Bell-LaPadula dans Swarm](../../architecture/BELL-LAPADULA.md) et son miroir EN,
+avec liens README, positionnement sécurité, Biba et flux. Propriétaire : Codex.
+
+La référence distingue calcul pur, administration, attribution exacte, lecteurs
+PAEA ciblés, provenance v3 et diagnostic postérieur à l’enregistrement. Elle
+expose les conditions d’autorité, l’absence de filiation physique et d’héritage,
+les opérations réelles et les lots restants. Les preuves citées restent celles
+de leurs sources/profils et du parcours local owner-key ; aucune qualification
+d’Authority/enrôlement ou conformité globale n’est ajoutée. L’API de version a
+été relue :296, commit compilé b4cbfa2255, modifié=true (observation datée).
+
+Vérification : liens locaux/ancrages, chiffres des résultats conservés et revue
+FR/EN. Aucun code, politique, validation ou traitement d’erreur modifié ; aucune
+fonction créée/modifiée, donc aucune Rustdoc/docstring à changer. Les fichiers
+documentaires concernés ne sont pas des entrées compilées du profil qualifié :
+pas de rebuild, redémarrage ni nouvelle note de livraison. `version_history.json`
+conserve les modifications d’autres sessions. Les liens persistants atteignent
+les futurs lecteurs du dépôt ; aucun contexte embarqué ou processus déjà démarré
+n’est reconstruit par cette documentation. Revue de cet incrément conservée dans
+`verification-blp/20261101-blp-documentation-review.json`.
+
+## Reprise exécution — verrou d’émission de préparation, 1er novembre 2026
+
+L’utilisateur autorise la suite BLP-04/05 et l’héritage BF-16, puis la médiation
+fichiers/réseau/descendants, migration et déclassification. État réel : le worker
+reçoit aujourd’hui une requête réseau après budget/fraîcheur, sans lease BLP
+jusqu’à l’émission. Les acquis et changements tiers sont préservés.
+
+Deux voies examinées : un contrôle seulement à la réception du send (fenêtre
+d’activation/révocation avant le transport), ou un verrou au transport sérialisé
+avec les mutations Trust, plus refus avant admission. Second choix. Première
+étape décidée : politique booléenne persistée `preparation_quarantine`, absente/
+false = comportement historique, true = refus explicite des nouveaux sends et
+des émissions des workers en attente. Aucune activation sur les données réelles.
+Édition dans le JSON de politique de l’Admin, mêmes validation et valeur via
+API/CLI ; statut FR/EN explicite. Un changement d’état attend la fin d’une
+opération déjà engagée sous réservation partagée ; arrêt opérateur et délais
+existants restent applicables. Aucun nouveau timeout/plafond ou rôle implicite.
+
+Critères : ancien JSON/digest inchangé quand le champ est absent/false ; rejet
+null/type invalide ; aperçu sans mutation, sauvegarde/relecture/reprise ; contrôle
+valide avec émetteur inerte avant activation, puis zéro émission après refus ;
+garde répétée au transport, activation sérialisée avec une émission en cours ;
+causes et effet déjà observé conservés si libération échoue. Recettes permanentes,
+revue liée aux octets, documentation FR/EN et installation du candidat qualifié.
+Propriétaire : Codex, sans délégation/appel payant. Ce verrou ne fournit pas de
+chemin d’envoi classifié autorisé, d’héritage de réponse ou de confinement des
+descendants : ces besoins restent ouverts et la suite ne s’arrête pas à ce verrou.
+
+Replan de disponibilité avant livraison : le témoin core-01 validait une
+réservation Trust globale pendant l’IO ; cette conception bloquerait aussi les
+écritures métier. Options : conserver ce blocage avec arrêt manuel, ou séparer
+le verrou d’émission et ne garder Trust que pour le snapshot. Second choix :
+`preparation-egress.lock` partagé autour de l’opération, exclusif pour config-apply
+et blp-policy-apply, ordre egress → SQL éventuel → Trust court. Le consommateur
+enrôlé doit acquérir egress avant sa transaction SQL pour éviter une inversion
+contre l’admission. Pré-authentification canonique I3/admin avant attente, puis
+authentification autoritative répétée. Core-01 reste historique, remplacé pour
+la concurrence ; le modèle pur 11/11 garde ses sources. Le nouveau témoin vérifie
+égress exclusif bloqué, Trust exclusif disponible et appel faible refusé sans
+attendre. Les parcours publics couvrent aussi l’émission CLI déjà engagée.
+
+Reprise des preuves : locks-02 refuse la qualification malgré 1+15 tests réussis, car les traductions UI ont changé pendant le run. Elles ne sont pas des entrées de compilation des tests moteur ; retrait de ces quatre entrées du seul collecteur moteur, vérification UI conservée dans son parcours public. Le refus original reste conservé.
+
+Contrôle de méthode : le script npm `i18n:check` supposé n’existe pas ; refus conservé dans la session. Le contrat réel de package.json est `i18n:build` et le générateur accepte `--check` ; vérification corrigée par cette commande directe, sans modifier les ressources compilées.
+
+Replan public-01 : les 25 contrôles de transport passent ; le navigateur échoue avant interaction sur une URL de test supposée. La table native_admin.rs sert le fichier trust-native.html sur /trust-actions.html, pas /trust-native.html. Correction du parcours et du mapping route → fichier compilé, diagnostic HTTP enrichi du chemin sans secret. Aucun changement produit, tolérance ou masquage du404 ; reprise avec ces entrées corrigées.
+
+## Qualification et livraison de la quarantaine — 1er novembre 2026
+
+Implémenté, vérifié et installé : v0.1.1-dev.299, SHA256
+`75ad879faf4807d33b6b9c3ff5a71e570aa76d252f394da3b309d95ecadda5e9`.
+Profil natif normal sans fixture ; helper de tours en attente construit séparément.
+Contrôles : modèle pur11 (core-01, sources inchangées), verrou/libération1,
+confidentialité15 et enrôlement4 (locks-03), parcours public28 et Admin59
+(public-02), inventaire54 ancrages/25 flux OPEN et5 régressions (inventory-01).
+Le récepteur inerte observe sockets et requêtes : refus sans émission nouvelle,
+worker de production en attente refusé et réservation non engagée libérée ;
+activation attend les émissions API et CLI engagées, reprise explicite vérifiée.
+
+Installation par restart --prepared-build exact ; processus/version/notes FR/EN,
+ressources protégées et56 assertions navigateur vérifiés (installed-01), aide CLI
+FR/EN relue. Commit compilé d4e219eeaf, modifié=true. Une entrée compilée plus
+récente non installée est annoncée par le lanceur. Aucun bootstrap Trust, classement
+de données réelles ou activation de quarantaine réelle ; aucun appel fournisseur
+payant, commit ou push effectué par cet incrément. Les changements tiers sont préservés.
+
+Preuves : dossiers `verification-blp/20261101-preparation-quarantine-*` ; revue
+sémantique liée aux octets dans `20261101-preparation-quarantine-source-review.json`.
+Locks-01/02 et public-01 restent des refus historiques intacts. Les apprentissages
+sont transmis par les contrats FR/EN et les recettes persistantes ; cela ne met
+pas à jour les contextes d’agents déjà démarrés. Auto-revue, aucune acceptation
+indépendante ni conformité globale déclarée.
+
+Suite conservée : BLP-04 doit lier le principal authentifié de l’admission, les
+classifications attribuées par les producteurs et le domaine immuable aux octets
+capturés ; BLP-05 doit ensuite lier destinataire/compte/politique au transport ;
+BF-16 doit hériter ce domaine sur réponses/erreurs/propositions et lecteurs.
+La quarantaine reste un blocage explicite, sans chemin d’envoi classifié autorisé.
+La médiation OS des descendants, la migration et BLP-06 restent ouverts.
+
+## Reprise BLP-04 — attribution depuis la source capturée, 1er novembre 2026
+
+Besoin repris après la quarantaine299 : le diagnostic sait résoudre les tranches
+mais leur producteur public demande encore un digest et un chemin déclarés par
+l’opérateur. Deux voies : enregistrer immédiatement un domaine d’exécution (ses
+lecteurs/destinataires ne sont pas encore protégés), ou raccorder d’abord
+l’attribution au producteur réel. Seconde voie retenue, sans habilitation implicite.
+Codex réalise seul `blp-preparation-attribute` : I3/admin authentifié, habilitation
+sur la classification explicitement choisie, révisions Trust/BLP/tour courantes,
+parent exact, instance Root et manifeste complet vérifiés ; index d’une tranche
+capturée, jamais digest/chemin fournis. La même opération d’attribution conserve
+l’unicité, le refus des déclassements et la publication/reprise. Le contexte de
+capture participe à l’identité d’événement ; aucun texte source n’est rendu.
+
+Critères à vérifier : CLI/API persistantes, replay identique, index invalide,
+parent/révisions erronés, absence d’autorité avant recherche de ligne, entrée
+forgée/refus sans mutation, jointure diagnostique après classement des tranches,
+profil natif et installation locale identifiés. Sources identiques restent un
+seul objet par digest/projet/révision : un autre événement ne les reclasse pas.
+Ceci reste une attribution de contrôle postérieure à la capture, sans filiation
+physique durable, principal d’admission, domaine immuable, envoi autorisé ni
+héritage des résultats. Ces critères et les autres flux restent ouverts.
+
+Replan de recette / recipe recovery: before-01 échoue avant le nouveau parcours
+(KeyError revision). Le DTO réel expose source_revision ; correction du consommateur
+de test, preuve originale conservée, reprise dans before-02. Aucun comportement
+produit ne découle de ce premier échec.
+
+Replan de disponibilité de vérification : compilation encore active sous pression
+mémoire observée (14GiB RAM, swap14GiB/15GiB) et pack-objects Git concurrent
+(~6GiB, autre parent). Aucun timeout arbitraire ajouté, aucun processus tiers
+arrêté. Suivi des sorties/CPU et travaux documentaires indépendants ; cette
+lenteur ne constitue pas un résultat de test.
+
+Revue avant livraison : la lecture ajoutée ouvrait une transaction imbriquée
+inutile lorsque le consommateur en possède déjà une. L’essai engine-01 est
+interrompu volontairement (seul rustc de cette recette), et reste FAIL intact.
+Lecture unique de la ligne complète retenue ; régression témoin, transaction
+appelante préservée, corruption/root/historique et reprise. Aucun échec en
+production observé : le vocabulaire signé d’enrôlement ne propose pas encore
+les opérations BLP. Cette correction ne les y ajoute pas et ne qualifie pas
+l’authentification enrôlée. Autre constat sur le fichier d’aide modifié : sa
+formule héritée « aucun contrôle d’exécution » ignorait la quarantaine ; aide
+FR/EN précisée en contrôles partiels, et blp-check séparé de l’exigence Admin.
+
+Amélioration conservée : l’opérateur doit pouvoir distinguer les tranches et les
+digests identiques sans lecture SQL. Valeur : classement explicite compréhensible ;
+périmètre : futur inventaire protégé des sources, propriétaire BLP/UX, état OPEN.
+Critère : identité/habilitation avant métadonnées, sélection du bon producteur,
+aucun texte classifié rendu sans droit. La présente API ne livre pas cet écran.
+
+Replan engine-02 : les2 tests réussissent mais le collecteur hérité inclut les
+sources web de sa seconde étape ; native_admin.rs change pendant le test moteur,
+ce qui refuse correctement le lot entier. Séparation des recettes moteur et
+adaptateur HTTP, inventaires conservés selon leurs dépendances réelles. Le moteur
+reprend la fermeture de dépendances déjà retenue par locks-03 ; le contrôle web
+reste dans sa propre recette et dans le parcours public du binaire qualifié.
+Ce défaut de méthode rappelle de dimensionner les preuves par étape compilée,
+pas d’hériter un collecteur multi-composants. Original engine-02 intact/FAIL.
+
+Replan de méthode : engine-03 recompilait malgré les2 résultats inchangés. Arrêt
+du seul compilateur de cette recette ; refus conservé. Réutilisation explicite
+des2 tests nommés engine-02 avec522 entrées moteur conservées, identiques avant/
+après/actuellement, dans engine-reuse.json. Le lot initial reste FAIL ; cela ne
+prouve ni le graphe compilateur complet ni un profil de production. La recette
+moteur corrigée est conservée pour les futures modifications pertinentes.
+
+Le serveur observé est303 (autre livraison, distincte de299 historique).
+Build304 compile en38,88s mais refuse la qualification après modifications
+concurrentes de locales/en.json, web/i18n-en.js et web/native-authority-admin.js.
+Aucun redémarrage ni installation304. Originaux conservés dans build-01.
+Reprise : nouvelles empreintes effectives après cette édition Authority/UI,
+recette HTTP indépendante puis parcours public sur une image qualifiée.
+
+Replan build-02/adapters-01 : l’unité HTTP nommée réussit1/1, mais son lot
+refuse des modifications Authority pendant compilation ; le second build
+compile aussi puis refuse audit.rs/server.rs modifiés. Ces fichiers participent
+réellement à la fermeture compilée : aucune exclusion ni installation d’un
+candidat refusé. Les deux builds et le lot adaptateur restent FAIL intacts.
+Coordination demandée à l’utilisateur : finir/suspendre les éditions de la
+session Authority pour une fenêtre de qualification. Propriétaire de cette
+précondition : session Authority/utilisateur ; pas d’arrêt de ses processus.
+En parallèle, nouveau contrôle moteur de l’opération publique : attribution
+réelle depuis la tranche, refus/rejeu/conflit, corruption/root/historique et
+refus des déclassements après renouvellement. Sources moteur seules modifiées ;
+pas de nouvelle fonction produit ni de changement runtime après build-02.
+
+Replan public-01 : attribution CLI et rejeu HTTP réussissent. La première
+assertion HTTP de refus échoue parce que la recette reprend des tuples CLI
+(code, statut) comme (statut, code). La réponse originale est403 avec
+`authorization_required`, conforme au contrat. Conversion explicite de l’ordre
+pour le seul consommateur HTTP ; refus original conservé, aucun changement
+runtime, reprise sur la même image qualifiée341e71bb… et une fixture neuve.
+
+## Livraison du producteur de sources capturées — 1er novembre 2026
+
+Installé et vérifié en **v0.1.1-dev.304**, image SHA256
+`341e71bb2e67d47d0c468c04f8c7ecd38f313fb0686b60af88ba675d50cbade6`,
+commit compilé821dbb340ceb99b323fd4bb9a7f2bbdc106b0e9c, modifié=true.
+Le troisième build a retrouvé une fenêtre stable et un profil natif qualifié,
+sans fixture ; les builds refusés restent intacts, jamais installés. Redémarrage
+par sélection exacte du candidat ;0 entrée compilée plus récente à cet instant.
+La demande de coordination Authority n’a entraîné aucun arrêt de ses processus.
+
+Preuves : engine-04,2 tests nommés PASS et intégrité VERIFIED ; adapters-02,1 test
+HTTP PASS/VERIFIED ; public-02,103 assertions CLI/HTTP PASS/VERIFIED, dont écriture
+HTTP puis rejeu CLI et classement sous quarantaine sans la lever ; inventory-02,
+56 ancrages/25 flux OPEN et5 régressions ; installed-01,21 entrées runtime
+concordantes et56 contrôles navigateur (version, notes FR/EN, commit réel et
+modifications locales). Sources fonctionnelles du test moteur inchangées après
+seul ajout de sa Rustdoc, preuve séparée test-doc-review ; pas de réexécution
+inventée pour cet ajout documentaire. Les échecs de recette, interruptions et
+changements concurrents restent conservés et distingués des résultats nommés.
+
+Revue personnelle liée aux octets : `20261101-preparation-source-producer-source-review.json`, politiques/fonctions/
+erreurs et documentation. Aucune revue indépendante, acceptation globale ou
+conformité transversale ajoutée. Aucun appel payant, classement réel, bootstrap
+Trust, activation de politique réelle, commit ou push par ce lot.
+
+BLP-04 progresse par un producteur d’attribution post-capture, pas par un domaine
+à l’admission. Suite conservée : identité authentifiée de l’émetteur à l’admission,
+classifications héritées des producteurs et domaine fixe ; liaison effective du
+compte/destinataire au transport (BLP-05), puis résultats et lecteurs BF-16.
+Fichiers/réseau/descendants, migration et déclassification humaine restent ouverts.
+`runtime_enforced:false` demeure justifié. Les documents/recettes sont persistants ;
+les contextes d’agents déjà démarrés ne sont pas remplacés par ces textes.
+
+Contrôle final : une restauration de stash concurrente crée deux conflits dans
+les PAEA-APEX FR/EN. Conservation des originaux compressés et des stages Git dans
+documentation-conflict-01 ; fusion des bilans historiques299 puis304 sans perdre
+les textes voisins, index résolu sur ces deux seuls documents. Aucun commit ni
+changement runtime. Vérifications diff de travail/index et revue documentaire
+actualisées.
+
+## Reprise BLP-04 — domaine fixé avant émission, 1er novembre 2026
+
+Autorisation utilisateur : poursuivre le domaine à l’admission. Comparaison :
+transformer les tours historiques/pending (lecteurs et dispatch legacy exposés),
+ou créer une admission immuable distincte sans tour exécutable. Seconde voie :
+réutiliser exactement le producteur de prompt, extraire sa capture sans écriture
+SQL/réservation, attribuer explicitement les tranches avant admission par une
+opération I3/admin habilitée, puis joindre toutes les attributions courantes sous
+le principal authentifié de l’admission. Les sources inconnues refusent sans
+capsule ; aucun rôle, label, compte ou destinataire n’est inféré.
+
+Capsule privée create-only, framing natif existant (taille observée, SHA), liée
+au Root ouvert, principal, révisions/digest de politique et octets complets du
+prompt. Espace distinct des tours legacy : aucun dispatch/worker/lecteur legacy
+ne reçoit la capsule. Rejeu immuable, lecture métadonnées sous principal courant
+et habilitation, changement de politique/Root/refus avant restitution. Aucun
+budget réservé, fournisseur contacté ou transport autorisé par l’admission.
+La quarantaine ne bloque pas ce travail local sans IO fournisseur et n’est pas
+modifiée. Réutilisation des politiques de contexte et de contention persistées.
+
+Critères : producteur identique au send historique, capture sans mutation,
+authentification avant lookup, attribution pré-admission explicite, refus de
+source manquante/clearance/révision/déclassement, capsule fixe/replay/reopen,
+corruption et publication incertaine conservées, zéro tour/budget/émission,
+CLI/API réels, docs FR/EN/revue des octets et installation locale qualifiée.
+Propriétaire Codex seul ; aucune délégation, appel payant ou politique réelle.
+Le destinataire, les résultats/lecteurs, l’OS et la migration restent ouverts.
+
+Replan engine-01 : compilation normale refuse la référence à AtomicStorageFault
+réexportée seulement sous test-fixtures. Consommer le type interne existant,
+comme le journal Trust ; aucune feature fixture activée pour contourner le refus.
+La capsule retient aussi niveau demandé/cible/mode de contexte, sans clé :
+nécessaires au raccord de transport futur, qui reste non autorisé.
+
+Replan engine-02 :6 cas réussissent, dont l’admission ; un ancien test exige un
+refus du rejeu actif historique. Le binaire304 reproduit pourtant le retour
+readonly/pending, sans modifier la ligne ; la fonction replay_turn est identique
+octet pour octet au profil304. Original engine-02 reste FAIL. Correction du
+contrat de test : observation readonly, dispatch_if_native=false, claim natif
+refusé et budget toujours réservé. Rejouer ce seul cas ; les six corps de tests
+réussis et le code produit ne changent pas. Baseline publique conservée dans
+legacy-baseline-01. Le compactage Git termine sans interruption ; aucune
+suspension n’a été appliquée en l’absence de réponse à la demande d’autorité.
+
+Build-01 compile normalement en40,88s mais refuse la qualification : audit.rs/
+server.rs Authority changent pendant la compilation. Originaux conservés, aucune
+installation ni exclusion de dépendance. Le build suivant requiert les empreintes
+Authority actualisées. L’instance observée avant ce build était308 (autre lot).
+
+Replan public-01 : CLI/admission/jointure/absence de mutations passent ; la
+recette HTTP masque son module importé par une fonction locale homonyme http.
+Renommage du seul helper en request_http et correction du préfixe de preuve
+hérité. Aucun changement runtime, nouvelle fixture et même image309 qualifiée ;
+refus original conservé.
+
+Replan livraison réelle :309 est activé dans le moteur interne38434, derrière
+Authority38433. Le probe owner-key vérifie version/image/22 sources/notes puis
+reçoit403 sur les assets protégés : refus attendu du mode, pas un succès UI.
+Aucun gate affaibli, aucune identité/token humain fabriqué. installed-01 conserve
+le refus ; installed-02 est explicitement PARTIAL_AUTHORITY_UI_NOT_VERIFIED,
+avec22 sources et refus403 sur les3 assets. Le pilote navigateur signale son
+hôte indisponible ; contrôle visuel réel demandé à l’utilisateur authentifié.
+Une entrée source Authority/assertion.rs plus récente (wire v2) n’est pas dans
+l’image309 ; aucune installation de cette évolution n’est déclarée et son
+raccord demeure au chantier Authority. Son statut indique actif mais binaire
+installé différent du dernier build, sans diagnostic de session humaine fabriqué.
+
+Vérification UI indépendante sur fixture, même image de production : première
+recette refuse l’appel Server.request observé pendant capture asynchrone.
+Contrat réel : observe=False pour la requête HTTP séparée. Corrigé uniquement
+dans le driver ; nouvel espace ui-02, même image, critère Authority réel maintenu
+ouvert. Le navigateur partagé distingue désormais explicitement fixture d’image
+et instance gérée ; mêmes assertions, marqueur privé obligatoire, aucun contournement.
+
+## État de l’admission pré-transport — 1er novembre 2026
+
+Code implémenté et activé dans le moteur **v0.1.1-dev.309**, image SHA256
+`c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b`.
+Profil natif normal qualifié, sans fixtures ; producteur de prompt extrait sans
+changer son corps (preuve producer-parity). Principal Trust réel de l’admission,
+jointure de toutes les tranches actuelles et capsule immuable privée ; aucune
+émission, réservation, tour exécutable ou droit fournisseur. Paramètres/routage
+retenus sans clé, sans autorité de sink implicite. Aucun label/principal du
+modèle ne peut remplacer cette admission.
+
+Preuves de code :6 corps de tests réussis engine-02 réutilisés à l’identique,
+puis cas legacy corrigé1/1 PASS/VERIFIED (engine-reuse et legacy-01). Le lot
+engine-02 reste FAIL original, pas un faux succès global ; son seul échec est
+reproduit sur304 et corrigé dans le test selon le contrat readonly réel.
+Public-02 :74 assertions CLI/HTTP PASS/VERIFIED, dont jointure différente de
+l’habilitation maximale, classement HTTP pré-admission, révocation, corruption
+frame/Root/label/JSON avec témoins et reprises, aucune émission/tour/réservation.
+Legacy-public-01 :103 assertions anciennes passent sur la même image, dont un
+fournisseur CLI inerte. Inventory-01 :60 ancrages/25 flux OPEN et5 régressions.
+
+Livraison par restart --prepared-build exact. Installed-02 confirme image/PID,
+version et notes FR/EN, aide CLI et22 fichiers runtime. Une source Authority
+plus récente (assertion.rs, v2) n’est pas installée par cette image ; sa livraison
+reste au chantier Authority. L’instance a été passée en mode Authority dans
+l’autre chantier : démon38433, moteur38434. Les3 assets protégés refusent
+l’owner-key403 ; aucune protection n’a été désactivée. Le contrôle UI réel reste
+**OPEN**, propriétaire utilisateur/session Authority : connexion réelle et
+observation du dialogue Version, pilote navigateur actuellement indisponible.
+Installed-02 est donc PARTIAL_AUTHORITY_UI_NOT_VERIFIED, jamais un PASS visuel.
+
+Ui-02 vérifie séparément56 assertions navigateur sur une racine isolée avec
+la MÊME image de production (assets réellement servis, notes FR/EN, version et
+commit) ; cela ne vaut pas acceptation de la session Authority réelle. Les
+recettes/préconditions ont été corrigées sans remplacer les refus originaux.
+Les données/politiques réelles n’ont pas été classées ou modifiées ; aucun appel
+payant, commit, push ni identité humaine fabriquée. Revue [liée aux octets](verification-blp/20261101-preparation-admission-source-review.json) : politiques, fonctions, erreurs et documents ; revue personnelle uniquement.
+
+Prochain raccord BLP-05 : vérifier au dernier usage le compte/destinataire, la
+clé et les droits/budgets actuels avant d’autoriser un transport depuis une
+capsule. Puis héritage des résultats/lecteurs et médiation OS/descendants.
+Transformations amont, migration, déclassification humaine et retrait explicite
+des capsules restent ouverts. `runtime_enforced:false` demeure nécessaire.
+Les documents/recettes persistent ; aucun contexte natif déjà lancé n’a été
+remplacé par ces textes et aucune surveillance récurrente n’a été créée.
+
+## Reprise BLP-05 — destinataire et transport au dernier usage, 1er novembre 2026
+
+Besoin : BLP-05 — contrôle effectif du compte et du destinataire au dernier
+usage, avant émission fournisseur. Choix utilisateur confirmé : **liaison
+explicite du sink** — une opération enregistre un label de destination pour le
+compte/endpoint exact (base_url+model+digest de configuration) ; l’envoi
+classifié revalide capsule+destination+politique/budget au dernier usage sous le
+verrou egress ; le chemin d’envoi legacy n’est **pas** modifié.
+
+### Réalisé (implémenté + testé local, non activé côté travailleur)
+
+- `blp-preparation-destination-attribute` : administrateur habilité, écho
+  obligatoire `base_url`/`model` de la connexion courante, digest canonique
+  recalculé par le Root (jamais appelant), clé jamais en entrée ; passage par le
+  producteur `blp-object-attribute` (unicité exact-once, anti-déclassification
+  hérités). [`preparation_transport.rs`](../../../rust/crates/swarm-engine/src/root_store/preparation_transport.rs)
+- `blp-preparation-transport` : sous verrou egress partagé, re-vérification
+  complète de la capsule, fraîcheur connection/provider_source/settings depuis
+  l’admission, liaison courante pour ce digest exact, dominance no-write-down
+  au dernier usage, observation budget lecture seule ; réponse fixe non émissive
+  (`transport-authorized-not-sent`, `runtime_authorized:false`,
+  `runtime_enforced:false`), publication `None`.
+- Dispatch readonly + egress : `trust_store.rs:69-122` ; mapping HTTP
+  400/404/409/403/500 dans `swarm-web/src/service/trust.rs` ; CLI whitelist
+  `swarm-cli/src/trust.rs` ; readonly public `blp-preparation-transport`.
+- Test d’intégration `rust/crates/swarm-engine/tests/preparation_transport.rs`
+  : **PASS 1/1 (2.0s)** — refus non attribué, écho TOCTOU, liaison réservée
+  admin, liaison enregistrée sans clé, rejeu exact, décision fixe non émissive,
+  rejeu identique, ownership, zéro réservation SQL, fixture auto-nettoyée.
+- Parcours public `tests/blp_transport_public.py` + recette
+  `tools/verification/recipes/blp-preparation-transport-public.json` :
+  **exécutés le 2 novembre 2026 sur le binaire qualifié** sha256
+  `41f00bf9…` (profil `rust-zrtk4hyt`, installé localement, v0.1.1-dev.312) :
+  **PASS 65/65 assertions** (`BLP_TRANSPORT_JOURNEY_SHA256`
+  `0690d1e0…`), recette `recipe.py run` PASS puis `recipe.py verify`
+  `VERIFIED/PASS` (preuves `.swarm-fixtures/blp-transport-recipe-20261102/`,
+  parcours `.swarm-fixtures/blp-transport-proof-20261102/`). Le parcours
+  prouve aussi le rejeu identique, le no-write-down (`blp-access-denied`),
+  l’invalidation par renouvellement de politique (3 révisions), la fraîcheur
+  des paramètres, la révocation d’identité, la carte HTTP complète
+  (200/400/404/404-ownership/403) et l’absence totale de lancement fournisseur
+  ou mutation SQL (sentinelle + compteurs). Aucun résidu `/tmp` du parcours.
+- Inventaire BF (`tools/paea/check_blp_inventory.py`) : rafraîchi, 65
+  références / 25 flux, 0 dérive, +5 références transport (producteur,
+  dispatch, HTTP).
+- Amélioration portée par l’exécution : `preparation_calls.rs` allouait ses
+  fixtures via `std::env::temp_dir()` (interdiction `/tmp` du 31 octobre) ;
+  corrigé sur le schéma établi (`TMPDIR` exigé + refus `/tmp`, enregistrement
+  de naissance, `Drop` conservant la racine uniquement en panique). Suite
+  **7/7 PASS**, preuve `/tmp` avant=après, zéro racine restante.
+- Revue liée aux octets : [source-review](verification-blp/20261102-preparation-transport-source-review.json).
+- Documentation FR/EN : BELL-LAPADULA (nouvelle section), BIBA-RUST (contrat
+  technique complet + diagramme), BLP-FLOWS (paragraphe de révision BF-05/BF-07).
+
+### Limites conservées
+
+La décision n’engage pas le transport réel (BF-07 OPEN) ; héritage des
+résultats/lecteurs, confinement OS/descendants, envois legacy, transformations
+amont : inchangés. `runtime_enforced:false` reste justifié. Le hook
+travailleur (branche Api de `preparation_worker.rs`) est l’incrément **suivant**,
+pas celui-ci ; aucun chemin d’envoi existant n’a été touché. Aucune donnée
+réelle classée, aucun fournisseur payant, aucune capsule réelle.
+
+### Étape suivante
+
+Incrément suivant : hook travailleur d’émission (branche Api de
+`preparation_worker.rs`) appelant la décision au dernier usage avant tout
+envoi classifié ; le chemin legacy reste intact. RETEX de l’incrément :
+[RETEX-BLP-05-20261102](paea/RETEX-BLP-05-20261102.md).

@@ -1,0 +1,201 @@
+# Bell-LaPadula dans Swarm — état existant
+
+État documenté au 1er novembre 2026 · [English](../en/BELL-LAPADULA.md).
+
+**Bell-LaPadula est partiellement intégré à Swarm. Les contrôles disponibles ne
+constituent pas une protection de confidentialité de bout en bout.** La capacité
+moteur conserve `runtime_enforced:false` et `declassification_available:false`.
+Ces valeurs restent vraies même après l’enregistrement d’une politique.
+
+## Capacités disponibles
+
+| Capacité | Comportement implémenté | Limite de la garantie |
+| --- | --- | --- |
+| Modèle de confidentialité | Niveaux ordonnés, compartiments, habilitations ; dominance, combinaison conservatrice, domaine de calcul fixe et refus des classifications inconnues | Contrats de données de `swarm-confidentiality` ; ils n’authentifient ni une source ni un processus et ne confinent pas le système |
+| Administration | Politique persistée et révisionnée ; consultation, aperçu, application et contrôle par API/CLI ; éditeur de politique dans l’Admin | Administration sous identité Trust I3/admin courante ; aucune activation implicite de la médiation |
+| Attribution d’un objet | `blp-object-attribute` enregistre une classification explicite sous les révisions Trust/BLP courantes, pour un digest et un chemin projet exacts ; rejeu et conflits contrôlés | L’acteur doit aussi être habilité à cette classification ; pas de formulaire Admin d’attribution d’objet ni d’identité physique établie par le seul digest/chemin |
+| Monotonie des attributions | Une attribution du même digest/projet ne peut baisser de niveau ni perdre de compartiments lors d’un renouvellement ; un historique déjà abaissé refuse à la relecture | Cette règle seule ne suit pas les copies, contenus modifiés, résumés ou objets de nouveau digest |
+| Lecteurs PAEA ciblés | L’aperçu et la présentation d’appel Git préparé exigent identité authentifiée, autorité/politique courantes, attribution exacte et habilitation du lecteur | Ces frontières de présentation ne démontrent pas la confidentialité de l’appel Git ou de tous les parcours PAEA |
+| Provenance du prompt | Les nouveaux enregistrements natifs v3 couvrent tous les octets du prompt privé : instructions, contexte projet, contrat éventuel, neuf valeurs JSON et cadrage | Preuve de cohérence des octets, sans classification automatique des producteurs ni autorité pour les historiques antérieurs |
+| Diagnostic du prompt enregistré | `blp-preparation-check` retrouve les attributions courantes de chaque partie, les combine et vérifie l’habilitation du demandeur ; source inconnue, révision périmée ou provenance invalide refusent | Lecture seule après enregistrement ; principal du diagnostic distinct du principal de l’envoi ; aucune autorisation de dispatch ou attribution persistée à la réponse |
+
+Biba traite séparément l’intégrité. Un niveau I3, un rôle admin, une session web
+ou une configuration fournisseur ne remplacent pas une habilitation de
+confidentialité. Une authentification Trust locale ne prouve pas une identité
+humaine ni un accord de déclassification.
+
+## Interfaces et usage
+
+Les opérations existantes du namespace `trust` sont :
+
+| Opération | Usage et autorité |
+| --- | --- |
+| `blp-show` | Consulter politique, historique et révisions ; I3/admin |
+| `blp-policy-preview` / `blp-policy-apply` | Examiner puis enregistrer une politique explicite ; I3/admin, révisions courantes |
+| `blp-check` | Calculer un diagnostic sur des classifications fournies ; identité authentifiée et politique courante ; les labels de la requête restent des déclarations |
+| `blp-object-attribute` | Attribuer explicitement un objet ; I3/admin habilité, intention et révisions explicites |
+| `blp-preparation-attribute` | Classer une tranche capturée vérifiée ; I3/admin habilité, parent/index/révisions explicites, digest et chemin résolus par le moteur ; aucun droit d’envoi |
+| `blp-preparation-check` | Contrôler les sources d’un tour natif enregistré ; identité authentifiée habilitée, politique courante et attributions de toutes les parties |
+
+CLI : `swarm-rust trust OPERATION --root RACINE --input INTENTION.json --json` ;
+le jeton vient de `SWARM_TRUST_TOKEN`, jamais d’un champ d’identité déclaré.
+API : `POST /api/v1/trust-actions?action=OPERATION` ; dans le parcours local
+owner-key vérifié, sous Host/session/Origin/CSRF
+puis authentification Trust indépendante, notamment `Authorization: Bearer …`.
+La session seule ne confère pas l’autorité de ces opérations. Ces recettes BLP
+ne qualifient pas les modes d’accès Authority/enrôlement développés dans d’autres lots.
+
+Le corps de `blp-preparation-check` contient uniquement `schema_version:1`,
+`expected_revision` (révision BLP observée), `preparation_id` et `turn_id`.
+Son résultat comporte acteur, révision, digest du prompt, nombre de parties et
+classification combinée, avec `diagnostic_only:true` et `runtime_authorized:false`.
+Il ne rend aucun texte du prompt. Chaque digest concerne les octets transmis,
+y compris l’échappement JSON ; attribuer un document brut ne suffit pas.
+Les valeurs structurées restent des parties agrégées et aucun écran d’inventaire
+de leurs digests n’est livré.
+
+Les refus HTTP du diagnostic distinguent intention invalide (400), identité ou
+habilitation (403), tour absent (404) et précondition à corriger (409). Provenance
+incohérente, racine privée incompatible et erreurs de stockage/fermeture restent
+des erreurs serveur. Un historique sans provenance ne gagne aucun droit : créer
+un nouveau tour par le parcours pris en charge, sans réécrire les anciennes lignes.
+Les formats d’attribution, erreurs, révisions et reprises sont détaillés dans
+le [contrat technique](BIBA-RUST.md#diagnostic-des-sources-de-préparation).
+
+## Quarantaine des préparations livrée
+
+La version locale 299 ajoute `preparation_quarantine`, éditable dans la politique JSON
+de l’Admin et les mêmes opérations API/CLI. True bloque les nouveaux sends et
+les émissions contrôlées des workers en attente. Son application attend la fin
+d’une émission déjà engagée. False ou absence reste le mode historique sans
+garantie BLP ; ce n’est pas un chemin d’envoi classifié autorisé. Le parcours public vérifie 28 assertions et 59 contrôles Admin FR/EN, thèmes et
+largeurs 1280/390 ; la livraison vérifie 56 contrôles de version et ressources.
+La politique réelle n’a pas été activée par ces recettes. Voir le [contrat](BIBA-RUST.md#quarantaine-explicite-des-envois-de-préparation).
+
+## Travaux non terminés
+
+- **BLP-01** : compléter l’inventaire dynamique des sources, lecteurs et sorties.
+  Les 25 flux recensés restent ouverts pour leur contrôle BLP transversal.
+- **BLP-03** : migrer explicitement les objets existants non classifiés.
+- **BLP-04** : établir l’attribution par les producteurs et l’identité des sources,
+  lier le principal authentifié de l’envoi au domaine fixe et au rejeu, puis
+  conserver la classification sur les réponses, erreurs, résumés et mémoires.
+- **BLP-05** : médiation effective fichiers/réseau/fournisseurs/agents descendants,
+  avec liaison des octets au destinataire, compte et politique courants.
+- **BLP-06** : déclassification avec identité humaine établie et approbation des
+  octets/destinataires exacts ; aucune commande de déclassification disponible.
+- **BLP-07** : recette, revue indépendante et RETEX transversaux, après les raccords.
+
+La prochaine chaîne de raccordement reste BF-05 → BF-07 → BF-16 : sources du
+prompt → engagement fournisseur → héritage du résultat. Un diagnostic positif
+ne peut servir de ticket d’envoi ou de preuve d’acceptation globale.
+
+## Preuves disponibles et portée
+
+La quarantaine est livrée en **v0.1.1-dev.299**, image
+`75ad879faf4807d33b6b9c3ff5a71e570aa76d252f394da3b309d95ecadda5e9`,
+commit compilé `d4e219eeafcae5f90307a105ddaa93ba9874dc4f`, modifié=true.
+[Preuve du processus et de la livraison](../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-installed-01/delivery-scope.json).
+Une entrée compilée plus récente reste en attente, comme annoncé par le lanceur.
+
+La précédente livraison du diagnostic était **v0.1.1-dev.296**, image
+`e4a802c4dc4d32d90d036169604168c64db15196695d692885369b748686ca72`.
+La version locale a été relue pendant cette mise à jour : même numéro, commit
+compilé `b4cbfa22552140fe9a7bcf46ac91165b0abe120d`, modifications annoncées.
+C’est une observation datée, pas une promesse sur une future instance.
+
+| Preuve conservée | Ce qu’elle établit |
+| --- | --- |
+| [Parcours public](../plans/actions-confiance/verification-blp/20261101-preparation-check-public-01/result.json) | 26 assertions CLI/HTTP sur image normale qualifiée, prompt réel produit par double local inerte ; aucun appel payant |
+| [Régression moteur](../plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/result.json) | Résolution des attributions, combinaison, refus et reprise sur fixture de consommateur |
+| [Statuts HTTP](../plans/actions-confiance/verification-blp/20261101-preparation-http-status-01/result.json) | Refus métier distincts des défauts internes et des erreurs de nettoyage |
+| [Livraison locale](../plans/actions-confiance/verification-blp/20261101-preparation-check-installed-01/delivery-scope.json) | Image exécutée, 13 sources conformes, 56 contrôles navigateur FR/EN/thèmes/version/ressources et deux aides CLI |
+| [Inventaire](../plans/actions-confiance/verification-blp/20261101-preparation-flow-inventory-01/result.json) | Fraîcheur de 25 flux, 50 ancrages et 46 fichiers ; aucun inventaire exhaustif ni contrôle de divulgation déduit |
+
+Les tests sur fixtures, le contrôle du profil de production et l’installation
+locale sont des preuves distinctes. Aucun bootstrap Trust réel, classement des
+données vivantes, fournisseur réel, déclassification humaine ou acceptation
+indépendante globale n’est établi par ces résultats.
+
+[Plan et reprises BLP](../plans/actions-confiance/BLP-APEX.md) ·
+[Flux et frontières](BLP-FLOWS.md) ·
+[Positionnement de sécurité](../SECURITY-POSITIONING.md).
+
+Ancrages d’implémentation : [modèle](../../rust/crates/swarm-confidentiality/src/lib.rs),
+[politique et attributions](../../rust/crates/swarm-engine/src/trust/confidentiality.rs),
+[diagnostic du prompt](../../rust/crates/swarm-engine/src/root_store/preparation_call.rs),
+[lecteur PAEA](../../rust/crates/swarm-engine/src/root_store/reader_guard.rs),
+[éditeur Admin de politique](../../web/trust-confidentiality.js).
+
+Preuves de quarantaine : [moteur et ordre des verrous](../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-locks-03/result.json), [CLI/HTTP et Admin réels sur fixture](../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-02/result.json). Les refus historiques sont conservés dans le suivi APEX.
+
+Le producteur `blp-preparation-attribute` attribue une tranche capturée vérifiée,
+sous I3/admin habilité et révisions courantes : le moteur résout lui-même son
+digest et son chemin, sans texte source en réponse. C’est un classement explicite
+après capture, sans autorisation d’envoi ni domaine persistant. Contrat et exemple :
+[BIBA-RUST](BIBA-RUST.md#attribution-depuis-une-source-de-préparation-capturée).
+
+Cette attribution depuis la capture est livrée en **v0.1.1-dev.304**, image
+`341e71bb2e67d47d0c468c04f8c7ecd38f313fb0686b60af88ba675d50cbade6`.
+Le parcours public vérifie103 assertions CLI/HTTP, le moteur2 tests, l’adaptateur
+HTTP1 test et la livraison56 contrôles navigateur FR/EN. Le profil natif est sans
+fixture ;21 fichiers runtime concordent avec l’image active. Les données et
+politiques réelles n’ont pas été classées/modifiées par cette recette. Preuves :
+[plan APEX](../plans/actions-confiance/BLP-APEX.md#livraison-du-producteur-de-sources-capturées--1er-novembre-2026).
+
+## Domaine fixé avant transport
+
+La309 ajoute l’attribution des tranches avant admission, l’admission sous le
+principal Trust authentifié et une capsule privée immuable du prompt complet.
+Toutes les tranches exigent une classification courante ; le domaine est leur
+jointure, pas l’habilitation maximale. La capsule n’est ni un tour exécutable ni
+un droit fournisseur ; aucun budget n’est réservé. Métadonnées sous propriétaire
+courant, politique/Root revalidés, sans remise à jour implicite d’une ancienne capsule.
+
+Les opérations `blp-preparation-input-attribute`, `blp-preparation-admit` et
+`blp-preparation-admission-show` sont détaillées dans le
+[contrat technique](BIBA-RUST.md#admission-immuable-avant-transport).
+74 assertions publiques et103 régressions CLI/HTTP passent sur l’image309.
+L’image active et22 fichiers runtime sont vérifiés. Les56 contrôles navigateur
+concernent une fixture de la même image ; le dialogue réel derrière Authority
+reste à confirmer dans une session authentifiée. Ni cette admission ni les
+preuves de fixture ne clôturent la confidentialité de bout en bout.
+
+## Liaison explicite du destinataire et décision au dernier usage
+
+Le chantier BLP-05 ajoute deux opérations qui relient le compte/endpoint à un
+destinataire contrôlé, puis arbitrent l’envoi au dernier usage — sans émettre.
+Leur contrat technique complet est décrit dans le
+[contrat technique](BIBA-RUST.md#liaison-du-destinataire-et-transport-au-dernier-usage).
+
+- **`blp-preparation-destination-attribute`** (administrateur habilité) :
+  enregistre un label de destination pour une connexion `api-` identifiée par
+  son triple `base_url`/`model`/digest de configuration, avec écho obligatoire
+  de `base_url` et `model`. La clé de connexion n’est jamais une entrée ;
+  le digest canonique est calculé par le Root courant. La liaison est
+  ré-enregistrable (dernière écriture gagnante) et meurt avec l’Entry de
+  politique qui la porte : tout renouvellement de politique efface les
+  liaisons comme les attributions de tranches.
+- **`blp-preparation-transport`** (principal propriétaire d’une capsule admise) :
+  sous le verrou egress partagé, re-vérifie intégralement la capsule, la
+  fraîcheur connection/provider_source/settings depuis l’admission, la liaison
+  courante pour ce digest exact, la dominance no-write-down du label de sortie
+  vers le label de destination au dernier usage, puis observe en lecture seule
+  les enveloppes de budget. Réponse fixe et non émissive :
+  `runtime_authorized:false`, `runtime_enforced:false`, état
+  `transport-authorized-not-sent`. Aucun tour, réservation, IO fournisseur ou
+  modification legacy.
+
+Refus typés : grammaire (`blp-transport-invalid`,
+`blp-destination-invalid`), écho (`blp-destination-echo-mismatch`),
+attribution absente (`blp-destination-not-attributed`, 404), fraîcheur
+(`blp-transport-connection-changed|blp-transport-provider-source-changed|
+blp-transport-settings-changed`, 409), write-down (`blp-access-denied`),
+budget (`preparation-budget-exhausted|work-budget-exhausted`).
+
+Portée et limites inchangées : la décision n’engage pas le transport réel
+(BF-07 reste OPEN), n’hérite pas des résultats, ne confine pas les descendants
+et ne protège pas les envois legacy. La vérification s’appuie sur le test
+d’intégration `preparation_transport.rs` et le parcours public
+`tests/blp_transport_public.py` via la recette
+`tools/verification/recipes/blp-preparation-transport-public.json`.

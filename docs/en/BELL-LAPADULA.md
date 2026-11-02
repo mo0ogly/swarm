@@ -1,0 +1,195 @@
+# Bell-LaPadula in Swarm — existing implementation
+
+Documented state, 1 November 2026 · [Français](../architecture/BELL-LAPADULA.md).
+
+**Bell-LaPadula is partially integrated into Swarm. Available controls do not
+provide end-to-end confidentiality protection.** The engine capability keeps
+`runtime_enforced:false` and `declassification_available:false`, including after
+policy configuration.
+
+## Available capabilities
+
+| Capability | Implemented behavior | Assurance limit |
+| --- | --- | --- |
+| Confidentiality model | Ordered levels, compartments, clearances; dominance, conservative join, fixed calculation domain and unknown-classification refusal | Data contracts in `swarm-confidentiality`; no source/process authentication or OS confinement |
+| Administration | Revisioned persistent policy; API/CLI show, preview, apply and diagnostic; Admin policy editor | Current Trust I3/admin identity for administration; no implicit mediation activation |
+| Object attribution | `blp-object-attribute` records an explicit label under current Trust/BLP revisions for an exact digest/project path; replay/conflict controls | Actor also needs clearance for the label; no object-attribution Admin form or physical identity established by digest/path alone |
+| Attribution monotonicity | Renewing the policy cannot lower the same digest/project label or remove compartments; an already-lowered history refuses on read | This rule alone does not track copies, changed content, summaries or new-digest objects |
+| Targeted PAEA readers | Prepared Git-call preview and presentation require authenticated identity, current authority/policy, exact attribution and reader clearance | Presentation boundaries do not prove confidentiality of Git execution or every PAEA flow |
+| Prompt provenance | New native v3 records cover every private prompt byte: instructions, project context, optional contract, nine JSON values and framing | Byte-consistency evidence without automatic producer labels or authority for earlier records |
+| Recorded-prompt diagnostic | `blp-preparation-check` resolves current attributions for every slice, joins them and checks caller clearance; unknown sources, stale revision or invalid provenance refuse | Readonly post-recording observation; diagnostic caller is distinct from original sender; no dispatch authority or persisted response attribution |
+
+Biba separately addresses integrity. I3, admin role, web session or provider
+configuration cannot replace confidentiality clearance. Local Trust
+authentication establishes neither a verified human nor declassification consent.
+
+## Interfaces and usage
+
+Existing `trust` operations:
+
+| Operation | Purpose and authority |
+| --- | --- |
+| `blp-show` | Read policy/history/revisions; I3/admin |
+| `blp-policy-preview` / `blp-policy-apply` | Examine then record explicit policy; I3/admin and current revisions |
+| `blp-check` | Diagnostic over supplied labels; authenticated identity/current policy; request labels remain claims |
+| `blp-object-attribute` | Explicit object attribution; cleared I3/admin, explicit intent/revisions |
+| `blp-preparation-attribute` | Attribute a verified captured slice; cleared I3/admin, explicit parent/index/revisions, engine-derived digest/path; no send authority |
+| `blp-preparation-check` | Check sources of a recorded native turn; cleared authenticated identity, current policy and attribution for every slice |
+
+CLI: `swarm-rust trust OPERATION --root ROOT --input INTENT.json --json`; token
+comes from `SWARM_TRUST_TOKEN`, never a declared identity field.
+API: `POST /api/v1/trust-actions?action=OPERATION`; the verified local owner-key
+flow uses Host/session/Origin/CSRF
+and independent Trust authentication, including `Authorization: Bearer …`.
+The session alone grants no authority for these operations. These BLP recipes
+do not qualify the Authority/enrollment access modes developed in other packages.
+
+`blp-preparation-check` accepts only `schema_version:1`, `expected_revision`
+(observed BLP revision), `preparation_id` and `turn_id`. Result contains actor,
+revision, prompt digest, part count and joined classification, with
+`diagnostic_only:true` and `runtime_authorized:false`. No prompt text is returned.
+Digests concern transmitted bytes including JSON escaping; attributing the raw
+document is insufficient. Structured values remain aggregate slices and no
+slice-digest inventory screen is provided.
+
+HTTP diagnostic refusals distinguish invalid intent (400), identity/clearance
+(403), missing turn (404) and a prerequisite requiring correction (409).
+Incoherent provenance, incompatible private Root and storage/close failures remain
+server errors. Historical rows without provenance acquire no authority: create
+a new turn through the supported flow rather than rewrite old rows. See the
+[technical contract](BIBA-RUST.md#preparation-source-diagnostic) for attribution
+formats, errors, revisions and recovery.
+
+## Delivered preparation quarantine
+
+Local version299 adds `preparation_quarantine`, editable in Admin policy JSON and the
+same API/CLI policy operations. True blocks new sends and controlled egress by
+pending workers. Applying waits for already-engaged emission to finish. False/
+omission retains legacy behavior without BLP assurance, not an authorized
+classified-send route. The public journey verifies28 assertions and59 Admin checks in FR/EN, both
+themes and1280/390 widths; delivery verifies56 version/asset checks. The real
+policy was not activated by these recipes. See the
+[contract](BIBA-RUST.md#explicit-preparation-send-quarantine).
+
+## Unfinished work
+
+- **BLP-01**: complete dynamic source/reader/output inventory. All 25 documented
+  flows remain open for transversal BLP controls.
+- **BLP-03**: explicitly migrate existing unclassified objects.
+- **BLP-04**: establish producer attribution/source identities, bind authenticated
+  sender to fixed domain and replay, then retain classification on answers,
+  errors, summaries and memory.
+- **BLP-05**: actual filesystem/network/provider/descendant mediation, binding
+  bytes to current recipient, account and policy.
+- **BLP-06**: declassification with established human identity and approval of
+  exact bytes/recipients; no declassification command is available.
+- **BLP-07**: transversal recipe, independent review and RETEX after integration.
+
+The next integration chain remains BF-05 → BF-07 → BF-16: prompt sources →
+provider engagement → result inheritance. A positive diagnostic is neither a
+send ticket nor evidence of global acceptance.
+
+## Retained evidence and scope
+
+Quarantine is delivered in **v0.1.1-dev.299**, image
+`75ad879faf4807d33b6b9c3ff5a71e570aa76d252f394da3b309d95ecadda5e9`,
+compiled commit `d4e219eeafcae5f90307a105ddaa93ba9874dc4f`, modified=true.
+[Process/delivery evidence](../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-installed-01/delivery-scope.json).
+One newer compiler input remains pending, as disclosed by the launcher.
+
+Previous diagnostic delivery: **v0.1.1-dev.296**, image
+`e4a802c4dc4d32d90d036169604168c64db15196695d692885369b748686ca72`.
+Local version was reread during this update: same number, compiled commit
+`b4cbfa22552140fe9a7bcf46ac91165b0abe120d`, disclosed modifications. This is a dated
+observation, not a promise about a future instance.
+
+| Retained evidence | What it establishes |
+| --- | --- |
+| [Public journey](../plans/actions-confiance/verification-blp/20261101-preparation-check-public-01/result.json) | 26 CLI/HTTP assertions on qualified normal image; actual prompt produced by inert local double, no paid provider |
+| [Engine regression](../plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/result.json) | Attribution resolution/join/refusal/recovery on consumer fixture |
+| [HTTP statuses](../plans/actions-confiance/verification-blp/20261101-preparation-http-status-01/result.json) | Business refusals distinguished from internal/cleanup failures |
+| [Local delivery](../plans/actions-confiance/verification-blp/20261101-preparation-check-installed-01/delivery-scope.json) | Running image,13 matching sources,56 FR/EN/theme/version/asset browser checks and two CLI help checks |
+| [Inventory](../plans/actions-confiance/verification-blp/20261101-preparation-flow-inventory-01/result.json) | Freshness of25 flows,50 anchors and46 files; neither exhaustive inventory nor disclosure prevention |
+
+Fixture checks, production-profile qualification and local installation are
+separate evidence. These results establish no live Trust bootstrap, live-data
+classification, real provider, human declassification or independent global
+acceptance.
+
+[BLP plan and recovery](plans/actions-confiance/BLP-APEX.md) ·
+[Flows and boundaries](BLP-FLOWS.md) ·
+[Security positioning](SECURITY-POSITIONING.md).
+
+Implementation anchors: [model](../../rust/crates/swarm-confidentiality/src/lib.rs),
+[policy and attributions](../../rust/crates/swarm-engine/src/trust/confidentiality.rs),
+[prompt diagnostic](../../rust/crates/swarm-engine/src/root_store/preparation_call.rs),
+[PAEA reader](../../rust/crates/swarm-engine/src/root_store/reader_guard.rs),
+[Admin policy editor](../../web/trust-confidentiality.js).
+
+Quarantine evidence: [engine and lock ordering](../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-locks-03/result.json), [real fixture CLI/HTTP and Admin journey](../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-02/result.json). Historical refusals remain in the APEX record.
+
+The `blp-preparation-attribute` producer attributes a verified captured slice under
+a cleared I3/admin and current revisions; the engine supplies digest/path and
+returns no source text. This explicit post-capture classification grants neither
+send authority nor a persisted domain. Contract and example:
+[BIBA-RUST](BIBA-RUST.md#attribution-from-a-captured-preparation-source).
+
+Captured-source attribution is delivered in **v0.1.1-dev.304**, image
+`341e71bb2e67d47d0c468c04f8c7ecd38f313fb0686b60af88ba675d50cbade6`.
+Evidence covers103 public CLI/HTTP assertions,2 engine tests,1 HTTP unit and56
+FR/EN delivery browser checks. The native profile contains no fixtures;21 runtime
+files match the active image. No real data or policy was classified/changed. See
+the [APEX plan](plans/actions-confiance/BLP-APEX.md#captured-source-producer-delivery--1-november-2026).
+
+## Fixed domain before transport
+
+Version309 adds explicit pre-admission source attribution, actual authenticated
+Trust principal and a private immutable full-prompt capsule. Every slice needs
+current classification; the domain is their join, not maximum clearance. This
+capsule is neither an executable turn nor provider authority and reserves no
+budget. Metadata reads revalidate owner/current policy/Root; no implicit refresh.
+
+`blp-preparation-input-attribute`, `blp-preparation-admit` and
+`blp-preparation-admission-show` are described in the
+[technical contract](BIBA-RUST.md#immutable-pre-transport-admission).
+74 public assertions and103 CLI/HTTP regressions pass on309. The active image
+and22 runtime files are verified. The56 browser checks cover a fixture of the
+same image; the real Authority Version dialog still requires an authenticated
+session observation. Admission and fixture evidence do not establish end-to-end
+confidentiality.
+
+## Explicit recipient binding and last-use decision
+
+BLP-05 adds two operations that tie the account/endpoint to a controlled
+recipient, then arbitrate the send at last use — without emitting. Their full
+technical contract is described in the
+[technical contract](BIBA-RUST.md#recipient-binding-and-last-use-transport).
+
+- **`blp-preparation-destination-attribute`** (privileged administrator):
+  records a destination label for an `api-` connection identified by its
+  `base_url`/`model`/config-digest triple, with mandatory `base_url` and
+  `model` echo. The connection key is never an input; the canonical digest is
+  computed by the current Root. The binding is re-recordable (last write wins)
+  and dies with the policy Entry carrying it: every policy renewal wipes
+  bindings just like slice attributions.
+- **`blp-preparation-transport`** (principal owning an admitted capsule): under
+  the shared egress lock, fully re-verifies the capsule, the
+  connection/provider_source/settings freshness since admission, the current
+  binding for that exact digest, the no-write-down dominance of the output
+  label toward the destination label at last use, then observes the budget
+  envelopes read-only. Fixed non-emissive reply: `runtime_authorized:false`,
+  `runtime_enforced:false`, state `transport-authorized-not-sent`. No turn,
+  reservation, provider IO or legacy modification.
+
+Typed refusals: grammar (`blp-transport-invalid`, `blp-destination-invalid`),
+echo (`blp-destination-echo-mismatch`), missing attribution
+(`blp-destination-not-attributed`, 404), freshness
+(`blp-transport-connection-changed|blp-transport-provider-source-changed|
+blp-transport-settings-changed`, 409), write-down (`blp-access-denied`),
+budget (`preparation-budget-exhausted|work-budget-exhausted`).
+
+Scope and limits are unchanged: the decision does not engage the real transport
+(BF-07 remains OPEN), inherits no results, confines no descendants and protects
+no legacy send. Verification rests on the `preparation_transport.rs`
+integration test and the public journey `tests/blp_transport_public.py` via the
+recipe `tools/verification/recipes/blp-preparation-transport-public.json`.

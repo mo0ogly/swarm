@@ -34,8 +34,8 @@
     {
       "id": "send",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "dc1a21530466bd7842816b4105f1ba7cb01bf615d09e6e95aa83f4ad56d704a8",
-      "line": 554,
+      "sha256": "ff0ea3b703ab9ec5ae3f5fc3673c3be4dfde22a21635bf14b7500b2f8d06f942",
+      "line": 617,
       "anchor": "pub fn preparation_send<"
     },
     {
@@ -69,22 +69,22 @@
     {
       "id": "claim",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "dc1a21530466bd7842816b4105f1ba7cb01bf615d09e6e95aa83f4ad56d704a8",
-      "line": 787,
+      "sha256": "ff0ea3b703ab9ec5ae3f5fc3673c3be4dfde22a21635bf14b7500b2f8d06f942",
+      "line": 901,
       "anchor": "pub fn preparation_worker_claim("
     },
     {
       "id": "storage",
       "path": "rust/crates/swarm-engine/src/local_storage.rs",
-      "sha256": "a0a2bc944ad37c03ab3ebc6ee25fc84e490aee0599c6c7bacc5b2397c12cfbd0",
-      "line": 773,
+      "sha256": "61298c08ec9665102cf8b198ad21a5ec61b5df119e6d097a11a4e3c24d284524",
+      "line": 785,
       "anchor": "pub(crate) fn publish("
     },
     {
       "id": "prep_cli",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs",
-      "sha256": "8ed4016593df7dbb4bec6d423e777a8590f225cb961174d4eeced2620785de4f",
-      "line": 575,
+      "sha256": "69aeeb4b5eda0c43d41b330b99b7fa16b84dcc4060316d13cbf9d5ccba0c98c7",
+      "line": 587,
       "anchor": "let prepared = crate::native_provider_exec::PreparedExec::prepare("
     },
     {
@@ -97,8 +97,8 @@
     {
       "id": "api_worker",
       "path": "rust/crates/swarm-cli/src/preparation_worker.rs",
-      "sha256": "95adf90e6799466b9ebde2e8f38b24345de7d75ec5e1916bfcc665f4bd5eabea",
-      "line": 132,
+      "sha256": "57dd4786cf832b2cbf5e063eed4951717e502207b6cef09bbb22cb59d48304d0",
+      "line": 135,
       "anchor": "async fn run("
     },
     {
@@ -195,8 +195,8 @@
     {
       "id": "finish",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "dc1a21530466bd7842816b4105f1ba7cb01bf615d09e6e95aa83f4ad56d704a8",
-      "line": 936,
+      "sha256": "ff0ea3b703ab9ec5ae3f5fc3673c3be4dfde22a21635bf14b7500b2f8d06f942",
+      "line": 1060,
       "anchor": "pub fn preparation_worker_finish<"
     },
     {
@@ -293,65 +293,170 @@
     {
       "id": "trust_store",
       "path": "rust/crates/swarm-engine/src/root_store/trust_store.rs",
-      "sha256": "ce0b3808cf20260dab82bb7746817fc5b61faea884ca8572871133b9296b7d1b",
+      "sha256": "806840779f20d2a8bf756a7d9961627c9aef050883e00b716a2c7db793a35ed6",
       "line": 54,
       "anchor": "pub fn trust("
     },
     {
       "id": "blp_diag",
       "path": "rust/crates/swarm-engine/src/trust/confidentiality.rs",
-      "sha256": "4bad3731bf2089d97ef7000befd15b366e809e68aa29bc3e175fb22bf3dbe691",
-      "line": 263,
+      "sha256": "0a43d76e9284de852ee734ea8bd72ecc1af94269e367a77732fef110bd72160a",
+      "line": 264,
       "anchor": "pub(crate) fn capability("
     },
     {
       "id": "prompt_provenance",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
-      "sha256": "95f3ffe4d4a03c7d0068868abae1b67be6ecb4e2341d0cbaf6e0c888cb6d98cd",
-      "line": 136,
+      "sha256": "2c977828bd39969af3fc6f94dd1df724d1dc1e3559407aa30508b64d3c76725d",
+      "line": 146,
       "anchor": "pub(super) fn assemble("
     },
     {
       "id": "reader_guard",
       "path": "rust/crates/swarm-engine/src/root_store/reader_guard.rs",
-      "sha256": "237af07cab099cf7f320b3fd574fbe7d33205b2d33f1736fdd5fe7892d4b2975",
-      "line": 73,
+      "sha256": "28f4c90075f1bc83b9e85cc01dcbe09926c2683697bce85e7cce2d891d10b86d",
+      "line": 200,
       "anchor": "pub fn paea_reader_verdict("
     },
     {
       "id": "prompt_classifications",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
-      "sha256": "95f3ffe4d4a03c7d0068868abae1b67be6ecb4e2341d0cbaf6e0c888cb6d98cd",
-      "line": 59,
+      "sha256": "2c977828bd39969af3fc6f94dd1df724d1dc1e3559407aa30508b64d3c76725d",
+      "line": 69,
       "anchor": "pub(super) fn classifications("
     },
     {
       "id": "preparation_blp_check",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "dc1a21530466bd7842816b4105f1ba7cb01bf615d09e6e95aa83f4ad56d704a8",
-      "line": 265,
+      "sha256": "ff0ea3b703ab9ec5ae3f5fc3673c3be4dfde22a21635bf14b7500b2f8d06f942",
+      "line": 301,
       "anchor": "pub(super) fn confidentiality_check("
     },
     {
       "id": "trust_cli_route",
       "path": "rust/crates/swarm-cli/src/trust.rs",
-      "sha256": "5649bc7d822f4ba8f80a9c647ef66fd5138114df1c29f0c8225607c30bc4e95e",
-      "line": 12,
+      "sha256": "0895181f6c51ebd14006f042804d2bc1c89fc4adca5baef3b1b8abb36ca8f291",
+      "line": 13,
       "anchor": "pub(super) fn execute("
     },
     {
       "id": "trust_http_route",
       "path": "rust/crates/swarm-web/src/service/trust.rs",
-      "sha256": "0eb2bf8c2ba360cbd859a2ac16bbea270c465e9794efde41b9d00e730923e5a5",
+      "sha256": "9af0abddb7b56a48082e61f1018b03dbbe7c7683a18de4e8b2419b4b98d85bdc",
       "line": 12,
       "anchor": "pub(super) fn trust_actions("
     },
     {
       "id": "diagnostic_http_status",
       "path": "rust/crates/swarm-web/src/service.rs",
-      "sha256": "849c76a1654d6c9895bfb22032c9180160b29df8b73f2fb4ce5857980dacb0ed",
-      "line": 362,
+      "sha256": "95ec4570c4c5e009f565385026654845db5fd6bf2a3986ae5445711a3d17268c",
+      "line": 380,
       "anchor": "\"blp-access-denied\" if *operation==\"trust-command\""
+    },
+    {
+      "id": "preparation_quarantine",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_confidentiality.rs",
+      "sha256": "171c02d79bc1b253fe74618acb00eb0382e0b6494eccd926a199d9218153bc0b",
+      "line": 33,
+      "anchor": "pub fn with_preparation_egress<"
+    },
+    {
+      "id": "preparation_egress_lock",
+      "path": "rust/crates/swarm-engine/src/local_storage.rs",
+      "sha256": "61298c08ec9665102cf8b198ad21a5ec61b5df119e6d097a11a4e3c24d284524",
+      "line": 438,
+      "anchor": "pub(crate) fn reserve_preparation_egress("
+    },
+    {
+      "id": "preparation_control",
+      "path": "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+      "sha256": "806840779f20d2a8bf756a7d9961627c9aef050883e00b716a2c7db793a35ed6",
+      "line": 81,
+      "anchor": "pub(super) fn with_preparation_control("
+    },
+    {
+      "id": "enrolled_preparation_control",
+      "path": "rust/crates/swarm-engine/src/root_store/trust_enrollment.rs",
+      "sha256": "b046b879c5209101ab91b2a434b6836ab32efed490702f8a3ff494bef6806a98",
+      "line": 78,
+      "anchor": "self.with_preparation_control("
+    },
+    {
+      "id": "preparation_source_attribute",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_attribution.rs",
+      "sha256": "8b9a4761cae66822a44e86c883265957cd745316aa38ebfacf970c4a20f81886",
+      "line": 36,
+      "anchor": "pub(super) fn execute("
+    },
+    {
+      "id": "captured_source",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+      "sha256": "ff0ea3b703ab9ec5ae3f5fc3673c3be4dfde22a21635bf14b7500b2f8d06f942",
+      "line": 351,
+      "anchor": "pub(super) fn attribution_source("
+    },
+    {
+      "id": "admission_source_attribute",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_admission.rs",
+      "sha256": "d9b2282cd6306b338da40806af9d658e3346590b0a4c8e5169cb1968c0e69455",
+      "line": 130,
+      "anchor": "pub(super) fn attribute("
+    },
+    {
+      "id": "fixed_domain_admission",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_admission.rs",
+      "sha256": "d9b2282cd6306b338da40806af9d658e3346590b0a4c8e5169cb1968c0e69455",
+      "line": 163,
+      "anchor": "pub(super) fn execute("
+    },
+    {
+      "id": "shared_prompt_producer",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+      "sha256": "ff0ea3b703ab9ec5ae3f5fc3673c3be4dfde22a21635bf14b7500b2f8d06f942",
+      "line": 664,
+      "anchor": "fn capture_in_tx("
+    },
+    {
+      "id": "pretransport_capture",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+      "sha256": "ff0ea3b703ab9ec5ae3f5fc3673c3be4dfde22a21635bf14b7500b2f8d06f942",
+      "line": 718,
+      "anchor": "pub(super) fn capture_admission_intent("
+    },
+    {
+      "id": "transport_digest",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_transport.rs",
+      "sha256": "453333cc50804f4db214e5822003c66e61a0e4ef5928d31886f9bb038003ae2a",
+      "line": 24,
+      "anchor": "fn destination_digest("
+    },
+    {
+      "id": "transport_resolve",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_transport.rs",
+      "sha256": "453333cc50804f4db214e5822003c66e61a0e4ef5928d31886f9bb038003ae2a",
+      "line": 40,
+      "anchor": "fn resolve_destination("
+    },
+    {
+      "id": "transport_execute",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_transport.rs",
+      "sha256": "453333cc50804f4db214e5822003c66e61a0e4ef5928d31886f9bb038003ae2a",
+      "line": 162,
+      "anchor": "pub(super) fn execute(root: &RootStore"
+    },
+    {
+      "id": "transport_dispatch",
+      "path": "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+      "sha256": "806840779f20d2a8bf756a7d9961627c9aef050883e00b716a2c7db793a35ed6",
+      "line": 69,
+      "anchor": "if matches!(operation,\"blp-preparation-admit\""
+    },
+    {
+      "id": "transport_http_map",
+      "path": "rust/crates/swarm-web/src/service.rs",
+      "sha256": "95ec4570c4c5e009f565385026654845db5fd6bf2a3986ae5445711a3d17268c",
+      "line": 389,
+      "anchor": "\"blp-transport-invalid\"|\"blp-destination-invalid\"|\"blp-destination-echo-mismatch\""
     }
   ],
   "flows": [
@@ -450,10 +555,23 @@
         "storage",
         "prompt_provenance",
         "prompt_classifications",
-        "preparation_blp_check"
+        "preparation_blp_check",
+        "preparation_quarantine",
+        "preparation_egress_lock",
+        "preparation_control",
+        "enrolled_preparation_control",
+        "preparation_source_attribute",
+        "captured_source",
+        "admission_source_attribute",
+        "fixed_domain_admission",
+        "shared_prompt_producer",
+        "pretransport_capture",
+        "transport_digest",
+        "transport_resolve",
+        "transport_execute"
       ],
       "material": "complete combined prompt and private native envelope",
-      "current_controls": "Root/settings/SQL snapshots, digests/revisions/caps and budget admission; native v3 provenance verifies every prompt byte before worker use. Authenticated readonly blp-preparation-check resolves current control attributions of every exact slice and joins them under the diagnostic caller clearance. It grants no send authority, original-sender binding, producer source labels or fixed transmission domain.",
+      "current_controls": "Root/settings/SQL snapshots, digests/revisions/caps and budget admission; native v3 provenance verifies every prompt byte before worker use. Authenticated readonly blp-preparation-check resolves current control attributions of every exact slice and joins them under the diagnostic caller clearance. It grants no send authority, original-sender binding, producer source labels or fixed transmission domain. Explicit persisted preparation_quarantine blocks admission/claim and controlled API/CLI egress. A dedicated shared egress reservation serializes config/BLP mutations through actual IO while releasing the business Trust reservation. Absent/false retains legacy behavior; no classified destination/sender authorization, descendant confinement or output inheritance is established. Authenticated cleared I3/admin blp-preparation-attribute now derives an exact selected slice digest/path from the actual captured native turn, validating complete provenance, Root instance, source_revision and parent before delegating to canonical attribution; caller digest/path fields refuse. This is post-capture control attribution, not an admission principal or persisted fixed domain. Separate authenticated pre-transport admission now reuses the exact legacy producer without SQL turn/reservation or provider IO; cleared I3/admin explicitly attributes captured input slices, then actual admitting principal must dominate the join of every current source. Create-only private native-framed capsule freezes prompt/provenance/principal/policy/Root; owner metadata reads and replay revalidate current authority, and policy changes never refresh it implicitly. No capsule is executable or enumerated by legacy turn readers; allowed recipient/transport/output inheritance and upstream transformation-wide label inheritance remain open. The explicit destination binding records an administrator label for the exact api- account/endpoint digest; the last-use blp-preparation-transport decision re-verifies the capsule, freshness, current binding and no-write-down under the shared egress lock without emitting, reserving or mutating.",
       "missing_blp": [
         "BLP-03",
         "BLP-04"
@@ -470,10 +588,14 @@
       "consumer": "sealed stdin of configured CLI",
       "references": [
         "prep_cli",
-        "exec"
+        "exec",
+        "preparation_quarantine",
+        "preparation_egress_lock",
+        "preparation_control",
+        "enrolled_preparation_control"
       ],
       "material": "full prompt, selected environment, account configuration",
-      "current_controls": "fresh private gate and mandatory I0 sandbox; provider identity is not clearance",
+      "current_controls": "fresh private gate and mandatory I0 sandbox; provider identity is not clearance Explicit persisted preparation_quarantine blocks admission/claim and controlled API/CLI egress. A dedicated shared egress reservation serializes config/BLP mutations through actual IO while releasing the business Trust reservation. Absent/false retains legacy behavior; no classified destination/sender authorization, descendant confinement or output inheritance is established.",
       "missing_blp": [
         "BLP-04",
         "BLP-05"
@@ -491,10 +613,16 @@
       "references": [
         "claim",
         "api_worker",
-        "api_client"
+        "api_client",
+        "preparation_quarantine",
+        "preparation_egress_lock",
+        "preparation_control",
+        "enrolled_preparation_control",
+        "transport_dispatch",
+        "transport_http_map"
       ],
       "material": "serialized prompt, model identifier and bearer key",
-      "current_controls": "saved deadline/cancellation, redirects/retries disabled; no BLP engagement reservation",
+      "current_controls": "saved deadline/cancellation, redirects/retries disabled; no classified-send BLP engagement reservation Explicit persisted preparation_quarantine blocks admission/claim and controlled API/CLI egress. A dedicated shared egress reservation serializes config/BLP mutations through actual IO while releasing the business Trust reservation. Absent/false retains legacy behavior; no classified destination/sender authorization, descendant confinement or output inheritance is established. The controlled last-use decision path (CLI/HTTP readonly) is typemapped 400/404/409/403/500 and publishes nothing; it still does not engage the real send, which remains legacy/quarantined.",
       "missing_blp": [
         "BLP-04",
         "BLP-05"

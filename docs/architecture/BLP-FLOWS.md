@@ -1,5 +1,7 @@
 # Bell-LaPadula — inventaire des sources et transmissions Rust
 
+[Bell-LaPadula : état existant et interfaces](BELL-LAPADULA.md).
+
 [English](../en/BLP-FLOWS.md) · [Inventaire lié aux sources](blp-flow-inventory.json) ·
 [Plan BLP](../plans/actions-confiance/BLP-APEX.md) ·
 [Réexamen PAEA](../plans/actions-confiance/paea/BLP-REASSESSMENT-20261031.md).
@@ -185,3 +187,44 @@ ancrages couvrent le diagnostic et ses adaptateurs. La recette
 vérificateur, avec intégrité vérifiée. Le refus de l’ancien inventaire reste
 conservé dans `20261101-preparation-flow-inventory-before-01`. Ces comptes ne sont
 pas des comptes de contrôles BLP effectifs ni une acceptation indépendante.
+
+### Révision : quarantaine explicite des préparations
+
+BF-05/06/07 incluent le refus courant à l’admission, au claim et au transport API/CLI. Quatre ancrages supplémentaires suivent le verrou egress dédié et les mutations Trust locales/enrôlées ; le verrou métier est relâché avant l’IO. Les dix références dont les sources ont changé ont été relues et actualisées. Les 25 flux restent OPEN : une quarantaine optionnelle ne fournit ni autorisation classifiée de destinataire ni héritage de résultat ni confinement des descendants. Les preuves du nouveau parcours sont conservées dans le plan APEX.
+
+BLP-04 ajoute le producteur public blp-preparation-attribute : il sélectionne une tranche
+du tour natif vérifié sous I3/admin habilité, sans digest/chemin déclarés par le
+demandeur. Deux nouveaux ancrages portent l’inventaire à56 ; les25 flux restent
+OPEN. Ce contrôle après capture ne fournit ni domaine fixe à l’admission, ni
+autorisation de destinataire, ni héritage des résultats.
+
+L’admission pré-transport ajoute quatre ancrages (60 au total) au flux BF-05 :
+producteur partagé sans tour/réservation, attribution explicite des tranches
+avant admission et capsule immuable sous principal authentifié. Les25 flux
+restent OPEN : ni destinataire/transport autorisé, ni héritage des résultats,
+ni protection générale des envois legacy ou des transformations amont.
+
+### Révision : liaison de destination et décision de transport au dernier usage
+
+BF-05 et BF-07 ajoutent la liaison de destination explicite et la décision
+last-use `blp-preparation-transport` : un administrateur habilité enregistre un
+label de destination pour le compte/endpoint exact d’une connexion `api-`
+(écho `base_url`/`model` obligatoire, digest canonique par Root, clé jamais en
+entrée), puis le principal propriétaire d’une capsule admise peut observer une
+décision go/no-go sous le verrou egress partagé : re-vérification complète de la
+capsule (principal, instance, révisions, digest de politique, rejointe de chaque
+source, label de sortie reconstruit), fraîcheur connection/provider_source/
+settings depuis l’admission, label courant pour ce digest exact, dominance
+no-write-down au dernier usage et observation lecture seule des enveloppes de
+budget. La réponse est fixe et non émissive (`runtime_authorized:false`,
+`runtime_enforced:false`, état `transport-authorized-not-sent`) ; aucun tour,
+réservation ou IO fournisseur n’est produit, et aucun chemin legacy n’est modifié.
+Les refus typés couvrent grammaire (`blp-transport-invalid`,
+`blp-destination-invalid`), écho (`blp-destination-echo-mismatch`), attribution
+absente (`blp-destination-not-attributed`), fraîcheur
+(`blp-transport-connection-changed|provider-source-changed|settings-changed`),
+write-down (`blp-access-denied`) et budget
+(`preparation-budget-exhausted|work-budget-exhausted`) ; le mapping HTTP
+distingue 400/404/409/403/500. La surveillance ne crée ni droit d’émission ni
+confinement OS ni héritage de résultat ; BF-07 reste OPEN pour l’engagement
+réel du transport, BF-05 pour l’identité physique des sources.

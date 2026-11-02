@@ -1,5 +1,7 @@
 # Bell-LaPadula — PAEA technical subplan
 
+Current operational state: [Bell-LaPadula in Swarm](../../BELL-LAPADULA.md). Dated sections below retain historical evidence and its limits.
+
 [Français: detailed technical plan and historical handoff](../../../plans/actions-confiance/BLP-APEX.md).
 
 ## Authority and integration
@@ -537,3 +539,391 @@ BF-16 retains these prerequisites; this diagnostic is no dispatch ticket. No liv
 Trust bootstrap, paid provider, human declassification or global conformance;
 same-context review only. Final tracking/inventory edits do not change the
 installed executable.
+
+## Documentation resumption — existing state, 1 November 2026
+
+User request: document existing implementation after clarifying that BLP is
+incomplete. Replan: contracts/evidence exist but scope is scattered across Biba,
+flows and plan history. Alternatives: extend history only, or create a linked
+FR/EN operational reference. The latter is implemented in
+[Bell-LaPadula in Swarm](../../BELL-LAPADULA.md), linked from README, security
+positioning, Biba and flows. Owner: Codex.
+
+The reference distinguishes pure calculation, administration, exact attribution,
+targeted PAEA readers, native v3 provenance and post-recording diagnostic. It
+explains authority, absent physical lineage/inheritance, real operations and
+unfinished packages. Evidence stays bound to its sources/profiles and local
+owner-key flow; no Authority/enrollment qualification or global conformance is
+added. Version API reread:296, compiled b4cbfa2255, modified=true (dated observation).
+
+Checks: local links/anchors, retained evidence counts and FR/EN review. No code,
+policy, validation or error handling changed; no function created/modified and
+no Rustdoc/docstring update required. Edited documentation is absent from the
+qualified compiler input inventory: no build/restart/new delivery note. Other
+sessions' version_history.json edits remain preserved. Persistent links reach
+future repository readers; documentation rebuilds no embedded context or running
+process. Increment review: `verification-blp/20261101-blp-documentation-review.json`.
+
+## Execution resumption — preparation egress lock, 1 November 2026
+
+User authorizes continued BLP-04/05/result inheritance, then filesystem/network/
+descendant mediation, migration and human declassification. Current worker
+receives network-capable data after budget/freshness checks without a BLP lease
+through emission. Existing results and unrelated work remain preserved.
+
+Alternatives: check only at send receipt (activation/revocation gap before IO),
+or serialize actual transport with Trust changes and also refuse before admission.
+Choose the second. First step: persisted boolean `preparation_quarantine`, absent/
+false retains legacy behavior, true explicitly refuses new sends and pending
+worker egress. No activation on live data. Admin policy JSON, API and CLI share
+validation/effective value, with explicit FR/EN status. Policy changes wait for
+an already-engaged shared reservation; existing stop/deadline policies apply.
+No new timeout/cap or implicit role.
+
+Criteria: legacy JSON/digest unchanged for absent/false; reject null/wrong type;
+readonly preview/save/reopen/recovery; valid inert sender before activation then
+zero emission after refusal; transport recheck, serialized activation against
+in-flight egress; preserve causes/observed effect on release failure. Permanent
+recipes, byte-bound review, FR/EN docs and qualified local installation. Owner:
+Codex, no delegation/paid provider. This lock supplies no authorized classified
+send, inherited response label or descendant confinement; these remain open and
+work continues beyond the lock.
+
+Pre-delivery availability replan: core-01 validated a global Trust lease during
+IO, which would also block business writes. Alternatives: retain blocking with
+manual stop, or separate egress serialization and keep Trust only for a snapshot.
+Choose dedicated preparation-egress.lock: shared through operation, exclusive
+for config-apply/blp-policy-apply, order egress → optional SQL → short Trust.
+Enrolled consumer acquires egress before its SQL transaction to avoid admission
+inversion. Canonical I3/admin preflight rejects unauthorized waiters; authoritative
+authentication repeats. Core-01 remains historical, superseded for concurrency;
+11/11 pure model sources remain unchanged. New witness requires egress writer
+blocked, business Trust writer available and weak caller refused without waiting.
+Public journey also covers already-engaged CLI emission.
+
+Evidence recovery: locks-02 refuses qualification despite 1+15 passing tests because UI translations changed during execution. These are not compiler inputs for engine tests; remove those four inputs from the engine-only collector and retain UI verification in its public journey. The original refusal is preserved.
+
+Method check: assumed npm script `i18n:check` does not exist; the refusal is retained in the session. The actual package.json contract provides `i18n:build`, whose generator accepts `--check`; verification uses that direct command without changing compiled resources.
+
+Replan public-01: 25 transport assertions pass; browser fails before interaction on an assumed test URL. native_admin.rs serves trust-native.html at /trust-actions.html, not /trust-native.html. Correct journey and route → compiled-source mapping; enrich HTTP diagnostics with credential-free pathname. No product change, tolerance or hidden404; resume with corrected inputs.
+
+## Quarantine qualification and delivery — November1,2026
+
+Implemented, verified and installed version299, SHA256
+`75ad879faf4807d33b6b9c3ff5a71e570aa76d252f394da3b309d95ecadda5e9`.
+Normal native profile without fixtures; pending-turn helper compiled separately.
+Retained checks: pure model11 (unchanged core-01 sources), release1 + confidentiality15
++ enrollment4 (locks-03), public28 and Admin59 (public-02), inventory54 anchors/
+25 OPEN flows and5 checker regressions (inventory-01). Inert receivers observe
+sockets and actual requests, including API/CLI engaged-operation serialization,
+no-egress refusal, queued production worker refusal and explicit recovery.
+
+Exact prepared restart, running process/version/FR/EN notes/protected assets,
+56 browser assertions and FR/EN CLI help verified (installed-01). Compiled commit
+d4e219eeaf, modified=true. Launcher discloses one newer compiler input pending.
+No live Trust bootstrap, data classification or quarantine activation; no paid
+provider, commit or push performed by this increment. Third-party work preserved.
+Evidence and byte-bound self-review: verification-blp/20261101-preparation-quarantine-*.
+Original locks-01/02 and public-01 refusals remain intact. Persistent FR/EN contracts
+and recipes transmit the verified lesson, without rebuilding already-started agent
+contexts. No independent acceptance or global conformity is claimed.
+
+Continue BLP-04 with authenticated admission principal, producer classifications
+and immutable captured-byte domain, then BLP-05 with fixed destination/account/current
+policy at transport and BF-16 inheritance onto results/errors/proposals/readers.
+Quarantine is an explicit block, without an authorized classified-send route.
+OS/descendant mediation, existing-data migration and BLP-06 remain open.
+
+## BLP-04 resumed — attribution from captured source, 1 November 2026
+
+After quarantine299, the diagnostic resolves prompt slices but public attribution
+still requires an operator-supplied digest/path. Options: immediately persist an
+execution domain before protecting its readers/destinations, or first connect
+attribution to the actual producer. Choose the latter. Codex alone implements
+`blp-preparation-attribute`: authenticated I3/admin, clearance for the explicit
+classification, current Trust/BLP/turn revisions, exact parent, Root instance and
+complete provenance; select a captured slice index instead of supplying its hash
+or path. Reuse attribution uniqueness, no declassification and publication/replay.
+Capture context participates in event identity; source text is never returned.
+
+Required checks: persistent CLI/API, identical replay, invalid index, wrong
+parent/revisions, authority before row lookup, forged input/refusal without
+mutation, diagnostic join after source classification, identified native profile
+and local installation. Identical slices remain one object per digest/project/
+revision; another event does not relabel them. This is post-capture control
+attribution, without durable physical lineage, admission principal, immutable
+domain, allowed classified egress or output inheritance. These remain open.
+
+Replan de recette / recipe recovery: before-01 échoue avant le nouveau parcours
+(KeyError revision). Le DTO réel expose source_revision ; correction du consommateur
+de test, preuve originale conservée, reprise dans before-02. Aucun comportement
+produit ne découle de ce premier échec.
+
+Verification availability recovery: compilation remains active under observed
+memory pressure (14GiB RAM,14GiB/15GiB swap) and concurrent Git pack-objects
+(~6GiB, another parent). No arbitrary timeout or interruption of others; monitor
+outputs/CPU while doing independent documentation work. Slowness is not a test result.
+
+Pre-delivery review found a redundant nested SQL transaction when the consumer
+already owns one. engine-01 was deliberately interrupted (only its own rustc)
+and remains an intact FAIL. Use one complete row read instead; retain a valid
+control, caller-transaction preservation, corruption/Root/history refusal and
+recovery regression. No production failure was observed: the signed enrollment
+vocabulary does not yet expose BLP operations. This change neither adds them nor
+qualifies enrollment authentication. The touched CLI help also incorrectly said
+there was no execution control despite quarantine; FR/EN now say partial controls
+and distinguish authenticated blp-check from Admin-only administration.
+
+Retained improvement: operators need to distinguish slices and identical digests
+without SQL access. Value: understandable explicit classification; scope: future
+protected source inventory; owner BLP/UX; status OPEN. Observable: identity/
+clearance before metadata, correct producer selection, no unauthorized classified
+text. This API does not provide that screen.
+
+engine-02 recovery: both tests pass, but the inherited collector includes web
+sources for its later step; native_admin.rs changes during the engine test and
+correctly refuses the whole batch. Split engine and HTTP adapter recipes using
+their actual dependencies. Engine reuses the locks-03 dependency closure; web
+remains in its own collector and the qualified-image public journey. Lesson:
+bind evidence per compiled stage instead of inheriting a combined collector.
+Original engine-02 remains intact/FAIL.
+
+Method recovery: engine-03 was recompiling despite the2 unchanged results, so
+only its own compiler was stopped; retain the refusal. engine-reuse.json records
+reuse of2 named engine-02 tests and522 retained engine inputs identical before,
+after and currently. The original batch remains FAIL, without full compiler-
+graph or production-profile claims. Keep the corrected engine recipe for future
+relevant changes.
+
+Observed server is303 (another delivery;299 remains historical). Build304
+compiles in38.88s but qualification refuses concurrent edits to locales/en.json,
+web/i18n-en.js and web/native-authority-admin.js. No restart or304 installation.
+Originals retained in build-01. Resume with a new effective-input snapshot after
+Authority/UI edits, an independent HTTP recipe and qualified-image public flow.
+
+build-02/adapters-01 recovery: the named HTTP unit passes1/1, but its batch
+refuses Authority source changes during compilation. The second build also
+compiles then refuses changed audit.rs/server.rs. These are actual compiler
+dependencies: no exclusion or installation of a refused candidate. Both builds
+and the adapter batch remain intact FAIL. User coordination requested: finish
+or pause Authority edits for a qualification window; owner Authority session/
+user. None of its processes was interrupted. Independently extend the public
+engine operation regression: actual captured attribution, refusal/replay/event
+conflict, corruption/Root/history and no declassification after renewal. Only
+engine regression sources change; no runtime change after build-02.
+
+public-01 recovery: CLI attribution and HTTP replay pass. The first HTTP refusal
+assertion fails because CLI tuples (code, status) were reused as (status, code).
+The original response is403 authorization_required, matching the contract.
+Explicitly convert tuple order for the HTTP consumer; preserve original failure,
+change no runtime code and rerun the same qualified341e71bb… image with a fresh fixture.
+
+## Captured-source producer delivery — 1 November 2026
+
+Installed and verified **v0.1.1-dev.304**, image SHA256
+`341e71bb2e67d47d0c468c04f8c7ecd38f313fb0686b60af88ba675d50cbade6`,
+compiled commit821dbb340ceb99b323fd4bb9a7f2bbdc106b0e9c, modified=true. The third
+build obtained stable inputs and a qualified native profile without fixtures;
+refused builds remain intact and were never installed. Exact prepared-image
+restart reported0 newer compiler inputs then. Authority coordination required
+no interruption of its processes.
+
+Evidence: engine-04,2 named tests PASS/VERIFIED; adapters-02,1 HTTP unit PASS/
+VERIFIED; public-02,103 CLI/HTTP assertions PASS/VERIFIED, including actual HTTP
+publication then CLI replay and attribution under quarantine without lifting it;
+inventory-02,56 anchors/25 OPEN flows and5 regressions; installed-01,21 matching
+runtime inputs and56 browser checks covering version, FR/EN notes, actual commit
+and dirty disclosure. Engine functional test bytes remain unchanged after adding
+its Rustdoc only (separate test-doc-review); no invented rerun for documentation.
+Original recipe errors, interruptions and concurrent changes remain retained.
+
+Byte-bound self-review: `20261101-preparation-source-producer-source-review.json` covering policies, functions, errors
+and documentation. No independent review, global acceptance or transversal BLP
+claim. No paid call, real classification, Trust bootstrap, real policy activation,
+commit or push by this increment.
+
+BLP-04 gains post-capture control attribution, not an admission-time domain.
+Next retained work: authenticated admission sender, inherited producer labels and
+fixed domain; actual account/recipient transport binding (BLP-05), then results
+and BF-16 readers. Files/network/descendants, migration and human declassification
+remain open. `runtime_enforced:false` stays justified. Docs/recipes persist but
+do not replace already running agent contexts.
+
+Final check: concurrent stash restoration creates conflicts in both PAEA-APEX
+languages. Original bytes (losslessly compressed) and Git stages retained in
+documentation-conflict-01; preserve historical299 then304 sections and adjacent
+text, resolving only these two documentation index entries. No commit/runtime
+change. Working/index diff checks and documentation review refreshed.
+
+## BLP-04 resumed — fixed domain before egress, 1 November 2026
+
+User authorizes admission-time domain work. Compare promotion of historical/
+pending turns with exposed legacy readers/dispatch against a separate immutable
+admission with no executable turn. Choose the latter: reuse the exact prompt
+producer, capture without SQL/budget mutation, explicitly attribute slices through
+a cleared I3/admin operation, then join all current attributions for the actual
+authenticated admitting principal. Unknown sources refuse without a capsule;
+no role, label, account or destination is inferred.
+
+Private create-only capsule uses existing native receipt framing (observed extent/
+SHA), binds opened Root, principal, policy revisions/digest and complete prompt
+bytes. Its namespace is separate from legacy turns/readers/workers. Immutable
+replay, current principal/clearance metadata reads, policy/Root/corruption refusal.
+Admission reserves no budget, contacts no provider and grants no transport.
+Quarantine neither blocks this local no-provider-IO work nor changes implicitly.
+Reuse persisted context and storage-contention policies. Required evidence:
+producer parity, no mutation on capture/refusal, authority before lookup,
+pre-admission attribution, missing-source/clearance/revision/no-declassification
+refusals, fixed capsule/replay/reopen, corruption/uncertain publication handling,
+no turns/budget/egress, actual CLI/API, FR/EN docs and qualified local delivery.
+Codex alone; no delegation/paid provider/live policy changes. Recipient, output/
+reader, OS and migration contracts remain open.
+
+engine-01 recovery: normal compilation refuses AtomicStorageFault through its
+fixture-only public reexport. Use the existing internal type as Trust storage
+does; do not enable fixture features. Also retain requested level/target/context
+mode without credentials for the future still-unauthorized transport integration.
+
+engine-02 recovery:6 cases pass including admission; a historical test expects
+active legacy replay to refuse. Actual304 instead reproduces readonly/pending
+with the row unchanged; replay_turn bytes match the304 profile exactly. Keep
+original FAIL. Correct the test contract: readonly observation, no native
+dispatch, native claim refused and reservation unchanged. Rerun only this case;
+the six passing test bodies/runtime code stay unchanged. Retain actual public
+legacy-baseline-01 evidence. Git maintenance finishes without interruption;
+no suspension was applied without a response granting authority.
+
+build-01 compiles normally in40.88s but qualification refuses changed Authority
+audit.rs/server.rs during compilation. Originals retained; no installation or
+dependency exclusion. Next build uses the updated actual Authority inputs.
+Observed instance before this build was308 (another delivery).
+
+public-01 recovery: CLI admission/join/no-mutation checks pass; a local http
+function shadows the imported Python module before the first HTTP request.
+Rename only that helper to request_http and update the inherited evidence prefix.
+Keep original FAIL, use a fresh fixture and the same qualified309 image; no runtime change.
+
+Actual delivery recovery:309 runs internally on38434 behind Authority38433.
+Owner-key probe verifies image/version/22 sources/notes then gets403 for protected
+assets, as required by Authority mode. No gate weakened or human credential
+fabricated. installed-01 retains refusal; installed-02 explicitly reports
+PARTIAL_AUTHORITY_UI_NOT_VERIFIED with22 sources and three asset403 controls.
+Browser host unavailable; actual signed-in UI observation requested from user.
+Newer Authority/assertion.rs wire-v2 source is outside image309; its delivery is
+not claimed and belongs to Authority work. Authority status reports active but
+installed binary differs from latest build; no human-session diagnosis inferred.
+
+Independent UI fixture uses the SAME production image. First driver incorrectly
+calls observed Server.request during async capture; actual contract requires
+observe=False for separate HTTP. Correct only driver, fresh ui-02, preserve live
+Authority UI criterion OPEN. Shared browser recipe now explicitly distinguishes
+owned-image fixture from managed instance with identical assertions and a private
+fixture marker, never an authentication bypass.
+
+## Pre-transport admission state — 1 November 2026
+
+Implemented code is active in **v0.1.1-dev.309**, image SHA256
+`c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b`.
+Qualified normal native profile, no fixtures; exact shared-producer body parity.
+Actual admitting Trust principal, all-current-source join and immutable private
+capsule, with no provider IO, executable turn, budget reservation or sink grant.
+Routing metadata contains no key and supplies no recipient authority.
+
+Code evidence:6 unchanged passed engine-02 test bodies reused, plus1 corrected
+legacy case PASS/VERIFIED (engine-reuse/legacy-01). Original engine-02 remains
+FAIL, not a fabricated full-batch PASS; its only failure reproduces on304 and
+the test is corrected to actual readonly replay. Public-02:74 CLI/HTTP assertions
+PASS/VERIFIED, including join distinct from maximum clearance, real HTTP input
+attribution, revocation, frame/Root/label/JSON corruption controls/recovery and
+no provider/turn/reservation. Legacy-public-01:103 previous assertions pass on
+the same image with an inert CLI provider. Inventory-01:60 anchors/25 OPEN flows
+and5 checker regressions.
+
+Exact prepared-image restart activates309. Installed-02 verifies running image/
+PID, version, FR/EN notes/help and22 runtime files. Newer Authority assertion.rs
+v2 source is outside this image and remains Authority delivery work. The other
+workstream switched the real instance to Authority: daemon38433, engine38434.
+Three protected assets correctly refuse the owner cookie403; no gate disabled.
+Real Authority UI verification remains **OPEN**, owned by user/session: actual
+sign-in and Version dialog observation; browser host currently unavailable.
+Installed-02 explicitly reports PARTIAL_AUTHORITY_UI_NOT_VERIFIED, never UI PASS.
+
+Ui-02 separately passes56 browser assertions on an owned Root using the SAME
+production image (actual served assets, FR/EN notes, version/commit). This does
+not establish real Authority-session acceptance. Original refusals retained;
+no live classification/policy changes, paid provider, commit/push or fabricated
+human identity. [Byte-bound source review](../../../plans/actions-confiance/verification-blp/20261101-preparation-admission-source-review.json) covers policies/functions/errors/docs;
+self-review only. Next BLP-05 binds current account/recipient/key and rights/
+budgets at actual transport, then output inheritance/readers and OS/descendants.
+Upstream transformations, migration, human declassification and capsule retirement
+remain open; runtime_enforced:false stays justified. Persistent docs/recipes do
+not replace existing native contexts or establish recurring supervision.
+
+## Resume BLP-05 — recipient and last-use transport, 1 November 2026
+
+Need: BLP-05 — effective account/recipient control at last use, before provider
+emission. User choice confirmed: **explicit sink binding** — one operation
+records a destination label for the exact account/endpoint
+(base_url+model+config digest); the classified send revalidates
+capsule+destination+policy/budget at last use under the egress lock; the legacy
+send path is **not** modified.
+
+### Delivered (implemented + locally tested, not activated in the worker)
+
+- `blp-preparation-destination-attribute`: privileged administrator, mandatory
+  `base_url`/`model` echo of the current connection, canonical digest recomputed
+  by the Root (never caller-supplied), key never an input; goes through the
+  `blp-object-attribute` producer (exact-once uniqueness, inherited
+  anti-declassification guard). [`preparation_transport.rs`](../../../rust/crates/swarm-engine/src/root_store/preparation_transport.rs)
+- `blp-preparation-transport`: under the shared egress lock, full capsule
+  re-verification, connection/provider_source/settings freshness since
+  admission, current binding for that exact digest, last-use no-write-down
+  dominance, read-only budget observation; fixed non-emissive reply
+  (`transport-authorized-not-sent`, `runtime_authorized:false`,
+  `runtime_enforced:false`), publication `None`.
+- Dispatch readonly + egress: `trust_store.rs:69-122`; HTTP mapping
+  400/404/409/403/500 in `swarm-web/src/service/trust.rs`; CLI whitelist
+  `swarm-cli/src/trust.rs`; public readonly `blp-preparation-transport`.
+- Integration test `rust/crates/swarm-engine/tests/preparation_transport.rs`:
+  **PASS 1/1 (2.0s)** — not-attributed refusal, TOCTOU echo, admin-only
+  binding, key-free recorded binding, exact replay, fixed non-emissive decision,
+  identical replay, ownership, zero SQL reservations, self-cleaned fixture.
+- Public journey `tests/blp_transport_public.py` + recipe
+  `tools/verification/recipes/blp-preparation-transport-public.json`:
+  **executed on 2 November 2026 on the qualified binary** sha256 `41f00bf9…`
+  (profile `rust-zrtk4hyt`, locally installed, v0.1.1-dev.312): **PASS 65/65
+  assertions** (`BLP_TRANSPORT_JOURNEY_SHA256` `0690d1e0…`), recipe
+  `recipe.py run` PASS then `recipe.py verify` `VERIFIED/PASS` (evidence
+  `.swarm-fixtures/blp-transport-recipe-20261102/`, journey
+  `.swarm-fixtures/blp-transport-proof-20261102/`). The journey also proves
+  identical replay, no-write-down (`blp-access-denied`), policy-renewal
+  invalidation (3 revisions), settings freshness, identity revocation, the
+  full HTTP map (200/400/404/404-ownership/403) and zero provider launch or
+  SQL mutation (sentinel + counters). No `/tmp` residue from the journey.
+- BF inventory (`tools/paea/check_blp_inventory.py`): refreshed, 65
+  references / 25 flows, 0 drift, +5 transport references (producer,
+  dispatch, HTTP).
+- Improvement surfaced by execution: `preparation_calls.rs` allocated its
+  fixtures via `std::env::temp_dir()` (31 October `/tmp` interdiction);
+  fixed on the established pattern (`TMPDIR` required + `/tmp` refusal,
+  birth record, `Drop` retaining the root on panic only). Suite
+  **7/7 PASS**, proof `/tmp` before=after, zero remaining root.
+- Byte-bound review: [source-review](verification-blp/20261102-preparation-transport-source-review.json).
+- FR/EN documentation: BELL-LAPADULA (new section), BIBA-RUST (full technical
+  contract + diagram), BLP-FLOWS (BF-05/BF-07 revision paragraph).
+
+### Limits retained
+
+The decision does not engage the real transport (BF-07 OPEN); result/reader
+inheritance, OS/descendant confinement, legacy sends, upstream transformations:
+unchanged. `runtime_enforced:false` stays justified. The worker hook (Api branch
+of `preparation_worker.rs`) is the **next** increment, not this one; no existing
+send path was touched. No real data classified, no paid provider, no real
+capsule.
+
+### Next step
+
+Next increment: the worker emission hook (Api branch of
+`preparation_worker.rs`) calling the last-use decision before any classified
+send; the legacy path stays untouched. Increment RETEX:
+[RETEX-BLP-05-20261102](paea/RETEX-BLP-05-20261102.en.md).

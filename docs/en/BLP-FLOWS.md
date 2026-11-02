@@ -1,5 +1,7 @@
 # Bell-LaPadula — Rust source and transmission inventory
 
+[Bell-LaPadula: existing implementation and interfaces](BELL-LAPADULA.md).
+
 [Français](../architecture/BLP-FLOWS.md) ·
 [Source-bound inventory](../architecture/blp-flow-inventory.json) ·
 [BLP plan](plans/actions-confiance/BLP-APEX.md) ·
@@ -170,3 +172,44 @@ diagnostic/adapters. `20261101-preparation-flow-inventory-01` passes two steps a
 five checker tests with verified integrity. Stale inventory refusal remains in
 `20261101-preparation-flow-inventory-before-01`. Counts do not establish effective
 BLP controls or independent acceptance.
+
+### Revision: explicit preparation quarantine
+
+BF-05/06/07 include current refusal at admission, claim and API/CLI transport. Four additional anchors track the dedicated egress lock and local/enrolled Trust mutations; the business lock is released before IO. The ten references whose sources changed were reread and refreshed. All 25 flows remain OPEN: optional quarantine establishes neither classified recipient authorization, result inheritance nor descendant confinement. New journey evidence is retained in the APEX plan.
+
+BLP-04 adds the public blp-preparation-attribute producer: it selects a verified native
+turn slice under cleared I3/admin authority without caller-supplied digest/path.
+Two anchors bring the inventory to56; all25 flows remain OPEN. This post-capture
+control establishes neither an admission-time fixed domain, recipient permission
+nor output inheritance.
+
+Pre-transport admission adds four BF-05 anchors (60 total): shared producer
+without turn/reservation, explicit pre-admission source labels and immutable
+capsule for the actual authenticated principal. All25 flows remain OPEN: no
+allowed recipient/transport, output inheritance or general legacy-send/upstream
+transformation protection is established.
+
+### Revision: explicit destination binding and last-use transport decision
+
+BF-05 and BF-07 add the explicit destination binding and last-use
+`blp-preparation-transport` decision: a privileged administrator records a
+destination label for the exact account/endpoint of an `api-` connection
+(mandatory `base_url`/`model` echo, per-Root canonical digest, key never an
+input), then the principal owning an admitted capsule can observe a go/no-go
+decision under the shared egress lock: full capsule re-verification (principal,
+instance, revisions, policy digest, per-source join, rebuilt output label),
+connection/provider_source/settings freshness since admission, the current label
+for that exact digest, no-write-down dominance at last use, and read-only budget
+envelope observation. The reply is fixed and non-emissive
+(`runtime_authorized:false`, `runtime_enforced:false`, state
+`transport-authorized-not-sent`); no turn, reservation or provider IO is
+produced, and no legacy path is modified. Typed refusals cover grammar
+(`blp-transport-invalid`, `blp-destination-invalid`), echo
+(`blp-destination-echo-mismatch`), missing attribution
+(`blp-destination-not-attributed`), freshness
+(`blp-transport-connection-changed|provider-source-changed|settings-changed`),
+write-down (`blp-access-denied`) and budget
+(`preparation-budget-exhausted|work-budget-exhausted`); the HTTP mapping
+distinguishes 400/404/409/403/500. The surveillance grants neither emission
+rights, OS confinement, nor result inheritance; BF-07 remains OPEN for the real
+transport engagement, BF-05 for physical source identity.
