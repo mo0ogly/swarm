@@ -3339,6 +3339,44 @@ for corrupted provenance, incompatible Root, different operation context and
 cleanup. The public recipe now requires 26 assertions, including eight exact
 HTTP status/code cases (200/400/403/404/409). The HTTP500 reproducer used an
 explicitly unqualified compiled image for defect evidence only, never delivery.
+
+## Recette blp-preparation-transport-public (liaison du destinataire, décision au dernier usage)
+
+`recipes/blp-preparation-transport-public.json` exige `SWARM_BLP_BINARY` et
+`SWARM_BLP_PROFILE` (profil normal qualifié) ; `SWARM_BLP_PROOF_OUTPUT` peut
+sélectionner un dossier de parcours neuf. Le parcours exerce la liaison
+explicite du destinataire (`blp-preparation-destination-attribute` : grammaire
+`api-`, écho TOCTOU `base_url`/`model`, réservée admin, rejeu exact, sans clé)
+puis la décision de transport au dernier usage (`blp-preparation-transport` :
+champs fixes non émissifs, rejeu identique, ownership, écho erroné, connexion
+autre, invalidation par renouvellement de politique, refus no-write-down
+`blp-access-denied`, fraîcheur des paramètres, révocation d'identité), et la
+même décision via la route HTTP protégée (200/400/404/404-ownership/403).
+Un programme sentinelle prouve qu'aucun fournisseur n'est lancé sur refus,
+décision ou rejeu ; les compteurs SQL en lecture seule prouvent l'absence de
+tour/réservation. La décision n'engage pas le transport réel, n'hérite pas des
+résultats et ne confine pas les descendants ; `runtime_enforced:false` reste
+justifié. Le digest final imprimé lie le manifeste du parcours ; vérifier ses
+fichiers en plus du reçu externe de `recipe.py verify`.
+
+## Recipe blp-preparation-transport-public (recipient binding, last-use decision)
+
+`recipes/blp-preparation-transport-public.json` requires `SWARM_BLP_BINARY` and
+`SWARM_BLP_PROFILE` (qualified normal profile); `SWARM_BLP_PROOF_OUTPUT` may
+select a fresh journey directory. The journey exercises the explicit recipient
+binding (`blp-preparation-destination-attribute`: `api-` grammar, `base_url`/
+`model` TOCTOU echo, admin-only, exact replay, key-free) then the last-use
+transport decision (`blp-preparation-transport`: fixed non-emissive fields,
+identical replay, ownership, wrong echo, other connection, policy-renewal
+invalidation, no-write-down refusal `blp-access-denied`, settings freshness,
+identity revocation), and the same decision through the protected HTTP route
+(200/400/404/404-ownership/403). A sentinel program proves no provider is
+launched on refusal, decision or replay; readonly SQL counters prove no
+turn/reservation. The decision does not engage the real transport, inherits no
+results and confines no descendants; `runtime_enforced:false` stays justified.
+The printed final digest binds the journey manifest; verify those files as well
+as the outer recipe receipt.
+
 ## Recette local-pair-guard-rust (garde de paire d'assertion avant remplacement moteur)
 
 `recipes/local-pair-guard.json` épingle la prévention de l'incident du

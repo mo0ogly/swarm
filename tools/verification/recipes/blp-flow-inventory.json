@@ -51,7 +51,12 @@
     "rust/crates/swarm-engine/src/root_store/reader_guard.rs",
     "rust/crates/swarm-cli/src/trust.rs",
     "rust/crates/swarm-web/src/service/trust.rs",
-    "rust/crates/swarm-web/src/service.rs"
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_confidentiality.rs",
+    "rust/crates/swarm-engine/src/root_store/trust_enrollment.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_attribution.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_admission.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_transport.rs"
   ],
   "environment": {},
   "steps": [
@@ -65,7 +70,7 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "\"reference_count\": 50",
+        "\"reference_count\": 65",
         "\"flow_count\": 25",
         "BLP_INVENTORY_CURRENT declared anchors and source hashes only; runtime protection not established"
       ],

@@ -29,6 +29,7 @@ def main():
     """
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ['binary','profile','output']:parser.add_argument('--'+name,type=Path,required=True)
+    parser.add_argument('--producer-attribution',action='store_true',help='Attribute through the captured-source public producer instead of caller hashes')
     args=parser.parse_args();binary=args.binary.resolve(strict=True)
     out=args.output.resolve();out.mkdir(mode=0o700,exist_ok=False)
     profile=json.loads(args.profile.read_bytes());sha=digest(binary)
@@ -81,7 +82,7 @@ print(json.dumps({'type':'turn.completed','usage':{'input_tokens':1,'output_toke
         assert part['start']==cursor and part['end']>cursor
         assert hashlib.sha256(raw[cursor:part['end']]).hexdigest()==part['sha256'];cursor=part['end']
     check('complete-byte-coverage',cursor==len(raw))
-    trust('config-apply',dict(schema_version=1,event_id='trust-init',expected_revision=0,reason='Owned source fixture',policy=dict(mandate_ttl_seconds=3600,unknown_reconcile_seconds=0,evidence_retention_days=365,require_separation=True),identities=[dict(subject='admin',integrity=3,roles=['admin'],token='fixture-admin-token'),dict(subject='worker',integrity=1,roles=['requester'],token='fixture-worker-token'),dict(subject='approver',integrity=2,roles=['approver'],token='fixture-approver-token')]),token='')
+    trust('config-apply',dict(schema_version=1,event_id='trust-init',expected_revision=0,reason='Owned source fixture',policy=dict(mandate_ttl_seconds=3600,unknown_reconcile_seconds=0,evidence_retention_days=365,require_separation=True),identities=[dict(subject='admin',integrity=3,roles=['admin'],token='fixture-admin-token'),dict(subject='worker',integrity=1,roles=['requester'],token='fixture-worker-token'),dict(subject='approver',integrity=2,roles=['approver'],token='fixture-approver-token'),dict(subject='uncleared',integrity=3,roles=['admin'],token='fixture-uncleared-token')]),token='')
     policy=dict(schema_version=1,levels=[dict(id='public',name_fr='Public',name_en='Public'),dict(id='secret',name_fr='Secret',name_en='Secret')],compartments=['a','b'],clearances=dict(admin=dict(level='secret',compartments=['a','b']),worker=dict(level='secret',compartments=['a'])))
     trust('blp-policy-apply',dict(schema_version=1,event_id='policy',expected_revision=0,expected_trust_revision=1,reason='Owned source fixture',policy=policy))
     request=dict(schema_version=1,expected_revision=1,preparation_id=p['id'],turn_id=turn['id'])
@@ -89,12 +90,54 @@ print(json.dumps({'type':'turn.completed','usage':{'input_tokens':1,'output_toke
     refused=trust('blp-preparation-check',request,success=False)
     check('unattributed-source-refuses',refused.get('failure',{}).get('code')=='blp-classification-required')
     check('missing-attribution-does-not-mutate',state.read_bytes()==before)
+    if args.producer_attribution:
+        base_capture=dict(schema_version=1,event_id='invalid-capture',expected_revision=1,expected_trust_revision=1,
+            preparation_id=p['id'],turn_id=turn['id'],expected_turn_revision=turn['source_revision'],source_index=0,
+            classification=dict(level='secret',compartments=['a','b']),reason='Explicit captured fixture source')
+        producer_cases=[
+            ('session-before-row','',{**base_capture,'turn_id':'missing'},'authorization_required',403),
+            ('weak-role-before-row','fixture-worker-token',{**base_capture,'turn_id':'missing'},'authorization_required',403),
+            ('uncleared-before-row','fixture-uncleared-token',{**base_capture,'turn_id':'missing'},'blp-access-denied',403),
+            ('invalid-label','fixture-admin-token',{**base_capture,'classification':dict(level='missing',compartments=[])},'blp-classification-invalid',400),
+            ('bad-schema','fixture-admin-token',{**base_capture,'schema_version':0},'blp-preparation-attribute-invalid',400),
+            ('bad-index','fixture-admin-token',{**base_capture,'source_index':len(parts)},'blp-preparation-source-not-found',404),
+            ('stale-turn','fixture-admin-token',{**base_capture,'expected_turn_revision':turn['source_revision']+1},'preparation-revision-conflict',409),
+            ('wrong-parent','fixture-admin-token',{**base_capture,'preparation_id':'other'},'blp-preparation-parent-mismatch',409),
+            ('stale-policy','fixture-admin-token',{**base_capture,'expected_revision':0},'blp-policy-stale',409),
+            ('stale-trust','fixture-admin-token',{**base_capture,'expected_trust_revision':0},'blp-policy-stale',409),
+            ('forged-digest','fixture-admin-token',{**base_capture,'canonical_digest':'a'*64},'format',400),
+            ('forged-path','fixture-admin-token',{**base_capture,'project_path':str(f.root)},'format',400),
+            ('null-label','fixture-admin-token',{**base_capture,'classification':None},'format',400),
+            ('empty-reason','fixture-admin-token',{**base_capture,'reason':''},'blp-preparation-attribute-invalid',400),
+            ('missing-turn','fixture-admin-token',{**base_capture,'turn_id':'missing'},'preparation-turn-not-found',404)]
+        for name,token,value,reason,_ in producer_cases:
+            refused=trust('blp-preparation-attribute',value,token=token,success=False)
+            check('producer-cli-'+name,refused.get('failure',{}).get('code')==reason and state.read_bytes()==before
+                and 'PRIVATE_BLP_SOURCE' not in json.dumps(refused))
     seen=set()
     for part in parts:
         sha_part=part['sha256']
         if sha_part in seen:continue
         seen.add(sha_part);secret=part['origin'].get('field')=='user_message'
-        trust('blp-object-attribute',dict(schema_version=1,event_id='part-'+str(len(seen)),expected_revision=1,expected_trust_revision=1,canonical_digest=sha_part,project_path=str(f.root),classification=dict(level='secret' if secret else 'public',compartments=['a','b'] if secret else ['a']),reason='Exact recorded fixture slice'))
+        classification=dict(level='secret' if secret else 'public',compartments=['a','b'] if secret else ['a'])
+        if args.producer_attribution:
+            capture=dict(schema_version=1,event_id='part-'+str(len(seen)),expected_revision=1,expected_trust_revision=1,
+                preparation_id=p['id'],turn_id=turn['id'],expected_turn_revision=turn['source_revision'],source_index=parts.index(part),
+                classification=classification,reason='Explicit captured fixture slice')
+            attributed=trust('blp-preparation-attribute',capture)
+            check('producer-captured-source-'+str(len(seen)),attributed['canonical_digest']==sha_part and attributed['producer_captured'] is True
+                and attributed['source_index']==parts.index(part) and attributed['source_count']==len(parts))
+            snapshot=state.read_bytes()
+            check('producer-replay-'+str(len(seen)),trust('blp-preparation-attribute',capture)==attributed and state.read_bytes()==snapshot)
+        else:
+            trust('blp-object-attribute',dict(schema_version=1,event_id='part-'+str(len(seen)),expected_revision=1,expected_trust_revision=1,canonical_digest=sha_part,project_path=str(f.root),classification=classification,reason='Exact recorded fixture slice'))
+    if args.producer_attribution:
+        refused=trust('blp-preparation-attribute',{**capture,'reason':'Changed decision under reused event'},success=False)
+        check('producer-event-conflict',refused.get('failure',{}).get('code')=='event_conflict' and state.read_bytes()==snapshot)
+        refused=trust('blp-preparation-attribute',{**capture,'source_index':0},success=False)
+        check('producer-selector-conflict',refused.get('failure',{}).get('code')=='event_conflict' and state.read_bytes()==snapshot)
+        refused=trust('blp-preparation-attribute',{**capture,'event_id':'duplicate-source'},success=False)
+        check('producer-duplicate-object-refuses',refused.get('failure',{}).get('code')=='blp-attribution-conflict' and state.read_bytes()==snapshot)
     witness=trust('blp-preparation-check',request)
     check('source-derived-join',witness['output_classification']==dict(level='secret',compartments=['a','b']))
     check('diagnostic-is-not-dispatch-authority',witness['runtime_authorized'] is False and witness['diagnostic_only'] is True)
@@ -138,6 +181,42 @@ print(json.dumps({'type':'turn.completed','usage':{'input_tokens':1,'output_toke
                 (observed==witness if expected_status==200 else observed.get('failure',{}).get('code')==expected_code)
                 and b'PRIVATE_BLP_SOURCE' not in body)
         check('http-read-does-not-mutate',state.read_bytes()==before)
+        if args.producer_attribution:
+            # CLI cases carry (reason, status); the HTTP runner needs (status, reason).
+            producer_http=[('replay','fixture-admin-token',capture,200,None)]+[
+                (name,token,value,status,reason) for name,token,value,reason,status in producer_cases]
+            for name,token,value,expected_status,expected_code in producer_http:
+                headers={'Origin':'http://'+web.address,'Cookie':web.cookie,'X-Swarm-CSRF':csrf,'Content-Type':'application/json'}
+                if token:headers['Authorization']='Bearer '+token
+                connection=http.client.HTTPConnection(web.host,web.port,timeout=None)
+                try:
+                    connection.request('POST','/api/v1/trust-actions?action=blp-preparation-attribute',body=json.dumps(value).encode(),headers=headers)
+                    response=connection.getresponse();body=response.read();status=response.status
+                finally:connection.close()
+                observed=json.loads(body);publish(out/('producer-http-'+name+'.json'),dict(status=status,body=observed))
+                check('producer-http-'+name,status==expected_status and
+                    (observed==attributed if expected_status==200 else observed.get('failure',{}).get('code')==expected_code)
+                    and b'PRIVATE_BLP_SOURCE' not in body and state.read_bytes()==before)
+
+            # A genuine HTTP publication, not just an HTTP replay of CLI data.
+            # Renew the policy explicitly: previous object labels remain floors.
+            trust('blp-policy-apply',dict(schema_version=1,event_id='policy-quarantine-renewal',expected_revision=1,
+                expected_trust_revision=1,reason='Explicit fixture quarantine and renewal',policy={**policy,'preparation_quarantine':True}))
+            renewal={**capture,'event_id':'http-source-renewal','expected_revision':2}
+            before_write=state.read_bytes()
+            headers={'Origin':'http://'+web.address,'Cookie':web.cookie,'X-Swarm-CSRF':csrf,'Content-Type':'application/json','Authorization':'Bearer fixture-admin-token'}
+            connection=http.client.HTTPConnection(web.host,web.port,timeout=None)
+            try:
+                connection.request('POST','/api/v1/trust-actions?action=blp-preparation-attribute',body=json.dumps(renewal).encode(),headers=headers)
+                response=connection.getresponse();body=response.read();status=response.status
+            finally:connection.close()
+            written=json.loads(body);publish(out/'producer-http-publication.json',dict(status=status,body=written))
+            check('producer-http-real-publication-under-quarantine',status==200 and written['producer_captured'] is True
+                and written['policy_revision']=='2' and state.read_bytes()!=before_write and b'PRIVATE_BLP_SOURCE' not in body)
+            after_write=state.read_bytes()
+            check('producer-http-effect-reopens-through-cli',trust('blp-preparation-attribute',renewal)==written and state.read_bytes()==after_write)
+            show=trust('blp-show',{})
+            check('producer-does-not-lift-quarantine',show['capability']['preparation_quarantined'] is True and show['capability']['runtime_enforced'] is False)
     except BaseException as error:
         primary=error
         raise
