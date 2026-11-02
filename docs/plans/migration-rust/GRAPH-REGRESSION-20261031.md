@@ -1064,3 +1064,36 @@ hiérarchiques gardent leur parcours de révision de contrat, aucun undo génér
 ni restauration de preuves n’est ajouté. RETEX et transmission au prochain
 contexte par PLAN.md + docs produit FR/EN + tests/recette versionnés ; aucun
 contexte d’agent natif en cours n’est prétendu réécrit. Commit/push non réalisés.
+## Prévention paire-protocole livrée (clôture de l'item ouvert)
+
+L'item « prévention paire-protocole avant remplacement moteur » est livré et
+vérifié localement le 31 octobre 2026. Garde dans `tools/swarm_local.py`
+(`require_matching_assertion_pair`, branchée dans `main()` pour `start` et
+`restart`) : avant tout `stop()`, refus (exit 2, « Opération refusée : Paire
+d’assertion incompatible : … ») quand le mode d'accès sauvegardé du Root est
+`authority` et que le démon installé et le moteur candidat ne parlent pas le
+même protocole d'assertion. Discriminant observé : octets du domaine embarqué
+(`swarm-authority-assertion-v2\0`/`v1`, `rust/crates/swarm-authority/src/assertion.rs`) ;
+vérifié sur les binaires réels du jour — `bin/swarm` v2 et démon installé
+`/usr/local/lib/swarm-authority/swarm-authority` v2 (paire courante compatible,
+activation sans effet pour l'opérateur). Passages : owner-key, Root jamais
+initialisé, démon absent, protocoles égaux ; refus fail-closed : paire
+divergente (dans les deux sens), démon sans marqueur reconnu, réglages
+illisibles. Le refus ne nomme jamais la ligne de commande (argument opener =
+credential) et nomme la reprise `./swarm.sh authority install`.
+
+Preuve : reproduiseur `tests/test_local_pair_guard.py` (12 tests ; échec
+initial FAIL avant fix conservé — Root fixture créé hors umask 0o077 refusé
+« path » par le moteur, correction fidèle au parcours réel) + recette
+`tools/verification/recipes/local-pair-guard.json` PASS (12 tests, épinglée
+empreinte `41f00bf9…` v312, preuve `.swarm-fixtures/recipe-pair-guard-result.json/`).
+Suites voisines inchangées : `test_swarm_local.py` 14/14 (un échec intermédiaire
+FAIL avant fix conservé — fixture `built` sans marqueur rendait la comparaison
+d'empreintes d'`enable` légitimement refusante), `test_authority_refresh.py`
+8/8. Aucune écriture /tmp. Docs lanceur FR/EN mises à jour dans le même
+incrément (contrat de la garde, passages, limites : démon servi d'ailleurs hors
+de la garde, échec fermé à l'exécution).
+
+Reste ouvert (inchangé) : la preuve du parcours authentifié public (session
+humaine du démon) et l'inspection visuelle graphe restent bloquées sans session
+opérateur ; la garde observe le chemin d'installation par défaut uniquement.

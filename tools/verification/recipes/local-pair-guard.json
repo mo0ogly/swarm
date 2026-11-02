@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "id": "local-pair-guard",
+  "inputs": [
+    "swarm.sh",
+    "tools/swarm_local.py",
+    "tools/swarm_version.py",
+    "deploy/local-build.json",
+    "version_history.json",
+    "tests/test_local_pair_guard.py",
+    "tests/fixture_area.py",
+    "docs/architecture/NATIVE-LOCAL-LAUNCHER.md",
+    "docs/en/NATIVE-LOCAL-LAUNCHER.md",
+    "docs/plans/migration-rust/GRAPH-REGRESSION-20261031.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "local-pair-guard-refusal-and-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,hashlib,unittest\nfrom pathlib import Path\np=json.loads(Path(os.environ['SWARM_STATUS_CONTRACT_PROFILE']).read_text())\nb=Path(os.environ['SWARM_STATUS_CONTRACT_BINARY']).resolve()\nif hashlib.sha256(b.read_bytes()).hexdigest()!=p['sha256']:raise ValueError('pair-guard-recipe-binary-mismatch')\nos.environ['SWARM_TEST_BINARY']=str(b)\nsuite=unittest.defaultTestLoader.discover('tests',pattern='test_local_pair_guard.py')\nresult=unittest.TextTestRunner(verbosity=2).run(suite)\nif result.testsRun!=12 or not result.wasSuccessful() or result.skipped:raise SystemExit('pair-guard-recipe-incomplete')\nprint('PASS local-pair-guard-12-named-tests '+p['sha256'])\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS local-pair-guard-12-named-tests"
+      ],
+      "required_stderr": [
+        "Ran 12 tests",
+        "OK"
+      ]
+    }
+  ]
+}

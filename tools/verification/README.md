@@ -3339,3 +3339,35 @@ for corrupted provenance, incompatible Root, different operation context and
 cleanup. The public recipe now requires 26 assertions, including eight exact
 HTTP status/code cases (200/400/403/404/409). The HTTP500 reproducer used an
 explicitly unqualified compiled image for defect evidence only, never delivery.
+## Recette local-pair-guard-rust (garde de paire d'assertion avant remplacement moteur)
+
+`recipes/local-pair-guard.json` épingle la prévention de l'incident du
+31 octobre 2026 : un `start`/`restart` du lanceur dont le mode d'accès
+sauvegardé est `authority` refuse (exit 2, sans arrêt) quand le démon installé
+et le moteur candidat ne parlent pas le même protocole d'assertion (octets du
+domaine embarqué v2/v1). 12 tests nommés (`tests/test_local_pair_guard.py`) :
+forme d'incident, sens inverse, paire égale, marqueur inconnu, owner-key,
+Root jamais initialisé, démon absent, réglages illisibles, et le parcours
+public réel (serveur lancé puis refusé sans changement de pid ; contrôle
+paire égale remplaçant le serveur). Fournir `SWARM_STATUS_CONTRACT_BINARY` et
+`SWARM_STATUS_CONTRACT_PROFILE` (binaire figé qualifié et empreinte), comme
+`native-version-public`. Aucune opération sudo, aucun démon réel, aucune
+compilation ; aire de fixtures uniquement, jamais /tmp. La recette observe le
+chemin d'installation par défaut uniquement ; un démon servi d'ailleurs échoue
+fermé à l'exécution.
+
+## Recipe local-pair-guard-rust (assertion pair guard before engine replacement)
+
+`recipes/local-pair-guard.json` pins the October 31, 2026 incident prevention:
+a launcher `start`/`restart` whose saved access mode is `authority` refuses
+(exit 2, before any stop) when the installed daemon and the candidate engine do
+not speak the same assertion protocol (embedded v2/v1 domain bytes). 12 named
+tests (`tests/test_local_pair_guard.py`): incident shape, reverse direction,
+equal pair, unknown marker, owner-key, never-initialized Root, absent daemon,
+unreadable settings, and the real public path (running server refused with an
+unchanged pid; equal-pair control replacing the server). Supply
+`SWARM_STATUS_CONTRACT_BINARY` and `SWARM_STATUS_CONTRACT_PROFILE` (frozen
+qualified binary and digest), like `native-version-public`. No sudo, no real
+daemon, no compilation; fixture area only, never /tmp. The recipe observes the
+default installation path only; a daemon served from elsewhere fails closed at
+runtime.

@@ -21,6 +21,10 @@ SOURCE = Path(__file__).resolve().parent.parent
 # default binary path pointing there either. The candidate binary now lives in
 # the repository delivery area; override with SWARM_TEST_BINARY when needed.
 BINARY = os.environ.get("SWARM_TEST_BINARY", str(SOURCE / "bin" / "swarm"))
+# Assertion-domain marker compiled into every v2 daemon/engine binary
+# (`rust/crates/swarm-authority/src/assertion.rs`); byte presence is the
+# launcher pair-guard observable.
+V2_MARKER = b"swarm-authority-assertion-v2\0"
 
 
 class LocalWeb(unittest.TestCase):
@@ -102,7 +106,11 @@ class LocalWeb(unittest.TestCase):
         opener.chmod(0o700)
         unit = Path(self.temp.name) / "swarm-authority.service"
         args = [arg for arg in self.args if arg != "--no-open"]
-        env = {**os.environ, "SWARM_BROWSER": str(opener), "SWARM_AUTHORITY_UNIT": str(unit)}
+        # No installed daemon on disk for the pair guard: absence passes (the
+        # mode is authority but nothing on disk can desynchronize), keeping the
+        # test independent of the operator's real daemon installation.
+        env = {**os.environ, "SWARM_BROWSER": str(opener), "SWARM_AUTHORITY_UNIT": str(unit),
+               "SWARM_AUTHORITY_INSTALLED": str(Path(self.temp.name) / "no-such-daemon")}
         # Witness of the refusal first: no unit -> open refuses, no owner ticket.
         missing = subprocess.run([*args, "open"], env=env, text=True, capture_output=True)
         self.assertEqual(missing.returncode, 2, missing.stdout)
@@ -305,10 +313,13 @@ class LocalWeb(unittest.TestCase):
         (fake / "etc").mkdir()
         (fake / "etc" / "public_key").write_text("AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8\n")
         installed = fake / "installed"
-        installed.write_bytes(b"daemon v1")
+        # Fake daemons carry the v2 assertion-domain marker like the real one
+        # (`rust/crates/swarm-authority/src/assertion.rs` is compiled in), so
+        # the launcher pair guard recognizes them as the same protocol.
+        installed.write_bytes(b"daemon v1 " + V2_MARKER)
         built = checkout / "rust/target/release/swarm-authority"
         built.parent.mkdir(parents=True)
-        built.write_bytes(b"daemon v2")
+        built.write_bytes(b"daemon v2 " + V2_MARKER)
         env = {**os.environ, "PATH": str(fake / "bin") + os.pathsep + os.environ["PATH"], "SWARM_AUTHORITY_UNIT": str(unit),
                "SWARM_AUTHORITY_ETC": str(fake / "etc"), "SWARM_AUTHORITY_INSTALLED": str(installed)}
         run = lambda *a, code=0: self.assertEqual((r := subprocess.run([*launcher, *a], env=env, text=True, capture_output=True)).returncode, code, r.stderr) or r
@@ -320,7 +331,9 @@ class LocalWeb(unittest.TestCase):
             self.assertIn("diffère du dernier build", refused.stderr)
             self.assertEqual((mode(), sudo_log.exists()), ("owner-key", False), "refusal had no effect")
             self.assertTrue(json.loads(run("status").stdout)["ready"])
-            built.write_bytes(b"daemon v1")
+            # Same protocol, differing bytes: the enable sha-comparison turns
+            # equal while the pair guard keeps recognizing the daemon as v2.
+            built.write_bytes(b"daemon v1 " + V2_MARKER)
             run("authority", "enable", "--no-open")
             self.assertEqual(mode(), "authority")
             self.assertEqual(sudo_log.read_text().splitlines(), ["systemctl enable --now swarm-authority"])

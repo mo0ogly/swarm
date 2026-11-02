@@ -55,3 +55,25 @@ Go is absent from these build/runtime paths. Docker uses locked default-feature 
 The launcher separates its broad candidate inventory (cache invalidation) from Cargo-qualified actual inputs. An unused test may change without refusing a delivery whose compiled inputs stayed identical. The cache records the current broad inventory after checks. Every effective input must match the qualified profile bytes, including after qualification; delivery tools, FR/EN notes, Git, environment and toolchain are compared before/after. A mismatch retains the previous server and establishes no installation. These observations are not an atomic filesystem lease.
 
 `tests/test_swarm_version_candidate_race.py` covers a valid control, cache reuse, changed unused tests and refusal after changed compiled input, Git, compiler, notes or launcher. Its compiler and probe are explicit doubles; only actual public build and verification establish a delivery.
+
+**Pair guard before any replacement (prevention of the October 31, 2026
+incident).** Before any `start` or `restart`, and before stopping anything, the
+launcher refuses (exit 2, « Paire d’assertion incompatible » message) an engine
+replacement when the Root’s saved access mode is `authority` and the installed
+daemon and the candidate engine do not speak the same assertion protocol. The
+protocol is read from the embedded domain bytes
+(`swarm-authority-assertion-v2\0` then `v1`;
+`rust/crates/swarm-authority/src/assertion.rs` signs and verifies with it).
+Pass cases: `owner-key` mode, a never-initialized Root (no `.swarm/state.db`),
+an absent installed daemon (nothing on disk to desynchronize), equal protocols.
+Fail-closed refusals: divergent pair, a daemon file without any recognized
+marker, unreadable engine settings from an initialized Root. The refusal message
+names both binaries, their protocols and the recovery:
+`./swarm.sh authority install` (which replaces the daemon before the engine
+restart the guard observes). Limits: the guard observes
+`/usr/local/lib/swarm-authority/swarm-authority` (`SWARM_AUTHORITY_INSTALLED`)
+only; a daemon served from elsewhere fails closed at runtime with
+`assertion-format`. Read-only (settings + bytes); it stops, starts and
+reconfigures nothing. Test: `tests/test_local_pair_guard.py`; recipe
+`tools/verification/recipes/local-pair-guard.json` (12 tests, pinned to the
+supplied binary digest).

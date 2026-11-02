@@ -55,3 +55,24 @@ Go n’intervient pas dans ces chemins de build/exécution. Docker utilise Cargo
 Le lanceur distingue l’inventaire large de candidats (invalidation du cache) des entrées réellement qualifiées par Cargo. Un test absent du build peut changer sans refuser une livraison dont les entrées compilées sont restées identiques. Le cache retient l’inventaire large courant après les contrôles. Les octets de chaque entrée effective doivent correspondre au profil qualifié, y compris après la qualification ; les outils de livraison, notes FR/EN, Git, environnement et chaîne de compilation sont comparés avant/après. Une différence conserve l’ancien serveur et ne produit aucune installation. Ces lectures ne constituent pas un verrou atomique du système de fichiers.
 
 `tests/test_swarm_version_candidate_race.py` couvre témoin, cache réutilisé, test inutilisé modifié et refus après changement d’une source compilée, de Git, du compilateur, des notes ou du lanceur. Son compilateur et sa sonde sont des doubles explicites ; seules la compilation et la vérification publiques réelles établissent une livraison.
+
+**Garde de paire avant tout remplacement (prévention de l’incident du 31
+octobre 2026).** Avant tout `start` ou `restart`, et avant d’arrêter quoi que ce
+soit, le lanceur refuse (exit 2, message « Paire d’assertion incompatible ») le
+remplacement du moteur quand le mode d’accès sauvegardé du Root est `authority`
+et que le démon installé et le moteur candidat ne parlent pas le même protocole
+d’assertion. Le protocole se lit sur les octets du domaine embarqué
+(`swarm-authority-assertion-v2\0` puis `v1` ; `rust/crates/swarm-authority/src/assertion.rs`
+signe et vérifie avec). Cas de passage : mode `owner-key`, Root jamais initialisé
+(pas de `.swarm/state.db`), démon installé absent (rien sur disque à
+désynchroniser), protocoles égaux. Cas de refus fail-closed : paire divergente,
+démon présent sans marqueur reconnu, réglages du moteur illisibles depuis un
+Root initialisé. Le message de refus nomme les deux binaires, leurs protocoles
+et la reprise : `./swarm.sh authority install` (qui remplace le démon avant le
+redémarrage du moteur observé par la garde). Limites : la garde observe
+`/usr/local/lib/swarm-authority/swarm-authority` (`SWARM_AUTHORITY_INSTALLED`)
+seulement ; un démon servi d’ailleurs échoue fermé à l’exécution avec
+`assertion-format`. Lecture seule (réglages + octets) ; n’arrête, ne démarre et
+ne reconfigure rien. Test : `tests/test_local_pair_guard.py` ; recette
+`tools/verification/recipes/local-pair-guard.json` (12 tests, épinglée sur
+l’empreinte du binaire fourni).

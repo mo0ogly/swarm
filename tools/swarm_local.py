@@ -206,6 +206,14 @@ def main():
                     except BaseException as cleanup:raise BaseExceptionGroup('Prepared refusal and candidate cleanup failed',[primary,cleanup])
                     raise
             else:prepared, _ = prepare_versioned_build(SOURCE, binary)
+        # Pair guard: before stopping anything, refuse an engine replacement
+        # that would desynchronize the authority assertion pair (2026-10-31
+        # incident prevention). The currently running binary, not the
+        # candidate, is the one whose settings decide — `candidate` only
+        # carries bytes the live server has not loaded yet.
+        if args.action in ("restart", "start"):
+            pair_candidate = str(prepared) if prepared is not None else str(binary)
+            require_matching_assertion_pair(str(binary), pair_candidate, str(root))
         if args.action in ("stop", "restart"):
             stop(state, args.stop_timeout, args.address)
             state_path.unlink(missing_ok=True)
@@ -374,6 +382,92 @@ def sign_in_url(binary, root, address):
 
 AUTHORITY_ETC = Path(os.environ.get("SWARM_AUTHORITY_ETC", "/etc/swarm-authority"))
 AUTHORITY_INSTALLED = Path(os.environ.get("SWARM_AUTHORITY_INSTALLED", "/usr/local/lib/swarm-authority/swarm-authority"))
+
+# Assertion protocols the launcher can recognize in a binary. Each protocol era
+# hardcodes exactly one domain byte string (`rust/crates/swarm-authority/src/
+# assertion.rs` signs and verifies with it), so byte presence is the observable
+# that tells which protocol a daemon or engine speaks. v2 first: verify()
+# refuses every other claim version, so a binary carrying both speaks v2.
+ASSERTION_PROTOCOL_DOMAINS = (
+    ("v2", b"swarm-authority-assertion-v2\0"),
+    ("v1", b"swarm-authority-assertion-v1\0"),
+)
+
+
+def assertion_protocol(path):
+    """Return the assertion protocol a binary speaks, from its embedded domain
+    marker ("v2"/"v1"), or None when the file is missing/unreadable or carries
+    no known marker. The 2026-10-31 incident (engine v2 running against an
+    installed v1 daemon) refused every relayed request with `assertion-format`;
+    this byte-presence observable was verified on the installed daemon, the
+    release build and the engine. Reads the file whole (the launcher already
+    hashes binaries whole); executes nothing, changes nothing.
+    """
+    try:
+        data = Path(path).read_bytes()
+    except OSError:
+        return None
+    return next((name for name, marker in ASSERTION_PROTOCOL_DOMAINS if marker in data), None)
+
+
+def require_matching_assertion_pair(current, candidate, root):
+    """Refuse an engine replacement that would desynchronize the authority pair,
+    before the launcher stops anything.
+
+    On a Root whose saved access mode is `authority` (read through the public
+    read-only `engine-settings show` run with the binary in place), the
+    installed daemon (SWARM_AUTHORITY_INSTALLED, default
+    /usr/local/lib/swarm-authority/swarm-authority) and the candidate engine
+    binary must speak the same assertion protocol. Errors: RuntimeError naming
+    both binaries, their protocols and the supported recovery (`./swarm.sh
+    authority install`) on protocol mismatch or on an installed daemon file
+    that carries no recognized protocol marker; a mode that cannot be read
+    from an initialized Root is also refused (never silently treated as
+    owner-key). Passes: owner-key Roots, a Root never initialized (no
+    .swarm/state.db — the saved mode is then the owner-key default, nothing
+    was ever switchable), and an absent daemon file (nothing on disk to
+    desynchronize with; refusing would lock the operator out of a Root whose
+    daemon was uninstalled, and the start path already warns about the
+    missing front). Limits: the guard observes AUTHORITY_INSTALLED only — a
+    daemon served from another path is out of its sight, and a copied
+    authority Root whose daemon is elsewhere still fails closed at runtime
+    with `assertion-format` on every relayed request; `authority install`
+    replaces the daemon before the engine restart this guard observes, so the
+    supported recovery stays a same-tree rebuild of both sides. Reads
+    settings and binary bytes; starts, stops and reconfigures nothing.
+    """
+    if not (Path(root) / ".swarm" / "state.db").is_file():
+        return
+    if not Path(current).is_file():
+        return
+    try:
+        shown = subprocess.run([str(current), "--root", str(root), "engine-settings", "show", "--json"],
+                               cwd=SOURCE, capture_output=True, text=True)
+    except OSError:
+        shown = None
+    if shown is None or shown.returncode != 0:
+        raise RuntimeError("Réglages du moteur illisibles ; compatibilité d’assertion inconnaissable, moteur non arrêté.")
+    try:
+        mode = json.loads(shown.stdout)["values"].get("web_access_mode", "owner-key")
+    except (ValueError, KeyError, TypeError, AttributeError):
+        raise RuntimeError("Réglages du moteur illisibles ; compatibilité d’assertion inconnaissable, moteur non arrêté.") from None
+    if mode != "authority":
+        return
+    installed_path = Path(AUTHORITY_INSTALLED)
+    if not installed_path.is_file():
+        return
+    installed = assertion_protocol(installed_path)
+    candidate_protocol = assertion_protocol(candidate)
+    if installed is not None and installed == candidate_protocol:
+        return
+    def label(protocol, path):
+        if protocol is not None:
+            return protocol
+        return "absent" if not Path(path).is_file() else "sans-protocole-reconnu"
+    raise RuntimeError(
+        f"Paire d’assertion incompatible : démon installé ({installed_path})={label(installed, installed_path)}, "
+        f"moteur candidat ({candidate})={label(candidate_protocol, candidate)}. Moteur non arrêté ; "
+        f"rétablissez la paire avec ./swarm.sh authority install puis relancez le redémarrage.")
 
 
 def unit_addresses():
