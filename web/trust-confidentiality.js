@@ -1,6 +1,7 @@
 'use strict';
 /** BLP policy administration for the native Trust dialog. Saving a policy does
- * not activate runtime enforcement. No credentials enter storage or reports. */
+ * not activate transversal enforcement; explicit preparation quarantine blocks
+ * controlled sends without granting any classified-send authority. No credentials enter storage or reports. */
 globalThis.SwarmTrustConfidentiality={
  /** Install explicit read/preview/save gestures using the shared protected API.
   * Returns synchronization/cleanup hooks; no request is sent on installation. */
@@ -14,11 +15,11 @@ globalThis.SwarmTrustConfidentiality={
    * Never populate a permissive default or infer grants from displayed roles. */
   async function load(){
    const {result}=await api('blp-show','{}');
-   if(result.capability?.runtime_enforced!==false||typeof result.trust_revision!=='string')throw Error(t('Réponse invalide'));
+   if(result.capability?.runtime_enforced!==false||typeof result.capability.preparation_quarantined!=='boolean'||typeof result.trust_revision!=='string')throw Error(t('Réponse invalide'));
    view=result;proposal=null;
    const history=result.record?.history;
    $('blp-policy').value=history?.length?JSON.stringify(history[history.length-1].policy,null,2):'';
-   $('blp-status').textContent=t(result.capability.configured?'Politique enregistrée ; protection transversale non active':'Aucune politique de confidentialité enregistrée');sync();
+   $('blp-status').textContent=t(result.capability.preparation_quarantined?'Envois de préparation en quarantaine ; protection transversale incomplète':result.capability.configured?'Politique enregistrée ; protection transversale non active':'Aucune politique de confidentialité enregistrée');sync();
   }
   /** Encode revision decimals without Number rounding or marker replacement. */
   function revision(value){if(typeof value!=='string'||!/^(0|[1-9][0-9]*)$/.test(value))throw Error(t('Réponse invalide'));return value;}
@@ -32,7 +33,7 @@ globalThis.SwarmTrustConfidentiality={
     {id:'internal',name_fr:'Interne',name_en:'Internal'},
     {id:'confidential',name_fr:'Confidentiel',name_en:'Confidential'},
     {id:'restricted',name_fr:'Restreint',name_en:'Restricted'}
-   ],compartments:[],clearances:{}},null,2);
+   ],compartments:[],clearances:{},preparation_quarantine:false},null,2);
    $('blp-status').textContent=t('Exemple sans habilitation ; aucune modification enregistrée');sync();
   });
   $('blp-preview').addEventListener('click',()=>guarded(async()=>{
@@ -50,7 +51,7 @@ globalThis.SwarmTrustConfidentiality={
    if(!proposal)return;const raw=proposal;proposal=null;sync();
    const {result}=await api('blp-policy-apply',raw);
    if(result.applied!==true||result.runtime_enforced!==false)throw Error(t('Réponse invalide'));
-   await load();$('blp-status').textContent=t('Politique enregistrée et relue ; protection transversale non active');
+   await load();$('blp-status').textContent=t(view.capability.preparation_quarantined?'Envois de préparation en quarantaine ; protection transversale incomplète':'Politique enregistrée et relue ; protection transversale non active');
   }));
   return {sync,reset};
  }

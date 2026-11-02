@@ -56,6 +56,28 @@ fn state(directory: &std::path::Path) -> Vec<u8> {
     std::fs::read(directory.join(".swarm/trust-actions.json")).unwrap()
 }
 
+/// Exercise the real enrolled configuration consumer after its egress-before-
+/// SQL ordering change. Fixture authority is synthetic, not a real human proof;
+/// the existing exact Root/plan/bytes/role checks and publication remain required.
+#[test]
+fn enrolled_configuration_uses_egress_control_before_sql() {
+    let (directory,root,work)=root();
+    let raw=serde_json::to_vec(&json!({"schema_version":1,"event_id":"enrolled-configuration","expected_revision":1,
+        "reason":"Owned enrolled configuration ordering fixture",
+        "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":true},
+        "identities":[{"subject":"requester","token":"fixture-requester-token","integrity":1,"roles":["requester"]},
+            {"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]},
+            {"subject":"executor","token":"fixture-executor-token","integrity":2,"roles":["effect"]},
+            {"subject":"admin","integrity":3,"roles":["admin"],"enrollment_principal":{"principal_id":"operator","principal_kind":"human","issuer":"https://fixture.invalid","subject":"stable-person"}}]})).unwrap();
+    let request=root.trust_enrollment_request(Operation::ConfigApply,&raw).unwrap();
+    let fixture=fixture::Fixture::build_for_trust(request.request().permission(),scope(directory.path(),&work),1);
+    let (auth,head)=authenticated_startup::open(&Context::new(),fixture.path.to_str().unwrap(),&fixture.pin).unwrap();
+    let used=auth.with_trust_action(&UseContext::new(),&head,b"STARTUP_FIXTURE_PASSWORD",request.request(),
+        |identity|root.trust_as_enrolled(&request,identity,&raw)).unwrap();
+    assert!(used.authority.is_ok());assert_eq!(used.action.unwrap().unwrap().publication,Some("recorded"));
+    assert_eq!(root.trust_revision().unwrap(),Some(2));root.close().unwrap();
+}
+
 /// A current real account/grant succeeds first, then wrong bytes/root/plan refuse
 /// without changing Trust state. Exact replay retains one attributed original.
 #[test]

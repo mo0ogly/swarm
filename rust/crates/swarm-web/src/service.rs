@@ -361,13 +361,22 @@ impl HttpServiceError {
                 StatusCode::NOT_IMPLEMENTED
             }
             Self::Root { operation, cause } => match cause.code() {
+                "blp-preparation-quarantined" if *operation=="preparation-call" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
                 // Only these typed Trust diagnostic refusals are caller states.
                 // Corrupt provenance, storage and wrapped cleanup stay server errors.
                 "blp-access-denied" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
-                "blp-policy-required"|"blp-policy-stale"|"blp-classification-required"|"blp-preparation-provenance-required"|"blp-preparation-parent-mismatch"
+                "blp-policy-required"|"blp-policy-stale"|"blp-classification-required"|"blp-preparation-provenance-required"|"blp-preparation-parent-mismatch"|"preparation-revision-conflict"|"blp-admission-event-conflict"|"blp-admission-policy-changed"
                     if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
-                "blp-preparation-check-invalid" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
-                "preparation-turn-not-found" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
+                "preparation-send-invalid" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Preparation(_))=>StatusCode::BAD_REQUEST,
+                "preparation-send-invalid"|"preparation-message-over-limit"|"preparation-context-over-limit"
+                    if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
+                "preparation-capability-stale"|"preparation-method-unavailable"|"preparation-stale-method"|"preparation-turn-active"|"preparation-call-disabled"
+                    if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+                "blp-admission-invalid"|"blp-preparation-check-invalid"|"blp-preparation-attribute-invalid"|"blp-classification-invalid" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
+                "blp-transport-invalid"|"blp-destination-invalid"|"blp-destination-echo-mismatch" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
+                "blp-destination-not-attributed" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
+                "blp-transport-connection-changed"|"blp-transport-provider-source-changed"|"blp-transport-settings-changed" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+                "blp-admission-not-found"|"preparation-turn-not-found"|"blp-preparation-source-not-found" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
                 "blp-preparation-platform-unsupported" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_IMPLEMENTED,
                 "project-profile-conflict" if matches!(*operation,"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
                 "project-profile-choice-unknown" if *operation=="project-profile-write" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
@@ -1612,6 +1621,18 @@ fn response(
 #[cfg(test)]
 mod tests {
     use super::*;
+    /// Explicit quarantine is a typed policy refusal; cleanup or another
+    /// operation context must not be disguised as a caller authorization error.
+    #[test]
+    fn preparation_quarantine_status_keeps_cleanup_failures_server_errors() {
+        assert_eq!(root("preparation-call",RootStoreError::Refused("blp-preparation-quarantined")).status(),StatusCode::FORBIDDEN);
+        assert_eq!(root("other-operation",RootStoreError::Refused("blp-preparation-quarantined")).status(),StatusCode::INTERNAL_SERVER_ERROR);
+        let wrapped=RootStoreError::Cleanup {
+            primary:Some(Box::new(RootStoreError::Refused("blp-preparation-quarantined"))),
+            cleanup:Box::new(RootStoreError::Refused("fixture-release-failed")),
+        };
+        assert_eq!(root("preparation-call",wrapped).status(),StatusCode::INTERNAL_SERVER_ERROR);
+    }
     /// Diagnostic business refusals are exact typed client states; corrupt
     /// native provenance and late cleanup remain server failures. A matching
     /// code from another operation never inherits this diagnostic's mapping.
@@ -1631,6 +1652,13 @@ mod tests {
             ("preparation-revision-conflict",StatusCode::CONFLICT),
             ("preparation-turn-not-found",StatusCode::NOT_FOUND),
             ("blp-preparation-platform-unsupported",StatusCode::NOT_IMPLEMENTED),
+            ("blp-transport-invalid",StatusCode::BAD_REQUEST),
+            ("blp-destination-invalid",StatusCode::BAD_REQUEST),
+            ("blp-destination-echo-mismatch",StatusCode::BAD_REQUEST),
+            ("blp-destination-not-attributed",StatusCode::NOT_FOUND),
+            ("blp-transport-connection-changed",StatusCode::CONFLICT),
+            ("blp-transport-provider-source-changed",StatusCode::CONFLICT),
+            ("blp-transport-settings-changed",StatusCode::CONFLICT),
             ("preparation-prompt-provenance-invalid",StatusCode::INTERNAL_SERVER_ERROR),
             ("preparation-root-instance-changed",StatusCode::INTERNAL_SERVER_ERROR),
         ] {

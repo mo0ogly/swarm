@@ -87,6 +87,94 @@ fn check(destination:Value)->Value {
     json!({"schema_version":1,"expected_revision":1,"sources":[{"level":"confidential","compartments":["client-a"]}],"destination":destination})
 }
 
+/// Explicit quarantine change: existing Admin operation/revisions, no new role.
+fn quarantine_change(revision:u64, enabled:bool)->Value {
+    let mut value=change(revision,if enabled{"quarantine-on"}else{"quarantine-off"});
+    value["policy"]["preparation_quarantine"]=enabled.into();value
+}
+
+#[test]
+fn preparation_quarantine_preview_reopen_refusal_and_recovery() {
+    let f=Fixture::new();f.apply();
+    let root=RootStore::open(&f.0,true).unwrap();
+    assert_eq!(root.with_preparation_egress(||Ok(7)).unwrap(),7);root.close().unwrap();
+    let before=f.state();
+    let preview=f.call("blp-policy-preview",quarantine_change(1,true),"fixture-admin-token").unwrap();
+    assert_eq!(preview["applied"],false);assert_eq!(before,f.state());
+    f.call("blp-policy-apply",quarantine_change(1,true),"fixture-admin-token").unwrap();
+    let show=f.call("blp-show",json!({}),"fixture-admin-token").unwrap();
+    assert_eq!(show["capability"]["preparation_quarantined"],true);
+    assert_eq!(show["capability"]["runtime_enforced"],false);
+    let before=f.state();let called=std::cell::Cell::new(false);
+    let root=RootStore::open(&f.0,true).unwrap();
+    let error=root.with_preparation_egress(||{called.set(true);Ok(())}).unwrap_err();
+    assert_eq!(error.code(),"blp-preparation-quarantined");assert!(!called.get());
+    let error=root.preparation_send(b"{}",&mut SystemEnvironment).err().unwrap();
+    assert_eq!(error.code(),"blp-preparation-quarantined");
+    root.close().unwrap();assert_eq!(before,f.state());
+    // Authority renewal cannot lift an existing quarantine implicitly.
+    f.call("config-apply",config(1,"identity-renewal"),"fixture-admin-token").unwrap();
+    let root=RootStore::open(&f.0,true).unwrap();
+    assert_eq!(root.with_preparation_egress(||Ok(())).unwrap_err().code(),"blp-preparation-quarantined");
+    root.close().unwrap();
+    let mut off=quarantine_change(2,false);off["expected_trust_revision"]=2.into();
+    f.call("blp-policy-apply",off,"fixture-admin-token").unwrap();
+    let root=RootStore::open(&f.0,true).unwrap();
+    assert_eq!(root.with_preparation_egress(||Ok(9)).unwrap(),9);root.close().unwrap();
+}
+
+#[test]
+fn preparation_quarantine_corruption_never_falls_back_to_disabled() {
+    let f=Fixture::new();f.apply();
+    let root=RootStore::open(&f.0,true).unwrap();
+    assert!(root.with_preparation_egress(||Ok(())).is_ok());root.close().unwrap();
+    let original=f.state();f.rewrite_state(|_|b"invalid fixture state".to_vec());
+    let called=std::cell::Cell::new(false);let root=RootStore::open(&f.0,true).unwrap();
+    assert!(root.with_preparation_egress(||{called.set(true);Ok(())}).is_err());
+    assert!(!called.get());root.close().unwrap();
+    f.rewrite_state(|_|original.clone());
+    let root=RootStore::open(&f.0,true).unwrap();
+    assert!(root.with_preparation_egress(||Ok(())).is_ok());root.close().unwrap();
+}
+
+#[test]
+fn preparation_quarantine_activation_serializes_with_engaged_operation() {
+    let f=Fixture::new();f.apply();
+    let (held_tx,held_rx)=std::sync::mpsc::channel();
+    let (release_tx,release_rx)=std::sync::mpsc::channel();let path=f.0.clone();
+    let engaged=std::thread::spawn(move||{
+        let root=RootStore::open(&path,true).unwrap();
+        let result=root.with_preparation_egress(||{
+            held_tx.send(()).unwrap();release_rx.recv().unwrap();Ok(11)
+        });
+        root.close().unwrap();result.unwrap()
+    });
+    held_rx.recv().unwrap();
+    // The business Trust lock remains free during IO; only the dedicated
+    // egress lock fences identity/BLP changes. No time cutoff proves ordering.
+    let business=std::fs::OpenOptions::new().read(true).write(true)
+        .open(f.0.join(".swarm/trust-actions.lock")).unwrap();
+    rustix::fs::flock(&business,rustix::fs::FlockOperation::NonBlockingLockExclusive).unwrap();
+    rustix::fs::flock(&business,rustix::fs::FlockOperation::Unlock).unwrap();
+    // Unauthorized callers must refuse before waiting on the egress writer.
+    assert!(f.call("blp-policy-apply",quarantine_change(1,true),"fixture-worker-token").unwrap_err().contains("authorization_required"));
+    let probe=std::fs::OpenOptions::new().read(true).write(true)
+        .open(f.0.join(".swarm/preparation-egress.lock")).unwrap();
+    let blocked=rustix::fs::flock(&probe,rustix::fs::FlockOperation::NonBlockingLockExclusive).unwrap_err();
+    assert_eq!(blocked,rustix::io::Errno::WOULDBLOCK);
+    let path=f.0.clone();let (started_tx,started_rx)=std::sync::mpsc::channel();
+    let writer=std::thread::spawn(move||{
+        let root=RootStore::open(&path,true).unwrap();started_tx.send(()).unwrap();
+        let result=root.trust_as_principal("blp-policy-apply",&serde_json::to_vec(&quarantine_change(1,true)).unwrap(),"fixture-admin-token");
+        root.close().unwrap();result.unwrap();
+    });
+    started_rx.recv().unwrap();release_tx.send(()).unwrap();
+    assert_eq!(engaged.join().unwrap(),11);writer.join().unwrap();
+    let root=RootStore::open(&f.0,true).unwrap();
+    assert_eq!(root.with_preparation_egress(||Ok(())).unwrap_err().code(),"blp-preparation-quarantined");
+    root.close().unwrap();
+}
+
 #[test]
 fn policy_preview_apply_reopen_and_replay_preserve_history() {
     let f=Fixture::new(); let before=f.state();
