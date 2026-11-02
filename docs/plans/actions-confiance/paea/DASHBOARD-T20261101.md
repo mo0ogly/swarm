@@ -43,7 +43,7 @@ campagnes T01…T22 exécutées.
 | T14 | I02/I14 | conception manquante | — | Design A2A puis code |
 | T15 | I15 | PASS | même preuve que T11 (admission + substitution refusée) | Inventaire ACS (entrées externes) |
 | T16 | I12/I16 | PASS | `paea-i16-lease-reopen-rust.json` (30-10, bloc 9) + contrat 8 cas (glm-order-receipt-20261030T075024Z) | Limites distribuées séparées |
-| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-10` (ELF 280d0199…, 01-11 fin de soirée, 6/6 VERIFIED — révocation settlement-call refusée puis récupération ; run-8/c12004bf, run-5/dev.298 et run-4/dev.292 conservés) | Propagation production |
+| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-11` (ELF 41f00bf9…, 02-11 matin, 6/6 VERIFIED — révocation settlement-call refusée puis récupération ; run-10/280d0199, run-8/c12004bf, run-5/dev.298 et run-4/dev.292 conservés) | Propagation production |
 | T18 | I03/I14 | non exercée | — | Périmètre E3 uniquement |
 | T19 | I06/I13 | non exercée | — | Périmètre E3 + confinement I06/I13 |
 | T20 | I04/I15 | non exercée | — | Périmètre E3 uniquement |
@@ -115,6 +115,12 @@ campagnes T01…T22 exécutées.
   épine=real, puis run-10 settlement 6/6 VERIFIED et chain-run-4 4/4 VERIFIED
   (témoins = livré courant dans les stdout, refus de SHA erroné compris),
   `source_stable: true`. T17 reste PASS, preuve étendue au livré courant.
+- Extension 02-11 matin : 280d0199… → 41f00bf96e568caaa0ef40cc26b758139acbb
+  2133cddb4829dd0965dfa2ad061 (7e remplacement du jour, porte de stabilité
+  verte 09:31→09:41). Re-épingle depuis le hash réel `sha256sum` (cross-check
+  épine=réel) puis run-11 settlement 6/6 VERIFIED et chain-run-5 4/4 VERIFIED
+  (témoins = livré courant, refus de SHA erroné compris), `source_stable: true`.
+  T17 reste PASS, preuve étendue au livré courant.
 
 ## Portée et limites
 
@@ -152,6 +158,10 @@ un pourcentage d'avancement » (invariant-matrix.json, global_limits).
   280d0199…6011c (01-11-2026 22:07Z, `source_stable: true`)
 - `.swarm-fixtures/i17-rerun/chain-run-4/` — 4/4 VERIFIED sur ELF
   280d0199…6011c (01-11-2026 22:10Z, refus de SHA erroné compris)
+- `.swarm-fixtures/i17-rerun/i17-run-11/` — 6/6 VERIFIED sur ELF
+  41f00bf9…a2d061 (02-11-2026 09:44Z, `source_stable: true`)
+- `.swarm-fixtures/i17-rerun/chain-run-5/` — 4/4 VERIFIED sur ELF
+  41f00bf9…a2d061 (02-11-2026 09:45Z, refus de SHA erroné compris)
 - `paea/DASHBOARD-T20261031.md` — instantané précédent (31 octobre 2026)
 - `paea/PILOTE-OPERATIONNEL.md` — recettes initiales T04, T06/T21, T05/T17
 - `paea/E3-PROTOCOL.md` — périmètre des campagnes formelles

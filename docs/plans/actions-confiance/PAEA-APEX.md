@@ -351,14 +351,31 @@ candidat dev.267 ci-dessus. Tableau de bord de réalisation (instantané 1er
 novembre 2026, T01–T22 et pourcentages sourcés) :
 [DASHBOARD-T20261101.md](paea/DASHBOARD-T20261101.md).
 
-### État courant — 1er novembre 2026 (fin de soirée)
+### État courant — 2 novembre 2026 (matin)
 
 Candidat unique livré localement : `bin/swarm` SHA-256
+`41f00bf96e568caaa0ef40cc26b758139acbb2133cddb4829dd0965dfa2ad061`
+(7e remplacement en 24 h, 02-11 matin ; porte de stabilité verte 09:31→09:41).
+Les deux recettes delivered sont re-pinnées depuis le hash réel `sha256sum`
+(cross-check épine=réel) et re-jouées sur ce livré : settlement 6/6 VERIFIED
+(`.swarm-fixtures/i17-rerun/i17-run-11/`, `source_stable: true`, témoins
+`delivered-binary-witness` = livré courant) et chaîne 4/4 VERIFIED
+(`.swarm-fixtures/i17-rerun/chain-run-5/`, y compris le refus de SHA erroné).
+L'étape I17 (révocation du courant sur le chemin settlement-call → refus sans
+effet puis récupération) reste localement prouvée sur le candidat courant.
+Acceptation indépendante : 0/17, inchangée ; les sept critères ouverts E2
+restent opérants. Les blocs « État courant » précédents ci-dessous sont
+conservés comme historique (fin de soirée : 280d0199…, run-10 + chain-run-4).
+
+### État courant — 1er novembre 2026 (fin de soirée, historique)
+
+Candidat livré de 21:34:15Z à la nuit : `bin/swarm` SHA-256
 `280d01995c52475c5aaebe7588165cc0089a892f88e367c19dd2648a6f66011c`
 (6e remplacement du jour, 2026-11-01T21:34:15Z ; porte de stabilité adaptative
 verte 21:34→21:45 — les cinq remplacements précédents, dont dev.308/e54a1dd5…
 commit 0eff289d1f et c12004bf…, restent dans l'historique du tableau de bord).
-Les deux recettes delivered sont re-pinnées depuis le hash réel `sha256sum`
+Les deux recettes delivered y ont été re-pinnées depuis le hash réel
+`sha256sum`
 (cross-check épine=réel) et re-jouées sur ce livré : settlement 6/6 VERIFIED
 (`.swarm-fixtures/i17-rerun/i17-run-10/`, `source_stable: true`, témoins
 `delivered-binary-witness` = livré courant) et chaîne 4/4 VERIFIED
@@ -368,12 +385,8 @@ concurrente pendant compilation), run-7 (témoin interne vs remplacement
 binaire de 19:44:34Z) et run-9 (épingle tronquée posée par cette session lors
 de la re-épingle manuelle — le témoin interne a refusé la divergence ; la
 correction au contrat est la substitution depuis `sha256sum` réel plus
-cross-check). Aucune régression produit établie. L'étape I17 (révocation du
-courant sur le chemin settlement-call → refus sans effet puis récupération)
-reste localement prouvée sur le candidat courant. Acceptation indépendante :
-0/17, inchangée ; les sept critères ouverts E2 restent opérants. Les blocs
-« État courant » de l'après-midi et du soir ci-dessous sont conservés comme
-historique.
+cross-check). Aucune régression produit établie. Conservé comme historique ;
+le livré courant est décrit dans le bloc « 2 novembre 2026 (matin) ».
 
 ### État courant — 1er novembre 2026 (soir, historique)
 

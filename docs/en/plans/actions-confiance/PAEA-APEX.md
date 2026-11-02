@@ -257,6 +257,22 @@ single source of the detailed state; recovery synthesis in
 realization dashboard (snapshot 1 November 2026, T01–T22 with sourced
 percentages): [DASHBOARD-T20261101.md](../../../plans/actions-confiance/paea/DASHBOARD-T20261101.md).
 Current locally delivered candidate: `bin/swarm` SHA-256
+`41f00bf96e568caaa0ef40cc26b758139acbb2133cddb4829dd0965dfa2ad061`
+(7th replacement within 24 h, 2 November morning; stability gate green
+09:31→09:41). Both delivered recipes were re-pinned from the real `sha256sum`
+hash (pin=actual cross-check) and replayed on this delivered ELF: settlement
+6/6 VERIFIED (`.swarm-fixtures/i17-rerun/i17-run-11/`, `source_stable: true`,
+`delivered-binary-witness` matching the current candidate) and chain 4/4
+VERIFIED (`.swarm-fixtures/i17-rerun/chain-run-5/`, including the wrong-SHA
+refusal). The I17 step (current-authority revocation on the settlement-call
+path → refusal without effect, then recovery) remains locally proven on the
+current candidate. Independent acceptance: 0/17, unchanged; the seven open E2
+criteria remain operative. The previous "Current locally delivered candidate"
+blocks below are kept as history (late evening: 280d0199…, run-10 +
+chain-run-4).
+
+Delivered candidate from 21:34:15Z to the night (late evening, history):
+`bin/swarm` SHA-256
 `280d01995c52475c5aaebe7588165cc0089a892f88e367c19dd2648a6f66011c`
 (6th replacement of the day, 2026-11-01T21:34:15Z; adaptive stability gate
 green 21:34→21:45 — the five previous replacements, including dev.308/
@@ -271,12 +287,8 @@ a concurrent edit during compilation), run-7 (internal witness vs the
 19:44:34Z binary swap) and run-9 (a truncated pin set by this session during
 manual re-pinning — the internal witness refused the divergence; the contract
 fix is substitution from the real `sha256sum` plus a pin=actual cross-check).
-No product regression established. The I17 step (current-authority revocation
-on the settlement-call path → refusal without effect, then recovery) remains
-locally proven on the current candidate. Independent acceptance: 0/17,
-unchanged; the seven open E2 criteria remain operative. The afternoon and
-evening "Current locally delivered candidate" blocks below are kept as
-history.
+No product regression established. Kept as history; the current candidate is
+described in the 2 November morning block.
 
 Delivered candidate from 19:44:34Z to ~20:15Z (evening, history): `bin/swarm`
 SHA-256 `c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b`.
