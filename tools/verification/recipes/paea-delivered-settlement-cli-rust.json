@@ -23,7 +23,7 @@
     "CARGO_PROFILE_TEST_DEBUG": "0",
     "CARGO_INCREMENTAL": "0",
     "SWARM_PAEA_DELIVERED_BIN": "{root}/bin/swarm",
-    "SWARM_PAEA_DELIVERED_BIN_SHA256": "41f00bf96e568caaa0ef40cc26b758139acbb2133cddb4829dd0965dfa2ad061"
+    "SWARM_PAEA_DELIVERED_BIN_SHA256": "cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d"
   },
   "steps": [
     {
@@ -51,7 +51,7 @@
         "delivered_settlement_commit_replay_reconcile_once ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=41f00bf96e568caaa0ef40cc26b758139acbb2133cddb4829dd0965dfa2ad061",
+        "sha256=cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d",
         "delivered-settlement-argv --json paea settlement-call commit"
       ],
       "required_stderr": []
@@ -81,7 +81,7 @@
         "delivered_settlement_refuses_bad_frame_without_consumption ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=41f00bf96e568caaa0ef40cc26b758139acbb2133cddb4829dd0965dfa2ad061"
+        "sha256=cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d"
       ],
       "required_stderr": []
     },
@@ -110,7 +110,7 @@
         "delivered_settlement_revoked_current_authority_refuses_without_effect_then_recovers ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=41f00bf96e568caaa0ef40cc26b758139acbb2133cddb4829dd0965dfa2ad061",
+        "sha256=cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d",
         "revoked-window-1-refusal",
         "paea-settlement-trust-revision",
         "revoked-window-2-refusal",
@@ -143,7 +143,7 @@
         "delivered_settlement_two_cli_instances_same_business_terms_single_effect ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=41f00bf96e568caaa0ef40cc26b758139acbb2133cddb4829dd0965dfa2ad061",
+        "sha256=cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d",
         "delivered-settlement-argv --json paea settlement-call commit"
       ],
       "required_stderr": []
@@ -173,7 +173,7 @@
         "delivered_settlement_wrong_agreement_refuses_without_effect_then_recovers ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=41f00bf96e568caaa0ef40cc26b758139acbb2133cddb4829dd0965dfa2ad061",
+        "sha256=cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d",
         "agreement-mismatch-refusal",
         "enrollment-control:permission"
       ],
@@ -204,7 +204,7 @@
         "delivered_settlement_lost_stdout_after_commit_replays_without_second_effect ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=41f00bf96e568caaa0ef40cc26b758139acbb2133cddb4829dd0965dfa2ad061",
+        "sha256=cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d",
         "lost-response-code paea-settlement-call-output durable-effects 1",
         "delivered-settlement-argv --json paea settlement-call commit"
       ],

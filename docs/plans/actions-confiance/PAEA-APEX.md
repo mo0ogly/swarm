@@ -351,9 +351,26 @@ candidat dev.267 ci-dessus. Tableau de bord de réalisation (instantané 1er
 novembre 2026, T01–T22 et pourcentages sourcés) :
 [DASHBOARD-T20261101.md](paea/DASHBOARD-T20261101.md).
 
-### État courant — 2 novembre 2026 (matin)
+### État courant — 2 novembre 2026 (fin de matinée)
 
 Candidat unique livré localement : `bin/swarm` SHA-256
+`cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d`
+(8e remplacement en ~27 h, livré ~10:36, détecté 10:54 ; porte de stabilité
+verte 10:44→10:54). Les deux recettes delivered sont re-pinnées depuis le
+hash réel `sha256sum` (cross-check épine=réel, 10/10 tokens) et re-jouées sur
+ce livré : settlement 6/6 VERIFIED
+(`.swarm-fixtures/i17-rerun/i17-run-12/`, `source_stable: true`, témoins
+`delivered-binary-witness` = livré courant) et chaîne 4/4 VERIFIED
+(`.swarm-fixtures/i17-rerun/chain-run-6/`, y compris le refus de SHA erroné).
+L'étape I17 (révocation du courant sur le chemin settlement-call → refus sans
+effet puis récupération) reste localement prouvée sur le candidat courant.
+Acceptation indépendante : 0/17, inchangée ; les sept critères ouverts E2
+restent opérants. Les blocs « État courant » précédents ci-dessous sont
+conservés comme historique (02-11 matin : 41f00bf9…, run-11 + chain-run-5).
+
+### État courant — 2 novembre 2026 (matin, historique)
+
+Candidat livré localement : `bin/swarm` SHA-256
 `41f00bf96e568caaa0ef40cc26b758139acbb2133cddb4829dd0965dfa2ad061`
 (7e remplacement en 24 h, 02-11 matin ; porte de stabilité verte 09:31→09:41).
 Les deux recettes delivered sont re-pinnées depuis le hash réel `sha256sum`
@@ -361,11 +378,8 @@ Les deux recettes delivered sont re-pinnées depuis le hash réel `sha256sum`
 (`.swarm-fixtures/i17-rerun/i17-run-11/`, `source_stable: true`, témoins
 `delivered-binary-witness` = livré courant) et chaîne 4/4 VERIFIED
 (`.swarm-fixtures/i17-rerun/chain-run-5/`, y compris le refus de SHA erroné).
-L'étape I17 (révocation du courant sur le chemin settlement-call → refus sans
-effet puis récupération) reste localement prouvée sur le candidat courant.
-Acceptation indépendante : 0/17, inchangée ; les sept critères ouverts E2
-restent opérants. Les blocs « État courant » précédents ci-dessous sont
-conservés comme historique (fin de soirée : 280d0199…, run-10 + chain-run-4).
+Conservé comme historique ; le livré courant est décrit dans le bloc
+« 2 novembre 2026 (fin de matinée) ».
 
 ### État courant — 1er novembre 2026 (fin de soirée, historique)
 
