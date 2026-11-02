@@ -117,6 +117,42 @@ pub struct PreparationCallPolicyView {
     pub refresh_ms: u64,
     pub transport: String,
 }
+/// Private immutable admission input. Captured from the shared send producer;
+/// serialization never grants authority and contains no provider credential.
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(super) struct AdmissionCapture {
+    pub(super) preparation_id: String,
+    pub(super) source_revision: i64,
+    pub(super) provider: String,
+    pub(super) provider_source: String,
+    pub(super) request_level: String,
+    pub(super) target: String,
+    pub(super) context_mode: String,
+    pub(super) request_hash: String,
+    pub(super) settings_digest: String,
+    pub(super) prompt: String,
+    pub(super) provenance: super::preparation_prompt::Manifest,
+}
+
+/// Validate one legacy-compatible send intent for either producer consumer.
+/// No capture, mutation, classification or transport occurs on failure.
+fn validated_send(raw: &[u8]) -> Result<PreparationSend,E> {
+        let r = decode_send(raw)?;
+        if r.version != 1
+            || !crate::valid_preparation_key(&r.preparation_id)
+            || !crate::valid_preparation_key(&r.event_id)
+            || r.expected_revision.is_none_or(|v| v < 1)
+            || !swarm_identity_contract::name(r.provider.as_bytes())
+            || !matches!(r.context_mode.as_str(), "" | "full" | "recent")
+            || !matches!(r.target.as_str(), "" | "brief" | "plan")
+            || crate::text::trim_space(&r.message).is_empty()
+        {
+            return Err(E::Refused("preparation-send-invalid"));
+        }
+    Ok(r)
+}
+
 /// Private persistence envelope; public historical DTO always omits prompt.
 /// Nonce/kernel/datastore association does not authenticate another local user.
 #[derive(Serialize, Deserialize)]
@@ -305,6 +341,30 @@ pub(super) fn confidentiality_check(root: &RootStore, state: &crate::trust::stat
         finished(result, tx.rollback().map_err(E::Sql))
     })
 }
+/// Resolve one captured source for an already authenticated, cleared control
+/// administrator. The caller owns the current Trust reservation. This readonly
+/// single-row snapshot reuses any caller transaction and verifies parent,
+/// source revision, Root instance and full native
+/// provenance before returning a digest/count; no prompt text or label is
+/// returned. SQL/material cleanup failures remain failures, with no attribution
+/// published. Historical rows lacking provenance refuse rather than migrate.
+pub(super) fn attribution_source(root: &RootStore, preparation: &str, id: &str,
+    revision: i64, index: usize) -> Result<(String, usize), E>
+{
+    super::material_path::with_material_read(root, || {
+        // One SELECT owns the complete captured row. Reuse an outer enrolled
+        // transaction when present; starting another transaction would refuse.
+        let (turn, native) = record(&root.db, id)?;
+        if turn.preparation_id != preparation { return Err(E::Refused("blp-preparation-parent-mismatch")); }
+        if turn.revision != revision { return Err(E::Refused("preparation-revision-conflict")); }
+        let native = native.ok_or(E::Refused("blp-preparation-provenance-required"))?;
+        if native.root != root.instance()? { return Err(E::Refused("preparation-root-instance-changed")); }
+        let manifest = native.prompt_provenance.as_ref().ok_or(E::Refused("blp-preparation-provenance-required"))?;
+        let (digest, count) = manifest.source_digest(&turn.prompt, index)?;
+        Ok((digest.to_owned(), count))
+    })
+}
+
 /// Require the native envelope before worker or dispatch operations.
 /// Historical rows never acquire process custody through a successful read.
 /// Underlying read errors remain unchanged; missing metadata refuses explicitly.
@@ -435,7 +495,7 @@ impl RootStore {
     }
     /// Select exact active configured API model/key and hash both catalogues.
     /// CLI/API namespace collisions and malformed sources refuse; no fallback.
-    fn preparation_api_provider(
+    pub(super) fn preparation_api_provider(
         &self,
         name: &str,
         settings: &EngineSettingsValues,
@@ -550,24 +610,35 @@ impl RootStore {
     /// may be replayed; new levels remain restricted, replay grants no dispatch.
     /// Current source/settings,
     /// revision, adopted brief and context limits are checked under custody.
+    /// Current explicit BLP quarantine refuses before admission/replay. A shared
+    /// egress reservation fences identity/BLP policy changes through admission; successful
+    /// recording survives a later release error through PreparationRecorded.
     /// This method creates pending data only; dispatch is a separate owned gate.
     pub fn preparation_send<W: crate::WorkEnvironment>(
         &self,
         raw: &[u8],
         environment: &mut W,
     ) -> Result<PreparationTurn, E> {
-        let r = decode_send(raw)?;
-        if r.version != 1
-            || !crate::valid_preparation_key(&r.preparation_id)
-            || !crate::valid_preparation_key(&r.event_id)
-            || r.expected_revision.is_none_or(|v| v < 1)
-            || !swarm_identity_contract::name(r.provider.as_bytes())
-            || !matches!(r.context_mode.as_str(), "" | "full" | "recent")
-            || !matches!(r.target.as_str(), "" | "brief" | "plan")
-            || crate::text::trim_space(&r.message).is_empty()
-        {
-            return Err(E::Refused("preparation-send-invalid"));
-        }
+        if !self.writable { return Err(E::Refused("root-read-only")); }
+        let mut receipt = None;
+        self.with_preparation_egress(|| {
+            let turn = self.preparation_send_unquarantined(raw, environment)?;
+            receipt = Some((turn.id.clone(), turn.revision));
+            Ok(turn)
+        }).map_err(|primary| match receipt {
+            Some((id, revision)) => E::PreparationRecorded { primary: Box::new(primary), id, revision },
+            None => primary,
+        })
+    }
+    /// Admit the legacy-shaped intent only while the caller holds the current
+    /// quarantine reservation. Preserves replay, source/budget validation and
+    /// recorded/uncertain commit errors; performs no provider IO or adoption.
+    fn preparation_send_unquarantined<W: crate::WorkEnvironment>(
+        &self,
+        raw: &[u8],
+        environment: &mut W,
+    ) -> Result<PreparationTurn, E> {
+        let r = validated_send(raw)?;
         let request_hash =
             hash(&crate::encode_model(&r).map_err(|e| cause("preparation-send-encode", e))?);
         let id = format!(
@@ -582,6 +653,18 @@ impl RootStore {
             let exists=stmt.query_row([&id],|row|row.get::<_,i64>(0)).map_err(E::Sql);
             let exists=finished(exists,stmt.finalize().map_err(E::Sql))?;
             if exists>0{return replay_turn(db,&id,&r.preparation_id,&request_hash);}
+            let (t,n,p)=self.capture_in_tx(db,settings,&r,at.clone(),nonce.clone(),id.clone(),request_hash.clone())?;
+            save(db,&t,&n,true)?;let w=super::preparation_call_budget::reserve(db,&p,&t.id)?;verify_record(db,&t,&encoded(&t,&n)?)?;super::preparation_call_budget::verify(db,&w)?;Ok(t)
+        })
+    }
+    /// Shared historical send producer. All source/settings/provider/limit
+    /// checks and prompt assembly occur here under the caller's SQL/settings
+    /// snapshot. Returns captured intent plus native provenance and parent,
+    /// without recording a turn, reserving budget or invoking a provider.
+    fn capture_in_tx(&self, db: &Connection, settings: &crate::EngineSettingsDocument,
+        r: &PreparationSend, at: String, nonce: String, id: String, request_hash: String)
+        -> Result<(PreparationTurn, Native, crate::Preparation), E>
+    {
             let requested=requested_level(&r.level)?;
             if r.provider.starts_with("api-") && !requested.is_empty(){return Err(E::Refused("preparation-send-invalid"));}
             let policy=settings.values.preparation_call_policy().map_err(E::Settings)?;
@@ -623,9 +706,38 @@ impl RootStore {
             let t=PreparationTurn{id:id.clone(),preparation_id:p.id.clone(),status:"pending".into(),created_at:at.clone(),revision:p.revision,method_hash:method.sha256.clone(),provider:r.provider.clone(),provider_digest:source.clone(),request_hash:request_hash.clone(),question:crate::text::trim_space(&r.message).into(),prompt,context_mode:r.context_mode.clone(),target:r.target.clone(),project:project.as_ref().map(|o|Box::new(o.context.clone())),model_route:route.clone().map(Box::new),timeout_seconds:i64::try_from(policy.timeout_seconds).map_err(|e|cause("preparation-timeout-representation",e))?,timeout_maximum:i64::try_from(policy.timeout_maximum_seconds).map_err(|e|cause("preparation-timeout-representation",e))?,..Default::default()};
             let event=settings.values.agent_execution_policy().map_err(E::Settings)?.event_max_bytes.0.map(|v|usize::try_from(v.0)).transpose().map_err(|e|cause("preparation-event-representation",e))?;
             let n=Native{monitor:None,version:3,prompt_provenance:Some(prompt_provenance),request_level:requested.into(),root:self.instance()?,nonce:nonce.clone(),settings_digest:settings.history.last().ok_or(E::Refused("preparation-settings-history-missing"))?.digest.clone(),provider_source:source,project:project.map(|p|p.context),policy:SavedPolicy{timeout:policy.timeout_seconds,observation:policy.observation_ms,response:policy.response_max_bytes,event,h1:policy.http1_max_headers,h2:policy.http2_max_header_bytes,transport:policy.transport}};
-            save(db,&t,&n,true)?;let w=super::preparation_call_budget::reserve(db,&p,&t.id)?;verify_record(db,&t,&encoded(&t,&n)?)?;super::preparation_call_budget::verify(db,&w)?;Ok(t)
+        Ok((t,n,p))
+    }
+
+    /// Capture the SAME producer as send in a rolled-back read transaction,
+    /// under existing saved settings/contention and material-Root guards.
+    /// Returns private bytes/provenance only to trusted admission consumers;
+    /// never writes SQL, reserves budget, dispatches or assigns classification.
+    /// Caller owns Trust authority; this requires an autocommit Root connection.
+    /// Every read/rollback/material/close cause propagates without a fallback.
+    pub(super) fn capture_admission_intent(&self, raw: &[u8]) -> Result<AdmissionCapture, E> {
+        use crate::WorkEnvironment;
+        let r=validated_send(raw)?;
+        let request_hash=hash(&crate::encode_model(&r).map_err(|e|cause("preparation-send-encode",e))?);
+        let id=format!("pt-{}",&hash(format!("{}\0{}",r.preparation_id,r.event_id).as_bytes())[..32]);
+        let mut environment=crate::SystemEnvironment;
+        let at=environment.timestamp().map_err(E::Runtime)?;
+        let nonce=environment.identifier("pc-").map_err(E::Runtime)?;
+        crate::agent_storage_retry::execute_borrowed(&self.db,&self.directory,false,|db,settings| {
+            super::material_path::with_material_read(self,|| {
+                let mut tx=Transaction::new_unchecked(db,TransactionBehavior::Deferred).map_err(E::Sql)?;
+                tx.set_drop_behavior(rusqlite::DropBehavior::Ignore);
+                let result=self.capture_in_tx(&tx,settings,&r,at.clone(),nonce.clone(),id.clone(),request_hash.clone())
+                    .and_then(|(t,n,_)| Ok(AdmissionCapture {preparation_id:t.preparation_id,
+                        source_revision:t.revision,provider:t.provider,provider_source:n.provider_source,
+                        request_level:n.request_level,target:t.target,context_mode:t.context_mode,
+                        request_hash:t.request_hash,settings_digest:n.settings_digest,prompt:t.prompt,
+                        provenance:n.prompt_provenance.ok_or(E::Refused("blp-preparation-provenance-required"))?}));
+                finished(result,tx.rollback().map_err(E::Sql))
+            })
         })
     }
+
 }
 
 /// Current saved plan/task policies accompany a fixed wire-format example.
@@ -783,8 +895,20 @@ impl RootStore {
     /// Claim a registered pending turn using its private stdin token, current
     /// kernel PID/stamp/host, physical Root, source and settings. Recheck budget
     /// and move reserved→estimated BEFORE returning a request able to contact
-    /// the provider. Subsequent cancellation/error never refunds estimated.
+    /// the provider. Explicit quarantine refuses before that transition. This
+    /// observation is not a lease for future IO: actual transport rechecks under
+    /// its own held reservation. Subsequent cancellation/error never refunds estimated.
     pub fn preparation_worker_claim(
+        &self,
+        id: &str,
+        token: &str,
+    ) -> Result<PreparationWorkerRequest, E> {
+        self.with_preparation_egress(|| self.preparation_worker_claim_unquarantined(id, token))
+    }
+    /// Build a request only under the caller's quarantine reservation. Kernel
+    /// registration, freshness and budget checks remain authoritative; actual
+    /// API/CLI transport must reacquire the reservation at last use.
+    fn preparation_worker_claim_unquarantined(
         &self,
         id: &str,
         token: &str,

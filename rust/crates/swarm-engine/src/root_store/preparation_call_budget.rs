@@ -421,3 +421,45 @@ pub(super) fn existing(
     verify(db, &w)?;
     Ok(w)
 }
+
+/// Read-only freshness observation of the preparation and its linked work
+/// against the currently saved envelopes, mirroring [`existing`]'s limit
+/// arithmetic without any of its turn prerequisites: no open transaction is
+/// required, no witness row is reconstructed (the caller has no turn id), and
+/// nothing is written — this observes, it does not reserve. Reads see the
+/// caller's transaction state; the caller owns admission and transaction
+/// finalization exactly as for [`existing`]. Refusals reuse [`existing`]'s
+/// codes: `preparation-budget-envelope-invalid` on a malformed saved envelope
+/// or shared ledger, `preparation-budget-exhausted` / `work-budget-exhausted`
+/// when a limit above zero is already met or exceeded by the recorded
+/// `reserved`/`estimated` sums. A zero/absent limit is unlimited; recorded
+/// amounts are reserves, never measured cost.
+pub(super) fn observe(db: &Connection, p: &Preparation) -> Result<(), RootStoreError> {
+    if let Some(b) = &p.budget {
+        validate_budget(b).map_err(|e| cause(ENVELOPE_INVALID, e))?;
+        if b.limit_usd.0 > 0.0
+            && ledger_sum(db, &p.id, PREPARATION_USED_ROWS, PREPARATION_USED_SUM)
+                .map_err(|e| cause(ENVELOPE_INVALID, e))?
+                > b.limit_usd.0
+        {
+            return Err(RootStoreError::Refused(PREPARATION_EXHAUSTED));
+        }
+    }
+    if !p.work_id.is_empty() {
+        read_recorded_work(db, &p.work_id).map_err(RootStoreError::Work)?;
+        if let Some(b) = read_budget(db, &p.work_id).map_err(|e| cause(ENVELOPE_INVALID, e))? {
+            if b.limit_usd.0 > 0.0 {
+                let a = ledger_sum(db, &p.work_id, AGENT_ASSIST_ROWS, AGENT_ASSIST_SUM)
+                    .map_err(|e| cause(ENVELOPE_INVALID, e))?;
+                let pr = ledger_sum(db, &p.work_id, PREPARATION_WORK_ROWS, PREPARATION_WORK_SUM)
+                    .map_err(|e| cause(ENVELOPE_INVALID, e))?;
+                let pl = ledger_sum(db, &p.work_id, PLANNING_ROWS, PLANNING_SUM)
+                    .map_err(|e| cause(ENVELOPE_INVALID, e))?;
+                if checked_add(checked_add(a, pr)?, pl)? > b.limit_usd.0 {
+                    return Err(RootStoreError::Refused(WORK_EXHAUSTED));
+                }
+            }
+        }
+    }
+    Ok(())
+}

@@ -389,7 +389,19 @@ impl RootStore {
     /// Saved timeout/observation/output limits are rederived from the native turn;
     /// request values are not authority. No retry/refund or Work task dispatch.
     /// Stream/controller/close/wait failures retain their original typed causes.
+    /// A current quarantine reservation covers this whole controlled operation;
+    /// enabling quarantine waits for it, and no classified-send right is inferred.
     pub fn preparation_worker_run_cli(
+        &self,
+        id: &str,
+        token: &str,
+    ) -> Result<(String, Option<crate::Usage>), E> {
+        self.with_preparation_egress(|| self.preparation_worker_run_cli_unquarantined(id, token))
+    }
+    /// Run the registered CLI provider under the caller's held quarantine
+    /// reservation. Existing process, stdin, stop and cleanup checks apply;
+    /// no unconfined fallback, label or inherited BLP authority is introduced.
+    fn preparation_worker_run_cli_unquarantined(
         &self,
         id: &str,
         token: &str,

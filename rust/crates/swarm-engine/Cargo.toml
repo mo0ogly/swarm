@@ -7,6 +7,10 @@ publish = false
 [features]
 test-fixtures = []
 
+[[example]]
+name = "preparation_quarantine_fixture"
+required-features = ["test-fixtures"]
+
 [dependencies]
 swarm-confidentiality.workspace = true
 c_http = { package = "http", version = "=1.5.0" }

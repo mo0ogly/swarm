@@ -5,6 +5,9 @@ use swarm_engine::{RootStore, RootStoreError as E, SystemEnvironment};
 
 /// Consume exactly a SHA256-sized private gate from stdin, claim the owned
 /// turn, run cancellable HTTP under saved policy and persist its terminal state.
+/// API IO rechecks current quarantine under a shared egress reservation; the
+/// engine CLI runner does the same around its subprocess lifecycle. Policy apply
+/// waits for engaged operations. No classified-send authority is inferred.
 /// Any possible contact retains estimated budget; local cancellation says nothing
 /// about remote completion/billing. Original failures survive finalization errors.
 pub(super) fn execute(a: &Arguments) -> Result<u8, CliError> {
@@ -69,7 +72,7 @@ pub(super) fn execute(a: &Arguments) -> Result<u8, CliError> {
         {
             Ok(runtime) => match request {
                 swarm_engine::PreparationWorkerRequest::Api(request) => {
-                    runtime.block_on(run(&root, id, request))
+                    root.with_preparation_egress(|| runtime.block_on(run(&root, id, request)))
                 }
                 swarm_engine::PreparationWorkerRequest::Cli(_) => {
                     root.preparation_worker_run_cli(id, token)

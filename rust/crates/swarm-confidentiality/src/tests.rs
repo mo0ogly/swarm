@@ -9,7 +9,28 @@ fn policy() -> Policy {
     Policy { schema_version: 1, levels: ["public", "internal", "confidential", "restricted"].iter().map(|id|
         Level { id: (*id).into(), name_fr: (*id).into(), name_en: (*id).into() }).collect(),
         compartments: vec!["client-a".into(), "client-b".into()],
-        clearances: BTreeMap::from([("worker".into(), label("restricted", &["client-a", "client-b"]))]) }
+        clearances: BTreeMap::from([("worker".into(), label("restricted", &["client-a", "client-b"]))]),
+        preparation_quarantine: false }
+}
+
+#[test]
+fn preparation_quarantine_is_explicit_and_preserves_legacy_encoding() {
+    let policy = policy();
+    let legacy = serde_json::to_value(&policy).unwrap();
+    assert!(legacy.get("preparation_quarantine").is_none());
+    let absent: Policy = serde_json::from_value(legacy.clone()).unwrap();
+    assert!(!absent.preparation_quarantine);
+    let mut explicit = legacy.clone(); explicit["preparation_quarantine"] = false.into();
+    let off: Policy = serde_json::from_value(explicit).unwrap();
+    assert_eq!(serde_json::to_vec(&off).unwrap(), serde_json::to_vec(&absent).unwrap());
+    let mut on = legacy.clone(); on["preparation_quarantine"] = true.into();
+    let on: Policy = serde_json::from_value(on).unwrap();
+    assert!(on.preparation_quarantine); absent.validate_successor(&on).unwrap();
+    on.validate_successor(&absent).unwrap();
+    for value in [serde_json::Value::Null, "true".into(), 1.into()] {
+        let mut invalid = legacy.clone(); invalid["preparation_quarantine"] = value;
+        assert!(serde_json::from_value::<Policy>(invalid).is_err());
+    }
 }
 
 #[test]

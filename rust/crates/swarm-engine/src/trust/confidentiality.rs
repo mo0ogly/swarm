@@ -259,14 +259,16 @@ impl Entry {
 }
 
 /// Summarize configured state without disclosing grants, labels or history to
-/// the general operator projection. It explicitly does not claim enforcement.
+/// the general operator projection. Quarantine is an explicit scoped block,
+/// never a claim of transversal BLP enforcement or classified-send authority.
 pub(crate) fn capability(st: &State) -> Result<Value, E> {
     let current=st.confidentiality.as_ref().map(Record::current).transpose()?;
     Ok(json!({"schema_version":1,"configured":current.is_some(),
         "policy_revision":current.map(|e|e.revision.to_string()),
         "authority_current":current.is_some_and(|e|e.trust_revision==st.revision),
         "runtime_enforced":false,"declassification_available":false,
-        "scope":"policy-administration-and-data-only-diagnostics",
+        "preparation_quarantined":current.is_some_and(|e|e.policy.preparation_quarantine),
+        "scope":"policy-administration-diagnostics-and-preparation-quarantine",
         "reason":"blp-producer-and-sink-integration-required"}))
 }
 
@@ -297,7 +299,7 @@ pub(crate) fn execute(st: &mut State, op: &str, raw: &[u8], source: Source<'_>, 
             Err(e)=>json!({"schema_version":1,"diagnostic_only":true,"runtime_authorized":false,"allowed_by_supplied_labels":false,"reason":e.code(),"policy_revision":entry.revision.to_string()}),
         })?,None));
     }
-    if actor.integrity!=3 || !actor.roles.iter().any(|r|r=="admin") { return Err(E::Authorization); }
+    authentication::require_administrator(&actor)?;
     if op=="blp-show" {
         let value:std::collections::BTreeMap<String,Value>=swarm_wire_json::decode(raw)?;
         if !value.is_empty() { return Err(E::Invalid("blp-show-body-invalid")); }

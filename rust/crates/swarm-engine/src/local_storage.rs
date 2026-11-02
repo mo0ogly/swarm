@@ -431,6 +431,18 @@ impl LocalDirectory {
         Ok(LocalReservation{file})
     }
 
+    /// Serialize preparation egress with BLP-policy/identity changes without
+    /// holding the general Trust business journal through provider IO. The
+    /// fixed lock name is protocol vocabulary. Callers acquire this BEFORE a
+    /// short Trust reservation and explicitly preserve unlock/close failures.
+    pub(crate) fn reserve_preparation_egress(&self, exclusive: bool) -> Result<LocalReservation, LocalStorageError> {
+        let file=self.open_file("preparation-egress.lock",OFlags::RDWR|OFlags::CREATE)?;
+        if let Err(error)=fs::flock(&file,if exclusive {FlockOperation::LockExclusive}else{FlockOperation::LockShared}) {
+            return close_after(Err(LocalStorageError::new(LocalStorageOperation::Lock,error)),file);
+        }
+        Ok(LocalReservation{file})
+    }
+
     /// Reserve the actual Go pricing lock with its blocking exclusive semantics.
     /// No timeout, retries or alternative lock name is invented. Open/flock/close
     /// failures preserve causes; callers must close the returned reservation.

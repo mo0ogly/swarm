@@ -52,6 +52,16 @@ pub(super) struct Manifest {
 fn hash(raw: &[u8]) -> String { format!("{:x}", Sha256::digest(raw)) }
 
 impl Manifest {
+    /// Select one exact producer-captured slice after verifying the complete
+    /// prompt, including framing. Returns its digest and total slice count;
+    /// no source text, classification or permission is inferred. An invalid
+    /// index refuses without falling back to a different source.
+    pub(super) fn source_digest(&self, prompt: &str, index: usize) -> Result<(&str, usize), E> {
+        self.verify(prompt)?;
+        let part = self.parts.get(index).ok_or(E::Refused("blp-preparation-source-not-found"))?;
+        Ok((&part.sha256, self.parts.len()))
+    }
+
     /// Resolve every exact transmitted slice against a validated current control
     /// entry and project identity. Verifies provenance first; missing attribution
     /// refuses, including framing/null/empty JSON. Does not infer classification

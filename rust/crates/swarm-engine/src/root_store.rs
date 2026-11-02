@@ -3886,6 +3886,15 @@ mod preparation_call_budget;
 
 #[cfg(target_os = "linux")]
 mod preparation_call;
+
+#[cfg(target_os = "linux")]
+mod preparation_confidentiality;
+#[cfg(target_os = "linux")]
+mod preparation_attribution;
+#[cfg(target_os = "linux")]
+mod preparation_admission;
+#[cfg(target_os = "linux")]
+mod preparation_transport;
 #[cfg(target_os = "linux")]
 mod preparation_prompt;
 #[cfg(target_os = "linux")]

@@ -65,7 +65,15 @@ pub struct Policy {
     pub levels: Vec<Level>,
     pub compartments: Vec<String>,
     pub clearances: BTreeMap<String, Classification>,
+    /// Explicit operator quarantine for preparation sends. Missing/false retains
+    /// the historical policy encoding; true blocks controlled API/CLI egress,
+    /// not arbitrary OS access. Engine consumers own the actual IO reservation.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub preparation_quarantine: bool,
 }
+
+/// Preserve historical policy digests when the optional quarantine is disabled.
+fn is_false(value: &bool) -> bool { !*value }
 
 /// Technical identifier grammar, not an operator limit on levels or compartments.
 fn identifier(s: &str) -> bool {
