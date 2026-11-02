@@ -329,6 +329,20 @@ une décision autorisée ; aucun repli permissif automatique.
 
 ## État réel et reprise
 
+### État courant — 2 novembre 2026 (midi)
+
+Candidat unique livré localement : `bin/swarm` SHA-256
+`186cc38b4dbbdf2d60406d22f7449c3ed848dd046ea26545beb2e97840157853`
+(dev.315 du commit 5c9ca0fe8, livré 2026-11-02T10:51:30Z — 9e remplacement).
+La recette settlement est étendue à sept étapes avec le nouveau scénario T09
+fractionnement/cumul et re-épinglée sur ce livré : preuves fraîches
+`.swarm-fixtures/i17-rerun/i17-run-13/` (7/7 étapes PASS, `source_stable`,
+témoin binaire désigné = livré courant ; voir incrément 121). T09 est désormais
+complète localement pour la fraction agent-actionnable. Acceptation
+indépendante : 0/17, inchangée ; les sept critères ouverts E2 restent opérants.
+Les blocs « État courant » précédents ci-dessous sont conservés comme
+historique (02-11 fin de matinée : run-12 + chain-run-6 sur cdde554a…).
+
 ### État courant — 31 octobre 2026
 
 Candidat unique livré localement : `bin/swarm` SHA-256
@@ -2912,3 +2926,55 @@ complet après octets stables consigné au statut du lot.
 identité simulée, aucun enrôlement réel, aucune approbation produit) ; le
 rejoue complet garde/session-refus/lecture/accord/stale reste exigé avant
 toute remise acceptée ; aucun build/install/serveur ; aucun commit/push.
+
+### Incrément121 — T09/I08 : fractionnement de dette et cumul par re-clé refusés sur l'ELF livré (vérification, Claude)
+
+Tâche bornée (dossier de preuves `.swarm-fixtures/i17-rerun/i17-run-13/`,
+recette permanente `paea-delivered-settlement-cli-rust.json`) : exercer la
+partie « fractionnement et cumul multi-agents » de T09 (PAEA-APEX :287,
+invariant I08 « nouvelle clé ne réautorise pas l'effet ») sur le chemin
+settlement-call du même ELF livré `bin/swarm` SHA-256
+`cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d` (re-hashé à
+chaque spawn, témoin `delivered-binary-witness` = livré courant). Aucun
+changement produit : les refus déjà livrés sont exercés, pas modifiés ;
+compilation TEST seule, pas de rebuild de production.
+
+Test nommé `delivered_settlement_split_and_rekey_refuse_without_second_effect`
+(`rust/crates/swarm-cli/tests/paea_settlement_delivered.rs`, `#[ignore]`,
+exécution explicite par recette), quatre préparations légitimes successives sur
+UNE seule dette provisionnée (invoice-17/v7/420000/EUR/account-17), même
+projet/Trust/révision courante, aucune config-apply dans la fenêtre :
+1. préparation S portant LA MOITIÉ du montant provisionné pour la MÊME facture
+   (210000, `request-split-terms`) → refus `paea-settlement-debt-incompatible`
+   (la ligne de dette garde ses termes provisionnés, jamais réécrits —
+   `paea_settlement.rs` :595), zéro effet (fractionnement avant règlement) ;
+2. préparation aux termes exacts (témoin) → `recorded`, `replayed=false`, un
+   effet durable unique lié aux termes provisionnés ;
+3. préparation S2 (mêmes termes scindés, nonce racine frais) → refus
+   `paea-settlement-business-intent-conflict` : l'action scindée partage
+   l'intention dérivée du domaine (projet+facture, `canonical.rs` :91) avec
+   l'effet enregistré mais son `action_digest` diffère — ni nouvel effet, ni
+   rejeu de l'effet enregistré (fractionnement après règlement) ;
+4. préparation à clé de transport renommée (`request-renamed-transport-key`,
+   mêmes termes canoniques, `request_id` seul modifié) → `recorded`,
+   `replayed=true`, mêmes `intent_id`/`action_digest` : une nouvelle clé de
+   transport ne réautorise jamais l'effet réglé (cumul par re-clé).
+L'état final du grand livre : exactement un effet, dette inchangée
+(v7/420000/EUR/account-17), `paea reconcile-effects` public `consistent`,
+`effectCount` 1, `verified=true`. Recette permanente étendue au septième step
+`settlement-cli-delivered-split-and-rekey-refuse-without-second-effect`
+(assertions obligatoires : témoin binaire désigné, `split-refusal`,
+`paea-settlement-debt-incompatible`, `split-after-settlement-refusal`,
+`paea-settlement-business-intent-conflict`, argv settlement-call commit) ;
+premier run FAIL à l'étape 1 : le livré a encore changé sous le run
+(cdde554a… → 186cc38b…, 9e remplacement, dev.315 du commit 5c9ca0fe8, refusé
+par le témoin interne ; dossier FAIL supprimé, recréé net). Re-épingle depuis
+le hash réel `sha256sum` (cross-check épine=réel, 8/8 occurrences) puis
+run-13 : 7/7 étapes PASS, `recipe.py verify` → VERIFIED
+(`.swarm-fixtures/i17-rerun/i17-run-13/`, `source_stable: true`, 5 spawns
+témoin = livré courant à l'étape T09). Portée : autorité fixture
+explicitement simulée, same-UID, données fictives SQLite ; aucune preuve de
+séparation UID, d'enrôlement humain, de paiement réel ou d'acceptation
+indépendante — T09 passe de « partielle » à « complète localement » pour la
+fraction agent-actionnable (fraction humaine/OS inchangée) ; PAEA17 et
+l'acceptation indépendante 0/17 restent ouverts.

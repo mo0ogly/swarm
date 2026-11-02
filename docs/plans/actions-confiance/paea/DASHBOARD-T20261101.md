@@ -8,10 +8,10 @@ campagnes T01…T22 exécutées.
 ## Candidat et blocage courant
 
 - Binaire désigné : `bin/swarm` SHA-256
-  `4164953c841c2b22476bd552a12496aac2b7f95e9b26de04d986c3238e2ed83c`
-  (v0.1.1-dev.292, commit 8cb05983175bfe6d4195337503aa75e39b4865a5 « authority
-  sessions, signed assertions and engine access mode », construit
-  2026-11-01T09:57:50Z, `modified=true` — arbre sale au build)
+  `186cc38b4dbbdf2d60406d22f7449c3ed848dd046ea26545beb2e97840157853`
+  (v0.1.1-dev.315, commit 5c9ca0fe85a871a102af002c268e9e69a219e863, livré
+  2026-11-02T10:51:30Z — 9e remplacement depuis dev.292 ci-dessous ;
+  historique dev.292/4164953c… conservé pour contexte)
 - Déclaration E2 bornée : **émise** le 31 octobre 2026
   (`claude-e2-arbitrage-20261031T135859Z/DECLARATION-E2.md`) — règlement 6/6 et
   chaîne 4/4 PASS VERIFIED sur fixture regen-5 ; clôt l'étape PA-10 seulement.
@@ -35,7 +35,7 @@ campagnes T01…T22 exécutées.
 | T06 | I08/I09 | PASS | recette crash post-publication, unicité grand livre (PILOTE-OPERATIONNEL) | — (campagne E3 restante) |
 | T07 | I06 | partielle | barrière BT02 incomplète (matrice, 29-10) | Confinement OS |
 | T08 | I07 | bloquée | fixture uniquement | Secrets réels / prérequis OS |
-| T09 | I08 | partielle | grand livre/ref Git local | Fractionnement/cumul multi-agents complet |
+| T09 | I08 | PASS | recette `paea-delivered-settlement-cli-rust` / `i17-run-13` (fractionnement dette + re-clé transport refusés, ELF 186cc38b…, 02-11) | Campagne complète non jouée |
 | T10 | I10/I12 | bloquée | fixture uniquement | Supervision humaine réelle |
 | T11 | I04/I05/I11/I15 | PASS | `paea-i15-tool-substitution-rust.json` / `claude-i15-readmission-20261031T100227Z` (mutation → réadmission prouvée produit) | Campagne complète non jouée |
 | T12 | I11 | bloquée | — | Évaluateur indépendant E3 (0/17) |
@@ -43,7 +43,7 @@ campagnes T01…T22 exécutées.
 | T14 | I02/I14 | conception manquante | — | Design A2A puis code |
 | T15 | I15 | PASS | même preuve que T11 (admission + substitution refusée) | Inventaire ACS (entrées externes) |
 | T16 | I12/I16 | PASS | `paea-i16-lease-reopen-rust.json` (30-10, bloc 9) + contrat 8 cas (glm-order-receipt-20261030T075024Z) | Limites distribuées séparées |
-| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-12` (ELF cdde554a…, 02-11 fin de matinée, 6/6 VERIFIED — révocation settlement-call refusée puis récupération ; run-11/41f00bf9, run-10/280d0199, run-8/c12004bf et antérieurs conservés) | Propagation production |
+| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-13` (ELF 186cc38b…, 02-11 midi, 7/7 VERIFIED — l'étape T09 y est incluse ; run-12/cdde554a, run-11/41f00bf9 et antérieurs conservés) | Propagation production |
 | T18 | I03/I14 | non exercée | — | Périmètre E3 uniquement |
 | T19 | I06/I13 | non exercée | — | Périmètre E3 + confinement I06/I13 |
 | T20 | I04/I15 | non exercée | — | Périmètre E3 uniquement |
@@ -53,8 +53,8 @@ campagnes T01…T22 exécutées.
 ## Pourcentages (numérateurs observés dans les registres)
 
 - Campagnes formelles E3 exécutées : 0/22 (0 %)
-- Recette locale PASS : 8/22 (36 %) — T01, T04, T05, T06, T11, T15, T16, T17
-- Partielle : 4/22 (18 %) — T02, T07, T09, T21
+- Recette locale PASS : 9/22 (41 %) — T01, T04, T05, T06, T09, T11, T15, T16, T17
+- Partielle : 3/22 (14 %) — T02, T07, T21
 - Bloquée humain/OS : 6/22 (27 %) — T03, T08, T10, T12, T13, T22
 - Non exercée E3 : 3/22 (14 %) — T18, T19, T20
 - Conception manquante : 1/22 (5 %) — T14
@@ -128,6 +128,19 @@ campagnes T01…T22 exécutées.
   run-12 settlement 6/6 VERIFIED et chain-run-6 4/4 VERIFIED (témoins = livré
   courant, refus de SHA erroné compris), `source_stable: true`. T17 reste
   PASS, preuve étendue au livré courant.
+- Extension 02-11 midi — T09 passe de « partielle » à PASS local : nouveau
+  scénario de fractionnement/cumul (incrément 121) ajouté à la recette
+  settlement (7e étape) — scission de la dette provisionnée (210000/420000)
+  refusée `paea-settlement-debt-incompatible` avant règlement,
+  `paea-settlement-business-intent-conflict` après règlement, re-clé
+  transport (`request_id` seul modifié) en replay `replayed=true` sans second
+  effet. Premier run FAIL étape 1 : le livré a encore changé sous le run
+  (cdde554a… → 186cc38b…, 9e remplacement, dev.315 de mon commit 5c9ca0fe8,
+  détecté par le témoin interne) ; re-épingle depuis le hash réel
+  `sha256sum` (cross-check épine=réel, 8/8 occurrences) puis run-13 : 7/7
+  étapes VERIFIED sur ELF 186cc38b… (`.swarm-fixtures/i17-rerun/i17-run-13/`,
+  `source_stable: true`). Le livré courant porte maintenant le scénario
+  fractionnement/cumul ; l'ancien run-13 FAIL a été supprimé (recréé net).
 
 ## Portée et limites
 
@@ -173,6 +186,10 @@ un pourcentage d'avancement » (invariant-matrix.json, global_limits).
   cdde554a…9872d (02-11-2026 ~10:55Z, `source_stable: true`)
 - `.swarm-fixtures/i17-rerun/chain-run-6/` — 4/4 VERIFIED sur ELF
   cdde554a…9872d (02-11-2026 ~10:57Z, refus de SHA erroné compris)
+- `.swarm-fixtures/i17-rerun/i17-run-13/` — recette settlement étendue à 7
+  étapes, 7/7 VERIFIED sur ELF 186cc38b…7853 (dev.315, 02-11-2026 midi,
+  `source_stable: true`) — nouvelle étape T09 fractionnement/cumul (run
+  précédent FAIL sur remplacement binaire concurrent, supprimé net)
 - `paea/DASHBOARD-T20261031.md` — instantané précédent (31 octobre 2026)
 - `paea/PILOTE-OPERATIONNEL.md` — recettes initiales T04, T06/T21, T05/T17
 - `paea/E3-PROTOCOL.md` — périmètre des campagnes formelles

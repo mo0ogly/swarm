@@ -360,6 +360,20 @@ M4 installed local E2; M5 independent E3 campaigns; M6 re-evaluated corrections 
 final retrospective. Program remains open after M4. Disabling project protection
 requires an authorized decision; no automatic permissive fallback.
 
+### Current state — 2 November 2026 (midday)
+
+Locally delivered unique candidate: `bin/swarm` SHA-256
+`186cc38b4dbbdf2d60406d22f7449c3ed848dd046ea26545beb2e97840157853`
+(dev.315 from commit 5c9ca0fe8, delivered 2026-11-02T10:51:30Z — 9th
+replacement). The settlement recipe is extended to seven steps with the new
+T09 splitting/accumulation scenario and re-pinned on this binary: fresh
+evidence `.swarm-fixtures/i17-rerun/i17-run-13/` (7/7 steps PASS,
+`source_stable`, designated-binary witness = current delivered binary; see
+increment 121). T09 is now locally complete for the agent-actionable fraction.
+Independent acceptance: 0/17, unchanged; the seven open E2 criteria remain in
+force. The "Current state" blocks below are kept as history (02-11 late
+morning: run-12 + chain-run-6 on cdde554a…).
+
 ### Current state — 31 October 2026
 
 Locally delivered unique candidate: `bin/swarm` SHA-256
@@ -2844,3 +2858,55 @@ after stable bytes recorded in the lot status.
 simulated identity, no real enrollment, no product approval); the full
 guard/session-refusal/read/agreement/stale browser rerun remains required
 before any accepted handover; no build/install/server; no commit/push.
+
+### Increment 121 — T09/I08: debt splitting and re-key accumulation refused on the delivered ELF (verification, Claude)
+
+Bounded task (evidence directory `.swarm-fixtures/i17-rerun/i17-run-13/`,
+permanent recipe `paea-delivered-settlement-cli-rust.json`): exercise the
+"splitting and multi-agent accumulation" part of T09 (PAEA-APEX :287, invariant
+I08 "a new key never re-authorizes the effect") on the settlement-call path of
+the same delivered ELF `bin/swarm` SHA-256
+`cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d` (re-hashed
+at every spawn, `delivered-binary-witness` = current delivered binary). No
+product change: the already-delivered refusals are exercised, not modified;
+TEST-only compilation, no production rebuild.
+
+Test named `delivered_settlement_split_and_rekey_refuse_without_second_effect`
+(`rust/crates/swarm-cli/tests/paea_settlement_delivered.rs`, `#[ignore]`,
+explicit execution via the recipe), four successive legitimate preparations
+against ONE provisioned debt (invoice-17/v7/420000/EUR/account-17), same
+project/Trust/current revision, no config-apply inside the window:
+1. preparation S carrying HALF the provisioned amount for the SAME invoice
+   (210000, `request-split-terms`) → refusal `paea-settlement-debt-incompatible`
+   (the debt row keeps its provisioned terms, never rewritten —
+   `paea_settlement.rs` :595), zero effects (splitting before settlement);
+2. exact-terms preparation (witness) → `recorded`, `replayed=false`, one unique
+   durable effect bound to the provisioned terms;
+3. preparation S2 (same split terms, fresh root nonce) → refusal
+   `paea-settlement-business-intent-conflict`: the split action shares the
+   domain-derived intent (project+invoice, `canonical.rs` :91) with the
+   recorded effect but its `action_digest` differs — no new effect and no
+   replay of the recorded one (splitting after settlement);
+4. renamed-transport-key preparation (`request-renamed-transport-key`, same
+   canonical terms, only `request_id` changed) → `recorded`, `replayed=true`,
+   same `intent_id`/`action_digest`: a new transport key never re-authorizes
+   the settled effect (accumulation through re-keying).
+Final ledger state: exactly one effect, unchanged debt (v7/420000/EUR/
+account-17), public `paea reconcile-effects` `consistent`, `effectCount` 1,
+`verified=true`. Permanent recipe extended to the seventh step
+`settlement-cli-delivered-split-and-rekey-refuse-without-second-effect`
+(mandatory assertions: designated-binary witness, `split-refusal`,
+`paea-settlement-debt-incompatible`, `split-after-settlement-refusal`,
+`paea-settlement-business-intent-conflict`, settlement-call commit argv);
+first run FAIL at step 1: the delivered binary changed again under the run
+(cdde554a… → 186cc38b…, 9th replacement, dev.315 from commit 5c9ca0fe8,
+refused by the internal witness; FAIL directory deleted, recreated clean).
+Re-pin from the real `sha256sum` (pin=real cross-check, 8/8 occurrences) then
+run-13: 7/7 steps PASS, `recipe.py verify` → VERIFIED
+(`.swarm-fixtures/i17-rerun/i17-run-13/`, `source_stable: true`, 5 witnessed
+spawns = current delivered binary at the T09 step). Scope: explicitly
+simulated fixture authority, same-UID, fictitious SQLite data; no UID
+separation, human enrollment, real payment or independent acceptance evidence —
+T09 moves from "partial" to "locally complete" for the agent-actionable
+fraction (human/OS fraction unchanged); PAEA17 and independent acceptance 0/17
+remain open.

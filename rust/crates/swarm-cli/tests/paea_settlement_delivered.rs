@@ -1595,3 +1595,268 @@ fn delivered_settlement_two_cli_instances_same_business_terms_single_effect() {
     owned.ledger.close().unwrap();
     owned.project.close().unwrap();
 }
+
+/// Build one split-terms preparation request by re-encoding the same fixture
+/// document with HALF the provisioned amount for the SAME invoice: same project
+/// context, same `invoice_id`/`invoice_version`/currency/beneficiary, but
+/// `amount_minor` 210000 instead of the provisioned 420000. The document is
+/// re-decoded so the split terms stay inside the real protocol grammar; no
+/// field outside the retained `Document` shape is invented. Returns the exact
+/// bytes to feed the CLI `--input` file plus the canonical-action digest of the
+/// split action (bound through the real canonicalizer, never recomputed by the
+/// harness).
+fn split_document() -> (Vec<u8>, String) {
+    let (mut proposal, context, _) = document();
+    proposal.request_id = "request-split-terms".into();
+    proposal.action = swarm_protection_contract::Action::Payment {
+        invoice_id: "invoice-17".into(),
+        invoice_version: "v7".into(),
+        amount_minor: "210000".into(),
+        currency: "EUR".into(),
+        beneficiary_account_id: "account-17".into(),
+    };
+    let doc = swarm_protection_contract::Document {
+        proposal,
+        context: context.clone(),
+    };
+    // Round-trip through the real decoder: the split terms are proven
+    // representable before any CLI sees them, and the bytes are canonical.
+    let raw = serde_json::to_vec(&doc).unwrap();
+    let decoded = swarm_protection_contract::decode_document(&raw).unwrap();
+    assert_eq!(decoded.proposal, doc.proposal);
+    assert_eq!(decoded.context, doc.context);
+    let split_digest = swarm_protection_contract::canonicalize(&decoded.proposal, &decoded.context)
+        .unwrap()
+        .digest()
+        .to_owned();
+    (raw, split_digest)
+}
+
+/// Build one same-terms request under a DIFFERENT transport key: identical
+/// canonical payment terms (invoice-17/v7/420000/EUR/account-17) but a new
+/// `request_id`, so the canonical action (and its domain-derived intent) is
+/// unchanged while the transport bytes differ. Returns the exact bytes for the
+/// CLI `--input` file.
+fn renamed_request_document() -> Vec<u8> {
+    let (mut proposal, context, _) = document();
+    proposal.request_id = "request-renamed-transport-key".into();
+    let doc = swarm_protection_contract::Document {
+        proposal,
+        context: context.clone(),
+    };
+    let raw = serde_json::to_vec(&doc).unwrap();
+    let decoded = swarm_protection_contract::decode_document(&raw).unwrap();
+    assert_eq!(decoded.proposal, doc.proposal);
+    assert_eq!(decoded.context, doc.context);
+    raw
+}
+
+/// One real T09 splitting-and-accumulation window on the delivered settlement
+/// CLI against ONE provisioned debt (invoice-17/v7/420000/EUR/account-17), same
+/// project/Trust and current revision throughout, no config-apply inside the
+/// window. Four legitimate preparations, each consumed exactly once with its
+/// own current signed fixture agreement:
+/// 1. a SPLIT preparation carrying HALF the provisioned amount for the SAME
+///    invoice refuses `paea-settlement-debt-incompatible` with zero effects:
+///    the debt row keeps its provisioned terms and the half-payment never
+///    settles anything (splitting before settlement);
+/// 2. the exact-terms preparation commits once (`replayed=false`, one durable
+///    effect bound to the provisioned terms) — the same valid witness the other
+///    delivered scenarios use;
+/// 3. a SECOND split preparation (fresh root nonce, same split terms, after
+///    settlement) refuses `paea-settlement-business-intent-conflict`: the split
+///    action shares the domain-derived intent (project+invoice) with the
+///    recorded effect but its action digest differs, so no new effect and no
+///    replay of the recorded one (splitting after settlement);
+/// 4. a renamed-transport-key preparation (same canonical terms, new
+///    `request_id`) replays the SAME durable intent (`replayed=true`, same
+///    intent/digest): a new transport key never re-authorizes the settled
+///    effect (accumulation through re-keying). The ledger ends with exactly
+///    one effect and the debt unchanged; the public read-only
+///    `paea reconcile-effects` CLI reports `consistent`, `effectCount` 1,
+///    one verified finding. Fixture authority only, same-UID, fictitious
+///    SQLite: no UID separation, human presence, real payment or independent
+///    acceptance is proven here.
+#[test]
+#[ignore = "guarded full-root settlement splitting scenario; run explicitly via its recipe"]
+fn delivered_settlement_split_and_rekey_refuse_without_second_effect() {
+    let owned = owned();
+    assert_eq!(
+        debt(owned.ledger_dir.path()),
+        Some(("v7".into(), 420000, "EUR".into(), "account-17".into()))
+    );
+    let (split_raw, split_digest) = split_document();
+    // The split action is a DIFFERENT canonical action from the provisioned
+    // terms (amount differs), while keeping the same domain-derived intent
+    // (project+invoice): exactly the alias the uniqueness contract must refuse.
+    let original_digest = {
+        let (proposal, context, _) = document();
+        swarm_protection_contract::canonicalize(&proposal, &context)
+            .unwrap()
+            .digest()
+            .to_owned()
+    };
+    assert_ne!(split_digest, original_digest);
+    // --- 1. Split preparation BEFORE settlement: refuse, zero effect. ---
+    // `Prepared::prepare` reads the fixed `settlement-request.json` path, so the
+    // request bytes for THIS preparation must sit there first (the
+    // wrong-agreement pattern).
+    let request = owned.ledger_dir.path().join("settlement-request.json");
+    fs::write(&request, &split_raw).unwrap();
+    let mut split1 = Prepared::prepare(
+        &owned,
+        owned
+            .ledger_dir
+            .path()
+            .join("operator-declaration-split-1.json"),
+    );
+    let split_resource = split1.permission.resource.clone();
+    let (split_fixture, split_packet) = provision(&owned, &split1);
+    let (split_status, split_rest, split_stderr) =
+        { let _keep = split_fixture; split1.consume(&split_packet) };
+    assert!(!split_status.success(), "unexpected stdout: {split_rest}");
+    assert!(split_rest.is_empty(), "unexpected stdout: {split_rest}");
+    let split_error: Value = serde_json::from_str(split_stderr.trim()).unwrap();
+    println!(
+        "split-refusal {}",
+        serde_json::to_string(&split_error).unwrap()
+    );
+    assert_eq!(
+        split_error["failure"]["code"], "paea-settlement-debt-incompatible",
+        "stderr: {split_stderr}"
+    );
+    assert_eq!(count(owned.ledger_dir.path()), 0);
+    assert_eq!(
+        debt(owned.ledger_dir.path()),
+        Some(("v7".into(), 420000, "EUR".into(), "account-17".into()))
+    );
+    // --- 2. Exact-terms witness commits once (same path as the other steps). ---
+    fs::write(&request, &owned.document).unwrap();
+    let mut exact = Prepared::prepare(
+        &owned,
+        owned.ledger_dir.path().join("operator-declaration-exact.json"),
+    );
+    let (exact_fixture, exact_packet) = provision(&owned, &exact);
+    let (exact_status, exact_rest, exact_stderr) =
+        { let _keep = exact_fixture; exact.consume(&exact_packet) };
+    assert!(exact_status.success(), "stderr: {exact_stderr}");
+    let committed: Value = serde_json::from_str(exact_rest.trim()).unwrap();
+    assert_eq!(committed["event"], "paea-settlement-result");
+    assert_eq!(committed["outcome"], "recorded");
+    assert_eq!(committed["replayed"], false);
+    assert_eq!(committed["invoice_id"], "invoice-17");
+    let row_intent = committed["intent_id"].as_str().unwrap().to_owned();
+    let row_digest = committed["action_digest"].as_str().unwrap().to_owned();
+    assert_eq!(count(owned.ledger_dir.path()), 1);
+    assert_eq!(
+        debt(owned.ledger_dir.path()),
+        Some(("v7".into(), 420000, "EUR".into(), "account-17".into()))
+    );
+    // --- 3. Split preparation AFTER settlement: intent conflict, no effect. ---
+    fs::write(&request, &split_raw).unwrap();
+    let mut split2 = Prepared::prepare(
+        &owned,
+        owned
+            .ledger_dir
+            .path()
+            .join("operator-declaration-split-2.json"),
+    );
+    assert_ne!(
+        split2.permission.resource, split_resource,
+        "second split preparation reused the refused window's nonce"
+    );
+    // Same domain-derived intent family (project+invoice) but a different
+    // canonical action: the recorded effect must be replayed by its OWN action
+    // only, never by the split one.
+    let (split2_fixture, split2_packet) = provision(&owned, &split2);
+    let (split2_status, split2_rest, split2_stderr) =
+        { let _keep = split2_fixture; split2.consume(&split2_packet) };
+    assert!(!split2_status.success(), "unexpected stdout: {split2_rest}");
+    assert!(split2_rest.is_empty(), "unexpected stdout: {split2_rest}");
+    let split2_error: Value = serde_json::from_str(split2_stderr.trim()).unwrap();
+    println!(
+        "split-after-settlement-refusal {}",
+        serde_json::to_string(&split2_error).unwrap()
+    );
+    assert_eq!(
+        split2_error["failure"]["code"], "paea-settlement-business-intent-conflict",
+        "stderr: {split2_stderr}"
+    );
+    // The ledger still holds exactly the one legitimate effect; the split
+    // refusal recorded nothing and mutated nothing.
+    assert_eq!(count(owned.ledger_dir.path()), 1);
+    assert_eq!(
+        debt(owned.ledger_dir.path()),
+        Some(("v7".into(), 420000, "EUR".into(), "account-17".into()))
+    );
+    // --- 4. Renamed transport key, same canonical terms: replay, no new effect. ---
+    // The renamed request carries the SAME canonical action as the recorded
+    // effect (transport keys are excluded from canonicalization): its exact
+    // agreement replays the durable intent, never a new commitment.
+    fs::write(&request, renamed_request_document()).unwrap();
+    let mut renamed = Prepared::prepare(
+        &owned,
+        owned
+            .ledger_dir
+            .path()
+            .join("operator-declaration-renamed.json"),
+    );
+    assert_eq!(
+        renamed.permission.resource.rsplit('/').next().unwrap(),
+        row_digest.as_str(),
+        "renamed request did not bind the recorded canonical action"
+    );
+    let (renamed_fixture, renamed_packet) = provision(&owned, &renamed);
+    let (renamed_status, renamed_rest, renamed_stderr) =
+        { let _keep = renamed_fixture; renamed.consume(&renamed_packet) };
+    assert!(renamed_status.success(), "stderr: {renamed_stderr}");
+    let replay: Value = serde_json::from_str(renamed_rest.trim()).unwrap();
+    assert_eq!(replay["event"], "paea-settlement-result");
+    assert_eq!(replay["outcome"], "recorded");
+    assert_eq!(
+        replay["replayed"], true,
+        "renamed transport key claimed a new commitment"
+    );
+    assert_eq!(replay["intent_id"], row_intent.as_str());
+    assert_eq!(replay["action_digest"], row_digest.as_str());
+    // Final durable state: exactly one effect, debt unchanged, consistent.
+    assert_eq!(count(owned.ledger_dir.path()), 1);
+    assert_eq!(
+        debt(owned.ledger_dir.path()),
+        Some(("v7".into(), 420000, "EUR".into(), "account-17".into()))
+    );
+    let (same_intent, _, same_digest, _) = effect(owned.ledger_dir.path());
+    assert_eq!(same_intent, row_intent);
+    assert_eq!(same_digest, row_digest);
+    let mut command = delivered_binary();
+    let report_raw = command
+        .args([
+            "paea",
+            "reconcile-effects",
+            owned.ledger_dir.path().to_str().unwrap(),
+            "--json",
+            "--root",
+            owned.project_dir.path().to_str().unwrap(),
+        ])
+        .output()
+        .unwrap();
+    assert!(
+        report_raw.status.success(),
+        "{}",
+        String::from_utf8_lossy(&report_raw.stderr)
+    );
+    assert!(report_raw.stderr.is_empty());
+    let report: Value = serde_json::from_slice(&report_raw.stdout).unwrap();
+    assert_eq!(report["schema_version"], 1);
+    assert_eq!(report["settlement"]["state"], "consistent");
+    assert_eq!(report["settlement"]["effectCount"], 1);
+    assert_eq!(report["settlement"]["findings"][0]["intent_id"], row_intent.as_str());
+    assert_eq!(
+        report["settlement"]["findings"][0]["verified"],
+        true,
+        "unexpected refusals: {:?}",
+        report["settlement"]["findings"][0]["refusals"]
+    );
+    owned.ledger.close().unwrap();
+    owned.project.close().unwrap();
+}

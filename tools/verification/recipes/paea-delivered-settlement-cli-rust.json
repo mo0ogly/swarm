@@ -23,7 +23,7 @@
     "CARGO_PROFILE_TEST_DEBUG": "0",
     "CARGO_INCREMENTAL": "0",
     "SWARM_PAEA_DELIVERED_BIN": "{root}/bin/swarm",
-    "SWARM_PAEA_DELIVERED_BIN_SHA256": "cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d"
+    "SWARM_PAEA_DELIVERED_BIN_SHA256": "186cc38b4dbbdf2d60406d22f7449c3ed848dd046ea26545beb2e97840157853"
   },
   "steps": [
     {
@@ -51,7 +51,7 @@
         "delivered_settlement_commit_replay_reconcile_once ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d",
+        "sha256=186cc38b4dbbdf2d60406d22f7449c3ed848dd046ea26545beb2e97840157853",
         "delivered-settlement-argv --json paea settlement-call commit"
       ],
       "required_stderr": []
@@ -81,7 +81,7 @@
         "delivered_settlement_refuses_bad_frame_without_consumption ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d"
+        "sha256=186cc38b4dbbdf2d60406d22f7449c3ed848dd046ea26545beb2e97840157853"
       ],
       "required_stderr": []
     },
@@ -110,7 +110,7 @@
         "delivered_settlement_revoked_current_authority_refuses_without_effect_then_recovers ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d",
+        "sha256=186cc38b4dbbdf2d60406d22f7449c3ed848dd046ea26545beb2e97840157853",
         "revoked-window-1-refusal",
         "paea-settlement-trust-revision",
         "revoked-window-2-refusal",
@@ -143,7 +143,7 @@
         "delivered_settlement_two_cli_instances_same_business_terms_single_effect ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d",
+        "sha256=186cc38b4dbbdf2d60406d22f7449c3ed848dd046ea26545beb2e97840157853",
         "delivered-settlement-argv --json paea settlement-call commit"
       ],
       "required_stderr": []
@@ -173,7 +173,7 @@
         "delivered_settlement_wrong_agreement_refuses_without_effect_then_recovers ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d",
+        "sha256=186cc38b4dbbdf2d60406d22f7449c3ed848dd046ea26545beb2e97840157853",
         "agreement-mismatch-refusal",
         "enrollment-control:permission"
       ],
@@ -204,8 +204,42 @@
         "delivered_settlement_lost_stdout_after_commit_replays_without_second_effect ... ok",
         "1 passed; 0 failed",
         "delivered-binary-witness path=",
-        "sha256=cdde554aaa55420d7f1739cd4ff5052071f9c3dc6a51992c5a8c6c187659872d",
+        "sha256=186cc38b4dbbdf2d60406d22f7449c3ed848dd046ea26545beb2e97840157853",
         "lost-response-code paea-settlement-call-output durable-effects 1",
+        "delivered-settlement-argv --json paea settlement-call commit"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "settlement-cli-delivered-split-and-rekey-refuse-without-second-effect",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_settlement_delivered",
+        "delivered_settlement_split_and_rekey_refuse_without_second_effect",
+        "--message-format=json",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "delivered_settlement_split_and_rekey_refuse_without_second_effect ... ok",
+        "1 passed; 0 failed",
+        "delivered-binary-witness path=",
+        "sha256=186cc38b4dbbdf2d60406d22f7449c3ed848dd046ea26545beb2e97840157853",
+        "split-refusal",
+        "paea-settlement-debt-incompatible",
+        "split-after-settlement-refusal",
+        "paea-settlement-business-intent-conflict",
         "delivered-settlement-argv --json paea settlement-call commit"
       ],
       "required_stderr": []
