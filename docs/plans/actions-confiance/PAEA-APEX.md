@@ -351,26 +351,41 @@ candidat dev.267 ci-dessus. Tableau de bord de réalisation (instantané 1er
 novembre 2026, T01–T22 et pourcentages sourcés) :
 [DASHBOARD-T20261101.md](paea/DASHBOARD-T20261101.md).
 
-### État courant — 1er novembre 2026 (soir)
+### État courant — 1er novembre 2026 (fin de soirée)
 
 Candidat unique livré localement : `bin/swarm` SHA-256
-`c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b`
-(4e remplacement du jour, 2026-11-01T19:44:34Z — la session parallèle livre
-plusieurs lots à la suite ; dev.308/e54a1dd5… commit 0eff289d1f puis dev.298/
-f5a154da… commit d4e219eea restent dans l'historique du tableau de bord).
-Les deux recettes delivered sont re-pinnées et re-jouées sur ce livré :
+`280d01995c52475c5aaebe7588165cc0089a892f88e367c19dd2648a6f66011c`
+(6e remplacement du jour, 2026-11-01T21:34:15Z ; porte de stabilité adaptative
+verte 21:34→21:45 — les cinq remplacements précédents, dont dev.308/e54a1dd5…
+commit 0eff289d1f et c12004bf…, restent dans l'historique du tableau de bord).
+Les deux recettes delivered sont re-pinnées depuis le hash réel `sha256sum`
+(cross-check épine=réel) et re-jouées sur ce livré : settlement 6/6 VERIFIED
+(`.swarm-fixtures/i17-rerun/i17-run-10/`, `source_stable: true`, témoins
+`delivered-binary-witness` = livré courant) et chaîne 4/4 VERIFIED
+(`.swarm-fixtures/i17-rerun/chain-run-4/`, y compris le refus de SHA erroné).
+Incidents de reprise documentés, preuves conservées : run-6 (E0433 édition
+concurrente pendant compilation), run-7 (témoin interne vs remplacement
+binaire de 19:44:34Z) et run-9 (épingle tronquée posée par cette session lors
+de la re-épingle manuelle — le témoin interne a refusé la divergence ; la
+correction au contrat est la substitution depuis `sha256sum` réel plus
+cross-check). Aucune régression produit établie. L'étape I17 (révocation du
+courant sur le chemin settlement-call → refus sans effet puis récupération)
+reste localement prouvée sur le candidat courant. Acceptation indépendante :
+0/17, inchangée ; les sept critères ouverts E2 restent opérants. Les blocs
+« État courant » de l'après-midi et du soir ci-dessous sont conservés comme
+historique.
+
+### État courant — 1er novembre 2026 (soir, historique)
+
+Candidat livré de 19:44:34Z à ~20:15Z : `bin/swarm` SHA-256
+`c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b`.
+Les deux recettes delivered y avaient été re-pinnées et re-jouées :
 settlement 6/6 VERIFIED (`.swarm-fixtures/i17-rerun/i17-run-8/`,
-`source_stable: true`, témoins `delivered-binary-witness` = livré courant à
-chaque spawn) et chaîne 4/4 VERIFIED (`.swarm-fixtures/i17-rerun/chain-run-3/`,
-y compris le refus de SHA erroné), après deux échecs de reprise documentés :
-run-6 (E0433 édition concurrente pendant compilation, `source_stable: false`)
-et run-7 (témoin interne a refusé la divergence épingle/réel provoquée par le
-remplacement binaire de 19:44:34Z, `source_stable: true`) — preuves conservées,
-aucune régression produit. L'étape I17 (révocation du courant sur le chemin
-settlement-call → refus sans effet puis récupération) reste localement prouvée
-sur le candidat courant. Acceptation indépendante : 0/17, inchangée ; les sept
-critères ouverts E2 restent opérants. Le bloc « État courant — 1er novembre
-2026 » ci-dessous est conservé comme historique de l'après-midi.
+`source_stable: true`) et chaîne 4/4 VERIFIED
+(`.swarm-fixtures/i17-rerun/chain-run-3/`, y compris le refus de SHA erroné),
+après les échecs de reprise run-6 et run-7 documentés ci-dessus.
+Conservé comme historique ; le livré courant est décrit dans le bloc
+« fin de soirée ».
 
 ### État courant — 1er novembre 2026 (après-midi, historique)
 

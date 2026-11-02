@@ -43,7 +43,7 @@ campagnes T01…T22 exécutées.
 | T14 | I02/I14 | conception manquante | — | Design A2A puis code |
 | T15 | I15 | PASS | même preuve que T11 (admission + substitution refusée) | Inventaire ACS (entrées externes) |
 | T16 | I12/I16 | PASS | `paea-i16-lease-reopen-rust.json` (30-10, bloc 9) + contrat 8 cas (glm-order-receipt-20261030T075024Z) | Limites distribuées séparées |
-| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-8` (ELF c12004bf…, 01-11 soir, 6/6 VERIFIED — révocation settlement-call refusée puis récupération ; run-5/dev.298 et run-4/dev.292 conservés) | Propagation production |
+| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-10` (ELF 280d0199…, 01-11 fin de soirée, 6/6 VERIFIED — révocation settlement-call refusée puis récupération ; run-8/c12004bf, run-5/dev.298 et run-4/dev.292 conservés) | Propagation production |
 | T18 | I03/I14 | non exercée | — | Périmètre E3 uniquement |
 | T19 | I06/I13 | non exercée | — | Périmètre E3 + confinement I06/I13 |
 | T20 | I04/I15 | non exercée | — | Périmètre E3 uniquement |
@@ -103,6 +103,18 @@ campagnes T01…T22 exécutées.
   VERIFIED (`chain-run-3/`, refus de SHA erroné compris). T17 reste PASS,
   preuve étendue au livré courant ; run-6/run-7 restent conservés comme preuves
   des deux incidents de reprise.
+- Extension 01-11 fin de soirée : c12004bf… → 4c47b7e8… (5e swap, ~20:15Z)
+  puis 280d01995c52475c5aaebe7588165cc0089a892f88e367c19dd2648a6f66011c
+  (6e swap, 21:34:15Z, porte de stabilité adaptative verte 21:34→21:45).
+  run-9 FAIL à l'étape 1 : épingle posée avec un hash tronqué/faux lors de la
+  re-épingle manuelle (préfixe 16 hex exact, suffixe erroné) — le contrôle
+  `grep` de la session comptait les occurrences du hash faux sans le comparer
+  au réel ; le témoin interne du test a refusé la divergence
+  (`i17-run-9/` conservé, `source_stable: true`). Correction au contrat :
+  re-épingle par substitution depuis `sha256sum` réel + cross-check
+  épine=real, puis run-10 settlement 6/6 VERIFIED et chain-run-4 4/4 VERIFIED
+  (témoins = livré courant dans les stdout, refus de SHA erroné compris),
+  `source_stable: true`. T17 reste PASS, preuve étendue au livré courant.
 
 ## Portée et limites
 
@@ -133,6 +145,13 @@ un pourcentage d'avancement » (invariant-matrix.json, global_limits).
   (01-11-2026 19:56Z, `source_stable: true`, témoins livré courant)
 - `.swarm-fixtures/i17-rerun/chain-run-3/` — 4/4 VERIFIED sur ELF c12004bf…
   (01-11-2026 19:57Z, refus de SHA erroné compris)
+- `.swarm-fixtures/i17-rerun/i17-run-9/` — FAIL étape 1 (épingle tronquée
+  posée par la session, témoin interne a refusé, `source_stable: true`,
+  01-11-2026 21:59Z)
+- `.swarm-fixtures/i17-rerun/i17-run-10/` — 6/6 VERIFIED sur ELF
+  280d0199…6011c (01-11-2026 22:07Z, `source_stable: true`)
+- `.swarm-fixtures/i17-rerun/chain-run-4/` — 4/4 VERIFIED sur ELF
+  280d0199…6011c (01-11-2026 22:10Z, refus de SHA erroné compris)
 - `paea/DASHBOARD-T20261031.md` — instantané précédent (31 octobre 2026)
 - `paea/PILOTE-OPERATIONNEL.md` — recettes initiales T04, T06/T21, T05/T17
 - `paea/E3-PROTOCOL.md` — périmètre des campagnes formelles

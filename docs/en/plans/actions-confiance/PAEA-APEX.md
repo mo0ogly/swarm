@@ -257,24 +257,36 @@ single source of the detailed state; recovery synthesis in
 realization dashboard (snapshot 1 November 2026, T01–T22 with sourced
 percentages): [DASHBOARD-T20261101.md](../../../plans/actions-confiance/paea/DASHBOARD-T20261101.md).
 Current locally delivered candidate: `bin/swarm` SHA-256
-`c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b`
-(4th replacement of the day, 2026-11-01T19:44:34Z — the parallel session is
-shipping successive lots; dev.308/e54a1dd5… commit 0eff289d1f then dev.298/
-f5a154da… commit d4e219eea remain in the dashboard history). Both delivered
-recipes were re-pinned and replayed on this delivered ELF: settlement 6/6
-VERIFIED (`.swarm-fixtures/i17-rerun/i17-run-8/`, `source_stable: true`,
-`delivered-binary-witness` witnesses matching the current candidate at every
-spawn) and chain 4/4 VERIFIED (`.swarm-fixtures/i17-rerun/chain-run-3/`,
-including the wrong-SHA refusal), after two documented recovery failures:
-run-6 (E0433 from a concurrent edit during compilation,
-`source_stable: false`) and run-7 (the test's internal witness refused the
-pin/actual divergence caused by the 19:44:34Z binary swap,
-`source_stable: true`) — evidence retained, no product regression. The I17
-step (current-authority revocation on the settlement-call path → refusal
-without effect, then recovery) remains locally proven on the current
-candidate. Independent acceptance: 0/17, unchanged; the seven open E2 criteria
-remain operative. The "Current locally delivered candidate" paragraph of the
-1 November afternoon state below is kept as history.
+`280d01995c52475c5aaebe7588165cc0089a892f88e367c19dd2648a6f66011c`
+(6th replacement of the day, 2026-11-01T21:34:15Z; adaptive stability gate
+green 21:34→21:45 — the five previous replacements, including dev.308/
+e54a1dd5… commit 0eff289d1f and c12004bf…, remain in the dashboard history).
+Both delivered recipes were re-pinned from the real `sha256sum` hash
+(pin=actual cross-check) and replayed on this delivered ELF: settlement 6/6
+VERIFIED (`.swarm-fixtures/i17-rerun/i17-run-10/`, `source_stable: true`,
+`delivered-binary-witness` matching the current candidate) and chain 4/4
+VERIFIED (`.swarm-fixtures/i17-rerun/chain-run-4/`, including the wrong-SHA
+refusal). Documented recovery failures, evidence retained: run-6 (E0433 from
+a concurrent edit during compilation), run-7 (internal witness vs the
+19:44:34Z binary swap) and run-9 (a truncated pin set by this session during
+manual re-pinning — the internal witness refused the divergence; the contract
+fix is substitution from the real `sha256sum` plus a pin=actual cross-check).
+No product regression established. The I17 step (current-authority revocation
+on the settlement-call path → refusal without effect, then recovery) remains
+locally proven on the current candidate. Independent acceptance: 0/17,
+unchanged; the seven open E2 criteria remain operative. The afternoon and
+evening "Current locally delivered candidate" blocks below are kept as
+history.
+
+Delivered candidate from 19:44:34Z to ~20:15Z (evening, history): `bin/swarm`
+SHA-256 `c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b`.
+Both delivered recipes had been re-pinned and replayed on it: settlement 6/6
+VERIFIED (`.swarm-fixtures/i17-rerun/i17-run-8/`, `source_stable: true`) and
+chain 4/4 VERIFIED (`.swarm-fixtures/i17-rerun/chain-run-3/`, including the
+wrong-SHA refusal), after the run-6 and run-7 recovery failures documented
+above. Kept as history; the current candidate is described in the
+late-evening block.
+
 State summary as of 31 October 2026: local partial verification I01, I04, I05,
 I08, I09, I12, I16, I17; incomplete candidates I06, I13 (BT02, egress not
 confined); human/OS prerequisites I02, I07, I10; missing design I14 (A2A);
