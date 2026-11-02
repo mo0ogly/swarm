@@ -43,7 +43,7 @@ campagnes T01…T22 exécutées.
 | T14 | I02/I14 | conception manquante | — | Design A2A puis code |
 | T15 | I15 | PASS | même preuve que T11 (admission + substitution refusée) | Inventaire ACS (entrées externes) |
 | T16 | I12/I16 | PASS | `paea-i16-lease-reopen-rust.json` (30-10, bloc 9) + contrat 8 cas (glm-order-receipt-20261030T075024Z) | Limites distribuées séparées |
-| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-13` (ELF 186cc38b…, 02-11 midi, 7/7 VERIFIED — l'étape T09 y est incluse ; run-12/cdde554a, run-11/41f00bf9 et antérieurs conservés) | Propagation production |
+| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-13` (ELF 186cc38b…, 02-11 midi, 7/7 VERIFIED, étape I17 révocation comprise ; run-12/cdde554a, run-11/41f00bf9 et antérieurs conservés) | Propagation production |
 | T18 | I03/I14 | non exercée | — | Périmètre E3 uniquement |
 | T19 | I06/I13 | non exercée | — | Périmètre E3 + confinement I06/I13 |
 | T20 | I04/I15 | non exercée | — | Périmètre E3 uniquement |
