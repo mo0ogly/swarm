@@ -1,0 +1,12 @@
+{
+  "error": "blp-preparation-quarantined",
+  "failure": {
+    "causes": [
+      "blp-preparation-quarantined"
+    ],
+    "code": "blp-preparation-quarantined",
+    "message": "blp-preparation-quarantined",
+    "retryable": false
+  },
+  "schema_version": 1
+}

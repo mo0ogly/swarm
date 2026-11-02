@@ -1,0 +1,36 @@
+{
+  "argv": [
+    "cargo",
+    "tree",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--edges",
+    "normal,dev,build",
+    "--prefix",
+    "none",
+    "--format",
+    "{p}"
+  ],
+  "exit": 0,
+  "local_package_closure": [
+    "swarm-biba-linux",
+    "swarm-confidentiality",
+    "swarm-engine",
+    "swarm-enrollment-authority",
+    "swarm-enrollment-bootstrap",
+    "swarm-enrollment-config",
+    "swarm-enrollment-proof",
+    "swarm-enrollment-state",
+    "swarm-identity-contract",
+    "swarm-linux-identity-channel",
+    "swarm-linux-prerequisites",
+    "swarm-protection-contract",
+    "swarm-wire-json"
+  ],
+  "original_refusal": "20261101-preparation-quarantine-locks-01: changed graph_batch.rs outside this dependency closure",
+  "scope": "Declared source scope for engine tests, not complete compiler/feature qualification; production profile separately required"
+}

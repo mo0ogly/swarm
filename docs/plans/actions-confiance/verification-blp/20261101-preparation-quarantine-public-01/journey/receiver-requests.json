@@ -1,0 +1,37 @@
+[
+  {
+    "path": "/v1/chat/completions",
+    "kind": "api",
+    "bytes": 13812,
+    "sha256": "8e5668726272d258dc7622665e360762d822e000b3f2cea251d219566f8eb1e5",
+    "sentinel_present": true
+  },
+  {
+    "path": "/cli-observe",
+    "kind": "cli",
+    "bytes": 26,
+    "sha256": "9eb9ace44897042e09c96d3deed72f76fb9e606fcc18df3a9a7cd9a4ecb67e31",
+    "sentinel_present": true
+  },
+  {
+    "path": "/v1/chat/completions",
+    "kind": "api",
+    "bytes": 14106,
+    "sha256": "2fe76997667e5c09d3572ab124e8022202ee2f75a54c6d0f388599ecb0edf0f1",
+    "sentinel_present": true
+  },
+  {
+    "path": "/v1/chat/completions",
+    "kind": "api",
+    "bytes": 14255,
+    "sha256": "020973ae23a27138f56fae6ae64279c5011cbd7f19149f6ca4bcc1c7f60c00a6",
+    "sentinel_present": true
+  },
+  {
+    "path": "/cli-observe",
+    "kind": "cli",
+    "bytes": 26,
+    "sha256": "9eb9ace44897042e09c96d3deed72f76fb9e606fcc18df3a9a7cd9a4ecb67e31",
+    "sentinel_present": true
+  }
+]

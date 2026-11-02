@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "blp-preparation-source-producer-engine",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/*/src/**/*",
+    "rust/crates/swarm-engine/config/**/*",
+    "rust/crates/swarm-engine/tests/confidentiality.rs",
+    "tools/verification/recipe.py",
+    "rust/crates/swarm-engine/src/root_store/preparation_attribution.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call.rs"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/blp-verification-target",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_BUILD_JOBS": "1"
+  },
+  "steps": [
+    {
+      "id": "typed-http-refusal-status-and-internal-failure",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--lib",
+        "service::tests::blp_preparation_status_preserves_refusal_and_internal_failures",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "blp_preparation_status_preserves_refusal_and_internal_failures",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

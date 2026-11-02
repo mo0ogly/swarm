@@ -1,0 +1,11 @@
+{
+  "status": "DOCUMENTATION_ONLY_REVIEWED",
+  "file": "rust/crates/swarm-engine/src/root_store/preparation_confidentiality_tests.rs",
+  "before_sha256": "941b1ffffeed02fdb66159a5613f1e6ec1cfbe6dedd3b3d04125d35294ca1190",
+  "after_sha256": "b52a5161fe3ea20bdf75ec05dafd84878ca7679d924cf69d3fc8a9025a420835",
+  "test_body_bytes_unchanged": true,
+  "runtime_inputs_unchanged": true,
+  "retained_functional_evidence": "20261101-preparation-source-producer-engine-04",
+  "limits": "Retained tests executed before this attached Rustdoc-only insertion; no claim of compiling the new comment, no repeated application test for wording-only change",
+  "diff": "--- \n+++ \n@@ -25,6 +25,10 @@\n     result\n }\n \n+/// With an owned TMPDIR Root, explicit identities/policy and an inserted native\n+/// row, exercise control attribution and source-derived diagnostics. Panics on\n+/// refusal/replay/corruption/recovery mismatch; writes only the isolated fixture.\n+/// This proves consumer behavior, never admission, real providers or confinement.\n #[test]\n fn recorded_sources_authentication_join_refusal_and_recovery() {\n     let area=std::env::var_os(\"TMPDIR\").expect(\"recipe fixture area required\");\n"
+}

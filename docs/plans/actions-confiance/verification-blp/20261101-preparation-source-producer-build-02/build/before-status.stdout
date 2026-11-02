@@ -1,0 +1,98 @@
+ M README.md
+ M docs/SECURITY-POSITIONING.md
+ M docs/architecture/BIBA-RUST.md
+ M docs/architecture/BLP-FLOWS.md
+ M docs/architecture/blp-flow-inventory.json
+ M docs/en/BIBA-RUST.md
+ M docs/en/BLP-FLOWS.md
+ M docs/en/SECURITY-POSITIONING.md
+ M docs/en/plans/actions-confiance/BLP-APEX.md
+ M docs/en/plans/actions-confiance/PAEA-APEX.md
+ M docs/plans/actions-confiance/BLP-APEX.md
+ M docs/plans/actions-confiance/PAEA-APEX.md
+ M docs/plans/actions-confiance/paea/DASHBOARD-T20261101.md
+ M frontend/engine-settings/admin.css
+ M locales/en.json
+ M rust/crates/swarm-authority/src/accounts.rs
+ M rust/crates/swarm-authority/src/lib.rs
+ M rust/crates/swarm-authority/src/main.rs
+ M rust/crates/swarm-authority/src/policy.rs
+ M rust/crates/swarm-authority/src/server.rs
+ M rust/crates/swarm-authority/src/sessions.rs
+ M rust/crates/swarm-authority/tests/policy.rs
+ M rust/crates/swarm-cli/src/lib.rs
+ M rust/crates/swarm-cli/src/preparation_worker.rs
+ M rust/crates/swarm-cli/src/trust.rs
+ M rust/crates/swarm-confidentiality/src/lib.rs
+ M rust/crates/swarm-confidentiality/src/tests.rs
+ M rust/crates/swarm-engine/Cargo.toml
+ M rust/crates/swarm-engine/src/local_storage.rs
+ M rust/crates/swarm-engine/src/root_store.rs
+ M rust/crates/swarm-engine/src/root_store/preparation_call.rs
+ M rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs
+ M rust/crates/swarm-engine/src/root_store/preparation_confidentiality_tests.rs
+ M rust/crates/swarm-engine/src/root_store/preparation_prompt.rs
+ M rust/crates/swarm-engine/src/root_store/trust_enrollment.rs
+ M rust/crates/swarm-engine/src/root_store/trust_store.rs
+ M rust/crates/swarm-engine/src/trust/authentication.rs
+ M rust/crates/swarm-engine/src/trust/confidentiality.rs
+ M rust/crates/swarm-engine/tests/confidentiality.rs
+ M rust/crates/swarm-engine/tests/trust_enrollment.rs
+ M rust/crates/swarm-web/src/service.rs
+ M rust/crates/swarm-web/src/service/native_admin.rs
+ M rust/crates/swarm-web/src/service/trust.rs
+ M tests/blp_preparation_check.py
+ M tools/verification/recipes/blp-flow-inventory.json
+ M tools/verification/recipes/paea-delivered-chain-cli-rust.json
+ M tools/verification/recipes/paea-delivered-settlement-cli-rust.json
+ M version_history.json
+ M web/i18n-en.js
+ M web/native-runtime.html
+ M web/native-runtime.js
+ M web/trust-confidentiality.js
+ M web/trust-native.html
+?? docs/architecture/BELL-LAPADULA.md
+?? docs/en/BELL-LAPADULA.md
+?? docs/plans/actions-confiance/verification-blp/20261101-blp-documentation-review.json
+?? docs/plans/actions-confiance/verification-blp/20261101-graph-workbench-commitcheck/
+?? docs/plans/actions-confiance/verification-blp/20261101-http-status-commitcheck/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-adapters-01/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-core-01/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-dependency-scope.json
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-documentation-review.json
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-installed-01/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-inventory-01/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-locks-01/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-locks-02/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-locks-03/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-02/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-source-review.json
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-source-producer-adapters-01/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-source-producer-before-01/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-source-producer-before-02/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-source-producer-build-01/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-source-producer-engine-01/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-source-producer-engine-02/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-source-producer-engine-03/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-source-producer-engine-reuse.json
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-source-producer-inventory-01/
+?? docs/plans/actions-confiance/verification-blp/20261101-preparation-source-producer-inventory-02/
+?? rust/crates/swarm-authority/src/admin.rs
+?? rust/crates/swarm-authority/src/audit.rs
+?? rust/crates/swarm-authority/src/keys.rs
+?? rust/crates/swarm-authority/tests/admin_api.rs
+?? rust/crates/swarm-engine/examples/preparation_quarantine_fixture.rs
+?? rust/crates/swarm-engine/src/root_store/preparation_attribution.rs
+?? rust/crates/swarm-engine/src/root_store/preparation_confidentiality.rs
+?? tests/blp_quarantine_installed.py
+?? tests/blp_quarantine_public.py
+?? tests/blp_quarantine_ui.cjs
+?? tools/verification/recipes/blp-preparation-quarantine-adapters.json
+?? tools/verification/recipes/blp-preparation-quarantine-core.json
+?? tools/verification/recipes/blp-preparation-quarantine-locks.json
+?? tools/verification/recipes/blp-preparation-quarantine-public.json
+?? tools/verification/recipes/blp-preparation-source-producer-adapters.json
+?? tools/verification/recipes/blp-preparation-source-producer-engine.json
+?? tools/verification/recipes/blp-preparation-source-producer-public.json
+?? web/native-authority-admin.js

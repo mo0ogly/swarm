@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-preparation-quarantine-locks",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "release-preserves-observed-effect",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::preparation_confidentiality::tests",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 72.17246971999703,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "policy-public-storage-and-actual-lock-order",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "confidentiality",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 62.92269019500236,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "enrolled-config-and-business-consumer",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "trust_enrollment",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 2.504614001009031,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "rebuild-current-separate-pending-fixture-helper",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--features",
+        "test-fixtures",
+        "--example",
+        "preparation_quarantine_fixture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 50.479325865991996,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "7c4313425c5e1da1e849b4d0712364e969550d5fa3ddc8dc791bada7ee3ae4fb",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "e4f370b5b5466adf3ea95bcaa61ef33e767978493f442cffbc07cbd95e0e4cf3",
+    "declared-inputs.tar.gz": "4dee01bad4acaad0dc5e844c7212fca34d66b62c776d1aa56ae10d995ed64872",
+    "environment.json": "5bb3210e002c55a567147892b20d4eb8449de3a250e9a119554abecea3f95608",
+    "step-0001.stdout": "730d0f23103e937986b541faa7fd076056de6526ce429aedb0e12f537456597f",
+    "step-0001.stderr": "6f8ae5ad8f6da07b7a71cfa6b3946c3d96c72eabc2a0b66442b7d69bfce64170",
+    "step-0001.json": "e4e0a8f102caacef488d854dc477d630f52a71a5d9f894c6fff07e1c52eea7c3",
+    "step-0002.stdout": "1cdfb7944260c2a02913f21f9bcecd424f8526f43580e6835d5d1baca7852614",
+    "step-0002.stderr": "9fbf94fe9be0e7ffa694994137d320eb7172ecdeb5eb77ff207cb1fe41f26ee4",
+    "step-0002.json": "b1caaa44d92ec662cf565a84a0e1f87f05e70388ae44337327040e75cb582ad1",
+    "step-0003.stdout": "7571d03ee37b7b831a9b621706372a80471c8474f3dd7e4a24039bc3b345a59e",
+    "step-0003.stderr": "3342f7ecaf8452ce8a19680f91262d64bfebc5b205941750f74c25bc3fee05dc",
+    "step-0003.json": "395be3401676d4576c72d88f14c3935d63e9be9fcd5277312026dc909656b1b2",
+    "step-0004.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0004.stderr": "d9356d027b085ea8ccf07f277d66ed5937caade4d562699e1f9798c1e992272c",
+    "step-0004.json": "790bfef0179822f60467d3e2aa6ce876163670433ed5e95915c4cd37727bcd00",
+    "inputs.after.json": "e4f370b5b5466adf3ea95bcaa61ef33e767978493f442cffbc07cbd95e0e4cf3"
+  }
+}

@@ -1,0 +1,298 @@
+[
+  {
+    "name": "sentinel-executable-control",
+    "passed": true
+  },
+  {
+    "name": "unclassified-admission-refuses",
+    "passed": true
+  },
+  {
+    "name": "unknown-source-no-capsule-or-business-mutation",
+    "passed": true
+  },
+  {
+    "name": "classification-needs-admin",
+    "passed": true
+  },
+  {
+    "name": "actual-pre-admission-source",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-1",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-2",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-3",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-4",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-5",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-6",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-7",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-8",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-9",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-10",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-11",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-12",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-13",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-14",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-15",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-16",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-17",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-18",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-19",
+    "passed": true
+  },
+  {
+    "name": "explicit-source-20",
+    "passed": true
+  },
+  {
+    "name": "source-attribution-does-not-create-turns-or-reservations",
+    "passed": true
+  },
+  {
+    "name": "cli-session",
+    "passed": true
+  },
+  {
+    "name": "cli-no-grant-before-context",
+    "passed": true
+  },
+  {
+    "name": "cli-insufficient-clearance",
+    "passed": true
+  },
+  {
+    "name": "cli-forged-actor",
+    "passed": true
+  },
+  {
+    "name": "cli-forged-label",
+    "passed": true
+  },
+  {
+    "name": "cli-stale-policy",
+    "passed": true
+  },
+  {
+    "name": "cli-stale-trust",
+    "passed": true
+  },
+  {
+    "name": "cli-bad-schema",
+    "passed": true
+  },
+  {
+    "name": "authenticated-nonadmin-domain",
+    "passed": true
+  },
+  {
+    "name": "domain-is-source-join-not-maximum-clearance",
+    "passed": true
+  },
+  {
+    "name": "admission-is-not-provider-authority",
+    "passed": true
+  },
+  {
+    "name": "capsule-private-storage",
+    "passed": true
+  },
+  {
+    "name": "fixed-replay-and-readback",
+    "passed": true
+  },
+  {
+    "name": "admission-does-not-write-trust-or-sql",
+    "passed": true
+  },
+  {
+    "name": "admin-does-not-impersonate-owner",
+    "passed": true
+  },
+  {
+    "name": "event-cannot-change-fixed-context",
+    "passed": true
+  },
+  {
+    "name": "new-context-needs-new-source-attribution",
+    "passed": true
+  },
+  {
+    "name": "http-session",
+    "passed": true
+  },
+  {
+    "name": "http-no-grant-before-context",
+    "passed": true
+  },
+  {
+    "name": "http-insufficient-clearance",
+    "passed": true
+  },
+  {
+    "name": "http-forged-actor",
+    "passed": true
+  },
+  {
+    "name": "http-forged-label",
+    "passed": true
+  },
+  {
+    "name": "http-stale-policy",
+    "passed": true
+  },
+  {
+    "name": "http-stale-trust",
+    "passed": true
+  },
+  {
+    "name": "http-bad-schema",
+    "passed": true
+  },
+  {
+    "name": "http-no-caller-selected-path",
+    "passed": true
+  },
+  {
+    "name": "http-missing-capsule-is-explicit",
+    "passed": true
+  },
+  {
+    "name": "http-real-domain-publication",
+    "passed": true
+  },
+  {
+    "name": "http-effect-reopens-through-cli",
+    "passed": true
+  },
+  {
+    "name": "control-before-truncated-frame",
+    "passed": true
+  },
+  {
+    "name": "http-refuses-truncated-frame",
+    "passed": true
+  },
+  {
+    "name": "recovery-after-truncated-frame",
+    "passed": true
+  },
+  {
+    "name": "control-before-root-mismatch",
+    "passed": true
+  },
+  {
+    "name": "http-refuses-root-mismatch",
+    "passed": true
+  },
+  {
+    "name": "recovery-after-root-mismatch",
+    "passed": true
+  },
+  {
+    "name": "control-before-label-downgrade",
+    "passed": true
+  },
+  {
+    "name": "http-refuses-label-downgrade",
+    "passed": true
+  },
+  {
+    "name": "recovery-after-label-downgrade",
+    "passed": true
+  },
+  {
+    "name": "control-before-invalid-stored-json",
+    "passed": true
+  },
+  {
+    "name": "http-refuses-invalid-stored-json",
+    "passed": true
+  },
+  {
+    "name": "recovery-after-invalid-stored-json",
+    "passed": true
+  },
+  {
+    "name": "policy-change-cannot-refresh-old-domain",
+    "passed": true
+  },
+  {
+    "name": "http-input-attribution-cannot-declassify",
+    "passed": true
+  },
+  {
+    "name": "http-source-attribution-real-publication",
+    "passed": true
+  },
+  {
+    "name": "policy-renewal-needs-every-source-again",
+    "passed": true
+  },
+  {
+    "name": "current-identity-revocation-refuses",
+    "passed": true
+  },
+  {
+    "name": "no-provider-launch-or-business-mutation",
+    "passed": true
+  },
+  {
+    "name": "qualified-image-unchanged",
+    "passed": true
+  }
+]

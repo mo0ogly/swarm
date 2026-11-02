@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "action": "create",
+  "event_id": "create",
+  "expected_revision": 0,
+  "title": "Fixed domain fixture",
+  "text": "Fixture need"
+}

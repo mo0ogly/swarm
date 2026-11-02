@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "blp-preparation-source-producer-public",
+  "inputs": [
+    "tests/blp_attribution_history_cli.py",
+    "tests/fixture_area.py",
+    "tests/rust_agent_model_route.py",
+    "tools/verification/recipe.py",
+    "tests/blp_preparation_check.py",
+    "tests/rust_native_http_cli.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "captured-source-producer-cli-http",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,sys; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=Path(os.environ['SWARM_BLP_PROOF_OUTPUT']) if 'SWARM_BLP_PROOF_OUTPUT' in os.environ else fixture_root('blp-preparation-proof-')/'journey'; subprocess.run(['python3','tests/blp_preparation_check.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',str(out),'--producer-attribution'],check=True); print('BLP_PREPARATION_CLI_HTTP_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS source-derived-join",
+        "PASS http-join",
+        "PASS http-refusal-session",
+        "PASS http-refusal-compartment",
+        "BLP_PREPARATION_JOURNEY_SHA256",
+        "PASS producer-event-conflict",
+        "PASS producer-http-replay",
+        "PASS producer-cli-uncleared-before-row",
+        "PASS producer-http-forged-path",
+        "PASS producer-http-real-publication-under-quarantine",
+        "PASS producer-http-effect-reopens-through-cli",
+        "PASS producer-selector-conflict",
+        "PASS producer-duplicate-object-refuses",
+        "PASS producer-does-not-lift-quarantine"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

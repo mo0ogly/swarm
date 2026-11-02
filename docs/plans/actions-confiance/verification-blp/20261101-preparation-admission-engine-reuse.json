@@ -1,0 +1,16 @@
+{
+  "status": "SIX_UNCHANGED_PASSED_CASES_PLUS_VERIFIED_REPLACEMENT",
+  "original_batch_status": "FAIL",
+  "original": "20261101-preparation-admission-engine-02",
+  "reused_passed_test_body_sha256": {
+    "legacy_terminal_replay_without_native_authority": "a12f4dbe637b17f459de917f5fe487a7b61ec7de8caab5d40b4d548c0a7656f3",
+    "commit_failure_rolls_back_for_same_root_reuse": "2d5c2771d9c261255430d2c5acce7b0057e9e99eea247713b26330069acbbc88",
+    "physical_root_switch_refuses_and_owned_restore_recovers": "882702fa148d1c6b471be06fe00c552bbd8c36c312dda923d73b1355daaf4f17",
+    "last_write_witness_refuses_turn_and_budget_drift": "052eb4480c035bb1daddaf69c1ad3c9e40f9e357a71201e2d59caa77e4eb953b",
+    "changed_source_and_policy_refuse_before_contact": "248031dd2064ce390f68864dfc2324f9a82e0598de8677b3834f2f17acf9bf70",
+    "confidential_admission_is_fixed_authenticated_and_never_dispatchable": "c2e078d73984276c09d52e591bb55c5682a492b842e85c5d8a1e6ee41abcd54f"
+  },
+  "replacement": "20261101-preparation-admission-legacy-01 (1 PASS/VERIFIED)",
+  "baseline": "20261101-preparation-admission-legacy-baseline-01 (real304 readonly replay, exact replay function parity)",
+  "limits": "Original full-batch FAIL retained; six exact test bodies reused and one corrected legacy case rerun. Production qualification and public CLI/HTTP have separate evidence."
+}

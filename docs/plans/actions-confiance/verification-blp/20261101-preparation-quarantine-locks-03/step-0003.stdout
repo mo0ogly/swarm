@@ -1,0 +1,9 @@
+
+running 4 tests
+test enrolled_configuration_uses_egress_control_before_sql ... ok
+test enrolled_biba_action_current_source_exact_root_bytes_plan_and_replay ... ok
+test enrolled_approver_cannot_bypass_exact_financial_validation ... ok
+test enrolled_biba_rechecks_revision_and_disabled_mapping ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.25s
+

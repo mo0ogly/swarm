@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "preparation_id": "prep-fa8847b0c33183273f594550",
+  "event_id": "send",
+  "expected_revision": 2,
+  "provider": "fixture",
+  "capability_hash": "fd89df5dc330988d684ca7c368c81c9ab672d58d733912b5b60e4f2c38e8b70d",
+  "message": "PRIVATE_BLP_SOURCE",
+  "context_mode": "full"
+}

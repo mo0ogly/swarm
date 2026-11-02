@@ -1,0 +1,41 @@
+{
+  "model_route": {
+    "level": "standard",
+    "model": "fixture-standard",
+    "effort": "",
+    "billing": "external",
+    "policy_hash": "1fe3eaf59e14447dba38882e33056f1c767a93127d00d1b29de54d54c9ea3439",
+    "reason": "Politique fournisseur enregistrée · preparation · sans montée en gamme automatique ; annonce non authentifiée"
+  },
+  "context_mode": "full",
+  "used_in_plan": false,
+  "used_in_brief": false,
+  "id": "pt-fa0ebff61b46c05c9dff0b9a8526b181",
+  "preparation_id": "prep-0d6e4079e36703ebd37c0072",
+  "status": "answered",
+  "created_at": "2026-11-01T14:28:52.962138317Z",
+  "ended_at": "2026-11-01T14:28:53.445083559Z",
+  "source_revision": 2,
+  "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+  "provider": "fixture",
+  "provider_digest": "23b36202e25d3dbe34c6accbca90353cc702f9b798bc76a99591d6f72570367e",
+  "request_hash": "9ab372c9b66555b02e47e8ec41a91722da32ebf9c3da6428154fb2151b4c13f0",
+  "question": "PRIVATE_QUARANTINE_FIXTURE",
+  "answer": {
+    "message": "Inert CLI answer",
+    "brief": "Inert CLI brief"
+  },
+  "usage": {
+    "input_tokens": 1,
+    "output_tokens": 1,
+    "source": "événement fournisseur turn.completed",
+    "scope": "dernier événement terminal valide, déclaration non authentifiée ; caches séparés, sans somme ni cumul de session",
+    "at": ""
+  },
+  "stale": false,
+  "timeout_seconds": 300,
+  "timeout_maximum_seconds": 600,
+  "supervisor_pid": 1977641,
+  "supervisor_stamp": "10124035",
+  "host": "fpizzi:93ca189a-b565-4bcd-8585-7b98e29f74b1:pid:[4026531836]"
+}

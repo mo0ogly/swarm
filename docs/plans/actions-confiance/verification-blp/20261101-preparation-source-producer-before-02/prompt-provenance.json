@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "prompt_bytes": 13443,
+  "prompt_sha256": "43897896af72822e81670abc23a8e8397de589ff965456119461e38c864a5b99",
+  "parts": [
+    {
+      "origin": {
+        "kind": "engine_instructions"
+      },
+      "start": 0,
+      "end": 648,
+      "sha256": "a49ed29d56d44aa4d90a377ac6bd6adeaa128078d72680ae3006722b248612fb"
+    },
+    {
+      "origin": {
+        "kind": "data_framing"
+      },
+      "start": 648,
+      "end": 665,
+      "sha256": "b085639e21db327b8e2bb1c6adddcde5933dbc97ce05b3ab66eccd4971e32fea"
+    },
+    {
+      "origin": {
+        "kind": "data_framing"
+      },
+      "start": 665,
+      "end": 681,
+      "sha256": "5673e6db42bb6501518bbb4f6980ae68f17d12c8851722cddb6ca4e05d34b4a7"
+    },
+    {
+      "origin": {
+        "kind": "preparation_data",
+        "field": "adopted_brief"
+      },
+      "start": 681,
+      "end": 685,
+      "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"
+    },
+    {
+      "origin": {
+        "kind": "data_framing"
+      },
+      "start": 685,
+      "end": 698,
+      "sha256": "fb029bc40d2918d34d0732d5c29c77c65e6cb4707b9a7adc8804224dff755a05"
+    },
+    {
+      "origin": {
+        "kind": "preparation_data",
+        "field": "documents"
+      },
+      "start": 698,
+      "end": 875,
+      "sha256": "a58b5cbda16f28342fb35ad67dc2774a91a0e0ed66b2e0df318d2eb877ff0a77"
+    },
+    {
+      "origin": {
+        "kind": "data_framing"
+      },
+      "start": 875,
+      "end": 905,
+      "sha256": "7d0455ba7d7522feff56a168810fb3724a1c6c4191905e60728b7f2fb37252ff"
+    },
+    {
+      "origin": {
+        "kind": "preparation_data",
+        "field": "earlier_exchanges_not_sent"
+      },
+      "start": 905,
+      "end": 906,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "origin": {
+        "kind": "data_framing"
+      },
+      "start": 906,
+      "end": 917,
+      "sha256": "bafb72a3343887b30a8f45a3116eb3020b8b30a4f59ca1a7c272655a3b8aaff6"
+    },
+    {
+      "origin": {
+        "kind": "preparation_data",
+        "field": "history"
+      },
+      "start": 917,
+      "end": 919,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "origin": {
+        "kind": "data_framing"
+      },
+      "start": 919,
+      "end": 935,
+      "sha256": "9799cd07b8292e57f447a0ad282bdbb68016f233092bdc3dd733d8a89c962be2"
+    },
+    {
+      "origin": {
+        "kind": "preparation_data",
+        "field": "history_mode"
+      },
+      "start": 935,
+      "end": 941,
+      "sha256": "1e5941238a72b1f89a5d4cfad9164d5d37f08fab209161841ebf39bf057083d4"
+    },
+    {
+      "origin": {
+        "kind": "data_framing"
+      },
+      "start": 941,
+      "end": 951,
+      "sha256": "fd633b6543c50d86e84903d04f527b38283f367c7c298ef36f08514fa9896478"
+    },
+    {
+      "origin": {
+        "kind": "preparation_data",
+        "field": "method"
+      },
+      "start": 951,
+      "end": 957,
+      "sha256": "d79d81584ece329d53ca68dce6649c42c3f3595408a45d17f9e3da6a9e611ab9"
+    },
+    {
+      "origin": {
+        "kind": "data_framing"
+      },
+      "start": 957,
+      "end": 975,
+      "sha256": "d1b3e297e07906fd0c762e52399aefe785f2ed52735dbab69fbb511a80169fc1"
+    },
+    {
+      "origin": {
+        "kind": "preparation_data",
+        "field": "method_sources"
+      },
+      "start": 975,
+      "end": 13391,
+      "sha256": "1dc53bbb29831719457350c6c98b7179933eda700f2d34893d917c173c70961b"
+    },
+    {
+      "origin": {
+        "kind": "data_framing"
+      },
+      "start": 13391,
+      "end": 13402,
+      "sha256": "5dfe6d9127e7cec138ff893e593bc04e25df4823d8f15c7e48c840206f659a43"
+    },
+    {
+      "origin": {
+        "kind": "preparation_data",
+        "field": "sources"
+      },
+      "start": 13402,
+      "end": 13406,
+      "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"
+    },
+    {
+      "origin": {
+        "kind": "data_framing"
+      },
+      "start": 13406,
+      "end": 13422,
+      "sha256": "33d01589c28170e9ffc420f23b46a7d9f211b85b7a5c09f0562387575ab80243"
+    },
+    {
+      "origin": {
+        "kind": "preparation_data",
+        "field": "user_message"
+      },
+      "start": 13422,
+      "end": 13442,
+      "sha256": "3a7f006dcbffb597f7b399e20a7c154bf89e788cd23cdf9854b719ccc4644069"
+    },
+    {
+      "origin": {
+        "kind": "data_framing"
+      },
+      "start": 13442,
+      "end": 13443,
+      "sha256": "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2"
+    }
+  ]
+}

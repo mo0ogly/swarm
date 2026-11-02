@@ -1,0 +1,8 @@
+{
+  "status": "FAIL_LIVE_UI_PROBE",
+  "cause": "Authority mode correctly refuses owner-key UI assets403; native metadata/image/source checks completed before UI request",
+  "runtime_activated": true,
+  "weakened_authentication": false,
+  "browser_host": "unavailable",
+  "resumption": "Real authenticated Authority session for protected live UI; metadata-only proof separately retained, never a full UI PASS"
+}

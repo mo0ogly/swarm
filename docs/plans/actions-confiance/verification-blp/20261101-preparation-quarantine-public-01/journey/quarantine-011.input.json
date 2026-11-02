@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "expected_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "connection": {
+    "id": "local",
+    "label": "Owned inert API",
+    "base_url": "http://127.0.0.1:42331/v1",
+    "model": "fixed-model",
+    "key": "PRIVATE_INERT_KEY",
+    "disabled": false
+  },
+  "replace_key": true,
+  "preview": false,
+  "preview_token": "ae35df21f688121ad1e7cc70f79dab53cea48fe67406115536d0e6fd58a77454"
+}

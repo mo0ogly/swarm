@@ -1,0 +1,2 @@
+{"scope": "declared-source-inventory-only", "runtime_enforced": false, "failures": [], "reference_count": 56, "flow_count": 25}
+BLP_INVENTORY_CURRENT declared anchors and source hashes only; runtime protection not established

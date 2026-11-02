@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "preparation_id": "prep-0d6e4079e36703ebd37c0072",
+  "event_id": "recovery",
+  "expected_revision": 2,
+  "provider": "api-local",
+  "capability_hash": "4f45803d28a1d93ac6076c408e1035241af771d9b9fbd6d103fb6933c8c37b65",
+  "message": "PRIVATE_QUARANTINE_FIXTURE",
+  "context_mode": "full"
+}

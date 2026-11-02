@@ -1,0 +1,12 @@
+{
+  "tests/blp_admission_public.py": "c75c1185537613f796b3c56f2c725b1feb517a1f2d15704c0a3cd3542318e79d",
+  "tests/blp_admission_ui.py": "f2b1b6c0c7366f1d27d516cd6b45bcf73c6d2f73cee0fac2e157dea45fef1f6d",
+  "tests/blp_attribution_history_cli.py": "8652793f2e492f750a342c4cde862acc205cde7552ab2d350bb20a8c19b53a03",
+  "tests/blp_preparation_check.py": "405611fadbac6e151f0babb34a127f02254bc1ea41296ed19efd1312b90ff456",
+  "tests/fixture_area.py": "4ece994bd492dc4e44adf24388ed50073ceeff7e74527cd106b31824c8ce566c",
+  "tests/paea_local_delivery_test.cjs": "cbe23a2bc12e079c7e65ed5765970b66ddcc4e9f61d8dd73bfab75f9012d4641",
+  "tests/rust_agent_model_route.py": "fbde7b0f32e55d093fe0fd7e490dbb5e317033bff1cbf45476d0fb4ead9248fa",
+  "tests/rust_native_http_cli.py": "81fd8a8e7e4a5f503efe76a21030e4ac66e4d42be08d4354a8f66ebbe9f20c36",
+  "tools/verification/recipe.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+  "tools/verification/recipes/blp-preparation-admission-ui.json": "367f390923380e6bc78f68f39f3bbbf45b83c603c4a199b43238c37f6e17e01f"
+}

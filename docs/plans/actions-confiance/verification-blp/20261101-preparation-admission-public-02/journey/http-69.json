@@ -1,0 +1,24 @@
+{
+  "status": 200,
+  "body": {
+    "actor": "admin",
+    "attributed": true,
+    "canonical_digest": "a49ed29d56d44aa4d90a377ac6bd6adeaa128078d72680ae3006722b248612fb",
+    "capture_phase": "pre-admission",
+    "classification": {
+      "compartments": [
+        "a",
+        "b"
+      ],
+      "level": "secret"
+    },
+    "policy_revision": "2",
+    "producer_captured": true,
+    "reason": "{\"operation\":\"blp-preparation-input-attribute\",\"reason\":\"Explicit per-slice classification fixture\",\"request_digest\":\"3e780536f8e3f493d9026fd4e557132934b3616280635f41ee28c08dc2275db5\",\"source_index\":0}",
+    "runtime_enforced": false,
+    "schema_version": 1,
+    "source_count": 21,
+    "source_index": 0,
+    "trust_revision": "1"
+  }
+}

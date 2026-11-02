@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "event_id": "policy",
+  "expected_revision": 0,
+  "expected_trust_revision": 1,
+  "reason": "Owned source fixture",
+  "policy": {
+    "schema_version": 1,
+    "levels": [
+      {
+        "id": "public",
+        "name_fr": "Public",
+        "name_en": "Public"
+      },
+      {
+        "id": "secret",
+        "name_fr": "Secret",
+        "name_en": "Secret"
+      }
+    ],
+    "compartments": [
+      "a",
+      "b"
+    ],
+    "clearances": {
+      "admin": {
+        "level": "secret",
+        "compartments": [
+          "a",
+          "b"
+        ]
+      },
+      "worker": {
+        "level": "secret",
+        "compartments": [
+          "a"
+        ]
+      }
+    }
+  }
+}

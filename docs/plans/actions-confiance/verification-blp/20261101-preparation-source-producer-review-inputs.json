@@ -1,0 +1,38 @@
+{
+  "rust/crates/swarm-engine/src/root_store/preparation_attribution.rs": {
+    "baseline303_sha256": null,
+    "current_sha256": "8b9a4761cae66822a44e86c883265957cd745316aa38ebfacf970c4a20f81886"
+  },
+  "rust/crates/swarm-engine/src/root_store/preparation_call.rs": {
+    "baseline303_sha256": "71ed5917ea0a84e77574fbae609eeda6fc928e682183099564b0576e8f74c3df",
+    "current_sha256": "12ef0111b53c4d7f86ca93869c1bd1c75bfe02482ac01ea6ff92ef21338af856"
+  },
+  "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs": {
+    "baseline303_sha256": "95f3ffe4d4a03c7d0068868abae1b67be6ecb4e2341d0cbaf6e0c888cb6d98cd",
+    "current_sha256": "2c977828bd39969af3fc6f94dd1df724d1dc1e3559407aa30508b64d3c76725d"
+  },
+  "rust/crates/swarm-engine/src/root_store/trust_store.rs": {
+    "baseline303_sha256": "4dcfc08ec162c8c17286cfc08a1cd5ffc44ef793df7ea99207c44534274d0ca6",
+    "current_sha256": "e2692af15e92476560807a34e6f7dfcfdf1373da30181fb9bbc969614228d894"
+  },
+  "rust/crates/swarm-engine/src/root_store.rs": {
+    "baseline303_sha256": "cf1770cfc7a9657927cc954e3e472820c4683424ded72068fc88c97258f1f493",
+    "current_sha256": "e9fbfe6efbfae8d38cb3053fcc32a9e6f1b8876b3c9003234298f88e7abfbd19"
+  },
+  "rust/crates/swarm-cli/src/trust.rs": {
+    "baseline303_sha256": "5649bc7d822f4ba8f80a9c647ef66fd5138114df1c29f0c8225607c30bc4e95e",
+    "current_sha256": "5e3c035fa0cfa7906bb174bc2492c606d4a4ff990857450a82f9754c5716c089"
+  },
+  "rust/crates/swarm-cli/src/lib.rs": {
+    "baseline303_sha256": "258f9bd9f2d0011ee64693a9009dd90a5d8abefe06c953e7c7006bd92752c698",
+    "current_sha256": "79c1659f39055d0160907495544c0b159052d85aa54a668806d5dc968ffcaf82"
+  },
+  "rust/crates/swarm-web/src/service/trust.rs": {
+    "baseline303_sha256": "0eb2bf8c2ba360cbd859a2ac16bbea270c465e9794efde41b9d00e730923e5a5",
+    "current_sha256": "7dafb19493a756814e639c7562a1eb1069c38d9bb320b7a01cde42180e9492bf"
+  },
+  "rust/crates/swarm-web/src/service.rs": {
+    "baseline303_sha256": "fe238d4fbef71c11d76662a7ac7356e7fdbfeb4848e16d96523ea6900c187d29",
+    "current_sha256": "a42eadeb7fdde9f6fc69aa130402dfbc93d0ce0802cb6ec4d0c4faf679682886"
+  }
+}

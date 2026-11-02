@@ -1,0 +1,12 @@
+{
+  "error": "blp-admission-event-conflict",
+  "failure": {
+    "causes": [
+      "blp-admission-event-conflict"
+    ],
+    "code": "blp-admission-event-conflict",
+    "message": "blp-admission-event-conflict",
+    "retryable": false
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,1 @@
+{"applied":true,"current_revision":"1","policy":{"clearances":{},"compartments":[],"levels":[{"id":"public","name_en":"Public","name_fr":"Public"}],"preparation_quarantine":true,"schema_version":1},"policy_digest":"e8fd7ceee2081662b461cf1a8000679646779e0a31a863192b5792040b859545","proposed_revision":"2","runtime_enforced":false,"schema_version":1,"trust_revision":"1"}

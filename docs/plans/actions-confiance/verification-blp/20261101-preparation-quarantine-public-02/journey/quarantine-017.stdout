@@ -1,0 +1,27 @@
+{
+  "budget": {
+    "limit_usd": 10,
+    "reserve_per_launch_usd": 0.5,
+    "estimate_source": "Inert fixture",
+    "reference_date": "2026-11-01",
+    "updated": "2026-11-01T14:29:25.97905017Z",
+    "actor": "fpizzi/uid:1001"
+  },
+  "id": "prep-d36be6494248ee06ac18f38e",
+  "title": "Quarantine fixture",
+  "method": "apex",
+  "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+  "revision": 2,
+  "created_at": "2026-11-01T14:29:25.873450999Z",
+  "updated_at": "2026-11-01T14:29:25.97905017Z",
+  "documents": {
+    "besoin": {
+      "kind": "besoin",
+      "text": "Owned need",
+      "revision": 1,
+      "sha256": "d87edb4c9b539df32aaaf252b6687aecc68156101d572e758fe4dc308b3157e3",
+      "at": "2026-11-01T14:29:25.873450999Z"
+    }
+  },
+  "plan_ready": false
+}

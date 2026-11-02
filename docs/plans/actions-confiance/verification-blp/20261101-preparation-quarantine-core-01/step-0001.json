@@ -1,0 +1,21 @@
+{
+  "id": "policy-compatibility-and-lattice",
+  "command": [
+    "/home/fpizzi/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-confidentiality",
+    "--lib",
+    "--",
+    "--nocapture"
+  ],
+  "expected_exit": 0,
+  "exit": 0,
+  "seconds": 9.596791750009288,
+  "executable": "/home/fpizzi/.cargo/bin/rustup",
+  "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+}

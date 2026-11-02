@@ -1,0 +1,47 @@
+   Compiling swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+error[E0433]: cannot find `AtomicStorageFault` in `crate`
+   --> crates/swarm-engine/src/root_store/preparation_admission.rs:215:82
+    |
+215 |         if let Err(e)=root.directory.publish_new_with_fault(&name,&framed,crate::AtomicStorageFault::None) {
+    |                                                                                  ^^^^^^^^^^^^^^^^^^ could not find `AtomicStorageFault` in the crate root
+    |
+note: found an item that was configured out
+   --> crates/swarm-engine/src/lib.rs:331:24
+    |
+330 | #[cfg(all(unix, feature = "test-fixtures"))]
+    |                 ------------------------- the item is gated behind the `test-fixtures` feature
+331 | pub use local_storage::AtomicStorageFault;
+    |                        ^^^^^^^^^^^^^^^^^^
+help: consider importing this enum
+    |
+  3 + use crate::local_storage::AtomicStorageFault;
+    |
+help: if you import `AtomicStorageFault`, refer to it directly
+    |
+215 -         if let Err(e)=root.directory.publish_new_with_fault(&name,&framed,crate::AtomicStorageFault::None) {
+215 +         if let Err(e)=root.directory.publish_new_with_fault(&name,&framed,AtomicStorageFault::None) {
+    |
+
+warning: unused import: `verify_candidate`
+  --> crates/swarm-engine/src/managed_repository.rs:19:78
+   |
+19 | pub(crate) use worker::{candidate_worker, prepare_worker, prepare_candidate, verify_candidate, pin_candidate, CandidateWitness, Mana...
+   |                                                                              ^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `SettingCount`
+  --> crates/swarm-engine/src/validation_run_recovery.rs:29:63
+   |
+29 | use crate::{AgentLaunchError, GitReportError, RootStoreError, SettingCount};
+   |                                                               ^^^^^^^^^^^^
+
+warning: unused import: `process::CommandExt`
+  --> crates/swarm-engine/src/root_store/task_validation/process.rs:20:33
+   |
+20 |     os::unix::{net::UnixStream, process::CommandExt},
+   |                                 ^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0433`.
+warning: `swarm-engine` (lib) generated 3 warnings
+error: could not compile `swarm-engine` (lib) due to 1 previous error; 3 warnings emitted

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "add",
+  "expected_revision": 1,
+  "id": "task",
+  "title": "Run",
+  "deliverable": "Evidence",
+  "criteria": [
+    "Observed, not accepted"
+  ]
+}
