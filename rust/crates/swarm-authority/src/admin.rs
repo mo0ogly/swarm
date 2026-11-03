@@ -13,15 +13,26 @@
 //! - `GET  …/accounts`, `POST …/accounts {subject, display_name, roles,
 //!   integrity, attributes, password}`, `POST …/accounts/S/profile {...}`,
 //!   `POST …/accounts/S/password {password}`, `POST …/accounts/S/disable`.
+//! - `GET  …/groups`, `POST …/groups {key, label, roles, members}`,
+//!   `POST …/groups/K/profile {label, roles, members}` (rôles/membres),
+//!   `POST …/groups/K/rename {key}` (nouvelle clé, ancienne lignée révoquée),
+//!   `POST …/groups/K/duplicate {key, label, roles, members}`,
+//!   `POST …/groups/K/delete`. Refus `group-exists` (409), `group-missing`
+//!   (404), `group-in-use` (409), gardes `authority-self-lockout` et
+//!   `authority-last-admin` évalués sur les droits effectifs candidats
+//!   (compte ∪ groupes) contre la politique courante.
 //! - `GET  …/sessions`, `POST …/sessions/ID/revoke`.
 //! - `GET  …/policy`, `POST …/policy/preview {policy, method, path, roles,
 //!   integrity, attributes}`, `POST …/policy {policy, revision}`.
 //! - `GET  …/config`, `POST …/config/preview {config}`,
 //!   `POST …/config {config, revision}`.
 //! - `GET  …/audit` — every audit line ([`crate::audit`]) and `chain_valid`;
-//!   `GET …/audit/sessions?from&to&subject` (connections per session),
+//!   `GET …/audit/sessions?from&to&subject&client&view&no_admin&status&q&sort&dir&page&per_page&format`
+//!   (connections per session; filters, search, sort, server-side pagination,
+//!   `format=csv|json` export without pagination),
 //!   `GET …/audit/sessions/CREDENTIAL` (lines of one session or key),
-//!   `GET …/audit/dashboard?from&to` (per day and account), `POST
+//!   `GET …/audit/dashboard?from&to` (per day and account plus KPIs, per-view
+//!   usage and the 20 most recent lines), `POST
 //!   …/audit/purge {older_than_days}` (≥ 1, no default; chain kept). All
 //!   need the `audit.read` permission.
 //! - B9 keys ([`crate::keys`]): `GET …/me/keys`, `POST …/me/keys {name,
@@ -39,7 +50,7 @@
 //! revision the editor read (`authority-revision-stale`, 409) and replace
 //! `policy.json` / `authority.json` atomically (temporary file in the same
 //! directory, fsync, rename, directory fsync) before swapping the live copy.
-use crate::accounts::{AccountView, Profile};
+use crate::accounts::{AccountView, Group, Profile};
 use crate::config::AuthorityConfig;
 use crate::policy::{self, Action, Policy, Subject};
 use crate::server::{full, now, read_body, Body, Front, COOKIE};
@@ -190,6 +201,38 @@ struct PurgeIn {
     older_than_days: i64,
 }
 
+/// Body of `POST …/groups` (create) and `POST …/groups/K/duplicate`
+/// (target definition): key, label, roles, members — all explicit, no
+/// default membership or role.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct GroupIn {
+    key: String,
+    label: String,
+    #[serde(default)]
+    roles: Vec<String>,
+    #[serde(default)]
+    members: Vec<String>,
+}
+
+/// Body of `POST …/groups/K/profile` (label/roles/members change; the key is
+/// the URL one) and `POST …/groups/K/rename {key: new}` (rename to `key`).
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct GroupProfileIn {
+    label: String,
+    #[serde(default)]
+    roles: Vec<String>,
+    #[serde(default)]
+    members: Vec<String>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct GroupRenameIn {
+    key: String,
+}
+
 fn q_i64(query: &[(String, String)], key: &str) -> Option<i64> {
     query.iter().find(|(k, _)| k == key).and_then(|(_, v)| v.parse().ok())
 }
@@ -213,16 +256,96 @@ fn known_roles(front: &Front, roles: &[String]) -> Result<(), http::Response<Bod
 
 fn account_refusal(code: &str) -> http::Response<Body> {
     let status = match code {
-        "account-missing" | "key-missing" => StatusCode::NOT_FOUND,
+        "account-missing" | "key-missing" | "group-missing" => StatusCode::NOT_FOUND,
         "account-role-unknown" => StatusCode::BAD_REQUEST,
         "key-name-invalid" | "key-expiry-invalid" => StatusCode::BAD_REQUEST,
-        "account-exists" => StatusCode::CONFLICT,
+        "account-exists" | "group-exists" | "group-in-use" => StatusCode::CONFLICT,
         "account-authentication-refused" => StatusCode::FORBIDDEN,
         c if c.starts_with("account-") && c.ends_with("-invalid") => StatusCode::BAD_REQUEST,
+        c if c.starts_with("group-") && c.ends_with("-invalid") => StatusCode::BAD_REQUEST,
         "account-credential" => StatusCode::BAD_REQUEST,
         _ => StatusCode::INTERNAL_SERVER_ERROR,
     };
     refuse(status, code)
+}
+
+/// One candidate change to the group state, for the safety guards:
+/// `Replace(key, group)` rewrites that group, `Delete(key)` removes it.
+enum GroupChange<'a> {
+    Replace(&'a str, Option<(&'a [String], &'a [String])>),
+    Delete(&'a str),
+}
+
+/// Every account's effective roles under the **candidate** group state
+/// (own roles ∪ group roles after applying `change`). Errors surface as
+/// `authority-state` (503): the guards run after the account/group reads
+/// already succeeded once, so a failure here is state corruption, not a
+/// client mistake.
+async fn candidate_effective(front: Arc<Front>, change: GroupChange<'_>) -> Result<Vec<(String, Vec<String>)>, http::Response<Body>> {
+    let f = Arc::clone(&front);
+    let outcome = blocking(move || {
+        let ctx = Context::new();
+        let accounts = f.accounts.list(&ctx).map_err(|e| e.code())?;
+        let groups = f.accounts.groups_map(&ctx).map_err(|e| e.code())?;
+        Ok::<_, &'static str>((accounts, groups))
+    })
+    .await;
+    let (accounts, mut groups) = match outcome {
+        Some(Ok(v)) => v,
+        Some(Err(_)) | None => return Err(refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state")),
+    };
+    // `accounts.list()` already returns effective (own ∪ group) roles; the
+    // stored own roles are what the union must start from. Rebuild them by
+    // subtracting the current group contribution, then re-unite with the
+    // candidate groups — own roles are kept whatever the groups do.
+    let mut own: Vec<(String, Vec<String>)> = accounts
+        .iter()
+        .map(|a| {
+            let borrowed: std::collections::BTreeSet<String> = groups
+                .values()
+                .filter(|g| g.members.iter().any(|m| m == &a.subject))
+                .flat_map(|g| g.roles.iter().cloned())
+                .collect();
+            let kept = a.roles.iter().filter(|r| !borrowed.contains(*r)).cloned().collect();
+            (a.subject.clone(), kept)
+        })
+        .collect();
+    match change {
+        GroupChange::Replace(key, Some((roles, members))) => {
+            let label = groups.get(key).map(|g| g.label.clone()).unwrap_or_default();
+            groups.insert(key.to_owned(), crate::accounts::GroupBody { schema_version: 1, key: key.to_owned(), label, roles: roles.to_vec(), members: members.to_vec() });
+        }
+        GroupChange::Replace(key, None) | GroupChange::Delete(key) => { groups.remove(key); }
+    }
+    own.retain_mut(|(s, r)| { let union = crate::accounts::effective_roles(r, s, &groups); *r = union; true });
+    Ok(own)
+}
+
+/// Safety guards for a group change, in order:
+///
+/// 1. `authority-self-lockout` (409) — the caller would no longer
+///    administer the daemon under the candidate state;
+/// 2. `authority-last-admin` (409) — **no account** would still administer
+///    the daemon under the candidate state.
+///
+/// Both judge administration against the *live* policy (`can_administer`),
+/// the same rule the per-account profile guard uses.
+async fn group_guards(front: Arc<Front>, caller: &AccountView, change: GroupChange<'_>) -> Option<http::Response<Body>> {
+    let effective = match candidate_effective(Arc::clone(&front), change).await {
+        Ok(v) => v,
+        Err(r) => return Some(r),
+    };
+    let keeps = |roles: &[String]| {
+        front.policy.read().map(|p| can_administer(&p, roles, caller.integrity, &caller.attributes)).unwrap_or(false)
+    };
+    let mine = effective.iter().find(|(s, _)| s == &caller.subject).map(|(_, r)| r.clone()).unwrap_or_default();
+    if !keeps(&mine) {
+        return Some(refuse(StatusCode::CONFLICT, "authority-self-lockout"));
+    }
+    if !effective.iter().any(|(_, r)| keeps(r)) {
+        return Some(refuse(StatusCode::CONFLICT, "authority-last-admin"));
+    }
+    None
 }
 
 /// Dispatch one administration request for the signed-in `caller` holding
@@ -244,15 +367,17 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
     };
     match (method, segments.as_slice()) {
         (Method::GET, ["me"]) => {
-            let (administer, permissions) = front
+            let (administer, permissions, views) = front
                 .policy
                 .read()
                 .map(|p| {
-                    let held: Vec<&str> = policy::CATALOG.iter().map(|x| x.key).filter(|k| policy::holds(&p, &subject_of(&caller), k)).collect();
-                    (held.contains(&"accounts.manage"), held)
+                    let subject = subject_of(&caller);
+                    let held: Vec<&str> = policy::CATALOG.iter().map(|x| x.key).filter(|k| policy::holds(&p, &subject, k)).collect();
+                    let views: Vec<&str> = policy::VIEWS.iter().map(|v| v.key).filter(|k| policy::holds(&p, &subject, k)).collect();
+                    (held.contains(&"accounts.manage"), held, views)
                 })
-                .unwrap_or((false, Vec::new()));
-            ok(json!({"account": caller, "session": crate::sessions::token_id(&token), "administer": administer, "permissions": permissions}))
+                .unwrap_or((false, Vec::new(), Vec::new()));
+            ok(json!({"account": caller, "session": crate::sessions::token_id(&token), "administer": administer, "permissions": permissions, "views": views}))
         }
         (Method::POST, ["me", "password"]) => {
             let input: OwnPasswordIn = match decode(&body) { Ok(i) => i, Err(r) => return r };
@@ -402,6 +527,69 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
                 None => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
             }
         }
+        (Method::GET, ["groups"]) => {
+            let f = Arc::clone(&front);
+            match blocking(move || f.accounts.groups(&Context::new()).map_err(|e| e.code())).await {
+                Some(Ok(groups)) => ok(json!({"groups": groups})),
+                Some(Err(c)) => account_refusal(c),
+                None => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
+            }
+        }
+        (Method::POST, ["groups"]) => {
+            let input: GroupIn = match decode(&body) { Ok(i) => i, Err(r) => return r };
+            if let Err(r) = known_roles(&front, &input.roles) { return r; }
+            let (f, g) = (Arc::clone(&front), Group { key: input.key, label: input.label, roles: input.roles, members: input.members });
+            match blocking(move || f.accounts.create_group(&Context::new(), &g).map_err(|e| e.code())).await {
+                Some(Ok(_)) => ok(json!({"created": true})),
+                Some(Err(c)) => account_refusal(c),
+                None => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
+            }
+        }
+        (Method::POST, ["groups", key, "profile"]) => {
+            let input: GroupProfileIn = match decode(&body) { Ok(i) => i, Err(r) => return r };
+            if let Err(r) = known_roles(&front, &input.roles) { return r; }
+            if let Some(r) = group_guards(Arc::clone(&front), &caller, GroupChange::Replace(key, Some((&input.roles, &input.members)))).await { return r; }
+            let (f, k, g) = (Arc::clone(&front), key.to_string(), Group { key: key.to_string(), label: input.label, roles: input.roles, members: input.members });
+            match blocking(move || f.accounts.update_group(&Context::new(), &k, &g).map_err(|e| e.code())).await {
+                Some(Ok(_)) => ok(json!({"updated": true})),
+                Some(Err(c)) => account_refusal(c),
+                None => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
+            }
+        }
+        (Method::POST, ["groups", key, "rename"]) => {
+            let input: GroupRenameIn = match decode(&body) { Ok(i) => i, Err(r) => return r };
+            let (f, k, new) = (Arc::clone(&front), key.to_string(), input.key);
+            match blocking(move || {
+                let ctx = Context::new();
+                let current = f.accounts.group(&ctx, &k).map_err(|e| e.code())?.ok_or("group-missing")?;
+                let g = Group { key: new, label: current.label, roles: current.roles, members: current.members };
+                f.accounts.rename_group(&ctx, &k, &g).map_err(|e| e.code())
+            })
+            .await
+            {
+                Some(Ok(_)) => ok(json!({"renamed": true})),
+                Some(Err(c)) => account_refusal(c),
+                None => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
+            }
+        }
+        (Method::POST, ["groups", key, "duplicate"]) => {
+            let input: GroupIn = match decode(&body) { Ok(i) => i, Err(r) => return r };
+            let (f, k, dup) = (Arc::clone(&front), key.to_string(), Group { key: input.key, label: input.label, roles: input.roles, members: input.members });
+            match blocking(move || f.accounts.duplicate_group(&Context::new(), &k, &dup).map_err(|e| e.code())).await {
+                Some(Ok(_)) => ok(json!({"duplicated": true})),
+                Some(Err(c)) => account_refusal(c),
+                None => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
+            }
+        }
+        (Method::POST, ["groups", key, "delete"]) => {
+            if let Some(r) = group_guards(Arc::clone(&front), &caller, GroupChange::Delete(key)).await { return r; }
+            let (f, k) = (Arc::clone(&front), key.to_string());
+            match blocking(move || f.accounts.delete_group(&Context::new(), &k).map_err(|e| e.code())).await {
+                Some(Ok(_)) => ok(json!({"deleted": true})),
+                Some(Err(c)) => account_refusal(c),
+                None => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
+            }
+        }
         (Method::GET, ["sessions"]) => match front.sessions.list(now()) {
             Ok(list) => ok(json!({"sessions": list, "current": crate::sessions::token_id(&token)})),
             Err(e) => refuse(StatusCode::INTERNAL_SERVER_ERROR, e.code()),
@@ -413,7 +601,7 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
         },
         (Method::GET, ["policy"]) => match front.policy.read() {
             Ok(p) => ok(json!({"policy": *p, "revision": revision(&*p), "source": source(&front.dir, "policy.json"),
-                "catalog": policy::CATALOG, "builtin_roles": policy::BUILTIN_ROLES, "floors": {
+                "catalog": policy::CATALOG, "views": policy::VIEWS, "builtin_roles": policy::BUILTIN_ROLES, "floors": {
                 "read": policy::integrity_floor(Action::Read), "write": policy::integrity_floor(Action::Write),
                 "approve": policy::integrity_floor(Action::Approve), "administer": policy::integrity_floor(Action::Administer)}})),
             Err(_) => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
@@ -465,12 +653,101 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
         }
         (Method::GET, ["audit", "sessions"]) | (Method::GET, ["audit", "dashboard"]) => {
             let (from, to) = (q_i64(&query, "from").unwrap_or(0), q_i64(&query, "to").unwrap_or(i64::MAX));
-            let subject = query.iter().find(|(k, _)| k == "subject").map(|(_, v)| v.as_str()).filter(|v| !v.is_empty());
+            let q = |key: &str| query.iter().find(|(k, _)| k == key).map(|(_, v)| v.as_str()).filter(|v| !v.is_empty());
+            let subject = q("subject");
             match front.audit.read() {
-                Ok((entries, chain_valid)) if segments[1] == "sessions" => ok(json!({"sessions": crate::audit::sessions(&entries, from, to, subject), "chain_valid": chain_valid})),
+                Ok((entries, chain_valid)) if segments[1] == "sessions" => {
+                    // ADM-06: filters, sort, server-side pagination, export.
+                    let mut rows = crate::audit::sessions(&entries, from, to, subject);
+                    if let Some(client) = q("client") {
+                        rows.retain(|r| r.clients.iter().any(|c| c == client));
+                    }
+                    if let Some(view) = q("view") {
+                        rows.retain(|r| r.views.iter().any(|v| v == view));
+                    }
+                    // "Without administration": keep only sessions whose
+                    // account has no `administer` decision on POST …/accounts
+                    // under the live policy (needs the accounts list; blocking).
+                    if q("no_admin") == Some("1") {
+                        let admins: std::collections::BTreeSet<String> = match {
+                            let f = Arc::clone(&front);
+                            blocking(move || f.accounts.list(&Context::new())).await
+                        } {
+                            Some(Ok(list)) => list
+                                .iter()
+                                .filter(|a| {
+                                    let Ok(p) = front.policy.read() else { return false };
+                                    let s = Subject { roles: &a.roles, integrity: a.integrity, attributes: &a.attributes };
+                                    policy::decide(&p, &s, "POST", "/api/v1/authority/accounts").allowed
+                                })
+                                .map(|a| a.subject.clone())
+                                .collect(),
+                            _ => return refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
+                        };
+                        rows.retain(|r| r.subject.as_deref().is_none_or(|s| !admins.contains(s)));
+                    }
+                    if let Some(status) = q("status") {
+                        match status {
+                            "active" => rows.retain(|r| !r.signed_out),
+                            "signed_out" => rows.retain(|r| r.signed_out),
+                            "refused" => rows.retain(|r| r.refusals > 0),
+                            _ => return refuse(StatusCode::BAD_REQUEST, "authority-request-invalid"),
+                        }
+                    }
+                    if let Some(needle) = q("q") {
+                        let n = needle.to_lowercase();
+                        rows.retain(|r| r.subject.as_deref().is_some_and(|s| s.to_lowercase().contains(&n)) || r.credential.to_lowercase().contains(&n));
+                    }
+                    // Sort: `sort` in {last_at, first_at, subject, actions,
+                    // refusals}, `dir` in {asc, desc} (desc default for the
+                    // time and count keys, asc for subject).
+                    let key = q("sort").unwrap_or("last_at");
+                    let desc = q("dir").map(|d| d == "desc").unwrap_or(key != "subject");
+                    let cmp = |a: &crate::audit::SessionSummary, b: &crate::audit::SessionSummary| match key {
+                        "first_at" => a.first_at.cmp(&b.first_at),
+                        "subject" => a.subject.as_deref().unwrap_or("").cmp(b.subject.as_deref().unwrap_or("")),
+                        "actions" => a.actions.cmp(&b.actions),
+                        "refusals" => a.refusals.cmp(&b.refusals),
+                        _ => a.last_at.cmp(&b.last_at),
+                    };
+                    rows.sort_by(|a, b| if desc { cmp(b, a) } else { cmp(a, b) });
+                    let total = rows.len();
+                    let rows = if q("format").is_some() {
+                        rows // export: no pagination
+                    } else {
+                        let page = q_i64(&query, "page").unwrap_or(1).max(1) as usize;
+                        let per = q_i64(&query, "per_page").unwrap_or(50).clamp(1, 200) as usize;
+                        rows.chunks(per).nth(page - 1).unwrap_or_default().to_vec()
+                    };
+                    if q("format") == Some("csv") {
+                        let mut csv = String::from("credential,subject,first_at,last_at,consultations,actions,refusals,signed_out,clients,views\n");
+                        for r in &rows {
+                            let esc = |s: &str| if s.contains(',') || s.contains('"') { format!("\"{}\"", s.replace('"', "\"\"")) } else { s.to_owned() };
+                            csv.push_str(&format!("{},{},{},{},{},{},{},{},{},{}\n",
+                                esc(&r.credential), esc(r.subject.as_deref().unwrap_or("")), r.first_at, r.last_at,
+                                r.consultations, r.actions, r.refusals, r.signed_out,
+                                esc(&r.clients.join(" ")), esc(&r.views.join(" "))));
+                        }
+                        let mut rep = full(StatusCode::OK, "text/csv; charset=utf-8", csv);
+                        rep.headers_mut().insert(header::CONTENT_DISPOSITION, HeaderValue::from_static("attachment; filename=\"connections.csv\""));
+                        return rep;
+                    }
+                    if q("format") == Some("json") {
+                        let mut rep = ok(json!({"sessions": rows, "total": total}));
+                        rep.headers_mut().insert(header::CONTENT_DISPOSITION, HeaderValue::from_static("attachment; filename=\"connections.json\""));
+                        return rep;
+                    }
+                    ok(json!({"sessions": rows, "total": total, "chain_valid": chain_valid}))
+                }
                 Ok((entries, chain_valid)) => {
+                    // ADM-07: dashboard — KPIs, per-view usage, last 20 lines.
                     let (days, accounts) = crate::audit::dashboard(&entries, from, to);
-                    ok(json!({"days": days, "accounts": accounts, "chain_valid": chain_valid}))
+                    let k = crate::audit::kpis(&entries, from, to);
+                    let views = crate::audit::view_usage(&entries, from, to);
+                    let mut recent: Vec<&crate::audit::Entry> = entries.iter().filter(|e| e.at >= from && e.at < to && e.event != crate::audit::PURGE_ANCHOR).collect();
+                    recent.sort_by_key(|e| std::cmp::Reverse(e.at));
+                    let recent: Vec<_> = recent.into_iter().take(20).cloned().collect();
+                    ok(json!({"days": days, "accounts": accounts, "kpis": k, "views": views, "recent": recent, "chain_valid": chain_valid}))
                 }
                 Err(code) => refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
             }
@@ -486,6 +763,11 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
             let input: PurgeIn = match decode(&body) { Ok(i) => i, Err(r) => return r };
             if input.older_than_days < 1 {
                 return refuse(StatusCode::BAD_REQUEST, "authority-purge-days-invalid");
+            }
+            if !front.consume_purge_slot() {
+                let mut rep = refuse(StatusCode::TOO_MANY_REQUESTS, "authority-purge-rate");
+                rep.headers_mut().insert(header::RETRY_AFTER, HeaderValue::from_static("60"));
+                return rep;
             }
             let at = now();
             let Some(before) = input.older_than_days.checked_mul(86_400).and_then(|d| at.checked_sub(d)) else {
@@ -504,9 +786,17 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
             Err(code) => refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
         },
         (Method::GET, ["config"]) => match front.config.read() {
-            Ok(c) => ok(json!({"config": *c, "revision": revision(&*c), "source": source(&front.dir, "authority.json")})),
+            Ok(c) => ok(json!({"config": *c, "revision": revision(&*c), "source": source(&front.dir, "authority.json"),
+                "log_levels": crate::config::LOG_LEVELS, "log_file": "authority.log"})),
             Err(_) => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
         },
+        (Method::GET, ["log"]) => {
+            // Last 200 lines of the daemon's bounded diagnostics file.
+            match front.diag.read_tail(200) {
+                Ok(lines) => ok(json!({"level": front.diag.level(), "lines": lines, "max_bytes": crate::diag::MAX_BYTES})),
+                Err(code) => refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
+            }
+        }
         (Method::POST, ["config", "preview"]) | (Method::POST, ["config"]) => {
             let apply = segments.len() == 1;
             let input: ConfigIn = match decode(&body) { Ok(i) => i, Err(r) => return r };
@@ -525,8 +815,13 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
             if let Err(code) = persist(&front.dir, "authority.json", &bytes) {
                 return refuse(StatusCode::INTERNAL_SERVER_ERROR, code);
             }
-            if front.sessions.set_config(candidate).is_err() {
+            if front.sessions.set_config(candidate.clone()).is_err() {
                 return refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state");
+            }
+            // The diagnostics level follows the applied config (ADM-09);
+            // validation already refused unknown levels.
+            if let Some(level) = crate::diag::level_static(&candidate.log_level) {
+                front.diag.set_level(level);
             }
             *live = candidate;
             ok(json!({"applied": true, "revision": revision(&*live)}))

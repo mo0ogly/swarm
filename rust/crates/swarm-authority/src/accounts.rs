@@ -9,8 +9,18 @@
 //! leaves the new password effective; the stale generation is revoked by the
 //! next write on that subject.
 //!
-//! Limits: no rollback witness (the journal head is not compared with an
-//! independent copy — EP-06 stays open). Journal calls of this process are
+//! Groups (ADM-01) live on the same journal as records
+//! `group/<key>/<nonce>` ([`GroupBody`](crate::accounts::GroupBody): label, roles, members). A group has
+//! no generation: every change (label, roles, members) is a new record; the
+//! only active one wins and deletion revokes it. The **effective roles** of
+//! an account are the union of its own roles and the roles of every active
+//! group it belongs to; [`Accounts::current`](crate::accounts::Accounts::current) returns that union, so
+//! sessions, API keys, policy decisions, signed assertions and `/me` all see
+//! the effective rights without a separate lookup.
+//!
+//! Limits: this registry alone does not compare journal heads with an independent
+//! witness. The HTTP assertion/engine witness path is separate (see [`crate::server`]);
+//! registry operations alone do not establish its deployment or effect. Journal calls are
 //! serialized (the journal has no busy wait by contract). Sessions live in
 //! [`crate::sessions`], API keys in [`crate::keys`] (same journal, `apikey/`
 //! records). Argon2 costs come from [`crate::config::AuthorityConfig`].
@@ -39,7 +49,9 @@ pub struct AccountBody {
     pub credential: Record,
 }
 
-/// Account attributes without verifier material; safe to display.
+/// Account attributes without verifier material; safe to display. `roles` is
+/// the **effective** set (own roles ∪ roles of the active groups the account
+/// belongs to), not the stored profile roles.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct AccountView {
     pub subject: String,
@@ -48,6 +60,63 @@ pub struct AccountView {
     pub integrity: i64,
     pub attributes: BTreeMap<String, String>,
     pub generation: i64,
+}
+
+/// Persisted body of one group state. `deny_unknown_fields`: a body written
+/// by a newer schema refuses instead of being half-read. `key` is the stable
+/// identifier (journal id part, contract name); `label` is the display name;
+/// `members` are account subjects (existence is checked by the callers that
+/// list accounts).
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct GroupBody {
+    pub schema_version: i64,
+    pub key: String,
+    pub label: String,
+    pub roles: Vec<String>,
+    pub members: Vec<String>,
+}
+
+/// Group attributes safe to display.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct GroupView {
+    pub key: String,
+    pub label: String,
+    pub roles: Vec<String>,
+    pub members: Vec<String>,
+}
+
+/// Attributes for a new group or a group change (rename changes the key and
+/// revokes the old lineage; label/roles/members changes rewrite the record).
+#[derive(Clone, Debug)]
+pub struct Group {
+    pub key: String,
+    pub label: String,
+    pub roles: Vec<String>,
+    pub members: Vec<String>,
+}
+
+/// Structural checks for a group: key is a contract `name`, label non-empty
+/// without control characters, roles unique contract names (their existence
+/// in the access policy is checked by the callers that know it; an empty
+/// role list is valid — a group may exist to hold members before roles are
+/// assigned), members unique contract names.
+fn validate_group(g: &Group) -> Result<(), Error> {
+    if !swarm_identity_contract::name(g.key.as_bytes()) {
+        return Err(Error::Refused("group-key-invalid"));
+    }
+    if g.label.trim().is_empty() || g.label.chars().any(char::is_control) {
+        return Err(Error::Refused("group-label-invalid"));
+    }
+    let mut seen = std::collections::BTreeSet::new();
+    if g.roles.iter().any(|r| !swarm_identity_contract::name(r.as_bytes()) || !seen.insert(r)) {
+        return Err(Error::Refused("group-roles-invalid"));
+    }
+    let mut seen = std::collections::BTreeSet::new();
+    if g.members.iter().any(|m| !swarm_identity_contract::name(m.as_bytes()) || !seen.insert(m)) {
+        return Err(Error::Refused("group-members-invalid"));
+    }
+    Ok(())
 }
 
 /// Attributes for a new account or a profile change.
@@ -231,13 +300,20 @@ impl Accounts {
     }
 
     /// Current active generation of `subject` without checking any secret
-    /// (`None` when disabled or unknown). Used by sessions to re-check an
-    /// account at every request. Journal/body errors stay typed.
+    /// (`None` when disabled or unknown). Used by sessions and API keys to
+    /// re-check an account at every request; the view carries the **effective
+    /// roles** (own roles ∪ roles of the active groups the account belongs
+    /// to), so policy decisions, assertions and `/me` see group rights. A
+    /// group membership change therefore takes effect at the account's next
+    /// request, without ending its sessions. Journal/body errors stay typed.
     pub fn current(&self, ctx: &Context, subject: &str) -> Result<Option<AccountView>, Error> {
         if !swarm_identity_contract::name(subject.as_bytes()) {
             return Ok(None);
         }
-        Ok(self.generations(ctx, subject)?.1.first().map(|(_, b)| view(b)))
+        let (_, current) = self.generations(ctx, subject)?;
+        let Some((_, body)) = current.into_iter().next() else { return Ok(None) };
+        let groups = self.groups_map(ctx)?;
+        Ok(Some(effective_view(&body, &groups)))
     }
 
     /// Replace the password: new generation with the same profile, then the
@@ -281,8 +357,10 @@ impl Accounts {
     }
 
     /// All active accounts (current generation each), sorted by subject;
-    /// verifier material is excluded.
+    /// verifier material is excluded. Roles are the effective ones (own
+    /// roles ∪ group roles), like [`Accounts::current`](crate::accounts::Accounts::current).
     pub fn list(&self, ctx: &Context) -> Result<Vec<AccountView>, Error> {
+        let groups = self.groups_map(ctx)?;
         let (_, ids) = self.serial_snapshot(ctx).map_err(Error::Journal)?;
         let mut subjects: Vec<String> = ids
             .iter()
@@ -292,7 +370,7 @@ impl Accounts {
         let mut out = Vec::new();
         for subject in subjects {
             if let Some((_, body)) = self.generations(ctx, &subject)?.1.into_iter().next() {
-                out.push(view(&body));
+                out.push(effective_view(&body, &groups));
             }
         }
         Ok(out)
@@ -308,6 +386,157 @@ impl Accounts {
     pub fn close(&self) -> Result<(), Error> {
         self.journal.close().map_err(Error::Journal)
     }
+
+    /// Active body of group `key` (the record enrolled last; `None` when
+    /// unknown or deleted). Journal/body errors stay typed; a body whose key
+    /// or schema does not match its journal id refuses with
+    /// `group-body-mismatch`. Snapshots list active records sorted by id and
+    /// carry each record's `enrolled_sequence`: the group's current record is
+    /// the one with the highest sequence (a group has no generation counter).
+    fn group_body(&self, ctx: &Context, key: &str) -> Result<Option<GroupBody>, Error> {
+        let (head, ids) = self.serial_snapshot(ctx).map_err(Error::Journal)?;
+        let prefix = format!("group/{key}/");
+        let mut latest: Option<(i64, GroupBody)> = None;
+        for id in ids.into_iter().filter(|id| id.starts_with(&prefix)) {
+            let (seq, body) = self
+                .serial_active(ctx, &head, &id, |r| Ok((r.enrolled_sequence, r.body)))
+                .map_err(Error::Journal)?;
+            let parsed: GroupBody = serde_json::from_slice(&body).map_err(Error::Body)?;
+            if parsed.key != key || parsed.schema_version != 1 {
+                return Err(Error::Refused("group-body-mismatch"));
+            }
+            if latest.as_ref().is_none_or(|(s, _)| seq > *s) {
+                latest = Some((seq, parsed));
+            }
+        }
+        Ok(latest.map(|(_, b)| b))
+    }
+
+    /// Every active group: key → body, sorted by key. Used to compute
+    /// effective roles and to list groups in the Admin.
+    pub fn groups_map(&self, ctx: &Context) -> Result<BTreeMap<String, GroupBody>, Error> {
+        let (_, ids) = self.serial_snapshot(ctx).map_err(Error::Journal)?;
+        let mut keys: Vec<String> = ids
+            .iter()
+            .filter_map(|id| id.strip_prefix("group/").and_then(|r| r.split('/').next()).map(str::to_owned))
+            .collect();
+        keys.sort();
+        keys.dedup();
+        let mut out = BTreeMap::new();
+        for key in keys {
+            if let Some(body) = self.group_body(ctx, &key)? {
+                out.insert(key, body);
+            }
+        }
+        Ok(out)
+    }
+
+    /// All active groups as displayable views, sorted by key.
+    pub fn groups(&self, ctx: &Context) -> Result<Vec<GroupView>, Error> {
+        Ok(self.groups_map(ctx)?.into_values().map(|b| GroupView { key: b.key, label: b.label, roles: b.roles, members: b.members }).collect())
+    }
+
+    /// One group as a displayable view; `None` when unknown or deleted.
+    pub fn group(&self, ctx: &Context, key: &str) -> Result<Option<GroupView>, Error> {
+        if !swarm_identity_contract::name(key.as_bytes()) {
+            return Ok(None);
+        }
+        Ok(self.group_body(ctx, key)?.map(|b| GroupView { key: b.key, label: b.label, roles: b.roles, members: b.members }))
+    }
+
+    /// Create group `key` (journal record `group/<key>/<nonce>`). Refuses an
+    /// already active key (`group-exists`), an invalid definition.
+    pub fn create_group(&self, ctx: &Context, g: &Group) -> Result<Head, Error> {
+        validate_group(g)?;
+        if self.group_body(ctx, &g.key)?.is_some() {
+            return Err(Error::Refused("group-exists"));
+        }
+        self.write_group(ctx, g)
+    }
+
+    /// Replace group `key`'s label/roles/members (same journal key; `g.key`
+    /// must equal `key` — rename goes through [`Accounts::rename_group`]).
+    /// Refuses an unknown key (`group-missing`), an invalid definition.
+    pub fn update_group(&self, ctx: &Context, key: &str, g: &Group) -> Result<Head, Error> {
+        if self.group_body(ctx, key)?.is_none() {
+            return Err(Error::Refused("group-missing"));
+        }
+        self.write_group(ctx, g)
+    }
+
+    /// Rename variant of [`Accounts::update_group`]: enroll under `new_key`
+    /// first, then revoke every still-active record of the old key (an
+    /// interruption between the two writes leaves both active; the next
+    /// write on either key resolves it — same policy as account generations).
+    pub fn rename_group(&self, ctx: &Context, old_key: &str, g: &Group) -> Result<Head, Error> {
+        if self.group_body(ctx, old_key)?.is_none() {
+            return Err(Error::Refused("group-missing"));
+        }
+        if self.group_body(ctx, &g.key)?.is_some() {
+            return Err(Error::Refused("group-exists"));
+        }
+        self.write_group(ctx, g)?;
+        let (mut head, ids) = self.serial_snapshot(ctx).map_err(Error::Journal)?;
+        for old in self.stale_group_records(ctx, &head, &ids, old_key) {
+            let raw = sign_change(&self.key, self.project, &head, "revoke", &old, b"").map_err(Error::Journal)?;
+            head = self.serial_apply(ctx, &head, &raw).map_err(Error::Journal)?;
+        }
+        Ok(head)
+    }
+
+    /// Still-active record ids under `group/<key>/` (snapshot ids include
+    /// only active records, so every match revokes; kept as a helper for the
+    /// revoke loops).
+    fn stale_group_records(&self, ctx: &Context, head: &Head, ids: &[String], key: &str) -> Vec<String> {
+        let prefix = format!("group/{key}/");
+        ids.iter().filter(|id| id.starts_with(&prefix)).filter(|id| self.probe_active(ctx, head, id)).cloned().collect()
+    }
+
+    /// `true` when the record is still active (probe: `with_active` succeeds).
+    fn probe_active(&self, ctx: &Context, head: &Head, id: &str) -> bool {
+        self.serial_active(ctx, head, id, |_r| Ok(())).is_ok()
+    }
+
+    /// Duplicate group `key` as `dup` (same label/roles/members). Refuses an
+    /// unknown source (`group-missing`), an existing target (`group-exists`).
+    pub fn duplicate_group(&self, ctx: &Context, key: &str, dup: &Group) -> Result<Head, Error> {
+        let Some(source) = self.group_body(ctx, key)? else { return Err(Error::Refused("group-missing")) };
+        let g = Group { key: dup.key.clone(), label: dup.label.clone(), roles: source.roles, members: source.members };
+        self.create_group(ctx, &g)
+    }
+
+    /// Delete group `key`: revoke every still-active record of the key.
+    /// Refuses an unknown or already-deleted key (`group-missing`).
+    pub fn delete_group(&self, ctx: &Context, key: &str) -> Result<Head, Error> {
+        let (head, ids) = self.serial_snapshot(ctx).map_err(Error::Journal)?;
+        let stale = self.stale_group_records(ctx, &head, &ids, key);
+        if stale.is_empty() {
+            return Err(Error::Refused("group-missing"));
+        }
+        let mut head = head;
+        for old in stale {
+            let raw = sign_change(&self.key, self.project, &head, "revoke", &old, b"").map_err(Error::Journal)?;
+            head = self.serial_apply(ctx, &head, &raw).map_err(Error::Journal)?;
+        }
+        Ok(head)
+    }
+
+    /// Enroll one group record, then revoke every older active record of the
+    /// same key (single-writer history, like account generations).
+    fn write_group(&self, ctx: &Context, g: &Group) -> Result<Head, Error> {
+        let (mut head, ids) = self.serial_snapshot(ctx).map_err(Error::Journal)?;
+        let mut nonce = [0u8; 8];
+        getrandom::fill(&mut nonce).map_err(|_| Error::Entropy)?;
+        let id = format!("group/{}/{}", g.key, nonce.iter().map(|b| format!("{b:02x}")).collect::<String>());
+        let body = serde_json::to_vec(&GroupBody { schema_version: 1, key: g.key.clone(), label: g.label.clone(), roles: g.roles.clone(), members: g.members.clone() }).map_err(Error::Body)?;
+        let raw = sign_change(&self.key, self.project, &head, "enroll", &id, &body).map_err(Error::Journal)?;
+        head = self.serial_apply(ctx, &head, &raw).map_err(Error::Journal)?;
+        for old in self.stale_group_records(ctx, &head, &ids, &g.key) {
+            let raw = sign_change(&self.key, self.project, &head, "revoke", &old, b"").map_err(Error::Journal)?;
+            head = self.serial_apply(ctx, &head, &raw).map_err(Error::Journal)?;
+        }
+        Ok(head)
+    }
 }
 
 fn view(b: &AccountBody) -> AccountView {
@@ -319,4 +548,24 @@ fn view(b: &AccountBody) -> AccountView {
         attributes: b.attributes.clone(),
         generation: b.generation,
     }
+}
+
+/// Effective roles of `subject` given the active groups: own roles ∪ roles of
+/// every group listing `subject` as a member, sorted and deduplicated.
+pub fn effective_roles(own: &[String], subject: &str, groups: &BTreeMap<String, GroupBody>) -> Vec<String> {
+    let mut set = std::collections::BTreeSet::new();
+    set.extend(own.iter().cloned());
+    for g in groups.values() {
+        if g.members.iter().any(|m| m == subject) {
+            set.extend(g.roles.iter().cloned());
+        }
+    }
+    set.into_iter().collect()
+}
+
+/// [`AccountView`] carrying effective roles instead of the stored profile.
+fn effective_view(b: &AccountBody, groups: &BTreeMap<String, GroupBody>) -> AccountView {
+    let mut v = view(b);
+    v.roles = effective_roles(&b.roles, &b.subject, groups);
+    v
 }

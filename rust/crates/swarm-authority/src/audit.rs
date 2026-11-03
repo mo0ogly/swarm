@@ -29,7 +29,10 @@ use std::{
     sync::Mutex,
 };
 
-/// One audit line (also the read view).
+/// One audit line (also the read view). The enrichment fields (ADM-05,
+/// `duration_ms` … `detail`) are optional and default when absent, so lines
+/// written before they existed decode unchanged and the hash chain stays
+/// valid (T3 compatibility rule: old lines are never rewritten).
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Entry {
@@ -51,6 +54,28 @@ pub struct Entry {
     pub action: Option<String>,
     /// HTTP status of the outcome.
     pub status: Option<u16>,
+    /// Request duration in milliseconds (outcome lines only; measured from
+    /// the request's arrival, sign-in included). Absent on old lines.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub duration_ms: Option<i64>,
+    /// Cockpit view the URL belongs to (`view.<id>` from the catalog, or
+    /// `none` outside every exclusive prefix — API calls, assets). Absent on
+    /// old lines. `view.manage` for the whole authority API.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub view: Option<String>,
+    /// How the caller reached the daemon: `browser` (signed-in session) or
+    /// `api-key`. Absent on old lines.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub client: Option<String>,
+    /// `User-Agent` header, truncated to 120 characters (display only; no
+    /// parsing, no fingerprinting promise). Absent on old lines.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_agent: Option<String>,
+    /// Readable one-line description of an administration mutation (ADM-10),
+    /// e.g. `account created: bob`; `None` for engine relays and reads.
+    /// Absent on old lines.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub detail: Option<String>,
     /// SHA-256 (hex) of the previous line; 64 zeros for the first line.
     pub prev: String,
 }
@@ -67,6 +92,11 @@ pub struct Event<'a> {
     pub path: Option<&'a str>,
     pub action: Option<&'a str>,
     pub status: Option<u16>,
+    pub duration_ms: Option<i64>,
+    pub view: Option<&'a str>,
+    pub client: Option<&'a str>,
+    pub user_agent: Option<&'a str>,
+    pub detail: Option<&'a str>,
 }
 
 struct Tail {
@@ -82,6 +112,62 @@ pub struct Audit {
 
 /// Event of the first line written by [`Audit::purge`].
 pub const PURGE_ANCHOR: &str = "purge-anchor";
+
+/// View key of `path` (no query) for the audit's `view` column (ADM-05): the
+/// exclusive claim when the path is one view's route, `view.authority` for
+/// the whole daemon administration API, `none` elsewhere (family-gated APIs,
+/// assets, sign-in). Not a decision — only an attribution column.
+pub fn view_of(path: &str) -> &'static str {
+    if let Some(v) = crate::policy::view_of_exclusive(path) {
+        return v.key;
+    }
+    if crate::policy::under(path, crate::policy::AUTHORITY_PREFIX) {
+        return "view.authority";
+    }
+    "none"
+}
+
+/// Readable one-line description of an administration mutation (ADM-10),
+/// derived from the method and path only (no body, no secret): the intent
+/// line carries it before the request runs. `None` outside the authority
+/// administration API (engine relays keep their path as the detail).
+pub fn admin_detail(method: &str, path: &str) -> Option<String> {
+    if !crate::policy::under(path, crate::policy::AUTHORITY_PREFIX) || method == "GET" || method == "HEAD" {
+        return None;
+    }
+    let rest = path.strip_prefix(crate::policy::AUTHORITY_PREFIX).unwrap_or(path);
+    let seg: Vec<&str> = rest.split('/').filter(|s| !s.is_empty()).collect();
+    let last = seg.last().copied().unwrap_or("");
+    let target = seg.iter().rev().skip(1).next().copied().unwrap_or("");
+    // A POST to the bare collection creates (subject/key is in the unread
+    // body); any deeper POST targets the entry named by the last segment.
+    let collection = seg.len() == 1;
+    let d = match (seg.first().copied(), last) {
+        (Some("accounts"), "password") => format!("password reset: {target}"),
+        (Some("accounts"), "disable") => format!("account disabled: {target}"),
+        (Some("accounts"), "profile") => format!("account profile changed: {target}"),
+        (Some("accounts"), _) if collection => "account created".to_owned(),
+        (Some("accounts"), _) => format!("account changed: {target}"),
+        (Some("groups"), "profile") => format!("group changed: {target}"),
+        (Some("groups"), "rename") => format!("group renamed: {target}"),
+        (Some("groups"), "duplicate") => format!("group duplicated: {target}"),
+        (Some("groups"), "delete") => format!("group deleted: {target}"),
+        (Some("groups"), _) if collection => "group created".to_owned(),
+        (Some("groups"), _) => format!("group changed: {target}"),
+        (Some("sessions"), "revoke") => format!("session revoked: {target}"),
+        (Some("keys"), "revoke") => format!("API key revoked: {target}"),
+        (Some("me"), "keys") => format!("API key created for self: {target}"),
+        (Some("me"), "revoke") => format!("own API key revoked: {target}"),
+        (Some("me"), "password") => "own password changed".to_owned(),
+        (Some("policy"), "preview") => "policy previewed".to_owned(),
+        (Some("policy"), _) => "policy applied".to_owned(),
+        (Some("config"), "preview") => "settings previewed".to_owned(),
+        (Some("config"), _) => "settings applied".to_owned(),
+        (Some("audit"), "purge") => "audit purged".to_owned(),
+        _ => return None,
+    };
+    Some(d)
+}
 
 const GENESIS: &str = "0000000000000000000000000000000000000000000000000000000000000000";
 
@@ -161,6 +247,11 @@ impl Audit {
             path: ev.path.map(str::to_owned),
             action: ev.action.map(str::to_owned),
             status: ev.status,
+            duration_ms: ev.duration_ms,
+            view: ev.view.map(str::to_owned),
+            client: ev.client.map(str::to_owned),
+            user_agent: ev.user_agent.map(str::to_owned),
+            detail: ev.detail.map(str::to_owned),
             prev: tail.prev.clone(),
         };
         let line = serde_json::to_vec(&entry).map_err(|_| "authority-audit-state")?;
@@ -226,6 +317,11 @@ impl Audit {
             path: None,
             action: Some(format!("removed:{removed}")),
             status: None,
+            duration_ms: None,
+            view: None,
+            client: None,
+            user_agent: None,
+            detail: None,
             prev: String::new(),
         };
         let mut out = serde_json::to_vec(&anchor).map_err(|_| "authority-audit-state")?;
@@ -275,22 +371,29 @@ pub struct SessionSummary {
     pub actions: usize,
     pub refusals: usize,
     pub signed_out: bool,
+    /// Access means seen on this session's lines (`browser`, `api-key`),
+    /// sorted and deduplicated (in practice exactly one).
+    pub clients: Vec<String>,
+    /// Distinct `view.*` keys touched (consulted or acted on), sorted;
+    /// `none` (engine pages without an exclusive view) is included.
+    pub views: Vec<String>,
 }
 
 /// Group `entries` with `at` in `[from, to)` (and `subject` when given) by
 /// credential, most recent first. Lines without credential (refused
-/// sign-ins, anchors) are not sessions.
+/// sign-ins, anchors) are not sessions. The `clients` and `views` columns
+/// back the connections-page filters (ADM-06).
 pub fn sessions(entries: &[Entry], from: i64, to: i64, subject: Option<&str>) -> Vec<SessionSummary> {
-    let mut by: std::collections::BTreeMap<String, SessionSummary> = Default::default();
+    let mut by: std::collections::BTreeMap<String, (SessionSummary, std::collections::BTreeSet<String>, std::collections::BTreeSet<String>)> = Default::default();
     for e in entries.iter().filter(|e| e.at >= from && e.at < to && subject.is_none_or(|s| e.subject.as_deref() == Some(s))) {
         let Some(c) = &e.credential else { continue };
         if !(c.starts_with("session:") || c.starts_with("key:")) {
             continue;
         }
-        let s = by.entry(c.clone()).or_insert_with(|| SessionSummary {
+        let (s, clients, views) = by.entry(c.clone()).or_insert_with(|| (SessionSummary {
             credential: c.clone(), subject: e.subject.clone(), first_at: e.at, last_at: e.at,
-            consultations: 0, actions: 0, refusals: 0, signed_out: false,
-        });
+            consultations: 0, actions: 0, refusals: 0, signed_out: false, clients: Vec::new(), views: Vec::new(),
+        }, Default::default(), Default::default()));
         s.first_at = s.first_at.min(e.at);
         s.last_at = s.last_at.max(e.at);
         match e.event.as_str() {
@@ -300,8 +403,21 @@ pub fn sessions(entries: &[Entry], from: i64, to: i64, subject: Option<&str>) ->
             "sign-out" => s.signed_out = true,
             _ => {}
         }
+        if let Some(cl) = &e.client {
+            clients.insert(cl.clone());
+        }
+        if let Some(v) = &e.view {
+            views.insert(v.clone());
+        }
     }
-    let mut out: Vec<SessionSummary> = by.into_values().collect();
+    let mut out: Vec<SessionSummary> = by
+        .into_values()
+        .map(|(mut s, clients, views)| {
+            s.clients = clients.into_iter().collect();
+            s.views = views.into_iter().collect();
+            s
+        })
+        .collect();
     out.sort_by_key(|s| std::cmp::Reverse(s.first_at));
     out
 }
@@ -388,4 +504,59 @@ pub fn dashboard(entries: &[Entry], from: i64, to: i64) -> (Vec<Day>, Vec<Accoun
     let mut accounts: Vec<AccountActivity> = accounts.into_values().map(|(mut a, c)| { a.sessions = c.len(); a }).collect();
     accounts.sort_by_key(|a| std::cmp::Reverse((a.actions, a.consultations)));
     (days, accounts)
+}
+
+/// Headline counters over `[from, to)` (ADM-07): the four dashboard KPIs.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct Kpis {
+    pub sign_ins: usize,
+    pub refused_sign_ins: usize,
+    pub actions: usize,
+    pub refusals: usize,
+}
+
+/// Count of each event family over the period — the four headline KPIs.
+pub fn kpis(entries: &[Entry], from: i64, to: i64) -> Kpis {
+    let mut k = Kpis { sign_ins: 0, refused_sign_ins: 0, actions: 0, refusals: 0 };
+    for e in entries.iter().filter(|e| e.at >= from && e.at < to) {
+        match e.event.as_str() {
+            "sign-in" => k.sign_ins += 1,
+            "sign-in-refused" => k.refused_sign_ins += 1,
+            "intent" => k.actions += 1,
+            "refused" => k.refusals += 1,
+            _ => {}
+        }
+    }
+    k
+}
+
+/// Request/activity count for one `view.*` key over the period — the
+/// per-view bar chart (ADM-07). `none` groups engine pages without an
+/// exclusive view; anchors have no view.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct ViewUsage {
+    /// `view.*` key or `none`.
+    pub view: String,
+    pub consultations: usize,
+    pub actions: usize,
+    pub refusals: usize,
+}
+
+/// Per-view activity over `[from, to)`, consultations then actions
+/// descending, `none` last.
+pub fn view_usage(entries: &[Entry], from: i64, to: i64) -> Vec<ViewUsage> {
+    let mut by: std::collections::BTreeMap<String, ViewUsage> = Default::default();
+    for e in entries.iter().filter(|e| e.at >= from && e.at < to && e.event != PURGE_ANCHOR) {
+        let Some(key) = e.view.clone().or_else(|| (e.event == "sign-in" || e.event == "sign-out").then(|| "none".to_owned())) else { continue };
+        let v = by.entry(key).or_insert_with(|| ViewUsage { view: String::new(), consultations: 0, actions: 0, refusals: 0 });
+        match e.event.as_str() {
+            "consultation" => v.consultations += 1,
+            "intent" | "outcome" => v.actions += 1,
+            "refused" => v.refusals += 1,
+            _ => {}
+        }
+    }
+    let mut out: Vec<ViewUsage> = by.into_iter().map(|(view, v)| ViewUsage { view, ..v }).collect();
+    out.sort_by(|a, b| (b.consultations, b.actions).cmp(&(a.consultations, a.actions)).then(b.view.cmp(&a.view)));
+    out
 }

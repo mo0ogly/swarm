@@ -1,5 +1,5 @@
 {
- "schema_version": 2,
+ "schema_version": 3,
  "roles": [
   {"key": "viewer", "label": "Lecteur", "description": "Consulte le cockpit et les préparations."},
   {"key": "operator", "label": "Opérateur", "description": "Pilote les missions et mène les préparations."},
@@ -7,9 +7,9 @@
   {"key": "admin", "label": "Administrateur", "description": "Toutes les habilitations (non modifiable)."}
  ],
  "grants": [
-  {"role": "viewer", "permissions": ["cockpit.read", "preparations.read"]},
-  {"role": "operator", "permissions": ["cockpit.read", "missions.write", "preparations.read", "preparations.write", "settings.read", "providers.read", "budgets.read"]},
-  {"role": "approver", "permissions": ["cockpit.read", "preparations.read", "approvals.approve"]},
-  {"role": "admin", "permissions": ["cockpit.read", "missions.write", "preparations.read", "preparations.write", "approvals.approve", "settings.read", "settings.write", "providers.read", "providers.write", "budgets.read", "budgets.write", "accounts.manage", "audit.read", "unclassified.write"]}
+  {"role": "viewer", "permissions": ["cockpit.read", "preparations.read", "view.manage", "view.brainstorm", "view.conduite", "view.tasks", "view.agents", "view.decisions", "view.logs", "view.resume", "view.automation", "view.providers", "view.admin", "view.authority", "view.live", "view.trust-native", "view.native-runtime"]},
+  {"role": "operator", "permissions": ["cockpit.read", "missions.write", "preparations.read", "preparations.write", "settings.read", "providers.read", "budgets.read", "view.manage", "view.brainstorm", "view.conduite", "view.tasks", "view.agents", "view.decisions", "view.logs", "view.budget", "view.resume", "view.automation", "view.providers", "view.admin", "view.authority", "view.live", "view.trust-native", "view.native-runtime"]},
+  {"role": "approver", "permissions": ["cockpit.read", "preparations.read", "approvals.approve", "view.manage", "view.brainstorm", "view.conduite", "view.tasks", "view.agents", "view.decisions", "view.logs", "view.resume", "view.automation", "view.providers", "view.admin", "view.authority", "view.live", "view.trust-native", "view.native-runtime"]},
+  {"role": "admin", "permissions": ["cockpit.read", "missions.write", "preparations.read", "preparations.write", "approvals.approve", "settings.read", "settings.write", "providers.read", "providers.write", "budgets.read", "budgets.write", "accounts.manage", "audit.read", "unclassified.write", "view.manage", "view.brainstorm", "view.conduite", "view.tasks", "view.agents", "view.decisions", "view.logs", "view.budget", "view.resume", "view.automation", "view.providers", "view.admin", "view.authority", "view.live", "view.trust-native", "view.native-runtime"]}
  ]
 }

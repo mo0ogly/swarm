@@ -1,12 +1,16 @@
-//! Swarm cockpit authority daemon — phase B, slices B2.1 (declaration check)
-//! and B2.2 (account registry, see [`accounts`]).
+//! Swarm cockpit authority: installation checks, accounts, sessions, policy,
+//! signed assertions, audit and the HTTP front (see [`server`] and [`sessions`]).
 //!
-//! The daemon is meant to run under a dedicated system UID (`service_uid`)
-//! declared in a protected installation declaration, distinct from the
-//! operator UID (`controller_uid`) that Swarm agents share. This slice only
-//! loads and checks that declaration and provides the account registry; it
-//! opens no socket or session and grants no authority by itself. See
-//! `docs/plans/acces-cockpit/PHASE-B-AUTORITE.md`.
+//! The service validates a pinned installation declaration and runs under its
+//! dedicated `service_uid`, distinct from `controller_uid`. The HTTP front holds
+//! sign-in sessions and relays authorized requests with signed assertions; the
+//! engine validates those assertions. The read-only [`check`] operation alone
+//! creates no socket, session or account. Failures retain typed refusal codes.
+//!
+//! These sources describe capabilities, not the identity of an installed image.
+//! Cockpit UID separation does not establish protected PAEA effect authority,
+//! human presence, agent confinement or qualification of the complete chain.
+//! See `docs/plans/acces-cockpit/PHASE-B-AUTORITE.md` for delivery history.
 #![forbid(unsafe_code)]
 use serde::Serialize;
 
@@ -21,6 +25,8 @@ pub mod assertion;
 /// Attribute-based access decision: route classes, grants, Biba floor (B6).
 pub mod admin;
 pub mod audit;
+/// Bounded diagnostics file of the daemon (ADM-09).
+pub mod diag;
 pub mod keys;
 pub mod policy;
 /// HTTP front: sign-in, sessions and signed relay to the engine (slice B5.3).

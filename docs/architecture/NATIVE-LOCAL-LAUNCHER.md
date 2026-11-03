@@ -11,7 +11,27 @@
 ./swarm.sh stop
 ```
 
-Le projet, l’adresse et le binaire sont mémorisés par `configure` dans `deploy/local-web.json` (local, non versionné). Les options `--root`, `--address`, `--binary`, `--startup-timeout`, `--stop-timeout`, `--mask-cifs` et les variables existantes restent disponibles. `rust_target_dir` dans ce fichier, ou `SWARM_RUST_TARGET_DIR`, choisit le cache Cargo local ; défaut technique : `.cache/rust-build-local`. Les cibles doivent être exclusives pendant une compilation. Un binaire externe reste externe ; le lanceur ne reconstruit automatiquement que `bin/swarm` et `bin/swarm-local`. `build.sh OUTPUT` émet aussi un candidat Rust qualifié, sans activation du service ; `SWARM_VERSION` peut fournir une étiquette explicite valide.
+Le projet, l’adresse et le binaire sont mémorisés par `status` prend un verrou de cycle de vie partagé non bloquant. Une opération
+exclusive concurrente donne le JSON `status:"concurrent-operation"`, code 2 ;
+`running`, `ready`, `pid`, `binary` et `binary_sha256` valent null (inconnus).
+Aucun état en cours d’écriture ni serveur n’est alors lu/sondé. Après libération,
+le statut normal retourne 0 pour le processus actif attribué, 1 pour son absence ;
+les erreurs HTTP/version restent des refus. Les lecteurs partagés coexistent ;
+les mutations gardent le verrou exclusif. L’identité est revérifiée après les deux
+observations de version et disponibilité. Aucun nouveau délai, retry ou choix opérateur.
+Régression : `tests/test_local_status_lock.py` et
+`LocalWeb.test_status_during_lifecycle_mutation_preserves_live_identity` ;
+recette `tools/verification/recipes/local-status-lock.json`.
+
+Contrôle installé en lecture seule (instance Authority gérée prête, verrou libre
+et dernière image source qualifiée requis) : recette
+`tools/verification/recipes/local-status-installed.json`, source maintenue
+`tests/local_status_installed.py`. Identité/état vérifiés avant et après notre verrou
+brièvement détenu, notes compilées et refus UI de la clé owner. Verrou occupé ou
+image périmée : refus ; aucune session humaine créée, dialogue Version connecté
+laissé ouvert comme critère non vérifié.
+
+`configure` dans `deploy/local-web.json` (local, non versionné). Les options `--root`, `--address`, `--binary`, `--startup-timeout`, `--stop-timeout`, `--mask-cifs` et les variables existantes restent disponibles. `rust_target_dir` dans ce fichier, ou `SWARM_RUST_TARGET_DIR`, choisit le cache Cargo local ; défaut technique : `.cache/rust-build-local`. Les cibles doivent être exclusives pendant une compilation. Un binaire externe reste externe ; le lanceur ne reconstruit automatiquement que `bin/swarm` et `bin/swarm-local`. `build.sh OUTPUT` émet aussi un candidat Rust qualifié, sans activation du service ; `SWARM_VERSION` peut fournir une étiquette explicite valide.
 
 La compilation normale sans fixtures conserve ses dépendances effectives, caractéristiques et empreintes dans `.cache/local-delivery/`. Les sources/tests de recette sont maintenus dans le dépôt. L’empreinte plus large de candidats invalide le cache ; seules les dépendances effectives, les outils de livraison, le manifeste de notes, le commit, l’état modifié et la configuration/toolchain observée déterminent le numéro. Un graphe modifié peut nécessiter une seconde compilation pour corriger le numéro proposé. Les contraintes de configuration héritées du collecteur natif restent applicables ; cela ne prouve ni confinement de la chaîne de compilation ni acceptation globale.
 
@@ -56,6 +76,23 @@ Le lanceur distingue l’inventaire large de candidats (invalidation du cache) d
 
 `tests/test_swarm_version_candidate_race.py` couvre témoin, cache réutilisé, test inutilisé modifié et refus après changement d’une source compilée, de Git, du compilateur, des notes ou du lanceur. Son compilateur et sa sonde sont des doubles explicites ; seules la compilation et la vérification publiques réelles établissent une livraison.
 
+### Mettre à jour une autorité déjà initialisée
+
+`./swarm.sh authority install` sans argument rafraîchit une installation déjà
+initialisée : compilation du démon, installation système via sudo, puis lecture
+stricte du mode moteur et redémarrage du moteur en mode authority. Les comptes,
+clé, pin et premier utilisateur restent conservés. Une installation fraîche
+exige toujours `--admin LOGIN --display NOM` ; un marqueur initialisé sans
+pin/clé publique refuse avant remplacement. Une lecture de réglages échouée
+ou invalide indique que le démon a été installé mais que la suite n’a pas été
+effectuée ; elle ne devient pas un succès vide.
+
+Démon et moteur doivent partager le format des assertions (v1 et v2 ne sont
+pas interchangeables). Après activation d’un moteur v2 face à un démon v1,
+`assertion-format` impose la mise à jour cohérente de la paire, sans désactiver
+l’autorité ni accepter les anciennes assertions. L’étape sudo nécessite le
+terminal de l’opérateur quand aucune autorisation non interactive n’existe.
+
 **Garde de paire avant tout remplacement (prévention de l’incident du 31
 octobre 2026).** Avant tout `start` ou `restart`, et avant d’arrêter quoi que ce
 soit, le lanceur refuse (exit 2, message « Paire d’assertion incompatible ») le
@@ -76,3 +113,50 @@ seulement ; un démon servi d’ailleurs échoue fermé à l’exécution avec
 ne reconfigure rien. Test : `tests/test_local_pair_guard.py` ; recette
 `tools/verification/recipes/local-pair-guard.json` (12 tests, épinglée sur
 l’empreinte du binaire fourni).
+
+## Administration « Comptes et accès » (mode authority)
+
+En mode `authority`, le démon sert la page de connexion et le cockpit ; la
+vue **Comptes et accès** du cockpit natif (entrée de menu réservée aux droits
+`admin`) donne l'équivalent du menu Outils Wattson, aux standards Swarm :
+
+- **Comptes** : création/modification/désactivation, affichage et création
+  de clés API (le secret s'affiche une seule fois ; seule son empreinte
+  reste consultable), révocation, sessions actives et déconnexion forcée.
+  Le mot de passe n'est jamais affiché ni exporté.
+- **Groupes** (union des droits) : création, duplication, renommage,
+  modification du profil de permissions ; le droit effectif d'un compte est
+  l'union de ses groupes. Le dernier administrateur ne peut perdre son
+  droit `admin` ni être désactivé (`last-admin` refusé côté serveur).
+- **Habilitations** : matrice rôles × permissions, une ligne par famille
+  d'API du catalogue (14) et par entrée de menu (`view.<id>`, 16) ;
+  le rôle intégré `admin` est verrouillé (30 cases cochées et désactivées).
+  L'API reste l'autorité : une vue de menu masquée côté UI est aussi
+  refusée en 403 côté serveur (`policy.rs`, schéma 3).
+- **Journal d'accès** : connexions (filtres date/sujet/vue/moyen/statut,
+  tri, pagination 50/page, export CSV/JSON), détail des actions par
+  session, tableau de bord (4 KPI + 6 graphiques SVG par jour et par vue),
+  actions d'administration, purge manuelle (regex + confirmation) et
+  rétention `audit_retention_days` (vide = désactivée, sinon entier ≥ 1 ;
+  relecture après écriture), niveau de journal du démon modifiable en
+  direct. La purge par regex est soumise à une limite de débit serveur.
+- **Réglages du démon** : configuration lue puis écrite avec `revision`
+  (conflit = refus `revision-conflict`), diagnostics de l'instance.
+
+API sous `/api/v1/authority/*` (comptes, groupes, policy, audit, config,
+journal) ; granularité = familles d'API + `view.<id>` par entrée de menu ;
+politique par défaut en deny-by-default avec planchers Biba. Chaque
+connexion et chaque action d'administration sont inscrites dans le journal
+signé du démon (`audit.jsonl`, chaînage par hachage).
+
+Vérification : recette permanente
+`tools/verification/recipes/authority-admin-ui-rust.json` — i18n `--check`
+puis parcours navigateur réel sur binaires fournis (41 contrôles nommés :
+connexion FR/EN × thèmes, entrée de menu, lien direct refusé sans droit,
+compte, clé API, matrice verrouillée, rôle personnalisé, journal,
+tableau de bord, purge, mobile 390 px, traduction anglaise intégrale ;
+`recipe.py run` PASS puis `verify` VERIFIED). Preuve de qualification sous
+`.swarm-fixtures/` avec empreintes SHA-256 des deux binaires. Limites :
+vérification locale — ni acceptation indépendante ni installation ; la
+recette n'exerce ni le relais distant ni la rotation des clés au-delà du
+secret affiché une fois.

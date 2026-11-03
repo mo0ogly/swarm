@@ -69,3 +69,30 @@ fn aggregates_purge_and_chain() {
     std::fs::write(&file, text).unwrap();
     assert_eq!(Audit::open(dir.path()).unwrap().purge(i64::MAX, "ana", 103), Err("authority-audit-chain-broken"));
 }
+
+/// Lines written before the ADM-05 enrichment carry none of the new fields:
+/// they must decode unchanged and keep the chain verifiable, and a line
+/// appended after them must chain to them.
+#[test]
+fn pre_enrichment_lines_still_verify() {
+    let area = std::path::Path::new(env!("CARGO_TARGET_TMPDIR"));
+    let dir = tempfile::tempdir_in(area).unwrap();
+    // A pre-enrichment line: only the original fields, `prev` last.
+    let old = serde_json::json!({
+        "seq": 1, "at": 10, "event": "sign-in", "subject": "ana",
+        "credential": "session:aa", "method": "POST", "path": "/login",
+        "prev": "0000000000000000000000000000000000000000000000000000000000000000"
+    });
+    std::fs::write(dir.path().join("audit.jsonl"), format!("{old}\n")).unwrap();
+    let a = Audit::open(dir.path()).unwrap();
+    let (entries, valid) = a.read().unwrap();
+    assert!(valid && entries.len() == 1, "old line decodes, chain starts valid");
+    assert_eq!(entries[0].event, "sign-in");
+    assert_eq!(entries[0].duration_ms, None, "enrichment fields default when absent");
+    // A new enriched line chains onto the old one; mixing keeps the chain.
+    a.record(&Event { at: 20, event: "outcome", subject: Some("ana"), credential: Some("session:bb"),
+        duration_ms: Some(7), view: Some("view.authority"), client: Some("api-key"), ..Default::default() }).unwrap();
+    let (entries, valid) = a.read().unwrap();
+    assert!(valid && entries.len() == 2, "enriched line chains onto a pre-enrichment one");
+    assert_eq!((entries[1].duration_ms, entries[1].client.as_deref(), entries[1].view.as_deref()), (Some(7), Some("api-key"), Some("view.authority")));
+}

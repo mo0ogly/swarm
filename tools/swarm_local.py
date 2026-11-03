@@ -118,8 +118,12 @@ def main():
 
     Build and isolated qualification precede any owned stop. Existing Roots are
     opened by Rust without implicit init; new Roots use public init. Failures keep
-    data/history and never select Go. Browser opening uses the native login page,
-    without a secret URL. Source binaries are built; external binaries stay external.
+    data/history and never select Go. Status takes a nonblocking shared lock;
+    a concurrent mutation returns exit 2 with unknown availability/version without
+    reading partial state or probing the server. Mutations retain exclusive locking.
+    Browser hand-off uses native sign-in: an owner-key single-use ticket or
+    Authority login, without printing credentials. Source binaries are built;
+    external binaries stay external.
     """
     config_path = SOURCE / "deploy" / "local-web.json"
     settings = json.loads(config_path.read_text()) if config_path.exists() else {}
@@ -152,7 +156,17 @@ def main():
     state_path = runtime / "server.json"
     log_path = runtime / "server.log"
     with contextlib.ExitStack() as stack, (runtime / "lifecycle.lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
+        if args.action == "status":
+            try:
+                fcntl.flock(lock, fcntl.LOCK_SH | fcntl.LOCK_NB)
+            except BlockingIOError:
+                print(json.dumps({"status": "concurrent-operation", "running": None,
+                                  "pid": None, "root": str(root), "url": f"http://{args.address}/",
+                                  "ready": None, "engine": "rust", "binary": None,
+                                  "binary_sha256": None}))
+                return 2
+        else:
+            fcntl.flock(lock, fcntl.LOCK_EX)
         state = json.loads(state_path.read_text()) if state_path.exists() else None
         running = owned(state)
         if args.action == "configure":
@@ -173,9 +187,10 @@ def main():
             return 0
         if args.action == "status":
             version,sha=running_version(args.address,root,state['pid']) if running else (None,None)
-            if running and not owned(state):raise RuntimeError('Server identity changed during version observation')
+            available = ready(args.address, root) if running else False
+            if running and not owned(state):raise RuntimeError('Server identity changed during status observation')
             print(json.dumps({"running": bool(running), "pid": state["pid"] if running else None,
-                              "root": str(root), "url": f"http://{args.address}/", "ready": ready(args.address, root) if running else False,
+                              "root": str(root), "url": f"http://{args.address}/", "ready": available,
                               "engine":"rust", "binary":version['binary'] if version else None,"binary_sha256":sha}))
             return 0 if running else 1
         if args.action == "logs":
@@ -539,10 +554,13 @@ def authority(argv):
     """`./swarm.sh authority install|enable|disable|status`: the one entry
     point for the cockpit authority daemon (phase B).
 
-    - install --admin LOGIN --display NOM : build the release daemon, then run
+    - install [--admin LOGIN --display NOM] : build the release daemon, then run
       `sudo deploy/authority/install.sh` (sudo password and the first user's
       password are asked on this terminal; idempotent, restarts a running
-      service).
+      service). Names are required for a first installation only; refresh of an
+      initialized installation preserves accounts without inventing an identity.
+      Failures after installation preserve that known effect and original cause;
+      they never claim that an unreadable mode means a successful owner fallback.
     - enable : stop the engine, save `authority` mode + the installed daemon
       key, move the engine to the unit's internal `--engine` address, start
       it, `sudo systemctl enable --now swarm-authority`, open the sign-in page.
@@ -550,7 +568,9 @@ def authority(argv):
       (an outdated daemon would be activated).
     - disable : `sudo systemctl disable --now`, back to `owner-key` mode, the
       engine on the daemon's former public address.
-    - status : unit, service, installed/build identity, engine mode.
+    - status : unit, service, engine mode and whether the installed daemon
+      equals the *last* release build (read only: it does not rebuild, so a
+      stale build can hide newer sources; `enable` rebuilds before comparing).
     - accept-restore : after a deliberate restore of the daemon state (the
       engine then refuses assertions with `web-assertion-rollback`/`-fork`),
       stop the engine, reset the Root rollback witness (recorded in the
@@ -575,23 +595,32 @@ def authority(argv):
     def step(text):
         print("→ " + text, flush=True)
     if args.step == "install":
-        if not args.admin or not args.display:
-            parser.error("install exige --admin LOGIN --display NOM")
+        if bool(args.admin) != bool(args.display):
+            parser.error("install exige --admin LOGIN et --display NOM ensemble")
+        if not args.admin and not Path("/etc/swarm-authority/initialized").is_file():
+            parser.error("première installation : --admin LOGIN --display NOM requis")
         step("Compilation du démon (release)")
         subprocess.run(["cargo", "build", "--release", "-p", "swarm-authority"], cwd=SOURCE / "rust", check=True)
         step("Installation système (sudo)")
-        subprocess.run(["sudo", str(SOURCE / "deploy/authority/install.sh"), "--admin", args.admin, "--display", args.display], check=True)
-        settings = json.loads((SOURCE / "deploy" / "local-web.json").read_text()) if (SOURCE / "deploy" / "local-web.json").exists() else {}
-        root = Path(os.environ.get("SWARM_PROJECT_ROOT", settings.get("root", str(SOURCE)))).resolve()
-        binary = Path(settings["binary"]).resolve() if settings.get("binary") else SOURCE / "bin" / "swarm-local"
-        shown = subprocess.run([str(binary), "--root", str(root), "engine-settings", "show", "--json"], cwd=SOURCE, capture_output=True, text=True)
-        mode = None
-        with contextlib.suppress(ValueError, KeyError):
-            mode = json.loads(shown.stdout)["values"].get("web_access_mode")
+        install_args = ["--admin", args.admin, "--display", args.display] if args.admin else []
+        subprocess.run(["sudo", str(SOURCE / "deploy/authority/install.sh"), *install_args], check=True)
+        try:
+            settings = json.loads((SOURCE / "deploy" / "local-web.json").read_text()) if (SOURCE / "deploy" / "local-web.json").exists() else {}
+            root = Path(os.environ.get("SWARM_PROJECT_ROOT", settings.get("root", str(SOURCE)))).resolve()
+            binary = Path(settings["binary"]).resolve() if settings.get("binary") else SOURCE / "bin" / "swarm-local"
+            shown = subprocess.run([str(binary), "--root", str(root), "engine-settings", "show", "--json"], cwd=SOURCE, capture_output=True, text=True, check=True)
+            mode = json.loads(shown.stdout)["values"]["web_access_mode"]
+            if mode not in ("authority", "owner-key"):
+                raise ValueError("engine-access-mode-invalid")
+        except (OSError, ValueError, KeyError, TypeError, AttributeError, RuntimeError, subprocess.CalledProcessError) as error:
+            raise RuntimeError("Démon installé ; configuration ou réglages moteur illisibles, suite non effectuée.") from error
         if mode == "authority":
             # Daemon and engine share the assertion format: refresh both.
-            step("Moteur reconstruit et redémarré (même format d’assertion que le démon)")
-            subprocess.run([*me, "restart", "--no-open"], check=True)
+            step("Reconstruction et redémarrage du moteur (même format d’assertion que le démon)")
+            try:
+                subprocess.run([*me, "restart", "--no-open"], check=True)
+            except (OSError, subprocess.CalledProcessError) as error:
+                raise RuntimeError("Démon installé ; redémarrage moteur non confirmé, paire à vérifier.") from error
             print("Démon et moteur à jour.")
         else:
             print("Démon installé. Suite : ./swarm.sh authority enable")
@@ -637,6 +666,9 @@ def authority(argv):
         print("Mot de passe remplacé ; les sessions ouvertes de ce compte prennent fin.")
         return 0
     if args.step == "enable":
+        # Compare with the current sources, not a stale earlier build.
+        step("Compilation du démon (release) pour comparer avec le démon installé")
+        subprocess.run(["cargo", "build", "--release", "-p", "swarm-authority"], cwd=SOURCE / "rust", check=True)
         if sha(AUTHORITY_INSTALLED) != sha(built):
             raise RuntimeError("Le démon installé diffère du dernier build : ./swarm.sh authority install --admin LOGIN --display NOM")
         try:

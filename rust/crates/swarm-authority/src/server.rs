@@ -53,8 +53,60 @@ pub struct Front {
     pub policy: RwLock<policy::Policy>,
     /// Access audit (B8 attribution): sign-in/out and every non-read request.
     pub audit: audit::Audit,
+    /// Bounded diagnostics file (ADM-09), level set in the Admin.
+    pub diag: crate::diag::Diag,
+    /// Timestamps of recent manual purges (rate limit, ADM-08).
+    pub purge_slots: std::sync::Mutex<Vec<i64>>,
     /// Pending forgotten-password requests shown to administrators.
     pub reset_requests: crate::sessions::ResetRequests,
+}
+
+/// Run one automatic audit purge according to `audit_retention_days`
+/// (ADM-08): a best-effort daemon task, never a request's concern.
+/// Returns the number of lines removed (`Ok(0)` when no retention is set,
+/// the chain is broken or the write fails — the manual purge reports those).
+pub fn auto_purge(front: &Front) -> usize {
+    let Some(days) = front.config.read().ok().and_then(|c| c.audit_retention_days) else { return 0 };
+    let before = now().saturating_sub(days.saturating_mul(86_400));
+    match front.audit.purge(before, "automatic", now()) {
+        Ok(n) => n,
+        Err(code) => {
+            front.diag.log("warn", "audit auto purge skipped", serde_json::json!({"code": code}));
+            0
+        }
+    }
+}
+
+/// Spawn the daemon's background loop: automatic audit purge (every 6 hours
+/// and once at start-up) under the configured retention.
+pub fn spawn_maintenance(front: Arc<Front>) {
+    tokio::spawn(async move {
+        loop {
+            auto_purge(&front);
+            if tokio::time::timeout(std::time::Duration::from_secs(6 * 3600), tokio::signal::ctrl_c()).await.is_ok() {
+                break;
+            }
+        }
+    });
+}
+
+/// Rate limit of the manual purge endpoint: 5 calls per rolling minute
+/// (the response carries `Retry-After`; the window is best effort).
+pub const PURGE_RATE: usize = 5;
+
+impl Front {
+    /// Consume one purge slot; `false` when the last minute already saw
+    /// [`PURGE_RATE`] calls (the caller refuses with 429).
+    pub fn consume_purge_slot(&self) -> bool {
+        let mut q = self.purge_slots.lock().unwrap_or_else(|e| e.into_inner());
+        let cut = now().saturating_sub(60);
+        q.retain(|t| *t >= cut);
+        if q.len() >= PURGE_RATE {
+            return false;
+        }
+        q.push(now());
+        true
+    }
 }
 
 pub(crate) fn now() -> i64 {
@@ -240,6 +292,26 @@ pub(crate) async fn read_body(front: &Front, body: Incoming) -> Result<Bytes, Re
     }
 }
 
+/// Request provenance captured once per request for the audit's enriched
+/// columns (ADM-05): truncated user agent, `browser`/`api-key` client and
+/// the arrival instant (for `duration_ms` on outcome lines).
+struct Meta {
+    user_agent: Option<String>,
+    client: &'static str,
+    started: std::time::Instant,
+}
+
+impl Meta {
+    fn from(req: &Request<Incoming>, client: &'static str) -> Self {
+        let ua = req.headers().get(header::USER_AGENT).and_then(|v| v.to_str().ok()).map(|s| s.chars().take(120).collect::<String>());
+        Self { user_agent: ua, client, started: std::time::Instant::now() }
+    }
+    /// Milliseconds elapsed since the request arrived.
+    fn duration_ms(&self) -> i64 {
+        self.started.elapsed().as_millis().try_into().unwrap_or(i64::MAX)
+    }
+}
+
 /// Route one browser request. Never panics on client input.
 pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Body>, hyper::Error> {
     if !host_ok(&front, &req) {
@@ -266,6 +338,7 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
             Ok(login_response(StatusCode::OK, forgot_page(english, safe_next(next), false)))
         }
         (Method::POST, "/login/forgot") => {
+            let meta = Meta::from(&req, "browser");
             let body = match read_body(&front, req.into_body()).await { Ok(b) => b, Err(r) => return Ok(r) };
             let form: Vec<(String, String)> = form_urlencoded::parse(&body).into_owned().collect();
             let get = |k: &str| form.iter().find(|(n, _)| n == k).map(|(_, v)| v.clone()).unwrap_or_default();
@@ -276,7 +349,8 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
                 // only a new request of an existing account is recorded.
                 if let Ok(Ok(Some(view))) = tokio::task::spawn_blocking(move || f.accounts.current(&Context::new(), &s)).await {
                     if front.reset_requests.request(&view.subject, view.generation, now()) {
-                        let ev = audit::Event { at: now(), event: "reset-requested", subject: Some(&view.subject), ..Default::default() };
+                        let ev = audit::Event { at: now(), event: "reset-requested", subject: Some(&view.subject),
+                            client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() };
                         if front.audit.record(&ev).is_err() {
                             eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
                         }
@@ -290,6 +364,7 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
             Ok(login_response(StatusCode::OK, login_page(english, safe_next(next), "")))
         }
         (Method::POST, "/login") => {
+            let meta = Meta::from(&req, "browser");
             let body = match read_body(&front, req.into_body()).await { Ok(b) => b, Err(r) => return Ok(r) };
             let form: Vec<(String, String)> = form_urlencoded::parse(&body).into_owned().collect();
             let get = |k: &str| form.iter().find(|(n, _)| n == k).map(|(_, v)| v.clone()).unwrap_or_default();
@@ -301,7 +376,8 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
                 Ok(Ok((token, _))) => {
                     // A refused audit line refuses the sign-in (fail closed).
                     let via = format!("session:{}", crate::sessions::token_id(&token));
-                    if front.audit.record(&audit::Event { at: now(), event: "sign-in", subject: named, credential: Some(&via), ..Default::default() }).is_err() {
+                    if front.audit.record(&audit::Event { at: now(), event: "sign-in", subject: named, credential: Some(&via),
+                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() }).is_err() {
                         let _ = front.sessions.logout(&token);
                         return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-audit-unavailable"));
                     }
@@ -309,7 +385,8 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
                     Ok(redirect(safe_next(&next), Some(c.to_string())))
                 }
                 _ => {
-                    if front.audit.record(&audit::Event { at: now(), event: "sign-in-refused", subject: named, ..Default::default() }).is_err() {
+                    if front.audit.record(&audit::Event { at: now(), event: "sign-in-refused", subject: named,
+                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() }).is_err() {
                         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
                     }
                     let msg = if english { "Sign-in refused. Check the account and password." } else { "Connexion refusée. Vérifiez le compte et le mot de passe." };
@@ -323,10 +400,12 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
             // Both the form path and the cockpit buttons' API path end the
             // daemon session (the engine's own cookie logout is irrelevant here).
             let api = req.uri().path() == "/api/v1/logout";
+            let meta = Meta::from(&req, "browser");
             if let Some(t) = session_token(&req) {
                 if let Ok(Some(subject)) = front.sessions.logout(&t) {
                     let via = format!("session:{}", crate::sessions::token_id(&t));
-                    if front.audit.record(&audit::Event { at: now(), event: "sign-out", subject: Some(&subject), credential: Some(&via), ..Default::default() }).is_err() {
+                    if front.audit.record(&audit::Event { at: now(), event: "sign-out", subject: Some(&subject), credential: Some(&via),
+                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() }).is_err() {
                         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
                     }
                 }
@@ -392,6 +471,7 @@ fn authorize(front: &Front, view: &AccountView, method: &str, path: &str) -> Res
 /// signed-in account; everything else needs the `administer` decision.
 async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Body>, hyper::Error> {
     let path = req.uri().path().to_owned();
+    let meta = Meta::from(&req, "browser");
     let (credential, view) = match authenticate(&front, &req, &path).await { Ok(v) => v, Err(r) => return Ok(r) };
     let Credential::Session(token) = credential else {
         // B9: keys never manage accounts, sessions, keys, policy or settings.
@@ -403,7 +483,7 @@ async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Res
         match authorize(&front, &view, req.method().as_str(), &path) {
             Ok(_) => "administer",
             Err(r) => {
-                note(&front, "refused", &view.subject, &format!("session:{}", crate::sessions::token_id(&token)), req.method().as_str(), &path, Some(403));
+                note(&front, &meta, "refused", &view.subject, &format!("session:{}", crate::sessions::token_id(&token)), req.method().as_str(), &path, Some(403));
                 return Ok(r);
             }
         }
@@ -414,11 +494,12 @@ async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Res
     let method = req.method().as_str().to_owned();
     let subject = view.subject.clone();
     let via = format!("session:{}", crate::sessions::token_id(&token));
-    if let Err(r) = intent(&front, &subject, &via, None, &method, &path, action) {
+    let detail = audit::admin_detail(&method, &path);
+    if let Err(r) = intent(&front, &meta, &subject, &via, None, &method, &path, action, detail.as_deref()) {
         return Ok(r);
     }
     let response = admin::handle(Arc::clone(&front), req, view, token).await;
-    outcome(&front, &subject, &via, None, &method, &path, action, response.status());
+    outcome(&front, &meta, &subject, &via, None, &method, &path, action, response.status());
     Ok(response)
 }
 
@@ -427,12 +508,13 @@ async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Res
 async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Body>, hyper::Error> {
     let path = req.uri().path_and_query().map(|p| p.as_str().to_owned()).unwrap_or_else(|| "/".into());
     let (credential, view) = match authenticate(&front, &req, &path).await { Ok(v) => v, Err(r) => return Ok(r) };
+    let meta = Meta::from(&req, if matches!(credential, Credential::Key { .. }) { "api-key" } else { "browser" });
     // B6: decide before reading the body or touching the engine; a refusal
     // is final for this request and carries only stable codes.
     let action = match authorize(&front, &view, req.method().as_str(), req.uri().path()) {
         Ok(a) => a,
         Err(r) => {
-            note(&front, "refused", &view.subject, &credential.label(), req.method().as_str(), req.uri().path(), Some(403));
+            note(&front, &meta, "refused", &view.subject, &credential.label(), req.method().as_str(), req.uri().path(), Some(403));
             return Ok(r);
         }
     };
@@ -456,7 +538,7 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
     let (view_subject, consulted) = (view.subject.clone(), req.uri().path().to_owned());
     let audited = (action != policy::Action::Read).then(|| (view.subject.clone(), req.method().as_str().to_owned(), req.uri().path().to_owned(), action_name(action)));
     if let Some((subject, method, p, a)) = &audited {
-        if let Err(r) = intent(&front, subject, &via, Some(&reference), method, p, a) {
+        if let Err(r) = intent(&front, &meta, subject, &via, Some(&reference), method, p, a, None) {
             return Ok(r);
         }
     }
@@ -502,13 +584,26 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
         Ok(r) => r,
         Err(_) => return Ok(full(StatusCode::BAD_REQUEST, "text/plain; charset=utf-8", "authority-relay-request")),
     };
+    // Consultations (page views) are recorded even when the engine is
+    // unreachable: the visit happened, whatever the engine's answer.
+    let note_consultation = |status: u16| {
+        if consultation {
+            note(&front, &meta, "consultation", &view_subject, &via, "GET", &consulted, Some(status));
+        }
+    };
     let stream = match tokio::net::TcpStream::connect(front.engine).await {
         Ok(s) => s,
-        Err(_) => return Ok(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-unavailable")),
+        Err(_) => {
+            note_consultation(502);
+            return Ok(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-unavailable"));
+        }
     };
     let (mut sender, conn) = match hyper::client::conn::http1::handshake(hyper_util::rt::TokioIo::new(stream)).await {
         Ok(v) => v,
-        Err(_) => return Ok(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-handshake")),
+        Err(_) => {
+            note_consultation(502);
+            return Ok(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-handshake"));
+        }
     };
     tokio::spawn(conn);
     let response = match sender.send_request(out).await {
@@ -516,17 +611,18 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
         Err(_) => full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-unavailable"),
     };
     if let Some((subject, method, p, a)) = &audited {
-        outcome(&front, subject, &via, Some(&reference), method, p, a, response.status());
+        outcome(&front, &meta, subject, &via, Some(&reference), method, p, a, response.status());
     } else if consultation {
-        note(&front, "consultation", &view_subject, &via, "GET", &consulted, Some(response.status().as_u16()));
+        note(&front, &meta, "consultation", &view_subject, &via, "GET", &consulted, Some(response.status().as_u16()));
     }
     Ok(response)
 }
 
 /// Best-effort informational line (consultation, refusal): a write failure
 /// is reported on stderr and never changes the response.
-fn note(front: &Front, event: &str, subject: &str, via: &str, method: &str, path: &str, status: Option<u16>) {
-    let ev = audit::Event { at: now(), event, subject: Some(subject), credential: Some(via), method: Some(method), path: Some(path), status, ..Default::default() };
+fn note(front: &Front, meta: &Meta, event: &str, subject: &str, via: &str, method: &str, path: &str, status: Option<u16>) {
+    let ev = audit::Event { at: now(), event, subject: Some(subject), credential: Some(via), method: Some(method), path: Some(path), status,
+        view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() };
     if front.audit.record(&ev).is_err() {
         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
     }
@@ -544,21 +640,25 @@ fn action_name(a: policy::Action) -> &'static str {
 /// Record the intent of a mutating request before executing it; a failed
 /// write refuses the request with 503 `authority-audit-unavailable` (no
 /// unattributed effect).
+/// `detail` is a human-readable description derived from the path only.
 #[allow(clippy::result_large_err)] // the Err is the ready HTTP refusal
 #[allow(clippy::too_many_arguments)] // one audit line's fields
-fn intent(front: &Front, subject: &str, via: &str, reference: Option<&str>, method: &str, path: &str, action: &str) -> Result<(), Response<Body>> {
+fn intent(front: &Front, meta: &Meta, subject: &str, via: &str, reference: Option<&str>, method: &str, path: &str, action: &str, detail: Option<&str>) -> Result<(), Response<Body>> {
     front
         .audit
-        .record(&audit::Event { at: now(), event: "intent", subject: Some(subject), credential: Some(via), reference, method: Some(method), path: Some(path), action: Some(action), status: None })
+        .record(&audit::Event { at: now(), event: "intent", subject: Some(subject), credential: Some(via), reference, method: Some(method), path: Some(path), action: Some(action), status: None,
+            view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(), detail: detail.map(|d| d.to_string()).as_deref(), ..Default::default() })
         .map(|_| ())
         .map_err(|_| full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-audit-unavailable"))
 }
 
 /// Record the outcome status after execution (best effort: the effect has
 /// happened; a failure is reported on stderr, the response is unchanged).
+/// Carries the request duration measured from the `Meta` capture instant.
 #[allow(clippy::too_many_arguments)] // one audit line's fields
-fn outcome(front: &Front, subject: &str, via: &str, reference: Option<&str>, method: &str, path: &str, action: &str, status: StatusCode) {
-    let ev = audit::Event { at: now(), event: "outcome", subject: Some(subject), credential: Some(via), reference, method: Some(method), path: Some(path), action: Some(action), status: Some(status.as_u16()) };
+fn outcome(front: &Front, meta: &Meta, subject: &str, via: &str, reference: Option<&str>, method: &str, path: &str, action: &str, status: StatusCode) {
+    let ev = audit::Event { at: now(), event: "outcome", subject: Some(subject), credential: Some(via), reference, method: Some(method), path: Some(path), action: Some(action), status: Some(status.as_u16()),
+        duration_ms: Some(meta.duration_ms()), view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() };
     if front.audit.record(&ev).is_err() {
         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable", "subject": subject, "path": path}));
     }

@@ -320,7 +320,8 @@ mod linux {
                     let listener = match tokio::net::TcpListener::bind(listen).await { Ok(l) => l, Err(_) => return fail("authority-listen") };
                     let own_host = match listener.local_addr() { Ok(a) => a.to_string(), Err(_) => return fail("authority-listen") };
                     eprintln!("{}", serde_json::json!({"schema_version": 1, "listening": own_host, "engine": engine}));
-                    let front = Arc::new(server::Front { accounts: a, sessions: Sessions::new(config), signer: key, config: std::sync::RwLock::new(config), dir: loaded.dir.clone(), own_host, engine, policy: std::sync::RwLock::new(policy), audit, reset_requests: Default::default() });
+                    let front = Arc::new(server::Front { accounts: a, sessions: Sessions::new(config.clone()), signer: key, config: std::sync::RwLock::new(config), dir: loaded.dir.clone(), own_host, engine, policy: std::sync::RwLock::new(policy), audit, diag: swarm_authority::diag::Diag::open(&loaded.dir, "info"), purge_slots: Default::default(), reset_requests: Default::default() });
+                    server::spawn_maintenance(Arc::clone(&front));
                     tokio::select! {
                         r = server::serve(listener, front) => if r.is_err() { return fail("authority-serve") },
                         _ = tokio::signal::ctrl_c() => {}

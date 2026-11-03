@@ -7,5 +7,7 @@
   "passes": 3,
   "parallelism": 1
  },
- "relay_body_max_bytes": 16777216
+ "relay_body_max_bytes": 16777216,
+ "audit_retention_days": 365,
+ "log_level": "info"
 }

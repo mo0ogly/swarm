@@ -22,7 +22,14 @@
  function url(path){const u=new URL(path,location.href);u.searchParams.set('lang',globalThis.SwarmI18n?.language==='en'?'en':'fr');u.searchParams.set('theme',document.documentElement.dataset.theme);return u.pathname+u.search}
  /** Reuse original sections/navigation. Unconnected sections remain reachable,
   * with visible limitations and disabled commands, never silently empty success. */
- function showView(name,focus=false){if(!views.has(name))name='conduite';for(const section of document.querySelectorAll('.view'))section.hidden=section.id!==name;for(const button of document.querySelectorAll('#tabs [data-view]')){if(button.dataset.view===name)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current')}
+ function showView(name,focus=false){if(!views.has(name))name='conduite';
+  // ADM-04: a direct view access without the menu right stays refused with a
+  // clear message; the API answers 403 on its own — the UI grants nothing.
+  if(globalThis.SwarmAuthorityMenu&&!globalThis.SwarmAuthorityMenu.visibleView(name)){
+   $('message').hidden=false;$('message').className='notice alert';$('message').textContent=globalThis.SwarmAuthorityMenu.deniedMessage();
+   return;
+  }
+  for(const section of document.querySelectorAll('.view'))section.hidden=section.id!==name;for(const button of document.querySelectorAll('#tabs [data-view]')){if(button.dataset.view===name)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current')}
   $('assistant').hidden=true;globalThis.SwarmShell?.navigate(name);const u=new URL(location.href);u.searchParams.set('view',name);history.replaceState(null,'',u);if(focus)$('main-content').focus();if(name==='manage')renderManager();if(name==='resume')resumePanel?.refresh();if(name==='logs')logsPanel?.refresh();if(name!=='logs'&&current?.statusObserved===false)select(selected);
  }
  /** Filter the original mission manager with actual Work rows. No lifecycle

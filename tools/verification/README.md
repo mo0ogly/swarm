@@ -21,6 +21,13 @@ l'environnement hérité. Les processus reçoivent EOF sur stdin. Arrêt à la p
 anomalie ; aucun prochain pas après un échec. Écriture exclusive et atomique des
 preuves ; une panne disque peut laisser un lot incomplet, jamais un PASS confirmé.
 
+**Conserver les échecs.** Ne jamais supprimer un dossier FAIL/incomplet pour
+réutiliser son nom : choisir un nouveau dossier frère et consigner le prédécesseur,
+la cause et la précondition corrigée dans le suivi existant. Le refus d'une
+sortie existante ne doit pas être contourné par effacement. Les empreintes et
+`verify` ne restaurent ni ne prouvent l'existence d'un original supprimé.
+Une perte reste déclarée ; un PASS ultérieur ne remplace pas l'ancien FAIL.
+
 `run` retourne 0 pour PASS, 1 pour FAIL, 2 pour refus/prérequis impossible.
 `verify` contrôle empreintes, archive et cohérence ; il retourne 1 pour un FAIL
 intact et 2 pour une preuve incohérente. Il ne rejoue rien. Les empreintes locales
@@ -43,6 +50,12 @@ explicit environment overrides, launcher hash, argv, complete stdout/stderr, dur
 exit and failure cause. Inherited environment is not recorded; stdin receives EOF.
 The first anomaly stops subsequent steps. Atomic exclusive publication preserves
 old evidence; disk failure can leave an incomplete batch, never a confirmed PASS.
+**Retain failures.** Never delete a FAIL/incomplete directory to reuse its name.
+Choose a fresh sibling and record predecessor, cause and corrected precondition
+in the existing tracking record. Do not bypass destination refusal by deletion.
+Hashes and verify cannot restore or attest the historical existence of a deleted
+original. Declare the loss; a later PASS never substitutes for the original FAIL.
+
 Run exits: 0 PASS, 1 FAIL, 2 refusal/prerequisite failure. Verify checks archive,
 hashes and consistency without executing tests: intact FAIL remains exit 1,
 inconsistent evidence exits 2. These are local self-consistency checks, not signed
@@ -3409,3 +3422,54 @@ qualified binary and digest), like `native-version-public`. No sudo, no real
 daemon, no compilation; fixture area only, never /tmp. The recipe observes the
 default installation path only; a daemon served from elsewhere fails closed at
 runtime.
+
+## Recipe authority-admin-ui-rust (accounts and access browser qualification)
+
+`recipes/authority-admin-ui-rust.json` qualifie la vue « Comptes et accès » du
+cockpit natif en mode authority : étape i18n (`scripts/i18n/build.cjs --check`)
+puis `tests/authority_admin_ui_recipe.py --engine … --daemon …` (binaires
+fournis, jamais reconstruits ; sortie fraîche obligatoire sous l'aire de
+fixtures ; /tmp refusé avant toute allocation ; empreintes SHA-256 du moteur et
+du démon figées dans `result.json`). Le driver `tests/authority_admin_ui.cjs`
+lance un démon `swarm-authority serve` réel devant un moteur réel et vérifie
+41 contrôles nommés : connexion FR/EN × clair/sombre, mot de passe oublié,
+mobile de connexion, entrée de menu cockpit, lien direct refusé sans le droit
+(message clair, l'API répond 403), création de compte avec restauration du
+focus, variante refusée, clé API (secret affiché une fois puis Bearer valide),
+matrice des habilitations (30 cases admin verrouillées, schéma 3 = 14 familles
++ 16 vues), création d'un rôle personnalisé + enregistrement + offre à la
+création de compte, journal d'accès (connexions → détail action → tableau de
+bord → purge refusée sans jours valides), traduction anglaise intégrale,
+mobile 390 px sans débordement global. Le wrapper `verify` refuse une preuve
+de forme inattendue (41 exactement, aucune entrée « error »). Exécuter
+`recipe.py run` puis `recipe.py verify` sur la preuve conservée. Limites :
+vérification locale sur binaires fournis — ni acceptation indépendante ni
+installation ; ni le relais distant ni la rotation des clés au-delà du secret
+affiché une fois. Prédicat de rendu : tous les blocs `<details>` **ouverts**
+remplis (« Aide » n'a jamais de table), borne 60 s justifiée par l'observation
+(≤ 26 s rendu réel), diagnostic conservant l'état rendu.
+
+## Recipe authority-admin-ui-rust (browser qualification of the accounts and access view)
+
+`recipes/authority-admin-ui-rust.json` qualifies the native cockpit's
+« Comptes et accès » view in authority mode: an i18n step
+(`scripts/i18n/build.cjs --check`) then
+`tests/authority_admin_ui_recipe.py --engine … --daemon …` (supplied binaries,
+never rebuilt; fresh output under the fixture area; /tmp refused before any
+allocation; SHA-256 of engine and daemon frozen in `result.json`). The driver
+`tests/authority_admin_ui.cjs` runs a real `swarm-authority serve` daemon in
+front of a real engine and checks 41 named controls: FR/EN × light/dark
+sign-in, forgot password, mobile sign-in, cockpit menu entry, direct link
+refused without the right (clear message, the API answers 403), account
+creation with focus restoration, refusal variant, API key (secret shown once
+then a valid Bearer), habilitations matrix (30 locked admin boxes, schema 3 =
+14 families + 16 views), custom role creation + save + offered on account
+creation, access journal (connections → action detail → dashboard → purge
+refused without valid days), full English translation, 390 px mobile with no
+global overflow. The wrapper `verify` refuses an unexpected proof shape
+(exactly 41, no « error » entry). Run `recipe.py run` then `recipe.py verify`
+on the retained evidence. Limits: local verification on supplied binaries —
+neither independent acceptance nor installation; neither the remote relay nor
+key rotation beyond the secret-shown-once. Rendering predicate: every **open**
+`<details>` block filled (« Aide » never holds a table), 60 s bound justified
+by observation (≤ 26 s real rendering), diagnostic keeping the rendered state.

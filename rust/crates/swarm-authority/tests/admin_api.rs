@@ -276,6 +276,73 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     let in_use = c.post("/api/v1/authority/policy", &ana, json!({"policy": without, "revision": after["revision"]})).json();
     assert_eq!((in_use["error"].as_str(), in_use["subject"].as_str()), (Some("authority-role-in-use"), Some("dan")));
 
+    // Groups (ADM-01): CRUD on the signed journal, effective roles = own ∪
+    // group roles seen by sessions, `/me` and policy decisions.
+    assert_eq!(error(&c.post("/api/v1/authority/groups", &ana, json!({"key":"ops","label":"Ops","roles":["root"],"members":[]}))), "account-role-unknown");
+    assert_eq!(c.post("/api/v1/authority/groups", &ana, json!({"key":"ops","label":"Ops","roles":["operator"],"members":["dan"]})).status, 200, "create with roles and members");
+    assert_eq!(error(&c.post("/api/v1/authority/groups", &ana, json!({"key":"ops","label":"Ops","roles":[],"members":[]}))), "group-exists");
+    let dan_me = c.get("/api/v1/authority/me", &dan_cookie).json();
+    assert!(dan_me["account"]["roles"].as_array().unwrap().iter().any(|r| r == "operator"), "dan sees the group role");
+    assert!(dan_me["permissions"].as_array().unwrap().iter().any(|p| p == "missions.write"), "effective right granted through the group");
+    // The group alone gives administration-grade rights? No — operator is not admin; check the refusal stays.
+    assert_eq!(c.get("/api/v1/authority/accounts", &dan_cookie).status, 403);
+    // Group grants administration to dan through a custom admin-grade role.
+    let pol = c.get("/api/v1/authority/policy", &ana).json();
+    let revision = pol["revision"].as_str().unwrap().to_owned();
+    let mut wider2 = pol["policy"].clone();
+    wider2["roles"].as_array_mut().unwrap().push(json!({"key":"superop","label":"Super op","description":"Administers the daemon"}));
+    wider2["grants"].as_array_mut().unwrap().push(json!({"role":"superop","permissions":["accounts.manage"]}));
+    let applied2 = c.post("/api/v1/authority/policy", &ana, json!({"policy": wider2, "revision": revision}));
+    assert_eq!(applied2.status, 200, "{}", applied2.body);
+    let g2 = c.post("/api/v1/authority/groups", &ana, json!({"key":"ops2","label":"Ops2","roles":["superop"],"members":["dan"]}));
+    assert_eq!(g2.status, 200, "{}", g2.body);
+    let dan_me = c.get("/api/v1/authority/me", &dan_cookie).json();
+    assert_eq!(dan_me["administer"], true, "dan administers through the group");
+    assert_eq!(c.get("/api/v1/authority/accounts", &dan_cookie).status, 200);
+    // Stripping the group's admin role down while dan still holds nothing
+    // else: candidate state leaves ana administering — allowed (200).
+    let strip = c.post("/api/v1/authority/groups/ops2/profile", &ana, json!({"label":"Ops2","roles":["viewer"],"members":["dan"]}));
+    assert_eq!(strip.status, 200, "{}", strip.body);
+    assert_eq!(c.get("/api/v1/authority/me", &dan_cookie).json()["administer"], false, "role retrait effective immediately");
+    // Restore the admin-grade role, then delete the group as if dan were the
+    // only administrator: refused `authority-last-admin`.
+    assert_eq!(c.post("/api/v1/authority/groups/ops2/profile", &ana, json!({"label":"Ops2","roles":["superop"],"members":["dan"]})).status, 200);
+    // dan revokes... actually dan now administers: self-lockout check via
+    // dan editing his own admin group is the second guard below.
+    assert_eq!(
+        error(&c.post("/api/v1/authority/groups/ops2/delete", &dan_cookie, json!({}))),
+        "authority-self-lockout",
+        "dan cannot delete his own source of administration"
+    );
+    assert_eq!(c.post("/api/v1/authority/groups/ops2/delete", &ana, json!({})).status, 200, "ana remains administrator, delete allowed");
+    assert_eq!(c.get("/api/v1/authority/me", &dan_cookie).json()["administer"], false, "group deletion ends the borrowed rights");
+    assert_eq!(error(&c.post("/api/v1/authority/groups/ops2/delete", &ana, json!({}))), "group-missing");
+    // Rename keeps members/roles under the new key; the old key is free.
+    assert_eq!(c.post("/api/v1/authority/groups/ops/rename", &ana, json!({"key":"ops-team"})).status, 200);
+    let groups = c.get("/api/v1/authority/groups", &ana).json()["groups"].as_array().unwrap().to_owned();
+    assert!(groups.iter().any(|g| g["key"] == "ops-team" && g["members"].as_array().unwrap().iter().any(|m| m == "dan")), "rename kept members");
+    assert!(!groups.iter().any(|g| g["key"] == "ops"), "old key gone");
+    assert_eq!(c.post("/api/v1/authority/groups", &ana, json!({"key":"ops","label":"Ops again","roles":[],"members":[]})).status, 200, "old key reusable");
+    // Duplicate copies label/roles/members under a new key.
+    assert_eq!(c.post("/api/v1/authority/groups/ops-team/duplicate", &ana, json!({"key":"ops-copy","label":"Ops copy","roles":[],"members":[]})).status, 200);
+    let dup = c.get("/api/v1/authority/groups", &ana).json()["groups"].as_array().unwrap().iter().find(|g| g["key"] == "ops-copy").unwrap().to_owned();
+    assert_eq!((dup["roles"][0].as_str(), dup["members"][0].as_str()), (Some("operator"), Some("dan")), "duplicate copied roles and members");
+    assert_eq!(error(&c.post("/api/v1/authority/groups/ops-copy/rename", &ana, json!({"key":"ops-team"}))), "group-exists", "rename onto a live key refused");
+    assert_eq!(error(&c.post("/api/v1/authority/groups/nobody/profile", &ana, json!({"label":"X","roles":[],"members":[]}))), "group-missing");
+    // Journal chain still valid with the group records.
+    assert_eq!(c.get("/api/v1/authority/audit", &ana).json()["chain_valid"], true);
+
+    // A browser navigation (GET with Accept: text/html) is a consultation;
+    // the engine is absent here, the note is written all the same.
+    let nav = {
+        let mut s = TcpStream::connect(("127.0.0.1", port)).unwrap();
+        s.write_all(format!("GET / HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nCookie: {ana}\r\nConnection: close\r\nAccept: text/html\r\n\r\n").as_bytes()).unwrap();
+        let mut raw = String::new();
+        s.read_to_string(&mut raw).unwrap();
+        raw.lines().next().unwrap().to_owned()
+    };
+    assert!(nav.starts_with("HTTP/1.1 5"), "engine absent: {nav}");
+
     // Configuration: preview, stale refusal, apply persisted and live.
     let cfg = c.get("/api/v1/authority/config", &ana).json();
     let mut next = cfg["config"].clone();
@@ -314,6 +381,19 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     assert!(!audit.to_string().contains("ana pass") && !audit.to_string().contains("as1-"), "no secret in the audit");
     let seqs: Vec<u64> = entries.iter().map(|e| e["seq"].as_u64().unwrap()).collect();
     assert_eq!(seqs, (1..=seqs.len() as u64).collect::<Vec<_>>());
+    // ADM-05 enrichment: outcome lines carry duration/client/UA/view; intents
+    // carry the readable detail; consultations name their view.
+    let outcome = entries.iter().find(|e| e["event"] == "outcome" && e["path"] == "/api/v1/authority/accounts").expect("outcome");
+    assert!(outcome["duration_ms"].as_i64().is_some(), "duration_ms present");
+    assert_eq!(outcome["client"], "browser");
+    assert_eq!(outcome["view"], "view.authority");
+    let intent = entries.iter().find(|e| e["event"] == "intent" && e["path"] == "/api/v1/authority/accounts").expect("intent");
+    assert_eq!(intent["detail"], "account created", "readable detail from path only (subject is in the body)");
+    assert_eq!(intent["client"], "browser");
+    assert!(entries.iter().all(|e| e.get("user_agent").and_then(|u| u.as_str()).map(|u| u.len() <= 120).unwrap_or(true)), "UA truncated to 120");
+    let consult = entries.iter().find(|e| e["event"] == "consultation" && e["subject"] == "ana").expect("consultation");
+    assert_eq!(consult["view"], "none", "engine pages are not exclusive views");
+    assert_eq!(consult["client"], "browser");
     // Connections per session, session detail, dashboard (audit.read).
     let conns = c.get("/api/v1/authority/audit/sessions", &fresh).json();
     let rows = conns["sessions"].as_array().unwrap();
@@ -323,13 +403,89 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     let detail = c.get(&format!("/api/v1/authority/audit/sessions/{}", carol_row["credential"].as_str().unwrap()), &fresh).json();
     assert!(detail["entries"].as_array().unwrap().iter().any(|e| e["event"] == "refused" && e["path"] == "/api/v1/authority/sessions"));
     assert_eq!(c.get("/api/v1/authority/audit/sessions?subject=bob", &fresh).json()["sessions"].as_array().unwrap().iter().filter(|r| r["subject"] != "bob").count(), 0);
+    // ADM-06: enrichment columns, filters, sort, pagination, export.
+    let carol = carol_row.as_object().unwrap();
+    assert_eq!(carol["clients"][0], "browser", "access means recorded");
+    assert!(carol["views"].as_array().unwrap().iter().any(|v| v == "view.authority"), "views touched by the session");
+    assert_eq!(c.get("/api/v1/authority/audit/sessions?client=api-key", &fresh).json()["sessions"].as_array().unwrap().len(), 0, "no key used in this run");
+    assert_eq!(c.get("/api/v1/authority/audit/sessions?view=view.authority", &fresh).json()["sessions"].as_array().unwrap().iter().all(|r| r["views"].as_array().unwrap().iter().any(|v| v == "view.authority")), true);
+    let no_admin_reply = c.get("/api/v1/authority/audit/sessions?no_admin=1", &fresh).json();
+    let no_admin = no_admin_reply["sessions"].as_array().unwrap();
+    assert!(no_admin.iter().all(|r| r["subject"] != "ana"), "ana administers; her sessions are filtered out");
+    assert!(no_admin.iter().any(|r| r["subject"] == "bob"), "bob has no administration");
+    assert_eq!(c.get("/api/v1/authority/audit/sessions?status=active", &fresh).json()["sessions"].as_array().unwrap().iter().all(|r| r["signed_out"] == false), true);
+    assert_eq!(c.get("/api/v1/authority/audit/sessions?status=refused", &fresh).json()["sessions"].as_array().unwrap().iter().all(|r| r["refusals"].as_u64().unwrap() > 0), true);
+    assert_eq!(error(&c.get("/api/v1/authority/audit/sessions?status=nonsense", &fresh)), "authority-request-invalid");
+    assert_eq!(c.get("/api/v1/authority/audit/sessions?q=CAR", &fresh).json()["sessions"].as_array().unwrap().len(), 1, "case-insensitive search");
+    let sorted_reply = c.get("/api/v1/authority/audit/sessions?sort=subject&dir=asc", &fresh).json();
+    let sorted = sorted_reply["sessions"].as_array().unwrap();
+    let subs: Vec<&str> = sorted.iter().map(|r| r["subject"].as_str().unwrap_or("")).collect();
+    let mut want = subs.clone();
+    want.sort();
+    assert_eq!(subs, want, "subject sort asc");
+    let page1 = c.get("/api/v1/authority/audit/sessions?per_page=2&page=1", &fresh).json();
+    assert_eq!(page1["sessions"].as_array().unwrap().len(), 2);
+    let total = page1["total"].as_u64().unwrap();
+    let page2 = c.get("/api/v1/authority/audit/sessions?per_page=2&page=2", &fresh).json();
+    assert_eq!(page2["sessions"].as_array().unwrap().len(), (total as usize - 2).min(2), "second page holds the rest");
+    assert_ne!(page1["sessions"][0]["credential"], page2["sessions"][0]["credential"], "pages are disjoint");
+    let csv = c.get("/api/v1/authority/audit/sessions?format=csv", &fresh);
+    assert_eq!(csv.headers.iter().find(|(k, _)| k == "content-type").map(|(_, v)| v.as_str()), Some("text/csv; charset=utf-8"));
+    assert!(csv.body.starts_with("credential,subject,first_at,"), "CSV header");
+    assert_eq!(csv.body.lines().count() as u64, total + 1, "export is not paginated");
+    let exported = c.get("/api/v1/authority/audit/sessions?format=json", &fresh).json();
+    assert_eq!(exported["sessions"].as_array().unwrap().len() as u64, total, "JSON export not paginated either");
     let dash = c.get("/api/v1/authority/audit/dashboard", &fresh).json();
     assert!(!dash["days"].as_array().unwrap().is_empty() && dash["accounts"].as_array().unwrap().iter().any(|a| a["subject"] == "ana"));
+    // ADM-07: KPIs, per-view usage, 20 most recent lines.
+    assert!(dash["kpis"]["sign_ins"].as_u64().unwrap() >= 3, "sign-in KPI");
+    assert!(dash["kpis"]["refusals"].as_u64().unwrap() >= 1, "refusal KPI");
+    let views = dash["views"].as_array().unwrap();
+    assert!(views.iter().any(|v| v["view"] == "view.authority" && v["actions"].as_u64().unwrap() > 0), "authority usage charted");
+    assert!(views.iter().any(|v| v["view"] == "none"), "engine consultations grouped under none");
+    let recent = dash["recent"].as_array().unwrap();
+    assert!(!recent.is_empty() && recent.len() <= 20);
+    let recents: Vec<i64> = recent.iter().map(|e| e["at"].as_i64().unwrap()).collect();
+    let mut want_recent = recents.clone();
+    want_recent.sort_unstable_by_key(|t| std::cmp::Reverse(*t));
+    assert_eq!(recents, want_recent, "recent lines are the newest first");
     assert_eq!(error(&c.post("/api/v1/authority/audit/purge", &fresh, json!({"older_than_days": 0}))), "authority-purge-days-invalid");
     assert_eq!(error(&c.post("/api/v1/authority/audit/purge", &fresh, json!({}))), "authority-request-invalid", "no default retention");
     let purge = c.post("/api/v1/authority/audit/purge", &fresh, json!({"older_than_days": 1})).json();
     assert_eq!(purge["removed"], 0, "everything is recent");
     assert_eq!(c.get("/api/v1/authority/audit", &fresh).json()["chain_valid"], true);
+    // ADM-08: manual purge is rate-limited to 5 calls per rolling minute.
+    // The purge above consumed one slot; four more are accepted, the 6th
+    // call (5 slots used) is refused with 429 + Retry-After.
+    let statuses: Vec<u16> = (0..5)
+        .map(|_| c.post("/api/v1/authority/audit/purge", &fresh, json!({"older_than_days": 1})).status)
+        .collect();
+    assert_eq!(&statuses[..4], &[200, 200, 200, 200], "slots 2-5 accepted");
+    assert_eq!(statuses[4], 429, "6th call in the minute refused");
+    // ADM-09: the daemon's diagnostics file is readable, bounded and level-filtered.
+    let log = c.get("/api/v1/authority/log", &fresh).json();
+    assert_eq!(log["level"], "info");
+    assert!(log["lines"].as_array().unwrap().len() <= 200);
+    // Configuration gains the retention and level; invalid values refused.
+    // The fixture's own authority.json predates both fields: absent here
+    // (None) and defaulted to "info" — the shipped 365-day default is
+    // asserted in tests/sessions.rs.
+    let cfg = c.get("/api/v1/authority/config", &fresh).json();
+    assert_eq!(cfg["config"]["log_level"], "info");
+    assert!(cfg["config"].get("audit_retention_days").is_none_or(|v| v.is_null()), "legacy document: no automatic purge");
+    assert_eq!(cfg["log_levels"].as_array().unwrap().len(), 4);
+    let mut next = cfg["config"].clone();
+    next["log_level"] = json!("loud");
+    assert_eq!(error(&c.post("/api/v1/authority/config/preview", &fresh, json!({"config": next}))), "authority-config-invalid");
+    let mut next = cfg["config"].clone();
+    next["audit_retention_days"] = json!(0);
+    assert_eq!(error(&c.post("/api/v1/authority/config/preview", &fresh, json!({"config": next}))), "authority-config-invalid");
+    let mut next = cfg["config"].clone();
+    next["audit_retention_days"] = json!(null);
+    next["log_level"] = json!("debug");
+    let applied = c.post("/api/v1/authority/config", &fresh, json!({"config": next, "revision": cfg["revision"]}));
+    assert_eq!(applied.status, 200, "{}", applied.body);
+    assert_eq!(c.get("/api/v1/authority/log", &fresh).json()["level"], "debug", "level applied live");
     // Fail closed: an unwritable audit refuses the mutation, with no effect.
     let log = conf.join("audit.jsonl");
     fs::set_permissions(&log, fs::Permissions::from_mode(0o400)).unwrap();

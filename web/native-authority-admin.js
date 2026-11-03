@@ -31,6 +31,10 @@
   const messages={
    'authority-self-lockout':'Refusé : cette modification vous retirerait l’administration.',
    'authority-revision-stale':'Refusé : la source a changé depuis votre lecture. Rechargez puis recommencez.',
+   'group-exists':'Ce groupe existe déjà.',
+   'group-missing':'Ce groupe n’existe plus. Rechargez la liste.',
+   'authority-group-key':'Identifiant de groupe : lettres, chiffres, - ou _.',
+   'authority-label-empty':'Donnez un libellé.',
    'account-exists':'Ce compte existe déjà.',
    'account-missing':'Ce compte n’existe plus. Rechargez la liste.',
    'account-authentication-refused':'Mot de passe actuel incorrect.',
@@ -82,10 +86,18 @@
   const summary=node('p');summary.textContent=tr('Connecté en tant que')+' '+me.account.display_name+' · '+tr('rôles')+' : '+me.account.roles.join(', ')+' · '+tr('intégrité')+' I'+me.account.integrity;
   card.append(node('h3','Comptes et accès'),node('p','Les comptes, les sessions et la politique d’accès sont tenus par le démon d’autorité, sous son propre compte système. Chaque requête du cockpit est vérifiée par lui avant d’atteindre le moteur.'),summary,status);host.replaceChildren(card);status.hidden=true;
   function notice(text,alert){status.hidden=false;status.className='notice '+(alert?'alert':'info');status.textContent=typeof text==='string'?tr(text):text;status.focus?.()}
-  const group=(title,hint)=>{const g=node('details',undefined,'engine-settings-group'),s=node('summary',title),content=node('div');g.append(s,node('p',hint),content);card.append(g);return content};
+  const group=(title,hint)=>{const g=node('details',undefined,'engine-settings-group'),s=node('summary',title),content=node('div');content.append(node('p','Chargement…','notice info'));g.append(s,node('p',hint),content);card.append(g);return content};
   const table=(heads)=>{const wrap=node('div',undefined,'engine-settings-table-wrap'),t=node('table',undefined,'engine-settings-table'),thead=node('thead'),tr0=node('tr'),tb=node('tbody');for(const h of heads){const th=node('th',h);th.scope='col';tr0.append(th)}thead.append(tr0);t.append(thead,tb);wrap.append(t);return {wrap,tb}};
   const cell=(row,text)=>{const td=node('td');td.textContent=text;row.append(td);return td};
   const toolbar=(...b)=>{const t=node('div',undefined,'toolbar');t.append(...b);return t};
+  /** Section shortcuts at the top of the card (Wattson-style admin menu):
+   * each opens its group, collapses the others and moves focus to it. */
+  function jumpBar(){
+   const groups=[...card.querySelectorAll(':scope > details.engine-settings-group')];if(groups.length<2)return;
+   const bar=node('nav',undefined,'toolbar authority-tabs');bar.setAttribute('aria-label',tr('Sections de l’administration'));
+   for(const g of groups){const b=button(g.querySelector('summary').textContent);b.dataset.authorityJump='';b.addEventListener('click',()=>{for(const o of groups)o.open=o===g;g.querySelector('summary').focus();g.scrollIntoView({block:'start'})});bar.append(b)}
+   card.insertBefore(bar,groups[0]);
+  }
   // Personal API keys (B9): every account manages its own; admins see all.
   const keysHost=group(me.administer?'Clés API':'Mes clés API','Une clé agit au nom de son compte pour des scripts, sans dépasser sa portée ni la politique d’accès. Elle ne permet jamais d’administrer comptes, sessions, clés ou politique. Le secret n’est affiché qu’une fois.');
   const scopes=['read','write','approve','administer'];
@@ -100,7 +112,47 @@
     async state=>{if(!/^[1-9][0-9]*$/.test(days.value))throw Error('key-expiry-invalid');const r=await call('POST','/me/keys',{name:name.value,scope:scope.value,expires_in_seconds:Number(days.value)*86400});await loadKeys();
      setTimeout(()=>dialog('Clé créée',body=>{body.append(node('p','Copiez ce secret maintenant : il ne sera plus jamais affiché. Utilisez-le dans l’en-tête « Authorization: Bearer ».'));const out=input('text',r.secret);out.readOnly=true;field(body,'Secret',out);setTimeout(()=>out.select(),0)},async()=>'',{submitLabel:'J’ai copié le secret'}),0);return ''})});
   }
-  if(!me.administer){card.append(node('p','Seuls les comptes autorisés à administrer gèrent les comptes, les sessions et la politique.'));if(me.permissions?.includes('audit.read'))buildAudit();await loadKeys();return {mode:'authority',administer:false}}
+  if(!me.administer){card.append(node('p','Seuls les comptes autorisés à administrer gèrent les comptes, les sessions et la politique.'));if(me.permissions?.includes('audit.read'))buildAudit();jumpBar();await loadKeys();return {mode:'authority',administer:false,views:me.views||[]}}
+  // Shared reads for the permissions matrix (role usage, ADM-03).
+  let lastAccounts=[],lastGroups=[];
+  // Account groups (ADM-01): rights = own roles ∪ roles of active groups.
+  const groupsHost=group('Groupes','Rôles attribués à un groupe de comptes. Les droits effectifs d’un compte sont l’union de ses rôles propres et de ceux de ses groupes. Un membre retiré perd les droits du groupe à sa prochaine requête, sans fin de session.');
+  async function loadGroups(){
+   const add=button('Créer un groupe','primary'),reload=button('Recharger');add.dataset.authorityGroupCreate='';
+   let accounts=[];
+   try{accounts=(await call('GET','/accounts')).accounts}catch{} // member picker works even if the read fails
+   try{const {groups}=await call('GET','/groups');lastGroups=groups;refreshMatrixIfIdle();const {wrap,tb}=table(['Groupe','Rôles','Membres','Actions']);
+    for(const g of groups){const row=node('tr');cell(row,g.label+' ('+g.key+')');cell(row,g.roles.join(', ')||'—');cell(row,g.members.join(', ')||'—');
+     const actions=cell(row,''),edit=button('Modifier'),dup=button('Dupliquer'),del=button('Supprimer');edit.dataset.authorityGroupEdit=dup.dataset.authorityGroupDuplicate=del.dataset.authorityGroupDelete=g.key;actions.append(edit,dup);
+     edit.addEventListener('click',()=>openGroup(g,'edit'));
+     dup.addEventListener('click',()=>openGroup(g,'duplicate'));
+     del.addEventListener('click',()=>{dialog(tr('Supprimer le groupe')+' '+g.key,body=>{body.append(node('p','Les membres conservent leurs rôles propres et perdent les rôles du groupe à leur prochaine requête.'))},async()=>{await call('POST','/groups/'+encodeURIComponent(g.key)+'/delete',{});await loadGroups();return 'Groupe supprimé.'},{submitLabel:'Supprimer'})});
+     tb.append(row)}
+    groupsHost.replaceChildren(groups.length?wrap:node('p','Aucun groupe. Les comptes ne tiennent que leurs rôles propres.'),toolbar(add,reload));
+   }catch(e){const p=node('p',undefined,'notice alert');p.textContent=explain(e);groupsHost.replaceChildren(p,toolbar(reload))}
+   function groupFields(body,g,creating){
+    const f={};if(creating){f.key=field(body,'Identifiant (lettres, chiffres, - ou _)',input('text',g?g.key+'-copie':''));f.key.autocomplete='off'}
+    f.label=field(body,'Libellé',input('text',g?.label||''));
+    const set=node('fieldset',undefined,'authority-roles');set.append(node('legend','Rôles du groupe'));f.roles={};for(const r of policyRoles){const l=node('label');const c=input('checkbox');c.checked=!!g?.roles?.includes(r.key);c.value=r.key;l.append(c,document.createTextNode(' '+r.label));set.append(l);f.roles[r.key]=c}body.append(set);
+    const members=node('fieldset',undefined,'authority-roles');members.append(node('legend','Membres'));f.members={};for(const a of accounts){const l=node('label');const c=input('checkbox');c.checked=!!g?.members?.includes(a.subject);c.value=a.subject;l.append(c,document.createTextNode(' '+a.subject));members.append(l);f.members[a.subject]=c}body.append(members);
+    return f;
+   }
+   const profileOf=f=>({label:f.label.value,roles:Object.keys(f.roles).filter(r=>f.roles[r].checked),members:Object.keys(f.members).filter(m=>f.members[m].checked)});
+   function openGroup(g,mode){ // mode: 'create' | 'edit' | 'duplicate'
+    let f;const creating=mode!=='edit';
+    const target=g?'/groups/'+encodeURIComponent(g.key)+(mode==='duplicate'?'/duplicate':'/profile'):'/groups';
+    dialog(mode==='create'?'Nouveau groupe':(mode==='duplicate'?tr('Dupliquer le groupe')+' '+g.key:tr('Modifier le groupe')+' '+g.key),body=>{f=groupFields(body,g,creating)},async()=>{
+     const p=profileOf(f);
+     if(mode==='create')await call('POST',target,{key:f.key.value,...p});
+     else if(mode==='duplicate')await call('POST',target,{key:f.key.value,...p});
+     else{ // edit: a changed identifier is a rename (label/roles/members still applied)
+      if(f.key.value!==g.key)await call('POST','/groups/'+encodeURIComponent(g.key)+'/rename',{key:f.key.value});
+      await call('POST','/groups/'+encodeURIComponent(f.key.value)+'/profile',p);
+     }
+     await loadGroups();return creating?'Groupe créé.':'Groupe modifié.'});
+   }
+   add.addEventListener('click',()=>openGroup(null,true));
+  }
   // Accounts.
   const accountsHost=group('Comptes','Créer, modifier, réinitialiser ou désactiver un compte. Un compte désactivé ne peut plus se connecter et ses sessions prennent fin.');
   function profileFields(body,a,creating){
@@ -115,7 +167,7 @@
   const profileOf=f=>({display_name:f.display.value,roles:Object.keys(f.roles).filter(r=>f.roles[r].checked),integrity:Number(f.integrity.value),attributes:attributes(f.attributes.value)});
   async function loadAccounts(){
    const add=button('Ajouter un compte','primary'),reload=button('Recharger');add.dataset.authorityAdd='';
-   try{const {accounts,reset_requests:resets={}}=await call('GET','/accounts');const {wrap,tb}=table(['Identifiant','Nom','Rôles','Intégrité','Attributs','Actions']);
+   try{const {accounts,reset_requests:resets={}}=await call('GET','/accounts');lastAccounts=accounts;refreshMatrixIfIdle();const {wrap,tb}=table(['Identifiant','Nom','Rôles','Intégrité','Attributs','Actions']);
     for(const a of accounts){const row=node('tr');cell(row,a.subject+(a.subject===me.account.subject?' ('+tr('vous')+')':'')+(resets[a.subject]?' — '+tr('réinitialisation demandée le')+' '+when(resets[a.subject]):''));cell(row,a.display_name);cell(row,a.roles.join(', '));cell(row,'I'+a.integrity);cell(row,Object.entries(a.attributes).map(([k,v])=>k+'='+v).join(', ')||'—');
      const actions=cell(row,''),edit=button('Modifier'),reset=button('Mot de passe'),off=button('Désactiver');edit.dataset.authorityEdit=reset.dataset.authorityReset=off.dataset.authorityDisable=a.subject;actions.append(edit,reset);if(a.subject!==me.account.subject)actions.append(off);
      edit.addEventListener('click',()=>{let f;dialog(tr('Modifier le compte')+' '+a.subject,body=>{f=profileFields(body,a,false)},async()=>{await call('POST','/accounts/'+encodeURIComponent(a.subject)+'/profile',profileOf(f));await loadAccounts();return 'Compte modifié.'})});
@@ -138,10 +190,14 @@
     sessionsHost.replaceChildren(sessions.length?wrap:node('p','Aucune session ouverte.'),toolbar(reload));
    }catch(e){const p=node('p',undefined,'notice alert');p.textContent=explain(e);sessionsHost.replaceChildren(p,toolbar(reload))}
   }
-  // Habilitations (policy schema 2): roles × permission matrix, edited as a
+  // Habilitations (policy schema 3: 14 familles + 16 vues): roles × permission matrix, edited as a
   // local draft, then validated by the daemon (preview) and saved with the
   // revision read. Built-in roles cannot be deleted; admin is locked.
   let policyRoles=roles.map(key=>({key,label:key}));
+  /** Role usage in the matrix reads these lists; a late load refreshes the
+   * matrix without re-reading the policy. */
+  function refreshMatrixIfIdle(){if(matrixRefresh)matrixRefresh()}
+  let matrixRefresh=null;
   const policyHost=group('Habilitations','Rôles et habilitations, comme une matrice : chaque case autorise une famille de routes. Les planchers d’intégrité (lecture I1, écriture I2, approbation et administration I3) s’appliquent toujours.');
   async function loadPolicy(){
    const reload=button('Recharger');reload.addEventListener('click',loadPolicy);
@@ -153,6 +209,15 @@
    const meta=node('p');meta.textContent=tr('Source')+' : '+tr(view.source==='saved'?'enregistrée':'défaut d’installation')+' · '+tr('Révision')+' '+view.revision.slice(0,12);
    const matrixHost=node('div'),condHost=node('div');
    function renderMatrix(){
+    // Section rows with per-section check-all/clear; view keys (menu rights)
+    // are listed after the family keys of the same section. Orphan keys
+    // (granted but unknown to the catalog) appear as a warning row.
+    const catalogKeys=new Set(view.catalog.map(p=>p.key).concat(view.views.map(v=>v.key)));
+    const orphans=[...new Set(draft.grants.filter(g=>!Object.keys(g.when||{}).length).flatMap(g=>g.permissions))].filter(k=>!catalogKeys.has(k));
+    // Ordered union of sections: catalog sections first, then sections that
+    // only hold view rows (Conduite, Suivi, Configuration, Pages…) — the two
+    // catalogs share "Missions" but not their other section labels.
+    const sections=[...new Set([...view.catalog.map(p=>p.section),...view.views.map(v=>v.section)])];
     const {wrap,tb}=table(['Habilitation',...draft.roles.map(r=>r.label)]);wrap.dataset.authorityMatrix='';
     const head=wrap.querySelector('thead tr');
     // Role actions under each role header.
@@ -161,17 +226,44 @@
      if(!builtin.has(r.key)){const del=button('Supprimer');del.dataset.authorityRoleDelete=r.key;box.append(del);del.addEventListener('click',()=>{draft.roles=draft.roles.filter(x=>x.key!==r.key);draft.grants=draft.grants.filter(g=>g.role!==r.key);renderMatrix();renderConditions();dirty()})}
      rn.addEventListener('click',()=>{let label,desc;dialog(tr('Renommer le rôle')+' '+r.key,body=>{label=field(body,'Libellé',input('text',r.label));desc=field(body,'Description',input('text',r.description||''))},async()=>{if(!label.value.trim())throw Error('authority-role-label');r.label=label.value.trim();r.description=desc.value.trim();renderMatrix();dirty();return ''},{submitLabel:'Appliquer au brouillon'})});
      dup.addEventListener('click',()=>roleDialog(r));th.append(box)});
-    let section='';
-    for(const p of view.catalog){
-     if(p.section!==section){section=p.section;const sr=node('tr'),sc=node('th',section);sc.colSpan=draft.roles.length+1;sc.scope='colgroup';sr.append(sc);tb.append(sr)}
-     const row=node('tr'),label=node('th');label.scope='row';label.textContent=tr(p.label)+' ';label.append(node('small','('+p.key+' · I'+view.floors[p.family]+')'));row.append(label);
-     for(const r of draft.roles){const td=node('td'),c=input('checkbox');c.dataset.role=r.key;c.dataset.permission=p.key;c.setAttribute('aria-label',r.label+' — '+tr(p.label));
-      c.checked=!!draft.grants.find(g=>g.role===r.key&&!Object.keys(g.when||{}).length&&g.permissions.includes(p.key));
-      if(r.key==='admin'){c.checked=true;c.disabled=true}
-      c.addEventListener('change',()=>{const g=unconditional(r.key);g.permissions=c.checked?[...new Set([...g.permissions,p.key])]:g.permissions.filter(x=>x!==p.key);dirty()});
-      td.append(c);row.append(td)}
-     tb.append(row)}
-    matrixHost.replaceChildren(wrap);
+    const held=role=>{const g=draft.grants.find(x=>x.role===role&&!Object.keys(x.when||{}).length);return g?new Set(g.permissions):new Set()};
+    // Usage (ADM-03): accounts and groups holding each role, from the lists
+    // already loaded; reloaded with them (the buttons call loadPolicy again).
+    const usage=new Map(draft.roles.map(r=>[r.key,{accounts:0,groups:0}]));
+    (lastAccounts||[]).forEach(a=>{for(const r of a.roles)if(usage.has(r))usage.get(r).accounts++});
+    (lastGroups||[]).forEach(g=>{for(const r of g.roles)if(usage.has(r))usage.get(r).groups++});
+    const sectionRow=section=>{
+     const sr=node('tr'),sc=node('th',undefined);sc.colSpan=draft.roles.length+1;sc.scope='colgroup';
+     const box=node('div',undefined,'toolbar authority-section');
+     box.append(node('strong',section));
+     for(const r of draft.roles){if(r.key==='admin')continue;const all=button('Tout cocher'),none=button('Tout décocher');all.dataset.authorityAll=none.dataset.authorityNone=r.key;all.addEventListener('click',()=>{const g=unconditional(r.key);g.permissions=[...new Set([...g.permissions,...items.map(p=>p.key)])];renderMatrix();dirty()});none.addEventListener('click',()=>{const g=unconditional(r.key);g.permissions=g.permissions.filter(k=>!items.some(p=>p.key===k));renderMatrix();dirty()});box.append(all,none)}
+     sc.append(box);sr.append(sc);tb.append(sr);
+    };
+    for(const section of sections){
+     const items=view.catalog.filter(p=>p.section===section);
+     sectionRow(section);
+     for(const p of items){
+      const row=node('tr'),label=node('th');label.scope='row';label.textContent=tr(p.label)+' ';label.append(node('small','('+p.key+' · I'+view.floors[p.family]+')'));row.append(label);
+      for(const r of draft.roles){const td=node('td'),c=input('checkbox');c.dataset.role=r.key;c.dataset.permission=p.key;c.setAttribute('aria-label',r.label+' — '+tr(p.label));
+       c.checked=held(r.key).has(p.key);
+       if(r.key==='admin'){c.checked=true;c.disabled=true}
+       c.addEventListener('change',()=>{const g=unconditional(r.key);g.permissions=c.checked?[...new Set([...g.permissions,p.key])]:g.permissions.filter(x=>x!==p.key);dirty()});
+       td.append(c);row.append(td)}
+      tb.append(row)}
+     // View keys of this section (menu entries guarded by these exclusive rights).
+     for(const v of view.views.filter(v=>v.section===section)){
+      const row=node('tr'),label=node('th');label.scope='row';label.textContent=tr(v.label)+' ';label.append(node('small','('+v.key+')'));row.append(label);
+      for(const r of draft.roles){const td=node('td'),c=input('checkbox');c.dataset.role=r.key;c.dataset.permission=v.key;c.setAttribute('aria-label',r.label+' — '+tr(v.label));
+       c.checked=held(r.key).has(v.key);
+       if(r.key==='admin'){c.checked=true;c.disabled=true}
+       c.addEventListener('change',()=>{const g=unconditional(r.key);g.permissions=c.checked?[...new Set([...g.permissions,v.key])]:g.permissions.filter(x=>x!==v.key);dirty()});
+       td.append(c);row.append(td)}
+      tb.append(row)}
+    }
+    if(orphans.length){const sr=node('tr'),sc=node('th',undefined);sc.colSpan=draft.roles.length+1;sc.scope='colgroup';sc.className='authority-orphans';sc.append(node('strong','Clés orphelines (attribuées mais inconnues du catalogue) : '+orphans.join(', ')));sr.append(sc);tb.append(sr)}
+    // Counter: unconditional grants per role, shown under the matrix.
+    const counter=node('p',undefined,'authority-counter');counter.textContent=tr('Droits par rôle')+' : '+draft.roles.map(r=>{const u=usage.get(r.key);return r.label+' '+held(r.key).size+(u&&(u.accounts||u.groups)?' ('+tr('usage')+' : '+[u.accounts?u.accounts+' '+tr('compte(s)'):'',u.groups?u.groups+' '+tr('groupe(s)'):''].filter(Boolean).join(', ')+')':'')}).join(' · ');
+    matrixHost.replaceChildren(wrap,counter);
    }
    function roleDialog(from){let key,label,desc;dialog(from?tr('Dupliquer le rôle')+' '+from.key:'Nouveau rôle',body=>{key=field(body,'Identifiant du rôle (lettres, chiffres, - ou _)',input('text',from?from.key+'-copie':''));label=field(body,'Libellé',input('text',from?from.label+' '+tr('(copie)'):''));desc=field(body,'Description',input('text',from?.description||''))},
     async()=>{const k=key.value.trim();if(!/^[A-Za-z0-9_-]{1,64}$/.test(k))throw Error('authority-role-key');if(draft.roles.some(r=>r.key===k))throw Error('authority-role-exists');if(!label.value.trim())throw Error('authority-role-label');
@@ -197,6 +289,7 @@
    advanced.addEventListener('click',()=>{let text;dialog('JSON avancé',body=>{body.append(node('p','Le brouillon complet (rôles et autorisations). Les modifications sont reprises dans la matrice ; rien n’est enregistré avant « Enregistrer les habilitations ».'));text=document.createElement('textarea');text.rows=16;text.spellcheck=false;text.value=JSON.stringify(draft,null,1);field(body,'Politique (JSON)',text)},
     async()=>{let next;try{next=JSON.parse(text.value)}catch{throw Error('authority-policy-json')}Object.assign(draft,next);renderMatrix();renderConditions();dirty();return ''},{submitLabel:'Appliquer au brouillon'})});
    renderMatrix();renderConditions();
+   matrixRefresh=renderMatrix;
    policyHost.replaceChildren(meta,matrixHost,condHost,state,toolbar(save,newRole,test,advanced,reload));
   }
   // Daemon configuration.
@@ -214,41 +307,119 @@
     });
    }catch(e){const p=node('p',undefined,'notice alert');p.textContent=explain(e);configHost.replaceChildren(p,toolbar(reload))}
   }
-  // Access audit (Wattson-style): connections per session with drill-down,
-  // activity dashboard, explicit purge. Shown with the audit.read permission.
+  // Access audit (Wattson-style, ADM-06/07/08/09/10): connections with
+  // filters/sort/pagination/export, dashboard KPIs + 6 local SVG charts with
+  // alternative tables + 20 recent lines, armed purge with retention,
+  // daemon log, filterable administration actions tab. Shown with the
+  // audit.read permission.
   function buildAudit(){
-   const host=group('Journal d’accès','Connexions, consultations de pages, actions (intention puis résultat) et refus, avec le compte et la session. La chaîne d’empreintes révèle une modification du fichier, sans l’empêcher.');
+   const host=group('Journal d’accès','Connexions, consultations de pages, actions (intention puis résultat) et refus, avec le compte, la session, la durée et le moyen d’accès. La chaîne d’empreintes révèle une modification du fichier, sans l’empêcher.');
    const eventLabels={'sign-in':'connexion acceptée','sign-in-refused':'connexion refusée','sign-out':'déconnexion','intent':'intention','outcome':'résultat de la requête','consultation':'consultation','refused':'refus d’accès','reset-requested':'mot de passe oublié','purge-anchor':'purge du journal'};
+   const clientLabels={browser:'navigateur','api-key':'clé API'};
    const day=d=>d?Math.floor(new Date(d+'T00:00:00Z').getTime()/1000):null;
-   const from=input('date'),to=input('date'),who=input('text');who.placeholder=tr('tous');
-   const filters=node('div',undefined,'engine-settings-fields');field(filters,'Du (inclus)',from);field(filters,'Au (inclus)',to);field(filters,'Compte',who);
-   const qs=()=>{const p=new URLSearchParams();const f=day(from.value),t=day(to.value);if(f!=null)p.set('from',f);if(t!=null)p.set('to',t+86400);if(who.value.trim())p.set('subject',who.value.trim());const q=p.toString();return q?'?'+q:''};
+   const from=input('date'),to=input('date'),who=input('text'),viewFilter=input('text'),clientFilter=document.createElement('select'),noAdmin=input('checkbox'),statusFilter=document.createElement('select'),q=input('text');
+   who.placeholder=q.placeholder=tr('tous');noAdmin.checked=false;
+   for(const [v,label] of [['','—'],['browser','navigateur'],['api-key','clé API']]){const o=node('option');o.value=v;o.textContent=tr(label);clientFilter.append(o)}
+   for(const [v,label] of [['','—'],['active','active'],['signed_out','déconnectée'],['refused','refusée']]){const o=node('option');o.value=v;o.textContent=tr(label);statusFilter.append(o)}
+   const filters=node('div',undefined,'engine-settings-fields');
+   field(filters,'Du (inclus)',from);field(filters,'Au (inclus)',to);field(filters,'Compte',who);field(filters,'Recherche',q);
+   field(filters,'Vue (view.*)',viewFilter);field(filters,'Moyen d’accès',clientFilter);field(filters,'Statut',statusFilter);
+   const noAdminLabel=node('label','Sans administration','engine-settings-field');noAdminLabel.append(noAdmin,document.createTextNode(' '+tr('seulement les comptes sans droit d’administration')));filters.append(noAdminLabel);
+   const qs=extra=>{const p=new URLSearchParams();const f=day(from.value),t=day(to.value);if(f!=null)p.set('from',f);if(t!=null)p.set('to',t+86400);if(who.value.trim())p.set('subject',who.value.trim());if(q.value.trim())p.set('q',q.value.trim());if(viewFilter.value.trim())p.set('view',viewFilter.value.trim());if(clientFilter.value)p.set('client',clientFilter.value);if(statusFilter.value)p.set('status',statusFilter.value);if(noAdmin.checked)p.set('no_admin','1');if(extra)for(const [k,v] of Object.entries(extra))p.set(k,v);return '?'+p.toString()};
    const tabs=node('div',undefined,'toolbar authority-tabs');tabs.setAttribute('role','tablist');const panel=node('div');panel.setAttribute('role','tabpanel');panel.tabIndex=-1;
-   const views={connections:['Connexions',connections],dashboard:['Tableau de bord',dashboardView],purge:['Purge',purgeView]};let current='connections';
-   for(const [k,[label]] of Object.entries(views)){const b=button(label);b.setAttribute('role','tab');b.dataset.auditTab=k;b.addEventListener('click',()=>show(k));tabs.append(b)}
-   function show(k){current=k;for(const b of tabs.children){const on=b.dataset.auditTab===k;b.setAttribute('aria-selected',String(on));b.className=on?'primary':''}panel.replaceChildren(node('p','Chargement…','notice info'));views[k][1]()}
+   const tabsMap={connections:['Connexions',connections],dashboard:['Tableau de bord',dashboardView],actions:['Actions d’administration',actionsView],log:['Journal du démon',logView],purge:['Purge',purgeView]};let current='connections';
+   for(const [k,[label]] of Object.entries(tabsMap)){const b=button(label);b.setAttribute('role','tab');b.dataset.auditTab=k;b.addEventListener('click',()=>show(k));tabs.append(b)}
+   function show(k){current=k;for(const b of tabs.children){const on=b.dataset.auditTab===k;b.setAttribute('aria-selected',String(on));b.className=on?'primary':'';b.tabIndex=on?0:-1}panel.replaceChildren(node('p','Chargement…','notice info'));tabsMap[k][1]()}
    const apply=button('Filtrer');apply.addEventListener('click',()=>show(current));
    const chainNote=valid=>node('p',valid?'Chaîne d’empreintes intacte.':'Chaîne d’empreintes rompue : le journal a été modifié ou tronqué.','notice '+(valid?'info':'alert'));
-   async function connections(){
-    try{const r=await call('GET','/audit/sessions'+qs());const {wrap,tb}=table(['Compte','Session','Ouverture','Dernière activité','Consultations','Actions','Refus','Détail']);
-     for(const x of r.sessions){const row=node('tr');cell(row,x.subject||'—');cell(row,x.credential+(x.signed_out?' ('+tr('déconnectée')+')':''));cell(row,when(x.first_at));cell(row,when(x.last_at));cell(row,String(x.consultations));cell(row,String(x.actions));cell(row,String(x.refusals));
+   /** Collapsible per-section help (ADM-11), FR text translated by SwarmI18n. */
+   const help=(text)=>{const d=node('details',undefined,'authority-help');d.append(node('summary','Aide'),node('p',text));return d};
+   const also=(el,fn)=>{fn(el);return el};
+   /** Local SVG bar chart (ADM-07): no external resource, data stays in page.
+    * Returns an <svg> of `width`×`height` with one vertical bar per point. */
+   function barChart(points,width,height,label){
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 '+width+' '+height);svg.setAttribute('role','img');svg.setAttribute('aria-label',label);svg.setAttribute('width','100%');svg.style.maxWidth=width+'px';
+    const max=Math.max(1,...points.map(p=>p.value)),n=Math.max(1,points.length),slot=width/n,bw=Math.min(slot*0.7,28);
+    for(const [i,p] of points.entries()){const h=Math.round(p.value/max*(height-24)),x=i*slot+(slot-bw)/2;
+     const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');rect.setAttribute('x',x);rect.setAttribute('y',height-16-h);rect.setAttribute('width',bw);rect.setAttribute('height',Math.max(h,p.value?1:0));rect.setAttribute('class','authority-chart-bar');rect.appendChild(node('title',p.label+' : '+p.value));svg.append(rect);
+     if(n<=14||i%Math.ceil(n/14)===0){const t=document.createElementNS('http://www.w3.org/2000/svg','text');t.setAttribute('x',x+bw/2);t.setAttribute('y',height-4);t.setAttribute('text-anchor','middle');t.setAttribute('class','authority-chart-text');t.textContent=p.label.length>10?p.label.slice(0,9)+'…':p.label;svg.append(t)}}
+    return svg;
+   }
+   function chartBlock(title,points,unit){
+    const box=node('div',undefined,'authority-chart');box.append(node('h4',title));
+    if(points.some(p=>p.value))box.append(barChart(points,560,140,title));
+    const alt=table([unit,'Total']);for(const p of points)if(p.value){const row=node('tr');cell(row,p.label);cell(row,String(p.value));alt.tb.append(row)}
+    box.append(also(node('details',undefined,'authority-help'),d=>{d.append(node('summary','Tableau alternatif'));d.append(alt.wrap)}));
+    return box;
+   }
+   async function connections(page=1,sort='last_at',dir='desc'){
+    try{const r=await call('GET','/audit/sessions'+qs({page,per_page:50,sort,dir}));const {wrap,tb}=table(['Compte','Session','Ouverture','Dernière activité','Moyens','Vues','Consultations','Actions','Refus','Statut','Détail']);
+     for(const x of r.sessions){const row=node('tr');cell(row,x.subject||'—');cell(row,x.credential+(x.signed_out?' ('+tr('déconnectée')+')':''));cell(row,when(x.first_at));cell(row,when(x.last_at));
+      cell(row,(x.clients||[]).map(c=>tr(clientLabels[c]||c)).join(', ')||'—');cell(row,(x.views||[]).join(', ')||'—');
+      cell(row,String(x.consultations));cell(row,String(x.actions));cell(row,String(x.refusals));cell(row,x.signed_out?tr('déconnectée'):tr('active'));
       const open=button('Voir');open.dataset.auditSession=x.credential;open.addEventListener('click',()=>detail(x));cell(row,'').append(open);tb.append(row)}
-     panel.replaceChildren(chainNote(r.chain_valid),r.sessions.length?wrap:node('p','Aucune connexion sur la période.'))}catch(e){fail(e)}
+     const total=r.total!=null?r.total:r.sessions.length,pages=Math.max(1,Math.ceil(total/50));
+     const nav=toolbar(),first=button('«'),prev=button('‹'),next=button('›'),last=button('»');
+     for(const [b,target] of [[first,1],[prev,page-1],[next,page+1],[last,pages]]){b.disabled=target<1||target>pages||target===page;b.addEventListener('click',()=>connections(target,sort,dir));nav.append(b)}
+     nav.append(node('span',tr('Page')+' '+page+' / '+pages+' — '+total+' '+tr('sessions'),'authority-pages'));
+     const sortable=(label,key)=>{const b=button(label+(sort===key?(dir==='desc'?' ↓':' ↑'):''));b.className='authority-sort';b.addEventListener('click',()=>connections(1,key,sort===key&&dir==='desc'?'asc':'desc'));return b};
+     const sorts=toolbar(sortable(tr('Trier : activité'),'last_at'),sortable(tr('ouverture'),'first_at'),sortable(tr('compte'),'subject'),sortable(tr('actions'),'actions'),sortable(tr('refus'),'refusals'));
+     const exportBar=toolbar(button('Exporter CSV',()=>location.assign(base+'/audit/sessions'+qs({format:'csv',sort,dir}))),button('Exporter JSON',()=>location.assign(base+'/audit/sessions'+qs({format:'json',sort,dir}))));
+     panel.replaceChildren(chainNote(r.chain_valid),help('Chaque ligne est une session (une connexion et ses requêtes). « Moyens » distingue le navigateur de la clé API ; « Vues » liste les droits de menu employés (none = pages moteur sans menu). Les filtres s’appliquent côté serveur : période, compte, vue, moyen, statut, sans administration, recherche.'),sorts,wrap,nav,exportBar)}catch(e){fail(e)}
    }
    async function detail(x){
-    try{const r=await call('GET','/audit/sessions/'+x.credential) /* [a-z0-9:] only, path-safe */;const {wrap,tb}=table(['N°','Date','Événement','Requête','Résultat']);
-     for(const e of [...r.entries].reverse()){const row=node('tr');cell(row,String(e.seq));cell(row,when(e.at));cell(row,tr(eventLabels[e.event]||e.event));cell(row,e.method?e.method+' '+e.path+(e.action?' ('+e.action+')':''):'—');cell(row,e.status==null?'—':String(e.status));tb.append(row)}
+    try{const r=await call('GET','/audit/sessions/'+x.credential) /* [a-z0-9:] only, path-safe */;const {wrap,tb}=table(['N°','Date','Événement','Requête','Vue','Moyen','Résultat','Durée','Détail']);
+     for(const e of [...r.entries].reverse()){const row=node('tr');cell(row,String(e.seq));cell(row,when(e.at));cell(row,tr(eventLabels[e.event]||e.event));
+      cell(row,e.method?e.method+' '+e.path+(e.action?' ('+e.action+')':''):'—');cell(row,e.view||'—');cell(row,e.client?tr(clientLabels[e.client]||e.client):'—');
+      cell(row,e.status==null?'—':String(e.status));cell(row,e.duration_ms!=null?e.duration_ms+' ms':'—');cell(row,e.detail||'—');tb.append(row)}
      const back=button('Retour aux connexions');back.addEventListener('click',()=>show('connections'));const h=node('h4');h.textContent=tr('Session')+' '+x.credential+' — '+(x.subject||'—');panel.replaceChildren(h,wrap,toolbar(back));back.focus()}catch(e){fail(e)}
    }
    async function dashboardView(){
-    try{const r=await call('GET','/audit/dashboard'+qs());const d=table(['Jour (UTC)','Connexions','Connexions refusées','Comptes actifs','Consultations','Actions','Refus']);
+    try{const r=await call('GET','/audit/dashboard'+qs());const k=r.kpis||{};
+     const kpiBar=node('div',undefined,'authority-kpis');
+     for(const [label,value] of [[tr('Connexions'),k.sign_ins],[tr('Connexions refusées'),k.refused_sign_ins],[tr('Actions'),k.actions],[tr('Refus'),k.refusals]]){const c=node('div',undefined,'authority-kpi');c.append(node('strong',String(value??0)),node('span',label));kpiBar.append(c)}
+     const d=table(['Jour (UTC)','Connexions','Connexions refusées','Comptes actifs','Consultations','Actions','Refus']);
      for(const x of r.days){const row=node('tr');for(const v of [x.day,x.sign_ins,x.refused_sign_ins,x.accounts,x.consultations,x.actions,x.refusals])cell(row,String(v));d.tb.append(row)}
      const a=table(['Compte','Sessions','Consultations','Actions','Refus','Dernière activité']);for(const x of r.accounts){const row=node('tr');for(const v of [x.subject,x.sessions,x.consultations,x.actions,x.refusals])cell(row,String(v));cell(row,when(x.last_at));a.tb.append(row)}
-     panel.replaceChildren(chainNote(r.chain_valid),node('h4','Activité par jour'),r.days.length?d.wrap:node('p','Aucune activité sur la période.'),node('h4','Activité par compte'),r.accounts.length?a.wrap:node('p','Aucune activité sur la période.'))}catch(e){fail(e)}
+     const charts=node('div',undefined,'authority-charts');
+     charts.append(chartBlock(tr('Connexions par jour'),r.days.map(x=>({label:x.day.slice(5),value:x.sign_ins})),tr('Jour')));
+     charts.append(chartBlock(tr('Actions par jour'),r.days.map(x=>({label:x.day.slice(5),value:x.actions})),tr('Jour')));
+     charts.append(chartBlock(tr('Consultations par jour'),r.days.map(x=>({label:x.day.slice(5),value:x.consultations})),tr('Jour')));
+     charts.append(chartBlock(tr('Refus par jour'),r.days.map(x=>({label:x.day.slice(5),value:x.refusals})),tr('Jour')));
+     charts.append(chartBlock((r.views||[]).map(v=>v.view==='none'?tr('pages moteur'):v.view),r.views.map(v=>({label:v.view==='none'?tr('pages moteur'):v.view,value:v.consultations})),tr('Vue')));
+     charts.append(chartBlock(tr('Actions par vue'),(r.views||[]).map(v=>({label:v.view==='none'?tr('pages moteur'):v.view,value:v.actions})),tr('Vue')));
+     const recent=table(['Date','Événement','Compte','Requête','Résultat']);
+     for(const e of (r.recent||[])){const row=node('tr');cell(row,when(e.at));cell(row,tr(eventLabels[e.event]||e.event));cell(row,e.subject||'—');cell(row,e.method?e.method+' '+e.path:e.path||'—');cell(row,e.status==null?'—':String(e.status));recent.tb.append(row)}
+     panel.replaceChildren(chainNote(r.chain_valid),help('Quatre indicateurs, six graphiques construits localement (aucune ressource externe) avec tableau alternatif repliable, puis les 20 dernières lignes de la période. La période suit les filtres en haut de section.'),kpiBar,charts,node('h4','Activité par jour'),r.days.length?d.wrap:node('p','Aucune activité sur la période.'),node('h4','Activité par compte'),r.accounts.length?a.wrap:node('p','Aucune activité sur la période.'),node('h4','20 dernières connexions'),(r.recent||[]).length?recent.wrap:node('p','Aucune activité sur la période.'))}catch(e){fail(e)}
    }
-   function purgeView(){
+   async function actionsView(){
+    try{const r=await call('GET','/audit'+qs());const entries=(r.entries||[]).filter(e=>e.event==='intent'&&e.at>=(day(from.value)||0)&&e.at<(day(to.value)!==null?day(to.value)+86400:Number.MAX_SAFE_INTEGER));const {wrap,tb}=table(['Date','Compte','Action','Chemin','Résultat']);
+     for(const e of entries){const row=node('tr');cell(row,when(e.at));cell(row,e.subject||'—');cell(row,e.detail||e.action||'—');cell(row,e.method+' '+e.path);cell(row,e.status==null?'—':String(e.status));tb.append(row)}
+     panel.replaceChildren(chainNote(r.chain_valid),help('Chaque mutation d’administration est décrite en clair (création de compte, changement de mot de passe, application de politique…) à partir du chemin demandé — jamais du corps, qui peut contenir un secret.'),entries.length?wrap:node('p','Aucune action d’administration sur la période.'))}catch(e){fail(e)}
+   }
+   async function logView(){
+    try{const r=await call('GET','/log');const pre=node('pre',undefined,'authority-log');pre.tabIndex=0;pre.textContent=(r.lines||[]).join('\n')||tr('(journal vide)');
+     const levels=r.log_levels||['error','warn','info','debug'];
+     const cfg=await call('GET','/config');const cur=cfg.config.log_level||'info';
+     const levelSel=document.createElement('select');for(const l of levels){const o=node('option');o.value=l;o.textContent=l;levelSel.append(o)}levelSel.value=levels.includes(cur)?cur:'info';
+     const save=button('Enregistrer le niveau','primary');save.addEventListener('click',async()=>{const c=structuredClone(cfg.config);c.log_level=levelSel.value;await call('POST','/config',{config:c,revision:cfg.revision});notice('Niveau de journal enregistré et appliqué en direct.');await logView()});
+     panel.replaceChildren(help('Diagnostics du démon dans un fichier borné (8 Mio, tronqué par le début). Le niveau choisit la quantité de détails : error, warn, info, debug. Le changement est appliqué en direct.'),also(node('p',undefined,'authority-log-meta'),p=>p.textContent=tr('Niveau courant')+' : '+r.level+' · '+tr('Taille maximale')+' : '+Math.round(r.max_bytes/1048576)+' Mio'),field(node('div',undefined,'engine-settings-fields'),'Niveau minimum',levelSel),toolbar(save),pre)}catch(e){fail(e)}
+   }
+   async function purgeView(){
     const days=input('text');days.inputMode='numeric';const run=button('Purger','primary');run.dataset.auditPurge='';
-    const box=node('div');box.append(node('p','Supprime les lignes plus anciennes que le nombre de jours choisi. La chaîne reste vérifiable grâce à une ligne d’ancrage qui note la purge et son auteur. Aucune durée n’est appliquée automatiquement.'));field(box,'Supprimer les lignes de plus de (jours)',days);box.append(toolbar(run));
+    const retention=input('text');retention.inputMode='numeric';
+    let cfg=null;
+    try{cfg=await call('GET','/config')}catch(e){/* retention stays hidden on config refusal */}
+    const box=node('div');
+    box.append(node('p','Supprime les lignes plus anciennes que le nombre de jours choisi. La chaîne reste vérifiable grâce à une ligne d’ancrage qui note la purge et son auteur. La purge manuelle est limitée à 5 appels par minute.'));
+    field(box,'Supprimer les lignes de plus de (jours)',days);box.append(toolbar(run));
+    if(cfg){const save=button('Enregistrer la rétention automatique');save.addEventListener('click',async()=>{
+      const c=structuredClone(cfg.config);const v=retention.value.trim();
+      if(v===''){delete c.audit_retention_days}else{if(!/^[1-9][0-9]*$/.test(v)){notice(explain(Error('authority-purge-days-invalid')),true);return}c.audit_retention_days=Number(v)}
+      await call('POST','/config',{config:c,revision:cfg.revision});cfg=await call('GET','/config');notice(v===''?'Rétention automatique désactivée.':'Rétention enregistrée.')});
+     const retBox=node('div');field(retBox,'Purge automatique : lignes de plus de (jours, vide = aucune)',retention);if(cfg.config.audit_retention_days!=null)retention.value=String(cfg.config.audit_retention_days);
+     box.append(node('h4','Rétention automatique'),node('p','Le démon purge seul à son démarrage puis toutes les 6 heures, avec l’acteur « automatic ». Vide : aucune purge automatique.'),retBox,toolbar(save));
+    }
     run.addEventListener('click',()=>{if(!/^[1-9][0-9]*$/.test(days.value)){notice(explain(Error('authority-purge-days-invalid')),true);return}
      dialog('Purger le journal d’accès',body=>{const p=node('p');p.textContent=tr('Les lignes de plus de {n} jours seront supprimées définitivement.').replace('{n}',days.value);body.append(p)},async()=>{const r=await call('POST','/audit/purge',{older_than_days:Number(days.value)});show('connections');return tr('Lignes supprimées')+' : '+r.removed},{submitLabel:'Purger'})});
     panel.replaceChildren(box);
@@ -258,8 +429,9 @@
    host.parentElement.addEventListener('toggle',ev=>{if(ev.currentTarget.open&&!panel.childElementCount)show('connections')});
   }
   if(me.permissions?.includes('audit.read'))buildAudit();
-  await Promise.all([loadAccounts(),loadSessions(),loadPolicy(),loadConfig(),loadKeys()]);
-  return {mode:'authority',administer:true};
+  jumpBar();
+  await Promise.all([loadGroups(),loadAccounts(),loadSessions(),loadPolicy(),loadConfig(),loadKeys()]);
+  return {mode:'authority',administer:true,views:me.views||[]};
  }
  globalThis.SwarmAuthorityAdmin=Object.freeze({mount,call,attributes});
 })();

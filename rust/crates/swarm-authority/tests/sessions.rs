@@ -19,18 +19,27 @@ fn dir() -> tempfile::TempDir {
 fn config_defaults_override_and_refusals() {
     let d = AuthorityConfig::installation().unwrap();
     assert!(d.session_idle_seconds <= d.session_absolute_seconds);
+    assert_eq!(d.audit_retention_days, Some(365), "shipped retention");
+    assert_eq!(d.log_level, "info");
     let t = dir();
     assert_eq!(AuthorityConfig::load(t.path()).unwrap(), d, "absent file = shipped default");
     let mut custom = d;
     custom.session_idle_seconds = 60;
     std::fs::write(t.path().join("authority.json"), serde_json::to_vec(&custom).unwrap()).unwrap();
     assert_eq!(AuthorityConfig::load(t.path()).unwrap(), custom);
+    // ADM-08/09 fields: default when absent (old documents decode), no
+    // retention means `None`, unknown level and sub-day retention refused.
+    let legacy = r#"{"schema_version":1,"session_absolute_seconds":10,"session_idle_seconds":5,"argon2":{"memory_kib":8,"passes":1,"parallelism":1},"relay_body_max_bytes":1}"#;
+    let decoded = AuthorityConfig::decode(legacy.as_bytes()).unwrap();
+    assert_eq!(decoded.audit_retention_days, None, "no default retention");
+    assert_eq!(decoded.log_level, "info");
     for bad in [
         r#"{"schema_version":1}"#,
-        r#"{"schema_version":1,"session_absolute_seconds":10,"session_idle_seconds":20,"argon2":{"memory_kib":8,"passes":1,"parallelism":1},"relay_body_max_bytes":1}"#,
         r#"{"schema_version":1,"session_absolute_seconds":0,"session_idle_seconds":0,"argon2":{"memory_kib":8,"passes":1,"parallelism":1},"relay_body_max_bytes":1}"#,
         r#"{"schema_version":1,"session_absolute_seconds":10,"session_idle_seconds":5,"argon2":{"memory_kib":1,"passes":1,"parallelism":1},"relay_body_max_bytes":1}"#,
         r#"{"schema_version":1,"session_absolute_seconds":10,"session_idle_seconds":5,"argon2":{"memory_kib":8,"passes":1,"parallelism":1},"relay_body_max_bytes":1,"extra":1}"#,
+        r#"{"schema_version":1,"session_absolute_seconds":10,"session_idle_seconds":5,"argon2":{"memory_kib":8,"passes":1,"parallelism":1},"relay_body_max_bytes":1,"audit_retention_days":0}"#,
+        r#"{"schema_version":1,"session_absolute_seconds":10,"session_idle_seconds":5,"argon2":{"memory_kib":8,"passes":1,"parallelism":1},"relay_body_max_bytes":1,"log_level":"loud"}"#,
     ] {
         std::fs::write(t.path().join("authority.json"), bad).unwrap();
         assert!(AuthorityConfig::load(t.path()).is_err(), "{bad}");

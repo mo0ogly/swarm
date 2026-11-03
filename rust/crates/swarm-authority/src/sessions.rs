@@ -69,7 +69,7 @@ impl Sessions {
     /// (first 16 hex of the token hash), subject, sign-in and last-seen
     /// times, sorted by subject then sign-in time.
     pub fn list(&self, now: i64) -> Result<Vec<SessionInfo>, Error> {
-        let config = *self.config.read().map_err(|_| Error::Refused("session-state"))?;
+        let config = self.config.read().map_err(|_| Error::Refused("session-state"))?.clone();
         let table = self.table.lock().map_err(|_| Error::Refused("session-state"))?;
         let mut out: Vec<SessionInfo> = table
             .iter()
@@ -112,7 +112,7 @@ impl Sessions {
         if !token.starts_with(PREFIX) {
             return Err(refused());
         }
-        let config = *self.config.read().map_err(|_| Error::Refused("session-state"))?;
+        let config = self.config.read().map_err(|_| Error::Refused("session-state"))?.clone();
         let k = key(token);
         let (subject, generation) = {
             let mut table = self.table.lock().map_err(|_| Error::Refused("session-state"))?;

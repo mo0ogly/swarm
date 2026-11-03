@@ -135,7 +135,22 @@ impl AuthorityRecords {
         let Some(ledger) = cell.as_ref() else { return Err("web-attribution-unavailable") };
         let reference = format!("assertion:{nonce}");
         ledger
-            .record(&Event { at: now, event, subject: Some(subject), credential: Some("assertion"), reference: Some(&reference), method: Some(method), path: Some(path), action: None, status })
+            .record(&Event {
+                at: now,
+                event,
+                subject: Some(subject),
+                credential: Some("assertion"),
+                reference: Some(&reference),
+                method: Some(method),
+                path: Some(path),
+                action: None,
+                status,
+                duration_ms: None,
+                view: None,
+                client: None,
+                user_agent: None,
+                detail: None,
+            })
             .map(|_| ())
             .map_err(|_| "web-attribution-unavailable")
     }

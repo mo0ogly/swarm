@@ -5,6 +5,7 @@
 # normal user:   (cd rust && cargo build --release -p swarm-authority)
 #
 #   sudo deploy/authority/install.sh --admin LOGIN --display "Full Name" [--dry-run]
+#   sudo deploy/authority/install.sh  # refresh an initialized installation
 #   sudo deploy/authority/install.sh --uninstall [--purge]
 #
 # What it does (idempotent; accounts, key, pin and first user are never
@@ -85,8 +86,16 @@ if [ "$uninstall" = yes ]; then
     exit 0
 fi
 
-[[ "$admin" =~ ^[A-Za-z0-9_-]{1,100}$ ]] || fail "--admin LOGIN requis (lettres, chiffres, - ou _)"
-[ -n "$display" ] || fail "--display requis"
+upgrading=no
+if [ -f "$ETC/initialized" ]; then
+    # Existing accounts and their pinned identity are never re-provisioned.
+    # Refuse incomplete public markers before replacing the binary or unit.
+    [ -f "$ETC/pin" ] && [ -f "$ETC/public_key" ] || fail "installation initialisée incomplète : pin ou clé publique absent"
+    upgrading=yes
+else
+    [[ "$admin" =~ ^[A-Za-z0-9_-]{1,100}$ ]] || fail "--admin LOGIN requis (lettres, chiffres, - ou _)"
+    [ -n "$display" ] || fail "--display requis"
+fi
 [[ "$listen" =~ ^127\.0\.0\.1:[0-9]{1,5}$ ]] || fail "--listen doit être 127.0.0.1:PORT"
 [[ "$engine" =~ ^127\.0\.0\.1:[0-9]{1,5}$ ]] || fail "--engine doit être 127.0.0.1:PORT"
 [ "$listen" != "$engine" ] || fail "--listen et --engine doivent différer"
@@ -108,7 +117,7 @@ run install -d -o root -g root -m 0755 "$ETC"
 # 4. prepare (once)
 as_account() { run runuser -u "$ACCOUNT" -- "$LIB_DIR/swarm-authority" "$@"; }
 declaration="$STATE/bootstrap/declaration.json"
-if [ "$dry" = yes ]; then
+if [ "$dry" = yes ] && [ "$upgrading" = no ]; then
     as_account prepare --dir "$STATE" --controller-uid "$controller" --admin "$admin" --json
     pin=DRY-RUN-PIN public_key=DRY-RUN-KEY
 elif [ -f "$ETC/pin" ]; then
@@ -163,7 +172,7 @@ run systemctl daemon-reload
 # (try-restart does nothing when the service is stopped).
 run systemctl try-restart swarm-authority.service
 # 6. first user (password asked on the terminal)
-if [ "$dry" = yes ]; then
+if [ "$dry" = yes ] && [ "$upgrading" = no ]; then
     as_account init --declaration "$declaration" --pin "$pin" --admin "$admin" --display "$display" --json
 else
     if [ -f "$ETC/initialized" ]; then

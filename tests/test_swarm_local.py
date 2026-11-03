@@ -47,6 +47,29 @@ class LocalWeb(unittest.TestCase):
         subprocess.run([*self.args, "stop"], capture_output=True)
         self.temp.cleanup()
 
+    def test_status_during_lifecycle_mutation_preserves_live_identity(self):
+        """Observe a real owned server before/after contention; never stop the holder.
+
+        The fixture owns the lock. Concurrent status exposes no availability or
+        version; releasing it restores the same PID/image and leaves state bytes.
+        """
+        import fcntl
+        self.run_cli("start")
+        control = json.loads(self.run_cli("status"))
+        self.assertTrue(control["ready"])
+        runtime = self.root / ".swarm/local-web" / hashlib.sha256(self.address.encode()).hexdigest()[:16]
+        state = runtime / "server.json"
+        before = state.read_bytes()
+        with (runtime / "lifecycle.lock").open("a") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            concurrent = json.loads(self.run_cli("status", code=2))
+            self.assertEqual(concurrent["status"], "concurrent-operation")
+            for field in ("running", "ready", "pid", "binary", "binary_sha256"):
+                self.assertIsNone(concurrent[field])
+            self.assertEqual(state.read_bytes(), before)
+        self.assertEqual(json.loads(self.run_cli("status")), control)
+        self.assertEqual(state.read_bytes(), before)
+
     def test_local_opener_gets_native_login_without_terminal_disclosure(self):
         self.run_cli("start")
         received = Path(self.temp.name) / "opener-url"
@@ -308,6 +331,10 @@ class LocalWeb(unittest.TestCase):
         sudo_log = fake / "sudo.log"
         (fake / "bin" / "sudo").write_text('#!/bin/sh\necho "$*" >> "' + str(sudo_log) + '"\n')
         (fake / "bin" / "sudo").chmod(0o700)
+        # `enable` rebuilds the release daemon first; the isolated checkout has
+        # no Rust project, so cargo is a no-op stub that logs its call.
+        (fake / "bin" / "cargo").write_text('#!/bin/sh\necho "$*" >> "' + str(fake / "cargo.log") + '"\n')
+        (fake / "bin" / "cargo").chmod(0o700)
         unit = fake / "swarm-authority.service"
         unit.write_text(f"[Service]\nExecStart=/x serve --pin P --listen {self.address} --engine {internal}\n")
         (fake / "etc").mkdir()
@@ -337,6 +364,7 @@ class LocalWeb(unittest.TestCase):
             run("authority", "enable", "--no-open")
             self.assertEqual(mode(), "authority")
             self.assertEqual(sudo_log.read_text().splitlines(), ["systemctl enable --now swarm-authority"])
+            self.assertIn("build --release -p swarm-authority", (fake / "cargo.log").read_text(), "enable compares with fresh sources")
             status = json.loads(run("status").stdout)
             self.assertEqual((status["url"], status["ready"]), (f"http://{internal}/", True))
             report = json.loads(run("authority", "status").stdout)

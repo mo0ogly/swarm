@@ -22,6 +22,12 @@ const check=(name,ok,detail)=>{checks.push({name,ok:!!ok,detail});if(!ok)throw E
 function run(bin,args,input){const r=spawnSync(bin,args,{env,input,encoding:'utf8'});if(r.status!==0)throw Error(args.join(' ')+': '+r.stderr);return r.stdout?JSON.parse(r.stdout):null}
 const free=()=>new Promise(res=>{const s=net.createServer();s.listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>res(p))})});
 async function listening(port){for(;;){const ok=await new Promise(res=>{const c=net.connect(port,'127.0.0.1',()=>{c.end();res(true)});c.on('error',()=>res(false))});if(ok)return;await new Promise(r=>setTimeout(r,50))}}
+/** Wait for the admin card to finish rendering (lazy group fetches complete).
+ * Bound 60 s justified by observation: cold Chrome + loaded daemon renders in
+ * ≤26 s; RAF default polling was flaky under load, 500 ms polling is stable.
+ * On timeout the diagnostic keeps the rendered state (details/save/config) so
+ * the failure names its cause instead of a bare "Waiting failed". */
+async function cardReady(pg){try{await pg.waitForFunction(()=>[...document.querySelectorAll('#native-authority-admin details')].every(d=>!d.open||d.querySelector('table,.notice.alert,div > p'))&&document.querySelector('[data-authority-policy-save]')&&document.querySelector('[data-authority-config]'),{timeout:60000,polling:500})}catch(e){throw Error('card-wait url='+pg.url()+' state='+JSON.stringify(await pg.evaluate(()=>({details:[...document.querySelectorAll('#native-authority-admin details')].map(d=>({t:d.querySelector('summary')?.textContent,open:d.open,kids:d.querySelector('table')?'table':(d.querySelector('.notice.alert')?'alert':(d.querySelector('div > p')?'p':'none'))})),save:!!document.querySelector('[data-authority-policy-save]'),cfg:!!document.querySelector('[data-authority-config]')}))))}}
 (async()=>{let browser,success=false;try{
  const prep=run(daemonBin,['prepare','--dir',dir,'--controller-uid','4242','--admin','ana','--json']);
  fs.writeFileSync(path.join(dir,'configuration/authority.json'),JSON.stringify({schema_version:1,session_absolute_seconds:3600,session_idle_seconds:1800,argon2:{memory_kib:8,passes:1,parallelism:1},relay_body_max_bytes:16777216}));
@@ -50,8 +56,17 @@ async function listening(port){for(;;){const ok=await new Promise(res=>{const c=
  check('forgot-confirmation',await page.$eval('[role=status]',e=>e.textContent.includes('Si ce compte existe')));await page.screenshot({path:path.join(output,'forgot-sent-fr.png')});
  await page.setViewport({width:390,height:844});await page.goto(origin+'/login');check('login-mobile-no-overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:path.join(output,'login-mobile.png')});await page.setViewport({width:1440,height:960});
  await page.goto(origin+'/login');await page.type('input[name=subject]','ana');await page.type('input[name=password]','ana pass');
- await Promise.all([page.waitForNavigation(),page.click('button[type=submit]')]);check('signed-in',!page.url().includes('/login'),page.url());const cookies=await page.cookies();checks.push({name:'debug-after-login',ok:true,detail:{url:page.url(),cookies:cookies.map(c=>c.name+' '+c.sameSite),title:await page.title()}});
+ await Promise.all([page.waitForNavigation(),page.click('button[type=submit]')]);check('signed-in',!page.url().includes('/login'),page.url());
  const open=async(lang)=>{await page.goto(origin+'/native-runtime.html?lang='+lang);await page.waitForFunction(()=>!document.getElementById('native-authority-admin').hidden&&document.querySelector('#native-authority-admin table'));failOnError();await page.click('[data-native-view="admin"]');await page.waitForSelector('#native-admin-view:not([hidden])')};
+ // Main cockpit menu: "Utilisateurs et accès" view (Wattson-style admin).
+ await page.goto(origin+'/?lang=fr');await page.waitForSelector('#tabs [data-view="authority"]');
+ await page.waitForFunction(()=>location.search.includes('view='));await page.$eval('#tabs [data-view="authority"]',b=>b.closest('details').open=true);await page.click('#tabs [data-view="authority"]');await page.waitForFunction(()=>!document.getElementById('authority').hidden&&document.querySelector('#authority table'));
+ await page.goto(origin+'/?lang=fr&view=authority');await page.waitForFunction(()=>!document.getElementById('authority').hidden&&document.querySelector('#authority table'));check('cockpit-direct-link',true);check('no-unconnected-note',await page.$$eval('#authority > p.notice',n=>n.length===0));
+ check('cockpit-menu-entry',await page.$eval('#tabs [data-view="authority"]',b=>!b.hidden&&b.textContent==='Utilisateurs et accès'));
+ await page.waitForSelector('#authority [data-authority-add]');await page.waitForSelector('#authority [data-authority-key-create]');
+ const jumps=await page.$$('#authority [data-authority-jump]');check('cockpit-jump-bar',jumps.length>=5,jumps.length);
+ await jumps[1].click();check('jump-opens-one',await page.$$eval('#authority details.engine-settings-group',ds=>ds.filter(d=>d.open).length===1));
+ await page.screenshot({path:path.join(output,'fr-cockpit-users-access.png'),fullPage:false});
  await open('fr');
  await page.waitForSelector('[data-authority-add]');check('reset-request-shown',await page.$eval('#native-authority-admin',e=>e.textContent.includes('réinitialisation demandée')));
  const who=await page.$eval('.native-session-user',e=>e.textContent);check('header-user',who==='Ana Admin (ana)',who);
@@ -80,7 +95,9 @@ async function listening(port){for(;;){const ok=await new Promise(res=>{const c=
  // Habilitations: matrix (admin locked), new custom role in the draft, saved,
  // then offered when creating an account.
  await page.$$eval('#native-authority-admin details',ds=>ds.forEach(d=>d.open=true));await page.waitForSelector('[data-authority-matrix]');
- check('admin-column-locked',await page.$$eval('[data-authority-matrix] input[data-role="admin"]',cs=>cs.length===14&&cs.every(c=>c.checked&&c.disabled)));
+ // Schema 3 matrix: one row per catalog family permission (14) + per menu
+ // view key (16) = 30 locked admin checkboxes.
+ check('admin-column-locked',await page.$$eval('[data-authority-matrix] input[data-role="admin"]',cs=>cs.length===30&&cs.every(c=>c.checked&&c.disabled)),{count:await page.$$eval('[data-authority-matrix] input[data-role="admin"]',cs=>cs.length),bad:await page.$$eval('[data-authority-matrix] input[data-role="admin"]',cs=>cs.filter(c=>!c.checked||!c.disabled).map(c=>c.dataset.permission))});
  await page.click('[data-authority-role-new]');await page.waitForSelector(dlg);const rin=await page.$$(dlg+'input[type=text]');await rin[0].type('auditor');await rin[1].type('Auditeur');
  await page.click(dlg+'button[type=submit]');await page.waitForFunction(()=>!document.querySelector('dialog[open]')&&document.querySelector('[data-authority-matrix] input[data-role="auditor"][data-permission="audit.read"]'));
  await page.click('[data-authority-matrix] input[data-role="auditor"][data-permission="audit.read"]');await page.click('[data-authority-matrix] input[data-role="auditor"][data-permission="cockpit.read"]');
@@ -102,12 +119,12 @@ async function listening(port){for(;;){const ok=await new Promise(res=>{const c=
  // Languages × themes, full card screenshots; English must translate all fixed text.
  for(const lang of ['fr','en'])for(const theme of ['etat','sombre']){
   await open(lang);await page.click('[data-theme-choice="'+theme+'"]');await page.$$eval('#native-authority-admin details',ds=>ds.forEach(d=>d.open=true));
-  await page.waitForFunction(()=>[...document.querySelectorAll('#native-authority-admin details')].every(d=>d.querySelector('table,.notice.alert,div > p'))&&document.querySelector('[data-authority-policy-save]')&&document.querySelector('[data-authority-config]'));
+  await cardReady(page);
   const card=await page.$('#native-authority-admin');await card.screenshot({path:path.join(output,lang+'-'+theme+'-card.png')});
   if(lang==='en'){const text=await page.$eval('#native-authority-admin',e=>e.innerText);for(const fr of ['Comptes et accès','Journal d’accès','Habilitations','Réglages du démon','Ajouter un compte','Créer une clé','Révoquer'])check('en-no-french:'+fr,!text.includes(fr))}
  }
  // Mobile: no global horizontal overflow (tables scroll locally).
- await page.setViewport({width:390,height:844});await open('fr');await page.$$eval('#native-authority-admin details',ds=>ds.forEach(d=>d.open=true));await page.waitForFunction(()=>[...document.querySelectorAll('#native-authority-admin details')].every(d=>d.querySelector('table,.notice.alert,div > p'))&&document.querySelector('[data-authority-policy-save]')&&document.querySelector('[data-authority-config]'));
+ await page.setViewport({width:390,height:844});await open('fr');await page.$$eval('#native-authority-admin details',ds=>ds.forEach(d=>d.open=true));await cardReady(page);
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);check('mobile-no-overflow',overflow<=0,overflow);
  await page.screenshot({path:path.join(output,'fr-mobile.png'),fullPage:true});
  failOnError();success=true;

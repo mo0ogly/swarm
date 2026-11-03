@@ -7,12 +7,18 @@
 //!
 //! Validation: lifetimes strictly positive with idle <= absolute; Argon2
 //! costs accepted by the Argon2 parameter contract; relay body limit
-//! strictly positive. Unknown fields refuse.
+//! strictly positive; audit retention (when set) at least one day; log
+//! level one of `debug`, `info`, `warn`, `error`. Unknown fields refuse;
+//! `audit_retention_days` and `log_level` are optional on read so documents
+//! written before them still decode (they are always written back).
 use serde::{Deserialize, Serialize};
 use swarm_enrollment_authority::credentials::Parameters;
 
+/// Levels of the daemon diagnostics log, least to most verbose.
+pub const LOG_LEVELS: [&str; 4] = ["error", "warn", "info", "debug"];
+
 /// Validated configuration snapshot.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct AuthorityConfig {
     pub schema_version: i64,
@@ -24,6 +30,17 @@ pub struct AuthorityConfig {
     pub argon2: Parameters,
     /// Largest request body the daemon reads before relaying to the engine.
     pub relay_body_max_bytes: i64,
+    /// Audit lines older than this many days are purged daily by the daemon
+    /// (`None` = no automatic purge; the manual purge stays available).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub audit_retention_days: Option<i64>,
+    /// Verbosity of the daemon diagnostics file (`debug`…`error`).
+    #[serde(default = "default_log_level")]
+    pub log_level: String,
+}
+
+fn default_log_level() -> String {
+    "info".to_owned()
 }
 
 /// Installation default, read from the shipped configuration file.
@@ -50,6 +67,8 @@ impl AuthorityConfig {
             || self.session_idle_seconds > self.session_absolute_seconds
             || self.argon2.validate().is_err()
             || self.relay_body_max_bytes < 1
+            || self.audit_retention_days.is_some_and(|d| d < 1)
+            || !LOG_LEVELS.contains(&self.log_level.as_str())
         {
             return Err("authority-config-invalid");
         }
