@@ -173,12 +173,19 @@ impl State {
             if !value.is_object() || value.get("enabled").is_some_and(|v| !v.is_boolean()) {
                 return Err(TrustError::Integrity("trust-policy-shape"));
             }
-            if name == "delegation" && value.get("max_depth").and_then(Value::as_i64).is_none() {
-                return Err(TrustError::Integrity("trust-delegation-shape"));
+            if name == "delegation" {
+                let depth = value.get("max_depth").and_then(Value::as_i64);
+                if depth.is_none() {
+                    return Err(TrustError::Integrity("trust-delegation-shape"));
+                }
+                // Delegation is ported: any explicit depth (including 0, which
+                // disables child mandates) is a supported admission shape.
+                if *depth.as_ref().unwrap() < 0 {
+                    return Err(TrustError::Integrity("trust-delegation-shape"));
+                }
+                continue;
             }
-            if value.get("enabled").and_then(Value::as_bool) == Some(true)
-                || name == "delegation" && value.get("max_depth").and_then(Value::as_i64) != Some(0)
-            {
+            if value.get("enabled").and_then(Value::as_bool) == Some(true) {
                 return Err(TrustError::Unsupported("trust-active-extension-not-ported"));
             }
         }
@@ -219,6 +226,24 @@ impl State {
             value
         }).collect();
         let mut view = serde_json::json!({"schema_version":1,"revision":self.revision,"policy":self.policy,"identities":identities,"mandates":self.mandates,"actions":self.actions,"ledger":self.ledger,"access_ledger":self.access_ledger,"effect_receipts":self.connector_receipts,"evidence_count":self.evidence.len(),"simulation":true,"originals_missing":self.evidence.iter().filter(|e|self.originals.get(&e.original_digest).is_none_or(|v|v.is_empty())).count(),"limits":["aucun paiement réel","identités locales authentifiées","politiques avancées actives non portées : refus fermé"],"biba":{"model":"strict-with-named-endorsement-v1","scope":"trust-actions-only","os_confinement":false},"amount_minor_text":self.actions.iter().map(|(id,a)|(id.clone(),Value::String(a.get("amount_minor").and_then(Value::as_i64).unwrap_or(0).to_string()))).collect::<BTreeMap<_,_>>()});
+        // Effective per-mandate freshness/chain verdicts; a stored timestamp or
+        // hash is never replaced by an empty success here. Chain refusals reuse
+        // the engine's admission reasons exactly.
+        let now = time::OffsetDateTime::now_utc();
+        let status: BTreeMap<String, String> = self
+            .mandates
+            .keys()
+            .map(|id| {
+                let reason = super::operations::active(self, id, now).unwrap_or_default();
+                let label = if reason.is_empty() {
+                    "Mandat disponible".to_string()
+                } else {
+                    reason
+                };
+                (id.clone(), label)
+            })
+            .collect();
+        view["mandate_status"] = serde_json::to_value(status)?;
         view["identity_authentication"]=serde_json::json!({"local_bearer":true,"held_enrollment":{"root_api_available":cfg!(target_os="linux"),"http_available":false,"reason":"trusted-enrollment-startup-not-bound"}});
         view["confidentiality"]=super::confidentiality::capability(self)?;
         for (name, raw) in self.controls()? {

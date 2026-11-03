@@ -648,8 +648,10 @@ historiques et les preuves antérieures sont conservés tels quels. Témoin de
 l'état réel : sortie de contrôle du superviseur, sept gardes PASS, sortie 0
 (`supervisor-legacy-marker-control/` du lot
 `glm-pa09-nonempty-recipe-manifest-20261103T115459Z`). Édition GLM :
-l'exécution des recettes réconciliées reste UNVERIFIED tant que Codex ne les
-a pas personnellement courues (`recipe.py run` puis `verify`).
+l'exécution des recettes réconciliées restait UNVERIFIED tant que Codex ne
+les avait pas personnellement courues (`recipe.py run` puis `verify`) —
+réception personnelle depuis acquise, voir le paragraphe de réception
+ci-dessous.
 
 Câblage du prérequis de fixture mémoire, même date : l'exécution personnelle
 du superviseur de la recette complète `preparation-calls-rust` sur l'ELF322
@@ -678,8 +680,9 @@ restant fourni de l'extérieur par `SWARM_PREPARATION_UI_BINARY`. La source
 de fixture réellement consommée `tests/fixture_area.py` entre dans
 l'inventaire déclaré. Les sept gardes nommées et toutes les assertions
 fonctionnelles restent inchangées ; les scripts de test ne sont pas modifiés
-pour sauter l'ensemencement. Exécution des recettes recâblées : UNVERIFIED
-tant que Codex ne les a pas personnellement courues.
+pour sauter l'ensemencement. Exécution des recettes recâblées : d'abord UNVERIFIED
+tant que Codex ne les avait pas personnellement courues ; depuis reçue
+personnellement (paragraphe de réception ci-dessous).
 
 Réconciliation du compteur du producteur, même date : l'exécution recâblée
 du superviseur a réellement passé la garde de placement (`1 passed; 0
@@ -699,10 +702,55 @@ inchangés. Preuve conservée (ELF322 épinglé 3146c837…, lot
 `supervisor-full-recipes/preparation-calls-rust/` (`step-0003.stdout`,
 `step-0003.json`, `result.json`), `supervisor-next-boundary.json` et le
 témoin retained `supervisor-retained-calls35`. Les échecs historiques
-antérieurs restent intacts ; les recettes restent non entièrement
-vérifiées jusqu'aux exécutions complètes personnelles de Codex (stades
-`transport`, `engine-budget-policy`, `retained-root-faults` et recette
-legacy non exécutés dans ce run).
+antérieurs restent intacts ; à ce stade, les recettes n'étaient pas encore
+entièrement vérifiées (stades `transport`, `engine-budget-policy`,
+`retained-root-faults` et recette legacy non exécutés dans ce run) — les
+exécutions complètes personnelles de Codex ont depuis été reçues (paragraphe
+de réception ci-dessous).
+
+Réconciliation du filtre moteur, même date : l'exécution poursuivie du
+superviseur a ensuite réellement passé `transport` (4 tests) puis l'étape
+`engine-budget-policy` elle-même (exit 0) ; la recette s'est arrêtée
+uniquement sur l'attente périmée `running 7 tests`/`7 passed`. Inventaire
+réel observé (`step-0005.stdout`, ELF322 épinglé 3146c837…) : 18 tests
+nommés, tous PASS, 0 failed, 0 ignored, 735 filtrés — la commande
+`--lib preparation_call` sélectionne désormais six groupes de modules :
+5 `level_tests`, 2 `cli::level_tests`, 3 `preparation_call_budget`, 4
+`engine_settings::preparation_calls`, 2 `legacy`, 2 `confidentiality_tests`.
+L'attente de l'étape passe à `running 18 tests`/`18 passed; 0 failed` et
+porte désormais l'inventaire nommé complet des 18 tests ; les commandes,
+l'environnement, les prérequis et les autres étapes restent inchangés.
+Preuve conservée au lot `glm-preparation-calls-count-20261103T132200Z`
+(`step-0005.stdout/.stderr/.json`, `result.json`,
+`supervisor-next-boundary.json`) ; échec historique préservé. À ce stade, la recette
+n'était pas encore entièrement vérifiée : `retained-root-faults` (7 gardes)
+et la recette legacy complète restaient à l'exécution personnelle de Codex —
+depuis reçues (paragraphe de réception ci-dessous).
+
+Réception personnelle des deux recettes, même date : Codex a personnellement
+couru puis vérifié les deux recettes complètes (`recipe.py run` puis
+`verify`, quatre sorties réelles 0) sur l'ELF322 épinglé
+3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a, sources et
+production stables. `preparation-calls-rust`, 6 étapes : garde de placement
+1 PASS, public 35 assertions + navigateur 48, transport 4, moteur 18,
+retained-root-faults 7. `preparation-legacy-replay-rust`, 5 étapes : garde 1,
+replay legacy public 33 — replay terminal exact, conflits d'événement
+préservés, observation LECTURE SEULE des tours actifs
+pending/running/stopping avec grands livres reserved/estimated inchangés,
+aucune écriture de ligne ni de grand livre, aucun contact fournisseur — puis
+public 35 + navigateur 48 et root-faults 7 ; les deux `verify` rendent
+`integrity VERIFIED, recorded_status PASS`. Preuves conservées hors cache,
+lot `glm-preparation-engine-count-20261103T140800Z` : `supervisor-receipt.json`,
+`supervisor-full-recipes/preparation-calls-rust/result.json`,
+`supervisor-full-recipes/preparation-legacy-replay-rust/result.json`,
+`supervisor-full-recipes/preparation-calls-rust-verify.stdout`,
+`supervisor-full-recipes/preparation-legacy-replay-rust-verify.stdout`,
+parcours retained sous `supervisor-retained-journeys/`. Portée du reçu :
+racines inertes possédées et faux fournisseur local ; ni PAEA globale,
+enrôlement humain, revue indépendante, confinement de production ni
+acceptation du dialogue de versions humain protégé ; l'admin JS étranger
+diffère, pas d'équivalence whole-workspace. Les échecs intermédiaires
+historiques des lots antérieurs restent conservés tels quels.
 
 La classification HTTP publique des quatre refus lecteur BF-16a du dialogue
 (`blp-dialogue-authentication-required`, `blp-dialogue-policy-required`,

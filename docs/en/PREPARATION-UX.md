@@ -266,9 +266,11 @@ must explicitly adopt the new settings.
 
 The existing conversation view displays retained turns, provenance and freshness.
 Proposals remain readable without sending, stopping or implicitly adopting them;
-private prompts stay excluded. An active turn keeps an explicit refusal until
-its supervisor is ported. Reading ends no call and releases no reservation.
-See the [reference](REFERENCE.md#preparation-conversation-history--rust).
+private prompts stay excluded. An active pending/running/stopping turn is
+observed read-only — reading ends no call, releases no reservation and never
+dispatches, adopts a worker or contacts a provider; exact same-event replay
+returns the recorded status, a changed message conflicts (409). See the
+[reference](REFERENCE.md#preparation-conversation-history--rust).
 
 Local pilot: text API dialogue with cancellation and explicit proposal
 comparison, installed and verified; see the preparation AI calls migration record.

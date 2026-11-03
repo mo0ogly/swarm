@@ -101,7 +101,7 @@ replaced by the **access means** (browser or API key) and a short **user agent**
 | T6 | ADM-03, 04, 06–11 | `web/*authority*.js`, `admin.css`, translations | complete interface | done (local check) |
 | T7 | all | `tests/authority_admin_ui.cjs`, recipe | browser FR/EN, themes, mobile, keyboard | done (local check) |
 | T8 | — | FR/EN documentation | real behavior and limits | done |
-| T9 | — | `./swarm.sh authority install` (operator sudo), `./swarm.sh restart` | verified binary, live flow | to do |
+| T9 | — | `./swarm.sh authority install` (operator sudo), `./swarm.sh restart` | verified binary, live flow | done |
 
 ## Limits
 
@@ -397,3 +397,24 @@ replaced by the **access means** (browser or API key) and a short **user agent**
   recipe and its limits (no independent acceptance, relay and rotation out
   of scope).
 - Plan register: T7/T8 sections added above and the table updated.
+
+### T9 (2026-11-03)
+
+- Operator install: `./swarm.sh authority install` (sudo) — refresh path for
+  an already-initialized installation (no `--admin` required, accounts
+  preserved). Daemon relaunched from `/usr/local/lib/swarm-authority/`
+  (verified pid), engine restarted from `bin/swarm`.
+- Binaries verified: installed daemon = release candidate = running daemon,
+  same SHA-256 `d77edc7d…` (the refresh rebuilds the release build, hence a
+  hash different from the previous daemon `5f17747c`); running engine
+  `bin/swarm` v0.1.1-dev.323 = current binary `ccef210a…`, with the embedded
+  UI (markers « Utilisateurs et accès » ×29 and `cockpit-authority.js` ×2 in
+  the binary).
+- Live flow: permanent recipe `authority-admin-ui-rust` run against the
+  release pair — 41 named checks, 0 failures, PASS; hashes frozen in
+  `result.json` (engine `4a286e9e…`, daemon `d77edc7d…` — the exercised
+  daemon is exactly the installed and running binary); evidence under
+  `.swarm-fixtures/authority-admin-ui-wx7q89p1/`, no run residue under /tmp.
+- Limits: the run exercises its own isolated engine+daemon pair under
+  `.swarm-fixtures/` (never the mission database); the recipe does not
+  modify the installed daemon's real configuration.

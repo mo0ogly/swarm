@@ -616,8 +616,9 @@ environment and the other steps stay unchanged; historical failures and
 earlier evidence are kept as-is. Ground-truth witness: the supervisor
 control run, seven guards PASS, exit 0 (`supervisor-legacy-marker-control/`
 in lot `glm-pa09-nonempty-recipe-manifest-20261103T115459Z`). GLM edits: the
-reconciled recipes' execution remains UNVERIFIED until Codex personally runs
-them (`recipe.py run` then `verify`).
+reconciled recipes' execution was UNVERIFIED until Codex personally ran
+them (`recipe.py run` then `verify`) — personal receipt since acquired, see
+the receipt paragraph below.
 
 Memory-fixture prerequisite wiring, same date: the supervisor's personal run
 of the full `preparation-calls-rust` recipe on pinned ELF322 failed at the
@@ -644,7 +645,9 @@ supplied externally through `SWARM_PREPARATION_UI_BINARY`. The actually
 consumed fixture source `tests/fixture_area.py` joins the declared
 inventory. The seven named guards and every functional assertion stay
 unchanged; the test scripts are not modified to skip seeding. Execution of
-the rewired recipes: UNVERIFIED until Codex personally runs them.
+the rewired recipes: first UNVERIFIED
+until Codex personally ran them; since personally received (receipt
+paragraph below).
 
 Producer count reconciliation, same date: the supervisor's rewired run
 really passed the placement guard (`1 passed; 0 failed`), the sidecar build
@@ -663,9 +666,53 @@ ELF322 3146c837…, lot
 `supervisor-full-recipes/preparation-calls-rust/` (`step-0003.stdout`,
 `step-0003.json`, `result.json`), `supervisor-next-boundary.json` and the
 retained witness `supervisor-retained-calls35`. Earlier historical failures
-stay intact; the recipes remain not fully verified until Codex's personal
-full runs (the `transport`, `engine-budget-policy`, `retained-root-faults`
-stages and the legacy recipe were not executed in that run).
+stay intact; at that stage the recipes were not yet fully verified (the
+`transport`, `engine-budget-policy`, `retained-root-faults` stages and the
+legacy recipe were not executed in that run) — Codex's personal full runs
+have since been received (receipt paragraph below).
+
+Engine filter reconciliation, same date: the supervisor's continued run then
+really passed `transport` (4 tests) and the `engine-budget-policy` step
+itself (exit 0); the recipe aborted solely on the stale `running 7 tests`/
+`7 passed` expectation. Real observed inventory (`step-0005.stdout`, pinned
+ELF322 3146c837…): 18 named tests, all PASS, 0 failed, 0 ignored, 735
+filtered — the `--lib preparation_call` filter now selects six module
+groups: 5 `level_tests`, 2 `cli::level_tests`, 3 `preparation_call_budget`,
+4 `engine_settings::preparation_calls`, 2 `legacy`, 2
+`confidentiality_tests`. The step's expectation moves to `running 18 tests`/
+`18 passed; 0 failed` and now carries the complete named inventory of all 18
+tests; commands, environment, prerequisites and other steps stay unchanged.
+Evidence retained in lot `glm-preparation-calls-count-20261103T132200Z`
+(`step-0005.stdout/.stderr/.json`, `result.json`,
+`supervisor-next-boundary.json`); historical failure preserved. At that stage the recipe was
+still not fully verified: `retained-root-faults` (7 guards) and the full
+legacy recipe remained pending Codex's personal execution — since received
+(receipt paragraph below).
+
+Personal receipt of both recipes, same date: Codex personally ran and then
+verified the two complete recipes (`recipe.py run` then `verify`, four real
+exit codes 0) on the pinned ELF322
+3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a, with
+stable sources and production. `preparation-calls-rust`, 6 steps: placement
+guard 1 PASS, public 35 assertions + browser 48, transport 4, engine 18,
+retained-root-faults 7. `preparation-legacy-replay-rust`, 5 steps: guard 1,
+public legacy replay 33 — exact terminal replay, preserved event conflicts,
+READ-ONLY observation of active pending/running/stopping turns with
+reserved/estimated ledgers unchanged, no row or ledger write, no provider
+contact — then public 35 + browser 48 and root-faults 7; both `verify`
+return `integrity VERIFIED, recorded_status PASS`. Evidence retained outside
+the cache, lot `glm-preparation-engine-count-20261103T140800Z`:
+`supervisor-receipt.json`,
+`supervisor-full-recipes/preparation-calls-rust/result.json`,
+`supervisor-full-recipes/preparation-legacy-replay-rust/result.json`,
+`supervisor-full-recipes/preparation-calls-rust-verify.stdout`,
+`supervisor-full-recipes/preparation-legacy-replay-rust-verify.stdout`,
+retained journeys under `supervisor-retained-journeys/`. Receipt scope:
+owned inert Roots and a local fake provider; neither global PAEA, human
+enrollment, independent review, production confinement nor acceptance of the
+protected human version dialogue; the foreign admin JS differs, no
+whole-workspace equivalence. The intermediate historical failures of the
+earlier lots stay preserved as-is.
 
 The public HTTP classification of the four BF-16a dialogue reader refusals
 (`blp-dialogue-authentication-required`, `blp-dialogue-policy-required`,

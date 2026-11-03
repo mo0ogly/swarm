@@ -107,9 +107,14 @@ pub(crate) fn change(
             policy.validate()?;continue;
         }
         super::extensions::validate(name, value)?;
-        let prior = st.extensions.get(name).or_else(|| controls.get(name));
-        if prior.is_none_or(|v|v.raw()!=value.raw()) {
-            return Err(E::Unsupported("trust-extension-edit-not-ported"));
+        // Delegation is ported: an operator may admit or change its explicit
+        // depth (0 disables child mandates). Every other retained block stays
+        // frozen: an unported active policy must never silently become effective.
+        if name != "delegation" {
+            let prior = st.extensions.get(name).or_else(|| controls.get(name));
+            if prior.is_none_or(|v|v.raw()!=value.raw()) {
+                return Err(E::Unsupported("trust-extension-edit-not-ported"));
+            }
         }
     }
     let fingerprint = super::digest(&ConfigDigest(&c))?;

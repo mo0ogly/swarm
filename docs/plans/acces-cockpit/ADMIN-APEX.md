@@ -102,7 +102,7 @@ et l'**agent utilisateur** court.
 | T6 | ADM-03, 04, 06–11 | `web/*authority*.js`, `admin.css`, traductions | interface complète | fait (vérif. locale) |
 | T7 | toutes | `tests/authority_admin_ui.cjs`, recette | navigateur FR/EN, thèmes, mobile, clavier | fait (vérif. locale) |
 | T8 | — | documentation FR/EN | comportement réel et limites | fait |
-| T9 | — | `./swarm.sh authority install` (sudo opérateur), `./swarm.sh restart` | binaire vérifié, parcours live | à faire |
+| T9 | — | `./swarm.sh authority install` (sudo opérateur), `./swarm.sh restart` | binaire vérifié, parcours live | fait |
 
 ## Limites
 
@@ -407,3 +407,25 @@ et l'**agent utilisateur** court.
   chaîné, recette permanente et ses limites (pas d'acceptation
   indépendante, relais et rotation hors périmètre).
 - Registre du plan : sections T7/T8 ajoutées ci-dessus et tableau mis à jour.
+
+### T9 (2026-11-03)
+
+- Installation opérateur : `./swarm.sh authority install` (sudo) — chemin
+  refresh d'une installation déjà initialisée (aucun `--admin` requis,
+  comptes conservés). Démon relancé depuis `/usr/local/lib/swarm-authority/`
+  (pid vérifié), moteur redémarré depuis `bin/swarm`.
+- Binaires vérifiés : démon installé = candidat release = démon en cours,
+  même empreinte SHA-256 `d77edc7d…` (le refresh reconstruit le release,
+  d'où un hash différent du démon antérieur `5f17747c`) ; moteur en cours
+  `bin/swarm` v0.1.1-dev.323 = binaire courant `ccef210a…`, avec l'UI
+  embarquée (marqueurs « Utilisateurs et accès » ×29 et
+  `cockpit-authority.js` ×2 dans le binaire).
+- Parcours live : recette permanente `authority-admin-ui-rust` exécutée sur
+  la paire release — 41 contrôles nommés, 0 échec, PASS ; empreintes figées
+  dans `result.json` (moteur `4a286e9e…`, démon `d77edc7d…` — le démon
+  exercé est exactement le binaire installé et en cours) ; preuve sous
+  `.swarm-fixtures/authority-admin-ui-wx7q89p1/`, aucun résidu de run sous
+  /tmp.
+- Limites : le run exerce sa propre paire moteur+démon isolée sous
+  `.swarm-fixtures/` (jamais la base mission) ; la configuration réelle du
+  démon installé n'est pas modifiée par la recette.

@@ -444,11 +444,16 @@ identity/type/causes refuse. used_in_brief/used_in_plan and stale are recalculat
 from current documents and observed method bytes. The private prompt cannot be
 serialized by this readonly DTO.
 
-Reading kills/finishes no process and changes no reservation. A pending/running/
-stopping turn explicitly refuses501 until its supervisor is ported. Completed
+Reading kills/finishes no process and changes no reservation. An active
+pending/running/stopping turn is observed READ-ONLY: an exact same-event send
+replay returns its recorded status without dispatch, a new reservation or
+worker adoption; a mismatching message conflicts (409
+`preparation-event-conflict`). No row, ledger or provider mutation results;
+the historical `reserved`/`estimated` ledger states stay unchanged. Completed
 history is readable as text in the existing conversation view; send/stop/use
-proposal remain unavailable. No polling, inherited20-turn cap or15s deadline is
-introduced. Future calls and policies require their own saved contract.
+proposal remain unavailable as native-call operations. No polling, inherited
+20-turn cap or15s deadline is introduced. Future calls and policies require
+their own saved contract.
 
 ### Rust preparation AI calls — local pilot
 
@@ -493,16 +498,21 @@ establish neither agent authentication nor OS confinement.
 
 Explicit comparison precedes `use-proposal` with event identity and CAS; version
 history and `source_turn` are preserved. Brief adoption remains explicit, and a
-plan still needs validation. This flow starts no mission. CLI provider adapters,
-legacy active turns and Work API agents remain outside this first integration.
-Versioned-memory sources retain their501 guard and static reason; removing it
-is not a recovery mode.
+plan still needs validation. This flow starts no mission. CLI provider adapters
+and Work API agents remain outside this first integration (legacy active turns
+are since observed read-only, see above). Versioned-memory sources retain
+their501 guard and static reason; removing it is not a recovery mode.
 
 Delivered historical compatibility: an exact completed Go turn can be
 replayed without native-worker metadata, provider contact or mutation. Parent and
 request hash still bind the record; another message conflicts. Legacy active
-turns remain explicitly unported (CLI and HTTP501). New calls still accept only
-empty/auto levels. See the historical replay migration record.
+turns (pending/running/stopping) are observed read-only: exact same-event
+replay serves the recorded status across `reserved`/`estimated` ledgers
+without dispatch or adoption; a changed message keeps the 409
+`preparation-event-conflict`; the row and ledger never move. This is a
+read-only historical observation, not a native call: dispatch, stop authority,
+worker adoption and provider contact stay outside it. New calls still accept
+only empty/auto levels. See the historical replay migration record.
 
 ### Rust project profile selection — local pilot
 
