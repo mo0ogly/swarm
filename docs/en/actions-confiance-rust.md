@@ -734,6 +734,21 @@ conversion regression — no Root/DB/process, not a real GET, no end-to-end
 producer coverage (the guard's refusal decisions stay covered by the engine
 dialogue tests); execution: supervisor, never the editor.
 
+**UNVERIFIED (pending Codex's personal execution)** — First real HTTP boundary
+added: `tests/blp_dialogue_reader_public.py` replays, on one owned Root with an
+inert local provider double, a genuinely answered turn through the public
+producer (prepare create/budget/send), then bootstraps trust and admits the
+same intent through public operations (config-apply, blp-policy-apply,
+per-slice attribution, blp-preparation-admit). Before the injection, a bare GET
+on `/api/v1/preparations/dialogue` must stay 200 (legacy zero-matched path);
+after, the same bare GET refuses 403 `blp-dialogue-authentication-required`
+without any private byte, and the cleared reader re-reads 200 the exact same
+nonempty answer with the private prompt absent; readonly SQL/journal/capsule
+snapshots stay identical around each GET. If the public admission refuses the
+existing turn, the script stops at that exact refusal with its raw retained
+evidence instead of fabricating a success. Out of scope, deferred: recipe,
+HEAD, stale/revoked/malformed — later bounded lots after Codex's execution.
+
 A retained `null` federation block remains absent and grants no authority. Business commands tolerate only the historical all-zero `policy` placeholder (three zero integers and false separation) to preserve Go fingerprints; it configures nothing. Any other value refuses without mutation.
 Duplicate keys also refuse at the top level of configuration and state, before extension selection.
 Omitting `policy` from a business command is equivalent to the zero placeholder and configures nothing. Null data/group policy internals and null/zero mandatory durations also refuse in their Go producers; they are not valid historical configurations to reactivate.

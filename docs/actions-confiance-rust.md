@@ -772,6 +772,22 @@ pure — aucun Root/DB/processus, pas un GET réel, aucune couverture de bout en
 bout du producteur (les décisions de refus du garde restent couvertes par les
 tests moteur du dialogue) ; exécution : superviseur, jamais l'éditeur.
 
+**UNVERIFIÉ (en attente de l'exécution personnelle de Codex)** — Première
+frontière HTTP réelle ajoutée : `tests/blp_dialogue_reader_public.py` rejoue, sur
+un Root possédé avec double fournisseur local inerte, une réponse réelle via le
+producteur public (prepare create/budget/send), puis amorce la confiance et
+avoue le même intent via les opérations publiques (config-apply,
+blp-policy-apply, attribution par tranche, blp-preparation-admit). Avant
+l'injection, un GET nu sur `/api/v1/preparations/dialogue` doit rester 200
+(chemin hérité zéro-correspondance) ; après, le même GET nu refuse 403
+`blp-dialogue-authentication-required` sans octet privé, et le lecteur habilité
+relit 200 la même réponse non vide, prompt privé absent ; les instantanés
+readonly SQL/journal/capsules restent identiques autour de chaque GET. Si
+l'admission publique refuse le tour existant, le script s'arrête sur ce refus
+exact avec ses preuves brutes au lieu de fabriquer un succès. Hors périmètre,
+différé : recette, HEAD, stale/révélé/malformé — lots bornés suivants après
+l'exécution de Codex.
+
 Un bloc fédéré conservé `null` reste absent, sans autorité. Dans une commande métier, seul le champ `policy` historique entièrement nul (trois entiers zéro et séparation false) est toléré pour conserver les empreintes Go ; il ne configure rien. Toute autre valeur refuse sans mutation.
 Les clés répétées refusent aussi au niveau supérieur de la configuration et de l’état, avant sélection des extensions.
 L’omission de `policy` dans une commande métier équivaut au placeholder zéro et ne configure rien. Les formes internes nulles des politiques de données/groupes et les durées obligatoires nulles/zéro refusent aussi chez leurs producteurs Go : ce ne sont pas des configurations historiques valides à réactiver.

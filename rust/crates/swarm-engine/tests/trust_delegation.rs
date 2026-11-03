@@ -43,7 +43,12 @@ impl Fixture {
         let s = RootStore::open(&self.0, true).unwrap();
         let r = s.trust(op, &serde_json::to_vec(v).unwrap(), token);
         s.close().unwrap();
-        r.map(|reply| serde_json::from_slice(&reply.bytes).unwrap())
+        let reply = match r {
+            Ok(reply) => reply,
+            Err(swarm_engine::RootStoreError::Trust(e)) => return Err(*e),
+            Err(e) => panic!("{op}: unexpected store error {e}"),
+        };
+        serde_json::from_slice::<Value>(&reply.bytes).unwrap()
     }
 }
 impl Drop for Fixture {
@@ -67,7 +72,7 @@ fn cmd(id: &str, v: Value) -> Value {
     v
 }
 /// Positive-control root mandate for the invoice resource.
-fn root_mandate(f: &Fixture, event: &str, expires_hours: i64) -> Value {
+fn root_mandate(f: &Fixture, event: &str) -> Value {
     let m = cmd(
         event,
         json!({"mandate_id":"root","subject":"requester","actions":["settle"],"resource":"invoice/acme","max_amount_minor":1000,"currency":"EUR","beneficiary":"ACME","starts_at":"2026-11-02T12:00:00Z","expires_at":"2026-11-02T13:00:00Z"}),
@@ -125,7 +130,7 @@ fn delegation_config_admission_persists_and_rejects_bad_shapes() {
 fn delegation_depth_zero_and_authority_boundary() {
     let f = Fixture::new();
     f.call("config-apply", &config("configure", 0, Some(0)), "");
-    root_mandate(&f, "root-mandate", 1);
+    root_mandate(&f, "root-mandate");
     let child = delegated("child", "root", "carol");
     let v = f.call("mandate-create", &child, "fixture-requester-token");
     assert_eq!(v["state"], "denied");
@@ -142,7 +147,7 @@ fn delegation_depth_zero_and_authority_boundary() {
 fn delegation_chain_request_approve_commit_and_depth_ceiling() {
     let f = Fixture::new();
     f.call("config-apply", &config("configure", 0, Some(1)), "");
-    root_mandate(&f, "root-mandate", 1);
+    root_mandate(&f, "root-mandate");
     let child = f.call("mandate-create", &delegated("child", "root", "carol"), "fixture-admin-token");
     assert_eq!(child["state"], "admitted");
     assert_eq!(child["parent_mandate_id"], "root");
@@ -184,7 +189,7 @@ fn delegation_ancestor_revocation_blocks_boundaries() {
     for phase in ["approve", "commit"] {
         let f = Fixture::new();
         f.call("config-apply", &config("configure", 0, Some(1)), "");
-        root_mandate(&f, "root-mandate", 1);
+        root_mandate(&f, "root-mandate");
         f.call(
             "mandate-create",
             &delegated("child", "root", "carol"),
@@ -256,7 +261,7 @@ fn delegation_rejects_amplification() {
     for (name, mutate) in cases {
         let f = Fixture::new();
         f.call("config-apply", &config("configure", 0, Some(2)), "");
-        root_mandate(&f, "root-mandate", 1);
+        root_mandate(&f, "root-mandate");
         let mut c = delegated("rejected", "root", "carol");
         for (k, v) in mutate.as_object().unwrap() {
             c[k] = v.clone();
@@ -285,7 +290,7 @@ fn delegation_rejects_amplification() {
 fn delegation_default_expiry_bounded_by_parent() {
     let f = Fixture::new();
     f.call("config-apply", &config("configure", 0, Some(1)), "");
-    let parent = root_mandate(&f, "root-mandate", 1);
+    let parent = root_mandate(&f, "root-mandate");
     let mut c = delegated("default-child", "root", "carol");
     c.as_object_mut().unwrap().remove("expires_at");
     let child = f.call("mandate-create", &c, "fixture-admin-token");
@@ -298,7 +303,7 @@ fn delegation_default_expiry_bounded_by_parent() {
 fn delegation_projection_reports_status() {
     let f = Fixture::new();
     f.call("config-apply", &config("configure", 0, Some(1)), "");
-    root_mandate(&f, "root-mandate", 1);
+    root_mandate(&f, "root-mandate");
     f.call(
         "mandate-create",
         &delegated("child", "root", "carol"),
