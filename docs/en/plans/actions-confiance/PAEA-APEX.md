@@ -360,6 +360,51 @@ M4 installed local E2; M5 independent E3 campaigns; M6 re-evaluated corrections 
 final retrospective. Program remains open after M4. Disabling project protection
 requires an authorized decision; no automatic permissive fallback.
 
+### Current state — 2 November 2026 (evening)
+
+Locally delivered unique candidate: `bin/swarm` SHA-256
+`e2f0039a1f3a34957c161e770c4e5efdd46f4e3a16fc82fe9cf5d9761dc94da3`
+(v0.1.1-dev.316, HEAD 562953dba3, in place 2026-11-02 22:10:33 — 10th
+replacement). Settlement and chain recipes re-pinned on this binary from the
+real `sha256sum` hash (pin=actual cross-check, 8/8 then 3/3 occurrences).
+First settlement run fail-closed at step 1
+(`i17-rerun/settlement-run-14/`, FAIL retained): the test harness does not
+compile on the live tree — a concurrent session's uncommitted diff
+(`rust/crates/swarm-authority/src/audit.rs`, +178, `Event` enrichment for
+ADM-05/ADM-10) breaks the committed consumer
+`swarm-web/src/authority_ledger.rs:138` (E0063, 5 missing fields); those
+sources are not mine to fix (another's scope). Resumption via the frozen
+sources method (LIVE-UX-01 precedent): a detached worktree at HEAD
+562953dba3 — exactly the commit the delivery was built from — with the
+e2f0039a ELF copied in as `bin/swarm` (mode 500); the harness
+`SWARM_PAEA_DELIVERED_BIN_SHA256` witness re-proves the delivery at every
+spawn exactly as on the live tree, and the chain's wrong-SHA refusal remains
+exercised. Settlement run-15 launched on this freeze, chain next; completion
+state is recorded in
+[DASHBOARD-T20261101.md](paea/DASHBOARD-T20261101.md) (02-11 evening
+extension). **Result (02-11 evening): the current delivery e2f0039a… is fully
+re-verified — settlement run-15 7/7 PASS then chain-run-8 4/4 VERIFIED on the
+frozen worktree 562953dba3, `source_stable: true` on both, wrong-SHA refusal
+exercised** (`i17-rerun/settlement-run-15/`, `i17-rerun/chain-run-8/`; 23
+settlement witness spawns plus chain witness spawns re-proved). The first
+chain launch was refused `recipe-input-pattern-empty`: the declared source
+fixture (`chain-fixture-regen-20261031b`, a gitignored local-only evidence
+directory) did not exist in the freeze; it was copied byte-identically (655
+files, empty sha256 diff) before relaunch. **Addition (02-11 late night): the
+concurrent session landed the consumer update (5 `None` fields at
+`authority_ledger.rs:138`), the live tree compiles again, and the
+re-verification was repeated on the live tree without any freeze —
+settlement-run-16 7/7 PASS VERIFIED `source_stable: true` (23 e2f0039a…
+witness spawns) then chain-run-9 4/4 PASS VERIFIED `source_stable: true`,
+wrong-SHA refusal included** (`i17-rerun/settlement-run-16/`,
+`i17-rerun/chain-run-9/`). The current delivery therefore carries a full
+proof on each of the two surfaces: frozen worktree 562953dba3 (run-15 +
+chain-run-8) and live tree (run-16 + chain-run-9). Independent acceptance:
+0/17, unchanged; the seven open E2 criteria remain in force. The "Current
+state — 2
+November 2026 (midday)" block below is kept as history (run-13 + chain-run-7
+on 186cc38b…).
+
 ### Current state — 2 November 2026 (midday)
 
 Locally delivered unique candidate: `bin/swarm` SHA-256
@@ -1189,6 +1234,26 @@ service wiring + administrator/UID prerequisites).
 file exists under `paea/`, and no mention of an exercise numbered 82 was found
 in this journal or the evidence folders as of 31 October 2026; the preserved
 numbering runs from 81 to 83. Recorded as observed, without reconstruction.
+
+> **Attributed erratum (2026-11-02, PAEA/qualification author — BLP-RET-07)**:
+> the claim “increment 82 qualified in the morning (reconcile-82 recipe PASS
+> 4/4)” in INCREMENT-83.md has a located primary source. The 29 October
+> session (transcript `79e0b89a`, this repo, same branch) launched the
+> `paea-owned-git-transfer-reconcile` recipe on 29 Oct 05:52:59Z into
+> `evidence/20261029-fixture-regen-mvfdts57/reconcile-82`, read `status: PASS`
+> on 4 steps exit 0 at 05:53:19Z, and itself labelled that exercise
+> “increment 82” (announcement 05:52:53Z) before writing INCREMENT-83.md at
+> 06:17:54Z repeating that label. No `INCREMENT-82.md` was ever written: the
+> number 82 is a session label, not a numbered lot. The “no lot attributed”
+> finding above remains exact on its scope and is not rewritten. Limits:
+> `result.json` survives only fragmentarily (a read truncated to 1,500
+> characters plus a semantic 4/4 summary); the `reconcile-82` evidence
+> payload was lost on 31 October (manifest-only archive, tarball never
+> persisted). Full extraction and hashes:
+> `.swarm-fixtures/recovery-20261102/RECONCILE-82-EXTRACTION.json` (SHA-256
+> `1bcc57b8b40900dba668ab3e7d557c9741455f610e7d67676533573212a6fd30`) and
+> `.swarm-fixtures/recovery-20261102/RECOVERY-NOTE.md`. Increment numbering
+> remains with the journal owner.
 
 ### Increment83 — Git-ref promotion under current authority
 

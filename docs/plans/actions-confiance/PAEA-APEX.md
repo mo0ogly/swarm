@@ -329,6 +329,49 @@ une décision autorisée ; aucun repli permissif automatique.
 
 ## État réel et reprise
 
+### État courant — 2 novembre 2026 (soirée)
+
+Candidat unique livré localement : `bin/swarm` SHA-256
+`e2f0039a1f3a34957c161e770c4e5efdd46f4e3a16fc82fe9cf5d9761dc94da3`
+(v0.1.1-dev.316, HEAD 562953dba3, posé 2026-11-02 22:10:33 — 10e
+remplacement). Recettes settlement + chaîne re-épinglées sur ce livré depuis
+le `sha256sum` réel (cross-check épine=réel, 8/8 puis 3/3 occurrences).
+Premier run settlement fail-closed à l'étape 1
+(`i17-rerun/settlement-run-14/`, FAIL conservé) : le harnais ne compile pas
+sur l'arbre vivant — le diff non commité d'une session concurrente
+(`rust/crates/swarm-authority/src/audit.rs`, +178, enrichissement `Event`
+ADM-05/ADM-10) casse le consommateur commité
+`swarm-web/src/authority_ledger.rs:138` (E0063, 5 champs manquants) ; ces
+sources ne sont pas miennes à corriger (portée d'autrui). Reprise par la
+méthode des sources gelées (précédent LIVE-UX-01) : worktree détaché à HEAD
+562953dba3 — le commit exact d'où le livré est construit — avec l'ELF e2f0039a
+copié en `bin/swarm` (mode 500) ; le témoin `SWARM_PAEA_DELIVERED_BIN_SHA256`
+du harnais re-prouve le livré à chaque spawn comme sur l'arbre vivant, le
+refus de SHA erroné de la chaîne reste exercé. Settlement run-15 lancé sur ce
+gel, chaîne ensuite ; l'état de complétion est consigné dans
+[DASHBOARD-T20261101.md](paea/DASHBOARD-T20261101.md) (extension 02-11
+soirée). **Résultat (02-11 soir) : re-vérification complète du livré courant
+e2f0039a… — settlement run-15 7/7 PASS puis chain-run-8 4/4 VERIFIED sur le
+worktree gelé 562953dba3, `source_stable: true` aux deux, refus de SHA erroné
+exercé** (`i17-rerun/settlement-run-15/`, `i17-rerun/chain-run-8/` ; 23 spawns
+témoins settlement + spawns témoins chaîne re-prouvés). Premier lancement de
+la chaîne refusé `recipe-input-pattern-empty` : la fixture source déclarée
+(`chain-fixture-regen-20261031b`, preuve locale gitignorée jamais commitée)
+n'existait pas dans le gel ; copiée byte-identiquement (655 fichiers, diff
+sha256 vide) avant relance. **Complément (02-11 fin de nuit) : la session
+concurrente a posé la mise à jour consommateur (5 champs `None` à
+`authority_ledger.rs:138`), l'arbre vivant recompile, et la re-vérification
+a été répétée sur l'arbre vivant sans gel — settlement-run-16 7/7 PASS
+VERIFIED `source_stable: true` (23 spawns témoins e2f0039a…) puis
+chain-run-9 4/4 PASS VERIFIED `source_stable: true`, refus de SHA erroné
+compris** (`i17-rerun/settlement-run-16/`, `i17-rerun/chain-run-9/`). Le
+livré courant porte donc une preuve intégrale sur chacune des deux surfaces :
+gel 562953dba3 (run-15 + chain-run-8) et arbre vivant (run-16 + chain-run-9).
+Acceptation indépendante : 0/17, inchangée ; les sept critères ouverts E2
+restent opérants. Le bloc « État courant — 2 novembre
+2026 (midi) » ci-dessous est conservé comme historique (run-13 + chain-run-7
+sur 186cc38b…).
+
 ### État courant — 2 novembre 2026 (midi)
 
 Candidat unique livré localement : `bin/swarm` SHA-256
@@ -1234,6 +1277,26 @@ administrateur/UID).
 `CONTINUITE-82.md` sous `paea/`, aucune mention d'un exercice numéroté 82 dans
 ce journal ou les dossiers d'évidence au 31 octobre 2026 ; la numérotation
 conservée passe de 81 à 83. Constat enregistré tel quel, sans reconstruction.
+
+> **Erratum attribué (02-11-2026, auteur PAEA/qualification — BLP-RET-07)** :
+> la mention « incrément 82 qualifié le matin (recette reconcile-82 PASS 4/4) »
+> dans INCREMENT-83.md a une source primaire localisée. La session du 29-10
+> (transcript `79e0b89a`, ce dépôt, même branche) a lancé la recette
+> `paea-owned-git-transfer-reconcile` le 29-10 05:52:59Z vers
+> `evidence/20261029-fixture-regen-mvfdts57/reconcile-82`, lu `status: PASS`
+> sur 4 étapes exit 0 à 05:53:19Z, et a elle-même étiqueté cet exercice
+> « incrément 82 » (annonce 05:52:53Z), avant d'écrire INCREMENT-83.md à
+> 06:17:54Z reprenant cet étiquetage. Aucun `INCREMENT-82.md` n'a jamais été
+> écrit : le numéro 82 est un étiquetage de session, pas un lot numéroté. Le
+> constat « aucun lot attribué » ci-dessus reste exact sur son périmètre et
+> n'est pas réécrit. Limites : `result.json` n'est conservé que fragmentaire
+> (lecture tronquée à 1 500 caractères + résumé sémantique 4/4) ; le payload
+> d'évidence `reconcile-82` a disparu le 31-10 (archive manifest-only, tarball
+> jamais persistée). Extraction intégrale et empreintes :
+> `.swarm-fixtures/recovery-20261102/RECONCILE-82-EXTRACTION.json` (SHA-256
+> `1bcc57b8b40900dba668ab3e7d557c9741455f610e7d67676533573212a6fd30`) et
+> `.swarm-fixtures/recovery-20261102/RECOVERY-NOTE.md`. La numérotation des
+> incréments reste au propriétaire du journal.
 
 
 ### Incrément83 — promotion de référence Git sous autorité courante

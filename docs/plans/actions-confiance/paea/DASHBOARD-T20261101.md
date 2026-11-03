@@ -8,10 +8,14 @@ campagnes T01…T22 exécutées.
 ## Candidat et blocage courant
 
 - Binaire désigné : `bin/swarm` SHA-256
-  `186cc38b4dbbdf2d60406d22f7449c3ed848dd046ea26545beb2e97840157853`
-  (v0.1.1-dev.315, commit 5c9ca0fe85a871a102af002c268e9e69a219e863, livré
-  2026-11-02T10:51:30Z — 9e remplacement depuis dev.292 ci-dessous ;
-  historique dev.292/4164953c… conservé pour contexte)
+  `e2f0039a1f3a34957c161e770c4e5efdd46f4e3a16fc82fe9cf5d9761dc94da3`
+  (v0.1.1-dev.316, HEAD 562953dba3f8d6eaabca7beda35535b31a9390fa, posé
+  2026-11-02 22:10:33 — 10e remplacement depuis dev.292 ci-dessous ;
+  historique dev.315/186cc38b… et dev.292/4164953c… conservés pour contexte)
+  — re-vérifié deux fois : worktree gelé 562953dba3 (settlement run-15 7/7 +
+  chaîne chain-run-8 4/4) puis arbre vivant recompilé (settlement run-16 7/7 +
+  chaîne chain-run-9 4/4) — les quatre VERIFIED (extensions 02-11 soirée et
+  fin de nuit ci-dessous)
 - Déclaration E2 bornée : **émise** le 31 octobre 2026
   (`claude-e2-arbitrage-20261031T135859Z/DECLARATION-E2.md`) — règlement 6/6 et
   chaîne 4/4 PASS VERIFIED sur fixture regen-5 ; clôt l'étape PA-10 seulement.
@@ -43,7 +47,12 @@ campagnes T01…T22 exécutées.
 | T14 | I02/I14 | conception manquante | — | Design A2A puis code |
 | T15 | I15 | PASS | même preuve que T11 (admission + substitution refusée) | Inventaire ACS (entrées externes) |
 | T16 | I12/I16 | PASS | `paea-i16-lease-reopen-rust.json` (30-10, bloc 9) + contrat 8 cas (glm-order-receipt-20261030T075024Z) | Limites distribuées séparées |
-| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-13` (ELF 186cc38b…, 02-11 midi, 7/7 VERIFIED, étape I17 révocation comprise ; run-12/cdde554a, run-11/41f00bf9 et antérieurs conservés) | Propagation production |
+| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-13` (ELF 186cc38b…, 02-11 midi, 7/7 VERIFIED, étape I17 révocation comprise ; run-12/cdde554a, run-11/41f00bf9 et antérieurs conservés) ; **re-vérifié sur livré courant e2f0039a… (02-11 soir) : `settlement-run-15` 7/7 + `chain-run-8` 4/4 VERIFIED sur worktree gelé 562953dba3** | Propagation production |
+
+Re-vérification du livré courant dev.316/e2f0039a : **complète** (02-11 soir —
+run-15 settlement 7/7 + chain-run-8 4/4 VERIFIED sur worktree gelé
+562953dba3 ; l'arbre vivant restait incompilable par autrui, voir extension
+soirée ci-dessous).
 | T18 | I03/I14 | non exercée | — | Périmètre E3 uniquement |
 | T19 | I06/I13 | non exercée | — | Périmètre E3 + confinement I06/I13 |
 | T20 | I04/I15 | non exercée | — | Périmètre E3 uniquement |
@@ -148,6 +157,52 @@ campagnes T01…T22 exécutées.
   (`.swarm-fixtures/i17-rerun/chain-run-7/`, témoins = livré courant, refus de
   SHA erroné compris, `source_stable: true`). Le livré courant est désormais
   intégralement re-vérifié (settlement run-13 7/7 + chaîne chain-run-7 4/4).
+- Extension 02-11 soirée — 10e remplacement : 186cc38b… → e2f0039a1f3a349
+  57c161e770c4e5efdd46f4e3a16fc82fe9cf5d9761dc94da3 (v0.1.1-dev.316, HEAD
+  562953dba3, construit 19:35:26Z, posé 22:10:33, porte de stabilité verte —
+  3 sondes sha256 sur ~3 min, même mtime). Recettes settlement + chaîne
+  re-épinglées depuis le hash réel `sha256sum` (cross-check épine=réel,
+  8/8 puis 3/3 occurrences). Premier run settlement FAIL fail-closed à
+  l'étape 1 (`i17-rerun/settlement-run-14/`, conservé) : compilation du
+  harnais impossible sur l'arbre vivant — le diff non commité d'une session
+  concurrente (`rust/crates/swarm-authority/src/audit.rs`, +178, enrichissement
+  `Event` ADM-05/ADM-10) casse le consommateur commité
+  `swarm-web/src/authority_ledger.rs:138` (E0063, 5 champs manquants) ;
+  l'enrichissement ni sa mise à jour consommateur ne sont miens à corriger
+  (portée d'autrui). Reprise autorisée par la méthode des sources gelées
+  (précédent LIVE-UX-01) : worktree détaché à HEAD 562953dba3 — exactement le
+  commit d'où le livré est construit — avec l'ELF e2f0039a copié en `bin/swarm`
+  (mode 500) ; le témoin sha256 du harnais re-prouve le livré à chaque spawn
+  comme sur l'arbre vivant. Settlement re-lancé sur ce gel (run-15) et chaîne
+  ensuite ; preuves dans `.swarm-fixtures/i17-rerun/`.
+- Extension 02-11 soirée (complétion settlement) — run-15 sur le worktree
+  gelé 562953dba3 : **7/7 étapes PASS** sur l'ELF livré e2f0039a…,
+  `source_stable: true`, `recipe.py verify` → VERIFIED
+  (`.swarm-fixtures/i17-rerun/settlement-run-15/`), 23 spawns témoins
+  `sha256=e2f0039a…` re-prouvés (compilation du harnais 1 min 26 s sur
+  sources gelées, là où l'arbre vivant échouait E0063). La chaîne
+  (`chain-run-8`) suit sur le même gel.
+- Extension 02-11 soir (complétion chaîne) — chain-run-8 sur le même worktree
+  gelé : **4/4 étapes VERIFIED** sur l'ELF livré e2f0039a…,
+  `source_stable: true`, refus de SHA erroné exercé (étape 4), témoins
+  `sha256=e2f0039a…` re-prouvés aux spawns (`.swarm-fixtures/i17-rerun/
+  chain-run-8/`). Premier lancement refusé `recipe-input-pattern-empty` : la
+  fixture source déclarée de la chaîne (`claude-tmp-fix-e2e-20261031T173021Z/
+  chain-fixture-regen-20261031b`, evidence locale gitignorée, jamais commitée)
+  n'existait pas dans le worktree gelé ; copiée byte-identiquement (diff
+  sha256 des 655 fichiers = vide) avant la relance. **Le livré courant
+  dev.316/e2f0039a est intégralement re-vérifié (settlement 7/7 + chaîne
+  4/4)**, comme dev.315 avant lui.
+- Extension 02-11 fin de nuit — re-vérification répétée sur l'**arbre vivant
+  recompilé** : la session concurrente a posé la mise à jour consommateur
+  (`authority_ledger.rs` : 5 nouveaux champs `None` à l'initialiseur `Event`),
+  l'arbre vivant recompile (`cargo check -p swarm-web` et `-p swarm-cli
+  --tests` sans erreur). Settlement `settlement-run-16` 7/7 PASS VERIFIED
+  `source_stable: true` (23 spawns témoins e2f0039a…), puis chaîne
+  `chain-run-9` 4/4 PASS VERIFIED `source_stable: true`, refus de SHA erroné
+  compris — toutes deux sur l'arbre vivant, sans gel. Le livré courant porte
+  donc une preuve sur chacune des deux surfaces : gel 562953dba3 (run-15 +
+  chain-run-8) et arbre vivant (run-16 + chain-run-9).
 
 ## Portée et limites
 

@@ -7140,7 +7140,16 @@
     "excluded_number": 82,
     "plan_statement": "No allocated increment82",
     "increment83_statement": "Claims increment82 qualified with reconcile-82 4/4",
-    "resolution": "Preserve both statements; no reconstructed action or inherited qualification. Owner: PAEA history maintainer."
+    "resolution": "Preserve both statements; no reconstructed action or inherited qualification. Owner: PAEA history maintainer.",
+    "primary_source_located_utc": "2026-11-02T23:05:00Z",
+    "primary_source": {
+      "method": "extraction from session transcript 79e0b89a-950b-4d2c-96ee-dba23585c33a.jsonl (sha256 1e37d5ef97a2b4eef9b7c7ce37eb9575780314c5d7c763d42d1ec099355f3a11, 18788 lines); no editorial reconstruction",
+      "findings": "Session of 2026-10-29 launched recipe paea-owned-git-transfer-reconcile at 05:52:59Z into evidence/20261029-fixture-regen-mvfdts57/reconcile-82, read status PASS on 4 steps exit 0 at 05:53:19Z, itself labelled the exercise 'increment 82' (05:52:53Z), then wrote INCREMENT-83.md at 06:17:54Z repeating that label. No INCREMENT-82.md was ever written. The plan statement 'no allocated increment82' remains exact on its scope; both historical statements preserved.",
+      "limits": "result.json recoverable only fragmentarily (1500-char truncated read plus semantic 4/4 PASS summary); reconcile-82 evidence payload lost 2026-10-31 (manifest-only archive, tarball never persisted)",
+      "extraction": ".swarm-fixtures/recovery-20261102/RECONCILE-82-EXTRACTION.json (sha256 1bcc57b8b40900dba668ab3e7d557c9741455f610e7d67676533573212a6fd30)",
+      "note": ".swarm-fixtures/recovery-20261102/RECOVERY-NOTE.md",
+      "erratum": "Attributed erratum appended to PAEA-APEX.md 'Numéro 82' and EN mirror 'Number 82' on 2026-11-02; plan finding not rewritten"
+    }
   },
   "open_findings": [
     "BLP-RET-01",
@@ -7157,5 +7166,34 @@
     "blp_07_closed": false,
     "runtime_confidentiality_qualified": false,
     "historical_assurance_results_rewritten": false
+  },
+  "missing_referenced_e2_originals_recovery": {
+    "recovered_utc": "2026-11-02T22:15:00Z",
+    "recovered_by": "PAEA author/qualification session (Claude)",
+    "method": "byte-exact extraction from session transcripts (Read result of 2026-10-31 for DECLARATION-E2.md; original Write record for TRIAGE-PAEA17.md); no editorial reconstruction",
+    "files": {
+      "docs/plans/actions-confiance/paea/evidence/claude-e2-arbitrage-20261031T135859Z/DECLARATION-E2.md": {
+        "sha256": "7dc86403b01a5de429cce1578fa0dc7bc62ae71158dd7ffec167336aaec39233",
+        "bytes": 3491,
+        "provenance": "last state read on 2026-10-31 (transcript 1bc07880 line 419)"
+      },
+      "docs/plans/actions-confiance/paea/evidence/claude-e2-arbitrage-20261031T135859Z/TRIAGE-PAEA17.md": {
+        "sha256": "ef3b2fd75a6542b406225c22b921ffba36e3116f419768c31b4e5945b6eca3f4",
+        "bytes": 4950,
+        "provenance": "full original Write record (transcript 5b2a1e56 line 11962)"
+      }
+    },
+    "note": "Recovery path also archived in .swarm-fixtures/recovery-20261102/ with RECOVERY-NOTE.md. Hashes prove byte identity with preserved original states; they do not requalify the runs or the declaration. PA-10 closure stays historical and unaccepted; BLP-07 remains open. The original finding above is preserved as the 2026-10-31 observation."
+  },
+  "ret08_runner_effect": {
+    "examined_utc": "2026-11-02T23:30:00Z",
+    "examined_by": "PAEA author/qualification session (Claude)",
+    "historical_runner_sha256": "b2c8d496adb6946515873f1af2fa62363be71c9fa549c0dddafbd13907bc4562",
+    "current_recipe_sha256": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "diff_hunks": 1,
+    "diff_content": "fallback root rename swarm-recipe-fallback-fixtures -> swarm-fixtures (Chrome ProcessSingleton socket length limit, measured 2026-10-31) plus explanatory comment",
+    "effect_on_retained_pass": "No effect possible: the 4 retained steps are cargo test invocations (no browser) and TMPDIR relocation between two private-state directories changes no step input. Retained evidence re-verified on 2026-11-02 with the current runner: integrity VERIFIED, recorded_status PASS, recipe blp-confidentiality-rust.",
+    "details": ".swarm-fixtures/recovery-20261102/RET08-RUNNER-EFFECT.json (sha256 386705e264e386b34ad80a3a4b65dbfc2303fcbb9f6091673361ff1b5980e0db)",
+    "remaining": "Effective-input and required-flow completion (production profile, real UI/API, network oracle) on the target candidate remains with BLP qualification; BLP-07 stays partial."
   }
 }
