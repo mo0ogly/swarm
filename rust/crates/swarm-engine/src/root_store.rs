@@ -98,7 +98,7 @@ pub use managed_git_current::CurrentManagedGitPublication;
 #[cfg(target_os = "linux")]
 pub use paea_git_intent::{PaeaGitIntent,PaeaGitIntentReservation,PaeaGitIntentObservation,PaeaGitIntentError};
 #[cfg(target_os = "linux")]
-pub use paea_settlement::{PaeaSettlementRequest,PaeaSettlementReceipt,PaeaSettlementOutcome,PaeaSettlementError,PaeaSettlementObservation,PaeaSettlementCallError};
+pub use paea_settlement::{PaeaPaymentAgreement,PaeaSettlementRequest,PaeaSettlementReceipt,PaeaSettlementOutcome,PaeaSettlementError,PaeaSettlementObservation,PaeaSettlementCallError};
 #[cfg(target_os = "linux")]
 mod paea_git_transfer_call;
 #[cfg(target_os = "linux")]

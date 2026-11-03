@@ -142,15 +142,16 @@ ou du reçu ; il reste conservé, tandis que compte, droit, mapping et révision
 Trust de l’observateur sont courants. Une modification de politique ne relabellise
 pas un effet historique et ne permet pas un nouvel engagement.
 
-Ce noyau ne sait pas encore établir les participants et l’accord PAEA. Il refuse
-un `Commit` quand `require_separation` est vrai ou quand une politique de rôles
-active impose des incompatibilités. Une liste de conflits vide n’en impose pas.
-Le refus `paea-settlement-attributed-admission-required` reste ouvert jusqu’au
-raccord de l’admission attribuée : il ne clôt pas PA-03. La réconciliation est
-une lecture, sans engagement nouveau. Les témoins de règlement des recettes sont
-un profil de référence de fixture où ces exigences sont explicitement désactivées
-par l’opération publique de configuration ; aucune politique réelle ou valeur
-par défaut de l’instance locale n’est abaissée.
+Le raccord P1/G1 de l'[accord séparé exact](PAEA-PAYMENT-AGREEMENT.md) prend
+en charge `require_separation` avec l'accord durable Trust lié à l'empreinte
+canonique complète. La lecture courante et la référence conservée dans le reçu
+ne prouvent ni présence humaine ni provenance du contexte. Sans accord actuel,
+`paea-settlement-attributed-admission-required` refuse avant nouvel effet.
+Une politique de rôles active imposant des incompatibilités reste refusée ; une
+liste vide n'en impose pas. La réconciliation reste une lecture sans engagement.
+Les anciens témoins de recette gardent leur profil sans séparation, distinct du
+nouveau parcours avec accord ; aucune politique réelle ou valeur par défaut de
+l'instance locale n'est abaissée. PA-03 global n'est pas clôturé par ce raccord.
 
 `RootStore::call_paea_settlement` compose le compte/droit courant et le backend.
 `PaeaSettlementCallError` conserve Personal/Authority/Action/MissingAction,
@@ -167,7 +168,7 @@ La lecture d'un reçu vérifie aussi l'identifiant d'enrôlement, la représenta
 RFC3339 du temps, le pin projet du grand livre et la révision de politique dans
 l'action canonique. Aucun âge maximal ni comparaison à l'heure actuelle n'est
 ajouté : la réconciliation historique reste possible. Un refus conserve la cause
-de décodage du temps et ne modifie ni reçu ni effet. Les13tests comprennent un
+de décodage du temps et ne modifie ni reçu ni effet. Les scénarios comprennent un
 témoin avant chacune de quatre altérations isolées et la restauration exacte.
 Ces contrôles détectent des incohérences, pas une réécriture cohérente par le
 propriétaire. Ils ne prouvent ni signature ni mandat/approbation historiques et

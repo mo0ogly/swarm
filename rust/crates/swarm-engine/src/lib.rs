@@ -344,7 +344,7 @@ pub use root_store::{PaeaGitRepository,PaeaGitRepositoryBinding,PaeaGitRepositor
 #[cfg(target_os = "linux")]
 pub use root_store::{PaeaGitIntent,PaeaGitIntentReservation,PaeaGitIntentObservation,PaeaGitIntentError};
 #[cfg(target_os = "linux")]
-pub use root_store::{PaeaSettlementRequest,PaeaSettlementReceipt,PaeaSettlementOutcome,PaeaSettlementError,PaeaSettlementObservation,PaeaSettlementCallError};
+pub use root_store::{PaeaPaymentAgreement,PaeaSettlementRequest,PaeaSettlementReceipt,PaeaSettlementOutcome,PaeaSettlementError,PaeaSettlementObservation,PaeaSettlementCallError};
 #[cfg(target_os = "linux")]
 pub use root_store::{PaeaGitTransferCall, PaeaGitTransferCallError, PaeaGitTransferReceipt};
 #[cfg(target_os = "linux")]

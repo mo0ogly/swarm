@@ -1,5 +1,5 @@
 //! Actual current policy attribution and fail-closed compatibility checks.
-use super::{PaeaSettlementError, Result, RootStore, R};
+use super::{agreement, PaeaPaymentAgreement, PaeaSettlementRequest, PaeaSettlementError, Result, RootStore, R};
 use swarm_enrollment_authority::paea_action::{Identity, Operation};
 use swarm_protection_contract::AdmissionContext;
 /// Read the actual protected configuration under a caller-held Trust reservation.
@@ -70,11 +70,15 @@ pub(super) fn attribute(
 /// its shared reservation is held. PAEA permission never substitutes for a
 /// disabled/missing role mapping or a newer configuration. The existing bounded
 /// state reader and shared Biba invariant are reused without a new policy.
+/// Basic separation additionally requires a durable exact payment agreement;
+/// advanced role policy stays refused. The returned record is local audit data,
+/// valid only while the caller keeps this reservation and checks its deadline.
 pub(super) fn current_actor(
     project: &RootStore,
     identity: &Identity<'_>,
-    context: &AdmissionContext,
-) -> Result<()> {
+    prepared: &PaeaSettlementRequest,
+) -> Result<Option<PaeaPaymentAgreement>> {
+    let context = &prepared.context;
     let state = read(project)?;
     if identity.trust_revision() != state.revision {
         return Err(PaeaSettlementError::refused(
@@ -108,8 +112,7 @@ pub(super) fn current_actor(
     )
     .map_err(|e| PaeaSettlementError::caused("paea-settlement-effect-integrity", e))?;
     if identity.request().operation() == Operation::Commit {
-        if state.policy.require_separation
-            || state
+        if state
                 .role_separation
                 .as_ref()
                 .is_some_and(|p| p.enabled && !p.incompatible_roles.is_empty())
@@ -123,6 +126,10 @@ pub(super) fn current_actor(
         {
             return Err(PaeaSettlementError::refused("paea-settlement-policy-stale"));
         }
+        if state.policy.require_separation {
+            return agreement::current(&state, prepared)?.map(Some).ok_or_else(||
+                PaeaSettlementError::refused("paea-settlement-attributed-admission-required"));
+        }
     }
-    Ok(())
+    Ok(None)
 }

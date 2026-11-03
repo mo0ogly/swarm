@@ -1061,3 +1061,111 @@ fn settlement_declared_tool_manifest_binding_and_existing_intent_refusal() {
     ledger.close().unwrap();
     project.close().unwrap();
 }
+
+/// Configure basic requester/approver separation and an explicit fixture admin.
+/// Tokens are isolated test inputs; no human identity or privileged service is claimed.
+fn separated_config(project: &RootStore) -> i64 {
+    let view: Value = serde_json::from_slice(&project.trust("show", b"{}", "").unwrap().bytes).unwrap();
+    let mut ids = view["identities"].clone();
+    for id in ids.as_array_mut().unwrap() {
+        if id["enrollment_principal"].is_null() {
+            id["token"] = format!("fixture-{}-token", id["subject"].as_str().unwrap()).into();
+        }
+    }
+    ids.as_array_mut().unwrap().push(json!({"subject":"agreement-admin","token":"fixture-admin-token","integrity":3,"roles":["admin"]}));
+    let revision = view["revision"].as_i64().unwrap();
+    let mut policy = view["policy"].clone();
+    policy["require_separation"] = true.into();
+    let change = json!({"schema_version":1,"event_id":"separated-config","expected_revision":revision,
+        "reason":"Exact separated payment agreement fixture","policy":policy,"identities":ids});
+    project.trust("config-apply", &serde_json::to_vec(&change).unwrap(), "").unwrap();
+    revision + 1
+}
+
+/// Produce durable exact agreement using real public Trust operations; its
+/// resource binds every canonical payment/context byte, not only amount/payee.
+fn payment_agreement(project: &RootStore, request: &PaeaSettlementRequest, prefix: &str) -> Value {
+    let document: Value = serde_json::from_slice(request.canonical().bytes()).unwrap();
+    let action = &document["action"];
+    let amount = action["amount_minor"].as_str().unwrap().parse::<i64>().unwrap();
+    let currency = action["currency"].as_str().unwrap();
+    let beneficiary = action["beneficiary_account_id"].as_str().unwrap();
+    let resource = format!("paea-payment/{}", request.canonical().digest());
+    let mandate = format!("{prefix}-mandate");
+    let trust = |op: &str, command: Value, token: &str| -> Value {
+        serde_json::from_slice(&project.trust(op, &serde_json::to_vec(&command).unwrap(), token).unwrap().bytes).unwrap()
+    };
+    trust("mandate-create", json!({"schema_version":1,"event_id":format!("{prefix}-mandate"),
+        "mandate_id":mandate,"subject":"requester","actions":["settle"],"resource":resource,
+        "max_amount_minor":amount,"currency":currency,"beneficiary":beneficiary}),"fixture-admin-token");
+    let action = trust("request", json!({"schema_version":1,"event_id":format!("{prefix}-request"),
+        "mandate_id":mandate,"resource":resource,"amount_minor":amount,"currency":currency,
+        "beneficiary":beneficiary,"idempotency_key":format!("{prefix}-key")}),"fixture-requester-token");
+    assert_eq!(action["state"], "pending_approval");
+    let approved = trust("approve", json!({"schema_version":1,"event_id":format!("{prefix}-approve"),
+        "action_id":action["id"],"mandate_id":mandate,"content_digest":action["content_digest"],
+        "resource":resource,"amount_minor":amount,"currency":currency,"beneficiary":beneficiary}),"fixture-approver-token");
+    assert_eq!(approved["state"], "approved");
+    approved
+}
+
+/// Regression: a captured separated exact agreement must allow the current
+/// fictitious payment once. Original kernel refuses even this valid admission.
+/// Context mutation and public mandate revocation must refuse before any effect;
+/// restoring a fresh exact approval recovers without changing rights/history.
+#[test]
+fn settlement_separated_exact_agreement_commits_refuses_mutation_revocation_and_recovers() {
+    let (_pd, project, scope) = project();
+    let (ld, ledger) = root();
+    let (p, c) = action();
+    ledger.paea_initialize_settlement(&c.project_id, &"0b".repeat(32), &[p.clone()]).unwrap();
+    let revision = separated_config(&project);
+    let prepared = project.paea_settlement_request(&ledger, &p, &c, Operation::Commit).unwrap();
+    let approved = payment_agreement(&project, &prepared, "valid");
+    let receipt = recorded(invoke_revision(&project, &ledger, &prepared, &scope, revision).unwrap(), false);
+    assert_eq!(receipt.action_digest, prepared.canonical().digest());
+    let observed = receipt.agreement.as_ref().expect("separated agreement retained");
+    assert_eq!(observed.action_id, approved["id"].as_str().unwrap());
+    assert_eq!(observed.requester, "requester");
+    assert_eq!(observed.approver, "approver");
+    assert_eq!(observed.policy_revision, revision);
+    assert_eq!(count(ld.path()), 1);
+    // A valid replay precedes each corrupted receipt variant. Only the isolated
+    // ledger fixture is changed; restoring exact bytes recovers the same effect.
+    let db = rusqlite::Connection::open(ld.path().join(".swarm/state.db")).unwrap();
+    let original: String = db.query_row("SELECT receipt FROM paea_settlement_effects", [], |r| r.get(0)).unwrap();
+    for (field, value) in [("action_digest", json!("ab".repeat(32))),
+        ("approver", json!("requester")), ("policy_revision", json!(0)),
+        ("expires_at", json!("2000-01-01T00:00:00Z"))] {
+        recorded(invoke_revision(&project, &ledger, &prepared, &scope, revision).unwrap(), true);
+        let mut damaged: Value = serde_json::from_str(&original).unwrap();
+        damaged["agreement"][field] = value;
+        db.execute("UPDATE paea_settlement_effects SET receipt=?", [damaged.to_string()]).unwrap();
+        let error = invoke_revision(&project, &ledger, &prepared, &scope, revision).unwrap_err();
+        assert_eq!(error.code, "paea-settlement-receipt-agreement");
+        assert_eq!(count(ld.path()), 1);
+        db.execute("UPDATE paea_settlement_effects SET receipt=?", [&original]).unwrap();
+    }
+    db.close().unwrap();
+    // A changed instance keeps debt terms valid but must invalidate the exact agreement.
+    let mut changed = prepared.context().clone();
+    changed.instance_id = "different-instance".into();
+    let mutated = project.paea_settlement_request(&ledger, &p, &changed, Operation::Commit).unwrap();
+    let error = invoke_revision(&project, &ledger, &mutated, &scope, revision).unwrap_err();
+    assert_eq!(error.code, "paea-settlement-attributed-admission-required");
+    assert_eq!(count(ld.path()), 1);
+    mutated.close().unwrap();
+    // Valid replay before the next fault proves the authority is still usable.
+    recorded(invoke_revision(&project, &ledger, &prepared, &scope, revision).unwrap(), true);
+    let revoke = json!({"schema_version":1,"event_id":"revoke-valid",
+        "mandate_id":approved["mandate_id"]});
+    project.trust("mandate-revoke", &serde_json::to_vec(&revoke).unwrap(), "fixture-admin-token").unwrap();
+    let error = invoke_revision(&project, &ledger, &prepared, &scope, revision).unwrap_err();
+    assert_eq!(error.code, "paea-settlement-attributed-admission-required");
+    assert_eq!(count(ld.path()), 1);
+    payment_agreement(&project, &prepared, "fresh");
+    recorded(invoke_revision(&project, &ledger, &prepared, &scope, revision).unwrap(), true);
+    prepared.close().unwrap();
+    ledger.close().unwrap();
+    project.close().unwrap();
+}

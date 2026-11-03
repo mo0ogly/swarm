@@ -116,6 +116,7 @@ fn run(
             "operation":operation.as_str(),
             "root_digest":request.root_digest(),
             "action_digest":request.action_digest(),
+            "approval_resource":prepared.approval_resource(),
             "permission":request.permission(),
             "authority":false,
             "restart_reusable":false
@@ -235,6 +236,7 @@ fn run(
             "action_digest":receipt.action_digest,
             "invoice_id":receipt.invoice_id,
             "trust_revision":receipt.trust_revision,
+            "agreement":receipt.agreement,
             "commit_requested_at":receipt.commit_requested_at,
             "replayed":replayed
         }),

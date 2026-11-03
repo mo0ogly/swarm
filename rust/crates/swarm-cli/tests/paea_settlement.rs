@@ -172,7 +172,7 @@ fn invoke(owned: &Owned, operation: &str, bad_frame: bool) -> (std::process::Exi
     fs::create_dir_all(&declaration_dir).unwrap();
     fs::set_permissions(&declaration_dir, fs::Permissions::from_mode(0o700)).unwrap();
     let declaration = declaration_dir.join("declaration.json");
-    let mut child = Command::new(env!("CARGO_BIN_EXE_swarm-rust"))
+    let mut child = designated_binary()
         .args([
             "--json",
             "paea",
@@ -292,4 +292,96 @@ fn settlement_call_cli_refuses_bad_frame_without_consumption() {
     assert_eq!(count(owned.ledger_dir.path()), 0);
     owned.ledger.close().unwrap();
     owned.project.close().unwrap();
+}
+
+/// Exercise separated payment approval through the real two-phase public CLI.
+/// Fixture identities/keys remain explicit doubles; the durable ledger, Trust
+/// producers, child executable, refusal and replay are real isolated operations.
+#[test]
+fn settlement_call_cli_separated_exact_agreement_and_recovery() {
+    let mut owned = owned();
+    let view: Value = serde_json::from_slice(&owned.project.trust("show", b"{}", "").unwrap().bytes).unwrap();
+    let mut ids = view["identities"].clone();
+    for id in ids.as_array_mut().unwrap() {
+        if id["enrollment_principal"].is_null() {
+            id["token"] = format!("fixture-{}-token", id["subject"].as_str().unwrap()).into();
+        }
+    }
+    ids.as_array_mut().unwrap().push(json!({"subject":"agreement-admin","token":"fixture-admin-token","integrity":3,"roles":["admin"]}));
+    let mut policy = view["policy"].clone();
+    policy["require_separation"] = true.into();
+    let change = json!({"schema_version":1,"event_id":"separated-config","expected_revision":owned.trust_revision,
+        "reason":"Public CLI exact separated payment fixture","policy":policy,"identities":ids});
+    owned.project.trust("config-apply", &serde_json::to_vec(&change).unwrap(), "").unwrap();
+    owned.trust_revision += 1;
+    let (proposal, context, _) = document();
+    let prepared = owned.project.paea_settlement_request(&owned.ledger, &proposal, &context,
+        swarm_enrollment_authority::paea_action::Operation::Commit).unwrap();
+    let resource = prepared.approval_resource();
+    let action: Value = serde_json::from_slice(prepared.canonical().bytes()).unwrap();
+    let amount = action["action"]["amount_minor"].as_str().unwrap().parse::<i64>().unwrap();
+    let currency = action["action"]["currency"].as_str().unwrap();
+    let beneficiary = action["action"]["beneficiary_account_id"].as_str().unwrap();
+    let trust = |op: &str, command: Value, token: &str| -> Value {
+        serde_json::from_slice(&owned.project.trust(op, &serde_json::to_vec(&command).unwrap(), token).unwrap().bytes).unwrap()
+    };
+    trust("mandate-create", json!({"schema_version":1,"event_id":"cli-mandate","mandate_id":"cli-mandate",
+        "subject":"requester","actions":["settle"],"resource":resource,"max_amount_minor":amount,
+        "currency":currency,"beneficiary":beneficiary}), "fixture-admin-token");
+    let requested = trust("request", json!({"schema_version":1,"event_id":"cli-request","mandate_id":"cli-mandate",
+        "resource":resource,"amount_minor":amount,"currency":currency,"beneficiary":beneficiary,
+        "idempotency_key":"cli-key"}),"fixture-requester-token");
+    assert_eq!(requested["state"], "pending_approval");
+    // This refuses without an agreement, while the retained request and grant
+    // are otherwise valid; approval of those exact bytes changes the precondition.
+    let (status, _, _) = invoke(&owned, "commit", false);
+    assert!(!status.success());
+    assert_eq!(count(owned.ledger_dir.path()), 0);
+    let approved = trust("approve", json!({"schema_version":1,"event_id":"cli-approve",
+        "action_id":requested["id"],"mandate_id":"cli-mandate","content_digest":requested["content_digest"],
+        "resource":resource,"amount_minor":amount,"currency":currency,"beneficiary":beneficiary}),"fixture-approver-token");
+    assert_eq!(approved["state"], "approved");
+    prepared.close().unwrap();
+    let (status, output, error) = invoke(&owned, "commit", false);
+    assert!(status.success(), "{error}");
+    let reply: Value = serde_json::from_str(output.trim()).unwrap();
+    assert_eq!(reply["replayed"], false);
+    assert_eq!(reply["agreement"]["action_id"], approved["id"]);
+    assert_eq!(reply["agreement"]["requester"], "requester");
+    assert_eq!(reply["agreement"]["approver"], "approver");
+    assert_eq!(count(owned.ledger_dir.path()), 1);
+    let original = owned.document.clone();
+    let mut changed: Value = serde_json::from_slice(&original).unwrap();
+    changed["context"]["instance_id"] = "different-instance".into();
+    owned.document = serde_json::to_vec(&changed).unwrap();
+    let (status, _, _) = invoke(&owned, "commit", false);
+    assert!(!status.success());
+    assert_eq!(count(owned.ledger_dir.path()), 1);
+    owned.document = original;
+    let (status, output, error) = invoke(&owned, "commit", false);
+    assert!(status.success(), "{error}");
+    let reply: Value = serde_json::from_str(output.trim()).unwrap();
+    assert_eq!(reply["replayed"], true);
+    assert_eq!(reply["agreement"]["action_id"], approved["id"]);
+    assert_eq!(count(owned.ledger_dir.path()), 1);
+    owned.ledger.close().unwrap();
+    owned.project.close().unwrap();
+}
+
+/// Select the designated production image with a mandatory full hash witness at
+/// every spawn, or the Cargo test binary when no image is designated. Reuses the
+/// retained delivered-settlement harness contract; a wrong pin fails before exec.
+fn designated_binary() -> Command {
+    match std::env::var_os("SWARM_PAEA_DELIVERED_BIN") {
+        None => Command::new(env!("CARGO_BIN_EXE_swarm-rust")),
+        Some(path) => {
+            use sha2::Digest;
+            let expected = std::env::var("SWARM_PAEA_DELIVERED_BIN_SHA256")
+                .expect("full SHA256 required with designated image");
+            let actual = format!("{:x}", sha2::Sha256::digest(fs::read(&path).unwrap()));
+            assert_eq!(actual, expected, "designated delivered binary hash mismatch");
+            println!("delivered-binary-witness path={} sha256={actual}", path.to_string_lossy());
+            Command::new(path)
+        }
+    }
 }
