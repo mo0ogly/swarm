@@ -83,6 +83,11 @@ class RecipeTests(unittest.TestCase):
         self.assertEqual((output/'step-0001.stderr').read_text(), 'cause\n')
         self.assertFalse((output/'step-0002.stdout').exists())
         self.assertEqual(recipe.verify_evidence(output)['recorded_status'], 'FAIL')
+        retained = {name: (output / name).read_bytes() for name in
+                    ('result.json', 'step-0001.stderr', 'inputs.before.json')}
+        with self.assertRaisesRegex(ValueError, 'recipe-output-must-be-new'):
+            recipe.run_recipe(self.root, self.path, output)
+        self.assertEqual({name: (output / name).read_bytes() for name in retained}, retained)
         self.value['steps'] = [self.step("print('named-test PASS')")]
         self.write()
         self.assertEqual(self.run_fixture('recovered')[0]['status'], 'PASS')

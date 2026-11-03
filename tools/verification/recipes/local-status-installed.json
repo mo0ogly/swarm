@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "p0-installed-status",
+  "inputs": [
+    "swarm.sh",
+    "tools/swarm_local.py",
+    "tools/swarm_version.py",
+    "tests/local_status_installed.py",
+    "version_history.json",
+    "bin/swarm",
+    "docs/architecture/NATIVE-LOCAL-LAUNCHER.md",
+    "docs/en/NATIVE-LOCAL-LAUNCHER.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "managed-identity-contention-recovery-notes-and-protected-ui-refusal",
+      "command": [
+        "python3",
+        "tests/local_status_installed.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS_RUNTIME_IDENTITY_STATUS_AND_NOTES",
+        "\"notes_fr_en_equal\": true",
+        "\"live_authenticated_dialog_verified\": false",
+        "\"global_watchdog\": null"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

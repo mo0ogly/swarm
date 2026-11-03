@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "p0-local-status-lock",
+  "inputs": [
+    "swarm.sh",
+    "tools/swarm_local.py",
+    "tools/swarm_version.py",
+    "tests/test_local_status_lock.py",
+    "tests/test_swarm_local.py",
+    "tests/fixture_area.py",
+    "tools/verification/recipe.py",
+    "tools/verification/test_recipe.py",
+    "docs/architecture/NATIVE-LOCAL-LAUNCHER.md",
+    "docs/en/NATIVE-LOCAL-LAUNCHER.md",
+    "tools/verification/README.md",
+    "bin/swarm"
+  ],
+  "environment": {
+    "PYTHONPATH": "{root}/tests"
+  },
+  "steps": [
+    {
+      "id": "status-concurrency-refusal-recovery-identity",
+      "command": [
+        "python3",
+        "-c",
+        "import hashlib,os,shutil,subprocess,tempfile\nfrom pathlib import Path\nfrom fixture_area import fixture_area\n# Freeze the declared production image under a fixture path: source-managed\n# bin/swarm would trigger another build when the lifecycle test calls start.\nwith tempfile.TemporaryDirectory(prefix='p0-image-',dir=fixture_area()) as d:\n    binary=Path(d)/'swarm'\n    shutil.copy2('bin/swarm',binary)\n    print('FIXTURE_IMAGE_SHA256 '+hashlib.sha256(binary.read_bytes()).hexdigest(),flush=True)\n    result=subprocess.run(['python3','-m','unittest','test_local_status_lock','test_swarm_local.LocalWeb.test_status_during_lifecycle_mutation_preserves_live_identity','-v'],env={**os.environ,'SWARM_TEST_BINARY':str(binary.resolve())})\n    raise SystemExit(result.returncode)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "FIXTURE_IMAGE_SHA256 "
+      ],
+      "required_stderr": [
+        "test_exclusive_contention_unknown_and_recovery",
+        "test_identity_change_during_readiness_refuses",
+        "test_invalid_state_refuses_without_rewrite",
+        "test_mutation_still_excluded_and_recovers",
+        "test_shared_readers_are_compatible",
+        "test_status_during_lifecycle_mutation_preserves_live_identity",
+        "Ran 6 tests",
+        "\nOK\n"
+      ]
+    }
+  ]
+}

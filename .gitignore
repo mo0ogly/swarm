@@ -2,6 +2,9 @@
 __pycache__/
 /companion
 
+# Local communication drafts and media. Already tracked files remain tracked.
+/docs/communication/
+
 # Per-project runtime data and credentials never belong in this repository.
 .swarm/
 .env
