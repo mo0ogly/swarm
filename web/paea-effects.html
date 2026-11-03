@@ -34,6 +34,9 @@
 </section>
 <section aria-labelledby="reconcile-title"><h2 id="reconcile-title" data-i18n>Rapprochement des journaux d'effets (PA-09)</h2>
 <p id="reconcile-status" role="status" aria-live="polite" data-state="loading" data-i18n>Chargement…</p>
+<p><label for="reconcile-reader-credential"><span data-i18n>Jeton lecteur (lecture du rapport de rapprochement classifié)</span></label>
+<input type="password" id="reconcile-reader-credential" autocomplete="off">
+<button type="button" id="reconcile-reload" data-i18n>Relire le rapport</button></p>
 <div id="reconcile-report" hidden>
 <section id="reconcile-settlement" aria-labelledby="settlement-title"><h3 id="settlement-title" data-i18n>Grand livre de règlement séparé</h3><div id="settlement-state"></div><ul id="settlement-findings"></ul></section>
 <section id="reconcile-git" aria-labelledby="git-title"><h3 id="git-title" data-i18n>Intentions et promotions Git</h3><div id="git-state"></div><ul id="git-findings"></ul></section>

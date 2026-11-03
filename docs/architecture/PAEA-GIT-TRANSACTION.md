@@ -832,11 +832,17 @@ les quatre tests d'intégration `paea_effect_reconcile` (journaux cohérents +
 digest d'effet altéré détecté comme finding non vérifié dans les deux domaines,
 intention durable manquante détectée), les trois tests CLI `paea_reconcile`
 (rapport explicite sans mutation, refus de racine partagée, refus des options
-d'exécution sans ouverture), les trois tests web `swarm-web paea_reconcile`
+d'exécution sans ouverture), les six tests web `swarm-web paea_reconcile`
 (rapport uninitialized via l'API authentifiée sans mutation du disque, refus
-409 de racine partagée, refus 403 sans session et des charges malformées) ainsi
-que la bibliothèque des réglages (17 tests unitaires dont la politique v49) et
-Rustdoc `-D warnings`, sur les mêmes fixtures vivantes writer78b/current71c.
+409 de racine partagée, refus 403 sans session et des charges malformées,
+jeton inconnu refusé avant toute IO de grand livre, témoin lecteur connu puis
+désactivé puis réactivé — 409 avant la désactivation, 403
+`authorization_required` avant toute IO pendant la désactivation, retour 409
+après réactivation, sans cache d'identité — et contrat de frontière lecteur
+sur un rapport réel produit par les producteurs réels) ainsi que la
+bibliothèque des réglages (23 tests unitaires dont la politique du chemin du
+grand livre, schéma v49) et Rustdoc `-D warnings`, sur les mêmes fixtures
+vivantes writer78b/current71c.
 La corruption est injectée par SQL direct sur le stockage de test possédé,
 jamais sur une base live.
 
@@ -864,6 +870,28 @@ FR → EN générées `npm run i18n:build`), thèmes etat/sombre, cibles tactile
 ≥ 44 px, largeurs mobile vérifiées, navigation clavier (lien d'évitement en
 premier tab).
 
+Lecteur du rapport de rapprochement (portée du lot PA-09) : le rapport classifié
+n'est plus appelé sans identifiant explicite. Un champ de jeton lecteur éphémère
+(`#reconcile-reader-credential`, `type="password"`, `autocomplete="off"`, sans
+`maxlength` — le producteur impose un minimum de 16 octets mais aucun maximum) et
+une commande explicite « Relire le rapport » (`#reconcile-reload`, bouton simple)
+portent `GET /api/v1/paea/reconcile-effects` seul : l'en-tête
+`Authorization: Bearer <jeton>` n'est envoyé que sur cette lecture, jamais sur
+les autres endpoints, et le jeton ne transite jamais dans une URL. Le jeton est
+lu du champ au moment de la requête puis effacé du champ à CHAQUE sortie (succès,
+refus typé, réponse illisible, échec réseau) ; `Échap` le vide aussi. Chaque
+cycle — y compris le chargement initial — purge d'abord tout le DOM du rapport
+(conteneur replié, rendu technique, états et findings des deux domaines) avant
+d'afficher l'état de chargement, puis présente soit le rapport réel (succès non
+vide), soit un refus typé : les codes `paea-reader-*` reçoivent le message
+dédié « Lecture du rapport refusée : {code}… » avec le code verbatim et la voie
+de reprise (vérifier le jeton puis relire), les autres échecs le message
+« Refus du rapport : {code} » ou « Réponse illisible ; vérifier l'état avant
+reprise ». Une garde de séquence monotone rend toute réponse périmée — y compris
+celle du chargement initial retardé par une relecture — inapte à réafficher des
+données après un refus ou une relecture plus récente ; la reprise positive passe
+par la même opération publique (relire), jamais par un contournement.
+
 Choix d'emplacement (décision réversible argumentée) : la page rejoint la
 famille « Vérifications PAEA » plutôt que le cockpit — (a) cohérence produit :
 les deux endpoints consommés sont des surfaces de vérification/observation
@@ -872,15 +900,179 @@ qualifié de la famille (thèmes, i18n, clavier, mobile) ; (c) surface réversib
 et strictement lecture seule, sans risque d'être prise pour une action
 d'opérateur. Le hub `paea.html` lie la page.
 
-Vérification : `tools/verification/recipes/paea-effects-ui.json` — catalogue
-i18n synchrone (`--check`), tests Rust de page `swarm-web paea_effects_page`
-(servi sous session, refus 403 sans session, absence de POST dans le script,
-liens du hub, clés EN présentes), reconstruction binaire frais (re-touch de la
-table d'assets embarqués pour garantir l'octet servi), puis qualification
-navigateur réelle `tests/paea_effects_ui_recipe.py` sur binaire frais et racine
-fixture 0700 : états vides explicites sans faux succès, refus PA-09 visible
-exact, FR/EN, deux thèmes, clavier (lien d'évitement premier, cible ≥ 44 px),
-pas de débordement horizontal à 1280 et 390 px, captures d'écran, refus 403
-anonyme page + API, aucun diagnostic inattendu dans la preuve.
+Vérification (driver natif réécrit, lot PA-09) : `tests/paea_effects_ui.cjs`
+s'invoque directement — `node tests/paea_effects_ui.cjs <binaire>
+<dossier-neuf>` (cwd racine dépôt) — ou via la recette permanente
+`python3 tools/verification/recipe.py run --recipe
+tools/verification/recipes/paea-effects-ui.json --output /CHEMIN/NEUF`
+(puis `recipe.py verify --evidence /CHEMIN/NEUF`) : trois étapes sans shell,
+check i18n, gardes unittest du wrapper puis qualification navigateur sur le
+binaire géré explicite `--binary {root}/bin/swarm` — aucun build ni touch
+dans la recette, aucun placeholder de binaire non supporté (recipe.py ne
+substitue que `{root}`) ;
+l'empreinte SHA-256 du binaire est calculée AVANT et APRÈS le run par
+hashlib et doit égaler le champ `binary_sha256` de la preuve driver. Le
+wrapper `tests/paea_effects_ui_recipe.py` (< 120 lignes) alloue un dossier
+wrapper FRAÎCHE à chaque exécution (`--output` inexistant obligatoire, ou
+`--output-parent` existant + `mkdtemp` privé 0700 par run, mutuellement
+exclusifs) et n'écrit que dans un dossier créé par CETTE invocation : un
+refus de précondition (`--output` déjà existant — son mkdir refuse, la
+sentinelle failure.txt préexistante de l'appelant n'est jamais écrasée —,
+`--output-parent` absent) sort non nul avec stderr seul, octet préexistant
+intact, et `/tmp` comme tout chemin sous `/tmp` est refusé pour `--output`
+ET `--output-parent` avant toute allocation fs (chemins résolus d'abord ;
+TMPDIR étant configuré ailleurs, tempfile ne cible jamais /tmp ici). Il
+passe au driver le sous-dossier `browser` INEXISTANT (le driver exige la
+fraîcheur et crée son profil dedans), capture stdout/stderr/code avant tout
+filtre, écrit browser.stdout/browser.stderr puis failure.txt en cas d'échec
+uniquement dans le dossier fraîchement créé (les dumps 0600 du driver
+restent les siens) ; échec = stderr original conservé + exit non nul SANS
+aucun PASS. Garde de non-régression :
+`tests/paea_effects_ui_recipe_guard_test.py` (sentinelle préservée après
+refus subprocess réel ; refus /tmp des deux options intercepté avant
+allocation, sans écriture hors zone ; succès fraîchement créé et possédé,
+driver doublé, sans navigateur) est exécutée par la recette permanente
+comme étape `wrapper-ownership-guards` (`python3 … -v`) AVANT la
+qualification navigateur, avec inputs archivés (test, helper
+`tests/fixture_area.py`, défaut de zone
+`rust/crates/swarm-engine/config/engine-settings.json`) : exit 0 requis,
+stderr unittest réel seul (`Ran 4 tests`, `OK` et les 4 noms de tests
+réels, stdout vide) — aucun faux marqueur ni pipeline grep. Timeout
+`None` explicite (aucun watchdog arbitraire) ; readiness et plafonds réels
+restent ceux, événementiels, du driver. La vérification porte sur les NOMS
+réels des checks (pas le seul compteur) : kind `paea-effects-ui-v1`, 19
+checks nommés exacts (6 statiques × FR/EN, thèmes/largeurs `etat`/1280 et
+`sombre`/390, 3 globaux, 2 dynamiques préfixe+suffixe), unexpected_diagnostics
+vide, expected_denials 8, 8 refusals 403 observés, empreinte binaire
+correspondante ; le marqueur `PAEA_EFFECTS_UI_BROWSER_VERIFIED 19` et le
+chemin frais ne s'impriment qu'après cette vérification. Le driver lui-même ne
+reconstruit rien : il reçoit le
+binaire candidat fourni en argument, refuse une réutilisation du dossier de
+sortie, alloue une racine fixture 0700 neuve via `tests/fixture_area.cjs`
+(jamais /tmp), exécute l'init public, démarre `web 127.0.0.1:0 --json` et
+attend la disponibilité PAR ÉVÉNEMENTS — première ligne JSON stdout portant
+l'adresse écoutée, rejet sur `error`/`close` du child — sans polling ni sleep
+ni timeout 15000 ; l'identité du processus réel est prouvée par
+`/proc/<pid>/exe` comparé au binaire fourni, et la session légitime est
+établie avec le jeton session réellement créé par le bind (lu avec
+O_NOFOLLOW, déposé en cookie). Sous cette session, le driver remplace
+l'ancienne attente du 500 du reconcile par le refus RÉEL 403 typé :
+chargement initial sans jeton lecteur → `paea-reader-authentication-required`
+avant tout registre, DOM du rapport purgé ; jeton fixture INCONNU saisi dans
+le champ réellement servi → le code identité réellement servi, attendu
+`paea-reader-policy-required` sur fixture neuve sans journal de confiance
+(`reader_guard.rs:86` journal absent → `:124-126` ; le littéral
+`authorization_required` exige un journal EXISTANT et resterait hors
+d'atteinte sans enrôlement, que le driver ne fabrique pas) — divergence
+documentée dans la preuve au lieu d'un état inventé. Aucune lecture positive
+autorisée n'est émise ; chaque 4xx observé est classé exactement par
+méthode+chemin+statut armé (pas d'ignorance globale des 403), tout autre
+diagnostic navigateur échoue le run ; le champ password
+`reconcile-reader-credential` et le bouton `reconcile-reload` sont vérifiés
+réellement servis avec leurs libellés FR/EN, effacement du champ après refus
+et commande de reprise disponible. Sont conservés : états vides explicites
+(preview, git-call) sans faux succès, FR/EN, deux thèmes, clavier (lien
+d'évitement premier, cible ≥ 44 px), pas de débordement horizontal à 1280 et
+390 px, captures d'écran, refus 403 anonyme page + API
+(`web-access-refused`), aucun diagnostic inattendu dans la preuve ; readiness
+et cleanup : vraies issues child conservées, arrêt SIGINT du SEUL serveur
+possédé avec vérification du code de sortie, sans attente infinie. Le
+compteur de lectures credentialed (exactement une sur tout le run) passe par
+UN helper partagé `credentialedReads()` consommé par la baseline de phase ET
+l'assertion finale de scoping — même prédicte des deux côtés ; les lectures
+nues du journal (5 sur la matrice) n'entrent jamais dans ce compte, et un
+mélange baseline-journal/ assertion-filtrée est le défaut reçu corrigé
+(échec réel `1 !== 6`).
+Composant lecteur : `tools/verification/recipes/paea-reconcile-reader-ui.json`
+→ `python3 tools/verification/recipe.py run --recipe
+tools/verification/recipes/paea-reconcile-reader-ui.json --output /CHEMIN/NEUF`
+(puis `recipe.py verify --evidence /CHEMIN/NEUF`) — trois étapes, sans shell :
+(1) check i18n ; (2) garde compagnon
+`env PAEA_RECONCILE_DOUBLE_GUARD=1 node tests/paea_reconcile_reader_ui.cjs`
+(argv explicite, marqueur `DOUBLE_CLOSE_GUARD_VERIFIED` attendu) ; (3) vrai run
+navigateur `env -u PAEA_RECONCILE_DOUBLE_GUARD node
+tests/paea_reconcile_reader_ui.cjs {root}/.cache/paea-reconcile-reader-ui`
+— `env -u` désactive explicitement la variable de garde héritée de
+l'environnement du lanceur pour que le step navigateur ne puisse pas basculer
+en mode garde silencieux (une surcharge d'environnement globale de la recette
+activerait le mode garde et désactiverait l'étape navigateur ; le schéma des
+steps n'a pas de clé env par étape). Précondition documentée du step
+navigateur : le parent `{root}/.cache/paea-reconcile-reader-ui` doit déjà
+exister (créé par le lanceur ; l'allocateur ne crée PAS le parent — un parent
+manquant ⇒ ENOENT qui échoue le run sans PASS) ; cette précondition reste
+explicite, sans suppression ni destruction de preuves. L'allocation de preuve
+est UN helper commun `allocateRunDirectory()` du driver, consommé par le run
+navigateur ET
+par la garde : la garde exerce le vrai chemin d'allocation, pas une copie.
+Les sorties de preuve sont FRAÎCHES à chaque exécution : l'argument du driver
+est un PARENT sous lequel chaque exécution alloue un dossier de run neuf
+(`fs.mkdtempSync`, 0700) — `evidence-*.json`, sentinelle `run-manifest.json`
+(chemin du run, parent, instant monotone, pid, mode garde) et profil navigateur
+vivent uniquement dans ce dossier frais, imprimé sur stdout
+(`PAEA_RECONCILE_READER_UI_RUN_DIR`) ; aucun fichier d'un run précédent n'est
+écrasé ni effacé, sans argument le parent est une racine fixture de
+`tests/fixture_area.cjs` (jamais /tmp), un parent littéralement `/tmp` ou sous
+`/tmp` est refusé comme entrée négative AVANT toute écriture (jamais via
+`os.tmpdir()`, que la borne TMPDIR du lanceur détournerait), toute erreur de
+création/écriture échoue sans PASS. Profil navigateur : fixture de test,
+jamais un vrai profil, alloué sous le dossier de run frais. Navigateur isolé
+servi par des doubles HTTP explicitement étiquetés
+(`X-Test-Double: paea-reconcile-reader-ui`) distribuant les vrais fichiers de la
+page — résolus depuis la racine dépôt dérivée de l'emplacement du fichier de
+test (`<repo>/tests/` → parent), jamais un miroir `tests/web/`, toute erreur fs
+sur un asset manquant restant un échec explicite ; ~60 assertions nommées couvrant : refus initial sans jeton typé exact
+(état erreur, DOM purgé, aucune donnée), champ éphémère sans `maxlength`,
+commande simple sans POST, Bearer présent exactement et uniquement sur les
+requêtes reconcile GET (jamais dans une URL, jamais sur preview/git-call/
+approval), rapport réel non vide rendu (deux domaines, findings par intent),
+purge complète du rapport précédent avant tout refus avec jeton, effacement du
+jeton après succès/refus/illisible/réseau et absence de toute trace dans le DOM,
+les deux web storages et l'URL, reprise positive par la même opération,
+courses de réponses périmées forcées par le lanceur (double clic et relecture
+pendant le chargement initial : la première réponse est explicitement retenue
+par le double via `hold`, le lanceur attend l'événement réel de requête
+capturée (`waitForRequests`), commande l'appel plus récent, constate le refus
+plus récent rendu, puis libère la première réponse et constate que son
+traitement ne réaffiche jamais de données), frappe clavier
+(Échap vide le champ, Entrée ne soumet rien), mobile 390 px sans débordement,
+deux thèmes, aucun `pageerror` réel. Témoin positif au bon moment : le rapport
+de succès (fixture aligné sur les clés réelles du JSON consommateur) n'est
+installé sur le double QU'APRÈS observation du refus initial typé sans jeton
+et AVANT la relecture avec credential — le double étiqueté reste un fixture,
+jamais une vraie autorité falsifiée. Contrat d'attente d'état : chaque
+`waitText` observe le cycle réel de la page (loading → état stabilisé) via UN
+classifieur partagé `classifyStatus()` sérialisé dans la page par sa source
+(pas de copie de logique) : `loading`/non-démarré ne sont jamais un résultat,
+l'attendu stabilisé résout, et un état terminal CONTRADICTOIRE déjà affiché
+(refus typé pendant l'attente du succès, ou l'inverse) termine l'attente
+immédiatement avec attendu/observé/cause — jamais d'attente indéfinie d'un
+texte impossible, aucun timeout/timer/sleep/plafond arbitraire ajouté ; la
+fermeture de page/une navigation et les erreurs fetch/parse/réseau surfacent
+leur propre cause (le cycle produit rend ces erreurs dans un état visible que
+le classifieur lit). Contrat de fermeture du double, prouvé
+par une garde compagnon (`PAEA_RECONCILE_DOUBLE_GUARD=1`, même fichier classe,
+sans navigateur) : `close()` rejette le `done` des réponses encore retenues
+avec la cause conservée ET détruit la réponse HTTP abandonnée AVANT d'attendre
+la fin du vrai `http.Server.close()` (sinon la connexion inachevée peut
+bloquer la fermeture indéfiniment) ; `waitForRequests` appelé après fermeture
+rejette avec la même cause, jamais d'enfilage sans fin ni de résolution fausse ;
+`close`/`release` idempotents, erreurs du serveur sans unhandledrejection.
+La même garde contient la régression de fraîcheur : via le VRAI helper
+`allocateRunDirectory()` (deux appels), deux allocations sous un même parent
+produisent deux dossiers de run distincts (instants manifestes distincts,
+droits 0700), la sentinelle `evidence-final.json` du premier run reste intacte
+après la seconde allocation et un parent sous /tmp est refusé avec sa cause ;
+la même garde porte aussi la régression du défaut reçu (attente d'état) : via
+le VRAI classifieur partagé `classifyStatus()`, `loading`/non-démarré ne sont
+jamais des résultats et un état terminal contradictoire est détecté au lieu
+d'être attendu indéfiniment.
+Sortie `PAEA_RECONCILE_READER_UI_VERIFIED`
++ journal des assertions + journal des requêtes doubles dans la sortie de run ;
+tout échec d'assertion force un code de sortie non nul. Preuve composant sur
+doubles étiquetés : ce n'est ni la preuve native, ni la preuve de livraison.
 Limites : la page reflète les rapports réels ; elle n'établit ni authenticité
 des journaux (recomputation seulement, cf. PA-09), ni enrôlement, ni acceptation.
+Suivis détenus (hors lot) : `tests/paea_effects_ui.cjs` et le driver natif de
+`tests/paea-approval-form-ui.cjs` qualifiaient l'ancien 500 du reconcile comme
+comportement attendu ; derrière la garde lecteur (403 typé), cette
+classification est périmée et leurs mises à jour restent des lots séparés.

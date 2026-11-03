@@ -6,6 +6,7 @@
         "rust/Cargo.lock",
         ".cargo/config.toml",
         "rust/crates/swarm-cli/**/*",
+        "rust/crates/swarm-engine/config/engine-settings.json",
         "rust/crates/swarm-engine/src/**/*",
         "rust/crates/swarm-web/src/**/*",
         "rust/crates/swarm-web/tests/paea_effects_page.rs",
@@ -20,8 +21,10 @@
         "web/swarm-logo.png",
         "locales/en.json",
         "scripts/i18n/build.cjs",
+        "tests/fixture_area.py",
         "tests/paea_effects_ui.cjs",
         "tests/paea_effects_ui_recipe.py",
+        "tests/paea_effects_ui_recipe_guard_test.py",
         "package.json",
         "package-lock.json",
         "tools/verification/recipe.py",
@@ -29,10 +32,7 @@
         "docs/architecture/PAEA-GIT-TRANSACTION.md",
         "docs/en/PAEA-GIT-TRANSACTION.md"
     ],
-    "environment": {
-        "CARGO_TARGET_DIR": "{root}/.cache/paea-effects-ui-target",
-        "CARGO_INCREMENTAL": "0"
-    },
+    "environment": {},
     "steps": [
         {
             "id": "i18n-generated",
@@ -49,53 +49,36 @@
             "required_stderr": []
         },
         {
-            "id": "workspace-page-tests",
+            "id": "wrapper-ownership-guards",
             "command": [
-                "cargo",
-                "test",
-                "--manifest-path",
-                "rust/Cargo.toml",
-                "--offline",
-                "--locked",
-                "-p",
-                "swarm-web",
-                "--test",
-                "paea_effects_page",
-                "--",
-                "--test-threads=1"
-            ],
-            "expected_exit": 0,
-            "required_stdout": [
-                "2 passed; 0 failed"
-            ],
-            "required_stderr": []
-        },
-        {
-            "id": "fresh-binary-build",
-            "command": [
-                "sh",
-                "-c",
-                "touch rust/crates/swarm-web/src/service/native_admin.rs && cargo build --manifest-path rust/Cargo.toml --offline --locked -p swarm-cli --bin swarm-rust"
+                "python3",
+                "tests/paea_effects_ui_recipe_guard_test.py",
+                "-v"
             ],
             "expected_exit": 0,
             "required_stdout": [],
             "required_stderr": [
-                "Finished"
+                "test_refused_existing_output_preserves_preexisting_bytes",
+                "test_refused_missing_parent_allocates_nothing",
+                "test_tmp_refused_before_allocation_for_both_options",
+                "test_success_fresh_output_dir_is_owned",
+                "Ran 4 tests",
+                "OK"
             ]
         },
         {
-            "id": "real-browser-qualification",
+            "id": "managed-binary-browser-qualification",
             "command": [
                 "python3",
                 "tests/paea_effects_ui_recipe.py",
                 "--binary",
-                "{root}/.cache/paea-effects-ui-target/debug/swarm-rust",
-                "--output",
-                "{root}/.cache/paea-effects-ui-browser-evidence"
+                "{root}/bin/swarm",
+                "--output-parent",
+                "{root}/.cache"
             ],
             "expected_exit": 0,
             "required_stdout": [
-                "PAEA_EFFECTS_UI_BROWSER_VERIFIED 7"
+                "PAEA_EFFECTS_UI_BROWSER_VERIFIED 19"
             ],
             "required_stderr": []
         }

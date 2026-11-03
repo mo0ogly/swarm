@@ -36,7 +36,141 @@ pub enum ReaderVerdict {
     Refused(&'static str),
 }
 
+/// Shared reader-identity observation behind both the served surfaces' early
+/// precheck ([`RootStore::paea_reader_identity_precheck`]) and the full
+/// verdict ([`RootStore::paea_reader_verdict`]): one read of this root's
+/// trust journal, decoded/validated, with the local bearer authenticated
+/// against the CURRENT persisted identities.
+/// Shared reader-identity observation behind both the served PAEA surfaces'
+/// precheck/verdict and, since BF-16a, the preparation dialogue frontier: one
+/// read of this root's trust journal, decoded/validated, with the local
+/// bearer authenticated against the CURRENT persisted identities. `pub(super)`
+/// lets the sibling dialogue frontier re-use it unchanged so exactly one
+/// authentication happens on the same real current bytes; each frontier maps
+/// the three observed states to its own stable refusal codes.
+pub(super) enum ReaderIdentityState {
+    /// No reader credential: a session alone is never authorization.
+    BareSession,
+    /// Trust journal absent: no identity can be recognized and no policy or
+    /// attribution can exist — the full verdict's explicit
+    /// `Refused(POLICY_REQUIRED)` observed state.
+    AbsentJournal,
+    /// Credential recognized against the current validated state; the actor
+    /// is carried so the full verdict uses exactly one authentication, as
+    /// before the shared observation existed.
+    Current { state: State, actor: authentication::Actor },
+}
+
+/// Outcome of the shared reader-identity precheck: an explicit refusal code
+/// (bare session, absent trust journal) or the recognized credential with
+/// the current validated state and its authenticated actor.
+enum ReaderIdentityOutcome {
+    /// Refuse with the stable code before any further IO; no byte disclosed.
+    Refused(&'static str),
+    /// Credential recognized against the current validated trust state.
+    Current(State, authentication::Actor),
+}
+
 impl RootStore {
+    /// Shared reader-identity observation behind both the public precheck
+    /// ([`Self::paea_reader_identity_precheck`]) and the full verdict
+    /// ([`Self::paea_reader_verdict`]): one read of this root's trust
+    /// journal, decoded/validated, with the local bearer authenticated
+    /// against the CURRENT persisted identities.
+    pub(super) fn reader_identity_state(
+        &self,
+        token: Option<&str>,
+    ) -> Result<ReaderIdentityState, R> {
+        let Some(token) = token else {
+            return Ok(ReaderIdentityState::BareSession);
+        };
+        let raw = match self.directory.read_bounded(STATE, MAX_STATE) {
+            Ok(raw) => raw,
+            // Absent journal: trust never configured on this root, so no
+            // identity can be recognized and no policy/attribution exists.
+            // Explicit refusal state without any fabricated policy or
+            // disclosure.
+            Err(e) if absent(&e) => return Ok(ReaderIdentityState::AbsentJournal),
+            Err(e) => return Err(R::Storage(e)),
+        };
+        let state = State::decode(&raw).map_err(failure)?;
+        state.validate().map_err(failure)?;
+        state.require_supported().map_err(failure)?;
+        // Authenticate the bearer against the CURRENT persisted identities.
+        // Unknown/disabled tokens propagate the typed `TrustError::Authorization`
+        // (an HTTP refusal, e.g. 403 with `authorization_required`), unlike a
+        // bare session which is the explicit `Refused(AUTHENTICATION_REQUIRED)`
+        // verdict above. Both paths carry no classified byte; the distinction
+        // is observable and asserted by the web suite's refusal matrix.
+        let actor = authentication::authenticated(&state, authentication::Source::Local(token))
+            .map_err(failure)?;
+        Ok(ReaderIdentityState::Current { state, actor })
+    }
+
+    /// Shared reader-identity precheck over the CURRENT trust state, for the
+    /// served reader surfaces: decides the credential BEFORE any
+    /// settings/ledger/journal IO of the caller, so an unrecognized
+    /// credential can learn nothing beyond the typed identity refusal.
+    /// Output: `Refused(code)` for a bare session
+    /// (`AUTHENTICATION_REQUIRED`) or an absent trust journal
+    /// (`POLICY_REQUIRED`); `Current(state, actor)` for a recognized
+    /// credential. Unknown/disabled token → typed
+    /// `TrustError::Authorization` (HTTP 403 `authorization_required`).
+    /// Errors: decode/validate/storage failures propagate typed
+    /// (`RootStoreError::Trust`/`Storage`). No disclosure beyond those
+    /// states; no classified byte is ever carried. Lock-free, takes no
+    /// reservation beside a running protocol, mutates nothing.
+    fn reader_identity_precheck(
+        &self,
+        token: Option<&str>,
+    ) -> Result<ReaderIdentityOutcome, R> {
+        match self.reader_identity_state(token)? {
+            ReaderIdentityState::BareSession => {
+                Ok(ReaderIdentityOutcome::Refused(AUTHENTICATION_REQUIRED))
+            }
+            ReaderIdentityState::AbsentJournal => {
+                Ok(ReaderIdentityOutcome::Refused(POLICY_REQUIRED))
+            }
+            ReaderIdentityState::Current { state, actor } => {
+                Ok(ReaderIdentityOutcome::Current(state, actor))
+            }
+        }
+    }
+
+    /// Public shared identity precheck for the served reader surfaces: the
+    /// PA-09 reconcile route calls it BEFORE any settings/ledger/journal IO
+    /// so an unrecognized credential learns nothing beyond the typed
+    /// identity refusal. Input: `token` is the extracted
+    /// `Authorization: Bearer <token>` value (`None` = session alone).
+    /// Output: `Ok(Some(code))` — refuse with that stable guard code: a
+    /// bare session (`paea-reader-authentication-required`; a session alone
+    /// is never authorization) or an absent trust journal
+    /// (`paea-reader-policy-required`: no identity can be recognized and no
+    /// policy or attribution can exist); `Ok(None)` — the credential is
+    /// recognized against the CURRENT validated trust state: the caller may
+    /// proceed with its reads but MUST still evaluate the full verdict
+    /// ([`Self::paea_reader_verdict`]) before serving anything, because
+    /// this precheck alone grants no authorization (no policy currency,
+    /// attribution or clearance decision). Unknown/disabled token → typed
+    /// `TrustError::Authorization` (HTTP 403 `authorization_required`).
+    /// Errors: decode/validate/storage failures propagate typed
+    /// (`RootStoreError::Trust`/`Storage`). No disclosure beyond those
+    /// states; no classified byte is ever carried; no identity is cached
+    /// beyond the call. Lock-free, takes no reservation beside a running
+    /// protocol, mutates nothing. Limits: reads only this root's trust
+    /// journal; performs no policy, attribution or clearance decision; no
+    /// enforcement beyond the reader presentation surfaces is claimed
+    /// anywhere.
+    pub fn paea_reader_identity_precheck(
+        &self,
+        token: Option<&str>,
+    ) -> Result<Option<&'static str>, R> {
+        match self.reader_identity_precheck(token)? {
+            ReaderIdentityOutcome::Refused(code) => Ok(Some(code)),
+            ReaderIdentityOutcome::Current(..) => Ok(None),
+        }
+    }
+
     /// Decide whether a Bearer-token reader may receive the classified
     /// projection of one exact prepared action (canonical bytes digest +
     /// project root) under the CURRENT BLP policy, re-read at every
@@ -76,30 +210,17 @@ impl RootStore {
         canonical_digest: &str,
         project_path: &Path,
     ) -> Result<ReaderVerdict, R> {
-        // Session alone: no identity behind the request. Refuse before any
-        // object lookup, without revealing whether a projection exists.
-        let Some(token) = token else {
-            return Ok(ReaderVerdict::Refused(AUTHENTICATION_REQUIRED));
+        // Shared identity precheck FIRST: a bare session and an
+        // unknown/disabled credential are decided on the trust journal alone,
+        // before any policy or attribution work of this verdict. The
+        // authenticated actor from the current validated state is carried to
+        // the clearance check below, so exactly one authentication happens —
+        // on the same real current bytes as before this shared observation
+        // existed. The precheck grants nothing by itself.
+        let (state, actor) = match self.reader_identity_precheck(token)? {
+            ReaderIdentityOutcome::Refused(code) => return Ok(ReaderVerdict::Refused(code)),
+            ReaderIdentityOutcome::Current(state, actor) => (state, actor),
         };
-        let raw = match self.directory.read_bounded(STATE, MAX_STATE) {
-            Ok(raw) => raw,
-            // Absent journal: trust never configured on this root, so no
-            // policy and no attribution can exist. Explicit refusal without
-            // any fabricated policy or disclosure.
-            Err(e) if absent(&e) => return Ok(ReaderVerdict::Refused(POLICY_REQUIRED)),
-            Err(e) => return Err(R::Storage(e)),
-        };
-        let state = State::decode(&raw).map_err(failure)?;
-        state.validate().map_err(failure)?;
-        state.require_supported().map_err(failure)?;
-        // Authenticate the bearer against the CURRENT persisted identities.
-        // Unknown/disabled tokens propagate the typed `TrustError::Authorization`
-        // (an HTTP refusal, e.g. 403 with `authorization_required`), unlike a
-        // bare session which is the explicit `Refused(AUTHENTICATION_REQUIRED)`
-        // verdict above. Both paths carry no classified byte; the distinction
-        // is observable and asserted by the web suite's refusal matrix.
-        let actor = authentication::authenticated(&state, authentication::Source::Local(token))
-            .map_err(|_| R::Trust(Box::new(E::Authorization)))?;
         let Some(record) = state.confidentiality.as_ref() else {
             return Ok(ReaderVerdict::Refused(POLICY_REQUIRED));
         };

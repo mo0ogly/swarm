@@ -33,6 +33,13 @@ button:disabled{opacity:.65;cursor:default}
 #paea-status[data-state="success"],#preview-status[data-state="success"],#gitcall-status[data-state="success"],#reconcile-status[data-state="success"],#approval-status[data-state="success"],#result-status[data-state="success"]{border-inline-start:4px solid var(--wattson-succes-encre);background:var(--wattson-succes-fond);color:var(--wattson-succes-encre)}
 #paea-status[data-state="empty"],#preview-status[data-state="empty"],#gitcall-status[data-state="empty"],#reconcile-status[data-state="empty"],#approval-status[data-state="empty"],#result-status[data-state="empty"]{border-inline-start:4px solid var(--wattson-ligne);color:var(--wattson-texte-discret)}
 #paea-status,#paea-summary,dt,dd,pre,#paea-sources li,#result-detail dd{overflow-wrap:anywhere;white-space:pre-wrap}
+/* Reconciliation finding rows carry the full canonical intent/effect
+ * digests (PA-09): they must stay INTEGRAL exact bytes and wrap anywhere
+ * instead of overflowing the card/viewport (reproduced overflow en/390:
+ * document scrollWidth 650 vs 390, finding 564 vs 258). No truncate,
+ * ellipsis, hidden overflow or scrollbar: the readable line break IS the
+ * fix (docs/UI-DESIGN.md: pas de débordement global). */
+#settlement-findings li,#git-findings li{overflow-wrap:anywhere}
 /* Ledger presentation: term/value rows read like a signed register. */
 dl{margin:0}
 dt{font-weight:600;margin-block-start:.75rem;color:var(--wattson-libelle);font-size:.92rem}

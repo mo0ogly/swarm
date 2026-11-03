@@ -2,7 +2,7 @@
 //! service Root against the saved separate settlement ledger Root.
 use super::{close, reader_bearer_token, root, HttpServiceError as E, NativeHttpService, RouteBody};
 use http::{Method, Request};
-use swarm_engine::{ReaderVerdict, RootStore};
+use swarm_engine::ReaderVerdict;
 
 impl NativeHttpService {
     /// GET/HEAD, empty body/query, after the ordinary session/Host/CSRF gate.
@@ -24,26 +24,56 @@ impl NativeHttpService {
     /// classified material — its findings disclose durable effect identifiers
     /// (`intent_id`, `action_digest`) and per-row verdicts. The session alone
     /// is never authorization for it, under GET as under HEAD, in success as
-    /// in every refusal. The served authorization binds the EXACT bytes this
-    /// route serves: after the reconciliation completes, the canonical digest
-    /// of the report encoding is recomputed HERE (never a hash or label from
-    /// the browser) and the CURRENT reader verdict
-    /// (`RootStore::paea_reader_verdict`) is evaluated on the service root —
-    /// the root whose Git journals the report reads — BEFORE the report bytes
-    /// are returned. The attribution is the existing `blp-object-attribute`
-    /// control operation binding that exact report digest, this project root
-    /// and the current BLP policy revision (see `trust::confidentiality`);
-    /// clearance alone never invents provenance or attribution, and the
-    /// verdict is re-read at every consumption. A bare session, an unknown
-    /// provenance, a stale policy or an unattributed report refuse with an
-    /// explicit `available:false` reply carrying ONLY the stable reason code —
-    /// no finding, identifier, digest, journal state or error detail — even
-    /// for the highest-cleared reader; HEAD answers the same refusal with an
-    /// empty body. An unknown or disabled credential propagates the typed
-    /// `TrustError::Authorization` refusal instead (non-success status); both
-    /// paths mutate nothing, never journal anything and never yield a partial
-    /// report. Refusals stay observable and the route recovers: a later
-    /// correctly attributed read reuses the same public operation.
+    /// in every refusal. Three ordered gates keep that promise:
+    ///
+    /// 1. BEFORE any Root/settings/ledger IO, a bare session (no reader
+    ///    credential) is refused: the typed non-success refusal (403) carries
+    ///    ONLY the stable guard code `paea-reader-authentication-required`
+    ///    (GET: in the typed failure body; HEAD: empty body), so the refusal
+    ///    stays observable and cannot pass for a success. No journal error,
+    ///    ledger state or settings detail can precede or accompany it.
+    /// 2. AFTER the service Root is opened (read-only) and still BEFORE any
+    ///    settings read, ledger open or journal read, a PRESENT credential is
+    ///    decided by the shared engine identity precheck
+    ///    (`RootStore::paea_reader_identity_precheck`) against the service
+    ///    Root's CURRENT trust state: an unknown or disabled token receives
+    ///    only the typed `TrustError::Authorization` refusal (403
+    ///    `authorization_required`); an absent trust journal refuses as
+    ///    `paea-reader-policy-required`; a recognized credential proceeds. No
+    ///    settings, ledger or reconciliation state or error can reach an
+    ///    unrecognized credential. The precheck grants no authorization: the
+    ///    full verdict of gate 3 is still evaluated on real current bytes.
+    /// 3. AFTER the reconciliation completes, the canonical digest of the
+    ///    report encoding is recomputed HERE and the CURRENT reader verdict
+    ///    (`RootStore::paea_reader_verdict`) is evaluated on the service root
+    ///    — the root whose Git journals the report reads — BEFORE the report
+    ///    bytes are returned. The verdict re-runs the same shared identity
+    ///    observation on a FRESH read of the current trust state (a
+    ///    credential recognized at gate 2 is re-authenticated, never served
+    ///    from a cached identity) and enforces policy currency, attribution
+    ///    and clearance on the exact report digest. The attribution is the
+    ///    existing `blp-object-attribute` control operation binding that
+    ///    exact report digest, this project root and the current BLP policy
+    ///    revision (see `trust::confidentiality`); clearance alone never
+    ///    invents provenance or attribution, and the verdict is re-read at
+    ///    every consumption. A stale policy, an unattributed object or an
+    ///    insufficient reader refuse with ONLY the stable reason; an unknown
+    ///    or disabled credential propagates the typed
+    ///    `TrustError::Authorization` refusal instead (non-success status).
+    ///    All of these are non-success refusals.
+    ///    All gates mutate nothing, journal nothing and never yield a
+    ///    partial report; the route recovers: a later correctly attributed
+    ///    read reuses the same public operation.
+    ///
+    /// HTTP contract (documented alongside GET): every reader refusal is the
+    /// typed `Refused` error mapped to 403 for BOTH verbs — observably a
+    /// refusal, never a success status that a report read would also carry.
+    /// GET carries ONLY the stable guard code in the typed failure body
+    /// (`error`/`failure.code`, the same surface every typed refusal uses);
+    /// HEAD is stripped to the empty 403 body, so an empty reply can never
+    /// pass for the success mirror. A HEAD success stays the empty 200 mirror
+    /// of GET. No refusal ever carries a report byte, identifier, journal
+    /// state or internal cause.
     pub(super) fn reconcile_effects(&self, request: &Request<Vec<u8>>) -> Result<RouteBody, E> {
         if !matches!(*request.method(), Method::GET | Method::HEAD) {
             return Err(E::Method("GET, HEAD"));
@@ -58,8 +88,37 @@ impl NativeHttpService {
         // Reader credential shape is validated BEFORE any Root open; None is
         // the bare session the guard treats as never-authorization.
         let token = reader_bearer_token(request)?;
+        let Some(token) = token else {
+            // Bare session: refuse BEFORE any settings read, Root open, ledger
+            // open or journal read, so no state or error of those IOs can be
+            // revealed or even observed ahead of the refusal. The code is the
+            // guard's stable no-credential code; GET carries it as the
+            // explicit projection, HEAD as the typed 403 refusal.
+            return Self::reader_refusal("paea-reader-authentication-required", head);
+        };
         let service = swarm_engine::RootStore::open(&self.root, false).map_err(|e| root("open", e))?;
-        close(self.reconcile_with(&service, token.as_deref(), head), service.close())
+        // Gate 2 — shared identity precheck on the service Root's CURRENT
+        // trust state, BEFORE any settings/ledger/reconciliation IO: an
+        // unrecognized credential learns only the typed identity refusal,
+        // never a ledger/separation or settings state or error. Recognized
+        // credentials proceed to the full contract of `reconcile_with`,
+        // whose final verdict re-authenticates on fresh current bytes.
+        let outcome = match service.paea_reader_identity_precheck(Some(token.as_str())) {
+            Ok(None) => self.reconcile_with(&service, &token, head),
+            Ok(Some(reason)) => Self::reader_refusal(reason, head),
+            Err(e) => Err(root("paea-reader-precheck", e)),
+        };
+        close(outcome, service.close())
+    }
+    /// The route's explicit reader refusal: the typed `Refused` error mapped
+    /// to 403 for BOTH verbs — observably a refusal, never a success status.
+    /// GET carries the stable guard code in the typed failure body
+    /// (`error`/`failure.code`, the same surface every typed refusal uses and
+    /// the field the served consumers read); HEAD is stripped to the empty
+    /// 403 body. No report byte, identifier, journal state or internal cause
+    /// is ever included; the code names only the guard state.
+    fn reader_refusal(reason: &'static str, _head: bool) -> Result<RouteBody, E> {
+        Err(E::Refused(reason))
     }
     /// Reconcile against the saved ledger root with the ledger opened/closed
     /// and its close failure paired ahead of the service close. Typed causes
@@ -68,15 +127,15 @@ impl NativeHttpService {
     /// Reader frontier: the reconciliation completes first (both roots opened
     /// read-only, separation guard applied, closes paired), then the exact
     /// digest of the report encoding is recomputed HERE and the CURRENT reader
-    /// verdict decides whether those bytes may be served. A refusal answers
-    /// the explicit `available:false` projection with the stable reason and no
-    /// report byte (HEAD: empty body); an authorization error propagates
-    /// typed. No report byte, identifier or journal state can reach a refused
-    /// reader, a log line or a close cause.
+    /// verdict decides whether those bytes may be served. A refusal is the
+    /// typed 403 `Refused` error with ONLY the stable guard code (HEAD: empty
+    /// body) and no report byte; an authorization error propagates typed. No
+    /// report byte, identifier or journal state can reach a refused reader, a
+    /// log line or a close cause.
     fn reconcile_with(
         &self,
         service: &swarm_engine::RootStore,
-        token: Option<&str>,
+        token: &str,
         head: bool,
     ) -> Result<RouteBody, E> {
         self.check_binding(service)?;
@@ -96,45 +155,35 @@ impl NativeHttpService {
                 .and_then(|report| {
                     // Reader verdict on the EXACT bytes this route would serve:
                     // the digest is recomputed here from the just-computed
-                    // report (never a browser-supplied hash or label), and the
-                    // guard re-reads the CURRENT persisted BLP record itself.
-                    // Evaluated before the report bytes are returned, so a
-                    // refusal can never carry a finding, identifier, journal
-                    // state or any other report byte.
-                    let report_digest = swarm_engine::digest_trust(&report)
-                        .map_err(|e| {
-                            root("reconcile-report-digest", swarm_engine::RootStoreError::Trust(Box::new(e)))
-                        })?;
+                    // report through the engine's single canonical
+                    // encoding+hash domain (the same bytes `encode_model`
+                    // would serve; never a browser-supplied hash or label),
+                    // and the guard re-reads the CURRENT persisted BLP record
+                    // itself. Evaluated before the report bytes are returned,
+                    // so a refusal can never carry a finding, identifier,
+                    // journal state or any other report byte.
+                    let report_digest = swarm_engine::digest_trust(&report).map_err(|e| {
+                        root(
+                            "reconcile-report-digest",
+                            swarm_engine::RootStoreError::Trust(Box::new(e)),
+                        )
+                    })?;
                     let verdict = service
-                        .paea_reader_verdict(token, &report_digest, &self.root)
+                        .paea_reader_verdict(Some(token), &report_digest, &self.root)
                         .map_err(|e| root("paea-reconcile-reader", e))?;
                     match verdict {
                         ReaderVerdict::Allowed => swarm_engine::encode_model(&report)
                             .map(|bytes| {
                                 if head {
+                                    // HEAD mirrors the allowed read without a
+                                    // body; the paired close stays observable.
                                     RouteBody::plain(Vec::new())
                                 } else {
                                     RouteBody::plain(bytes)
                                 }
                             })
                             .map_err(E::Model),
-                        ReaderVerdict::Refused(reason) => {
-                            if head {
-                                // HEAD mirrors the refusal status without a
-                                // body; the paired close stays observable.
-                                Ok(RouteBody::plain(Vec::new()))
-                            } else {
-                                let reply = serde_json::json!({
-                                    "schema_version":1,
-                                    "event":"paea-effect-reconcile-report",
-                                    "available":false,
-                                    "reason":reason,
-                                });
-                                Ok(RouteBody::plain(
-                                    serde_json::to_vec(&reply).map_err(E::ResponseJson)?,
-                                ))
-                            }
-                        }
+                        ReaderVerdict::Refused(reason) => Self::reader_refusal(reason, head),
                     }
                 }),
             ledger.close(),

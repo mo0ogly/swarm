@@ -9,6 +9,9 @@
  * Optional SWARM_PAEA_LIVE_SOURCE_INVENTORY + SWARM_PAEA_LIVE_NOTES bind
  * assets/notes to a retained qualified build instead of later workspace edits.
  * Both must be supplied together; notes bytes must match that inventory.
+ * SWARM_PAEA_IMAGE_FIXTURE=1 is an explicit owned-fixture mode with the SAME
+ * assertions; a private marker/status scope is mandatory and output never claims
+ * live Authority acceptance. It grants no access or authentication bypass.
  * The recipe retains diagnostics, and the browser is closed in finally.
  * Verifies current FR/EN notes, all five data views, the laboratory reader and twenty-five asset byte sets;
  * empty comparison/invoice fields are checked without submitting any live data.
@@ -18,6 +21,7 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),assert=require('node:assert/strict'),puppeteer=require('puppeteer');
 const fault=process.argv.length===3&&process.argv[2]==='--fault-version-script';assert(process.argv.length===2||fault);
 const cfg=JSON.parse(fs.readFileSync(process.env.SWARM_PAEA_LIVE_STATUS,'utf8')),out=process.env.SWARM_PAEA_LIVE_EVIDENCE+(fault?'-fault-script':''),root=process.cwd();assert(Boolean(process.env.SWARM_PAEA_LIVE_SOURCE_INVENTORY)===Boolean(process.env.SWARM_PAEA_LIVE_NOTES));const compiledInputs=process.env.SWARM_PAEA_LIVE_SOURCE_INVENTORY?JSON.parse(fs.readFileSync(process.env.SWARM_PAEA_LIVE_SOURCE_INVENTORY)):null,notesRaw=fs.readFileSync(process.env.SWARM_PAEA_LIVE_NOTES||path.join(root,'version_history.json')),notes=JSON.parse(notesRaw).local_changes;fs.mkdirSync(out);
+const imageFixture=process.env.SWARM_PAEA_IMAGE_FIXTURE==='1';if(imageFixture){assert.equal(cfg.verification_scope,'owned-fixture-same-production-image');assert.equal(fs.readFileSync(path.join(cfg.root,'.blp-ui-fixture'),'utf8'),'owned image UI fixture\n')}
 const sha=x=>crypto.createHash('sha256').update(x).digest('hex'),url=new URL(cfg.url),address=url.host,checks=[],errors=[];
 if(compiledInputs)assert.equal(sha(notesRaw),compiledInputs['version_history.json']);
 assert(url.protocol==='http:'&&url.hostname==='127.0.0.1'&&url.port);assert.equal(sha(fs.readFileSync('/proc/'+cfg.pid+'/exe')),cfg.binary_sha256);
@@ -77,7 +81,7 @@ try{await Promise.race([(async()=>{
   await (await page.$('#version-dialog')).screenshot({path:path.join(out,lang+'-version-dialog.png')});
   await page.evaluate(()=>{globalThis.versionClosed=new Promise(resolve=>document.getElementById('version-dialog').addEventListener('close',resolve,{once:true}))});await page.keyboard.press('Escape');await page.evaluate(()=>globalThis.versionClosed);check(lang+'-live-dialog-focus',await page.evaluate(()=>document.activeElement.id==='version-open'));await context.close();
  }
- check('managed-process-stable',sha(fs.readFileSync('/proc/'+cfg.pid+'/exe'))===cfg.binary_sha256);check('no-browser-errors-or-writes',errors.length===0);
+ check(imageFixture?'fixture-production-image-stable':'managed-process-stable',sha(fs.readFileSync('/proc/'+cfg.pid+'/exe'))===cfg.binary_sha256);check('no-browser-errors-or-writes',errors.length===0);
  })(),observedFailure]);}catch(e){failure=e;console.error(e.stack)}finally{try{if(browser)await browser.close()}catch(e){errors.push('browser-close:'+e.message);failure??=e}fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({scope:'read-only live native assets and Version dialog; no mission database used as fixture',version:cfg.binary,pid:cfg.pid,binary_sha256:cfg.binary_sha256,source_basis:compiledInputs?'retained-qualified-input-inventory':'current-workspace',notes_sha256:sha(notesRaw),checks,errors,success:!failure},null,2))}
- if(failure)process.exitCode=1;else console.log('LIVE_PAEA_DELIVERY_VERIFIED '+checks.length);
+ if(failure)process.exitCode=1;else console.log((imageFixture?'FIXTURE_PAEA_IMAGE_VERIFIED ':'LIVE_PAEA_DELIVERY_VERIFIED ')+checks.length);
 })();

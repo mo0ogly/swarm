@@ -97,10 +97,13 @@
    ],
    "expected_exit": 0,
    "required_stdout": [
-    "test reconcile_effects_reports_explicit_uninitialized_from_saved_ledger_path ... ok",
+    "test reconcile_effects_refuses_bare_session_with_stable_reader_code ... ok",
     "test reconcile_effects_refuses_shared_saved_root_and_mutation_never_occurs ... ok",
+    "test reconcile_effects_unknown_token_refused_identity_before_ledger_error ... ok",
     "test reconcile_effects_refuses_unauthenticated_and_malformed_requests_without_io ... ok",
-    "3 passed; 0 failed"
+    "test reconcile_effects_reader_frontier_contract_with_real_report ... ok",
+    "test reconcile_effects_known_reader_disabled_then_reenabled_before_invalid_ledger ... ok",
+    "6 passed; 0 failed"
    ],
    "required_stderr": []
   },

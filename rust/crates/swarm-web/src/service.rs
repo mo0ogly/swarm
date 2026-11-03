@@ -352,6 +352,23 @@ impl HttpServiceError {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
             Self::Refused("web-root-binding-changed" | "budget-revision-conflict" | "preparation-stale-plan" | "preparation-already-released") => StatusCode::CONFLICT,
+            // BLP reader-frontier guard codes (BLP-RET-05, BF-16a dialogue):
+            // a refused classified projection is a caller authorization
+            // state, never a bad request — the reconcile and dialogue routes'
+            // reader refusals rely on this mapping to stay an observable 403
+            // instead of a silent empty success.
+            Self::Refused(
+                "paea-reader-authentication-required"
+                | "paea-reader-policy-required"
+                | "paea-reader-policy-stale"
+                | "paea-reader-attribution-required"
+                | "paea-reader-attribution-mismatch"
+                | "paea-reader-access-denied"
+                | "blp-dialogue-authentication-required"
+                | "blp-dialogue-policy-required"
+                | "blp-dialogue-policy-stale"
+                | "blp-dialogue-access-denied",
+            ) => StatusCode::FORBIDDEN,
             Self::Refused("web-route-unported" | "live-agent-unknown" | "live-run-unknown" | "live-task-unknown") => StatusCode::NOT_FOUND,
             Self::Refused(
                 "web-operation-unported" | "preparation-release-scope-unported"
@@ -435,6 +452,16 @@ impl HttpServiceError {
                 "preparation-source-range"|"preparation-source-start-beyond-file"|"preparation-source-path-refused"|"preparation-source-type-refused"|"preparation-source-scope-refused"|"preparation-source-not-regular"|"preparation-source-file-over-limit"|"preparation-source-excerpt-over-limit"|"preparation-source-binary"|"preparation-source-utf8"|"preparation-source-secret"|"preparation-source-count-over-limit"|"preparation-source-total-over-limit"|"preparation-source-query-over-limit"|"preparation-source-absent"
                     if matches!(*operation,"preparation-read"|"preparation-command") && matches!(cause.as_ref(),RootStoreError::Refused(_)|RootStoreError::Preparation(_))=>StatusCode::BAD_REQUEST,
                 "preparation-dialogue-active-unported" if matches!(*operation,"preparation-read"|"preparation-call") && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_IMPLEMENTED,
+                // BLP-RET-05 / BF-16a dialogue frontier: the dialogue route's real
+                // adapter (service/preparations.rs `encode`) forwards the engine
+                // read as Root{operation:"preparation-read"}, so the four typed
+                // reader refusals are classified HERE, on the exact bare Refused
+                // variant. A Cleanup wrapper keeps its own "root-cleanup" family
+                // and stays a server error: a close/rollback failure must never be
+                // reclassified as a caller authorization state, and its refused
+                // primary remains inspectable through the typed causes.
+                "blp-dialogue-authentication-required"|"blp-dialogue-policy-required"|"blp-dialogue-policy-stale"|"blp-dialogue-access-denied"
+                    if *operation=="preparation-read" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
                 "preparation-organization-mode-unported" | "preparation-organization-worker-role-required" | "preparation-release-scope-unported" => StatusCode::NOT_IMPLEMENTED,
                 // Declared port boundary of the planning-tree status read, not a server fault.
                 "mission-status-planning-unported" if *operation == "read" && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::NOT_IMPLEMENTED,
