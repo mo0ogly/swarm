@@ -121,3 +121,10 @@
 | PAEA-114 | [Incrément114 — I04/PA08 : qualification navigateur de l'aperçu lié, fraîche puis périmée, et dialogue Version du profil livré (reprise, GLM)](../PAEA-APEX.md) | UI/API, inspection et affichage des contenus | P | A | A | A | A | C | A | BLP-RET-05 |
 | PAEA-115 | [Incrément115 — I04/PA08 : garde de consommation par accord exact capturé — approbateur Trust authentifié lié aux octets canoniques de l'action Git (production, GLM)](../PAEA-APEX.md) | Accord humain présenté/capturé et dernier usage | P | A | A | A | A | A | A | BLP-RET-04 |
 | PAEA-116 | [Incrément116 — I05/PA08 : fraîcheur de l'accord exact au dernier usage — révocation publique entre lookup et effet Git refuse sans publication (production, GLM)](../PAEA-APEX.md) | Accord humain présenté/capturé et dernier usage | P | A | A | A | A | A | A | BLP-RET-04 |
+
+---
+
+Note de traçabilité (02-11-2026) : la ligne PAEA-113 porte l'écart BLP-RET-06 tel qu'observé le 31-10.
+Le constat initial (originaux introuvables) a été levé le 02-11 par récupération octet-exacte depuis
+les transcripts (voir BLP-REASSESSMENT-20261031.md, ligne BLP-RET-06 et `.swarm-fixtures/recovery-20261102/`).
+Le tableau ci-dessus n'est pas réécrit : il reste l'observation datée du 31-10.

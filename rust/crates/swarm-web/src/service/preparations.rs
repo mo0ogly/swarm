@@ -1,5 +1,5 @@
 //! Protected preparation reads/edits, locked conversion and explicit release.
-use super::{close, root, HttpServiceError as E, NativeHttpService, RouteBody};
+use super::{close, reader_bearer_token, root, HttpServiceError as E, NativeHttpService, RouteBody};
 use http::{Method, Request};
 use serde::Serialize;
 use swarm_engine::{PreparationReadObservation, RootStore, RootStoreError};
@@ -85,7 +85,15 @@ impl NativeHttpService {
                 "/api/v1/preparations/show" => encode(store.preparation_show(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?), &mut causes)?,
                 // Shared CLI/HTTP observation; both revisions still bind release.
                 "/api/v1/preparations/release-review" => encode(store.preparation_release_review(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?), &mut causes)?,
-                "/api/v1/preparations/dialogue" => encode(store.preparation_dialogue(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?), &mut causes)?,
+                // BF-16a: the dialogue projection inherits the admitted output
+                // domain. The Bearer credential is extracted with the shared
+                // reader extractor (malformed headers refuse before any Root
+                // read; no header is a bare session, decided by the engine
+                // only when classified dialogue is actually served).
+                "/api/v1/preparations/dialogue" => {
+                    let reader_token = reader_bearer_token(request)?;
+                    encode(store.preparation_dialogue(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?, reader_token.as_deref()), &mut causes)?
+                }
                 "/api/v1/preparations/budget" => encode(store.preparation_budget(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?), &mut causes)?,
                 "/api/v1/preparations/history" => encode(store.preparation_history(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?, document.as_deref().ok_or(E::Refused("preparation-query-invalid"))?, before), &mut causes)?,
                 _ => return Err(E::Refused("web-route-unported")),

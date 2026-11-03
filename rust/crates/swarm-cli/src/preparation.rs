@@ -47,7 +47,11 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         "template"=>bytes(store.preparation_template(&a.pos[2]),&mut causes),
         "show" => bytes(store.preparation_show(&a.pos[2]), &mut causes),
         "release-review" => bytes(store.preparation_release_review(&a.pos[2]), &mut causes),
-        "dialogue" => bytes(store.preparation_dialogue(&a.pos[2]), &mut causes),
+        // BF-16a: the reader credential comes only from SWARM_TRUST_TOKEN
+        // (like `trust`), never rendered; an absent variable is a bare
+        // session, decided by the engine only when classified dialogue is
+        // actually served.
+        "dialogue" => bytes(store.preparation_dialogue(&a.pos[2], Some(std::env::var("SWARM_TRUST_TOKEN").unwrap_or_default().as_str()).filter(|t|!t.is_empty())), &mut causes),
         "budget" => bytes(store.preparation_budget(&a.pos[2]), &mut causes),
         "files" => bytes(store.preparation_files(&a.pos[2],a.pos.get(3).map_or(".",String::as_str),a.pos.get(4).map_or("",String::as_str)),&mut causes),
         "source" => {

@@ -228,3 +228,23 @@ write-down (`blp-access-denied`) et budget
 distingue 400/404/409/403/500. La surveillance ne crée ni droit d’émission ni
 confinement OS ni héritage de résultat ; BF-07 reste OPEN pour l’engagement
 réel du transport, BF-05 pour l’identité physique des sources.
+
+### Révision : gate travailleur d’émission (hook BF-07 livré)
+
+Le hook BF-07 est implémenté et vérifié localement : la branche Api du
+travailleur Rust appelle la décision via
+`preparation_worker_transport_gate(id, token, base_url, model)` dans la
+réservation egress déjà tenue, avant la construction de la requête — aucun
+socket sans décision. Zéro receipt d’admission correspondant au tour
+(preparation_id, provider, request_hash — hash qui couvre l’event_id : la
+liaison admission→tour est par événement) → chemin legacy inchangé ; ≥1
+receipt → re-vérification complète (principal du receipt, fraîcheur
+settings, attribution pour le digest résolu du `provider` du tour, écho
+obligatoire du `base_url`/`model` effectifs fermant le TOCTOU claim→envoi,
+no-write-down au dernier usage, budget lecture seule). Le balayage est
+fail-closed et la possession du tour exigée (état `running`, token
+SHA256(nonce), PID/stamp/host). Vérifié par
+`preparation_worker_transport.rs` et la recette
+`tools/verification/recipes/blp-preparation-worker-gate.json`. Restent
+OPEN : héritage des résultats (BF-16), confinement OS/descendants,
+quarantaine optionnelle ; non activé en production, non accepté.

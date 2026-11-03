@@ -190,14 +190,31 @@ impl RootStore {
             let mut p = stored(db, id)?; self.preparation_project(&mut p, policy, causes)?; Ok(p)
         })
     }
-    /// Observe retained dialogue under one readonly SQL/material/settings guard.
-    /// Current method hashes and document source-turn references determine stale/
-    /// used flags. Method failures remain sidecars even on later SQL/refusal/close
-    /// errors. All turns are read without a second history cap. Legacy active turns
-    /// refuse; native active records must bind this physical Root. No stop, timeout heuristic,
-    /// budget/reservation/history mutation or provider call. File observations
-    /// are not an atomic filesystem snapshot or future execution authority.
-    pub fn preparation_dialogue(&self,id:&str)->Result<PreparationReadObservation<Vec<crate::PreparationTurn>>,E>{
+    /// Observe retained dialogue for one reader under one readonly
+    /// SQL/material/settings guard (BF-16a domain inheritance). `reader_token`
+    /// is the caller's local bearer credential (`None` = bare session, never
+    /// authorization). Decision is scan-then-decide: the dialogue rows and the
+    /// admission receipt directory are read first (a data read that discloses
+    /// nothing by itself), and only when at least one receipt matches this
+    /// preparation's recorded turns does the reader verdict run — bare session
+    /// → `blp-dialogue-authentication-required`, absent trust journal →
+    /// `blp-dialogue-policy-required`, unknown/disabled token → typed
+    /// `TrustError::Authorization`, non-current recorded policy →
+    /// `blp-dialogue-policy-stale`, failed capsule re-verification or missing
+    /// clearance → `blp-dialogue-access-denied`. Zero matched receipts serves
+    /// the legacy unclassified read without any Trust state, so existing bare
+    /// session consumers keep working. A refusal discloses no turn byte. All
+    /// other legacy properties hold unchanged: current method hashes and
+    /// document source-turn references determine stale/used flags; method
+    /// failures remain sidecars even on later SQL/refusal/close errors; all
+    /// turns are read without a second history cap; legacy active turns
+    /// refuse; native active records must bind this physical Root. No stop,
+    /// timeout heuristic, budget/reservation/history mutation or provider
+    /// call. Receipt reads are fail-closed: an unreadable or undecodable
+    /// matching candidate refuses rather than authorizes. This is a
+    /// presentation frontier only, no acceptance, dispatch or execution
+    /// authority; producer-internal dialogue reads stay uncontrolled.
+    pub fn preparation_dialogue(&self,id:&str,reader_token:Option<&str>)->Result<PreparationReadObservation<Vec<crate::PreparationTurn>>,E>{
         if !crate::valid_preparation_key(id){return Err(E::Refused("preparation-id-invalid"));}
         self.preparation_observed(|db,policy,causes|{
             let p=stored(db,id)?;
@@ -205,7 +222,7 @@ impl RootStore {
             causes.append(&mut methods.causes);
             let id=if p.method=="audit_pdca"{"audit-pdca"}else{p.method.as_str()};
             let hash=methods.value.iter().find(|m|m.id==id && m.available).map(|m|m.sha256.as_str());
-            super::preparation_dialogue::read(db,&p,hash,&self.instance()?)
+            super::preparation_dialogue::read_controlled(self,db,&p,hash,&self.instance()?,reader_token)
         })
     }
     /// Observe preparation estimates/cost coverage in one read-only SQL snapshot.

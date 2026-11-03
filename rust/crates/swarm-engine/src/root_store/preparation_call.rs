@@ -135,6 +135,44 @@ pub(super) struct AdmissionCapture {
     pub(super) provenance: super::preparation_prompt::Manifest,
 }
 
+/// Public-field custody projection of one recorded native turn for the
+/// worker-side transport gate. Prompts, provenance bytes and the private
+/// nonce stay private to this module; the token check is performed here.
+/// Possession of these fields is an observation of a recorded row, never
+/// dispatch authority or a BLP capability.
+pub(super) struct TurnCustody {
+    pub(super) turn: PreparationTurn,
+    pub(super) request_level: String,
+    pub(super) settings_digest: String,
+}
+
+/// Read one recorded native turn under the caller's material guard with its
+/// actual current kernel registration and private nonce-token custody check.
+/// Historical rows and rows with any other registered process refuse: the
+/// gate observes only a turn the calling process itself registered. No state
+/// changes; every read/decode/token cause propagates unchanged.
+pub(super) fn gated_turn(root: &RootStore, id: &str, token: &str) -> Result<TurnCustody, E> {
+    let identity = crate::SupervisorIdentity::current()
+        .map_err(|e| cause("preparation-worker-identity", e))?;
+    let (t, n) = turn(&root.db, id)?;
+    if t.status != "running"
+        || token != hash(n.nonce.as_bytes())
+        || t.supervisor_pid != identity.pid()
+        || t.supervisor_stamp != identity.process_stamp()
+        || t.host != identity.host()
+    {
+        return Err(E::Refused("preparation-worker-registration-mismatch"));
+    }
+    if n.root != root.instance()? {
+        return Err(E::Refused("preparation-root-instance-changed"));
+    }
+    Ok(TurnCustody {
+        request_level: n.request_level.clone(),
+        settings_digest: n.settings_digest.clone(),
+        turn: t,
+    })
+}
+
 /// Validate one legacy-compatible send intent for either producer consumer.
 /// No capture, mutation, classification or transport occurs on failure.
 fn validated_send(raw: &[u8]) -> Result<PreparationSend,E> {

@@ -676,3 +676,69 @@ les observations précédentes ; la relecture d’une capsule admise ne recaptur
 pas la liaison. La cohabitation avec la quarantaine explicite reste celle de
 l’admission : activer la quarantaine locale pendant le classement ne change pas
 ce contrat.
+
+## Gate travailleur d’émission au dernier usage
+
+La branche Api du travailleur Rust (`_prepare_turn` dans
+`swarm-cli/src/preparation_worker.rs`) applique désormais la décision avant
+toute émission classifiée, par
+`RootStore::preparation_worker_transport_gate(id, token, base_url, model)`,
+exécutée dans la réservation egress partagée déjà tenue par le travailleur
+(`with_preparation_egress`) et appelée avant la construction de la requête :
+aucun socket ne s’ouvre sans décision.
+
+**Possession du tour.** Un accesseur privé `gated_turn(root, id, token)`
+relit la ligne sous `with_material_read` et exige exactement l’état
+`running` laissé par le claim, token égal à SHA256 du nonce natif, et
+PID/stamp/host égaux à `SupervisorIdentity::current()`
+(`preparation-worker-registration-mismatch` sinon), puis racine inchangée
+(`preparation-root-instance-changed`). Il expose `TurnCustody{turn,
+request_level, settings_digest}` sans jamais exposer prompt, provenance ni
+nonce. Le travailleur ne détient aucun principal : l’identité vient du
+receipt d’admission re-vérifié.
+
+**Chemin legacy intact.** Le balayage cherche dans `names()` les noms de
+grammaire exacte `blp-admission-{64 hex minuscules}.receipt`. Zéro
+correspondance au triplet (preparation_id, provider, request_hash) →
+`Ok(())` avant toute lecture d’état Trust : les tours sans admission ne
+paient rien. Un candidat de format valide mais illisible ou indécodable
+refuse typé (`blp-admission-not-found`, `blp-admission-record-invalid`) :
+jamais de passage silencieux.
+
+**request_hash couvre event_id.** Le hash canonique du send couvre
+l’`event_id` : deux événements distincts donnent des hash distincts. Un
+receipt d’admission ne correspond donc qu’au tour émis pour le MÊME
+event_id (même preparation_id, même provider) — la liaison admission→tour
+est par événement, pas seulement par préparation.
+
+**Décision au dernier usage.** Avec ≥1 correspondance : réservation Trust
+courte (après le balayage, jamais avant), relecture de l’Entry courante,
+puis pour chaque receipt `preparation_admission::verify` complet (principal
+du receipt, schéma, digest d’identité, instance, révisions, digest de
+politique, rejointe des sources, label de sortie) ; fraîcheur
+`settings_digest` de la capture (`blp-transport-settings-changed`),
+résolution de la destination depuis le `provider` du tour avec écho
+obligatoire du `base_url`/`model` effectifs du travailleur
+(`blp-destination-echo-mismatch`) — fermeture du TOCTOU claim→envoi —,
+attribution pour le digest de destination courant
+(`blp-destination-not-attributed`), no-write-down re-dérivé par
+`ExecutionDomain::prepare` sous politique COURANTE vers le label de
+destination (`blp-access-denied`), observation budget lecture seule. La
+gate ne contacte rien, ne réserve rien en SQL et n’écrit rien ; l’ordre de
+verrous est egress (déjà tenue) → lecture matérielle → balayage →
+réservation Trust courte → clôture.
+
+Vérification : test d’intégration `preparation_worker_transport.rs`
+(bootstrap admission→tour legacy claimé puis terminé→tour lié claimé ;
+refus token, destination non attribuée, écho base_url faux, écho model
+faux ; passage exact sans réservation de gate ; comptage SQL des
+réservations avant/après) et recette permanente
+`tools/verification/recipes/blp-preparation-worker-gate.json` (gate,
+suites voisines `preparation_calls`/`preparation_transport`, compilation
+`cargo check -p swarm-cli`). Contraintes d’ordre vérifiées :
+l’attribution doit précéder tout send (refus `preparation-turn-active`
+sinon), la gate exige le claim, un seul tour actif par préparation. Portée
+: branche Api du travailleur ; le chemin CLI conserve son propre contrôle
+egress. BF-16 (héritage des résultats) et le confinement OS/descendants
+restent ouverts ; non activé en production, non accepté, Bell-LaPadula non
+déclaré terminé.

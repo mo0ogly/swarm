@@ -74,11 +74,11 @@ fn main()->Result<(),Box<dyn std::error::Error>> {
             // Read the parent from the public list, never private SQLite.
             let parents=observed(store.preparation_list()?)?.preparations;
             let mut parent=None;
-            for p in parents {if observed(store.preparation_dialogue(&p.id)?)?.iter().any(|t|t.id==id){parent=Some(p.id);break;}}
+            for p in parents {if observed(store.preparation_dialogue(&p.id,None)?)?.iter().any(|t|t.id==id){parent=Some(p.id);break;}}
             let parent=parent.ok_or(E::Refused("fixture-turn-not-found"))?;
             store.preparation_dispatch(id)?;
             loop {
-                let turns=observed(store.preparation_dialogue(&parent)?)?;
+                let turns=observed(store.preparation_dialogue(&parent,None)?)?;
                 let turn=turns.into_iter().find(|t|t.id==id).ok_or(E::Refused("fixture-turn-not-found"))?;
                 if !turn.active() {break Ok(serde_json::json!({"id":turn.id,"status":turn.status,"error":turn.error}));}
                 std::thread::sleep(std::time::Duration::from_millis(20));

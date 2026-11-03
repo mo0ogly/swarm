@@ -213,3 +213,22 @@ write-down (`blp-access-denied`) and budget
 distinguishes 400/404/409/403/500. The surveillance grants neither emission
 rights, OS confinement, nor result inheritance; BF-07 remains OPEN for the real
 transport engagement, BF-05 for physical source identity.
+
+### Revision: worker emission gate (BF-07 hook delivered)
+
+The BF-07 hook is implemented and locally verified: the Rust worker's Api
+branch calls the decision through
+`preparation_worker_transport_gate(id, token, base_url, model)` inside the
+already-held egress reservation, before the request is built — no socket
+without a decision. Zero admission receipt matching the turn
+(preparation_id, provider, request_hash — a hash that covers the event_id:
+the admission→turn binding is per event) → legacy path unchanged; ≥1
+receipt → full re-verification (receipt's principal, settings freshness,
+attribution for the digest resolved from the turn's `provider`, mandatory
+echo of the actual `base_url`/`model` closing the claim→send TOCTOU,
+no-write-down at last use, read-only budget). The scan is fail-closed and
+turn custody is required (`running` state, SHA256(nonce) token, PID/stamp/
+host). Verified by `preparation_worker_transport.rs` and the recipe
+`tools/verification/recipes/blp-preparation-worker-gate.json`. Still OPEN:
+result inheritance (BF-16), OS/descendant confinement, optional quarantine;
+not activated in production, not accepted.

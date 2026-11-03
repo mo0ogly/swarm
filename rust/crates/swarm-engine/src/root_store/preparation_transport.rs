@@ -13,6 +13,170 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use swarm_confidentiality::{Classification, ExecutionDomain};
 
+impl RootStore {
+    /// Last-use worker-side transport gate for one claimed preparation turn.
+    ///
+    /// Runs inside the worker's already-held shared egress reservation (shared
+    /// re-entry never blocks; the quarantine snapshot is re-checked, strictly
+    /// no weaker). The connection name comes from the turn's recorded provider,
+    /// never from a caller argument; the caller's actual base_url/model are
+    /// echoed like the last-use transport decision, closing the claim→send
+    /// TOCTOU. Zero admission receipts matching the turn's (preparation_id,
+    /// provider, request_hash) is legacy behavior: the gate returns Ok before
+    /// reading any Trust state, so an unconfigured Root proceeds unchanged.
+    /// With at least one matching receipt, the full admission capsule is
+    /// re-verified — principal taken from the producer-written record, never
+    /// supplied; instance, revisions, policy digest, every source re-join and
+    /// output label reconstruction — then settings/provider-source freshness,
+    /// the destination attribution on the resolved digest for the recorded
+    /// connection and the last-use no-write-down check all apply exactly like
+    /// the `blp-preparation-transport` decision. Any failure refuses before
+    /// the caller's send; the gate itself performs no provider IO, no
+    /// reservation and no SQL mutation. This grants no sink authority, OS
+    /// confinement or output-reader protection.
+    pub fn preparation_worker_transport_gate(
+        &self,
+        id: &str,
+        token: &str,
+        base_url: &str,
+        model: &str,
+    ) -> Result<(), E> {
+        self.with_preparation_egress(|| worker_transport_gate(self, id, token, base_url, model))
+    }
+}
+
+/// Gate body under the caller's shared egress reservation. The turn custody
+/// read runs under the material guard; the receipt scan admits only names
+/// with the exact admission grammar, and a matching receipt that cannot be
+/// read or decoded refuses (fail-closed), never silently authorizes.
+fn worker_transport_gate(
+    root: &RootStore,
+    id: &str,
+    token: &str,
+    base_url: &str,
+    model: &str,
+) -> Result<(), E> {
+    let custody = super::material_path::with_material_read(root, || {
+        super::preparation_call::gated_turn(root, id, token)
+    })?;
+    let mut matched = Vec::new();
+    for name in root.directory.names().map_err(E::Storage)? {
+        // Only exact admission grammar names are candidates; anything else in
+        // the directory is not an admission receipt and stays unread.
+        let hash = std::str::from_utf8(&name)
+            .ok()
+            .and_then(|n| n.strip_suffix(".receipt"))
+            .and_then(|n| n.strip_prefix("blp-admission-"));
+        let Some(hash) = hash else { continue };
+        if hash.len() != 64 || !hash.bytes().all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c)) {
+            continue;
+        }
+        let name = format!("blp-admission-{hash}.receipt");
+        let bytes = root
+            .directory
+            .read_native_receipt(&name)
+            .map_err(|e| if absent(&e) { E::Refused("blp-admission-not-found") } else { E::Storage(e) })?;
+        let admission: Admission = serde_json::from_slice(&bytes)
+            .map_err(|e| super::preparation_read::cause("blp-admission-record-invalid", e))?;
+        if admission.captured.preparation_id == custody.turn.preparation_id
+            && admission.captured.provider == custody.turn.provider
+            && admission.captured.request_hash == custody.turn.request_hash
+        {
+            matched.push(admission);
+        }
+    }
+    if matched.is_empty() {
+        // Legacy fast path: nothing classified was admitted for this exact
+        // intent; proceed without reading any Trust state.
+        return Ok(());
+    }
+    // Classified send path: mirror the last-use transport decision.
+    let lock = root.directory.reserve_trust(false).map_err(E::Storage)?;
+    let result = (|| {
+        let state = match root
+            .directory
+            .read_bounded(super::trust_store::STATE, super::trust_store::MAX_STATE)
+        {
+            Ok(bytes) => State::decode(&bytes).map_err(failure)?,
+            Err(e) if absent(&e) => State::initial(),
+            Err(e) => return Err(E::Storage(e)),
+        };
+        state.validate().map_err(failure)?;
+        state.require_supported().map_err(failure)?;
+        let entry = state
+            .confidentiality
+            .as_ref()
+            .ok_or(E::Refused("blp-policy-required"))?
+            .current()
+            .map_err(failure)?;
+        // The principal comes from the producer-written receipt; a receipt
+        // whose recorded identity does not survive full re-verification
+        // refuses instead of authorizing. No token grants any principal.
+        for admission in &matched {
+            super::preparation_admission::verify(root, &state, &admission.principal, admission)?;
+        }
+        if custody.settings_digest != current_settings_digest(root)? {
+            return Err(E::Refused("blp-transport-settings-changed"));
+        }
+        let (destination, provider_source) =
+            resolve_destination(root, &custody.turn.provider, Some(base_url), Some(model))?;
+        for admission in &matched {
+            if admission.captured.provider_source != provider_source {
+                return Err(E::Refused("blp-transport-provider-source-changed"));
+            }
+            if admission.captured.settings_digest != custody.settings_digest {
+                return Err(E::Refused("blp-transport-settings-changed"));
+            }
+        }
+        let digest = destination_digest(
+            root,
+            &destination.id,
+            &destination.base_url,
+            &destination.model,
+            &provider_source,
+        )?;
+        let project_path = root
+            .root
+            .to_str()
+            .ok_or(E::Refused("blp-attribute-project-invalid"))?;
+        let Some((level, _actor, compartments)) = entry.attribution_for(&digest, project_path.as_bytes())
+        else {
+            return Err(E::Refused("blp-destination-not-attributed"));
+        };
+        let label = Classification {
+            level: level.to_owned(),
+            compartments: compartments.to_vec(),
+        };
+        for admission in &matched {
+            let sources = admission.captured.provenance.classifications(
+                &admission.captured.prompt,
+                entry,
+                root.root.as_os_str().as_encoded_bytes(),
+            )?;
+            // No-write-down is re-derived under the CURRENT policy and the
+            // receipt's recorded principal (the worker holds no principal
+            // token; possession of a claimed turn is never identity).
+            let domain = ExecutionDomain::prepare(
+                entry.policy(),
+                entry.revision(),
+                &admission.principal,
+                &sources,
+            )
+            .map_err(|e| E::Refused(e.code()))?;
+            if domain.output_classification() != &admission.classification {
+                return Err(E::Refused("blp-admission-record-invalid"));
+            }
+            domain
+                .check_output(entry.policy(), entry.revision(), Some(&label))
+                .map_err(|e| E::Refused(e.code()))?;
+        }
+        observe_budget(root, &custody.turn.preparation_id)?;
+        Ok(())
+    })();
+    finished(result, lock.close().map_err(E::Storage))
+}
+
+
 /// Stable safe wrapper; diagnostics never include prompt or credential bytes.
 fn failure(e: trust::TrustError) -> E { E::Trust(Box::new(e)) }
 

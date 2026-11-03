@@ -193,3 +193,39 @@ Scope and limits are unchanged: the decision does not engage the real transport
 no legacy send. Verification rests on the `preparation_transport.rs`
 integration test and the public journey `tests/blp_transport_public.py` via the
 recipe `tools/verification/recipes/blp-preparation-transport-public.json`.
+
+## Worker emission hook (BF-07)
+
+The API worker (`_prepare_turn`, Api branch of `swarm-cli/src/
+preparation_worker.rs`) now calls the decision at last use before any
+classified emission, through
+`RootStore::preparation_worker_transport_gate(id, token, base_url, model)`.
+The gate runs inside the shared egress reservation already held by the worker
+and refuses before the HTTP request is built: no socket opens without a
+decision.
+
+- Zero admission receipt matching the turn
+  (preparation_id, provider, request_hash) → immediate `Ok(())` before any
+  Trust-state read: the legacy path is unchanged.
+- ≥1 receipt: full re-verification of each capsule (principal read from the
+  producer-written receipt, never supplied by the caller), settings/
+  provider_source freshness, destination attribution for the digest resolved
+  from the connection recorded in the turn, no-write-down at last use,
+  read-only budget observation. The connection comes from the turn's
+  `provider` field; the worker's actual `base_url`/`model` are the mandatory
+  echo (closing the claim→send TOCTOU).
+- Custody: re-read with token=SHA256(nonce) + turn PID/stamp/host
+  (`preparation-worker-registration-mismatch` otherwise). The worker holds no
+  principal; identity stays the receipt's re-verified one.
+- Fail-closed scan: an unreadable/undecodable matching receipt refuses
+  (`blp-admission-not-found`/`blp-admission-record-invalid`), never silence.
+  The gate contacts nothing, reserves nothing, writes nothing to SQL.
+
+Verification: integration test `preparation_worker_transport.rs` (token/
+destination/echo refusals, exact pass, zero gate reservations, self-cleaning
+fixture) and recipe
+`tools/verification/recipes/blp-preparation-worker-gate.json` (gate, neighbor
+suites, CLI compilation). Scope: the Rust worker's Api branch; the CLI path
+keeps its own egress control. Result inheritance (BF-16) and OS/descendant
+confinement remain open; nothing is declared activated in production or
+accepted.

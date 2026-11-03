@@ -70,7 +70,7 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "\"reference_count\": 65",
+        "\"reference_count\": 67",
         "\"flow_count\": 25",
         "BLP_INVENTORY_CURRENT declared anchors and source hashes only; runtime protection not established"
       ],

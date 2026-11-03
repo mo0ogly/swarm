@@ -1,0 +1,19 @@
+{
+ "rust/crates/swarm-engine/src/root_store/preparation_transport.rs": "c70cf31c278ce35d03f5a8055bfcf7f3472ba7eec59f269611ee72cd9e8c01b5",
+ "rust/crates/swarm-engine/src/root_store/preparation_call.rs": "8c2b8c85b465b7f3fab57d810ac01e7f8af81ecdbf3fccdfee67572bac2dd7af",
+ "rust/crates/swarm-cli/src/preparation_worker.rs": "9f810034affc30d570b4313d90dbc9c4f3bd905534444c9f23be28a161e0e36e",
+ "rust/crates/swarm-engine/tests/preparation_worker_transport.rs": "d7edf155f0722b9b096b42f4ef4cc8909dbf455d1815a547622d9343417d5bd3",
+ "rust/crates/swarm-engine/tests/preparation_calls.rs": "a7bd90c9b1db409ae8b44acc569d8eda9ac06d1078e2e8acaf34814b282f3486",
+ "rust/crates/swarm-engine/tests/preparation_transport.rs": "8fdafd7827601ae7e6f4970c83370fe6490e51f3187aa805a2b77ce41ee9947c",
+ "tools/verification/recipes/blp-preparation-worker-gate.json": "743b85bebc1ccd7f745560e6bff4a3724106d420126b3a9043b891fccecc5072",
+ "docs/architecture/BELL-LAPADULA.md": "1abf732cd2896a8ca20ddd87e87539585572fd02aea57dae7214dd06a2326fad",
+ "docs/en/BELL-LAPADULA.md": "bb61459032fbf81b8a190741552bd721d03f440fb28a976d5cff1d59fe2af79b",
+ "docs/architecture/BIBA-RUST.md": "09e2fd01280d5bc9c921cd59f421eb7636e060c958c8b35609fef5c888b39948",
+ "docs/en/BIBA-RUST.md": "cd1676cd6154a8e42a71f704dd3eb30fc7a17b4dd28638a02160e47becf7c9e6",
+ "docs/architecture/BLP-FLOWS.md": "897537d26f51eac06eb21e764571da6de05445353b4c5e16dbceccfe606148aa",
+ "docs/en/BLP-FLOWS.md": "a2bb36f5276096e8a6cb1fbf46053d79bc4187b6b55c9b1aefb4a914792b5c37",
+ "docs/plans/actions-confiance/BLP-APEX.md": "61066202497959b5b3faadef3e34babce8ac02a542887e08ae1922c1f08de234",
+ "docs/en/plans/actions-confiance/BLP-APEX.md": "a68cb8d141c9d9544a7ff80e0b63e16818b0587b5db737d8d9039ad73864a5b7",
+ "docs/architecture/blp-flow-inventory.json": "e26072b772d48dc7810d0f11b5de82d37a6d9f82638bc958107a715346ffe27d",
+ "version_history.json": "dc6b02be22f54b3bd103148f0600a3bbe12095bd120444fea91dc5b727c2b63e"
+}

@@ -42,6 +42,7 @@ documentaire, sans sélection d’une baseline ni évaluation normative exhausti
 | [OWASP ASVS 5.0.0](https://asvs.owasp.org/) | Exigences de vérification des applications et services web | Référence proposée pour vérifier API, sessions, permissions et configuration ; aucun niveau ASVS évalué ici |
 | [NIST SP 800-53 Rev. 5](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final) | Catalogue de contrôles de sécurité et de confidentialité | Douze contrôles sélectionnés sont déjà reliés à des preuves contextuelles dans la [matrice R19](actions-confiance-referentiels.md), sans score ni conformité globale |
 | Biba | Modèle de contrôle des flux d’intégrité | Moniteur I0–I3 dans le [noyau Rust des actions de confiance](actions-confiance-rust.md) ; ni preuve de vérité des contenus, ni protection sémantique générale contre l’injection, ni contrôle d’accès Linux |
+| Bell-LaPadula | Modèle de contrôle des flux de confidentialité | [État existant](architecture/BELL-LAPADULA.md) : politique révisionnée, attribution d’objets, lecteurs ciblés et diagnostic de préparation ; intégration de bout en bout inachevée (`runtime_enforced:false`) |
 
 La page OWASP d’ACS porte la date du 1er septembre 2026. Le README du dépôt
 consulté décrit déjà une couche déterministe avec un recours optionnel à un

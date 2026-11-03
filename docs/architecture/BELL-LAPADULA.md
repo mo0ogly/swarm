@@ -199,3 +199,39 @@ et ne protège pas les envois legacy. La vérification s’appuie sur le test
 d’intégration `preparation_transport.rs` et le parcours public
 `tests/blp_transport_public.py` via la recette
 `tools/verification/recipes/blp-preparation-transport-public.json`.
+
+## Hook travailleur d’émission (BF-07)
+
+Le travailleur API (`_prepare_turn`, branche Api de `swarm-cli/src/
+preparation_worker.rs`) appelle désormais la décision au dernier usage avant
+toute émission classifiée, via
+`RootStore::preparation_worker_transport_gate(id, token, base_url, model)`.
+La gate tourne dans la réservation egress partagée déjà tenue par le
+travailleur et refuse avant la construction de la requête HTTP : aucun socket
+ne s’ouvre sans décision.
+
+- Zéro receipt d’admission correspondant au tour
+  (preparation_id, provider, request_hash) → `Ok(())` immédiat avant toute
+  lecture d’état Trust : le chemin legacy reste inchangé.
+- ≥1 receipt : re-vérification complète de chaque capsule (principal lu dans
+  le receipt produit par le producteur, jamais fourni par l’appelant),
+  fraîcheur settings/provider_source, attribution de destination pour le
+  digest résolu de la connexion enregistrée dans le tour, no-write-down au
+  dernier usage, observation budget lecture seule. La connexion vient du
+  champ `provider` du tour ; `base_url`/`model` effectifs du travailleur sont
+  l’écho obligatoire (fermeture du TOCTOU claim→envoi).
+- Possession : relecture token=SHA256(nonce) + PID/stamp/host du tour
+  (`preparation-worker-registration-mismatch` sinon). Le travailleur ne
+  détient aucun principal ; l’identité reste celle du receipt re-vérifié.
+- Balayage fail-closed : un receipt correspondant illisible/indécodable
+  refuse (`blp-admission-not-found`/`blp-admission-record-invalid`), jamais un
+  silence. La gate ne contacte rien, ne réserve rien, n’écrit rien en SQL.
+
+Vérification : test d’intégration `preparation_worker_transport.rs` (refus
+token/destination/écho, passage exact, zéro réservation de gate, fixture
+auto-nettoyée) et recette
+`tools/verification/recipes/blp-preparation-worker-gate.json` (gate, suites
+voisines, compilation CLI). Portée : branche Api du travailleur Rust ; le
+chemin CLI garde son propre contrôle egress. Héritage des résultats (BF-16) et
+confinement OS/descendants restent ouverts ; rien n’est déclaré activé en
+production ni accepté.

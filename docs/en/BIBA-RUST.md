@@ -643,3 +643,65 @@ Re-recording a binding or renewing the policy invalidates previous
 observations; replaying an admitted capsule does not recapture the binding.
 Coexistence with the explicit quarantine stays the admission's: enabling local
 quarantine during classification does not change this contract.
+
+## Worker emission gate at last use
+
+The Rust worker's Api branch (`_prepare_turn` in
+`swarm-cli/src/preparation_worker.rs`) now applies the decision before any
+classified emission, through
+`RootStore::preparation_worker_transport_gate(id, token, base_url, model)`,
+executed inside the shared egress reservation the worker already holds
+(`with_preparation_egress`) and called before the request is built: no socket
+opens without a decision.
+
+**Turn custody.** A private accessor `gated_turn(root, id, token)` re-reads
+the row under `with_material_read` and requires exactly the `running` state
+left by the claim, token equal to SHA256 of the native nonce, and PID/stamp/
+host equal to `SupervisorIdentity::current()`
+(`preparation-worker-registration-mismatch` otherwise), then unchanged root
+(`preparation-root-instance-changed`). It exposes
+`TurnCustody{turn, request_level, settings_digest}` without ever exposing
+prompt, provenance or nonce. The worker holds no principal: identity comes
+from the re-verified admission receipt.
+
+**Legacy path intact.** The scan looks through `names()` for names of exact
+grammar `blp-admission-{64 lowercase hex}.receipt`. Zero match on the triple
+(preparation_id, provider, request_hash) → `Ok(())` before any Trust-state
+read: turns without admission pay nothing. A validly-formatted candidate
+that is unreadable or undecodable refuses with a typed code
+(`blp-admission-not-found`, `blp-admission-record-invalid`): never a silent
+pass.
+
+**request_hash covers event_id.** The send's canonical hash covers the
+`event_id`: two distinct events produce distinct hashes. An admission receipt
+therefore matches only the turn emitted for the SAME event_id (same
+preparation_id, same provider) — the admission→turn binding is per event,
+not merely per preparation.
+
+**Decision at last use.** With ≥1 match: short Trust reservation (after the
+scan, never before), re-read of the current Entry, then for each receipt a
+full `preparation_admission::verify` (receipt's principal, schema, identity
+digest, instance, revisions, policy digest, per-source join, output label);
+captured `settings_digest` freshness (`blp-transport-settings-changed`),
+destination resolution from the turn's `provider` with mandatory echo of the
+worker's actual `base_url`/`model` (`blp-destination-echo-mismatch`) —
+closing the claim→send TOCTOU —, attribution for the current destination
+digest (`blp-destination-not-attributed`), no-write-down re-derived through
+`ExecutionDomain::prepare` under CURRENT policy toward the destination label
+(`blp-access-denied`), read-only budget observation. The gate contacts
+nothing, reserves nothing in SQL and writes nothing; lock order is egress
+(already held) → material read → scan → short Trust reservation → close.
+
+Verification: integration test `preparation_worker_transport.rs`
+(bootstrap admission→claimed-then-finished legacy turn→claimed bound turn;
+token refusal, unattributed destination, wrong base_url echo, wrong model
+echo; exact pass with zero gate reservations; SQL reservation count
+before/after) and permanent recipe
+`tools/verification/recipes/blp-preparation-worker-gate.json` (gate, neighbor
+suites `preparation_calls`/`preparation_transport`, compilation
+`cargo check -p swarm-cli`). Verified ordering constraints: attribution must
+precede any send (else `preparation-turn-active`), the gate requires the
+claim, one active turn per preparation. Scope: the worker's Api branch; the
+CLI path keeps its own egress control. BF-16 (result inheritance) and
+OS/descendant confinement remain open; not activated in production, not
+accepted, Bell-LaPadula not declared finished.

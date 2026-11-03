@@ -217,6 +217,10 @@ réservé ou un coût absent ne devient ni preuve d’exécution, ni facture, ni
 
 ## Sécurité et évolutions prévues
 
+[Bell-LaPadula : état existant](docs/architecture/BELL-LAPADULA.md) décrit les
+politiques, attributions, lecteurs ciblés et diagnostics livrés. L’intégration
+reste partielle : aucune confidentialité de bout en bout n’est revendiquée.
+
 Le [positionnement et les références de sécurité](docs/SECURITY-POSITIONING.md)
 relient orchestration, autorité, action exacte et reprise. Ils distinguent le
 rôle d’ISO, OWASP, NIST et SPIFFE, les acquis locaux Biba Rust et les protections

@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """Read retained preparation dialogue on an owned inactive Root, never run/stop AI.
 
-Fault injection is synthetic SQL after a valid control; public reads must not
-write or publish prompts. Original argv/channels retained, no global watchdog.
+Legacy active rows (pending/running/stopping) are read-only observations with
+their exact SQL status; only a native envelope binding another Root refuses
+(preparation-turn-owner-mismatch, covered by the preparation_calls engine
+tests). Fault injection is synthetic SQL after a valid control; public reads
+must not write or publish prompts. Original argv/channels retained, no global
+watchdog.
 """
 import argparse,copy,json,sqlite3
 from pathlib import Path
@@ -16,7 +20,8 @@ def turn_fixture(p,method):
 
 
 def main():
-    """Assert public chronology, projection, freshness, safe refusal and recovery."""
+    """Assert public chronology, projection, freshness, legacy active observation,
+    safe refusal and recovery."""
     ap=argparse.ArgumentParser();ap.add_argument('--binary',required=True);ap.add_argument('--output',required=True);ap.add_argument('--expect-unported',action='store_true');a=ap.parse_args();out=Path(a.output).resolve();out.mkdir(parents=True,exist_ok=False);f=fixture.Fixture(Path(a.binary).resolve(),out,'preparation-dialogue');f.settings_change(preparation_write_enabled='1');p=f.ok(['prepare','create'],dict(version=1,action='create',event_id='dialogue-create',expected_revision=0,title='Historical conversation',text='Need'));checks=[]
     def check(name,value):
         """Retain each named assertion immediately; no empty-success fallback."""
@@ -35,7 +40,8 @@ def main():
     try:
         path='/api/v1/preparations/dialogue?id='+p['id'];check('dialogue-http-cli-equal',server.request(path,observe=False)==turns);server.request(path+'&id='+p['id'],status=400,observe=False);check('dialogue-invalid-query-no-write',before==sql())
         for status in ['pending','running','stopping']:
-            f.ok(['prepare','dialogue',p['id']]);put(base,status=status);fault=sql();rc,error=f.call(['prepare','dialogue',p['id']]);check('dialogue-active-'+status+'-refuses',rc!=0 and error['failure']['code']=='preparation-dialogue-active-unported' and fault==sql());server.request(path,status=501,observe=False);put(base);check('dialogue-active-'+status+'-recovery',f.ok(['prepare','dialogue',p['id']])==turns)
+            f.ok(['prepare','dialogue',p['id']]);put(base,status=status);fault=sql();observed=f.ok(['prepare','dialogue',p['id']]);expected=copy.deepcopy(turns);expected[0]['status']=status
+            check('dialogue-active-'+status+'-observes',observed==expected and fault==sql());check('dialogue-active-'+status+'-prompt-private','PRIVATE_PROMPT_SENTINEL' not in json.dumps(observed) and all('prompt' not in t for t in observed));check('dialogue-active-'+status+'-http-equal',server.request(path,observe=False)==observed and fault==sql());put(base);check('dialogue-active-'+status+'-recovery',f.ok(['prepare','dialogue',p['id']])==turns)
         for label,raw in [('malformed',b'{'),('wrong-key',json.dumps({**base,'id':'turn-other'})),('wrong-parent',json.dumps({**base,'preparation_id':'prep-other'})),('wrong-prompt-type',json.dumps({**base,'prompt':{}}))]:
             f.ok(['prepare','dialogue',p['id']]);put(base,raw=raw);fault=sql();rc,error=f.call(['prepare','dialogue',p['id']]);check('dialogue-'+label+'-refuses',rc!=0 and fault==sql());response=server.request(path,status=500,observe=False);check('dialogue-'+label+'-http-safe', 'PRIVATE_PROMPT_SENTINEL' not in json.dumps(response) and 'causes' not in response['failure']);put(base);check('dialogue-'+label+'-recovery',f.ok(['prepare','dialogue',p['id']])==turns)
         # Same repeated field/alias/null semantics as Go, before serde decoding.

@@ -1125,3 +1125,84 @@ Incrément suivant : hook travailleur d’émission (branche Api de
 `preparation_worker.rs`) appelant la décision au dernier usage avant tout
 envoi classifié ; le chemin legacy reste intact. RETEX de l’incrément :
 [RETEX-BLP-05-20261102](paea/RETEX-BLP-05-20261102.md).
+
+## Reprise BF-07 — hook travailleur d’émission, 2 novembre 2026
+
+Besoin : BF-07 — le travailleur API (`_prepare_turn`, branche Api de
+`swarm-cli/src/preparation_worker.rs`) doit appeler la décision de transport au
+dernier usage avant toute émission classifiée ; le chemin legacy (zéro capsule
+d’admission) reste intact. Fait suite à BLP-05 (décision
+`blp-preparation-transport`), sans toucher cette décision ni ses refus.
+
+### Conception vérifiée avant écriture
+
+- La connexion vient du champ `provider` du tour enregistré (jamais d’un
+  argument appelant) ; `base_url`/`model` effectifs du travailleur sont passés
+  en écho, exactement comme la décision — le mismatch
+  `blp-destination-echo-mismatch` ferme le TOCTOU claim→envoi.
+- La garde de tour (`gated_turn`, `pub(super)` dans `preparation_call.rs`)
+  relit la ligne sous garde matérielle et refait le contrôle de possession
+  token=SHA256(nonce) + PID/stamp/host ; statut exact `running` (l’état laissé
+  par la claim). `Native` reste privé ; la projection `TurnCustody` n’expose
+  ni prompt, ni provenance, ni nonce.
+- Le principal vient du receipt produit par le producteur d’admission
+  (auto-authentifié : `admission_id == identity(principal, preparation_id,
+  event_id)` — toute altération du principal casse le digest). Le travailleur
+  ne détient aucun token de principal ; possession d’un tour réclamé n’est
+  jamais une identité.
+- Couplage admission↔tour : `request_hash` est canonique sur la struct
+  `PreparationSend` **y compris `event_id`** — vérifié par l’exécution du test
+  (deux event_ids distincts produisent deux hash distincts) ; un receipt
+  correspond donc à (preparation_id, provider, request_hash) du tour pour le
+  même event_id.
+- Verrous : la gate tourne dans la réservation egress partagée déjà tenue par
+  le travailleur (partagé+partagé ne bloque jamais ; la photo de quarantaine
+  est reprise, strictement pas plus faible). Ordre egress → Trust → settings
+  préservé ; la réservation Trust courte n’est prise qu’après détection
+  d’au moins un receipt correspondant.
+
+### Réalisé (implémenté + testé local, non activé en production)
+
+- `RootStore::preparation_worker_transport_gate(id, token, base_url, model)`
+  dans `preparation_transport.rs` : zéro receipt correspondant → `Ok(())`
+  **avant toute lecture d’état Trust** (chemin legacy inchangé) ; ≥1 receipt →
+  re-vérification complète de chaque capsule (principal du receipt, instance,
+  révisions, digest de politique, re-jointure de chaque source, reconstruction
+  du label de sortie), fraîcheur settings/provider_source, attribution de
+  destination pour le digest résolu de la connexion enregistrée, no-write-down
+  au dernier usage, observation budget lecture seule. Tout échec refuse avant
+  l’envoi ; la gate ne contacte rien, ne réserve rien, n’écrit rien en SQL.
+- Balayage fail-closed : seuls les noms de grammaire exacte
+  `blp-admission-{64 hex}.receipt` sont candidats ; un receipt correspondant
+  illisible/indécodable refuse (`blp-admission-not-found` /
+  `blp-admission-record-invalid`), jamais un silence.
+- CLI : le token passe de `execute()` à `run()` ;
+  `preparation_worker_transport_gate(id, token, &r.base_url, &r.model)` est
+  appelée avant la construction de la requête (`swarm_api_client::complete`) —
+  aucun socket n’est ouvert avant la décision.
+- Test d’intégration
+  `rust/crates/swarm-engine/tests/preparation_worker_transport.rs` :
+  **PASS 1/1 (1.8s)** — zéro admission → `Ok` immédiat sans réservation ;
+  token falsifié → `preparation-worker-registration-mismatch` ; admission sans
+  destination → `blp-destination-not-attributed` ; écho faux (base_url et
+  model) → `blp-destination-echo-mismatch` ; attribution exacte → la gate
+  passe ; aucune réservation de gate. Fixture auto-nettoyée, zone `.swarm-fixtures`.
+- Recette permanente `tools/verification/recipes/blp-preparation-worker-gate.json`
+  : **PASS 3/3 étapes** (`recipe.py run`, preuves `.cache/bf07-proof/`) —
+  gate (refus + chemin legacy), suites voisines inchangées
+  (`preparation_calls` 7/7, `preparation_transport` 1/1), compilation
+  `swarm-cli` avec threading du token.
+
+### Limites conservées
+
+Gate active uniquement dans la branche Api du travailleur Rust ; le chemin CLI
+(`preparation_worker_run_cli`) garde son propre contrôle egress (hors périmètre
+BF-07). Aucune donnée réelle classée, aucun fournisseur payant, aucune capsule
+réelle. Héritage des résultats/lecteurs (BF-16), confinement OS/descendants :
+ouverts. « Implémenté + testé local » n’est ni activé en production ni
+accepté ; Bell-LaPadula n’est pas déclaré terminé.
+
+### Étape suivante
+
+BF-16 : héritage du domaine sur les réponses/erreurs/propositions et les
+lecteurs. Le commit/push de BF-07 attend l’autorisation explicite habituelle.

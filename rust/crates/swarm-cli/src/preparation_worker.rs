@@ -72,7 +72,9 @@ pub(super) fn execute(a: &Arguments) -> Result<u8, CliError> {
         {
             Ok(runtime) => match request {
                 swarm_engine::PreparationWorkerRequest::Api(request) => {
-                    root.with_preparation_egress(|| runtime.block_on(run(&root, id, request)))
+                    root.with_preparation_egress(|| {
+                        runtime.block_on(run(&root, id, token, request))
+                    })
                 }
                 swarm_engine::PreparationWorkerRequest::Cli(_) => {
                     root.preparation_worker_run_cli(id, token)
@@ -132,11 +134,18 @@ pub(super) fn execute(a: &Arguments) -> Result<u8, CliError> {
 }
 /// Run one HTTP future with caller-owned product timeout and stop observation.
 /// Dropping the future cancels local IO only. No retry, fallback or paid fixture.
+/// The last-use transport gate runs inside the caller's shared egress
+/// reservation before any request object exists: zero matching admission
+/// receipts proceeds unchanged (legacy path), an admitted classified send
+/// without a current destination attribution or with a mismatched
+/// base_url/model echo refuses before any socket opens.
 async fn run(
     root: &RootStore,
     id: &str,
+    token: &str,
     r: swarm_engine::PreparationApiRequest,
 ) -> Result<(String, Option<swarm_engine::Usage>), E> {
+    root.preparation_worker_transport_gate(id, token, &r.base_url, &r.model)?;
     let observation = std::time::Duration::from_millis(r.observation_ms);
     let timeout = r.timeout_seconds;
     let request = swarm_api_client::Request {
