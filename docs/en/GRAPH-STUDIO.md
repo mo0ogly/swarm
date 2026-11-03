@@ -156,8 +156,9 @@ a viewport, Home for the origin and End for the far edge.
 The **ID** button copies the exact identifier without opening the editor. Success
 requires clipboard acknowledgement. Refusal or an unavailable API leaves a
 selected readonly identifier without claiming a successful copy.
-“Graph gestures” reveals the controls. Close or Escape collapses this help and
-restores summary focus. Card titles and labels are abbreviated to 24 UTF-16 units to leave
+“Graph gestures” opens a named modal with a title, scrollable content and visible
+close action, including above full screen. Close or Escape restores the help
+button focus without closing the graph. Card titles and labels are abbreviated to 24 UTF-16 units to leave
 room for controls; their full text remains in the tooltip.
 
 Search matches task IDs and titles regardless of case or accents. It highlights
@@ -222,6 +223,28 @@ does not establish embedded resource delivery.
 **Migration limit:** atomic batch drafts, their engine preview and historical undo/redo are not yet connected to the Rust cockpit. The historical
 contract below remains the target for these capabilities, not evidence of native
 availability. [APEX recovery and open criteria](../plans/migration-rust/GRAPH-REGRESSION-20261031.md).
+
+### Move cards and edit links
+
+Drag a card body to change its local placement. A click without movement opens
+the task; the handle and its keyboard arrows remain available for individual
+cards and selected groups. Escape cancels the provisional move; Undo placement
+restores the previous one. Moving never changes Work. Tool icons complement
+visible text; colors use the theme semantic pairs with a status legend.
+
+On mobile, zoom, search and full screen use compact icons whose accessible
+names and tooltips retain their labels. Main actions keep visible text to leave
+a useful graph surface.
+
+**Add task** opens the existing form: enter an identifier, title, deliverable,
+criteria and prerequisites, then Save. The engine checks revision, rights and
+cycles. **Multi-task draft** remains the option for preparing a batch.
+
+Connect an output to an input to propose a link in that form. Click an arrow to
+open **Edit a dependency**: choose another prerequisite or **Remove this link**,
+then inspect and save the next form. Enter/Space on the arrow opens this modal;
+Delete directly prepares removal. None of these proposals saves before Save.
+Background panning ignores cards and arrows to preserve their gestures.
 
 ## Historical workbench and remaining target
 

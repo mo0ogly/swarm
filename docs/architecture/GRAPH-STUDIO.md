@@ -166,8 +166,9 @@ parcourent un demi-écran, Début revient à l’origine et Fin à l’extrémit
 Le bouton **ID** copie l’identifiant exact sans ouvrir le formulaire. Le succès
 attend l’accord du presse-papiers ; un refus ou une API indisponible laisse
 l’identifiant en lecture seule, sélectionné, sans annoncer de copie réussie.
-« Aide des gestes » expose les commandes ; Fermer ou Échap referme l’aide et
-rend le focus à son titre. Les titres et libellés de carte sont abrégés à 24 unités UTF-16
+« Aide des gestes » ouvre une modale nommée, avec titre, contenu défilable et
+fermeture visible, aussi au-dessus du plein écran. Fermer ou Échap rend le focus
+au bouton d’aide sans fermer le graphe. Les titres et libellés de carte sont abrégés à 24 unités UTF-16
 pour ménager les commandes ; leur texte complet reste dans l’infobulle.
 
 La recherche par identifiant ou titre ignore la casse et les accents. Elle met
@@ -242,6 +243,30 @@ et l’annulation/rétablissement historique ne sont
 pas encore raccordés au cockpit Rust. Le contrat historique ci-dessous reste
 la cible pour ces capacités ; il ne décrit pas leur disponibilité native.
 Preuves et critères ouverts : [reprise APEX](../plans/migration-rust/GRAPH-REGRESSION-20261031.md).
+
+### Déplacer les cadres et modifier les liens
+
+Glisser directement le corps d’une carte déplace son placement local. Un clic
+sans mouvement ouvre sa tâche ; la poignée et ses flèches clavier restent
+disponibles, y compris pour le groupe sélectionné. Échap annule le déplacement
+provisoire et Annuler le placement restaure le précédent. Aucun déplacement
+ne modifie le Work. Les icônes des outils complètent leurs textes ; les couleurs
+viennent des paires sémantiques du thème, avec une légende des états.
+
+Sur mobile, zoom, recherche et plein écran utilisent des icônes compactes dont
+le nom accessible et l’infobulle conservent le libellé. Les actions principales
+gardent leur texte pour laisser une surface de graphe utilisable.
+
+**Ajouter une tâche** ouvre le formulaire existant. Renseigner identifiant, titre,
+livrable, critères et prérequis puis Enregistrer ; le moteur vérifie révision,
+droits et cycles. **Brouillon multi-tâches** reste l’option pour préparer un lot.
+
+Relier une sortie à une entrée prépare un lien dans ce même formulaire. Cliquer
+une flèche ouvre **Modifier un lien** : choisir un autre prérequis ou **Retirer
+ce lien**, puis vérifier et enregistrer le formulaire suivant. Entrée/Espace
+sur la flèche ouvre cette modale ; Suppr prépare directement son retrait.
+Aucune de ces préparations ne sauvegarde avant Enregistrer. Le déplacement du
+fond ignore cartes et flèches pour ne pas capturer leurs gestes.
 
 ## Atelier historique et cible restante
 

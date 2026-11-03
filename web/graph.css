@@ -95,10 +95,10 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .native-graph-search input { flex:1 1 160px; width:100%; min-width:0; }
 .native-graph-studio .graph-search-match .graph-cadre { stroke:var(--wattson-lien); stroke-width:3; stroke-dasharray:6 3; }
 
-.native-graph-editor { width:min(640px,calc(100vw - 24px)); max-height:calc(100dvh - 24px); padding:0; background:var(--wattson-carte); color:var(--wattson-texte); border:1px solid var(--wattson-ligne); }
+.native-graph-editor,.native-graph-help { width:min(640px,calc(100vw - 24px)); max-height:calc(100dvh - 24px); padding:0; background:var(--wattson-carte); color:var(--wattson-texte); border:1px solid var(--wattson-ligne); }
 .native-graph-editor form { display:flex; flex-direction:column; max-height:calc(100dvh - 26px); }
-.native-graph-editor header,.native-graph-editor footer { padding:14px; flex-shrink:0; display:flex; gap:12px; align-items:center; justify-content:space-between; }
-.native-graph-editor .modal-body { padding:14px; overflow:auto; display:grid; gap:12px; }
+.native-graph-editor header,.native-graph-editor footer,.native-graph-help>header,.native-graph-help>footer { padding:14px; flex-shrink:0; display:flex; gap:12px; align-items:center; justify-content:space-between; }
+.native-graph-editor .modal-body,.native-graph-help>.modal-body { padding:14px; overflow:auto; display:grid; gap:12px; }
 .native-graph-editor label { display:grid; gap:6px; min-width:0; }
 .native-graph-editor input,.native-graph-editor textarea,.native-graph-editor select { width:100%; min-width:0; box-sizing:border-box; }
 .native-graph-editor select[multiple],.native-graph-editor textarea { min-height:100px; }
@@ -165,3 +165,47 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .native-graph-batch-comparison dl { margin:0; }
 .native-graph-batch-comparison dt { font-weight:600; }
 .native-graph-batch-comparison dd { margin:0 0 10px; white-space:pre-line; overflow-wrap:anywhere; }
+
+/* Native graph affordances: semantic pairs retain their theme contrast; icons
+   are decorative and each action keeps its visible/accessible text label. */
+.native-graph-tool-icon { width:18px; height:18px; flex-shrink:0; vertical-align:middle; margin-inline-end:6px; }
+.native-graph-studio .pilot-actions>button:not(.primary):not(:disabled),
+.native-graph-studio .native-graph-tools>summary,
+.native-graph-studio .native-graph-analysis>summary { background:var(--wattson-info-fond); color:var(--wattson-info-encre); border-color:var(--wattson-info-encre); }
+.native-graph-studio .pilot-actions>button:not(.primary):hover:not(:disabled) { box-shadow:inset 0 -2px var(--wattson-info-encre); }
+.native-graph-studio #pilot-zoom-out,.native-graph-studio #pilot-zoom-in { font-weight:700; }
+.native-graph-studio .graph-task-open { cursor:grab; touch-action:none; user-select:none; }
+.native-graph-studio .graph-task-open:active { cursor:grabbing; }
+.native-graph-studio .graph-noeud[data-etat=attente] .graph-cadre { fill:color-mix(in srgb,var(--wattson-info-fond) 45%,var(--wattson-carte)); stroke:var(--wattson-info-encre); stroke-width:2; }
+.native-graph-studio .graph-drag rect { fill:var(--wattson-info-fond); stroke:var(--wattson-info-encre); }
+.native-graph-studio .graph-drag text { fill:var(--wattson-info-encre); }
+.native-graph-studio .graph-port[data-side=in] { fill:var(--wattson-attention-fond); stroke:var(--wattson-attention-encre); }
+.native-graph-studio .graph-port[data-side=out] { fill:var(--wattson-info-fond); stroke:var(--wattson-info-encre); }
+.native-graph-studio .graph-arete { stroke:var(--wattson-info-encre); stroke-width:2.5; cursor:pointer; pointer-events:stroke; }
+.native-graph-studio .graph-arete:hover,.native-graph-studio .graph-arete:focus-visible { stroke:var(--wattson-lien); stroke-width:5; }
+.native-graph-studio .graph-fleche { fill:var(--wattson-info-encre); }
+.native-graph-color-key { display:flex; flex-wrap:wrap; gap:8px 16px; color:var(--wattson-texte); font-size:13px; margin-block:8px; }
+.native-graph-color-key .graph-teinte[data-etat=attente]::before { background:color-mix(in srgb,var(--wattson-info-fond) 45%,var(--wattson-carte)); border-color:var(--wattson-info-encre); }
+.native-graph-gesture-hint { margin-block:8px; color:var(--wattson-texte); }
+.native-graph-help[open] { display:flex; flex-direction:column; padding:0; }
+.native-graph-help>.modal-body { min-height:0; overflow:auto; }
+.native-graph-help li { margin-block:8px; }
+.native-graph-link-editor footer { flex-wrap:wrap; }
+
+@media(max-width:760px) {
+  .native-graph-studio #pilot-zoom-in,.native-graph-studio #pilot-zoom-out,
+  .native-graph-studio #pilot-fullscreen,.native-graph-studio #pilot-search-previous,
+  .native-graph-studio #pilot-search-next,.native-graph-studio #pilot-search-clear { width:44px; min-width:44px; min-height:44px; padding:8px; position:relative; }
+  .native-graph-studio :is(#pilot-zoom-in,#pilot-zoom-out,#pilot-fullscreen,#pilot-search-previous,#pilot-search-next,#pilot-search-clear) .native-graph-action-label { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+  .native-graph-studio :is(#pilot-zoom-in,#pilot-zoom-out,#pilot-fullscreen,#pilot-search-previous,#pilot-search-next,#pilot-search-clear) .native-graph-tool-icon { margin:0; }
+  .native-graph-search input { flex-basis:100px; }
+  .native-graph-gesture-hint { font-size:13px; line-height:1.4; }
+}
+
+/* Scoped ID beats the shared neutral fit override without changing its token. */
+.native-graph-studio #pilot-fit { background:var(--wattson-info-fond); color:var(--wattson-info-encre); border-color:var(--wattson-info-encre); }
+.native-graph-studio .graph-studio-hint:empty { display:none; }
+@media(max-width:760px) {
+  .native-graph-studio .native-graph-tools,.native-graph-studio .native-graph-analysis { padding:0; }
+  .native-graph-studio .native-graph-tools>summary,.native-graph-studio .native-graph-analysis>summary { min-height:44px; box-sizing:border-box; padding:10px; }
+}

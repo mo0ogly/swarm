@@ -372,6 +372,27 @@
     dialog.showModal();fields[task?'title':'id'].focus();
   }
 
+  /** Inspect a recorded dependency and prepare its replacement/removal in the
+   * existing task editor. No POST occurs here; Save retains native revision,
+   * rights and cycle checks. Closing restores the invoking edge's focus.
+   * @param {object} work recorded Work, never a local draft projection
+   * @param {string} from prerequisite ID
+   * @param {string} to dependent task ID
+   */
+  function inspectLink(work,from,to){
+    const task=work.tasks.find(task=>task.id===to);if(!task)return;
+    const focus=document.activeElement,dialog=document.createElement('dialog');dialog.className='native-graph-editor native-graph-link-editor';dialog.setAttribute('aria-labelledby','native-graph-link-title');
+    const header=document.createElement('header'),title=document.createElement('h2'),close=document.createElement('button');title.id='native-graph-link-title';title.textContent=t('Modifier un lien');close.type='button';close.textContent=t('Fermer');header.append(title,close);
+    const body=document.createElement('div');body.className='modal-body';const relation=document.createElement('p');relation.textContent=from+' → '+to;const note=document.createElement('p');note.textContent=t('Ce lien signifie que la tâche de droite attend le prérequis de gauche. Le formulaire suivant demande une confirmation. Retirer un lien ne supprime aucune tâche.');
+    const label=document.createElement('label'),choice=document.createElement('select');choice.id='native-graph-link-source';label.htmlFor=choice.id;label.textContent=t('Nouveau prérequis');for(const candidate of work.tasks){if(candidate.id===to)continue;const option=document.createElement('option');option.value=candidate.id;option.textContent=candidate.id+' — '+candidate.title;choice.append(option)}choice.value=from;label.append(choice);
+    const footer=document.createElement('footer'),replace=document.createElement('button'),remove=document.createElement('button');replace.type=remove.type='button';replace.id='native-graph-link-replace';remove.id='native-graph-link-remove';replace.className='primary';replace.textContent=t('Préparer le changement');remove.textContent=t('Retirer ce lien');
+    /** Hand off a proposal after closing this modal, without overlapping task
+     * forms or mutating the recorded Work. The task editor owns confirmation.
+     */
+    function propose(depends){dialog.addEventListener('close',()=>editTask(work,task,depends),{once:true});dialog.close()}
+    replace.addEventListener('click',()=>propose([...new Set([...(task.depends||[]).filter(id=>id!==from),choice.value])]));remove.addEventListener('click',()=>propose((task.depends||[]).filter(id=>id!==from)));close.addEventListener('click',()=>dialog.close());dialog.addEventListener('close',()=>{dialog.remove();container().graphRestoreView?.();if(focus?.isConnected)focus.focus({preventScroll:true})});footer.append(replace,remove);body.append(relation,note,label);dialog.append(header,body,footer);document.body.append(dialog);dialog.showModal();choice.focus();
+  }
+
   /** Mount local presentation controls around a validated recorded graph.
    * Coordinates/zoom are device preferences, scoped to origin, Work and direction;
    * they grant no mutation or execution rights. Storage failure remains visible.
@@ -483,8 +504,16 @@
       map.append(viewport);updateViewport();undo.disabled=previousPositions===null;redo.disabled=redoPositions===null;zoomOut.disabled=zoom<=.15;zoomIn.disabled=zoom>=2;
       zoomText.textContent=Math.round(zoom*100)+' %';
     }
-    /** Create a native action with textContent and scoped listener. */
-    function button(id,label,action){const b=document.createElement('button');b.type='button';b.id=id;b.textContent=t(label);b.addEventListener('click',action);toolbar.append(b);return b}
+    /** Add a local decorative vector without changing a control's text/name.
+     * Paths are static icon geometry, never external resources or user content.
+     */
+    function decorate(control,kind){const paths={previous:'M15 4l-8 8 8 8',next:'M9 4l8 8-8 8',clear:'M5 5l14 14M19 5L5 19',zoomPlus:'M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0M15 15l6 6M6 10h8M10 6v8',zoom:'M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0M15 15l6 6M6 10h8',plus:'M12 4v16M4 12h16',fit:'M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5M8 12h8M12 8v8',tools:'M4 4h6v6H4zM14 14h6v6h-6zM14 4h6v6h-6zM7 10v7h7',undo:'M8 4L3 9l5 5M3 9h10a7 7 0 0 1 0 14',help:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M9 9a3 3 0 1 1 4 3l-1 1v1M12 17v1',draft:'M5 3h14v18H5zM8 7h8M8 11h8M8 15h5'};const icon=svgNode('svg',{class:'native-graph-tool-icon',viewBox:'0 0 24 24','aria-hidden':'true',focusable:'false'});icon.append(svgNode('path',{d:paths[kind]||paths.tools,fill:'none',stroke:'currentColor','stroke-width':2,'stroke-linecap':'round','stroke-linejoin':'round'}));control.prepend(icon)}
+    /** Create a labelled native action with a decorative icon and listener. */
+    function button(id,label,action){const b=document.createElement('button');b.type='button';b.id=id;actionLabel(b,label);b.addEventListener('click',action);toolbar.append(b);return b}
+    /** Keep a visible desktop label and an accessible compact label on mobile.
+     * Titles describe icon-only controls; no action or authority changes here.
+     */
+    function actionLabel(control,label){const id=control.id,kind=id==='pilot-search-previous'?'previous':id==='pilot-search-next'?'next':id==='pilot-search-clear'?'clear':id==='pilot-zoom-in'?'zoomPlus':id==='pilot-zoom-100'?'fit':id.includes('zoom')?'zoom':id==='pilot-add-task'?'plus':id.includes('fit')||id.includes('fullscreen')?'fit':id.includes('undo')||id.includes('redo')?'undo':id.includes('help')?'help':id.includes('draft')?'draft':'tools';control.replaceChildren();const text=document.createElement('span');text.className='native-graph-action-label';text.textContent=t(label);control.append(text);control.title=t(label);decorate(control,kind)}
     const zoomText=document.createElement('output');zoomText.setAttribute('aria-label',t('Zoom'));
     const zoomOut=button('pilot-zoom-out','Réduire le zoom',()=>{zoom=Math.max(.15,zoom-.15);update();save()});
     toolbar.append(zoomText);
@@ -501,7 +530,7 @@
      */
     function fitProjection(){update();let left=0,top=0,right=extent.width,bottom=extent.height;if(visibleIds?.size){left=Infinity;top=Infinity;right=0;bottom=0;for(const [id,u]of units){if(!isVisible(id))continue;const x=u.x+(positions[id]?.x??0),y=u.y+(positions[id]?.y??0);left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x+u.w);bottom=Math.max(bottom,y+u.h)}left=Math.max(0,left-12);top=Math.max(0,top-12);right+=12;bottom+=12}const required=Math.min(1,(canvas.clientWidth-24)/(right-left),(canvas.clientHeight-24)/(bottom-top));zoom=Math.max(.15,required);update();canvas.scrollTo(left*zoom,top*zoom);if(required<.15)status.textContent=t('Zoom minimum atteint. Rapprochez les cartes pour tout voir.');save()}
     button('pilot-fit','Vue d’ensemble',fitProjection);
-    const full=button('pilot-fullscreen','Plein écran',()=>{resumeFullscreen=false;if(modal.open){modal.close();return}modal.showModal();modal.append(studio);studio.classList.add('is-fullscreen');document.body.classList.add('graph-studio-open');full.textContent=t('Quitter le plein écran');full.setAttribute('aria-expanded','true');full.focus()});full.setAttribute('aria-expanded','false');
+    const full=button('pilot-fullscreen','Plein écran',()=>{resumeFullscreen=false;if(modal.open){modal.close();return}modal.showModal();modal.append(studio);studio.classList.add('is-fullscreen');document.body.classList.add('graph-studio-open');actionLabel(full,'Quitter le plein écran');full.setAttribute('aria-expanded','true');full.focus()});full.setAttribute('aria-expanded','false');
     button('pilot-layout-reset','Ranger les cartes',()=>{const before=copyPositions();positions=Object.create(null);rememberPlacement(before);update();save()});
     const undo=button('pilot-layout-undo','Annuler le placement',()=>{if(!previousPositions)return;finish(true);redoPositions=copyPositions();positions=previousPositions;previousPositions=null;update();save()});undo.disabled=true;
     const redo=button('pilot-layout-redo','Rétablir le placement',()=>{if(redoPositions===null)return;finish(true);previousPositions=copyPositions();positions=redoPositions;redoPositions=null;update();save()});redo.disabled=true;
@@ -512,7 +541,7 @@
      */
     function resetNavigation(){finish(true);try{localStorage.removeItem(viewKey)}catch(cause){const code=storageErrorFamily(cause);preferenceStatus.dataset.viewError=code;preferenceStatus.textContent=t('Réinitialisation de navigation non confirmée.')+' ('+code+')';return}resetting=true;host.dataset.orientation='LR';host.graphView=()=>({work:work.id,orientation:'LR',left:0,top:0,studioLeft:0,studioTop:0,fullscreen:modal.open,toolsOpen:media.matches});render(work)}
     button('pilot-view-reset','Réinitialiser la navigation',resetNavigation);
-    button('pilot-add-task','Ajouter une tâche',()=>editTask(work));
+    button('pilot-add-task','Ajouter une tâche',()=>editTask(work)).className='primary';
     button('pilot-business-draft','Brouillon multi-tâches',()=>openBusinessDraft(work));
     const neighbors=document.createElement('label');neighbors.className='native-graph-neighbors';neighbors.textContent=t('Repérer les dépendances');neighbors.htmlFor='pilot-neighbors';
     const neighborSelect=document.createElement('select');neighborSelect.id='pilot-neighbors';const noNeighbor=document.createElement('option');noNeighbor.value='';noNeighbor.textContent=t('Choisir une carte');neighborSelect.append(noNeighbor);
@@ -640,8 +669,8 @@
       catch(error){if(!disposed){copyStatus.dataset.copyState='unconfirmed';copyStatus.dataset.copyError=/^[A-Za-z]+Error$/.test(error?.name)?error.name:'ClipboardError';copyStatus.textContent=t('Copie non confirmée. Sélectionnez l’identifiant.');copyFallback.hidden=false;copyValue.value=id;copyValue.focus();copyValue.select()}}
       finally{copying=false;control.setAttribute('aria-busy','false')}
     }
-    const help=document.createElement('details');help.id='pilot-graph-help';help.className='native-graph-help';
-    const helpToggle=document.createElement('summary');helpToggle.id='pilot-graph-help-toggle';helpToggle.textContent=t('Aide des gestes');help.append(helpToggle);
+    const help=document.createElement('dialog');help.id='pilot-graph-help';help.className='native-graph-help';help.setAttribute('aria-labelledby','pilot-graph-help-title');
+    const helpToggle=button('pilot-graph-help-toggle','Aide des gestes',()=>{help.showModal();helpTitle.focus()});helpToggle.setAttribute('aria-haspopup','dialog');const helpHeader=document.createElement('header'),helpTitle=document.createElement('h2');helpTitle.id='pilot-graph-help-title';helpTitle.textContent=t('Aide des gestes');helpTitle.tabIndex=-1;helpHeader.append(helpTitle);const helpBody=document.createElement('div');helpBody.className='modal-body';help.append(helpHeader,helpBody);
     const helpList=document.createElement('ul');for(const text of [
       'Zoom : boutons ou Ctrl + molette. Vue d’ensemble inclut les cartes déplacées.',
       'Outils du graphe regroupe placement, orientation, repérage et export. Échap referme ce panneau.',
@@ -653,21 +682,23 @@
       'Analyser et sélectionner isole une branche ou tous les chemins orientés entre deux tâches. Voir tout le graphe restaure la vue.',
       'En mode sélection, cliquez ou appuyez sur Entrée sur chaque carte, puis déplacez une poignée pour déplacer le groupe. Annuler le placement restaure tout le groupe.',
       'L’export SVG télécharge le placement affiché ; les boutons ne sont pas exportés.',
-      'Déplacez le fond pour naviguer et les poignées pour placer les cartes. Annuler le placement restaure le dernier déplacement ou rangement.',
+      'Déplacez le fond pour naviguer. Glissez le cadre lui-même ou sa poignée pour le placer ; un clic sans déplacement ouvre la tâche. Annuler le placement restaure le dernier déplacement ou rangement.',
+      'Ajouter une tâche ouvre le formulaire : choisissez un identifiant, un titre, un livrable et des critères, puis enregistrez. Le brouillon multi-tâches permet de préparer plusieurs changements avant application.',
+      'Cliquez sur une flèche pour changer son prérequis ou préparer son retrait. Le formulaire confirme le changement. Suppr sur un lien prépare directement son retrait.',
       'Mini-carte : cliquez pour centrer ; utilisez les flèches, Début et Fin au clavier.',
       'Recherche : Entrée ou Suivant centre une correspondance ; Échap efface la saisie.',
       'Liens : reliez une sortie à une entrée, puis confirmez dans le formulaire. Aucun geste ne sauvegarde un lien.',
       'ID copie l’identifiant de la carte. Une copie non confirmée laisse le texte sélectionnable.',
       'Échap annule un geste en cours ou ferme le plein écran. Entrée ouvre la carte ciblée.'
-    ]){const item=document.createElement('li');item.textContent=t(text);helpList.append(item)}help.append(helpList);
+    ]){const item=document.createElement('li');item.textContent=t(text);helpList.append(item)}helpBody.append(helpList);
     const helpClose=document.createElement('button');helpClose.type='button';helpClose.id='pilot-graph-help-close';helpClose.textContent=t('Fermer l’aide');
     /** Close only this disclosure and restore its summary focus. */
-    function closeHelp(){help.open=false;helpToggle.focus()}
-    helpClose.addEventListener('click',closeHelp);help.append(helpClose);help.addEventListener('keydown',e=>{if(e.key==='Escape'&&help.open){e.preventDefault();e.stopPropagation();closeHelp()}});
+    function closeHelp(){help.close()}
+    const helpFooter=document.createElement('footer');helpClose.addEventListener('click',closeHelp);helpFooter.append(helpClose);help.append(helpFooter);help.addEventListener('close',()=>{if(helpToggle.isConnected)helpToggle.focus({preventScroll:true})});
     /** Convert pointer coordinates to unscaled SVG units; no engine state. */
     function point(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
     /** End or roll back a captured gesture; cancellation never persists changes. */
-    function finish(cancel=false){if(!gesture)return;const g=gesture;gesture=null;if(cancel&&g.id)positions=copyPositions(g.snapshot);if(cancel&&!g.id&&!g.link)canvas.scrollTo(g.left,g.top);if(g.target.hasPointerCapture(g.pointer))g.target.releasePointerCapture(g.pointer);svg.querySelector('.graph-link-ghost')?.remove();if(!cancel&&g.id)rememberPlacement(g.snapshot);update();if(!cancel&&g.id)save();else if(!cancel)persistView()}
+    function finish(cancel=false){if(!gesture)return;const g=gesture;gesture=null;if(g.card&&g.moved)g.suppressClick();if(cancel&&g.id)positions=copyPositions(g.snapshot);if(cancel&&!g.id&&!g.link)canvas.scrollTo(g.left,g.top);if(g.target.hasPointerCapture(g.pointer))g.target.releasePointerCapture(g.pointer);svg.querySelector('.graph-link-ghost')?.remove();if(!cancel&&g.id&&(!g.card||g.moved))rememberPlacement(g.snapshot);update();if(!cancel&&g.id&&(!g.card||g.moved))save();else if(!cancel)persistView()}
     /** Stage one link in the destination task form; never save from a gesture.
      * The engine checks cycles/activity/revision on explicit confirmation.
      */
@@ -681,8 +712,14 @@
       while(group.firstChild)open.append(group.firstChild);group.append(open);group.setAttribute('role','group');
       /** Selection mode replaces opening only for this renderer; ordinary mode
        * retains the task editor. A toggle performs no storage or engine write. */
-      function activateCard(){if(selectionMode){finish(true);if(selectedIds.has(id))selectedIds.delete(id);else selectedIds.add(id);updateSelection()}else editTask(work,work.tasks.find(t=>t.id===id))}
+      let suppressCardClick=false;
+      function activateCard(event){if(event?.detail&&suppressCardClick)return;if(selectionMode){finish(true);if(selectedIds.has(id))selectedIds.delete(id);else selectedIds.add(id);updateSelection()}else editTask(work,work.tasks.find(t=>t.id===id))}
       open.addEventListener('click',activateCard);
+      // A four-screen-pixel threshold distinguishes a click from a drag,
+      // matching the existing port gesture tolerance; never an engine policy.
+      open.addEventListener('pointerdown',e=>{if(e.button!==0)return;finish(true);suppressCardClick=false;open.focus({preventScroll:true});gesture={id,ids:movementIds(id),card:true,moved:false,suppressClick:()=>{suppressCardClick=true},target:open,pointer:e.pointerId,snapshot:copyPositions(),start:point(e),screen:{x:e.clientX,y:e.clientY}};open.setPointerCapture(e.pointerId)});
+      open.addEventListener('pointermove',e=>{if(gesture?.target!==open)return;const g=gesture;if(!g.moved&&Math.hypot(e.clientX-g.screen.x,e.clientY-g.screen.y)<=4)return;g.moved=true;e.preventDefault();const p=point(e);translateGroup(g.snapshot,g.ids,p.x-g.start.x,p.y-g.start.y);update()});
+      open.addEventListener('pointerup',()=>{if(gesture?.target===open)finish()});open.addEventListener('pointercancel',()=>{if(gesture?.target===open)finish(true)});
       open.addEventListener('keydown',e=>{if(!['Enter',' '].includes(e.key))return;e.preventDefault();activateCard()});
       const handle=svgNode('g',{class:'graph-drag',role:'button',tabindex:0,'aria-label':t('Déplacer la carte')+' '+id});handle.dataset.task=id;handle.append(svgNode('rect',{x:x+w-34,y:y+4,width:30,height:30,rx:6}),svgNode('text',{x:x+w-30,y:y+25},'⠿'));group.append(handle);
       handle.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();e.stopPropagation();finish(true);const before=copyPositions();translateGroup(before,movementIds(id),e.key==='ArrowLeft'?-16:e.key==='ArrowRight'?16:0,e.key==='ArrowUp'?-16:e.key==='ArrowDown'?16:0);rememberPlacement(before);update();save()});
@@ -691,7 +728,7 @@
       handle.addEventListener('pointerup',()=>finish());handle.addEventListener('pointercancel',()=>finish(true));
       const copy=svgNode('g',{class:'graph-copy',role:'button',tabindex:0,'aria-label':t('Copier l’identifiant')+' '+id});copy.dataset.task=id;copy.append(svgNode('title',{},t('Copier l’identifiant')+' '+id),svgNode('rect',{x:x+w-82,y:y+2,width:44,height:44,rx:6}),svgNode('text',{x:x+w-68,y:y+28},'ID'));group.append(copy);copy.addEventListener('pointerdown',e=>e.stopPropagation());copy.addEventListener('click',e=>{e.stopPropagation();copyId(id,copy)});copy.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();e.stopPropagation();copyId(id,copy)}});
       for(const side of ['in','out']){
-        const vertical=orientation==='TB',port=svgNode('circle',{class:'graph-port',role:'button',tabindex:0,r:9,cx:vertical?x+w/2:side==='in'?x:x+w,cy:vertical?(side==='in'?y:y+h):y+h/2,'aria-label':t(side==='out'?'Relier cette sortie':'Relier cette entrée')+' '+id});port.dataset.task=id;port.dataset.side=side;let suppressClick=false;group.append(port);
+        const vertical=orientation==='TB',port=svgNode('circle',{class:'graph-port',role:'button',tabindex:0,r:9,cx:vertical?x+w/2:side==='in'?x:x+w,cy:vertical?(side==='in'?y:y+h):y+h/2,'aria-label':t(side==='out'?'Relier cette sortie':'Relier cette entrée')+' '+id});port.dataset.task=id;port.dataset.side=side;port.append(svgNode('title',{},t(side==='in'?'Entrée : prérequis':'Sortie : dépendants')+' — '+id));let suppressClick=false;group.append(port);
         port.addEventListener('keydown',e=>{if(!['Enter',' '].includes(e.key))return;e.preventDefault();e.stopPropagation();activatePort(id,side)});
         port.addEventListener('click',e=>{e.stopPropagation();if(suppressClick){suppressClick=false;return}activatePort(id,side)});
         port.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();e.stopPropagation();port.focus();gesture={link:true,target:port,pointer:e.pointerId,start:point(e),moved:false};port.setPointerCapture(e.pointerId)});
@@ -705,7 +742,7 @@
     function centerMap(x,y){canvas.scrollLeft=x*zoom-canvas.clientWidth/2;canvas.scrollTop=y*zoom-canvas.clientHeight/2;updateViewport()}
     map.addEventListener('pointerdown',e=>e.stopPropagation());map.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const p=map.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const at=p.matrixTransform(map.getScreenCTM().inverse());centerMap(at.x,at.y);map.focus({preventScroll:true})});
     map.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key))return;e.preventDefault();e.stopPropagation();if(e.key==='Home')canvas.scrollTo(0,0);else if(e.key==='End')canvas.scrollTo(canvas.scrollWidth,canvas.scrollHeight);else{canvas.scrollLeft+=(e.key==='ArrowLeft'?-1:e.key==='ArrowRight'?1:0)*canvas.clientWidth/2;canvas.scrollTop+=(e.key==='ArrowUp'?-1:e.key==='ArrowDown'?1:0)*canvas.clientHeight/2}updateViewport()});canvas.addEventListener('scroll',()=>{updateViewport();persistView()});studio.addEventListener('scroll',()=>persistView());
-    canvas.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('.graph-noeud'))return;e.preventDefault();canvas.focus();gesture={target:canvas,pointer:e.pointerId,start:{x:e.clientX,y:e.clientY},left:canvas.scrollLeft,top:canvas.scrollTop};canvas.setPointerCapture(e.pointerId)});
+    canvas.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('.graph-noeud,.graph-arete'))return;e.preventDefault();canvas.focus();gesture={target:canvas,pointer:e.pointerId,start:{x:e.clientX,y:e.clientY},left:canvas.scrollLeft,top:canvas.scrollTop};canvas.setPointerCapture(e.pointerId)});
     canvas.addEventListener('pointermove',e=>{if(!gesture||gesture.id||gesture.link)return;canvas.scrollLeft=gesture.left+gesture.start.x-e.clientX;canvas.scrollTop=gesture.top+gesture.start.y-e.clientY});canvas.addEventListener('pointerup',()=>finish());canvas.addEventListener('pointercancel',()=>finish(true));
     /** Keep the graph point under the cursor stable on Ctrl+wheel. The native
      * scroll clamp applies at edges and the existing zoom limits are unchanged.
@@ -713,9 +750,9 @@
      */
     function zoomAtCursor(e){if(!e.ctrlKey)return;e.preventDefault();const at=point(e),view=canvas.getBoundingClientRect(),x=e.clientX-view.left-canvas.clientLeft,y=e.clientY-view.top-canvas.clientTop;zoom=Math.max(.15,Math.min(2,zoom+(e.deltaY<0?.15:-.15)));update();canvas.scrollLeft=at.x*zoom-x;canvas.scrollTop=at.y*zoom-y;updateViewport();save()}
     canvas.addEventListener('wheel',zoomAtCursor,{passive:false});
-    for(const edge of svg.querySelectorAll('.graph-arete')){edge.setAttribute('role','button');edge.setAttribute('tabindex','0');edge.setAttribute('aria-label',t('Retirer ce lien')+' '+edge.dataset.from+' → '+edge.dataset.to);const remove=()=>{const target=work.tasks.find(t=>t.id===edge.dataset.to);editTask(work,target,(target.depends||[]).filter(id=>id!==edge.dataset.from))};edge.addEventListener('click',remove);edge.addEventListener('keydown',e=>{if(['Enter',' ','Delete','Backspace'].includes(e.key)){e.preventDefault();remove()}})}
+    for(const edge of svg.querySelectorAll('.graph-arete')){edge.setAttribute('role','button');edge.setAttribute('tabindex','0');edge.setAttribute('aria-label',t('Modifier un lien')+' '+edge.dataset.from+' → '+edge.dataset.to);const remove=()=>{const target=work.tasks.find(t=>t.id===edge.dataset.to);editTask(work,target,(target.depends||[]).filter(id=>id!==edge.dataset.from))};edge.addEventListener('click',()=>inspectLink(work,edge.dataset.from,edge.dataset.to));edge.addEventListener('keydown',e=>{if(['Enter',' ','Delete','Backspace'].includes(e.key)){e.preventDefault();if(['Delete','Backspace'].includes(e.key))remove();else inspectLink(work,edge.dataset.from,edge.dataset.to)}})}
     studio.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(gesture||connection){e.preventDefault();e.stopPropagation();finish(true);connection=null;status.textContent=''}else if(selectionMode){e.preventDefault();e.stopPropagation();selectionMode=false;selectedIds.clear();updateSelection()}else if(modal.open){e.preventDefault();modal.close()}});
-    modal.addEventListener('close',()=>{if(disposed)return;finish(true);host.insertBefore(studio,modal);studio.classList.remove('is-fullscreen');document.body.classList.remove('graph-studio-open');full.textContent=t('Plein écran');full.setAttribute('aria-expanded','false');full.focus()});
+    modal.addEventListener('close',()=>{if(disposed)return;finish(true);host.insertBefore(studio,modal);studio.classList.remove('is-fullscreen');document.body.classList.remove('graph-studio-open');actionLabel(full,'Plein écran');full.setAttribute('aria-expanded','false');full.focus()});
     const viewportObserver=new ResizeObserver(()=>{if(disposed)return;host.graphRestoreView?.();updateViewport();persistView()});viewportObserver.observe(canvas);
     for(const id of ['pilot-layout-reset','pilot-layout-undo','pilot-layout-redo','pilot-view-reset','pilot-neighbors','pilot-neighbors-clear','pilot-export','pilot-orientation']){const control=toolbar.querySelector('#'+id);if(control)toolsBody.append(control===neighborSelect?neighbors:control)}
     const closeTools=document.createElement('button');closeTools.type='button';closeTools.id='pilot-tools-close';closeTools.textContent=t('Fermer les outils');toolsBody.append(closeTools);
@@ -727,7 +764,10 @@
      */
     function resizeTools(e){if(!e.matches&&tools.contains(document.activeElement))toolsToggle.focus();tools.open=e.matches;persistView()}
     media.addEventListener('change',resizeTools);
-    studio.append(toolbar,analysis,tools,help,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,canvas);host.replaceChildren(studio,modal);
+    decorate(toolsToggle,'tools');decorate(analysisToggle,'tools');
+    const legend=document.createElement('div');legend.id='pilot-graph-colors';legend.className='native-graph-color-key';legend.setAttribute('aria-label',t('Couleurs des états'));for(const [tone,label]of [['attente','à faire'],['active','en cours'],['attention','à vérifier'],['alerte','bloquée'],['validee','acceptée']]){const item=document.createElement('span');item.className='graph-teinte';item.dataset.etat=tone;item.textContent=t(label);legend.append(item)}
+    const gestureHint=document.createElement('p');gestureHint.className='native-graph-gesture-hint';gestureHint.textContent=t('Glissez un cadre pour le déplacer. Cliquez pour ouvrir la tâche ; cliquez sur une flèche pour modifier le lien.');
+    studio.append(toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,canvas);host.replaceChildren(studio,modal,help);
     /** Capture completed same-Work presentation, including deferred modal/scroll.
      * In-progress card movement and canvas panning are excluded, as on cancel.
      * Memory only; callers must compare Work IDs before restoring this object.
@@ -738,7 +778,7 @@
      * modal above a task editor; scroll is retained until its geometry is ready.
      */
     host.graphRestoreView=()=>{if(disposed||resumeFullscreen&&document.querySelector('.native-graph-editor[open]'))return;if(!resumeFullscreen&&(!canvas.clientWidth||!canvas.clientHeight))return;if(resumeFullscreen){resumeFullscreen=false;if(!modal.open)full.click()}if(pendingScroll){canvas.scrollTo(pendingScroll.left,pendingScroll.top);pendingScroll=null}if(pendingStudio){studio.scrollTo(pendingStudio.left,pendingStudio.top);pendingStudio=null}updateViewport()};
-    host.graphCleanup=()=>{finish(true);persistView();disposed=true;viewportObserver.disconnect();media.removeEventListener('change',resizeTools);if(exportUrl)URL.revokeObjectURL(exportUrl);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};updateSelection();update();host.graphRestoreView();lastViewAttempt=JSON.stringify(viewRecord());if(initial&&initial.orientation!==orientation)persistView(true);
+    host.graphCleanup=()=>{if(help.open)help.close();finish(true);persistView();disposed=true;viewportObserver.disconnect();media.removeEventListener('change',resizeTools);if(exportUrl)URL.revokeObjectURL(exportUrl);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};updateSelection();update();host.graphRestoreView();lastViewAttempt=JSON.stringify(viewRecord());if(initial&&initial.orientation!==orientation)persistView(true);
   }
 
   /**

@@ -23,7 +23,8 @@
     "docs/architecture/GRAPH-STUDIO.md",
     "docs/en/GRAPH-STUDIO.md",
     "version_history.json",
-    "package-lock.json"
+    "package-lock.json",
+    "tests/rust_graph_direct_ui.cjs"
   ],
   "environment": {},
   "steps": [
@@ -118,7 +119,11 @@
         "PASS en-sombre-analyst-cancel-rolls-back-entire-group",
         "PASS en-sombre-analyst-pointer-group-common-translation",
         "PASS en-sombre-analyst-origin-clamp-retains-relative-offset",
-        "PASS en-sombre-analyst-mobile-filter-320"
+        "PASS en-sombre-analyst-mobile-filter-320",
+        "PASS en-sombre-direct-body-drag-moves-card",
+        "PASS en-sombre-direct-help-is-modal",
+        "PASS en-sombre-direct-path-click-opens-link-modal",
+        "PASS en-sombre-direct-gestures-never-mutate-work"
       ],
       "required_stderr": []
     },

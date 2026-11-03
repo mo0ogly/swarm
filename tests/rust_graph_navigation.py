@@ -31,7 +31,7 @@ def main():
     binary, out = args.binary.resolve(), args.output.resolve()
     out.mkdir(mode=0o700, parents=True, exist_ok=False)
     retained.publish(out / 'binary.json',dict(path=str(binary),sha256=hashlib.sha256(binary.read_bytes()).hexdigest()))
-    source_names=['tests/rust_graph_navigation.py','tests/rust_graph_navigation_ui.cjs','tests/rust_graph_analyst_ui.cjs','web/cockpit-native-graph.js','web/cockpit-native.js','web/graph.css','web/i18n-en.js']
+    source_names=['tests/rust_graph_navigation.py','tests/rust_graph_navigation_ui.cjs','tests/rust_graph_analyst_ui.cjs','tests/rust_graph_direct_ui.cjs','web/cockpit-native-graph.js','web/cockpit-native.js','web/graph.css','web/i18n-en.js']
     source_hashes={name:hashlib.sha256(Path(name).read_bytes()).hexdigest() for name in source_names}
     retained.publish(out / 'inputs-before.json',source_hashes)
     for index,name in enumerate(source_names):

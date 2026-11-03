@@ -35,7 +35,7 @@ navigateur et14 contrôles Version ;7assets servis identiques. Sources parallèl
 postérieures non installées ; qualification globale Authority reste ouverte.
 [Critères, échecs et RETEX](GRAPH-REGRESSION-20261031.md#ergonomie-analyste-a1a3-livrée--rust298).
 
-Dernier incrément graphe : B1–B4 livrés localement en **v0.1.1-dev.303**,
+Incrément métier précédent : B1–B4 livrés localement en **v0.1.1-dev.303**,
 image `5f22359a9b0acfed477b0e2e95b80d814a81b08d885362f6ac060be8164f518a`.
 Duplication de définition, aperçu moteur, brouillon chiffré/application atomique,
 compensation du dernier lot ; plans manuels uniquement, aucun lancement implicite.
@@ -50,6 +50,30 @@ Revue corrective302→303 complète1/1 ; limites globales298→302/BLP/Authority
 conservées, aucun commit/push.
 [Suivi et RETEX](GRAPH-REGRESSION-20261031.md#clôture-b1b4--rust303) ·
 [Revue indépendante](GRAPH-BUSINESS-INDEPENDENT-20261101.md).
+
+Dernier incrément graphe UI : candidat308 qualifié, glissement direct de cadre,
+icônes/couleurs des outils, aide modale, modification/retrait explicites de lien.
+Trois recettes308 PASS/VERIFIED :14tests et1952assertions navigateur ; revue
+indépendante approve. Image e54a1dd5… activée via prepared-build exact ; identité
+/version/notes/capacités vérifiées. **Vérification publique U5 partielle** :
+Root en mode authority, cookie propriétaire limité aux sondes ; façade38433
+requiert la session humaine, navigateur CUA indisponible. Question utilisateur
+envoyée, ni7assets publics ni fenêtre Version revendiqués vérifiés. Reprise avec
+connexion publique et onglet authentifié/retour utilisateur ; aucun changement
+de compte/politique, aucune acceptation globale Authority/BLP, pas de commit/push.
+[Preuves, axes et limite](GRAPH-DIRECT-REVIEW-20261101.md).
+
+Incident public après308 : moteur309 assertion-v2 activé pendant que le démon
+installé restev1 ; assertion-format utilisateur confirmé par contrat et empreintes.
+Pas de downgrade ou acceptationv1. Récupération supportée préparée :
+`./swarm.sh authority install` sans identifiant sur installation initialisée,
+comptes préservés, erreurs/état connu explicites ;8tests/recette VERIFIED et revue
+indépendante approve. **Bloqué à l’étape sudo humaine**, aucune mise à jour
+système ou réparation effective revendiquée. Prévention générique de paire
+incompatible livrée le 31 octobre 2026 : garde lanceur avant tout arrêt
+(refus exit 2 sur paire divergente, reprise `./swarm.sh authority install`),
+reproduiseur `tests/test_local_pair_guard.py` 12 tests et recette
+`local-pair-guard.json` PASS sur v312. [Suivi](GRAPH-REGRESSION-20261031.md#prévention-paire-protocole-livrée-clôture-de-litem-ouvert).
 
 ## Point de reprise —28 octobre : consultation historique233 livrée
 

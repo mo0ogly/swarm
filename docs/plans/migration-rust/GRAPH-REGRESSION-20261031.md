@@ -1064,6 +1064,148 @@ hiérarchiques gardent leur parcours de révision de contrat, aucun undo génér
 ni restauration de preuves n’est ajouté. RETEX et transmission au prochain
 contexte par PLAN.md + docs produit FR/EN + tests/recette versionnés ; aucun
 contexte d’agent natif en cours n’est prétendu réécrit. Commit/push non réalisés.
+
+
+## Ergonomie visuelle et gestes — reprise après303
+
+Demande : déplacer les cadres plus naturellement, icônes et couleurs sur zoom/
+vue d’ensemble/outils, couleur lisible du graphe, aide des gestes en modale et
+ajout/modification/retrait des liens explicites. Méthodes APEX/replan, Codex
+implémente directement ; pas de nouveau droit de délégation/commit/push.
+U1 glisser le corps de carte sans ouvrir l’éditeur après drag, click/keyboard
+conservés, annulation et positions locales ; U2 icônes décoratives avec libellés
+et couleurs sémantiques, focus/contraste FR/EN/thèmes ; U3 modale d’aide nommée,
+Escape/fermeture/focus, aussi au-dessus du plein écran ; U4 création visible et
+explication liens par ports/formulaire, retrait confirmé ; U5 tests parcours,
+documentation et installation locale exacte. La suppression de tâches reste
+une clarification demandée, ne pas l’inventer via suppression de données SQL.
+Choix : rendre visible et prolonger les parcours publics existants plutôt que
+créer un second moteur de graphe. Les mutations task.add/update et autorisations
+existantes restent seules frontières métier ; déplacement et couleurs locaux.
+Ancien comportement observé : déplacement limité à une poignée, aide details,
+retrait d’un lien au clic ouvre directement le formulaire sans expliquer le geste.
+Préserver sources Authority/BLP parallèles et record307 observé.
+
+
+Premiers contrôles U1–U4 : témoin natif303 valide puis before303 FAIL attendu
+(icônes absentes). Iteration/ puis iteration2/ conservent deux défauts de mesure :
+les coordonnées de drag puis de clic après redimensionnement pouvaient être
+hors viewport ; le banc centre désormais explicitement la surface et garde
+points/hit-tests réels avant action. Iteration3/ confirme déplacement/annulation,
+aide modale mobile/plein écran et lien réellement cliqué (hit path conservé),
+mais retrouve une régression : l’aide persistante cachée portait la classe des
+éditeurs de tâche et faussait leur détection de présence. Correction du contrat
+de surface : classe dédiée à l’aide, styles partagés explicitement, sans changer
+les gardes d’édition. Garder assertion d’absence de faux éditeur après fermeture.
+
+
+Iteration4/ puis iteration5/ PASS ciblés FR/EN,2thèmes, readonly Work, glissement
+direct/annulation, aide modale/focus/plein écran, vrai clic path, remplacement
+et retrait préparés puis annulés, et parcours analyste antérieur. Contraste
+des contrôles rendu mesuré AA. Inspection mobile a montré une surface graphe
+trop réduite : commandes zoom/recherche/plein écran compactées en icônes avec
+texte accessible conservé, labels principaux visibles. Garde mobile : au moins
+une carte complète doit être visible dans le canvas et viewport, pas seulement
+absence de débordement. Résolution couleur Vue d’ensemble : override ID partagé
+neutralisait le style local ; sélecteur natif ciblé + assertion égalité au zoom.
+Pas de nouvelle palette ni règle opérateur. Les paragraphes de statut vides
+s’effacent, en-têtes secondaires mobiles gardent44px d’action sans doublepadding.
+Recette finale native à exécuter après build, preuve overlay non assimilée à
+ressources embarquées.
+
+
+Native308 : première recette graphe FAIL au garde svg-resolved-palette ;
+SVG original conservé dans graph-navigation-1ktr95gu/journey/browser/
+fr-etat-downloads/swarm-graph.svg. Les contrôles ouverture offline, sécurité,
+placement et absence de contrôles/ressources passent. Le garde exigeait préfixe
+rgb alors que getComputedStyle résout color-mix en color(srgb...). Revue
+indépendante confirme que le contrat promet palette résolue/autonome, pas cette
+syntaxe. Corriger la mesure : CSS.supports et refus var/currentColor/url, puis
+échantillonnageRGBA de la couleur réellement rendue offline contre celle source ;
+conserver JSON palette original. Aucun octet produit308 modifié, aucun contrôle
+de sécurité retiré. Rejouer graphe dans fresh graph-palette ; preuves responsive
+308 PASS réutilisables, métier308 continue sur ses sources inchangées.
+
+
+308 : graph-rgba PASS/VERIFIED (1561assertions), business PASS/VERIFIED
+(14tests +246assertions), responsive PASS/VERIFIED (145assertions). Nouveau
+garde échantillonne source/offlineRGBA ; contrôle XML namespace red/blue exact
+dans palette-namespace-control.json. Aucune source produit changée entre les
+échecs de mesure et cette recette. Revue indépendante UI308 approve, inventaires
+24/35/14 frais. Revue des politiques/fonctions/erreurs/docs et empreintes dans
+[GRAPH-DIRECT-REVIEW-20261101.md](GRAPH-DIRECT-REVIEW-20261101.md).
+
+Activation exacte308 réussie (e54a1dd539599fbac0a49aab33c353ead614eef47557101553fd7543f6349a6d),
+mais recette installée héritée échoue403 : le mode authority parallèle déplace
+le moteur en38434 et réserve le cookie owner aux sondes version/capabilities.
+La façade38433 requiert le compte utilisateur (401 sans session). Identité
+/proc/exe, version308, notes FR/EN exactes à l’archive et capacités Graph vérifiées
+dans installed308-identity.json ; ne pas prétendre aux7assets publics ou fenêtre
+Version vérifiés. CUA getState rapporte browser access host unavailable, aucun
+autre connecteur navigateur accessible. Pas de repli owner, pas de modification
+des comptes/politiques, pas de secrets récupérés. Demande utilisateur précise
+envoyée : se connecter à38433, recharger et confirmer les nouveaux outils/modale.
+U1–U4 PASS, U5 PARTIAL pour accès authentifié réel. Codex propriétaire de la
+vérification, utilisateur/connexion navigateur précondition de reprise.
+
+RETEX : les affordances doivent être testées par hit-test réel, pas seulement
+.click() synthétique ; centrer le viewport avant les coordonnées. Une modale
+persistante d’aide ne doit pas porter la classe de formulaire métier. L’export
+doît prouver une couleur rendue équivalente, pas une syntaxe de sérialisation.
+Enfin une recette d’installation doit choisir le parcours du mode d’accès
+effectif : owner-key ne prouve jamais une session humaine du démon authority.
+Le blocage restant est de preuve publique, aucun défaut fonctionnel Graph
+confirmé. Aucun commit/push pour ce nouvel incrément.
+
+
+## Incident assertion-format — livraison désynchronisée
+
+Après UI308, un autre incrément a activé moteur309 (pid2857217,
+c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b)
+avec domaine assertion-v2. Démon système355b754e… encore assertion-v1 ;
+release préparée4a0a81a4… assertion-v2. Rejet assertion-format partagé par
+l’utilisateur cohérent avec formatstrict avant signature : ne pas accepterv1
+pour contourner EP-06. Cause : remplacement du moteur seul, paire non livrée.
+Sudo -n true refuse interactive authentication required. /proc du démon autre
+UID refuse lecture (limite normale) ; empreinte root-owned installée et statut
+systemd conservés, ne pas prétendre cette lecture process réussie.
+Le registre Authority indique EP-06 fait/non installé ; preserve son travail.
+Recovery retenue : livraison supportée du démon puis moteur correspondant ;
+le downgrade308 n’est pas choisi (protection version/préparation et état nouveau).
+Préparation additive des sources partagées tools/swarm_local.py et
+deploy/authority/install.sh : mise à jour déjà initialisée sans admin/display
+fictifs, refus si installation fraîche ou marqueurs incomplets. Aucun compte/
+clé changé ; sudo humain reste une précondition effective de mise à jour.
+Prévention paire-protocole avant remplacement moteur reste ouverte à traiter
+au contrat de livraison, owner parcours local/Authority, contrôle observable
+refus sans arrêt sur paire incompatible puis reprise sur paire compatible.
+
+
+Récupération système préparée : noms admin/display désormais réservés à la
+première installation ; refresh sans argument exige initialized et pin/public_key
+avant effets. Aucune création de compte/clé/pin au refresh. Première régression
+FAIL avantfix,8tests nommés PASS, syntaxe shell et recette authority-refresh
+recipe2 PASS/VERIFIED. Refus initial recipe-observable-assertion-required conservé
+(recette syntaxe sans assertion) puis enveloppe observable corrigée, aucun fauxPASS.
+Revue indépendante d’abord request changes : lecture/configuration moteur après
+sudo perdait état connu dans diagnostic public. Contre-exemple public-before
+FAIL, correction chaînant cause et indiquant démon installé/suite non faite ;
+redémarrage non confirmé distingué. Handler __main__ réel testé sur source
+relocalisée avec commandes inertes, privé fixture non divulgué. Revue finale
+approve étroite, empreintes dans assertion-refresh/recovery-approved.json.
+Les docs lanceur FR/EN, commentaires fonctions et notes FR/EN sont actualisés.
+
+Aucune mise à jour système exécutée : sudo interactif humain requis. Commande
+préparée depuis checkout : ./swarm.sh authority install. Elle compile le démon,
+le réinstalle via sudo en conservant comptes, puis reconstruit/redémarre le
+moteur en mode authority. Reprise : opérateur exécute dans son terminal puis
+contrôler les deux binaires, native-version et le parcours public authentifié ;
+une session humaine doit se reconnecter après le redémarrage du démon. La
+prévention générique des remplacements moteur seuls incompatibles reste ouverte
+au contrat de livraison ; ne pas appeler cette récupération définitive ni
+annoncer assertion-format corrigé avant preuve du parcours réel.
+
+
 ## Prévention paire-protocole livrée (clôture de l'item ouvert)
 
 L'item « prévention paire-protocole avant remplacement moteur » est livré et
