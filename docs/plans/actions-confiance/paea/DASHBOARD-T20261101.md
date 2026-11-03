@@ -1,5 +1,12 @@
 # Tableau de bord PAEA — 1er novembre 2026
 
+Actualisation de périmètre P0 (3 novembre) : voir [P0-G0-20261103.md](P0-G0-20261103.md).
+L'absence de séparation UID ci-dessous concerne les services d'effet de la chaîne
+PAEA E2 ; le démon cockpit séparé UID993 existe, sans qualifier cette chaîne.
+La suppression/recréation de l'ancien FAIL run-13 reste historique : original
+introuvable dans les racines examinées, perte déclarée sans reconstruire de preuve.
+Les PASS datés ne deviennent pas des acceptations E3 ni des rejeux du code courant.
+
 Instantané d'état construit depuis les registres réels par `/apex`. Sources
 complètes en fin de fichier. Rappel : ce fichier est un instantané sourcé,
 pas une revendication d'acceptation ; les cas locaux de PA-01 ne sont pas les
@@ -8,14 +15,17 @@ campagnes T01…T22 exécutées.
 ## Candidat et blocage courant
 
 - Binaire désigné : `bin/swarm` SHA-256
-  `e2f0039a1f3a34957c161e770c4e5efdd46f4e3a16fc82fe9cf5d9761dc94da3`
-  (v0.1.1-dev.316, HEAD 562953dba3f8d6eaabca7beda35535b31a9390fa, posé
-  2026-11-02 22:10:33 — 10e remplacement depuis dev.292 ci-dessous ;
-  historique dev.315/186cc38b… et dev.292/4164953c… conservés pour contexte)
-  — re-vérifié deux fois : worktree gelé 562953dba3 (settlement run-15 7/7 +
-  chaîne chain-run-8 4/4) puis arbre vivant recompilé (settlement run-16 7/7 +
-  chaîne chain-run-9 4/4) — les quatre VERIFIED (extensions 02-11 soirée et
-  fin de nuit ci-dessous)
+  `3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a`
+  (v0.1.1-dev.322, commit 277e337cb400b81ed3d0beb620006a6ee7bdbcb9, modified=true,
+  construit 2026-11-03T10:11:15Z, posé 2026-11-03 11:16:56 — 11e remplacement
+  depuis dev.292 ci-dessous ; historique dev.316/e2f0039a…, dev.315/186cc38b… et
+  dev.292/4164953c… conservés pour contexte)
+  — re-vérifié sur l'arbre vivant (settlement run-17 7/7 + chaîne chain-run-10
+  4/4, les deux VERIFIED, extension 03-11 ci-dessous). Le précédent dev.316
+  e2f0039a… avait été re-vérifié deux fois : worktree gelé 562953dba3
+  (settlement run-15 7/7 + chaîne chain-run-8 4/4) puis arbre vivant recompilé
+  (settlement run-16 7/7 + chaîne chain-run-9 4/4) — les quatre VERIFIED
+  (extensions 02-11 soirée et fin de nuit ci-dessous)
 - Déclaration E2 bornée : **émise** le 31 octobre 2026
   (`claude-e2-arbitrage-20261031T135859Z/DECLARATION-E2.md`) — règlement 6/6 et
   chaîne 4/4 PASS VERIFIED sur fixture regen-5 ; clôt l'étape PA-10 seulement.
@@ -44,15 +54,17 @@ campagnes T01…T22 exécutées.
 | T11 | I04/I05/I11/I15 | PASS | `paea-i15-tool-substitution-rust.json` / `claude-i15-readmission-20261031T100227Z` (mutation → réadmission prouvée produit) | Campagne complète non jouée |
 | T12 | I11 | bloquée | — | Évaluateur indépendant E3 (0/17) |
 | T13 | I13 | bloquée | — | Confinement egress absent |
-| T14 | I02/I14 | conception manquante | — | Design A2A puis code |
+| T14 | I02/I14 | conception déposée | `T14-A2A-DESIGN.md` (02-11 : décisions D1–D7, chaîne d'admission, critères) | Portage `delegation` + code A2A ; identité réelle (I02) |
 | T15 | I15 | PASS | même preuve que T11 (admission + substitution refusée) | Inventaire ACS (entrées externes) |
 | T16 | I12/I16 | PASS | `paea-i16-lease-reopen-rust.json` (30-10, bloc 9) + contrat 8 cas (glm-order-receipt-20261030T075024Z) | Limites distribuées séparées |
-| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-13` (ELF 186cc38b…, 02-11 midi, 7/7 VERIFIED, étape I17 révocation comprise ; run-12/cdde554a, run-11/41f00bf9 et antérieurs conservés) ; **re-vérifié sur livré courant e2f0039a… (02-11 soir) : `settlement-run-15` 7/7 + `chain-run-8` 4/4 VERIFIED sur worktree gelé 562953dba3** | Propagation production |
+| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-13` (ELF 186cc38b…, 02-11 midi, 7/7 VERIFIED, étape I17 révocation comprise ; run-12/cdde554a, run-11/41f00bf9 et antérieurs conservés) ; **re-vérifié sur livré courant 3146c837… (03-11) : `settlement-run-17` 7/7 + `chain-run-10` 4/4 VERIFIED sur l'arbre vivant** ; précédent e2f0039a… : `settlement-run-15` 7/7 + `chain-run-8` 4/4 sur gel 562953dba3, puis run-16 + chain-run-9 sur arbre vivant | Propagation production |
 
-Re-vérification du livré courant dev.316/e2f0039a : **complète** (02-11 soir —
-run-15 settlement 7/7 + chain-run-8 4/4 VERIFIED sur worktree gelé
-562953dba3 ; l'arbre vivant restait incompilable par autrui, voir extension
-soirée ci-dessous).
+Re-vérification du livré courant dev.322/3146c837 : **complète** (03-11 —
+run-17 settlement 7/7 + chain-run-10 4/4 VERIFIED sur l'arbre vivant,
+l'arbre recompilant après l'atterrissage du consommateur ; voir extension
+03-11 ci-dessous). Re-vérification du précédent dev.316/e2f0039a : complète
+(02-11 soir — run-15 settlement 7/7 + chain-run-8 4/4 VERIFIED sur worktree
+gelé 562953dba3, puis run-16 + chain-run-9 sur arbre vivant recompilé).
 | T18 | I03/I14 | non exercée | — | Périmètre E3 uniquement |
 | T19 | I06/I13 | non exercée | — | Périmètre E3 + confinement I06/I13 |
 | T20 | I04/I15 | non exercée | — | Périmètre E3 uniquement |
@@ -66,7 +78,8 @@ soirée ci-dessous).
 - Partielle : 3/22 (14 %) — T02, T07, T21
 - Bloquée humain/OS : 6/22 (27 %) — T03, T08, T10, T12, T13, T22
 - Non exercée E3 : 3/22 (14 %) — T18, T19, T20
-- Conception manquante : 1/22 (5 %) — T14
+- Conception déposée : 1/22 (5 %) — T14 (design A2A `T14-A2A-DESIGN.md`,
+  non implémenté ; le code et les preuves restent à produire)
 - Invariants en vérification locale partielle : 10/17 (59 %) — I01, I04, I05,
   I08, I09, I12, I16, I17 + partiels I03, I15
 - Acceptation indépendante : 0/17 (0 %)
@@ -203,6 +216,21 @@ soirée ci-dessous).
   compris — toutes deux sur l'arbre vivant, sans gel. Le livré courant porte
   donc une preuve sur chacune des deux surfaces : gel 562953dba3 (run-15 +
   chain-run-8) et arbre vivant (run-16 + chain-run-9).
+- Extension 03-11 — 11e remplacement : e2f0039a… →
+  `3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a`
+  (v0.1.1-dev.322, commit 277e337cb4 — le lot de re-vérification 02-11 committé
+  —, modified=true, construit 10:11:15Z, posé 11:16:56, porte de stabilité
+  verte — 3 sondes sha256 sur ~90 s). Recettes settlement + chaîne re-épinglées
+  depuis le hash réel `sha256sum` (cross-check épine=réel, 8/8 puis 3/3
+  occurrences). L'arbre vivant recompile (cargo check `swarm-web` +
+  `swarm-cli --tests` : 0 erreur) — exécution directe sans gel. Settlement
+  `settlement-run-17` 7/7 PASS VERIFIED `source_stable: true` (23 spawns
+  témoins `sha256=3146c837…`), puis chaîne `chain-run-10` 4/4 PASS VERIFIED
+  `source_stable: true` (15 spawns témoins), refus de SHA erroné exercé
+  (étape 4) — preuves dans `.swarm-fixtures/i17-rerun/`. Le livré courant
+  dev.322 est intégralement re-vérifié sur l'arbre vivant ; les preuves du
+  précédent dev.316 (run-15/16 + chain-run-8/9) restent conservées comme
+  historique.
 
 ## Portée et limites
 

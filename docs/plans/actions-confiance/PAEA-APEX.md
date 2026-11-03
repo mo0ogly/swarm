@@ -1,5 +1,15 @@
 # PAEA — plan APEX adopté et suivi d’exécution
 
+## Point courant P1/G1 — 3 novembre 2026
+
+Première tranche locale [accord séparé exact du règlement](paea/P1-G1-20261103.md)
+livrée en dev.322, image 3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a.
+Preuves noyau/CLI, recette sur image exacte, régression Git et revue des sept
+entrées effectives ; métadonnées et dialogue Version FR/EN observés. G1 global,
+enrôlement humain, services protégés et E3 restent ouverts. Les anciennes
+déclarations E2 et leurs images gardent leur portée historique, sans requalification
+globale de la nouvelle image par ces seuls tests.
+
 [English](../../en/plans/actions-confiance/PAEA-APEX.md) ·
 File APEX (`../FILE-APEX.md`, suivi local hors de cette publication) · AC-02 (`securite-execution-apex.md`, suivi local hors de cette publication)
 
@@ -280,7 +290,9 @@ source unique de l’état détaillé ; synthèse de reprise dans
 [POINT-ETAPE-20261029.md](paea/POINT-ETAPE-20261029.md). Résumé d’état au
 31 octobre 2026 : vérification locale partielle I01, I04, I05, I08, I09, I12,
 I16, I17 ; candidats incomplets I06, I13 (BT02, egress non confiné) ; prérequis
-humain/OS I02, I07, I10 ; conception manquante I14 (A2A) ; provenance partielle
+humain/OS I02, I07, I10 ; conception manquante I14 (A2A — conception déposée
+le 2 novembre 2026 dans [T14-A2A-DESIGN](paea/T14-A2A-DESIGN.md), non
+implémentée, I14 reste NON ÉTABLI) ; provenance partielle
 I03 ; acceptation indépendante 0/17 (I11).
 
 T11 complète I04/I05/I11/I15 : mutation politique/source/candidat invalide la
@@ -328,6 +340,32 @@ Le programme reste ouvert après M4. La désactivation d’un projet protégé e
 une décision autorisée ; aucun repli permissif automatique.
 
 ## État réel et reprise
+
+### P0/G0 — 3 novembre 2026
+
+Incrément base/statut/preuves autorisé : [bilan et limites](paea/P0-G0-20261103.md).
+Séparation UID du démon cockpit distincte de l'autorité des effets PAEA. Les
+observations suivantes restent datées ; aucun G1…G7 ni verdict indépendant revendiqué.
+
+### État courant — 3 novembre 2026 (matin)
+
+Candidat unique livré localement : `bin/swarm` SHA-256
+`3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a`
+(v0.1.1-dev.322, commit 277e337cb4 — le lot de re-vérification 02-11 committé —,
+modified=true, construit 2026-11-03T10:11:15Z, posé 2026-11-03 11:16:56 — 11e
+remplacement). Porte de stabilité verte (3 sondes sha256 sur ~90 s). Recettes
+settlement + chaîne re-épinglées sur ce livré depuis le `sha256sum` réel
+(cross-check épine=réel, 8/8 puis 3/3 occurrences). L'arbre vivant recompile
+(`cargo check -p swarm-web -p swarm-cli --tests` : 0 erreur) — exécution
+directe, sans gel. **Résultat (03-11 matin) : re-vérification complète du
+livré courant — settlement run-17 7/7 PASS puis chain-run-10 4/4 VERIFIED sur
+l'arbre vivant, `source_stable: true` aux deux, refus de SHA erroné exercé**
+(`i17-rerun/settlement-run-17/` : 23 spawns témoins `sha256=3146c837…` ;
+`i17-rerun/chain-run-10/` : 15 spawns témoins, étape 4 = refus de SHA erroné).
+Acceptation indépendante : 0/17, inchangée ; les sept critères ouverts E2
+restent opérants. Le bloc « État courant — 2 novembre 2026 (soirée) »
+ci-dessous est conservé comme historique (run-15/16 + chain-run-8/9 sur
+e2f0039a…).
 
 ### État courant — 2 novembre 2026 (soirée)
 
@@ -2995,6 +3033,33 @@ identité simulée, aucun enrôlement réel, aucune approbation produit) ; le
 rejoue complet garde/session-refus/lecture/accord/stale reste exigé avant
 toute remise acceptée ; aucun build/install/serveur ; aucun commit/push.
 
+## Raccord BLP — quarantaine de préparation livrée, 1er novembre 2026
+
+BLP-05 progresse partiellement : verrou dédié sur admission, worker et transport
+API/CLI, politique persistée éditable Admin/API/CLI, refus sans émission et reprise
+explicite. Version locale299, profil normal sans fixture, actualisée et vérifiée.
+[28 assertions publiques et59 Admin](verification-blp/20261101-preparation-quarantine-public-02/result.json),
+[preuve de livraison](verification-blp/20261101-preparation-quarantine-installed-01/delivery-scope.json),
+[revue de l’incrément](verification-blp/20261101-preparation-quarantine-source-review.json).
+Ces témoins utilisent des récepteurs inertes : aucune migration/classification de
+données réelles, aucun fournisseur réel ni identité humaine de déclassification.
+Ils ne clôturent aucun invariant transversal, scénario T07/T08/T13/T19 complet,
+revue indépendante ou BLP-04/05/06. `runtime_enforced:false` reste maintenu.
+Le [plan technique BLP](BLP-APEX.md) conserve les refus originaux et la suite :
+producteurs/principal/domaine fixe → destinataire/compte → héritage du résultat,
+puis médiation OS/descendants, migration et déclassification humaine exacte.
+
+BLP — producteur de sources capturées livré304 : attribution I3/admin habilitée
+depuis les octets du tour vérifié,103 assertions publiques,2+1 tests Rust et56
+contrôles navigateur. Preuves et limites dans BLP-APEX.md, livraison du1er novembre.
+Aucun invariant PAEA, T07/T08/T13/T19 ou chantier Bell-LaPadula global clôturé.
+
+BLP309 : domaine du prompt fixé sous principal Trust authentifié dans une
+capsule privée sans transport/tour/réservation.74 assertions publiques et103
+régressions passent ; activation et22 sources vérifiées,56 contrôles UI sur
+fixture de la même image. UI réelle Authority encore OPEN, sans clôture globale
+PAEA/BLP ; preuves/limites dans BLP-APEX.md (admission pré-transport).
+
 ### Incrément121 — T09/I08 : fractionnement de dette et cumul par re-clé refusés sur l'ELF livré (vérification, Claude)
 
 Tâche bornée (dossier de preuves `.swarm-fixtures/i17-rerun/i17-run-13/`,
@@ -3046,3 +3111,626 @@ séparation UID, d'enrôlement humain, de paiement réel ou d'acceptation
 indépendante — T09 passe de « partielle » à « complète localement » pour la
 fraction agent-actionnable (fraction humaine/OS inchangée) ; PAEA17 et
 l'acceptation indépendante 0/17 restent ouverts.
+
+### Réception de supervision PA09 — 3 novembre 2026
+
+État borné, pas une clôture de PA-00…PA-13 ni du RETEX final. Le lecteur du
+rapport PA09 a été codé uniquement par GLM. Codex a personnellement exécuté
+93 assertions du composant sur doubles HTTP étiquetés, puis 19 contrôles
+navigateur sur l'ELF natif normal v316 et quatre gardes Python de préservation.
+La recette native permanente comporte désormais i18n → quatre gardes →
+navigateur ; les trois étapes ont de vraies sorties 0 et son archive a été
+vérifiée. [Réception directe](paea/evidence/20261028-acquisition81-mvfdts57/glm-pa09-native-guard-recipe-20261102T230553Z/supervisor-receipt.json).
+
+L'image gérée v316, SHA256
+e2f0039a1f3a34957c161e770c4e5efdd46f4e3a16fc82fe9cf5d9761dc94da3,
+a été activée par restart --prepared-build après contrôle personnel du profil,
+des 754 entrées archivées, du véritable ELF et des huit assets servis en fixture.
+Les notes FR/EN de l'API native égalent l'archive ; cela ne prouve pas le dialogue
+Version au frontal d'autorité, toujours soumis à la connexion humaine déjà
+demandée. Les sept entrées plus récentes signalées par le lanceur ne sont pas
+déclarées installées. Les refus bare/inconnu de la fixture vierge ne prouvent
+pas une lecture positive sous Trust configuré. Celle-ci reste la prochaine
+frontière native, sans fabriquer d'enrôlement humain, d'UID ou d'indépendance.
+
+Les échecs originaux restent dans les dossiers de session : mauvais chemin
+d'assets, attente de succès sans témoin positif, baselines de compteurs
+différentes, fermeture HTTP incomplète, écrasement d'une ancienne preuve sur
+refus. Les corrections ont été recontrôlées directement ; les erreurs de suivi,
+les coupures DNS et la compaction répétée n'ont pas été transformées en PASS.
+PA-10…PA-13, E3, confinement, provenance externe, acceptation humaine et RETEX
+final gardent leurs critères et leurs preuves antérieures ; aucune acceptation
+globale n'est déduite de ces recettes.
+
+English — bounded supervisor receipt, not programme completion: GLM authored
+the report-reader code; Codex directly verified 93 component assertions,
+19 native browser checks and four Python preservation guards. The permanent
+three-step native recipe and its retained archive pass. Managed v316 was
+activated with the exact prepared image above; native fixture assets and FR/EN
+API notes match the build archive. Protected authority Version-dialog reception,
+a positive configured-reader native witness and the existing PA00–PA13/final
+RETEX acceptance criteria remain open. Historical failures and scope limits are
+preserved; no human enrollment, UID separation or independent acceptance is
+claimed.
+
+
+### Réception directe PA09 — 3 novembre 2026, 01:50 UTC
+
+Codex a personnellement exécuté le témoin API natif reconcile_effects_native_binary_positive_reader_frontier_empty_ledger : 1 exécuté PASS, 0 ignoré, puis les 6 tests par défaut PASS (le natif séparément reçu est ignoré dans ce second run). Sources stables avant/après. ELF316 qualifié e2f0039a1f3a34957c161e770c4e5efdd46f4e3a16fc82fe9cf5d9761dc94da3 : deux Roots privés distincts, refus lecteur, attribution publique du rapport exact vide, positif, inconnu, récupération, snapshots par phase, arrêt propre observé. Identités fixture same-UID seulement : aucun enrôlement, confinement ou accord humain établi.
+
+Preuve : paea/evidence/20261028-acquisition81-mvfdts57/glm-pa09-native-signal-type-20261103T013508Z/supervisor-receipt.json. Refus initiaux (requête settings mal typée, puis deux E0308) conservés. Conservation complète durable des flux enfant ouverte, tâche GLM bornée en cours avant le témoin UI natif positif. Dialogue Version protégé, PA00–PA13 et RETEX ouverts. Aucune nouvelle installation revendiquée pour ces ajouts de tests.
+
+Codex personally ran the exact native API witness (1 executed PASS, 0 ignored), then six default regression tests (6 PASS), with stable source inventories. This proves the empty-report reader frontier against qualified ELF316 in private distinct fixture Roots. Human enrollment, OS confinement, native positive browser behavior and global acceptance remain unproven. Complete durable child output retention is assigned to the next bounded GLM task; protected Version dialog and PA00–PA13/RETEX remain open.
+
+### Correction stockage capture brute PA09 — 3 novembre 2026 (édition GLM bornée, NON TESTÉE)
+
+Correction bornée du stockage de `RawCapture` dans
+`rust/crates/swarm-web/tests/paea_reconcile.rs` (témoin natif), après la
+réception E0308 de 01:50 : l'appel `store("exit.json", …)` emprunte désormais
+la sérialisation (`&`), et le stockage devient exclusif et durable —
+réservation par `from_env` d'un dossier NEUF 0700 par `create_dir` unique
+(parent existant exigé, jamais `create_dir_all` : un dossier créé
+concurrentement par autrui ne peut être ni revendiqué ni chmodé ; réutilisation
+ou revendication concurrente refusées sans écriture) AVANT le spawn ; fichier
+temporaire privé `.name.partial` 0600 en création exclusive (jamais d'écrasement
+ni de suivi de symlink), fsync fichier, publication par `hard_link` EXCLUSIF
+(un nom déjà publié reste intact, jamais de rename par-dessus), fsync dossier,
+puis retrait du temporaire resynchronisé ; chemin effectif sous `/tmp` refusé
+via le parent canonique, sans écriture ; écriture partielle ou échec de
+conservation : fichier publié conservé et cause préservée (panique chemin
+nominal, `eprintln` au Drop chemin d'échec) ; `SWARM_PAEA_NATIVE_EVIDENCE_DIR`
+reste REQUISE pour le témoin natif — aucun PASS sans preuve, aucun état produit
+créé. drains/lifecycle (`split_drain`, joins, nettoyage enfant) NON modifiés :
+résidus explicites de la tâche suivante. Contrats documentés dans les
+docstrings et le bloc de séquence du témoin (étape 8). Édition Read/Edit seule,
+sans compilation ni exécution : statut NOT TESTED ; compile, run exact
+(1 natif + 6 default contre ELF316 e2f0039a…) et refus de réutilisation
+appartiennent à Codex. Aucune acceptation déduite.
+
+English — bounded GLM edit, NOT TESTED: fixed `RawCapture` storage in the
+native witness — E0308 borrow at the `exit.json` store call; `from_env` now
+EXCLUSIVELY reserves a FRESH 0700 directory with a single `create_dir`
+(pre-existing parent required, never `create_dir_all`, so a concurrently
+created foreign directory can neither be claimed nor chmod'ed; reuse and
+concurrent claims refused with nothing written) BEFORE the spawn; files are
+published through an exclusive-create 0600 private temp (no overwrite, no
+symlink follow), file fsync, EXCLUSIVE `hard_link` publication (an already
+published name is never replaced by a rename), directory fsync and resync'ed
+temp removal; `/tmp` paths refused through the canonicalized parent with no
+write; partial writes keep the original file and the real cause (panic on the
+success path, `eprintln` at Drop on the failure path);
+`SWARM_PAEA_NATIVE_EVIDENCE_DIR` stays REQUIRED — no PASS without evidence, no
+product state created. Drains/lifecycle (`split_drain`, joins, child cleanup)
+are intentionally untouched: explicit residual for the next task. Function
+contracts documented in docstrings and the witness sequence block (step 8).
+Read/Edit-only edit without compile or run: NOT TESTED; compile, the exact
+native run (1 native + 6 default against ELF316 e2f0039a…) and the
+reuse-refusal check belong to Codex. No acceptance is derived.
+
+
+### Réception directe PA09 navigateur natif — 3 novembre 2026, 04:08 UTC
+
+Codex a personnellement exécuté le témoin sur ELF316 : 1 test natif PASS, sortie réelle 0 et sources stables ; navigateur réel, 14 contrôles nommés, 0 diagnostic inattendu, 4 refus attendus, 7 GET de rapprochement. Le même écran FR affiche le rapport vide exact attribué, puis purge tous les états/JSON au refus lecteur inconnu et récupère le rapport avec le lecteur reconnu. EN mobile, clavier et changement de thème sont contrôlés. Les deux captures ont été inspectées ; la capture EN était prise après changement vers etat, donc aucune conformité visuelle complète du thème sombre n'est revendiquée. La capture brute nominale et l'échec volontaire après S1 ont aussi été reçus : sorties enfant complètes, vrai exit 0 après récolte, refus de valeur invalide avant capture, six régressions PASS.
+
+Preuves : paea/evidence/20261028-acquisition81-mvfdts57/glm-pa09-browser-final-privacy-20261103T040513Z/supervisor-receipt.json et glm-pa09-native-fault-witness-20261103T030550Z/supervisor-receipt.json. Nouvelle tâche GLM bornée : recette pérenne avec vérification stricte des artefacts natifs et des assertions réellement exécutées. Aucun changement produit ou installation nouvelle revendiqué. Rapport vide et identités fixture same-UID uniquement ; Version protégée, acceptation globale PA00–PA13 et RETEX restent ouverts.
+
+Codex personally received the real native browser witness: one executed PASS, real exit zero, stable sources, 14 named browser checks, no unexpected diagnostic, same-page positive/denial/purge/recovery, FR/EN and keyboard coverage. Empty-report fixture scope only. The permanent recipe is the next bounded GLM task; protected live Version dialog and global PA00–PA13/RETEX acceptance remain open.
+
+
+### Réception recette native lecteur — 3 novembre 2026, 04:36 UTC
+
+Codex a exécuté personnellement la recette pérenne paea-native-reader-ui : deux étapes PASS, entrées déclarées stables, puis recipe.py verify = VERIFIED/PASS. Le wrapper conserve le vrai run exact (1 PASS, 0 ignoré, 9 autres filtrés), les deux exits enfant, 14 contrôles navigateur nommés, les sorties natives complètes et les images FR/EN/EN sombre. La capture EN sombre a été inspectée personnellement. Trois refus du wrapper (sortie préexistante, parent absent, /tmp) ont été exercés sans modifier le témoin préexistant. git diff --check ciblé = 0.
+
+Preuves : paea/evidence/20261028-acquisition81-mvfdts57/glm-pa09-native-recipe-contract-20261103T042028Z/supervisor-receipt.json ; 17 fichiers de run retenus et re-hashés dans supervisor-retained-native-browser, hors cache ; le profil Chrome régénérable seul est exclu de cette copie. Les échecs précédents restent intacts. Ce résultat porte sur le rapport VIDE de deux Roots fixture ; la prochaine tâche GLM bornée vise le témoin API natif NON VIDE par le producteur public existant. Aucun code produit ni nouvelle installation revendiquée. Version protégée, identités humaines, séparation OS, acceptation indépendante PA00–PA13 et RETEX restent ouverts.
+
+The canonical native reader browser recipe and retained evidence integrity were personally verified. This remains empty-report fixture coverage, not global acceptance. A bounded nonempty native API witness is next, using the existing public fixture producer and preserving the received empty-case behavior.
+
+
+### Réception superviseur — 3 novembre 2026, contrôle 06:06–06:18 UTC
+
+Le correctif de retour à la ligne PA-09 est construit dans le candidat local317
+(ELF SHA256 `2eb7519fc924aeb398aa65936f2e80c18f4a31407e6792b919c7a14955b3dba3`).
+Le témoin316 échoue à390px sur les identifiants non vides ;317 passe les14 assertions
+fonctionnelles et les gardes horizontales, sans couper le texte canonique. Les8
+ressources HTTP et les métadonnées natives FR/EN sont reçues sur fixture ; ce n’est
+pas le dialogue Version protégé du compte humain. L’instance gérée reste316 prête.
+
+La comparaison des29 entrées de production avec316 a révélé des dépendances de
+qualification. Codex a exécuté personnellement les2 tests de lecteurs de dialogue,
+le test de transport worker et les2 tests du ledger web :5 tests nommés passent,
+inventaire Rust avant/après identique. La recette worker passe ses3 étapes et sa
+vérification de preuves. La recette de dialogue échoue réellement dès le cœur,
+après8 assertions, sur `dialogue-active-pending-refuses` : le binaire retourne une
+observation legacy alors que l’ancienne recette attend501/unported. Le producteur
+`active_history` autorise explicitement ces observations sans adoption ni mutation.
+Il faut rapprocher le contrat livré, ses tests et sa documentation avant de corriger
+l’oracle ou le produit ; aucun PASS hérité ni activation pendant ce refus requis.
+Les étapes navigateur dépendantes n’ont pas été exécutées.
+
+L’inventaire BLP comporte67 références/25 flux, et non65 comme annoncé par GLM ;
+5 références donnent9 diagnostics source/ancre. Un lot GLM borné répare cet
+inventaire après revue sémantique, sans écrire les sources testées ni clôturer BF-16.
+Une reprise a écrit son suivi dans l’ancien dossier : client propre interrompu
+après contrôle PID/boot/start/session, écritures conservées, ancien status restauré
+depuis son stream original ; ancien PROGRESS non récupérable comme original, donc
+non utilisé comme preuve. Nouveau paquet avec chemin absolu explicite ; réception
+au bon chemin à contrôler. Cet incident de transmission reste distingué du produit.
+
+Les politiques et erreurs du nouveau diagnostic Authority ne sont pas acceptées
+par la formule GLM « borne technique » : rétention8MiB et lecture interrompue
+silencieusement restent à qualifier. Ce daemon possède un exécutable et une
+installation séparés ; le build moteur317 ne prouve pas sa livraison. Ne pas
+étendre implicitement PAEA à son développement ; contrôler les consommateurs
+moteur/ressources et leur compatibilité avec le daemon réellement installé.
+
+Preuves : `paea/evidence/20261028-acquisition81-mvfdts57/`
+`glm-pa09-candidate-delta-qualification-20261103T054910Z/supervisor-reception-v2.json`,
+`supervisor-native-targeted/`, `supervisor-native-recipes/`,
+`supervisor-dialogue-diagnostic.json`, `supervisor-dialogue-failure-retained/` ;
+repère courant `paea/evidence/CURRENT-GLM.json`. Propriétaire : Codex supervision et
+vérification, GLM corrections bornées. PA00–PA13 et RETEX global restent ouverts.
+
+
+### Réception superviseur — inventaire BLP, 3 novembre 2026 06:23 UTC
+
+Le lot GLM `glm-pa09-inventory-path-recovery-20261103T061619Z` est reçu sur son
+périmètre déclaré : les cinq références relues correspondent personnellement aux
+empreintes et lignes courantes ; la recette déclare67 références/25 flux et passe
+ses2 étapes, dont5 tests nommés de refus/reprise, puis `verify` retourne
+`VERIFIED/PASS`. Sorties brutes lues par Codex ; aucun droit runtime ni clôtureBF-16
+n’en découle. Le schéma du suivi a de nouveau fourni `next_evidence` comme tableau :
+original conservé puis normalisé en chaîne par le superviseur ; le paquet suivant
+impose explicitement les types attendus pour prévenir la récidive.
+
+Lot suivant unique : `glm-pa09-dialogue-recipe-recovery-20261103T062304Z`.
+GLM doit rapprocher les assertions legacy actives de la recette dialogue du
+producteur `active_history` et de sa régression existante, puis corriger l’oracle
+si son obsolescence est établie, en conservant les refus réels et les assertions
+sans mutation/adoption. Pas de changement produit Rust autorisé dans ce lot ;
+une cause produit établie sera remise pour décision bornée. Codex réexécutera la
+recette complète après remise stable. Le candidat317 reste non activé ; aucune
+acceptation globale ni installation vérifiée n’est annoncée.
+
+Preuves de réception : `paea/evidence/20261028-acquisition81-mvfdts57/`
+`glm-pa09-inventory-path-recovery-20261103T061619Z/supervisor-receipt.json`,
+`supervisor-inventory-recipe/`, `supervisor-run-results.json` et sorties `run/verify`.
+
+
+### Replan de supervision — 3 novembre 2026 06:39 UTC
+
+Le paquet dialogue complet a produit plus de240 lectures/recherches, aucun
+correctif et un suivi non actualisé ; il a aussi créé un placeholder hors
+périmètre et tenté Bash, effectivement désactivé. Le superviseur a interrompu
+son client après vérification propriétaire/boot/start/session, conservé les
+preuves et retiré seulement le placeholder identifié après conservation des
+octets et de leur empreinte. Pas de processus d’autrui arrêté. Le lot est
+redécoupé au seul oracle Python core ; navigateur dépendant remis après sa
+réception. La première relance contenait un mauvais chemin documentaire donné
+par Codex : client propre arrêté, original conservé, paquet corrigé vers les
+pages PAEA FR/EN existantes. Aucun correctif produit n’est revendiqué par ces
+mesures de supervision.
+
+Le lot unique `glm-pa09-dialogue-core-input-fixed-20261103T063906Z` a reçu la
+consigne correcte et commencé les éditions de `tests/rust_preparation_dialogue.py`.
+Pas de test Codex sur sources en modification. Remise stable et réexécution core
+restent requises, puis navigateur complet ; candidat317 toujours suspendu.
+Preuves d’incident : lots `glm-pa09-dialogue-recipe-recovery-20261103T062304Z/`
+`supervisor-replan-diagnostic.json`, `supervisor-stray-preservation.json` et
+`glm-pa09-dialogue-core-oracle-20261103T063816Z/supervisor-prompt-path-correction.json`.
+
+
+### Réception directe et dépendance suivante — 3 novembre 2026 06:55 UTC
+
+Core dialogue corrigé par GLM, personnellement rejoué par Codex sur ELF317 exact :
+41 assertions nommées PASS, sortie0, empreintes des entrées avant/après identiques.
+La recette complète conservée passe core, puis échoue réellement au navigateur
+sur `fr-etat-history-no-send-adopt-controls`, après3 assertions. La sortie Node et
+son erreur sont conservées hors cache, avec la sortie1 réelle du wrapper ; étape
+native-preparation non exécutée. Le produit expose les contrôles si un provider
+éligible existe, même appels désactivés ; la fixture historique hérite justement
+un provider du constructeur partagé. Lot suivant borné : établir explicitement
+l’absence de capacités sur cette seule fixture, affirmer le vrai endpoint puis
+rejouer les contrôles historiques. Ne pas supprimer leur assertion. Une lacune
+du core reçu (dump non comparé après HTTP avant restauration) est confiée à GLM
+dans ce même lot de fixture pour compléter la preuve sans changer le compteur41.
+
+Preuves : `glm-pa09-dialogue-core-input-fixed-20261103T063906Z/`
+`supervisor-core-run/`, `supervisor-full-recipe/`,
+`supervisor-browser-failure-retained/`, `supervisor-receipt.json` sous le dossier
+commun `paea/evidence/20261028-acquisition81-mvfdts57/`. Lot actif unique :
+`glm-pa09-dialogue-browser-fixture-20261103T065518Z`. Instance316 prête ;317
+candidat non activé ; aucune installation vérifiée ni clôture globale.
+
+Découvertes transmises par FINAL du lot core, conservées pour suites bornées :
+docs/en/REFERENCE.md et PREPARATION-UX.md décrivent encore le refus legacy501 ;
+Rustdoc de PreparationTurn::active() le reconduit ; deux anciennes recettes
+preparation-calls-rust/preparation-legacy-replay-rust attendent un ancien nom de
+test ; mappings service.rs et preparation-native-dialogue.js du codeunported
+n’ont plus de producteur ; rust_installed_preparation_sources.py contient une
+ancienne branche501 ; note historique version_history indisponibilité à qualifier
+sans réécrire l’histoire. Origine : FINAL core ; valeur : éviter refus de recette
+périmés et documentation fausse ; propriétaire : Codex découpe, GLM modifications ;
+état : candidats à revue sémantique, non corrigés/non vérifiés. Reprise après
+réception de la recette dialogue courante ; critère : contrats/docstrings et
+recettes nommées concordent avec vrais producteurs et refus conservés. Ne pas
+confondre cet inventaire de suites avec leur effet réalisé.
+
+
+### Réception directe recette dialogue complète — 2026-11-03T08:12:07.065726+00:00
+
+Codex a personnellement relancé la recette maintenue sur l’ELF317 exact après
+remise stable GLM : core41 assertions PASS, historique navigateur45 PASS,
+préparation native105 PASS ;3étapes PASS, `verify` VERIFIED/PASS, entrées stables.
+L’assertion HTTP core compare désormais le dumpSQL avant restauration ; la fixture
+historique publie providers{} avant serveur et exige le vrai capabilities
+`enabled=false/providers=[]` avant navigateur. Les refus/corruptions/reprises sont
+conservés. Sorties brutes réellement lues ;75artefacts de parcours conservés hors
+cache avec inventaireSHA. Deux images390px inspectées personnellement (historique
+EN sombre ; préparationFR état après injection volontaire métadonnées indisponibles).
+Le dialogue Version du compte humain reste distinct et non reçu.
+
+Preuves : `paea/evidence/20261028-acquisition81-mvfdts57/`
+`glm-pa09-dialogue-browser-fixture-20261103T065518Z/supervisor-full-recipe/`,
+`supervisor-retained-journeys/`, `supervisor-receipt.json`. Limite : le wrapper
+historique conserve sortiesNode et exige rc0, mais ne persiste pas séparément le
+code numériqueNode ; amélioration utile conservée, propriétaireGLM après lotcourant,
+critère fichier d’issue réelle avant assertions sans modifier helperpartagé.
+
+Lot suivant unique : `glm-pa09-dialogue-http-refusals-20261103T081140Z` : régression
+test-only des quatre classificationsHTTP403 dialogue dans le module existant
+service/status_tests.rs, avec codeexact et contrôle erreursinternes/cleanup500.
+Il ne prouvera ni GET réel ni admissionproducteur ; ne pas convertir cette limite
+en acceptationglobale. Pas de modificationruntime autorisée. Les preuves précédentes
+restent réutilisables sur leurs entrées exactes ;317 n’est pas encore activé.
+PA00–PA13 et RETEX restent ouverts, suivi15minutes conservé.
+
+
+### Frontière de conversion réelle — 3 novembre 2026 08:28 UTC
+
+Le lot test-only HTTP est encore actif ; il a ajouté le test de conversion via
+`root("preparation-read", RootStoreError::Refused(code))`, sans test lancé sur les
+sources en modification. Lecture personnelle du superviseur : root() produit le
+variant HttpServiceError::Root alors que les quatre codes blp-dialogue figurent
+seulement dans le bras HttpServiceError::Refused. Leur présence dans ce dernier
+ne démontre donc pas la classification403 du parcours réel. Hypothèse ciblée :
+le nouveau test doit révéler500 ; attendre la remise stable pour la reproduire
+personnellement, puis confier le correctif du vrai consommateur à GLM si confirmé.
+Ne pas valider cette lacuneC7 sur l’ancienne déclaration de matrice.317 reste
+suspendu. Preuve de lecture et décision : lotcourant
+`glm-pa09-dialogue-http-refusals-20261103T081140Z/supervisor-mapping-boundary.json`.
+Propriétaire : Codex réception/test, GLM correction bornée ; aucun PASS déclaré.
+
+
+### Régression C7 reproduite personnellement — 3 novembre 2026 08:44 UTC
+
+Codex a arrêté son clientGLM vérifié : après les éditions ciblées, il recherchait
+répétitivement des horodatages dans son historique complet au lieu de remettre le
+lot. Cause et écritures conservées ; pas de test sur sources en modification.
+Après issue réelle du client, le test exact ajouté a été personnellement lancé :
+1testFAILED, sortie101, sourcesstables. Premier refus
+`blp-dialogue-authentication-required` :500 observé,403 attendu. Les contrôles de
+cleanup500 antérieurs dans le test sont franchis. La cause de conversion prévue
+est donc reproduite : les quatre codes sont dans le mauvais variant de statut,
+alors que la route réelle transmet HttpServiceError::Root.
+
+317 reste impropre à cette revendication et non activé. Lotcorrectif unique
+`glm-pa09-dialogue-root-http-fix-20261103T084449Z` autorise GLM à corriger ce vrai
+consommateur sous opération/type exacts, conserver erreursinternes et causes,
+renforcer les contrôles voisins, docFR/EN et évolutionlocal_changesFR/EN. Pas de
+recherche d’historique ou d’horodatage : date de déclaration fournie explicitement.
+Codex reprendra red→green et voisinages après remise stable, puis qualification
+de nouvelleimage ; le succès du test ne prouvera pas encore un GET réel ni
+l’installation. Preuvesoriginales : lotHTTP081140Z/supervisor-targeted-red/ et
+supervisor-receipt.json ; supervision de dérive supervisor-replan-history-search.json.
+
+
+### Réception personnelle red→green et préparation livraison — 3 novembre 2026 09:00 UTC
+
+Correction GLM du vrai wrapper Root reçue sur son périmètre : Codex a relancé le
+même test exact (précédemment101/500vs403), maintenant1PASS0FAIL, puis3voisins
+nommés PASS ; sorties réelles0 et entrées avant/après stables. Les4codes403 sont
+préservés, cleanup500 conserve réellement ses2causes, opération étrangère et code
+voisin restent500. Test de conversion pur, aucun GET classifié réel revendiqué.
+Diffcheckciblé0. Anciennes preuves317 restent valables sur leurs entrées ; son
+seul delta de production actuel est service.rs + version_history.json, conservé
+par comparaison des755 entréesarchivées.
+
+Preuves : `glm-pa09-dialogue-root-http-fix-20261103T084449Z/`
+`supervisor-targeted-green/`, `supervisor-receipt.json`,
+`supervisor-candidate317-current-delta.json` sous preuvecommunePAEA. LotGLMsuivant
+unique : `glm-pa09-dialogue-map-inventory-20261103T090020Z` corrige2empreintes
+inventaire avec SHA réellement calculé par Codex, après vérification des ancres.
+Aucune modificationRustautorisée pendant le build de qualification.
+
+Codex a lancé le chemin soutenu `./swarm.sh build`, sans arrêt du serveur316.
+Preuves du processus et sortiesbrutes : lot090020Z/supervisor-managed-build/.
+Ne pas supposer numéro, SHA, réussite ou activation tant que sa vraie issue et
+son profil n’ont pas été lus. Après build : vérifierprofil/ELF/entrées exactes,
+retour recettes PA09/dialogue sur la nouvelleimage, puis activationgérée du
+candidat reçu. Le dialogue Version protégé du comptehumain reste un critère de
+réception distinct ; aucun « installé et vérifié » ne peut en être déduit.
+
+
+### Replan du lancement de vérification — 3 novembre 2026 09:21 UTC
+
+Le build318 lancé en session d’outil a disparu sans résultat : PID absent,
+session52364 inconnue, collector incomplet sans événement build-finished. Boot
+inchangé ; nouvelle génération app/Codex observée vers09:18, interruption liée au
+redémarrage de l’app probable mais non démontrée causalement. Aucun signalOOM trouvé
+au journal noyau consultable. L’issue originale reste inconnue, aucun exit0 inventé ;
+preuves et compilation partielle conservées. Serveur316 toujours prêt.
+
+Aucun cargo/rustc restant : Codex reprend le même build soutenu dans une preuve
+neuve, avec runner autonome en nouvelle session, stdin fermé, fichiers stdout/stderr
+propres et vrai wait() persistant l’issue atomiquement. Précondition changée : la
+survie du build ne dépend plus de la sessionPTY de l’app. Pas de retry inchangé,
+aucun timeout ajouté, aucun processus d’autrui interrompu. Lire
+`glm-pa09-dialogue-map-inventory-20261103T090020Z/supervisor-current-build.json`
+pour le dossier courant, puis son result.json ; original explicite dans
+supervisor-build-disappearance-diagnostic.json. Le build incomplet ne qualifie ni
+318 ni installation. Le contrôle15minutes et les prochaines recettes restent requis.
+
+
+### Reboot établi et disponibilité restaurée — 3 novembre 2026 09:37 UTC
+
+Le deuxième build a disparu sans issue persistée à cause d’un reboot établi :
+boot06037215… remplacé parbd578744… ; tous anciensPID invalides, serveur local
+arrêté. Les deux compilations partielles et leurs issues inconnues sont conservées,
+pas transformées en succès. DNS SKYNET10.202.26.231 et proxy4010 de nouveau
+accessibles sans modification partagée. Ce fait ne rétroprouve pas la cause du
+premier incident d’app, qui reste hypothèse.
+
+Codex a restauré la disponibilité par le chemin soutenu `start --binary` sur
+l’ELF immuable316 précédemment actif, sans `configure` ni changement des réglages
+persistants : sortie0, PID40692, readytrue, vraie empreinteproc/exe
+e2f0039a1f3a34957c161e770c4e5efdd46f4e3a16fc82fe9cf5d9761dc94da3.
+C’est une restauration provisoire de l’ancienne image, pas une livraison318 ni
+une validation du dialogueVersion humain.
+
+La constructionsource reprend en preuve neuve avec le même runnerwait via une
+unité utilisateur transitoire dédiée `swarm-paea-build-20261103t093728z.service`,
+indépendante du processus de l’app, sans retry/watchdog global. Aucune unité
+partagée modifiée ; RuntimeMaxSec=infinity explicite. Un nouveau reboot reste
+une interruption à diagnostiquer, pas une réussite. Lire `supervisor-current-build.json`
+puis result.json et le journal de cette seule unité. L’état runtime/profil/tests
+et l’activation318 restent à recevoir. Origine/preuves : lot090020Z,
+supervisor-reboot-diagnostic.json, supervisor-restore316-after-reboot/,
+supervisor-managed-build-systemd-20261103T093728Z/. Continuité15minutes conservée.
+
+
+### Build reçu et image active d’un autre propriétaire — 3 novembre 2026 09:52 UTC
+
+Notre unité dédiée a terminé le build318 à09:38:27, vraie sortie0 et canauxbruts
+complets conservés. Candidat318 : SHA397081843b8f4b1d3f0f43b83615086b3a9c9fc4d63bbc4c53d1449947038395,
+preuve `.cache/local-delivery/rust-lh_yherd/build/`. Entretemps un autre propriétaire
+a construit/activé319 puis320 et changé HEAD à277e337c… : aucune de ces actions
+n’a été effectuée par ce superviseur. Ne pas écraser son état ni redémarrer/dégrader
+son serveur. Actuel320 prêt, PID90472, vraie empreinte/proc/exe
+fbf41a82cace631588f6849979731b081951c16f705ac813b204ebdebd8949c0.
+
+Codex a personnellement comparé les archives318→320 : seuls accounts.rs,
+authority/lib.rs, policy.rs et version_history.json diffèrent ; service.rs contient
+exactement notre correctif dcb9daea…050. Les755 entrées archivées320 correspondent
+aux sources courantes ; profil natif4core sans features/test/fixture, dépendances
+stables et commande/environment relus. Ces preuves établissent image/profil,
+pas les fonctionnalités ni l’acceptation du travail d’autrui.
+
+La prochaine action utile est la vérification de l’ELF réellement actif320 sur
+fixtures privées, sans toucher au serveur : recettesdialogue3étapes+verify,
+PA09vide14assertions+verify (recette dérivée au seul argumentbinary), puis PA09
+nonvide avec témoinnavigateur. Exécution séquentielle sous unité dédiée
+`swarm-paea-verify320-20261103t095209z.service`, vrais canaux/états/issue et inventaire
+avant/après. Aucun test concurrent avec GLM en édition. Lire le repère secondaire
+`glm-pa09-dialogue-map-inventory-20261103T090020Z/supervisor-current-verification.json`
+pour la preuve courante. Observations/profil/delta : supervisor-other-delivery-observation.json
+et supervisor-active320-profile-receipt.json. Le dialogueVersion humain et l’acceptation
+globalePA00–PA13+RETEX restent ouverts ; ne pas attribuer cette installation à Codex.
+
+
+### Réception personnelle de l’ELF320 — 3 novembre 2026 10:07 UTC
+
+Vérification séquentielle terminée : dialogue41/45/105 assertions, recettevide14,
+chacune run+verifyPASS ; testnonvide natifignoredexact1PASS0FAIL0ignored, navigateur
+14 assertions surfindingréel1, purge/reprisemêmepage, 7GET/4Bearer/4refus attendus,
+0diagnostic inattendu. Codex a lu sortiesbrutes et assertions, spawn et vraies
+issuesNode/natif0, contrôlé les755 entréesproductionstables, et vu personnellement
+l’imageENsombre390px avec identifiants complets enveloppés. Artefacts de cache
+retenus92fichiers avecsha ; limitesfixture/identitéhumaine/OSinchangées.
+Preuve : lot090020Z/supervisor-active320-validation/supervisor-receipt.json et
+retained-cache-evidence/inventory.json. Ni la pureconversionBF16a ni ces parcours
+PA09 ne constituent une recetteGETdialogueclassifié réelle ; nepasétendrele verdict.
+Le dialogueVersion du comptehumain reste nonreçu et demandéantérieurement.
+
+LotGLMsuivant unique : `glm-pa09-nonempty-permanent-recipe-20261103T100729Z`.
+Objectif : wrappermaintenu à portéeexplicitevide/nonvide et recettenonvide
+permanente, réutilisant les vrais schémas et invariants de la preuve reçue. Aucun
+changementRust/JSproduit/browserdriver autorisé ; aucune exécutionpendantédition.
+Codex réceptionnera lesdeuxportées et refusparamètreinvalide aprèsstabilité.
+PA00–PA13+RETEXglobaux encoreouverts ; aucunetransformation desfixturesen
+indépendance/enrôlement/acceptation, aucunenouvelleinterventionhumaine nécessaire.
+
+
+### Replan de compaction GLM — 3 novembre 2026 10:22 UTC
+
+Le lotnonvide n’a produit aucune édition de régression : après lecture du wrapper,
+le client a répété17+étatscompacting sans compact_boundary ni nouvelle sortie
+modèle. Diagnostic ciblé : DNS/proxy disponibles, CountTokens403 repli local traité,
+HTTPmessages200 ne prouvant pas la compaction ; métadonnées seules du dernier1MiB
+de la session exacte montrent128317tokenshérités, aucun historique réinjecté.
+Le superviseur a arrêté uniquement son client après contrôleUID/boot/start/session,
+conservé le journal et la session6d2b4bbb… inchangés et son issue réelle.
+
+Même tâche bornée relancée en contexteGLM neuf via l’option locale documentée
+--session-id, pas de hausse de plafond/effort/timeout et aucune modificationproxy.
+Nouvelle précondition : suppression du contextehistorique sans dépendance utile,
+paquet minimal conservant chemins de preuves et contrats nécessaires. Lotactif
+unique `glm-pa09-nonempty-recipe-fresh-20261103T102240Z`, transitiond’UUID tracée dans
+session-transition.json ; ancienincident et preuve de décision dans
+lot100729Z/supervisor-compaction-replan-decision.json. Les résultats320 restent
+liés à320 ;321 actifobservé séparément et nonqualifié ici. Réception de la recette
+maintenue, puis vérificationpersonnelle des2portées restent à faire.
+
+
+### Redécoupage au wrapper seul — 3 novembre 2026 11:07 UTC
+
+Le lotnonvide neuf n’a écrit aucun artefact après ses lectures ; une recherche
+récursive dans l’ancienne preuve a expiré à la borne technique du toolGlob20s.
+Les lectures ont aussi débordé vers un ancienstatus non requis. Diagnostic et
+client propre conservés ; arrêt après vérificationUID/boot/start/session, pas de
+seuil arbitraire de test. Précondition corrigée : paquet anglais court avec cinq
+fichiers exacts, dont le JSONnavigateur nonvide précis ; pas de découverte de
+répertoires ni d’historique. Outils réduits àRead/Edit/Write.
+
+Lotactif unique `glm-pa09-scope-wrapper-20261103T110700Z` : wrapper àportéeexplicite
+et contratFR/EN seulement ; nouvelle recettenonvide reportée comme tâche dépendante
+après réception personnelle des2portées et refusvaleurinvalide. Le statut est
+préinitialisé par le superviseur avec attribution explicite, nonPASS ; GLM doit
+l’actualiser. Ancien diagnostic : lot102240Z/supervisor-scope-replan.json.
+Le delta de l’ELF322 livré par autrui inclut désormais settlement (7entrées),
+conservé dans supervisor-runtime-profile-observation.json du même ancienlot ;
+les résultats320 ne sont pas transférés implicitement. Aucune modification du
+produit/source d’autrui ni test concurrent de sources en édition.
+
+
+### Réception personnelle wrapper à deux portées — 3 novembre 2026 11:54 UTC
+
+GLM a livré le wrapper stable, sans nouvelle recette. Codex a vérifié la syntaxe,
+le vrai refus argparse2 d’une portéeinvalide avant allocation, et la qualification
+pure des deux témoins320 conservés : portée correcteacceptée, portée croiséerefusée.
+Puis deux vraies exécutions séquentielles sur l’ELF322 courant épinglé
+3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a :
+vide pardéfaut1testPASS et nonvideexplicite1testPASS,0FAIL/0ignored chacun,
+14contrôlesnavigateur chacun,4refus/7GET, vraisNode/natif0,drainssans erreur,
+sourceproduction+tests+wrapper+docs avant/après identiques. Sorties et métadonnées
+relues personnellement. Cela reçoit ce contratPA09sur322, pas l’ensemble du travail
+settlement d’autrui ni une identitéhumaine/OSséparation/acceptationindépendante.
+
+Preuves : lot `glm-pa09-scope-wrapper-20261103T110700Z/` supervisor-preflight/,
+supervisor-current-target.json, supervisor-two-scope-run/ et
+supervisor-wrapper-receipt.json. Les erreursoutilanciennes sont conservées et
+leur reprise est maintenant liée à ces résultats, pas déclarée sur simpleactivité.
+La recommandation FINAL « bin/swarm doitavoirlehash320 » est périmée : Codex a
+utilisé l’ELFimmuable322 fourni explicitement, jamais supposé le binairecourant.
+
+LotGLMsuivant unique `glm-pa09-nonempty-recipe-manifest-20261103T115459Z` : créer le
+seul manifeste maintenunonvide et actualiser le contratFR/EN existant, sansmodifier
+wrapper/produit. Codex exécute ensuite run+verify sur un ELF explicitement lié ;
+GLM reste propriétaire de touteéditionPAEA/tests, ycompris lemanifeste. Le dialogue
+Version humain reste nonreçu et aucune clôtureglobalePA00–PA13+RETEX n’est annoncée.
+
+
+### Recette nonvide reçue et inventaires legacy périmés — 3 novembre 2026 12:09 UTC
+
+Codex a personnellement reçu le manifeste nonvide GLM :2étapesPASS puis verify
+VERIFIED/PASS, entréesstables, marqueurNONEMPTY14, vraie image3223146c837…313a,
+natif/Node0observés.17artefacts horscache retenus avecSHA. Recette dérivée au seul
+argumentbinary ; le conseil FINAL de repointer bin/swarm n’a pas été exécuté.
+Aucune modification du serveur partagé. Preuves : lot115459Z/supervisor-recipe-run/,
+supervisor-retained-nonempty/ et supervisor-receipt.json.
+
+La suite déjà conservée des recetteslegacy a été discriminée personnellement :
+le target preparation_calls actuel exécute7testsnommésPASS/0FAIL/0ignored etsort0.
+Les deux recettes preparation-calls-rust et preparation-legacy-replay-rust attendent
+encore6tests/6passed et l’anciennom legacy_active_replay_remains_explicitly_unported :
+3assertionsrequisesabsentes chacune. Ce contrôle montre l’oraclepérimé, sans
+prétendre à un runcomplet de ces recettes. Preuvebrute : lot115459Z/
+supervisor-legacy-marker-control/.
+
+LotGLMactif unique `glm-preparation-legacy-recipe-markers-20261103T120909Z` :
+réconcilier seulement ces2inventaires et le contratFR/EN, sans modifier les tests
+ni affaiblir les refus ; conserver les5autres tests et ajouter le7e garde d’admission.
+Codex exécute ensuite lesrecettes aprèsstabilité. VérificationglobalePA00–PA13,
+identités/indépendance et dialogueVersionhumain restentouverts ; aucunPASSglobal.
+
+
+### Première précondition manquante des recettes préparation — 3 novembre 2026 12:40 UTC
+
+Les deux inventairesGLM réconciliés ont été relus. Codex a ensuite lancé les
+recettes séquentielles sur l’ELF322 réellement actif épinglé, sourcesproduction
+identiques àson archive. La première étape publicCLI/HTTP de preparation-calls-rust
+échoue1 après des assertions réelles sur endpointfactice local : KeyError
+SWARM_PROJECT_MEMORY_SEEDER dans seed_work appelé par seed_lesson. Navigateur non
+atteint ; étapes suivantes et deuxième recette non exécutées ; sourcesstables.
+Ni un PASS des marqueurs ni un provider réel en panne ne sont déduits de ce run.
+Preuvesoriginales : lot120909Z/supervisor-full-recipes/preparation-calls-rust/,
+supervisor-reception-diagnostic.json. Issues vraies conservées avant filtrage.
+
+Diagnostic : helpermémoire utilise déjà un writerfixture natif gardé, mais ces
+deux consommateurs ne câblent ni son guard/build ni son environnement. La recette
+existante blp-preparation-provenance-public documente ce chemin soutenu. LotGLM
+unique suivant `glm-preparation-memory-fixture-wiring-20261103T124003Z` : ajouter
+prérequisguard/build, pathenvcohérent et inputssource aux deuxrecettes, dans un
+cachefixture/test séparé de la production, sans toucherhelper/produit et sans
+court-circuiterlegarde. Codex reprend les recettes complètes après remise stable.
+Aucunebase live utilisée et aucuneinstallation/acceptationglobale annoncée.
+
+
+### Contrôle du 3 novembre 2026, 13:06 UTC — prérequis mémoire reçu, vérification personnelle lancée
+
+GLM a terminé le lot `glm-preparation-memory-fixture-wiring-20261103T124003Z` (vrai exit 0). Codex a comparé les deux prérequis de chaque recette au modèle provenance : identiques ; cible de fixture dédiée, environnement seeder cohérent, inventaire fixture_area ajouté, assertions métier conservées. Réception de code/documentation uniquement : aucun PASS repris du rapport GLM. Les deux recettes complètes sont lancées séquentiellement, avec run puis verify et arrêt au premier échec, sans watchdog global, sous unité propre `swarm-preparation-recipes-20261103t1307z`. Preuves brutes et vrais exits : dossier `supervisor-full-recipes/` de ce lot.
+
+Replan du précontrôle : un input de production étranger (`web/native-authority-admin.js`) diffère de l’archive322 ; première assertion refusée, aucune exécution alors lancée. Cet input est absent des deux inventaires de recettes et ne change pas le véritable ELF322 épinglé, personnellement comparé à `/proc/185354/exe` (SHA3146c837…c313a). Vérification ciblée poursuivie sur cet ELF, inventaires avant/après conservés ; aucune équivalence sources actuelles/livraison revendiquée et aucune modification du travail étranger. Le dialogue Version protégé reste inaccessible avant connexion humaine (CUA direct, observation conservée), demande antérieure non répétée. PA00–PA13 et RETEX restent ouverts.
+
+
+### Contrôle du 3 novembre 2026, 13:20 UTC — première frontière suivante traitée
+
+Sorties brutes personnellement relues : le prérequis mémoire passe (garde nommée 1/1, sidecar construit exit0), le parcours public CLI/HTTP/navigateur finit réellement exit0 avec 35 assertions et 48 assertions navigateur. La recette globale refuse pourtant exit1 : seul marqueur manquant `PREPARATION_CALLS_PASS 34`, producteur observé `35`, dont `browser-public-journey`. Sources déclarées et inventaire de production stables pendant le run. Aucun PASS global ni exécution des étapes aval/recette legacy revendiqué. Les 245 artefacts du parcours ont été préservés hors cache dans `glm-preparation-memory-fixture-wiring-20261103T124003Z/supervisor-retained-calls35/` ; revue politiques/fonctions/erreurs liée aux empreintes dans le même lot.
+
+Replan : nouvelle tâche unique `glm-preparation-calls-count-20261103T132200Z`, même session GLM reprise, DNS/proxy et absence de client de la session contrôlés. Éditions limitées aux deux marqueurs consommateurs et documentation FR/EN correspondante ; tous tests, assertions et prérequis préservés. Codex reprendra personnellement les deux recettes complètes après remise stable. Aucun développement PAEA par Codex, aucune modification du service partagé.
+
+
+### Contrôle du 3 novembre 2026, 13:51 UTC — compteur reçu, recettes complètes relancées
+
+Lot GLM `glm-preparation-calls-count-20261103T132200Z` terminé, vrai exit0 et FINAL relus. Comparaison personnelle du manifeste courant au manifeste exact du précédent run : seul marqueur public34→35 ; documentation FR/EN cohérente, fonctions inchangées, assertions conservées et diffcheck0. Nouveau run séquentiel personnel des deux recettes avec verify sous unité propre `swarm-preparation-recipes-20261103t1352z` ; aucune source modifiée par GLM pendant ces tests. ELF322 toujours épinglé et comparé à `/proc/185354/exe` ; seule divergence archive/source constatée demeure `web/native-authority-admin.js`, hors inventaires des recettes et préservée. Sources, sorties brutes et vrais exits retenus dans `supervisor-full-recipes/` du lot courant. Vérification complète encore attendue ; PA00–PA13/RETEX ouverts.
+
+
+### Contrôle du 3 novembre 2026, 14:07 UTC — inventaire moteur supplémentaire révélé
+
+Deuxième run complet personnel : garde1, sidecar, public35/navigateur48, transport4 passent réellement. Le stade `engine-budget-policy` exécute 18 tests nommés, tous PASS0failed0ignored, et conserve les sept noms attendus ; le filtre `preparation_call` collecte désormais aussi niveaux, legacy et confidentialité. La recette entière refuse exit1 car ses deux compteurs attendent encore7. Sorties stdout/stderr complètes examinées, sources déclarées et production stables pendant le run ; pas de résultat aval ni de recette legacy inventé. Témoin public conservé horscache dans `glm-preparation-calls-count-20261103T132200Z/supervisor-retained-calls35/`.
+
+Replan immédiatement transmis à une tâche GLM unique `glm-preparation-engine-count-20261103T140800Z` : corriger seulement l’inventaire attendu du stade moteur et documentation FR/EN, conserver commandes, tests, sept gardes et toutes assertions. DNS/proxy et absence de client de la même session vérifiés avant reprise. Codex ne développe pas PAEA et reprendra les recettes après remise stable ; ce nouveau compteur n’est pas un PASS global.
+
+
+### Contrôle du 3 novembre 2026, 14:22 UTC — inventaire18 reçu, diagnostic outil traité
+
+GLM terminé exit0 ; status.py exit3 exige diagnostic : un Read avait un ancien dossier inventé `...140800Z`, absent. Le journal montre ensuite la lecture du bon `...132200Z/step-0005.json`. Codex a directement comparé les vingt attentes (deux compteurs et dix-huit noms) à stdout brut : toutes présentes ; seul required_stdout du stade moteur diffère du manifeste exact précédent. Correction de notre propre prompt : ancien stade moteur contenait deux compteurs uniquement, les sept noms appartenaient au stade retained-root-faults ; cette distinction est conservée dans la réception. Documentation FR/EN, revue liée aux hashes et diffcheck examinés.
+
+Nouvelle vérification personnelle des deux recettes, run+verify séquentiels sous unité `swarm-preparation-recipes-20261103t1423z`, sans watchdogglobal, ELF322 personnellement rehashé contre processus185354. Divergence étrangère authority-adminJS horsinventaires préservée. Aucune acceptation globale : attente des vrais exits et sorties complètes avant prochain lot.
+
+
+### Réception personnelle du 3 novembre 2026, 14:37 UTC — deux recettes complètes vérifiées
+
+Codex a examiné les résultats, sorties brutes et vrais exits du lot `glm-preparation-engine-count-20261103T140800Z/supervisor-full-recipes/` : preparation-calls6étapesPASS puis verifyVERIFIED/PASS ; legacy5étapesPASS puis verifyVERIFIED/PASS, quatreexits0. Garde1, public35/navigateur48 dans chaqueparcours, transport4, moteur18 et gardes7, legacy33 ycompris observationlectureseulepending/running/stopping×reserved/estimated avec refusconflit/nonmutation/absenceprovider. Sourcesdéclarées et productionstables durantlerun ; ELF322 épinglé. Troisjourneysconservés horscache avecinventaireSHA. Le status.py3 reste dû au Read historique mal adressé, déjà diagnostiqué puis corrigé avantrun ; aucunclientactif n’attendcesrésultats.
+
+Réceptionciblée honnête dans supervisor-receipt.json, pasacceptationglobalePAEA, ni enrôlementhumain/confinement/Versionprotégée. LotGLMsuivantunique `glm-preparation-received-docs-20261103T144000Z` pour actualiserlesmentionscourantesUNVERIFIED et501legacy danslesseulsdocuments ciblés, sans réécrireleséchecshistoriques. ContrôlesDNS/proxy/clientsfaitsavantreprise ; aucunredémarrage/commit/autresourceproduitparCodex.
+
+
+### Contrôle du 3 novembre 2026, 14:52 UTC — diagnostic de supervision traité
+
+status.py3 pour deux lectures et contratprérempli : GLM avait omis le segment `supervisor-full-recipes/` des chemins verify.stdout ; le flux atteste ensuite les lectures aux bons chemins, puis producteur/testlegacy/docFR. Aucune erreur de tests ni attente sur sortie textuelle ; pas de raison de dupliquer ou interrompre le client. Codex avait omis updated_utc du statusprérempli : réparé atomiquement avec attribution explicite, sans attribuer cette écriture à un progrèsGLM. Réception de documentation encoreattendue ; prochain paquet fournira les chemins complets de chaque preuve, sans raccourci ambigu. Détaildans `glm-preparation-received-docs-20261103T144000Z/supervisor-diagnostic.json`. AucunPASSglobalajouté.
+
+
+### Replan du 3 novembre 2026, 15:08 UTC — corriger le paquet documentaire invalide
+
+Le diagnostic obligatoire status.py3 révèle dernierRead enéchec sur `docs/plans/migration-rust/PREPARATION-UX-20261027.md`, chemin fourni à tort par Codex ; emplacement réel `docs/en/PREPARATION-UX.md`. Pasdéditionlivrée, lectureinutileslongues de documentscomplets. Codex a conservéflux etidentité, puis interrompu le seul clientpropre après UID/boot/start/sessioncontrôlés (pasuntimer/arrêtd’autrui). Le runner a conservé son exit réel0, distinct d’une remise documentaire absente.
+
+Préconditioncorrigée : nouveaupaquet limité aux deuxsectionsFR/EN (plageslignesvérifiées) et unseulreceipt existant, même sessionGLM--resume, dossierneuf `glm-preparation-receipt-docs-20261103T151000Z`, DNS/proxy etabsenceclients vérifiés. PropriétaireCodex du défautdeprompt ; suite501restanteGLM distincte aprèsréception, vraicheminconfirmé. Pasdenouvellepreuveglobaleacceptation ; résultatsrecettesprécédentsconservés.
+
+
+### Réception documentaire du 3 novembre 2026, 15:23 UTC
+
+Le paquet corrigé `glm-preparation-receipt-docs-20261103T151000Z` a livré les deux sectionsFR/EN et FINAL, exitréel0. Codex a comparé les retouches et leurs revendications au propre reçu14:23:45 : chiffres, profils/ELF, sources stables, limitesetpreuvesconcordent ; les échecsantérieurs restentéchecs. Diffcheck0 et reçu lié auxSHA ; aucune réexécutioninutile pour proseuniquement.
+
+Prochaintâcheunique `glm-legacy-readonly-reference-20261103T152500Z` : deuxparagraphesanglais toujours501/refusactif dans les fichiers effectivementexistants `docs/en/REFERENCE.md` et `docs/en/PREPARATION-UX.md`. Les homologues docs/REFERENCE.md et docs/PREPARATION-UX.md sontabsents, nepaslesinventer ; contratFR déjàdocumenté/reçu. Paquetneuf etplagesréduites, preuvescomplètes exactesfournies ; restelectureseulelegacy, aucunsuperviseur/habilitationfabriqué. Prérequisréseau/clientsvérifiés. PA00–13/RETEXouverts.
+
+
+### Réception du 3 novembre 2026, 15:55 UTC — références legacy puis frontière HTTP BF16a
+
+GLM a livré deuxcorrectifsEN (`REFERENCE.md`, `PREPARATION-UX.md`) exit0, FINALetdiffexaminés : lectureseuleactive/replayexact409conflit/no mutation cohérentsavecles33contrôlespublicsreçus. Gardesmémoire501horsscopepréservées, aucunecontrepartieFRinexistantecréée. ReçuliéauxSHAetdiffcheck0 ; pasdererunpourprose.
+
+Prochainlotunique `glm-bf16-dialogue-http-regression-20261103T155600Z` implémente le témoinmanquant réelproducteur→admission→GET/HEADdialogueclassifié : nouveautestpublicPython+recette+docsFR/EN, aucunproduitmodifiéparCodex. Réutilisationdesfixtures/publicsource/admissionexistants, vraieimagequalifiée, controlevraipositifnonvidepuisrefus/nonmutation/reprise ; pasdefabricationSQL/capsule/identité, pasdepaidprovider ni protectiondésactivée. L’ancienstatusadapter et dialoguelegacy ne suffisentpas ; aucunefinBF16annoncée. Codex examineraetexécuteralecontrôleaprèsstabilité, etappliquerareplanàlapremièrefrontièreréellementmanquante. Clients/réseauvérifiésavantreprise. PA00–13/RETEXouverts.
+
+
+### Replan du 3 novembre 2026, 17:08 UTC — premier témoin HTTP au lieu de paquet trop large
+
+Le lotBF16 initial n’a produitaucuneédition après lecturesdesproducteurs puis modulesentiers ; lacompactionréussie neconstituaitpas unprogrès. Codex prend enchargeledéfautdedécoupage : préserverleslogs, vérifierUID/boot/start/sessionetinterrompre leseulclientpropre, vrai exitrunner0 conservé (sansremise, donc pasunsuccèsmétier). NouveaumêmeGLM--resume, dossierneuf `glm-bf16-first-http-boundary-20261103T171000Z`, paquetréduitauscriptuniquepremiercontrôle : publicsendréelanswered→publicadmissioncorrespondante→GETbare403/lecteur200exact, témoinsnonmutation, docsFR/ENcourtes. MatriceHEAD/stale/revocation/recettedifféréeaveccause etpropriétaireGLM jusqu’à laréceptionpersonnelle dupremierparcours ; aucune exigenceglobaleeffacée. DNS/proxyetabsenceclientssamesessioncontrôlésavantreprise. CodexaucundéveloppementPAEA.

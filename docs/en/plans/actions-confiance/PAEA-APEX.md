@@ -1,5 +1,15 @@
 # PAEA — adopted APEX plan and execution record
 
+## Current P1/G1 point — 3 November 2026
+
+First local [exact separated settlement agreement slice](paea/P1-G1-20261103.md)
+delivered as dev.322, image 3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a.
+Kernel/CLI evidence, exact-image recipe, Git regression and seven effective-input
+reviews retained; metadata and connected FR/EN Version dialog observed. Global G1,
+real human enrollment, protected services and E3 remain open. Historical E2
+declarations/images retain their original scope; these tests do not globally
+requalify E2 for the new image.
+
 [Français](../../../plans/actions-confiance/PAEA-APEX.md) ·
 APEX queue (`../../APEX-QUEUE.md`, local tracking outside this publication) · AC-02 (`securite-execution-apex.md`, local tracking outside this publication)
 
@@ -314,8 +324,10 @@ late-evening block.
 
 State summary as of 31 October 2026: local partial verification I01, I04, I05,
 I08, I09, I12, I16, I17; incomplete candidates I06, I13 (BT02, egress not
-confined); human/OS prerequisites I02, I07, I10; missing design I14 (A2A);
-partial provenance I03; independent acceptance 0/17 (I11).
+confined); human/OS prerequisites I02, I07, I10; missing design I14 (A2A,
+design filed 2 November 2026 as [T14-A2A-DESIGN](paea/T14-A2A-DESIGN.md) —
+not implemented, I14 stays NOT ESTABLISHED); partial provenance I03;
+independent acceptance 0/17 (I11).
 
 T11 additionally covers changed policy/source/candidate and stale proof. T09
 includes split/cumulative effects across agents. Establish a valid control before
@@ -360,6 +372,31 @@ M4 installed local E2; M5 independent E3 campaigns; M6 re-evaluated corrections 
 final retrospective. Program remains open after M4. Disabling project protection
 requires an authorized decision; no automatic permissive fallback.
 
+### P0/G0 — 3 November 2026
+
+Authorized baseline/status/evidence increment: [record and limits](paea/P0-G0-20261103.md).
+Cockpit daemon UID separation is distinct from PAEA effect authority. Earlier
+observations below remain dated; no G1–G7 or independent acceptance claimed.
+
+### Current state — 3 November 2026 (morning)
+
+Locally delivered unique candidate: `bin/swarm` SHA-256
+`3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a`
+(v0.1.1-dev.322, commit 277e337cb4 — the 02-11 re-verification lot as committed —,
+modified=true, built 2026-11-03T10:11:15Z, in place 2026-11-03 11:16:56 — 11th
+replacement). Stability gate green (3 sha256 probes over ~90 s). Settlement and
+chain recipes re-pinned on this binary from the real `sha256sum` hash (pin=actual
+cross-check, 8/8 then 3/3 occurrences). The live tree compiles (`cargo check -p
+swarm-web -p swarm-cli --tests`: 0 errors) — direct run, no freeze. **Result
+(03-11 morning): the current delivery is fully re-verified — settlement run-17
+7/7 PASS then chain-run-10 4/4 VERIFIED on the live tree, `source_stable: true`
+on both, wrong-SHA refusal exercised** (`i17-rerun/settlement-run-17/`: 23
+witness spawns `sha256=3146c837…`; `i17-rerun/chain-run-10/`: 15 witness spawns,
+step 4 = wrong-SHA refusal). Independent acceptance: 0/17, unchanged; the seven
+open E2 criteria remain in force. The "Current state — 2 November 2026
+(evening)" block below is kept as history (run-15/16 + chain-run-8/9 on
+e2f0039a…).
+
 ### Current state — 2 November 2026 (evening)
 
 Locally delivered unique candidate: `bin/swarm` SHA-256
@@ -381,7 +418,7 @@ e2f0039a ELF copied in as `bin/swarm` (mode 500); the harness
 spawn exactly as on the live tree, and the chain's wrong-SHA refusal remains
 exercised. Settlement run-15 launched on this freeze, chain next; completion
 state is recorded in
-[DASHBOARD-T20261101.md](paea/DASHBOARD-T20261101.md) (02-11 evening
+[DASHBOARD-T20261101.md](../../../plans/actions-confiance/paea/DASHBOARD-T20261101.md) (02-11 evening
 extension). **Result (02-11 evening): the current delivery e2f0039a… is fully
 re-verified — settlement run-15 7/7 PASS then chain-run-8 4/4 VERIFIED on the
 frozen worktree 562953dba3, `source_stable: true` on both, wrong-SHA refusal
@@ -2928,6 +2965,33 @@ after stable bytes recorded in the lot status.
 simulated identity, no real enrollment, no product approval); the full
 guard/session-refusal/read/agreement/stale browser rerun remains required
 before any accepted handover; no build/install/server; no commit/push.
+
+## BLP integration — preparation quarantine delivered, November1,2026
+
+BLP-05 partially progresses: dedicated admission/worker/API/CLI transport lock,
+persistent Admin/API/CLI policy, no-egress refusal and explicit recovery.
+Local version299 installed and verified with normal no-fixture profile.
+[28 public and59 Admin assertions](../../../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-02/result.json),
+[delivery evidence](../../../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-installed-01/delivery-scope.json),
+[byte-bound increment review](../../../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-source-review.json).
+These use inert receivers, with no live-data migration/classification, actual
+provider or established declassification human identity. They close no transversal
+invariant, complete T07/T08/T13/T19 scenario, independent review or BLP-04/05/06.
+`runtime_enforced:false` remains. The [technical BLP plan](BLP-APEX.md) retains
+original refusals and next work: producers/principal/fixed domain → destination/
+account → output inheritance, then OS/descendant mediation, migration and exact
+human declassification.
+
+BLP captured-source producer delivered304: cleared I3/admin attribution from a
+verified native turn,103 public assertions,2+1 Rust tests and56 browser checks.
+Evidence/limits in BLP-APEX.md,1 November delivery. No PAEA invariant, T07/T08/
+T13/T19 or global Bell-LaPadula completion is established.
+
+BLP309 freezes prompt exposure for the actual authenticated Trust principal in
+a private capsule, without transport/turn/reservation.74 public assertions and
+103 regressions pass; active image/22 sources verified,56 UI checks on same-image
+fixture. Real Authority UI remains OPEN, without global PAEA/BLP completion;
+evidence/limits in BLP-APEX.md (pre-transport admission).
 
 ### Increment 121 — T09/I08: debt splitting and re-key accumulation refused on the delivered ELF (verification, Claude)
 
