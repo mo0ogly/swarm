@@ -2,6 +2,7 @@
 //! this module cannot start a process, write a file, contact a provider or pay.
 use super::{
     command::{self, Command},
+    data_policy,
     digest, encoded, hash,
     json::CompactJson,
     proof,
@@ -127,7 +128,7 @@ fn action_hash(cmd: &Command, requester: &str) -> Result<String, E> {
         Beneficiary: &'a str,
         IdempotencyKey: &'a str,
         #[serde(skip_serializing_if = "Option::is_none")]
-        data_context: &'a Option<CompactJson>,
+        data_context: Option<&'a data_policy::DataContext>,
     }
     let base = digest(&Fields {
         MandateID: &cmd.mandate_id,
@@ -137,7 +138,7 @@ fn action_hash(cmd: &Command, requester: &str) -> Result<String, E> {
         Currency: &cmd.currency,
         Beneficiary: &cmd.beneficiary,
         IdempotencyKey: &cmd.idempotency_key,
-        data_context: &cmd.data_context,
+        data_context: cmd.data_context.as_ref(),
     })?;
     if cmd.connector.is_none() {
         return Ok(base);
@@ -568,9 +569,12 @@ pub(crate) fn execute<'a>(
         });
     }
     proof::verify_chain(&proof::export(st)?)?;
-    if cmd.data_context.is_some() {
-        return Err(E::Unsupported("trust-advanced-admission-not-ported"));
-    }
+    // Data provenance admission precedes connector validation and mirrors the
+    // Go order: replay and proof first, then the data path, then the stored
+    // action's recorded context, then the connector. A denial here never
+    // persists the context or any other supplied data.
+    data_policy::admission(st, op, &cmd)?;
+    data_policy::action_admission(st, op, target(&cmd))?;
     let connector_id = connector(&cmd)?.to_string();
     if connector_id == "local-access-simulation"
         && (cmd.amount_minor != 0
@@ -734,6 +738,9 @@ pub(crate) fn execute<'a>(
                     let mut action = json!({"id":id,"mandate_id":cmd.mandate_id,"requester":actor.subject,"resource":cmd.resource,"amount_minor":cmd.amount_minor,"currency":cmd.currency,"beneficiary":cmd.beneficiary,"idempotency_key":cmd.idempotency_key,"content_digest":content,"original_digest":hash(raw),"state":"pending_approval","next_action":"approbation séparée requise","created_at":at,"updated_at":at});
                     if let Some(c) = &cmd.connector {
                         action["connector"] = serde_json::to_value(c)?;
+                    }
+                    if let Some(c) = &cmd.data_context {
+                        action["data_context"] = serde_json::to_value(c)?;
                     }
                     st.actions.insert(id, action.clone());
                     action
@@ -932,6 +939,7 @@ pub(super) fn bound_action(st: &State, a: &Value) -> Result<(), E> {
         .cloned()
         .map(serde_json::from_value)
         .transpose()?;
+    cmd.data_context = data_policy::stored_context(a)?;
     let id = connector(&cmd)?;
     let operation = if id == "local-access-simulation" {
         "grant-access"
@@ -1016,6 +1024,12 @@ fn effect_transition(
     proof::verify_chain(&proof::export(st)?)?;
     st.require_supported()?;
     bound_action(st, a)?;
+    // Fixed inner re-admission (Go trustConnectorCommit): the effect boundary
+    // re-checks the stored action's data path after the hash re-derivation.
+    // Reconcile is deliberately not re-admitted; recovery stays possible.
+    if op != "reconcile" {
+        data_policy::action_admission(st, "commit", text(a, "id"))?;
+    }
     if !role(actor, "effect") || access(actor, 2, BibaAccess::Invoke).is_err() {
         return Err(E::Authorization);
     }

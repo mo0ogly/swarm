@@ -1,6 +1,672 @@
 # PAEA — adopted APEX plan and execution record
 
-## Current P1/G1 point — 3 November 2026
+Evidence update — 2026-11-05 11:04 UTC: three targeted checks verified:
+real held-flock retention/recovery1PASS (default), classifier1PASS (test-fixtures),
+candidate custody1PASS (default). Intermediate zero-test run remains historical
+FAIL; corrected remaining batch2/2PASS, integrityVERIFIED. Actual binary/features
+inventory retained, hash-bound source review and94MB USB archive read back with
+local index; originals retained. FR/EN release notes were added afterwards: unit
+receipts bind prior embedded-note bytes with unchanged tested functions. The new
+public proof below is distinct.
+
+Supported **normal334** build, SHA
+`23651e383c4b7eb6ba1b25bf66d0c63d3e58dd8adf6ab18435fe3cfb7390514c`,
+`./swarm.sh build --no-open` exit0, fixture-free normal profile verified, effective
+sources archived/stable (`.cache/local-delivery/rust-it8w409o`). Not installed.
+Genuinely fresh complete source producer **exit0/PASS**:2 inert managed cycles,
+12review-input,5reviewer,8publication checks.37 helpers stable and archived/read
+back by hash. Fixture task accepted, mission not accepted; no paid provider,
+human-independent review or confinement claim. Healthy source root retained for
+HTTP; positive recipe explicitly repinned to image/profile/source, NOT RUN.
+Evidence: `paea/evidence/20261028-acquisition81-mvfdts57/glm-direct-held-lock-guard-review-repair-20261105T104154Z/supervisor-native-source334-reception.json`.
+
+GLM105149 proposal refused:3 repeated partial blocks, neither actual startup
+relocation nor promised EOF regression, comments claiming integration. None of
+that proposal applied. Method diagnosis retained; next request is just anchored
+minimal startup relocation, then separate regression and receipts. One direct
+GLM request active: `glm-direct-positive-startup-boundary-only-20261105T110450Z`,
+no tools/source writes/effort change. No unchanged repeat or raised budget. Reader,
+approval and E2E objective stays open; recette_agent integration not started here.
+
+Interactive recovery — 2026-11-05 10:55 UTC: the reader is connected to the
+HTTP witness, but E2E remains UNACCEPTED. GLM moved raw SQL observations to causal
+boundaries without dropping any of60 assertions. A fresh normal333 producer failed
+earlier with real exit2: typed managed-result-retention-incomplete / managed-operation-busy /
+Lock / errno11, after Workrev15 was recorded. The nonblocking managed lane was
+contended; exact holder unknown. Original failure retained; no forged SQL success
+or consumption reset. Owned process cleanup and PID evidence retained.
+
+GLM102905 proposal and104154 repair integrated: only direct typed clean acquisition
+EAGAIN with no publication/cleanup becomes Waiting at discovery and retention.
+Other causes and partial effects remain errors. Existing saved cadence is reused;
+no added retry, delay or ceiling. A genuine separate flock holder produced the
+expected RED1FAILED/cargo101 before correction, then GREEN1PASS with unchanged
+ref/report/manifest/proof and recovery of the same frozen result. The overall green
+run remains FAIL because the second filter collected0 under a fixture feature gate;
+the recipe correctly rejected it. Corrected feature invocation and existing custody
+guard are running; the successful unchanged first step is retained. Verified intact
+proofs: `paea/evidence/20261028-acquisition81-mvfdts57/glm-direct-held-lock-guard-review-repair-20261105T104154Z/`.
+
+The single direct GLM proposal task `glm-direct-approval-bootstrap-guard-20261105T105149Z`
+covers all post-spawn startup and a real EOF/exit7 child guard. Codex owns review,
+integration and tests. Complete receipts/secondary failures and refusal ownership
+remain open. A new normal build, fresh native source producer, public approval E2E
+and local delivery are still required. Normal333 archived/read back on USB, local
+index retained; not activated. User advised a separate recette_agent feasibility
+chat with Swarm read-only; no chat created or privileged capture launched. This
+chat keeps its existing scope.
+
+## Current supervision — 5 November 2026
+
+Interactive resume — 2026-11-05 09:42 UTC: user explicitly requests reader integration
+into approval flow, followed by personal E2E tests before next work. Codex reuses
+the current sole GLM client. **Normal333** built via `./swarm.sh build --no-open`,
+actual exit0, **VERIFIED_DEFAULT_NATIVE_PROFILE**, no fixture features, stable
+effective sources. SHA256
+`ee1d29c5ed3e2cc7a8b29295c6ba21359c75abc9e60800fd943000290942f220`, proof
+`.cache/local-delivery/rust-6lyxyka8`. Not activated. Build disjoint from GLM’s
+test/recipe/README edits: zero overlap with3049candidates, actually checked.
+FR/EN evolution notes updated without claiming HTTP acceptance.
+
+Fresh333 source fixture actually ran: **exit1**, first real cycle passed then
+`sqlite3.OperationalError: database is locked` on a raw SQL read during the second
+worker’s startup. Secondary cleanup refusal: unknown PID6788 not signalled;
+later /proc absent, actual exit unknown; no observed process with exact fixture
+Root argv. Original evidence/diagnosis:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-http-startup-owned-receipt-20261105T091555Z/supervisor-source333-failure-reception.json`
+(French proof tree). Hypothesis: direct SQLite observation concurrent with
+canonical writes; require a stable causal/public boundary, not an arbitrary
+busy timeout/retry. Do not rerun unchanged. Fixture correction follows the
+current GLM task boundary; personal21guards, fresh source/HTTP still required.
+
+Retained user opportunity: Rust `recette_agent/discoveryprobe` as a complementary
+external Swarm observer. Source inspection only: exec/fork/connect/open/DNS/
+listen/accept/IPC and JSON; request/response traces reside in the Python proxy.
+Sorting/deduplication and evicting ring do not establish chronology/completeness;
+append alone does not prove durability/immutability. Proposed offline adapter,
+then one isolated real witness with process attribution/loss controls, preserving
+Swarm’s authority boundary. No integration or privileged capture launched;
+separate scope decision after HTTP gate. Source hashes and criteria retained in
+current task’s `supervisor-recette-agent-feasibility.json`.15min monitoring kept;
+interactive supervision active, no concurrent author.
+
+Personal check5Nov09:15UTC: actual normal332 positiveHTTP recipe **0PASS/1FAILED/23filtered,cargo101/run1, sources stable, integrityVERIFIED/recordedFAIL**. Older qualified332 image lacks approval-web CLI grammar: rawchildstdout0/stderr4179 command_failed/usage; no profile downgrade. PreparedEOF panic outside signalguard lost actualwait/receipt: true child exitUNKNOWN, process-receipt absent. Private raws validatedUID0700/containment and copied; reception `paea/evidence/20261028-acquisition81-mvfdts57/glm-http-positive-normal-fixture-pin-20261105T085538Z/supervisor-normal-http-first-reception.json`.
+
+Personal OScheck: pidfdSIGINT to own exited7/unreaped child succeeds, then wait7; common need not change. One GLM task `glm-http-startup-owned-receipt-20261105T091555Z` moves ALL postspawn bootstrap under existing guard and retains raw/exit/terminalstates BEFOREpanic; actual startupEOF guard and21-case recipe if added. Then supported ./swarm.sh build of stable normal source (staging, no activation before qualification), NEW fixture and current-image pin. No332binary patch/inventedexit; HTTP unaccepted. Consumed fixture setup requires renewal. PA00–PA13/RETEX/form/delivery/parentrefusals open,15min monitor retained.
+
+Personal reception5Nov08:55UTC: **4reviewer guardsOK/exit0/no warnings**, then actual NEW normal332 producer **exit0/PASS**:2inert Biba cycles,12reviewinputs,5reviewer and8publication checks; task_accepted=true only in fixture, mission_accepted=false/paid_provider=false. SR1v2magic/length/SHA,waited/exit0/outputcomplete/grant/channelclosed verified; markerPID/PPID==nativejob4030982/4030810 and prompt/context/catalog hashes bound.37helper sources stable; archive read back and hashes compared. Evidence `paea/evidence/20261028-acquisition81-mvfdts57/glm-reviewer-marker-raw-no-spin-20261105T083858Z/supervisor-source-qualified-next-http.json` plus direct reception.
+
+Scope: owned inert supported public publication fixture, no human independence/global confinement/HTTP acceptance. One GLM task `glm-http-positive-normal-fixture-pin-20261105T085538Z` pins exact positive1test recipe to this fresh fixture and NORMAL332 image/SHA00560d87…+retained profile, rather than default testCLI. Personal HTTP recipe/raw/Git/service/project/actualexit/verify after handback; parent refusal/ownership/receipt review remains open. No new live delivery claimed. PA00–PA13/RETEX/form/delivery open,15min monitor retained.
+
+Personal reception5Nov08:38UTC: **3reviewerI0 guardsOK/exit0/no warnings/stable sources**, raw+4exact inputs `paea/evidence/20261028-acquisition81-mvfdts57/glm-reviewer-fixture-i0-config-marker-20261105T081222Z/supervisor-reviewer-workspace-three/`. Embedded config and0600marker in testcwd established, not Biba/nativepermission. Full run unqualified: replay compares raw marker to different newly compactedJSON; unusedwaitTrue adds infinitebusy-spin. One GLM task `glm-reviewer-marker-raw-no-spin-20261105T083858Z` freezesRAWbytes/removes option+loop with actualPopen/single-read regression. Personal NEW normal332 producer after stability; marker/nativejobPID coherence still needs verification, source/publish-refusal variants unqualified and explicit. No publicationfixturePASS/HTTP acceptance; PA00–PA13/RETEX/delivery/form/parentretention open,15min monitor retained.
+
+Personal reception5Nov08:12UTC: close-proof/privacy guards now **14 named testsOK/exit0 without ResourceWarning, sources stable**. Initial recheck13OK/1FAIL was a guard expecting4reads instead of2; GLM corrected only that fixture. Actual nonvacuous close mutation and retained private payload ran. Evidence `paea/evidence/20261028-acquisition81-mvfdts57/glm-observation-guard-call-count-20261105T080645Z/supervisor-fourteen-final/`. One GLM task `glm-reviewer-fixture-i0-config-marker-20261105T081222Z` resumes actual producer boundary: reviewer root-relative config absent from I0cwd and marker consumers. Primary `native_provider_workspace.rs`/material.rs contract: engine Reviewer output/publicclaim under `.swarm/biba-i0/reviewer/<event_id>`, no invented permission. Fixture/consumer code plus targeted regressions, no weakenedBiba; unqualified fault variants must stay explicit. Personal NEW producer after stable handback; prior2actual normalBiba cycles retained but no publicationfixturePASS/HTTP acceptance. PA00–PA13/RETEX/delivery/form/parentretention open,15min monitor retained.
+
+Controlled resume5Nov07:51UTC: actual network precondition externally restored, internalDNS10.202.26.231, proxyhealthHTTP200 and upstreamGET/models200/19models verified without model call. No sharedDNS/VPN/proxy settings changed. Test source unchanged during outage, no sameUUID client/orphan active; previous network request now resolved. Evidence `paea/evidence/20261028-acquisition81-mvfdts57/glm-canonical-guard-syntax-fix-20261105T064719Z/supervisor-network-restored-resumption.json`. SameUUID GLM--resume in fresh `glm-canonical-guard-syntax-network-resume-20261105T075134Z` for ONLY the unfinished syntax/close-guard correction, no cap/budget increase. No new PAEA qualification; failure logs retained. Personal14guards after handback then reviewerfixture cwd/config. PA00–PA13/RETEX/positiveHTTP/delivery/form/parentretention remain open,15min monitor retained.
+
+Network replan5Nov07:34UTC: GLM client ended **exit1/API500 Connectionerror** without modifying the test. Targeted diagnosis confirms internal DNS `chat.skynet.cossi.internet` EAI_NONAME; proxyTCP4010 available, WiFi192.168.0.1 is the only visible DNS scope. No changed precondition for another call: GLM calls suspended, no sharedDNS/VPN/proxy changes, no Codex development. Evidence `paea/evidence/20261028-acquisition81-mvfdts57/glm-canonical-guard-syntax-fix-20261105T064719Z/supervisor-network-blocker.json`, DNS/resolver/exit/full logs retained. Network owner:user/operations; resume after actual internal DNS restored and proxy available, orphan check then sameUUID--resume/fresh folder/exact unfinished syntax fix. First network intervention notice for this loss, do not repeat while pending.15min monitoring remains useful and active; PA00–PA13/RETEX andHTTP/form open.
+
+Personal reception5Nov06:47UTC: close-proof/redaction fix handed back but direct script **exit1/SyntaxErrorline619, zero functional cases executed**, sources stable. Raw+3exact inputs `paea/evidence/20261028-acquisition81-mvfdts57/glm-canonical-proof-redaction-fix-20261105T063448Z/supervisor-canonical-fourteen/`. Outertry dedented before except/finally; close mutation targets already closed old FDs and could select rerun watch. Minimal GLM task `glm-canonical-guard-syntax-fix-20261105T064719Z` repairs ONLY that guard function/mutation isolation to newly held returned FDs, retaining assertion before testcleanup. Reviewerfixture config/cwd remains next dependency after14actually executed guards. Prior two actual normalBiba cycles retained, no publicationfixturePASS or HTTP acceptance; PA00–PA13/RETEX/delivery/form/parentretention open,15min monitor retained.
+
+Personal check5Nov06:34UTC: **12helper guardsOK/exit0stable**, then a NEW normal332 producer passed **both actual inert Biba worker cycles** (canonical/kernel attachment, file ready/probe, server stop/adoption, release/waitpid0, FIFO/durable settlement): actual NATIVE_MANAGED_AUTO_PASS and MANAGED_REVIEW_INPUTS_PASS12assertions. No global confinement/independence/acceptance proof. Overall producer **exit1** afterwards: inert reviewer loads relative config absent from actual cwd; retainedSR1 receipt magic/length/SHA verified, waited=true/exit1 and FileNotFoundError line6. Reception `paea/evidence/20261028-acquisition81-mvfdts57/glm-canonical-queued-close-fix-20261105T060323Z/supervisor-source-fixture-second-reception.json`.
+
+Helper reception still rejected: new close guard closes its own FDs before assertions (false positive) and unknown/malformed refusals re-render private payload. One GLM task `glm-canonical-proof-redaction-fix-20261105T063448Z` fixes proof/refusals before qualification; next repair reviewer fixture config/cwd/invocation observation through actual retained channels, no Biba bypass. No publicationfixturePASS or positiveHTTP acceptance. Normalprofile/delivery/form, parentretention andPA00–PA13/RETEX open;15min monitor retained.
+
+Personal check5Nov06:03UTC: AF_UNIX bootstrap removed and alias/release corrected in source; **9helper tests OK/exit0 stable**,25unchanged protocol results reused. Real NEW producer ran on normal332/image00560d87… and qualified profile: **exit1**, false terminal refusal for queued agent/not-ready PIDs/null exit. Actual failure and completed cleanup retained in `paea/evidence/20261028-acquisition81-mvfdts57/glm-managed-public-identity-attach-20261105T054735Z/supervisor-canonical-producer-reception.json` plus raw stdout/stderr/argv/exit. Engine queued nonterminal contract read directly. New canonical boundary also repeats return-inside-try hiding close refusal and uncleared pendingBUSY: one GLM task `glm-canonical-queued-close-fix-20261105T060323Z` fixes classification/ownership with dedicated regressions. No new PASSfixture or HTTP acceptance; no unchanged producer retry. Personal reception after stability then a new fixture; PA00–PA13/RETEX/normalprofile/delivery/form/parentretention remain open,15min monitor retained.
+
+Personal reception5Nov05:47UTC: **25protocol+9helper tests OK, exit0/no warnings, sources stable**; raw and5exact inputs `paea/evidence/20261028-acquisition81-mvfdts57/glm-managed-file-rendezvous-integration-20261105T051729Z/supervisor-integration-compatibility/`. Actual integration REJECTED by contract review: provider module shadowed by a local variable (symtable confirms first-call UnboundLocalError), AF_UNIX bootstrap retained although new provider never connects, disjoint release int+str and divergent filenames. NEW producer not launched on this impossible path. One GLM correction `glm-managed-public-identity-attach-20261105T054735Z` implements canonicalagent→kernel/pidfd attachment without initial socket, separates alias and aligns release;25-guard module read-only. Personal9compatibility then a NEW normal332 producer after stability; no sandbox-free image. PositiveHTTP/normalprofile/delivery/form, parentretention andPA00–PA13/RETEX remain open;15min monitor retained.
+
+Personal reception5Nov05:17UTC: **23 named protocol tests OK, exit0, no ResourceWarning, sources stable**; direct command and4exact inputs retained under `paea/evidence/20261028-acquisition81-mvfdts57/glm-file-protocol-stdin-close-20261105T050147Z/supervisor-file-protocol-cleanup-recheck/`. Actual stdin close assertsclosed, no warning suppression. Scope strictly standalone, not Biba/publicidentity. Active next GLM task `glm-managed-file-rendezvous-integration-20261105T051729Z` wires real managed cycles: canonical agent→kernel/stamps/pidfd→readyfile, retaining existing survival/settlement/refusal assertions. Any external terminal descriptors need qualification before a NEW normal332 producer. No older sandbox-free image or copied fixture. PositiveHTTP/normalprofile/delivery/form, parentretention and PA00–PA13/RETEX remain open;15min monitor retained.
+
+Personal check5Nov05:01UTC: protocol direct tests now **23OK/exit0**, before/after sources stable and exact bytes retained under `paea/evidence/20261028-acquisition81-mvfdts57/glm-file-protocol-mode-bytes-fix-20261105T044704Z/supervisor-file-protocol-recheck/`.0600 modes and stderrbytes corrected in that scope. ResourceWarning stays open: actual kill-before-ready path leaves stdinBufferedWriter open and terminal cleanup skips it; cause personally read. Minimal active GLM task `glm-file-protocol-stdin-close-20261105T050147Z` closes the owned endpoint and assertsclosed without suppressing warning/forcingGC/changing kill timing. No leak-free reception or Biba integration before recheck; public identity/two-cycle wiring remains next dependency. PositiveHTTP/normalprofile/delivery/form, parentretention and PA00–PA13/RETEX open;15min monitor retained.
+
+Personal check5Nov04:47UTC: protocol module actually handed back, then23tests run after stability: **21OK/1FAIL/1ERROR, exit1**, exact inputs archived and before/after sources stable. Evidence `paea/evidence/20261028-acquisition81-mvfdts57/glm-fixture-file-protocol-20261105T041742Z/supervisor-file-protocol-direct/`. Positive witness FAIL: handoff0664 rather than0600 (model-received shares ambient-umask creation); bad-release assertion ERROR comparesstr to stderrbytes. Active minimal GLM fix `glm-file-protocol-mode-bytes-fix-20261105T044704Z` creates both files exclusive0600 and fixes bytes assertion/technical-batch docs without weakening checks. Additional unclosed stdinBufferedWriter ResourceWarning retained for diagnosis before protocol reception. README suggestions to regenerate using an older sandbox-free binary were observed; no such use authorized or performed by this monitor, real Biba remains to verify after integration. Protocol/sourcefixture/positiveHTTP and PA00–PA13/RETEX unaccepted;15min monitor retained.
+
+Personal replan5Nov04:16UTC: fixture transport package coupled too many contracts before its first implementation. Two public compactions and82tool replies, no module/tests created, continued mapping and PENDING progress; no verified functional progress. Evidence `paea/evidence/20261028-acquisition81-mvfdts57/glm-source-fixture-file-rendezvous-20261105T034757Z/supervisor-package-decomposition-replan.json`. Only the owned GLM client interrupted after UID/boot/start/session verification; actual exit0/error_during_execution and sources/logs retained, no cap/budget increase. SameUUID resumed in fresh `glm-fixture-file-protocol-20261105T041742Z`: inert-provider file protocol/tests/docsONLY; public identity and two-cycle integration after personal module reception. Biba protection unchanged; no unchanged producer replay. Last verified functional result remains9helper tests; sourcefixture/positiveHTTP/normalprofile/delivery/form and PA00–PA13/RETEX open,15min monitor retained.
+
+Personal reception5Nov03:47UTC: direct command **9 named tests PASS, exit0, sources stable**; full stdout/stderr, argv/identity/hashes and four exact inputs retained under `paea/evidence/20261028-acquisition81-mvfdts57/glm-provider-wait-reception-fixes-20261105T031729Z/supervisor-provider-wait-direct/`. Scope: causal wait, terminal priority, owned cleanup and retained private payload with nonce-free rendering, simulated CLI fixtures plus actual inotify/sockets; not qualification of the entire producer. One active GLM task `glm-source-fixture-file-rendezvous-20261105T034757Z` implements/integrates regular-file rendezvous INSIDE the Biba workspace, binding identity to the canonical agent and kernel/pidfd before reading its report; AF_UNIX protection unchanged. Both real cycles and refusal/recovery/durability assertions remain required; personal tests then a NEW producer after stability. Positive HTTP/normalprofile/delivery/form, parent findings and PA00–PA13/RETEX stay open;15min monitor retained.
+
+Personal reception5Nov03:17UTC: wait helper handed back, but exact documented command **exit1/loaderERROR, zero functional cases executed**, sources stable: rust_managed_auto_worker absent from module import path. Evidence `paea/evidence/20261028-acquisition81-mvfdts57/glm-fixture-provider-terminal-wait-20261105T025842Z/supervisor-provider-wait-first/`. Pre-execution review found wrong-endpoint peek that could block, close error lost by return, accept without re-observation after simultaneous DB activity, and whole public agent rendered including prompt/context. One active GLM correction `glm-provider-wait-reception-fixes-20261105T031729Z` covers code/guards/FR+EN docs; direct script command and complete statusJSON schema transmitted. No tests on changing sources, no helper acceptance or new positive HTTP. Biba-compatible fixture transport and parent HTTP findings remain open; PA00–PA13/RETEX and15min monitor retained.
+
+Personal check5Nov02:58UTC: take_stdin compatibility **20PASS/0FAILED/0ignored/4filtered, run0/verify0**. Actual HTTP positive recipe compiled and ran **0PASS/1FAILED/0ignored/23filtered, cargo101/run1**, integrity VERIFIED/recordedFAIL: missing SWARM_PAEA_SOURCE_FIXTURE before any HTTP child spawn. GLM added an explicit fresh fixture and declared result/inputs, and moved the manifest to stderr; source handback only, no accepted replay.
+
+Actual fresh source producer on qualified normal332 image00560d87…: both inert providers failed **exit1/EPERM socket(AF_UNIX), kernel_reaped/output_complete true**. Biba intentionally deniesAF_UNIX; protection preserved. Controller still waited on listener/serverfd after provider termination. Personal causal diagnosis found empty pipe0/65536; UID/boot/start/parent/argv/ELF verified, then one pidfdSIGINT to only this newly owned fixture server let cleanup finish with actual producer exit1. No live instance touched. Original proof: `paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-http-eof-api-integration-20261105T023433Z/supervisor-source-fixture-missing-provider-replan.json` plus retained outputs and agent observations.
+
+One active GLM task `glm-fixture-provider-terminal-wait-20261105T025842Z`: implement causal wait observing newly terminal canonical agents, preserve cause/cleanup and targeted regressions, without temporal polling/watchdog/budget changes. Biba-compatible fixture transport is the next dependency; no unchanged regeneration. Positive HTTP reception requires a genuinely valid source fixture. Parent review stays open: startup/protocol outside guard, refusal consumers dropping ownership, receipt lacking actual exit/capture outcomes and emitted too late, proc-exe hashing via reopened pathname.20 helper cases do not prove HTTP/normalprofile/delivery/form. PA00–PA13/RETEX open;15min monitor retained.
+
+Personal replan5Nov02:33UTC: smallest discriminating producer check done.
+ActualCLI waits frameEOF beforebound; original witness takes/writes/drops
+stdin, but helper exposes only a borrow and closesstdin atfinish. MissingAPI
+and denied producerread were incorrect packet prerequisites, establishing a
+prepared→bound deadlock risk. Retained diagnosis:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-http-raw-capture-integration-20261105T022042Z/supervisor-eof-before-bound-replan.json` (French proof tree).
+Only ownedGLM client interrupted afterUID/boot/start/session check; actual
+exit0/error_during_execution,parent unchanged,no newrecipe. Same session
+resumed in fresh `glm-approval-http-eof-api-integration-20261105T023433Z`:
+minimal take_stdin helperAPI authorized, exact EOFproducers readable, write
+frame thenclose ownedendpoint BEFOREbound. PositiveHTTP objective/assertions
+unchanged; no addedtimeout or productprotocol bypass. Personal20guards then
+exactpositive recipe afterhandback; PA00–PA13/RETEX,normalprofile/delivery/form
+remainopen,15minmonitor retained.
+
+Personal control5Nov02:18UTC: actual recipe **20PASS/0FAILED/0ignored/
+4filtered, run0/verify0, stable sources**. Real stdinEOF-ignoring child:
+SIGINThandler tails, actualexit0,two rawcaptures andoriginalcontrollerpanic
+verified after healthy control thenpanic phase. Bounded receipt:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-signal-rustix-types-fix-20261105T020241Z/supervisor-owned-signal-reception.json` (French proof tree).
+Pidfd/signalrefusal paths remain unexercised; no OSisolation/independence claim.
+One GLM implementation task active:
+`glm-approval-http-raw-capture-integration-20261105T022042Z`, wiring helper
+into existing HTTP witness(prepared→frame→bound→approval inRootPROJET),
+retained rawstdout/stderr and actualprocessreceipt, exactpositiverecipe and
+FR-ENREADME. No report replaces implementation. Personalbusinessrecipe after
+handback; normalprofile/refusal/recovery/build/activation/form andPA00–PA13/
+RETEX remainopen,15minmonitor retained.
+
+Personal control5Nov02:02UTC: submitted signal wrapper refused at actual
+compilation: cargo101/run1,zero guards,stable sources. ThreeE0308: Option<Pid>
+instead ofPid and twoErrno instead ofio::Error. Originalproof and integrity
+VERIFIED/recordedFAIL retained:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-owned-signal-shutdown-20261105T013618Z/supervisor-signal-compile-refusal.json` (French proof tree).
+One minimal GLM task active `glm-child-signal-rustix-types-fix-20261105T020241Z`,
+with exact primary pid.rs/pidfd.rs reads and cause/ownership-preserving
+conversions; no assertion weakened. Personal20guardrecipe follows. No owned
+signal shutdown qualified or HTTPintegration delivered by this lot. Lastgreen
+remains19guards and actualtypedrecovery; PA00–PA13/RETEXopen,15minmonitor retained.
+
+Personal control5Nov01:35UTC: minimal fix received, actual recipe
+**19PASS/0FAILED/0ignored/4filtered, run0/verify0, stable sources**. Actual
+conserve/panic_any/catch/owneddowncast/recovery then first realwait executed;
+sameChild,cause,paths,states and exact originalcontrollerpayload verified after
+collection. Bounded receipt:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-carrier-owned-unbox-fix-20261105T013234Z/supervisor-owned-carrier-reception.json` (French proof tree).
+One GLM task active `glm-child-owned-signal-shutdown-20261105T013618Z`:
+explicit pidfd-bound ownedChild shutdown(installedrustixAPI inspected),
+prepare beforecontroller, caller-requested signal, actualnormal/panic collection,
+ONE stdinEOF-ignoring child guard and20guardrecipe/FR-ENdocs. Concrete
+prerequisite to wiring approval-web server requiring SIGINT. No other's process
+stop or timeout/fallbackpolicy; pidfd proves neitherconfinement nor independence.
+Then normalprofile HTTP RootPROJET witness,build/activation/form; PA00–PA13/
+RETEX remain open.
+
+Personal control on5November01:32UTC: strengthened guard refused at
+compilation, cargo101/run1,zero guards,stable sources. OneE0308 at owned
+Box<WaitRefusalCarrier> unboxing(2117–2126). Proof integrity VERIFIED,
+recordedFAIL; original retained:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-typed-carrier-roundtrip-guard-20261105T011713Z/supervisor-box-unboxing-compile-refusal.json` (French proof tree).
+One minimal GLM task active: `glm-child-carrier-owned-unbox-fix-20261105T013234Z`,
+that type only, then personal19guard recipe. Actual typed boundary remains
+unqualified until its guard executes its assertions; lastgreen19 applies to
+previous source only. Lexar absent,indexed localfallback,about10GB available.
+HTTP/profile/delivery/form and PA00–PA13/RETEX remain open;15min monitor retained.
+
+Personal control5Nov01:16UTC: actual recipe **19PASS/0FAILED/0ignored/
+4filtered, run0/verify0, stable sources**. Three compiler errors repaired;
+synthetic refusal, cause/count1/sameChild/paths then actualexit5 and two
+Completed37/38 verified aftercollection. Bounded receipt:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-wait-handback-consumers-fix-20261105T004740Z/supervisor-handback-nineteen-reception.json` (French proof tree).
+Typedcarrier retains fields in source, but actual panic/catch/owneddowncast/
+recovery boundary remains unexercised (author-disclosed limit). One GLM task
+active `glm-child-typed-carrier-roundtrip-guard-20261105T011713Z` strengthens
+existing19thguard through that boundary, no additionalguard or ownerAPI;
+actual resolution and allassertions aftercollection. No realOSwait-error/
+forcedcancellation/HTTP/profile/delivery acceptance. PA00–PA13/RETEX open,
+15min monitor retained, historical failures preserved.
+
+Personal control5Nov00:46UTC:19guard recipe REFUSED at compilation,
+cargo101/run1,zero guards,stable sources; integrityVERIFIED/recordedFAIL.
+Incomplete tuple migration: borrowed handback into consuminghelper line713,
+stale struct pattern883,missing checker Ok return1420. Original proof:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-wait-refusal-ownership-20261105T003214Z/supervisor-wait-refusal-reception-rejected.json` (French proof tree).
+Two source findings remain: refusal consumer drops Child/paths beforepanic,
+and new guard verdicts precede actual wait/joins. One GLM task active
+`glm-child-wait-handback-consumers-fix-20261105T004740Z` repairs coherent
+producer/consumers and collection-before-verdict order, with no new count or
+automaticretry. Personal19guardrecipe afterstability; last boundedgreen18guards,
+no19guard/HTTP/profile/delivery/global qualification. PA00–PA13/RETEX open;
+originalFAIL history retained,15min monitor maintained.
+
+Personal control5Nov00:31UTC: compile fix received, actual recipe
+**18PASS/0FAILED/0ignored/4filtered, run0/verify0, stable sources**.
+Controller panic injected before release, actual cooperativeEOF finish, exit9,
+two exact captures and original-payload rethrow verified; original compiler
+failure retained. Bounded receipt:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-controller-compile-fix-20261105T001656Z/supervisor-controller-reception.json` (French proof tree).
+WaitRefused finding remains blocking: automatic retry without changed
+precondition. One GLM task active `glm-child-wait-refusal-ownership-20261105T003214Z`
+repairs typed cause/ownership/panic handback without retry and adds ONE
+synthetic shared-handler refusal guard,19guard recipe/FR-EN docs. This
+qualifies neither a real OS wait error nor forced cancellation. Business/
+profile/delivery/form and PA00–PA13/RETEX remain open.
+
+Personal control5Nov00:16UTC: controller/panic handback REFUSED at actual
+compilation: cargo101, recipe run1, **zero guards executed**, stable sources.
+E0599 `io::Error.clone` and twoE0614 on ownedu64; originalFAIL retained,
+`verify` integrityVERIFIED/recordedFAIL/exit1. Receipt:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-cooperative-controller-panic-20261104T234736Z/supervisor-controller-compile-refusal.json` (French proof tree).
+One GLM task active: `glm-child-controller-compile-fix-20261105T001656Z`,
+minimal3compiler-error fix then personal18guard recipe. Separate finding
+remains open: WaitRefused repeats wait without a changed prerequisite,
+since stdinEOF preceded the first wait; no qualified resolution. No new panic
+acceptance or business/profile/delivery. Last passing evidence remains17guards;
+PA00–PA13/RETEX open,15min monitor retained.
+
+Personal control23:46 UTC: permanent recipe actually executed,
+**17PASS/0FAILED/0ignored/4filtered, run0/verify0, stable sources**. New
+handshake verified: both raw prefixes read before stdin release, exact tails,
+non-success exit9 and two Completed outcomes. Bounded receipt:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-stdin-live-handshake-20261104T231704Z/supervisor-handshake-reception.json` (French proof tree).
+Review does not qualify panic cleanup: test helper discards Finished capture
+issues and repeats wait after WaitRefused without a changed prerequisite. One
+GLM task active: `glm-child-cooperative-controller-panic-20261104T234736Z`,
+wrapper retaining controller result/original panic and complete finish for a
+child with established stdin-EOF shutdown, plus ONE real injected-panic guard
+and18guard recipe/FR-EN docs. Forced cancellation/general Drop stay outside
+this scope; business integration/delivery unaccepted. README reads limited to
+the current section to prevent observed size refusals/compactions. PA00–PA13/
+RETEX remain open.
+
+Control23:16 UTC: raw16guard output personally reread, actual exit0/source
+stability and six source/doc/recipe hashes match; personally reran integrity
+`recipe.py verify`: VERIFIED/PASS/exit0. Reused unchanged interactive personal
+execution without redundant compilation. Reader component gate closed, bounded
+scope: `paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-final-review-resume-fixed-20261104T225041Z/supervisor-reader-completion.json` (French proof tree).
+One GLM task active: `glm-child-stdin-live-handshake-20261104T231704Z`, one
+causal Child guard reading both prefixes before stdin release, plus17guard
+recipe/docs; reader/owner implementations unchanged. Stable handback then
+personal execution required; Child cancellation/unwind and business/profile/
+delivery/form remain unqualified. No global PAEA acceptance; PA00–PA13/RETEX
+open,15min monitor retained.
+
+Reader component closure — 2026-11-04 23:05 UTC (5 November local):
+**16/16guards PASS, 0FAILED, 0ignored, 4filtered, exit0**, personally executed
+by Codex after stable GLM handback. Permanent recipe
+`tools/verification/recipes/paea-capture-reader.json`, declared input stability
+and `recipe.py verify` **VERIFIED/PASS**. Breakdown: 10reader,3primitive,
+3Child compatibility. Both original integrity counterexamples remain retained
+as FAIL and now pass without weakened assertions. Byte-bound report/review:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-final-review-resume-fixed-20261104T225041Z/READER-COMPLETION.md` and
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-final-review-resume-fixed-20261104T225041Z/supervisor-reader-completion.json` (French proof tree).
+
+Verified effects: reserved-descriptor binding despite pathname replacement,
+positional reads, premature physical EOF refusal, prefixed and zero-byte
+failure/panic, empty buffer without consuming the terminal error, preparation
+refusal preserving the empty0600artifact/cause followed by fresh recovery.
+Child-consumer documentation corrected (comments-only delta). Codex corrected
+one Rustdoc phrase from no file exists to no NEW file created; behavior authored
+by GLM. Explicit policy/function/error review and diff checks completed against
+retained hashes. No new operator policy, hidden ceiling or watchdog introduced.
+
+The user’s reader gate is **closed for this component contract**. This does
+not establish approval-witness integration, an installed production profile or
+global PAEA/PA00–PA13/RETEX acceptance. Helpers compile only in the integration
+test: no cockpit build/restart/version update required for this increment.
+Child cancellation/Drop/unwind/handshake and business flow remain open; this
+interactive increment performed no next task. Retained learning: include absolute
+source paths in GLM’s actual prompt as well as scope metadata, positively verify
+guard rights, normalize existing-session `--resume` versus new `--session-id`,
+and require actual personal evidence before accepting a report. Original
+transmission refusals/failures retained in predecessors and
+`supervisor-transmission-learning.json`; effective skill-source maintenance is
+assigned to the next skill revision.
+
+Personal check22:47 UTC: permanent reader recipe actually executed,
+**15PASS/0FAILED/0ignored/4filtered, exit0**, declared stability and integrity
+**VERIFIED**. Proof: `paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-integrity-fix-and-terminal-edges-20261104T223157Z/supervisor-reader-fifteen-personal` (French proof tree).
+Both original integrity counterexamples now pass without weakened assertions.
+Final reader review increment remains: shared descriptor preparation for both
+entries; ReaderPrepare refusal guard preserving the empty artifact/cause;
+Child-consumer documentation (Open vs ReaderPrepare); collect outcomes before
+empty-buffer assertions. One GLM task in a fresh bounded context
+(`glm-reader-final-review-preparation-contract-20261104T224741Z`), after the prior
+client’s real exit; history/failures retained. Reason: two compactions of the long
+prior context delayed handback. Latency improvement is not yet verified. Updated
+recipe requires16guards, NOT YET EXECUTED on this final increment. No next
+Child/business task or cockpit delivery.
+
+Personal check22:31 UTC: all13guards actually ran:
+**11PASS/2FAILED/0ignored/4filtered, exit101**, declared inputs stable and FAIL
+proofs **integrity VERIFIED**. Both pins demonstrate forged-path bytes delivered
+to the consumer and false clean EOF after truncating the evidence.
+Original: `paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-integrity-counterexamples-20261104T222535Z/supervisor-reader-integrity-red` (French proof tree).
+Original synthetic files remain, bytes reread in
+`supervisor-retained-fault-artifacts.json` (observations, no exclusive attribution
+of leaves by timestamp alone). GLM repairs only the reader/shared primitive,
+then covers zero-prefix fault/panic and empty buffers; Codex runs the permanent
+recipe and review before acceptance. Interactive supervision owns current tests
+(`supervisor-interactive-ownership.json`); no duplicate client or next
+Child/business task before this gate.
+
+Personal check22:24 UTC: GLM’s two u64 dereference corrections compile;
+**11PASS/0FAILED/0ignored**, declared recipe/source archives **integrity VERIFIED**
+(`paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-gate-compile-scalars-20261104T222013Z/supervisor-reader-baseline-11`, French proof tree).
+Reader replan: two integrity hypotheses need counterexamples before correction:
+pathname reopen after reservation (original writer FD versus substituted reader),
+and physical EOF despite bytes reported written. GLM adds only these two guards,
+with healthy controls first; Codex will execute them before repair. Chosen route:
+reproduce then correct the descriptor identity/EOF contract generally, rather than
+hide the discrepancy with an existence check or retry. Zero-prefix fault/panic,
+empty buffers and diagnostics remain to be verified afterwards. User gate remains;
+no further Child/business task and no qualified product delivery.
+
+User completion gate (current interactive request): finish/correct the live
+stream reader with GLM, then personally verify it BEFORE the next task. Let the
+already-active ownership repair finish because it modifies the reader's reserved
+entry; do not start any further Child/unwind/handshake/business task before reader
+acceptance. Recheck current8guards plus consumer diagnostics, failure/panic before
+the first byte and empty-buffer semantics, current docs and byte-bound review,
+permanent recipe/verify. Old8PASS is historical to its exact source; current
+active changes need renewed personal evidence. Gate retained in current task's
+`supervisor-user-reader-completion-gate.json`; no duplicate author.
+
+Personal control22:01 UTC: actual start ownership counterexamples ran:
+**1PASS/2FAILED/0ignored/12filtered, exit101**, compilation green, stable
+declared inputs. After healthy controls and actual returned-child collection,
+both missing-stdout pins fail exactly; implementation not yet corrected.
+Reread proof/source archives:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-child-start-ownership-guards-20261104T214712Z/supervisor-start-ownership-reproduction/reception.json` (French proof tree).
+Limits: negative child wait status collected in memory but not serialized at
+failure, subsequent stderr pin not reached; no invented status/signal. One GLM
+task active: `glm-approval-child-start-ownership-fix-20261104T220210Z`, general
+precondition/descriptor-reservation correction before pipe transfer, child/live
+only; retain partial proof and real causes. Codex will personally run11guards
+after stable handback; no recipe/profile/delivery or business integration
+qualified. Stderr-refusal/unwind/handshake, normal RootPROJET HTTP approval,
+same-image form and PA00–PA13/RETEX remain open;15min monitor retained.
+
+Personal control21:46 UTC: normal Child guard actually ran:
+**1PASS/0FAILED/0ignored/12filtered, exit0**, stable declared inputs. Real
+local child non-success exit7, exact raw stdout/stderr NUL/nonUTF8/CRLF,
+two Completed joins and0600 verified. Parent changes only declare the module.
+Reread receipt/archive:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-child-normal-capture-20261104T213147Z/supervisor-normal-child-verification/reception.json` (French proof tree).
+This normal PASS qualifies no setup/unwind: source review finds stdout taken
+then lost when stderr is missing, and both pipes lost on stdout-evidence
+refusal, contradicting documented ownership. One GLM tests-only task active:
+`glm-approval-child-start-ownership-guards-20261104T214712Z`, healthy controls
+then two counterexamples for personal pre-fix FAIL before a separate general
+repair. Also move normal guard assertions after actual finish. Controller panic,
+handshake, business/profile/recipe/delivery and PA00–PA13/RETEX remain open;
+15min monitor retained. Typo-path Read refusal handled without mutation or
+scope expansion.
+
+Control21:30 UTC: full Child task stopped by client, actual exit1,
+`is_error=true` despite success subtype: response exceeded its32000 output
+maximum. Three successful Reads, no edit, parent unchanged, no Child module.
+SKYNET DNS/proxy available; client output failure, not network outage. Diagnosis:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-owned-child-capture-20261104T210219Z/supervisor-output-limit-replan.json` (French proof tree).
+No cap/effort/budget increase. One GLM task resumed in the same session:
+`glm-approval-child-normal-capture-20261104T213147Z`, NORMAL-path helper,
+two concurrent streams and one synthetic exit7 guard; setup/refusal/unwind
+remain blocking next steps before business integration. No additional verified
+progress beyond previous8guards. Existing instance observed ready dev.332,
+expected actual ELF personally hashed; no new code installed or global acceptance.
+PA00–PA13/RETEX remain open.
+
+Personal control21:01 UTC: general EOF repair received; eight guards
+actually ran: **8PASS/0FAILED/0ignored/4filtered, exit0**, stable declared
+inputs. Both previously failing assertions pass without weakening: prefix then
+consumer Err, Failed state/Panicked payload retained at actual join. Source/proof
+archive reread and hashes verified:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-live-eof-fix-20261104T204712Z/supervisor-eof-fix-verification/reception.json` (French proof tree).
+One wrong-directory FINAL Write was denied without mutation, then submitted
+to its actual path; handled refusal, no authority expansion. Retained limits:
+stale docstring names, consumer diagnostic and empty-prefix/empty-buffer guards
+not yet asserted; this PASS qualifies no Child/profile/delivery. One GLM task
+active: `glm-approval-owned-child-capture-20261104T210219Z`, owned concurrent raw
+stdout/stderr, actual exit and controller-panic evidence retention, helper and
+guards only. Business integration follows personal handback verification;
+PA00–PA13/RETEX open, single15min monitor retained.
+
+Personal control20:46 UTC: eight guards actually executed after stable
+tests-only handback: **6PASS/2FAILED/0ignored/4filtered, exit101**. Both
+counterexamples reach exactly their final assertion: consumer Ok(700) on
+Failed/Panicked after healthy pre-injection controls, actual joins and exact
+prefixes. No unrelated failure;4filtered corrects FINAL's erroneous2 prediction.
+Original proof:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-live-eof-counterexamples-20261104T203232Z/supervisor-prefixed-failure-reproduction/reception.json` (French proof tree).
+Local archive reread/hash-verified, Lexar absent, originals retained. One GLM
+task active: `glm-approval-live-eof-fix-20261104T204712Z`, general consumer EOF/error
+repair and current documentation in the live module alone, without weakening
+guards. Codex will personally rerun after stable handback. No Child integration
+or delivery accepted; PA00–PA13/RETEX open. Following checks remain historical.
+
+Personal control20:31 UTC: GLM mutability fix received, then six guards
+actually executed: **6PASS/0FAILED/0ignored/4filtered, exit0**,1221 stable
+declared inputs. Raw outputs, inputs, sources and local archive reread and
+verified; Lexar absent, originals retained. Bounded receipt:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-live-notify-mutability-20261104T201716Z/supervisor-capture-guards/reception.json` (French proof tree).
+This PASS does not cover the Failed/Panicked consumer: the reader still returns
+clean EOF and the healthy witness follows injection. One active GLM task,
+tests only in `glm-approval-live-eof-counterexamples-20261104T203232Z`: error/panic
+counterexamples, healthy controls before injection and actual join before terminal
+assertions; implementation unchanged for personal pre-fix failure reception before
+a separate repair. No Child, profile or delivery accepted. Single15min monitor
+retained; PA00–PA13 and RETEX open. Following paragraphs retain historical
+checks and refusals without requalifying them.
+
+Personal interactive check20:16 UTC: the two submitted compiler fixes remove
+E0425/E0502, but the actual scoped six-guard run still exits101 with E0596:
+`notify` is not mutable when passed as `&mut notify` (live.rs261). Zero guards
+executed, declared sources stable. Original recipe FAIL and archive integrity
+verified; no live PASS, integration or delivery. Receipt:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-live-compile-fix-20261104T200427Z/supervisor-interactive-E0596-reception.json`.
+The shared task status carries this exact correction; the15min supervisor is
+active, no concurrent author launched interactively. Consumer EOF/error semantics
+and valid pre-fault control remain required after compilation is restored.
+
+Personal control20:02 UTC: live-reader handback refused. GLM exited0 but
+actual targeted compilation101: E0425 (missing Path import) and E0502
+(front borrow overlaps delivered mutation), **zero guards executed**, stable
+declared inputs. No live-stream or child-capture PASS accepted. Raw outputs
+and three changed source snapshots retained; bounded Rust/web inventory is
+not effective-profile qualification. Reception:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-live-recorded-stream-20261104T194204Z/supervisor-heartbeat-live-check/reception.json` (French proof tree).
+Personal control20:15 UTC: the first two compile errors are no longer
+observed, but compilation101 now reports E0596 (immutable notify mutably
+borrowed), stable source and zero guards executed. Original failure retained:
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-live-compile-fix-20261104T200427Z/supervisor-capture-compile-recheck/reception.json`.
+One GLM task active through CURRENT-GLM.json: this local mutability repair
+only, then personal guards. Two semantic findings remain open before integration:
+Read produces clean EOF on Failed/Panicked; the faulty-reader guard places its
+healthy control after injection. Dedicated counterexample/repair must follow;
+no Child integration before resolution. Single15min monitor retained, no
+concurrent tests on actively edited sources. Primitive recipe now scopes its
+three names without a filtered-test ceiling; rerun awaits working compilation.
+Normal profile/version/activation/same-image form and PA00–13/RETEX remain open.
+
+Interactive reception19:40 UTC: the primitive correction first failed actual
+compilation (missing format argument), zero tests; recipe2FAIL is retained and
+integrity-verified. GLM repaired that single argument; interactive Codex reran
+the permanent recipe `tools/verification/recipes/paea-capture-stream.json`:
+3PASS/0FAILED/0ignored/4filtered, run0/verify0, stable declared sources and retained
+archive. Reception: `paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-stream-format-fix-20261104T193503Z/supervisor-personal-reception.json`.
+CAP01/02/03 are verified in their stated trusted-runner scope. This is only raw
+Read→new-file capture, not concurrent child capture, exit/panic retention, normal
+bootstrap qualification or delivery. Next: live recorded reader before EOF, then
+child integration and the business witness. No new installed behavior or restart.
+
+Interactive recovery, 4 November 19:26 UTC: the previous client produced
+three output-limit continuations with no tools/source changes. Its identified
+client alone was interrupted; logs and actual exit0/error_during_execution are
+retained, without acceptance. The scheduled supervisor reduced the task to one
+raw-stream recorder. GLM handed back code; interactive Codex personally ran the
+three named capture guards:3PASS/0FAILED/0ignored/4filtered, exit0,3342 declared
+inputs stable (declarative inventory, not compiler/profile qualification).
+Source archive and reception: `paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-stream-recorder-only-20261104T192033Z/supervisor-interactive-stream-check/`.
+CAP01/02/03 remain open: configured/exclusive fixture allocation, valid controls
+before each fault, exact recipe names/counts. One GLM correction task is now
+active via CURRENT-GLM.json; no concurrent author, new cap or budget. Full child
+capture, final image/profile, bootstrap qualification and delivery remain open.
+Current dev.332 was observed ready with its expected ELF. Lexar is absent:
+proofs stay in indexed local staging; no historical original removed. Test-only
+helpers do not create a newly installed product behavior or trigger restart.
+
+The last received delivery is **dev.332**, ELF
+`00560d87ddc4b1a615981952076c064808445c13010f839e263819f6efe1ccf5`.
+[Bounded personal reception](../../../plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-disabled-focus-oracle-20261104T074254Z/supervisor-delivery-reception332.json):
+756 effective/archive inputs checked, four core artifacts without fixture
+features/test profile, two changes since331 (form JS and FR/EN notes), exact
+restart/actual ELF checked, served history equals archive. Twelve-step form
+recipe run0/verify0 uses distinct test artifact `771eecbb…`; stale keyboard
+confirmation stays locked after observed neutral focus, four flows, no unexpected
+diagnostics. The owned normal image passes56 UI/Version FR/EN checks, both themes,
+notes/commit/dirty disclosure/focus; three protected form assets match effective
+inventory and dialogs were personally viewed.
+
+The normal `approval-web` CLI bootstrap is written but neither delivered nor
+qualified for HTTP business effects. Review prompted explicit prepared-source
+closes, independent closes of both roots, and separate cleanup of the unattached
+approval witness. Personal `cargo check -p swarm-cli --lib` now exits0 on1218
+stable declared inputs, preserving original E0618/E0277 failures. The named
+`prepared_source_public_close_releases_witnesses_and_permits_fresh_preparation`
+test actually ran1 PASS case (ignored selection explicitly enabled), with stable
+inputs; it establishes neither close-failure variants nor HTTP business effects.
+[Direct reception](../../../plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-shadow-direct-edit-20261104T104217Z/supervisor-reception.json).
+
+GLM fixed both E0509 failures in the positive target. Codex personally recompiled
+the target: exit0, stable declared inputs. The exact ignored test actually ran
+one case: FAILED/exit101 at its final oracle, no acceptance. Before that panic:
+real bound CLI/HTTP server, approved HTTP ack, durable approved PROJECT action
+attributed to fixture operator, unchanged SERVICE/Git refs, owned child SIGINT
+and successful exit. The safe NativeOutcomeRecord exposes trust_publication,
+not the business state field incorrectly expected by the test. Producer sources
+were inspected; one GLM task fixes only the test oracle and retains full child
+output before verdict, same session --resume, fresh exact-scope directory.
+[Partial personal reception](../../../plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-positive-compile-fix-20261104T130029Z/supervisor-reception.json).
+At13:40, four actual edits update documentation and exact approved ack checks;
+final oracle/child-output retention and handback remain pending. Stream order
+shows completed compaction (null status then compact_boundary) after compacting
+statuses; counts alone do not justify interruption. No signal, duplicate author
+or concurrent test was launched.
+At13:55 the actual post-compaction blocker is established: Edit refuses an
+unread file while the supervisor had disabled Read. Repeated Edit, unavailable
+Read and an out-of-scope memory Write did not repair that prerequisite; the
+exact hook denied the memory write. Sources and traces preserved, only the
+identified owned client interrupted after UID/boot/start/session checks, actual
+exit0 without acceptance. Same-session --resume in a fresh directory now allows
+Read/Edit/Write only on the target and new FINAL, requiring a targeted Read
+before editing. Available Edit does not prove its native post-compaction
+prerequisite; future Edit packets retain exact-scoped Read and a validated guard.
+At14:10 Read actually succeeded, verifying the native prerequisite. Three
+subsequent Edit calls failed ENOSPC with unchanged target. Snapshot writing
+also failed in its temporary file and GLM output was truncated; previous
+snapshot/sources remained intact. Only the identified owned client was paused
+then ended. Only the regenerable owned PAEA compiler incremental cache was
+removed after retaining11250 per-file hashes and checking no concurrent target
+compiler; no binary or proof removed. Space returned and supervisor atomic
+refusal/recovery fixture passed. [Incident/original evidence](../../../plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-oracle-read-gate-20261104T135721Z/supervisor-enospc/incident.json).
+Same session resumed with fresh complete capture; GLM correction still pending,
+no test concurrent with its active author. Disk recovery is not business proof;
+dev.332 remains the last received delivery.
+At14:27 Codex personally reran the exact witness after stable handback:
+**1PASS,0FAILED,0filtered,exit0**,1219 stable declared inputs. Typed approved
+ack bound to the frozen action, durable PROJECT approved/fixture operator state,
+unchanged SERVICE/Git refs, successful owned SIGINT/exit and exactly one recorded
+Trust publication verified. [Reception/limits](../../../plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-oracle-disk-recovery-20261104T141417Z/supervisor-positive-business/reception.json).
+Evidence copied to verified mounted USB Lexar/vfat/rw as a metadata-preserving
+archive, reread and inventory/hash matched; local restoration index retained,
+no original moved/deleted. Reading FINAL before it existed was resolved by
+writing the new FINAL, not a product regression. At15:44 host boot identity changed (`bd578744…` → `02b98b5c…`); previous
+client/runner vanished without exit or FINAL, target source unchanged. Actual
+exit stays unknown; no fabricated outcome, reboot cause not established.
+SKYNET DNS/proxy and authenticated models GET200 checked before resumption.
+Supported status found the local server stopped; exact supported prepared-build
+start restored dev.332: readytrue,PID250945, actual ELF00560d87… and complete
+version/FR-EN history equal the previous reception. Three newer effective inputs
+remain uninstalled; no new bootstrap qualification or human Authority journey.
+Recovery proof archived/reread on Lexar with local index. Same GLM session
+resumed in a fresh exact-scope directory after orphan checks, no cap/retry added.
+At16:29 the first authored boundary is still missing after actual Reads in
+both attempts, without observed tool/network/compaction errors. The packet
+coupled two separately verifiable changes; excessive coupling is a framing
+hypothesis, not a cause established from time or private reasoning. Source/stream
+preserved, only the owned identified client interrupted after UID/boot/start/
+session checks. Same-session --resume in a fresh directory now requests **CLI
+selector/pin only**; durable capture follows personal reception. No timeout,
+cap or retry added; the split's effect remains UNVERIFIED.
+At17:00 the selector was handed back; Codex personally ran its three guards:
+**2PASS/1FAILED/1ignored,exit101**, stable inputs. Compilation succeeded; GLM
+resolved the partial Debug/moved-Git candidates before handback. Actual failure:
+canonicalize error retains its OS cause but omits the promised/asserted
+no-fallback diagnostic marker. No actual fallback observed, no weakened guard.
+One GLM correction of general filesystem diagnostics launched immediately;
+no capture task or new business witness until guards pass. [Raw reception](../../../plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-cli-selector-only-20261104T163141Z/supervisor-selector-check/reception.json),
+original FAILED retained and USB archive reread/indexed. The split was followed
+by an actual handback; causality and conformance remain separate questions.
+At17:15 personal verification after stable correction: **3selector PASS/0FAILED/
+1ignored,exit0**, then **positive1PASS/0FAILED/3filtered,exit0**, stable inputs
+in both runs. The original FAILED marker case now passes without weakening
+its guard; no final executable/normal-profile or global conformance inferred.
+[Reception/limits](../../../plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-selector-diagnostic-fix-20261104T170214Z/supervisor-qualified-reception.json).
+Both raw Cargo runs and received source archived/reread on Lexar with matched
+inventory/hashes and local index; original failure preserved. One GLM task
+has no active client: API500/10native retries ended exit1 at17:50. SKYNET DNS
+is unresolved (resolvectl name not found), local proxy reachable. All model
+calls suspended until DNS/proxy and upstream metadata200 are verified. Only
+partial imports changed, retained; no helper/FINAL handed back, no compilation
+or test after incomplete editing. No orphan client. Dev.332 stays running/ready
+with unchanged ELF. Lexar is absent in findmnt: no write below an unmounted
+mountpoint; explicit local fallback is the current session's
+`supervisor-network-refusal` directory, indexed/hashed, with adequate space.
+Failed findmnt1 is not qualified by independent git-check exit0. No shared DNS/
+VPN/proxy changed. One network intervention request at18:15: restore normal DNS access to
+`chat.skynet.cossi.internet`. Owner: user/network administrator; Codex must not
+change shared DNS/VPN/proxy or replace GLM with Codex PAEA development. This
+is separate from the existing human Authority request, which is not repeated.
+Automatic resumption requires DNS/proxy/upstream metadata200 and orphan checks.
+Fifteen-minute monitoring remains useful for changing
+network/storage prerequisites. At19:00 SKYNET DNS again resolves to10.202.26.231; local proxy and authenticated
+upstream metadata GET200/GLM524288 verified. Network request resolved on observed
+preconditions, without attributing its restoration or repeating the human
+Authority request. No model call occurred while DNS was absent. Orphan/session
+checks passed; same-session --resume in a fresh directory preserves partial
+imports. Lexar remains absent, so future evidence uses indexed private local
+staging until the drive returns. At19:15 process exited0 but actual terminal is error_during_execution,
+is_errortrue, stop_reason=max_tokens, without edit/handback: not PASS. Full
+stream reread after flush distinguishes actual terminal from an earlier running
+snapshot or exit0. The status→/proc disappearance race is handled without
+inventing identity or sending signals. Observed output stop is max_tokens;
+network/context causality is not established. No cap/effort/budget raised and
+no unchanged retry: capture is decomposed. One task now authors a lossless
+Read→exclusive new-file primitive with refusal/partial-prefix/fresh recovery,
+in a dedicated source module plus minimal parent wiring/import repair. Owned
+Child integration/concurrent streams/true exit/panic remain mandatory next,
+then normal identity/delivery. Decomposition effect not yet verified. Parent
+objective retained: persistent child stdout/stderr/actual exit capture, including early
+panic and its failure/recovery guards. Metadata is_file/cause-flattening review
+candidate remains open; no normal-profile qualification or new delivery.
+Refusal/recovery, normal pin
+without fallback, recipe, FR/EN docs and notes remain mandatory.
+Artificial per-task write probes
+are removed: unchanged guard and new exact allowlist have retained local
+allow/deny checks plus earlier actual client refusal proofs. Hook stays active,
+no new rights or OS confinement claimed. Increment unfinished and undelivered;
+then the form on that same normal image. One active task and
+proofs come from the [persistent pointer](../../../plans/actions-confiance/paea/evidence/CURRENT-GLM.json).
+
+Network500/DNS incidents and the gitignored-evidence search loop remain retained.
+Network preconditions were checked before resumption; ordinary-rg/--no-ignore
+counterproof motivated direct paths and Read/Edit/Write tools. No shared DNS/VPN/
+proxy changed, no cap or retry added. Exact-write client hook is not OS confinement.
+A later resumption cycled in compaction:26 statuses, no author message or
+tool call, while the proxy retains31 messagesPOST200 responses. The original
+conversation and actual exit remain preserved; the same bounded witness now
+uses a fresh GLM context with only useful persistent inputs, without increasing
+limits/effort or reinjecting history. Network and exact scope were rechecked;
+this recovery establishes no business progress.
+The fresh context produced reads but no target, then expanded reads and resumed
+compactions. Zero usage counters do not support reliable token diagnosis; the
+existing524288/70 window is unchanged. The same witness now receives a148996-byte
+self-contained packet of hashed actual source/instructions without history and
+Write as its sole tool. Codex prepared inputs, wrote no PAEA code. Exact hook is
+retained; the file was created and compiler checks found the two E0509 above.
+Business verification remains pending a verified correction.
+Codex supervises/verifies; GLM is sole author. PA00–13/RETEX, human Authority,
+protected services, observed separation and E3 remain open. Pending human request
+not repeated; no additional commit/push or external deployment.
+
+## Historical P1/G1 point — 3 November 2026
 
 First local [exact separated settlement agreement slice](paea/P1-G1-20261103.md)
 delivered as dev.322, image 3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a.
@@ -1907,8 +2573,10 @@ ledger record, with no provider launch and no `providers.json`/
 `ai-connections.json` read (those belong to the agent-launch flow; the
 admitted→consumption barrier was already proven in Increment101); the only
 "declared tools" candidate on the Trust side (`data_policy.tools/providers`)
-is dormant and refused at activation (`trust-active-extension-not-ported`,
-`trust/state.rs:196`); `context.sources` has no engine consumer. Hashing the
+is historical evidence of a dormant field — since 2026-11-05 the data provenance
+lot ports `data_policy` admission in Rust (`trust/data_policy.rs`), so this
+once-dormant block is active behind its typed policy; `context.sources` has no
+engine consumer. Hashing the
 ambient provider configuration would have filled a dormant field with a
 dependency this effect never consumes: no fake producer was implemented.
 
@@ -3106,3 +3774,95 @@ pin of `mission_report_relay.rs` created by commit 8cb0598317 which changed
 `engine_settings.rs` without updating the test — dated before this lot;
 mission_status `/tmp` fixtures; confidentiality recipes' TMPDIR contract).
 Still no commit and no install; acceptance remains to be established.
+
+### Rust data provenance — T14 G4 sub-lot, Claude session 2026-11-05
+
+Rust port of the G4 « provenance » sub-lot: the `data_policy` block and typed
+`data_context` of the Go contract (`internal/engine/trust_data_policy.go`),
+per [T14-A2A-DESIGN](paea/T14-A2A-DESIGN.md), without the A2A network sub-lot
+(D1–D7). New module `rust/crates/swarm-engine/src/trust/data_policy.rs`
+(typed `DataPolicy`, `DataContext`, `DataResource`, Go field order;
+`allowed_path`, `admission`, `action_admission`, `stored_context`,
+`validate`), error variant `TrustError::Data(&'static str)` keeping the
+historical « authorization_required » code (HTTP 403, CLI exit 4) with a safe
+diagnosable reason, `command.rs` moves to the typed context (Go-identical
+digest for non-canonical input key order). Six `operations.rs` wiring points:
+exact Go order replay → proof → data admission → stored-context re-admission →
+connector; action preimage `data_context` omitempty; context storage in the
+request action; typed reconstruction in `bound_action`; inner re-admission at
+the `commit` effect boundary (never `reconcile`, recovery preserved).
+`state.rs`: data_policy branch in `require_supported` (deep stored-block
+validation, format family); limits label updated (« délégation de mandat et
+contexte de données portés ; admission distante A2A encore refusée »).
+`config.rs`: data_policy edits admitted in the freeze loop, effective-policy
+validation (supplied or stored) via `require_supported` before any
+persistence, preview projecting the effective policy.
+`swarm-web/src/service.rs`: `Data` variant mapped to 403. Go-contract mirror
+tests (7) in `rust/crates/swarm-engine/tests/trust_data_policy.rs` (isolated
+roots `.swarm-fixtures/trust-data-policy/`, never `/tmp`); `trust_biba.rs`
+updated (data_policy becomes editable; an incomplete stored block now refuses
+at load as in Go). Permanent recipe
+`tools/verification/recipes/trust-data-policy-rust.json` + wrapper
+`tests/rust_trust_data_policy_unit.py`: run PASS, retained evidence
+`.swarm-fixtures/recipe-trust-data-policy`. Local trust suites green:
+trust_data_policy 7/7, trust_biba 14/14, trust_delegation 9/9,
+confidentiality 16/16. Full swarm-engine suite: the 5 remaining lib failures
+belong to the concurrent scope (mission_report_relay/preparation_models/
+agent_supervision, uncommitted BF-16 edits; `preparation_show` gains
+`reader_token`, breaking 7 concurrent test files outside this lot). FR/EN
+docs (`docs/actions-confiance-rust.md` §Refus et reprise) in the same
+increment; the dormant→active PAEA note corrected. Still closed: A2A network,
+`confidential`/`restricted` classifications in input, real tools. No commit
+and no install; acceptance remains to be established.
+
+Same-increment staleness correction: the « Declared prerequisites » table of
+[T14-A2A-DESIGN](paea/T14-A2A-DESIGN.md) cited refusals that no longer exist
+in the sources (`trust-delegated-mandate-not-ported`,
+`trust-advanced-admission-not-ported`) and presented `delegation`/`data_policy`
+as closed to admission. The FR and EN tables keep the 2026-11-02 column
+verbatim and add an « update as of 2026-11-05 » column: delegation ported
+(commit `75c35fa278`), child mandates ported, provenance ported (this lot);
+the only remaining active guard is the generic unported-extension guard
+(`trust-active-extension-not-ported`, `trust/state.rs`). The « Out of scope »
+section marks the completed porting and states that networked A2A (audience,
+D6 channel, D5 receipts) remains whole, blocked on human IA3 enrolment and the
+G1 real integration.
+
+
+### Explicit recovery on 6 November 2026
+
+The user resumed GLM-only work. The previous stream stalled, then reboot removed its client without a final answer or known exit. The supervisor-added requirement for an inaccessible upstream terminal state was removed: the skill supports bounded recovery after diagnosis. DNS, proxy and model catalogue checked, no orphan clients, target source unchanged. One tool-free direct HTTP recovery was launched under the existing handoff; GLM authors code and Codex supervises/verifies. Fifteen-minute supervision restored. Reception, startup protection, EOF regression, receipts and positive HTTP flow remain open; no new installation or acceptance.
+
+Evidence: `docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-startup-boundary-recovery-20261106T130244Z`.
+
+
+Positive bootstrap: GLM proposal integrated using10 unique anchors; all postcapture startup is under signal_stop, with image hashing through /proc/PID/exe itself. Codex ran20 named tests (20PASS,0FAIL,4filtered), declared sources stable, then verify0 integrityVERIFIED/recordedPASS. This does not establish shared startup EOF regression, positive HTTP or installation. Next GLM task launched: shared line reader and real EOF/exit7 guard, recipe21 only after actual addition. Receipts/refusals remain open.
+Evidence: `docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-startup-boundary-recovery-20261106T130244Z`.
+
+
+Reception6Nov14:18UTC:21 personally executed named tests,21PASS/0FAIL/4filtered, declared inputs stable; verify0 integrityVERIFIED/recordedPASS. New guard shares the actual prepared/bound reader and checks healthy witness then partialEOF, realexit7, originalpanic and exact Completed counts. No positiveHTTP or installed claim. Next GLM task launched: Finished receipt before verdict with realexit/terminal data and0600 at creation; typedrefusals remain open.
+Evidence: `docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-startup-eof-terminal-count-repair-20261106T134943Z`.
+
+
+### Direct reception, 6 November 2026, 15:41 UTC — Finished receipts
+
+The GLM proposal and two repairs were reviewed and integrated exactly; the independent concurrent Cargo-lock documentation addition was preserved. Codex personally reran all21 named capture guards:21 PASS,0 FAIL, stable declared sources; `recipe.py verify` exit0. Direct inspection of both receipts and raw files: healthy child actualexit0, stdout53/stderr0,no panic; startup EOF fault actualexit7,stdout30/stderr29,panic present; Completed terminals, exact hashes and0600 receipt mode. The guard also verifies a real rename refusal and retention of both causes, preserving the proof leaf. Evidence: `paea/evidence/20261028-acquisition81-mvfdts57/glm-receipt-probe-evidence-hygiene-20261106T152111Z/supervisor-finished-receipt21` and `supervisor-receipt-direct-reception.json`.
+
+Open limits: typed refusal resource ownership, deterministic temporary-create refusal, actual HTTP approval, connected FR/EN form, local installation and overall PA00–PA13/RETEX. Codex is now running the actual HTTP witness using the pinned normal334 candidate and retained isolated fixture; no outcome is anticipated. Capture tests and builds establish neither HTTP approval nor installation.
+
+
+6 November2026,15:42UTC: normal334 HTTP approval personally verified:1PASS/0FAIL/24filtered, stable declared sources,verify0. Direct receipt: actualexit0,Completed stdout1525/stderr0,no controller panic; /proc/exe SHA23651e383c4b7eb6ba1b25bf66d0c63d3e58dd8adf6ab18435fe3cfb7390514c. Real session/CSRF,empty POST,approved exact-action acknowledgement,durable PROJECT state attributed operator,SERVICE Trust and Git refs unchanged,exactly one recorded publication. Evidence `paea/evidence/20261028-acquisition81-mvfdts57/glm-receipt-probe-evidence-hygiene-20261106T152111Z/supervisor-http-direct-reception.json`. Isolated fixture enrollment only; no human approval or installation established.
+
+Next single GLM task `glm-form-approved-state-contract-20261106T154505Z`: correct two existing FR/EN form consumers (approval-form accepts admitted; consent displays unknown states as success). Deliver implementation,before/after guard and docs,preserving legitimate approved responses and visible refusals; no further analysis-only report. Tool-free direct call active,pointer updated. Typed refusal ownership,local delivery and overall PA00–PA13/RETEX remain open;15min monitoring maintained.
+
+
+Control6Nov16:20UTC: complete GLM form proposal received, actual clientexit0 at16:10:32; no integration accepted. Personal review found the guard waited for expected state instead of actual completion, hanging the consent RED witness; browser diagnostics did not fail, translated EN text was not asserted, stash baseline instructions conflicted with preserved dirty work. Bounded test-only repair delegated to GLM `glm-form-state-regression-repair-20261106T162148Z`. Product/docs proposals retained unchanged/unapplied. Next: RED on private exact asset snapshot, then GREEN after GLM integration. HTTP proof unaffected; no new form or installation qualification.
+
+
+6Nov17:22UTC: Codex personally reproduced both false successes: original RED at approval fr admitted, then mixed RED at consent fr admitted after18checks. The9GLM product/docs replacements were integrated exactly with before copies/hashes. The GLM test run on stable sources covers36FR/ENchecks(full/redacted approved,denied,unknown states,password erasure,singlePOST), but overall status remains FAIL exit1:8diagnostics from two missing synthetic sibling endpoints(git-call/reconcile-effects404). No PASS or installation claimed. GLM now repairs only those fixtures and supplies a permanent recipe in `glm-form-sibling-fixture-repair-20261106T172242Z`; zero-diagnostics gate preserved. Original RED/GREEN outputs and supervisor-form-integration-review.json remain in predecessor `glm-form-state-regression-repair-20261106T162148Z`. Test setup/cleanup error handling limits stay open; next servedform/localdelivery after verification.
+
+
+6Nov17:36UTC: exact GLM synthetic sibling route patch integrated. Personal browser rerun:36namedFR/ENchecks,0diagnostics,actualexit0,stable sources; reception `glm-form-sibling-fixture-repair-20261106T172242Z/supervisor-browser-direct-reception.json` in the same evidence area. Both prior RED witnesses retained. Scope: actual frontend scripts served in Chrome,explicit syntheticAPI,DOMgestures; no normalELF served form/human approval proved. Proposed permanentrecipe rejected before writing(strictschema missing,double shell/stdout escaping): tinyGLMrepair `glm-form-recipe-json-fix-20261106T173628Z`,thenpersonalrun/verify. Guard setup/cleanupreview,normalservedflow,localdelivery/FR_ENVersion remainopen.
+
+
+6Nov17:52UTC: corrected permanent GLM recipe integrated and personally run:36FR/ENchecks,0diagnostics,exit0,stable declared sources; verify0/integrityVERIFIED/recordedPASS. Evidence `glm-form-recipe-json-fix-20261106T173628Z/supervisor-form-state-recipe`. Fresh retained private browser output,no fixed path overwritten. Next bounded GLM task `glm-form-local-delivery-notes-20261106T175205Z` supplies bilingual evolution notes and recipe docs before supported normalbuild. Personal local status:projectservice38434 running/ready,PID917853,dev337,ELF622776374de9c7da1254cf355440027e1689dacf6e317e5a309416ecb4cfe7f6. Separate observation:newform changes are NOT claimedembedded in thisELF. Qualification/localdelivery and guard setup/cleanuperror review remainopen; no globalacceptance.

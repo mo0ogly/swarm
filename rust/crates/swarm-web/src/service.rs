@@ -316,7 +316,7 @@ impl HttpServiceError {
         if let Self::Root{operation,cause}=self {if let Some(status)=graph_batch::status(operation,cause){return status}}
         if self.trust_publication().is_some(){return StatusCode::INTERNAL_SERVER_ERROR;}
         if let Self::Root{cause,..}=self {if cause.trust_publication().is_some(){return StatusCode::INTERNAL_SERVER_ERROR;}
-        if let Some(e)=cause.trust_failure(){return match e{swarm_engine::TrustError::Authorization=>StatusCode::FORBIDDEN,swarm_engine::TrustError::Conflict(_)|swarm_engine::TrustError::Integrity(_)=>StatusCode::CONFLICT,swarm_engine::TrustError::Unsupported(_)=>StatusCode::NOT_IMPLEMENTED,_=>StatusCode::BAD_REQUEST};}}
+        if let Some(e)=cause.trust_failure(){return match e{swarm_engine::TrustError::Authorization|swarm_engine::TrustError::Data(_)=>StatusCode::FORBIDDEN,swarm_engine::TrustError::Conflict(_)|swarm_engine::TrustError::Integrity(_)=>StatusCode::CONFLICT,swarm_engine::TrustError::Unsupported(_)=>StatusCode::NOT_IMPLEMENTED,_=>StatusCode::BAD_REQUEST};}}
 
         if self.recorded_preparation().is_some() || self.recorded_work().is_some() || self.configuration_may_be_recorded() {
             return StatusCode::INTERNAL_SERVER_ERROR;

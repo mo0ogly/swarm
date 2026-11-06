@@ -33,13 +33,21 @@ Registre PAEA :
 
 Prérequis déclarés et état réel :
 
-| Prérequis | État au 02-11-2026 | Portée |
-|---|---|---|
-| Identité réelle (sorties IA3, enrôlement) | ouverte, humaine | I02 d'abord ; A2A authentifié réel attend sa sortie |
-| `delegation` (schéma `max_depth`) | admission fermée : `max_depth != 0` → `trust-active-extension-not-ported` | le bloc reste inactif jusqu'au portage contractuel |
-| Mandats délégués | `parent_mandate_id` non vide → `trust-delegated-mandate-not-ported` (`trust/operations.rs:83`) | I02 borne les droits délégables ; I14 les fait circuler entre pairs |
-| `data_context` | `trust-advanced-admission-not-ported` (`trust/operations.rs`) | provenance conservée des messages, lot séparé |
-| Pairs authentifiés (canal local) | UID authentifiée mais aucun mandat déduit de la seule UID (PAEA-APEX, diagramme) | l'identification n'autorise rien sans mandat courant |
+| Prérequis | État au 02-11-2026 | Mise à jour au 05-11-2026 | Portée |
+|---|---|---|---|
+| Identité réelle (sorties IA3, enrôlement) | ouverte, humaine | inchangé — ouvert, humain | I02 d'abord ; A2A authentifié réel attend sa sortie |
+| `delegation` (schéma `max_depth`) | admission fermée : `max_depth != 0` → `trust-active-extension-not-ported` | **porté** (commit `75c35fa278`, recette `trust-delegation-rust`) : profondeur 0 refuse par défaut, profondeur > 0 plafonnée à la création ; la réception par pair (audience D3) reste à construire | I02 borne les droits délégables |
+| Mandats délégués | `parent_mandate_id` non vide → `trust-delegated-mandate-not-ported` (`trust/operations.rs:83`) | **portés** : `parent_mandate_id` vérifié contre la politique (profondeur, révoqué en cascade) ; le refus historique `trust-delegated-mandate-not-ported` n'existe plus dans les sources | I14 les fait circuler entre pairs |
+| `data_context` | `trust-advanced-admission-not-ported` (`trust/operations.rs`) | **porté** (2026-11-05, lot provenance, `trust/data_policy.rs`) : admission typée `data_policy`/`data_context` avec refus `authorization_required` et validation au format ; le refus historique n'existe plus dans les sources | provenance conservée des messages, hors A2A réseau |
+| Pairs authentifiés (canal local) | UID authentifiée mais aucun mandat déduit de la seule UID (PAEA-APEX, diagramme) | inchangé — l'identification n'autorise rien sans mandat courant | le transport de message D1 n'accorde rien |
+
+La colonne « état au 02-11-2026 » est conservée telle quelle : elle décrit ce
+que la conception avait sous les yeux au 2 novembre. Les codes cités
+`trust-delegated-mandate-not-ported` et `trust-advanced-admission-not-ported`
+n'existent plus dans `rust/crates/swarm-engine/src/` ; le seul garde actif
+restant est le garde générique des extensions non portées
+(`trust-active-extension-not-ported`, `trust/state.rs`), qui ne concerne plus
+ni `delegation` ni `data_policy`.
 
 ## Décisions de conception
 
@@ -112,12 +120,20 @@ par un contournement.
 
 ## Hors périmètre de cette conception
 
-- Portage du bloc `delegation` (activation réelle de `max_depth`) — lot
-  contractuel distinct, admission de configuration d'abord.
-- Mandats délégués en chaîne (`parent_mandate_id`) au-delà du premier niveau —
-  borné par I02 et la politique, non exercé ici.
+- ~~Portage du bloc `delegation` (activation réelle de `max_depth`) — lot
+  contractuel distinct, admission de configuration d'abord.~~ Réalisé
+  (commit `75c35fa278`, 2026-11-04, recette `trust-delegation-rust`) ; la
+  profondeur 0 reste l'interdiction par défaut, conformément à D2.
+- ~~Mandats délégués en chaîne (`parent_mandate_id`) au-delà du premier niveau —
+  borné par I02 et la politique, non exercé ici.~~ Le premier niveau est porté
+  et borné par la politique ; les chaînes profondes restent bornées par
+  `max_depth` et non exercées en A2A.
 - T18 et toute campagne adaptative — périmètre E3, équipe non auteure.
-- Identité réelle des pairs — enrôlement humain (IA3), prérequis I02.
+- Identité réelle des pairs — enrôlement humain (IA3), prérequis I02, toujours
+  ouvert.
+- A2A réseau (réception par audience, canal D6, reçus liés D5) — reste entier :
+  c'est l'objet de ce document, bloqué sur l'enrôlement humain IA3 et
+  l'intégration G1 réelle (tronçon dev.322 posé, enrôlement humain non fait).
 
 ## Critères de vérification locale (quand le code existe)
 

@@ -4,6 +4,11 @@ use std::{error::Error, fmt};
 pub enum TrustError {
     Invalid(&'static str),
     Authorization,
+    /// Data provenance admission refusal. Carries a diagnosable safe reason
+    /// (unlike `Authorization`, whose reason stays fixed) while keeping the
+    /// historical Go code « authorization_required » for every consumer that
+    /// classifies by code: HTTP 403, CLI exit 4, managed wrapper families.
+    Data(&'static str),
     Conflict(&'static str),
     Integrity(&'static str),
     Unsupported(&'static str),
@@ -13,7 +18,7 @@ impl TrustError {
     /// Stable historical diagnostic family; do not classify by message text.
     pub fn code(&self) -> &'static str {
         match self {
-            Self::Authorization => "authorization_required",
+            Self::Authorization | Self::Data(_) => "authorization_required",
             Self::Conflict(code) => code,
             Self::Integrity(_) => "trust-proof-integrity",
             Self::Unsupported(_) => "command_not_ported",
@@ -24,6 +29,7 @@ impl TrustError {
     pub fn reason(&self) -> &'static str {
         match self {
             Self::Authorization => "identité non reconnue ou suspendue",
+            Self::Data(reason) => reason,
             Self::Invalid(reason)
             | Self::Conflict(reason)
             | Self::Integrity(reason)

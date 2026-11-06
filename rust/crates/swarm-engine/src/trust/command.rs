@@ -31,7 +31,7 @@ pub(crate) struct Command {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub connector: Option<ConnectorSelection>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub data_context: Option<CompactJson>,
+    pub data_context: Option<super::data_policy::DataContext>,
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub parent_mandate_id: String,
     #[serde(default)]

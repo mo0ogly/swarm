@@ -185,6 +185,16 @@ impl State {
                 }
                 continue;
             }
+            if name == "data_policy" {
+                // Data provenance is ported: deep-validate the stored block in
+                // place of the structural-only extension check, mirroring the
+                // Go config/consistency contract. Corruption is a state-integrity
+                // refusal, not a business authorization one.
+                let policy:super::data_policy::DataPolicy =
+                    swarm_wire_json::decode(raw.raw().as_bytes())?;
+                policy.validate()?;
+                continue;
+            }
             if value.get("enabled").and_then(Value::as_bool) == Some(true) {
                 return Err(TrustError::Unsupported("trust-active-extension-not-ported"));
             }
@@ -229,7 +239,7 @@ impl State {
             if let Some(p)=&id.enrollment_principal {value["enrollment_principal"]=serde_json::json!({"principal_id":p.id,"principal_kind":p.kind,"issuer":p.issuer,"subject":p.subject});}
             value
         }).collect();
-        let mut view = serde_json::json!({"schema_version":1,"revision":self.revision,"policy":self.policy,"identities":identities,"mandates":self.mandates,"actions":self.actions,"ledger":self.ledger,"access_ledger":self.access_ledger,"effect_receipts":self.connector_receipts,"evidence_count":self.evidence.len(),"simulation":true,"originals_missing":self.evidence.iter().filter(|e|self.originals.get(&e.original_digest).is_none_or(|v|v.is_empty())).count(),"limits":["aucun paiement réel","identités locales authentifiées","délégation de mandat portée ; admission distante A2A et contexte de données encore refusés"],"biba":{"model":"strict-with-named-endorsement-v1","scope":"trust-actions-only","os_confinement":false},"amount_minor_text":self.actions.iter().map(|(id,a)|(id.clone(),Value::String(a.get("amount_minor").and_then(Value::as_i64).unwrap_or(0).to_string()))).collect::<BTreeMap<_,_>>()});
+        let mut view = serde_json::json!({"schema_version":1,"revision":self.revision,"policy":self.policy,"identities":identities,"mandates":self.mandates,"actions":self.actions,"ledger":self.ledger,"access_ledger":self.access_ledger,"effect_receipts":self.connector_receipts,"evidence_count":self.evidence.len(),"simulation":true,"originals_missing":self.evidence.iter().filter(|e|self.originals.get(&e.original_digest).is_none_or(|v|v.is_empty())).count(),"limits":["aucun paiement réel","identités locales authentifiées","délégation de mandat et contexte de données portés ; admission distante A2A encore refusée"],"biba":{"model":"strict-with-named-endorsement-v1","scope":"trust-actions-only","os_confinement":false},"amount_minor_text":self.actions.iter().map(|(id,a)|(id.clone(),Value::String(a.get("amount_minor").and_then(Value::as_i64).unwrap_or(0).to_string()))).collect::<BTreeMap<_,_>>()});
         // Effective per-mandate freshness/chain verdicts; a stored timestamp or
         // hash is never replaced by an empty success here. Chain refusals reuse
         // the engine's admission reasons exactly. A technical error (invalid

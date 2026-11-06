@@ -211,6 +211,40 @@ precheck, a PRESENT but UNKNOWN token observed the ledger-side business error
 refusal — the exact test
 `reconcile_effects_unknown_token_refused_identity_before_ledger_error` (red
 reproduced then green, GET+HEAD+non-mutation executed) fixes the contract.
+The approval form's real-browser qualification (`tests/paea-approval-form-ui.cjs`)
+also affirms this first gate from real Chrome: every page load's bare
+reconcile read is classified exactly there (GET method, exact URL, 403,
+confirmed body carrying the exact code on both `error` and `failure.code`),
+with the observed coded refusals kept verbatim in the proof JSON; the former
+HTTP 500 expectation (ledger precondition) is removed there as unreachable
+behind this gate.
+
+**Form reception and wiring of the wrong physical root regression
+(4 November 2026)**: the supervisor's personal reception
+(`glm-approval-observation-completion-20261104T042459Z/supervisor-reception.json`)
+— the permanent form recipe
+`tools/verification/recipes/paea-approval-form-rust.json` ran run 0/verify 0,
+eleven stable steps; real browser: four FR/EN flows without unexpected
+diagnostics, four GET 403 refusals carrying the exact reader code kept in
+proof; three named HTTP tests of the approval channel then pass on the same
+stable test artifact (`bf775a5b…`, a TEST profile distinct from production
+331), each 1 PASS exit 0: agreement captured on the project, wrong role then
+legitimate recovery, wrong physical root. This last regression
+`approval_route_wrong_physical_project_root_refuses_without_effects`
+(`rust/crates/swarm-web/tests/paea_git_call.rs`) is now retained by the
+permanent recipe
+`tools/verification/recipes/paea-git-call-approval-rust.json` — ONE step added
+after the positive journey, before the wrong-role step, the eight other steps
+and their order unchanged (GLM edit; the run/verify of the fresh recipe
+remains for Codex to execute): a same-family approval preparation whose
+physical witness targets ANOTHER really distinct project root (never a copy)
+refuses the bind typed `trust-enrollment-root` without capturing an agreement
+or consuming an effect — the projectA/serviceA Trust stores and the REAL
+projectB's, managed refs, the explicit target-ref absence and both services'
+effect journals stay byte-identical, no agreement anywhere. No human
+Authority approval or enrollment (requested 3 November 2026, never repeated
+or bypassed), no OS/protected-services separation, no independent E3, no
+global PA00–13/RETEX acceptance is established by these test-profile proofs.
 
 **PA-09 native positive reader witness (real qualified binary)**: this contract
 is also proven on the real native ELF by the integration test
@@ -566,6 +600,83 @@ regression of the Go contract:
 `.swarm-fixtures/trust-delegation/`, never `/tmp`). Still closed: remote A2A
 creation and `data_context` — any command carrying them keeps refusing.
 
+**Data context / provenance (ported, 5 November 2026)** — the `data_policy`
+block (classified resources, explicit
+`classifications`/`destinations`/`providers`/`tools` lists, `enabled` flag) is
+admitted in configuration and carried through the full flow, mirroring
+`trust_data_policy.go`: typed validation refuses null lists, unknown/duplicate
+values and invalid resource rules (historical `format` family, never
+`authorization_required`, which stays reserved for admission refusals); the
+configuration preview projects the effective policy (supplied or stored,
+defaulted when absent) without mutation. Admission follows the exact Go
+order — replay, proof, then `data_policy::admission`, then the target
+action's stored-context re-admission, then the connector: only `request` may
+carry a typed `data_context` (classification/destination/provider/tool,
+explicit fields), an active policy requires the exact classified path
+(catalogued resource, `public|internal` classification, connector-fixed
+destination and tool — `local-access-simulation` derives
+`local-access-state`/`simulated-access-grant`, otherwise
+`local-ledger`/`simulated-settlement`, provider `swarm`); `approve`/`commit`
+re-admit the stored context, `reconcile` deliberately does not (recovery
+preserved after narrowing); the `commit` effect re-checks the stored path at
+the effect boundary like `trustConnectorCommit`. Every refusal returns
+« authorization_required » with the safe reason « données : contexte ou
+chemin non autorisé ; aucune donnée conservée », persisting neither the
+context nor any supplied data and leaving state byte-identical (sentinel
+test). The `TrustError::Data` variant keeps the historical code for HTTP 403
+(web) and CLI exit 4. The action store keeps the typed context (Go field
+order): the action digest stays identical for a non-canonical input key
+order. Mirror regression of the Go contract:
+`rust/crates/swarm-engine/tests/trust_data_policy.rs` (7 tests, isolated roots
+in `.swarm-fixtures/trust-data-policy/`, never `/tmp`); permanent recipe
+`tools/verification/recipes/trust-data-policy-rust.json`
+(`tests/rust_trust_data_policy_unit.py`, retained evidence). Still closed:
+remote A2A admission, real tools (simulation only) and
+`confidential`/`restricted` classifications in input.
+
+**Versioned project memory (native engine, 5 November 2026)** — the Go
+`projectMemoryOperation` cycle is ported into the Rust mutation engine
+(`rust/crates/swarm-engine/src/project_memory.rs`, wired in `work_engine.rs`,
+preview in `root_store.rs`): `memory.admit`, `memory.replace`,
+`memory.withdraw` and `memory.select` decode the canonical request
+(schema 1, work and reason required, 1 MiB transport cap, per-action shapes —
+selection carries only task/versions/reason, admission accepts no implicit
+selection, an explicit empty `selections: []` array passes), then apply under
+the mutation transaction. Admission requires a safe identity with no expected
+digest, `experience`/`procedure` kind, nonempty content and conditions,
+recognizable-secret refusal, a `verifie` RETEX and a rechecked fresh verified
+source at apply time (the source task's fresh acceptance through real
+lifecycle limits, or a recognized dialogue exchange). Replacement and
+withdrawal refuse imports, foreign works, altered/stale versions and double
+withdrawal; they replay the active-use inventory (`memoryUses`) for the impact
+list. Selection targets a future executing task only (status `todo`, not a
+subplanner, not brainstorm), refuses while an active attempt already reserved
+the instructions, stamps `memory_selections`/`memory_decision` (event,
+operator, reason, environment timestamp), projects the "MÉMOIRE DE PROJET
+SÉLECTIONNÉE" block and binds everything to the preview token: an absent or
+forged token refuses `project-memory-preview-stale` before commit and the
+transaction rolls back. `RootStore::preview_project_memory` replays the same
+contract read-only under the settings reservation (token, preview, current
+version, context, revision, affected uses). Withdrawal never erases versions:
+contexts already received stay attributed; an inventory error is never turned
+into an empty catalogue (R3). Conversation lineage is now readable: the
+`agentMemoryReferences` port (`project_memory_dialogue.go`) walks the
+`dialogue_restore` chain — valid receipts, source decoded and re-checked
+against its state digest, root and strictly decreasing turn counts — and feeds
+the active-use inventory with ancestor selections (deduplicated by full
+reference, the same work/id at two versions still reported twice). Broken
+lineages refuse with stable codes (`project-memory-lineage-invalid`,
+`-source-inaccessible`, `-source-modified`, `-turns-not-decreasing`,
+`-root-mismatch`, `-selected-twice`, `-cyclic`); the cyclic guard remains
+defense in depth with no constructible case (each hop covers the next receipt
+through its digest and turns strictly decrease), matching the Go test that
+asserts refusal only. Still closed in this tranche: the dedicated
+HTTP/CLI surface, extractive summarization (M20) and read/summarize/transmit/
+compact rights. Evidence:
+`rust/crates/swarm-engine/tests/project_memory_engine.rs` (6 tests, isolated
+in-memory SQL) and `cargo test -p swarm-engine project_memory --lib`
+(11 tests).
+
 The historical interprocess flock serializes writes. One idempotency key creates
 one native entry; conflicting content refuses. `lose_response:true` records
 `unknown` after the simulated effect. Another commit cannot duplicate it;
@@ -753,7 +864,56 @@ an internal fault is never disguised as a caller refusal, and the dialogue
 contract does not leak outside its gate. Honest limit: this is a pure
 conversion regression — no Root/DB/process, not a real GET, no end-to-end
 producer coverage (the guard's refusal decisions stay covered by the engine
-dialogue tests); execution: supervisor, never the editor.
+dialogue tests); execution: supervisor, never the editor. The first personal
+execution failed before fixture creation (TypeError: the `digest(path)` helper
+received bytes), with raw reception retained; the correction was **RECEIVED**
+on 3 November 2026 (true exit 0, 33 named assertions, 136 verified artifact
+digests, qualified 322 binary; proof: `paea/evidence/20261028-acquisition81-mvfdts57/
+glm-bf16-first-boundary-fix-20261103T175700Z/supervisor-receipt.json`). The
+incremental reader-matrix extension over the same actual HTTP flow (bare/
+authorized HEAD with empty raw-retained body, exact 403
+`authorization_required` for an unknown bearer, exact 403
+`blp-dialogue-access-denied` for the known `low` reader, authorized recovery
+to the same DTO after each refusal, every read bracketed by the full
+snapshots) is authored and remains **UNVERIFIED** pending Codex's new
+personal run; the historical failure receipt is kept as is. The first
+execution of that matrix ran through the bare HEAD (403, empty raw-retained
+body, equal snapshots), then failed on the authorized-recovery oracle: the
+predicate wrongly forbade any question/answer byte on an authorized 200 body
+— a test-oracle cause, not a product regression. The correction of the four
+recovery predicates (HTTP 200 + exact same DTO + full before/after snapshots
++ true absence of the assembled private prompt; the 403 negative controls
+keep forbidding all secrets, HEAD unchanged) was **RECEIVED** on 3 November
+2026: Codex's personal run, true exit 0, 46 named assertions (26 fixed + 20
+dynamic explicit sources), 160 artifact hashes verified, 11 identical full
+snapshot pairs, qualified 322 binary; exact observed refusal codes: bare HEAD
+403 empty body, authorized HEAD 200 empty body, unknown bearer 403
+`authorization_required`, `low` reader 403 `blp-dialogue-access-denied`, the
+four authorized recoveries 200 with the exact same DTO and private prompt
+absent (proof:
+`paea/evidence/20261028-acquisition81-mvfdts57/
+glm-bf16-reader-recovery-oracle-20261103T182600Z/supervisor-receipt.json`;
+qualification limited to the 322 fixture — the shared 323 server is not
+qualified by this proof). The original failure is preserved as is.
+
+The permanent recipe `tools/verification/recipes/blp-dialogue-reader-public.json`
+was **RECEIVED** on 3 November 2026: `recipe.py` actually ran and verified it on
+BOTH images, the 322 fixture AND the active shared 323 server, each time
+run+verify exit 0, 46 named assertions, 0 native output, stable source, 160
+artifact hashes, 11 identical full snapshot pairs (proofs:
+`paea/evidence/20261028-acquisition81-mvfdts57/
+glm-bf16-reader-permanent-recipe-20261103T184100Z/supervisor-receipt.json`;
+for 323, Codex's personal qualification in
+`glm-bf16-reader-permanent-recipe-20261103T184100Z/supervisor-recipe323/qualification.json`:
+active ELF v0.1.1-dev.323 sha `ccef210a…` identical to the executed process,
+756 verified archive inputs, 4 core artifacts `features []`/`test false`,
+effective inputs unchanged across the build, 323 preserved without any Codex
+installation). This proof still covers the script as received at 46 checks; the
+"322 only" limitation above is therefore superseded for the recipe by the
+two-image coverage. The next frontier, public freshness then recovery, is
+authored in the script but remains **UNVERIFIED** pending Codex's personal run
+and verification. Still open and outside this recipe: the revocation/
+poisoned-capsule matrix, `humanVersion` qualification, global PAEA acceptance.
 
 **UNVERIFIED (pending Codex's personal execution)** — First real HTTP boundary
 added: `tests/blp_dialogue_reader_public.py` replays, on one owned Root with an
@@ -767,8 +927,553 @@ without any private byte, and the cleared reader re-reads 200 the exact same
 nonempty answer with the private prompt absent; readonly SQL/journal/capsule
 snapshots stay identical around each GET. If the public admission refuses the
 existing turn, the script stops at that exact refusal with its raw retained
-evidence instead of fabricating a success. Out of scope, deferred: recipe,
-HEAD, stale/revoked/malformed — later bounded lots after Codex's execution.
+evidence instead of fabricating a success.
+
+**UNVERIFIED (product correction revised after the source review, pending the
+normal build then Codex's personal execution)** — After the received matrix, the
+script publicly renews the SAME policy (a second blp-policy-apply, revision 2),
+requires a valid GET control immediately before, then requires the authorized
+GET and HEAD to refuse 403 with the single declared reader staleness code
+`blp-dialogue-policy-stale`, empty HEAD body, no private byte, full snapshot
+pairs. Codex's first personal execution (3 November 2026, qualified 323 binary
+`ccef210a…`) actually passed the 47 named assertions up to the pre-renewal
+control (GET 200 to the exact same DTO, equal snapshots), then the first stale
+GET observed HTTP 500 with the exact refusal `blp-admission-policy-changed`,
+no question/answer served: a first-cause product defect — `read_controlled`
+let the internal `Refused` of `preparation_admission::verify` cross the reader
+guard while the HTTP layer knows only the `blp-dialogue-*` family (retained
+proofs: `paea/evidence/20261028-acquisition81-mvfdts57/
+glm-bf16-reader-policy-freshness-20261103T185800Z/supervisor-personal-run323/
+{stdout,stderr,exit.json}` and `journey/http-policy-stale-get.json`,
+`supervisor-reception-failure.json`; the test oracle, which then accepted the
+two documented codes, was corrected to this single reader code — never to hide
+the internal code, which no longer reaches the HTTP layer). The authored and
+**UNVERIFIED** product correction, revised after the supervisor's source
+review (OPEN-before-build verdict, retained:
+`paea/evidence/20261028-acquisition81-mvfdts57/
+glm-bf16-reader-stale-status-fix-20261103T192700Z/supervisor-reception-review.json`):
+the first authored gate `admission_stale`, evaluated BEFORE `verify`, is
+removed — its precheck short-circuited `verify`'s validation order and, for a
+matched receipt that is both stale and corrupt (wrong Root instance or invalid
+record), would have masked a 500 internal refusal under the reader 403;
+source-level counterexample, not executed. The replacement correction:
+`read_controlled`
+(`rust/crates/swarm-engine/src/root_store/preparation_dialogue.rs`) first
+calls `preparation_admission::verify` in its original order (principal,
+record validity, Root instance BEFORE policy currency, source re-join, output
+label) and only then adapts the completed result: the single
+`RootStoreError::Refused` carrying the shared stable code
+`blp-admission-policy-changed` (the `pub(super) POLICY_CHANGED` constant of
+`preparation_admission.rs`, shared by producer and consumer) becomes
+`E::Refused(POLICY_STALE)` — typed classification of the exact enum variant,
+not free-form wording parsing; every other variant (neighbor refusals
+`blp-admission-not-found`, `blp-admission-record-invalid`,
+`preparation-root-instance-changed`, Storage/Sql/Trust errors, `TrustPublished`
+close wrappers) is returned unchanged, no success fallback, no refusal
+suppression; `verify` stays the authority for record validity, Root instance,
+source re-join and output label. A focused unit regression of the adapter
+(`reader_stale_adapts_only_exact_stale_refusal`, `tests` module of
+`preparation_dialogue.rs`) is authored in sources only (exact refusal →
+reader code; neighbor refusals unchanged; same code under a wrapper
+unchanged; positive result unchanged); the exact cargo execution is Codex's.
+Codex's first targeted execution actually failed compilation (cargo exit 101,
+three E0433 — in the nested `tests` module, `super` names
+`preparation_dialogue`, not `root_store`; raw proof retained:
+`supervisor-unit-and-build/` of lot
+`glm-bf16-reader-verify-order-20261103T194100Z`, normal build not executed).
+The authored correction, strictly limited to `#[cfg(test)]`: the three test
+uses import the sibling module by its real crate path
+`crate::root_store::preparation_admission` — no visibility widened, no product
+behavior changed — UNVERIFIED pending Codex's unit rerun then normal build.
+Then the supported public recovery follows:
+re-attributing every captured source under revision 2 with new event ids, then
+re-admitting the SAME intent as a new admission event (new admission_id,
+`policy_revision '2'`, `trust_revision '1'`), then the intended authorized 200
+GET to the exact same DTO; the public recovery remains **UNVERIFIED** (the old
+matched admission can never pass `verify` again under revision 2 without a
+private removal, which is forbidden — the exact recovery failure, should it
+occur after the corrected 403, will stay retained as the next frontier's
+evidence). No private capsule removal, no policy rollback, no capability
+bypass. If the public admission refuses the existing turn, the script stops at
+that exact refusal with its raw retained evidence instead of fabricating a
+success.
+
+**ACTUAL RESULT (Codex's personal execution, 3 November 2026, qualified 324
+binary `663b46…` not installed, run exit 1)** — The normal build passed
+(exit 0) and the public execution on the fixture actually observed the
+corrected behavior: all 75 named assertions passed through
+`renewal-mutations-no-sql-mutation` inclusive — pre-renewal control GET 200 to
+the exact same DTO, post-renewal GET and HEAD 403 with the single declared
+reader staleness code `blp-dialogue-policy-stale`, empty HEAD body, no private
+byte, full snapshot pairs — then the script failed at the expected red
+assertion `authorized-recovery-after-policy-renewal` (AssertionError, line
+361): the re-attribution under revision 2 and the re-admission of the SAME
+intent (new admission_id, `policy_revision '2'`, `trust_revision '1'`)
+actually succeeded without SQL mutation, but the final authorized GET stays
+403 `blp-dialogue-policy-stale` instead of the intended 200 — exactly the
+recovery frontier predicted above. Retained proofs, never replaced by a PASS:
+`paea/evidence/20261028-acquisition81-mvfdts57/
+glm-bf16-reader-unit-borrow-20261103T201100Z/supervisor-public-run324/
+{stdout,stderr,exit.json}` and `supervisor-partial-receipt.json`; native
+cleanup 0, shared 323 server preserved without installation. First-cause
+product defect established: `read_controlled` required EVERY matched receipt
+to pass full `verify` forever — a receipt predating a renewal can never become
+current again without a private removal, which is forbidden — so public
+recovery was structurally impossible.
+
+**UNVERIFIED (authored recovery product correction, pending the normal build
+then Codex's personal execution)** — Correction authored by the delegated
+agent on the two allowed modules, with no other product or recipe change:
+`read_controlled` becomes a three-pass recovery that keeps `verify`'s
+authority order as the sole validation. Pass 1: every matched receipt is
+re-verified IN FULL via `preparation_admission::verify` in its original order
+(principal, record validity, Root instance BEFORE policy currency, source
+re-join, output label) and the completed result is classified once by the new
+typed helper `classify_verify_result` (`preparation_dialogue.rs`): `Ok` → a
+fully verified CURRENT authority; the exact `Refused(POLICY_CHANGED)` refusal
+→ an identity-valid but stale receipt (verify's order proves such a refusal
+already validated principal, record and Root); ANY other refusal (invalid
+record, wrong Root, source re-join, Storage/Sql, `TrustPublished` wrappers)
+propagates unchanged and refuses the whole read even if a current equivalent
+exists — no duplicated pre-validation, no error suppression. Pass 2: a stale
+receipt is covered only by a fully verified CURRENT admission of the same
+principal, same opened Root instance, STRICTLY equal output classification and
+byte-identical captured lineage — new shared helper `equivalent_current_covers`
+(`preparation_admission.rs`, `pub(super)`): every `AdmissionCapture` field
+compared directly (preparation_id, source_revision, provider, provider_source,
+request_level, target, context_mode, request_hash, settings_digest, prompt)
+plus the `Manifest` provenance compared through its serialized bytes;
+`admission_id`, `event_id` and
+`request_digest` are deliberately NOT compared (a renewal legitimately
+redesigns them); `trust_revision`, `policy_revision`, `policy_digest` are the
+very staleness being covered; any uncovered staleness keeps the declared
+reader refusal through the exact-typed adapter (`reader_stale` stays
+production-used, 403 code `blp-dialogue-policy-stale`) — no global
+stale-ignore, no choosing any recent receipt, no mission/date/event-key
+exception. Pass 3: every matched admission, current or covered-stale, still
+passes the reader clearance `Policy::check_read` against its recorded label →
+`ACCESS_DENIED` otherwise; no partial filtered output. Recorded limitation:
+coverage requires STRICT label equality — a current admission with a higher
+label does NOT cover a lower-labeled stale one (no general higher-label
+coverage); a renewal that raises the label keeps the stale 403 until
+re-admission at the same label. Added targeted coverage as pure unit tests
+(`tests` module of `preparation_dialogue.rs`, no IO, no store):
+`equivalent_current_covers_only_same_identity_and_lineage` (equivalent current
+recaptured through the real `assemble` producer → covered; unrelated
+principal, different opened Root instance on owned fixture tuples — no OS
+identity claim —, changed captured lineage, changed prompt with valid
+recomputed provenance, different label → never covers) and
+`classify_verify_result_propagates_every_non_stale_refusal` (invalid-record,
+wrong-Root, not-found neighbor refusals propagate unchanged);
+`reader_stale_adapts_only_exact_stale_refusal` kept unchanged. The end-to-end
+proof remains the existing public red flow
+`authorized-recovery-after-policy-renewal` of `tests/blp_dialogue_reader_public.py`
+(which must turn green without weakening any prior negative guard: same
+DTO/prompt/snapshots). This correction has NOT been built or executed by the
+authoring agent; the red 324 run above remains the last actually observed
+result and is NOT replaced by a PASS.
+
+**UNVERIFIED (supervisor source review processed, serialization-cause
+correction authored, pending the normal build then Codex's personal
+execution)** — The supervisor source review
+(`glm-bf16-reader-renewal-recovery-20261103T202800Z/supervisor-reception-review.json`)
+established a real defect in the `equivalent_current_covers` helper: comparing
+provenance bytes via `match (to_vec, to_vec)` folded an actual serialization
+failure into `_ => false`, fail-closed without a cause — fail-closed does not
+justify losing the error cause. Correction authored on the only allowed
+modules: the helper's return type becomes `Result<bool,E>` — ordinary semantic
+inequality (different principal, Root instance, label, captured field or
+serialized provenance content) → `Ok(false)`; an actual provenance
+serialization error → typed `Err` through the module's existing failure
+conversion (`serde_json::Error` → `TrustError` → `E::Trust(Box<…>)`, same safe
+context as the other conversion sites, no input bytes in diagnostics). The
+Pass 2 caller no longer uses `.any` closures (a closure cannot propagate `?`):
+explicit checked `for` loops whose `?` propagates the typed error unchanged —
+it is never mapped to non-coverage (which would mask the real cause behind a
+stale 403) nor to coverage (which would serve without a decision). The
+three-pass business contract, the strict same Root/principal/capture/label
+requirement and the deliberately non-compared fields are unchanged; no broader
+recency selection. The test
+`equivalent_current_covers_only_same_identity_and_lineage` adapts to `Result`
+without weakened assertions and gains the wrong-Root non-coverage variant
+(owned fixture tuples, no OS identity claim);
+`classify_verify_result_propagates_every_non_stale_refusal` and
+`reader_stale_adapts_only_exact_stale_refusal` stay unchanged. Recorded
+limitation: no serializer-failure injection is invented — a valid
+producer-written `Manifest` representation cannot fail to serialize, so the
+typed `Err` branch is preserved in code without any claim of having tested
+that branch. This correction has NOT been built or executed by the authoring
+agent; the red 324 run above remains the last actually observed result and is
+NOT replaced by a PASS.
+
+**RECEIVED (Codex personal execution, 3 November 2026, normal candidate 325
+`3d9438…`, 3 units PASS, public run exit 0, 75 assertions PASS, native 0,
+sources stable, NOT installed — the active 323 server stays in place pending
+the remaining checks)** — Run 325 actually observed the corrected freshness
+boundary (GET/HEAD 403 `blp-dialogue-policy-stale` after public renewal,
+re-attribution + re-admission revision 2 without SQL mutation, then final
+authorized GET 200 to the exact same DTO, private prompt absent, 245 artifact
+hashes and 15 equal full snapshot pairs):
+`glm-bf16-recovery-fixture-format-20261103T211100Z/supervisor-receipt.json`
+and `supervisor-public-run325/`. The red run 324 remains retained as history,
+never rewritten. No global acceptance.
+
+**RECEIVED (STORED-corruption negative guards verified by Codex on image
+331)** — After the received recovery,
+`tests/blp_dialogue_reader_public.py` gains exactly two negative guards
+(`corrupt_history_guard('wrong-root-stored','root')` and
+`corrupt_history_guard('invalid-stored-schema','schema')`) over the fixture's
+ONLY OLD stale receipt (first emitted capsule, stale under revision 2), the
+valid current receipt staying untouched: (1) an exact authorized GET 200
+control with a full snapshot pair; (2) original bytes retained, corruption via
+the existing `reframe` of `tests/blp_admission_public.py` ('root' → stored
+Root identity altered, SR1 framing checksum preserved; 'schema' →
+`schema_version='STORED_SECRET'`) through the existing atomic publish —
+explicit fault injection on owned test data, never a production writer nor a
+fabricated acceptance; (3) the actual authorized GET must fail 500 — neither
+an ordinary reader 403 (a stored fault is a verifier/storage failure, not a
+clearance decision) nor a 200 serving any turn — with no
+question/answer/private-prompt/STORED_SECRET byte, raw response retained
+before any assertion, the error code asserted exactly only when the retained
+body actually carries one (explicitly recorded, never a regex success), a
+snapshot pair around the fault read on a baseline taken AFTER the mutation;
+(4) exact original bytes restored in a `finally` (even on assertion failure),
+original+mutated byte-level proof retained, then an authorized GET 200 same
+DTO + full snapshot pair. No private capsule removal: restoration is only the
+fixture fault cleanup, never an operational recovery substitute. The original
+75 positive checks, strict freshness 403 / current recovery 200 and all raw
+channels/true cleanup/manifest hashes are kept; two faults only, no matrix or
+recipe expansion; no new watchdog/cap/retry. Guards NOT executed by the
+writing agent; reception 331 of 4 November 2026: BLP recipe run/verify 0 on
+the activated image 331, 93 named checks of the script including these
+guards, 268 artifact hashes, 21 complete readonly pairs.
+
+**RECEIVED (Codex personal execution of the guards, 3 November 2026, same
+candidate 325 `3d9438…` not installed, active 323 server preserved)** — 93
+assertions PASS (the original 75 + the 18 guard checks), 268 artifact hashes,
+equal full snapshot pairs, byte-exact restoration verified, native 0, sources
+stable; observed EXACT fault codes: `preparation-root-instance-changed`
+(wrong stored Root) and `blp-admission-record-invalid` (invalid stored schema)
+— `glm-bf16-reader-corrupt-history-20261103T212900Z/supervisor-receipt.json`
+and `supervisor-stored-guards325/`. The 7 existing `trust_delegation` tests
+also pass on the unchanged Rust sources, without closing the open swallowed
+error-path hypotheses in config/state. Anomaly recorded by Codex: the
+`fault-<name>-explicit-code` check only verified a conditional nonempty code,
+not equality.
+
+**RECEIVED (exact error oracle and recipe contract verified by Codex on
+image 331)** — Correction of the anomaly in
+`tests/blp_dialogue_reader_public.py`: each guard (`corrupt_history_guard`)
+now asserts the MANDATORY EQUALITY of the retained code with the exact
+expected oracle of its fault kind — `preparation-root-instance-changed` for
+`wrong-root-stored` (wrong stored Root), `blp-admission-record-invalid` for
+`invalid-stored-schema` (invalid stored schema), codes actually observed on
+the received run 325 — through two checks: the equality inside
+`fault-<name>-refuses-500` (a missing, non-string or different code fails;
+the conditional nonempty placeholder is removed) and a dedicated check
+renamed `fault-<name>-exact-code`. HTTP 500, no-leak
+(question/answer/private-prompt/STORED_SECRET), readonly, `finally`
+restoration and 200 recovery are unchanged; the docstrings (module, `main`,
+guard) are corrected in the same increment — the false "exact code only when
+the body carries one" promise is replaced by mandatory equality. The
+permanent recipe `tools/verification/recipes/blp-dialogue-reader-public.json`
+is aligned: `tests/blp_admission_public.py` (the `reframe` provider) is added
+to the declared inputs, and the required fixed names now explicitly cover
+freshness (GET/HEAD 403 `blp-dialogue-policy-stale`,
+`renewal-admission-same-intent`, `renewal-mutations-no-sql-mutation`,
+`authorized-recovery-after-policy-renewal`) and both complete guards
+(control/mutation/fault/exact-code/readonly/restore/recovery for
+`wrong-root-stored` and `invalid-stored-schema`), while keeping prior
+requirements; the final counter stays dynamic
+(`BLP_DIALOGUE_READER_PUBLIC_PASS` without a pinned value — 93 received
+today, do not pin) and the journey hash is required
+(`BLP_DIALOGUE_READER_JOURNEY_SHA256`). Oracle and recipe NOT executed by
+the writing agent; reception 331 of 4 November 2026: BLP recipe run/verify 0
+on the activated image 331 — 93 named checks including the exact-oracle
+equalities, 268 artifact hashes, 21 complete readonly pairs. No global
+acceptance.
+
+**RECEIVED (lost cause in mandate projection fixed; Codex targeted test,
+build and personal CLI flow done, activated in 331)** — Codex personal reproduction on candidate
+325 (`3d9438…`, no live data): with a valid configuration and root mandate,
+`trust show` exits 0 with "Mandat disponible"; after replacing the single
+stored `starts_at` with `STORED_INVALID_TIMESTAMP`, `trust show` STILL exits 0
+with "Mandat disponible", without mutation — the typed timestamp error is
+swallowed then presented as availability
+(`glm-bf16-guard-recipe-contract-20261103T214400Z/supervisor-receipt.json`,
+`supervisor-trust-error-boundary325-valid-identities/`). Source cause:
+`rust/crates/swarm-engine/src/trust/state.rs` `State::public` called
+`operations::active(...).unwrap_or_default()`, folding any technical error
+into an empty string then an available label. General fix on the single
+module: the projection now iterates `self.mandates.keys()` in an explicit loop
+and propagates the original typed error via `?` (`E::Invalid("date RFC3339
+requise")` from a stored timestamp outside the RFC3339 contract,
+delegation-hash errors) — a technical
+error refuses the whole projection, it never becomes an available success;
+business refusals Ok(nonempty) ("mandat absent/révoqué/inactif/expiré/…")
+stay displayed as-is. Precision after the supervisor source review: an absent
+mandate stays that "mandat absent" business refusal from `active_base`, never
+an error; the `E::Integrity("trust-mandate-missing")` branch following it in
+`active` is defensive and unreachable: `active` holds a single shared `&State`
+for its whole body, so the `mandates` content seen by the defensive get equals
+what `active_base` saw — Ok("") from `active_base` already proves the mandate
+present. The three
+other `active` callers (request, approve,
+effect_transition) already propagated `?` and are unchanged; `show` in
+`trust_store.rs` already refused the whole operation on an `Err` from
+`public()`. Function contracts documented in the same increment (`public`,
+`active`, `active_base`). A bounded regression was added to
+`rust/crates/swarm-engine/tests/trust_delegation.rs`
+(`mandate_status_projection_propagates_stored_timestamp_error`) on an owned
+isolated Root, mirroring the reproduction: valid "Mandat disponible" control
+under the same preconditions (3+ identity config, root mandate), owned stored
+fault (`starts_at` → `STORED_INVALID_TIMESTAMP`), `show` refuses typed without
+any mutation of stored bytes, exact restoration of the original bytes then a
+byte-identical "Mandat disponible" recovery; on failure the fixture is
+retained. Distinct hypothesis since picked up: the delegation depth
+read by `delegation_max_depth` with `.ok()...unwrap_or(0)` also swallowed
+errors — reproduced by Codex on image330 (isolated root via the public CLI,
+config `delegation.max_depth=1`, valid root then child mandates; only the
+stored field replaced by the string `INVALID_STORED_DEPTH`: `show` exit 0
+with child "délégations désactivées", root available, no mutation, exact
+restoration then recovery; proof
+`supervisor-depth-discriminant330/result.json`) and fixed in its own
+increment: `delegation_max_depth` is now typed `Result<i64, E>` and reuses
+the existing admission code `trust-delegation-shape` — no new error code or
+ceiling: an explicit zero keeps the legitimate "délégations désactivées"
+business refusal, an absent block keeps the historical compatibility
+fallback to the registered default, and a non-integer or negative stored
+shape — exactly what configuration admission already refuses — propagates
+typed via `?` instead of the silent fallback. A named regression was added
+to `rust/crates/swarm-engine/tests/trust_delegation.rs`
+(`mandate_status_projection_propagates_stored_depth_error`): valid
+child/root witness, stored string then negative faults, `show` refuses typed
+without any mutation, exact restoration then recovery of both mandates, the
+existing zero/depth-chain tests kept. Reception by Codex on 4 November 2026
+(`glm-trust-depth-fixture-target-20261104T024053Z/supervisor-delivery-reception331.json`):
+the targeted test `mandate_status_projection_propagates_stored_depth_error`
+passes with the 8 existing unchanged `trust_delegation` tests reused, and
+the normal build is delivered then activated — v0.1.1-dev.331, SHA
+`e695ab1cdde2ea3e15094905a5445878f463dfdfac05ddde4b1c5b06159d0c71`, PID
+3330501, 756 archive members checked, core artifacts features empty and test
+false. Public CLI flow re-verified on this image: a stored string or negative
+depth refuses with exit 2 under the public family `trust-proof-integrity` —
+the internal Rust reason remains `Integrity("trust-delegation-shape")`, the
+first supervisor run's internal code oracle having been corrected by Codex
+against the actual error contract — and the explicit zero stays the exit-0
+business refusal "délégations désactivées"; three exact restorations without
+mutation then recovery observed. No global acceptance.
+
+**RECEIVED (owner-key/authority capability fix built, executed by Codex and
+activated in 331)** — Anomaly received
+(3 November 2026, image 328 `3ba746a8…`, activation PID 2507781, activated
+image not declared installed-and-verified): in owner-key mode, the
+`web/native-authority-admin.js` module unconditionally called
+`GET /api/v1/authority/me`, a route the real native server does not serve — a
+systematic 404 `web-route-unported` in the console and server stream, with no
+injected fault (server cleanup 0). The fix is a general capability/consumer
+change: the existing native capability document (`GET
+/api/v1/native-capabilities`) now discloses the mode of the actually started
+access gate under the single added key `access.mode` ("owner-key" or
+"authority"; `capabilities_document` helper in
+`rust/crates/swarm-web/src/service.rs`, injected into the existing route arm —
+both dispatch profiles and every other capability key stay unchanged). This
+disclosure is read-only information granting no right: the daemon keeps
+authorizing every route independently, and no key material, freshness window,
+nonce or ledger record is exposed. The consumer
+`web/native-authority-admin.js` reads that capability first: in "authority"
+mode the existing flow (GET /me then the card) is unchanged; in "owner-key"
+mode the card stays absent WITHOUT any authority request; a refused,
+unreachable or malformed capability read stays an explicit visible diagnostic
+(resolved mode `error`, message rendered in the host made visible,
+`console.error`, stable
+codes `authority-capability-unreachable|refused|invalid`) — never a hidden
+success fallback nor a silent owner-key fold. After a positive "authority"
+mode, a failed, refused or malformed first `GET /me` also refuses explicitly
+into a visible `error` mode (diagnostic rendered, `console.error`), never a
+"none" fold nor an empty success; only a positive "owner-key" mode stays
+"none" without any daemon request. Network and parse failures of the
+capability read keep the original cause on `Error.cause`, and the resolved
+`error` mode exposes a structured `error` (stable code, optional `status`,
+original cause) for consumers; only the safe translated message and stable
+code are rendered or logged — no stack, secret or request object.
+`web/cockpit-authority.js`
+handles that `error` mode by keeping the menu entry visible with the
+diagnostic, and its catch of an unexpected mount failure now renders the
+visible diagnostic with the cause retained instead of swallowing the error;
+`web/native-runtime.js` (second consumer of the mount) no longer silently
+hides an unexpected failure: it logs the safe code and renders the diagnostic
+in the card, cause retained. Pure regression added
+(`capabilities_document_discloses_access_mode_without_gate_secrets`, tests
+module of `service.rs`): owner-key shape, purely constructed authority shape
+(no IO), witness that only the `access` key differs from both capability DTOs.
+Same-increment consumer corrections (code not executed): cause preservation in
+`accessMode`, a failed first `/me` refused into a visible `error` mode instead
+of "none", visible diagnostics for unexpected mount failures in
+`cockpit-authority.js` and `native-runtime.js`. Behavioral contract guard
+(authored, NOT executed on the GLM side; executed by Codex in reception 331
+below): `tests/authority_capability_consumer_test.cjs`
+executes the real sources of the three files inside `node:vm` contexts with
+explicit doubles (route-matched recorded fetch with a call log, minimal DOM
+element doubles, recording console), loads the real `web/i18n-en.js` table
+and reads four targeted keys of `locales/en.json` (catalog/generated parity
+checked inside the guard, no catalog pagination); the `PRIVATE_*` sentinels
+are unit fixtures (never live data) and no UID, enrollment or acceptance is
+fabricated — the first `/me` is counted then refused. Named assertions
+received by the supervisor: 90 PASS / 0 FAIL (the real run of 4 November
+2026 validated 90 named assertions — the 87 of the FIX lot then three more;
+the "89" announced in the runtime lot's FINAL was stale), stable
+sources, exit 0. Owner-key ⇒ "none", card hidden, 1 capability fetch / 0 daemon
+fetches; authority ⇒ `/me` offered then refused, status 403 preserved; cap
+403/network/parse/key absent/unknown mode ⇒ visible `error` with the cause
+kept by identity and no `PRIVATE` leak in DOM/console/`reason`; `/me`
+malformed/refused/network/parse ⇒ visible `error`, status and cause
+preserved; unexpected mount rejection at both consumers, fed a RAW private
+rejection (the sentinel itself, not a stable wrapper) ⇒ card visible, entry
+not hidden, EN translated message + stable code, original sentinel
+reachable unmutated on the stable wrapper's `cause` chain (cycle-detecting
+walk, no ceiling, observed through a recording `Error` inside each
+sandbox); explicit recovery by a fresh mount on a fresh host with a valid
+owner-key capability ⇒ zero auto
+retry, zero parasitic `/me`. Safe-renderer lot
+`glm-authority-renderer-safe-code-20261104T005700Z` (code authored, NOT
+executed on the GLM side — executed by Codex and embedded in the activated
+image 331, verified by the JS guard of reception 331 below): the supervisor
+discriminant showed the former shared renderer `explain` appended
+`(<e.message>)` unfiltered — an unknown daemon code
+(`PRIVATE_UNKNOWN_DAEMON_DETAIL` sentinel, `private_leaked:true`) was
+rendered verbatim in the dialog state. The shared rendering is fixed in
+`web/native-authority-admin.js`: the displayed code is derived (known local
+key → itself; safe daemon surface code → itself; unknown or hostile,
+including a prototype-inherited key → the generic `authority-refused`
+code), the translation stays the generic message's, and the original error
+is read, never mutated (message, `status`, `reason` kept for diagnostics);
+already-known codes keep rendering (`authority-response-unreadable` and
+`authority-config-invalid` added to the safe surface so they do not
+regress). The regression guard exercises the dialog-submit path for real:
+non-admin mount with a strictly fictitious `/me` DTO declared as unit data
+(never a UID, enrollment, session or acceptance); a control route really
+answers that first `GET /me` with the DTO — declared after the specific
+`/me/password` and `/me/keys` routes, the fetch double matching by
+substring — and the positive preconditions (mode `authority` with
+`administer:false`, exactly one exact `GET /me` by URL and method,
+"Mon mot de passe" button present in the nav) are asserted before the
+refusal is injected; an invalid precondition stops the guard with a loud
+failure instead of continuing into a fake witness. The renderer lot's
+received positive witness was false: the declared DTO was never served
+(`meDto` declared, never wired), the unmatched fetch made mount resolve in
+visible error mode, and the card-visible check alone mistook that error
+mode for a valid witness (real Codex red, exit 1, `own=absent`, Codex
+personal proofs kept in the renderer lot's directory); repaired test-only
+in `glm-dialog-guard-control-route-20261104T012700Z`, product unchanged.
+Opening the "Mon mot de
+passe" dialog, POST `/me/password` refused 500 with the unknown daemon
+code ⇒ visible "notice alert" refusal, re-enabled button, render = generic
+translated message + `authority-refused`, no occurrence of the sentinel in
+DOM/console, original error unmutated with status 500 observed through the
+admin sandbox's recording `Error`; explicit recovery by flipping the route
+to success and really resubmitting the same dialog ⇒ translated success
+notice and POST counted 2 (no reload, no reset). The next real run's
+assertion total is not frozen (dynamic guard summary). The FIX lot
+`glm-capability-safe-error-fix-20261104T001200Z` corrected the three reds
+really observed by Codex on 4 November 2026 (exit 1, 84 PASS / 3 FAIL /
+87 assertions, stable sources): `/me` transport failure wrapped under
+`authority-me-unreachable` (original error unmutated on `.cause`), 2xx JSON
+decode failure under `authority-response-unreadable` (decode cause on
+`.cause`, flattened to `authority-me-invalid` at the `/me` consumer),
+rendering/logging of the single stable code (existing generic translated
+message), never mutating the original error to manufacture a success; the
+three assertions remain contract obligations (no "expected red" mechanism
+remains, every named failure is a red to diagnose). Harness termination is
+observed, never guessed: the admin and cockpit scenarios await the actual
+promise `mount()`/the captured handler returns; the runtime scenarios go
+through the lifecycle the source REALLY offers (`readyState:'loading'` →
+the source registers its own global `load` listener, the harness captures
+THAT exact handler — exactly one, `{once:true}`, otherwise a loud failure —
+triggers it the way the browser would and awaits the actual promise
+`start()` returns). The tracked-promise barrier (fetch, body reads, stub
+rejections, waves until the tracked graph is quiescent) only drains
+detached jobs AFTER that awaited real completion; a graph-empty quiescence
+never establishes the product's own untracked awaits (2026-11-04 harness
+red: barrier returned before the async startup had scheduled any fetch;
+evidence dir `glm-runtime-guard-lifecycle-20261104T004200Z`). Product defect
+= diagnosable hang, never a masked PASS; no round ceiling, timer or retry.
+Command: `node tests/authority_capability_consumer_test.cjs`.
+Limits: no compilation nor
+execution on the authoring agent side; the behavioral guard and the normal
+build were executed and delivered by Codex — reception 331 of 4 November
+2026 (details and links in the recipe below): recipe run/verify 0 on the
+activated image v0.1.1-dev.331 (SHA `e695ab1c…`, PID 3330501) with 106 JS
+assertions and 56 owned-UI assertions, and the FR/EN version personally
+viewed on that same image; the owned UI remains a FIXTURE_UI, not a real
+human login; the real Authority
+front (human login requested on 3 November 2026, never repeated nor bypassed)
+stays a distinct unclosed workstream; the fixture UID 4242 of the existing
+authority tests is not reused; the `tests/paea_local_delivery_test.cjs` recipe
+is not adapted to ignore errors; every failure name is a red to diagnose.
+Execution, hashing and installation: Codex, never the authoring agent. No
+global acceptance.
+
+Permanent recipe of the capability/owner-key consumer contract:
+`tools/verification/recipes/authority-capability-ownerkey-ui.json` (authored,
+NOT executed on the GLM side; executed by Codex on the activated image 331,
+run/verify 0 — reception331 below). Four sequential steps under `recipe.py run`:
+(1) input binding `tests/authority_capability_inputs.py --binary
+$SWARM_BLP_BINARY --profile $SWARM_BLP_PROFILE` — refuses before anything
+else if the real ELF's SHA-256 differs from the normal qualified profile's
+`sha256` field, if a normal-profile precondition is not exactly the expected
+type and value (`status` the string `VERIFIED_DEFAULT_NATIVE_PROFILE`;
+`no_fixture_feature`, `all_core_features_empty`, `all_core_test_false`
+booleans exactly `True` — false, absent or wrong type = named refusal), or
+if any of the seven real workspace consumer inputs (the three consumer JS
+sources `web/cockpit-authority.js`, `web/native-authority-admin.js`,
+`web/native-runtime.js` and their real `web/i18n-en.js`, `locales/en.json`,
+`rust/crates/swarm-web/src/service.rs`, `version_history.json`) differs from
+the hash recorded in the profile's `after.json`. A refusal prints
+`AUTHORITY_CAPABILITY_INPUTS_REFUSED <cause>` to stderr immediately and
+exits 2; (2) the negative guard `python3
+tests/authority_capability_binding_negative.py` — valid witness first, then
+one minimal perturbation per refusal class (preconditions false, absent or
+wrong type; divergent binary `sha256`; missing then divergent input), and
+finally the witness re-run (recovery), through the real helper as a
+subprocess with no CLI-boundary mock, no copied ELF and no archive — markers
+`AUTHORITY_CAPABILITY_BINDING_NEGATIVE_PASS cases=` (informational count,
+not frozen) and `AUTHORITY_CAPABILITY_BINDING_NEGATIVE_WITNESS_SHA256`;
+(3) the guard `node
+tests/authority_capability_consumer_test.cjs`; (4) the real owned UI
+`tests/blp_admission_ui.py --binary --profile --output fresh` on the same
+image. Step 4 follows the `blp-dialogue-reader-public.json` recipe pattern:
+proof output via the explicit `SWARM_CAPABILITY_PROOF_OUTPUT` variable when
+set, otherwise
+`fixture_area.fixture_root('authority-capability-proof-')/ownerkey-ui` (never
+`/tmp`); the existing `SWARM_BLP_BINARY`/`SWARM_BLP_PROFILE` variables are
+reused with no new secret. The binding is necessary: the guard reads the JS
+from the workspace while the UI reads the image, its
+`effective-sources.tar.gz` archive (the helper itself NEVER reads that
+archive — it re-hashes the workspace files) and its profile `after.json` —
+without it, a guard could validate sources that are no longer the ones
+embedded in the image the UI verified. The helper performs read-only hashing
+and validation only; no rebuild or activation; it establishes input coherence
+at check time, not independent effective-graph or archive qualification, nor
+any right. Required named stdout assertions: owner-key (mode `none`, zero
+daemon, no retry), capability and `/me` errors with preserved causes, visible
+`/me` refusal, both consumers cockpit/runtime, safe dialog and recovery,
+final markers `AUTHORITY_CAPABILITY_CONSUMER_GUARD_PASS` and
+`BLP_ADMISSION_FIXTURE_UI_PASS 56` / `LIVE_AUTHORITY_UI_OPEN`; the JS counter
+is not frozen (the `GUARD_SUMMARY` line stays dynamic). Limits and reception:
+the owned UI remains `FIXTURE_UI` (no fabricated `/me` as acceptance); the JS
+doubles remain unit ones; the negative guard of 4 November 2026 receives the
+anomaly where `all_core_features_empty=false` then `all_core_test_false=false`
+were each accepted with exit 0 by the first helper version — fixed by the
+strict validation of the four preconditions above; reception330 verified the
+106 JS assertions and the
+56 FR/EN browser assertions on the same owned image330 (SHA
+67a8ec31bee4e5672a185ce2767cac2ccefec259d67087a4d6fd51d915d4df33, PID
+3109042, whole embedded history checked through the permitted real native
+probe) but demonstrates neither the human Authority login, nor E3, nor any
+acceptance; PA00–PA13/RETEX workstreams remain open; the whole set (fixed
+helper, negative guard, four-step recipe) remains NOT executed on the GLM
+side — Codex personally runs the refusals then a fresh recipe run/verify.
 
 A retained `null` federation block remains absent and grants no authority. Business commands tolerate only the historical all-zero `policy` placeholder (three zero integers and false separation) to preserve Go fingerprints; it configures nothing. Any other value refuses without mutation.
 Duplicate keys also refuse at the top level of configuration and state, before extension selection.

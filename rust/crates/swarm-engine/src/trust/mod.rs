@@ -2,6 +2,7 @@
 //! Linux confinement or authority is conferred by deserializing its data.
 pub(crate) mod authentication;
 pub(crate) mod command;
+pub(crate) mod data_policy;
 pub(crate) mod audit;
 pub(crate) mod config;
 pub(crate) mod confidentiality;

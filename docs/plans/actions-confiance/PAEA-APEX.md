@@ -1,6 +1,696 @@
 # PAEA — plan APEX adopté et suivi d’exécution
 
-## Point courant P1/G1 — 3 novembre 2026
+Point de preuve — 2026-11-05 11:04 UTC : trois contrôles ciblés vérifiés :
+rétention sous vrai flock et reprise1PASS (profil default), classificateur1PASS
+(feature test-fixtures), custody candidat1PASS (default). Zéro-test intermédiaire
+reste FAIL historique ; lot corrigé2/2PASS et intégritéVERIFIED. Inventaire des
+binaires/features dans `supervisor-tested-artifacts.json`, revue liée aux hashes
+et archiveUSB relue94Mo/index local, originaux conservés. Notes FR/EN ajoutées
+ensuite ; unitaires prouvent leurs octets antérieurs des notes embarquées, sans
+changement des fonctions testées. Nouvelle preuve publique distincte ci-dessous.
+
+Build soutenu **normal334**, SHA
+`23651e383c4b7eb6ba1b25bf66d0c63d3e58dd8adf6ab18435fe3cfb7390514c`,
+`./swarm.sh build --no-open` exit0, profil normal sansfixture vérifié et sources
+effectives archivées stables (`.cache/local-delivery/rust-it8w409o`). Non installé.
+Vrai producteur source neuf complet **exit0/PASS** :2cycles managed inertes,
+12reviewinputs,5reviewer,8publication.37helpers stables, archivés puis relus avec
+hashes ; taskfixture acceptée, mission non acceptée, pas fournisseur payé ni
+indépendance humaine/confinement. Nouvelle racine saine conservée pour HTTP ;
+recette HTTP repinnée explicitement image/profil/source, NON EXÉCUTÉE. Preuves :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-direct-held-lock-guard-review-repair-20261105T104154Z/supervisor-native-source334-reception.json`.
+
+Proposition GLM105149 refusée :3blocs partiels répétés, aucune relocalisation
+réelle ni régression EOF promise, commentaires prétendant l’intégration. Aucun
+code de cette proposition appliqué. Diagnostic méthode conservé ; découpage en
+transformation ancrée minimale du seul bootstrap, puis régression et reçus séparés.
+Une requête GLM directe active `glm-direct-positive-startup-boundary-only-20261105T110450Z`,
+sans outil/modification dépôt/modification effort. Pas répétition identique ni
+relèvement de budget. Objectif lecteur/approbation/E2E demeure ouvert, aucun
+passage à l’intégration recette_agent dans ce checkout.
+
+Reprise interactive — 2026-11-05 10:55 UTC : lecteur toujours raccordé au témoin
+HTTP mais E2E NON accepté. La correction GLM d’observation SQL a conservé les
+60 assertions à des frontières causales ; nouveau producteur333 arrêté plus
+tôt, vrai exit2 : `managed-result-retention-incomplete / managed-operation-busy /
+storage-operation:Lock / os-errno:11` après Workrev15 enregistré. Cause nouvelle :
+contention non bloquante du verrou managed traitée comme fatale ; détenteur exact
+inconnu. Fixture originale conservée, aucun succès SQL forgé ni consommation remise
+à zéro. Processus propres récoltés, contexte PID/cleanup conservé.
+
+Proposition GLM102905 + réparation104154 intégrée : seul échec d’acquisition
+EAGAIN typé direct, sans publication/nettoyage, devient attente dans découverte
+et rétention ; autres causes/effets partiels restent erreurs. Cadence enregistrée
+existante, aucun nouveau retry/délai/plafond. Test témoin réel avec détenteur flock
+séparé : ROUGE attendu1FAILED/cargo101 avant correctif ; VERT1PASS après correctif,
+références/rapport/manifeste/preuve inchangés puis reprise du même résultat. Le lot
+vert reste FAIL car le second filtre a collecté0tests sous la feature fixture ;
+recette a correctement refusé ce faux vert. Invocation feature corrigée et garde
+custody en cours, sans répéter le premier succès inchangé. Preuves intègres vérifiées
+dans `paea/evidence/20261028-acquisition81-mvfdts57/glm-direct-held-lock-guard-review-repair-20261105T104154Z/`.
+
+GLM direct unique `glm-direct-approval-bootstrap-guard-20261105T105149Z`
+prépare la garde couvrant tout bootstrap post-spawn et un enfant réel EOF/exit7.
+Codex reste seul superviseur/intégrateur/testeur. Reçus complets/secondaires et
+refus ownership restent ouverts ; nouveau build normal, producteur source frais,
+E2E public et livraison locale restent nécessaires. USB333 archivée/relue, index
+local conservé ; candidat333 non activé. Conseil utilisateur : session distincte
+recette_agent, Swarm en lecture seule pendant faisabilité ; aucune nouvelle session
+créée ni capture privilégiée lancée. Périmètre de ce chat inchangé.
+
+## Supervision courante — 5 novembre 2026
+
+Reprise interactive — 2026-11-05 09:42 UTC : utilisateur demande explicitement raccord lecteur
+au parcours d’approbation puis tests E2E personnels avant suite. Codex reprend
+le client GLM courant sans doublon. Candidat **normal333** construit par
+`./swarm.sh build --no-open`, vrai exit0, profil **VERIFIED_DEFAULT_NATIVE_PROFILE**,
+features fixtures absentes et sources effectives stables. Empreinte
+`ee1d29c5ed3e2cc7a8b29295c6ba21359c75abc9e60800fd943000290942f220`, preuve
+`.cache/local-delivery/rust-6lyxyka8`. Pas activé. Construction indépendante des
+éditions GLM test/recette/README : intersection nulle avec3049candidats, vérifiée.
+Notes d’évolution FR/EN complétées sans prétendre HTTP accepté.
+
+Nouvelle sourcefixture333 réellement exécutée : **exit1**, premier cycle réel
+réussi puis `sqlite3.OperationalError: database is locked` sur lecture SQL brute
+au démarrage du second. Échec secondaire de nettoyage : PID6788 inconnu non
+signalé ; observation ultérieure /proc absent, exit réel inconnu, aucun processus
+observé avec argv Root exact de cette fixture. Originaux et diagnostic
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-http-startup-owned-receipt-20261105T091555Z/supervisor-source333-failure-reception.json`.
+Hypothèse à corriger : observation directe SQLite pendant écriture canonique ;
+préférer frontière causale stable/publication acquise, pas timeout/retry arbitraire.
+Ne pas rejouer producteur inchangé. Correctif fixture à la frontière de tâche GLM
+courante ; réception21gardes puis source fraîche/HTTP restent nécessaires.
+
+Opportunité utilisateur conservée : moteur Rust `recette_agent/discoveryprobe`
+comme observateur externe complémentaire de Swarm. Lecture sources seule :
+exec/fork/connect/open/DNS/listen/accept/IPC et JSON ; traces requête/réponse dans
+proxy Python. Tri/dédoublonnage et ring avec éviction ne prouvent ni chronologie
+ni exhaustivité ; audit append seul ne prouve pas durabilité/immutabilité.
+Proposition : adaptateur offline puis témoin réel isolé, identités et pertes
+contrôlées, sans modifier la frontière d’autorité Swarm. Aucune intégration ou
+capture privilégiée lancée ; décision de périmètre distincte après porte HTTP.
+Sources/hashes et critères : `supervisor-recette-agent-feasibility.json` du même
+dossier. Suivi15min maintenu ; supervision interactive active, aucun autre auteur.
+
+Contrôlepersonnel5nov09:15UTC : recetteHTTPpositivenormale332 réellementexécutée : **0PASS/1FAILED/23filtered,cargo101/run1, source stable, integrityVERIFIED/recordedFAIL**. Image332qualifiéeancienne n'exposePAScommandeCLIapproval-web : rawchildstdout0/stderr4179 command_failed/usage ; pasdeprofil dégradé. PanicpreparedEOFhorssignalguard a perdurealwait/reçu : exit réelchildINCONNU, process-receiptab­sent. Rawsprivés validésUID0700/containmentetcopiés, réception `paea/evidence/20261028-acquisition81-mvfdts57/glm-http-positive-normal-fixture-pin-20261105T085538Z/supervisor-normal-http-first-reception.json`.
+
+CheckOSpersonnel : pidfdSIGINT surenfantpropre exit7déjàfini/nonreaped réussit puiswait7 ; pasbesoinchangercommon. TâcheGLMunique `glm-http-startup-owned-receipt-20261105T091555Z` placeTOUTbootstrappostspawn sousguardexistant etréceptionraw/exit/terminalstatesAVANTpanic ; gardeEOFstartup réelle etrecette21si ajout. EnsuitebuildNORMALsourcestable parcheminsoutenu ./swarm.sh build (staging, aucuneactivationavantqualification), nouvellefixtureetpinimageactuelle. Pasrepatchbinaire332/forgerexit ; PAEAHTTPpasaccepté. Anciennefixtureconsomméesetupàrenouveler. PA00–PA13/RETEX/formulaire/livraison/parentrefusouverts, suivi15minmaintenu.
+
+Réceptionpersonnelle5nov08:55UTC : **4gardesreviewerOK/exit0sanswarning**, puis VRAIproducteurNEUFnormal332 **exit0/PASS** :2cyclesinertesBiba,12reviewinputs,5reviewer et8publicationchecks réels ; task_accepted=true dansfixture, mission_accepted=false/paid_provider=false. SR1v2magic/length/SHA, waited/exit0/outputcomplete/grant/channelclosed vérifiés ; PID/PPIDmarker==job4030982/4030810 etprompt/context/cataloghashesliés.37sourceshelpersstables, archive relue+empreintescomparées. Preuve `paea/evidence/20261028-acquisition81-mvfdts57/glm-reviewer-marker-raw-no-spin-20261105T083858Z/supervisor-source-qualified-next-http.json` etréceptiondirecte.
+
+Portée : fixtureinersupportedpublicpublication, aucuneindépendancehumaine/confinementglobal/HTTPacceptation. Une tâcheGLMactive `glm-http-positive-normal-fixture-pin-20261105T085538Z` raccorderecette1testpositif àcettefixturefraîche etimageNORMALE332/SHA00560d87…+profilretained explicites, pasdéfautCLItest. Aprèsremise CodexexécuteHTTPpersonnel avecraw/Git/service/project/vraiexitetverify ; parentrefus/ownership/reçuencoreouverts. Aucunenouvellelivraisonliveannoncée. PA00–PA13/RETEX/formulaire/livraisonouverts, suivi15minmaintenu.
+
+Réceptionpersonnelle5nov08:38UTC : **3gardesreviewerI0 OK/exit0sanswarning/sourcesstables**, raw+4entréesexactes `paea/evidence/20261028-acquisition81-mvfdts57/glm-reviewer-fixture-i0-config-marker-20261105T081222Z/supervisor-reviewer-workspace-three/`. Configembarquée etmarker0600danscwdtestétablis, pasBiba/permissionnative. Runcompletnonqualifié : bytesmarkerrejouécomparésànouvelleJSONcompactdifférente ; waitTrueinutiliséintroduitbusy-spininfini. TâcheGLMunique `glm-reviewer-marker-raw-no-spin-20261105T083858Z` gèlebytesRAWetsupprimeoption/boucle, régressionréellePopen+lectureunique. Nouveauproducerpersonnelnormal332 aprèsstabilité ; cohérencePIDmarker/jobnatifresteàvérifier, variantesfaultsource/publish-refusalnonqualifiéesrestentvisibles. PasfixturepublicationPASS/HTTPaccepté ; PA00–PA13/RETEX/livraison/formulaire/parentretentionouverts, suivi15minmaintenu.
+
+Réceptionpersonnelle5nov08:12UTC : gardeclose/rédaction désormais **14tests nommés OK/exit0 sansResourceWarning, sourcesstables**. Aprèspremierrecheck13OK/1FAIL (fauxcompteur4lecturesau lieu2), GLMacorrigéfixtureduseultest ; nonvacuitécloseetpayloadprivé réellementexécutés. Preuves `paea/evidence/20261028-acquisition81-mvfdts57/glm-observation-guard-call-count-20261105T080645Z/supervisor-fourteen-final/`. TâcheGLMunique `glm-reviewer-fixture-i0-config-marker-20261105T081222Z` reprendfrontièreVRAIproducer : configreviewerrootrelativeabsenteducwdI0etmarkerconsommateurs. Contratprimaire `native_provider_workspace.rs` etmaterial.rs : engineoutputReviewer/claimpublic sous `.swarm/biba-i0/reviewer/<event_id>`, paspermissioninventée. Codefixture+consommateurs+régressions ciblées, aucunBibaaffaibli ; variantesfaultnonqualifiées doiventrestervisibles. VraiNEWproducerpersonnelaprèsremise ;2cyclesnormalBibaantérieursconservésmaisaucunepublicationfixturePASS/HTTPaccepté. PA00–PA13/RETEX/livraison/formulaire/parentretentionouverts, suivi15minmaintenu.
+
+Reprisecontrôlée5nov07:51UTC : préconditionréseauréellementrétablie extérieurement, DNSinterne10.202.26.231, proxyHTTPhealth200 etupstreamGET/models200/19modèles vérifiés sansappelmodèle. AucuneconfigurationDNS/VPN/proxypartagéemodifiée. Testsourceinchangépendantpanne, aucunclient/orphelinmêmeUUIDactif ; demandéréseauprécédentdésormaisrésolu. Preuve `paea/evidence/20261028-acquisition81-mvfdts57/glm-canonical-guard-syntax-fix-20261105T064719Z/supervisor-network-restored-resumption.json`. MêmeUUIDGLM--resume en dossierneuf `glm-canonical-guard-syntax-network-resume-20261105T075134Z` pourSEULcorrectifsyntaxe/gardecloseencoreinexécuté, sanshaussecap/budget. PasnouvellequalificationPAEA, logséchecpréservés.14gardespersonnellesaprèsremise, puisfixture reviewercwd/config. PA00–PA13/RETEX/HTTPpositif/livraison/formulaire/parentretentionouverts, suivi15minmaintenu.
+
+Replan réseau5nov07:34UTC : client GLM a terminé **exit1/API500 Connectionerror** sansmodifierle test. Diagnosticcibléconfirme DNSinterne `chat.skynet.cossi.internet` EAI_NONAME ; proxyTCP4010disponible, resolverWiFi192.168.0.1seulscopeDNSvisible. Aucunepréconditionnouvellepourappel : appelsGLMsuspendus, aucunDNS/VPN/proxypartagémodifié, aucunCodexdéveloppement. Preuves `paea/evidence/20261028-acquisition81-mvfdts57/glm-canonical-guard-syntax-fix-20261105T064719Z/supervisor-network-blocker.json`, diagnosticDNS/étatrésolveur/exit/logs conservés. Propriétaireaccèsréseau : utilisateur/exploitation ; reprise quandDNSréelinternerétabli+proxydisponible, contrôleorphelinspuismêmeUUID--resume/dossierneuf/correctifsyntaxeexactnonréalisé. Premieravisinterventionréseau pourcetteperte, nepasrépéterdemande. Surveillance15minresteutileetmaintenue ; PA00–PA13/RETEX etHTTP/formulaireouverts.
+
+Réceptionpersonnelle5nov06:47UTC : correctifpreuveclose/redaction remis mais scriptdirect **exit1/SyntaxErrorligne619, zérocasexécuté**, sourcesstables. Raw+3entréesexactes `paea/evidence/20261028-acquisition81-mvfdts57/glm-canonical-proof-redaction-fix-20261105T063448Z/supervisor-canonical-fourteen/`. Outertrydédentéavantexcept/finally ; mutationcloseutiliseanciensFDsdéjàfermés, risquesélectionwatchdurantreprise. TâcheGLMminimale `glm-canonical-guard-syntax-fix-20261105T064719Z` répareSEULEfonctiongardecorrecte/isolationmutationsousnouveauxFDsencorepossédés, sansaffaiblirassertionavantcleanup. Reviewerfixtureconfig/cwdresteprochaindépendance après14gardesréellementexécutées.2cyclesnormalBiba réels antérieursreténus, paspublicationfixturePASSniHTTPaccepté ; PA00–PA13/RETEX/livraison/formulaire/parentretentionouverts, suivi15minmaintenu.
+
+Contrôlepersonnel5nov06:34UTC : **12gardeshelperOK/exit0stables**, puis producteurNEUFnormal332 a franchi **les2vraiscyclesworkerinertes Biba** (attachementcanonical/kernel, ready/probefichier, arrêtserveur/adoption, release/waitpid0, settlementFIFO/durables) : NATIVE_MANAGED_AUTO_PASS et MANAGED_REVIEW_INPUTS_PASS12assertions réels. Paspreuveglobaleconfinement/indépendance/acceptation. Producteurentier **exit1** ensuite : reviewerinerte lit configrelativeabsenteducwdréel ; receiptSR1 magic/length/SHA vérifié, waited=true/exit1 etstderrFileNotFoundError ligne6 conservés. Réception `paea/evidence/20261028-acquisition81-mvfdts57/glm-canonical-queued-close-fix-20261105T060323Z/supervisor-source-fixture-second-reception.json`.
+
+Réceptionhelperencorerefusée : nouvelle gardeclosefermeelle-mêmelesFDsavantassertion (fauxpositif) etrefusunknown/malformedréaffichentpayloadprivé. TâcheGLMunique `glm-canonical-proof-redaction-fix-20261105T063448Z` corrige preuve/refusavantqualification ; ensuitecorrectiffixture reviewerconfig/cwd/observationparvraiscanaux, pasbypassBiba. AucunefixturepublicationPASSniHTTPpositifaccepté. Profilnormal/livraison/formulaire, parentretention etPA00–PA13/RETEXouverts, suivi15minmaintenu.
+
+Contrôlepersonnel5nov06:03UTC : bootstrapAF_UNIX supprimé etalias/release corrigés ensource ; **9helpertestsOK/exit0stables**,25protocoleinchangés réutilisés. Vrai producteurNEUF lancé avecnormal332/image00560d87… etprofilqualifié : **exit1**, fauxrefus agentqueued/PIDsnonprêts/exitnull classéterminal. Causeproduitréelleetcleanupterminé retenus `paea/evidence/20261028-acquisition81-mvfdts57/glm-managed-public-identity-attach-20261105T054735Z/supervisor-canonical-producer-reception.json`, stdout/stderr/argv/exitréels. Contratenginequeuednonterminal confirmé enlecture. Nouvellefrontièrecanonicalrépèteaussireturn-dans-try masquantrefuscloseetpendingBUSYnoneffacé : tâcheGLMunique `glm-canonical-queued-close-fix-20261105T060323Z` corrigeclassification/ownership etrégressionsdédiées. PasnouvellefixturePASSniHTTPaccepté ; pasrépétitionproducteurinchangé. Réceptionpersonnelleaprèsstabilité puisnouvellefixture ; PA00–PA13/RETEX/profilnormal/livraison/formulaire/parentretentionouverts, suivi15minmaintenu.
+
+Réceptionpersonnelle5nov05:47UTC : **25testsprotocole+9helper OK, exit0/sanswarning, sourcesstables** ; rawet5entréesexactes `paea/evidence/20261028-acquisition81-mvfdts57/glm-managed-file-rendezvous-integration-20261105T051729Z/supervisor-integration-compatibility/`. Raccordréel REFUSÉ parrevuedecontrat : moduleprovider masquéparvariablelocale (symtableconfirmeUnboundLocalpremierappel), bootstrapAF_UNIX conservéalorsquenouveauproviderneconnecteplus, release disjointint+str etnomsdivergents. ProducteurNEW nonlancé surcecheminimpossible. TâchecorrectiveGLMunique `glm-managed-public-identity-attach-20261105T054735Z` implémente attachementcanonicalagent→kernel/pidfd sanssocketinitial, séparealias etaligne release ; module25gardeslectureseule. Réceptionpersonnelle9compatpuis producteurNEUF normal332 aprèsstabilité ; aucunbinaire sanssandbox. HTTPpositif/profilnormal/livraison/formulaire, parentretention etPA00–PA13/RETEXouverts, suivi15minmaintenu.
+
+Réceptionpersonnelle5nov05:17UTC : **23testsprotocole nommés OK, exit0, aucunResourceWarning, sourcesstables**, commande directe et4entréesexactesretenues sous `paea/evidence/20261028-acquisition81-mvfdts57/glm-file-protocol-stdin-close-20261105T050147Z/supervisor-file-protocol-cleanup-recheck/`. Fermeturestdinréelleasserteclosed, aucunwarningsupprimé. Portée strictestandalone, pasBiba/publicidentity. Prochaine tâcheGLMactive `glm-managed-file-rendezvous-integration-20261105T051729Z` : raccordauxtoursmanagedréels, identitécanonicalagent→kernel/stamps/pidfd→readyfichier, survie/settlement/refus existants conservés. Éventuelsfdsterminauxexternes qualifiés séparémentavantproducerNEWnormal332. Pasancienbinaire sanssandbox ni fixturecopiée. HTTPpositif/profilnormal/livraison/formulaire, parentretention et PA00–PA13/RETEX restentouverts, suivi15min maintenu.
+
+Contrôle personnel5nov05:01UTC : les23tests directs du protocole sont **23OK/exit0**, sources avant/aprèsstables etoctetsexactsretenus sous `paea/evidence/20261028-acquisition81-mvfdts57/glm-file-protocol-mode-bytes-fix-20261105T044704Z/supervisor-file-protocol-recheck/`. Modes0600 etstderrbytes corrigés danscetteportée. ResourceWarningresteouvert : chemin réel killavantready garde stdinBufferedWriter ouvert, cleanupterminal le saute ; causepersonnellementlue. TâcheGLMminimale `glm-file-protocol-stdin-close-20261105T050147Z` ferme cetteextrémitépossédéeetasserteclosed sanssupprimerwarning/GC ni changerlemomentdukill. Pasréception 'sansfuite' ni intégrationBiba avant recheck ; raccordidentitépublique/2tours resteprochaindépendance. HTTPpositif/profilnormal/livraison/formulaire, parentretention et PA00–PA13/RETEX ouverts, suivi15min maintenu.
+
+Contrôle personnel5nov04:47UTC : moduleprotocole réellement remis puis23tests exécutés aprèsstabilité : **21OK/1FAIL/1ERROR, exit1**, entréesexactes archivées etsourceavant/aprèsstable. Preuve `paea/evidence/20261028-acquisition81-mvfdts57/glm-fixture-file-protocol-20261105T041742Z/supervisor-file-protocol-direct/`. FAILtémoinpositif modehandoff0664 attendu0600 (model-received mêmecréationumask) ; ERRORassertionstrcontrebytesstderr refusbadrelease. CorrectionminimaleGLMactive `glm-file-protocol-mode-bytes-fix-20261105T044704Z` : créationexclusive0600desdeuxfichiers, assertionbytes exacte, docbatchtechnique. Aucunaffaiblissement de garde. ResourceWarningadditionnel stdinBufferedWriter nonfermé conservé, àdiagnostiquer avant réceptionprotocole. Les notesREADME de régénération avec ancienbinaire sanssandbox ont été vues ; aucune utilisation autorisée ni réalisée par ce suivi, vraiBiba reste àvérifier aprèsraccord. Protocole/sourcefixture/HTTPpositif et PA00–PA13/RETEX nonacceptés, suivi15min maintenu.
+
+Replan personnel5nov04:16UTC : paquet transportfixture trop couplé avant première implémentation. Deux compactions publiques et82réponsesoutils, aucunmodule/test créé, mapping poursuivi et suiviPENDING ; aucune progression fonctionnelle vérifiée. Preuve `paea/evidence/20261028-acquisition81-mvfdts57/glm-source-fixture-file-rendezvous-20261105T034757Z/supervisor-package-decomposition-replan.json`. ClientGLMseul possédé interrompu aprèsidentitéUID/boot/start/session, vraieissue0/error_during_execution et sources/logs préservés ; aucunehaussecap/budget. MêmeUUID repris en dossierneuf `glm-fixture-file-protocol-20261105T041742Z` : protocolefichiers providerinerte+tests+docsSEULEMENT ; raccordidentitépublique/2tours après réceptionpersonnelle de ce module. ProtectionBiba inchangée ; ne pasrelancer producteurinchangé. Dernier résultatfonctionnel vérifié reste9testshelper ; sourcefixture/HTTPpositif/profilnormal/livraison/formulaire et PA00–PA13/RETEX ouverts, suivi15min maintenu.
+
+Réception personnelle5nov03:47UTC : commande directe **9tests nommés PASS, exit0, sources stables** ; stdout/stderr complets, argv/identité/empreintes et quatre entrées exactes retenus sous `paea/evidence/20261028-acquisition81-mvfdts57/glm-provider-wait-reception-fixes-20261105T031729Z/supervisor-provider-wait-direct/`. Portée : attente causale, priorité terminal, ownershipfermeture et payloadprivé avec rendu sansnonce, fixtures simulées et vrais inotify/sockets ; pas qualification du producteur entier. Une tâche GLM active `glm-source-fixture-file-rendezvous-20261105T034757Z` implémente/raccorde le rendez-vous de fichiers réguliers DANS workspace Biba, identité liée au canonicalagent et au kernel/pidfd avant lecture du rapport ; aucune protectionAF_UNIX affaiblie. Deux tours réels, refus/reprise/durabilité préservés ; tests puis producteur NEUF personnels après stabilité. HTTPpositif/profilnormal/livraison/formulaire, défautsparent et PA00–PA13/RETEX restentouverts, suivi15min maintenu.
+
+Réception personnelle5nov03:17UTC : helper d'attente remis, mais commande exacte documentée **exit1/loaderERROR, zéro cas fonctionnel exécuté**, sources stables : import rust_managed_auto_worker absent du chemin module. Preuves `paea/evidence/20261028-acquisition81-mvfdts57/glm-fixture-provider-terminal-wait-20261105T025842Z/supervisor-provider-wait-first/`. Revue avant exécution directe : peek du mauvais endpoint susceptible de bloquer, erreurclose perdue par return, accept sans réobservation après activité DB simultanée, rendu de l'agent public entier contenant prompt/context. Une tâche corrective GLM active `glm-provider-wait-reception-fixes-20261105T031729Z`, code+gardes+docsFR/EN ; commande directe et statutJSON complet transmis. Aucun test concurrent aux sources modifiées, aucune réception du helper ni nouveau positifHTTP. TransportfixtureBiba compatible et défautsparentHTTP restent ouverts ; PA00–PA13/RETEX, suivi15min maintenus.
+
+Contrôle personnel5nov02:58UTC : compatibilité take_stdin **20PASS/0FAILED/0ignored/4filtered, run0/verify0**. RecetteHTTP positive réellement compilée/exécutée : **0PASS/1FAILED/0ignored/23filtered, cargo101/run1**, intégrité VERIFIED/recordedFAIL ; première frontière : SWARM_PAEA_SOURCE_FIXTURE absent avant tout spawnHTTP. GLM a raccordé une sourcefixture neuve explicite et ses result/inputs déclarés, et déplacé le manifest vers stderr ; remise source seule, pas replay accepté.
+
+Producteur sourcefixture réellement lancé sur image normale332 qualifiée00560d87… : deux providers inertes ont échoué **exit1/EPERM socket(AF_UNIX), kernel_reaped/output_complete vrais**. Contrat Biba interdit volontairementAF_UNIX ; protection conservée. Le contrôleur attendait encore listener/serverfd après ces fins. Diagnostic personnel causal, pipevide0/65536, identitéUID/boot/start/parent/argv/ELF vérifiée ; SIGINTpidfd au seul serveur de cette nouvelle fixture, vraie collecte producteurexit1, aucune instance live touchée. Preuves originales : `paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-http-eof-api-integration-20261105T023433Z/supervisor-source-fixture-missing-provider-replan.json` et sorties/agents associés.
+
+Une tâche GLM active `glm-fixture-provider-terminal-wait-20261105T025842Z` : implémenter attente causale observant les nouvelles fins canoniques, préserver cause et fermetures, régressions ciblées ; pas timeout/pollingtemporel/haussebudget. Transportfixture compatible Biba constitue la dépendance suivante, sans nouvelle génération inchangée. Réception positiveHTTP bloquée jusqu'à sourcefixture réellement valide. Revueparent ouverte : démarrage/protocole horsguard, refusconsommateurs abandonnant ownership, reçu sans vrai exit/étatcaptures et émis trop tard, hashprocexe réouvrant pathname. Ne pas confondre20gardes avec réceptionHTTP/profilnormal/livraison/formulaire. PA00–PA13/RETEX ouverts, suivi15min maintenu.
+
+Replan personnel5nov02:33UTC : plus petit check discriminant du producteur
+réel effectué. Le CLI attend EOF de la frame avant bound ; le témoin original
+prend/écrit/drop stdin, mais le helper n'expose qu'un emprunt et ferme stdin
+seulement au finish. API manquante et producteur hors lecture autorisée :
+préconditions du paquet erronées, risque de blocage prepared→bound établi.
+Diagnostic conservé : `paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-http-raw-capture-integration-20261105T022042Z/supervisor-eof-before-bound-replan.json`.
+Seul client GLM possédé interrompu après UID/boot/start/session ; vrai
+exit0/error_during_execution, parent inchangé et aucune recette créée.
+Même session reprise en dossier neuf `glm-approval-http-eof-api-integration-20261105T023433Z` :
+petite API take_stdin autorisée au helper, producteurs EOF exacts lisibles,
+frame écrite puis extrémité possédée fermée AVANT bound. Objectif HTTP positif
+et assertions inchangés ; pas de timeout ajouté ni protocole produit contourné.
+20gardes puis recette positive personnelles après remise ; PA00–PA13/RETEX,
+profil normal/livraison/formulaire restent ouverts, suivi15min maintenu.
+
+Contrôle personnel du5nov02:18UTC : recette **20PASS/0FAILED/0ignored/
+4filtered, run0/verify0, sources stables**. Enfant réel ignorantEOFstdin :
+handlerSIGINT, queues exactes, vrai exit0, deux captures et payload contrôleur
+vérifiés sur témoin sain puis phasepanic. Réception bornée :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-signal-rustix-types-fix-20261105T020241Z/supervisor-owned-signal-reception.json`.
+Les refus pidfd/signal restent non exercés, aucune isolation/indépendance
+OS revendiquée. Une tâche GLM d'implémentation active :
+`glm-approval-http-raw-capture-integration-20261105T022042Z`, raccord du helper
+au témoin HTTP existant (prepared→frame→bound→approval dans RootPROJET),
+conservation brute stdout/stderr et reçu vrai processus, recette positive
+exacte et READMEFR/EN. Aucun nouveau rapport substitué au code. Recette
+métier personnelle après remise ; profil normal/refus/reprise/build/activation/
+formulaire et PA00–PA13/RETEX restent ouverts, suivi15min maintenu.
+
+Contrôle personnel du5nov02:02UTC : wrapper signal remis mais refusé
+à la compilation réelle : cargo101/run1, zéro garde, sources stables.
+Trois E0308 : Option<Pid> au lieu de Pid et deux Errno au lieu de io::Error.
+Preuves originales et intégrité VERIFIED/recordedFAIL conservées :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-owned-signal-shutdown-20261105T013618Z/supervisor-signal-compile-refusal.json`.
+Une tâche GLM minimale active `glm-child-signal-rustix-types-fix-20261105T020241Z`,
+avec lectures primaires exactes pid.rs/pidfd.rs et conversions conservant
+cause/ownership ; pas d'assertion modifiée. Recette20 personnelle ensuite.
+Aucun arrêt possédé qualifié par ce lot ni branchement HTTP livré. Le dernier
+vert demeure19gardes et vraie récupération typée ; PA00–PA13/RETEX ouverts,
+suivi15min maintenu.
+
+Contrôle personnel5nov01:35UTC : correction minimale reçue, recette
+**19PASS/0FAILED/0ignored/4filtered, run0/verify0, sources stables**.
+La vraie frontière conserve/panic_any/catch/downcast possédé/récupération puis
+premierwait réel est exécutée ; mêmes Child, cause, paths, états et payload
+contrôleur exacts vérifiés après collecte. Réception bornée :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-carrier-owned-unbox-fix-20261105T013234Z/supervisor-owned-carrier-reception.json`.
+Une tâche GLM active `glm-child-owned-signal-shutdown-20261105T013618Z` :
+arrêt explicite du Child possédé par pidfd (API rustix installée vérifiée),
+préparation avant contrôleur, signal demandé par caller, collecte réelle normale
+et panic, UNE garde enfant ignorantEOFstdin, recette20/docFR/EN. Prérequis
+concret au branchement du serveur approval-web qui requiert SIGINT. Aucun
+arrêt d'autrui ni politique de délai/fallback ; pidfd n'est pas preuve de
+confinement ou indépendance. Puis témoin HTTP RootPROJET/profil normal,
+build/activation/formulaire ; PA00–PA13/RETEX restent ouverts.
+
+Contrôle personnel du 5 novembre à 01:32 UTC : la garde renforcée est
+refusée à la compilation, cargo101/run1, zéro garde, sources stables.
+Une E0308 au déballage possédé de Box<WaitRefusalCarrier> (2117–2126).
+Intégrité des preuves VERIFIED, résultat enregistré FAIL ; original conservé :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-typed-carrier-roundtrip-guard-20261105T011713Z/supervisor-box-unboxing-compile-refusal.json`.
+Une tâche GLM minimale active : `glm-child-carrier-owned-unbox-fix-20261105T013234Z`,
+ce type uniquement, puis recette19 personnelle. La vraie frontière typée reste
+non qualifiée tant que sa garde n'a pas exécuté ses assertions. Dernier vert19
+limité à la version précédente. Lexar absente, repli local indexé, environ10Go
+libres observés. Intégration HTTP/profil/livraison/formulaire et PA00–PA13/RETEX
+restent ouverts ; suivi15min maintenu.
+
+Contrôle personnel5nov01:16UTC : recette réelle **19PASS/0FAILED/0ignored/
+4filtered, run0/verify0, sources stables**. Trois erreurs compilateur corrigées ;
+refus synthétique, cause/count1/mêmeChild/paths puis wait réel code5 et deux
+Completed37/38 vérifiés après collecte. Réception bornée :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-wait-handback-consumers-fix-20261105T004740Z/supervisor-handback-nineteen-reception.json`.
+Le porteur typé conserve les champs en source mais sa vraie frontière
+panic/catch/downcast/récupération n'est pas exercée (limite reconnue auteur).
+Une seule tâche GLM active `glm-child-typed-carrier-roundtrip-guard-20261105T011713Z`
+renforce la19egarde existante pour traverser cette frontière, sans nouveau
+garde ni APIowner ; vraie résolution et toutesassertions après collecte.
+Pas d'acceptation erreurwaitOSréelle/annulationforcée/HTTP/profil/livraison.
+PA00–PA13/RETEX ouverts, suivi15min maintenu, échecs historiques conservés.
+
+Contrôle personnel5nov00:46UTC : recette19 REFUSÉE compilation,
+cargo101/run1, zéro garde, sources stables ; intégritéVERIFIED/recordedFAIL.
+Migration tuple incomplète : emprunt passé au helper consommant ligne713,
+ancien pattern structure ligne883, retourOk manquant au checker ligne1420.
+Preuve originale : `paea/evidence/20261028-acquisition81-mvfdts57/glm-child-wait-refusal-ownership-20261105T003214Z/supervisor-wait-refusal-reception-rejected.json`.
+Deux findings source demeurent : cheminrefus dropChild/paths avantpanic
+(remise incomplète), assertions nouvellegarde avantvrai wait/joins. Une tâche
+GLM active `glm-child-wait-handback-consumers-fix-20261105T004740Z` corrige
+producteur/consommateurs cohérents et ordre collecte/verdict, sans nouveau
+compteur ni retry automatique. Recipe19 personnelle aprèsstabilité ; dernier
+vert borné18gardes, aucune qualification19/HTTP/profil/livraison/global.
+PA00–PA13/RETEX ouverts ; historiqueFAIL préservé, suivi15min maintenu.
+
+Contrôle personnel5nov00:31UTC : correctif compilation reçu, recette réelle
+**18PASS/0FAILED/0ignored/4filtered, run0/verify0, sources stables**.
+Panic contrôleur injecté avant release, vrai finish EOFcoopératif, code9,
+deux captures exactes et payload original réémis vérifiés ; échec original
+compilation conservé. Réception bornée :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-controller-compile-fix-20261105T001656Z/supervisor-controller-reception.json`.
+Finding WaitRefused toujours bloquant : retry automatique sans précondition
+changée. Une tâche GLM active `glm-child-wait-refusal-ownership-20261105T003214Z`
+corrige remise typée cause/ownership/panic sans retry et ajoute UNE garde de
+refus synthétique dans le handler partagé, recette19/docFR/EN. Ce n'est pas
+une erreur waitOS réelle ni qualification d'annulation forcée. Intégration
+métier/profil/livraison/formulaire et PA00–PA13/RETEX restent ouverts.
+
+Contrôle personnel5nov00:16UTC : remise contrôleur/panic REFUSÉE à la
+compilation réelle : cargo101, recette run1, **zéro garde exécutée**,
+sources stables. E0599 `io::Error.clone` et deuxE0614 sur u64 possédés ;
+FAILoriginal conservé, `verify` intégritéVERIFIED/recordedFAIL/exit1.
+Réception : `paea/evidence/20261028-acquisition81-mvfdts57/glm-child-cooperative-controller-panic-20261104T234736Z/supervisor-controller-compile-refusal.json`.
+Une seule tâche GLM active : `glm-child-controller-compile-fix-20261105T001656Z`,
+correction minimale de ces3erreurs puis reprise personnelle recette18.
+Finding distinct toujours ouvert : WaitRefused retentewait sans précondition
+modifiée, EOFstdin ayant précédé le premierwait ; aucune résolution qualifiée.
+Pas de nouvelle acceptation panic, ni intégration métier/profil/livraison.
+La dernière preuve verte reste17gardes ; PA00–PA13/RETEX ouverts, suivi15min.
+
+Contrôle personnel23:46 UTC : recette permanente effectivement exécutée,
+**17PASS/0FAILED/0ignored/4filtered, run0/verify0, sources stables**. Nouveau
+handshake : deux préfixes bruts lus avant libération stdin, queues exactes,
+code9 non succès et deux Completed vérifiés. Réception bornée :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-child-stdin-live-handshake-20261104T231704Z/supervisor-handshake-reception.json`.
+La revue ne qualifie pas cleanup/panic : helper test ignore issues Finished et
+retente wait sans précondition changée après WaitRefused. Une tâche GLM active :
+`glm-child-cooperative-controller-panic-20261104T234736Z`, wrapper conservant
+résultat/payload original et finish complet pour enfant dont arrêt EOFstdin
+est établi, plus UNE garde d'injection réelle et recette18/docFR/EN.
+Cette portée exclut annulation forcée/Drop général ; pas d'intégration métier
+ou livraison acceptée. Relecture README limitée au bloc courant pour éviter
+les refus de taille/compactions constatés. PA00–PA13/RETEX ouverts.
+
+Contrôle23:16 UTC : sortie brute des16gardes personnellement relue,
+exit0/stabilité et six empreintes source/doc/recette concordantes ; intégrité
+rejouée personnellement `recipe.py verify` : VERIFIED/PASS/exit0. Réutilisation
+de la course personnelle interactive inchangée, pas de compilation redondante.
+Porte composant lecteur fermée, portée bornée :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-final-review-resume-fixed-20261104T225041Z/supervisor-reader-completion.json`.
+Une seule tâche GLM active : `glm-child-stdin-live-handshake-20261104T231704Z`,
+une garde Child causale lisant deux préfixes avant libération stdin, plus
+recette17/doc correspondantes ; implémentations lecteur/owner inchangées.
+Remise puis exécution personnelle requises ; annulation/unwind Child et
+intégration métier/profil/livraison/formulaire restent non qualifiés.
+Aucune acceptation PAEA globale ; PA00–PA13/RETEX ouverts, suivi15min maintenu.
+
+Clôture du composant lecteur — 2026-11-04 23:05 UTC (5 novembre local) :
+**16/16gardes PASS, 0FAILED, 0ignored, 4filtered, exit0**, exécutées
+personnellement par Codex après remise GLM stable. Recette permanente
+`tools/verification/recipes/paea-capture-reader.json`, stabilité des entrées
+déclarées et `recipe.py verify` **VERIFIED/PASS**. Répartition : 10lecteur,
+3primitive, 3compatibilité Child. Les deux contre-exemples d’intégrité originaux
+restent conservés en FAIL et sont maintenant verts sans affaiblissement.
+Bilan et revue liés aux octets :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-final-review-resume-fixed-20261104T225041Z/READER-COMPLETION.md` et
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-final-review-resume-fixed-20261104T225041Z/supervisor-reader-completion.json`.
+
+Effets vérifiés : lecture liée au descripteur réservé (substitution du chemin
+sans divergence), lecture positionnelle, refus d’EOF physique prématuré,
+erreurs/panics avec préfixe et sans octet, buffer vide sans consommation d’erreur,
+refus de préparation conservant l’artefact vide0600/cause puis reprise fraîche.
+Documentation du consommateur Child corrigée (delta commentaires seulement).
+Codex a corrigé une formulation Rustdoc « aucun fichier existe » en « aucun
+nouveau fichier créé » ; comportement écrit par GLM. Revue explicite
+politiques/docstrings/erreurs et contrôles de diff terminés sur les empreintes
+retenues. Aucun choix opérateur nouveau, plafond caché ou watchdog ajouté.
+
+La porte utilisateur lecteur est **fermée pour ce contrat de composant**.
+Ce n’est ni l’intégration au témoin d’approbation, ni la qualification produit
+installé, ni l’acceptation globale PAEA/PA00–PA13/RETEX. Helpers compilés seulement
+dans le test : aucun build/redémarrage/version cockpit nécessaire pour cet
+incrément. Annulation/Drop/unwind/handshake Child et parcours métier restent
+ouverts ; aucune tâche suivante exécutée dans cet incrément interactif.
+Apprentissage conservé : fournir les chemins absolus aussi dans le prompt GLM,
+tester réellement les droits exacts du garde, normaliser `--resume` vs nouveau
+`--session-id`, vérifier les preuves personnelles avant d’accepter un rapport.
+Les refus/erreurs de notre transmission et leurs remises sont conservés dans les
+prédécesseurs et `supervisor-transmission-learning.json` ; maintenance de la
+source effective de la skill à reprendre lors de sa prochaine révision.
+
+Contrôle personnel22:47 UTC : recette permanente lecteur réellement exécutée,
+**15PASS/0FAILED/0ignored/4filtered, exit0**, stabilité déclarée et intégrité
+**VERIFIED**. Preuve : `paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-integrity-fix-and-terminal-edges-20261104T223157Z/supervisor-reader-fifteen-personal`.
+Les deux contre-exemples d’intégrité sont maintenant verts sans affaiblissement.
+La revue laisse un incrément lecteur précis : préparation de descripteur commune
+aux deux entrées, garde de refus ReaderPrepare conservant le fichier vide et
+cause, documentation du consommateur Child (Open vs ReaderPrepare), collecte des
+issues avant assertions des deux gardes buffer vide. Une seule tâche GLM en
+nouveau contexte borné (`glm-reader-final-review-preparation-contract-20261104T224741Z`),
+après fin réelle du client précédent ; historique/échecs conservés. Motif : deux
+compactions du long contexte précédent ont retardé la remise. L’amélioration de
+délai n’est pas encore vérifiée. Recette visera16gardes, encore NON EXÉCUTÉES sur
+ce dernier incrément. Aucune progression Child/métier ni livraison cockpit.
+
+Contrôle personnel22:31 UTC : les13gardes ont réellement tourné :
+**11PASS/2FAILED/0ignored/4filtered, exit101**, sources déclarées stables et
+preuves FAIL **integrity VERIFIED**. Les deux pins démontrent la lecture des
+octets du fichier substitué et le faux EOF propre après troncature de la preuve.
+Original : `paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-integrity-counterexamples-20261104T222535Z/supervisor-reader-integrity-red`.
+Les fichiers synthétiques originaux sont conservés, leurs octets relus dans
+`supervisor-retained-fault-artifacts.json` (observations, sans attribution
+exclusive des feuilles par seule date). GLM corrige uniquement lecteur/primitive
+commune, puis ajoute erreur/panic sans préfixe et buffer vide ; Codex exécutera
+la recette permanente et sa revue avant acceptation. L’interactif possède la
+vérification actuelle (`supervisor-interactive-ownership.json`) ; ni doublon de
+client, ni tâche Child/métier suivante autorisée avant cette porte.
+
+Contrôle personnel22:24 UTC : correction GLM des deux déréférencements u64
+compilée ; **11PASS/0FAILED/0ignored**, recette et archives déclarées
+**integrity VERIFIED** (`paea/evidence/20261028-acquisition81-mvfdts57/glm-reader-gate-compile-scalars-20261104T222013Z/supervisor-reader-baseline-11`).
+Replan lecteur : deux hypothèses d’intégrité demandent un contre-exemple avant
+correction : réouverture par chemin après réservation (écriture FD original,
+lecture potentiellement substituée), et EOF physique malgré des octets annoncés
+écrits. GLM ajoute seulement ces deux gardes avec témoins sains préalables ;
+Codex les exécutera avant toute réparation. Option retenue : reproduction puis
+correction générale de l’identité des descripteurs/de l’EOF, plutôt que masquer
+l’écart par un contrôle d’existence ou un retry. Erreur/panic à préfixe vide,
+buffer vide et diagnostics restent à vérifier ensuite. Porte utilisateur intacte ;
+aucune nouvelle tâche Child/métier, aucune livraison produit qualifiée.
+
+Porte de clôture utilisateur (demande interactive courante) : corriger et
+terminer le lecteur de flux avec GLM, puis vérifier personnellement AVANT la
+suite. Laisser finir la réparation ownership déjà active, car elle modifie
+l'entrée réservée du lecteur ; aucune nouvelle tâche Child/unwind/handshake/métier
+avant acceptation du lecteur. Revérifier ses8gardes et les diagnostics consommateur,
+erreur/panic avant premier octet et buffer vide, docstrings courantes, revue liée
+aux octets et recette permanente/verify. L'ancien8PASS reste historique ; les
+éditions actives demandent de nouvelles preuves personnelles. Porte conservée
+sous `supervisor-user-reader-completion-gate.json` du dossier courant ; pas de
+second auteur lancé.
+
+Contrôle personnel22:01 UTC : contre-exemples ownership start réellement
+exécutés : **1PASS/2FAILED/0ignored/12filtered, exit101**, compilation verte,
+entrées déclarées stables. Après témoins sains et collecte réelle du child rendu,
+les deux pins de stdout perdu échouent exactement ; aucune correction encore.
+Preuve/archives sources relues :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-child-start-ownership-guards-20261104T214712Z/supervisor-start-ownership-reproduction/reception.json`.
+Limites : statut child négatif collecté en mémoire mais non sérialisé au pin,
+pin stderr suivant non atteint ; aucun statut/signal inventé. Une seule tâche
+GLM active : `glm-approval-child-start-ownership-fix-20261104T220210Z`,
+correction générale préconditions/réservation des descripteurs avant transfert
+des pipes, child/live uniquement ; conserver preuves partielles et causes.
+Codex rejouera les11gardes après remise stable ; aucune recette/profil/livraison
+ou intégration métier qualifiée. stderr-refusal/unwind/handshake puis
+approbationHTTP RootPROJET normale, formulaire mêmeimage et PA00–PA13/RETEX
+restent ouverts, suivi15min conservé.
+
+Contrôle personnel21:46 UTC : garde Child normale réellement exécutée :
+**1PASS/0FAILED/0ignored/12filtered, exit0**, sources déclarées stables.
+Vrai enfant local code7 non succès, stdout/stderr bruts exacts NUL/nonUTF8/CRLF,
+deux joins Completed et0600 vérifiés. Parent : seule déclaration du module.
+Réception/archive relue :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-child-normal-capture-20261104T213147Z/supervisor-normal-child-verification/reception.json`.
+Ce PASS normal ne qualifie pas setup/unwind : revue révèle stdout retiré puis
+perdu si stderr manque, et les deux pipes perdus au refus evidence stdout,
+contrairement au contrat documenté. Une seule tâche GLM active tests seuls :
+`glm-approval-child-start-ownership-guards-20261104T214712Z`, témoins sains puis
+deux contre-exemples pour FAIL personnel avant correction générale séparée.
+Déplacer aussi les assertions de la garde normale après son finish réel.
+Panic contrôleur, handshake, intégration métier/profil/recette/livraison et
+PA00–PA13/RETEX restent ouverts ; suivi15min maintenu. Refus Read d'un chemin
+mal orthographié traité sans mutation ni élargissement des droits.
+
+Contrôle21:30 UTC : tâche Child complète arrêtée par le client, vrai exit1,
+`is_error=true` malgré subtype success : réponse dépassant son maximum32000.
+Trois Read réussis, aucune édition, parent inchangé, module Child absent.
+DNS SKYNET/proxy disponibles ; cause sortie client, pas panne réseau. Diagnostic :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-owned-child-capture-20261104T210219Z/supervisor-output-limit-replan.json`.
+Aucun plafond/effort/budget augmenté. Une seule tâche GLM reprise même session :
+`glm-approval-child-normal-capture-20261104T213147Z`, helper chemin NORMAL,
+deux flux concurrents et une garde synthétique exit7 ; setup/refus/unwind
+restent étapes bloquantes suivantes avant branchement métier, pas oubliées.
+Aucune nouvelle progression vérifiée depuis les8gardes précédentes. Instance
+existante observée prête dev.332, véritable ELF attendu personnellement hashé ;
+aucun code nouveau installé ni acceptation globale. PA00–PA13/RETEX ouverts.
+
+Contrôle personnel21:01 UTC : correction générale EOF reçue et huit gardes
+réellement exécutées : **8PASS/0FAILED/0ignored/4filtered, exit0**, entrées
+déclarées stables. Les deux assertions précédemment rouges passent sans
+relâchement : préfixe puis Err consommateur, état Failed/payload Panicked
+conservés au vrai join. Archive source/preuves relue et empreintes vérifiées :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-live-eof-fix-20261104T204712Z/supervisor-eof-fix-verification/reception.json`.
+Un Write FINAL hors dossier a été refusé sans mutation puis remis au bon
+chemin ; refus traité, pas extension de droits. Limites conservées : noms de
+docstrings obsolètes, diagnostics consommateur et préfixe vide/buffer vide pas
+encore assertés ; aucune qualification Child/profil/livraison par ce PASS.
+Une tâche GLM active : `glm-approval-owned-child-capture-20261104T210219Z`,
+propriétaire Child stdout/stderr bruts concurrents, vrai exit et remise en cas
+de panic contrôleur, helper et gardes seulement. Branchement métier suivant
+après remise personnelle ; PA00–PA13/RETEX ouverts, suivi15min maintenu.
+
+Contrôle personnel20:46 UTC : huit gardes réellement exécutées après remise
+tests seule stable : **6PASS/2FAILED/0ignored/4filtered, exit101**. Les deux
+contre-exemples atteignent exactement l'assertion finale : Ok(700) consommateur
+sur Failed/Panicked, après témoins sains avant injection, vrais joins et préfixes
+exacts. Aucun autre échec ; les4tests filtrés corrigent la prévision erronée2
+du FINAL. Preuve originale :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-live-eof-counterexamples-20261104T203232Z/supervisor-prefixed-failure-reproduction/reception.json`.
+Archive locale relue/hash vérifié, Lexar absente, originaux conservés.
+Une seule tâche GLM active : `glm-approval-live-eof-fix-20261104T204712Z`,
+correction générale EOF/erreur et documentation du seul module live, sans
+affaiblissement des gardes. Codex rejouera personnellement après stabilité.
+Pas d'intégration Child ni livraison acceptée ; PA00–PA13/RETEX ouverts.
+Les paragraphes suivants conservent les contrôles historiques.
+
+Contrôle personnel20:31 UTC : correction de mutabilité GLM reçue puis six
+gardes réellement exécutées, **6PASS/0FAILED/0ignored/4filtered, exit0**,
+1221 entrées déclarées stables. Sorties brutes, entrées, sources et archive locale
+relues et vérifiées ; Lexar absente, originaux conservés. Réception bornée :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-live-notify-mutability-20261104T201716Z/supervisor-capture-guards/reception.json`.
+Ce PASS ne couvre pas le consommateur sur Failed/Panicked : le lecteur retourne
+encore EOF propre et le témoin sain arrive après la faute. Une seule tâche GLM
+active, tests seuls dans `glm-approval-live-eof-counterexamples-20261104T203232Z` :
+contre-exemples erreur/panic, témoins sains avant injection et join réel avant
+assertions terminales ; implémentation inchangée pour réception personnelle des
+échecs avant correction dédiée. Aucun Child, profil ou livraison accepté.
+Suivi15min maintenu ; PA00–PA13 et RETEX ouverts. Les paragraphes suivants
+conservent les contrôles historiques et leurs refus, sans les requalifier.
+
+Contrôle personnel interactif20:16 UTC : les deux corrections remises retirent
+E0425/E0502, mais le lancement ciblé réel des six gardes termine encore101 sur
+E0596 : `notify` non mutable passé par `&mut notify` (live.rs261). Zéro garde
+exécutée, sources déclarées stables. FAIL original et intégrité de son archive
+vérifiés ; aucun PASS live, intégration ou livraison. Réception :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-live-compile-fix-20261104T200427Z/supervisor-interactive-E0596-reception.json`.
+Le statut de tâche partagé porte cette correction exacte ; le superviseur15min
+est actif, aucun auteur concurrent lancé par la reprise interactive. Sémantique
+EOF/erreur et témoin valide avant faute restent requis après compilation rétablie.
+
+Contrôle personnel20:02 UTC : remise du lecteur live refusée. GLM terminé0
+mais compilation ciblée réelle101 : E0425 (Path non importé) et E0502
+(emprunt front puis mutation delivered), **zéro garde exécutée**, sources
+déclarées stables. Aucun PASS live ni capture enfant accepté. Sorties brutes
+et trois sources modifiées conservées, inventaire déclaratif borné Rust/web,
+pas qualification effective du profil. Réception :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-live-recorded-stream-20261104T194204Z/supervisor-heartbeat-live-check/reception.json`.
+Contrôle personnel20:15 UTC : les deux premières erreurs ne sont plus
+observées, mais nouvelle compilation101 sur E0596 (notify immuable emprunté
+mutablement), source stable et zéro garde exécutée. Échec original conservé :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-live-compile-fix-20261104T200427Z/supervisor-capture-compile-recheck/reception.json`.
+Une seule tâche GLM active via CURRENT-GLM.json : cette correction locale de
+mutabilité uniquement, puis reprise personnelle des gardes. Deux findings
+sémantiques restent ouverts avant intégration : Read retourne EOF propre sur
+Failed/Panicked ; le témoin sain de la garde fautive arrive après l'injection.
+Contre-exemple et correction dédiée requis ensuite, pas de Child avant leur
+résolution. Suivi15min unique maintenu ; sources actives non testées en parallèle.
+Recette primitive désormais bornée à ses3noms sans plafond des tests filtrés ;
+sa nouvelle exécution attend une compilation rétablie. Profil normal, version,
+activation/formulaire mêmeimage et PA00–13/RETEX restent ouverts.
+
+Réception interactive19:40 UTC : la correction de primitive a d'abord échoué
+à la compilation réelle (argument de format absent), zéro test ; recipe2FAIL
+conservé et intégrité vérifiée. GLM a corrigé cet unique argument ; Codex interactif
+a rejoué la recette permanente `tools/verification/recipes/paea-capture-stream.json` :
+3PASS/0FAILED/0ignored/4filtered, run0/verify0, sources déclarées stables et archive
+conservée. Réception :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-stream-format-fix-20261104T193503Z/supervisor-personal-reception.json`.
+CAP01/02/03 vérifiés dans leur portée de runner de confiance documentée. Ce lot
+couvre seulement Read→fichier neuf brut, pas la capture enfant concurrente,
+l'issue/panic, la qualification bootstrap normale ou la livraison. Suite : lecteur
+sur octets conservés avant EOF, puis intégration enfant et témoin métier.
+Aucun comportement nouvellement installé ni redémarrage.
+
+Reprise interactive, 4 novembre 19:26 UTC : l'ancien client a produit trois
+continuations sur limite de sortie sans outil ni modification. Seul ce client
+identifié a été interrompu ; journaux et issue réelle0/error_during_execution
+conservés, sans acceptation. Le suivi programmé a réduit la tâche à une primitive
+d'enregistrement brut. GLM a remis le code ; Codex interactif a personnellement
+exécuté les trois gardes nommées :3PASS/0FAILED/0ignored/4filtered, exit0,
+3342 entrées déclarées stables (inventaire déclaratif, pas qualification du graphe
+compilateur/profil). Archive source et réception :
+`paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-stream-recorder-only-20261104T192033Z/supervisor-interactive-stream-check/`.
+CAP01/02/03 restent ouverts : allocation fixture configurée/exclusive, témoins
+valides avant chaque faute, noms/compteurs de recette exacts. Une seule tâche GLM
+de correction est active via CURRENT-GLM.json ; aucun auteur concurrent, plafond
+ou budget nouveau. Capture enfant complète, identité/profil final, qualification
+bootstrap et livraison restent ouverts. Dev.332 a été observée prête avec son ELF
+attendu. Lexar absente : staging local indexé, aucun original historique supprimé.
+Les helpers de test seuls ne constituent pas un comportement produit installé
+nouveau et ne déclenchent pas de redémarrage.
+
+La dernière livraison reçue est **dev.332**, ELF
+`00560d87ddc4b1a615981952076c064808445c13010f839e263819f6efe1ccf5`.
+[Réception personnelle bornée](paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-disabled-focus-oracle-20261104T074254Z/supervisor-delivery-reception332.json) :
+756 entrées effectives et archives comparées, quatre artefacts cœur sans features
+fixture/profil test, deux changements depuis331 (formulaire JS et notes FR/EN),
+restart exact et véritable ELF contrôlés, historique servi égal à l'archive.
+Recette formulaire12 étapes run0/verify0 sur artefact de test `771eecbb…` distinct ;
+clavier périmé verrouillé après focus neutre observé, quatre parcours et aucun
+diagnostic inattendu. Sur l'image normale possédée : 56 contrôles UI/Version
+FR/EN, deux thèmes, notes/commit/modifications/focus, trois ressources protégées
+du formulaire identiques à l'inventaire ; dialogues personnellement vus.
+
+Le bootstrap CLI normal `approval-web` est écrit mais pas livré ni qualifié en
+HTTP métier. La revue a fait corriger les fermetures explicites des sources,
+les deux roots indépendants et le témoin d'approbation non encore attaché.
+La compilation personnelle `cargo check -p swarm-cli --lib` finit désormais0 sur
+1218 entrées déclarées stables, après conservation des E0618/E0277 d'origine.
+Le test nommé `prepared_source_public_close_releases_witnesses_and_permits_fresh_preparation`
+a réellement exécuté1 cas PASS (sélection ignorée explicitement activée), entrées
+stables ; cela ne prouve pas les variantes d'échec de fermeture ni l'effet HTTP.
+[Réception directe](paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-shadow-direct-edit-20261104T104217Z/supervisor-reception.json).
+
+GLM a corrigé les deux E0509 du target positif. Codex a personnellement
+recompilé la cible : exit0, entrées déclarées stables. Le test exact ignoré a
+réellement exécuté1 cas : FAILED/exit101 sur l'oracle final, aucune acceptation.
+Avant ce panic : serveur CLI/HTTP lié, ack approved, action durable approved
+dans le bon Root PROJET et principal operator de fixture, SERVICE/refs Git
+inchangés, enfant possédé terminé après SIGINT avec succès. La projection sûre
+NativeOutcomeRecord expose trust_publication, pas le champ métier state attendu
+à tort par le test. Sources productrices relues ; correction GLM limitée au test
+et à la conservation des sorties enfant avant verdict, même session --resume,
+dossier neuf à scope exact.
+[Réception personnelle partielle](paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-positive-compile-fix-20261104T130029Z/supervisor-reception.json).
+Contrôle13:40 : quatre éditions réelles (documentation et ack approved exact),
+mais oracle final/rétention enfant et remise restent attendus. L'ordre du flux
+montre une compaction terminée (status nul puis compact_boundary) après les
+statuts compacting ; leurs compteurs seuls ne justifient pas une interruption.
+Aucun signal envoyé, aucun auteur dupliqué, aucun test concurrent lancé.
+Contrôle13:55 : le vrai blocage est établi après compaction : Edit refuse un
+fichier non relu, tandis que le superviseur avait retiré Read. Les mêmes
+Edit répétés puis Read indisponible et Write mémoire hors scope n'ont pas
+corrigé cette précondition ; la mémoire hors scope a été refusée par le hook.
+Sources et traces conservées, seul client possédé interrompu après identité
+UID/boot/start/session, issue réelle0 sans acceptation. Reprise même session
+--resume en dossier neuf : Read/Edit/Write limités au target et nouveau FINAL,
+première action Read ciblée requise avant édition. La disponibilité d'Edit
+ne prouve pas sa précondition native après compaction ; conserver Read exact
+dans les prochains paquets qui emploient Edit, avec guard validé.
+Contrôle14:10 : Read a réellement réussi ; la précondition native est donc
+rétablie. Les trois Edit suivants ont échoué ENOSPC, target inchangé. Le snapshot
+a aussi refusé dans son temporaire et le flux GLM a été tronqué ; ancien snapshot
+et sources intacts. Seul client possédé suspendu puis terminé après vérification
+d'identité. Seul cache incrémental compilateur PAEA régénérable supprimé, après
+inventaire/hash11250 fichiers, aucun compilateur concurrent, aucun binaire ou
+preuve supprimé ; espace revenu et refus/reprise atomique vérifiés sur fixture
+de supervision. [Incident et preuves originales](paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-oracle-read-gate-20261104T135721Z/supervisor-enospc/incident.json).
+Même session reprise en dossier neuf avec capture complète ; correction GLM
+encore attendue, aucun test relancé sur auteur actif. Le disque réparé n'est
+pas la preuve métier ; la dernière livraison reçue reste dev.332.
+Réception14:27 : Codex a personnellement réexécuté le témoin exact après remise
+stable : **1PASS,0FAILED,0filtered,exit0**,1219 entrées déclarées stables.
+Ack approved typé lié à l'action, état durable approved/operator fixture dans
+Root PROJET, SERVICE/refs inchangés, SIGINT/exit succès et exactement1publication
+recorded vérifiés. [Réception et limites](paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-oracle-disk-recovery-20261104T141417Z/supervisor-positive-business/reception.json).
+Preuve copiée sur Lexar réellement montée USB/vfat/rw : archive métadonnées
+relue, inventaire/hash comparés ; index local et restauration conservés, aucun
+original déplacé/supprimé. Read de FINAL absent avant sa création est un refus
+observé résolu par Write du nouveau FINAL, pas une régression du produit.
+Contrôle15:44 : le boot hôte a changé (`bd578744…` → `02b98b5c…`) ;
+client/runner précédents disparus sans exit ni FINAL, source cible inchangée.
+Issue inconnue conservée, aucun exit inventé ; cause du reboot non établie.
+DNS SKYNET/proxy puis GET authentifié models200 vérifiés avant reprise. Serveur
+local arrêté constaté par status, puis dev.332 restaurée par start exact
+--prepared-build soutenu : readytrue,PID250945, ELF00560d87… et réponse version
+complète/notes FR/EN égales à la réception antérieure. Trois entrées effectives
+plus récentes restent non installées ; pas de nouvelle qualification du bootstrap
+ni de parcours humain Authority. Preuve de récupération archivée/relue sur Lexar,
+index local conservé. Même session GLM reprise en dossier neuf à scope exact,
+sans client orphelin ni plafond/retry ajouté.
+Contrôle16:29 : la première frontière reste sans édition/remise après Read
+réel dans les deux tentatives, sans erreur réseau/outil/compaction observée.
+Le paquet couplait deux changements vérifiables séparément ; hypothèse de
+cadrage trop couplé conservée, pas cause établie par le temps ou le raisonnement
+privé. Source/stream préservés, seul client possédé interrompu après contrôle
+UID/boot/start/session. Même session --resume en dossier neuf : **sélecteur
+CLI/pin seulement**, puis capture persistante après réception personnelle.
+Aucun timeout/plafond/retry ajouté ; effet du découpage encore NON VÉRIFIÉ.
+Réception17:00 : le sélecteur est remis, et Codex a personnellement exécuté
+les trois gardes : **2PASS/1FAILED/1ignored,exit101**, sources stables.
+Compilation réussie ; candidates Debug/déplacement Git du diff partiel résolues
+par GLM avant remise. Échec réel : erreur de canonicalize conserve la cause OS
+mais omet le marqueur sans fallback promis et asserté. Aucun repli effectif
+observé, aucune garde affaiblie. Correction GLM unique du diagnostic général
+filesystem lancée immédiatement ; pas de suite capture ni nouveau témoin
+métier avant gardes vertes. [Réception brute](paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-cli-selector-only-20261104T163141Z/supervisor-selector-check/reception.json),
+original FAILED conservé et archive Lexar relue/indexée. Le découpage a
+produit une remise réelle, mais sa causalité et la conformité restent distinctes.
+Réception17:15 : vérification personnelle après correction stable : **3gardes
+PASS/0FAILED/1ignored,exit0**, puis **positif1PASS/0FAILED/3filtered,exit0**,
+entrées stables dans les deux exécutions. Le défaut de marqueur initialement
+FAILED est corrigé sur son cas réel, sans affaiblir la garde ; aucune identité
+d'exécution normale ou conformité globale déduite. [Réception et limites](paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-selector-diagnostic-fix-20261104T170214Z/supervisor-qualified-reception.json).
+Deux sorties brutes Cargo et source reçue archivées/relues sur Lexar, inventaire
+et empreintes comparés, index local conservé ; échec d'origine intact.
+Contrôle17:50 : client sorti1 après API500/10retries natifs ; DNS SKYNET
+non résolu (resolvectl confirme nom introuvable), proxy local joignable.
+Tous appels modèle suspendus jusqu'à DNS/proxy puis métadonnées amont200
+vérifiés. Seuls imports partiels modifiés, conservés ; aucun helper/FINAL remis,
+pas de compilation/test après l'édition incomplète. Aucun client orphelin.
+Dev.332 reste running/ready, ELF inchangé. Lexar absente au contrôle findmnt :
+aucune écriture sous point de montage absent ; repli local dans le dossier
+`supervisor-network-refusal` de la session courante, index/hash conservés,
+espace local suffisant. L'échec findmnt1 n'est pas transformé en copie réussie
+par le git-check indépendant0. Aucun DNS/VPN/proxy partagé modifié.
+Intervention réseau demandée une seule fois au contrôle18:15 : rétablir
+la résolution de `chat.skynet.cossi.internet` par le réseau habituel. Propriétaire :
+utilisateur/administrateur réseau ; Codex ne modifie pas DNS/VPN/proxy partagé
+et ne remplace pas GLM par du développement PAEA. Demande distincte de
+l'Authority humaine déjà pendante, non répétée. Reprise automatique après
+DNS/proxy/métadonnées amont200 et contrôle des orphelins.
+Surveillance15min maintenue pour changement de précondition réseau/support.
+Contrôle19:00 : DNS SKYNET de nouveau résolu vers10.202.26.231, proxy local
+joignable, GET authentifié des métadonnées amont200 et GLM524288 vérifiés.
+Demande réseau clôturée sur observations, sans attribuer sa résolution ni
+répéter la demande Authority humaine. Aucun appel modèle n'a été lancé pendant
+l'absence DNS. Orphelins/session contrôlés, même session --resume en dossier
+neuf, imports partiels conservés. Lexar toujours absente au contrôle, preuves
+futures en staging local privé/indexé tant que le support ne revient pas.
+Contrôle19:15 : processus sorti0 mais terminal réel error_during_execution,
+is_errortrue, stop_reason=max_tokens ; aucune édition ni remise, pas de PASS.
+Le flux complet a été réexaminé après flush, plutôt que confondre le premier
+instantané en cours ou le code0 avec une réussite. La disparition entre status
+et lecture /proc est traitée sans inventer d'identité ni signal. Cause observée :
+arrêt de sortie max_tokens, sans attribution non prouvée au réseau ou au contexte.
+Aucun plafond/effort/budget relevé, aucune reprise inchangée : capture décomposée.
+Tâche active unique : primitive Read→fichier neuf sans perte, refus/préfixe
+partiel/reprise, dans un module source dédié + raccord/imports parent minimal.
+L'intégration Child/stdout/stderr concurrents/issue/panic reste ensuite obligatoire,
+puis identité normale et livraison. Effet de la décomposition non encore vérifié.
+Objectif parent conservé : capture persistante stdout/stderr/vraie issue enfant,
+y compris panic précoce, avec ses gardes de refus/reprise. Candidate metadata
+is_file/cause aplatie reste ouverte pour la revue suivante ; pas de déclaration
+de qualification du profil normal ou de livraison nouvelle. Refus/reprise,
+pin normal sans fallback, recette, docs FR/EN et notes restent obligatoires.
+La sonde artificielle par tâche est retirée : guard inchangé et liste nouvelle
+ont leurs contrôles allow/deny locaux conservés, plus les anciens refus clients
+réels. Le hook reste actif, sans droit nouveau ni confinement OS revendiqué.
+Incrément non clos et non livré ; puis formulaire sur la même image normale. Tâche unique et
+preuves viennent du [repère persistant](paea/evidence/CURRENT-GLM.json).
+
+Les incidents réseau500/DNS et la boucle de recherche dans des preuves ignorées
+sont conservés dans leurs dossiers. Les préconditions réseau ont été vérifiées
+avant reprise ; le discriminant rg ordinaire/--no-ignore a motivé l'accès direct
+et les outils Read/Edit/Write. Aucun DNS/VPN/proxy partagé modifié, aucun plafond
+ou retry ajouté. Hook client à écritures exactes, sans preuve de confinement OS.
+Une reprise a ensuite bouclé en compaction : 26 statuts, aucun message auteur
+ni outil, alors que le proxy conserve31 POST messages200. La conversation
+originale et son issue restent préservées ; le même témoin borné repart dans
+un contexte GLM neuf avec seulement les entrées persistantes utiles, sans
+augmentation de limite/effort ni réinjection de l'historique. Le réseau et le
+scope ont été revérifiés ; aucune progression métier déduite de cette reprise.
+Le contexte neuf a produit des lectures mais pas le target ; les lectures se
+sont encore élargies et des compactions ont repris. Les compteurs d'usage à zéro
+ne permettent pas de diagnostic fiable par jetons ; fenêtre524288/70 existante
+inchangée. Le même témoin reçoit désormais un paquet autosuffisant de148996 octets
+(source/instructions réellement hashées, sans historique) et le seul outil Write.
+Codex a préparé les entrées, sans écrire de code PAEA. Le hook exact est conservé ;
+le fichier a été créé ; le contrôle compilateur a révélé les deux E0509 ci-dessus.
+Le contrôle métier reste à exécuter après correction vérifiée.
+Codex supervise/vérifie ; GLM seul auteur. PA00–13/RETEX, Authority humaine,
+services protégés, séparation observée et E3 restent ouverts. Demande humaine
+pendante non répétée ; aucun commit/push supplémentaire ni déploiement externe.
+
+## Repère historique P1/G1 — 3 novembre 2026
 
 Première tranche locale [accord séparé exact du règlement](paea/P1-G1-20261103.md)
 livrée en dev.322, image 3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a.
@@ -1969,9 +2659,11 @@ consomme aucun outil — `paea_settle` → `settlement_locked` est un enregistre
 SQL du ledger, sans lancement de provider ni lecture `providers.json`/
 `ai-connections.json` (celles-ci appartiennent au parcours agent-launch, barrière
 admis→consommation déjà prouvée Incrément101) ; le seul candidat « outils
-déclarés » côté Trust (`data_policy.tools/providers`) est dormant et refusé à
-l'activation (`trust-active-extension-not-ported`, `trust/state.rs:196`) ;
-`context.sources` n'a aucun consommateur moteur. Hacher la configuration
+déclarés » côté Trust (`data_policy.tools/providers`) est, à la date de ce
+constat, dormant — depuis le 2026-11-05 le lot provenance porte l'admission
+`data_policy` en Rust (`trust/data_policy.rs`) et ce bloc autrefois dormant est
+actif derrière sa politique typée ; `context.sources` n'a aucun consommateur
+moteur. Hacher la configuration
 provider ambiante aurait rempli un champ dormant d'une dépendance jamais
 consommée par cet effet : aucune implémentation de producteur fictif.
 
@@ -3735,6 +4427,172 @@ Prochainlotunique `glm-bf16-dialogue-http-regression-20261103T155600Z` implémen
 
 Le lotBF16 initial n’a produitaucuneédition après lecturesdesproducteurs puis modulesentiers ; lacompactionréussie neconstituaitpas unprogrès. Codex prend enchargeledéfautdedécoupage : préserverleslogs, vérifierUID/boot/start/sessionetinterrompre leseulclientpropre, vrai exitrunner0 conservé (sansremise, donc pasunsuccèsmétier). NouveaumêmeGLM--resume, dossierneuf `glm-bf16-first-http-boundary-20261103T171000Z`, paquetréduitauscriptuniquepremiercontrôle : publicsendréelanswered→publicadmissioncorrespondante→GETbare403/lecteur200exact, témoinsnonmutation, docsFR/ENcourtes. MatriceHEAD/stale/revocation/recettedifféréeaveccause etpropriétaireGLM jusqu’à laréceptionpersonnelle dupremierparcours ; aucune exigenceglobaleeffacée. DNS/proxyetabsenceclientssamesessioncontrôlésavantreprise. CodexaucundéveloppementPAEA.
 
+
+### Réception refusée du 3 novembre 2026, 17:55 UTC — première exécution réellement rouge
+
+GLM a livré le scriptBF16premièrefrontière etdocsFR/EN, runnerexit0. status.py3 : tentativeBashrefusée (outilbienindisponible, aucuneexécution) etReadconfigabsent ; diagnosticsconservés. Codex a lu le scriptcomplet etcontratdigest(path), vérifiéAST+image/profilnormal322 puis exécutépersonnellementdansdossierneuf. Vraiexit1 avantcréationFixture : digest appeléavecbytes (profil/source), TypeError. Toutes sorties/argv/exit/sourceSHA conservésdans `glm-bf16-first-http-boundary-20261103T171000Z/supervisor-first-execution/`. Aucunprodmodifié ni testvertinventé.
+
+Revueconstate aussisquecomparerlecountdetours/réservationsneprouvepas leurimmutabilité. LotGLMunique `glm-bf16-first-boundary-fix-20261103T175700Z` corrigelesdeuxappelshelperetremplacelescountsparsnapshotsreadonlycompletsdesvraieslignes ; docstrings/docsFR/ENdanslemêmeincrément. Réseau/clientscontrôlés, sourcesanciennespréservées. Codex réexécuterafraîchementaprèsstabilité ; matricereaderélargie/recetteensuite, PA00–13/RETEXouverts.
+
+
+### Réception personnelle du 3 novembre 2026, 18:09 UTC — première frontière HTTP BF16a enfin observée
+
+GLM correctiondigest/snapshots reçue aprèsexamen ; Codex a exécutélescriptdansdossierneuf sousunitépropre sanswatchdog. Vraiexit0, sourcesstables,33assertionsPASS, nativechildexit0 vérifié dansrecords,136artefactsSHAconcordants. Vraitouranswerednonvidepublic→vraieadmissionpublicsameintent→GETsessionbare403exactblp-dialogue-authentication-required etaucunoctetquestion/prompt/réponse→lecteurhabilitéGET200mêmetour/DTO. Les3pairesavant/après contiennentlesvraieslignes/colonnescomplètes, trust etdigestsrecettes, égalitépersonnellementcontrôlée. Preuve `glm-bf16-first-boundary-fix-20261103T175700Z/supervisor-personal-run/` etreçu/source-review danslemêmelot ; échecTypeErrororiginalpréservé.
+
+Imagequalifiée322 seulement. Le servicepartagéest désormais323 PID1379834 SHA ccef210aa7f6b7a7ef0dc2e69631d3659325a588e6fe9e6cc31196ec65e96b60, commit41efac54398c0bc48b910f82a34ebdd8a46360f0, autrelivraison16:49:08 préservée. Pasd’équivalence323 ni installationattribuée à cesfixtures322. NouveauGLMunique `glm-bf16-http-reader-head-20261103T181200Z` pour HEADbare/autorisé, GETinconnu/faibleet reprisespositivesavecnonmutation ; recettepermanenteensuite. Aucunstatusstale/révocation/globalPAEAaccepté. Prérequisréseau/clientsvérifiés.
+
+
+### Contrôle personnel du 3 novembre 2026, 18:24 UTC — HEAD bare reçu, oracle reprise à corriger
+
+ExtensionGLMlivrée ; Codex a reluFINAL/helpers/conditionspuis exécutépersonnellement sur322dansdossierneuf. Vraiexit1 sourcesstables/nativecleanup0 ; premièresassertionsreçues+HEADbare403corpsvide passent. Première reprise autorisée renvoie réellement200, DTOidentique etsnapshotcompletégal, promptprivéabsent. L’oracleajouté exigeàtort l’absencedelaquestion/réponsequecelecteurhabilitédoitvoir. PreuvesbrutesetycomprisHTTP/snapshots conservés `glm-bf16-http-reader-head-20261103T181200Z/supervisor-personal-run/` ; n’imputerpasceFAILauproduit.
+
+ReplanimmédiatGLMunique `glm-bf16-reader-recovery-oracle-20261103T182600Z` : corrigerles4assertionsrepriseautorisée (DTOexact+nonmutation+promptprivéabsent) toutenpréservantinterdictiondetoutcontenusensibleauxrefus403etHEADvide. Aucunrelâchementglobal/skip ; autrescasnonencoreexécutés. Réseau/clientssamesession vérifiés, nouvelleexécutionCodexaprèsstabilité. Recettepermanenteetpreuves323ensuite ; globalPAEA/RETEXouverts.
+
+
+### Réception personnelle du 3 novembre 2026, 18:39 UTC — matrice lecteur46 vérifiée sur322
+
+CorrectionGLMdes4oracles reçue aprèsexamenetnouvelleexécutionpersonnelle : vrai exit0/sourcesstables/nativecleanup0,46assertionsPASS,160artefactsSHAconcordants et11pairescompletessnapshotségales. HEADbare403etHEADautorisé200corpsvides ; GETinconnu403authorization_required etlecteurfaible403blp-dialogue-access-denied, aucuncontenurefusé ; les4reprisesautoriséesrendent200DTOexact+promptabsent+nonmutation. Preuve `glm-bf16-reader-recovery-oracle-20261103T182600Z/supervisor-personal-run/`, reçuetsource-reviewmêmelot ; ancienéchecoracleconservé.
+
+ProchaintâcheuniqueGLM `glm-bf16-reader-permanent-recipe-20261103T184100Z` créerarecettepermanente avecinventaire/attentesnommées etdocsFR/ENreçues46 ; commandesnormalbinary/profile etpreuve fraîche, aucunhashcodéendurnicompte46figé siinventairesourcesvarie. Codexrun+verifyaprèsremise, qualification323ensuite ; stale/révocation/capsulepoisonnée, Versionhumaine, globalPAEA/RETEXrestentouverts. Réseau/clientssamesessioncontrôlés.
+
+
+### Réception personnelle du 3 novembre 2026, 18:56 UTC — recette BF16 permanente reçue322et323
+
+RecetteGLM examinée (26attentesnommées+marqueursdynamiques, inventairehelpersréels, sanshashfigé), run+verify personnelsPASSsur322puis323. Chaqueimage46assertions/nativeexit0/sourcesstables/160artefactsSHAet11pairesfullstateégales ; sortiesbrutes323personnellementlues. Preuves `glm-bf16-reader-permanent-recipe-20261103T184100Z/supervisor-recipe322/` et `supervisor-recipe323/`, reçu/source-review. status.py3 evidencebindingplaceholdersGLMdiagnostiqué, originalconservéetlisteneutraliséeavecattribution.
+
+Qualification323personnelle : /proc/1379834/exeSHA ccef210…96b60 égaleimageimmutable etprofilnormal ;756membrearchivevérifiés,4coreartifactsfeatures[]/testfalse, commandecargoexacteetoverridesabsents. Précontrôlerefuséd’abordcarinventairebefore3047candidats≠after756effectifs ; aprèsinspection,tous756étaientprésents/byteégauxavant, différence=raffinementgraphe,paschangementignoré. Aucuneécriture/livraisondupropriétaire323modifiée. Versiondialoguehumainrestehorspreuve.
+
+ProchaintâcheGLMunique `glm-bf16-reader-policy-freshness-20261103T185800Z` ajoutetémoinpublicrenouvellementpolitique→GET/HEAD403stale→récupérationpublique(attribution/admissioncourantes)→GET200exact ; siancienreceiptmatchingempêche reprise, conserverlecontre-exemplerougeetassignercauseproduitensuite, aucuneffacementprivé/bypass. Réseauetabsenceclientscontrôlés ; matricefreshnessnouvelleUNVERIFIED, PA00–13/RETEXouverts.
+
+
+### Régression produit reproduite du 3 novembre 2026, 19:24 UTC — politique périmée fuit en500
+
+GLM extensionfreshnesslivrée, Codex a lu le nouveauparcourspuis exécutépersonnellement surnormal323, sorties/exit/inputsconservés dans `glm-bf16-reader-policy-freshness-20261103T185800Z/supervisor-personal-run323/`. Vraiexit1/sourcesstables/nativecleanup0. Contrôlesprécédents+GET200justeavantmême-politique-renouvelée passent ; premierGETaprèsrenouvellementrenvoieHTTP500 code blp-admission-policy-changed, sanscontenuclassifié. HEAD/repriseensuitenonexécutés. CeFAILrévèleunerégressionréelleducontratHTTPreader403stale, pasunPASSmoyen.
+
+Cause examinée directement : read_controlled propage verify(admission)Refusedpolicychanged sansconversionversPOLICY_STALEfamillelecteur, mappingHTTPconnaissantseulementcesrefuslecteurs. LotGLMunique `glm-bf16-reader-stale-status-fix-20261103T192700Z` traitecettefrontièreetstrictifiel’oracleaucodelecteurexact ; préservercorruption/IO/cleanupen500, aucunmappingadmissionglobal. DocsRust/FR/EN/version_historydanslemêmeincrément ; Codextests/buildnormalaprèsstabilité. Repriseavecancienreceiptpotentiellementpérimérestetâchesuivanteaprèsreproduction, pasencoreacceptée. Réseau/clientsvérifiés, preuvesetservice323préservés, CodexaucundéveloppementPAEA.
+
+
+### Revue du 3 novembre 2026, 19:40 UTC — ordre de validation à préserver avant build
+
+GLM avait livré ungatedefraîcheurtypedavantverify. Codex a relu le diffetlecontratverify : unreceiptmatchingdécodéàRootinvalide+politiquepériméecourt-circuitelesvérificationsidentité/Rootparrefus403, contrairementàlagarantienon-downgrade500. Contre-exemplesourceconservédans `glm-bf16-reader-stale-status-fix-20261103T192700Z/supervisor-reception-review.json`, pasencorepreuveexécutée, donc fixnonreçuetaucunbuild/livraisonannoncé. PlaceholdersevidenceinvalidesetdatesGLMfuturespréservés, nonutiliséspourprogression.
+
+ReplanuniqueGLM `glm-bf16-reader-verify-order-20261103T194100Z` : supprimerprécheckdupliqué, lancerverifycompletavantadapterseulementenumRefused(codecontractuelstableadmission-policy-changed)versreaderPOLICY_STALE ; tousautreserreurs/wrappersdemeurentintacts. Clarificationdedroit : classifierenum/codestableexactn’estpasanalysertexte/message, aucunmappingHTTPglobal. Unitregression cibléevariantssuccès/stale/voisins/wrappers, docsRust/FR/EN/versionnotesdanslemêmeincrément, puisCodextestsnormalbuild+parcourspublicaprèsstabilité. Sourcesetpreuvespréservées, CodexaucundéveloppementPAEA.
+
+
+### Vérification du 3 novembre 2026, 19:55 UTC — compilation de régression à réparer
+
+AdaptationGLMaprèsverifyrelue : ordrecompletpréservé, enumRefusedconstantuniqueconverti,toutesautresvariantesinchangées. Codex a lancéexactement letestlibnomméavec--exact, canauxbrutsetvraiexitconservés `glm-bf16-reader-verify-order-20261103T194100Z/supervisor-unit-and-build/`. Compilationéchoue101 E0433 : modtests utilise super::preparation_admissionalorsquesuper=preparation_dialogue ; sourcesRuststables. Aucuntestn’aétéexécuté, buildsuivantnonlancéconformémentàl’arrêtaprèsprérequisrouge.
+
+CorrectionGLMunique `glm-bf16-reader-unit-namespace-20261103T195600Z` limitéenamespaceunit+docFR/ENcourte, sanschangerdroits/visibilité/production/oracle. Codexrerunmêmetestaprèsremisepuisbuildnormal siverifié. statuspreuveinvalides/contratupdated_utcabsentdiagnostiqué, originalpréservéettimestampréeld’observationajoutéavecattribution. Pasd’installationni403runtimeannoncé. Réseau/clientscontrôlésavantreprise, globalPAEA/RETEXouverts.
+
+
+### Reprise vérifiée du paquet du 3 novembre 2026, 20:09 UTC
+
+CorrectionGLMnamespace reçuecontrecheminréel etcompilerdiagnostic : importcrate::root_store::preparation_admissionet3référencestestcorrigées, productioninchangée/docFR/ENmêmeincrément. Nouveaurunnerpersonnel séquentiel exactunit→buildnormal seulementsilevertdans `glm-bf16-reader-unit-namespace-20261103T195600Z/supervisor-unit-and-build/`, unitépropre `swarm-bf16-unit-namespace-20261103t2009z`, sanswatchdog. Preuvesbrutes/vraisexits etinventaireRustavant/après ; placeholdersevidenceinvalidesGLMdiagnostiquésetsauvegardés, aucuneacceptationdeleurpart. PasdetestconcurrentsuréditionGLM ; attendantunitréelpuisbuild, service323préservé.
+
+
+### Nouveau diagnostic du 3 novembre 2026, 20:10 UTC — assertion empruntée
+
+Exactunitpersonnelencore101/sourcesstables,maisnamespaceE0433résolu. NouveaupremieréchecE0277dansassertionwrapper : primaire.as_ref()donnecode&&str ; comparaisoncontreconst&stràcorriger sanschangerlavaleurassertée. Rawcompletconservé `glm-bf16-reader-unit-namespace-20261103T195600Z/supervisor-unit-and-build/`; aucuntestexécuté/buildnonlancé. GLMmicrotaskunique `glm-bf16-reader-unit-borrow-20261103T201100Z` limité àcetteassertioncfgtest, aucunproduit/droitvisibilitéchangé. Pasdepageopérationnelleàchangerpourfixdetypepur ; raisonretenuedanssuivietFINAL, contratRustdoc/docFR/ENUNVERIFIEDinchangé. Réseau/clientscontrôlés, prochaineactionexactunitpuisbuildsiPASS.
+
+
+### Vérification réelle du 3 novembre 2026, 20:25 UTC — frontière403 corrigée, reprise encore rouge
+
+Exactunitpersonnel1PASS0failed0ignored, puis buildnormal ./swarm.sh build vrai0, sourcesRuststables. Candidat324 SHA663b46ba8ed83e99be3821d3a3bb67033791386f6f5ce3c7b0effcd76bea5e78 préparé20:11:35 ;profilnormal4corefeatures[]testfalse,archiveeffectifetworkspacecourantcomparés, binairecandidate/immutableégaux. Preuves `glm-bf16-reader-unit-borrow-20261103T201100Z/supervisor-unit-and-build/` et `supervisor-public-run324/qualification.json`.
+
+Codex a exécutépersonnellement leparcourspubliccomplet sur324, vrai1/sourceStable/nativecleanup0 : GETstale403codeexactlecteuretHEAD403vide/nonmutation passent, toutesré-attributionsrevision2etnouvelleadmissionpubliqueexactsameintentpassent ; repriseautoriséeGETreste403policy-stale au lieu200. Donclesources/rapport/buildneprouventpasune livraisonvérifiée. Installation324HELD tantquecetterégressionrequisereste rouge, service323préservé.
+
+Causeactuelleconfirmée : ancienreceiptmatchingrevision1resterequisàchaquereadmalgrééquivalentcourantrevision2. LotGLMunique `glm-bf16-reader-renewal-recovery-20261103T202800Z` traiteraremplacementparéquivalentcourantpleinementvérifié(mêmeRoot/intent/principal/capture/label), sansignorerstaleglobalementniinvalidRoot/corruption/IO. Anciennespreuvesconservées ; Codextests/buildetparcourspublicaprèsremise, aucunCodePAEAparCodex. Réseau/clientsvérifiés, PA00–13/RETEXouverts.
+
+
+### Revue du 3 novembre 2026, 20:55 UTC — reprise rédigée, cause sérialisation à conserver
+
+GLM a remis récupération3passes : verifierchaquereceiptcomplet→couvrirpériméseulementparcourantpleinementvérifiémêmeprincipal/Root/capture/labelégal→contrôlerclearancepourchaquedomaine. Pasencoreexécuté. Codex a lu helper/calleur/unités et trouvéErrdesérialisationprovenancetransforméenfalse : refusfermémaiscaused’erreurperdue, contraireaucontratrequis. Source-reviewconservé `glm-bf16-reader-renewal-recovery-20261103T202800Z/supervisor-reception-review.json`, sansprétendrebrancheErrreproduite ; no-opEditidentiqueetbindingsevidenceinvalidesdiagnostiqués/originauxconservés.
+
+LotGLMunique `glm-bf16-recovery-error-propagation-20261103T205600Z` feraResult<bool,E> etpropagationtypedanslesbouclesreader, inégalitéordinairefalse, Errjamais403stale. AjoutertémoinRootdifférenteaucouverttu purefixture, préserverprincipaux/lineage/labelnondowngrade. Rustdoc/FR/ENmêmeincrément ; testes3ciblés/buildnormal/publicflowCodexaprèsstabilité. Candidat324toujoursnoninstallé/régressionrepriseencorerouge, serveur323préservé. Réseau/absenceclientssamesessioncontrôlés, PA00–13/RETEXouverts.
+
+
+### Compilation ciblée du 3 novembre 2026, 21:10 UTC — fixture Rust à corriger
+
+Result<bool,E>/propagation? livrésGLM, helper/caller/Rootnoncouverture relus. Codex a lancé3unitésnommées (--lib filtremodule, sans--exactzérotest) puisbuildconditionnel. Vraicargo101/sourcesstables : format!n’acceptepascaptured.source_revisiondanscapturedeformat, fixture_admissionligne264 ; aucuntestexécuté/buildnonlancé. Raw `glm-bf16-recovery-error-propagation-20261103T205600Z/supervisor-three-units-and-build/`.
+
+MicrotâcheGLMunique `glm-bf16-recovery-fixture-format-20261103T211100Z` corrigeexpressionformatcfgtestuniquement, intendedfixtureIDinchangée, sansproduit/asser­tions/visibilitémodifiés. Raisonvérifiablenondocopérationnelle : syntaxepuretest, contratsRustdoc/FR/ENauthoredUNVERIFIEDrestentvrais, incidentretenudanssuivi/FINAL. Réseau/clientscontrôlés ; Codexrejouera3tests/buildaprèsstabilité. Toujoursaucuneinstallation324, repriseglobaleencorenonreçue.
+
+
+### Réception personnelle du 3 novembre 2026, 21:26 UTC — reprise publique75 verte sur325
+
+Les3unitéscibléespassent(noms/countsexactslus), puisnormalbuild325vrai0/sourcesRuststables. Codex a qualifié325 SHA3d94380cb3efc60a7c8ec75e451f070ebf1ceab37ff6576cb617cb69de919712 (archiveeffectif/profile/4corefeatures[]testfalse,candidate/immutableégaux,workspacedrift0), puiscourupersonnellement leparcourspublic. Vraiexit0/nativecleanup0/sourceStable,75assertionsPASS,245artefactsSHAet15pairesfullsnapshotségales. Ancien324rougepréservé : maintenantaprèsrenouvellementpublicGET/HEAD403stale puisré-attribution+admissioncourantesrepriseGET200DTOexact+promptprivéabsent+nonmutation. Preuve/reçu `glm-bf16-recovery-fixture-format-20261103T211100Z/supervisor-public-run325/` etmêmelot/supervisor-receipt.json.
+
+Installation325encoreattente : delta323→325contientaussi3fichiersTrustdélégationd’autreauteur(config/operations/state), clairementidentifiés, sansmodificationparCodex. Vérificationcibléeexistingtrust_delegation7caslancée avecraisonavantélargissement sous`supervisor-trust-delegation-qualification/` du lotcourant. Hypothèsesd’erreurmasquée (`active(...).unwrap_or_default`, controls.okfallback) àtrieravantqualificationsanslimite ; propriétairechangementTrustinitial, critèrecontre-exempled’erreur→diagnosticpréservé, aucuneacceptanceglobaleinférée.
+
+NouveauGLMunique `glm-bf16-reader-corrupt-history-20261103T212900Z` ajouteuniquementvraiscontre-exemplesstockésanciensreceiptsmauvaiseRoot/schémapoisonnéalorsqu’équivalentcourantvalideexiste, témoins200avantfaute→500nondivulgant→restaurationexactefixture→200reprise. PasdeRootlive/fabricationacceptance ; script/docsseulement, sourcesRustinchangéespendantvérificationindépendanteTrust.
+
+Améliorationméthodesuivi : répétitiondesbindingsevidenceinvalidesGLMmalgréconsignes→status.jsondésormaispréremplietpropriétéCodex, GLMautoriséseulementFINAL/source ; effectivitéàvérifieràprochaineremise (aucunbindinginvalideetcontratconservé). Conservercetterèglepourlesprochainspaquets, pasdereconfigurationclientoudebudget. Réseau/clientscontrôlés, Versionhumaine/globalPAEA/RETEXtoujoursouverts.
+
+
+### Supervision 2026-11-03 21:44 UTC — BF16 gardes stockées reçues
+Codex a relu les sorties brutes: 93 assertions publiques sur candidat325, natif0, sources stables, 268 empreintes vérifiées, 21 paires complètes égales, deux HTTP500 exacts et restaurations octet pour octet. Sept tests nommés trust_delegation PASS avec sources stables; hypothèses de pertes de cause config/state non reproduites restent ouvertes, propriétaire auteur trust / qualification Codex. Preuve: `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-bf16-reader-corrupt-history-20261103T212900Z/supervisor-receipt.json`. Oracle conditionnel nonempty insuffisant découvert: GLM reprend égalité des codes et raccordement permanent freshness/guards dans `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-bf16-guard-recipe-contract-20261103T214400Z`; status maintenant superviseur seul (aucune modification GLM observée). Candidat325 non installé, serveur323 préservé; Version FR/EN protégée et acceptation globale PA00–PA13/RETEX non établies.
+
+
+### Supervision 2026-11-03 22:00 UTC — recette BF16 reçue, projection Trust rouge
+Codex a personnellement reçu recette BLP run0/verify0, 93 assertions dont codes stockés exacts, 268hashes vérifiés, 21paires complètes égales et natif0, sources stables. Preuve `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-bf16-guard-recipe-contract-20261103T214400Z/supervisor-receipt.json`. Plus petit discriminant sur Root privé: contrôle mandat valide disponible, starts_at stocké invalide puis trustshow exit0 disponible, aucune mutation; restaurationexacte/recovery. Cause active(...).unwrap_or_default dans State::public perdant erreur timestamp; contre-exemple `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-bf16-guard-recipe-contract-20261103T214400Z/supervisor-trust-error-boundary325-valid-identities/result.json`. Précondition initiale fixture2identités refusée préfaute conservée, corrigée en3identités suivant contratprepare_identities. GLM corrige générale et garde régression dans `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-trust-projection-error-cause-20261103T220000Z`; activation325 suspendue à cette correction/vérification,323préservé. Hypothèse distincte delegation_max_depth .ok reste ouverte, propriétaire qualificationTrust, reprise discriminant après ce lot. Aucun critère global PA00–PA13/RETEX déclaré fini.
+
+
+### Supervision 2026-11-03 22:25 UTC — correction Trust reçue sur image326
+8tests nommés PASS dont timestamp, build326exit0 sourcesRuststables. Codex a vérifié 756sources effectives avant/après/archive/courantes et4corefeaturesvides/testfalse. ELF326 SHA3a518679a00f6a5e3eb26fce0b96757104e7815ccf50524e6accbacd7dc82bd0: contrôle CLI valide, faute stockée timestamp -> exit2 format sans disponibilité ni mutation, restaurationexacte et recovery valides. Recette BLP326 run0/verify0,93assertions,268hashes,21paires complètes,natif0. Preuve `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-trust-projection-doc-precision-20261103T222500Z/supervisor-receipt326.json`. GLM précise uniquement deux écarts doc/rapport aprèsremise stable; aucune modification logique demandée. Serveur323 observé prêt PID1379834, image326 noninstallée; prochain build/commentaires puis activationcheminsoutenu et contrôleELF/assets/Version. Login humain déjàpendant nonredemandé. Hypothèse delegation_max_depth .ok gardéeouverte, aucunepreuve de conformitéglobale ni PA00–PA13/RETEXachevés.
+
+
+### Supervision 2026-11-03 22:40 UTC — précision reçue, consommateur notes repris
+Codex a comparé opérations source à archive326: commentaires seuls; contradictions mandatabsent/ordre derestauration closes avec limitesexactes. Build3270/Ruststable. Défaut denotre cadragederevue: notes embarquées version_history.items[0] oubliées par lotdocprécision, encoreancienmandatmanquant/attentetestsdépassée. GLM corrige uniquement cetitemFR/EN en comportementproduit concis dans `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-trust-release-notes-20261103T224000Z` avant finalbuild/activation. Preuvesfonctionnelles326 conservées et réutilisables portéeexacte, pas acceptation327 ni installation annoncée.
+
+
+### Supervision 2026-11-03 22:46 UTC — image328 activée, première frontière UI traitée
+Codex a reçu CLI328 contrôle/faute2/restauration/recovery, recetteBLP328run0verify0/93assertions/268hashes/21paires/natif0; archive756/4coreprofilnormal vérifiés. Restartpréparéexact328exit0, PID2507781 ELF3ba746a8612ed09a8231e8aaa3ac95156078130fbb2fd8b7fa765c00e7ad46ef prêt. Pas livraisonentièrevérifiée: frontAuthority401/CUAlogin confirmé; essainatiflive403 classépréconditionAuthoritysignée (serviceauthorize_request), pasbypass. Ownedfixturemêmeimage20assertionsFRverts dont25assets+versionnotes puis cockpitauthorityme404/consoleerror, nettoyage0. GLM corrige premièrecausecapacitéconsommateur sansignorer404 dans `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-ownerkey-authority-capability-20261103T224600Z`. Preuve `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-trust-release-notes-20261103T224000Z/supervisor-receipt.json`. Login humain déjàpendant nonredemandé; pasdéclarationPA00–PA13/RETEXterminés.
+
+
+### Supervision 2026-11-03 23:11 UTC — unité capacité reçue, erreurs consommateur reprises
+Codex a reçu helperAccessGate/routage et unitécapacité1PASS0FAIL/exit0, inputslistésstables. ToolEditdocumentationmanqué classéaprèsinspectionfinale. Revue3axes `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-ownerkey-authority-capability-20261103T224600Z/supervisor-reception-review.json` conserve quatreécarts: causesréseau/parseperdues, échecme aprèscapacitéAuthoritypositive cachéenmode none, troisdiagnosticsFRnontraduitsEN, absencedegardesJScomportementales. GLM traite cecontrat borné dans `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-capability-consumer-error-guards-20261103T231100Z` avantbuild; aucune UI328déclaréeverte, pasderelancedemandehumainelogin.
+
+
+### Supervision 2026-11-03 23:40 UTC — replan bouclelecture GLM
+Deuxcontrôles:83puis133Read, mêmes5Edittraductions, pascodeprincipal/guard/FINAL. Défautdenotre découpage/outillage établi, passimplePIDactif. ClientGLMproprePID2599084 UID/boot/start/sessionvérifiés SIGINTuniquementceclient, exit0véritableclasséinterruption (pasPASS), logs/traductionsconservés. DNS/proxyprêts, aucunclientmêmesessionorphelin. Reprise--resume mêmeréférenceUUID dossierneuf `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-capability-errors-code-20261103T234000Z`, périmètrestrict3JScontraterreur +documentationcourte; gardes séparées prochainlot. Greplectureseuleautorisé pouréviterpaginationcatalogue, aucunBash/droitmétierélargi. Preuve `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-capability-consumer-error-guards-20261103T231100Z/supervisor-replan-overread.json`. Préparateur initial refuséSyntaxErrorfstringavantécriture/lancement, causecorrigéeconservéeavantreprise.328active/UIrouge toujoursouverte, pasdemandehumaine répétée.
+
+
+### Supervision 2026-11-03 23:45 UTC — recadragecode remis, gardes séparées
+MêmeGLMsession recadrée a livré11éditionsprincipales puisFINAL, effetdutraitementbouclelectureobservé (pasproductPASS). Deuxerreurspréparateursuperviseurconservées: fstring refuséeavantwrites, puisprintAttributeErroraprèslancement (repère/processinspectés, aucun doublon). npm i18n:build0, canonicaleninchangé/generatedwebidentique. Revuepartiellemaintienthypothèses meparsecauseperdue et rawerror.message rendu/loggé. GLM écritseulementgardecomportementale+docs dans `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-capability-js-guards-20261103T234500Z` avantCodexrun, sansaffaibliroracles.328actif/UIouverte, pasnouvellepreuveglobale.
+
+
+### Supervision 2026-11-04 00:12 UTC — trois rouges JS personnellement reproduits
+Codex a lu/exécuté gardeGLM:87assertionsnommées,84PASS/3FAIL, vraiexit1/sourcesstables. Networkmeaffiche/logPRIVATE_ME_CAUSE; parsemeperdcause. Preuve `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-capability-js-guards-20261103T234500Z/supervisor-red-reception.json` et rawstdout/stderr; aucunexpected-red acceptés. Revueharnais:200roundsmicrotasksarbitraires àremplacerparcompletionobservable; outererroridentiqueoriginal incompatiblewrapperstable doncassertcausechainidentityexactejustifiée; casunexpectedprivébrutàajouter. GLMfixborné dans `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-capability-safe-error-fix-20261104T001200Z`; buildinterditavantgardesvertes,328active/UIouverte.
+
+
+### Supervision 2026-11-04 00:42 UTC — rouges produit corrigés danspréfixe, lifecycleharnais repris
+CodexvraiNodeexit1/sourcesstables: 70assertionspréfixePASS dont3anciensrouges, puis4FAILruntime prématurés etReferenceError els. Pas89PASSniacceptationglobale. Causebarrièretrackedsetincomplètefaceawaitsasyncstart nonobservés; sourceoffrelifecycleglobal load (native-runtime.js85) dontcallbackretournePromiseeffectif. GLMtestonly répare dans `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-runtime-guard-lifecycle-20261104T004200Z` sanscap/timer/sourceinstrumenté, sourceproduitinchangée. Preuve `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-capability-safe-error-fix-20261104T001200Z/supervisor-harness-red-reception.json`. Unknowndaemonerrorgenericdialoggardérelevantouvertaprèspremièrecause; pasbuild/activationnouveau,328actif.
+
+
+### Supervision 2026-11-04 00:57 UTC — 90 gardes reçues, rendu générique discriminé
+Codex a reçu toutes90assertionsnommées PASS0FAIL/vraiexit0/sourcesstables (FINALattendait89, compteurréelconservé). Lifecycleload/start réellementawaité, aucunplafond. Helperexplainexercépersonnellement sursourceexacte renvoiePRIVATE_UNKNOWN_DAEMON_DETAILdansmessage: contreexempleisolé `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-runtime-guard-lifecycle-20261104T004200Z/supervisor-renderer-discriminant/stdout`, paspreuveUI. GLMfermecontratrendupartagéetgardedialog dans `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-authority-renderer-safe-code-20261104T005700Z` avantbuild;90gardesconservées,328active/UIouverte, pasacceptationhumaine.
+
+
+### Supervision 2026-11-04 01:27 UTC — garde dialog témoin invalide repris
+VraiNodeexit1/sourcesstables: boutonmotdepasseabsent puis TypeError listeners. meDto déclaréjamaisutilisé, routeGETmeabsente ; erreurmountvisiblefaisaitfauxtémoinhostvisible. GLMtestonly corrige routageetassertionmodeauthority+GETexactavantinjection dans `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-dialog-guard-control-route-20261104T012700Z`. Preuve `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-authority-renderer-safe-code-20261104T005700Z/supervisor-dialog-fixture-red.json`. Produitsharedrenderermodifiémaisnonqualifiéparnouvellegarde,90précédentsconservésportéeexacte, pasbuild/activationnouveau.
+
+
+### Supervision 2026-11-04 01:43 UTC — 106 gardes reçues et image329 qualifiée
+Codex a exécuté et lu106assertionsPASS0FAIL/exitréel0/inputs stables, incluant témoinGETme+dialogno-leak/refus/original/recovery. Build3290/allRust+web+locales+notesstables;756sources effectives avant/après/archive/courantes et4corefeatures[]/testfalse vérifiés. Image329 SHA92bf3cf877daee63fbd46f07996b1e78a31b7991d48b2b6988cfe47608a6f306 noninstallée. WrapperUIpermanent tourne surimage/archive329immuables; pendantcecontrôle GLM nechangequeitemnotesFR/ENworkspace, nonlusparbrowser. Notesproduitencoretroplongues/détailsinternes: microédition `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-capability-release-note-20261104T014300Z` avantfinalbuild. Preuve `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-dialog-guard-control-route-20261104T012700Z/supervisor-reception106.json`,328active/Authorityhumaineouverte.
+
+
+### Supervision 2026-11-04 01:46 UTC — UI329 entièrement reçue portéefixture, notes BF16 reprises
+Codex a reçu56assertionsFR/EN navigateurpermanentvertes/noerrors/noPOST, assetbytes25sets/langue/version/notes/commit/disclosure/focus/thèmes, nettoyage0 ; capturesVersionFR/EN vuespersonnellement. Image329qualifiée immuable, pasAuthorityhumaine. Itemnote0corrigédeltauniquereçu. Inspectionvisuelle révèle3notes BF16mêmecontrat[2,3,6] encorechronologietests/source: GLMéditionsixchaînes seulement dans `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-bf16-release-notes-concise-20261104T014600Z` puisfinalbuild. Apprentissage: examiner notescourantesmêmecontratvisibles, pas seulementdernieritem, avantfinalbuild; autres379items/étrangershorsscope. Preuve `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-capability-release-note-20261104T014300Z/supervisor-note-and-ui-reception.json`.
+
+
+### Supervision 2026-11-04 01:45 UTC — correction fonctionnelle329 activée sans attendre notes
+Qualification106JS+56UI/normalimage329 reçue : restartpréparéexact329exit0, PID3090764 ELF92bf3cf877daee63fbd46f07996b1e78a31b7991d48b2b6988cfe47608a6f306 prêt. Sourcecompilednouvelleenattente1(versionnotes), non déclaréeinstallée. Probelectureseule native-version réel200avecownerkeyexistant permisparlauncher : historiqueentierégalarchive329, version/commit/dirty exacts; aucuneassertiondémonsignée fabriquée. Correctionfonctionnelle activée ; notesBF16courantesencoreenédition, frontAuthorityhumainnonvérifié. Preuve `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-bf16-release-notes-concise-20261104T014600Z/supervisor-active329-reception.json`.
+
+
+### Supervision 2026-11-04 01:52 UTC — 330 activée et réception directe bornée
+Finalnotes330build0/sourcesstables ;756effectiveinputs avant/après/archive/courants,4normalcorefeatures[]testfalse. Codexreçu106JSsourcesinchangées, BLP33093assertions/run0verify0/natif0/268hashes/21paires complètes, UI33056FR/EN/noerrors/writes/25assetssets parlangue ; capturesVersionvues. Restartpréparé330exit0sanssourcepending, PID3109042 ELF67a8ec31bee4e5672a185ce2767cac2ccefec259d67087a4d6fd51d915d4df33 prêt ; native-versionréel200/historiqueentierégalarchive/commitdirty exact. Portéefixturemêmeimage+runtimeprobe, pasAuthorityhumaine/E3. Preuve `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-bf16-release-notes-concise-20261104T014600Z/supervisor-delivery-reception330.json`. GLMmetpermanentguard/UI avecbindingworkspace/image dans `/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-capability-permanent-recipe-20261104T015200Z`, aucuneéditionproduitnouvelle.
+
 ### Délégation de mandat Rust — lot T14 (chaîne d'admission), session Claude 2026-11-04
 
 Lot séparé des lots GLM BF-16/SECURITY-PROOFS : portage Rust de la chaîne
@@ -3799,3 +4657,96 @@ changé `engine_settings.rs` sans mettre à jour le test — daté d'avant ce lo
 fixtures `/tmp` des tests mission_status ; contrat TMPDIR des recettes
 confidentialité). Toujours ni commit ni installation ; l'acceptation reste à
 établir.
+
+### Provenance données Rust — lot T14 sous-ensemble G4, session Claude 2026-11-05
+
+Portage Rust du sous-ensemble « provenance » de G4 : le bloc `data_policy` et
+le `data_context` typé du contrat Go (`internal/engine/trust_data_policy.go`),
+conformément à [T14-A2A-DESIGN](paea/T14-A2A-DESIGN.md), sans le volet A2A
+réseau (D1–D7). Nouveau module `rust/crates/swarm-engine/src/trust/data_policy.rs`
+(`DataPolicy`, `DataContext`, `DataResource` typés, ordre des champs Go ;
+`allowed_path`, `admission`, `action_admission`, `stored_context`,
+`validate`), variante d'erreur `TrustError::Data(&'static str)` conservant le
+code historique « authorization_required » (HTTP 403, CLI 4) avec raison sûre
+diagnostiquable, `command.rs` passe au contexte typé (digest Go identique
+pour un ordre de clés non canonique). Câblage `operations.rs` en six points :
+ordre Go exact rejeu → preuve → admission données → re-admission du contexte
+stocké → connecteur ; préimage d'action `data_context` omitempty ; stockage
+du contexte dans l'action request ; reconstruction typée dans `bound_action` ;
+re-admission interne à la frontière d'effet `commit` (jamais `reconcile`,
+récupération préservée). `state.rs` : branche `require_supported` data_policy
+(validation profonde stockée, famille format) ; libellé de limite mis à jour
+(« délégation de mandat et contexte de données portés ; admission distante A2A
+encore refusée »). `config.rs` : édition data_policy admise dans la boucle de
+gel, validation de la politique effective (fournie ou stockée) via
+`require_supported` avant toute persistance, aperçu projetant la politique
+effective. `swarm-web/src/service.rs` : variante `Data` mappée 403. Tests
+miroir du contrat Go (7) dans
+`rust/crates/swarm-engine/tests/trust_data_policy.rs` (racines isolées
+`.swarm-fixtures/trust-data-policy/`, jamais `/tmp`) ; `trust_biba.rs` mis à
+jour (data_policy devient éditable ; un bloc stocké incomplet refuse
+désormais au chargement comme en Go). Recette permanente
+`tools/verification/recipes/trust-data-policy-rust.json` + wrapper
+`tests/rust_trust_data_policy_unit.py` : run PASS, évidence conservée
+`.swarm-fixtures/recipe-trust-data-policy`. Suites trust locales vertes :
+trust_data_policy 7/7, trust_biba 14/14, trust_delegation 9/9,
+confidentiality 16/16. Suite complète swarm-engine : les 5 échecs lib restants
+appartiennent au périmètre concurrent (mission_report_relay/preparation_models/
+agent_supervision, modifications non commitées BF-16 ; `preparation_show` gagne
+`reader_token`, casse 7 fichiers de tests concurrents hors lot). Docs FR/EN
+(`docs/actions-confiance-rust.md` §Refus et reprise) dans le même incrément ;
+note PAEA dormant-→-actif corrigée. Restent fermés : A2A réseau, classifications
+`confidential`/`restricted` en entrée, outils réels. Ni commit ni
+installation ; l'acceptation reste à établir.
+
+Correction d'obsolescence dans le même incrément : la table « Prérequis
+déclarés et état réel » de [T14-A2A-DESIGN](paea/T14-A2A-DESIGN.md) citait des
+refus qui n'existent plus dans les sources
+(`trust-delegated-mandate-not-ported`, `trust-advanced-admission-not-ported`)
+et présentait `delegation`/`data_policy` comme fermés à l'admission. La table
+FR et EN conserve la colonne du 02-11-2026 telle quelle et ajoute une colonne
+« mise à jour au 05-11-2026 » : délégation portée (commit `75c35fa278`),
+mandats enfants portés, provenance portée (ce lot) ; le seul garde actif
+restant est le garde générique des extensions non portées
+(`trust-active-extension-not-ported`, `trust/state.rs`). La section « Hors
+périmètre » marque le portage réalisé et précise qu'A2A réseau (audience,
+canal D6, reçus D5) reste entier, bloqué sur l'enrôlement humain IA3 et
+l'intégration G1 réelle.
+
+### Reprise explicite du 6 novembre 2026
+
+La reprise utilisateur réautorise la continuité GLM seule. Le flux précédent était figé puis son client a disparu au redémarrage, sans résultat final ni exit connu. L’attente ajoutée par le superviseur d’un état terminal fournisseur inaccessible a été retirée : la skill prévoit une récupération bornée après diagnostic. DNS, proxy et catalogue vérifiés, aucun client orphelin, source cible inchangée. Une seule récupération HTTP directe sans outils a été lancée selon le handoff existant ; GLM reste auteur du code, Codex supervise et vérifie. Suivi rétabli toutes les quinze minutes. Réception, protection du bootstrap, régression EOF, reçus et HTTP positif demeurent ouverts ; aucune installation/acceptation nouvelle.
+
+Evidence: `docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-startup-boundary-recovery-20261106T130244Z`.
+
+
+Bootstrap positif : proposition GLM intégrée avec10 ancres uniques ; toute la séquence postcapture est sous signal_stop et le hash lit /proc/PID/exe directement. Codex a exécuté20 tests nommés (20PASS,0FAIL,4filtrés), sources déclarées stables, puis verify0 intégritéVERIFIED/statutPASS. Cela ne prouve ni EOF de démarrage dans le parcours partagé, ni HTTP positif, ni installation. Tâche GLM suivante lancée : lecteur de ligne partagé et régression réelle EOF/exit7, recette21 uniquement après ajout effectif. Reçus/refus restent ouverts.
+Evidence: `docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-startup-boundary-recovery-20261106T130244Z`.
+
+
+Réception6nov14:18UTC :21 tests nommés personnellement exécutés,21PASS/0FAIL/4filtrés, sources déclarées stables ; verify0 intégritéVERIFIED/statutPASS. La nouvelle garde partage le vrai lecteur prepared/bound, vérifie témoin sain puis EOF partiel, exit réel7, payload original et compteurs Completed exacts. Aucun HTTP positif ni installé vérifié. Lot GLM suivant lancé : reçu du processus Finished avant verdict, vrai exit/terminal et mode0600 dès création ; refus typés restent ouverts.
+Evidence: `docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-startup-eof-terminal-count-repair-20261106T134943Z`.
+
+
+### Réception directe du 6 novembre 2026, 15:41 UTC — reçus Finished
+
+Proposition GLM et deux réparations revues puis intégrées exactement ; l’ajout concurrent indépendant de documentation des verrous Cargo a été préservé. Codex a réexécuté personnellement les 21 gardes nommées de capture : 21 PASS, 0 FAIL, sources déclarées stables ; `recipe.py verify` exit0. Lecture directe des deux reçus et fichiers bruts : enfant sain exit0, stdout53/stderr0, sans panic ; faute EOF exit7, stdout30/stderr29, panic présent ; terminaux Completed et hachages exacts, reçu0600. La garde vérifie aussi le refus réel de rename et le transport des deux causes, sans effacer la feuille de preuve. Preuves : `paea/evidence/20261028-acquisition81-mvfdts57/glm-receipt-probe-evidence-hygiene-20261106T152111Z/supervisor-finished-receipt21` et `supervisor-receipt-direct-reception.json`.
+
+Limites ouvertes : refus typés et propriété de leurs ressources, refus déterministe de création temporaire, approbation HTTP réelle, formulaire FR/EN, installation et PA00–PA13/RETEX. Le témoin HTTP sur le candidat normal334 épinglé et sa fixture retenue est maintenant exécuté personnellement ; aucun résultat anticipé. Aucun build ou test de capture ne prouve cette approbation ni l’installation.
+
+
+6 novembre 2026,15:42UTC : approbation HTTP normale334 personnellement vérifiée :1PASS/0FAIL/24filtered, sources déclarées stables, verify0. Reçu direct : exit0, deux Completed(stdout1525/stderr0), aucun panic ; /proc/exe SHA23651e383c4b7eb6ba1b25bf66d0c63d3e58dd8adf6ab18435fe3cfb7390514c. Session/CSRF réels, POST vide, accusé approved de l’action exacte, état durable dans PROJECT attribué operator, SERVICE Trust et refs Git inchangés, exactement une publication recorded. Preuve `paea/evidence/20261028-acquisition81-mvfdts57/glm-receipt-probe-evidence-hygiene-20261106T152111Z/supervisor-http-direct-reception.json`. Portée fixture enrôlée seulement : aucune approbation humaine ni installation établie.
+
+Suite GLM unique `glm-form-approved-state-contract-20261106T154505Z` : corriger deux consommateurs existants du formulaire FR/EN (admitted accepté par approval-form, états inconnus affichés succès par consent). Livrer code/garde avant-après/docs, conserver approved légitime et refus visibles ; pas nouveau rapport d’analyse. Appel direct sans outils en cours, repère mis à jour. Refus typés, livraison locale et PA00–PA13/RETEX restent ouverts ; contrôle15min maintenu.
+
+
+Contrôle6nov16:20UTC : remise GLM formulaire reçue complète, clientexit0 à16:10:32 ; aucune intégration acceptée. Revue personnelle : garde proposée attendait l’état attendu plutôt que l’issue réelle et aurait bloqué le témoin rouge consent ; diagnostics navigateur tolérés, EN non vérifié par texte traduit, procédure stash incompatible avec travaux sales préservés. Réparation bornée du seul test confiée à GLM `glm-form-state-regression-repair-20261106T162148Z`. Propositions produit/docs conservées intactes non appliquées ; suite RED sur copie privée exacte des assets puis GREEN après intégration GLM. Aucun recul de la preuve HTTP, aucune qualification supplémentaire du formulaire/livraison.
+
+
+6nov17:22UTC : Codex a reproduit personnellement les deux faux succès : RED original à approval fr admitted puis RED mixte à consent fr admitted après18checks. Les9remplacements GLM produit/docs ont été intégrés exactement, avec copies avant et hashes. Le nouveau test GLM exécuté sur sources stables couvre36checks FR/EN (approved complet/rédigé, refus, états inconnus, effacement mot de passe et POST unique), mais le résultat GLOBAL reste FAIL exit1 :8diagnostics dus à deux endpoints synthétiques frères absents (git-call/reconcile-effects404). Aucun PASS ni installé annoncé. GLM corrige seulement ces deux fixtures et fournit une recette permanente sous `glm-form-sibling-fixture-repair-20261106T172242Z`; garde zéro-diagnostic conservée. Preuves originales dans prédécesseur `glm-form-state-regression-repair-20261106T162148Z`, sorties RED/GREEN et supervisor-form-integration-review.json. Limites de gestion setup/cleanup du test encore ouvertes ; poursuivre vers formulaire servi/livraison après vérification.
+
+
+6nov17:36UTC : correction GLM des deux routes synthétiques intégrée exactement. Réexécution personnelle du navigateur :36checks nommés FR/EN,0diagnostic,exit0, sources stables ; réception `glm-form-sibling-fixture-repair-20261106T172242Z/supervisor-browser-direct-reception.json` dans la même zone de preuves. Deux témoins RED antérieurs conservés. Portée : vrais scripts servis dans Chrome, API explicitement simulées, gestes DOM ; cela ne prouve pas le formulaire servi par un ELF normal ni une approbation humaine. Recette permanente proposée encore refusée avant écriture (schéma strict incomplet et double échappement shell/stdout) : correction minuscule confiée à GLM `glm-form-recipe-json-fix-20261106T173628Z`, puis run/verify personnels. Revue setup/cleanup du test, parcours normal servi et livraison/Version FR/EN restent ouverts.
+
+
+6nov17:52UTC : recette permanente GLM corrigée intégrée puis personnellement exécutée :36checks FR/EN,0diagnostic,exit0,sources déclarées stables ; verify0/integrityVERIFIED/recordedPASS. Preuve `glm-form-recipe-json-fix-20261106T173628Z/supervisor-form-state-recipe`. Aucun chemin fixe écrasé, sortie navigateur privée fraîche conservée. Suite GLM bornée `glm-form-local-delivery-notes-20261106T175205Z` pour notes FR/EN et documentation recette avant build normal soutenu. Statut local lu personnellement : service projet38434 actif prêt, PID917853,dev337,ELF622776374de9c7da1254cf355440027e1689dacf6e317e5a309416ecb4cfe7f6. Observation distincte : les nouvelles corrections de formulaire ne sont pas déclarées intégrées dans cet ELF. Qualification/livraison et revue des erreurs setup/cleanup restent ouvertes ; aucune acceptation globale.

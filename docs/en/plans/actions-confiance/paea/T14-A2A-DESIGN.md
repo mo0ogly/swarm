@@ -33,13 +33,21 @@ PAEA registry:
 
 Declared prerequisites and their real state:
 
-| Prerequisite | State as of 2026-11-02 | Scope |
-|---|---|---|
-| Real identity (IA3 outputs, enrolment) | open, human | I02 first; authenticated real A2A waits for its output |
-| `delegation` (schema `max_depth`) | admission closed: `max_depth != 0` → `trust-active-extension-not-ported` | the block stays inactive until contractual porting |
-| Delegated mandates | non-empty `parent_mandate_id` → `trust-delegated-mandate-not-ported` (`trust/operations.rs:83`) | I02 bounds delegable rights; I14 circulates them between peers |
-| `data_context` | `trust-advanced-admission-not-ported` (`trust/operations.rs`) | preserved provenance of messages, separate lot |
-| Authenticated peers (local channel) | UID authenticated but no mandate derived from the UID alone (PAEA-APEX diagram) | identification authorizes nothing without a current mandate |
+| Prerequisite | State as of 2026-11-02 | Update as of 2026-11-05 | Scope |
+|---|---|---|---|
+| Real identity (IA3 outputs, enrolment) | open, human | unchanged — open, human | I02 first; authenticated real A2A waits for its output |
+| `delegation` (schema `max_depth`) | admission closed: `max_depth != 0` → `trust-active-extension-not-ported` | **ported** (commit `75c35fa278`, recipe `trust-delegation-rust`): depth 0 refuses by default, greater depth capped at creation; peer reception (audience D3) still to build | I02 bounds delegable rights |
+| Delegated mandates | non-empty `parent_mandate_id` → `trust-delegated-mandate-not-ported` (`trust/operations.rs:83`) | **ported**: `parent_mandate_id` checked against the policy (depth, cascade revocation); the historical refusal `trust-delegated-mandate-not-ported` no longer exists in the sources | I14 circulates them between peers |
+| `data_context` | `trust-advanced-admission-not-ported` (`trust/operations.rs`) | **ported** (2026-11-05, provenance lot, `trust/data_policy.rs`): typed `data_policy`/`data_context` admission with `authorization_required` refusals and format-family validation; the historical refusal no longer exists in the sources | preserved provenance of messages, outside networked A2A |
+| Authenticated peers (local channel) | UID authenticated but no mandate derived from the UID alone (PAEA-APEX diagram) | unchanged — identification authorizes nothing without a current mandate | message transport D1 grants nothing |
+
+The "state as of 2026-11-02" column is kept verbatim: it records what the
+design had in front of it on 2 November. The cited codes
+`trust-delegated-mandate-not-ported` and `trust-advanced-admission-not-ported`
+no longer exist in `rust/crates/swarm-engine/src/`; the only remaining active
+guard is the generic unported-extension guard
+(`trust-active-extension-not-ported`, `trust/state.rs`), which no longer covers
+either `delegation` or `data_policy`.
 
 ## Design decisions
 
@@ -107,12 +115,19 @@ operations (new mandate, new audience), never a bypass.
 
 ## Out of scope of this design
 
-- Porting the `delegation` block (real activation of `max_depth`) — a distinct
-  contractual lot, configuration admission first.
-- Delegated mandate chains (`parent_mandate_id`) beyond the first level —
-  bounded by I02 and the policy, not exercised here.
+- ~~Porting the `delegation` block (real activation of `max_depth`) — a distinct
+  contractual lot, configuration admission first.~~ Done (commit `75c35fa278`,
+  2026-11-04, recipe `trust-delegation-rust`); depth 0 remains the default
+  prohibition, per D2.
+- ~~Delegated mandate chains (`parent_mandate_id`) beyond the first level —
+  bounded by I02 and the policy, not exercised here.~~ The first level is
+  ported and policy-bounded; deep chains remain bounded by `max_depth` and not
+  exercised in A2A.
 - T18 and any adaptive campaign — E3 scope, non-author team.
-- Real peer identity — human enrolment (IA3), I02 prerequisite.
+- Real peer identity — human enrolment (IA3), I02 prerequisite, still open.
+- Networked A2A (audience reception, D6 channel, linked receipts D5) — remains
+  whole: it is this document's subject, blocked on human IA3 enrolment and the
+  G1 real integration (dev.322 tranche in place, human enrolment not done).
 
 ## Local verification criteria (once the code exists)
 
