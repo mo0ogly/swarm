@@ -155,6 +155,73 @@ L'enregistrement initial de ce plan a refusé un patch mal formé avant créatio
 préfixage systématique de chaque ligne. Ce défaut de méthode n'est pas un défaut
 produit et n'invalide pas l'audit conservé.
 
+## Découverte D02 — garde de source mémoire déjà porté, appelants obsolètes
+
+Origine : tranche G2 « mémoire versionnée — moteur » (5 novembre 2026). En
+câblant le cycle `memory.*` dans le moteur Rust, constat que le garde de source
+versionnée attend par `project_context.rs:294` est déjà porté :
+`rust/crates/swarm-engine/src/project_memory_source.rs` (commit `2496c031be`,
+vague Biba) refuse `project-memory-source-inventory` /
+`project-source-memory-managed`. Preuve : `cargo test -p swarm-engine --test
+project_context` — `review_document_cap_and_managed_memory_alias_refusals_are_explicit`
+échoue en attendant l'ancien code `versioned-memory-source-guard-not-ported`
+(`tests/project_context.rs:134,153`) ; le mapping HTTP 501 de
+`rust/crates/swarm-web/src/service.rs:401-402` filtre ce même code devenu
+inobservable. Valeur : la bascule 501 devient une simplification (le parcours
+est porté) et deux obsolences appellent une mise à jour. Propriétaire : vague
+BF-16b active sur `service.rs` au moment du constat (diff concurrent visible) ;
+test concerné modifiable après accord de la vague. État : découvert, qualifié,
+non corrigé ici pour éviter un conflit d'édition ; condition de reprise :
+consommer le diff BF-16b publié puis mettre à jour l'attente du test et
+retirer le filtre 501 ou le retourner sur les codes réels. Sans cette reprise,
+le code HTTP reste un filtre mort : sans effet de sécurité immédiat, mais un
+contrat obsolète affiché.
+
+Tranche G2 moteur (même date) : cycle complet porté et vérifié — module
+`project_memory.rs` (10 tests), câblage `work_engine.rs` + aperçu
+`root_store.rs`, intégration `tests/project_memory_engine.rs` (6 tests),
+recette permanente `tools/verification/recipes/versioned-memory-engine-rust.json`
+(PASS, preuve `.swarm-fixtures/versioned-memory-engine-evidence/run-20261105-1`),
+doc FR/EN `docs/actions-confiance-rust.md`. Restent fermés : surface HTTP/CLI
+dédiée, résumé extractif M20, droits lire/résumer/transmettre/compacter.
+
+Tranche G2 filiation (même date) : `agentMemoryReferences`
+(`project_memory_dialogue.go`) porté — `memoryUses` parcourt la chaîne
+`dialogue_restore` (reçus valides, source recontrôlée contre son empreinte,
+racine et tours strictement décroissants), alimente l'inventaire des usages
+actifs avec les sélections d'ancêtres, refuse les filiations brisées par codes
+stables `project-memory-lineage-*` ; le garde cyclique est documenté comme
+défense en profondeur sans cas constructible (empreinte couvrant le reçu
+suivant à chaque hop, tours strictement décroissants), aligné sur le test Go
+qui n'affirme que le refus. Preuve : test
+`lineage_walk_reads_ancestors_and_refuses_broken_chains` (11 tests lib au
+total), recette mise à jour 10→11 et
+rejouée, preuve `.swarm-fixtures/versioned-memory-engine-evidence/run-20261105-3`.
+Restent fermés : surface HTTP/CLI dédiée, résumé extractif M20, droits
+lire/résumer/transmettre/compacter.
+
+## Découverte D03 — fixtures de tests Rust sous /tmp (interdiction opérateur)
+
+Origine : reprise tranche G2 filiation (6 novembre 2026). Après l'interdiction
+opérateur du 31 octobre 2026 (aucune écriture projet sous /tmp, tmpfs effacé au
+redémarrage), deux producteurs de tests Rust du dépôt créent encore leurs
+fixtures sous `std::env::temp_dir()` : `project_context.rs:593`
+(`swarm-profile-document-{label}-{pid}-{nanos}`, module
+`supplied_document_tests`) et `root_store/mission_status_review.rs:369`
+(`swarm-status-review-{pid}-{nanos}`, fixture diagnostique retenue volontairement
+par `current_review_report_and_artifact_staleness_recover` en échec). Un
+chacun laisse des répertoires résiduels sous /tmp après chaque exécution de la
+suite lib. Valeur : conformité à l'interdiction et survie des fixtures de
+diagnostic à un redémarrage (tmpfs) — la fixture retenue d'un échec est perdue
+au reboot. Propriétaire : vague BF-16b (fichiers en modification concurrente au
+moment du constat). État : découvert, qualifié, non corrigé ici (conflit
+d'édition évité) ; condition de reprise : consommer le diff BF-16b puis
+remplacer `std::env::temp_dir()` par `.swarm-fixtures/` (ou
+`~/.local/state/swarm-fixtures/`) dans ces deux producteurs, et ajouter un
+garde `tools/check_tmp_interdiction.py` ciblant ces motifs. Les répertoires
+inertes de mes propres exécutions ont été retirés ; la fixture diagnostique
+retenue du test en échec de la vague est préservée telle quelle.
+
 ## Revue et état de clôture
 
 Revue de cohérence par le même auteur : C01…C11 rattachés, PA existants conservés,
