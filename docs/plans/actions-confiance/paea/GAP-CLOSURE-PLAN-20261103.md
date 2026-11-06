@@ -170,12 +170,18 @@ project_context` — `review_document_cap_and_managed_memory_alias_refusals_are_
 inobservable. Valeur : la bascule 501 devient une simplification (le parcours
 est porté) et deux obsolences appellent une mise à jour. Propriétaire : vague
 BF-16b active sur `service.rs` au moment du constat (diff concurrent visible) ;
-test concerné modifiable après accord de la vague. État : découvert, qualifié,
-non corrigé ici pour éviter un conflit d'édition ; condition de reprise :
-consommer le diff BF-16b publié puis mettre à jour l'attente du test et
-retirer le filtre 501 ou le retourner sur les codes réels. Sans cette reprise,
-le code HTTP reste un filtre mort : sans effet de sécurité immédiat, mais un
-contrat obsolète affiché.
+test concerné modifiable après accord de la vague. **Corrigé le 6 novembre 2026**
+(ordre utilisateur « corrigés ») : attentes du test mises à jour vers les codes
+réels du garde porté (`project-memory-source-inventory`, refus causé explicite
+sur fixture nue — commentaire prouvant le portage, pas un affaiblissement des
+assertions), filtre 501 retiré au profit de `caller_invalid` (400 pour les
+entrées d'appelant invalides : `project-source-memory-managed` inclus ;
+les défaillances d'inventaire racine/SQL restent des erreurs serveur par défaut).
+Preuves : `cargo test -p swarm-engine --test project_context` 4/4 vert ;
+`cargo test -p swarm-web --test service` 10/10 ; `--lib -- project` 31/31 ;
+`--test root_project_context` 3/3 ; `cargo check -p swarm-web` 0 erreur.
+Clé UX morte remplacée dans `web/project-profile.js` (motifs français réels).
+Doc FR/EN REFERENCE.md mise à jour (garde porté, frontière 501 retirée).
 
 Tranche G2 moteur (même date) : cycle complet porté et vérifié — module
 `project_memory.rs` (10 tests), câblage `work_engine.rs` + aperçu
@@ -214,13 +220,51 @@ chacun laisse des répertoires résiduels sous /tmp après chaque exécution de 
 suite lib. Valeur : conformité à l'interdiction et survie des fixtures de
 diagnostic à un redémarrage (tmpfs) — la fixture retenue d'un échec est perdue
 au reboot. Propriétaire : vague BF-16b (fichiers en modification concurrente au
-moment du constat). État : découvert, qualifié, non corrigé ici (conflit
-d'édition évité) ; condition de reprise : consommer le diff BF-16b puis
-remplacer `std::env::temp_dir()` par `.swarm-fixtures/` (ou
-`~/.local/state/swarm-fixtures/`) dans ces deux producteurs, et ajouter un
-garde `tools/check_tmp_interdiction.py` ciblant ces motifs. Les répertoires
-inertes de mes propres exécutions ont été retirés ; la fixture diagnostique
-retenue du test en échec de la vague est préservée telle quelle.
+moment du constat). **Corrigé le 6 novembre 2026** (ordre utilisateur
+« corrigés », avec accord implicite des propriétaires vagues puisque l'utilisateur
+a ordonné la correction) : les deux producteurs déplacés vers
+`.swarm-fixtures/` avec l'idiome du dépôt (`CARGO_MANIFEST_DIR` + base 0700
+récursive + répertoire de fixture 0700) ; canonisation de la base pour les
+chemins de fixture (le test exerce `clean()` qui refuse les `..` lexicaux —
+même piège qu'un TMPDIR non canonique, précédent : `runtime_temporary.rs:10`) ;
+le `Fixture` de `tests/project_context.rs:5-7` déplacé aussi (troisième
+producteur repéré à la reprise, même classe). Preuves : producteur 1 — test
+`supplied_document_matches_reader_without_profile_writes` vert, répertoires
+vérifiés sous `.swarm-fixtures/swarm-profile-document-*`, zéro sous /tmp ;
+producteur 2 — fixture créée sous `.swarm-fixtures/swarm-status-review-*`
+(le test reste rouge uniquement à cause de l'échec préexistant de la vague
+BF-16b `gate-evidence-invalid` à `mission_status_review.rs:412`, non une
+régression du déplacement — diff purement localisateur) ; producteur 3 —
+`cargo test --test project_context` 4/4 vert après canonisation. `check_tmp_interdiction.py` :
+0 violation (le garde ne scanne pas les sources Rust — l'exclusion Rust est
+couverte par le filet TMPDIR de recipe.py et la règle source documentée ;
+extension du garde au Rust non retenue ici : ~130 sites `env::temp_dir()`
+passeraient en rouge sans traiter la cause, découverte consignée ci-dessous D04).
+Reste sous /tmp : la fixture diagnostique de la vague BF-16b
+`swarm-status-review-536028-1793974459868644663` est préservée telle quelle
+(suppression refusée à raison par le classificateur : preuve de la vague, non
+propriété de cette correction) — décision de suppression à son propriétaire.
+
+## Découverte D04 — allocations de fixtures Rust via `env::temp_dir()` (systémique)
+
+Découverte de reprise (6 novembre 2026) pendant la correction de D03 : environ
+130 sites de tests Rust du dépôt allouent leurs fixtures via
+`std::env::temp_dir()` (grep `env::temp_dir` sous `rust/crates`). Ce n'est pas
+une violation des octets sous /tmp tant que l'exécution passe par
+`tools/verification/recipe.py`, qui épingle TMPDIR vers la zone de fixtures —
+le filet documenté du garde `check_tmp_interdiction.py` (qui scanne
+volontairement `.py/.cjs/.js` seulement). Mais toute exécution cargo nue
+(TMPDIR par défaut) écrit sous /tmp : la conformité à l'interdiction du
+31 octobre repose alors sur la discipline de lancement, pas sur les octets.
+Valeur : déplacer ces sites vers l'idiome `.swarm-fixtures/` rendrait la
+conformité structurelle. Non corrigé ici : massive (≈130 sites), hors
+périmètre de l'ordre « corrigés » (D02+D03 ciblés), et un garde Rust rouge
+immédiat bloquerait toute la vague sans corriger la cause. Propriétaire :
+ouvert — à rattacher à un lot de migration ou à un accord de vague ; condition
+de reprise : décision d'étendre le garde `check_tmp_interdiction.py` aux
+sources Rust (classe `env::temp_dir()` sans TMPDIR explicite) en même temps
+que la migration des sites, producteur connu identifié : `tests/trust_biba.rs:7`
+(`biba-*`).
 
 ## Revue et état de clôture
 

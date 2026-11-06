@@ -624,6 +624,218 @@ mod tests {
         (root, work, agent, settings)
     }
 
+    /// Real kernel flock contention on the managed lane must surface as the
+    /// existing typed waiting reason without touching retained bytes, and a
+    /// later repeat after the external holder releases must recover the same
+    /// retained result. The holder is a separate owned python3 child taking
+    /// LOCK_EX on the actual settings lock file; only the real Git/prepare/
+    /// result producers of the custody fixture with supplied DTOs are
+    /// exercised. No SQL Agent, kernel receipt, confinement, grant or
+    /// acceptance is made, and no lock owner beyond this owned child is
+    /// identified or invented.
+    #[test]
+    fn managed_result_clean_lane_contention_waits_and_recovers() {
+        use std::io::{Read as _, Write as _};
+        use std::process::{Command, Stdio};
+        let (root, work, agent, settings) = custody_fixture("app");
+        let repo = work
+            .planning
+            .as_deref()
+            .and_then(|p| p.repository.as_deref())
+            .expect("fixture planning repository");
+        let managed = PathBuf::from(&repo.storage);
+        let attempt_ref = managed
+            .join("repository.git")
+            .join("refs")
+            .join("swarm")
+            .join("attempts")
+            .join(&agent.id);
+        let retained_report = managed.join("results").join(&agent.id).join("report.md");
+        let retained_manifest = managed.join("results").join(&agent.id).join("result.json");
+        let retained_proof = managed.join(format!("native-worker-{}.json", agent.id));
+        let lock_path = managed.join(".engine-settings.lock");
+        let healthy = match result::retain_result(&root, &work, &agent, &settings) {
+            Ok(Ok(value)) => (
+                value.commit.clone(),
+                value.report_sha256.clone(),
+                value.report_path.clone(),
+            ),
+            Ok(Err(reason)) => panic!("healthy retention stayed pending: {reason}"),
+            Err(e) => panic!("healthy retention failed: {e:?}"),
+        };
+        let healthy_bytes = (
+            std::fs::read(&attempt_ref).expect("retained ref missing"),
+            std::fs::read(&retained_report).expect("retained report missing"),
+            std::fs::read(&retained_manifest).expect("retained result manifest missing"),
+            std::fs::read(&retained_proof).expect("retained proof missing"),
+        );
+        let holder = "\
+import fcntl, os, sys
+fd = os.open(sys.argv[1], os.O_RDWR)
+fcntl.flock(fd, fcntl.LOCK_EX)
+sys.stdout.buffer.write(b'r')
+sys.stdout.buffer.flush()
+sys.stdin.buffer.read(1)
+fcntl.flock(fd, fcntl.LOCK_UN)
+os.close(fd)
+";
+        let mut child = Command::new("python3")
+            .arg("-c")
+            .arg(holder)
+            .arg(&lock_path)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap_or_else(|e| panic!("owned python3 lock holder failed to spawn: {e}"));
+        let mut stdout = child.stdout.take();
+        let mut stderr = child.stderr.take();
+        let handshake = match stdout.as_mut() {
+            Some(pipe) => {
+                let mut ready = [0u8; 1];
+                pipe.read_exact(&mut ready).map(|_| ready[0] == b'r')
+            }
+            None => Err(std::io::Error::new(
+                std::io::ErrorKind::BrokenPipe,
+                "lock holder stdout unavailable",
+            )),
+        };
+        // While the external holder owns the lane, retention must return the
+        // existing typed pending reason, not an outer error and not another
+        // report outcome.
+        let held = result::retain_result(&root, &work, &agent, &settings);
+        let held_bytes = (
+            std::fs::read(&attempt_ref),
+            std::fs::read(&retained_report),
+            std::fs::read(&retained_manifest),
+            std::fs::read(&retained_proof),
+        );
+        let mut stdin = child.stdin.take();
+        let release = match stdin.as_mut() {
+            Some(pipe) => pipe.write_all(b"release").and_then(|_| pipe.flush()),
+            None => Err(std::io::Error::new(
+                std::io::ErrorKind::BrokenPipe,
+                "lock holder stdin unavailable",
+            )),
+        };
+        drop(stdin);
+        let mut trailing = Vec::new();
+        let drained = match stdout.as_mut() {
+            Some(pipe) => pipe.read_to_end(&mut trailing).map(|_| ()),
+            None => Err(std::io::Error::new(
+                std::io::ErrorKind::BrokenPipe,
+                "lock holder stdout unavailable",
+            )),
+        };
+        let mut diagnostics = Vec::new();
+        let diagnostic_read = match stderr.as_mut() {
+            Some(pipe) => pipe.read_to_end(&mut diagnostics).map(|_| ()),
+            None => Err(std::io::Error::new(
+                std::io::ErrorKind::BrokenPipe,
+                "lock holder stderr unavailable",
+            )),
+        };
+        let waited = child.wait();
+        // Every outcome above is collected before any verdict, so a failed
+        // assertion can never leak the child process.
+        assert!(
+            diagnostic_read.is_ok(),
+            "reading the lock holder stderr failed: {diagnostic_read:?}"
+        );
+        assert!(
+            matches!(&handshake, Ok(true)),
+            "lock holder never signalled readiness: {handshake:?}"
+        );
+        match &held {
+            Ok(Err(reason)) => assert_eq!(
+                *reason, "managed-operation-busy",
+                "held retention reported a different pending reason"
+            ),
+            Ok(Ok(_)) => panic!("retention ran while an external holder owned the clean lane"),
+            Err(e) => panic!(
+                "held retention leaked an outer error instead of the pending reason: {e:?}"
+            ),
+        }
+        let held_ref = held_bytes
+            .0
+            .expect("retained ref disappeared during the held refusal");
+        let held_report = held_bytes
+            .1
+            .expect("retained report disappeared during the held refusal");
+        let held_manifest = held_bytes
+            .2
+            .expect("retained result manifest disappeared during the held refusal");
+        let held_proof = held_bytes
+            .3
+            .expect("retained proof disappeared during the held refusal");
+        assert_eq!(held_ref, healthy_bytes.0, "ref changed during the held refusal");
+        assert_eq!(held_report, healthy_bytes.1, "report changed during the held refusal");
+        assert_eq!(
+            held_manifest, healthy_bytes.2,
+            "result manifest changed during the held refusal"
+        );
+        assert_eq!(held_proof, healthy_bytes.3, "proof changed during the held refusal");
+        assert!(
+            release.is_ok(),
+            "releasing the lock holder failed: {:?}",
+            release.as_ref().err()
+        );
+        assert!(
+            drained.is_ok() && trailing.is_empty(),
+            "lock holder produced unexpected trailing output: {trailing:?}"
+        );
+        match waited {
+            Ok(status) => assert!(
+                status.success(),
+                "lock holder did not exit cleanly after release{}",
+                if diagnostics.is_empty() {
+                    String::new()
+                } else {
+                    format!(": {}", String::from_utf8_lossy(&diagnostics))
+                }
+            ),
+            Err(e) => panic!("waiting for the lock holder failed: {e}"),
+        }
+        let recovered = match result::retain_result(&root, &work, &agent, &settings) {
+            Ok(Ok(value)) => value,
+            Ok(Err(reason)) => panic!("retention stayed pending after release: {reason}"),
+            Err(e) => panic!("retention failed after release: {e:?}"),
+        };
+        assert_eq!(
+            recovered.commit, healthy.0,
+            "recovered commit differs from the first retention"
+        );
+        assert_eq!(
+            recovered.report_sha256, healthy.1,
+            "recovered report hash differs from the first retention"
+        );
+        assert_eq!(
+            recovered.report_path, healthy.2,
+            "recovered report path differs from the first retention"
+        );
+        let recovered_bytes = (
+            std::fs::read(&attempt_ref).expect("retained ref missing after recovery"),
+            std::fs::read(&retained_report).expect("retained report missing after recovery"),
+            std::fs::read(&retained_manifest)
+                .expect("retained result manifest missing after recovery"),
+            std::fs::read(&retained_proof).expect("retained proof missing after recovery"),
+        );
+        assert_eq!(
+            std::str::from_utf8(&recovered_bytes.0)
+                .ok()
+                .map(str::trim),
+            Some(recovered.commit.as_str()),
+            "retained ref does not name the recovered commit"
+        );
+        assert_eq!(recovered_bytes.1, healthy_bytes.1, "recovered report changed");
+        assert_eq!(
+            recovered_bytes.2, healthy_bytes.2,
+            "recovered result manifest changed"
+        );
+        assert_eq!(recovered_bytes.3, healthy_bytes.3, "recovered proof changed");
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
     /// A valid original must not silently acquire another effective command
     /// plan after a saved default changes. Restoring that default must recover
     /// the same checkpoint, without execution or stage recreation.

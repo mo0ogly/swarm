@@ -64,6 +64,66 @@ compiler graph, feature, dependency and production-binary qualification. A manif
 grants no live-state, provider or deployment authority. Review a recipe whenever
 its consumed contract changes.
 
+### Nettoyage concurrent des caches / Concurrent cache cleanup
+
+Un scan de processus seul laisse une course avec un nouveau build. Préparer les
+empreintes et copies hors verrou, puis obtenir sans attente le verrou réel du
+producteur avant de revalider inode, taille, mtime et références actives et de
+supprimer. Conserver les fichiers si le verrou est occupé ou l’identité a changé ;
+ne pas supprimer le verrou. Qualifier d’abord ce protocole avec l’outil installé.
+Cargo 1.96.0 a été observé via strace : `.cargo-build-lock` exclusif et
+`.cargo-lock` partagé ; un verrou exclusif sur le `.cargo-lock` existant a bloqué
+un Cargo témoin puis permis sa reprise. Ce verrou ne protège pas contre tous les
+lecteurs directs non coordonnés : leurs références doivent rester préservées.
+Cette méthode ne change aucune politique produit et ne qualifie pas les tests
+d’un build concurrent. Le 6 novembre 2026, un build a démarré après le scan initial
+du ménage ; le refus de rmdir a préservé ses nouveaux fichiers. La revue et les
+preuves conservées portent sur la portée exacte, pas sur une absence globale
+d’impact non mesurée. Voir le module officiel des verrous Cargo :
+https://doc.rust-lang.org/stable/nightly-rustc/cargo/util/flock/index.html.
+
+A process scan alone races a new build. Prepare hashes and copies outside the
+lock, then nonblockingly acquire the actual producer lock and revalidate file
+identity and live references before unlinking. Retain busy/changed/uncertain
+candidates; never remove a lock file. Qualify the installed tool’s protocol first.
+Observed Cargo 1.96.0 uses an exclusive `.cargo-build-lock` and shared `.cargo-lock`;
+an exclusive lock on its existing `.cargo-lock` blocked a control Cargo invocation
+and allowed completion after release. This does not exclude all uncoordinated
+direct readers. Preserve their references. It adds no product retention policy
+and proves no other build’s test verdict. Retain original races and exact proof
+scope; a directory-removal refusal preserving new files is not a complete purge.
+
+### Stockage USB préféré / Preferred USB storage
+
+Décision utilisateur du 4 novembre 2026 : privilégier les futures preuves sur la
+clé identifiée (actuellement Lexar, `/media/fpizzi/Lexar`) si elle est montée,
+inscriptible et suffisamment libre. Contrôler le support monté avant l’écriture ;
+un répertoire existant ne prouve pas la présence de la clé. Garder un index local
+avec emplacement, inventaire/empreintes et restauration. Le paramètre `--output`
+reste explicite et le dossier de sortie doit être neuf. Vérifier la compatibilité
+du parcours avant une sortie directe : FAT32 ne conserve pas les permissions/liens
+Unix et limite la taille d’un fichier. Si nécessaire, conserver fixtures et staging
+sur le stockage Unix configuré puis transférer les preuves dans des archives
+préservant les métadonnées, fractionnées selon la limite réelle du support.
+Synchroniser, relire et comparer intégralement avant de retirer les seuls originaux
+inchangés dont le déplacement est autorisé. Ne pas déplacer sources versionnées,
+missions ou travaux actifs ; conserver les FAIL. Si la clé est indisponible ou
+inadaptée, signaler explicitement le repli local et vérifier l’espace disponible.
+Cela ne modifie ni `runtime_temporary_directory`, ni une exécution déjà démarrée.
+
+User decision, 4 November 2026: prefer the identified USB drive (currently Lexar
+at `/media/fpizzi/Lexar`) for future evidence when mounted, writable and with
+adequate free space. Verify the mounted device, not merely the directory. Keep a
+local location/inventory/hash/restore index. `--output` remains explicit and its
+output directory must be fresh. Check flow compatibility before direct output:
+FAT32 lacks Unix permission/link semantics and limits individual file size. Where
+needed, keep fixtures and staging on configured Unix storage, then transfer
+metadata-preserving archives, split to the actual filesystem limit. Sync, read
+back and compare all copied content before removing only authorized unchanged
+originals. Preserve tracked sources, missions, active work and historical FAILs.
+Report any local fallback and check free space. This changes neither the configured
+`runtime_temporary_directory` nor an already running execution.
+
 ### Interdiction /tmp et aire de fixtures — /tmp interdiction and fixture area
 
 Interdiction opérateur (2026-10-31) : aucune donnée du projet sous `/tmp` (tmpfs
@@ -111,7 +171,10 @@ fixture allocation: exempt.
 
 Quand un autre travail modifie le checkout pendant un run (`source_stable: false`),
 `snapshot.py` copie **uniquement** les fichiers sélectionnés par les `inputs` de la
-recette (même sélection et mêmes refus que `recipe.py`), la recette et le lanceur,
+recette (même sélection et mêmes refus que `recipe.py`), la recette, le lanceur et
+`tests/fixture_area.py` (l'aire d'interdiction /tmp que le lanceur résout à
+l'exécution, embarqué même s'il n'est pas déclaré ; refus
+`snapshot-fixture-area-missing` s'il manque),
 dans un répertoire neuf ; il lie les dossiers de dépendances nommés (`--link`,
 jamais copiés ni déclarés) puis lance `recipe.py run --root <instantané>`. Une
 entrée non déclarée échoue visiblement au lieu d'être lue dans le checkout vivant.
@@ -124,8 +187,10 @@ python3 tools/verification/snapshot.py --recipe tools/verification/recipes/live-
 ```
 
 When concurrent work changes the checkout during a run, `snapshot.py` copies only
-the recipe's declared inputs (same selection/refusals as `recipe.py`), the manifest
-and runner into a fresh directory, symlinks named dependency directories and runs
+the recipe's declared inputs (same selection/refusals as `recipe.py`), the manifest,
+runner and `tests/fixture_area.py` (the /tmp interdiction area the runner resolves
+at run time, shipped even when undeclared; refusal `snapshot-fixture-area-missing`
+when absent) into a fresh directory, symlinks named dependency directories and runs
 the recipe with `--root` there; an undeclared input fails visibly. Before copying,
 it refuses (exit 2, `snapshot-embedded-input-undeclared: <chemins>`) a declared
 `.rs` whose literal `include_str!`/`include_bytes!` target is not declared, so a
@@ -2390,6 +2455,498 @@ built from; recipe binary witnesses stay pinned to the delivered candidate.
 Never run a live fixture's provider program against its control socket; that
 collapses the scenario run. Remaining sweep: about 120 other test scripts
 still create `/tmp` evidence dirs and must migrate to `fixture_root()`.
+
+Attente causale du producteur managed-auto (correction du 2026-11-05, preuve
+réelle `supervisor-source-fixture-missing-provider-replan.json`) : l'ancien
+`select([listener, server_fd], [], [])` de `tests/rust_managed_auto_worker.py`
+attendait indéfiniment alors que les deux agents canoniques du tour étaient déjà
+terminal failed (cause réelle : le noyau Biba refuse `socket(AF_UNIX)` par
+contrat — protection à ne PAS affaiblir). Le nouveau helper documenté
+`await_provider_turn` remplace ce select : souscription inotify sur
+`root/'.swarm'` (`worker.watch_directory`, `modifications=True`) AVANT la
+première lecture publique, relecture publique après activité réelle de la base
+ou socket lisible, BUSY SQLite structuré conservé comme refus avec sa raison
+(jamais un succès vide), refus terminal structuré pour tout agent nouvellement
+lancé qui n'est plus starting/running — exception typée
+`ManagedAutoTerminalRefusal` : message rendu minimal et sûr (identifiant,
+statut, exit code, code d'échec public seulement), payload public complet
+conservé dans l'attribut possédé `payload` (exit code, `native_execution_result`,
+cause réelle comme EPERM sur `socket(AF_UNIX)`, agent public intégral) pour un
+accès programmatique exact —, agents des tours précédents ignorés par identité
+(id + génération strictement croissante), refus immédiat si la socket
+conducteur devient lisible (serveur sorti avant le provider), priorité du
+terminal sur une connexion prête simultanément : relecture publique AVANT
+`accept` après activité réelle, connexion refusée laissée non consommée dans le
+backlog, fermeture contrôlée du descripteur en toutes sorties — succès rendu
+seulement APRÈS fermeture et vérification des causes, refus de fermeture
+conservé avec l'agent public sans jamais rendre un succès à erreur perdue ni
+fuir la socket acceptée (`_close_watch_fd` cousu module-level pour la régression
+ciblée). Aucun timeout global, polling temporel, plafond, retry ni attente sur
+texte ; les `failure.json` et le cleanup publics existants restent inchangés.
+Limites : la fenêtre sonde/acceptation reste causale, pas atomique ; sans aucun
+événement l'attente se poursuit (pas de minuteur autorisé). Régressions ciblées :
+`python3 tests/test_managed_auto_provider_wait.py -v` (lancement direct qui rend
+`tests/` importable — la forme `python3 -m unittest
+tests.test_managed_auto_provider_wait -v` échoue en ImportError réelle du
+2026-11-05, 0 cas exécuté ; fixtures simulées clairement étiquetées, aucun
+binaire produit ni fausse acceptation ; zone de fixtures explicite via
+`SWARM_TEST_FIXTURE_AREA`, par défaut `<repo>/.swarm-fixtures`, jamais /tmp) ;
+Codex l'exécute personnellement après stabilité des sources. (Phrase
+historique 2026-11-05, remplacée depuis : « tant que le raccord managed-auto
+du rendez-vous n'existe pas, régénérer les fixtures avec le binaire sans
+sandbox ci-dessus » — ce binaire n'établit aucune preuve Biba et n'est plus
+la route indiquée ; voir le raccord codé plus bas.)
+FR — Rendez-vous de fixture par fichiers du provider (2026-11-05, module
+standalone vérifié par Codex : 23 tests OK, exit 0, sans ResourceWarning) :
+Biba refuse volontairement
+`socket(AF_UNIX)` (protection à ne pas affaiblir) ; le nouveau module
+`tests/rust_managed_file_provider.py` remplace la socket de contrôle des
+providers de fixture par des fichiers réguliers DANS un workspace. Côté
+enfant, `program(nonce, turn_name)` produit un provider Python inerte sans
+aucune socket : vrai stdin jusqu'à EOF, `--model` en argv,
+`model-received.json` hérité (champs pid/ppid/stdin_sha256/stdin_bytes/argv),
+inotify du workspace SOUSCRIT AVANT la publication de `ready-<tour>.json`
+(temp 0600 exclusif, fsync, rename ; champs nonce,pid,ppid,sid,pgid) ; chaque
+requête de probe identifiée est répondue par un fichier reply atomique
+portant la même identité ; `release-<tour>.json` doit porter exactement
+`{'nonce':…,'release':True}` ou l'enfant refuse avec cause conservée et vraie
+sortie non nulle ; release valide donne `handoff.md` puis les trois événements
+JSONL usage 7/8, `total_cost_usd` 1, sans modèle payant. Les fichiers créés
+par l'enfant (`model-received.json`, `handoff.md`) sont ouverts 0600 dès
+`os.open` exclusif (pas d'umask ambiante, pas de chmod après coup) ; tous les
+fichiers du protocole sont donc réellement 0600. Côté parent,
+`FileRendezvous` reçoit workspace/nonce/nom de tour, une identité DÉJÀ validée
+par l'appelant et un pidfd appartenant à l'appelant ; il ne valide ni ne
+fabrique aucune autorité UID/root et ne signale aucun PID — les champs
+nonce/PID déclarés doivent correspondre à l'identité fournie, un rapport
+n'autorise jamais un PID. API explicite `ready()`/`probe()`/`release()` ;
+souscription inotify avant première lecture ; `select(watch, pidfd)` causal :
+la mort réelle de l'enfant avant ready/probe termine l'attente par refus, pas
+de boucle infinie, sans délai, poll temporel, plafond, tentative ni watchdog.
+Publication lue complète seulement après rename atomique ; refus lien
+symbolique (O_NOFOLLOW), lien physique (st_nlink>1), traversée, hors
+workspace, mauvais nonce et PID forgé, originaux préservés ; création
+parente exclusive 0600/fsync sans suppression ni remplacement d'originaux ;
+probes identifiées jamais réutilisées, sans plafond ; fermeture via un seam
+module avec causes primaire+secondaire conservées et retour après erreurs
+vérifiées. Limites : protocole de fixture seulement — ni confinement ni
+acceptation ; les tests standalone ne prouvent PAS Biba réel, le prochain
+raccord managed-auto (identité publique/pidfd et deux vrais tours) devra
+l'établir. Régressions ciblées :
+`python3 tests/test_managed_file_provider.py -v` (lancement direct qui rend
+`tests/` importable ; témoin Popen réel stdin→ready→probe→release→exit0,
+refus nonce/PID forgé/lien/traversée sans perte de preuves, mort réelle avant
+ready/probe via pidfd, refus de fermeture injecté avec témoin valide avant ;
+déterminisme causal sans sleep ni watchdog arbitraire ; fixtures via
+`fixture_area.fixture_root`, jamais /tmp, aucune DB live) ; Codex l'exécute
+personnellement après stabilité des sources (25 gardes protocole OK exit 0
+sans ResourceWarning, vérifiées personnellement par Codex le 2026-11-05 :
+23 initiales + garde 24 terminal externe + garde constructeur
+`terminal_fds` ; les 9 gardes helper `await_provider_turn` le sont aussi —
+le helper reste qualifié lecture inchangé mais n'est PLUS appelé par run).
+Raccord managed-auto (2026-11-05, CODÉ mais NON EXÉCUTÉ) : `run()` de
+`tests/rust_managed_auto_worker.py` utilise désormais le module vérifié
+(`file_provider.program(nonce, turn_name)` + `FileRendezvous(workspace,
+nonce, turn_name, identity, pidfd, terminal_fds=(('conductor', server_fd),
+('helper', supervisor_fd)))) pour les deux vrais tours : bootstrap SANS
+socket — le helper `_attach_canonical_agent` attend le nouvel agent via
+public `mission status-native` + `agent show` (inotify Root/'.swarm' souscrit
+AVANT le premier read, BUSY structuré conservé, refus terminal typé
+`ManagedAutoTerminalRefusal`, aucun poll temporel/timeout/retry) puis
+valide l'identité kernel (`_attach_agent_kernel` : stamps `supervisor_pid`/
+`child_pid`/`supervisor_identity`/`child_identity` comparés au /proc réel,
+chaîne provider→supervisor→serveur possédé, argv superviseur EXACT, hash
+`/proc/<supervisor>/exe` == image, pidfds caller-owned, aucun pidfd
+abandonné sur refus partielle) ; ready/probe causaux côté conducteur, stop
+serveur réel puis adoption (`ppid == os.getpid()`), release physique après
+le stop, settlement inchangé ; `release-<turn>.json` garde le nommage
+protocole pour tous les tours, `model-received.json`/`handoff.md` restent
+renommés par `disjoint_results` ; aucune revendication SO_PEERCRED sur
+aucun canal ; un rapport (payload public ou fichier) ne fait jamais que
+répéter une identité déjà établie du /proc réel — il n'autorise jamais un
+PID. MAIS ce raccord n'a PAS encore été exécuté : Biba réel, producteur
+normal et parcours HTTP positifs restent inconnus jusqu'à la vérification
+personnelle de Codex (compatibilité 9 helper puis nouveau producteur normal
+332/profile exact avant HTTP positif). Les vieux conseils « binaire sans
+sandbox » du paragraphe sur la régénération de fixtures sont HISTORIQUES :
+ce binaire n'établit aucune preuve Biba et n'est pas la route par défaut ;
+un nouveau producteur réel sera produit par Codex après stabilité, sans
+réutiliser une ancienne fixture failed/copie/faux result. Option
+`terminal_fds` ajoutée au module vérifié : tuples `(role, fd)` appartenant
+à l'appelant, observés par le même selector causal (erreur nommant le ROLE
+si un terminal externe devient lisible, aucun fd de l'appelant fermé,
+défaut sans option inchangé).
+Correction refus terminal faux sur `queued` (2026-11-05, CODÉ mais NON
+EXÉCUTÉ ; preuve réelle du premier refus par Codex :
+`docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-managed-public-identity-attach-20261105T054735Z/supervisor-source-fixture.stdout/.stderr/.exit.json`
+et `supervisor-source-fixture-20261105T060141Z`, root privé conservé) : sur le
+producteur réel, `_running_new_agent` a classé TERMINAL un agent public
+`status=queued`, `exit_code=null` — erreur de protocole : l'état Queued est
+légitime et validé par `agent_execution_preflight.rs` (PIDs 0, stamps vides,
+`native_execution_result` None), et le contrat produit
+`agent_contract.rs` `is_active` reconnaît `queued|starting|running|stopping`
+comme membres actifs. Correctif appliqué dans
+`tests/rust_managed_auto_worker.py` : `_running_new_agent` ET
+`_observe_new_agents` suivent l'appartenance de cycle de vie — `queued`,
+`starting`, `stopping` continuent d'observer (jamais terminal faux) ;
+`running` n'est candidat qu'avec PIDs entiers positifs ET stamps chaînes
+décimales non vides (`supervisor_identity`/`child_identity`), sinon l'activité
+causale continue ; seuls les vrais terminaux `failed`/`completed` déclenchent
+le refus typé payload-safe ; un statut inconnu/malformed (y compris un payload
+sans statut) conserve la cause de phase via l'exception typée bornée
+`ObservationRefusal` (message statique sûr rendant AUCUN champ de payload —
+la valeur du statut elle-même pourrait porter un secret — payload public
+complet conservé dans l'attribut possédé ``payload``, jamais de dump dans
+message/repr/traceback, jamais succès vide, jamais classification terminale
+fabriquée ; la classe `ManagedAutoTerminalRefusal` n'est ni affaiblie ni
+réutilisée). Même incrément :
+`_attach_canonical_agent` ne fait plus `return` dans le try après attachement
+des 2 pidfds (l'ancienne faute déjà corrigée dans `await_provider_turn`) — le
+résultat n'est rendu qu'APRÈS la fermeture watch contrôlée ; si la fermeture
+watch échoue après attachement réussi, les 2 pidfds sont explicitement rendus
+avec leurs erreurs secondaires groupées et aucun succès n'est rendu ; le
+pending BUSY est effacé (`pending=None`) par la fresh read valide. Trois
+nouvelles régressions ciblées dans `tests/test_managed_auto_provider_wait.py`
+(9 gardes existantes préservées, 12 au total) : queued→running après vraie
+activité (attachement kernel EXPLICITEMENT simulé — deux descripteurs réels
+possédés comme stand-ins, aucun droit signal, aucun fait /proc revendiqué),
+queued→failed préserve la cause sans faux premier refus, fermeture watch
+refusée après attachement rend les 2 pidfds sans succès perdu. Réception
+critique du 2026-11-05 (CODÉ mais NON EXÉCUTÉ) : la garde de fermeture
+n'affirme l'EBADF des 2 descripteurs rendus qu'AVANT son cleanup de test
+(l'ancienne version fermait d'abord dans le finally — garde passant à vide) ;
+une phase seam bornée annule la fermeture des seuls 2 FDs retournés pour
+prouver la non-vacuité (la garde passe ROUGE, AssertionError attendue au sein
+de la régression, jamais fausse acceptation ; le cleanup ferme par identité
+st_dev/st_ino uniquement les FDs encore possédés par la fixture) ; deux
+gardes `ObservationRefusal` plantent un nonce dans statut/prompt/context/
+capture (absent de str, repr, traceback rendu ; payload strictement égal
+accessible) et un payload sans statut (payload exact, raison statique, jamais
+succès vide) — 14 gardes au total. NON EXÉCUTÉ :
+Codex exécute `python3 tests/test_managed_auto_provider_wait.py -v` puis le
+NOUVEAU producteur normal après stabilité, pas l'ancien état muté.
+FR — Frontière d'observation SQL causale du producteur managed-auto (2026-11-05,
+CODÉ mais NON EXÉCUTÉ ; constat réel Codex sur le producteur NORMAL333 qualifié
+`ee1d29c5…f220` : premier vrai cycle worker entièrement passé, réouverture pause
+passée, second `_attach_canonical_agent` réussi, puis le SELECT direct
+`rows()` sur `managed_attempts` a levé `sqlite3.OperationalError: database is
+locked` — `rows()` ouvre readonly timeout=0 pendant que le serveur natif/worker
+réel écrit au démarrage ; FAIL original conservé, aucun rerun inchangé) : les
+assertions SQL brutes de `run()` sont déplacées hors des phases d'écriture
+concurrente vers les fenêtres stables existantes. (1) Les vérifications
+`managed_attempts` « ready » et `workspace_turns` « waiting » (tour 0) sont lues
+APRÈS `server.stop()`/`native.finish` et AVANT `rendezvous.release()` : ready
+et probe déjà acquis causalement, serveur réellement arrêté, pidfd du helper
+et identité provider validée toujours détenues, provider lui-même BLOQUÉ sur
+`release-<tour>.json` — la sonde suit les écritures concurrentes connues ;
+tout refus reste un échec, et le release qui suit commence exactement le
+settlement que ces lignes attestent (jamais déplacé au-delà du
+release/settlement qu'elles observent). (2) L'`assert_resources` de la
+réouverture en pause (tour 1) est lue AVANT le démarrage du second serveur —
+lignes réglées du tour 0, aucun écrivain vivant — tandis que l'observation
+HTTP publique « paused » reste sur le serveur rouvert live. Toutes les
+assertions exactes sont conservées (témoins inchangés : seconde tâche en
+attente sans seconde copie) ; ni timeout global, ni busy_timeout, ni
+retry/sleep/poll, ni changement SQLite produit ; les `assert_resources`
+post-release/settlement et les lectures HTTP publiques gardent leur position
+de témoin ; aucun mock unitaire miroir. NON EXÉCUTÉ : Codex relance
+personnellement le producteur source frais (deux vrais cycles + reviewer +
+publication) sur le même NORMAL333 qualifié après handback stable, puis
+poursuit la porte e2e d'approbation originale.
+EN — Managed-auto producer causal wait (2026-11-05 correction, real evidence
+`supervisor-source-fixture-missing-provider-replan.json`): the former bare
+`select([listener, server_fd], [], [])` in `tests/rust_managed_auto_worker.py`
+waited forever while both canonical agents of the turn were already terminal
+failed (real cause: the Biba kernel refuses `socket(AF_UNIX)` by contract —
+protection must NOT be weakened). The new documented helper
+`await_provider_turn` replaces that select: inotify subscription on
+`root/'.swarm'` (`worker.watch_directory`, `modifications=True`) BEFORE the
+first public read, public re-read after real database activity or a readable
+socket, structured SQLite BUSY preserved as a refusal with its reason (never an
+empty success), structured terminal refusal for any newly launched agent no
+longer starting/running — typed exception `ManagedAutoTerminalRefusal`: the
+rendered message stays minimal and safe (identifier, status, exit code and
+public failure code only), the full public payload is kept in the owned
+`payload` attribute (exit code, `native_execution_result`, the real cause such
+as EPERM on `socket(AF_UNIX)`, the whole public agent) for exact programmatic
+access —, previous-turn agents ignored by identity (id + strictly increasing
+generation), immediate refusal when the conductor socket becomes readable
+(server exited before the provider), terminal priority over a simultaneously
+ready connection: public re-observation BEFORE `accept` after real activity,
+the refused connection left unconsumed in the backlog, controlled descriptor
+closure on every exit path — success returned only AFTER closure and cause
+check, a refusing close conserved with the public agent without ever returning
+a lost-error success or leaking the accepted socket (`_close_watch_fd`
+module-level seam for the targeted regression). No global timeout, temporal
+polling, cap, retry or text-based wait; the existing public `failure.json`
+writing and cleanup stay unchanged. Limits: the probe/accept window stays
+causal, not atomic; with no event at all the wait continues (no timer allowed).
+Targeted regressions: `python3 tests/test_managed_auto_provider_wait.py -v`
+(direct run which makes `tests/` importable — the `python3 -m unittest
+tests.test_managed_auto_provider_wait -v` form failed with a real ImportError
+on 2026-11-05, 0 cases executed; clearly labeled simulated fixtures, no product
+binary and no fabricated acceptance; explicit fixture area via
+`SWARM_TEST_FIXTURE_AREA`, default `<repo>/.swarm-fixtures`, never /tmp); Codex
+executes it personally after sources are stable. (Historical sentence as of
+2026-11-05, superseded since: "until the managed-auto wiring of the rendezvous
+exists, regenerate fixtures with the sandbox-less binary from the paragraph
+above" — that binary establishes no Biba evidence and is no longer the
+indicated route; see the coded wiring below.)
+EN — File-based fixture rendezvous for the provider (2026-11-05, standalone
+module verified by Codex: 23 tests OK, exit 0, no ResourceWarning): Biba
+voluntarily refuses
+`socket(AF_UNIX)` (protection not to be weakened); the new module
+`tests/rust_managed_file_provider.py` replaces the fixture providers' control
+socket with regular files INSIDE one workspace. On the child side,
+`program(nonce, turn_name)` produces an inert Python provider with no socket
+at all: real stdin to EOF, `--model` on argv, inherited `model-received.json`
+(fields pid/ppid/stdin_sha256/stdin_bytes/argv), workspace inotify subscribed
+BEFORE publishing `ready-<turn>.json` (exclusive 0600 temp, fsync, rename;
+fields nonce,pid,ppid,sid,pgid); each identified probe request is answered by
+an atomic reply file carrying the same identity; `release-<turn>.json` must
+carry exactly `{'nonce':…,'release':True}` or the child refuses with its cause
+conserved and a real non-zero exit; a valid release produces `handoff.md` then
+the three JSONL events usage 7/8, `total_cost_usd` 1, with no paid model. The
+files the child creates (`model-received.json`, `handoff.md`) are opened 0600
+from the exclusive `os.open` itself (no ambient umask, no after-the-fact
+chmod); every protocol file is therefore really 0600. On
+the parent side, `FileRendezvous` receives workspace/nonce/turn name, an
+identity the caller has ALREADY validated, and a caller-owned pidfd; it never
+validates or manufactures any UID/root authority and never signals a PID —
+declared nonce/PID fields must match the provided identity, a report never
+authorizes a PID. Explicit `ready()`/`probe()`/`release()` API; inotify
+subscription before the first read; causal `select(watch, pidfd)`: the real
+child death before ready/probe terminates the wait with a refusal, no infinite
+loop, no delay, temporal poll, cap, retry or watchdog. Publications are read
+completely only after their atomic rename; symlink (O_NOFOLLOW), hard link
+(st_nlink>1), traversal, outside-workspace, wrong-nonce and forged-PID
+refusals preserve the originals; parent creation is exclusive 0600/fsync
+without deleting or replacing originals; identified probes are never reused,
+with no cap; closure goes through a module seam with primary+secondary causes
+conserved and a return only after errors are verified. Limits: fixture
+protocol only — neither confinement nor acceptance; standalone tests do NOT
+prove the real Biba, the upcoming managed-auto wiring (public identity/pidfd
+and the two real turns) will have to establish it. Targeted regressions:
+`python3 tests/test_managed_file_provider.py -v` (direct run which makes
+`tests/` importable; real Popen witness stdin→ready→probe→release→exit0,
+wrong-nonce/forged-PID/link/traversal refusals without evidence loss, real
+death before ready/probe via pidfd, injected close refusal with a valid
+witness first; causal determinism without sleep or arbitrary watchdog;
+fixtures via `fixture_area.fixture_root`, never /tmp, no live DB); Codex
+executes it personally after sources are stable (25 protocol guards OK exit 0
+without ResourceWarning, personally verified by Codex on 2026-11-05: 23
+initial + guard 24 external terminal + the `terminal_fds` constructor guard;
+the 9 `await_provider_turn` helper guards are verified too — the helper keeps
+its unchanged read qualification but is NO LONGER called by run). Managed-auto
+wiring (2026-11-05, CODED but NOT EXECUTED): the `run()` of
+`tests/rust_managed_auto_worker.py` now uses the verified module
+(`file_provider.program(nonce, turn_name)` + `FileRendezvous(workspace, nonce,
+turn_name, identity, pidfd, terminal_fds=(('conductor', server_fd),
+('helper', supervisor_fd)))`) for the two real turns: SOCKET-FREE bootstrap —
+the `_attach_canonical_agent` helper waits for the newly launched agent via
+public `mission status-native` + `agent show` (inotify on root/'.swarm'
+subscribed BEFORE the first read, structured BUSY kept as a refusal, typed
+`ManagedAutoTerminalRefusal`, no temporal poll/timeout/retry) then validates
+the kernel identity (`_attach_agent_kernel`: `supervisor_pid`/`child_pid`/
+`supervisor_identity`/`child_identity` stamps compared to the real /proc,
+parent chain provider→supervisor→owned server, EXACT supervisor argv, real
+`/proc/<supervisor>/exe` hash == provided image, caller-owned pidfds, no
+pidfd abandoned on a partial refusal); causal ready/probe on the conductor
+side, real server stop then adoption (`ppid == os.getpid()`), physical
+release after the stop, settlement unchanged; `release-<turn>.json` keeps
+the protocol naming for every turn, `model-received.json`/`handoff.md` stay
+renamed by `disjoint_results`; no SO_PEERCRED is claimed on any channel; a
+report (public payload or file) only ever repeats an identity already
+established from real /proc facts — it never authorizes a PID. BUT this
+wiring has NOT been executed yet: the real Biba behavior, the normal producer
+and the positive HTTP path remain unknown until Codex's personal verification
+(helper 9 compatibility then a NEW normal producer 332/exact profile before
+positive HTTP). The old "sandbox-less binary" advice in the fixture-regeneration
+paragraph is HISTORICAL: that binary establishes no Biba proof and is not the
+default route; a new real producer will be produced by Codex after stability,
+without reusing any old failed/copied/fake-result fixture. The optional
+`terminal_fds` parameter was added to the verified module: caller-owned
+`(role, fd)` tuples observed by the same causal selector (an error naming the
+ROLE fires when an external terminal becomes readable, no caller fd is ever
+closed, the no-option default is unchanged).
+EN — False terminal refusal on `queued` correction (2026-11-05, CODED but NOT
+EXECUTED; real first-refusal evidence recorded by Codex:
+`docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-managed-public-identity-attach-20261105T054735Z/supervisor-source-fixture.stdout/.stderr/.exit.json`
+and `supervisor-source-fixture-20261105T060141Z`, private root retained): on
+the real producer run, `_running_new_agent` classified a public agent with
+`status=queued`, `exit_code=null` as TERMINAL — a protocol error: the Queued
+state is legitimate and validated by `agent_execution_preflight.rs` (PIDs 0,
+empty stamps, `native_execution_result` None), and the product contract
+`agent_contract.rs` `is_active` recognizes
+`queued|starting|running|stopping` as active membership. Fix applied in
+`tests/rust_managed_auto_worker.py`: `_running_new_agent` AND
+`_observe_new_agents` now follow the product lifecycle membership — `queued`,
+`starting`, `stopping` keep observing (never falsely terminal); a `running`
+entry is a candidate only with positive-int PIDs AND non-empty decimal stamp
+strings (`supervisor_identity`/`child_identity`), otherwise causal activity
+continues; only the real terminals `failed`/`completed` raise the typed
+payload-safe refusal; an unknown/malformed status (including a payload
+without a status at all) conserves the phase cause via the bounded typed
+exception `ObservationRefusal` (static safe message rendering NO payload
+field — the status value itself could carry a secret — complete public
+payload kept in the owned ``payload`` attribute, never dumped into
+message/repr/traceback, never an empty success, never a fabricated terminal
+classification; `ManagedAutoTerminalRefusal` is neither weakened nor reused).
+Same
+increment: `_attach_canonical_agent` no longer returns inside the try after
+attaching the 2 pidfds (the old fault already corrected in
+`await_provider_turn`) — the result is returned only AFTER the controlled
+watch closure; when the watch close fails after a successful attachment, both
+pidfds are explicitly released with their secondary errors grouped and no
+success is returned; the pending BUSY is cleared (`pending=None`) by the
+fresh valid read. Three new targeted regressions in
+`tests/test_managed_auto_provider_wait.py` (9 existing guards preserved, 12
+total): queued→running after real activity (kernel attachment EXPLICITLY
+simulated — two real owned descriptor stand-ins, no signal right, no /proc
+fact claimed), queued→failed cause preserved without a false first refusal,
+refusing watch close after attachment releasing both pidfds without a
+lost-error success. Critical reception of 2026-11-05 (CODED but NOT
+EXECUTED): the close guard asserts the EBADF of the 2 released descriptors
+BEFORE its test cleanup (the former version closed them in the finally first
+— a vacuously passing guard); a bounded seam phase suppresses the close of
+exactly the 2 returned fds to prove non-vacuity (the guard goes RED, an
+expected AssertionError inside the regression, never a false acceptance;
+cleanup closes by st_dev/st_ino identity only fds still owned by the
+fixture); two `ObservationRefusal` guards plant a nonce in
+status/prompt/context/capture (absent from str, repr and the rendered
+traceback; strictly equal payload stays accessible) and a payload without a
+status (exact payload, static reason, never an empty success) — 14 guards
+total. NOT EXECUTED: Codex runs
+`python3 tests/test_managed_auto_provider_wait.py -v` then the NEW normal
+producer after stability, not the old mutated state.
+EN — Managed-auto causal SQL observation boundary (2026-11-05, CODED but NOT
+EXECUTED; real Codex finding on the qualified NORMAL333 producer
+`ee1d29c5…f220`: the first real worker cycle fully passed, the paused reopen
+passed, the second `_attach_canonical_agent` succeeded, then the direct
+`rows()` SELECT on `managed_attempts` raised `sqlite3.OperationalError:
+database is locked` — `rows()` opens readonly timeout=0 while the real native
+server/worker writes at startup; the original FAIL is retained, no unchanged
+rerun): the raw SQL assertions of `run()` are moved out of concurrent
+live-writer phases into the existing stable windows. (1) The `managed_attempts`
+"ready" and `workspace_turns` "waiting" (turn 0) checks are read AFTER
+`server.stop()`/`native.finish` and BEFORE `rendezvous.release()`: ready and
+probe already causally acquired, the server really stopped, the helper pidfd
+and the validated provider identity still held, the provider itself BLOCKED on
+`release-<turn>.json` — the probe follows the known concurrent write phase;
+any refusal remains a failure, and the following release starts exactly the settlement those rows
+witness (never moved beyond the release/settlement they observe). (2) The
+paused-reopen `assert_resources` (turn 1) is read BEFORE the second server
+starts — settled turn-0 rows, no live writer — while the public "paused" HTTP
+observation stays on the live reopened server. All exact assertions are
+retained (unchanged witnesses: second task waiting without a second copy); no
+global timeout, no busy_timeout, no retry/sleep/poll, no product SQLite
+change; post-release/settlement `assert_resources` and public HTTP reads keep
+their witness positions; no mirroring unit mocks. NOT EXECUTED: Codex
+personally reruns the fresh source producer (two real cycles + reviewer +
+publication) on the same qualified NORMAL333 after the stable handback, then
+continues the original approval e2e gate.
+FR — Fixture reviewer native : config gelée embarquée et marqueur dans le vrai
+output I0 (2026-11-05, CODÉ mais NON EXÉCUTÉ) : le cwd réel du provider inerte
+est la feuille I0 créée par le moteur `.swarm/biba-i0/reviewer/{request.event_id}`
+(contrat natif `native_provider_workspace.rs`, claim = event_id de la requête
+vérifiée, aucune autorité conférée) — l'ancienne écriture d'un config/marqueur
+relatifs à Root échouait (FileNotFoundError réel du producteur). Le programme
+généré par `tests/rust_native_managed_reviewer.py` embarque sa config JSON
+sérialisée quotésûre (aucun fichier Root lu, aucun fallback cwd) et publie le
+marqueur d'invocation réel O_EXCL 0600 + flush/fsync DANS ce cwd (champs
+pid/ppid/stdin_sha256/context_sha256/catalog_sha256/native_invocation_supported,
+observation de fixture — ni permission, ni indépendance, ni acceptation).
+Toute lecture parent passe par `reviewer_leaf`/`read_reviewer_marker` : claim
+simple refusant traversée/lien, containment résolue, owner (st_dev, st_ino)
+optionnel, marqueur racine historique reconnu schéma incompatible — jamais
+consommé ni réécrit. Les consommateurs `run`, `recover_original` et
+`tests/rust_native_first_publication.py` sont raccordés à l'event_id RETENU de
+`native-review.input.json` (écrit par invoke avant l'appel) ; no-new-call/débit,
+finance, work et original natif restent prouvés. Variantes : `publish-refusal`
+— l'obstruction répertoire `.swarm/native-review-context-v1-<context_sha256>.json`
+est plantée par le parent AVANT l'appel public, retirée AVANT reconcile,
+restauration garantie en finally ; `source` écrit le fichier suivi par son
+chemin ABSOLU déclaré (chronologie causale réelle) — limites de variantes
+conservées, aucun affaiblissement Biba. Régression ciblée :
+`python3 tests/test_managed_reviewer_fixture_workspace.py -v` (Popen réel du
+programme inerte avec cwd privé ≠ Root, config embarquée sans fichier root,
+stdin de protocole clairement simulé → marqueur 0600 + frames + exit 0 ; refus
+claim/lien/owner/marqueur racine conservés ; ne prouve NI Biba NI permission
+native NI acceptation) — NON EXÉCUTÉ : Codex lance d'abord ce script ciblé puis
+le VRAI producteur NEW normal 332/profil exact après stabilité des sources,
+jamais une copie d'un run failed.
+Correction lecture unique / raw retenu (2026-11-05, CODÉ mais NON EXÉCUTÉ ;
+3 gardes ciblées précédentes vérifiées personnellement par Codex, preuve
+`supervisor-reviewer-workspace-three`) : `read_reviewer_marker` n'a PLUS
+d'option `wait` (branche inventée à boucle vide infinie supprimée) — lecture
+UNIQUE après l'issue réelle connue de la CLI, marqueur absent →
+FileNotFoundError/refus legacy causal, jamais d'attente texte/timer/retry ni
+de borne ajoutée pour masquer. `run` gèle les octets EXACTS du marqueur AVANT
+parsing et la replay les compare à CES octets (source de vérité), jamais à une
+re-canonification JSON — `json.dump` écrit avec espacements, un JSON compact
+n'est jamais égal à la preuve originale, laquelle n'est ni réécrite ni
+canonisée. Une garde Popen réelle dans une feuille I0 SIMULÉE clairement
+(répertoires de fixture ordinaires, aucun label engine/permission fabriqué)
+prouve que le helper retourne les octets exacts du provider (espacement
+préservé, prouvé ≠ JSON compacté) et qu'un marqueur absent refuse après la
+vraie sortie de l'enfant. Variante `source` : elle écrit le chemin ABSOLU
+HORS feuille I0 — la vraie Biba refuse cette écriture, la variante reste NON
+QUALIFIÉE avec limite visible (le passer à `os.open(...,0700)` ne créerait PAS
+de chronologie causale réelle) ; `publish-refusal` reste à qualifier
+indépendamment. Limites : pid/ppid du marqueur sont des champs de cohérence —
+jamais une qualification d'identité de processus ; le vrai NEW producer et la
+raw frame restent personnels à Codex.
+EN — Native reviewer fixture: frozen embedded config and marker in the REAL I0
+output (2026-11-05, CODED but NOT EXECUTED): the inert provider's real cwd is
+the engine-created I0 leaf `.swarm/biba-i0/reviewer/{request.event_id}` (native
+contract `native_provider_workspace.rs`, claim = the verified request event_id,
+no authority conferred) — the former Root-relative config/marker writes failed
+with the producer's real FileNotFoundError. The program generated by
+`tests/rust_native_managed_reviewer.py` embeds its serialized JSON config
+quoting-safe (no Root file read, no cwd fallback) and publishes the
+real-invocation marker O_EXCL 0600 + flush/fsync INSIDE that cwd (fields
+pid/ppid/stdin_sha256/context_sha256/catalog_sha256/native_invocation_supported
+— fixture observation, neither permission, nor independence, nor acceptance).
+Every parent read goes through `reviewer_leaf`/`read_reviewer_marker`: simple
+claim refusing traversal/links, resolved containment, optional (st_dev, st_ino)
+owner, historical root marker recognized as an incompatible schema — never
+consumed or rewritten. Consumers `run`, `recover_original` and
+`tests/rust_native_first_publication.py` are rewired to the RETAINED event_id
+of `native-review.input.json` (written by invoke before the call); no-new-call/
+debit, finance, work and native-original assertions stay in place. Variants:
+`publish-refusal` — the `.swarm/native-review-context-v1-<context_sha256>.json`
+directory obstruction is planted by the PARENT BEFORE the public call, removed
+BEFORE reconcile, restoration guaranteed in finally; `source` writes the
+tracked file at its DECLARED ABSOLUTE path (real causal chronology) — variant
+limits conserved, no Biba weakening. Targeted regression:
+`python3 tests/test_managed_reviewer_fixture_workspace.py -v` (real Popen of
+the inert program with a private cwd ≠ Root, embedded config with no root
+file, clearly simulated protocol stdin → 0600 marker + frames + exit 0;
+claim/link/owner/root-marker refusals conserved; proves NEITHER Biba NOR
+native permission NOR acceptance) — NOT EXECUTED: Codex first runs this
+targeted script then the REAL NEW normal producer 332/exact profile after
+source stability, never a copy of a failed run.
+Single-read / exact-raw correction (2026-11-05, CODED but NOT EXECUTED; the
+previous 3 targeted guards personally verified by Codex, evidence
+`supervisor-reviewer-workspace-three`): `read_reviewer_marker` no longer has a
+`wait` option (the invented infinite busy-spin branch is removed) — a SINGLE
+read after the CLI call whose real outcome is already known, absent marker →
+causal FileNotFoundError/legacy refusal, never text-based waits/timers/retries
+and no added bound to mask anything. `run` freezes the marker's EXACT bytes
+BEFORE parsing and the replay compares THOSE bytes (source of truth), never a
+JSON re-canonicalization — `json.dump` writes with spacing, a compacted JSON is
+never equal to the original evidence, which is neither rewritten nor
+canonicalized. A real Popen guard in a CLEARLY SIMULATED I0-like leaf (plain
+fixture directories, no fabricated engine label/permission) proves the helper
+returns the provider's exact bytes (spacing preserved, provably ≠ compacted
+JSON) and that an absent marker refuses after the child's real exit. Variant
+`source`: it writes the declared ABSOLUTE path OUTSIDE the I0 leaf — real Biba
+refuses that write, so the variant stays NOT QUALIFIED with its limit visible
+(switching it to `os.open(...,0700)` would NOT create real causal chronology);
+`publish-refusal` stays to be qualified independently. Limits: the marker's
+pid/ppid are coherence fields — never a process-identity qualification; the
+real NEW producer and raw frame remain Codex's personal steps.
+
 The source case checks actual shared-lane writer contention, retained custody
 after repository-capability close, wrong Root/candidate, bare and lock inode
 substitution/refusal/restoration, explicit source close/writer recovery and
@@ -2845,10 +3402,24 @@ no acceptance.
 
 FR : la recette `recipes/paea-git-call-approval-rust.json` exécute le contrôle
 permanent du canal HTTP `POST /api/v1/paea/git-call/approval` sur le test
-`paea_git_call` de swarm-web. Sept étapes nommées : observation moteur des
-accords (7 tests `root_store::paea_git_agreement`) ; parcours positif
+`paea_git_call` de swarm-web. Neuf étapes épinglant 15 tests nommés
+(7 moteur + 8 HTTP) : observation moteur des accords (7 tests
+`root_store::paea_git_agreement`) ; parcours positif
 `approval_route_captures_project_agreement_and_refuses_wrong_body_revision`
 (capture d'accord + refus corps/révision modifiés) ;
+`approval_route_wrong_physical_project_root_refuses_without_effects` — une
+préparation d'approbation valide de la même famille (mêmes octets approve
+figés, même fixture d'enrôlement) est présentée contre une racine projet B
+physiquement distincte, jamais une copie de A : le bind refuse AVANT toute
+publication de session, refus typé `trust-enrollment-root` — la vérification
+du témoin physique du moteur compare la racine réellement ouverte au binding
+retenu et ferme l'autorité et le témoin fournis sur le chemin du refus —,
+aucun accord capturé nulle part, états Trust de A, serviceA, la VRAIE racine
+B et serviceB octet pour octet identiques, listing des refs gérées de A
+inchangé avec la ref cible de promotion explicitement absente avant ET après
+(Git réel), journaux d'effets durables des deux racines service inchangés
+(lus via des connexions lecture seule indépendantes) — le bind ne prépare
+qu'un témoin, il n'écrit jamais l'état Trust ;
 `approval_route_wrong_role_denies_without_approval_or_service_effects` —
 acteur réellement enrôlé mais sans le rôle Trust `approver` : la permission
 signée injectée est VOLONTAIREMENT valide, le refus est la garde RÔLE du
@@ -2863,29 +3434,60 @@ enrôlement signé à la révision courante, re-bind, POST HTTP réel →
 canoniques comme NOUVEL accord à la révision courante, rejeu sans second
 entrant de journal, action refusée jamais rétro-approuvée) ; consommation
 avec accord capturé ; annulation d'accord après changement de révision ;
-**frontière lecteur BLP-RET-05** (`preview_reader_guard_enforces_produced_attribution`
-sur l'aperçu de l'action liée : session seule → `paea-reader-authentication-required`
-exact, lecteur enrôlé non habilité → `paea-reader-access-denied` exact sans
-marqueur privé, lecteur autorisé par une attribution produite par les
-producteurs soutenus → projection exacte avec marqueur, politique périmée via
-`config-apply` réel → `paea-reader-policy-stale`). Fixture native tmpfs via
-`SWARM_PAEA_SOURCE_FIXTURE` (producteur documenté
-`tests/rust_native_first_publication.py`, jamais la tmpfs saturée
-`/tmp/swarm-model83-0cxbra65`) ; les étapes épinglent des cas
-`--exact --ignored` nommés (le cas frontière lecteur court sans filtre).
-Ceci prouve le canal d'approbation protégé et sa reprise par rôle sur
-fixture isolée : aucun commit/push Git, aucun règlement, aucun enrôlement
-humain, aucune acceptation ; les étapes non couvertes par cette recette
-(autres tests du binaire, profils livrés) restent non rejugées ici.
+présentation de l'action liée exacte
+(`preview_route_presents_exact_bound_action_with_current_state` : l'aperçu
+présente l'action préparée exacte détenue à un lecteur Bearer autorisé —
+proposal/context déclarés verbatim, identité canonique recalculée, état
+témoin courant, révision Trust courante ; politique+attribution produites
+par les producteurs soutenus avant lecture (BLP-RET-05) ; une session seule
+n'obtient aucun marqueur classifié, sans consentement/grant/consommation) ;
+statut des siblings sans digest classifié (fn Rust
+`status_siblings_serve_no_classified_digest_to_bare_session`, étape de
+recette `web-status-siblings-serve-no-classified-digest`) ;
+non-discrimination de deux intentions préparées (fn Rust
+`status_does_not_discriminate_two_prepared_intentions`, étape
+`web-status-does-not-discriminate-two-prepared-intentions`, cas
+`--ignored`). Fixture native via `SWARM_PAEA_SOURCE_FIXTURE`
+(producteur documenté `tests/rust_native_first_publication.py`, fixture
+`.swarm-fixtures/source-fixture-approval-fresh-regen-20261031`, distincte de
+celle de la recette formulaire) ; les étapes web épinglent des cas nommés
+`--exact` — étapes de parcours en `--ignored` sans `--nocapture`, les deux
+étapes statut ajoutent `--nocapture`, seule la dernière est `--ignored`.
+Réception Codex 4 novembre 2026 : run0/verify0, `source_stable` vrai, le
+test mauvais racine physique passe en étape 3 (preuve brute
+`step-0003.stdout` sous
+`../../docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-project-root-recipe-20261104T044456Z/supervisor-http-recipe/recipe/`).
+TMPDIR : quand les ancêtres du checkout sont inscriptibles au groupe, le
+lanceur bascule seul vers `~/.local/state/swarm-fixtures/runner-tmp`
+(méthode existante de `tools/verification/recipe.py`, sans chmod partagé,
+jamais `/tmp`). Ceci prouve le canal d'approbation protégé et sa reprise par
+rôle sur fixture isolée : aucun commit/push Git, aucun règlement, aucun
+enrôlement humain, aucune acceptation ; l'image de test est le binaire de
+profil test, distincte de la production 331 ; les étapes non couvertes par
+cette recette (autres tests du binaire, profils livrés) restent non rejugées
+ici.
 
 ## Recipe paea-git-call-approval-rust (protected approval channel)
 
 EN: `recipes/paea-git-call-approval-rust.json` runs the permanent check of
 the `POST /api/v1/paea/git-call/approval` channel on the swarm-web
-`paea_git_call` test binary. Seven named steps: engine agreement observation
+`paea_git_call` test binary. Nine steps pinning 15 named tests
+(7 engine + 8 HTTP): engine agreement observation
 (7 `root_store::paea_git_agreement` tests); the positive journey
 `approval_route_captures_project_agreement_and_refuses_wrong_body_revision`
 (agreement capture + modified body/revision refusals);
+`approval_route_wrong_physical_project_root_refuses_without_effects` — a
+valid same-family approval preparation (same frozen approve bytes, same
+enrollment fixture) is presented against a physically distinct project root
+B, never a copy of A: bind refuses BEFORE any session publication with typed
+`trust-enrollment-root` — the engine's physical-witness check compares the
+actually opened project root against the retained binding and closes the
+supplied authority and witness on the refusal path —, no agreement captured
+anywhere, Trust states of A, serviceA, the REAL root B and serviceB
+byte-identical, A's managed refs unchanged with the promotion target ref
+explicitly absent before AND after (real Git), both service roots' durable
+effect journals unchanged (read via independent read-only connections) —
+bind prepares a witness only, it never writes Trust state;
 `approval_route_wrong_role_denies_without_approval_or_service_effects` — an
 actually enrolled actor WITHOUT the Trust `approver` role: the injected
 signed permission is deliberately VALID, the refusal under test is the
@@ -2900,20 +3502,35 @@ real HTTP POST → `approved`/`trust-status-ack-v1`, project guard recognizes
 the SAME canonical bytes as a NEW agreement at the current revision, replay
 without a second journal entry, denied action never retro-approved);
 consumption with a captured agreement; agreement void after a revision
-change; **BLP-RET-05 reader frontier**
-(`preview_reader_guard_enforces_produced_attribution` on the bound-action
-preview: bare session → exact `paea-reader-authentication-required`,
-enrolled-but-uncleared reader → exact `paea-reader-access-denied` without a
-private marker, reader authorized by an attribution produced through the
-supported producers → exact projection with marker, stale policy through a
-real `config-apply` → `paea-reader-policy-stale`). Native tmpfs fixture via
-`SWARM_PAEA_SOURCE_FIXTURE` (documented producer
-`tests/rust_native_first_publication.py`, never the saturated
-`/tmp/swarm-model83-0cxbra65` tmpfs); steps pin named
-`--exact --ignored` cases (the reader-frontier case runs unfiltered). This
+change; presentation of the exact bound action
+(`preview_route_presents_exact_bound_action_with_current_state`: the preview
+presents the exact held action to an authorized Bearer reader — declared
+proposal/context verbatim, recomputed canonical identity, current witness
+state, current Trust revision; policy+attribution produced through the
+supported producers before read (BLP-RET-05); a bare session gets no
+classified marker, with no consent/grant/consumption); sibling status serves
+no classified digest (Rust fn
+`status_siblings_serve_no_classified_digest_to_bare_session`, recipe step
+`web-status-siblings-serve-no-classified-digest`); non-discrimination of
+two prepared intentions (Rust fn
+`status_does_not_discriminate_two_prepared_intentions`, step
+`web-status-does-not-discriminate-two-prepared-intentions`, `--ignored`
+case). Native fixture via `SWARM_PAEA_SOURCE_FIXTURE` (documented producer
+`tests/rust_native_first_publication.py`, fixture
+`.swarm-fixtures/source-fixture-approval-fresh-regen-20261031`, distinct
+from the form recipe's); web steps pin named `--exact` cases — journey
+steps run `--ignored` without `--nocapture`, both status steps add
+`--nocapture`, only the last is `--ignored`. Codex reception 4 November
+2026: run0/verify0, `source_stable` true, the wrong-physical-root test
+passes as step 3 (raw evidence `step-0003.stdout` under
+`../../docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-project-root-recipe-20261104T044456Z/supervisor-http-recipe/recipe/`).
+TMPDIR: when checkout ancestors are group-writable, the runner falls back on
+its own to `~/.local/state/swarm-fixtures/runner-tmp` (existing method of
+`tools/verification/recipe.py`, no shared chmod, never `/tmp`). This
 proves the protected approval channel and its role recovery on an isolated
 fixture: no Git commit/push, no settlement, no human enrollment, no
-acceptance; steps not covered by this recipe (the binary's other tests,
+acceptance; the test image is the test-profile binary, distinct from
+production 331; steps not covered by this recipe (the binary's other tests,
 delivered profiles) remain un-replayed here.
 
 ## Recette paea-consent-ui-rust (surface navigateur du consentement approbateur)
@@ -3014,35 +3631,174 @@ FR : la recette `recipes/paea-approval-form-rust.json` qualifie de bout en
 bout le formulaire d'approbation déjà implémenté
 (`web/paea-approval-form.js`, section « Approbation » de `paea-effects.html`,
 route `POST /api/v1/paea/git-call/approval` à corps vide, commande figée
-détenue côté service) sur le contrat conservé, sans redesign. Six étapes :
-trois tests Rust `--exact` (absence explicite sans source liée, projection
-figée commandes+termes, actifs embarqués de la page) ; catalogue i18n à jour
-(`node scripts/i18n/build.cjs --check`) ; binaire de test reconstruit par
-flux CargoJSON (`cargo test --no-run --message-format=json`, touch du fichier
-embarquant) ; qualification navigateur réelle via le driver
-`tests/paea_approval_form_ui_recipe.py` (binaire résolu par le flux
-`compiler-artifact` — jamais par mtime —, deux canaux enfants streamés et
-drainés avant tout verdict, digest du binaire exécuté avant/après) et le
-harnais `tests/paea-approval-form-ui.cjs` : serveur natif réellement lié,
-vrai Chrome, une consommation explicite à corps vide via le formulaire avec
-le mot de passe fixture étiqueté (auth simulée), rejeu à révision courante =
-ack enregistré 200 `trust-status-ack-v1`, puis `config-apply` Trust réel
-(révision +1) : péremption visible FR/EN sans confirmation ni normalisation,
-refus post-péremption typé 403 par le même canal réel (l'autorité enrôlée
-détenue est liée à la révision consommée — le chemin rejeu est inatteignable
-après la mutation, jamais de re-consommation ni de re-approbation), 4
-contrôles harnais exigés par le driver, 5 refus attendus classés un pour un
-(réponse + écho console), arrêt owned (`phase2.done` → marqueur stop →
-`serve_until` fermé vérifié). Marqueurs publiés atomiquement (tmp+rename) :
-le sondage Rust à 100 ms ne voit jamais un fichier tronqué. Écriture de
-preuve NEUVE exigée (`recipe-output-must-be-new-outside-live-state`) ; les
-tentatives en échec restent conservées intactes. Limites : auth simulée
-étiquetée, aucune présence humaine, aucun enrôlement réel, aucun appel Git,
-aucune acceptation ; la consommation correcte n'est prouvée que sur cette
-fixture owned, jamais sur la base live.
+détenue côté service) sur le contrat conservé, sans redesign. Douze étapes — les
+deux gardes driver d'abord, avant toute compilation ou navigateur :
+`approval-form-resolution-raw-evidence-guard`
+(`tests/test_approval_resolution_raw_evidence.py`, 6 cas) reproduit les deux
+contre-exemples reçus (exit enfant 42 avec stderr de plus de 2000 octets
+jadis réduit à la queue du message ; enfant non UTF-8/CRLF jadis perdu à
+`UnicodeDecodeError`) et prouve que chaque tentative écrit AVANT tout
+filtrage ou refus, dans un dossier de preuve NEUF dédié de la zone fixtures
+(`tempfile.mkdtemp(prefix="approval-resolution-evidence-", dir=fixture_area())`),
+l'argv réel, l'exit réel et stdout/stderr INTÉGRAUX en OCTETS ORIGINAUX ; le
+décodage humain (`errors="replace"`, queue coupée) ne vaut que pour le
+message de diagnostic ; un skip de la garde est un échec dur. Puis la
+`approval-form-driver-stream-drain-guard`
+(`tests/test_approval_driver_stream_drain.py`, 6 cas) prouve le contrat de
+drain du driver : les QUATRE enregistreurs (les deux canaux des deux
+enfants) sont retenus, joints jusqu'à leur vrai EOF AVANT tout verdict ou
+marqueur de résultat — l'observation causale est l'ordre strict des
+événements (joint du recorder suspendu, puis verdict), détecté par
+suspension d'un enregistreur sur un handshake d'événements, sans timer ni
+sleep ; une erreur d'un worker d'enregistrement (échec d'ouverture/écriture
+du sink — oracle réel `FileExistsError` : l'ouverture exclusive sur un
+chemin préexistant échoue EEXIST avant tout contrôle répertoire ; l'oracle
+initial `IsADirectoryError` du garde, contredit par cette sémantique reçue
+et reproduite 2026-11-04, a été corrigé dans la garde, pas dans le produit)
+est capturée avec son canal puis OBSERVÉE DANS LES BOUCLES D'ATTENTE du
+driver — le run refuse SANS attendre le producteur du canal défaillant,
+susceptible d'être bloqué à jamais à écrire dans le tube dont le seul
+lecteur vient de disparaître ; le containment annule alors uniquement les
+deux enfants OWNED (jamais de PID extérieur), draine les enregistreurs
+restants, record les exits réels observés (exit négatif de signal d'un
+enfant annulé enregistré tel quel, jamais d'exit inventé, jamais de 0/0
+forcé sous annulation) et le refus nomme la cause en marquant le canal
+« INCOMPLETE by capture » — jamais de « all channels drained » prétendu
+pour une capture échouée ; un cas backpressure reproduit le repro reçu
+(`supervisor-stream-backpressure/` : capacité du tube MESURÉE causalement
+sur un tube sonde avant tout enfant — jamais le 8192 supposé à tort,
+conservé comme diagnostic de méthode —, enfant vrai remplissant exactement
+cette capacité puis acquittant sur un tube auxiliaire, enregistreur
+rust.stdout du producteur bloqué lui-même à porte d'acquittement tué par
+un sink répertoire précréé, producteur bloqué à sa deuxième écriture puis
+annulé exit −9 réel, canal INCOMPLETE prouvé sur disque, reprise sur
+dossier de sortie neuf) ; un cas fenêtre tardive reproduit le repro reçu
+(`supervisor-late-wait-probe/` : après sortie du harnais et check one-shot
+sur boîte VIDE, l'enregistreur rust.stdout échoue PENDANT l'attente bloquante
+jadis nue — tube plein non lu, producteur vivant, FileExistsError capturé,
+wait intercepté ; la boucle corrigée observe error_box jusqu'au vrai exit,
+libération causale par seams (wait harnais marque la frontière post-harnais,
+premier poll rust de la boucle tardive libère le worker à porte), refus avec
+nom de canal réel et INCOMPLETE, annulation owned exit −9 réel, témoin sain
+0/0 avec la même suspension, reprise sur dossier neuf) — jamais de faux PASS
+sur exception de thread ;
+exits.json porte l'exit réel de chaque enfant sur tous les chemins (None
+explicite si jamais créé, jamais d'exit inventé) ; les enfants de la garde
+sont deux vrais processus python minuscules (pas de cargo/node/Chrome, pas
+de réseau, pas d'ELF copié).
+Suivent
+`approval-presentation-absence-without-source` (absence explicite sans
+source liée, `--exact --nocapture --test-threads=1`) ;
+`approval-presentation-frozen-command-and-terms` (projection figée
+commandes+termes, `--ignored --exact --nocapture --test-threads=1`) ;
+`approval-page-embedded-assets` (actifs embarqués de la page, 2 tests) ;
+`approval-page-i18n-catalog` (catalogue i18n généré à jour) ;
+`approval-form-reader-credential-erasure` (6 contrôles, zéro diagnostic
+inattendu) ; `approval-form-test-binary-build` (touch du fichier
+embarquant puis `cargo test --no-run --message-format=json`) ;
+`approval-form-test-binary-bind` ; `approval-form-real-browser-qualification` ;
+`approval-form-bound-binary-stable` ;
+`approval-form-linked-output-counterproofs`.
 
-FR (contrat du binaire lié, 2026-10-31) : la recette comporte huit étapes.
-L'identité du binaire de test est une SORTIE LIÉE, jamais une entrée
+Qualification navigateur (driver `tests/paea_approval_form_ui_recipe.py` +
+harnais `tests/paea-approval-form-ui.cjs`) : binaire résolu par le flux
+`compiler-artifact` — jamais par mtime —, les deux processus enfants sont
+attendus avec leur vrai exit et leurs quatre canaux bruts sont drainés en
+entier (quatre enregistreurs retenus et joints jusqu'à EOF réel) avant tout
+verdict ; un travailleur d'enregistrement en échec est OBSERVÉ DANS LES
+BOUCLES D'ATTENTE du driver — le run refuse SANS attendre le producteur de
+ce canal (susceptible d'être bloqué à jamais à écrire dans le tube dont le
+seul lecteur vient de disparaître, reçu et reproduit 2026-11-04 avec un
+tube mesuré 65536 octets), le containment annule uniquement les deux
+enfants OWNED, record les exits réels observés (jamais inventés) et le
+refus nomme la cause en marquant le canal « INCOMPLETE by capture » —
+contrat réalisé par GLM 4 novembre 2026 dans
+`tests/paea_approval_form_ui_recipe.py` et sa garde ; la garde exécutée
+par Codex le même jour a échoué (exit 1, oracle `IsADirectoryError`
+contredit) puis a été corrigée — oracle réel `FileExistsError`,
+containment et cas backpressure ajoutés ; la fenêtre tardive reçue le
+même jour (`supervisor-late-wait-probe/` : après sortie du harnais,
+recorder_failure() vérifié UNE SEULE FOIS puis `rust.wait()` nu bloqué,
+l'enregistreur échouant PENDANT cette attente était inobservé jusqu'au
+containment) a été comblée le même jour : TOUTE attente bloquante d'un
+enfant possédé observe error_box jusqu'au vrai exit de l'enfant —
+y compris `harness.wait()` après le rejet Rust désormais drainé en boucle
+observée — sans timeout ni plafond nouveau ; exécution UNEXÉCUTÉE par GLM
+(Read/Edit/Write/Grep seuls), exécution réelle de la garde corrigée (6 cas)
+et du parcours browser par Codex en attente —, digest du binaire exécuté
+identique avant/après ;
+serveur natif réellement lié, vrai Chrome, une consommation explicite à
+corps vide via le formulaire avec le mot de passe fixture étiqueté (auth
+simulée), rejeu à révision courante = ack enregistré 200
+`trust-status-ack-v1`, puis `config-apply` Trust réel (révision +1) :
+péremption visible FR/EN sans confirmation ni normalisation, refus
+post-péremption typé 403 par le même canal réel (l'autorité enrôlée détenue
+est liée à la révision consommée — le chemin rejeu est inatteignable après
+la mutation, jamais de re-consommation ni de re-approbation).
+Régression du geste clavier réel (contre-exemple reçu
+`supervisor-stale-confirm-discriminant/`, 2026-11-04 : focus
+`#approval-confirm` + Espace réel rendait `checked=true` ET send utilisable
+sur l'état périmé, la case restant active) : le formulaire porte désormais
+un état commun d'admissibilité (`confirmable` dans `web/paea-approval-form.js`,
+écrit par les transitions d'état — début de chargement, indisponible,
+périmé, racines, succès admissible —, lu par `sync()`, par l'état disabled
+de la case et par la sortie `finally` de `guarded`, qui ne réactive plus la
+case à l'aveugle) ; sur tout état non admissible la case elle-même est
+désactivée, donc aucun geste clavier ne peut la cocher ni réactiver
+l'envoi, l'état reste error avec la projection de refus maintenue, et la
+reprise passe par la relecture existante (contrôlée en phase 1 : case de
+nouveau utilisable après la relecture admissible). Prérequis de focus de
+l'oracle corrigé (discriminant `supervisor-disabled-focus-discriminant/`,
+2026-11-04, reçu après l'échec d'étape 10 « 'loading' !== 'error' » : un
+contrôle désactivé ne prend pas le focus — le `page.focus` de la case
+désactivée était sans effet, `activeElement` restait sur le bouton de
+relecture laissé par son propre clic, et l'Espace réel AGISSAIT SUR CE
+BOUTON, lançant la boucle de relecture ; défaut d'ORACLE, jamais du
+produit — la case est restée non cochée, aucun POST) : le harnais pose
+explicitement un focus neutre (flou de l'élément actif, `activeElement`
+observé égal à body), tente le focus de la case désactivée et OBSERVE que
+le focus ne peut pas s'y déplacer (toujours body), puis presse l'Espace
+réel — il n'atteint ni la case ni aucun autre contrôle — et les
+post-conditions restent exigées : case non cochée et désactivée, send
+désactivé, refus error, projection visible. L'absence de POST
+supplémentaire est observée par un compteur du canal de réponses (2 POST
+d'approbation réglés comme exacts après la navigation EN : consommation
+explicite + rejeu à révision courante, aucun de plus dans la fenêtre du
+geste). Précondition de vérification, jamais un patch produit : ni sleep,
+ni ignore du loading, ni fabrication de changement DOM. Oracle lecteur
+exact : à chaque chargement de page, un GET
+`/api/v1/paea/reconcile-effects` en session nue doit être refusé 403 avec le
+code `paea-reader-authentication-required` observé dans le corps, confirmé
+sur `error` ET `failure.code` ; l'ancienne attente d'un 500 a été retirée
+comme inatteignable derrière la porte lecteur — ce n'est pas un
+relâchement, tout 500 ou autre statut reste inattendu ; les messages console
+d'échec de fetch de Chrome, sans URL, sont différés verbatim puis rattachés
+à exactement un refus confirmé, tout reste devient un échec ; 4 chargements
+→ 4 refus GET 403 codés conservés verbatim dans la preuve
+`expected_refusals` ; le POST périmé armé (403 classifié attendu) est le 5e
+refus attendu sur 5 ; le verdict exige l'observation réelle complétée
+(settle → `page.close()` → drain console → vérifications par refus). 4
+contrôles harnais exigés par le driver ; arrêt owned (`phase2.done` →
+marqueur stop → `serve_until` fermé vérifié). Marqueurs publiés
+atomiquement (tmp+rename) : le sondage Rust à 100 ms ne voit jamais un
+fichier tronqué. Sortie stable : la sortie orpheline d'une tentative
+remplacée est archivée `<name>-superseded-<UTC>`. Écriture de preuve NEUVE
+exigée (`recipe-output-must-be-new-outside-live-state`) ; les tentatives en
+échec restent conservées intactes. Réception Codex 4 novembre 2026 :
+run0/verify0, 11 étapes stables, 4 parcours FR/EN avec zéro diagnostic
+inattendu, 6 gardes + 7 contre-cas binder PASS (réception
+`../../docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-observation-completion-20261104T042459Z/supervisor-reception.json`)
+; image de test
+`bf775a5b80075361fe1379c62ec0b498ca7e06794f82300d9a93bb320c6f2625` (profil
+test, `features[]`, distincte de la production 331) ; fixture
+`.swarm-fixtures/source-fixture-fresh-regen-20261031`, distincte de celle de
+la recette HTTP approbation. Limites : auth simulée étiquetée, aucune
+présence humaine, aucun enrôlement réel, aucun appel Git, aucune
+acceptation ; la consommation correcte n'est prouvée que sur cette fixture
+owned, jamais sur la base live.
+
+FR (contrat du binaire lié, 2026-10-31) : parmi les étapes, l'identité
+du binaire de test est une SORTIE LIÉE, jamais une entrée
 déclarée — la recette ne doit déclarer aucun chemin que ses propres étapes
 créent (le run4 du 2026-10-31 échouait `recipe-declared-inputs-changed` sur
 les métadonnées `.fingerprint/swarm-web-*/test-integration-test-paea_git_call`
@@ -3078,33 +3834,167 @@ EN: `recipes/paea-approval-form-rust.json` qualifies end to end the
 already-implemented approval form (`web/paea-approval-form.js`, the
 "Approbation" section of `paea-effects.html`, route
 `POST /api/v1/paea/git-call/approval` with an empty body, frozen command
-held server-side) on the conserved contract, no redesign. Six steps: three
-`--exact` Rust tests (explicit absence without a bound source, frozen
-commands+terms projection, embedded page assets); up-to-date i18n catalog
-(`node scripts/i18n/build.cjs --check`); test binary rebuilt from the
-CargoJSON stream (`cargo test --no-run --message-format=json`, embedding
-file touched); real-browser qualification via driver
-`tests/paea_approval_form_ui_recipe.py` (binary resolved from the
-`compiler-artifact` stream — never mtimes —, both child channels streamed
-and drained before any verdict, executed-binary digest before/after) and
-harness `tests/paea-approval-form-ui.cjs`: really bound native server, real
-Chrome, one explicit empty-body consumption through the form with the
-labeled fixture password (simulated auth), replay at current revision =
-recorded 200 `trust-status-ack-v1` ack, then a real Trust `config-apply`
-(revision +1): visible FR/EN staleness with no confirmation and no
-normalization, post-stale typed 403 refusal over the same real channel (the
-held enrolled authority is bound to the consumed revision — the replay path
-is unreachable after the mutation, never a re-consumption or re-approval),
-4 harness checks enforced by the driver, 5 expected denials classified one
-for one (response + console echo), owned shutdown (`phase2.done` → stop
-marker → verified-closed `serve_until`). Markers published atomically
-(tmp+rename): the Rust 100ms poll never observes a truncated file. Fresh
-proof writing enforced (`recipe-output-must-be-new-outside-live-state`);
-failed attempts stay retained intact. Limits: labeled simulated auth, no
-human presence, no real enrollment, no Git call, no acceptance; the correct
-consumption is proven only on this owned fixture, never on the live base.
+held server-side) on the conserved contract, no redesign. Twelve steps —
+the two driver guards first, before any compile or browser:
+`approval-form-resolution-raw-evidence-guard`
+(`tests/test_approval_resolution_raw_evidence.py`, 6 cases) reproduces the
+two received counterexamples (child exit 42 with a >2000-byte stderr once
+reduced to the message tail; non-UTF-8/CRLF child once lost to
+`UnicodeDecodeError`) and proves that each attempt writes, BEFORE any
+filtering or refusal, into a fresh dedicated evidence directory of the
+fixtures area
+(`tempfile.mkdtemp(prefix="approval-resolution-evidence-", dir=fixture_area())`),
+the real argv, the real exit and stdout/stderr INTACT as ORIGINAL BYTES;
+human decoding (`errors="replace"`, tail cut) applies only to the diagnosis
+message; a skipped guard is a hard failure. Then the
+`approval-form-driver-stream-drain-guard`
+(`tests/test_approval_driver_stream_drain.py`, 6 cases) proves the driver's
+drain contract: ALL FOUR recorders (both channels of both children) are
+retained, joined to their real EOF BEFORE any verdict or result marker —
+the causal observation is the strict event ordering (suspended recorder
+joined, then verdict), detected by suspending one recorder on an
+event-handshake, with no timer and no sleep; a recorder worker error
+(sink open/write failure — real oracle `FileExistsError`: an exclusive
+open on a pre-existing path fails EEXIST before any directory check; the
+guard's original `IsADirectoryError` oracle, contradicted by that
+received-and-reproduced 2026-11-04 semantics, was corrected in the guard,
+not in the product) is captured with its channel then OBSERVED INSIDE THE
+DRIVER'S WAIT LOOPS — the run refuses WITHOUT waiting for the failing
+channel's producer, which may be blocked forever writing into the pipe
+whose only reader just disappeared; the containment then cancels only the
+two OWNED children (never an external PID), drains the remaining
+recorders, records the real observed exits (a cancelled child's negative
+signal exit recorded as-is, never an invented exit, never a forced 0/0
+under cancellation) and the refusal names the cause marking the channel
+"INCOMPLETE by capture" — "all channels drained" is never claimed for a
+failed capture; a backpressure case reproduces the received repro
+(`supervisor-stream-backpressure/`: pipe capacity MEASURED causally on a
+probe pipe before any child — never the wrongly assumed 8192, conserved
+as a method diagnostic —, a real child filling exactly that capacity then
+acknowledging over an aux pipe, the blocked producer's OWN rust.stdout
+recorder ack-gated and killed by a pre-created directory sink, the
+producer blocked on its second write then cancelled with its real −9
+exit, the channel INCOMPLETE proven on disk, recovery on a fresh output
+directory); a late-window case reproduces the received repro
+(`supervisor-late-wait-probe/`: after harness exit and a one-shot check
+reading an EMPTY box, the rust.stdout recorder fails DURING the formerly
+bare blocking wait — full unread pipe, producer alive, FileExistsError
+captured, the wait intercepted; the corrected loop observes error_box
+until the real exit, causal release through the seams (harness wait marks
+the post-harness boundary, the late loop's first rust poll releases the
+gated worker), refusal with the real channel name and INCOMPLETE, owned
+cancellation with the real −9 exit, healthy 0/0 witness with the same
+suspension, recovery on a fresh directory) — never a false PASS on a
+thread exception; exits.json carries
+the real exit of each child on every path (explicit None if never
+spawned, never an invented exit); the guard's children are two tiny real
+python processes (no cargo/node/Chrome, no network, no copied ELF). Then
+`approval-presentation-absence-without-source` (explicit absence without a
+bound source, `--exact --nocapture --test-threads=1`);
+`approval-presentation-frozen-command-and-terms` (frozen commands+terms
+projection, `--ignored --exact --nocapture --test-threads=1`);
+`approval-page-embedded-assets` (embedded page assets, 2 tests);
+`approval-page-i18n-catalog` (up-to-date generated i18n catalog);
+`approval-form-reader-credential-erasure` (6 checks, zero unexpected
+diagnostics); `approval-form-test-binary-build` (embedding file touched
+then `cargo test --no-run --message-format=json`);
+`approval-form-test-binary-bind`; `approval-form-real-browser-qualification`;
+`approval-form-bound-binary-stable`; `approval-form-linked-output-counterproofs`.
 
-EN (linked-binary contract, 2026-10-31): the recipe now has eight steps. The
+Browser qualification (driver `tests/paea_approval_form_ui_recipe.py` +
+harness `tests/paea-approval-form-ui.cjs`): binary resolved from the
+`compiler-artifact` stream — never mtimes —, both child processes are
+expected with their real exit and their four raw channels are fully
+drained (four retained recorders joined to real EOF) before any verdict;
+a failing recorder worker is OBSERVED INSIDE the driver's wait loops — the
+run refuses WITHOUT waiting for that channel's producer (which may be
+blocked forever writing into the pipe whose only reader just died,
+received and reproduced 2026-11-04 with a measured 65536-byte pipe), the
+containment cancels only the two OWNED children, records the real
+observed exits (never invented) and the refusal names the cause marking
+the channel INCOMPLETE by capture — contract realized by GLM on
+4 November 2026 in `tests/paea_approval_form_ui_recipe.py` and its guard;
+the guard executed by Codex the same day failed (exit 1, contradicted
+`IsADirectoryError` oracle) and was then corrected — real
+`FileExistsError` oracle, containment and backpressure case added;
+the late window received the same day (`supervisor-late-wait-probe/`:
+after harness exit, recorder_failure() checked ONCE then the bare
+`rust.wait()` blocked — a recorder failing DURING that wait went
+unobserved until containment) was closed the same day: EVERY blocking
+wait of an owned child observes error_box until the child's real exit —
+including `harness.wait()` after a Rust refusal, now drained by an
+observed loop — with no new timeout or ceiling; execution NOT RUN by GLM
+(Read/Edit/Write/Grep only), real execution of
+the corrected guard (6 cases) and of the browser flow by Codex pending —, executed-binary digest
+identical before/after; really bound native server, real Chrome, one explicit
+empty-body consumption through the form with the labeled fixture password
+(simulated auth), replay at current revision = recorded 200
+`trust-status-ack-v1` ack, then a real Trust `config-apply` (revision +1):
+visible FR/EN staleness with no confirmation and no normalization,
+post-stale typed 403 refusal over the same real channel (the held enrolled
+authority is bound to the consumed revision — the replay path is
+unreachable after the mutation, never a re-consumption or re-approval).
+Real-keyboard-gesture regression (received counterexample
+`supervisor-stale-confirm-discriminant/`, 2026-11-04: focus on
+`#approval-confirm` + a real Space press set `checked=true` AND enabled
+send on the stale state, the checkbox staying enabled): the form now
+carries a common admissibility state (`confirmable` in
+`web/paea-approval-form.js`, written by the state transitions — load
+start, unavailable, stale, wrong-roots, admissible success — and read by
+`sync()`, the checkbox's disabled state and the guarded `finally` exit,
+which no longer re-enables the checkbox blindly); on any non-admissible
+state the checkbox itself is disabled, so no keyboard gesture can check
+it or re-enable send, the state stays error with the refusal projection
+maintained, and recovery runs through the existing re-read control
+(checked in phase 1: the checkbox is usable again after the admissible
+re-read). Corrected oracle focus precondition (received
+`supervisor-disabled-focus-discriminant/`, 2026-11-04, after the step-10
+failure "'loading' !== 'error'": a disabled control cannot take focus —
+the blind `page.focus` on the disabled checkbox was a no-op,
+`activeElement` stayed on the reload button left there by its own click,
+and the real Space ACTED ON THAT BUTTON, starting the re-read loop; an
+ORACLE defect, never a product defect — the checkbox stayed unchecked,
+no POST): the harness explicitly sets a neutral focus (blur of the
+active element, observed `activeElement` equal to body), attempts to
+focus the disabled confirmation and OBSERVES that focus cannot move onto
+it (still body), then presses the real Space — it reaches neither the
+checkbox nor any other control — and the post-conditions stay required:
+checkbox unchecked and disabled, send disabled, error refusal, visible
+projection. The no-additional-POST observation is a response-channel
+counter (2 approval POSTs settled as exact after the EN navigation: the
+explicit consumption + the replay while current, none more within the
+gesture window). A verification precondition, never a product patch: no
+sleep, no loading ignore, no fabricated DOM change. Exact reader
+oracle: on every page load, a bare-session GET
+`/api/v1/paea/reconcile-effects` must be refused 403 with code
+`paea-reader-authentication-required` observed in the body, confirmed on
+BOTH `error` and `failure.code`; the former 500 expectation was removed as
+unreachable behind the reader gate — this is not a relaxation, any 500 or
+other status stays unexpected; Chrome's URL-less console fetch-failure
+messages are deferred verbatim then attached to exactly one confirmed
+refusal, leftovers become failures; 4 page loads → 4 coded GET-403 refusals
+kept verbatim in the proof's `expected_refusals`; the armed stale POST
+(expected classified 403) is the 5th of 5 expected denials; the verdict
+requires real observation completion (settle → `page.close()` → console
+drain → per-refusal checks). 4 harness checks enforced by the driver;
+owned shutdown (`phase2.done` → stop marker → verified-closed
+`serve_until`). Markers published atomically (tmp+rename): the Rust 100ms
+poll never observes a truncated file. Stable output: orphan output of a
+superseded attempt is archived `<name>-superseded-<UTC>`. Fresh proof
+writing enforced (`recipe-output-must-be-new-outside-live-state`); failed
+attempts stay retained intact. Codex reception 4 November 2026:
+run0/verify0, 11 stable steps, 4 FR/EN flows with zero unexpected
+diagnostics, 6 guards + 7 binder counter-cases PASS (reception
+`../../docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-observation-completion-20261104T042459Z/supervisor-reception.json`);
+test image
+`bf775a5b80075361fe1379c62ec0b498ca7e06794f82300d9a93bb320c6f2625`
+(test profile, `features[]`, distinct from production 331); fixture
+`.swarm-fixtures/source-fixture-fresh-regen-20261031`, distinct from the
+HTTP approval recipe's. Limits: labeled simulated auth, no human presence,
+no real enrollment, no Git call, no acceptance; the correct consumption is
+proven only on this owned fixture, never on the live base.
+
+EN (linked-binary contract, 2026-10-31): among the steps, the
 test-binary identity is a LINKED OUTPUT, never a declared input — the
 manifest must not declare any path its own steps create (run4 on 2026-10-31
 failed `recipe-declared-inputs-changed` on the
@@ -3241,6 +4131,59 @@ The sidecar requires an explicit configured area, a direct fixture child and its
 marker; /tmp stays forbidden. This fixture executable is outside the delivered
 profile. Recipe success does not establish BLP labels, sink mediation, independent
 review or paid-provider/account confinement.
+
+### Recette HTTP positive approval-web (fixture qualifiée consommée, image normale épinglée) / Positive approval-web HTTP recipe (consumed qualified fixture, pinned normal image)
+
+FR : `recipes/paea-approval-web-positive.json` est re-pointée le 2026-11-05 vers la
+fixture source nouvellement validée par le producteur NEW normal 332 réellement
+exécuté par Codex (exit 0 ; résultat PASS/`task_accepted=true`/`mission_accepted=false`/`paid_provider=false` ;
+12 entrées de revue, 5 contrôles reviewer et 8 contrôles first-publication réellement
+passés, frames SR1 vérifiés personnellement) : `SWARM_PAEA_SOURCE_FIXTURE` vaut
+désormais
+`{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-reviewer-marker-raw-no-spin-20261105T083858Z/supervisor-source-fixture-20261105T085106Z`
+et ses `result.json`/`inputs.json` sont déclarés en entrées. Le re-pointage se fait
+PAR CONSOMMATION : seules les deux anciennes entrées pointant la fixture 025309
+failed quittent la liste — les preuves elles-mêmes ne sont jamais supprimées ni
+réécrites. Sélection NORMALE explicite, distincte du harnais de test (ce n'est PAS
+le défaut `CARGO_BIN_EXE` test-feature) : `SWARM_PAEA_APPROVAL_WEB_CLI` épingle
+`{root}/.cache/rust-migration-binaries/swarm-rust-00560d87ddc4b1a615981952076c064808445c13010f839e263819f6efe1ccf5`
+et `SWARM_PAEA_APPROVAL_WEB_CLI_SHA256` la même empreinte ; le parent existant
+`approval_web_cli()` lit exactement ces deux variables, chemin+SHA ensemble, sans
+fallback, et le binaire épinglé ainsi que le `result.json` du profil qualifié
+(`.cache/local-delivery/rust-3hwotoxm/build/profile/result.json`) sont des entrées
+déclarées pour un binding réel. Objectif : premier positif direct sur l'image
+NORMALE qualifiée 332 sur une fixture isolée. État et limites : l'HTTP réel reste
+NON EXÉCUTÉ tant que Codex n'a pas rejoué la recette après stabilité ; si l'image
+refuse, le vrai FAIL est conservé avant tout diagnostic, jamais de dégradation du
+profil pour passer ; la commande est inchangée (un seul test ignoré explicite, nom
+PASS et `1 passed; 0 failed; 0 ignored;` attendus), toutes les assertions restent
+en place, aucun watchdog ; aucune livraison sur instance n'est annoncée et aucun
+binaire sans sandbox n'est autorisé.
+
+EN: `recipes/paea-approval-web-positive.json` is re-pointed on 2026-11-05 to the
+source fixture newly validated by the REAL normal-332 NEW producer personally run
+by Codex (exit 0; PASS/`task_accepted=true`/`mission_accepted=false`/`paid_provider=false`
+result; 12 review inputs, 5 reviewer and 8 first-publication checks really passed,
+SR1 frames personally verified): `SWARM_PAEA_SOURCE_FIXTURE` now points to
+`{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-reviewer-marker-raw-no-spin-20261105T083858Z/supervisor-source-fixture-20261105T085106Z`
+and its `result.json`/`inputs.json` are declared inputs. The re-point is BY
+CONSUMPTION: only the two old entries pointing at the failed 025309 fixture leave
+the input list — the evidence themselves are never deleted or rewritten. Explicit
+NORMAL selection, distinct from the test harness (NOT the `CARGO_BIN_EXE`
+test-feature default): `SWARM_PAEA_APPROVAL_WEB_CLI` pins
+`{root}/.cache/rust-migration-binaries/swarm-rust-00560d87ddc4b1a615981952076c064808445c13010f839e263819f6efe1ccf5`
+and `SWARM_PAEA_APPROVAL_WEB_CLI_SHA256` the same digest; the existing parent
+`approval_web_cli()` reads exactly these two variables, path+SHA together, no
+fallback, and the pinned binary plus the qualified profile's `result.json`
+(`.cache/local-delivery/rust-3hwotoxm/build/profile/result.json`) are declared
+inputs for a real binding. Objective: the first direct positive on the NORMAL
+qualified 332 image on an isolated fixture. Status and limits: the real HTTP stays
+NOT EXECUTED until Codex reruns the recipe after stability; if the image refuses,
+the real FAIL is kept before any diagnosis, the profile is never degraded to pass;
+the command is unchanged (one explicit ignored test, PASS name and
+`1 passed; 0 failed; 0 ignored;` expected), every assertion stays in place, no
+watchdog; no delivery on an instance is announced and no sandbox-less binary is
+authorized.
 
 ### Renouvellement d’attribution BLP / BLP attribution renewal
 
@@ -3473,3 +4416,394 @@ neither independent acceptance nor installation; neither the remote relay nor
 key rotation beyond the secret-shown-once. Rendering predicate: every **open**
 `<details>` block filled (« Aide » never holds a table), 60 s bound justified
 by observation (≤ 26 s real rendering), diagnostic keeping the rendered state.
+
+### Primitive PAEA / PAEA primitive
+
+`recipes/paea-capture-stream.json` vérifie trois gardes nommées de copie brute,
+refus d'écrasement et préfixe/erreur/reprise fraîche, avec témoin valide avant
+chaque faute. TMPDIR est celui résolu par le runner depuis l'aire configurée ;
+les feuilles Unix privées sont créées exclusivement. Cette recette ne qualifie
+ni la capture d'un enfant, ni son vrai exit, ni un profil produit installé.
+
+The recipe verifies three named raw-copy, overwrite-refusal and failure-prefix /
+fresh-recovery guards, with valid controls before faults and exclusively created
+private leaves under the runner-resolved configured TMPDIR. It does not qualify
+child capture, actual child exit or an installed production profile.
+
+
+### Approbation PAEA à échec fermé / PAEA fail-closed approval
+
+#### Défaillances de la garde entretenues (4 vérifications) / Maintained guard-failure regression (4 checks)
+
+FR : la recette `tools/verification/recipes/paea-approval-guard-failures.json` exécute `tests/paea_approval_guard_failures.py`, qui transforme les défaillances vérifiées une seule fois à la main en régression permanente : (1) contrôle valide sur la garde actuelle — 36 vérifications, 0 diagnostic inattendu, sortie 0 ; puis 3 défaillances réelles en sortie 1 — écoute du serveur fixture (EACCES synthétique local), lancement (`CHROME_BIN` vers un chemin fixture inexistant, jamais un vrai chemin utilisateur), écriture de l'artefact d'échec (cause primaire + secondaire toutes deux sur stderr, artefact absent, aucun PASS). Limites explicites : la couture de préchargement est strictement synthétique, locale et privée — aucun service externe ni fournisseur, aucune échéance, relance, limite d'essais, force-kill ni watchdog global ; aucun EACCES au niveau de l'OS n'est effectué ni revendiqué ; les preuves brutes (stdout/stderr, codes de sortie réels, SHA-256 de la source avant/après) sont conservées sous `--output` et jamais supprimées. `PAEA_APPROVAL_GUARD_FAILURES_PASS 4` n'est émis que si les 4 vérifications tiennent. La recette existante des 36 vérifications reste séparée et inchangée.
+
+EN: the recipe `tools/verification/recipes/paea-approval-guard-failures.json` runs `tests/paea_approval_guard_failures.py`, which turns the once-hand-verified faults into a permanent regression: (1) valid control on the current guard — 36 checks, 0 unexpected diagnostics, exit 0; then 3 real exit-1 faults — fixture server listen (local synthetic EACCES), launch (`CHROME_BIN` pointing at a nonexistent fixture path, never a real user path), failure-artifact write (primary + secondary cause both on stderr, no artifact, no PASS). Explicit limits: the preload seam is strictly synthetic, local and private — no external service or provider, no deadline, retry, attempt cap, force-kill or global watchdog; no OS-level EACCES is performed or claimed; raw proofs (stdout/stderr, real exit codes, before/after source SHA-256) are retained under `--output` and never deleted. `PAEA_APPROVAL_GUARD_FAILURES_PASS 4` is printed only when all 4 checks hold. The existing 36-check recipe stays separate and unchanged.
+
+Recette permanente `tools/verification/recipes/paea-approval-state-fail-closed.json` : `python3 tools/verification/recipe.py run --recipe tools/verification/recipes/paea-approval-state-fail-closed.json --output FRESH`, puis `python3 tools/verification/recipe.py verify --evidence FRESH` sur ce même répertoire FRESH produit par la recette (manifeste d’exécution, entrées et sorties brutes conservés dans FRESH) ; 36 contrôles nommés FR/EN attendus, 0 diagnostic. Le navigateur crée séparément, via node, son propre TMPDIR privé et frais, imprimé dans la sortie d’étape ; `verify` ne consomme pas ce TMPDIR. Les preuves ROUGE originales des deux faux succès (formulaire d’approbation FR `admitted` ; consentement FR `admitted` après contrôles sains) sont conservées séparément. Cette preuve ne démontre ni le navigateur réellement servi par le profil normal, ni une installation.
+
+Permanent recipe `tools/verification/recipes/paea-approval-state-fail-closed.json`: `python3 tools/verification/recipe.py run --recipe tools/verification/recipes/paea-approval-state-fail-closed.json --output FRESH`, then `python3 tools/verification/recipe.py verify --evidence FRESH` on that same FRESH directory produced by the recipe run (run manifest, inputs and raw outputs retained in FRESH); 36 named FR/EN checks expected, 0 diagnostics. The browser separately creates, via node, its own private and fresh TMPDIR, printed in the step stdout; `verify` does not consume that TMPDIR. The original RED proofs of the two false successes (approval form FR `admitted`; consent FR `admitted` after healthy controls) are retained separately. This evidence proves neither the browser actually served by the normal profile nor an installation.
+
+### Lecteur PAEA / PAEA reader
+
+`recipes/paea-capture-reader.json` exige vingt et une gardes nommées : trois pour la
+primitive, dix pour le lecteur live et sept gardes du propriétaire
+Child. La vingt-et-unième garde parente `paea_capture_startup_eof_retains_actual_exit_and_raw` (collectée par le filtre `paea_capture_` existant) partage le lecteur de ligne complète de démarrage extrait des deux boucles live du témoin positif — décodage UTF-8 exact, et non plus octet-par-caractère. L’enfant réel sain émet une ligne préparée complète puis attend l’EOF stdin : lecture causale, libération, collecte réelle. L’enfant fautif réel ignore SIGINT, écrit un fragment stdout sans newline et un diagnostic stderr connu, puis sort naturellement 7 sans ligne préparée : sous le vrai wrapper `signal_stop`, l’EOF avant newline est un échec du lecteur partagé (diagnostic sûr — phase et chemin brut, jamais les octets capturés), la propriété brute est capturée avant tout verdict, le payload de panic d’origine n’est observé qu’après la collecte, l’exit réel 7 est récolté par l’unique vrai wait (enfant réellement reapé, jamais un faux exit de nettoyage) et les deux terminaux `Completed` conservent les octets bruts exacts. Le même constructeur local de reçu du témoin écrit ensuite, AVANT tout verdict, un reçu de chemin terminé pour l’enfant sain réel d’abord (exit réel 0, aucun signal, succès réel, deux `Completed` aux compteurs exacts, absence réelle de panic contrôleur) puis pour l’enfant fautif réel : code de sortie réel 7, aucun signal Unix, pas de succès, présence du panic contrôleur vraie (jamais le payload privé ni les octets bruts dans le JSON), les deux variantes terminales réelles avec leurs compteurs `Completed` exacts, chemin relatif et hachage SHA-256 réels des deux fichiers bruts conservés, et mode 0600 appliqué À LA CRÉATION du fichier temporaire via `OpenOptionsExt::mode` (aucune fenêtre de protection post-création ; mêmes fsync fichier, rename, fsync répertoire ; un refus d’écriture du reçu reste un échec, jamais un faux PASS). L’erreur retournée par le constructeur est un texte étiqueté par étape (`Err(String)`, p. ex. `receipt atomic rename refused: <affichage de l’erreur io>`), pas une cause OS typée ni une chaîne d’erreurs traversable ; une régression déterministe, sur une feuille privée avec des octets bruts contrôlés puis un vrai répertoire vide nommé `process-receipt.json`, force le refus RÉEL du rename (aucun horodatage deviné, aucune erreur OS simulée) et vérifie, après capture du unwind et downcast, que le transporteur typé `CompoundPanic` conserve à la fois l’étape/cause secondaire du reçu et le payload d’origine resté downcastable — le type de premier niveau est honnêtement le transporteur, jamais déguisé ; la voie normale à payload seul garde le type de panic d’origine. Portée et limites : ce lecteur de démarrage, ses fautes et ce reçu de chemin terminé seulement — ni confinement OS, ni approbation humaine, ni acceptation globale ; aucune limite, minuteur, retry, chemin ou dépendance inventé ; la propriété typée des routes de refus (enveloppe UNKNOWN / non terminé, conservation du panic d’origine) reste une tâche ultérieure ouverte. Le lecteur doit rendre le premier fragment avant EOF, rester lié au
+fichier réservé après substitution du chemin, refuser un EOF physique prématuré,
+conserver le fichier vide et la cause d’un refus de préparation du descripteur
+(injection déterministe locale), conserver préfixes et causes en erreur/panic,
+et traiter le buffer vide sans
+consommer l’erreur terminale, y compris avant tout octet. La quatrième garde
+Child prouve la prise de main en poignée de main : un enfant local constant
+écrit et purge deux préfixes bruts distincts (NUL, non UTF-8, CRLF), attend
+exactement un octet de stdin, puis émet des queues connues et sort avec son code
+réel ; le contrôleur lit les deux préfixes exacts via les lecteurs d’évidence
+AVANT d’écrire l’octet unique de déblocage sur le stdin exposé — cet ordre
+causal prouve la lisibilité avant l’EOF du producteur. La cinquième garde Child
+prouve le wrapper coopératif `run_controller_then_finish` : le contrôleur
+panique (message distinctif original) APRÈS ses deux lectures causales mais
+AVANT l’octet de déblocage, le wrapper exécute quand même le finish réel via
+l’EOF stdin (le `read(1)` unique du script retourne, queues connues, code réel
+9), et retourne à la fois le résultat complet de collecte (exit réel, deux
+`Completed` aux compteurs exacts, fichiers préfixe+queue exacts sur disque,
+modes 0600) ET le payload d’origine, retenu verbatim puis réémis par
+l’appelant via un `catch_unwind` de test APRÈS conservation du reçu — un
+témoin sain (même feuille, mêmes octets, même protocole) précède l’injection
+de panic. La sixième garde Child épingle le nouveau contrat de remise de refus
+d’attente : UN SEUL essai d’attente par finish — le chemin public passe le vrai
+`Child::wait` par une couture privée `finish_with_wait` (forme `FnOnce` de la
+vraie signature de méthode), et un refus rend `WaitRefusalHandback` : cause
+d’origine NON Clone déplacée verbatim, Child avec stdin déjà fermé, DEUX
+captures encore en cours (aucun join sur le chemin de refus) et les deux
+chemins d’évidence, statut de sortie INCONNU ; aucune re-attente automatique
+n’existe dans le module — la résolution est une décision explicite de
+l’appelant. Les helpers consommateurs de test conservent tout refus inattendu dans un
+porteur typé COMPLET (`WaitRefusalCarrier` : cause, même Child, les DEUX états
+terminaux de capture réellement joints, les deux chemins d’évidence et
+l’éventuel payload de panic contrôleur d’origine) — aucun champ abandonné.
+La garde exerce la frontière typée RÉELLE de bout en bout : le porteur
+conservé (portant un payload contrôleur original distinctif, mis en boîte
+AVANT la porte de panic) traverse la VRAIE fonction
+`fail_unexpected_wait_refusal` au sein d’un `catch_unwind` de test, et le
+payload boxed est récupéré PAR VALEUR (`downcast::<WaitRefusalCarrier>` — un
+simple `downcast_ref` ne passe pas la propriété) ; la conservation ne
+re-attend jamais l’enfant (statut de sortie INCONNU ; toute re-attente reste
+une décision explicite).
+La garde injecte un refus SYNTHÉTIQUE distinctif via la couture
+privée AVANT tout vrai wait (témoin sain réel du même script/feuille/protocole
+avant l’injection, finish public vérifié), SNAPSHOTNE d’abord les faits sans
+verdict (cause par `to_string` ; compteur d’invocation du handler : exactement
+un essai ; même Child rendu ; les deux chemins ; stdin exposé), puis, après la
+récupération par valeur, SNAPSHOTNE les faits du porteur récupéré (libellé de
+contexte, cause récupérée, pid du Child récupéré, les deux chemins, les deux
+états terminaux, présence du payload) — toujours sans verdict — résout
+ENSUITE explicitement le Child récupéré par sa PREMIÈRE vraie attente directe
+(precondition réellement changée car l’injection n’a jamais atteint le vrai
+`Child::wait`) sans jamais joindre une seconde fois les captures (déjà
+terminales dans le porteur), puis exécute TOUTES les assertions
+APRÈS la vraie collecte — aucune affaiblie : libellé de contexte conservé
+verbatim, cause d’origine par égalité au travers de la frontière typée
+(conservation, `panic_any`, `catch_unwind`, downcast par valeur) et inchangée
+dans le porteur récupéré, un seul essai, même Child à chaque étape, deux
+chemins conservés, payload original présent, redowncast PAR VALEUR en `String`
+et égal EXACTEMENT à l’original détenu (jamais affiché, jamais inventé après
+la porte), stdin exposé, exit réel 5, deux `Completed` aux compteurs exacts
+37/38, fichiers bruts préfixe+queue exacts, modes 0600. ÉTIQUETTE
+: le refus injecté est SYNTHÉTIQUE — il prouve le contrat de remise ET la
+récupération typée, PAS une erreur OS d’attente réelle. Portée réelle du wrapper : uniquement un enfant dont le protocole
+propose un arrêt coopératif à l’EOF stdin ; ni annulation d’enfant arbitraire,
+ni mécanisme général de Drop/unwind, ni couverture d’un panic interne au
+finish ou d’un épuisement de ressources ; toute issue secondaire de nettoyage
+est conservée avec sa cause, jamais masquée. Les lectures et l’écriture
+sont enregistrées et assertées seulement après la vraie collecte (attente réelle
+plus les deux joins). Chaque injection suit
+un témoin sain ; les issues réelles sont collectées, les preuves d’échec restent.
+Le manifeste vise le seul test d’intégration `paea_approval_web`, filtre
+`paea_capture_`, sans exécuter son témoin métier ignoré. Aucun watchdog global ;
+TMPDIR explicite fourni par le runner, mêmes protections que la primitive.
+Une réussite qualifie ces gardes de composant : ni intégration du lecteur au
+parcours d’approbation, ni campagne de refus de setup au-delà des épingles
+présentes, ni annulation/Drop du Child, ni profil produit installé,
+ni protection contre une réécriture externe de même taille. Aucun redémarrage
+du cockpit n’est requis pour des helpers compilés seulement dans ce test.
+
+La septième garde Child prouve le wrapper de décision EXPLICITE
+`signal_stop` pour un enfant qui IGNORE l’EOF stdin : l’appelant fournit
+lui-même la décision d’arrêt (signal exact, aucun timeout, politique,
+retry, poll, plafond, PID kill nu ou signal de secours implicite) ; le
+wrapper ouvre un pidfd DIRECTEMENT depuis le Child possédé AVANT l’appel
+contrôleur (jamais d’API pid arbitraire), demande le signal UNE fois par
+ce descripteur tenu sur la sortie normale ET sur le chemin de panic
+(`catch_unwind`), et seulement après une demande réussie exécute le
+finish explicite existant (EOF stdin — sans effet sur cet enfant — UN
+vrai wait, DEUX joins). Témoin sain D’ABORD (même feuille, mêmes octets,
+même protocole : l’enfant `/usr/bin/python3` installe son handler SIGINT
+AVANT toute sortie, écrit deux préfixes bruts distincts, puis bloque dans
+`signal.pause()` sans jamais lire stdin), puis phase panic (message
+original distinctif) où le signal est quand même demandé sur le chemin de
+panic et le payload d’origine retenu verbatim puis réémis via un
+`catch_unwind` de test APRÈS conservation du reçu. Les queues connues
+n’existent que dans le handler : leur présence prouve la livraison
+réelle du signal, et l’exit réel 0 via le handler est l’arrêt contrôlé
+épinglé (contrasté avec les gardes à exit non nul). Tout refus de
+préparation pidfd ou de demande de signal rend la propriété COMPLÈTE
+typée (capture intacte — Child non récolté, stdin NON fermé, DEUX
+captures encore en cours, les deux chemins —, pidfd tenu le cas échéant,
+cause non Clone d’origine, payload contrôleur éventuel) sans aucune
+attente aveugle ; ces chemins de refus ne sont PAS exercés par la garde
+et restent des limites explicites du contrat. Le pidfd ne prouve ni
+l’indépendance UID, ni le confinement OS, ni l’acceptation métier ;
+l’enfant qui ignorerait le signal demandé garderait le wait bloqué (pas
+de minuteur).
+
+`recipes/paea-capture-reader.json` requires twenty named guards: three
+primitive, ten live-reader, and seven Child-owner guards. It checks
+first-fragment visibility before EOF, reserved-file identity after pathname
+replacement, refusal of premature physical EOF, empty-artifact/cause
+preservation on a deterministically injected descriptor-preparation refusal,
+preserved prefixes/causes on failure/panic,
+and empty-buffer reads that do not consume terminal errors, including before
+any byte. The fourth Child guard proves the stdin/live-output handshake: a
+constant local child writes and flushes two distinct raw prefixes (NUL,
+non-UTF-8, CRLF), waits for exactly one stdin byte, then emits known tails and
+exits with its real code; the controller reads both exact prefixes through the
+evidence readers BEFORE writing the single release byte to the exposed stdin —
+this causal ordering proves readability before producer EOF. The fifth Child
+guard proves the cooperative wrapper `run_controller_then_finish`: the
+controller panics (distinctive original message) AFTER its two causal reads
+but BEFORE the release byte, the wrapper still runs the real finish via stdin
+EOF (the script's single `read(1)` returns, known tails, real exit code 9),
+and returns BOTH the complete real outcome (real exit, two `Completed`
+captures with exact counts, exact prefix+tail files on disk, 0600 modes) AND
+the original payload, retained verbatim then re-emitted by the caller through
+a test `catch_unwind` AFTER the receipt is conserved — a healthy witness
+(same leaf, same bytes, same protocol) precedes the panic injection. The
+sixth Child guard pins the repaired wait-refusal handback contract: ONE wait
+attempt per finish — the public path passes the real `Child::wait` through a
+private `finish_with_wait` seam (`FnOnce` shape of the real method
+signature), and a refusal returns `WaitRefusalHandback`: the original
+non-Clone cause moved verbatim, the Child with stdin already closed, BOTH
+still-running captures (no join on the refusal path) and both evidence
+paths, exit status UNKNOWN; no automatic re-wait exists anywhere in the
+module — resolution is the caller's explicit decision. Test-side consumer helpers conserve any unexpected refusal into a COMPLETE
+typed carrier (`WaitRefusalCarrier`: the cause, the same Child, BOTH
+really-joined capture terminal states, both evidence paths and any original
+controller panic payload) — no field dropped.
+The guard exercises the REAL typed frontier end-to-end: the conserved carrier
+(carrying a distinctive ORIGINAL controller payload, boxed BEFORE the panic
+door) goes through the REAL `fail_unexpected_wait_refusal` function inside a
+test `catch_unwind`, and the boxed payload is recovered BY VALUE
+(`downcast::<WaitRefusalCarrier>` — a bare `downcast_ref` borrow would not
+pass ownership); conservation never re-waits the child (exit status UNKNOWN;
+any re-wait remains an explicit caller decision). The guard injects a
+distinctive SYNTHETIC refusal through the private seam BEFORE any real wait
+(a healthy real witness of the same script/leaf/protocol precedes the
+injection, public finish verified), first SNAPSHOTS the facts without a
+verdict (cause via `to_string`; handler invocation count: exactly one
+attempt; same Child handed back; both paths; stdin exposed), then, after the
+by-value recovery, SNAPSHOTS the recovered carrier's facts (context label,
+recovered cause, recovered Child pid, both paths, both terminal states,
+payload presence) — still without a verdict — then resolves the recovered
+Child EXPLICITLY through its FIRST direct real wait (genuinely changed
+precondition because the injection never reached the real `Child::wait`)
+without ever joining the captures a second time (already terminal inside the
+carrier), and only then runs ALL assertions AFTER the real collection — none
+weakened: the conserved context label verbatim, the original cause by
+equality through the typed frontier (conservation, `panic_any`,
+`catch_unwind`, by-value downcast) and unchanged in the recovered carrier,
+exactly one attempt, the same Child at every stage, both paths conserved, the
+ORIGINAL payload present, downcast BY VALUE to `String` and EXACTLY equal to
+the held original (never displayed, never invented after the door), stdin
+exposed, real exit 5, two `Completed` captures with the exact 37/38 counts,
+exact prefix+tail raw files, 0600 modes.
+LABEL: the injected refusal is SYNTHETIC — it proves the handback contract
+AND the typed recovery, NOT a real OS wait error. Real
+wrapper scope: only a child whose own protocol offers a cooperative stop at
+stdin EOF; neither arbitrary-child cancellation, nor a general Drop/unwind
+mechanism, nor coverage of an internal panic inside `finish` or resource
+exhaustion; any secondary cleanup issue is conserved with its real cause,
+never masked. Reads and the
+write are recorded and asserted only after the real finish (true wait plus
+both joins). Each injection follows a
+healthy control; real outcomes are collected and
+failed evidence retained. Only the `paea_approval_web` integration target with
+the `paea_capture_` filter runs; the ignored business witness does not run. No
+global watchdog; explicit runner-provided TMPDIR and the primitive’s privacy
+protections.
+The seventh Child guard proves the EXPLICIT `signal_stop` decision wrapper
+for a child that IGNORES stdin EOF: the caller provides the stop decision
+itself (the exact signal; no implicit timeout, policy, retry, poll, cap,
+bare-PID kill or fallback signal); the wrapper opens a pidfd DIRECTLY from
+the owned Child BEFORE the controller call (never an arbitrary-PID API),
+requests the signal EXACTLY ONCE through that held descriptor on the normal
+AND the panic path (`catch_unwind`), and only after a successful request
+runs the existing explicit finish (stdin EOF — no effect on this child —
+ONE real wait, BOTH joins). A healthy witness FIRST (same leaf, same bytes,
+same protocol: the `/usr/bin/python3` child installs its SIGINT handler
+BEFORE any output, writes two distinct raw prefixes, then blocks in
+`signal.pause()` without ever reading stdin), then the panic phase
+(distinctive original message) where the signal is still requested on the
+panic path and the original payload is retained verbatim then re-emitted
+through a test `catch_unwind` AFTER the receipt is conserved. The known
+tails exist ONLY inside the handler: their presence proves the real signal
+delivery, and the real exit 0 through the handler is the pinned controlled
+stop (contrasted with the nonzero-exit guards). Every pidfd-preparation or
+signal-request refusal returns the COMPLETE typed ownership (intact capture
+— unreaped Child, stdin NOT closed, BOTH still-running captures, both paths
+—, the held pidfd when acquired, the original non-Clone cause, any
+controller payload) with NO blind wait; those refusal paths are NOT
+exercised by the guard and remain EXPLICIT limits of the contract. The
+pidfd proves neither UID independence, nor OS confinement, nor business
+acceptance; a child that ignored the requested signal would keep `wait`
+blocked (no timer).
+A pass qualifies these component guards, not approval-flow integration,
+a setup-refusal campaign beyond the pins present, Child cancellation/Drop, an
+installed production profile or protection against same-size external
+rewriting. These test-only helpers require no cockpit restart.
+
+`recipes/paea-approval-web-positive.json` branche enfin ces fondations sur le
+VRAI témoin HTTP `approval_web_cli_binds_and_consumes_exact_preparation_once`
+(ignoré, un seul test, exécuté via `-- --ignored --exact --nocapture
+--test-threads=1`). Le Child est pris en main par `OwnedChildCapture::start` :
+stdout et stderr sont conservés en continu dans deux fichiers exclusifs 0600
+(`stdout.raw`, `stderr.raw`) sous une feuille privée 0700
+`private_fixture_leaf("approval-web-positive")` créée sous le TMPDIR explicite
+du runner (jamais /tmp, aucun repli système). Les événements `prepared` puis
+`bound` sont lus AVANT la fin du producteur via le lecteur live
+(`evidence_reader`) — la frame pin-only de 87 octets est écrite par l'extrémité
+stdin TRANSFÉRÉE (`take_stdin`) puis l'extrémité est détruite explicitement :
+c'est ce drop qui délivre l'EOF réel que `read_packet`/`read_guarded` attend
+(lecture jusqu'à EOF), un simple emprunt fermé par la capture ne suffirait pas.
+Tout le contrôleur HTTP (session native, CSRF, status GET, consommation POST
+unique) et les assertions métier (ack `approved`/`trust-status-ack-v1`/
+`object_id`/`content_redacted`, action durable `approved` attribuée au
+principal `operator` dans le root PROJET, SERVICE et refs Git inchangés)
+s'exécutent DANS le wrapper `signal_stop` : le pidfd est ouvert AVANT le
+contrôleur depuis le Child possédé, le signal est demandé exactement une fois
+sur les chemins normal ET panic. Les routes typées `PreparationRefused`,
+`SignalRefused` et `WaitRefused` sont gérées explicitement (reçu écrit, cause
+et propriété conservées, réémission) mais ne sont PAS exercées par ce témoin
+positif — elles restent des limites déclarées. Après l'arrêt, les événements
+`prepared`/`bound` (re-prouvés identiques aux lectures live) et les
+`NativeOutcomeRecord` v1 sont parsés depuis `stdout.raw` conservé — aucune
+nouvelle boucle de conservation, aucun thread de drain. Preuves persistantes :
+le reçu processus (chemins relatifs + SHA-256 des octets bruts + argv exact,
+mode de sélection, PID, boot id/start ticks, hash `/proc/<pid>/exe` réel lu
+pendant la vie du Child) est écrit 0600 de façon atomique (temp exclusif,
+fsync, rename, fsync répertoire) AVANT tout verdict — refus, panic ou PASS —
+et la feuille (stdout.raw, stderr.raw, reçu) n'est JAMAIS supprimée par le
+témoin : elle reste dans la zone privée TMPDIR jusqu'à réception par Codex.
+Une seule ligne manifeste JSON est imprimée sur STDERR (jamais stdout : sous
+`--nocapture`, une `println!` du témoin s'intercalerait dans les lignes de
+sortie du harnais que la recette épingle sur `required_stdout`). Les fixtures
+sont synthétiques et la sélection d'image est source-fixture par défaut :
+aucun UID, enrôlement, confinement, indépendance ni acceptation humaine n'est
+fabriqué, et aucun profil normal/livraison n'est prouvé — la sélection d'image
+source (profil normal des tests) est distincte du profil livré. La recette
+fournit `SWARM_PAEA_SOURCE_FIXTURE` : la fixture source réelle attendue
+(`project()` ouvre explicitement `SWARM_PAEA_SOURCE_FIXTURE/result.json` et
+refuse sinon — panic « explicit new source fixture »), produite par le
+superviseur via `rust_native_first_publication.py` dans un `--output` NOUVEAU ;
+ses `result.json` et `inputs.json` sont des `inputs` déclarés de la recette.
+Conformément à la convention du README (voir la voie `paea-native-git-source`,
+règle vérifiée du 2026-10-31) : une fixture source n'est jamais copiée ni
+mutée — toute régénération passe par un NOUVEAU répertoire `--output` du
+producteur, puis on REPOINTE `SWARM_PAEA_SOURCE_FIXTURE` (substitution
+`{root}` uniquement) et les entrées `result.json`/`inputs.json` de la recette
+avant toute nouvelle consommation ; la recette n'est pas réutilisable
+inchangée sur une fixture mutée. Reprise : rejouer la recette telle quelle
+(`recipe.py run` puis `verify --evidence`), chaque exécution crée une feuille
+fraîche unique ; les feuilles des exécutions précédentes restent en place
+comme preuves historiques.
+
+`recipes/paea-approval-web-positive.json` finally wires these foundations onto
+the REAL HTTP witness
+`approval_web_cli_binds_and_consumes_exact_preparation_once` (ignored,
+single test, run via `-- --ignored --exact --nocapture --test-threads=1`).
+The Child is taken over by `OwnedChildCapture::start`: stdout and stderr are
+conserved continuously into two exclusive 0600 files (`stdout.raw`,
+`stderr.raw`) under a private 0700 leaf
+`private_fixture_leaf("approval-web-positive")` created under the runner's
+EXPLICIT TMPDIR (never /tmp, no system fallback). The `prepared` then `bound`
+events are read BEFORE producer EOF through the live reader
+(`evidence_reader`) — the 87-byte pin-only frame is written through the
+TRANSFERRED stdin end (`take_stdin`) and the end is then explicitly DROPPED:
+that drop delivers the real EOF that `read_packet`/`read_guarded` waits on
+(reads to EOF); a borrowed end closed by the capture could not establish it.
+The whole HTTP controller (native session, CSRF, status GET, single
+consumption POST) and the business assertions (ack
+`approved`/`trust-status-ack-v1`/`object_id`/`content_redacted`, durable
+`approved` action attributed to principal `operator` in the PROJECT root,
+SERVICE and Git refs unchanged) run INSIDE the `signal_stop` wrapper: the
+pidfd is opened BEFORE the controller from the owned Child, the signal is
+requested exactly once on both the normal and the panic path. The typed
+routes `PreparationRefused`, `SignalRefused` and `WaitRefused` are handled
+explicitly (receipt written, cause and ownership conserved, re-raise) but are
+NOT exercised by this positive witness — they remain declared limits. After
+the stop, the `prepared`/`bound` events (re-proven identical to the live
+reads) and the `NativeOutcomeRecord` v1 records are parsed from the conserved
+`stdout.raw` — no second conservation loop, no drain thread. Persistent
+evidence: the process receipt (relative paths + SHA-256 of the raw bytes +
+exact argv, selection mode, PID, boot id/start ticks, real `/proc/<pid>/exe`
+hash read while the Child was alive) is written 0600 atomically (exclusive
+temp, fsync, rename, directory fsync) BEFORE any verdict — refusal, panic or
+PASS — and the leaf (stdout.raw, stderr.raw, receipt) is NEVER deleted by the
+witness: it stays in the private TMPDIR area until Codex receives it. A
+single manifest JSON line is printed on STDERR (never stdout: under
+`--nocapture`, a witness `println!` would interleave with the harness's own
+stdout lines that the recipe pins via `required_stdout`). The fixtures are
+synthetic and the image selection defaults to the source-fixture: no UID,
+enrollment, confinement, independence or human acceptance is fabricated, and
+no normal/delivery profile is proven — the source image selection (the tests'
+normal profile) is distinct from the delivered profile. The recipe supplies
+`SWARM_PAEA_SOURCE_FIXTURE`: the real source fixture the witness expects
+(`project()` explicitly opens `SWARM_PAEA_SOURCE_FIXTURE/result.json` and
+refuses otherwise — the "explicit new source fixture" panic), produced by the
+supervisor through `rust_native_first_publication.py` into a NEW `--output`
+directory; its `result.json` and `inputs.json` are declared recipe `inputs`.
+Per the README convention (see the `paea-native-git-source` lane, rule
+verified 2026-10-31): a source fixture is never copied or mutated in place —
+every regeneration goes through a NEW producer `--output` directory, then the
+recipe's `SWARM_PAEA_SOURCE_FIXTURE` (`{root}` substitution only) and its
+`result.json`/`inputs.json` inputs are REPOINTED before any new consumption;
+the recipe is not reusable unchanged against a mutated fixture. Resumption:
+replay the recipe as-is (`recipe.py run` then `verify --evidence`); every run
+creates one fresh unique leaf; leaves of previous runs stay in place as
+historical evidence.
+
+
+### Managed result lane contention (2026-11-05)
+
+`paea-managed-retention-contention.json` exercises one real separate-process
+nonblocking lane conflict, verifies retained ref/report/manifest/proof bytes are
+unchanged, releases the holder, then recovers the same frozen result. It also
+runs typed classification negatives and the existing candidate custody guard.
+Only the direct typed flock `EAGAIN` at a failed acquisition, with no publication
+or cleanup error, becomes `managed-operation-busy` waiting in report discovery
+and result retention. No operation body ran for that failed acquisition; earlier
+recorded Work effects remain recorded. Unknown/wrapped causes, other operations,
+permission failures and cleanup failures retain their error paths. The existing
+saved conductor cadence remains authoritative: no new retry, delay or ceiling.
+The classifier is meaningful only at the reviewed acquisition producer; it does
+not prove absence of effects in arbitrary error chains. The unit fixture is not
+native provider, approval E2E or independent acceptance evidence. Preserve the
+original red and a fresh green; `recipe.py verify` validates retained integrity,
+not a production delivery. Full source publication and protected approval flows
+remain separate required checks.
+
+### Contention du verrou des résultats managed (5 novembre 2026)
+
+La recette `paea-managed-retention-contention.json` tient le vrai verrou depuis
+un processus distinct, vérifie les octets ref/rapport/manifeste/preuve inchangés,
+libère le verrou puis retrouve le même résultat figé. Elle exécute aussi les
+refus du classificateur typé et la garde existante de custody du candidat.
+Seul `EAGAIN` typé direct à l’acquisition, sans publication ni erreur de nettoyage,
+devient l’attente `managed-operation-busy` dans découverte et rétention. Le corps
+de cette acquisition n’a pas tourné ; les effets Work déjà enregistrés restent
+acquis. Autres opérations, permissions, wrappers, causes inconnues et nettoyages
+restent des erreurs. La cadence enregistrée existante reste seule autorité :
+aucune nouvelle tentative, durée ou limite. Le classificateur ne vaut qu’au
+producteur d’acquisition relu ; il ne prouve pas l’absence d’effet d’une chaîne
+arbitraire. Cette fixture unitaire ne prouve ni fournisseur natif, ni approbation
+E2E, ni acceptation indépendante. Garder le rouge original et un vert frais ;
+`recipe.py verify` contrôle l’intégrité, pas la livraison. Publication source
+complète et approbation protégée restent des vérifications distinctes.

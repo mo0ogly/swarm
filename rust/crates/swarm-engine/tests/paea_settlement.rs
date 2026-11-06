@@ -1109,6 +1109,77 @@ fn payment_agreement(project: &RootStore, request: &PaeaSettlementRequest, prefi
     approved
 }
 
+/// Apply an explicit advanced fixture policy through config-apply. Only the
+/// enrolled effect participant's declared group changes; no identity is forged.
+/// Returns the persisted revision; malformed/refused configuration fails the test.
+fn payment_role_policy(project: &RootStore, effect_group: &str) -> i64 {
+    let view: Value = serde_json::from_slice(&project.trust("show", b"{}", "").unwrap().bytes).unwrap();
+    let mut ids = view["identities"].clone();
+    for id in ids.as_array_mut().unwrap() {
+        if id["enrollment_principal"].is_null() {
+            id["token"] = if id["subject"] == "agreement-admin" {
+                "fixture-admin-token".into()
+            } else {
+                format!("fixture-{}-token", id["subject"].as_str().unwrap()).into()
+            };
+        }
+    }
+    let revision = view["revision"].as_i64().unwrap();
+    let command = json!({"schema_version":1,"event_id":format!("role-policy-{}",revision+1),
+        "expected_revision":revision,"reason":"Explicit payment role separation fixture",
+        "policy":view["policy"],"identities":ids,"role_separation":{"enabled":true,
+        "incompatible_roles":[["admin","effect"],["requester","effect"],["approver","effect"]],
+        "principals":{"enrolled-effect":effect_group,"agreement-admin":"admin-person",
+            "requester":"requester-person","approver":"approver-person"}}});
+    project.trust("config-apply", &serde_json::to_vec(&command).unwrap(), "").unwrap();
+    revision + 1
+}
+
+/// A valid exact approval must survive an enabled advanced policy. Each fault
+/// changes only the effect principal's group; upstream approval remains valid.
+/// Check no ledger insertion on refusal, then recover via public reconfiguration
+/// and a fresh exact approval. Fixture groups do not establish distinct people.
+#[test]
+fn settlement_advanced_role_separation_checks_effect_and_recovers() {
+    for conflict in ["admin-person", "requester-person", "approver-person"] {
+        // Same public setup and full valid control before each injected conflict.
+        for group in ["effect-person", conflict] {
+            let (_pd, project, scope) = project();
+            let (ld, ledger) = root();
+            let (p, c) = action();
+            ledger.paea_initialize_settlement(&c.project_id, &"0b".repeat(32), &[p.clone()]).unwrap();
+            separated_config(&project);
+            let revision = payment_role_policy(&project, group);
+            let prepared = project.paea_settlement_request(&ledger, &p, &c, Operation::Commit).unwrap();
+            payment_agreement(&project, &prepared, "advanced");
+            assert_eq!(count(ld.path()), 0);
+            let result = invoke_revision(&project, &ledger, &prepared, &scope, revision);
+            if group == "effect-person" {
+                recorded(result.unwrap(), false);
+                recorded(invoke_revision(&project, &ledger, &prepared, &scope, revision).unwrap(), true);
+            } else {
+                assert_eq!(result.unwrap_err().code, "paea-settlement-role-separation");
+                assert_eq!(count(ld.path()), 0, "conflict {conflict} inserted an effect");
+                prepared.close().unwrap();
+                let revision = payment_role_policy(&project, "effect-person");
+                let fresh = project.paea_settlement_request(&ledger, &p, &c, Operation::Commit).unwrap();
+                payment_agreement(&project, &fresh, "recovered");
+                recorded(invoke_revision(&project, &ledger, &fresh, &scope, revision).unwrap(), false);
+                recorded(invoke_revision(&project, &ledger, &fresh, &scope, revision).unwrap(), true);
+                fresh.close().unwrap();
+                assert_eq!(count(ld.path()), 1);
+                ledger.close().unwrap();
+                project.close().unwrap();
+                continue;
+            }
+            assert_eq!(count(ld.path()), 1);
+            prepared.close().unwrap();
+            ledger.close().unwrap();
+            project.close().unwrap();
+        }
+    }
+}
+
 /// Regression: a captured separated exact agreement must allow the current
 /// fictitious payment once. Original kernel refuses even this valid admission.
 /// Context mutation and public mandate revocation must refuse before any effect;

@@ -232,3 +232,12 @@ host). Verified by `preparation_worker_transport.rs` and the recipe
 `tools/verification/recipes/blp-preparation-worker-gate.json`. Still OPEN:
 result inheritance (BF-16), OS/descendant confinement, optional quarantine;
 not activated in production, not accepted.
+
+
+### Revision: Security and evidence observation
+
+BF-24 adds the I3/admin security-show projection and native view: configuration
+metadata and compiled inventory, no project content or imported evidence.
+69 references, 25 OPEN flows. Changed anchors were reread and refreshed; this
+does not qualify concurrent BF-16a/storage edits. NOT_TESTED/unknown/not_qualified
+remain explicit; no certification is established.

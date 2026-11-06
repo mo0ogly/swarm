@@ -87,6 +87,49 @@ fn check(destination:Value)->Value {
     json!({"schema_version":1,"expected_revision":1,"sources":[{"level":"confidential","compartments":["client-a"]}],"destination":destination})
 }
 
+/// Security metadata is an authenticated readonly observation, not a stored
+/// qualification. A current policy never upgrades missing runtime evidence.
+#[test]
+fn security_status_is_admin_readonly_and_never_invents_qualification() {
+    let f=Fixture::new();
+    let before=f.state();
+    let request=json!({"schema_version":1});
+    let absent=f.call("security-show",request.clone(),"fixture-admin-token").unwrap();
+    assert_eq!(absent["domains"][0]["configuration"]["configured"],false);
+    assert_eq!(absent["domains"][0]["verification"]["result"],"NOT_TESTED");
+    assert_eq!(absent["domains"][0]["verification"]["freshness"],"unknown");
+    assert_eq!(absent["domains"][0]["qualification"]["state"],"not_qualified");
+    assert_eq!(absent["domains"][0]["runtime_enforced"],false);
+    assert!(absent["domains"][0]["flows"].as_array().unwrap().len()>=25);
+    for token in ["", "unknown-fixture-token", "fixture-worker-token"] {
+        assert!(f.call("security-show",request.clone(),token).unwrap_err().contains("authorization_required"));
+    }
+    for invalid in [json!({}),json!({"schema_version":2}),json!({"schema_version":1,"accepted":true})] {
+        assert!(f.call("security-show",invalid,"fixture-admin-token").is_err());
+    }
+    assert_eq!(before,f.state());
+    f.apply();
+    let before=f.state();
+    let store=RootStore::open(&f.0,false).unwrap();
+    let reply=store.trust_as_principal("security-show",br#"{"schema_version":1}"#,"fixture-admin-token").unwrap();
+    assert_eq!(reply.publication,None);
+    store.close().unwrap();
+    let current:Value=serde_json::from_slice(&reply.bytes).unwrap();
+    assert_eq!(current["domains"][0]["configuration"]["authority_current"],true);
+    assert_eq!(current["domains"][0]["configuration"]["configured"],true);
+    assert_eq!(current["domains"][0]["qualification"]["state"],"not_qualified");
+    let text=String::from_utf8(reply.bytes).unwrap();
+    for private in ["fixture-admin-token","fixture-worker-token","token_hash","client-a",f.0.to_str().unwrap()] {
+        assert!(!text.contains(private),"metadata leaked {private}");
+    }
+    assert_eq!(before,f.state());
+    f.call("config-apply",config(1,"renew-security-observation"),"fixture-admin-token").unwrap();
+    let stale=f.call("security-show",request,"fixture-admin-token").unwrap();
+    assert_eq!(stale["domains"][0]["configuration"]["authority_current"],false);
+    assert_ne!(current["observation_digest"],stale["observation_digest"]);
+    assert_eq!(stale["domains"][0]["verification"]["result"],"NOT_TESTED");
+}
+
 /// Explicit quarantine change: existing Admin operation/revisions, no new role.
 fn quarantine_change(revision:u64, enabled:bool)->Value {
     let mut value=change(revision,if enabled{"quarantine-on"}else{"quarantine-off"});

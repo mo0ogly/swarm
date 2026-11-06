@@ -248,3 +248,12 @@ SHA256(nonce), PID/stamp/host). Vérifié par
 `tools/verification/recipes/blp-preparation-worker-gate.json`. Restent
 OPEN : héritage des résultats (BF-16), confinement OS/descendants,
 quarantaine optionnelle ; non activé en production, non accepté.
+
+
+### Révision : observation Sécurité et preuves
+
+BF-24 ajoute la projection I3/admin security-show et sa vue native : métadonnées
+de configuration et inventaire compilé, sans contenu projet ni preuve importée.
+69 références, 25 flux OPEN. Les ancrages modifiés ont été relus et actualisés ;
+ce rafraîchissement ne qualifie pas les modifications concurrentes BF-16a/stockage.
+Les états NOT_TESTED/unknown/not_qualified restent explicites ; aucune certification.

@@ -159,8 +159,19 @@ impl RootStore {
                     if current.planning.as_deref().is_some_and(|p|p.repository.is_some()) {
                         // Verify attribution in the coherent read. Retention runs
                         // after this read closes; the writer repeats all guards.
-                        crate::managed_repository::verify_worker(&self.root,&self.db,&current,&row,&settings,
-                            crate::managed_repository::WorkerCheck::Observe).map_err(|e|E::Launch(Box::new(e)))?;
+                        if let Err(e) = crate::managed_repository::verify_worker(&self.root,&self.db,&current,&row,&settings,
+                            crate::managed_repository::WorkerCheck::Observe) {
+                            // A clean failed managed-lane acquisition started no
+                            // retention and made no observation effect; select the
+                            // existing waiting reason so the saved cadence
+                            // re-observes later while this coherent read still
+                            // closes normally. Any other verification failure
+                            // keeps its typed cause and the original mapping.
+                            if crate::managed_repository::clean_lane_contention(&e) {
+                                return Ok(Some(Selection::Waiting("managed-operation-busy")));
+                            }
+                            return Err(E::Launch(Box::new(e)));
+                        }
                         return Ok(Some(Selection::Managed));
                     }
                     report(&self.root, &row, settings.values.report_clock_skew_seconds().map_err(E::Settings)?)

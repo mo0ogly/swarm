@@ -873,7 +873,7 @@ mod mission_supervision_store;
 pub(crate) mod reported_costs;
 mod cockpit_health;
 mod cockpit_actions;
-mod cockpit_post_delivery;
+pub(crate) mod cockpit_post_delivery;
 #[cfg(target_os = "linux")]
 mod cockpit_snapshot;
 #[cfg(target_os = "linux")]
@@ -1976,6 +1976,53 @@ impl RootStore {
             let settings = self.read_settings()?;
             crate::task_model::preview(&self.db, &self.root, work, &request, &settings, environment)
                 .map_err(|e| RootStoreError::Launch(Box::new(e)))
+        })();
+        finished(result, reservation.close().map_err(RootStoreError::Storage))
+    }
+    /// Read-only project-memory proposal under one settings reservation,
+    /// mirroring Go `projectMemoryPreview` byte-for-byte: decode, revision
+    /// observation, selection guards/idle/projected attachments or next-version
+    /// candidate with the verified-source recheck, active-use impact list and
+    /// binding token. Starts no agent, admits no version and grants no
+    /// authority; the mutation path independently rechecks everything it relies
+    /// on. Raw request bytes and the `memory.<action>-preview` kind both arrive
+    /// through the caller's dispatch.
+    pub fn preview_project_memory(
+        &self,
+        work: &str,
+        raw: &[u8],
+        action: &str,
+    ) -> Result<crate::project_memory::ProjectMemoryPreview, RootStoreError> {
+        crate::check_command_input_size(raw).map_err(RootStoreError::Input)?;
+        let request = crate::project_memory::decode_project_memory_request(raw, action)
+            .map_err(|e| RootStoreError::Mutation(WorkEngineError::Memory(e)))?;
+        let reservation = self
+            .directory
+            .reserve(false, false)
+            .map_err(RootStoreError::Storage)?;
+        let result = (|| {
+            let settings = self.read_settings()?;
+            let limits = crate::EngineMutationLimits {
+                task: crate::TaskDefinitionLimits::legacy_go(),
+                policy: crate::ValidationPolicyLimits::legacy_go(),
+            };
+            let policy = settings.quality_policy_snapshot().ok();
+            let lifecycle = crate::TaskLifecycleContext {
+                root: &self.root,
+                quality_policy: policy.as_ref(),
+                task_limits: &limits.task,
+                validation_limits: &limits.policy,
+            };
+            crate::project_memory::preview(
+                &self.db,
+                &self.root,
+                work,
+                action,
+                &request,
+                &lifecycle,
+                Some(&settings),
+            )
+            .map_err(|e| RootStoreError::Mutation(WorkEngineError::Memory(e)))
         })();
         finished(result, reservation.close().map_err(RootStoreError::Storage))
     }

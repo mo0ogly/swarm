@@ -22,6 +22,9 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
     A genuine passed witness precedes injected faults; faults are restored before
     publication. Replay/collisions and current accepted proof are separate checks.
     Original attempts/failures remain retained and no model is rerun on reuse.
+    The provider invocation marker is read through the claim-based I0 reviewer
+    leaf of the RETAINED request event id (native-review.input.json), never a
+    root-level path.
     """
     out.mkdir(mode=0o700,parents=True,exist_ok=False)
     fixture=native.inspection.native.fixture
@@ -30,6 +33,7 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
     source=json.loads((reuse/'result.json').read_text())
     assert source['status']=='PASS' and source['case']=='pass' and not source['accepted'] and not source['paid_provider']
     root=Path(source['root']);work=source['work'];environment=dict(os.environ,CODEX_HOME=str(root/'codex-home'))
+    retained_event=json.loads((reuse/'native-review.input.json').read_text())['event_id']
     births=list((reuse/'inspection').rglob('owned-root-*.json'))
     assert any(json.loads(f.read_text()).get('root')==str(root) for f in births),'actual fixture birth required'
     checks=[]
@@ -55,7 +59,7 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
         return dict(attempts=rows,events=events,finance=native.finance(root,work))
     before=shown('before');task=next(t for t in before['tasks'] if t.get('independent_review',{}).get('state')=='passed')
     review=task['independent_review'];request=dict(schema_version=1,event_id='first-publication-'+hashlib.sha256(str(out).encode()).hexdigest(),expected_revision=before['revision'],task_id=task['id'])
-    baseline=state();marker=(root/'managed-reviewer-invoked.json').read_bytes()
+    baseline=state();marker=native.read_reviewer_marker(root,retained_event)
     if pending_dependent:
         dependent=next(t for t in before['tasks'] if t['id']=='dependent')
         assert dependent['status']=='todo' and dependent['depends']==['task'] and not dependent.get('attempts')
@@ -86,7 +90,7 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
     assert preview['native_original_verified'] and preview['current_candidate_verified'] and preview['opinion_state']=='passed'
     def unchanged(label):
         """A refusal must preserve Work, all event/worker/financial rows and call marker."""
-        assert shown(label)==before and state()==baseline and (root/'managed-reviewer-invoked.json').read_bytes()==marker
+        assert shown(label)==before and state()==baseline and native.read_reviewer_marker(root,retained_event)==marker
     for label,modified in [('bad-revision',dict(request,expected_revision=before['revision']+1)),('unknown-field',dict(request,allow=True))]:
         call(label,['task','publish',work],modified,False);unchanged(label+'-unchanged');checks.append(label+'-refuses-without-mutation')
     private=root/'.swarm'/('native-review-'+fixture.digest(review['id'].encode())+'.receipt')
@@ -105,7 +109,7 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
     assert accepted['status']=='accepted' and after['revision']==before['revision']+1
     assert after['planning']['repository']['candidate_commit']==review['candidate_commit']
     assert accepted['independent_review']==review and accepted['automatic_validation']==task['automatic_validation']
-    assert native.finance(root,work)==baseline['finance'] and (root/'managed-reviewer-invoked.json').read_bytes()==marker
+    assert native.finance(root,work)==baseline['finance'] and native.read_reviewer_marker(root,retained_event)==marker
     with db() as connection:
         row=connection.execute('SELECT state,result_commit,detail FROM managed_attempts WHERE agent_id=?',(review['producer'],)).fetchone()
         event=connection.execute('SELECT kind,revision,request,payload FROM events WHERE id=?',(request['event_id'],)).fetchone()
@@ -151,7 +155,7 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
         check_current('committed-candidate-restored',True)
         checks.append('canonical-receipt-and-committed-git-refusal-and-restoration')
         if created:mark.unlink()
-    assert (root/'managed-reviewer-invoked.json').read_bytes()==marker and state()==settled
+    assert native.read_reviewer_marker(root,retained_event)==marker and state()==settled
     fixture.publish(out/'result.json',dict(status='PASS',root=str(root),work=work,checks=checks,task_accepted=True,mission_accepted=False,provider_started=False,paid_provider=False,global_watchdog=None))
     print('MANAGED_FIRST_PUBLICATION_PASS',len(checks),flush=True)
 

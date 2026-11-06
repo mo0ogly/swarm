@@ -1206,3 +1206,110 @@ accepté ; Bell-LaPadula n’est pas déclaré terminé.
 
 BF-16 : héritage du domaine sur les réponses/erreurs/propositions et les
 lecteurs. Le commit/push de BF-07 attend l’autorisation explicite habituelle.
+
+## BF-16a — contrôle des lecteurs du dialogue — 5 novembre 2026
+
+Premier sous-incrément de BF-16, livré après le trou reproduit au pré-fix :
+un envoi admis à réponse classifiée était servi par la lecture publique du
+dialogue à une session nue sans aucun contrôle.
+
+- **Implémenté** : scan-then-décide dans
+  `RootStore::preparation_dialogue(id, reader_token)` (lecture SQL d’abord
+  comme entrée de décision, puis balayage fail-closed des receipts
+  d’admission ; zéro receipt correspondant = chemin legacy, ≥1 = identité
+  PA-09 puis récupération trois-passes — re-vérification complète, couverture
+  des receipts périmés par équivalent courant de même principal/Root/étiquette/
+  lignée, `check_read` sur chaque classification du receipt). Quatre codes
+  typés : `blp-dialogue-authentication-required`,
+  `blp-dialogue-policy-required`, `blp-dialogue-policy-stale`,
+  `blp-dialogue-access-denied`. Web : extracteur `reader_bearer_token`
+  (Bearer unique non vide, refus typé avant ouverture de Root) + 403 sur
+  les quatre codes. CLI : `SWARM_TRUST_TOKEN` (vide = session nue). Le
+  chemin producteur interne (`preparation_call`) reste non contrôlé,
+  délibérément. `reader_identity_state`/`ReaderIdentityState` élargis à
+  `pub(super)` sans changement logique. La récupération staleness et les
+  gardes de corruption stockée sont le travail reçu des sessions
+  déléguées des 3–4 novembre 2026 (images 325/331, historique détaillé dans
+  `docs/actions-confiance-rust.md`) ; cette entrée documente l’ensemble
+  BF-16a.
+- **Testé local** : test d’intégration
+  `preparation_dialogue_readers.rs` — matrice session nue/jeton inconnu/
+  lecteur non habilité (refus, zéro octet servi), récupération par lecteur
+  habilité, continuité legacy sans admission ; 2/2 verts. Gate BF-07
+  voisine : 1/1 verte. Recette permanente
+  `tools/verification/recipes/blp-preparation-dialogue-readers.json` :
+  PASS 3/3, preuve
+  `.swarm-fixtures/blp-dialogue-readers-proof-20261105b-2479227` (re-run sur
+  l'arbre évolué après réception staleness ; integrity VERIFIED ; archive
+  `.tgz` + SHA-256 copiée et relue sur
+  `/media/fpizzi/Lexar/swarm-preuves/2026-11-05/`, index
+  `.swarm-fixtures/PROOF-INDEX.md`). La frontière HTTP publique et la
+  récupération staleness sont reçues via
+  `tools/verification/recipes/blp-dialogue-reader-public.json` (93
+  contrôles, images 325/331, historique dans
+  `docs/actions-confiance-rust.md`). La suite complète
+  `cargo test -p swarm-engine` n’a pas été rejouée intégralement après
+  interruption ; la preuve ciblée porte sur les deux suites concernées.
+- **Limites conservées** : lecture présentation seulement —
+  `preparation_show`, `preparation_history` et les documents adoptés liés
+  par `source_turn` restent sans contrôle lecteur (incrément BF-16
+  suivant, clos par BF-16b ci-dessous) ; héritage sur erreurs/propositions,
+  médiation fichiers/réseau/descendants, migration des données existantes
+  et déclassification humaine (BLP-06) ouverts. Pas d’installation locale
+  effectuée (le check workspace reste bloqué par le WIP concurrent de la
+  session authority, E0063 `authority_ledger.rs`) ; pas de commit/push
+  sans autorisation explicite ; « implémenté + testé local » n’est ni
+  activé en production ni accepté.
+
+## BF-16b — lecteurs de show, history et release-review — 6 novembre 2026
+
+Deuxième sous-incrément de BF-16 : le verdict lecteur du dialogue est
+étendu aux autres frontières de présentation, pour fermer le contournement
+« lire par show/history ce que le dialogue refuse ».
+
+- **Implémenté** : verdict extrait en
+  `preparation_dialogue::reader_verdict` (pub(super)) partagé par
+  `read_controlled` (dialogue), `preparation_show(id, reader_token)` et
+  `preparation_history(id, kind, before, reader_token)` — mêmes codes
+  `blp-dialogue-*`, même scan-then-décide, même récupération trois-passes,
+  même habilitation ; rien n’est servi avant `Ok(())`. Show/history
+  construisent leurs clés de décision via l’aide `recorded_turn_keys`
+  (tours enregistrés décodés sous la même capture, prompts effacés,
+  incohérence d’identité refusée comme dialogue, sans observation
+  d’historique actif). Zéro receipt apparié = chemin legacy conservé.
+  `preparation_release_review(id, reader_token)` propage le jeton vers
+  show. Web : `reader_bearer_token` extrait sur show/history/
+  release-review ; 403 inchangé sur les quatre codes partagés. CLI :
+  `SWARM_TRUST_TOKEN` résolu une fois pour show/release-review/dialogue/
+  history.
+- **Testé local** : `preparation_dialogue_readers.rs` 4/4 verts — les deux
+  tests BF-16a conservés plus `show_and_history_inherit_the_dialogue_
+  reader_verdict` (session nue + lecteur sous-habilité refusés sur show et
+  history pour chaque kind, récupération par le sender habilité, history
+  `besoin` révision 1 servie au lecteur habilité) et
+  `show_and_history_without_any_matched_admission_keep_legacy_bare_read`
+  (continuité session nue sans admission sur les deux frontières).
+  Régresseurs web/CLI : `swarm-web --test service` 10/10,
+  `--test confidentiality_http` verte, `swarm-cli` lancé avant le WIP
+  concurrent `trust/data_policy.rs` (E0432 transitoire observé ensuite,
+  périmètre de la session déléguée). `preparation_show` gagne un
+  paramètre `reader_token` : appelants adaptés (web, CLI,
+  release-review).
+- **Limites conservées** : lecture présentation seulement — l’exécution,
+  l’adoption et les autres canaux restent hors du verdict ; héritage sur
+  erreurs/propositions, médiation fichiers/réseau/descendants, migration
+  des données existantes et déclassification humaine (BLP-06) ouverts.
+  Pas d’installation locale (même blocage WIP concurrent) ; pas de
+  commit/push sans autorisation explicite ; « implémenté + testé local »
+  n’est ni activé en production ni accepté. La recette permanente
+  `blp-preparation-dialogue-readers.json` couvre la frontière dialogue et
+  la gate BF-07 ; une extension de recette couvrant show/history est
+  conservée comme suite (les tests d’intégration font foi en attendant).
+
+
+## Administration et qualification — 5 novembre 2026
+
+Le plan [Sécurité et preuves](SECURITY-PROOFS-APEX.md), adopté par l’utilisateur,
+complète BLP-01–07 : projection moteur/API/CLI, UX, administration, recettes
+autorisées et dossier de qualification. Aucun état de conformité, test ou
+acceptation BLP n’est changé par ce rattachement.

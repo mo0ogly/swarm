@@ -235,3 +235,120 @@ voisines, compilation CLI). Portée : branche Api du travailleur Rust ; le
 chemin CLI garde son propre contrôle egress. Héritage des résultats (BF-16) et
 confinement OS/descendants restent ouverts ; rien n’est déclaré activé en
 production ni accepté.
+
+## Contrôle des lecteurs du dialogue (BF-16a)
+
+La lecture publique du dialogue d’une préparation
+(`RootStore::preparation_dialogue(id, reader_token)` ; HTTP
+`GET /api/v1/preparations/dialogue` ; CLI `preparation dialogue` avec
+`SWARM_TRUST_TOKEN`) applique désormais, **uniquement quand au moins un
+receipt d’admission correspond au tour lu**, le contrôle no-read-down :
+
+- Décision en deux temps : la lecture SQL non contrôlée d’abord (entrée de
+  décision seule, rien n’est servi avant le verdict), puis balayage des
+  receipts d’admission (`blp-admission-{64 hex}.receipt`, lectures
+  fail-closed) filtrés sur `captured.preparation_id` et le triplet
+  (provider, request_hash) du tour.
+- Zéro receipt correspondant → chemin legacy servi tel quel, aucun état
+  Trust lu : continuité des préparations sans admission (test dédié).
+- ≥1 receipt : identité d’abord (`ReaderIdentityState` de PA-09, observée
+  sans réservation — ordre de verrous Trust→settings préservé) :
+  session nue → `blp-dialogue-authentication-required` ; journal absent →
+  `blp-dialogue-policy-required` ; jeton inconnu/désactivé → refus typé ;
+  politique périmée → `blp-dialogue-policy-stale`. Puis récupération en
+  trois passes : (1) chaque receipt apparié est re-vérifié en entier
+  (`preparation_admission::verify` dans son ordre d’origine, principal lu
+  dans le receipt produit) et le résultat est classifié une seule fois —
+  le refus exact `blp-admission-policy-changed` marque un receipt
+  identité-valide mais périmé, tout autre refus (enregistrement invalide,
+  mauvaise Root, re-jointure des sources, stockage) est propagé inchangé
+  et refuse la lecture entière même si un équivalent courant existe ;
+  (2) un receipt périmé n’est couvert que par une admission courante
+  pleinement vérifiée de même principal, même instance de Root ouverte,
+  étiquette de sortie strictement égale et lignée capturée identique à
+  l’octet (`equivalent_current_covers` ; admission_id/event_id/
+  request_digest légitimement redéfinis par un renouvellement ne sont pas
+  comparés ; une erreur de sérialisation de provenance refuse avec sa
+  cause typée, jamais silencieusement) ; (3) chaque admission appariée,
+  courante ou couverte-périmée, repasse l’habilitation lecteur
+  `check_read(sujet, classification)` du receipt →
+  `blp-dialogue-access-denied`. Une couverture exige l’égalité stricte de
+  l’étiquette : un renouvellement qui élève l’étiquette garde le 403 de
+  stalèté jusqu’à ré-admission à étiquette égale. Un refus ne sert aucun
+  octet du dialogue (pas de filtrage partiel).
+- Web : extracteur `reader_bearer_token` (une en-tête `Authorization:
+  Bearer <valeur non vide>`, sinon refus typé avant toute ouverture de Root)
+  ; les quatre codes `blp-dialogue-*` renvoient 403 FORBIDDEN. CLI :
+  variable `SWARM_TRUST_TOKEN` (vide = session nue).
+- Le chemin producteur interne (`preparation_call`, capture de réponse)
+  conserve la lecture non contrôlée : le producteur est le détenteur
+  légitime du domaine ; BF-16a ne change rien côté capture.
+
+Vérification : test d’intégration `preparation_dialogue_readers.rs`
+(matrice de refus session nue / jeton inconnu / lecteur non habilité,
+récupération par lecteur habilité, continuité legacy sans admission) et
+recette `tools/verification/recipes/blp-preparation-dialogue-readers.json`
+(dialogue, gate BF-07 voisine, compilation CLI ; preuve
+`blp-dialogue-readers-proof-20261105b-2479227`, re-run sur l’arbre évolué
+après réception staleness, archive vérifiée).
+La frontière HTTP publique et sa récupération staleness sont couvertes par
+`tests/blp_dialogue_reader_public.py` et la recette
+`tools/verification/recipes/blp-dialogue-reader-public.json`
+(reçues les 3–4 novembre 2026 sur les images qualifiées 325/331 :
+fraîcheur GET/HEAD 403 `blp-dialogue-policy-stale` après renouvellement
+public, ré-admission du même intent, récupération 200 vers le même DTO,
+gardes de corruption stockée refuse-500 avec oracle d’erreur exact).
+Portée : lecture présentation seulement. Restent ouverts dans BF-16 :
+héritage du domaine sur erreurs/propositions, médiation
+fichiers/réseau/descendants, migration des données existantes,
+déclassification humaine (BLP-06). Rien n’est déclaré activé en production
+ni accepté.
+
+### BF-16b — lecteurs de show, history et release-review (6 novembre 2026)
+
+Le même verdict lecteur s’applique désormais aux autres frontières de
+présentation de la préparation : `RootStore::preparation_show(id,
+reader_token)`, `RootStore::preparation_history(id, kind, before,
+reader_token)` et `RootStore::preparation_release_review(id, reader_token)`
+(HTTP `GET /api/v1/preparations/show`, `/history`, `/release-review` ; CLI
+`preparation show|history|release-review` avec `SWARM_TRUST_TOKEN`) :
+
+- Le verdict est extrait en une fonction partagée
+  `preparation_dialogue::reader_verdict` (pub(super)) appelée par
+  `read_controlled` (dialogue) et par show/history : mêmes codes
+  `blp-dialogue-*`, même balayage scan-then-decide, même récupération en
+  trois passes, même habilitation ; aucun octet de préparation ni de
+  document n’est servi avant `Ok(())`.
+- Show/history lisent les clés de décision via l’aide
+  `recorded_turn_keys` : les tours enregistrés de CETTE préparation sont
+  décodés (provider/request_hash vivent dans le corps enregistré) sous la
+  même capture de lecture, prompts effacés avant restitution — entrée de
+  décision seule, rien n’est servi par l’aide. Une incohérence d’identité
+  de ligne refuse comme la frontière dialogue
+  (`preparation-dialogue-row-identity-mismatch`). Contrairement à la
+  lecture dialogue, aucune observation d’historique actif ne s’y exécute
+  (show/history observent des documents, pas des appels vivants).
+- Zéro receipt apparié → chemin legacy inchangé : session nue conservée
+  sur les préparations sans admission (tests de continuité dédiés pour
+  show et history).
+- Les documents exposés par show/history héritent du domaine du tour
+  source (`source_turn` : brief/plan adoptés) : un lecteur sous-habilité
+  ne peut plus lire par show/history ce que le dialogue lui refuse.
+- `preparation_release_review` propage le jeton vers `preparation_show` :
+  une revue de conversion d’une préparation portant une sortie classifiée
+  admise refuse un relecteur non habilité avec les mêmes codes.
+- Web : les trois routes extraient `reader_bearer_token` comme dialogue ;
+  les quatre codes partagés renvoient 403 FORBIDDEN (mapping inchangé).
+  CLI : `SWARM_TRUST_TOKEN` (vide = session nue), résolu une fois pour
+  show/release-review/dialogue/history.
+
+Vérification BF-16b : tests d’intégration étendus
+`preparation_dialogue_readers.rs` — `show_and_history_inherit_the_
+dialogue_reader_verdict` (session nue et lecteur sous-habilité refusés sur
+show et sur history pour chaque kind, récupération par le sender habilité)
+et `show_and_history_without_any_matched_admission_keep_legacy_bare_read`
+(continuité session nue sans admission, les deux frontières) ; suites
+web/CLI (`service`, `confidentiality_http`, `swarm-cli`) repassées. Portée
+toujours : présentation seulement ; l’exécution, l’adoption et les
+autres canaux restent hors de ce verdict. Rien n’est déclaré activé en
+production ni accepté.

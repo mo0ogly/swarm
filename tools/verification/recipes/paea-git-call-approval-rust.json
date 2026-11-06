@@ -73,6 +73,31 @@
       "required_stderr": []
     },
     {
+      "id": "web-approval-wrong-physical-project-root-refuses-without-effects",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea_git_call",
+        "--",
+        "--ignored",
+        "--exact",
+        "approval_route_wrong_physical_project_root_refuses_without_effects"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "approval_route_wrong_physical_project_root_refuses_without_effects ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
       "id": "web-approval-wrong-role-denies-then-recovers-legitimately",
       "command": [
         "cargo",

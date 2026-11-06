@@ -119,7 +119,7 @@ impl RootStore {
             operation,
             "show" | "export" | "anchor" | "config-preview" | "read-object" | "read-original" | "public-anchor"
                 | "blp-show" | "blp-policy-preview" | "blp-check" | "blp-preparation-check"
-                | "blp-preparation-transport"
+                | "blp-preparation-transport" | "security-show"
         );
         if !readonly && !self.writable {
             return Err(R::Refused("read-only-root"));
@@ -159,6 +159,7 @@ impl RootStore {
             } else { "local-operator".to_owned() };
             let mut planned = None;
             let bytes = match operation {
+                "security-show" => trust::security::observe(&st,raw,token)?,
                 #[cfg(target_os="linux")]
                 "blp-preparation-input-attribute" => {
                     let (bytes,state)=super::preparation_admission::attribute(self,&mut st,raw,token,now)?;

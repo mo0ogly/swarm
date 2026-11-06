@@ -46,7 +46,8 @@ impl NativeHttpService{
 
 /// Classify only candidate/input failures at the new writable profile boundary.
 /// Original IO, malformed active configuration and any cleanup retain server
-/// diagnostics. The dedicated unported-memory mapping must precede this check.
+/// diagnostics. The former dedicated unported-memory 501 mapping is retired:
+/// the versioned guard is ported and its typed refusals classify here.
 pub(super) fn caller_invalid(operation:&str,error:&swarm_engine::RootStoreError)->bool{
     if !matches!(operation,"project-profile-preview"|"project-profile-write"){return false;}
     match error{

@@ -352,10 +352,11 @@ impl HttpServiceError {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
             Self::Refused("web-root-binding-changed" | "budget-revision-conflict" | "preparation-stale-plan" | "preparation-already-released") => StatusCode::CONFLICT,
-            // BLP reader-frontier guard codes (BLP-RET-05, BF-16a dialogue):
-            // a refused classified projection is a caller authorization
-            // state, never a bad request — the reconcile and dialogue routes'
-            // reader refusals rely on this mapping to stay an observable 403
+            // BLP reader-frontier guard codes (BLP-RET-05, BF-16a dialogue,
+            // BF-16b show/history): a refused classified projection is a
+            // caller authorization state, never a bad request — the reconcile,
+            // dialogue, show, history and release-review routes' reader
+            // refusals rely on this mapping to stay an observable 403
             // instead of a silent empty success.
             Self::Refused(
                 "paea-reader-authentication-required"
@@ -397,8 +398,13 @@ impl HttpServiceError {
                 "blp-preparation-platform-unsupported" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_IMPLEMENTED,
                 "project-profile-conflict" if matches!(*operation,"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
                 "project-profile-choice-unknown" if *operation=="project-profile-write" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
-                _ if project_profile::caller_invalid(operation,cause.as_ref()) && !matches!(cause.as_ref(),RootStoreError::Context(e) if e.reason()=="versioned-memory-source-guard-not-ported")=>StatusCode::BAD_REQUEST,
-                "project-context-invalid" if matches!(*operation,"project-profile-read"|"preparation-call"|"project-profile-catalog"|"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Context(error) if error.reason()=="versioned-memory-source-guard-not-ported" && error.cleanup_cause().is_none())=>StatusCode::NOT_IMPLEMENTED,
+                // The versioned-memory guard is ported (project_memory_source.rs),
+                // so the dedicated unported-memory 501 mapping is retired: caller
+                // input failures are 400 through caller_invalid, SQL/inventory
+                // failures keep their server-error default, and a refusal for the
+                // managed canonical guide source is the typed caller refusal
+                // project-source-memory-managed (also 400 here).
+                _ if project_profile::caller_invalid(operation,cause.as_ref())=>StatusCode::BAD_REQUEST,
                 "settings-context-policy-not-configured" if matches!(*operation,"project-profile-read"|"preparation-call"|"project-profile-catalog"|"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Settings(_))=>StatusCode::NOT_IMPLEMENTED,
                 "settings-revision-conflict"
                 | "settings-event-conflict"
@@ -679,6 +685,22 @@ impl DispatchProfile {
             }
         }
     }
+}
+/// Inject the real access-gate mode (read at server start) into the existing
+/// capability document under the single new key `access.mode`: "owner-key"
+/// when no authority daemon routes are served, "authority" when assertion-
+/// gated administration is offered. Read-only disclosure for the embedded
+/// cockpit: it grants no right, exposes no key material, freshness window,
+/// nonce or ledger record, and the daemon keeps authorizing every route
+/// independently. Both dispatch profiles keep their exact existing keys;
+/// only `access` is added. Pure function: no IO, no request data, no fallback.
+fn capabilities_document(profile: DispatchProfile, access: &AccessGate) -> serde_json::Value {
+    let mut document = profile.capabilities();
+    document["access"] = serde_json::json!({"mode": match access {
+        AccessGate::OwnerKey => "owner-key",
+        AccessGate::Authority { .. } => "authority",
+    }});
+    document
 }
 /// Trusted service configuration: private Root path and bound-address capability.
 /// Request data cannot replace either. No Root is initialized implicitly; each
@@ -1250,7 +1272,10 @@ impl NativeHttpService {
     /// command. GET/HEAD remain observational; POST action/settings apply can mutate.
     /// Native version returns compiled identity and embedded release notes only;
     /// malformed declarations preserve typed causes without borrowing live Git.
-    /// Shared session/Host admission still precedes this read-only route.
+    /// The native capability document adds the started access-gate mode
+    /// (`access.mode`, right-free disclosure); every other capability key and
+    /// both dispatch profiles stay unchanged. Shared session/Host admission
+    /// still precedes this read-only route.
     fn route(
         &self,
         request: &Request<Vec<u8>>,
@@ -1282,7 +1307,7 @@ impl NativeHttpService {
                 if request.method() != Method::GET && request.method() != Method::HEAD {
                     return Err(HttpServiceError::Method("GET, HEAD"));
                 }
-                serde_json::to_vec(&profile.capabilities())
+                serde_json::to_vec(&capabilities_document(profile, &self.access))
                     .map(RouteBody::plain)
                     .map_err(HttpServiceError::ResponseJson)
             }
@@ -1648,6 +1673,37 @@ fn response(
 #[cfg(test)]
 mod tests {
     use super::*;
+    /// The native-capabilities document discloses the real started access-gate
+    /// mode ("owner-key" or "authority") and nothing else about the gate: no
+    /// key material, freshness window, nonce or ledger record appears, and the
+    /// added `access` key is the only difference from the plain capability DTO
+    /// on both dispatch profiles. Read-only information: it grants no right and
+    /// the daemon keeps authorizing each route, so an embedded consumer may
+    /// gate its authority probes on this field alone.
+    #[test]
+    fn capabilities_document_discloses_access_mode_without_gate_secrets() {
+        let owner_key = AccessGate::OwnerKey;
+        let authority = AccessGate::Authority {
+            key: ed25519_dalek::SigningKey::from_bytes(&[7u8; 32]).verifying_key(),
+            max_age_seconds: 120,
+            nonces: std::sync::Mutex::new(Default::default()),
+            records: Default::default(),
+        };
+        for (access, mode) in [(&owner_key, "owner-key"), (&authority, "authority")] {
+            for profile in [DispatchProfile::Typed, DispatchProfile::ObservedHttp1] {
+                let document = capabilities_document(profile, access);
+                assert_eq!(document["access"], serde_json::json!({"mode": mode}));
+                assert_eq!(document["access"].as_object().unwrap().len(), 1);
+                let plain = profile.capabilities();
+                let plain = plain.as_object().unwrap();
+                let document = document.as_object().unwrap();
+                assert_eq!(document.len(), plain.len() + 1, "only access is added");
+                for (key, value) in plain {
+                    assert_eq!(document.get(key), Some(value), "{key} changed");
+                }
+            }
+        }
+    }
     /// Explicit quarantine is a typed policy refusal; cleanup or another
     /// operation context must not be disguised as a caller authorization error.
     #[test]

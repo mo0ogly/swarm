@@ -586,11 +586,15 @@ mod supplied_document_tests {
     use super::*;
     use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt};
 
-    /// Retain one attributed inert fixture; refuse collisions instead of removing
-    /// another run's files. The private Root and sources survive failed assertions.
+    /// Retain one attributed inert fixture under the repository fixture area
+    /// (never /tmp per the 2026-10-31 operator interdiction); refuse collisions
+    /// instead of removing another run's files. The private Root and sources
+    /// survive failed assertions.
     fn fixture_root(label: &str) -> std::path::PathBuf {
         use std::io::Write;
-        let root = std::env::temp_dir().join(format!("swarm-profile-document-{label}-{}-{}",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+        let base = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../.swarm-fixtures");
+        fs::DirBuilder::new().recursive(true).mode(0o700).create(&base).unwrap();
+        let root = base.join(format!("swarm-profile-document-{label}-{}-{}",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
         fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
         let mut birth = fs::OpenOptions::new().write(true).create_new(true).mode(0o600).open(root.join("fixture-birth.json")).unwrap();
         birth.write_all(serde_json::to_vec(&serde_json::json!({"root":root,"fixture":true,"live":false,"owner":"project-profile-document-tests"})).unwrap().as_slice()).unwrap();

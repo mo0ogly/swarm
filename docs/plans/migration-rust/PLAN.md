@@ -992,6 +992,23 @@ Clippy FAIL sur 16 lints des fichiers en cours mission_status_*/mission_worker_a
 `.cache/ev-tel31-231532` et `ev-tel31b-231532`. Recette complète à rejouer après
 Clippy PASS du lot Codex. `snapshot.py` refuse désormais tout `include_str!` non déclaré.
 
+Reprise console live tel33 (Claude, 6 nov., après ménages disque du 4–6 nov. qui
+ont retiré preuves tel31/tel31b déjà vérifiées et binaire) : défouts partagés
+corrigés test-first. (1) `recipe.py` importe `tests/fixture_area.py` depuis la
+racine de run depuis l'interdiction /tmp du 31 oct. ; le snapshot ne l'embarquait
+pas et tout run figé échouait avant la première étape — `snapshot.py` l'embarque
+maintenant avec le lanceur (refus `snapshot-fixture-area-missing`), test e2e
+étendu, README FR/EN à jour. (2) La recette attendait « Ran 3 tests » sur
+`test_snapshot.py` qui en a 4 depuis le test de régression du 23 oct. — assertion
+passée à « Ran 4 tests ». État Clippy 6 nov. : 7 lints nouveaux (rustc 1.96 :
+is_multiple_of, useless_conversion, result_large_err, too_many_arguments,
+nonminimal_bool) dans swarm-linux-identity-channel / swarm-linux-prerequisites /
+swarm-enrollment-config committées le 28 oct., et 12 appels de test périmés
+`preparation_show(&id)` (tests preparation_plan/preparation_writes) après le
+changement de signature BF-16a en cours de Codex (`preparation_read.rs`
+modifié à l'instant) — fichiers consommateurs non raccordés, propriétaire Codex.
+Run complet tel33 relancé ; recette dérivée attendue si Clippy bloque encore.
+
 ## Limites et décisions qui conditionnent la suite
 
 - Baseline de qualification :199/review28 ; review96 du lot201 reste bloquée,

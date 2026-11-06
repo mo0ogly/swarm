@@ -1009,3 +1009,107 @@ accepted; Bell-LaPadula is not declared finished.
 
 BF-16: domain inheritance on responses/errors/propositions and readers. The
 BF-07 commit/push awaits the usual explicit authorization.
+
+## BF-16a — dialogue reader control — 5 November 2026
+
+First BF-16 sub-increment, delivered after the reproduced pre-fix hole: an
+admitted send with a classified answer was served by the public dialogue
+read to a bare session with no control at all.
+
+- **Implemented**: scan-then-decide in
+  `RootStore::preparation_dialogue(id, reader_token)` (SQL read first as
+  decision input, then a fail-closed admission-receipt scan; zero matching
+  receipt = legacy path, ≥1 = PA-09 identity then three-pass recovery —
+  full re-verification, stale-receipt coverage by a current equivalent of
+  same principal/Root/label/lineage, `check_read` on every receipt
+  classification). Four typed codes:
+  `blp-dialogue-authentication-required`, `blp-dialogue-policy-required`,
+  `blp-dialogue-policy-stale`, `blp-dialogue-access-denied`. Web: the
+  `reader_bearer_token` extractor (one non-empty Bearer, typed refusal
+  before Root open) + 403 on the four codes. CLI: `SWARM_TRUST_TOKEN`
+  (empty = bare session). The internal producer path (`preparation_call`)
+  stays uncontrolled, deliberately. `reader_identity_state`/
+  `ReaderIdentityState` widened to `pub(super)` with no logic change. The
+  staleness recovery and stored-corruption guards are the work received
+  from the delegated sessions of 3–4 November 2026 (images 325/331,
+  detailed history in `docs/actions-confiance-rust.md`); this entry
+  documents BF-16a as a whole.
+- **Locally tested**: integration test `preparation_dialogue_readers.rs` —
+  bare session/unknown token/under-cleared-reader matrix (refusal, zero
+  bytes served), recovery by a cleared reader, legacy continuity without
+  admission; 2/2 green. Neighbor BF-07 gate: 1/1 green. Permanent recipe
+  `tools/verification/recipes/blp-preparation-dialogue-readers.json`:
+  PASS 3/3, evidence
+  `.swarm-fixtures/blp-dialogue-readers-proof-20261105b-2479227` (re-run on
+  the evolved tree after the staleness reception; integrity VERIFIED;
+  `.tgz` archive + SHA-256 copied and re-read on
+  `/media/fpizzi/Lexar/swarm-preuves/2026-11-05/`, index
+  `.swarm-fixtures/PROOF-INDEX.md`). The public HTTP boundary and the
+  staleness recovery are received via
+  `tools/verification/recipes/blp-dialogue-reader-public.json` (93
+  checks, images 325/331, history in
+  `docs/actions-confiance-rust.md`). The full `cargo test -p
+  swarm-engine` suite was not replayed end to end after interruptions; the
+  targeted evidence covers the two affected suites.
+- **Limits retained**: presentation reads only — `preparation_show`,
+  `preparation_history` and adopted documents linked by `source_turn`
+  still lack reader control (next BF-16 increment, closed by BF-16b
+  below); inheritance on errors/propositions, file/network/descendant
+  mediation, migration of existing data and human declassification
+  (BLP-06) remain open. No local install performed (the workspace check
+  is still blocked by the authority session's concurrent WIP, E0063
+  `authority_ledger.rs`); no commit/push without explicit authorization;
+  "implemented + locally tested" is neither activated in production nor
+  accepted.
+
+## BF-16b — readers of show, history and release-review — 6 November 2026
+
+Second BF-16 sub-increment: the dialogue's reader verdict extends to the
+other presentation frontiers, closing the "read through show/history what
+the dialogue refuses" bypass.
+
+- **Implemented**: the verdict extracted into
+  `preparation_dialogue::reader_verdict` (pub(super)) shared by
+  `read_controlled` (dialogue), `preparation_show(id, reader_token)` and
+  `preparation_history(id, kind, before, reader_token)` — same
+  `blp-dialogue-*` codes, same scan-then-decide, same three-pass
+  recovery, same clearance; nothing is served before `Ok(())`.
+  Show/history build their decision keys through the `recorded_turn_keys`
+  helper (recorded turns decoded under the same snapshot, prompts
+  cleared, row identity mismatch refusing like dialogue, no active-history
+  observation). Zero matched receipts = legacy path kept.
+  `preparation_release_review(id, reader_token)` forwards the token to
+  show. Web: `reader_bearer_token` extracted on show/history/
+  release-review; 403 unchanged on the four shared codes. CLI:
+  `SWARM_TRUST_TOKEN` resolved once for show/release-review/dialogue/
+  history.
+- **Locally tested**: `preparation_dialogue_readers.rs` 4/4 green — the
+  two retained BF-16a tests plus `show_and_history_inherit_the_dialogue_
+  reader_verdict` (bare session + under-cleared reader refused on show
+  and history for every kind, recovery by the cleared sender, history
+  `besoin` revision 1 served to the cleared reader) and
+  `show_and_history_without_any_matched_admission_keep_legacy_bare_read`
+  (bare-session continuity without admission on both frontiers).
+  Web/CLI regressors: `swarm-web --test service` 10/10,
+  `--test confidentiality_http` green, `swarm-cli` run before the
+  concurrent `trust/data_policy.rs` WIP (transient E0432 observed after,
+  the delegated session's scope). `preparation_show` gains a
+  `reader_token` parameter: callers adapted (web, CLI, release-review).
+- **Limits retained**: presentation reads only — execution, adoption and
+  other channels stay outside the verdict; inheritance on
+  errors/propositions, file/network/descendant mediation, migration of
+  existing data and human declassification (BLP-06) remain open. No local
+  install (same concurrent WIP block); no commit/push without explicit
+  authorization; "implemented + locally tested" is neither activated in
+  production nor accepted. The permanent recipe
+  `blp-preparation-dialogue-readers.json` covers the dialogue frontier
+  and the BF-07 gate; a recipe extension covering show/history is kept as
+  follow-up work (the integration tests stand as evidence meanwhile).
+
+
+## Administration and qualification — 5 November 2026
+
+The user-adopted [Security and evidence plan](SECURITY-PROOFS-APEX.md) supplements
+BLP-01–07 with engine/API/CLI observation, UX, administration, authorized recipes
+and an internal qualification dossier. This link changes no BLP conformity, test
+or acceptance state.

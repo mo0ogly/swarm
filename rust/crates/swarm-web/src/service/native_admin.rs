@@ -50,6 +50,9 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/paea-examples/v1/payment-request.json"=>Some(("application/json; charset=utf-8",include_bytes!("../../../../../web/paea-examples/v1/payment-request.json"))),
         "/paea-examples/v1/payment-after.json"=>Some(("application/json; charset=utf-8",include_bytes!("../../../../../web/paea-examples/v1/payment-after.json"))),
         "/paea-examples/v1/git-after.json"=>Some(("application/json; charset=utf-8",include_bytes!("../../../../../web/paea-examples/v1/git-after.json"))),
+        "/security-proofs.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/security-proofs.html"))),
+        "/security-proofs.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/security-proofs.js"))),
+        "/security-proofs.css"=>Some(("text/css; charset=utf-8",include_bytes!("../../../../../web/security-proofs.css"))),
         "/trust-actions.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/trust-native.html"))),
         "/trust-native.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/trust-native.js"))),
         "/trust-confidentiality.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/trust-confidentiality.js"))),
@@ -184,7 +187,7 @@ fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
     if source.matches("</head>").count() != 1 {
         return Err(HttpServiceError::Refused("web-cockpit-template-invalid"));
     }
-    source=source.replacen("</nav>","<a href=\"/trust-actions.html\" data-i18n>Biba — Actions de confiance</a><a href=\"/paea.html\" data-i18n>Vérifications PAEA</a></nav>",1);
+    source=source.replacen("</nav>","<a href=\"/trust-actions.html\" data-i18n>Biba — Actions de confiance</a><a href=\"/security-proofs.html\" data-i18n>Sécurité et preuves</a><a href=\"/paea.html\" data-i18n>Vérifications PAEA</a></nav>",1);
     // Wattson-style "Utilisateurs et accès" view next to Administration
     // (accounts, permissions, access logs from the authority daemon; the
     // entry hides itself outside authority mode).

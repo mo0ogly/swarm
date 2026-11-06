@@ -62,7 +62,7 @@
     {
       "id": "history",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_dialogue.rs",
-      "sha256": "e1c28471143de938dcdbc89ff24d310e3d5648d8296d2142ba0ba67f2bf2bf5d",
+      "sha256": "67dff561971e30c7cd66be9f6575e7a36946b1950be9de9e1d6bd9f7678b4b60",
       "line": 23,
       "anchor": "pub(super) fn read("
     },
@@ -76,8 +76,8 @@
     {
       "id": "storage",
       "path": "rust/crates/swarm-engine/src/local_storage.rs",
-      "sha256": "61298c08ec9665102cf8b198ad21a5ec61b5df119e6d097a11a4e3c24d284524",
-      "line": 785,
+      "sha256": "fd3ac43b8df4232075f84f2fb4266d0719e2e5b2ed70e723076a62eb7cfef9c3",
+      "line": 804,
       "anchor": "pub(crate) fn publish("
     },
     {
@@ -293,7 +293,7 @@
     {
       "id": "trust_store",
       "path": "rust/crates/swarm-engine/src/root_store/trust_store.rs",
-      "sha256": "806840779f20d2a8bf756a7d9961627c9aef050883e00b716a2c7db793a35ed6",
+      "sha256": "92c4d973a953ffc95a454cb25d67baf7d4b3fa5d67879254301c885e36b12d9f",
       "line": 54,
       "anchor": "pub fn trust("
     },
@@ -335,21 +335,21 @@
     {
       "id": "trust_cli_route",
       "path": "rust/crates/swarm-cli/src/trust.rs",
-      "sha256": "0895181f6c51ebd14006f042804d2bc1c89fc4adca5baef3b1b8abb36ca8f291",
-      "line": 13,
+      "sha256": "7a3653535e638045d7e7500d1631a47335da9402697b7338278de684b301dba7",
+      "line": 15,
       "anchor": "pub(super) fn execute("
     },
     {
       "id": "trust_http_route",
       "path": "rust/crates/swarm-web/src/service/trust.rs",
-      "sha256": "9af0abddb7b56a48082e61f1018b03dbbe7c7683a18de4e8b2419b4b98d85bdc",
-      "line": 12,
+      "sha256": "3c88f2b98feaa8fd91ae985ebc075709ccd5b515ec916306bd6459c6926a5142",
+      "line": 14,
       "anchor": "pub(super) fn trust_actions("
     },
     {
       "id": "diagnostic_http_status",
       "path": "rust/crates/swarm-web/src/service.rs",
-      "sha256": "dcb9daea0ddc2743e390b928cf426f42a412fcd1563017d09b37b6e4d3f08050",
+      "sha256": "5810e1e56d212a6d133096ca0f3ee3b991596f99954c87b406413f0a57bfa3c5",
       "line": 384,
       "anchor": "\"blp-access-denied\" if *operation==\"trust-command\""
     },
@@ -363,14 +363,14 @@
     {
       "id": "preparation_egress_lock",
       "path": "rust/crates/swarm-engine/src/local_storage.rs",
-      "sha256": "61298c08ec9665102cf8b198ad21a5ec61b5df119e6d097a11a4e3c24d284524",
-      "line": 438,
+      "sha256": "fd3ac43b8df4232075f84f2fb4266d0719e2e5b2ed70e723076a62eb7cfef9c3",
+      "line": 457,
       "anchor": "pub(crate) fn reserve_preparation_egress("
     },
     {
       "id": "preparation_control",
       "path": "rust/crates/swarm-engine/src/root_store/trust_store.rs",
-      "sha256": "806840779f20d2a8bf756a7d9961627c9aef050883e00b716a2c7db793a35ed6",
+      "sha256": "92c4d973a953ffc95a454cb25d67baf7d4b3fa5d67879254301c885e36b12d9f",
       "line": 81,
       "anchor": "pub(super) fn with_preparation_control("
     },
@@ -398,15 +398,15 @@
     {
       "id": "admission_source_attribute",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_admission.rs",
-      "sha256": "d9b2282cd6306b338da40806af9d658e3346590b0a4c8e5169cb1968c0e69455",
-      "line": 130,
+      "sha256": "bdebe2f2da4e26ba55da9f6ec07a5b02a3647f20e2abeb1a963f1fddd2367bc6",
+      "line": 188,
       "anchor": "pub(super) fn attribute("
     },
     {
       "id": "fixed_domain_admission",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_admission.rs",
-      "sha256": "d9b2282cd6306b338da40806af9d658e3346590b0a4c8e5169cb1968c0e69455",
-      "line": 163,
+      "sha256": "bdebe2f2da4e26ba55da9f6ec07a5b02a3647f20e2abeb1a963f1fddd2367bc6",
+      "line": 221,
       "anchor": "pub(super) fn execute("
     },
     {
@@ -447,14 +447,14 @@
     {
       "id": "transport_dispatch",
       "path": "rust/crates/swarm-engine/src/root_store/trust_store.rs",
-      "sha256": "806840779f20d2a8bf756a7d9961627c9aef050883e00b716a2c7db793a35ed6",
+      "sha256": "92c4d973a953ffc95a454cb25d67baf7d4b3fa5d67879254301c885e36b12d9f",
       "line": 69,
       "anchor": "if matches!(operation,\"blp-preparation-admit\""
     },
     {
       "id": "transport_http_map",
       "path": "rust/crates/swarm-web/src/service.rs",
-      "sha256": "dcb9daea0ddc2743e390b928cf426f42a412fcd1563017d09b37b6e4d3f08050",
+      "sha256": "5810e1e56d212a6d133096ca0f3ee3b991596f99954c87b406413f0a57bfa3c5",
       "line": 393,
       "anchor": "\"blp-transport-invalid\"|\"blp-destination-invalid\"|\"blp-destination-echo-mismatch\""
     },
@@ -471,6 +471,20 @@
       "sha256": "9f810034affc30d570b4313d90dbc9c4f3bd905534444c9f23be28a161e0e36e",
       "line": 148,
       "anchor": "root.preparation_worker_transport_gate(id, token, &r.base_url, &r.model)?;"
+    },
+    {
+      "id": "security_metadata",
+      "path": "rust/crates/swarm-engine/src/trust/security.rs",
+      "sha256": "e1d5b5c7ae993267e36cfc097e1552f987ce29f4e985ee5bc606c8a31555a0c1",
+      "line": 25,
+      "anchor": "pub(crate) fn observe("
+    },
+    {
+      "id": "security_view",
+      "path": "web/security-proofs.js",
+      "sha256": "d9ceec285ea55f6c43d92d91df41d812d862aa815ef13d94c7d84db6c88ff1cb",
+      "line": 24,
+      "anchor": "function render(v,d)"
     }
   ],
   "flows": [
@@ -826,7 +840,7 @@
         "history"
       ],
       "material": "returned text, proposals and provider-declared usage",
-      "current_controls": "response parsing/limits/state/publication and explicit operator adoption; no BLP classification is persisted on answers or proposals and no context-domain inheritance is established",
+      "current_controls": "response parsing/limits/state/publication and explicit operator adoption; BF-16a (2026-11-05): the public dialogue read applies no-read-down on readers when an admission receipt matches the turn (scan-then-decide, four typed blp-dialogue-* refusals, zero bytes on refusal); BF-16b (2026-11-06): the same shared reader verdict covers preparation_show, preparation_history and release-review (adopted documents linked by source_turn inherit their source turn's domain; zero matched receipts keeps the legacy bare read); no BLP classification is persisted on answers or proposals and no context-domain inheritance is established",
       "missing_blp": [
         "BLP-04"
       ],
@@ -995,10 +1009,12 @@
         "reconcile",
         "blp_diag",
         "storage",
-        "reader_guard"
+        "reader_guard",
+        "security_metadata",
+        "security_view"
       ],
       "material": "originals, policy history, identifiers, proofs and diagnostics",
-      "current_controls": "operator authority, hashes/publication errors; connected PAEA readers validate current persisted attribution and monotone history. Diagnostics remain non-authorizing; remaining show/export/archive surfaces need BLP coverage.",
+      "current_controls": "operator authority, hashes/publication errors; connected PAEA readers validate current persisted attribution and monotone history. Diagnostics remain non-authorizing; remaining show/export/archive surfaces need BLP coverage. Security metadata is an I3/admin read-only observation of current BLP capability and compiled declared inventory, with no project bytes, grants or evidence import; NOT_TESTED/unknown/not_qualified remain explicit. It does not verify source-anchor freshness or classify/export project evidence.",
       "missing_blp": [
         "BLP-04",
         "BLP-05",

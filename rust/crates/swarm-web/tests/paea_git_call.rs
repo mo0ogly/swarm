@@ -5550,3 +5550,87 @@ fn sqlite_effect_journal_state(db_path: &Path) -> String {
         .unwrap_or_else(|e| panic!("read-only state.db close failed: {e:?}"));
     report
 }
+
+/// Public prepared-source closes complete the ownership frontier: a prepared
+/// transfer source and its separately frozen approval are each released
+/// exactly once through the public `close_prepared` contracts, with no
+/// authority opened, no declaration, no HTTP and no journal write anywhere.
+/// Observations, no more and no less: the project and service Trust states
+/// byte-identical through the preparation and both closes, and a FRESH
+/// preparation on the same roots succeeding afterwards (explicit release,
+/// never a Drop or process-exit substitution). The approval witness is closed
+/// alone first, proving the approval owner's close consumes only its own
+/// witness and leaves the source closeable exactly once. Close failures stay
+/// typed through the existing engine signatures; this test exercises the
+/// success contract on legitimate witnesses.
+#[test]
+#[ignore = "requires explicit retained native source fixture"]
+fn prepared_source_public_close_releases_witnesses_and_permits_fresh_preparation() {
+    let owned = owned();
+    let project_before = service_trust_state(&owned.project_path);
+    let service_before = service_trust_state(&owned.service_path);
+    // Legitimate witnesses first: one prepared transfer source plus its
+    // frozen approval command against the source's own project root. The
+    // command bytes are fixture-only (digested, never executed, never
+    // approved); no declaration is provisioned and no authority is opened.
+    let source = PaeaGitCallSource::new_transfer(
+        owned.prepared,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    );
+    let approval = source
+        .prepare_approval(
+            swarm_enrollment_authority::trust_action::Operation::Approve,
+            b"close-contract-fixture-approve-command",
+        )
+        .unwrap_or_else(|e| panic!("approval preparation refused: {:?}", e.code()));
+    // The approval witness closes alone through its own public contract.
+    approval
+        .close_prepared()
+        .unwrap_or_else(|e| panic!("approval witness close refused: {:?}", e.code()));
+    // The source close then releases the held transfer witness exactly once.
+    source
+        .close_prepared()
+        .unwrap_or_else(|e| panic!("prepared source close refused: {:?}", e.code()));
+    // No durable effect from preparation or closes: both Trust stores
+    // byte-identical to before any preparation.
+    assert_eq!(
+        project_before,
+        service_trust_state(&owned.project_path),
+        "project trust state must stay byte-identical through preparation and closes"
+    );
+    assert_eq!(
+        service_before,
+        service_trust_state(&owned.service_path),
+        "service trust state must stay byte-identical through preparation and closes"
+    );
+    // Fresh recovery on the same roots: the released witnesses permit a new
+    // preparation and its own explicit close — the frontier stays usable
+    // without any process exit or Drop fallback.
+    let fresh = owned
+        .service
+        .paea_git_transfer_call(
+            &owned.project,
+            &proposal(&owned.repository_id, &owned.candidate),
+            &context(owned.trust_revision),
+            &owned.work,
+            "bare",
+            PIN,
+            "transfer-pack",
+        )
+        .unwrap_or_else(|e| panic!("fresh preparation refused after explicit closes: {:?}", e));
+    PaeaGitCallSource::new_transfer(
+        fresh,
+        owned.service_path.clone(),
+        owned.project_path.clone(),
+    )
+    .close_prepared()
+    .unwrap_or_else(|e| panic!("fresh source close refused: {:?}", e.code()));
+    assert_eq!(
+        project_before,
+        service_trust_state(&owned.project_path),
+        "project trust state must stay byte-identical through the fresh preparation"
+    );
+    let _ = owned.project.close();
+    let _ = owned.service.close();
+}

@@ -38,6 +38,12 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         _ => return Err(CliError::Usage),
     };
     let source_lines=if kind=="source"{Some((a.pos[4].parse::<i64>().map_err(|_|CliError::Usage)?,a.pos[5].parse::<i64>().map_err(|_|CliError::Usage)?))}else{None};
+    // BF-16a/BF-16b: the reader credential comes only from SWARM_TRUST_TOKEN
+    // (like `trust`), never rendered; an absent variable is a bare session,
+    // decided by the engine only when a matched admission makes the read
+    // classified.
+    let trust_variable=std::env::var("SWARM_TRUST_TOKEN").unwrap_or_default();
+    let reader_token=Some(trust_variable.as_str()).filter(|t|!t.is_empty());
     let store = RootStore::open(std::path::Path::new(&a.root), false).map_err(|e| CliError::Root(Box::new(e)))?;
     let mut causes = Vec::new();
     let result = match kind {
@@ -45,20 +51,16 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         "methods" => bytes(store.preparation_methods(), &mut causes),
         "templates"=>bytes(store.preparation_templates(),&mut causes),
         "template"=>bytes(store.preparation_template(&a.pos[2]),&mut causes),
-        "show" => bytes(store.preparation_show(&a.pos[2]), &mut causes),
-        "release-review" => bytes(store.preparation_release_review(&a.pos[2]), &mut causes),
-        // BF-16a: the reader credential comes only from SWARM_TRUST_TOKEN
-        // (like `trust`), never rendered; an absent variable is a bare
-        // session, decided by the engine only when classified dialogue is
-        // actually served.
-        "dialogue" => bytes(store.preparation_dialogue(&a.pos[2], Some(std::env::var("SWARM_TRUST_TOKEN").unwrap_or_default().as_str()).filter(|t|!t.is_empty())), &mut causes),
+        "show" => bytes(store.preparation_show(&a.pos[2], reader_token), &mut causes),
+        "release-review" => bytes(store.preparation_release_review(&a.pos[2], reader_token), &mut causes),
+        "dialogue" => bytes(store.preparation_dialogue(&a.pos[2], reader_token), &mut causes),
         "budget" => bytes(store.preparation_budget(&a.pos[2]), &mut causes),
         "files" => bytes(store.preparation_files(&a.pos[2],a.pos.get(3).map_or(".",String::as_str),a.pos.get(4).map_or("",String::as_str)),&mut causes),
         "source" => {
             let (start,end)=source_lines.expect("validated source operation");
             bytes(store.preparation_source(&a.pos[2],&a.pos[3],start,end,&mut swarm_engine::SystemEnvironment),&mut causes)
         },
-        "history" => bytes(store.preparation_history(&a.pos[2], &a.pos[3], before), &mut causes),
+        "history" => bytes(store.preparation_history(&a.pos[2], &a.pos[3], before, reader_token), &mut causes),
         _ => unreachable!("validated operation vocabulary"),
     };
     finish_read(store,result,out,causes)

@@ -570,9 +570,11 @@ Pour cette lecture, les refus exposent un motif statique sûr dans failure.reaso
 les causes internes restent masquées. L’interface l’affiche comme texte sans
 modifier les décisions de contrôle fondées sur les codes.
 
-La source canonique sous `.claude/field-guide` reste refusée avec HTTP501 et
-`versioned-memory-source-guard-not-ported` tant que son garde versionné n’est pas
-porté. Le statut ne contourne pas cette limite.
+La source canonique sous `.claude/field-guide` reste refusée : son garde versionné
+est porté (project_memory_source.rs) et expose des refus typés — une source mémoire
+gérée visée comme consigne refuse en 400 `project-source-memory-managed` (400 pour
+une entrée d'appelant invalide via caller_invalid ; une défaillance d'inventaire
+racine/SQL reste une erreur serveur). Le statut ne contourne pas cette limite.
 
 `prepare release-review ID` lit le même objet `{preparation, work}` que GET
 `/api/v1/preparations/release-review?id=ID`. Les deux observations successives
@@ -643,8 +645,9 @@ Les propositions se comparent avant `use-proposal`, avec événement et CAS ; le
 brouillon, son historique et `source_turn` sont conservés. L'adoption du brief
 reste explicite ; le plan reste à vérifier. Aucune mission n'est démarrée par ce
 parcours. Adaptateurs CLI, anciens tours actifs et agents Work API restent hors
-de ce premier raccord. La garde des sources mémoire versionnées reste en501,
-avec une raison statique ; la supprimer n'est pas un mode de reprise.
+de ce premier raccord. Les sources mémoire versionnées sont gardées par leur
+garde porté (project_memory_source.rs) : une source gérée visée comme consigne
+refuse avec une raison statique typée ; la supprimer n'est pas un mode de reprise.
 
 Compatibilité historique livrée : un événement exact d'un tour Go
 terminé peut être relu sans métadonnées de worker natif, sans appel ni mutation.
@@ -683,7 +686,8 @@ Les cibles réelles privées `.swarm`/`.git` et les alias vers des fichiers autr
 que Markdown/texte sont refusés ; sur Unix, les sources à liens physiques
 multiples et les redirections de composants lors de l'ouverture sont refusées.
 Cette preuve concerne Linux : ni absence de tout secret, ni confinement OS, ni
-attestation d'agent. Les mémoires versionnées restent sous leur garde501.
+attestation d'agent. Les mémoires versionnées restent sous leur garde porté
+(project_memory_source.rs), avec un refus typé.
 Le formulaire conserve le brouillon et son ancien SHA après échec ; actualiser
 ne le rebase pas silencieusement. Aucune configuration vivante n'est sélectionnée
 par l'installation. Voir [le suivi](docs/plans/migration-rust/PROJECT-PROFILE-SELECT-20261027.md).

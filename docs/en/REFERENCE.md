@@ -426,9 +426,12 @@ remain migration work. For this read, refusals expose a safe static identifier i
 internal causes remain hidden. The interface displays that identifier as text;
 control decisions still use stable codes without parsing message wording.
 
-A canonical source under `.claude/field-guide` still refuses with HTTP501 and
-`versioned-memory-source-guard-not-ported` until its versioned guard is ported.
-The status reader does not bypass this limitation.
+A canonical source under `.claude/field-guide` still refuses: its versioned
+guard is ported (project_memory_source.rs) and exposes typed refusals — a
+managed memory source targeted as a directive refuses with 400
+`project-source-memory-managed` (400 for invalid caller input through
+caller_invalid; a root/SQL inventory failure stays a server error). The
+status reader does not bypass this limitation.
 
 `prepare release-review ID` reads the same `{preparation, work}` object as GET
 `/api/v1/preparations/release-review?id=ID`. Two sequential observations are not
@@ -500,8 +503,10 @@ Explicit comparison precedes `use-proposal` with event identity and CAS; version
 history and `source_turn` are preserved. Brief adoption remains explicit, and a
 plan still needs validation. This flow starts no mission. CLI provider adapters
 and Work API agents remain outside this first integration (legacy active turns
-are since observed read-only, see above). Versioned-memory sources retain
-their501 guard and static reason; removing it is not a recovery mode.
+are since observed read-only, see above). Versioned-memory sources are guarded
+by their ported guard (project_memory_source.rs): a managed source targeted as
+a directive refuses with a typed static reason; removing it is not a recovery
+mode.
 
 Delivered historical compatibility: an exact completed Go turn can be
 replayed without native-worker metadata, provider contact or mutation. Parent and
@@ -541,8 +546,9 @@ an invalid active JSON profile's SHA for explicit repair, without calling it val
 Recognizable secrets are checked in names, paths and text. Actual `.swarm`/`.git`
 targets and aliases to non-Markdown/text files refuse; on Unix, multiple hardlinks
 and component redirection during open refuse. Evidence concerns Linux, not absence
-of every secret, OS confinement or agent attestation. Versioned memory retains
-its501 guard. The form keeps draft/original SHA on failure; refreshing never
+of every secret, OS confinement or agent attestation. Versioned memory is guarded
+by its ported guard (project_memory_source.rs), with a typed refusal. The form
+keeps draft/original SHA on failure; refreshing never
 silently rebases it. Installation selects no live configuration. See the
 [migration record](../plans/migration-rust/PROJECT-PROFILE-SELECT-20261027.md).
 

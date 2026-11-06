@@ -23,6 +23,9 @@
   "tests/paea-reader-credential-erasure.cjs",
   "tests/paea-approval-form-ui.cjs",
   "tests/paea_approval_form_ui_recipe.py",
+  "tests/test_approval_resolution_raw_evidence.py",
+  "tests/test_approval_driver_stream_drain.py",
+  "tests/fixture_area.py",
   "package.json",
   "package-lock.json",
   "tools/verification/recipe.py",
@@ -39,6 +42,32 @@
   "SWARM_PAEA_SOURCE_FIXTURE": "{root}/.swarm-fixtures/source-fixture-fresh-regen-20261031"
  },
  "steps": [
+  {
+   "id": "approval-form-resolution-raw-evidence-guard",
+   "command": [
+    "python3",
+    "tests/test_approval_resolution_raw_evidence.py"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "APPROVAL_RESOLUTION_RAW_EVIDENCE_GUARD",
+    "OK"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "approval-form-driver-stream-drain-guard",
+   "command": [
+    "python3",
+    "tests/test_approval_driver_stream_drain.py"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "APPROVAL_DRIVER_STREAM_DRAIN_GUARD",
+    "OK"
+   ],
+   "required_stderr": []
+  },
   {
    "id": "approval-presentation-absence-without-source",
    "command": [

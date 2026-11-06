@@ -95,7 +95,7 @@
       "expected_exit": 0,
       "required_stdout": [],
       "required_stderr": [
-        "Ran 3 tests",
+        "Ran 4 tests",
         "OK",
         "test_end_to_end_run_passes_in_snapshot_and_fails_on_undeclared_read"
       ]

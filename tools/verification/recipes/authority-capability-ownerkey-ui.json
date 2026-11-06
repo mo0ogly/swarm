@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "id": "authority-capability-ownerkey-ui",
+  "inputs": [
+    "tests/authority_capability_binding_negative.py",
+    "tests/authority_capability_consumer_test.cjs",
+    "tests/authority_capability_inputs.py",
+    "tests/blp_admission_ui.py",
+    "tests/fixture_area.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "tests/blp_attribution_history_cli.py",
+    "web/cockpit-authority.js",
+    "web/i18n-en.js",
+    "web/native-authority-admin.js",
+    "web/native-runtime.js",
+    "locales/en.json",
+    "rust/crates/swarm-web/src/service.rs",
+    "version_history.json",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "capability-ownerkey-input-binding",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess; subprocess.run(['python3','tests/authority_capability_inputs.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE']],check=True); print('AUTHORITY_CAPABILITY_INPUTS_STEP_BOUND')"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "AUTHORITY_CAPABILITY_INPUTS_BOUND "
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "capability-ownerkey-binding-negative",
+      "command": [
+        "python3",
+        "tests/authority_capability_binding_negative.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "NEGATIVE witness exit=0",
+        "AUTHORITY_CAPABILITY_BINDING_NEGATIVE_PASS cases=",
+        "AUTHORITY_CAPABILITY_BINDING_NEGATIVE_WITNESS_SHA256 "
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "capability-ownerkey-consumer-guard",
+      "command": [
+        "node",
+        "tests/authority_capability_consumer_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS owner_key_resolves_mode_none",
+        "PASS owner_key_administer_false",
+        "PASS owner_key_no_error_attached",
+        "PASS owner_key_hides_card",
+        "PASS owner_key_exactly_one_capability_fetch",
+        "PASS owner_key_zero_daemon_fetches",
+        "PASS owner_key_no_auto_retry_after_settle",
+        "PASS owner_key_no_console_errors",
+        "PASS authority_mode_offers_first_me_call",
+        "PASS authority_me_refusal_resolves_visible_error_mode",
+        "PASS authority_me_refusal_status_preserved_403",
+        "PASS authority_me_refusal_reason_stable_code",
+        "PASS authority_me_refusal_no_views_granted",
+        "PASS capability_403_resolves_error_mode",
+        "PASS capability_403_status_preserved",
+        "PASS capability_403_reason_stable_code",
+        "PASS capability_network_reject_cause_identity",
+        "PASS capability_network_reject_no_private_in_dom_console_reason",
+        "PASS capability_parse_reject_cause_identity",
+        "PASS capability_key_absent_resolves_error_not_none",
+        "PASS capability_mode_unknown_resolves_error_not_none",
+        "PASS me_network_reject_reason_is_stable_code",
+        "PASS me_network_reject_no_private_in_dom_console_reason",
+        "PASS me_parse_reject_cause_identity",
+        "PASS recovery_after_capability_network_failure_resolves_none",
+        "PASS recovery_after_me_refusal_owner_key_none_zero_me",
+        "PASS cockpit_unexpected_rejection_card_visible_not_hidden",
+        "PASS cockpit_unexpected_rejection_no_private_leak",
+        "PASS cockpit_owner_key_card_hidden",
+        "PASS cockpit_owner_key_single_fetch_zero_me",
+        "PASS runtime_unexpected_rejection_mount_called_once_no_retry",
+        "PASS runtime_unexpected_rejection_no_private_leak",
+        "PASS runtime_owner_key_no_daemon_fetch",
+        "PASS dialog_path_mount_authority_card_visible",
+        "PASS dialog_path_single_exact_me_read",
+        "PASS dialog_path_mount_resolves_authority_mode",
+        "PASS dialog_path_own_password_button_present",
+        "PASS dialog_submit_unknown_daemon_code_refusal_visible",
+        "PASS dialog_submit_renders_generic_refusal_message_only",
+        "PASS dialog_submit_unknown_daemon_code_never_renders",
+        "PASS dialog_submit_no_private_leak_in_dom_console",
+        "PASS dialog_submit_original_error_unmutated_with_status",
+        "PASS dialog_submit_reason_not_contaminated",
+        "PASS dialog_submit_ok_reenabled_for_recovery",
+        "PASS dialog_submit_recovery_resubmit_success_notice_on_card",
+        "PASS dialog_submit_recovery_single_retried_post",
+        "GUARD_SUMMARY pass=",
+        "AUTHORITY_CAPABILITY_CONSUMER_GUARD_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "capability-ownerkey-owned-image-ui",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,sys; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=Path(os.environ['SWARM_CAPABILITY_PROOF_OUTPUT']) if 'SWARM_CAPABILITY_PROOF_OUTPUT' in os.environ else fixture_root('authority-capability-proof-')/'ownerkey-ui'; subprocess.run(['python3','tests/blp_admission_ui.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',str(out)],check=True); print('AUTHORITY_CAPABILITY_OWNED_UI_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "BLP_ADMISSION_FIXTURE_UI_PASS 56",
+        "LIVE_AUTHORITY_UI_OPEN",
+        "AUTHORITY_CAPABILITY_OWNED_UI_EVIDENCE "
+      ],
+      "required_stderr": []
+    }
+  ]
+}

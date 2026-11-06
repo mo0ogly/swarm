@@ -36,7 +36,9 @@
   * no repeated operation, hidden queue cap or timeout is added. */
  function request(operation,change,work){const previous=barrier;let release;barrier=new Promise(resolve=>{release=resolve});return previous.then(async()=>{try{return await send(operation,change,work)}finally{release()}})}
  /** Bootstrap a protected dedicated CSRF and mount the existing component once.
-  * Terminal errors stay visible with an explicit reload. Navigation/unload does
+  * Terminal errors stay visible with an explicit reload. The authority Admin
+  * mount never hides a failure: an unexpected throw is logged by stable code,
+  * rendered in the card, its original cause retained unmutated. Navigation/unload does
   * not claim to cancel an already admitted Root publication; history owns replay. */
  async function start(){if(starting||component)return;starting=true;retry.hidden=true;status.hidden=false;status.className='notice info';status.textContent=tr('Chargement…');
   try{const session=await request('session');if(session?.schema_version!==1||session.csrf_format!=='hmac-sha256-v1'||typeof session.csrf_token!=='string'||!/^[0-9a-f]{64}$/.test(session.csrf_token))throw failure('web-native-session-invalid');csrf=session.csrf_token;
@@ -44,7 +46,13 @@
    SwarmLogReadPolicyAdmin.mount(document.getElementById("native-log-read-policy"),{show:()=>request("logReadPolicyShow"),preview:r=>request("logReadPolicyPreview",r),apply:r=>request("logReadPolicyApply",r)},{translate:tr});
    SwarmActivityPolicyAdmin.mount(document.getElementById("native-activity-policy"),{show:()=>request("activityPolicyShow"),preview:r=>request("activityPolicyPreview",r),apply:r=>request("activityPolicyApply",r)},{translate:tr});
    SwarmGraphPerformanceAdmin.mount(document.getElementById("native-graph-performance"),{show:()=>request("graphPerformanceShow"),preview:r=>request("graphPerformancePreview",r),apply:r=>request("graphPerformanceApply",r)},{translate:tr});
-   SwarmAuthorityAdmin.mount(document.getElementById('native-authority-admin'),document.querySelector('.native-runtime-header nav'),{translate:tr}).catch(()=>{document.getElementById('native-authority-admin').hidden=true}); // B8: hidden outside authority mode
+   SwarmAuthorityAdmin.mount(document.getElementById('native-authority-admin'),document.querySelector('.native-runtime-header nav'),{translate:tr}).catch(original=>{ // B8: contract errors resolve mode 'error' with the diagnostic already rendered; an unexpected throw stays visible here — the original error stays unmutated on `.cause` of a stable wrapper (reason copied when a plain string), safe code only
+    const error=Error('authority-mount-unexpected',{cause:original});
+    if(typeof original.reason==='string')error.reason=original.reason;
+    console.error('SwarmAuthorityAdmin mount:',error.message);
+    const host=document.getElementById('native-authority-admin');host.hidden=false;
+    const notice=document.createElement('p');notice.className='notice alert';notice.textContent=tr('Refus du démon d’autorité.')+' ('+error.message+')';host.replaceChildren(notice);
+   });
    component=SwarmEngineSettingsAdmin.mount(document.getElementById('native-settings-admin'),{describe:()=>request('describe'),show:()=>request('show'),preview:change=>request('preview',change),apply:change=>request('apply',change),budget:{show:()=>request('budgetShow'),preview:change=>request('budgetPreview',change),apply:change=>request('budgetApply',change)}},{translate:tr});
    if(!lifecycleInventory)lifecycleInventory=SwarmLifecycleInventory.mount(document.getElementById('native-lifecycle-inventory'),{show:()=>request('lifecycleInventory')},{translate:tr});
    if(!cockpit)cockpit=SwarmNativeCockpit.mount(document.getElementById('native-cockpit'),{list:()=>request('quotaList'),controls:work=>request('missionControls',undefined,work),status:work=>request('missionStatus',undefined,work),activity:query=>request('activity',undefined,query),exchanges:work=>request('exchanges',undefined,work),planningHistory:work=>request('planningHistory',undefined,work),visit:{show:work=>request('visitShow',undefined,work),mark:(work,intent)=>request('visitMark',intent,work)}},{translate:tr});

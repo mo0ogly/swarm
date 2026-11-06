@@ -1,6 +1,8 @@
 //! BF-16a reproduction: the public preparation dialogue returns an admitted
-//! turn's classified answer with no reader control at all. No provider is
-//! contacted; fixtures live under the repository fixture area (never /tmp).
+//! turn's classified answer with no reader control at all. BF-16b extends the
+//! same reader verdict to the show and history presentation frontiers. No
+//! provider is contacted; fixtures live under the repository fixture area
+//! (never /tmp).
 #![cfg(target_os = "linux")]
 use rusqlite::{params, Connection};
 use serde_json::{json, Value};
@@ -329,6 +331,144 @@ fn dialogue_without_any_matched_admission_keeps_legacy_bare_read() {
         answer.message.contains("réponse legacy"),
         "legacy dialogue remains readable to a bare session without admission"
     );
+    let fixture_path = f.path.clone();
+    f.close();
+    std::fs::remove_dir_all(&fixture_path).ok();
+}
+
+/// BF-16b: show and history are presentation frontiers of the same admitted
+/// classified output. The adopted documents they expose inherit the source
+/// turn's classified domain, so once one admission receipt matches the
+/// preparation's recorded turns, a bare session must be refused on BOTH
+/// frontiers with the shared dialogue code and an under-cleared reader with
+/// access-denied, before any preparation or document byte is served — while
+/// the cleared sender keeps its reads (recovery side). Zero matched receipts
+/// keeps the legacy bare read on both frontiers, proven here by the second
+/// fixture whose preparation carries no admission at all.
+#[test]
+fn show_and_history_inherit_the_dialogue_reader_verdict() {
+    // Classified fixture: admitted turn, so show/history become frontiers.
+    let f = Fixture::new("show-frontier");
+    let _admission = bootstrap(&f);
+    let bound = serde_json::to_vec(&f.request("intent")).unwrap();
+    let turn = f.root.preparation_send(&bound, &mut SystemEnvironment).unwrap();
+    let token = f.register(&turn.id);
+    f.root.preparation_worker_claim(&turn.id, &token).unwrap();
+    f.root
+        .preparation_worker_finish(
+            &turn.id,
+            Some(r#"{"message":"Réponse classifiée de fixture"}"#),
+            None,
+            "fixture-no-contact",
+            &mut SystemEnvironment,
+        )
+        .unwrap();
+    // BF-16b contract on show: a bare session is never authorization once
+    // admitted classified output exists; the shared dialogue code refuses
+    // before any preparation byte.
+    let bare_show = codes(f.root.preparation_show(&f.preparation.id, None).map(|_| ()).map_err(|e| e).err().expect("classified show must refuse a bare session"));
+    assert!(
+        bare_show.contains("blp-dialogue-authentication-required"),
+        "expected bare-session show refusal, got: {bare_show}"
+    );
+    // The same verdict on history for every document kind.
+    for kind in ["besoin", "brief", "plan"] {
+        let bare_history = codes(f.root
+            .preparation_history(&f.preparation.id, kind, None, None)
+            .map(|_| ())
+            .map_err(|e| e)
+            .err()
+            .expect("classified history must refuse a bare session"));
+        assert!(
+            bare_history.contains("blp-dialogue-authentication-required"),
+            "expected bare-session history refusal for {kind}, got: {bare_history}"
+        );
+    }
+    // An under-cleared known reader authenticates but holds no clearance.
+    let under_show = codes(f.root
+        .preparation_show(&f.preparation.id, Some("fixture-reader-token"))
+        .map(|_| ())
+        .map_err(|e| e)
+        .err()
+        .expect("classified show must refuse an under-cleared reader"));
+    assert!(
+        under_show.contains("blp-dialogue-access-denied"),
+        "expected under-cleared show refusal, got: {under_show}"
+    );
+    // Recovery side: the cleared sender keeps both frontiers readable. Show
+    // serves the preparation (the dialogue is a separate frontier, asserted
+    // above); history serves the saved revisions (none yet for every kind).
+    let shown = f.root
+        .preparation_show(&f.preparation.id, Some("fixture-sender-token"))
+        .unwrap();
+    assert_eq!(
+        shown.value.id, f.preparation.id,
+        "a cleared reader keeps reading the admitted show frontier"
+    );
+    for (kind, expected) in [("besoin", 1), ("brief", 0), ("plan", 0)] {
+        let history = f.root
+            .preparation_history(&f.preparation.id, kind, None, Some("fixture-sender-token"))
+            .unwrap();
+        assert_eq!(
+            history.value.len(),
+            expected,
+            "history for {kind} must still be served to a cleared reader"
+        );
+    }
+    let fixture_path = f.path.clone();
+    f.close();
+    std::fs::remove_dir_all(&fixture_path).ok();
+}
+
+/// BF-16b legacy continuity: with NO admission receipt matching the
+/// preparation, show and history keep serving a bare session exactly as
+/// before — the control keys on matched admissions, never on policy presence.
+#[test]
+fn show_and_history_without_any_matched_admission_keep_legacy_bare_read() {
+    let f = Fixture::new("show-legacy");
+    // Trust configured but no admission: no receipt can match this
+    // preparation, so both frontiers stay on the legacy path.
+    call(&f.root, "config-apply", json!({"schema_version":1,"event_id":"init","expected_revision":0,"reason":"owned fixture",
+        "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":true},
+        "identities":[{"subject":"admin","integrity":3,"roles":["admin"],"token":"fixture-admin-token"},
+        {"subject":"sender","integrity":1,"roles":["requester"],"token":"fixture-sender-token"},
+        {"subject":"reader","integrity":1,"roles":["requester"],"token":"fixture-reader-token"}]}), "").unwrap();
+    call(&f.root, "blp-policy-apply", json!({"schema_version":1,"event_id":"policy","expected_revision":0,
+        "expected_trust_revision":1,"reason":"explicit fixture policy",
+        "policy":{"schema_version":1,"levels":[{"id":"public","name_fr":"Public","name_en":"Public"}],
+        "compartments":[],"clearances":{"admin":{"level":"public","compartments":[]}}}}),
+        "fixture-admin-token").unwrap();
+    // One ordinary legacy send/finish cycle with no admission at all.
+    let unbound = serde_json::to_vec(&f.request("legacy-event")).unwrap();
+    let turn = f.root.preparation_send(&unbound, &mut SystemEnvironment).unwrap();
+    let token = f.register(&turn.id);
+    f.root.preparation_worker_claim(&turn.id, &token).unwrap();
+    f.root
+        .preparation_worker_finish(
+            &turn.id,
+            Some(r#"{"message":"réponse legacy sans admission"}"#),
+            None,
+            "fixture-no-contact",
+            &mut SystemEnvironment,
+        )
+        .unwrap();
+    // Bare session reads both frontiers: the zero-receipt legacy path stays
+    // intact — show serves the preparation, history serves saved revisions.
+    let shown = f.root.preparation_show(&f.preparation.id, None).unwrap();
+    assert_eq!(
+        shown.value.id, f.preparation.id,
+        "legacy show remains readable to a bare session without admission"
+    );
+    for (kind, expected) in [("besoin", 1), ("brief", 0), ("plan", 0)] {
+        let history = f.root
+            .preparation_history(&f.preparation.id, kind, None, None)
+            .unwrap();
+        assert_eq!(
+            history.value.len(),
+            expected,
+            "legacy history for {kind} must stay readable to a bare session"
+        );
+    }
     let fixture_path = f.path.clone();
     f.close();
     std::fs::remove_dir_all(&fixture_path).ok();

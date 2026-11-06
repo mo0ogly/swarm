@@ -62,3 +62,18 @@ passe, le refus du callback, la révocation, l’annulation après usage et le C
 Elle réexécute les trois régressions Trust concernées par le noyau commun. Ces
 preuves locales ne qualifient ni un effet séparé, ni l’installation protégée,
 ni les invariants PAEA globaux, ni E2/E3.
+
+## Réponse d’approbation connectée
+
+Les deux surfaces web connectées (`web/paea-approval-form.js` et
+`web/paea-consent.js`) n’interprètent un succès de la consommation POST
+d’approbation que sur un état exact `state:"approved"` : l’objet ordinaire
+complet et l’accusé rédigé `trust-status-ack-v1` (`content_redacted:true`)
+portent tous deux cet état et sont acceptés sans imposer la forme rédigée.
+`denied` reste un refus visible avec sa raison ; `admitted`,
+`pending_approval`, `committed`, `unknown`, `reconciled` et tout état manquant,
+nul ou vide s’affichent en échec fermé et ne sont jamais un succès. C’est une
+interprétation de présentation côté navigateur, sans changement producteur ni
+serveur ; elle ne qualifie aucune installation ni acceptation globale.
+
+Qualification locale : recette permanente `tools/verification/recipes/paea-approval-state-fail-closed.json` — `python3 tools/verification/recipe.py run --recipe tools/verification/recipes/paea-approval-state-fail-closed.json --output FRESH`, puis `python3 tools/verification/recipe.py verify --evidence FRESH` sur ce même répertoire FRESH produit par la recette (manifeste d’exécution, entrées et sorties brutes conservés dans FRESH) ; 36 contrôles nommés FR/EN attendus, 0 diagnostic. Le navigateur crée séparément son propre TMPDIR privé, frais, imprimé dans la sortie d’étape ; `verify` ne consomme pas ce TMPDIR. Périmètre de preuve : API synthétique et scripts Chrome réels pilotés par gestes DOM ; aucune vérification du service des ressources par l’ELF normal, du pointeur physique ou de la disposition de l’interface n’est revendiquée, et cette preuve ne qualifie ni installation ni acceptation globale.

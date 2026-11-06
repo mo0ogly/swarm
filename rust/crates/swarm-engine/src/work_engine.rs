@@ -87,6 +87,8 @@ pub enum WorkEngineError {
     Gate(crate::GateContractError),
     GateRequest(crate::GateRequestError),
     Lifecycle(crate::TaskLifecycleError),
+    /// Versioned-memory cycle refusal with its stable code and safe reason.
+    Memory(crate::project_memory::MemoryError),
     UnportedStatus,
     Overflow,
     Rollback {
@@ -115,6 +117,7 @@ impl WorkEngineError {
             Self::Gate(e) => e.code(),
             Self::GateRequest(e) => e.code(),
             Self::Lifecycle(e) => e.code(),
+            Self::Memory(e) => e.code(),
             Self::Definition(e) => e.code(),
             Self::Task(e) => e.code(),
             Self::Checkpoint(e) => e.code(),
@@ -172,6 +175,7 @@ impl fmt::Display for WorkEngineError {
             Self::Task(e) => fmt::Display::fmt(e, f),
             Self::Gate(e) => fmt::Display::fmt(e, f),
             Self::Lifecycle(e) => fmt::Display::fmt(e, f),
+            Self::Memory(e) => fmt::Display::fmt(e, f),
             _ => f.write_str(self.code()),
         }
     }
@@ -188,6 +192,7 @@ impl Error for WorkEngineError {
             Self::Gate(e) => Some(e),
             Self::GateRequest(e) => Some(e),
             Self::Lifecycle(e) => Some(e),
+            Self::Memory(e) => Some(e),
             Self::Definition(e) => Some(e),
             Self::Task(e) => Some(e),
             Self::Checkpoint(e) => Some(e),
@@ -351,6 +356,15 @@ impl<'a, E: WorkEnvironment> WorkEngine<'a, E> {
         } else {
             None
         };
+        let memory = if let Some(action) = kind.strip_prefix("memory.") {
+            Some((
+                crate::project_memory::decode_project_memory_request(raw, action)
+                    .map_err(WorkEngineError::Memory)?,
+                action.to_string(),
+            ))
+        } else {
+            None
+        };
         let planning = if let Some(action) = crate::PlanningControlAction::from_kind(kind) {
             let request =
                 crate::decode_planning_request(raw).map_err(WorkEngineError::PlanningRequest)?;
@@ -420,6 +434,19 @@ impl<'a, E: WorkEnvironment> WorkEngine<'a, E> {
                     ))
                 })?,
             )
+        } else if let Some((change, _)) = &memory {
+            (
+                Request {
+                    schema_version: change.schema_version,
+                    event_id: change.event_id.clone(),
+                    expected_revision: change.expected_revision,
+                    id: change.id.clone(),
+                    ..Default::default()
+                },
+                crate::encode_model(change).map_err(|e| {
+                    WorkEngineError::Memory(crate::project_memory::MemoryError::Row(e))
+                })?,
+            )
         } else if let Some((planning, _)) = &planning {
             (
                 Request {
@@ -482,6 +509,7 @@ impl<'a, E: WorkEnvironment> WorkEngine<'a, E> {
                     quota: quota.as_ref(),
                     task_model: task_model.as_ref(),
                     task_report: task_report.as_ref(),
+                    memory: memory.as_ref().map(|(r, a)| (r, a.as_str())),
                     gate: gate.as_ref(),
                     graph: graph.as_ref(),
                     budget: budget.as_ref(),
@@ -588,6 +616,7 @@ struct Invocation<'a> {
     quota: Option<&'a crate::QuotaChange>,
     task_model: Option<&'a crate::TaskModelRequest>,
     task_report: Option<&'a crate::TaskReportRequest>,
+    memory: Option<(&'a crate::ProjectMemoryRequest, &'a str)>,
     gate: Option<&'a crate::GateRequest>,
     graph: Option<&'a crate::GraphBatchRequest>,
     budget: Option<&'a crate::BudgetChange>,
@@ -625,6 +654,7 @@ fn apply<E: WorkEnvironment>(
         quota,
         task_model,
         task_report,
+        memory,
         budget,
         quality_policy,
         planning,
@@ -641,6 +671,7 @@ fn apply<E: WorkEnvironment>(
         && quota.is_none()
         && task_model.is_none()
         && task_report.is_none()
+        && memory.is_none()
         && graph.is_none()
     {
         let empty = Work::default();
@@ -743,6 +774,192 @@ fn apply<E: WorkEnvironment>(
             ))?;
             crate::task_model::apply(tx, root, &mut candidate, request, settings, environment)
                 .map_err(WorkEngineError::TaskModel)?;
+        }
+        "memory.select" | "memory.admit" | "memory.replace" | "memory.withdraw" => {
+            let action = kind.strip_prefix("memory.").ok_or(WorkEngineError::UnportedStatus)?;
+            let (request, _) = memory.ok_or(WorkEngineError::UnportedStatus)?;
+            if action == "select" {
+                // Go memorySelection: an executing future task only.
+                let task = candidate
+                    .tasks
+                    .as_deref()
+                    .unwrap_or_default()
+                    .iter()
+                    .find(|t| t.id == request.task)
+                    .ok_or_else(|| {
+                        WorkEngineError::Memory(crate::project_memory::MemoryError::Refused(
+                            "project-memory-task-unknown",
+                        ))
+                    })?;
+                if task.status != "todo"
+                    || task.plan_role == "subplanner"
+                    || task.brainstorm
+                {
+                    return Err(WorkEngineError::Memory(
+                        crate::project_memory::MemoryError::Refused(
+                            "project-memory-selection-not-executing",
+                        ),
+                    ));
+                }
+                // Go instructionIdleTx: an active attempt already reserved the
+                // task's instructions; the selection must not race it.
+                let active: i64 = tx
+                    .query_row(
+                        "SELECT count(*) FROM agents WHERE work_id=? AND task_id=? AND status IN ('queued','starting','running','stopping')",
+                        rusqlite::params![candidate.id, request.task],
+                        |row| row.get(0),
+                    )
+                    .map_err(WorkEngineError::Sql)?;
+                if active != 0 {
+                    return Err(WorkEngineError::Memory(
+                        crate::project_memory::MemoryError::Refused(
+                            "project-memory-instructions-reserved",
+                        ),
+                    ));
+                }
+                // Stamp the selection on the task (Go fn body).
+                let selections = request.selections.clone().unwrap_or_default();
+                let task = candidate
+                    .tasks
+                    .as_mut()
+                    .unwrap()
+                    .iter_mut()
+                    .find(|t| t.id == request.task)
+                    .ok_or(WorkEngineError::UnportedStatus)?;
+                task.memory_selections = Some(selections.clone());
+                task.memory_selection_imported = false;
+                let actor = environment.operator().map_err(WorkEngineError::Runtime)?;
+                let at = environment.timestamp().map_err(WorkEngineError::Runtime)?;
+                task.memory_decision = Some(Box::new(crate::MemorySelectionDecision {
+                    event_id: request.event_id.clone(),
+                    actor,
+                    reason: request.reason.clone(),
+                    at,
+                }));
+                // Go hook: idle guard, projected attachments, selection token.
+                let project_hash =
+                    crate::agent_launch_preflight::hash(root.to_string_lossy().as_bytes());
+                let policy = match quality_policy {
+                    Some(policy) => Some(policy.clone()),
+                    None => planning_settings
+                        .filter(|_| candidate.planning.is_some())
+                        .and_then(|settings| settings.quality_policy_snapshot().ok()),
+                };
+                let lifecycle = crate::TaskLifecycleContext {
+                    root,
+                    quality_policy: policy.as_ref(),
+                    task_limits: &limits.task,
+                    validation_limits: &limits.policy,
+                };
+                let verified_source = |work: &crate::Work, retex: &crate::Retex| {
+                    crate::project_memory::verified_memory_source(
+                        work,
+                        retex,
+                        &lifecycle,
+                        planning_settings,
+                    )
+                };
+                let context = crate::project_memory::memory_attachments(
+                    &candidate,
+                    &selections,
+                    "worker",
+                    &project_hash,
+                    &verified_source,
+                )
+                .map_err(WorkEngineError::Memory)?;
+                let expected = crate::project_memory::memory_preview_token(
+                    action,
+                    request,
+                    &crate::MemoryVersion::default(),
+                    &context,
+                )
+                .map_err(WorkEngineError::Memory)?;
+                if request.preview_token.is_empty() || request.preview_token != expected {
+                    return Err(WorkEngineError::Memory(
+                        crate::project_memory::MemoryError::RevisionConflict(
+                            "project-memory-preview-stale",
+                        ),
+                    ));
+                }
+            } else {
+                // Content branch: the verified-source checker recomputes fresh
+                // acceptance or dialogue evidence under the current candidate.
+                let policy = match quality_policy {
+                    Some(policy) => Some(policy.clone()),
+                    None => planning_settings
+                        .filter(|_| candidate.planning.is_some())
+                        .and_then(|settings| settings.quality_policy_snapshot().ok()),
+                };
+                let lifecycle = crate::TaskLifecycleContext {
+                    root,
+                    quality_policy: policy.as_ref(),
+                    task_limits: &limits.task,
+                    validation_limits: &limits.policy,
+                };
+                let verified_source = |work: &crate::Work, retex: &crate::Retex| {
+                    crate::project_memory::verified_memory_source(
+                        work,
+                        retex,
+                        &lifecycle,
+                        planning_settings,
+                    )
+                };
+                // Go hash([]byte(s.root)): digest of the root path string.
+                let project_hash =
+                    crate::agent_launch_preflight::hash(root.to_string_lossy().as_bytes());
+                let operator = environment.operator().map_err(WorkEngineError::Runtime)?;
+                let mut version = crate::project_memory::next_memory(
+                    &candidate,
+                    action,
+                    request,
+                    &project_hash,
+                    &operator,
+                    &verified_source,
+                )
+                .map_err(WorkEngineError::Memory)?;
+                // Preview-token guard (Go fn body, before stamping).
+                let expected = crate::project_memory::memory_preview_token(
+                    action,
+                    request,
+                    &version,
+                    "",
+                )
+                .map_err(WorkEngineError::Memory)?;
+                if request.preview_token.is_empty() || request.preview_token != expected {
+                    return Err(WorkEngineError::Memory(
+                        crate::project_memory::MemoryError::RevisionConflict(
+                            "project-memory-preview-stale",
+                        ),
+                    ));
+                }
+                // Commit stamping (Go v.At = now(); v.SHA256 = memoryVersionSHA(v)).
+                version.at = environment.timestamp().map_err(WorkEngineError::Runtime)?;
+                version.sha256 = crate::project_memory::memory_version_sha(&version)
+                    .map_err(WorkEngineError::Memory)?;
+                if action == "admit" {
+                    let entry = crate::ProjectMemory {
+                        id: request.id.clone(),
+                        imported: false,
+                        versions: Some(vec![version]),
+                    };
+                    candidate
+                        .project_memory
+                        .get_or_insert_with(Vec::new)
+                        .push(entry);
+                } else {
+                    let entry = candidate
+                        .project_memory
+                        .as_mut()
+                        .and_then(|entries| {
+                            entries.iter_mut().find(|entry| entry.id == request.id)
+                        })
+                        .ok_or(WorkEngineError::UnportedStatus)?;
+                    entry
+                        .versions
+                        .get_or_insert_with(Vec::new)
+                        .push(version);
+                }
+            }
         }
         "budget.configure" => {
             let change = budget.ok_or(WorkEngineError::UnportedStatus)?;

@@ -136,12 +136,18 @@ code (`tests/project_context.rs:134,153`); the HTTP 501 mapping in
 code. Value: the 501 flip becomes a simplification (the flow is ported) and two
 stale spots call for an update. Owner: the BF-16b wave, actively editing
 `service.rs` at the time of the finding (concurrent diff visible); the test can
-be updated after that wave's agreement. State: discovered, qualified, not
-corrected here to avoid an editing conflict; resumption condition: consume the
-published BF-16b diff, then update the test expectation and remove the 501
-filter or repoint it at the real codes. Without that resumption the HTTP code
-stays a dead filter: no immediate security effect, but a displayed stale
-contract.
+be updated after that wave's agreement. **Fixed on 6 November 2026** (user
+order "corrigés"): test expectations updated to the ported guard's real codes
+(`project-memory-source-inventory`, explicit caused refusal on the bare
+fixture — comment proves the portage, assertions not weakened), 501 filter
+retired in favor of `caller_invalid` (400 for invalid caller input:
+`project-source-memory-managed` included; root/SQL inventory failures keep
+their server-error default). Evidence: `cargo test -p swarm-engine --test
+project_context` 4/4 green; `cargo test -p swarm-web --test service` 10/10;
+`--lib -- project` 31/31; `--test root_project_context` 3/3; `cargo check -p
+swarm-web` 0 errors. Dead UX key replaced in `web/project-profile.js` (real
+French reasons). FR/EN REFERENCE.md updated (guard ported, 501 boundary
+retired).
 
 G2 engine tranche (same date): full cycle ported and verified — module
 `project_memory.rs` (10 tests), `work_engine.rs` wiring + `root_store.rs`
@@ -178,13 +184,48 @@ retained by the failing `current_review_report_and_artifact_staleness_recover`).
 Each leaves residual directories under /tmp after every lib-suite run. Value:
 conformance to the interdiction and survival of diagnostic fixtures across a
 reboot (tmpfs) — a retained failure fixture is lost at reboot. Owner: BF-16b
-wave (files under concurrent modification at observation time). State:
-discovered, qualified, not fixed here (edit conflict avoided); resumption
-condition: consume the published BF-16b diff then replace `std::env::temp_dir()`
-with `.swarm-fixtures/` (or `~/.local/state/swarm-fixtures/`) in both
-producers, and add a `tools/check_tmp_interdiction.py` guard targeting these
-patterns. Inert directories from my own runs were removed; the wave's failing
-test's retained diagnostic fixture is preserved untouched.
+wave (files under concurrent modification at observation time). **Fixed on
+6 November 2026** (user order "corrigés", with implicit owner agreement since
+the user ordered the fix): both producers moved to `.swarm-fixtures/` with the
+repository idiom (`CARGO_MANIFEST_DIR` + recursive 0700 base + 0700 fixture
+directory); base canonicalized for fixture paths (the test exercises `clean()`,
+which refuses lexical `..` — same trap as a non-canonical TMPDIR; precedent:
+`runtime_temporary.rs:10`); the `Fixture` helper in `tests/project_context.rs:5-7`
+also moved (third producer spotted during resumption, same class). Evidence:
+producer 1 — test `supplied_document_matches_reader_without_profile_writes`
+green, directories verified under `.swarm-fixtures/swarm-profile-document-*`,
+zero under /tmp; producer 2 — fixture created under
+`.swarm-fixtures/swarm-status-review-*` (the test stays red only because of
+the pre-existing BF-16b wave failure `gate-evidence-invalid` at
+`mission_status_review.rs:412`, not a regression of the relocation — purely
+localizing diff); producer 3 — `cargo test --test project_context` 4/4 green
+after canonicalization. `check_tmp_interdiction.py`: 0 violations (the guard
+does not scan Rust sources — the Rust exclusion is covered by recipe.py's
+TMPDIR net and the documented source rule; extending the guard to Rust not
+retained here: ~130 `env::temp_dir()` sites would go red without fixing the
+cause, discovery consigned below as D04). Still under /tmp: the BF-16b wave's
+diagnostic fixture `swarm-status-review-536028-1793974459868644663` is
+preserved untouched (deletion refused, rightly, by the classifier: wave
+evidence, not owned by this fix) — its removal belongs to its owner.
+
+## Discovery D04 — Rust fixture allocations via `env::temp_dir()` (systemic)
+
+Resumption discovery (6 November 2026) while fixing D03: roughly 130 Rust test
+sites in the repository allocate fixtures through `std::env::temp_dir()` (grep
+`env::temp_dir` under `rust/crates`). This is not a bytes-under-/tmp violation
+as long as execution goes through `tools/verification/recipe.py`, which pins
+TMPDIR to the fixture area — the documented net of the
+`check_tmp_interdiction.py` guard (which deliberately scans `.py/.cjs/.js`
+only). But any naked cargo run (default TMPDIR) writes under /tmp: conformance
+to the 31 October interdiction then rests on launch discipline, not on bytes.
+Value: moving those sites to the `.swarm-fixtures/` idiom would make
+conformance structural. Not fixed here: massive (≈130 sites), outside the
+"corrigés" order scope (D02+D03 targeted), and an immediately red Rust guard
+would block the whole wave without fixing the cause. Owner: open — to attach
+to a migration lot or a wave agreement; resumption condition: decide to extend
+`check_tmp_interdiction.py` to Rust sources (`env::temp_dir()` class without
+an explicit TMPDIR) together with migrating the sites; one known producer:
+`tests/trust_biba.rs:7` (`biba-*`).
 
 Same-author consistency review: C01…C11 mapped, existing PA IDs retained, acyclic
 dependencies and H1…H4 owners explicit. Ready for selection as local work;

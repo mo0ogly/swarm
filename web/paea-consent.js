@@ -22,8 +22,12 @@
  * re-encodes or substitutes the held command. Refusals (role/separation,
  * stale revision, credentials, any non-empty body) and every explicit state
  * are shown verbatim; no success is ever fabricated and no automatic retry
- * exists. No Git call is triggered from here; this page only routes the real
- * Trust approve on the project root.
+ * exists. The success wording is fail-closed: only an exact
+ * `state:"approved"` decision renders success — the ordinary full approved
+ * object and the redacted `trust-status-ack-v1` acknowledgement both carry
+ * that state — while `admitted`, `unknown` and any missing, null or empty
+ * state never do. No Git call is triggered from here; this page only routes
+ * the real Trust approve on the project root.
  */
 (() => {
   const $=id=>document.getElementById(id),t=(s,v)=>globalThis.SwarmI18n.t(s,v);
@@ -260,7 +264,14 @@
     if(!r.ok)throw Error(value.failure?.code||value.error||String(r.status));
     return value;
   }
-  /** Show the mediated reply verbatim; a denied state stays a refusal view. */
+  /** Show the mediated reply verbatim; fail-closed success: only an exact
+   * `state:"approved"` renders the success wording — the ordinary full
+   * approved object and the redacted `trust-status-ack-v1` acknowledgement
+   * (`content_redacted:true`) both carry that state and both are accepted,
+   * so no redacted-only shape is imposed. A denied state stays a visible
+   * refusal with its reason; `admitted`, `pending_approval`, `committed`,
+   * `unknown`, `reconciled` and any missing, null or empty state render the
+   * "Réponse inattendue" refusal with the state verbatim — NEVER a success. */
   function result(value){
     const dl=$('result-detail');dl.replaceChildren();
     for(const [key,label] of [['kind','Type d’accusé'],['object_id','Identifiant de l’objet'],['state','État rapporté'],['reason','Raison'],['next_action','Suite indiquée'],['business_mutated','Effet métier réalisé']])
@@ -274,8 +285,8 @@
       state.dataset.state='success';
       state.textContent=t('Accusé du canal d’approbation : état rapporté ci-dessous, attesté par le moteur sur le Root projet. Le contenu de l’action reste rédigé (content_redacted) ; l’accord exact est ensuite observable côté moteur.');
     }else{
-      state.dataset.state='success';
-      state.textContent=t('Réponse du canal d’approbation, présentée telle quelle.');
+      state.dataset.state='error';
+      state.textContent=t('Réponse inattendue : {state} — vérifier l’état avant reprise',{state:String(value.state??'')});
     }
   }
   function navigation(){for(const link of document.querySelectorAll('[data-paea-link]')){const url=new URL(link.href);url.searchParams.set('lang',globalThis.SwarmI18n.language);url.searchParams.set('theme',document.documentElement.dataset.theme);link.href=url.pathname+url.search}}

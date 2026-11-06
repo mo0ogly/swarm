@@ -161,8 +161,13 @@ impl PaeaGitCallSource {
             Prepared::Promote(prepared) => prepared.request(),
         }
     }
-    /// Explicitly release both held storage witnesses on every refusal path.
-    fn close_prepared(self) -> Result<(), RootStoreError> {
+    /// Explicitly release both held storage witnesses on every refusal path
+    /// before `open()` consumes this source; `open()` owns the same release on
+    /// its own startup refusal. Reuses the existing typed engine close; no
+    /// authority, permission, persisted data or root state changes. Consuming
+    /// `self` keeps every owner closed exactly once and a closed source cannot
+    /// be opened afterwards.
+    pub fn close_prepared(self) -> Result<(), RootStoreError> {
         match self.prepared {
             Prepared::Transfer(prepared) => prepared.close(),
             Prepared::Promote(prepared) => prepared.close(),
@@ -233,8 +238,13 @@ impl PaeaGitCallApprovalSource {
     pub(super) fn engine_request(&self) -> &swarm_engine::TrustEnrollmentRequest {
         &self.prepared
     }
-    /// Explicitly release the held project witness on every refusal path.
-    pub(super) fn close_prepared(self) -> Result<(), RootStoreError> {
+    /// Explicitly release the held project witness on every refusal path
+    /// before `bind_git_call_with_approval` attaches it to the held authority;
+    /// `bind_approval` and the authority's own `close` own the same release
+    /// afterwards. Reuses the existing typed engine close; no authority,
+    /// permission, persisted data or root state changes. Consuming `self`
+    /// keeps every owner closed exactly once.
+    pub fn close_prepared(self) -> Result<(), RootStoreError> {
         self.prepared.close()
     }
 }

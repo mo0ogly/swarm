@@ -97,6 +97,25 @@ impl LocalStorageError {
             "local-storage"
         }
     }
+
+    /// Whether this error is exactly a clean failed whole-lock acquisition:
+    /// the `Lock` operation was refused by the typed nonblocking flock cause
+    /// `rustix::io::Errno::AGAIN` while nothing was published and no cleanup
+    /// error was recorded. This is pure classification of the already-typed
+    /// boxed cause: no `std::io::Error` or source-chain unwrapping, no
+    /// message or Display matching, and no lock-owner identity exists here.
+    /// It grants no retry, blocking, creation or release rights; callers own
+    /// any waiting or repeat policy. Every other operation, errno,
+    /// publication state, cleanup chain or custom wrapper returns `false`.
+    pub(crate) fn is_clean_lock_contention(&self) -> bool {
+        self.operation == LocalStorageOperation::Lock
+            && self.publication == PublicationState::NotPublished
+            && self.cleanup.is_none()
+            && self
+                .cause
+                .downcast_ref::<rustix::io::Errno>()
+                .is_some_and(|errno| *errno == rustix::io::Errno::AGAIN)
+    }
 }
 impl fmt::Display for LocalStorageError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -1006,6 +1025,46 @@ mod tests {
                 disk::remove_dir_all(&self.0).unwrap();
             }
         }
+    }
+
+    /// Pure typed classification of clean lock contention. The first error is
+    /// the exact shape `reserve` produces for a refused nonblocking flock;
+    /// every later case is a synthetic variant that must stay unclassified:
+    /// an explicit cleanup chain, a different operation, a different typed
+    /// errno, an uncertain publication state and an errno wrapped in
+    /// `std::io::Error` instead of kept as the direct typed cause. No
+    /// fault-injection arm or OS close-failure path is claimed or exercised.
+    #[test]
+    fn clean_lock_contention_classifies_only_typed_again_lock() {
+        let clean = LocalStorageError::new(LocalStorageOperation::Lock, rustix::io::Errno::AGAIN);
+        assert!(clean.is_clean_lock_contention());
+
+        let mut with_cleanup =
+            LocalStorageError::new(LocalStorageOperation::Lock, rustix::io::Errno::AGAIN);
+        with_cleanup.cleanup = Some(Box::new(LocalStorageError::new(
+            LocalStorageOperation::CloseFile,
+            rustix::io::Errno::AGAIN,
+        )));
+        assert!(!with_cleanup.is_clean_lock_contention());
+
+        let wrong_operation =
+            LocalStorageError::new(LocalStorageOperation::OpenFile, rustix::io::Errno::AGAIN);
+        assert!(!wrong_operation.is_clean_lock_contention());
+
+        let wrong_errno =
+            LocalStorageError::new(LocalStorageOperation::Lock, rustix::io::Errno::PERM);
+        assert!(!wrong_errno.is_clean_lock_contention());
+
+        let mut uncertain =
+            LocalStorageError::new(LocalStorageOperation::Lock, rustix::io::Errno::AGAIN);
+        uncertain.publication = PublicationState::RenamedDurabilityUnknown;
+        assert!(!uncertain.is_clean_lock_contention());
+
+        let io_wrapped = LocalStorageError::new(
+            LocalStorageOperation::Lock,
+            std::io::Error::from_raw_os_error(rustix::io::Errno::AGAIN.raw_os_error()),
+        );
+        assert!(!io_wrapped.is_clean_lock_contention());
     }
     #[test]
     fn publication_faults_preserve_original_or_report_visible_uncertain_write_and_recover() {

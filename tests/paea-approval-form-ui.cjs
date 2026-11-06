@@ -23,6 +23,15 @@
 // body and the server holds the frozen command (bound approval); no mock
 // HTTP/DOM, no Git effect, no second approval system, no acceptance;
 // screenshots and console/request assertions stay in the owned evidence dir.
+// Phase 2 also carries the real-keyboard-gesture regression of the received
+// counterexample (2026-11-04, supervisor-stale-confirm-discriminant): focus
+// on the confirmation checkbox + a real Space press used to check the
+// ENABLED checkbox and re-enable send on the stale error state — the change
+// listener ignored admissibility. The corrected UI contract disables the
+// checkbox itself on any non-admissible presentation, so the gesture cannot
+// check it, send stays disabled and no approval POST is made; recovery runs
+// through the existing re-read control (exercised in phase 1: usable
+// confirmation again after the authorized re-read).
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const pup=require(path.join(process.cwd(),'node_modules','puppeteer'));
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),control=path.resolve(process.argv[4]);
@@ -35,25 +44,55 @@ const secret=fs.readFileSync(path.join(root,'.swarm',server.session_file),'utf8'
 // (tests/common/authenticated_fixture.rs), labeled simulated — the real
 // human enrollment stays a declared open precondition of live operation.
 const PASSWORD='STARTUP_FIXTURE_PASSWORD';
-const checks=[],errors=[];let expected=0;
-// Exact refusal classification (correction of the earlier blanket filters):
-// the response listener classifies by EXACT URL+status — the fixture service
-// configures no settlement ledger root, so the guarded reconcile read refuses
-// with the typed settings-paea-ledger-root-not-configured cause which maps to
-// HTTP 500 for the reconcile operation (service.rs maps it to 501 only for
-// the settings-ledger-root operation). Any other status on that URL (404, 403,
-// …) stays unexpected, and any 500 on any other URL stays unexpected too.
-// The browser console error of a failed fetch carries NO URL (Chrome omits
-// it), so the console listener cannot classify by URL: it consumes exactly
-// one allowance per already-classified expected response with the same
-// status, and any console error without a matching pending allowance stays
-// unexpected. No blanket ignore of any status class remains.
-const pendingConsole=[];
+const checks=[],errors=[];
+// Exact reader-frontier classification (correction of the stale oracle): the
+// bare-session GET /api/v1/paea/reconcile-effects fired by every page load is
+// refused by the reconcile reader gate BEFORE any settings read, ledger open
+// or journal read — typed 403 whose failure body carries ONLY the stable
+// guard code on `failure.code`/`error`. The former oracle expected HTTP 500
+// (the settings-paea-ledger-root-not-configured precondition): that branch is
+// unreachable for a bare session since the reader gate precedes every ledger
+// IO, so the 500 expectation is REMOVED, not relaxed — any 500, and any other
+// status/method/URL, stays an unexpected failure. The body code is OBSERVED
+// through the browser, never assumed: the classification (and the
+// console-duplicate allowance it grants) is decided only on the confirmed
+// exact code; a body that fails to confirm stays a recorded failure. The
+// browser console error of a failed fetch carries NO URL (Chrome omits it),
+// so the console listener cannot classify by URL: a fetch-failure message
+// that arrives before its response body is confirmed is deferred — never
+// dropped — and attaches at the settle points to exactly one confirmed
+// refusal; a console error that attaches to no confirmed refusal becomes a
+// failure. No blanket ignore of any status class remains.
+const pendingConsole=[];   // confirmed refusals awaiting their console duplicate
+const deferredConsole=[];  // fetch-failure console messages awaiting their confirmed response
+const reconcileReads=[];   // in-flight body confirmations of bare reconcile reads
+const expectedRefusals=[]; // observed coded refusals, kept verbatim in the proof
+const READER_GUARD_CODE='paea-reader-authentication-required'; // the ONLY code a bare reconcile refusal may carry
+let expected=0; // confirmed expected denials: classified reader refusals + the armed stale POST refusal
+// Settle the in-flight body confirmations, then attach the deferred console
+// duplicates to the allowances their confirmed responses granted. With flush
+// set, every still-unattached entry becomes a recorded failure: the verdict
+// is rendered only after all observations (responses, bodies, duplicates)
+// have settled, and nothing is dropped or blanket-ignored on the way.
+async function settleReaderObservations(flush){
+ await Promise.all(reconcileReads.splice(0));
+ for(let i=deferredConsole.length-1;i>=0;i--){
+  const j=pendingConsole.indexOf(deferredConsole[i].status);
+  if(j>=0){pendingConsole.splice(j,1);deferredConsole.splice(i,1)}
+ }
+ if(flush)while(deferredConsole.length){const d=deferredConsole.shift();errors.push(d.text+' [fetch-failure console message attached to no confirmed expected refusal]')}
+}
 // Armed just before the deliberate post-stale refusal probe and never reset:
 // both the response and its browser-console duplicate must then classify as
 // the expected denial instead of unexpected diagnostics. Any other status on
 // the approval POST (a 500, for instance) stays unexpected.
 let staleRefusalArmed=false;
+// Approval POST counter over the response channel: the keyboard-gesture
+// regression must make NO additional approval POST. Before the armed stale
+// probe the exact count is 2 — the phase-1 explicit consumption and the
+// replay-while-current, both 200 acks — read after the EN navigation, so
+// the channel has fully settled (no racy same-tick read).
+let approvalPosts=0;
 let browser;
 (async()=>{
  browser=await pup.launch({headless:'new',executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage']});
@@ -63,13 +102,42 @@ let browser;
  page.on('console',m=>{
   if(m.type()!=='error')return;
   const match=m.text().match(/status of (\d{3})/);
-  if(match){const i=pendingConsole.indexOf(match[1]);if(i>=0){pendingConsole.splice(i,1);return}}
+  if(match){
+   const i=pendingConsole.indexOf(match[1]);
+   if(i>=0){pendingConsole.splice(i,1);return}
+   // Chrome omits the URL: this duplicate may precede its response's body
+   // confirmation. Defer it verbatim — never drop it — until a settle point
+   // attaches it to exactly one confirmed refusal or records it as a failure.
+   deferredConsole.push({status:match[1],text:m.text()});return;
+  }
   errors.push(m.text());
  });
  page.on('response',r=>{
+  if(r.url().endsWith('/api/v1/paea/git-call/approval')&&r.request().method().toUpperCase()==='POST')approvalPosts+=1;
   if(r.status()<400)return;
-  if(r.url().endsWith('/api/v1/paea/reconcile-effects')){
-   if(r.status()===500){expected+=1;pendingConsole.push('500');return}
+  if(r.url()===origin+'/api/v1/paea/reconcile-effects'){
+   if(r.status()===403&&r.request().method().toUpperCase()==='GET'){
+    // The reader refusal is confirmed through the browser, never assumed:
+    // the allowance (and the console-duplicate pairing it grants) is decided
+    // only on the observed body, which must carry the exact stable guard code
+    // on both `error` and `failure.code`. The confirmation is awaited at the
+    // settle points; a body that fails to confirm is a recorded failure.
+    const confirm=(async()=>{
+     try{
+      const parsed=JSON.parse(await r.text());
+      if(parsed===null||typeof parsed!=='object'||parsed.error!==READER_GUARD_CODE||parsed.failure===null||typeof parsed.failure!=='object'||parsed.failure.code!==READER_GUARD_CODE)throw new Error('body without the exact reader guard code: '+JSON.stringify(parsed));
+      expectedRefusals.push({method:'GET',url:r.url(),status:403,body:parsed});
+      expected+=1;pendingConsole.push('403');
+     }catch(err){errors.push('unconfirmed reconcile refusal 403 '+r.url()+': '+err.message)}
+    })();
+    reconcileReads.push(confirm);
+    return;
+   }
+   // The former oracle expected HTTP 500 (the settings ledger-root
+   // precondition). The reader gate precedes every settings read, ledger open
+   // and journal read, so a bare session can no longer reach that
+   // precondition: no 500 expectation remains, and a 500 — like any other
+   // status or method on this URL — stays an unexpected failure.
    errors.push(r.status()+' '+r.url());return;
   }
   if(staleRefusalArmed&&r.status()===403&&r.url().endsWith('/api/v1/paea/git-call/approval')){expected+=1;pendingConsole.push('403');return}
@@ -95,6 +163,7 @@ let browser;
  // any projection — this IS the real product refusal the correction connects.
  await open('fr','etat',1280);
  await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
+ await settleReaderObservations(true);
  const bareStatus=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
  assert.equal(bareStatus.state,'empty','bare session must stay the explicit empty/refused state, never a success');
  assert.ok(bareStatus.text.includes('paea-reader-authentication-required'),'bare-session refusal must name the exact reader code, got: '+bareStatus.text);
@@ -110,6 +179,10 @@ let browser;
  const freshStatus=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
  assert.equal(freshStatus.state,'success','reader-authorized presentation must be the explicit success state');
  assert.ok(freshStatus.text.includes('Approbation présentée'),'FR fresh message must name the presented approval, got: '+freshStatus.text);
+ // Recovery through the existing path: this admissible read followed the
+ // non-admissible bare refusal, so the confirmation checkbox being usable
+ // again IS the common admissibility contract's recovery witness.
+ assert.equal(await page.$eval('#approval-confirm',e=>e.disabled),false,'admissible re-read must restore a usable confirmation through the existing re-read control');
  // Reader credential erased by the page right after the guarded read: never
  // in the input, the page source or any storage.
  assert.equal(await page.$eval('#approval-reader-credential',e=>e.value),'','reader input must be cleared after the guarded read');
@@ -157,6 +230,7 @@ let browser;
  // credential through the form's re-read control.
  await open('en','sombre',390);
  await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
+ await settleReaderObservations(true);
  const bareEn=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
  assert.equal(bareEn.state,'empty','EN bare session must refuse identically');
  assert.ok(bareEn.text.includes('Read refused'),'EN bare-session refusal must be translated, got: '+bareEn.text);
@@ -227,6 +301,7 @@ let browser;
  assert.equal(phase2.nonce,nonce);
  await open('fr','etat',1280);
  await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
+ await settleReaderObservations(true);
  const bareStaleFr=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
  assert.equal(bareStaleFr.state,'empty','stale bare session must still refuse first, never project');
  assert.ok(bareStaleFr.text.includes('paea-reader-authentication-required'),'stale bare-session refusal must keep the exact reader code, got: '+bareStaleFr.text);
@@ -239,19 +314,51 @@ let browser;
  // No confirmation solicited: send disabled, checkbox unchecked.
  assert.equal(await page.$eval('#approval-send',e=>e.disabled),true,'stale state must keep send disabled');
  assert.equal(await page.$eval('#approval-confirm',e=>e.checked),false,'stale state must keep confirmation unchecked');
+ // Real-keyboard-gesture regression (received counterexample, 2026-11-04):
+ // the checkbox is DISABLED on this non-admissible state, so no keyboard
+ // gesture can check it or re-enable send. The gesture's focus precondition
+ // is EXPLICIT and OBSERVED (received disabled-focus discriminant: a
+ // disabled control cannot take focus — the former attempt left
+ // activeElement on the reload button after its click, so the blind Space
+ // acted on ANOTHER control and started the re-read loop; an oracle defect,
+ // never a product defect): first neutralize the focus left by the
+ // preceding re-read click and observe the active element, then attempt to
+ // focus the disabled confirmation and observe that the focus cannot move
+ // onto it. Only then the real Space is pressed: it can reach neither the
+ // checkbox (unfocusable) nor any other control (focus is neutral on body).
+ assert.equal(await page.$eval('#approval-confirm',e=>e.disabled),true,'stale state must disable the confirmation itself, not only send');
+ await page.evaluate(()=>{const a=document.activeElement;if(a&&typeof a.blur==='function')a.blur()});
+ const focusNeutral=await page.evaluate(()=>({active:document.activeElement===document.body?'body':(document.activeElement.id||document.activeElement.tagName)}));
+ assert.equal(focusNeutral.active,'body','neutral focus precondition: focus must leave the re-read control before the gesture, got: '+JSON.stringify(focusNeutral));
+ await page.focus('#approval-confirm');
+ const focusAttempt=await page.evaluate(()=>({active:document.activeElement===document.body?'body':(document.activeElement.id||document.activeElement.tagName),confirmDisabled:document.getElementById('approval-confirm').disabled}));
+ assert.equal(focusAttempt.active,'body','a disabled confirmation must not take focus, got: '+JSON.stringify(focusAttempt));
+ assert.equal(focusAttempt.confirmDisabled,true,'the confirmation stays disabled through the focus attempt');
+ await page.keyboard.press('Space');
+ const staleKeyboard=await page.evaluate(()=>({checked:document.getElementById('approval-confirm').checked,confirmDisabled:document.getElementById('approval-confirm').disabled,sendDisabled:document.getElementById('approval-send').disabled,status:document.getElementById('approval-status').dataset.state,detailHidden:document.getElementById('approval-detail').hidden}));
+ assert.equal(staleKeyboard.checked,false,'real Space on the disabled stale checkbox must not check it');
+ assert.equal(staleKeyboard.confirmDisabled,true,'real Space must not re-enable the stale confirmation');
+ assert.equal(staleKeyboard.sendDisabled,true,'real Space must not re-enable send on the stale state');
+ assert.equal(staleKeyboard.status,'error','the visible stale error must stay after the gesture');
+ assert.equal(staleKeyboard.detailHidden,false,'the maintained refusal projection must stay visible after the gesture');
  const staleWitness=await body('#approval-witness');
  assert.ok(staleWitness.text.includes('non'),'stale witness must report revision-current = non');
  await (await page.$('#approval-detail')).screenshot({path:path.join(out,'approval-stale-fr.png')});
  await open('en','sombre',390);
  await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
+ await settleReaderObservations(true);
  await page.type('#approval-reader-credential',server.reader_token);
  await page.click('#approval-reload');
  await page.waitForFunction(()=>document.getElementById('approval-status').dataset.state!=='loading',{timeout:20000});
  const staleEn=await page.$eval('#approval-status',e=>({state:e.dataset.state,text:e.textContent}));
  assert.equal(staleEn.state,'error');
  assert.ok(/Stale approval/i.test(staleEn.text),'EN stale message, got: '+staleEn.text);
+ // The non-confirmable state is language-independent: the disabled checkbox
+ // and gated send hold in EN too.
+ assert.equal(await page.$eval('#approval-confirm',e=>e.disabled),true,'EN stale state must disable the confirmation itself');
+ assert.equal(await page.$eval('#approval-send',e=>e.disabled),true,'EN stale state must keep send disabled');
  await (await page.$('#approval-detail')).screenshot({path:path.join(out,'approval-stale-en.png')});
- checks.push('stale: real Trust revision change (policy renewed through real producers) → visible error FR/EN behind the reader frontier, no confirmation solicited, no normalization');
+ checks.push('stale: real Trust revision change (policy renewed through real producers) → visible error FR/EN behind the reader frontier, no confirmation solicited, and the real keyboard gesture (focus + Space) cannot check the disabled confirmation nor re-enable send — the state stays error with the refusal projection maintained, no normalization');
  // Post-stale refusal cross-check: the same channel now refuses (the held
  // enrolled authority is bound to the consumed Trust revision — engine
  // contract proven by the server-route test). A browser console duplicate of
@@ -259,6 +366,12 @@ let browser;
  // only by URL, so the empty-body POST refusal is classified here as expected.
  // The browser page itself must not have consumed twice: exactly one phase-1
  // send happened.
+ // Settled no-POST observation for the whole gesture window: between the
+ // phase-1 consumption and here, the only approval POSTs are the explicit
+ // consumption and the replay-while-current (both 200 acks) — the keyboard
+ // gesture and the EN flow made none. Read after the EN navigation, so the
+ // response channel has fully settled; a third POST here is a failure.
+ assert.equal(approvalPosts,2,'no additional approval POST between the explicit consumption and the armed stale probe (gesture window included), got: '+approvalPosts);
  staleRefusalArmed=true;
  const stalePost=await page.evaluate(async pwd=>{
   const s=await (await fetch('/api/v1/native-session',{cache:'no-store',credentials:'same-origin'})).json();
@@ -269,13 +382,42 @@ let browser;
  assert.equal(stalePost.status,403,'post-stale replay must refuse typed (403), never re-approve or replay');
  assert.notEqual(stalePost.body.state,'approved','post-stale replay must never return an approved state');
  checks.push('post-stale refusal: the same real channel refuses typed (403) after the actual Trust revision change, never re-approves and never replays');
+ // Final verdict on the reader-frontier observations — rendered only once the
+ // observations are really finished: never after an arbitrary duration, never
+ // on a claimed measurement. Real completion, in order: (1) await the
+ // in-flight reconcile body confirmations by their actual promises; (2) close
+ // the controlled page — the page's own lifecycle is the end of its event
+ // stream, so after its close no console/response event can still arrive for
+ // it; (3) drain what remains before the verdict: attach any deferred console
+ // duplicate to exactly one confirmed refusal and turn every leftover into a
+ // recorded failure. Every bare reconcile read of this run must have
+ // confirmed the exact typed GET 403 refusal — four page loads, four coded
+ // refusals, kept verbatim in the proof's expected_refusals — and every
+ // confirmed refusal must have its own console duplicate; anything else
+ // already landed in the errors above.
+ await settleReaderObservations(false);
+ await page.close();
+ await settleReaderObservations(true);
+ if(pendingConsole.length)errors.push('confirmed expected refusals left without an observed console duplicate: '+pendingConsole.join(', '));
+ assert.equal(expectedRefusals.length,4,'exactly four bare reconcile reads must have confirmed the typed reader refusal, got: '+JSON.stringify(expectedRefusals));
+ for(const refusal of expectedRefusals){
+  assert.equal(refusal.method,'GET','each reconcile refusal must be the bare GET');
+  assert.equal(refusal.url,origin+'/api/v1/paea/reconcile-effects','each reconcile refusal must target the exact reconcile URL');
+  assert.equal(refusal.status,403,'each reconcile refusal must be the typed 403');
+  assert.equal(refusal.body.error,READER_GUARD_CODE,'each reconcile refusal body must name the exact reader code');
+  assert.equal(refusal.body.failure.code,READER_GUARD_CODE,'each reconcile refusal failure.code must name the exact reader code');
+ }
  // The Rust test's owned protocol waits for phase2.done to run its own
  // shutdown; publish it (atomic write) only after every phase-2 assertion
  // has held, so a successful harness always releases the waiter.
  write('phase2.done',{status:'ok'});
- fs.writeFileSync(path.join(out,'approval-form-ui.json'),JSON.stringify({schema_version:1,kind:'paea-approval-form-ui-v1',checks,unexpected_diagnostics:errors,expected_denials:expected,server:{request_digest:server.request_digest,action_id:server.action_id,resource:server.resource,trust_revision_fresh:server.trust_revision,trust_revision_stale:phase2.trust_revision},at:new Date().toISOString()},null,2)+'\n');
+ fs.writeFileSync(path.join(out,'approval-form-ui.json'),JSON.stringify({schema_version:1,kind:'paea-approval-form-ui-v1',checks,unexpected_diagnostics:errors,expected_denials:expected,expected_refusals:expectedRefusals,server:{request_digest:server.request_digest,action_id:server.action_id,resource:server.resource,trust_revision_fresh:server.trust_revision,trust_revision_stale:phase2.trust_revision},at:new Date().toISOString()},null,2)+'\n');
  console.log(JSON.stringify({checks:checks.length,unexpected_diagnostics:errors.length}));
 })().catch(e=>{
+ // No diagnostics lost on early failure either: flush the deferred console
+ // duplicates verbatim and report body confirmations still in flight.
+ while(deferredConsole.length){const d=deferredConsole.shift();errors.push(d.text+' [fetch-failure console message attached to no confirmed expected refusal]')}
+ if(reconcileReads.length)errors.push('reconcile 403 body confirmations still in flight at failure time: '+reconcileReads.length);
  try{fs.writeFileSync(path.join(control,'phase1.done'),JSON.stringify({nonce,error:e.message}))}catch{}
  // A phase-2 failure must reach the Rust waiter verbatim too: by then the
  // phase1.done write above is already consumed, so the waiter sits on

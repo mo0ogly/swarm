@@ -9,6 +9,8 @@ impl NativeHttpService {
     /// Object attribution is an explicit mutating I3/admin control intent whose
     /// bearer, revisions and label are checked by the existing engine producer.
     /// Session admission alone grants no classification or declassification rights.
+    /// `security-show` uses the same I3/admin admission, shared read reservation
+    /// and close path; its metadata includes no evidence-import or execution grant.
     pub(super) fn trust_actions(
         &self,
         r: &Request<Vec<u8>>,
@@ -25,7 +27,7 @@ impl NativeHttpService {
         };
         if !matches!(
             op,
-            "show"
+            "show" | "security-show"
                 | "export"
                 | "anchor"
                 | "verify"
@@ -76,7 +78,7 @@ impl NativeHttpService {
             op,
             "show" | "export" | "anchor" | "config-preview" | "read-object" | "read-original" | "public-anchor"
                 | "blp-show" | "blp-policy-preview" | "blp-check" | "blp-preparation-check" | "blp-preparation-admission-show"
-                | "blp-preparation-transport"
+                | "blp-preparation-transport" | "security-show"
         );
         let store = RootStore::open(&self.root, !readonly).map_err(|e| root("trust-open", e))?;
         let mut publication = None;

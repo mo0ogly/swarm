@@ -14,7 +14,8 @@ function contextValid(value) {
 function profileReason(reason){
  const messages={
   'project-profile-source-missing':'Fichier de consignes absent du projet.',
-  'versioned-memory-source-guard-not-ported':'Les sources mémoire versionnées ne sont pas encore prises en charge.',
+  'project-source-memory-managed':'Cette source est une leçon mémoire gérée du projet. Elle ne peut pas servir de consigne.',
+  'project-memory-source-inventory':'L’inventaire mémoire du projet est inaccessible. Réessayez ou consultez les diagnostics.',
   'source-exceeds-configured-cap':'Une limite de taille des consignes est dépassée. Vérifiez les réglages Admin.',
   'recognizable-secret-no-context':'Un secret reconnaissable a été détecté. Cette source ne peut pas être transmise.',
   'project-profile-conflict':'Le profil a changé. Actualisez le catalogue et comparez votre brouillon avant de recommencer.',

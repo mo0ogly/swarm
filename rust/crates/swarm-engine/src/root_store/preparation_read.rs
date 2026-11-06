@@ -184,10 +184,21 @@ impl RootStore {
     /// Read one retained preparation, recomputing plan_ready from actual method
     /// observations. ID is a query parameter, never a path or default Work.
     /// Missing/malformed/misbound data and all enclosing IO/close errors refuse.
-    pub fn preparation_show(&self, id: &str) -> Result<PreparationReadObservation<Preparation>, E> {
+    /// `reader_token` is the caller's local bearer credential (`None` = bare
+    /// session, never authorization), with the same semantics as
+    /// `preparation_dialogue`. BF-16a presentation frontier (BF-16b): when at
+    /// least one admission receipt matches this preparation's recorded turns,
+    /// the same reader verdict as the dialogue frontier runs BEFORE any byte is
+    /// served — the adopted documents exposed here inherit their source turn's
+    /// classified domain, so an under-cleared reader is refused with the shared
+    /// `blp-dialogue-*` codes. Zero matched receipts keeps the legacy
+    /// bare-session read.
+    pub fn preparation_show(&self, id: &str, reader_token: Option<&str>) -> Result<PreparationReadObservation<Preparation>, E> {
         if !crate::valid_preparation_key(id) { return Err(E::Refused("preparation-id-invalid")); }
         self.preparation_observed(|db, policy, causes| {
-            let mut p = stored(db, id)?; self.preparation_project(&mut p, policy, causes)?; Ok(p)
+            let mut p = stored(db, id)?; self.preparation_project(&mut p, policy, causes)?;
+            super::preparation_dialogue::reader_verdict(self, db, &p, &recorded_turn_keys(db, &p)?, reader_token)?;
+            Ok(p)
         })
     }
     /// Observe retained dialogue for one reader under one readonly
@@ -263,13 +274,23 @@ impl RootStore {
     }
     /// Read earlier document snapshots newest revision first. Positive before
     /// is exclusive; absence uses Go's i64 max sentinel, not a product cutoff.
-    /// The saved history row limit is explicit. No visit, write, adoption or launch.
-    pub fn preparation_history(&self, id: &str, kind: &str, before: Option<i64>) -> Result<PreparationReadObservation<Vec<PreparationDocument>>, E> {
+    /// The saved history row limit is explicit. No visit, write, adoption or
+    /// launch. `reader_token` is the caller's local bearer credential (`None`
+    /// = bare session, never authorization), with the same semantics as
+    /// `preparation_dialogue`. BF-16a presentation frontier (BF-16b): when at
+    /// least one admission receipt matches this preparation's recorded turns,
+    /// the same reader verdict as the dialogue frontier runs BEFORE any
+    /// document byte is served — adopted documents inherit their source turn's
+    /// classified domain, so an under-cleared reader is refused with the
+    /// shared `blp-dialogue-*` codes. Zero matched receipts keeps the legacy
+    /// bare-session read.
+    pub fn preparation_history(&self, id: &str, kind: &str, before: Option<i64>, reader_token: Option<&str>) -> Result<PreparationReadObservation<Vec<PreparationDocument>>, E> {
         if !crate::valid_preparation_key(id) { return Err(E::Refused("preparation-id-invalid")); }
         if !matches!(kind, "besoin" | "brief" | "plan") { return Err(E::Refused("preparation-document-kind-invalid")); }
         if before.is_some_and(|value| value < 1) { return Err(E::Refused("preparation-revision-invalid")); }
         self.preparation_observed(|db, policy, causes| {
             let mut p = stored(db, id)?; self.preparation_project(&mut p, policy, causes)?;
+            super::preparation_dialogue::reader_verdict(self, db, &p, &recorded_turn_keys(db, &p)?, reader_token)?;
             let mut statement = db.prepare("SELECT kind,revision,body FROM preparation_documents WHERE preparation_id=?1 AND kind=?2 AND revision<?3 ORDER BY revision DESC LIMIT ?4").map_err(E::Sql)?;
             let result = (|| {
                 let mut rows = statement.query(rusqlite::params![id, kind, before.unwrap_or(i64::MAX), sql_limit(policy.history_limit)?]).map_err(E::Sql)?;
@@ -287,4 +308,33 @@ impl RootStore {
             super::finished(result, statement.finalize().map_err(E::Sql))
         })
     }
+}
+
+/// Read only the (provider, request_hash) pairs recorded for one preparation's
+/// turns, under the caller's read snapshot — the minimal decision input for the
+/// shared reader verdict on the show/history frontiers. Turn bytes ARE read and
+/// decoded here (provider/request_hash live in the recorded turn body) but only
+/// as a decision input: prompts are cleared before the values are returned, and
+/// no turn or document byte is served by this helper. Identity mismatch refuses
+/// like the dialogue frontier's row binding; unlike the dialogue read, no
+/// active-history observation runs (the show/history frontiers observe
+/// documents, not live calls).
+fn recorded_turn_keys(db:&rusqlite::Connection,p:&Preparation)->Result<Vec<crate::PreparationTurn>,E>{
+    let mut statement=db.prepare("SELECT id,preparation_id,status,body FROM preparation_turns WHERE preparation_id=?1 ORDER BY rowid").map_err(E::Sql)?;
+    let result=(||{
+        let mut rows=statement.query([&p.id]).map_err(E::Sql)?;
+        let mut out=Vec::new();
+        while let Some(row)=rows.next().map_err(E::Sql)?{
+            let id:String=row.get(0).map_err(E::Sql)?;
+            let parent:String=row.get(1).map_err(E::Sql)?;
+            let status:String=row.get(2).map_err(E::Sql)?;
+            let mut turn:crate::PreparationTurn=crate::work::decode(&body(row,3)?,crate::preparation_turn::shape_preparation_turn()).map_err(|e|cause("preparation-dialogue-document-invalid",e))?;
+            if turn.id!=id || turn.preparation_id!=parent || parent!=p.id{return Err(E::Refused("preparation-dialogue-row-identity-mismatch"));}
+            turn.status=status;
+            turn.prompt.clear();
+            out.push(turn);
+        }
+        Ok(out)
+    })();
+    super::finished(result,statement.finalize().map_err(E::Sql))
 }

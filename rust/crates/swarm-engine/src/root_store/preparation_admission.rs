@@ -87,6 +87,11 @@ pub(super) fn filename(id: &str) -> Result<String,E> {
     }
     Ok(format!("blp-admission-{hash}.receipt"))
 }
+/// Stable ordinary-staleness refusal code of `verify`'s policy-currency block
+/// (recorded trust revision, policy revision or policy digest no longer
+/// current). Shared with the dialogue reader's after-verify result adapter in
+/// `preparation_dialogue.rs` so producer and consumer never diverge.
+pub(super) const POLICY_CHANGED: &str = "blp-admission-policy-changed";
 /// Verify complete stored bytes, owner, Root and current policy before exposing
 /// metadata. Reconstruct the exact fixed label; stale grants/policies or any
 /// mismatch refuse. This checks consistency, not malicious same-UID rollback.
@@ -104,13 +109,66 @@ pub(super) fn verify(root: &RootStore, state: &State, principal: &str, admission
     if admission.trust_revision!=state.revision || entry.trust_revision()!=state.revision
         || admission.policy_revision!=entry.revision()
         || admission.policy_digest!=trust::digest(entry.policy()).map_err(failure)? {
-        return Err(E::Refused("blp-admission-policy-changed"));
+        return Err(E::Refused(POLICY_CHANGED));
     }
     let sources=admission.captured.provenance.classifications(&admission.captured.prompt,entry,root.root.as_os_str().as_encoded_bytes())?;
     let domain=ExecutionDomain::prepare(entry.policy(),entry.revision(),principal,&sources).map_err(|e|E::Refused(e.code()))?;
     if domain.output_classification()!=&admission.classification { return Err(E::Refused("blp-admission-record-invalid")); }
     Ok(sources.len())
 }
+/// Whether one fully verified CURRENT admission can stand as replacement
+/// authority for one ordinary-stale admission of the same opened Root and
+/// unchanged captured lineage, for the dialogue reader's public renewal
+/// recovery only. Inputs are two producer-written records as stored; the
+/// caller must already have run `verify` on `current` and observed success,
+/// and on `stale` the exact `Refused(POLICY_CHANGED)` result — this function
+/// re-checks neither currency nor record validity and performs no IO, decode
+/// or mutation. Returns `Ok(true)` only when: same principal; same Root
+/// instance identity; same recorded output classification (strict `==`); and
+/// the captured lineage is byte-identical — every `AdmissionCapture` field
+/// compared directly (preparation_id, source_revision, provider,
+/// provider_source, request_level, target, context_mode, request_hash,
+/// settings_digest, prompt) plus the prompt provenance `Manifest` compared
+/// through its serialized bytes, so provenance equality requires identical
+/// parts, digests and schema. Returns `Ok(false)` for ordinary semantic
+/// inequality: a different principal, Root instance, label, captured field or
+/// serialized provenance content. An actual provenance serialization error is
+/// NOT converted to `Ok(false)`: it is returned as the typed
+/// `RootStoreError::Trust` cause through this module's existing failure
+/// conversion, so the caller propagates the original safe diagnostic and
+/// refuses the whole read instead of silently reporting non-coverage or
+/// serving. Deliberately NOT compared:
+/// `admission_id`, `event_id` and `request_digest` (a renewal legitimately
+/// redesigns them), and `trust_revision`, `policy_revision`, `policy_digest`
+/// (their divergence is the staleness being covered). Limitation recorded:
+/// coverage requires the STRICTLY same output classification — a current
+/// admission with a higher label does NOT cover a lower-labeled stale one,
+/// so no general higher-label coverage is implemented and a renewal that
+/// raises the label keeps the stale 403 until re-admission at the same
+/// label; no mission/date/event-key exception exists. A current admission
+/// from a different principal, source capture or classification never
+/// covers an old stale one. Second limitation: the `Err` branch is
+/// contract-preserved but not evidence-backed — no fault is test-injected,
+/// because a valid producer-written `Manifest` representation cannot fail to
+/// serialize.
+pub(super) fn equivalent_current_covers(stale: &Admission, current: &Admission) -> Result<bool,E> {
+    if stale.principal!=current.principal || stale.root!=current.root
+        || stale.classification!=current.classification {
+        return Ok(false);
+    }
+    let a=&stale.captured; let b=&current.captured;
+    if a.preparation_id!=b.preparation_id || a.source_revision!=b.source_revision
+        || a.provider!=b.provider || a.provider_source!=b.provider_source
+        || a.request_level!=b.request_level || a.target!=b.target
+        || a.context_mode!=b.context_mode || a.request_hash!=b.request_hash
+        || a.settings_digest!=b.settings_digest || a.prompt!=b.prompt {
+        return Ok(false);
+    }
+    let left=serde_json::to_vec(&a.provenance).map_err(|e|failure(e.into()))?;
+    let right=serde_json::to_vec(&b.provenance).map_err(|e|failure(e.into()))?;
+    Ok(left==right)
+}
+
 /// Return fixed metadata only to the current authenticated owner. No prompt,
 /// worker gate, key or supplied label becomes an execution capability.
 fn metadata(admission: &Admission, source_count: usize) -> Result<Vec<u8>,E> {

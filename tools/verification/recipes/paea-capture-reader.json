@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "paea-capture-live-reader",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/**/Cargo.toml",
+    "rust/crates/**/src/**/*.rs",
+    "rust/crates/swarm-cli/tests/paea_approval_web.rs",
+    "rust/crates/swarm-cli/tests/common/*.rs",
+    "rust/crates/swarm-enrollment-authority/tests/common/*.rs",
+    "web/**/*",
+    "frontend/**/*",
+    ".cargo/config.toml",
+    "tests/fixture_area.py",
+    "tools/verification/recipes/paea-capture-reader.json",
+    "tools/verification/README.md"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_NET_OFFLINE": "true"
+  },
+  "steps": [
+    {
+      "id": "live-bytes-descriptor-integrity-terminal-errors-and-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_approval_web",
+        "paea_capture_",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test paea_capture_stream::capture_stream_writes_exact_bytes_to_a_new_file ... ok",
+        "test paea_capture_stream::capture_stream_refuses_existing_file_and_dangling_symlink_without_alteration ... ok",
+        "test paea_capture_stream::capture_stream_preserves_prefix_and_cause_on_reader_failure_then_recovers_fresh ... ok",
+        "test paea_capture_live::live_stream_renders_first_fragment_before_producer_eof ... ok",
+        "test paea_capture_live::live_stream_reports_source_fault_and_keeps_prefix_then_recovers_fresh ... ok",
+        "test paea_capture_live::live_stream_consumer_receives_source_fault_as_error_not_clean_eof ... ok",
+        "test paea_capture_live::live_stream_consumer_receives_panicking_source_as_error_not_clean_eof ... ok",
+        "test paea_capture_live::live_stream_reserved_descriptor_survives_path_replacement ... ok",
+        "test paea_capture_live::live_stream_truncated_evidence_refuses_premature_clean_eof ... ok",
+        "test paea_capture_live::live_stream_refuses_existing_evidence_without_mutation_or_ambiguous_start ... ok",
+        "test paea_capture_child::child_capture_owner_collects_exact_raw_streams_and_real_exit ... ok",
+        "test paea_capture_child::child_capture_start_refusal_stderr_not_piped_keeps_stdout_pipe_owned ... ok",
+        "test paea_capture_child::child_capture_start_refusal_stdout_evidence_refused_keeps_both_pipes_owned ... ok",
+        "test paea_capture_child::child_capture_handshake_reads_both_prefixes_before_stdin_release ... ok",
+        "test paea_capture_child::child_capture_controller_panic_keeps_real_finish_and_original_payload ... ok",
+        "test paea_capture_live::live_stream_zero_prefix_failure_and_empty_buffer_preserve_error ... ok",
+        "test paea_capture_live::live_stream_zero_prefix_panic_and_empty_buffer_preserve_payload ... ok",
+        "test paea_capture_live::live_stream_reader_prepare_refusal_keeps_empty_artifact_then_recovers_fresh ... ok",
+        "test paea_capture_child::child_capture_wait_refusal_preserves_cause_and_returned_ownership ... ok",
+        "test paea_capture_child::child_capture_owned_signal_stops_eof_ignoring_child_and_retains_panic ... ok",
+        "test paea_capture_startup_eof_retains_actual_exit_and_raw ... ok",
+        "21 passed; 0 failed; 0 ignored;"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

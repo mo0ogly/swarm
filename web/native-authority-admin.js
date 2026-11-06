@@ -1,27 +1,112 @@
 'use strict';
 /** Accounts and access (phase B, slice B8). Talks only to the authority
- * daemon's own API (`/api/v1/authority/*`, never relayed to the engine). The
- * card stays hidden when the cockpit is not behind the daemon (owner-key
- * mode: `GET …/me` is not answered with an account). Every rule (access
- * policy, self-lockout, revisions, password checks) is enforced by the
- * daemon; this view never infers a right, never retries a refusal and never
- * keeps a password after its request. */
+ * daemon's own API (`/api/v1/authority/*`, never relayed to the engine).
+ * Before any daemon call, mount reads the same-origin native capability
+ * document (`GET /api/v1/native-capabilities`): only `access.mode ===
+ * 'authority'` proceeds to `GET …/me`; in owner-key mode the card stays
+ * hidden with no daemon request at all (no doomed 404). A capability read
+ * that is refused, unreachable or malformed stays an explicit visible
+ * diagnostic (resolved mode 'error'), never a hidden success fallback; the
+ * same holds for a failed first `GET …/me` in authority mode. Failures keep
+ * their original cause/status on the thrown or resolved `error` for
+ * diagnostics; only the safe translated message and stable code are shown.
+ * Transport failures of daemon calls are wrapped under the stable code
+ * `authority-me-unreachable` with the original error unmutated on `.cause`
+ * (and its `reason` copied when a plain string); a 2xx body whose JSON decode
+ * fails throws `authority-response-unreadable` (original decode cause on
+ * `.cause`, never reused as a success). The /me catch keeps already-stable
+ * errors unmutated (transport wrapper, daemon business codes, `http-<status>`,
+ * the invalid-document code), flattens the unreadable-document carrier to
+ * `authority-me-invalid` with the decode cause directly on `.cause`, and wraps
+ * any other raw failure under the generic refusal code `authority-refused`
+ * (original unmutated on `.cause`); the resolved diagnostic's `reason` is
+ * that stable code, and only the safe translated message plus stable code
+ * are rendered or logged. The shared refusal renderer (`explain`) applies on
+ * every rendering path — mount diagnostics, section reload catches and
+ * dialog submit states: a message that is not a known safe code (unknown or
+ * hostile daemon code, prototype-inherited key) renders as the generic
+ * refusal code, and the original error is read, never mutated. Every rule
+ * (access policy, self-lockout, revisions, password checks) is
+ * enforced by the daemon; this view never infers a right, never retries a
+ * refusal and never keeps a password after its request. */
 (()=>{
  const base='/api/v1/authority',roles=['viewer','operator','approver','admin'];
- /** One JSON request; non-2xx throws Error(code) with `status`/`reason`. */
+ /** Stable fallback code for any structured authority diagnostic that has no
+  * more specific safe code; it carries no failure detail by itself. */
+ const GENERIC_REFUSAL_CODE='authority-refused';
+ /** English text of the daemon business-refusal codes this view can surface
+  * verbatim (already published, user-intent codes — no failure detail). */
+ const SAFE_DAEMON_MESSAGES={'group-exists':1,'group-missing':1,'account-exists':1,
+  'account-missing':1,'account-authentication-refused':1,'authority-policy-denied':1,
+  'authority-session-missing':1,'authority-attributes-line':1,'authority-password-mismatch':1,
+  'authority-password-empty':1,'authority-policy-json':1,'authority-preview-required':1,
+  'key-expiry-invalid':1,'key-name-invalid':1,'key-missing':1,'authority-purge-days-invalid':1,
+  'authority-audit-chain-broken':1,'account-role-unknown':1,'authority-role-in-use':1,
+  'authority-role-key':1,'authority-role-exists':1,'authority-role-label':1,
+  'authority-condition-empty':1,'authority-policy-invalid':1,'web-route-unported':1};
+ /** True for a message the view may surface as-is: a daemon-published business
+  * code, one of the view's stable transport/invalid-document/unreadable-
+  * response/invalid-configuration codes, or an `http-<status>` refusal marker. */
+ const safeSurfaceMessage=m=>typeof m==='string'&&
+  (SAFE_DAEMON_MESSAGES[m]===1||m==='authority-me-invalid'||m==='authority-me-unreachable'||
+   m==='authority-response-unreadable'||m==='authority-config-invalid'||/^http-\d+$/.test(m));
+ /** Message for a daemon business-refusal code. The daemon publishes these
+  * codes deliberately for the UI; an unknown one keeps the generic refusal. */
+ const daemonMessage=code=>SAFE_DAEMON_MESSAGES[code]===1?code:null;
+ /** Stable wrapper for an unexpected transport failure: the original error
+  * stays reachable, unmutated, on `.cause` for diagnostics, and its reason
+  * (when a plain string) is copied onto the wrapper for direct reading. */
+ const transportError=(code,cause)=>{const e=Error(code,{cause});
+  if(typeof cause?.reason==='string')e.reason=cause.reason;return e};
+ /** One JSON request. A fetch rejection is wrapped under the stable code
+  * `authority-me-unreachable` (original error unmutated on `.cause`, its
+  * plain-string `reason` copied); a 2xx body whose JSON decode fails throws
+  * `authority-response-unreadable` with the decode cause on `.cause`; a
+  * non-2xx response throws Error(code) with `status`/`reason`. */
  async function call(method,path,body){
   const headers={Accept:'application/json'};if(body!==undefined)headers['Content-Type']='application/json';
-  const r=await fetch(base+path,{method,credentials:'same-origin',cache:'no-store',headers,body:body===undefined?undefined:JSON.stringify(body)});
-  let data=null;try{data=await r.json()}catch{}
-  if(!r.ok){const e=Error(data?.error||'http-'+r.status);e.status=r.status;e.reason=data?.reason;throw e}
+  let r;
+  try{r=await fetch(base+path,{method,credentials:'same-origin',cache:'no-store',headers,body:body===undefined?undefined:JSON.stringify(body)})}
+  catch(cause){throw transportError('authority-me-unreachable',cause)}
+  let data,parseCause;
+  try{data=await r.json()}catch(cause){parseCause=cause}
+  if(!r.ok){const e=Error(daemonMessage(data?.error)||data?.error||'http-'+r.status);e.status=r.status;e.reason=data?.reason;throw e}
+  if(parseCause!==undefined)throw Error('authority-response-unreadable',{cause:parseCause});
   return data;
  }
  /** Parse `k=v` lines; refuses a line without `=` (no silent drop). */
  function attributes(text){const out={};for(const line of text.split('\n').map(l=>l.trim()).filter(Boolean)){const i=line.indexOf('=');if(i<1)throw Error('authority-attributes-line');out[line.slice(0,i).trim()]=line.slice(i+1).trim()}return out}
+ /** Stable diagnostic code for a structured consumer/mount error: the safe
+  * surface message when present (stable code), else the generic refusal
+  * code. Never derived from raw failure text. */
+ const stableCodeOf=e=>safeSurfaceMessage(e?.message)?e.message:GENERIC_REFUSAL_CODE;
+ /** Read the started access-gate mode from the same-origin native capability
+  * document. Resolves 'authority' or 'owner-key'; throws Error with a stable
+  * `authority-capability-*` code (and `.status` on refusal; original
+  * network/parse failure retained on `cause`, never rendered) when the read
+  * fails or the document is missing the mode — never a silent fallback, and
+  * the returned mode grants no right (the daemon keeps authorizing). */
+ async function accessMode(){
+  let r;
+  try{r=await fetch('/api/v1/native-capabilities',{method:'GET',credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}})}
+  catch(cause){throw Error('authority-capability-unreachable',{cause})}
+  if(!r.ok){const e=Error('authority-capability-refused');e.status=r.status;throw e}
+  let data=null;try{data=await r.json()}catch(cause){throw Error('authority-capability-invalid',{cause})}
+  const mode=data?.access?.mode;
+  if(mode!=='authority'&&mode!=='owner-key')throw Error('authority-capability-invalid');
+  return mode;
+ }
  const attributesText=a=>Object.entries(a||{}).map(([k,v])=>k+'='+v).join('\n');
  /** Mount into `host` (Admin card) and `nav` (header session controls).
-  * Resolves `{mode:'authority'|'none', administer}` once the first read
-  * settles, refusals included. */
+  * Resolves `{mode:'authority'|'none'|'error', administer, reason?, error?}`
+  * once the capability read settles (then, in authority mode, the first
+  * daemon read). 'none' = owner-key capability: card hidden, no daemon
+  * request. 'error' = capability read refused/unreachable/malformed, or a
+  * failed/refused/malformed first `GET …/me` in authority mode: explicit
+  * diagnostic rendered in `host` (made visible), never a hidden success
+  * fallback. `error` keeps the structured cause (stable-code `message`,
+  * optional `status`, original `cause`) for consumers; only the safe
+  * translated message and stable code are rendered or logged. */
  async function mount(host,nav,{translate:tr=x=>x}={}){
   if(host.dataset.authorityMounted)return {mode:'mounted',administer:false};host.dataset.authorityMounted='1';
   const lang=document.documentElement.lang||'fr';
@@ -57,11 +142,62 @@
    'authority-role-label':'Donnez un libellé au rôle.',
    'authority-condition-empty':'Choisissez au moins une habilitation et une condition.',
    'authority-policy-invalid':'Politique refusée : un rôle intégré manque, l’administrateur doit garder toutes les habilitations, ou une habilitation est inconnue.',
+   'authority-capability-unreachable':'Capacité d’accès indisponible : le service natif n’a pas répondu.',
+   'authority-capability-refused':'Lecture de la capacité d’accès refusée par le service natif.',
+   'authority-capability-invalid':'Capacité d’accès illisible : document inattendu.',
   };
-  const explain=e=>(messages[e.message]?tr(messages[e.message]):tr('Refus du démon d’autorité.'))+' ('+e.message+')';
+  /**
+   * Shared refusal renderer, used by every rendering path of the view
+   * (mount diagnostics, section reload catches, dialog submit states):
+   * renders only a translated message plus a safe code. `e.message` must be
+   * an error code (the view throws codes; `call()` builds its errors from
+   * the daemon's published code or an `http-<status>` marker). The rendered
+   * code is derived as: known local key → itself; daemon-safe surface code
+   * (known to have no failure detail) → itself; anything else (unknown or
+   * hostile daemon code, prototype-inherited key like 'constructor') → the
+   * generic refusal code. Owner-only lookup (`Object.hasOwn`) so inherited
+   * `Object.prototype` keys are never treated as known. The original error
+   * is read, never mutated: its raw message/status/reason stay on the error
+   * for console diagnostics and consumers. Errors: none (pure); a non-Error
+   * input throws on property reads by design (all callers pass Errors).
+   */
+  const explain=e=>{
+   const raw=e.message;
+   const code=Object.hasOwn(messages,raw)?raw:
+    safeSurfaceMessage(raw)?raw:GENERIC_REFUSAL_CODE;
+   return (Object.hasOwn(messages,raw)?tr(messages[raw]):tr('Refus du démon d’autorité.'))+' ('+code+')';
+  };
+  // Capability gate before any daemon call: owner-key keeps the card absent
+  // without a doomed request; a failed read stays an explicit diagnostic.
+  const capability=await accessMode().catch(error=>error);
+  if(capability instanceof Error){
+   console.error('SwarmAuthorityAdmin:',capability.message,capability.status);
+   host.hidden=false;
+   host.replaceChildren(node('p',explain(capability),'notice alert'));
+   return {mode:'error',administer:false,reason:capability.message,error:capability};
+  }
+  if(capability==='owner-key'){host.hidden=true;return {mode:'none',administer:false}}
   let me;
   try{me=await call('GET','/me');if(!me?.account?.subject)throw Error('authority-me-invalid')}
-  catch{host.hidden=true;return {mode:'none',administer:false}}
+  catch(original){
+   // Authority mode is established: a failed first read stays a visible
+   // error, never a silent 'none'. Already-stable errors pass through
+   // unmutated (transport wrapper, daemon business codes, `http-<status>`,
+   // invalid-document code); the unreadable-document carrier is flattened
+   // so the decode cause sits directly on `.cause`; any other raw failure
+   // is wrapped under the generic refusal code — the original error is
+   // NEVER mutated, only referenced on `.cause` of the stable wrapper.
+   // DOM/console/reason carry only the stable code, never raw detail.
+   const m=original.message;
+   const error=m==='authority-me-unreachable'||m==='authority-response-unreadable'||safeSurfaceMessage(m)?
+    (m==='authority-response-unreadable'?
+      Error('authority-me-invalid',{cause:original.cause}):original):
+    Error(GENERIC_REFUSAL_CODE,{cause:original});
+   console.error('SwarmAuthorityAdmin:',stableCodeOf(error),original.status);
+   host.hidden=false;
+   host.replaceChildren(node('p',explain(error),'notice alert'));
+   return {mode:'error',administer:false,reason:stableCodeOf(error),error};
+  }
   host.hidden=false;
   // Header: who is signed in + own password change.
   const who=node('span',undefined,'native-session-user');who.textContent=me.account.display_name+' ('+me.account.subject+')';

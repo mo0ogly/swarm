@@ -82,9 +82,20 @@ impl NativeHttpService {
                 "/api/v1/preparations" => encode(store.preparation_list(), &mut causes)?,
                 "/api/v1/preparations/methods" => encode(store.preparation_methods(), &mut causes)?,
                 "/api/v1/preparations/templates"=>encode(store.preparation_templates(),&mut causes)?,
-                "/api/v1/preparations/show" => encode(store.preparation_show(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?), &mut causes)?,
+                // BF-16b: show/history/release-review are presentation frontiers
+                // like dialogue — the Bearer credential is extracted with the
+                // shared reader extractor (malformed headers refuse before any
+                // Root read; no header is a bare session, decided by the engine
+                // only when a matched admission makes the read classified).
+                "/api/v1/preparations/show" => {
+                    let reader_token = reader_bearer_token(request)?;
+                    encode(store.preparation_show(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?, reader_token.as_deref()), &mut causes)?
+                }
                 // Shared CLI/HTTP observation; both revisions still bind release.
-                "/api/v1/preparations/release-review" => encode(store.preparation_release_review(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?), &mut causes)?,
+                "/api/v1/preparations/release-review" => {
+                    let reader_token = reader_bearer_token(request)?;
+                    encode(store.preparation_release_review(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?, reader_token.as_deref()), &mut causes)?
+                }
                 // BF-16a: the dialogue projection inherits the admitted output
                 // domain. The Bearer credential is extracted with the shared
                 // reader extractor (malformed headers refuse before any Root
@@ -95,7 +106,10 @@ impl NativeHttpService {
                     encode(store.preparation_dialogue(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?, reader_token.as_deref()), &mut causes)?
                 }
                 "/api/v1/preparations/budget" => encode(store.preparation_budget(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?), &mut causes)?,
-                "/api/v1/preparations/history" => encode(store.preparation_history(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?, document.as_deref().ok_or(E::Refused("preparation-query-invalid"))?, before), &mut causes)?,
+                "/api/v1/preparations/history" => {
+                    let reader_token = reader_bearer_token(request)?;
+                    encode(store.preparation_history(id.as_deref().ok_or(E::Refused("preparation-query-invalid"))?, document.as_deref().ok_or(E::Refused("preparation-query-invalid"))?, before, reader_token.as_deref()), &mut causes)?
+                }
                 _ => return Err(E::Refused("web-route-unported")),
             };
             Ok(RouteBody::plain(bytes))

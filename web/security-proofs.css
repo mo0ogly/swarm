@@ -1,0 +1,6 @@
+/* Shared semantic pairs only; disclosures preserve readable local overflow. */
+#security-main{max-width:64rem}#security-access{max-width:40rem}#security-message{white-space:pre-wrap;overflow-wrap:anywhere}
+#security-main section,#security-main details{min-width:0}#security-main details{padding-block:.5rem}
+#security-main summary{min-height:44px;padding:.5rem}#security-main dl{display:grid;gap:.5rem;grid-template-columns:minmax(0,1fr)}
+#security-main dt{font-weight:600}#security-main dd{margin:0 0 .75rem;overflow-wrap:anywhere}#security-token{max-width:100%}
+.security-skip{position:absolute;left:-10000px}.security-skip:focus{position:static;display:block;padding:1rem}
