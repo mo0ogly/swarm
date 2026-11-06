@@ -572,6 +572,28 @@ HTTP 400, 403 ou 409 selon la cause. Une politique avancée active non portée
 refuse explicitement, sans repli vers les identités statiques. Les identités
 mappées fédérées ne deviennent pas locales parce que leur fédération est arrêtée.
 
+**Délégation de mandat (portée, 4 novembre 2026)** — le bloc `delegation`
+(`max_depth`, entier explicite ≥ 0 ; null, chaîne, fraction, booléen, négatif
+refusent) est admis en configuration et porté au parcours complet : un enfant
+`mandate-create` avec `parent_mandate_id` exige un administrateur I3, enregistre
+l'identité et l'empreinte courante du parent, plafonne l'expiration par défaut
+sur celle du parent, puis dérive la chaîne d'admission avant insertion — cycle,
+empreinte altérée, identité absente, plafond de profondeur (chaque maillon
+compte), parent absent/révoqué/inactif/expiré/périmé, empreinte parentale
+périmée et tout élargissement (montant, ressource, devise, bénéficiaire,
+actions, fenêtre, sujet, parent) refusent avec les raisons historiques Go, sans
+mutation et avec une preuve conservée. La même chaîne rejoue aux frontières
+`approve`/`commit` : une révocation d'ancêtre bloque avec
+« mandat parent révoqué ». La projection publique rapporte l'état effectif de
+chaque mandat (`mandate_status`) et propage typée une erreur technique de l'état
+stocké. Le digest racine historique (sans connecteur ni ascendance) est épinglé
+par un test unitaire : `17749c31acf37938ebabe43b794adf5726fbc565905e6c0eb059afdae9ab5ad3`.
+Régression miroir du contrat Go :
+`rust/crates/swarm-engine/tests/trust_delegation.rs` (7 tests, racines isolées
+dans `.swarm-fixtures/trust-delegation/`, jamais `/tmp`). Restent fermés : la
+création distante A2A et le `data_context` — toute commande qui les porte
+refuse encore.
+
 Le verrou interprocessus historique sérialise les écritures. Une même clé ne
 produit qu’une entrée native ; un autre contenu sous cette clé est refusé.
 `lose_response:true` rend l’état `unknown` après l’effet simulé. Un nouvel

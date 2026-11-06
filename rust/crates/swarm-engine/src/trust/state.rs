@@ -219,30 +219,33 @@ impl State {
     /// Operator audit projection: no raw token, hash, sessions or original bytes.
     /// Read access is local operator / authenticated native web control, not an
     /// agent-selected integrity level or direct read of an official object.
+    /// Errors: a technical stored-state failure while projecting any mandate
+    /// (e.g. unparseable stored timestamp) refuses the whole projection with
+    /// the original typed error; it is never folded into an available label or
+    /// an empty success. Business refusals (Ok nonempty reasons) stay displayed.
     pub fn public(&self) -> Result<Value, TrustError> {
         let identities:Vec<Value>=self.identities.iter().map(|id| {
             let mut value=serde_json::json!({"subject":id.subject,"integrity":id.integrity,"roles":id.roles,"disabled":id.disabled});
             if let Some(p)=&id.enrollment_principal {value["enrollment_principal"]=serde_json::json!({"principal_id":p.id,"principal_kind":p.kind,"issuer":p.issuer,"subject":p.subject});}
             value
         }).collect();
-        let mut view = serde_json::json!({"schema_version":1,"revision":self.revision,"policy":self.policy,"identities":identities,"mandates":self.mandates,"actions":self.actions,"ledger":self.ledger,"access_ledger":self.access_ledger,"effect_receipts":self.connector_receipts,"evidence_count":self.evidence.len(),"simulation":true,"originals_missing":self.evidence.iter().filter(|e|self.originals.get(&e.original_digest).is_none_or(|v|v.is_empty())).count(),"limits":["aucun paiement réel","identités locales authentifiées","politiques avancées actives non portées : refus fermé"],"biba":{"model":"strict-with-named-endorsement-v1","scope":"trust-actions-only","os_confinement":false},"amount_minor_text":self.actions.iter().map(|(id,a)|(id.clone(),Value::String(a.get("amount_minor").and_then(Value::as_i64).unwrap_or(0).to_string()))).collect::<BTreeMap<_,_>>()});
+        let mut view = serde_json::json!({"schema_version":1,"revision":self.revision,"policy":self.policy,"identities":identities,"mandates":self.mandates,"actions":self.actions,"ledger":self.ledger,"access_ledger":self.access_ledger,"effect_receipts":self.connector_receipts,"evidence_count":self.evidence.len(),"simulation":true,"originals_missing":self.evidence.iter().filter(|e|self.originals.get(&e.original_digest).is_none_or(|v|v.is_empty())).count(),"limits":["aucun paiement réel","identités locales authentifiées","délégation de mandat portée ; admission distante A2A et contexte de données encore refusés"],"biba":{"model":"strict-with-named-endorsement-v1","scope":"trust-actions-only","os_confinement":false},"amount_minor_text":self.actions.iter().map(|(id,a)|(id.clone(),Value::String(a.get("amount_minor").and_then(Value::as_i64).unwrap_or(0).to_string()))).collect::<BTreeMap<_,_>>()});
         // Effective per-mandate freshness/chain verdicts; a stored timestamp or
         // hash is never replaced by an empty success here. Chain refusals reuse
-        // the engine's admission reasons exactly.
+        // the engine's admission reasons exactly. A technical error (invalid
+        // stored timestamp, missing mandate) propagates typed and refuses the
+        // projection; only business refusals surface as status labels.
         let now = time::OffsetDateTime::now_utc();
-        let status: BTreeMap<String, String> = self
-            .mandates
-            .keys()
-            .map(|id| {
-                let reason = super::operations::active(self, id, now).unwrap_or_default();
-                let label = if reason.is_empty() {
-                    "Mandat disponible".to_string()
-                } else {
-                    reason
-                };
-                (id.clone(), label)
-            })
-            .collect();
+        let mut status: BTreeMap<String, String> = BTreeMap::new();
+        for id in self.mandates.keys() {
+            let reason = super::operations::active(self, id, now)?;
+            let label = if reason.is_empty() {
+                "Mandat disponible".to_string()
+            } else {
+                reason
+            };
+            status.insert(id.clone(), label);
+        }
         view["mandate_status"] = serde_json::to_value(status)?;
         view["identity_authentication"]=serde_json::json!({"local_bearer":true,"held_enrollment":{"root_api_available":cfg!(target_os="linux"),"http_available":false,"reason":"trusted-enrollment-startup-not-bound"}});
         view["confidentiality"]=super::confidentiality::capability(self)?;

@@ -3044,3 +3044,65 @@ separation, human enrollment, real payment or independent acceptance evidence �
 T09 moves from "partial" to "locally complete" for the agent-actionable
 fraction (human/OS fraction unchanged); PAEA17 and independent acceptance 0/17
 remain open.
+
+### Rust mandate delegation — T14 lot (admission chain), Claude session 2026-11-04
+
+Lot separate from the GLM BF-16/SECURITY-PROOFS lots: Rust portage of the Go
+admission chain (`internal/engine/trust_delegation.go`) per
+[T14-A2A-DESIGN](paea/T14-A2A-DESIGN.md), without the A2A network sub-lot
+(D1–D7) or `data_context`, which stay closed. Two general product fixes in
+`rust/crates/swarm-engine/src/trust/operations.rs`: (1) the
+`delegated_mandate_reason` chain check was missing from `mandate-create`
+admission — a widened child was inserted and only refused at use time; the full
+re-derivation (cycle, digest, identity, depth, parent, narrowing) now refuses
+before insertion, mirroring `trust_actions.go` 958–990; (2) the `public()`
+projection in `trust/state.rs` now propagates a stored-state technical error
+typed instead of collapsing it into "Mandat disponible". Mirror regression of
+the Go contract (11 tests) in
+`rust/crates/swarm-engine/tests/trust_delegation.rs`: 7 integration tests on
+isolated `.swarm-fixtures/trust-delegation/` roots (never `/tmp`), strict config
+admission, I1/I3 authority boundary, full request→approve→commit chain,
+ancestor revocation at the approve/commit boundaries, 9 widening cases refused
+without mutation or evidence loss, default expiry capped by the parent,
+`mandate_status` projection; plus 1 unit test pinning the historical Go root
+digest `17749c31acf37938ebabe43b794adf5726fbc565905e6c0eb059afdae9ab5ad3`
+(`TestActionsConfianceT3DelegationPreservesLegacyRootDigest` had no Rust
+equivalent). Local Claude execution, 4 November 2026: the 7 integration tests
+pass (cargo test -p swarm-engine --test trust_delegation, 2.5 s); I3 reads a
+redacted ack (`trust-status-ack-v1`) rather than the I2 object — parent bindings
+are read from `show`. Portage limits label updated in `public()` ("délégation
+de mandat portée ; admission distante A2A et contexte de données encore
+refusés"). FR/EN docs (`docs/actions-confiance-rust.md` Refusals section,
+`docs/en/…`) in the same increment. Remaining in the lot: permanent recipe,
+full swarm-engine suite, Go non-regression suite, no commit and no install —
+the full suite and acceptance are not established as of this date.
+
+### Rust mandate delegation — T14 lot, verification follow-up, Claude session 2026-11-05
+
+Follow-up to the 4 November note: the remaining lot items are executed.
+(1) Permanent recipe created
+`tools/verification/recipes/trust-delegation-rust.json` (declared inputs:
+trust sources + tests + wrapper + FR/EN docs + Go contract) with wrapper
+`tests/rust_trust_delegation_unit.py` (CARGO_TARGET_DIR under `.cache/`,
+never `/tmp`). First run FAIL retained in
+`.swarm-fixtures/recipe-evidence/trust-delegation-rust-20261105-232657`:
+the pin counted 7 tests while the file carries 9 — two
+`mandate_status_projection_propagates_stored_{timestamp,depth}_error`
+regressions were added to the same file by the concurrent typed-errors lot
+(`State::public()`), consistent with the recipe's declared inputs; the
+wrapper and recipe are corrected to 9 names (general cause: pinning a count
+without re-reading the file's real inventory after a concurrent edit).
+(2) Second run PASS with verified evidence:
+`.swarm-fixtures/recipe-evidence/trust-delegation-rust-20261105-233011`
+(`verify` → `integrity: VERIFIED`, `DELEGATION_UNIT_PASS 9 named tests`,
+`test result: ok. 9 passed;`), retained locally; archive copy placed on the
+Lexar drive and read back fully identical (index:
+`.swarm-fixtures/recipe-evidence/INDEX-lexar-2026-11-05.md`, 4 November
+preference). (3) Go non-regression on the shared tree:
+`go test ./internal/engine -run TestActionsConfianceT3Delegation -count=1`
+→ 10/10 PASS, 0 FAIL. Full swarm-engine suite: 730/736 on 4 November, the
+6 failures diagnosed outside the lot (schema_version drift 52 vs the 40/39
+pin of `mission_report_relay.rs` created by commit 8cb0598317 which changed
+`engine_settings.rs` without updating the test — dated before this lot;
+mission_status `/tmp` fixtures; confidentiality recipes' TMPDIR contract).
+Still no commit and no install; acceptance remains to be established.

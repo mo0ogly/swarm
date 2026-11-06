@@ -545,6 +545,27 @@ identity 4, revision/event/idempotency conflicts 3; HTTP 400/403/409 by cause.
 An active unported policy refuses explicitly, never falling back to static
 identities. Stopping federation does not turn mapped principals into local ones.
 
+**Mandate delegation (ported, 4 November 2026)** — the `delegation` block
+(`max_depth`, explicit integer ≥ 0; null, string, fraction, boolean, negative
+refuse) is admitted in configuration and carried through the full flow: a
+`mandate-create` child with `parent_mandate_id` requires an I3 administrator,
+records the parent's identity and current digest, caps the default expiry at the
+parent's, then derives the admission chain before insertion — cycle, altered
+digest, absent identity, depth ceiling (each link counts), absent/revoked/
+inactive/expired/stale-revision parent, stale parent digest and any widening
+(amount, resource, currency, beneficiary, actions, window, subject, parent)
+refuse with the historical Go reasons, without mutation and with retained
+evidence. The same chain re-runs at the `approve`/`commit` boundaries: an
+ancestor revocation blocks with « mandat parent révoqué ». The public projection
+reports each mandate's effective status (`mandate_status`) and propagates a
+stored-state technical error typed. The historical root digest (no connector, no
+ancestry) is pinned by a unit test:
+`17749c31acf37938ebabe43b794adf5726fbc565905e6c0eb059afdae9ab5ad3`. Mirror
+regression of the Go contract:
+`rust/crates/swarm-engine/tests/trust_delegation.rs` (7 tests, isolated roots in
+`.swarm-fixtures/trust-delegation/`, never `/tmp`). Still closed: remote A2A
+creation and `data_context` — any command carrying them keeps refusing.
+
 The historical interprocess flock serializes writes. One idempotency key creates
 one native entry; conflicting content refuses. `lose_response:true` records
 `unknown` after the simulated effect. Another commit cannot duplicate it;

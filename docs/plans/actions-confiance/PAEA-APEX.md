@@ -3734,3 +3734,68 @@ Prochainlotunique `glm-bf16-dialogue-http-regression-20261103T155600Z` implémen
 ### Replan du 3 novembre 2026, 17:08 UTC — premier témoin HTTP au lieu de paquet trop large
 
 Le lotBF16 initial n’a produitaucuneédition après lecturesdesproducteurs puis modulesentiers ; lacompactionréussie neconstituaitpas unprogrès. Codex prend enchargeledéfautdedécoupage : préserverleslogs, vérifierUID/boot/start/sessionetinterrompre leseulclientpropre, vrai exitrunner0 conservé (sansremise, donc pasunsuccèsmétier). NouveaumêmeGLM--resume, dossierneuf `glm-bf16-first-http-boundary-20261103T171000Z`, paquetréduitauscriptuniquepremiercontrôle : publicsendréelanswered→publicadmissioncorrespondante→GETbare403/lecteur200exact, témoinsnonmutation, docsFR/ENcourtes. MatriceHEAD/stale/revocation/recettedifféréeaveccause etpropriétaireGLM jusqu’à laréceptionpersonnelle dupremierparcours ; aucune exigenceglobaleeffacée. DNS/proxyetabsenceclientssamesessioncontrôlésavantreprise. CodexaucundéveloppementPAEA.
+
+### Délégation de mandat Rust — lot T14 (chaîne d'admission), session Claude 2026-11-04
+
+Lot séparé des lots GLM BF-16/SECURITY-PROOFS : portage Rust de la chaîne
+d'admission délégation du contrat Go (`internal/engine/trust_delegation.go`)
+conformément à [T14-A2A-DESIGN](paea/T14-A2A-DESIGN.md), sans le volet A2A
+réseau (D1–D7) ni `data_context`, qui restent fermés. Deux corrections produit
+générales dans `rust/crates/swarm-engine/src/trust/operations.rs` :
+(1) le contrôle de chaîne `delegated_mandate_reason` manquait à l'admission
+`mandate-create` — un enfant élargi était inséré puis refusé seulement à
+l'usage ; la re-dérivation complète (cycle, empreinte, identité, profondeur,
+parent, rétrécissement) refuse désormais avant insertion, miroir de
+`trust_actions.go` 958–990 ; (2) la projection `public()` de
+`trust/state.rs` propage typée l'erreur technique d'un état stocké invalide au
+lieu de la réduire en « Mandat disponible ». Régression miroir du contrat Go
+(11 tests) dans `rust/crates/swarm-engine/tests/trust_delegation.rs` :
+7 tests d'intégration sur racines isolées `.swarm-fixtures/trust-delegation/`
+(jamais `/tmp`), config admission stricte, frontière autorité I1/I3, chaîne
+complète request→approve→commit, révocation d'ancêtre aux frontières
+approve/commit, 9 cas d'élargissement refusés sans mutation ni perte de preuve,
+expiration par défaut plafonnée au parent, projection `mandate_status` ; et
+1 test unitaire épinglant le digest racine historique Go
+`17749c31acf37938ebabe43b794adf5726fbc565905e6c0eb059afdae9ab5ad3`
+(`TestActionsConfianceT3DelegationPreservesLegacyRootDigest` n'avait pas
+d'équivalent Rust). Exécution locale Claude du 4 novembre 2026 : les 7 tests
+d'intégration passent (cargo test -p swarm-engine --test trust_delegation,
+2,5 s) ; I3 lit un ack rédigé (`trust-status-ack-v1`) plutôt que l'objet I2 —
+les liaisons parentales se lisent depuis `show`. Libellé de limite du
+portage mis à jour dans `public()` (« délégation de mandat portée ; admission
+distante A2A et contexte de données encore refusés »). Docs FR/EN
+(`docs/actions-confiance-rust.md` §Refus et reprise, `docs/en/…`) dans le même
+incrément. Reste du lot : recette permanente, suite complète swarm-engine,
+suite Go de non-régression, ni commit ni installation — la suite complète et
+l'acceptation ne sont pas établies à cette date.
+
+### Délégation de mandat Rust — lot T14, suite de vérification, session Claude 2026-11-05
+
+Suite de la note du 4 novembre : les items restants du lot sont exécutés.
+(1) Recette permanente créée
+`tools/verification/recipes/trust-delegation-rust.json` (entrées déclarées :
+sources trust + tests + wrapper + docs FR/EN + contrat Go) avec wrapper
+`tests/rust_trust_delegation_unit.py` (CARGO_TARGET_DIR sous `.cache/`, jamais
+`/tmp`). Premier run FAIL conservé dans
+`.swarm-fixtures/recipe-evidence/trust-delegation-rust-20261105-232657` :
+l'épinglage comptait 7 tests alors que le fichier en porte 9 — deux
+régressions `mandate_status_projection_propagates_stored_{timestamp,depth}_error`
+ont été ajoutées au même fichier par le lot concurrent des erreurs typées
+(`State::public()`), cohérent avec les entrées déclarées de la recette ; le
+wrapper et la recette sont corrigés à 9 noms (cause générale : épingler un
+compteur sans relire l'inventaire réel du fichier après édition concurrente).
+(2) Second run PASS avec preuve vérifiée :
+`.swarm-fixtures/recipe-evidence/trust-delegation-rust-20261105-233011`
+(`verify` → `integrity: VERIFIED`, `DELEGATION_UNIT_PASS 9 named tests`,
+`test result: ok. 9 passed;`), conservée localement ; copie d'archive sur la
+clé Lexar posée et relire intégrale identique (index :
+`.swarm-fixtures/recipe-evidence/INDEX-lexar-2026-11-05.md`, préférence du
+4 novembre). (3) Non-régression Go sur l'arbre partagé :
+`go test ./internal/engine -run TestActionsConfianceT3Delegation -count=1`
+→ 10/10 PASS, 0 FAIL. Suite complète swarm-engine : 730/736 au 4 novembre,
+les 6 échecs diagnostiqués hors lot (dérive schema_version 52 vs épinglage
+40/39 de `mission_report_relay.rs` créée par le commit 8cb0598317 qui a
+changé `engine_settings.rs` sans mettre à jour le test — daté d'avant ce lot ;
+fixtures `/tmp` des tests mission_status ; contrat TMPDIR des recettes
+confidentialité). Toujours ni commit ni installation ; l'acceptation reste à
+établir.

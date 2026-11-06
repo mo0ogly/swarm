@@ -76,6 +76,22 @@ fn access(a: &TrustIdentity, object: i64, kind: BibaAccess) -> Result<(), E> {
 /// chain when present. Shared with the PAEA agreement guard: last-use freshness
 /// must also consult the mandate's current revocation/expiration state, not
 /// only the revision. Root mandates keep the historical base reasons only.
+/// Returns Ok("") exactly when the mandate is currently available; Ok(nonempty)
+/// is a business refusal displayed as-is — an absent mandate observably yields
+/// the Ok("mandat absent") refusal from `active_base`, never an error. Errors:
+/// a stored timestamp outside the Go RFC3339 contract yields
+/// `E::Invalid("date RFC3339 requise")` (from `active_base` or the chain
+/// walk); delegation-hash errors and a stored delegation depth whose shape
+/// admission would refuse (`E::Integrity("trust-delegation-shape")` via
+/// `delegated_mandate_reason` → `delegation_max_depth`) also propagate typed.
+/// The
+/// `E::Integrity("trust-mandate-missing")` lookup after `active_base` is a
+/// defensive branch only: `active` holds one shared `&State` for its whole
+/// body, so the map content seen by the defensive get equals what `active_base`
+/// saw — Ok("") from `active_base` already proves the mandate present, the
+/// branch cannot fire, and it is not the normal path for an absent mandate. Technical errors are never
+/// folded into an availability label by callers; the operator projection
+/// propagates them via `?`.
 pub(crate) fn active(st: &State, id: &str, now: OffsetDateTime) -> Result<String, E> {
     let base = active_base(st, id, now)?;
     if !base.is_empty() {
@@ -210,13 +226,31 @@ fn mandate_hash(m: &Value) -> Result<String, E> {
     })
 }
 /// Effective configured delegation depth; 0 disables child mandates entirely.
-fn delegation_max_depth(st: &State) -> i64 {
-    st.controls()
-        .ok()
-        .and_then(|c| c.get("delegation").cloned())
-        .and_then(|raw| serde_json::from_str::<Value>(raw.raw()).ok())
-        .and_then(|v| v.get("max_depth").and_then(Value::as_i64))
-        .unwrap_or(0)
+/// The stored shape is re-checked against the existing admission contract
+/// (`State::require_supported`, same `trust-delegation-shape` code, no new
+/// error family): a missing stored block falls back to the registered default
+/// for compatibility, an explicit non-negative integer returns as-is — the
+/// caller keeps the legitimate business refusal for 0 — and a non-integer or
+/// negative stored `max_depth`, exactly the shapes configuration admission
+/// refuses, propagates typed instead of silently reading as 0. Inputs: `st`,
+/// the opened state. Output: `Ok(depth)` per above. Errors:
+/// `E::Integrity("trust-delegation-shape")` for an absent effective
+/// delegation entry or a non-integer/negative stored depth;
+/// `E::Json`/registry errors from `controls()` or a malformed stored block
+/// propagate — no fallback masks them. Limits: read-only coherence with
+/// admission, not a whole-state re-validation; the business meaning of the
+/// returned depth stays with the caller.
+fn delegation_max_depth(st: &State) -> Result<i64, E> {
+    let raw = st
+        .controls()?
+        .get("delegation")
+        .cloned()
+        .ok_or(E::Integrity("trust-delegation-shape"))?;
+    let value: Value = serde_json::from_str(raw.raw())?;
+    match value.get("max_depth").and_then(Value::as_i64) {
+        Some(depth) if depth >= 0 => Ok(depth),
+        _ => Err(E::Integrity("trust-delegation-shape")),
+    }
 }
 
 /// A child mandate must stay strictly inside its parent: same connector,
@@ -264,7 +298,11 @@ fn delegation_identity_active(st: &State, subject: &str) -> bool {
         .is_some_and(|i| !i.disabled)
 }
 
-/// Base freshness of one stored mandate without any chain walk.
+/// Base freshness of one stored mandate without any chain walk. Business
+/// refusals (absent/revoked/inactive/expired/stale revision) return Ok with the
+/// historical reason text. Errors: a stored `starts_at`/`expires_at` outside
+/// the Go RFC3339 contract propagates `E::Invalid("date RFC3339 requise")`
+/// instead of any refusal text or availability.
 fn active_base(st: &State, id: &str, now: OffsetDateTime) -> Result<String, E> {
     let Some(m) = st.mandates.get(id) else {
         return Ok("mandat absent".into());
@@ -287,6 +325,14 @@ fn active_base(st: &State, id: &str, now: OffsetDateTime) -> Result<String, E> {
 /// Walk a delegated mandate's ancestry with the historical Go refusals. Depth
 /// counts links above the mandate; every ancestor stays fresh and strictly
 /// narrowing, each recorded digest matches its mandate and no cycle exists.
+/// Ok("") means the chain imposes no refusal; Ok(nonempty) is the business
+/// refusal displayed as-is. The effective depth comes from
+/// `delegation_max_depth`: 0 keeps the legitimate "délégations désactivées"
+/// refusal, while a stored shape admission would refuse (non-integer or
+/// negative `max_depth`) propagates typed instead of reading as 0. Errors:
+/// `E::Integrity("trust-delegation-shape")` from the stored depth,
+/// `E::Invalid("date RFC3339 requise")` from a stored timestamp, and
+/// delegation-hash errors propagate — none folds into a business label.
 fn delegated_mandate_reason(st: &State, m: &Value, now: OffsetDateTime) -> Result<String, E> {
     let parent_id = text(m, "parent_mandate_id");
     if parent_id.is_empty() {
@@ -296,7 +342,7 @@ fn delegated_mandate_reason(st: &State, m: &Value, now: OffsetDateTime) -> Resul
             String::new()
         });
     }
-    let max_depth = delegation_max_depth(st);
+    let max_depth = delegation_max_depth(st)?;
     if max_depth == 0 {
         return Ok("délégations désactivées".into());
     }
@@ -1193,4 +1239,29 @@ fn effect_transition(
     action["updated_at"] = at.into();
     st.actions.insert(text(a, "id").into(), action.clone());
     Ok((action, Some(snapshot(st, a)?)))
+}
+
+/// Historical root-digest pin: the canonical encoding of a root mandate (no
+/// connector, no ancestry layer) must never drift, because recorded children
+/// bind their parent's recorded digest bytes.
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn root_mandate_digest_matches_legacy_preimage() {
+        let m = json!({
+            "id": "legacy-root", "subject": "alice", "delegator": "admin",
+            "actions": ["settle"], "resource": "invoice/acme",
+            "max_amount_minor": 1000, "currency": "EUR", "beneficiary": "ACME",
+            "version": 1, "policy_revision": 1, "integrity": 2,
+            "starts_at": "2026-10-14T12:00:00Z", "expires_at": "2026-10-14T13:00:00Z",
+            "revoked_at": ""
+        });
+        assert_eq!(
+            mandate_hash(&m).unwrap(),
+            "17749c31acf37938ebabe43b794adf5726fbc565905e6c0eb059afdae9ab5ad3"
+        );
+    }
 }
