@@ -708,6 +708,37 @@ Preuve :
 `rust/crates/swarm-engine/tests/project_memory_engine.rs` (6 tests, SQL en
 mémoire isolé) et `cargo test -p swarm-engine project_memory --lib` (11 tests).
 
+**Catalogue mémoire en lecture (7 novembre 2026)** — le portage de
+`projectMemoryCatalog` (`project_memory_public.go`) expose la consultation du
+catalogue de mémoire de projet sur les trois surfaces : moteur
+`rust/crates/swarm-engine/src/memory_catalog.rs` (`memory_catalog` assemblage
+pur + `memory_catalog_from_connection` lecture transactionnelle, exporté
+depuis `swarm-engine`), HTTP `GET /api/v1/project-memory` (lecture seule,
+paramètre `q` unique obligatoire, doublon ou membre inconnu refusé
+`project-memory-query-invalid`) et CLI `swarm-rust memory list --root ROOT
+[--json]` (phase delivery, lecture seule). Contrats Go conservés : la requête
+est repliée (`foldDialogue` — minuscules d'abord, accents mappés ensuite,
+œ→oe) avant le filtre **et** renvoyée repliée dans la réponse
+`{"entries", "method":"literal", "query"}` ; une entrée porte `ref`, `version`,
+`status`, `reason`, `work_revision`, `source_title`, `used_by` ; la version
+courante est `active` (« Version courante ; conditions à revérifier ») ou
+`unavailable` avec le texte d'erreur exact (retirée, source modifiée, import
+« Mémoire importée ou d’un autre projet : admission locale requise »), les
+versions antérieures sont `historical` (« Version historique, non
+sélectionnable ») ; le filtre porte sur corps et conditions repliés ;
+`used_by` liste les usages actifs de la référence exacte. R3 conservé : un
+échec de lecture/décodage d'une ligne refuse tout le catalogue (jamais un
+résultat vide), octets conservés. Preuves : `cargo test -p swarm-engine
+--lib memory_catalog` (5), `--test memory_catalog_root` (3, racine réelle
+`RootStore::memory_catalog`, corruption externe `{"x":1}` refusée sans
+catalogue partiel), `cargo test -p swarm-web --test project_memory` (1, GET/
+HEAD, `?q=%C3%89TAPE` replié en `etape`, POST refusé, état inchangé),
+`cargo test -p swarm-cli --test memory` (4) ; recette permanente
+`tools/verification/recipes/versioned-memory-catalog-rust.json`. Restent
+fermés : la surface de mutation HTTP/CLI dédiée (admission, remplacement,
+retrait, sélection), le résumé extractif M20 et les droits
+lire/résumer/transmettre/compacter.
+
 Le verrou interprocessus historique sérialise les écritures. Une même clé ne
 produit qu’une entrée native ; un autre contenu sous cette clé est refusé.
 `lose_response:true` rend l’état `unknown` après l’effet simulé. Un nouvel

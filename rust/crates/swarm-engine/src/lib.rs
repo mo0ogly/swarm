@@ -385,6 +385,7 @@ mod identity_plan_rules;
 mod identity_plan_upgrade;
 mod instruction;
 mod instruction_learning;
+mod memory_catalog;
 mod memory_files;
 mod local_path;
 mod model_wire;
@@ -392,9 +393,10 @@ mod models;
 mod mutation_guard;
 mod project_memory;
 pub use project_memory::{
-    decode_project_memory_request, memory_preview_token, memory_version_sha, MemoryUse,
-    ProjectMemoryPreview, ProjectMemoryRequest,
+    decode_project_memory_request, memory_preview_token, memory_source_sha, memory_version_sha,
+    MemoryUse, ProjectMemoryPreview, ProjectMemoryRequest,
 };
+pub use memory_catalog::{memory_catalog, MemoryCatalog, MemoryCatalogEntry};
 pub use financial_budget::{
     check_launch_budget, check_reserved_agent_budget, check_reserved_planning_start_budget,
     decode_budget_change, reserve_planning_call, validate_budget, validate_budget_change, Budget,

@@ -206,6 +206,21 @@ rejouée, preuve `.swarm-fixtures/versioned-memory-engine-evidence/run-20261105-
 Restent fermés : surface HTTP/CLI dédiée, résumé extractif M20, droits
 lire/résumer/transmettre/compacter.
 
+Tranche G2 catalogue (7 novembre 2026) : la lecture du catalogue est portée —
+`projectMemoryCatalog` (`project_memory_public.go`) → `memory_catalog.rs`
+(assemblage pur + entrée connexion), `RootStore::memory_catalog`,
+HTTP `GET /api/v1/project-memory` (lecture seule, `q` unique) et CLI
+`swarm-rust memory list --root ROOT [--json]`. Contrats Go conservés : requête
+repliée avant filtre et renvoyée repliée, statuts/reasons exacts (`active`/
+`historical`/`unavailable` avec textes Go, import « Mémoire importée ou d’un
+autre projet : admission locale requise »), R3 refus global sans catalogue
+partiel (corruption externe `{"x":1}` en fixture). Preuve : tests moteur 5 lib
++ 3 racine, web 1, CLI 4 ; recette permanente
+`tools/verification/recipes/versioned-memory-catalog-rust.json` ; doc FR/EN
+`docs/actions-confiance-rust.md`. Restent fermés : surface de mutation
+HTTP/CLI dédiée (admission, remplacement, retrait, sélection), résumé
+extractif M20, droits lire/résumer/transmettre/compacter.
+
 ## Découverte D03 — fixtures de tests Rust sous /tmp (interdiction opérateur)
 
 Origine : reprise tranche G2 filiation (6 novembre 2026). Après l'interdiction

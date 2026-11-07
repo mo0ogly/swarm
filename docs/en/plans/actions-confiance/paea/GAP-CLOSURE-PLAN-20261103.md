@@ -171,6 +171,21 @@ Evidence: test `lineage_walk_reads_ancestors_and_refuses_broken_chains`
 closed: dedicated HTTP/CLI surface, extractive summarization M20,
 read/summarize/transmit/compact rights.
 
+G2 catalog tranche (7 November 2026): the catalog read is ported —
+`projectMemoryCatalog` (`project_memory_public.go`) → `memory_catalog.rs`
+(pure assembly + connection entry), `RootStore::memory_catalog`, HTTP
+`GET /api/v1/project-memory` (read-only, single `q`) and CLI
+`swarm-rust memory list --root ROOT [--json]`. Go contracts preserved: query
+folded before filtering and returned folded, exact statuses/reasons
+(`active`/`historical`/`unavailable` with Go texts, import "Mémoire importée
+ou d’un autre projet : admission locale requise"), R3 whole-catalog refusal
+with no partial result (external corruption `{"x":1}` as fixture). Evidence:
+engine tests 5 lib + 3 root, web 1, CLI 4; permanent recipe
+`tools/verification/recipes/versioned-memory-catalog-rust.json`; FR/EN doc
+`docs/actions-confiance-rust.md`. Still closed: the dedicated HTTP/CLI
+mutation surface (admit, replace, withdraw, select), extractive
+summarization M20, read/summarize/transmit/compact rights.
+
 ## Discovery D03 — Rust test fixtures under /tmp (operator interdiction)
 
 Origin: G2 lineage tranche resumption (6 November 2026). After the operator

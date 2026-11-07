@@ -677,6 +677,36 @@ compact rights. Evidence:
 in-memory SQL) and `cargo test -p swarm-engine project_memory --lib`
 (11 tests).
 
+**Memory catalog read surface (7 November 2026)** — the Go
+`projectMemoryCatalog` (`project_memory_public.go`) port exposes project-memory
+catalog consultation on all three surfaces: engine
+`rust/crates/swarm-engine/src/memory_catalog.rs` (`memory_catalog` pure
+assembly + `memory_catalog_from_connection` transactional read, exported from
+`swarm-engine`), HTTP `GET /api/v1/project-memory` (read-only, single `q`
+query member required, duplicate or unknown member refuses
+`project-memory-query-invalid`) and CLI `swarm-rust memory list --root ROOT
+[--json]` (delivery phase, read-only). Go contracts preserved: the query is
+folded (`foldDialogue` — lowercase first, accent mappings after, œ→oe) before
+filtering **and** returned folded in the response
+`{"entries", "method":"literal", "query"}`; an entry carries `ref`, `version`,
+`status`, `reason`, `work_revision`, `source_title`, `used_by`; the current
+version is `active` ("Version courante ; conditions à revérifier") or
+`unavailable` with the exact error text (withdrawn, modified source, import
+"Mémoire importée ou d’un autre projet : admission locale requise"), earlier
+versions are `historical` ("Version historique, non sélectionnable"); the
+filter applies over folded body and conditions; `used_by` lists active uses of
+the exact reference. R3 preserved: a row read/decode failure refuses the whole
+catalog (never an empty result), retained bytes unchanged. Evidence:
+`cargo test -p swarm-engine --lib memory_catalog` (5),
+`--test memory_catalog_root` (3, real-root `RootStore::memory_catalog`,
+external corruption `{"x":1}` refused with no partial catalog),
+`cargo test -p swarm-web --test project_memory` (1, GET/HEAD,
+`?q=%C3%89TAPE` folded to `etape`, POST refused, state unchanged),
+`cargo test -p swarm-cli --test memory` (4); permanent recipe
+`tools/verification/recipes/versioned-memory-catalog-rust.json`. Still closed:
+the dedicated HTTP/CLI mutation surface (admit, replace, withdraw, select),
+extractive summarization (M20) and read/summarize/transmit/compact rights.
+
 The historical interprocess flock serializes writes. One idempotency key creates
 one native entry; conflicting content refuses. `lose_response:true` records
 `unknown` after the simulated effect. Another commit cannot duplicate it;

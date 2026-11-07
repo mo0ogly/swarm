@@ -1313,6 +1313,7 @@ impl NativeHttpService {
             }
             "/api/v1/run-limits"|"/api/v1/run-limits/effective"|"/api/v1/run-limits/preview"|"/api/v1/run-limits/apply"|"/api/v1/run-limits/rollback"|"/api/v1/run-limits/rollback/preview"=>self.run_limits_admin(request),
             "/api/v1/project-profile"=>self.project_profile_status(request),
+            "/api/v1/project-memory"=>self.project_memory(request),
             "/api/v1/project-profile/catalog"|"/api/v1/project-profile/preview"|"/api/v1/project-profile/apply"|"/api/v1/project-profile/select"=>self.project_profile_configuration(request),
             "/api/v1/preparations/command" => self.preparation_command(request),
             "/api/v1/preparations/send"|"/api/v1/preparations/stop"|"/api/v1/preparations/capabilities"=>self.preparation_calls(request),
@@ -1991,6 +1992,9 @@ mod tests {
 }
 
 mod preparations;
+
+#[cfg(target_os="linux")]
+mod project_memory;
 
 #[cfg(target_os="linux")]
 mod project_profile;

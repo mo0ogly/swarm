@@ -2026,6 +2026,47 @@ impl RootStore {
         })();
         finished(result, reservation.close().map_err(RootStoreError::Storage))
     }
+    /// Read-only versioned-memory catalog under one settings reservation,
+    /// mirroring Go `projectMemoryCatalog`: the whole Work inventory (rowid
+    /// descending) and the active-use inventory come from this root's own
+    /// connection, each stored version reports its current status with Go's
+    /// reason text, and the folded literal query filters body+conditions. No
+    /// admission, no authority and no mutation follows; a read or decode
+    /// failure refuses the whole catalog instead of returning a partial one.
+    /// Settings are read like every other memory surface so planning works'
+    /// freshness checks observe the same saved policy snapshot.
+    pub fn memory_catalog(
+        &self,
+        query: &str,
+    ) -> Result<crate::memory_catalog::MemoryCatalog, RootStoreError> {
+        let reservation = self
+            .directory
+            .reserve(false, false)
+            .map_err(RootStoreError::Storage)?;
+        let result = (|| {
+            let settings = self.read_settings()?;
+            let limits = crate::EngineMutationLimits {
+                task: crate::TaskDefinitionLimits::legacy_go(),
+                policy: crate::ValidationPolicyLimits::legacy_go(),
+            };
+            let policy = settings.quality_policy_snapshot().ok();
+            let lifecycle = crate::TaskLifecycleContext {
+                root: &self.root,
+                quality_policy: policy.as_ref(),
+                task_limits: &limits.task,
+                validation_limits: &limits.policy,
+            };
+            crate::memory_catalog::memory_catalog_from_connection(
+                &self.db,
+                &self.root,
+                &lifecycle,
+                Some(&settings),
+                query,
+            )
+            .map_err(|e| RootStoreError::Mutation(WorkEngineError::Memory(e)))
+        })();
+        finished(result, reservation.close().map_err(RootStoreError::Storage))
+    }
     /// Retain the directory and actual SQLite identities with owned CLOEXEC handles.
     /// The caller can compare future Root opens without trusting a pathname or
     /// allowing inode reuse. This observes storage, grants no permissions and
