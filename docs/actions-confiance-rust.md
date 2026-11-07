@@ -763,6 +763,40 @@ aperçu+commit sans entrée ajoutée, refus `summary-source`/action inconnue,
 état inchangé). Restent fermés : le résumé extractif M20 et les droits
 lire/résumer/transmettre/compacter.
 
+**Résumé extractif M20 (7 novembre 2026)** — `memorySummarySource`
+(`internal/engine/memory_summary_source.go`) est porté dans
+`rust/crates/swarm-engine/src/memory_summary_source.rs` et servi sur les trois
+surfaces. CLI `swarm-rust memory summary-source --root ROOT --input FILE
+[--json]` (le corps est la demande, pas d'argument Work positionnel) ; HTTP
+`POST /api/v1/project-memory?action=summary-source` ; moteur
+`RootStore::memory_summary_source(&[u8])` (lecture seule, ouverture en
+lecture, aucun réglage lu). Le contrat Go est conservé octet près : décode
+strict avec plafond transport 1 Mio **avant** décodage, refus
+`project-summary-source-request-schema-invalid` (schéma ≠ 1, révision < 1,
+nom non sûr, dialogues vides), identité `project-summary-source-work-identity-
+mismatch`, conflit `project-memory-work-changed`, tâche inconnue
+`project-memory-task-unknown`, tâche brainstorm `project-summary-source-
+brainstorm-target`, dialogue dupliqué `-dialogue-duplicate`, échange absent
+`dialogue-exchange-missing` ou vide `-exchange-empty` ; HTTP refuse le pairage
+`GET ?action=summary-source` par 405 avant tout décodage (ordre Go). Le paquet
+`swarm_summary_source_v1` embarque le contrat de travail sérialisé
+(`encode_model`, échappement identique à `json.Marshal` Go) comme source
+`current-task-snapshot`, puis question (`operator_question`) et réponse
+(`historical_answer`) par dialogue avec identifiant dérivé de l'empreinte de
+la référence sérialisée ; le payload est une **chaîne** avec son `sha256`
+(vérification inter-runtime possible contre le Go). Preuves : moteur
+`cargo test -p swarm-engine --lib memory_summary_source` (6 : refus de
+décodage/validation, identité/révision/tâche/brainstorm, doublon/absent/vide,
+paquet exact — 5 sources avec snapshot contenant le JSON du contrat, ids
+dérivés, digest par source, aucun échange déplacé), CLI `cargo test -p
+swarm-cli --test memory` (8 : paquet exact, refus brainstorm et révision
+périmée via CLI), web `cargo test -p swarm-web --test project_memory` (3 :
+POST paquet exact sans mutation, GET pairage 405) ; recette permanente
+`tools/verification/recipes/versioned-memory-catalog-rust.json` (5 étapes),
+preuve `.swarm-fixtures/versioned-memory-catalog-evidence/run-20261107-4`.
+Restent fermés : les droits lire/résumer/transmettre/compacter (droits
+opérateur M20, incrément distinct).
+
 Le verrou interprocessus historique sérialise les écritures. Une même clé ne
 produit qu’une entrée native ; un autre contenu sous cette clé est refusé.
 `lose_response:true` rend l’état `unknown` après l’effet simulé. Un nouvel

@@ -139,8 +139,8 @@ fn memory_rejects_unported_subcommands_and_extra_arguments() {
     seed_work(root);
     let mut error = Vec::new();
     let mut out = Vec::new();
-    // M20 summary-source is a later G2 increment: usage refusal, no
-    // fabricated behavior. Unknown subcommands and arity errors refuse too.
+    // M20 summary-source is ported, but it still refuses usage without
+    // --input. Unknown subcommands and arity errors refuse too.
     for args in [
         vec!["memory", "summary-source"],
         vec!["memory", "admit"],
@@ -369,5 +369,138 @@ fn memory_list_human_output_adds_localized_heading() {
     assert_eq!(swarm_cli::run(&args, "en", &mut out, &mut error), 0);
     assert!(String::from_utf8(out).unwrap().starts_with("Memory catalog\n"));
     let _ = io::sink();
+    std::fs::remove_dir_all(root).unwrap();
+}
+
+/// Seed one executing task plus one brainstorm exchange by splicing the
+/// stored body (the engine's external task.add has no brainstorm fields).
+fn splice_brainstorm(root: &std::path::Path, id: &str) {
+    let db = rusqlite::Connection::open(root.join(".swarm/state.db")).unwrap();
+    swarm_engine::register_identity_plan_projection(&db).unwrap();
+    let raw: Vec<u8> = db
+        .query_row("SELECT body FROM works WHERE id=?", [id], |row| row.get(0))
+        .unwrap();
+    let mut doc: swarm_engine::Work = swarm_engine::decode_work(&raw).unwrap();
+    let mut worker = doc
+        .tasks
+        .as_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|t| t.id == "task-worker")
+        .expect("seeded worker task");
+    worker.next = "lancer le test".into();
+    let mut brain = swarm_engine::Task::default();
+    brain.id = "old-0".into();
+    brain.brainstorm = true;
+    brain.question = "Décision numéro 0".into();
+    brain.answers = Some(vec![swarm_engine::BrainstormAnswer {
+        attempt: "a0".into(),
+        text: "Réponse 0".into(),
+        at: String::new(),
+    }]);
+    brain.response = "Réponse 0".into();
+    doc.tasks.as_mut().unwrap().push(brain);
+    let body = swarm_engine::encode_model(&doc).unwrap();
+    db.execute(
+        "UPDATE works SET body=? WHERE id=?",
+        rusqlite::params![body, id],
+    )
+    .unwrap();
+}
+
+/// The M20 summary source over the CLI: the exact packet (schema/kind/payload
+/// digest, snapshot carrying the contract JSON, question and answer sources),
+/// then the brainstorm-target and stale-revision refusals without mutation.
+#[test]
+fn memory_summary_source_serves_packet_and_refuses_target_and_stale() {
+    use sha2::{Digest, Sha256};
+    let root: &std::path::Path = &fixture_root("cli-memcat-");
+    let id = seed_work(root);
+    // Add the executing task through the engine, then splice the brainstorm.
+    let mut env = swarm_engine::SystemEnvironment;
+    let mut store = swarm_engine::RootStore::open(root, true).unwrap();
+    let task = serde_json::json!({
+        "schema_version":1,"event_id":"task","expected_revision":1,
+        "id":"task-worker","title":"Contrôler","deliverable":"rapport","criteria":["Preuve"]
+    });
+    let added = store
+        .execute_external(&id, "task.add", &serde_json::to_vec(&task).unwrap(), &mut env)
+        .unwrap();
+    let revision = added.result.work.revision;
+    store.close().unwrap();
+    splice_brainstorm(root, &id);
+    let digest = |raw: &[u8]| format!("{:x}", Sha256::digest(raw));
+
+    // A valid request: the packet is byte-shaped like Go's.
+    let request = serde_json::json!({
+        "schema_version":1,"work":id,"task":"task-worker","expected_revision":revision,
+        "dialogues":[{"task":"old-0","attempt":"a0","sha256":digest(format!("Décision numéro 0\nRéponse 0").as_bytes())}]
+    });
+    let input = root.join("summary.json");
+    std::fs::write(&input, serde_json::to_vec(&request).unwrap()).unwrap();
+    let args = ["memory", "summary-source", "--input", input.to_str().unwrap(), "--root", root.to_str().unwrap(), "--json"]
+        .iter()
+        .map(|s| s.to_string())
+        .collect::<Vec<_>>();
+    let mut out = Vec::new();
+    let mut error = Vec::new();
+    assert_eq!(swarm_cli::run(&args, "en", &mut out, &mut error), 0, "{}", String::from_utf8_lossy(&error));
+    let packet: serde_json::Value = serde_json::from_slice(&out).unwrap();
+    assert_eq!(packet["schema_version"], 1);
+    assert_eq!(packet["kind"], "swarm_summary_source_v1");
+    assert_eq!(packet["sha256"], packet["payload"].as_str().map(|p| digest(p.as_bytes())).unwrap());
+    let payload: serde_json::Value = serde_json::from_str(packet["payload"].as_str().unwrap()).unwrap();
+    assert_eq!(payload["scope"]["work"], id);
+    assert_eq!(payload["scope"]["task"], "task-worker");
+    assert_eq!(payload["work_revision"], revision);
+    assert_eq!(payload["audience"], "local_operator");
+    assert_eq!(payload["provider_history_complete"], false);
+    let sources = payload["sources"].as_array().unwrap();
+    assert_eq!(sources.len(), 3);
+    assert_eq!(sources[0]["id"], "current-task-snapshot");
+    assert!(sources[0]["text"].as_str().unwrap().contains("Preuve"));
+    assert_eq!(sources[1]["text"], "Décision numéro 0");
+    assert_eq!(sources[2]["text"], "Réponse 0");
+    assert_eq!(sources[2]["role"], "assistant");
+
+    // Targeting the brainstorm task refuses.
+    let bad = serde_json::json!({
+        "schema_version":1,"work":id,"task":"old-0","expected_revision":revision,
+        "dialogues":[{"task":"old-0","attempt":"a0","sha256":digest(format!("Décision numéro 0\nRéponse 0").as_bytes())}]
+    });
+    let input = root.join("summary-bad.json");
+    std::fs::write(&input, serde_json::to_vec(&bad).unwrap()).unwrap();
+    let args = ["memory", "summary-source", "--input", input.to_str().unwrap(), "--root", root.to_str().unwrap()]
+        .iter()
+        .map(|s| s.to_string())
+        .collect::<Vec<_>>();
+    let mut out = Vec::new();
+    let mut error = Vec::new();
+    assert_eq!(swarm_cli::run(&args, "en", &mut out, &mut error), 2);
+    assert!(
+        String::from_utf8_lossy(&error).contains("project-summary-source-brainstorm-target"),
+        "unexpected: {}",
+        String::from_utf8_lossy(&error)
+    );
+
+    // A stale expected revision refuses with the revision conflict.
+    let stale = serde_json::json!({
+        "schema_version":1,"work":id,"task":"task-worker","expected_revision":revision - 1,
+        "dialogues":[{"task":"old-0","attempt":"a0","sha256":digest(format!("Décision numéro 0\nRéponse 0").as_bytes())}]
+    });
+    let input = root.join("summary-stale.json");
+    std::fs::write(&input, serde_json::to_vec(&stale).unwrap()).unwrap();
+    let args = ["memory", "summary-source", "--input", input.to_str().unwrap(), "--root", root.to_str().unwrap()]
+        .iter()
+        .map(|s| s.to_string())
+        .collect::<Vec<_>>();
+    let mut out = Vec::new();
+    let mut error = Vec::new();
+    assert_eq!(swarm_cli::run(&args, "en", &mut out, &mut error), 2);
+    assert!(
+        String::from_utf8_lossy(&error).contains("project-memory-work-changed"),
+        "unexpected: {}",
+        String::from_utf8_lossy(&error)
+    );
     std::fs::remove_dir_all(root).unwrap();
 }

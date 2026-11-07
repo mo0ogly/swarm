@@ -235,6 +235,28 @@ entrée ajoutée, unported, état inchangé) ; recette mise à jour 4→7 CLI et
 1→2 web. Restent fermés : résumé extractif M20, droits
 lire/résumer/transmettre/compacter.
 
+Tranche G2 résumé extractif M20 (7 novembre 2026) : `memorySummarySource`
+(`internal/engine/memory_summary_source.go`) est porté et servi sur les trois
+surfaces — `rust/crates/swarm-engine/src/memory_summary_source.rs`,
+`RootStore::memory_summary_source` (lecture seule), CLI
+`swarm-rust memory summary-source --root ROOT --input FILE [--json]` (corps =
+demande, pas d'argument Work positionnel) et HTTP
+`POST /api/v1/project-memory?action=summary-source` avec le refus 405 du
+pairage `GET ?action=summary-source` avant tout décodage (ordre Go). Contrat
+Go conservé octet près : plafond transport 1 Mio avant décodage strict, refus
+stables (schéma/révision/nom/dialogues vides, identité, conflit
+`project-memory-work-changed`, tâche inconnue, cible brainstorm, doublon,
+échange absent/vide), paquet `swarm_summary_source_v1` à payload **chaîne**
+avec son empreinte (vérification inter-runtime possible), source snapshot =
+contrat de travail sérialisé par `encode_model`, question/réponse par dialogue
+avec identifiant dérivé de l'empreinte de la référence. Preuve : moteur 6
+tests lib, CLI 8 tests (paquet exact, refus brainstorm et révision périmée),
+web 3 tests (POST paquet exact sans mutation, GET pairage 405) ; recette mise
+à jour (5 étapes, entrées Go+Rust M20 ajoutées) et rejouée, preuve
+`.swarm-fixtures/versioned-memory-catalog-evidence/run-20261107-4` (PASS,
+verify VERIFIED). Restent fermés : droits lire/résumer/transmettre/compacter
+(décision opérateur, incréments distincts).
+
 ## Découverte D03 — fixtures de tests Rust sous /tmp (interdiction opérateur)
 
 Origine : reprise tranche G2 filiation (6 novembre 2026). Après l'interdiction

@@ -223,8 +223,7 @@ impl Fixture {
 /// (token, empty preview, revision) without mutating; the commit with the
 /// preview token stamps the decision and reports the recorded Work; admit on
 /// a source-unfresh Work refuses on both preview and commit routes with the
-/// stable cause and nothing lands; `summary-source` and unknown actions
-/// refuse as unported.
+/// stable cause and nothing lands; unknown actions refuse as unported.
 #[test]
 fn memory_post_previews_selects_and_refuses_unfresh_and_unported() {
     let f = Fixture::new();
@@ -325,9 +324,9 @@ fn memory_post_previews_selects_and_refuses_unfresh_and_unported() {
     assert_eq!(entries.len(), 1);
     assert_eq!(entries[0].id, "lesson");
 
-    // Unknown and M20 actions refuse as unported; nothing mutates.
+    // Unknown actions refuse as unported; nothing mutates.
     let before = f.snapshot_state();
-    for action in ["summary-source", "erase", ""] {
+    for action in ["erase", ""] {
         let path = if action.is_empty() {
             "/api/v1/project-memory".to_string()
         } else {
@@ -343,5 +342,141 @@ fn memory_post_previews_selects_and_refuses_unfresh_and_unported() {
             .unwrap();
         assert!(reply.failure.is_some(), "{action}");
     }
+    assert_eq!(f.snapshot_state(), before);
+}
+
+/// Splice an executing worker task next and one brainstorm exchange directly
+/// into the stored Work (the summary source reads stored dialogues only).
+fn splice_brainstorm(f: &Fixture) {
+    let db = rusqlite::Connection::open(f.root.join(".swarm/state.db")).unwrap();
+    swarm_engine::register_identity_plan_projection(&db).unwrap();
+    let raw: Vec<u8> = db
+        .query_row(
+            "SELECT body FROM works WHERE id=?",
+            [&f.work],
+            |row| row.get(0),
+        )
+        .unwrap();
+    let mut doc: swarm_engine::Work = swarm_engine::decode_work(&raw).unwrap();
+    let worker = doc
+        .tasks
+        .as_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|t| t.id == "task-worker")
+        .expect("seeded worker task");
+    worker.next = "lancer le test".into();
+    let mut brain = swarm_engine::Task::default();
+    brain.id = "old-0".into();
+    brain.brainstorm = true;
+    brain.question = "Décision numéro 0".into();
+    brain.answers = Some(vec![swarm_engine::BrainstormAnswer {
+        attempt: "a0".into(),
+        text: "Réponse 0".into(),
+        at: String::new(),
+    }]);
+    brain.response = "Réponse 0".into();
+    doc.tasks.as_mut().unwrap().push(brain);
+    let body = swarm_engine::encode_model(&doc).unwrap();
+    db.execute(
+        "UPDATE works SET body=? WHERE id=?",
+        rusqlite::params![body, f.work],
+    )
+    .unwrap();
+}
+
+/// The M20 summary source over the HTTP surface: POST with a valid request
+/// returns the exact packet (schema/kind, payload digest, contract snapshot,
+/// question and answer sources) without mutating; GET with the same action
+/// refuses with Go's 405 pairing even before any decode.
+#[test]
+fn memory_summary_source_posts_packet_and_refuses_get_pairing() {
+    use sha2::{Digest, Sha256};
+    let f = Fixture::new();
+    {
+        let mut s = RootStore::open(&f.root, true).unwrap();
+        let revision: i64 = {
+            let db = rusqlite::Connection::open(f.root.join(".swarm/state.db")).unwrap();
+            db.query_row(
+                "SELECT revision FROM works WHERE id=?",
+                [&f.work],
+                |row| row.get(0),
+            )
+            .unwrap()
+        };
+        s.execute_external(
+            &f.work,
+            "task.add",
+            &serde_json::to_vec(&serde_json::json!({
+                "schema_version":1,"event_id":"task","expected_revision":revision,
+                "id":"task-worker","title":"Worker","deliverable":"Report","criteria":["Proof"]
+            }))
+            .unwrap(),
+            &mut SystemEnvironment,
+        )
+        .unwrap();
+        s.close().unwrap();
+    }
+    splice_brainstorm(&f);
+    let service = NativeHttpService::open(&f.root, f.authority()).unwrap();
+    let digest = |raw: &[u8]| format!("{:x}", Sha256::digest(raw));
+
+    // GET with the summary-source action refuses as method pairing first.
+    let before = f.snapshot_state();
+    let reply = service
+        .handle(f.request("GET", "/api/v1/project-memory?action=summary-source"))
+        .unwrap();
+    assert!(reply.failure.is_some(), "GET pairing must refuse");
+    assert_eq!(
+        reply.response.status(),
+        StatusCode::METHOD_NOT_ALLOWED,
+        "{:?}",
+        reply.failure
+    );
+    assert_eq!(f.snapshot_state(), before);
+
+    // POST with a valid request returns the packet without mutating.
+    let reply = service
+        .handle(f.post(
+            "summary-source",
+            serde_json::json!({
+                "schema_version":1,"work":f.work,"task":"task-worker",
+                "expected_revision":2,
+                "dialogues":[{"task":"old-0","attempt":"a0",
+                    "sha256":digest(format!("Décision numéro 0\nRéponse 0").as_bytes())}]
+            }),
+        ))
+        .unwrap();
+    assert_eq!(
+        reply.response.status(),
+        StatusCode::OK,
+        "summary-source failed: {:?} body={}",
+        reply.failure.as_ref().map(|e| e.to_string()),
+        String::from_utf8_lossy(reply.response.body())
+    );
+    assert!(reply.failure.is_none());
+    assert!(!reply.recorded_work.is_some());
+    let packet: serde_json::Value = serde_json::from_slice(reply.response.body()).unwrap();
+    assert_eq!(packet["schema_version"], 1);
+    assert_eq!(packet["kind"], "swarm_summary_source_v1");
+    let payload_raw = packet["payload"].as_str().unwrap();
+    assert_eq!(packet["sha256"], digest(payload_raw.as_bytes()));
+    let payload: serde_json::Value = serde_json::from_str(payload_raw).unwrap();
+    assert_eq!(payload["scope"]["work"], f.work);
+    assert_eq!(payload["scope"]["task"], "task-worker");
+    assert_eq!(payload["work_revision"], 2);
+    assert_eq!(payload["audience"], "local_operator");
+    assert_eq!(payload["provider_history_complete"], false);
+    let sources = payload["sources"].as_array().unwrap();
+    assert_eq!(sources.len(), 3);
+    assert_eq!(sources[0]["id"], "current-task-snapshot");
+    assert!(sources[0]["text"].as_str().unwrap().contains("Proof"));
+    assert_eq!(sources[0]["sha256"], sources[0]["text"].as_str().map(|t| digest(t.as_bytes())).unwrap());
+    assert_eq!(sources[1]["role"], "user");
+    assert_eq!(sources[1]["kind"], "operator_question");
+    assert_eq!(sources[1]["text"], "Décision numéro 0");
+    assert_eq!(sources[2]["role"], "assistant");
+    assert_eq!(sources[2]["kind"], "historical_answer");
+    assert_eq!(sources[2]["text"], "Réponse 0");
     assert_eq!(f.snapshot_state(), before);
 }

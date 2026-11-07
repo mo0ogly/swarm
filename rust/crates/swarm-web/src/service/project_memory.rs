@@ -1,10 +1,12 @@
-//! Protected versioned-memory catalog read and mutation surface (Go
-//! `/api/v1/project-memory`). GET/HEAD serve the read-only catalog; POST with
-//! `action=…` serves the memory previews and commits through the same
-//! RootStore paths as the CLI (preview → `preview_project_memory`, commit →
-//! `execute_external("memory.<action>")`). The M20 `summary-source` action and
-//! any unknown action refuse with the typed unported code instead of inventing
-//! their wire behavior here.
+//! Protected versioned-memory catalog, summary-source and mutation surface
+//! (Go `/api/v1/project-memory`). GET/HEAD serve the read-only catalog; POST
+//! with `action=…` serves the M20 `summary-source` read, the memory previews
+//! and commits through the same RootStore paths as the CLI (summary-source →
+//! `memory_summary_source`, preview → `preview_project_memory`, commit →
+//! `execute_external("memory.<action>")`). A POST `action=summary-source` must
+//! arrive with the POST method itself (Go checks that pairing before the GET
+//! branch); any unknown action refuses with the typed unported code instead of
+//! inventing its wire behavior here.
 use super::{close, root, HttpServiceError as E, NativeHttpService, RouteBody};
 use http::{Method, Request};
 use swarm_engine::{RootStore, RootStoreError};
@@ -35,9 +37,10 @@ fn catalog_query(raw: Option<&str>) -> Result<String, E> {
 }
 
 /// Select the POST action from the `action` query member (single, nonempty,
-/// known); anything else refuses with the typed unported code — the M20
-/// summary-source packet stays a later increment and unknown names never fall
-/// back to a default mutation.
+/// known); anything else refuses with the typed unported code — unknown names
+/// never fall back to a default mutation. `summary-source` is served: the M20
+/// extractive summary packet is read-only and decode/refuse through its own
+/// request shape before any Root open.
 fn post_action(raw: Option<&str>) -> Result<&'static str, E> {
     let mut action: Option<String> = None;
     for (k, v) in form_urlencoded::parse(raw.unwrap_or("").as_bytes()) {
@@ -47,7 +50,7 @@ fn post_action(raw: Option<&str>) -> Result<&'static str, E> {
     }
     let action = action.as_deref().ok_or(E::Refused("project-memory-query-invalid"))?;
     if action == "summary-source" {
-        return Err(E::Refused("project-memory-operation-unported"));
+        return Ok("summary-source");
     }
     COMMIT_ACTIONS
         .iter()
@@ -60,15 +63,29 @@ fn post_action(raw: Option<&str>) -> Result<&'static str, E> {
 impl NativeHttpService {
     /// GET/HEAD catalog read with an optional folded literal `q` filter; empty
     /// body, readonly Root, shared scoped session and datastore binding precede
-    /// the guarded catalog read. POST carries the `action` query member: a
-    /// preview action reads the proposed outcome under a readonly Root (no
-    /// commit), a commit action opens the writable bound Root and runs the
-    /// same engine transaction/replay/preview-token checks as the CLI,
-    /// reporting a recorded Work state on a later close/encode failure. Go's
-    /// response shapes are preserved by the engine types. A read/encode/close
-    /// failure refuses — never an empty success. `summary-source` and unknown
-    /// actions refuse as unported: the M20 packet is a later G2 increment.
+    /// the guarded catalog read. A POST `action=summary-source` with a non-POST
+    /// method refuses first (Go's ordering: the summary-source method pairing
+    /// is checked before the GET branch). POST carries the `action` query
+    /// member: summary-source reads the packet under a readonly Root through
+    /// its own strict decode; a preview action reads the proposed outcome under
+    /// a readonly Root (no commit); a commit action opens the writable bound
+    /// Root and runs the same engine transaction/replay/preview-token checks
+    /// as the CLI, reporting a recorded Work state on a later close/encode
+    /// failure. Go's response shapes are preserved by the engine types. A
+    /// read/encode/close failure refuses — never an empty success. Unknown
+    /// actions refuse as unported.
     pub(super) fn project_memory(&self, request: &Request<Vec<u8>>) -> Result<RouteBody, E> {
+        // Go projectMemoryHTTP checks `action == "summary-source" &&
+        // method != POST` → « POST requis » before the GET branch, so a
+        // GET/HEAD summary-source attempt never reads the catalog.
+        let query_map = form_urlencoded::parse(request.uri().query().unwrap_or("").as_bytes());
+        let summary_pairing = matches!(*request.method(), Method::GET | Method::HEAD)
+            && query_map
+                .filter(|(k, _)| k == &"action")
+                .any(|(_, v)| v == "summary-source");
+        if summary_pairing {
+            return Err(E::Method("POST"));
+        }
         if matches!(*request.method(), Method::GET | Method::HEAD) {
             if !request.body().is_empty() {
                 return Err(E::Refused("project-memory-query-invalid"));
@@ -90,6 +107,29 @@ impl NativeHttpService {
         }
         let action = post_action(request.uri().query())?;
         swarm_engine::check_command_input_size(request.body()).map_err(E::Input)?;
+        if action == "summary-source" {
+            // M20 read: decode with the summary-source request shape before
+            // opening the Root (stable shape cause at the transport phase),
+            // then the same readonly path as the catalog. The Work id lives
+            // inside the request body; no `work` query member is consulted.
+            swarm_engine::decode_summary_source_request(request.body()).map_err(|e| {
+                root(
+                    "project-memory-input",
+                    RootStoreError::Mutation(swarm_engine::WorkEngineError::Memory(e)),
+                )
+            })?;
+            let store = RootStore::open(&self.root, false).map_err(|e| root("open", e))?;
+            let result = (|| {
+                self.check_binding(&store)?;
+                let packet = store
+                    .memory_summary_source(request.body())
+                    .map_err(|e| root("project-memory-summary-source", e))?;
+                serde_json::to_vec(&packet)
+                    .map(RouteBody::plain)
+                    .map_err(E::ResponseJson)
+            })();
+            return close(result, store.close());
+        }
         // Decode before opening the Root so malformed memory documents refuse
         // with their stable shape cause at the transport phase. The decode
         // action is the bare action name (Go strips `-preview` before any

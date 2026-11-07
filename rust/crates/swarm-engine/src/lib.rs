@@ -387,6 +387,11 @@ mod instruction;
 mod instruction_learning;
 mod memory_catalog;
 mod memory_files;
+mod memory_summary_source;
+pub use memory_summary_source::{
+    decode_summary_source_request, summary_source_for_work, MemorySummarySource,
+    MemorySummarySourcePacket, MemorySummarySourceRequest,
+};
 mod local_path;
 mod model_wire;
 mod models;

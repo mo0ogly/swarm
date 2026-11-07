@@ -732,6 +732,42 @@ preview+commit, unfresh refusals preview+commit with no entry added,
 `summary-source`/unknown-action refusals, state unchanged). Still closed:
 extractive summarization (M20) and read/summarize/transmit/compact rights.
 
+**Extractive summarization M20 (7 November 2026)** — `memorySummarySource`
+(`internal/engine/memory_summary_source.go`) is ported to
+`rust/crates/swarm-engine/src/memory_summary_source.rs` and served on all
+three surfaces. CLI `swarm-rust memory summary-source --root ROOT --input FILE
+[--json]` (the body is the request; no positional work argument); HTTP
+`POST /api/v1/project-memory?action=summary-source`; engine
+`RootStore::memory_summary_source(&[u8])` (read-only open, no settings read).
+The Go contract is preserved byte-for-byte: strict decode with the 1 MiB
+transport ceiling checked **before** decoding, refusals
+`project-summary-source-request-schema-invalid` (schema ≠ 1, revision < 1,
+unsafe name, empty dialogues), identity
+`project-summary-source-work-identity-mismatch`, conflict
+`project-memory-work-changed`, unknown task `project-memory-task-unknown`,
+brainstorm task `project-summary-source-brainstorm-target`, duplicated
+dialogue `-dialogue-duplicate`, missing exchange `dialogue-exchange-missing`
+or empty `-exchange-empty`; HTTP refuses the `GET ?action=summary-source`
+pairing with 405 before any decoding (Go ordering). The
+`swarm_summary_source_v1` packet embeds the serialized work contract
+(`encode_model`, escaping identical to Go `json.Marshal`) as the
+`current-task-snapshot` source, then one question (`operator_question`) and
+one answer (`historical_answer`) source per dialogue with the id derived from
+the digest of the serialized reference; the payload is a **string** carrying
+its `sha256` (cross-runtime byte verification against Go is possible).
+Evidence: engine `cargo test -p swarm-engine --lib memory_summary_source`
+(6: decode/validation refusals, identity/revision/task/brainstorm,
+duplicate/missing/empty, exact packet — 5 sources with the snapshot carrying
+the contract JSON, derived ids, per-source digest, no exchange moved), CLI
+`cargo test -p swarm-cli --test memory` (8: exact packet, brainstorm and
+stale-revision refusals through the CLI), web `cargo test -p swarm-web --test
+project_memory` (3: POST exact packet without mutation, GET pairing 405);
+permanent recipe
+`tools/verification/recipes/versioned-memory-catalog-rust.json` (5 steps),
+evidence `.swarm-fixtures/versioned-memory-catalog-evidence/run-20261107-4`.
+Still closed: read/summarize/transmit/compact rights (M20 operator rights, a
+distinct increment).
+
 The historical interprocess flock serializes writes. One idempotency key creates
 one native entry; conflicting content refuses. `lose_response:true` records
 `unknown` after the simulated effect. Another commit cannot duplicate it;

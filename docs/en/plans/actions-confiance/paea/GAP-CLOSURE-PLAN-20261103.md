@@ -200,6 +200,29 @@ preview+commit, unfresh refusals with no entry added, unported, state
 unchanged); recipe updated 4→7 CLI and 1→2 web. Still closed: extractive
 summarization M20, read/summarize/transmit/compact rights.
 
+G2 extractive summarization M20 tranche (7 November 2026): `memorySummarySource`
+(`internal/engine/memory_summary_source.go`) is ported and served on all three
+surfaces — `rust/crates/swarm-engine/src/memory_summary_source.rs`,
+`RootStore::memory_summary_source` (read-only), CLI
+`swarm-rust memory summary-source --root ROOT --input FILE [--json]` (body is
+the request, no positional work argument) and HTTP
+`POST /api/v1/project-memory?action=summary-source` with the 405 refusal of
+the `GET ?action=summary-source` pairing before any decoding (Go ordering).
+The Go contract is preserved byte-for-byte: 1 MiB transport ceiling before
+strict decoding, stable refusals (schema/revision/name/empty-dialogues,
+identity, `project-memory-work-changed` conflict, unknown task, brainstorm
+target, duplicate, missing/empty exchange), `swarm_summary_source_v1` packet
+with a **string** payload carrying its digest (cross-runtime verification
+possible), snapshot source = work contract serialized by `encode_model`,
+question/answer per dialogue with the id derived from the reference digest.
+Evidence: engine 6 lib tests, CLI 8 tests (exact packet, brainstorm and
+stale-revision refusals), web 3 tests (POST exact packet without mutation,
+GET pairing 405); recipe updated (5 steps, Go+Rust M20 inputs added) and
+re-run, evidence
+`.swarm-fixtures/versioned-memory-catalog-evidence/run-20261107-4` (PASS,
+verify VERIFIED). Still closed: read/summarize/transmit/compact rights
+(operator decision, distinct increments).
+
 ## Discovery D03 — Rust test fixtures under /tmp (operator interdiction)
 
 Origin: G2 lineage tranche resumption (6 November 2026). After the operator

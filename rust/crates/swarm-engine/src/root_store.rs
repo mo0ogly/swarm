@@ -2067,6 +2067,29 @@ impl RootStore {
         })();
         finished(result, reservation.close().map_err(RootStoreError::Storage))
     }
+    /// Read-only extractive summary source under one directory reservation,
+    /// mirroring Go `Store.memorySummarySource`: the 1 MiB transport ceiling
+    /// and strict decode run first, then the stored Work row is the complete
+    /// consistency boundary (task definition and selected answers from the
+    /// same row). No settings read, no admission, no authority and no Work
+    /// mutation follows; a read or decode failure refuses the whole packet
+    /// instead of returning a partial one.
+    pub fn memory_summary_source(
+        &self,
+        raw: &[u8],
+    ) -> Result<crate::memory_summary_source::MemorySummarySourcePacket, RootStoreError> {
+        let reservation = self
+            .directory
+            .reserve(false, false)
+            .map_err(RootStoreError::Storage)?;
+        let result = crate::memory_summary_source::summary_source_from_connection(
+            &self.db,
+            &self.root,
+            raw,
+        )
+        .map_err(|e| RootStoreError::Mutation(WorkEngineError::Memory(e)));
+        finished(result, reservation.close().map_err(RootStoreError::Storage))
+    }
     /// Retain the directory and actual SQLite identities with owned CLOEXEC handles.
     /// The caller can compare future Root opens without trusting a pathname or
     /// allowing inode reuse. This observes storage, grants no permissions and
