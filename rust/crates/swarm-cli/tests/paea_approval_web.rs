@@ -335,6 +335,1540 @@ fn not_finished_process_outcome(controller_panic_presence: Option<bool>) -> Valu
     })
 }
 
+/// Witness-local typed carrier of the ONE fixed parent WaitRefused route
+/// (the SIGINT-stopped route whose finish came back as
+/// `ChildCaptureOutcome::WaitRefused`). EVERY conserved fact is carried BY
+/// VALUE: the original non-Clone wait-refusal cause (moved verbatim —
+/// `io::Error` is not Clone, never copied or re-created), the SAME child
+/// (stdin already closed; NEVER re-waited by the conservation — the exit
+/// status stays UNKNOWN, zero automatic wait after a real refusal), BOTH
+/// captures as their REAL joined terminal states (their `Failed` /
+/// `Panicked` issues and causes are retained verbatim, never masked),
+/// both evidence paths, the ORIGINAL controller panic payload when one
+/// was retained (only its presence ever reaches the receipt; the payload
+/// text never does), and the process-receipt outcome as DATA —
+/// `Ok(receipt path)` on the receipt success path or `Err(stage-tagged
+/// receipt text)` on the secondary receipt-write failure (never
+/// swallowed, never disguised as a success). A `catch_unwind` receiver
+/// can recover the carrier from the panic payload BY VALUE
+/// (`downcast::<ParentWaitRefusedCarrier>()` on the boxed payload — a
+/// bare `downcast_ref` borrow would NOT pass ownership) and then decide
+/// the actual cleanup explicitly (including the FIRST real `Child::wait`
+/// when no real wait has run). Witness-local to this test (bounded
+/// helper, never a product or shared-module API).
+struct ParentWaitRefusedCarrier {
+    context: &'static str,
+    error: std::io::Error,
+    child: std::process::Child,
+    stdout_state: paea_capture_live::LiveStreamState,
+    stderr_state: paea_capture_live::LiveStreamState,
+    stdout_path: PathBuf,
+    stderr_path: PathBuf,
+    controller_panic: Option<Box<dyn std::any::Any + Send>>,
+    receipt: Result<PathBuf, String>,
+}
+
+/// Manual Debug: the child is identified by its pid (diagnostic only —
+/// `Child` itself is not `Debug` and a pid may be recycled after exit),
+/// the controller panic only by its presence.
+impl std::fmt::Debug for ParentWaitRefusedCarrier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ParentWaitRefusedCarrier")
+            .field("context", &self.context)
+            .field("error", &self.error)
+            .field("child_pid", &self.child.id())
+            .field("stdout_state", &self.stdout_state)
+            .field("stderr_state", &self.stderr_state)
+            .field("stdout_path", &self.stdout_path)
+            .field("stderr_path", &self.stderr_path)
+            .field(
+                "controller_panic_present",
+                &self.controller_panic.is_some(),
+            )
+            .field("receipt", &self.receipt)
+            .finish()
+    }
+}
+
+/// Conservation of a WaitRefused handback on the parent's SIGINT-stopped
+/// route into the complete typed [`ParentWaitRefusedCarrier`] — the ONE
+/// WaitRefused route fixed in this slice, shared VERBATIM by the
+/// production witness arm and the dedicated regression guard below. EVERY
+/// handback field is moved in BY VALUE (nothing dropped, no silent
+/// abandonment); BOTH captures join to their REAL terminal states BEFORE
+/// the receipt is written (on this route the SIGINT stop was accepted and
+/// the stdin-EOF permission was already given, but an accepted stop
+/// request is NOT termination proof — the joins keep the same documented
+/// blocking limit as the finish contract and end only at the producer's
+/// real causal EOF: no timer, no kill, no retry; `Failed`/`Panicked`
+/// states and their causes are retained verbatim); the receipt is the
+/// EXPLICIT
+/// UNKNOWN / not-finished envelope — the exit status stays UNKNOWN — and
+/// now records the controller-panic PRESENCE the route actually knows
+/// (never the payload text). The child is NOT re-waited here and no
+/// signal, kill, timer, retry or second conservation reader exists: the
+/// receipt reuses the ONE existing `write_process_receipt` and the real
+/// producer contracts. Resolving the handback (an explicit FIRST real
+/// `Child::wait` when no real wait has run, or any other decision) is the
+/// `catch_unwind` receiver's explicit job after recovering the carrier BY
+/// VALUE; this helper itself resolves nothing.
+fn conserve_parent_wait_refused_carrier(
+    context: &'static str,
+    witness: &str,
+    manifest: &str,
+    leaf: &Path,
+    selection: &Value,
+    handback: paea_capture_child::WaitRefusalHandback,
+    controller_panic: Option<Box<dyn std::any::Any + Send>>,
+) -> ParentWaitRefusedCarrier {
+    let paea_capture_child::WaitRefusalHandback {
+        error,
+        child,
+        stdout_stream,
+        stderr_stream,
+        stdout_path,
+        stderr_path,
+    } = handback;
+    let stdout_state = stdout_stream.join();
+    let stderr_state = stderr_stream.join();
+    let receipt = write_process_receipt(
+        leaf,
+        witness,
+        manifest,
+        selection,
+        &not_finished_process_outcome(Some(controller_panic.is_some())),
+    )
+    .map(|(receipt_path, _)| receipt_path);
+    ParentWaitRefusedCarrier {
+        context,
+        error,
+        child,
+        stdout_state,
+        stderr_state,
+        stdout_path,
+        stderr_path,
+        controller_panic,
+        receipt,
+    }
+}
+
+/// Explicit typed failure for the parent witness's WaitRefused route: the
+/// COMPLETE carrier is transferred REALLY to this typed boundary and
+/// panicked WITH the test as a TYPED RECOVERABLE payload — a
+/// `catch_unwind` receiver can recover it BY VALUE
+/// (`downcast::<ParentWaitRefusedCarrier>()` on the boxed payload) and
+/// decide the actual cleanup explicitly (including the FIRST real
+/// `Child::wait` when no real wait has run). The conserved facts are
+/// printed first (the payload itself is not a message string); the child
+/// is NEVER re-waited here and the exit status stays UNKNOWN through this
+/// boundary. Limits: this typed carrier only transfers ownership to a
+/// recovering `catch_unwind` receiver — with no higher consumer, the
+/// libtest top-level drop does NOT establish any external cleanup, the
+/// unexpected handback stays VISIBLE as this witness's failure, and NO
+/// claim is made that all refusal routes are resolved (PreparationRefused
+/// and SignalRefused remain explicitly OPEN and untouched).
+fn fail_parent_wait_refused(carrier: ParentWaitRefusedCarrier) -> ! {
+    eprintln!(
+        "parent witness unexpected wait refusal — {context}: cause {error}; \
+         child pid {pid} NEVER re-waited here (exit status UNKNOWN); \
+         stdout {stdout:?}, stderr {stderr:?}; stdout path {stdout_path:?}, \
+         stderr path {stderr_path:?}; original controller panic retained: \
+         {panic_present}; receipt outcome: {receipt:?}",
+        context = carrier.context,
+        error = carrier.error,
+        pid = carrier.child.id(),
+        stdout = carrier.stdout_state,
+        stderr = carrier.stderr_state,
+        stdout_path = carrier.stdout_path,
+        stderr_path = carrier.stderr_path,
+        panic_present = carrier.controller_panic.is_some(),
+        receipt = carrier.receipt,
+    );
+    std::panic::panic_any(carrier);
+}
+
+/// Constant cooperative script for the parent wait-refusal guard's real
+/// local children (`/usr/bin/python3 -c`, stdin + both raw streams
+/// piped — the SAME preconditions as the parent's stopped route): fixed
+/// prefix bytes on BOTH streams, then a block on the single stdin byte
+/// that only the finish's stdin-EOF permission releases, then fixed final
+/// bytes and the constant exit code. Fully deterministic: no clock, no
+/// network, no UID, no live authority.
+const PARENT_WAIT_REFUSAL_SCRIPT: &str = "\
+import sys
+sys.stdout.buffer.write(b'parent-refusal stdout prefix\\n')
+sys.stdout.buffer.flush()
+sys.stderr.buffer.write(b'parent-refusal stderr prefix\\n')
+sys.stderr.buffer.flush()
+sys.stdin.buffer.read(1)
+sys.stdout.buffer.write(b'parent-refusal stdout final\\n')
+sys.stdout.buffer.flush()
+sys.stderr.buffer.write(b'parent-refusal stderr final\\n')
+sys.stderr.buffer.flush()
+sys.exit(7)
+";
+const PARENT_WAIT_REFUSAL_STDOUT_PREFIX: &[u8] = b"parent-refusal stdout prefix\n";
+const PARENT_WAIT_REFUSAL_STDERR_PREFIX: &[u8] = b"parent-refusal stderr prefix\n";
+const PARENT_WAIT_REFUSAL_STDOUT_FINAL: &[u8] = b"parent-refusal stdout final\n";
+const PARENT_WAIT_REFUSAL_STDERR_FINAL: &[u8] = b"parent-refusal stderr final\n";
+/// The constant real exit code of the guard's script child.
+const PARENT_WAIT_REFUSAL_EXIT_CODE: i32 = 7;
+/// Distinctive marker inside the SYNTHETIC seam refusal cause (the
+/// injected error is a test seam, never a real OS wait failure).
+const PARENT_WAIT_REFUSAL_SEAM_MARKER: &str = "synthetic parent-guard wait refusal";
+/// Distinctive marker carried INSIDE the typed boundary as the original
+/// controller panic payload; verified by EXACT value equality after the
+/// BY-VALUE recovery (never displayed, never serialized into a receipt).
+const PARENT_WAIT_REFUSAL_PANIC_MARKER: &str =
+    "parent wait-refusal original controller panic payload marker";
+const PARENT_GUARD_WITNESS: &str = "paea_capture_parent_wait_refusal_retains_owned_handoff";
+const PARENT_GUARD_MANIFEST: &str = "paea-capture-parent-wait-refusal-guard-receipt";
+const PARENT_GUARD_HEALTHY_CONTEXT: &str = "parent guard healthy witness wait refused";
+const PARENT_GUARD_INJECTED_CONTEXT: &str =
+    "parent guard injected wait refusal conserved before the typed boundary";
+const PARENT_GUARD_COLLISION_CONTEXT: &str =
+    "parent guard injected wait refusal with the receipt rename collision";
+
+/// Spawns ONE real local script child with the guard's fixed
+/// preconditions (stdin, stdout and stderr ALL piped).
+fn spawn_parent_wait_refusal_child() -> std::process::Child {
+    std::process::Command::new("/usr/bin/python3")
+        .arg("-c")
+        .arg(PARENT_WAIT_REFUSAL_SCRIPT)
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .expect("synthetic local python3 parent wait-refusal child must spawn")
+}
+
+/// Starts the capture for a guard child whose start is NOT guaranteed
+/// to succeed: fresh private paths and all-three-piped stdio make a
+/// refusal unlikely but never impossible, so the owned typed start
+/// refusal is NEVER dropped. The refusal is the actual four-variant
+/// `paea_capture_child::OwnedChildCaptureStartError` ENUM (no
+/// `.error`/`.child` fields exist across its variants), so the SAME
+/// child is extracted per exact variant — `StdoutNotPiped`,
+/// `StderrNotPiped`, `StdoutEvidenceRefused`, `StderrEvidenceRefused` —
+/// while a witness-local `ParentGuardStartCause` mirrors every
+/// non-child field as owned data: both preserved refusal paths and the
+/// non-Clone `StreamCaptureError` moved verbatim (never cloned, never
+/// stringified), so the original cause stays Debug-reportable AND keeps
+/// its real typed error fields inside the typed
+/// `ParentGuardStartFailure` carrier. The original cause is snapshotted
+/// FIRST, the pid pin is snapshotted before the pipes are consumed, and
+/// the returned child ownership is resolved through the shared
+/// observable collector — called by full path
+/// `paea_capture_child::collect_refused_child_observably` (this parent
+/// has no glob import): it closes our stdin end, drains every
+/// still-owned pipe concurrently to causal EOF, then ONE real wait — a
+/// plain `child.wait()` would hang forever on this stdin-blocking
+/// script. The collector's real collected outcome and — if the
+/// collector itself panics — its opaque secondary cleanup payload are
+/// both retained BY VALUE in the carrier's `collected_or_cleanup_panic`
+/// field: the secondary is never downcast-guessed to `String`, never
+/// stringified, never silently dropped, and never allowed to replace
+/// the reported primary cause, and no panic message claims to preserve
+/// the original payload text. Only then does the panic report the
+/// preserved primary refusal together with the REAL collected facts.
+/// Scope: `pub(crate)`, test-only witness scaffolding for this guard —
+/// not a production API. This helper claims NO coverage of an
+/// unexpected setup failure: no guard phase exercises this route.
+pub(crate) fn start_parent_guard_capture(
+    child: std::process::Child,
+    stdout_path: &std::path::Path,
+    stderr_path: &std::path::Path,
+) -> OwnedChildCapture {
+    // Witness-local cause mirror of the actual four-variant start
+    // refusal: every non-child field kept as owned data. The generic
+    // parameter is deliberately only NAMED after the producer's
+    // non-Clone stream-capture error type — inference binds it to the
+    // concrete error carried by the refused variant, so no producer
+    // type path is assumed or needed here.
+    #[derive(Debug)]
+    enum ParentGuardStartCause<StreamCaptureError> {
+        StdoutNotPiped,
+        StderrNotPiped,
+        StdoutEvidenceRefused { error: StreamCaptureError },
+        StderrEvidenceRefused {
+            stdout_artifact_path: std::path::PathBuf,
+            stderr_path: std::path::PathBuf,
+            error: StreamCaptureError,
+        },
+    }
+
+    // The shared collector's outcome: either its real collected facts
+    // (typed by inference — never assumed) or the collector's own
+    // opaque secondary panic payload, retained BY VALUE.
+    enum ParentGuardCollectedOrCleanupPanic<Collected> {
+        Collected(Collected),
+        CleanupPanic(Box<dyn std::any::Any + Send>),
+    }
+
+    // Typed failure carrier: the preserved cause plus whichever
+    // outcome the shared collector produced.
+    struct ParentGuardStartFailure<Collected, StreamCaptureError> {
+        cause: ParentGuardStartCause<StreamCaptureError>,
+        collected_or_cleanup_panic: ParentGuardCollectedOrCleanupPanic<Collected>,
+    }
+
+    match OwnedChildCapture::start(child, stdout_path, stderr_path) {
+        Ok(capture) => capture,
+        Err(refusal) => {
+            // Split the actual enum refusal into the SAME child (handed
+            // to the shared collector below) and a typed witness of
+            // every non-child field, preserving the exact variant and
+            // its owned data (the non-Clone error is moved, not cloned;
+            // nothing is dropped, and nothing about the collector's
+            // return type is assumed beyond what it hands back).
+            let (cause, refused_child) = match refusal {
+                paea_capture_child::OwnedChildCaptureStartError::StdoutNotPiped { child } => {
+                    (ParentGuardStartCause::StdoutNotPiped, child)
+                }
+                paea_capture_child::OwnedChildCaptureStartError::StderrNotPiped { child } => {
+                    (ParentGuardStartCause::StderrNotPiped, child)
+                }
+                paea_capture_child::OwnedChildCaptureStartError::StdoutEvidenceRefused {
+                    child,
+                    error,
+                } => (ParentGuardStartCause::StdoutEvidenceRefused { error }, child),
+                paea_capture_child::OwnedChildCaptureStartError::StderrEvidenceRefused {
+                    child,
+                    stdout_artifact_path,
+                    stderr_path,
+                    error,
+                } => (
+                    ParentGuardStartCause::StderrEvidenceRefused {
+                        stdout_artifact_path,
+                        stderr_path,
+                        error,
+                    },
+                    child,
+                ),
+            };
+            let refused_pid = refused_child.id();
+            let cleanup = std::panic::catch_unwind(std::panic::AssertUnwindSafe(move || {
+                paea_capture_child::collect_refused_child_observably(refused_child)
+            }));
+            let failure = ParentGuardStartFailure {
+                cause,
+                collected_or_cleanup_panic: match cleanup {
+                    Ok(collected) => ParentGuardCollectedOrCleanupPanic::Collected(collected),
+                    Err(secondary) => ParentGuardCollectedOrCleanupPanic::CleanupPanic(secondary),
+                },
+            };
+            match &failure.collected_or_cleanup_panic {
+                ParentGuardCollectedOrCleanupPanic::Collected(collected) => eprintln!(
+                    "parent guard capture start refused — primary cause preserved (typed \
+                     witness, Debug): {cause_debug:?}; refused child pid {refused_pid} \
+                     resolved observably before this panic — shared collector outcome: \
+                     {collected:?}; setup-refusal route not exercised by this guard; \
+                     no coverage claim",
+                    cause_debug = failure.cause
+                ),
+                // The `_` here ignores only the variant binding: the
+                // opaque payload itself stays BY VALUE inside `failure`'s
+                // `collected_or_cleanup_panic` field — never dropped
+                // early, never stringified, never downcast-guessed.
+                ParentGuardCollectedOrCleanupPanic::CleanupPanic(_) => eprintln!(
+                    "parent guard capture start refused — primary cause preserved (typed \
+                     witness, Debug): {cause_debug:?}; refused child pid {refused_pid}; \
+                     secondary cleanup panic preserved alongside the primary cause — the \
+                     collector panicked and its opaque `Box<dyn Any + Send>` payload is \
+                     retained BY VALUE in the typed `ParentGuardStartFailure` carrier's \
+                     `collected_or_cleanup_panic` field; this report deliberately does \
+                     not stringify, downcast-guess, or claim to preserve the original \
+                     payload, and the secondary never replaces the primary cause",
+                    cause_debug = failure.cause
+                ),
+            }
+            std::panic::resume_unwind(Box::new(failure));
+        }
+    }
+}
+
+/// Asserts that one joined capture state is the REAL `Completed` terminal
+/// variant with the EXACT expected byte count; `Failed`/`Panicked` are
+/// named explicitly (their causes stay conserved in the state) and are
+/// never converted into completions.
+fn assert_parent_guard_completed(
+    state: &paea_capture_live::LiveStreamState,
+    expected_bytes: usize,
+    label: &str,
+) {
+    match state {
+        paea_capture_live::LiveStreamState::Completed { bytes } => {
+            assert_eq!(
+                *bytes,
+                u64::try_from(expected_bytes).expect("expected byte count must fit in u64"),
+                "{label} completed byte count"
+            );
+        }
+        paea_capture_live::LiveStreamState::Failed { .. } => {
+            panic!("{label} must be Completed, got Failed (cause conserved in the state)");
+        }
+        paea_capture_live::LiveStreamState::Panicked { .. } => {
+            panic!("{label} must be Completed, got Panicked (cause conserved in the state)");
+        }
+    }
+}
+
+/// PARENT REGRESSION (the ONE named guard of this slice):
+/// `paea_capture_parent_wait_refusal_retains_owned_handoff` — the typed
+/// receipt / ownership boundary of the parent witness's WaitRefused
+/// route.
+///
+/// Phase 1 — HEALTHY CONTROL: an actual valid child under the SAME
+/// preconditions as the parent's stopped route (stdin + both raw streams
+/// piped, cooperative stdin-EOF stop) with a REAL finish: the real
+/// stdin-EOF permission, the real one-attempt `Child::wait` and BOTH real
+/// joins; the constant exit code, BOTH `Completed` terminal byte counts
+/// and the EXACT raw stream bytes are asserted.
+///
+/// Phase 2 — INJECTED REFUSAL, receipt success path: a second real child;
+/// the finish runs through the ACTUAL `finish_with_wait` FnOnce seam with
+/// a SYNTHETIC refusal injected BEFORE any real wait (a test seam ONLY —
+/// this is NOT a real OS wait failure). The handback is conserved with
+/// the SAME helper the production WaitRefused arm uses
+/// (`conserve_parent_wait_refused_carrier`): BOTH captures join to their
+/// real terminal states BEFORE the receipt, the UNKNOWN / not-finished
+/// receipt envelope records the controller-panic PRESENCE (never the
+/// payload text), the receipt path travels as data, and a DISTINCTIVE
+/// original controller-panic payload marker travels INSIDE the carrier.
+/// The typed boundary is failed with the SAME `fail_parent_wait_refused`
+/// the production arm uses, inside a test `catch_unwind`; the boxed
+/// payload is recovered BY VALUE (a borrow downcast would not pass
+/// ownership), every field is destructured by move, and the facts are
+/// asserted as data: single seam invocation, same child pid, verbatim
+/// non-Clone cause, completed terminal states, exact raw bytes, UNKNOWN
+/// receipt envelope with `controller_panic: true` and no raw payload
+/// text, and the exact payload marker. The RECEIVER then decides the
+/// actual cleanup explicitly: the injected handler never reached the real
+/// `Child::wait`, so the direct `child.wait()` is the FIRST real wait of
+/// this child — the real exit code is retained, no orphan.
+///
+/// Phase 3 — SECONDARY RECEIPT FAILURE as data: a third real child on a
+/// fresh leaf whose receipt target path is pre-created as a real
+/// DIRECTORY, so the receipt's atomic rename REALLY refuses (actual
+/// directory rename collision, feasible inside the same bounded guard).
+/// The same helper conserved the handback and the SAME typed boundary
+/// fails; the recovered carrier carries
+/// `Err("receipt atomic rename refused: …")` as data (never swallowed,
+/// never a fake success), the joined terminal states stay conserved, and
+/// the receiver again runs the explicit FIRST real wait — the real exit
+/// code is retained, no orphan. The refused temp receipt file and the
+/// collision directory stay in the private failure leaf as retained
+/// evidence.
+///
+/// Limits (visible, never hidden): the injected refusal is a TEST SEAM,
+/// not a real OS wait failure; the typed carrier transfers ownership ONLY
+/// to the `catch_unwind` receiver that recovers it — the libtest
+/// top-level drop establishes no external cleanup, and if no higher
+/// consumer recovers the production witness's unexpected handback, that
+/// handback stays VISIBLE as the witness failure; NO claim is made that
+/// all refusal routes are resolved (PreparationRefused and SignalRefused
+/// remain explicitly OPEN and untouched); there is no automatic re-wait,
+/// no signal, no kill, no timeout and no retry anywhere in this guard.
+#[test]
+fn paea_capture_parent_wait_refusal_retains_owned_handoff() {
+    let healthy_leaf = private_fixture_leaf("parent-wait-refusal-handoff-healthy");
+    let injected_leaf = private_fixture_leaf("parent-wait-refusal-handoff-injected");
+    let selection = json!({
+        "guard": "paea_capture_parent_wait_refusal_retains_owned_handoff",
+        "child": "constant local /usr/bin/python3 -c script; stdin and both raw streams piped; cooperative stdin-EOF stop",
+    });
+    let mut expected_stdout = PARENT_WAIT_REFUSAL_STDOUT_PREFIX.to_vec();
+    expected_stdout.extend_from_slice(PARENT_WAIT_REFUSAL_STDOUT_FINAL);
+    let mut expected_stderr = PARENT_WAIT_REFUSAL_STDERR_PREFIX.to_vec();
+    expected_stderr.extend_from_slice(PARENT_WAIT_REFUSAL_STDERR_FINAL);
+
+    // PHASE 1 — HEALTHY CONTROL under the same preconditions, REAL finish.
+    let healthy_stdout_path = healthy_leaf.join("stdout.raw");
+    let healthy_stderr_path = healthy_leaf.join("stderr.raw");
+    let healthy = start_parent_guard_capture(
+        spawn_parent_wait_refusal_child(),
+        &healthy_stdout_path,
+        &healthy_stderr_path,
+    );
+    let (healthy_exit, healthy_stdout_state, healthy_stderr_state) = match healthy.finish() {
+        paea_capture_child::ChildCaptureOutcome::Finished {
+            exit,
+            stdout_capture,
+            stderr_capture,
+            ..
+        } => (exit, stdout_capture, stderr_capture),
+        paea_capture_child::ChildCaptureOutcome::WaitRefused(handback) => {
+            fail_parent_wait_refused(conserve_parent_wait_refused_carrier(
+                PARENT_GUARD_HEALTHY_CONTEXT,
+                PARENT_GUARD_WITNESS,
+                PARENT_GUARD_MANIFEST,
+                &healthy_leaf,
+                &selection,
+                handback,
+                None,
+            ));
+        }
+    };
+    assert_eq!(
+        healthy_exit.code(),
+        Some(PARENT_WAIT_REFUSAL_EXIT_CODE),
+        "the healthy control child must terminate with its constant real exit code"
+    );
+    assert_parent_guard_completed(
+        &healthy_stdout_state,
+        expected_stdout.len(),
+        "healthy stdout capture",
+    );
+    assert_parent_guard_completed(
+        &healthy_stderr_state,
+        expected_stderr.len(),
+        "healthy stderr capture",
+    );
+    assert_eq!(
+        fs::read(&healthy_stdout_path).expect("healthy stdout evidence must be readable"),
+        expected_stdout,
+        "the healthy control must retain the EXACT raw stdout bytes"
+    );
+    assert_eq!(
+        fs::read(&healthy_stderr_path).expect("healthy stderr evidence must be readable"),
+        expected_stderr,
+        "the healthy control must retain the EXACT raw stderr bytes"
+    );
+    // The SAME receipt builder the WaitRefused route reuses must also
+    // succeed on the healthy control's REAL Finished facts BEFORE any
+    // fault is injected (not just the raw files): the builder reads the
+    // exact `stdout.raw` / `stderr.raw` names this fresh private leaf
+    // retains, so this success proves the per-phase leaf naming
+    // precondition that the injected and collision phases rely on. The
+    // child exited by its constant code (asserted above), so the signal
+    // field is genuinely Null and success is genuinely false for exit
+    // code 7 (never reported as a success); the terminal labels mirror
+    // the real `Completed` variants asserted above.
+    let healthy_receipt_outcome = json!({
+        "finished": true,
+        "exit_code": healthy_exit.code(),
+        "signal": Value::Null,
+        "success": healthy_exit.success(),
+        "stdout_terminal": "Completed",
+        "stdout_completed_bytes": expected_stdout.len(),
+        "stderr_terminal": "Completed",
+        "stderr_completed_bytes": expected_stderr.len(),
+        "controller_panic": false,
+    });
+    let (healthy_receipt_path, _) = write_process_receipt(
+        &healthy_leaf,
+        PARENT_GUARD_WITNESS,
+        PARENT_GUARD_MANIFEST,
+        &selection,
+        &healthy_receipt_outcome,
+    )
+    .expect(
+        "the healthy control's receipt write must succeed on its REAL \
+         Finished facts before any fault is injected",
+    );
+    let healthy_receipt: Value = serde_json::from_slice(
+        &fs::read(&healthy_receipt_path)
+            .expect("the healthy control's receipt must be readable"),
+    )
+    .expect("the healthy control's receipt must be valid JSON");
+    assert_eq!(
+        healthy_receipt["process"]["finished"], json!(true),
+        "the healthy control's receipt must record its real Finished facts"
+    );
+    assert_eq!(
+        healthy_receipt["process"]["exit_code"], json!(PARENT_WAIT_REFUSAL_EXIT_CODE),
+        "the healthy control's receipt must record the real constant exit code"
+    );
+    assert_eq!(
+        healthy_receipt["process"]["success"], json!(false),
+        "the healthy control's receipt must record the real success flag \
+         (exit code 7 is NOT a success)"
+    );
+    assert_eq!(
+        healthy_receipt["artifacts"]["stdout"]["bytes"], json!(expected_stdout.len()),
+        "the healthy control's receipt must account for the real retained stdout bytes"
+    );
+    assert_eq!(
+        healthy_receipt["artifacts"]["stderr"]["bytes"], json!(expected_stderr.len()),
+        "the healthy control's receipt must account for the real retained stderr bytes"
+    );
+
+    // PHASE 2 — ONE explicit injected wait refusal BEFORE any real wait
+    // (actual FnOnce seam; test seam only, NOT a real OS wait failure).
+    let injected_stdout_path = injected_leaf.join("stdout.raw");
+    let injected_stderr_path = injected_leaf.join("stderr.raw");
+    let injected = start_parent_guard_capture(
+        spawn_parent_wait_refusal_child(),
+        &injected_stdout_path,
+        &injected_stderr_path,
+    );
+    let seam_invocations = std::cell::Cell::new(0u32);
+    let seam_child_pid = std::cell::Cell::new(0u32);
+    let seam_invocations_ref = &seam_invocations;
+    let seam_child_pid_ref = &seam_child_pid;
+    let injected_cause =
+        format!("{PARENT_WAIT_REFUSAL_SEAM_MARKER} injected before any real wait");
+    let injected_cause_text = injected_cause.clone();
+    let injected_outcome = injected.finish_with_wait(move |handler_child| {
+        seam_child_pid_ref.set(handler_child.id());
+        seam_invocations_ref.set(seam_invocations_ref.get() + 1);
+        Err(std::io::Error::new(std::io::ErrorKind::Other, injected_cause))
+    });
+    let handback = match injected_outcome {
+        paea_capture_child::ChildCaptureOutcome::WaitRefused(handback) => handback,
+        paea_capture_child::ChildCaptureOutcome::Finished { exit, .. } => panic!(
+            "the SYNTHETIC seam handler must refuse the wait; the finish \
+             must NOT report a Finished outcome: {exit:?}"
+        ),
+    };
+    // Conservation with the SAME helper the production WaitRefused arm
+    // uses — joins BEFORE the receipt, UNKNOWN envelope, presence-only
+    // panic record, receipt success path as data, and the DISTINCTIVE
+    // original controller-panic payload marker INSIDE the carrier.
+    let conserved = conserve_parent_wait_refused_carrier(
+        PARENT_GUARD_INJECTED_CONTEXT,
+        PARENT_GUARD_WITNESS,
+        PARENT_GUARD_MANIFEST,
+        &injected_leaf,
+        &selection,
+        handback,
+        Some(Box::new(PARENT_WAIT_REFUSAL_PANIC_MARKER.to_string())
+            as Box<dyn std::any::Any + Send>),
+    );
+    // THE REAL TYPED BOUNDARY — failed with the SAME function the
+    // production WaitRefused arm uses, inside a test catch_unwind; the
+    // boxed payload is recovered BY VALUE (the default panic hook may
+    // print during the catch — no global hook mutation is allowed).
+    let caught = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        fail_parent_wait_refused(conserved);
+    }));
+    let boxed_payload = caught.expect_err(
+        "the typed refusal failure must really panic with the conserved \
+         carrier as its payload",
+    );
+    let carrier = boxed_payload
+        .downcast::<ParentWaitRefusedCarrier>()
+        .expect(
+            "the typed panic payload must downcast BY VALUE into the \
+             complete ParentWaitRefusedCarrier",
+        );
+    // Every field destructured BY MOVE out of the recovered box — nothing
+    // cloned, no cause re-creation, no borrow replacing the ownership
+    // transfer. Facts are snapshotted as data BEFORE any verdict.
+    let ParentWaitRefusedCarrier {
+        context: carrier_context,
+        error: recovered_error,
+        mut child,
+        stdout_state,
+        stderr_state,
+        stdout_path: recovered_stdout_path,
+        stderr_path: recovered_stderr_path,
+        controller_panic: recovered_panic,
+        receipt: recovered_receipt,
+    } = *carrier;
+    let recovered_child_pid = child.id();
+    // EXPLICIT RECEIVER RESOLUTION FIRST — immediately after the BY-VALUE
+    // destructure and BEFORE every verdict and evidence read: the injected
+    // seam handler never reached the real `Child::wait`, so this is the
+    // FIRST real wait of this child (a deliberate receiver decision for
+    // the synthetic refusal-before-actual-wait case — no automatic wait,
+    // retry, signal or kill exists anywhere in this guard). The REAL exit
+    // code is snapshotted now, so even a failing later verdict cannot
+    // drop the unreaped child and its real runtime issue stays retained.
+    let recovered_exit_code = child
+        .wait()
+        .expect("the FIRST real wait of the injected child must succeed")
+        .code();
+    let recovered_cause_text = recovered_error.to_string();
+    let recovered_cause_kind = recovered_error.kind();
+    let seam_invocation_count = seam_invocations.get();
+    let seam_seen_pid = seam_child_pid.get();
+    let recovered_panic_present = recovered_panic.is_some();
+    let receipt_path = match &recovered_receipt {
+        Ok(path) => path.clone(),
+        Err(text) => panic!(
+            "the injected guard's receipt write must succeed on the clean \
+             leaf; unexpected secondary receipt failure conserved as data: {text}"
+        ),
+    };
+    let marker_text = match recovered_panic {
+        Some(payload) => match payload.downcast::<String>() {
+            Ok(text) => *text,
+            Err(_) => panic!(
+                "the original controller panic payload must keep its exact \
+                 type through the typed boundary"
+            ),
+        },
+        None => panic!(
+            "the original controller panic payload must travel INSIDE the \
+             carrier, not be dropped"
+        ),
+    };
+    // FACT VERDICTS — all data-level, nothing invented:
+    assert_eq!(
+        carrier_context, PARENT_GUARD_INJECTED_CONTEXT,
+        "the failing-site context label must travel with the carrier"
+    );
+    assert_eq!(
+        seam_invocation_count, 1,
+        "the FnOnce seam handler is the ONE wait attempt of this finish \
+         (no retry, no automatic reattempt)"
+    );
+    assert_eq!(
+        seam_seen_pid, recovered_child_pid,
+        "the SAME original child (same pid) must travel through the \
+         handback and the typed carrier"
+    );
+    assert_eq!(
+        recovered_cause_text, injected_cause_text,
+        "the original non-Clone refusal cause must reach the receiver \
+         verbatim (moved, never copied or re-created)"
+    );
+    assert_eq!(
+        recovered_cause_kind,
+        std::io::ErrorKind::Other,
+        "the recovered cause must keep its real error kind"
+    );
+    assert!(
+        recovered_panic_present,
+        "the original controller panic payload must be present"
+    );
+    assert_eq!(
+        marker_text, PARENT_WAIT_REFUSAL_PANIC_MARKER,
+        "the original controller panic payload must survive BY VALUE, \
+         verbatim and downcastable"
+    );
+    assert!(
+        receipt_path.starts_with(&injected_leaf),
+        "the receipt must be written inside the guard's private leaf"
+    );
+    assert_parent_guard_completed(
+        &stdout_state,
+        expected_stdout.len(),
+        "injected stdout capture",
+    );
+    assert_parent_guard_completed(
+        &stderr_state,
+        expected_stderr.len(),
+        "injected stderr capture",
+    );
+    assert_eq!(
+        fs::read(&recovered_stdout_path).expect("injected stdout evidence must be readable"),
+        expected_stdout,
+        "the REAL raw stdout bytes must be retained through the typed boundary"
+    );
+    assert_eq!(
+        fs::read(&recovered_stderr_path).expect("injected stderr evidence must be readable"),
+        expected_stderr,
+        "the REAL raw stderr bytes must be retained through the typed boundary"
+    );
+    // UNKNOWN exit receipt: the envelope is explicitly not-finished with
+    // no invented code/signal/success/terminal state, records the
+    // controller-panic PRESENCE the route actually knows, and NEVER
+    // carries the raw payload text.
+    let receipt_raw =
+        fs::read(&receipt_path).expect("the retained process receipt must be readable");
+    let receipt_json: Value = serde_json::from_slice(&receipt_raw)
+        .expect("the retained process receipt must be valid JSON");
+    assert_eq!(
+        receipt_json["process"]["finished"], json!(false),
+        "the receipt must record the UNKNOWN / not-finished envelope"
+    );
+    assert_eq!(
+        receipt_json["process"]["exit_code"], Value::Null,
+        "the exit status stays UNKNOWN: no invented code"
+    );
+    assert_eq!(
+        receipt_json["process"]["signal"], Value::Null,
+        "the exit status stays UNKNOWN: no invented signal"
+    );
+    assert_eq!(
+        receipt_json["process"]["success"], Value::Null,
+        "the exit status stays UNKNOWN: no invented success flag"
+    );
+    assert_eq!(
+        receipt_json["process"]["stdout_terminal"], Value::Null,
+        "the UNKNOWN envelope invents no terminal state"
+    );
+    assert_eq!(
+        receipt_json["process"]["stderr_terminal"], Value::Null,
+        "the UNKNOWN envelope invents no terminal state"
+    );
+    assert_eq!(
+        receipt_json["process"]["controller_panic"], json!(true),
+        "the UNKNOWN envelope must record the controller-panic PRESENCE \
+         the route actually knows"
+    );
+    assert_eq!(
+        receipt_json["artifacts"]["stdout"]["bytes"], json!(expected_stdout.len()),
+        "the receipt must account for the REAL retained stdout bytes"
+    );
+    assert_eq!(
+        receipt_json["artifacts"]["stderr"]["bytes"], json!(expected_stderr.len()),
+        "the receipt must account for the REAL retained stderr bytes"
+    );
+    let receipt_text = String::from_utf8(receipt_raw).expect("the receipt must be UTF-8");
+    assert!(
+        !receipt_text.contains(PARENT_WAIT_REFUSAL_PANIC_MARKER),
+        "the receipt must NEVER contain the raw controller-panic payload text"
+    );
+    // RECEIVER VERDICT on the snapshotted REAL exit — the child was
+    // already reaped immediately after the BY-VALUE destructure, so no
+    // failing assertion above can orphan it.
+    assert_eq!(
+        recovered_exit_code,
+        Some(PARENT_WAIT_REFUSAL_EXIT_CODE),
+        "the real exit code must be retained after the explicit first wait — no orphan"
+    );
+
+    // PHASE 3 — SECONDARY RECEIPT FAILURE AS DATA: a fresh leaf where the
+    // receipt target path is pre-created as a real DIRECTORY, so the
+    // existing write_process_receipt REALLY refuses at its atomic rename
+    // (actual directory rename collision, feasible inside the same
+    // bounded guard). The refused temp receipt file and the collision
+    // directory stay in the private failure leaf as retained evidence.
+    let collision_leaf = private_fixture_leaf("parent-wait-refusal-receipt-collision");
+    fs::create_dir(collision_leaf.join("process-receipt.json"))
+        .expect("the collision leaf must accept the receipt-path directory");
+    let collision_stdout_path = collision_leaf.join("stdout.raw");
+    let collision_stderr_path = collision_leaf.join("stderr.raw");
+    let collision = start_parent_guard_capture(
+        spawn_parent_wait_refusal_child(),
+        &collision_stdout_path,
+        &collision_stderr_path,
+    );
+    let collision_seam_invocations = std::cell::Cell::new(0u32);
+    let collision_seam_ref = &collision_seam_invocations;
+    let collision_cause = format!(
+        "{PARENT_WAIT_REFUSAL_SEAM_MARKER} collision branch injected before any real wait"
+    );
+    let collision_cause_text = collision_cause.clone();
+    let collision_outcome = collision.finish_with_wait(move |handler_child| {
+        let _ = handler_child.id();
+        collision_seam_ref.set(collision_seam_ref.get() + 1);
+        Err(std::io::Error::new(std::io::ErrorKind::Other, collision_cause))
+    });
+    let collision_handback = match collision_outcome {
+        paea_capture_child::ChildCaptureOutcome::WaitRefused(handback) => handback,
+        paea_capture_child::ChildCaptureOutcome::Finished { exit, .. } => panic!(
+            "the SYNTHETIC collision seam handler must refuse the wait: {exit:?}"
+        ),
+    };
+    let collision_conserved = conserve_parent_wait_refused_carrier(
+        PARENT_GUARD_COLLISION_CONTEXT,
+        PARENT_GUARD_WITNESS,
+        PARENT_GUARD_MANIFEST,
+        &collision_leaf,
+        &selection,
+        collision_handback,
+        None,
+    );
+    let collision_caught = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        fail_parent_wait_refused(collision_conserved);
+    }));
+    let collision_carrier = collision_caught
+        .expect_err(
+            "the collision typed refusal failure must really panic with the \
+             conserved carrier as its payload",
+        )
+        .downcast::<ParentWaitRefusedCarrier>()
+        .expect(
+            "the collision typed panic payload must downcast BY VALUE into \
+             the complete ParentWaitRefusedCarrier",
+        );
+    let ParentWaitRefusedCarrier {
+        error: collision_error,
+        child: mut collision_child,
+        stdout_state: collision_stdout_state,
+        stderr_state: collision_stderr_state,
+        receipt: collision_receipt,
+        ..
+    } = *collision_carrier;
+    // EXPLICIT RECEIVER RESOLUTION FIRST — immediately after the BY-VALUE
+    // destructure and BEFORE every verdict and evidence read: the FIRST
+    // real wait of this child (a deliberate receiver decision, never an
+    // automatic reattempt — no automatic wait, retry, signal or kill
+    // exists anywhere in this guard). The REAL exit code is snapshotted
+    // now, so even a failing later verdict cannot drop the unreaped child
+    // and its real runtime issue stays retained.
+    let collision_exit_code = collision_child
+        .wait()
+        .expect("the FIRST real wait of the collision child must succeed")
+        .code();
+    let collision_receipt_text = match &collision_receipt {
+        Ok(path) => panic!(
+            "the receipt rename collision must FAIL the receipt write; \
+             unexpected success: {}",
+            path.display()
+        ),
+        Err(text) => text.clone(),
+    };
+    assert!(
+        collision_receipt_text.starts_with("receipt atomic rename refused:"),
+        "the secondary receipt failure must be the REAL stage-tagged rename \
+         refusal conserved as data: {collision_receipt_text}"
+    );
+    assert_eq!(
+        collision_error.to_string(),
+        collision_cause_text,
+        "the non-Clone refusal cause must also survive the collision branch verbatim"
+    );
+    assert_parent_guard_completed(
+        &collision_stdout_state,
+        expected_stdout.len(),
+        "collision stdout capture",
+    );
+    assert_parent_guard_completed(
+        &collision_stderr_state,
+        expected_stderr.len(),
+        "collision stderr capture",
+    );
+    assert_eq!(
+        collision_seam_invocations.get(), 1,
+        "ONE wait attempt per finish on the collision branch too"
+    );
+    // RECEIVER VERDICT on the snapshotted REAL exit — the child was
+    // already reaped immediately after the BY-VALUE destructure, so no
+    // failing assertion above can orphan it.
+    assert_eq!(
+        collision_exit_code,
+        Some(PARENT_WAIT_REFUSAL_EXIT_CODE),
+        "the collision child's real exit code must be retained — no orphan"
+    );
+}
+
+/// Archive one byte-exact proof copy inside an existing private proof leaf.
+///
+/// Purpose: retain exact receipt bytes OUTSIDE the tested leaf so the
+/// healthy copy survives the later writer overwrite of the tested-leaf
+/// target and the recovered copy is preserved alongside it for the next
+/// dependent task to re-read.
+///
+/// Input: `proof_leaf` is an existing 0700 private leaf created by
+/// `private_fixture_leaf`; `file_name` is a single path component used
+/// verbatim; `bytes` are the exact bytes to preserve.
+///
+/// Output: the `PathBuf` of the newly created copy inside `proof_leaf`.
+///
+/// Errors: any creation, write, flush, or fsync failure panics with the
+/// underlying message; nothing is retried or swallowed, so a fresh
+/// partial proof copy fails the guard honestly.
+///
+/// Side effects: creates exactly one new file, mode 0600 at creation via
+/// `create_new` (duplicate creation is refused), then write_all, flush, and
+/// sync_all; the tested leaf and its final EXACT 3 files are untouched.
+///
+/// Limits: single-purpose for the healthy and recovery receipt copies;
+/// not a general copy framework; does not read contents back (the
+/// existing readback tests stay as is); the caller must keep both
+/// copies inside the SAME proof leaf.
+fn archive_proof_copy(proof_leaf: &Path, file_name: &str, bytes: &[u8]) -> PathBuf {
+    let target = proof_leaf.join(file_name);
+    let mut file = fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o600)
+        .open(&target)
+        .unwrap_or_else(|e| panic!("proof copy create refused for {file_name}: {e}"));
+    file.write_all(bytes)
+        .unwrap_or_else(|e| panic!("proof copy write failed for {file_name}: {e}"));
+    file.flush()
+        .unwrap_or_else(|e| panic!("proof copy flush failed for {file_name}: {e}"));
+    file.sync_all()
+        .unwrap_or_else(|e| panic!("proof copy fsync failed for {file_name}: {e}"));
+    target
+}
+
+/// Digest a fault-inventory snapshot into a stable lowercase-hex SHA-256.
+///
+/// Purpose: let the fault-observation manifest record an actual before/after
+/// raw inventory hash so a reviewer can verify the tested leaf stayed
+/// byte-identical across the fault window instead of trusting a bare equality
+/// flag.
+///
+/// Inputs: `inventory` - a snapshot of `(file name, file bytes)` pairs ordered
+/// by file name (the guard passes a name-sorted canonical copy of its
+/// `before_fault` capture, or a post-restore capture from
+/// `paea_receipt_create_fault_inventory_checked`).
+///
+/// Results: a 64-character lowercase hex digest computed over, for each pair
+/// in order: the name bytes, one NUL separator byte, the byte length as
+/// little-endian u64, then the file bytes.
+///
+/// Errors: none; pure computation over in-memory data.
+///
+/// Side effects: none.
+///
+/// Limits: a test-observation aid, not a security boundary; strength is
+/// bounded by SHA-256 and by snapshot ordering, so callers must feed snapshots
+/// built with the same name-sorted ordering or identical directories can
+/// yield different digests.
+fn paea_receipt_create_fault_inventory_digest(inventory: &[(String, Vec<u8>)]) -> String {
+    let mut hasher = Sha256::new();
+    for (name, bytes) in inventory {
+        hasher.update(name.as_bytes());
+        hasher.update([0u8]);
+        hasher.update((bytes.len() as u64).to_le_bytes());
+        hasher.update(bytes);
+    }
+    hasher
+        .finalize()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect()
+}
+
+/// Fallibly capture the tested leaf's flat file inventory for fault records.
+///
+/// Purpose: mirror the panicking private inventory helper for the post-restore
+/// observation, but report read failures as `Err` data so an unexpected
+/// inventory failure cannot erase the already-captured primary and restore
+/// causes with a panic.
+///
+/// Inputs: `leaf` - the tested fixture directory; only its direct entries are
+/// read, as raw bytes.
+///
+/// Results: `Ok` with the inventory sorted by file name as
+/// `Vec<(String, Vec<u8>)>`, the same shape the private helper returns on the
+/// happy path.
+///
+/// Errors: `Err(String)` naming the exact failing stage (`read_dir`, directory
+/// entry read, non-UTF8 file name, or per-file `read`) with the underlying
+/// `std::io::Error` rendered into the string; nothing panics.
+///
+/// Side effects: none; strictly read-only, never writes to the tested leaf.
+///
+/// Limits: one directory level, no recursion; any non-UTF8 name or read error
+/// fails the whole capture rather than being skipped, matching the panicking
+/// helper's strictness; entries that are not readable regular files surface as
+/// per-file read errors.
+fn paea_receipt_create_fault_inventory_checked(
+    leaf: &Path,
+) -> Result<Vec<(String, Vec<u8>)>, String> {
+    let mut names: Vec<String> = Vec::new();
+    let entries =
+        fs::read_dir(leaf).map_err(|e| format!("read_dir {}: {e}", leaf.display()))?;
+    for entry in entries {
+        let entry =
+            entry.map_err(|e| format!("read_dir entry in {}: {e}", leaf.display()))?;
+        let name = entry
+            .file_name()
+            .into_string()
+            .map_err(|raw| format!("non-UTF8 file name {raw:?}"))?;
+        names.push(name);
+    }
+    names.sort();
+    let mut inventory: Vec<(String, Vec<u8>)> = Vec::new();
+    for name in names {
+        let bytes = fs::read(leaf.join(&name)).map_err(|e| format!("read {name}: {e}"))?;
+        inventory.push((name, bytes));
+    }
+    Ok(inventory)
+}
+
+/// Persist the fault-observation manifest as JSON mode 0600 and echo it.
+///
+/// Purpose: retain the actual fault facts (primary stage/cause, observed probe
+/// errno, euid/owner/mode facts, actual restore result, before/after raw
+/// inventory digests and equality) on disk in the external proof leaf BEFORE
+/// any verdict assertion, and print the manifest and its path to stderr so
+/// Codex can re-read them after stability.
+///
+/// Inputs: `proof_leaf` - the existing exclusive 0700 proof directory external
+/// to the tested leaf; `observations` - the fully assembled JSON value to
+/// persist verbatim.
+///
+/// Results: `Ok(PathBuf)` with the manifest path after the file has been
+/// created, written, flushed and fsynced.
+///
+/// Errors: `Err(String)` naming the exact failing stage (JSON serialization,
+/// create, write, flush, or fsync) with the underlying error; deliberately
+/// returns instead of panicking so the caller can report the primary and
+/// restore causes together with this secondary proof-write failure.
+///
+/// Side effects: creates exactly one new file
+/// `paea-receipt-create-fault-observations.json` (mode 0600 at creation via
+/// `create_new`) inside `proof_leaf`, and writes two stderr lines (the path,
+/// then the JSON manifest). Never touches the tested leaf.
+///
+/// Limits: no retry, no permission fallback, no overwrite - a pre-existing
+/// manifest makes `create_new` fail and the caller must fail honestly with all
+/// causes; the 0600 mode is applied at creation only and is not re-chmodded;
+/// the stored file is not read back for validation.
+fn paea_receipt_create_fault_observations_write(
+    proof_leaf: &Path,
+    observations: &Value,
+) -> Result<PathBuf, String> {
+    let manifest_path = proof_leaf.join("paea-receipt-create-fault-observations.json");
+    let bytes = serde_json::to_vec_pretty(observations)
+        .map_err(|e| format!("serialize fault observations JSON: {e}"))?;
+    let mut file = fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o600)
+        .open(&manifest_path)
+        .map_err(|e| format!("create fault observations {}: {e}", manifest_path.display()))?;
+    file.write_all(&bytes)
+        .map_err(|e| format!("write fault observations {}: {e}", manifest_path.display()))?;
+    file.flush()
+        .map_err(|e| format!("flush fault observations {}: {e}", manifest_path.display()))?;
+    file.sync_all()
+        .map_err(|e| format!("fsync fault observations {}: {e}", manifest_path.display()))?;
+    eprintln!(
+        "paea-receipt-create fault observations manifest path: {}",
+        manifest_path.display()
+    );
+    eprintln!("paea-receipt-create fault observations manifest: {observations}");
+    Ok(manifest_path)
+}
+
+/// Byte-exact inventory of every entry directly inside `leaf`, sorted by
+/// file name: two equal inventories mean the same names with the same
+/// contents, so a missing or leftover receipt temp file - or any mutated
+/// byte - shows up as a mismatch instead of a guessed temp filename. Only
+/// call this while `leaf` is at 0700, so a panic here can never leave the
+/// owned fixture unrestored.
+fn paea_receipt_create_inventory(leaf: &Path) -> Vec<(String, Vec<u8>)> {
+    let mut names: Vec<String> = fs::read_dir(leaf)
+        .unwrap_or_else(|e| panic!("inventory read_dir refused for {leaf:?}: {e}"))
+        .map(|entry| {
+            entry.unwrap_or_else(|e| {
+                panic!("inventory read_dir entry refused for {leaf:?}: {e}")
+            })
+        })
+        .map(|entry| {
+            entry
+                .file_name()
+                .into_string()
+                .unwrap_or_else(|raw| panic!("inventory filename not UTF-8 for {leaf:?}: {raw:?}"))
+        })
+        .collect();
+    names.sort();
+    names
+        .into_iter()
+        .map(|name| {
+            let bytes = fs::read(leaf.join(&name))
+                .unwrap_or_else(|e| panic!("inventory read refused for {leaf:?}/{name}: {e}"));
+            (name, bytes)
+        })
+        .collect()
+}
+
+/// Explicit refusal - never a PASS - when the same-uid/0700 OS precondition
+/// of the 0500 temp-create refusal does not apply. The already-attempted
+/// restore outcome is embedded as data so the owned fixture's state is
+/// never silent.
+fn paea_receipt_create_precondition_refusal(leaf: &Path, why: &str, restore: std::io::Result<()>) -> ! {
+    panic!(
+        "receipt temp-create precondition not applicable on {leaf:?}: {why}; restore-to-0700 outcome {restore:?}; refusing instead of passing"
+    );
+}
+
+/// Receipt temp-CREATE refusal on a fresh private leaf, TEST-ONLY bounded
+/// slice: after a real healthy receipt write/readback with controlled
+/// `stdout.raw`/`stderr.raw`, the same-uid owner drops the owned 0700
+/// fixture directory to 0500 so the existing raw evidence stays readable
+/// while the unchanged receipt writer's exclusive `create_new` temp open is
+/// refused by the OS (EACCES, os error 13) at the known stage `receipt temp
+/// creation refused` - a fresh-creation refusal, never a rename collision,/// and the nanosecond temp filename is never guessed. The owned fixture is
+/// restored to 0700 BEFORE any assertion that could panic, any secondary
+/// restore error is preserved as data, and an explicit fresh recovery write
+/// with a distinct payload is then read back. Limitations surfaced, not
+/// hidden: the writer reports stage and cause as a single `Err(String)`,
+/// not a typed OS error chain, so the errno is validated through std's
+/// locale-independent `os error 13` display; the UID precondition is
+/// explicit and refuses safely instead of passing when not applicable;
+/// child-wait, live HTTP, installation, and Authority acceptance coverage
+/// is out of scope. No synthetic OS error, no new uid, no live root, no
+/// hardcoded /tmp, no inferred timestamp, no retry of unchanged input, no
+/// automatic kill, no timeout; raw evidence and all receipts stay on disk
+/// on failure and on PASS.
+#[test]
+fn paea_capture_receipt_temp_create_refusal_keeps_stage_inventory_and_recovers_fresh() {
+    use std::os::unix::fs::MetadataExt;
+
+    // Fresh exclusive-0700 private service-storage leaf under the explicit
+    // TMPDIR, preserved on disk: never a user mission, never TempDir, never
+    // a hardcoded /tmp.
+    let leaf: PathBuf = private_fixture_leaf("receipt-temp-create-guard");
+
+    // Controlled evidence the receipt will conserve - real files, real
+    // bytes, written before anything is faulted.
+    let stdout_bytes = b"controlled stdout prologue for the receipt temp-create refusal guard\n";
+    let stderr_bytes = b"controlled stderr prologue for the receipt temp-create refusal guard\n";
+    fs::write(leaf.join("stdout.raw"), stdout_bytes)
+        .unwrap_or_else(|e| panic!("controlled stdout.raw write refused on fresh fixture {leaf:?}: {e}"));
+    fs::write(leaf.join("stderr.raw"), stderr_bytes)
+        .unwrap_or_else(|e| panic!("controlled stderr.raw write refused on fresh fixture {leaf:?}: {e}"));
+
+    // Same-uid ownership precondition, with the process's actual effective
+    // uid read directly via rustix::process::geteuid() rather than inferred
+    // from a probe file. The fixture directory must be 0700 and owned by
+    // that same uid; otherwise the 0500 refusal below would not be the
+    // observed OS precondition and this guard refuses instead of passing.
+    let euid = rustix::process::geteuid().as_raw();
+    let leaf_meta = fs::metadata(&leaf).unwrap_or_else(|e| panic!("fixture metadata refused on {leaf:?}: {e}"));
+    let dir_uid = leaf_meta.uid();
+    let dir_mode_bits = leaf_meta.permissions().mode() & 0o777;
+    if dir_mode_bits != 0o700 || dir_uid != euid {
+        panic!(
+            "receipt temp-create precondition not applicable on {leaf:?}: directory mode {dir_mode_bits:o} uid {dir_uid} versus effective uid {euid}, expected 0700 owned by this process; refusing instead of passing"
+        );
+    }
+
+    // Healthy actual receipt write/readback BEFORE any fault: the unchanged
+    // writer runs for real on the owned 0700 fixture, and its conserved
+    // hashes are validated against the controlled bytes, not just an exit
+    // code.
+    let witness = "paea-capture-receipt-temp-create-refusal";
+    let selection = json!({
+        "guard": "paea_capture_receipt_temp_create_refusal_keeps_stage_inventory_and_recovers_fresh",
+        "stage": "healthy-prologue",
+    });
+    let process_outcome = json!({"fixture_only": true, "phase": "healthy-prologue"});
+    let (healthy_receipt_path, healthy_receipt_leaf) = write_process_receipt(
+        &leaf,
+        witness,
+        "paea-capture-receipt-temp-create-refusal/healthy-prologue",
+        &selection,
+        &process_outcome,
+    )
+    .unwrap_or_else(|e| panic!("healthy receipt write refused before any fault: {e}"));
+    assert_eq!(
+        healthy_receipt_path,
+        leaf.join("process-receipt.json"),
+        "the healthy receipt must land at the writer's real target path"
+    );
+    assert_eq!(healthy_receipt_leaf, leaf, "the healthy receipt leaf must be the private fixture");
+    let expected_stdout_sha = format!("{:x}", Sha256::digest(stdout_bytes));
+    let expected_stderr_sha = format!("{:x}", Sha256::digest(stderr_bytes));
+    let healthy_receipt_bytes = fs::read(&healthy_receipt_path)
+        .unwrap_or_else(|e| panic!("healthy receipt readback refused: {e}"));
+    // Retain an exact copy of the healthy receipt outside the tested leaf
+    // before the writer later overwrites the tested-leaf target.
+    let proof_leaf = private_fixture_leaf("receipt-proof-copies");
+    let healthy_proof_copy = archive_proof_copy(
+        &proof_leaf,
+        "healthy-receipt.bin",
+        &healthy_receipt_bytes,
+    );
+    eprintln!(
+        "{}",
+        json!({
+            "locator": "healthy_receipt_copy",
+            "proof_leaf": proof_leaf.display().to_string(),
+            "file": "healthy-receipt.bin",
+            "path": healthy_proof_copy.display().to_string(),
+            "len": healthy_receipt_bytes.len()
+        })
+    );
+    let healthy_receipt: Value = serde_json::from_slice(&healthy_receipt_bytes)
+        .unwrap_or_else(|e| panic!("healthy receipt readback is not JSON: {e}"));
+    assert_eq!(healthy_receipt["schema_version"], json!(1), "healthy receipt schema_version");
+    assert_eq!(healthy_receipt["witness"], json!(witness), "healthy receipt witness");
+    assert_eq!(healthy_receipt["selection"], selection, "healthy receipt selection");
+    assert_eq!(healthy_receipt["process"], process_outcome, "healthy receipt process outcome");
+    assert_eq!(healthy_receipt["artifacts"]["stdout"]["path"], json!("stdout.raw"), "healthy receipt stdout path");
+    assert_eq!(
+        healthy_receipt["artifacts"]["stdout"]["sha256"],
+        json!(expected_stdout_sha),
+        "healthy receipt stdout sha256 must be the real hash of the controlled bytes"
+    );
+    assert_eq!(healthy_receipt["artifacts"]["stdout"]["bytes"], json!(stdout_bytes.len()), "healthy receipt stdout byte count");
+    assert_eq!(healthy_receipt["artifacts"]["stderr"]["path"], json!("stderr.raw"), "healthy receipt stderr path");
+    assert_eq!(
+        healthy_receipt["artifacts"]["stderr"]["sha256"],
+        json!(expected_stderr_sha),
+        "healthy receipt stderr sha256 must be the real hash of the controlled bytes"
+    );
+    assert_eq!(healthy_receipt["artifacts"]["stderr"]["bytes"], json!(stderr_bytes.len()), "healthy receipt stderr byte count");
+
+    // Byte-exact snapshot while everything is healthy and the leaf is still
+    // 0700, taken BEFORE the fault, so the post-refusal comparison proves
+    // the refusal created no temp file and mutated no byte.
+    let before_fault = paea_receipt_create_inventory(&leaf);
+
+    // The fault: the same-uid owner drops the directory to 0500 - existing
+    // raw files stay readable, creation does not.
+    fs::set_permissions(&leaf, fs::Permissions::from_mode(0o500))
+        .unwrap_or_else(|e| panic!("chmod 0500 refused on owned fixture {leaf:?}: {e}"));
+
+    // OS precondition gate under 0500, BEFORE the writer runs: the existing
+    // raw stays readable, and an exclusive create of our OWN probe name
+    // (never a guessed temp name) is refused with EACCES 13. If either half
+    // does not hold - for example under a supervisor that bypasses
+    // directory permissions - restore 0700 and refuse explicitly instead
+    // of passing.
+    if let Err(read_err) = fs::read(leaf.join("stdout.raw")) {
+        let restore = fs::set_permissions(&leaf, fs::Permissions::from_mode(0o700));
+        paea_receipt_create_precondition_refusal(
+            &leaf,
+            &format!("existing stdout.raw not readable under 0500: {read_err}"),
+            restore,
+        );
+    }
+    let probe_path = leaf.join(".paea-receipt-create-probe");
+    let probe_open = fs::OpenOptions::new().write(true).create_new(true).open(&probe_path);
+    // The probe's actual error is data: capture the raw errno before matching
+    // so the expected-EACCES arm cannot silently drop the local Err, and so
+    // the fault-observation manifest below records what really happened.
+    let observed_probe_errno: Option<i32> = match &probe_open {
+        Ok(_) => None,
+        Err(probe_err) => probe_err.raw_os_error(),
+    };
+    match probe_open {
+        Ok(_) => {
+            let remove = fs::remove_file(&probe_path);
+            let restore = fs::set_permissions(&leaf, fs::Permissions::from_mode(0o700));
+            paea_receipt_create_precondition_refusal(
+                &leaf,
+                &format!("exclusive create under 0500 unexpectedly succeeded (probe removal outcome {remove:?}); a supervisor or uid bypasses directory permissions"),
+                restore,
+            );
+        }
+        Err(probe_err) => {
+            if probe_err.raw_os_error() != Some(13) {
+                let restore = fs::set_permissions(&leaf, fs::Permissions::from_mode(0o700));
+                paea_receipt_create_precondition_refusal(
+                    &leaf,
+                    &format!("exclusive create under 0500 failed with {probe_err} (raw_os_error {:?}), expected EACCES 13", probe_err.raw_os_error()),
+                    restore,
+                );
+            }
+        }
+    }
+
+    // The actual refusal under test: the unchanged writer must fail at its
+    // temp-CREATE stage on this fresh leaf. No temp name is guessed and no
+    // temp pre-exists, so this cannot be a rename collision; the primary
+    // stage/cause is captured as data first, before any assertion.
+    let primary: String = match write_process_receipt(
+        &leaf,
+        witness,
+        "paea-capture-receipt-temp-create-refusal/fault",
+        &selection,
+        &process_outcome,
+    ) {
+        Ok(_) => {
+            let restore = fs::set_permissions(&leaf, fs::Permissions::from_mode(0o700));
+            panic!(
+                "receipt write unexpectedly succeeded under 0500 after the refused EACCES probe; restore-to-0700 outcome {restore:?}; refusing instead of passing"
+            );
+        }
+        Err(cause) => cause,
+    };
+
+    // Restore 0700 FIRST - before any assertion that could panic - so no
+    // assertion failure can ever leave the owned fixture unrestored. A
+    // secondary restore error, if any, is preserved as data.
+    let restore_error: Option<String> =
+        match fs::set_permissions(&leaf, fs::Permissions::from_mode(0o700)) {
+            Ok(()) => None,
+            Err(e) => Some(format!("chmod 0700 restore refused on {leaf:?}: {e}")),
+        };
+    // Fault observations are captured and persisted BEFORE any verdict
+    // assertion and BEFORE the restore-refusal panic below, so neither a
+    // failed restore nor a later assertion failure can erase the observed
+    // facts. The restore attempt above still precedes every post-fault read.
+    // The primary is the writer's Err(String) cause, captured verbatim: no
+    // structured stage exists, and that String-stage limitation is recorded
+    // as data in the manifest. Post-restore reads are fallible on purpose so
+    // an unexpected read failure cannot replace the primary/restore causes.
+    let after_restore_inventory: Result<Vec<(String, Vec<u8>)>, String> =
+        paea_receipt_create_fault_inventory_checked(&leaf);
+    // Digests and equality use a name-sorted canonical copy of the before
+    // snapshot so the comparison cannot depend on the private helper's
+    // internal ordering.
+    let mut before_fault_canonical = before_fault.clone();
+    before_fault_canonical.sort_by(|a, b| a.0.cmp(&b.0));
+    let before_fault_sha256 = paea_receipt_create_fault_inventory_digest(&before_fault_canonical);
+    let (after_fault_sha256, after_fault_error, inventories_equal, after_fault_file_count): (
+        Option<String>,
+        Option<String>,
+        Option<bool>,
+        Option<usize>,
+    ) = match &after_restore_inventory {
+        Ok(after) => (
+            Some(paea_receipt_create_fault_inventory_digest(after)),
+            None,
+            Some(before_fault_canonical == *after),
+            Some(after.len()),
+        ),
+        Err(cause) => (None, Some(cause.clone()), None, None),
+    };
+    let (actual_mode, meta_error): (Option<u32>, Option<String>) = match fs::metadata(&leaf) {
+        Ok(m) => (Some(m.permissions().mode() & 0o7777), None),
+        Err(meta_err) => (None, Some(meta_err.to_string())),
+    };
+    let fault_observations = json!({
+        "guard": "paea-receipt-create-temp-create-refusal/fault-observations",
+        "phase": "fixture_only",
+        "primary_stage_limitation":
+            "primary is the writer's Err(String) cause, captured verbatim; no structured stage field exists, so the stage is whatever that string records",
+        "primary_cause": &primary,
+        "observed_probe_errno": observed_probe_errno,
+        "observed_probe_errno_is_expected_eacces": observed_probe_errno == Some(13),
+        "euid": euid,
+        "leaf_owner_uid": dir_uid,
+        "leaf_mode_bits_guard_captured": dir_mode_bits,
+        "leaf_mode_bits_after_restore": {
+            "actual_mode": actual_mode,
+            "meta_error": meta_error
+        },
+        "restore_result": &restore_error,
+        "restore_succeeded": restore_error.is_none(),
+        "before_fault_inventory_sha256": &before_fault_sha256,
+        "after_restore_inventory_sha256": &after_fault_sha256,
+        "after_restore_inventory_error": &after_fault_error,
+        "before_after_inventory_equal": inventories_equal,
+        "inventory_comparison_note":
+            "digests and equality are over name-sorted canonical order of (name, bytes) pairs",
+        "before_fault_file_count": before_fault.len(),
+        "after_restore_file_count": after_fault_file_count,
+        "process_outcome_note":
+            "fixture-only outcome data passed to the writer; this guard spawns no real child process and no real process outcome is claimed",
+    });
+    if let Err(proof_cause) =
+        paea_receipt_create_fault_observations_write(&proof_leaf, &fault_observations)
+    {
+        panic!(
+            "secondary fault-observation proof write refused; failing honestly with all causes as data; primary stage/cause {primary:?}; secondary restore error {restore_error:?}; proof write error {proof_cause}"
+        );
+    }
+    if let Some(restore_cause) = &restore_error {
+        panic!(
+            "owned fixture could not be restored to 0700 before assertions; refusing with both causes as data; primary stage/cause {primary:?}; secondary restore error {restore_cause}; fault observations were persisted to the external proof leaf before this panic"
+        );
+    }
+
+    // Known stage, preserved verbatim by the Err(String) writer contract.
+    assert_eq!(
+        actual_mode,
+        Some(0o700),
+        "known-stage post-restore mode mismatch: actual_mode={:?} meta_error={:?} primary={:?} restore_error={:?}",
+        actual_mode,
+        meta_error,
+        primary,
+        restore_error
+    );
+    assert!(
+        meta_error.is_none(),
+        "known-stage metadata observation failed: meta_error={:?} primary={:?} restore_error={:?}",
+        meta_error,
+        primary,
+        restore_error
+    );
+    assert!(
+        primary.starts_with("receipt temp creation refused: "),
+        "expected the known receipt temp-creation stage in the primary cause, got {primary:?}"
+    );
+    // The writer returns Err(String), not a typed OS error chain, so the
+    // errno is validated through the locale-independent `os error 13`
+    // suffix that std's io::Error Display always appends for EACCES - the
+    // limitation is surfaced, not hidden.
+    assert!(
+        primary.contains("os error 13"),
+        "expected EACCES (os error 13) inside the temp-creation cause, got {primary:?}"
+    );
+
+    // No guessed temp name, no rename collision: the refusal must have left
+    // the leaf byte-for-byte identical - same entries, same contents, no
+    // temp remnant, raw evidence and healthy receipt conserved whole.
+    let after_refusal = paea_receipt_create_inventory(&leaf);
+    assert_eq!(
+        after_refusal, before_fault,
+        "leaf inventory must be byte-identical after the temp-create refusal (no temp file, no mutated byte); primary cause {primary}"
+    );
+    let stdout_after = fs::read(leaf.join("stdout.raw"))
+        .unwrap_or_else(|e| panic!("stdout.raw readback after restore refused: {e}"));
+    let stderr_after = fs::read(leaf.join("stderr.raw"))
+        .unwrap_or_else(|e| panic!("stderr.raw readback after restore refused: {e}"));
+    assert_eq!(stdout_after, &stdout_bytes[..], "controlled stdout.raw bytes unchanged by the refusal");
+    assert_eq!(stderr_after, &stderr_bytes[..], "controlled stderr.raw bytes unchanged by the refusal");
+    assert_eq!(
+        format!("{:x}", Sha256::digest(&stdout_after)),
+        expected_stdout_sha,
+        "stdout.raw sha256 unchanged by the refusal"
+    );
+    assert_eq!(
+        format!("{:x}", Sha256::digest(&stderr_after)),
+        expected_stderr_sha,
+        "stderr.raw sha256 unchanged by the refusal"
+    );
+
+    // Explicit fresh recovery on the SAME restored leaf: a distinct payload
+    // proves the recovered receipt was really written after the restore and
+    // is not the stale healthy receipt; this is a different input state,
+    // never a retry of the unchanged faulted input.
+    let recovery_selection = json!({
+        "guard": "paea_capture_receipt_temp_create_refusal_keeps_stage_inventory_and_recovers_fresh",
+        "stage": "recovery-after-temp-create-refusal",
+    });
+    let recovery_outcome = json!({"fixture_only": true, "phase": "recovered-after-temp-create-refusal"});
+    let (recovered_path, recovered_leaf) = write_process_receipt(
+        &leaf,
+        witness,
+        "paea-capture-receipt-temp-create-refusal/recovery",
+        &recovery_selection,
+        &recovery_outcome,
+    )
+    .unwrap_or_else(|e| panic!("fresh recovery receipt write refused after restore to 0700: {e}"));
+    assert_eq!(recovered_path, leaf.join("process-receipt.json"), "recovery receipt target path");
+    assert_eq!(recovered_leaf, leaf, "recovery receipt leaf");
+    let recovered_bytes = fs::read(&recovered_path)
+        .unwrap_or_else(|e| panic!("recovery receipt readback refused: {e}"));
+    // Archive the exact recovered bytes into the SAME private proof leaf
+    // under a different exclusive name.
+    let recovered_proof_copy = archive_proof_copy(
+        &proof_leaf,
+        "recovered-receipt.bin",
+        &recovered_bytes,
+    );
+    eprintln!(
+        "{}",
+        json!({
+            "locator": "recovered_receipt_copy",
+            "proof_leaf": proof_leaf.display().to_string(),
+            "file": "recovered-receipt.bin",
+            "path": recovered_proof_copy.display().to_string(),
+            "len": recovered_bytes.len()
+        })
+    );
+    let recovered: Value = serde_json::from_slice(&recovered_bytes)
+        .unwrap_or_else(|e| panic!("recovery receipt readback is not JSON: {e}"));
+    assert_eq!(recovered["schema_version"], json!(1), "recovery receipt schema_version");
+    assert_eq!(recovered["witness"], json!(witness), "recovery receipt witness");
+    assert_eq!(
+        recovered["selection"], recovery_selection,
+        "recovery receipt must carry the distinct recovery payload"
+    );
+    assert_eq!(
+        recovered["process"], recovery_outcome,
+        "recovery receipt must carry the distinct recovery payload, proving the write happened after the restore"
+    );
+    assert_eq!(
+        recovered["artifacts"]["stdout"]["sha256"],
+        json!(expected_stdout_sha),
+        "recovery receipt conserves the same controlled stdout bytes"
+    );
+    assert_eq!(
+        recovered["artifacts"]["stderr"]["sha256"],
+        json!(expected_stderr_sha),
+        "recovery receipt conserves the same controlled stderr bytes"
+    );
+    // Final real-file inventory: exactly the two controlled raw streams and
+    // the single replaced receipt - no temp remnant from any route.
+    let final_names: Vec<String> = paea_receipt_create_inventory(&leaf)
+        .into_iter()
+        .map(|(name, _)| name)
+        .collect();
+    assert_eq!(
+        final_names,
+        vec!["process-receipt.json".to_string(), "stderr.raw".to_string(), "stdout.raw".to_string()],
+        "recovered leaf must contain exactly the two raw streams and the single receipt, with no temp remnant"
+    );
+}
+
 /// Fresh native service storage; never open a user mission as a fixture.
 fn service() -> (tempfile::TempDir, RootStore) {
     let dir = tempfile::tempdir().unwrap();
@@ -1278,37 +2812,43 @@ fn approval_web_cli_binds_and_consumes_exact_preparation_once() {
             stderr_path,
         } => (exit, stdout_capture, stderr_capture, stdout_path, stderr_path),
         paea_capture_child::ChildCaptureOutcome::WaitRefused(handback) => {
-            // Typed refusal route, NOT claimed exercised: the receipt
-            // carries the explicit UNKNOWN / not-finished outcome envelope
-            // (the exit status is UNKNOWN on this route; no invented
-            // status, count or settled state); its typed ownership and
-            // original-panic preservation stay OPEN. A receipt failure
-            // stays a failure and conserves the real wait-refusal cause as
-            // the primary information.
-            let (receipt, _) = write_process_receipt(
-                &leaf,
+            // THE ONE WaitRefused route fixed in this slice: the COMPLETE
+            // handback is conserved into the witness-local typed
+            // [`ParentWaitRefusedCarrier`] — BOTH captures join to their
+            // real terminal states BEFORE the receipt (the SIGINT stop was
+            // accepted on this route and the stdin-EOF permission was
+            // already given, but an accepted stop request is NOT
+            // termination proof — the joins keep the same documented
+            // blocking limit as the finish contract and end only at the
+            // producer's real causal EOF; `Failed`/`Panicked` states and
+            // their causes are retained verbatim, never masked), the
+            // receipt is the
+            // EXPLICIT UNKNOWN / not-finished envelope that now records
+            // the controller-panic PRESENCE this route actually knows
+            // (never the payload text), and the receipt success path OR
+            // the secondary receipt-write error travels as DATA inside the
+            // carrier. The original non-Clone cause, the SAME child (never
+            // re-waited here — the exit status stays UNKNOWN; no signal,
+            // kill, timer or retry exists) and the original controller
+            // panic payload move BY VALUE through the typed recoverable
+            // boundary — no formatted panic pretends to conserve the
+            // ownership. A higher `catch_unwind` receiver can recover the
+            // carrier BY VALUE and decide the actual cleanup explicitly
+            // (including the FIRST real `Child::wait` when no real wait
+            // has run); with no higher consumer this unexpected handback
+            // stays VISIBLE as the witness failure (the libtest top-level
+            // drop establishes no external cleanup) — no claim is made
+            // that all refusal routes are resolved: PreparationRefused
+            // and SignalRefused remain explicitly OPEN and untouched.
+            fail_parent_wait_refused(conserve_parent_wait_refused_carrier(
+                "approval-web positive witness wait refused after the accepted SIGINT",
                 "approval_web_cli_binds_and_consumes_exact_preparation_once",
                 "paea-approval-web-positive-process-receipt",
+                &leaf,
                 &selection,
-                &not_finished_process_outcome(None),
-            )
-            .unwrap_or_else(|e| {
-                panic!(
-                    "child wait refused after the successful SIGINT request (child pid {}; \
-                     original cause: {}) AND its process receipt write was also refused: {e}",
-                    handback.child.id(),
-                    handback.error
-                )
-            });
-            panic!(
-                "child wait refused after the successful SIGINT request — receipt: {}; \
-                 handback conserved whole (child pid {}, BOTH captures still running): {:?}; \
-                 original cause: {}",
-                receipt.display(),
-                handback.child.id(),
                 handback,
-                handback.error
-            );
+                stopped.controller_panic,
+            ));
         }
     };
     // Finished-path evidence increment: the process receipt is written

@@ -523,10 +523,14 @@ impl OwnedChildCapture {
         self.finish_with_wait(std::process::Child::wait)
     }
 
-    /// PRIVATE wait seam shared by the public `finish` (which passes the
-    /// REAL `std::process::Child::wait`) and the test-crate refusal guard
+    /// Wait seam shared by the public `finish` (which passes the
+    /// REAL `std::process::Child::wait`), the test-crate refusal guard
     /// (which injects a SYNTHETIC distinctive wait error BEFORE any real
-    /// wait). ONE wait attempt per finish: the `FnOnce` handler is called
+    /// wait) and the parent witness regression (the same synthetic
+    /// injection seam). `pub(crate)` visibility ONLY because this module
+    /// lives in `tests/common` and is compiled exclusively inside test
+    /// binaries — never a product binary, no new shared API behavior.
+    /// ONE wait attempt per finish: the `FnOnce` handler is called
     /// exactly once on the owned child, after the stdin-EOF permission;
     /// there is no retry loop and no automatic second wait anywhere. On
     /// refusal the original (non-Clone) cause, the child, BOTH
@@ -537,7 +541,7 @@ impl OwnedChildCapture {
     /// dropped or faked. The handler shape is the uncurried real method
     /// shape (`&mut Child -> io::Result<ExitStatus>`), so the public path
     /// exercises the exact same code as production `Child::wait`.
-    fn finish_with_wait(
+    pub(crate) fn finish_with_wait(
         mut self,
         wait: impl FnOnce(&mut std::process::Child) -> std::io::Result<std::process::ExitStatus>,
     ) -> ChildCaptureOutcome {
@@ -1087,8 +1091,9 @@ fn child_capture_owner_collects_exact_raw_streams_and_real_exit() {
     fs::remove_dir_all(&leaf).expect("own leaf cleanup");
 }
 
-/// Real collection of a refused start's returned child, shared by BOTH
-/// refusal guards below: closes our stdin end first (the child's EOF
+/// Real collection of a refused start's returned child, shared by ALL
+/// refusal guards below (including the parent wait-refusal guard):
+/// closes our stdin end first (the child's EOF
 /// permission — stdin is never a reason to wait), drains every pipe the
 /// child STILL owns concurrently to causal EOF through dedicated workers
 /// (no timer, no poll, no retry, no volume ceiling), joins the workers
@@ -1107,7 +1112,7 @@ fn child_capture_owner_collects_exact_raw_streams_and_real_exit() {
 /// Limits: proves no business acceptance; the drain consumes the pipes,
 /// so any ownership pin on the returned child must be snapshotted by the
 /// caller BEFORE calling this.
-fn collect_refused_child_observably(
+pub(crate) fn collect_refused_child_observably(
     mut child: std::process::Child,
 ) -> (
     std::process::ExitStatus,

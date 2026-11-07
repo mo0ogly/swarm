@@ -266,6 +266,32 @@ sources Rust (classe `env::temp_dir()` sans TMPDIR explicite) en même temps
 que la migration des sites, producteur connu identifié : `tests/trust_biba.rs:7`
 (`biba-*`).
 
+### Leçons vérifiées de la reprise (6 novembre 2026, portée D03)
+
+1. **TMPDIR à la main ≠ filet de recipe.py** : épingler TMPDIR vers un
+   répertoire sous le dépôt (ex. `.swarm-fixtures/runner-tmp`) casse les tests
+   de contrats ancêtres-privés (`open_private_directory`,
+   swarm-enrollment-config/src/store.rs:105) — les ancêtres `ChatGPT`/`swarm`
+   sont 775 inscriptibles au groupe. Le filet de `tools/verification/recipe.py`
+   (repli `~/.local/state/swarm-fixtures/runner-tmp`, chaîne 700 vérifiée par
+   `namei`) est le mode contractuel : 11/11 suites swarm-enrollment-config au
+   vert sous ce repli. Ne pas réinventer ce TMPDIR à la main.
+2. **Tests mutateurs BLP sur fixture partagée** : les tests `paea_git_call`
+   mutent la révision BLP d'une racine commune (chaque appel `owned()` →
+   config-apply → blp-policy-apply) ; une exécution groupée perd des courses de
+   révision (`blp-revision-conflict` en 2625/3677). Le mode contractuel
+   délivré (recettes) est un test par pas avec `--exact` — 3/3 au vert
+   individuellement, y compris avec la fixture restaurée depuis l'archive USB.
+3. **Concurrence cargo, deux flocons observés** (non reproductibles
+   individuellement, fichiers jamais touchés par D02/D03) :
+   `agent_supervision.rs:662` (assertion heartbeat de passage — re-flou sous
+   charge) et `managed_repository_candidate_store.rs:1257`
+   (`ExecutableFileBusy` « Text file busy » sur la fixture de garde-fou).
+   Ré-exécution complète sous le même TMPDIR : 736/4 (ensemble exact
+   préexistant BF-16b), soit la ligne de base d'avant corrections — aucun
+   élément de D02/D03 ne rougit. Le diagnostic a coûté 2 minutes ; la re-run
+   complète valant la dissection, qualifier par re-run avant d'ouvrir un sujet.
+
 ## Revue et état de clôture
 
 Revue de cohérence par le même auteur : C01…C11 rattachés, PA existants conservés,

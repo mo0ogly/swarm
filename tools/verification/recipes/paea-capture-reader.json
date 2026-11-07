@@ -65,7 +65,9 @@
         "test paea_capture_child::child_capture_wait_refusal_preserves_cause_and_returned_ownership ... ok",
         "test paea_capture_child::child_capture_owned_signal_stops_eof_ignoring_child_and_retains_panic ... ok",
         "test paea_capture_startup_eof_retains_actual_exit_and_raw ... ok",
-        "21 passed; 0 failed; 0 ignored;"
+        "test paea_capture_parent_wait_refusal_retains_owned_handoff ... ok",
+        "test paea_capture_receipt_temp_create_refusal_keeps_stage_inventory_and_recovers_fresh ... ok",
+        "23 passed; 0 failed; 0 ignored;"
       ],
       "required_stderr": []
     }

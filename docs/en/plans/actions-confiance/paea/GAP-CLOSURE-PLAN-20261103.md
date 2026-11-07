@@ -227,6 +227,32 @@ to a migration lot or a wave agreement; resumption condition: decide to extend
 an explicit TMPDIR) together with migrating the sites; one known producer:
 `tests/trust_biba.rs:7` (`biba-*`).
 
+### Verified lessons from the resumption (6 November 2026, D03 scope)
+
+1. **Hand-pinned TMPDIR ≠ recipe.py's net**: pinning TMPDIR to a directory
+   under the repo (e.g. `.swarm-fixtures/runner-tmp`) breaks
+   ancestor-private contract tests (`open_private_directory`,
+   swarm-enrollment-config/src/store.rs:105) — the `ChatGPT`/`swarm`
+   ancestors are 775 group-writable. recipe.py's net (fallback
+   `~/.local/state/swarm-fixtures/runner-tmp`, 700 chain verified via
+   `namei`) is the contractual mode: 11/11 swarm-enrollment-config suites
+   green under that fallback. Do not re-invent this TMPDIR by hand.
+2. **BLP-mutating tests on a shared fixture**: the `paea_git_call` tests
+   mutate the BLP revision of one shared root (each `owned()` call runs
+   config-apply then blp-policy-apply); grouped execution loses revision
+   races (`blp-revision-conflict` at 2625/3677). The delivered contractual
+   mode (recipes) is one test per step with `--exact` — 3/3 green
+   individually, including with the fixture restored from the USB archive.
+3. **Cargo concurrency, two flakes observed** (not reproducible
+   individually, files untouched by D02/D03): `agent_supervision.rs:662`
+   (heartbeat-pass assertion — flaky under load) and
+   `managed_repository_candidate_store.rs:1257` (`ExecutableFileBusy`
+   "Text file busy" on the guard-rail fixture). A full re-run under the same
+   TMPDIR gave 736/4 (the exact pre-existing BF-16b set), i.e. the
+   pre-correction baseline — nothing from D02/D03 turns red. Diagnosis took
+   2 minutes; the full re-run beat the dissection — qualify by re-run
+   before opening a topic.
+
 Same-author consistency review: C01…C11 mapped, existing PA IDs retained, acyclic
 dependencies and H1…H4 owners explicit. Ready for selection as local work;
 protected qualification depends on H1/H2/G3, E3 on H3/H4/G5.
