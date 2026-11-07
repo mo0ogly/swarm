@@ -17,7 +17,10 @@ function shown(){const n=++serial,r=spawnSync(cfg.binary,['engine-settings','sho
   const context=await browser.createBrowserContext(),page=await context.newPage();page.setDefaultTimeout(0);page.setDefaultNavigationTimeout(0);
   let reject;const failed=new Promise((_,r)=>{reject=r}),guard=p=>Promise.race([p,failed]);
   page.on('pageerror',e=>{errors.push(e.message);reject(e)});page.on('requestfailed',r=>{errors.push(new URL(r.url()).pathname);reject(Error('Resource failed'))});page.on('console',m=>{if(m.type()==='error'){errors.push(m.text());reject(Error('Console error'))}});page.on('response',r=>{if(r.status()>=400){errors.push({path:new URL(r.url()).pathname,status:r.status()});reject(Error('Unexpected HTTP refusal'))}});
-  await page.setViewport({width:1440,height:1000});await guard(page.goto('http://'+cfg.address+'/?lang='+lang+'&theme='+theme,{waitUntil:'networkidle0'}));await page.type('#access-key',cfg.key);await guard(Promise.all([page.waitForNavigation({waitUntil:'networkidle0'}),page.click('button[type=submit]')]));await guard(state.waitForSettingsState(page,'loaded'));
+  await page.setViewport({width:1440,height:1000});await guard(page.goto('http://'+cfg.address+'/?lang='+lang+'&theme='+theme,{waitUntil:'networkidle0'}));await page.type('#access-key',cfg.key);await guard(Promise.all([page.waitForNavigation({waitUntil:'networkidle0'}),page.click('button[type=submit]')]));
+  // The cockpit home is now a mission selector; the engine-settings admin panel
+  // lives on native-runtime.html (cockpit-native.js "Ouvrir les réglages Rust").
+  await guard(page.goto('http://'+cfg.address+'/native-runtime.html?lang='+lang+'&theme='+theme+'&view=admin',{waitUntil:'networkidle0'}));await guard(state.waitForSettingsState(page,'loaded'));
   const before=shown();assert.equal(before.schema_version,CURRENT_SETTINGS);// newest catalog version, not a fixed pin
   await page.click('[data-action=edit]');await guard(page.waitForSelector('dialog[data-engine-settings][open]'));await page.click('[data-settings-group=agents] > summary');
   const selector='[data-setting=agent_telemetry_providers]';
@@ -32,6 +35,11 @@ function shown(){const n=++serial,r=spawnSync(cfg.binary,['engine-settings','sho
   for(const [name,v] of bounds){const u='[data-unlimited='+name+']';if(await page.$eval(u,e=>e.checked)!==(v===null))await page.click(u);if(v!==null)await page.$eval('[data-setting='+name+']',(e,x)=>{e.value=x;e.dispatchEvent(new Event('input',{bubbles:true}))},v)}
   await page.$eval('[data-setting-reason]',e=>{e.value='Telemetry providers through Admin';e.dispatchEvent(new Event('input',{bubbles:true}))});
   for(const width of [1440,390]){await page.setViewport({width,height:width===390?844:1000});await page.$eval(selector,e=>e.closest('.engine-settings-field').scrollIntoView({block:'center'}));assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:path.join(output,label+'-'+width+'.png'),fullPage:true})}
+  // A silently-refused submit (form.reportValidity() false, e.g. an unrelated
+  // required field the fixture cannot satisfy) would wait on 'preview' forever:
+  // fail fast naming the invalid field instead of hanging the whole recipe.
+  const invalid=await page.evaluate(()=>[...document.querySelectorAll('dialog[data-engine-settings] form :invalid')].map(e=>e.dataset?.setting||e.name||e.tagName));
+  assert.deepEqual(invalid,[],'form refused submit on invalid fields');
   await page.click('[data-action=confirm]');await guard(state.waitForSettingsState(page,'preview'));assert.deepEqual(shown(),before);
   await page.click('[data-action=confirm]');await guard(state.waitForSettingsState(page,'saved'));const saved=shown();assert.deepEqual(saved.values.agent_telemetry_providers,desired);for(const [name,v] of bounds)assert.equal(saved.values[name],v,name);assert.equal(saved.history.length,before.history.length+1);assert.deepEqual(saved.history.slice(0,-1),before.history);
   await page.click('[data-action=edit]');await guard(page.waitForSelector('dialog[data-engine-settings][open]'));await page.click('[data-settings-group=agents] > summary');assert.equal(await page.$eval(selector,e=>e.value),desired.join('\n'));for(const [name,v] of bounds){assert.equal(await page.$eval('[data-unlimited='+name+']',e=>e.checked),v===null,name+' reopened');if(v!==null)assert.equal(await page.$eval('[data-setting='+name+']',e=>e.value),v)}await page.keyboard.press('Escape');await guard(page.waitForFunction(()=>!document.querySelector('dialog[data-engine-settings][open]')));

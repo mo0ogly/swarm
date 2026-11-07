@@ -1102,6 +1102,46 @@ de sortie distincte) puis relance de la recette dérivée
 `.swarm-fixtures/derived-tel33b-19-24.json`. Le point ouvert mineur du 0323b
 (distinguer le 503 busy conçu) reste valable tel quel.
 
+tel33d — issue 1415 (Claude, 7 nov. 14:00-15:15) : `telemetry-admin-browser`
+**FAIL déterministe par attente infinie**, cause racine double, établie par
+sonde CDP sur la page vivante (`.cache/ev-adminbrowser-0912` puis
+`.cache/ev-adminbrowser-fix-1`, preuves conservées). (1) **Raccord harnais**
+(ma zone, corrigé) : la refonte cockpit f9ff58214 a déplacé le panneau Admin
+hors de `/` post-login (devenue sélecteur de mission) vers
+`native-runtime.html?view=admin` ; `tests/rust_telemetry_settings_ui.cjs:20`
+attendait `waitForSettingsState('loaded')` sur l'ancien layout sans délai —
+corrigé : navigation vers `native-runtime.html?view=admin` après login. (2)
+**Défaut produit, zone Codex** : le formulaire Admin refuse tout `submit`
+silencieusement (`form.reportValidity()` false) car le champ v52
+`web_authority_public_key` (introduit 8cb059831, required dès que la valeur
+courante ≠ null, règle frontend 174b89106) porte la valeur `""` des défauts
+d'installation (`engine-settings.json` v52 : `web_authority_public_key: ""`,
+mode `owner-key` où la doc produit dit « Vide seulement en mode owner-key ») ;
+`engine_settings_admin_state.cjs` attend alors `preview` sans fin. Repro
+vérifié par sonde : clic confirm → `submitFired:false`, `:invalid` =
+`web_authority_public_key` (« Please fill out this field. »), aucune requête
+réseau. Contradiction de contrat : défauts d'installation incohérents avec le
+formulaire qui exige non-vide dès que la valeur est présente (owner-key exige
+"" côté Rust web_access.rs:59 — toute sauvegarde Admin depuis l'état installé
+est impossible). Affects tout scénario Admin qui ouvre le formulaire sur un
+root frais v52. Décision produit requise (Codex) : défaut `owner-key` sans
+clé ouverte doit être traité comme valide au formulaire (champ désactivé ou
+non-required en owner-key), ou les défauts d'installation ne doivent pas
+sérialiser `""`. Le scénario telemetry-settings reste légitime tel quel
+(édite seulement agent_telemetry_providers + plafonds v33). Reprise : après
+correction produit, relance `.swarm-fixtures/derived-adminbrowser.json`
+(répertoire de sortie neuf) — le run corrigé-harnais de 14:41 a bien dépassé
+le bloqueur cockpit (captures fr-etat écrites) et s'est bloqué exactement au
+submit confirm, prouvant le raccord (1) et isolant le défaut (2). Portée
+vérifiée : tout root créé par `Fixture` (tests/rust_agent_model_route.py:107,
+`self.ok(['init'])` → défauts v52) frappé par un scénario qui soumet le vrai
+formulaire est bloqué pareillement (rust_preparation_admin_ui.cjs:36,
+rust_preparation_sources_admin_ui.cjs, rust_preparation_templates_admin_ui.cjs,
+telemetry-settings). Garde harnais ajouté (telemetry-settings) : avant chaque
+clic confirm, assert `:invalid` vide dans le formulaire, faute nommée
+immédiate au lieu d'attente infinie — ce garde échouera proprement tant que
+le défaut produit (2) subsiste.
+
 ## Limites et décisions qui conditionnent la suite
 
 - Baseline de qualification :199/review28 ; review96 du lot201 reste bloquée,
