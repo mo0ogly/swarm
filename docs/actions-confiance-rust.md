@@ -733,10 +733,34 @@ résultat vide), octets conservés. Preuves : `cargo test -p swarm-engine
 `RootStore::memory_catalog`, corruption externe `{"x":1}` refusée sans
 catalogue partiel), `cargo test -p swarm-web --test project_memory` (1, GET/
 HEAD, `?q=%C3%89TAPE` replié en `etape`, POST refusé, état inchangé),
-`cargo test -p swarm-cli --test memory` (4) ; recette permanente
-`tools/verification/recipes/versioned-memory-catalog-rust.json`. Restent
-fermés : la surface de mutation HTTP/CLI dédiée (admission, remplacement,
-retrait, sélection), le résumé extractif M20 et les droits
+`cargo test -p swarm-cli --test memory` (7) ; recette permanente
+`tools/verification/recipes/versioned-memory-catalog-rust.json`.
+
+**Surface de mutation HTTP/CLI (7 novembre 2026)** — les aperçus et commits
+mémoire sont exposés sur les deux surfaces d'opérateur, avec le contrat Go
+`projectMemoryOperation`/`projectMemoryPreview` : CLI
+`swarm-rust memory admit-preview|admit|replace-preview|replace|
+withdraw-preview|withdraw|select-preview|select WORK --root ROOT --input FILE
+[--json]` et HTTP `POST /api/v1/project-memory?action=…` (mêmes huit actions).
+L'aperçu (`-preview`) est une lecture seule : version proposée, version
+courante (remplacement/retrait), contexte projeté (sélection), usages
+impactés, jeton liant le tout, révision observée — il appelle le même
+constructeur de candidat `next_memory`, donc il refuse exactement comme le
+commit (`project-memory-source-unfresh` sur une source non fraîche, conflit
+de révision sur un travail modifié). Le commit passe par
+`RootStore::execute_external("memory.<action>")` — transaction, rejeu,
+jeton d'aperçu et gardes moteur identiques au chemin Go `mutateWithHook` —
+et rapporte l'état Work enregistré (`Recorded`/`PlanningStatePreserved`) si
+une failure d'encodage/clôture suit l'enregistrement. La sélection exige un
+jeton d'aperçu valide : absent ou forgé refuse `preview_stale` avant
+engagement. `summary-source` (M20) reste refusé `project-memory-operation-
+unported` sur les deux surfaces (usage CLI) — incrément séparé. Preuves :
+`cargo test -p swarm-cli --test memory` (7 : aperçu+commit sélection
+exécutante avec décision marquée, refus unfresh identiques aperçu/commit,
+conflit de révision typé, refus d'usage), `cargo test -p swarm-web
+--test project_memory` (2 : POST sélection preview+commit, refus unfresh
+aperçu+commit sans entrée ajoutée, refus `summary-source`/action inconnue,
+état inchangé). Restent fermés : le résumé extractif M20 et les droits
 lire/résumer/transmettre/compacter.
 
 Le verrou interprocessus historique sérialise les écritures. Une même clé ne

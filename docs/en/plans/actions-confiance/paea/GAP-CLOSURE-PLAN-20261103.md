@@ -182,8 +182,22 @@ ou d’un autre projet : admission locale requise"), R3 whole-catalog refusal
 with no partial result (external corruption `{"x":1}` as fixture). Evidence:
 engine tests 5 lib + 3 root, web 1, CLI 4; permanent recipe
 `tools/verification/recipes/versioned-memory-catalog-rust.json`; FR/EN doc
-`docs/actions-confiance-rust.md`. Still closed: the dedicated HTTP/CLI
-mutation surface (admit, replace, withdraw, select), extractive
+`docs/actions-confiance-rust.md`.
+
+G2 HTTP/CLI mutation tranche (same day): the eight preview/commit
+subcommands (admit, replace, withdraw, select and their `-preview`) are
+exposed on the CLI (`swarm-rust memory … WORK --root ROOT --input FILE`) and
+HTTP (`POST /api/v1/project-memory?action=…`). The preview reads the
+candidate through the same `next_memory` (refusals identical to the commit,
+notably `project-memory-source-unfresh` and the revision conflict); the
+commit runs through `execute_external("memory.<action>")` (transaction,
+replay, preview token, guards) and reports the recorded state. Selection
+requires the preview token (`preview_stale` otherwise). `summary-source`
+stays refused unported (M20, separate increment). Evidence: CLI 7 tests
+(preview+commit selection with the stamped decision, identical unfresh
+refusals preview/commit, typed conflict, usage), web 2 tests (POST selection
+preview+commit, unfresh refusals with no entry added, unported, state
+unchanged); recipe updated 4→7 CLI and 1→2 web. Still closed: extractive
 summarization M20, read/summarize/transmit/compact rights.
 
 ## Discovery D03 — Rust test fixtures under /tmp (operator interdiction)
@@ -281,6 +295,15 @@ Still open (class 2, not handled here): ~153 `tempfile::tempdir()` /
 discovery consigned for a later wave — same target idiom (`fixture_root`),
 producer to attach to the enrollment lot. The BF-16b diagnostic fixture under
 /tmp remains preserved for its owner.
+Fixed within our own batches (7 November 2026): the CLI test
+`rust/crates/swarm-cli/tests/memory.rs` born from the catalog tranche used
+`TempDir::new()` (class-2 idiom) and created `.tmpXXXX` entries under /tmp on
+every run — noticed by scanning /tmp directories newer than the test window,
+orphans removed after timestamp identification. Migrated in place:
+`swarm_engine::fixture_root("cli-memcat-")` plus a `remove_dir_all` cleanup
+at test end (failure kept for diagnosis, `settings_output.rs` convention);
+the web tests of the same batch already used `fixture_root`. Re-verified:
+7/7 green, no new `.tmp` under /tmp during a full run.
 
 ### Verified lessons from the resumption (6 November 2026, D03 scope)
 

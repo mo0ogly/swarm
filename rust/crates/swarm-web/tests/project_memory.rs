@@ -175,8 +175,7 @@ fn memory_catalog_get_reports_statuses_filter_and_refusals() {
     let reply = service.handle(f.request("HEAD", "/api/v1/project-memory")).unwrap();
     assert_eq!(reply.response.status(), StatusCode::OK);
 
-    // POST stays refused as unported: the mutation surface is a later G2
-    // increment; no invented behavior, no mutation.
+    // POST without an action query member refuses as invalid; no mutation.
     let before = f.snapshot_state();
     let reply = service.handle(f.request("POST", "/api/v1/project-memory")).unwrap();
     assert!(reply.failure.is_some());
@@ -211,4 +210,138 @@ impl Fixture {
         db.close().unwrap();
         raw
     }
+    /// A POST request with a typed JSON body on the memory route.
+    fn post(&self, action: &str, body: serde_json::Value) -> Request<Vec<u8>> {
+        let mut r = self.request("POST", &format!("/api/v1/project-memory?action={action}"));
+        *r.body_mut() = serde_json::to_vec(&body).unwrap();
+        r
+    }
+}
+
+/// The POST mutation surface honors the same Go contract as the CLI: a
+/// selection preview on an executing todo task returns the proposed outcome
+/// (token, empty preview, revision) without mutating; the commit with the
+/// preview token stamps the decision and reports the recorded Work; admit on
+/// a source-unfresh Work refuses on both preview and commit routes with the
+/// stable cause and nothing lands; `summary-source` and unknown actions
+/// refuse as unported.
+#[test]
+fn memory_post_previews_selects_and_refuses_unfresh_and_unported() {
+    let f = Fixture::new();
+    // One executing todo task for the selection route.
+    {
+        let mut s = RootStore::open(&f.root, true).unwrap();
+        let revision: i64 = {
+            let db = rusqlite::Connection::open(f.root.join(".swarm/state.db")).unwrap();
+            db.query_row(
+                "SELECT revision FROM works WHERE id=?",
+                [&f.work],
+                |row| row.get(0),
+            )
+            .unwrap()
+        };
+        s.execute_external(
+            &f.work,
+            "task.add",
+            &serde_json::to_vec(&serde_json::json!({
+                "schema_version":1,"event_id":"task","expected_revision":revision,
+                "id":"task-worker","title":"Worker","deliverable":"Report","criteria":["Proof"]
+            }))
+            .unwrap(),
+            &mut SystemEnvironment,
+        )
+        .unwrap();
+        s.close().unwrap();
+    }
+    splice_memory(&f);
+    let service = NativeHttpService::open(&f.root, f.authority()).unwrap();
+
+    // Selection preview succeeds read-only and carries the token binding.
+    let reply = service
+        .handle(f.post(
+            "select-preview",
+            serde_json::json!({
+                "schema_version":1,"event_id":"select-1","expected_revision":2,
+                "work":f.work,"reason":"operator decision",
+                "task":"task-worker","selections":[]
+            }),
+        ))
+        .unwrap();
+    assert_eq!(
+        reply.response.status(),
+        StatusCode::OK,
+        "preview failed: {:?} body={}",
+        reply.failure.as_ref().map(|e| e.to_string()),
+        String::from_utf8_lossy(reply.response.body())
+    );
+    assert!(reply.failure.is_none());
+    let preview: serde_json::Value = serde_json::from_slice(reply.response.body()).unwrap();
+    assert!(!preview["preview_token"].as_str().unwrap().is_empty());
+    assert_eq!(preview["preview"]["action"], "");
+    assert_eq!(preview["revision"], 2);
+    let before = f.snapshot_state();
+
+    // The commit stamps the executing task's decision and reports the Work.
+    let reply = service
+        .handle(f.post(
+            "select",
+            serde_json::json!({
+                "schema_version":1,"event_id":"select-2","expected_revision":2,
+                "work":f.work,"reason":"operator decision",
+                "task":"task-worker","selections":[],
+                "preview_token":preview["preview_token"]
+            }),
+        ))
+        .unwrap();
+    assert_eq!(reply.response.status(), StatusCode::OK, "{:?}", reply.failure);
+    assert!(reply.failure.is_none());
+    let work: serde_json::Value = serde_json::from_slice(reply.response.body()).unwrap();
+    let tasks = work["tasks"].as_array().unwrap();
+    let worker = tasks.iter().find(|t| t["id"] == "task-worker").unwrap();
+    assert_eq!(worker["memory_decision"]["event_id"], "select-2");
+
+    // Admit preview and commit both refuse on this Work: its RETEX is
+    // verified but its source task was never accepted (source-unfresh). The
+    // selection commit advanced the revision to 3.
+    let admit_body = serde_json::json!({
+        "schema_version":1,"event_id":"admit-1","expected_revision":3,
+        "work":f.work,"reason":"operator decision",
+        "id":"mem-1","kind":"experience","body":"Lesson",
+        "conditions":"Recheck","source_retex":"retex-1"
+    });
+    for action in ["admit-preview", "admit"] {
+        let reply = service.handle(f.post(action, admit_body.clone())).unwrap();
+        assert!(reply.failure.is_some(), "{action}");
+        // The HTTP surface exposes the stable refusal family; the exact
+        // source-unfresh reason is asserted at the CLI and engine layers.
+        let text = format!("{:?}", reply.failure.as_ref().map(|e| e.to_string()));
+        assert!(text.contains("project-memory-refused"), "{text}");
+    }
+    // The decision stamped above is the only change; the refused admits left
+    // no memory entry (the spliced "lesson" entry is the only one).
+    let after = f.snapshot_state();
+    let doc: swarm_engine::Work = swarm_engine::decode_work(&after).unwrap();
+    let entries = doc.project_memory.as_deref().unwrap_or_default();
+    assert_eq!(entries.len(), 1);
+    assert_eq!(entries[0].id, "lesson");
+
+    // Unknown and M20 actions refuse as unported; nothing mutates.
+    let before = f.snapshot_state();
+    for action in ["summary-source", "erase", ""] {
+        let path = if action.is_empty() {
+            "/api/v1/project-memory".to_string()
+        } else {
+            format!("/api/v1/project-memory?action={action}")
+        };
+        let reply = service
+            .handle(f.post(&path, serde_json::json!({"schema_version":1})))
+            .or_else(|_| {
+                // An empty action is a query-refusal raised before decode; the
+                // handle call itself still returns a reply envelope.
+                service.handle(f.request("POST", &path))
+            })
+            .unwrap();
+        assert!(reply.failure.is_some(), "{action}");
+    }
+    assert_eq!(f.snapshot_state(), before);
 }

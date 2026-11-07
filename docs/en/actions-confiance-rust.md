@@ -703,8 +703,33 @@ external corruption `{"x":1}` refused with no partial catalog),
 `cargo test -p swarm-web --test project_memory` (1, GET/HEAD,
 `?q=%C3%89TAPE` folded to `etape`, POST refused, state unchanged),
 `cargo test -p swarm-cli --test memory` (4); permanent recipe
-`tools/verification/recipes/versioned-memory-catalog-rust.json`. Still closed:
-the dedicated HTTP/CLI mutation surface (admit, replace, withdraw, select),
+`tools/verification/recipes/versioned-memory-catalog-rust.json`.
+
+**HTTP/CLI mutation surface (7 November 2026)** — memory previews and commits
+are exposed on both operator surfaces with the Go
+`projectMemoryOperation`/`projectMemoryPreview` contract: CLI
+`swarm-rust memory admit-preview|admit|replace-preview|replace|
+withdraw-preview|withdraw|select-preview|select WORK --root ROOT --input FILE
+[--json]` and HTTP `POST /api/v1/project-memory?action=…` (the same eight
+actions). The preview (`-preview`) is read-only: proposed version, current
+version (replace/withdraw), projected context (selection), affected uses, the
+token binding them all, observed revision — it calls the same `next_memory`
+candidate builder, so it refuses exactly like the commit
+(`project-memory-source-unfresh` on an unfresh source, typed revision
+conflict on a changed Work). The commit runs through
+`RootStore::execute_external("memory.<action>")` — transaction, replay,
+preview-token binding and engine guards identical to the Go `mutateWithHook`
+route — and reports the recorded Work state (`Recorded`/
+`PlanningStatePreserved`) when an encode/close failure follows the commit.
+Selection requires a valid preview token: absent or forged refuses
+`preview_stale` before engagement. `summary-source` (M20) stays refused
+`project-memory-operation-unported` on both surfaces (CLI usage) — a separate
+increment. Evidence: `cargo test -p swarm-cli --test memory` (7: preview+
+commit selection on an executing task with the stamped decision, identical
+unfresh refusals preview/commit, typed revision conflict, usage refusals),
+`cargo test -p swarm-web --test project_memory` (2: POST selection
+preview+commit, unfresh refusals preview+commit with no entry added,
+`summary-source`/unknown-action refusals, state unchanged). Still closed:
 extractive summarization (M20) and read/summarize/transmit/compact rights.
 
 The historical interprocess flock serializes writes. One idempotency key creates

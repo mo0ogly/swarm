@@ -217,9 +217,23 @@ autre projet : admission locale requise »), R3 refus global sans catalogue
 partiel (corruption externe `{"x":1}` en fixture). Preuve : tests moteur 5 lib
 + 3 racine, web 1, CLI 4 ; recette permanente
 `tools/verification/recipes/versioned-memory-catalog-rust.json` ; doc FR/EN
-`docs/actions-confiance-rust.md`. Restent fermés : surface de mutation
-HTTP/CLI dédiée (admission, remplacement, retrait, sélection), résumé
-extractif M20, droits lire/résumer/transmettre/compacter.
+`docs/actions-confiance-rust.md`.
+
+Tranche G2 mutation HTTP/CLI (même jour) : les huit sous-commandes
+aperçu/commit (admit, replace, withdraw, select et leurs `-preview`) sont
+exposées en CLI (`swarm-rust memory … WORK --root ROOT --input FILE`) et en
+HTTP (`POST /api/v1/project-memory?action=…`). L'aperçu lit le candidat via
+le même `next_memory` (refus identiques au commit, notamment
+`project-memory-source-unfresh` et le conflit de révision) ; le commit passe
+par `execute_external("memory.<action>")` (transaction, rejeu, jeton
+d'aperçu, gardes) et rapporte l'état enregistré. La sélection exige le jeton
+d'aperçu (`preview_stale` sinon). `summary-source` reste refusé unported
+(M20, incrément séparé). Preuve : CLI 7 tests (aperçu+commit sélection avec
+décision marquée, refus unfresh identiques aperçu/commit, conflit typé,
+usage), web 2 tests (POST sélection preview+commit, refus unfresh sans
+entrée ajoutée, unported, état inchangé) ; recette mise à jour 4→7 CLI et
+1→2 web. Restent fermés : résumé extractif M20, droits
+lire/résumer/transmettre/compacter.
 
 ## Découverte D03 — fixtures de tests Rust sous /tmp (interdiction opérateur)
 
@@ -321,6 +335,16 @@ Reste ouvert (classe 2, non traitée ici) : ~153 sites `tempfile::tempdir()` /
 découverte consignée pour une vague suivante — même idiome cible
 (`fixture_root`), producteur à rattacher au lot enrollment. La fixture
 diagnostique BF-16b sous /tmp reste préservée pour son propriétaire.
+Correction dans nos propres lots (7 novembre 2026) : le test CLI
+`rust/crates/swarm-cli/tests/memory.rs` né de la tranche catalogue utilisait
+`TempDir::new()` (idiome classe 2) et créait des `.tmpXXXX` sous /tmp à chaque
+exécution — constaté par balayage des répertoires /tmp postérieurs à la
+fenêtre de test, orphelins retirés après identification des horodatages.
+Migration faite sur place : `swarm_engine::fixture_root("cli-memcat-")` +
+nettoyage `remove_dir_all` en fin de test (échec conservé pour diagnostic,
+convention `settings_output.rs`) ; les tests web du même lot utilisaient déjà
+`fixture_root`. Re-vérifié : 7/7 au vert, aucun nouveau `.tmp` sous /tmp
+pendant une exécution complète.
 
 ### Leçons vérifiées de la reprise (6 novembre 2026, portée D03)
 
