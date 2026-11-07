@@ -1041,6 +1041,32 @@ telemetry-admin-browser, id live-monitor-native-derived-tel33b) lancée sur
 `.cache/ev-tel33b-derived-0323` ; les étapes 5–17 restent derrière le blocage
 de compilation Codex.
 
+tel33d (Claude, 7 nov. 09:12, arbre propre HEAD 1265081eb, RAM 5,3 Go dispo) :
+requalification des étapes 19–24 après deux interruptions d'exploitation —
+0323 arrêté par mon propre tuyau `head -5` sur la sortie du run
+(BrokenPipeError à la 6ᵉ ligne de progression ; 3 étapes PASS conservées :
+web-rustdoc 82 s, binary-build 119 s, token-fixture-build 63 s) puis 0323b
+FAIL étape 4 `browser-live` à 57 s. Diagnostic 0323b qualifié : les 32 checks
+UI des deux passes (fr-etat, en-sombre) sont PASS ; l'assertion finale
+`problems: []` (rust_native_live_ui.cjs:342) échoue sur un seul 503
+`POST /api/v1/live/alerts/evaluate` sur 774 requêtes (770×200). Le code côté
+serveur enregistré pour cette réponse est `telemetry-store-unavailable`
+(preuve `.cache/live-monitor-browser-evidence/live-ui-73xb6zm8`,
+live-native-records.json : erreurs {telemetry-store-unavailable: 1}) — ce
+n'est PAS le refus `telemetry-store-busy` documenté comme conçu dans
+`evaluate_alerts` (service/live.rs:1406 : busy timeout 0, l'UI retente une
+fois, live.js:273) que le harnais devrait distinguer. La classification
+serveur (tout défaut SQL/IO non-busy → unavailable, otel.rs:104 → 503) est
+conforme à son contrat ; le harnais a raison de compter un 503 non
+`web-workers-saturated` comme problème. Cause probable : défaut IO/SQL
+transitoire sous la contention du 0323b (disque 87 %, modifications concurrentes
+Codex, 9 fenêtres navigateur + captures) ; requalification en cours sur arbre
+propre (`.cache/ev-tel33b-derived-0912`). Le harnais ne tolère aujourd'hui que
+le corps `web-workers-saturated` (cjs:21) ; si le 503 busy conçu devait
+survenir, distinguer le corps JSON `{"error":"telemetry-store-busy"}` du 503
+unavailable serait le raccord à ouvrir (zone tests/rust_native_live_ui.cjs +
+web/live.js, mineure).
+
 ## Limites et décisions qui conditionnent la suite
 
 - Baseline de qualification :199/review28 ; review96 du lot201 reste bloquée,
