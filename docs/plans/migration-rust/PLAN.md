@@ -1067,6 +1067,39 @@ survenir, distinguer le corps JSON `{"error":"telemetry-store-busy"}` du 503
 unavailable serait le raccord à ouvrir (zone tests/rust_native_live_ui.cjs +
 web/live.js, mineure).
 
+tel33d — issue 0912 (Claude, 7 nov. 10:0x, qualifications vérifiées) : (1)
+`browser-live` **PASS** en conditions normales (arbre propre, 83 s) — la
+requalification confirme l'hypothèse : le 503 `unavailable` du 0323b était
+transitoire sous contention, pas un défaut serveur. (2) `telemetry-launch-e2e`
+**FAIL** déterministe, cause racine établie par le journal de complétion
+(`.swarm-fixtures/swarm-cli-http97-qslswgwu/.swarm/native-completion-2871652a83beabd9929d98edfe1c930d7d08b655edd1de8f140d6f9d5365cf33.json`) :
+refus **pré-exec** `biba-workspace-overlaps-root`, chaîne
+`agent-telemetry-after-token-failed ← telemetry-token-issued ← biba-workspace-overlaps-root`.
+Mécanisme : un agent opérateur lancé sans champ `workspace` (cas du test E2E
+LIVE-UX-03, `agent prepare` sans workspace) reçoit par défaut
+`workspace = Racine` (agent_launch_preflight.rs:89-93 : vide → root) ; le
+preflight de lancement l'accepte, puis à l'exécution `biba::prepare` refuse
+`root.starts_with(&path)` avec égalité (swarm-biba-linux/src/lib.rs:80) → aucun
+exec du fournisseur. Effets observés, tous cohérents : jeton télémétrie par
+tentative émis avant le refus (INSERT engagé), aucune connexion acceptée par le
+serveur web (telemetry-web-records.json : accepted_connections 0), ni
+provider-proof.json ni codex-proof.json, exit helper 2, et les 528 octets
+d'erreur JSON de la CLI (stderr fusionné dans le tuyau stdout par
+validation_run.rs:452-465) deviennent `first_event_error =
+agent-guard-input-invalid` / `degraded: MalformedEvent` — cosmétique, le journal
+enregistre correctement pre_exec_failure et les trames de canal privé. Premier
+run enregistré de cette E2E (aucun PASS/FAIL antérieur en local ni sur USB) :
+jamais passée ; conflit de contrat déterministe entre le défaut de lancement
+(workspace = Racine, parité Go) et la frontière I0 à l'exec (workspace distinct
+de la Racine exigée). Périmètre moteur : agent_launch_preflight.rs,
+agent_execution_gate.rs, biba — **zone Codex** ; le scénario du test (lancement
+opérateur au défaut) est légitime et ne doit pas être masqué par un workspace
+explicite. Reprise conditionnée à la décision produit (refuser workspace=Racine
+au lancement avec un code clair, ou admettre l'égalité à l'exec avec une feuille
+de sortie distincte) puis relance de la recette dérivée
+`.swarm-fixtures/derived-tel33b-19-24.json`. Le point ouvert mineur du 0323b
+(distinguer le 503 busy conçu) reste valable tel quel.
+
 ## Limites et décisions qui conditionnent la suite
 
 - Baseline de qualification :199/review28 ; review96 du lot201 reste bloquée,
