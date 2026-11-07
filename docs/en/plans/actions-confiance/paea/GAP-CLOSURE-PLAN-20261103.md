@@ -252,6 +252,43 @@ an explicit TMPDIR) together with migrating the sites; one known producer:
    pre-correction baseline — nothing from D02/D03 turns red. Diagnosis took
    2 minutes; the full re-run beat the dissection — qualify by re-run
    before opening a topic.
+4. **USB archive move → recipes declaring relocated fixtures**: the
+   4 November USB archival relocated
+   `source-fixture-writer78b-regen/result.json` (declared input, line 19 of
+   `tools/verification/recipes/paea-git-call-web-rust.json`), which would
+   have refused the recipe at launch (exit 2, empty input). On 7 November
+   both declared paths were restored from the Lexar archive (single-member
+   `tar -xOf` extraction, JSON validated, 0700 dir), and the full
+   contractual recipe passes again: PASS 3/3 steps, `verify` integrity
+   VERIFIED. Evidence on the key:
+   `preuves/swarm/20261107-paea-git-call-web-rust/` (local index
+   `.swarm-fixtures/INDEX-USB-PREUVES.md`). Lesson: after any evidence move
+   to the key, re-run the affected recipes — a missing declared input is a
+   launch refusal, not a test failure; never infer a recipe's health from a
+   half-restored fixture.
+5. **Actual restoration scope after the USB archival**: a sweep of the 391
+   recipes found 163 declared paths missing (many pre-existing outside the
+   USB move: `tests/rust_*.py` globs, migration-rust 20261022 evidence);
+   15 declarations stemmed from the USB move, spread over 8 recipes and 3
+   additional fixtures (`consent-fixture-regen-20261031c`,
+   `chain-fixture-regen-20261031b`,
+   `source-fixture-current-pub-regen-20261031`). The restoration contract,
+   established by failure: `result.json` alone is not enough — the `born()`
+   tests also require the `native/inspection/workers/planning/setup/
+   owned-root-*.json` witness (full `native/` tree extraction, 572-932
+   files per fixture). All 8 repaired recipes pass again (promote 2/2,
+   payment-agreement 4/4, effect-reconcile 5/5, consent-ui 10/10 with a real
+   browser, transfer-call-cli 8/8, transfer-reconcile 4/4, source-acquisition
+   5/5, source-context 6/6, current-managed-git-publication 4/4 — the latter
+   expects its fixture via an explicit launch env, README:2341, not declared
+   in the JSON). Separately, `paea-delivered-chain-cli-rust` pins the
+   delivered binary SHA: after the v341 install (8704ab44…), all 3
+   occurrences were re-pinned (env + required_stdout witnesses), following
+   the 8a946aafd pattern. Finally, the D02 writing had introduced two
+   intra-doc links to `MemoryError::Refused`/`Row` in a public docstring
+   (`decode_project_memory_request`) that failed the `-D warnings` rustdoc
+   step of 18 recipes — links converted to text (project_memory.rs), rustdoc
+   green again, proven by the rustdoc steps of the recipes above.
 
 Same-author consistency review: C01…C11 mapped, existing PA IDs retained, acyclic
 dependencies and H1…H4 owners explicit. Ready for selection as local work;

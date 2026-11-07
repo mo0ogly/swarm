@@ -1009,6 +1009,38 @@ changement de signature BF-16a en cours de Codex (`preparation_read.rs`
 modifié à l'instant) — fichiers consommateurs non raccordés, propriétaire Codex.
 Run complet tel33 relancé ; recette dérivée attendue si Clippy bloque encore.
 
+tel33b (Claude, 7 nov. 00:49, après commit global 13d4ff5bc et lot Codex
+af513a417) : tué par le système à 12,1 Go RAM utilisés / swap 9,3 Go pendant
+l'étape 5 ; étapes 1–4 partielles sans result.json (preuve conservée
+`.cache/ev-tel33-181951`). Cause amont diagnostiquée : boucle `git maintenance
+--auto` — chaque repack cruft (~3 Go, 4,9 Go RSS, >45 min) tué par la pression
+mémoire laissait son `.tmp-<PID>-pack-*` orphelin (7 cycles depuis le 2 nov.,
+14,3 Go de débris + tmp_pack 2,84 Go). Ménage du 7 nov. : tmp-packs orphelins
+et poubelle git retirés (garde PID vivant, verrou, ~17 Go), `git fsck
+--connectivity-only` propre. La saturation disque à 34 Mo libres pendant un
+build concurrent (proc-macro2) a évité l'ENOSPC de justesse ; `rust/target`
+(61→2,4 Go) a ensuite été purgé par un autre acteur à 01:44. Nouveau test
+durant le run complet de reprise : voir tel33c.
+
+tel33c (Claude, 7 nov. 02:49, préconditions réunies : HEAD af513a417, arbre
+propre, disque 75 Go, RAM 3,7 Go dispo, 0 build concurrent) : FAIL étape 4
+`engine-live-read-unit` exit 101, deux causes séparées. (1) Nouveau :
+`agent_supervision::pending_gate_observes_stop_without_heartbeat_writes`
+FAILED (`agent_supervision.rs:662` assertion `control.ack_eof`) pendant le
+run, 64 passed/1 failed ; repro isolé sous l'env exact de la recette (8 runs,
+mêmes CARGO_TARGET_DIR/CARGO_INCREMENTAL) : 8/8 ok. Module inchangé depuis le
+24 oct. (b76e934b3). Hypothèse qualifiée : instabilité sous contention (disque
+momentanément à 34 Mo libres pendant la compilation du run) ; à requalifier
+sur run en conditions normales, défaut read_gate à ouvrir si récidive —
+propriétaire Codex (module). (2) Connue et toujours non raccordée : 8+ E0061
+`preparation_show(&p.id)` sans `reader_token` (tests preparation_plan.rs —
+29:21, 37:76 — et preparation_writes.rs), BF-16a, dernier commit consommateur
+Codex af513a417 sans raccord ; bloque la compilation `--tests` donc toutes
+les étapes suivantes. Recette dérivée étapes 19–24 (web-rustdoc →
+telemetry-admin-browser, id live-monitor-native-derived-tel33b) lancée sur
+`.cache/ev-tel33b-derived-0323` ; les étapes 5–17 restent derrière le blocage
+de compilation Codex.
+
 ## Limites et décisions qui conditionnent la suite
 
 - Baseline de qualification :199/review28 ; review96 du lot201 reste bloquée,

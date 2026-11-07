@@ -291,6 +291,43 @@ que la migration des sites, producteur connu identifié : `tests/trust_biba.rs:7
    préexistant BF-16b), soit la ligne de base d'avant corrections — aucun
    élément de D02/D03 ne rougit. Le diagnostic a coûté 2 minutes ; la re-run
    complète valant la dissection, qualifier par re-run avant d'ouvrir un sujet.
+4. **Rupture d'archive USB → recettes déclarant des fixtures déplacées** :
+   l'archivage USB du 4 novembre a déplacé
+   `source-fixture-writer78b-regen/result.json` (input déclaré ligne 19 de
+   `tools/verification/recipes/paea-git-call-web-rust.json`), ce qui aurait
+   fait refuser la recette (exit 2, input vide). Le 7 novembre, les deux
+   chemins déclarés sont restaurés depuis l'archive Lexar (extraction
+   `tar -xOf` d'un seul membre, JSON validé, dir 0700), et la recette
+   contractuelle complète repasse : PASS 3/3 pas, `verify` integrity
+   VERIFIED. Preuve sur clé : `preuves/swarm/20261107-paea-git-call-web-rust/`
+   (index local `.swarm-fixtures/INDEX-USB-PREUVES.md`). Leçon : après tout
+   déplacement de preuves vers la clé, relancer les recettes touchées — un
+   input déclaré manquant est un refus au lancement, pas un échec de test ;
+   ne pas déduire la santé d'une recette d'une fixture restaurée à moitié.
+5. **Portée réelle de la restauration après archivage USB** : un balayage des
+   391 recettes a trouvé 163 chemins déclarés absents (dont beaucoup
+   préexistants hors du déplacement USB : globs `tests/rust_*.py`, preuves
+   migration-rust 20261022) ; 15 déclarations relevaient du déplacement USB,
+   réparties sur 8 recettes et 3 fixtures supplémentaires
+   (`consent-fixture-regen-20261031c`, `chain-fixture-regen-20261031b`,
+   `source-fixture-current-pub-regen-20261031`). Contrat de restauration
+   établi par échec : `result.json` seul ne suffit pas — les tests
+   `born()` exigent aussi le témoin `native/inspection/workers/planning/
+   setup/owned-root-*.json` (extraction de l'arborescence `native/`
+   complète, 572-932 fichiers par fixture). Les 8 recettes réparées ont
+   toutes repassé (promote 2/2, payment-agreement 4/4, effect-reconcile 5/5,
+   consent-ui 10/10 avec navigateur réel, transfer-call-cli 8/8,
+   transfer-reconcile 4/4, source-acquisition 5/5, source-context 6/6,
+   current-managed-git-publication 4/4 — celle-ci attend son fixture par env
+   explicite au lancement, README:2341, non déclaré dans le JSON).
+   Par ailleurs la recette `paea-delivered-chain-cli-rust` épingle le SHA du
+   binaire livré : après l'installation v341 (8704ab44…), re-pin des 3
+   occurrences (env + témoins required_stdout), motif du commit 8a946aafd.
+   Enfin la rédaction D02 avait introduit deux liens intra-doc vers
+   `MemoryError::Refused`/`Row` dans une docstring publique
+   (`decode_project_memory_request`) qui échouaient au pas rustdoc
+   `-D warnings` de 18 recettes — liens convertis en texte (project_memory.rs),
+   rustdoc à nouveau vert, prouvé par les pas rustdoc des recettes ci-dessus.
 
 ## Revue et état de clôture
 

@@ -951,9 +951,9 @@ fn request_shape() -> crate::model_wire::Fields {
 ///
 /// # Errors
 ///
-/// [`MemoryError::Refused`] with Go's message semantics on schema, identity,
+/// `MemoryError::Refused` with Go's message semantics on schema, identity,
 /// unknown action, transport overflow or per-action shape violations;
-/// [`MemoryError::Row`] retains the decode cause.
+/// `MemoryError::Row` retains the decode cause.
 pub fn decode_project_memory_request(
     raw: &[u8],
     action: &str,
