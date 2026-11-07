@@ -436,3 +436,55 @@ d'une équipe tierce par le commanditaire (H3). La préparation locale
 indépendante que le graphe n'interdit pas (dossier de revue G6, contrats
 T01…T22) appartient au lot G6 « préparer E3 » et reste ouverte à la
 désignation des tiers ; aucun travail G7 n'est entrepris sans elle.
+
+## Suivi du 7 novembre (fin) — Matrice d'invariants du 29 octobre : I15 et I17 refermés depuis génération
+
+La matrice
+[`invariant-matrix.json`](../paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json)
+(générée 2026-10-29T20:31:00Z, désignée par APEX « source unique de l'état
+détaillé ») est antérieure aux preuves des 3-7 novembre. Le fichier historique
+n'est pas réécrit (préservation des preuves) ; la présente note fait foi comme
+delta vérifié, rattaché à des preuves existantes :
+
+- **I17 — Révocation au service : l'écart local est refermé.** La
+  `recommended_next_bounded_task` de la matrice (« répliquer le test de
+  révocation promote sur le chemin settlement-call du même ELF désigné ») est
+  réalisée : settlement-run-19 étape 3
+  `settlement-cli-delivered-revoked-current-authority-refuses-then-recovers`
+  PASS sur le binaire livré dev.343 `a0721124…` (recette
+  `paea-delivered-settlement-cli-rust`, 7/7 PASS, `recipe.py verify` →
+  VERIFIED, preuve `.swarm-fixtures/g1-livraison-20261107/settlement-run-19/`).
+- **I15 — Outillage : l'écart local est refermé, sur deux voies.** La
+  `gap_action` de la matrice (« substitution réelle d'outil → réadmission
+  forcée, PA-07/T15/T20 ») est couverte par (a) l'Incrément101 : mutation
+  d'un artefact fournisseur réellement admis refusée avant consommation
+  (`agent-execution-preflight-changed`), recette permanente
+  `paea-i15-tool-substitution-rust.json` VERIFIED ; (b) l'Incrément103 :
+  liaison réelle `tool_manifest_digest` settlement — mutation d'un outil
+  déclaré après publication refusée `paea-settlement-business-intent-conflict`
+  (observation Known conservée, zéro nouvel effet), recette permanente
+  `paea-i15-manifest-binding-rust.json` VERIFIED ; la voie A (consommation
+  d'outils dans settlement) est structurellement refusée — settlement ne
+  consomme aucun outil, le raccord manquant est l'absence de consommateur,
+  pas un hook manquant.
+
+Classement résiduel après ces refermetures (aucune classe ni `gap_action`
+d'origine modifiée dans le fichier historique) :
+
+- **verification_manquante restante (I01, I03, I04, I05, I08, I09, I12, I16)**
+  : chaque invariant garde sa preuve locale de recette, mais l'écart résiduel
+  exige un prérequis non local — identité authentifiée réelle (IA3) et
+  approbateur réel (PA-08) pour I01/I04/I05/I12 ; provenance d'exécution
+  (raccord mémoire G2 + IA3) pour I03 ; cumul distribué (T09) pour I08 et
+  scénario composé deux domaines pour I16, hors portée locale. La partie
+  unicité au niveau fixture de I08 est déjà prouvée (run-19 étape 4,
+  contention deux instances à termes identiques → effet unique).
+- **prerequis_humain_os_reel (I02, I06, I07, I10, I13)** inchangées — IA3,
+  approbateur humain réel, secrets réels, oracle egress.
+- **I11 (acceptation_externe, 0/17) et I14 (conception_code_manquant)**
+  inchangées.
+
+Conséquence de préparation G6 : une matrice régénérée datée sera un livrable
+du dossier de revue G6 (au moment de la désignation des tiers) ; en attendant,
+la présente note tient le rôle de delta entre la matrice du 29 octobre et
+l'état courant, et APEX doit être lu avec ce delta.

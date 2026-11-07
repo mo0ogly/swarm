@@ -352,3 +352,52 @@ sponsor's appointment of an evaluator and a separate implementation team
 (H3). The local-independent preparation the DAG does not forbid (G6 review
 package, T01…T22 contracts) belongs to lot G6 "prepare E3" and stays open
 pending the tier designation; no G7 work is undertaken without it.
+## 7 November follow-up (end) — 29 October invariant matrix: I15 and I17 closed since generation
+
+The matrix
+[`invariant-matrix.json`](../../../../plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json)
+(generated 2026-10-29T20:31:00Z, designated by APEX as the "single source of
+detailed state") predates the 3–7 November evidence. The historical file is
+not rewritten (evidence preservation); this note is the verified delta,
+anchored to existing evidence:
+
+- **I17 — Revocation at service: the local gap is closed.** The matrix's
+  `recommended_next_bounded_task` ("replicate the promote revocation test on
+  the settlement-call path of the same designated ELF") is done: settlement-run-19
+  step 3 `settlement-cli-delivered-revoked-current-authority-refuses-then-recovers`
+  PASS on the delivered binary dev.343 `a0721124…` (recipe
+  `paea-delivered-settlement-cli-rust`, 7/7 PASS, `recipe.py verify` →
+  VERIFIED, evidence `.swarm-fixtures/g1-livraison-20261107/settlement-run-19/`).
+- **I15 — Tooling: the local gap is closed, on two paths.** The matrix's
+  `gap_action` ("real tool substitution → forced re-admission, PA-07/T15/T20")
+  is covered by (a) Increment101: mutation of a really admitted provider
+  artifact refused before consumption
+  (`agent-execution-preflight-changed`), permanent recipe
+  `paea-i15-tool-substitution-rust.json` VERIFIED; (b) Increment103: real
+  settlement `tool_manifest_digest` binding — mutation of a declared tool
+  after publication refused `paea-settlement-business-intent-conflict`
+  (Known observation retained, zero new effect), permanent recipe
+  `paea-i15-manifest-binding-rust.json` VERIFIED; Route A (tool consumption
+  inside settlement) is structurally refused — settlement consumes no tools,
+  the missing link is the absence of a consumer, not a missing hook.
+
+Residual classification after these closures (no original class or
+`gap_action` modified in the historical file):
+
+- **Remaining verification_manquante (I01, I03, I04, I05, I08, I09, I12,
+  I16)**: each invariant keeps its recipe-level local proof, but the residual
+  gap requires a non-local prerequisite — real authenticated identity (IA3)
+  and real approver (PA-08) for I01/I04/I05/I12; execution provenance (memory
+  integration G2 + IA3) for I03; distributed accumulation (T09) for I08 and a
+  composed two-domain scenario for I16, outside local scope. The fixture-level
+  uniqueness part of I08 is already proven (run-19 step 4, two-instance
+  contention with identical terms → single effect).
+- **prerequis_humain_os_reel (I02, I06, I07, I10, I13)** unchanged — IA3,
+  real human approver, real secrets, egress oracle.
+- **I11 (acceptation_externe, 0/17) and I14 (conception_code_manquant)**
+  unchanged.
+
+G6 preparation consequence: a regenerated, dated matrix will be a deliverable
+of the G6 review package (at the time of the tier designation); until then,
+this note serves as the delta between the 29 October matrix and the current
+state, and APEX must be read with this delta.
