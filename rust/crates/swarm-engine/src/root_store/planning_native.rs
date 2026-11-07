@@ -1985,9 +1985,7 @@ mod tests {
     #[test]
     fn pending_gate_defers_parent_provider_lock_but_eof_keeps_validation() {
         use std::{fs, os::unix::fs::PermissionsExt};
-        let path=std::env::temp_dir().join(crate::generate_identifier("swarm-gate184-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path,fs::Permissions::from_mode(0o700)).unwrap();
+        let path=crate::fixture_root("swarm-gate184-");
         eprintln!("Owned provider-gate fixture {}",path.display());
         let store=RootStore::initialize(&path,&mut crate::SystemEnvironment).unwrap();
         let probe=|| store.directory.reserve_provider_configuration().map_err(E::Storage)?.close().map_err(E::Storage);

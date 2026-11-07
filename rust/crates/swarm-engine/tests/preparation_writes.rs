@@ -2,15 +2,13 @@
 //! Public CLI refuses extra schema objects before commands; this retained-Root
 //! fixture injects only test SQL after a valid open, never a live mission DB.
 use swarm_engine::{RootStore, SystemEnvironment};
-use std::os::unix::fs::DirBuilderExt;
 
 /// An available method is first selected successfully. A receipt-insert fault
 /// must roll back both method/hash and revision, without touching document
 /// history; dropping only the fixture trigger permits the identical intent.
 #[test]
 fn preparation_method_receipt_failure_rolls_back_and_recovers() {
-    let path=std::env::temp_dir().join(format!("swarm-preparation-method-{}-{}",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
-    std::fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+    let path=swarm_engine::fixture_root("swarm-preparation-method-");
     let root=RootStore::initialize(&path,&mut SystemEnvironment).unwrap();
     let p=root.preparation_command(br#"{"version":1,"action":"create","event_id":"method-create","expected_revision":0,"text":"retained"}"#,&mut SystemEnvironment).unwrap().value;
     let raw=serde_json::to_vec(&serde_json::json!({"version":1,"action":"method","preparation_id":p.id,"event_id":"method-control","expected_revision":1,"method":"debug"})).unwrap();
@@ -38,8 +36,7 @@ fn preparation_method_receipt_failure_rolls_back_and_recovers() {
 /// document rows and event ledger. No provider, execution or approval is granted.
 #[test]
 fn preparation_child_insert_failure_rolls_back_and_same_event_recovers() {
-    let path=std::env::temp_dir().join(format!("swarm-preparation-atomic-{}-{}",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
-    std::fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+    let path=swarm_engine::fixture_root("swarm-preparation-atomic-");
     let root=RootStore::initialize(&path,&mut SystemEnvironment).unwrap();
     let mut current=root.preparation_command(br#"{"version":1,"action":"create","event_id":"atomic-create","expected_revision":0,"text":"initial"}"#,&mut SystemEnvironment).unwrap().value;
     let db=rusqlite::Connection::open(path.join(".swarm/state.db")).unwrap();
@@ -76,8 +73,7 @@ fn preparation_child_insert_failure_rolls_back_and_same_event_recovers() {
 /// is integrity detection, not protection against arbitrary database writers.
 #[test]
 fn preparation_current_receipt_content_must_match_stored_state() {
-    let path=std::env::temp_dir().join(format!("swarm-preparation-receipt-{}-{}",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
-    std::fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+    let path=swarm_engine::fixture_root("swarm-preparation-receipt-");
     let root=RootStore::initialize(&path,&mut SystemEnvironment).unwrap();
     let request=br#"{"version":1,"action":"create","event_id":"receipt-integrity","expected_revision":0,"text":"original"}"#;
     let initial=root.preparation_command(request,&mut SystemEnvironment).unwrap().value;
@@ -113,8 +109,7 @@ fn preparation_current_receipt_content_must_match_stored_state() {
 /// or plan approval is established.
 #[test]
 fn preparation_adopt_brief_receipt_failure_rolls_back_and_same_event_recovers() {
-    let path=std::env::temp_dir().join(format!("swarm-preparation-adopt-{}-{}",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
-    std::fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+    let path=swarm_engine::fixture_root("swarm-preparation-adopt-");
     let root=RootStore::initialize(&path,&mut SystemEnvironment).unwrap();
     let created=root.preparation_command(br#"{"version":1,"action":"create","event_id":"adopt-create","expected_revision":0,"text":"need text"}"#,&mut SystemEnvironment).unwrap().value;
     assert_eq!(created.revision,1);
@@ -173,8 +168,7 @@ fn preparation_adopt_brief_receipt_failure_rolls_back_and_same_event_recovers() 
 /// permits the identical event. No provider, consumption reset or live Root.
 #[test]
 fn preparation_budget_receipt_failure_rolls_back_and_recovers() {
-    let path=std::env::temp_dir().join(format!("swarm-preparation-budget-{}-{}",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
-    std::fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+    let path=swarm_engine::fixture_root("swarm-preparation-budget-");
     let root=RootStore::initialize(&path,&mut SystemEnvironment).unwrap();
     let p=root.preparation_command(br#"{"version":1,"action":"create","event_id":"budget-born","expected_revision":0,"text":"retained"}"#,&mut SystemEnvironment).unwrap().value;
     let request=|revision,event,limit|serde_json::to_vec(&serde_json::json!({"version":1,"action":"budget","preparation_id":p.id,"event_id":event,"expected_revision":revision,"budget":{"limit_usd":limit,"reserve_per_launch_usd":0.5,"estimate_source":"fixture","reference_date":"2026-10-26"}})).unwrap();

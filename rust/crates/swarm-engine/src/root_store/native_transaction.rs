@@ -215,9 +215,7 @@ mod tests {
     }
     impl Fixture {
         fn new() -> Self {
-            let path = std::env::temp_dir().join(crate::generate_identifier("visit-sql-").unwrap());
-            fs::create_dir(&path).unwrap();
-            fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+            let path = crate::fixture_root("visit-sql-");
             let root = RootStore::initialize(&path, &mut SystemEnvironment).unwrap();
             root.db
                 .execute_batch("CREATE TABLE visit_test_effect(value INTEGER NOT NULL)")

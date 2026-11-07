@@ -292,11 +292,7 @@ struct ControlRoot(std::path::PathBuf);
 #[cfg(unix)]
 impl ControlRoot {
     fn new() -> Self {
-        use std::os::unix::fs::PermissionsExt;
-        let path = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("planning-control61-").unwrap());
-        std::fs::create_dir(&path).unwrap();
-        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let path = swarm_engine::fixture_root("planning-control61-");
         Self(path)
     }
     /// Seed only this owned initialized fixture, with actual schema/UDFs enabled.

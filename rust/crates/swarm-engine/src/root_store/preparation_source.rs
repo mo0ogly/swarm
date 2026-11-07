@@ -80,8 +80,8 @@ mod tests {
     impl Fixture {
         /// Own an isolated filesystem only; preserve it on failure for diagnosis.
         fn new() -> Self {
-            let path = std::env::temp_dir().join(crate::generate_identifier("preparation-source-").unwrap());
-            fs::create_dir(&path).unwrap(); Self(path)
+            let path = crate::fixture_root("preparation-source-");
+            Self(path)
         }
     }
     impl Drop for Fixture {

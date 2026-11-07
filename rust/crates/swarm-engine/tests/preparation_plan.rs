@@ -1,6 +1,5 @@
 //! Plan-verdict receipt rollback on an owned, already-open Root only.
 use swarm_engine::{RootStore, SystemEnvironment};
-use std::os::unix::fs::DirBuilderExt;
 
 /// A real valid verdict precedes the injected receipt failure. The transaction
 /// must retain the original verdict/revision/documents and all row counts, then
@@ -8,8 +7,7 @@ use std::os::unix::fs::DirBuilderExt;
 /// No mission, provider, acceptance identity or live datastore is involved.
 #[test]
 fn plan_verdict_receipt_failure_rolls_back_and_replays() {
-    let path=std::env::temp_dir().join(format!("swarm-plan-atomic-{}-{}",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
-    std::fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+    let path=swarm_engine::fixture_root("swarm-plan-atomic-");
     let root=RootStore::initialize(&path,&mut SystemEnvironment).unwrap();
     let command=|value:serde_json::Value|root.preparation_command(&serde_json::to_vec(&value).unwrap(),&mut SystemEnvironment).unwrap().value;
     let mut p=command(serde_json::json!({"version":1,"action":"create","event_id":"plan-create","expected_revision":0,"text":"need"}));

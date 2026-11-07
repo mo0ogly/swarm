@@ -26,9 +26,7 @@ impl Fixture {
     /// directly in the owned test database (fixture only, not a runtime path).
     fn new() -> Self {
         let root =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("live-web-").unwrap());
-        fs::create_dir(&root).unwrap();
-        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+            swarm_engine::fixture_root("live-web-");
         let mut r = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
         let mut create = |title: &str, event: &str| {
             let raw = format!(r#"{{"schema_version":1,"event_id":"{event}","expected_revision":0,"title":"{title}","objective":"Observe","scope":"Fixture","criteria":["Visible"]}}"#);

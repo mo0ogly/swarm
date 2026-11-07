@@ -17,9 +17,7 @@ impl Fixture {
     /// Allocate a private root and bare repository; failures preserve original evidence.
     fn new() -> Self {
         let p =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("git-report-").unwrap());
-        fs::create_dir(&p).unwrap();
-        fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+            swarm_engine::fixture_root("git-report-");
         let f = Self(p);
         f.git(&["init", "--bare", "repository.git"], b"");
         f

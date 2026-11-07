@@ -136,14 +136,20 @@ dans `.swarm/engine-settings.json`, sinon défaut livré ; `/tmp` refusé. Le mo
 exporte aussi ce dossier comme `TMPDIR` au démarrage de chaque commande et de
 `web`. Le contrat unique est `tests/fixture_area.py`
 (`fixture_root(prefix)`, `fixture_area()`) et son miroir Node
-`tests/fixture_area.cjs`. Deux niveaux de couverture : (1) à la source —
+`tests/fixture_area.cjs`, et le miroir Rust
+`rust/crates/swarm-engine/src/fixture_area.rs` (`crate::fixture_root(prefix)`
+dans swarm-engine ; `swarm_engine::fixture_root(prefix)` dans swarm-web,
+swarm-cli et les tests d'intégration). Deux niveaux de couverture : (1) à la source —
 `tools/check_tmp_interdiction.py` scanne les allocations tempfile sans `dir=`
 et échoue s'il en reste (garde de non-récidive ; les lectures gettempdir sont
-signalées pour revue) ; (2) au runner — `recipe.py` épingle `TMPDIR` sous
+signalées pour revue) ; depuis la migration D04 du 7 novembre 2026, il scanne
+aussi les sources Rust : tout `env::temp_dir()` hors carte d'exemptions
+documentée `RUST_EXEMPT` (sondes lecture-seule du volume système, chemins
+assertés inexistants, assertions de composition, assertion du pinning TMPDIR)
+est une violation ; les mentions dans commentaires/doc sont ignorées ; (2) au runner — `recipe.py` épingle `TMPDIR` sous
 `<dossier temporaire configuré>/runner-tmp` pour la durée de chaque run, couvrant Python
 tempfile, Rust `env::temp_dir()`/TempDir, Node `os.tmpdir()` et Go
-`t.TempDir()` qui l'honorent ; `env::temp_dir()` ou `dir=` explicites
-contournant TMPDIR restent une obligation source. `mkstemp(dir=destination.
+`t.TempDir()` qui l'honorent. `mkstemp(dir=destination.
 parent)` est un échafaudage d'écriture atomique adjacente à la destination,
 pas une allocation de fixture : exempté.
 
@@ -156,14 +162,21 @@ under the kernel limit). The saved value is read from `.swarm/engine-settings.js
 else the shipped default; `/tmp` is refused. The engine also exports it as
 `TMPDIR` when every command and `web` start. The
 single contract is `tests/fixture_area.py` (`fixture_root(prefix)`,
-`fixture_area()`) and its Node mirror `tests/fixture_area.cjs`. Two coverage
+`fixture_area()`) and its Node mirror `tests/fixture_area.cjs`, plus the Rust
+mirror `rust/crates/swarm-engine/src/fixture_area.rs`
+(`crate::fixture_root(prefix)` inside swarm-engine;
+`swarm_engine::fixture_root(prefix)` in swarm-web, swarm-cli and integration
+tests). Two coverage
 levels: (1) at source — `tools/check_tmp_interdiction.py` scans tempfile
 allocations without `dir=` and fails if any remain (non-regression guard;
-gettempdir reads are reported for review); (2) at runner — `recipe.py` pins
+gettempdir reads are reported for review); since the 7 November 2026 D04
+migration it also scans Rust sources: any `env::temp_dir()` outside the
+documented `RUST_EXEMPT` map (read-only system-volume probes, paths asserted
+not to exist, pure path-composition assertions, the TMPDIR-pinning assertion
+itself) is a violation; mentions inside comments/docs are ignored; (2) at runner — `recipe.py` pins
 `TMPDIR` under `<configured temporary directory>/runner-tmp` for each run, covering Python
 tempfile, Rust `env::temp_dir()`/TempDir, Node `os.tmpdir()` and Go
-`t.TempDir()` which honor it; `env::temp_dir()` or explicit `dir=` uses
-bypassing TMPDIR remain a source-level obligation. `mkstemp(dir=
+`t.TempDir()` which honor it. `mkstemp(dir=
 destination.parent)` is adjacent-to-destination atomic-write scaffolding, not
 fixture allocation: exempt.
 

@@ -4,11 +4,7 @@ use swarm_engine::{EngineSettingsChange, RootStore, SettingCap, SettingCount, Sy
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
-        let root = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("swarm-context-guard-").unwrap());
-        fs::create_dir(&root).unwrap();
-        use std::os::unix::fs::PermissionsExt;
-        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        let root = swarm_engine::fixture_root("swarm-context-guard-");
         Self(root)
     }
     fn profile(&self) {

@@ -515,9 +515,7 @@ mod tests {
     /// real native custody/permission checks remain public-journey obligations.
     fn custody_fixture(subdir: &str) -> (PathBuf, Work, Agent, EngineSettingsDocument) {
         let root =
-            std::env::temp_dir().join(crate::generate_identifier("candidate-custody-").unwrap());
-        std::fs::create_dir(&root).unwrap();
-        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+            crate::fixture_root("candidate-custody-");
         let state = root.join(".swarm");
         std::fs::create_dir(&state).unwrap();
         std::fs::set_permissions(&state, std::fs::Permissions::from_mode(0o700)).unwrap();

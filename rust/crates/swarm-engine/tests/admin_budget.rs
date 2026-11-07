@@ -20,8 +20,7 @@ impl Drop for Fixture {
 /// Initialize a real native Root through its public API; no SQL/data fabrication.
 fn fixture() -> Fixture {
     let path =
-        std::env::temp_dir().join(swarm_engine::generate_identifier("admin-budget-").unwrap());
-    fs::create_dir(&path).unwrap();
+        swarm_engine::fixture_root("admin-budget-");
     RootStore::initialize(&path, &mut SystemEnvironment)
         .unwrap()
         .close()

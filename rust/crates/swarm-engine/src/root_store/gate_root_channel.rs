@@ -174,8 +174,7 @@ mod tests {
     impl Fixture {
         /// Initialize using the real Root API and close its SQLite connection.
         fn new() -> Self {
-            let path = std::env::temp_dir().join(crate::generate_identifier("gate-channel100-").unwrap());
-            fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+            let path = crate::fixture_root("gate-channel100-");
             RootStore::initialize(&path, &mut crate::SystemEnvironment).unwrap().close().unwrap();
             Self(path)
         }

@@ -470,14 +470,7 @@ mod tests {
     /// is not an OS confinement, identity or acceptance proof.
     #[test]
     fn preflight_admitted_provider_artifact_mutation_refuses_before_consumption_and_recovers() {
-        let root = std::env::temp_dir().join(crate::generate_identifier("toolsubst81-").unwrap());
-        {
-            use std::os::unix::fs::DirBuilderExt;
-            std::fs::DirBuilder::new()
-                .mode(0o700)
-                .create(&root)
-                .unwrap();
-        }
+        let root = crate::fixture_root("toolsubst81-");
         eprintln!("owned provider-substitution fixture: {}", root.display());
         let mut store =
             crate::RootStore::initialize(root.as_path(), &mut crate::SystemEnvironment).unwrap();
@@ -633,8 +626,7 @@ mod tests {
     fn preflight_admitted_artifact_mutation_forces_fresh_admission_binding_mutated_digest() {
         use std::os::unix::fs::DirBuilderExt;
         use std::os::unix::fs::PermissionsExt;
-        let root = std::env::temp_dir().join(crate::generate_identifier("readmit82-").unwrap());
-        std::fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
+        let root = crate::fixture_root("readmit82-");
         eprintln!("owned readmission fixture: {}", root.display());
         let mut store =
             crate::RootStore::initialize(root.as_path(), &mut crate::SystemEnvironment).unwrap();
@@ -937,11 +929,7 @@ mod tests {
     #[test]
     fn preflight_output_claims_before_permission_refuse_and_recover() {
         use std::os::unix::fs::DirBuilderExt;
-        let root = std::env::temp_dir().join(crate::generate_identifier("facts79-").unwrap());
-        std::fs::DirBuilder::new()
-            .mode(0o700)
-            .create(&root)
-            .unwrap();
+        let root = crate::fixture_root("facts79-");
         eprintln!("owned prestart metadata fixture: {}", root.display());
         let mut store =
             crate::RootStore::initialize(root.as_path(), &mut crate::SystemEnvironment).unwrap();

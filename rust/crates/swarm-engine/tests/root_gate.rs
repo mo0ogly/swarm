@@ -13,9 +13,7 @@ struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
         let path =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("root-gate-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+            swarm_engine::fixture_root("root-gate-");
         Self(path)
     }
 }

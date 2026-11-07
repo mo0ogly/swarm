@@ -7,11 +7,7 @@ struct Fixture {
 }
 impl Fixture {
     fn new(requirements: usize) -> Self {
-        use std::os::unix::fs::PermissionsExt;
-        let root = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("planning-enable62-").unwrap());
-        std::fs::create_dir(&root).unwrap();
-        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let root = swarm_engine::fixture_root("planning-enable62-");
         let mut store = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
         let raw=serde_json::to_vec(&serde_json::json!({"schema_version":1,"event_id":"create","expected_revision":0,"title":"Enable fixture","objective":"Observable planning","scope":"Private","criteria":(0..requirements).map(|i|format!("Requirement {i}")).collect::<Vec<_>>()})).unwrap();
         let work = store

@@ -15,9 +15,7 @@ use swarm_engine::{encode_model, Agent, RootStore, SystemEnvironment, TelemetryS
 use swarm_web::NativeHttpServer;
 
 fn root() -> (PathBuf, String) {
-    let p = std::env::temp_dir().join(swarm_engine::generate_identifier("otel-").unwrap());
-    fs::create_dir(&p).unwrap();
-    fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+    let p = swarm_engine::fixture_root("otel-");
     let mut r = RootStore::initialize(&p, &mut SystemEnvironment).unwrap();
     let work = r.execute_external("", "work.create", br#"{"schema_version":1,"event_id":"c","expected_revision":0,"title":"Otel","objective":"Observe","scope":"Fixture","criteria":["Visible"]}"#, &mut SystemEnvironment).unwrap().result.work.id;
     r.close().unwrap();

@@ -480,15 +480,7 @@ struct LedgerFixture(std::path::PathBuf);
 impl LedgerFixture {
     /// Use the existing secure identifier helper, with no extra dev dependency.
     fn new() -> Self {
-        let path = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("swarm-financial-").unwrap());
-        let mut builder = std::fs::DirBuilder::new();
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::DirBuilderExt;
-            builder.mode(0o700);
-        }
-        builder.create(&path).unwrap();
+        let path = swarm_engine::fixture_root("swarm-financial-");
         Self(path)
     }
 }

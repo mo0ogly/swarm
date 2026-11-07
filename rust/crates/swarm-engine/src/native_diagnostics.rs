@@ -754,9 +754,7 @@ mod tests {
         let cleanup_errno = rustix::io::Errno::PIPE.raw_os_error();
         let missing_errno = rustix::io::Errno::NOENT.raw_os_error();
         for wrapper in 0..4 {
-            let path = std::env::temp_dir().join(crate::generate_identifier("telemetry-diagnostic-").unwrap());
-            std::fs::create_dir(&path).unwrap();
-            std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+            let path = crate::fixture_root("telemetry-diagnostic-");
             crate::local_storage::LocalDirectory::open(&path).unwrap().close().unwrap();
             let storage = crate::local_storage::LocalDirectory::open(&path.join("PRIVATE_missing_root")).err().unwrap();
             std::fs::remove_dir(&path).unwrap();
@@ -1106,9 +1104,7 @@ mod tests {
     #[test]
     fn native_diagnostics_keep_context_read_reason_through_launch_wrapper() {
         use std::os::unix::fs::PermissionsExt;
-        let root = std::env::temp_dir().join(crate::generate_identifier("native-context-cause-").unwrap());
-        std::fs::create_dir(&root).unwrap();
-        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let root = crate::fixture_root("native-context-cause-");
         std::fs::write(root.join("private.md"), "ok").unwrap();
         let mut limits = crate::ContextPolicyLimits {
             profile_name_bytes: None, profile_sources: None, profile_path_bytes: None,

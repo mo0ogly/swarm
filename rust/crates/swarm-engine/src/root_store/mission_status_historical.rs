@@ -763,10 +763,7 @@ mod tests {
     impl Fixture {
         /// Generate a unique fixture directory; mode0700 attributes fixture data.
         fn new() -> Self {
-            let path = std::env::temp_dir()
-                .join(crate::generate_identifier("status-historical-").unwrap());
-            fs::create_dir(&path).unwrap();
-            fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+            let path = crate::fixture_root("status-historical-");
             Self(path)
         }
     }

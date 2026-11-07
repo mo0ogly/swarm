@@ -269,9 +269,7 @@ mod tests {
     /// Owned private directory for isolated actual publication operations. No Root/mission reused.
     fn fixture() -> std::path::PathBuf {
         let path =
-            std::env::temp_dir().join(crate::generate_identifier("session-storage91-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+            crate::fixture_root("session-storage91-");
         path
     }
     /// A valid witness precedes entropy/representation failures. Both keep causes,

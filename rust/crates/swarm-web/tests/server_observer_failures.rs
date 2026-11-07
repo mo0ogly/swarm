@@ -32,10 +32,7 @@ struct Fixture {
 impl Fixture {
     /// Initialize a private Root and verify the real report consumer before any fault.
     fn new() -> Self {
-        let root = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("tcp-observer96-").unwrap());
-        fs::create_dir(&root).unwrap();
-        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        let root = swarm_engine::fixture_root("tcp-observer96-");
         RootStore::initialize(&root, &mut SystemEnvironment)
             .unwrap()
             .close()

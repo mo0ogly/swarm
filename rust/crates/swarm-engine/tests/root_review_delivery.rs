@@ -4,11 +4,7 @@ use swarm_engine::{EngineSettingsChange, RootStore, SettingCap, SettingCount, Sy
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
-        let p = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("review-document-").unwrap());
-        fs::create_dir(&p).unwrap();
-        use std::os::unix::fs::PermissionsExt;
-        fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+        let p = swarm_engine::fixture_root("review-document-");
         Self(p)
     }
 }

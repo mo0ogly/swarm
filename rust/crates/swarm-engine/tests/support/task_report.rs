@@ -11,9 +11,7 @@ impl Fixture {
     /// as an explicit storage double. Public Python recipe covers the real child.
     /// No live database, provider account, PID or authenticated actor is used.
     pub fn new() -> Self {
-        let root = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("report-fixture-").unwrap());
-        fs::create_dir(&root).unwrap();
+        let root = swarm_engine::fixture_root("report-fixture-");
         let mut s = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
         let work=s.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Report","objective":"Storage contract","scope":"Fixture","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap().result.work.id;
         s.execute_external(&work,"task.add",br#"{"schema_version":1,"event_id":"add","expected_revision":1,"id":"task","title":"Report","deliverable":"Report","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap();

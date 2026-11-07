@@ -199,11 +199,11 @@ zero under /tmp; producer 2 — fixture created under
 the pre-existing BF-16b wave failure `gate-evidence-invalid` at
 `mission_status_review.rs:412`, not a regression of the relocation — purely
 localizing diff); producer 3 — `cargo test --test project_context` 4/4 green
-after canonicalization. `check_tmp_interdiction.py`: 0 violations (the guard
-does not scan Rust sources — the Rust exclusion is covered by recipe.py's
-TMPDIR net and the documented source rule; extending the guard to Rust not
-retained here: ~130 `env::temp_dir()` sites would go red without fixing the
-cause, discovery consigned below as D04). Still under /tmp: the BF-16b wave's
+after canonicalization. `check_tmp_interdiction.py`: 0 violations (as of
+6 November the guard did not scan Rust sources — the Rust exclusion was
+covered by recipe.py's TMPDIR net and the documented source rule; the
+extension was retained and executed on 7 November together with the D04
+migration, see the closure section below). Still under /tmp: the BF-16b wave's
 diagnostic fixture `swarm-status-review-536028-1793974459868644663` is
 preserved untouched (deletion refused, rightly, by the classifier: wave
 evidence, not owned by this fix) — its removal belongs to its owner.
@@ -219,13 +219,53 @@ TMPDIR to the fixture area — the documented net of the
 only). But any naked cargo run (default TMPDIR) writes under /tmp: conformance
 to the 31 October interdiction then rests on launch discipline, not on bytes.
 Value: moving those sites to the `.swarm-fixtures/` idiom would make
-conformance structural. Not fixed here: massive (≈130 sites), outside the
-"corrigés" order scope (D02+D03 targeted), and an immediately red Rust guard
-would block the whole wave without fixing the cause. Owner: open — to attach
-to a migration lot or a wave agreement; resumption condition: decide to extend
-`check_tmp_interdiction.py` to Rust sources (`env::temp_dir()` class without
-an explicit TMPDIR) together with migrating the sites; one known producer:
-`tests/trust_biba.rs:7` (`biba-*`).
+conformance structural.
+
+### D04 migration executed (7 November 2026) — `env::temp_dir()` class closed
+
+Class 1 (`std::env::temp_dir()`) is migrated to the `fixture_root()` idiom
+delivered in `rust/crates/swarm-engine/src/fixture_area.rs` (area governed by
+the Admin setting `runtime_temporary_directory`, default
+`<repo>/.swarm-fixtures/`, 0700; the embedded default is honored — behavior
+follows the saved setting like the Admin modal). Real scope: **~95 sites**
+(not ≈130 — the first scan also counted classes 2/3), all replaced by exact
+literal replacements, site by site: swarm-engine src/ (~33), swarm-engine
+tests/ (~52), swarm-web src/service.rs + tests/ (~17), swarm-cli tests/ (4).
+Verification: lib + 55 swarm-engine test targets recompiled and re-run
+(migrated suites green; remaining failures are all pre-existing, each
+re-verified identical against the HEAD version of its file — v52 settings
+counter 6≠4 families, agent_workflow prompt body, git_report `format`,
+planning_enable `agent-provider-catalogue-read` port), 18 swarm-web and
+swarm-cli targets green (0 failures). One migration regression, fixed:
+`git_metadata::unavailable_fields...` contracted "no ancestor Git repository"
+— a precondition true implicitly under /tmp, false under the repository area
+(Git discovers the Swarm repository); fixed at the contract level: that test
+now allocates its root in the operator fallback area
+`~/.local/state/swarm-fixtures/` (outside any repository, provided by the
+31 October instruction for what the repository area cannot host). Migration
+lessons: (a) after each `join` replacement, scan the following lines for
+orphaned `create_dir`/`set_permissions` (3 regressions of this class caught
+before compilation); (b) removing a `PermissionsExt` import can break a
+remaining `from_mode` usage elsewhere in the file — sweep `from_mode` without
+import after removal; (c) run the HEAD version of any test failing after
+migration before blaming the migration (5 false positives avoided).
+
+**Guard extended together with the migration** (recorded resumption
+condition): `tools/check_tmp_interdiction.py` now scans `.rs` — any
+`env::temp_dir()` outside the documented `RUST_EXEMPT` map is a violation
+(exit 1); the exemptions (7 lines: read-only system-volume probes
+`mission_status_runtime.rs:57/:584`, paths asserted not to exist
+`:538/:586`, pure path-composition assertions `preparation_call_cli.rs:682-683`,
+the TMPDIR-pinning assertion itself `runtime_temporary.rs:29`) appear as
+review items, never violations; mentions inside comments/docs are ignored.
+Negative test verified (injected site → violation; doc mention → ignored).
+Guards run together: 0 violations (Python, JS and Rust).
+
+Still open (class 2, not handled here): ~153 `tempfile::tempdir()` /
+`TempDir::new()` sites under `rust/crates` (mostly the enrollment family),
+discovery consigned for a later wave — same target idiom (`fixture_root`),
+producer to attach to the enrollment lot. The BF-16b diagnostic fixture under
+/tmp remains preserved for its owner.
 
 ### Verified lessons from the resumption (6 November 2026, D03 scope)
 

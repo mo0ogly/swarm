@@ -33,9 +33,7 @@ impl Fixture {
     /// Root; all test data stays under these 0700 temp directories.
     fn new() -> Self {
         let make = |prefix: &str| {
-            let dir = std::env::temp_dir()
-                .join(swarm_engine::generate_identifier(prefix).unwrap());
-            create_dir_mode_0700(&dir).unwrap();
+            let dir = swarm_engine::fixture_root(prefix);
             let store = RootStore::initialize(&dir, &mut SystemEnvironment).unwrap();
             store.close().unwrap();
             dir

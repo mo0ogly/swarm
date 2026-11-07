@@ -613,8 +613,7 @@ mod tests {
         use crate::{AgentExecutionSnapshot, AgentExecutionPhase, AgentGuardSnapshot,
             EngineSettingsValues, SettingCount, SettingCap, SystemEnvironment};
         use std::{collections::BTreeMap, fs, os::unix::fs::PermissionsExt};
-        let root=std::env::temp_dir().join(crate::generate_identifier("gate-pulse-").unwrap());
-        fs::create_dir(&root).unwrap();fs::set_permissions(&root,fs::Permissions::from_mode(0o700)).unwrap();
+        let root=crate::fixture_root("gate-pulse-");
         let store=crate::RootStore::initialize(&root,&mut SystemEnvironment).unwrap();
         let settings=store.settings().unwrap();store.close().unwrap();
         let dir=LocalDirectory::open_owned(&root.join(".swarm")).unwrap();

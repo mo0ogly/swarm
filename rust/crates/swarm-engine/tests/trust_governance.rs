@@ -6,10 +6,7 @@ impl Fixture {
     /// Initialize one owned private root; retain it on a failed assertion.
     fn new() -> Self {
         let p =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("governance-").unwrap());
-        std::fs::create_dir(&p).unwrap();
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(&p, std::fs::Permissions::from_mode(0o700)).unwrap();
+            swarm_engine::fixture_root("governance-");
         RootStore::initialize(&p, &mut SystemEnvironment)
             .unwrap()
             .close()
@@ -150,7 +147,7 @@ fn governance_public_signatures_checkpoints_and_revocation() {
     let pin = activated["registry"]["keys"][id].clone();
     // Persist the public pin outside the producer root, then acquire it again.
     let pin_path =
-        std::env::temp_dir().join(swarm_engine::generate_identifier("independent-pin-").unwrap());
+        swarm_engine::fixture_root("independent-pin-").join("pin.json");
     std::fs::write(&pin_path, serde_json::to_vec(&pin).unwrap()).unwrap();
     let independent: Value = serde_json::from_slice(&std::fs::read(&pin_path).unwrap()).unwrap();
     let bundle = f.call("public-anchor", &json!({}), "fixture-admin-token");

@@ -1787,10 +1787,7 @@ mod tests {
     #[test]
     fn native_cookie_policy_keeps_the_server_snapshot_when_saved_values_change() {
         use std::{fs, net::TcpListener, os::unix::fs::PermissionsExt};
-        let root = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("cookie-snapshot98-").unwrap());
-        fs::create_dir(&root).unwrap();
-        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        let root = swarm_engine::fixture_root("cookie-snapshot98-");
         let store = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
         let document = store.settings().unwrap();
         let policy = document.values.web_transport_policy().unwrap();

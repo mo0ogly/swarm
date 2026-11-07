@@ -4,10 +4,7 @@ use swarm_engine::{RootStore, SystemEnvironment};
 struct Fixture(std::path::PathBuf);
 impl Fixture {
     fn new() -> Self {
-        let p = std::env::temp_dir().join(swarm_engine::generate_identifier("biba-").unwrap());
-        std::fs::create_dir(&p).unwrap();
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(&p, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let p = swarm_engine::fixture_root("biba-");
         let s = RootStore::initialize(&p, &mut SystemEnvironment).unwrap();
         s.close().unwrap();
         Self(p)

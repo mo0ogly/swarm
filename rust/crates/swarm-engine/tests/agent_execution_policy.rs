@@ -169,8 +169,7 @@ fn supervision_public_adoption_preview_reopen_preserves_history() {
         SystemEnvironment,
     };
     let root =
-        std::env::temp_dir().join(swarm_engine::generate_identifier("supervision78-").unwrap());
-    fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
+        swarm_engine::fixture_root("supervision78-");
     let store = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
     store.close().unwrap();
     let all = v18_values();

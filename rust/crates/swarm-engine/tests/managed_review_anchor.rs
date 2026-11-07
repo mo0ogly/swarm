@@ -7,9 +7,7 @@ use swarm_engine::{
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
-        let path = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("managed-anchor-").unwrap());
-        fs::create_dir(&path).unwrap();
+        let path = swarm_engine::fixture_root("managed-anchor-");
         for (name, data) in files() {
             fs::write(path.join(name), data).unwrap();
         }

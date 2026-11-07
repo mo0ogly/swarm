@@ -82,9 +82,7 @@ fn named_regular_symlink_boundary_sparse_fifo_and_device_contracts() {
     };
     use swarm_engine::read_command_file;
     let root =
-        std::env::temp_dir().join(swarm_engine::generate_identifier("command-input-").unwrap());
-    fs::create_dir(&root).unwrap();
-    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        swarm_engine::fixture_root("command-input-");
     let file = root.join("request.json");
     fs::write(&file, b"control").unwrap();
     assert_eq!(read_command_file(&file).unwrap(), b"control");

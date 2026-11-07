@@ -589,11 +589,7 @@ mod tests {
     /// Create an isolated Root, Work and real claim using supported operations.
     /// No SQL manufactures an Agent, permission, receipt or owning handle.
     fn fixture() -> (std::path::PathBuf, RootStore, MissionLease, String) {
-        use std::os::unix::fs::PermissionsExt;
-        let path =
-            std::env::temp_dir().join(crate::generate_identifier("continuation126-").unwrap());
-        std::fs::create_dir(&path).unwrap();
-        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let path = crate::fixture_root("continuation126-");
         let mut environment = crate::SystemEnvironment;
         let mut store = RootStore::initialize(&path, &mut environment).unwrap();
         let request = serde_json::json!({"schema_version":1,"event_id":"continuation-create",

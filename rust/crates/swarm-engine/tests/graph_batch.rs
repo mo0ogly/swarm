@@ -8,8 +8,7 @@ struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
         let p =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("graph-batch-").unwrap());
-        fs::create_dir(&p).unwrap();
+            swarm_engine::fixture_root("graph-batch-");
         Self(p)
     }
     fn db(&self) -> rusqlite::Connection {

@@ -8,8 +8,7 @@ struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
         let p =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("gate-contract-").unwrap());
-        fs::create_dir(&p).unwrap();
+            swarm_engine::fixture_root("gate-contract-");
         Self(p)
     }
     fn path(&self) -> &Path {

@@ -415,11 +415,8 @@ mod tests {
     /// repair a malformed current body. Native must not invent a read prerequisite.
     #[test]
     fn legacy_cas_apply_can_repair_unreadable_current_values() {
-        use std::{fs, os::unix::fs::PermissionsExt};
-        let path =
-            std::env::temp_dir().join(crate::generate_identifier("run-limits-repair-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+        use std::fs;
+        let path = crate::fixture_root("run-limits-repair-");
         let mut environment = crate::SystemEnvironment;
         let mut store = RootStore::initialize(&path, &mut environment).unwrap();
         let request=crate::decode_api_run_limits_config_change(br#"{"schema_version":1,"event_id":"valid-cas","scope":"project","expected_revision":0,"values":{},"reason":"Owned native control"}"#).unwrap();
@@ -456,11 +453,8 @@ mod tests {
     /// The shared transaction must reject readback and undo the current-row write.
     #[test]
     fn ignored_history_insert_rolls_back_current_and_recovers() {
-        use std::{fs, os::unix::fs::PermissionsExt};
-        let path =
-            std::env::temp_dir().join(crate::generate_identifier("run-limits-atomic-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+        use std::fs;
+        let path = crate::fixture_root("run-limits-atomic-");
         let mut env = crate::SystemEnvironment;
         let mut store = RootStore::initialize(&path, &mut env).unwrap();
         let one=crate::decode_api_run_limits_config_change(br#"{"schema_version":1,"event_id":"control","scope":"project","expected_revision":0,"values":{"silence_seconds":2},"reason":"Valid control"}"#).unwrap();

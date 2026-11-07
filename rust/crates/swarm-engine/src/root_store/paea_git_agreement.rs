@@ -363,11 +363,7 @@ mod tests {
     struct Fixture(std::path::PathBuf);
     impl Fixture {
         fn new() -> Self {
-            let path = std::env::temp_dir()
-                .join(crate::generate_identifier("paea-agreement-").unwrap());
-            std::fs::create_dir(&path).unwrap();
-            use std::os::unix::fs::PermissionsExt;
-            std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+            let path = crate::fixture_root("paea-agreement-");
             let root = RootStore::initialize(&path, &mut SystemEnvironment).unwrap();
             let config = json!({
                 "schema_version":1,

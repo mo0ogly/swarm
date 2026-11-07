@@ -35,9 +35,7 @@ fn json(response: String) -> serde_json::Value {
 fn native_tcp_settings_preview_apply_replay_use_real_saved_consumer() {
     use sha2::{Digest, Sha256};
     let p =
-        std::env::temp_dir().join(swarm_engine::generate_identifier("tcp-mutation96-").unwrap());
-    fs::create_dir(&p).unwrap();
-    fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+        swarm_engine::fixture_root("tcp-mutation96-");
     let r = RootStore::initialize(&p, &mut SystemEnvironment).unwrap();
     let d = r.settings().unwrap();
     r.close().unwrap();

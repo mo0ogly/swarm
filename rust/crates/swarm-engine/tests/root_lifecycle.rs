@@ -11,10 +11,7 @@ use swarm_engine::{
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
-        let p = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("root-lifecycle-").unwrap());
-        fs::create_dir(&p).unwrap();
-        fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+        let p = swarm_engine::fixture_root("root-lifecycle-");
         Self(p)
     }
 }

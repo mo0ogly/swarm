@@ -24,8 +24,7 @@ impl Fixture {
     /// Initialize only an owned Root; no live mission, provider or effect exists here.
     fn new() -> Self {
         let root =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("paea-web-").unwrap());
-        fs::create_dir(&root).unwrap();
+            swarm_engine::fixture_root("paea-web-");
         RootStore::initialize(&root, &mut SystemEnvironment)
             .unwrap()
             .close()

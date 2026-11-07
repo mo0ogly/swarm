@@ -98,9 +98,7 @@ mod tests {
     #[test]
     fn reviewer_runtime_catalogue_digest_cooldown_and_executable_refuse_then_recover() {
         let path =
-            std::env::temp_dir().join(crate::generate_identifier("reviewer-runtime-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+            crate::fixture_root("reviewer-runtime-");
         let root = crate::RootStore::initialize(&path, &mut crate::SystemEnvironment).unwrap();
         let command = path.join("claude");
         fs::write(&command, b"#!/bin/sh\nexit 0\n").unwrap();

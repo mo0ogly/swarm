@@ -6,10 +6,7 @@ struct Fixture(PathBuf);
 impl Fixture {
     /// Initialize through the supported Root API; no live DB or provider is used.
     fn new() -> (Self, RootStore, String) {
-        let path = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("swarm-mission100-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+        let path = swarm_engine::fixture_root("swarm-mission100-");
         let mut env = SystemEnvironment;
         let mut store = RootStore::initialize(&path, &mut env).unwrap();
         let raw=serde_json::to_vec(&serde_json::json!({"schema_version":1,"event_id":"create","expected_revision":0,"title":"Mission fixture","objective":"Lease guard","scope":"Isolated","criteria":["Ownership"]})).unwrap();

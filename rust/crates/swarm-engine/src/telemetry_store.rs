@@ -1556,7 +1556,7 @@ impl TelemetryStore {
 mod tests {
     #[test]
     fn scenarios_save_with_revisions_and_read_per_work() {
-        let dir = std::env::temp_dir().join(crate::generate_identifier("scenarios-").unwrap());
+        let dir = crate::fixture_root("scenarios-");
         fs::create_dir_all(dir.join(".swarm")).unwrap();
         let mut store = TelemetryStore::open(&dir, true).unwrap();
         let spec: crate::ScenarioSpec = serde_json::from_str(r#"{"schema_version":1,"expectations":[{"kind":"usage-observed"}]}"#).unwrap();
@@ -1574,7 +1574,7 @@ mod tests {
 
     #[test]
     fn evaluations_are_recorded_once_per_attempt() {
-        let dir = std::env::temp_dir().join(crate::generate_identifier("evaluations-").unwrap());
+        let dir = crate::fixture_root("evaluations-");
         fs::create_dir_all(dir.join(".swarm")).unwrap();
         let mut store = TelemetryStore::open(&dir, true).unwrap();
         let eval = |passed| crate::AttemptEvaluation { evaluator: "outcome", score: None, passed: Some(passed), detail: String::new() };
@@ -1589,7 +1589,7 @@ mod tests {
 
     #[test]
     fn annotations_create_change_conflict_and_stay_per_work() {
-        let dir = std::env::temp_dir().join(crate::generate_identifier("annotations-").unwrap());
+        let dir = crate::fixture_root("annotations-");
         fs::create_dir_all(dir.join(".swarm")).unwrap();
         let mut store = TelemetryStore::open(&dir, true).unwrap();
         let first = store.annotate("a", "w", "bad", "wrong file edited", 0, 10).unwrap();
@@ -1629,8 +1629,7 @@ mod tests {
         }
     }
     fn plain() -> Scratch {
-        let path = std::env::temp_dir().join(crate::generate_identifier("telemetry-").unwrap());
-        fs::create_dir(&path).unwrap();
+        let path = crate::fixture_root("telemetry-");
         Scratch(path)
     }
     fn root() -> Scratch {

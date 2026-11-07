@@ -107,8 +107,7 @@ mod tests {
     /// external CLI support, effective sandbox or actual model execution.
     #[test]
     fn readonly_adapter_before_model_arguments_preserves_effort_and_sandbox() {
-        let root = std::env::temp_dir().join(crate::generate_identifier("reviewer-argv-").unwrap());
-        fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
+        let root = crate::fixture_root("reviewer-argv-");
         let path = root.join("codex");
         let mut file = fs::OpenOptions::new()
             .write(true)

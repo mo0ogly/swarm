@@ -8,10 +8,7 @@ struct Fixture(PathBuf);
 impl Fixture {
     /// Allocate a private isolated file root; no live mission or provider is used.
     fn new() -> Self {
-        let p = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("baseline-files-").unwrap());
-        fs::create_dir(&p).unwrap();
-        fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+        let p = swarm_engine::fixture_root("baseline-files-");
         Self(p)
     }
     /// Create literal contract files with real digests, optionally referencing prior reviews.

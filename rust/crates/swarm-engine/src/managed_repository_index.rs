@@ -106,9 +106,7 @@ mod tests {
         std::path::PathBuf,
         EngineSettingsDocument,
     ) {
-        let root = std::env::temp_dir().join(crate::generate_identifier("managed-index-").unwrap());
-        std::fs::create_dir(&root).unwrap();
-        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let root = crate::fixture_root("managed-index-");
         println!("INDEX_FIXTURE {}", root.display());
         let repo = root.join("source");
         std::fs::create_dir(&repo).unwrap();

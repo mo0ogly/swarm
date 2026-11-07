@@ -8,10 +8,7 @@ struct Fixture(PathBuf);
 impl Fixture {
     /// Private real native root; no mission/provider or live data.
     fn new() -> Self {
-        let p = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("runtime-limits-").unwrap());
-        fs::create_dir(&p).unwrap();
-        fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+        let p = swarm_engine::fixture_root("runtime-limits-");
         RootStore::initialize(&p, &mut SystemEnvironment)
             .unwrap()
             .close()

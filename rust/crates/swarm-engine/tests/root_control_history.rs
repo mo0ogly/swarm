@@ -6,9 +6,7 @@ impl Fixture {
     /// Private isolated root; the actual Work is created/started through supported operations.
     fn new() -> Self {
         let root =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("history-root-").unwrap());
-        fs::create_dir(&root).unwrap();
-        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+            swarm_engine::fixture_root("history-root-");
         Self(root)
     }
 }

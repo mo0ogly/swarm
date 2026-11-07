@@ -745,9 +745,7 @@ mod peer_tests {
     /// Public Root/work/lease setup, never a manufactured SQL owner or claim.
     fn fixture() -> (std::path::PathBuf, RootStore, MissionLease, String) {
         use std::os::unix::fs::PermissionsExt;
-        let path=std::env::temp_dir().join(crate::generate_identifier("mission-peer-").unwrap());
-        std::fs::create_dir(&path).unwrap();
-        std::fs::set_permissions(&path,std::fs::Permissions::from_mode(0o700)).unwrap();
+        let path=crate::fixture_root("mission-peer-");
         let mut store=RootStore::initialize(&path,&mut crate::SystemEnvironment).unwrap();
         let request=serde_json::json!({"schema_version":1,"event_id":"peer-create","expected_revision":0,
             "title":"Peer fixture","objective":"Scoped role","scope":"Owned test","criteria":["No implicit grant"]});

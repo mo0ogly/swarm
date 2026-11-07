@@ -46,9 +46,7 @@ mod tests {
         fn new() -> Self {
             use std::os::unix::fs::PermissionsExt;
             let root =
-                std::env::temp_dir().join(crate::generate_identifier("scope-context113-").unwrap());
-            std::fs::create_dir(&root).unwrap();
-            std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+                crate::fixture_root("scope-context113-");
             let mut values = EngineSettingsValues::installation_defaults().unwrap();
             values.planning_context_max_events = Some(SettingCap(Some(SettingCount(1))));
             let settings = EngineSettingsDocument::initial(

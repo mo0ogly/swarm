@@ -347,10 +347,9 @@ mod tests {
     /// is a deterministic private-file fault, not proof of concurrent public CAS.
     #[test]
     fn unlimited_policy_and_fresh_tightening_are_observed_without_deadlines() {
-        use std::{fs, os::unix::fs::DirBuilderExt};
+        use std::fs;
         for (tighten, borrowed) in [(false, false), (true, false), (false, true), (true, true)] {
-            let root = std::env::temp_dir().join(crate::generate_identifier("storage77-").unwrap());
-            fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
+            let root = crate::fixture_root("storage77-");
             let store = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
             let doc = store.settings().unwrap();
             let mut values = EngineSettingsValues::installation_defaults().unwrap();
@@ -445,10 +444,9 @@ mod tests {
     /// without changing settings/history; a raw immediate EAGAIN is insufficient.
     #[test]
     fn real_settings_lock_budget_refuses_without_callback_then_recovers() {
-        use std::{fs, os::unix::fs::DirBuilderExt};
+        use std::fs;
         for (retries, borrowed) in [(0, false), (1, false), (0, true), (1, true)] {
-            let root = std::env::temp_dir().join(crate::generate_identifier("lock78-").unwrap());
-            fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
+            let root = crate::fixture_root("lock78-");
             let store = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
             let current = store.settings().unwrap();
             let mut values = current.values;

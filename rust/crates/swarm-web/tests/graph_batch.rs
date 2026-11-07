@@ -18,8 +18,7 @@ struct Fixture {
 impl Fixture {
     fn new() -> Self {
         let path =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("graph-http-").unwrap());
-        fs::create_dir(&path).unwrap();
+            swarm_engine::fixture_root("graph-http-");
         let mut s = RootStore::initialize(&path, &mut SystemEnvironment).unwrap();
         let work=s.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Graph","objective":"Atomic HTTP","scope":"Private","criteria":["Observed"]}"#,&mut SystemEnvironment).unwrap().result.work.id;
         s.close().unwrap();

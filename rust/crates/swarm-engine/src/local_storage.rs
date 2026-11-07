@@ -990,11 +990,7 @@ mod binding_tests {
     #[test]
     fn directory_binding_duplicate_preserves_identity_and_cloexec() {
         use std::os::unix::fs::DirBuilderExt;
-        let path = std::env::temp_dir().join(generate_identifier("binding-storage-").unwrap());
-        std::fs::DirBuilder::new()
-            .mode(0o700)
-            .create(&path)
-            .unwrap();
+        let path = crate::fixture_root("binding-storage-");
         let original = LocalDirectory::open(&path).unwrap();
         let duplicate = original.duplicate().unwrap();
         assert_eq!(original.identity().unwrap(), duplicate.identity().unwrap());
@@ -1013,9 +1009,7 @@ mod tests {
     struct Fixture(std::path::PathBuf);
     impl Fixture {
         fn new() -> Self {
-            let p = std::env::temp_dir().join(generate_identifier("atomic-storage-").unwrap());
-            disk::create_dir(&p).unwrap();
-            disk::set_permissions(&p, disk::Permissions::from_mode(0o700)).unwrap();
+            let p = crate::fixture_root("atomic-storage-");
             Self(p)
         }
     }
@@ -1288,9 +1282,7 @@ mod database_initialization_tests {
     impl Fixture {
         /// Create the isolated private directory needed by real O_PATH calls.
         fn new() -> Self {
-            let path = std::env::temp_dir().join(generate_identifier("database-init-").unwrap());
-            disk::create_dir(&path).unwrap();
-            disk::set_permissions(&path, disk::Permissions::from_mode(0o700)).unwrap();
+            let path = crate::fixture_root("database-init-");
             Self(path)
         }
     }

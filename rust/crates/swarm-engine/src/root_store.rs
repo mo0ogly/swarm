@@ -3227,9 +3227,7 @@ mod planning_lease_pause_tests {
     #[test]
     fn planning_lease_renewal_respects_persisted_mission_pause_and_recovers() {
         let path =
-            std::env::temp_dir().join(crate::generate_identifier("lease-pause115-").unwrap());
-        std::fs::create_dir(&path).unwrap();
-        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+            crate::fixture_root("lease-pause115-");
         let fixture = Fixture(path);
         println!("owned legacy-controls fixture: {}", fixture.0.display());
         let mut env = crate::SystemEnvironment;
@@ -3423,9 +3421,7 @@ mod planning_lease_pause_tests {
     #[test]
     fn planning_transaction_hooks_pause_archive_and_corrupt_controls_are_atomic() {
         let path =
-            std::env::temp_dir().join(crate::generate_identifier("planning-hooks116-").unwrap());
-        std::fs::create_dir(&path).unwrap();
-        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+            crate::fixture_root("planning-hooks116-");
         let fixture = Fixture(path);
         println!("owned legacy-hook fixture: {}", fixture.0.display());
         let mut store = RootStore::initialize(&fixture.0, &mut crate::SystemEnvironment).unwrap();
@@ -3520,10 +3516,7 @@ mod planning_lease_pause_tests {
     fn planning_claim_input_schema_refuses_atomically_then_recovers() {
         for fault in ["view", "ddl", "index", "trigger"] {
             for healthy in [true, false] {
-                let path = std::env::temp_dir()
-                    .join(crate::generate_identifier("claim-input117-").unwrap());
-                std::fs::create_dir(&path).unwrap();
-                std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+                let path = crate::fixture_root("claim-input117-");
                 let fixture = Fixture(path);
                 println!("owned claim-input fixture: {}", fixture.0.display());
                 let mut store =
@@ -3637,9 +3630,7 @@ mod bootstrap_busy_tests {
     impl Fixture {
         /// Initialize and close a genuine Root through its supported API.
         fn new() -> Self {
-            let path = std::env::temp_dir()
-                .join(crate::generate_identifier("bootstrap-busy201-").unwrap());
-            fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+            let path = crate::fixture_root("bootstrap-busy201-");
             let store = RootStore::initialize(&path, &mut crate::SystemEnvironment).unwrap();
             store.close().unwrap();
             Self(path)
@@ -3856,8 +3847,7 @@ mod interruption_scope_tests {
     #[test]
     fn interruption_scope_restores_nested_state_and_unwind(){
         use std::os::unix::fs::PermissionsExt;
-        let path=std::env::temp_dir().join(crate::generate_identifier("interrupt-scope-").unwrap());
-        std::fs::create_dir(&path).unwrap();std::fs::set_permissions(&path,std::fs::Permissions::from_mode(0o700)).unwrap();
+        let path=crate::fixture_root("interrupt-scope-");
         let mut root=RootStore::initialize(&path,&mut crate::SystemEnvironment).unwrap();
         let source=crate::ExecutionInterrupt::new().unwrap();let inner=crate::ExecutionInterrupt::new().unwrap();
         inner.request(crate::ExecutionInterruptReason::Terminate).unwrap();

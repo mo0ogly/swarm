@@ -7,11 +7,8 @@ use swarm_engine::{
 struct Fixture(std::path::PathBuf);
 impl Fixture {
     fn new() -> Self {
-        use std::os::unix::fs::PermissionsExt;
         let p =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("workflow63-").unwrap());
-        std::fs::create_dir(&p).unwrap();
-        std::fs::set_permissions(&p, std::fs::Permissions::from_mode(0o700)).unwrap();
+            swarm_engine::fixture_root("workflow63-");
         RootStore::initialize(&p, &mut SystemEnvironment)
             .unwrap()
             .close()

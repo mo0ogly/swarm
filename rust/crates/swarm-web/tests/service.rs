@@ -16,9 +16,7 @@ struct Fixture {
 impl Fixture {
     /// Public operations establish meaningful isolated Work/tasks before HTTP faults.
     fn new() -> Self {
-        let root =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("web-root-").unwrap());
-        fs::create_dir(&root).unwrap();
+        let root = swarm_engine::fixture_root("web-root-");
         let mut s = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
         let work=s.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Web","objective":"Preserve Root guards","scope":"Fixture","criteria":["Observable state"]}"#,&mut SystemEnvironment).unwrap().result.work.id;
         for (id, revision) in [("task", 1), ("other", 2)] {
@@ -428,8 +426,7 @@ fn action_wire_go_case_null_and_duplicate_struct_merge_reach_the_real_task() {
 /// [], whereas an unavailable/corrupt Root remains a visible failure, not [].
 #[test]
 fn initialized_empty_work_list_is_distinct_from_root_failure() {
-    let root = std::env::temp_dir().join(swarm_engine::generate_identifier("web-empty-").unwrap());
-    fs::create_dir(&root).unwrap();
+    let root = swarm_engine::fixture_root("web-empty-");
     RootStore::initialize(&root, &mut SystemEnvironment)
         .unwrap()
         .close()

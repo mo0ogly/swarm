@@ -383,9 +383,7 @@ mod tests {
         /// Owned files only; this does not seed a live Root or validation receipt.
         fn new() -> Self {
             let root =
-                std::env::temp_dir().join(crate::generate_identifier("review-coherence-").unwrap());
-            fs::create_dir(&root).unwrap();
-            fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+                crate::fixture_root("review-coherence-");
             fs::create_dir(root.join("docs")).unwrap();
             fs::write(root.join("report.md"), "Complete supplied report").unwrap();
             fs::write(root.join("docs/delivery.md"), "Original checked document").unwrap();

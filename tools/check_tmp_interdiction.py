@@ -13,13 +13,16 @@ Detected violation classes:
 - Python: `tempfile.gettempdir()` / `tempfile.tempdir` reads (reported for
   review: some are legitimate capacity observations, not allocations);
 - JavaScript (.cjs/.js): `os.tmpdir()` occurrences and `mkdtempSync` calls
-  whose prefix derives from `tmpdir` (reported for review).
+  whose prefix derives from `tmpdir` (reported for review);
+- Rust (.rs): `std::env::temp_dir()` allocations (reported for review, and as
+  violations when they join-create a directory — see RUST_EXEMPT below). The
+  D04 migration (2026-11-07) moved fixture allocation to
+  `crate::fixture_root()`/`swarm_engine::fixture_root()` under the configured
+  fixture area; remaining `temp_dir()` uses must be one of the documented
+  exemptions (read-only probes of the system volume, paths asserted not to
+  exist, assertions on the TMPDIR pinning itself, or pure path composition).
 
-Rust `env::temp_dir()` uses are covered at runner level (recipe.py pins
-TMPDIR) and by the documented source rule; they are intentionally not part
-of this guard's exit status.
-
-Exit status: 0 when no Python allocation violation remains; 1 otherwise.
+Exit status: 0 when no allocation violation remains; 1 otherwise.
 Review categories never affect the exit status. With `--json`, prints one
 JSON object instead of text.
 
@@ -36,6 +39,31 @@ SKIP_DIRS = {'.git', 'node_modules', '__pycache__', '.venv', 'venv', 'target',
              '.swarm-fixtures', 'dist', 'build'}
 
 PY_ALLOC = {'mkdtemp', 'TemporaryDirectory', 'mkstemp', 'NamedTemporaryFile'}
+
+# Rust `std::env::temp_dir()` sites exempt from the D04 source rule (2026-11-07).
+# Each entry: repo-relative path -> set of 1-based line numbers. An exempt line
+# must never allocate a fixture: read-only probes of the system temp volume,
+# paths asserted not to exist, assertions on the TMPDIR pinning itself, or pure
+# path composition without creation. Additions require updating this map AND
+# rust/crates/swarm-engine/src/fixture_area.rs module documentation in the same
+# change, with the qualifying category stated in the accompanying plan entry.
+RUST_EXEMPT = {
+    'rust/crates/swarm-engine/src/mission_status_runtime.rs': {
+        57,   # read-only temp-volume health probe entry ("temporary" row)
+        538,  # test: path asserted NOT to exist, never created
+        584,  # test: probe() assertion on the system volume itself
+        586,  # test: path asserted NOT to exist, never created
+    },
+    'rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs': {
+        682,  # test: assertion — workspace must NOT be under temp_dir
+        683,  # test: assertion — temp_dir must NOT be inside workspace
+    },
+    'rust/crates/swarm-engine/tests/runtime_temporary.rs': {
+        29,   # test: asserts TMPDIR pinning (env::temp_dir() == applied)
+    },
+}
+
+RS_TEMP_DIR = re.compile(r'\bstd::env::temp_dir\s*\(\s*\)|\benv::temp_dir\s*\(\s*\)')
 
 
 def tempfile_bindings(tree):
@@ -105,6 +133,30 @@ def scan_js(path, text):
     return review
 
 
+def scan_rust(path, rel):
+    """Return (violations, review) for one Rust file.
+
+    Every `env::temp_dir()` occurrence in code is reported; a line of the
+    documented RUST_EXEMPT map is a review item (never a violation), any other
+    line is an allocation violation — after the D04 migration, fixture
+    allocation must go through fixture_root() and a new temp_dir() site needs
+    an explicit, documented exemption before it lands. Line comments (//, ///,
+    //!) and everything after them are ignored: doc mentions of the migrated
+    class are not call sites.
+    """
+    review = []
+    violations = []
+    exempt = RUST_EXEMPT.get(rel, set())
+    for i, line in enumerate(path.read_text(errors='replace').splitlines(), 1):
+        code = line.split('//', 1)[0]
+        if RS_TEMP_DIR.search(code):
+            if i in exempt:
+                review.append((i, 'exempt temp_dir() (documented)'))
+            else:
+                violations.append((i, 'env::temp_dir() — use fixture_root()'))
+    return violations, review
+
+
 def iter_files(roots, suffixes):
     for root in roots:
         root = root.resolve()
@@ -123,10 +175,12 @@ def main():
     roots = [pathlib.Path(a) for a in args] or [REPO / 'tests', REPO / 'tools', REPO / 'web']
     result = {'violations': {}, 'reviews': {}}
     fail = 0
-    for path in iter_files(roots, {'.py', '.cjs', '.js'}):
+    for path in iter_files(roots, {'.py', '.cjs', '.js', '.rs'}):
         text = path.read_text(errors='replace')
         if path.suffix == '.py':
             alloc, review = scan_python(path, text)
+        elif path.suffix == '.rs':
+            alloc, review = scan_rust(path, str(path.relative_to(REPO)))
         else:
             alloc, review = [], scan_js(path, text)
         rel = str(path.relative_to(REPO))

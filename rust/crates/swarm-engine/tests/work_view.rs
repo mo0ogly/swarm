@@ -19,9 +19,7 @@ impl Drop for Fixture {
 }
 /// Allocate an owned isolated root; failed checks retain it for diagnosis.
 fn fixture() -> Fixture {
-    let path = std::env::temp_dir().join(swarm_engine::generate_identifier("work-view-").unwrap());
-    fs::create_dir(&path).unwrap();
-    fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+    let path = swarm_engine::fixture_root("work-view-");
     Fixture(path)
 }
 use swarm_engine::{

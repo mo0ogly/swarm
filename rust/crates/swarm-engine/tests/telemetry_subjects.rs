@@ -15,8 +15,7 @@ impl Drop for Root {
 
 #[test]
 fn subjects_are_active_only_while_their_run_is_live() {
-    let path = std::env::temp_dir().join(swarm_engine::generate_identifier("telemetry-subjects-").unwrap());
-    fs::create_dir(&path).unwrap();
+    let path = swarm_engine::fixture_root("telemetry-subjects-");
     let _owned = Root(path.clone());
     RootStore::initialize(&path, &mut SystemEnvironment).unwrap().close().unwrap();
     let store = RootStore::open(&path, false).unwrap();
@@ -47,8 +46,7 @@ fn subjects_are_active_only_while_their_run_is_live() {
 
 #[test]
 fn runs_of_a_work_list_both_kinds_and_tolerate_missing_tables() {
-    let path = std::env::temp_dir().join(swarm_engine::generate_identifier("telemetry-runs-").unwrap());
-    fs::create_dir(&path).unwrap();
+    let path = swarm_engine::fixture_root("telemetry-runs-");
     let _owned = Root(path.clone());
     RootStore::initialize(&path, &mut SystemEnvironment).unwrap().close().unwrap();
     let store = RootStore::open(&path, false).unwrap();

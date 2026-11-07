@@ -16,9 +16,7 @@ impl Fixture {
     /// Build actual schema, Work and task through public commands. A harmless
     /// local executable is observed only; it must never be started by admission.
     fn new() -> Self {
-        let root =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("launch75-").unwrap());
-        fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
+        let root = swarm_engine::fixture_root("launch75-");
         let mut store = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
         let created=store.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Title","objective":"Goal","scope":"Scope","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap();
         let work = created.result.work.id;

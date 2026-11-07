@@ -293,10 +293,7 @@ mod tests {
     impl Fixture {
         /// Create an owned private parent for independently initialized Roots.
         fn new() -> Self {
-            let path = std::env::temp_dir()
-                .join(crate::generate_identifier("gate-telemetry-binding-").unwrap());
-            fs::create_dir(&path).unwrap();
-            fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+            let path = crate::fixture_root("gate-telemetry-binding-");
             Self(path)
         }
         /// Initialize through the supported Root API; no permission SQL is forged.

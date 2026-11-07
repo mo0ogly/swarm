@@ -416,7 +416,7 @@ mod tests {
         }
     }
     fn root() -> Scratch {
-        let path = std::env::temp_dir().join(crate::generate_identifier("endpoint-").unwrap());
+        let path = crate::fixture_root("endpoint-");
         fs::create_dir_all(path.join(".swarm")).unwrap();
         Scratch(path)
     }

@@ -10,9 +10,7 @@ impl Fixture {
     /// Allocate an owned private root; no live mission or provider participates.
     fn new() -> Self {
         let path =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("reply-root-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+            swarm_engine::fixture_root("reply-root-");
         Self(path)
     }
 }

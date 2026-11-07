@@ -1612,10 +1612,7 @@ mod dispatch_replay_tests {
             |tx, _| recorded_dispatch_launch(tx, "work", "operation", &mut DispatchReplayObservation::default()));
         assert!(result.unwrap().is_none()); assert_eq!(fence.0.load(Ordering::SeqCst), 2);
         assert_eq!(db.query_row("SELECT count(*) FROM pulses", [], |r| r.get::<_,i64>(0)).unwrap(), 0);
-        let directory_path = std::env::temp_dir().join(crate::generate_identifier("replay-instance-").unwrap());
-        std::fs::create_dir(&directory_path).unwrap();
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(&directory_path, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let directory_path = crate::fixture_root("replay-instance-");
         let directory = crate::local_storage::LocalDirectory::open(&directory_path).unwrap();
         let launch = Launch { schema_version:1,event_id:"operation".into(),task_id:"task".into(),provider:"fixture".into(),
             role:"worker".into(),origin:"conducteur".into(),conductor_id:"owner".into(),expected_revision:1,..Default::default() };

@@ -17,9 +17,7 @@ impl Fixture {
     /// Real owned service Root in a 0700 temp directory with a session
     /// credential derived from the test listener.
     fn new() -> Self {
-        let dir = std::env::temp_dir().join(swarm_engine::generate_identifier("paea-page94-").unwrap());
-        std::fs::create_dir(&dir).unwrap();
-        std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let dir = swarm_engine::fixture_root("paea-page94-");
         let store = swarm_engine::RootStore::initialize(&dir, &mut swarm_engine::SystemEnvironment).unwrap();
         store.close().unwrap();
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();

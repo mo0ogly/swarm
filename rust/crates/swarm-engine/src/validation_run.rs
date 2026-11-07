@@ -994,8 +994,7 @@ mod controlled_process_tests {
     /// errors fail with their original cause. No retry or product policy changes.
     fn executable_fixture() -> std::path::PathBuf {
         use std::{fs, os::unix::fs::DirBuilderExt};
-        let root = std::env::temp_dir().join(crate::generate_identifier("exec78-").unwrap());
-        fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
+        let root = crate::fixture_root("exec78-");
         let script = "import pathlib,sys; root=pathlib.Path(sys.argv[1]); a=root/'valid'; b=root/'invalid'; a.write_bytes(b\"#!/bin/sh\\nprintf 'CONTROL\\\\n'\\n\"); b.write_bytes(b\"printf 'UNEXPECTED_SHELL\\\\n'\\n\"); a.chmod(0o700); b.chmod(0o700)";
         let output = Command::new("/usr/bin/python3")
             .args(["-c", script])

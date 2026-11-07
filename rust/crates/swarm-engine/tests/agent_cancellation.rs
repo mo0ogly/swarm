@@ -8,8 +8,7 @@ impl Fixture {
     /// Real native schema and one unstarted manual attempt, all fixture-owned.
     fn new() -> Self {
         let path =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("agent-cancel-").unwrap());
-        fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+            swarm_engine::fixture_root("agent-cancel-");
         RootStore::initialize(&path, &mut SystemEnvironment)
             .unwrap()
             .close()
