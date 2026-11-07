@@ -21,7 +21,7 @@ fn preparation_method_receipt_failure_rolls_back_and_recovers() {
     db.execute_batch("CREATE TRIGGER preparation_method_fault BEFORE INSERT ON preparation_commands BEGIN SELECT RAISE(ABORT,'PRIVATE_METHOD_FAULT'); END").unwrap();
     let error=root.preparation_command(&request,&mut SystemEnvironment).err().expect("receipt fault must refuse");
     assert_eq!(error.code(),"agent-launch-storage");assert!(error.recorded_preparation().is_none());
-    assert_eq!(root.preparation_show(&p.id).unwrap().value,current);
+    assert_eq!(root.preparation_show(&p.id, None).unwrap().value,current);
     assert_eq!((count("preparation_documents"),count("preparation_commands")),before);
     db.execute_batch("DROP TRIGGER preparation_method_fault").unwrap();
     let recovered=root.preparation_command(&request,&mut SystemEnvironment).unwrap().value;
@@ -43,7 +43,7 @@ fn preparation_child_insert_failure_rolls_back_and_same_event_recovers() {
     for (index,table) in ["preparation_documents","preparation_commands"].iter().enumerate(){
         let request=serde_json::json!({"version":1,"action":"save","preparation_id":current.id,"event_id":format!("atomic-{index}"),"expected_revision":current.revision,"document":"plan","text":"new draft"});
         let raw=serde_json::to_vec(&request).unwrap();
-        assert_eq!(root.preparation_show(&current.id).unwrap().value,current);
+        assert_eq!(root.preparation_show(&current.id, None).unwrap().value,current);
         let count=|table:&str|db.query_row(&format!("SELECT count(*) FROM {table}"),[],|row|row.get::<_,i64>(0)).unwrap();
         let before=(count("preparation_documents"),count("preparation_commands"));
         db.execute_batch(&format!("CREATE TRIGGER preparation_test_refusal BEFORE INSERT ON {table} BEGIN SELECT RAISE(ABORT,'PRIVATE_SQL_FAULT'); END")).unwrap();
@@ -51,7 +51,7 @@ fn preparation_child_insert_failure_rolls_back_and_same_event_recovers() {
         assert_eq!(error.code(),"agent-launch-storage");
         assert!(!error.to_string().contains("PRIVATE_SQL_FAULT"));
         assert!(error.recorded_preparation().is_none(),"known rollback is not a committed receipt");
-        assert_eq!(root.preparation_show(&current.id).unwrap().value,current);
+        assert_eq!(root.preparation_show(&current.id, None).unwrap().value,current);
         assert_eq!((count("preparation_documents"),count("preparation_commands")),before);
         db.execute_batch("DROP TRIGGER preparation_test_refusal").unwrap();
         let next=root.preparation_command(&raw,&mut SystemEnvironment).unwrap().value;
@@ -63,7 +63,7 @@ fn preparation_child_insert_failure_rolls_back_and_same_event_recovers() {
         current=next;
     }
     db.close().unwrap();root.close().unwrap();
-    let reopened=RootStore::open(&path,false).unwrap();assert_eq!(reopened.preparation_show(&current.id).unwrap().value,current);reopened.close().unwrap();
+    let reopened=RootStore::open(&path,false).unwrap();assert_eq!(reopened.preparation_show(&current.id, None).unwrap().value,current);reopened.close().unwrap();
     std::fs::remove_dir_all(path).unwrap();
 }
 
@@ -88,7 +88,7 @@ fn preparation_current_receipt_content_must_match_stored_state() {
         let result=root.preparation_command(request,&mut SystemEnvironment);
         assert!(result.is_err(),"altered current receipt accepted; fixture={}",path.display());
         assert_eq!(result.err().unwrap().code(),"preparation-receipt-identity-mismatch");
-        assert_eq!(root.preparation_show(&initial.id).unwrap().value,initial);
+        assert_eq!(root.preparation_show(&initial.id, None).unwrap().value,initial);
         assert_eq!(db.query_row("SELECT count(*) FROM preparation_commands",[],|row|row.get::<_,i64>(0)).unwrap(),count);
         db.execute("UPDATE preparation_commands SET response=?1 WHERE preparation_id=?2 AND event_id='receipt-integrity'",rusqlite::params![original,initial.id]).unwrap();
         assert_eq!(root.preparation_command(request,&mut SystemEnvironment).unwrap().value,initial);
@@ -135,7 +135,7 @@ fn preparation_adopt_brief_receipt_failure_rolls_back_and_same_event_recovers() 
     let mut seeded:serde_json::Value=serde_json::from_slice(&body).unwrap();
     seeded["verdict"]=serde_json::json!({"plan_hash":"stale-plan","brief_hash":"stale-brief","method_hash":"stale-method","at":"2020-01-01T00:00:00Z"});
     assert_eq!(db.execute("UPDATE preparations SET body=?1 WHERE id=?2",rusqlite::params![serde_json::to_vec(&seeded).unwrap(),created.id]).unwrap(),1);
-    let current=root.preparation_show(&created.id).unwrap().value;
+    let current=root.preparation_show(&created.id, None).unwrap().value;
     assert!(current.verdict.is_some());assert_eq!(current.revision,4);
     let count=|table:&str|db.query_row(&format!("SELECT count(*) FROM {table}"),[],|row|row.get::<_,i64>(0)).unwrap();
     let before=(count("preparation_documents"),count("preparation_commands"));
@@ -145,7 +145,7 @@ fn preparation_adopt_brief_receipt_failure_rolls_back_and_same_event_recovers() 
     assert_eq!(error.code(),"agent-launch-storage");
     assert!(!error.to_string().contains("PRIVATE_ADOPT_FAULT"));
     assert!(error.recorded_preparation().is_none(),"known rollback is not a committed receipt");
-    assert_eq!(root.preparation_show(&created.id).unwrap().value,current);
+    assert_eq!(root.preparation_show(&created.id, None).unwrap().value,current);
     assert_eq!((count("preparation_documents"),count("preparation_commands")),before);
     db.execute_batch("DROP TRIGGER preparation_adopt_fault").unwrap();
     let recovered=root.preparation_command(&request,&mut SystemEnvironment).unwrap().value;
@@ -158,7 +158,7 @@ fn preparation_adopt_brief_receipt_failure_rolls_back_and_same_event_recovers() 
     assert_eq!(root.preparation_command(&request,&mut SystemEnvironment).unwrap().value,recovered);
     db.close().unwrap();root.close().unwrap();
     let reopened=RootStore::open(&path,false).unwrap();
-    assert_eq!(reopened.preparation_show(&created.id).unwrap().value,recovered);
+    assert_eq!(reopened.preparation_show(&created.id, None).unwrap().value,recovered);
     reopened.close().unwrap();
     std::fs::remove_dir_all(path).unwrap();
 }
@@ -179,11 +179,11 @@ fn preparation_budget_receipt_failure_rolls_back_and_recovers() {
     db.execute_batch("CREATE TRIGGER preparation_budget_fault BEFORE INSERT ON preparation_commands BEGIN SELECT RAISE(ABORT,'PRIVATE_BUDGET_FAULT'); END").unwrap();
     let error=root.preparation_command(&raw,&mut SystemEnvironment).err().expect("receipt fault must refuse");
     assert_eq!(error.code(),"agent-launch-storage");assert!(error.recorded_preparation().is_none());assert!(!error.to_string().contains("PRIVATE_BUDGET_FAULT"));
-    assert_eq!(root.preparation_show(&p.id).unwrap().value,current);
+    assert_eq!(root.preparation_show(&p.id, None).unwrap().value,current);
     db.execute_batch("DROP TRIGGER preparation_budget_fault").unwrap();
     let recovered=root.preparation_command(&raw,&mut SystemEnvironment).unwrap().value;
     assert_eq!(recovered.revision,3);assert_eq!(recovered.budget.as_ref().unwrap().limit_usd.0,20.0);assert_eq!(recovered.documents,p.documents);
     assert_eq!(root.preparation_command(&raw,&mut SystemEnvironment).unwrap().value,recovered);
     db.close().unwrap();root.close().unwrap();
-    let reopened=RootStore::open(&path,false).unwrap();assert_eq!(reopened.preparation_show(&p.id).unwrap().value,recovered);reopened.close().unwrap();std::fs::remove_dir_all(path).unwrap();
+    let reopened=RootStore::open(&path,false).unwrap();assert_eq!(reopened.preparation_show(&p.id, None).unwrap().value,recovered);reopened.close().unwrap();std::fs::remove_dir_all(path).unwrap();
 }

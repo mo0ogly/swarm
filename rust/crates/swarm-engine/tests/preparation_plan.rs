@@ -24,7 +24,7 @@ fn plan_verdict_receipt_failure_rolls_back_and_replays() {
     db.execute_batch("CREATE TRIGGER plan_receipt_fault BEFORE INSERT ON preparation_commands BEGIN SELECT RAISE(ABORT,'PRIVATE_PLAN_FAULT'); END").unwrap();
     let error=root.preparation_command(&request,&mut SystemEnvironment).err().expect("receipt insert must fail");
     assert_eq!(error.code(),"agent-launch-storage");assert!(!error.to_string().contains("PRIVATE_PLAN_FAULT"));assert!(error.recorded_preparation().is_none());
-    assert_eq!(root.preparation_show(&p.id).unwrap().value,p);
+    assert_eq!(root.preparation_show(&p.id, None).unwrap().value,p);
     assert_eq!((count("preparation_documents"),count("preparation_commands")),before);
     db.execute_batch("DROP TRIGGER plan_receipt_fault").unwrap();
     let recovered=root.preparation_command(&request,&mut SystemEnvironment).unwrap().value;
@@ -32,5 +32,5 @@ fn plan_verdict_receipt_failure_rolls_back_and_replays() {
     assert_eq!((count("preparation_documents"),count("preparation_commands")),(before.0,before.1+1));
     assert_eq!(root.preparation_command(&request,&mut SystemEnvironment).unwrap().value,recovered);
     db.close().unwrap();root.close().unwrap();
-    let reopened=RootStore::open(&path,false).unwrap();assert_eq!(reopened.preparation_show(&p.id).unwrap().value,recovered);reopened.close().unwrap();std::fs::remove_dir_all(path).unwrap();
+    let reopened=RootStore::open(&path,false).unwrap();assert_eq!(reopened.preparation_show(&p.id, None).unwrap().value,recovered);reopened.close().unwrap();std::fs::remove_dir_all(path).unwrap();
 }
