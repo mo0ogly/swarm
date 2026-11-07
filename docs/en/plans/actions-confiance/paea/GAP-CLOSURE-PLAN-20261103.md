@@ -296,3 +296,59 @@ protected qualification depends on H1/H2/G3, E3 on H3/H4/G5.
 All lots remain proposed, not executed by this request. No engine adoption or
 independent acceptance claimed. Documentation-only increment: no executable
 function/policy changes and no build/restart required.
+
+## 7 November follow-up — G1 advanced separation executed locally
+
+Lot G1 (advanced separation at the fictitious settlement, tracked in
+[P1-G1-20261103.md](P1-G1-20261103.md)) was executed locally by the relay
+Claude session: admin/requester/approver↔effect conflicts checked at the
+engagement point through the existing Trust monitor, typed refusals without
+insertion, recovery proven. The "matrix with require_separation=true"
+criterion is covered; "matrix alone" remains explicitly refused. The
+`paea-payment-agreement` recipe is extended, PASS 5/5 VERIFIED. Global G1
+remains partial: human enrollment, protected effect services, operator flow
+and independent review stay open.
+
+Local delivery (same day): `./swarm.sh restart` requalified and installed
+the dev.342 candidate (SHA `9f268e0e…`, verified normal profile
+`VERIFIED_DEFAULT_NATIVE_PROFILE`) carrying the G1 engine change, with
+identity verified in chain (build record = disk = `/proc/<pid>/exe`,
+effective digest = modified `policy.rs` bytes). A build warning in the lot's
+new code, fixed during a recipe run (editing a declared input during a run:
+run invalidated, kept as witness — recognized method fault, lesson: freeze
+sources before runs), required a re-delivery. The dev.343 re-delivery was
+first **refused by the launcher** (`profile-effective-input-changed`):
+concurrent session swarm-3d was editing its fixture_area files during the
+build; server stayed dev.342, failure kept. Resumption at 13:55 on operator
+request: engine tree stable, restart succeeded — **dev.343 installed and
+verified in chain** (SHA `a0721124…` = build record `VERIFIED_DEFAULT_
+NATIVE_PROFILE` = disk = `/proc/<pid>/exe`), carrying both lots (G1 +
+fixture_area). Delivered recipes re-pinned from the real hash (chain 3
+occ., settlement 8 occ.) then replayed on the real delivery:
+**settlement-run-19 PASS 7/7** (23 witness spawns) and **chain-run-11 PASS
+4/4** (10 witness spawns, wrong-SHA refusal exercised), both `verify`
+VERIFIED. `paea-payment-agreement` unchanged (fixed historical archive).
+The G1 lot was committed (6261e0fb8, 10 files); push awaits its explicit
+instruction.
+
+## 7 November follow-up (cont.) — APEX current state updated, G7 examined
+
+The "Current state — 7 November 2026" entry of
+[PAEA-APEX.md](../../PAEA-APEX.md) replaces the 3 November one (kept as
+history): delivered dev.343 `a0721124…`, re-verification
+settlement-run-19 + chain-run-11, G1 advanced separation committed 6261e0fb8,
+independent acceptance unchanged 0/17.
+
+Examination of lot **G7 — P3 Evaluation/retrospective** (lot table, row G7):
+local content — "reproduce findings, fix common contracts, deliver and
+prepare retrospective"; human gate — "evaluator runs T01…T22 and reassesses
+fixes; authorized human participants" (H4); exit criterion — "bounded
+independent verdict, retained failures/exclusions, final retrospective"
+(R8). **The lot cannot start locally**: its qualification dependencies are
+G5 → G7 and G6 → G7 (DAG: "G5 + G6 → G7"), and neither G5 (supervision /
+composed E2) nor G6 (tier designation) is qualified — G5 requires real
+humans for approvals and an authorized real provider, G6 requires the
+sponsor's appointment of an evaluator and a separate implementation team
+(H3). The local-independent preparation the DAG does not forbid (G6 review
+package, T01…T22 contracts) belongs to lot G6 "prepare E3" and stays open
+pending the tier designation; no G7 work is undertaken without it.

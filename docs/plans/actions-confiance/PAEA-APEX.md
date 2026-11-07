@@ -1037,6 +1037,35 @@ Incrément base/statut/preuves autorisé : [bilan et limites](paea/P0-G0-2026110
 Séparation UID du démon cockpit distincte de l'autorité des effets PAEA. Les
 observations suivantes restent datées ; aucun G1…G7 ni verdict indépendant revendiqué.
 
+### État courant — 7 novembre 2026
+
+Candidat unique livré localement : `bin/swarm` SHA-256
+`a07211247b68cc9fd617a048b05f2bd198097c57bd677f248288f4fef43c94ba`
+(v0.1.1-dev.343, commit 0e45e4dbd — modified=true, construit 2026-11-07T12:57:54Z,
+posé 2026-11-07 13:57 — 12e remplacement ; lot G1 séparation avancée + chantier
+fixture_area de la session concurrente). Le cycle complet de livraison —
+dev.342 puis refus lanceur dev.343 première tentative (`profile-effective-input-changed`
+pendant le chantier concurrent, échec conservé), reprise après stabilisation,
+installation vérifiée (build record = disque = `/proc/<pid>/exe`, octets
+`policy.rs` consommés cross-check), défaut de méthode (édition source pendant
+un run de recette, run témoin conservé) — est consigné dans
+[P1-G1-20261103.md](paea/P1-G1-20261103.md). Recettes settlement + chaîne
+re-épinglées sur ce livré depuis le `sha256sum` réel (cross-check épine=réel,
+8 puis 3 occurrences). **Résultat (07-11) : re-vérification complète du livré
+courant — settlement run-19 7/7 PASS puis chain-run-11 4/4 VERIFIED,
+`source_stable: true` aux deux, refus de SHA erroné exercé**
+(`g1-livraison-20261107/settlement-run-19/` : 23 spawns témoins
+`sha256=a0721124…` ; `g1-livraison-20261107/chain-run-11/` : 10 spawns témoins,
+étape 4 = refus de SHA erroné). G1 séparation avancée : la matrice de rôles
+activée par-dessus `require_separation` est désormais vérifiée au point
+d'engagement sur les participants réels de l'action approuvée (conflit →
+`paea-settlement-role-separation`, mapping manquant →
+`paea-settlement-role-mapping`, sans insertion ; matrice sans séparation de
+base toujours refusée) — lot committé 6261e0fb8. Acceptation indépendante :
+0/17, inchangée ; les sept critères ouverts E2 restent opérants. Le bloc
+« État courant — 3 novembre 2026 (matin) » ci-dessous est conservé comme
+historique (run-17 + chain-run-10 sur 3146c837…).
+
 ### État courant — 3 novembre 2026 (matin)
 
 Candidat unique livré localement : `bin/swarm` SHA-256

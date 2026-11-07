@@ -236,10 +236,10 @@ producteur 2 — fixture créée sous `.swarm-fixtures/swarm-status-review-*`
 BF-16b `gate-evidence-invalid` à `mission_status_review.rs:412`, non une
 régression du déplacement — diff purement localisateur) ; producteur 3 —
 `cargo test --test project_context` 4/4 vert après canonisation. `check_tmp_interdiction.py` :
-0 violation (le garde ne scanne pas les sources Rust — l'exclusion Rust est
-couverte par le filet TMPDIR de recipe.py et la règle source documentée ;
-extension du garde au Rust non retenue ici : ~130 sites `env::temp_dir()`
-passeraient en rouge sans traiter la cause, découverte consignée ci-dessous D04).
+0 violation (au 6 novembre le garde ne scannait pas les sources Rust —
+l'exclusion Rust était couverte par le filet TMPDIR de recipe.py et la règle
+source documentée ; extension retenue puis exécutée le 7 novembre en même
+temps que la migration D04, voir la section de clôture ci-dessous).
 Reste sous /tmp : la fixture diagnostique de la vague BF-16b
 `swarm-status-review-536028-1793974459868644663` est préservée telle quelle
 (suppression refusée à raison par le classificateur : preuve de la vague, non
@@ -257,14 +257,55 @@ volontairement `.py/.cjs/.js` seulement). Mais toute exécution cargo nue
 (TMPDIR par défaut) écrit sous /tmp : la conformité à l'interdiction du
 31 octobre repose alors sur la discipline de lancement, pas sur les octets.
 Valeur : déplacer ces sites vers l'idiome `.swarm-fixtures/` rendrait la
-conformité structurelle. Non corrigé ici : massive (≈130 sites), hors
-périmètre de l'ordre « corrigés » (D02+D03 ciblés), et un garde Rust rouge
-immédiat bloquerait toute la vague sans corriger la cause. Propriétaire :
-ouvert — à rattacher à un lot de migration ou à un accord de vague ; condition
-de reprise : décision d'étendre le garde `check_tmp_interdiction.py` aux
-sources Rust (classe `env::temp_dir()` sans TMPDIR explicite) en même temps
-que la migration des sites, producteur connu identifié : `tests/trust_biba.rs:7`
-(`biba-*`).
+conformité structurelle.
+
+### Migration D04 exécutée (7 novembre 2026) — classe `env::temp_dir()` fermée
+
+La classe 1 (`std::env::temp_dir()`) est migrée vers l'idiome
+`fixture_root()` livré dans `rust/crates/swarm-engine/src/fixture_area.rs`
+(aire réglée par l'Admin `runtime_temporary_directory`, défaut
+`<repo>/.swarm-fixtures/`, 0700 ; défaut embarqué pris en compte — le
+comportement suit le réglage sauvegardé comme le modal Admin). Portée réelle :
+**~95 sites** (pas ≈130 — le premier scan comptait les classes 2/3), tous
+remplacés par des remplacements littéraux exacts site par site :
+swarm-engine src/ (~33 sites), swarm-engine tests/ (~52),
+swarm-web src/service.rs + tests/ (~17), swarm-cli tests/ (4). Vérification :
+lib + 55 cibles de tests swarm-engine recompilées et relancées (les suites
+migrées au vert ; les échecs restants sont tous préexistants, chacun revérifié
+identique sur la version HEAD du fichier — familles v52 compteur de réglages
+6≠4, agent_workflow corps de prompt, git_report `format`, planning_enable
+portage `agent-provider-catalogue-read`), 18 cibles swarm-web et swarm-cli au
+vert (0 échec). Une seule régression de la migration, corrigée :
+`git_metadata::unavailable_fields...` contractait « aucun dépôt git ancêtre »
+— précondition vraie implicitement sous /tmp, fausse sous l'aire dépôt (git
+découvre le dépôt Swarm) ; correction au niveau du contrat : ce test alloue
+désormais son root dans l'aire repli opérateur
+`~/.local/state/swarm-fixtures/` (hors de tout dépôt, prévue par la consigne
+du 31 octobre pour ce que l'aire dépôt ne peut pas héberger). Leçons de
+migration : (a) après chaque remplacement de `join`, scanner les lignes
+suivantes pour les `create_dir`/`set_permissions` orphelins (3 régressions de
+cette classe attrapées avant compilation) ; (b) le retrait d'un import
+`PermissionsExt` peut casser un usage `from_mode` restant ailleurs dans le
+fichier — balayer `from_mode` sans import après retrait ; (c) exécuter la
+version HEAD d'un test qui échoue après migration avant d'incriminer la
+migration (5 faux positifs évités).
+
+**Garde étendu en même temps que la migration** (condition de reprise
+enregistrée) : `tools/check_tmp_interdiction.py` scanne désormais `.rs` — tout
+`env::temp_dir()` hors carte d'exemptions documentée `RUST_EXEMPT` est une
+violation (exit 1) ; les exemptions (7 lignes : sondes lecture-seule du volume
+système `mission_status_runtime.rs:57/:584`, chemins assertés inexistants
+`:538/:586`, assertions de composition `preparation_call_cli.rs:682-683`,
+assertion du pinning TMPDIR lui-même `runtime_temporary.rs:29`) apparaissent
+en revue, jamais en violation ; les mentions dans commentaires/doc sont
+ignorées. Test négatif vérifié (site injecté → violation ; mention en doc →
+ignorée). Gardes coexécutés : 0 violation (Python, JS et Rust).
+
+Reste ouvert (classe 2, non traitée ici) : ~153 sites `tempfile::tempdir()` /
+`TempDir::new()` sous `rust/crates` (famille enrollment pour l'essentiel),
+découverte consignée pour une vague suivante — même idiome cible
+(`fixture_root`), producteur à rattacher au lot enrollment. La fixture
+diagnostique BF-16b sous /tmp reste préservée pour son propriétaire.
 
 ### Leçons vérifiées de la reprise (6 novembre 2026, portée D03)
 
@@ -370,5 +411,28 @@ réel (chain 3 occ., settlement 8 occ.) puis rejeu sur le livré réel :
 **settlement-run-19 PASS 7/7** (23 spawns témoins) et **chain-run-11 PASS
 4/4** (10 spawns témoins, refus de mauvais SHA exercé), les deux `verify`
 VERIFIED. `paea-payment-agreement` inchangé (archive historique fixe).
-Le lot G1 reste non committé ; commit/push attendent l'instruction
-explicite de l'opérateur.
+Le lot G1 a été committé (6261e0fb8, 10 fichiers) ; push attend son
+instruction explicite.
+
+## Suivi du 7 novembre (suite) — État courant APEX mis à jour, examen G7
+
+L'entrée « État courant — 7 novembre 2026 » de
+[PAEA-APEX.md](../PAEA-APEX.md) remplace celle du 3 novembre (conservée
+comme historique) : livré dev.343 `a0721124…`, re-vérification
+settlement-run-19 + chain-run-11, G1 séparation avancée committé 6261e0fb8,
+acceptation indépendante inchangée 0/17.
+
+Examen du lot **G7 — P3 Évaluation/RETEX** (table des lots, ligne 56) :
+contenu local — « reproduire les défauts reçus, corriger le contrat commun,
+livrer, préparer RETEX » ; porte humaine — « l'évaluateur mène T01…T22 et
+réévalue les corrections ; participants habilités » (H4) ; critère de
+sortie — « verdict indépendant borné, défauts et exclusions conservés, puis
+RETEX final » (R8). **Le lot n'est pas démarrable localement** : ses
+dépendances de qualification sont G5 → G7 et G6 → G7 (graphe, lignes 71-72),
+et G5 (supervision/E2 composée) comme G6 (désignation des tiers) ne sont
+pas qualifiés — G5 requiert des humains pour approbations et un fournisseur
+réel avec moyens établis, G6 requiert la désignation d'un évaluateur et
+d'une équipe tierce par le commanditaire (H3). La préparation locale
+indépendante que le graphe n'interdit pas (dossier de revue G6, contrats
+T01…T22) appartient au lot G6 « préparer E3 » et reste ouverte à la
+désignation des tiers ; aucun travail G7 n'est entrepris sans elle.

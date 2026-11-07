@@ -1044,6 +1044,35 @@ Authorized baseline/status/evidence increment: [record and limits](paea/P0-G0-20
 Cockpit daemon UID separation is distinct from PAEA effect authority. Earlier
 observations below remain dated; no G1–G7 or independent acceptance claimed.
 
+### Current state — 7 November 2026
+
+Locally delivered unique candidate: `bin/swarm` SHA-256
+`a07211247b68cc9fd617a048b05f2bd198097c57bd677f248288f4fef43c94ba`
+(v0.1.1-dev.343, commit 0e45e4dbd — modified=true, built
+2026-11-07T12:57:54Z, in place 2026-11-07 13:57 — 12th replacement; G1
+advanced-separation lot + the concurrent session's fixture_area worksite).
+The full delivery cycle — dev.342 then the refused first dev.343 attempt
+(`profile-effective-input-changed` during the concurrent worksite, failure
+kept), resumption after stabilization, verified installation (build record =
+disk = `/proc/<pid>/exe`, `policy.rs` bytes consumed cross-check), method
+fault (source edit during a recipe run, witness run kept) — is recorded in
+[P1-G1-20261103.md](paea/P1-G1-20261103.md). Settlement and chain recipes
+re-pinned on this delivery from the real `sha256sum` hash (pin=actual
+cross-check, 8 then 3 occurrences). **Result (07-11): the current delivery
+is fully re-verified — settlement run-19 7/7 PASS then chain-run-11 4/4
+VERIFIED, `source_stable: true` on both, wrong-SHA refusal exercised**
+(`g1-livraison-20261107/settlement-run-19/`: 23 witness spawns
+`sha256=a0721124…`; `g1-livraison-20261107/chain-run-11/`: 10 witness
+spawns, step 4 = wrong-SHA refusal). G1 advanced separation: the role matrix
+enabled on top of `require_separation` is now checked at the engagement
+point against the real participants of the approved action (conflict →
+`paea-settlement-role-separation`, missing mapping →
+`paea-settlement-role-mapping`, without insertion; matrix without basic
+separation still refused) — lot committed as 6261e0fb8. Independent
+acceptance: 0/17, unchanged; the seven open E2 criteria remain in force.
+The "Current state — 3 November 2026 (morning)" block below is kept as
+history (run-17 + chain-run-10 on 3146c837…).
+
 ### Current state — 3 November 2026 (morning)
 
 Locally delivered unique candidate: `bin/swarm` SHA-256
