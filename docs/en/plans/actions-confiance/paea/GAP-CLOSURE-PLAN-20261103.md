@@ -352,6 +352,7 @@ sponsor's appointment of an evaluator and a separate implementation team
 (H3). The local-independent preparation the DAG does not forbid (G6 review
 package, T01…T22 contracts) belongs to lot G6 "prepare E3" and stays open
 pending the tier designation; no G7 work is undertaken without it.
+
 ## 7 November follow-up (end) — 29 October invariant matrix: I15 and I17 closed since generation
 
 The matrix
