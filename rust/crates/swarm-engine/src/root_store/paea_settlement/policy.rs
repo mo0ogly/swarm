@@ -1,5 +1,6 @@
 //! Actual current policy attribution and fail-closed compatibility checks.
 use super::{agreement, PaeaPaymentAgreement, PaeaSettlementRequest, PaeaSettlementError, Result, RootStore, R};
+use serde_json::Value;
 use swarm_enrollment_authority::paea_action::{Identity, Operation};
 use swarm_protection_contract::AdmissionContext;
 /// Read the actual protected configuration under a caller-held Trust reservation.
@@ -70,9 +71,15 @@ pub(super) fn attribute(
 /// its shared reservation is held. PAEA permission never substitutes for a
 /// disabled/missing role mapping or a newer configuration. The existing bounded
 /// state reader and shared Biba invariant are reused without a new policy.
-/// Basic separation additionally requires a durable exact payment agreement;
-/// advanced role policy stays refused. The returned record is local audit data,
-/// valid only while the caller keeps this reservation and checks its deadline.
+/// Basic separation additionally requires a durable exact payment agreement.
+/// An enabled advanced matrix on top of it re-checks the agreement's real
+/// participants (admin/requester/approver/effect) through the Trust monitor's
+/// own group comparison before engagement: a conflict refuses without any
+/// ledger insertion (`paea-settlement-role-separation`), a missing mapping
+/// refuses too (`paea-settlement-role-mapping`). A matrix without basic
+/// separation stays refused (`paea-settlement-attributed-admission-required`).
+/// The returned record is local audit data, valid only while the caller keeps
+/// this reservation and checks its deadline.
 pub(super) fn current_actor(
     project: &RootStore,
     identity: &Identity<'_>,
@@ -117,9 +124,48 @@ pub(super) fn current_actor(
                 .as_ref()
                 .is_some_and(|p| p.enabled && !p.incompatible_roles.is_empty())
         {
-            return Err(PaeaSettlementError::refused(
-                "paea-settlement-attributed-admission-required",
-            ));
+            if !state.policy.require_separation {
+                return Err(PaeaSettlementError::refused(
+                    "paea-settlement-attributed-admission-required",
+                ));
+            }
+            // Advanced matrix on top of basic separation: re-check the real
+            // participants of the exact approved action the durable agreement
+            // binds, reusing the Trust monitor's own group comparison. Group
+            // assignments stay administrator assertions, never identity proof.
+            let agreement = agreement::current(&state, prepared)?;
+            if let Some(agreement) = agreement.as_ref() {
+                let admin = state
+                    .mandates
+                    .get(&agreement.mandate_id)
+                    .and_then(|m| m.get("delegator"))
+                    .and_then(Value::as_str)
+                    .ok_or_else(|| {
+                        PaeaSettlementError::refused("paea-settlement-agreement-mandate-missing")
+                    })?;
+                let participants = [
+                    ("admin", admin),
+                    ("requester", agreement.requester.as_str()),
+                    ("approver", agreement.approver.as_str()),
+                    ("effect", actor.subject.as_str()),
+                ];
+                let policy = state.role_separation.as_ref().expect("checked above");
+                if policy.conflicts(&participants).map_err(|_e| {
+                    PaeaSettlementError::refused("paea-settlement-role-mapping")
+                })? {
+                    return Err(PaeaSettlementError::refused(
+                        "paea-settlement-role-separation",
+                    ));
+                }
+            }
+            if context.policy_revision != state.revision
+                || context.policy_digest != fingerprint(&state)?
+            {
+                return Err(PaeaSettlementError::refused("paea-settlement-policy-stale"));
+            }
+            return agreement.map(Some).ok_or_else(|| {
+                PaeaSettlementError::refused("paea-settlement-attributed-admission-required")
+            });
         }
         if context.policy_revision != state.revision
             || context.policy_digest != fingerprint(&state)?

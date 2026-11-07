@@ -134,8 +134,13 @@ supports `require_separation` through durable Trust approval bound to the full
 canonical digest. Current observation and its retained receipt reference prove
 neither human presence nor context provenance. Without current approval,
 `paea-settlement-attributed-admission-required` refuses before any new effect.
-Enabled role policy imposing incompatibilities remains refused; an empty list
-imposes none. Reconciliation remains a read without new commitment. Historical
+With `require_separation`, an enabled advanced matrix rechecks the approved
+action's actual participants at the engagement point (admin, requester, approver,
+effect) through the Trust monitor's group comparison: a conflict refuses without
+insertion (`paea-settlement-role-separation`), a missing mapping refuses
+(`paea-settlement-role-mapping`). An enabled matrix without `require_separation`
+remains refused; an empty list imposes none. Reconciliation remains a read
+without new commitment. Historical
 non-separated fixtures remain distinct from the new approval flow; no actual
 local-instance policy or default is weakened. This does not close global PA-03.
 

@@ -338,3 +338,37 @@ H1/H2/G3 ; E3 à H3/H4/G5. Aucune validation moteur ou revue indépendante prét
 État de tous les lots : proposés, non exécutés par cette demande.
 Cette modification est documentaire ; aucune fonction ou politique exécutable
 modifiée, aucun build/redémarrage nécessaire pour livrer un plan.
+
+## Suivi du 7 novembre — G1 séparation avancée exécutée localement
+
+Le lot G1 (séparation avancée au règlement fictif, suivi `P1-G1-20261103.md`)
+a été exécuté localement par la session Claude de relais : conflits
+admin/requester/approver↔effect vérifiés au point d'engagement via le moniteur
+Trust existant, refus typés sans insertion, rétablissement prouvé. Critère
+« matrice avec require_separation=true » couvert ; « matrice seule » reste
+explicitement refusée. Recette `paea-payment-agreement` étendue, PASS 5/5
+VERIFIED. G1 global reste partiel : enrôlement humain, services d'effet
+protégés, parcours opérateur et revue indépendante restent ouverts.
+
+Livraison locale (même jour) : `./swarm.sh restart` a requalifié et installé
+le candidat dev.342 (SHA `9f268e0e…`, profil normal vérifié
+`VERIFIED_DEFAULT_NATIVE_PROFILE`) portant le changement moteur G1, avec
+identité vérifiée en chaîne (build record = disque = `/proc/<pid>/exe`,
+digest effectif = octets modifiés de `policy.rs`). Un avertissement
+compilation dans le code nouveau du lot, corrigé pendant un run de recette
+(éditer une source déclarée pendant un run : run invalidé, conservé comme
+témoin — défaut de méthode reconnu, leçon : geler les sources avant run),
+a exigé une re-livraison. La re-livraison dev.343 a d'abord été **refusée
+par le lanceur** (`profile-effective-input-changed`) : la session
+concurrente swarm-3d éditait ses fichiers fixture_area pendant le build ;
+serveur resté dev.342, échec conservé. Reprise à 13:55 sur demande
+opérateur : arbre moteur stable, restart réussi — **dev.343 installée et
+vérifiée en chaîne** (SHA `a0721124…` = build record `VERIFIED_DEFAULT_
+NATIVE_PROFILE` = disque = `/proc/<pid>/exe`), embarquant les deux lots
+(G1 + fixture_area). Re-épinglage des recettes livrées depuis le hash
+réel (chain 3 occ., settlement 8 occ.) puis rejeu sur le livré réel :
+**settlement-run-19 PASS 7/7** (23 spawns témoins) et **chain-run-11 PASS
+4/4** (10 spawns témoins, refus de mauvais SHA exercé), les deux `verify`
+VERIFIED. `paea-payment-agreement` inchangé (archive historique fixe).
+Le lot G1 reste non committé ; commit/push attendent l'instruction
+explicite de l'opérateur.

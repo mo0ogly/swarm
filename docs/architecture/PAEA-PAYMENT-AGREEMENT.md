@@ -24,8 +24,20 @@ Au dernier usage, sous les réservations projet/Trust conservées, le moteur
 vérifie chaîne et originaux, révision courante, action approuvée, acteurs distincts
 et rôles courants, demande admise, mandat actif et liaison aux octets canoniques.
 Le délai du mandat est recontrôlé avant l'engagement SQLite ; ce n'est pas une
-garantie temps réel entre contrôle et COMMIT. La séparation avancée par matrice de
-rôles reste refusée, sans désactiver la politique sauvegardée.
+garantie temps réel entre contrôle et COMMIT.
+
+Lorsque la matrice avancée de séparation des rôles est activée par-dessus
+require_separation, le moteur recontrôle au point d'engagement les participants
+réels de l'action approuvée liée à l'accord — délégataire admin du mandat,
+requester, approver, effect — avec la comparaison de groupes du moniteur Trust
+existant. Un conflit refuse sans aucune insertion de grand livre
+(`paea-settlement-role-separation`) ; un mapping manquant refuse aussi
+(`paea-settlement-role-mapping`). Les groupes restent des assertions
+d'administrateur et ne prouvent aucune identité humaine. Une matrice activée
+sans require_separation reste refusée
+(`paea-settlement-attributed-admission-required`), sans désactiver la politique
+sauvegardée. La politique de base reste exigée au point d'engagement : un droit
+fraîchement signé ne rend pas une politique périmée utilisable.
 
 Le reçu ajoute un champ optionnel agreement : action_id, mandate_id, requester,
 approver, action_digest, evidence_hash, original_digest, policy_revision et

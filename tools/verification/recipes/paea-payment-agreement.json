@@ -83,6 +83,7 @@
     "docs/architecture/PAEA-PAYMENT-AGREEMENT.md",
     "docs/en/PAEA-PAYMENT-AGREEMENT.md",
     "tools/verification/recipes/paea-payment-agreement.json",
+    "docs/plans/actions-confiance/paea/P1-G1-20261103.md",
     "docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/chain-fixture-regen-20261031b/result.json",
     ".cache/rust-migration-binaries/swarm-rust-3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a"
   ],
@@ -118,6 +119,31 @@
       "expected_exit": 0,
       "required_stdout": [
         "settlement_separated_exact_agreement_commits_refuses_mutation_revocation_and_recovers ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "advanced-role-matrix-conflict-refusal-without-effect-then-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "paea_settlement",
+        "settlement_advanced_role_separation_checks_effect_and_recovers",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "settlement_advanced_role_separation_checks_effect_and_recovers ... ok",
         "1 passed; 0 failed"
       ],
       "required_stderr": []

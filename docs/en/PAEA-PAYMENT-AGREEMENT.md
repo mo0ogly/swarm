@@ -22,7 +22,18 @@ At last use, while retaining project/Trust reservations, the engine verifies the
 chain/originals, current revision, approved action, distinct actors/current roles,
 admitted request, active mandate and exact canonical binding. Mandate expiry is
 rechecked before SQLite commitment; this is not real-time assurance between the
-check and COMMIT. Advanced role-matrix separation remains explicitly refused.
+check and COMMIT.
+
+When the advanced role-separation matrix is enabled on top of require_separation,
+the engine rechecks the approved action's actual participants at the engagement
+point — the mandate's admin delegator, requester, approver, effect — with the
+existing Trust monitor's group comparison. A conflict refuses without any ledger
+insertion (`paea-settlement-role-separation`); a missing mapping also refuses
+(`paea-settlement-role-mapping`). Groups remain administrator assertions and
+prove no human identity. An enabled matrix without require_separation stays
+refused (`paea-settlement-attributed-admission-required`) without disabling the
+persisted policy. Basic policy is still required at the engagement point: a
+freshly signed grant never revives a stale policy.
 
 Receipts add optional agreement: action_id, mandate_id, requester, approver,
 action_digest, evidence_hash, original_digest, policy_revision and expires_at.

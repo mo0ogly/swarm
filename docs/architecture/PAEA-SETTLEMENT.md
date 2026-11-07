@@ -147,8 +147,13 @@ en charge `require_separation` avec l'accord durable Trust lié à l'empreinte
 canonique complète. La lecture courante et la référence conservée dans le reçu
 ne prouvent ni présence humaine ni provenance du contexte. Sans accord actuel,
 `paea-settlement-attributed-admission-required` refuse avant nouvel effet.
-Une politique de rôles active imposant des incompatibilités reste refusée ; une
-liste vide n'en impose pas. La réconciliation reste une lecture sans engagement.
+Avec `require_separation`, une matrice avancée activée recontrôle au point
+d'engagement les participants réels de l'action approuvée (admin, requester,
+approver, effect) via la comparaison de groupes du moniteur Trust : conflit
+refusé sans insertion (`paea-settlement-role-separation`), mapping manquant
+refusée (`paea-settlement-role-mapping`). Une matrice activée sans
+`require_separation` reste refusée ; une liste vide n'impose pas d'incompatibilité.
+La réconciliation reste une lecture sans engagement.
 Les anciens témoins de recette gardent leur profil sans séparation, distinct du
 nouveau parcours avec accord ; aucune politique réelle ou valeur par défaut de
 l'instance locale n'est abaissée. PA-03 global n'est pas clôturé par ce raccord.
