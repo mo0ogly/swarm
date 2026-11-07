@@ -1061,11 +1061,13 @@ conforme à son contrat ; le harnais a raison de compter un 503 non
 `web-workers-saturated` comme problème. Cause probable : défaut IO/SQL
 transitoire sous la contention du 0323b (disque 87 %, modifications concurrentes
 Codex, 9 fenêtres navigateur + captures) ; requalification en cours sur arbre
-propre (`.cache/ev-tel33b-derived-0912`). Le harnais ne tolère aujourd'hui que
-le corps `web-workers-saturated` (cjs:21) ; si le 503 busy conçu devait
-survenir, distinguer le corps JSON `{"error":"telemetry-store-busy"}` du 503
-unavailable serait le raccord à ouvrir (zone tests/rust_native_live_ui.cjs +
-web/live.js, mineure).
+propre (`.cache/ev-tel33b-derived-0912`). Le harnais ne tolérait que le corps
+`web-workers-saturated` (cjs:21) ; le raccord mineur est réalisé (7 nov.) :
+`watch()` classe désormais le 503 busy conçu `telemetry-store-busy` (page
+retente une fois, live.js alerts()) dans une liste `busy[]` comptée à part —
+`busy_reads` dans result.json — tout autre 503 reste un problème ;
+requalification `browser-live` seule relancée (recette dérivée
+`.swarm-fixtures/derived-browserlive.json`, `.cache/ev-browserlive-raccord`).
 
 tel33d — issue 0912 (Claude, 7 nov. 10:0x, qualifications vérifiées) : (1)
 `browser-live` **PASS** en conditions normales (arbre propre, 83 s) — la
