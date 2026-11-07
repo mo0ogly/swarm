@@ -976,7 +976,11 @@ limite de propagation déclarée et action critique suspendue.
 d’application, oracle, tests, état implémenté/vérifié localement/accepté
 indépendamment, classe d’écart, autorité requise) est maintenue dans
 [paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json](paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json),
-source unique de l’état détaillé ; synthèse de reprise dans
+source unique de l’état détaillé ; **delta du 7 novembre 2026** : I15 et I17
+sont refermés depuis sa génération (preuves settlement-run-19 et
+Incréments101/103) — lire la matrice avec la note de delta
+[paea/GAP-CLOSURE-PLAN-20261103.md, section « Suivi du 7 novembre (fin) »](paea/GAP-CLOSURE-PLAN-20261103.md) ;
+synthèse de reprise dans
 [POINT-ETAPE-20261029.md](paea/POINT-ETAPE-20261029.md). Résumé d’état au
 31 octobre 2026 : vérification locale partielle I01, I04, I05, I08, I09, I12,
 I16, I17 ; candidats incomplets I06, I13 (BT02, egress non confiné) ; prérequis

@@ -928,7 +928,11 @@ State per invariant: the per-invariant closure matrix (owner, application
 point, oracle, tests, implemented/locally verified/independently accepted
 state, gap class, required authority) is maintained in
 [paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json](../../../plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json),
-single source of the detailed state; recovery synthesis in
+single source of the detailed state; **7 November 2026 delta**: I15 and I17
+have been closed since its generation (evidence settlement-run-19 and
+Increments101/103) — read the matrix with the delta note
+[paea/GAP-CLOSURE-PLAN-20261103.md, section "7 November follow-up (end)"](../../../plans/actions-confiance/paea/GAP-CLOSURE-PLAN-20261103.md);
+recovery synthesis in
 [POINT-ETAPE-20261029.md](../../../plans/actions-confiance/paea/POINT-ETAPE-20261029.md);
 realization dashboard (snapshot 1 November 2026, T01–T22 with sourced
 percentages): [DASHBOARD-T20261101.md](../../../plans/actions-confiance/paea/DASHBOARD-T20261101.md).
