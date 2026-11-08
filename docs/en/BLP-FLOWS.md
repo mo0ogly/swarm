@@ -61,9 +61,16 @@ controls that still require implementation and qualification.
   mechanisms. They establish no confidentiality clearance and must not be disabled
   to make a BLP scenario work.
 - The inspected Linux profile restricts writes/private authority but allows reads
-  outside the private root; denying AF_UNIX is not Internet confinement. SDKs may
-  access files, caches, account configuration and services outside the prompt.
-  Observe these before making BF-14 claims.
+  outside the private root; denying AF_UNIX is not Internet confinement. Since
+  9 November 2026 (BF-14a), the explicit operator policy `provider_internet_denied`
+  has the engine pose an additive seccomp filter (AF_INET/AF_INET6 on socket and
+  socketpair → EPERM) at all five classified provider helper exec points, frozen
+  at exec; the `biba-linux-boundary` recipe shows at kernel level that the
+  mandatory profile alone still allowed INET creation (the BF-14 gap) and that the
+  additive filter closes it while preserving the AF_UNIX verdict. Full destination
+  (account, routing, proxy) and descendant channels remain outside this refusal.
+  SDKs may access files, caches, account configuration and services outside the
+  prompt. Observe these before making BF-14 claims.
 - Configured endpoint alone does not establish full destination: bind account,
   resolution, any proxy/routing path and actual connection or refuse explicitly.
   No private ambient-proxy configuration was inspected/tested; its effect remains
@@ -158,6 +165,13 @@ are retained in the [resumption record](plans/actions-confiance/BLP-PROVENANCE-2
 recheck. Policy renewal preserves prior levels/compartments; coverage remains
 partial. Four drifted sources were reviewed (preview, presentation, Trust
 dispatch, BLP module); unrelated source hashes were not refreshed.
+
+8 November revision (BLP-03a): the Trust dialog exposes the Admin form for
+explicit attribution of an existing object (digest, absolute path,
+classification chosen from the re-read policy, reason; preview then save
+replaying the same bytes) — one gesture per object, no automatic scan;
+`runtime_enforced` stays `false`. Detailed controls: inventory BF-23
+(`blp-flow-inventory.json`, BF-23c note).
 
 ### Revision: preparation-source diagnostic
 

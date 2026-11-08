@@ -6965,5 +6965,18 @@ globalThis.SwarmEnglish = {
   "Cette vue ne vérifie pas la fraîcheur des ancrages de l’inventaire.": "This view does not verify inventory anchor freshness.",
   "Consulter les frontières recensées": "Inspect listed boundaries",
   "Consulter les recettes disponibles": "Inspect available recipes",
-  "Vérifications de sécurité": "Security checks"
+  "Vérifications de sécurité": "Security checks",
+  "Attribution d’un objet existant (migration)": "Attribution of an existing object (migration)",
+  "Un objet déjà présent n’est lu par les lecteurs habilités que si son empreinte est attribuée explicitement. Chaque geste couvre exactement un objet ; aucun balayage automatique n’est effectué.": "An existing object is read by cleared readers only if its digest has been explicitly attributed. Each gesture covers exactly one object; no automatic scan is performed.",
+  "Empreinte canonique SHA-256 de l’objet": "Object canonical SHA-256 digest",
+  "Chemin absolu du projet": "Absolute project path",
+  "Niveau de classification": "Classification level",
+  "Compartiments": "Compartments",
+  "Motif d’attribution": "Attribution reason",
+  "Prévisualiser l’attribution": "Preview attribution",
+  "Enregistrer l’attribution": "Save attribution",
+  "Empreinte canonique invalide ; 64 hexadécimales minuscules exigées": "Invalid canonical digest; 64 lowercase hexadecimal characters required",
+  "Chemin de projet absolu exigé": "Absolute project path required",
+  "Motif exigé": "Reason required",
+  "Attribution enregistrée et relue ; l’objet est classé sous la politique courante": "Attribution saved and re-read; the object is classified under the current policy"
 };

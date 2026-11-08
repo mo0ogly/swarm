@@ -652,15 +652,25 @@ impl RootStore {
     /// egress reservation fences identity/BLP policy changes through admission; successful
     /// recording survives a later release error through PreparationRecorded.
     /// This method creates pending data only; dispatch is a separate owned gate.
+    /// BF-16c: `reader_token` is the caller's local bearer credential (`None` =
+    /// bare session, never authorization). Once this preparation's recorded
+    /// turns match at least one admission receipt (classified domain), the
+    /// shared reader verdict runs BEFORE the turn is returned — both on the
+    /// replay path (the recorded turn with its classified answer) and on the
+    /// first-admission path (the assembled prompt embeds earlier classified
+    /// history). A refusal rolls the transaction back: no turn is recorded, no
+    /// budget reserved, no byte served. Zero matched receipts keeps the legacy
+    /// bare-session path.
     pub fn preparation_send<W: crate::WorkEnvironment>(
         &self,
         raw: &[u8],
         environment: &mut W,
+        reader_token: Option<&str>,
     ) -> Result<PreparationTurn, E> {
         if !self.writable { return Err(E::Refused("root-read-only")); }
         let mut receipt = None;
         self.with_preparation_egress(|| {
-            let turn = self.preparation_send_unquarantined(raw, environment)?;
+            let turn = self.preparation_send_unquarantined(raw, environment, reader_token)?;
             receipt = Some((turn.id.clone(), turn.revision));
             Ok(turn)
         }).map_err(|primary| match receipt {
@@ -675,6 +685,7 @@ impl RootStore {
         &self,
         raw: &[u8],
         environment: &mut W,
+        reader_token: Option<&str>,
     ) -> Result<PreparationTurn, E> {
         let r = validated_send(raw)?;
         let request_hash =
@@ -690,9 +701,37 @@ impl RootStore {
             let mut stmt=db.prepare("SELECT count(*) FROM preparation_turns WHERE id=?1").map_err(E::Sql)?;
             let exists=stmt.query_row([&id],|row|row.get::<_,i64>(0)).map_err(E::Sql);
             let exists=finished(exists,stmt.finalize().map_err(E::Sql))?;
-            if exists>0{return replay_turn(db,&id,&r.preparation_id,&request_hash);}
+            if exists>0{
+                let turn=replay_turn(db,&id,&r.preparation_id,&request_hash)?;
+                // BF-16c presentation frontier: a replay serves the recorded
+                // turn (classified answer included). Decide the reader before
+                // returning any byte — same shared verdict, same codes.
+                let p=super::preparation_read::stored(db,&r.preparation_id)?;
+                super::preparation_dialogue::reader_verdict(
+                    self,
+                    db,
+                    &p,
+                    &super::preparation_read::recorded_turn_keys(db,&p)?,
+                    reader_token,
+                )?;
+                return Ok(turn);
+            }
             let (t,n,p)=self.capture_in_tx(db,settings,&r,at.clone(),nonce.clone(),id.clone(),request_hash.clone())?;
-            save(db,&t,&n,true)?;let w=super::preparation_call_budget::reserve(db,&p,&t.id)?;verify_record(db,&t,&encoded(&t,&n)?)?;super::preparation_call_budget::verify(db,&w)?;Ok(t)
+            save(db,&t,&n,true)?;
+            // BF-16c presentation frontier: the just-recorded turn makes this
+            // preparation's classified domain matchable by admission receipts
+            // (same provider/request-hash keys), and the assembled prompt
+            // embeds earlier classified history. Decide the reader INSIDE the
+            // transaction: a refusal rolls the whole admission back — no turn
+            // row, no budget reservation, no byte served.
+            super::preparation_dialogue::reader_verdict(
+                self,
+                db,
+                &p,
+                &super::preparation_read::recorded_turn_keys(db,&p)?,
+                reader_token,
+            )?;
+            let w=super::preparation_call_budget::reserve(db,&p,&t.id)?;verify_record(db,&t,&encoded(&t,&n)?)?;super::preparation_call_budget::verify(db,&w)?;Ok(t)
         })
     }
     /// Shared historical send producer. All source/settings/provider/limit
@@ -1232,11 +1271,19 @@ impl RootStore {
     /// stopping; the owning worker observes this and cancels its HTTP future.
     /// A proven dead/reused kernel process may be settled interrupted without
     /// refunding estimated. Unknown kernel errors refuse; no raw-PID signal.
+    /// BF-16c: `reader_token` decides a terminal-turn serve (the `!t.active()`
+    /// branch and the legacy terminal branch return the recorded turn with its
+    /// classified answer) with the same shared reader verdict as the dialogue;
+    /// a refusal rolls the transaction back — the terminal state is untouched.
+    /// The producer-internal monitor settle path passes `None`: it settles a
+    /// turn it produced itself and serves no classified bytes to any reader
+    /// (mirrors the deliberately-uncontrolled `preparation_call::read`).
     pub fn preparation_stop<W: crate::WorkEnvironment>(
         &self,
         preparation: &str,
         id: &str,
         environment: &mut W,
+        reader_token: Option<&str>,
     ) -> Result<PreparationTurn, E> {
         if !crate::valid_preparation_key(preparation) || !crate::valid_preparation_key(id) {
             return Err(E::Refused("preparation-stop-invalid"));
@@ -1247,11 +1294,30 @@ impl RootStore {
             if t.preparation_id != preparation {
                 return Err(E::Refused("preparation-turn-owner-mismatch"));
             }
-            let Some(n) = n else { return legacy::stop(db, t, &at); };
+            let Some(n) = n else {
+                // BF-16c: legacy terminal rows serve their recorded answer too.
+                if !t.active() {
+                    let p=super::preparation_read::stored(db,&t.preparation_id)?;
+                    super::preparation_dialogue::reader_verdict(
+                        self, db, &p,
+                        &super::preparation_read::recorded_turn_keys(db,&p)?,
+                        reader_token,
+                    )?;
+                }
+                return legacy::stop(db, t, &at);
+            };
             if n.root != self.instance()? {
                 return Err(E::Refused("preparation-turn-owner-mismatch"));
             }
             if !t.active() {
+                // BF-16c presentation frontier: a terminal turn serves its
+                // recorded answer. Decide the reader before returning it.
+                let p=super::preparation_read::stored(db,&t.preparation_id)?;
+                super::preparation_dialogue::reader_verdict(
+                    self, db, &p,
+                    &super::preparation_read::recorded_turn_keys(db,&p)?,
+                    reader_token,
+                )?;
                 return Ok(t);
             }
             if t.supervisor_pid != 0
@@ -1354,7 +1420,11 @@ impl RootStore {
             Ok(Some(t.preparation_id))
         })?;
         if let Some(parent) = parent {
-            self.preparation_stop(&parent, id, &mut crate::SystemEnvironment)?;
+            // BF-16c: producer-internal settle — no reader is served here; the
+            // turn this monitor produced is settled by its own producer. The
+            // explicit None is the deliberate producer exemption documented on
+            // preparation_stop.
+            self.preparation_stop(&parent, id, &mut crate::SystemEnvironment, None)?;
         }
         Ok(())
     }

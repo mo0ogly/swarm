@@ -135,6 +135,17 @@ impl Sandbox {
     /// Close an unused prepared profile after another gate check refuses.
     pub fn close(self)->Result<(),Error>{finish(finish(close(self.rules),close(self.workspace)),close(self.private))}
 }
+/// Cumulative engine-posed refusal of Internet sockets for classified provider
+/// helpers, installed AFTER `Sandbox::enforce`. Seccomp filters stack and can
+/// only restrict: this denies socket/socketpair with EPERM when the requested
+/// domain is AF_INET or AF_INET6, preserving every other domain's existing
+/// verdict (AF_UNIX is already refused by the mandatory profile). This is an
+/// additive operator policy surface, not a change to the mandatory profile and
+/// not a network destination allowance. Load failure refuses; the caller must
+/// exit, never execute an unconfined or Internet-allowed fallback.
+pub fn deny_internet()->Result<(),Error>{
+    kernel::deny_internet().map_err(|e|err("biba-internet-deny",e))
+}
 /// Retain both a primary failure and a cleanup error without converting to success.
 fn finish<T>(value:Result<T,Error>,cleanup:Result<(),Error>)->Result<T,Error>{
     match(value,cleanup){(v,Ok(()))=>v,(Ok(_),Err(e))=>Err(e),(Err(mut e),Err(c))=>{e.cleanup.push(c);Err(e)}}

@@ -352,3 +352,134 @@ web/CLI (`service`, `confidentiality_http`, `swarm-cli`) repassées. Portée
 toujours : présentation seulement ; l’exécution, l’adoption et les
 autres canaux restent hors de ce verdict. Rien n’est déclaré activé en
 production ni accepté.
+
+### BF-16c — lecteurs de send (rejeu et première admission) et de stop (tour terminal) (8 novembre 2026)
+
+Le verdict lecteur couvre désormais les deux dernières frontières qui
+servaient un tour enregistré sans contrôle : `RootStore::preparation_send(raw,
+environment, reader_token)` et `RootStore::preparation_stop(preparation_id,
+turn_id, environment, reader_token)` (HTTP `POST /api/v1/preparations/send`
+et `/stop` avec `Authorization: Bearer` ; CLI `preparation send|stop` avec
+`SWARM_TRUST_TOKEN`) :
+
+- Send — rejeu : un appel dont le triplet (provider, request_hash) existe
+  déjà servait le `PreparationTurn` enregistré (réponse classifiée incluse ;
+  le prompt n’est jamais sérialisé) comme les autres lectures de
+  présentation, sans aucun contrôle. La rejeu décide maintenant le verdict
+  partagé (`reader_verdict` sur les clés `recorded_turn_keys`) avant de
+  rendre le tour : mêmes codes `blp-dialogue-*`, aucun octet servi avant
+  `Ok(())`.
+- Send — première admission : le tour tout juste enregistré rend le domaine
+  classifié de la préparation appariable par les receipts d’admission
+  (mêmes clés provider/request_hash) et le prompt assemblé embarque
+  l’historique classifié antérieur. Le verdict est donc décidé **dans la
+  transaction d’écriture**, après `save` et avant la réservation de budget :
+  un refus annule toute l’admission — pas de ligne de tour, pas de
+  réservation, pas d’octet servi, et un appelant sous-habilité ne peut pas
+  consommer le budget d’une admission qu’il ne peut pas lire.
+- Stop — tour terminal : les deux branches de service du tour terminal
+  (ligne legacy et native) servent la réponse enregistrée ; chaque branche
+  décide le verdict partagé quand le tour n’est plus actif, avant le
+  retour. Un stop sur un tour actif reste une transition d’état du
+  producteur, pas une lecture : pas de verdict.
+- Chemin producteur interne : le ràz-frais du moniteur (`preparation_stop`
+  depuis la boucle de settle) passe explicitement `None` avec le commentaire
+  d’exemption — producteur interne, aucun lecteur servi, miroir de
+  `preparation_call` resté non contrôlé en BF-16a. `None` n’est jamais une
+  autorisation : une session nue est refusée comme avant dès qu’un receipt
+  apparié rend le domaine classifié.
+- Web : `preparation_calls` extrait `reader_bearer_token` comme les
+  frontières GET (les requêtes à capability restent en lecture seule et
+  hors contrôle, choix BF-16a inchangé) ; le mapping 403 FORBIDDEN de
+  `service.rs` couvre les quatre codes partagés sous l’opération
+  `preparation-call`. CLI : `SWARM_TRUST_TOKEN` résolu une fois pour send
+  et stop dans `calls()`.
+
+Vérification BF-16c : tests d’intégration
+`preparation_dialogue_readers.rs` portés à 6/6 — les deux nouveaux tests
+`send_replay_and_stop_serve_classified_turn_without_reader_control`
+(session nue et lecteur sous-habilité refusés sur la rejeu ET le premier
+envoi admis, aucun octet servi et admission annulée, puis service du tour
+terminal refusé à la session nue et au jeton inconnu, récupération par le
+sender habilité) et
+`send_replay_and_stop_without_any_matched_admission_keep_legacy_bare_path`
+(continuité session nue sans admission sur send et stop). Preuve
+rouge→vert : avec les signatures antérieures la rejeu servait le tour là
+où le refus est affirmé. Régresseurs : `preparation_calls` 24/24,
+`confidentiality` (1/1), `preparation_worker_transport` (chemins
+legacy/natifs adaptés), `confidentiality_http` + `service` web (11/11),
+gate CLI 2/2, check workspace 0 erreur. Appelants adaptés : exemples et
+suites (sends/stops legacy en `None` explicite). Portée toujours :
+présentation seulement ; l’exécution, l’adoption et les autres canaux
+restent hors de ce verdict. Restent ouverts dans BF-16 : héritage du
+domaine sur erreurs/propositions, médiation fichiers/réseau/descendants,
+migration des données existantes, déclassification humaine (BLP-06).
+Rien n’est déclaré activé en production ni accepté ; pas de commit/push
+sans autorisation explicite.
+
+### BF-16d — lecteurs de l'adoption de proposition, de la rejeu de commande et de la liste (8 novembre 2026)
+
+Le verdict lecteur couvre les trois frontières restantes qui servaient le
+domaine classifié d'une réponse admise sans contrôle, conformément à
+BLP-APEX (« BF-16 doit hériter ce domaine sur réponses/erreurs/
+propositions et lecteurs »). L'axe erreurs était déjà couvert par BF-16a/b/c
+(les DTO sous contrôle de frontière, codes statifs sûrs uniquement) ;
+celui-ci ferme les propositions et la liste :
+
+- Adoption (`use-proposal`) : `RootStore::preparation_command(raw,
+  environment, reader_token)` gagne `reader_token` comme dernier paramètre
+  (miroir de `preparation_send`). Une adoption copie la réponse classifiée
+  du tour source dans `documents` (et `adopted_brief`) — le document hérite
+  du domaine classifié de sa source. Le verdict partagé `reader_verdict`
+  (clés `recorded_turn_keys` de la préparation) décide **dans la
+  transaction Immediate, après `apply` et avant le commit** : un refus
+  annule toute la mutation — document, incrément de révision et ligne de
+  reçu — par le rollback existant. Un seul appel couvre ainsi la première
+  adoption ET la rejeu du reçu (la branche early-return de `apply` sert un
+  corps de `Preparation` historique, qui est une lecture de présentation
+  comme les autres).
+- Liste (`preparation_list`) : `preparation_list(reader_token)` juge
+  chaque ligne comme `preparation_show` (même `reader_verdict` sur les
+  tours enregistrés de la préparation listée). La première ligne à
+  receipt apparié sans lecteur suffisant refuse **toute** la liste avant
+  qu'un octet soit servi — une liste qui servirait les lignes non
+  classifiées et refuserait les autres révélerait par sa réponse même
+  l'existence d'un contenu classifié.
+- Continuité legacy : zéro receipt apparié garde le chemin nu existant
+  (adoption, rejeu à révision courante, liste) — la décision reste
+  attachée aux admissions appariées, jamais à la présence d'une policy.
+- Surfaces publiques : HTTP `POST /api/v1/preparations/command` et
+  `GET /api/v1/preparations` extraient `reader_bearer_token` avec
+  l'extracteur partagé (en-tête malformé refusé avant toute lecture de
+  Root) ; le mapping 403 FORBIDDEN de `service.rs` couvre les codes
+  partagés. CLI : `SWARM_TRUST_TOKEN` résolu dans `write()` (commande) et
+  dans le chemin read-only pour `list`. Vues budget : compteurs
+  uniquement, aucun octet de préparation — hors périmètre (choix BF-16a
+  inchangé).
+
+Vérification BF-16d : tests d'intégration `preparation_dialogue_readers.rs`
+portés à 8/8 — le nouveau
+`use_proposal_replay_and_list_adopt_classified_answer_without_reader_control`
+(session nue refusée à l'adoption ET à la rejeu ET à la liste, aucun octet
+classifié dans aucun refus, lecteur sous-habilité refusé
+`blp-dialogue-access-denied`, jeton inconnu refus typé Authorization,
+preuve qu'un refus ne laisse aucune trace — révision inchangée, pas de
+document brief, pas de ligne de reçu —, puis récupération par le sender
+habilité qui adopte, rejoue et liste) et le jumeau
+`use_proposal_replay_and_list_without_any_matched_admission_keep_legacy_bare_path`
+(continuité session nue sans admission : adoption, rejeu identique à
+révision courante, liste). Preuve rouge→vert : signature threadée d'abord
+(compilation rougi sur les 10 sites d'appel du test), puis verdict
+ajouté — le rouge runtime établi (`bf16d-red2.log`) montre la session nue
+ADOPTER le brief classifié là où le refus est affirmé. Régresseurs :
+`preparation_writes` 5/5, `preparation_calls` 7/7, `preparation_plan` 1/1,
+`preparation_transport` 1/1, `preparation_worker_transport` 1/1,
+`confidentiality` 16/16, `server_mutations` web 1/1, check workspace
+0 erreur. Appelants adaptés : CLI `write()`/`list`, web
+`preparation_command`/liste, exemple `preparation_quarantine_fixture`,
+suites transport (sites pré-admission en `None` explicite). Portée
+toujours : présentation seulement ; l'exécution, la conversion et les
+autres canaux restent hors de ce verdict. Restent ouverts dans BF-16 :
+médiation fichiers/réseau/descendants, migration des données existantes
+(BLP-03), déclassification humaine (BLP-06). Rien n'est déclaré activé en
+production ni accepté ; pas de commit/push sans autorisation explicite.

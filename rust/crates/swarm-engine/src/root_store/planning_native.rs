@@ -499,16 +499,21 @@ pub fn execute_planning_gate(root: &Path, claim: &str) -> Result<Infallible, E> 
             return Err(E::Refused("planning-gate-release-invalid"));
         }
         let mut store = RootStore::open(root, false)?;
-        let (material, row) = finished(
-            store.prepare_planning_gate(claim, i64::from(peer.pid())),
-            store.close(),
-        )?;
+        // Frozen engine-read transport decision, taken under this same store
+        // before closure; the exec point poses the additive kernel refusal.
+        let operation = (|| {
+            let (material, row) = store.prepare_planning_gate(claim, i64::from(peer.pid()))?;
+            let internet_denied = store.provider_internet_denied_snapshot()?;
+            Ok((material, row, internet_denied))
+        })();
+        let (material, row, internet_denied) = finished(operation, store.close())?;
         let transport = crate::native_provider_exec::PreparedExec::prepare(
             material.model.provider(),
             &material.host.environment_names,
             &material.host.workspace,
             &material.prompt,
-        )?.with_workspace_identity(material.host.directory_identity);
+        )?.with_workspace_identity(material.host.directory_identity)
+          .with_internet_denied(internet_denied);
         if let Err(error) = material
             .fresh(root)
             .map_err(launch)

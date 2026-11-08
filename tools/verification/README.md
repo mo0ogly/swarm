@@ -1,5 +1,10 @@
 # Recettes permanentes / Permanent verification recipes
 
+Pour les paramètres des prochaines compilations Cargo et le garde d'admission
+disque, voir [Stockage des compilations](BUILD-STORAGE.md).
+For future Cargo settings and the disk admission guard, see
+[Local build storage](BUILD-STORAGE.en.md). This is not a filesystem quota.
+
 Le lanceur Python standard `recipe.py` exécute des commandes explicites sans shell
 implicite, relance ni watchdog global. Les recettes JSON version 1 résident dans
 `recipes/`. Elles déclarent sources, environnement explicite, commandes, code de
@@ -146,7 +151,30 @@ signalées pour revue) ; depuis la migration D04 du 7 novembre 2026, il scanne
 aussi les sources Rust : tout `env::temp_dir()` hors carte d'exemptions
 documentée `RUST_EXEMPT` (sondes lecture-seule du volume système, chemins
 assertés inexistants, assertions de composition, assertion du pinning TMPDIR)
-est une violation ; les mentions dans commentaires/doc sont ignorées ; (2) au runner — `recipe.py` épingle `TMPDIR` sous
+est une violation ; les mentions dans commentaires/doc sont ignorées ; depuis la
+migration D05 du 7 novembre 2026, toute allocation Rust `tempfile::tempdir()` /
+`TempDir::new()` (y compris la fenêtre `Builder::new().…tempdir()`) est aussi une
+violation : la forme gouvernée est `tempdir_in(<aire>)`/`new_in(<aire>)` —
+`swarm_engine::fixture_area()` (aire de dépôt) ou `swarm_engine::fallback_area()`
+(`~/.local/state/swarm-fixtures/`, 0700) pour les contrats qui refusent un
+dépôt Git ancêtre ou exigent une chaîne entièrement privée (fixtures
+`open_private_directory` : crates enrollment, git_metadata,
+version_no_repository, les modules identity swarm-cli qui appellent
+`provisioning::prepare`/`Documents::open` et les suites swarm-cli
+trust_enrollment + identity_checkpoint/control/initial/personal/
+operator/provisioning dont le parcours lit ancres/déclarations via le
+walk privé) ;
+les crates sans dépendance swarm-engine répliquent l'aire de repli inline ;
+**règle décisionnelle** (8 novembre 2026, obtenue en trois vagues de rouges) :
+le critère est le parcours, pas le crate — toute suite ou module dont le code
+(allumé ou enfant CLI) relit une ancre ou une déclaration via
+`open_private_directory` (walk NOFOLLOW des ancêtres, refus de tout ancêtre
+inscriptible groupe/autres), via `Documents::open`/`authenticated_startup::open`
+ou via `load_authenticated` exige l'aire de repli, même sous swarm-cli ; les
+crates enrollment exigent la repli d'office ; les autres allocations prennent
+l'aire de dépôt ; un enfant CLI qui relit un fichier de fixture suffit à
+déclencher la règle ;
+(2) au runner — `recipe.py` épingle `TMPDIR` sous
 `<dossier temporaire configuré>/runner-tmp` pour la durée de chaque run, couvrant Python
 tempfile, Rust `env::temp_dir()`/TempDir, Node `os.tmpdir()` et Go
 `t.TempDir()` qui l'honorent. `mkstemp(dir=destination.
@@ -173,7 +201,30 @@ gettempdir reads are reported for review); since the 7 November 2026 D04
 migration it also scans Rust sources: any `env::temp_dir()` outside the
 documented `RUST_EXEMPT` map (read-only system-volume probes, paths asserted
 not to exist, pure path-composition assertions, the TMPDIR-pinning assertion
-itself) is a violation; mentions inside comments/docs are ignored; (2) at runner — `recipe.py` pins
+itself) is a violation; mentions inside comments/docs are ignored; since the
+7 November 2026 D05 migration, any Rust `tempfile::tempdir()` /
+`TempDir::new()` allocation (including the `Builder::new().…tempdir()` window)
+is also a violation: the governed form is `tempdir_in(<area>)`/`new_in(<area>)`
+— `swarm_engine::fixture_area()` (repository area) or
+`swarm_engine::fallback_area()` (`~/.local/state/swarm-fixtures/`, 0700) for
+contracts refusing an ancestor Git repository or requiring a fully private
+chain (`open_private_directory` fixtures: enrollment crates, git_metadata,
+version_no_repository, the swarm-cli identity modules calling
+`provisioning::prepare`/`Documents::open`, and the swarm-cli
+trust_enrollment + identity_checkpoint/control/initial/personal/
+operator/provisioning suites whose flow reads anchors/declarations
+through the private walk); crates without a swarm-engine
+dependency replicate the fallback inline;
+**decision rule** (8 November 2026, obtained through three red waves): the
+criterion is the flow, not the crate — any suite or module whose code (in-process
+or CLI child) reads an anchor or declaration back through
+`open_private_directory` (NOFOLLOW ancestor walk, refusing any
+group/other-writable ancestor), through
+`Documents::open`/`authenticated_startup::open`, or through
+`load_authenticated` requires the fallback area, even inside swarm-cli;
+enrollment crates take the fallback outright; all other allocations take the
+repository area; a CLI child re-reading a fixture file is enough to trigger
+the rule; (2) at runner — `recipe.py` pins
 `TMPDIR` under `<configured temporary directory>/runner-tmp` for each run, covering Python
 tempfile, Rust `env::temp_dir()`/TempDir, Node `os.tmpdir()` and Go
 `t.TempDir()` which honor it. `mkstemp(dir=
@@ -3125,6 +3176,10 @@ sept cas nommés auparavant en échec, plus `9 passed; 0 failed` au total.
 Limites : autorité fixture, même UID, pas d'enrôlement humain, pas de mission
 vivante, pas de qualification du profil livré ; les étapes témoin du binaire
 livré restent dans `paea-delivered-chain-cli-rust`.
+
+
+Chaîne composée du binaire livré : la recette
+`recipes/paea-delivered-chain-cli-rust.json`
 exécute le cas `delivered_chain_transfer_promote_replay_reconcile_once`, la
 sensibilité du garde de racine partagée et le garde de refus de mauvaise
 empreinte. Le harnais garde `CARGO_BIN_EXE_swarm-rust` par défaut, sans
@@ -3250,6 +3305,56 @@ les termes provisionnés exacts et la dette réglée une seule fois, lus aussi p
 des connexions SQLite lecture seule distinctes du CLI. Aucune preuve de
 séparation UID, de paiement réel ou d'acceptation indépendante n'est revendiquée
 par ce cas.
+
+
+Class-2 governed fixture areas: `recipes/rust-class2-fixture-areas.json` proves
+the permanent result of the D05 migration — every fixture allocation under
+`rust/crates` that a code path reads back through `open_private_directory`
+(enrollment `Documents`, provisioning prepare, service installation,
+anchor/declaration reads) allocates in the fully private fallback area
+(`~/.local/state/swarm-fixtures/`, 0700 chain), because the checkout's
+group-writable ancestors are refused by the private ancestor walk, while all
+other allocations use the repository area `.swarm-fixtures/` with RAII `Drop`
+cleanup preserved. Step 1 runs `tools/check_tmp_interdiction.py`, whose exit 0
+asserts `0 allocation violation(s)` (the 10 review items are documented
+exemptions and `os.tmpdir()` readers, not fixture writes). Steps 2–4 run the
+representative flows: the swarm-cli `identity` unit modules (18 passed) and the
+two integration suites whose CLI children or in-process runs traverse the
+private walk — `trust_enrollment` (2 passed) and `identity_checkpoint`
+(6 passed), the exact suites that exposed the first-pass area choice as red on
+November 8. The runner itself pins `TMPDIR` under the configured fixture area
+per its own contract, so no step needs an explicit TMPDIR override. Scope:
+declared recipe checks on isolated owned fixtures, same UID; not mission
+acceptance, not the excluded agent_launch/planning reds (owner Codex, consigned
+in BLP-APEX), and not the 20 `#[ignore]`-gated canonical-fixture paea suites,
+which keep their dedicated recipes. Evidence of the qualification run:
+`.swarm-fixtures/class2-recipe-20261108T030000Z` (PASS 4/4, verify VERIFIED).
+
+Aires de fixtures gouvernées class-2 : la recette
+`recipes/rust-class2-fixture-areas.json` prouve le résultat permanent de la
+migration D05 — chaque allocation de fixture sous `rust/crates` qu'un parcours
+de code relit via `open_private_directory` (Documents d'enrôlement, prepare de
+provisioning, installation de service, lectures d'ancres/déclarations) alloue
+dans l'aire de repli entièrement privée (`~/.local/state/swarm-fixtures/`,
+chaîne 0700), car les ancêtres inscriptibles au groupe du dépôt sont refusés par
+le walk privé d'ancêtres, tandis que toutes les autres allocations utilisent
+l'aire de dépôt `.swarm-fixtures/` avec le nettoyage RAII `Drop` préservé.
+L'étape 1 lance `tools/check_tmp_interdiction.py`, dont l'exit 0 affirme
+`0 allocation violation(s)` (les 10 review items sont des exemptions documentées
+et des lectures `os.tmpdir()`, pas des écritures de fixture). Les étapes 2–4
+lancent les parcours représentatifs : les modules unitaires `identity` de
+swarm-cli (18 passed) et les deux suites d'intégration dont les enfants CLI ou
+runs en processus traversent le walk privé — `trust_enrollment` (2 passed) et
+`identity_checkpoint` (6 passed), exactement les suites qui ont révélé en rouge
+le premier choix d'aire le 8 novembre. Le runner lui-même épingle `TMPDIR` sous
+l'aire de fixtures configurée selon son propre contrat, donc aucune étape n'a
+besoin de surcharge TMPDIR explicite. Périmètre : vérifications déclarées de la
+recette sur fixtures isolées possédées, même UID ; ni acceptation de mission, ni
+les rouges agent_launch/planning exclus (propriétaire Codex, consignés dans
+BLP-APEX), ni les 20 suites paea gardées par `#[ignore]` sur fixture canonique,
+qui conservent leurs recettes dédiées. Preuve de la run de qualification :
+`.swarm-fixtures/class2-recipe-20261108T030000Z` (PASS 4/4, vérification
+VERIFIED).
 
 ## PAEA I16 stale lease after holder reopen / Ancien bail après reprise du porteur (PA-07)
 
@@ -4264,6 +4369,36 @@ hashes those files in `result.json` and prints that result's SHA256 into the
 recipe's retained stdout. `recipe.py verify` verifies the outer receipt; also
 verify the journey manifest/hash before reusing its detailed channels.
 
+### Recette blp-object-attribute-public (formulaire Admin d'attribution) / Admin object-attribution form
+
+`recipes/blp-object-attribute-public.json` exige `SWARM_BLP_BINARY`,
+`SWARM_BLP_PROFILE` (preuve `verify_native_profile.py`) et
+`SWARM_BLP_PROOF_OUTPUT` (répertoire neuf) : le driver Puppeteer
+`tests/blp_object_attribute_public.py` pilote l'Admin réel du binaire qualifié
+— formulaire présent (empreinte, chemin absolu, niveau/compartiments issus de
+la politique relue, motif), prévisualisation puis enregistrement rejouant les
+mêmes octets `blp-object-attribute`, persistance exacte d'une attribution par parcours (huit objets distincts, un par combo — le producteur refuse un doublon d'empreinte/chemin/révision),
+refus typés 403 (session seule, bearer faible) sans mutation, 2 langues × 2
+thèmes × 2 largeurs, empreintes des assets servis = `after.json` du profil.
+Les assets `web/*`/`locales/*` sont des entrées déclarées : toute modification
+de surface invalide la preuve (embed `include_bytes!`). 4 assertions ; la
+recette ne prouve ni la médiation fichiers (BF-13/BF-15), ni BLP-06, ni une
+migration réelle de données.
+
+`recipes/blp-object-attribute-public.json` requires `SWARM_BLP_BINARY`,
+`SWARM_BLP_PROFILE` (a `verify_native_profile.py` proof) and
+`SWARM_BLP_PROOF_OUTPUT` (a fresh directory): the Puppeteer driver
+`tests/blp_object_attribute_public.py` drives the qualified binary's real
+Admin — form present (digest, absolute path, level/compartments from the
+re-read policy, reason), preview then save replaying the same
+`blp-object-attribute` bytes, exact persistence of one attribution per journey (eight distinct objects, one per combo — the producer refuses a digest/path/revision duplicate), typed 403
+refusals (session alone, weak bearer) without mutation, 2 languages × 2 themes
+× 2 widths, served-asset digests = the profile's `after.json`. The
+`web/*`/`locales/*` assets are declared inputs: any surface change invalidates
+the evidence (`include_bytes!` embedding). 4 assertions; the recipe proves
+neither file mediation (BF-13/BF-15), nor BLP-06, nor a real data migration.
+
+
 ### Sources de préparation classifiées / Classified preparation sources
 
 `recipes/blp-preparation-check.json` exerce le consommateur natif sous
@@ -4295,6 +4430,40 @@ its owned fixture provenance through readonly SQL, attributes all slices using
 public operations, then compares CLI and protected HTTP. Original failures stay
 retained. The printed final digest binds journey artifacts; verify them as well
 as the outer recipe receipt.
+
+`recipes/blp-preparation-quarantine-public.json` additionally requires
+`SWARM_BLP_HELPER`: the path to the compiled
+`swarm-engine` example `preparation_quarantine_fixture` (inert fixture-only
+pending-turn helper, private child exec of the exact qualified binary).
+Compile the example separately, never through a recipe step; the example
+source follows engine call-site changes (BF-16 reader tokens), so a stale
+prebuilt helper refuses. `recipes/blp-preparation-provenance-public.json`
+compiles its own example in-step and therefore cannot run against a frozen
+binary without compiling the current workspace sources.
+
+### Recette agrégée blp-aggregate-public / Aggregated recipe blp-aggregate-public
+
+`recipes/blp-aggregate-public.json` enchaîne six recettes publiques (inventaire,
+check, admission, dialogue-reader, transport, object-attribute UI) en une seule
+commande `recipe.py run` + `verify`. Elle exige `SWARM_BLP_BINARY` et
+`SWARM_BLP_PROFILE` (le candidat qualifié sous test) dans l'environnement de
+lancement ; chaque étape enfant alloue sa sortie fraîche (racine `blp-aggr-NN-*`
+de l'aire de fixtures + parcours `journey/`) et fixe `SWARM_BLP_PROOF_OUTPUT`
+elle-même. Les preuves retenues : le reçu externe (étapes 6/6) et les six
+preuves enfant indépendamment verify-ables. Hors agrégat : recettes cargo-test
+(qualifient les sources courantes, pas un candidat gelé), quarantaine et
+provenance (helper/compilation).
+
+`recipes/blp-aggregate-public.json` chains six public recipes (inventory,
+check, admission, dialogue-reader, transport, object-attribute UI) under a
+single `recipe.py run` + `verify`. It requires `SWARM_BLP_BINARY` and
+`SWARM_BLP_PROFILE` (the qualified candidate under test) in the launching
+environment; each child step allocates its own fresh output (`blp-aggr-NN-*`
+fixture-area root + `journey/`) and sets `SWARM_BLP_PROOF_OUTPUT` itself.
+Retained evidence: the outer receipt (6/6 steps) plus the six child evidence
+trees, each independently verify-able. Outside the aggregate: cargo-test
+recipes (qualify current sources, not a frozen candidate), quarantine and
+provenance (helper/compilation).
 
 `recipes/blp-preparation-http-status.json` vérifie un test nommé de traduction
 des refus métier typés ; provenance corrompue, racine incompatible, contexte

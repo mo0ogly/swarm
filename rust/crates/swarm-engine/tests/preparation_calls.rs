@@ -68,8 +68,8 @@ impl Fixture {
             )
             .unwrap();
         }
-        let p=root.preparation_command(br#"{"version":1,"action":"create","event_id":"create","expected_revision":0,"text":"Fixture need"}"#,&mut SystemEnvironment).unwrap().value;
-        let preparation=root.preparation_command(&serde_json::to_vec(&serde_json::json!({"version":1,"action":"budget","event_id":"budget","preparation_id":p.id,"expected_revision":p.revision,"budget":{"limit_usd":10,"reserve_per_launch_usd":0.5,"estimate_source":"Owned fixture","reference_date":"2026-10-27"}})).unwrap(),&mut SystemEnvironment).unwrap().value;
+        let p=root.preparation_command(br#"{"version":1,"action":"create","event_id":"create","expected_revision":0,"text":"Fixture need"}"#, &mut SystemEnvironment, None).unwrap().value;
+        let preparation=root.preparation_command(&serde_json::to_vec(&serde_json::json!({"version":1,"action":"budget","event_id":"budget","preparation_id":p.id,"expected_revision":p.revision,"budget":{"limit_usd":10,"reserve_per_launch_usd":0.5,"estimate_source":"Owned fixture","reference_date":"2026-10-27"}})).unwrap(), &mut SystemEnvironment, None).unwrap().value;
         let db = Connection::open(path.join(".swarm/state.db")).unwrap();
         println!("PREPARATION_CALL_FAULT_ROOT {}", path.display());
         Self {
@@ -92,14 +92,14 @@ impl Fixture {
     /// Admit without dispatch. This library operation never contacts a provider.
     fn admit(&self, event: &str) -> PreparationTurn {
         self.root
-            .preparation_send(&self.request(event), &mut SystemEnvironment)
+            .preparation_send(&self.request(event), &mut SystemEnvironment, None)
             .unwrap()
     }
     /// Exercise pending cancellation through the same public stop operation.
     fn stop(&self, id: &str) {
         assert_eq!(
             self.root
-                .preparation_stop(&self.preparation.id, id, &mut SystemEnvironment)
+                .preparation_stop(&self.preparation.id, id, &mut SystemEnvironment, None)
                 .unwrap()
                 .status,
             "interrupted"
@@ -190,7 +190,7 @@ fn commit_failure_rolls_back_for_same_root_reuse() {
     let request = f.request("commit-fault");
     let error = f
         .root
-        .preparation_send(&request, &mut SystemEnvironment)
+        .preparation_send(&request, &mut SystemEnvironment, None)
         .err()
         .expect("deferred commit must refuse");
     assert_eq!(error.code(), "preparation-call-commit-uncertain");
@@ -198,7 +198,7 @@ fn commit_failure_rolls_back_for_same_root_reuse() {
         .unwrap();
     let recovered = f
         .root
-        .preparation_send(&request, &mut SystemEnvironment)
+        .preparation_send(&request, &mut SystemEnvironment, None)
         .unwrap();
     f.stop(&recovered.id);
     assert_eq!(
@@ -234,7 +234,7 @@ fn last_write_witness_refuses_turn_and_budget_drift() {
         let request = f.request(label);
         assert!(f
             .root
-            .preparation_send(&request, &mut SystemEnvironment)
+            .preparation_send(&request, &mut SystemEnvironment, None)
             .is_err());
         assert_eq!(
             f.db.query_row("SELECT count(*) FROM preparation_turns", [], |r| r
@@ -246,7 +246,7 @@ fn last_write_witness_refuses_turn_and_budget_drift() {
             .unwrap();
         let recovered = f
             .root
-            .preparation_send(&request, &mut SystemEnvironment)
+            .preparation_send(&request, &mut SystemEnvironment, None)
             .unwrap();
         f.stop(&recovered.id);
     }
@@ -373,7 +373,7 @@ fn legacy_terminal_replay_without_native_authority() {
     f.db.execute_batch("CREATE TRIGGER replay_is_readonly BEFORE UPDATE ON preparation_turns BEGIN SELECT RAISE(ABORT,'replay must not mutate'); END;").unwrap();
     let replay = f
         .root
-        .preparation_send(&raw, &mut SystemEnvironment)
+        .preparation_send(&raw, &mut SystemEnvironment, None)
         .unwrap();
     assert_eq!(replay.id, t.id);
     assert_eq!(replay.status, "failed");
@@ -398,6 +398,7 @@ fn legacy_terminal_replay_without_native_authority() {
         .preparation_send(
             &swarm_engine::encode_model(&request).unwrap(),
             &mut SystemEnvironment,
+            None,
         )
         .err()
         .expect("expected explicit refusal");
@@ -408,6 +409,7 @@ fn legacy_terminal_replay_without_native_authority() {
         .preparation_send(
             &swarm_engine::encode_model(&request).unwrap(),
             &mut SystemEnvironment,
+            None,
         )
         .err()
         .expect("expected explicit refusal");
@@ -440,9 +442,9 @@ fn legacy_active_replay_is_readonly_without_native_authority() {
     .unwrap();
     let mut changed = swarm_engine::decode_preparation_send(&f.request("legacy")).unwrap();
     changed.message = "different historical intent".into();
-    let conflict = f.root.preparation_send(&swarm_engine::encode_model(&changed).unwrap(), &mut SystemEnvironment).err().expect("event conflict required");
+    let conflict = f.root.preparation_send(&swarm_engine::encode_model(&changed).unwrap(), &mut SystemEnvironment, None).err().expect("event conflict required");
     assert!(format!("{conflict:?}").contains("preparation-event-conflict"), "{conflict:?}");
-    let observed = f.root.preparation_send(&f.request("legacy"), &mut SystemEnvironment).unwrap();
+    let observed = f.root.preparation_send(&f.request("legacy"), &mut SystemEnvironment, None).unwrap();
     assert_eq!(observed.id,t.id);assert_eq!(observed.status,"pending");
     assert!(!f.root.preparation_dispatch_if_native(&t.id).unwrap());
     let claim=f.root.preparation_worker_claim(&t.id,"not-a-worker-grant").err().expect("legacy row has no native custody");

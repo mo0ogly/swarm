@@ -1,6 +1,25 @@
 //! Pure parser witnesses and disposable IO fixtures, never launch authority.
 use super::*;
 use std::os::unix::fs::{symlink, PermissionsExt};
+
+
+/// Private operator fallback fixture area (0700 chain), replicating
+/// `swarm_engine::fallback_area()` inline: this crate has no swarm-engine
+/// dependency and these fixtures contract private ancestors.
+fn area() -> std::path::PathBuf {
+    use std::os::unix::fs::DirBuilderExt;
+    let home = std::env::var_os("HOME")
+        .unwrap_or_else(|| panic!("HOME required for the operator fallback fixture area"));
+    let area = std::path::Path::new(&home).join(".local/state/swarm-fixtures");
+    std::fs::DirBuilder::new()
+        .recursive(true)
+        .mode(0o700)
+        .create(&area)
+        .unwrap_or_else(|e| {
+            panic!("fallback fixture area {} cannot be created: {e}", area.display())
+        });
+    area
+}
 /// Private disposable source tree; no live Root or host metadata is changed.
 struct Fixture(PathBuf);
 impl Fixture {
@@ -8,7 +27,7 @@ impl Fixture {
     fn new() -> Self {
         let p = tempfile::Builder::new()
             .prefix("paea-native-prereq-")
-            .tempdir()
+            .tempdir_in(area())
             .unwrap()
             .keep();
         fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();

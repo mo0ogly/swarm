@@ -3999,6 +3999,8 @@ mod preparation_transport;
 #[cfg(target_os = "linux")]
 mod preparation_prompt;
 #[cfg(target_os = "linux")]
+mod provider_network;
+#[cfg(target_os = "linux")]
 pub use preparation_call::{worker_error as preparation_worker_error,PreparationSend,PreparationCallCapabilities,PreparationApiRequest,execute_preparation_cli_gate,PreparationWorkerRequest,PreparationCliRequest,decode_send as decode_preparation_send,decode_stop as decode_preparation_stop,PreparationStop};
 
 #[cfg(target_os="linux")]

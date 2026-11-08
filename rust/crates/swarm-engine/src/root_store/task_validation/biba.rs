@@ -9,13 +9,15 @@ fn cause(code:&'static str,error:impl std::error::Error+Send+Sync+'static)->E {
 /// Owned control transport prepared inside its verified private gate. Close it
 /// explicitly if Root closure refuses. Successful exec never returns; no result
 /// or task is accepted. Only an attributed managed I0 workspace is supported.
-pub(super) struct Prepared { command:Command, profile:Sandbox, input:File }
+/// `internet_denied` is the engine-read current operator policy frozen at the
+/// gate; the exec point poses the additive kernel refusal before the command.
+pub(super) struct Prepared { command:Command, profile:Sandbox, input:File, internet_denied:bool }
 impl Prepared {
     /// Bind the holder workspace and contained control cwd, restrict inherited
     /// environment to the saved launch allowlist and open null stdin before
     /// restriction. No provider program is started and no policy is invented.
     /// IO/kernel/close failures refuse with causes; no unconfined fallback exists.
-    pub(super) fn prepare(root:&Path,workspace:&Path,mut command:Command,environment:&[String])->Result<Self,E>{
+    pub(super) fn prepare(root:&Path,workspace:&Path,mut command:Command,environment:&[String],internet_denied:bool)->Result<Self,E>{
         let base=workspace.canonicalize().map_err(|e|cause("task-validation-i0-workspace",e))?;
         let cwd=command.get_current_dir().ok_or(E::Refused("task-validation-i0-cwd-required"))?
             .canonicalize().map_err(|e|cause("task-validation-i0-cwd",e))?;
@@ -32,7 +34,7 @@ impl Prepared {
         let observed=workspace.metadata().map_err(|e|cause("task-validation-i0-workspace",e))?;
         let input=File::open("/dev/null").map_err(|e|cause("task-validation-i0-stdin",e))?;
         match boundary::prepare_boundary(root,workspace,(observed.dev(),observed.ino())) {
-            Ok(profile)=>Ok(Self{command,profile,input}),
+            Ok(profile)=>Ok(Self{command,profile,input,internet_denied}),
             Err(error)=>finished(Err(error),nix::unistd::close(input).map_err(|e|cause("task-validation-i0-stdin-close",e))),
         }
     }
@@ -41,13 +43,18 @@ impl Prepared {
         finished(boundary::close_boundary(self.profile),nix::unistd::close(self.input).map_err(|e|cause("task-validation-i0-stdin-close",e)))
     }
     /// Attach empty owned stdin, enter the pinned profile, then execute only the
-    /// normalized command. Descendants inherit it. Any return requires helper
-    /// exit and preserves setup/kernel/exec causes; no Root operation is accepted.
+    /// normalized command. The operator network refusal, when frozen at the gate,
+    /// is posed additively after the profile, before the command; descendants
+    /// inherit it. Any return requires helper exit and preserves setup/kernel/exec
+    /// causes; no Root operation is accepted.
     pub(super) fn execute(mut self)->Result<Infallible,E>{
         let attach=rustix::stdio::dup2_stdin(&self.input).map_err(|e|cause("task-validation-i0-stdin-attach",e));
         let attached=finished(attach,nix::unistd::close(self.input).map_err(|e|cause("task-validation-i0-stdin-close",e)));
         if let Err(error)=attached{return finished(Err(error),boundary::close_boundary(self.profile))}
         boundary::enforce_boundary(self.profile)?;
+        if self.internet_denied {
+            boundary::deny_internet().map_err(|e|cause("task-validation-i0-internet-deny",e))?;
+        }
         Err(cause("task-validation-command-exec",self.command.exec()))
     }
 }

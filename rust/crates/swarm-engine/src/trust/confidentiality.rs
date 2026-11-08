@@ -259,8 +259,9 @@ impl Entry {
 }
 
 /// Summarize configured state without disclosing grants, labels or history to
-/// the general operator projection. Quarantine is an explicit scoped block,
-/// never a claim of transversal BLP enforcement or classified-send authority.
+/// the general operator projection. Quarantine and the Internet-socket refusal
+/// are explicit scoped blocks, never a claim of transversal BLP enforcement or
+/// classified-send authority.
 pub(crate) fn capability(st: &State) -> Result<Value, E> {
     let current=st.confidentiality.as_ref().map(Record::current).transpose()?;
     Ok(json!({"schema_version":1,"configured":current.is_some(),
@@ -268,6 +269,7 @@ pub(crate) fn capability(st: &State) -> Result<Value, E> {
         "authority_current":current.is_some_and(|e|e.trust_revision==st.revision),
         "runtime_enforced":false,"declassification_available":false,
         "preparation_quarantined":current.is_some_and(|e|e.policy.preparation_quarantine),
+        "provider_internet_denied":current.is_some_and(|e|e.policy.provider_internet_denied),
         "scope":"policy-administration-diagnostics-and-preparation-quarantine",
         "reason":"blp-producer-and-sink-integration-required"}))
 }

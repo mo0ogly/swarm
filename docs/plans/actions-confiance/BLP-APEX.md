@@ -92,11 +92,11 @@ label désérialisé ou champ de provenance ne constitue une autorité.
 |---|---|---|---|
 | BLP-01 | Inventaire sources, consommateurs, sorties et frontières, modèle de menace | — | EN COURS |
 | BLP-02 | Moniteur de dominance/combinaison, domaines fixes, erreurs sûres, indépendance Biba | 01 | VÉRIFIÉ (contrats purs ; 10/10 tests du 31/10/2026, voir « Reprise ») |
-| BLP-03 | Configuration persistée révisionnée, migration explicite, Admin/API/CLI | 02 | VÉRIFIÉ partiellement (historique, opérations, tests 5/5 du 31/10/2026 ; migration des objets existants non faite) |
+| BLP-03 | Configuration persistée révisionnée, migration explicite, Admin/API/CLI | 02 | VÉRIFIÉ partiellement (historique, opérations, tests 5/5 du 31/10/2026 ; migration explicite des objets existants livrée le 9/11/2026 — formulaire Admin BLP-03a, recette `blp-object-attribute-public` ; API/CLI de migration non ajoutées) |
 | BLP-04 | Attribution par producteurs, contexte/mémoire/sorties et replays | 03 | PARTIEL — provenance privée v3, contrôle d’objet et diagnostic authentifié des sources API/CLI ; identité producteur, principal d’envoi et héritage ouverts |
 | BLP-05 | Médiation réelle fichiers/réseau/fournisseurs/descendants, refus sans repli | 04 | PARTIEL — quarantaine API/CLI livrée et vérifiée ; envoi classifié, fichiers/réseau/descendants ouverts |
 | BLP-06 | Identité humaine établie, validation des octets/destinataires, nouvelle copie | 03–05 | À FAIRE |
-| BLP-07 | Recettes, revue du candidat, livraison locale, ressources servies et RETEX | 01–06 | EN COURS (incréments ciblés vérifiés ; installé v0.1.1-dev.299 ; recette globale et RETEX transversal ouverts) |
+| BLP-07 | Recettes, revue du candidat, livraison locale, ressources servies et RETEX | 01–06 | EN COURS (incréments ciblés vérifiés ; installé v0.1.1-dev.299 ; RETEX transversal écrit [RETEX-BLP-20261109](paea/RETEX-BLP-20261109.md) ; recette agrégée publique `blp-aggregate-public` PASS 6/6 + VERIFIED sur candidat unique du 9/11 ; recettes cargo/helper hors agrégat et acceptation indépendante ouverts) |
 
 Chaque lot inclut documentation FR/EN, contrats des fonctions et revue explicite
 politiques/fonctions/erreurs liée aux octets. Aucun critère critique non vérifié
@@ -1307,6 +1307,156 @@ Deuxième sous-incrément de BF-16 : le verdict lecteur du dialogue est
   conservée comme suite (les tests d’intégration font foi en attendant).
 
 
+## BF-16c — lecteurs de send (rejeu et première admission) et de stop (tour terminal) — 8 novembre 2026
+
+Troisième sous-incrément de BF-16 : les deux dernières frontières qui
+servaient un tour enregistré sans aucun contrôle lecteur, fermant le
+contournement « obtenir par send (rejeu) ou stop (tour terminal) ce que le
+dialogue refuse ».
+
+- **Implémenté** : `preparation_send(raw, environment, reader_token)` —
+  la rejeu (triplet provider/request_hash déjà enregistré) décide le
+  verdict partagé `reader_verdict` sur `recorded_turn_keys` avant de
+  servir le `PreparationTurn` enregistré (réponse classifiée incluse, le
+  prompt n’est jamais sérialisé) ; la première admission décide le même
+  verdict **dans la transaction d’écriture**, après `save` et avant la
+  réservation de budget — un refus annule toute l’admission (pas de ligne
+  de tour, pas de réservation, pas d’octet ; un appelant sous-habilité ne
+  peut pas consommer le budget d’une admission illisible).
+  `preparation_stop(preparation_id, turn_id, environment, reader_token)` —
+  les deux branches de service du tour terminal (ligne legacy, native)
+  décident le verdict quand le tour n’est plus actif, avant le retour ;
+  un stop sur tour actif reste une transition producteur, pas une lecture.
+  Le ràz-frais du moniteur passe explicitement `None` avec commentaire
+  d’exemption producteur (miroir du `preparation_call` non contrôlé de
+  BF-16a ; `None` n’est jamais une autorisation). Web : `preparation_calls`
+  extrait `reader_bearer_token` comme les GET (capabilities toujours en
+  lecture seule hors contrôle) ; 403 des quatre codes partagés sous
+  l’opération `preparation-call` dans `service.rs`. CLI :
+  `SWARM_TRUST_TOKEN` résolu une fois pour send/stop dans `calls()`.
+- **Testé local** : `preparation_dialogue_readers.rs` 6/6 — deux nouveaux
+  tests `send_replay_and_stop_serve_classified_turn_without_reader_control`
+  (session nue + lecteur sous-habilité refusés sur rejeu ET premier envoi
+  admis, admission annulée ; tour terminal refusé à session nue et jeton
+  inconnu ; récupération par le sender habilité) et
+  `send_replay_and_stop_without_any_matched_admission_keep_legacy_bare_
+  path` (continuité legacy send/stop sans admission). Preuve rouge→vert :
+  sous les signatures antérieures, la rejeu servait le tour là où le refus
+  est affirmé. Régresseurs : `preparation_calls` 24/24, `confidentiality`
+  1/1, `preparation_worker_transport` adapté (legacy/natif),
+  `confidentiality_http` + web `service` 11/11, gate CLI 2/2, check
+  workspace 0 erreur. Appelants adaptés : exemples et suites (sends/stops
+  legacy en `None` explicite).
+- **Limites conservées** : lecture présentation seulement — l’exécution,
+  l’adoption et les autres canaux restent hors du verdict ; héritage sur
+  erreurs/propositions, médiation fichiers/réseau/descendants, migration
+  des données existantes et déclassification humaine (BLP-06) ouverts.
+  Pas d’installation locale à ce stade ; pas de commit/push sans
+  autorisation explicite ; « implémenté + testé local » n’est ni activé
+  en production ni accepté.
+
+
+## Preuves de non-régression BF-16b — cartographie swarm-cli, 7 novembre 2026
+
+Conclusion de la preuve demandée par BF-16b : classer chaque échec
+`swarm-cli` comme dette préexistante ou régression du lot lecteur. Le
+lot BF-16a/16b ne touche que `preparation_dialogue`, `preparation_read`,
+`preparation_show/history/release_review` et leurs appelants ; les familles
+ci-dessous sont hors de ce périmètre et rien ne les a fait bouger.
+
+- **agent_launch — 4 verts / 9 rouges (BT02, dette Biba transverse)** :
+  reconfirmé après retrait de l'instrumentation de diagnostic
+  (`agent_execution_preflight.rs`/`agent_launch_preflight.rs` revenus à
+  l'état HEAD, diff vide). Les 9 échecs natifs sont la dette BT02 du
+  30 octobre (6706e201b) : fixtures `workspace==root` → refus
+  `biba-workspace-overlaps-root` en pré-exécution → `status: failed`,
+  `exit_code: None`. Propriétaire Codex, dossier
+  BIBA-TRANSVERSE-APEX.md. Hors périmètre BF-16.
+- **Cartographie complète (7 novembre, après rebuild propre) — famille
+  TMPDIR élargie à 13 échecs sur 8 cibles** : agent_runtime ×3, budget ×1,
+  planning ×2, pricing ×1, provider_configuration ×3, provider_policy ×1,
+  run_limits ×1, task_model ×1. Mécanique confirmée en deux variantes :
+  (a) séquentielle — dans une boucle `for flush in [false, true]`, la 2ᵉ
+  itération crée son `tempfile::tempdir()` avec un TMPDIR pointant vers
+  le `.swarm-fixtures` de l'itération 1 déjà détruite → NotFound
+  `/tmp/.tmpXXX/.swarm-fixtures/.tmpYYY` ; (b) parallèle — le harnas
+  Rust exécute les tests d'un même binaire en threads concurrents,
+  `env::set_var` est process-wide : le test A exporte TMPDIR vers son
+  root, le test B crée son tempdir (ou lance son CLI enfant qui lit son
+  `--input`) sous l'arbre de A, A droppe son root → NotFound imbriquée
+  (`/tmp/.tmpA/.swarm-fixtures/.tmpB/.swarm-fixtures/.tmpC`, observée
+  agent_runtime.rs:23) ou ENOENT enfant (`input-document-io` errno 2,
+  provider_configuration.rs:32). Dette produit/typologie de test
+  introduite par f9ff58214 (31 octobre) ; corriger au contrat (figer
+  TMPDIR par test ou passer par sous-processus). Aucune de ces cibles
+  n'appelle le périmètre lecteur BF-16.
+- **Garde capture PAEA — comportement attendu, pas un échec produit** :
+  les 23 rouges du premier passage paea (sans TMPDIR) sont le garde
+  explicite `paea_capture_stream.rs:272` « explicit TMPDIR is required
+  … never /tmp » — l'interdiction /tmp appliquée aux preuves de
+  capture. Avec TMPDIR pointé explicitement, le bloc paea complet est
+  vert : paea_reconcile/promote/settlement_delivered/approval_web 31
+  verts / 15 ignorés (fixtures canoniques retenues requises),
+  paea_settlement 1 vert / 3 ignorés.
+- **Conflit d'ancêtres enrollment — environnement, pas un défaut** :
+  `Documents::open` → `open_private_directory` (swarm-enrollment-config
+  store.rs:105) exige des ancêtres non group/other-writable ;
+  `/home/fpizzi/Documents/ChatGPT` et `swarm` sont 775 → refus `path`
+  même avec un TMPDIR sous `.swarm-fixtures`. Un TMPDIR sous
+  `/home/fpizzi` (755) lève le blocage : `paea_settlement` vert. Le
+  répertoire d'exécution `/home/fpizzi/swarm-run-tmp` (0700, hors
+  dépôt) sert de zone TMPDIR conforme pour les suites locales ; à
+  documenter dans la recette permanente.
+- **planning `planning_cli_enables_new_work_and_refuses_unported_
+  preparations` — catalogue-read, jamais vert** : échec isolé confirmé
+  `agent-provider-catalogue-read` vs `command_not_ported` attendu
+  (planning.rs:417, itération `provider:"unported"`). Le test utilise
+  `call()` en sous-processus : hors famille TMPDIR. Reconstruction au
+  commit de création 174b89106 : `validate_planning_enable_target` ne
+  refuse jamais un provider (seuls new-work/budget/repository), et
+  `reviewer_bootstrap::prepare` → `observe_provider` → `agent_launch::
+  provider` exige `providers.json` (ENOENT → `agent-provider-catalogue-
+  read`, le secours `absent()` ne couvre que ai-connections.json) ; le
+  mapping `PlanningBootstrap(e) => e.code()` est identique des deux côtés
+  ; le fixture (identique création/aujourd'hui, fichier jamais modifié)
+  ne sème jamais `providers.json` et `init` ne le crée jamais — seul
+  `providers config init` le fait. L'itération provider n'a donc jamais
+  pu produire `command_not_ported` : hypothèse « jamais vert » confirmée
+  par reconstruction de code ; l'exécution historique directe reste
+  indisponible (binaire du 3 novembre supprimé, logs rtk du jour seul).
+  Depuis 298640e07, `validate` reçoit `local_request` (repository
+  effacé), donc l'itération repository suit aujourd'hui le même chemin
+  bootstrap et échouerait aussi. Propriétaire Codex ; piste : semer
+  `providers.json` au fixture OU refuser le provider avant bootstrap.
+  Chaîne de preuve complète :
+  `.swarm-fixtures/diag-instr/planning-catalogue-read-finding.md`.
+- **Latent (conservé, hors périmètre)** : un `--root` non canonique fait
+  observer au parent un TMPDIR différent de celui du helper
+  (`apply_runtime_temporary_directory` joint le texte brut de la racine,
+  le helper reçoit la racine canonique). Aucun échec actuel ne s'y
+  réduit ; à surveiller à la migration des recettes.
+- **Constat d'environnement (cette session)** : conflit entre
+  l'interdiction /tmp (tmpfs effacé au reboot) et les `fixture()` qui
+  passent par `tempfile::tempdir()` → `/tmp`. Les suites concernées ne
+  peuvent être ni lancées conformes à l'interdiction ni relocalisées
+  sans édition des sources ; à trancher au contrat de test (owner Codex),
+  en attendant TMPDIR explicitement pointé hors /tmp quand la suite le
+  permet (les gardes exigent en plus des ancêtres non group-writables,
+  cf. conflit d'ancêtres enrollment ci-dessus).
+
+Enseignement : aucun échec swarm-cli restant n'est attribuable au lot
+lecteur BF-16b ; les rouges remontent tous à des dettes datées
+(30-31 octobre) antérieures au lot ou antérieures au test lui-même.
+Cartographie exhaustive des cibles swarm-cli exécutées le 7 novembre :
+cli 17, identity_* 37, gate 2, graph_batch 1, linux_prerequisites 2,
+model_policy 2, trust_enrollment 2, agent_workflow 2, work_list/work_view/
+web_bootstrap/version_no_repository 18, protection ×6 22, planning_report 2,
+pricing 2/1F, provider_policy 1/1F, reported_costs 2, run_limits 1/1F,
+settings_output 3, task_model 1/1F, task_report 1, provider_configuration
+1/3F, paea_* 33 verts/18 ignorés, budget 2/1F, agent_runtime 1/3F,
+planning 2/3F (catalogue-read jamais vert + 2 TMPDIR), agent_launch 4/9F
+(BT02 Biba).
+
 ## Fermeture class-2 — migrations tempdir sous aires gouvernées, 7 novembre 2026
 
 Clôture du constat d'environnement ci-dessus (« les `fixture()` qui passent
@@ -1402,3 +1552,395 @@ Le plan [Sécurité et preuves](SECURITY-PROOFS-APEX.md), adopté par l’utilis
 complète BLP-01–07 : projection moteur/API/CLI, UX, administration, recettes
 autorisées et dossier de qualification. Aucun état de conformité, test ou
 acceptation BLP n’est changé par ce rattachement.
+
+## BF-16d — lecteurs de l'adoption de proposition, de la rejeu de commande et de la liste — 8 novembre 2026
+
+Quatrième sous-incrément de BF-16 : les trois frontières restantes qui
+servaient le domaine classifié d'une réponse admise sans aucun contrôle
+lecteur, fermant le contournement « obtenir par adoption, rejeu de
+commande ou liste ce que le dialogue refuse ». L'axe erreurs était déjà
+couvert par BF-16a/b/c (DTO sous contrôle de frontière, codes statifs
+sûrs uniquement) ; ce lot ferme propositions et liste (BLP-APEX :801).
+
+- **Implémenté** : `preparation_command(raw, environment, reader_token)`
+  gagne `reader_token` en dernier paramètre (miroir de `preparation_send`)
+  — l'adoption `use-proposal` copie la réponse classifiée du tour source
+  dans `documents`/`adopted_brief` (le document hérite du domaine de sa
+  source) et la rejeu du reçu sert un corps `Preparation` historique ;
+  le verdict partagé `reader_verdict` (clés `recorded_turn_keys`) décide
+  **dans la transaction Immediate, après `apply` et avant le commit** —
+  un refus annule document, incrément de révision et ligne de reçu par le
+  rollback existant ; un seul appel couvre adoption ET rejeu.
+  `preparation_list(reader_token)` juge chaque ligne comme
+  `preparation_show` — la première ligne à receipt apparié sans lecteur
+  suffisant refuse toute la liste avant tout octet (servir les lignes
+  non classifiées et refuser les autres révélerait l'existence d'un
+  contenu classifié par la réponse elle-même). Continuité legacy : zéro
+  receipt apparié garde le chemin nu (adoption, rejeu identique à
+  révision courante, liste) — décision attachée aux admissions
+  appariées, jamais à la présence d'une policy. Vues budget : compteurs
+  uniquement, hors périmètre (choix BF-16a inchangé). Web :
+  `POST /api/v1/preparations/command` et `GET /api/v1/preparations`
+  extraient `reader_bearer_token` avec l'extracteur partagé (en-tête
+  malformé refusé avant toute lecture de Root) ; 403 des codes partagés
+  déjà câblé dans `service.rs`. CLI : `SWARM_TRUST_TOKEN` résolu dans
+  `write()` (commande) et le chemin read-only (liste).
+- **Testé local** : `preparation_dialogue_readers.rs` 8/8 — nouveau
+  `use_proposal_replay_and_list_adopt_classified_answer_without_reader_
+  control` (session nue refusée sur adoption/rejeu/liste, aucun octet
+  classifié dans aucun refus, sous-habilité → `blp-dialogue-access-
+  denied`, jeton inconnu → refus typé Authorization, refus sans trace —
+  révision inchangée, pas de document brief, pas de ligne de reçu —,
+  récupération par le sender habilité) et jumeau
+  `use_proposal_replay_and_list_without_any_matched_admission_keep_
+  legacy_bare_path`. Preuve rouge→vert : signatures threadées d'abord
+  (les 10 sites d'appel du test échouent à compiler), puis verdict —
+  le rouge runtime établi montre la session nue ADOPTER le brief
+  classifié là où le refus est affirmé. Régresseurs :
+  `preparation_writes` 5/5, `preparation_calls` 7/7, `preparation_plan`
+  1/1, `preparation_transport` 1/1, `preparation_worker_transport` 1/1,
+  `confidentiality` 16/16, web `server_mutations` 1/1, check workspace
+  0 erreur. Appelants adaptés : CLI `write()`/`list`, web
+  `preparation_command`/liste, exemple `preparation_quarantine_fixture`,
+  suites transport (sites pré-admission en `None` explicite).
+- **Limites conservées** : lecture/présentation seulement — l'exécution,
+  la conversion et les autres canaux restent hors du verdict ;
+  médiation fichiers/réseau/descendants, migration des données
+  existantes (BLP-03) et déclassification humaine (BLP-06) ouverts.
+  Installé localement le même jour (décision du 24 octobre) : candidat
+  `VERIFIED_NATIVE_CANDIDATE` sha256 `dbc888fb…df3d9` livré par
+  `install.sh --mode native`, service moteur 38434 redémarré sous le même
+  contrat (PID vérifié par sha256 de `/proc/<pid>/exe`) ; le parcours HTTP
+  reste protégé par l'auth web préexistante (403 sans session, refus conservé).
+  Pas de commit/push sans autorisation explicite ; « implémenté + testé +
+  installé » n'est ni activé en production ni accepté.
+
+## BF-14a — médiation réseau : refus explicite des sockets Internet aux helpers fournisseur — 9 novembre 2026
+
+Autorisation à l'origine : BLP-APEX.md:727 (« … puis la médiation
+fichiers/réseau/descendants, migration et déclassification. »). L'incrément
+traité ici est la partie réseau de la médiation (gap BF-14 : « Internet
+destination control absent »), avant la migration des données (BLP-03) et la
+déclassification humaine (BLP-06).
+
+### Constat et contrat
+
+Le profil Biba obligatoire refuse AF_UNIX mais laisse `socket(AF_INET)`/AF_INET6
+accessibles aux helpers fournisseur classifiés — un helper compromis ou
+prompt-injecté pouvait créer une connexion Internet sortante. La politique
+n'est pas déduite du code : c'est un choix opérateur explicite, persisté dans
+la politique de confidentialité et modifié par la surface Admin existante
+(`blp-policy-preview`/`blp-policy-apply`, Trust I3). Champ
+`provider_internet_denied: bool` dans `swarm-confidentiality::Policy`
+(sérialisation conditionnelle, l'absence et `false` encodent identiquement —
+les digests historiques sont préservés, comme pour `preparation_quarantine`).
+
+### Implémentation (contrainte moteur : `#![forbid(unsafe_code)]`)
+
+- **Filtre noyau** (`swarm-biba-linux/src/kernel.rs`, extension additive de la
+  crate de Codex — son filtre `seccomp()` et `enforce()` inchangés) :
+  `deny_internet()` installe un second filtre seccomp après le profil
+  obligatoire. Les filtres se stackent et ne peuvent que restreindre : EPERM
+  sur `socket`/`socketpair` quand le domaine demandé est AF_INET ou AF_INET6,
+  verdict inchangé pour tout autre domaine. Échec de pose = refus, jamais
+  d'exécution en repli.
+- **Point d'exécution** (`native_provider_exec.rs`) : `PreparedExec` porte un
+  `internet_denied: bool` fixé par le moteur (`with_internet_denied`, jamais
+  accepté d'un JSON) ; `execute()` pose `biba::enforce` puis le refus additif
+  puis `execve` — pas de relecture après restriction.
+- **Décision gelée à chaque porte** : chaque transport lit sa propre
+  `provider_internet_denied_snapshot()` sous sa propre réservation Trust
+  (`root_store/provider_network.rs`) et la transmet au point d'exécution. Les
+  cinq sites sont câblés : porte agent (`agent_execution_gate.rs`),
+  planificateur (`planning_native.rs`), relecteur (`reviewer_native/gate.rs`),
+  CLI de préparation (`preparation_call_cli.rs`) et validation de tâche
+  (`task_validation/{process,biba}.rs`). État corrompu ou non supporté →
+  refus, jamais repli à false.
+- **Exposition** : `capability()` (diagnostics `blp-show`) rapporte
+  `provider_internet_denied` avec `runtime_enforced:false` — la valeur
+  persistée n'est pas la preuve d'exécution.
+
+### Testé local
+
+- `swarm-confidentiality` : le nouveau test (absent→false, false explicite
+  identique à l'absence en octets, true round-trip, successeurs dans les deux
+  sens, valeurs invalides refusées) + la garde quarantaine jumelle. Suite
+  verte.
+- `swarm-engine --test confidentiality` **18/18** : contrôle Admin (préview
+  refusée au jeton worker, appliquée en Admin), `blp-show` reflète la valeur,
+  snapshot lu vrai, renouvellement d'autorité sans levée, retour explicite à
+  false à la révision attendue ; corruption d'état → snapshot en erreur,
+  jamais repli. TMPDIR projet-local (`~/swarm-run-tmp`), jamais /tmp.
+- `cargo check --workspace` et `--all-targets` : 0 erreur (les 16 erreurs
+  préexistantes de `swarm-enrollment-authority/tests/service_installation.rs`
+  sont le travail en vol de Codex derrière `#[cfg(feature="test-fixtures")]`,
+  préservées non corrigées).
+- **Recette OS-level** `biba-linux-boundary` étendue du cas `native-internet`
+  (drivers compilés contre le rlib réel de cargo, jamais le binaire produit) :
+  contrôle non confiné → INET créé ; **profil obligatoire seul → INET encore
+  créé (le trou BF-14 est démontré au noyau)** ; profil + refus additif →
+  EPERM uniforme sur INET/INET6/socketpair-INET (seccomp s'évalue avant la
+  validation de famille du noyau), verdict AF_UNIX inchangé. Faits
+  d'environnement distingués des verdicts politiques : ce noyau est sans IPv6
+  (EAFNOSUPPORT=97) et le noyau ne fait socketpair que pour AF_UNIX
+  (EOPNOTSUPP=95). Run complet **PASS** avec preuve conservée.
+
+### Installé
+
+Le 9 novembre (décision du 24 octobre) : candidat qualifié
+`VERIFIED_NATIVE_CANDIDATE` sha256 `24024aba…3ec5` produit par
+`build_native.py --install-candidate` (le premier run a échoué sur
+`profile-effective-input-changed:version_history.json` — édition concurrente
+de ma part, corrigée en relançant sans toucher aux sources ; défaut de méthode,
+pas du produit), livré en `bin/swarm` (l'ancien `dbc888fb…` archivé sous
+`.swarm-fixtures/bin-archives/`), service moteur 38434 redémarré sous le même
+contrat (PID 557693, sha256 de `/proc/<pid>/exe` = sha du candidat, flux HTTP
+403 sans session — auth web préexistante conservée). Pas de commit/push sans
+autorisation explicite ; « implémenté + testé + installé » n'est ni activé en
+production ni accepté.
+
+### Limites
+
+Le refus porte sur la création de sockets Internet par les helpers classifiés ;
+la destination complète (compte, résolution, proxy), les canaux descendants
+déjà établis et les autres formes d'égressions (fichiers, caches, télémétrie)
+restent hors de ce refus — BF-14/BF-15 restent OPEN. Implémenté + testé +
+installé ≠ activé en production ≠ accepté. Pas de commit/push sans
+autorisation explicite.
+
+## BLP-03a — migration explicite des objets existants : formulaire Admin — 9 novembre 2026
+
+Autorisation à l'origine : BLP-APEX.md:727 (BLP-03 : « configuration
+persistée révisionnée, migration explicite, Admin/API/CLI »). Le lot
+historique/opérations/CLI de BLP-03 était VÉRIFIÉ le 31 octobre 2026 (tests
+5/5) ; il restait la migration des objets existants non classifiés. Cet
+incrément livre la surface opérateur de cette migration : un formulaire
+Admin dans le dialogue Trust (`trust-actions.html`), un geste = exactement
+un objet, qui pilote le producteur existant et testé `blp-object-attribute`
+(sans changer son contrat).
+
+### Constat et contrat
+
+Aucune surface Admin n'exposait `blp-object-attribute` : l'attribution
+d'un objet existant exigeait l'API/CLI (aucun balayage n'existe ni
+n'est introduit). Le formulaire reprend le contrat exact du producteur
+(`swarm-engine/src/trust/confidentiality.rs`, `deny_unknown_fields`) :
+empreinte canonique SHA-256 (64 hexadécimales minuscules), chemin absolu
+du projet, classification {niveau, compartiments} choisis dans la
+politique relue — jamais inventés par la page — et motif non vide.
+Deux gestes : prévisualisation (aucun changement appliqué), puis
+enregistrement qui rejoue les mêmes octets d'événement (idempotence
+conservée). Un geste = exactement un objet ; aucun balayage automatique
+des objets non classés n'existe.
+
+### Implémentation
+
+- `web/trust-native.html` : sous-fieldset « Attribution d'un objet
+  existant (migration) » dans `#blp-settings` — `#blp-object-digest`,
+  `#blp-object-path`, `#blp-object-level` (select alimenté par la
+  politique relue), `#blp-object-compartments` (multi-select, aucun
+  pré-sélectionné), `#blp-object-reason`, statut `role="status"`,
+  `#blp-attribute-preview` puis `#blp-attribute-apply` (désactivé tant
+  qu'aucune prévisualisation n'est validée).
+- `web/trust-confidentiality.js` : module `SwarmTrustConfidentiality`
+  étendu — options niveau/compartiments reconstruites à chaque relecture
+  depuis `policy.levels`/`policy.compartments` ; validation cliente
+  (empreinte, chemin absolu sans NUL, niveau choisi, motif non vide) ;
+  événement `blp-object-attribute` avec `expected_revision`/
+  `expected_trust_revision` décodés en décimal exact (pas de rounding
+  Number) ; prévisualisation puis rejeu des mêmes octets ; invalidation
+  de la prévisualisation à toute saisie ; réinitialisation complète à
+  la fermeture Admin (aucun matériel privé retenu) ; `runtime_enforced`
+  reste `false` (aucune activation transversale).
+- `locales/en.json` + `npm run i18n:build` : 13 entrées EN ajoutées
+  (9 HTML, 4 JS) ; `web/i18n-en.js` régénéré.
+
+### Tests (rouge → vert, image de production qualifiée)
+
+- `tests/blp_object_attribute_public.py` + `tests/blp_object_attribute_ui.cjs`
+  : driver Puppeteer sur l'Admin réel du binaire qualifié — parcours
+  complet (formulaire présent, niveaux issus de la politique relue,
+  prévisualisation `attributed===true`, enregistrement qui rejoue les
+  mêmes octets), persistance exacte (une attribution par parcours, huit
+  objets distincts — le producteur refuse un second enregistrement du même
+  triplet empreinte/chemin/révision sous un autre event id ;
+  empreinte/chemin/niveau/acteur), refus typés 403 (session seule, bearer faible) sans
+  mutation, suppression des erreurs console, 2 langues × 2 thèmes ×
+  2 largeurs, empreintes des assets servis = `after.json` du profil.
+- ROUGE (binaire d'avant formulaire, run1 `064e624a…`) : parcours CLI
+  PASS, navigateur en échec (formulaire absent) — preuve conservée
+  `/home/fpizzi/.local/state/swarm-fixtures/objattr-profile/red-1/`.
+- VERT (run3 `a166e2b8…`, profil `VERIFIED_DEFAULT_NATIVE_PROFILE`,
+  sources archivées stables) : `OBJECT_ATTRIBUTE_PUBLIC_PASS 4`
+  (policy-current, admin-ui-attribution-form-journey,
+  one-explicit-attribution-persisted, qualified-production-image-unchanged)
+  — preuve `/home/fpizzi/.local/state/swarm-fixtures/objattr-profile/green-2/`.
+- Courses diagnostiquées pendant la mise au point (produit inchangé,
+  preuves conservées) : `green-0-hung` (contrôles dans un `<details>`
+  fermé — clics muets), `green-0b-dup409` (un seul objet pour huit
+  parcours — le producteur refuse un second enregistrement du même
+  triplet), `green-0c-escape-race` (attente post-apply satisfaite en
+  vol ; Escape fermait le dialogue pendant la requête et la restitution
+  de focus visait un bouton encore désactivé). Le test final attend le
+  texte de complétion posé après la relecture, puis Escape.
+- Recette permanente : `tools/verification/recipes/blp-object-attribute-public.json`
+  (entrées = tests + assets embarqués ; env `SWARM_BLP_BINARY`,
+  `SWARM_BLP_PROFILE`, `SWARM_BLP_PROOF_OUTPUT`).
+
+### Limites
+
+L'attribution reste une décision opérateur par objet, sous l'authentification
+Admin existante (403 typés conservés) ; `runtime_enforced:false` — aucune
+activation transversale. Le balayage automatique des objets non classés
+reste inexistant par conception (pas d'énumération) ; la médiation fichiers
+(BF-13/BF-15) et la déclassification humaine (BLP-06) restent OPEN.
+Implémenté + testé ≠ installé ≠ activé en production ≠ accepté. Pas de
+commit/push sans autorisation explicite.
+
+## BLP-06 — contrat d'implémentation préparé pour Codex — 9 novembre 2026
+
+La déclassification humaine exacte exige trois évolutions moteur qui restent du
+périmètre Codex (décision « Codex-only » du 24/10/2026, fichiers moteur portant
+en ce moment la diff BF-14a concurrente). Ce contrat fixe le comportement exact
+attendu, sans aucune écriture moteur de cette session.
+
+### 1. Vocabulaire signé — `swarm-enrollment-authority/src/control/trust_action.rs`
+
+Ajouter `ObjectDeclassify` à l'enum `Operation` fermé (`as_str` →
+`"blp-object-declassify"`, ajouté à la liste fermée de `Operation::parse`).
+Le nom lie une permission signée ; il n'accorde aucun rôle ni ne sélectionne un
+processus ou un endpoint.
+
+### 2. Producteur — `swarm-engine/src/trust/confidentiality.rs`
+
+Nouvelle branche `op=="blp-object-declassify"` dans `execute()` (après
+`authentication::require_administrator(&actor)`) qui :
+
+- décode un `DeclassifyChange` `deny_unknown_fields` : `{schema_version:1,
+  event_id, expected_revision, expected_trust_revision, canonical_digest,
+  project_path, recipients, reason}` — mêmes validations que
+  `blp-object-attribute` (event_id `swarm_identity_contract::name`, reason non
+  vide sans contrôle, digest 64 hex minuscules, chemin absolu sans `\0`,
+  `expected_trust_revision==st.revision`, `expected_revision==entry.revision`,
+  entrée courante sous peine des mêmes codes `blp-policy-required`,
+  `blp-trust-revision-conflict`, `blp-policy-stale`) ;
+- refuse si l'acteur n'est pas un acteur enrôlé humain : `actor.enrollment`
+  doit être `Some` (source `Source::Enrolled` uniquement — un bearer local I3/admin
+  ne déclasse jamais) et le principal enrôlé doit rester `kind=="human"` déjà
+  garanti par `trust_as_enrolled` (`trust_enrollment.rs:73`) — erreur typée
+  `blp-declassification-human-required` sinon. L'habilitation admin seule ne
+  vaut pas accord humain BLP-06 (règle déjà consignée ligne 361) ;
+- exige que l'objet ait exactement une attribution courante
+  (`entry.attribution_for(digest, path)` — `None` →
+  `blp-declassification-object-unknown`, jamais un fallback d'une entrée
+  périmée) ;
+- rejoue l'octet d'événement exact (identité `event_id` → reply enregistré,
+  `trust_publication:"replayed"` ; `event_id` connu avec des octets différents
+  → `event_conflict`), même contrat exact-once que l'attribution ;
+- exige que les `recipients` soient la liste non vide des destinataires exacts
+  validés (identités enrôlées `principal_id` existantes et non désactivées ;
+  un destinataire inconnu ou désactivé →
+  `blp-declassification-recipient-unknown`), jamais un rôle ou un label ;
+- produit une NOUVELLE COPIE : l'effet enregistre un
+  `Declassification{canonical_digest, project_path, policy_revision,
+  recipients, actor (principal enrôlé), at, reason}` sur l'entrée courante et
+  un événement `blp-declassification` — il ne modifie ni ne supprime jamais
+  l'attribution existante (l'étiquette enregistrée reste l'autorité de
+  lecture ; la déclassification autorise explicitement ces destinataires pour
+  ces octets exacts, elle ne réécrit pas l'objet) ;
+- reste soumis à la lecture de l'historique : toute `Declassification`
+  antérieure du même triplet refusée en re-émission sous un autre event_id
+  (`blp-declassification-conflict`) — l'exact-once s'applique aussi ici ;
+- conserve `runtime_enforced:false` dans la réponse et
+  `declassification_available` reflétant l'état réel (actuellement `false` ;
+  passe à `true` seulement quand cette opération est jointe).
+
+### 3. Lecteur — `root_store/reader_guard.rs`
+
+`check_read` refuse toujours par défaut pour un objet attribué ; la
+déclassification n'élargit PAS `check_read` : elle est consommée par le
+chemin d'envoi (préparation/admission), qui revalide destinataire+capsule
+comme aujourd'hui, avec la `Declassification` courante comme preuve
+supplémentaire liant destinataire exact + octets exacts. Aucune commande
+générique « lire sans étiquette » n'apparaît.
+
+### 4. Raccords — web + CLI
+
+- `swarm-web/src/service/trust.rs` : ajouter `"blp-object-declassify"` à la
+  liste POST autorisée (mutant, non readonly) ;
+- `swarm-cli/src/trust.rs` + aide FR/EN de `lib.rs` : même ajout, doc « identité
+  humaine enrôlée exigée, nouvelle copie, aucun déclassement de l'étiquette ».
+
+### Critères observables (test rouge→vert attendu)
+
+1. Bearer admin local + objet confidentiel attribué → `blp-object-declassify`
+   → `blp-declassification-human-required`, aucune mutation.
+2. Acteur enrôlé humain + destinataires exacts + octets → enregistrement
+   `blp-declassification`, attribution inchangée (relue), réponse
+   `runtime_enforced:false`.
+3. Re-émission même triplet sous un autre event_id → `409
+   blp-declassification-conflict`.
+4. Destinataire désactivé ou inconnu → refus typé, aucune mutation.
+5. Un résumé, une sortie vide ou un filtrage LLM ne produit jamais cet effet
+   (le producteur n'est appelable que par cette opération signée).
+
+Limites conservées : le chemin d'envoi classifié (BF-13/BF-15) reste la seule
+consommatrice prévue ; aucun effet fichiers/réseau n'est créé par
+`blp-object-declassify` lui-même. Implémenté + testé ≠ installé ≠ activé.
+
+## BLP-07 — RETEX transversal rédigé — 9 novembre 2026
+
+Le RETEX transversal (lots 01–06, intervalle 2–9 novembre) est écrit :
+[RETEX-BLP-20261109](paea/RETEX-BLP-20261109.md) (miroir EN `.en.md`),
+méthode `retex-analyzer`. Couverture : livraison et qualification BLP-03a
+(recette run PASS + verify VERIFIED revérifié), livraison locale avec chaîne
+d'identité, ressources servies (inventaire 74 refs / 25 flux, 0 échec),
+contrat BLP-06 transmis, écart de traçabilité `version_history` découvert et
+corrigé (+4 lignes). Écarts BLP-RET-01–08 relus : tous OUVERTS.
+
+Restant pour BLP-07 : acceptation indépendante (la recette globale agrégée
+publique est livrée le 9/11, voir « Recette globale ciblée » ci-dessous) ;
+BLP-01 partiel, BLP-04/05 partiels, BLP-06
+contrat seul. `runtime_enforced:false` reste la vérité du runtime.
+
+### Recette globale ciblée sur candidat unique — 9 novembre 2026
+
+Réexamen des acquis demandé par BLP-07 : les recettes permanentes publiques
+clés ont été repassées sur **un même candidat qualifié** (`a166e2b8…`,
+profil `VERIFIED_DEFAULT_NATIVE_PROFILE` du run3 conservé), preuves
+`~/.local/state/swarm-fixtures/objattr-profile/global-{1,2,3,5,6}/`, chacune
+reverify **VERIFIED** :
+
+- `blp-preparation-transport-public` PASS (global-1) ;
+- `blp-dialogue-reader-public` PASS (global-2) ;
+- `blp-preparation-check-public` PASS (global-3) ;
+- `blp-preparation-admission-public` PASS (global-5) ;
+- `blp-flow-inventory` PASS (global-6) après repin de `reference_count`
+  69→74 (dérive suivant les raccords BF-16, même discipline que les repins
+  antérieurs) ;
+- `blp-object-attribute-public` déjà VERIFIED sur ce candidat le même jour
+  (`recipe-run1`).
+
+Limites constatées : `blp-preparation-quarantine-public` **non repassée** —
+son pilote exige `SWARM_BLP_HELPER` (binaire d'exemple
+`preparation_quarantine_fixture` compilé) ; l'exemple porte la diff
+d'appelants BF-16 non commitée et sa compilation entraînerait la diff
+concurrente BF-14a de Codex dans `swarm-engine`. Le PASS du 1/11 conservé
+(`verification-blp/20261101-preparation-quarantine-public-02/`) reste
+VERIFIED sur son candidat d'origine. `blp-preparation-provenance-public`
+non repassée pour la même raison (étapes cargo). **Recette agrégée livrée** : `tools/verification/recipes/blp-aggregate-public.json`
+(6 étapes enfant, une par recette ci-dessus, ordre inventaire → check →
+admission → dialogue-reader → transport → UI ; sorties enfant fraîches sous
+l'aire de fixtures via `configured_area()` + suffixe unique, créées par le
+runner enfant lui-même). Premier passage sur le candidat `a166e2b8…` :
+**PASS 6/6 étapes**, verify externe **VERIFIED** + les 6 preuves enfant
+reverify VERIFIED ; `/tmp` propre. Environnement attendu au lancement :
+`SWARM_BLP_BINARY` + `SWARM_BLP_PROFILE` (le candidat sous test) ;
+`SWARM_BLP_PROOF_OUTPUT` est alloué par étape, jamais hérité. Un défaut de
+première mise au point (racine enfant pré-créée par `fixture_root` refusée
+par `recipe-output-must-be-new-outside-live-state`) a été corrigé dans la
+recette elle-même ; l'évidence du refus est conservée dans l'arbre
+`global-agg-1` remplacé. Reste hors agrégat : `blp-preparation-quarantine-public`
+et `blp-preparation-provenance-public` (helper/compilation, diff concurrente)
+et les recettes cargo-test (moteur WIP concurrent) — l'agrégat est la recette
+globale **publique** sur candidat gelé, pas une requalification moteur.

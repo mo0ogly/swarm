@@ -6,6 +6,7 @@
     "rust/crates/swarm-biba-linux/Cargo.toml",
     "rust/Cargo.lock",
     "tests/rust_biba_boundary_driver.rs",
+    "tests/rust_biba_internet_deny_driver.rs",
     "tests/rust_biba_linux_boundary*.py",
     "tests/rust_agent_model_route.py",
     "docs/architecture/BIBA-RUST.md",

@@ -79,7 +79,17 @@ impl NativeHttpService {
                     if request.uri().path().ends_with("/files"){encode(store.preparation_files(id,scope,query),&mut causes)?}
                     else{encode(store.preparation_source(id,path,*start,*end,&mut swarm_engine::SystemEnvironment),&mut causes)?}
                 }
-                "/api/v1/preparations" => encode(store.preparation_list(), &mut causes)?,
+                // BF-16d: the list is a presentation frontier like show — a
+                // listed preparation whose turns match an admission receipt
+                // inherits the classified domain, so the Bearer credential is
+                // extracted with the shared reader extractor (malformed
+                // headers refuse before any Root read; no header is a bare
+                // session, decided by the engine only when a matched
+                // admission makes a listed row classified).
+                "/api/v1/preparations" => {
+                    let reader_token = reader_bearer_token(request)?;
+                    encode(store.preparation_list(reader_token.as_deref()), &mut causes)?
+                }
                 "/api/v1/preparations/methods" => encode(store.preparation_methods(), &mut causes)?,
                 "/api/v1/preparations/templates"=>encode(store.preparation_templates(),&mut causes)?,
                 // BF-16b: show/history/release-review are presentation frontiers
@@ -137,9 +147,16 @@ impl NativeHttpService {
         let store=RootStore::open(&self.root,true).map_err(|e|root("open",e))?;
         let mut receipt=None;
         let mut causes=Vec::new();
+        // BF-16d: the command frontier (use-proposal adoption and receipt
+        // replay) inherits the source dialogue's classified domain — the
+        // Bearer credential is extracted with the shared reader extractor
+        // (malformed headers refuse before any Root read; no header is a bare
+        // session, decided by the engine only when a matched admission makes
+        // the operation classified).
+        let reader_token = reader_bearer_token(request)?;
         let result=(||{
             self.check_binding(&store)?;
-            let mut observation=store.preparation_command(request.body(),&mut swarm_engine::SystemEnvironment).map_err(|e|root("preparation-command",e))?;
+            let mut observation=store.preparation_command(request.body(),&mut swarm_engine::SystemEnvironment, reader_token.as_deref()).map_err(|e|root("preparation-command",e))?;
             causes.append(&mut observation.causes);
             let p=observation.value;
             receipt=Some((p.id.clone(),p.revision));
@@ -178,23 +195,31 @@ impl NativeHttpService {
     /// failure cannot imply rollback of an admitted turn: replay the same event.
     /// No real provider contact occurs in this request handler; owned gated Rust
     /// worker applies the separately saved preparation policy and reservation.
-    /// Historical active replay remains observation; native preflight precedes spawn.
+    /// Historical active replay remains observation; native preflight precedes
+    /// spawn. BF-16c: send/stop carry the caller's local bearer token (same
+    /// extraction contract as the BF-16b reads) — once one admission receipt
+    /// matches the preparation, the engine's shared reader verdict decides
+    /// before any turn byte (replay answer, terminal answer or the history-
+    /// carrying prompt's first-admission serve) leaves the call; bare sessions
+    /// are never authorization. Capabilities stay readonly and uncontrolled:
+    /// they name no preparation, record nothing and serve no turn byte.
     pub(super) fn preparation_calls(&self,request:&Request<Vec<u8>>)->Result<RouteBody,E>{
         let capability=request.uri().path().ends_with("/capabilities");
         if capability{if !matches!(*request.method(),Method::GET|Method::HEAD){return Err(E::Method("GET, HEAD"));}if !request.body().is_empty(){return Err(E::Refused("preparation-query-invalid"));}}
         else{if request.method()!=Method::POST{return Err(E::Method("POST"));}swarm_engine::check_command_input_size(request.body()).map_err(E::Input)?;}
         if request.uri().query().is_some(){return Err(E::Refused("preparation-query-invalid"));}
+        let reader_token=if capability{None}else{reader_bearer_token(request)?};
         let store=RootStore::open(&self.root,!capability).map_err(|e|root("open",e))?;
         let result=(||{
             self.check_binding(&store)?;
             let bytes=if capability{serde_json::to_vec(&store.preparation_call_capabilities().map_err(|e|root("preparation-call",e))?).map_err(E::ResponseJson)?}
             else{
                 let turn=if request.uri().path().ends_with("/send"){
-                    let t=store.preparation_send(request.body(),&mut swarm_engine::SystemEnvironment).map_err(|e|root("preparation-call",e))?;
+                    let t=store.preparation_send(request.body(),&mut swarm_engine::SystemEnvironment,reader_token.as_deref()).map_err(|e|root("preparation-call",e))?;
                     if t.status=="pending" && t.supervisor_pid==0{store.preparation_dispatch_if_native(&t.id).map_err(|e|root("preparation-call",e))?;}t
                 }else{
                     let r=swarm_engine::decode_preparation_stop(request.body()).map_err(|e|root("preparation-call",e))?;
-                    store.preparation_stop(&r.preparation_id,&r.turn_id,&mut swarm_engine::SystemEnvironment).map_err(|e|root("preparation-call",e))?
+                    store.preparation_stop(&r.preparation_id,&r.turn_id,&mut swarm_engine::SystemEnvironment,reader_token.as_deref()).map_err(|e|root("preparation-call",e))?
                 };serde_json::to_vec(&turn).map_err(E::ResponseJson)?
             };self.check_binding(&store)?;Ok(RouteBody::plain(bytes))
         })();close(result,store.close())

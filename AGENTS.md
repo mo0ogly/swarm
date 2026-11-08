@@ -237,7 +237,11 @@ history or force-push without explicit authority.
 ## Local delivery version and release notes
 
 Every delivered change must have an identifiable running version and current
-French/English evolution notes in `version_history.json` (`local_changes`).
+French/English evolution notes in `version_history.json` (`local_changes`),
+entered in the same increment as the announcement — not retro-discovered at a
+later RETEX (lesson from the BLP-03a delivery of 9 November 2026, where the
+plan and RETEX updates held but the registry entry was missing until the
+transversal RETEX found it).
 Use `./swarm.sh build` / `./swarm.sh restart` for a source-managed local server:
 the launcher numbers changed effective build inputs before stopping the previous
 server, and preserves the number for unchanged inputs. Do not leave an old

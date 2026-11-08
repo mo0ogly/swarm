@@ -260,7 +260,7 @@ pub use run_limits::{
 mod engine_settings;
 mod engine_settings_catalog;
 mod fixture_area;
-pub use fixture_area::{configured_area, fixture_area, fixture_root};
+pub use fixture_area::{configured_area, fallback_area, fixture_area, fixture_root};
 mod gate_contract;
 mod gate_evaluation;
 mod managed_receipt;

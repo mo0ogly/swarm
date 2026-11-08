@@ -51,5 +51,19 @@ class EffectiveSourceArchive(unittest.TestCase):
             self.assertEqual(archive.extractfile('.cargo/config.toml').read(),raw)
             self.assertEqual(set(archive.getnames()),set(inputs))
 
+    def test_admission_support_bytes_survive_source_removal(self):
+        """Build records retain exact wrapper/policy bytes independently of the checkout."""
+        expected={}
+        for name in profile.CARGO_SUPPORT_NAMES:
+            path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True)
+            expected[name]=('fixture support '+name).encode();path.write_bytes(expected[name])
+        inputs={**self.inputs,**profile.manifest(self.root,profile.cargo_config_inputs(self.root))}
+        out=self.root/'support-witness';out.mkdir()
+        profile.archive_effective_sources(self.root,out,inputs)
+        for name in expected:(self.root/name).unlink()
+        with tarfile.open(out/'effective-sources.tar.gz') as archive:
+            for name,raw in expected.items():self.assertEqual(archive.extractfile(name).read(),raw)
+            self.assertEqual(set(archive.getnames()),set(inputs))
+
 
 if __name__=='__main__':unittest.main()

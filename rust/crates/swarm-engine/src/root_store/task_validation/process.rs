@@ -141,7 +141,10 @@ fn gate_command(store: &RootStore, id: &str, peer: i64, managed: &mut Option<sup
     });
     let workspace = managed.as_ref().ok_or(E::Refused("task-validation-i0-context-required"))?.workspace();
     let environment = prepared.settings.values.agent_launch_policy().map_err(E::Settings)?.environment;
-    biba::Prepared::prepare(&store.root, &workspace, command, &environment)
+    // Frozen engine-read operator policy under this gate's open store; the exec
+    // point poses the additive kernel refusal before the validated command.
+    let internet_denied = store.provider_internet_denied_snapshot()?;
+    biba::Prepared::prepare(&store.root, &workspace, command, &environment, internet_denied)
 }
 /// Private CLI helper only. Actual Unix peer credentials and parent-death signal
 /// precede the one-byte grant; committed permission and fresh source precede

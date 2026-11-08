@@ -86,3 +86,29 @@ pub(crate) fn seccomp()->io::Result<()> {
     // SAFETY: initialized finite native BPF instructions remain alive through prctl.
     if unsafe{libc::prctl(libc::PR_SET_SECCOMP,2,&program)}!=0{Err(io::Error::last_os_error())}else{Ok(())}
 }
+/// Additive engine-posed Internet-socket refusal, separate from the mandatory
+/// profile. Seccomp filters stack and can only restrict: denying socketpair
+/// for Internet families removes nothing the fixed profile allows. Load
+/// failure refuses; the caller must exit without any fallback.
+pub(crate) fn deny_internet()->io::Result<()> {
+    #[cfg(target_arch="x86_64")] const ARCH:u32=0xc000003e;
+    #[cfg(target_arch="aarch64")] const ARCH:u32=0xc00000b7;
+    #[cfg(not(any(target_arch="x86_64",target_arch="aarch64")))] compile_error!("Internet denial requires an audited native architecture");
+    fn ins(code:u16,jt:u8,jf:u8,k:u32)->libc::sock_filter{libc::sock_filter{code,jt,jf,k}}
+    let deny=0x00050000|libc::EPERM as u32;
+    let mut f=vec![ins(0x20,0,0,4),ins(0x15,1,0,ARCH),ins(0x06,0,0,0x80000000),ins(0x20,0,0,0)];
+    // Deny only Internet-family creation; every other domain keeps the
+    // mandatory profile's existing verdict (AF_UNIX already refused there).
+    for syscall in [libc::SYS_socket, libc::SYS_socketpair] {
+        f.extend([ins(0x15,0,4,syscall as u32),ins(0x20,0,0,16),
+            ins(0x15,1,0,libc::AF_INET as u32),
+            ins(0x15,0,1,libc::AF_INET6 as u32),
+            ins(0x06,0,0,deny),ins(0x20,0,0,0)]);
+    }
+    f.push(ins(0x06,0,0,0x7fff0000));
+    let program=libc::sock_fprog{len:f.len() as u16,filter:f.as_mut_ptr()};
+    // SAFETY: initialized finite native BPF instructions remain alive through prctl.
+    // SECCOMP_MODE_FILTER can only restrict this already-restricted single-threaded
+    // helper (no_new_privs is set by the profile before this runs).
+    if unsafe{libc::prctl(libc::PR_SET_SECCOMP,2,&program)}!=0{Err(io::Error::last_os_error())}else{Ok(())}
+}

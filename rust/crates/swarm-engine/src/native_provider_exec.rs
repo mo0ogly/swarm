@@ -2,7 +2,7 @@
 #![cfg(target_os = "linux")]
 #[path = "native_provider_biba.rs"]
 mod biba;
-pub(crate) use biba::{output_workspace, OutputRole};
+pub(crate) use biba::{deny_internet, output_workspace, OutputRole};
 pub(crate) use biba::{prepare as prepare_boundary, enforce as enforce_boundary, close as close_boundary};
 use crate::{root_store::finished as finish, AgentLaunchError, Provider, RootStoreError as E};
 use std::{
@@ -32,6 +32,10 @@ pub(crate) struct PreparedExec {
     environment: Vec<CString>,
     workspace: PathBuf,
     workspace_identity: Option<(u64, u64)>,
+    /// Frozen engine-side decision read under the launching gate's own store;
+    /// never a caller-supplied flag. true poses a cumulative kernel refusal of
+    /// Internet sockets at the shared exec point, after the Biba profile.
+    internet_denied: bool,
 }
 impl PreparedExec {
     /// Encode exact CLI arguments, observe only the supplied validated environment
@@ -117,6 +121,7 @@ impl PreparedExec {
             environment,
             workspace: workspace.to_owned(),
             workspace_identity: None,
+            internet_denied: false,
         })
     }
 
@@ -125,6 +130,15 @@ impl PreparedExec {
     /// before granting output access. Missing/mismatched observations refuse.
     pub(crate) fn with_workspace_identity(mut self, identity: (u64, u64)) -> Self {
         self.workspace_identity = Some(identity);
+        self
+    }
+
+    /// Freeze the current operator network policy read by the launching gate
+    /// under its own store reservations. The value is engine-observed, never
+    /// accepted from JSON; consumers must call this before any exec transport
+    /// use, mirroring `with_workspace_identity`. No kernel effect until exec.
+    pub(crate) fn with_internet_denied(mut self, denied: bool) -> Self {
+        self.internet_denied = denied;
         self
     }
 
@@ -208,6 +222,12 @@ impl PreparedExec {
             return finish(Err(error), biba::close(sandbox));
         }
         biba::enforce(sandbox)?;
+        // Operator network policy rides the same additive, deny-only path:
+        // posed after the profile, before execve; failure refuses without
+        // fallback and the helper exits (its stdin and ruleset die with it).
+        if self.internet_denied {
+            biba::deny_internet().map_err(|error| caused("agent-execution-internet-deny", error))?;
+        }
         nix::unistd::execve(&self.path, &self.args, &self.environment)
             .map_err(|e| caused("agent-provider-exec", e))
     }

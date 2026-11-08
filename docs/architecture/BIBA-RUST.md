@@ -346,10 +346,15 @@ exact rejoué sans réécriture, autre événement pour le même objet/révision
 révisions périmées et déclassement refusés. Le lecteur recalcule le digest de son
 objet réel et consulte la politique courante : fournir un digest n'établit ni
 les octets source, ni la filiation physique, ni un droit de déclassification.
-Le formulaire Admin configure la politique ; il n'offre pas encore de formulaire
-d'attribution d'objet. Aucun classement implicite des sources de préparation ou
-contrôle transversal n'est introduit. Les erreurs de publication/conclusion
-conservent leur état connu ; après résultat incertain, relire avant reprise.
+Le formulaire Admin configure la politique et attribue désormais un objet
+existant (BLP-03) : empreinte 64 hexadécimales, chemin absolu, niveau et
+compartiments choisis dans la politique relue — jamais inventés par la page —
+et motif non vide, en deux gestes (prévisualisation puis enregistrement qui
+rejoue les mêmes octets d'événement). Un geste couvre exactement un objet ;
+aucun balayage automatique des objets non classés n'existe. Aucun classement
+implicite des sources de préparation ou contrôle transversal n'est introduit.
+Les erreurs de publication/conclusion conservent leur état connu ; après
+résultat incertain, relire avant reprise.
 
 ### Diagnostic des sources de préparation
 

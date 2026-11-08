@@ -65,6 +65,14 @@ pointillées représentent les contrôles à implémenter et qualifier.
   faire fonctionner un scénario BLP.
 - Le profil Linux inspecté limite les écritures et l'autorité privée, mais permet
   des lectures hors racine privée ; le refus AF_UNIX ne confine pas Internet.
+  Depuis le 9 novembre 2026 (BF-14a), une politique opérateur explicite
+  `provider_internet_denied` fait poser par le moteur un filtre seccomp additif
+  (AF_INET/AF_INET6 en socket et socketpair → EPERM) à chacun des cinq points
+  d'exécution des helpers fournisseur classifiés, gelé à l'exec ; la recette
+  `biba-linux-boundary` montre au niveau noyau que le profil obligatoire seul
+  laissait créer des sockets INET (trou BF-14) et que le filtre additif le ferme
+  en préservant le verdict AF_UNIX. La destination complète (compte, routage,
+  proxy) et les canaux descendants restent hors de ce refus.
   Les SDK peuvent consommer fichiers, caches, configuration de compte et services
   hors du prompt. Les observer est une précondition des revendications BF-14.
 - L'endpoint configuré ne suffit pas à établir la destination complète : compte,
@@ -171,6 +179,13 @@ d’attribution courante. Les renouvellements de politique conservent les niveau
 et compartiments antérieurs ; le contrôle reste partiel. Les quatre fichiers
 dont les empreintes avaient dérivé ont été relus (aperçu, présentation, dispatch
 Trust, module BLP), sans rafraîchir les autres empreintes.
+
+Révision du 8 novembre (BLP-03a) : le dialogue Trust expose le formulaire
+Admin d’attribution explicite d’un objet existant (empreinte, chemin absolu,
+classification choisie dans la politique relue, motif ; prévisualisation puis
+enregistrement rejeuant les mêmes octets) — un geste par objet, aucun balayage
+automatique ; `runtime_enforced` reste `false`. Contrôles détaillés : inventaire
+BF-23 (`blp-flow-inventory.json`, note BF-23c).
 
 ### Révision : diagnostic des sources de préparation
 

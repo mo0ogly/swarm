@@ -43,3 +43,11 @@ pub(crate) fn enforce(sandbox: Sandbox) -> Result<(), E> {
 pub(crate) fn close(sandbox: Sandbox) -> Result<(), E> {
     sandbox.close().map_err(convert)
 }
+
+/// Additive engine-posed Internet-socket refusal, installed AFTER `enforce`.
+/// Seccomp filters stack and can only restrict; this is an explicit operator
+/// policy, not a profile change. Any returned error requires helper exit;
+/// retrying or executing with Internet sockets reachable is forbidden.
+pub(crate) fn deny_internet() -> Result<(), E> {
+    swarm_biba_linux::deny_internet().map_err(convert)
+}

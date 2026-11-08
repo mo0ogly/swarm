@@ -589,7 +589,11 @@ impl RootStore {
             &environment,
             workspace,
             t.prompt.as_bytes(),
-        )?.with_workspace_identity((observed.dev(), observed.ino()));
+        )?
+        .with_workspace_identity((observed.dev(), observed.ino()))
+        // Frozen engine-read operator policy: this helper's own store snapshot
+        // decides the additive kernel refusal the exec point will pose.
+        .with_internet_denied(self.provider_internet_denied_snapshot()?);
         // One final freshness observation; pathname executable replacement remains
         // the same unverified-host limitation as the existing native exec transport.
         let result = self

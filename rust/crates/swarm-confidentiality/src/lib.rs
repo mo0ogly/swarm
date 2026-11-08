@@ -70,6 +70,14 @@ pub struct Policy {
     /// not arbitrary OS access. Engine consumers own the actual IO reservation.
     #[serde(default, skip_serializing_if = "is_false")]
     pub preparation_quarantine: bool,
+    /// Explicit operator refusal of Internet sockets (AF_INET/AF_INET6) for
+    /// classified provider helpers launched inside the I0 boundary. Missing/false
+    /// retains the historical policy encoding; true makes the engine pose a
+    /// cumulative seccomp denial at the shared exec point — an additive kernel
+    /// restriction on top of the mandatory Biba profile, never a permission.
+    /// Engine-side transport (loopback to the local engine) is unaffected.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub provider_internet_denied: bool,
 }
 
 /// Preserve historical policy digests when the optional quarantine is disabled.

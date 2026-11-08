@@ -73,6 +73,7 @@ impl Fixture {
             .preparation_command(
                 br#"{"version":1,"action":"create","event_id":"create","expected_revision":0,"text":"Fixture need"}"#,
                 &mut SystemEnvironment,
+                None,
             )
             .unwrap()
             .value;
@@ -85,6 +86,7 @@ impl Fixture {
                 }))
                 .unwrap(),
                 &mut SystemEnvironment,
+                None,
             )
             .unwrap()
             .value;

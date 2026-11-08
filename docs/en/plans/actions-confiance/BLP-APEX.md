@@ -24,15 +24,17 @@ evidence and recovery, without a second assurance program or changed denominator
 | BLP-04 | Protected attribution, context/memory/output propagation and replays | BLP-03 | PARTIAL — private v3 prompt provenance and API/CLI object control; source classification, principal and inheritance open |
 | BLP-05 | Actual filesystem/network/provider/descendant mediation, no unconfined fallback | BLP-04 | PA-04/05 |
 | BLP-06 | Established human identity, approval of exact bytes/recipients, new copy | BLP-03–05 | PA-02/08/09 |
-| BLP-07 | Retained recipes, candidate review, local delivery, served assets and RETEX | BLP-01–06 | PA-09/10/11/12/13 |
+| BLP-07 | Retained recipes, candidate review, local delivery, served assets and RETEX | BLP-01–06 | IN PROGRESS (targeted increments verified; v0.1.1-dev.299 installed; transverse RETEX written [RETEX-BLP-20261109](../../../plans/actions-confiance/paea/RETEX-BLP-20261109.md); public aggregated recipe `blp-aggregate-public` PASS 6/6 + VERIFIED on single candidate 9 Nov; cargo/helper recipes outside the aggregate and independent acceptance open) |
 
 ## Current technical state
 
-BLP-04 remains partial: native v3 provenance, public object control and the
-authenticated recorded-source diagnostic are verified and installed in296.
-Producer source identity, original send-principal binding and output inheritance
-remain open. BLP-07 retains global recipe/review/RETEX requirements. See the
-verified-result section below for exact image/evidence.
+BLP-03 explicit migration is delivered (9 November 2026, Admin form BLP-03a
+below, recipe `blp-object-attribute-public`); the migration API/CLI surface is
+not added. BLP-04 remains partial: native v3 provenance, public object control
+and the authenticated recorded-source diagnostic are verified and installed
+in296. Producer source identity, original send-principal binding and output
+inheritance remain open. BLP-07 retains global recipe/review/RETEX
+requirements. See the verified-result section below for exact image/evidence.
 
 ## Required reassessment of previous PAEA work
 
@@ -146,7 +148,7 @@ The French record above remains the detailed canonical log. Summary:
   trust bootstrap, an operator decision not taken in this increment.
 - Real browser qualification (Chrome headless, script and evidence under
   `.swarm-fixtures/`, retained in-repo at
-  [verification-blp/20261031-ui-qualification/](verification-blp/20261031-ui-qualification/)):
+  [verification-blp/20261031-ui-qualification/](../../../plans/actions-confiance/verification-blp/20261031-ui-qualification/)):
   served page + embedded BLP asset, Admin dialog, typed
   FR/EN refusal messages, 4-level no-clearance example, save disabled without
   preview, theme sombre→etat verified by attribute, no horizontal overflow at
@@ -155,7 +157,20 @@ The French record above remains the detailed canonical log. Summary:
   open. `runtime_enforced:false` and `runtime_authorized:false` remain the
   runtime truth; no real content classified, no protected execution.
 
-RETEX written: [paea/RETEX-BLP-20261031.en.md](../../paea/RETEX-BLP-20261031.en.md)
+Transverse RETEX now written (9 November 2026):
+[paea/RETEX-BLP-20261109.en.md](../../../plans/actions-confiance/paea/RETEX-BLP-20261109.en.md)
+(French original `.md`) — method `retex-analyzer`, scope lots 01–06 over the
+2–9 November interval: BLP-03a delivery and qualification (recipe run PASS +
+verify VERIFIED re-checked), local delivery with the identity chain, served
+resources (inventory 74 refs / 25 flows, 0 failures), the BLP-06 contract
+transmitted, and a `version_history` traceability gap found and corrected
+(+4 lines). BLP-RET-01–08 re-read: all OPEN. BLP-07 remains open for independent
+acceptance (the public aggregated global recipe was delivered on 9 Nov, see
+"Targeted global recipe" below); BLP-01 partial, BLP-04/05 partial, BLP-06
+contract only.
+`runtime_enforced:false` remains the runtime truth.
+
+RETEX written: [paea/RETEX-BLP-20261031.en.md](../../../plans/actions-confiance/paea/RETEX-BLP-20261031.en.md)
 (French original `.md`). BLP-07 stays open for independent acceptance;
 BLP-01 (partial) and BLP-04–06 stay open.
 
@@ -181,7 +196,7 @@ open: migration, authenticated principal, sink checks and inheritance remain pen
 
 ## Positive BLP administration on a fixture root — November 1 (Claude session)
 
-The [RETEX](../../paea/RETEX-BLP-20261031.en.md) next experiment, executed: the
+The [RETEX](../../../plans/actions-confiance/paea/RETEX-BLP-20261031.en.md) next experiment, executed: the
 full recorded administration flow through the real UI, independent of any
 mission-root bootstrap decision.
 
@@ -198,7 +213,7 @@ mission-root bootstrap decision.
   `policy_revision:1`, one attributed history entry (actor `admin`, reason
   preserved). **7/7 checks, 0 errors.**
 - Evidence retained:
-  [verification-blp/20261101-blp-positive-ui/](verification-blp/20261101-blp-positive-ui/)
+  [verification-blp/20261101-blp-positive-ui/](../../../plans/actions-confiance/verification-blp/20261101-blp-positive-ui/)
   (harness, `checks.json`, screenshot, fixture-root trust state — fixture-only
   labeled data).
 
@@ -383,7 +398,7 @@ CPU/stage progression and memory pressure remain in
 arbitrary deadline or duplicate build.
 
 Policies/functions/errors review:
-[hashes and limits](verification-blp/20261101-public-producer-source-review.json).
+[hashes and limits](../../../plans/actions-confiance/verification-blp/20261101-public-producer-source-review.json).
 Fixed operation names are protocol vocabulary; no new operator policy or ceiling.
 CLI/HTTP contracts document actual authority; producer errors and existing
 close/publication/output handling remain intact. HTTP evidence is reused only for
@@ -507,7 +522,7 @@ must recompute exact sources and current authority.
   46 files**, all OPEN for transversal protection. Original stale inventory
   remains intact FAIL/VERIFIED in `...-before-01`.
 
-[Byte-bound policy/function/error review](verification-blp/20261101-preparation-check-source-review.json).
+[Byte-bound policy/function/error review](../../../plans/actions-confiance/verification-blp/20261101-preparation-check-source-review.json).
 The attempted cancellation of our third queued build sent no signal: its guard
 observed compilation had just started. That build subsequently qualified the
 image above. A separate concurrent build refused changed version_history.json/
@@ -874,7 +889,7 @@ send path is **not** modified.
   `base_url`/`model` echo of the current connection, canonical digest recomputed
   by the Root (never caller-supplied), key never an input; goes through the
   `blp-object-attribute` producer (exact-once uniqueness, inherited
-  anti-declassification guard). [`preparation_transport.rs`](../../../rust/crates/swarm-engine/src/root_store/preparation_transport.rs)
+  anti-declassification guard). [`preparation_transport.rs`](../../../../rust/crates/swarm-engine/src/root_store/preparation_transport.rs)
 - `blp-preparation-transport`: under the shared egress lock, full capsule
   re-verification, connection/provider_source/settings freshness since
   admission, current binding for that exact digest, last-use no-write-down
@@ -908,7 +923,7 @@ send path is **not** modified.
   fixed on the established pattern (`TMPDIR` required + `/tmp` refusal,
   birth record, `Drop` retaining the root on panic only). Suite
   **7/7 PASS**, proof `/tmp` before=after, zero remaining root.
-- Byte-bound review: [source-review](verification-blp/20261102-preparation-transport-source-review.json).
+- Byte-bound review: [source-review](../../../plans/actions-confiance/verification-blp/20261102-preparation-transport-source-review.json).
 - FR/EN documentation: BELL-LAPADULA (new section), BIBA-RUST (full technical
   contract + diagram), BLP-FLOWS (BF-05/BF-07 revision paragraph).
 
@@ -926,7 +941,7 @@ capsule.
 Next increment: the worker emission hook (Api branch of
 `preparation_worker.rs`) calling the last-use decision before any classified
 send; the legacy path stays untouched. Increment RETEX:
-[RETEX-BLP-05-20261102](paea/RETEX-BLP-05-20261102.en.md).
+[RETEX-BLP-05-20261102](../../../plans/actions-confiance/paea/RETEX-BLP-05-20261102.en.md).
 
 ## BF-07 resumption — worker emission hook, 2 November 2026
 
@@ -1107,6 +1122,154 @@ the dialogue refuses" bypass.
   follow-up work (the integration tests stand as evidence meanwhile).
 
 
+## BF-16c — readers of send (replay and first admission) and stop (terminal turn) — 8 November 2026
+
+Third BF-16 sub-increment: the last two frontiers that served a recorded
+turn with no reader control, closing the "obtain through send (replay) or
+stop (terminal turn) what the dialogue refuses" bypass.
+
+- **Implemented**: `preparation_send(raw, environment, reader_token)` —
+  the replay (an already-recorded provider/request_hash triple) decides
+  the shared `reader_verdict` over `recorded_turn_keys` before serving
+  the recorded `PreparationTurn` (classified answer included, the prompt
+  is never serialized); the first admission decides the same verdict
+  **inside the write transaction**, after `save` and before the budget
+  reservation — a refusal rolls the whole admission back (no turn row, no
+  reservation, no byte; an under-cleared caller cannot consume the budget
+  of an admission it cannot read). `preparation_stop(preparation_id,
+  turn_id, environment, reader_token)` — both terminal-turn serving
+  branches (legacy row, native) decide the verdict when the turn is no
+  longer active, before returning; a stop on an active turn remains a
+  producer transition, not a read. The monitor's settle pass passes
+  explicit `None` with the producer-exemption comment (mirroring
+  `preparation_call` left uncontrolled since BF-16a; `None` is never an
+  authorization). Web: `preparation_calls` extracts `reader_bearer_token`
+  like the GET frontiers (capability requests still readonly and outside
+  the verdict); the four shared codes map to 403 under operation
+  `preparation-call` in `service.rs`. CLI: `SWARM_TRUST_TOKEN` resolved
+  once for send/stop in `calls()`.
+- **Locally tested**: `preparation_dialogue_readers.rs` 6/6 — two new
+  tests `send_replay_and_stop_serve_classified_turn_without_reader_
+  control` (bare session + under-cleared reader refused on both the
+  replay and the first admitted send, admission rolled back; terminal
+  turn refused to a bare session and an unknown token; recovery by the
+  cleared sender) and `send_replay_and_stop_without_any_matched_admission_
+  keep_legacy_bare_path` (legacy send/stop continuity without admission).
+  Red→green proof: under the previous signatures, the replay served the
+  turn exactly where the refusal is asserted. Regressors:
+  `preparation_calls` 24/24, `confidentiality` 1/1,
+  `preparation_worker_transport` adapted (legacy/native),
+  `confidentiality_http` + web `service` 11/11, CLI gate 2/2, workspace
+  check 0 errors. Callers adapted: examples and suites (legacy sends/
+  stops pass explicit `None`).
+- **Limits retained**: presentation reads only — execution, adoption and
+  other channels stay outside the verdict; inheritance on
+  errors/propositions, file/network/descendant mediation, migration of
+  existing data and human declassification (BLP-06) remain open. No local
+  install at this stage; no commit/push without explicit authorization;
+  "implemented + locally tested" is neither activated in production nor
+  accepted.
+
+
+## BF-16b non-regression evidence — swarm-cli mapping, 7 November 2026
+
+Closing the evidence BF-16b called for: classify every remaining `swarm-cli`
+failure as pre-existing debt or a reader-lot regression. The BF-16a/16b lot
+touches only `preparation_dialogue`, `preparation_read`,
+`preparation_show/history/release_review` and their callers; the families
+below are outside that surface and nothing in the lot moved them.
+
+- **agent_launch — 4 pass / 9 fail (BT02, transversal Biba debt)**:
+  reconfirmed after removing the diagnostic instrumentation
+  (`agent_execution_preflight.rs`/`agent_launch_preflight.rs` back to
+  HEAD, empty diff). The 9 native failures are the 30 October BT02 debt
+  (6706e201b): `workspace==root` fixtures → `biba-workspace-overlaps-root`
+  pre-exec refusal → `status: failed`, `exit_code: None`. Owner Codex,
+  dossier BIBA-TRANSVERSE-APEX.md. Outside the BF-16 scope.
+- **Full mapping (7 November, after a clean rebuild) — the TMPDIR family
+  widens to 13 failures across 8 targets**: agent_runtime ×3, budget ×1,
+  planning ×2, pricing ×1, provider_configuration ×3, provider_policy ×1,
+  run_limits ×1, task_model ×1. Two confirmed mechanisms: (a) sequential —
+  in a `for flush in [false, true]` loop, iteration 2 creates its
+  `tempfile::tempdir()` with TMPDIR still pointing at iteration 1's
+  already-dropped `.swarm-fixtures` → NotFound
+  `/tmp/.tmpXXX/.swarm-fixtures/.tmpYYY`; (b) parallel — the Rust harness
+  runs a binary's tests on concurrent threads and `env::set_var` is
+  process-wide: test A exports TMPDIR to its root, test B creates its
+  tempdir (or launches its CLI child that reads its `--input`) under A's
+  tree, A drops its root → nested NotFound
+  (`/tmp/.tmpA/.swarm-fixtures/.tmpB/.swarm-fixtures/.tmpC`, observed at
+  agent_runtime.rs:23) or child ENOENT (`input-document-io` errno 2,
+  provider_configuration.rs:32). Product/test-typology debt introduced by
+  f9ff58214 (31 October); fix at the contract level (freeze TMPDIR per
+  test or move to subprocess calls). None of these targets touches the
+  BF-16 reader surface.
+- **PAEA capture guard — expected behavior, not a product failure**: the
+  23 reds from the first paea pass (no TMPDIR) are the explicit guard at
+  `paea_capture_stream.rs:272` ("explicit TMPDIR is required … never
+  /tmp") — the /tmp interdiction applied to capture evidence. With TMPDIR
+  pointed explicitly, the full paea block is green:
+  paea_reconcile/promote/settlement_delivered/approval_web 31 pass / 15
+  ignored (retained canonical fixtures required), paea_settlement 1 pass /
+  3 ignored.
+- **Enrollment ancestor conflict — environment, not a defect**:
+  `Documents::open` → `open_private_directory` (swarm-enrollment-config
+  store.rs:105) requires non-group/other-writable ancestors;
+  `/home/fpizzi/Documents/ChatGPT` and `swarm` are 775 → `path` refusal
+  even with a TMPDIR under `.swarm-fixtures`. A TMPDIR under
+  `/home/fpizzi` (755) clears the block: `paea_settlement` green. The
+  run directory `/home/fpizzi/swarm-run-tmp` (0700, outside the repo)
+  serves as the compliant local TMPDIR area for the suites; to be
+  documented in the permanent recipe.
+- **planning `planning_cli_enables_new_work_and_refuses_unported_
+  preparations` — catalogue-read, never green**: isolated failure
+  confirmed as `agent-provider-catalogue-read` vs expected
+  `command_not_ported` (planning.rs:417, `provider:"unported"`
+  iteration). The test uses a subprocess `call()`: outside the TMPDIR
+  family. Code reconstruction at the creation commit 174b89106:
+  `validate_planning_enable_target` never refuses a provider (only
+  new-work/budget/repository), and `reviewer_bootstrap::prepare` →
+  `observe_provider` → `agent_launch::provider` requires `providers.json`
+  (ENOENT → `agent-provider-catalogue-read`; the `absent()` fallback only
+  covers ai-connections.json); the `PlanningBootstrap(e) => e.code()`
+  mapping is identical on both sides; the fixture (identical at creation
+  and today, file never modified) never seeds `providers.json` and `init`
+  never creates it — only `providers config init` does. The provider
+  iteration therefore never could produce `command_not_ported`: the
+  "never green" hypothesis is confirmed by code reconstruction; direct
+  historical execution remains unavailable (the 3 November binary was
+  deleted, rtk logs only cover today). Since 298640e07, `validate`
+  receives `local_request` (repository cleared), so the repository
+  iteration now follows the same bootstrap path and would fail too.
+  Owner Codex; candidate fixes: seed `providers.json` in the fixture OR
+  refuse the provider before bootstrap. Full evidence chain:
+  `.swarm-fixtures/diag-instr/planning-catalogue-read-finding.md`.
+- **Latent (recorded, out of scope)**: a non-canonical `--root` makes
+  the parent observe a different TMPDIR than the helper
+  (`apply_runtime_temporary_directory` joins the raw root text, the
+  helper receives the canonical root). No current failure reduces to it;
+  watch during recipe migration.
+- **Environment observation (this session)**: conflict between the /tmp
+  interdiction (tmpfs wiped at reboot) and `fixture()` helpers built on
+  `tempfile::tempdir()` → `/tmp`. The affected suites cannot be run in
+  compliance with the interdiction nor relocated without source edits;
+  to settle at the test-contract level (owner Codex); meanwhile point
+  TMPDIR explicitly outside /tmp when the suite allows it (the guards
+  additionally require non-group-writable ancestors — see the enrollment
+  ancestor conflict above).
+
+Lesson: none of the remaining swarm-cli failures is attributable to the
+BF-16b reader lot; every red traces to dated debt (30-31 October) older
+than the lot or older than the test itself. Exhaustive mapping of the
+swarm-cli targets executed on 7 November: cli 17, identity_* 37, gate 2,
+graph_batch 1, linux_prerequisites 2, model_policy 2, trust_enrollment 2,
+agent_workflow 2, work_list/work_view/web_bootstrap/version_no_repository
+18, protection ×6 22, planning_report 2, pricing 2/1F, provider_policy
+1/1F, reported_costs 2, run_limits 1/1F, settings_output 3, task_model
+1/1F, task_report 1, provider_configuration 1/3F, paea_* 33 green/18
+ignored, budget 2/1F, agent_runtime 1/3F, planning 2/3F (catalogue-read
+never green + 2 TMPDIR), agent_launch 4/9F (BT02 Biba).
+
 ## Class-2 closure — tempdir migrations under governed areas, 7 November 2026
 
 Closing the environment finding above ("the `fixture()` calls going through
@@ -1204,3 +1367,373 @@ The user-adopted [Security and evidence plan](SECURITY-PROOFS-APEX.md) supplemen
 BLP-01–07 with engine/API/CLI observation, UX, administration, authorized recipes
 and an internal qualification dossier. This link changes no BLP conformity, test
 or acceptance state.
+
+## BF-16d — readers of proposal adoption, command replay and the list — 8 November 2026
+
+Fourth BF-16 sub-increment: the three remaining frontiers that served an
+admitted answer's classified domain with no reader control, closing the
+"obtain through adoption, command replay or the list what the dialogue
+refuses" bypass. The errors axis was already covered by BF-16a/b/c
+(frontier-controlled DTOs, static safe codes only); this increment closes
+propositions and the list (BLP-APEX:801).
+
+- **Implemented**: `preparation_command(raw, environment, reader_token)`
+  gains `reader_token` as its last parameter (mirroring
+  `preparation_send`) — the `use-proposal` adoption copies the source
+  turn's classified answer into `documents`/`adopted_brief` (the document
+  inherits its source's domain) and the receipt replay serves a
+  historical `Preparation` body; the shared `reader_verdict` (keyed on
+  `recorded_turn_keys`) decides **inside the Immediate transaction, after
+  `apply` and before the commit** — a refusal rolls back the document,
+  the revision bump and the receipt row through the existing rollback;
+  one call covers both adoption AND replay.
+  `preparation_list(reader_token)` judges each row exactly like
+  `preparation_show` — the first matched-admission row without a
+  sufficient reader refuses the whole list before any byte (serving
+  unclassified rows while refusing others would disclose the existence
+  of classified content through the response itself). Legacy continuity:
+  zero matched receipts keep the bare path (adoption, identical replay at
+  the current revision, list) — the decision stays keyed on matched
+  admissions, never on policy presence. Budget views: counters only, out
+  of scope (BF-16a choice unchanged). Web: `POST
+  /api/v1/preparations/command` and `GET /api/v1/preparations` extract
+  `reader_bearer_token` with the shared extractor (a malformed header
+  refuses before any Root read); the shared codes' 403 mapping was
+  already wired in `service.rs`. CLI: `SWARM_TRUST_TOKEN` resolved in
+  `write()` (command) and the readonly path (list).
+- **Locally tested**: `preparation_dialogue_readers.rs` 8/8 — new
+  `use_proposal_replay_and_list_adopt_classified_answer_without_reader_
+  control` (bare session refused on adoption/replay/list, no classified
+  byte in any refusal, under-cleared → `blp-dialogue-access-denied`,
+  unknown token → typed Authorization refusal, traceless refusal —
+  revision unchanged, no brief document, no receipt row — recovery by the
+  cleared sender) and its twin
+  `use_proposal_replay_and_list_without_any_matched_admission_keep_
+  legacy_bare_path`. Red→green proof: signatures threaded first (the
+  test's 10 call sites failed compilation), then the verdict — the
+  established runtime red shows the bare session ADOPT the classified
+  brief exactly where the refusal is asserted. Regressors:
+  `preparation_writes` 5/5, `preparation_calls` 7/7, `preparation_plan`
+  1/1, `preparation_transport` 1/1, `preparation_worker_transport` 1/1,
+  `confidentiality` 16/16, web `server_mutations` 1/1, workspace check
+  0 errors. Callers adapted: CLI `write()`/`list`, web
+  `preparation_command`/list, the `preparation_quarantine_fixture`
+  example, transport suites (pre-admission sites pass explicit `None`).
+- **Limits retained**: presentation reads only — execution, conversion
+  and other channels stay outside the verdict; file/network/descendant
+  mediation, migration of existing data (BLP-03) and human
+  declassification (BLP-06) remain open. Installed locally the same day
+  (24 October decision): `VERIFIED_NATIVE_CANDIDATE` sha256
+  `dbc888fb…df3d9` delivered via `install.sh --mode native`, the 38434
+  engine service restarted under the same contract (PID verified by
+  sha256 of `/proc/<pid>/exe`); the HTTP flow stays protected by the
+  pre-existing web auth (403 without a session, refusal retained).
+  No commit/push without explicit authorization; "implemented + tested +
+  installed" is neither activated in production nor accepted.
+
+## BF-14a — network mediation: explicit Internet-socket refusal for provider helpers — 9 November 2026
+
+Authorizing line: BLP-APEX.md:727 ("… then file/network/descendant mediation,
+migration and declassification."). This increment is the network part of that
+mediation (the BF-14 gap: "Internet destination control absent"), before data
+migration (BLP-03) and human declassification (BLP-06).
+
+### Finding and contract
+
+The mandatory Biba profile refuses AF_UNIX but leaves `socket(AF_INET)`/AF_INET6
+reachable for classified provider helpers — a compromised or prompt-injected
+helper could open an outbound Internet connection. The policy is not derived
+from code: it is an explicit operator choice, persisted in the confidentiality
+policy and changed through the existing Admin surface
+(`blp-policy-preview`/`blp-policy-apply`, Trust I3). New
+`provider_internet_denied: bool` field in `swarm-confidentiality::Policy`
+(conditional serialization; absent and `false` encode identically — historical
+digests preserved, mirroring `preparation_quarantine`).
+
+### Implementation (engine constraint: `#![forbid(unsafe_code)]`)
+
+- **Kernel filter** (`swarm-biba-linux/src/kernel.rs`, additive extension of
+  Codex's crate — his `seccomp()` filter and `enforce()` untouched):
+  `deny_internet()` installs a second seccomp filter AFTER the mandatory
+  profile. Filters stack and can only restrict: EPERM on `socket`/`socketpair`
+  when the requested domain is AF_INET or AF_INET6, every other domain keeps
+  its existing verdict. Pose failure refuses; no unconfined fallback.
+- **Exec point** (`native_provider_exec.rs`): `PreparedExec` carries an
+  `internet_denied: bool` set by the engine (`with_internet_denied`, never
+  accepted from JSON); `execute()` poses `biba::enforce`, then the additive
+  refusal, then `execve` — no re-read after restriction.
+- **Decision frozen at each gate**: every transport reads its own
+  `provider_internet_denied_snapshot()` under its own Trust reservation
+  (`root_store/provider_network.rs`) and passes it to the exec point. All five
+  sites are wired: agent gate (`agent_execution_gate.rs`), planner
+  (`planning_native.rs`), reviewer (`reviewer_native/gate.rs`), preparation
+  CLI (`preparation_call_cli.rs`) and task validation
+  (`task_validation/{process,biba}.rs`). Corrupt or unsupported state refuses,
+  never falls back to false.
+- **Exposure**: `capability()` (`blp-show` diagnostics) reports
+  `provider_internet_denied` with `runtime_enforced:false` — the persisted
+  value is not proof of enforcement.
+
+### Tested locally
+
+- `swarm-confidentiality`: the new test (absent→false, explicit false
+  byte-identical to absent, true round-trip, successors both directions,
+  invalid values refused) plus the twin quarantine guard. Suite green.
+- `swarm-engine --test confidentiality` **18/18**: Admin control (preview
+  refused on the worker token, applied as Admin), `blp-show` reflects the
+  value, snapshot reads true, authority renewal does not lift it, explicit
+  back-to-false at the expected revision; corrupted state → snapshot errors,
+  never falls back. Project-local TMPDIR (`~/swarm-run-tmp`), never /tmp.
+- `cargo check --workspace` and `--all-targets`: 0 errors (the 16 pre-existing
+  `swarm-enrollment-authority/tests/service_installation.rs` errors are Codex's
+  work in flight behind `#[cfg(feature="test-fixtures")]`, preserved unfixed).
+- **OS-level recipe** `biba-linux-boundary` extended with the `native-internet`
+  case (drivers compiled against cargo's real rlib, never the product binary):
+  unconfined control → INET created; **mandatory profile alone → INET still
+  created (the BF-14 gap is demonstrated at kernel level)**; profile + additive
+  refusal → uniform EPERM on INET/INET6/INET-socketpair (seccomp evaluates
+  before the kernel's family validation), AF_UNIX verdict unchanged.
+  Environment facts distinguished from policy verdicts: this kernel has no
+  IPv6 (EAFNOSUPPORT=97) and the kernel only implements socketpair for AF_UNIX
+  (EOPNOTSUPP=95). Full run **PASS** with retained evidence.
+
+### Installed
+
+On 9 November (24 October decision): qualified candidate
+`VERIFIED_NATIVE_CANDIDATE` sha256 `24024aba…3ec5` produced by
+`build_native.py --install-candidate` (the first run failed on
+`profile-effective-input-changed:version_history.json` — my own concurrent
+edit, fixed by re-running without touching sources; a method defect, not a
+product defect), delivered as `bin/swarm` (the old `dbc888fb…` archived under
+`.swarm-fixtures/bin-archives/`), engine service 38434 restarted under the
+same contract (PID 557693, sha256 of `/proc/<pid>/exe` = candidate sha, HTTP
+flows 403 without a session — pre-existing web auth retained). No commit/push
+without explicit authorization; "implemented + tested + installed" is neither
+activated in production nor accepted.
+
+### Limits
+
+The refusal covers Internet socket creation by classified helpers; full
+destination (account, resolution, proxy), already-established descendant
+channels and other egress shapes (files, caches, telemetry) remain outside it —
+BF-14/BF-15 stay OPEN. Implemented + tested + installed ≠ activated in
+production ≠ accepted. No commit/push without explicit authorization.
+
+## BLP-03a — explicit migration of existing objects: Admin form — 9 November 2026
+
+Originating authorization: BLP-APEX.md:727 (BLP-03: "persisted reviewed
+configuration, explicit migration, Admin/API/CLI"). The
+history/operations/CLI batch of BLP-03 was VERIFIED on 31 October 2026
+(tests 5/5); the migration of existing unclassified objects remained. This
+increment delivers the operator surface of that migration: an Admin form in
+the Trust dialog (`trust-actions.html`), one gesture = exactly one object,
+driving the existing tested `blp-object-attribute` producer (its contract
+unchanged).
+
+### Finding and contract
+
+No Admin surface exposed `blp-object-attribute`: attributing an existing
+object required the API/CLI (no scan exists and none is introduced). The
+form carries the producer's exact contract
+(`swarm-engine/src/trust/confidentiality.rs`, `deny_unknown_fields`):
+canonical SHA-256 digest (64 lowercase hex), absolute project path,
+classification {level, compartments} chosen from the re-read policy —
+never invented by the page — and a non-empty reason. Two gestures:
+preview (no change applied), then save which replays the SAME event bytes
+(idempotence retained). One gesture = exactly one object; no automatic
+scan of unclassified objects exists.
+
+### Implementation
+
+- `web/trust-native.html`: sub-fieldset "Attribution of an existing object
+  (migration)" inside `#blp-settings` — `#blp-object-digest`,
+  `#blp-object-path`, `#blp-object-level` (select fed from the re-read
+  policy), `#blp-object-compartments` (multi-select, none preselected),
+  `#blp-object-reason`, `role="status"` line, `#blp-attribute-preview`
+  then `#blp-attribute-apply` (disabled until a preview validates).
+- `web/trust-confidentiality.js`: the `SwarmTrustConfidentiality` module
+  extended — level/compartment options rebuilt at every re-read from
+  `policy.levels`/`policy.compartments`; client validation (digest,
+  absolute path without NUL, level chosen, non-empty reason);
+  `blp-object-attribute` event with `expected_revision`/
+  `expected_trust_revision` decoded as exact decimals (no Number
+  rounding); preview then replay of the same bytes; preview invalidated
+  on any input; full reset when Admin closes (no private material
+  retained); `runtime_enforced` stays `false` (no transversal
+  activation).
+- `locales/en.json` + `npm run i18n:build`: 13 EN entries added (9 HTML,
+  4 JS); `web/i18n-en.js` regenerated.
+
+### Tests (red → green, qualified production image)
+
+- `tests/blp_object_attribute_public.py` +
+  `tests/blp_object_attribute_ui.cjs`: Puppeteer driver against the real
+  Admin of the qualified binary — full journey (form present, levels from
+  the re-read policy, preview `attributed===true`, save replaying the
+  same bytes), exact persistence (one attribution per journey, eight
+  distinct objects — the producer refuses a second recording of the same
+  digest/path/revision triple under another event id;
+  digest/path/level/actor), typed 403 refusals (session alone, weak
+  bearer) without mutation, console-error suppression, 2 languages × 2
+  themes × 2 widths, served-asset digests = the profile's `after.json`.
+- RED (pre-form binary, run1 `064e624a…`): CLI journey PASS, browser
+  failed (form absent) — evidence retained at
+  `/home/fpizzi/.local/state/swarm-fixtures/objattr-profile/red-1/`.
+- GREEN (run3 `a166e2b8…`, profile `VERIFIED_DEFAULT_NATIVE_PROFILE`,
+  archived sources stable): `OBJECT_ATTRIBUTE_PUBLIC_PASS 4`
+  (policy-current, admin-ui-attribution-form-journey,
+  one-explicit-attribution-persisted, qualified-production-image-unchanged)
+  — evidence `/home/fpizzi/.local/state/swarm-fixtures/objattr-profile/green-2/`.
+- Races diagnosed while tuning (product unchanged, evidence retained):
+  `green-0-hung` (controls inside a closed `<details>` — silent clicks),
+  `green-0b-dup409` (one object for eight journeys — the producer refuses
+  a second record of the same triple), `green-0c-escape-race` (post-apply
+  wait satisfied in flight; Escape closed the dialog during the request
+  and focus restoration targeted a still-disabled button). The final test
+  waits for the completion text set after the re-read, then presses
+  Escape.
+- Permanent recipe: `tools/verification/recipes/blp-object-attribute-public.json`
+  (inputs = tests + embedded assets; env `SWARM_BLP_BINARY`,
+  `SWARM_BLP_PROFILE`, `SWARM_BLP_PROOF_OUTPUT`).
+
+### Limits
+
+Attribution remains a per-object operator decision, under the existing
+Admin authentication (typed 403s retained); `runtime_enforced:false` — no
+transversal activation. Automatic scanning of unclassified objects stays
+nonexistent by design (no enumeration); file mediation (BF-13/BF-15) and
+human declassification (BLP-06) remain OPEN. Implemented + tested ≠
+installed ≠ activated in production ≠ accepted. No commit/push without
+explicit authorization.
+
+## BLP-06 — implementation contract prepared for Codex — 9 November 2026
+
+Exact human declassification requires three engine changes that remain Codex's
+scope (the "Codex-only" decision of 24 October 2026; the engine files carry
+Codex's concurrent BF-14a diff right now). This contract fixes the exact
+expected behavior; this session wrote no engine code.
+
+### 1. Signed vocabulary — `swarm-enrollment-authority/src/control/trust_action.rs`
+
+Add `ObjectDeclassify` to the closed `Operation` enum (`as_str` →
+`"blp-object-declassify"`, added to the closed list in `Operation::parse`).
+The name binds a signed permission; it grants no role and selects no process
+or endpoint.
+
+### 2. Producer — `swarm-engine/src/trust/confidentiality.rs`
+
+A new `op=="blp-object-declassify"` branch in `execute()` (after
+`authentication::require_administrator(&actor)`) that:
+
+- decodes a `DeclassifyChange` `deny_unknown_fields`: `{schema_version:1,
+  event_id, expected_revision, expected_trust_revision, canonical_digest,
+  project_path, recipients, reason}` — the same validations as
+  `blp-object-attribute` (event_id `swarm_identity_contract::name`, non-empty
+  control-free reason, lowercase 64-hex digest, absolute path without `\0`,
+  `expected_trust_revision==st.revision`, `expected_revision==entry.revision`,
+  current entry, else the same typed codes `blp-policy-required`,
+  `blp-trust-revision-conflict`, `blp-policy-stale`);
+- refuses unless the actor is an enrolled human: `actor.enrollment` must be
+  `Some` (source `Source::Enrolled` only — a local I3/admin bearer never
+  declassifies) and the enrolled principal stays `kind=="human"`, already
+  guaranteed by `trust_as_enrolled` (`trust_enrollment.rs:73`) — typed error
+  `blp-declassification-human-required` otherwise. The admin clearance alone
+  never constitutes the BLP-06 human approval (rule already recorded above);
+- requires exactly one current attribution for the object
+  (`entry.attribution_for(digest, path)` — `None` →
+  `blp-declassification-object-unknown`, never a fallback to a stale entry);
+- replays the exact event bytes (same `event_id` → recorded reply,
+  `trust_publication:"replayed"`; known `event_id` with different bytes →
+  `event_conflict`), the same exact-once contract as attribution;
+- requires `recipients` to be the non-empty list of exact validated
+  recipients (existing non-disabled enrolled identities by `principal_id`; an
+  unknown or disabled recipient → `blp-declassification-recipient-unknown`),
+  never a role or a label;
+- produces a NEW COPY: the effect records a
+  `Declassification{canonical_digest, project_path, policy_revision,
+  recipients, actor (enrolled principal), at, reason}` on the current entry
+  and a `blp-declassification` event — it never modifies or removes the
+  existing attribution (the recorded label stays the read authority;
+  declassification explicitly authorizes those recipients for those exact
+  bytes, it does not rewrite the object);
+- stays subject to history reading: any prior `Declassification` of the same
+  triple refused on re-issue under another event_id
+  (`blp-declassification-conflict`) — exact-once applies here too;
+- keeps `runtime_enforced:false` in the reply, and
+  `declassification_available` reflecting the real state (currently `false`;
+  flips to `true` only when this operation is wired).
+
+### 3. Reader — `root_store/reader_guard.rs`
+
+`check_read` keeps refusing by default for an attributed object;
+declassification does NOT widen `check_read`: the classified-send path
+(preparation/admission) consumes it, revalidating recipient+capsule as today,
+with the current `Declassification` as an additional proof binding exact
+recipient + exact bytes. No generic "read without a label" command appears.
+
+### 4. Wiring — web + CLI
+
+- `swarm-web/src/service/trust.rs`: add `"blp-object-declassify"` to the
+  allowed POST list (mutating, not readonly);
+- `swarm-cli/src/trust.rs` + FR/EN help in `lib.rs`: same addition, documented
+  "enrolled human identity required, new copy, no label downgrade".
+
+### Observable criteria (expected red→green test)
+
+1. Local admin bearer + attributed confidential object →
+   `blp-object-declassify` → `blp-declassification-human-required`, no
+   mutation.
+2. Enrolled human actor + exact recipients + bytes → records
+   `blp-declassification`, attribution unchanged on re-read, reply
+   `runtime_enforced:false`.
+3. Re-issue of the same triple under another event_id → `409
+   blp-declassification-conflict`.
+4. Disabled or unknown recipient → typed refusal, no mutation.
+5. A summary, an empty output or an LLM filter never produces this effect
+   (the producer is callable only through this signed operation).
+
+Limits retained: the classified-send path (BF-13/BF-15) remains the only
+planned consumer; `blp-object-declassify` itself creates no filesystem or
+network effect. Implemented + tested ≠ installed ≠ activated.
+
+### Targeted global recipe on a single candidate — 9 November 2026
+
+The acquisition re-examination requested by BLP-07: the key public permanent
+recipes were re-run on **one single qualified candidate** (`a166e2b8…`,
+profile `VERIFIED_DEFAULT_NATIVE_PROFILE` from the retained run3), evidence
+`~/.local/state/swarm-fixtures/objattr-profile/global-{1,2,3,5,6}/`, each
+re-verified **VERIFIED**:
+
+- `blp-preparation-transport-public` PASS (global-1);
+- `blp-dialogue-reader-public` PASS (global-2);
+- `blp-preparation-check-public` PASS (global-3);
+- `blp-preparation-admission-public` PASS (global-5);
+- `blp-flow-inventory` PASS (global-6) after re-pinning `reference_count`
+  69→74 (drift following the BF-16 wirings, same discipline as earlier
+  repins);
+- `blp-object-attribute-public` already VERIFIED on this candidate the same
+  day (`recipe-run1`).
+
+Gaps found: `blp-preparation-quarantine-public` **not re-run** — its driver
+requires `SWARM_BLP_HELPER` (the compiled
+`preparation_quarantine_fixture` example binary); the example carries the
+uncommitted BF-16 caller adaptation and compiling it would pull Codex's
+concurrent BF-14a diff into `swarm-engine`. The retained 1 Nov PASS
+(`verification-blp/20261101-preparation-quarantine-public-02/`) stays
+VERIFIED on its original candidate. `blp-preparation-provenance-public` not
+re-run for the same reason (cargo steps). **Aggregated recipe delivered**: `tools/verification/recipes/blp-aggregate-public.json`
+(6 child steps, one per recipe above, order inventory → check → admission →
+dialogue-reader → transport → UI; fresh child outputs under the fixture area
+via `configured_area()` + unique suffix, created by the child runner itself).
+First pass on candidate `a166e2b8…`: **PASS 6/6 steps**, outer verify
+**VERIFIED** + all 6 child evidence trees re-verified VERIFIED; `/tmp`
+clean. Launch environment: `SWARM_BLP_BINARY` + `SWARM_BLP_PROFILE` (the
+candidate under test); `SWARM_BLP_PROOF_OUTPUT` is allocated per step, never
+inherited. One first-tuning defect (child root pre-created by `fixture_root`
+refused by `recipe-output-must-be-new-outside-live-state`) was fixed in the
+recipe itself; the refusal evidence is retained in the replaced
+`global-agg-1` tree. Still outside the aggregate:
+`blp-preparation-quarantine-public` and `blp-preparation-provenance-public`
+(helper/compilation, concurrent diff) and the cargo-test recipes (concurrent
+engine WIP) — the aggregate is the **public** global recipe on a frozen
+candidate, not an engine requalification.

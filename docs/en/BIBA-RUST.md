@@ -335,8 +335,12 @@ The producer checks authority and dominance before publication: identical events
 replay without rewriting; a different event for the same object/revision, stale
 revisions and downgrades refuse. Readers recompute their actual object's digest
 and consult current policy: supplying a digest establishes neither source bytes,
-physical lineage nor declassification authority. Admin configures policy but has
-no object-attribution form yet. This adds no implicit preparation-source labels
+physical lineage nor declassification authority. Admin configures policy and now attributes an existing object (BLP-03):
+64-hex digest, absolute path, a level and compartments chosen from the re-read
+policy — never invented by the page — and a non-empty reason, in two gestures
+(preview, then apply replaying the same event bytes). One gesture covers
+exactly one object; no automatic scan of unclassified objects exists. This
+adds no implicit preparation-source labels
 or transversal control. Publication/close failures retain known outcome; reread
 before retrying an uncertain result.
 

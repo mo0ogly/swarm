@@ -490,6 +490,13 @@ impl HttpServiceError {
                 // primary remains inspectable through the typed causes.
                 "blp-dialogue-authentication-required"|"blp-dialogue-policy-required"|"blp-dialogue-policy-stale"|"blp-dialogue-access-denied"
                     if *operation=="preparation-read" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
+                // BF-16c send/stop frontiers: the same four typed reader
+                // refusals arrive here under operation "preparation-call" (the
+                // send/stop route's adapter). Same exact-bare-Refused rule as
+                // the dialogue arm above: a Cleanup wrapper stays a server
+                // error, never a caller authorization state.
+                "blp-dialogue-authentication-required"|"blp-dialogue-policy-required"|"blp-dialogue-policy-stale"|"blp-dialogue-access-denied"
+                    if *operation=="preparation-call" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
                 "preparation-organization-mode-unported" | "preparation-organization-worker-role-required" | "preparation-release-scope-unported" => StatusCode::NOT_IMPLEMENTED,
                 // Declared port boundary of the planning-tree status read, not a server fault.
                 "mission-status-planning-unported" if *operation == "read" && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::NOT_IMPLEMENTED,

@@ -342,3 +342,130 @@ web/CLI suites (`service`, `confidentiality_http`, `swarm-cli`) re-run.
 Scope remains: presentation only; execution, adoption and other channels
 stay outside this verdict. Nothing is declared activated in production
 or accepted.
+
+### BF-16c — readers of send (replay and first admission) and stop (terminal turn) (8 November 2026)
+
+The reader verdict now covers the last two frontiers that served a
+recorded turn uncontrolled: `RootStore::preparation_send(raw, environment,
+reader_token)` and `RootStore::preparation_stop(preparation_id, turn_id,
+environment, reader_token)` (HTTP `POST /api/v1/preparations/send` and
+`/stop` with `Authorization: Bearer`; CLI `preparation send|stop` with
+`SWARM_TRUST_TOKEN`):
+
+- Send — replay: a call whose (provider, request_hash) triple already
+  existed served the recorded `PreparationTurn` (classified answer
+  included; the prompt is never serialized) like the other presentation
+  reads, with no control. The replay now decides the shared verdict
+  (`reader_verdict` over the `recorded_turn_keys`) before returning the
+  turn: same `blp-dialogue-*` codes, no byte served before `Ok(())`.
+- Send — first admission: the just-recorded turn makes the preparation's
+  classified domain matchable by admission receipts (same
+  provider/request_hash keys) and the assembled prompt embeds earlier
+  classified history. The verdict is therefore decided **inside the write
+  transaction**, after `save` and before the budget reservation: a refusal
+  rolls the whole admission back — no turn row, no reservation, no byte
+  served, and an under-cleared caller cannot consume the budget of an
+  admission it cannot read.
+- Stop — terminal turn: both terminal-turn serving branches (legacy row
+  and native) serve the recorded answer; each branch decides the shared
+  verdict when the turn is no longer active, before returning. A stop on
+  an active turn remains a producer state transition, not a read: no
+  verdict.
+- Internal producer path: the monitor's settle pass (`preparation_stop`
+  from the settle loop) passes `None` explicitly with the exemption
+  comment — internal producer, no reader served, mirroring
+  `preparation_call` left uncontrolled since BF-16a. `None` is never an
+  authorization: a bare session is refused as before as soon as a matched
+  receipt makes the domain classified.
+- Web: `preparation_calls` extracts `reader_bearer_token` like the GET
+  frontiers (capability requests stay readonly and uncontrolled, BF-16a
+  choice unchanged); the `service.rs` 403 FORBIDDEN mapping covers the
+  four shared codes under operation `preparation-call`. CLI:
+  `SWARM_TRUST_TOKEN` resolved once for send and stop in `calls()`.
+
+BF-16c verification: `preparation_dialogue_readers.rs` extended to 6/6 —
+the two new tests `send_replay_and_stop_serve_classified_turn_without_
+reader_control` (bare session and under-cleared reader refused on both
+the replay and the first admitted send, no byte served and the admission
+rolled back, then terminal-turn serving refused to a bare session and an
+unknown token, recovery by the cleared sender) and
+`send_replay_and_stop_without_any_matched_admission_keep_legacy_bare_
+path` (bare-session continuity without admission on send and stop).
+Red→green proof: with the previous signatures the replay served the turn
+exactly where the refusal is asserted. Regressors: `preparation_calls`
+24/24, `confidentiality` (1/1), `preparation_worker_transport`
+(legacy/native paths adapted), web `confidentiality_http` + `service`
+(11/11), CLI gate 2/2, workspace check 0 errors. Callers adapted:
+examples and suites (legacy sends/stops pass explicit `None`). Scope
+remains: presentation only; execution, adoption and other channels stay
+outside this verdict. Still open within BF-16: domain inheritance on
+errors/propositions, file/network/descendant mediation, migration of
+existing data, human declassification (BLP-06). Nothing is declared
+activated in production or accepted; no commit/push without explicit
+authorization.
+
+### BF-16d — readers of proposal adoption, command replay and the list (8 November 2026)
+
+The reader verdict now covers the three remaining frontiers that served a
+classified answer's domain with no control, per BLP-APEX ("BF-16 must
+inherit this domain on answers/errors/propositions and readers"). The
+errors axis was already covered by BF-16a/b/c (frontier-controlled DTOs,
+static safe codes only); this increment closes propositions and the list:
+
+- Adoption (`use-proposal`): `RootStore::preparation_command(raw,
+  environment, reader_token)` gains `reader_token` as its last parameter
+  (mirroring `preparation_send`). An adoption copies the source turn's
+  classified answer into `documents` (and `adopted_brief`) — the document
+  inherits its source's classified domain. The shared `reader_verdict`
+  (keyed on the preparation's `recorded_turn_keys`) decides **inside the
+  Immediate transaction, after `apply` and before the commit**: a refusal
+  rolls back the whole mutation — document, revision bump and receipt
+  row — through the existing rollback. One call thus covers both the
+  first adoption AND the receipt replay (apply's early-return branch
+  serves a historical `Preparation` body, which is a presentation read
+  like any other).
+- List (`preparation_list`): `preparation_list(reader_token)` judges each
+  row exactly like `preparation_show` (same `reader_verdict` over the
+  listed preparation's recorded turns). The first matched-admission row
+  without a sufficient reader refuses the WHOLE list before any byte is
+  served — a list that served unclassified rows while refusing others
+  would disclose, through its own response, that classified content
+  exists.
+- Legacy continuity: zero matched receipts keep the existing bare path
+  (adoption, replay at the current revision, list) — the decision stays
+  keyed on matched admissions, never on policy presence.
+- Public surfaces: HTTP `POST /api/v1/preparations/command` and
+  `GET /api/v1/preparations` extract `reader_bearer_token` with the
+  shared extractor (a malformed header refuses before any Root read); the
+  `service.rs` 403 FORBIDDEN mapping covers the shared codes. CLI:
+  `SWARM_TRUST_TOKEN` resolved in `write()` (command) and in the
+  readonly path for `list`. Budget views: counters only, no preparation
+  bytes — out of scope (BF-16a choice unchanged).
+
+BF-16d verification: `preparation_dialogue_readers.rs` extended to 8/8 —
+the new
+`use_proposal_replay_and_list_adopt_classified_answer_without_reader_control`
+(bare session refused on adoption AND replay AND list, no classified byte
+in any refusal, under-cleared reader refused `blp-dialogue-access-denied`,
+unknown token refused with typed Authorization, proof that a refusal
+leaves no trace — revision unchanged, no brief document, no receipt row —
+then recovery by the cleared sender who adopts, replays and lists) and
+its twin
+`use_proposal_replay_and_list_without_any_matched_admission_keep_legacy_bare_path`
+(bare-session continuity without admission: adoption, identical replay at
+the current revision, list). Red→green proof: signature threaded first
+(the test's 10 call sites failed compilation), then the verdict added —
+the established runtime red (`bf16d-red2.log`) shows the bare session
+ADOPT the classified brief exactly where the refusal is asserted.
+Regressors: `preparation_writes` 5/5, `preparation_calls` 7/7,
+`preparation_plan` 1/1, `preparation_transport` 1/1,
+`preparation_worker_transport` 1/1, `confidentiality` 16/16, web
+`server_mutations` 1/1, workspace check 0 errors. Callers adapted: CLI
+`write()`/`list`, web `preparation_command`/list, the
+`preparation_quarantine_fixture` example, transport suites (pre-admission
+sites pass explicit `None`). Scope remains: presentation only; execution,
+conversion and other channels stay outside this verdict. Still open
+within BF-16: file/network/descendant mediation, migration of existing
+data (BLP-03), human declassification (BLP-06). Nothing is declared
+activated in production or accepted; no commit/push without explicit
+authorization.

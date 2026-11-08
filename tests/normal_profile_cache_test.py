@@ -67,6 +67,26 @@ class ProfileCargoConfiguration(unittest.TestCase):
         self.config.write_bytes(self.config_bytes)
         profile.effective_unchanged(self.root,before,profile.dependencies(self.root,self.depfile))
 
+    def test_admission_tool_and_policy_bound_with_drift_and_removal_refusal(self):
+        """Wrapper/policy bytes survive depfile omissions; changed inputs refuse reuse."""
+        for name in profile.CARGO_SUPPORT_NAMES:
+            path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True)
+            path.write_text('synthetic invocation support\n')
+        before=profile.candidates(self.root)
+        actual=profile.dependencies(self.root,self.depfile)
+        profile.effective_unchanged(self.root,before,actual)
+        for name in profile.CARGO_SUPPORT_NAMES:
+            self.assertIn(name,before)
+            self.assertEqual(profile.config_manifest(actual)[name],before[name])
+            path=self.root/name;raw=path.read_bytes();path.write_bytes(raw+b'changed')
+            with self.assertRaises(ValueError):
+                profile.effective_unchanged(self.root,before,profile.dependencies(self.root,self.depfile))
+            path.unlink()
+            with self.assertRaises(ValueError):
+                profile.effective_unchanged(self.root,before,profile.dependencies(self.root,self.depfile))
+            path.write_bytes(raw)
+            profile.effective_unchanged(self.root,before,profile.dependencies(self.root,self.depfile))
+
     def test_absent_config_legacy_compatible_but_late_appearance_refused(self):
         """Historical no-config builds work; adding config after binding refuses."""
         before=profile.candidates(self.root)

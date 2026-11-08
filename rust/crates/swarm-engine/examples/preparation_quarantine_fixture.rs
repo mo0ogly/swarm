@@ -67,12 +67,12 @@ fn main()->Result<(),Box<dyn std::error::Error>> {
         if args[0]=="stage" {
             let raw=swarm_engine::read_command_file(Path::new(&args[2]))
                 .map_err(|e|swarm_engine::preparation_worker_error("fixture-stage-input-invalid",e))?;
-            let turn=store.preparation_send(&raw,&mut SystemEnvironment)?;
+            let turn=store.preparation_send(&raw,&mut SystemEnvironment,None)?;
             Ok(serde_json::json!({"id":turn.id,"preparation_id":turn.preparation_id,"status":turn.status}))
         } else if args[0]=="dispatch" {
             let id=args[2].to_str().ok_or(E::Refused("fixture-turn-invalid"))?;
             // Read the parent from the public list, never private SQLite.
-            let parents=observed(store.preparation_list()?)?.preparations;
+            let parents=observed(store.preparation_list(None)?)?.preparations;
             let mut parent=None;
             for p in parents {if observed(store.preparation_dialogue(&p.id,None)?)?.iter().any(|t|t.id==id){parent=Some(p.id);break;}}
             let parent=parent.ok_or(E::Refused("fixture-turn-not-found"))?;

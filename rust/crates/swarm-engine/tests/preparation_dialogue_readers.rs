@@ -78,6 +78,7 @@ impl Fixture {
             .preparation_command(
                 br#"{"version":1,"action":"create","event_id":"create","expected_revision":0,"text":"Fixture need"}"#,
                 &mut SystemEnvironment,
+                None,
             )
             .unwrap()
             .value;
@@ -90,6 +91,7 @@ impl Fixture {
                 }))
                 .unwrap(),
                 &mut SystemEnvironment,
+                None,
             )
             .unwrap()
             .value;
@@ -230,7 +232,7 @@ fn dialogue_admitted_answer_readable_without_any_reader_control() {
     let _admission = bootstrap(&f);
     // Admitted turn: same event id as the admission, so the receipt matches.
     let bound = serde_json::to_vec(&f.request("intent")).unwrap();
-    let turn = f.root.preparation_send(&bound, &mut SystemEnvironment).unwrap();
+    let turn = f.root.preparation_send(&bound, &mut SystemEnvironment, Some("fixture-sender-token")).unwrap();
     let token = f.register(&turn.id);
     f.root.preparation_worker_claim(&turn.id, &token).unwrap();
     f.root
@@ -307,7 +309,7 @@ fn dialogue_without_any_matched_admission_keeps_legacy_bare_read() {
         "fixture-admin-token").unwrap();
     // One ordinary legacy send/finish cycle with no admission at all.
     let unbound = serde_json::to_vec(&f.request("legacy-event")).unwrap();
-    let turn = f.root.preparation_send(&unbound, &mut SystemEnvironment).unwrap();
+    let turn = f.root.preparation_send(&unbound, &mut SystemEnvironment, None).unwrap();
     let token = f.register(&turn.id);
     f.root.preparation_worker_claim(&turn.id, &token).unwrap();
     f.root
@@ -351,7 +353,7 @@ fn show_and_history_inherit_the_dialogue_reader_verdict() {
     let f = Fixture::new("show-frontier");
     let _admission = bootstrap(&f);
     let bound = serde_json::to_vec(&f.request("intent")).unwrap();
-    let turn = f.root.preparation_send(&bound, &mut SystemEnvironment).unwrap();
+    let turn = f.root.preparation_send(&bound, &mut SystemEnvironment, Some("fixture-sender-token")).unwrap();
     let token = f.register(&turn.id);
     f.root.preparation_worker_claim(&turn.id, &token).unwrap();
     f.root
@@ -440,7 +442,7 @@ fn show_and_history_without_any_matched_admission_keep_legacy_bare_read() {
         "fixture-admin-token").unwrap();
     // One ordinary legacy send/finish cycle with no admission at all.
     let unbound = serde_json::to_vec(&f.request("legacy-event")).unwrap();
-    let turn = f.root.preparation_send(&unbound, &mut SystemEnvironment).unwrap();
+    let turn = f.root.preparation_send(&unbound, &mut SystemEnvironment, None).unwrap();
     let token = f.register(&turn.id);
     f.root.preparation_worker_claim(&turn.id, &token).unwrap();
     f.root
@@ -469,6 +471,403 @@ fn show_and_history_without_any_matched_admission_keep_legacy_bare_read() {
             "legacy history for {kind} must stay readable to a bare session"
         );
     }
+    let fixture_path = f.path.clone();
+    f.close();
+    std::fs::remove_dir_all(&fixture_path).ok();
+}
+
+/// BF-16c reproduction: the send replay and the terminal-turn stop serve the
+/// complete recorded turn — classified answer and the history-carrying prompt —
+/// with no reader control, once an admission receipt matches the preparation.
+/// A bare session re-POSTs the same send JSON (replay) or stops the finished
+/// turn and reads back what the dialogue frontier refuses. No provider is
+/// contacted; the fixture lives in the repository fixture area (never /tmp).
+#[test]
+fn send_replay_and_stop_serve_classified_turn_without_reader_control() {
+    let f = Fixture::new("send-stop-frontier");
+    let _admission = bootstrap(&f);
+    // Admitted turn: same event id as the admission, so the receipt matches.
+    // BF-16c: the admission principal (cleared sender) proceeds on first send.
+    let bound = serde_json::to_vec(&f.request("intent")).unwrap();
+    let turn = f.root.preparation_send(&bound, &mut SystemEnvironment, Some("fixture-sender-token")).unwrap();
+    let token = f.register(&turn.id);
+    f.root.preparation_worker_claim(&turn.id, &token).unwrap();
+    f.root
+        .preparation_worker_finish(
+            &turn.id,
+            Some(r#"{"message":"Réponse classifiée de fixture"}"#),
+            None,
+            "fixture-no-contact",
+            &mut SystemEnvironment,
+        )
+        .unwrap();
+    // Hole 1 — replay: the same admitted send event is a read-only replay that
+    // returns the full recorded turn. A bare session must NOT read it.
+    let replay = f.root
+        .preparation_send(&bound, &mut SystemEnvironment, None)
+        .map(|_| ())
+        .map_err(|e| e)
+        .err()
+        .expect("send replay must refuse a bare session once classified output is admitted");
+    let replay = codes(replay);
+    assert!(
+        replay.contains("blp-dialogue-authentication-required"),
+        "expected bare-session send-replay refusal, got: {replay}"
+    );
+    assert!(
+        !replay.contains("Réponse classifiée"),
+        "send replay refusal must carry no classified payload"
+    );
+    // The under-cleared known reader authenticates but holds no clearance.
+    let under = f.root
+        .preparation_send(&bound, &mut SystemEnvironment, Some("fixture-reader-token"))
+        .map(|_| ())
+        .map_err(|e| e)
+        .err()
+        .expect("send replay must refuse an under-cleared reader");
+    let under = codes(under);
+    assert!(
+        under.contains("blp-dialogue-access-denied"),
+        "expected under-cleared send-replay refusal, got: {under}"
+    );
+    // Recovery side: the cleared sender keeps replaying (recorded intent, no
+    // new reservation) and sees the recorded turn.
+    let cleared = f.root.preparation_send(&bound, &mut SystemEnvironment, Some("fixture-sender-token")).unwrap();
+    let answer = cleared.answer.as_ref().expect("recorded answer present on cleared replay");
+    assert!(
+        answer.message.contains("Réponse classifiée"),
+        "a cleared reader keeps replaying the admitted send"
+    );
+    // Hole 2 — terminal stop: stopping a finished turn is a read-only
+    // observation of the recorded turn. A bare session must NOT read it.
+    let stop = f.root
+        .preparation_stop(&f.preparation.id, &turn.id, &mut SystemEnvironment, None)
+        .map(|_| ())
+        .map_err(|e| e)
+        .err()
+        .expect("terminal-turn stop must refuse a bare session once classified output is admitted");
+    let stop = codes(stop);
+    assert!(
+        stop.contains("blp-dialogue-authentication-required"),
+        "expected bare-session terminal-stop refusal, got: {stop}"
+    );
+    // An unknown token is a typed authorization refusal (403 family), not a
+    // bare-session downgrade and not a serve.
+    let unknown = f.root
+        .preparation_stop(&f.preparation.id, &turn.id, &mut SystemEnvironment, Some("no-such-token"))
+        .map(|_| ())
+        .map_err(|e| e)
+        .err()
+        .expect("terminal-turn stop must refuse an unknown token");
+    let unknown = codes(unknown);
+    assert!(
+        unknown.contains("Authorization") || unknown.contains("authorization_required"),
+        "expected typed authorization refusal for unknown token, got: {unknown}"
+    );
+    // Recovery side: the cleared sender observes the finished turn.
+    let observed = f.root
+        .preparation_stop(&f.preparation.id, &turn.id, &mut SystemEnvironment, Some("fixture-sender-token"))
+        .unwrap();
+    assert_eq!(
+        observed.id, turn.id,
+        "a cleared reader keeps observing the terminal turn via stop"
+    );
+    let fixture_path = f.path.clone();
+    f.close();
+    std::fs::remove_dir_all(&fixture_path).ok();
+}
+
+/// BF-16c legacy continuity: with NO admission receipt matching the
+/// preparation, a bare session keeps replaying sends and observing terminal
+/// stops exactly as before — the control keys on matched admissions, never on
+/// policy presence.
+#[test]
+fn send_replay_and_stop_without_any_matched_admission_keep_legacy_bare_path() {
+    let f = Fixture::new("send-stop-legacy");
+    // Trust configured but no admission: no receipt can match this
+    // preparation, so the send/stop path stays on the legacy bare route.
+    call(&f.root, "config-apply", json!({"schema_version":1,"event_id":"init","expected_revision":0,"reason":"owned fixture",
+        "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":true},
+        "identities":[{"subject":"admin","integrity":3,"roles":["admin"],"token":"fixture-admin-token"},
+        {"subject":"sender","integrity":1,"roles":["requester"],"token":"fixture-sender-token"},
+        {"subject":"reader","integrity":1,"roles":["requester"],"token":"fixture-reader-token"}]}), "").unwrap();
+    call(&f.root, "blp-policy-apply", json!({"schema_version":1,"event_id":"policy","expected_revision":0,"expected_trust_revision":1,"reason":"explicit fixture policy",
+        "policy":{"schema_version":1,"levels":[{"id":"public","name_fr":"Public","name_en":"Public"}],
+        "compartments":[],"clearances":{"admin":{"level":"public","compartments":[]}}}}),
+        "fixture-admin-token").unwrap();
+    // One ordinary legacy send/finish cycle with no admission at all.
+    let unbound = serde_json::to_vec(&f.request("legacy-event")).unwrap();
+    let turn = f.root.preparation_send(&unbound, &mut SystemEnvironment, None).unwrap();
+    let token = f.register(&turn.id);
+    f.root.preparation_worker_claim(&turn.id, &token).unwrap();
+    f.root
+        .preparation_worker_finish(
+            &turn.id,
+            Some(r#"{"message":"réponse legacy sans admission"}"#),
+            None,
+            "fixture-no-contact",
+            &mut SystemEnvironment,
+        )
+        .unwrap();
+    // Bare session replays and observes: the zero-receipt legacy path stays
+    // intact — replay returns the recorded turn, stop observes it terminal.
+    let replayed = f.root.preparation_send(&unbound, &mut SystemEnvironment, None).unwrap();
+    assert_eq!(
+        replayed.id, turn.id,
+        "legacy send replay stays readable to a bare session without admission"
+    );
+    let observed = f.root
+        .preparation_stop(&f.preparation.id, &turn.id, &mut SystemEnvironment, None)
+        .unwrap();
+    assert_eq!(
+        observed.id, turn.id,
+        "legacy terminal stop stays readable to a bare session without admission"
+    );
+    let fixture_path = f.path.clone();
+    f.close();
+    std::fs::remove_dir_all(&fixture_path).ok();
+}
+
+/// BF-16d reproduction: once a classified answer exists, the use-proposal
+/// adoption frontier, the receipt replay of that same adoption and the
+/// preparation list all serve the classified brief with no reader control at
+/// all. The show frontier already refuses (BF-16b), but the write path, its
+/// replay and the list observation are separate surfaces. No provider is
+/// contacted; the turn target stays the default (brief, not plan), so the
+/// admission receipt built by `bootstrap` matches this turn's recorded
+/// (provider, request_hash) exactly like the BF-16a dialogue test.
+#[test]
+fn use_proposal_replay_and_list_adopt_classified_answer_without_reader_control() {
+    let f = Fixture::new("adoption-frontier");
+    let _admission = bootstrap(&f);
+    // Admitted turn: same event id as the admission, so the receipt matches.
+    // The cleared sender asks the (inert) provider for a brief proposal.
+    let bound = serde_json::to_vec(&f.request("intent")).unwrap();
+    let turn = f.root
+        .preparation_send(&bound, &mut SystemEnvironment, Some("fixture-sender-token"))
+        .unwrap();
+    let token = f.register(&turn.id);
+    f.root.preparation_worker_claim(&turn.id, &token).unwrap();
+    f.root
+        .preparation_worker_finish(
+            &turn.id,
+            Some(r#"{"message":"Proposition de fixture","brief":"Brief classifié de fixture"}"#),
+            None,
+            "fixture-no-contact",
+            &mut SystemEnvironment,
+        )
+        .unwrap();
+    let before = f.preparation.revision;
+    // Hole 1 — adoption: a bare session adopts the classified answer's brief
+    // through use-proposal. The write must refuse before any document lands.
+    let adopt_raw = serde_json::to_vec(&json!({
+        "version":1,"action":"use-proposal","event_id":"adopt",
+        "preparation_id":f.preparation.id,"expected_revision":before,
+        "turn_id":turn.id,"adopt_brief":true
+    }))
+    .unwrap();
+    let adopt = f.root
+        .preparation_command(&adopt_raw, &mut SystemEnvironment, None)
+        .map(|_| ())
+        .map_err(|e| e)
+        .err()
+        .expect("use-proposal must refuse a bare session once the source answer is admitted");
+    let adopt = codes(adopt);
+    assert!(
+        adopt.contains("blp-dialogue-authentication-required"),
+        "expected bare-session adoption refusal, got: {adopt}"
+    );
+    assert!(
+        !adopt.contains("Brief classifié"),
+        "adoption refusal must carry no classified payload"
+    );
+    // The under-cleared known reader authenticates but holds no clearance.
+    let under = f.root
+        .preparation_command(&adopt_raw, &mut SystemEnvironment, Some("fixture-reader-token"))
+        .map(|_| ())
+        .map_err(|e| e)
+        .err()
+        .expect("use-proposal must refuse an under-cleared reader");
+    let under = codes(under);
+    assert!(
+        under.contains("blp-dialogue-access-denied"),
+        "expected under-cleared adoption refusal, got: {under}"
+    );
+    // An unknown token is a typed authorization refusal (403 family).
+    let unknown = f.root
+        .preparation_command(&adopt_raw, &mut SystemEnvironment, Some("no-such-token"))
+        .map(|_| ())
+        .map_err(|e| e)
+        .err()
+        .expect("use-proposal must refuse an unknown token");
+    let unknown = codes(unknown);
+    assert!(
+        unknown.contains("Authorization") || unknown.contains("authorization_required"),
+        "expected typed authorization refusal for unknown token, got: {unknown}"
+    );
+    // The refusal left no trace: the preparation keeps its revision and
+    // carries no brief document, and the event has no receipt row.
+    let after_refusal = f.root
+        .preparation_show(&f.preparation.id, Some("fixture-sender-token"))
+        .unwrap()
+        .value;
+    assert_eq!(
+        after_refusal.revision, before,
+        "a refused adoption must not bump the preparation revision"
+    );
+    assert!(
+        after_refusal
+            .documents
+            .as_ref()
+            .is_none_or(|d| !d.contains_key("brief")),
+        "a refused adoption must not store the brief document"
+    );
+    // Recovery side: the cleared sender completes the adoption.
+    let adopted = f.root
+        .preparation_command(&adopt_raw, &mut SystemEnvironment, Some("fixture-sender-token"))
+        .unwrap()
+        .value;
+    assert_eq!(
+        adopted.revision,
+        before + 1,
+        "a cleared adoption bumps the preparation revision exactly once"
+    );
+    let brief = adopted
+        .documents
+        .as_ref()
+        .and_then(|d| d.get("brief"))
+        .expect("cleared adoption stores the brief document");
+    assert!(
+        brief.text.contains("Brief classifié"),
+        "the adopted brief is the classified answer's brief"
+    );
+    assert_eq!(
+        brief.source_turn, turn.id,
+        "the adopted brief keeps its source turn provenance"
+    );
+    let adopted_brief = adopted.adopted_brief.as_ref().expect("cleared adoption sets adopted_brief");
+    assert_eq!(adopted_brief.sha256, brief.sha256);
+    // Hole 2 — receipt replay: replaying the SAME adoption event returns the
+    // historical preparation. A bare session must NOT read it.
+    let replay = f.root
+        .preparation_command(&adopt_raw, &mut SystemEnvironment, None)
+        .map(|_| ())
+        .map_err(|e| e)
+        .err()
+        .expect("adoption receipt replay must refuse a bare session");
+    let replay = codes(replay);
+    assert!(
+        replay.contains("blp-dialogue-authentication-required"),
+        "expected bare-session replay refusal, got: {replay}"
+    );
+    // Hole 3 — list: the public preparation list serves every retained body.
+    // A bare session must NOT receive this preparation's adopted brief.
+    let listed = f.root
+        .preparation_list(None)
+        .map(|_| ())
+        .map_err(|e| e)
+        .err()
+        .expect("preparation list must refuse a bare session once a classified brief is adopted");
+    let listed = codes(listed);
+    assert!(
+        listed.contains("blp-dialogue-authentication-required"),
+        "expected bare-session list refusal, got: {listed}"
+    );
+    // Recovery side: the cleared sender keeps listing.
+    let cleared_list = f.root.preparation_list(Some("fixture-sender-token")).unwrap().value;
+    let row = cleared_list
+        .preparations
+        .iter()
+        .find(|p| p.id == f.preparation.id)
+        .expect("cleared list keeps returning the adopted preparation");
+    assert!(
+        row.documents
+            .as_ref()
+            .is_some_and(|d| d.get("brief").is_some_and(|b| b.text.contains("Brief classifié"))),
+        "a cleared reader keeps seeing the adopted brief in the list"
+    );
+    let fixture_path = f.path.clone();
+    f.close();
+    std::fs::remove_dir_all(&fixture_path).ok();
+}
+
+/// BF-16d legacy continuity: with NO admission receipt matching the
+/// preparation, a bare session keeps adopting briefs, replaying adoptions and
+/// listing preparations exactly as before — the control keys on matched
+/// admissions, never on policy presence.
+#[test]
+fn use_proposal_replay_and_list_without_any_matched_admission_keep_legacy_bare_path() {
+    let f = Fixture::new("adoption-legacy");
+    // Trust configured but no admission: no receipt can match this
+    // preparation, so the adoption/replay/list path stays on the legacy bare
+    // route.
+    call(&f.root, "config-apply", json!({"schema_version":1,"event_id":"init","expected_revision":0,"reason":"owned fixture",
+        "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":true},
+        "identities":[{"subject":"admin","integrity":3,"roles":["admin"],"token":"fixture-admin-token"},
+        {"subject":"sender","integrity":1,"roles":["requester"],"token":"fixture-sender-token"},
+        {"subject":"reader","integrity":1,"roles":["requester"],"token":"fixture-reader-token"}]}), "").unwrap();
+    call(&f.root, "blp-policy-apply", json!({"schema_version":1,"event_id":"policy","expected_revision":0,"expected_trust_revision":1,"reason":"explicit fixture policy",
+        "policy":{"schema_version":1,"levels":[{"id":"public","name_fr":"Public","name_en":"Public"}],
+        "compartments":[],"clearances":{"admin":{"level":"public","compartments":[]}}}}),
+        "fixture-admin-token").unwrap();
+    // One ordinary legacy send/finish/use-proposal cycle with no admission.
+    let unbound = serde_json::to_vec(&f.request("legacy-event")).unwrap();
+    let turn = f.root.preparation_send(&unbound, &mut SystemEnvironment, None).unwrap();
+    let token = f.register(&turn.id);
+    f.root.preparation_worker_claim(&turn.id, &token).unwrap();
+    f.root
+        .preparation_worker_finish(
+            &turn.id,
+            Some(r#"{"message":"proposition legacy","brief":"brief legacy de fixture"}"#),
+            None,
+            "fixture-no-contact",
+            &mut SystemEnvironment,
+        )
+        .unwrap();
+    let adopt_raw = serde_json::to_vec(&json!({
+        "version":1,"action":"use-proposal","event_id":"adopt",
+        "preparation_id":f.preparation.id,"expected_revision":f.preparation.revision,
+        "turn_id":turn.id,"adopt_brief":true
+    }))
+    .unwrap();
+    let adopted = f.root
+        .preparation_command(&adopt_raw, &mut SystemEnvironment, None)
+        .unwrap()
+        .value;
+    assert!(
+        adopted
+            .documents
+            .as_ref()
+            .is_some_and(|d| d.get("brief").is_some_and(|b| b.text.contains("brief legacy"))),
+        "bare session keeps adopting an unadmitted brief"
+    );
+    // Bare session replays and lists: the zero-receipt legacy path stays
+    // intact — replay at the current revision returns the identical body
+    // (receipt_historical stays false exactly like the pre-BF-16 contract),
+    // and list serves the body.
+    let replayed = f.root
+        .preparation_command(&adopt_raw, &mut SystemEnvironment, None)
+        .unwrap()
+        .value;
+    assert_eq!(
+        replayed.revision, adopted.revision,
+        "legacy adoption replay stays readable to a bare session without admission"
+    );
+    assert_eq!(
+        replayed, adopted,
+        "legacy replay at the current revision returns the recorded body unchanged"
+    );
+    let listed = f.root.preparation_list(None).unwrap().value;
+    assert!(
+        listed
+            .preparations
+            .iter()
+            .any(|p| p.id == f.preparation.id
+                && p.documents
+                    .as_ref()
+                    .is_some_and(|d| d.get("brief").is_some_and(|b| b.text.contains("brief legacy")))),
+        "bare list keeps serving an unadmitted preparation"
+    );
     let fixture_path = f.path.clone();
     f.close();
     std::fs::remove_dir_all(&fixture_path).ok();

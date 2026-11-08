@@ -1,0 +1,38 @@
+{
+ "schema_version": 1,
+ "id": "blp-object-attribute-public",
+ "inputs": [
+  "tests/blp_object_attribute_public.py",
+  "tests/blp_object_attribute_ui.cjs",
+  "tests/fixture_area.py",
+  "tests/rust_native_http_cli.py",
+  "tools/verification/recipe.py",
+  "package.json",
+  "package-lock.json",
+  "web/trust-native.html",
+  "web/trust-confidentiality.js",
+  "locales/en.json",
+  "web/i18n-en.js"
+ ],
+ "environment": {},
+ "steps": [
+  {
+   "id": "admin-object-attribution-form-end-to-end",
+   "command": [
+    "python3",
+    "-c",
+    "import os,subprocess; subprocess.run(['python3','tests/blp_object_attribute_public.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',os.environ['SWARM_BLP_PROOF_OUTPUT']],check=True)"
+  ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "OBJECT_ATTRIBUTE_PUBLIC_PASS 4",
+    "PASS policy-current",
+    "PASS admin-ui-attribution-form-journey",
+    "PASS one-explicit-attribution-persisted",
+    "PASS qualified-production-image-unchanged",
+    "OBJECT_ATTRIBUTE_JOURNEY_SHA256"
+   ],
+   "required_stderr": []
+  }
+ ]
+}

@@ -80,6 +80,7 @@ impl Fixture {
             .preparation_command(
                 br#"{"version":1,"action":"create","event_id":"create","expected_revision":0,"text":"Fixture need"}"#,
                 &mut SystemEnvironment,
+                None,
             )
             .unwrap()
             .value;
@@ -92,6 +93,7 @@ impl Fixture {
                 }))
                 .unwrap(),
                 &mut SystemEnvironment,
+                None,
             )
             .unwrap()
             .value;
@@ -249,7 +251,7 @@ fn worker_gate_refuses_unauthorized_and_passes_bound_sends() {
     // and claim exactly like the real worker journey; the gate must return
     // Ok immediately.
     let unbound = serde_json::to_vec(&f.request("legacy-event")).unwrap();
-    let legacy = f.root.preparation_send(&unbound, &mut SystemEnvironment).unwrap();
+    let legacy = f.root.preparation_send(&unbound, &mut SystemEnvironment, None).unwrap();
     let legacy_token = f.register(&legacy.id);
     f.root.preparation_worker_claim(&legacy.id, &legacy_token).unwrap();
     let before = read_reservations(&f.path);
@@ -273,7 +275,7 @@ fn worker_gate_refuses_unauthorized_and_passes_bound_sends() {
     // Admitted turn: SAME event id as the admission (`intent`), so the receipt
     // matches (preparation_id, provider, request_hash) exactly.
     let bound = serde_json::to_vec(&f.request("intent")).unwrap();
-    let turn = f.root.preparation_send(&bound, &mut SystemEnvironment).unwrap();
+    let turn = f.root.preparation_send(&bound, &mut SystemEnvironment, Some("fixture-sender-token")).unwrap();
     let token = f.register(&turn.id);
     f.root.preparation_worker_claim(&turn.id, &token).unwrap();
     // Wrong custody token: registration identity, never a BLP code.

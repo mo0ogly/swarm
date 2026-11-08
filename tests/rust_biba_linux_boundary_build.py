@@ -2,6 +2,8 @@
 """Build the standalone fixture from Cargo's actual artifact, then verify it.
 No guessed hashed rlib, feature promotion, product install, retry or watchdog.
 The native boundary test is distinct from the production engine qualification.
+Both fixture drivers compile from the same audited rlib: the mandatory-profile
+discriminator and the additive Internet-refusal discriminator it precedes.
 """
 import argparse,json,os,subprocess,sys
 from pathlib import Path
@@ -28,11 +30,14 @@ def run(target,out):
     selected=[v for v in artifacts if v.get('reason')=='compiler-artifact' and v['target']['name']=='swarm_biba_linux' and v['target']['kind']==['lib']]
     assert len(selected)==1 and not selected[0]['features']
     libraries=[Path(n) for n in selected[0]['filenames'] if n.endswith('.rlib')];assert len(libraries)==1
-    library=libraries[0];driver=out/'boundary-driver'
+    library=libraries[0];driver=out/'boundary-driver';internet_driver=out/'internet-driver'
     proof.publish(out/'artifact.json',dict(artifact=selected[0],sha256=proof.digest(library.read_bytes())))
     command('rustc',['rustc','--edition=2021',str(root/'tests/rust_biba_boundary_driver.rs'),'-L','dependency='+str(target/'debug/deps'),'--extern','swarm_biba_linux='+str(library),'-o',str(driver)])
+    command('rustc-internet',['rustc','--edition=2021',str(root/'tests/rust_biba_internet_deny_driver.rs'),'-L','dependency='+str(target/'debug/deps'),'--extern','swarm_biba_linux='+str(library),'-o',str(internet_driver)])
     command('native',[sys.executable,str(root/'tests/rust_biba_linux_boundary.py'),'--driver',str(driver),'--output',str(out/'native')])
     assert json.loads((out/'native/result.json').read_text())['status']=='PASS'
+    command('native-internet',[sys.executable,str(root/'tests/rust_biba_linux_boundary_internet.py'),'--driver',str(driver),'--internet-driver',str(internet_driver),'--output',str(out/'native-internet')])
+    assert json.loads((out/'native-internet/result.json').read_text())['status']=='PASS'
     command('workspace-swap',[sys.executable,str(root/'tests/rust_biba_workspace_swap.py'),'--driver',str(driver),'--output',str(out/'workspace-swap')])
     swap=json.loads((out/'workspace-swap/result.json').read_text())
     assert swap['status']=='PASS' and swap['private_original_unchanged'] and swap['swap_observed'] and swap['provider_not_executed']

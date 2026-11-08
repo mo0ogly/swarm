@@ -47,7 +47,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     let store = RootStore::open(std::path::Path::new(&a.root), false).map_err(|e| CliError::Root(Box::new(e)))?;
     let mut causes = Vec::new();
     let result = match kind {
-        "list" => bytes(store.preparation_list(), &mut causes),
+        "list" => bytes(store.preparation_list(reader_token), &mut causes),
         "methods" => bytes(store.preparation_methods(), &mut causes),
         "templates"=>bytes(store.preparation_templates(),&mut causes),
         "template"=>bytes(store.preparation_template(&a.pos[2]),&mut causes),
@@ -85,7 +85,14 @@ fn write(a:&Arguments,out:&mut dyn Write)->Result<u8,CliError>{
     let store=RootStore::open(std::path::Path::new(&a.root),true).map_err(|e|CliError::Root(Box::new(e)))?;
     let mut receipt=None;
     let mut causes=Vec::new();
-    let result=store.preparation_command(&raw,&mut SystemEnvironment).map_err(|e|CliError::Root(Box::new(e))).and_then(|mut observation|{
+    // BF-16d: the command frontier (use-proposal adoption and receipt replay)
+    // inherits the source dialogue's classified domain like every read — the
+    // reader credential comes only from SWARM_TRUST_TOKEN (like `trust`),
+    // never rendered; an absent variable is a bare session, decided by the
+    // engine only when a matched admission makes the operation classified.
+    let trust_variable=std::env::var("SWARM_TRUST_TOKEN").unwrap_or_default();
+    let reader_token=Some(trust_variable.as_str()).filter(|t|!t.is_empty());
+    let result=store.preparation_command(&raw, &mut SystemEnvironment, reader_token).map_err(|e|CliError::Root(Box::new(e))).and_then(|mut observation|{
         causes.append(&mut observation.causes);
         let p=observation.value;
         receipt=Some((p.id.clone(),p.revision));json_bytes(&p).map_err(CliError::Output)
@@ -132,16 +139,25 @@ fn template_check(a:&Arguments,out:&mut dyn Write)->Result<u8,CliError>{
 /// Explicit AI send/stop and readonly capability adapter. Input identity is
 /// supplied by the caller. A known admitted send remains recorded on dispatch,
 /// close or output failure; replay observes the same turn without another debit.
-/// Historical active replay remains observation; the native preflight fences dispatch.
+/// Historical active replay remains observation; the native preflight fences
+/// dispatch. BF-16c: send/stop carry the caller's SWARM_TRUST_TOKEN (same
+/// credential contract as the readonly reads) — once one admission receipt
+/// matches the preparation, the engine's shared reader verdict decides before
+/// any turn byte leaves the call; an absent variable is a bare session, never
+/// authorization. Capabilities stay readonly and uncontrolled: they name no
+/// preparation and serve no turn byte.
 fn calls(a:&Arguments,out:&mut dyn Write)->Result<u8,CliError>{
     let kind=a.pos[1].as_str();
     if a.pos.len()!=if kind=="capabilities"{2}else{3} || !a.output.is_empty() || a.server || !a.task.is_empty() || a.phase!="delivery" || (kind=="capabilities")!=a.input.is_empty(){return Err(CliError::Usage);}
+    // BF-16c: same SWARM_TRUST_TOKEN contract as the readonly reads above.
+    let trust_variable=std::env::var("SWARM_TRUST_TOKEN").unwrap_or_default();
+    let reader_token=Some(trust_variable.as_str()).filter(|t|!t.is_empty());
     let root=RootStore::open(std::path::Path::new(&a.root),kind!="capabilities").map_err(|e|CliError::Root(Box::new(e)))?;
     let result=(||{
         if kind=="capabilities"{return json_bytes(&root.preparation_call_capabilities().map_err(|e|CliError::Root(Box::new(e)))?).map_err(CliError::Output);}
         let raw=if a.input=="-"{swarm_engine::read_command_document(&mut std::io::stdin().lock())}else{swarm_engine::read_command_file(std::path::Path::new(&a.input))}.map_err(CliError::CommandInput)?;
-        let turn=if kind=="send"{let r=swarm_engine::decode_preparation_send(&raw).map_err(|e|CliError::Root(Box::new(e)))?;if r.preparation_id!=a.pos[2]{return Err(CliError::Usage);}let t=root.preparation_send(&raw,&mut swarm_engine::SystemEnvironment).map_err(|e|CliError::Root(Box::new(e)))?;if t.status=="pending" && t.supervisor_pid==0{root.preparation_dispatch_if_native(&t.id).map_err(|e|CliError::Root(Box::new(e)))?;}t}else{
-            let r=swarm_engine::decode_preparation_stop(&raw).map_err(|e|CliError::Root(Box::new(e)))?;if r.preparation_id!=a.pos[2]{return Err(CliError::Usage);}root.preparation_stop(&r.preparation_id,&r.turn_id,&mut swarm_engine::SystemEnvironment).map_err(|e|CliError::Root(Box::new(e)))?
+        let turn=if kind=="send"{let r=swarm_engine::decode_preparation_send(&raw).map_err(|e|CliError::Root(Box::new(e)))?;if r.preparation_id!=a.pos[2]{return Err(CliError::Usage);}let t=root.preparation_send(&raw,&mut swarm_engine::SystemEnvironment,reader_token).map_err(|e|CliError::Root(Box::new(e)))?;if t.status=="pending" && t.supervisor_pid==0{root.preparation_dispatch_if_native(&t.id).map_err(|e|CliError::Root(Box::new(e)))?;}t}else{
+            let r=swarm_engine::decode_preparation_stop(&raw).map_err(|e|CliError::Root(Box::new(e)))?;if r.preparation_id!=a.pos[2]{return Err(CliError::Usage);}root.preparation_stop(&r.preparation_id,&r.turn_id,&mut swarm_engine::SystemEnvironment,reader_token).map_err(|e|CliError::Root(Box::new(e)))?
         };json_bytes(&turn).map_err(CliError::Output)
     })();finish_read(root,result,out,Vec::new())
 }

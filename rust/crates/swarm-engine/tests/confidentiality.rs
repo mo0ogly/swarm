@@ -136,6 +136,54 @@ fn quarantine_change(revision:u64, enabled:bool)->Value {
     value["policy"]["preparation_quarantine"]=enabled.into();value
 }
 
+/// Explicit Internet-denial change under the same Admin operation/revisions;
+/// the policy schema is shared with quarantine, no new role or operation.
+fn internet_change(revision:u64, enabled:bool)->Value {
+    let mut value=change(revision,if enabled{"internet-deny-on"}else{"internet-deny-off"});
+    value["policy"]["provider_internet_denied"]=enabled.into();value
+}
+
+#[test]
+fn provider_internet_denial_is_admin_controlled_and_refuses_invalid_state() {
+    let f=Fixture::new();f.apply();
+    // Historical encoding: absent field reads false at the transport snapshot.
+    let root=RootStore::open(&f.0,true).unwrap();
+    assert_eq!(root.provider_internet_denied_snapshot().unwrap(),false);root.close().unwrap();
+    let before=f.state();
+    let preview=f.call("blp-policy-preview",internet_change(1,true),"fixture-admin-token").unwrap();
+    assert_eq!(preview["applied"],false);assert_eq!(before,f.state());
+    // Unauthorized callers refuse before any state change.
+    assert!(f.call("blp-policy-apply",internet_change(1,true),"fixture-worker-token").unwrap_err().contains("authorization_required"));
+    assert_eq!(f.state(),before);
+    f.call("blp-policy-apply",internet_change(1,true),"fixture-admin-token").unwrap();
+    let show=f.call("blp-show",json!({}),"fixture-admin-token").unwrap();
+    assert_eq!(show["capability"]["provider_internet_denied"],true);
+    assert_eq!(show["capability"]["runtime_enforced"],false);
+    let root=RootStore::open(&f.0,true).unwrap();
+    assert_eq!(root.provider_internet_denied_snapshot().unwrap(),true);
+    root.close().unwrap();
+    // Authority renewal cannot implicitly lift an explicit refusal.
+    f.call("config-apply",config(1,"identity-renewal-deny"),"fixture-admin-token").unwrap();
+    let root=RootStore::open(&f.0,true).unwrap();
+    assert_eq!(root.provider_internet_denied_snapshot().unwrap(),true);root.close().unwrap();
+    let mut off=internet_change(2,false);off["expected_trust_revision"]=2.into();
+    f.call("blp-policy-apply",off,"fixture-admin-token").unwrap();
+    let root=RootStore::open(&f.0,true).unwrap();
+    assert_eq!(root.provider_internet_denied_snapshot().unwrap(),false);root.close().unwrap();
+}
+
+#[test]
+fn provider_internet_denial_corruption_never_falls_back_to_disabled() {
+    let f=Fixture::new();f.apply();
+    f.call("blp-policy-apply",internet_change(1,true),"fixture-admin-token").unwrap();
+    let original=f.state();f.rewrite_state(|_|b"invalid fixture state".to_vec());
+    let root=RootStore::open(&f.0,true).unwrap();
+    assert!(root.provider_internet_denied_snapshot().is_err());root.close().unwrap();
+    f.rewrite_state(|_|original);
+    let root=RootStore::open(&f.0,true).unwrap();
+    assert_eq!(root.provider_internet_denied_snapshot().unwrap(),true);root.close().unwrap();
+}
+
 #[test]
 fn preparation_quarantine_preview_reopen_refusal_and_recovery() {
     let f=Fixture::new();f.apply();
@@ -152,7 +200,7 @@ fn preparation_quarantine_preview_reopen_refusal_and_recovery() {
     let root=RootStore::open(&f.0,true).unwrap();
     let error=root.with_preparation_egress(||{called.set(true);Ok(())}).unwrap_err();
     assert_eq!(error.code(),"blp-preparation-quarantined");assert!(!called.get());
-    let error=root.preparation_send(b"{}",&mut SystemEnvironment).err().unwrap();
+    let error=root.preparation_send(b"{}",&mut SystemEnvironment,None).err().unwrap();
     assert_eq!(error.code(),"blp-preparation-quarantined");
     root.close().unwrap();assert_eq!(before,f.state());
     // Authority renewal cannot lift an existing quarantine implicitly.

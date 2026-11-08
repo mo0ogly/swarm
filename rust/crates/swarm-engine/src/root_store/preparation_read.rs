@@ -167,14 +167,24 @@ impl RootStore {
     /// List newest recorded rows by SQLite rowid, with the persisted row bound
     /// and freshly projected plan_ready. Empty/unlimited/zero remain distinct;
     /// typed SQL/codec/material/close errors refuse, no history is changed.
-    pub fn preparation_list(&self) -> Result<PreparationReadObservation<PreparationList>, E> {
+    /// `reader_token` is the caller's local bearer credential (`None` = bare
+    /// session, never authorization), with the BF-16 frontier semantics of
+    /// `preparation_show`: any listed preparation whose recorded turns match
+    /// an admission receipt inherits its source dialogue's classified domain,
+    /// and the whole list refuses before serving any byte.
+    pub fn preparation_list(&self, reader_token: Option<&str>) -> Result<PreparationReadObservation<PreparationList>, E> {
         self.preparation_observed(|db, policy, causes| {
             let mut statement = db.prepare("SELECT id,work_id,revision,body FROM preparations ORDER BY rowid DESC LIMIT ?1").map_err(E::Sql)?;
             let result = (|| {
                 let mut rows = statement.query([sql_limit(policy.list_limit)?]).map_err(E::Sql)?;
                 let mut preparations = Vec::new();
                 while let Some(row) = rows.next().map_err(E::Sql)? {
-                    let mut p = preparation(row)?; self.preparation_project(&mut p, policy, causes)?; preparations.push(p);
+                    let mut p = preparation(row)?; self.preparation_project(&mut p, policy, causes)?;
+                    // BF-16d: each listed row is judged like `preparation_show`;
+                    // the first matched-admission row without a sufficient
+                    // reader refuses the WHOLE list before any byte is served.
+                    super::preparation_dialogue::reader_verdict(self, db, &p, &recorded_turn_keys(db, &p)?, reader_token)?;
+                    preparations.push(p);
                 }
                 Ok(PreparationList { preparations, limit: policy.list_limit })
             })();
@@ -318,8 +328,10 @@ impl RootStore {
 /// no turn or document byte is served by this helper. Identity mismatch refuses
 /// like the dialogue frontier's row binding; unlike the dialogue read, no
 /// active-history observation runs (the show/history frontiers observe
-/// documents, not live calls).
-fn recorded_turn_keys(db:&rusqlite::Connection,p:&Preparation)->Result<Vec<crate::PreparationTurn>,E>{
+/// documents, not live calls). BF-16c: also consumed by the send/stop
+/// frontiers inside their write transaction — same decision input, same
+/// zero-serve guarantee.
+pub(super) fn recorded_turn_keys(db:&rusqlite::Connection,p:&Preparation)->Result<Vec<crate::PreparationTurn>,E>{
     let mut statement=db.prepare("SELECT id,preparation_id,status,body FROM preparation_turns WHERE preparation_id=?1 ORDER BY rowid").map_err(E::Sql)?;
     let result=(||{
         let mut rows=statement.query([&p.id]).map_err(E::Sql)?;

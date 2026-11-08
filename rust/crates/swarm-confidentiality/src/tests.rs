@@ -10,7 +10,27 @@ fn policy() -> Policy {
         Level { id: (*id).into(), name_fr: (*id).into(), name_en: (*id).into() }).collect(),
         compartments: vec!["client-a".into(), "client-b".into()],
         clearances: BTreeMap::from([("worker".into(), label("restricted", &["client-a", "client-b"]))]),
-        preparation_quarantine: false }
+        preparation_quarantine: false, provider_internet_denied: false }
+}
+
+#[test]
+fn provider_internet_denial_is_explicit_and_preserves_legacy_encoding() {
+    let policy = policy();
+    let legacy = serde_json::to_value(&policy).unwrap();
+    assert!(legacy.get("provider_internet_denied").is_none());
+    let absent: Policy = serde_json::from_value(legacy.clone()).unwrap();
+    assert!(!absent.provider_internet_denied);
+    let mut explicit = legacy.clone(); explicit["provider_internet_denied"] = false.into();
+    let off: Policy = serde_json::from_value(explicit).unwrap();
+    assert_eq!(serde_json::to_vec(&off).unwrap(), serde_json::to_vec(&absent).unwrap());
+    let mut on = legacy.clone(); on["provider_internet_denied"] = true.into();
+    let on: Policy = serde_json::from_value(on).unwrap();
+    assert!(on.provider_internet_denied); absent.validate_successor(&on).unwrap();
+    on.validate_successor(&absent).unwrap();
+    for value in [serde_json::Value::Null, "true".into(), 1.into()] {
+        let mut invalid = legacy.clone(); invalid["provider_internet_denied"] = value;
+        assert!(serde_json::from_value::<Policy>(invalid).is_err());
+    }
 }
 
 #[test]

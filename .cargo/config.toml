@@ -3,3 +3,16 @@
 # This is not an operator execution policy. Unsupported builds refuse Root opens.
 [env]
 LIBSQLITE3_FLAGS = { value = "-DSQLITE_ENABLE_FILESTAT", force = true }
+
+# Future builds only. See tools/verification/BUILD-STORAGE.md for limits and
+# explicit debugging overrides. No source, feature or runtime policy changes.
+[build]
+rustc-wrapper = "tools/verification/cargo_space_guard.py"
+
+[profile.dev]
+debug = 0
+incremental = false
+
+[profile.test]
+debug = 0
+incremental = false
