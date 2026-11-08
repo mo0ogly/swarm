@@ -625,9 +625,9 @@ stocké. Le digest racine historique (sans connecteur ni ascendance) est épingl
 par un test unitaire : `17749c31acf37938ebabe43b794adf5726fbc565905e6c0eb059afdae9ab5ad3`.
 Régression miroir du contrat Go :
 `rust/crates/swarm-engine/tests/trust_delegation.rs` (10 tests, racines isolées
-dans `.swarm-fixtures/trust-delegation/`, jamais `/tmp`). Restent fermés : la
-création distante A2A et le `data_context` — toute commande qui les porte
-refuse encore.
+dans `.swarm-fixtures/trust-delegation/`, jamais `/tmp`). Reste fermée : la
+création distante A2A — toute commande qui la porte refuse encore ; le
+`data_context` n'y figure plus, porté depuis le 5 novembre (bloc suivant).
 
 **Audience du mandat délégué (portion locale de T14 D3, 8 novembre 2026)** —
 le sujet nommé du mandat vaut audience côté usage : un pair enrôlé autre que

@@ -598,7 +598,8 @@ ancestry) is pinned by a unit test:
 regression of the Go contract:
 `rust/crates/swarm-engine/tests/trust_delegation.rs` (10 tests, isolated roots in
 `.swarm-fixtures/trust-delegation/`, never `/tmp`). Still closed: remote A2A
-creation and `data_context` — any command carrying them keeps refusing.
+creation — any command carrying it keeps refusing; `data_context` is no longer
+listed here, ported since 5 November (next block).
 
 **Delegated-mandate audience (local T14 D3 subset, 8 November 2026)** — a
 mandate's named subject is its use-side audience: an enrolled peer other than
