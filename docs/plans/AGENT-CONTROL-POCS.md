@@ -2425,7 +2425,7 @@ leur résultat courant et la décision de fusion sont consultables dans PR #20.
 
 ## BF-L0-A — premier lot borné proposé après réalignement (8 novembre 2026)
 
-**État courant : A-1 appliqué, A-2 vérifié, A-3 vérifié en miniatures ; A-4 ouvert.** Voir la mise à jour d’application en fin de section. Le cadrage initial ci-dessous est conservé comme historique.
+**État courant : A-1/A-2/A-3 établis ; A-4 et BF-L0-A clôturés dans la portée déclarative/miniature. BF-L0 global reste ouvert.** Voir la mise à jour d’application en fin de section. Le cadrage initial ci-dessous est conservé comme historique.
 
 **Préparation documentaire uniquement, non appliquée et non qualifiée.** Reprise sur
 main `b4e07cb26066cffdb20b36ac2fc9c60f758cb23e` dans le checkout principal réaligné.
@@ -2769,3 +2769,57 @@ lancée. Le commit/push demandé portera uniquement ce travail sur branche dédi
 ni PR/CI compilante ni intégration main supplémentaires autorisées ici. Le checkout
 principal et son index seront préservés ; le commit sera construit avec index
 séparé, en excluant les changements concurrents et les lots X 15/16 voisins.
+
+
+### BF-L0-A — A-4 revue et clôture du sous-lot (8 novembre 2026)
+
+**A-4 établi ; BF-L0-A clôturé dans sa portée bornée : six déclarations corrigées,
+sélection/archivage contrôlés et refus/reprises vérifiés en miniatures.** Autorisation
+Fabrice : revue A-1/A-2/A-3 et clôture si critères établis, puis commit/push. La revue
+porte sur le candidat `de5a762fbeb6757ee9352b2f41c8da5cefcac1fe`, ses mêmes octets
+pertinents dans le checkout principal et leurs originaux archivés. C'est une revue
+locale de cette conversation, pas une revue indépendante ou une acceptation moteur.
+Les anciens états « A-4 ouvert » sont conservés comme historique.
+
+| Critère de clôture | Preuve relue et résultat établi | Limite conservée |
+| --- | --- | --- |
+| A-1 : six ajouts exacts et comportement de recette préservé | Archives avant/après relues et empreintes vérifiées ; trois inputs supplémentaires une fois par manifeste, anciens inputs dans le même ordre, tous les autres champs identiques. Les deux manifestes après édition égalent le commit de5a762fb et les octets courants relus. | Aucune commande native exécutée pour cette revue. |
+| A-2 : sélection et rétention des six occurrences | Deux enveloppes/inventaires et tous leurs membres relus : 866 et 868 fichiers, ensembles/empreintes avant/après identiques, trois nouveaux chemins présents dans chaque archive et mêmes octets qu'A-1/A-3. | Archives déclaratives historiques, pas preuve du graphe compilateur ou de tout l'état sale actuel. |
+| A-3 : témoins, causes, arrêt et reprise | Matrice exhaustive 2 recettes × 3 entrées × 2 défauts relue dans les preuves brutes : 24 PASS, 6 REFUSED, 6 FAIL. Causes exactes, aucune sentinelle lors des absences, seule première sentinelle lors des dérives, seule cible modifiée, reprise sur originaux avec recette inchangée. | Deux commandes Python inertes dérivées ; pas succès des recettes Git/intention natives. |
+| Intégrité complète sans rejeu | Fonction actuelle `verify_evidence` appelée seulement en lecture sur 33 dossiers complets extraits de la copie USB vérifiée : 30 du passage réussi, ses deux enveloppes historiques PASS/FAIL et le témoin du premier montage. Les FAIL restent FAIL ; six refus avant run n'ont pas de faux dossier vérifié. | Aucun scénario rejoué, pas de `verify` sur le simple paquet A-2. |
+| Même chaîne d'octets pertinente | Manifeste après A-1 = original A-2 = source A-3 = commit/checkout pour les deux recettes ; helper/wrapper/politique et runner communs liés par leurs SHA-256, sources du pilote liées au candidat. | Pas d'identité revendiquée de l'ensemble des sources natives concurrentes avec le commit publié. |
+| Échec initial conservé et reprise justifiée | Mode 0775 du parent et fallback initial relus dans l'archive ; unique diff du pilote : création explicite du parent possédé en 0700. Les douze groupes corrigés ont ce parent 0700. Runner/helper/wrapper/politique identiques entre essais. | Défaut de montage du banc corrigé, aucune garantie générale d'absence d'effet ou de confinement OS. |
+
+Les 33 vérifications sont une relecture de preuves, **pas 33 nouveaux tests**. Les
+36 passages A-3 restent ceux du lot précédent. Aucun nouvel appel `run_recipe`,
+compilation, fournisseur, navigateur ou service. Les empreintes des trois jeux
+d'archives USB, chaque membre des inventaires A-2 et les 1022 fichiers A-3 ont été
+rapprochés ; les sorties/causes/événements reçus ont été examinés au-delà du statut.
+
+Dossier A-4 de revue et rattachement aux preuves originales :
+`/media/fpizzi/Lexar/swarm-evidence/bf-l0-a-a4-20261108T205712Z/a4-review.tar.gz`.
+SHA-256 : `030368c42322001ba6fef6c7fa7c4d6afbaa855ed1378ff689e119b8476ee428`.
+Copie relue après fsync ; index local, portée et restauration :
+`.cache/bf-l0-a-a4-20261108-index.json`. Les originaux A-1/A-2/A-3, dont le premier
+FAIL, restent inchangés ; aucune perte ou substitution d'historique.
+
+**Ce qui reste ouvert :** BF-L0 global et R03/R04 complets (projection du réglage
+résolu, fallback effectif de l'invocation native, configs/profil/outils réellement
+consommés), les dix-neuf autres recettes et les obligations R01/02/R05–R13. La
+clôture ne qualifie ni les recettes natives complètes, ni BF-L1/BF-L5/BF-P3, ni les
+scénarios 03-F/03-B, ni une capacité financière. La preuve A-2 ne devient pas une
+qualification du checkout sale actuel ; tout changement d'entrée pertinente impose
+un rapprochement et, si nécessaire, une nouvelle preuve autorisée.
+
+Suite conservée au plan : définir le lot natif cohérent R01/02/07 et les compléments
+statiques R05/R09, puis leurs qualifications/outils/images selon les prérequis déjà
+tracés. Aucune réalisation supplémentaire décidée ici. Codex propriétaire du suivi ;
+Fabrice conserve l'autorité restante. L'apprentissage sur le parent privé reste
+dans le pilote et la chronologie, sans changement de politique partagée.
+
+Revue de cet incrément documentaire : aucun choix opérateur, fonction/docstring
+ou chemin d'erreur modifié ; seule la conclusion de portée change avec ses preuves.
+Plans FR/EN mis à jour ensemble et changements concurrents conservés. Pas de
+livraison produit/version_history ou contexte embarqué à reconstruire. Le commit
+documentaire de clôture utilisera un index séparé et la branche BF-L0-A existante ;
+main/index principal restent en place, sans PR ni CI compilante.

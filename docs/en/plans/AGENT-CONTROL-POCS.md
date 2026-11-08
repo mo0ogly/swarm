@@ -2054,7 +2054,7 @@ retains their current outcome and the merge decision.
 
 ## BF-L0-A — proposed first bounded batch after realignment (8 November 2026)
 
-**Current state: A-1 applied, A-2 verified, A-3 verified on miniatures; A-4 open.** See the application update at the end of this section. Initial framing below is retained as history.
+**Current state: A-1/A-2/A-3 established; A-4 and BF-L0-A closed within declarative/miniature scope. Global BF-L0 remains open.** See the application update at the end of this section. Initial framing below is retained as history.
 
 **Documentary preparation only; neither applied nor qualified.** Resumed on main
 `b4e07cb26066cffdb20b36ac2fc9c60f758cb23e` in the realigned primary checkout.
@@ -2377,3 +2377,54 @@ service or product/version delivery started. Requested commit/push includes only
 this work on a dedicated branch; no PR/compilation CI or further main integration
 authorized here. Preserve primary checkout/index; construct commit through a
 separate index, excluding concurrent changes and neighboring X batches 15/16.
+
+
+### BF-L0-A — A-4 review and bounded sub-batch closure (8 November 2026)
+
+**A-4 established; BF-L0-A closed within its bounded scope: six corrected input
+declarations, checked selection/archive retention and miniature refusal/recovery.**
+Fabrice authorizes A-1/A-2/A-3 review and closure if established, then commit/push.
+Review binds candidate `de5a762fbeb6757ee9352b2f41c8da5cefcac1fe`, matching relevant
+primary-checkout bytes and archived originals. This is local same-conversation
+review, not independent review or engine acceptance. Prior A-4-open states remain
+historical.
+
+| Closure criterion | Read proof and established outcome | Retained limit |
+| --- | --- | --- |
+| A-1: exact six additions, recipe behavior preserved | Before/after archives and hashes checked; three additional inputs once per manifest, old input order and all other fields identical. After manifests match candidate de5a762fb and read current bytes. | No native command executed for this review. |
+| A-2: six selected/retained occurrences | Both inventories/archives and every member read: 866/868 files, identical before/after sets and hashes, three new entries per archive matching A-1/A-3 bytes. | Historical declared inventories, not compiler graph or complete current dirty-state proof. |
+| A-3: valid controls, causes, stop and recovery | Raw exhaustive 2 recipes × 3 inputs × 2 faults: 24 PASS, 6 REFUSED, 6 FAIL. Exact causes, zero sentinel delta for missing inputs, only first sentinel for drift, only target changes, recovery on original bytes and unchanged recipe. | Two inert derived Python commands, not native Git/intent recipe success. |
+| Complete integrity without replay | Current verify_evidence reads 33 complete copied USB evidence directories: 30 from successful matrix, both historical PASS/FAIL envelopes and initial-setup control. FAIL remains FAIL; six preflight refusals have no fabricated verified run. | No scenarios replayed; no verify applied to an A-2-only package. |
+| Matching relevant byte chain | A-1 after manifest = A-2 original = A-3 source = commit/checkout for both recipes; shared helper/wrapper/policy/runner bound by SHA-256, driver sources tied to candidate. | No claim that all concurrent native source bytes match published commit. |
+| Original failure retained, justified recovery | Archived parent mode 0775 and initial fallback read; only driver diff explicitly creates owned parent 0700. All twelve corrected groups retain parent mode 0700. Shared runner/helper/wrapper/policy match across attempts. | Bench setup corrected; no general absence-of-effect or OS confinement guarantee. |
+
+33 verifications are proof readback, **not 33 new tests**. The 36 A-3 passages remain
+those of the preceding batch. No new run_recipe, compilation, provider, browser
+or service. USB archive hashes, all A-2 inventory members and 1022 A-3 files were
+reconciled; received streams/causes/events examined beyond result labels.
+
+A-4 review and links to original proof:
+`/media/fpizzi/Lexar/swarm-evidence/bf-l0-a-a4-20261108T205712Z/a4-review.tar.gz`.
+SHA-256: `030368c42322001ba6fef6c7fa7c4d6afbaa855ed1378ff689e119b8476ee428`.
+Copy read back after fsync; local scope/location/restore index:
+`.cache/bf-l0-a-a4-20261108-index.json`. A-1/A-2/A-3 originals, including first FAIL,
+remain unchanged; no substituted or lost history.
+
+**Still open:** global BF-L0 and full R03/R04 (resolved-setting projection, native
+invocation fallback, effective configuration/profile/tools), the other nineteen
+recipes and R01/02/R05–R13 obligations. Closure qualifies no complete native recipe,
+BF-L1/BF-L5/BF-P3, 03-F/03-B scenario or financial capability. A-2 does not become
+qualification of the current dirty checkout; changed relevant inputs require
+remapping and, when necessary, fresh authorized proof.
+
+Retained next work: define coherent native R01/02/07 batch and static R05/R09
+additions, then their qualifications/tools/images under recorded prerequisites.
+No further implementation decided here. Codex owns tracking; Fabrice retains
+remaining authority. Private-parent lesson stays in driver/history without shared
+policy changes.
+
+Documentary increment review: no operator choice, function/docstring or error path
+changes; only evidence-backed scope conclusion changes. FR/EN plans updated
+together, concurrent work preserved. No product delivery/version_history or
+embedded-context rebuild. Closure docs commit uses a separate index and existing
+BF-L0-A branch; primary main/index remain in place, with no PR or compilation CI.
