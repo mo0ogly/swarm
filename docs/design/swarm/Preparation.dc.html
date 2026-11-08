@@ -126,7 +126,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
             <li style="display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid {{t.border}}">
               <span style="{{b.mark}}"></span>
               <div style="min-width: 0">
-                <div style="font-weight: 600">{{b.label}} <span style="font-weight: 400; font-size: 12px; color: {{b.ink}}">· {{b.stateLabel}}</span></div>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span style="font-weight: 600">{{b.label}}</span><span style="{{b.badge}}">{{b.stateLabel}}</span></div>
                 <div style="font-size: 13px; color: {{t.muted}}">{{b.summary}}</div>
               </div>
             </li>
@@ -157,8 +157,8 @@ class Component extends DCLogic {
   }
   renderVals() {
     var themes = {
-      sombre: { bg: '#081b29', surface: '#102b3b', composer: '#0d2636', input: '#0b2232', userBg: '#0f3446', text: '#e5edf0', title: '#f6f3e9', link: '#93d4df', muted: '#a9bcc4', border: '#2a5163', primaryBg: '#f8c650', primaryInk: '#062b49', goldBg: '#2a2a1c', goldBorder: '#f8c650', okBg: '#16352a', okBorder: '#7fd8a4', ok: '#7fd8a4', warn: '#f8c650', todo: '#a9bcc4', chipBg: '#0b2232', disabledBg: '#25404f', disabledInk: '#a9bcc4' },
-      clair: { bg: '#f5f3ec', surface: '#fffefa', composer: '#f8f6ef', input: '#ffffff', userBg: '#e8f2f4', text: '#243d4a', title: '#062b49', link: '#205e70', muted: '#52656f', border: '#cfcabb', primaryBg: '#062b49', primaryInk: '#ffffff', goldBg: '#fbf3dc', goldBorder: '#926300', okBg: '#e6f4ea', okBorder: '#1e7a46', ok: '#1e7a46', warn: '#926300', todo: '#52656f', chipBg: '#fffefa', disabledBg: '#e4e1d6', disabledInk: '#52656f' }
+      sombre: { bg: '#081b29', surface: '#102b3b', composer: '#0d2636', input: '#0b2232', userBg: '#0f3446', text: '#e5edf0', title: '#f6f3e9', link: '#93d4df', muted: '#a9bcc4', border: '#2a5163', primaryBg: '#f8c650', primaryInk: '#062b49', goldBg: '#2a2a1c', goldBorder: '#f8c650', okBg: '#16352a', okBorder: '#7fd8a4', ok: '#7fd8a4', warn: '#f8c650', todo: '#a9bcc4', okTint: '#173d2b', warnTint: '#3a3216', todoTint: '#1d3442', chipBg: '#0b2232', disabledBg: '#25404f', disabledInk: '#a9bcc4' },
+      clair: { bg: '#f5f3ec', surface: '#fffefa', composer: '#f8f6ef', input: '#ffffff', userBg: '#e8f2f4', text: '#243d4a', title: '#062b49', link: '#205e70', muted: '#52656f', border: '#cfcabb', primaryBg: '#062b49', primaryInk: '#ffffff', goldBg: '#fbf3dc', goldBorder: '#926300', okBg: '#e6f4ea', okBorder: '#1e7a46', ok: '#1e7a46', warn: '#926300', todo: '#52656f', okTint: '#e3f3e8', warnTint: '#fbf3dc', todoTint: '#eceae3', chipBg: '#fffefa', disabledBg: '#e4e1d6', disabledInk: '#52656f' }
     };
     var t = themes[this.props.theme] || themes.sombre;
     var self = this;
@@ -200,7 +200,10 @@ class Component extends DCLogic {
       { label: 'Pièces jointes', state: 'ok', summary: '[n] fichiers' }
     ];
     var sections = secDefs.map(function (s) {
-      return { label: s.label, summary: s.summary, stateLabel: stLabel[s.state], ink: s.state === 'ok' ? t.ok : (s.state === 'partial' ? t.warn : t.todo), mark: markFor(s.state) };
+      var ink = s.state === 'ok' ? t.ok : (s.state === 'partial' ? t.warn : t.todo);
+      var tint = s.state === 'ok' ? t.okTint : (s.state === 'partial' ? t.warnTint : t.todoTint);
+      return { label: s.label, summary: s.summary, stateLabel: stLabel[s.state], ink: ink, mark: markFor(s.state),
+        badge: 'display: inline-flex; align-items: center; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; line-height: 1.7; white-space: nowrap; background: ' + tint + '; color: ' + ink + '; border: 1px solid ' + ink };
     });
     var readyCount = secDefs.filter(function (s) { return s.state === 'ok'; }).length;
     var missing = secDefs.filter(function (s) { return s.state !== 'ok'; }).map(function (s) { return s.label; });

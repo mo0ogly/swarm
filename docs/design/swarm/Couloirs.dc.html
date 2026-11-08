@@ -51,7 +51,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{o
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px">
         <sc-for list="{{queue}}" as="q" hint-placeholder-count="3">
           <article style="{{q.style}}">
-            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: {{q.ink}}"><span style="{{q.mark}}"></span>{{q.kind}}</div>
+            <div style="display: flex"><span style="{{q.badge}}"><span style="{{q.mark}}"></span>{{q.kind}}</span></div>
             <div style="font-weight: 600; color: {{t.title}}">{{q.title}}</div>
             <div style="font-size: 14px; color: {{t.muted}}">{{q.text}}</div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto">
@@ -73,7 +73,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{o
         </div>
         </div>
         <div style="display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: {{t.muted}}">
-          <sc-for list="{{legend}}" as="l" hint-placeholder-count="5"><span style="display: flex; align-items: center; gap: 6px"><span style="{{l.mark}}"></span>{{l.label}}</span></sc-for>
+          <sc-for list="{{legend}}" as="l" hint-placeholder-count="5"><span style="{{l.badge}}"><span style="{{l.mark}}"></span>{{l.label}}</span></sc-for>
         </div>
       </div>
       <div style="overflow-x: auto; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}">
@@ -91,7 +91,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{o
               <div style="padding: 10px; border-top: 1px solid {{t.border}}; border-left: 1px solid {{t.border}}; display: flex; flex-direction: column; gap: 8px; min-height: 76px; background: {{c.bg}}">
                 <sc-for list="{{c.items}}" as="b" hint-placeholder-count="1">
                   <button type="button" onClick="{{b.pick}}" aria-pressed="{{b.pressed}}" style="{{b.style}}">
-                    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: {{b.ink}}"><span style="{{b.mark}}"></span>{{b.stateLabel}}<span style="margin-left: auto; font-family: ui-monospace, monospace; font-weight: 400; color: {{t.muted}}">{{b.id}}</span></span>
+                    <span style="display: flex; align-items: center; gap: 6px"><span style="{{b.badge}}"><span style="{{b.mark}}"></span>{{b.stateLabel}}</span><span style="margin-left: auto; font-family: ui-monospace, monospace; font-size: 12px; color: {{t.muted}}">{{b.id}}</span></span>
                     <span style="font-weight: 600; color: {{t.title}}; text-align: left; line-height: 1.3">{{b.title}}</span>
                     <span style="display: block; height: 4px; border-radius: 2px; background: {{t.track}}"><span style="display: block; height: 4px; border-radius: 2px; background: {{b.ink}}; width: {{b.progress}}"></span></span>
                   </button>
@@ -107,7 +107,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{o
       <div style="flex: 2 1 320px; min-width: 0">
         <div style="font-family: ui-monospace, monospace; font-size: 12px; color: {{t.muted}}">{{sel.id}} · {{sel.lane}} · {{sel.phase}}</div>
         <h2 style="margin: 2px 0 6px; font-family: Georgia, serif; font-size: 24px; font-weight: 400; color: {{t.title}}">{{sel.title}}</h2>
-        <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: {{sel.ink}}"><span style="{{sel.mark}}"></span>{{sel.stateLabel}}</div>
+        <div><span style="{{sel.badge}}"><span style="{{sel.mark}}"></span>{{sel.stateLabel}}</span></div>
         <p style="margin: 10px 0 0">{{sel.note}}</p>
       </div>
       <dl style="flex: 1 1 220px; margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 14px">
@@ -134,9 +134,9 @@ class Component extends DCLogic {
   renderVals() {
     var themes = {
       sombre: { bg: '#081b29', surface: '#102b3b', text: '#e5edf0', title: '#f6f3e9', link: '#93d4df', muted: '#a9bcc4', border: '#2a5163', track: '#24485c', primaryBg: '#f8c650', primaryInk: '#062b49', gold: '#f8c650', cellOn: '#0d2636', blockBg: '#0b2232',
-        st: { done: '#7fd8a4', running: '#93d4df', review: '#f8c650', blocked: '#ff8a80', todo: '#a9bcc4' } },
+        st: { done: '#7fd8a4', running: '#93d4df', review: '#f8c650', blocked: '#ff8a80', todo: '#a9bcc4' }, tint: { done: '#173d2b', running: '#12384a', review: '#3a3216', blocked: '#45232a', todo: '#1d3442' } },
       clair: { bg: '#f5f3ec', surface: '#fffefa', text: '#243d4a', title: '#062b49', link: '#205e70', muted: '#52656f', border: '#cfcabb', track: '#e4e1d6', primaryBg: '#062b49', primaryInk: '#ffffff', gold: '#926300', cellOn: '#f8f6ef', blockBg: '#ffffff',
-        st: { done: '#1e7a46', running: '#205e70', review: '#926300', blocked: '#b3261e', todo: '#52656f' } }
+        st: { done: '#1e7a46', running: '#205e70', review: '#926300', blocked: '#b3261e', todo: '#52656f' }, tint: { done: '#e3f3e8', running: '#e2eff3', review: '#fbf3dc', blocked: '#fbe3e1', todo: '#eceae3' } }
     };
     var t = themes[this.props.theme] || themes.sombre;
     var self = this;
@@ -148,6 +148,9 @@ class Component extends DCLogic {
       if (s === 'review') return b + 'background: ' + c + '; border-radius: 2px';
       if (s === 'running') return b + 'border-radius: 50%; border: 2px solid ' + c + '; background: linear-gradient(90deg, ' + c + ' 50%, transparent 50%)';
       return b + 'border-radius: 50%; background: ' + c;
+    };
+    var badge = function (s) {
+      return 'display: inline-flex; align-items: center; gap: 6px; padding: 1px 10px 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; line-height: 1.6; white-space: nowrap; background: ' + t.tint[s] + '; color: ' + t.st[s] + '; border: 1px solid ' + t.st[s];
     };
     var phases = [{ id: 'cadrage', num: '1', label: 'Cadrage' }, { id: 'real', num: '2', label: 'Réalisation' }, { id: 'revue', num: '3', label: 'Revue' }, { id: 'valid', num: '4', label: 'Validation' }];
     var laneDefs = [{ id: 'planner', label: 'Planificateur', agents: '1 agent' }, { id: 'worker', label: 'Workers', agents: '[n] agents' }, { id: 'reviewer', label: 'Relecteurs', agents: '1 agent' }, { id: 'super', label: 'Superviseur', agents: 'vous' }];
@@ -170,7 +173,7 @@ class Component extends DCLogic {
           var items = tasks.filter(function (x) { return x.lane === l.id && x.phase === p.id; }).map(function (x) {
             var on = x.id === selId, c = t.st[x.state];
             return {
-              id: x.id, title: x.title, stateLabel: labels[x.state], ink: c, mark: mark(x.state), progress: x.p + '%', pressed: on ? 'true' : 'false',
+              id: x.id, title: x.title, stateLabel: labels[x.state], ink: c, mark: mark(x.state), badge: badge(x.state), progress: x.p + '%', pressed: on ? 'true' : 'false',
               style: 'display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 6px; background: ' + t.blockBg + '; color: ' + t.text + '; border: ' + (x.state === 'todo' ? '1px dashed ' : '1px solid ') + (on ? t.primaryBg : t.border) + '; box-shadow: ' + (on ? '0 0 0 2px ' + t.primaryBg : 'none'),
               pick: function () { self.setState({ selected: x.id }); }
             };
@@ -186,7 +189,7 @@ class Component extends DCLogic {
     var queue = qDefs.map(function (q) {
       var c = t.st[q.state];
       return {
-        kind: q.kind, title: q.title, text: q.text, action: q.action, ink: c, mark: mark(q.state),
+        kind: q.kind, title: q.title, text: q.text, action: q.action, ink: c, mark: mark(q.state), badge: badge(q.state),
         style: 'display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 8px; background: ' + t.surface + '; border: 1px solid ' + c,
         open: function () { self.setState({ selected: q.id }); }
       };
@@ -196,8 +199,8 @@ class Component extends DCLogic {
     var phaseLabel = phases.filter(function (p) { return p.id === s.phase; })[0].label;
     return {
       t: t, phases: phases, lanes: lanes, queue: queue, queueCount: queue.length,
-      legend: ['done', 'running', 'review', 'blocked', 'todo'].map(function (k) { return { label: labels[k], mark: mark(k) }; }),
-      sel: { id: s.id, title: s.title, lane: laneLabel, phase: phaseLabel, stateLabel: labels[s.state], ink: t.st[s.state], mark: mark(s.state), deps: s.deps, note: s.note }
+      legend: ['done', 'running', 'review', 'blocked', 'todo'].map(function (k) { return { label: labels[k], mark: mark(k), badge: badge(k) }; }),
+      sel: { id: s.id, title: s.title, lane: laneLabel, phase: phaseLabel, stateLabel: labels[s.state], ink: t.st[s.state], mark: mark(s.state), badge: badge(s.state), deps: s.deps, note: s.note }
     };
   }
 }
