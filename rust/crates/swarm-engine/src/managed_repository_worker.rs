@@ -31,9 +31,15 @@ struct Proof {
     workspace_identity: (u64, u64),
     git_identity: (u64, u64),
 }
-/// Open the original retained storage and nonblocking managed lane. Preserve
-/// operation and lock/directory-close failures; create no Root or lock fallback.
-fn with_storage<T>(
+/// Open the original retained storage and nonblocking managed lane. The stored
+/// root alias must bind to both held canonical state/Work directories through
+/// the shared descriptor check; original manifests and worker checks still apply.
+/// Inputs are the caller's observed Work/Root, an explicit shared/exclusive lane
+/// choice and its callback. That choice is a locking mode, never a permission.
+/// The callback runs with the canonical directory retained. Caller owns business
+/// authorization and settings; no manifest/worker proof is inferred by this guard.
+/// Preserve operation and lock/directory-close failures; create no Root or fallback.
+pub(crate) fn with_storage<T>(
     root: &Path,
     work: &Work,
     exclusive: bool,

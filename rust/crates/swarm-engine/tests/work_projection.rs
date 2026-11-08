@@ -427,3 +427,52 @@ fn stored_human_control_freshness_rechecks_saved_policy_and_real_artifacts() {
     );
     s.close().unwrap();
 }
+
+/// A valid managed data projection precedes an unrelated unknown fragment
+/// review. That review must stay explicitly unqualified, without suppressing
+/// other tasks or manufacturing current controls. Restoring the ordinary record
+/// resumes. Private fixture SQL only; no provider or mission process is started.
+#[test]
+fn unknown_legacy_protocol_is_task_local_without_fabricating_qualification() {
+    use swarm_engine::{IndependentReview, ManagedFragmentJournalAnchor, ManagedRepository, PlanningState};
+    let f=Fixture::new();
+    println!("GO_QUALIFICATION_FIXTURE {}",f.0.display());
+    let mut w=started(&f);
+    w.planning=Some(Box::new(PlanningState{repository:Some(Box::new(ManagedRepository::default())),..Default::default()}));
+    publish(&f,&mut w,b"{}","baseline-managed");
+    let read=|w:&Work| {let s=RootStore::open(&f.0,false).unwrap();let result=s.inspect_work_validation(&w.id,WorkViewLanguage::French);s.close().unwrap();result};
+    let control=read(&w).unwrap();
+    assert_eq!(control.validation.validated,0);
+    let before=swarm_engine::encode_model(&w).unwrap();
+    w.tasks.as_mut().unwrap()[0].independent_review=Some(Box::new(IndependentReview{state:"unknown".into(),fragment_journal:Some(Box::new(ManagedFragmentJournalAnchor::default())),..Default::default()}));
+    publish(&f,&mut w,b"{}","unknown-fragment");
+    let observed=read(&w).unwrap();
+    let task=&observed.validation.tasks["task"];
+    assert!(!task.fresh);
+    assert_eq!(task.evidence.report_review.state,"unknown");
+    assert_eq!(task.evidence.controls.state,"unknown");
+    assert!(task.evidence.report_review.limits.iter().any(|s|s.contains("managed-review-fragment-protocol-not-ported")));
+    let raw=swarm_engine::encode_model(&w).unwrap();
+    let unchanged=RootStore::open(&f.0,false).unwrap();
+    assert_eq!(raw,swarm_engine::encode_model(&unchanged.read_work(&w.id).unwrap()).unwrap());
+    unchanged.close().unwrap();
+    // A non-favorable batch opinion has the same task-local contract, while
+    // keeping its distinct diagnostic. No unsupported protocol becomes PASS.
+    let review=w.tasks.as_mut().unwrap()[0].independent_review.as_mut().unwrap();
+    review.fragment_journal=None;
+    review.batches=Some(vec![Default::default()]);
+    review.state="changes_requested".into();
+    publish(&f,&mut w,b"{}","negative-batch");
+    let observed=read(&w).unwrap();
+    let task=&observed.validation.tasks["task"];
+    assert!(!task.fresh);
+    assert_eq!(task.evidence.report_review.state,"changes_requested");
+    assert_eq!(task.evidence.controls.state,"unknown");
+    assert!(task.evidence.report_review.limits.iter().any(|s|s.contains("managed-review-batch-protocol-not-ported")));
+    let revision=w.revision;
+    w=swarm_engine::decode_work(&before).unwrap();
+    w.revision=revision; // Restoration appends after retained fault history.
+    publish(&f,&mut w,b"{}","restored-managed");
+    assert_eq!(read(&w).unwrap().validation.validated,0);
+    std::mem::forget(f);
+}

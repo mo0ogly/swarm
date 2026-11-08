@@ -177,6 +177,21 @@ struct EvidenceContext<'a> {
     limits: &'a WorkViewLimits,
     settings: &'a crate::EngineSettingsDocument,
 }
+/// Identify an unsupported managed protocol only for a non-favorable recorded
+/// opinion. Such an opinion cannot establish current review freshness; its
+/// protocol remains explicitly unqualified and no receipt fallback is consumed.
+/// This pure discriminator grants nothing and never changes the strict readers
+/// used for favorable reviews, acceptance, retry or execution.
+fn non_favorable_managed_protocol(work: &Work, task: &Task) -> Option<&'static str> {
+    work.planning.as_deref()?.repository.as_deref()?;
+    let review = task.independent_review.as_deref()?;
+    if review.state == "passed" { return None; }
+    if review.fragment_journal.is_some() {
+        Some("managed-review-fragment-protocol-not-ported")
+    } else if review.batches.as_ref().is_some_and(|v| !v.is_empty()) {
+        Some("managed-review-batch-protocol-not-ported")
+    } else { None }
+}
 /// Build the task evidence DTO from this read's private context and derived
 /// freshness. Receipt/gate claims remain distinct from executed/current facts.
 /// Malformed or unavailable SQL history refuses with cause; a human-control
@@ -240,7 +255,12 @@ fn evidence(
     }
     // A receipt fallback is display data only: do not inject it into Work or the
     // independent-review freshness guard, which requires the original automatic record.
-    let receipt = if task.automatic_validation.is_none()
+    let unqualified_protocol = non_favorable_managed_protocol(work, task);
+    if let Some(code) = unqualified_protocol {
+        e.report_review.limits.push(code.into());
+        e.limits.push(code.into());
+    }
+    let receipt = if unqualified_protocol.is_none() && task.automatic_validation.is_none()
         && work
             .planning
             .as_deref()
@@ -459,7 +479,9 @@ fn dependency_freshness<'a>(
 /// Derive manual, ordinary and simple managed read data from files/settings/history.
 /// Hierarchical freshness requires the original current review, including waivers;
 /// a receipt fallback supplies display controls only and never repairs that guard.
-/// Managed batches/fragments refuse in every task state; managed Git is Linux-only.
+/// Favorable managed batches/fragments still refuse in every task state.
+/// Non-favorable opinions remain explicitly unqualified per task, without reading
+/// their unsupported receipt protocol or suppressing other tasks. Managed Git is Linux-only.
 /// The fallback requires explicit receipt policy and complete digest-bound bytes.
 /// No identity, authority or acceptance follows from this read. SQL/codec
 /// history failure refuses the whole observation; stale gate/control facts stay
@@ -485,6 +507,7 @@ pub fn project_work_validation(
             .iter()
             .flatten()
             .filter_map(|t| t.independent_review.as_deref())
+            .filter(|review| review.state == "passed")
         {
             if review.fragment_journal.is_some() {
                 return Err(E::Refused("managed-review-fragment-protocol-not-ported"));

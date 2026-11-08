@@ -17,6 +17,7 @@ mod source;
 mod controls;
 pub(crate) use controls::{ControlPlan as ManagedControlPlan, plan as managed_control_plan};
 pub(crate) use worker::{candidate_worker, clean_lane_contention, prepare_worker, prepare_candidate, verify_candidate, pin_candidate, CandidateWitness, ManagedCandidate, retain_result, verify_result, verify_worker, WorkerCheck};
+pub(crate) use worker::with_storage as with_bound_storage;
 use sha2::{Digest, Sha256};
 use std::os::unix::fs::PermissionsExt;
 use std::{

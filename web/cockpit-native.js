@@ -65,7 +65,7 @@
   }else if(readMode!=='history')error='web-native-status-not-observed';
   if(ticket!==generation)return;
   try{const observation=await read('/api/v1/cockpit-read?'+new URLSearchParams({work:id}));if(ticket!==generation)return;if(observation?.work_id!==id)throw failure('web-native-observation-invalid');SwarmRustCockpitPanels.render(observation);panelsObserved=true}catch(cause){if(ticket!==generation)return;error=cause.code||'web-native-observation-invalid';SwarmRustCockpitPanels.clear(tr('Lecture impossible. Actualisez pour reprendre.')+' ('+error+')')}
-  current={work,mission,missionError:error,control,panelsObserved,statusObserved,readMode};SwarmNativeInstructions.render(instructions,work,rejectInstruction,true);SwarmRustCockpitRead.render(current);$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr(error?'Lecture partielle — actualisez pour reprendre.':readMode==='history'?'Historique reçu — qualification actuelle non évaluée.':'Lecture reçue — actualisation manuelle.');
+  current={work,mission,missionError:error,control,panelsObserved,statusObserved,readMode};SwarmNativeInstructions.render(instructions,work,rejectInstruction,true);SwarmRustCockpitRead.render(current);$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr(error?'Lecture partielle — actualisez pour reprendre.':readMode==='history'?'Historique reçu — statut opérationnel non évalué.':'Lecture reçue — actualisation manuelle.');
  }
  /** Reject only the explicitly selected, observed instruction revision. CSRF
   * is freshly read; the server owns authorization/CAS/active-task checks. Lost

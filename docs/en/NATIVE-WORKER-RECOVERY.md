@@ -362,3 +362,33 @@ unknown. Current qualification still uses the strict reader and exposes refusals
 history never substitutes for it. Work/control/panel read failures remain blocking.
 Logs retain their separate public path. This neither qualifies historical Go
 evidence nor restarts agents or migrates data.
+
+## Current qualification and historical Go opinions
+
+Use `work show` or the calculated resume in Resume and OODA
+(`/api/v1/work-resume?work=ID&lang=en`). These readers inspect current evidence
+through `inspect_work_view` and its validation projection. They remain separate
+from recorded summaries and the global operational mission status. Favorable
+simple Go reviews retain context, contract, candidate, file and Git-report guards.
+An unknown/unfavorable opinion using an unported batch/fragment protocol remains
+explicitly unqualified on its task; its receipt fallback is not consumed and it
+does not suppress neighboring simple reviews. A favorable opinion using an
+unported protocol still refuses. Unknown never becomes PASS, missing evidence
+is never repaired, and reading starts no agent. IO failures on consumed evidence
+still refuse; restoring originals allows inspection again without rewriting history.
+See [Go qualification tracking](../reports/historical-go-qualification-20261108.md).
+
+The recorded-read banner says “operational status not evaluated”: it does not
+contradict evidence qualification separately requested in the calculated Resume
+and OODA summary. Global status and evidence qualification are different
+observations; neither grants execution authority.
+
+The Git review reader also uses the shared binding guard for historical absolute
+Go locators through a root alias. Standard .swarm/managed/Work shape, matching
+private State/Work identities and the existing shared lane are required; owned
+descriptors stay open during Git inspection of the canonical contained path.
+No file or stored locator is rewritten. Another state, missing alias, contention
+or Git failure refuses; restoring originals permits the next read. Independent
+review and close causes survive together through Root Cleanup. Observations
+protocol_verified/authority_verified stay false: this is data consistency, not
+acceptance authority or same-UID confinement.

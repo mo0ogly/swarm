@@ -384,3 +384,35 @@ toujours le lecteur strict et expose ses refus ; elle n’est pas remplacée par
 l’historique. Les erreurs de lecture Work/contrôles/panneaux restent bloquantes.
 Les journaux gardent leur parcours public séparé. Ce n’est pas une qualification
 actuelle des anciennes preuves Go ni une relance ou migration de données.
+
+## Qualification courante et anciens avis Go
+
+La qualification se consulte avec `work show` ou le résumé calculé de Reprise et
+OODA (`/api/v1/work-resume?work=ID&lang=fr`). Ces parcours lisent les preuves
+actuelles via `inspect_work_view` et sa projection de validation ; ils restent
+distincts du résumé enregistré et du statut opérationnel global de mission.
+Une revue Go simple favorable conserve les gardes de contexte, contrat, candidat,
+fichiers et rapport Git. Une revue unknown/défavorable en protocole batch/fragment
+non porté est explicitement non qualifiée sur sa tâche ; son reçu de remplacement
+n’est pas consommé et elle ne bloque pas les revues simples voisines. Un avis
+favorable utilisant un protocole non porté refuse toujours. Aucun résultat
+unknown ne devient PASS, aucune preuve manquante n’est réparée et aucun agent
+n’est lancé par la lecture. Les erreurs IO des preuves consommées restent des
+refus ; restaurer les originaux permet de les réexaminer, sans réécrire l’histoire.
+Voir [le suivi de qualification Go](../reports/historical-go-qualification-20261108.md).
+
+Le bandeau de consultation historique indique « statut opérationnel non évalué » :
+il ne contredit pas la qualification des preuves demandée séparément dans le
+résumé calculé de Reprise et OODA. Le statut global et cette qualification sont
+deux observations différentes ; aucune n’accorde de droit d’exécution.
+
+Le lecteur de revue Git applique également la garde commune aux anciens chemins
+Go absolus passant par un alias racine. La forme standard .swarm/managed/Work,
+l’identité des états privés et des dossiers Work et le verrou partagé existant
+sont exigés ; les descripteurs restent ouverts pendant le calcul Git sur le
+chemin canonique contenu. Aucun fichier ni chemin enregistré n’est réécrit.
+Un autre état, un alias absent, une contention ou une erreur Git refuse ; la
+restauration des originaux permet la lecture suivante. Les causes de revue et
+de fermeture indépendantes sont conservées ensemble via Root Cleanup. Les
+observations protocol_verified/authority_verified restent fausses : il s’agit de
+concordance de données, pas d’un droit d’acceptation ni de confinement same-UID.

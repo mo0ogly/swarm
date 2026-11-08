@@ -978,3 +978,76 @@ fn root_managed_projection_tracks_current_review_and_preserves_io_refusal() {
     );
     store.close().unwrap();
 }
+
+/// Real simple Go-shaped candidate/receipt/context/Git evidence is the valid
+/// control (a waiver fixture, never acceptance authority). An unrelated unknown
+/// fragment review must not suppress it. Report tampering remains noncurrent;
+/// a missing original refuses, and exact restoration resumes without read writes.
+#[cfg(target_os = "linux")]
+#[test]
+fn legacy_simple_go_qualification_survives_unknown_review_and_retains_refusals() {
+    use swarm_engine::{ManagedFragmentJournalAnchor, Task, WorkViewLanguage};
+    let f=Fixture::new();println!("GO_QUALIFICATION_FIXTURE {}",f.0.display());
+    let mut w=managed_waiver(&f);seed(&f,&w);
+    let inspect=|| {let s=RootStore::open(&f.0,false).unwrap();let before=fs::read(f.0.join(".swarm/state.db")).unwrap();let result=s.inspect_work_validation(&w.id,WorkViewLanguage::French);assert_eq!(before,fs::read(f.0.join(".swarm/state.db")).unwrap());s.close().unwrap();result};
+    assert!(inspect().unwrap().validation.tasks["task"].fresh);
+    w.tasks.as_mut().unwrap().push(Task{id:"unknown-task".into(),title:"Unknown review".into(),status:"blocked".into(),independent_review:Some(Box::new(IndependentReview{state:"unknown".into(),fragment_journal:Some(Box::new(ManagedFragmentJournalAnchor::default())),..Default::default()})),..Default::default()});seed(&f,&w);
+    let result=inspect().unwrap();assert!(result.validation.tasks["task"].fresh);assert!(!result.validation.tasks["unknown-task"].fresh);assert_eq!(result.validation.tasks["unknown-task"].evidence.report_review.state,"unknown");
+    let report=fs::read(f.0.join("report.md")).unwrap();fs::write(f.0.join("report.md"),b"V2 changed evidence").unwrap();assert!(!inspect().unwrap().validation.tasks["task"].fresh);fs::write(f.0.join("report.md"),&report).unwrap();assert!(inspect().unwrap().validation.tasks["task"].fresh);
+    let receipt=fs::read(f.0.join("managed.receipt")).unwrap();fs::remove_file(f.0.join("managed.receipt")).unwrap();assert!(inspect().is_err());fs::write(f.0.join("managed.receipt"),&receipt).unwrap();assert!(inspect().unwrap().validation.tasks["task"].fresh);
+    std::mem::forget(f);
+}
+
+/// The same Go-shaped simple review and immutable Git objects must remain
+/// inspectable through a historical alias of their private standard storage.
+/// Canonical control precedes the alias; no live Root or process is used.
+#[cfg(target_os = "linux")]
+#[test]
+fn legacy_go_review_same_storage_alias_is_current_without_rebinding_history() {
+    use std::os::unix::fs::{symlink,PermissionsExt};
+    let f=Fixture::new();println!("GO_QUALIFICATION_FIXTURE {}",f.0.display());
+    let mut w=managed_waiver(&f);
+    let parent=f.0.join(".swarm/managed");fs::create_dir(&parent).unwrap();fs::set_permissions(&parent,fs::Permissions::from_mode(0o700)).unwrap();
+    let storage=parent.join(&w.id);fs::create_dir(&storage).unwrap();fs::set_permissions(&storage,fs::Permissions::from_mode(0o700)).unwrap();
+    fs::rename(f.0.join("repository.git"),storage.join("repository.git")).unwrap();
+    fs::write(storage.join("operation.lock"),b"").unwrap();fs::set_permissions(storage.join("operation.lock"),fs::Permissions::from_mode(0o600)).unwrap();
+    w.planning.as_mut().unwrap().repository.as_mut().unwrap().storage=storage.to_str().unwrap().into();seed(&f,&w);
+    let inspect=|| {let s=RootStore::open(&f.0,false).unwrap();let result=s.inspect_work_validation(&w.id,swarm_engine::WorkViewLanguage::French);s.close().unwrap();result};
+    assert!(inspect().unwrap().validation.tasks["task"].fresh);
+    let alias=f.0.with_extension("root-alias");symlink(&f.0,&alias).unwrap();
+    println!("GO_QUALIFICATION_ALIAS {}",alias.display());
+    w.planning.as_mut().unwrap().repository.as_mut().unwrap().storage=alias.join(".swarm/managed").join(&w.id).to_str().unwrap().into();seed(&f,&w);
+    let body=fs::read(f.0.join(".swarm/state.db")).unwrap();
+    assert!(inspect().unwrap().validation.tasks["task"].fresh);
+    assert_eq!(body,fs::read(f.0.join(".swarm/state.db")).unwrap());
+    assert!(!storage.join(".engine-settings.lock").exists());
+    // A failure inside Git inspection must survive successful lane/FD cleanup.
+    fs::rename(storage.join("repository.git"),storage.join("repository.retained")).unwrap();
+    assert!(inspect().is_err());
+    fs::rename(storage.join("repository.retained"),storage.join("repository.git")).unwrap();
+    assert!(inspect().unwrap().validation.tasks["task"].fresh);
+    // Another valid private datastore, same managed name and Git objects,
+    // must not acquire authority through the historical locator.
+    let other=Fixture::new();println!("GO_QUALIFICATION_FIXTURE {}",other.0.display());
+    RootStore::initialize(&other.0,&mut SystemEnvironment).unwrap().close().unwrap();
+    let other_parent=other.0.join(".swarm/managed");fs::create_dir(&other_parent).unwrap();fs::set_permissions(&other_parent,fs::Permissions::from_mode(0o700)).unwrap();
+    let other_storage=other_parent.join(&w.id);fs::create_dir(&other_storage).unwrap();fs::set_permissions(&other_storage,fs::Permissions::from_mode(0o700)).unwrap();
+    let clone=std::process::Command::new("git")
+        .env("GIT_CONFIG_NOSYSTEM","1").env("GIT_CONFIG_GLOBAL","/dev/null")
+        .env("GIT_CONFIG_COUNT","0").env_remove("GIT_CONFIG_PARAMETERS")
+        .args(["clone","--bare","--",storage.join("repository.git").to_str().unwrap(),other_storage.join("repository.git").to_str().unwrap()]).output().unwrap();
+    assert!(clone.status.success(),"owned bare fixture copy refused");
+    assert_eq!(managed_fixture_git(&other,&["--git-dir",other_storage.join("repository.git").to_str().unwrap(),"rev-parse","--verify",&w.planning.as_ref().unwrap().repository.as_ref().unwrap().candidate_commit],b""),w.planning.as_ref().unwrap().repository.as_ref().unwrap().candidate_commit);
+    fs::write(other_storage.join("operation.lock"),b"").unwrap();fs::set_permissions(other_storage.join("operation.lock"),fs::Permissions::from_mode(0o600)).unwrap();
+    fs::remove_file(&alias).unwrap();symlink(&other.0,&alias).unwrap();
+    let error=inspect().err().unwrap();assert!(error.to_string().contains("managed-storage-binding-mismatch"),"{error}");
+    fs::remove_file(&alias).unwrap();symlink(&f.0,&alias).unwrap();assert!(inspect().unwrap().validation.tasks["task"].fresh);
+    fs::remove_file(&alias).unwrap();assert!(inspect().is_err());symlink(&f.0,&alias).unwrap();assert!(inspect().unwrap().validation.tasks["task"].fresh);
+    let lock=fs::OpenOptions::new().read(true).write(true).open(storage.join("operation.lock")).unwrap();
+    rustix::fs::flock(&lock,rustix::fs::FlockOperation::NonBlockingLockExclusive).unwrap();assert!(inspect().is_err());
+    rustix::fs::flock(&lock,rustix::fs::FlockOperation::Unlock).unwrap();drop(lock);assert!(inspect().unwrap().validation.tasks["task"].fresh);
+    assert_eq!(body,fs::read(f.0.join(".swarm/state.db")).unwrap());
+    assert!(!storage.join(".engine-settings.lock").exists());
+    std::mem::forget(other);
+    std::mem::forget(f);
+}

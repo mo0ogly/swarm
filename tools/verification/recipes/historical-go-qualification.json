@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "historical-go-qualification",
+  "inputs": [
+    "rust/crates/swarm-engine/src/**/*.rs",
+    "rust/crates/swarm-engine/config/*.json",
+    "rust/crates/swarm-engine/tests/root_review_evidence.rs",
+    "rust/crates/swarm-engine/tests/work_projection.rs",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "docs/architecture/NATIVE-WORKER-RECOVERY.md",
+    "docs/en/NATIVE-WORKER-RECOVERY.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "default-sdk-qualification-refusal-and-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,hashlib\nfrom pathlib import Path\nfor var,args in [('SWARM_GQ_REVIEW_SDK',['managed','--nocapture']),('SWARM_GQ_REVIEW_SDK',['--exact','legacy_simple_go_qualification_survives_unknown_review_and_retains_refusals','--nocapture']),('SWARM_GQ_REVIEW_SDK',['--exact','legacy_go_review_same_storage_alias_is_current_without_rebinding_history','--nocapture']),('SWARM_GQ_PROJECTION_SDK',['--exact','unknown_legacy_protocol_is_task_local_without_fabricating_qualification','--nocapture'])]:\n p=Path(os.environ[var]).resolve()\n print('SDK_SHA256 '+hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)\n subprocess.run([str(p),*args],check=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "SDK_SHA256",
+        "test root_current_managed_review_refuses_stale_bindings_and_recovers_without_mutation ... ok",
+        "test root_managed_projection_refuses_batch_fragment_in_every_state_and_recovers ... ok",
+        "test legacy_simple_go_qualification_survives_unknown_review_and_retains_refusals ... ok",
+        "test unknown_legacy_protocol_is_task_local_without_fabricating_qualification ... ok",
+        "7 passed; 0 failed",
+        "1 passed; 0 failed",
+        "test legacy_go_review_same_storage_alias_is_current_without_rebinding_history ... ok"
+      ],
+      "required_stderr": []
+    }
+  ]
+}
