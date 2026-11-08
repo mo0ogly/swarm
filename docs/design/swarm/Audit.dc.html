@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Swarm — Audit et preuves</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#93d4df}a:hover{color:#f6f3e9}
+input,select,textarea{font:inherit;font-size:16px}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible{outline:3px solid #f8c650;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.6; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav aria-label="Navigation principale" style="flex: 1 1 240px; max-width: 280px; min-width: 220px; background: #062b49; color: #e5edf0; padding: 22px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <img src="/_blob/2bff2b20ec3b0483720f4946060f97be" alt="" style="width: 44px; height: 44px; object-fit: contain">
+      <span style="font-family: Georgia, serif; font-size: 22px; color: #f6f3e9">Swarm</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <details style="padding: 4px 0"><summary style="min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">01</span> Missions</summary></details>
+      <details style="padding: 4px 0"><summary style="min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">02</span> Préparation</summary></details>
+      <details style="padding: 4px 0"><summary style="min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">03</span> Conduite</summary></details>
+      <details open style="padding: 4px 0"><summary style="min-height: 32px; color: #f8c650"><span style="font-family: ui-monospace, monospace">04</span> Suivi</summary>
+        <div style="display: flex; flex-direction: column; padding: 4px 0 0 26px">
+          <a href="#" style="color: #e5edf0; text-decoration: none; padding: 8px 10px">Journaux</a>
+          <a href="#" style="color: #e5edf0; text-decoration: none; padding: 8px 10px">Budgets et coûts IA</a>
+          <a href="#" aria-current="page" style="color: #f8c650; text-decoration: none; padding: 8px 10px; border-radius: 5px; background: #0f3d61; font-weight: 600">Audit et preuves</a>
+          <a href="#" style="color: #e5edf0; text-decoration: none; padding: 8px 10px">Reprise et OODA</a>
+        </div>
+      </details>
+      <details style="padding: 4px 0"><summary style="min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">05</span> Configuration</summary>
+        <div style="display: flex; flex-direction: column; padding: 4px 0 0 26px">
+          <a href="Securite.dc.html" style="color: #e5edf0; text-decoration: none; padding: 8px 10px">Sécurité</a>
+        </div>
+      </details>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px clamp(16px, 3vw, 40px); box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+    <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+      <div style="min-width: 0; max-width: 760px">
+        <div style="font-family: ui-monospace, monospace; font-size: 13px; color: {{t.link}}">04 · Suivi</div>
+        <h1 style="margin: 0; font-family: Georgia, serif; font-size: 36px; font-weight: 400; color: {{t.title}}; line-height: 1.15">Audit et preuves</h1>
+        <p style="margin: 6px 0 0; color: {{t.muted}}">Retracer une action de confiance, vérifier ses preuves, exporter pour un tiers. Lecture seule.</p>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <button type="button" style="min-height: 44px; padding: 0 14px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Exporter les preuves</button>
+        <button type="button" style="min-height: 44px; padding: 0 14px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Lire l’ancre HMAC</button>
+      </div>
+    </header>
+
+    <section aria-label="Couverture et fraîcheur" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px">
+      <sc-for list="{{cards}}" as="c" hint-placeholder-count="4">
+        <a href="#" style="display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 8px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}; text-decoration: none">
+          <span style="font-size: 13px; color: {{t.muted}}">{{c.label}}</span>
+          <span style="{{c.badge}}">{{c.value}}</span>
+          <span style="font-size: 13px">{{c.hint}}</span>
+        </a>
+      </sc-for>
+    </section>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+      <section aria-labelledby="tx-title" style="flex: 1 1 260px; min-width: 0; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 id="tx-title" style="margin: 0; font-family: Georgia, serif; font-size: 20px; font-weight: 400; color: {{t.title}}">Transactions</h2>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: {{t.muted}}">Filtrer<input placeholder="Mandat, sujet, ressource…" style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}"></label>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{txs}}" as="x" hint-placeholder-count="4">
+            <button type="button" onClick="{{x.pick}}" aria-pressed="{{x.pressed}}" style="{{x.style}}">
+              <span style="display: flex; justify-content: space-between; gap: 8px; align-items: center"><span style="font-family: ui-monospace, monospace; font-size: 12px; color: {{t.muted}}">{{x.id}}</span><span style="{{x.badge}}">{{x.stateLabel}}</span></span>
+              <span style="font-weight: 600; text-align: left">{{x.title}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </section>
+
+      <section aria-labelledby="chain-title" style="flex: 2 1 420px; min-width: 0; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+        <div>
+          <div style="font-family: ui-monospace, monospace; font-size: 12px; color: {{t.muted}}">{{sel.id}}</div>
+          <h2 id="chain-title" style="margin: 0; font-family: Georgia, serif; font-size: 22px; font-weight: 400; color: {{t.title}}">Chaîne de preuve — {{sel.title}}</h2>
+        </div>
+        <ol style="list-style: none; margin: 0; padding: 0">
+          <sc-for list="{{sel.steps}}" as="s" hint-placeholder-count="5">
+            <li style="display: flex; gap: 14px">
+              <div style="display: flex; flex-direction: column; align-items: center">
+                <span style="{{s.dot}}"></span>
+                <span style="flex: 1 1 auto; width: 2px; background: {{t.border}}"></span>
+              </div>
+              <div style="padding-bottom: 16px; min-width: 0; flex: 1 1 auto">
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+                  <strong style="color: {{t.title}}">{{s.label}}</strong>
+                  <span style="font-family: ui-monospace, monospace; font-size: 12px; color: {{t.muted}}">{{s.op}}</span>
+                  <span style="{{s.badge}}">{{s.result}}</span>
+                </div>
+                <div style="font-size: 13px">{{s.detail}}</div>
+                <div style="font-family: ui-monospace, monospace; font-size: 12px; color: {{t.muted}}">[sujet] · [date] · empreinte [sha256…]</div>
+              </div>
+            </li>
+          </sc-for>
+        </ol>
+        <details>
+          <summary style="min-height: 32px; color: {{t.title}}">Événements et preuves techniques</summary>
+          <pre style="margin: 6px 0 0; padding: 10px; border-radius: 5px; background: {{t.input}}; font-size: 12px; overflow-x: auto">[rapport d’audit brut]</pre>
+        </details>
+      </section>
+
+      <aside aria-labelledby="verify-title" style="flex: 1 1 300px; min-width: 0; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+        <h2 id="verify-title" style="margin: 0; font-family: Georgia, serif; font-size: 20px; font-weight: 400; color: {{t.title}}">Vérifier une preuve publique</h2>
+        <p style="margin: 0; font-size: 13px; color: {{t.muted}}">Pour un tiers : la clé publique doit être acquise séparément, jamais depuis l’export.</p>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">Export des preuves<textarea rows="2" style="padding: 8px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}"></textarea></label>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">Ancre publique<textarea rows="2" style="padding: 8px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}"></textarea></label>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">Clé publique de confiance<textarea rows="2" style="padding: 8px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}"></textarea></label>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">Checkpoint de confiance — facultatif<textarea rows="1" style="padding: 8px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}"></textarea></label>
+        <button type="button" onClick="{{verify}}" style="min-height: 44px; border-radius: 5px; border: 0; background: {{t.primaryBg}}; color: {{t.primaryInk}}; font-weight: 600">Vérifier signatures et préfixe</button>
+        <sc-if value="{{verified}}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="padding: 10px 12px; border-radius: 6px; border: 1px solid {{t.okInk}}; background: {{t.okBg}}; font-size: 14px"><strong style="color: {{t.okInk}}">Exemple de verdict :</strong> signatures valides, préfixe cohérent avec l’ancre.</div>
+        </sc-if>
+        <details style="border-top: 1px solid {{t.border}}; padding-top: 10px">
+          <summary style="min-height: 32px; font-weight: 600; color: {{t.title}}">Archives protégées</summary>
+          <p style="margin: 6px 0 8px; font-size: 13px; color: {{t.muted}}">Préparer, lire, lever la protection après échéance.</p>
+          <button type="button" style="min-height: 44px; padding: 0 14px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Préparer une archive</button>
+        </details>
+      </aside>
+    </div>
+    <p style="margin: 0; font-size: 12px; color: {{t.muted}}">Maquette — transactions, résultats et compteurs d’exemple.</p>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["sombre","clair"],"default":"sombre"},"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { selected: 'A-2', verified: false };
+  }
+  renderVals() {
+    var themes = {
+      sombre: { bg: '#081b29', surface: '#102b3b', input: '#0b2232', text: '#e5edf0', title: '#f6f3e9', link: '#93d4df', muted: '#a9bcc4', border: '#2a5163', primaryBg: '#f8c650', primaryInk: '#062b49', okInk: '#7fd8a4', okBg: '#173d2b', rowOn: '#0d2636',
+        c: { ok: '#7fd8a4', run: '#93d4df', wait: '#f8c650', bad: '#ff8a80', none: '#a9bcc4' }, tint: { ok: '#173d2b', run: '#12384a', wait: '#3a3216', bad: '#45232a', none: '#1d3442' } },
+      clair: { bg: '#f5f3ec', surface: '#fffefa', input: '#ffffff', text: '#243d4a', title: '#062b49', link: '#205e70', muted: '#52656f', border: '#cfcabb', primaryBg: '#062b49', primaryInk: '#ffffff', okInk: '#1e7a46', okBg: '#e3f3e8', rowOn: '#f8f6ef',
+        c: { ok: '#1e7a46', run: '#205e70', wait: '#926300', bad: '#b3261e', none: '#52656f' }, tint: { ok: '#e3f3e8', run: '#e2eff3', wait: '#fbf3dc', bad: '#fbe3e1', none: '#eceae3' } }
+    };
+    var t = themes[this.props.theme] || themes.sombre;
+    var self = this;
+    var badge = function (k) { return 'display: inline-flex; align-items: center; align-self: flex-start; padding: 1px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; line-height: 1.6; white-space: nowrap; background: ' + t.tint[k] + '; color: ' + t.c[k] + '; border: 1px solid ' + t.c[k]; };
+    var dot = function (k) { return 'width: 14px; height: 14px; border-radius: 50%; margin-top: 5px; box-sizing: border-box; ' + (k === 'none' ? 'border: 2px dashed ' + t.c[k] : 'background: ' + t.c[k] + '; box-shadow: 0 0 0 3px ' + t.tint[k]); };
+    var stepLabels = [['Mandat admis', 'mandate-create'], ['Demande déposée', 'request'], ['Approbation', 'approve'], ['Effet engagé', 'commit'], ['Réconciliation', 'reconcile']];
+    var txDefs = [
+      { id: 'A-1', title: 'Paiement fournisseur [montant]', state: 'ok', stateLabel: 'Réconciliée', res: ['ok', 'ok', 'ok', 'ok', 'ok'] },
+      { id: 'A-2', title: 'Accès au dépôt [ressource]', state: 'wait', stateLabel: 'Approbation attendue', res: ['ok', 'ok', 'wait', 'none', 'none'] },
+      { id: 'A-3', title: 'Export de données [ressource]', state: 'bad', stateLabel: 'Refusée', res: ['ok', 'ok', 'bad', 'none', 'none'] },
+      { id: 'A-4', title: 'Résultat inconnu [ressource]', state: 'run', stateLabel: 'À réconcilier', res: ['ok', 'ok', 'ok', 'run', 'none'] }
+    ];
+    var resLabel = { ok: 'valide', wait: 'en attente', bad: 'refusé', run: 'inconnu', none: 'pas encore' };
+    var details = {
+      ok: ['Plafond et durée du mandat vérifiés.', 'Demandeur [sujet], intégrité I1.', 'Approbateur distinct du demandeur.', 'Effet simulé engagé une seule fois.', 'Résultat confirmé et rapproché.'],
+      wait: ['Plafond et durée du mandat vérifiés.', 'Demandeur [sujet], intégrité I1.', 'Attend un approbateur distinct du demandeur.', '', ''],
+      bad: ['Plafond et durée du mandat vérifiés.', 'Demandeur [sujet], intégrité I1.', 'Refus : même principal que le demandeur (conflit de rôles).', '', ''],
+      run: ['Plafond et durée du mandat vérifiés.', 'Demandeur [sujet], intégrité I1.', 'Approbateur distinct du demandeur.', 'Réponse perdue : résultat inconnu, réconciliation requise.', '']
+    };
+    var selId = this.state.selected;
+    var txs = txDefs.map(function (x) {
+      var on = x.id === selId;
+      return {
+        id: x.id, title: x.title, stateLabel: x.stateLabel, badge: badge(x.state), pressed: on ? 'true' : 'false',
+        style: 'display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: 6px; color: ' + t.text + '; background: ' + (on ? t.rowOn : 'transparent') + '; border: 1px solid ' + (on ? t.primaryBg : t.border),
+        pick: function () { self.setState({ selected: x.id, verified: false }); }
+      };
+    });
+    var s = txDefs.filter(function (x) { return x.id === selId; })[0];
+    var steps = stepLabels.map(function (l, i) {
+      var k = s.res[i];
+      var d = details[s.state][i] || details.ok[i];
+      return { label: l[0], op: l[1], result: resLabel[k], badge: badge(k), dot: dot(k), detail: k === 'none' ? 'Étape non atteinte.' : d };
+    });
+    return {
+      t: t, txs: txs,
+      sel: { id: s.id, title: s.title, steps: steps },
+      cards: [
+        { label: 'Transactions auditables', value: '[n]', hint: 'dont [n] à réconcilier', badge: badge('run') },
+        { label: 'Vérifications PAEA', value: '[n] / [n]', hint: 'Ouvrir les vérifications', badge: badge('ok') },
+        { label: 'Frontières recensées', value: '[n]', hint: 'Couverture déclarée', badge: badge('none') },
+        { label: 'Fraîcheur des preuves', value: '[date]', hint: 'Recettes disponibles', badge: badge('wait') }
+      ],
+      verified: this.state.verified,
+      verify: function () { self.setState({ verified: true }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
