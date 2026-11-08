@@ -263,6 +263,19 @@ rapportés distingués des originaux non relus. Aucun défaut exécuté/démontr
 développement, installation ou acceptation nouvelle. Codex porte le cadrage ;
 Fabrice conserve la décision d'autoriser la réalisation.
 
+**GI-T1/GI-T2 exécutés ensuite sur demande : reproduction obtenue avant correction.**
+Le [rapport Gi.eth](actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md) conserve témoin
+V1 accepté, dépendance effective non déclarée V2, onze entrées suivies identiques,
+et acceptation V2 sous le même R1 sans nouvel appel reviewer. Recette en **FAIL**,
+intégrité VERIFIED ; deux échecs de méthode antérieurs conservés et diagnostiqués.
+Reviewer inerte, diagnostic V2 sans effet externe, aucune revue de sécurité
+indépendante établie. Test et recette permanents ajoutés ; aucun correctif moteur,
+service, installation, appel payant ou R2. La portée des inputs déclarés et la
+reprise sous preuve fraîche restent distinctes de cette reproduction terminée.
+Preuves : `.cache/gieth-v1-v2-20261108/LOCATION.json` ; archive Lexar de
+35 131 479 octets, 2 276 fichiers/liens vérifiés et trois recettes restaurées
+VERIFIED/FAIL. Originaux gardés ; rapport lié pour l'empreinte et la restauration.
+
 
 ## Reprise Peter Wilcheck — 8 novembre 2026 : diagnostic statique et plan uniquement
 
@@ -1353,3 +1366,415 @@ et FAIL restent historiques. Aucun processus, contexte embarqué ou service rech
 | `20261029-settlement-call-cli-mvfdts57` | `4392dae39147dd2daf4e4738ff6753a84ec94a223fd2f2d626b473d00ae837b0` |
 
 `root-audit-final.stdout` SHA-256: `1a8b4108e07b127a9f55c1b17366d9cfd2d5ebb75df0227184b104d622ddbc65`.
+
+
+## POC-03-F / 03-B — contrat d’attribution et d’absence d’effet, 8 novembre 2026
+
+**Statut : spécification de scénarios proposée et conservée sur demande de Fabrice ;
+aucune réalisation, exécution ou acceptation produit.** Cette précision poursuit le
+plan existant et sa relecture des archives, sans nouvelle campagne. Codex seul,
+méthodes spec-builder/replan ; aucun développement, test, appel fournisseur,
+paiement, build ou service. Les autres scénarios 03-A/C/D/E/G/H restent inchangés.
+Révision lue : HEAD `aaf1a7b8c99fa5354a191525417fc37552ad3170` ; les résultats historiques restent attachés à leurs
+anciennes entrées. Les autres travaux du checkout sont préservés.
+
+### Frontières actuelles relues avant ce contrat
+
+| Affirmation bornée | Source actuelle relue, depuis la racine du dépôt | Conséquence pour la spécification |
+| --- | --- | --- |
+| La réservation d’intention ne prouve pas une publication. | `rust/crates/swarm-engine/src/root_store/paea_git_intent.rs:11–38` | Ne pas utiliser la présence de I comme reçu d’effet ou autorisation. |
+| Reconcile négatif est une absence de ligne, pas une observation de ref. | `root_store/paea_git_promote_call.rs:140–171,1073–1136` du même crate | Conserver le résultat natif et sa portée « journal » ; aucune promotion vers absence d’effet ou droit de Commit. |
+| Le reçu Git décrit ref/old/new, sans auteur ou tentative dédiés. | Même fichier, `166–171,1059–1070` | Une liaison de causalité plus forte est une exigence à qualifier, pas une capacité du DTO actuel. |
+| Le callback already n’est appelé qu’après prepare. | Même fichier `967–1028` et `src/git_reference_transaction.rs:252–302,415–433` | Documenter séparément tentative d’update, ACK prepare, callback, COMMIT et lecture de ref. Ne pas annoncer une récupération acquise sur le seul code already. |
+| PA-09 recalcule les lignes d’effet existantes. | `src/root_store/paea_effect_reconcile.rs:1–16,420–473`, `docs/architecture/PAEA-GIT-TRANSACTION.md`, section PA-09 | `verified=true` ne prouve ni authenticité ni exhaustivité des publications hors journal. |
+| La clé d’intention Git dépend du OLD attendu. | `rust/crates/swarm-protection-contract/src/canonical.rs:84–116`, `types.rs:85–93` | Modifier OLD change l’intention calculée ; ce n’est pas une preuve que l’ancienne obligation est résolue. Clé/digest ne prouvent pas auteur, émission ou autorité. |
+| Les témoins existants ont une portée plus étroite. | `swarm-engine/tests/paea_git_promote_call.rs:640–676`, capsules historiques 85/86 relues au complément précédent | Rejeu avec reçu existant et lecture avant premier commit ne couvrent pas une ref publiée sans reçu ni un tiers identique. |
+
+Les chemins abrégés de la table sont sous `rust/crates/swarm-engine/`.
+Les empreintes de cette relecture figurent en fin de section. Les assertions du
+contrat ci-dessous sont **des exigences proposées**, pas des descriptions d’un
+nouveau protocole, champ JSON, endpoint ou mécanisme d’authentification livré.
+
+### Contrat commun : conclusions et preuves distinctes
+
+**Objet logique retenu.** I désigne l’objectif initial et sa filiation conservée,
+A1/A2 ses tentatives, B un autre acteur, D l’instance physique du dépôt, R la ref
+directe, O l’ancien OID et N le candidat, avec **O différent de N** dans les cas
+principaux. L’action exacte et le contexte canonique sont conservés. Un changement
+de D/R/O/N/contexte n’est pas un retry équivalent : conserver le lien au besoin
+initial et requérir la décision/admission applicables. Ne pas confondre I avec
+un champ moteur nouveau ou avec la seule clé d’intention calculée.
+
+Deux objectifs de fixture sont explicitement distincts et à conserver dans les
+critères avant le témoin : **G-état**, obtenir R=N ; **G-auteur**, établir que A a
+produit la transition autorisée O→N. Pour G-auteur, une action de B ne satisfait
+pas le critère d’auteur. Recommandation : vérifier les deux interprétations ;
+aucun choix métier implicite n’autorise une nouvelle mutation pour fabriquer une
+preuve d’auteur manquante. Dans les cas principaux B possède sa propre autorité
+valide, distincte de celle d’A. Si cette autorité est inconnue ou inapplicable,
+l’état présent ne prouve pas la conformité de l’effet B ; aucune clôture comme
+effet autorisé ne peut être déduite de la seule satisfaction de G-état.
+
+| ID exigence | Déclencheur et conclusion permise | Preuve minimale / interdiction |
+| --- | --- | --- |
+| BF-C01 — état courant | Quand l’observateur lit D/R à une barrière identifiée, il peut conclure « R vaut N à cette observation ». | Instance effectivement ouverte, ref directe et OID observés, identité/provenance et point d’observation conservés. Une égalité ne prouve ni auteur, ni transition passée, ni permanence après lecture. |
+| BF-C02 — effet historique attribué | Quand une transition effective est rapportée, l’attribuer à A1 seulement si son occurrence et sa liaison causale à A1 sont établies. | Observation au producteur/sink reliant instance, cible, O→N effectivement appliqué, requête exacte, tentative et identité observée ; provenance et intégrité dans le modèle de menace déclaré. ACK, timestamp, hash, nom de clé, PID ou auteur déclaré seul insuffisant. Sans liaison : attribution inconnue, pas attribution par défaut à A. |
+| BF-C03 — absence de reçu | Quand le journal est lisible et ne contient pas le reçu attendu, conclure seulement « reçu absent dans ce journal à cette lecture ». | Expliquer le périmètre et conserver le résultat natif. Journal absent/corrompu/inaccessible ou lecture refusée : état distinct, pas journal vide. Même journal vide et R=O ne prouvent pas qu’aucune publication passée n’a eu lieu. |
+| BF-C04 — absence d’effet de A1 | Quand on veut autoriser une reprise sur la base de « A1 n’a rien publié », exiger une observation complète du périmètre d’émission de A1, depuis avant sa première possibilité d’émission jusqu’à sa terminaison/fencing effectif. | Couverture de tous ses chemins autorisés inventoriés, aucun événement de publication A1, barrière finale et preuve que A1/enfants ne peuvent plus publier. Conserver séparément les effets de B. Si capture lacunaire, provenance non établie, chemin non couvert ou capacité résiduelle : absence non établie, reprise mutante suspendue. Un arrêt de processus ou une révocation seule ne prouve pas la fin d’une émission déjà engagée. |
+| BF-C05 — absence globale bornée | Quand une absence de toute publication est affirmée, couvrir tous les écrivains/chemins permis par la fixture et l’intervalle déclaré, pas seulement A1. | Différencier « aucune publication de A1 », « aucune publication observée » et « aucune publication dans le périmètre complètement observé ». Le dernier ne s’étend ni à d’autres chemins/acteurs ni au futur. Une ref revenue à O après O→N→O ne signifie pas absence historique. |
+| BF-C06 — preuve contradictoire ou tardive | Quand des preuves valides mais incompatibles, tardives, tronquées ou non attribuables arrivent, conserver chaque original et la portée de chaque constat. | Événement rattaché à sa tentative, réception chez le décideur prouvée séparément, conflit/unknown visible ; ne pas écraser un effet connu ni réinterpréter un reçu d’A1 comme résultat d’A2. Horloges seules ne donnent pas un ordre causal entre systèmes. |
+| BF-C07 — lecture et décision | Quand une preuve ou un résultat Reconcile est reçu, décider explicitement consulter, attendre, accepter l’état ou proposer une nouvelle émission. | La lecture ne peut publier ni « réparer » rétroactivement un reçu en inventant l’auteur. Décision signée/attribuée selon le parcours choisi, liée aux originaux et révisions, par le rôle actuellement autorisé ; sa réception, application et effet restent des preuves séparées. Ce contrat ne choisit pas une technique de signature nouvelle. |
+| BF-C08 — reprise mutante | Quand un nouvel effet est proposé, aucune absence de réponse, expiration ou nouvelle clé n’en constitue le mandat. | A1 terminée/fencée, effet historique/objectif clarifiés, état courant relu, préconditions OLD et droits/accord/politique revérifiés au point d’application, décision explicite. Précondition changée ou preuve insuffisante : refus/suspension sans publication ; pas d’ajustement silencieux de OLD pour faire passer le retry. |
+
+Une preuve positive d’effet historique peut coexister avec R≠N maintenant ;
+l’effet ne disparaît pas du suivi. L’absence établie de publication A1 peut
+coexister avec R=N du fait de B. La tâche peut donc être satisfaite selon G-état
+et non satisfaite selon G-auteur. Aucun de ces constats n’efface une consommation,
+une ancienne tentative ou une décision.
+
+### Table de décision attendue — cible à qualifier, pas état moteur existant
+
+| Observations disponibles | Conclusion à présenter | Action de reprise permise dans ces scénarios |
+| --- | --- | --- |
+| R=N, effet A1 attribué, ancien reçu éventuellement perdu | État présent ; effet A1 établi ; reçu absent si tel est le constat. | Relecture/collecte sous droit applicable, décision de clôture explicite selon critères ; **zéro nouvelle publication**. |
+| R=N, effet B attribué, absence A1 établie | État présent par B ; A1 n’a pas publié dans sa portée observée. | G-état : clôture possible par autorité compétente. G-auteur : critère non satisfait, arbitrage nécessaire ; **aucune publication pour s’approprier l’effet B**. |
+| R=N, auteur inconnu ou preuves contradictoires | État présent, causalité inconnue/conflit ; le reçu manquant ne tranche pas. | Observation/arbitrage ; **zéro publication** dans le lot. G-auteur reste ouvert. |
+| R=O, absence A1 établie, A1 clôturée/fencée, aucun autre effet incompatible | État souhaité absent au point de décision, absence A1 bornée établie. | A2 peut être proposée sous BF-C08 ; une seule publication O→N sous droit actuel, jamais un lancement automatique. |
+| R=O, capture incomplète ou A1 encore capable de publier | Ni absence historique ni sécurité du retry établies. | Observation/fencing à établir ; **zéro publication A2** tant que le risque demeure. |
+| R=O après une publication passée O→N→O, ou R=X inattendu | Effet historique conservé ; précondition/objectif devenus différents. | Replan et arbitrage ; aucune assimilation à « A1 n’a rien fait » ni nouvelle mutation sous l’ancien accord. |
+| Lecture D/R ou journal refusée/erronée, instance remplacée | Observation indisponible ou liaison périmée, distincte d’une absence. | Diagnostic sûr et arrêt de la décision mutante ; reprise seulement après précondition corrigée. |
+
+```mermaid
+flowchart TD
+  P[Preuves originales reçues et instance liée] --> S[Observer état, effet historique et attribution séparément]
+  S --> C{Preuves suffisantes et compatibles dans leur portée ?}
+  C -->|Non| U[Conserver inconnu ou conflit et suspendre toute émission]
+  C -->|Oui| G[Évaluer G-état ou G-auteur sous les critères retenus]
+  G --> D[Décision du rôle autorisé liée aux preuves]
+  D --> R[Relire sans publier ou clôturer selon les critères]
+  D --> V{Nouvel effet explicitement autorisé et BF-C08 satisfait ?}
+  V -->|Non| U
+  V -->|Oui| A[Une émission contrôlée puis observation indépendante]
+```
+
+### Montage isolé prévu et oracle
+
+Fixture Unix neuve, projet/service et dépôt possédés, données fictives, aucun
+accès réseau ni fournisseur nécessaire. Utiliser le chemin public de bibliothèque
+PAEA déjà existant pour les parcours couverts ; la sélection exacte des appels,
+fixtures sources Git retenues et moyens d’injection est un **prérequis à qualifier**,
+pas un nouveau helper implicitement disponible. Aucun dépôt actif ou mission live.
+Données O et N distinctes et objets valides ; configuration/accord/rôles nécessaires
+identiques au témoin, pas d’abaissement de politique pour faire passer la faute.
+
+Avant chaque variante, un témoin positif dans une instance indépendante sous les
+mêmes préconditions montre que l’action autorisée et l’observateur fonctionnent.
+La mise en place d’un témoin ne vaut pas exercice du scénario injecté. Les barrières
+prévues distinguent : intention durable → préparation Git → COMMIT demandé →
+publication effective → ACK/réponse → reçu durable → réception → décision.
+Leur ordre exact dépend du parcours retenu et devra être constaté ; ne pas attribuer
+au binaire actuel une barrière d’injection qui n’existe pas encore. Aucun sleep ou
+timeout global ajouté. Une preuve de non-progression exigera diagnostic, pas retry.
+
+L’oracle de fixture possède un journal d’observation indépendant de l’agent et
+couvre A, B et les chemins inventoriés, avec provenance d’écrivain établie dans cette
+fixture. Conserver séparément ce qu’il sait et ce que reçoit le décideur : cacher un
+reçu doit réellement empêcher l’agent de le consulter par une autre projection.
+Un journal fabriqué par le worker ne prouve pas le sink. Si l’observateur fiable ou
+la couverture ne sont pas disponibles, le critère d’attribution/absence est
+**NOT TESTED / prérequis manquant**, jamais PASS par refus commun.
+
+Compteurs séparés et bornés au scénario après installation du témoin : nombre de
+demandes mutantes, protocoles update-ref/prepare, COMMIT envoyés, transitions
+réellement publiées par A/B, lignes du journal d’effet et lectures. Un protocole
+commencé ou une commande no-op n’est pas une publication ; un état final identique
+peut cacher plusieurs publications. Pendant relecture/reprise d’observation,
+**delta de publications = 0**. Les écritures de preuve du banc sont distinctes des
+mutations de ref et ne doivent ni effacer ni falsifier le journal d’effet.
+
+### 03-F — rupture référence Git / journal : variantes et acceptation
+
+Chaque ligne hérite de BF-C01–08 et du témoin positif précédent. Tous les cas sont
+**PLANIFIÉS / NOT TESTED**, sans présumer un nouveau raccord dans le produit.
+
+| ID | Injection après témoin et preuve discriminante à conserver | Critère d’acceptation futur |
+| --- | --- | --- |
+| 03-F-T | Témoin : O→N par A1 sous autorité valide, réponse et reçu présents ; relire puis rejouer le résultat via les opérations existantes. | Une transition A, zéro B ; reçu/intention/action/instance cohérents ; lectures/rejeu ajoutent zéro publication et l’effet historique reste attribué dans la portée de l’oracle. Le reçu actuel seul ne suffit pas à cette attribution. |
+| 03-F-1 | Rupture après réservation d’intention, avant première émission ; A1 définitivement close/fencée ; oracle complet sans publication, R=O, reçu absent. | Distinguer intention présente et absence d’effet établie par oracle. Reconcile seul ne publie rien. Sous nouvelle décision et BF-C08, A2 proposée puis une transition O→N, un seul effet cumulé. Si aucune reprise publique supportée ne satisfait ces conditions, noter le prérequis au lieu de contourner la réservation. |
+| 03-F-2 | Rupture après transition réelle O→N avant ACK/réponse et avant reçu ; variante réponse reçue mais rupture avant reçu. | Oracle : une publication A1. Reconcile peut rendre son négatif natif **limité au journal** ; le décideur ne conclut ni absence d’effet ni droit de Commit. Une relecture autorisée maintient R=N, attribution seulement si preuve suffisante, delta publication zéro ; critère bloqué si le consommateur élargit la négation. |
+| 03-F-3 | Rupture après reçu durable avant réponse ; rouvrir les seuls stores de fixture, puis relire. | Reçu historique retrouvé dans la même instance ; aucune nouvelle publication, même si la clé de transport change. Perte de réponse distincte de perte du reçu ; refus de lecture ne devient pas « non engagé ». |
+| 03-F-4 | Même état R=N et reçu absent que F-2 ; demander séparément un diagnostic de la branche de récupération Commit avec OLD=O≠N, seulement dans une future fixture explicitement autorisée. | Tracer prepare ACK/refus, callback effectivement atteint ou non, COMMIT envoyé ou non, effet et journal avant/après. Un refus avant callback documente l’atteignabilité manquante, **pas une récupération réussie**. Aucun assouplissement de OLD ni suppression de verrou. Toute seconde publication fait échouer l’invariant ; la clôture G-état doit pouvoir rester une décision sans réémission. |
+| 03-F-5 | Publier O→N puis un acteur de fixture autorisé rétablit O avant observation finale ; variante R=X. | Oracle conserve les deux transitions et leurs auteurs ; R=O ne devient jamais absence historique. Aucune reprise automatique ; ancien effet conservé, objectif/accord à réexaminer. Les mutations B de l’injection sont séparées du delta produit pendant la reprise. |
+| 03-F-6 | Rendre observation/journal illisible, corrompu ou remplacer l’instance physique après préparation ; variante A1 garde une émission en vol. | Erreur/conflit/unknown et cause sûre conservés, aucun succès vide ni absence inventée ; A2 ne publie pas. Reprise d’observation après restauration/lien frais ou fencing démontré, puis décision fraîche. Ne pas supprimer un verrou Git pour obtenir le passage. |
+
+### 03-B — changement identique par un tiers : variantes et acceptation
+
+| ID | Injection après témoin et preuve discriminante à conserver | Critère d’acceptation futur |
+| --- | --- | --- |
+| 03-B-T | Témoin A1 attribué O→N puis témoin B distinct observé dans sa propre instance équivalente. | L’oracle distingue réellement A et B, requêtes et transitions ; une indisponibilité commune ne peut expliquer le refus d’A dans les variantes. |
+| 03-B-1 | Empêcher A1 d’émettre, établir sa fin/fencing, puis B publie le même N ; livrer la preuve B au décideur. | G-état satisfait à l’observation, G-auteur non satisfait ; A1 sans publication dans la portée établie. Aucun reçu A fabriqué, aucune nouvelle publication pour revendiquer B. Décision explicite de clôture ou arbitrage selon objectif. |
+| 03-B-2 | Même état que B-1 mais cacher la preuve d’auteur B au décideur ; oracle conserve la vérité. Variante observation incomplète d’A1. | R=N reste observable ; auteur inconnu côté décideur, pas attribution à A ni à B par défaut. Si A1 non fencée, risque résiduel explicite. Zéro émission de reprise ; critère d’auteur reste ouvert. |
+| 03-B-3 | A et B font chacun une publication menant à N, avec une transition intermédiaire autorisée et contrôlée, ou une mutation comptable de fixture révélant les deux effets ; ne pas supposer que deux update-ref identiques causent deux changements Git. | Oracle distingue demandes et publications effectives. Deux effets historiques restent deux, même état final N ; la reprise n’en ajoute aucun et ne prétend pas avoir empêché la duplication injectée. Si le banc n’observe que l’état final, scénario non discriminant à reprendre. |
+| 03-B-4 | Reçu d’une autre tentative, identité, instance, cible ou action présenté avec la même clé ; reçu cohérent mais provenance non établie ; puis preuve correcte rétablie. | Aucune attribution/autorisation par seule clé ou hash ; refus de liaison, conflit ou inconnu explicite. Original rejeté conservé ; la preuve correcte permet une nouvelle décision de lecture, sans publication additionnelle ni transfert de droits. |
+| 03-B-5 | B publie puis rétablit O (ABA) ; variante B modifie D/R ou le payload pendant la décision. | Ne pas confondre R=O avec absence globale, ni changement de cible avec retry équivalent. Sous preuve lacunaire, conserver inconnu ; sous oracle complet, effet B attribué et préconditions changées. Zéro mutation sous accord devenu inapplicable. |
+
+### Acceptation, écarts et dépendances de la future réalisation
+
+Les critères ci-dessous sont obligatoires **pour une future vérification**, non
+satisfaits par cette rédaction :
+
+- Chaque variante a son témoin réussi sous mêmes préconditions ; sa faute atteint
+  la frontière visée. Aucun zéro-test, refus préalable commun ou sortie 0 ne vaut PASS.
+- Comparer conclusion effectivement reçue par le décideur à l’oracle : état,
+  attribution, absence bornée et capacité résiduelle séparés. Reçu natif et limite
+  conservés jusque dans le consommateur choisi, sans simple correction de vocabulaire
+  dans un rapport externe masquant une décision produit erronée.
+- Tracer réception des originaux → décision autorisée → application → effet observé.
+  Ni fixture omnisciente ni nom de mécanisme ne remplacent cette chaîne.
+- Vérifier les compteurs avant/après **chaque reprise** : zéro publication pour
+  les lectures/états satisfaits/inconnus/conflits ; seulement F-1, sous conditions,
+  vise une nouvelle publication unique. Les actions B de l’injection restent visibles.
+- Vérifier refus sans mutation, retour à une observation autorisée après correction
+  des préconditions et reprise après réouverture ; preuve ancienne reste historique,
+  décision et autorité d’application doivent être courantes. Une révocation
+  ultérieure n’efface pas un effet historique autorisé ; son succès observé
+  n’accorde aucun droit pour une nouvelle action.
+- Toute preuve manquante reste NOT TESTED/prérequis manquant ; contradiction d’un
+  critère observable reste FAIL. Les PASS historiques du complément précédent
+  sont réutilisables seulement dans leur portée, jamais comme exécution de F/B.
+
+| Étape proposée | Responsable / dépendance | Livrable et critère de passage |
+| --- | --- | --- |
+| BF-P1, documentaire — présente demande | Codex, sources actuelles et archives déjà relues | Contrat, choix G-état/G-auteur explicités comme variantes, matrices et limites FR/EN. Réalisé documentaire, sans validation moteur. |
+| BF-P2, qualification des prérequis | Codex après autorisation future du périmètre | Parcours public exact, profil/features/binaire, instance et fixtures Git, observateur et points de barrière réellement disponibles, chemins d’A/B et moyens de fencing inventoriés. Si instrumentation manquante, proposer un changement borné séparé, sans l’introduire silencieusement. |
+| BF-P3, reproduction ciblée | Exécutant autorisé, BF-P2 et témoins F-T/B-T | D’abord F-2/F-4 et B-1/B-2, puis négatif F-1, ABA F-5/B-5 et variantes restantes ; sources/argv/sorties/empreintes, oracle, preuve reçue et verdicts par critère. Aucun lancement par ce plan. |
+| BF-P4, décision éventuelle de correction | Fabrice pour réalisation ; Codex pour proposition, résultats BF-P3 | Comparer projection explicite des observations + décision séparée, versus renforcement du reçu durable et de sa liaison tentative/producteur. Ne pas choisir d’emblée une signature, nouvelle clé ou retry générique. Si le défaut est établi, correction générale et recette permanente sous autorisation appropriée. |
+
+Découverte précisée : **ABA et couverture temporelle** sont nécessaires pour que
+le témoin de non-effet discrimine réellement les cas. Valeur attendue : éviter un
+faux négatif malgré R=O ; propriétaire Codex, critères BF-C04/05 et F-5/B-5,
+état spécifié, non exécuté. La portée exacte de l’oracle et le fencing restent des
+prérequis non établis, pas une garantie créée par ce document.
+
+Incrément documentaire seulement : aucune fonction/docstring produit, politique,
+valeur par défaut, limite ou gestion d’erreur modifiée ; aucun schéma/API nouveau
+ni évolution livrée à inscrire dans version_history.json. Transmission par ce plan
+FR/EN et le registre X local ignoré par Git ; aucun contexte embarqué, processus
+ou service rechargé. L’autorisation de développement/test reste explicitement exclue
+par la présente demande.
+
+Empreintes des passages relus, sans nouvelle preuve d’exécution :
+
+| Source | SHA-256 |
+| --- | --- |
+| `rust/crates/swarm-engine/src/root_store/paea_git_intent.rs` | `2aef44210363e5aec5b96d88e1990828744dc6b84828c0e0dc15b0ddd2c82652` |
+| `rust/crates/swarm-engine/src/root_store/paea_git_promote_call.rs` | `1255d665e4ef6b7183253bbca39193904519466850e75d66c501593ccb9fd6e2` |
+| `rust/crates/swarm-engine/src/git_reference_transaction.rs` | `180adba837db4fe54c61a38a7b3e44443bed9b8bfbeef33cedf323cc62bf8324` |
+| `rust/crates/swarm-engine/src/root_store/paea_effect_reconcile.rs` | `1a62d87a9ad1fc34f376138dcb2208ed6d8bc9e19e930b853e5d1a51d32b36e5` |
+| `rust/crates/swarm-protection-contract/src/canonical.rs` | `5e9bad76b65a7fdbbd2a3966fdebbba59480d80c2e2337498ac5d0bd2a9092f0` |
+| `rust/crates/swarm-protection-contract/src/types.rs` | `4cf2a9869422eff1d9aaf8bc9d019600b8ef179ac9132e6fbbba3101cbf76c42` |
+| `rust/crates/swarm-engine/tests/paea_git_promote_call.rs` | `ef4e847c8edc68a6ac1793959e906177d8ac1fceef2859fc40c74c4d226424a5` |
+| `docs/architecture/PAEA-GIT-TRANSACTION.md` | `46aceee29e685100866171a42e3fb42e8ff0fda400eea0d2f236b8f198b38e4c` |
+
+
+## BF-P2 — qualification documentaire des prérequis 03-F / 03-B, 8 novembre 2026
+
+**Périmètre autorisé : lecture et mise à jour du plan seulement.** Aucun code,
+test, build, appel fournisseur, paiement ou service lancé ; aucune fixture créée,
+réouverte par RootStore, modifiée ou réutilisée. Méthodes replan/spec-builder,
+Codex seul. HEAD lu : `aaf1a7b8c99fa5354a191525417fc37552ad3170`. Les ajouts précédents et autres travaux restent
+préservés. La qualification documentaire BF-P2 est réalisée ; **la préparation
+exécutable de BF-P3 reste PARTIELLE**, sans PASS runtime ni nouvelle autorisation.
+
+### BF-P2.1 — parcours public retenu et limites
+
+**Choix de cadrage : bibliothèque publique normale `swarm-engine`, Linux**, pas le
+serveur. Le parcours actuellement défini en source est :
+
+1. RootStore projet et RootStore service physiquement distincts, ouverts avec droit
+   d’écriture ; provisionnement explicite des journaux d’intention/promotion et du
+   dépôt service (`paea_initialize_git_intents`, `paea_initialize_git_promotions`,
+   `paea_provision_git_repository`). Ces opérations de provisionnement ne sont pas
+   une autorité de publication. Les appels ne sont pas exécutés dans cette reprise.
+2. Publication candidate native réellement qualifiée dans le projet ; transfert
+   préalable des objets via `paea_git_transfer_call` / `call_paea_git_transfer`.
+   Un objet N simplement nommé ou absent du dépôt destination n’est pas un témoin.
+3. Préparation publique
+   `service.paea_git_promote_call(project, proposal, context, operation, work, child, pin)`.
+   Commit attribue les champs de politique ; Reconcile conserve le contexte
+   historique exact. Le retour conserve les témoins physiques et `request()` expose
+   la permission exacte à provisionner ; préparer ne réserve pas encore l’intention.
+4. Compte et autorité séparément provisionnés, ouverture `authenticated_startup::open`,
+   puis `service.call_paea_git_promote(project, prepared, authority, context, head, password)`.
+   L’appel contrôle les témoins, le plan, le mapping effect et la politique ; Commit
+   recontrôle l’accord exact courant. Le backend Commit exige un principal observé
+   de type `human` : cela ne prouve ni présence humaine réelle ni provenance d’un agent A.
+5. Reconcile passe par la même garde d’appel et exige des RootStore **writable**, bien
+   qu’il ne publie pas de ref et n’exécute pas Git. Il lit le journal. Conserver
+   séparément ce droit d’ouverture/réservation et l’absence de mutation de ref.
+   Clore explicitement prepared, autorités et Roots ; conserver erreurs et effets.
+
+**Restriction de profil établie :** `policy::current_actor`, même module
+`648–693`, refuse Commit si `require_separation=true` ou si la matrice de séparation
+activée contient des rôles incompatibles (`paea-git-promote-attributed-admission-required`).
+Le harnais existant déclare `require_separation=false` dans sa fixture ; cela ne
+qualifie pas le profil protégé complet. Le cadrage proposé utilise seulement ce
+profil de référence explicite, avec l’accord exact exigé par le consommateur ;
+aucun réglage courant de l’instance n’est abaissé. Si la future exigence porte sur
+le profil avec séparation, le raccord d’admission manquant devient un prérequis
+bloquant à traiter séparément, pas un témoin refusé à compter comme succès.
+
+Sources lues : `src/root_store/paea_git_promote_call.rs:348–550,648–693,853–911,1073–1136`,
+`tests/paea_git_promote_call.rs:319–497,499–579` sous
+`rust/crates/swarm-engine/`, et constructeur d’autorité cité plus bas.
+
+**Autres surfaces existantes, non retenues pour une première preuve isolée :**
+CLI `paea promote-call OPERATION SERVICE PROJECT WORK CHILD PIN DECLARATION --input REQUESTFILE`
+(`rust/crates/swarm-cli/src/paea_promote.rs:28–50,224–254`) utilise la trame privée
+à deux phases. Il projette `outcome:reconciled_not_committed` sans ajouter une
+observation de ref ; sa portée doit rester « journal ». Le lecteur PA-09 public
+`RootStore::paea_reconcile_effect_journals` / CLI `paea reconcile-effects` recalcule
+les lignes d’effet existantes, avec un ledger séparé ; ce n’est pas l’observateur
+historique complet de D/R. Aucun parcours HTTP ni navigateur nécessaire pour BF-P3
+retenu ; aucune équivalence entre ces surfaces n’est déduite de leur existence.
+
+### BF-P2.2 — fixtures identifiées et disponibilité réelle
+
+| Élément examiné | Constat en lecture seule | Qualification / condition avant usage |
+| --- | --- | --- |
+| Zone temporaire gouvernée | `.swarm/engine-settings.json`, `values.runtime_temporary_directory = .swarm-fixtures` ; répertoire présent, mode 0700 observé. `src/fixture_area.rs:51–117` valide et résout ce réglage. | Présence et résolution identifiées ; aucun appel au helper qui créerait un répertoire. Permissions complètes, place, quiescence et état à revalider au futur run. Le réglage de fixture ne devient pas la destination USB des preuves. |
+| Fixture source de la recette promote | `SWARM_PAEA_SOURCE_FIXTURE` et `SWARM_PAEA_WRITER_FIXTURE` désignent tous deux `docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-writer78b-regen-20261031b`. result.json présent : PASS, task_accepted=true, paid_provider=false ; root indiqué `.swarm-fixtures/swarm-model83-u5rvobb_`, fichier state.db présent ; un owned-root correspondant retrouvé dans le dossier de preuve. | Présence/provenance déclarée et trace de naissance retrouvées ; ni fraîcheur des preuves natives, ni empreintes/inodes actuels rapprochés, ni absence d’utilisation établies. Ne pas ouvrir/modifier ce root par simple lecture du PASS. |
+| Fixture publication courante | `.../source-fixture-current-pub-regen-20261031/result.json` présent, mêmes marqueurs, root `.swarm-fixtures/swarm-model83-jx8u1ndc` présent avec state.db et trace owned-root correspondante. | Autre racine conservée ; mêmes limites. Aucun transfert de sa qualification à la première fixture ou au profil courant. |
+| Harnais PAEA de promotion | `tests/paea_git_promote_call.rs:80–105,319–433` crée un **service neuf**, mais `project()` ouvre **writable le projet conservé** et `owned_with()` y applique Trust ; le dépôt bare/OLD et l’import candidat sont préparés ensuite. | Réutilisable comme référence de composition, pas comme recette d’instances entièrement neuves. Nouvelle source native qualifiée par parcours pris en charge requise pour des témoins indépendants ; une copie/restore du root ne remplace pas les liaisons physiques natives. Génération non effectuée ici. |
+| Autorités de fixture | `swarm-enrollment-authority/tests/common/authenticated_fixture.rs:35–60,96–145` construit des journaux privés dans `~/.local/state/swarm-fixtures` et fixe le principal `operator`, type human, subject stable-person. | Deux constructions ne créent pas deux acteurs A/B distincts. Il manque une composition de fixture avec identités observées distinctes et droits exacts prouvés pour chacune ; cela ne démontre pas que le produit ne saurait les représenter. Pas de clé/signature/compte réel utilisé. |
+| Données Git synthétiques | `tests/git_reference_transaction.rs:30–104` crée un bare et trois commits O/N/X sans projet ni fournisseur. | Disponible en source pour le protocole isolé et l’ABA ; ne satisfait pas à lui seul la publication native, l’accord et l’autorité du parcours PAEA. Aucun constructeur exécuté. |
+
+**Écart de recette observé BF-P2-R1 :**
+`tools/verification/recipes/paea-owned-git-promote.json` déclare dans `inputs`
+`.../source-fixture-writer78b-regen/result.json`, tandis que son environnement
+SOURCE/WRITER pointe `.../source-fixture-writer78b-regen-20261031b`, dont `project()`
+lit réellement result.json. Ce dernier chemin n’est ni déclaré exactement ni
+couvert par un motif docs général dans cette recette. La recette acquisition
+référencée a aussi ces variables mais ne déclare pas ces fichiers externes.
+Cela limite la couverture de l’inventaire déclaré ; aucune altération historique
+ou panne runtime n’en est déduite. **Propriétaire Codex vérification**, critère :
+rapprocher consommateurs/inputs effectifs, provenance des fixtures et empreintes
+avant une recette dérivée ; correction de manifeste future non réalisée ici.
+Ne pas lancer telle quelle la recette pour qualifier une nouvelle fixture.
+
+### BF-P2.3 — observateur : état disponible, attribution incomplète
+
+| Besoin du contrat | Moyen actuellement trouvé | Verdict de préparation |
+| --- | --- | --- |
+| Lire l’état final de la ref directe | Dans les tests protocole, `Fixture::value` appelle Git rev-parse, `direct` vérifie ref directe/OLD ; en promotion, lecture interne avant/après protocole (`paea_git_promote_call.rs:967–1068`). | **Disponible en source**, sous identité de dépôt/provenance d’outil à conserver. `PaeaGitRepository::inspect` vérifie garde/candidat, pas la ref cible (`paea_git_repository.rs:218–238`). Ni lecture ponctuelle ni état final ne détectent tout ABA. |
+| Lire intention/reçu | `paea_read_git_intent`, Reconcile et PA-09. | **Disponible en source, portée journal uniquement**. Pas une preuve complète d’effet externe ni une attribution A/B. |
+| Observer un point de commit Git | Test `git_reference_commit_without_ack_retains_uncertainty_and_actual_ref`, `tests/git_reference_transaction.rs:360–398` : hook de fixture committed, marqueur écrit puis Git tué avant ACK ; ref relue, CommitRequested conservé. | **Point d’injection/oracle partiel du protocole trouvé**, non exécuté ici. Ce hook contrôlé ne prouve pas un observateur indépendant d’un producteur hostile, ni un parcours PAEA complet. |
+| Conserver intention après ACK perdu | Test `git_reference_durable_intent_survives_missing_ack`, même fichier `535–626`, réserve une intention puis exécute le protocole, rouvre et constate Existing sans nouvelle publication. | **Couverture en source plus précise que le seul simulateur**. Réutiliser recette `paea-native-git-intent.json` pour sa portée future, pas comme PASS nouveau ou raccord à effect::commit. |
+| Compter toutes les publications, attribuer à A1/B, prouver réception et distinguer preuve cachée | Aucun observateur complet correspondant trouvé dans les producteurs, harnais et recettes examinés. Reçu Git = ref/old/new ; fixture d’autorité fixe le même principal. | **Prérequis manquant dans le parcours examiné** : journal d’oracle indépendant avec origine d’écrivain/tentative, couverture et barrières, projection distincte vers décideur. Un PID, le Git author du commit, un fichier marqueur, reflog ou hash seul ne remplit pas ce contrat. Aucune absence universelle déclarée. |
+
+Les recettes `paea-native-git-reference-transaction.json` et
+`paea-native-git-intent.json` contiennent les tests nommés ci-dessus ; elles n’ont
+pas été exécutées ou revérifiées dans cette reprise. Les preuves historiques déjà
+relues ne sont pas étendues à ces nouveaux éléments par simple proximité de noms.
+
+### BF-P2.4 — points d’injection disponibles et non raccordés
+
+| Frontière visée | Point réellement accessible actuellement | Scénarios et limite |
+| --- | --- | --- |
+| Avant appel public / avant engagement | L’appelant garde la main avant `call_paea_git_promote` ; test de révocation `...revoked_after_agreement_then_readmits_once`, `tests/paea_git_promote_call.rs:689–783`, termine la révocation avant consommation. | Permet préconditions modifiées avant appel, F-6 et stimuli B avant A. Ne coupe pas un appel déjà en vol. |
+| Après intention, avant processus Git | `paea_reserve_git_intent` est public et peut créer un état d’intention isolé sans Git ; la réservation interne `effect::commit` est privée, sans callback exposé à cet emplacement dans le code lu. | F-1 peut avoir un état synthétique de préparation documenté. Cela ne prouve pas une rupture réellement injectée dans le chemin complet ; une barrière intégrée reste à qualifier. |
+| Après prepare, avant COMMIT | `run_git_reference_transaction(Command, proposal, deadline, cancelFD, decide)` est public ; son callback intervient après ACK prepare. Les tests y vérifient verrou, écriture concurrente refusée, annulation/délai avant COMMIT. | Disponible **au niveau protocole**. La promotion fournit sa propre closure interne et `cancel=None` (`paea_git_promote_call.rs:963–1009`) ; ces paramètres ne sont pas exposés par son API publique. |
+| Après publication, avant ACK | Le hook committed de la fixture protocole réalise ce cas avec Git réel en source. | Réutilisation protocole possible après autorisation. Le producteur PAEA `managed_repository::git_command`, `managed_repository.rs:63–106`, force `core.hooksPath=/dev/null` et nettoie GIT_* ; ne pas modifier cette protection ni substituer un Git-wrapper pour prétendre tester le même profil. F-2 PAEA non prêt. |
+| Après publication/lecture de ref, avant écriture du reçu | `effect::commit` appelle ensuite la fonction privée `record`; aucun callback/barrière public trouvé entre les deux dans le module relu. | **Manquant pour F-2/F-4** sous parcours PAEA normal. Un kill chronométré ou l’attente d’un log n’est pas une injection causale qualifiée. Un état créé à la main dans le journal n’établit pas cette rupture. |
+| Après retour de bibliothèque / reçu durable avant réception demandeur | Le banc peut retenir le résultat retourné avant sa livraison au décideur ; les sources CLI ne projettent le résultat final qu’après l’appel et les clôtures. | Composition de banc possible pour F-3 et preuve cachée B-2, pas harnais déjà prêt. Distinguer perte dans le banc, échec d’écriture stdout et vraie réponse perdue en transport ; aucun protocole réseau à lancer. |
+
+Le test d’annulation protocole `...prepared_cancellation_retains_owned_process_and_lock`
+(`tests/git_reference_transaction.rs:406–455`) supprime lui-même un verrou de sa
+fixture après vérification de l’inode et du reap. **Cette recette de nettoyage n’est
+pas adoptée pour F/B** : le plan interdit de supprimer un verrou pour forcer la
+reprise. Prévoir observation/diagnostic et instance neuve si aucun parcours de
+récupération compatible n’est établi ; ne pas appeler ce nettoyage une capacité PAEA.
+
+### BF-P2.5 — fencing : portée de chaque mécanisme
+
+| Mécanisme relu | Ce qu’il contrôle dans les sources | Ce qu’il ne prouve pas / prérequis restant |
+| --- | --- | --- |
+| OLD et verrou prepare | `update NEW OLD`, callback sous verrou Git, test concurrence `git_reference_prepared_lock_excludes_competing_writers:248–275`. | Sérialise cette ref pendant la transaction, pas toutes les actions A1 ni les écritures futures. Une valeur O restaurée ne protège pas d’ABA ; un écrivain après libération reste possible. |
+| Writer SQL projet et réservation Trust | `call_paea_git_promote:491–528` conserve plan/politique/accord sur l’application ; la révocation publique concurrente exige un autre verrou. | Ne pas prévoir une révocation pendant la section protégée comme barrière immédiate. Révocation achevée avant appel bloque l’accord obsolète ; elle n’annule pas un effet déjà engagé. |
+| Context::cancel et cancelFD | `authenticated_control.rs:11–30` annule ses consommateurs ; protocole check avant COMMIT, `git_reference_transaction.rs:181–211,284–302`. | Le Context de compte n’est pas un cancelFD Git dans la promotion, qui passe None. Ni annulation ni expiration seule ne prouve la fin des enfants ou l’absence d’effet. |
+| Possession du processus | `validation_run.rs:389–425,556–590` utilise groupe dédié, pidfd/wait et conserve Child/erreurs ; getters `reaped_exit_status`, `take_unreaped_process`, ownership-lost conservent des limites explicites. | Signal délivré ≠ arrêt de tous descendants ; status du leader ne couvre pas un descendant échappé, encore moins un autre acteur même UID. Ne pas transformer un PID en capacité de kill. Aucun signal envoyé ici. |
+| Reprise d’ownership | `validation_run_recovery.rs:31–54` poll les Child conservés sans lancement/signal/retry, fonction privée crate. | Ce n’est pas une API publique générale de fencing d’A1. La preuve BF-C04 d’absence d’émission résiduelle sur tous chemins/enfants demeure **non établie**. |
+
+**Condition minimale de BF-P3 :** A1 n’est éligible à une reprise mutante qu’après
+preuve d’ownership/fin applicable, fermeture de tous ses chemins d’émission du banc
+et observation finale sous barrière. Ni le verrou Git absent, ni un booléen canceled,
+ni un reçu manquant n’en tient lieu. Pour B-2, si l’oracle ne peut prouver cette
+couverture, résultat attendu = inconnu et zéro publication, pas absence démontrée.
+
+### BF-P2.6 — profil, inventaires et décision de passage
+
+`swarm-engine/Cargo.toml` expose `test-fixtures` séparément ; les recettes normales
+lues n’ajoutent pas cette feature et utilisent les tests d’intégration nommés
+`paea_git_promote_call` / `git_reference_transaction` ; ceux du premier target sont
+`#[ignore]` et nécessitent une fixture native explicite. `.cargo/config.toml` fixe
+profil dev/test sans debug ni incremental, wrapper de compilation et option SQLite
+FILESTAT. Cela décrit des entrées configurées, pas les features unifiées ni un ELF
+exercé. Aucune compilation, métadonnée Cargo, vérification Git --version ou inspection
+d’un binaire actif effectuée ; profil effectif, outil Git réellement utilisé et
+identité d’un futur exécutable restent à retenir lors d’une exécution autorisée.
+
+| Préparation par famille | État documentaire actuel | Condition concrète de passage |
+| --- | --- | --- |
+| Témoins F-T / B-T | Composition PAEA identifiée ; projet frais, acteur B distinct et oracle non disponibles comme harnais qualifié. | Source native neuve par chemin pris en charge, droits A/B distincts, provenance/compteurs et témoin observé. |
+| F-1 / F-3 / F-6 | Préparation/réservation et frontières avant/après appel composables ; rupture intégrée, ownership et projection de preuve encore à établir. | Choisir entre état synthétique explicitement borné et vraie rupture ; qualifier les liaisons/erreurs et ne pas confondre ces portées. |
+| F-2 / F-4 | Test protocole ACK perdu disponible en source ; barrière PAEA ref→reçu et atteignabilité de already non qualifiées. | Banc déterministe préservant le parcours normal, puis reproduction séparée ; aucun passage global. |
+| B-1 / B-2 / B-4 | Stimuli état/masquage possibles comme composition de fixture, mais second acteur/provenance/réception complète manquants. | Observer identité effective de chaque publication, limiter ce que reçoit le décideur, droits distincts prouvés. |
+| F-5 / B-3 / B-5 | Commits O/N/X synthétiques disponibles au protocole ; observation historique complète de transitions absente du banc PAEA examiné. | Oracle couvrant transitions intermédiaires et auteurs, pas comparaison des seuls endpoints. |
+
+**Décision retenue dans le plan : BF-P2 documentaire terminé, passage BF-P3 non acquis.**
+Deux suites réalistes sont conservées sans les lancer :
+- réutiliser d’abord le banc protocole existant pour caractériser prepare/OLD et
+  ACK perdu, avec portée explicitement inférieure au PoC PAEA ; cela ne réduit pas
+  les critères finaux de F/B ;
+- préparer un banc F/B borné pour le parcours public normal : source neuve,
+  identités A/B observées, oracle, réception contrôlée et barrière ref→reçu. Le
+  besoin exact d’instrumentation de test, d’adaptateur ou d’évolution produit sera
+  à décider avant édition ; aucun hook de production ou retry nouveau présumé.
+
+Propriétaire de ces suites et de BF-P2-R1 : Codex pour proposition/réalisation
+ultérieure, Fabrice pour autorisation de développement/test et arbitrage. Ordre
+recommandé : corriger les entrées effectives de recette sous autorisation appropriée,
+qualifier les fixtures fraîches/identités, puis oracle/barrières/fencing, avant
+F-2/F-4 et B-1/B-2. Dans cette session, seuls leurs contrats et manques sont conservés.
+
+Aucune politique, limite, fonction ou docstring produit modifiée. Aucune recette
+éditée, fixture active ou preuve historique changée. Pas de build/livraison ni de
+version_history.json à modifier ; transmission persistante par plans FR/EN et
+registre X local ignoré par Git, aucun contexte embarqué ou processus rechargé.
+
+Empreintes de la qualification statique, pas inventaire de compilation ni preuve d’exécution :
+
+| Source / fichier de preuve lu | SHA-256 |
+| --- | --- |
+| `rust/crates/swarm-engine/src/root_store/paea_git_promote_call.rs` | `1255d665e4ef6b7183253bbca39193904519466850e75d66c501593ccb9fd6e2` |
+| `rust/crates/swarm-engine/tests/paea_git_promote_call.rs` | `ef4e847c8edc68a6ac1793959e906177d8ac1fceef2859fc40c74c4d226424a5` |
+| `rust/crates/swarm-engine/src/root_store/paea_git_intent.rs` | `2aef44210363e5aec5b96d88e1990828744dc6b84828c0e0dc15b0ddd2c82652` |
+| `rust/crates/swarm-engine/src/root_store/paea_git_repository.rs` | `0b59230a65dd318da0f9ca387145ebe49c1800f1c70ad196a2fa3aefb9cbbe18` |
+| `rust/crates/swarm-engine/src/git_reference_transaction.rs` | `180adba837db4fe54c61a38a7b3e44443bed9b8bfbeef33cedf323cc62bf8324` |
+| `rust/crates/swarm-engine/tests/git_reference_transaction.rs` | `fa3ed15210465b128ca2ea0be6aed984034b26367c5932a413f9fe71b211ed3e` |
+| `rust/crates/swarm-engine/src/managed_repository.rs` | `6e6a87c8eb6fa6cf207f581a8bc85784e3598a875fb5427ce696c55af396bae3` |
+| `rust/crates/swarm-engine/src/validation_run.rs` | `1c843fdfcafea7962d079198eb74fe163b81d2d3c10f9e54dea8e10b7f5399c2` |
+| `rust/crates/swarm-engine/src/validation_run_recovery.rs` | `548966ca99e07b62c6d672f70cf2cab9e73f5af18537f54cf67447f637cbd554` |
+| `rust/crates/swarm-engine/src/fixture_area.rs` | `af557230575868c1e70c83825136cd9d9d26673681301f318e54621cb9f22708` |
+| `rust/crates/swarm-enrollment-authority/src/authenticated_control.rs` | `cf502d4b735137d4c2a830ddfadaa3afefb5630241bb1fab40a3c7894eb0256a` |
+| `rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs` | `0c0f3635a8c9cfa2b4afa3a88c38baf71e8b0a8f48f89a2992bd9724586df6d2` |
+| `rust/crates/swarm-cli/src/paea_promote.rs` | `1547acd73582dafbd7b6acde6f6616f2db624995411a5b3cf699f2ec339fd6a5` |
+| `rust/crates/swarm-cli/src/paea.rs` | `8c39c1758e3e08a886f15fc78056e83071e5ecd6d16810c4d63189cf68f21c56` |
+| `rust/crates/swarm-engine/Cargo.toml` | `513a0d0b17756cd31e08e9f6d2fb1872df41dcb3bf8cc1b11d4830aa4a692f89` |
+| `.cargo/config.toml` | `31bee734fefe516086f75b642c1ca537e54997d684e4cc5c983951e01157ca72` |
+| `tools/verification/recipes/paea-owned-git-promote.json` | `7ee5855ce0ef3b1c74836a0968e2da3031db882d8954e7dfe2e1b79a3db3e656` |
+| `tools/verification/recipes/paea-owned-source-acquisition.json` | `2eb35de6b2851f8ed957701e3d21ce311477eb97eb0c8c5df5e34cff97517866` |
+| `tools/verification/recipes/paea-native-git-reference-transaction.json` | `09a4a07914cc9c97eb77c766823c09778a4628a9b7d9e096d58512ddb1bbe43c` |
+| `tools/verification/recipes/paea-native-git-intent.json` | `e2d478da120bce223bead78109f427794ef957a05a58cb046c3bb30092e30fdf` |
+| `docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-writer78b-regen-20261031b/result.json` | `bc58ae6b3492da38697f45d438f116f79c545ad8f0236ad4c5de9ddbea779218` |
+| `docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-current-pub-regen-20261031/result.json` | `f79644bc4a6fcb3f0d1b508d8e9a9dd293a12f6ecaafa879a46b5144b4bec020` |
