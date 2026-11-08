@@ -1961,3 +1961,30 @@ Targeted read fingerprints, no compiler graph or execution:
 | `tools/verification/recipes/paea-payment-agreement.json` | `e0e6024b48a546ab75cfcdb85ab050ac087b592b7de9116cd770aaa15372d54d` |
 | `tools/verification/recipes/paea-promote-cli-suite-regression-rust.json` | `9f0dc5c619426b04c512f8c98eadb892e48177f8b34ff999862d1b58f592ff7e` |
 | `tools/verification/recipes/paea-transfer-call-cli-rust.json` | `3ad8afeaa1071396eba837c83249e7ad0848a0edbeed1f1960a923cb0e2268e8` |
+
+
+### Git replan — protected main publication refused, 8 November 2026
+
+Documentation commit created: `19b1e948125a9521389b33d6ef46c97ae187b651`, only the
+two FR/EN plans, 1036 added lines including prior work. Direct main push **rejected
+GH006**: PR required and two expected checks. Read protection: enforce_admins=true,
+strict=true, contexts checks/install, zero minimum human approvals. Local commit
+preserved; no successful main push claimed.
+
+.github/workflows/ci.yml matches HEAD/origin/main, Git blob
+`329f4f498d2ed958316785c49444eec65f004505`. Push trigger main only, pull_request
+without documentation filter; checks/install run Cargo/npm/install tests. Opening
+a documentary PR would therefore run tests forbidden by current request. No
+workflow/check/protection/history changed to bypass; no PR opened.
+
+Preservation route within push objective: remote target
+`codex/bf-l0-input-audit-19b1e9481` from documentary HEAD, no checkout switch or
+uncommitted native work included. This branch push does not trigger read workflow;
+actual push/ref success must be observed through Git. Main remains unintegrated.
+
+Resumption owner: Fabrice for authority to run PR-required CI; Codex then uses
+protected flow. No unchanged main-push retry. Prepared PR title
+`docs(poc03): map BF-L0 recipe inputs and remaining blockers`; body describes
+fifteen additional static recipe mappings, R09–13 and retained limits, documentary
+hash/diff validation only, no local tests. No product capability, BF-L0 clearance
+or independent acceptance claimed.

@@ -2327,3 +2327,34 @@ Empreintes de lecture ciblée, sans graphe compilateur ni exécution :
 | `tools/verification/recipes/paea-payment-agreement.json` | `e0e6024b48a546ab75cfcdb85ab050ac087b592b7de9116cd770aaa15372d54d` |
 | `tools/verification/recipes/paea-promote-cli-suite-regression-rust.json` | `9f0dc5c619426b04c512f8c98eadb892e48177f8b34ff999862d1b58f592ff7e` |
 | `tools/verification/recipes/paea-transfer-call-cli-rust.json` | `3ad8afeaa1071396eba837c83249e7ad0848a0edbeed1f1960a923cb0e2268e8` |
+
+
+### Replan Git — publication main refusée par protection, 8 novembre 2026
+
+Commit documentaire créé : `19b1e948125a9521389b33d6ef46c97ae187b651`, deux plans
+FR/EN seulement, 1036 lignes ajoutées avec leurs travaux précédents. Le push direct
+sur main a été **refusé GH006** : PR obligatoire, deux checks attendus. Lecture
+GitHub de la protection : enforce_admins=true, strict=true, contextes `checks` et
+`install`, aucun approbateur humain minimum requis. Le refus ne remet pas en cause
+le commit local ; aucun push main réussi n’est déclaré.
+
+`.github/workflows/ci.yml` relu dans HEAD et origin/main : mêmes octets Git
+`329f4f498d2ed958316785c49444eec65f004505`. Push déclenché seulement sur main,
+pull_request sans filtre documentaire ; jobs checks/install exécutent notamment
+cargo test, npm test et tests d’installation. Ouvrir même une PR documentaire
+lancerait donc des tests, interdits par la demande actuelle. Aucun workflow, check,
+protection ou historique modifié pour contourner cette règle ; aucune PR ouverte.
+
+Voie de conservation autorisée dans la continuité du push : branche distante cible
+`codex/bf-l0-input-audit-19b1e9481`, depuis le HEAD documentaire, sans changer le
+checkout principal ni embarquer les modifications natives non committées. Le push
+sur cette branche n’est pas un déclencheur du workflow lu ; sa réussite et les refs
+réelles sont à constater par le parcours Git. La cible main reste non intégrée.
+
+Propriétaire de la condition de reprise : Fabrice pour l’autorisation des contrôles
+CI nécessaires à une PR/intégration ; Codex pour appliquer alors le parcours protégé.
+Ne pas relancer le même push main inchangé. Préparation de PR : titre
+`docs(poc03): map BF-L0 recipe inputs and remaining blockers` ; corps : rapprochement
+statique des quinze recettes complémentaires, R09–13 et limites conservées ;
+validation documentaire/empreintes seulement, aucun test local exécuté. Aucune
+capacité produit, levée BF-L0 ou acceptation indépendante revendiquée.
