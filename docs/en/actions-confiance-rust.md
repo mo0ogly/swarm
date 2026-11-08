@@ -812,6 +812,50 @@ Permanent recipe
 Still closed: read/summarize/transmit/compact rights (M20 operator rights, a
 distinct increment).
 
+**M25 usage proposal (8 November 2026)** — the usage binding
+`memorySummaryUsageBinding` (`internal/engine/memory_usage_binding.go`) is
+ported to `rust/crates/swarm-engine/src/memory_usage_binding.rs`. Construction
+is pure: no SQL, no identity evaluation, no reservation, no commitment and no
+transmission; the digest binds requests, never rights. It rebuilds the
+supported M19 pipeline on the caller-owned Work snapshot, refuses an invalid
+caller contract (`memory-usage-binding-invalid`: non-absolute or non-clean
+root, Work outside schema 1, unsafe names, missing selection, target task
+different from the launch task, scope outside the Work, recipient without an
+instance) and invalid sources (`memory-usage-sources-invalid`: duplicate or
+unknown received ids, the operator snapshot is never transmissible, non-UTF-8
+or digest-divergent text, a received id absent from the selected sources).
+The `swarm-memory-usage-v2` projection carries the target (scope, task,
+recipient), the packet/selection/attachment digests and one exact source per
+selected source (`memory:v2:<digest>` derived from the
+`swarm-memory-resource-v2` project/work/task/id/kind/role contract); only
+sources marked received carry `transmit`. `requests()` produces per source
+`memory.read` and `memory.summarize` (+ `memory.transmit` when received),
+bound to the complete proposal digest, with event ids derived from the
+`swarm-memory-usage-event-v1` contract; these requests confer no right
+without the identity kernel (a protected frame and a fresh caller are IA3
+requirements). Canonical Go parity is proven by cross digest: a fixed
+projection and one event id hash to the Go program's reference digests
+(recorded in the `projection_digest_matches_go_reference` test; the scratch
+program lived at `.swarm-fixtures/memory-usage-crosscheck` and is preserved
+inside run-20261108-1). No public path consumes the binding — as in Go
+(M24/M25, library only): `evaluateMemorySummaryUsage`
+(`memory_usage_decision.go`) stays unported pending the identity kernel
+(`evaluateAgentIdentity`, 32 Go files), and isolated preparation remains the
+only supported use. No public activation: M20-U01 to U10 open, P4 criteria
+required before any activation. Evidence:
+`cargo test -p swarm-engine --lib memory_usage` (6: exact sources and
+transmission, content change under the same projection,
+destination/selection tracking, rejection without partial result,
+request scope/grant/digest binding, Go digest parity), the Go reference
+`TestMemoryUsageBinding*` + `TestMemoryUsageRequests*` (32) green as the
+parity witness. Permanent recipe
+`tools/verification/recipes/versioned-memory-usage-binding-rust.json`
+(3 steps), evidence
+`.swarm-fixtures/versioned-memory-usage-binding-evidence/run-20261108-1`
+(PASS, `verify` → VERIFIED). Still closed: the M25 decision node (identity
+kernel), read/summarize/transmit/compact rights (M20 operator rights, a
+distinct increment) and any public wiring.
+
 The historical interprocess flock serializes writes. One idempotency key creates
 one native entry; conflicting content refuses. `lose_response:true` records
 `unknown` after the simulated effect. Another commit cannot duplicate it;

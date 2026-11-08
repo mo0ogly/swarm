@@ -283,6 +283,40 @@ recette permanente
 Restent fermés : droits lire/résumer/transmettre/compacter (décision
 opérateur, incréments distincts).
 
+Tranche G2 liaison d'usage M25 (8 novembre 2026) : la proposition d'usage est
+portée — `memorySummaryUsageBinding` (`internal/engine/memory_usage_binding.go`)
+dans `rust/crates/swarm-engine/src/memory_usage_binding.rs`. Construction
+pure : pas de SQL, pas d'évaluation d'identité, pas de réservation, pas
+d'engagement, pas de transmission ; le digest lie des demandes, jamais des
+droits. La projection `swarm-memory-usage-v2` porte la cible (scope, tâche,
+destinataire), les digests paquet/sélection/pièce jointe et une source exacte
+par source sélectionnée (`memory:v2:<digest>`, dérivé du contrat
+`swarm-memory-resource-v2`) ; seules les sources reçues portent `transmit`
+(l'instantané opérateur n'est jamais transmissible). `requests()` émet par
+source `memory.read` et `memory.summarize` (+ `memory.transmit` si reçue)
+liées au digest complet, avec ids d'événement dérivés du contrat
+`swarm-memory-usage-event-v1` ; ces demandes ne confèrent aucun droit sans le
+noyau d'identité. Refus typés `memory-usage-binding-invalid` (contrat
+appelant : racine non absolue ou non nettoyée, Work hors schéma 1, noms
+dangereux, sélection absente, cible hors tâche ou hors Work, destinataire
+sans instance) et `memory-usage-sources-invalid` (ids reçus dupliqués ou
+inconnus, texte non UTF-8 ou divergent, id reçu absent des sources). Parité
+canonique Go prouvée par digest croisé : la projection et un id d'événement
+fixés retrouvent les digests de référence du programme Go (test
+`projection_digest_matches_go_reference`). Aucun chemin public ne consomme la
+liaison — comme en Go (M24/M25, bibliothèque seule) : `evaluateMemorySummaryUsage`
+reste à porter en attente du noyau d'identité (`evaluateAgentIdentity`),
+la préparation isolée reste le seul usage soutenu, aucune activation
+publique (M20-U01..U10 ouverts, critères P4 requis). Preuve : moteur
+`--lib memory_usage` 6 tests, référence Go `TestMemoryUsageBinding*` +
+`TestMemoryUsageRequests*` (32) verte ; recette permanente
+`tools/verification/recipes/versioned-memory-usage-binding-rust.json`
+(3 étapes), preuve
+`.swarm-fixtures/versioned-memory-usage-binding-evidence/run-20261108-1`
+(PASS, verify VERIFIED). Restent fermés : le nœud de décision M25 (noyau
+d'identité), les droits lire/résumer/transmettre/compacter (décision
+opérateur, incréments distincts), tout câblage public.
+
 ## Découverte D03 — fixtures de tests Rust sous /tmp (interdiction opérateur)
 
 Origine : reprise tranche G2 filiation (6 novembre 2026). Après l'interdiction

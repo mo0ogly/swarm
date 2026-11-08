@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "id": "versioned-memory-usage-binding-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/memory_usage_binding.rs",
+    "rust/crates/swarm-engine/src/memory_summary_selection.rs",
+    "rust/crates/swarm-engine/src/memory_summary_source.rs",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/agent_launch_preflight.rs",
+    "rust/crates/swarm-engine/src/agent_models.rs",
+    "rust/crates/swarm-engine/src/agent_launch_error.rs",
+    "rust/crates/swarm-engine/src/local_path.rs",
+    "rust/crates/swarm-engine/src/models.rs",
+    "rust/crates/swarm-engine/src/work.rs",
+    "rust/crates/swarm-engine/src/project_memory.rs",
+    "rust/crates/swarm-engine/src/fixture_area.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-identity-contract/src/lib.rs",
+    "rust/crates/swarm-wire-json/src/lib.rs",
+    "internal/engine/memory_usage_binding.go",
+    "internal/engine/memory_usage_binding_test.go",
+    "internal/engine/agent_identity_contract.go",
+    "internal/engine/memory_summary_selection.go",
+    "internal/engine/agents_store.go",
+    "docs/actions-confiance-rust.md",
+    "docs/en/actions-confiance-rust.md",
+    "tools/verification/recipes/versioned-memory-usage-binding-rust.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "usage-binding-unit",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "memory_usage",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 6 tests",
+        "test result: ok. 6 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "usage-binding-selection-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "memory_summary",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 9 tests",
+        "test result: ok. 9 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "usage-binding-go-parity-reference",
+      "command": [
+        "go",
+        "test",
+        "./internal/engine/",
+        "-run",
+        "TestMemoryUsageBinding|TestMemoryUsageRequests",
+        "-count=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "ok  "
+      ],
+      "required_stderr": []
+    }
+  ]
+}

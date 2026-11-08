@@ -840,6 +840,50 @@ driftées, branches réservées), web `cargo test -p swarm-web --lib`
 Restent fermés : les droits lire/résumer/transmettre/compacter (droits
 opérateur M20, incrément distinct).
 
+**Proposition d'usage M25 (8 novembre 2026)** — la liaison d'usage
+`memorySummaryUsageBinding` (`internal/engine/memory_usage_binding.go`) est
+portée dans `rust/crates/swarm-engine/src/memory_usage_binding.rs`. La
+construction est pure : aucune SQL, aucune évaluation d'identité, aucune
+réservation, aucun engagement ni aucune transmission ; le digest lie des
+demandes, jamais des droits. Elle reconstruit le pipeline M19 supporté sur
+l'instantané du Work fourni par l'appelant, refuse un contrat appelant
+invalide (`memory-usage-binding-invalid` : racine non absolue ou non nette,
+Work hors schéma 1, noms non sûrs, sélection absente, tâche cible différente
+de la tâche de lancement, portée hors Work, destinataire sans instance) et
+des sources invalides (`memory-usage-sources-invalid` : reçus dupliqués ou
+inconnus, instantané opérateur jamais transmissible, texte non UTF-8 ou dont
+le digest diverge, reçu reçu absent des sources sélectionnées). La projection
+`swarm-memory-usage-v2` porte la cible (portée, tâche, destinataire), les
+empreintes paquet/sélection/pièce jointe et une source exacte par source
+sélectionnée (`memory:v2:<digest>` dérivé du contrat
+`swarm-memory-resource-v2` projet/tâche/œuvre/id/genre/rôle) ; seules les
+sources marquées reçues portent `transmit`. `requests()` produit par source
+`memory.read` et `memory.summarize` (+ `memory.transmit` si reçu), liées au
+digest complet de la proposition, avec des identifiants d'événement dérivés
+du contrat `swarm-memory-usage-event-v1` ; ces demandes ne confèrent aucun
+droit sans noyau d'identité (trame protégée + appelant frais requis par IA3).
+La parité canonique avec Go est prouvée par digest croisé : la projection
+fixe et un identifiant d'événement hachent aux empreintes de référence du
+programme Go (mémorisées dans le test `projection_digest_matches_go_reference`,
+ex-évidence `.swarm-fixtures/memory-usage-crosscheck`, conservées dans
+run-20261108-1). Aucun chemin public ne consomme la liaison — comme en Go
+(M24/M25, bibliothèque seule) : `evaluateMemorySummaryUsage`
+(`memory_usage_decision.go`) reste non porté en attendant le noyau
+d'identité (`evaluateAgentIdentity`, 32 fichiers Go), et la préparation
+isolée reste le seul usage supporté. Aucune activation publique : M20-U01 à
+U10 ouverts, critères P4 requis avant toute activation. Preuves :
+`cargo test -p swarm-engine --lib memory_usage` (6 : sources exactes et
+transmission, changement de contenu sous même projection, suivi de
+destination/sélection, refus sans résultat partiel, portée/grant/digest des
+demandes, parité de digest Go), rappel Go `TestMemoryUsageBinding*` +
+`TestMemoryUsageRequests*` (32) au vert comme référence. Recette permanente
+`tools/verification/recipes/versioned-memory-usage-binding-rust.json`
+(3 étapes), preuve
+`.swarm-fixtures/versioned-memory-usage-binding-evidence/run-20261108-1`
+(PASS, `verify` → VERIFIED). Restent fermés : le nœud de décision M25
+(noyau d'identité), les droits lire/résumer/transmettre/compacter (droits
+opérateur M20, incrément distinct) et tout raccord public.
+
 Le verrou interprocessus historique sérialise les écritures. Une même clé ne
 produit qu’une entrée native ; un autre contenu sous cette clé est refusé.
 `lose_response:true` rend l’état `unknown` après l’effet simulé. Un nouvel

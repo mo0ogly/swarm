@@ -389,9 +389,14 @@ mod memory_catalog;
 mod memory_files;
 mod memory_summary_selection;
 mod memory_summary_source;
+mod memory_usage_binding;
 pub use memory_summary_source::{
     decode_summary_source_request, summary_source_for_work, MemorySummarySource,
     MemorySummarySourcePacket, MemorySummarySourceRequest,
+};
+pub use memory_usage_binding::{
+    memory_summary_usage_binding, Actor, MemoryUsageBinding, MemoryUsageProjection,
+    MemoryUsageRequest, MemoryUsageSourceBinding, MemoryUsageTarget,
 };
 mod local_path;
 mod model_wire;

@@ -249,6 +249,40 @@ tests; permanent recipe
 Still closed: read/summarize/transmit/compact rights (operator decision,
 distinct increments).
 
+G2 usage-binding M25 tranche (8 November 2026): the usage proposal is
+ported — `memorySummaryUsageBinding` (`internal/engine/memory_usage_binding.go`)
+to `rust/crates/swarm-engine/src/memory_usage_binding.rs`. Pure construction:
+no SQL, no identity evaluation, no reservation, no commitment, no
+transmission; the digest binds requests, never rights. The
+`swarm-memory-usage-v2` projection carries the target (scope, task,
+recipient), the packet/selection/attachment digests and one exact source per
+selected source (`memory:v2:<digest>`, derived from the
+`swarm-memory-resource-v2` contract); only received sources carry `transmit`
+(the operator snapshot is never transmissible). `requests()` emits per source
+`memory.read` and `memory.summarize` (+ `memory.transmit` when received)
+bound to the full digest, with event ids derived from the
+`swarm-memory-usage-event-v1` contract; these requests confer no right
+without the identity kernel. Typed refusals `memory-usage-binding-invalid`
+(caller contract: non-absolute or non-clean root, Work outside schema 1,
+unsafe names, missing selection, target outside the task or the Work,
+recipient without an instance) and `memory-usage-sources-invalid` (duplicate
+or unknown received ids, non-UTF-8 or divergent text, received id absent
+from the sources). Canonical Go parity proven by cross digest: a fixed
+projection and one event id reproduce the Go program's reference digests
+(`projection_digest_matches_go_reference` test). No public path consumes the
+binding — as in Go (M24/M25, library only): `evaluateMemorySummaryUsage`
+remains unported pending the identity kernel (`evaluateAgentIdentity`),
+isolated preparation remains the only supported use, no public activation
+(M20-U01..U10 open, P4 criteria required). Evidence: engine `--lib
+memory_usage` 6 tests, Go reference `TestMemoryUsageBinding*` +
+`TestMemoryUsageRequests*` (32) green; permanent recipe
+`tools/verification/recipes/versioned-memory-usage-binding-rust.json`
+(3 steps), evidence
+`.swarm-fixtures/versioned-memory-usage-binding-evidence/run-20261108-1`
+(PASS, verify VERIFIED). Still closed: the M25 decision node (identity
+kernel), read/summarize/transmit/compact rights (operator decision, distinct
+increments), any public wiring.
+
 ## Discovery D03 — Rust test fixtures under /tmp (operator interdiction)
 
 Origin: G2 lineage tranche resumption (6 November 2026). After the operator
