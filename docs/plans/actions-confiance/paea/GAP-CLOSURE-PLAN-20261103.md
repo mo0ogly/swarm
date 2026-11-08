@@ -1,5 +1,13 @@
 # Plan priorisé — écarts entre articles, produit et preuves
 
+**8 novembre 2026 : la totalité du travail de branche est fusionnée sur main**
+via PR #16 (merge `024d720528800cd11896b6ceeded08ac2652e51a`, contenant
+`700c36fa8` — réalignement des trois conflits sémantiques du merge
+197d663f6 : inventaire 21 scripts, graphe vide, workspace I0 du fixture
+model-route ; recette `existing-cockpit-rust` verte 4/4 étapes,
+`.swarm-fixtures/ci-cockpit-fix3` ; témoins d'échec conservés). CI post-merge
+sur main en cours à la date de ce paragraphe.
+
 **P1/G1 autorisé puis première tranche locale livrée le 3 novembre 2026** :
 [accord exact du règlement, dev.322 et preuves](P1-G1-20261103.md).
 G1 reste partiel aux frontières humaines/OS ; G2…G7 ne sont pas lancés par cette tranche.

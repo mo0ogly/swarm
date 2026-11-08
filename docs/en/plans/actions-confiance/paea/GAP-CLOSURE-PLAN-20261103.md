@@ -1,5 +1,13 @@
 # Prioritized plan — gaps between articles, product and evidence
 
+**8 November 2026: the entire branch work is merged to main** via PR #16
+(merge `024d720528800cd11896b6ceeded08ac2652e51a`, containing `700c36fa8` —
+realignment of the three semantic conflicts of merge 197d663f6: 21-script
+inventory, empty graph, model-route fixture I0 workspace; the
+`existing-cockpit-rust` recipe is green 4/4 steps,
+`.swarm-fixtures/ci-cockpit-fix3`; failure witnesses retained). Post-merge CI
+on main was still running when this paragraph was written.
+
 **P1/G1 authorized and first local slice delivered on 3 November 2026**:
 [exact settlement approval, dev.322 and evidence](P1-G1-20261103.md).
 Global G1 remains partial at human/OS boundaries; this slice launches no G2…G7.
