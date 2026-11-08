@@ -202,9 +202,10 @@ mod tests {
         path::Path,
         process::Command,
     };
-    /// Fresh private filesystem fixture, no live Root or positive business SQL.
+    /// Fresh private filesystem fixture under the governed repository fixture
+    /// area, no live Root or positive business SQL.
     fn parent() -> (tempfile::TempDir, LocalDirectory) {
-        let temp = tempfile::tempdir().unwrap();
+        let temp = tempfile::tempdir_in(crate::fixture_area()).unwrap();
         fs::set_permissions(temp.path(), fs::Permissions::from_mode(0o700)).unwrap();
         let dir = LocalDirectory::open(temp.path()).unwrap();
         (temp, dir)

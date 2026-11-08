@@ -71,7 +71,7 @@ fn refused(output: Output, code: &str) {
 /// differ only in transport ID and raw request hash, never resolved debt terms.
 #[test]
 fn payment_resolution_public_aliases_and_both_languages() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     fixture(dir.path());
     for lang in ["fr", "en"] {
         let first = accepted(call(dir.path(), lang, &[]));
@@ -96,7 +96,7 @@ fn payment_resolution_public_aliases_and_both_languages() {
 /// recover, preserving both input files and avoiding any output/Root creation.
 #[test]
 fn payment_resolution_public_refusal_and_recovery() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     fixture(dir.path());
     for file in ["registry.json", "request.json"] {
         accepted(call(dir.path(), "en", &[]));
@@ -164,7 +164,7 @@ fn payment_resolution_write_and_flush_causes_and_recovery() {
             Err(io::Error::new(io::ErrorKind::BrokenPipe, "IO_CANARY"))
         }
     }
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     fixture(dir.path());
     for flush_only in [false, true] {
         let argv = args(dir.path(), "en");

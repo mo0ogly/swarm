@@ -1,4 +1,5 @@
 #![cfg(target_os = "linux")]
+mod common;
 mod personal_common;
 use ed25519_dalek::SigningKey;
 use personal_common::Fixture;
@@ -28,7 +29,7 @@ impl Case {
     }
     /// Preserve the same real fixture when a test also needs its independent writer.
     fn from_fixture(f: Fixture) -> Self {
-        let witness = tempfile::tempdir().unwrap();
+        let witness = tempfile::tempdir_in(personal_common::area()).unwrap();
         fs::set_permissions(witness.path(), fs::Permissions::from_mode(0o700)).unwrap();
         let documents =
             Documents::open(witness.path(), rustix::process::geteuid().as_raw()).unwrap();

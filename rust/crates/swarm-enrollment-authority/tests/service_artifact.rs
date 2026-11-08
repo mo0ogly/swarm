@@ -1,4 +1,5 @@
 //! Service-only handoff data, never an installed service or human authority.
+mod common;
 use sha2::{Digest, Sha256};
 use std::{fs, os::unix::fs::PermissionsExt};
 use swarm_enrollment_authority::provisioning::{self as p, service_artifact as s};
@@ -142,7 +143,7 @@ fn service_artifact_seed_layout_generation_and_head_bindings_refuse() {
 fn apply_real(artifact: &s::ServiceArtifact, recovery: Option<&[u8]>) {
     use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
     use swarm_enrollment_state::{Context, Head, Journal};
-    let d = tempfile::tempdir().unwrap();
+    let d = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(d.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let key = URL_SAFE_NO_PAD
         .decode(&artifact.document().control.installation.pins.public_key)

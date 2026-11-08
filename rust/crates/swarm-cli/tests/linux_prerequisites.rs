@@ -32,7 +32,7 @@ fn valid(root: &std::path::Path, lang: &str) -> Value {
 /// before source selection, never creating Root/output or accepting a fake path.
 #[test]
 fn native_prerequisites_cli_valid_refusal_and_recovery_without_root() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let no_json = Command::new(env!("CARGO_BIN_EXE_swarm-rust"))
         .current_dir(dir.path())
         .args(["identity", "linux-prerequisites"])

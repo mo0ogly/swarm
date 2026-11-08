@@ -581,10 +581,28 @@ fn advance(records: &mut HashMap<String, Entry>, c: &Change) -> Result<(), Error
 
 #[cfg(test)]
 mod tests {
+    /// Private operator fallback fixture area (0700 chain), replicating
+    /// `swarm_engine::fallback_area()` inline: this crate has no swarm-engine
+    /// dependency and these fixtures contract private ancestors.
+    fn area() -> std::path::PathBuf {
+        use std::os::unix::fs::DirBuilderExt;
+        let home = std::env::var_os("HOME")
+            .unwrap_or_else(|| panic!("HOME required for the operator fallback fixture area"));
+        let area = std::path::Path::new(&home).join(".local/state/swarm-fixtures");
+        std::fs::DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(&area)
+            .unwrap_or_else(|e| {
+                panic!("fallback fixture area {} cannot be created: {e}", area.display())
+            });
+        area
+    }
+
     use super::*;
     #[test]
     fn every_connection_has_full_sync_no_busy_timeout_and_sql_cancellation_recovers() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir_in(area()).unwrap();
         let key = SigningKey::from_bytes(&[7; 32]);
         let ctx = Context::new();
         let j = Journal::open(

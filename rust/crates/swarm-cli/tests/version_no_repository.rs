@@ -10,7 +10,7 @@ fn version(root: &Path) -> Output {
 /// The optional source candidate must be explicitly unavailable, without mutation.
 #[test]
 fn version_initialized_non_git_root_is_explicitly_unavailable() {
-    let root=tempfile::tempdir().unwrap();
+    let root=tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
     RootStore::initialize(root.path(), &mut SystemEnvironment).unwrap().close().unwrap();
     let before=fs::read(root.path().join(".swarm/engine-settings.json")).unwrap();
     let output=version(root.path());
@@ -24,7 +24,7 @@ fn version_initialized_non_git_root_is_explicitly_unavailable() {
 /// A broken marker is not absence: preserve the existing typed Git failure.
 #[test]
 fn version_broken_git_marker_refuses_and_recovers() {
-    let root=tempfile::tempdir().unwrap();
+    let root=tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
     RootStore::initialize(root.path(), &mut SystemEnvironment).unwrap().close().unwrap();
     fs::write(root.path().join(".git"),b"gitdir: missing-private-fixture\n").unwrap();
     let failed=version(root.path());assert!(!failed.status.success());
@@ -37,7 +37,7 @@ fn version_broken_git_marker_refuses_and_recovers() {
 /// Cold-start identity remains available and does not initialize an absent Root.
 #[test]
 fn version_cold_root_does_not_initialize() {
-    let parent=tempfile::tempdir().unwrap();let absent=parent.path().join("absent");
+    let parent=tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();let absent=parent.path().join("absent");
     assert!(version(&absent).status.success());assert!(!absent.exists());
 }
 

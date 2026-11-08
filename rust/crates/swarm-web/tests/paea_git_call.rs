@@ -475,9 +475,10 @@ fn git_executable() -> &'static std::path::Path {
     );
     path
 }
-/// Fresh native service storage; never open a user mission as a fixture.
+/// Fresh native service storage under the governed repository fixture area;
+/// never open a user mission as a fixture.
 fn service() -> (tempfile::TempDir, RootStore) {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     fs::set_permissions(dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let root = RootStore::initialize(dir.path(), &mut SystemEnvironment).unwrap();
     (dir, root)
@@ -4714,7 +4715,7 @@ fn approval_route_wrong_physical_project_root_refuses_without_effects() {
     // projectA (the held source's project path) and check_root compares the
     // projectB witness — the exact physical mismatch under test. It must
     // refuse typed.
-    let project_b_dir = tempfile::tempdir().unwrap();
+    let project_b_dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     fs::set_permissions(project_b_dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let project_b = RootStore::initialize(project_b_dir.path(), &mut SystemEnvironment).unwrap();
     // The REAL projectB's Trust snapshot is taken right after its actual

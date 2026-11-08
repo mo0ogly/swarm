@@ -36,7 +36,9 @@ struct Case {
 impl Case {
     /// Current-owned private request and two private targets, no default UID/grant.
     fn new() -> Self {
-        let root = tempfile::tempdir().unwrap();
+        // Anchor/target checks walk ancestors with open_private_directory
+        // (checkout is 775): the private fallback area is required here.
+        let root = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
         let op = root.path().join("operator");
         let a = root.path().join("anchor");

@@ -229,7 +229,7 @@ fn challenge_binding_is_data_only_and_keeps_cryptography_separate() {
 }
 #[test]
 fn authenticated_consumer_requires_exact_document_and_explicit_session() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     let key = SigningKey::from_bytes(&[7; 32]);
     let doc = document();
     let j = Journal::open(

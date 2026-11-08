@@ -22,6 +22,18 @@
 //! use. Roots needing no ancestor Git repository go to the operator fallback
 //! area `~/.local/state/swarm-fixtures/` instead (see
 //! `tests/git_metadata.rs::unavailable_fields_...` for the worked case).
+//! D05 (same day): bare `tempfile::tempdir()`/`TempDir::new()` allocations
+//! moved to `tempdir_in(area)`/`new_in(area)` — [`fixture_area`] for crates
+//! whose contracts tolerate repository ancestors, [`fallback_area`] where
+//! private-directory contracts refuse group/other-writable ancestors (the
+//! checkout path is 775; crates without a swarm-engine dependency replicate
+//! the fallback inline, mirroring this function). Callers whose code path
+//! runs `open_private_directory` (enrollment Documents, provisioning
+//! prepare, service installation, anchor/declaration reads — including
+//! swarm-cli's identity test modules and trust_enrollment) need
+//! [`fallback_area`] even inside swarm-cli. The guard also
+//! accepts `CARGO_TARGET_TMPDIR` (cargo-managed scratch) and runner-pinned
+//! `TMPDIR` reads as governed areas.
 use crate::engine_settings::EngineSettingsValues;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
@@ -119,6 +131,31 @@ pub fn fixture_root(prefix: &str) -> PathBuf {
         .create(&path)
         .unwrap_or_else(|e| panic!("fixture root {} cannot be created: {e}", path.display()));
     path
+}
+
+/// Operator fallback fixture area for fixtures whose contracts refuse
+/// group/other-writable ancestors (e.g. `open_private_directory` walks every
+/// ancestor and refuses any not owned by root or the current user without the
+/// sticky bit — a standard checkout is 775). `~/.local/state/swarm-fixtures/`
+/// sits under a fully private 0700 chain, mirroring the recipe.py fallback
+/// (`tools/verification/recipe.py`) and the 31 October operator instruction.
+/// Created 0700 on call, never on import; errors panic with the path (test
+/// helper contract, like [`fixture_area`]). Crates that do not depend on
+/// swarm-engine replicate this resolution inline in their test modules; any
+/// change here must be mirrored there in the same increment.
+pub fn fallback_area() -> PathBuf {
+    use std::os::unix::fs::DirBuilderExt;
+    let home = std::env::var_os("HOME")
+        .unwrap_or_else(|| panic!("HOME required for the operator fallback fixture area"));
+    let area = Path::new(&home).join(".local/state/swarm-fixtures");
+    std::fs::DirBuilder::new()
+        .recursive(true)
+        .mode(0o700)
+        .create(&area)
+        .unwrap_or_else(|e| {
+            panic!("fallback fixture area {} cannot be created: {e}", area.display())
+        });
+    area
 }
 
 #[cfg(test)]

@@ -1,4 +1,5 @@
 //! Explicit operator-package recovery, no installed service or human enrollment.
+mod common;
 use sha2::{Digest, Sha256};
 use std::{fs, os::unix::fs::PermissionsExt};
 use swarm_enrollment_authority::provisioning::{self as p, repository as v};
@@ -8,7 +9,7 @@ use swarm_enrollment_config::store::{
 };
 /// Private operator fixture, fault clone only for current test-fixtures feature.
 fn fixture() -> (tempfile::TempDir, Documents, v::PackageStore, v::Seal) {
-    let d = tempfile::tempdir().unwrap();
+    let d = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(d.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let docs = Documents::open(d.path(), rustix::process::geteuid().as_raw()).unwrap();
     let request: p::Request = serde_json::from_str(include_str!(

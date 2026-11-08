@@ -13,7 +13,10 @@ struct Case {
 impl Case {
     /// Actual current-owned fixture anchor, containing synthetic canonical pins only.
     fn new() -> Self {
-        let root = tempfile::tempdir().unwrap();
+        // The anchor check walks the --input parent with
+        // open_private_directory, refusing group/other-writable ancestors:
+        // the checkout is 775, so the private fallback area is required.
+        let root = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
         let input = root.path().join("anchor.json");
         let raw=format!("{{\"schema_version\":1,\"protocol\":\"swarm-operator-anchor-v1\",\"request_pin\":\"{}\",\"package_pin\":\"{}\"}}","ab".repeat(32),"cd".repeat(32));

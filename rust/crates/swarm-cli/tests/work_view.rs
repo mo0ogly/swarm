@@ -12,7 +12,7 @@ fn call(root: &Path, args: &[&str]) -> std::process::Output {
 }
 /// Persist through the supported native mutation path before checking CLI reads.
 fn fixture() -> (tempfile::TempDir, swarm_engine::Work) {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     assert!(Command::new("git")
         .args(["init", "--quiet"])
         .arg(root.path())

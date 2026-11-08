@@ -9,7 +9,7 @@ use swarm_engine::{RootStore, SystemEnvironment};
 /// Owned initialized root and explicit config request; unavailable executable is
 /// intentional staging data, not a readiness witness or an executed provider.
 fn fixture() -> (tempfile::TempDir, PathBuf) {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     RootStore::initialize(root.path(), &mut SystemEnvironment)
         .unwrap()
         .close()

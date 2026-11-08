@@ -28,7 +28,7 @@ const PIN: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 // --- Settlement harness (autonomous; mirrors tests/paea_settlement.rs) ---
 
 fn root() -> (tempfile::TempDir, RootStore) {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     fs::set_permissions(dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let store = RootStore::initialize(dir.path(), &mut SystemEnvironment).unwrap();
     (dir, store)

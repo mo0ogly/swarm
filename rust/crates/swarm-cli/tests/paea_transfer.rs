@@ -22,7 +22,11 @@ const PIN: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
 /// Fresh native service storage; never open a user mission as a fixture.
 fn service() -> (tempfile::TempDir, RootStore) {
-    let dir = tempfile::tempdir().unwrap();
+    // The CLI child reads the operator declaration through
+    // authenticated_startup::open → open_private_directory, which refuses
+    // group/other-writable ancestors (checkout is 775): the private fallback
+    // area is required here.
+    let dir = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
     fs::set_permissions(dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let root = RootStore::initialize(dir.path(), &mut SystemEnvironment).unwrap();
     (dir, root)

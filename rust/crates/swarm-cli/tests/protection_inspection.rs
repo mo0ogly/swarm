@@ -14,7 +14,7 @@ fn call(root: &std::path::Path, file: &std::path::Path, operation: &str, lang: &
 /// both domains/FR/EN. Maximum integer text survives; no project store is created.
 #[test]
 fn inspection_cli_matches_pure_report_and_existing_canonicalize() {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let file = root.path().join("document.json");
     let vectors: Value = serde_json::from_str(include_str!("../../../../tests/fixtures/paea/contract-v1.json")).unwrap();
     for index in [0, 8] {
@@ -46,7 +46,7 @@ fn inspection_cli_matches_pure_report_and_existing_canonicalize() {
 /// the fictional input; no configuration, ledger or authority is fabricated.
 #[test]
 fn inspection_cli_refusal_and_recovery_keep_output_and_root_safe() {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let file = root.path().join("document.json");
     let valid = include_bytes!("../../../../web/paea-examples/v1/payment-document.json");
     fs::write(&file, valid).unwrap();

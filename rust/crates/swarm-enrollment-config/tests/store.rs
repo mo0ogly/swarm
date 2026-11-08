@@ -19,7 +19,7 @@ fn authorizer() -> Authorizer {
     Arc::new(|_, _, _| Ok(pins().principal))
 }
 fn fixture() -> (TempDir, Store) {
-    let root = TempDir::new().unwrap();
+    let root = TempDir::new_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let s = Store::open(root.path(), owner(), pins(), Some(authorizer())).unwrap();
     (root, s)
@@ -439,7 +439,7 @@ fn unwind_rejects_poisoned_state_and_close_reports_retained_release_failure() {
 fn create_never_replaces_a_file_that_appears_after_the_initial_read() {
     use std::io::Write;
     use std::os::unix::fs::OpenOptionsExt;
-    let root = TempDir::new().unwrap();
+    let root = TempDir::new_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let path = root.path().join("config.json");
     let target = path.clone();
@@ -478,7 +478,7 @@ fn create_never_replaces_a_file_that_appears_after_the_initial_read() {
 #[test]
 fn exact_replays_require_current_authorization_before_returning_saved_data() {
     use std::sync::atomic::{AtomicBool, Ordering};
-    let root = TempDir::new().unwrap();
+    let root = TempDir::new_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let allowed = Arc::new(AtomicBool::new(true));
     let flag = allowed.clone();

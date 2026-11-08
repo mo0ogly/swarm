@@ -318,14 +318,32 @@ pub fn load_authenticated_with_faults(
 }
 #[cfg(test)]
 mod tests {
+    /// Private operator fallback fixture area (0700 chain), replicating
+    /// `swarm_engine::fallback_area()` inline: this crate has no swarm-engine
+    /// dependency and these fixtures contract private ancestors.
+    fn area() -> std::path::PathBuf {
+        use std::os::unix::fs::DirBuilderExt;
+        let home = std::env::var_os("HOME")
+            .unwrap_or_else(|| panic!("HOME required for the operator fallback fixture area"));
+        let area = std::path::Path::new(&home).join(".local/state/swarm-fixtures");
+        std::fs::DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(&area)
+            .unwrap_or_else(|e| {
+                panic!("fallback fixture area {} cannot be created: {e}", area.display())
+            });
+        area
+    }
+
     use super::*;
     use std::os::unix::fs::PermissionsExt;
     /// Actual retained FD alias, not mocked metadata or privileged mount. A valid
     /// pair of distinct private directories precedes rejection of duplicate inode.
     #[test]
     fn distinct_root_real_owned_descriptor_alias_refuses_after_distinct_control() {
-        let one = tempfile::tempdir().unwrap();
-        let two = tempfile::tempdir().unwrap();
+        let one = tempfile::tempdir_in(area()).unwrap();
+        let two = tempfile::tempdir_in(area()).unwrap();
         let uid = rustix::process::geteuid().as_raw();
         for root in [one.path(), two.path()] {
             std::fs::set_permissions(root, std::fs::Permissions::from_mode(0o700)).unwrap();

@@ -21,10 +21,23 @@ Detected violation classes:
   fixture area; remaining `temp_dir()` uses must be one of the documented
   exemptions (read-only probes of the system volume, paths asserted not to
   exist, assertions on the TMPDIR pinning itself, or pure path composition).
+- Rust (.rs): bare `tempfile::tempdir()`, `TempDir::new()`,
+  `NamedTempFile::new()` and `Builder...tempdir()` allocations (no `_in`
+  suffix). The D05 migration (2026-11-07, same day) moved them to
+  `tempdir_in(area)`/`new_in(area)` — RAII kept — with the area chosen by
+  contract: the repository fixture area where ancestor privacy is not
+  contracted, the operator fallback area where private-directory contracts
+  refuse group-writable ancestors. Legitimate without migration: allocation
+  into `CARGO_TARGET_TMPDIR` (cargo-managed target scratch, not /tmp) and the
+  TMPDIR-pinning tests that read the pinned `TMPDIR` variable themselves.
 
 Exit status: 0 when no allocation violation remains; 1 otherwise.
 Review categories never affect the exit status. With `--json`, prints one
 JSON object instead of text.
+
+Default scan roots cover `tests/`, `tools/`, `web/` AND `rust/` (the Rust
+mirror is part of the contract since D04/D05; before, `rust/` had to be
+passed explicitly and was silently missed).
 
 Usage: python3 tools/check_tmp_interdiction.py [--json] [paths...]
 """
@@ -55,8 +68,10 @@ RUST_EXEMPT = {
         586,  # test: path asserted NOT to exist, never created
     },
     'rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs': {
-        682,  # test: assertion — workspace must NOT be under temp_dir
-        683,  # test: assertion — temp_dir must NOT be inside workspace
+        # 2026-11-08: the concurrent with_internet_denied snapshot insertion
+        # (~line 589) shifted these assertions from 682/683 to 686/687.
+        686,  # test: assertion — workspace must NOT be under temp_dir
+        687,  # test: assertion — temp_dir must NOT be inside workspace
     },
     'rust/crates/swarm-engine/tests/runtime_temporary.rs': {
         29,   # test: asserts TMPDIR pinning (env::temp_dir() == applied)
@@ -64,6 +79,29 @@ RUST_EXEMPT = {
 }
 
 RS_TEMP_DIR = re.compile(r'\bstd::env::temp_dir\s*\(\s*\)|\benv::temp_dir\s*\(\s*\)')
+
+# Rust bare-tempfile allocation forms (D05, 2026-11-07): `tempdir()`,
+# `TempDir::new()`, `NamedTempFile::new()` and `Builder...tempdir()` without an
+# `_in` variant allocate into the system temp directory (TMPDIR-honoring) and
+# violate the operator /tmp interdiction on a bare cargo run. The governed
+# forms end in `_in(area)` and are not matched here. `new()` inside a longer
+# identifier (`new_in`) is excluded by the (?!\w) guard. A `Builder::new()` is
+# NOT itself a violation — thread/hyper/tokio builders share the shape — the
+# tempfile Builder chain is caught by the pending `.tempdir` window below.
+RS_BARE_TEMP = re.compile(
+    r'\btempfile::tempdir\s*\(\s*\)'
+    r'|\btempdir\s*\(\s*\)(?!\w)'          # after `use tempfile::tempdir;`
+    r'|\bTempDir::new\s*\(\s*\)(?!\w)'
+    r'|\bNamedTempFile::new\s*\(\s*\)(?!\w)'
+)
+
+# Rust allocation sites that are legitimate without migration (D05 categories):
+# - CARGO_TARGET_TMPDIR: cargo-managed target scratch directory, never /tmp;
+# - `var_os("TMPDIR")` / `var("TMPDIR")`: the test reads the runner-pinned
+#   TMPDIR itself (TMPDIR-pinning assertions and `tempdir_in(area)` on the
+#   pinned value). A file using the pinned TMPDIR as its allocation area is
+#   governed by recipe.py's net, which is the contractual runner coverage.
+RS_LEGIT_TMP = re.compile(r'CARGO_TARGET_TMPDIR|var_os\(\s*"TMPDIR"\s*\)|var\(\s*"TMPDIR"\s*\)')
 
 
 def tempfile_bindings(tree):
@@ -140,20 +178,43 @@ def scan_rust(path, rel):
     documented RUST_EXEMPT map is a review item (never a violation), any other
     line is an allocation violation — after the D04 migration, fixture
     allocation must go through fixture_root() and a new temp_dir() site needs
-    an explicit, documented exemption before it lands. Line comments (//, ///,
-    //!) and everything after them are ignored: doc mentions of the migrated
-    class are not call sites.
+    an explicit, documented exemption before it lands. Every bare-tempfile
+    allocation (`tempdir()`, `TempDir::new()`, `NamedTempFile::new()`,
+    `Builder...tempdir()`) is a violation unless the line also references a
+    legitimate governed area (CARGO_TARGET_TMPDIR or the runner-pinned TMPDIR
+    variable) — after the D05 migration those allocations go through
+    `tempdir_in(area)`/`new_in(area)` with the area chosen by the crate's
+    contracts. A multi-line Builder chain (`.tempdir()` on a later line than
+    `Builder::new()`) is caught by retaining one pending-Builder line window.
+    Line comments (//, ///, //!) and everything after them are ignored: doc
+    mentions of the migrated classes are not call sites.
     """
     review = []
     violations = []
     exempt = RUST_EXEMPT.get(rel, set())
+    pending_builder = -10  # line number of a recent Builder::new( opening
     for i, line in enumerate(path.read_text(errors='replace').splitlines(), 1):
         code = line.split('//', 1)[0]
+        hit = False
+        what = None
         if RS_TEMP_DIR.search(code):
+            hit = True
+            what = 'env::temp_dir() — use fixture_root()'
+        elif RS_BARE_TEMP.search(code):
+            hit = True
+            what = 'bare tempfile allocation — use tempdir_in(fixture area)'
+        elif '.tempdir' in code and '.tempdir_in' not in code and i - pending_builder <= 4:
+            hit = True
+            what = 'bare tempfile allocation — use tempdir_in(fixture area)'
+        if 'Builder::new' in code:
+            pending_builder = i
+        if hit:
             if i in exempt:
-                review.append((i, 'exempt temp_dir() (documented)'))
+                review.append((i, 'exempt (documented)'))
+            elif RS_LEGIT_TMP.search(code):
+                review.append((i, 'governed area (CARGO_TARGET_TMPDIR / pinned TMPDIR)'))
             else:
-                violations.append((i, 'env::temp_dir() — use fixture_root()'))
+                violations.append((i, what))
     return violations, review
 
 
@@ -172,7 +233,8 @@ def iter_files(roots, suffixes):
 def main():
     args = [a for a in sys.argv[1:] if a != '--json']
     as_json = '--json' in sys.argv
-    roots = [pathlib.Path(a) for a in args] or [REPO / 'tests', REPO / 'tools', REPO / 'web']
+    roots = [pathlib.Path(a) for a in args] or [
+        REPO / 'tests', REPO / 'tools', REPO / 'web', REPO / 'rust']
     result = {'violations': {}, 'reviews': {}}
     fail = 0
     for path in iter_files(roots, {'.py', '.cjs', '.js', '.rs'}):

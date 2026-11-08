@@ -41,7 +41,7 @@ fn document(task: &swarm_engine::Task) -> serde_json::Value {
 /// exit1. Task mismatch/unknown fields refuse without mutation, then recover.
 #[test]
 fn public_gate_persists_allowed_and_denied_results_without_claiming_acceptance() {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let work = seed(root.path());
     fs::write(root.path().join("proof.txt"), b"proof").unwrap();
     let doc = document(&work.tasks.as_ref().unwrap()[0]);
@@ -155,7 +155,7 @@ fn quality(root: &Path, event: &str, threshold: i64) {
 /// policy is refused and preserves the stored row; the saved policy stays binding.
 #[test]
 fn public_gate_uses_saved_quality_and_refuses_caller_policy() {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let work = seed(root.path());
     fs::write(root.path().join("proof.txt"), b"proof").unwrap();
     let mut doc = document(&work.tasks.as_ref().unwrap()[0]);

@@ -37,7 +37,7 @@ fn born(dir: &Path, root: &str) -> bool {
 #[test]
 fn current_managed_git_publication_refuses_nonmanaged_work() {
     use std::os::unix::fs::PermissionsExt;
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     fs::set_permissions(dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let mut root = RootStore::initialize(dir.path(), &mut SystemEnvironment).unwrap();
     let work=root.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"No Git","objective":"No inferred candidate","scope":"Fixture","criteria":["No fabricated proof"]}"#,&mut SystemEnvironment).unwrap().result.work;
@@ -230,7 +230,7 @@ fn replace_with(
 #[test]
 fn current_managed_git_fixture_atomic_write_refuses_and_recovers() {
     use std::io::Write;
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let path = dir.path().join("original");
     fs::write(&path, b"initial").unwrap();
     replace(&path, b"valid control").unwrap();

@@ -1,5 +1,6 @@
 //! Initial material witnesses using only disposable private roots. No installed
 //! grant, real human, provider, service account or confinement is established.
+mod common;
 use std::{fs, os::unix::fs::PermissionsExt, path::PathBuf};
 use swarm_enrollment_authority::{self as a, credentials::Parameters, provisioning as p};
 use swarm_enrollment_state::{Context, Head, Journal};
@@ -60,7 +61,7 @@ fn mode(path: &std::path::Path, bits: u32) {
 /// Real random preparation followed by exact private roundtrip; no secret in Debug.
 #[test]
 fn provisioning_private_roundtrip_preserves_exact_initial_proposals() {
-    let d = tempfile::tempdir().unwrap();
+    let d = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     let r = request(d.path());
     let one = p::prepare(&r).unwrap();
     let other = p::prepare(&r).unwrap();
@@ -86,7 +87,7 @@ fn provisioning_private_roundtrip_preserves_exact_initial_proposals() {
 /// Rejection of ambiguous/corrupt framing never generates replacement keys.
 #[test]
 fn provisioning_private_codec_refuses_truncation_noncanonical_and_unknown_fields() {
-    let d = tempfile::tempdir().unwrap();
+    let d = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     let r = request(d.path());
     let one = p::prepare(&r).unwrap();
     let raw = one.encode_private().unwrap();
@@ -116,7 +117,7 @@ fn provisioning_private_codec_refuses_truncation_noncanonical_and_unknown_fields
 /// are explicit; invalid requests cannot become an empty/default installation.
 #[test]
 fn provisioning_invalid_request_refuses_then_valid_request_recovers() {
-    let d = tempfile::tempdir().unwrap();
+    let d = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     let good = request(d.path());
     p::prepare(&good).unwrap();
     let changes: Vec<fn(&mut p::Request)> = vec![
@@ -146,7 +147,7 @@ fn provisioning_invalid_request_refuses_then_valid_request_recovers() {
 /// key is installed in fixture service storage; no business private key is used.
 #[test]
 fn provisioning_material_drives_actual_cold_lifecycle_without_business_key() {
-    let d = tempfile::tempdir().unwrap();
+    let d = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     mode(d.path(), 0o700);
     let r = request(d.path());
     let prepared = p::prepare(&r).unwrap();
@@ -327,7 +328,7 @@ fn provisioning_private_sink_error_is_typed_and_redacted() {
             Ok(())
         }
     }
-    let d = tempfile::tempdir().unwrap();
+    let d = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     let material = p::prepare(&request(d.path())).unwrap();
     let e = material.write_installation_proof(&mut Broken).unwrap_err();
     assert_eq!(e.code(), "provisioning-output");

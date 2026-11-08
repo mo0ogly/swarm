@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "id": "rust-class2-fixture-areas",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "tools/check_tmp_interdiction.py",
+    "tools/verification/recipe.py",
+    "rust/crates/swarm-engine/**/*",
+    "rust/crates/swarm-cli/**/*",
+    "rust/crates/swarm-enrollment-authority/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-web/**/*"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/class2-fixture-target"
+  },
+  "steps": [
+    {
+      "id": "tmp-interdiction-guard",
+      "command": [
+        "python3",
+        "tools/check_tmp_interdiction.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "0 allocation violation(s)",
+        "10 review item(s)"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "identity-lib-fallback-areas",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--lib",
+        "identity",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "18 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "trust-enrollment-integration-fallback",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "trust_enrollment",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "2 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "identity-checkpoint-integration-fallback",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "identity_checkpoint",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "6 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

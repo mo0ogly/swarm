@@ -7,9 +7,10 @@ use std::{
     path::{Path, PathBuf},
     process::Command,
 };
-/// Create a disposable native Root with private storage, not a user mission.
+/// Create a disposable native Root with private storage under the governed
+/// repository fixture area, not a user mission.
 pub(super) fn fresh() -> (tempfile::TempDir, RootStore) {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(crate::fixture_area()).unwrap();
     fs::set_permissions(dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let root = RootStore::initialize(dir.path(), &mut SystemEnvironment).unwrap();
     (dir, root)

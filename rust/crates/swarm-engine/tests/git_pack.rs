@@ -41,9 +41,10 @@ fn settings() -> EngineSettingsDocument {
     .unwrap()
 }
 impl Fixture {
-    /// Make two fresh bare repositories and a real commit, without any Root DB.
+    /// Make two fresh bare repositories and a real commit under the governed
+    /// repository fixture area, without any Root DB.
     fn new() -> Self {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
         let source = dir.path().join("source");
         let target = dir.path().join("target");
         for p in [&source, &target] {

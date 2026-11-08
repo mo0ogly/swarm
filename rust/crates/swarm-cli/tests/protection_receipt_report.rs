@@ -71,7 +71,7 @@ fn refused(output: Output, code: &str) {
 /// preserving the legacy report's exact shape and its non-authorizing result.
 #[test]
 fn protection_receipt_report_exact_files_and_legacy_shape_in_both_languages() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     for language in ["fr", "en"] {
         for index in [0, 8] {
             let (action, receipt, vector) = fixture(dir.path(), index);
@@ -118,7 +118,7 @@ fn protection_receipt_report_exact_files_and_legacy_shape_in_both_languages() {
 /// no report, preserve fixture state and recover between valid controls.
 #[test]
 fn protection_receipt_report_refuses_invalid_inputs_and_runtime_then_recovers() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let (action, receipt, _) = fixture(dir.path(), 0);
     for name in ["action.json", "receipt.json"] {
         accepted(call(dir.path(), "receipt-report", "en", &[]));
@@ -197,7 +197,7 @@ fn protection_receipt_report_refuses_invalid_inputs_and_runtime_then_recovers() 
 #[cfg(target_os = "linux")]
 #[test]
 fn protection_receipt_report_writer_failure_then_recovery() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let (action, receipt, _) = fixture(dir.path(), 8);
     accepted(call(dir.path(), "receipt-report", "en", &[]));
     let full = fs::OpenOptions::new()

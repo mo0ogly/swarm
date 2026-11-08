@@ -19,7 +19,7 @@ fn parse(out: std::process::Output) -> Value {
 }
 #[test]
 fn public_preview_apply_replay_and_undo_are_native_and_persistent() {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     parse(call(root.path(), &["init"]));
     let file = root.path().join("request.json");
     fs::write(&file,serde_json::to_vec(&json!({"schema_version":1,"event_id":"create","expected_revision":0,"title":"CLI graph","objective":"Atomic batches","scope":"Private","criteria":["Verified"]})).unwrap()).unwrap();

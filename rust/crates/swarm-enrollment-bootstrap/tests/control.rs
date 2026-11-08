@@ -1,4 +1,5 @@
 #![cfg(target_os = "linux")]
+mod common;
 use sha2::{Digest, Sha256};
 use std::{fs, os::unix::fs::PermissionsExt, path::PathBuf};
 use swarm_enrollment_bootstrap::{
@@ -10,7 +11,7 @@ use swarm_identity_contract::{Principal, Scope};
 /// Build a private filesystem declaration, not a signed journal or human proof.
 /// All storage belongs to a disposable fixture; setup errors panic.
 fn fixture() -> (tempfile::TempDir, ControlDocument, PathBuf) {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     for name in ["bootstrap", "configuration", "witness", "authority"] {
         let p = root.path().join(name);

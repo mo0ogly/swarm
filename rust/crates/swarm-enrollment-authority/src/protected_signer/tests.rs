@@ -7,9 +7,26 @@ use std::{
     sync::Arc,
 };
 use tempfile::TempDir;
+/// Private operator fallback fixture area (0700 chain), replicating
+/// `swarm_engine::fallback_area()` inline: this crate has no swarm-engine
+/// dependency and these fixtures contract private ancestors.
+fn area() -> std::path::PathBuf {
+    use std::os::unix::fs::DirBuilderExt;
+    let home = std::env::var_os("HOME")
+        .unwrap_or_else(|| panic!("HOME required for the operator fallback fixture area"));
+    let area = std::path::Path::new(&home).join(".local/state/swarm-fixtures");
+    std::fs::DirBuilder::new()
+        .recursive(true)
+        .mode(0o700)
+        .create(&area)
+        .unwrap_or_else(|e| {
+            panic!("fallback fixture area {} cannot be created: {e}", area.display())
+        });
+    area
+}
 /// Existing private root/file, independently pinned fixture seed. No live secret.
 fn fixture() -> (TempDir, std::path::PathBuf, [u8; 32]) {
-    let d = tempfile::tempdir().unwrap();
+    let d = tempfile::tempdir_in(area()).unwrap();
     fs::set_permissions(d.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let p = d.path().join("signing.seed");
     fs::write(&p, [73; 32]).unwrap();
@@ -196,7 +213,7 @@ fn protected_signer_uid_and_directory_symlink_checks_are_actual() {
     // Both owned descriptors above are fixtures. Production load closes explicitly.
     drop(f);
     drop(dir);
-    let parent = tempfile::tempdir().unwrap();
+    let parent = tempfile::tempdir_in(area()).unwrap();
     let alias = parent.path().join("alias");
     symlink(d.path(), &alias).unwrap();
     assert!(load(&alias.join("signing.seed"), k).is_err());

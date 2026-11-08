@@ -1307,6 +1307,95 @@ Deuxième sous-incrément de BF-16 : le verdict lecteur du dialogue est
   conservée comme suite (les tests d’intégration font foi en attendant).
 
 
+## Fermeture class-2 — migrations tempdir sous aires gouvernées, 7 novembre 2026
+
+Clôture du constat d'environnement ci-dessus (« les `fixture()` qui passent
+par `tempfile::tempdir()` → `/tmp` ») : les 151 sites d'allocation nues sous
+`rust/crates` sont migrés au contrat `tempdir_in(<aire>)`/`new_in(<aire>)`
+(RAII `TempDir` conservé, garde `tools/check_tmp_interdiction.py` étendu).
+Répartition : swarm-engine 14 (aire de dépôt), swarm-web 6 (aire de dépôt),
+swarm-cli 86 (aire de dépôt ; `version_no_repository.rs`, les 4 modules
+identity `src/identity_{operator,provisioning,service,service_call}/tests.rs`,
+les 7 suites d'intégration trust_enrollment + identity_*.rs, cli.rs,
+paea_settlement et les 4 suites paea à déclaration (promote, transfer,
+approval_web, settlement_delivered) → aire de repli : leur parcours lit
+ancres/déclarations via `open_private_directory`, qui refuse les ancêtres
+775 du checkout — corrigé après un premier passage à l'aire de dépôt,
+7 rouges identity `--lib`, 8 rouges d'intégration (2 trust_enrollment +
+6 identity_checkpoint) et 3 rouges cli/paea causés et retirés par les runs
+de vérification), crates enrollment + linux-prerequisites
+51 (aire de repli inline : le walk d'ancêtres de `open_private_directory`
+refuse les ancêtres 775 du checkout, donc `~/.local/state/swarm-fixtures/`
+0700 ; pas de dépendance swarm-engine chez les consumers, l'aire est répliquée
+inline dans chaque crate). Sécurité git au dépôt établie : tout appel git
+moteur épingle cwd+`--git-dir .` et efface `GIT_*` (managed_repository.rs:33) ;
+seul `git_metadata.rs` contracte « pas de dépôt ancêtre » (aire de repli, D04).
+Le garde passe de « tempfile sans `dir=` » à « toute allocation tempfile Rust
+nue » : 0 violation, 10 items de revue (documentés/préexistants).
+
+Vérification : `cargo check --tests` 0 erreur sur les 7 crates touchées
+(engine/web/cli en défaut ; config/state/bootstrap/linux-prerequisites et
+authority avec `--features test-fixtures`, convention des recettes projet —
+les rouges plain `--tests` sur `install_with_hook`/`FixtureFault` sont
+préexistants à HEAD, feature-gated, hors parcours de vérification) ;
+`cargo test` config/state/bootstrap/linux-prerequisites 110 verts,
+authority 207 verts, trust_enrollment 2 verts + identity_*.rs 37 verts
+après correction d'aire. Docs : README de vérification FR/EN (forme
+gouvernée + aire de repli), doc de module `fixture_area.rs` (D05). Preuves
+de travail : `rust/.swarm-fixtures/d04-class2-files.txt`,
+`d05-violations.txt`, `d05-guard-final.txt` (garde final : 0 violation),
+`d05-cli-files.txt`, `d05-cli-final-noff.txt` (run intégral final). Recette
+permanente `tools/verification/recipes/rust-class2-fixture-areas.json` (garde +
+identity `--lib` + trust_enrollment + identity_checkpoint) : PASS 4/4,
+vérification VERIFIED, preuve
+`.swarm-fixtures/class2-recipe-20261108T030000Z` ; section dédiée dans
+`tools/verification/README.md` (FR/EN).
+
+Rouges swarm-engine `--lib` qualifiés **hors périmètre class-2** (sources des
+tests et de leur chaîne identiques à HEAD, preuves diff vides) :
+- `preparation_policy_explicit_defaults_legacy_and_unlimited` et
+  `mission_report_settings_absence_is_not_default_adoption` : dérive v52
+  (`schema_version()` retourne 52 via `has_web_access_policy`, test attendait
+  41) — dette v52 consignée, vague Codex ;
+- `captured_source_reuses_caller_transaction…`/`recorded_sources_authentication…`
+  : exigent un TMPDIR épinglé (« recipe fixture area required ») — verts avec
+  `TMPDIR=/home/fpizzi/swarm-run-tmp` (0700 hors dépôt, à intégrer aux
+  recettes permanentes) ;
+- `agent_supervision`/`web_session` : verts en isolation, flakes de
+  concurrence (port éphémère / écritures process-wide) ;
+- **`mission_status_reports_contained_scan_symlinks_refusal_recovery` et
+  `current_review_report_and_artifact_staleness_recover` : dette datée du
+  lot Biba 2496c031b (28 octobre)** — à l'origine du test (174b89106)
+  `artifact_metadata` appelait `local_file` directement (source =
+  `LocalPathError`, downcast OK) ; l'interposition `anchored_artifact::with`
+  fait de `GateEvaluationError::source()` un `AnchoredArtifactError`, le
+  downcast en `LocalPathError` (mission_status_reports.rs:1118) échoue et
+  `semantic_artifact` ne reconnaît plus le refus (gate-evidence-invalid).
+  Aucun rapport au changement d'aire de fixtures (root `.swarm-fixtures` vs
+  `/tmp` n'entre pas dans le containment). Propriétaire : vague Codex Biba ;
+  piste : projeter la source `LocalPathError` à travers
+  `AnchoredArtifactError::Path` dans `anchored_error` ou downcaster la
+  source transitive.
+
+Vérification swarm-cli (TMPDIR gouverné ; cartographie du 7 novembre sans
+`--no-fail-fast`, complétée le 8 par un run `--no-fail-fast` intégral) :
+suites identity `--lib` 18 verts après correction d'aire (fallback requise —
+cf. répartition ci-dessus) ; `agent_launch` 5 verts / 8 rouges = la dette
+BT02 Biba cartographiée (workspace==root → `biba-workspace-overlaps-root`,
+CLI mort avant READY), propriétaire Codex, dossier
+BIBA-TRANSVERSE-APEX.md ; run final intégral : 258 verts / 9 rouges / 20
+ignorés — les 9 = les 8 agent_launch + 1 planning
+`agent-provider-catalogue-read` (dette « jamais vert », reconstruction au
+commit de création 174b89106 ; preuve du rouge : `.swarm-fixtures/d05-cli-final-noff.txt`,
+run final intégral ; le diagnostic de reconstruction relève du lot Codex —
+aucun fichier de preuve vérifiable au 8 nov., propriétaire Codex) ; les 20 ignorés = gardes/fixtures canoniques des
+recettes dédiées ; avec `SWARM_PAEA_SOURCE_FIXTURE` canonique, les 5 suites
+paea ajoutent 29 verts. Les rouges cli.rs/paea_settlement du premier
+passage intégral étaient introduits par le lot (aire de dépôt sous suites à
+déclaration) puis retirés — trust_enrollment était vert à la cartographie
+BF-16b du 7 novembre, les rouges d'intégration du premier passage aussi.
+
+
 ## Administration et qualification — 5 novembre 2026
 
 Le plan [Sécurité et preuves](SECURITY-PROOFS-APEX.md), adopté par l’utilisateur,

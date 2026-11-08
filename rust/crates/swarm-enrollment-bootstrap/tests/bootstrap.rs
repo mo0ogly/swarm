@@ -1,4 +1,5 @@
 #![cfg(target_os = "linux")]
+mod common;
 use sha2::{Digest, Sha256};
 use std::{fs, os::unix::fs::PermissionsExt};
 use swarm_enrollment_bootstrap::{decode, encode, load, Document};
@@ -8,7 +9,7 @@ fn hash(raw: &[u8]) -> String {
     format!("{:x}", Sha256::digest(raw))
 }
 fn fixture() -> (tempfile::TempDir, Document, std::path::PathBuf) {
-    let root = tempfile::TempDir::new().unwrap();
+    let root = tempfile::TempDir::new_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     for name in ["bootstrap", "configuration", "witness"] {
         fs::create_dir(root.path().join(name)).unwrap();

@@ -33,6 +33,27 @@ pub(crate) struct Fixture {
 pub(crate) fn mode(path: &std::path::Path, bits: u32) {
     fs::set_permissions(path, fs::Permissions::from_mode(bits)).unwrap()
 }
+/// Governed operator fallback fixture area (0700 chain under
+/// `$HOME/.local/state/swarm-fixtures`), replicating
+/// `swarm_engine::fallback_area()` inline. This file is also included
+/// cross-crate via `#[path]` from `swarm-engine/tests/trust_enrollment.rs`,
+/// where `super::` resolves to the including crate root, so a sibling
+/// `common::fixture_area` path would not resolve there.
+pub(crate) fn area() -> std::path::PathBuf {
+    use std::os::unix::fs::DirBuilderExt;
+    let home = std::env::var_os("HOME").unwrap_or_else(|| {
+        panic!("HOME required for the operator fallback fixture area")
+    });
+    let area = std::path::Path::new(&home).join(".local/state/swarm-fixtures");
+    std::fs::DirBuilder::new()
+        .recursive(true)
+        .mode(0o700)
+        .create(&area)
+        .unwrap_or_else(|e| {
+            panic!("fallback fixture area {} cannot be created: {e}", area.display())
+        });
+    area
+}
 /// Pure existing config operation used after actual account and grant checks.
 pub(crate) fn change() -> Change {
     Change {
@@ -96,7 +117,7 @@ impl Fixture {
         actions: Vec<swarm_identity_contract::Permission>,
         binding: Option<(Scope, i64)>,
     ) -> Self {
-        let root = tempfile::tempdir().unwrap();
+        let root = tempfile::tempdir_in(area()).unwrap();
         mode(root.path(), 0o700);
         for name in [
             "bootstrap",

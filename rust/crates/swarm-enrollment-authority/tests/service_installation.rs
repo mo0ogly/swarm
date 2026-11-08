@@ -1,4 +1,5 @@
 //! Real disposable service-root publication; no OS account or human acceptance.
+mod common;
 use std::{
     fs,
     os::unix::fs::{symlink, PermissionsExt},
@@ -28,7 +29,7 @@ fn material(path: &Path) -> p::Prepared {
 }
 /// Private parent with no live database; its child is deliberately initially absent.
 fn fixture() -> (tempfile::TempDir, p::Prepared, artifact::ServiceArtifact) {
-    let d = tempfile::tempdir().unwrap();
+    let d = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(d.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let p = material(&d.path().join("service"));
     let a = artifact::from_prepared(&p).unwrap();

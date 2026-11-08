@@ -66,7 +66,7 @@ fn refused(output: Output, code: &str) {
 /// both help languages; reports grant nothing and all input bytes remain intact.
 #[test]
 fn protection_receipt_both_domains_and_reconciliation_are_offline() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     for language in ["fr", "en"] {
         let help = Command::new(env!("CARGO_BIN_EXE_swarm-rust"))
             .current_dir(dir.path())
@@ -128,7 +128,7 @@ fn protection_receipt_both_domains_and_reconciliation_are_offline() {
 /// prove recovery to the same correspondence without creating a project.
 #[test]
 fn protection_receipt_invalid_inputs_and_bindings_refuse_then_recover() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     for index in [0, 8] {
         let (action, receipt) = inputs(index, "COMMITTED");
         let good_action = serde_json::to_vec(&action).unwrap();
@@ -269,7 +269,7 @@ fn protection_receipt_invalid_inputs_and_bindings_refuse_then_recover() {
 /// errors, including with absent paths; valid calls bracket each mutation.
 #[test]
 fn protection_receipt_runtime_options_and_framing_refuse_before_reads() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let (action, receipt) = inputs(8, "COMMITTED");
     fs::write(
         dir.path().join("action.json"),
@@ -352,7 +352,7 @@ fn protection_receipt_write_and_flush_failures_keep_cause_and_recover() {
     // accidental future Root-opening regression away from the calling checkout.
     const CHILD_ROOT: &str = "SWARM_PAEA_RECEIPT_IO_CHILD_ROOT";
     if std::env::var_os(CHILD_ROOT).is_none() {
-        let isolated = tempfile::tempdir().unwrap();
+        let isolated = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
         let output = Command::new(std::env::current_exe().unwrap())
             .current_dir(isolated.path())
             .env(CHILD_ROOT, isolated.path())
@@ -394,7 +394,7 @@ fn protection_receipt_write_and_flush_failures_keep_cause_and_recover() {
             Err(io::Error::new(io::ErrorKind::BrokenPipe, "IO_CANARY"))
         }
     }
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let (action, receipt) = inputs(0, "COMMITTED");
     let action_bytes = serde_json::to_vec(&action).unwrap();
     let receipt_bytes = serde_json::to_vec(&receipt).unwrap();

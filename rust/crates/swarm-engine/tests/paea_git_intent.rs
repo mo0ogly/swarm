@@ -6,10 +6,11 @@ use swarm_engine::{
 };
 use swarm_protection_contract::{canonicalize, Action, AdmissionContext, Proposal};
 const PIN: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-/// Build a private disposable native Root, never an existing mission database.
+/// Build a private disposable native Root under the governed repository
+/// fixture area, never an existing mission database.
 fn root() -> (tempfile::TempDir, RootStore) {
     use std::os::unix::fs::PermissionsExt;
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     std::fs::set_permissions(dir.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
     let store = RootStore::initialize(dir.path(), &mut SystemEnvironment).unwrap();
     (dir, store)

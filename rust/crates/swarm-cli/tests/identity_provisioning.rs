@@ -21,7 +21,9 @@ impl Case {
     /// Canonical explicit request data under a private /tmp parent; cheap KDF and
     /// grants are fixture inputs, not production defaults or current authority.
     fn new() -> Self {
-        let root = tempfile::tempdir().unwrap();
+        // Request/target checks walk ancestors with open_private_directory
+        // (checkout is 775): the private fallback area is required here.
+        let root = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
         let path = root.path().join("request.json");
         let target = root.path().join("future-service");

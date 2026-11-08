@@ -7,7 +7,7 @@ use std::{
 use swarm_engine::{EngineSettingsChange, RootStore, SettingCount, SystemEnvironment};
 /// Owned current-schema native root and explicit diagnostic input, no provider.
 fn fixture() -> tempfile::TempDir {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     RootStore::initialize(root.path(), &mut SystemEnvironment)
         .unwrap()
         .close()

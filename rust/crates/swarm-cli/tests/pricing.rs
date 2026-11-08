@@ -8,7 +8,7 @@ use std::{
 use swarm_engine::{RootStore, SystemEnvironment};
 /// Fresh owned root, no Git/provider/server required by this catalogue contract.
 fn fixture() -> tempfile::TempDir {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     RootStore::initialize(root.path(), &mut SystemEnvironment)
         .unwrap()
         .close()

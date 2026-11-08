@@ -19,7 +19,7 @@ fn call(root: &Path, args: &[&str]) -> Output {
 /// Public root, Work/task mutations and strict native request; local executable
 /// is observed only. Admission starts no provider and performs no paid call.
 fn fixture() -> (tempfile::TempDir, String, std::path::PathBuf) {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let mut store = RootStore::initialize(root.path(), &mut SystemEnvironment).unwrap();
     let work=store.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Title","objective":"Goal","scope":"Scope","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap().result.work.id;
     store.execute_external(&work,"task.add",br#"{"schema_version":1,"event_id":"add","expected_revision":1,"id":"task","title":"Task","deliverable":"Report","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap();

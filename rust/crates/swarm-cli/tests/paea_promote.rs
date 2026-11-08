@@ -116,7 +116,7 @@ fn delivered_binary_refuses_wrong_sha256_witness() {
     use std::sync::Mutex;
     static ENV_LOCK: Mutex<()> = Mutex::new(());
     let _env = ENV_LOCK.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let file = dir.path().join("swarm-mismatch");
     fs::write(&file, b"not-the-delivered-elf").unwrap();
     // SAFETY of the env twins: tests of this binary run single-threaded per
@@ -154,7 +154,11 @@ fn delivered_binary_refuses_wrong_sha256_witness() {
 
 /// Fresh native service storage; never open a user mission as a fixture.
 fn service() -> (tempfile::TempDir, RootStore) {
-    let dir = tempfile::tempdir().unwrap();
+    // The CLI child reads the operator declaration through
+    // authenticated_startup::open → open_private_directory, which refuses
+    // group/other-writable ancestors (checkout is 775): the private fallback
+    // area is required here.
+    let dir = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
     fs::set_permissions(dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let root = RootStore::initialize(dir.path(), &mut SystemEnvironment).unwrap();
     (dir, root)
@@ -853,7 +857,8 @@ fn promote_call_cli_chain_transfer_promote_replay_reconcile_once() {
     // The reference never moved: no second publication occurred.
     assert_eq!(observed(owned._service_dir.path()), owned.candidate);
     // --- Step 3: public read-only CLI reconciliation on a separate ledger. ---
-    let ledger_dir = tempfile::tempdir().unwrap();
+    // Declaration-bearing ledger: private fallback area (see `service`).
+    let ledger_dir = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
     fs::set_permissions(ledger_dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
     RootStore::initialize(ledger_dir.path(), &mut SystemEnvironment)
         .unwrap()
@@ -954,7 +959,8 @@ fn delivered_chain_transfer_promote_replay_reconcile_once() {
     assert_eq!(replay["new_oid"], owned.candidate);
     assert_eq!(observed(owned._service_dir.path()), owned.candidate);
     // --- Step 3: public read-only CLI reconciliation on a separate ledger. ---
-    let ledger_dir = tempfile::tempdir().unwrap();
+    // Declaration-bearing ledger: private fallback area (see `service`).
+    let ledger_dir = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
     fs::set_permissions(ledger_dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
     RootStore::initialize(ledger_dir.path(), &mut SystemEnvironment)
         .unwrap()
@@ -1390,7 +1396,8 @@ fn invoke_settlement_between(
 fn composed_git_settlement_stale_preparations_refuse_then_fresh_recover() {
     let _root = shared_project_root_guard();
     let owned = owned("commit");
-    let ledger_dir = tempfile::tempdir().unwrap();
+    // Declaration-bearing ledger: private fallback area (see `service`).
+    let ledger_dir = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
     fs::set_permissions(ledger_dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let ledger = RootStore::initialize(ledger_dir.path(), &mut SystemEnvironment).unwrap();
     let document = payment_document();

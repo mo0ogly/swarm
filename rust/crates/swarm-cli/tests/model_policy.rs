@@ -17,7 +17,7 @@ impl Fixture {
     /// failure. No cleanup touches live roots or an unrelated retained fixture.
     fn new() -> Self {
         let fixture = Self {
-            root: tempfile::tempdir().unwrap().keep(),
+            root: tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap().keep(),
         };
         fixture.ok(&["init"], None);
         fixture

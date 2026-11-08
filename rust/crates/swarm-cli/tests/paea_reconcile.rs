@@ -29,8 +29,8 @@ fn call(service: &Path, ledger: &Path, language: &str, extra: &[&str]) -> std::p
 /// success, and the read mutates neither the service root nor the ledger.
 #[test]
 fn paea_reconcile_effects_reports_explicit_uninitialized_without_mutation() {
-    let service_root = tempfile::tempdir().unwrap();
-    let ledger_root = tempfile::tempdir().unwrap();
+    let service_root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
+    let ledger_root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     RootStore::initialize(service_root.path(), &mut SystemEnvironment)
         .unwrap()
         .close()
@@ -66,7 +66,7 @@ fn paea_reconcile_effects_reports_explicit_uninitialized_without_mutation() {
 /// the cross-check.
 #[test]
 fn paea_reconcile_effects_refuses_shared_service_and_ledger_root() {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     RootStore::initialize(root.path(), &mut SystemEnvironment)
         .unwrap()
         .close()
@@ -84,8 +84,8 @@ fn paea_reconcile_effects_refuses_shared_service_and_ledger_root() {
 /// usage before any root is opened; no report is emitted.
 #[test]
 fn paea_reconcile_effects_rejects_runtime_options_without_opening_roots() {
-    let service_root = tempfile::tempdir().unwrap();
-    let ledger_root = tempfile::tempdir().unwrap();
+    let service_root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
+    let ledger_root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     for extra in [
         &["--server"][..],
         &["--task", "x"],

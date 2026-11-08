@@ -98,9 +98,10 @@ fn bare(root: &Path, child: &str) -> PathBuf {
     assert!(result.status.success());
     path
 }
-/// Fresh native service storage; never open a user mission as a fixture.
+/// Fresh native service storage under the governed repository fixture area;
+/// never open a user mission as a fixture.
 fn service() -> (tempfile::TempDir, RootStore) {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     fs::set_permissions(dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let root = RootStore::initialize(dir.path(), &mut SystemEnvironment).unwrap();
     (dir, root)

@@ -15,10 +15,11 @@ use swarm_enrollment_state::{sign_change, Context};
 use swarm_identity_contract::Scope;
 use swarm_protection_contract::{Action, AdmissionContext, Proposal};
 
-/// Create one owned native Root; no existing user/project database is opened.
+/// Create one owned native Root under the governed repository fixture area;
+/// no existing user/project database is opened.
 fn root() -> (tempfile::TempDir, RootStore) {
     use std::os::unix::fs::PermissionsExt;
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     std::fs::set_permissions(dir.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
     let store = RootStore::initialize(dir.path(), &mut SystemEnvironment).unwrap();
     (dir, store)

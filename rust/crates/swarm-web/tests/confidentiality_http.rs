@@ -57,7 +57,7 @@ fn attribute(service:&NativeHttpService,listener:&TcpListener,root:&Path,revisio
 #[test]
 fn policy_renewal_and_poisoned_history_refuse_through_http() {
     use std::os::unix::fs::PermissionsExt;
-    let directory=tempfile::tempdir().unwrap();
+    let directory=tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     std::fs::set_permissions(directory.path(),std::fs::Permissions::from_mode(0o700)).unwrap();
     let root=directory.path();RootStore::initialize(root,&mut SystemEnvironment).unwrap().close().unwrap();
     let listener=TcpListener::bind("127.0.0.1:0").unwrap();

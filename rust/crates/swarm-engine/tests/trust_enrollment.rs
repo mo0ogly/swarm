@@ -10,10 +10,11 @@ use swarm_enrollment_authority::{
 use swarm_enrollment_state::Context;
 use swarm_identity_contract::Scope;
 
-/// Build a real native plan and map one enrolled human to the administered I3 role.
+/// Build a real native plan under the governed repository fixture area and map
+/// one enrolled human to the administered I3 role.
 fn root() -> (tempfile::TempDir, RootStore, String) {
     use std::os::unix::fs::PermissionsExt;
-    let directory = tempfile::tempdir().unwrap();
+    let directory = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     std::fs::set_permissions(directory.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
     let mut root = RootStore::initialize(directory.path(), &mut SystemEnvironment).unwrap();
     let work=root.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Identity plan","objective":"Bound action","scope":"Fixture only","criteria":["Exact authority"]}"#,&mut SystemEnvironment).unwrap().result.work.id;

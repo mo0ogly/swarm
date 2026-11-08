@@ -28,7 +28,7 @@ fn create(store: &mut RootStore, event: &str, title: &str) -> swarm_engine::Work
 /// FR/EN JSON and separator escaping. Reading changes no DB/settings bytes.
 #[test]
 fn public_work_list_reads_actual_stored_objects_in_reverse_order_without_mutation() {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let mut store = RootStore::initialize(root.path(), &mut SystemEnvironment).unwrap();
     store.close().unwrap();
     let empty = call(root.path(), "fr");
@@ -68,7 +68,7 @@ fn public_work_list_reads_actual_stored_objects_in_reverse_order_without_mutatio
 /// failed bytes survive and restoration recovers the same actual Work.
 #[test]
 fn public_work_list_refuses_unreadable_database_and_recovers_without_losing_original() {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let mut store = RootStore::initialize(root.path(), &mut SystemEnvironment).unwrap();
     let work = create(&mut store, "create", "Preserved Work");
     store.close().unwrap();
@@ -103,7 +103,7 @@ fn public_work_list_refuses_unreadable_database_and_recovers_without_losing_orig
 /// IO cause and return failure. Invalid syntax never opens a missing root.
 #[test]
 fn public_work_list_rejects_unsupported_arguments_missing_roots_and_failed_output() {
-    let absent = tempfile::tempdir().unwrap().path().join("absent");
+    let absent = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap().path().join("absent");
     for args in [
         vec!["work", "list", "--json", "--input", "ignored"],
         vec!["work", "show"],
@@ -120,7 +120,7 @@ fn public_work_list_rejects_unsupported_arguments_missing_roots_and_failed_outpu
     assert_eq!(failure.status.code(), Some(2));
     assert!(failure.stdout.is_empty());
     assert!(!absent.exists());
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     RootStore::initialize(root.path(), &mut SystemEnvironment)
         .unwrap()
         .close()

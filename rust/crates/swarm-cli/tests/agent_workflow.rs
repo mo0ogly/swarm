@@ -16,7 +16,7 @@ fn call(root: &Path, args: &[&str]) -> Output {
 /// overrides or change DB/settings, and refuses unknown roles without private echo.
 #[test]
 fn public_workflow_observation_is_readonly_and_bound_to_compiled_sources() {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     assert!(call(root.path(), &["init", "--json"]).status.success());
     fs::create_dir_all(root.path().join(".claude/skills/apex")).unwrap();
     fs::write(
@@ -78,7 +78,7 @@ fn workflow_output_failure_preserves_readonly_state() {
             }
         }
     }
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     assert!(call(root.path(), &["init", "--json"]).status.success());
     let before = fs::read(root.path().join(".swarm/state.db")).unwrap();
     let settings = fs::read(root.path().join(".swarm/engine-settings.json")).unwrap();

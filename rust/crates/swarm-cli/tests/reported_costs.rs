@@ -4,7 +4,7 @@ use std::io::{self, Write};
 use swarm_engine::{RootStore, SystemEnvironment};
 /// Initialize only owned data through public operations; never alter live state.
 fn fixture() -> (tempfile::TempDir, String) {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let mut store = RootStore::initialize(root.path(), &mut SystemEnvironment).unwrap();
     let work=store.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Costs","objective":"Observe","scope":"Owned","criteria":["Partial remains partial"]}"#,&mut SystemEnvironment).unwrap().result.work.id;
     store.close().unwrap();

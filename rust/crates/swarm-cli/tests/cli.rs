@@ -73,7 +73,9 @@ fn diagnostic_write_failure_preserves_both_causes_without_echoing_private_io_dat
 fn fixture() -> (tempfile::TempDir, String, String) {
     use sha2::{Digest, Sha256};
     use std::{fs, os::unix::fs::PermissionsExt};
-    let root = tempfile::TempDir::new().unwrap();
+    // bootstrap-check walks the --input parent with open_private_directory
+    // (checkout is 775): the private fallback area is required here.
+    let root = tempfile::TempDir::new_in(swarm_engine::fallback_area()).unwrap();
     fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     for name in ["bootstrap", "configuration", "witness"] {
         fs::create_dir(root.path().join(name)).unwrap();
@@ -246,7 +248,7 @@ fn invalid_os_argument_is_refused_and_failed_diagnostic_is_retained() {
 #[test]
 fn native_root_settings_cli_persists_reopens_previews_and_replays_without_go() {
     use std::fs;
-    let root = tempfile::TempDir::new().unwrap();
+    let root = tempfile::TempDir::new_in(swarm_engine::fixture_area()).unwrap();
     fn invoke(args: Vec<String>) -> (u8, serde_json::Value) {
         let mut out = Vec::new();
         let mut error = Vec::new();
@@ -327,7 +329,7 @@ fn native_root_settings_cli_persists_reopens_previews_and_replays_without_go() {
 #[test]
 fn settings_publication_survives_lost_cli_output_and_replays_once() {
     use std::fs;
-    let root = tempfile::TempDir::new().unwrap();
+    let root = tempfile::TempDir::new_in(swarm_engine::fixture_area()).unwrap();
     let mut env = swarm_engine::SystemEnvironment;
     let store = swarm_engine::RootStore::initialize(root.path(), &mut env).unwrap();
     let doc = store.settings().unwrap();
@@ -378,7 +380,7 @@ fn settings_publication_survives_lost_cli_output_and_replays_once() {
 
 #[test]
 fn settings_catalogue_needs_no_project_and_configuration_errors_keep_safe_reason_codes() {
-    let root = tempfile::TempDir::new().unwrap();
+    let root = tempfile::TempDir::new_in(swarm_engine::fixture_area()).unwrap();
     let mut out = Vec::new();
     let mut error = Vec::new();
     let args = [
@@ -443,7 +445,7 @@ fn settings_catalogue_needs_no_project_and_configuration_errors_keep_safe_reason
 #[test]
 fn settings_file_framing_fifo_device_and_exact_boundary_refuse_or_recover_without_mutation() {
     use std::fs;
-    let root = tempfile::TempDir::new().unwrap();
+    let root = tempfile::TempDir::new_in(swarm_engine::fixture_area()).unwrap();
     let store =
         swarm_engine::RootStore::initialize(root.path(), &mut swarm_engine::SystemEnvironment)
             .unwrap();
@@ -519,7 +521,7 @@ fn native_binary_supports_explicit_finite_stdin_for_settings_without_publishing_
         io::Write,
         process::{Command, Stdio},
     };
-    let root = tempfile::TempDir::new().unwrap();
+    let root = tempfile::TempDir::new_in(swarm_engine::fixture_area()).unwrap();
     let store =
         swarm_engine::RootStore::initialize(root.path(), &mut swarm_engine::SystemEnvironment)
             .unwrap();
@@ -567,7 +569,7 @@ fn native_binary_supports_explicit_finite_stdin_for_settings_without_publishing_
 
 #[test]
 fn quality_profile_cli_is_readonly_and_legacy_configuration_has_no_implicit_bar() {
-    let root = tempfile::TempDir::new().unwrap();
+    let root = tempfile::TempDir::new_in(swarm_engine::fixture_area()).unwrap();
     let call = |parts: &[&str]| {
         let mut args = parts.iter().map(|s| s.to_string()).collect::<Vec<_>>();
         args.extend([
@@ -611,7 +613,7 @@ fn quality_profile_cli_is_readonly_and_legacy_configuration_has_no_implicit_bar(
 #[test]
 fn native_evaluate_legacy_is_readonly_and_business_refusal_keeps_json_without_error() {
     use sha2::{Digest, Sha256};
-    let root = tempfile::TempDir::new().unwrap();
+    let root = tempfile::TempDir::new_in(swarm_engine::fixture_area()).unwrap();
     std::fs::write(root.path().join("proof.txt"), b"proof").unwrap();
     let mut doc = serde_json::json!({"method_version":"2","scope_id":"task","artifacts":{"proof.txt":format!("{:x}",Sha256::digest(b"proof"))},"domains":{"quality":1},"checks":[{"id":"score","domain":"quality","mandatory":true,"gate":"delivery","severity":"critical","penalty":20,"max_penalty":100}],"results":[{"id":"score","status":"PASS","count":0,"evidence":["proof.txt"]}]});
     let file = root.path().join("gate.json");
@@ -656,7 +658,7 @@ fn native_evaluate_legacy_is_readonly_and_business_refusal_keeps_json_without_er
 fn native_evaluate_uses_saved_quality_policy_and_reports_output_failure() {
     use sha2::{Digest, Sha256};
     use std::io;
-    let root = tempfile::TempDir::new().unwrap();
+    let root = tempfile::TempDir::new_in(swarm_engine::fixture_area()).unwrap();
     let call = |parts: &[&str]| {
         let mut args = parts.iter().map(|s| s.to_string()).collect::<Vec<_>>();
         args.extend([
@@ -752,7 +754,7 @@ fn native_evaluate_uses_saved_quality_policy_and_reports_output_failure() {
 
 #[test]
 fn project_context_cli_uses_saved_limits_without_writing_or_starting_provider() {
-    let root = tempfile::TempDir::new().unwrap();
+    let root = tempfile::TempDir::new_in(swarm_engine::fixture_area()).unwrap();
     let store =
         swarm_engine::RootStore::initialize(root.path(), &mut swarm_engine::SystemEnvironment)
             .unwrap();

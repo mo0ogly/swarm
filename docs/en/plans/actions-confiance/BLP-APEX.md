@@ -1107,6 +1107,97 @@ the dialogue refuses" bypass.
   follow-up work (the integration tests stand as evidence meanwhile).
 
 
+## Class-2 closure — tempdir migrations under governed areas, 7 November 2026
+
+Closing the environment finding above ("the `fixture()` calls going through
+`tempfile::tempdir()` → `/tmp`"): the 151 bare allocation sites under
+`rust/crates` are migrated to the `tempdir_in(<area>)`/`new_in(<area>)`
+contract (RAII `TempDir` kept, `tools/check_tmp_interdiction.py` guard
+extended). Distribution: swarm-engine 14 (repository area), swarm-web 6
+(repository area), swarm-cli 86 (repository area; `version_no_repository.rs`,
+the 4 identity modules `src/identity_{operator,provisioning,service,
+service_call}/tests.rs`, the 7 trust_enrollment + identity_*.rs integration
+suites, cli.rs, paea_settlement and the 4 declaration-bearing paea suites
+(promote, transfer, approval_web, settlement_delivered) → fallback area:
+their flow reads anchors/declarations through `open_private_directory`,
+which refuses the checkout's 775 ancestors — corrected after a first pass on
+the repository area had caused and withdrawn 7 identity `--lib` reds, then
+8 integration reds (2 trust_enrollment + 6 identity_checkpoint) and 3
+cli/paea reds during the verification runs), enrollment crates +
+linux-prerequisites 51 (inline
+fallback area: the `open_private_directory` ancestor walk refuses the
+checkout's 775 ancestors, hence `~/.local/state/swarm-fixtures/` 0700;
+consumers have no swarm-engine dependency, so the fallback is replicated
+inline per crate). Repository git
+safety established: every engine git call pins cwd+`--git-dir .` and strips
+`GIT_*` (managed_repository.rs:33); only `git_metadata.rs` contracts
+"no ancestor repository" (fallback area, D04). The guard moves from
+"tempfile without `dir=`" to "any bare Rust tempfile allocation":
+0 violations, 10 review items (documented/pre-existing).
+
+Verification: `cargo check --tests` 0 errors on the 7 touched crates
+(engine/web/cli on defaults; config/state/bootstrap/linux-prerequisites and
+authority with `--features test-fixtures`, the project recipe convention —
+the plain `--tests` reds on `install_with_hook`/`FixtureFault` pre-exist at
+HEAD, feature-gated, outside the verification path); `cargo test`
+config/state/bootstrap/linux-prerequisites 110 green, authority 207 green,
+trust_enrollment 2 green + identity_*.rs 37 green after the area correction.
+Docs: verification README FR/EN (governed form + fallback area),
+`fixture_area.rs` module doc (D05). Work evidence:
+`rust/.swarm-fixtures/d04-class2-files.txt`, `d05-violations.txt`,
+`d05-guard-final.txt` (final guard: 0 violations), `d05-cli-files.txt`,
+`d05-cli-final-noff.txt` (final full run). Permanent recipe
+`tools/verification/recipes/rust-class2-fixture-areas.json` (guard + identity
+`--lib` + trust_enrollment + identity_checkpoint): PASS 4/4, verification
+VERIFIED, evidence `.swarm-fixtures/class2-recipe-20261108T030000Z`; dedicated
+section in `tools/verification/README.md` (EN/FR).
+
+swarm-engine `--lib` reds qualified **out of the class-2 scope** (the tests
+and their chain's sources are identical to HEAD, empty diffs as proof):
+- `preparation_policy_explicit_defaults_legacy_and_unlimited` and
+  `mission_report_settings_absence_is_not_default_adoption`: the v52 drift
+  (`schema_version()` returns 52 via `has_web_access_policy`, test expected
+  41) — recorded v52 debt, Codex wave;
+- `captured_source_reuses_caller_transaction…`/`recorded_sources_authentication…`
+  require a pinned TMPDIR ("recipe fixture area required") — green with
+  `TMPDIR=/home/fpizzi/swarm-run-tmp` (0700, outside the checkout; to fold
+  into the permanent recipes);
+- `agent_supervision`/`web_session`: green in isolation, concurrency flakes
+  (ephemeral port / process-wide writes);
+- **`mission_status_reports_contained_scan_symlinks_refusal_recovery` and
+  `current_review_report_and_artifact_staleness_recover`: debt dated to the
+  Biba batch 2496c031b (28 October)** — at the test's origin (174b89106)
+  `artifact_metadata` called `local_file` directly (source =
+  `LocalPathError`, downcast OK); the `anchored_artifact::with`
+  interposition makes `GateEvaluationError::source()` an
+  `AnchoredArtifactError`, the `LocalPathError` downcast
+  (mission_status_reports.rs:1118) fails and `semantic_artifact` no longer
+  recognizes the refusal (gate-evidence-invalid). Unrelated to the fixture
+  area change (root `.swarm-fixtures` vs `/tmp` does not enter the
+  containment check). Owner: Codex Biba wave; lead: project the
+  `LocalPathError` source through `AnchoredArtifactError::Path` in
+  `anchored_error`, or downcast the transitive source.
+
+swarm-cli verification (governed TMPDIR; the 7 November cartography ran
+without `--no-fail-fast`, completed on the 8th by a full `--no-fail-fast`
+run): identity `--lib` suites 18 green after the area correction (fallback
+required — see the distribution above); `agent_launch` 5 green / 8 red =
+the mapped BT02 Biba debt (workspace==root →
+`biba-workspace-overlaps-root`, CLI dead before READY), owner Codex,
+BIBA-TRANSVERSE-APEX.md dossier; final full run: 258 green / 9 red /
+20 ignored — the 9 = the 8 agent_launch + 1 planning
+`agent-provider-catalogue-read` (the "never green" debt, reconstructed at
+the creating commit 174b89106; red-run evidence:
+`.swarm-fixtures/d05-cli-final-noff.txt`, final full run; the
+reconstruction diagnosis belongs to the Codex lot — no verifiable
+evidence file as of 8 Nov, owner Codex); the 20 ignored = canonical-fixture/recipe guards for dedicated
+recipes; with the canonical `SWARM_PAEA_SOURCE_FIXTURE` the 5 paea suites
+add 29 green. The first full-pass cli.rs/paea_settlement reds were
+introduced by this batch (repository area under declaration-bearing suites)
+and then withdrawn — trust_enrollment was green in the 7 November BF-16b
+cartography, so were the first-pass integration reds.
+
+
 ## Administration and qualification — 5 November 2026
 
 The user-adopted [Security and evidence plan](SECURITY-PROOFS-APEX.md) supplements

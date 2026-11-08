@@ -18,7 +18,7 @@ fn call(root: &Path, args: &[&str]) -> Output {
 /// real projection triggers/UDFs. This is fixture data, never live mission editing.
 fn fixture() -> tempfile::TempDir {
     use std::os::unix::fs::PermissionsExt;
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     assert!(call(root.path(), &["init", "--json"]).status.success());
     let raw=br#"{"schema_version":1,"id":"work","revision":1,"criteria":["Proof"],"planning":{"version":1,"paused":false,"failure":"Failure","max_tasks":10,"max_decisions":10,"max_activations":15,"scopes":[{"id":"root","objective":"Root","requirements":["req-1"],"revision":1,"generation":2,"holder":"fixture","lease_until":"2099-01-01T00:00:00Z","state":"blocked"}]}}"#;
