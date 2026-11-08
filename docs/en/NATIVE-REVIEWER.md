@@ -1241,3 +1241,36 @@ See `tools/verification/recipes/paea-current-managed-git-publication.json` and
 `tests/paea_historical_publication_test.py` for the actual inert cumulative control,
 corruption/refusal and restoration checks. This establishes no human identity,
 current PAEA authority or protected Git effect.
+
+## Local input freshness and explicit review renewal (Gi.eth)
+
+Native private candidate frame v2 retains the regular files present in the
+workspace before controls, including files omitted from declared policy inputs.
+Their hashes join artifacts and native source binding. Review/publication readers
+rehash that initial selection and compare its source with the original. Changed,
+missing or unreadable inputs block reuse; IO failure never becomes empty success.
+
+Later generated files are outputs, not initial inputs. Tracked links retain their
+literal-target contract; an untracked link present at admission refuses. Git
+metadata and IPC are outside this regular-content inventory. This is neither OS
+confinement nor an inventory of external programs, libraries or environment. It
+does not automatically send private content to the reviewer: a hash cannot prove
+a criterion whose required original is missing.
+
+`swarm-rust task review-refresh WORK --root ROOT --input FILE --json` uses the
+native envelope `schema_version:1`, `event_id`, `expected_revision`, `task_id`.
+For an idle submitted managed task, it checks genuine passed review/control
+originals and an observed input change (or missing binding in historical frame
+v1). A still-applicable opinion, revision conflict, active job or uncertain read
+refuses. It atomically archives the opinion in `previous_reviews`, clears current
+controls/gate and records `task.review-refresh`. Original receipts, attempts,
+review calls and charges remain. Exact replay creates no call or counter reset.
+Explicit continuation is `task validate` → `task review` → `task publish`, with new
+controls and an applicable new opinion. Renewal never accepts work or promotes a
+failed control. Historical frames are not rewritten to invent input coverage.
+This CLI command adds no UX button or HTTP mutation journey.
+
+Maintained recipe: `tools/verification/recipes/gieth-review-refresh.json`; scoped
+plan, evidence and limits: [Gi.eth report (French)](../plans/actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md).
+
+The `task review-refresh` command is listed in both French and English CLI help. This reference describes explicit proof renewal; help grants no review, publication or acceptance authority.

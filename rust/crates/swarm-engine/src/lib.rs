@@ -104,6 +104,7 @@ pub use mission_supervision::{
 };
 #[cfg(target_os = "linux")]
 pub use root_store::{
+    ReviewRefreshOutcome,
     CockpitAutonomyObservation, MissionAutonomy, MissionConsentObservation, MissionControlSettings, MissionControlsObservation,
     CostSummary, CostTotal,
     TaskFreshnessEvidence, MissionResultObservation, MissionStatusObservation,

@@ -13,12 +13,16 @@ pub(in crate::root_store) struct ReviewCandidate {
     review:Option<crate::IndependentReview>,
 }
 impl ReviewCandidate {
-    /// Recompute current Root source using held observations, without Git inside
-    /// the caller's snapshot. Exact native evidence is checked by its consumer.
+    /// Recompute current Root source and bind its initial input inventory to the
+    /// original control job. Drift refuses before reviewer/publication, without
+    /// Git inside SQL, mutation, fallback or a transferable freshness lease.
     pub(in crate::root_store) fn preview(&self, root: &RootStore, tx: &rusqlite::Connection,
         settings: &crate::EngineSettingsDocument, work: &str, request: &Request,review:Option<&crate::IndependentReview>) -> Result<TaskValidationPreview, A> {
         if review!=self.review.as_ref(){return Err(A::Refused("review-managed-held-record-changed"));}
-        managed_execution::prepare_for_review(tx,&root.directory,&root.root,settings,work,request,&self.session.data,review).map(|p|p.preview)
+        let prepared=managed_execution::prepare_for_review(tx,&root.directory,&root.root,settings,work,request,&self.session.data,review)?;
+        let source=managed_execution::bound_source(tx,&self.job,&prepared.preview.source_sha256,Some(self.candidate()))?;
+        if source!=self.job.source_sha256 {return Err(A::Refused("managed-review-inputs-stale"));}
+        Ok(prepared.preview)
     }
     /// Borrow the complete checkpoint; a digest or DTO alone grants no access.
     pub(in crate::root_store) fn candidate(&self) -> &crate::managed_repository::ManagedCandidate { &self.session.data.candidate }
