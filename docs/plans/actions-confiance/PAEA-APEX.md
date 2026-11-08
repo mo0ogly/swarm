@@ -4914,3 +4914,21 @@ Cela ne conclut ni avantage de Swarm, ni indépendance des essais, ni
 local) et le préenregistrement (porte humaine H3 — l'utilisateur a confirmé
 ne disposer ni d'évaluateur indépendant ni d'équipe tierce ; aucun rôle
 inventé).
+
+
+Point G6 du 9 novembre 2026 (suite) — paquet de revue livré, les quatre objets
+locaux du lot G6 sont posés. [REVIEW-PACKAGE-20261109.md](paea/REVIEW-PACKAGE-20261109.md)
+documente l'assembleur `tools/paea/review_package.py` : inventaire fermé des
+livrables de préparation E3 en trois dossiers (conception 7 / réalisation 21 /
+qualification 5), chaque entrée avec SHA256 exact et taille, publication
+atomique via `recipe.py::publish`. Contrat : livrable manquant ou vide →
+refus ; double collecte refusant toute source modifiée pendant l'assemblage ;
+paquet reproductible (manifestes byte-identiques). Étiquettes honnêtes dans le
+manifeste : prouve existence + identité octets au moment de l'assemblage, ne
+prouve ni qualité, ni acceptation, ni évaluation indépendante, ni
+préenregistrement, ni corpus réservé ; portes de remise H3/H4 explicites.
+Exécution réelle : trois manifestes byte-identiques (33 entrées, 324 890
+octets, sha256 `f981d9b7…`), dont la voie publique (recette
+`paea-review-package` PASS, vérification indépendante VERIFIED) ; refus sans
+variable d'evidence conservé. La remise effective attend la désignation H3 ;
+aucun rôle inventé, aucune réception fabriquée.

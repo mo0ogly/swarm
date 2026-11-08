@@ -396,6 +396,27 @@ local object) and preregistration (human gate H3 — evaluator, reserved
 corpus, volumes and order designated by the sponsor before any compared
 campaign).
 
+Tranche G6 review package (9 November 2026): the last local G6 object is
+delivered — [REVIEW-PACKAGE-20261109.md](REVIEW-PACKAGE-20261109.md) +
+[`tools/paea/review_package.py`](../../../../../tools/paea/review_package.py) +
+recipe `tools/verification/recipes/paea-review-package.json`. The assembler
+inventories the E3 preparation deliverables in three folders (conception 7 /
+realization 21 / qualification 5 = 33 entries), each entry with exact SHA256
+and byte size, published atomically via `recipe.py::publish`. Contract:
+missing or empty deliverable → refusal (`review-package-deliverable-missing`/
+`-empty`, an empty glob is the same refusal); double collection — any source
+changed during assembly refuses with the divergent paths listed
+(`review-package-source-changed-during-assembly`); reproducible package
+(byte-identical manifests across runs). Honest labels carried in the
+manifest: proves existence + byte-identity at assembly time; proves neither
+quality, nor acceptance, nor independent evaluation, nor preregistration,
+nor a reserved corpus; H3/H4 handover gates explicit. Actual execution:
+three byte-identical manifests (sha256 `f981d9b7…`), including the public
+path (recipe PASS, independent verification VERIFIED); the refusal without
+the evidence variable is retained as proof (`rp-recipe-evidence/`). All four
+local G6 objects are delivered; human gates remain: preregistration (H3/H4)
+then the compared campaign PA-12.
+
 ## Discovery D03 — Rust test fixtures under /tmp (operator interdiction)
 
 Origin: G2 lineage tranche resumption (6 November 2026). After the operator

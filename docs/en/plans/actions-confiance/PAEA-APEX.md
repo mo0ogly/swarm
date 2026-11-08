@@ -4028,3 +4028,21 @@ deviation path verified; evidence under `.swarm-fixtures/`, never under
 independent evaluation. Remaining for G6: the review package (last local
 object) and preregistration (human gate H3 — the user confirmed having
 neither an independent evaluator nor a third-party team; no invented roles).
+
+
+G6 point of 9 November 2026 (continued) — review package delivered; all four
+local G6 objects are in place. [REVIEW-PACKAGE-20261109.md](paea/REVIEW-PACKAGE-20261109.md)
+documents the assembler `tools/paea/review_package.py`: closed inventory of
+the E3 preparation deliverables in three folders (conception 7 / realization
+21 / qualification 5), each entry with exact SHA256 and byte size, atomic
+publication via `recipe.py::publish`. Contract: missing or empty deliverable
+→ refusal; double collection refusing any source changed during assembly;
+reproducible package (byte-identical manifests). Honest labels in the
+manifest: proves existence + byte-identity at assembly time, proves neither
+quality, nor acceptance, nor independent evaluation, nor preregistration, nor
+a reserved corpus; H3/H4 handover gates explicit. Actual execution: three
+byte-identical manifests (33 entries, 324,890 bytes, sha256 `f981d9b7…`),
+including the public path (recipe `paea-review-package` PASS, independent
+verification VERIFIED); the refusal without the evidence variable retained.
+The actual handover waits for H3 designation; no invented roles, no
+fabricated reception.

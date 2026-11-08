@@ -432,6 +432,28 @@ Restent pour G6 : le paquet de revue (dernier objet local) et le
 préenregistrement (porte humaine H3 — évaluateur, corpus réservé, volumes et
 ordre désignés par le commanditaire avant toute campagne comparée).
 
+Tranche G6 paquet de revue (9 novembre 2026) : le dernier objet local du lot
+G6 est livré — [REVIEW-PACKAGE-20261109.md](REVIEW-PACKAGE-20261109.md) +
+[`tools/paea/review_package.py`](../../../../../tools/paea/review_package.py) +
+recette `tools/verification/recipes/paea-review-package.json`. L'assembleur
+inventorie les livrables de préparation E3 en trois dossiers (conception 7 /
+réalisation 21 / qualification 5 = 33 entrées), chaque entrée avec SHA256
+exact et taille, publiés atomiquement via `recipe.py::publish`. Contrat :
+livrable manquant ou vide → refus (`review-package-deliverable-missing`/
+`-empty`, un glob vide est le même refus) ; double collecte — toute source
+modifiée pendant l'assemblage refuse avec les chemins divergents
+(`review-package-source-changed-during-assembly`) ; paquet reproductible
+(manifestes byte-identiques entre exécutions). Étiquettes honnêtes portées
+dans le manifeste : prouve existence + identité octets au moment de
+l'assemblage ; ne prouve ni qualité, ni acceptation, ni évaluation
+indépendante, ni préenregistrement, ni corpus réservé ; portes de remise H3/H4
+explicites. Exécution réelle : trois manifestes byte-identiques (sha256
+`f981d9b7…`), dont la voie publique (recette PASS, vérification indépendante
+VERIFIED) ; refus sans variable d'evidence conservé comme preuve
+(`rp-recipe-evidence/`). Les quatre objets locaux de G6 sont livrés ;
+restent les portes humaines : préenregistrement (H3/H4) puis campagne
+comparée PA-12.
+
 ## Découverte D03 — fixtures de tests Rust sous /tmp (interdiction opérateur)
 
 Origine : reprise tranche G2 filiation (6 novembre 2026). Après l'interdiction
