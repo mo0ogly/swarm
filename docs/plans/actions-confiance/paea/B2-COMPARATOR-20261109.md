@@ -105,6 +105,38 @@ livré du 9 novembre) :
   `b2-recipe-evidence2/` (recette, non effaçable — originaux) ; jamais sous
   /tmp.
 
+## 4 bis. Requalification après le merge 197d663f6 — 8 novembre 2026
+
+Le merge `197d663f6` (transportant `8532ce05d`) puis la documentation du
+delta de requalification ont changé deux entrées déclarées de la recette B2
+(`docs/plans/actions-confiance/paea/B2-COMPARATOR-20261109.md` et sa miroir
+EN — la doc du comparateur se déclare elle-même) et le binaire livré est
+remplacé (13e remplacement, `dev.346` sha256
+`84b1e78c8dbd9f38c5ebebb7fd48c097f6e7de76805249fd06592730aa5211a8`). Le run
+`b2-recipe-evidence2/` reste
+VERIFIED sur son candidat gelé (`a166e2b8…`, 9 novembre) ; il n'est pas
+transposé à l'arbre courant. Requalification rejouée :
+
+- rejeu `b2-run3` sous `.swarm-fixtures/requal-merge-20261108/b2-run3/`
+  (observations `b2-run3-obs/`, dossier neuf créé par le script) : PASS,
+  `source_stable:true`, 6 essais / **0 déviation**, six témoins
+  `PAEA_PILOT_BINARY_STABLE 84b1e78c…`, publication
+  `PAEA_B2_REPORT_PUBLISHED trials=6 p50=2.384s p95=2.853s`, décisions
+  inchangées (T04 `refused-then-accepted`, T06-T21
+  `unknown-recovered-once` avec `RECONCILED_COMMITTED`, T05-T17
+  `revoked-refused-then-current-grant-commits`, sur payment et git) ;
+  vérification indépendante `{"integrity": "VERIFIED",
+  "recorded_status": "PASS"}` ;
+- un premier lancement a échoué sur l'usage (3 variables requises, celle du
+  dossier d'observations manquante) ; ce FAIL est conservé dans le journal
+  de tâche — le refus d'usage fait partie du contrat.
+- le paquet de revue (autre objet G6) est requalifié dans le même incrément :
+  `rp-run3` PASS, 33 livrables / 330 442 octets, manifeste sha256
+  `a29de65beba8f6540463b257f8721cd12944ae22320df2617422efda9eb38d5f` ; un
+  lancement intermédiaire avec dossier d'evidence pré-créé est conservé FAIL
+  (`rp-run2/`) — la variante de refus « dossier déjà existant » reste
+  vérifiée sur la voie publique.
+
 ## 5. Ce que ce comparateur ne conclut pas
 
 - Il mesure le **workflow durci B2**, pas Swarm. Aucun avantage de Swarm

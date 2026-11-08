@@ -66,6 +66,26 @@ remplace jamais le préenregistrement ni la campagne comparée.
 - variantes de refus vérifiées : livrable manquant → refus ; livrable vide →
   refus ; variable d'evidence absente ou dossier déjà existant → refus.
 
+### Requalification après le merge 197d663f6 — 8 novembre 2026
+
+Le merge `197d663f6` puis les documentations de requalification ont changé
+cinq entrées déclarées de la recette (`GAP-CLOSURE-PLAN-20261103.md` FR/EN,
+`REVIEW-PACKAGE-20261109.md` FR/EN, `DASHBOARD-T20261101.md` FR —
+inventaire par diff des `inputs.before.json`, 44 entrées des deux côtés).
+Le run `rp-recipe-evidence2/` reste VERIFIED sur son instantané gelé
+(manifeste `f981d9b7…`, 9 novembre) ; il n'est pas transposé à l'arbre
+courant. Rejeu `rp-run3` sous
+`.swarm-fixtures/requal-merge-20261108/rp-run3/` (evidence `rp-run3-obs/`,
+créé par le script) : PASS, `source_stable:true`, 33 livrables /
+330 442 octets, manifeste sha256
+`a29de65beba8f6540463b257f8721cd12944ae22320df2617422efda9eb38d5f`,
+vérification indépendante `{"integrity": "VERIFIED",
+"recorded_status": "PASS"}`. Un lancement intermédiaire avec dossier
+d'evidence pré-créé est conservé FAIL (`rp-run2/`) : la variante de refus
+« dossier déjà existant » reste vérifiée sur la voie publique après le
+merge. L'ancien manifeste `f981d9b7…` reste l'offre historique de l'époque
+de son assemblage.
+
 ## 4. Remise — condition concrète de reprise
 
 La remise effective attend la désignation H3 (l'utilisateur a confirmé le

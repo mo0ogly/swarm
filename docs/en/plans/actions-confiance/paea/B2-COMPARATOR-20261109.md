@@ -102,6 +102,38 @@ binary of 9 November):
   `b2-recipe-evidence2/` (recipe, non-erasable — originals); never under
   /tmp.
 
+## 4 bis. Requalification after merge 197d663f6 — 8 November 2026
+
+The `197d663f6` merge (carrying `8532ce05d`) followed by the
+requalification-delta documentation changed two declared inputs of the B2
+recipe (`docs/plans/actions-confiance/paea/B2-COMPARATOR-20261109.md` and
+its EN mirror — the comparator's doc declares itself) and the delivered
+binary was replaced (13th replacement, `dev.346` sha256
+`84b1e78c8dbd9f38c5ebebb7fd48c097f6e7de76805249fd06592730aa5211a8`). The
+`b2-recipe-evidence2/` run stays VERIFIED on its frozen candidate
+(`a166e2b8…`, 9 November); it is not transposed to the current tree.
+Requalification replayed:
+
+- replay `b2-run3` under `.swarm-fixtures/requal-merge-20261108/b2-run3/`
+  (observations `b2-run3-obs/`, fresh directory created by the script):
+  PASS, `source_stable:true`, 6 trials / **0 deviations**, six
+  `PAEA_PILOT_BINARY_STABLE 84b1e78c…` witnesses, publication
+  `PAEA_B2_REPORT_PUBLISHED trials=6 p50=2.384s p95=2.853s`, decisions
+  unchanged (T04 `refused-then-accepted`, T06-T21
+  `unknown-recovered-once` with `RECONCILED_COMMITTED`, T05-T17
+  `revoked-refused-then-current-grant-commits`, on payment and git);
+  independent verification `{"integrity": "VERIFIED",
+  "recorded_status": "PASS"}`;
+- a first launch failed on usage (3 required variables, the observations
+  directory one missing); that FAIL is retained in the task log — the
+  usage refusal is part of the contract.
+- the review package (other G6 object) is requalified in the same
+  increment: `rp-run3` PASS, 33 deliverables / 330 442 bytes, manifest
+  sha256 `a29de65beba8f6540463b257f8721cd12944ae22320df2617422efda9eb38d5f`;
+  an intermediate launch with a pre-created evidence directory is retained
+  FAIL (`rp-run2/`) — the "directory already exists" refusal variant stays
+  verified on the public path.
+
 ## 5. What this comparator does not conclude
 
 - It measures the **hardened B2 workflow**, not Swarm. No Swarm advantage is

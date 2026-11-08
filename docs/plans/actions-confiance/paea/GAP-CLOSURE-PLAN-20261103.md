@@ -784,3 +784,35 @@ consommation) reste fermé sur le nouveau livré. Le candidat `f8184922…`
 est `84b1e78c…` — les deux mêmes sources, deux compilations distinctes.
 Pas de commit/push sans autorisation explicite ; requalification ≠
 acceptation indépendante (I11 0/17 inchangé).
+
+### Objets G6 requalifiés sur le livré courant — 8 novembre 2026
+
+Les deux autres objets G6 (comparateur B2, paquet de revue) étaient
+verrouillés sur l'époque `a166e2b8…` (9 novembre) avec des entrées
+déclarées devenues fausses sur l'arbre courant (2 pour B2 : sa propre doc
+FR/EN ; 5 pour le paquet de revue : les docs de requalification du jour).
+Requalifiés par rejeu sur le livré `84b1e78c…` :
+
+- **Comparateur B2** — `b2-run3` (evidence `b2-run3-obs/`) : PASS
+  6 essais / 0 déviation, `source_stable:true`, six témoins
+  `PAEA_PILOT_BINARY_STABLE 84b1e78c…`, décisions inchangées (T04,
+  T06-T21, T05-T17 × payment/git), publication
+  `PAEA_B2_REPORT_PUBLISHED trials=6 p50=2.384s p95=2.853s`, vérification
+  externe VERIFIED. Un premier lancement FAIL (variable
+  `SWARM_PAEA_PILOT_EVIDENCE` manquante — contrat à 3 variables) est
+  conservé comme témoin du refus d'usage.
+- **Paquet de revue** — `rp-run3` (evidence `rp-run3-obs/`) : PASS, 33
+  livrables / 330 442 octets, manifeste sha256 `a29de65b…` (l'offre
+  historique reste `f981d9b7…` de son époque), `source_stable:true`,
+  vérification externe VERIFIED. Un lancement intermédiaire FAIL
+  (`rp-run2`, dossier d'evidence pré-créé par erreur de préparation) est
+  conservé : la variante « dossier déjà existant → refus » reste exercée
+  sur la voie publique.
+- Détails et limites dans
+  [B2-COMPARATOR-20261109.md](B2-COMPARATOR-20261109.md) (« 4 bis ») et
+  [REVIEW-PACKAGE-20261109.md](REVIEW-PACKAGE-20261109.md)
+  (requalification) ; preuves sous
+  `.swarm-fixtures/requal-merge-20261108/{b2-run3,rp-run3}/`.
+
+Le préenregistrement G6 et la campagne comparée restent bloqués sur les
+désignations humaines (H3/H4) — la requalification ne les débloque pas.

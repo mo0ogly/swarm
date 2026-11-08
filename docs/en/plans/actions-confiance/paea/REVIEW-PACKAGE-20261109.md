@@ -69,6 +69,26 @@ or the compared campaign.
   → refusal; missing evidence variable or already-existing directory →
   refusal.
 
+### Requalification after merge 197d663f6 — 8 November 2026
+
+The `197d663f6` merge then the requalification documentations changed five
+declared inputs of the recipe (`GAP-CLOSURE-PLAN-20261103.md` FR/EN,
+`REVIEW-PACKAGE-20261109.md` FR/EN, `DASHBOARD-T20261101.md` FR —
+inventory by diffing the `inputs.before.json`, 44 entries on both sides).
+The `rp-recipe-evidence2/` run stays VERIFIED on its frozen snapshot
+(manifest `f981d9b7…`, 9 November); it is not transposed to the current
+tree. Replay `rp-run3` under
+`.swarm-fixtures/requal-merge-20261108/rp-run3/` (evidence `rp-run3-obs/`,
+created by the script): PASS, `source_stable:true`, 33 deliverables /
+330,442 bytes, manifest sha256
+`a29de65beba8f6540463b257f8721cd12944ae22320df2617422efda9eb38d5f`,
+independent verification `{"integrity": "VERIFIED",
+"recorded_status": "PASS"}`. An intermediate launch with a pre-created
+evidence directory is retained FAIL (`rp-run2/`): the "directory already
+exists" refusal variant stays verified on the public path after the merge.
+The old manifest `f981d9b7…` remains the historical offer of its assembly
+time.
+
 ## 4. Handover — concrete resumption condition
 
 The actual handover waits for H3 designation (the user confirmed on 25

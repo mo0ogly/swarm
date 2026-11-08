@@ -736,3 +736,33 @@ consumption) remains closed on the new delivery. The `f8184922…` candidate
 `84b1e78c…` — same sources, two distinct compilations. No commit/push
 without explicit authorization; requalification ≠ independent acceptance
 (I11 0/17 unchanged).
+
+### G6 objects requalified on the current delivery — 8 November 2026
+
+The two other G6 objects (B2 comparator, review package) were locked to the
+`a166e2b8…` era (9 November) with declared inputs gone stale on the current
+tree (2 for B2: its own FR/EN doc; 5 for the review package: the day's
+requalification docs). Requalified by replay on the `84b1e78c…` delivery:
+
+- **B2 comparator** — `b2-run3` (evidence `b2-run3-obs/`): PASS 6 trials /
+  0 deviations, `source_stable:true`, six `PAEA_PILOT_BINARY_STABLE
+  84b1e78c…` witnesses, decisions unchanged (T04, T06-T21, T05-T17 ×
+  payment/git), publication `PAEA_B2_REPORT_PUBLISHED trials=6 p50=2.384s
+  p95=2.853s`, external verification VERIFIED. A first FAIL launch
+  (missing `SWARM_PAEA_PILOT_EVIDENCE` variable — 3-variable contract) is
+  retained as the usage-refusal witness.
+- **Review package** — `rp-run3` (evidence `rp-run3-obs/`): PASS, 33
+  deliverables / 330,442 bytes, manifest sha256 `a29de65b…` (the historical
+  offer stays `f981d9b7…` of its era), `source_stable:true`, external
+  verification VERIFIED. An intermediate FAIL launch (`rp-run2`, evidence
+  directory pre-created by a preparation mistake) is retained: the
+  "already-existing directory → refusal" variant stays exercised on the
+  public path.
+- Details and limits in
+  [B2-COMPARATOR-20261109.md](B2-COMPARATOR-20261109.md) ("4 bis") and
+  [REVIEW-PACKAGE-20261109.md](REVIEW-PACKAGE-20261109.md)
+  (requalification); evidence under
+  `.swarm-fixtures/requal-merge-20261108/{b2-run3,rp-run3}/`.
+
+G6 preregistration and the compared campaign remain blocked on the human
+designations (H3/H4) — requalification does not unblock them.
