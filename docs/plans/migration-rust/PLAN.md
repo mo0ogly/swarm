@@ -1147,6 +1147,22 @@ runs tués en cours (pas de result.json, kill volontaire après diagnostic) :
 par la panne du classifieur de permissions (8+ tentatives), à repousser
 quand la voie le permet.
 
+tel33d — issue 1415 suite (Claude, 8 nov. 09:45) : relance
+`.swarm-fixtures/derived-adminbrowser.json` dans sortie neuve
+`.swarm-fixtures/ev-adminbrowser-guard-1` (push ea9d55848/4901d7979 entre-temps
+effectué). FAIL propre en 10,6 s : le garde fail-fast a tiré exactement comme
+conçu — assertion `form refused submit on invalid fields + ['web_authority_public_key']`
+(telemetry-settings, `tests/rust_telemetry_settings_ui.cjs:42`) au lieu du
+pendage de 25 min ; le raccord (1) reste bon (état `loaded` atteint, captures
+fr-etat écrites) et le défaut produit (2) est re-attesté à jour sur l'état
+courant (admin.js:292 et engine-settings.json:246 intouchés par Codex au 8 nov).
+Ce run est un result.json qualifié côté harnais : il prouve le garde et le
+blocage, pas l'acceptation du scénario (réputé rouge tant que (2) subsiste).
+/tmp vérifié propre pour ce run ; profil chrome du navigateur sous la racine
+figée `.swarm-fixtures/swarm-cli-http97-ba3up_wj` (login_ui.cjs:16). Reprise
+inchangée : correction produit v52 (Codex), puis relance en sortie neuve —
+elle doit alors passer le garde et finir verte.
+
 ## Limites et décisions qui conditionnent la suite
 
 - Baseline de qualification :199/review28 ; review96 du lot201 reste bloquée,
