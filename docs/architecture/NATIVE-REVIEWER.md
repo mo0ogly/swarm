@@ -1303,3 +1303,38 @@ Voir `tools/verification/recipes/paea-current-managed-git-publication.json` et
 `tests/paea_historical_publication_test.py` pour le témoin cumulatif inerte,
 les corruptions/refus et les restaurations. Cela n'atteste pas un acteur humain,
 une autorisation PAEA courante ou un effet Git protégé.
+
+## Fraîcheur des entrées locales et renouvellement explicite (Gi.eth)
+
+Le cadre privé de candidat natif v2 conserve la sélection des fichiers réguliers
+présents dans le workspace avant le lancement des contrôles, y compris ceux que
+la politique n'a pas déclarés. Leurs empreintes rejoignent les artefacts et la
+source native ; les lecteurs de revue/publication relisent cette sélection et
+rapprochent la source de l'original. Une modification, absence ou lecture refusée
+bloque la réutilisation ; une erreur IO ne devient pas un succès vide.
+
+Les fichiers générés ensuite par les contrôles sont des sorties, pas des entrées
+initiales. Les liens suivis gardent leur contrat de cible littérale ; un lien non
+suivi présent à l'admission refuse. Métadonnées Git et IPC ne sont pas un contenu
+régulier inventorié. Ce garde ne constitue ni confinement OS, ni inventaire des
+programmes, bibliothèques, environnement ou autres dépendances externes. Il ne
+fournit pas automatiquement le contenu privé au reviewer : une empreinte seule
+ne suffit pas à juger un critère dont l'original manque.
+
+`swarm-rust task review-refresh WORK --root ROOT --input FILE --json` utilise
+l'enveloppe native `schema_version:1`, `event_id`, `expected_revision`, `task_id`.
+Sur tâche gérée soumise et inactive, il vérifie les vrais originaux d'un avis
+favorable puis un changement d'entrée réellement observé (ou l'absence du lien
+sur un ancien cadre v1). Un avis toujours applicable, une mauvaise révision, un
+job actif ou une lecture incertaine refuse. Il archive l'avis dans
+`previous_reviews`, retire les contrôles/gate courants et enregistre un événement
+`task.review-refresh` atomiquement ; les reçus privés/publics, tentatives, appels
+et dépenses antérieurs demeurent. Rejeu exact sans nouvel appel ni remise de
+compteur. La suite explicite est `task validate` → `task review` → `task publish`,
+avec nouveaux contrôles et nouvel avis applicables ; le renouvellement n'accepte
+rien et ne transforme pas un contrôle échoué en succès. Les cadres historiques
+ne sont pas réécrits pour leur attribuer un inventaire qu'ils n'avaient pas.
+Cette commande CLI n'ajoute pas de bouton UX ou de parcours HTTP de mutation.
+
+Recette maintenue : `tools/verification/recipes/gieth-review-refresh.json` ; suivi,
+preuves et limites : [cadrage et résultats Gi.eth](../plans/actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md).

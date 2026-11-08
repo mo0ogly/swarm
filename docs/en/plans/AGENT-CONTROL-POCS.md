@@ -4,7 +4,9 @@ Real-model qualification requested on 8 November 2026:
 [actual Codex under unchanged native profile](../../plans/actions-confiance/REAL-MODEL-TOOL-QUALIFICATION.md#english-handoff).
 **Not qualified**: four failures retained; actual CLI reaches a Tokio UnixStream
 refusal before any model/tool execution. An unchanged target is not a PASS.
-Alternative tool-enabled GLM harness awaits explicit authorization.
+Fabrice chose Codex only; GLM was not used. Instrumented replay confirms the
+startup refusal. Resume requires a compatible Codex integration with unchanged
+protections and a genuine successful model/tool control first.
 
 Native qualification authorized on 8 November 2026:
 [actual worker and Python child tool](../../plans/actions-confiance/NATIVE-AGENT-TOOL-QUALIFICATION.md#english-handoff).
@@ -1671,7 +1673,8 @@ and R2. A safe V2 variant resumes through publication/replay; dangerous V2 remai
 refused. gieth-review-refresh and gieth-legacy-refresh recipes PASS, retained proofs
 verified; inert reviewers do not establish an independent security audit. Normal
 profile, active binary identity and actual FR/EN Version dialog verified. Escape
-focus restoration remains open; no universal external dependency inventory claimed.
+focus restoration was open in witness 347; fixed and verified in FR/EN and both themes
+in local version 348 (GI-UI-1, see report). No universal external dependency inventory claimed.
 [Sources, results, evidence, unknowns and retrospective (FR)](../../plans/actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md).
 
 

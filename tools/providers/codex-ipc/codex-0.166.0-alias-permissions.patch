@@ -1,0 +1,31 @@
+--- a/codex-rs/arg0/src/lib.rs
++++ b/codex-rs/arg0/src/lib.rs
+@@ -349,13 +349,24 @@
+     let temp_root = codex_home
+         .join("tmp")
+         .join(format!("arg0-{}", std::env::consts::OS));
++    #[cfg(not(unix))]
+     std::fs::create_dir_all(&temp_root)?;
+     #[cfg(unix)]
+     {
+-        use std::os::unix::fs::PermissionsExt;
+-
+-        // Ensure only the current user can access the temp directory.
+-        std::fs::set_permissions(&temp_root, std::fs::Permissions::from_mode(0o700))?;
++        use std::os::unix::fs::{DirBuilderExt, PermissionsExt};
++
++        // Establish the required mode at creation, including new ancestors.
++        // This needs no chmod capability when the new directory is already safe.
++        std::fs::DirBuilder::new().recursive(true).mode(0o700).create(&temp_root)?;
++
++        // Keep the existing exact private-directory mode. A correctly created
++        // 0700 directory needs no metadata mutation; confinement can deny chmod
++        // without weakening its mode. An unsafe mode still requires the same
++        // successful correction as upstream, otherwise setup refuses.
++        let current_mode = std::fs::metadata(&temp_root)?.permissions().mode() & 0o7777;
++        if current_mode != 0o700 {
++            std::fs::set_permissions(&temp_root, std::fs::Permissions::from_mode(0o700))?;
++        }
+     }
+ 
+     // Best-effort cleanup of stale per-session dirs. Ignore failures so startup proceeds.

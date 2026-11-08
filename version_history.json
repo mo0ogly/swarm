@@ -7,6 +7,18 @@
   },
   "items": [
    {
+    "fr": "Indicateurs : valeurs affichées dans des badges colorés selon leur tonalité, avec les paires de couleurs partagées des thèmes clair et sombre ; libellés et valeurs conservés.",
+    "en": "Metrics: values displayed in badges colored by their tone, using the shared light and dark theme color pairs; labels and values preserved."
+   },
+   {
+    "fr": "Dialogue Version : Échap ferme uniquement le dialogue modal et rend le focus au bouton Version resté visible. Le menu de navigation conserve sa propre action Échap une fois le dialogue fermé.",
+    "en": "Version dialog: Escape closes only the modal dialog and returns focus to the still-visible Version button. Navigation retains its own Escape action after the dialog closes."
+   },
+   {
+    "fr": "Candidats natifs : les fichiers réguliers présents avant les contrôles, y compris non déclarés, sont liés aux preuves et revérifiés avant revue et publication. Un changement refuse l’ancien avis ; task review-refresh conserve cet avis et la consommation pour exiger de nouveaux contrôles et une nouvelle revue. Portée : copie candidate, sans inventaire universel des dépendances externes.",
+    "en": "Native candidates: regular files present before controls, including undeclared files, are bound to evidence and rechecked before review and publication. A change rejects the old opinion; task review-refresh preserves that opinion and consumption while requiring new controls and a new review. Scope: candidate copy, without a universal external dependency inventory."
+   },
+   {
     "fr": "Vérification Bell-LaPadula : recette agrégée publique `blp-aggregate-public` — une seule commande repasse les six recettes permanentes publiques (inventaire, check, admission, dialogue-reader, transport, object-attribute UI) sur un candidat qualifié unique, empreinte réassertée par chaque enfant, preuves enfant indépendamment revérifiables ; recettes à helper et cargo hors agrégat.",
     "en": "Bell-LaPadula verification: public aggregated recipe `blp-aggregate-public` — a single command re-runs the six public permanent recipes (inventory, check, admission, dialogue-reader, transport, object-attribute UI) on one qualified candidate, fingerprint re-asserted by each child, child evidence independently re-verifiable; helper and cargo recipes stay outside the aggregate."
    },

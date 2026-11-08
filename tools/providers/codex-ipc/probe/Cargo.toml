@@ -1,0 +1,13 @@
+[package]
+name = "swarm-codex-ipc-probe"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+tokio = { version = "=1.52.3", features = ["rt", "signal", "process", "net"] }
+mio = "=1.2.0"
+libc = "=0.2.186"
+swarm-biba-linux = { path = "../../../../rust/crates/swarm-biba-linux" }

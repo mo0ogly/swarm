@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "trust-action-path-cli",
+  "inputs": [
+    "tests/trust_action_path.py",
+    "tests/rust_trust_biba.py",
+    "tests/rust_agent_model_route.py",
+    "tests/fixture_area.py",
+    "tests/rust_native_http_cli.py",
+    "tools/verification/recipe.py",
+    "bin/swarm",
+    "deploy/local-build.json",
+    "rust/crates/swarm-engine/tests/trust_biba.rs",
+    "rust/crates/swarm-cli/src/trust.rs",
+    "rust/crates/swarm-engine/src/trust/operations.rs",
+    "rust/crates/swarm-engine/src/biba.rs",
+    "rust/crates/swarm-engine/config/engine-settings.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "installed-trust-r1-target-and-recovery",
+      "command": [
+        "python3", "tests/trust_action_path.py",
+        "--binary", "{root}/bin/swarm",
+        "--build-record", "{root}/deploy/local-build.json"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS forged-forged-approval-refused",
+        "PASS quoted-forged-approval-refused",
+        "PASS claims-forged-approval-refused",
+        "PASS forged-public-reopened-effect",
+        "PASS quoted-public-reopened-effect",
+        "PASS claims-public-reopened-effect",
+        "PASS frozen-binary-unchanged",
+        "TRUST_ACTION_PATH_PASS 3 R1 cases; public CLI synthetic effect"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

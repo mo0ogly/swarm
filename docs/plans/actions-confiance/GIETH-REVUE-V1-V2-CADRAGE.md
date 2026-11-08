@@ -1,12 +1,13 @@
 # Gi.eth, lot 14 — applicabilité d'une revue après changement effectif
 
-**État courant : GI-T1/GI-T2 réalisés, reproduction positive du défaut de portée
-des preuves en fixture. V2 accepté avec R1 inchangé, configuration effective non
-déclarée modifiée et 11 entrées suivies identiques. Recette en FAIL ; aucun
-correctif moteur. Résultats et limites en fin de note. Le cadrage initial et les
-deux incidents de méthode ci-dessous restent historiques.**
+**État courant : GI-T1 à GI-T4 réalisés dans la portée bornée ci-dessous.
+Défaut reproduit avant correction ; V2/R1 refusé après correction ; reprise sur
+variante V2 sûre avec nouveaux contrôles et R2, puis publication/rejeu vérifiés.
+Correction locale active v0.1.1-dev.347. Pas d’audit de sécurité indépendant ni de
+fermeture universelle des dépendances. RETEX et correction du focus GI-UI-1 en fin de note.
+Les sections de cadrage et incidents antérieurs restent historiques.**
 
-Analyse du 8 novembre 2026, Codex seul, méthode replan. **Cadrage uniquement :
+Cadrage initial du 8 novembre 2026, Codex seul, méthode replan. **À cette étape seulement :
 aucun développement, test, build, recette, appel fournisseur, service ou mission
 exécuté.** Les commandes utilisées servent à lire les sources et le suivi ; les
 contrôles documentaires finaux ne sont pas une recette comportementale.
@@ -393,3 +394,217 @@ différence ; les preuves du binaire restent donc dans leur portée. Les notes
 préexistantes et l'étude TechOnlineNews sont préservées, sans appropriation de
 leurs résultats. Le rapport final et ses empreintes de clôture sont aussi copiés
 à côté de l'archive ; leur écriture n'est pas une nouvelle exécution.
+
+## GI-T3/GI-T4 — plan autorisé et frontière de correction
+
+Autorisation suivante de Fabrice : correction, refus V2/R1, R2 et reprise,
+docs FR/EN, installation locale et RETEX. Base `aaf1a7b8…`, Codex seul,
+APEX/replan ; originaux GI-T1/T2 inchangés. Critères : GI-F1 lier les fichiers
+réguliers présents dans le workspace avant contrôles, même non déclarés ; GI-F2
+refuser un R1 dont ces entrées ont changé ; GI-F3 renouvellement public explicite,
+histoire et consommation conservées ; GI-F4 nouveaux contrôles et R2 applicables,
+publication/rejeu ; GI-F5 profil livré, version/notes FR/EN, installation et RETEX.
+
+Deux options examinées : confinement des lectures à une fermeture déclarée, ou
+inventaire conservateur des entrées de copie candidate réutilisant source/reçus.
+La première exige un contrat de lecture système/interpréteur/sorties absent et
+ne constitue pas un petit correctif. Retenue : inventorier les fichiers réguliers
+présents avant les contrôles, enregistrer la sélection initiale dans la préimage
+privée et le reçu, relire les mêmes octets jusqu'à publication. Les fichiers
+créés ensuite par les contrôles restent des sorties, pas des entrées initiales.
+Aucune exception par mission, nom de configuration, date ou erreur. Pas de lecture
+automatique du contenu privé dans le prompt ; empreintes et contrôles restent
+distincts des originaux nécessaires au jugement. Dépendances hors workspace,
+environnement et entrées générées pendant un contrôle restent une frontière
+explicitement non hermétique, sans garantie universelle inventée.
+
+Ordre : nouvelle régression attendue et cas invalides → inventaire/préimage/source
+et garde de publication → opération publique de renouvellement sur changement
+prouvé (archive R1, nouveaux contrôles/R2, sans remise de budget) → recette complète
+→ revue de source/erreurs/docs → build normal/livraison locale → preuve réelle,
+conservation et RETEX. Le V2 dangereux initial (B autorisé malgré contrôle qui
+exige son refus) ne doit pas obtenir de R2 favorable ; la reprise favorable sera
+également exercée sur un changement de configuration conservant le critère de
+sécurité, avec ses nouveaux contrôles. Aucun succès fabriqué sur contrôle échoué.
+
+
+## GI-T3/GI-T4 — résultat vérifié et installation
+
+Cause générale corrigée : la sélection d’entrées provenait des seules déclarations.
+`input_inventory.rs` sélectionne les fichiers réguliers initiaux de la copie candidate,
+y compris non déclarés ; la préimage privée d’admission schéma 2 retient cette sélection.
+`managed_execution.rs` et `review_candidate.rs` relisent ces entrées avant revue/publication.
+Ce schéma privé est distinct du checkpoint candidat. Une ancienne préimage schéma 1
+ne fabrique pas de liaison rétroactive. Fichier modifié, absent ou illisible : refus
+avec cause, sans transformer une erreur d’observation en succès vide.
+
+`task review-refresh` est l’opération CLI publique de reprise : requête stricte,
+révision attendue, tâche soumise sans travail natif actif, R1/contrôles authentiques,
+changement observé ou ancien schéma sans liaison. Elle archive R1 dans
+`previous_reviews`, invalide les preuves courantes et exige nouveaux contrôles/revue.
+Historique, jobs, tentatives, appels et consommation sont conservés. Rejeu sans
+nouvel appel ; transaction annulée sans fausse revendication d’état appliqué.
+Aucun nouveau plafond opérateur, droit de fournisseur, route HTTP ou bouton ajouté.
+Contrat FR/EN : [FR](../../architecture/NATIVE-REVIEWER.md),
+[EN](../../en/NATIVE-REVIEWER.md). Implémentation et recettes restent distinctes
+comme preuves : les programmes de reviewer sont inertes, pas un jugement spécialisé.
+
+Preuves locales `.cache/gieth-fix-20261108/` :
+
+| Preuve | Résultat et portée |
+| --- | --- |
+| `unit-final.stdout` | Test nommé d’inventaire : entrées non déclarées, sorties générées, changement/restauration, absence, symlink et chemin hors copie ; PASS |
+| `run-03`, `flow-03/result.json` | PASS, 176,55 s, sources déclarées stables ; recette revérifiée VERIFIED/PASS |
+| `flow-03` | Témoin V1 réellement publié ; 11 entrées suivies inchangées ; V2 dangereux autorise B (exit42), publication sous R1 refusée ; R1/état/consommation conservés |
+| `flow-03` | Variante V2 sûre différente (autorise C, refuse B) encore refusée sous R1 ; refresh explicite/rejeu, nouveaux contrôles, R2 distinct, publication/rejeu et réouverture acceptés |
+| `flow-03` / `refresh-sdk` | Test SDK ciblé d’annulation SQL : erreur originale et absence de faux WorkRecorded ; binaire de test séparé de la livraison |
+| `api-refusals-maintained/result.json` | Témoin de rejeu valide puis mauvaise révision et champ inconnu : causes typées, aucune mutation ni consommation |
+| `legacy-run`, `legacy-flow` | PASS, 66,03 s, VERIFIED/PASS ; R1 produit par l’ancien vrai binaire, refus sous nouveau contrat, refresh puis nouveaux contrôles, originaux et consommation conservés |
+| `rustdoc.stdout/stderr` | Documentation moteur compilée ; avertissement préexistant de lien privé dans memory_usage_decision.rs, aucune assertion de compilation sans avertissement |
+
+Le V2 dangereux n’est pas accepté sous R2 : ses contrôles échouent. La reprise
+favorable concerne explicitement la variante sûre, avec nouvelle preuve applicable.
+Le run03 conserve son snapshot propre : l’ajout ultérieur des cas API et legacy
+est vérifié séparément, sans prétendre à un nouveau parcours complet sur ces octets.
+Le SDK rollback précède le dernier renforcement lexical de l’inventaire ; le test
+unitaire final et la recette publique utilisent le contrat final concerné.
+
+Livraison normale par `swarm.sh build`, puis `restart --prepared-build` :
+**v0.1.1-dev.347**, SHA-256
+`3512fdaed47a9f111959de2cfd8186276d1d32d073da510e0dd8e86913b0735f`.
+Qualification `.cache/local-delivery/rust-t6j1_qkl/build/profile/result.json` :
+779 entrées effectives archivées, profil sans feature de fixture et artefacts core
+non test. Identité du processus relue, cinq Works/revisions conservés ; aucune
+base de mission active utilisée comme fixture. Le dialogue protégé réel, après
+connexion par Fabrice, affiche version, note GI FR/EN, commit de base exact
+`9d64cb33d09a0285abae8975aa6fcdd2268e8e4d` et modifications non commitées.
+Aucun commit ni push par ce travail. Notes compilées concordantes au registre.
+
+## RETEX — cause, incidents de méthode et suites
+
+- Cause : un inventaire déclaratif de candidat ne suffit pas à prouver la fraîcheur
+  d’une configuration réellement consommée. Prévention bornée : retenir la sélection
+  initiale et ses octets jusqu’au dernier consommateur, puis renouveler explicitement
+  les preuves. Les contextes natifs n’ont pas été réécrits ; c’est le moteur livré
+  qui applique cette garde et la CLI qui expose la reprise.
+- Run01 FAIL conservé (167,55 s) : le moteur refusait déjà V2, mais un helper hérité
+  exigeait zéro appel malgré R1 existant. Corrigé en conservation des appels/avis ;
+  aucune remise à zéro pour réussir. Run02 FAIL (1,04 s) : chemin temporaire de
+  candidat déplacé par le build ; aucun démarrage de fixture. Reprise avec binaire
+  gelé adressé par empreinte. Les FAIL originaux restent revérifiables.
+- Les témoins précèdent chaque défaut : V1 publié, refresh frais refusé, entrée
+  restaurée après absence, rejeu valide avant requêtes invalides, vrai R1 historique.
+  Les recettes existantes de workers/reviewer/publication sont réutilisées.
+- Intervention humaine : autorisations successives et connexion au navigateur par
+  Fabrice ; implémentation/diagnostic/vérifications par Codex seul. Aucun appel
+  fournisseur payant ni audit indépendant. Pas d’acceptation globale inférée.
+- Limites ouvertes, propriétaire contrat natif : dépendances externes, environnement,
+  programmes/interpréteurs, métadonnées Git, IPC et entrées créées pendant contrôles.
+  Cette correction n’est pas hermétique ; reprendre avec un contrat explicite de
+  fermeture des lectures et une fixture discriminante avant toute garantie plus large.
+- GI-UI-1, propriétaire interface : Échap ferme Version, mais le focus observé revient
+  au document au lieu du bouton. `web/runtime-health.js` tente déjà opener.focus ;
+  cause non établie (visibilité de navigation à vérifier). Notes FR/EN, lien et version
+  restent vérifiés ; conformité complète de focus non acquise. Hors modification
+  moteur de cet incrément ; reprise : témoin navigateur isolé navigation ouverte /
+  fermée, diagnostic du cycle close, correction commune et régression clavier.
+- Amélioration de méthode : vérifier le chemin gelé après le producteur de build et
+  traiter les compteurs comme historique à préserver, non comme état frais implicite.
+  Capitalisation dans le helper maintenu, les recettes et cette note, sans réécrire
+  l’archive historique ni attribuer une supervision autonome aux instructions.
+
+Conservation : index local `.cache/gieth-fix-20261108/LOCATION.json`, archive USB
+`/media/fpizzi/Lexar/swarm-evidence/gieth-fix-20261108/` avec empreinte et commande
+restauration dans cet index. Voir aussi l’archive GI-T1/T2 ci-dessus. La conservation
+ne constitue aucune nouvelle exécution ni permission de rejouer les Roots historiques.
+
+
+### Conservation finale relue
+
+Archive GI-T3/GI-T4 : `/media/fpizzi/Lexar/swarm-evidence/gieth-fix-20261108/gieth-fix-20261108-evidence-01.tar.gz` ; 67359525 octets, SHA-256
+`b612a9b90c8f7cb9229a7f63d0b9247176b4b603addcdf6c2068c5e853a2d860`. 6010 fichiers/liens comparés aux originaux, copie USB relue intégralement.
+Quatre dossiers de recette restaurés en répertoire Unix neuf et revérifiés :
+run01/run02 VERIFIED/FAIL historiques ; run03 et legacy-run VERIFIED/PASS.
+Aucun original supprimé. Le rapport final et les résultats de restauration sont
+copiés à côté de l’archive (postérieurs à sa constitution), avec empreintes propres.
+`git diff --check` et liens locaux ajoutés contrôlés ; aucune modification de
+source compilée depuis le candidat installé. GI-F1 à GI-F5 vérifiés dans la portée
+décrite ; GI-UI-1 et fermeture universelle des dépendances restent explicitement ouverts.
+
+
+## GI-UI-1 — reprise autorisée, focus Version
+
+Demande suivante : corriger le retour du focus Échap, parcours réel FR/EN, preuves,
+docs et installation. Méthodes replan/verify-fix, Codex seul. Témoin livré 347 :
+navigation seule + Échap ferme le menu et focalise nav-toggle ; dialogue Version
++ Échap ferme aussi le menu, cache version-open (zéro rectangle), focus BODY.
+Cause lue : gestionnaire document keydown de web/swarm-shell.js ne vérifie pas
+le dialogue modal, tandis que runtime-health.js tente déjà le retour à l’ouvreur.
+Options : rouvrir la navigation lors du retour du focus, ou empêcher le gestionnaire
+arrière-plan de consommer Échap sous modal. Retenue : seconde, commune aux dialogues
+modaux, sans restaurer artificiellement des préférences de navigation. Les événements
+déjà consommés restent également ignorés. Les dialogues non modaux ne monopolisent
+pas ce contrat. Aucun moteur, droit, délai, budget ni traduction nouvelle.
+
+Critères : témoin sans modal conservé ; modal actif ferme seul, menu reste visible,
+retour version-open ; seconde touche Échap ferme menu et revient nav-toggle ;
+réouverture et bouton Fermer ; FR/EN, thèmes clair/sombre, largeur réelle du navigateur ;
+notes/version/commit/modifié du nouveau binaire. Régression maintenue avec double DOM
+explicitement distinct du navigateur réel, FAIL avant correction conservé.
+Preuves nouvelles : .cache/version-focus-20261108 ; historique GI intact.
+
+
+### GI-UI-1 — correction et vérification locale
+
+Gestionnaire commun corrigé : un modal natif (`dialog:modal`) garde Échap ;
+un événement déjà consommé ne ferme pas la navigation arrière-plan. Le dialogue
+Version conserve son gestionnaire close et le bouton reste visible pour son retour
+de focus. Aucun nom de dialogue ni langue codé en exception.
+
+Preuves `.cache/version-focus-20261108` : recette version-focus-escape, FAIL avant
+correction (témoin navigation seule PASS), puis cinq assertions nommées PASS ;
+les deux dossiers revérifiés VERIFIED, sans watchdog. Ce double DOM exécute le vrai
+gestionnaire mais n’établit pas le comportement natif du navigateur. L’ancienne
+recette version_ui ne suffit pas : sa surface de fixture ne charge pas le gestionnaire
+de navigation et ne cache pas l’ouvreur ; elle ne couvrait donc pas cette cause.
+
+Le parcours CUA réel, session authentifiée par Fabrice précédemment, vérifie FR/EN
+× clair/sombre à la largeur réelle 609 px : titre focalisé à l’ouverture ; Échap
+ferme Version, navigation toujours ouverte, version-open visible et focalisé.
+Réouverture par Entrée + bouton Fermer vérifiées FR/EN ; seconde touche Échap ferme
+la navigation et rend le focus à nav-toggle. Retour final en français/clair.
+Aucune erreur ni avertissement dans la console capturée. Les réponses réseau
+échouées ne sont pas inventoriées par ce canal ; sondes statiques séparées refusées
+401/403, sans contournement d’authentification. Pas de comparaison indépendante des
+octets HTTP protégés revendiquée ; archive des ressources compilées vérifiée et
+comportement du vrai navigateur constaté. Pas de qualification visuelle à toutes
+les largeurs, ni d’acceptation indépendante déduite.
+
+Installation par build puis restart --prepared-build : **v0.1.1-dev.348**, SHA-256
+`edea3b37f360d7adad75d6736c124aaa67847e0bfb41647ff3bd6c035ef886be`.
+Profil normal sans feature de fixture, 779 entrées effectives archivées ;
+notes FR/EN visibles, commit de base `1fec07d4874cc469c5a3905abb9bb64f855b2d26`,
+modifications non commitées divulguées. Identité réelle relue via swarm.sh status.
+Aucune entrée compilée modifiée depuis le candidat sélectionné. Des commits
+extérieurs documentaires sont apparus pendant le travail ; aucun commit/push
+créé ici et aucune appropriation de leurs changements.
+
+RETEX complémentaire : l’ouvreur connecté n’est pas nécessairement visible ; la
+responsabilité des événements modaux doit être conservée jusqu’au consommateur
+arrière-plan. Prévention dans le gestionnaire commun et la régression maintenue,
+transmission dans les docs FR/EN et notes embarquées reconstruites. Incidents de
+méthode conservés : liaison CUA reprise après reset ; argument recette corrigé
+avant exécution ; tentatives anglaises sous sous-menu replié refusées, puis
+expansion réelle et nouveau témoin ; changement de langue suivi trop vite d’un
+clic menu corrigé après relecture de son état. Aucun échec masqué en PASS.
+GI-UI-1 clos pour le retour de focus demandé ; les limites externes du contrat GI
+restent inchangées. Conservation/empreinte/restauration : index local
+`.cache/version-focus-20261108/LOCATION.json` et archive Lexar dédiée.
+
+
+Conservation GI-UI-1 terminée : archive `/media/fpizzi/Lexar/swarm-evidence/version-focus-20261108/version-focus-20261108-evidence-01.tar.gz`,
+28103147 octets, SHA-256 `41dda0ec0c25a164e615e2eb0ef6768e97eb5960a9f071122b97538d8c808623`.
+55 fichiers relus contre leurs sources, copie USB relue intégralement ; deux
+dossiers de recette restaurés, VERIFIED/FAIL puis VERIFIED/PASS. Aucun original
+supprimé. Rapport final postérieur à l’archive copié séparément avec empreinte.
+`git diff --check` ne signale aucune erreur.

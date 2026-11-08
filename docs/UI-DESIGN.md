@@ -58,6 +58,12 @@ Une fenêtre d’information longue commence au titre :
 `SwarmShell.focusWindowStart(dialog)` place un focus programmatique sur le titre
 nommé et remet le défilement au début. Les formulaires conservent le focus natif
 sur leur saisie ; Échap et les fermetures rendent le focus au déclencheur.
+Le gestionnaire global de navigation ignore Échap tant qu’un dialogue modal est
+actif (sélecteur natif `dialog:modal`) ou que l’événement est déjà consommé.
+Ainsi le menu portant le déclencheur reste visible pendant la fermeture du dialogue.
+Une seconde touche Échap, sans modal, peut fermer le menu et focaliser son bouton.
+Régression de responsabilité : `version-focus-escape.json` ; elle utilise un double
+DOM et exige une vérification navigateur réelle du retour de focus.
 
 Recette : `node tests/window_identity_ui.cjs CHEMIN_BINAIRE DOSSIER_PREUVES`, puis
 la recette design existante pour les états, formulaires et parcours complets.
@@ -276,3 +282,19 @@ ni version active ne constitue une signature ou une autorisation.
 Le cockpit natif de lecture du24octobre et ses limites sont décrits dans
 [Rust — parcours UX](architecture/RUST-MIGRATION.md#cockpit-natif--parcours-ux-du24octobre2026)
 et [en anglais](en/RUST-MIGRATION.md#native-cockpit--ux-journey24october2026).
+
+
+### Badges des indicateurs
+
+Les valeurs KPI portent un badge compact coloré, sans colorer toute la carte :
+information en bleu/cyan (`info`), validation en vert (`success`), décision ou
+examen en ambre (`attention`), alerte en rouge (`alert`). Les badges sans tonalité
+restent neutres. Utiliser les paires fond/encre sémantiques existantes dans les
+thèmes clair et sombre, pour les métriques d’en-tête et les KPI de mission.
+Conserver les libellés et les valeurs exacts, y compris « — » quand aucune donnée
+n’est disponible ; la couleur ne constitue ni un état moteur ni une validation.
+
+Vérification visuelle : ouvrir le cockpit, comparer les quatre badges aux libellés,
+basculer clair/sombre et FR/EN, vérifier contraste et absence de débordement.
+Sans mission, conserver les tirets ; sur une mission existante, conserver les
+valeurs du producteur. La coloration ne nécessite aucun lancement de tâche.

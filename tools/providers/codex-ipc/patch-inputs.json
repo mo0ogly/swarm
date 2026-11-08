@@ -1,0 +1,20 @@
+{
+  "tokio_version": "1.52.3",
+  "crate_sha256": "8fc7f01b389ac15039e4dc9531aa973a135d7a4135281b12d7c1bc79fd57fffe",
+  "source_files": {
+    "src/signal/unix.rs": {
+      "before": "a505ee54eb7b357546c4b9a2f6a2048a668ce7f773263f948b05a0df97cb9d4b",
+      "after": "13ceb16635cdf80ebf53b6b7e963d9d7f3aa5e3de7f7a86e5880f2cdaa8f0d1f"
+    },
+    "src/runtime/signal/mod.rs": {
+      "before": "7cae37626477a94dfe683df137b6bc669ef023b626c9e7e2c7af850769d9e5a2",
+      "after": "f2105c65b2165780b4e684287617234a1e37cee091acaefbb4263ae65e0ebabd"
+    },
+    "src/runtime/io/driver/signal.rs": {
+      "before": "2e53479e68f48bf39c8cce92f0d12422bf4c68d931e741aae8daed854cd3f6ac",
+      "after": "6816341fb8eae820d09c02aa1dfaaa59fd5597d3baa3252612c2e4b269dd9235"
+    }
+  },
+  "native_profile_changed": false,
+  "scope": "Linux source-built Codex candidate; no upstream release claim"
+}

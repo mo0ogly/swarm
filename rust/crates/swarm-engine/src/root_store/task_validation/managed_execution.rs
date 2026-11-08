@@ -63,6 +63,7 @@ impl Session {
             &self.witness,
             &self.data.repository_sha256,
             &self.data.root_instance,
+            Some(&self.data.artifacts),
         )? != self.data
         {
             return Err(E::Refused("task-validation-managed-inputs-changed"));
@@ -82,7 +83,8 @@ impl Session {
         finished(result, fresh.close())
     }
 }
-/// Private create-only admission preimage. Schema1 is a protocol version, not
+/// Private create-only admission preimage. Schema2 binds initial regular files;
+/// schema1 remains historical/unbound and cannot grant fresh execution. This is not
 /// operator policy. The actual SQL origin binds the candidate/whole cohort hash.
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -90,6 +92,8 @@ struct Frame {
     schema_version: i64,
     job_id: String,
     candidate: ManagedCandidate,
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    input_artifacts: Option<BTreeMap<String,String>>,
 }
 /// Plain actual producer/settings observations after checked lock release.
 struct Inputs {
@@ -198,7 +202,9 @@ fn relative(root: &Path, path: &Path) -> Result<String, E> {
         .map(str::to_owned)
         .ok_or(E::Refused("task-validation-managed-artifact-outside-root"))
 }
-/// Observe actual held workspace inputs/dirs with existing checked artifact IO.
+/// Observe initial regular workspace files and declared inputs/directories.
+/// Reobservation selects the retained initial set so generated outputs remain
+/// separate. Missing/changed inputs refuse; original source binding is caller-owned.
 /// Every input must first resolve inside the candidate project; Root-relative
 /// remapping preserves that real file for the existing gate/evidence consumers.
 /// No copied artifact, hidden size cap, Git, permission or Root mutation is added.
@@ -207,6 +213,7 @@ fn capture(
     witness: &CandidateWitness,
     repository_sha256: &str,
     root_instance: &crate::root_store::RootInstanceIdentity,
+    initial: Option<&BTreeMap<String,String>>,
 ) -> Result<Captured, E> {
     witness.verify_retained_identities().map_err(launch)?;
     let candidate = witness.record();
@@ -221,7 +228,15 @@ fn capture(
         .control_plan
         .as_ref()
         .ok_or(E::Refused("task-validation-managed-plan-required"))?;
-    let mut artifacts = BTreeMap::new();
+    // Entry names include the repository project prefix. Resolve against the
+    // actual retained repository, not a reconstructed caller path.
+    let repository=crate::local_directory(&witness.repository_path(),"").map_err(E::Path)?;
+    let links=candidate.review_entries().filter(|(_,mode,_)| *mode=="120000")
+        .map(|(name,_,_)|repository.join(name)).collect();
+    let mut artifacts = match initial {
+        Some(expected)=>super::input_inventory::observe(&base,&workspace,expected)?,
+        None=>super::input_inventory::collect(&base,&workspace,&links)?,
+    };
     let mut directories = BTreeMap::new();
     for slot in &plan.slots {
         let directory = crate::local_directory(&witness.workspace_path(), &slot.control.dir)
@@ -268,6 +283,7 @@ fn acquire(
     input: Inputs,
     create: bool,
     expected: Option<&ManagedCandidate>,
+    initial: Option<&BTreeMap<String,String>>,
 ) -> Result<Session, E> {
     let observation = input.observation;
     let repository_sha256 = super::digest(
@@ -316,6 +332,7 @@ fn acquire(
             &witness,
             &repository_sha256,
             &input.root_instance,
+            initial,
         )
     })();
     match observed {
@@ -333,7 +350,7 @@ pub(super) fn acquire_fresh(
     create: bool,
 ) -> Result<Option<Session>, E> {
     inputs(store, work, request, None)?
-        .map(|i| acquire(store, i, create, None))
+        .map(|i| acquire(store, i, create, None, None))
         .transpose()
 }
 /// Inspect only the exact existing candidate of a real registered job. No stage
@@ -351,7 +368,8 @@ pub(super) fn acquire_job(
     };
     let input = inputs(store, &job.work_id, &request, Some(job))?
         .ok_or(E::Refused("task-validation-managed-repository-required"))?;
-    acquire(store, input, false, Some(candidate))
+    let initial=initial_artifacts(store,job,candidate)?;
+    acquire(store, input, false, Some(candidate),Some(&initial))
 }
 /// Pin an existing completed control job for an internally selected current
 /// running reviewer or readonly completed opinion. Full submission equality and immutable checkpoint guards
@@ -360,7 +378,8 @@ pub(super) fn acquire_for_review(store:&RootStore,job:&store::Job,candidate:&Man
     let request=Request{schema_version:1,event_id:job.event_id.clone(),expected_revision:job.work_revision,task_id:job.task_id.clone()};
     let input=inputs_using(store,&job.work_id,&request,Some(job),review)?
         .ok_or(E::Refused("task-validation-managed-repository-required"))?;
-    acquire(store,input,false,Some(candidate))
+    let initial=initial_artifacts(store,job,candidate)?;
+    acquire(store,input,false,Some(candidate),Some(&initial))
 }
 /// Persist one candidate preimage before SQL claim. A later failed claim can
 /// leave this immutable orphan; it grants nothing and never replaces an original.
@@ -369,9 +388,10 @@ pub(super) fn persist(store: &RootStore, id: &str, session: &Session) -> Result<
         store,
         &journal::name("candidate", id),
         &Frame {
-            schema_version: 1,
+            schema_version: 2,
             job_id: id.into(),
             candidate: session.data.candidate.clone(),
+            input_artifacts:Some(session.data.artifacts.clone()),
         },
     )
     .map(|_| ())
@@ -388,7 +408,7 @@ pub(super) fn for_helper(store: &RootStore, job: &store::Job) -> Result<Option<S
         return Ok(None);
     }
     let (frame, _): (Frame, String) = journal::read(store, &journal::name("candidate", &job.id))?;
-    if frame.schema_version != 1 || frame.job_id != job.id {
+    if frame.schema_version != 2 || frame.input_artifacts.is_none() || frame.job_id != job.id {
         return Err(E::Refused("task-validation-managed-frame-invalid"));
     }
     frame.candidate.verify_binding().map_err(launch)?;
@@ -397,6 +417,23 @@ pub(super) fn for_helper(store: &RootStore, job: &store::Job) -> Result<Option<S
         .verify_candidate_binding(Some(&binding))
         .map_err(launch)?;
     acquire_job(store, job, &frame.candidate).map(Some)
+}
+/// Read the initial file selection from the original native candidate frame.
+/// Legacy frames stay historical but cannot grant fresh review/publication.
+/// Origin/source consumers separately bind this preimage to the real SQL job.
+/// Missing, malformed or mismatched originals refuse without a fallback/write.
+fn initial_artifacts(store:&RootStore,job:&store::Job,candidate:&ManagedCandidate)->Result<BTreeMap<String,String>,E>{
+    retained_inputs(store,job,candidate)?.ok_or(E::Refused("managed-input-inventory-required"))
+}
+/// Read a verified frame's original selection, distinguishing historical absence
+/// from IO/codec failure. None permits explicit requalification only, not review.
+pub(super) fn retained_inputs(store:&RootStore,job:&store::Job,candidate:&ManagedCandidate)->Result<Option<BTreeMap<String,String>>,E>{
+    let (frame,_):(Frame,String)=journal::read(store,&journal::name("candidate",&job.id))?;
+    if !matches!(frame.schema_version,1|2) || frame.job_id!=job.id || frame.candidate!=*candidate
+        || (frame.schema_version==2)!=frame.input_artifacts.is_some() {
+        return Err(E::Refused("managed-input-inventory-required"));
+    }
+    Ok(frame.input_artifacts)
 }
 /// Compose current authoritative Root source using already observed physical
 /// candidate data; performs no Git and owns no descriptors. Current saved cohort
