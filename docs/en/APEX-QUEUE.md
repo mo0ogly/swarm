@@ -1,5 +1,39 @@
 # Swarm APEX project queue
 
+## Master plan — November 8, 2026 consolidation
+
+The existing chats form one project with a coordinating chat, bounded work cards,
+dependencies, owners, evidence and explicit completion gates. No new execution is
+authorized by organizing this queue. Existing plans and historical evidence remain
+canonical. Numbered titles are priority cues, not proof of physical sidebar sorting.
+
+See the [current French master queue](../plans/FILE-APEX.md),
+[bounded cards](REPRISES-PAR-LOTS.md), [retrospective index](RETEX-INDEX.md),
+and [memory recovery inventory](../plans/deepagents-integration/INDEX-REPRISE.md).
+
+Finish active handoffs first; reconcile existing work before authority/effect,
+memory/composition, end-to-end qualification and scoped retrospective cards.
+Blocked external prerequisites do not block independent analysis. Only one assigned
+shared-source writer at a time. PAEA development remains GLM-only. No automatic
+duplication, provider retry, installation or claim of independent acceptance.
+
+Fabrice explicitly deferred billing to the end for later: chat 99, monitoring
+PAUSED, no overnight assignment. Preserve its 950/1700 observation and SQLite
+failure. Cloud migration is deferred. Access administration is documented as
+T0–T9 done; do not restart it from an old partial report. Security/proofs still has
+SP-L03 partial and L04–L06 remaining in the inspected plan.
+
+Inventory covers 50 recent chats, pinned chats and local Codex archive results,
+not all historical unreturned chats. Two old chat histories cannot be read because
+their source rollout is missing; their progress stays unknown. The retirement
+chat belongs outside Swarm. After an initial tool refusal due to source access,
+the next inventory shows it assigned to the existing toulouse vente project.
+The coordinator granted no additional source access.
+
+Historical Go qualification364 and N4 handoff are received; no new bounded gap
+is demonstrated. Shared hunks and publication remain separate open integration
+work; do not restart the completed qualification.
+
 [Français](../plans/FILE-APEX.md) · [APEX method](../../.claude/skills/apex/SKILL.md)
 
 Updated October 24, 2026: eleven entries after waves 2 and 3; reconciled

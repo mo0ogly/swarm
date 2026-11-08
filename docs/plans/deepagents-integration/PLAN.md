@@ -1,5 +1,9 @@
 # Plan d’action Deep Agents pour la mémoire de Swarm
 
+## Reprise organisée — 8 novembre 2026
+
+[Index des incréments, résultats et suites dispersées](INDEX-REPRISE.md) · [Cartes MEM bornées](../REPRISES-PAR-LOTS.md) · [Plan directeur](../FILE-APEX.md). Les preuves et IDs historiques ci-dessous sont conservés. Cette organisation ne relance aucun travail et ne prouve pas la couverture Rust courante.
+
 Cadrage du 15 octobre 2026. Responsable : Codex, dans le checkout Swarm existant,
 sans délégation ni orchestration native ajoutée. Décisions produit : utilisateur.
 

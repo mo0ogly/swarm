@@ -1,0 +1,7 @@
+{
+  "archive": "/media/fpizzi/Lexar/swarm-evidence/research-sessions-20261108T210839781684Z/contexts-skill.tar.gz",
+  "sha256": "20bad846cd55fcc54f93fa00dcec1ddb35123b5073c17a80683458cf21e83751",
+  "readback_verified": true,
+  "originals_retained": true,
+  "restore": "Extraire dans un dossier distinct ; personal/ correspond aux skills locales, comparer avant restauration."
+}

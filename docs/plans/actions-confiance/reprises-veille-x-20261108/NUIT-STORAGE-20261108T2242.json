@@ -1,0 +1,29 @@
+{
+  "archive": "/media/fpizzi/Lexar/swarm-evidence/x-veille/nuit-20261108T2242-N6.tar.gz",
+  "sha256": "0ab68e60eb308ec0976eef41ef39c2532a23eec1d12e7fabb32c80a69398d9c9",
+  "readback_verified": true,
+  "originals_retained": true,
+  "members": [
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/BILAN-N6.md",
+      "sha256": "aee35b53a5d5a7afc8d33d22395ed1363064e5a732aa04f6e72cb30eef657fef"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/ARTICLE-N6-EN-BROUILLON.md",
+      "sha256": "901463ef8698d1bb95e28dde37c8d84a8ed77c732c177cfb24784fc3e20eb356"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/NUIT-QUEUE.json",
+      "sha256": "c501bc925be8913b40bf4596d29b2565db843da258e34709aea03c95f9503944"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/NUIT-ETAT-20261108T2242.json",
+      "sha256": "89a2db16ec7328f349f2c3484c900bcfb613821f992df18944c6847fcd39eec3"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/communication/x-swarm-20261107/SUIVI.md",
+      "sha256": "88b40619ae8e43adbfe1b10d901e2eb3d341152a51ce5b5a65a3c6974b15feac"
+    }
+  ],
+  "restore_command": "tar -xzf /media/fpizzi/Lexar/swarm-evidence/x-veille/nuit-20261108T2242-N6.tar.gz -C /path/to/empty-restore"
+}

@@ -1,0 +1,33 @@
+{
+  "archive": "/media/fpizzi/Lexar/swarm-evidence/x-veille/N6-consolide-20261108T225114Z.tar.gz",
+  "sha256": "38917956e9d44d89c66c449a35f176fb88aed6650cb7e4b014b75055ce22963f",
+  "readback_verified": true,
+  "originals_retained": true,
+  "members": [
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/BILAN-N6.md",
+      "sha256": "04c2da0ace0255ba0b93dbe3ce7c77a414217f07dfc50b4fdfcb33a45e8af422"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/ARTICLE-N6-EN-BROUILLON.md",
+      "sha256": "6f665eadc46b71d3fe28aa444013c88268287fa816cfbc63228db39a84157ac7"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/NUIT-QUEUE.json",
+      "sha256": "5a84e2d35b67f8a6646374cde7e4fa160e7904e6e6aac8b42796cadf00d1c697"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/02-revues-candidats/ANALYSE-N4-NUIT.md",
+      "sha256": "aadfe16f8317d4dc8c006f07ba6f535eaf9beea76f028586db987ad7d677dd11"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/03-resultats-inconnus/RAPPROCHEMENT-N5-COORDINATEUR.md",
+      "sha256": "c2a96d8d67b320734f08616ad7b5b4bd8c44354b867ba2ddd1b0380b906c46e5"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/communication/x-swarm-20261107/SUIVI.md",
+      "sha256": "ea9508bc268c5905b93aad09a32e3bf88b86cc7335ea8aacb3f6ecb57aa6fb44"
+    }
+  ],
+  "restore_command": "tar -xzf /media/fpizzi/Lexar/swarm-evidence/x-veille/N6-consolide-20261108T225114Z.tar.gz -C /path/to/empty-restore"
+}
